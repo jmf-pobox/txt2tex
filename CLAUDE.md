@@ -318,3 +318,4 @@ If starting fresh from `/Users/jfreeman/Coding/fuzz/txt2tex/sem/`:
 2. Test files are in parent directory `../`
 3. Set `TEXINPUTS=../tex//:` when compiling
 4. Reference this document for context
+- remember to use txt2pdf.sh to run the app.  Fix this script if it is not working.
