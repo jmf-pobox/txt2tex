@@ -79,12 +79,12 @@ class Lexer:
         # Whitespace (skip but track)
         if char in " \t":
             self._advance()
-            return None  # Skip whitespace in Phase 0
+            return None  # Skip whitespace
 
-        # Newline
+        # Newline (significant in Phase 1 for multi-line documents)
         if char == "\n":
             self._advance()
-            return None  # Skip newlines in Phase 0
+            return Token(TokenType.NEWLINE, "\n", start_line, start_column)
 
         # Multi-character operators
         if char == "=" and self._peek_char() == ">":
