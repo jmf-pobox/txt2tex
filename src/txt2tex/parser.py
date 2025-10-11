@@ -2,7 +2,20 @@
 
 from __future__ import annotations
 
-from txt2tex.ast_nodes import BinaryOp, Document, Expr, Identifier, UnaryOp
+from txt2tex.ast_nodes import (
+    BinaryOp,
+    Document,
+    DocumentItem,
+    EquivChain,
+    EquivStep,
+    Expr,
+    Identifier,
+    Part,
+    Section,
+    Solution,
+    TruthTable,
+    UnaryOp,
+)
 from txt2tex.tokens import Token, TokenType
 
 
@@ -17,9 +30,9 @@ class ParserError(Exception):
 
 class Parser:
     """
-    Recursive descent parser for Phase 0: simple propositional logic.
+    Recursive descent parser for Phase 0 + Phase 1 + Phase 2.
 
-    Grammar (with precedence from lowest to highest):
+    Phase 0 - Expression grammar (precedence from lowest to highest):
         expr     ::= iff
         iff      ::= implies ( '<=>' implies )*
         implies  ::= or ( '=>' or )*
@@ -27,6 +40,19 @@ class Parser:
         and      ::= unary ( 'and' unary )*
         unary    ::= 'not' unary | primary
         primary  ::= IDENTIFIER | '(' expr ')'
+
+    Phase 1 - Document structure:
+        document ::= document_item*
+        document_item ::= section | solution | part | truth_table | expr
+        section ::= '===' TEXT '===' document_item*
+        solution ::= '**' TEXT '**' document_item*
+        part ::= PART_LABEL document_item*
+        truth_table ::= 'TRUTH TABLE:' table_rows
+
+    Phase 2 - Equivalence chains:
+        equiv_chain ::= 'EQUIV:' equiv_step+
+        equiv_step ::= expr ('<=' '>')? justification?
+        justification ::= '[' TEXT ']'
     """
 
     def __init__(self, tokens: list[Token]) -> None:
@@ -38,37 +64,73 @@ class Parser:
         """
         Parse tokens and return AST.
 
-        Returns Document for multi-line input, or single Expr for single expression.
+        Returns Document for multi-line input or structural elements,
+        or single Expr for single expression (backward compatible).
         """
         self._skip_newlines()
 
-        # Parse first expression
+        # Empty input
         if self._at_end():
-            # Empty document
             return Document(items=[], line=1, column=1)
 
         first_line = self._current().line
-        first_expr = self._parse_expr()
 
-        # Check if there are more expressions
+        # Check if we start with a structural element (Phase 1)
+        if self._is_structural_token():
+            # Parse as document with structural elements
+            items: list[DocumentItem] = []
+            while not self._at_end():
+                items.append(self._parse_document_item())
+                self._skip_newlines()
+            return Document(items=items, line=first_line, column=1)
+
+        # Try to parse as expression
+        first_item = self._parse_expr()
+
+        # Check if there are more items (multi-line document)
         if self._match(TokenType.NEWLINE):
-            # Multi-line document
-            expressions = [first_expr]
+            items_list: list[DocumentItem] = [first_item]
             self._skip_newlines()
 
             while not self._at_end():
-                expressions.append(self._parse_expr())
+                items_list.append(self._parse_document_item())
                 self._skip_newlines()
 
-            return Document(items=expressions, line=first_line, column=1)
+            return Document(items=items_list, line=first_line, column=1)
 
-        # Single expression (Phase 0 behavior)
+        # Single expression (Phase 0 backward compatibility)
         if not self._at_end():
             raise ParserError(
                 f"Unexpected token after expression: {self._current().value!r}",
                 self._current(),
             )
-        return first_expr
+        return first_item
+
+    def _is_structural_token(self) -> bool:
+        """Check if current token is a structural element."""
+        return self._match(
+            TokenType.SECTION_MARKER,
+            TokenType.SOLUTION_MARKER,
+            TokenType.PART_LABEL,
+            TokenType.TRUTH_TABLE,
+            TokenType.EQUIV,
+        )
+
+    def _parse_document_item(self) -> DocumentItem:
+        """Parse a document item (expression or structural element)."""
+        if self._match(TokenType.SECTION_MARKER):
+            return self._parse_section()
+        if self._match(TokenType.SOLUTION_MARKER):
+            return self._parse_solution()
+        if self._match(TokenType.PART_LABEL):
+            return self._parse_part()
+        if self._match(TokenType.TRUTH_TABLE):
+            return self._parse_truth_table()
+        if self._match(TokenType.EQUIV):
+            return self._parse_equiv_chain()
+
+        # Default: parse as expression
+        return self._parse_expr()
 
     def _at_end(self) -> bool:
         """Check if we've consumed all tokens."""
@@ -93,6 +155,220 @@ class Parser:
         """Skip all consecutive newline tokens."""
         while self._match(TokenType.NEWLINE) and not self._at_end():
             self._advance()
+
+    def _parse_section(self) -> Section:
+        """Parse section: === Title ==="""
+        start_token = self._advance()  # Consume first '==='
+
+        # Collect title text (all identifiers until closing ===)
+        title_parts: list[str] = []
+        while not self._match(TokenType.SECTION_MARKER) and not self._at_end():
+            if self._match(TokenType.NEWLINE):
+                break  # Section title on one line
+            title_parts.append(self._current().value)
+            self._advance()
+
+        if not self._match(TokenType.SECTION_MARKER):
+            raise ParserError("Expected closing '===' for section", self._current())
+
+        self._advance()  # Consume closing '==='
+        title = " ".join(title_parts)
+        self._skip_newlines()
+
+        # Parse section content until next section or end
+        items: list[DocumentItem] = []
+        while not self._at_end() and not self._match(TokenType.SECTION_MARKER):
+            items.append(self._parse_document_item())
+            self._skip_newlines()
+
+        return Section(
+            title=title, items=items, line=start_token.line, column=start_token.column
+        )
+
+    def _parse_solution(self) -> Solution:
+        """Parse solution: ** Solution N **"""
+        start_token = self._advance()  # Consume first '**'
+
+        # Collect solution number/text (all tokens until closing **)
+        solution_parts: list[str] = []
+        while not self._match(TokenType.SOLUTION_MARKER) and not self._at_end():
+            if self._match(TokenType.NEWLINE):
+                break  # Solution marker on one line
+            solution_parts.append(self._current().value)
+            self._advance()
+
+        if not self._match(TokenType.SOLUTION_MARKER):
+            raise ParserError("Expected closing '**' for solution", self._current())
+
+        self._advance()  # Consume closing '**'
+        number = " ".join(solution_parts)
+        self._skip_newlines()
+
+        # Parse solution content until next solution/section or end
+        items: list[DocumentItem] = []
+        while not self._at_end() and not self._match(
+            TokenType.SOLUTION_MARKER, TokenType.SECTION_MARKER
+        ):
+            items.append(self._parse_document_item())
+            self._skip_newlines()
+
+        return Solution(
+            number=number, items=items, line=start_token.line, column=start_token.column
+        )
+
+    def _parse_part(self) -> Part:
+        """Parse part: (a) content"""
+        part_token = self._advance()  # Consume '(a)', '(b)', etc.
+
+        # Extract label from token value: "(a)" -> "a"
+        label = part_token.value[1:-1]
+        self._skip_newlines()
+
+        # Parse part content until next part/solution/section or end
+        items: list[DocumentItem] = []
+        while not self._at_end() and not self._match(
+            TokenType.PART_LABEL,
+            TokenType.SOLUTION_MARKER,
+            TokenType.SECTION_MARKER,
+        ):
+            items.append(self._parse_document_item())
+            self._skip_newlines()
+
+        return Part(
+            label=label, items=items, line=part_token.line, column=part_token.column
+        )
+
+    def _parse_truth_table(self) -> TruthTable:
+        """Parse truth table: TRUTH TABLE: followed by table rows."""
+        start_token = self._advance()  # Consume 'TRUTH TABLE:'
+        self._skip_newlines()
+
+        # Parse header row (columns separated by |)
+        headers: list[str] = []
+        if not self._match(TokenType.IDENTIFIER):
+            raise ParserError("Expected truth table header row", self._current())
+
+        # Collect columns (tokens between pipes)
+        column_tokens: list[str] = []
+        while not self._match(TokenType.NEWLINE) and not self._at_end():
+            if self._match(TokenType.PIPE):
+                # Save current column
+                if column_tokens:
+                    headers.append(" ".join(column_tokens))
+                    column_tokens = []
+                self._advance()  # Skip pipe
+            elif self._match(
+                TokenType.IDENTIFIER,
+                TokenType.AND,
+                TokenType.OR,
+                TokenType.NOT,
+                TokenType.IMPLIES,
+                TokenType.IFF,
+                TokenType.LPAREN,
+                TokenType.RPAREN,
+            ):
+                column_tokens.append(self._current().value)
+                self._advance()
+            else:
+                break
+
+        # Add last column
+        if column_tokens:
+            headers.append(" ".join(column_tokens))
+
+        if not headers:
+            raise ParserError("Expected truth table headers", self._current())
+
+        self._skip_newlines()
+
+        # Parse data rows
+        rows: list[list[str]] = []
+        while not self._at_end() and not self._is_structural_token():
+            row: list[str] = []
+
+            # Check if line starts with T or F (truth values)
+            if not self._match(TokenType.IDENTIFIER):
+                break
+
+            first_val = self._current().value
+            if first_val not in ("T", "F"):
+                break  # Not a truth table row
+
+            # Collect row values separated by pipes
+            while not self._match(TokenType.NEWLINE) and not self._at_end():
+                if self._match(TokenType.PIPE):
+                    self._advance()  # Skip pipe
+                elif self._match(TokenType.IDENTIFIER):
+                    row.append(self._current().value)
+                    self._advance()
+                else:
+                    break
+
+            if row:
+                rows.append(row)
+            self._skip_newlines()
+
+        return TruthTable(
+            headers=headers,
+            rows=rows,
+            line=start_token.line,
+            column=start_token.column,
+        )
+
+    def _parse_equiv_chain(self) -> EquivChain:
+        """Parse equivalence chain: EQUIV: followed by steps."""
+        start_token = self._advance()  # Consume 'EQUIV:'
+        self._skip_newlines()
+
+        steps: list[EquivStep] = []
+
+        # Parse steps until we hit another structural element or end
+        while not self._at_end() and not self._is_structural_token():
+            # Parse expression
+            expr = self._parse_expr()
+            self._skip_newlines()
+
+            # Check for optional justification [text]
+            justification: str | None = None
+            if self._match(TokenType.LBRACKET):
+                self._advance()  # Consume '['
+
+                # Collect justification text (all tokens until ']')
+                just_parts: list[str] = []
+                while not self._match(TokenType.RBRACKET) and not self._at_end():
+                    if self._match(TokenType.NEWLINE):
+                        break  # Justification on one line
+                    just_parts.append(self._current().value)
+                    self._advance()
+
+                if not self._match(TokenType.RBRACKET):
+                    raise ParserError(
+                        "Expected closing ']' for justification", self._current()
+                    )
+
+                self._advance()  # Consume ']'
+                justification = " ".join(just_parts)
+
+            # Create step
+            steps.append(
+                EquivStep(
+                    expression=expr,
+                    justification=justification,
+                    line=expr.line,
+                    column=expr.column,
+                )
+            )
+
+            self._skip_newlines()
+
+        if not steps:
+            raise ParserError(
+                "Expected at least one step in EQUIV chain", self._current()
+            )
+
+        return EquivChain(
+            steps=steps, line=start_token.line, column=start_token.column
+        )
 
     def _parse_expr(self) -> Expr:
         """Parse expression (entry point)."""

@@ -319,6 +319,8 @@ class TestIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        # Single expression should return Expr, not Document
+        assert isinstance(ast, (BinaryOp, UnaryOp, Identifier))
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == r"p \land q \Rightarrow r"
@@ -330,6 +332,8 @@ class TestIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        # Single expression should return Expr, not Document
+        assert isinstance(ast, (BinaryOp, UnaryOp, Identifier))
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == r"\lnot p \lor q \Leftrightarrow p \Rightarrow q"
@@ -341,6 +345,8 @@ class TestIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        # Single expression should return Expr, not Document
+        assert isinstance(ast, (BinaryOp, UnaryOp, Identifier))
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         # Note: LaTeX generates without parens, relying on precedence
@@ -353,6 +359,8 @@ class TestIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        # Single expression should return Expr, not Document
+        assert isinstance(ast, (BinaryOp, UnaryOp, Identifier))
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == r"p \Rightarrow q \Rightarrow r"
@@ -364,6 +372,8 @@ class TestIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        # Single expression should return Expr, not Document
+        assert isinstance(ast, (BinaryOp, UnaryOp, Identifier))
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == r"\lnot p \land q \lor r"
