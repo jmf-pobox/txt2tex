@@ -1,0 +1,107 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Equivalence Chains}
+
+\bigskip
+\noindent
+\textbf{Solution 1}
+
+(a)
+$Commutative$
+
+$property$
+
+\begin{align*}
+p \land q \\
+&\Leftrightarrow q \land p && \text{commutative}
+\end{align*}
+
+\medskip
+
+(b)
+$De$
+
+$Morgan$
+
+$law$
+
+\begin{align*}
+\lnot p \land q \\
+&\Leftrightarrow \lnot p \lor \lnot q && \text{De Morgan} \\
+&\Leftrightarrow \lnot p \lor \lnot q && \text{parentheses}
+\end{align*}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 2}
+
+(a)
+$Definition$
+
+$of$
+
+$implication$
+
+\begin{align*}
+p \Rightarrow q \\
+&\Leftrightarrow \lnot p \lor q && \text{definition}
+\end{align*}
+
+\medskip
+
+(b)
+$Multiple$
+
+$equivalence$
+
+$steps$
+
+\begin{align*}
+p \land q \lor p \land r \\
+&\Leftrightarrow p \land q \lor r && \text{distributive} \\
+&\Leftrightarrow q \lor r \land p && \text{commutative} \\
+&\Leftrightarrow p \land r \lor q && \text{commutative}
+\end{align*}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 3}
+
+(a)
+$Equivalence$
+
+$chain$
+
+$without$
+
+$justifications$
+
+\begin{align*}
+p \lor p \\
+&\Leftrightarrow p
+\end{align*}
+
+\medskip
+
+(b)
+$Mixed$
+
+$justifications$
+
+\begin{align*}
+p \Leftrightarrow q \\
+&\Leftrightarrow p \Rightarrow q \land q \Rightarrow p && \text{definition} \\
+&\Leftrightarrow \lnot p \lor q \land \lnot q \lor p
+\end{align*}
+
+\medskip
+
+\end{document}
