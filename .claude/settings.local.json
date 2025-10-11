@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/jfreeman/Coding/fuzz/txt2tex/**)",
+      "Read(//Users/jfreeman/Coding/fuzz/tex/**)",
+      "Read(//Users/jfreeman/Coding/fuzz/**)",
+      "Read(//Users/jfreeman/Coding/langlearn-anki/**)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(hatch env create:*)",
+      "Bash(hatch run type:*)",
+      "Bash(hatch run lint:*)",
+      "Bash(hatch run format:*)",
+      "Bash(hatch run ruff:*)",
+      "Bash(hatch run mypy:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
