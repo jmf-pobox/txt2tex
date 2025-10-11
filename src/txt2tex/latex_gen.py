@@ -12,27 +12,49 @@ from txt2tex.ast_nodes import (
     EquivChain,
     Expr,
     Identifier,
+    Number,
     Part,
+    Quantifier,
     Section,
     Solution,
+    Subscript,
+    Superscript,
     TruthTable,
     UnaryOp,
 )
 
 
 class LaTeXGenerator:
-    """Generates LaTeX from AST for Phase 0 + Phase 1 + Phase 2."""
+    """Generates LaTeX from AST for Phase 0 + Phase 1 + Phase 2 + Phase 3."""
 
     # Operator mappings
     BINARY_OPS: ClassVar[dict[str, str]] = {
+        # Propositional logic
         "and": r"\land",
         "or": r"\lor",
         "=>": r"\Rightarrow",
         "<=>": r"\Leftrightarrow",
+        # Comparison operators (Phase 3)
+        "<": r"<",
+        ">": r">",
+        "<=": r"\leq",
+        ">=": r"\geq",
+        "=": r"=",
+        # Set operators (Phase 3)
+        "in": r"\in",
+        "subset": r"\subseteq",
+        "union": r"\cup",
+        "intersect": r"\cap",
     }
 
     UNARY_OPS: ClassVar[dict[str, str]] = {
         "not": r"\lnot",
+    }
+
+    # Quantifier mappings (Phase 3)
+    QUANTIFIERS: ClassVar[dict[str, str]] = {
+        "forall": r"\forall",
+        "exists": r"\exists",
     }
 
     # Operator precedence (lower number = lower precedence)
@@ -100,16 +122,28 @@ class LaTeXGenerator:
         """Generate LaTeX for expression (without wrapping in math mode)."""
         if isinstance(expr, Identifier):
             return self._generate_identifier(expr)
+        if isinstance(expr, Number):
+            return self._generate_number(expr)
         if isinstance(expr, UnaryOp):
             return self._generate_unary_op(expr)
         if isinstance(expr, BinaryOp):
             return self._generate_binary_op(expr)
+        if isinstance(expr, Quantifier):
+            return self._generate_quantifier(expr)
+        if isinstance(expr, Subscript):
+            return self._generate_subscript(expr)
+        if isinstance(expr, Superscript):
+            return self._generate_superscript(expr)
 
         raise TypeError(f"Unknown expression type: {type(expr)}")
 
     def _generate_identifier(self, node: Identifier) -> str:
         """Generate LaTeX for identifier."""
         return node.name
+
+    def _generate_number(self, node: Number) -> str:
+        """Generate LaTeX for number."""
+        return node.value
 
     def _generate_unary_op(self, node: UnaryOp) -> str:
         """Generate LaTeX for unary operation."""
@@ -148,6 +182,47 @@ class LaTeXGenerator:
             right = f"({right})"
 
         return f"{left} {op_latex} {right}"
+
+    def _generate_quantifier(self, node: Quantifier) -> str:
+        """Generate LaTeX for quantifier (forall, exists)."""
+        quant_latex = self.QUANTIFIERS.get(node.quantifier)
+        if quant_latex is None:
+            raise ValueError(f"Unknown quantifier: {node.quantifier}")
+
+        # Generate variable and domain
+        parts = [quant_latex, node.variable]
+
+        if node.domain:
+            domain_latex = self.generate_expr(node.domain)
+            parts.append(r"\colon")
+            parts.append(domain_latex)
+
+        # Add bullet separator and body
+        parts.append(r"\bullet")
+        body_latex = self.generate_expr(node.body)
+        parts.append(body_latex)
+
+        return " ".join(parts)
+
+    def _generate_subscript(self, node: Subscript) -> str:
+        """Generate LaTeX for subscript (a_1, x_i)."""
+        base = self.generate_expr(node.base)
+        index = self.generate_expr(node.index)
+
+        # Wrap index in braces if it's more than one character
+        if len(index) > 1:
+            return f"{base}_{{{index}}}"
+        return f"{base}_{index}"
+
+    def _generate_superscript(self, node: Superscript) -> str:
+        """Generate LaTeX for superscript (x^2, 2^n)."""
+        base = self.generate_expr(node.base)
+        exponent = self.generate_expr(node.exponent)
+
+        # Wrap exponent in braces if it's more than one character
+        if len(exponent) > 1:
+            return f"{base}^{{{exponent}}}"
+        return f"{base}^{exponent}"
 
     def _generate_section(self, node: Section) -> list[str]:
         """Generate LaTeX for section."""

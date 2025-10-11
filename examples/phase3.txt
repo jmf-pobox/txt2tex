@@ -1,0 +1,62 @@
+=== Phase 3: Quantifiers and Mathematical Notation ===
+
+** Example 1: Quantifiers **
+
+(a)
+forall x : N | x >= 0
+
+(b)
+exists y : N | y = 0
+
+(c)
+forall n : N | n >= 0 and n < 100
+
+** Example 2: Subscripts and Superscripts **
+
+(a)
+x^2
+
+(b)
+a_1
+
+(c)
+x_i^2
+
+** Example 3: Comparison Operators **
+
+(a)
+x < 10
+
+(b)
+x >= 0 and x <= 100
+
+(c)
+y > 5 or y = 0
+
+** Example 4: Set Operators **
+
+(a)
+x in N
+
+(b)
+A subset B
+
+(c)
+A union B intersect C
+
+** Example 5: Complex Expressions **
+
+(a) EQUIV:
+forall x : N | x in N and x >= 0
+forall x : N | x >= 0
+
+(b)
+forall i : N | a_i > 0 => a_i^2 > 0
+
+(c) TRUTH TABLE:
+p | q | p => q
+T | T | T
+T | F | F
+F | T | T
+F | F | T
+
