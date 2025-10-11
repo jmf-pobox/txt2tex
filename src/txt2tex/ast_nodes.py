@@ -77,15 +77,7 @@ class Superscript(ASTNode):
 
 
 # Type alias for all expression types
-Expr = (
-    BinaryOp
-    | UnaryOp
-    | Identifier
-    | Number
-    | Quantifier
-    | Subscript
-    | Superscript
-)
+Expr = BinaryOp | UnaryOp | Identifier | Number | Quantifier | Subscript | Superscript
 
 
 # Document structure nodes (Phase 1)
@@ -192,6 +184,26 @@ class Schema(ASTNode):
     predicates: list[Expr]
 
 
+# Proof tree nodes (Phase 5)
+
+
+@dataclass(frozen=True)
+class ProofNode(ASTNode):
+    """Node in a proof tree."""
+
+    expression: Expr
+    justification: str | None  # Optional rule name
+    children: list[ProofNode]  # Child proof nodes
+    indent_level: int  # Indentation level
+
+
+@dataclass(frozen=True)
+class ProofTree(ASTNode):
+    """Proof tree with indentation-based structure."""
+
+    nodes: list[ProofNode]  # Top-level nodes
+
+
 # Type alias for document items (expressions or structural elements)
 DocumentItem = (
     Expr
@@ -205,6 +217,7 @@ DocumentItem = (
     | Abbreviation
     | AxDef
     | Schema
+    | ProofTree
 )
 
 

@@ -157,11 +157,7 @@ class Lexer:
             return Token(TokenType.PIPE, "|", start_line, start_column)
 
         # Free type operator ::= (Phase 4) - check before : alone
-        if (
-            char == ":"
-            and self._peek_char() == ":"
-            and self._peek_char(2) == "="
-        ):
+        if char == ":" and self._peek_char() == ":" and self._peek_char(2) == "=":
             self._advance()
             self._advance()
             self._advance()
@@ -270,6 +266,11 @@ class Lexer:
         if value == "EQUIV" and self._current_char() == ":":
             self._advance()  # Consume ':'
             return Token(TokenType.EQUIV, "EQUIV:", start_line, start_column)
+
+        # Check for PROOF: keyword
+        if value == "PROOF" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+            return Token(TokenType.PROOF, "PROOF:", start_line, start_column)
 
         # Check for keywords (propositional logic)
         if value == "and":
