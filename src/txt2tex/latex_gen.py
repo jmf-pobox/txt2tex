@@ -35,6 +35,14 @@ class LaTeXGenerator:
         "not": r"\lnot",
     }
 
+    # Operator precedence (lower number = lower precedence)
+    PRECEDENCE: ClassVar[dict[str, int]] = {
+        "<=>": 1,  # Lowest precedence
+        "=>": 2,
+        "or": 3,
+        "and": 4,  # Highest precedence (for binary ops)
+    }
+
     def __init__(self, use_fuzz: bool = False) -> None:
         """Initialize generator with package choice."""
         self.use_fuzz = use_fuzz
@@ -112,6 +120,18 @@ class LaTeXGenerator:
         operand = self.generate_expr(node.operand)
         return f"{op_latex} {operand}"
 
+    def _needs_parens(self, child: Expr, parent_op: str) -> bool:
+        """Check if child expression needs parentheses in parent context."""
+        # Only binary ops need precedence checking
+        if not isinstance(child, BinaryOp):
+            return False
+
+        child_prec = self.PRECEDENCE.get(child.operator, 999)
+        parent_prec = self.PRECEDENCE.get(parent_op, 999)
+
+        # Need parens if child has lower precedence than parent
+        return child_prec < parent_prec
+
     def _generate_binary_op(self, node: BinaryOp) -> str:
         """Generate LaTeX for binary operation."""
         op_latex = self.BINARY_OPS.get(node.operator)
@@ -120,6 +140,13 @@ class LaTeXGenerator:
 
         left = self.generate_expr(node.left)
         right = self.generate_expr(node.right)
+
+        # Add parentheses if needed for precedence
+        if self._needs_parens(node.left, node.operator):
+            left = f"({left})"
+        if self._needs_parens(node.right, node.operator):
+            right = f"({right})"
+
         return f"{left} {op_latex} {right}"
 
     def _generate_section(self, node: Section) -> list[str]:
