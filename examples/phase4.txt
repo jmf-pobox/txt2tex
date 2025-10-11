@@ -1,0 +1,46 @@
+=== Phase 4: Z Notation Basics ===
+
+** Example 1: Given Types **
+
+given Person Company
+
+** Example 2: Free Types **
+
+Status ::= active | inactive | suspended
+
+Answer ::= yes | no
+
+** Example 3: Abbreviations **
+
+adult == age >= 18
+
+positive == x > 0
+
+** Example 4: Axiomatic Definitions **
+
+axdef
+population : N
+capacity : N
+where
+population <= capacity
+capacity > 0
+end
+
+** Example 5: Schema Definitions **
+
+schema Library
+books : N
+members : N
+where
+books > 0
+members >= 0
+end
+
+schema BankAccount
+balance : N
+overdraft : N
+where
+balance >= 0
+overdraft >= 0
+end
+

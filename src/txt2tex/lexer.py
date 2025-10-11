@@ -17,10 +17,10 @@ class LexerError(Exception):
 
 class Lexer:
     """
-    Tokenizes input text for Phase 0 + Phase 1 + Phase 2 + Phase 3.
+    Tokenizes input text for Phase 0 + Phase 1 + Phase 2 + Phase 3 + Phase 4.
 
     Supports propositional logic, document structure, equivalence chains,
-    and predicate logic with quantifiers and mathematical notation.
+    predicate logic with quantifiers and mathematical notation, and Z notation.
     """
 
     def __init__(self, text: str) -> None:
@@ -156,6 +156,17 @@ class Lexer:
             self._advance()
             return Token(TokenType.PIPE, "|", start_line, start_column)
 
+        # Free type operator ::= (Phase 4) - check before : alone
+        if (
+            char == ":"
+            and self._peek_char() == ":"
+            and self._peek_char(2) == "="
+        ):
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.FREE_TYPE, "::=", start_line, start_column)
+
         # Colon (for quantifiers in Phase 3)
         if char == ":":
             self._advance()
@@ -182,7 +193,14 @@ class Lexer:
             self._advance()
             return Token(TokenType.GREATER_THAN, ">", start_line, start_column)
 
-        # Equals (Phase 3) - but not => which is handled earlier
+        # Abbreviation operator == (Phase 4) - check before = alone
+        # Already checked for === and => earlier
+        if char == "=" and self._peek_char() == "=":
+            self._advance()
+            self._advance()
+            return Token(TokenType.ABBREV, "==", start_line, start_column)
+
+        # Equals (Phase 3) - but not =>, ==, or === which are handled earlier
         if char == "=":
             self._advance()
             return Token(TokenType.EQUALS, "=", start_line, start_column)
@@ -276,6 +294,18 @@ class Lexer:
             return Token(TokenType.UNION, value, start_line, start_column)
         if value == "intersect":
             return Token(TokenType.INTERSECT, value, start_line, start_column)
+
+        # Check for Z notation keywords (Phase 4)
+        if value == "given":
+            return Token(TokenType.GIVEN, value, start_line, start_column)
+        if value == "axdef":
+            return Token(TokenType.AXDEF, value, start_line, start_column)
+        if value == "schema":
+            return Token(TokenType.SCHEMA, value, start_line, start_column)
+        if value == "where":
+            return Token(TokenType.WHERE, value, start_line, start_column)
+        if value == "end":
+            return Token(TokenType.END, value, start_line, start_column)
 
         # Regular identifier
         return Token(TokenType.IDENTIFIER, value, start_line, start_column)
