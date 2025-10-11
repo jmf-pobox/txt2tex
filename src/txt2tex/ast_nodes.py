@@ -48,7 +48,61 @@ Expr = BinaryOp | UnaryOp | Identifier
 
 
 @dataclass(frozen=True)
+class Section(ASTNode):
+    """Section with title and content."""
+
+    title: str
+    items: list[DocumentItem]
+
+
+@dataclass(frozen=True)
+class Solution(ASTNode):
+    """Solution block with number and content."""
+
+    number: str
+    items: list[DocumentItem]
+
+
+@dataclass(frozen=True)
+class Part(ASTNode):
+    """Part label with content."""
+
+    label: str
+    items: list[DocumentItem]
+
+
+@dataclass(frozen=True)
+class TruthTable(ASTNode):
+    """Truth table with headers and rows."""
+
+    headers: list[str]
+    rows: list[list[str]]
+
+
+# Equivalence chain nodes (Phase 2)
+
+
+@dataclass(frozen=True)
+class EquivStep(ASTNode):
+    """Single step in an equivalence chain."""
+
+    expression: Expr
+    justification: str | None
+
+
+@dataclass(frozen=True)
+class EquivChain(ASTNode):
+    """Equivalence chain with multiple steps."""
+
+    steps: list[EquivStep]
+
+
+# Type alias for document items (expressions or structural elements)
+DocumentItem = Expr | Section | Solution | Part | TruthTable | EquivChain
+
+
+@dataclass(frozen=True)
 class Document(ASTNode):
     """Document containing multiple expressions or blocks."""
 
-    items: list[Expr]
+    items: list[DocumentItem]
