@@ -40,8 +40,52 @@ class Identifier(ASTNode):
     name: str
 
 
+@dataclass(frozen=True)
+class Number(ASTNode):
+    """Numeric literal node."""
+
+    value: str
+
+
+# Phase 3 expression nodes
+
+
+@dataclass(frozen=True)
+class Quantifier(ASTNode):
+    """Quantifier node (forall, exists)."""
+
+    quantifier: str  # "forall" or "exists"
+    variable: str
+    domain: Expr | None  # Optional domain (e.g., N, Z)
+    body: Expr
+
+
+@dataclass(frozen=True)
+class Subscript(ASTNode):
+    """Subscript node (a_1, x_i)."""
+
+    base: Expr
+    index: Expr
+
+
+@dataclass(frozen=True)
+class Superscript(ASTNode):
+    """Superscript node (x^2, 2^n)."""
+
+    base: Expr
+    exponent: Expr
+
+
 # Type alias for all expression types
-Expr = BinaryOp | UnaryOp | Identifier
+Expr = (
+    BinaryOp
+    | UnaryOp
+    | Identifier
+    | Number
+    | Quantifier
+    | Subscript
+    | Superscript
+)
 
 
 # Document structure nodes (Phase 1)
