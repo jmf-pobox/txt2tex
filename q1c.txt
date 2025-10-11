@@ -1,6 +1,12 @@
 === Propositional Logic ===
 
-** Solution 3c **
+** Solution 3 **
+
+
+(a) EQUIV:
+p
+p or not p [or introduction]
+(not p => p) [=> disjunction]
 
 (c) EQUIV:
 ((p => r) and (q => r))

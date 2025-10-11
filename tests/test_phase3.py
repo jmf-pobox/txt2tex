@@ -1,8 +1,6 @@
-"""Tests for Phase 3: Quantifiers, subscripts, superscripts, and mathematical notation."""
+"""Tests for Phase 3: Quantifiers, subscripts, superscripts, and math."""
 
 from __future__ import annotations
-
-import pytest
 
 from txt2tex.ast_nodes import (
     BinaryOp,
@@ -43,7 +41,9 @@ class TestLexer:
         """Test lexing comparison operators."""
         lexer = Lexer("x < y <= z > w >= v = u")
         tokens = lexer.tokenize()
-        types = [t.type.name for t in tokens[:-1][1::2]]  # Exclude EOF, every other is operator
+        types = [
+            t.type.name for t in tokens[:-1][1::2]
+        ]  # Exclude EOF, every other is operator
         assert types == [
             "LESS_THAN",
             "LESS_EQUAL",
