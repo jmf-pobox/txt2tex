@@ -349,8 +349,8 @@ class TestIntegration:
         assert isinstance(ast, (BinaryOp, UnaryOp, Identifier))
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        # Note: LaTeX generates without parens, relying on precedence
-        assert latex == r"p \lor q \land r"
+        # Parentheses must be preserved because 'or' has lower precedence than 'and'
+        assert latex == r"(p \lor q) \land r"
 
     def test_nested_parentheses(self) -> None:
         """Test complete pipeline with nested parentheses."""
