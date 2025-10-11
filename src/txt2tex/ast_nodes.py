@@ -13,6 +13,9 @@ class ASTNode:
     column: int
 
 
+# Expression nodes (Phase 0)
+
+
 @dataclass(frozen=True)
 class BinaryOp(ASTNode):
     """Binary operation node (and, or, =>, <=>)."""
@@ -39,3 +42,13 @@ class Identifier(ASTNode):
 
 # Type alias for all expression types
 Expr = BinaryOp | UnaryOp | Identifier
+
+
+# Document structure nodes (Phase 1)
+
+
+@dataclass(frozen=True)
+class Document(ASTNode):
+    """Document containing multiple expressions or blocks."""
+
+    items: list[Expr]
