@@ -16,6 +16,10 @@ class TokenType(Enum):
     IMPLIES = auto()
     IFF = auto()
 
+    # Grouping
+    LPAREN = auto()
+    RPAREN = auto()
+
     # Identifiers and literals
     IDENTIFIER = auto()
 

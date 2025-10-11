@@ -41,6 +41,8 @@ PYTHONPATH=src python -m txt2tex.cli input.txt
 
 ### Features
 - ✅ Correct operator precedence (not > and > or > => > <=>)
+- ✅ Parentheses to override precedence
+- ✅ Nested parentheses support
 - ✅ Error messages with line/column positions
 - ✅ Choice of LaTeX packages (zed-* or fuzz)
 - ✅ File or expression input
@@ -84,6 +86,20 @@ $ PYTHONPATH=src python -m txt2tex.cli -e "not p or q <=> p => q"
 
 Generates: `$\lnot p \lor q \Leftrightarrow p \Rightarrow q$`
 
+**Parentheses to override precedence:**
+```bash
+$ PYTHONPATH=src python -m txt2tex.cli -e "(p and q) => r"
+```
+
+Generates: `$p \land q \Rightarrow r$`
+
+**Nested parentheses:**
+```bash
+$ PYTHONPATH=src python -m txt2tex.cli -e "p => (q => r)"
+```
+
+Generates: `$p \Rightarrow q \Rightarrow r$`
+
 ## Operator Precedence
 
 From highest to lowest:
@@ -124,7 +140,12 @@ Error: Line 1, column 3: Unexpected character: '@'
 
 ```bash
 $ PYTHONPATH=src python -m txt2tex.cli -e "p and"
-Error: Line 1, column 6: Expected identifier, got EOF
+Error: Line 1, column 6: Expected identifier or '(', got EOF
+```
+
+```bash
+$ PYTHONPATH=src python -m txt2tex.cli -e "(p and q"
+Error: Line 1, column 9: Expected ')' after expression
 ```
 
 ## What's Coming Next
@@ -198,7 +219,7 @@ sem/
 │   ├── latex_gen.py     # LaTeX generator
 │   └── cli.py           # Command-line interface
 ├── tests/
-│   └── test_phase0.py   # Test suite (22 tests)
+│   └── test_phase0.py   # Test suite (31 tests)
 ├── examples/
 │   ├── phase0_simple.txt    # Example input
 │   └── phase0_simple.tex    # Example output

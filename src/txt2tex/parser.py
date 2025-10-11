@@ -26,7 +26,7 @@ class Parser:
         or       ::= and ( 'or' and )*
         and      ::= unary ( 'and' unary )*
         unary    ::= 'not' unary | primary
-        primary  ::= IDENTIFIER
+        primary  ::= IDENTIFIER | '(' expr ')'
     """
 
     def __init__(self, tokens: list[Token]) -> None:
@@ -150,11 +150,20 @@ class Parser:
         return self._parse_primary()
 
     def _parse_primary(self) -> Expr:
-        """Parse primary expression (identifier)."""
+        """Parse primary expression (identifier or parenthesized expression)."""
         if self._match(TokenType.IDENTIFIER):
             token = self._advance()
             return Identifier(name=token.value, line=token.line, column=token.column)
 
+        if self._match(TokenType.LPAREN):
+            self._advance()  # Consume '('
+            expr = self._parse_expr()
+            if not self._match(TokenType.RPAREN):
+                raise ParserError("Expected ')' after expression", self._current())
+            self._advance()  # Consume ')'
+            return expr
+
         raise ParserError(
-            f"Expected identifier, got {self._current().type.name}", self._current()
+            f"Expected identifier or '(', got {self._current().type.name}",
+            self._current(),
         )
