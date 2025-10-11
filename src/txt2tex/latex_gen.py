@@ -9,7 +9,6 @@ from txt2tex.ast_nodes import (
     Abbreviation,
     AxDef,
     BinaryOp,
-    Declaration,
     Document,
     DocumentItem,
     EquivChain,
@@ -19,6 +18,8 @@ from txt2tex.ast_nodes import (
     Identifier,
     Number,
     Part,
+    ProofNode,
+    ProofTree,
     Quantifier,
     Schema,
     Section,
@@ -129,6 +130,8 @@ class LaTeXGenerator:
             return self._generate_axdef(item)
         if isinstance(item, Schema):
             return self._generate_schema(item)
+        if isinstance(item, ProofTree):
+            return self._generate_proof_tree(item)
 
         # Item is an Expr - wrap in math mode
         latex_expr = self.generate_expr(item)
@@ -417,5 +420,46 @@ class LaTeXGenerator:
 
         lines.append(r"\end{schema}")
         lines.append("")
+
+        return lines
+
+    def _generate_proof_tree(self, node: ProofTree) -> list[str]:
+        """Generate LaTeX for proof tree using nested itemize."""
+        lines: list[str] = []
+
+        lines.append(r"\begin{itemize}")
+
+        # Generate each top-level proof node
+        for proof_node in node.nodes:
+            node_lines = self._generate_proof_node(proof_node)
+            lines.extend(node_lines)
+
+        lines.append(r"\end{itemize}")
+        lines.append("")
+
+        return lines
+
+    def _generate_proof_node(self, node: ProofNode) -> list[str]:
+        """Generate LaTeX for a single proof node with optional children."""
+        lines: list[str] = []
+
+        # Generate expression in math mode
+        expr_latex = self.generate_expr(node.expression)
+        item_text = f"${expr_latex}$"
+
+        # Add justification if present
+        if node.justification:
+            escaped_just = self._escape_justification(node.justification)
+            item_text += f" [{escaped_just}]"
+
+        lines.append(r"\item " + item_text)
+
+        # Generate children if present (nested itemize)
+        if node.children:
+            lines.append(r"\begin{itemize}")
+            for child in node.children:
+                child_lines = self._generate_proof_node(child)
+                lines.extend(child_lines)
+            lines.append(r"\end{itemize}")
 
         return lines

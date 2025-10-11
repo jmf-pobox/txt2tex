@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from txt2tex.ast_nodes import (
     Abbreviation,
     AxDef,
@@ -226,9 +224,7 @@ class TestLaTeXGenerator:
     def test_free_type(self) -> None:
         """Test generating free type."""
         gen = LaTeXGenerator()
-        ast = FreeType(
-            name="Status", branches=["active", "inactive"], line=1, column=1
-        )
+        ast = FreeType(name="Status", branches=["active", "inactive"], line=1, column=1)
         latex_lines = gen.generate_document_item(ast)
         latex = "".join(latex_lines)
         assert "Status ::= active | inactive" in latex

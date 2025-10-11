@@ -7,7 +7,7 @@ from enum import Enum, auto
 
 
 class TokenType(Enum):
-    """Token types for txt2tex lexer (Phase 0 + Phase 1 + Phase 2 + Phase 3 + Phase 4)."""
+    """Token types for txt2tex lexer (Phases 0-4)."""
 
     # Operators (propositional logic)
     AND = auto()
@@ -72,6 +72,10 @@ class TokenType(Enum):
     SCHEMA = auto()  # schema
     WHERE = auto()  # where
     END = auto()  # end
+
+    # Proof trees (Phase 5)
+    PROOF = auto()  # PROOF:
+    INDENT = auto()  # Indentation level (significant whitespace)
 
     # Whitespace and structure
     WHITESPACE = auto()
