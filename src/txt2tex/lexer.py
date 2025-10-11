@@ -17,9 +17,10 @@ class LexerError(Exception):
 
 class Lexer:
     """
-    Tokenizes input text for Phase 0 + Phase 1 + Phase 2.
+    Tokenizes input text for Phase 0 + Phase 1 + Phase 2 + Phase 3.
 
-    Supports propositional logic with document structure and equivalence chains.
+    Supports propositional logic, document structure, equivalence chains,
+    and predicate logic with quantifiers and mathematical notation.
     """
 
     def __init__(self, text: str) -> None:
@@ -141,10 +142,59 @@ class Lexer:
             self._advance()
             return Token(TokenType.RBRACKET, "]", start_line, start_column)
 
-        # Pipe (for truth tables)
+        # Braces (for grouping subscripts/superscripts in Phase 3)
+        if char == "{":
+            self._advance()
+            return Token(TokenType.LBRACE, "{", start_line, start_column)
+
+        if char == "}":
+            self._advance()
+            return Token(TokenType.RBRACE, "}", start_line, start_column)
+
+        # Pipe (for truth tables and quantifiers)
         if char == "|":
             self._advance()
             return Token(TokenType.PIPE, "|", start_line, start_column)
+
+        # Colon (for quantifiers in Phase 3)
+        if char == ":":
+            self._advance()
+            return Token(TokenType.COLON, ":", start_line, start_column)
+
+        # Comparison operators (Phase 3)
+        # Check <= and >= before < and >
+        # But watch out for <=> which is handled earlier
+        if char == "<" and self._peek_char() == "=" and self._peek_char(2) != ">":
+            self._advance()
+            self._advance()
+            return Token(TokenType.LESS_EQUAL, "<=", start_line, start_column)
+
+        if char == "<":
+            self._advance()
+            return Token(TokenType.LESS_THAN, "<", start_line, start_column)
+
+        if char == ">" and self._peek_char() == "=":
+            self._advance()
+            self._advance()
+            return Token(TokenType.GREATER_EQUAL, ">=", start_line, start_column)
+
+        if char == ">":
+            self._advance()
+            return Token(TokenType.GREATER_THAN, ">", start_line, start_column)
+
+        # Equals (Phase 3) - but not => which is handled earlier
+        if char == "=":
+            self._advance()
+            return Token(TokenType.EQUALS, "=", start_line, start_column)
+
+        # Math operators (Phase 3)
+        if char == "^":
+            self._advance()
+            return Token(TokenType.CARET, "^", start_line, start_column)
+
+        if char == "_":
+            self._advance()
+            return Token(TokenType.UNDERSCORE, "_", start_line, start_column)
 
         # Identifiers and keywords
         if char.isalpha():
@@ -203,13 +253,29 @@ class Lexer:
             self._advance()  # Consume ':'
             return Token(TokenType.EQUIV, "EQUIV:", start_line, start_column)
 
-        # Check for keywords
+        # Check for keywords (propositional logic)
         if value == "and":
             return Token(TokenType.AND, value, start_line, start_column)
         if value == "or":
             return Token(TokenType.OR, value, start_line, start_column)
         if value == "not":
             return Token(TokenType.NOT, value, start_line, start_column)
+
+        # Check for quantifiers (Phase 3)
+        if value == "forall":
+            return Token(TokenType.FORALL, value, start_line, start_column)
+        if value == "exists":
+            return Token(TokenType.EXISTS, value, start_line, start_column)
+
+        # Check for set operators (Phase 3)
+        if value == "in":
+            return Token(TokenType.IN, value, start_line, start_column)
+        if value == "subset":
+            return Token(TokenType.SUBSET, value, start_line, start_column)
+        if value == "union":
+            return Token(TokenType.UNION, value, start_line, start_column)
+        if value == "intersect":
+            return Token(TokenType.INTERSECT, value, start_line, start_column)
 
         # Regular identifier
         return Token(TokenType.IDENTIFIER, value, start_line, start_column)
