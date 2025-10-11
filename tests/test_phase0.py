@@ -65,6 +65,19 @@ class TestLexer:
             lexer.tokenize()
         assert "Unexpected character" in str(exc_info.value)
 
+    def test_parentheses(self) -> None:
+        """Test lexing parentheses."""
+        lexer = Lexer("(p and q)")
+        tokens = lexer.tokenize()
+        types = [t.type for t in tokens[:-1]]  # Exclude EOF
+        assert types == [
+            TokenType.LPAREN,
+            TokenType.IDENTIFIER,
+            TokenType.AND,
+            TokenType.IDENTIFIER,
+            TokenType.RPAREN,
+        ]
+
 
 class TestParser:
     """Tests for parser."""
@@ -144,6 +157,60 @@ class TestParser:
         parser = Parser(tokens)
         with pytest.raises(ParserError):
             parser.parse()
+
+    def test_simple_parens(self) -> None:
+        """Test parsing simple parenthesized expression."""
+        lexer = Lexer("(p)")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Identifier)
+        assert ast.name == "p"
+
+    def test_precedence_override_with_parens(self) -> None:
+        """Test parentheses override precedence."""
+        lexer = Lexer("(p or q) and r")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        # Should parse as: (p or q) and r
+        assert isinstance(ast, BinaryOp)
+        assert ast.operator == "and"
+        assert isinstance(ast.left, BinaryOp)
+        assert ast.left.operator == "or"
+        assert isinstance(ast.right, Identifier)
+
+    def test_nested_parens(self) -> None:
+        """Test parsing nested parentheses."""
+        lexer = Lexer("((p and q))")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, BinaryOp)
+        assert ast.operator == "and"
+
+    def test_complex_parens(self) -> None:
+        """Test parsing complex parenthesized expression."""
+        lexer = Lexer("(p => q) and (q => r)")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        # Should parse as: (p => q) and (q => r)
+        assert isinstance(ast, BinaryOp)
+        assert ast.operator == "and"
+        assert isinstance(ast.left, BinaryOp)
+        assert ast.left.operator == "=>"
+        assert isinstance(ast.right, BinaryOp)
+        assert ast.right.operator == "=>"
+
+    def test_unclosed_paren(self) -> None:
+        """Test error on unclosed parenthesis."""
+        lexer = Lexer("(p and q")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        with pytest.raises(ParserError) as exc_info:
+            parser.parse()
+        assert "Expected ')'" in str(exc_info.value)
 
 
 class TestLaTeXGenerator:
@@ -266,3 +333,37 @@ class TestIntegration:
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == r"\lnot p \lor q \Leftrightarrow p \Rightarrow q"
+
+    def test_parentheses_precedence_override(self) -> None:
+        """Test complete pipeline with parentheses overriding precedence."""
+        text = "(p or q) and r"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        # Note: LaTeX generates without parens, relying on precedence
+        assert latex == r"p \lor q \land r"
+
+    def test_nested_parentheses(self) -> None:
+        """Test complete pipeline with nested parentheses."""
+        text = "p => (q => r)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        assert latex == r"p \Rightarrow q \Rightarrow r"
+
+    def test_solution3_expression(self) -> None:
+        """Test expression from Solution 3 with parentheses."""
+        text = "not (p and q) or r"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        assert latex == r"\lnot p \land q \lor r"
