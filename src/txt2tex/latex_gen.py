@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from txt2tex.ast_nodes import BinaryOp, Expr, Identifier, UnaryOp
+from txt2tex.ast_nodes import BinaryOp, Document, Expr, Identifier, UnaryOp
 
 
 class LaTeXGenerator:
@@ -26,7 +26,7 @@ class LaTeXGenerator:
         """Initialize generator with package choice."""
         self.use_fuzz = use_fuzz
 
-    def generate_document(self, expr: Expr) -> str:
+    def generate_document(self, ast: Document | Expr) -> str:
         """Generate complete LaTeX document with preamble and postamble."""
         lines: list[str] = []
 
@@ -41,10 +41,18 @@ class LaTeXGenerator:
         lines.append(r"\begin{document}")
         lines.append("")
 
-        # Content
-        latex_expr = self.generate_expr(expr)
-        lines.append(f"${latex_expr}$")
-        lines.append("")
+        # Content - handle both Document and single Expr
+        if isinstance(ast, Document):
+            # Multi-line document: generate each expression on separate line
+            for expr in ast.items:
+                latex_expr = self.generate_expr(expr)
+                lines.append(f"${latex_expr}$")
+                lines.append("")
+        else:
+            # Single expression (Phase 0 behavior)
+            latex_expr = self.generate_expr(ast)
+            lines.append(f"${latex_expr}$")
+            lines.append("")
 
         # Postamble
         lines.append(r"\end{document}")

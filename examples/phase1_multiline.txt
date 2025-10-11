@@ -1,0 +1,6 @@
+p and q
+p or q
+p => q
+p <=> q
+not p
+(p and q) => r
