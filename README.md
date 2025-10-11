@@ -8,15 +8,22 @@ Convert whiteboard-style mathematical notation to LaTeX.
 
 ## Quick Start
 
+**Easiest way** - use the shell script:
+```bash
+# Convert text file to PDF (one command!)
+./txt2pdf.sh input.txt
+
+# Use fuzz package
+./txt2pdf.sh input.txt --fuzz
+```
+
+**Direct CLI access**:
 ```bash
 # Convert a simple expression
 PYTHONPATH=src python -m txt2tex.cli -e "p and q => r"
 
-# Save to file
+# Save to LaTeX file
 PYTHONPATH=src python -m txt2tex.cli -e "not p or q <=> p => q" -o output.tex
-
-# Use fuzz package instead of zed-*
-PYTHONPATH=src python -m txt2tex.cli -e "p => q" --fuzz
 
 # Convert from file
 echo "p and q => r" > input.txt
@@ -41,12 +48,23 @@ PYTHONPATH=src python -m txt2tex.cli input.txt
 
 ### Examples
 
-**Input:**
-```
-p and q => r
+**Simple workflow:**
+```bash
+$ echo "p and q => r" > myproof.txt
+$ ./txt2pdf.sh myproof.txt
+
+Converting: myproof.txt
+Output: myproof.pdf
+
+Step 1/2: Generating LaTeX...
+  → Generated: myproof.tex
+Step 2/2: Compiling PDF...
+  → Generated: myproof.pdf
+
+✓ Success: myproof.pdf
 ```
 
-**Output:**
+**Generated LaTeX** (myproof.tex):
 ```latex
 \documentclass{article}
 \usepackage{zed-cm}
@@ -59,7 +77,7 @@ $p \land q \Rightarrow r$
 \end{document}
 ```
 
-**Complex example:**
+**Complex expression:**
 ```bash
 $ PYTHONPATH=src python -m txt2tex.cli -e "not p or q <=> p => q"
 ```
