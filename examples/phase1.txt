@@ -1,0 +1,27 @@
+=== Propositional Logic ===
+
+** Solution 1 **
+
+(a) p and q => p
+
+(b) TRUTH TABLE:
+p | q | p => q
+T | T | T
+T | F | F
+F | T | T
+F | F | T
+
+(c) not (p and q) <=> (not p) or (not q)
+
+** Solution 2 **
+
+(a) (p or q) and r <=> (p and r) or (q and r)
+
+(b) TRUTH TABLE:
+p | q | p <=> q
+T | T | T
+T | F | F
+F | T | F
+F | F | T
+
+(c) p => q => r

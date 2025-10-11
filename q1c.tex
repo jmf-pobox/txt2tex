@@ -1,0 +1,24 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Propositional Logic}
+
+\bigskip
+\noindent
+\textbf{Solution 3 c}
+
+(c)
+\begin{align*}
+(p \Rightarrow r) \land (q \Rightarrow r) \\
+&\Leftrightarrow (\lnot p \lor r) \land (\lnot q \lor r) && \text{[$\Rightarrow$ disjunction]} \\
+&\Leftrightarrow r \land (\lnot p \lor \lnot q) && \text{[distributivity 2]} \\
+&\Leftrightarrow (\lnot p \lor \lnot q) \land r && \text{[associativity of $\lor$]} \\
+&\Leftrightarrow p \lor q \Rightarrow r
+\end{align*}
+
+\medskip
+
+\end{document}
