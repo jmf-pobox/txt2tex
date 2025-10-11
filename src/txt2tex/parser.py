@@ -3,16 +3,22 @@
 from __future__ import annotations
 
 from txt2tex.ast_nodes import (
+    Abbreviation,
+    AxDef,
     BinaryOp,
+    Declaration,
     Document,
     DocumentItem,
     EquivChain,
     EquivStep,
     Expr,
+    FreeType,
+    GivenType,
     Identifier,
     Number,
     Part,
     Quantifier,
+    Schema,
     Section,
     Solution,
     Subscript,
@@ -94,7 +100,7 @@ class Parser:
 
         first_line = self._current().line
 
-        # Check if we start with a structural element (Phase 1)
+        # Check if we start with a structural element (Phase 1 + Phase 4)
         if self._is_structural_token():
             # Parse as document with structural elements
             items: list[DocumentItem] = []
@@ -102,6 +108,17 @@ class Parser:
                 items.append(self._parse_document_item())
                 self._skip_newlines()
             return Document(items=items, line=first_line, column=1)
+
+        # Check for abbreviation or free type (Phase 4)
+        # Look ahead to see if this is "identifier ::=" or "identifier =="
+        if self._match(TokenType.IDENTIFIER):
+            next_token = self._peek_ahead(1)
+            if next_token.type == TokenType.FREE_TYPE:
+                # This is a free type definition
+                return Document(items=[self._parse_free_type()], line=first_line, column=1)
+            if next_token.type == TokenType.ABBREV:
+                # This is an abbreviation
+                return Document(items=[self._parse_abbreviation()], line=first_line, column=1)
 
         # Try to parse as expression
         first_item = self._parse_expr()
@@ -133,6 +150,9 @@ class Parser:
             TokenType.PART_LABEL,
             TokenType.TRUTH_TABLE,
             TokenType.EQUIV,
+            TokenType.GIVEN,
+            TokenType.AXDEF,
+            TokenType.SCHEMA,
         )
 
     def _parse_document_item(self) -> DocumentItem:
@@ -147,6 +167,22 @@ class Parser:
             return self._parse_truth_table()
         if self._match(TokenType.EQUIV):
             return self._parse_equiv_chain()
+        if self._match(TokenType.GIVEN):
+            return self._parse_given_type()
+        if self._match(TokenType.AXDEF):
+            return self._parse_axdef()
+        if self._match(TokenType.SCHEMA):
+            return self._parse_schema()
+
+        # Check for abbreviation (identifier == expr) or free type (identifier ::= ...)
+        if self._match(TokenType.IDENTIFIER):
+            # Look ahead to determine type
+            name_token = self._current()
+            if self._peek_ahead(1).type == TokenType.FREE_TYPE:
+                return self._parse_free_type()
+            if self._peek_ahead(1).type == TokenType.ABBREV:
+                return self._parse_abbreviation()
+            # Otherwise, fall through to expression parsing
 
         # Default: parse as expression
         return self._parse_expr()
@@ -169,6 +205,13 @@ class Parser:
     def _match(self, *types: TokenType) -> bool:
         """Check if current token matches any of the given types."""
         return self._current().type in types
+
+    def _peek_ahead(self, offset: int = 1) -> Token:
+        """Look ahead at token without consuming it."""
+        pos = self.pos + offset
+        if pos < len(self.tokens):
+            return self.tokens[pos]
+        return self.tokens[-1]  # Return EOF if past end
 
     def _skip_newlines(self) -> None:
         """Skip all consecutive newline tokens."""
@@ -635,4 +678,226 @@ class Parser:
         raise ParserError(
             f"Expected identifier, number, or '(', got {self._current().type.name}",
             self._current(),
+        )
+
+    def _parse_given_type(self) -> GivenType:
+        """Parse given type: given A, B, C"""
+        start_token = self._advance()  # Consume 'given'
+
+        names: list[str] = []
+
+        # Parse comma-separated list of type names
+        while not self._at_end() and not self._match(TokenType.NEWLINE):
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError(
+                    "Expected type name in given declaration", self._current()
+                )
+
+            names.append(self._current().value)
+            self._advance()
+
+            # Check for comma
+            if not self._match(TokenType.NEWLINE) and not self._at_end():
+                # Expect comma (represented as identifier in current lexer)
+                # Skip any whitespace/tokens until next identifier or newline
+                pass
+
+        if not names:
+            raise ParserError(
+                "Expected at least one type name in given declaration", self._current()
+            )
+
+        return GivenType(names=names, line=start_token.line, column=start_token.column)
+
+    def _parse_free_type(self) -> FreeType:
+        """Parse free type: Type ::= branch1 | branch2 | branch3"""
+        # Identifier already consumed in _parse_document_item, need to back up
+        name_token = self._current()
+        type_name = name_token.value
+        self._advance()  # Move to ::=
+
+        if not self._match(TokenType.FREE_TYPE):
+            raise ParserError("Expected '::=' in free type definition", self._current())
+        self._advance()  # Consume '::='
+
+        branches: list[str] = []
+
+        # Parse pipe-separated list of branches
+        while not self._at_end() and not self._match(TokenType.NEWLINE):
+            if self._match(TokenType.IDENTIFIER):
+                branches.append(self._current().value)
+                self._advance()
+
+            # Check for pipe separator
+            if self._match(TokenType.PIPE):
+                self._advance()
+            elif not self._match(TokenType.NEWLINE) and not self._at_end():
+                # Allow end of line or more branches
+                pass
+
+        if not branches:
+            raise ParserError(
+                "Expected at least one branch in free type definition", self._current()
+            )
+
+        return FreeType(
+            name=type_name, branches=branches, line=name_token.line, column=name_token.column
+        )
+
+    def _parse_abbreviation(self) -> Abbreviation:
+        """Parse abbreviation: name == expression"""
+        name_token = self._current()
+        name = name_token.value
+        self._advance()  # Move to ==
+
+        if not self._match(TokenType.ABBREV):
+            raise ParserError("Expected '==' in abbreviation", self._current())
+        self._advance()  # Consume '=='
+
+        # Parse expression
+        expr = self._parse_expr()
+
+        return Abbreviation(
+            name=name, expression=expr, line=name_token.line, column=name_token.column
+        )
+
+    def _parse_axdef(self) -> AxDef:
+        """Parse axiomatic definition block."""
+        start_token = self._advance()  # Consume 'axdef'
+        self._skip_newlines()
+
+        declarations: list[Declaration] = []
+        predicates: list[Expr] = []
+
+        # Parse declarations until 'where' or 'end'
+        while not self._at_end() and not self._match(TokenType.WHERE, TokenType.END):
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+                continue
+
+            # Parse declaration: var : Type
+            if self._match(TokenType.IDENTIFIER):
+                var_token = self._current()
+                var_name = var_token.value
+                self._advance()
+
+                if not self._match(TokenType.COLON):
+                    raise ParserError(
+                        "Expected ':' in declaration", self._current()
+                    )
+                self._advance()  # Consume ':'
+
+                # Parse type expression
+                type_expr = self._parse_expr()
+
+                declarations.append(
+                    Declaration(
+                        variable=var_name,
+                        type_expr=type_expr,
+                        line=var_token.line,
+                        column=var_token.column,
+                    )
+                )
+                self._skip_newlines()
+            else:
+                break
+
+        # Parse 'where' clause (optional)
+        if self._match(TokenType.WHERE):
+            self._advance()  # Consume 'where'
+            self._skip_newlines()
+
+            # Parse predicates until 'end'
+            while not self._at_end() and not self._match(TokenType.END):
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                    continue
+
+                predicates.append(self._parse_expr())
+                self._skip_newlines()
+
+        # Expect 'end'
+        if not self._match(TokenType.END):
+            raise ParserError("Expected 'end' to close axdef block", self._current())
+        self._advance()  # Consume 'end'
+
+        return AxDef(
+            declarations=declarations,
+            predicates=predicates,
+            line=start_token.line,
+            column=start_token.column,
+        )
+
+    def _parse_schema(self) -> Schema:
+        """Parse schema definition block."""
+        start_token = self._advance()  # Consume 'schema'
+
+        # Parse schema name
+        if not self._match(TokenType.IDENTIFIER):
+            raise ParserError("Expected schema name", self._current())
+        name = self._current().value
+        self._advance()
+        self._skip_newlines()
+
+        declarations: list[Declaration] = []
+        predicates: list[Expr] = []
+
+        # Parse declarations until 'where' or 'end'
+        while not self._at_end() and not self._match(TokenType.WHERE, TokenType.END):
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+                continue
+
+            # Parse declaration: var : Type
+            if self._match(TokenType.IDENTIFIER):
+                var_token = self._current()
+                var_name = var_token.value
+                self._advance()
+
+                if not self._match(TokenType.COLON):
+                    raise ParserError(
+                        "Expected ':' in declaration", self._current()
+                    )
+                self._advance()  # Consume ':'
+
+                # Parse type expression
+                type_expr = self._parse_expr()
+
+                declarations.append(
+                    Declaration(
+                        variable=var_name,
+                        type_expr=type_expr,
+                        line=var_token.line,
+                        column=var_token.column,
+                    )
+                )
+                self._skip_newlines()
+            else:
+                break
+
+        # Parse 'where' clause (optional)
+        if self._match(TokenType.WHERE):
+            self._advance()  # Consume 'where'
+            self._skip_newlines()
+
+            # Parse predicates until 'end'
+            while not self._at_end() and not self._match(TokenType.END):
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                    continue
+
+                predicates.append(self._parse_expr())
+                self._skip_newlines()
+
+        # Expect 'end'
+        if not self._match(TokenType.END):
+            raise ParserError("Expected 'end' to close schema block", self._current())
+        self._advance()  # Consume 'end'
+
+        return Schema(
+            name=name,
+            declarations=declarations,
+            predicates=predicates,
+            line=start_token.line,
+            column=start_token.column,
         )
