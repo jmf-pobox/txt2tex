@@ -98,6 +98,15 @@ class Lexer:
             self._advance()
             return Token(TokenType.IFF, "<=>", start_line, start_column)
 
+        # Parentheses
+        if char == "(":
+            self._advance()
+            return Token(TokenType.LPAREN, "(", start_line, start_column)
+
+        if char == ")":
+            self._advance()
+            return Token(TokenType.RPAREN, ")", start_line, start_column)
+
         # Identifiers and keywords
         if char.isalpha():
             return self._scan_identifier(start_line, start_column)
