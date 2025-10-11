@@ -17,6 +17,8 @@ from txt2tex.ast_nodes import (
     Identifier,
     Number,
     Part,
+    ProofNode,
+    ProofTree,
     Quantifier,
     Schema,
     Section,
@@ -115,10 +117,14 @@ class Parser:
             next_token = self._peek_ahead(1)
             if next_token.type == TokenType.FREE_TYPE:
                 # This is a free type definition
-                return Document(items=[self._parse_free_type()], line=first_line, column=1)
+                return Document(
+                    items=[self._parse_free_type()], line=first_line, column=1
+                )
             if next_token.type == TokenType.ABBREV:
                 # This is an abbreviation
-                return Document(items=[self._parse_abbreviation()], line=first_line, column=1)
+                return Document(
+                    items=[self._parse_abbreviation()], line=first_line, column=1
+                )
 
         # Try to parse as expression
         first_item = self._parse_expr()
@@ -153,6 +159,7 @@ class Parser:
             TokenType.GIVEN,
             TokenType.AXDEF,
             TokenType.SCHEMA,
+            TokenType.PROOF,
         )
 
     def _parse_document_item(self) -> DocumentItem:
@@ -173,11 +180,12 @@ class Parser:
             return self._parse_axdef()
         if self._match(TokenType.SCHEMA):
             return self._parse_schema()
+        if self._match(TokenType.PROOF):
+            return self._parse_proof_tree()
 
         # Check for abbreviation (identifier == expr) or free type (identifier ::= ...)
         if self._match(TokenType.IDENTIFIER):
             # Look ahead to determine type
-            name_token = self._current()
             if self._peek_ahead(1).type == TokenType.FREE_TYPE:
                 return self._parse_free_type()
             if self._peek_ahead(1).type == TokenType.ABBREV:
@@ -428,9 +436,7 @@ class Parser:
                 "Expected at least one step in EQUIV chain", self._current()
             )
 
-        return EquivChain(
-            steps=steps, line=start_token.line, column=start_token.column
-        )
+        return EquivChain(steps=steps, line=start_token.line, column=start_token.column)
 
     def _parse_expr(self) -> Expr:
         """Parse expression (entry point)."""
@@ -540,9 +546,7 @@ class Parser:
 
         # Parse separator |
         if not self._match(TokenType.PIPE):
-            raise ParserError(
-                f"Expected '|' after quantifier binding", self._current()
-            )
+            raise ParserError("Expected '|' after quantifier binding", self._current())
         self._advance()  # Consume '|'
 
         # Parse body (rest of expression)
@@ -741,7 +745,10 @@ class Parser:
             )
 
         return FreeType(
-            name=type_name, branches=branches, line=name_token.line, column=name_token.column
+            name=type_name,
+            branches=branches,
+            line=name_token.line,
+            column=name_token.column,
         )
 
     def _parse_abbreviation(self) -> Abbreviation:
@@ -782,9 +789,7 @@ class Parser:
                 self._advance()
 
                 if not self._match(TokenType.COLON):
-                    raise ParserError(
-                        "Expected ':' in declaration", self._current()
-                    )
+                    raise ParserError("Expected ':' in declaration", self._current())
                 self._advance()  # Consume ':'
 
                 # Parse type expression
@@ -855,9 +860,7 @@ class Parser:
                 self._advance()
 
                 if not self._match(TokenType.COLON):
-                    raise ParserError(
-                        "Expected ':' in declaration", self._current()
-                    )
+                    raise ParserError("Expected ':' in declaration", self._current())
                 self._advance()  # Consume ':'
 
                 # Parse type expression
@@ -901,3 +904,79 @@ class Parser:
             line=start_token.line,
             column=start_token.column,
         )
+
+    def _parse_proof_tree(self) -> ProofTree:
+        """Parse proof tree with indentation-based structure."""
+        start_token = self._advance()  # Consume 'PROOF:'
+        self._skip_newlines()
+
+        # Parse proof nodes with indentation tracking
+        nodes = self._parse_proof_nodes(base_indent=0)
+
+        return ProofTree(nodes=nodes, line=start_token.line, column=start_token.column)
+
+    def _parse_proof_nodes(
+        self, base_indent: int, parent_indent: int | None = None
+    ) -> list[ProofNode]:
+        """Parse proof nodes recursively based on indentation."""
+        nodes: list[ProofNode] = []
+
+        while not self._at_end() and not self._is_structural_token():
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+                continue
+
+            # Get the indentation of this line (column of first token)
+            current_indent = self._current().column
+
+            # If we've dedented past the parent level, stop parsing at this level
+            if parent_indent is not None and current_indent <= parent_indent:
+                break
+
+            # Parse the expression on this line
+            line_token = self._current()
+            expr = self._parse_expr()
+
+            # Check for optional justification [rule name]
+            justification: str | None = None
+            if self._match(TokenType.LBRACKET):
+                self._advance()  # Consume '['
+
+                # Collect justification text
+                just_parts: list[str] = []
+                while not self._match(TokenType.RBRACKET) and not self._at_end():
+                    if self._match(TokenType.NEWLINE):
+                        break
+                    just_parts.append(self._current().value)
+                    self._advance()
+
+                if self._match(TokenType.RBRACKET):
+                    self._advance()  # Consume ']'
+                    justification = " ".join(just_parts)
+
+            self._skip_newlines()
+
+            # Look ahead to see if the next line is more indented (children)
+            children: list[ProofNode] = []
+            if not self._at_end() and not self._is_structural_token():
+                next_token = self._current()
+                if next_token.type != TokenType.NEWLINE:
+                    next_indent = next_token.column
+                    if next_indent > current_indent:
+                        # Parse children at this indentation level
+                        children = self._parse_proof_nodes(
+                            base_indent=base_indent, parent_indent=current_indent
+                        )
+
+            # Create proof node
+            node = ProofNode(
+                expression=expr,
+                justification=justification,
+                children=children,
+                indent_level=current_indent - base_indent,
+                line=line_token.line,
+                column=line_token.column,
+            )
+            nodes.append(node)
+
+        return nodes

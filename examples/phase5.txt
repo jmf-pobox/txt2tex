@@ -1,0 +1,43 @@
+=== Phase 5: Proof Trees ===
+
+** Example 1: Simple Modus Ponens **
+
+PROOF:
+p => q [premise]
+p [premise]
+  q [modus ponens]
+
+** Example 2: Conjunction Elimination **
+
+PROOF:
+p and q [premise]
+  p [and elim left]
+  q [and elim right]
+
+** Example 3: Nested Proof **
+
+PROOF:
+(p => q) and (q => r) [premise]
+  p => q [and elim]
+  q => r [and elim]
+p [premise]
+  q [modus ponens]
+    r [modus ponens]
+
+** Example 4: Disjunction Cases **
+
+PROOF:
+p or q [premise]
+  p [case 1]
+    p => r [premise]
+      r [modus ponens]
+  q [case 2]
+    q => r [premise]
+      r [modus ponens]
+
+** Example 5: Proof with Quantifiers **
+
+PROOF:
+forall x : N | x > 0 [premise]
+a in N [premise]
+  a > 0 [universal instantiation]
