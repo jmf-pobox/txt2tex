@@ -480,9 +480,13 @@ class LaTeXGenerator:
         if self.options.use_fuzz:
             self.output.append(r'\usepackage{fuzz}')
         else:
+            # Default: zed-* packages (instructor's preference)
             self.output.append(r'\usepackage{zed-cm}')
             self.output.append(r'\usepackage{zed-maths}')
-            # ... other zed packages
+            if self.has_proof_trees:  # Detected during parsing
+                self.output.append(r'\usepackage{zed-proof}')
+            if self.has_floats:
+                self.output.append(r'\usepackage{zed-float}')
         self.output.append(r'\usepackage{amsmath}')
         self.output.append(r'\begin{document}')
 
@@ -780,7 +784,7 @@ class Options:
     keep_intermediate: bool = False
 
     # LaTeX packages
-    use_fuzz: bool = True           # vs zed-* packages
+    use_fuzz: bool = False          # True=fuzz, False=zed-* packages (default)
 
     # Validation
     run_fuzz_validation: bool = True
@@ -801,10 +805,14 @@ class Options:
 Optional `.txt2texrc` (YAML or JSON):
 
 ```yaml
-use_fuzz: true
+# LaTeX package choice
+use_fuzz: false  # false = zed-* packages (default), true = fuzz
+
+# Validation
 run_fuzz_validation: true
 strict_validation: false
 
+# Operator aliases (both ASCII and Unicode accepted)
 operator_aliases:
   implies: ["=>", "→", "⇒"]
   iff: ["<=>", "↔", "⇔"]
@@ -812,6 +820,7 @@ operator_aliases:
   or: ["or", "∨", "|"]
   not: ["not", "¬", "~"]
 
+# Formatting
 formatting:
   latex_indent: 2
   wrap_width: 80
@@ -819,51 +828,180 @@ formatting:
 
 ## Implementation Plan
 
-### Phase 1: Core Infrastructure (Week 1)
+### Phased End-to-End Approach
 
-1. Set up project structure
-2. Implement basic lexer (operators, structural markers)
-3. Implement basic parser (expressions, precedence)
-4. Implement basic LaTeX generator
-5. Test: Simple expressions → LaTeX
+Each phase delivers a working end-to-end system that is immediately useful for a subset of problems. This allows incremental development with regular user testing and feedback.
 
-**Deliverable**: Convert `p and q => r` to LaTeX
+### Phase 0: Minimal Viable Product (MVP)
+**Timeline**: 2-3 hours
+**Goal**: Convert simple propositional logic to LaTeX
 
-### Phase 2: Structural Elements (Week 2)
+**Features**:
+- Basic operators: `and`, `or`, `not`, `=>`, `<=>`
+- Simple expressions: `p and q => r`
+- Prose paragraphs with inline math
+- Document structure (minimal preamble/postamble)
 
-1. Add solution/section parsing
-2. Add truth table parsing
-3. Add equivalence chain parsing
-4. Add prose handling with inline math
+**Components**:
+- Basic lexer (operators, identifiers, whitespace)
+- Expression parser (precedence: `<=>` < `=>` < `or` < `and` < `not`)
+- Simple LaTeX generator
+- CLI wrapper
 
-**Deliverable**: Convert complete solution with truth table
+**Use Case**:
+```
+Input:  "The formula p and q => r is valid."
+Output: "The formula $p \land q \Rightarrow r$ is valid."
+```
 
-### Phase 3: Z Notation (Week 3)
+**Deliverable**: Can process simple logic statements
+**Test**: Convert a single paragraph with 3-5 expressions
+**Quality Gates**: All 5 commands pass (type, lint, format, test, test-cov)
 
-1. Add Z notation tokens/parsing
-2. Add schema/axdef support
-3. Add type definitions
-4. Test with fuzz validation
+---
 
-**Deliverable**: Convert Z notation examples from test.tex
+### Phase 1: Document Structure + Truth Tables
+**Timeline**: 2-3 hours
+**Goal**: Complete solutions with truth tables
 
-### Phase 4: Advanced Features (Week 4)
+**Add**:
+- `=== Section ===` headers
+- `** Solution N **` markers
+- `(a)`, `(b)`, `(c)` part labels
+- `TRUTH TABLE:` environment
+- Proper spacing (`\bigskip`, `\medskip`)
 
-1. Add proof tree parsing (indentation-based)
-2. Add semantic analysis
-3. Add source mapping for errors
-4. Improve error messages
+**Use Case**:
+```
+** Solution 1 **
 
-**Deliverable**: Full pipeline with validation
+(a) Construct a truth table for p => q
 
-### Phase 5: Polish (Week 5)
+TRUTH TABLE:
+p | q | p => q
+T | T | T
+T | F | F
+F | T | T
+F | F | T
+```
 
-1. Comprehensive test suite
-2. Documentation
-3. Performance optimization
-4. User testing with solutions_complete.txt
+**Deliverable**: Can process complete homework solutions with truth tables
+**Test**: Convert solutions 1-3 from test file
+**Quality Gates**: All 5 commands pass
 
-**Deliverable**: Production-ready tool
+---
+
+### Phase 2: Equivalence Chains + Justifications
+**Timeline**: 1-2 hours
+**Goal**: Step-by-step proofs with justifications
+
+**Add**:
+- `EQUIV:` environment
+- Justifications in `[brackets]`
+- Multi-step equivalence chains
+- Operator handling in justifications
+
+**Use Case**:
+```
+EQUIV:
+p and q
+<=> q and p [commutative]
+<=> q and p [idempotent]
+```
+
+**Deliverable**: Can process equivalence proofs
+**Test**: Convert solutions with EQUIV blocks
+**Quality Gates**: All 5 commands pass
+
+---
+
+### Phase 3: Quantifiers + Subscripts/Superscripts
+**Timeline**: 2-3 hours
+**Goal**: Predicate logic and mathematical notation
+
+**Add**:
+- `forall x : Domain | predicate` syntax
+- `exists` quantifier
+- Superscripts: `x^2`, `2^n`
+- Subscripts: `a_1`, `x_i`
+- Set operators: `in`, `subset`, `union`, `intersect`
+
+**Use Case**:
+```
+forall x : N | x^2 >= 0
+exists n : N | n > 10
+```
+
+**Deliverable**: Can process predicate logic problems
+**Test**: Convert solutions with quantified formulas
+**Quality Gates**: All 5 commands pass
+
+---
+
+### Phase 4: Z Notation Basics
+**Timeline**: 3-4 hours
+**Goal**: Type definitions and schemas
+
+**Add**:
+- `given A, B` (given types)
+- `Type ::= branch1 | branch2` (free types)
+- `abbrev == expression` (abbreviations)
+- `axdef ... where ... end` blocks
+- `schema Name ... where ... end` blocks
+
+**Use Case**:
+```
+given Person, Company
+
+Employment ::= employed | unemployed
+
+axdef
+  population : N
+where
+  population > 0
+end
+```
+
+**Deliverable**: Can process Z notation exercises
+**Test**: Convert Z notation definitions
+**Quality Gates**: All 5 commands pass
+
+---
+
+### Phase 5: Proof Trees (Advanced)
+**Timeline**: 4-5 hours
+**Goal**: Natural deduction proofs
+
+**Add**:
+- `PROOF:` environment
+- Indentation-based tree structure
+- Justifications/rule names
+- Optional: `\infer` syntax generation for zed-proof
+
+**Use Case**:
+```
+PROOF:
+  p and q
+    p [and-elim-1]
+    q [and-elim-2]
+```
+
+**Deliverable**: Can process proof tree exercises
+**Test**: Convert natural deduction proofs
+**Quality Gates**: All 5 commands pass
+
+---
+
+### Total Timeline
+Estimated 15-20 hours of focused work, spread over days/weeks with user testing between phases.
+
+### Advantages of Phased Approach
+1. ✅ **Early utility**: Phase 1 usable for truth table problems immediately
+2. ✅ **Risk reduction**: Each phase validates the architecture
+3. ✅ **Isolated testing**: Clear test scope per phase
+4. ✅ **Regular milestones**: Working software at each phase
+5. ✅ **User feedback**: Real usage drives next phase priorities
+6. ✅ **Easier debugging**: Smaller scope to diagnose issues
 
 ## Technology Choices
 
@@ -927,22 +1065,57 @@ txt2tex/
 └── README.md
 ```
 
-## Open Questions
+## Design Decisions
 
-1. **Package choice**: Support both fuzz and zed-* packages, or choose one?
-   - **Recommendation**: Support both, make it configurable
+### 1. Package Choice: fuzz vs zed-* ✅ RESOLVED
 
-2. **Proof tree syntax**: Keep indentation-based or require explicit structure?
-   - **Recommendation**: Start with indentation, add explicit syntax later
+**Decision**: Support both, default to **zed-***
 
-3. **Unicode operators**: Accept only, or convert on output?
-   - **Recommendation**: Accept both ASCII and Unicode on input
+**Rationale**:
+- **zed-* advantages**:
+  - No custom fonts (uses Computer Modern + AMS)
+  - Works on any LaTeX installation immediately
+  - Instructor uses it (submission compatibility)
+  - Built-in proof tree support (`\infer`, `\assume`, `\discharge`)
+  - Modular design (load only what's needed)
 
-4. **Justification syntax**: Keep `[...]` or change?
-   - **Recommendation**: Keep it, users are familiar
+- **fuzz advantages**:
+  - Historical standard for Z notation
+  - Single package simplicity
+  - Already working in txt2tex_v3.py
+  - May have typechecker integration
 
-5. **Error recovery**: Try to continue parsing after error?
-   - **Recommendation**: Stop at first error initially, add recovery later
+**Implementation**: Both packages use identical macro names (`\land`, `\forall`, `\begin{schema}`, etc.), so generated LaTeX is 99% compatible. Only difference is preamble and proof tree syntax.
+
+**Configuration**:
+```python
+Options(use_fuzz=False)  # Default: zed-*
+Options(use_fuzz=True)   # Use fuzz package
+```
+
+### 2. Proof tree syntax
+
+**Decision**: Keep indentation-based, add explicit syntax later
+
+**Notes**: zed-* packages provide `\infer` macros (from zed-maths.sty). Future enhancement could support explicit proof tree syntax.
+
+### 3. Unicode operators
+
+**Decision**: Accept both ASCII and Unicode on input
+
+Users can write either `and` or `∧`, `forall` or `∀`, etc.
+
+### 4. Justification syntax
+
+**Decision**: Keep `[...]` bracket syntax
+
+Users are familiar with `<=> q and p [commutative]`
+
+### 5. Error recovery
+
+**Decision**: Stop at first error initially, add recovery later
+
+Clear, actionable error messages more important than partial output in v1.
 
 ## Future Enhancements
 
@@ -1063,10 +1236,11 @@ Document(
 )
 ```
 
-**Output LaTeX**:
+**Output LaTeX** (with default zed-* packages):
 ```latex
 \documentclass{article}
-\usepackage{fuzz}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
 \usepackage{amsmath}
 \begin{document}
 
@@ -1090,3 +1264,5 @@ F & F & T \\
 
 \end{document}
 ```
+
+**Note**: Output with `use_fuzz=True` is identical except first three `\usepackage` lines become `\usepackage{fuzz}`.
