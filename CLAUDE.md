@@ -6,6 +6,52 @@ This is `txt2tex` - a tool to convert whiteboard-style mathematical notation to 
 
 **Goal**: Enable users to write mathematical proofs and solutions in plain ASCII (as they would on a whiteboard) and automatically convert them to properly formatted LaTeX documents.
 
+## CRITICAL: Code Quality Standards (MANDATORY)
+
+**🚨 ABSOLUTE REQUIREMENTS - NO EXCEPTIONS:**
+
+### Required Quality Gates (Run After EVERY Code Change)
+```bash
+hatch run type           # 1. ZERO MyPy errors (strict mode)
+hatch run lint           # 2. ZERO Ruff violations
+hatch run format         # 3. Perfect formatting
+hatch run test           # 4. ALL tests pass
+hatch run test-cov       # 5. Coverage maintained
+```
+
+### Code Standards (MANDATORY)
+- **Type hints**: Full type annotations on all functions and methods
+- **MyPy strict mode**: No Any types, no untyped definitions
+- **Protocol inheritance**: All protocol implementations must explicitly inherit
+- **Fail fast**: No defensive coding, raise exceptions on validation failure
+- **No inline imports**: All imports at top of file, grouped by PEP 8
+- **Direct imports**: Use `from __future__ import annotations`
+- **88 character line limit**: Enforced by ruff
+- **Double quotes**: For strings (enforced by ruff format)
+
+### Prohibited Patterns
+- ❌ No `type | None` parameters unless absolutely necessary
+- ❌ No inline import statements
+- ❌ No mock objects in production code (tests only)
+- ❌ No defensive coding or fallback logic unless explicitly requested
+- ❌ No `hasattr()` - use protocols instead
+- ❌ No duck typing - use explicit protocol inheritance
+
+### Micro-Commit Workflow (MANDATORY)
+- **One change** = One commit (extract function, fix bug, add test)
+- **Commit size limits**: 1-5 files, <100 lines preferred
+- **Branch workflow**: ALL development on feature branches
+- **Quality gates between commits**: Run all 5 commands above
+
+### Communication Standards
+- ❌ Never claim "fixed" without user confirmation
+- ❌ No buzzwords, jargon, or superlatives
+- ❌ No exaggeration or enthusiasm about unverified results
+- ✅ State what changed and why
+- ✅ Explain what needs user verification
+- ✅ Use plain, accurate language
+- ✅ Modest, short commit messages
+
 ## Environment Setup
 
 ### Critical Dependencies
