@@ -12,7 +12,8 @@
       "Bash(hatch run lint:*)",
       "Bash(hatch run format:*)",
       "Bash(hatch run ruff:*)",
-      "Bash(hatch run mypy:*)"
+      "Bash(hatch run mypy:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []
