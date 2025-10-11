@@ -7,7 +7,7 @@ from enum import Enum, auto
 
 
 class TokenType(Enum):
-    """Token types for Phase 0: Simple propositional logic."""
+    """Token types for txt2tex lexer (Phase 0 + Phase 1 + Phase 2)."""
 
     # Operators (propositional logic)
     AND = auto()
@@ -19,9 +19,22 @@ class TokenType(Enum):
     # Grouping
     LPAREN = auto()
     RPAREN = auto()
+    LBRACKET = auto()
+    RBRACKET = auto()
 
     # Identifiers and literals
     IDENTIFIER = auto()
+    NUMBER = auto()
+
+    # Document structure (Phase 1)
+    SECTION_MARKER = auto()  # ===
+    SOLUTION_MARKER = auto()  # **
+    PART_LABEL = auto()  # (a), (b), (c), etc.
+    TRUTH_TABLE = auto()  # TRUTH TABLE:
+    PIPE = auto()  # | for table columns
+
+    # Environments (Phase 2)
+    EQUIV = auto()  # EQUIV:
 
     # Whitespace and structure
     WHITESPACE = auto()
