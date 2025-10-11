@@ -6,15 +6,21 @@ import re
 from typing import ClassVar
 
 from txt2tex.ast_nodes import (
+    Abbreviation,
+    AxDef,
     BinaryOp,
+    Declaration,
     Document,
     DocumentItem,
     EquivChain,
     Expr,
+    FreeType,
+    GivenType,
     Identifier,
     Number,
     Part,
     Quantifier,
+    Schema,
     Section,
     Solution,
     Subscript,
@@ -25,7 +31,7 @@ from txt2tex.ast_nodes import (
 
 
 class LaTeXGenerator:
-    """Generates LaTeX from AST for Phase 0 + Phase 1 + Phase 2 + Phase 3."""
+    """Generates LaTeX from AST for Phase 0 + Phase 1 + Phase 2 + Phase 3 + Phase 4."""
 
     # Operator mappings
     BINARY_OPS: ClassVar[dict[str, str]] = {
@@ -113,6 +119,16 @@ class LaTeXGenerator:
             return self._generate_truth_table(item)
         if isinstance(item, EquivChain):
             return self._generate_equiv_chain(item)
+        if isinstance(item, GivenType):
+            return self._generate_given_type(item)
+        if isinstance(item, FreeType):
+            return self._generate_free_type(item)
+        if isinstance(item, Abbreviation):
+            return self._generate_abbreviation(item)
+        if isinstance(item, AxDef):
+            return self._generate_axdef(item)
+        if isinstance(item, Schema):
+            return self._generate_schema(item)
 
         # Item is an Expr - wrap in math mode
         latex_expr = self.generate_expr(item)
@@ -328,6 +344,78 @@ class LaTeXGenerator:
             lines.append(line)
 
         lines.append(r"\end{align*}")
+        lines.append("")
+
+        return lines
+
+    def _generate_given_type(self, node: GivenType) -> list[str]:
+        """Generate LaTeX for given type declaration."""
+        lines: list[str] = []
+        # Generate as: given [A, B, C]
+        names_str = ", ".join(node.names)
+        lines.append(f"\\begin{{zed}}[{names_str}]\\end{{zed}}")
+        lines.append("")
+        return lines
+
+    def _generate_free_type(self, node: FreeType) -> list[str]:
+        """Generate LaTeX for free type definition."""
+        lines: list[str] = []
+        # Generate as: Type ::= branch1 | branch2 | ...
+        branches_str = " | ".join(node.branches)
+        lines.append(f"{node.name} ::= {branches_str}")
+        lines.append("")
+        return lines
+
+    def _generate_abbreviation(self, node: Abbreviation) -> list[str]:
+        """Generate LaTeX for abbreviation definition."""
+        lines: list[str] = []
+        expr_latex = self.generate_expr(node.expression)
+        lines.append(f"{node.name} == {expr_latex}")
+        lines.append("")
+        return lines
+
+    def _generate_axdef(self, node: AxDef) -> list[str]:
+        """Generate LaTeX for axiomatic definition."""
+        lines: list[str] = []
+
+        lines.append(r"\begin{axdef}")
+
+        # Generate declarations
+        for decl in node.declarations:
+            type_latex = self.generate_expr(decl.type_expr)
+            lines.append(f"{decl.variable} : {type_latex}")
+
+        # Generate where clause if predicates exist
+        if node.predicates:
+            lines.append(r"\where")
+            for pred in node.predicates:
+                pred_latex = self.generate_expr(pred)
+                lines.append(pred_latex)
+
+        lines.append(r"\end{axdef}")
+        lines.append("")
+
+        return lines
+
+    def _generate_schema(self, node: Schema) -> list[str]:
+        """Generate LaTeX for schema definition."""
+        lines: list[str] = []
+
+        lines.append(r"\begin{schema}{" + node.name + "}")
+
+        # Generate declarations
+        for decl in node.declarations:
+            type_latex = self.generate_expr(decl.type_expr)
+            lines.append(f"{decl.variable} : {type_latex}")
+
+        # Generate where clause if predicates exist
+        if node.predicates:
+            lines.append(r"\where")
+            for pred in node.predicates:
+                pred_latex = self.generate_expr(pred)
+                lines.append(pred_latex)
+
+        lines.append(r"\end{schema}")
         lines.append("")
 
         return lines

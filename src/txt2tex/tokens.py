@@ -7,7 +7,7 @@ from enum import Enum, auto
 
 
 class TokenType(Enum):
-    """Token types for txt2tex lexer (Phase 0 + Phase 1 + Phase 2 + Phase 3)."""
+    """Token types for txt2tex lexer (Phase 0 + Phase 1 + Phase 2 + Phase 3 + Phase 4)."""
 
     # Operators (propositional logic)
     AND = auto()
@@ -32,6 +32,10 @@ class TokenType(Enum):
     LESS_EQUAL = auto()  # <=
     GREATER_EQUAL = auto()  # >=
     EQUALS = auto()  # =
+
+    # Z notation operators (Phase 4)
+    FREE_TYPE = auto()  # ::=
+    ABBREV = auto()  # ==
 
     # Math operators (Phase 3)
     CARET = auto()  # ^ for superscripts
@@ -61,6 +65,13 @@ class TokenType(Enum):
 
     # Environments (Phase 2)
     EQUIV = auto()  # EQUIV:
+
+    # Z notation keywords (Phase 4)
+    GIVEN = auto()  # given
+    AXDEF = auto()  # axdef
+    SCHEMA = auto()  # schema
+    WHERE = auto()  # where
+    END = auto()  # end
 
     # Whitespace and structure
     WHITESPACE = auto()
