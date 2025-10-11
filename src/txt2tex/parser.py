@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from txt2tex.ast_nodes import BinaryOp, Expr, Identifier, UnaryOp
+from txt2tex.ast_nodes import BinaryOp, Document, Expr, Identifier, UnaryOp
 from txt2tex.tokens import Token, TokenType
 
 
@@ -34,15 +34,41 @@ class Parser:
         self.tokens = tokens
         self.pos = 0
 
-    def parse(self) -> Expr:
-        """Parse tokens and return AST."""
-        expr = self._parse_expr()
+    def parse(self) -> Document | Expr:
+        """
+        Parse tokens and return AST.
+
+        Returns Document for multi-line input, or single Expr for single expression.
+        """
+        self._skip_newlines()
+
+        # Parse first expression
+        if self._at_end():
+            # Empty document
+            return Document(items=[], line=1, column=1)
+
+        first_line = self._current().line
+        first_expr = self._parse_expr()
+
+        # Check if there are more expressions
+        if self._match(TokenType.NEWLINE):
+            # Multi-line document
+            expressions = [first_expr]
+            self._skip_newlines()
+
+            while not self._at_end():
+                expressions.append(self._parse_expr())
+                self._skip_newlines()
+
+            return Document(items=expressions, line=first_line, column=1)
+
+        # Single expression (Phase 0 behavior)
         if not self._at_end():
             raise ParserError(
                 f"Unexpected token after expression: {self._current().value!r}",
                 self._current(),
             )
-        return expr
+        return first_expr
 
     def _at_end(self) -> bool:
         """Check if we've consumed all tokens."""
@@ -62,6 +88,11 @@ class Parser:
     def _match(self, *types: TokenType) -> bool:
         """Check if current token matches any of the given types."""
         return self._current().type in types
+
+    def _skip_newlines(self) -> None:
+        """Skip all consecutive newline tokens."""
+        while self._match(TokenType.NEWLINE) and not self._at_end():
+            self._advance()
 
     def _parse_expr(self) -> Expr:
         """Parse expression (entry point)."""
