@@ -141,8 +141,71 @@ class EquivChain(ASTNode):
     steps: list[EquivStep]
 
 
+# Z notation nodes (Phase 4)
+
+
+@dataclass(frozen=True)
+class GivenType(ASTNode):
+    """Given type declaration (given A, B, C)."""
+
+    names: list[str]
+
+
+@dataclass(frozen=True)
+class FreeType(ASTNode):
+    """Free type definition (Type ::= branch1 | branch2)."""
+
+    name: str
+    branches: list[str]
+
+
+@dataclass(frozen=True)
+class Abbreviation(ASTNode):
+    """Abbreviation definition (name == expression)."""
+
+    name: str
+    expression: Expr
+
+
+@dataclass(frozen=True)
+class Declaration(ASTNode):
+    """Declaration in axdef or schema (var : Type)."""
+
+    variable: str
+    type_expr: Expr
+
+
+@dataclass(frozen=True)
+class AxDef(ASTNode):
+    """Axiomatic definition block."""
+
+    declarations: list[Declaration]
+    predicates: list[Expr]
+
+
+@dataclass(frozen=True)
+class Schema(ASTNode):
+    """Schema definition block."""
+
+    name: str
+    declarations: list[Declaration]
+    predicates: list[Expr]
+
+
 # Type alias for document items (expressions or structural elements)
-DocumentItem = Expr | Section | Solution | Part | TruthTable | EquivChain
+DocumentItem = (
+    Expr
+    | Section
+    | Solution
+    | Part
+    | TruthTable
+    | EquivChain
+    | GivenType
+    | FreeType
+    | Abbreviation
+    | AxDef
+    | Schema
+)
 
 
 @dataclass(frozen=True)
