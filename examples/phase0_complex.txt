@@ -1,0 +1,53 @@
+true => false <=> false
+false => false <=> true
+false => true <=> true
+false => false <=> true
+
+p => not p
+not p or not p
+not p
+
+not p => p
+not not p or p
+p or p
+p
+
+p => (q => r)
+not p or (q => r)
+not p or (not q or r)
+(not p or not q) or r
+not (p and q) or r
+(p and q) => r
+
+q => (p => r)
+not q or (p => r)
+not q or (not p or r)
+not p or (not q or r)
+not p or (q => r)
+p => (q => r)
+
+(p and q) <=> p
+((p and q) => p) and (p => (p and q))
+(not (p and q) or p) and (not p or (p and q))
+((not p or not q) or p) and (not p or (p and q))
+(not q or (not p or p)) and (not p or (p and q))
+(not q or true) and (not p or (p and q))
+true and (not p or (p and q))
+not p or (p and q)
+(not p or p) and (not p or q)
+true and (not p or q)
+not p or q
+p => q
+
+(p or q) <=> p
+((p or q) => p) and (p => (p or q))
+(not (p or q) or p) and (not p or (p or q))
+((not p and not q) or p) and (not p or (p or q))
+((not p or p) and (not q or p)) and (not p or (p or q))
+(true and (not q or p)) and (not p or (p or q))
+(not q or p) and (not p or (p or q))
+(not q or p) and ((not p or p) or q)
+(not q or p) and (true or q)
+(not q or p) and true
+not q or p
+q => p

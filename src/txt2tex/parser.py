@@ -10,9 +10,13 @@ from txt2tex.ast_nodes import (
     EquivStep,
     Expr,
     Identifier,
+    Number,
     Part,
+    Quantifier,
     Section,
     Solution,
+    Subscript,
+    Superscript,
     TruthTable,
     UnaryOp,
 )
@@ -30,7 +34,7 @@ class ParserError(Exception):
 
 class Parser:
     """
-    Recursive descent parser for Phase 0 + Phase 1 + Phase 2.
+    Recursive descent parser for Phase 0 + Phase 1 + Phase 2 + Phase 3.
 
     Phase 0 - Expression grammar (precedence from lowest to highest):
         expr     ::= iff
@@ -53,6 +57,21 @@ class Parser:
         equiv_chain ::= 'EQUIV:' equiv_step+
         equiv_step ::= expr ('<=' '>')? justification?
         justification ::= '[' TEXT ']'
+
+    Phase 3 - Quantifiers and mathematical notation:
+        expr       ::= quantifier | iff
+        quantifier ::= ('forall' | 'exists') IDENTIFIER ':' atom '|' expr
+        iff        ::= implies ( '<=>' implies )*
+        implies    ::= or ( '=>' or )*
+        or         ::= and ( 'or' and )*
+        and        ::= comparison ( 'and' comparison )*
+        comparison ::= set_op ( ('<' | '>' | '<=' | '>=' | '=') set_op )?
+        set_op     ::= union ( ('in' | 'subset') union )?
+        union      ::= intersect ( 'union' intersect )*
+        intersect  ::= unary ( 'intersect' unary )*
+        unary      ::= 'not' unary | postfix
+        postfix    ::= atom ( '^' atom | '_' atom )*
+        atom       ::= IDENTIFIER | NUMBER | '(' expr ')'
     """
 
     def __init__(self, tokens: list[Token]) -> None:
@@ -372,6 +391,9 @@ class Parser:
 
     def _parse_expr(self) -> Expr:
         """Parse expression (entry point)."""
+        # Check for quantifier first (Phase 3)
+        if self._match(TokenType.FORALL, TokenType.EXISTS):
+            return self._parse_quantifier()
         return self._parse_iff()
 
     def _parse_iff(self) -> Expr:
@@ -427,11 +449,11 @@ class Parser:
 
     def _parse_and(self) -> Expr:
         """Parse and operation."""
-        left = self._parse_unary()
+        left = self._parse_comparison()
 
         while self._match(TokenType.AND):
             op_token = self._advance()
-            right = self._parse_unary()
+            right = self._parse_comparison()
             left = BinaryOp(
                 operator=op_token.value,
                 left=left,
@@ -454,13 +476,153 @@ class Parser:
                 column=op_token.column,
             )
 
-        return self._parse_primary()
+        return self._parse_postfix()
 
-    def _parse_primary(self) -> Expr:
-        """Parse primary expression (identifier or parenthesized expression)."""
+    def _parse_quantifier(self) -> Expr:
+        """Parse quantifier: (forall|exists) var : domain | body."""
+        quant_token = self._advance()  # Consume 'forall' or 'exists'
+
+        # Parse variable
+        if not self._match(TokenType.IDENTIFIER):
+            raise ParserError(
+                f"Expected variable name after {quant_token.value}", self._current()
+            )
+        var_token = self._advance()
+
+        # Parse optional domain (: domain)
+        domain: Expr | None = None
+        if self._match(TokenType.COLON):
+            self._advance()  # Consume ':'
+            domain = self._parse_atom()
+
+        # Parse separator |
+        if not self._match(TokenType.PIPE):
+            raise ParserError(
+                f"Expected '|' after quantifier binding", self._current()
+            )
+        self._advance()  # Consume '|'
+
+        # Parse body (rest of expression)
+        body = self._parse_expr()
+
+        return Quantifier(
+            quantifier=quant_token.value,
+            variable=var_token.value,
+            domain=domain,
+            body=body,
+            line=quant_token.line,
+            column=quant_token.column,
+        )
+
+    def _parse_comparison(self) -> Expr:
+        """Parse comparison operators (<, >, <=, >=, =)."""
+        left = self._parse_set_op()
+
+        if self._match(
+            TokenType.LESS_THAN,
+            TokenType.GREATER_THAN,
+            TokenType.LESS_EQUAL,
+            TokenType.GREATER_EQUAL,
+            TokenType.EQUALS,
+        ):
+            op_token = self._advance()
+            right = self._parse_set_op()
+            left = BinaryOp(
+                operator=op_token.value,
+                left=left,
+                right=right,
+                line=op_token.line,
+                column=op_token.column,
+            )
+
+        return left
+
+    def _parse_set_op(self) -> Expr:
+        """Parse set operators (in, subset)."""
+        left = self._parse_union()
+
+        if self._match(TokenType.IN, TokenType.SUBSET):
+            op_token = self._advance()
+            right = self._parse_union()
+            left = BinaryOp(
+                operator=op_token.value,
+                left=left,
+                right=right,
+                line=op_token.line,
+                column=op_token.column,
+            )
+
+        return left
+
+    def _parse_union(self) -> Expr:
+        """Parse union operator."""
+        left = self._parse_intersect()
+
+        while self._match(TokenType.UNION):
+            op_token = self._advance()
+            right = self._parse_intersect()
+            left = BinaryOp(
+                operator=op_token.value,
+                left=left,
+                right=right,
+                line=op_token.line,
+                column=op_token.column,
+            )
+
+        return left
+
+    def _parse_intersect(self) -> Expr:
+        """Parse intersect operator."""
+        left = self._parse_unary()
+
+        while self._match(TokenType.INTERSECT):
+            op_token = self._advance()
+            right = self._parse_unary()
+            left = BinaryOp(
+                operator=op_token.value,
+                left=left,
+                right=right,
+                line=op_token.line,
+                column=op_token.column,
+            )
+
+        return left
+
+    def _parse_postfix(self) -> Expr:
+        """Parse postfix operators (^ for superscript, _ for subscript)."""
+        base = self._parse_atom()
+
+        # Keep applying postfix operators while we see them
+        while self._match(TokenType.CARET, TokenType.UNDERSCORE):
+            op_token = self._advance()
+            operand = self._parse_atom()
+
+            if op_token.type == TokenType.CARET:
+                base = Superscript(
+                    base=base,
+                    exponent=operand,
+                    line=op_token.line,
+                    column=op_token.column,
+                )
+            else:  # UNDERSCORE
+                base = Subscript(
+                    base=base,
+                    index=operand,
+                    line=op_token.line,
+                    column=op_token.column,
+                )
+
+        return base
+
+    def _parse_atom(self) -> Expr:
+        """Parse atom (identifier, number, or parenthesized expression)."""
         if self._match(TokenType.IDENTIFIER):
             token = self._advance()
             return Identifier(name=token.value, line=token.line, column=token.column)
+
+        if self._match(TokenType.NUMBER):
+            token = self._advance()
+            return Number(value=token.value, line=token.line, column=token.column)
 
         if self._match(TokenType.LPAREN):
             self._advance()  # Consume '('
@@ -471,6 +633,6 @@ class Parser:
             return expr
 
         raise ParserError(
-            f"Expected identifier or '(', got {self._current().type.name}",
+            f"Expected identifier, number, or '(', got {self._current().type.name}",
             self._current(),
         )

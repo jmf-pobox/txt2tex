@@ -210,9 +210,9 @@ class Lexer:
     def _scan_identifier(self, start_line: int, start_column: int) -> Token:
         """Scan identifier or keyword."""
         start_pos = self.pos
-        while not self._at_end() and (
-            self._current_char().isalnum() or self._current_char() == "_"
-        ):
+        # Note: Do NOT include underscore in identifiers
+        # Underscore is used as subscript operator in Phase 3
+        while not self._at_end() and self._current_char().isalnum():
             self._advance()
 
         value = self.text[start_pos : self.pos]

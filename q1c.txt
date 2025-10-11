@@ -1,0 +1,10 @@
+=== Propositional Logic ===
+
+** Solution 3c **
+
+(c) EQUIV:
+((p => r) and (q => r))
+(not p or r) and (not q or r) [=> disjunction]
+r and (not p or not q) [distributivity 2]
+(not p or not q) and r [associativity of or]
+(p or q) => r
