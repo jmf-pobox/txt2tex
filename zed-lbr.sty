@@ -1,0 +1,354 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% zed-lbr.sty v1.4
+%
+% ZED symbols using Lucida Bright
+%
+% arrows, project larger than before
+
+\def\fileversion{1.4 upgrade} \def\filedate{01/01/29} 
+
+\NeedsTeXFormat{LaTeX2e}
+
+\ProvidesPackage{zed-lbr}[{%
+  \filedate\space\fileversion\space zed - l(ucida) br(ight)}]
+
+\newif\if@fleqn@ \@fleqn@true
+
+\DeclareOption{fleqn}{\@fleqn@true}
+\DeclareOption{nofleqn}{\@fleqn@false}
+
+\ExecuteOptions{fleqn} \ProcessOptions
+
+\RequirePackage{texnansi}
+\RequirePackage[expert,altbullet]{lucidabr}
+
+% >>> fonts and symbols <<<
+
+\DeclareMathSymbol{\doublebarwedge}{\mathbin}{symbols}{"D4}
+\DeclareMathSymbol{\lll}{\mathrel}{letters}{"DE}
+\DeclareMathSymbol{\ggg}{\mathrel}{letters}{"DF} 
+\DeclareMathSymbol{\eth}{\mathrel}{operators}{"F0}
+
+% >>> fuzz <<<
+
+\DeclareSymbolFont{italics}{\encodingdefault}{\rmdefault}{m}{it}
+
+\def\@setmcodes#1#2#3{{\count0=#1 \count1=#3
+    \loop \global\mathcode\count0=\count1 \ifnum \count0<#2
+    \advance\count0 by1 \advance\count1 by1 \repeat}}
+\@setmcodes{`A}{`Z}{"7\hexnumber@\symitalics41}% 
+\@setmcodes{`a}{`z}{"7\hexnumber@\symitalics61}% 
+
+\def~{\ifmmode\,\else\penalty\@M\ \fi}
+
+\let\@mc=\mathchardef \mathcode`\;="8000 {\catcode`\;=\active
+  \gdef;{\semicolon\;}} \@mc\semicolon="603B
+
+\def\strut@op#1{\mathop{\mathstrut{#1}}\nolimits}
+
+\def\_{\leavevmode \ifmmode\else\kern0.06em\fi \vbox{\hrule
+    width0.5em}} 
+
+\mathcode`\"="8000 \def\@kwote#1"{\hbox{\it #1}} {\catcode`\"=\active
+  \global\let"=\@kwote}
+
+\mathchardef\spot="320F
+\mathcode`\@=\spot
+\mathcode`\|=\mid
+
+\def\bsup#1 \esup{^{#1}}
+
+\def\inrel#1{\mathrel{\underline{#1}}}
+
+\newdimen\zedindent \zedindent=\leftmargini%
+\newdimen\zedleftsep \zedleftsep=1em%
+\newdimen\zedtab \zedtab=2em%
+\newdimen\zedbar \zedbar=6em%
+\newskip\zedskip \zedskip=0.5\baselineskip plus0.333333\baselineskip% 
+                                minus0.333333\baselineskip%
+\def\zedsize{}%
+
+\newcount\interzedlinepenalty \interzedlinepenalty=10000%
+\newcount\preboxpenalty \preboxpenalty=0%
+\newif\ifzt@p           \zt@pfalse%
+
+\def\@jot{0.5\zedskip}
+
+\def\@narrow{\advance\linewidth by-\zedindent}
+
+\def\@zrulefill{\leaders\hrule height\arrayrulewidth\hfill}
+
+\def\@topline#1{\hbox to\linewidth{%
+    \vrule height\arrayrulewidth width\arrayrulewidth
+    \vrule height0pt depth\@jot width0pt
+    \hbox to\zedleftsep{\@zrulefill\thinspace}%
+    #1\thinspace\@zrulefill}}
+
+\def\@zedline{\omit \vrule height\arrayrulewidth width\linewidth \cr}
+
+\def\where{\@zskip\@jot
+  \omit \vrule height\arrayrulewidth width\zedbar \cr
+  \@zskip\@jot}
+
+\def\also{\crcr \noalign{\penalty\interdisplaylinepenalty
+    \vskip\zedskip}} 
+\def\@zskip#1{\crcr \omit \vrule height#1 width\arrayrulewidth \cr}
+\def\@zlign{\tabskip\z@skip\everycr{}} 
+
+\let\tie=\t
+\def\t#1{\afterassignment\@t\count@=#1}
+\def\@t{\hskip\count@\zedtab}
+
+\def\@setzsize{\let\next=\@nomath\def\@nomath##1{}%
+  \skip0=\abovedisplayskip\skip1=\belowdisplayskip
+  \zedsize \let\@nomath=\next 
+  \abovedisplayskip=\skip0\belowdisplayskip=\skip1}
+
+\def\@zed{\ifvmode\@zleavevmode\fi
+  $$\global\zt@ptrue
+  \@setzsize
+  \advance\linewidth by-\zedindent
+  \advance\displayindent by\zedindent
+  \def\\{\crcr}% Must have \def and not \let for nested alignments.
+  \let\par=\relax
+  \tabskip=0pt}
+
+\def\@znoskip{\offinterlineskip
+  \everycr={\noalign{\ifzt@p \global\zt@pfalse
+      \ifdim\prevdepth>-1000pt \skip0=\normalbaselineskip
+        \advance\skip0by-\prevdepth \advance\skip0by-\ht\strutbox
+        \ifdim\skip0<\normallineskiplimit \vskip\normallineskip
+        \else \vskip\skip0 \fi\fi
+    \else \penalty\interzedlinepenalty \fi}}}
+
+\def\zed{\@zed\@znoskip\halign to\linewidth\bgroup
+  \strut$\@zlign##$\hfil \tabskip=0pt plus1fil\cr}
+\def\endzed{\crcr\egroup$$\global\@ignoretrue}
+
+\if@fleqn@
+  \def\[{\begingroup\zed} %
+  \def\]{\crcr\egroup$$\endgroup\ignorespaces} %
+\fi
+
+\def\axdef{\def\also{\@zskip\zedskip}%
+  \predisplaypenalty=\preboxpenalty
+  \@zed\@znoskip \halign to\linewidth\bgroup
+    \strut \vrule width\arrayrulewidth \hskip\zedleftsep
+    $\@zlign##$\hfil \tabskip=0pt plus1fil\cr}
+\let\endaxdef=\endzed
+
+\def\schema#1{\@ifnextchar[{\@schema{#1}}{\@nschema{#1}}}
+\def\@schema#1[#2]{\@nschema{#1[#2]}}
+\def\@nschema#1{\@narrow\axdef \omit\@topline{$\strut#1$}\cr}
+\def\endschema{\@zskip\@jot \@zedline \endzed}
+
+\@namedef{schema*}{\@narrow\axdef \@zedline \@zskip\@jot}
+\expandafter\let\csname endschema*\endcsname=\endschema
+
+\def\gendef{\@ifnextchar[{\@gendef}{\@ngendef}}
+\def\@gendef[#1]{\@narrow\axdef \omit \setbox0=\hbox{$\strut[#1]$}%
+  \rlap{\raise\doublerulesep\@topline{\hskip\wd0}}\@topline{\box0}\cr}
+\def\@ngendef{\@narrow\axdef \@zedline \omit \hbox to\linewidth{\vrule
+    height\doublerulesep width\arrayrulewidth \@zrulefill}\cr
+  \@zskip\@jot
+  } 
+\let\endgendef=\endschema
+
+\def\argue{\@zed \interzedlinepenalty=\interdisplaylinepenalty
+  \openup\@jot \halign to\linewidth\bgroup
+  \strut$\@zlign##$\hfil \tabskip=0pt plus1fil
+  &\hbox to0pt{\hss[\@zlign##\unskip]}\tabskip=0pt\cr
+  \noalign{\vskip-\@jot}}
+\let\endargue=\endzed
+
+\def\because#1{\noalign{\vskip-\jot}&#1\cr}
+
+\def\syntax{\@zed\@znoskip \halign\bgroup
+  \strut$\@zlign##$\hfil &\hfil$\@zlign{}##{}$\hfil
+  &$\@zlign##$\hfil\cr}
+\let\endsyntax=\endzed
+
+\def\infrule{\@zed\@znoskip \halign\bgroup
+  \strut\quad$\@zlign##$\quad\hfil&\quad\@zlign##\hfil\cr}
+\let\endinfrule=\endzed
+
+\def\derive{\crcr \noalign{\vskip\@jot} \omit\@zrulefill
+  \@ifnextchar[{\@xderive}{\@yderive}}
+\def\@xderive[#1]{&$\smash{\lower 0.5ex\hbox{$[\;#1\;]$}}$\cr 
+  \noalign{\vskip\@jot}}
+\def\@yderive{\cr \noalign{\vskip\@jot}}
+
+\def\@zleavevmode{\if@inlabel \indent
+  \else\if@noskipsec \indent
+  \else\if@nobreak \global\@nobreakfalse
+  \everypar={}\abovedisplayskip=0pt\fi
+  {\parskip=0pt\noindent}\fi\fi}
+
+% ----------------------------------------------------------------------
+
+\def\simple@enlarge#1{%
+  \mathchoice{%
+    \hbox{\large$#1$}%
+    }{%
+    \hbox{\large$#1$}%
+    }{%
+    \hbox{\small$#1$}%
+    }{%
+    \hbox{\small$#1$}%
+    }}
+
+\def\vcenter@enlarge#1{%
+  \mathchoice{%
+    \vcenter{\hbox{\large$#1$}}%
+    }{%
+    \vcenter{\hbox{\large$#1$}}%
+    }{%
+    \vcenter{\hbox{\small$#1$}}%
+    }{%
+    \vcenter{\hbox{\small$#1$}}%
+    }}
+
+\ifx\bbold\undefined
+  \let\bbold=\mathbb
+\fi
+
+\let\xlambda=\lambda \let\xmu=\mu 
+\let\xforall=\forall \let\xexists=\exists
+
+\def \bind      {\mathrel{\leadsto}}
+\def \bindsto   {\mathrel{\leadsto}}
+
+\def \lblot     {{\langle}\mkern -5mu{|}}
+\def \rblot     {{|}\mkern -5mu{\rangle}}
+
+\let\lbind=\lblot
+\let\rbind=\rblot
+
+\def \defs      {\mathrel{\widehat=}}
+\def \power     {\strut@op{\bbold P}}
+\let \cross     \times
+\def \lambda    {\strut@op{\xlambda}}
+\def \mu        {\strut@op{\xmu}}
+\let \lbag      \ldbrack
+\let \rbag      \rdbrack
+\def \lnot      {\neg\;}
+\def \land      {\mathrel{\wedge}}
+\def \lor       {\mathrel{\vee}}
+\let \implies   \Rightarrow
+\let \iff       \Leftrightarrow
+\def \forall    {\strut@op{\xforall}}
+\def \exists    {\strut@op{\xexists}}
+\def \hide      {\mathrel{\backslash}}
+\DeclareMathSymbol{\project@sym}{\mathord}{arrows}{"75}
+\def \project   {\mathrel{\simple@enlarge{\project@sym}}}
+\def \pre       {{\mathrm{pre}}\;}
+\def \semi      {\mathrel{\comp}}
+\def \ldata     {\langle\!\langle}
+\def \rdata     {\rangle\!\rangle}
+\let \shows     \vdash
+\def \pipe      {\mathord>\!\!\mathord>}
+\def \LET       {{\mathbf{let}}\;}
+\def \IF        {{\mathbf{if}}\;}
+\def \IN        {{\mathbf{in}}\;}
+\def \THEN      {\mathrel{\mathbf{then}}}
+\def \ELSE      {\mathrel{\mathbf{else}}}
+
+\def \dom       {\mathop{\mathrm{dom}}}
+\def \ran       {\mathop{\mathrm{ran}}}
+\def \id        {\mathop{\mathrm{id}}}
+\def\comp{\mathrel{\raise 0.66ex\hbox{\oalign{\hfil%
+        $\scriptscriptstyle\mathsf{o}$\hfil%
+        \cr\hfil$\scriptscriptstyle\mathsf{9}$\hfil}}}}
+
+\DeclareMathSymbol{\dres}{\mathbin}{letters}{"2F}
+\DeclareMathSymbol{\rres}{\mathbin}{letters}{"2E}
+\DeclareMathSymbol{\ndres}{\mathbin}{arrows}{17}
+\DeclareMathSymbol{\nrres}{\mathbin}{arrows}{18}
+
+\def \limg      {(\mskip-4.5mu|}
+\def \rimg      {|\mskip-4.5mu)}
+
+\def \nat       {{\bbold N}}
+\def \num       {{\bbold Z}}
+\def \div       {\mathbin{\mathsf{div}}}
+\def \mod       {\mathbin{\mathsf{mod}}}
+\def \upto      {\mathbin{\ldotp\ldotp}}
+\def \plus      {^+}
+\def \star      {^*}
+\def \finset    {\strut@op{{\bbold F}}}
+\def \seq       {\mathop{\mathrm{seq}}}
+\def \iseq      {\mathop{\mathrm{iseq}}}
+\def \cat       {\mathbin{\raise 0.8ex\hbox{$\smallfrown$}}}
+\def \filter    {\mathbin{\project}}
+\def \dcat      {\mathop{\cat/}}
+\def \bag       {\mathop{\mathrm{bag}}}
+\def \bcount    {\mathbin{\sharp}}
+
+\def \inbag     {\mathrel{\rlap{\hbox{$-$}}{\sqsubset}}}
+\let \subbageq  \sqsubseteq
+\def \disjoint  {{\mathsf{disjoint}}\;}
+\def \partition {\mathrel{\mathsf{partition}}}
+\def \prefix    {\mathrel{\mathsf{prefix}}}
+\def \suffix    {\mathrel{\mathsf{suffix}}}
+\def \inseq     {\mathrel{\mathsf{in}}}
+\def \extract   {\mathrel{\upharpoonleft}} 
+\def \uminus@sym{\setbox0=\hbox{$\cup$}\rlap{\hbox 
+    to\wd0{\hss\raise0.3ex\hbox{$\scriptscriptstyle{-}$}\hss}}\box0}
+\def \uminus    {\mathrel{\uminus@sym}}
+
+\let\inv@sym\sim 
+\def\inv{^{\simple@enlarge{\inv@sym}}}
+
+% -- arrows ------------------------------------------------------------
+
+\let\fun@sym\rightarrow
+\let\rel@sym\leftrightarrow
+\let\inj@sym\rightarrowtail
+\let\mapsto@sym\mapsto
+\let\surj@sym\twoheadrightarrow
+\DeclareMathSymbol{\pinj@sym}{\mathbin}{arrows}{146}
+
+\def\bij@sym{\ooalign{$\inj@sym$\hfil\cr$\mkern 2.4mu \fun@sym$}}
+
+\def\@p#1{%
+  \ooalign{\hfil$\mapstochar\mkern 8mu$\hfil\cr$#1$}}
+
+\def\@f#1{%
+  \ooalign{\hfil$\mapstochar\mkern 2mu\mapstochar\mkern 6mu$\hfil\cr$#1$}}
+
+\def\mapsto{\mathbin{\simple@enlarge{\mapsto@sym}}}
+\def\rel{\mathbin{\vcenter@enlarge{\rel@sym}}}
+
+\def\fun{\mathbin{\vcenter@enlarge{\fun@sym}}}
+\def\inj{\mathbin{\vcenter@enlarge{\inj@sym}}}
+\def\surj{\mathbin{\vcenter@enlarge{\surj@sym}}}
+\def\bij{\mathbin{\vcenter@enlarge{\bij@sym}}}
+\def\pinj{\mathbin{\vcenter@enlarge{\pinj@sym}}}
+\def\pfun{\mathbin{\vcenter@enlarge{\@p\fun@sym}}}
+\def\psurj{\mathbin{\vcenter@enlarge{\@p\surj@sym}}}
+\def\pbij{\mathbin{\vcenter@enlarge{\@p\bij@sym}}}
+\def\ffun{\mathbin{\vcenter@enlarge{\@f\fun@sym}}}
+\def\finj{\mathbin{\vcenter@enlarge{\@f\inj@sym}}}
+
+%% extra SEarrow for Using Z
+
+\DeclareMathSymbol{\refinedarrow}{\mathord}{arrows}{"65}
+\def\SEarrow{\hbox{\LARGE{$\refinedarrow$}}}
+
+%% nice macro names
+
+\let \Inter     \bigcap                   
+\let \Land      \bigwedge                 
+\let \Lor       \bigvee                   
+\let \Union     \bigcup                   
+\let \inter     \cap                          
+\def \nin       {\not\in}
+\let \union     \cup                          
+\def \nil       {\langle\rangle}
+\def\drop       {\array[t]{@{}l@{}}}
+\def\enddrop    {\endarray}
+
+\endinput
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
