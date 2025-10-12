@@ -52,16 +52,18 @@ class Number(ASTNode):
 
 @dataclass(frozen=True)
 class Quantifier(ASTNode):
-    """Quantifier node (forall, exists, exists1).
+    """Quantifier node (forall, exists, exists1, mu).
 
     Phase 6 enhancement: Supports multiple variables with shared domain.
+    Phase 7 enhancement: Supports mu-operator (definite description).
     Examples:
     - forall x : N | pred  -> variables=["x"], domain=N
     - forall x, y : N | pred -> variables=["x", "y"], domain=N
     - exists1 x : N | pred -> quantifier="exists1", variables=["x"]
+    - mu x : N | pred -> quantifier="mu", variables=["x"]
     """
 
-    quantifier: str  # "forall", "exists", or "exists1"
+    quantifier: str  # "forall", "exists", "exists1", or "mu"
     variables: list[str]  # One or more variables (e.g., ["x", "y"])
     domain: Expr | None  # Optional domain shared by all variables (e.g., N, Z)
     body: Expr
