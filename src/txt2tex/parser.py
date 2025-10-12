@@ -67,16 +67,17 @@ class Parser:
         equiv_step ::= expr ('<=' '>')? justification?
         justification ::= '[' TEXT ']'
 
-    Phase 3 - Quantifiers and mathematical notation (enhanced in Phase 6):
+    Phase 3 - Quantifiers and mathematical notation (enhanced in Phase 6-7):
         expr       ::= quantifier | iff
-        quantifier ::= ('forall' | 'exists' | 'exists1') var_list (':' atom)? '|' expr
+        quantifier ::= ('forall' | 'exists' | 'exists1' | 'mu')
+                       var_list (':' atom)? '|' expr
         var_list   ::= IDENTIFIER (',' IDENTIFIER)*
         iff        ::= implies ( '<=>' implies )*
         implies    ::= or ( '=>' or )*
         or         ::= and ( 'or' and )*
         and        ::= comparison ( 'and' comparison )*
-        comparison ::= set_op ( ('<' | '>' | '<=' | '>=' | '=') set_op )?
-        set_op     ::= union ( ('in' | 'subset') union )?
+        comparison ::= set_op ( ('<' | '>' | '<=' | '>=' | '=' | '!=') set_op )?
+        set_op     ::= union ( ('in' | 'notin' | 'subset') union )?
         union      ::= intersect ( 'union' intersect )*
         intersect  ::= unary ( 'intersect' unary )*
         unary      ::= 'not' unary | postfix
@@ -448,8 +449,10 @@ class Parser:
 
     def _parse_expr(self) -> Expr:
         """Parse expression (entry point)."""
-        # Check for quantifier first (Phase 3, enhanced in Phase 6)
-        if self._match(TokenType.FORALL, TokenType.EXISTS, TokenType.EXISTS1):
+        # Check for quantifier first (Phase 3, enhanced in Phase 6-7)
+        if self._match(
+            TokenType.FORALL, TokenType.EXISTS, TokenType.EXISTS1, TokenType.MU
+        ):
             return self._parse_quantifier()
         return self._parse_iff()
 
@@ -536,15 +539,17 @@ class Parser:
         return self._parse_postfix()
 
     def _parse_quantifier(self) -> Expr:
-        """Parse quantifier: (forall|exists|exists1) var [, var]* : domain | body.
+        """Parse quantifier: (forall|exists|exists1|mu) var [, var]* : domain | body.
 
         Phase 6 enhancement: Supports multiple variables with shared domain.
+        Phase 7 enhancement: Supports mu-operator (definite description).
         Examples:
         - forall x : N | pred
         - forall x, y : N | pred
         - exists1 x : N | pred
+        - mu x : N | pred (single variable only)
         """
-        quant_token = self._advance()  # Consume 'forall', 'exists', or 'exists1'
+        quant_token = self._advance()  # Consume 'forall', 'exists', 'exists1', or 'mu'
 
         # Parse first variable
         if not self._match(TokenType.IDENTIFIER):
@@ -584,7 +589,7 @@ class Parser:
         )
 
     def _parse_comparison(self) -> Expr:
-        """Parse comparison operators (<, >, <=, >=, =)."""
+        """Parse comparison operators (<, >, <=, >=, =, !=)."""
         left = self._parse_set_op()
 
         if self._match(
@@ -593,6 +598,7 @@ class Parser:
             TokenType.LESS_EQUAL,
             TokenType.GREATER_EQUAL,
             TokenType.EQUALS,
+            TokenType.NOT_EQUAL,
         ):
             op_token = self._advance()
             right = self._parse_set_op()
@@ -607,10 +613,10 @@ class Parser:
         return left
 
     def _parse_set_op(self) -> Expr:
-        """Parse set operators (in, subset)."""
+        """Parse set operators (in, notin, subset)."""
         left = self._parse_union()
 
-        if self._match(TokenType.IN, TokenType.SUBSET):
+        if self._match(TokenType.IN, TokenType.NOTIN, TokenType.SUBSET):
             op_token = self._advance()
             right = self._parse_union()
             left = BinaryOp(
