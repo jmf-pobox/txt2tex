@@ -1,8 +1,0 @@
-=== Test Path C Proof ===
-
-** Simple Implication **
-
-PROOF:
-p and q => q [=> intro from 1]
-  [1] p and q [assumption]
-      q [and elim]

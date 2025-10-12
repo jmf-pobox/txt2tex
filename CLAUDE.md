@@ -352,3 +352,4 @@ If starting fresh from `/Users/jfreeman/Coding/fuzz/txt2tex/sem/`:
 2. Test files are in parent directory `../`
 3. Use workflow commands at the top of this document
 4. Reference this document for context
+- always run hatch run check before each micro-commit and solve 100% of any issues reported
