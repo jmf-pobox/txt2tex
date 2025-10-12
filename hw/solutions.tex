@@ -122,7 +122,7 @@ p \Rightarrow \lnot p \Rightarrow p \\
 \vspace{11pt}
 \[
 \infer[$\Rightarrow$\text{-intro}^{[1]}]{p \Rightarrow \lnot p \Rightarrow p}{
-  \infer[$\Rightarrow$\text{-intro}^{[2]}]{\lnot p \Rightarrow p}{\infer[\text{assumption}]{\lnot p}{\infer[copy]{p}{\ulcorner p \urcorner^{[1]}}}}
+  \infer[$\Rightarrow$\text{-intro}^{[2]}]{\lnot p \Rightarrow p}{\ulcorner \lnot p \urcorner^{[2]} & \ulcorner p \urcorner^{[1]}}
 }
 \]
 
