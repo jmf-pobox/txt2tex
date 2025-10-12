@@ -223,5 +223,6 @@ not (p and q)"""
         latex = gen.generate_document(ast)
 
         assert r"$p \land q \Rightarrow p$" in latex
-        assert r"$p \Rightarrow q \Rightarrow r$" in latex
+        # Nested implications now have explicit parentheses for clarity
+        assert r"$p \Rightarrow (q \Rightarrow r)$" in latex
         assert r"$\lnot p \land q$" in latex
