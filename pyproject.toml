@@ -69,8 +69,8 @@ select = [
 extend-select = ["PLC0415"]
 
 ignore = [
-    "TCH001",  # Move import into TYPE_CHECKING - too aggressive for runtime imports
-    "TCH003",  # Move standard lib import into TYPE_CHECKING - unnecessary overhead
+    "TC001",  # Move import into TYPE_CHECKING - too aggressive for runtime imports
+    "TC003",  # Move standard lib import into TYPE_CHECKING - unnecessary overhead
 ]
 
 [tool.ruff.format]
