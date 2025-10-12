@@ -1,9 +1,0 @@
-PROOF:
-(p => q) and not q => not p [=> intro from 1]
-  [1] (p => q) and not q [assumption]
-      :: p => q [and elim]
-      :: not q [and elim]
-      not p [negation intro from 2]
-        [2] p [assumption]
-            q [=> elim]
-            false [contradiction]
