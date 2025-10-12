@@ -49,7 +49,9 @@
       "Read(//private/tmp/**)",
       "Bash(hatch run:*)",
       "Bash(PYTHONPATH=src pytest:*)",
-      "Bash(PYTHONPATH=src hatch run python3:*)"
+      "Bash(PYTHONPATH=src hatch run python3:*)",
+      "Bash(ls:*)",
+      "Bash(make:*)"
     ],
     "deny": [],
     "ask": []
