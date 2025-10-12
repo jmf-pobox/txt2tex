@@ -46,7 +46,10 @@
       "Read(//Users/jfreeman/Desktop/SEM/**)",
       "Bash(TEXINPUTS=./latex//: pdflatex:*)",
       "Bash(sem/txt2pdf.sh:*)",
-      "Read(//private/tmp/**)"
+      "Read(//private/tmp/**)",
+      "Bash(hatch run:*)",
+      "Bash(PYTHONPATH=src pytest:*)",
+      "Bash(PYTHONPATH=src hatch run python3:*)"
     ],
     "deny": [],
     "ask": []
