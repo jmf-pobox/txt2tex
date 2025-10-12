@@ -2,13 +2,13 @@
 
 Convert whiteboard-style mathematical notation to high-quality LaTeX for formal methods and Z notation.
 
-## Current Status: Phase 8 ✅
+## Current Status: Phase 9 ✅
 
-**Production Ready!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, and **set comprehension**.
+**Production Ready!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, and **generic parameters**.
 
-- 🎯 8 phases complete (Phase 0-8)
-- ✅ 183 tests passing
-- 📚 9 example files demonstrating all features
+- 🎯 9 phases complete (Phase 0-9)
+- ✅ 205 tests passing
+- 📚 10 example files demonstrating all features
 - 🔧 Makefile automation for building PDFs
 
 ## Quick Start
@@ -17,7 +17,7 @@ Convert whiteboard-style mathematical notation to high-quality LaTeX for formal 
 
 ```bash
 # Convert txt to PDF in one command
-./txt2pdf.sh examples/phase8.txt
+./txt2pdf.sh examples/phase9.txt
 
 # Use fuzz package instead of zed-*
 ./txt2pdf.sh myfile.txt --fuzz
@@ -80,6 +80,13 @@ Generates: `(a)\par\vspace{11pt}` with proper spacing
 TEXT: This is a plain text paragraph with => and <=> symbols.
 ```
 Operators in TEXT are converted: `=>` → `$\Rightarrow$`, `<=>` → `$\Leftrightarrow$`
+
+**Inline Math in TEXT** (Phase 8+): Math expressions are automatically detected and converted:
+```
+TEXT: The set { x : N | x > 0 } contains positive integers.
+TEXT: We know that forall x : N | x >= 0 is true.
+```
+Generates: `$\{ x \colon N \mid x > 0 \}$` and `$\forall x \colon N \bullet x \geq 0$`
 
 ---
 
@@ -270,6 +277,44 @@ where
 end
 ```
 
+#### Generic Parameters (Phase 9)
+
+Add type parameters to abbreviations, axdefs, and schemas for polymorphism:
+
+**Generic Abbreviations:**
+```
+[X] Pair == X
+[X, Y] Product == X x Y
+```
+
+**Generic Axiomatic Definitions:**
+```
+axdef [T]
+  identity : T
+where
+  identity = identity
+end
+```
+
+**Generic Schemas:**
+```
+schema Stack[X]
+  items : seq X
+where
+  # items <= 100
+end
+
+schema Relation[X, Y]
+  domain : P X
+  range : P Y
+end
+```
+
+Generic parameters are enclosed in square brackets `[X, Y]` and can be:
+- Before abbreviation names: `[X] Name == expr`
+- After `axdef` keyword: `axdef [T] ... end`
+- After schema names: `schema Name[X] ... end`
+
 ---
 
 ### Proof Trees (Phase 5)
@@ -375,6 +420,14 @@ PROOF:
 - Multi-variable: `{ x, y : N | pred }`
 - Optional domain: `{ x | pred }`
 - Nested set comprehensions
+- Inline math in TEXT paragraphs
+
+### ✅ Phase 9: Generic Parameters
+- Generic abbreviations: `[X] Name == expr`
+- Generic axiomatic definitions: `axdef [T] ... end`
+- Generic schemas: `schema Name[X, Y] ... end`
+- Multiple type parameters: `[X, Y, Z]`
+- Backwards compatible with non-generic definitions
 
 ---
 
@@ -444,12 +497,13 @@ See the `examples/` directory for complete working examples:
 - **phase6.txt** - Multi-variable quantifiers
 - **phase7.txt** - Equality and special operators
 - **phase8.txt** - Set comprehension
+- **phase9.txt** - Generic parameters
 
 Build all examples:
 ```bash
 cd examples
 make          # Build all
-make phase8   # Build specific phase
+make phase9   # Build specific phase
 ```
 
 ---
@@ -486,7 +540,7 @@ All code must pass:
 - ✅ MyPy strict mode (zero errors)
 - ✅ Ruff linting (zero violations)
 - ✅ Ruff formatting
-- ✅ All tests passing (183 tests)
+- ✅ All tests passing (205 tests)
 - ✅ Test coverage maintained
 
 ### Running Tests
@@ -496,7 +550,7 @@ All code must pass:
 hatch run test
 
 # Specific phase
-hatch run test tests/test_phase8.py
+hatch run test tests/test_phase9.py
 
 # With coverage
 hatch run test-cov
@@ -520,10 +574,12 @@ sem/
 │   ├── test_phase0.py        # Phase 0 tests
 │   ├── test_phase1.py        # Phase 1 tests
 │   ├── ...
-│   └── test_phase8.py        # Phase 8 tests (183 total)
+│   ├── test_phase8.py        # Phase 8 tests
+│   ├── test_phase9.py        # Phase 9 tests
+│   └── test_inline_math.py   # Inline math tests (205 total)
 ├── examples/                 # Example files
 │   ├── Makefile              # Build automation
-│   ├── phase0.txt            # Through phase8.txt
+│   ├── phase0.txt            # Through phase9.txt
 │   ├── exercises.pdf         # Reference materials
 │   ├── glossary.pdf
 │   └── solutions.pdf
@@ -676,7 +732,7 @@ Contributions are welcome! Please:
 
 ## Roadmap
 
-### Completed (Phase 0-8)
+### Completed (Phase 0-9)
 ✅ Propositional logic
 ✅ Document structure
 ✅ Truth tables
@@ -688,12 +744,10 @@ Contributions are welcome! Please:
 ✅ Z notation basics (given, free types, abbreviations, schemas)
 ✅ Natural deduction proof trees
 ✅ Set comprehension
+✅ Generic parameters (polymorphic Z notation)
+✅ Inline math in TEXT paragraphs
 
-### Future Phases (9-14)
-
-**Phase 9: Generic Definitions**
-- Generic parameters: `[X]`
-- Generic functions and schemas
+### Future Phases (10-14)
 
 **Phase 10: Relations**
 - Relation operators: `<->`, `|->`, `dom`, `ran`
@@ -722,13 +776,13 @@ Contributions are welcome! Please:
 - Pattern matching
 - Inductive proof structure
 
-### Enhancements
-- Inline math in TEXT paragraphs
+### Future Enhancements
 - Arithmetic operators (`+`, `-`, `*`, `/`)
 - Set literals: `{1, 2, 3}`
 - Tuple notation: `(a, b, c)`
 - Better error recovery
 - IDE integration (LSP server)
+- Schema decoration: `S'`, `∆S`, `ΞS`
 
 ---
 
@@ -748,6 +802,6 @@ For bugs, feature requests, or questions, please open an issue on GitHub.
 
 ---
 
-**Last Updated**: Phase 8 Complete (Set Comprehension)
-**Version**: 0.8.0
-**Status**: Production Ready for Phases 0-8
+**Last Updated**: Phase 9 Complete (Generic Parameters)
+**Version**: 0.9.0
+**Status**: Production Ready for Phases 0-9
