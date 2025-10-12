@@ -17,6 +17,7 @@ from txt2tex.ast_nodes import (
     GivenType,
     Identifier,
     Number,
+    Paragraph,
     Part,
     ProofNode,
     ProofTree,
@@ -158,11 +159,29 @@ class Parser:
             TokenType.SOLUTION_MARKER,
             TokenType.PART_LABEL,
             TokenType.TRUTH_TABLE,
+            TokenType.TEXT,
             TokenType.EQUIV,
             TokenType.GIVEN,
             TokenType.AXDEF,
             TokenType.SCHEMA,
             TokenType.PROOF,
+        )
+
+    def _parse_paragraph(self) -> Paragraph:
+        """Parse plain text paragraph from TEXT token.
+
+        The TEXT token value contains the raw text content (no tokenization).
+        """
+        text_token = self._advance()  # Consume TEXT token
+
+        if text_token.type != TokenType.TEXT:
+            raise ParserError("Expected TEXT token for paragraph", text_token)
+
+        # The token value contains the raw text (already captured by lexer)
+        text = text_token.value
+
+        return Paragraph(
+            text=text, line=text_token.line, column=text_token.column
         )
 
     def _parse_document_item(self) -> DocumentItem:
@@ -185,6 +204,8 @@ class Parser:
             return self._parse_schema()
         if self._match(TokenType.PROOF):
             return self._parse_proof_tree()
+        if self._match(TokenType.TEXT):
+            return self._parse_paragraph()
 
         # Check for abbreviation (identifier == expr) or free type (identifier ::= ...)
         if self._match(TokenType.IDENTIFIER):
@@ -193,7 +214,7 @@ class Parser:
                 return self._parse_free_type()
             if self._peek_ahead(1).type == TokenType.ABBREV:
                 return self._parse_abbreviation()
-            # Otherwise, fall through to expression parsing
+            # Otherwise fall through to expression parsing
 
         # Default: parse as expression
         return self._parse_expr()
