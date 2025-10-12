@@ -91,5 +91,32 @@ PROOF:
             [3] q [assumption]
           :: not p [from 2]
 
-TEXT: We then combine these two proofs with the <=>-intro rule.
+TEXT: We then combine these two proofs with the <=>-intro rule, using the results from above as premises.
 
+PROOF:
+  (not p => not q) <=> (q => p) [<=> intro]
+    :: (not p => not q) => (q => p)
+    :: (q => p) => (not p => not q)
+
+(c)
+
+TEXT: In one direction:
+
+PROOF:
+  ((p => r) and (q => r)) => ((p or q) => r) [=> intro from 1]
+    [1] (p => r) and (q => r) [assumption]
+    :: (p or q) => r [=> intro from 2]
+      [2] p or q [assumption]
+      :: r [or elim]
+        case p:
+          :: p => r [and elim 1]
+            :: (p => r) and (q => r) [from 1]
+          :: r [=> elim]
+            :: p => r [from above]
+            :: p [assumption]
+        case q:
+          :: q => r [and elim 2]
+            :: (p => r) and (q => r) [from 1]
+          :: r [=> elim]
+            :: q => r [from above]
+            :: q [assumption]

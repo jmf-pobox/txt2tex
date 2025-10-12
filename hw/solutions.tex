@@ -178,9 +178,47 @@ and the other:
 
 \bigskip
 
-We then combine these two proofs with the $\Leftrightarrow$-intro rule.
+We then combine these two proofs with the $\Leftrightarrow$-intro rule, using the results from above as premises.
 
 \bigskip
+
+\noindent
+\[
+\infer[\text{$\Leftrightarrow$ intro}]{\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p}{
+  (\lnot p \Rightarrow \lnot q) \Rightarrow (q \Rightarrow p) & (q \Rightarrow p) \Rightarrow (\lnot p \Rightarrow \lnot q)
+}
+\]
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+In one direction:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \Rightarrow r) \land (q \Rightarrow r) \Rightarrow (p \lor q \Rightarrow r)}{
+  \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]} & \infer[$\Rightarrow$\text{-intro}^{[2]}]{p \lor q \Rightarrow r}{
+  \ulcorner p \lor q \urcorner^{[2]} & \infer[\text{$\lor$ elim}]{r}{
+  \infer[$\land$\text{-elim-1}]{p \Rightarrow r}{
+  \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
+} & \infer[\text{$\Rightarrow$ elim}]{r}{
+  p \Rightarrow r & \ulcorner p \urcorner
+}
+  \infer[$\land$\text{-elim-2}]{q \Rightarrow r}{
+  \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
+} & \infer[\text{$\Rightarrow$ elim}]{r}{
+  q \Rightarrow r & \ulcorner q \urcorner
+}
+}
+}
+}
+\]
 
 \medskip
 

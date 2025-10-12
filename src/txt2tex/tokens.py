@@ -29,6 +29,28 @@ class TokenType(Enum):
     UNION = auto()
     INTERSECT = auto()
 
+    # Relation operators (Phase 10)
+    RELATION = auto()  # <-> (relation type)
+    MAPLET = auto()  # |-> (maplet constructor)
+    DRES = auto()  # <| (domain restriction)
+    RRES = auto()  # |> (range restriction)
+    NDRES = auto()  # <<| (domain subtraction)
+    NRRES = auto()  # |>> (range subtraction)
+    COMP = auto()  # comp or ; (relational composition)
+    SEMICOLON = auto()  # ; (relational composition)
+    CIRC = auto()  # o9 (forward/backward composition)
+    TILDE = auto()  # ~ (relational inverse postfix)
+    PLUS = auto()  # + (transitive closure postfix / arithmetic)
+    STAR = auto()  # * (reflexive-transitive closure postfix / arithmetic)
+    LIMG = auto()  # (| (relational image left)
+    RIMG = auto()  # |) (relational image right)
+
+    # Relation functions (Phase 10)
+    DOM = auto()  # dom (domain of relation)
+    RAN = auto()  # ran (range of relation)
+    INV = auto()  # inv (inverse of relation)
+    ID = auto()  # id (identity relation)
+
     # Comparison operators (Phase 3, enhanced in Phase 7)
     LESS_THAN = auto()  # <
     GREATER_THAN = auto()  # >
