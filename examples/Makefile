@@ -27,7 +27,7 @@ all: $(PDF_FILES)
 
 # Individual phase targets for convenience
 .PHONY: phase0 phase1 phase2 phase3 phase4 phase5 phase6 phase7 phase8
-phase0: phase0_simple.pdf
+phase0: phase0.pdf
 phase1: phase1.pdf
 phase2: phase2.pdf
 phase3: phase3.pdf
