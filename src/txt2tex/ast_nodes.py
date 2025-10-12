@@ -52,11 +52,18 @@ class Number(ASTNode):
 
 @dataclass(frozen=True)
 class Quantifier(ASTNode):
-    """Quantifier node (forall, exists)."""
+    """Quantifier node (forall, exists, exists1).
 
-    quantifier: str  # "forall" or "exists"
-    variable: str
-    domain: Expr | None  # Optional domain (e.g., N, Z)
+    Phase 6 enhancement: Supports multiple variables with shared domain.
+    Examples:
+    - forall x : N | pred  -> variables=["x"], domain=N
+    - forall x, y : N | pred -> variables=["x", "y"], domain=N
+    - exists1 x : N | pred -> quantifier="exists1", variables=["x"]
+    """
+
+    quantifier: str  # "forall", "exists", or "exists1"
+    variables: list[str]  # One or more variables (e.g., ["x", "y"])
+    domain: Expr | None  # Optional domain shared by all variables (e.g., N, Z)
     body: Expr
 
 
@@ -200,7 +207,9 @@ class ProofNode(ASTNode):
     """Node in a proof tree (Path C format)."""
 
     expression: Expr
-    justification: str | None  # Optional rule name (e.g., "and elim", "=> intro from 1")
+    justification: (
+        str | None
+    )  # Optional rule name (e.g., "and elim", "=> intro from 1")
     label: int | None  # For assumptions: [1], [2], etc.
     is_assumption: bool  # True if this is marked [assumption]
     is_sibling: bool  # True if marked with :: (sibling premise)

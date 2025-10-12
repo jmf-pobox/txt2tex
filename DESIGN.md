@@ -992,8 +992,522 @@ PROOF:
 
 ---
 
-### Total Timeline
-Estimated 15-20 hours of focused work, spread over days/weeks with user testing between phases.
+---
+
+### Phase 5b: Proof Tree Improvements ✅ COMPLETED
+**Timeline**: 2-3 hours
+**Goal**: Fix nested assumptions and improve proof tree rendering
+
+**Added**:
+- Boxed assumption notation: `⌜expr⌝[n]` for assumption references
+- Proper handling of "from N" references
+- Independent nested assumption rendering
+- Consistent spacing across all proof environments
+- Centered proof trees in display math mode
+
+**Deliverable**: Natural deduction proofs with correct assumption scope and discharge notation
+**Test**: Solutions 13-18 with complex nested assumptions
+**Quality Gates**: All 5 commands pass
+**Status**: ✅ Completed (tagged as phase5b)
+
+---
+
+## Coverage Assessment (As of Phase 5b)
+
+### Currently Supported ✅
+- **Propositional Logic**: Truth tables, equivalence chains, basic operators
+- **Document Structure**: Sections, solutions, part labels, proper spacing
+- **Basic Proofs**: Natural deduction with =>-intro, =>-elim, and-intro, and-elim, or-intro, or-elim, false-intro, false-elim
+- **Proof Features**: Nested assumptions, discharge notation, case analysis (or-elim)
+- **Basic Definitions**: Simple abbreviations (`Name == Expression`)
+
+### Coverage Statistics
+- **Solutions transcribed**: ~10 of 45+ (22%)
+- **Topics covered**: Propositional logic + basic natural deduction
+- **Topics remaining**: Quantifiers, equality, sets, relations, functions, sequences, schemas, free types, induction
+
+---
+
+## Remaining Implementation (Phases 6-14)
+
+### ⚡ Immediate Homework Needs
+
+**User's next homework requires:**
+1. **Set comprehensions** → Phase 8
+2. **Relational composition** → Phase 10
+3. **Generic functions** → Phase 9 + Phase 11 (partial)
+
+**Recommended implementation order for homework:**
+1. ✅ Phase 6 (Quantifiers) - foundation for set comprehensions
+2. ✅ Phase 8 (Sets) - **set comprehensions needed**
+3. ✅ Phase 9 (Z Definitions) - **generic syntax needed**
+4. ✅ Phase 10 (Relations) - **relational composition needed**
+5. ✅ Phase 11 (Functions, partial) - function types for generic functions
+
+**Estimated time to homework readiness**: 21-31 hours
+- Phase 6: 4-6h
+- Phase 8: 6-8h
+- Phase 9: 4-5h
+- Phase 10: 8-10h (can start earlier if needed)
+- Phase 11 (minimal): ~2-3h (just function signatures and type syntax)
+
+---
+
+### Phase 6: Quantifiers with Complex Domains
+**Timeline**: 4-6 hours
+**Goal**: Predicate logic with typed quantification
+**Priority**: ⚡ CRITICAL (foundation for Phase 8, needed for Solutions 5-8)
+
+**Add**:
+- Quantifier syntax with domains: `forall x : Domain | predicate`
+- Multi-variable quantification: `forall x, y : N | predicate`
+- Nested quantifiers: `exists d : Dog | forall t : Trainer | predicate`
+- Bullet operator in quantified predicates: `forall x : N | x > 0`
+- Domain restrictions and type annotations
+
+**Input Format**:
+```
+forall x : N | x^2 >= 0
+exists d : Dog | gentle(d) and well_trained(d)
+forall x, y : N | x + y = 4 and x < y
+```
+
+**LaTeX Output**:
+```latex
+$\forall x : \nat \bullet x^{2} \geq 0$
+$\exists d : Dog \bullet gentle(d) \land well\_trained(d)$
+$\forall x, y : \nat \bullet x + y = 4 \land x < y$
+```
+
+**Test Coverage**: Solutions 5-8
+**Deliverable**: Can process predicate logic with typed quantification
+
+---
+
+### Phase 7: Equality and Special Operators
+**Timeline**: 3-4 hours
+**Goal**: One-point rule, µ-operator, unique existence
+**Priority**: HIGH (needed for Solutions 9-12)
+
+**Add**:
+- Equality in equivalence chains: `x = y`, `x ≠ y`
+- One-point rule applications in EQUIV blocks
+- µ-operator (definite description): `(mu x : X | predicate)`
+- ∃₁ (unique existence): `exists1 x : X | predicate`
+- Set membership in predicates: `in`, `notin`
+- Arithmetic in predicates
+
+**Input Format**:
+```
+EQUIV:
+exists y : N | y in {0, 1} and y != 1 and x != y
+<=> exists y : N | y = 0 and x != y [arithmetic]
+<=> 0 in N and x != 0 [one-point rule]
+<=> x != 0
+```
+
+**LaTeX Output**:
+```latex
+\begin{align*}
+\exists y : \nat \bullet y \in \{0, 1\} \land y \neq 1 \land x \neq y \\
+&\Leftrightarrow \exists y : \nat \bullet y = 0 \land x \neq y && \text{[arithmetic]} \\
+&\Leftrightarrow 0 \in \nat \land x \neq 0 && \text{[one-point rule]} \\
+&\Leftrightarrow x \neq 0
+\end{align*}
+```
+
+**Test Coverage**: Solutions 9-12
+**Deliverable**: Can process equality reasoning and special quantifiers
+
+---
+
+### Phase 8: Sets and Set Theory
+**Timeline**: 6-8 hours
+**Goal**: Set operations, comprehensions, and set theory proofs
+**Priority**: ⚡ CRITICAL (needed for upcoming homework + Solutions 19-23)
+
+**Add**:
+- Set membership: `in`, `notin`, `subset`, `subseteq`
+- Set operations: `cap` (∩), `cup` (∪), `setminus` (\)
+- Power sets: `P`, `P1` (non-empty power set)
+- Cartesian products: `x` (×)
+- Set comprehensions: `{ x : X | predicate }`, `{ x : X | predicate . expression }`
+- Cardinality: `#` (as prefix operator)
+- Empty set: `emptyset` or `{}`
+- Set literals: `{1, 2, 3}`
+
+**Input Format**:
+```
+1 in {4, 3, 2, 1}
+{1} x {2, 3} = {(1, 2), (1, 3)}
+{ z : Z | 0 <= z and z <= 100 }
+{n : N | n <= 4 . n^2}
+{n : P {0, 1} . (n, # n)}
+
+EQUIV:
+x in a cap b
+<=> (x in a and x in b) [intersection]
+<=> (x in a) [idempotence of and]
+<=> x in a
+```
+
+**LaTeX Output**:
+```latex
+$1 \in \{4, 3, 2, 1\}$
+$\{1\} \times \{2, 3\} = \{(1, 2), (1, 3)\}$
+$\{ z : \mathbb{Z} \mid 0 \leq z \land z \leq 100 \}$
+$\{n : \nat \mid n \leq 4 \bullet n^{2}\}$
+$\{n : \mathbb{P} \{0, 1\} \bullet (n, \# n)\}$
+```
+
+**Test Coverage**: Solutions 19-23
+**Deliverable**: Can process set theory exercises and proofs
+
+---
+
+### Phase 9: Z Notation Definitions (Complete)
+**Timeline**: 4-5 hours
+**Goal**: Full Z notation definition support
+**Priority**: ⚡ CRITICAL (needed for upcoming homework generic functions + Solutions 24-26)
+
+**Add**:
+- Given types (basic types): `[Person]`, `[Dog]`
+- Abbreviation definitions: `Name == Expression`
+- Axiomatic definitions with schema boxes (proper rendering)
+- Generic definitions: `[X]` with generic parameters
+- Type constraints in predicates
+- Schema boxes with proper formatting
+
+**Input Format**:
+```
+given Person, Company
+
+Pairs == Z x Z
+
+StrictlyPositivePairs == { m, n : Z | m > 0 and n > 0 . (m, n) }
+
+Couples == { s : P Person | # s = 2 }
+
+axdef
+  notin[X] : (X <-> P X)
+where
+  forall x : X; s : P X | x notin s <=> not (x in s)
+end
+```
+
+**LaTeX Output**:
+```latex
+\begin{zed}
+[Person, Company]
+\end{zed}
+
+\begin{zed}
+Pairs == \mathbb{Z} \times \mathbb{Z}
+\end{zed}
+
+\begin{axdef}[X]
+\_ \not\in \_ : (X \rel \power X)
+\where
+\forall x : X; s : \power X \bullet
+  x \not\in s \iff \lnot (x \in s)
+\end{axdef}
+```
+
+**Test Coverage**: Solutions 24-26
+**Deliverable**: Can process Z notation definitions and axiomatic descriptions
+
+---
+
+### Phase 10: Relations
+**Timeline**: 8-10 hours
+**Goal**: Relational operators and relation calculus
+**Priority**: ⚡ CRITICAL (needed for upcoming homework relational composition + Solutions 27-32)
+
+**Add**:
+- Relation type: `X <-> Y`
+- Maplet: `x |-> y`
+- Domain/range: `dom R`, `ran R`
+- Domain/range restriction: `A <| R`, `R |> B`
+- Domain/range subtraction: `A <<| R`, `R |>> B`
+- Relational composition: `R comp S` or `R ; S`
+- Forward/backward composition: `R o9 S`
+- Relational inverse: `R~` or `inv R`
+- Transitive closure: `R+`, `R*`
+- Identity relation: `id[X]`
+- Relational image: `R(| S |)`
+
+**Input Format**:
+```
+dom R = {0, 1, 2}
+ran R = {1, 2, 3}
+{1, 2} <| R = {1 |-> 2, 1 |-> 3, 2 |-> 3}
+R |>> {1, 2} = {0 |-> 3, 1 |-> 3, 2 |-> 3}
+
+parentOf == childOf~
+siblingOf == (childOf o9 parentOf) \ id[Person]
+ancestorOf == parentOf+
+
+EQUIV:
+x |-> y in A <| (B <| R)
+<=> x in A and x |-> y in (B <| R) [domain restriction]
+<=> x in A and x in B and x |-> y in R [domain restriction]
+<=> x in A cap B and x |-> y in R [intersection]
+<=> x |-> y in (A cap B) <| R [domain restriction]
+```
+
+**LaTeX Output**:
+```latex
+$\dom R = \{0, 1, 2\}$
+$\ran R = \{1, 2, 3\}$
+$\{1, 2\} \dres R = \{1 \mapsto 2, 1 \mapsto 3, 2 \mapsto 3\}$
+$R \nrres \{1, 2\} = \{0 \mapsto 3, 1 \mapsto 3, 2 \mapsto 3\}$
+
+$parentOf == childOf^{\sim}$
+$siblingOf == (childOf \comp parentOf) \setminus id[Person]$
+$ancestorOf == parentOf^{+}$
+```
+
+**Test Coverage**: Solutions 27-32
+**Deliverable**: Can process relation theory and relational calculus
+
+---
+
+### Phase 11: Functions
+**Timeline**: 5-6 hours (2-3h minimal for homework)
+**Goal**: Function types and function operators
+**Priority**: ⚡ CRITICAL (partially needed for upcoming homework generic functions + Solutions 33-36)
+
+**Add**:
+- Partial functions: `X +-> Y`
+- Total functions: `X -> Y`
+- Partial injections: `X >+> Y`
+- Total injections: `X >-> Y`
+- Partial surjections: `X +->> Y`
+- Total surjections: `X -->> Y`
+- Bijections: `X >->> Y`
+- Function application: `f x`, `f(x)`
+- Function override: `f oplus {x |-> y}`
+- Lambda expressions: `lambda x : X . expression`
+- Relational image: `R(| S |)`
+
+**Input Format**:
+```
+children : Person -> P Person
+children = {p : Person . p |-> parentOf(| {p} |)}
+
+number_of_grandchildren : Person -> N
+number_of_grandchildren =
+  {p : Person . p |-> # (parentOf o9 parentOf)(| {p} |)}
+
+f : (Drivers <-> Cars) -> (Cars -> N)
+forall r : Drivers <-> Cars |
+  f(r) = {c : ran r . c |-> #{d : Drivers | d |-> c in r}}
+```
+
+**LaTeX Output**:
+```latex
+\begin{axdef}
+children : Person \fun \power Person \\
+children = \{p : Person \bullet p \mapsto parentOf(\limg \{p\} \rimg)\}
+\end{axdef}
+
+\begin{axdef}
+number\_of\_grandchildren : Person \fun \nat \\
+number\_of\_grandchildren = \\
+\t1 \{p : Person \bullet p \mapsto \# (parentOf \comp parentOf)(\limg \{p\} \rimg)\}
+\end{axdef}
+```
+
+**Test Coverage**: Solutions 33-36
+**Deliverable**: Can process function theory and function specifications
+
+---
+
+### Phase 12: Sequences
+**Timeline**: 6-8 hours
+**Goal**: Sequence types and sequence operators
+**Priority**: MEDIUM (needed for Solutions 37-39)
+
+**Add**:
+- Sequence types: `seq X`, `seq1 X` (non-empty), `iseq X` (injective)
+- Sequence literals: `<>`, `<a, b, c>`
+- Concatenation: `s ^ t`
+- Head/tail/last/front: `head s`, `tail s`, `last s`, `front s`
+- Sequence filtering: `s |` A` (filter by set)
+- Reverse: `rev s`
+- Extraction: `s(i)` (element at position)
+- Distributed concatenation: `cat/s`
+- Squash: `squash R`
+
+**Input Format**:
+```
+<a>
+<a, b, c, d> ^ <a, b> = {1 |-> a, 2 |-> b, 3 |-> c, 4 |-> d, 5 |-> a, 6 |-> b}
+tail <a, b, c, d> = <b, c, d>
+front <a, b, c, d> = <a, b, c>
+ran <a, b, a, d> = {a, b, d}
+
+f : Place -> P Place
+forall p : Place | f p = {q : Place | p |-> q in ran trains}
+
+{p : Place | exists1 x : dom trains | (trains x).2 = p}
+```
+
+**LaTeX Output**:
+```latex
+$\langle a \rangle$
+$\langle a, b, c, d \rangle \cat \langle a, b \rangle = \{1 \mapsto a, 2 \mapsto b, \ldots\}$
+$\tail \langle a, b, c, d \rangle = \langle b, c, d \rangle$
+$\front \langle a, b, c, d \rangle = \langle a, b, c \rangle$
+$\ran \langle a, b, a, d \rangle = \{a, b, d\}$
+```
+
+**Test Coverage**: Solutions 37-39
+**Deliverable**: Can process sequence specifications and operations
+
+---
+
+### Phase 13: Schemas and State Machines
+**Timeline**: 10-12 hours
+**Goal**: Z schemas, state, and operations
+**Priority**: MEDIUM-LOW (needed for Solutions 40-43)
+
+**Add**:
+- Schema boxes with declarations and predicates
+- Schema references and inclusion
+- Schema decoration: `S'`, `S?`, `S!`
+- Delta notation: `Delta S` (before/after state)
+- Xi notation: `Xi S` (no state change)
+- Schema composition: `S1 ; S2`, `S1 and S2`, `S1 or S2`
+- Schema projection: `S \ (x, y)`
+- Preconditions: `pre S`
+- Schema quantification
+
+**Input Format**:
+```
+schema State
+  hd : seq(Title x Length x Viewed)
+where
+  cumulative_total hd <= 12000
+  forall p : ran hd | p.2 <= 360
+end
+
+schema AddSong
+  Delta State
+  song? : SongId
+where
+  song? notin ran hd
+  hd' = hd ^ <song?>
+end
+```
+
+**LaTeX Output**:
+```latex
+\begin{schema}{State}
+hd : \seq(Title \cross Length \cross Viewed)
+\where
+cumulative\_total~hd \leq 12000 \\
+\forall p : \ran hd \bullet p.2 \leq 360
+\end{schema}
+
+\begin{schema}{AddSong}
+\Delta State \\
+song? : SongId
+\where
+song? \notin \ran hd \\
+hd' = hd \cat \langle song? \rangle
+\end{schema}
+```
+
+**Test Coverage**: Solutions 40-43
+**Deliverable**: Can process state-based specifications with schemas
+
+---
+
+### Phase 14: Free Types and Induction
+**Timeline**: 8-10 hours
+**Goal**: Recursive types and inductive proofs
+**Priority**: LOW (needed for Solutions 44-47)
+
+**Add**:
+- Free type definitions: `Type ::= constructor1 | constructor2 << Type >>`
+- Recursive constructors with parameters
+- Pattern matching in function definitions
+- Inductive proof structure (base case + inductive step)
+- Recursive function definitions over free types
+- Proof by structural induction
+
+**Input Format**:
+```
+Tree ::= stalk | leaf << N >> | branch << Tree x Tree >>
+
+count : Tree -> N
+count stalk = 0
+forall n : N | count (leaf n) = 1
+forall t1, t2 : Tree | count (branch (t1, t2)) = count t1 + count t2
+
+PROOF (by induction on t : Tree):
+Base case (stalk):
+  # (flatten stalk)
+  = # <> [flatten]
+  = 0 [#]
+  = count stalk [count]
+
+Inductive step (branch):
+  # (flatten branch (t1, t2))
+  = # (flatten t1 ^ flatten t2) [flatten]
+  = # flatten t1 + # flatten t2 [# is distributive]
+  = count t1 + count t2 [induction hypothesis]
+  = count branch (t1, t2) [count]
+```
+
+**LaTeX Output**:
+```latex
+\begin{zed}
+Tree ::= stalk | leaf \ldata \nat \rdata | branch \ldata Tree \cross Tree \rdata
+\end{zed}
+
+\begin{axdef}
+count : Tree \fun \nat
+\also
+count~stalk = 0 \\
+\forall n : \nat \bullet count~(leaf~n) = 1 \\
+\forall t_{1}, t_{2} : Tree \bullet count~(branch~(t_{1}, t_{2})) = count~t_{1} + count~t_{2}
+\end{axdef}
+
+[Proof rendered with proper structure...]
+```
+
+**Test Coverage**: Solutions 44-47
+**Deliverable**: Can process recursive types and inductive proofs
+
+---
+
+## Updated Timeline Summary
+
+### Completed (Phase 0-5b)
+- **Total time**: ~15-20 hours
+- **Coverage**: 22% of course material
+- **Status**: ✅ Propositional logic + basic natural deduction
+
+### Remaining (Phases 6-14)
+- **Phase 6**: Quantifiers (4-6h) → 28% coverage
+- **Phase 7**: Equality/µ (3-4h) → 35% coverage
+- **Phase 8**: Sets (6-8h) → 50% coverage
+- **Phase 9**: Z Definitions (4-5h) → 55% coverage
+- **Phase 10**: Relations (8-10h) → 70% coverage
+- **Phase 11**: Functions (5-6h) → 78% coverage
+- **Phase 12**: Sequences (6-8h) → 85% coverage
+- **Phase 13**: Schemas (10-12h) → 93% coverage
+- **Phase 14**: Free types (8-10h) → 100% coverage
+
+**Total remaining**: 54-69 hours of focused work
+
+### Grand Total
+- **All phases**: 69-89 hours for complete coverage
+- **Current progress**: 22% complete
+- **Critical path for homework**: Phases 6, 8, 9, 10, 11 (minimal) = 21-31 hours
+- **Critical path for course**: Phases 6-8 needed for most exercises
 
 ### Advantages of Phased Approach
 1. ✅ **Early utility**: Phase 1 usable for truth table problems immediately

@@ -7,6 +7,7 @@ from txt2tex.ast_nodes import (
     AxDef,
     BinaryOp,
     Declaration,
+    Document,
     FreeType,
     GivenType,
     Identifier,
@@ -80,6 +81,7 @@ class TestParser:
         parser = Parser(tokens)
         ast = parser.parse()
         # Document with one GivenType item
+        assert isinstance(ast, Document)
         assert len(ast.items) == 1
         given = ast.items[0]
         assert isinstance(given, GivenType)
@@ -91,6 +93,7 @@ class TestParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Document)
         given = ast.items[0]
         assert isinstance(given, GivenType)
         assert given.names == ["Person", "Company"]
@@ -101,6 +104,7 @@ class TestParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Document)
         free_type = ast.items[0]
         assert isinstance(free_type, FreeType)
         assert free_type.name == "Status"
@@ -112,6 +116,7 @@ class TestParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Document)
         free_type = ast.items[0]
         assert isinstance(free_type, FreeType)
         assert free_type.name == "Status"
@@ -123,6 +128,7 @@ class TestParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Document)
         abbrev = ast.items[0]
         assert isinstance(abbrev, Abbreviation)
         assert abbrev.name == "adult"
@@ -134,6 +140,7 @@ class TestParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Document)
         abbrev = ast.items[0]
         assert isinstance(abbrev, Abbreviation)
         assert abbrev.name == "positive"
@@ -150,6 +157,7 @@ end"""
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Document)
         axdef = ast.items[0]
         assert isinstance(axdef, AxDef)
         assert len(axdef.declarations) == 2
@@ -170,6 +178,7 @@ end"""
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Document)
         axdef = ast.items[0]
         assert isinstance(axdef, AxDef)
         assert len(axdef.declarations) == 2
@@ -185,6 +194,7 @@ end"""
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Document)
         schema = ast.items[0]
         assert isinstance(schema, Schema)
         assert schema.name == "Library"
@@ -203,6 +213,7 @@ end"""
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Document)
         schema = ast.items[0]
         assert isinstance(schema, Schema)
         assert schema.name == "BankAccount"

@@ -156,6 +156,11 @@ class Lexer:
             self._advance()
             return Token(TokenType.PIPE, "|", start_line, start_column)
 
+        # Comma (for multi-variable quantifiers in Phase 6)
+        if char == ",":
+            self._advance()
+            return Token(TokenType.COMMA, ",", start_line, start_column)
+
         # Free type operator ::= (Phase 4) - check before :: and :
         if char == ":" and self._peek_char() == ":" and self._peek_char(2) == "=":
             self._advance()
@@ -286,9 +291,11 @@ class Lexer:
         if value == "not":
             return Token(TokenType.NOT, value, start_line, start_column)
 
-        # Check for quantifiers (Phase 3)
+        # Check for quantifiers (Phase 3, enhanced in Phase 6)
         if value == "forall":
             return Token(TokenType.FORALL, value, start_line, start_column)
+        if value == "exists1":
+            return Token(TokenType.EXISTS1, value, start_line, start_column)
         if value == "exists":
             return Token(TokenType.EXISTS, value, start_line, start_column)
 
