@@ -1,0 +1,23 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Test Proof Tree}
+
+$$
+\infer[\Rightarrow\text{-intro}]{(p \land (p \Rightarrow q)) \Rightarrow (p \land q)}{
+  \infer[\land\text{-intro}]{p \land q}{
+    \infer[\land\text{-elim}]{p}{p \land (p \Rightarrow q)}
+    &
+    \infer[\Rightarrow\text{-elim}]{q}{
+      \infer[\land\text{-elim}]{p \Rightarrow q}{p \land (p \Rightarrow q)}
+      &
+      \infer[\land\text{-elim}]{p}{p \land (p \Rightarrow q)}
+    }
+  }
+}
+$$
+
+\end{document}

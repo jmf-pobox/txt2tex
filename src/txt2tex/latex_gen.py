@@ -9,6 +9,7 @@ from txt2tex.ast_nodes import (
     Abbreviation,
     AxDef,
     BinaryOp,
+    CaseAnalysis,
     Document,
     DocumentItem,
     EquivChain,
@@ -87,6 +88,7 @@ class LaTeXGenerator:
         else:
             lines.append(r"\usepackage{zed-cm}")
             lines.append(r"\usepackage{zed-maths}")
+            lines.append(r"\usepackage{zed-proof}")  # For \infer macros
         lines.append(r"\usepackage{amsmath}")
         lines.append(r"\begin{document}")
         lines.append("")
@@ -262,6 +264,8 @@ class LaTeXGenerator:
         lines.append(r"\noindent")
         lines.append(r"\textbf{" + node.number + "}")
         lines.append("")
+        lines.append(r"\medskip")  # Add vertical space before content
+        lines.append("")
 
         for item in node.items:
             item_lines = self.generate_document_item(item)
@@ -273,6 +277,8 @@ class LaTeXGenerator:
         """Generate LaTeX for part label."""
         lines: list[str] = []
         lines.append(f"({node.label})")
+        lines.append(r"\par")  # End paragraph cleanly
+        lines.append(r"\vspace{11pt}")  # Explicit spacing for all content types
 
         for item in node.items:
             item_lines = self.generate_document_item(item)
@@ -287,29 +293,45 @@ class LaTeXGenerator:
         """Generate LaTeX for truth table."""
         lines: list[str] = []
 
-        # Start table environment
+        # Start table environment (no vertical bars, only horizontal line after header)
+        # Spacing is controlled by part labels
         num_cols = len(node.headers)
-        col_spec = "|".join(["c"] * num_cols)
+        col_spec = " ".join(["c"] * num_cols)
         lines.append(r"\begin{center}")
-        lines.append(r"\begin{tabular}{|" + col_spec + r"|}")
+        lines.append(r"\begin{tabular}{" + col_spec + r"}")
 
         # Generate header row
         header_parts: list[str] = []
         for header in node.headers:
+            # Convert operators to LaTeX symbols
+            header_latex = self._convert_operators_to_latex(header)
             # Wrap header in math mode
-            header_parts.append(f"${header}$")
+            header_parts.append(f"${header_latex}$")
         lines.append(" & ".join(header_parts) + r" \\")
         lines.append(r"\hline")
 
-        # Generate data rows
+        # Generate data rows (lowercase t/f in text mode, not math mode)
         for row in node.rows:
-            lines.append(" & ".join(row) + r" \\")
+            # Don't wrap truth values in math mode - use text mode for lowercase t/f
+            row_parts = [val.lower() if val in ("T", "F") else val for val in row]
+            lines.append(" & ".join(row_parts) + r" \\")
 
         lines.append(r"\end{tabular}")
         lines.append(r"\end{center}")
         lines.append("")
 
         return lines
+
+    def _convert_operators_to_latex(self, text: str) -> str:
+        """Convert operator keywords to LaTeX symbols in text."""
+        # Replace operators with LaTeX commands using word boundaries
+        # Order matters: replace longer operators first
+        result = text.replace("<=>", r"\Leftrightarrow")
+        result = result.replace("=>", r"\Rightarrow")
+        result = re.sub(r"\band\b", r"\\land", result)
+        result = re.sub(r"\bor\b", r"\\lor", result)
+        result = re.sub(r"\bnot\b", r"\\lnot", result)
+        return result
 
     def _escape_justification(self, text: str) -> str:
         """Escape operators in justification text for LaTeX."""
@@ -326,6 +348,8 @@ class LaTeXGenerator:
         """Generate LaTeX for equivalence chain using align* environment."""
         lines: list[str] = []
 
+        # Compensate for align* automatic spacing (adds ~10px extra)
+        lines.append(r"\vspace{-10pt}")
         lines.append(r"\begin{align*}")
 
         # Generate steps
@@ -424,42 +448,489 @@ class LaTeXGenerator:
         return lines
 
     def _generate_proof_tree(self, node: ProofTree) -> list[str]:
-        """Generate LaTeX for proof tree using nested itemize."""
+        """Generate LaTeX for proof tree using \\infer macros from zed-proof.sty."""
         lines: list[str] = []
 
-        lines.append(r"\begin{itemize}")
-
-        # Generate each top-level proof node
-        for proof_node in node.nodes:
-            node_lines = self._generate_proof_node(proof_node)
-            lines.extend(node_lines)
-
-        lines.append(r"\end{itemize}")
+        # Generate the proof tree centered using display math mode
+        # Spacing is controlled by part labels (no additional spacing needed)
+        proof_latex = self._generate_proof_node_infer(node.conclusion)
+        lines.append(r"\[")
+        lines.append(proof_latex)
+        lines.append(r"\]")
         lines.append("")
 
         return lines
 
-    def _generate_proof_node(self, node: ProofNode) -> list[str]:
-        """Generate LaTeX for a single proof node with optional children."""
-        lines: list[str] = []
+    def _format_boxed_assumption(self, expr: Expr, label: int | None) -> str:
+        """Generate boxed assumption with corner brackets ⌈expr⌉[n]."""
+        expr_latex = self.generate_expr(expr)
+        # Use \ulcorner and \urcorner for corner brackets (requires amsmath)
+        if label is not None:
+            return f"\\ulcorner {expr_latex} \\urcorner^{{[{label}]}}"
+        return f"\\ulcorner {expr_latex} \\urcorner"
 
-        # Generate expression in math mode
+    def _calculate_tree_depth(self, node: ProofNode | CaseAnalysis) -> int:
+        """Calculate the depth of a proof tree (number of inference levels)."""
+        if isinstance(node, CaseAnalysis):
+            if not node.steps:
+                return 0
+
+            # For case analysis, count sequential steps (not just nested depth)
+            # Sequential steps stack vertically, increasing height
+            sibling_count = 0
+            sequential_count = 0
+
+            for step in node.steps:
+                if step.is_sibling:
+                    if sequential_count == 0:
+                        sibling_count += 1
+                    else:
+                        # Sibling after sequential - treat as sequential
+                        sequential_count += 1
+                else:
+                    sequential_count += 1
+
+            # Height is based on sequential steps + 1 for sibling layer (if any)
+            # Plus the depth of any nested children
+            sibling_layer = 1 if sibling_count > 0 else 0
+            max_child_depth = max((self._calculate_tree_depth(step) for step in node.steps), default=0)
+
+            return sibling_layer + sequential_count + max_child_depth
+
+        if not node.children:
+            return 0
+
+        return 1 + max(self._calculate_tree_depth(child) for child in node.children)
+
+    def _generate_proof_node_infer(self, node: ProofNode) -> str:
+        """
+        Generate \\infer macro for a proof node (bottom-up natural deduction).
+
+        Returns LaTeX string for this node and its supporting premises.
+        """
+        # If this is an assumption node, it should appear as a boxed premise
+        if node.is_assumption:
+            # The assumption itself is a premise (leaf)
+            assumption_latex = self._format_boxed_assumption(node.expression, node.label)
+
+            # If it has children, they are derivations from this assumption
+            # The assumption should be the base of the tree
+            if not node.children:
+                return assumption_latex
+
+            # For now, treat the first child as the main derivation from the assumption
+            # This is a simplified approach - full natural deduction requires dependency analysis
+            if len(node.children) == 1 and not isinstance(node.children[0], CaseAnalysis):
+                child = node.children[0]
+                # Generate child with assumption as its premise
+                return self._generate_inference_from_assumption(child, assumption_latex, node.label)
+
+            # Multiple children or case analysis - need special handling
+            return self._generate_complex_assumption_scope(node, assumption_latex)
+
+        # Generate expression for conclusion
         expr_latex = self.generate_expr(node.expression)
-        item_text = f"${expr_latex}$"
 
-        # Add justification if present
+        # If no children, return expression (possibly with justification)
+        if not node.children:
+            # Check if justification indicates a reference (not a derivation rule)
+            if node.justification:
+                just_lower = node.justification.lower()
+                # References like "from 1", "copy", etc. should not be wrapped in \infer
+                # They're just referencing an existing fact
+                if "from" in just_lower or "copy" in just_lower:
+                    # Extract assumption label if present (e.g., "from 1" -> "1")
+                    from_match = re.search(r"from\s+(\d+)", just_lower)
+                    if from_match:
+                        ref_label = from_match.group(1)
+                        # Render as boxed assumption reference
+                        return f"\\ulcorner {expr_latex} \\urcorner^{{[{ref_label}]}}"
+                    # Just return the expression - it's a reference without label
+                    return expr_latex
+                # Otherwise it's a derivation rule, wrap in \infer
+                just = self._format_justification_label(node.justification)
+                return f"\\infer[{just}]{{{expr_latex}}}{{}}"
+            return expr_latex
+
+        # Group children by siblings
+        # Siblings (marked with ::) should be rendered side-by-side with &
+        child_groups: list[list[str]] = []
+        current_group: list[str] = []
+
+        for child in node.children:
+            if isinstance(child, CaseAnalysis):
+                # Handle case analysis - generate as separate branch
+                case_latex = self._generate_case_analysis(child)
+                if current_group:
+                    child_groups.append(current_group)
+                    current_group = []
+                child_groups.append([case_latex])
+            elif isinstance(child, ProofNode):
+                # Regular proof node
+                child_latex = self._generate_proof_node_infer(child)
+
+                if child.is_sibling and current_group:
+                    # Add to current sibling group
+                    current_group.append(child_latex)
+                else:
+                    # Start new group
+                    if current_group:
+                        child_groups.append(current_group)
+                    current_group = [child_latex]
+
+        # Add last group
+        if current_group:
+            child_groups.append(current_group)
+
+        # Generate premises by joining siblings with &
+        premises_parts = [" & ".join(group) for group in child_groups]
+        premises = "\n  ".join(premises_parts)
+
+        # Generate justification label
         if node.justification:
-            escaped_just = self._escape_justification(node.justification)
-            item_text += f" [{escaped_just}]"
+            # Escape LaTeX special characters in justification
+            just = self._format_justification_label(node.justification)
+            return f"\\infer[{just}]{{{expr_latex}}}{{\n  {premises}\n}}"
+        else:
+            # No justification - use plain \infer
+            return f"\\infer{{{expr_latex}}}{{\n  {premises}\n}}"
 
-        lines.append(r"\item " + item_text)
+    def _generate_inference_from_assumption(
+        self, node: ProofNode, assumption_latex: str, assumption_label: int | None
+    ) -> str:
+        """Generate an inference that derives from a boxed assumption."""
+        expr_latex = self.generate_expr(node.expression)
 
-        # Generate children if present (nested itemize)
-        if node.children:
-            lines.append(r"\begin{itemize}")
-            for child in node.children:
-                child_lines = self._generate_proof_node(child)
-                lines.extend(child_lines)
-            lines.append(r"\end{itemize}")
+        # If this node has no children, it directly derives from the assumption
+        if not node.children:
+            if node.justification:
+                just = self._format_justification_label(node.justification)
+                return f"\\infer[{just}]{{{expr_latex}}}{{{assumption_latex}}}"
+            return f"\\infer{{{expr_latex}}}{{{assumption_latex}}}"
 
-        return lines
+        # Node has children - generate them recursively
+        # Children should ultimately reference the assumption as their premise
+        child_latex = self._generate_proof_node_infer_with_assumption(
+            node, assumption_latex, assumption_label
+        )
+        return child_latex
+
+    def _generate_proof_node_infer_with_assumption(
+        self, node: ProofNode, assumption_latex: str, assumption_label: int | None
+    ) -> str:
+        """Generate inference node where leaves should reference the given assumption."""
+        expr_latex = self.generate_expr(node.expression)
+
+        # Base case: no children means this should derive from the assumption
+        if not node.children:
+            if node.justification:
+                just_lower = node.justification.lower()
+                # References like "from 1", "copy", etc. should not be wrapped in \infer
+                if "from" in just_lower or "copy" in just_lower:
+                    # Extract assumption label if present (e.g., "from 1" -> "1")
+                    from_match = re.search(r"from\s+(\d+)", just_lower)
+                    if from_match:
+                        ref_label = from_match.group(1)
+                        # Render as boxed assumption reference
+                        return f"\\ulcorner {expr_latex} \\urcorner^{{[{ref_label}]}}"
+                    # Just return the expression - it's a reference without label
+                    return expr_latex
+                # Otherwise it's a derivation rule
+                just = self._format_justification_label(node.justification)
+                return f"\\infer[{just}]{{{expr_latex}}}{{{assumption_latex}}}"
+            return expr_latex
+
+        # Process children
+        premises: list[str] = []
+        for child in node.children:
+            if isinstance(child, CaseAnalysis):
+                premises.append(self._generate_case_analysis(child))
+            elif child.is_assumption:
+                # Child is its own assumption - process independently
+                child_latex = self._generate_proof_node_infer(child)
+                premises.append(child_latex)
+            else:
+                child_latex = self._generate_proof_node_infer_with_assumption(
+                    child, assumption_latex, assumption_label
+                )
+                premises.append(child_latex)
+
+        # Join premises
+        premises_str = " & ".join(premises) if premises else assumption_latex
+
+        # Generate with justification
+        if node.justification:
+            just = self._format_justification_label(node.justification)
+            return f"\\infer[{just}]{{{expr_latex}}}{{{premises_str}}}"
+        return f"\\infer{{{expr_latex}}}{{{premises_str}}}"
+
+    def _generate_complex_assumption_scope(
+        self, assumption_node: ProofNode, assumption_latex: str
+    ) -> str:
+        """Handle complex assumption scopes with multiple children or case analysis."""
+        # Group children into sibling groups and sequential derivations
+        # Siblings (marked with ::) are horizontal, non-siblings nest vertically
+
+        children = assumption_node.children
+        if not children:
+            return assumption_latex
+
+        # Separate siblings from sequential derivations
+        sibling_group: list[ProofNode | CaseAnalysis] = []
+        sequential: list[ProofNode | CaseAnalysis] = []
+
+        for child in children:
+            if isinstance(child, CaseAnalysis):
+                # Case analysis can appear in sibling position
+                if not sequential:
+                    sibling_group.append(child)
+                else:
+                    sequential.append(child)
+            elif child.is_sibling:
+                # Only add to sibling group if we haven't started sequential yet
+                if not sequential:
+                    sibling_group.append(child)
+                else:
+                    # Sibling after non-sibling - this is a new context
+                    sequential.append(child)
+            else:
+                # Non-sibling - starts sequential derivations
+                sequential.append(child)
+
+        # Generate sibling group (derives directly from assumption)
+        sibling_latex_parts: list[str] = []
+        for child in sibling_group:
+            if isinstance(child, CaseAnalysis):
+                sibling_latex_parts.append(self._generate_case_analysis(child))
+            else:
+                child_latex = self._generate_proof_node_infer_with_assumption(
+                    child, assumption_latex, assumption_node.label
+                )
+                sibling_latex_parts.append(child_latex)
+
+        # Combine siblings horizontally with &
+        if sibling_latex_parts:
+            current_premises = " & ".join(sibling_latex_parts)
+        else:
+            current_premises = assumption_latex
+
+        # Now build sequential derivations vertically on top
+        # Each sequential step uses the previous result as its premise
+        for child in sequential:
+            if isinstance(child, CaseAnalysis):
+                child_latex = self._generate_case_analysis(child)
+            else:
+                # Generate the child
+                # If it has children, we need to process them recursively
+                if child.children:
+                    # This node has children - need to generate a full subtree
+                    # The subtree should use current_premises as its base
+                    expr_latex = self.generate_expr(child.expression)
+
+                    # Generate children
+                    child_premises_parts: list[str] = []
+                    has_case_analysis = False
+                    for grandchild in child.children:
+                        if isinstance(grandchild, CaseAnalysis):
+                            child_premises_parts.append(self._generate_case_analysis(grandchild))
+                            has_case_analysis = True
+                        else:
+                            # Recurse to handle nested structure
+                            grandchild_latex = self._generate_proof_node_infer(grandchild)
+                            child_premises_parts.append(grandchild_latex)
+
+                    # Include siblings from parent scope as additional premises
+                    # Special case: for or-elim with case analysis, only include disjunction siblings
+                    # Other siblings (like extracted conjuncts) are handled within case branches
+                    if sibling_latex_parts and child_premises_parts:
+                        if has_case_analysis:
+                            # Only include disjunction siblings as top-level premises for or-elim
+                            disjunction_siblings = []
+                            for i, sib_child in enumerate(sibling_group):
+                                if isinstance(sib_child, ProofNode) and isinstance(sib_child.expression, BinaryOp):
+                                    if sib_child.expression.operator == "or":
+                                        disjunction_siblings.append(sibling_latex_parts[i])
+
+                            # Apply \raiseproof to case branches for vertical layout
+                            # STAGGERED STRATEGY: Different cases get different heights + horizontal spacing
+                            raised_cases = []
+
+                            # Collect all case indices first
+                            case_indices = []
+                            for idx, grandchild in enumerate(child.children):
+                                if isinstance(grandchild, CaseAnalysis):
+                                    case_indices.append(idx)
+
+                            # Generate raised cases with staggered heights
+                            for case_position, idx in enumerate(case_indices):
+                                grandchild = child.children[idx]
+                                depth = self._calculate_tree_depth(grandchild)
+                                case_latex = child_premises_parts[idx]
+
+                                # STAGGERED HEIGHT FORMULA:
+                                # First case: 6-8ex (minimal)
+                                # Subsequent cases: 18-24ex (much taller to avoid overlap)
+                                if case_position == 0:
+                                    # First case: minimal height
+                                    height = 6 + (depth * 2)  # Conservative for first case
+                                    raised = f"\\raiseproof{{{height}ex}}{{{case_latex}}}"
+                                else:
+                                    # Subsequent cases: taller + horizontal spacing
+                                    height = 18 + (depth * 4)  # Much taller for subsequent cases
+                                    raised = f"\\hskip 6em \\raiseproof{{{height}ex}}{{{case_latex}}}"
+
+                                raised_cases.append(raised)
+
+                            # Combine: disjunction siblings first, then raised case branches
+                            all_premises = disjunction_siblings + raised_cases
+                            child_premises = " & ".join(all_premises)
+                        else:
+                            # Not case analysis - include all siblings
+                            all_premises = sibling_latex_parts + child_premises_parts
+                            child_premises = " & ".join(all_premises)
+                    elif child_premises_parts:
+                        child_premises = " & ".join(child_premises_parts)
+                    else:
+                        child_premises = current_premises
+
+                    if child.justification:
+                        just = self._format_justification_label(child.justification)
+                        child_latex = f"\\infer[{just}]{{{expr_latex}}}{{{child_premises}}}"
+                    else:
+                        child_latex = f"\\infer{{{expr_latex}}}{{{child_premises}}}"
+                else:
+                    # No children - derive directly from current_premises
+                    expr_latex = self.generate_expr(child.expression)
+
+                    if child.justification:
+                        just = self._format_justification_label(child.justification)
+                        child_latex = f"\\infer[{just}]{{{expr_latex}}}{{{current_premises}}}"
+                    else:
+                        child_latex = f"\\infer{{{expr_latex}}}{{{current_premises}}}"
+
+            # This becomes the new premise for next step
+            current_premises = child_latex
+
+        return current_premises
+
+    def _generate_case_analysis(self, case: CaseAnalysis) -> str:
+        """Generate LaTeX for case analysis branch."""
+        # For each case, generate the proof steps
+        # Cases are typically rendered as separate inference branches
+        if not case.steps:
+            return f"\\text{{case {case.case_name}}}"
+
+        # Generate the first step (usually the conclusion of this case)
+        # In many cases, there's just one step per case
+        if len(case.steps) == 1:
+            return self._generate_proof_node_infer(case.steps[0])
+
+        # Multiple steps - need to group siblings horizontally, rest vertically
+        # Separate siblings from sequential steps
+        sibling_group: list[ProofNode] = []
+        sequential: list[ProofNode] = []
+
+        for step in case.steps:
+            if step.is_sibling:
+                # Only add to sibling group if we haven't started sequential yet
+                if not sequential:
+                    sibling_group.append(step)
+                else:
+                    sequential.append(step)
+            else:
+                # Non-sibling - starts sequential derivations
+                sequential.append(step)
+
+        # Generate sibling group (horizontal with &)
+        if sibling_group:
+            sibling_parts = [self._generate_proof_node_infer(s) for s in sibling_group]
+            current_result = " & ".join(sibling_parts)
+        else:
+            # No siblings, start with first sequential
+            if not sequential:
+                return ""
+            current_result = self._generate_proof_node_infer(sequential[0])
+            sequential = sequential[1:]
+
+        # Build sequential steps vertically on top
+        for step in sequential:
+            step_latex = self._generate_proof_node_infer(step)
+            expr_latex = self.generate_expr(step.expression)
+
+            if step.justification:
+                just = self._format_justification_label(step.justification)
+                current_result = f"\\infer[{just}]{{{expr_latex}}}{{{current_result}}}"
+            else:
+                current_result = f"\\infer{{{expr_latex}}}{{{current_result}}}"
+
+        return current_result
+
+    def _format_justification_label(self, just: str) -> str:
+        """
+        Format justification text for \\infer label.
+
+        Converts patterns:
+        - "=> intro from 1" → "$\\Rightarrow$-intro^{[1]}" (discharge superscript)
+        - "and elim 1" → "$\\land$-elim-1" (left/right projection, regular text)
+        - "or intro 2" → "$\\lor$-intro-2" (left/right injection, regular text)
+        """
+        # First, check for discharge pattern: "rule from N" or "rule[N]"
+        # Match: operator + rule name + (from N | [N])
+        discharge_pattern = r"^(.*?)\s+(intro|elim)\s+(?:from\s+(\d+)|\[(\d+)\])$"
+        match = re.match(discharge_pattern, just)
+
+        if match:
+            operator_part = match.group(1).strip()
+            rule_name = match.group(2)
+            label_num = match.group(3) or match.group(4)
+
+            # Convert operator to LaTeX
+            op_latex = operator_part.replace("<=>", r"$\Leftrightarrow$")
+            op_latex = op_latex.replace("=>", r"$\Rightarrow$")
+            op_latex = re.sub(r"\band\b", r"$\\land$", op_latex)
+            op_latex = re.sub(r"\bor\b", r"$\\lor$", op_latex)
+            op_latex = re.sub(r"\bnot\b", r"$\\lnot$", op_latex)
+
+            # Format as: operator-rule^{[label]}
+            return f"{op_latex}\\text{{-{rule_name}}}^{{[{label_num}]}}"
+
+        # Check for rule subscript pattern: "operator rule N" (like "and elim 1")
+        # Match: operator + rule name + number (1 or 2)
+        subscript_pattern = r"^(.*?)\s+(intro|elim)\s*([12])$"
+        match = re.match(subscript_pattern, just)
+
+        if match:
+            operator_part = match.group(1).strip()
+            rule_name = match.group(2)
+            subscript_num = match.group(3)
+
+            # Convert operator to LaTeX
+            op_latex = operator_part.replace("<=>", r"$\Leftrightarrow$")
+            op_latex = op_latex.replace("=>", r"$\Rightarrow$")
+            op_latex = re.sub(r"\band\b", r"$\\land$", op_latex)
+            op_latex = re.sub(r"\bor\b", r"$\\lor$", op_latex)
+            op_latex = re.sub(r"\bnot\b", r"$\\lnot$", op_latex)
+
+            # Format as: operator-rule-number (just regular text, no subscript)
+            return f"{op_latex}\\text{{-{rule_name}-{subscript_num}}}"
+
+        # No special pattern - process normally
+        # Replace logical operators with LaTeX symbols
+        result = just.replace("<=>", r"\Leftrightarrow")
+        result = result.replace("=>", r"\Rightarrow")
+        result = re.sub(r"\band\b", r"\\land", result)
+        result = re.sub(r"\bor\b", r"\\lor", result)
+        result = re.sub(r"\bnot\b", r"\\lnot", result)
+
+        # Wrap text parts in \text{}
+        # If it contains "elim", "intro", "assumption", etc., wrap in \text{}
+        if any(word in result for word in ["elim", "intro", "assumption", "premise", "from", "case", "contradiction", "middle"]):
+            # Replace operators with proper spacing
+            result = result.replace(r"\land", r"$\land$")
+            result = result.replace(r"\lor", r"$\lor$")
+            result = result.replace(r"\lnot", r"$\lnot$")
+            result = result.replace(r"\Rightarrow", r"$\Rightarrow$")
+            result = result.replace(r"\Leftrightarrow", r"$\Leftrightarrow$")
+            return r"\text{" + result + "}"
+
+        return result

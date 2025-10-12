@@ -42,6 +42,10 @@ type = "mypy src/txt2tex tests"
 type-quick = "mypy"
 check = ["lint", "type", "test"]
 check-cov = ["lint", "type", "test-cov"]
+# CLI wrapper - use for generating LaTeX
+cli = "PYTHONPATH=src python -m txt2tex.cli {args}"
+# Full pipeline - use for txt -> tex -> pdf
+convert = "./txt2pdf.sh {args}"
 
 [tool.ruff]
 line-length = 88

@@ -184,24 +184,35 @@ class Schema(ASTNode):
     predicates: list[Expr]
 
 
-# Proof tree nodes (Phase 5)
+# Proof tree nodes (Phase 5 - Path C)
+
+
+@dataclass(frozen=True)
+class CaseAnalysis(ASTNode):
+    """Case analysis branch (case q: ... case r: ...)."""
+
+    case_name: str  # "q", "r", etc.
+    steps: list[ProofNode]  # Proof steps for this case
 
 
 @dataclass(frozen=True)
 class ProofNode(ASTNode):
-    """Node in a proof tree."""
+    """Node in a proof tree (Path C format)."""
 
     expression: Expr
-    justification: str | None  # Optional rule name
-    children: list[ProofNode]  # Child proof nodes
-    indent_level: int  # Indentation level
+    justification: str | None  # Optional rule name (e.g., "and elim", "=> intro from 1")
+    label: int | None  # For assumptions: [1], [2], etc.
+    is_assumption: bool  # True if this is marked [assumption]
+    is_sibling: bool  # True if marked with :: (sibling premise)
+    children: list[ProofNode | CaseAnalysis]  # Child proof nodes or case branches
+    indent_level: int  # Indentation level (for parsing)
 
 
 @dataclass(frozen=True)
 class ProofTree(ASTNode):
-    """Proof tree with indentation-based structure."""
+    """Proof tree (Path C format) - conclusion with supporting proof."""
 
-    nodes: list[ProofNode]  # Top-level nodes
+    conclusion: ProofNode  # The final conclusion at the top
 
 
 # Type alias for document items (expressions or structural elements)

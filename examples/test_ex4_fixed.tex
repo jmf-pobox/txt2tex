@@ -1,0 +1,14 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+$$
+\infer[\text{$\Rightarrow$ intro from 1}]{(p \Rightarrow q) \land \lnot q \Rightarrow \lnot p}{
+  \infer[\text{negation intro from 2}]{\lnot p}{\infer[\text{$\land$ elim}]{p \Rightarrow q}{\ulcorner (p \Rightarrow q) \land \lnot q \urcorner^{[1]}} & \infer[\text{$\land$ elim}]{\lnot q}{\ulcorner (p \Rightarrow q) \land \lnot q \urcorner^{[1]}} & \infer[contradiction]{false}{\infer[\text{$\Rightarrow$ elim}]{q}{\ulcorner p \urcorner^{[2]}}}}
+}
+$$
+
+\end{document}

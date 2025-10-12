@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{zed-cm}
 \usepackage{zed-maths}
+\usepackage{zed-proof}
 \usepackage{amsmath}
 \begin{document}
 
@@ -8,81 +9,52 @@
 
 \bigskip
 \noindent
-\textbf{Example 1 : Simple Modus Ponens}
+\textbf{Example 1 : Simple Implication}
 
-\begin{itemize}
-\item $p \Rightarrow q$ [premise]
-\item $p$ [premise]
-\begin{itemize}
-\item $q$ [modus ponens]
-\end{itemize}
-\end{itemize}
+$$
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{p \land q \Rightarrow q}{
+  \infer[$\land$\text{-elim-2}]{q}{\ulcorner p \land q \urcorner^{[1]}}
+}
+$$
 
 \bigskip
 \noindent
-\textbf{Example 2 : Conjunction Elimination}
+\textbf{Example 2 : With Sibling Premises}
 
-\begin{itemize}
-\item $p \land q$ [premise]
-\begin{itemize}
-\item $p$ [$\land$ elim left]
-\item $q$ [$\land$ elim right]
-\end{itemize}
-\end{itemize}
+$$
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{p \land (p \Rightarrow q) \Rightarrow p \land q}{
+  \infer[\text{$\land$ intro}]{p \land q}{\infer[\text{$\Rightarrow$ elim}]{q}{\infer[$\land$\text{-elim-1}]{p}{\ulcorner p \land (p \Rightarrow q) \urcorner^{[1]}} & \infer[$\land$\text{-elim-2}]{p \Rightarrow q}{\ulcorner p \land (p \Rightarrow q) \urcorner^{[1]}}}}
+}
+$$
 
 \bigskip
 \noindent
-\textbf{Example 3 : Nested Proof}
+\textbf{Example 3 : Distribution with Cases}
 
-\begin{itemize}
-\item $(p \Rightarrow q) \land (q \Rightarrow r)$ [premise]
-\begin{itemize}
-\item $p \Rightarrow q$ [$\land$ elim]
-\item $q \Rightarrow r$ [$\land$ elim]
-\end{itemize}
-\item $p$ [premise]
-\begin{itemize}
-\item $q$ [modus ponens]
-\begin{itemize}
-\item $r$ [modus ponens]
-\end{itemize}
-\end{itemize}
-\end{itemize}
+$$
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{p \land (q \lor r) \Rightarrow p \land q \lor p \land r}{
+  \infer[\text{$\lor$ elim}]{p \land q \lor p \land r}{\infer[$\lor$\text{-intro-1}]{p \land q \lor p \land r}{\infer[\text{$\land$ intro}]{p \land q}{\infer[\text{from above}]{p}{} & \infer[\text{from case}]{q}{}}} & \infer[$\lor$\text{-intro-2}]{p \land q \lor p \land r}{\infer[\text{$\land$ intro}]{p \land r}{\infer[\text{from above}]{p}{} & \infer[\text{from case}]{r}{}}}}
+}
+$$
 
 \bigskip
 \noindent
-\textbf{Example 4 : Disjunction Cases}
+\textbf{Example 4 : Modus Tollens}
 
-\begin{itemize}
-\item $p \lor q$ [premise]
-\begin{itemize}
-\item $p$ [case 1]
-\begin{itemize}
-\item $p \Rightarrow r$ [premise]
-\begin{itemize}
-\item $r$ [modus ponens]
-\end{itemize}
-\end{itemize}
-\item $q$ [case 2]
-\begin{itemize}
-\item $q \Rightarrow r$ [premise]
-\begin{itemize}
-\item $r$ [modus ponens]
-\end{itemize}
-\end{itemize}
-\end{itemize}
-\end{itemize}
+$$
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \Rightarrow q) \land \lnot q \Rightarrow \lnot p}{
+  \infer[negation\text{-intro}^{[2]}]{\lnot p}{\infer[$\land$\text{-elim-1}]{p \Rightarrow q}{\ulcorner (p \Rightarrow q) \land \lnot q \urcorner^{[1]}} & \infer[$\land$\text{-elim-2}]{\lnot q}{\ulcorner (p \Rightarrow q) \land \lnot q \urcorner^{[1]}} & \infer[\text{contradiction}]{false}{\infer[\text{$\Rightarrow$ elim}]{q}{\ulcorner p \urcorner^{[2]}}}}
+}
+$$
 
 \bigskip
 \noindent
-\textbf{Example 5 : Proof with Quantifiers}
+\textbf{Example 5 : Solution 18 Implication to Disjunction}
 
-\begin{itemize}
-\item $\forall x \colon N \bullet x > 0$ [premise]
-\item $a \in N$ [premise]
-\begin{itemize}
-\item $a > 0$ [universal instantiation]
-\end{itemize}
-\end{itemize}
+$$
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{p \Rightarrow q \Rightarrow \lnot p \lor q}{
+  \infer[\text{excluded middle}]{p \lor \lnot p}{\ulcorner p \Rightarrow q \urcorner^{[1]}} & \infer[$\lor$\text{-elim}^{[2]}]{\lnot p \lor q}{\infer[$\lor$\text{-intro-2}]{\lnot p \lor q}{\infer[\text{$\Rightarrow$ elim}]{q}{\ulcorner p \urcorner^{[2]}}} & \infer[$\lor$\text{-intro-1}]{\lnot p \lor q}{\ulcorner \lnot p \urcorner^{[2]}}}
+}
+$$
 
 \end{document}

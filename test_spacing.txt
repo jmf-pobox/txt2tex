@@ -1,0 +1,10 @@
+=== Test ===
+
+** Question 3 **
+
+(a) PROOF:
+p => (not p => p) [=> intro from 1]
+  [1] p [assumption]
+      not p => p [=> intro from 2]
+        [2] not p [assumption]
+            p [copy]
