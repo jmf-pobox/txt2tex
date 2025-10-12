@@ -131,6 +131,13 @@ class Parser:
                     items=[self._parse_abbreviation()], line=first_line, column=1
                 )
 
+        # Check for abbreviation with generic parameters (Phase 9)
+        # [X, Y] Name == expression
+        if self._match(TokenType.LBRACKET):
+            return Document(
+                items=[self._parse_abbreviation()], line=first_line, column=1
+            )
+
         # Try to parse as expression
         first_item = self._parse_expr()
 
@@ -214,6 +221,11 @@ class Parser:
             if self._peek_ahead(1).type == TokenType.ABBREV:
                 return self._parse_abbreviation()
             # Otherwise fall through to expression parsing
+
+        # Check for abbreviation with generic parameters (Phase 9)
+        # [X, Y] Name == expression
+        if self._match(TokenType.LBRACKET):
+            return self._parse_abbreviation()
 
         # Default: parse as expression
         return self._parse_expr()
@@ -831,6 +843,10 @@ class Parser:
 
         # Parse comma-separated list of type names
         while not self._at_end() and not self._match(TokenType.NEWLINE):
+            if self._match(TokenType.COMMA):
+                self._advance()  # Skip comma
+                continue
+
             if not self._match(TokenType.IDENTIFIER):
                 raise ParserError(
                     "Expected type name in given declaration", self._current()
@@ -838,12 +854,6 @@ class Parser:
 
             names.append(self._current().value)
             self._advance()
-
-            # Check for comma
-            if not self._match(TokenType.NEWLINE) and not self._at_end():
-                # Expect comma (represented as identifier in current lexer)
-                # Skip any whitespace/tokens until next identifier or newline
-                pass
 
         if not names:
             raise ParserError(
@@ -890,8 +900,53 @@ class Parser:
             column=name_token.column,
         )
 
+    def _parse_generic_params(self) -> list[str] | None:
+        """Parse optional generic parameters: [X, Y, Z].
+
+        Phase 9: Generic parameter support for Z notation definitions.
+        Returns None if no generic parameters present.
+        """
+        if not self._match(TokenType.LBRACKET):
+            return None
+
+        self._advance()  # Consume '['
+        params: list[str] = []
+
+        # Parse comma-separated list of type parameters
+        while not self._match(TokenType.RBRACKET) and not self._at_end():
+            if self._match(TokenType.COMMA):
+                self._advance()  # Skip comma
+                continue
+
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError(
+                    "Expected type parameter name in generic list", self._current()
+                )
+
+            params.append(self._current().value)
+            self._advance()
+
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "Expected ']' to close generic parameter list", self._current()
+            )
+        self._advance()  # Consume ']'
+
+        return params if params else None
+
     def _parse_abbreviation(self) -> Abbreviation:
-        """Parse abbreviation: name == expression"""
+        """Parse abbreviation: [X] name == expression or name == expression.
+
+        Phase 9 enhancement: Supports optional generic parameters.
+        """
+        start_token = self._current()
+
+        # Check for generic parameters before name
+        generic_params = self._parse_generic_params()
+
+        # Parse name
+        if not self._match(TokenType.IDENTIFIER):
+            raise ParserError("Expected identifier in abbreviation", self._current())
         name_token = self._current()
         name = name_token.value
         self._advance()  # Move to ==
@@ -904,12 +959,24 @@ class Parser:
         expr = self._parse_expr()
 
         return Abbreviation(
-            name=name, expression=expr, line=name_token.line, column=name_token.column
+            name=name,
+            expression=expr,
+            generic_params=generic_params,
+            line=start_token.line if generic_params else name_token.line,
+            column=start_token.column if generic_params else name_token.column,
         )
 
     def _parse_axdef(self) -> AxDef:
-        """Parse axiomatic definition block."""
+        """Parse axiomatic definition block.
+
+        Phase 9 enhancement: Supports optional generic parameters.
+        Syntax: axdef [X, Y] ... end
+        """
         start_token = self._advance()  # Consume 'axdef'
+        self._skip_newlines()
+
+        # Check for generic parameters after 'axdef'
+        generic_params = self._parse_generic_params()
         self._skip_newlines()
 
         declarations: list[Declaration] = []
@@ -968,12 +1035,17 @@ class Parser:
         return AxDef(
             declarations=declarations,
             predicates=predicates,
+            generic_params=generic_params,
             line=start_token.line,
             column=start_token.column,
         )
 
     def _parse_schema(self) -> Schema:
-        """Parse schema definition block."""
+        """Parse schema definition block.
+
+        Phase 9 enhancement: Supports optional generic parameters.
+        Syntax: schema Name[X, Y] ... end or schema Name ... end
+        """
         start_token = self._advance()  # Consume 'schema'
 
         # Parse schema name
@@ -981,6 +1053,9 @@ class Parser:
             raise ParserError("Expected schema name", self._current())
         name = self._current().value
         self._advance()
+
+        # Check for generic parameters after name
+        generic_params = self._parse_generic_params()
         self._skip_newlines()
 
         declarations: list[Declaration] = []
@@ -1040,6 +1115,7 @@ class Parser:
             name=name,
             declarations=declarations,
             predicates=predicates,
+            generic_params=generic_params,
             line=start_token.line,
             column=start_token.column,
         )
