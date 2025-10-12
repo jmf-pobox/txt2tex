@@ -45,7 +45,7 @@ class ParserError(Exception):
 
 class Parser:
     """
-    Recursive descent parser for Phase 0 + Phase 1 + Phase 2 + Phase 3.
+    Recursive descent parser for Phase 0-4 + Phase 10a.
 
     Phase 0 - Expression grammar (precedence from lowest to highest):
         expr     ::= iff
@@ -78,13 +78,18 @@ class Parser:
         implies    ::= or ( '=>' or )*
         or         ::= and ( 'or' and )*
         and        ::= comparison ( 'and' comparison )*
-        comparison ::= set_op ( ('<' | '>' | '<=' | '>=' | '=' | '!=') set_op )?
+        comparison ::= relation ( ('<' | '>' | '<=' | '>=' | '=' | '!=') relation )?
+        relation   ::= set_op ( ('<->' | '|->' | '<|' | '|>' | 'comp' | ';') set_op )?
         set_op     ::= union ( ('in' | 'notin' | 'subset') union )?
         union      ::= intersect ( 'union' intersect )*
         intersect  ::= unary ( 'intersect' unary )*
         unary      ::= 'not' unary | postfix
         postfix    ::= atom ( '^' atom | '_' atom )*
-        atom       ::= IDENTIFIER | NUMBER | '(' expr ')'
+        atom       ::= ('dom' | 'ran') atom | IDENTIFIER | NUMBER | '(' expr ')'
+
+    Phase 10a - Relation operators:
+        - Infix: <-> |->, <|, |>, comp, ;
+        - Prefix functions: dom, ran
     """
 
     def __init__(self, tokens: list[Token]) -> None:
@@ -705,7 +710,7 @@ class Parser:
 
     def _parse_comparison(self) -> Expr:
         """Parse comparison operators (<, >, <=, >=, =, !=)."""
-        left = self._parse_set_op()
+        left = self._parse_relation()
 
         if self._match(
             TokenType.LESS_THAN,
@@ -714,6 +719,31 @@ class Parser:
             TokenType.GREATER_EQUAL,
             TokenType.EQUALS,
             TokenType.NOT_EQUAL,
+        ):
+            op_token = self._advance()
+            right = self._parse_relation()
+            left = BinaryOp(
+                operator=op_token.value,
+                left=left,
+                right=right,
+                line=op_token.line,
+                column=op_token.column,
+            )
+
+        return left
+
+    def _parse_relation(self) -> Expr:
+        """Parse relation operators (Phase 10a: <->, |->, <|, |>, comp, ;)."""
+        left = self._parse_set_op()
+
+        # Phase 10a: Infix relation operators (left-associative)
+        while self._match(
+            TokenType.RELATION,      # <->
+            TokenType.MAPLET,        # |->
+            TokenType.DRES,          # <|
+            TokenType.RRES,          # |>
+            TokenType.COMP,          # comp
+            TokenType.SEMICOLON,     # ;
         ):
             op_token = self._advance()
             right = self._parse_set_op()
@@ -807,8 +837,20 @@ class Parser:
     def _parse_atom(self) -> Expr:
         """Parse atom.
 
-        Handles: identifier, number, parenthesized expression, set comprehension.
+        Handles: identifier, number, parenthesized expression, set comprehension,
+        and Phase 10a relation functions (dom, ran).
         """
+        # Phase 10a: Prefix relation functions (dom, ran)
+        if self._match(TokenType.DOM, TokenType.RAN):
+            op_token = self._advance()
+            operand = self._parse_atom()
+            return UnaryOp(
+                operator=op_token.value,
+                operand=operand,
+                line=op_token.line,
+                column=op_token.column,
+            )
+
         if self._match(TokenType.IDENTIFIER):
             token = self._advance()
             return Identifier(name=token.value, line=token.line, column=token.column)

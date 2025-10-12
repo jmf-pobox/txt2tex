@@ -37,7 +37,11 @@ from txt2tex.parser import Parser
 
 
 class LaTeXGenerator:
-    """Generates LaTeX from AST for Phase 0 + Phase 1 + Phase 2 + Phase 3 + Phase 4."""
+    """Generates LaTeX from AST for Phase 0-4 + Phase 10a.
+
+    Phase 10a: Supports relation operators (<->, |->, <|, |>, comp, ;)
+    and relation functions (dom, ran).
+    """
 
     # Operator mappings
     BINARY_OPS: ClassVar[dict[str, str]] = {
@@ -59,10 +63,20 @@ class LaTeXGenerator:
         "subset": r"\subseteq",
         "union": r"\cup",
         "intersect": r"\cap",
+        # Relation operators (Phase 10a)
+        "<->": r"\rel",  # Relation type
+        "|->": r"\mapsto",  # Maplet constructor
+        "<|": r"\dres",  # Domain restriction
+        "|>": r"\rres",  # Range restriction
+        "comp": r"\comp",  # Relational composition
+        ";": r"\semi",  # Relational composition (semicolon)
     }
 
     UNARY_OPS: ClassVar[dict[str, str]] = {
         "not": r"\lnot",
+        # Relation functions (Phase 10a)
+        "dom": r"\dom",  # Domain of relation
+        "ran": r"\ran",  # Range of relation
     }
 
     # Quantifier mappings (Phase 3, enhanced in Phase 6-7)
@@ -78,7 +92,27 @@ class LaTeXGenerator:
         "<=>": 1,  # Lowest precedence
         "=>": 2,
         "or": 3,
-        "and": 4,  # Highest precedence (for binary ops)
+        "and": 4,
+        # Comparison operators
+        "<": 5,
+        ">": 5,
+        "<=": 5,
+        ">=": 5,
+        "=": 5,
+        "!=": 5,
+        # Relation operators (Phase 10a) - between comparison and set ops
+        "<->": 6,
+        "|->": 6,
+        "<|": 6,
+        "|>": 6,
+        "comp": 6,
+        ";": 6,
+        # Set operators - highest precedence
+        "in": 7,
+        "notin": 7,
+        "subset": 7,
+        "union": 8,
+        "intersect": 9,  # Highest precedence (for binary ops)
     }
 
     # Right-associative operators (need parens on left when same operator)
