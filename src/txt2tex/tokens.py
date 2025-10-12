@@ -16,23 +16,26 @@ class TokenType(Enum):
     IMPLIES = auto()
     IFF = auto()
 
-    # Quantifiers (Phase 3, enhanced in Phase 6)
+    # Quantifiers (Phase 3, enhanced in Phase 6-7)
     FORALL = auto()
     EXISTS = auto()
     EXISTS1 = auto()  # Unique existence quantifier
+    MU = auto()  # Definite description (mu-operator)
 
-    # Set operators (Phase 3)
+    # Set operators (Phase 3, enhanced in Phase 7)
     IN = auto()
+    NOTIN = auto()  # not in (set non-membership)
     SUBSET = auto()
     UNION = auto()
     INTERSECT = auto()
 
-    # Comparison operators (Phase 3)
+    # Comparison operators (Phase 3, enhanced in Phase 7)
     LESS_THAN = auto()  # <
     GREATER_THAN = auto()  # >
     LESS_EQUAL = auto()  # <=
     GREATER_EQUAL = auto()  # >=
     EQUALS = auto()  # =
+    NOT_EQUAL = auto()  # != or ≠
 
     # Z notation operators (Phase 4)
     FREE_TYPE = auto()  # ::=

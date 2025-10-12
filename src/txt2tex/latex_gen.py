@@ -42,14 +42,16 @@ class LaTeXGenerator:
         "or": r"\lor",
         "=>": r"\Rightarrow",
         "<=>": r"\Leftrightarrow",
-        # Comparison operators (Phase 3)
+        # Comparison operators (Phase 3, enhanced in Phase 7)
         "<": r"<",
         ">": r">",
         "<=": r"\leq",
         ">=": r"\geq",
         "=": r"=",
-        # Set operators (Phase 3)
+        "!=": r"\neq",
+        # Set operators (Phase 3, enhanced in Phase 7)
         "in": r"\in",
+        "notin": r"\notin",
         "subset": r"\subseteq",
         "union": r"\cup",
         "intersect": r"\cap",
@@ -59,11 +61,12 @@ class LaTeXGenerator:
         "not": r"\lnot",
     }
 
-    # Quantifier mappings (Phase 3, enhanced in Phase 6)
+    # Quantifier mappings (Phase 3, enhanced in Phase 6-7)
     QUANTIFIERS: ClassVar[dict[str, str]] = {
         "forall": r"\forall",
         "exists": r"\exists",
         "exists1": r"\exists_1",  # Unique existence quantifier
+        "mu": r"\mu",  # Definite description (mu-operator)
     }
 
     # Operator precedence (lower number = lower precedence)
@@ -206,13 +209,15 @@ class LaTeXGenerator:
         return f"{left} {op_latex} {right}"
 
     def _generate_quantifier(self, node: Quantifier) -> str:
-        """Generate LaTeX for quantifier (forall, exists, exists1).
+        """Generate LaTeX for quantifier (forall, exists, exists1, mu).
 
         Phase 6 enhancement: Supports multiple variables.
+        Phase 7 enhancement: Supports mu-operator (definite description).
         Examples:
         - forall x : N | pred -> \\forall x \\colon N \\bullet pred
         - forall x, y : N | pred -> \\forall x, y \\colon N \\bullet pred
         - exists1 x : N | pred -> \\exists_1 x \\colon N \\bullet pred
+        - mu x : N | pred -> \\mu x \\colon N \\bullet pred
         """
         quant_latex = self.QUANTIFIERS.get(node.quantifier)
         if quant_latex is None:
