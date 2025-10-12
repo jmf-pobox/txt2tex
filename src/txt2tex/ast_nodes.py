@@ -226,12 +226,27 @@ class ProofTree(ASTNode):
     conclusion: ProofNode  # The final conclusion at the top
 
 
+# Text paragraph node (Phase 0 - originally planned, now implementing)
+
+
+@dataclass(frozen=True)
+class Paragraph(ASTNode):
+    """Plain text paragraph.
+
+    Simple text content that gets rendered as-is in LaTeX.
+    No inline math parsing yet - that's a future enhancement.
+    """
+
+    text: str  # The paragraph content
+
+
 # Type alias for document items (expressions or structural elements)
 DocumentItem = (
     Expr
     | Section
     | Solution
     | Part
+    | Paragraph
     | TruthTable
     | EquivChain
     | GivenType
