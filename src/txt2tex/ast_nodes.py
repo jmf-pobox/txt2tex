@@ -85,8 +85,40 @@ class Superscript(ASTNode):
     exponent: Expr
 
 
+@dataclass(frozen=True)
+class SetComprehension(ASTNode):
+    """Set comprehension node (Phase 8).
+
+    Supports two forms:
+    - Set by predicate: { x : X | predicate } (expression=None)
+    - Set by expression: { x : X | predicate . expression }
+
+    Examples:
+    - { x : N | x > 0 } -> variables=["x"], domain=N, predicate=(x > 0),
+                           expression=None
+    - { x : N | x > 0 . x^2 } -> variables=["x"], domain=N,
+                                  predicate=(x > 0), expression=(x^2)
+    - { x, y : N | x + y = 4 } -> variables=["x", "y"], domain=N,
+                                   predicate=(x+y=4)
+    """
+
+    variables: list[str]  # One or more variables (e.g., ["x"], ["x", "y"])
+    domain: Expr | None  # Optional domain (e.g., N, Z, P X)
+    predicate: Expr  # The condition/predicate
+    expression: Expr | None  # Optional expression (if present, set by expression)
+
+
 # Type alias for all expression types
-Expr = BinaryOp | UnaryOp | Identifier | Number | Quantifier | Subscript | Superscript
+Expr = (
+    BinaryOp
+    | UnaryOp
+    | Identifier
+    | Number
+    | Quantifier
+    | Subscript
+    | Superscript
+    | SetComprehension
+)
 
 
 # Document structure nodes (Phase 1)
