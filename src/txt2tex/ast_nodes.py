@@ -194,10 +194,15 @@ class FreeType(ASTNode):
 
 @dataclass(frozen=True)
 class Abbreviation(ASTNode):
-    """Abbreviation definition (name == expression)."""
+    """Abbreviation definition (name == expression).
+
+    Phase 9 enhancement: Supports generic parameters [X, Y, ...].
+    Example: [X] Pairs == X x X
+    """
 
     name: str
     expression: Expr
+    generic_params: list[str] | None = None  # Optional generic parameters
 
 
 @dataclass(frozen=True)
@@ -210,19 +215,39 @@ class Declaration(ASTNode):
 
 @dataclass(frozen=True)
 class AxDef(ASTNode):
-    """Axiomatic definition block."""
+    """Axiomatic definition block.
+
+    Phase 9 enhancement: Supports generic parameters [X, Y, ...].
+    Example:
+    axdef [X]
+      f : X -> X
+    where
+      forall x : X | f(x) = x
+    end
+    """
 
     declarations: list[Declaration]
     predicates: list[Expr]
+    generic_params: list[str] | None = None  # Optional generic parameters
 
 
 @dataclass(frozen=True)
 class Schema(ASTNode):
-    """Schema definition block."""
+    """Schema definition block.
+
+    Phase 9 enhancement: Supports generic parameters [X, Y, ...].
+    Example:
+    schema GenericStack[X]
+      items : seq X
+    where
+      # items <= 100
+    end
+    """
 
     name: str
     declarations: list[Declaration]
     predicates: list[Expr]
+    generic_params: list[str] | None = None  # Optional generic parameters
 
 
 # Proof tree nodes (Phase 5 - Path C)

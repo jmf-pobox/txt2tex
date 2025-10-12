@@ -615,18 +615,36 @@ class LaTeXGenerator:
         return lines
 
     def _generate_abbreviation(self, node: Abbreviation) -> list[str]:
-        """Generate LaTeX for abbreviation definition."""
+        """Generate LaTeX for abbreviation definition.
+
+        Phase 9 enhancement: Supports optional generic parameters.
+        """
         lines: list[str] = []
         expr_latex = self.generate_expr(node.expression)
-        lines.append(f"{node.name} == {expr_latex}")
+
+        # Add generic parameters if present
+        if node.generic_params:
+            params_str = ", ".join(node.generic_params)
+            lines.append(f"[{params_str}] {node.name} == {expr_latex}")
+        else:
+            lines.append(f"{node.name} == {expr_latex}")
+
         lines.append("")
         return lines
 
     def _generate_axdef(self, node: AxDef) -> list[str]:
-        """Generate LaTeX for axiomatic definition."""
+        """Generate LaTeX for axiomatic definition.
+
+        Phase 9 enhancement: Supports optional generic parameters.
+        """
         lines: list[str] = []
 
-        lines.append(r"\begin{axdef}")
+        # Add generic parameters if present
+        if node.generic_params:
+            params_str = ", ".join(node.generic_params)
+            lines.append(f"\\begin{{axdef}}[{params_str}]")
+        else:
+            lines.append(r"\begin{axdef}")
 
         # Generate declarations
         for decl in node.declarations:
@@ -646,10 +664,18 @@ class LaTeXGenerator:
         return lines
 
     def _generate_schema(self, node: Schema) -> list[str]:
-        """Generate LaTeX for schema definition."""
+        """Generate LaTeX for schema definition.
+
+        Phase 9 enhancement: Supports optional generic parameters.
+        """
         lines: list[str] = []
 
-        lines.append(r"\begin{schema}{" + node.name + "}")
+        # Add generic parameters if present
+        if node.generic_params:
+            params_str = ", ".join(node.generic_params)
+            lines.append(f"\\begin{{schema}}{{{node.name}}}[{params_str}]")
+        else:
+            lines.append(r"\begin{schema}{" + node.name + "}")
 
         # Generate declarations
         for decl in node.declarations:
