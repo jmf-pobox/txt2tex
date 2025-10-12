@@ -1,0 +1,53 @@
+=== Phase 10a: Relation Operators ===
+
+** Example 1: Relation Type **
+
+R <-> S
+
+** Example 2: Maplet Constructor **
+
+x |-> y
+
+1 |-> 2
+
+** Example 3: Domain Restriction **
+
+S <| R
+
+** Example 4: Range Restriction **
+
+R |> T
+
+** Example 5: Relational Composition **
+
+R comp S
+
+R ; S
+
+** Example 6: Relation Functions **
+
+dom R
+
+ran R
+
+** Example 7: Complex Expressions **
+
+dom (S <| R)
+
+ran (R |> T)
+
+(A <| R) comp (R |> B)
+
+** Example 8: Chained Relations **
+
+R ; S ; T
+
+A <| R |> B
+
+** Example 9: Relations with Set Operations **
+
+(x |-> y) in R
+
+dom R subset S
+
+ran R union ran S

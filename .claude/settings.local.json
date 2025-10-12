@@ -51,7 +51,8 @@
       "Bash(PYTHONPATH=src pytest:*)",
       "Bash(PYTHONPATH=src hatch run python3:*)",
       "Bash(ls:*)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "Bash(PYTHONPATH=../src python3:*)"
     ],
     "deny": [],
     "ask": []

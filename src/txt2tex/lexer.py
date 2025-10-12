@@ -17,10 +17,11 @@ class LexerError(Exception):
 
 class Lexer:
     """
-    Tokenizes input text for Phase 0 + Phase 1 + Phase 2 + Phase 3 + Phase 4.
+    Tokenizes input text for Phase 0-4 + Phase 10a.
 
     Supports propositional logic, document structure, equivalence chains,
-    predicate logic with quantifiers and mathematical notation, and Z notation.
+    predicate logic with quantifiers and mathematical notation, Z notation,
+    and relational operators (Phase 10a: <->, |->, <|, |>, comp, ;, dom, ran).
     """
 
     def __init__(self, text: str) -> None:
@@ -110,6 +111,13 @@ class Lexer:
             self._advance()
             return Token(TokenType.IFF, "<=>", start_line, start_column)
 
+        # Relation type operator: <-> (Phase 10)
+        if char == "<" and self._peek_char() == "-" and self._peek_char(2) == ">":
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.RELATION, "<->", start_line, start_column)
+
         # Solution marker: **
         if char == "*" and self._peek_char() == "*":
             self._advance()
@@ -151,6 +159,19 @@ class Lexer:
             self._advance()
             return Token(TokenType.RBRACE, "}", start_line, start_column)
 
+        # Maplet operator: |-> (Phase 10a) - check before | alone
+        if char == "|" and self._peek_char() == "-" and self._peek_char(2) == ">":
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.MAPLET, "|->", start_line, start_column)
+
+        # Range restriction operator: |> (Phase 10a) - check before | alone
+        if char == "|" and self._peek_char() == ">":
+            self._advance()
+            self._advance()
+            return Token(TokenType.RRES, "|>", start_line, start_column)
+
         # Pipe (for truth tables and quantifiers)
         if char == "|":
             self._advance()
@@ -184,9 +205,20 @@ class Lexer:
             self._advance()
             return Token(TokenType.COLON, ":", start_line, start_column)
 
+        # Semicolon (for relational composition in Phase 10a)
+        if char == ";":
+            self._advance()
+            return Token(TokenType.SEMICOLON, ";", start_line, start_column)
+
         # Comparison operators (Phase 3)
         # Check <= and >= before < and >
-        # But watch out for <=> which is handled earlier
+        # But watch out for <=> and <-> which are handled earlier
+        # Domain restriction operator: <| (Phase 10a) - check before < alone
+        if char == "<" and self._peek_char() == "|":
+            self._advance()
+            self._advance()
+            return Token(TokenType.DRES, "<|", start_line, start_column)
+
         if char == "<" and self._peek_char() == "=" and self._peek_char(2) != ">":
             self._advance()
             self._advance()
@@ -353,6 +385,14 @@ class Lexer:
             return Token(TokenType.WHERE, value, start_line, start_column)
         if value == "end":
             return Token(TokenType.END, value, start_line, start_column)
+
+        # Check for relation functions (Phase 10a)
+        if value == "comp":
+            return Token(TokenType.COMP, value, start_line, start_column)
+        if value == "dom":
+            return Token(TokenType.DOM, value, start_line, start_column)
+        if value == "ran":
+            return Token(TokenType.RAN, value, start_line, start_column)
 
         # Regular identifier
         return Token(TokenType.IDENTIFIER, value, start_line, start_column)
