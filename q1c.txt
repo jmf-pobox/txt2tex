@@ -1,12 +1,49 @@
 === Propositional Logic ===
 
-** Solution 3 **
+** Question 1 **
 
+(a) TRUTH TABLE:                                                                            
+p | not p | (not p => p) | p => (not p => p)
+T | F | T | T                                  
+F | T | F | T
+
+
+(b) TRUTH TABLE:                                                                            
+p | q | (q => p) | not p | not q | (not p => not q) | (not p => not q) <=> (q => p)
+t | t | t | f | f | t | t
+t | f | t | f | t | t | t
+f | t | f | t | f | f | t
+f | f | t | t | t | t | t
+
+
+(c) TRUTH TABLE:
+p | q | r | (p => r) | (q => r) | ((p =>r) and (q => r)) | (p or q) | ((p or q) => r) | <=>
+t | t | t | t | t | t | t | t | t
+t | t | f | f | f | f | t | f | t
+t | f | t | t | t | t | t | t | t
+t | f | f | f | t | f | t | f | t
+f | t | t | t | t | t | t | t | t
+f | t | f | t | f | f | t | f | t
+f | f | t | t | t | t | f | t | t
+f | f | f | t | t | t | f | t | t
+
+** Question 2 **
 
 (a) EQUIV:
-p
-p or not p [or introduction]
-(not p => p) [=> disjunction]
+p => (not p => p) 
+p => (not not p or p) [=> disjunction]
+p => (p or p) [not not]
+p => p [idempotence of p]
+true [tautology]
+
+
+(b) EQUIV:
+(not p => not q)
+(not not p or not q) [=> disjunction]
+(p or not q) [not not]
+(not q or p) [commutativity of or]
+q => p [=> disjunction]
+
 
 (c) EQUIV:
 ((p => r) and (q => r))
@@ -14,3 +51,13 @@ p or not p [or introduction]
 r and (not p or not q) [distributivity 2]
 (not p or not q) and r [associativity of or]
 (p or q) => r
+
+** Question 3 **
+
+(a) PROOF:
+  p => (not p => p) [=> intro from 1]
+    [1] p [assumption]
+        not p => p [=> intro from 2]
+          [2] not p [assumption]
+          :: p [from 1]
+

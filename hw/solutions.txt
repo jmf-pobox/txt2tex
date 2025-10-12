@@ -54,11 +54,9 @@ r and (not p or not q) [distributivity 2]
 
 ** Question 3 **
 
-(a) PROOF:
-(p and (p => q)) => (p and q) [=> intro from 1]
-  [1] p and (p => q) [assumption]
-      :: p [and elim 1]
-      :: p => q [and elim 2]
-      q [=> elim]
-      p and q [and intro]
-
+(a) PROOF: 
+  p => (not p => p) [=> intro from 1]
+    [1] p [assumption]
+        not p => p [=> intro from 2]
+          [2] not p [assumption]
+              p [copy]

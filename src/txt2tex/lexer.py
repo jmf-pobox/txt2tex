@@ -156,12 +156,18 @@ class Lexer:
             self._advance()
             return Token(TokenType.PIPE, "|", start_line, start_column)
 
-        # Free type operator ::= (Phase 4) - check before : alone
+        # Free type operator ::= (Phase 4) - check before :: and :
         if char == ":" and self._peek_char() == ":" and self._peek_char(2) == "=":
             self._advance()
             self._advance()
             self._advance()
             return Token(TokenType.FREE_TYPE, "::=", start_line, start_column)
+
+        # Double colon :: (Phase 5 - sibling marker) - check before : alone
+        if char == ":" and self._peek_char() == ":":
+            self._advance()
+            self._advance()
+            return Token(TokenType.DOUBLE_COLON, "::", start_line, start_column)
 
         # Colon (for quantifiers in Phase 3)
         if char == ":":

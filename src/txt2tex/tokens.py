@@ -75,6 +75,7 @@ class TokenType(Enum):
 
     # Proof trees (Phase 5)
     PROOF = auto()  # PROOF:
+    DOUBLE_COLON = auto()  # :: (sibling marker in Path C)
     INDENT = auto()  # Indentation level (significant whitespace)
 
     # Whitespace and structure

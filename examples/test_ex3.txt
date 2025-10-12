@@ -1,0 +1,16 @@
+PROOF:
+p and (q or r) => (p and q) or (p and r) [=> intro from 1]
+  [1] p and (q or r) [assumption]
+      p [and elim]
+      q or r [and elim]
+      (p and q) or (p and r) [or elim]
+        case q:
+          :: p [from above]
+          :: q [from case]
+          p and q [and intro]
+          (p and q) or (p and r) [or intro]
+        case r:
+          :: p [from above]
+          :: r [from case]
+          p and r [and intro]
+          (p and q) or (p and r) [or intro]

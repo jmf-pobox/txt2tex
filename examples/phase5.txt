@@ -1,43 +1,64 @@
 === Phase 5: Proof Trees ===
 
-** Example 1: Simple Modus Ponens **
+** Example 1: Simple Implication **
 
 PROOF:
-p => q [premise]
-p [premise]
-  q [modus ponens]
+p and q => q [=> intro from 1]
+  [1] p and q [assumption]
+      q [and elim 2]
 
-** Example 2: Conjunction Elimination **
-
-PROOF:
-p and q [premise]
-  p [and elim left]
-  q [and elim right]
-
-** Example 3: Nested Proof **
+** Example 2: With Sibling Premises **
 
 PROOF:
-(p => q) and (q => r) [premise]
-  p => q [and elim]
-  q => r [and elim]
-p [premise]
-  q [modus ponens]
-    r [modus ponens]
+p and (p => q) => (p and q) [=> intro from 1]
+  [1] p and (p => q) [assumption]
+      :: p [and elim 1]
+      :: p => q [and elim 2]
+      q [=> elim]
+      p and q [and intro]
 
-** Example 4: Disjunction Cases **
-
-PROOF:
-p or q [premise]
-  p [case 1]
-    p => r [premise]
-      r [modus ponens]
-  q [case 2]
-    q => r [premise]
-      r [modus ponens]
-
-** Example 5: Proof with Quantifiers **
+** Example 3: Distribution with Cases **
 
 PROOF:
-forall x : N | x > 0 [premise]
-a in N [premise]
-  a > 0 [universal instantiation]
+p and (q or r) => (p and q) or (p and r) [=> intro from 1]
+  [1] p and (q or r) [assumption]
+      p [and elim 1]
+      q or r [and elim 2]
+      (p and q) or (p and r) [or elim]
+        case q:
+          :: p [from above]
+          :: q [from case]
+          p and q [and intro]
+          (p and q) or (p and r) [or intro 1]
+        case r:
+          :: p [from above]
+          :: r [from case]
+          p and r [and intro]
+          (p and q) or (p and r) [or intro 2]
+
+** Example 4: Modus Tollens **
+
+PROOF:
+(p => q) and not q => not p [=> intro from 1]
+  [1] (p => q) and not q [assumption]
+      :: p => q [and elim 1]
+      :: not q [and elim 2]
+      not p [negation intro from 2]
+        [2] p [assumption]
+            q [=> elim]
+            false [contradiction]
+
+** Example 5: Solution 18 Implication to Disjunction **
+
+PROOF:
+(p => q) => (not p or q) [=> intro from 1]
+  [1] p => q [assumption]
+      :: p or not p [excluded middle]
+      :: not p or q [or elim from 2]
+        case p:
+          [2] p [assumption]
+          q [=> elim]
+          not p or q [or intro 2]
+        case not p:
+          [2] not p [assumption]
+          not p or q [or intro 1]

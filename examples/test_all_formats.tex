@@ -1,0 +1,14 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+$$
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{p \land (q \lor r) \Rightarrow p \land q \lor p \land r}{
+  \infer[$\lor$\text{-elim}^{[2]}]{p \land q \lor p \land r}{\infer[$\land$\text{-elim-1}]{p}{\ulcorner p \land (q \lor r) \urcorner^{[1]}} & \infer[$\land$\text{-elim-2}]{q \lor r}{\ulcorner p \land (q \lor r) \urcorner^{[1]}} & \infer[$\lor$\text{-intro-1}]{p \land q \lor p \land r}{\infer[\text{$\land$ intro}]{p \land q}{\ulcorner q \urcorner^{[2]}}} & \infer[$\lor$\text{-intro-2}]{p \land q \lor p \land r}{\infer[\text{$\land$ intro}]{p \land r}{\ulcorner r \urcorner^{[2]}}}}
+}
+$$
+
+\end{document}
