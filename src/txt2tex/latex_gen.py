@@ -25,6 +25,7 @@ from txt2tex.ast_nodes import (
     Quantifier,
     Schema,
     Section,
+    SetComprehension,
     Solution,
     Subscript,
     Superscript,
@@ -81,7 +82,6 @@ class LaTeXGenerator:
     # Right-associative operators (need parens on left when same operator)
     # Implication and equivalence are right-associative
     RIGHT_ASSOCIATIVE: ClassVar[set[str]] = {"=>", "<=>"}
-
 
     def __init__(self, use_fuzz: bool = False) -> None:
         """Initialize generator with package choice."""
@@ -167,6 +167,8 @@ class LaTeXGenerator:
             return self._generate_subscript(expr)
         if isinstance(expr, Superscript):
             return self._generate_superscript(expr)
+        if isinstance(expr, SetComprehension):
+            return self._generate_set_comprehension(expr)
 
         raise TypeError(f"Unknown expression type: {type(expr)}")
 
@@ -187,9 +189,7 @@ class LaTeXGenerator:
         operand = self.generate_expr(node.operand)
         return f"{op_latex} {operand}"
 
-    def _needs_parens(
-        self, child: Expr, parent_op: str, is_left_child: bool
-    ) -> bool:
+    def _needs_parens(self, child: Expr, parent_op: str, is_left_child: bool) -> bool:
         """Check if child expression needs parentheses in parent context.
 
         Args:
@@ -272,6 +272,50 @@ class LaTeXGenerator:
         parts.append(r"\bullet")
         body_latex = self.generate_expr(node.body)
         parts.append(body_latex)
+
+        return " ".join(parts)
+
+    def _generate_set_comprehension(self, node: SetComprehension) -> str:
+        """Generate LaTeX for set comprehension (Phase 8).
+
+        Supports two forms:
+        - Set by predicate: { x : X | predicate }
+          -> \\{ x \\colon X \\mid predicate \\}
+        - Set by expression: { x : X | pred . expr }
+          -> \\{ x \\colon X \\mid pred \\bullet expr \\}
+
+        Examples:
+        - { x : N | x > 0 }
+          -> \\{ x \\colon \\mathbb{N} \\mid x > 0 \\}
+        - { x : N | x > 0 . x^2 }
+          -> \\{ x \\colon \\mathbb{N} \\mid x > 0 \\bullet x^{2} \\}
+        - { x, y : N | x + y = 4 }
+          -> \\{ x, y \\colon \\mathbb{N} \\mid x + y = 4 \\}
+        """
+        # Generate variables (comma-separated for multi-variable)
+        variables_str = ", ".join(node.variables)
+        parts = [r"\{", variables_str]
+
+        if node.domain:
+            domain_latex = self.generate_expr(node.domain)
+            parts.append(r"\colon")
+            parts.append(domain_latex)
+
+        # Add mid separator
+        parts.append(r"\mid")
+
+        # Generate predicate
+        predicate_latex = self.generate_expr(node.predicate)
+        parts.append(predicate_latex)
+
+        # If expression is present, add bullet and expression
+        if node.expression:
+            parts.append(r"\bullet")
+            expression_latex = self.generate_expr(node.expression)
+            parts.append(expression_latex)
+
+        # Close set
+        parts.append(r"\}")
 
         return " ".join(parts)
 
@@ -598,9 +642,7 @@ class LaTeXGenerator:
             # For now, treat the first child as the main derivation from the
             # assumption. This is a simplified approach - full natural deduction
             # requires dependency analysis.
-            if len(node.children) == 1 and isinstance(
-                node.children[0], ProofNode
-            ):
+            if len(node.children) == 1 and isinstance(node.children[0], ProofNode):
                 single_child = node.children[0]
                 # Generate child with assumption as its premise
                 return self._generate_inference_from_assumption(
@@ -840,9 +882,7 @@ class LaTeXGenerator:
                                     and isinstance(sib_child.expression, BinaryOp)
                                     and sib_child.expression.operator == "or"
                                 ):
-                                    disjunction_siblings.append(
-                                        sibling_latex_parts[i]
-                                    )
+                                    disjunction_siblings.append(sibling_latex_parts[i])
 
                             # Apply \raiseproof to case branches for vertical
                             # layout. STAGGERED STRATEGY: Different cases get

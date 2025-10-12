@@ -272,4 +272,6 @@ not (p and q)"""
         assert len(ast.items) == 1
         assert isinstance(ast.items[0], Paragraph)
         # Text is captured raw, including <=> and period
-        assert ast.items[0].text == "We combine these two proofs with the <=> intro rule."
+        assert (
+            ast.items[0].text == "We combine these two proofs with the <=> intro rule."
+        )
