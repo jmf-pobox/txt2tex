@@ -74,7 +74,7 @@ f & f & f & t & t & t & f & t & t \\
 \vspace{11pt}
 \vspace{-10pt}
 \begin{align*}
-p \Rightarrow \lnot p \Rightarrow p \\
+p \Rightarrow (\lnot p \Rightarrow p) \\
 &\Leftrightarrow p \Rightarrow \lnot \lnot p \lor p && \text{[$\Rightarrow$ disjunction]} \\
 &\Leftrightarrow p \Rightarrow p \lor p && \text{[$\lnot$ $\lnot$]} \\
 &\Leftrightarrow p \Rightarrow p && \text{[idempotence of p]} \\
@@ -120,11 +120,67 @@ p \Rightarrow \lnot p \Rightarrow p \\
 (a)
 \par
 \vspace{11pt}
+\noindent
 \[
-\infer[$\Rightarrow$\text{-intro}^{[1]}]{p \Rightarrow \lnot p \Rightarrow p}{
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{p \Rightarrow (\lnot p \Rightarrow p)}{
   \infer[$\Rightarrow$\text{-intro}^{[2]}]{\lnot p \Rightarrow p}{\ulcorner \lnot p \urcorner^{[2]} & \ulcorner p \urcorner^{[1]}}
 }
 \]
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+In one direction:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(\lnot p \Rightarrow \lnot q) \Rightarrow (q \Rightarrow p)}{
+  \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]} & \infer[$\Rightarrow$\text{-intro}^{[2]}]{q \Rightarrow p}{
+  \ulcorner q \urcorner^{[2]} & \infer[false\text{-elim}^{[3]}]{p}{
+  \infer[\text{false intro}]{false}{
+  \infer[\text{$\Rightarrow$ elim}]{\lnot q}{
+  \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]}
+  \ulcorner \lnot p \urcorner^{[3]}
+} & \ulcorner q \urcorner^{[2]}
+}
+}
+}
+}
+\]
+
+\bigskip
+
+and the other:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(q \Rightarrow p) \Rightarrow (\lnot p \Rightarrow \lnot q)}{
+  \ulcorner q \Rightarrow p \urcorner^{[1]} & \infer[$\Rightarrow$\text{-intro}^{[2]}]{\lnot p \Rightarrow \lnot q}{
+  \ulcorner \lnot p \urcorner^{[2]} & \infer[false\text{-elim}^{[3]}]{\lnot q}{
+  \infer[\text{false intro}]{false}{
+  \infer[\text{$\Rightarrow$ elim}]{p}{
+  \ulcorner q \Rightarrow p \urcorner^{[1]}
+  \ulcorner q \urcorner^{[3]}
+} & \ulcorner \lnot p \urcorner^{[2]}
+}
+}
+}
+}
+\]
+
+\bigskip
+
+We then combine these two proofs with the $\Leftrightarrow$-intro rule.
+
+\bigskip
 
 \medskip
 
