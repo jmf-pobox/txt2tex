@@ -75,10 +75,13 @@ p [conclusion]
         parser = Parser(tokens)
         ast = parser.parse()
 
+        assert isinstance(ast, Document)
         proof_tree = ast.items[0]
         assert isinstance(proof_tree, ProofTree)
         assert proof_tree.conclusion.justification == "conclusion"
-        assert proof_tree.conclusion.children[0].justification == "premise"
+        premise = proof_tree.conclusion.children[0]
+        assert isinstance(premise, ProofNode)
+        assert premise.justification == "premise"
 
     def test_assumption_label(self) -> None:
         """Test parsing assumption labels [1], [2], etc."""
@@ -91,6 +94,7 @@ p => q [=> intro from 1]
         parser = Parser(tokens)
         ast = parser.parse()
 
+        assert isinstance(ast, Document)
         proof_tree = ast.items[0]
         assert isinstance(proof_tree, ProofTree)
 
@@ -103,6 +107,7 @@ p => q [=> intro from 1]
         # Check assumption
         assert len(conclusion.children) == 1
         assumption = conclusion.children[0]
+        assert isinstance(assumption, ProofNode)
         assert assumption.label == 1
         assert assumption.is_assumption
         assert assumption.justification == "assumption"
@@ -118,7 +123,9 @@ p and q [and intro]
         parser = Parser(tokens)
         ast = parser.parse()
 
+        assert isinstance(ast, Document)
         proof_tree = ast.items[0]
+        assert isinstance(proof_tree, ProofTree)
         conclusion = proof_tree.conclusion
 
         # Check that we have two children
@@ -126,12 +133,14 @@ p and q [and intro]
 
         # Check first sibling
         first = conclusion.children[0]
+        assert isinstance(first, ProofNode)
         assert first.is_sibling
         assert isinstance(first.expression, Identifier)
         assert first.expression.name == "p"
 
         # Check second sibling
         second = conclusion.children[1]
+        assert isinstance(second, ProofNode)
         assert second.is_sibling
         assert isinstance(second.expression, Identifier)
         assert second.expression.name == "q"
@@ -149,7 +158,9 @@ p or q => r [or elim]
         parser = Parser(tokens)
         ast = parser.parse()
 
+        assert isinstance(ast, Document)
         proof_tree = ast.items[0]
+        assert isinstance(proof_tree, ProofTree)
         conclusion = proof_tree.conclusion
 
         # Check that we have two case branches
@@ -160,8 +171,9 @@ p or q => r [or elim]
         assert isinstance(case1, CaseAnalysis)
         assert case1.case_name == "p"
         assert len(case1.steps) == 1
-        assert isinstance(case1.steps[0].expression, Identifier)
-        assert case1.steps[0].expression.name == "r"
+        step1 = case1.steps[0]
+        assert isinstance(step1.expression, Identifier)
+        assert step1.expression.name == "r"
 
         # Check second case
         case2 = conclusion.children[1]
@@ -180,18 +192,22 @@ p
         parser = Parser(tokens)
         ast = parser.parse()
 
+        assert isinstance(ast, Document)
         proof_tree = ast.items[0]
+        assert isinstance(proof_tree, ProofTree)
         conclusion = proof_tree.conclusion
 
         # p has child q
         assert len(conclusion.children) == 1
         q_node = conclusion.children[0]
+        assert isinstance(q_node, ProofNode)
         assert isinstance(q_node.expression, Identifier)
         assert q_node.expression.name == "q"
 
         # q has child r
         assert len(q_node.children) == 1
         r_node = q_node.children[0]
+        assert isinstance(r_node, ProofNode)
         assert isinstance(r_node.expression, Identifier)
         assert r_node.expression.name == "r"
 
@@ -206,7 +222,9 @@ p and q => q [=> intro from 1]
         parser = Parser(tokens)
         ast = parser.parse()
 
+        assert isinstance(ast, Document)
         proof_tree = ast.items[0]
+        assert isinstance(proof_tree, ProofTree)
         conclusion = proof_tree.conclusion
 
         # Check conclusion expression is binary op

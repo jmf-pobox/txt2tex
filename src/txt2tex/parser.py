@@ -67,9 +67,10 @@ class Parser:
         equiv_step ::= expr ('<=' '>')? justification?
         justification ::= '[' TEXT ']'
 
-    Phase 3 - Quantifiers and mathematical notation:
+    Phase 3 - Quantifiers and mathematical notation (enhanced in Phase 6):
         expr       ::= quantifier | iff
-        quantifier ::= ('forall' | 'exists') IDENTIFIER ':' atom '|' expr
+        quantifier ::= ('forall' | 'exists' | 'exists1') var_list (':' atom)? '|' expr
+        var_list   ::= IDENTIFIER (',' IDENTIFIER)*
         iff        ::= implies ( '<=>' implies )*
         implies    ::= or ( '=>' or )*
         or         ::= and ( 'or' and )*
@@ -447,8 +448,8 @@ class Parser:
 
     def _parse_expr(self) -> Expr:
         """Parse expression (entry point)."""
-        # Check for quantifier first (Phase 3)
-        if self._match(TokenType.FORALL, TokenType.EXISTS):
+        # Check for quantifier first (Phase 3, enhanced in Phase 6)
+        if self._match(TokenType.FORALL, TokenType.EXISTS, TokenType.EXISTS1):
             return self._parse_quantifier()
         return self._parse_iff()
 
@@ -535,15 +536,29 @@ class Parser:
         return self._parse_postfix()
 
     def _parse_quantifier(self) -> Expr:
-        """Parse quantifier: (forall|exists) var : domain | body."""
-        quant_token = self._advance()  # Consume 'forall' or 'exists'
+        """Parse quantifier: (forall|exists|exists1) var [, var]* : domain | body.
 
-        # Parse variable
+        Phase 6 enhancement: Supports multiple variables with shared domain.
+        Examples:
+        - forall x : N | pred
+        - forall x, y : N | pred
+        - exists1 x : N | pred
+        """
+        quant_token = self._advance()  # Consume 'forall', 'exists', or 'exists1'
+
+        # Parse first variable
         if not self._match(TokenType.IDENTIFIER):
             raise ParserError(
                 f"Expected variable name after {quant_token.value}", self._current()
             )
-        var_token = self._advance()
+        variables: list[str] = [self._advance().value]
+
+        # Parse additional variables if comma-separated
+        while self._match(TokenType.COMMA):
+            self._advance()  # Consume ','
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError("Expected variable name after ','", self._current())
+            variables.append(self._advance().value)
 
         # Parse optional domain (: domain)
         domain: Expr | None = None
@@ -561,7 +576,7 @@ class Parser:
 
         return Quantifier(
             quantifier=quant_token.value,
-            variable=var_token.value,
+            variables=variables,
             domain=domain,
             body=body,
             line=quant_token.line,
@@ -949,13 +964,17 @@ class Parser:
                 label = int(self._current().value)
                 self._advance()
                 if not self._match(TokenType.RBRACKET):
-                    raise ParserError("Expected ']' after assumption label", self._current())
+                    raise ParserError(
+                        "Expected ']' after assumption label", self._current()
+                    )
                 self._advance()  # Consume ']'
             else:
                 # Not a label, must be justification - back up by recreating the bracket
                 # Actually, we can't back up easily. Let's handle this differently.
                 # For now, assume [number] is always a label at the start of a line.
-                raise ParserError("Expected number in assumption label", self._current())
+                raise ParserError(
+                    "Expected number in assumption label", self._current()
+                )
 
         # Check for sibling marker ::
         is_sibling = False
@@ -1080,7 +1099,9 @@ class Parser:
                 break  # Stop parsing this case
 
             # Parse proof node for this case
-            step = self._parse_proof_node(base_indent=base_indent, parent_indent=case_indent)
+            step = self._parse_proof_node(
+                base_indent=base_indent, parent_indent=case_indent
+            )
             steps.append(step)
 
         return CaseAnalysis(

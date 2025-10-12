@@ -59,10 +59,11 @@ class LaTeXGenerator:
         "not": r"\lnot",
     }
 
-    # Quantifier mappings (Phase 3)
+    # Quantifier mappings (Phase 3, enhanced in Phase 6)
     QUANTIFIERS: ClassVar[dict[str, str]] = {
         "forall": r"\forall",
         "exists": r"\exists",
+        "exists1": r"\exists_1",  # Unique existence quantifier
     }
 
     # Operator precedence (lower number = lower precedence)
@@ -205,13 +206,21 @@ class LaTeXGenerator:
         return f"{left} {op_latex} {right}"
 
     def _generate_quantifier(self, node: Quantifier) -> str:
-        """Generate LaTeX for quantifier (forall, exists)."""
+        """Generate LaTeX for quantifier (forall, exists, exists1).
+
+        Phase 6 enhancement: Supports multiple variables.
+        Examples:
+        - forall x : N | pred -> \\forall x \\colon N \\bullet pred
+        - forall x, y : N | pred -> \\forall x, y \\colon N \\bullet pred
+        - exists1 x : N | pred -> \\exists_1 x \\colon N \\bullet pred
+        """
         quant_latex = self.QUANTIFIERS.get(node.quantifier)
         if quant_latex is None:
             raise ValueError(f"Unknown quantifier: {node.quantifier}")
 
-        # Generate variable and domain
-        parts = [quant_latex, node.variable]
+        # Generate variables (comma-separated for multi-variable quantifiers)
+        variables_str = ", ".join(node.variables)
+        parts = [quant_latex, variables_str]
 
         if node.domain:
             domain_latex = self.generate_expr(node.domain)
@@ -451,9 +460,10 @@ class LaTeXGenerator:
         """Generate LaTeX for proof tree using \\infer macros from zed-proof.sty."""
         lines: list[str] = []
 
-        # Generate the proof tree centered using display math mode
+        # Generate the proof tree left-aligned using \noindent and display math mode
         # Spacing is controlled by part labels (no additional spacing needed)
         proof_latex = self._generate_proof_node_infer(node.conclusion)
+        lines.append(r"\noindent")
         lines.append(r"\[")
         lines.append(proof_latex)
         lines.append(r"\]")
@@ -493,7 +503,9 @@ class LaTeXGenerator:
             # Height is based on sequential steps + 1 for sibling layer (if any)
             # Plus the depth of any nested children
             sibling_layer = 1 if sibling_count > 0 else 0
-            max_child_depth = max((self._calculate_tree_depth(step) for step in node.steps), default=0)
+            max_child_depth = max(
+                (self._calculate_tree_depth(step) for step in node.steps), default=0
+            )
 
             return sibling_layer + sequential_count + max_child_depth
 
@@ -511,19 +523,26 @@ class LaTeXGenerator:
         # If this is an assumption node, it should appear as a boxed premise
         if node.is_assumption:
             # The assumption itself is a premise (leaf)
-            assumption_latex = self._format_boxed_assumption(node.expression, node.label)
+            assumption_latex = self._format_boxed_assumption(
+                node.expression, node.label
+            )
 
             # If it has children, they are derivations from this assumption
             # The assumption should be the base of the tree
             if not node.children:
                 return assumption_latex
 
-            # For now, treat the first child as the main derivation from the assumption
-            # This is a simplified approach - full natural deduction requires dependency analysis
-            if len(node.children) == 1 and not isinstance(node.children[0], CaseAnalysis):
-                child = node.children[0]
+            # For now, treat the first child as the main derivation from the
+            # assumption. This is a simplified approach - full natural deduction
+            # requires dependency analysis.
+            if len(node.children) == 1 and isinstance(
+                node.children[0], ProofNode
+            ):
+                single_child = node.children[0]
                 # Generate child with assumption as its premise
-                return self._generate_inference_from_assumption(child, assumption_latex, node.label)
+                return self._generate_inference_from_assumption(
+                    single_child, assumption_latex, node.label
+                )
 
             # Multiple children or case analysis - need special handling
             return self._generate_complex_assumption_scope(node, assumption_latex)
@@ -618,7 +637,7 @@ class LaTeXGenerator:
     def _generate_proof_node_infer_with_assumption(
         self, node: ProofNode, assumption_latex: str, assumption_label: int | None
     ) -> str:
-        """Generate inference node where leaves should reference the given assumption."""
+        """Generate inference node with leaves referencing the given assumption."""
         expr_latex = self.generate_expr(node.expression)
 
         # Base case: no children means this should derive from the assumption
@@ -732,27 +751,39 @@ class LaTeXGenerator:
                     has_case_analysis = False
                     for grandchild in child.children:
                         if isinstance(grandchild, CaseAnalysis):
-                            child_premises_parts.append(self._generate_case_analysis(grandchild))
+                            child_premises_parts.append(
+                                self._generate_case_analysis(grandchild)
+                            )
                             has_case_analysis = True
                         else:
                             # Recurse to handle nested structure
-                            grandchild_latex = self._generate_proof_node_infer(grandchild)
+                            grandchild_latex = self._generate_proof_node_infer(
+                                grandchild
+                            )
                             child_premises_parts.append(grandchild_latex)
 
-                    # Include siblings from parent scope as additional premises
-                    # Special case: for or-elim with case analysis, only include disjunction siblings
-                    # Other siblings (like extracted conjuncts) are handled within case branches
+                    # Include siblings from parent scope as additional premises.
+                    # Special case: for or-elim with case analysis, only include
+                    # disjunction siblings. Other siblings (like extracted
+                    # conjuncts) are handled within case branches.
                     if sibling_latex_parts and child_premises_parts:
                         if has_case_analysis:
-                            # Only include disjunction siblings as top-level premises for or-elim
+                            # Only include disjunction siblings as top-level
+                            # premises for or-elim
                             disjunction_siblings = []
                             for i, sib_child in enumerate(sibling_group):
-                                if isinstance(sib_child, ProofNode) and isinstance(sib_child.expression, BinaryOp):
-                                    if sib_child.expression.operator == "or":
-                                        disjunction_siblings.append(sibling_latex_parts[i])
+                                if (
+                                    isinstance(sib_child, ProofNode)
+                                    and isinstance(sib_child.expression, BinaryOp)
+                                    and sib_child.expression.operator == "or"
+                                ):
+                                    disjunction_siblings.append(
+                                        sibling_latex_parts[i]
+                                    )
 
-                            # Apply \raiseproof to case branches for vertical layout
-                            # STAGGERED STRATEGY: Different cases get different heights + horizontal spacing
+                            # Apply \raiseproof to case branches for vertical
+                            # layout. STAGGERED STRATEGY: Different cases get
+                            # different heights + horizontal spacing
                             raised_cases = []
 
                             # Collect all case indices first
@@ -769,19 +800,32 @@ class LaTeXGenerator:
 
                                 # STAGGERED HEIGHT FORMULA:
                                 # First case: 6-8ex (minimal)
-                                # Subsequent cases: 18-24ex (much taller to avoid overlap)
+                                # Subsequent cases: 18-24ex (much taller to
+                                # avoid overlap)
                                 if case_position == 0:
                                     # First case: minimal height
-                                    height = 6 + (depth * 2)  # Conservative for first case
-                                    raised = f"\\raiseproof{{{height}ex}}{{{case_latex}}}"
+                                    height = 6 + (
+                                        depth * 2
+                                    )  # Conservative for first case
+                                    raised = (
+                                        f"\\raiseproof{{{height}ex}}{{{case_latex}}}"
+                                    )
                                 else:
-                                    # Subsequent cases: taller + horizontal spacing
-                                    height = 18 + (depth * 4)  # Much taller for subsequent cases
-                                    raised = f"\\hskip 6em \\raiseproof{{{height}ex}}{{{case_latex}}}"
+                                    # Subsequent cases: taller + horizontal
+                                    # spacing
+                                    height = 18 + (
+                                        depth * 4
+                                    )  # Much taller for subsequent cases
+                                    raised = (
+                                        f"\\hskip 6em "
+                                        f"\\raiseproof{{{height}ex}}"
+                                        f"{{{case_latex}}}"
+                                    )
 
                                 raised_cases.append(raised)
 
-                            # Combine: disjunction siblings first, then raised case branches
+                            # Combine: disjunction siblings first, then raised
+                            # case branches
                             all_premises = disjunction_siblings + raised_cases
                             child_premises = " & ".join(all_premises)
                         else:
@@ -795,7 +839,9 @@ class LaTeXGenerator:
 
                     if child.justification:
                         just = self._format_justification_label(child.justification)
-                        child_latex = f"\\infer[{just}]{{{expr_latex}}}{{{child_premises}}}"
+                        child_latex = (
+                            f"\\infer[{just}]{{{expr_latex}}}{{{child_premises}}}"
+                        )
                     else:
                         child_latex = f"\\infer{{{expr_latex}}}{{{child_premises}}}"
                 else:
@@ -804,7 +850,9 @@ class LaTeXGenerator:
 
                     if child.justification:
                         just = self._format_justification_label(child.justification)
-                        child_latex = f"\\infer[{just}]{{{expr_latex}}}{{{current_premises}}}"
+                        child_latex = (
+                            f"\\infer[{just}]{{{expr_latex}}}{{{current_premises}}}"
+                        )
                     else:
                         child_latex = f"\\infer{{{expr_latex}}}{{{current_premises}}}"
 
@@ -854,7 +902,6 @@ class LaTeXGenerator:
 
         # Build sequential steps vertically on top
         for step in sequential:
-            step_latex = self._generate_proof_node_infer(step)
             expr_latex = self.generate_expr(step.expression)
 
             if step.justification:
@@ -924,7 +971,19 @@ class LaTeXGenerator:
 
         # Wrap text parts in \text{}
         # If it contains "elim", "intro", "assumption", etc., wrap in \text{}
-        if any(word in result for word in ["elim", "intro", "assumption", "premise", "from", "case", "contradiction", "middle"]):
+        if any(
+            word in result
+            for word in [
+                "elim",
+                "intro",
+                "assumption",
+                "premise",
+                "from",
+                "case",
+                "contradiction",
+                "middle",
+            ]
+        ):
             # Replace operators with proper spacing
             result = result.replace(r"\land", r"$\land$")
             result = result.replace(r"\lor", r"$\lor$")

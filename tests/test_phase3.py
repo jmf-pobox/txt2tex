@@ -122,6 +122,7 @@ class TestParser:
         # Should parse as (x_i)^2
         assert isinstance(ast, Superscript)
         assert isinstance(ast.base, Subscript)
+        assert isinstance(ast.base.base, Identifier)
         assert ast.base.base.name == "x"
 
     def test_comparison_less_than(self) -> None:
@@ -168,7 +169,7 @@ class TestParser:
         ast = parser.parse()
         assert isinstance(ast, Quantifier)
         assert ast.quantifier == "forall"
-        assert ast.variable == "x"
+        assert ast.variables == ["x"]
         assert ast.domain is None
         assert isinstance(ast.body, BinaryOp)
 
@@ -180,7 +181,7 @@ class TestParser:
         ast = parser.parse()
         assert isinstance(ast, Quantifier)
         assert ast.quantifier == "forall"
-        assert ast.variable == "x"
+        assert ast.variables == ["x"]
         assert isinstance(ast.domain, Identifier)
         assert ast.domain.name == "N"
 
@@ -192,7 +193,40 @@ class TestParser:
         ast = parser.parse()
         assert isinstance(ast, Quantifier)
         assert ast.quantifier == "exists"
-        assert ast.variable == "y"
+        assert ast.variables == ["y"]
+
+    def test_quantifier_multi_variable(self) -> None:
+        """Test parsing forall with multiple variables (Phase 6)."""
+        lexer = Lexer("forall x, y : N | x > y")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "forall"
+        assert ast.variables == ["x", "y"]
+        assert isinstance(ast.domain, Identifier)
+        assert ast.domain.name == "N"
+
+    def test_quantifier_exists1(self) -> None:
+        """Test parsing exists1 (unique existence, Phase 6)."""
+        lexer = Lexer("exists1 x : N | x = 0")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "exists1"
+        assert ast.variables == ["x"]
+
+    def test_quantifier_multi_variable_no_domain(self) -> None:
+        """Test parsing multi-variable quantifier without domain (Phase 6)."""
+        lexer = Lexer("exists x, y | x > y")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "exists"
+        assert ast.variables == ["x", "y"]
+        assert ast.domain is None
 
     def test_complex_quantified_expr(self) -> None:
         """Test parsing complex quantified expression."""
@@ -346,7 +380,7 @@ class TestLaTeXGenerator:
         gen = LaTeXGenerator()
         ast = Quantifier(
             quantifier="forall",
-            variable="x",
+            variables=["x"],
             domain=None,
             body=BinaryOp(
                 operator=">",
@@ -366,7 +400,7 @@ class TestLaTeXGenerator:
         gen = LaTeXGenerator()
         ast = Quantifier(
             quantifier="forall",
-            variable="x",
+            variables=["x"],
             domain=Identifier(name="N", line=1, column=11),
             body=BinaryOp(
                 operator=">",
@@ -386,7 +420,7 @@ class TestLaTeXGenerator:
         gen = LaTeXGenerator()
         ast = Quantifier(
             quantifier="exists",
-            variable="y",
+            variables=["y"],
             domain=Identifier(name="N", line=1, column=11),
             body=BinaryOp(
                 operator="=",
@@ -401,6 +435,46 @@ class TestLaTeXGenerator:
         latex = gen.generate_expr(ast)
         assert latex == r"\exists y \colon N \bullet y = 0"
 
+    def test_quantifier_multi_variable(self) -> None:
+        """Test generating multi-variable forall (Phase 6)."""
+        gen = LaTeXGenerator()
+        ast = Quantifier(
+            quantifier="forall",
+            variables=["x", "y"],
+            domain=Identifier(name="N", line=1, column=14),
+            body=BinaryOp(
+                operator=">",
+                left=Identifier(name="x", line=1, column=18),
+                right=Identifier(name="y", line=1, column=22),
+                line=1,
+                column=20,
+            ),
+            line=1,
+            column=1,
+        )
+        latex = gen.generate_expr(ast)
+        assert latex == r"\forall x, y \colon N \bullet x > y"
+
+    def test_quantifier_exists1(self) -> None:
+        """Test generating exists1 (Phase 6)."""
+        gen = LaTeXGenerator()
+        ast = Quantifier(
+            quantifier="exists1",
+            variables=["x"],
+            domain=Identifier(name="N", line=1, column=12),
+            body=BinaryOp(
+                operator="=",
+                left=Identifier(name="x", line=1, column=16),
+                right=Number(value="0", line=1, column=20),
+                line=1,
+                column=18,
+            ),
+            line=1,
+            column=1,
+        )
+        latex = gen.generate_expr(ast)
+        assert latex == r"\exists_1 x \colon N \bullet x = 0"
+
 
 class TestIntegration:
     """End-to-end integration tests for Phase 3."""
@@ -412,6 +486,7 @@ class TestIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Superscript)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == "x^2"
@@ -423,6 +498,7 @@ class TestIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Subscript)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == "a_1"
@@ -434,6 +510,7 @@ class TestIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == r"x \geq 0 \land x < 10"
@@ -445,6 +522,7 @@ class TestIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == r"x \in N \land x > 0"
@@ -456,6 +534,7 @@ class TestIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == r"\forall x \colon N \bullet x \geq 0"
@@ -467,6 +546,7 @@ class TestIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == r"\forall n \colon N \bullet n \geq 0 \land n < 100"
@@ -478,6 +558,43 @@ class TestIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
+        assert isinstance(ast, Subscript)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == "x_i"
+
+    def test_multi_variable_quantifier(self) -> None:
+        """Test complete pipeline for multi-variable quantifier (Phase 6)."""
+        text = "forall x, y : N | x > y"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Quantifier)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        assert latex == r"\forall x, y \colon N \bullet x > y"
+
+    def test_exists1_quantifier(self) -> None:
+        """Test complete pipeline for exists1 quantifier (Phase 6)."""
+        text = "exists1 x : N | x = 0"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Quantifier)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        assert latex == r"\exists_1 x \colon N \bullet x = 0"
+
+    def test_complex_multi_variable_expression(self) -> None:
+        """Test complete pipeline for complex multi-variable expression (Phase 6)."""
+        text = "exists x, y : N | x > 0 and y > 0 and x > y"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Quantifier)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        assert latex == r"\exists x, y \colon N \bullet x > 0 \land y > 0 \land x > y"
