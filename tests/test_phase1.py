@@ -225,7 +225,8 @@ not (p and q)"""
         assert r"$p \land q \Rightarrow p$" in latex
         # Nested implications now have explicit parentheses for clarity
         assert r"$p \Rightarrow (q \Rightarrow r)$" in latex
-        assert r"$\lnot p \land q$" in latex
+        # Fixed: Parentheses required around binary operand of not
+        assert r"$\lnot (p \land q)$" in latex
 
     def test_paragraph_parsing(self) -> None:
         """Test parsing text paragraphs with TEXT: keyword."""

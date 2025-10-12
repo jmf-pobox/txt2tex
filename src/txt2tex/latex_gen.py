@@ -183,12 +183,22 @@ class LaTeXGenerator:
         return node.value
 
     def _generate_unary_op(self, node: UnaryOp) -> str:
-        """Generate LaTeX for unary operation."""
+        """Generate LaTeX for unary operation.
+
+        Unary operators have higher precedence than all binary operators,
+        so parentheses are added around binary operator operands.
+        """
         op_latex = self.UNARY_OPS.get(node.operator)
         if op_latex is None:
             raise ValueError(f"Unknown unary operator: {node.operator}")
 
         operand = self.generate_expr(node.operand)
+
+        # Add parentheses if operand is a binary operator
+        # (unary has higher precedence than all binary operators)
+        if isinstance(node.operand, BinaryOp):
+            operand = f"({operand})"
+
         return f"{op_latex} {operand}"
 
     def _needs_parens(self, child: Expr, parent_op: str, is_left_child: bool) -> bool:
