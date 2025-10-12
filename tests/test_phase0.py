@@ -377,4 +377,96 @@ class TestIntegration:
         assert isinstance(ast, (BinaryOp, UnaryOp, Identifier))
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert latex == r"\lnot p \land q \lor r"
+        # Fixed: Parentheses must be preserved around binary operand of not
+        assert latex == r"\lnot (p \land q) \lor r"
+
+    def test_unary_with_binary_operand_and(self) -> None:
+        """Test not with and operand requires parentheses."""
+        text = "not (p and q)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, UnaryOp)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        # Parentheses required because 'and' is binary operator
+        assert latex == r"\lnot (p \land q)"
+
+    def test_unary_with_binary_operand_or(self) -> None:
+        """Test not with or operand requires parentheses."""
+        text = "not (p or q)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, UnaryOp)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        # Parentheses required because 'or' is binary operator
+        assert latex == r"\lnot (p \lor q)"
+
+    def test_unary_with_binary_operand_implies(self) -> None:
+        """Test not with implies operand requires parentheses."""
+        text = "not (p => q)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, UnaryOp)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        # Parentheses required because '=>' is binary operator
+        assert latex == r"\lnot (p \Rightarrow q)"
+
+    def test_unary_with_binary_operand_iff(self) -> None:
+        """Test not with iff operand requires parentheses."""
+        text = "not (p <=> q)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, UnaryOp)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        # Parentheses required because '<=>' is binary operator
+        assert latex == r"\lnot (p \Leftrightarrow q)"
+
+    def test_unary_with_unary_operand(self) -> None:
+        """Test not with not operand does not require parentheses."""
+        text = "not not p"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, UnaryOp)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        # No parentheses needed for unary operand
+        assert latex == r"\lnot \lnot p"
+
+    def test_unary_with_identifier_operand(self) -> None:
+        """Test not with identifier operand does not require parentheses."""
+        text = "not p"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, UnaryOp)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        # No parentheses needed for identifier operand
+        assert latex == r"\lnot p"
+
+    def test_complex_unary_binary_mix(self) -> None:
+        """Test complex expression mixing unary and binary operators."""
+        text = "not (p and q) => not (r or s)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, BinaryOp)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        # Both not operators need parentheses around their binary operands
+        assert latex == r"\lnot (p \land q) \Rightarrow \lnot (r \lor s)"
