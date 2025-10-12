@@ -1,0 +1,22 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Test Path C Proof}
+
+\bigskip
+\noindent
+\textbf{Simple Implication}
+
+$$
+\infer[\text{$\\Rightarrow$ intro from 1}]{p \land q \Rightarrow q}{
+  \infer[\text{assumption}]{p \land q}{
+  q
+}
+}
+$$
+
+\end{document}
