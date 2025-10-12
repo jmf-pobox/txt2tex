@@ -1,6 +1,6 @@
 """Tests for Phase 1: Multi-line document support."""
 
-from txt2tex.ast_nodes import BinaryOp, Document, Identifier, UnaryOp
+from txt2tex.ast_nodes import BinaryOp, Document, Identifier, Paragraph, UnaryOp
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
@@ -226,3 +226,50 @@ not (p and q)"""
         # Nested implications now have explicit parentheses for clarity
         assert r"$p \Rightarrow (q \Rightarrow r)$" in latex
         assert r"$\lnot p \land q$" in latex
+
+    def test_paragraph_parsing(self) -> None:
+        """Test parsing text paragraphs with TEXT: keyword."""
+        text = "TEXT: In one direction we have"
+
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        assert isinstance(ast, Document)
+        assert len(ast.items) == 1
+        assert isinstance(ast.items[0], Paragraph)
+        assert ast.items[0].text == "In one direction we have"
+
+    def test_paragraph_generation(self) -> None:
+        """Test LaTeX generation for paragraphs."""
+        gen = LaTeXGenerator()
+        doc = Document(
+            items=[
+                Paragraph(text="In one direction:", line=1, column=1),
+            ],
+            line=1,
+            column=1,
+        )
+
+        latex = gen.generate_document(doc)
+
+        assert "In one direction:" in latex
+        assert r"\documentclass{article}" in latex
+        assert r"\end{document}" in latex
+        assert r"\bigskip" in latex
+
+    def test_paragraph_with_symbols(self) -> None:
+        """Test paragraph with operators and punctuation."""
+        text = "TEXT: We combine these two proofs with the <=> intro rule."
+
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        assert isinstance(ast, Document)
+        assert len(ast.items) == 1
+        assert isinstance(ast.items[0], Paragraph)
+        # Text is captured raw, including <=> and period
+        assert ast.items[0].text == "We combine these two proofs with the <=> intro rule."

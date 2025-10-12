@@ -18,6 +18,7 @@ from txt2tex.ast_nodes import (
     GivenType,
     Identifier,
     Number,
+    Paragraph,
     Part,
     ProofNode,
     ProofTree,
@@ -127,6 +128,8 @@ class LaTeXGenerator:
             return self._generate_solution(item)
         if isinstance(item, Part):
             return self._generate_part(item)
+        if isinstance(item, Paragraph):
+            return self._generate_paragraph(item)
         if isinstance(item, TruthTable):
             return self._generate_truth_table(item)
         if isinstance(item, EquivChain):
@@ -334,6 +337,28 @@ class LaTeXGenerator:
         lines.append(r"\medskip")
         lines.append("")
 
+        return lines
+
+    def _generate_paragraph(self, node: Paragraph) -> list[str]:
+        """Generate LaTeX for plain text paragraph.
+
+        Converts symbolic operators like <=> and => to LaTeX math symbols.
+        Does NOT convert words like 'and', 'or', 'not' - these are English prose.
+        """
+        lines: list[str] = []
+        lines.append(r"\bigskip")  # Leading vertical space (larger than medskip)
+        lines.append("")
+
+        # Convert only symbolic operators to LaTeX math symbols
+        # Do NOT convert and/or/not - those are English words in prose context
+        text = node.text
+        text = text.replace("<=>", r"$\Leftrightarrow$")
+        text = text.replace("=>", r"$\Rightarrow$")
+
+        lines.append(text)
+        lines.append("")
+        lines.append(r"\bigskip")  # Trailing vertical space
+        lines.append("")
         return lines
 
     def _generate_truth_table(self, node: TruthTable) -> list[str]:
