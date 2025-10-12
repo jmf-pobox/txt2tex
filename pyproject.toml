@@ -35,6 +35,12 @@ dependencies = [
 [tool.hatch.envs.default.scripts]
 test = "PYTHONPATH=src pytest {args:tests}"
 test-cov = "PYTHONPATH=src pytest --cov=src/txt2tex --cov-report=term-missing --cov-report=html {args:tests}"
+# Phase-specific test targets
+test-phase3 = "PYTHONPATH=src pytest tests/test_phase3.py -v"
+test-phase4 = "PYTHONPATH=src pytest tests/test_phase4.py -v"
+test-phase5 = "PYTHONPATH=src pytest tests/test_phase5.py -v"
+test-phase6 = "PYTHONPATH=src pytest tests/test_phase6.py -v"
+test-phase7 = "PYTHONPATH=src pytest tests/test_phase7.py -v"
 lint = "ruff check ."
 format = "ruff format ."
 format-check = "ruff format --check ."

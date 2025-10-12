@@ -200,6 +200,12 @@ class Lexer:
             self._advance()
             return Token(TokenType.GREATER_THAN, ">", start_line, start_column)
 
+        # Not equal != (Phase 7) - check before other operators
+        if char == "!" and self._peek_char() == "=":
+            self._advance()
+            self._advance()
+            return Token(TokenType.NOT_EQUAL, "!=", start_line, start_column)
+
         # Abbreviation operator == (Phase 4) - check before = alone
         # Already checked for === and => earlier
         if char == "=" and self._peek_char() == "=":
@@ -291,15 +297,19 @@ class Lexer:
         if value == "not":
             return Token(TokenType.NOT, value, start_line, start_column)
 
-        # Check for quantifiers (Phase 3, enhanced in Phase 6)
+        # Check for quantifiers (Phase 3, enhanced in Phase 6-7)
         if value == "forall":
             return Token(TokenType.FORALL, value, start_line, start_column)
         if value == "exists1":
             return Token(TokenType.EXISTS1, value, start_line, start_column)
         if value == "exists":
             return Token(TokenType.EXISTS, value, start_line, start_column)
+        if value == "mu":
+            return Token(TokenType.MU, value, start_line, start_column)
 
-        # Check for set operators (Phase 3)
+        # Check for set operators (Phase 3, enhanced in Phase 7)
+        if value == "notin":
+            return Token(TokenType.NOTIN, value, start_line, start_column)
         if value == "in":
             return Token(TokenType.IN, value, start_line, start_column)
         if value == "subset":
