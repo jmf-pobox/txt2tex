@@ -1,0 +1,56 @@
+=== Phase 9: Generic Parameters ===
+
+TEXT: This example demonstrates Z notation definitions with generic (polymorphic) type parameters.
+
+given X, Y, Z
+
+TEXT: Basic generic abbreviation for a Pair type:
+
+[X] Pair == X
+
+TEXT: Generic abbreviation with two type parameters:
+
+[X, Y] Product == X
+
+TEXT: Generic axiomatic definition with constraints:
+
+axdef [T]
+  identity : T
+where
+  identity = identity
+end
+
+TEXT: Generic schema for a Stack data structure:
+
+schema Stack[X]
+  items : X
+  top : X
+where
+  top in items
+end
+
+TEXT: Generic schema with multiple parameters:
+
+schema Relation[X, Y]
+  domain : X
+  range : Y
+where
+  domain in X
+  range in Y
+end
+
+TEXT: Non-generic definitions still work as before:
+
+Naturals == N
+
+axdef
+  zero : N
+where
+  zero = 0
+end
+
+schema Counter
+  value : N
+where
+  value >= 0
+end
