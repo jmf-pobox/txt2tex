@@ -1012,7 +1012,7 @@ PROOF:
 
 ---
 
-## Coverage Assessment (As of Phase 7 + TEXT)
+## Coverage Assessment (As of Phase 8)
 
 ### Currently Supported ✅
 - **Propositional Logic**: Truth tables, equivalence chains, basic operators
@@ -1023,6 +1023,7 @@ PROOF:
 - **Quantifiers**: forall, exists, exists1, mu-operator with multi-variable support
 - **Subscripts/Superscripts**: `x_i`, `x^2`, `2^n`
 - **Set Operations**: in, notin, subset, union, intersect
+- **Set Comprehension** (Phase 8): `{ x : X | predicate }`, `{ x : X | predicate . expression }`, multi-variable, optional domain
 - **Equality**: =, != in predicates and equivalence chains
 - **Basic Definitions**: Simple abbreviations (`Name == Expression`)
 
