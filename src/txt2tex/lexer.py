@@ -161,6 +161,11 @@ class Lexer:
             self._advance()
             return Token(TokenType.COMMA, ",", start_line, start_column)
 
+        # Period (for sentences in paragraphs)
+        if char == ".":
+            self._advance()
+            return Token(TokenType.PERIOD, ".", start_line, start_column)
+
         # Free type operator ::= (Phase 4) - check before :: and :
         if char == ":" and self._peek_char() == ":" and self._peek_char(2) == "=":
             self._advance()
@@ -288,6 +293,24 @@ class Lexer:
         if value == "PROOF" and self._current_char() == ":":
             self._advance()  # Consume ':'
             return Token(TokenType.PROOF, "PROOF:", start_line, start_column)
+
+        # Check for TEXT: keyword - capture rest of line as raw text
+        if value == "TEXT" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+
+            # Skip any whitespace after the colon
+            while self._current_char() in " \t":
+                self._advance()
+
+            # Capture the rest of the line as raw text (don't tokenize)
+            text_start = self.pos
+            while not self._at_end() and self._current_char() != "\n":
+                self._advance()
+
+            # Extract the raw text content
+            text_content = self.text[text_start : self.pos]
+
+            return Token(TokenType.TEXT, text_content, start_line, start_column)
 
         # Check for keywords (propositional logic)
         if value == "and":

@@ -57,6 +57,7 @@ class TokenType(Enum):
     COLON = auto()  # : for quantifiers (forall x : N)
     PIPE = auto()  # | for quantifiers and table columns
     COMMA = auto()  # , for multi-variable quantifiers (forall x, y : N)
+    PERIOD = auto()  # . for sentences in paragraphs
 
     # Identifiers and literals
     IDENTIFIER = auto()
@@ -67,6 +68,7 @@ class TokenType(Enum):
     SOLUTION_MARKER = auto()  # **
     PART_LABEL = auto()  # (a), (b), (c), etc.
     TRUTH_TABLE = auto()  # TRUTH TABLE:
+    TEXT = auto()  # TEXT: (plain text paragraphs)
 
     # Environments (Phase 2)
     EQUIV = auto()  # EQUIV:
