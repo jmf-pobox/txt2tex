@@ -6,6 +6,7 @@ from txt2tex.ast_nodes import (
     Abbreviation,
     AxDef,
     BinaryOp,
+    CaseAnalysis,
     Declaration,
     Document,
     DocumentItem,
@@ -356,20 +357,22 @@ class Parser:
         while not self._at_end() and not self._is_structural_token():
             row: list[str] = []
 
-            # Check if line starts with T or F (truth values)
+            # Check if line starts with T/t or F/f (truth values)
             if not self._match(TokenType.IDENTIFIER):
                 break
 
             first_val = self._current().value
-            if first_val not in ("T", "F"):
+            if first_val.upper() not in ("T", "F"):
                 break  # Not a truth table row
 
-            # Collect row values separated by pipes
+            # Collect row values separated by pipes, normalizing to uppercase
             while not self._match(TokenType.NEWLINE) and not self._at_end():
                 if self._match(TokenType.PIPE):
                     self._advance()  # Skip pipe
                 elif self._match(TokenType.IDENTIFIER):
-                    row.append(self._current().value)
+                    val = self._current().value
+                    # Normalize t/f to T/F
+                    row.append(val.upper() if val.upper() in ("T", "F") else val)
                     self._advance()
                 else:
                     break
@@ -394,6 +397,10 @@ class Parser:
 
         # Parse steps until we hit another structural element or end
         while not self._at_end() and not self._is_structural_token():
+            # Consume leading <=> if present (for continuation lines)
+            if self._match(TokenType.IFF):
+                self._advance()  # Consume '<='
+
             # Parse expression
             expr = self._parse_expr()
             self._skip_newlines()
@@ -906,77 +913,179 @@ class Parser:
         )
 
     def _parse_proof_tree(self) -> ProofTree:
-        """Parse proof tree with indentation-based structure."""
+        """Parse proof tree with Path C syntax (conclusion with supporting proof)."""
         start_token = self._advance()  # Consume 'PROOF:'
         self._skip_newlines()
 
-        # Parse proof nodes with indentation tracking
-        nodes = self._parse_proof_nodes(base_indent=0)
+        if self._at_end() or self._is_structural_token():
+            raise ParserError("Expected proof node after PROOF:", self._current())
 
-        return ProofTree(nodes=nodes, line=start_token.line, column=start_token.column)
+        # Parse the conclusion node (first top-level node)
+        conclusion = self._parse_proof_node(base_indent=0, parent_indent=None)
 
-    def _parse_proof_nodes(
-        self, base_indent: int, parent_indent: int | None = None
-    ) -> list[ProofNode]:
-        """Parse proof nodes recursively based on indentation."""
-        nodes: list[ProofNode] = []
+        return ProofTree(
+            conclusion=conclusion, line=start_token.line, column=start_token.column
+        )
+
+    def _parse_proof_node(
+        self, base_indent: int, parent_indent: int | None
+    ) -> ProofNode:
+        """Parse a single proof node with Path C syntax."""
+        if self._at_end() or self._is_structural_token():
+            raise ParserError("Expected proof node", self._current())
+
+        line_token = self._current()
+        current_indent = line_token.column
+
+        # If we've dedented past the parent level, stop
+        if parent_indent is not None and current_indent <= parent_indent:
+            raise ParserError("Unexpected dedent in proof tree", self._current())
+
+        # Check for assumption label [1], [2], etc.
+        label: int | None = None
+        if self._match(TokenType.LBRACKET):
+            self._advance()  # Consume '['
+            if self._match(TokenType.NUMBER):
+                label = int(self._current().value)
+                self._advance()
+                if not self._match(TokenType.RBRACKET):
+                    raise ParserError("Expected ']' after assumption label", self._current())
+                self._advance()  # Consume ']'
+            else:
+                # Not a label, must be justification - back up by recreating the bracket
+                # Actually, we can't back up easily. Let's handle this differently.
+                # For now, assume [number] is always a label at the start of a line.
+                raise ParserError("Expected number in assumption label", self._current())
+
+        # Check for sibling marker ::
+        is_sibling = False
+        if self._match(TokenType.DOUBLE_COLON):
+            is_sibling = True
+            self._advance()  # Consume '::'
+
+        # Parse the expression
+        expr = self._parse_expr()
+
+        # Check for justification [rule name]
+        justification: str | None = None
+        is_assumption = False
+        if self._match(TokenType.LBRACKET):
+            self._advance()  # Consume '['
+
+            # Collect justification text
+            just_parts: list[str] = []
+            while not self._match(TokenType.RBRACKET) and not self._at_end():
+                if self._match(TokenType.NEWLINE):
+                    break
+                just_parts.append(self._current().value)
+                self._advance()
+
+            if self._match(TokenType.RBRACKET):
+                self._advance()  # Consume ']'
+                justification = " ".join(just_parts)
+                # Check if this is the [assumption] keyword
+                if justification == "assumption":
+                    is_assumption = True
+
+        self._skip_newlines()
+
+        # Parse children (nodes indented more than current)
+        children: list[ProofNode | CaseAnalysis] = []
+        while not self._at_end() and not self._is_structural_token():
+            if self._match(TokenType.NEWLINE):
+                self._skip_newlines()
+                if self._at_end() or self._is_structural_token():
+                    break
+
+            next_token = self._current()
+            next_indent = next_token.column
+
+            # Check if still indented relative to current node
+            if next_indent <= current_indent:
+                break
+
+            # Check for case analysis
+            if self._match(TokenType.IDENTIFIER) and self._current().value == "case":
+                case_analysis = self._parse_case_analysis(
+                    base_indent=base_indent, parent_indent=current_indent
+                )
+                children.append(case_analysis)
+            else:
+                # Regular proof node
+                child = self._parse_proof_node(
+                    base_indent=base_indent, parent_indent=current_indent
+                )
+                children.append(child)
+
+        return ProofNode(
+            expression=expr,
+            justification=justification,
+            label=label,
+            is_assumption=is_assumption,
+            is_sibling=is_sibling,
+            children=children,
+            indent_level=current_indent - base_indent,
+            line=line_token.line,
+            column=line_token.column,
+        )
+
+    def _parse_case_analysis(
+        self, base_indent: int, parent_indent: int
+    ) -> CaseAnalysis:
+        """Parse case analysis: case name: followed by proof steps."""
+        if not self._match(TokenType.IDENTIFIER) or self._current().value != "case":
+            raise ParserError("Expected 'case' keyword", self._current())
+
+        case_token = self._advance()  # Consume 'case'
+
+        # Parse case name - collect all tokens until colon
+        case_parts: list[str] = []
+        while not self._match(TokenType.COLON) and not self._at_end():
+            if self._match(TokenType.NEWLINE):
+                raise ParserError("Expected ':' after case name", self._current())
+            case_parts.append(self._current().value)
+            self._advance()
+
+        if not case_parts:
+            raise ParserError("Expected case name after 'case'", self._current())
+
+        case_name = " ".join(case_parts)
+
+        # Expect colon
+        if not self._match(TokenType.COLON):
+            raise ParserError("Expected ':' after case name", self._current())
+        self._advance()  # Consume ':'
+
+        self._skip_newlines()
+
+        # Parse proof steps indented under this case
+        steps: list[ProofNode] = []
+        case_indent = case_token.column
 
         while not self._at_end() and not self._is_structural_token():
             if self._match(TokenType.NEWLINE):
-                self._advance()
-                continue
+                self._skip_newlines()
+                if self._at_end() or self._is_structural_token():
+                    break
 
-            # Get the indentation of this line (column of first token)
-            current_indent = self._current().column
+            next_token = self._current()
+            next_indent = next_token.column
 
-            # If we've dedented past the parent level, stop parsing at this level
-            if parent_indent is not None and current_indent <= parent_indent:
+            # Check if still indented relative to case
+            if next_indent <= case_indent:
                 break
 
-            # Parse the expression on this line
-            line_token = self._current()
-            expr = self._parse_expr()
+            # Check if this is another case (sibling case)
+            if self._match(TokenType.IDENTIFIER) and self._current().value == "case":
+                break  # Stop parsing this case
 
-            # Check for optional justification [rule name]
-            justification: str | None = None
-            if self._match(TokenType.LBRACKET):
-                self._advance()  # Consume '['
+            # Parse proof node for this case
+            step = self._parse_proof_node(base_indent=base_indent, parent_indent=case_indent)
+            steps.append(step)
 
-                # Collect justification text
-                just_parts: list[str] = []
-                while not self._match(TokenType.RBRACKET) and not self._at_end():
-                    if self._match(TokenType.NEWLINE):
-                        break
-                    just_parts.append(self._current().value)
-                    self._advance()
-
-                if self._match(TokenType.RBRACKET):
-                    self._advance()  # Consume ']'
-                    justification = " ".join(just_parts)
-
-            self._skip_newlines()
-
-            # Look ahead to see if the next line is more indented (children)
-            children: list[ProofNode] = []
-            if not self._at_end() and not self._is_structural_token():
-                next_token = self._current()
-                if next_token.type != TokenType.NEWLINE:
-                    next_indent = next_token.column
-                    if next_indent > current_indent:
-                        # Parse children at this indentation level
-                        children = self._parse_proof_nodes(
-                            base_indent=base_indent, parent_indent=current_indent
-                        )
-
-            # Create proof node
-            node = ProofNode(
-                expression=expr,
-                justification=justification,
-                children=children,
-                indent_level=current_indent - base_indent,
-                line=line_token.line,
-                column=line_token.column,
-            )
-            nodes.append(node)
-
-        return nodes
+        return CaseAnalysis(
+            case_name=case_name,
+            steps=steps,
+            line=case_token.line,
+            column=case_token.column,
+        )

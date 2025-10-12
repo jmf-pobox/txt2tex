@@ -1,0 +1,364 @@
+=== Propositional Logic ===
+
+** Solution 1 **
+
+** Solution 2 **
+
+(a)
+
+TRUTH TABLE:
+p | q | p and q | (p and q) => p
+T | T | T | T
+T | F | F | T
+F | T | F | T
+F | F | F | T
+
+TRUTH TABLE:
+p | q | p and q | not p | not p => (p and q)
+T | T | T | F | T
+T | F | F | F | T
+F | T | F | T | F
+F | F | F | T | F
+
+TRUTH TABLE:
+p | q | p => q | p and (p => q) | (not p => (p and q)) <=> p
+T | T | T | T | T
+T | F | F | F | T
+F | T | T | F | T
+F | F | T | F | T
+
+(b)
+
+TRUTH TABLE:
+p | q | p => q | p and (p => q) | (p and (p => q)) => q
+T | T | T | T | T
+T | F | F | F | T
+F | T | T | F | T
+F | F | T | F | T
+
+** Solution 3 **
+
+(a)
+
+EQUIV:
+p => not p
+<=> not p or not p [=>]
+<=> not p [idempotence]
+
+(b)
+
+EQUIV:
+not p => p
+<=> not not p or p [=>]
+<=> p or p [not not]
+<=> p [idempotence]
+
+(c)
+
+EQUIV:
+p => (q => r)
+<=> not p or (q => r) [=>]
+<=> not p or (not q or r) [=>]
+<=> (not p or not q) or r [associativity]
+<=> not (p and q) or r [De Morgan]
+<=> (p and q) => r [=>]
+
+(d)
+
+EQUIV:
+q => (p => r)
+<=> not q or (p => r) [=>]
+<=> not q or (not p or r) [=>]
+<=> not p or (not q or r) [associativity and commutativity]
+<=> not p or (q => r) [=>]
+<=> p => (q => r) [=>]
+
+(e)
+
+EQUIV:
+(p and q) <=> p
+<=> ((p and q) => p) and (p => (p and q)) [<=>]
+<=> (not (p and q) or p) and (not p or (p and q)) [=>]
+<=> ((not p or not q) or p) and (not p or (p and q)) [De Morgan]
+<=> (not q or (not p or p)) and (not p or (p and q)) [associativity and comm]
+<=> (not q or true) and (not p or (p and q)) [excluded middle]
+<=> true and (not p or (p and q)) [or and true]
+<=> not p or (p and q) [and and true]
+<=> (not p or p) and (not p or q) [distribution]
+<=> true and (not p or q) [excluded middle]
+<=> not p or q [and and true]
+<=> p => q [=>]
+
+(f)
+
+EQUIV:
+(p or q) <=> p
+<=> ((p or q) => p) and (p => (p or q)) [<=>]
+<=> (not (p or q) or p) and (not p or (p or q)) [=>]
+<=> ((not p and not q) or p) and (not p or (p or q)) [De Morgan]
+<=> ((not p or p) and (not q or p)) and (not p or (p or q)) [distribution]
+<=> (true and (not q or p)) and (not p or (p or q)) [excluded middle]
+<=> (not q or p) and (not p or (p or q)) [and and true]
+<=> (not q or p) and ((not p or p) or q) [associativity]
+<=> (not q or p) and (true or q) [excluded middle]
+<=> (not q or p) and true [or and true]
+<=> not q or p [and and true]
+<=> q => p [=>]
+
+** Solution 4 **
+
+** Solution 5 **
+
+** Solution 6 **
+
+** Solution 7 **
+
+** Solution 8 **
+
+=== Equality ===
+
+** Solution 9 **
+
+** Solution 10 **
+
+** Solution 11 **
+
+** Solution 12 **
+
+=== Deductive Proofs ===
+
+** Solution 13 **
+
+PROOF:
+(p and (p => q)) => (p and q) [=> intro from 1]
+  [1] p and (p => q) [assumption]
+      :: p [and elim 1]
+      :: p => q [and elim 2]
+      q [=> elim]
+      p and q [and intro]
+
+** Solution 14 **
+
+PROOF:
+((p and q) <=> p) => (p => q) [=> intro from 1]
+  [1] (p and q) <=> p [assumption]
+      p => (p and q) [<=> elim 2]
+      [2] p [assumption]
+          p and q [=> elim]
+          q [and elim 2]
+      p => q [=> intro from 2]
+
+PROOF:
+(p => q) => ((p and q) <=> p) [=> intro from 1]
+  [1] p => q [assumption]
+      (p and q) => p [=> intro from 3]
+        [3] p and q [assumption]
+            p [and elim 1]
+      p => (p and q) [=> intro from 3]
+        [3] p [assumption]
+            q [=> elim]
+            p and q [and intro]
+      (p and q) <=> p [<=> intro]
+
+** Solution 15 **
+
+PROOF:
+((p => q) and not q) => not p [=> intro from 1]
+  [1] (p => q) and not q [assumption]
+      :: p => q [and elim 1]
+      :: not q [and elim 2]
+      not p [negation intro from 2]
+        [2] p [assumption]
+            q [=> elim]
+            false [contradiction]
+
+** Solution 16 **
+
+PROOF:
+(p and (q or r)) => ((p and q) or (p and r)) [=> intro from 1]
+  [1] p and (q or r) [assumption]
+      :: p [and elim 1]
+      :: q or r [and elim 2]
+      (p and q) or (p and r) [or elim from 2]
+        case q:
+          :: p [from above]
+          :: q [from case]
+          p and q [and intro]
+          (p and q) or (p and r) [or intro 1]
+        case r:
+          :: p [from above]
+          :: r [from case]
+          p and r [and intro]
+          (p and q) or (p and r) [or intro 2]
+
+PROOF:
+((p and q) or (p and r)) => (p and (q or r)) [=> intro from 3]
+  [3] (p and q) or (p and r) [assumption]
+      p and (q or r) [or elim from 4]
+        case p and q:
+          [4] p and q [assumption]
+              :: p [and elim 1]
+              :: q [and elim 2]
+              q or r [or intro 1]
+              p and (q or r) [and intro]
+        case p and r:
+          [4] p and r [assumption]
+              :: p [and elim 1]
+              :: r [and elim 2]
+              q or r [or intro 2]
+              p and (q or r) [and intro]
+
+** Solution 17 **
+
+PROOF:
+(p or (q and r)) => ((p or q) and (p or r)) [=> intro from 3]
+  [3] p or (q and r) [assumption]
+      (p or q) and (p or r) [or elim from 1]
+        case p:
+          [1] p [assumption]
+              :: p or q [or intro 1]
+              :: p or r [or intro 1]
+              (p or q) and (p or r) [and intro]
+        case q and r:
+          [1] q and r [assumption]
+              :: q [and elim 1]
+              :: r [and elim 2]
+              :: p or q [or intro 2]
+              :: p or r [or intro 2]
+              (p or q) and (p or r) [and intro]
+
+PROOF:
+((p or q) and (p or r)) => (p or (q and r)) [=> intro from 1]
+  [1] (p or q) and (p or r) [assumption]
+      :: p or q [and elim 1]
+      :: p or r [and elim 2]
+      p or (q and r) [or elim from 2]
+        case p:
+          [2] p [assumption]
+              p or (q and r) [or intro 1]
+        case q:
+          [2] q [assumption]
+              p or (q and r) [or elim from 3]
+                case p:
+                  [3] p [assumption]
+                      p or (q and r) [or intro 1]
+                case r:
+                  [3] r [assumption]
+                      q and r [and intro]
+                      p or (q and r) [or intro 2]
+
+** Solution 18 **
+
+PROOF:
+(p => q) => (not p or q) [=> intro from 1]
+  [1] p => q [assumption]
+      :: p or not p [excluded middle]
+      :: not p or q [or elim from 2]
+        case p:
+          [2] p [assumption]
+          q [=> elim]
+          not p or q [or intro 2]
+        case not p:
+          [2] not p [assumption]
+          not p or q [or intro 1]
+
+PROOF:
+(not p or q) => (p => q) [=> intro from 3]
+  [3] not p or q [assumption]
+      p => q [=> intro from 4]
+        [4] p [assumption]
+            q [or elim from 5]
+              case not p:
+                [5] not p [assumption]
+                    false [contradiction]
+                    q [false elim]
+              case q:
+                [5] q [assumption]
+
+=== Sets and Types ===
+
+** Solution 19 **
+
+** Solution 20 **
+
+** Solution 21 **
+
+** Solution 22 **
+
+** Solution 23 **
+
+=== Definitions ===
+
+** Solution 24 **
+
+(a)
+
+Pairs == Z x Z
+
+(b)
+
+StrictlyPositivePairs == Pairs
+
+(c)
+
+given Person
+
+(d)
+
+Couples == Pairs
+
+(e)
+
+Parties == Pairs
+
+** Solution 25 **
+
+** Solution 26 **
+
+=== Relations ===
+
+** Solution 27 **
+
+** Solution 28 **
+
+** Solution 29 **
+
+** Solution 30 **
+
+** Solution 31 **
+
+** Solution 32 **
+
+=== Functions ===
+
+** Solution 33 **
+
+** Solution 34 **
+
+** Solution 35 **
+
+** Solution 36 **
+
+=== Sequences ===
+
+** Solution 37 **
+
+** Solution 38 **
+
+** Solution 39 **
+
+=== Modelling ===
+
+** Solution 40 **
+
+** Solution 41 **
+
+** Solution 42 **
+
+** Solution 43 **
+
+=== Free Types and Induction ===
+
+** Solution 44 **
+
+** Solution 45 **

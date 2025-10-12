@@ -52,6 +52,43 @@ hatch run test-cov       # 5. Coverage maintained
 - ✅ Use plain, accurate language
 - ✅ Modest, short commit messages
 
+## Workflow Commands
+
+**ALWAYS use these commands (defined in pyproject.toml):**
+
+### Development Workflow
+```bash
+# LaTeX generation only (txt → tex)
+hatch run cli <file>
+
+# Full pipeline (txt → tex → pdf)
+hatch run convert <file>
+# OR directly:
+./txt2pdf.sh <file>
+
+# Quality gates (run after every change)
+hatch run type           # Type checking with mypy
+hatch run lint           # Linting with ruff
+hatch run format         # Format code
+hatch run test           # Run tests
+hatch run test-cov       # Run tests with coverage
+
+# Combined quality check
+hatch run check          # lint + type + test
+hatch run check-cov      # lint + type + test-cov
+```
+
+### Direct Python Invocation (if needed)
+```bash
+# CLI (from sem/ directory)
+PYTHONPATH=src python -m txt2tex.cli <file>
+
+# Running tests
+PYTHONPATH=src pytest tests
+```
+
+**Important**: The `txt2pdf.sh` script handles TEXINPUTS/MFINPUTS automatically. Don't manually invoke pdflatex unless debugging LaTeX compilation issues.
+
 ## Environment Setup
 
 ### Critical Dependencies
@@ -129,30 +166,27 @@ The project has been using **fuzz** (`../tex/fuzz.sty`) which provides its own Z
 - `/Users/jfreeman/Coding/fuzz/txt2tex/solutions_complete.tex` (intermediate LaTeX)
 - `/Users/jfreeman/Coding/fuzz/txt2tex/solutions_complete.pdf` (27 pages, ~180KB)
 
-## Compilation Commands
+## Compilation and Testing
 
-### Current Workflow
+### Verifying Output
 
 ```bash
-# Convert txt to LaTeX
-python3 txt2tex_v3.py solutions_complete.txt --wrap > solutions_complete.tex
-
-# Compile LaTeX to PDF (with fuzz support)
-TEXINPUTS=../tex//: MFINPUTS=../tex//: pdflatex -interaction=nonstopmode solutions_complete.tex
+# Generate and compile to PDF in one step
+./txt2pdf.sh examples/phase5.txt
 
 # Extract text from PDF for verification
-pdftotext solutions_complete.pdf -
+pdftotext examples/phase5.pdf -
 
 # Compare with reference
-# (manual visual comparison)
+# (manual visual comparison with solutions.pdf)
 ```
 
-### Key Flags
+### LaTeX Environment Variables (handled by txt2pdf.sh)
 
-- `--wrap`: Adds LaTeX document wrapper with `\documentclass`, `\usepackage{fuzz}`, etc.
-- `TEXINPUTS=../tex//:` - Tells LaTeX to search `../tex/` for style files
+- `TEXINPUTS=../tex//:` - Tells LaTeX to search `../tex/` for style files (fuzz)
+- `TEXINPUTS=./latex//:` - Also searches local latex/ directory for zed-* packages
 - `MFINPUTS=../tex//:` - Tells METAFONT to search `../tex/` for fonts
-- `-interaction=nonstopmode` - Don't stop on errors
+- `-interaction=nonstopmode` - Don't stop on LaTeX errors (check .log file)
 
 ## Input Format (Whiteboard Notation)
 
@@ -316,6 +350,5 @@ User mentioned: "I can exit our session and resume our session from the sem dire
 If starting fresh from `/Users/jfreeman/Coding/fuzz/txt2tex/sem/`:
 1. Remember fuzz is in `../tex/`
 2. Test files are in parent directory `../`
-3. Set `TEXINPUTS=../tex//:` when compiling
+3. Use workflow commands at the top of this document
 4. Reference this document for context
-- remember to use txt2pdf.sh to run the app.  Fix this script if it is not working.

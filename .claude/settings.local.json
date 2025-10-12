@@ -35,7 +35,16 @@
       "Bash(env TEXINPUTS=\"../../tex//:\" MFINPUTS=\"../../tex//:\" pdflatex:*)",
       "Bash(git tag:*)",
       "Bash(TEXINPUTS=..: pdflatex:*)",
-      "Bash(../txt2pdf.sh:*)"
+      "Bash(../txt2pdf.sh:*)",
+      "Bash(TEXINPUTS=.: pdflatex:*)",
+      "Bash(env TEXINPUTS=:*)",
+      "Bash(TEXINPUTS=.:..: pdflatex:*)",
+      "Bash(hatch run python:*)",
+      "Bash(hatch run convert:*)",
+      "Bash(find:*)",
+      "Bash(hatch run cli:*)",
+      "Read(//Users/jfreeman/Desktop/SEM/**)",
+      "Bash(TEXINPUTS=./latex//: pdflatex:*)"
     ],
     "deny": [],
     "ask": []

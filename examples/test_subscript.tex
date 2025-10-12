@@ -1,0 +1,14 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+$$
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{p \land q \Rightarrow p}{
+  \infer[$\land$\text{-elim}_{1}]{p}{\ulcorner p \land q \urcorner^{[1]}}
+}
+$$
+
+\end{document}
