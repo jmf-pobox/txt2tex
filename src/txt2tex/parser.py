@@ -24,6 +24,7 @@ from txt2tex.ast_nodes import (
     Quantifier,
     Schema,
     Section,
+    SetComprehension,
     Solution,
     Subscript,
     Superscript,
@@ -180,9 +181,7 @@ class Parser:
         # The token value contains the raw text (already captured by lexer)
         text = text_token.value
 
-        return Paragraph(
-            text=text, line=text_token.line, column=text_token.column
-        )
+        return Paragraph(text=text, line=text_token.line, column=text_token.column)
 
     def _parse_document_item(self) -> DocumentItem:
         """Parse a document item (expression or structural element)."""
@@ -609,6 +608,89 @@ class Parser:
             column=quant_token.column,
         )
 
+    def _parse_set_comprehension(self) -> Expr:
+        """Parse set comprehension.
+
+        Syntax: { var [, var]* : domain | predicate [. expression] }.
+
+        Phase 8: Set comprehension support.
+        Examples:
+        - { x : N | x > 0 }  (set by predicate)
+        - { x : N | x > 0 . x^2 }  (set by expression)
+        - { x, y : N | x + y = 4 }  (multi-variable)
+        - { x | x in A }  (no domain)
+        """
+        start_token = self._advance()  # Consume '{'
+
+        # Parse first variable
+        if not self._match(TokenType.IDENTIFIER):
+            raise ParserError(
+                "Expected variable name in set comprehension", self._current()
+            )
+        variables: list[str] = [self._advance().value]
+
+        # Parse additional variables if comma-separated
+        while self._match(TokenType.COMMA):
+            self._advance()  # Consume ','
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError("Expected variable name after ','", self._current())
+            variables.append(self._advance().value)
+
+        # Parse optional domain (: domain)
+        domain: Expr | None = None
+        if self._match(TokenType.COLON):
+            self._advance()  # Consume ':'
+            # Parse domain as atom (could be identifier like N, or more complex)
+            domain = self._parse_atom()
+
+        # Parse separator |
+        if not self._match(TokenType.PIPE):
+            raise ParserError(
+                "Expected '|' after set comprehension binding", self._current()
+            )
+        self._advance()  # Consume '|'
+
+        # Parse predicate expression (up to . or })
+        # We need to be careful not to consume . as part of the predicate
+        # Strategy: parse expression normally, then check for . or }
+        predicate = self._parse_set_predicate()
+
+        # Parse optional expression part (. expression)
+        expression: Expr | None = None
+        if self._match(TokenType.PERIOD):
+            self._advance()  # Consume '.'
+            # Parse expression (up to })
+            expression = self._parse_set_expression()
+
+        # Expect closing brace
+        if not self._match(TokenType.RBRACE):
+            raise ParserError(
+                "Expected '}' to close set comprehension", self._current()
+            )
+        self._advance()  # Consume '}'
+
+        return SetComprehension(
+            variables=variables,
+            domain=domain,
+            predicate=predicate,
+            expression=expression,
+            line=start_token.line,
+            column=start_token.column,
+        )
+
+    def _parse_set_predicate(self) -> Expr:
+        """Parse predicate in set comprehension (up to . or })."""
+        # Parse expression, but stop at PERIOD or RBRACE
+        # This is tricky because we need to parse a full expression
+        # but stop before . or }
+        # For now, use the standard expression parser but be aware of context
+        return self._parse_iff()
+
+    def _parse_set_expression(self) -> Expr:
+        """Parse expression in set comprehension (after . and up to })."""
+        # Parse expression up to }
+        return self._parse_iff()
+
     def _parse_comparison(self) -> Expr:
         """Parse comparison operators (<, >, <=, >=, =, !=)."""
         left = self._parse_set_op()
@@ -711,7 +793,10 @@ class Parser:
         return base
 
     def _parse_atom(self) -> Expr:
-        """Parse atom (identifier, number, or parenthesized expression)."""
+        """Parse atom.
+
+        Handles: identifier, number, parenthesized expression, set comprehension.
+        """
         if self._match(TokenType.IDENTIFIER):
             token = self._advance()
             return Identifier(name=token.value, line=token.line, column=token.column)
@@ -728,8 +813,13 @@ class Parser:
             self._advance()  # Consume ')'
             return expr
 
+        # Phase 8: Set comprehension { x : X | pred } or { x : X | pred . expr }
+        if self._match(TokenType.LBRACE):
+            return self._parse_set_comprehension()
+
         raise ParserError(
-            f"Expected identifier, number, or '(', got {self._current().type.name}",
+            f"Expected identifier, number, '(', or '{{',"
+            f" got {self._current().type.name}",
             self._current(),
         )
 
