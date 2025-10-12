@@ -33,6 +33,9 @@ fi
 # Get absolute path to script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Convert input to absolute path
+INPUT="$(cd "$(dirname "$INPUT")" && pwd)/$(basename "$INPUT")"
+
 # Derive output paths (same directory as input)
 INPUT_DIR="$(dirname "$INPUT")"
 INPUT_BASE="$(basename "$INPUT" .txt)"
@@ -45,8 +48,7 @@ echo ""
 
 # Step 1: Generate LaTeX
 echo "Step 1/2: Generating LaTeX..."
-cd "$SCRIPT_DIR"
-PYTHONPATH=src python -m txt2tex.cli "$INPUT" -o "$TEX_FILE" $FUZZ_FLAG
+(cd "$SCRIPT_DIR" && PYTHONPATH="${SCRIPT_DIR}/src" python -m txt2tex.cli "$INPUT" -o "$TEX_FILE" $FUZZ_FLAG)
 
 if [ ! -f "$TEX_FILE" ]; then
     echo "Error: LaTeX generation failed" >&2
@@ -57,12 +59,14 @@ echo "  → Generated: $TEX_FILE"
 
 # Step 2: Compile to PDF
 echo "Step 2/2: Compiling PDF..."
-cd "$INPUT_DIR"
+
+# Determine tex package directory (relative to script dir)
+TEX_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)/tex"
 
 # pdflatex may return non-zero even on success (warnings), so check PDF creation instead
 # Include both local latex/ and fuzz location in TEXINPUTS
 set +e  # Temporarily disable exit on error
-TEXINPUTS="${SCRIPT_DIR}/latex//:../../tex//:" pdflatex -interaction=nonstopmode "${INPUT_BASE}.tex" > "${INPUT_BASE}.pdflatex.log" 2>&1
+cd "$INPUT_DIR" && TEXINPUTS="${SCRIPT_DIR}/latex//:${TEX_DIR}//:" pdflatex -interaction=nonstopmode "${INPUT_BASE}.tex" > "${INPUT_BASE}.pdflatex.log" 2>&1
 PDFLATEX_EXIT=$?
 set -e  # Re-enable exit on error
 

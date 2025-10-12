@@ -44,7 +44,9 @@
       "Bash(find:*)",
       "Bash(hatch run cli:*)",
       "Read(//Users/jfreeman/Desktop/SEM/**)",
-      "Bash(TEXINPUTS=./latex//: pdflatex:*)"
+      "Bash(TEXINPUTS=./latex//: pdflatex:*)",
+      "Bash(sem/txt2pdf.sh:*)",
+      "Read(//private/tmp/**)"
     ],
     "deny": [],
     "ask": []
