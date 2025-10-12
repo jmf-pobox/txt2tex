@@ -363,7 +363,8 @@ class TestIntegration:
         assert isinstance(ast, (BinaryOp, UnaryOp, Identifier))
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert latex == r"p \Rightarrow q \Rightarrow r"
+        # Nested implications now have explicit parentheses for clarity
+        assert latex == r"p \Rightarrow (q \Rightarrow r)"
 
     def test_solution3_expression(self) -> None:
         """Test expression from Solution 3 with parentheses."""
