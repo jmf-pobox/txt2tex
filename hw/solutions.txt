@@ -60,3 +60,16 @@ r and (not p or not q) [distributivity 2]
         not p => p [=> intro from 2]
           [2] not p [assumption]
           :: p [from 1]
+
+(b) PROOF:
+  (not p => not q) => (q => p) [=> intro from 1]
+    [1] not p => not q [assumption]
+    :: q => p [=> intro from 2]
+      [2] q [assumption]
+      :: p [false elim from 3]
+        false [false intro]
+          :: not q [=> elim]
+            :: not p => not q [from 1]
+            [3] not p [assumption]
+          :: q [from 2]
+

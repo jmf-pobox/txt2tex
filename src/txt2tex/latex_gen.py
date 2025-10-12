@@ -77,6 +77,11 @@ class LaTeXGenerator:
         "and": 4,  # Highest precedence (for binary ops)
     }
 
+    # Right-associative operators (need parens on left when same operator)
+    # Implication and equivalence are right-associative
+    RIGHT_ASSOCIATIVE: ClassVar[set[str]] = {"=>", "<=>"}
+
+
     def __init__(self, use_fuzz: bool = False) -> None:
         """Initialize generator with package choice."""
         self.use_fuzz = use_fuzz
@@ -179,8 +184,19 @@ class LaTeXGenerator:
         operand = self.generate_expr(node.operand)
         return f"{op_latex} {operand}"
 
-    def _needs_parens(self, child: Expr, parent_op: str) -> bool:
-        """Check if child expression needs parentheses in parent context."""
+    def _needs_parens(
+        self, child: Expr, parent_op: str, is_left_child: bool
+    ) -> bool:
+        """Check if child expression needs parentheses in parent context.
+
+        Args:
+            child: The child expression to check
+            parent_op: The parent operator
+            is_left_child: True if this is the left child, False if right
+
+        Returns:
+            True if parentheses are needed
+        """
         # Only binary ops need precedence checking
         if not isinstance(child, BinaryOp):
             return False
@@ -189,7 +205,24 @@ class LaTeXGenerator:
         parent_prec = self.PRECEDENCE.get(parent_op, 999)
 
         # Need parens if child has lower precedence than parent
-        return child_prec < parent_prec
+        if child_prec < parent_prec:
+            return True
+
+        # If same precedence, check associativity
+        if child_prec == parent_prec and child.operator == parent_op:
+            # For clarity in proofs, always add parentheses for nested
+            # implications or equivalences (even if technically not required
+            # by associativity)
+            if parent_op in {"=>", "<=>"}:
+                return True
+
+            # For right-associative operators (general case), left child needs parens
+            if parent_op in self.RIGHT_ASSOCIATIVE and is_left_child:
+                return True
+            # For left-associative operators, right child needs parens
+            # Note: and/or are associative so they don't need parens
+
+        return False
 
     def _generate_binary_op(self, node: BinaryOp) -> str:
         """Generate LaTeX for binary operation."""
@@ -200,10 +233,10 @@ class LaTeXGenerator:
         left = self.generate_expr(node.left)
         right = self.generate_expr(node.right)
 
-        # Add parentheses if needed for precedence
-        if self._needs_parens(node.left, node.operator):
+        # Add parentheses if needed for precedence and associativity
+        if self._needs_parens(node.left, node.operator, is_left_child=True):
             left = f"({left})"
-        if self._needs_parens(node.right, node.operator):
+        if self._needs_parens(node.right, node.operator, is_left_child=False):
             right = f"({right})"
 
         return f"{left} {op_latex} {right}"
