@@ -1012,19 +1012,24 @@ PROOF:
 
 ---
 
-## Coverage Assessment (As of Phase 5b)
+## Coverage Assessment (As of Phase 7 + TEXT)
 
 ### Currently Supported ✅
 - **Propositional Logic**: Truth tables, equivalence chains, basic operators
-- **Document Structure**: Sections, solutions, part labels, proper spacing
+- **Document Structure**: Sections, solutions, part labels, proper spacing, explicit TEXT paragraphs
+- **Text Paragraphs**: Explicit `TEXT:` keyword captures raw line content with operator conversion
 - **Basic Proofs**: Natural deduction with =>-intro, =>-elim, and-intro, and-elim, or-intro, or-elim, false-intro, false-elim
 - **Proof Features**: Nested assumptions, discharge notation, case analysis (or-elim)
+- **Quantifiers**: forall, exists, exists1, mu-operator with multi-variable support
+- **Subscripts/Superscripts**: `x_i`, `x^2`, `2^n`
+- **Set Operations**: in, notin, subset, union, intersect
+- **Equality**: =, != in predicates and equivalence chains
 - **Basic Definitions**: Simple abbreviations (`Name == Expression`)
 
 ### Coverage Statistics
-- **Solutions transcribed**: ~10 of 45+ (22%)
-- **Topics covered**: Propositional logic + basic natural deduction
-- **Topics remaining**: Quantifiers, equality, sets, relations, functions, sequences, schemas, free types, induction
+- **Solutions transcribed**: ~12 of 45+ (27%)
+- **Topics covered**: Propositional logic, basic natural deduction, predicate logic (quantifiers), basic equality
+- **Topics remaining**: Set comprehensions, relations, functions, sequences, schemas, free types, induction
 
 ---
 
