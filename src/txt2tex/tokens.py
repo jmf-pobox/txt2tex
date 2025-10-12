@@ -16,9 +16,10 @@ class TokenType(Enum):
     IMPLIES = auto()
     IFF = auto()
 
-    # Quantifiers (Phase 3)
+    # Quantifiers (Phase 3, enhanced in Phase 6)
     FORALL = auto()
     EXISTS = auto()
+    EXISTS1 = auto()  # Unique existence quantifier
 
     # Set operators (Phase 3)
     IN = auto()
@@ -52,6 +53,7 @@ class TokenType(Enum):
     # Delimiters
     COLON = auto()  # : for quantifiers (forall x : N)
     PIPE = auto()  # | for quantifiers and table columns
+    COMMA = auto()  # , for multi-variable quantifiers (forall x, y : N)
 
     # Identifiers and literals
     IDENTIFIER = auto()
