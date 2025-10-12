@@ -32,6 +32,8 @@ from txt2tex.ast_nodes import (
     TruthTable,
     UnaryOp,
 )
+from txt2tex.lexer import Lexer
+from txt2tex.parser import Parser
 
 
 class LaTeXGenerator:
@@ -387,15 +389,18 @@ class LaTeXGenerator:
         """Generate LaTeX for plain text paragraph.
 
         Converts symbolic operators like <=> and => to LaTeX math symbols.
+        Supports inline math expressions like { x : N | x > 0 }.
         Does NOT convert words like 'and', 'or', 'not' - these are English prose.
         """
         lines: list[str] = []
         lines.append(r"\bigskip")  # Leading vertical space (larger than medskip)
         lines.append("")
 
-        # Convert only symbolic operators to LaTeX math symbols
+        # Process inline math expressions first
+        text = self._process_inline_math(node.text)
+
+        # Then convert remaining symbolic operators to LaTeX math symbols
         # Do NOT convert and/or/not - those are English words in prose context
-        text = node.text
         text = text.replace("<=>", r"$\Leftrightarrow$")
         text = text.replace("=>", r"$\Rightarrow$")
 
@@ -404,6 +409,106 @@ class LaTeXGenerator:
         lines.append(r"\bigskip")  # Trailing vertical space
         lines.append("")
         return lines
+
+    def _process_inline_math(self, text: str) -> str:
+        """Process inline math expressions in text.
+
+        Detects patterns like:
+        - Set comprehensions: { x : N | x > 0 }
+        - Quantifiers: forall x : N | predicate
+
+        Parses them and converts to $...$ wrapped LaTeX.
+        """
+        result = text
+
+        # Pattern 1: Set comprehensions { ... }
+        # Find balanced braces and try to parse as set comprehension
+        brace_pattern = r"\{[^{}]+\}"
+        matches = list(re.finditer(brace_pattern, text))
+
+        # Process matches in reverse order to preserve positions
+        for match in reversed(matches):
+            math_text = match.group(0)
+            try:
+                # Try to parse as math expression
+                lexer = Lexer(math_text)
+                tokens = lexer.tokenize()
+                parser = Parser(tokens)
+                ast = parser.parse()
+
+                # Check if it's a single expression (not a document)
+                if isinstance(ast, SetComprehension):
+                    # Generate LaTeX for the expression
+                    math_latex = self.generate_expr(ast)
+                    # Wrap in $...$
+                    result = (
+                        result[: match.start()]
+                        + f"${math_latex}$"
+                        + result[match.end() :]
+                    )
+            except Exception:
+                # If parsing fails, leave as-is (might be prose)
+                pass
+
+        # Pattern 2: Quantifiers (forall, exists, exists1, mu)
+        # Strategy: Find keyword, then try parsing increasingly longer substrings
+        quant_keywords = ["forall", "exists", "exists1", "mu"]
+        for keyword in quant_keywords:
+            # Find all occurrences of quantifier keywords
+            pattern = rf"\b{keyword}\b"
+            matches = list(re.finditer(pattern, result))
+
+            # Process matches in reverse order to preserve positions
+            for match in reversed(matches):
+                start_pos = match.start()
+
+                # Try to parse increasingly longer substrings from this point
+                # Stop at sentence boundaries or when parsing fails
+                for end_offset in range(
+                    len(result) - start_pos, 0, -1
+                ):  # Try longest first
+                    end_pos = start_pos + end_offset
+                    # Don't go past sentence boundaries
+                    if any(
+                        result[start_pos:end_pos].count(boundary) > 0
+                        for boundary in [". ", "! ", "? "]
+                    ):
+                        # Found a sentence boundary - try up to that point
+                        for boundary in [". ", "! ", "? "]:
+                            if boundary in result[start_pos:end_pos]:
+                                end_pos = start_pos + result[start_pos:end_pos].index(
+                                    boundary
+                                )
+                                break
+
+                    math_text = result[start_pos:end_pos].strip()
+
+                    # Must contain a pipe for quantifier syntax
+                    if "|" not in math_text:
+                        continue
+
+                    try:
+                        # Try to parse as quantifier
+                        lexer = Lexer(math_text)
+                        tokens = lexer.tokenize()
+                        parser = Parser(tokens)
+                        ast = parser.parse()
+
+                        if isinstance(ast, Quantifier):
+                            # Successfully parsed! Generate LaTeX
+                            math_latex = self.generate_expr(ast)
+                            # Wrap in $...$
+                            result = (
+                                result[:start_pos]
+                                + f"${math_latex}$"
+                                + result[end_pos:]
+                            )
+                            break  # Move to next match
+                    except Exception:
+                        # Try shorter substring
+                        continue
+
+        return result
 
     def _generate_truth_table(self, node: TruthTable) -> list[str]:
         """Generate LaTeX for truth table."""
