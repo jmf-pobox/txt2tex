@@ -17,12 +17,13 @@ class LexerError(Exception):
 
 class Lexer:
     """
-    Tokenizes input text for Phase 0-4 + Phase 10a-b.
+    Tokenizes input text for Phase 0-4 + Phase 10a-b + Phase 11a.
 
     Supports propositional logic, document structure, equivalence chains,
     predicate logic with quantifiers and mathematical notation, Z notation,
-    and relational operators (Phase 10a: <->, |->, <|, |>, comp, ;, dom, ran)
-    and extended operators (Phase 10b: <<|, |>>, o9, ~, +, *, inv, id).
+    relational operators (Phase 10a: <->, |->, <|, |>, comp, ;, dom, ran),
+    extended operators (Phase 10b: <<|, |>>, o9, ~, +, *, inv, id),
+    and function types (Phase 11a: ->, +->, >->, >+>, -->>, +->>, >->>).
     """
 
     def __init__(self, text: str) -> None:
@@ -248,6 +249,33 @@ class Lexer:
             self._advance()
             return Token(TokenType.GREATER_EQUAL, ">=", start_line, start_column)
 
+        # Function type operators starting with > (Phase 11a)
+        # Check 4-character first: >->>
+        if (
+            char == ">"
+            and self._peek_char() == "-"
+            and self._peek_char(2) == ">"
+            and self._peek_char(3) == ">"
+        ):
+            self._advance()
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.BIJECTION, ">->>", start_line, start_column)
+
+        # Check 3-character: >+>, >->
+        if char == ">" and self._peek_char() == "+" and self._peek_char(2) == ">":
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.PINJ, ">+>", start_line, start_column)
+
+        if char == ">" and self._peek_char() == "-" and self._peek_char(2) == ">":
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.TINJ, ">->", start_line, start_column)
+
         if char == ">":
             self._advance()
             return Token(TokenType.GREATER_THAN, ">", start_line, start_column)
@@ -284,6 +312,27 @@ class Lexer:
             self._advance()
             return Token(TokenType.TILDE, "~", start_line, start_column)
 
+        # Function type operators starting with + (Phase 11a)
+        # Check 4-character first: +->>
+        if (
+            char == "+"
+            and self._peek_char() == "-"
+            and self._peek_char(2) == ">"
+            and self._peek_char(3) == ">"
+        ):
+            self._advance()
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.PSURJ, "+->>", start_line, start_column)
+
+        # Check 3-character: +->
+        if char == "+" and self._peek_char() == "-" and self._peek_char(2) == ">":
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.PFUN, "+->", start_line, start_column)
+
         if char == "+":
             self._advance()
             return Token(TokenType.PLUS, "+", start_line, start_column)
@@ -293,6 +342,26 @@ class Lexer:
         if char == "*":
             self._advance()
             return Token(TokenType.STAR, "*", start_line, start_column)
+
+        # Function type operators starting with - (Phase 11a)
+        # Check 4-character first: -->>
+        if (
+            char == "-"
+            and self._peek_char() == "-"
+            and self._peek_char(2) == ">"
+            and self._peek_char(3) == ">"
+        ):
+            self._advance()
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.TSURJ, "-->>", start_line, start_column)
+
+        # Check 2-character: ->
+        if char == "-" and self._peek_char() == ">":
+            self._advance()
+            self._advance()
+            return Token(TokenType.TFUN, "->", start_line, start_column)
 
         # Identifiers and keywords
         if char.isalpha():

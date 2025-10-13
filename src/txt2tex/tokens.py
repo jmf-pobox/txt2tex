@@ -51,6 +51,15 @@ class TokenType(Enum):
     INV = auto()  # inv (inverse of relation)
     ID = auto()  # id (identity relation)
 
+    # Function type operators (Phase 11)
+    TFUN = auto()  # -> (total function)
+    PFUN = auto()  # +-> (partial function)
+    TINJ = auto()  # >-> (total injection)
+    PINJ = auto()  # >+> (partial injection)
+    TSURJ = auto()  # -->> (total surjection)
+    PSURJ = auto()  # +->> (partial surjection)
+    BIJECTION = auto()  # >->> (bijection)
+
     # Comparison operators (Phase 3, enhanced in Phase 7)
     LESS_THAN = auto()  # <
     GREATER_THAN = auto()  # >

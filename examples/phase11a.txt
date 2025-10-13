@@ -1,0 +1,38 @@
+=== Phase 11a: Function Types ===
+
+TEXT: Total functions:
+
+f : X -> Y
+g : N -> N
+
+TEXT: Partial functions:
+
+f : X +-> Y
+
+TEXT: Injections:
+
+f : X >-> Y
+g : X >+> Y
+
+TEXT: Surjections:
+
+f : X -->> Y
+g : X +->> Y
+
+TEXT: Bijections:
+
+f : X >->> Y
+
+TEXT: Complex types:
+
+f : (X -> Y) -> Z
+g : X -> (Y +-> Z)
+h : (N -> N) -> (N -> N)
+
+TEXT: Generic function from homework:
+
+axdef
+  notin : X <-> P X
+where
+  forall x : X | x notin s <=> not (x in s)
+end
