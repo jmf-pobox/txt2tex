@@ -271,7 +271,14 @@ class Parser:
 
         # Check for abbreviation with generic parameters (Phase 9)
         # [X, Y] Name == expression
+        # BUT: Phase 12 bag literals [[x]] start with [[ not [
         if self._match(TokenType.LBRACKET):
+            # Check if this is a bag literal [[...]] or abbreviation [X, Y] Name ==
+            next_token = self._peek_ahead(1)
+            if next_token.type == TokenType.LBRACKET:
+                # It's a bag literal - parse as expression
+                return self._parse_expr()
+            # It's an abbreviation with generic parameters
             return self._parse_abbreviation()
 
         # Default: parse as expression
