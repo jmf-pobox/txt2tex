@@ -13,7 +13,26 @@ Convert whiteboard-style mathematical notation to high-quality LaTeX for formal 
 
 ## Quick Start
 
-### Using the Shell Script (Easiest)
+### 🚨 Proper Conversion Workflow
+
+**Always use the shell script or hatch command - never manually invoke pdflatex!**
+
+```bash
+# Method 1: Shell script (recommended)
+./txt2pdf.sh examples/phase9.txt
+
+# Method 2: Hatch command
+hatch run convert examples/phase9.txt
+```
+
+The `txt2pdf.sh` script automatically:
+- Sets PYTHONPATH for the CLI
+- Generates LaTeX from txt
+- Sets TEXINPUTS and MFINPUTS for packages
+- Compiles to PDF
+- Cleans up auxiliary files
+
+### Using the Shell Script (Options)
 
 ```bash
 # Convert txt to PDF in one command

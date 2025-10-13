@@ -127,8 +127,14 @@ class Lexer:
             return Token(TokenType.SOLUTION_MARKER, "**", start_line, start_column)
 
         # Part label: (a), (b), (c), etc. - restrict to a-j for homework parts
+        # Phase 11b: Only match at start of line to avoid function app conflict
         next_char = self._peek_char()
-        if char == "(" and "a" <= next_char <= "j" and self._peek_char(2) == ")":
+        if (
+            char == "("
+            and "a" <= next_char <= "j"
+            and self._peek_char(2) == ")"
+            and start_column == 1
+        ):
             self._advance()  # consume '('
             label = self._advance()  # consume letter
             self._advance()  # consume ')'

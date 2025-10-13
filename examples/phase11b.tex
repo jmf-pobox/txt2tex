@@ -1,0 +1,171 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Phase 11 b : Function Application}
+
+\bigskip
+
+Basic function application (single argument):
+
+\bigskip
+
+$f(x)$
+
+$square(5)$
+
+$parent(john)$
+
+\bigskip
+
+Multiple arguments:
+
+\bigskip
+
+$g(x, y, z)$
+
+$sum(a, b, c, d)$
+
+$max(x, y)$
+
+\bigskip
+
+Nested function application:
+
+\bigskip
+
+$f(g(x))$
+
+$f(g(h(x)))$
+
+$outer(middle(inner(value)))$
+
+\bigskip
+
+Empty argument list:
+
+\bigskip
+
+$f()$
+
+$initialize()$
+
+\bigskip
+
+Function application in expressions:
+
+\bigskip
+
+$f(x) \land g(y)$
+
+$f(x) \Rightarrow g(x)$
+
+$f(x) > 0$
+
+$height(m) < 10$
+
+\bigskip
+
+Function application in quantifiers:
+
+\bigskip
+
+$\forall x \colon N \bullet f(x) > 0$
+
+$\exists d \colon Dog \bullet gentle(d) \land neat(d)$
+
+$\forall x, y \colon N \bullet g(x, y) = g(y, x)$
+
+\bigskip
+
+Special Z notation functions (generic instantiation):
+
+\bigskip
+
+\begin{axdef}
+items : \seq~N
+possibilities : \power~Item
+collection : \bag~X
+sequence : \iseq~N
+\end{axdef}
+
+\bigskip
+
+Function application with set membership:
+
+\bigskip
+
+$x \in f(S)$
+
+$y \in \power~X$
+
+$z \in \seq~N$
+
+\bigskip
+
+Complex predicates from Solution 5:
+
+\bigskip
+
+$\exists d \colon Dog \bullet gentle(d) \land neat(d)$
+
+$\forall d \colon Dog \bullet neat(d) \Rightarrow attractive(d)$
+
+\bigskip
+
+Function application in definitions:
+
+\bigskip
+
+\begin{axdef}
+f : X \fun Y
+\where
+\forall x \colon X \bullet f(x) \in Y
+\end{axdef}
+
+\begin{schema}{PersonHeight}
+height : Person \fun N
+\where
+\forall p \colon Person \bullet height(p) > 0 \land height(p) < 300
+\end{schema}
+
+\bigskip
+
+Function application with comparisons:
+
+\bigskip
+
+$f(x, y) > g(x, y)$
+
+$max(x, y) = max(y, x)$
+
+$f(0) = 1$
+
+\bigskip
+
+Expression arguments:
+
+\bigskip
+
+$f(x \land y)$
+
+$g(x \lor y, p \Rightarrow q)$
+
+$h(a > b, c < d)$
+
+\bigskip
+
+Function application with subscripts and superscripts:
+
+\bigskip
+
+$f(x_i)$
+
+$g(x^2)$
+
+$h(a_1, a_2)$
+
+\end{document}
