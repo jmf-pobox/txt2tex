@@ -45,7 +45,7 @@ class ParserError(Exception):
 
 class Parser:
     """
-    Recursive descent parser for Phase 0-4 + Phase 10a-b.
+    Recursive descent parser for Phase 0-4 + Phase 10a-b + Phase 11a.
 
     Phase 0 - Expression grammar (precedence from lowest to highest):
         expr     ::= iff
@@ -80,7 +80,9 @@ class Parser:
         and        ::= comparison ( 'and' comparison )*
         comparison ::= relation ( ('<' | '>' | '<=' | '>=' | '=' | '!=') relation )?
         relation   ::= set_op ( ('<->' | '|->' | '<|' | '|>' | '<<|' |
-                                  '|>>' | 'o9' | 'comp' | ';') set_op )?
+                                  '|>>' | 'o9' | 'comp' | ';' |
+                                  '->' | '+->' | '>->' | '>+>' |
+                                  '-->>' | '+->>' | '>->>') set_op )*
         set_op     ::= union ( ('in' | 'notin' | 'subset') union )?
         union      ::= intersect ( 'union' intersect )*
         intersect  ::= unary ( 'intersect' unary )*
@@ -97,6 +99,12 @@ class Parser:
         - Infix: <<| (domain subtraction), |>> (range subtraction), o9 (composition)
         - Prefix functions: inv (inverse), id (identity)
         - Postfix: ~ (inverse), + (transitive closure), * (reflexive-transitive closure)
+
+    Phase 11a - Function type operators:
+        - Infix: -> (total function), +-> (partial function),
+                 >-> (total injection), >+> (partial injection),
+                 -->> (total surjection), +->> (partial surjection),
+                 >->> (bijection)
     """
 
     def __init__(self, tokens: list[Token]) -> None:
@@ -740,15 +748,18 @@ class Parser:
         return left
 
     def _parse_relation(self) -> Expr:
-        """Parse relation operators (Phase 10a-b).
+        """Parse relation and function type operators (Phase 10a-b, 11a).
 
         Phase 10a: <->, |->, <|, |>, comp, ;
         Phase 10b: <<|, |>>, o9
+        Phase 11a: ->, +->, >->, >+>, -->>, +->>, >->>
         """
         left = self._parse_set_op()
 
-        # Phase 10a-b: Infix relation operators (left-associative)
+        # Phase 10a-b + 11a: Infix relation and function type operators
+        # (left-associative)
         while self._match(
+            # Relation operators (Phase 10)
             TokenType.RELATION,  # <->
             TokenType.MAPLET,  # |->
             TokenType.DRES,  # <|
@@ -758,6 +769,14 @@ class Parser:
             TokenType.CIRC,  # o9 (Phase 10b)
             TokenType.COMP,  # comp
             TokenType.SEMICOLON,  # ;
+            # Function type operators (Phase 11a)
+            TokenType.TFUN,  # ->
+            TokenType.PFUN,  # +->
+            TokenType.TINJ,  # >->
+            TokenType.PINJ,  # >+>
+            TokenType.TSURJ,  # -->>
+            TokenType.PSURJ,  # +->>
+            TokenType.BIJECTION,  # >->>
         ):
             op_token = self._advance()
             right = self._parse_set_op()
