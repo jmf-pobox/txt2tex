@@ -244,6 +244,31 @@ p \lor q \Leftrightarrow p \\
 
 \medskip
 
+(a)
+\par
+\vspace{11pt}
+$\exists d \colon Dog \bullet gentle(d) \land well_{trained(d)}$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\forall d \colon Dog \bullet neat(d) \land well_{trained(d)} \Rightarrow attractive(d)$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+(Requires nested quantifier in implication - parser limitation)
+
+\bigskip
+
+\medskip
+
 \bigskip
 \noindent
 \textbf{Solution 6}
@@ -364,14 +389,125 @@ $\forall x \colon N \bullet x \geq z$
 \medskip
 
 \bigskip
+
+As discussed, the quantifier exists1 can help give rise to a 'test' or 'precondition' to ensure that an application of mu will work.
+
+\bigskip
+
+\bigskip
+
+So, as a simple example, as the proposition
+
+\bigskip
+
+$\exists_1 n \colon N \bullet \forall m \colon N \bullet n \leq m$
+
+\bigskip
+
+is equivalent to true, we can be certain that the statement
+
+\bigskip
+
+$\mu n \colon N \bullet \forall m \colon N \bullet n \leq m$
+
+\bigskip
+
+will return a result (which happens to be 0).
+
+\bigskip
+
+\bigskip
 \noindent
 \textbf{Solution 11}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+($\mu a \colon N \bullet a = a$) = 0 is a provable statement, since 0 is the only natural number with the specified property.
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+($\mu b \colon N \bullet b = b$) = 1 is not provable. The specified property is true of both 0 and 1, and thus the value of the mu-expression is undefined.
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+($\mu c \colon N \bullet c > c$) = ($\mu c \colon N \bullet c > c$) is a provable statement. Neither expression is properly defined, but we may conclude that they are equal; there is little else that we can prove about them.
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+($\mu d \colon N \bullet d = d$) = 1 is not a provable statement. We cannot confirm that 1 is the only natural number with the specified property; we do not know what value is taken by undefined operations.
+
+\bigskip
 
 \medskip
 
 \bigskip
 \noindent
 \textbf{Solution 12}
+
+\medskip
+
+\bigskip
+
+(Requires mu-operator with expression part - not yet implemented)
+
+\bigskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+(mu m : Mountain | ($\forall n \colon Mountain \bullet height(n) \leq height(m)$) . height(m))
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+(mu c : Chapter | ($\exists_1 d \colon Chapter \bullet length(d) > length(c)$) . length(c))
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+Assuming the existence of a suitable function, max: ($\mu n \colon N \bullet n = max$($\{ m \colon N \mid 8 * m < 100 \bullet 8 * m \}$) . 100 - n)
+
+\bigskip
 
 \medskip
 
@@ -583,9 +719,101 @@ and the other:
 
 \medskip
 
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+1 in {4, 3, 2, 1} is true.
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+{1} in {1, 2, 3, 4} is undefined.
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+{1} in {{1}, {2}, {3}, {4}} is true.
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+The empty set in {1, 2, 3, 4} is undefined.
+
+\bigskip
+
+\medskip
+
 \bigskip
 \noindent
 \textbf{Solution 20}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\{1\} \cross \{2, 3\}$
+
+\bigskip
+
+is the set {(1, 2), (1, 3)}
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+The empty set cross {2, 3} is the empty set
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\power~emptyset \cross \{1\}$
+
+\bigskip
+
+is the set {(emptyset, 1)}
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+{(1, 2)} cross {3, 4} is the set {((1, 2), 3), ((1, 2), 4)}
+
+\bigskip
 
 \medskip
 
@@ -596,8 +824,71 @@ and the other:
 \medskip
 
 \bigskip
+
+There are various ways of describing these sets via set comprehensions. Examples are given below.
+
+\bigskip
+
+(a)
+\par
+\vspace{11pt}
+$\{ z \colon Z \mid 0 \leq z \land z \leq 100 \}$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{ z \colon Z \mid z = 10 \}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\{ z \colon Z \mid z \bmod 2 = 0 \lor z \bmod 3 = 0 \lor z \bmod 5 = 0 \}$
+
+\medskip
+
+\bigskip
 \noindent
 \textbf{Solution 22}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\{ n \colon N \mid n \leq 4 \bullet n^2 \}$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{ n \colon N \mid n \leq 4 \bullet (n, n^2) \}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+{ n : P {0, 1} } (set comprehension notation requires clarification)
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+{ n : P {0, 1} | true . (n, # n) } (alternative: map over powerset)
+
+\bigskip
 
 \medskip
 
@@ -637,6 +928,58 @@ x \in a \cup a \\
 
 \medskip
 
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of all pairs of integers is Z cross Z. To give it a name, we could write:
+
+\bigskip
+
+Pairs == Z \cross Z
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of all integer pairs in which each element is strictly greater than zero could be defined by:
+
+\bigskip
+
+StrictlyPositivePairs == \{ m, n \colon Z \mid m > 0 \land n > 0 \bullet (m, n) \}
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+It is intuitive to use a singular noun for the name of a basic type; we define the set of all people by writing:
+
+\bigskip
+
+\begin{zed}[Person]\end{zed}
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of all couples could be defined by:
+
+\bigskip
+
+Couples == \{ s \colon \power~Person \mid \# s = 2 \}
+
+\medskip
+
 \bigskip
 \noindent
 \textbf{Solution 25}
@@ -644,10 +987,22 @@ x \in a \cup a \\
 \medskip
 
 \bigskip
+
+(Requires generic set notation and Cartesian product)
+
+\bigskip
+
+\bigskip
 \noindent
 \textbf{Solution 26}
 
 \medskip
+
+\bigskip
+
+(Requires generic parameters and relation type notation)
+
+\bigskip
 
 \section*{Relations}
 
@@ -657,9 +1012,92 @@ x \in a \cup a \\
 
 \medskip
 
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+The power set of {(0,0), (0,1), (1,0), (1,1)} is:
+
+\bigskip
+
+\bigskip
+
+{ emptyset, {(0, 0)}, {(0, 1)}, {(1, 0)}, {(1, 1)}, {(1, 0), (1, 1)}, {(0, 0), (0, 1)}, {(0, 1), (1, 1)}, {(0, 1), (1, 0)}, {(0, 0), (1, 1)}, {(0, 0), (1, 0)}, {(0, 0), (1, 0), (1, 1)}, {(0, 0), (0, 1), (1, 1)}, {(0, 0), (0, 1), (1, 0)}, {(0, 1), (1, 0), (1, 1)}, {(0, 0), (0, 1), (1, 0), (1, 1)} }
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+{ emptyset, {(0, 0)}, {(0, 1)}, {(0, 0), (0, 1)} }
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+{ emptyset }
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+{ emptyset }
+
+\bigskip
+
+\medskip
+
 \bigskip
 \noindent
 \textbf{Solution 28}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+dom R = {0, 1, 2}
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+ran R = {1, 2, 3}
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+{1, 2} <| R = {1 |-> 2, 1 |-> 3, 2 |-> 3}
+
+\bigskip
 
 \medskip
 
@@ -669,15 +1107,137 @@ x \in a \cup a \\
 
 \medskip
 
+(a)
+\par
+\vspace{11pt}
+$\{2 \mapsto 4, 3 \mapsto 3, 3 \mapsto 4, 4 \mapsto 2\}$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{1 \mapsto 3, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 1\}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\{1 \mapsto 1, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4 \mapsto 4\}$
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+$\{1 \mapsto 4, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4 \mapsto 1\}$
+
+\medskip
+
 \bigskip
 \noindent
 \textbf{Solution 30}
 
 \medskip
 
+(a)
+\par
+\vspace{11pt}
+parentOf == childOf^{-1}
+
+\bigskip
+
+This is a good example of how there are many different ways of writing the same thing. An alternative abbreviation is:
+
+\bigskip
+
+parentOf == \{ x, y \colon Person \mid x \mapsto y \in childOf \bullet y \mapsto x \}
+
+\bigskip
+
+Or, via an axiomatic definition:
+
+\bigskip
+
+\begin{axdef}
+parentOf : Person \rel Person
+\where
+parentOf = childOf^{-1}
+\end{axdef}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+siblingOf == (childOf o9 parentOf) \ id
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+cousinOf == childOf \circ siblingOf \circ parentOf
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+ancestorOf == parentOf^+
+
+\medskip
+
 \bigskip
 \noindent
 \textbf{Solution 31}
+
+\medskip
+
+\bigskip
+
+(Requires compound identifiers with operators - R+, R*)
+
+\bigskip
+
+(a)
+\par
+\vspace{11pt}
+R == \{ a, b \colon N \mid b = a \lor b = a \}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+S == \{ a, b \colon N \mid b = a \lor b = a \}
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+R+ == $\{ a, b \colon N \mid b > a \}$
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+R* == $\{ a, b \colon N \mid b \geq a \}$
+
+\bigskip
 
 \medskip
 
@@ -725,8 +1285,127 @@ x \mapsto y \in R \cup S \rres C \\
 \medskip
 
 \bigskip
+
+The set of 9 functions:
+
+\bigskip
+
+\bigskip
+
+{ emptyset, {(0, 0)}, {(0, 1)}, {(1, 1)}, {(1, 0)}, {(0, 0), (1, 1)}, {(0, 1), (1, 1)}, {(1, 0), (0, 0)}, {(0, 1), (1, 0)} }
+
+\bigskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of total functions:
+
+\bigskip
+
+\bigskip
+
+{ {(0, 0), (1, 1)}, {(0, 1), (1, 1)}, {(1, 0), (0, 0)}, {(0, 1), (1, 0)} }
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of functions which are neither injective nor surjective:
+
+\bigskip
+
+\bigskip
+
+{ {(0, 1), (1, 1)}, {(0, 0), (1, 0)} }
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of functions which are injective but not surjective:
+
+\bigskip
+
+\bigskip
+
+{ emptyset, {(0, 0)}, {(0, 1)}, {(1, 0)}, {(1, 1)} }
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+There are no functions (of this type) which are surjective but not injective.
+
+\bigskip
+
+\medskip
+
+(e)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of bijective functions:
+
+\bigskip
+
+\bigskip
+
+{ {(0, 0), (1, 1)}, {(0, 1), (1, 0)} }
+
+\bigskip
+
+\medskip
+
+\bigskip
 \noindent
 \textbf{Solution 34}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\{1 \mapsto a, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+$\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
 
 \medskip
 
@@ -737,10 +1416,122 @@ x \mapsto y \in R \cup S \rres C \\
 \medskip
 
 \bigskip
+
+(Requires power set notation P and relational image)
+
+\bigskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+axdef
+
+\bigskip
+
+\bigskip
+
+children : Person -> P Person
+
+\bigskip
+
+\bigskip
+
+where
+
+\bigskip
+
+\bigskip
+
+children = {p : Person . p |-> parentOf(| {p} |)}
+
+\bigskip
+
+\bigskip
+
+end
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+axdef
+
+\bigskip
+
+\bigskip
+
+number_of_grandchildren : Person -> N
+
+\bigskip
+
+\bigskip
+
+where
+
+\bigskip
+
+\bigskip
+
+number_of_grandchildren = {p : Person . p |-> # (parentOf o9 parentOf)(| {p} |)}
+
+\bigskip
+
+\bigskip
+
+end
+
+\bigskip
+
+\medskip
+
+\bigskip
 \noindent
 \textbf{Solution 36}
 
 \medskip
+
+\bigskip
+
+(Requires power set, function types, and ran keyword)
+
+\bigskip
+
+\bigskip
+
+axdef
+
+\bigskip
+
+\bigskip
+
+number_of_drivers : (Drivers <-> Cars) -> (Cars -> N)
+
+\bigskip
+
+\bigskip
+
+where
+
+\bigskip
+
+\bigskip
+
+forall r : Drivers <-> Cars | number_of_drivers(r) = {c : ran r . c |-> #$\{ d \colon Drivers \mid d \mapsto c \in r \}$}
+
+\bigskip
+
+\bigskip
+
+end
+
+\bigskip
 
 \section*{Sequences}
 
