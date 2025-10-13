@@ -23,12 +23,15 @@ class TokenType(Enum):
     MU = auto()  # Definite description (mu-operator)
     LAMBDA = auto()  # Lambda expression (Phase 11d)
 
-    # Set operators (Phase 3, enhanced in Phase 7)
+    # Set operators (Phase 3, enhanced in Phase 7-8, Phase 11.5)
     IN = auto()
     NOTIN = auto()  # not in (set non-membership)
     SUBSET = auto()
     UNION = auto()
     INTERSECT = auto()
+    CROSS = auto()  # cross or × (Cartesian product)  # noqa: RUF003
+    SETMINUS = auto()  # \ (set difference)
+    HASH = auto()  # # (cardinality - prefix operator)
 
     # Relation operators (Phase 10)
     RELATION = auto()  # <-> (relation type)
@@ -51,6 +54,10 @@ class TokenType(Enum):
     RAN = auto()  # ran (range of relation)
     INV = auto()  # inv (inverse of relation)
     ID = auto()  # id (identity relation)
+
+    # Set functions (Phase 11.5)
+    POWER = auto()  # P (power set)
+    POWER1 = auto()  # P1 (non-empty power set)
 
     # Function type operators (Phase 11)
     TFUN = auto()  # -> (total function)
@@ -76,6 +83,7 @@ class TokenType(Enum):
     # Math operators (Phase 3)
     CARET = auto()  # ^ for superscripts
     UNDERSCORE = auto()  # _ for subscripts
+    MOD = auto()  # mod (modulo arithmetic)
 
     # Grouping
     LPAREN = auto()
