@@ -318,6 +318,20 @@ PROOF:
 
 ** Solution 23 **
 
+(a)
+
+EQUIV:
+x in a intersect a
+<=> x in a and x in a
+<=> x in a
+
+(b)
+
+EQUIV:
+x in a union a
+<=> x in a or x in a
+<=> x in a
+
 ** Solution 24 **
 
 ** Solution 25 **
