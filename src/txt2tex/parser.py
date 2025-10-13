@@ -18,6 +18,7 @@ from txt2tex.ast_nodes import (
     FunctionType,
     GivenType,
     Identifier,
+    Lambda,
     Number,
     Paragraph,
     Part,
@@ -508,6 +509,9 @@ class Parser:
             TokenType.FORALL, TokenType.EXISTS, TokenType.EXISTS1, TokenType.MU
         ):
             return self._parse_quantifier()
+        # Check for lambda expression (Phase 11d)
+        if self._match(TokenType.LAMBDA):
+            return self._parse_lambda()
         return self._parse_iff()
 
     def _parse_iff(self) -> Expr:
@@ -640,6 +644,56 @@ class Parser:
             body=body,
             line=quant_token.line,
             column=quant_token.column,
+        )
+
+    def _parse_lambda(self) -> Expr:
+        """Parse lambda expression: lambda var [, var]* : domain . body.
+
+        Phase 11d: Lambda expressions.
+        Examples:
+        - lambda x : N . x^2
+        - lambda x, y : N . x and y
+        - lambda f : X -> Y . lambda x : X . f(x)
+        """
+        lambda_token = self._advance()  # Consume 'lambda'
+
+        # Parse first variable
+        if not self._match(TokenType.IDENTIFIER):
+            raise ParserError("Expected variable name after lambda", self._current())
+        variables: list[str] = [self._advance().value]
+
+        # Parse additional variables if comma-separated
+        while self._match(TokenType.COMMA):
+            self._advance()  # Consume ','
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError("Expected variable name after ','", self._current())
+            variables.append(self._advance().value)
+
+        # Parse domain (: domain) - required for lambda
+        if not self._match(TokenType.COLON):
+            raise ParserError("Expected ':' after lambda variables", self._current())
+        self._advance()  # Consume ':'
+        # Parse domain as full type expression (can be complex like X -> Y)
+        # Use _parse_comparison() to get function types but stop at PERIOD
+        domain = self._parse_comparison()
+
+        # Parse separator . (period)
+        if not self._match(TokenType.PERIOD):
+            raise ParserError("Expected '.' after lambda binding", self._current())
+        self._advance()  # Consume '.'
+
+        # Parse body (rest of expression) - use _parse_expr() to allow nested
+        # quantifiers and lambdas in the body
+        # Lambda binds tighter than quantifiers, so "lambda x : X . forall y : Y | P"
+        # means the body is the entire quantifier expression
+        body = self._parse_expr()
+
+        return Lambda(
+            variables=variables,
+            domain=domain,
+            body=body,
+            line=lambda_token.line,
+            column=lambda_token.column,
         )
 
     def _parse_set_comprehension(self) -> Expr:
@@ -917,7 +971,8 @@ class Parser:
 
         Handles: identifier, number, parenthesized expression, set comprehension,
         Phase 10a relation functions (dom, ran), and Phase 10b functions (inv, id),
-        Phase 11b function application (f(x), g(x, y)).
+        Phase 11b function application (f(x), g(x, y)),
+        Phase 11d lambda expressions (lambda x : X . body).
         """
         # Phase 10a-b: Prefix relation functions (dom, ran, inv, id)
         if self._match(TokenType.DOM, TokenType.RAN, TokenType.INV, TokenType.ID):
@@ -929,6 +984,10 @@ class Parser:
                 line=op_token.line,
                 column=op_token.column,
             )
+
+        # Phase 11d: Lambda expressions
+        if self._match(TokenType.LAMBDA):
+            return self._parse_lambda()
 
         # Phase 11b: Check for identifier (function application or identifier)
         if self._match(TokenType.IDENTIFIER):
@@ -972,7 +1031,7 @@ class Parser:
             return self._parse_set_comprehension()
 
         raise ParserError(
-            f"Expected identifier, number, '(', or '{{',"
+            f"Expected identifier, number, '(', '{{', or lambda,"
             f" got {self._current().type.name}",
             self._current(),
         )
