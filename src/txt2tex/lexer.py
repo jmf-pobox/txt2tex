@@ -473,6 +473,8 @@ class Lexer:
             return Token(TokenType.EXISTS, value, start_line, start_column)
         if value == "mu":
             return Token(TokenType.MU, value, start_line, start_column)
+        if value == "lambda":
+            return Token(TokenType.LAMBDA, value, start_line, start_column)
 
         # Check for set operators (Phase 3, enhanced in Phase 7)
         if value == "notin":
