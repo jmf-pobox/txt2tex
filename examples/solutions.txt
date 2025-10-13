@@ -1,0 +1,239 @@
+=== Propositional logic ===
+
+** Solution 1 **
+
+(a)
+
+TEXT: false (as (true => false) <=> false)
+
+(b)
+
+TEXT: true (as (false => false) <=> true)
+
+(c)
+
+TEXT: true (as (false => true) <=> true)
+
+(d)
+
+TEXT: true (as (false => false) <=> true)
+
+TEXT: (Assuming that pigs can't fly . . . )
+
+** Solution 2 **
+
+(a)
+
+TRUTH TABLE:
+p | q | p and q | (p and q) => p
+T | T | T | T
+T | F | F | T
+F | T | F | T
+F | F | F | T
+
+(b)
+
+TRUTH TABLE:
+p | q | p and q | not p | not p => (p and q) | (not p => (p and q)) <=> p
+T | T | T | F | T | T
+T | F | F | F | T | T
+F | T | F | T | F | T
+F | F | F | T | F | T
+
+(c)
+
+TRUTH TABLE:
+p | q | p => q | p and (p => q) | (p and (p => q)) => q
+T | T | T | T | T
+T | F | F | F | T
+F | T | T | F | T
+F | F | T | F | T
+
+** Solution 3 **
+
+(a)
+
+EQUIV:
+p => not p
+<=> not p or not p [=>]
+<=> not p [idempotence]
+
+(b)
+
+EQUIV:
+not p => p
+<=> not not p or p [=>]
+<=> p or p [not not]
+<=> p [idempotence]
+
+(c)
+
+EQUIV:
+p => (q => r)
+<=> not p or (q => r) [=>]
+<=> not p or (not q or r) [=>]
+<=> (not p or not q) or r [associativity]
+<=> not (p and q) or r [De Morgan]
+<=> (p and q) => r [=>]
+
+(d)
+
+EQUIV:
+q => (p => r)
+<=> not q or (p => r) [=>]
+<=> not q or (not p or r) [=>]
+<=> not p or (not q or r) [associativity and commutativity]
+<=> not p or (q => r) [=>]
+<=> p => (q => r) [=>]
+
+(e)
+
+EQUIV:
+((p and q) <=> p)
+<=> ((p and q) => p) and (p => (p and q)) [<=>]
+<=> (not (p and q) or p) and (not p or (p and q)) [=>]
+<=> ((not p or not q) or p) and (not p or (p and q)) [De Morgan]
+<=> (not q or (not p or p)) and (not p or (p and q)) [associativity and comm.]
+<=> (not q or true) and (not p or (p and q)) [excluded middle]
+<=> true and (not p or (p and q)) [or and true]
+<=> not p or (p and q) [and and true]
+<=> (not p or p) and (not p or q) [distribution]
+<=> true and (not p or q) [excluded middle]
+<=> not p or q [and and true]
+<=> p => q [=>]
+
+(f)
+
+EQUIV:
+((p or q) <=> p)
+<=> ((p or q) => p) and (p => (p or q)) [<=>]
+<=> (not (p or q) or p) and (not p or (p or q)) [=>]
+<=> ((not p and not q) or p) and (not p or (p or q)) [De Morgan]
+<=> ((not p or p) and (not q or p)) and (not p or (p or q)) [distribution]
+<=> (true and (not q or p)) and (not p or (p or q)) [excluded middle]
+<=> (not q or p) and (not p or (p or q)) [and and true]
+<=> (not q or p) and ((not p or p) or q) [associativity]
+<=> (not q or p) and (true or q) [excluded middle]
+<=> (not q or p) and true [or and true]
+<=> (not q or p) [and and true]
+<=> q => p [=>]
+
+** Solution 4 **
+
+TEXT: (a) (p or q) <=> ((not p or not q) and q) is not a tautology. You might illustrate this via a truth table or via a chain of equivalences, showing that the proposition is not equivalent to true. Alternatively, you might try and find a combination of values for which the proposition is false. (In this case, the proposition is false when p and q are both true.)
+
+TEXT: (b) (p or q) <=> ((not p and not q) or q) is not a tautology. In this case, the proposition is false when p is true and q is false.
+
+** Solution 5 **
+
+** Solution 6 **
+
+** Solution 7 **
+
+** Solution 8 **
+
+=== Equality ===
+
+** Solution 9 **
+
+** Solution 10 **
+
+** Solution 11 **
+
+** Solution 12 **
+
+=== Deductive proofs ===
+
+** Solution 13 **
+
+** Solution 14 **
+
+** Solution 15 **
+
+** Solution 16 **
+
+** Solution 17 **
+
+** Solution 18 **
+
+=== Sets and types ===
+
+** Solution 19 **
+
+** Solution 20 **
+
+** Solution 21 **
+
+** Solution 22 **
+
+** Solution 23 **
+
+** Solution 24 **
+
+** Solution 25 **
+
+** Solution 26 **
+
+=== Relations ===
+
+** Solution 27 **
+
+** Solution 28 **
+
+** Solution 29 **
+
+** Solution 30 **
+
+** Solution 31 **
+
+** Solution 32 **
+
+=== Functions ===
+
+** Solution 33 **
+
+** Solution 34 **
+
+** Solution 35 **
+
+** Solution 36 **
+
+=== Sequences ===
+
+** Solution 37 **
+
+** Solution 38 **
+
+** Solution 39 **
+
+=== Modelling ===
+
+** Solution 40 **
+
+** Solution 41 **
+
+** Solution 42 **
+
+** Solution 43 **
+
+=== Free types and induction ===
+
+** Solution 44 **
+
+** Solution 45 **
+
+** Solution 46 **
+
+** Solution 47 **
+
+=== Supplementary material: assignment practice ===
+
+** Solution 48 **
+
+** Solution 49 **
+
+** Solution 50 **
+
+** Solution 51 **
+
+** Solution 52 **
