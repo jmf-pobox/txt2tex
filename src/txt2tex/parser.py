@@ -45,7 +45,7 @@ class ParserError(Exception):
 
 class Parser:
     """
-    Recursive descent parser for Phase 0-4 + Phase 10a.
+    Recursive descent parser for Phase 0-4 + Phase 10a-b.
 
     Phase 0 - Expression grammar (precedence from lowest to highest):
         expr     ::= iff
@@ -79,17 +79,24 @@ class Parser:
         or         ::= and ( 'or' and )*
         and        ::= comparison ( 'and' comparison )*
         comparison ::= relation ( ('<' | '>' | '<=' | '>=' | '=' | '!=') relation )?
-        relation   ::= set_op ( ('<->' | '|->' | '<|' | '|>' | 'comp' | ';') set_op )?
+        relation   ::= set_op ( ('<->' | '|->' | '<|' | '|>' | '<<|' |
+                                  '|>>' | 'o9' | 'comp' | ';') set_op )?
         set_op     ::= union ( ('in' | 'notin' | 'subset') union )?
         union      ::= intersect ( 'union' intersect )*
         intersect  ::= unary ( 'intersect' unary )*
         unary      ::= 'not' unary | postfix
-        postfix    ::= atom ( '^' atom | '_' atom )*
-        atom       ::= ('dom' | 'ran') atom | IDENTIFIER | NUMBER | '(' expr ')'
+        postfix    ::= atom ( '^' atom | '_' atom | '~' | '+' | '*' )*
+        atom       ::= ('dom' | 'ran' | 'inv' | 'id') atom |
+                       IDENTIFIER | NUMBER | '(' expr ')'
 
     Phase 10a - Relation operators:
-        - Infix: <-> |->, <|, |>, comp, ;
+        - Infix: <->, |->, <|, |>, comp, ;
         - Prefix functions: dom, ran
+
+    Phase 10b - Extended relation operators:
+        - Infix: <<| (domain subtraction), |>> (range subtraction), o9 (composition)
+        - Prefix functions: inv (inverse), id (identity)
+        - Postfix: ~ (inverse), + (transitive closure), * (reflexive-transitive closure)
     """
 
     def __init__(self, tokens: list[Token]) -> None:
@@ -733,17 +740,24 @@ class Parser:
         return left
 
     def _parse_relation(self) -> Expr:
-        """Parse relation operators (Phase 10a: <->, |->, <|, |>, comp, ;)."""
+        """Parse relation operators (Phase 10a-b).
+
+        Phase 10a: <->, |->, <|, |>, comp, ;
+        Phase 10b: <<|, |>>, o9
+        """
         left = self._parse_set_op()
 
-        # Phase 10a: Infix relation operators (left-associative)
+        # Phase 10a-b: Infix relation operators (left-associative)
         while self._match(
-            TokenType.RELATION,      # <->
-            TokenType.MAPLET,        # |->
-            TokenType.DRES,          # <|
-            TokenType.RRES,          # |>
-            TokenType.COMP,          # comp
-            TokenType.SEMICOLON,     # ;
+            TokenType.RELATION,  # <->
+            TokenType.MAPLET,  # |->
+            TokenType.DRES,  # <|
+            TokenType.RRES,  # |>
+            TokenType.NDRES,  # <<| (Phase 10b)
+            TokenType.NRRES,  # |>> (Phase 10b)
+            TokenType.CIRC,  # o9 (Phase 10b)
+            TokenType.COMP,  # comp
+            TokenType.SEMICOLON,  # ;
         ):
             op_token = self._advance()
             right = self._parse_set_op()
@@ -809,25 +823,47 @@ class Parser:
         return left
 
     def _parse_postfix(self) -> Expr:
-        """Parse postfix operators (^ for superscript, _ for subscript)."""
+        """Parse postfix operators.
+
+        Phase 3: ^ (superscript), _ (subscript) - take operands
+        Phase 10b: ~ (inverse), + (transitive closure),
+                   * (reflexive-transitive closure) - no operands
+        """
         base = self._parse_atom()
 
         # Keep applying postfix operators while we see them
-        while self._match(TokenType.CARET, TokenType.UNDERSCORE):
+        while self._match(
+            TokenType.CARET,
+            TokenType.UNDERSCORE,
+            TokenType.TILDE,
+            TokenType.PLUS,
+            TokenType.STAR,
+        ):
             op_token = self._advance()
-            operand = self._parse_atom()
 
             if op_token.type == TokenType.CARET:
+                # Superscript takes an operand
+                operand = self._parse_atom()
                 base = Superscript(
                     base=base,
                     exponent=operand,
                     line=op_token.line,
                     column=op_token.column,
                 )
-            else:  # UNDERSCORE
+            elif op_token.type == TokenType.UNDERSCORE:
+                # Subscript takes an operand
+                operand = self._parse_atom()
                 base = Subscript(
                     base=base,
                     index=operand,
+                    line=op_token.line,
+                    column=op_token.column,
+                )
+            else:
+                # Phase 10b: Unary postfix operators (no operand)
+                base = UnaryOp(
+                    operator=op_token.value,
+                    operand=base,
                     line=op_token.line,
                     column=op_token.column,
                 )
@@ -838,10 +874,10 @@ class Parser:
         """Parse atom.
 
         Handles: identifier, number, parenthesized expression, set comprehension,
-        and Phase 10a relation functions (dom, ran).
+        Phase 10a relation functions (dom, ran), and Phase 10b functions (inv, id).
         """
-        # Phase 10a: Prefix relation functions (dom, ran)
-        if self._match(TokenType.DOM, TokenType.RAN):
+        # Phase 10a-b: Prefix relation functions (dom, ran, inv, id)
+        if self._match(TokenType.DOM, TokenType.RAN, TokenType.INV, TokenType.ID):
             op_token = self._advance()
             operand = self._parse_atom()
             return UnaryOp(
