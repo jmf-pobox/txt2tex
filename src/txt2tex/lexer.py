@@ -157,6 +157,8 @@ class Lexer:
             return Token(TokenType.RPAREN, ")", start_line, start_column)
 
         # Brackets (for justifications in Phase 2)
+        # Note: Bag literals [[...]] are handled at parser level, not lexer level
+        # to avoid conflicts with nested brackets like Type[List[N]]
         if char == "[":
             self._advance()
             return Token(TokenType.LBRACKET, "[", start_line, start_column)
@@ -405,6 +407,25 @@ class Lexer:
             self._advance()
             return Token(TokenType.SETMINUS, "\\", start_line, start_column)
 
+        # Sequence literals (Phase 12) - Unicode angle brackets
+        if char == "⟨":
+            self._advance()
+            return Token(TokenType.LANGLE, "⟨", start_line, start_column)
+
+        if char == "⟩":
+            self._advance()
+            return Token(TokenType.RANGLE, "⟩", start_line, start_column)
+
+        # Sequence concatenation (Phase 12)
+        if char == "⌢":
+            self._advance()
+            return Token(TokenType.CAT, "⌢", start_line, start_column)
+
+        # Bag union (Phase 12)
+        if char == "⊎":
+            self._advance()
+            return Token(TokenType.BAG_UNION, "⊎", start_line, start_column)
+
         # Unknown character
         raise LexerError(f"Unexpected character: {char!r}", self.line, self.column)
 
@@ -554,7 +575,20 @@ class Lexer:
         if value == "P":
             return Token(TokenType.POWER, value, start_line, start_column)
 
-        # Regular identifier
+        # Check for sequence operator keywords (Phase 12)
+        # Note: seq and seq1 are left as identifiers to support seq(X) and seq[X]
+        if value == "head":
+            return Token(TokenType.HEAD, value, start_line, start_column)
+        if value == "tail":
+            return Token(TokenType.TAIL, value, start_line, start_column)
+        if value == "last":
+            return Token(TokenType.LAST, value, start_line, start_column)
+        if value == "front":
+            return Token(TokenType.FRONT, value, start_line, start_column)
+        if value == "rev":
+            return Token(TokenType.REV, value, start_line, start_column)
+
+        # Regular identifier (includes seq, seq1)
         return Token(TokenType.IDENTIFIER, value, start_line, start_column)
 
     def _scan_number(self, start_line: int, start_column: int) -> Token:

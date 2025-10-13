@@ -259,6 +259,68 @@ class GenericInstantiation(ASTNode):
     type_params: list[Expr]  # Type parameters (at least one)
 
 
+# Sequence nodes (Phase 12)
+
+
+@dataclass(frozen=True)
+class SequenceLiteral(ASTNode):
+    """Sequence literal node (Phase 12).
+
+    Represents sequence literals: ⟨⟩, ⟨a⟩, ⟨a, b, c⟩
+
+    Sequences are ordered lists of elements. The empty sequence is written ⟨⟩.
+
+    Examples:
+    - ⟨⟩ -> elements=[]  (empty sequence)
+    - ⟨a⟩ -> elements=[Identifier("a")]
+    - ⟨1, 2, 3⟩ -> elements=[Number("1"), Number("2"), Number("3")]
+    - ⟨x, y+1, f(z)⟩ -> elements=[Identifier("x"), BinaryOp("+", ...), FunctionApp(...)]
+
+    LaTeX rendering: \\langle elements \\rangle
+    """
+
+    elements: list[Expr]  # List of sequence elements (can be empty)
+
+
+@dataclass(frozen=True)
+class TupleProjection(ASTNode):
+    """Tuple projection node (Phase 12).
+
+    Represents tuple component access: x.1, x.2, x.3
+
+    Used to access specific components of tuples in sequences and relations.
+
+    Examples:
+    - x.1 -> base=Identifier("x"), index=1
+    - (a, b, c).2 -> base=Tuple([...]), index=2
+    - f(x).3 -> base=FunctionApp(...), index=3
+
+    LaTeX rendering: base.index (stays the same)
+    """
+
+    base: Expr  # The tuple expression
+    index: int  # Component index (1-based: 1, 2, 3, ...)
+
+
+@dataclass(frozen=True)
+class BagLiteral(ASTNode):
+    """Bag literal node (Phase 12).
+
+    Represents bag (multiset) literals: [[x]], [[a, b, c]]
+
+    Bags are unordered collections where elements can appear multiple times.
+    The notation [[x]] creates a bag containing a single element x.
+
+    Examples:
+    - [[x]] -> elements=[Identifier("x")]
+    - [[1, 2, 2, 3]] -> elements=[Number("1"), Number("2"), Number("2"), Number("3")]
+
+    LaTeX rendering: \\lbag elements \\rbag
+    """
+
+    elements: list[Expr]  # List of bag elements (can have duplicates)
+
+
 # Type alias for all expression types
 Expr = (
     BinaryOp
@@ -276,6 +338,9 @@ Expr = (
     | Tuple
     | RelationalImage
     | GenericInstantiation
+    | SequenceLiteral
+    | TupleProjection
+    | BagLiteral
 )
 
 
