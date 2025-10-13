@@ -1,0 +1,21 @@
+=== Phase 11.7: Set Literals with Maplets ===
+
+** Test Cases **
+
+(a) Simple relation
+{2 |-> 4, 3 |-> 3, 3 |-> 4, 4 |-> 2}
+
+(b) Function enumeration
+{1 |-> a, 2 |-> b, 3 |-> c, 4 |-> b}
+
+(c) Mixed set
+{1, 2 |-> 3, 4}
+
+(d) Empty set
+{}
+
+(e) Nested sets with maplets
+{{1 |-> 2}, {3 |-> 4}}
+
+(f) Maplets with tuples
+{(0, 0) |-> 1, (0, 1) |-> 2, (1, 0) |-> 3}
