@@ -128,9 +128,37 @@ TEXT: (b) (p or q) <=> ((not p and not q) or q) is not a tautology. In this case
 
 ** Solution 6 **
 
+(a)
+
+TEXT: This is a true proposition: whatever the value of x, the expression x^2 - x + 1 denotes a natural number. If we choose y to be this natural number, we will find that p is true.
+
+(b)
+
+TEXT: This is a false proposition. We cannot choose a large enough value for y such that p will hold for any value of x.
+
+(c)
+
+TEXT: This is a false proposition. It is an implication whose antecedent part is true and whose consequent part is false.
+
+(d)
+
+TEXT: This is a true proposition. It is an implication whose antecedent part is false and whose consequent part is true.
+
 ** Solution 7 **
 
+(a)
+
+TEXT: We must define a predicate p that is false for at least one value of x, and is true for at least one other value. A suitable solution would be p <=> x > 1.
+
+(b)
+
+TEXT: With the above choice of p, we require only that q is sometimes false when p is true (for else the universal quantification would hold). A suitable solution would be q <=> x > 3.
+
 ** Solution 8 **
+
+(a)
+
+forall x : N | x >= z
 
 === Equality ===
 
