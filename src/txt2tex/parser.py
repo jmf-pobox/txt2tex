@@ -5,6 +5,7 @@ from __future__ import annotations
 from txt2tex.ast_nodes import (
     Abbreviation,
     AxDef,
+    BagLiteral,
     BinaryOp,
     CaseAnalysis,
     Declaration,
@@ -29,6 +30,7 @@ from txt2tex.ast_nodes import (
     RelationalImage,
     Schema,
     Section,
+    SequenceLiteral,
     SetComprehension,
     SetLiteral,
     Solution,
@@ -1441,8 +1443,24 @@ class Parser:
         if self._match(TokenType.LBRACE):
             return self._parse_set()
 
+        # Phase 12: Sequence literals ⟨a, b, c⟩
+        if self._match(TokenType.LANGLE):
+            return self._parse_sequence_literal()
+
+        # Phase 12: Bag literals [[a, b, c]]
+        # Check for two consecutive left brackets
+        if self._match(TokenType.LBRACKET):
+            # Peek ahead to see if next token is also LBRACKET
+            if self._peek_ahead(1).type == TokenType.LBRACKET:
+                return self._parse_bag_literal()
+            # Single bracket - not a bag literal, error out
+            raise ParserError(
+                "Unexpected '[' - did you mean '[[' for bag literal?",
+                self._current(),
+            )
+
         raise ParserError(
-            f"Expected identifier, number, '(', '{{', or lambda,"
+            f"Expected identifier, number, '(', '{{', '⟨', or lambda,"
             f" got {self._current().type.name}",
             self._current(),
         )
@@ -1468,6 +1486,88 @@ class Parser:
             args.append(self._parse_expr())
 
         return args
+
+    def _parse_sequence_literal(self) -> Expr:
+        """Parse sequence literal: ⟨⟩, ⟨a⟩, ⟨a, b, c⟩.
+
+        Phase 12: Sequence literal support.
+        """
+        langle_token = self._advance()  # Consume '⟨'
+
+        elements: list[Expr] = []
+
+        # Empty sequence: ⟨⟩
+        if self._match(TokenType.RANGLE):
+            self._advance()  # Consume '⟩'
+            return SequenceLiteral(
+                elements=elements,
+                line=langle_token.line,
+                column=langle_token.column,
+            )
+
+        # Parse comma-separated elements
+        elements.append(self._parse_expr())
+
+        while self._match(TokenType.COMMA):
+            self._advance()  # Consume ','
+            # Check for trailing comma: ⟨a, b,⟩
+            if self._match(TokenType.RANGLE):
+                break
+            elements.append(self._parse_expr())
+
+        # Expect closing angle bracket
+        if not self._match(TokenType.RANGLE):
+            raise ParserError("Expected '⟩' to close sequence literal", self._current())
+        self._advance()  # Consume '⟩'
+
+        return SequenceLiteral(
+            elements=elements,
+            line=langle_token.line,
+            column=langle_token.column,
+        )
+
+    def _parse_bag_literal(self) -> Expr:
+        """Parse bag literal: [[a]], [[a, b, c]].
+
+        Phase 12: Bag literal support.
+        Bag literals use double brackets: [[...]]
+        """
+        # Consume first '['
+        lbag_token = self._advance()
+        # Consume second '['
+        if not self._match(TokenType.LBRACKET):
+            raise ParserError("Expected second '[' for bag literal", self._current())
+        self._advance()
+
+        elements: list[Expr] = []
+
+        # Parse comma-separated elements
+        elements.append(self._parse_expr())
+
+        while self._match(TokenType.COMMA):
+            self._advance()  # Consume ','
+            # Check for closing brackets
+            if self._match(TokenType.RBRACKET):
+                break
+            elements.append(self._parse_expr())
+
+        # Expect first closing bracket
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError("Expected ']' to close bag literal", self._current())
+        self._advance()  # Consume first ']'
+
+        # Expect second closing bracket
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "Expected second ']' to close bag literal", self._current()
+            )
+        self._advance()  # Consume second ']'
+
+        return BagLiteral(
+            elements=elements,
+            line=lbag_token.line,
+            column=lbag_token.column,
+        )
 
     def _parse_given_type(self) -> GivenType:
         """Parse given type: given A, B, C"""
