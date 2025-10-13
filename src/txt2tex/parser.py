@@ -38,6 +38,7 @@ from txt2tex.ast_nodes import (
     Superscript,
     TruthTable,
     Tuple,
+    TupleProjection,
     UnaryOp,
 )
 from txt2tex.tokens import Token, TokenType
@@ -1262,6 +1263,33 @@ class Parser:
                 type_params=type_params,
                 line=lbracket_token.line,
                 column=lbracket_token.column,
+            )
+
+        # Phase 12: Check for tuple projection .1, .2, .3
+        # Only treat . as tuple projection if followed by a number
+        while self._match(TokenType.PERIOD):
+            # Peek ahead to see if it's followed by a number
+            next_token = self._peek_ahead(1)
+            if next_token.type != TokenType.NUMBER:
+                # Not tuple projection, leave PERIOD for other uses
+                break
+
+            period_token = self._advance()  # Consume '.'
+            number_token = self._advance()  # Consume number
+
+            # Convert number to integer index
+            index = int(number_token.value)
+            if index < 1:
+                raise ParserError(
+                    f"Tuple projection index must be >= 1, got {index}",
+                    number_token,
+                )
+
+            base = TupleProjection(
+                base=base,
+                index=index,
+                line=period_token.line,
+                column=period_token.column,
             )
 
         # Keep applying other postfix operators
