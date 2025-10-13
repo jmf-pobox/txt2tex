@@ -212,7 +212,13 @@ class Lexer:
             self._advance()
             return Token(TokenType.COMMA, ",", start_line, start_column)
 
-        # Period (for sentences in paragraphs)
+        # Range operator .. (Phase 13) - check before period alone
+        if char == "." and self._peek_char() == ".":
+            self._advance()
+            self._advance()
+            return Token(TokenType.RANGE, "..", start_line, start_column)
+
+        # Period (for sentences in paragraphs and tuple projection)
         if char == ".":
             self._advance()
             return Token(TokenType.PERIOD, ".", start_line, start_column)

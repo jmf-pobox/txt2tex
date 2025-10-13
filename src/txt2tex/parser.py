@@ -27,6 +27,7 @@ from txt2tex.ast_nodes import (
     ProofNode,
     ProofTree,
     Quantifier,
+    Range,
     RelationalImage,
     Schema,
     Section,
@@ -642,7 +643,7 @@ class Parser:
                 column=op_token.column,
             )
 
-        return self._parse_additive()
+        return self._parse_range()
 
     def _parse_additive(self) -> Expr:
         """Parse additive operators (+ and - and ⌢).
@@ -664,6 +665,27 @@ class Parser:
                 operator=op_token.value,
                 left=left,
                 right=right,
+                line=op_token.line,
+                column=op_token.column,
+            )
+
+        return left
+
+    def _parse_range(self) -> Expr:
+        """Parse range operator .. (Phase 13).
+
+        Creates integer ranges: m..n represents {m, m+1, m+2, ..., n}
+        Range has lower precedence than addition, so 1+2..3+4 means (1+2)..(3+4)
+        Examples: 1..10, 1993..current, x.2..x.3
+        """
+        left = self._parse_additive()
+
+        if self._match(TokenType.RANGE):
+            op_token = self._advance()
+            right = self._parse_additive()
+            return Range(
+                start=left,
+                end=right,
                 line=op_token.line,
                 column=op_token.column,
             )
@@ -752,8 +774,8 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Use _parse_postfix to allow generic instantiation like P[N]
-            domain = self._parse_postfix()
+            # Use _parse_intersect to allow ranges and generic instantiation
+            domain = self._parse_intersect()
 
         # Parse separator |
         if not self._match(TokenType.PIPE):
@@ -941,8 +963,8 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Use _parse_postfix to allow generic instantiation like P[N]
-            domain = self._parse_postfix()
+            # Use _parse_intersect to allow ranges and generic instantiation
+            domain = self._parse_intersect()
 
         # Parse separator |
         if not self._match(TokenType.PIPE):
@@ -1011,8 +1033,8 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Use _parse_postfix to allow generic instantiation like P[N]
-            domain = self._parse_postfix()
+            # Use _parse_intersect to allow ranges and generic instantiation
+            domain = self._parse_intersect()
 
         # Parse separator |
         if not self._match(TokenType.PIPE):

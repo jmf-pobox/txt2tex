@@ -259,6 +259,29 @@ class GenericInstantiation(ASTNode):
     type_params: list[Expr]  # Type parameters (at least one)
 
 
+# Range node (Phase 13)
+
+
+@dataclass(frozen=True)
+class Range(ASTNode):
+    """Range expression node (Phase 13).
+
+    Represents integer range expressions: m..n
+
+    Creates the set {m, m+1, m+2, ..., n} in Z notation.
+
+    Examples:
+    - 1..10 -> range(Number("1"), Number("10"))
+    - 1993..current -> range(Number("1993"), Identifier("current"))
+    - x.2..x.3 -> range(TupleProjection(...), TupleProjection(...))
+
+    LaTeX rendering: start \\upto end
+    """
+
+    start: Expr  # Start of range (inclusive)
+    end: Expr  # End of range (inclusive)
+
+
 # Sequence nodes (Phase 12)
 
 
@@ -338,6 +361,7 @@ Expr = (
     | Tuple
     | RelationalImage
     | GenericInstantiation
+    | Range
     | SequenceLiteral
     | TupleProjection
     | BagLiteral
