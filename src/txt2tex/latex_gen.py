@@ -8,6 +8,7 @@ from typing import ClassVar
 from txt2tex.ast_nodes import (
     Abbreviation,
     AxDef,
+    BagLiteral,
     BinaryOp,
     CaseAnalysis,
     Document,
@@ -30,6 +31,7 @@ from txt2tex.ast_nodes import (
     RelationalImage,
     Schema,
     Section,
+    SequenceLiteral,
     SetComprehension,
     SetLiteral,
     Solution,
@@ -37,6 +39,7 @@ from txt2tex.ast_nodes import (
     Superscript,
     TruthTable,
     Tuple,
+    TupleProjection,
     UnaryOp,
 )
 from txt2tex.lexer import Lexer
@@ -44,12 +47,14 @@ from txt2tex.parser import Parser
 
 
 class LaTeXGenerator:
-    """Generates LaTeX from AST for Phase 0-4 + Phase 10a-b + Phase 11a.
+    """Generates LaTeX from AST for Phase 0-4 + Phase 10a-b + Phase 11 + Phase 12.
 
     Phase 10a: Supports relation operators (<->, |->, <|, |>, comp, ;)
     and relation functions (dom, ran).
     Phase 10b: Supports extended relation operators (<<|, |>>, o9, inv, id, ~, +, *).
-    Phase 11a: Supports function type operators (->, +->, >->, >+>, -->>, +->>, >->>).
+    Phase 11: Supports function types, lambda, tuples, relational images, generics.
+    Phase 12: Supports sequences (⟨⟩, head, tail, last, front, rev, ⌢, .1),
+    bags ([[x]]), and tuple projection.
     """
 
     # Operator mappings
@@ -97,6 +102,8 @@ class LaTeXGenerator:
         "+": r"+",  # Addition (also postfix in relational context)
         "*": r"*",  # Multiplication (also postfix in relational context)
         "mod": r"\bmod",  # Modulo
+        # Sequence operators (Phase 12)
+        "⌢": r"\cat",  # Sequence concatenation
     }
 
     UNARY_OPS: ClassVar[dict[str, str]] = {
@@ -111,6 +118,12 @@ class LaTeXGenerator:
         # Set functions (Phase 11.5)
         "P": r"\power",  # Power set
         "P1": r"\power_1",  # Non-empty power set
+        # Sequence operators (Phase 12)
+        "head": r"\head",  # First element
+        "tail": r"\tail",  # All but first
+        "last": r"\last",  # Last element
+        "front": r"\front",  # All but last
+        "rev": r"\rev",  # Reverse sequence
         # Postfix operators (Phase 10b) - special handling needed
         "~": r"^{-1}",  # Relational inverse (superscript -1)
         "+": r"^+",  # Transitive closure (superscript +)
@@ -270,6 +283,12 @@ class LaTeXGenerator:
             return self._generate_relational_image(expr)
         if isinstance(expr, GenericInstantiation):
             return self._generate_generic_instantiation(expr)
+        if isinstance(expr, SequenceLiteral):
+            return self._generate_sequence_literal(expr)
+        if isinstance(expr, TupleProjection):
+            return self._generate_tuple_projection(expr)
+        if isinstance(expr, BagLiteral):
+            return self._generate_bag_literal(expr)
 
         raise TypeError(f"Unknown expression type: {type(expr)}")
 
@@ -626,6 +645,53 @@ class LaTeXGenerator:
         # For now, use standard bracket notation for all types
         # Future enhancement: Could use special notation like \emptyset~N
         return f"{base_latex}[{type_params_latex}]"
+
+    def _generate_sequence_literal(self, node: SequenceLiteral) -> str:
+        """Generate LaTeX for sequence literal (Phase 12).
+
+        Examples:
+        - ⟨⟩ -> \\langle \\rangle (empty sequence)
+        - ⟨a⟩ -> \\langle a \\rangle
+        - ⟨1, 2, 3⟩ -> \\langle 1, 2, 3 \\rangle
+        """
+        if not node.elements:
+            # Empty sequence
+            return r"\langle \rangle"
+
+        # Generate comma-separated elements
+        elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
+        return f"\\langle {elements_latex} \\rangle"
+
+    def _generate_tuple_projection(self, node: TupleProjection) -> str:
+        """Generate LaTeX for tuple projection (Phase 12).
+
+        Examples:
+        - x.1 -> x.1
+        - (a, b).2 -> (a, b).2
+        - f(x).3 -> f(x).3
+
+        Tuple projection is rendered as-is (stays the same in LaTeX).
+        """
+        base_latex = self.generate_expr(node.base)
+
+        # Add parentheses if base is a binary operator
+        if isinstance(node.base, BinaryOp):
+            base_latex = f"({base_latex})"
+
+        return f"{base_latex}.{node.index}"
+
+    def _generate_bag_literal(self, node: BagLiteral) -> str:
+        """Generate LaTeX for bag literal (Phase 12).
+
+        Examples:
+        - [[x]] -> \\lbag x \\rbag
+        - [[1, 2, 2, 3]] -> \\lbag 1, 2, 2, 3 \\rbag
+
+        Bags are multisets where elements can appear multiple times.
+        """
+        # Generate comma-separated elements
+        elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
+        return f"\\lbag {elements_latex} \\rbag"
 
     def _generate_section(self, node: Section) -> list[str]:
         """Generate LaTeX for section."""
