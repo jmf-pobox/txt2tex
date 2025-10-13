@@ -1019,15 +1019,19 @@ class LaTeXGenerator:
         """Generate LaTeX for schema definition.
 
         Phase 9 enhancement: Supports optional generic parameters.
+        Phase 13 enhancement: Supports anonymous schemas (name=None).
         """
         lines: list[str] = []
+
+        # Determine schema name (empty string for anonymous)
+        schema_name = node.name if node.name is not None else ""
 
         # Add generic parameters if present
         if node.generic_params:
             params_str = ", ".join(node.generic_params)
-            lines.append(f"\\begin{{schema}}{{{node.name}}}[{params_str}]")
+            lines.append(f"\\begin{{schema}}{{{schema_name}}}[{params_str}]")
         else:
-            lines.append(r"\begin{schema}{" + node.name + "}")
+            lines.append(r"\begin{schema}{" + schema_name + "}")
 
         # Generate declarations
         for decl in node.declarations:
