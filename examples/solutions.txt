@@ -146,15 +146,128 @@ TEXT: (b) (p or q) <=> ((not p and not q) or q) is not a tautology. In this case
 
 ** Solution 13 **
 
+PROOF:
+  (p and (p => q)) => (p and q) [=> intro from 1]
+    [1] p and (p => q) [assumption]
+    :: p and q [and intro]
+      :: p [and elim from 1]
+        [1] p and (p => q) [from above]
+      :: q [=> elim]
+        :: p => q [and elim from 1]
+          [1] p and (p => q) [from above]
+        :: p [and elim from 1]
+          [1] p and (p => q) [from above]
+
 ** Solution 14 **
+
+TEXT: In one direction:
+
+PROOF:
+  ((p and q) <=> p) => (p => q) [=> intro from 1]
+    [1] (p and q) <=> p [assumption]
+    :: p => q [=> intro from 2]
+      [2] p [assumption]
+      :: q [and elim from 3]
+        :: p and q [=> elim from 1 and 2]
+          [3] p and q [derived]
+
+TEXT: and the other:
+
+PROOF:
+  (p => q) => ((p and q) <=> p) [=> intro from 1]
+    [1] p => q [assumption]
+    :: (p and q) <=> p [<=> intro]
+      :: (p and q) => p [=> intro from 2]
+        [2] p and q [assumption]
+        :: p [and elim from 2]
+      :: p => (p and q) [=> intro from 3]
+        [3] p [assumption]
+        :: p and q [and intro from 1 and 3]
+
+TEXT: We can then combine these two proofs with <=> intro.
 
 ** Solution 15 **
 
+PROOF:
+  ((p => q) and not q) => not p [=> intro from 1]
+    [1] (p => q) and not q [assumption]
+    :: not p [false elim from 2]
+      [2] p [assumption]
+      :: false [false intro]
+        :: q [=> elim]
+          :: p => q [and elim from 1]
+          :: p [from 2]
+        :: not q [and elim from 1]
+
 ** Solution 16 **
+
+TEXT: In one direction:
+
+PROOF:
+  (p and (q or r)) => ((p and q) or (p and r)) [=> intro from 1]
+    [1] p and (q or r) [assumption]
+    :: (p and q) or (p and r) [or elim from 2]
+      [2] q or r [from 1]
+      case q:
+        :: p and q [and intro]
+          :: p [and elim from 1]
+          :: q [case assumption]
+        :: (p and q) or (p and r) [or intro]
+      case r:
+        :: p and r [and intro]
+          :: p [and elim from 1]
+          :: r [case assumption]
+        :: (p and q) or (p and r) [or intro]
+
+TEXT: In the other:
+
+PROOF:
+  ((p and q) or (p and r)) => (p and (q or r)) [=> intro from 3]
+    [3] (p and q) or (p and r) [assumption]
+    :: p and (q or r) [or elim from 4]
+      [4] case1 or case2 [from 3]
+      case p and q:
+        :: p [and elim]
+        :: q or r [or intro]
+        :: p and (q or r) [and intro]
+      case p and r:
+        :: p [and elim]
+        :: q or r [or intro]
+        :: p and (q or r) [and intro]
 
 ** Solution 17 **
 
+TEXT: In one direction:
+
+PROOF:
+  (p or (q and r)) => ((p or q) and (p or r)) [=> intro from 3]
+    [3] p or (q and r) [assumption]
+    :: (p or q) and (p or r) [or elim and and intro]
+
+TEXT: and the other:
+
+PROOF:
+  ((p or q) and (p or r)) => (p or (q and r)) [=> intro from 1]
+    [1] (p or q) and (p or r) [assumption]
+    :: p or (q and r) [or elim from 2 and 3]
+
 ** Solution 18 **
+
+TEXT: In one direction:
+
+PROOF:
+  (p => q) => (not p or q) [=> intro from 1]
+    [1] p => q [assumption]
+    :: not p or q [or elim from excluded middle]
+
+TEXT: and the other:
+
+PROOF:
+  (not p or q) => (p => q) [=> intro from 3]
+    [3] not p or q [assumption]
+    :: p => q [=> intro from 4]
+      [4] p [assumption]
+      :: q [or elim and false elim from 3]
 
 === Sets and types ===
 
