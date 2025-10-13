@@ -1367,6 +1367,7 @@ class Parser:
         # Phase 10a-b: Prefix relation functions (dom, ran, inv, id)
         # Phase 11.5: Prefix set functions (P, P1)
         # Phase 11.9: Check for generic instantiation P[X] before treating as prefix
+        # Phase 12: Prefix sequence operators (head, tail, last, front, rev)
         if self._match(
             TokenType.DOM,
             TokenType.RAN,
@@ -1374,6 +1375,11 @@ class Parser:
             TokenType.ID,
             TokenType.POWER,
             TokenType.POWER1,
+            TokenType.HEAD,
+            TokenType.TAIL,
+            TokenType.LAST,
+            TokenType.FRONT,
+            TokenType.REV,
         ):
             op_token = self._advance()
 
