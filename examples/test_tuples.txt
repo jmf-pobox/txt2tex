@@ -1,0 +1,18 @@
+=== Phase 11.6: Tuple Expressions ===
+
+** Test Cases **
+
+(a) Simple tuple
+(1, 2)
+
+(b) Tuple with identifiers
+(x, y, z)
+
+(c) Set comprehension with tuple expression
+{ n : N | n <= 4 . (n, n^2) }
+
+(d) Tuple in set membership
+(a, b) in A cross B
+
+(e) Nested tuples
+((a, b), (c, d))

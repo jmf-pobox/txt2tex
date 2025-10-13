@@ -126,6 +126,18 @@ TEXT: (b) (p or q) <=> ((not p and not q) or q) is not a tautology. In this case
 
 ** Solution 5 **
 
+(a)
+
+exists d : Dog | gentle(d) and well_trained(d)
+
+(b)
+
+forall d : Dog | neat(d) and well_trained(d) => attractive(d)
+
+(c)
+
+TEXT: (Requires nested quantifier in implication - parser limitation)
+
 ** Solution 6 **
 
 (a)
@@ -175,9 +187,51 @@ exists x : N | (x = 1 and x > y) or (x = 2 and x > z)
 
 ** Solution 10 **
 
+TEXT: As discussed, the quantifier exists1 can help give rise to a 'test' or 'precondition' to ensure that an application of mu will work.
+
+TEXT: So, as a simple example, as the proposition
+
+exists1 n : N | (forall m : N | n <= m)
+
+TEXT: is equivalent to true, we can be certain that the statement
+
+(mu n : N | (forall m : N | n <= m))
+
+TEXT: will return a result (which happens to be 0).
+
 ** Solution 11 **
 
+(a)
+
+TEXT: (mu a : N | a = a) = 0 is a provable statement, since 0 is the only natural number with the specified property.
+
+(b)
+
+TEXT: (mu b : N | b = b) = 1 is not provable. The specified property is true of both 0 and 1, and thus the value of the mu-expression is undefined.
+
+(c)
+
+TEXT: (mu c : N | c > c) = (mu c : N | c > c) is a provable statement. Neither expression is properly defined, but we may conclude that they are equal; there is little else that we can prove about them.
+
+(d)
+
+TEXT: (mu d : N | d = d) = 1 is not a provable statement. We cannot confirm that 1 is the only natural number with the specified property; we do not know what value is taken by undefined operations.
+
 ** Solution 12 **
+
+TEXT: (Requires mu-operator with expression part - not yet implemented)
+
+(a)
+
+TEXT: (mu m : Mountain | (forall n : Mountain | height(n) <= height(m)) . height(m))
+
+(b)
+
+TEXT: (mu c : Chapter | (exists1 d : Chapter | length(d) > length(c)) . length(c))
+
+(c)
+
+TEXT: Assuming the existence of a suitable function, max: (mu n : N | n = max({ m : N | 8 * m < 100 . 8 * m }) . 100 - n)
 
 === Deductive proofs ===
 
@@ -310,11 +364,77 @@ PROOF:
 
 ** Solution 19 **
 
+(a)
+
+TEXT: 1 in {4, 3, 2, 1} is true.
+
+(b)
+
+TEXT: {1} in {1, 2, 3, 4} is undefined.
+
+(c)
+
+TEXT: {1} in {{1}, {2}, {3}, {4}} is true.
+
+(d)
+
+TEXT: The empty set in {1, 2, 3, 4} is undefined.
+
 ** Solution 20 **
+
+(a)
+
+{1} cross {2, 3}
+
+TEXT: is the set {(1, 2), (1, 3)}
+
+(b)
+
+TEXT: The empty set cross {2, 3} is the empty set
+
+(c)
+
+(P emptyset) cross {1}
+
+TEXT: is the set {(emptyset, 1)}
+
+(d)
+
+TEXT: {(1, 2)} cross {3, 4} is the set {((1, 2), 3), ((1, 2), 4)}
 
 ** Solution 21 **
 
+TEXT: There are various ways of describing these sets via set comprehensions. Examples are given below.
+
+(a)
+
+{ z : Z | 0 <= z and z <= 100 }
+
+(b)
+
+{ z : Z | z = 10 }
+
+(c)
+
+{ z : Z | z mod 2 = 0 or z mod 3 = 0 or z mod 5 = 0 }
+
 ** Solution 22 **
+
+(a)
+
+{ n : N | n <= 4 . n^2 }
+
+(b)
+
+{ n : N | n <= 4 . (n, n^2) }
+
+(c)
+
+TEXT: { n : P {0, 1} } (set comprehension notation requires clarification)
+
+(d)
+
+TEXT: { n : P {0, 1} | true . (n, # n) } (alternative: map over powerset)
 
 ** Solution 23 **
 
@@ -334,21 +454,141 @@ x in a union a
 
 ** Solution 24 **
 
+(a)
+
+TEXT: The set of all pairs of integers is Z cross Z. To give it a name, we could write:
+
+Pairs == Z cross Z
+
+(b)
+
+TEXT: The set of all integer pairs in which each element is strictly greater than zero could be defined by:
+
+StrictlyPositivePairs == { m, n : Z | m > 0 and n > 0 . (m, n) }
+
+(c)
+
+TEXT: It is intuitive to use a singular noun for the name of a basic type; we define the set of all people by writing:
+
+given Person
+
+(d)
+
+TEXT: The set of all couples could be defined by:
+
+Couples == { s : P Person | # s = 2 }
+
 ** Solution 25 **
 
+TEXT: (Requires generic set notation and Cartesian product)
+
 ** Solution 26 **
+
+TEXT: (Requires generic parameters and relation type notation)
 
 === Relations ===
 
 ** Solution 27 **
 
+(a)
+
+TEXT: The power set of {(0,0), (0,1), (1,0), (1,1)} is:
+
+TEXT: { emptyset, {(0, 0)}, {(0, 1)}, {(1, 0)}, {(1, 1)}, {(1, 0), (1, 1)}, {(0, 0), (0, 1)}, {(0, 1), (1, 1)}, {(0, 1), (1, 0)}, {(0, 0), (1, 1)}, {(0, 0), (1, 0)}, {(0, 0), (1, 0), (1, 1)}, {(0, 0), (0, 1), (1, 1)}, {(0, 0), (0, 1), (1, 0)}, {(0, 1), (1, 0), (1, 1)}, {(0, 0), (0, 1), (1, 0), (1, 1)} }
+
+(b)
+
+TEXT: { emptyset, {(0, 0)}, {(0, 1)}, {(0, 0), (0, 1)} }
+
+(c)
+
+TEXT: { emptyset }
+
+(d)
+
+TEXT: { emptyset }
+
 ** Solution 28 **
+
+(a)
+
+TEXT: dom R = {0, 1, 2}
+
+(b)
+
+TEXT: ran R = {1, 2, 3}
+
+(c)
+
+TEXT: {1, 2} <| R = {1 |-> 2, 1 |-> 3, 2 |-> 3}
 
 ** Solution 29 **
 
+(a)
+
+{2 |-> 4, 3 |-> 3, 3 |-> 4, 4 |-> 2}
+
+(b)
+
+{1 |-> 3, 2 |-> 2, 2 |-> 3, 3 |-> 1}
+
+(c)
+
+{1 |-> 1, 2 |-> 2, 2 |-> 3, 3 |-> 2, 3 |-> 3, 4 |-> 4}
+
+(d)
+
+{1 |-> 4, 2 |-> 2, 2 |-> 3, 3 |-> 2, 3 |-> 3, 4 |-> 1}
+
 ** Solution 30 **
 
+(a)
+
+parentOf == childOf~
+
+TEXT: This is a good example of how there are many different ways of writing the same thing. An alternative abbreviation is:
+
+parentOf == {x, y : Person | x |-> y in childOf . y |-> x}
+
+TEXT: Or, via an axiomatic definition:
+
+axdef
+  parentOf : Person <-> Person
+where
+  parentOf = childOf~
+end
+
+(b)
+
+TEXT: siblingOf == (childOf o9 parentOf) \ id
+
+(c)
+
+cousinOf == childOf o9 siblingOf o9 parentOf
+
+(d)
+
+ancestorOf == parentOf+
+
 ** Solution 31 **
+
+TEXT: (Requires compound identifiers with operators - R+, R*)
+
+(a)
+
+R == {a, b : N | b = a or b = a}
+
+(b)
+
+S == {a, b : N | b = a or b = a}
+
+(c)
+
+TEXT: R+ == {a, b : N | b > a}
+
+(d)
+
+TEXT: R* == {a, b : N | b >= a}
 
 ** Solution 32 **
 
@@ -375,11 +615,85 @@ x |-> y in (R union S) |> C
 
 ** Solution 33 **
 
+TEXT: The set of 9 functions:
+
+TEXT: { emptyset, {(0, 0)}, {(0, 1)}, {(1, 1)}, {(1, 0)}, {(0, 0), (1, 1)}, {(0, 1), (1, 1)}, {(1, 0), (0, 0)}, {(0, 1), (1, 0)} }
+
+(a)
+
+TEXT: The set of total functions:
+
+TEXT: { {(0, 0), (1, 1)}, {(0, 1), (1, 1)}, {(1, 0), (0, 0)}, {(0, 1), (1, 0)} }
+
+(b)
+
+TEXT: The set of functions which are neither injective nor surjective:
+
+TEXT: { {(0, 1), (1, 1)}, {(0, 0), (1, 0)} }
+
+(c)
+
+TEXT: The set of functions which are injective but not surjective:
+
+TEXT: { emptyset, {(0, 0)}, {(0, 1)}, {(1, 0)}, {(1, 1)} }
+
+(d)
+
+TEXT: There are no functions (of this type) which are surjective but not injective.
+
+(e)
+
+TEXT: The set of bijective functions:
+
+TEXT: { {(0, 0), (1, 1)}, {(0, 1), (1, 0)} }
+
 ** Solution 34 **
+
+(a)
+
+{1 |-> a, 2 |-> b, 3 |-> c, 4 |-> b}
+
+(b)
+
+{1 |-> c, 2 |-> b, 3 |-> c, 4 |-> d}
+
+(c)
+
+{1 |-> c, 2 |-> b, 3 |-> c, 4 |-> b}
+
+(d)
+
+{1 |-> c, 2 |-> b, 3 |-> c, 4 |-> b}
 
 ** Solution 35 **
 
+TEXT: (Requires power set notation P and relational image)
+
+(a)
+
+TEXT: axdef
+TEXT:   children : Person -> P Person
+TEXT: where
+TEXT:   children = {p : Person . p |-> parentOf(| {p} |)}
+TEXT: end
+
+(b)
+
+TEXT: axdef
+TEXT:   number_of_grandchildren : Person -> N
+TEXT: where
+TEXT:   number_of_grandchildren = {p : Person . p |-> # (parentOf o9 parentOf)(| {p} |)}
+TEXT: end
+
 ** Solution 36 **
+
+TEXT: (Requires power set, function types, and ran keyword)
+
+TEXT: axdef
+TEXT:   number_of_drivers : (Drivers <-> Cars) -> (Cars -> N)
+TEXT: where
+TEXT:   forall r : Drivers <-> Cars | number_of_drivers(r) = {c : ran r . c |-> #{d : Drivers | d |-> c in r}}
+TEXT: end
 
 === Sequences ===
 
