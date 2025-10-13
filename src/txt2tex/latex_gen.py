@@ -28,6 +28,7 @@ from txt2tex.ast_nodes import (
     ProofNode,
     ProofTree,
     Quantifier,
+    Range,
     RelationalImage,
     Schema,
     Section,
@@ -283,6 +284,8 @@ class LaTeXGenerator:
             return self._generate_relational_image(expr)
         if isinstance(expr, GenericInstantiation):
             return self._generate_generic_instantiation(expr)
+        if isinstance(expr, Range):
+            return self._generate_range(expr)
         if isinstance(expr, SequenceLiteral):
             return self._generate_sequence_literal(expr)
         if isinstance(expr, TupleProjection):
@@ -645,6 +648,22 @@ class LaTeXGenerator:
         # For now, use standard bracket notation for all types
         # Future enhancement: Could use special notation like \emptyset~N
         return f"{base_latex}[{type_params_latex}]"
+
+    def _generate_range(self, node: Range) -> str:
+        """Generate LaTeX for range expression (Phase 13).
+
+        Represents integer range expressions: m..n represents {m, m+1, ..., n}
+
+        Examples:
+        - 1..10 -> 1 \\upto 10
+        - 1993..current -> 1993 \\upto current
+        - x.2..x.3 -> x.2 \\upto x.3
+
+        LaTeX rendering uses \\upto command.
+        """
+        start_latex = self.generate_expr(node.start)
+        end_latex = self.generate_expr(node.end)
+        return f"{start_latex} \\upto {end_latex}"
 
     def _generate_sequence_literal(self, node: SequenceLiteral) -> str:
         """Generate LaTeX for sequence literal (Phase 12).

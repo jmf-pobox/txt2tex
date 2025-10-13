@@ -91,6 +91,9 @@ class TokenType(Enum):
     EQUALS = auto()  # =
     NOT_EQUAL = auto()  # != or ≠
 
+    # Range operator (Phase 13)
+    RANGE = auto()  # .. (e.g., 1..10, 1993..current)
+
     # Z notation operators (Phase 4)
     FREE_TYPE = auto()  # ::=
     ABBREV = auto()  # ==
