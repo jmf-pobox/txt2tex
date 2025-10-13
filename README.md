@@ -2,12 +2,12 @@
 
 Convert whiteboard-style mathematical notation to high-quality LaTeX for formal methods and Z notation.
 
-## Current Status: Phase 9 ✅
+## Current Status: Phase 10b ✅
 
-**Production Ready!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, and **generic parameters**.
+**Production Ready!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, and **extended relation operators**.
 
-- 🎯 9 phases complete (Phase 0-9)
-- ✅ 205 tests passing
+- 🎯 11 phases complete (Phase 0-9, 10a-b)
+- ✅ 287 tests passing
 - 📚 10 example files demonstrating all features
 - 🔧 Makefile automation for building PDFs
 
@@ -241,6 +241,89 @@ forall x : N | x in { y : N | y > 0 }
 
 ---
 
+### Relation Operators (Phase 10a-b)
+
+#### Basic Relations (Phase 10a)
+
+**Relation Type:**
+```
+R <-> S                      →  R ↔ S  (relation from X to Y)
+```
+
+**Maplet Constructor:**
+```
+x |-> y                      →  x ↦ y  (ordered pair)
+```
+
+**Domain and Range Restriction:**
+```
+S <| R                       →  S ◁ R  (domain restriction)
+R |> T                       →  R ▷ T  (range restriction)
+```
+
+**Composition:**
+```
+R ; S                        →  R ; S  (relational composition)
+R comp S                     →  R ∘ S  (alternative composition)
+```
+
+**Domain and Range Functions:**
+```
+dom R                        →  dom R  (domain of relation)
+ran R                        →  ran R  (range of relation)
+```
+
+#### Extended Relations (Phase 10b)
+
+**Domain and Range Subtraction:**
+```
+S <<| R                      →  S ⩤ R  (domain subtraction)
+R |>> T                      →  R ⩥ T  (range subtraction)
+```
+
+**Composition Operators:**
+```
+R o9 S                       →  R ∘ S  (forward/backward composition)
+```
+
+**Inverse and Identity:**
+```
+inv R                        →  inv R  (inverse function)
+id X                         →  id X   (identity relation)
+```
+
+**Postfix Operators:**
+```
+R~                           →  R⁻¹    (relational inverse)
+R+                           →  R⁺     (transitive closure)
+R*                           →  R*     (reflexive-transitive closure)
+```
+
+#### Examples
+
+**Basic relation expressions:**
+```
+x |-> y in R                 →  (x ↦ y) ∈ R
+dom (S <| R)                 →  dom (S ◁ R)
+R ; S ; T                    →  R ; S ; T  (left-associative)
+```
+
+**Extended operations:**
+```
+(R~)+                        →  (R⁻¹)⁺  (transitive closure of inverse)
+inv (S <<| R)                →  inv (S ⩤ R)
+(R o9 S)*                    →  (R ∘ S)*  (reflexive-transitive closure)
+```
+
+**Complex expressions:**
+```
+dom ((S <| R) |> T)          →  dom (S ◁ R ▷ T)
+(id X) ; R                   →  (id X) ; R
+R~ = inv R                   →  R⁻¹ = inv R
+```
+
+---
+
 ### Z Notation (Phase 4)
 
 #### Given Types
@@ -429,6 +512,24 @@ PROOF:
 - Multiple type parameters: `[X, Y, Z]`
 - Backwards compatible with non-generic definitions
 
+### ✅ Phase 10a: Basic Relation Operators
+- Relation type: `<->` (X ↔ Y)
+- Maplet constructor: `|->` (x ↦ y)
+- Domain restriction: `<|` (S ◁ R)
+- Range restriction: `|>` (R ▷ T)
+- Composition: `;` and `comp` (R ; S, R ∘ S)
+- Domain and range functions: `dom`, `ran`
+
+### ✅ Phase 10b: Extended Relation Operators
+- Domain subtraction: `<<|` (S ⩤ R)
+- Range subtraction: `|>>` (R ⩥ T)
+- Composition: `o9` (R ∘ S)
+- Inverse function: `inv` (inv R)
+- Identity relation: `id` (id X)
+- Postfix inverse: `~` (R⁻¹)
+- Transitive closure: `+` (R⁺)
+- Reflexive-transitive closure: `*` (R*)
+
 ---
 
 ## Command-Line Reference
@@ -540,7 +641,7 @@ All code must pass:
 - ✅ MyPy strict mode (zero errors)
 - ✅ Ruff linting (zero violations)
 - ✅ Ruff formatting
-- ✅ All tests passing (205 tests)
+- ✅ All tests passing (287 tests)
 - ✅ Test coverage maintained
 
 ### Running Tests
@@ -576,7 +677,9 @@ sem/
 │   ├── ...
 │   ├── test_phase8.py        # Phase 8 tests
 │   ├── test_phase9.py        # Phase 9 tests
-│   └── test_inline_math.py   # Inline math tests (205 total)
+│   ├── test_phase10a.py      # Phase 10a tests
+│   ├── test_phase10b.py      # Phase 10b tests
+│   └── test_inline_math.py   # Inline math tests (287 total)
 ├── examples/                 # Example files
 │   ├── Makefile              # Build automation
 │   ├── phase0.txt            # Through phase9.txt
@@ -732,7 +835,7 @@ Contributions are welcome! Please:
 
 ## Roadmap
 
-### Completed (Phase 0-9)
+### Completed (Phase 0-10b)
 ✅ Propositional logic
 ✅ Document structure
 ✅ Truth tables
@@ -746,14 +849,10 @@ Contributions are welcome! Please:
 ✅ Set comprehension
 ✅ Generic parameters (polymorphic Z notation)
 ✅ Inline math in TEXT paragraphs
+✅ **Phase 10a: Basic relation operators** (`<->`, `|->`, `<|`, `|>`, `dom`, `ran`, `;`, `comp`)
+✅ **Phase 10b: Extended relations** (`<<|`, `|>>`, `o9`, `inv`, `id`, `~`, `+`, `*`)
 
-### Future Phases (10-14)
-
-**Phase 10: Relations**
-- Relation operators: `<->`, `|->`, `dom`, `ran`
-- Domain/range restriction: `<|`, `|>`
-- Composition: `comp`, `o9`
-- Inverse: `~`, `+`, `*`
+### Future Phases (11-14)
 
 **Phase 11: Functions**
 - Function types: `->`, `+->`, `>->`, `-->>`, `>->>`
@@ -802,6 +901,6 @@ For bugs, feature requests, or questions, please open an issue on GitHub.
 
 ---
 
-**Last Updated**: Phase 9 Complete (Generic Parameters)
-**Version**: 0.9.0
-**Status**: Production Ready for Phases 0-9
+**Last Updated**: Phase 10b Complete (Extended Relation Operators)
+**Version**: 0.10.2
+**Status**: Production Ready for Phases 0-10b
