@@ -56,17 +56,20 @@ class Quantifier(ASTNode):
 
     Phase 6 enhancement: Supports multiple variables with shared domain.
     Phase 7 enhancement: Supports mu-operator (definite description).
+    Phase 11.5 enhancement: Supports mu with expression part (mu x : X | P . E).
     Examples:
-    - forall x : N | pred  -> variables=["x"], domain=N
-    - forall x, y : N | pred -> variables=["x", "y"], domain=N
-    - exists1 x : N | pred -> quantifier="exists1", variables=["x"]
-    - mu x : N | pred -> quantifier="mu", variables=["x"]
+    - forall x : N | pred  -> variables=["x"], domain=N, body=pred
+    - forall x, y : N | pred -> variables=["x", "y"], domain=N, body=pred
+    - exists1 x : N | pred -> quantifier="exists1", variables=["x"], body=pred
+    - mu x : N | pred -> quantifier="mu", variables=["x"], body=pred, expression=None
+    - mu x : N | pred . expr -> quantifier="mu", body=pred, expression=expr
     """
 
     quantifier: str  # "forall", "exists", "exists1", or "mu"
     variables: list[str]  # One or more variables (e.g., ["x", "y"])
     domain: Expr | None  # Optional domain shared by all variables (e.g., N, Z)
-    body: Expr
+    body: Expr  # Predicate/body expression
+    expression: Expr | None = None  # Optional expression part (mu only)
 
 
 @dataclass(frozen=True)
@@ -106,6 +109,21 @@ class SetComprehension(ASTNode):
     domain: Expr | None  # Optional domain (e.g., N, Z, P X)
     predicate: Expr  # The condition/predicate
     expression: Expr | None  # Optional expression (if present, set by expression)
+
+
+@dataclass(frozen=True)
+class SetLiteral(ASTNode):
+    """Set literal node (Phase 11.5).
+
+    Represents explicit set literals: {1, 2, 3}, {a, b, c}, {}
+
+    Examples:
+    - {1, 2, 3} -> elements=[Number("1"), Number("2"), Number("3")]
+    - {a, b} -> elements=[Identifier("a"), Identifier("b")]
+    - {} -> elements=[]  (empty set)
+    """
+
+    elements: list[Expr]  # List of elements in the set (can be empty)
 
 
 @dataclass(frozen=True)
@@ -173,6 +191,51 @@ class Lambda(ASTNode):
     body: Expr  # Lambda body expression
 
 
+@dataclass(frozen=True)
+class Tuple(ASTNode):
+    """Tuple expression node (Phase 11.6).
+
+    Represents tuple expressions: (a, b), (x, y, z)
+
+    Tuples are multi-element ordered collections, commonly used in:
+    - Cartesian products: (1, 2), (a, b, c)
+    - Set comprehensions: { x : N | x > 0 . (x, x^2) }
+    - Relations: (person, age)
+
+    Examples:
+    - (1, 2) -> elements=[Number("1"), Number("2")]
+    - (x, y, z) -> elements=[Identifier("x"), Identifier("y"), Identifier("z")]
+    - (a, b+1, f(c)) -> elements=[Identifier("a"), BinaryOp("+", ...), FunctionApp(...)]
+
+    Note: Single-element tuples like (x) are parsed as parenthesized expressions,
+    not tuples. Tuples require at least 2 elements.
+    """
+
+    elements: list[Expr]  # List of tuple elements (minimum 2)
+
+
+@dataclass(frozen=True)
+class RelationalImage(ASTNode):
+    r"""Relational image node (Phase 11.8).
+
+    Represents relational image: R(| S |)
+
+    The relational image R(| S |) gives the image of set S under relation R.
+    For a relation R : X <-> Y and set S : P X, R(| S |) is the set
+    {y : Y | exists x : S | x |-> y in R}
+
+    Examples:
+    - R(| {1, 2} |) -> relation=R, set={1, 2}
+    - parentOf(| {john} |) -> relation=parentOf, set={john}
+    - (R o9 S)(| A |) -> relation=(R o9 S), set=A
+
+    LaTeX rendering: R(\limg S \rimg)
+    """
+
+    relation: Expr  # The relation R
+    set: Expr  # The set S
+
+
 # Type alias for all expression types
 Expr = (
     BinaryOp
@@ -183,9 +246,12 @@ Expr = (
     | Subscript
     | Superscript
     | SetComprehension
+    | SetLiteral
     | FunctionApp
     | FunctionType
     | Lambda
+    | Tuple
+    | RelationalImage
 )
 
 
