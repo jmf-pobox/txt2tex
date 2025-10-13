@@ -873,6 +873,10 @@ class LaTeXGenerator:
                 if child.is_sibling and current_group:
                     # Add to current sibling group
                     current_group.append(child_latex)
+                elif child.is_assumption and current_group:
+                    # Assumptions should be laid out horizontally with siblings
+                    # for proper spacing (e.g., in => elim with p => r & p)
+                    current_group.append(child_latex)
                 else:
                     # Start new group
                     if current_group:
