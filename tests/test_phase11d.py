@@ -1,8 +1,7 @@
 """Tests for Phase 11d: Lambda Expressions."""
 
-import pytest
-
 from txt2tex.ast_nodes import (
+    AxDef,
     BinaryOp,
     Document,
     Expr,
@@ -208,11 +207,40 @@ end"""
         assert doc is not None
 
     def test_multiple_lambdas(self):
-        """Test lambda definition in axdef.
-
-        NOTE: Skipped due to pre-existing axdef parsing issue with function types.
-        """
-        pytest.skip("Pre-existing axdef parsing issue with function types")
+        """Test multiple lambda definitions in axdef with arithmetic."""
+        text = """axdef
+  f : N -> N
+  g : N -> N
+where
+  f = lambda x : N . x + 1
+  g = lambda y : N . y * 2
+end"""
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        doc = parser.parse()
+        assert isinstance(doc, Document)
+        # Verify that lambdas parsed correctly with arithmetic in body
+        assert len(doc.items) == 1
+        axdef = doc.items[0]
+        assert isinstance(axdef, AxDef)
+        assert len(axdef.predicates) == 2
+        # First predicate: f = lambda x : N . x + 1
+        pred1 = axdef.predicates[0]
+        assert isinstance(pred1, BinaryOp)
+        assert pred1.operator == "="
+        assert isinstance(pred1.right, Lambda)
+        # Body should be BinaryOp('+', x, 1), not UnaryOp
+        assert isinstance(pred1.right.body, BinaryOp)
+        assert pred1.right.body.operator == "+"
+        # Second predicate: g = lambda y : N . y * 2
+        pred2 = axdef.predicates[1]
+        assert isinstance(pred2, BinaryOp)
+        assert pred2.operator == "="
+        assert isinstance(pred2.right, Lambda)
+        # Body should be BinaryOp('*', y, 2), not UnaryOp
+        assert isinstance(pred2.right.body, BinaryOp)
+        assert pred2.right.body.operator == "*"
 
     def test_lambda_in_predicate(self):
         """Test lambda in a predicate."""
