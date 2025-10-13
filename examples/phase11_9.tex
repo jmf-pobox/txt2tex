@@ -1,0 +1,164 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Phase 11 . 9 : Generic Type Instantiation}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Basic Generic Instantiation}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$emptyset[N]$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$seq[N]$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$P[X]$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 2 : Complex Type Parameters}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$emptyset[N \cross N]$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$P[\power~X]$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$seq[N \cross N]$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 3 : Multiple Type Parameters}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$Type[A, B]$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$Container[X, Y, Z]$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 4 : Nested Generic Instantiation}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$Type[List[N]]$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$Container[seq[N]]$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 5 : Chained Generic Instantiation}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$Type[N][M]$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 6 : Generic Types in Expressions}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$x \in Type[N]$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$A \subseteq P[X]$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$emptyset[N] \cup \{x\}$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 7 : Generic Types in Set Comprehensions}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\{ s \colon P[N] \mid s = emptyset[N] \}$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{ x \colon seq[N] \mid \# x > 0 \}$
+
+\medskip
+
+\end{document}

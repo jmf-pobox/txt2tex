@@ -16,6 +16,7 @@ from txt2tex.ast_nodes import (
     FreeType,
     FunctionApp,
     FunctionType,
+    GenericInstantiation,
     GivenType,
     Identifier,
     Lambda,
@@ -117,6 +118,9 @@ class Parser:
         """Initialize parser with token list."""
         self.tokens = tokens
         self.pos = 0
+        # Track the end position of the last consumed token for whitespace detection
+        self.last_token_end_column = 0
+        self.last_token_line = 1
 
     def parse(self) -> Document | Expr:
         """
@@ -269,6 +273,9 @@ class Parser:
         token = self.tokens[self.pos]
         if not self._at_end():
             self.pos += 1
+        # Track the end position of this token for whitespace detection
+        self.last_token_end_column = token.column + len(token.value)
+        self.last_token_line = token.line
         return token
 
     def _match(self, *types: TokenType) -> bool:
@@ -719,7 +726,8 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            domain = self._parse_atom()
+            # Use _parse_postfix to allow generic instantiation like P[N]
+            domain = self._parse_postfix()
 
         # Parse separator |
         if not self._match(TokenType.PIPE):
@@ -907,8 +915,8 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Parse domain as atom (could be identifier like N, or more complex)
-            domain = self._parse_atom()
+            # Use _parse_postfix to allow generic instantiation like P[N]
+            domain = self._parse_postfix()
 
         # Parse separator |
         if not self._match(TokenType.PIPE):
@@ -977,8 +985,8 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Parse domain as atom (could be identifier like N, or more complex)
-            domain = self._parse_atom()
+            # Use _parse_postfix to allow generic instantiation like P[N]
+            domain = self._parse_postfix()
 
         # Parse separator |
         if not self._match(TokenType.PIPE):
@@ -1191,13 +1199,70 @@ class Parser:
         Phase 10b: ~ (inverse), + (transitive closure),
                    * (reflexive-transitive closure) - no operands
         Phase 11.8: (| ... |) (relational image) - takes set argument
+        Phase 11.9: [ ... ] (generic instantiation) - takes type parameters
 
         Disambiguation: + and * are postfix only if NOT followed by operand.
         If followed by operand, they're infix arithmetic operators.
         """
         base = self._parse_atom()
 
-        # Keep applying postfix operators while we see them
+        # Phase 11.9: Check for generic instantiation [...]
+        # Only treat [ as generic instantiation if:
+        # 1. Base is a type-like construct (Identifier or GenericInstantiation)
+        # 2. The '[' immediately follows the last consumed token (no whitespace)
+        # This prevents consuming '[' meant for justifications in equiv chains
+        while isinstance(base, (Identifier, GenericInstantiation)) and self._match(
+            TokenType.LBRACKET
+        ):
+            # Check if '[' immediately follows the last token (no whitespace)
+            # Use the tracked end position of the last consumed token
+            lbracket_col = self._current().column
+
+            # If on different lines or there's a gap,
+            # don't treat as generic instantiation
+            if (
+                self._current().line != self.last_token_line
+                or lbracket_col > self.last_token_end_column
+            ):
+                # There's whitespace - likely a justification, not generic
+                break
+
+            lbracket_token = self._advance()  # Consume '['
+
+            # Parse comma-separated type parameters
+            type_params: list[Expr] = []
+
+            # Parse first type parameter
+            if self._match(TokenType.RBRACKET):
+                raise ParserError(
+                    "Expected at least one type parameter in generic instantiation",
+                    self._current(),
+                )
+
+            type_params.append(self._parse_expr())
+
+            # Parse additional type parameters
+            while self._match(TokenType.COMMA):
+                self._advance()  # Consume ','
+                if self._match(TokenType.RBRACKET):
+                    # Trailing comma: Type[X,]
+                    break
+                type_params.append(self._parse_expr())
+
+            if not self._match(TokenType.RBRACKET):
+                raise ParserError(
+                    "Expected ']' after generic type parameters", self._current()
+                )
+            self._advance()  # Consume ']'
+
+            base = GenericInstantiation(
+                base=base,
+                type_params=type_params,
+                line=lbracket_token.line,
+                column=lbracket_token.column,
+            )
+
+        # Keep applying other postfix operators
         while self._match(
             TokenType.CARET,
             TokenType.UNDERSCORE,
@@ -1269,6 +1334,7 @@ class Parser:
         """
         # Phase 10a-b: Prefix relation functions (dom, ran, inv, id)
         # Phase 11.5: Prefix set functions (P, P1)
+        # Phase 11.9: Check for generic instantiation P[X] before treating as prefix
         if self._match(
             TokenType.DOM,
             TokenType.RAN,
@@ -1278,6 +1344,22 @@ class Parser:
             TokenType.POWER1,
         ):
             op_token = self._advance()
+
+            # Phase 11.9: Check if followed by '[' for generic instantiation
+            # If so, return as identifier-like node and let postfix handle it
+            if self._match(TokenType.LBRACKET):
+                # This is generic instantiation, not prefix operator
+                # Return as Identifier and let _parse_postfix handle the [...]
+                # Need to backtrack and reparse
+                self.pos -= 1  # Back up before the operator token
+                op_token = self._advance()  # Re-read it
+                return Identifier(
+                    name=op_token.value,
+                    line=op_token.line,
+                    column=op_token.column,
+                )
+
+            # Not followed by '[', so it's a prefix operator
             operand = self._parse_atom()
             return UnaryOp(
                 operator=op_token.value,
@@ -1311,6 +1393,7 @@ class Parser:
                 )
 
             # Just an identifier
+            # Note: Generic instantiation Type[X] is handled in _parse_postfix()
             # Note: Relational image R(| S |) is handled in _parse_postfix()
             return Identifier(
                 name=name_token.value, line=name_token.line, column=name_token.column

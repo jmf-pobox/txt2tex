@@ -236,6 +236,29 @@ class RelationalImage(ASTNode):
     set: Expr  # The set S
 
 
+@dataclass(frozen=True)
+class GenericInstantiation(ASTNode):
+    """Generic type instantiation node (Phase 11.9).
+
+    Represents generic type instantiation: Type[A, B]
+
+    In Z notation, generic types can be instantiated with specific type parameters.
+    This is written as the base type followed by type arguments in square brackets.
+
+    Examples:
+    - ∅[N] -> base=∅, type_params=[N]  (empty set of type N)
+    - seq[N] -> base=seq, type_params=[N]  (sequence of N)
+    - P[X] -> base=P, type_params=[X]  (power set of X)
+    - ∅[N cross N] -> base=∅, type_params=[N cross N]  (empty relation)
+    - Type[A, B] -> base=Type, type_params=[A, B]  (multi-parameter)
+
+    LaTeX rendering: base[type_params] or special notation depending on base
+    """
+
+    base: Expr  # The generic type being instantiated
+    type_params: list[Expr]  # Type parameters (at least one)
+
+
 # Type alias for all expression types
 Expr = (
     BinaryOp
@@ -252,6 +275,7 @@ Expr = (
     | Lambda
     | Tuple
     | RelationalImage
+    | GenericInstantiation
 )
 
 
