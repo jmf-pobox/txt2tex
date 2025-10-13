@@ -140,6 +140,13 @@ class Lexer:
             self._advance()  # consume ')'
             return Token(TokenType.PART_LABEL, f"({label})", start_line, start_column)
 
+        # Relational image operators (Phase 11.5): (| and |)
+        # Check before simple parentheses
+        if char == "(" and self._peek_char() == "|":
+            self._advance()
+            self._advance()
+            return Token(TokenType.LIMG, "(|", start_line, start_column)
+
         # Parentheses
         if char == "(":
             self._advance()
@@ -186,6 +193,12 @@ class Lexer:
             self._advance()
             self._advance()
             return Token(TokenType.RRES, "|>", start_line, start_column)
+
+        # Relational image right bracket: |) (Phase 11.5) - check before | alone
+        if char == "|" and self._peek_char() == ")":
+            self._advance()
+            self._advance()
+            return Token(TokenType.RIMG, "|)", start_line, start_column)
 
         # Pipe (for truth tables and quantifiers)
         if char == "|":
@@ -313,6 +326,11 @@ class Lexer:
             self._advance()
             return Token(TokenType.UNDERSCORE, "_", start_line, start_column)
 
+        # Cardinality operator (Phase 8)
+        if char == "#":
+            self._advance()
+            return Token(TokenType.HASH, "#", start_line, start_column)
+
         # Postfix relation operators (Phase 10b)
         if char == "~":
             self._advance()
@@ -376,6 +394,16 @@ class Lexer:
         # Numbers
         if char.isdigit():
             return self._scan_number(start_line, start_column)
+
+        # Unicode symbols (Phase 11.5)
+        if char == "×":  # noqa: RUF001
+            self._advance()
+            return Token(TokenType.CROSS, "×", start_line, start_column)  # noqa: RUF001
+
+        # Set difference operator (Phase 11.5)
+        if char == "\\":
+            self._advance()
+            return Token(TokenType.SETMINUS, "\\", start_line, start_column)
 
         # Unknown character
         raise LexerError(f"Unexpected character: {char!r}", self.line, self.column)
@@ -476,7 +504,7 @@ class Lexer:
         if value == "lambda":
             return Token(TokenType.LAMBDA, value, start_line, start_column)
 
-        # Check for set operators (Phase 3, enhanced in Phase 7)
+        # Check for set operators (Phase 3, enhanced in Phase 7, Phase 11.5)
         if value == "notin":
             return Token(TokenType.NOTIN, value, start_line, start_column)
         if value == "in":
@@ -487,6 +515,8 @@ class Lexer:
             return Token(TokenType.UNION, value, start_line, start_column)
         if value == "intersect":
             return Token(TokenType.INTERSECT, value, start_line, start_column)
+        if value == "cross":
+            return Token(TokenType.CROSS, value, start_line, start_column)
 
         # Check for Z notation keywords (Phase 4)
         if value == "given":
@@ -513,6 +543,16 @@ class Lexer:
             return Token(TokenType.INV, value, start_line, start_column)
         if value == "id":
             return Token(TokenType.ID, value, start_line, start_column)
+
+        # Check for arithmetic operators (modulo)
+        if value == "mod":
+            return Token(TokenType.MOD, value, start_line, start_column)
+
+        # Check for power set functions (Phase 11.5)
+        if value == "P1":
+            return Token(TokenType.POWER1, value, start_line, start_column)
+        if value == "P":
+            return Token(TokenType.POWER, value, start_line, start_column)
 
         # Regular identifier
         return Token(TokenType.IDENTIFIER, value, start_line, start_column)
