@@ -145,8 +145,7 @@ In one direction:
   \ulcorner q \urcorner^{[2]} & \infer[false\text{-elim}^{[3]}]{p}{
   \infer[\text{false intro}]{false}{
   \infer[\text{$\Rightarrow$ elim}]{\lnot q}{
-  \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]}
-  \ulcorner \lnot p \urcorner^{[3]}
+  \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]} & \ulcorner \lnot p \urcorner^{[3]}
 } & \ulcorner q \urcorner^{[2]}
 }
 }
@@ -167,8 +166,7 @@ and the other:
   \ulcorner \lnot p \urcorner^{[2]} & \infer[false\text{-elim}^{[3]}]{\lnot q}{
   \infer[\text{false intro}]{false}{
   \infer[\text{$\Rightarrow$ elim}]{p}{
-  \ulcorner q \Rightarrow p \urcorner^{[1]}
-  \ulcorner q \urcorner^{[3]}
+  \ulcorner q \Rightarrow p \urcorner^{[1]} & \ulcorner q \urcorner^{[3]}
 } & \ulcorner \lnot p \urcorner^{[2]}
 }
 }
@@ -204,15 +202,15 @@ In one direction:
 \[
 \infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \Rightarrow r) \land (q \Rightarrow r) \Rightarrow (p \lor q \Rightarrow r)}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]} & \infer[$\Rightarrow$\text{-intro}^{[2]}]{p \lor q \Rightarrow r}{
-  \ulcorner p \lor q \urcorner^{[2]} & \infer[\text{$\lor$ elim}]{r}{
+  \ulcorner p \lor q \urcorner^{[2]} & \infer[$\lor$\text{-elim}^{[3]}]{r}{
   \raiseproof{10ex}{\infer[$\land$\text{-elim-1}]{p \Rightarrow r}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
 } & \infer[\text{$\Rightarrow$ elim}]{r}{
-  p \Rightarrow r & \ulcorner p \urcorner
+  p \Rightarrow r & \ulcorner p \urcorner^{[3]}
 }} & \hskip 6em \raiseproof{26ex}{\infer[$\land$\text{-elim-2}]{q \Rightarrow r}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
 } & \infer[\text{$\Rightarrow$ elim}]{r}{
-  q \Rightarrow r & \ulcorner q \urcorner
+  q \Rightarrow r & \ulcorner q \urcorner^{[3]}
 }}
 }
 }
