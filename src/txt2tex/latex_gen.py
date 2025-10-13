@@ -17,6 +17,7 @@ from txt2tex.ast_nodes import (
     FreeType,
     FunctionApp,
     FunctionType,
+    GenericInstantiation,
     GivenType,
     Identifier,
     Lambda,
@@ -267,6 +268,8 @@ class LaTeXGenerator:
             return self._generate_tuple(expr)
         if isinstance(expr, RelationalImage):
             return self._generate_relational_image(expr)
+        if isinstance(expr, GenericInstantiation):
+            return self._generate_generic_instantiation(expr)
 
         raise TypeError(f"Unknown expression type: {type(expr)}")
 
@@ -595,6 +598,34 @@ class LaTeXGenerator:
         relation_latex = self.generate_expr(node.relation)
         set_latex = self.generate_expr(node.set)
         return f"{relation_latex}(\\limg {set_latex} \\rimg)"
+
+    def _generate_generic_instantiation(self, node: GenericInstantiation) -> str:
+        """Generate LaTeX for generic type instantiation (Phase 11.9).
+
+        Generic types can be instantiated with specific type parameters using
+        bracket notation. Special Z notation types use special LaTeX commands.
+
+        Examples:
+        - ∅[N] -> \\emptyset[N] or special empty set notation
+        - seq[N] -> \\seq[N]
+        - P[X] -> \\power[X]
+        - Type[A, B] -> Type[A, B]
+        - ∅[N cross N] -> \\emptyset[N \\cross N]
+
+        Strategy: Check if base is a special Z notation identifier, use special
+        rendering if so, otherwise use standard bracket notation.
+        """
+        base_latex = self.generate_expr(node.base)
+
+        # Generate comma-separated type parameters
+        type_params_latex = ", ".join(
+            self.generate_expr(param) for param in node.type_params
+        )
+
+        # Special Z notation types that might have custom rendering
+        # For now, use standard bracket notation for all types
+        # Future enhancement: Could use special notation like \emptyset~N
+        return f"{base_latex}[{type_params_latex}]"
 
     def _generate_section(self, node: Section) -> list[str]:
         """Generate LaTeX for section."""
