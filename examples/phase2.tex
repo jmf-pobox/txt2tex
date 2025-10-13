@@ -1,0 +1,132 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Equivalence Chains}
+
+\bigskip
+\noindent
+\textbf{Solution 1}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$Commutative$
+
+$property$
+
+\vspace{-10pt}
+\begin{align*}
+p \land q \\
+&\Leftrightarrow q \land p && \text{[commutative]}
+\end{align*}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$De$
+
+$Morgan$
+
+$law$
+
+\vspace{-10pt}
+\begin{align*}
+\lnot (p \land q) \\
+&\Leftrightarrow \lnot p \lor \lnot q && \text{[De Morgan]} \\
+&\Leftrightarrow \lnot p \lor \lnot q && \text{[parentheses]}
+\end{align*}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 2}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$Definition$
+
+$of$
+
+$implication$
+
+\vspace{-10pt}
+\begin{align*}
+p \Rightarrow q \\
+&\Leftrightarrow \lnot p \lor q && \text{[definition]}
+\end{align*}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$Multiple$
+
+$equivalence$
+
+$steps$
+
+\vspace{-10pt}
+\begin{align*}
+p \land q \lor p \land r \\
+&\Leftrightarrow p \land (q \lor r) && \text{[distributive]} \\
+&\Leftrightarrow (q \lor r) \land p && \text{[commutative]} \\
+&\Leftrightarrow p \land (r \lor q) && \text{[commutative]}
+\end{align*}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 3}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$Equivalence$
+
+$chain$
+
+$without$
+
+$justifications$
+
+\vspace{-10pt}
+\begin{align*}
+p \lor p \\
+&\Leftrightarrow p
+\end{align*}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$Mixed$
+
+$justifications$
+
+\vspace{-10pt}
+\begin{align*}
+p \Leftrightarrow q \\
+&\Leftrightarrow (p \Rightarrow q) \land (q \Rightarrow p) && \text{[definition]} \\
+&\Leftrightarrow (\lnot p \lor q) \land (\lnot q \lor p)
+\end{align*}
+
+\medskip
+
+\end{document}

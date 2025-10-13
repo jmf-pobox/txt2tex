@@ -1,0 +1,89 @@
+=== Phase 11b: Function Application ===
+
+TEXT: Basic function application (single argument):
+
+f(x)
+square(5)
+parent(john)
+
+TEXT: Multiple arguments:
+
+g(x, y, z)
+sum(a, b, c, d)
+max(x, y)
+
+TEXT: Nested function application:
+
+f(g(x))
+f(g(h(x)))
+outer(middle(inner(value)))
+
+TEXT: Empty argument list:
+
+f()
+initialize()
+
+TEXT: Function application in expressions:
+
+f(x) and g(y)
+f(x) => g(x)
+f(x) > 0
+height(m) < 10
+
+TEXT: Function application in quantifiers:
+
+forall x : N | f(x) > 0
+exists d : Dog | gentle(d) and neat(d)
+forall x, y : N | g(x, y) = g(y, x)
+
+TEXT: Special Z notation functions (generic instantiation):
+
+axdef
+  items : seq(N)
+  possibilities : P(Item)
+  collection : bag(X)
+  sequence : iseq(N)
+end
+
+TEXT: Function application with set membership:
+
+x in f(S)
+y in P(X)
+z in seq(N)
+
+TEXT: Complex predicates from Solution 5:
+
+exists d : Dog | gentle(d) and neat(d)
+forall d : Dog | neat(d) => attractive(d)
+
+TEXT: Function application in definitions:
+
+axdef
+  f : X -> Y
+where
+  forall x : X | f(x) in Y
+end
+
+schema PersonHeight
+  height : Person -> N
+where
+  forall p : Person | height(p) > 0 and height(p) < 300
+end
+
+TEXT: Function application with comparisons:
+
+f(x, y) > g(x, y)
+max(x, y) = max(y, x)
+f(0) = 1
+
+TEXT: Expression arguments:
+
+f(x and y)
+g(x or y, p => q)
+h(a > b, c < d)
+
+TEXT: Function application with subscripts and superscripts:
+
+f(x_i)
+g(x^2)
+h(a_1, a_2)

@@ -1,0 +1,74 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Phase 4 : Z Notation Basics}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Given Types}
+
+\medskip
+
+\begin{zed}[Person, Company]\end{zed}
+
+\bigskip
+\noindent
+\textbf{Example 2 : Free Types}
+
+\medskip
+
+Status ::= active | inactive | suspended
+
+Answer ::= yes | no
+
+\bigskip
+\noindent
+\textbf{Example 3 : Abbreviations}
+
+\medskip
+
+adult == age \geq 18
+
+positive == x > 0
+
+\bigskip
+\noindent
+\textbf{Example 4 : Axiomatic Definitions}
+
+\medskip
+
+\begin{axdef}
+population : N
+capacity : N
+\where
+population \leq capacity
+capacity > 0
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 5 : Schema Definitions}
+
+\medskip
+
+\begin{schema}{Library}
+books : N
+members : N
+\where
+books > 0
+members \geq 0
+\end{schema}
+
+\begin{schema}{BankAccount}
+balance : N
+overdraft : N
+\where
+balance \geq 0
+overdraft \geq 0
+\end{schema}
+
+\end{document}

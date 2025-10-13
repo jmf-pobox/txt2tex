@@ -15,6 +15,8 @@ from txt2tex.ast_nodes import (
     EquivChain,
     Expr,
     FreeType,
+    FunctionApp,
+    FunctionType,
     GivenType,
     Identifier,
     Number,
@@ -237,6 +239,10 @@ class LaTeXGenerator:
             return self._generate_superscript(expr)
         if isinstance(expr, SetComprehension):
             return self._generate_set_comprehension(expr)
+        if isinstance(expr, FunctionApp):
+            return self._generate_function_app(expr)
+        if isinstance(expr, FunctionType):
+            return self._generate_function_type(expr)
 
         raise TypeError(f"Unknown expression type: {type(expr)}")
 
@@ -425,6 +431,59 @@ class LaTeXGenerator:
         if len(exponent) > 1:
             return f"{base}^{{{exponent}}}"
         return f"{base}^{exponent}"
+
+    def _generate_function_app(self, node: FunctionApp) -> str:
+        """Generate LaTeX for function application (Phase 11b).
+
+        Examples:
+        - f(x) → f(x)
+        - g(x, y, z) → g(x, y, z)
+        - seq(N) → \\seq~N
+        - parent(john) → parent(john)
+        """
+        # Special Z notation functions with LaTeX commands
+        special_functions = {
+            "seq": r"\seq",
+            "iseq": r"\iseq",
+            "bag": r"\bag",
+            "P": r"\power",  # Power set
+        }
+
+        # Check if this is a special function with single argument
+        if node.name in special_functions and len(node.args) == 1:
+            # Generic instantiation: \seq~N
+            func_latex = special_functions[node.name]
+            arg_latex = self.generate_expr(node.args[0])
+            return f"{func_latex}~{arg_latex}"
+
+        # Standard function application: f(x, y, z)
+        func_name = node.name
+        args_latex = ", ".join(self.generate_expr(arg) for arg in node.args)
+        return f"{func_name}({args_latex})"
+
+    def _generate_function_type(self, node: FunctionType) -> str:
+        """Generate LaTeX for function type arrows (Phase 11c).
+
+        Examples:
+        - X -> Y → X \\fun Y
+        - X +-> Y → X \\pfun Y
+        - X >-> Y → X \\inj Y
+        - N +-> N → N \\pfun N
+        - A -> B -> C → A \\fun (B \\fun C) [right-associative]
+        """
+        arrow_latex = self.BINARY_OPS.get(node.arrow)
+        if arrow_latex is None:
+            raise ValueError(f"Unknown function arrow: {node.arrow}")
+
+        domain_latex = self.generate_expr(node.domain)
+        range_latex = self.generate_expr(node.range)
+
+        # Add parentheses to range if it's also a function type (for clarity)
+        # Function types are right-associative: A -> B -> C means A -> (B -> C)
+        if isinstance(node.range, FunctionType):
+            range_latex = f"({range_latex})"
+
+        return f"{domain_latex} {arrow_latex} {range_latex}"
 
     def _generate_section(self, node: Section) -> list[str]:
         """Generate LaTeX for section."""
