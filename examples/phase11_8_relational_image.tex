@@ -1,0 +1,76 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+\bigskip
+\noindent
+\textbf{Phase 11 . 8 : Relational Image}
+
+\medskip
+
+\bigskip
+
+The relational image R(| S |) gives the image of set S under relation R.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 1 : Simple relational image}
+
+\medskip
+
+$R(\limg S \rimg)$
+
+\bigskip
+\noindent
+\textbf{Example 2 : Relational image with set literal}
+
+\medskip
+
+$R(\limg \{1, 2, 3\} \rimg)$
+
+\bigskip
+\noindent
+\textbf{Example 3 : Relational image with singleton set}
+
+\medskip
+
+$parentOf(\limg \{john\} \rimg)$
+
+\bigskip
+\noindent
+\textbf{Example 4 : Relational image with composition}
+
+\medskip
+
+$R \circ S(\limg A \rimg)$
+
+\bigskip
+\noindent
+\textbf{Example 5 : Relational image with inverse}
+
+\medskip
+
+$R^{-1}(\limg S \rimg)$
+
+\bigskip
+\noindent
+\textbf{Example 6 : Set comprehension with relational image ( Solution 35 pattern )}
+
+\medskip
+
+$\{ p \colon Person \mid p \in \dom parentOf \bullet (p, parentOf(\limg \{p\} \rimg)) \}$
+
+\bigskip
+\noindent
+\textbf{Example 7 : Chained relational images}
+
+\medskip
+
+$R(\limg S \rimg)(\limg T \rimg)$
+
+\end{document}
