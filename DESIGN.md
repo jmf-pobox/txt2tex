@@ -1329,6 +1329,59 @@ number\_of\_grandchildren = \\
 
 ---
 
+### Phase 11.9: Generic Type Instantiation ✅ COMPLETED
+**Timeline**: 6-8 hours actual
+**Goal**: Generic type parameters for Z notation
+**Priority**: CRITICAL (needed for Solutions 25, 26)
+**Status**: ✅ Completed (90.4% coverage achieved)
+
+**Added**:
+- Generic type instantiation: `Type[A, B]`, `emptyset[N]`, `seq[N]`, `P[X]`
+- Whitespace-sensitive parsing: distinguishes `Type[X]` from `p [justification]`
+- Token position tracking in parser for accurate whitespace detection
+- Support for nested generics: `Type[List[N]]`
+- Support for chained generics: `Type[N][M]`
+- Support for complex type parameters: `emptyset[N cross N]`
+- Generic types in quantifier/set comprehension domains: `forall x : P[N] | ...`
+
+**Input Format**:
+```
+emptyset[N]
+seq[N cross N]
+P[X]
+Type[A, B, C]
+Type[List[N]]
+Type[N][M]
+
+{ s : P[N] | s = emptyset[N] }
+forall x : seq[N] | # x > 0
+```
+
+**LaTeX Output**:
+```latex
+$emptyset[N]$
+$seq[N \cross N]$
+$P[X]$
+$Type[A, B, C]$
+$Type[List[N]]$
+$Type[N][M]$
+
+$\{ s : P[N] \mid s = emptyset[N] \}$
+$\forall x : seq[N] \bullet \# x > 0$
+```
+
+**Implementation Details**:
+- Added `GenericInstantiation` AST node with `base` and `type_params` fields
+- Parser tracks `last_token_end_column` and `last_token_line` to detect whitespace
+- Handles special case: `P[X]` where `P` is lexed as POWER token but treated as identifier for generics
+- Updated domain parsing in quantifiers and set comprehensions to use `_parse_postfix()` instead of `_parse_atom()`
+
+**Test Coverage**: Solutions 25, 26 + comprehensive test suite (16 tests in test_generic_instantiation.py)
+**Deliverable**: Can process generic type specifications in Z notation
+**Result**: Achieved 90.4% solution coverage (47/52 solutions fully working)
+
+---
+
 ### Phase 12: Sequences
 **Timeline**: 6-8 hours
 **Goal**: Sequence types and sequence operators
