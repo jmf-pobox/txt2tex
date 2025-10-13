@@ -90,8 +90,14 @@ hatch run convert <file>
 hatch run type           # Type checking with mypy
 hatch run lint           # Linting with ruff
 hatch run format         # Format code
-hatch run test           # Run tests
+hatch run test           # Run ALL tests
 hatch run test-cov       # Run tests with coverage
+
+# Run specific tests (use hatch run test with path arguments)
+hatch run test tests/test_phase11d.py                           # Single file
+hatch run test tests/test_phase11d.py -v                        # Verbose output
+hatch run test tests/test_phase11d.py::TestPhase11dParsing     # Single test class
+hatch run test tests/test_phase11d.py::TestPhase11dParsing::test_simple_lambda -v  # Single test method
 
 # Combined quality check
 hatch run check          # lint + type + test
@@ -363,6 +369,66 @@ grep -i error output.log
     └── README.md                 # User documentation (to create)
 ```
 
+## Measuring Completeness
+
+**CRITICAL: Run this measurement at the END of EVERY phase of work.**
+
+The primary measure of project completeness is how much of the instructor's reference solutions we can successfully represent and render.
+
+### Reference Files
+
+- **Instructor's PDF**: `examples/solutions_full.pdf` (230K, complete solutions)
+- **Our TXT file**: `examples/solutions.txt` (work in progress)
+- **Generated PDF**: `examples/solutions.pdf` (auto-generated from solutions.txt)
+
+### Completeness Measurement Process
+
+```bash
+# 1. Generate PDF from current solutions.txt
+hatch run convert examples/solutions.txt
+
+# 2. Visual comparison
+open examples/solutions.pdf examples/solutions_full.pdf
+
+# 3. Count coverage
+# - Count solution numbers in solutions_full.pdf (total solutions)
+# - Count solution numbers in solutions.txt (implemented solutions)
+# - Calculate percentage: (implemented / total) * 100
+
+# 4. Identify gaps
+# - Which solutions are empty stubs?
+# - Which features are needed to complete them?
+# - What syntax is missing?
+```
+
+### Recording Measurements
+
+After each phase, record:
+1. **Phase completed**: e.g., "Phase 11d: Lambda expressions"
+2. **Solutions count**: e.g., "18 of 52 solutions complete (35%)"
+3. **New solutions added**: e.g., "Added Solutions 13-18 (proofs with => intro)"
+4. **Blocking issues**: e.g., "Solutions 33-36 need function override syntax"
+
+### Current Status
+
+**Last measured**: Phase 11d (Lambda expressions)
+**Solutions implemented**: Partial (exact count TBD - need to measure)
+**Total solutions**: 52 (Solutions 1-52 in solutions_full.pdf)
+**Coverage**: ~35% estimated (needs verification)
+
+**Known gaps**:
+- Schema composition operators (not yet implemented)
+- Function override syntax (not yet implemented)
+- Sequence notation (not yet implemented)
+- Free type induction (partially implemented)
+
+### Improvement Strategy
+
+1. After each phase, try to add 2-5 more solutions to solutions.txt
+2. Focus on solutions that use newly implemented features
+3. Keep solutions.txt rendering successfully (don't break it)
+4. Document which solutions are blocked by missing features
+
 ## Session Management
 
 User mentioned: "I can exit our session and resume our session from the sem directory if that will make things easier."
@@ -373,3 +439,4 @@ If starting fresh from `/Users/jfreeman/Coding/fuzz/txt2tex/sem/`:
 3. Use workflow commands at the top of this document
 4. Reference this document for context
 - always run hatch run check before each micro-commit and solve 100% of any issues reported
+- there are no pre-existing issues that should be used to justify anyting
