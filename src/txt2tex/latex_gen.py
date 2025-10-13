@@ -855,15 +855,17 @@ class LaTeXGenerator:
         # Siblings (marked with ::) should be rendered side-by-side with &
         child_groups: list[list[str]] = []
         current_group: list[str] = []
+        # Track case analysis with indices for raiseproof handling
+        case_children: list[tuple[int, CaseAnalysis]] = []
 
-        for child in node.children:
+        for idx, child in enumerate(node.children):
             if isinstance(child, CaseAnalysis):
-                # Handle case analysis - generate as separate branch
-                case_latex = self._generate_case_analysis(child)
+                # Track case analysis for raiseproof handling
+                case_children.append((idx, child))
+                # Close current group before case
                 if current_group:
                     child_groups.append(current_group)
                     current_group = []
-                child_groups.append([case_latex])
             elif isinstance(child, ProofNode):
                 # Regular proof node
                 child_latex = self._generate_proof_node_infer(child)
@@ -882,8 +884,49 @@ class LaTeXGenerator:
             child_groups.append(current_group)
 
         # Generate premises by joining siblings with &
-        premises_parts = [" & ".join(group) for group in child_groups]
-        premises = "\n  ".join(premises_parts)
+        non_case_premises = [" & ".join(group) for group in child_groups]
+
+        # If we have case analysis, apply raiseproof for vertical layout
+        if case_children:
+            # Identify disjunction siblings (for or-elim)
+            disjunction_premises = []
+            for group in child_groups:
+                for premise in group:
+                    # Check if this is a disjunction (contains \lor)
+                    if r"\lor" in premise:
+                        disjunction_premises.append(premise)
+
+            # Generate raised cases with staggered heights
+            raised_cases = []
+            for case_position, (_idx, case) in enumerate(case_children):
+                case_latex = self._generate_case_analysis(case)
+                depth = self._calculate_tree_depth(case)
+
+                # STAGGERED HEIGHT FORMULA:
+                # First case: 6-8ex (minimal)
+                # Subsequent cases: 18-24ex (much taller to avoid overlap)
+                if case_position == 0:
+                    # First case: minimal height
+                    height = 6 + (depth * 2)  # Conservative for first case
+                    raised = f"\\raiseproof{{{height}ex}}{{{case_latex}}}"
+                else:
+                    # Subsequent cases: taller + horizontal spacing
+                    height = 18 + (depth * 4)  # Much taller for subsequent cases
+                    raised = f"\\hskip 6em \\raiseproof{{{height}ex}}{{{case_latex}}}"
+
+                raised_cases.append(raised)
+
+            # Combine: disjunction premises first (if any), then raised case branches
+            if disjunction_premises:
+                all_premises = disjunction_premises + raised_cases
+            else:
+                # No disjunction - might be other premises before cases
+                all_premises = non_case_premises + raised_cases
+
+            premises = " & ".join(all_premises)
+        else:
+            # No case analysis - use normal premises
+            premises = "\n  ".join(non_case_premises)
 
         # Generate justification label
         if node.justification:
