@@ -1,5 +1,25 @@
 # Claude Code: Project Context and Instructions
 
+## 🚨 CRITICAL: Use Proper Workflow Commands
+
+**NEVER manually invoke pdflatex!** Always use:
+
+```bash
+# Convert txt to PDF (THE CORRECT WAY)
+hatch run convert examples/file.txt
+# OR
+./txt2pdf.sh examples/file.txt
+```
+
+The `txt2pdf.sh` script handles all the complexity:
+- Sets PYTHONPATH correctly
+- Generates LaTeX with txt2tex CLI
+- Sets TEXINPUTS and MFINPUTS for fuzz/zed-* packages
+- Compiles with pdflatex
+- Cleans up auxiliary files
+
+**DO NOT** manually run `pdflatex` with environment variables - you will forget steps and it will fail.
+
 ## Project Overview
 
 This is `txt2tex` - a tool to convert whiteboard-style mathematical notation to high-quality LaTeX that can be typechecked with fuzz and compiled to PDF.
