@@ -152,6 +152,27 @@ class FunctionType(ASTNode):
     range: Expr  # Range type
 
 
+@dataclass(frozen=True)
+class Lambda(ASTNode):
+    """Lambda expression node (Phase 11d).
+
+    Represents lambda expressions: lambda x : X . body
+
+    Supports multiple variables with shared domain:
+    - lambda x : X . x
+    - lambda x, y : N . x + y
+    - lambda f : X -> Y . lambda x : X . f(x)
+
+    Examples:
+    - lambda x : N . x^2 -> variables=["x"], domain=N, body=(x^2)
+    - lambda x, y : N . x + y -> variables=["x", "y"], domain=N, body=(x+y)
+    """
+
+    variables: list[str]  # One or more variables (e.g., ["x"], ["x", "y"])
+    domain: Expr  # Domain type expression
+    body: Expr  # Lambda body expression
+
+
 # Type alias for all expression types
 Expr = (
     BinaryOp
@@ -164,6 +185,7 @@ Expr = (
     | SetComprehension
     | FunctionApp
     | FunctionType
+    | Lambda
 )
 
 

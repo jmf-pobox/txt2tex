@@ -19,6 +19,7 @@ from txt2tex.ast_nodes import (
     FunctionType,
     GivenType,
     Identifier,
+    Lambda,
     Number,
     Paragraph,
     Part,
@@ -233,6 +234,8 @@ class LaTeXGenerator:
             return self._generate_binary_op(expr)
         if isinstance(expr, Quantifier):
             return self._generate_quantifier(expr)
+        if isinstance(expr, Lambda):
+            return self._generate_lambda(expr)
         if isinstance(expr, Subscript):
             return self._generate_subscript(expr)
         if isinstance(expr, Superscript):
@@ -360,6 +363,31 @@ class LaTeXGenerator:
             domain_latex = self.generate_expr(node.domain)
             parts.append(r"\colon")
             parts.append(domain_latex)
+
+        # Add bullet separator and body
+        parts.append(r"\bullet")
+        body_latex = self.generate_expr(node.body)
+        parts.append(body_latex)
+
+        return " ".join(parts)
+
+    def _generate_lambda(self, node: Lambda) -> str:
+        """Generate LaTeX for lambda expression (Phase 11d).
+
+        Examples:
+        - lambda x : N . x^2 -> \\lambda x : \\nat \\bullet x^{2}
+        - lambda x, y : N . x + y -> \\lambda x, y : \\nat \\bullet x + y
+        - lambda f : X -> Y . f(x) -> \\lambda f : X \\fun Y \\bullet f(x)
+
+        Note: Uses : (colon) for lambda binding, not \\colon.
+        """
+        # Generate variables (comma-separated for multi-variable)
+        variables_str = ", ".join(node.variables)
+        parts = [r"\lambda", variables_str, ":"]
+
+        # Generate domain (required for lambda)
+        domain_latex = self.generate_expr(node.domain)
+        parts.append(domain_latex)
 
         # Add bullet separator and body
         parts.append(r"\bullet")
