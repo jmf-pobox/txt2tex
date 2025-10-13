@@ -1,0 +1,796 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Propositional logic}
+
+\bigskip
+\noindent
+\textbf{Solution 1}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+false (as (true $\Rightarrow$ false) $\Leftrightarrow$ false)
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+true (as (false $\Rightarrow$ false) $\Leftrightarrow$ true)
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+true (as (false $\Rightarrow$ true) $\Leftrightarrow$ true)
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+true (as (false $\Rightarrow$ false) $\Leftrightarrow$ true)
+
+\bigskip
+
+\bigskip
+
+(Assuming that pigs can't fly . . . )
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 2}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\begin{center}
+\begin{tabular}{c c c c}
+$p$ & $q$ & $p \land q$ & $( p \land q ) \Rightarrow p$ \\
+\hline
+t & t & t & t \\
+t & f & f & t \\
+f & t & f & t \\
+f & f & f & t \\
+\end{tabular}
+\end{center}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\begin{center}
+\begin{tabular}{c c c c c c}
+$p$ & $q$ & $p \land q$ & $\lnot p$ & $\lnot p \Rightarrow ( p \land q )$ & $( \lnot p \Rightarrow ( p \land q ) ) \Leftrightarrow p$ \\
+\hline
+t & t & t & f & t & t \\
+t & f & f & f & t & t \\
+f & t & f & t & f & t \\
+f & f & f & t & f & t \\
+\end{tabular}
+\end{center}
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\begin{center}
+\begin{tabular}{c c c c c}
+$p$ & $q$ & $p \Rightarrow q$ & $p \land ( p \Rightarrow q )$ & $( p \land ( p \Rightarrow q ) ) \Rightarrow q$ \\
+\hline
+t & t & t & t & t \\
+t & f & f & f & t \\
+f & t & t & f & t \\
+f & f & t & f & t \\
+\end{tabular}
+\end{center}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 3}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+p \Rightarrow \lnot p \\
+&\Leftrightarrow \lnot p \lor \lnot p && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot p && \text{[idempotence]}
+\end{align*}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+\lnot p \Rightarrow p \\
+&\Leftrightarrow \lnot \lnot p \lor p && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow p \lor p && \text{[$\lnot$ $\lnot$]} \\
+&\Leftrightarrow p && \text{[idempotence]}
+\end{align*}
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+p \Rightarrow (q \Rightarrow r) \\
+&\Leftrightarrow \lnot p \lor (q \Rightarrow r) && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot p \lor \lnot q \lor r && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot p \lor \lnot q \lor r && \text{[associativity]} \\
+&\Leftrightarrow \lnot (p \land q) \lor r && \text{[De Morgan]} \\
+&\Leftrightarrow p \land q \Rightarrow r && \text{[$\Rightarrow$]}
+\end{align*}
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+q \Rightarrow (p \Rightarrow r) \\
+&\Leftrightarrow \lnot q \lor (p \Rightarrow r) && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot q \lor \lnot p \lor r && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot p \lor \lnot q \lor r && \text{[associativity $\land$ commutativity]} \\
+&\Leftrightarrow \lnot p \lor (q \Rightarrow r) && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow p \Rightarrow (q \Rightarrow r) && \text{[$\Rightarrow$]}
+\end{align*}
+
+\medskip
+
+(e)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+p \land q \Leftrightarrow p \\
+&\Leftrightarrow (p \land q \Rightarrow p) \land (p \Rightarrow p \land q) && \text{[$\Leftrightarrow$]} \\
+&\Leftrightarrow (\lnot (p \land q) \lor p) \land (\lnot p \lor p \land q) && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow (\lnot p \lor \lnot q \lor p) \land (\lnot p \lor p \land q) && \text{[De Morgan]} \\
+&\Leftrightarrow (\lnot q \lor \lnot p \lor p) \land (\lnot p \lor p \land q) && \text{[associativity $\land$ comm .]} \\
+&\Leftrightarrow (\lnot q \lor true) \land (\lnot p \lor p \land q) && \text{[excluded middle]} \\
+&\Leftrightarrow true \land (\lnot p \lor p \land q) && \text{[$\lor$ $\land$ true]} \\
+&\Leftrightarrow \lnot p \lor p \land q && \text{[$\land$ $\land$ true]} \\
+&\Leftrightarrow (\lnot p \lor p) \land (\lnot p \lor q) && \text{[distribution]} \\
+&\Leftrightarrow true \land (\lnot p \lor q) && \text{[excluded middle]} \\
+&\Leftrightarrow \lnot p \lor q && \text{[$\land$ $\land$ true]} \\
+&\Leftrightarrow p \Rightarrow q && \text{[$\Rightarrow$]}
+\end{align*}
+
+\medskip
+
+(f)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+p \lor q \Leftrightarrow p \\
+&\Leftrightarrow (p \lor q \Rightarrow p) \land (p \Rightarrow p \lor q) && \text{[$\Leftrightarrow$]} \\
+&\Leftrightarrow (\lnot (p \lor q) \lor p) \land (\lnot p \lor p \lor q) && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow (\lnot p \land \lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[De Morgan]} \\
+&\Leftrightarrow (\lnot p \lor p) \land (\lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[distribution]} \\
+&\Leftrightarrow true \land (\lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[excluded middle]} \\
+&\Leftrightarrow (\lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[$\land$ $\land$ true]} \\
+&\Leftrightarrow (\lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[associativity]} \\
+&\Leftrightarrow (\lnot q \lor p) \land (true \lor q) && \text{[excluded middle]} \\
+&\Leftrightarrow (\lnot q \lor p) \land true && \text{[$\lor$ $\land$ true]} \\
+&\Leftrightarrow \lnot q \lor p && \text{[$\land$ $\land$ true]} \\
+&\Leftrightarrow q \Rightarrow p && \text{[$\Rightarrow$]}
+\end{align*}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 4}
+
+\medskip
+
+\bigskip
+
+(a) (p or q) $\Leftrightarrow$ ((not p or not q) and q) is not a tautology. You might illustrate this via a truth table or via a chain of equivalences, showing that the proposition is not equivalent to true. Alternatively, you might try and find a combination of values for which the proposition is false. (In this case, the proposition is false when p and q are both true.)
+
+\bigskip
+
+\bigskip
+
+(b) (p or q) $\Leftrightarrow$ ((not p and not q) or q) is not a tautology. In this case, the proposition is false when p is true and q is false.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 5}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 6}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+This is a true proposition: whatever the value of x, the expression x^2 - x + 1 denotes a natural number. If we choose y to be this natural number, we will find that p is true.
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+This is a false proposition. We cannot choose a large enough value for y such that p will hold for any value of x.
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+This is a false proposition. It is an implication whose antecedent part is true and whose consequent part is false.
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+This is a true proposition. It is an implication whose antecedent part is false and whose consequent part is true.
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 7}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+We must define a predicate p that is false for at least one value of x, and is true for at least one other value. A suitable solution would be p $\Leftrightarrow$ x > 1.
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+With the above choice of p, we require only that q is sometimes false when p is true (for else the universal quantification would hold). A suitable solution would be q $\Leftrightarrow$ x > 3.
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 8}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\forall x \colon N \bullet x \geq z$
+
+\medskip
+
+\section*{Equality}
+
+\bigskip
+\noindent
+\textbf{Solution 9}
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+\exists x \colon N \bullet x = 1 \land x > y \lor x = 2 \land x > z \\
+&\Leftrightarrow \exists x \colon N \bullet x = 1 \land x > y \lor \exists x \colon N \bullet x = 2 \land x > z \\
+&\Leftrightarrow 1 \in N \land 1 > y \lor \exists x \colon N \bullet x = 2 \land x > z \\
+&\Leftrightarrow 1 \in N \land 1 > y \lor 2 \in N \land 2 > z \\
+&\Leftrightarrow 1 > y \lor 2 > z
+\end{align*}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 10}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 11}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 12}
+
+\medskip
+
+\section*{Deductive proofs}
+
+\bigskip
+\noindent
+\textbf{Solution 13}
+
+\medskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{p \land (p \Rightarrow q) \Rightarrow p \land q}{
+  \ulcorner p \land (p \Rightarrow q) \urcorner^{[1]} & \infer[\text{$\land$ intro}]{p \land q}{
+  \infer[$\land$\text{-elim}^{[1]}]{p}{
+  p \land (p \Rightarrow q)
+} & \infer[\text{$\Rightarrow$ elim}]{q}{
+  \infer[$\land$\text{-elim}^{[1]}]{p \Rightarrow q}{
+  p \land (p \Rightarrow q)
+} & \infer[$\land$\text{-elim}^{[1]}]{p}{
+  p \land (p \Rightarrow q)
+}
+}
+}
+}
+\]
+
+\bigskip
+\noindent
+\textbf{Solution 14}
+
+\medskip
+
+\bigskip
+
+In one direction:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \land q \Leftrightarrow p) \Rightarrow (p \Rightarrow q)}{
+  \ulcorner p \land q \Leftrightarrow p \urcorner^{[1]} & \infer[$\Rightarrow$\text{-intro}^{[2]}]{p \Rightarrow q}{
+  \ulcorner p \urcorner^{[2]} & \infer[$\land$\text{-elim}^{[3]}]{q}{
+  \infer[\text{$\Rightarrow$ elim from 1 $\land$ 2}]{p \land q}{
+  \infer[derived]{p \land q}{}
+}
+}
+}
+}
+\]
+
+\bigskip
+
+and the other:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \Rightarrow q) \Rightarrow (p \land q \Leftrightarrow p)}{
+  \ulcorner p \Rightarrow q \urcorner^{[1]} & \infer[\text{$\Leftrightarrow$ intro}]{p \land q \Leftrightarrow p}{
+  \infer[$\Rightarrow$\text{-intro}^{[2]}]{p \land q \Rightarrow p}{
+  \ulcorner p \land q \urcorner^{[2]} & \ulcorner p \urcorner^{[2]}
+} & \infer[$\Rightarrow$\text{-intro}^{[3]}]{p \Rightarrow p \land q}{
+  \ulcorner p \urcorner^{[3]} & \ulcorner p \land q \urcorner^{[1]}
+}
+}
+}
+\]
+
+\bigskip
+
+We can then combine these two proofs with $\Leftrightarrow$ intro.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 15}
+
+\medskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \Rightarrow q) \land \lnot q \Rightarrow \lnot p}{
+  \ulcorner (p \Rightarrow q) \land \lnot q \urcorner^{[1]} & \infer[false\text{-elim}^{[2]}]{\lnot p}{
+  \ulcorner p \urcorner^{[2]} & \infer[\text{false intro}]{false}{
+  \infer[\text{$\Rightarrow$ elim}]{q}{
+  \ulcorner p \Rightarrow q \urcorner^{[1]} & \ulcorner p \urcorner^{[2]}
+} & \ulcorner \lnot q \urcorner^{[1]}
+}
+}
+}
+\]
+
+\bigskip
+\noindent
+\textbf{Solution 16}
+
+\medskip
+
+\bigskip
+
+In one direction:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{p \land (q \lor r) \Rightarrow p \land q \lor p \land r}{
+  \ulcorner p \land (q \lor r) \urcorner^{[1]} & \infer[$\lor$\text{-elim}^{[2]}]{p \land q \lor p \land r}{
+  \ulcorner q \lor r \urcorner^{[1]} & \raiseproof{10ex}{\infer[\text{$\land$ intro}]{p \land q}{
+  \ulcorner p \urcorner^{[1]} & \infer[\text{case assumption}]{q}{}
+} & \infer[\text{$\lor$ intro}]{p \land q \lor p \land r}{}} & \hskip 6em \raiseproof{26ex}{\infer[\text{$\land$ intro}]{p \land r}{
+  \ulcorner p \urcorner^{[1]} & \infer[\text{case assumption}]{r}{}
+} & \infer[\text{$\lor$ intro}]{p \land q \lor p \land r}{}}
+}
+}
+\]
+
+\bigskip
+
+In the other:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[3]}]{p \land q \lor p \land r \Rightarrow p \land (q \lor r)}{
+  \ulcorner p \land q \lor p \land r \urcorner^{[3]} & \infer[$\lor$\text{-elim}^{[4]}]{p \land (q \lor r)}{
+  \ulcorner case1 \lor case2 \urcorner^{[3]} & \raiseproof{8ex}{\infer[\text{$\land$ elim}]{p}{} & \infer[\text{$\lor$ intro}]{q \lor r}{} & \infer[\text{$\land$ intro}]{p \land (q \lor r)}{}} & \hskip 6em \raiseproof{22ex}{\infer[\text{$\land$ elim}]{p}{} & \infer[\text{$\lor$ intro}]{q \lor r}{} & \infer[\text{$\land$ intro}]{p \land (q \lor r)}{}}
+}
+}
+\]
+
+\bigskip
+\noindent
+\textbf{Solution 17}
+
+\medskip
+
+\bigskip
+
+In one direction:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[3]}]{p \lor q \land r \Rightarrow (p \lor q) \land (p \lor r)}{
+  \ulcorner p \lor q \land r \urcorner^{[3]} & \infer[\text{$\lor$ elim $\land$ $\land$ intro}]{(p \lor q) \land (p \lor r)}{}
+}
+\]
+
+\bigskip
+
+and the other:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \lor q) \land (p \lor r) \Rightarrow p \lor q \land r}{
+  \ulcorner (p \lor q) \land (p \lor r) \urcorner^{[1]} & \ulcorner p \lor q \land r \urcorner^{[2]}
+}
+\]
+
+\bigskip
+\noindent
+\textbf{Solution 18}
+
+\medskip
+
+\bigskip
+
+In one direction:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \Rightarrow q) \Rightarrow \lnot p \lor q}{
+  \ulcorner p \Rightarrow q \urcorner^{[1]} & \lnot p \lor q
+}
+\]
+
+\bigskip
+
+and the other:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[3]}]{\lnot p \lor q \Rightarrow (p \Rightarrow q)}{
+  \ulcorner \lnot p \lor q \urcorner^{[3]} & \infer[$\Rightarrow$\text{-intro}^{[4]}]{p \Rightarrow q}{
+  \ulcorner p \urcorner^{[4]} & \ulcorner q \urcorner^{[3]}
+}
+}
+\]
+
+\section*{Sets and types}
+
+\bigskip
+\noindent
+\textbf{Solution 19}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 20}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 21}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 22}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 23}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 24}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 25}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 26}
+
+\medskip
+
+\section*{Relations}
+
+\bigskip
+\noindent
+\textbf{Solution 27}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 28}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 29}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 30}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 31}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 32}
+
+\medskip
+
+\section*{Functions}
+
+\bigskip
+\noindent
+\textbf{Solution 33}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 34}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 35}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 36}
+
+\medskip
+
+\section*{Sequences}
+
+\bigskip
+\noindent
+\textbf{Solution 37}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 38}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 39}
+
+\medskip
+
+\section*{Modelling}
+
+\bigskip
+\noindent
+\textbf{Solution 40}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 41}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 42}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 43}
+
+\medskip
+
+\section*{Free types and induction}
+
+\bigskip
+\noindent
+\textbf{Solution 44}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 45}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 46}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 47}
+
+\medskip
+
+\section*{Supplementary material : assignment practice}
+
+\bigskip
+\noindent
+\textbf{Solution 48}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 49}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 50}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 51}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 52}
+
+\medskip
+
+\end{document}
