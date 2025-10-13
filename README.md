@@ -2,15 +2,15 @@
 
 Convert whiteboard-style mathematical notation to high-quality LaTeX for formal methods and Z notation.
 
-## Current Status: Phase 11.8 ✅
+## Current Status: Phase 11.9 ✅
 
-**Production Ready!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, and **relational image**.
+**Production Ready!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, and **generic type instantiation**.
 
-- 🎯 18 phases complete (Phase 0-9, 10a-b, 11a-d, 11.5-11.8)
-- ✅ 453 tests passing
-- 📚 18 example files demonstrating all features
+- 🎯 19 phases complete (Phase 0-9, 10a-b, 11a-d, 11.5-11.9)
+- ✅ 469 tests passing
+- 📚 19 example files demonstrating all features
 - 🔧 Makefile automation for building PDFs
-- 📈 **86.5% solution coverage** (45/52 exercises fully working)
+- 📈 **90.4% solution coverage** (47/52 exercises fully working)
 
 ## Quick Start
 
@@ -596,6 +596,69 @@ R(| S |)(| T |)              →  R(⦇ S ⦈)(⦇ T ⦈)
 
 ---
 
+### Generic Type Instantiation (Phase 11.9)
+
+Generic type parameters allow polymorphic specifications:
+
+#### Basic Generic Instantiation
+```
+emptyset[N]                  →  ∅[N]
+seq[N]                       →  seq[N]
+P[X]                         →  P[X]
+```
+
+#### Multiple Type Parameters
+```
+Type[A, B]                   →  Type[A, B]
+Container[X, Y, Z]           →  Container[X, Y, Z]
+```
+
+#### Complex Type Parameters
+```
+emptyset[N cross N]          →  ∅[N × N]
+P[P X]                       →  P[P X]
+seq[N cross N]               →  seq[N × N]
+```
+
+#### Nested Generic Instantiation
+```
+Type[List[N]]                →  Type[List[N]]
+Container[seq[N]]            →  Container[seq[N]]
+```
+
+#### Chained Generic Instantiation
+```
+Type[N][M]                   →  Type[N][M]
+```
+**Note**: Parses left-to-right as `(Type[N])[M]`
+
+#### In Expressions
+```
+x in Type[N]                 →  x ∈ Type[N]
+A subset P[X]                →  A ⊆ P[X]
+emptyset[N] union {x}        →  ∅[N] ∪ {x}
+```
+
+#### In Set Comprehensions and Quantifiers
+```
+{ s : P[N] | s = emptyset[N] }
+→  { s : P[N] | s = ∅[N] }
+
+forall x : seq[N] | # x > 0
+→  ∀ x : seq[N] • # x > 0
+```
+
+**Whitespace Detection**: The parser distinguishes between:
+- `Type[X]` (no space) → generic instantiation
+- `p [justification]` (space before `[`) → justification bracket
+
+**Use cases:**
+- Polymorphic definitions: `[X] notin == { x : X ; s : P[X] | not (x in s) }`
+- Generic set types: `emptyset[N]`, `seq[Person]`, `P[Event]`
+- Type instantiation: `Type[A, B]` for multi-parameter types
+
+---
+
 ### Z Notation (Phase 4)
 
 #### Given Types
@@ -852,6 +915,15 @@ PROOF:
 - In comprehensions: `parentOf(| {p} |)`
 - Chained application
 
+### ✅ Phase 11.9: Generic Type Instantiation
+- Basic: `emptyset[N]`, `seq[N]`, `P[X]`
+- Multiple parameters: `Type[A, B, C]`
+- Complex parameters: `emptyset[N cross N]`
+- Nested: `Type[List[N]]`
+- Chained: `Type[N][M]`
+- In domains: `forall x : P[N] | ...`
+- Whitespace-sensitive parsing
+
 ---
 
 ## Command-Line Reference
@@ -929,6 +1001,7 @@ See the `examples/` directory for complete working examples:
 - **phase11_8_relational_image.txt** - Relational image
 - **test_tuples.txt** - Tuple expressions (Phase 11.6)
 - **test_set_literals.txt** - Set literals with maplets (Phase 11.7)
+- **phase11_9.txt** - Generic type instantiation (Phase 11.9)
 
 Build all examples:
 ```bash
@@ -972,7 +1045,7 @@ All code must pass:
 - ✅ MyPy strict mode (zero errors)
 - ✅ Ruff linting (zero violations)
 - ✅ Ruff formatting
-- ✅ All tests passing (453 tests)
+- ✅ All tests passing (469 tests)
 - ✅ Test coverage maintained (~79%)
 
 ### Running Tests
@@ -1173,7 +1246,7 @@ Contributions are welcome! Please:
 
 ## Roadmap
 
-### Completed (Phase 0-11.8) - 86.5% Solution Coverage
+### Completed (Phase 0-11.9) - 90.4% Solution Coverage ✅
 
 ✅ **Phase 0**: Propositional logic
 ✅ **Phase 1**: Document structure, truth tables
@@ -1195,14 +1268,19 @@ Contributions are welcome! Please:
 ✅ **Phase 11.6**: Tuple expressions (`(a, b, c)`)
 ✅ **Phase 11.7**: Set literals with maplets (`{1 |-> a, 2 |-> b}`)
 ✅ **Phase 11.8**: Relational image (`R(| S |)`)
+✅ **Phase 11.9**: Generic type instantiation (`emptyset[N]`, `Type[X]`, `P[N]`)
 
-### In Progress
+### Remaining Features (3 solutions to unblock)
 
-**Phase 11.9+: Remaining Features**
-- Generic type instantiation (`∅[N]`, `Type[X]`)
-- Compound identifiers (`R+`, `R*` as standalone)
-- Mu with expression part (`mu x : X | P . E`)
-- Nested quantifiers in implications
+**Partially Working Solutions (3):**
+- Solution 5(c): Nested quantifiers in implications
+- Solution 12: Mu-operator with expression part (`mu x : X | P . E`)
+- Solution 31(c,d): Compound identifiers (`R+`, `R*` as standalone)
+
+**To achieve 100% coverage:**
+- Compound identifiers with operators (would unblock 2 parts)
+- Mu with expression part (would unblock 1 solution)
+- Nested quantifier parsing improvements (would unblock 1 part)
 
 ### Future Phases (12-14)
 
@@ -1248,7 +1326,7 @@ For bugs, feature requests, or questions, please open an issue on GitHub.
 
 ---
 
-**Last Updated**: Phase 11.8 Complete (Relational Image)
-**Version**: 0.11.8
-**Status**: Production Ready - 86.5% Solution Coverage (45/52 exercises)
-**Test Suite**: 453 tests passing
+**Last Updated**: Phase 11.9 Complete (Generic Type Instantiation)
+**Version**: 0.11.9
+**Status**: Production Ready - 90.4% Solution Coverage (47/52 exercises)
+**Test Suite**: 469 tests passing
