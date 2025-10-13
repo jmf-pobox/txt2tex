@@ -52,7 +52,9 @@
       "Bash(PYTHONPATH=src hatch run python3:*)",
       "Bash(ls:*)",
       "Bash(make:*)",
-      "Bash(PYTHONPATH=../src python3:*)"
+      "Bash(PYTHONPATH=../src python3:*)",
+      "Bash(git checkout:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []

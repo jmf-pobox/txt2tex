@@ -205,16 +205,15 @@ In one direction:
 \infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \Rightarrow r) \land (q \Rightarrow r) \Rightarrow (p \lor q \Rightarrow r)}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]} & \infer[$\Rightarrow$\text{-intro}^{[2]}]{p \lor q \Rightarrow r}{
   \ulcorner p \lor q \urcorner^{[2]} & \infer[\text{$\lor$ elim}]{r}{
-  \infer[$\land$\text{-elim-1}]{p \Rightarrow r}{
+  \raiseproof{10ex}{\infer[$\land$\text{-elim-1}]{p \Rightarrow r}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
 } & \infer[\text{$\Rightarrow$ elim}]{r}{
   p \Rightarrow r & \ulcorner p \urcorner
-}
-  \infer[$\land$\text{-elim-2}]{q \Rightarrow r}{
+}} & \hskip 6em \raiseproof{26ex}{\infer[$\land$\text{-elim-2}]{q \Rightarrow r}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
 } & \infer[\text{$\Rightarrow$ elim}]{r}{
   q \Rightarrow r & \ulcorner q \urcorner
-}
+}}
 }
 }
 }
