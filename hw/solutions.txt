@@ -120,3 +120,5 @@ PROOF:
           :: r [=> elim]
             :: q => r [from above]
             [3] q [assumption]
+
+
