@@ -459,15 +459,14 @@ class Schema(ASTNode):
     """Schema definition block.
 
     Phase 9 enhancement: Supports generic parameters [X, Y, ...].
-    Example:
-    schema GenericStack[X]
-      items : seq X
-    where
-      # items <= 100
-    end
+    Phase 13 enhancement: Supports anonymous schemas (name=None).
+    Examples:
+    - schema GenericStack[X] ... end (named with generics)
+    - schema State ... end (named)
+    - schema ... end (anonymous)
     """
 
-    name: str
+    name: str | None  # Optional name (None for anonymous schemas)
     declarations: list[Declaration]
     predicates: list[Expr]
     generic_params: list[str] | None = None  # Optional generic parameters
