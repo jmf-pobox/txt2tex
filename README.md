@@ -2,14 +2,15 @@
 
 Convert whiteboard-style mathematical notation to high-quality LaTeX for formal methods and Z notation.
 
-## Current Status: Phase 11a ✅
+## Current Status: Phase 11.8 ✅
 
-**Production Ready!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, and **function type operators**.
+**Production Ready!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, and **relational image**.
 
-- 🎯 12 phases complete (Phase 0-9, 10a-b, 11a)
-- ✅ 320 tests passing
-- 📚 11 example files demonstrating all features
+- 🎯 18 phases complete (Phase 0-9, 10a-b, 11a-d, 11.5-11.8)
+- ✅ 453 tests passing
+- 📚 18 example files demonstrating all features
 - 🔧 Makefile automation for building PDFs
+- 📈 **86.5% solution coverage** (45/52 exercises fully working)
 
 ## Quick Start
 
@@ -412,6 +413,189 @@ X -> Y +-> Z >-> W           →  X ⇸ Y ⇀ Z ↣ W  (left-associative)
 
 ---
 
+### Function Application (Phase 11b)
+
+Function application uses standard mathematical notation:
+
+```
+f(x)                         →  f(x)
+g(x, y, z)                   →  g(x, y, z)
+```
+
+**Special Z notation functions** (generic instantiation):
+```
+seq(N)                       →  seq N  (sequence type)
+P(X)                         →  P X    (power set type)
+```
+
+**Nested application:**
+```
+f(g(h(x)))                   →  f(g(h(x)))
+```
+
+---
+
+### Lambda Expressions (Phase 11d)
+
+Lambda expressions define anonymous functions:
+
+#### Basic Lambdas
+```
+lambda x : N . x^2           →  λ x : ℕ • x²
+lambda f : X -> Y . f(x)     →  λ f : X ⇸ Y • f(x)
+```
+
+#### Multi-Variable Lambdas
+```
+lambda x, y : N . x + y      →  λ x, y : ℕ • x + y
+lambda a, b, c : Z . a       →  λ a, b, c : ℤ • a
+```
+
+#### Nested Lambdas
+```
+lambda x : X . lambda y : Y . (x, y)
+→  λ x : X • λ y : Y • (x, y)
+```
+
+#### Complex Domain Types
+```
+lambda f : X -> Y . lambda x : X . f(x)
+→  λ f : X ⇸ Y • λ x : X • f(x)
+```
+
+---
+
+### Additional Operators (Phase 11.5)
+
+#### Arithmetic Operators
+```
+x + y                        →  x + y   (addition)
+x * y                        →  x × y   (multiplication)
+x mod n                      →  x mod n (modulo)
+```
+
+#### Power Set Operators
+```
+P S                          →  P S    (power set)
+P1 S                         →  P₁ S   (non-empty power set)
+```
+
+#### Cartesian Product
+```
+A cross B                    →  A × B
+X cross Y cross Z            →  X × Y × Z
+```
+
+#### Set Difference
+```
+A \ B                        →  A ∖ B
+```
+
+#### Cardinality
+```
+# S                          →  # S
+# { x : N | x > 0 }          →  # { x : ℕ | x > 0 }
+```
+
+---
+
+### Tuple Expressions (Phase 11.6)
+
+Tuples are ordered collections of elements:
+
+```
+(a, b)                       →  (a, b)
+(x, y, z)                    →  (x, y, z)
+(1, 2, 3, 4)                 →  (1, 2, 3, 4)
+```
+
+**Tuples in expressions:**
+```
+(a, b+1, f(c))               →  (a, b+1, f(c))
+```
+
+**Tuples in set comprehensions:**
+```
+{ x : N | x > 0 . (x, x^2) }
+→  { x : ℕ | x > 0 • (x, x²) }
+```
+
+**Note**: Single-element parentheses `(x)` are parenthesized expressions, not tuples. Tuples require at least 2 elements.
+
+---
+
+### Set Literals (Phase 11.7)
+
+Explicit set notation with elements:
+
+#### Simple Set Literals
+```
+{1, 2, 3}                    →  {1, 2, 3}
+{a, b, c}                    →  {a, b, c}
+{}                           →  {}  (empty set)
+```
+
+#### Set Literals with Maplets
+```
+{1 |-> a, 2 |-> b, 3 |-> c}
+→  {1 ↦ a, 2 ↦ b, 3 ↦ c}
+```
+
+**Mixed content:**
+```
+{1, 2 |-> 3, 4}              →  {1, 2 ↦ 3, 4}
+```
+
+**Nested sets:**
+```
+{{1, 2}, {3, 4}}             →  {{1, 2}, {3, 4}}
+```
+
+---
+
+### Relational Image (Phase 11.8)
+
+The relational image gives the image of a set under a relation:
+
+#### Basic Relational Image
+```
+R(| S |)                     →  R(⦇ S ⦈)
+parentOf(| {john} |)         →  parentOf(⦇ {john} ⦈)
+```
+
+**Syntax**: `R(| S |)` where R is a relation and S is a set.
+
+**LaTeX**: Uses `\limg` and `\rimg` delimiters.
+
+#### With Set Literals
+```
+R(| {1, 2, 3} |)             →  R(⦇ {1, 2, 3} ⦈)
+```
+
+#### With Composed Relations
+```
+(R o9 S)(| A |)              →  (R ∘ S)(⦇ A ⦈)
+R~(| S |)                    →  R⁻¹(⦇ S ⦈)
+```
+
+#### In Set Comprehensions
+```
+{ p : Person | p in dom parentOf . (p, parentOf(| {p} |)) }
+→  { p : Person | p ∈ dom parentOf • (p, parentOf(⦇ {p} ⦈)) }
+```
+
+#### Chained Application
+```
+R(| S |)(| T |)              →  R(⦇ S ⦈)(⦇ T ⦈)
+```
+
+**Use cases:**
+- Function definitions: `{ p : Person . p |-> parentOf(| {p} |) }`
+- Image queries: `married(| {Alice, Bob} |)`
+- Relational composition: `(ancestor o9 parent)(| {john} |)`
+
+---
+
 ### Z Notation (Phase 4)
 
 #### Given Types
@@ -628,6 +812,46 @@ PROOF:
 - Bijections: `>->>` (X ⤖ Y)
 - Nested and complex function types
 
+### ✅ Phase 11b: Function Application
+- Standard application: `f(x)`, `g(x, y, z)`
+- Nested application: `f(g(h(x)))`
+- Generic instantiation: `seq(N)`, `P(X)`
+
+### ✅ Phase 11c: Function Type Parsing
+- Right-associative function types
+- Complex nested types
+- Integration with relation operators
+
+### ✅ Phase 11d: Lambda Expressions
+- Basic lambdas: `lambda x : N . x^2`
+- Multi-variable: `lambda x, y : N . x + y`
+- Nested lambdas
+- Complex domain types
+
+### ✅ Phase 11.5: Additional Operators
+- Arithmetic: `+`, `*`, `mod`
+- Power sets: `P`, `P1`
+- Cartesian product: `cross` (×)
+- Set difference: `\` (∖)
+- Cardinality: `#`
+
+### ✅ Phase 11.6: Tuple Expressions
+- Multi-element tuples: `(a, b, c)`
+- Tuples in expressions and comprehensions
+- Nested tuples
+
+### ✅ Phase 11.7: Set Literals
+- Simple literals: `{1, 2, 3}`, `{a, b, c}`
+- Empty set: `{}`
+- Maplets: `{1 |-> a, 2 |-> b}`
+- Nested sets
+
+### ✅ Phase 11.8: Relational Image
+- Basic: `R(| S |)`
+- With compositions: `(R o9 S)(| A |)`
+- In comprehensions: `parentOf(| {p} |)`
+- Chained application
+
 ---
 
 ## Command-Line Reference
@@ -697,15 +921,21 @@ See the `examples/` directory for complete working examples:
 - **phase7.txt** - Equality and special operators
 - **phase8.txt** - Set comprehension
 - **phase9.txt** - Generic parameters
-- **phase10a.txt** - Basic relation operators
-- **phase10b.txt** - Extended relation operators
+- **phase10a_relations.txt** - Basic relation operators
 - **phase11a.txt** - Function type operators
+- **phase11b.txt** - Function application
+- **phase11c.txt** - Function type parsing
+- **phase11d.txt** - Lambda expressions
+- **phase11_8_relational_image.txt** - Relational image
+- **test_tuples.txt** - Tuple expressions (Phase 11.6)
+- **test_set_literals.txt** - Set literals with maplets (Phase 11.7)
 
 Build all examples:
 ```bash
 cd examples
-make             # Build all
-make phase11a    # Build specific phase
+make                    # Build all
+make phase11a           # Build specific phase
+./txt2pdf.sh phase11_8_relational_image.txt  # Individual file
 ```
 
 ---
@@ -742,8 +972,8 @@ All code must pass:
 - ✅ MyPy strict mode (zero errors)
 - ✅ Ruff linting (zero violations)
 - ✅ Ruff formatting
-- ✅ All tests passing (320 tests)
-- ✅ Test coverage maintained
+- ✅ All tests passing (453 tests)
+- ✅ Test coverage maintained (~79%)
 
 ### Running Tests
 
@@ -781,7 +1011,13 @@ sem/
 │   ├── test_phase10a.py      # Phase 10a tests
 │   ├── test_phase10b.py      # Phase 10b tests
 │   ├── test_phase11a.py      # Phase 11a tests
-│   └── test_inline_math.py   # Inline math tests (320 total)
+│   ├── test_function_app.py  # Phase 11b tests
+│   ├── test_lambda.py        # Phase 11d tests
+│   ├── test_tuples.py        # Phase 11.6 tests
+│   ├── test_set_literals.py  # Phase 11.5/11.7 tests
+│   ├── test_relational_image.py # Phase 11.8 tests
+│   ├── test_inline_math.py   # Inline math tests
+│   └── ...                   # (453 tests total)
 ├── examples/                 # Example files
 │   ├── Makefile              # Build automation
 │   ├── phase0.txt            # Through phase9.txt
@@ -937,53 +1173,62 @@ Contributions are welcome! Please:
 
 ## Roadmap
 
-### Completed (Phase 0-11a)
-✅ Propositional logic
-✅ Document structure
-✅ Truth tables
-✅ Equivalence chains
-✅ Quantifiers (single and multi-variable)
-✅ Mathematical notation (subscripts, superscripts)
-✅ Set operators
-✅ Equality and special operators
-✅ Z notation basics (given, free types, abbreviations, schemas)
-✅ Natural deduction proof trees
-✅ Set comprehension
-✅ Generic parameters (polymorphic Z notation)
-✅ Inline math in TEXT paragraphs
-✅ **Phase 10a: Basic relation operators** (`<->`, `|->`, `<|`, `|>`, `dom`, `ran`, `;`, `comp`)
-✅ **Phase 10b: Extended relations** (`<<|`, `|>>`, `o9`, `inv`, `id`, `~`, `+`, `*`)
-✅ **Phase 11a: Function type operators** (`->`, `+->`, `>->`, `>+>`, `-->>`, `+->>`, `>->>`)
+### Completed (Phase 0-11.8) - 86.5% Solution Coverage
 
-### Future Phases (11b-14)
+✅ **Phase 0**: Propositional logic
+✅ **Phase 1**: Document structure, truth tables
+✅ **Phase 2**: Equivalence chains
+✅ **Phase 3**: Quantifiers, mathematical notation
+✅ **Phase 4**: Z notation basics (given, free types, abbreviations, schemas)
+✅ **Phase 5**: Natural deduction proof trees
+✅ **Phase 6**: Multi-variable quantifiers
+✅ **Phase 7**: Equality and special operators (exists1, mu)
+✅ **Phase 8**: Set comprehension, inline math
+✅ **Phase 9**: Generic parameters (polymorphic Z notation)
+✅ **Phase 10a**: Basic relation operators (`<->`, `|->`, `<|`, `|>`, `dom`, `ran`, `;`, `comp`)
+✅ **Phase 10b**: Extended relations (`<<|`, `|>>`, `o9`, `inv`, `id`, `~`, `+`, `*`)
+✅ **Phase 11a**: Function type operators (`->`, `+->`, `>->`, `>+>`, `-->>`, `+->>`, `>->>`)
+✅ **Phase 11b**: Function application (`f(x)`, `g(x,y,z)`)
+✅ **Phase 11c**: Function type parsing (right-associative)
+✅ **Phase 11d**: Lambda expressions (`lambda x : N . x^2`)
+✅ **Phase 11.5**: Additional operators (arithmetic, power set, cartesian product, set difference, cardinality)
+✅ **Phase 11.6**: Tuple expressions (`(a, b, c)`)
+✅ **Phase 11.7**: Set literals with maplets (`{1 |-> a, 2 |-> b}`)
+✅ **Phase 11.8**: Relational image (`R(| S |)`)
 
-**Phase 11b-d: Functions (continued)**
-- Function application
-- Lambda expressions
-- Function override
+### In Progress
+
+**Phase 11.9+: Remaining Features**
+- Generic type instantiation (`∅[N]`, `Type[X]`)
+- Compound identifiers (`R+`, `R*` as standalone)
+- Mu with expression part (`mu x : X | P . E`)
+- Nested quantifiers in implications
+
+### Future Phases (12-14)
 
 **Phase 12: Sequences**
 - Sequence types: `seq`, `seq1`, `iseq`
 - Sequence literals: `<a, b, c>`
-- Sequence operators: `^`, `head`, `tail`, `rev`
+- Sequence operators: `^`, `head`, `tail`, `rev`, `#`
 
 **Phase 13: Schemas & State Machines**
 - Schema decoration: `S'`, `S?`, `S!`
-- Delta/Xi notation
+- Delta/Xi notation: `∆S`, `ΞS`
 - Schema composition and operations
+- Pre/post-conditions
 
-**Phase 14: Free Types & Induction**
-- Recursive type definitions
-- Pattern matching
-- Inductive proof structure
+**Phase 14: Schema Calculus**
+- Schema conjunction, disjunction
+- Schema hiding, projection
+- Schema piping
+- Quantification over schemas
 
 ### Future Enhancements
-- Arithmetic operators (`+`, `-`, `*`, `/`)
-- Set literals: `{1, 2, 3}`
-- Tuple notation: `(a, b, c)`
-- Better error recovery
+- Better error recovery and messages
 - IDE integration (LSP server)
-- Schema decoration: `S'`, `∆S`, `ΞS`
+- Syntax highlighting configurations
+- Interactive REPL mode
+- LaTeX preview mode
 
 ---
 
@@ -1003,6 +1248,7 @@ For bugs, feature requests, or questions, please open an issue on GitHub.
 
 ---
 
-**Last Updated**: Phase 11a Complete (Function Type Operators)
-**Version**: 0.11.0
-**Status**: Production Ready for Phases 0-11a
+**Last Updated**: Phase 11.8 Complete (Relational Image)
+**Version**: 0.11.8
+**Status**: Production Ready - 86.5% Solution Coverage (45/52 exercises)
+**Test Suite**: 453 tests passing

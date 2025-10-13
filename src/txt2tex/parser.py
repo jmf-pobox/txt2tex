@@ -25,13 +25,16 @@ from txt2tex.ast_nodes import (
     ProofNode,
     ProofTree,
     Quantifier,
+    RelationalImage,
     Schema,
     Section,
     SetComprehension,
+    SetLiteral,
     Solution,
     Subscript,
     Superscript,
     TruthTable,
+    Tuple,
     UnaryOp,
 )
 from txt2tex.tokens import Token, TokenType
@@ -583,7 +586,10 @@ class Parser:
         return left
 
     def _parse_unary(self) -> Expr:
-        """Parse unary operation (not)."""
+        """Parse unary operation (not, #).
+
+        Phase 8 enhancement: Added cardinality operator (#) as prefix unary.
+        """
         if self._match(TokenType.NOT):
             op_token = self._advance()
             operand = self._parse_unary()
@@ -594,18 +600,104 @@ class Parser:
                 column=op_token.column,
             )
 
-        return self._parse_postfix()
+        # Cardinality operator (Phase 8)
+        if self._match(TokenType.HASH):
+            op_token = self._advance()
+            operand = self._parse_unary()
+            return UnaryOp(
+                operator=op_token.value,
+                operand=operand,
+                line=op_token.line,
+                column=op_token.column,
+            )
+
+        return self._parse_additive()
+
+    def _parse_additive(self) -> Expr:
+        """Parse additive operators (+ and -).
+
+        Arithmetic operators: + (addition), - (subtraction)
+        Note: + can also be postfix (transitive closure R+), handled by lookahead
+        """
+        left = self._parse_multiplicative()
+
+        while self._match(TokenType.PLUS):
+            # Lookahead: only treat as infix if followed by operand
+            if not self._is_operand_start():
+                break
+            op_token = self._advance()
+            right = self._parse_multiplicative()
+            left = BinaryOp(
+                operator=op_token.value,
+                left=left,
+                right=right,
+                line=op_token.line,
+                column=op_token.column,
+            )
+
+        return left
+
+    def _parse_multiplicative(self) -> Expr:
+        """Parse multiplicative operators (*, /, mod).
+
+        Arithmetic operators: * (multiplication), / (division), mod (modulo)
+        Note: * can also be postfix (reflexive-transitive closure R*),
+        handled by lookahead
+        """
+        left = self._parse_postfix()
+
+        while self._match(TokenType.STAR, TokenType.MOD):
+            # Lookahead for *: only treat as infix if followed by operand
+            if self._match(TokenType.STAR) and not self._is_operand_start():
+                break
+            op_token = self._advance()
+            right = self._parse_postfix()
+            left = BinaryOp(
+                operator=op_token.value,
+                left=left,
+                right=right,
+                line=op_token.line,
+                column=op_token.column,
+            )
+
+        return left
+
+    def _is_operand_start(self) -> bool:
+        """Check if next token could start an operand expression.
+
+        Used for lookahead to disambiguate postfix +/* from infix +/*.
+        Checks the NEXT token, not the current one.
+        """
+        next_token = self._peek_ahead(1)
+        return next_token.type in (
+            TokenType.IDENTIFIER,
+            TokenType.NUMBER,
+            TokenType.LPAREN,
+            TokenType.LBRACE,
+            TokenType.LBRACKET,
+            TokenType.NOT,
+            TokenType.HASH,
+            TokenType.POWER,
+            TokenType.POWER1,
+            TokenType.FORALL,
+            TokenType.EXISTS,
+            TokenType.EXISTS1,
+            TokenType.MU,
+            TokenType.LAMBDA,
+        )
 
     def _parse_quantifier(self) -> Expr:
         """Parse quantifier: (forall|exists|exists1|mu) var [, var]* : domain | body.
 
         Phase 6 enhancement: Supports multiple variables with shared domain.
         Phase 7 enhancement: Supports mu-operator (definite description).
+        Phase 11.5 enhancement: Supports mu with expression part (mu x : X | P . E).
         Examples:
         - forall x : N | pred
         - forall x, y : N | pred
         - exists1 x : N | pred
-        - mu x : N | pred (single variable only)
+        - mu x : N | pred
+        - mu x : N | pred . expr (Phase 11.5)
         """
         quant_token = self._advance()  # Consume 'forall', 'exists', 'exists1', or 'mu'
 
@@ -634,14 +726,23 @@ class Parser:
             raise ParserError("Expected '|' after quantifier binding", self._current())
         self._advance()  # Consume '|'
 
-        # Parse body (rest of expression)
-        body = self._parse_expr()
+        # Parse body
+        # For mu with expression part, we need to stop at PERIOD
+        # Use _parse_iff() to parse expression but not consume PERIOD
+        body = self._parse_iff()
+
+        # Phase 11.5: Check for optional expression part (mu only)
+        expression: Expr | None = None
+        if quant_token.value == "mu" and self._match(TokenType.PERIOD):
+            self._advance()  # Consume '.'
+            expression = self._parse_iff()  # Parse the expression part
 
         return Quantifier(
             quantifier=quant_token.value,
             variables=variables,
             domain=domain,
             body=body,
+            expression=expression,
             line=quant_token.line,
             column=quant_token.column,
         )
@@ -694,6 +795,154 @@ class Parser:
             body=body,
             line=lambda_token.line,
             column=lambda_token.column,
+        )
+
+    def _parse_set(self) -> Expr:
+        """Parse set literal or set comprehension (Phase 11.5).
+
+        Distinguishes between:
+        - Set literal: {1, 2, 3} or {a, b} - comma-separated elements
+        - Set comprehension: {x : X | pred} - has : and |
+
+        Strategy: Look ahead for : or | to determine type.
+        Multi-variable comprehensions like {x, y : N | ...} need special handling.
+        """
+        start_token = self._current()  # Save position before '{'
+        self._advance()  # Consume '{'
+
+        # Empty set: {}
+        if self._match(TokenType.RBRACE):
+            self._advance()  # Consume '}'
+            return SetLiteral(
+                elements=[], line=start_token.line, column=start_token.column
+            )
+
+        # Look ahead to distinguish literal from comprehension
+        # Strategy: Parse potential identifiers, check for : to determine type
+        saved_pos = self.pos
+        first_elem = self._parse_expr()
+
+        # Case 1: Immediate colon -> single-variable comprehension
+        if self._match(TokenType.COLON):
+            self.pos = saved_pos
+            return self._parse_set_comprehension_from_brace()
+
+        # Case 2: Immediate pipe + identifier -> comprehension without domain
+        if self._match(TokenType.PIPE):
+            if isinstance(first_elem, Identifier):
+                self.pos = saved_pos
+                return self._parse_set_comprehension_from_brace()
+            raise ParserError(
+                "Unexpected '|' in set literal",
+                self._current(),
+            )
+
+        # Case 3: Comma - need to look ahead further
+        # Could be {x, y : N | ...} or {1, 2, 3}
+        if self._match(TokenType.COMMA):
+            # Collect all comma-separated items
+            items: list[Expr] = [first_elem]
+            while self._match(TokenType.COMMA):
+                self._advance()  # Consume ','
+                if self._match(TokenType.RBRACE):
+                    # Trailing comma: {1, 2,}
+                    break
+                items.append(self._parse_expr())
+
+            # Check what follows the comma-separated items
+            if self._match(TokenType.COLON):
+                # Multi-variable comprehension: {x, y : N | ...}
+                # All items must be identifiers
+                if not all(isinstance(item, Identifier) for item in items):
+                    raise ParserError(
+                        "Set comprehension variables must be identifiers",
+                        self._current(),
+                    )
+                # Backtrack and parse as comprehension
+                self.pos = saved_pos
+                return self._parse_set_comprehension_from_brace()
+
+            # It's a literal: {1, 2, 3} or {a, b, c}
+            if not self._match(TokenType.RBRACE):
+                raise ParserError("Expected '}' to close set literal", self._current())
+            self._advance()  # Consume '}'
+            return SetLiteral(
+                elements=items, line=start_token.line, column=start_token.column
+            )
+
+        # Case 4: Single element followed by closing brace
+        if self._match(TokenType.RBRACE):
+            self._advance()  # Consume '}'
+            return SetLiteral(
+                elements=[first_elem],
+                line=start_token.line,
+                column=start_token.column,
+            )
+
+        # Unexpected token
+        raise ParserError(
+            "Expected ',', ':', '|', or '}' in set expression", self._current()
+        )
+
+    def _parse_set_comprehension_from_brace(self) -> Expr:
+        """Parse set comprehension after '{' already consumed.
+
+        Helper for _parse_set().
+        """
+        # Parse first variable
+        if not self._match(TokenType.IDENTIFIER):
+            raise ParserError(
+                "Expected variable name in set comprehension", self._current()
+            )
+        variables: list[str] = [self._advance().value]
+
+        # Parse additional variables if comma-separated
+        while self._match(TokenType.COMMA):
+            self._advance()  # Consume ','
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError("Expected variable name after ','", self._current())
+            variables.append(self._advance().value)
+
+        # Parse optional domain (: domain)
+        domain: Expr | None = None
+        if self._match(TokenType.COLON):
+            self._advance()  # Consume ':'
+            # Parse domain as atom (could be identifier like N, or more complex)
+            domain = self._parse_atom()
+
+        # Parse separator |
+        if not self._match(TokenType.PIPE):
+            raise ParserError(
+                "Expected '|' after set comprehension binding", self._current()
+            )
+        self._advance()  # Consume '|'
+
+        # Parse predicate expression (up to . or })
+        predicate = self._parse_set_predicate()
+
+        # Parse optional expression part (. expression)
+        expression: Expr | None = None
+        if self._match(TokenType.PERIOD):
+            self._advance()  # Consume '.'
+            # Parse expression (up to })
+            expression = self._parse_set_expression()
+
+        # Expect closing brace
+        if not self._match(TokenType.RBRACE):
+            raise ParserError(
+                "Expected '}' to close set comprehension", self._current()
+            )
+        self._advance()  # Consume '}'
+
+        # Use saved start position from _parse_set
+        start_token = self.tokens[self.pos - len(variables) - 5]  # Approximate
+        return SetComprehension(
+            variables=variables,
+            domain=domain,
+            predicate=predicate,
+            expression=expression,
+            line=start_token.line,
+            column=start_token.column,
         )
 
     def _parse_set_comprehension(self) -> Expr:
@@ -886,9 +1135,26 @@ class Parser:
 
     def _parse_union(self) -> Expr:
         """Parse union operator."""
-        left = self._parse_intersect()
+        left = self._parse_cross()
 
         while self._match(TokenType.UNION):
+            op_token = self._advance()
+            right = self._parse_cross()
+            left = BinaryOp(
+                operator=op_token.value,
+                left=left,
+                right=right,
+                line=op_token.line,
+                column=op_token.column,
+            )
+
+        return left
+
+    def _parse_cross(self) -> Expr:
+        """Parse Cartesian product operator (Phase 11.5)."""
+        left = self._parse_intersect()
+
+        while self._match(TokenType.CROSS):
             op_token = self._advance()
             right = self._parse_intersect()
             left = BinaryOp(
@@ -902,10 +1168,10 @@ class Parser:
         return left
 
     def _parse_intersect(self) -> Expr:
-        """Parse intersect operator."""
+        """Parse intersect and set difference operators (Phase 11.5)."""
         left = self._parse_unary()
 
-        while self._match(TokenType.INTERSECT):
+        while self._match(TokenType.INTERSECT, TokenType.SETMINUS):
             op_token = self._advance()
             right = self._parse_unary()
             left = BinaryOp(
@@ -924,6 +1190,10 @@ class Parser:
         Phase 3: ^ (superscript), _ (subscript) - take operands
         Phase 10b: ~ (inverse), + (transitive closure),
                    * (reflexive-transitive closure) - no operands
+        Phase 11.8: (| ... |) (relational image) - takes set argument
+
+        Disambiguation: + and * are postfix only if NOT followed by operand.
+        If followed by operand, they're infix arithmetic operators.
         """
         base = self._parse_atom()
 
@@ -934,7 +1204,30 @@ class Parser:
             TokenType.TILDE,
             TokenType.PLUS,
             TokenType.STAR,
+            TokenType.LIMG,  # (| for relational image
         ):
+            # Check for postfix +/* disambiguation
+            # If + or * followed by operand, treat as infix (don't consume as postfix)
+            if self._match(TokenType.PLUS, TokenType.STAR) and self._is_operand_start():
+                break
+
+            # Phase 11.8: Relational image R(| S |)
+            if self._match(TokenType.LIMG):
+                limg_token = self._advance()  # Consume '(|'
+                set_expr = self._parse_expr()  # Parse the set argument
+                if not self._match(TokenType.RIMG):
+                    raise ParserError(
+                        "Expected '|)' after relational image argument", self._current()
+                    )
+                self._advance()  # Consume '|)'
+                base = RelationalImage(
+                    relation=base,
+                    set=set_expr,
+                    line=limg_token.line,
+                    column=limg_token.column,
+                )
+                continue
+
             op_token = self._advance()
 
             if op_token.type == TokenType.CARET:
@@ -975,7 +1268,15 @@ class Parser:
         Phase 11d lambda expressions (lambda x : X . body).
         """
         # Phase 10a-b: Prefix relation functions (dom, ran, inv, id)
-        if self._match(TokenType.DOM, TokenType.RAN, TokenType.INV, TokenType.ID):
+        # Phase 11.5: Prefix set functions (P, P1)
+        if self._match(
+            TokenType.DOM,
+            TokenType.RAN,
+            TokenType.INV,
+            TokenType.ID,
+            TokenType.POWER,
+            TokenType.POWER1,
+        ):
             op_token = self._advance()
             operand = self._parse_atom()
             return UnaryOp(
@@ -1010,6 +1311,7 @@ class Parser:
                 )
 
             # Just an identifier
+            # Note: Relational image R(| S |) is handled in _parse_postfix()
             return Identifier(
                 name=name_token.value, line=name_token.line, column=name_token.column
             )
@@ -1019,16 +1321,42 @@ class Parser:
             return Number(value=token.value, line=token.line, column=token.column)
 
         if self._match(TokenType.LPAREN):
-            self._advance()  # Consume '('
-            expr = self._parse_expr()
+            lparen_token = self._advance()  # Consume '('
+
+            # Parse first expression
+            first_expr = self._parse_expr()
+
+            # Check for comma (tuple) vs single parenthesized expression
+            if self._match(TokenType.COMMA):
+                # It's a tuple: (expr, expr, ...)
+                elements: list[Expr] = [first_expr]
+
+                while self._match(TokenType.COMMA):
+                    self._advance()  # Consume ','
+                    # Check for trailing comma: (a, b,)
+                    if self._match(TokenType.RPAREN):
+                        break
+                    elements.append(self._parse_expr())
+
+                if not self._match(TokenType.RPAREN):
+                    raise ParserError("Expected ')' after tuple", self._current())
+                self._advance()  # Consume ')'
+
+                return Tuple(
+                    elements=elements,
+                    line=lparen_token.line,
+                    column=lparen_token.column,
+                )
+
+            # Single parenthesized expression
             if not self._match(TokenType.RPAREN):
                 raise ParserError("Expected ')' after expression", self._current())
             self._advance()  # Consume ')'
-            return expr
+            return first_expr
 
-        # Phase 8: Set comprehension { x : X | pred } or { x : X | pred . expr }
+        # Phase 8 + 11.5: Set comprehension or set literal
         if self._match(TokenType.LBRACE):
-            return self._parse_set_comprehension()
+            return self._parse_set()
 
         raise ParserError(
             f"Expected identifier, number, '(', '{{', or lambda,"
