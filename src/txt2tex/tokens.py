@@ -21,6 +21,7 @@ class TokenType(Enum):
     EXISTS = auto()
     EXISTS1 = auto()  # Unique existence quantifier
     MU = auto()  # Definite description (mu-operator)
+    LAMBDA = auto()  # Lambda expression (Phase 11d)
 
     # Set operators (Phase 3, enhanced in Phase 7)
     IN = auto()
