@@ -164,6 +164,15 @@ forall x : N | x >= z
 
 ** Solution 9 **
 
+(d)
+
+EQUIV:
+exists x : N | (x = 1 and x > y) or (x = 2 and x > z)
+<=> (exists x : N | x = 1 and x > y) or (exists x : N | x = 2 and x > z)
+<=> (1 in N and 1 > y) or (exists x : N | x = 2 and x > z)
+<=> (1 in N and 1 > y) or (2 in N and 2 > z)
+<=> 1 > y or 2 > z
+
 ** Solution 10 **
 
 ** Solution 11 **
