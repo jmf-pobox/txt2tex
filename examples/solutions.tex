@@ -687,6 +687,35 @@ x \in a \cup a \\
 
 \medskip
 
+(a)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+x \mapsto y \in A \dres B \dres R \\
+&\Leftrightarrow x \in A \land x \mapsto y \in (B \dres R) \\
+&\Leftrightarrow x \in A \land x \in B \land x \mapsto y \in R \\
+&\Leftrightarrow x \in A \cap B \land x \mapsto y \in R \\
+&\Leftrightarrow x \mapsto y \in A \cap B \dres R
+\end{align*}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+x \mapsto y \in R \cup S \rres C \\
+&\Leftrightarrow x \mapsto y \in R \cup S \land y \in C \\
+&\Leftrightarrow (x \mapsto y \in R \lor x \mapsto y \in S) \land y \in C \\
+&\Leftrightarrow x \mapsto y \in R \land y \in C \lor x \mapsto y \in S \land y \in C \\
+&\Leftrightarrow x \mapsto y \in R \rres C \lor x \mapsto y \in S \rres C \\
+&\Leftrightarrow x \mapsto y \in (R \rres C) \cup (S \rres C)
+\end{align*}
+
+\medskip
+
 \section*{Functions}
 
 \bigskip

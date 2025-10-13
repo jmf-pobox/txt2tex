@@ -352,6 +352,25 @@ x in a union a
 
 ** Solution 32 **
 
+(a)
+
+EQUIV:
+x |-> y in A <| (B <| R)
+<=> x in A and x |-> y in (B <| R)
+<=> x in A and x in B and x |-> y in R
+<=> x in A intersect B and x |-> y in R
+<=> x |-> y in (A intersect B) <| R
+
+(b)
+
+EQUIV:
+x |-> y in (R union S) |> C
+<=> x |-> y in (R union S) and y in C
+<=> (x |-> y in R or x |-> y in S) and y in C
+<=> (x |-> y in R and y in C) or (x |-> y in S and y in C)
+<=> x |-> y in R |> C or x |-> y in S |> C
+<=> x |-> y in (R |> C) union (S |> C)
+
 === Functions ===
 
 ** Solution 33 **
