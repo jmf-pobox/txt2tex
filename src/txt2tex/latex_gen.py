@@ -37,10 +37,11 @@ from txt2tex.parser import Parser
 
 
 class LaTeXGenerator:
-    """Generates LaTeX from AST for Phase 0-4 + Phase 10a.
+    """Generates LaTeX from AST for Phase 0-4 + Phase 10a-b.
 
     Phase 10a: Supports relation operators (<->, |->, <|, |>, comp, ;)
     and relation functions (dom, ran).
+    Phase 10b: Supports extended relation operators (<<|, |>>, o9, inv, id, ~, +, *).
     """
 
     # Operator mappings
@@ -70,6 +71,10 @@ class LaTeXGenerator:
         "|>": r"\rres",  # Range restriction
         "comp": r"\comp",  # Relational composition
         ";": r"\semi",  # Relational composition (semicolon)
+        # Extended relation operators (Phase 10b)
+        "<<|": r"\ndres",  # Domain subtraction (anti-restriction)
+        "|>>": r"\nrres",  # Range subtraction (anti-restriction)
+        "o9": r"\circ",  # Forward/backward composition
     }
 
     UNARY_OPS: ClassVar[dict[str, str]] = {
@@ -77,6 +82,13 @@ class LaTeXGenerator:
         # Relation functions (Phase 10a)
         "dom": r"\dom",  # Domain of relation
         "ran": r"\ran",  # Range of relation
+        # Extended relation functions (Phase 10b)
+        "inv": r"\inv",  # Inverse function
+        "id": r"\id",  # Identity relation
+        # Postfix operators (Phase 10b) - special handling needed
+        "~": r"^{-1}",  # Relational inverse (superscript -1)
+        "+": r"^+",  # Transitive closure (superscript +)
+        "*": r"^*",  # Reflexive-transitive closure (superscript *)
     }
 
     # Quantifier mappings (Phase 3, enhanced in Phase 6-7)
@@ -100,11 +112,14 @@ class LaTeXGenerator:
         ">=": 5,
         "=": 5,
         "!=": 5,
-        # Relation operators (Phase 10a) - between comparison and set ops
+        # Relation operators (Phase 10a-b) - between comparison and set ops
         "<->": 6,
         "|->": 6,
         "<|": 6,
         "|>": 6,
+        "<<|": 6,  # Phase 10b
+        "|>>": 6,  # Phase 10b
+        "o9": 6,  # Phase 10b
         "comp": 6,
         ";": 6,
         # Set operators - highest precedence
@@ -221,6 +236,9 @@ class LaTeXGenerator:
 
         Unary operators have higher precedence than all binary operators,
         so parentheses are added around binary operator operands.
+
+        Phase 10b: Postfix operators (~, +, *) are rendered as superscripts
+        on the operand, not as prefix operators.
         """
         op_latex = self.UNARY_OPS.get(node.operator)
         if op_latex is None:
@@ -233,7 +251,13 @@ class LaTeXGenerator:
         if isinstance(node.operand, BinaryOp):
             operand = f"({operand})"
 
-        return f"{op_latex} {operand}"
+        # Phase 10b: Check if this is a postfix operator (rendered as superscript)
+        if node.operator in {"~", "+", "*"}:
+            # Postfix: operand^{superscript}
+            return f"{operand}{op_latex}"
+        else:
+            # Prefix: operator operand
+            return f"{op_latex} {operand}"
 
     def _needs_parens(self, child: Expr, parent_op: str, is_left_child: bool) -> bool:
         """Check if child expression needs parentheses in parent context.
