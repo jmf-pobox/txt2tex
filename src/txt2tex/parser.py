@@ -14,6 +14,8 @@ from txt2tex.ast_nodes import (
     EquivStep,
     Expr,
     FreeType,
+    FunctionApp,
+    FunctionType,
     GivenType,
     Identifier,
     Number,
@@ -725,7 +727,7 @@ class Parser:
 
     def _parse_comparison(self) -> Expr:
         """Parse comparison operators (<, >, <=, >=, =, !=)."""
-        left = self._parse_relation()
+        left = self._parse_function_type()
 
         if self._match(
             TokenType.LESS_THAN,
@@ -736,7 +738,7 @@ class Parser:
             TokenType.NOT_EQUAL,
         ):
             op_token = self._advance()
-            right = self._parse_relation()
+            right = self._parse_function_type()
             left = BinaryOp(
                 operator=op_token.value,
                 left=left,
@@ -747,17 +749,46 @@ class Parser:
 
         return left
 
+    def _parse_function_type(self) -> Expr:
+        """Parse function type operators (Phase 11c).
+
+        Function types: ->, +->, >->, >+>, -->>, +->>, >->>
+        Right-associative: A -> B -> C parses as A -> (B -> C)
+        """
+        left = self._parse_relation()
+
+        # Check for function type arrow (right-associative)
+        if self._match(
+            TokenType.TFUN,  # ->
+            TokenType.PFUN,  # +->
+            TokenType.TINJ,  # >->
+            TokenType.PINJ,  # >+>
+            TokenType.TSURJ,  # -->>
+            TokenType.PSURJ,  # +->>
+            TokenType.BIJECTION,  # >->>
+        ):
+            arrow_token = self._advance()
+            # Right-associative: recursively parse the right side as function type
+            right = self._parse_function_type()
+            return FunctionType(
+                arrow=arrow_token.value,
+                domain=left,
+                range=right,
+                line=arrow_token.line,
+                column=arrow_token.column,
+            )
+
+        return left
+
     def _parse_relation(self) -> Expr:
-        """Parse relation and function type operators (Phase 10a-b, 11a).
+        """Parse relation operators (Phase 10a-b).
 
         Phase 10a: <->, |->, <|, |>, comp, ;
         Phase 10b: <<|, |>>, o9
-        Phase 11a: ->, +->, >->, >+>, -->>, +->>, >->>
         """
         left = self._parse_set_op()
 
-        # Phase 10a-b + 11a: Infix relation and function type operators
-        # (left-associative)
+        # Phase 10a-b: Infix relation operators (left-associative)
         while self._match(
             # Relation operators (Phase 10)
             TokenType.RELATION,  # <->
@@ -769,14 +800,6 @@ class Parser:
             TokenType.CIRC,  # o9 (Phase 10b)
             TokenType.COMP,  # comp
             TokenType.SEMICOLON,  # ;
-            # Function type operators (Phase 11a)
-            TokenType.TFUN,  # ->
-            TokenType.PFUN,  # +->
-            TokenType.TINJ,  # >->
-            TokenType.PINJ,  # >+>
-            TokenType.TSURJ,  # -->>
-            TokenType.PSURJ,  # +->>
-            TokenType.BIJECTION,  # >->>
         ):
             op_token = self._advance()
             right = self._parse_set_op()
@@ -893,7 +916,8 @@ class Parser:
         """Parse atom.
 
         Handles: identifier, number, parenthesized expression, set comprehension,
-        Phase 10a relation functions (dom, ran), and Phase 10b functions (inv, id).
+        Phase 10a relation functions (dom, ran), and Phase 10b functions (inv, id),
+        Phase 11b function application (f(x), g(x, y)).
         """
         # Phase 10a-b: Prefix relation functions (dom, ran, inv, id)
         if self._match(TokenType.DOM, TokenType.RAN, TokenType.INV, TokenType.ID):
@@ -906,9 +930,30 @@ class Parser:
                 column=op_token.column,
             )
 
+        # Phase 11b: Check for identifier (function application or identifier)
         if self._match(TokenType.IDENTIFIER):
-            token = self._advance()
-            return Identifier(name=token.value, line=token.line, column=token.column)
+            name_token = self._advance()
+
+            # Check if followed by '(' for function application
+            if self._match(TokenType.LPAREN):
+                self._advance()  # Consume '('
+                args = self._parse_argument_list()
+                if not self._match(TokenType.RPAREN):
+                    raise ParserError(
+                        "Expected ')' after function arguments", self._current()
+                    )
+                self._advance()  # Consume ')'
+                return FunctionApp(
+                    name=name_token.value,
+                    args=args,
+                    line=name_token.line,
+                    column=name_token.column,
+                )
+
+            # Just an identifier
+            return Identifier(
+                name=name_token.value, line=name_token.line, column=name_token.column
+            )
 
         if self._match(TokenType.NUMBER):
             token = self._advance()
@@ -931,6 +976,28 @@ class Parser:
             f" got {self._current().type.name}",
             self._current(),
         )
+
+    def _parse_argument_list(self) -> list[Expr]:
+        """Parse comma-separated argument list for function application.
+
+        Phase 11b: Handles empty list f(), single arg f(x), multiple args f(x, y, z).
+        Returns: List of expressions (arguments).
+        """
+        args: list[Expr] = []
+
+        # Empty argument list: f()
+        if self._match(TokenType.RPAREN):
+            return args
+
+        # Parse first argument
+        args.append(self._parse_expr())
+
+        # Parse remaining arguments (comma-separated)
+        while self._match(TokenType.COMMA):
+            self._advance()  # Consume ','
+            args.append(self._parse_expr())
+
+        return args
 
     def _parse_given_type(self) -> GivenType:
         """Parse given type: given A, B, C"""

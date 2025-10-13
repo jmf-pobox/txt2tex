@@ -1,0 +1,54 @@
+=== Phase 11c Function Type Arrows ===
+
+TEXT:
+Total function
+
+X -> Y
+
+TEXT:
+Partial function
+
+N +-> N
+
+TEXT:
+Total injection
+
+A >-> B
+
+TEXT:
+Partial injection
+
+X >+> Y
+
+TEXT:
+Total surjection
+
+A -->> B
+
+TEXT:
+Partial surjection
+
+X +->> Y
+
+TEXT:
+Bijection
+
+A >->> B
+
+TEXT:
+Higher order function type
+
+(N -> N) -> N
+
+TEXT:
+Right associative function types
+
+A -> B -> C
+
+X -> (Y -> Z)
+
+axdef
+  square : N -> N
+  pdiv : N +-> N
+  bmap : A >->> B
+end

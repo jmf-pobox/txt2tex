@@ -108,6 +108,50 @@ class SetComprehension(ASTNode):
     expression: Expr | None  # Optional expression (if present, set by expression)
 
 
+@dataclass(frozen=True)
+class FunctionApp(ASTNode):
+    """Function application node (Phase 11b).
+
+    Represents function application: f(x), g(x, y, z)
+    Also used for generic instantiation: seq(N), P(X)
+
+    Examples:
+    - f(x) -> name="f", args=[Identifier("x")]
+    - g(x, y, z) -> name="g", args=[Identifier("x"), Identifier("y"), Identifier("z")]
+    - seq(N) -> name="seq", args=[Identifier("N")]
+    - f(g(h(x))) -> name="f", args=[FunctionApp("g", [FunctionApp("h", [...])])]
+    """
+
+    name: str  # Function name
+    args: list[Expr]  # Argument list (can be empty for f())
+
+
+@dataclass(frozen=True)
+class FunctionType(ASTNode):
+    """Function type node (Phase 11c).
+
+    Represents function type arrows: X -> Y, X +-> Y, X >-> Y, etc.
+
+    Arrow types:
+    - "->" : total function (\\fun)
+    - "+->" : partial function (\\pfun)
+    - "->>" : total injection (\\inj)
+    - ">+>" : partial injection (\\pinj)
+    - "-->>" : total surjection (\\surj)
+    - "+->>" : partial surjection (\\psurj)
+    - ">->>" : bijection (\\bij)
+
+    Examples:
+    - X -> Y : total function from X to Y
+    - N +-> N : partial function from N to N
+    - A -> B -> C : curried function (right-associative: A -> (B -> C))
+    """
+
+    arrow: str  # Arrow type ("->", "+->", ">>", etc.)
+    domain: Expr  # Domain type
+    range: Expr  # Range type
+
+
 # Type alias for all expression types
 Expr = (
     BinaryOp
@@ -118,6 +162,8 @@ Expr = (
     | Subscript
     | Superscript
     | SetComprehension
+    | FunctionApp
+    | FunctionType
 )
 
 
