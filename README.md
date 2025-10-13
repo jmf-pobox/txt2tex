@@ -2,13 +2,13 @@
 
 Convert whiteboard-style mathematical notation to high-quality LaTeX for formal methods and Z notation.
 
-## Current Status: Phase 10b ✅
+## Current Status: Phase 11a ✅
 
-**Production Ready!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, and **extended relation operators**.
+**Production Ready!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, and **function type operators**.
 
-- 🎯 11 phases complete (Phase 0-9, 10a-b)
-- ✅ 287 tests passing
-- 📚 10 example files demonstrating all features
+- 🎯 12 phases complete (Phase 0-9, 10a-b, 11a)
+- ✅ 320 tests passing
+- 📚 11 example files demonstrating all features
 - 🔧 Makefile automation for building PDFs
 
 ## Quick Start
@@ -324,6 +324,75 @@ R~ = inv R                   →  R⁻¹ = inv R
 
 ---
 
+### Function Type Operators (Phase 11a)
+
+Function types in Z notation describe different classes of functions between sets.
+
+#### Total and Partial Functions
+
+**Total Functions** (every element in domain has a mapping):
+```
+f : X -> Y                   →  f : X ⇸ Y
+```
+
+**Partial Functions** (some elements may not have a mapping):
+```
+f : X +-> Y                  →  f : X ⇀ Y
+```
+
+#### Injections (one-to-one)
+
+**Total Injections** (injective total functions):
+```
+f : X >-> Y                  →  f : X ↣ Y
+```
+
+**Partial Injections** (injective partial functions):
+```
+f : X >+> Y                  →  f : X ⤔ Y
+```
+
+#### Surjections (onto)
+
+**Total Surjections** (surjective total functions):
+```
+f : X -->> Y                 →  f : X ↠ Y
+```
+
+**Partial Surjections** (surjective partial functions):
+```
+f : X +->> Y                 →  f : X ⤀ Y
+```
+
+#### Bijections (one-to-one and onto)
+
+**Bijections** (total injective and surjective):
+```
+f : X >->> Y                 →  f : X ⤖ Y
+```
+
+#### Complex Function Types
+
+**Nested function types:**
+```
+f : (X -> Y) -> Z            →  f : (X ⇸ Y) ⇸ Z
+g : X -> (Y +-> Z)           →  g : X ⇸ (Y ⇀ Z)
+h : (N -> N) -> (N -> N)     →  h : (ℕ ⇸ ℕ) ⇸ (ℕ ⇸ ℕ)
+```
+
+**Mixed function types:**
+```
+X -> Y +-> Z >-> W           →  X ⇸ Y ⇀ Z ↣ W  (left-associative)
+```
+
+#### Properties
+
+- **Precedence**: Function types have the same precedence as relations (level 6)
+- **Associativity**: Left-associative (e.g., `X -> Y -> Z` parses as `(X -> Y) -> Z`)
+- **Compatibility**: Work seamlessly with other relation operators
+
+---
+
 ### Z Notation (Phase 4)
 
 #### Given Types
@@ -530,6 +599,16 @@ PROOF:
 - Transitive closure: `+` (R⁺)
 - Reflexive-transitive closure: `*` (R*)
 
+### ✅ Phase 11a: Function Type Operators
+- Total functions: `->` (X ⇸ Y)
+- Partial functions: `+->` (X ⇀ Y)
+- Total injections: `>->` (X ↣ Y)
+- Partial injections: `>+>` (X ⤔ Y)
+- Total surjections: `-->>` (X ↠ Y)
+- Partial surjections: `+->>` (X ⤀ Y)
+- Bijections: `>->>` (X ⤖ Y)
+- Nested and complex function types
+
 ---
 
 ## Command-Line Reference
@@ -599,12 +678,15 @@ See the `examples/` directory for complete working examples:
 - **phase7.txt** - Equality and special operators
 - **phase8.txt** - Set comprehension
 - **phase9.txt** - Generic parameters
+- **phase10a.txt** - Basic relation operators
+- **phase10b.txt** - Extended relation operators
+- **phase11a.txt** - Function type operators
 
 Build all examples:
 ```bash
 cd examples
-make          # Build all
-make phase9   # Build specific phase
+make             # Build all
+make phase11a    # Build specific phase
 ```
 
 ---
@@ -641,7 +723,7 @@ All code must pass:
 - ✅ MyPy strict mode (zero errors)
 - ✅ Ruff linting (zero violations)
 - ✅ Ruff formatting
-- ✅ All tests passing (287 tests)
+- ✅ All tests passing (320 tests)
 - ✅ Test coverage maintained
 
 ### Running Tests
@@ -679,7 +761,8 @@ sem/
 │   ├── test_phase9.py        # Phase 9 tests
 │   ├── test_phase10a.py      # Phase 10a tests
 │   ├── test_phase10b.py      # Phase 10b tests
-│   └── test_inline_math.py   # Inline math tests (287 total)
+│   ├── test_phase11a.py      # Phase 11a tests
+│   └── test_inline_math.py   # Inline math tests (320 total)
 ├── examples/                 # Example files
 │   ├── Makefile              # Build automation
 │   ├── phase0.txt            # Through phase9.txt
@@ -835,7 +918,7 @@ Contributions are welcome! Please:
 
 ## Roadmap
 
-### Completed (Phase 0-10b)
+### Completed (Phase 0-11a)
 ✅ Propositional logic
 ✅ Document structure
 ✅ Truth tables
@@ -851,11 +934,11 @@ Contributions are welcome! Please:
 ✅ Inline math in TEXT paragraphs
 ✅ **Phase 10a: Basic relation operators** (`<->`, `|->`, `<|`, `|>`, `dom`, `ran`, `;`, `comp`)
 ✅ **Phase 10b: Extended relations** (`<<|`, `|>>`, `o9`, `inv`, `id`, `~`, `+`, `*`)
+✅ **Phase 11a: Function type operators** (`->`, `+->`, `>->`, `>+>`, `-->>`, `+->>`, `>->>`)
 
-### Future Phases (11-14)
+### Future Phases (11b-14)
 
-**Phase 11: Functions**
-- Function types: `->`, `+->`, `>->`, `-->>`, `>->>`
+**Phase 11b-d: Functions (continued)**
 - Function application
 - Lambda expressions
 - Function override
@@ -901,6 +984,6 @@ For bugs, feature requests, or questions, please open an issue on GitHub.
 
 ---
 
-**Last Updated**: Phase 10b Complete (Extended Relation Operators)
-**Version**: 0.10.2
-**Status**: Production Ready for Phases 0-10b
+**Last Updated**: Phase 11a Complete (Function Type Operators)
+**Version**: 0.11.0
+**Status**: Production Ready for Phases 0-11a

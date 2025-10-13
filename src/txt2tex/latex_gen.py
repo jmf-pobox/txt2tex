@@ -37,11 +37,12 @@ from txt2tex.parser import Parser
 
 
 class LaTeXGenerator:
-    """Generates LaTeX from AST for Phase 0-4 + Phase 10a-b.
+    """Generates LaTeX from AST for Phase 0-4 + Phase 10a-b + Phase 11a.
 
     Phase 10a: Supports relation operators (<->, |->, <|, |>, comp, ;)
     and relation functions (dom, ran).
     Phase 10b: Supports extended relation operators (<<|, |>>, o9, inv, id, ~, +, *).
+    Phase 11a: Supports function type operators (->, +->, >->, >+>, -->>, +->>, >->>).
     """
 
     # Operator mappings
@@ -75,6 +76,14 @@ class LaTeXGenerator:
         "<<|": r"\ndres",  # Domain subtraction (anti-restriction)
         "|>>": r"\nrres",  # Range subtraction (anti-restriction)
         "o9": r"\circ",  # Forward/backward composition
+        # Function type operators (Phase 11a)
+        "->": r"\fun",  # Total function
+        "+->": r"\pfun",  # Partial function
+        ">->": r"\inj",  # Total injection
+        ">+>": r"\pinj",  # Partial injection
+        "-->>": r"\surj",  # Total surjection
+        "+->>": r"\psurj",  # Partial surjection
+        ">->>": r"\bij",  # Bijection
     }
 
     UNARY_OPS: ClassVar[dict[str, str]] = {
@@ -122,6 +131,14 @@ class LaTeXGenerator:
         "o9": 6,  # Phase 10b
         "comp": 6,
         ";": 6,
+        # Function type operators (Phase 11a) - same as relations
+        "->": 6,
+        "+->": 6,
+        ">->": 6,
+        ">+>": 6,
+        "-->>": 6,
+        "+->>": 6,
+        ">->>": 6,
         # Set operators - highest precedence
         "in": 7,
         "notin": 7,
