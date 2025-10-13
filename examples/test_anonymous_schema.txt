@@ -1,0 +1,26 @@
+=== Testing Anonymous Schemas ===
+
+** Test 1: Named Schema **
+
+schema State
+  count : N
+where
+  count >= 0
+end
+
+** Test 2: Anonymous Schema **
+
+schema
+  hd : seq[N]
+where
+  # hd <= 100
+end
+
+** Test 3: Another Anonymous Schema **
+
+schema
+  x : N
+  y : N
+where
+  x + y < 100
+end

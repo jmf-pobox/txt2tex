@@ -1835,18 +1835,24 @@ class Parser:
         """Parse schema definition block.
 
         Phase 9 enhancement: Supports optional generic parameters.
-        Syntax: schema Name[X, Y] ... end or schema Name ... end
+        Phase 13 enhancement: Supports anonymous schemas (no name).
+        Syntax:
+        - schema Name[X, Y] ... end (named with generics)
+        - schema Name ... end (named)
+        - schema ... end (anonymous)
         """
         start_token = self._advance()  # Consume 'schema'
 
-        # Parse schema name
-        if not self._match(TokenType.IDENTIFIER):
-            raise ParserError("Expected schema name", self._current())
-        name = self._current().value
-        self._advance()
+        # Parse optional schema name
+        name: str | None = None
+        generic_params: list[str] | None = None
 
-        # Check for generic parameters after name
-        generic_params = self._parse_generic_params()
+        if self._match(TokenType.IDENTIFIER):
+            name = self._current().value
+            self._advance()
+            # Check for generic parameters after name
+            generic_params = self._parse_generic_params()
+
         self._skip_newlines()
 
         declarations: list[Declaration] = []
