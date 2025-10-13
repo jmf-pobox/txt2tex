@@ -6,9 +6,11 @@ from txt2tex.ast_nodes import (
     Document,
     Expr,
     FunctionApp,
+    GenericInstantiation,
     Identifier,
     Number,
     SequenceLiteral,
+    SetLiteral,
     TupleProjection,
     UnaryOp,
 )
@@ -447,8 +449,6 @@ class TestPhase12EdgeCases:
         text = "Type[List[N]]"
         ast = parse_expr(text)
         # Should parse as generic instantiation, not bag literal
-        from txt2tex.ast_nodes import GenericInstantiation
-
         assert isinstance(ast, GenericInstantiation)
 
     def test_empty_sequence_vs_tuple(self):
@@ -465,8 +465,6 @@ class TestPhase12EdgeCases:
         """Test ⟨1, 2⟩ vs {1, 2} - different constructs."""
         seq = parse_expr("⟨1, 2⟩")
         assert isinstance(seq, SequenceLiteral)
-
-        from txt2tex.ast_nodes import SetLiteral
 
         set_literal = parse_expr("{1, 2}")
         assert isinstance(set_literal, SetLiteral)

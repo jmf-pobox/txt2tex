@@ -1,0 +1,309 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Phase 12 : Sequences , Bags , and Tuple Projection}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Sequence Literals}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+Empty sequence
+
+\bigskip
+
+$\langle \rangle$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+Single element
+
+\bigskip
+
+$\langle a \rangle$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+Multiple elements
+
+\bigskip
+
+$\langle 1, 2, 3, 4, 5 \rangle$
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+Sequence of identifiers
+
+\bigskip
+
+$\langle x, y, z \rangle$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 2 : Sequence Operators}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\head \langle 1, 2, 3 \rangle$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\tail \langle 1, 2, 3 \rangle$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\last \langle 1, 2, 3 \rangle$
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+$\front \langle 1, 2, 3 \rangle$
+
+\medskip
+
+(e)
+\par
+\vspace{11pt}
+$\rev \langle 1, 2, 3 \rangle$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 3 : Sequence Concatenation}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\langle 1, 2 \rangle \cat \langle 3, 4 \rangle$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$s \cat t \cat u$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\langle a \rangle \cat \langle b, c \rangle \cat \langle d \rangle$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 4 : Tuple Projection}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$x.1$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$x.2$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$(a, b, c).1$
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+$(a, b, c).2$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 5 : Bag Literals}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\lbag x \rbag$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\lbag 1, 2, 3 \rbag$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\lbag a, b, c \rbag$
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+Bags with duplicates
+
+\bigskip
+
+$\lbag 1, 2, 2, 3, 3, 3 \rbag$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 6 : Sequences in Expressions}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$x \in \langle 1, 2, 3 \rangle$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\head s = a$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\tail \langle 1, 2, 3 \rangle = \langle 2, 3 \rangle$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 7 : Complex Expressions}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\forall i \colon N \bullet i \in \langle 1, 2, 3 \rangle \Rightarrow i > 0$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\exists s \colon seq[N] \bullet \head s = 1$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\{ x \colon N \mid x > 0 \bullet \langle x, x^2 \rangle \}$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 8 : Real Examples}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+From Solution 37
+
+\bigskip
+
+$\langle a \rangle$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+Tuple projection from Solution 38
+
+\bigskip
+
+$trains(x).2$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+Bags from Solution 39
+
+\bigskip
+
+$\lbag d \rbag$
+
+\medskip
+
+\end{document}

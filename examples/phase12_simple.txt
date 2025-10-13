@@ -1,0 +1,31 @@
+=== Phase 12 Feature Tests ===
+
+** Test 1: Sequence Literals from Solution 37 **
+
+(a) ⟨a⟩
+
+(b) ⟨a, b⟩
+
+** Test 2: Tuple Projection from Solution 38 **
+
+(a) (trains(x)).2
+
+(b) x.1
+
+(c) y.2
+
+** Test 3: Bag Literals from Solution 39 **
+
+(a) [[d]]
+
+(b) [[a, b, c]]
+
+** Test 4: Combined Features **
+
+(a) {⟨1, 2⟩, ⟨3, 4⟩}
+
+(b) head ⟨a, b, c⟩
+
+(c) tail ⟨1, 2, 3⟩
+
+(d) ⟨1, 2⟩ ⌢ ⟨3, 4⟩
