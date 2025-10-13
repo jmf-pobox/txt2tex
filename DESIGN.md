@@ -1012,25 +1012,33 @@ PROOF:
 
 ---
 
-## Coverage Assessment (As of Phase 8)
+## Coverage Assessment (As of Phase 11.9)
 
 ### Currently Supported ✅
-- **Propositional Logic**: Truth tables, equivalence chains, basic operators
+- **Propositional Logic**: Truth tables, equivalence chains, basic operators (and, or, not, =>, <=>)
 - **Document Structure**: Sections, solutions, part labels, proper spacing, explicit TEXT paragraphs
 - **Text Paragraphs**: Explicit `TEXT:` keyword captures raw line content with operator conversion
-- **Basic Proofs**: Natural deduction with =>-intro, =>-elim, and-intro, and-elim, or-intro, or-elim, false-intro, false-elim
-- **Proof Features**: Nested assumptions, discharge notation, case analysis (or-elim)
+- **Proofs**: Natural deduction with all major inference rules (=>-intro, =>-elim, and-intro, and-elim, or-intro, or-elim, false-intro, false-elim)
+- **Proof Features**: Nested assumptions, discharge notation, case analysis (or-elim), boxed assumption notation
 - **Quantifiers**: forall, exists, exists1, mu-operator with multi-variable support
 - **Subscripts/Superscripts**: `x_i`, `x^2`, `2^n`
-- **Set Operations**: in, notin, subset, union, intersect
-- **Set Comprehension** (Phase 8): `{ x : X | predicate }`, `{ x : X | predicate . expression }`, multi-variable, optional domain
+- **Set Operations**: in, notin, subset, union, intersect, cross (×), setminus (\), P (power set), P1, # (cardinality)
+- **Set Comprehension**: `{ x : X | predicate }`, `{ x : X | predicate . expression }`, multi-variable, optional domain
+- **Set Literals**: Including maplets `{1 |-> a, 2 |-> b, 3 |-> c}`
+- **Tuple Expressions**: `(a, b, c)` in set comprehensions and expressions
 - **Equality**: =, != in predicates and equivalence chains
-- **Basic Definitions**: Simple abbreviations (`Name == Expression`)
+- **Arithmetic**: +, *, mod operators
+- **Relations**: Relation type (<->), maplet (|->), domain restriction (<|), range restriction (|>), domain/range subtraction (<<|, |>>), composition (comp, ;, o9), inverse (~), transitive closure (+, *), dom, ran, inv, id, relational image (R(| S |))
+- **Functions**: All function types (partial, total, injection, surjection, bijection), lambda expressions
+- **Generic Parameters**: Generic definitions with [X] prefix, generic type instantiation (Type[A, B], emptyset[N], seq[N], P[X])
+- **Z Notation**: Given types, free types (::=), abbreviations (==), axiomatic definitions (axdef), schemas (schema)
 
 ### Coverage Statistics
-- **Solutions transcribed**: ~12 of 45+ (27%)
-- **Topics covered**: Propositional logic, basic natural deduction, predicate logic (quantifiers), basic equality
-- **Topics remaining**: Set comprehensions, relations, functions, sequences, schemas, free types, induction
+- **Solutions fully working**: 36 of 52 (69.2%)
+- **Solutions 1-36**: All working (propositional logic, quantifiers, equality, proofs, sets, relations, functions)
+- **Solutions 37-52**: NOT IMPLEMENTED (require sequences, state machines, free types)
+- **Topics covered**: Complete coverage through function theory and generic parameters
+- **Topics remaining**: Sequences (Phase 12), state machines (Phase 13), free types (Phase 14)
 
 ---
 
@@ -1333,7 +1341,7 @@ number\_of\_grandchildren = \\
 **Timeline**: 6-8 hours actual
 **Goal**: Generic type parameters for Z notation
 **Priority**: CRITICAL (needed for Solutions 25, 26)
-**Status**: ✅ Completed (90.4% coverage achieved)
+**Status**: ✅ Completed (69.2% coverage achieved - Solutions 1-36 fully working)
 
 **Added**:
 - Generic type instantiation: `Type[A, B]`, `emptyset[N]`, `seq[N]`, `P[X]`
@@ -1378,7 +1386,7 @@ $\forall x : seq[N] \bullet \# x > 0$
 
 **Test Coverage**: Solutions 25, 26 + comprehensive test suite (16 tests in test_generic_instantiation.py)
 **Deliverable**: Can process generic type specifications in Z notation
-**Result**: Achieved 90.4% solution coverage (47/52 solutions fully working)
+**Result**: Achieved 69.2% solution coverage (36/52 solutions fully working, Solutions 37-52 require additional features)
 
 ---
 
@@ -1544,29 +1552,24 @@ count~stalk = 0 \\
 
 ## Updated Timeline Summary
 
-### Completed (Phase 0-5b)
-- **Total time**: ~15-20 hours
-- **Coverage**: 22% of course material
-- **Status**: ✅ Propositional logic + basic natural deduction
+### Completed (Phase 0-11.9) ✅
+- **Total time invested**: ~60-80 hours
+- **Coverage**: 69.2% of course material (36/52 solutions)
+- **Status**: ✅ Phase 11 complete - all features for Solutions 1-36 implemented
+- **Phases complete**: 0, 1, 2, 3, 4, 5, 5b, 6, 7, 8, 9, 10a, 10b, 11a, 11b, 11c, 11d, 11.5, 11.6, 11.7, 11.8, 11.9
 
-### Remaining (Phases 6-14)
-- **Phase 6**: Quantifiers (4-6h) → 28% coverage
-- **Phase 7**: Equality/µ (3-4h) → 35% coverage
-- **Phase 8**: Sets (6-8h) → 50% coverage
-- **Phase 9**: Z Definitions (4-5h) → 55% coverage
-- **Phase 10**: Relations (8-10h) → 70% coverage
-- **Phase 11**: Functions (5-6h) → 78% coverage
-- **Phase 12**: Sequences (6-8h) → 85% coverage
-- **Phase 13**: Schemas (10-12h) → 93% coverage
-- **Phase 14**: Free types (8-10h) → 100% coverage
+### Remaining (Phases 12-14) for 100% Coverage
+- **Phase 12**: Sequences (6-8h) → 75% coverage (Solutions 37-39)
+- **Phase 13**: Schemas/State Machines (10-12h) → 83% coverage (Solutions 40-43)
+- **Phase 14**: Free types (8-10h) → 90% coverage (Solutions 44-47)
+- **Supplementary**: Advanced features (6-8h) → 100% coverage (Solutions 48-52)
 
-**Total remaining**: 54-69 hours of focused work
+**Total remaining**: 30-38 hours of focused work
 
 ### Grand Total
-- **All phases**: 69-89 hours for complete coverage
-- **Current progress**: 22% complete
-- **Critical path for homework**: Phases 6, 8, 9, 10, 11 (minimal) = 21-31 hours
-- **Critical path for course**: Phases 6-8 needed for most exercises
+- **Current progress**: 69.2% complete (36/52 solutions)
+- **Estimated total for 100%**: 90-118 hours
+- **Next milestone**: Phase 12 (Sequences) → 75% coverage
 
 ### Advantages of Phased Approach
 1. ✅ **Early utility**: Phase 1 usable for truth table problems immediately
