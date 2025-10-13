@@ -29,7 +29,12 @@
       "Bash(ls:*)",
       "Bash(make:*)",
       "Bash(git checkout:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(pdftotext:*)",
+      "Bash(awk:*)",
+      "Bash(python:*)",
+      "Bash(PYTHONPATH=src python test_axdef_lambda.py)",
+      "Bash(PYTHONPATH=src python:*)"
     ],
     "deny": [],
     "ask": []
