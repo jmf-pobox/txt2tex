@@ -624,16 +624,18 @@ class Parser:
         return self._parse_additive()
 
     def _parse_additive(self) -> Expr:
-        """Parse additive operators (+ and -).
+        """Parse additive operators (+ and - and ⌢).
 
         Arithmetic operators: + (addition), - (subtraction)
+        Sequence operator: ⌢ (concatenation) - Phase 12
         Note: + can also be postfix (transitive closure R+), handled by lookahead
         """
         left = self._parse_multiplicative()
 
-        while self._match(TokenType.PLUS):
-            # Lookahead: only treat as infix if followed by operand
-            if not self._is_operand_start():
+        while self._match(TokenType.PLUS, TokenType.CAT):
+            # Lookahead for +: only treat as infix if followed by operand
+            # CAT (⌢) is always infix, no ambiguity
+            if self._match(TokenType.PLUS) and not self._is_operand_start():
                 break
             op_token = self._advance()
             right = self._parse_multiplicative()
