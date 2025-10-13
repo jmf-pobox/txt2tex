@@ -26,13 +26,16 @@ from txt2tex.ast_nodes import (
     ProofNode,
     ProofTree,
     Quantifier,
+    RelationalImage,
     Schema,
     Section,
     SetComprehension,
+    SetLiteral,
     Solution,
     Subscript,
     Superscript,
     TruthTable,
+    Tuple,
     UnaryOp,
 )
 from txt2tex.lexer import Lexer
@@ -62,12 +65,14 @@ class LaTeXGenerator:
         ">=": r"\geq",
         "=": r"=",
         "!=": r"\neq",
-        # Set operators (Phase 3, enhanced in Phase 7)
+        # Set operators (Phase 3, enhanced in Phase 7, Phase 11.5)
         "in": r"\in",
         "notin": r"\notin",
         "subset": r"\subseteq",
         "union": r"\cup",
         "intersect": r"\cap",
+        "cross": r"\cross",  # Cartesian product
+        "\\": r"\setminus",  # Set difference
         # Relation operators (Phase 10a)
         "<->": r"\rel",  # Relation type
         "|->": r"\mapsto",  # Maplet constructor
@@ -87,16 +92,24 @@ class LaTeXGenerator:
         "-->>": r"\surj",  # Total surjection
         "+->>": r"\psurj",  # Partial surjection
         ">->>": r"\bij",  # Bijection
+        # Arithmetic operators
+        "+": r"+",  # Addition (also postfix in relational context)
+        "*": r"*",  # Multiplication (also postfix in relational context)
+        "mod": r"\bmod",  # Modulo
     }
 
     UNARY_OPS: ClassVar[dict[str, str]] = {
         "not": r"\lnot",
+        "#": r"\#",  # Cardinality (Phase 8)
         # Relation functions (Phase 10a)
         "dom": r"\dom",  # Domain of relation
         "ran": r"\ran",  # Range of relation
         # Extended relation functions (Phase 10b)
         "inv": r"\inv",  # Inverse function
         "id": r"\id",  # Identity relation
+        # Set functions (Phase 11.5)
+        "P": r"\power",  # Power set
+        "P1": r"\power_1",  # Non-empty power set
         # Postfix operators (Phase 10b) - special handling needed
         "~": r"^{-1}",  # Relational inverse (superscript -1)
         "+": r"^+",  # Transitive closure (superscript +)
@@ -147,7 +160,9 @@ class LaTeXGenerator:
         "notin": 7,
         "subset": 7,
         "union": 8,
-        "intersect": 9,  # Highest precedence (for binary ops)
+        "cross": 8,  # Cartesian product (Phase 11.5) - same as union
+        "intersect": 9,
+        "\\": 9,  # Set difference (Phase 11.5) - same as intersect
     }
 
     # Right-associative operators (need parens on left when same operator)
@@ -242,10 +257,16 @@ class LaTeXGenerator:
             return self._generate_superscript(expr)
         if isinstance(expr, SetComprehension):
             return self._generate_set_comprehension(expr)
+        if isinstance(expr, SetLiteral):
+            return self._generate_set_literal(expr)
         if isinstance(expr, FunctionApp):
             return self._generate_function_app(expr)
         if isinstance(expr, FunctionType):
             return self._generate_function_type(expr)
+        if isinstance(expr, Tuple):
+            return self._generate_tuple(expr)
+        if isinstance(expr, RelationalImage):
+            return self._generate_relational_image(expr)
 
         raise TypeError(f"Unknown expression type: {type(expr)}")
 
@@ -281,6 +302,10 @@ class LaTeXGenerator:
         if node.operator in {"~", "+", "*"}:
             # Postfix: operand^{superscript}
             return f"{operand}{op_latex}"
+        # Phase 11.5: Generic instantiation operators (P, P1) use tilde
+        elif node.operator in {"P", "P1"}:
+            # Generic instantiation: \power~X
+            return f"{op_latex}~{operand}"
         else:
             # Prefix: operator operand
             return f"{op_latex} {operand}"
@@ -345,11 +370,13 @@ class LaTeXGenerator:
 
         Phase 6 enhancement: Supports multiple variables.
         Phase 7 enhancement: Supports mu-operator (definite description).
+        Phase 11.5 enhancement: Supports mu with expression part (mu x : X | P . E).
         Examples:
         - forall x : N | pred -> \\forall x \\colon N \\bullet pred
         - forall x, y : N | pred -> \\forall x, y \\colon N \\bullet pred
         - exists1 x : N | pred -> \\exists_1 x \\colon N \\bullet pred
         - mu x : N | pred -> \\mu x \\colon N \\bullet pred
+        - mu x : N | pred . expr -> \\mu x \\colon N \\mid pred \\bullet expr
         """
         quant_latex = self.QUANTIFIERS.get(node.quantifier)
         if quant_latex is None:
@@ -364,10 +391,21 @@ class LaTeXGenerator:
             parts.append(r"\colon")
             parts.append(domain_latex)
 
-        # Add bullet separator and body
-        parts.append(r"\bullet")
-        body_latex = self.generate_expr(node.body)
-        parts.append(body_latex)
+        # Phase 11.5: Check if mu has expression part
+        if node.quantifier == "mu" and node.expression:
+            # Use \mid (mid) instead of \bullet for predicate separator
+            parts.append(r"\mid")
+            body_latex = self.generate_expr(node.body)
+            parts.append(body_latex)
+            # Add bullet separator and expression
+            parts.append(r"\bullet")
+            expr_latex = self.generate_expr(node.expression)
+            parts.append(expr_latex)
+        else:
+            # Standard quantifier: bullet separator and body
+            parts.append(r"\bullet")
+            body_latex = self.generate_expr(node.body)
+            parts.append(body_latex)
 
         return " ".join(parts)
 
@@ -439,6 +477,22 @@ class LaTeXGenerator:
         parts.append(r"\}")
 
         return " ".join(parts)
+
+    def _generate_set_literal(self, node: SetLiteral) -> str:
+        """Generate LaTeX for set literal (Phase 11.5).
+
+        Examples:
+        - {1, 2, 3} -> \\{1, 2, 3\\}
+        - {a, b} -> \\{a, b\\}
+        - {} -> \\{\\} (empty set)
+        """
+        if not node.elements:
+            # Empty set - render as \{\}
+            return r"\{\}"
+
+        # Generate comma-separated elements
+        elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
+        return f"\\{{{elements_latex}\\}}"
 
     def _generate_subscript(self, node: Subscript) -> str:
         """Generate LaTeX for subscript (a_1, x_i)."""
@@ -512,6 +566,35 @@ class LaTeXGenerator:
             range_latex = f"({range_latex})"
 
         return f"{domain_latex} {arrow_latex} {range_latex}"
+
+    def _generate_tuple(self, node: Tuple) -> str:
+        """Generate LaTeX for tuple expression (Phase 11.6).
+
+        Examples:
+        - (1, 2) -> (1, 2)
+        - (x, y, z) -> (x, y, z)
+        - (a, b+1, f(c)) -> (a, b+1, f(c))
+
+        Tuples are rendered as comma-separated expressions in parentheses.
+        """
+        elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
+        return f"({elements_latex})"
+
+    def _generate_relational_image(self, node: RelationalImage) -> str:
+        """Generate LaTeX for relational image (Phase 11.8).
+
+        The relational image R(| S |) gives the image of set S under relation R.
+
+        Examples:
+        - R(| {1, 2} |) -> R(\\limg \\{1, 2\\} \\rimg)
+        - parentOf(| {john} |) -> parentOf(\\limg \\{john\\} \\rimg)
+        - (R o9 S)(| A |) -> (R \\circ S)(\\limg A \\rimg)
+
+        LaTeX rendering uses \\limg and \\rimg delimiters.
+        """
+        relation_latex = self.generate_expr(node.relation)
+        set_latex = self.generate_expr(node.set)
+        return f"{relation_latex}(\\limg {set_latex} \\rimg)"
 
     def _generate_section(self, node: Section) -> list[str]:
         """Generate LaTeX for section."""
