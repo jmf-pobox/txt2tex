@@ -26,7 +26,7 @@ all: $(PDF_FILES)
 	@../txt2pdf.sh $< > /dev/null 2>&1 || (echo "Error building $@"; exit 1)
 
 # Individual phase targets for convenience
-.PHONY: phase0 phase1 phase2 phase3 phase4 phase5 phase6 phase7 phase8
+.PHONY: phase0 phase1 phase2 phase3 phase4 phase5 phase6 phase7 phase8 phase9 phase10a phase10b phase11a
 phase0: phase0.pdf
 phase1: phase1.pdf
 phase2: phase2.pdf
@@ -36,6 +36,10 @@ phase5: phase5.pdf
 phase6: phase6.pdf
 phase7: phase7.pdf
 phase8: phase8.pdf
+phase9: phase9.pdf
+phase10a: phase10a.pdf
+phase10b: phase10b.pdf
+phase11a: phase11a.pdf
 
 # Clean generated files
 .PHONY: clean
@@ -50,7 +54,7 @@ clean:
 list:
 	@echo "Available targets:"
 	@echo "  all          - Build all PDFs (default)"
-	@echo "  phase0-8     - Build specific phase PDF"
+	@echo "  phase0-11a   - Build specific phase PDF"
 	@echo "  clean        - Remove all generated files"
 	@echo "  list         - Show this help"
 	@echo ""
