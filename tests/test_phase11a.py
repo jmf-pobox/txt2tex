@@ -12,7 +12,7 @@ Phase 11a adds 7 function type operators for Z notation:
 
 from __future__ import annotations
 
-from txt2tex.ast_nodes import BinaryOp, Identifier
+from txt2tex.ast_nodes import BinaryOp, FunctionType, Identifier
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
@@ -117,93 +117,97 @@ class TestPhase11aParser:
     """Test Phase 11a function type operators in parser."""
 
     def test_tfun_parsing(self) -> None:
-        """Test -> (total function) parses to BinaryOp."""
+        """Test -> (total function) parses to FunctionType."""
         lexer = Lexer("X -> Y")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)
-        assert ast.operator == "->"
-        assert isinstance(ast.left, Identifier)
-        assert ast.left.name == "X"
-        assert isinstance(ast.right, Identifier)
-        assert ast.right.name == "Y"
+        assert isinstance(ast, FunctionType)
+        assert ast.arrow == "->"
+        assert isinstance(ast.domain, Identifier)
+        assert ast.domain.name == "X"
+        assert isinstance(ast.range, Identifier)
+        assert ast.range.name == "Y"
 
     def test_pfun_parsing(self) -> None:
-        """Test +-> (partial function) parses to BinaryOp."""
+        """Test +-> (partial function) parses to FunctionType."""
         lexer = Lexer("X +-> Y")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)
-        assert ast.operator == "+->"
+        assert isinstance(ast, FunctionType)
+        assert ast.arrow == "+->"
 
     def test_tinj_parsing(self) -> None:
-        """Test >-> (total injection) parses to BinaryOp."""
+        """Test >-> (total injection) parses to FunctionType."""
         lexer = Lexer("X >-> Y")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)
-        assert ast.operator == ">->"
+        assert isinstance(ast, FunctionType)
+        assert ast.arrow == ">->"
 
     def test_pinj_parsing(self) -> None:
-        """Test >+> (partial injection) parses to BinaryOp."""
+        """Test >+> (partial injection) parses to FunctionType."""
         lexer = Lexer("X >+> Y")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)
-        assert ast.operator == ">+>"
+        assert isinstance(ast, FunctionType)
+        assert ast.arrow == ">+>"
 
     def test_tsurj_parsing(self) -> None:
-        """Test -->> (total surjection) parses to BinaryOp."""
+        """Test -->> (total surjection) parses to FunctionType."""
         lexer = Lexer("X -->> Y")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)
-        assert ast.operator == "-->>"
+        assert isinstance(ast, FunctionType)
+        assert ast.arrow == "-->>"
 
     def test_psurj_parsing(self) -> None:
-        """Test +->> (partial surjection) parses to BinaryOp."""
+        """Test +->> (partial surjection) parses to FunctionType."""
         lexer = Lexer("X +->> Y")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)
-        assert ast.operator == "+->>"
+        assert isinstance(ast, FunctionType)
+        assert ast.arrow == "+->>"
 
     def test_bijection_parsing(self) -> None:
-        """Test >->> (bijection) parses to BinaryOp."""
+        """Test >->> (bijection) parses to FunctionType."""
         lexer = Lexer("X >->> Y")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)
-        assert ast.operator == ">->>"
+        assert isinstance(ast, FunctionType)
+        assert ast.arrow == ">->>"
 
-    def test_left_associativity(self) -> None:
-        """Test function types are left-associative."""
+    def test_right_associativity(self) -> None:
+        """Test function types are right-associative."""
         lexer = Lexer("X -> Y -> Z")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
 
-        # Should parse as (X -> Y) -> Z (left-associative)
-        assert isinstance(ast, BinaryOp)
-        assert ast.operator == "->"
-        assert isinstance(ast.left, BinaryOp)
-        assert ast.left.operator == "->"
-        assert isinstance(ast.right, Identifier)
-        assert ast.right.name == "Z"
+        # Should parse as X -> (Y -> Z) (right-associative)
+        assert isinstance(ast, FunctionType)
+        assert ast.arrow == "->"
+        assert isinstance(ast.domain, Identifier)
+        assert ast.domain.name == "X"
+        assert isinstance(ast.range, FunctionType)
+        assert ast.range.arrow == "->"
+        assert isinstance(ast.range.domain, Identifier)
+        assert ast.range.domain.name == "Y"
+        assert isinstance(ast.range.range, Identifier)
+        assert ast.range.range.name == "Z"
 
     def test_precedence_with_relations(self) -> None:
         """Test function types have same precedence as relations."""
@@ -213,11 +217,13 @@ class TestPhase11aParser:
         parser = Parser(tokens)
         ast = parser.parse()
 
-        # Both at precedence 6, so left-associative: (X -> Y) <-> Z
-        assert isinstance(ast, BinaryOp)
-        assert ast.operator == "<->"
-        assert isinstance(ast.left, BinaryOp)
-        assert ast.left.operator == "->"
+        # Both at precedence 6, but -> is right-assoc: X -> (Y <-> Z)
+        assert isinstance(ast, FunctionType)
+        assert ast.arrow == "->"
+        assert isinstance(ast.domain, Identifier)
+        assert ast.domain.name == "X"
+        assert isinstance(ast.range, BinaryOp)
+        assert ast.range.operator == "<->"
 
 
 class TestPhase11aLaTeXGeneration:
@@ -229,7 +235,7 @@ class TestPhase11aLaTeXGeneration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, BinaryOp)  # Type narrowing for mypy
+        assert isinstance(ast, FunctionType)  # Type narrowing for mypy
 
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
@@ -242,7 +248,7 @@ class TestPhase11aLaTeXGeneration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, BinaryOp)
+        assert isinstance(ast, FunctionType)
 
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
@@ -255,7 +261,7 @@ class TestPhase11aLaTeXGeneration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, BinaryOp)
+        assert isinstance(ast, FunctionType)
 
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
@@ -268,7 +274,7 @@ class TestPhase11aLaTeXGeneration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, BinaryOp)
+        assert isinstance(ast, FunctionType)
 
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
@@ -281,7 +287,7 @@ class TestPhase11aLaTeXGeneration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, BinaryOp)
+        assert isinstance(ast, FunctionType)
 
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
@@ -294,7 +300,7 @@ class TestPhase11aLaTeXGeneration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, BinaryOp)
+        assert isinstance(ast, FunctionType)
 
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
@@ -307,7 +313,7 @@ class TestPhase11aLaTeXGeneration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, BinaryOp)
+        assert isinstance(ast, FunctionType)
 
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
@@ -320,7 +326,7 @@ class TestPhase11aLaTeXGeneration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, BinaryOp)
+        assert isinstance(ast, FunctionType)
 
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
@@ -340,8 +346,8 @@ class TestPhase11aIntegration:
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)
-        assert ast.operator == "->"
+        assert isinstance(ast, FunctionType)
+        assert ast.arrow == "->"
 
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
@@ -356,7 +362,7 @@ class TestPhase11aIntegration:
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)
+        assert isinstance(ast, FunctionType)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
 
@@ -370,7 +376,7 @@ class TestPhase11aIntegration:
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)
+        assert isinstance(ast, FunctionType)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
 
@@ -384,7 +390,7 @@ class TestPhase11aIntegration:
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)
+        assert isinstance(ast, FunctionType)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
 
@@ -415,7 +421,7 @@ class TestPhase11aIntegration:
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)
+        assert isinstance(ast, FunctionType)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
 
@@ -430,7 +436,7 @@ class TestPhase11aIntegration:
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)  # Type narrowing
+        assert isinstance(ast, FunctionType)  # Type narrowing
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
 
@@ -447,7 +453,7 @@ class TestPhase11aIntegration:
         parser = Parser(tokens)
         ast = parser.parse()
 
-        assert isinstance(ast, BinaryOp)  # Type narrowing
+        assert isinstance(ast, FunctionType)  # Type narrowing
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
 
