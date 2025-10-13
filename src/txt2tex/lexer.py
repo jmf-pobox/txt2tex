@@ -17,11 +17,12 @@ class LexerError(Exception):
 
 class Lexer:
     """
-    Tokenizes input text for Phase 0-4 + Phase 10a.
+    Tokenizes input text for Phase 0-4 + Phase 10a-b.
 
     Supports propositional logic, document structure, equivalence chains,
     predicate logic with quantifiers and mathematical notation, Z notation,
-    and relational operators (Phase 10a: <->, |->, <|, |>, comp, ;, dom, ran).
+    and relational operators (Phase 10a: <->, |->, <|, |>, comp, ;, dom, ran)
+    and extended operators (Phase 10b: <<|, |>>, o9, ~, +, *, inv, id).
     """
 
     def __init__(self, text: str) -> None:
@@ -166,6 +167,13 @@ class Lexer:
             self._advance()
             return Token(TokenType.MAPLET, "|->", start_line, start_column)
 
+        # Range subtraction operator: |>> (Phase 10b) - check before |> and | alone
+        if char == "|" and self._peek_char() == ">" and self._peek_char(2) == ">":
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.NRRES, "|>>", start_line, start_column)
+
         # Range restriction operator: |> (Phase 10a) - check before | alone
         if char == "|" and self._peek_char() == ">":
             self._advance()
@@ -213,6 +221,13 @@ class Lexer:
         # Comparison operators (Phase 3)
         # Check <= and >= before < and >
         # But watch out for <=> and <-> which are handled earlier
+        # Domain subtraction operator: <<| (Phase 10b) - check before <| and < alone
+        if char == "<" and self._peek_char() == "<" and self._peek_char(2) == "|":
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.NDRES, "<<|", start_line, start_column)
+
         # Domain restriction operator: <| (Phase 10a) - check before < alone
         if char == "<" and self._peek_char() == "|":
             self._advance()
@@ -264,6 +279,21 @@ class Lexer:
             self._advance()
             return Token(TokenType.UNDERSCORE, "_", start_line, start_column)
 
+        # Postfix relation operators (Phase 10b)
+        if char == "~":
+            self._advance()
+            return Token(TokenType.TILDE, "~", start_line, start_column)
+
+        if char == "+":
+            self._advance()
+            return Token(TokenType.PLUS, "+", start_line, start_column)
+
+        # Note: * is used for both SOLUTION_MARKER (**) and STAR (*)
+        # ** is checked earlier, so single * is safe here
+        if char == "*":
+            self._advance()
+            return Token(TokenType.STAR, "*", start_line, start_column)
+
         # Identifiers and keywords
         if char.isalpha():
             return self._scan_identifier(start_line, start_column)
@@ -278,6 +308,13 @@ class Lexer:
     def _scan_identifier(self, start_line: int, start_column: int) -> Token:
         """Scan identifier or keyword."""
         start_pos = self.pos
+
+        # Check for special o9 operator (Phase 10b) - composition
+        if self._current_char() == "o" and self._peek_char() == "9":
+            self._advance()  # consume 'o'
+            self._advance()  # consume '9'
+            return Token(TokenType.CIRC, "o9", start_line, start_column)
+
         # Note: Do NOT include underscore in identifiers
         # Underscore is used as subscript operator in Phase 3
         while not self._at_end() and self._current_char().isalnum():
@@ -393,6 +430,12 @@ class Lexer:
             return Token(TokenType.DOM, value, start_line, start_column)
         if value == "ran":
             return Token(TokenType.RAN, value, start_line, start_column)
+
+        # Check for relation functions (Phase 10b)
+        if value == "inv":
+            return Token(TokenType.INV, value, start_line, start_column)
+        if value == "id":
+            return Token(TokenType.ID, value, start_line, start_column)
 
         # Regular identifier
         return Token(TokenType.IDENTIFIER, value, start_line, start_column)
