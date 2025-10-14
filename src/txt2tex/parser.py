@@ -808,9 +808,11 @@ class Parser:
         Phase 6 enhancement: Supports multiple variables with shared domain.
         Phase 7 enhancement: Supports mu-operator (definite description).
         Phase 11.5 enhancement: Supports mu with expression part (mu x : X | P . E).
+        Phase 17: Supports semicolon-separated bindings (x : T; y : U).
         Examples:
         - forall x : N | pred
         - forall x, y : N | pred
+        - forall x : T; y : U | pred (Phase 17: nested quantifiers)
         - exists1 x : N | pred
         - mu x : N | pred
         - mu x : N | pred . expr (Phase 11.5)
@@ -838,6 +840,35 @@ class Parser:
             # Use _parse_intersect to allow ranges and generic instantiation
             domain = self._parse_intersect()
 
+        # Phase 17: Check for semicolon-separated bindings
+        # If we see SEMICOLON, we have more binding groups: x : T; y : U | body
+        # Transform into nested quantifiers: Q x : T | Q y : U | body
+        if self._match(TokenType.SEMICOLON):
+            self._advance()  # Consume ';'
+
+            # Recursively parse remaining quantifiers (same quantifier type)
+            # We need to temporarily create a token for the nested quantifier
+            # Save position for nested quantifier
+            nested_line = self._current().line
+            nested_column = self._current().column
+
+            # Parse the rest as if it were a new quantifier of the same type
+            # This will handle: y : U | body or y : U; z : V | body
+            nested_quant = self._parse_quantifier_continuation(
+                quant_token.value, nested_line, nested_column
+            )
+
+            # Now wrap the nested quantifier as the body of this quantifier
+            return Quantifier(
+                quantifier=quant_token.value,
+                variables=variables,
+                domain=domain,
+                body=nested_quant,
+                expression=None,
+                line=quant_token.line,
+                column=quant_token.column,
+            )
+
         # Parse separator |
         if not self._match(TokenType.PIPE):
             raise ParserError("Expected '|' after quantifier binding", self._current())
@@ -862,6 +893,74 @@ class Parser:
             expression=expression,
             line=quant_token.line,
             column=quant_token.column,
+        )
+
+    def _parse_quantifier_continuation(
+        self, quantifier: str, line: int, column: int
+    ) -> Expr:
+        """Parse continuation of semicolon-separated quantifier bindings.
+
+        Phase 17: Helper for parsing y : U | body or y : U; z : V | body
+        after we've already parsed x : T;
+        """
+        # Parse variable(s)
+        if not self._match(TokenType.IDENTIFIER):
+            raise ParserError(
+                "Expected variable name after ';' in quantifier", self._current()
+            )
+        variables: list[str] = [self._advance().value]
+
+        # Parse additional comma-separated variables
+        while self._match(TokenType.COMMA):
+            self._advance()  # Consume ','
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError("Expected variable name after ','", self._current())
+            variables.append(self._advance().value)
+
+        # Parse domain
+        domain: Expr | None = None
+        if self._match(TokenType.COLON):
+            self._advance()  # Consume ':'
+            domain = self._parse_intersect()
+
+        # Check for another semicolon (more bindings)
+        if self._match(TokenType.SEMICOLON):
+            self._advance()  # Consume ';'
+            nested_quant = self._parse_quantifier_continuation(
+                quantifier, self._current().line, self._current().column
+            )
+            return Quantifier(
+                quantifier=quantifier,
+                variables=variables,
+                domain=domain,
+                body=nested_quant,
+                expression=None,
+                line=line,
+                column=column,
+            )
+
+        # Otherwise expect pipe
+        if not self._match(TokenType.PIPE):
+            raise ParserError("Expected '|' after quantifier binding", self._current())
+        self._advance()  # Consume '|'
+
+        # Parse body
+        body = self._parse_iff()
+
+        # Check for mu expression part
+        expression: Expr | None = None
+        if quantifier == "mu" and self._match(TokenType.PERIOD):
+            self._advance()  # Consume '.'
+            expression = self._parse_iff()
+
+        return Quantifier(
+            quantifier=quantifier,
+            variables=variables,
+            domain=domain,
+            body=body,
+            expression=expression,
+            line=line,
+            column=column,
         )
 
     def _parse_lambda(self) -> Expr:
