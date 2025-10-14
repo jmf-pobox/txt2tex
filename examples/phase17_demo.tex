@@ -1,0 +1,130 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Phase 17 Demo : Semicolon - Separated Bindings}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Two bindings}
+
+\medskip
+
+\bigskip
+
+Simple case with two binding groups:
+
+\bigskip
+
+\bigskip
+
+$\forall x \colon N \bullet \forall y \colon N \bullet x + y > 0$
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 2 : Three bindings}
+
+\medskip
+
+\bigskip
+
+Three levels of nesting:
+
+\bigskip
+
+\bigskip
+
+$\forall x \colon T \bullet \forall y \colon U \bullet \forall z \colon V \bullet x = y$
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 3 : Mixed comma and semicolon}
+
+\medskip
+
+\bigskip
+
+First quantifier has multiple variables with shared domain:
+
+\bigskip
+
+\bigskip
+
+$\forall x, y \colon N \bullet \forall z \colon N \bullet x + y = z$
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 4 : Real - world example from Solution 41}
+
+\medskip
+
+\bigskip
+
+$\forall r \colon \ran records \bullet \forall i1, i2 \colon \dom r \bullet i1 \neq i2 \Rightarrow true$
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 5 : Conditional with semicolon bindings}
+
+\medskip
+
+\bigskip
+
+Combining Phase 16 and Phase 17:
+
+\bigskip
+
+\bigskip
+
+$\forall x \colon N \bullet \forall y \colon N \bullet (\text{if } x > y \text{ then } x \text{ else } y)$
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 6 : Nested mu operator}
+
+\medskip
+
+\bigskip
+
+Definite description with multiple bindings:
+
+\bigskip
+
+\bigskip
+
+($\mu p \colon \ran hd \bullet \mu q \colon \ran hd \bullet p \neq q$| p.2 > q.2)
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 7 : With exists quantifier}
+
+\medskip
+
+\bigskip
+
+Multiple bindings with exists:
+
+\bigskip
+
+\bigskip
+
+$\exists x \colon N \bullet \exists y \colon N \bullet x > y \land y > 0$
+
+\bigskip
+
+\end{document}

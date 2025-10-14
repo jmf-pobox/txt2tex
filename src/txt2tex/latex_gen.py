@@ -95,11 +95,12 @@ class LaTeXGenerator:
         "<<|": r"\ndres",  # Domain subtraction (anti-restriction)
         "|>>": r"\nrres",  # Range subtraction (anti-restriction)
         "o9": r"\circ",  # Forward/backward composition
-        # Function type operators (Phase 11a)
+        # Function type operators (Phase 11a, enhanced Phase 18)
         "->": r"\fun",  # Total function
         "+->": r"\pfun",  # Partial function
         ">->": r"\inj",  # Total injection
         ">+>": r"\pinj",  # Partial injection
+        "-|>": r"\pinj",  # Partial injection (alternative notation)
         "-->>": r"\surj",  # Total surjection
         "+->>": r"\psurj",  # Partial surjection
         ">->>": r"\bij",  # Bijection

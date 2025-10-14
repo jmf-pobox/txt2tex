@@ -34,7 +34,8 @@
       "Bash(awk:*)",
       "Bash(python:*)",
       "Bash(PYTHONPATH=src python test_axdef_lambda.py)",
-      "Bash(PYTHONPATH=src python:*)"
+      "Bash(PYTHONPATH=src python:*)",
+      "Bash(/usr/local/bin/fuzz:*)"
     ],
     "deny": [],
     "ask": []
