@@ -124,9 +124,11 @@ class LaTeXGenerator:
         # Extended relation functions (Phase 10b)
         "inv": r"\inv",  # Inverse function
         "id": r"\id",  # Identity relation
-        # Set functions (Phase 11.5)
+        # Set functions (Phase 11.5, enhanced Phase 19)
         "P": r"\power",  # Power set
         "P1": r"\power_1",  # Non-empty power set
+        "F": r"\finset",  # Finite set
+        "F1": r"\finset_1",  # Non-empty finite set
         # Sequence operators (Phase 12)
         "head": r"\head",  # First element
         "tail": r"\tail",  # All but first
@@ -375,9 +377,9 @@ class LaTeXGenerator:
         if node.operator in {"~", "+", "*"}:
             # Postfix: operand^{superscript}
             return f"{operand}{op_latex}"
-        # Phase 11.5: Generic instantiation operators (P, P1) use tilde
-        elif node.operator in {"P", "P1"}:
-            # Generic instantiation: \power~X
+        # Phase 11.5, 19: Generic instantiation operators (P, P1, F, F1) use tilde
+        elif node.operator in {"P", "P1", "F", "F1"}:
+            # Generic instantiation: \power~X or \finset~X
             return f"{op_latex}~{operand}"
         else:
             # Prefix: operator operand
@@ -611,6 +613,7 @@ class LaTeXGenerator:
             "iseq": r"\iseq",
             "bag": r"\bag",
             "P": r"\power",  # Power set
+            "F": r"\finset",  # Finite set
         }
 
         # Check if function is a simple identifier with special handling

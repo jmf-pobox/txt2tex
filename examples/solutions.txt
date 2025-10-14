@@ -1019,29 +1019,36 @@ TEXT: (Remaining cases omitted - require equational reasoning with recursive fun
 
 ** Solution 48 **
 
-TEXT: songs : F SongId
-TEXT: users : F UserId
-TEXT: playlists : PlaylistId +-> Playlist
-TEXT: playlistOwner : PlaylistId +-> UserId
-TEXT: playlistSubscribers : PlaylistId +-> F1 UserId
-TEXT: forall i : dom(playlists) | ran(playlists(i)) subseteq songs
-TEXT: dom(playlistOwner) subseteq dom(playlists)
-TEXT: ran(playlistOwner) subseteq users
-TEXT: dom(playlistSubscribers) subseteq dom(playlists)
-TEXT: forall i : dom(playlistSubscribers) | playlistSubscribers(i) subseteq users
-TEXT: forall i : dom(playlists) | playlistOwner(i) in playlistSubscribers(i)
-TEXT: (Blocked by: F and F1 finite set types not implemented)
+given SongId, UserId, PlaylistId, Playlist
+
+axdef
+  songs : F SongId
+  users : F UserId
+  playlists : PlaylistId +-> Playlist
+  playlistOwner : PlaylistId +-> UserId
+  playlistSubscribers : PlaylistId +-> F1 UserId
+where
+  forall i : dom(playlists) | ran(playlists(i)) subseteq songs
+  dom(playlistOwner) subseteq dom(playlists)
+  ran(playlistOwner) subseteq users
+  dom(playlistSubscribers) subseteq dom(playlists)
+  forall i : dom(playlistSubscribers) | playlistSubscribers(i) subseteq users
+  forall i : dom(playlists) | playlistOwner(i) in playlistSubscribers(i)
+end
 
 ** Solution 49 **
 
-TEXT: hated : UserId +-> F SongId
-TEXT: loved : UserId +-> F SongId
-TEXT: dom(hated) subseteq users
-TEXT: forall i : dom(hated) | hated(i) subseteq songs
-TEXT: dom(loved) subseteq users
-TEXT: forall i : dom(loved) | loved(i) subseteq songs
-TEXT: forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
-TEXT: (Blocked by: F finite set type not implemented)
+TEXT: axdef
+TEXT:   hated : UserId +-> F SongId
+TEXT:   loved : UserId +-> F SongId
+TEXT: where
+TEXT:   dom(hated) subseteq users
+TEXT:   forall i : dom(hated) | hated(i) subseteq songs
+TEXT:   dom(loved) subseteq users
+TEXT:   forall i : dom(loved) | loved(i) subseteq songs
+TEXT:   forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
+TEXT: end
+TEXT: (Blocked by: union in quantifier domain - parser issue)
 
 ** Solution 50 **
 

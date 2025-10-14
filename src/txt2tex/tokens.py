@@ -56,9 +56,11 @@ class TokenType(Enum):
     INV = auto()  # inv (inverse of relation)
     ID = auto()  # id (identity relation)
 
-    # Set functions (Phase 11.5)
+    # Set functions (Phase 11.5, enhanced Phase 19)
     POWER = auto()  # P (power set)
     POWER1 = auto()  # P1 (non-empty power set)
+    FINSET = auto()  # F (finite set)
+    FINSET1 = auto()  # F1 (non-empty finite set)
 
     # Sequence operators (Phase 12)
     LANGLE = auto()  # ⟨ (sequence literal left)
