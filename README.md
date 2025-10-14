@@ -2,13 +2,13 @@
 
 Convert whiteboard-style mathematical notation to high-quality LaTeX for formal methods and Z notation.
 
-## Current Status: Phase 16 ✅
+## Current Status: Phase 18 ✅
 
-**Production Ready: Solutions 1-36 (69%)** - Fully inline parsing support for propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, **ASCII sequence brackets**, **multi-word identifiers with underscore**, and **conditional expressions (if/then/else)**.
+**Production Ready: Solutions 1-36, 52a (71%)** - Fully inline parsing support for propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, **ASCII sequence brackets**, **multi-word identifiers with underscore**, **conditional expressions (if/then/else)**, **semicolon-separated bindings**, and **partial function operators (+-> and -|>)**.
 
 ### Coverage Breakdown
 
-- 🎯 **25 phases complete** (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12, 13.1-13.4, 14, 15, 16)
+- 🎯 **27 phases complete** (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12, 13.1-13.4, 14, 15, 16, 17, 18)
 - ✅ **599 tests passing** (100% pass rate)
 - 📚 **19 example files** demonstrating all features
 - 🔧 **Makefile automation** for building PDFs
@@ -165,14 +165,7 @@ Following the conventions used in the fuzz package test suite:
 
 The following features are not yet implemented and require TEXT blocks as workarounds:
 
-**1. Partial Function Operators** (affects Solutions 41-42, 48-52):
-```
-❌ Not implemented: f : X +-> Y (partial injection)
-❌ Not implemented: f : X -|> Y (partial surjection)
-✅ Workaround: Use TEXT blocks or equivalent notation
-```
-
-**2. Finite Set Types** (affects Solutions 48-49):
+**1. Finite Set Types** (affects Solutions 48-49):
 ```
 ❌ Not implemented: F X (finite sets), F1 X (non-empty finite sets)
 ✅ Workaround: Use TEXT blocks or P X (power set)
@@ -494,6 +487,7 @@ f : X >-> Y                  →  f : X ↣ Y
 **Partial Injections** (injective partial functions):
 ```
 f : X >+> Y                  →  f : X ⤔ Y
+f : X -|> Y                  →  f : X ⤔ Y  (alternative notation)
 ```
 
 #### Surjections (onto)
@@ -1378,11 +1372,11 @@ PROOF:
 - Transitive closure: `+` (R⁺)
 - Reflexive-transitive closure: `*` (R*)
 
-### ✅ Phase 11a: Function Type Operators
+### ✅ Phase 11a: Function Type Operators (enhanced Phase 18)
 - Total functions: `->` (X ⇸ Y)
 - Partial functions: `+->` (X ⇀ Y)
 - Total injections: `>->` (X ↣ Y)
-- Partial injections: `>+>` (X ⤔ Y)
+- Partial injections: `>+>` or `-|>` (X ⤔ Y)
 - Total surjections: `-->>` (X ↠ Y)
 - Partial surjections: `+->>` (X ⤀ Y)
 - Bijections: `>->>` (X ⤖ Y)
@@ -1489,8 +1483,17 @@ PROOF:
 - Conditionals as operands in expressions
 - Function definitions with conditionals: `abs(x) = if x > 0 then x else -x`
 - Recursive functions: `f(s) = if s = <> then 0 else head s + f(tail s)`
-- Arithmetic subtraction and negation: `-`, `x - y`
-- LaTeX rendering with inline text keywords
+
+### ✅ Phase 17: Semicolon-Separated Bindings
+- Multiple binding groups: `forall x : N; y : N | P`
+- Mixed comma and semicolon: `forall x, y : N; z : N | P`
+- Nested scope for bindings
+- Right-to-left nested quantifiers in LaTeX
+
+### ✅ Phase 18: Partial Function Operators
+- Alternative partial injection notation: `-|>` (equivalent to `>+>`)
+- Used in database and state machine specifications
+- Full function type operator support: `->`, `+->`, `>->`, `>+>`, `-|>`, `-->>`, `+->>`, `>->>`
 
 ---
 
@@ -1895,8 +1898,8 @@ For bugs, feature requests, or questions, please open an issue on GitHub.
 
 ---
 
-**Last Updated**: Phase 16 Complete (Conditional Expressions - if/then/else)
-**Version**: 0.16.0
-**Status**: Production Ready for Solutions 1-39 - 75.0% Coverage (39/52 exercises)
-**Test Suite**: 590 tests passing
-**Remaining**: Solutions 40-52 (recursive free types, constructor pattern matching)
+**Last Updated**: Phase 18 Complete (Partial Function Operators - +-> and -|>)
+**Version**: 0.18.0
+**Status**: Production Ready for Solutions 1-36, 52a - 71% Coverage (37/52 exercises)
+**Test Suite**: 599 tests passing
+**Remaining**: Solutions 37-52 (nested quantifiers, F/F1 types, bigcup, recursive free types)

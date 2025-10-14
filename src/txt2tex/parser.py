@@ -1269,9 +1269,9 @@ class Parser:
         return left
 
     def _parse_function_type(self) -> Expr:
-        """Parse function type operators (Phase 11c).
+        """Parse function type operators (Phase 11c, enhanced Phase 18).
 
-        Function types: ->, +->, >->, >+>, -->>, +->>, >->>
+        Function types: ->, +->, >->, >+>, -|>, -->>, +->>, >->>
         Right-associative: A -> B -> C parses as A -> (B -> C)
         """
         left = self._parse_relation()
@@ -1282,6 +1282,7 @@ class Parser:
             TokenType.PFUN,  # +->
             TokenType.TINJ,  # >->
             TokenType.PINJ,  # >+>
+            TokenType.PINJ_ALT,  # -|>
             TokenType.TSURJ,  # -->>
             TokenType.PSURJ,  # +->>
             TokenType.BIJECTION,  # >->>
