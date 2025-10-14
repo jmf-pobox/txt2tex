@@ -2579,71 +2579,24 @@ users
 
 \medskip
 
-\bigskip
-
-axdef
-
-\bigskip
-
-\bigskip
-
-hated : UserId +-> F SongId
-
-\bigskip
-
-\bigskip
-
-loved : UserId +-> F SongId
-
-\bigskip
-
-\bigskip
-
-where
-
-\bigskip
-
-\bigskip
-
-dom(hated) subseteq users
-
-\bigskip
-
-\bigskip
-
-$\forall i \colon \dom hated \bullet hated(i)$subseteq songs
-
-\bigskip
-
-\bigskip
-
-dom(loved) subseteq users
-
-\bigskip
-
-\bigskip
-
-$\forall i \colon \dom loved \bullet loved(i)$subseteq songs
-
-\bigskip
-
-\bigskip
-
-forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
-
-\bigskip
-
-\bigskip
-
-end
-
-\bigskip
-
-\bigskip
-
-(Blocked by: union in quantifier domain - parser issue)
-
-\bigskip
+\begin{axdef}
+hated : UserId \pfun \finset~SongId
+loved : UserId \pfun \finset~SongId
+\where
+\dom hated
+subseteq
+users
+\forall i \colon \dom hated \bullet hated(i)
+subseteq
+songs
+\dom loved
+subseteq
+users
+\forall i \colon \dom loved \bullet loved(i)
+subseteq
+songs
+\forall i \colon \dom hated \cup \dom loved \bullet hated(i) \cap loved(i) = emptyset
+\end{axdef}
 
 \bigskip
 \noindent
