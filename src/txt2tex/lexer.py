@@ -378,10 +378,6 @@ class Lexer:
             self._advance()
             return Token(TokenType.CARET, "^", start_line, start_column)
 
-        if char == "_":
-            self._advance()
-            return Token(TokenType.UNDERSCORE, "_", start_line, start_column)
-
         # Cardinality operator (Phase 8)
         if char == "#":
             self._advance()
@@ -449,8 +445,8 @@ class Lexer:
             self._advance()
             return Token(TokenType.TFUN, "->", start_line, start_column)
 
-        # Identifiers and keywords
-        if char.isalpha():
+        # Identifiers and keywords (Phase 15: allow underscore in identifiers)
+        if char.isalpha() or char == "_":
             return self._scan_identifier(start_line, start_column)
 
         # Numbers
@@ -499,9 +495,12 @@ class Lexer:
             self._advance()  # consume '9'
             return Token(TokenType.CIRC, "o9", start_line, start_column)
 
-        # Note: Do NOT include underscore in identifiers
-        # Underscore is used as subscript operator in Phase 3
-        while not self._at_end() and self._current_char().isalnum():
+        # Phase 15: Include underscore in identifiers
+        # This allows multi-word identifiers like cumulative_total
+        # Subscripts like a_i are now handled in LaTeX generation
+        while not self._at_end() and (
+            self._current_char().isalnum() or self._current_char() == "_"
+        ):
             self._advance()
 
         value = self.text[start_pos : self.pos]
