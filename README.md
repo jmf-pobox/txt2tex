@@ -70,6 +70,81 @@ make -j4
 cd hw && make
 ```
 
+## Syntax Requirements & Limitations
+
+### Function and Type Application
+
+**Function application requires explicit parentheses** - juxtaposition (whitespace) is not supported:
+
+```
+✅ Correct:   f(x), cumulative_total(s), dom(R)
+❌ Incorrect: f x, cumulative_total s, dom R
+```
+
+**Type application also requires parentheses**:
+
+```
+✅ Correct:   seq(Entry), P(Person)
+❌ Incorrect: seq Entry, P Person
+```
+
+### Nested Quantifiers
+
+**Nested quantifiers in `and`/`or` expressions must be parenthesized**:
+
+```
+✅ Correct:   forall x : N | x > 0 and (forall y : N | y > x)
+❌ Incorrect: forall x : N | x > 0 and forall y : N | y > x
+```
+
+### Fuzz Typechecker Compatibility
+
+When using `--fuzz` flag for typechecking:
+
+**Identifiers with underscores are NOT supported by fuzz**:
+- `cumulative_total` will cause fuzz validation errors
+- The fuzz typechecker does not recognize underscores in identifiers
+
+**Recommended conventions for fuzz-compatible code**:
+
+Following the conventions used in the fuzz package test suite:
+
+1. **camelCase with initial capital** (for schemas and types):
+   ```
+   ✅ BirthdayBook, AddBirthday, CheckSys
+   ```
+
+2. **camelCase with initial lowercase** (for multi-word functions/variables):
+   ```
+   ✅ cumulativeTotal instead of cumulative_total
+   ✅ maxHeight instead of max_height
+   ✅ childOf instead of child_of
+   ```
+
+3. **Single-word identifiers** (preferred when possible):
+   ```
+   ✅ total, height, known, birthday, working
+   ```
+
+4. **Subscripts** (for indexed variables and variants):
+   ```
+   ✅ x_i, x_max, a_1
+   ✅ BirthdayBook1, CheckSys1 (variant/refinement schemas)
+   ```
+
+**Note**: Free types can use escaped underscores in constructor names (e.g., `REPORT ::= ok | already\_known`) as this is LaTeX syntax, not an identifier.
+
+**If you don't need fuzz validation**:
+- Use underscores freely: `cumulative_total`, `child_of`, etc.
+- Generate PDF without `--fuzz` flag
+- LaTeX rendering works perfectly with underscores
+
+**LaTeX generation works correctly** with underscores for both modes:
+- Without `--fuzz`: Generates `\mathit{cumulative\_total}` for pdflatex
+- With `--fuzz`: Generates `cumulative_total` for fuzz package (but fuzz will reject it)
+
+**Note**: This is a fuzz limitation, not a txt2tex limitation. The tool fully supports underscores in identifiers.
+
 ## User Guide: Text Format
 
 ### Document Structure

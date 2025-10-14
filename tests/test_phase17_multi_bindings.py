@@ -5,12 +5,20 @@ Z notation allows multiple binding groups separated by semicolons:
 - {x : T; y : U | P | E}   means  {(x, y) | x : T, y : U, P, E}
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from txt2tex.ast_nodes import BinaryOp, Identifier, Quantifier
+from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
 
+if TYPE_CHECKING:
+    from txt2tex.ast_nodes import ASTNode
 
-def parse_expr(text: str):
+
+def parse_expr(text: str) -> ASTNode:
     """Helper to parse expression."""
     lexer = Lexer(text)
     tokens = lexer.tokenize()
@@ -89,8 +97,10 @@ class TestSemicolonQuantifiers:
         # Note: Z notation doesn't allow forall x : T; exists y : U
         # Our implementation uses same quantifier type for all bindings
         ast = parse_expr("forall x : N; y : N | x = y")
+        assert isinstance(ast, Quantifier)
         # Both should be forall
         assert ast.quantifier == "forall"
+        assert isinstance(ast.body, Quantifier)
         assert ast.body.quantifier == "forall"
 
 
@@ -99,9 +109,8 @@ class TestSemicolonLaTeX:
 
     def test_forall_two_bindings_latex(self):
         """Test LaTeX for forall x : N; y : N | x = y."""
-        from txt2tex.latex_gen import LaTeXGenerator
-
         ast = parse_expr("forall x : N; y : N | x = y")
+        assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
 
@@ -112,10 +121,9 @@ class TestSemicolonLaTeX:
         assert "=" in latex
 
     def test_complex_binding_latex(self):
-        """Test LaTeX for forall x : Title * Length * Viewed; s : seq(Entry) | P."""
-        from txt2tex.latex_gen import LaTeXGenerator
-
+        """Test LaTeX for complex bindings."""
         ast = parse_expr("forall x : Title; s : seq(Entry) | x = s")
+        assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
 
@@ -129,7 +137,7 @@ class TestSolution40Examples:
     """Test actual examples from Solution 40."""
 
     def test_cumulative_total_binding(self):
-        """Test: forall x : Title * Length * Viewed; s : seq(Title * Length * Viewed) | ..."""
+        """Test forall with semicolon-separated product type bindings."""
         # Simplified version with product types
         ast = parse_expr("forall x : Title; s : seq(Title) | x = s")
 
