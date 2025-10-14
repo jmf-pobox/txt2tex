@@ -747,19 +747,20 @@ c
 
 (a)
 
-TEXT: f : Place -> P Place
-TEXT: forall p : Place | f p = {q : Place | p |-> q in ran trains}
-TEXT: (Blocked by: juxtaposition f p and P Place)
+axdef
+  f : Place -> P(Place)
+where
+  forall p : Place | f(p) = {q : Place | p |-> q in ran trains}
+end
 
 (b)
 
-TEXT: {p : Place | exists1 x : dom trains | (trains x).2 = p}
-TEXT: (Blocked by: juxtaposition trains x)
+{p : Place | (exists1 x : dom trains | (trains(x)).2 = p)}
 
 (c)
 
-TEXT: (mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains x).2 = p} > # {x : dom trains | (trains x).2 = q})
-TEXT: (Blocked by: nested quantifiers in mu with multiple pipes)
+TEXT: (mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains(x)).2 = p} > # {x : dom trains | (trains(x)).2 = q})
+TEXT: (Blocked by: nested quantifiers in mu with multiple pipes - parser ambiguity)
 
 ** Solution 39 **
 
@@ -890,64 +891,63 @@ TEXT: {y : Year | y in dom records . y |-> {l : Lecturer | # {c : ran (records y
 
 TEXT: axdef
 TEXT: where
-TEXT:   forall x : Entry; s : seq Entry | 479_courses (<>) = <> and 479_courses (<x> ^ s) = if x.3 = 479 then <x> ^ 479_courses s else 479_courses s
+TEXT:   forall x : Entry; s : seq(Entry) | 479_courses (<>) = <> and 479_courses (<x> ^ s) = if x.3 = 479 then <x> ^ 479_courses(s) else 479_courses(s)
 TEXT: end
-TEXT: (Blocked by: juxtaposition seq Entry and underscore in identifier)
+TEXT: (Blocked by: underscore in identifier - use camelCase for fuzz compatibility)
 
 (d)
 
-TEXT: axdef
-TEXT: where
-TEXT:   forall x : Entry; s : seq Entry | total (<>) = 0 and total (<x> ^ s) = x.5 + total s
-TEXT: end
-TEXT: (Blocked by: juxtaposition seq Entry)
+axdef
+where
+  forall x : Entry; s : seq(Entry) | total(<>) = 0 and total(<x> ^ s) = x.5 + total(s)
+end
 
 ** Solution 42 **
 
 given Person
 
 TEXT: axdef
-TEXT:   State : P (seq (iseq Person))
+TEXT:   State : P(seq(iseq(Person)))
 TEXT: where
-TEXT:   forall s : State | forall i, j : dom s | i /= j | ran (s i) intersect ran (s j) = {}
+TEXT:   forall s : State | forall i, j : dom(s) | i /= j | ran(s(i)) intersect ran(s(j)) = {}
 TEXT: end
-TEXT: (Blocked by: juxtaposition P (seq (iseq Person)) and s i)
+TEXT: (Blocked by: nested quantifiers with semicolon bindings - parser limitation)
 
 (b)
 
 TEXT: axdef
 TEXT:   add : N * Person * State -|> State
 TEXT: where
-TEXT:   forall n : N; p : Person; s : State | n in dom s and p /in bigcup (ran (ran s)) |
-TEXT:     add (n, p, s) = s ++ {n |-> (s n) ^ <p>}
+TEXT:   forall n : N; p : Person; s : State | n in dom s and p /in bigcup(ran(ran(s))) |
+TEXT:     add(n, p, s) = s ++ {n |-> s(n) ^ <p>}
 TEXT: end
-TEXT: (Blocked by: -|> operator and juxtaposition)
+TEXT: (Blocked by: -|> operator not implemented)
 
 ** Solution 43 **
 
 (a)
 
-TEXT: (i) forall i : dom bookings | forall x, y : bookings i | x /= y | (x.2..x.3) intersect (y.2..y.3) = {}
+TEXT: (i) forall i : dom bookings | forall x, y : bookings(i) | x /= y | (x.2..x.3) intersect (y.2..y.3) = {}
 TEXT:
-TEXT: (ii) forall i : dom bookings | forall x : bookings i | {x.2, x.3} subseteq 1..max i.1
+TEXT: (ii) forall i : dom bookings | forall x : bookings(i) | {x.2, x.3} subseteq 1..max(i.1)
 TEXT:
-TEXT: (iii) forall i : dom bookings | forall b : bookings i | b.2 <= b.3
+TEXT: (iii) forall i : dom bookings | forall b : bookings(i) | b.2 <= b.3
 TEXT:
 TEXT: (iv) This is enforced by the constraint for part (i).
 TEXT:
-TEXT: (Blocked by: juxtaposition bookings i and max i.1)
+TEXT: (Blocked by: nested quantifiers - parser limitation)
 
 (b)
 
 TEXT: (i) {i : dom bookings | i.1 = Banbury . i.2}
 TEXT:
-TEXT: (ii) {i : dom bookings | i.1 = Banbury and exists b : bookings i | 50 in b.2..b.3}
+TEXT: (ii) {i : dom bookings | i.1 = Banbury and exists b : bookings(i) | 50 in b.2..b.3}
 TEXT:
 TEXT: (iii) {r : Room; s : N | exists i : dom bookings | i.1 = r and i.2 = s . (r, s)}
 TEXT:
-TEXT: (iv) {r : Room | exists i : dom bookings | i.1 = r | # (bookings i) >= 10}
+TEXT: (iv) {r : Room | exists i : dom bookings | i.1 = r | # (bookings(i)) >= 10}
 TEXT:
-TEXT: (Blocked by: juxtaposition bookings i)
+TEXT: (Blocked by: semicolon bindings in set comprehensions and nested quantifiers)
 
 === Free types and induction ===
 

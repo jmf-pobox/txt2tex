@@ -1548,40 +1548,18 @@ $c$
 (a)
 \par
 \vspace{11pt}
-\bigskip
-
-f : Place -> P Place
-
-\bigskip
-
-\bigskip
-
-$\forall p \colon Place \bullet f$p = $\{ q \colon Place \mid p \mapsto q \in \ran trains \}$
-
-\bigskip
-
-\bigskip
-
-(Blocked by: juxtaposition f p and P Place)
-
-\bigskip
+\begin{axdef}
+f : Place \fun \power~Place
+\where
+\forall p \colon Place \bullet f(p) = \{ q \colon Place \mid p \mapsto q \in \ran trains \}
+\end{axdef}
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-\bigskip
-
-{p : Place | exists1 x : dom trains | (trains x).2 = p}
-
-\bigskip
-
-\bigskip
-
-(Blocked by: juxtaposition trains x)
-
-\bigskip
+$\{ p \colon Place \mid \exists_1 x \colon \dom trains \bullet trains(x).2 = p \}$
 
 \medskip
 
@@ -1590,13 +1568,13 @@ $\forall p \colon Place \bullet f$p = $\{ q \colon Place \mid p \mapsto q \in \r
 \vspace{11pt}
 \bigskip
 
-(mu p : Place | $\forall q \colon Place \bullet p \neq q$| # {x : dom trains | (trains x).2 = p} > # {x : dom trains | (trains x).2 = q})
+(mu p : Place | $\forall q \colon Place \bullet p \neq q$| # $\{ x \colon \dom trains \mid trains(x).2 = p \}$ > # $\{ x \colon \dom trains \mid trains(x).2 = q \}$)
 
 \bigskip
 
 \bigskip
 
-(Blocked by: nested quantifiers in mu with multiple pipes)
+(Blocked by: nested quantifiers in mu with multiple pipes - parser ambiguity)
 
 \bigskip
 
@@ -1999,7 +1977,7 @@ where
 
 \bigskip
 
-forall x : Entry; s : seq Entry | 479_courses (<>) = <> and 479_courses (<x> ^ s) = if x.3 = 479 then <x> ^ 479_courses s else 479_courses s
+$\forall x \colon Entry \bullet \forall s \colon \seq~Entry \bullet 479$_courses (<>) = <> and 479_courses (<x> ^ s) = if x.3 = 479 then <x> ^ 479_courses(s) else 479_courses(s)
 
 \bigskip
 
@@ -2011,7 +1989,7 @@ end
 
 \bigskip
 
-(Blocked by: juxtaposition seq Entry and underscore in identifier)
+(Blocked by: underscore in identifier - use camelCase for fuzz compatibility)
 
 \bigskip
 
@@ -2020,35 +1998,10 @@ end
 (d)
 \par
 \vspace{11pt}
-\bigskip
-
-axdef
-
-\bigskip
-
-\bigskip
-
-where
-
-\bigskip
-
-\bigskip
-
-forall x : Entry; s : seq Entry | total (<>) = 0 and total (<x> ^ s) = x.5 + total s
-
-\bigskip
-
-\bigskip
-
-end
-
-\bigskip
-
-\bigskip
-
-(Blocked by: juxtaposition seq Entry)
-
-\bigskip
+\begin{axdef}
+\where
+\forall x \colon Entry \bullet \forall s \colon \seq~Entry \bullet total(\langle \rangle) = 0 \land total(\langle x \rangle \cat s) = x.5 + total(s)
+\end{axdef}
 
 \medskip
 
@@ -2068,7 +2021,7 @@ axdef
 
 \bigskip
 
-State : P (seq (iseq Person))
+State : P(seq(iseq(Person)))
 
 \bigskip
 
@@ -2080,7 +2033,7 @@ where
 
 \bigskip
 
-forall s : State | $\forall i, j \colon \dom s \bullet i \neq j$| ran (s i) intersect ran (s j) = {}
+forall s : State | $\forall i, j \colon \dom s \bullet i \neq j$| ran(s(i)) intersect ran(s(j)) = {}
 
 \bigskip
 
@@ -2092,7 +2045,7 @@ end
 
 \bigskip
 
-(Blocked by: juxtaposition P (seq (iseq Person)) and s i)
+(Blocked by: nested quantifiers with semicolon bindings - parser limitation)
 
 \bigskip
 
@@ -2125,7 +2078,7 @@ $\forall n \colon N \bullet \forall p \colon Person \bullet \forall s \colon Sta
 
 \bigskip
 
-add (n, p, s) = s ++ {n |-> (s n) ^ <p>}
+add(n, p, s) = s ++ {n |-> s(n) ^ <p>}
 
 \bigskip
 
@@ -2137,7 +2090,7 @@ end
 
 \bigskip
 
-(Blocked by: -|> operator and juxtaposition)
+(Blocked by: -|> operator not implemented)
 
 \bigskip
 
@@ -2154,7 +2107,7 @@ end
 \vspace{11pt}
 \bigskip
 
-(i) $\forall i \colon \dom bookings \bullet foral$l x, y : bookings i | x /= y | (x.2..x.3) intersect (y.2..y.3) = {}
+(i) forall i : dom bookings | $\forall x, y \colon bookings(i) \bullet x \neq y$| (x.2..x.3) intersect (y.2..y.3) = {}
 
 \bigskip
 
@@ -2166,7 +2119,7 @@ end
 
 \bigskip
 
-(ii) $\forall i \colon \dom bookings \bullet foral$l x : bookings i | {x.2, x.3} subseteq 1..max i.1
+(ii) forall i : dom bookings | $\forall x \colon bookings(i) \bullet \{x.2, x.3\}$subseteq 1..max(i.1)
 
 \bigskip
 
@@ -2178,7 +2131,7 @@ end
 
 \bigskip
 
-(iii) $\forall i \colon \dom bookings \bullet foral$l b : bookings i | b.2 <= b.3
+(iii) forall i : dom bookings | $\forall b \colon bookings(i) \bullet b.2 \leq b.3$
 
 \bigskip
 
@@ -2202,7 +2155,7 @@ end
 
 \bigskip
 
-(Blocked by: juxtaposition bookings i and max i.1)
+(Blocked by: nested quantifiers - parser limitation)
 
 \bigskip
 
@@ -2225,7 +2178,7 @@ end
 
 \bigskip
 
-(ii) {i : dom bookings | i.1 = Banbury and exists b : bookings i | 50 in b.2..b.3}
+(ii) {i : dom bookings | i.1 = Banbury and $\exists b \colon bookings(i) \bullet 50 \in b.2 \upto b.3$}
 
 \bigskip
 
@@ -2249,7 +2202,7 @@ end
 
 \bigskip
 
-(iv) {r : Room | $\exists i \colon \dom bookings \bullet i.1 = r$| # (bookings i) >= 10}
+(iv) {r : Room | $\exists i \colon \dom bookings \bullet i.1 = r$| # (bookings(i)) >= 10}
 
 \bigskip
 
@@ -2261,7 +2214,7 @@ end
 
 \bigskip
 
-(Blocked by: juxtaposition bookings i)
+(Blocked by: semicolon bindings in set comprehensions and nested quantifiers)
 
 \bigskip
 

@@ -4,14 +4,23 @@ Convert whiteboard-style mathematical notation to high-quality LaTeX for formal 
 
 ## Current Status: Phase 16 ✅
 
-**Production Ready for Solutions 1-39!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, **ASCII sequence brackets with pattern matching support**, **multi-word identifiers with underscore**, and **conditional expressions (if/then/else)**.
+**Production Ready: Solutions 1-36 (69%)** - Fully inline parsing support for propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, **ASCII sequence brackets**, **multi-word identifiers with underscore**, and **conditional expressions (if/then/else)**.
 
-- 🎯 25 phases complete (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12, 13.1-13.4, 14, 15, 16)
-- ✅ 590 tests passing
-- 📚 19 example files demonstrating all features
-- 🔧 Makefile automation for building PDFs
-- 📈 **75.0% solution coverage** (39/52 solutions fully working)
-- ⏳ Solutions 40-52 require recursive free types, schema decoration
+### Coverage Breakdown
+
+- 🎯 **25 phases complete** (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12, 13.1-13.4, 14, 15, 16)
+- ✅ **599 tests passing** (100% pass rate)
+- 📚 **19 example files** demonstrating all features
+- 🔧 **Makefile automation** for building PDFs
+
+**Solution Coverage (Honest Assessment)**:
+- ✅ **Solutions 1-36**: 69% - Fully working with inline parsing
+- ⚠️ **Solutions 37-39**: 6% - Partial (some parts require TEXT blocks)
+- ⚠️ **Solutions 40-43**: 8% - Partial (most parts blocked by juxtaposition/operators)
+- ❌ **Solutions 44-47**: 8% - TEXT only (require recursive free types)
+- ❌ **Solutions 48-52**: 10% - TEXT only (require multiple missing features)
+
+**Overall: ~69% true inline parsing coverage** (36/52 solutions)
 
 ## Quick Start
 
@@ -97,6 +106,13 @@ cd hw && make
 ❌ Incorrect: forall x : N | x > 0 and forall y : N | y > x
 ```
 
+**Current limitation**: Deeply nested quantifiers with multiple bindings may not parse correctly:
+
+```
+❌ Not yet supported: forall i : T | forall x, y : U(i) | P
+✅ Workaround: Use TEXT blocks for complex nested quantifiers
+```
+
 ### Fuzz Typechecker Compatibility
 
 When using `--fuzz` flag for typechecking:
@@ -144,6 +160,38 @@ Following the conventions used in the fuzz package test suite:
 - With `--fuzz`: Generates `cumulative_total` for fuzz package (but fuzz will reject it)
 
 **Note**: This is a fuzz limitation, not a txt2tex limitation. The tool fully supports underscores in identifiers.
+
+### Known Limitations (Implementation Needed)
+
+The following features are not yet implemented and require TEXT blocks as workarounds:
+
+**1. Partial Function Operators** (affects Solutions 41-42, 48-52):
+```
+❌ Not implemented: f : X +-> Y (partial injection)
+❌ Not implemented: f : X -|> Y (partial surjection)
+✅ Workaround: Use TEXT blocks or equivalent notation
+```
+
+**2. Finite Set Types** (affects Solutions 48-49):
+```
+❌ Not implemented: F X (finite sets), F1 X (non-empty finite sets)
+✅ Workaround: Use TEXT blocks or P X (power set)
+```
+
+**3. Distributed Union** (affects Solution 50):
+```
+❌ Not implemented: bigcup S (distributed union)
+✅ Workaround: Use TEXT blocks
+```
+
+**4. Recursive Free Types** (affects Solutions 46-47):
+```
+❌ Not implemented: Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree * Tree⟩
+❌ Not implemented: Pattern matching in function definitions
+✅ Workaround: Use TEXT blocks
+```
+
+See [ROADMAP.md](ROADMAP.md) for implementation plans and [BUGS.md](BUGS.md) for complete list of known issues.
 
 ## User Guide: Text Format
 
