@@ -1190,10 +1190,15 @@ class Parser:
         return left
 
     def _parse_union(self) -> Expr:
-        """Parse union operator."""
+        """Parse union and override operators (Phase 13).
+
+        Union: union operator (set union)
+        Override: ++ (function/sequence override)
+        Both have similar precedence in Z notation.
+        """
         left = self._parse_cross()
 
-        while self._match(TokenType.UNION):
+        while self._match(TokenType.UNION, TokenType.OVERRIDE):
             op_token = self._advance()
             right = self._parse_cross()
             left = BinaryOp(

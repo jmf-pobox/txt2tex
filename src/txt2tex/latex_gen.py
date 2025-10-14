@@ -80,6 +80,7 @@ class LaTeXGenerator:
         "intersect": r"\cap",
         "cross": r"\cross",  # Cartesian product
         "\\": r"\setminus",  # Set difference
+        "++": r"\oplus",  # Override (Phase 13)
         # Relation operators (Phase 10a)
         "<->": r"\rel",  # Relation type
         "|->": r"\mapsto",  # Maplet constructor

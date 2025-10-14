@@ -365,6 +365,12 @@ class Lexer:
             self._advance()
             return Token(TokenType.PFUN, "+->", start_line, start_column)
 
+        # Override operator: ++ (Phase 13)
+        if char == "+" and self._peek_char() == "+":
+            self._advance()
+            self._advance()
+            return Token(TokenType.OVERRIDE, "++", start_line, start_column)
+
         if char == "+":
             self._advance()
             return Token(TokenType.PLUS, "+", start_line, start_column)
