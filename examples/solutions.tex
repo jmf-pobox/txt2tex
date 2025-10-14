@@ -1469,15 +1469,188 @@ end
 
 \medskip
 
+(a)
+\par
+\vspace{11pt}
+$\langle a \rangle$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{1 \mapsto a, 2 \mapsto b, 2 \mapsto a, 3 \mapsto c, 3 \mapsto b, 4 \mapsto d\}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\{2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}$
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+$\{1, 2, 3, 4\}$
+
+\medskip
+
+(e)
+\par
+\vspace{11pt}
+$\{a, b\}$
+
+\medskip
+
+(f)
+\par
+\vspace{11pt}
+$\{a \mapsto 1, b \mapsto 2, c \mapsto 3, d \mapsto 4\}$
+
+\medskip
+
+(g)
+\par
+\vspace{11pt}
+$\langle a, b \rangle$
+
+\medskip
+
+(h)
+\par
+\vspace{11pt}
+$\{3 \mapsto b\}$
+
+\medskip
+
+(i)
+\par
+\vspace{11pt}
+$\{a\}$
+
+\medskip
+
+(j)
+\par
+\vspace{11pt}
+$c$
+
+\medskip
+
 \bigskip
 \noindent
 \textbf{Solution 38}
 
 \medskip
 
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+f : Place -> P Place
+
+\bigskip
+
+\bigskip
+
+$\forall p \colon Place \bullet f$p = $\{ q \colon Place \mid p \mapsto q \in \ran trains \}$
+
+\bigskip
+
+\bigskip
+
+(Blocked by: juxtaposition f p and P Place)
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+{p : Place | exists1 x : dom trains | (trains x).2 = p}
+
+\bigskip
+
+\bigskip
+
+(Blocked by: juxtaposition trains x)
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+(mu p : Place | $\forall q \colon Place \bullet p \neq q$| # {x : dom trains | (trains x).2 = p} > # {x : dom trains | (trains x).2 = q})
+
+\bigskip
+
+\bigskip
+
+(Blocked by: nested quantifiers in mu with multiple pipes)
+
+\bigskip
+
+\medskip
+
 \bigskip
 \noindent
 \textbf{Solution 39}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+large_coins : Collection -> N
+
+\bigskip
+
+\bigskip
+
+$\forall c \colon Collection \bullet large_coins(c) = c(large)$
+
+\bigskip
+
+\bigskip
+
+(Blocked by: underscore in identifier for fuzz compatibility)
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+add_coin : Collection * Coin -> Collection
+
+\bigskip
+
+\bigskip
+
+$\forall c \colon Collection \bullet \forall d \colon Coin \bullet add_coin(c, d) = c \cup \lbag d \rbag$
+
+\bigskip
+
+\bigskip
+
+(Blocked by: underscore in identifier and bag union)
+
+\bigskip
 
 \medskip
 
@@ -2103,14 +2276,246 @@ end
 \medskip
 
 \bigskip
+
+The two cases of the proof are established by equational reasoning: the first by
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+reverse (<> ^ t) = reverse t [cat.1a] = (reverse t) ^ <> [cat.1b]
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+where cat.1a is <> ^ s = s and cat.1b is s ^ <> = s
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+and the second by
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+reverse ((<x> ^ u) ^ t) = reverse (<x> ^ (u ^ t)) [cat.2]
+
+\bigskip
+
+\bigskip
+
+= reverse (u ^ t) ^ <x>    [reverse.2]
+
+\bigskip
+
+\bigskip
+
+= (reverse t ^ reverse u) ^ <x>  [anti-distributive]
+
+\bigskip
+
+\bigskip
+
+= reverse t ^ (reverse u ^ <x>)  [cat.2]
+
+\bigskip
+
+\bigskip
+
+= reverse t ^ reverse (<x> ^ u)  [reverse.2]
+
+\bigskip
+
+\bigskip
 \noindent
 \textbf{Solution 45}
 
 \medskip
 
 \bigskip
+
+The base case:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+reverse (reverse <>) = reverse <> [reverse.1] = <> [reverse.1]
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+The inductive step:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+reverse (reverse (<x> ^ t))
+
+\bigskip
+
+\bigskip
+
+= reverse ((reverse t) ^ <x>)  [reverse.2]
+
+\bigskip
+
+\bigskip
+
+= reverse (<x>) ^ reverse (reverse t)  [anti-distributive]
+
+\bigskip
+
+\bigskip
+
+= reverse (<x> ^ <>) ^ reverse (reverse t)  [cat.1]
+
+\bigskip
+
+\bigskip
+
+= ((reverse <>) ^ <x>) ^ reverse (reverse t)  [reverse.2]
+
+\bigskip
+
+\bigskip
+
+= (<> ^ <x>) ^ reverse (reverse t)  [reverse.1]
+
+\bigskip
+
+\bigskip
+
+= <x> ^ reverse (reverse t)  [cat.1]
+
+\bigskip
+
+\bigskip
+
+= <x> ^ t  [reverse (reverse t) = t]
+
+\bigskip
+
+\bigskip
 \noindent
 \textbf{Solution 46}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+count : Tree -> N
+
+\bigskip
+
+\bigskip
+
+count stalk = 0
+
+\bigskip
+
+\bigskip
+
+$\forall n \colon N \bullet count$(leaf n) = 1
+
+\bigskip
+
+\bigskip
+
+$\forall t1, t2 \colon Tree \bullet count(branch(t1, t2)) = count$t1 + count t2
+
+\bigskip
+
+\bigskip
+
+(Blocked by: recursive free types and pattern matching)
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+flatten : Tree -> seq N
+
+\bigskip
+
+\bigskip
+
+flatten stalk = <>
+
+\bigskip
+
+\bigskip
+
+$\forall n \colon N \bullet flatten$(leaf n) = <n>
+
+\bigskip
+
+\bigskip
+
+$\forall t1, t2 \colon Tree \bullet flatten(branch(t1, t2)) = flatten$t1 ^ flatten t2
+
+\bigskip
+
+\bigskip
+
+(Blocked by: recursive free types and pattern matching)
+
+\bigskip
 
 \medskip
 
@@ -2119,6 +2524,66 @@ end
 \textbf{Solution 47}
 
 \medskip
+
+\bigskip
+
+First, exhibit the induction principle for the free type:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+P stalk and ($\forall n \colon N \bullet P$(leaf n)) and ($\forall t1, t2 \colon Tree \bullet \power~t1 \land \power~t2 \Rightarrow \power~branch(t1, t2)$)
+
+\bigskip
+
+\bigskip
+
+implies $\forall t \colon Tree \bullet \power~t$
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+This gives three cases for the proof:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+# (flatten stalk) = # <> [flatten] = 0 [#] = count stalk [count]
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+(Remaining cases omitted - require equational reasoning with recursive functions)
+
+\bigskip
 
 \section*{Supplementary material : assignment practice}
 
@@ -2129,14 +2594,202 @@ end
 \medskip
 
 \bigskip
+
+songs : F SongId
+
+\bigskip
+
+\bigskip
+
+users : F UserId
+
+\bigskip
+
+\bigskip
+
+playlists : PlaylistId +-> Playlist
+
+\bigskip
+
+\bigskip
+
+playlist_owner : PlaylistId +-> UserId
+
+\bigskip
+
+\bigskip
+
+playlist_subscribers : PlaylistId +-> F1 UserId
+
+\bigskip
+
+\bigskip
+
+$\forall i \colon \dom playlists \bullet ran$(playlists i) subseteq songs
+
+\bigskip
+
+\bigskip
+
+dom playlist_owner subseteq dom playlists
+
+\bigskip
+
+\bigskip
+
+ran playlist_owner subseteq users
+
+\bigskip
+
+\bigskip
+
+dom playlist_subscribers subseteq dom playlists
+
+\bigskip
+
+\bigskip
+
+$\forall i \colon \dom \mathit{playlist\_subscribers} \bullet \mathit{playlist\_subscribers}$i subseteq users
+
+\bigskip
+
+\bigskip
+
+forall i : dom playlists | (playlist_owner i) in playlist_subscribers i
+
+\bigskip
+
+\bigskip
+
+(Blocked by: +-> operator, juxtaposition, underscores, F and F1 types)
+
+\bigskip
+
+\bigskip
 \noindent
 \textbf{Solution 49}
 
 \medskip
 
 \bigskip
+
+hated : UserId +-> F SongId
+
+\bigskip
+
+\bigskip
+
+loved : UserId +-> F SongId
+
+\bigskip
+
+\bigskip
+
+dom hated subseteq users
+
+\bigskip
+
+\bigskip
+
+forall i : dom hated | (hated i) subseteq songs
+
+\bigskip
+
+\bigskip
+
+dom loved subseteq users
+
+\bigskip
+
+\bigskip
+
+forall i : dom loved | (loved i) subseteq songs
+
+\bigskip
+
+\bigskip
+
+forall i : dom hated union dom loved | hated i intersect loved i = emptyset
+
+\bigskip
+
+\bigskip
+
+(Blocked by: +-> operator, juxtaposition, F type)
+
+\bigskip
+
+\bigskip
 \noindent
 \textbf{Solution 50}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+A == users \ bigcup (ran playlist_subscribers)
+
+\bigskip
+
+\bigskip
+
+(Blocked by: underscore in identifier, bigcup operator)
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+B == {p : dom playlist_subscribers | # (playlist_subscribers p) >= 100}
+
+\bigskip
+
+\bigskip
+
+(Blocked by: underscore in identifier, juxtaposition)
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+C == (mu u : dom loved | $\forall v \colon \dom loved \bullet u \neq v$| # (loved u) > # (loved v))
+
+\bigskip
+
+\bigskip
+
+(Blocked by: nested quantifiers in mu)
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+D == (mu s : songs | $\forall t \colon songs \bullet s \neq t$| # {u : UserId | s in loved u} > # {u : UserId | t in loved u})
+
+\bigskip
+
+\bigskip
+
+(Blocked by: nested quantifiers in mu, juxtaposition loved u)
+
+\bigskip
 
 \medskip
 
@@ -2146,9 +2799,315 @@ end
 
 \medskip
 
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+Let's first define two helper functions:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+love_hate_score : SongId +-> N
+
+\bigskip
+
+\bigskip
+
+forall i : songs | # {u : UserId | i in loved u} >= # {u : UserId | i in hated u} $\Rightarrow$
+
+\bigskip
+
+\bigskip
+
+love_hate_score i = # {u : UserId | i in loved u} - # {u : UserId | i in hated u}
+
+\bigskip
+
+\bigskip
+
+and
+
+\bigskip
+
+\bigskip
+
+forall i : songs | # {u : UserId | i in loved u} < # {u : UserId | i in hated u} $\Rightarrow$
+
+\bigskip
+
+\bigskip
+
+love_hate_score i = 0
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+playlist_count : SongId +-> N
+
+\bigskip
+
+\bigskip
+
+$\forall i \colon songs \bullet \mathit{playlist\_count}$i = # {p : dom playlist | i in ran playlist p}
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+We then have:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+length : SongId +-> N
+
+\bigskip
+
+\bigskip
+
+popularity : SongId +-> N
+
+\bigskip
+
+\bigskip
+
+dom length subseteq songs
+
+\bigskip
+
+\bigskip
+
+dom popularity subseteq songs
+
+\bigskip
+
+\bigskip
+
+$\forall i \colon songs \bullet popularity$i = love_hate_score i + playlist_count i
+
+\bigskip
+
+\bigskip
+
+(Blocked by: +-> operator, underscores, juxtaposition throughout)
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+most_popular : SongId
+
+\bigskip
+
+\bigskip
+
+(exists1 i : songs | $\forall j \colon songs \bullet i \neq j$| popularity i > popularity j) $\Rightarrow$
+
+\bigskip
+
+\bigskip
+
+most_popular = (mu i : songs | $\forall j \colon songs \bullet i \neq j$| popularity i > popularity j)
+
+\bigskip
+
+\bigskip
+
+and
+
+\bigskip
+
+\bigskip
+
+not (exists1 i : songs | $\forall j \colon songs \bullet i \neq j$| popularity i > popularity j) $\Rightarrow$
+
+\bigskip
+
+\bigskip
+
+most_popular = null_song
+
+\bigskip
+
+\bigskip
+
+(Blocked by: underscore, nested quantifiers, juxtaposition)
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+playlists_containing_most_popular_song == {i : dom playlists | most_popular in ran playlists i}
+
+\bigskip
+
+\bigskip
+
+(Blocked by: underscores, juxtaposition playlists i)
+
+\bigskip
+
+\medskip
+
 \bigskip
 \noindent
 \textbf{Solution 52}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+premium_plays : seq Play -> seq Play
+
+\bigskip
+
+\bigskip
+
+premium_plays (<>) = <>
+
+\bigskip
+
+\bigskip
+
+forall x : Play; s : seq Play |
+
+\bigskip
+
+\bigskip
+
+premium_plays (<x> ^ s) = <x> ^ (premium_plays s)   if user_status (x.2) = premium
+
+\bigskip
+
+\bigskip
+
+premium_plays s           if user_status (x.2) = standard
+
+\bigskip
+
+\bigskip
+
+(Blocked by: underscores, juxtaposition user_status (x.2))
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+standard_plays : seq Play -> seq Play
+
+\bigskip
+
+\bigskip
+
+standard_plays (<>) = <>
+
+\bigskip
+
+\bigskip
+
+forall x : Play; s : seq Play |
+
+\bigskip
+
+\bigskip
+
+standard_plays (<x> ^ s) = <x> ^ (standard_plays s)  if user_status (x.2) = standard
+
+\bigskip
+
+\bigskip
+
+standard_plays s          if user_status (x.2) = premium
+
+\bigskip
+
+\bigskip
+
+(Blocked by: underscores, juxtaposition)
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+cumulative_length : seq Play -> N
+
+\bigskip
+
+\bigskip
+
+cumulative_length (<>) = 0
+
+\bigskip
+
+\bigskip
+
+forall x : Play; s : seq Play |
+
+\bigskip
+
+\bigskip
+
+cumulative_length (<x> ^ s) = length (x.1) + cumulative_length (s)
+
+\bigskip
+
+\bigskip
+
+(Blocked by: underscores, juxtaposition length (x.1))
+
+\bigskip
 
 \medskip
 
