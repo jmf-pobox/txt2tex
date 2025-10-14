@@ -129,6 +129,7 @@ class LaTeXGenerator:
         "P1": r"\power_1",  # Non-empty power set
         "F": r"\finset",  # Finite set
         "F1": r"\finset_1",  # Non-empty finite set
+        "bigcup": r"\bigcup",  # Distributed union (Phase 20)
         # Sequence operators (Phase 12)
         "head": r"\head",  # First element
         "tail": r"\tail",  # All but first

@@ -1054,12 +1054,11 @@ TEXT: (Blocked by: union in quantifier domain - parser issue)
 
 (a)
 
-TEXT: A == users \ bigcup(ran(playlistSubscribers))
-TEXT: (Blocked by: bigcup operator not implemented)
+abbrev A == users \ bigcup(ran(playlistSubscribers))
 
 (b)
 
-TEXT: B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
+abbrev B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
 
 (c)
 

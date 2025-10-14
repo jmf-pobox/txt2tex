@@ -2072,7 +2072,7 @@ where
 
 \bigskip
 
-$\forall n \colon N \bullet \forall p \colon Person \bullet \forall s \colon State \bullet n \in \dom s \land p \notin bigcup(\ran \ran s)$|
+$\forall n \colon N \bullet \forall p \colon Person \bullet \forall s \colon State \bullet n \in \dom s \land p \notin \bigcup \ran \ran s$|
 
 \bigskip
 
@@ -2654,28 +2654,18 @@ end
 (a)
 \par
 \vspace{11pt}
-\bigskip
+$abbrev$
 
-A == users \ bigcup(ran(playlistSubscribers))
-
-\bigskip
-
-\bigskip
-
-(Blocked by: bigcup operator not implemented)
-
-\bigskip
+A == users \setminus \bigcup \ran playlistSubscribers
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-\bigskip
+$abbrev$
 
-B == $\{ p \colon \dom playlistSubscribers \mid \# playlistSubscribers(p) \geq 100 \}$
-
-\bigskip
+B == \{ p \colon \dom playlistSubscribers \mid \# playlistSubscribers(p) \geq 100 \}
 
 \medskip
 
