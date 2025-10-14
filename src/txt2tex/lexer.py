@@ -347,6 +347,26 @@ class Lexer:
             self._advance()
             return Token(TokenType.NOT_EQUAL, "!=", start_line, start_column)
 
+        # Not equal /= (Z notation slash negation - Phase 16+)
+        if char == "/" and self._peek_char() == "=":
+            self._advance()
+            self._advance()
+            return Token(TokenType.NOT_EQUAL, "/=", start_line, start_column)
+
+        # Not in /in (Z notation slash negation - Phase 16+)
+        # Check for /in followed by non-alphanumeric (not part of identifier)
+        if (
+            char == "/"
+            and self._peek_char() == "i"
+            and self._peek_char(2) == "n"
+            and not self._peek_char(3).isalnum()
+            and self._peek_char(3) != "_"
+        ):
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.NOTIN, "/in", start_line, start_column)
+
         # Abbreviation operator == (Phase 4) - check before = alone
         # Already checked for === and => earlier
         if char == "=" and self._peek_char() == "=":

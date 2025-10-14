@@ -73,9 +73,11 @@ class LaTeXGenerator:
         ">=": r"\geq",
         "=": r"=",
         "!=": r"\neq",
+        "/=": r"\neq",  # Z notation slash negation (Phase 16+)
         # Set operators (Phase 3, enhanced in Phase 7, Phase 11.5)
         "in": r"\in",
         "notin": r"\notin",
+        "/in": r"\notin",  # Z notation slash negation (Phase 16+)
         "subset": r"\subseteq",
         "union": r"\cup",
         "intersect": r"\cap",
