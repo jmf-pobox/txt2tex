@@ -319,6 +319,10 @@ class LaTeXGenerator:
         if "_" not in name:
             return name
 
+        # Fuzz: keep underscores as-is, no escaping or mathit wrapper
+        if self.use_fuzz:
+            return name
+
         # Check for multi-word identifier pattern
         # Heuristic: if prefix OR suffix is > 3 chars, it's a multi-word identifier
         parts = name.split("_")
@@ -460,22 +464,23 @@ class LaTeXGenerator:
 
         if node.domain:
             domain_latex = self.generate_expr(node.domain)
-            parts.append(r"\colon")
+            # Fuzz uses : instead of \colon
+            parts.append(":" if self.use_fuzz else r"\colon")
             parts.append(domain_latex)
 
         # Phase 11.5: Check if mu has expression part
         if node.quantifier == "mu" and node.expression:
-            # Use \mid (mid) instead of \bullet for predicate separator
-            parts.append(r"\mid")
+            # Use | or \mid for predicate separator
+            parts.append("|" if self.use_fuzz else r"\mid")
             body_latex = self.generate_expr(node.body)
             parts.append(body_latex)
-            # Add bullet separator and expression
-            parts.append(r"\bullet")
+            # Add bullet/spot separator and expression
+            parts.append(r"\spot" if self.use_fuzz else r"\bullet")
             expr_latex = self.generate_expr(node.expression)
             parts.append(expr_latex)
         else:
-            # Standard quantifier: bullet separator and body
-            parts.append(r"\bullet")
+            # Standard quantifier: bullet/spot separator and body
+            parts.append(r"\spot" if self.use_fuzz else r"\bullet")
             body_latex = self.generate_expr(node.body)
             parts.append(body_latex)
 
@@ -529,19 +534,20 @@ class LaTeXGenerator:
 
         if node.domain:
             domain_latex = self.generate_expr(node.domain)
-            parts.append(r"\colon")
+            # Fuzz uses : instead of \colon
+            parts.append(":" if self.use_fuzz else r"\colon")
             parts.append(domain_latex)
 
-        # Add mid separator
-        parts.append(r"\mid")
+        # Add mid/pipe separator
+        parts.append("|" if self.use_fuzz else r"\mid")
 
         # Generate predicate
         predicate_latex = self.generate_expr(node.predicate)
         parts.append(predicate_latex)
 
-        # If expression is present, add bullet and expression
+        # If expression is present, add bullet/spot and expression
         if node.expression:
-            parts.append(r"\bullet")
+            parts.append(r"\spot" if self.use_fuzz else r"\bullet")
             expression_latex = self.generate_expr(node.expression)
             parts.append(expression_latex)
 
