@@ -1022,48 +1022,47 @@ TEXT: (Remaining cases omitted - require equational reasoning with recursive fun
 TEXT: songs : F SongId
 TEXT: users : F UserId
 TEXT: playlists : PlaylistId +-> Playlist
-TEXT: playlist_owner : PlaylistId +-> UserId
-TEXT: playlist_subscribers : PlaylistId +-> F1 UserId
-TEXT: forall i : dom playlists | ran (playlists i) subseteq songs
-TEXT: dom playlist_owner subseteq dom playlists
-TEXT: ran playlist_owner subseteq users
-TEXT: dom playlist_subscribers subseteq dom playlists
-TEXT: forall i : dom playlist_subscribers | playlist_subscribers i subseteq users
-TEXT: forall i : dom playlists | (playlist_owner i) in playlist_subscribers i
-TEXT: (Blocked by: +-> operator, juxtaposition, underscores, F and F1 types)
+TEXT: playlistOwner : PlaylistId +-> UserId
+TEXT: playlistSubscribers : PlaylistId +-> F1 UserId
+TEXT: forall i : dom(playlists) | ran(playlists(i)) subseteq songs
+TEXT: dom(playlistOwner) subseteq dom(playlists)
+TEXT: ran(playlistOwner) subseteq users
+TEXT: dom(playlistSubscribers) subseteq dom(playlists)
+TEXT: forall i : dom(playlistSubscribers) | playlistSubscribers(i) subseteq users
+TEXT: forall i : dom(playlists) | playlistOwner(i) in playlistSubscribers(i)
+TEXT: (Blocked by: +-> operator, F and F1 types not implemented)
 
 ** Solution 49 **
 
 TEXT: hated : UserId +-> F SongId
 TEXT: loved : UserId +-> F SongId
-TEXT: dom hated subseteq users
-TEXT: forall i : dom hated | (hated i) subseteq songs
-TEXT: dom loved subseteq users
-TEXT: forall i : dom loved | (loved i) subseteq songs
-TEXT: forall i : dom hated union dom loved | hated i intersect loved i = emptyset
-TEXT: (Blocked by: +-> operator, juxtaposition, F type)
+TEXT: dom(hated) subseteq users
+TEXT: forall i : dom(hated) | hated(i) subseteq songs
+TEXT: dom(loved) subseteq users
+TEXT: forall i : dom(loved) | loved(i) subseteq songs
+TEXT: forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
+TEXT: (Blocked by: +-> operator, F type not implemented)
 
 ** Solution 50 **
 
 (a)
 
-TEXT: A == users \ bigcup (ran playlist_subscribers)
-TEXT: (Blocked by: underscore in identifier, bigcup operator)
+TEXT: A == users \ bigcup(ran(playlistSubscribers))
+TEXT: (Blocked by: bigcup operator not implemented)
 
 (b)
 
-TEXT: B == {p : dom playlist_subscribers | # (playlist_subscribers p) >= 100}
-TEXT: (Blocked by: underscore in identifier, juxtaposition)
+TEXT: B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
 
 (c)
 
-TEXT: C == (mu u : dom loved | forall v : dom loved | u /= v | # (loved u) > # (loved v))
-TEXT: (Blocked by: nested quantifiers in mu)
+TEXT: C == (mu u : dom(loved) | forall v : dom(loved) | u /= v | # (loved(u)) > # (loved(v)))
+TEXT: (Blocked by: nested quantifiers in mu - parser ambiguity)
 
 (d)
 
-TEXT: D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved u} > # {u : UserId | t in loved u})
-TEXT: (Blocked by: nested quantifiers in mu, juxtaposition loved u)
+TEXT: D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved(u)} > # {u : UserId | t in loved(u)})
+TEXT: (Blocked by: nested quantifiers in mu - parser ambiguity)
 
 ** Solution 51 **
 
@@ -1071,64 +1070,63 @@ TEXT: (Blocked by: nested quantifiers in mu, juxtaposition loved u)
 
 TEXT: Let's first define two helper functions:
 TEXT:
-TEXT: love_hate_score : SongId +-> N
-TEXT: forall i : songs | # {u : UserId | i in loved u} >= # {u : UserId | i in hated u} =>
-TEXT:     love_hate_score i = # {u : UserId | i in loved u} - # {u : UserId | i in hated u}
+TEXT: loveHateScore : SongId +-> N
+TEXT: forall i : songs | # {u : UserId | i in loved(u)} >= # {u : UserId | i in hated(u)} =>
+TEXT:     loveHateScore(i) = # {u : UserId | i in loved(u)} - # {u : UserId | i in hated(u)}
 TEXT: and
-TEXT: forall i : songs | # {u : UserId | i in loved u} < # {u : UserId | i in hated u} =>
-TEXT:     love_hate_score i = 0
+TEXT: forall i : songs | # {u : UserId | i in loved(u)} < # {u : UserId | i in hated(u)} =>
+TEXT:     loveHateScore(i) = 0
 TEXT:
-TEXT: playlist_count : SongId +-> N
-TEXT: forall i : songs | playlist_count i = # {p : dom playlist | i in ran playlist p}
+TEXT: playlistCount : SongId +-> N
+TEXT: forall i : songs | playlistCount(i) = # {p : dom(playlist) | i in ran(playlist(p))}
 TEXT:
 TEXT: We then have:
 TEXT:
 TEXT: length : SongId +-> N
 TEXT: popularity : SongId +-> N
-TEXT: dom length subseteq songs
-TEXT: dom popularity subseteq songs
-TEXT: forall i : songs | popularity i = love_hate_score i + playlist_count i
-TEXT: (Blocked by: +-> operator, underscores, juxtaposition throughout)
+TEXT: dom(length) subseteq songs
+TEXT: dom(popularity) subseteq songs
+TEXT: forall i : songs | popularity(i) = loveHateScore(i) + playlistCount(i)
+TEXT: (Blocked by: +-> operator not implemented)
 
 (b)
 
-TEXT: most_popular : SongId
-TEXT: (exists1 i : songs | forall j : songs | i /= j | popularity i > popularity j) =>
-TEXT:     most_popular = (mu i : songs | forall j : songs | i /= j | popularity i > popularity j)
+TEXT: mostPopular : SongId
+TEXT: (exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j)) =>
+TEXT:     mostPopular = (mu i : songs | forall j : songs | i /= j | popularity(i) > popularity(j))
 TEXT: and
-TEXT: not (exists1 i : songs | forall j : songs | i /= j | popularity i > popularity j) =>
-TEXT:     most_popular = null_song
-TEXT: (Blocked by: underscore, nested quantifiers, juxtaposition)
+TEXT: not (exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j)) =>
+TEXT:     mostPopular = nullSong
+TEXT: (Blocked by: nested quantifiers in mu - parser ambiguity)
 
 (c)
 
-TEXT: playlists_containing_most_popular_song == {i : dom playlists | most_popular in ran playlists i}
-TEXT: (Blocked by: underscores, juxtaposition playlists i)
+TEXT: playlistsContainingMostPopularSong == {i : dom(playlists) | mostPopular in ran(playlists(i))}
 
 ** Solution 52 **
 
 (a)
 
-TEXT: premium_plays : seq Play -> seq Play
-TEXT: premium_plays (<>) = <>
-TEXT: forall x : Play; s : seq Play |
-TEXT:     premium_plays (<x> ^ s) = <x> ^ (premium_plays s)   if user_status (x.2) = premium
-TEXT:                                premium_plays s           if user_status (x.2) = standard
-TEXT: (Blocked by: underscores, juxtaposition user_status (x.2))
+TEXT: premiumPlays : seq(Play) -> seq(Play)
+TEXT: premiumPlays(<>) = <>
+TEXT: forall x : Play; s : seq(Play) |
+TEXT:     premiumPlays(<x> ^ s) = <x> ^ premiumPlays(s)   if userStatus(x.2) = premium
+TEXT:                              premiumPlays(s)          if userStatus(x.2) = standard
+TEXT: (Note: Uses camelCase for fuzz compatibility)
 
 (b)
 
-TEXT: standard_plays : seq Play -> seq Play
-TEXT: standard_plays (<>) = <>
-TEXT: forall x : Play; s : seq Play |
-TEXT:     standard_plays (<x> ^ s) = <x> ^ (standard_plays s)  if user_status (x.2) = standard
-TEXT:                                 standard_plays s          if user_status (x.2) = premium
-TEXT: (Blocked by: underscores, juxtaposition)
+TEXT: standardPlays : seq(Play) -> seq(Play)
+TEXT: standardPlays(<>) = <>
+TEXT: forall x : Play; s : seq(Play) |
+TEXT:     standardPlays(<x> ^ s) = <x> ^ standardPlays(s)  if userStatus(x.2) = standard
+TEXT:                               standardPlays(s)        if userStatus(x.2) = premium
+TEXT: (Note: Uses camelCase for fuzz compatibility)
 
 (c)
 
-TEXT: cumulative_length : seq Play -> N
-TEXT: cumulative_length (<>) = 0
-TEXT: forall x : Play; s : seq Play |
-TEXT:     cumulative_length (<x> ^ s) = length (x.1) + cumulative_length (s)
-TEXT: (Blocked by: underscores, juxtaposition length (x.1))
+TEXT: cumulativeLength : seq(Play) -> N
+TEXT: cumulativeLength(<>) = 0
+TEXT: forall x : Play; s : seq(Play) |
+TEXT:     cumulativeLength(<x> ^ s) = length(x.1) + cumulativeLength(s)
+TEXT: (Note: Uses camelCase for fuzz compatibility)
