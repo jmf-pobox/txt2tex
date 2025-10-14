@@ -459,6 +459,13 @@ class Lexer:
             self._advance()
             return Token(TokenType.TSURJ, "-->>", start_line, start_column)
 
+        # Check 3-character: -|> (Phase 18 - partial injection alternative)
+        if char == "-" and self._peek_char() == "|" and self._peek_char(2) == ">":
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.PINJ_ALT, "-|>", start_line, start_column)
+
         # Check 2-character: ->
         if char == "-" and self._peek_char() == ">":
             self._advance()

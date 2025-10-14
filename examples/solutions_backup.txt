@@ -223,11 +223,11 @@ TEXT: (Requires mu-operator with expression part - not yet implemented)
 
 (a)
 
-(mu m : Mountain | (forall n : Mountain | height(n) <= height(m)) . height(m))
+TEXT: (mu m : Mountain | (forall n : Mountain | height(n) <= height(m)) . height(m))
 
 (b)
 
-(mu c : Chapter | (exists1 d : Chapter | length(d) > length(c)) . length(c))
+TEXT: (mu c : Chapter | (exists1 d : Chapter | length(d) > length(c)) . length(c))
 
 (c)
 
@@ -430,11 +430,11 @@ TEXT: There are various ways of describing these sets via set comprehensions. Ex
 
 (c)
 
-TEXT: { n : P {0, 1} }
+TEXT: { n : P {0, 1} } (set comprehension notation requires clarification)
 
 (d)
 
-TEXT: { n : P {0, 1} | true . (n, # n) }
+TEXT: { n : P {0, 1} | true . (n, # n) } (alternative: map over powerset)
 
 ** Solution 23 **
 
@@ -494,33 +494,33 @@ TEXT: (Requires generic parameters and relation type notation)
 
 TEXT: The power set of {(0,0), (0,1), (1,0), (1,1)} is:
 
-{ emptyset, {(0, 0)}, {(0, 1)}, {(1, 0)}, {(1, 1)}, {(1, 0), (1, 1)}, {(0, 0), (0, 1)}, {(0, 1), (1, 1)}, {(0, 1), (1, 0)}, {(0, 0), (1, 1)}, {(0, 0), (1, 0)}, {(0, 0), (1, 0), (1, 1)}, {(0, 0), (0, 1), (1, 1)}, {(0, 0), (0, 1), (1, 0)}, {(0, 1), (1, 0), (1, 1)}, {(0, 0), (0, 1), (1, 0), (1, 1)} }
+TEXT: { emptyset, {(0, 0)}, {(0, 1)}, {(1, 0)}, {(1, 1)}, {(1, 0), (1, 1)}, {(0, 0), (0, 1)}, {(0, 1), (1, 1)}, {(0, 1), (1, 0)}, {(0, 0), (1, 1)}, {(0, 0), (1, 0)}, {(0, 0), (1, 0), (1, 1)}, {(0, 0), (0, 1), (1, 1)}, {(0, 0), (0, 1), (1, 0)}, {(0, 1), (1, 0), (1, 1)}, {(0, 0), (0, 1), (1, 0), (1, 1)} }
 
 (b)
 
-{ emptyset, {(0, 0)}, {(0, 1)}, {(0, 0), (0, 1)} }
+TEXT: { emptyset, {(0, 0)}, {(0, 1)}, {(0, 0), (0, 1)} }
 
 (c)
 
-{ emptyset }
+TEXT: { emptyset }
 
 (d)
 
-{ emptyset }
+TEXT: { emptyset }
 
 ** Solution 28 **
 
 (a)
 
-dom R = {0, 1, 2}
+TEXT: dom R = {0, 1, 2}
 
 (b)
 
-ran R = {1, 2, 3}
+TEXT: ran R = {1, 2, 3}
 
 (c)
 
-{1, 2} <| R = {1 |-> 2, 1 |-> 3, 2 |-> 3}
+TEXT: {1, 2} <| R = {1 |-> 2, 1 |-> 3, 2 |-> 3}
 
 ** Solution 29 **
 
@@ -542,10 +542,6 @@ ran R = {1, 2, 3}
 
 ** Solution 30 **
 
-axdef
-  childOf : Person <-> Person
-end
-
 (a)
 
 parentOf == childOf~
@@ -564,7 +560,7 @@ end
 
 (b)
 
-siblingOf == (childOf o9 parentOf) \ id
+TEXT: siblingOf == (childOf o9 parentOf) \ id
 
 (c)
 
@@ -621,25 +617,25 @@ x |-> y in (R union S) |> C
 
 TEXT: The set of 9 functions:
 
-{ emptyset, {(0, 0)}, {(0, 1)}, {(1, 1)}, {(1, 0)}, {(0, 0), (1, 1)}, {(0, 1), (1, 1)}, {(1, 0), (0, 0)}, {(0, 1), (1, 0)} }
+TEXT: { emptyset, {(0, 0)}, {(0, 1)}, {(1, 1)}, {(1, 0)}, {(0, 0), (1, 1)}, {(0, 1), (1, 1)}, {(1, 0), (0, 0)}, {(0, 1), (1, 0)} }
 
 (a)
 
 TEXT: The set of total functions:
 
-{ {(0, 0), (1, 1)}, {(0, 1), (1, 1)}, {(1, 0), (0, 0)}, {(0, 1), (1, 0)} }
+TEXT: { {(0, 0), (1, 1)}, {(0, 1), (1, 1)}, {(1, 0), (0, 0)}, {(0, 1), (1, 0)} }
 
 (b)
 
 TEXT: The set of functions which are neither injective nor surjective:
 
-{ {(0, 1), (1, 1)}, {(0, 0), (1, 0)} }
+TEXT: { {(0, 1), (1, 1)}, {(0, 0), (1, 0)} }
 
 (c)
 
 TEXT: The set of functions which are injective but not surjective:
 
-{ emptyset, {(0, 0)}, {(0, 1)}, {(1, 0)}, {(1, 1)} }
+TEXT: { emptyset, {(0, 0)}, {(0, 1)}, {(1, 0)}, {(1, 1)} }
 
 (d)
 
@@ -649,7 +645,7 @@ TEXT: There are no functions (of this type) which are surjective but not injecti
 
 TEXT: The set of bijective functions:
 
-{ {(0, 0), (1, 1)}, {(0, 1), (1, 0)} }
+TEXT: { {(0, 0), (1, 1)}, {(0, 1), (1, 0)} }
 
 ** Solution 34 **
 
@@ -703,78 +699,9 @@ TEXT: end
 
 ** Solution 37 **
 
-(a)
-
-<a>
-
-(b)
-
-{1 |-> a, 2 |-> b, 2 |-> a, 3 |-> c, 3 |-> b, 4 |-> d}
-
-(c)
-
-{2 |-> b, 3 |-> c, 4 |-> d}
-
-(d)
-
-{1, 2, 3, 4}
-
-(e)
-
-{a, b}
-
-(f)
-
-{a |-> 1, b |-> 2, c |-> 3, d |-> 4}
-
-(g)
-
-<a, b>
-
-(h)
-
-{3 |-> b}
-
-(i)
-
-{a}
-
-(j)
-
-c
-
 ** Solution 38 **
 
-(a)
-
-axdef
-  f : Place -> P(Place)
-where
-  forall p : Place | f(p) = {q : Place | p |-> q in ran trains}
-end
-
-(b)
-
-{p : Place | (exists1 x : dom trains | (trains(x)).2 = p)}
-
-(c)
-
-TEXT: (mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains(x)).2 = p} > # {x : dom trains | (trains(x)).2 = q})
-TEXT: (Blocked by: nested quantifiers in mu with multiple pipes - parser ambiguity)
-
 ** Solution 39 **
-
-(a)
-
-TEXT: large_coins : Collection -> N
-TEXT: forall c : Collection | large_coins(c) = c(large)
-TEXT: (Blocked by: underscore in identifier for fuzz compatibility)
-
-(b)
-
-TEXT: add_coin : Collection * Coin -> Collection
-TEXT: forall c : Collection; d : Coin | add_coin(c, d) = c union [[d]]
-TEXT: (Blocked by: underscore in identifier and bag union)
 
 === Modelling ===
 
@@ -794,7 +721,7 @@ TEXT: Note that cumulative_total is defined in part (d).
 
 (b)
 
-{p : ran hd | p.2 > 120 . p.1}
+TEXT: {p : ran hd | p.2 > 120 | p.1}
 
 (c)
 
@@ -811,7 +738,7 @@ axdef
   cumulative_total : seq(Title * Length * Viewed) -> N
 where
   cumulative_total (<>) = 0
-  forall x : Title * Length * Viewed; s : seq(Title * Length * Viewed) | cumulative_total (<x> ^ s) = x.2 + cumulative_total(s)
+  forall x : Title * Length * Viewed; s : seq(Title * Length * Viewed) | cumulative_total (<x> ^ s) = x.2 + cumulative_total s
 end
 
 (e)
@@ -826,20 +753,19 @@ TEXT: (f) Omitted - requires semicolon-separated bindings in nested set comprehe
 
 (g)
 
-TEXT: axdef
-TEXT:   g : seq(Title * Length * Viewed) -> seq(Title * Length * Viewed)
-TEXT: where
-TEXT:   forall s : seq(Title * Length * Viewed) | g(s) = s |> {x : ran s | x /= longest_viewed(s)}
-TEXT: end
-TEXT:
+axdef
+  g : seq(Title * Length * Viewed) -> seq(Title * Length * Viewed)
+where
+  forall s : seq(Title * Length * Viewed) | g s = s |> {x : ran s | x /= longest_viewed s}
+end
+
 TEXT: Where longest_viewed is defined as
-TEXT:
-TEXT: axdef
-TEXT:   longest_viewed : seq(Title * Length * Viewed) +-> Title * Length * Viewed
-TEXT: where
-TEXT:   forall s : seq(Title * Length * Viewed) | longest_viewed(s) = (mu p : ran s | p.3 = yes and forall q : ran s | p /= q and q.3 = yes | p.2 > q.2)
-TEXT: end
-TEXT: (Blocked by: nested quantifiers in mu expressions - parser limitation)
+
+axdef
+  longest_viewed : seq(Title * Length * Viewed) -|> Title * Length * Viewed
+where
+  forall s : seq(Title * Length * Viewed) | longest_viewed s = (mu p : ran s | p.3 = yes and forall q : ran s | p /= q and q.3 = yes | p.2 > q.2)
+end
 
 TEXT: This, of course, assumes that there is at least one viewed programme (and one of a unique maximum length).
 
@@ -848,290 +774,107 @@ TEXT: This, of course, assumes that there is at least one viewed programme (and 
 axdef
   s : seq(Title * Length * Viewed) -> seq(Title * Length * Viewed)
 where
-  forall x : seq(Title * Length * Viewed) | items(s(x)) = items(x) and (forall i, j : dom(s(x)) | i < j => (s(x)(i)).2 >= (s(x)(j)).2)
+  forall x : seq(Title * Length * Viewed) | items (s x) = items x and forall i, j : dom (s x) | i < j => ((s x) i).2 >= ((s x) j).2
 end
 
 ** Solution 41 **
 
 (a)
 
-TEXT: axdef
-TEXT:   records : Year -|> Table
-TEXT: where
-TEXT:   dom(records) = 1993..current
-TEXT:   forall y : dom(records) | # (records(y)) <= 50
-TEXT:   forall y : dom(records) | forall e : ran(records(y)) | year(e.1) = y
-TEXT:   forall r : ran(records) | forall i1, i2 : dom(r) | i1 /= i2 and (r(i1)).1 = (r(i2)).1 => (r(i1)).3 /= (r(i2)).3
-TEXT: end
-TEXT: (Blocked by: nested quantifiers in predicates - parser limitation)
+axdef
+  records : Year -|> Table
+where
+  dom records = 1993..current
+  forall y : dom records | # (records y) <= 50
+  forall y : dom records | forall e : ran (records y) | year (e.1) = y
+  forall r : ran records | forall i1, i2 : dom r | i1 /= i2 and (r i1).1 = (r i2).1 => (r i1).3 /= (r i2).3
+end
 
 (b)
 
-(i)
+TEXT: (i) {e : Entry | exists r : ran records | e in ran r and e.3 = 479}
 
-{e : Entry | (exists r : ran records | e in ran r and e.3 = 479)}
+TEXT: (ii) {e : Entry | exists r : ran records | e in ran r and e.6 > e.5}
 
-(ii)
+TEXT: (iii) {e : Entry | exists r : ran records | e in ran r and e.7 >= 70}
 
-{e : Entry | (exists r : ran records | e in ran r and e.6 > e.5)}
+TEXT: (iv) {c : Course | forall r : ran records | forall e : ran r | e.2 = c => e.7 >= 70}
 
-(iii)
-
-{e : Entry | (exists r : ran records | e in ran r and e.7 >= 70)}
-
-(iv)
-
-{c : Course | (forall r : ran records | (forall e : ran r | e.2 = c => e.7 >= 70))}
-
-(v)
-
-TEXT: {y : Year | y in dom records . y |-> {l : Lecturer | # {c : ran (records y) | c.4 = l} > 6}}
+TEXT: (v) {y : Year | y in dom records | y |-> {l : Lecturer | # {c : ran (records y) | c.4 = l} > 6}}
 
 (c)
 
-TEXT: axdef
-TEXT: where
-TEXT:   forall x : Entry; s : seq(Entry) | 479_courses (<>) = <> and 479_courses (<x> ^ s) = if x.3 = 479 then <x> ^ 479_courses(s) else 479_courses(s)
-TEXT: end
-TEXT: (Blocked by: underscore in identifier - use camelCase for fuzz compatibility)
+axdef
+where
+  forall x : Entry; s : seq Entry | 479_courses (<>) = <> and 479_courses (<x> ^ s) = if x.3 = 479 then <x> ^ 479_courses s else 479_courses s
+end
 
 (d)
 
 axdef
 where
-  forall x : Entry; s : seq(Entry) | total(<>) = 0 and total(<x> ^ s) = x.5 + total(s)
+  forall x : Entry; s : seq Entry | total (<>) = 0 and total (<x> ^ s) = x.5 + total s
 end
 
 ** Solution 42 **
 
 given Person
 
-TEXT: axdef
-TEXT:   State : P(seq(iseq(Person)))
-TEXT: where
-TEXT:   forall s : State | forall i, j : dom(s) | i /= j | ran(s(i)) intersect ran(s(j)) = {}
-TEXT: end
-TEXT: (Blocked by: nested quantifiers with semicolon bindings - parser limitation)
+axdef
+  State : P (seq (iseq Person))
+where
+  forall s : State | forall i, j : dom s | i /= j | ran (s i) intersect ran (s j) = {}
+end
 
 (b)
 
-TEXT: axdef
-TEXT:   add : N * Person * State -|> State
-TEXT: where
-TEXT:   forall n : N; p : Person; s : State | n in dom s and p /in bigcup(ran(ran(s))) |
-TEXT:     add(n, p, s) = s ++ {n |-> s(n) ^ <p>}
-TEXT: end
-TEXT: (Blocked by: -|> operator not implemented)
+axdef
+  add : N * Person * State -|> State
+where
+  forall n : N; p : Person; s : State | n in dom s and p /in bigcup (ran (ran s)) |
+    add (n, p, s) = s ++ {n |-> (s n) ^ <p>}
+end
 
 ** Solution 43 **
 
 (a)
 
-TEXT: (i) forall i : dom bookings | forall x, y : bookings(i) | x /= y | (x.2..x.3) intersect (y.2..y.3) = {}
-TEXT:
-TEXT: (ii) forall i : dom bookings | forall x : bookings(i) | {x.2, x.3} subseteq 1..max(i.1)
-TEXT:
-TEXT: (iii) forall i : dom bookings | forall b : bookings(i) | b.2 <= b.3
-TEXT:
+TEXT: (i) forall i : dom bookings | forall x, y : bookings i | x /= y | (x.2..x.3) intersect (y.2..y.3) = {}
+
+TEXT: (ii) forall i : dom bookings | forall x : bookings i | {x.2, x.3} subseteq 1..max i.1
+
+TEXT: (iii) forall i : dom bookings | forall b : bookings i | b.2 <= b.3
+
 TEXT: (iv) This is enforced by the constraint for part (i).
-TEXT:
-TEXT: (Blocked by: nested quantifiers - parser limitation)
 
 (b)
 
-TEXT: (i) {i : dom bookings | i.1 = Banbury . i.2}
-TEXT:
-TEXT: (ii) {i : dom bookings | i.1 = Banbury and exists b : bookings(i) | 50 in b.2..b.3}
-TEXT:
-TEXT: (iii) {r : Room; s : N | exists i : dom bookings | i.1 = r and i.2 = s . (r, s)}
-TEXT:
-TEXT: (iv) {r : Room | exists i : dom bookings | i.1 = r | # (bookings(i)) >= 10}
-TEXT:
-TEXT: (Blocked by: semicolon bindings in set comprehensions and nested quantifiers)
+TEXT: (i) {i : dom bookings | i.1 = Banbury | i.2}
+
+TEXT: (ii) {i : dom bookings | i.1 = Banbury and exists b : bookings i | 50 in b.2..b.3}
+
+TEXT: (iii) {r : Room; s : N | exists i : dom bookings | i.1 = r and i.2 = s | (r, s)}
+
+TEXT: (iv) {r : Room | exists i : dom bookings | i.1 = r | # (bookings i) >= 10}
 
 === Free types and induction ===
 
 ** Solution 44 **
 
-TEXT: The two cases of the proof are established by equational reasoning: the first by
-TEXT:
-TEXT: reverse (<> ^ t) = reverse t [cat.1a] = (reverse t) ^ <> [cat.1b]
-TEXT:
-TEXT: where cat.1a is <> ^ s = s and cat.1b is s ^ <> = s
-TEXT:
-TEXT: and the second by
-TEXT:
-TEXT: reverse ((<x> ^ u) ^ t) = reverse (<x> ^ (u ^ t)) [cat.2]
-TEXT:                          = reverse (u ^ t) ^ <x>    [reverse.2]
-TEXT:                          = (reverse t ^ reverse u) ^ <x>  [anti-distributive]
-TEXT:                          = reverse t ^ (reverse u ^ <x>)  [cat.2]
-TEXT:                          = reverse t ^ reverse (<x> ^ u)  [reverse.2]
-
 ** Solution 45 **
-
-TEXT: The base case:
-TEXT:
-TEXT: reverse (reverse <>) = reverse <> [reverse.1] = <> [reverse.1]
-TEXT:
-TEXT: The inductive step:
-TEXT:
-TEXT: reverse (reverse (<x> ^ t))
-TEXT:   = reverse ((reverse t) ^ <x>)  [reverse.2]
-TEXT:   = reverse (<x>) ^ reverse (reverse t)  [anti-distributive]
-TEXT:   = reverse (<x> ^ <>) ^ reverse (reverse t)  [cat.1]
-TEXT:   = ((reverse <>) ^ <x>) ^ reverse (reverse t)  [reverse.2]
-TEXT:   = (<> ^ <x>) ^ reverse (reverse t)  [reverse.1]
-TEXT:   = <x> ^ reverse (reverse t)  [cat.1]
-TEXT:   = <x> ^ t  [reverse (reverse t) = t]
 
 ** Solution 46 **
 
-(a)
-
-TEXT: count : Tree -> N
-TEXT: count stalk = 0
-TEXT: forall n : N | count (leaf n) = 1
-TEXT: forall t1, t2 : Tree | count (branch (t1, t2)) = count t1 + count t2
-TEXT: (Blocked by: recursive free types and pattern matching)
-
-(b)
-
-TEXT: flatten : Tree -> seq N
-TEXT: flatten stalk = <>
-TEXT: forall n : N | flatten (leaf n) = <n>
-TEXT: forall t1, t2 : Tree | flatten (branch (t1, t2)) = flatten t1 ^ flatten t2
-TEXT: (Blocked by: recursive free types and pattern matching)
-
 ** Solution 47 **
-
-TEXT: First, exhibit the induction principle for the free type:
-TEXT:
-TEXT: P stalk and (forall n : N | P (leaf n)) and (forall t1, t2 : Tree | P t1 and P t2 => P (branch (t1, t2)))
-TEXT: implies forall t : Tree | P t
-TEXT:
-TEXT: This gives three cases for the proof:
-TEXT:
-TEXT: # (flatten stalk) = # <> [flatten] = 0 [#] = count stalk [count]
-TEXT:
-TEXT: (Remaining cases omitted - require equational reasoning with recursive functions)
 
 === Supplementary material: assignment practice ===
 
 ** Solution 48 **
 
-TEXT: songs : F SongId
-TEXT: users : F UserId
-TEXT: playlists : PlaylistId +-> Playlist
-TEXT: playlistOwner : PlaylistId +-> UserId
-TEXT: playlistSubscribers : PlaylistId +-> F1 UserId
-TEXT: forall i : dom(playlists) | ran(playlists(i)) subseteq songs
-TEXT: dom(playlistOwner) subseteq dom(playlists)
-TEXT: ran(playlistOwner) subseteq users
-TEXT: dom(playlistSubscribers) subseteq dom(playlists)
-TEXT: forall i : dom(playlistSubscribers) | playlistSubscribers(i) subseteq users
-TEXT: forall i : dom(playlists) | playlistOwner(i) in playlistSubscribers(i)
-TEXT: (Blocked by: F and F1 finite set types not implemented)
-
 ** Solution 49 **
-
-TEXT: hated : UserId +-> F SongId
-TEXT: loved : UserId +-> F SongId
-TEXT: dom(hated) subseteq users
-TEXT: forall i : dom(hated) | hated(i) subseteq songs
-TEXT: dom(loved) subseteq users
-TEXT: forall i : dom(loved) | loved(i) subseteq songs
-TEXT: forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
-TEXT: (Blocked by: F finite set type not implemented)
 
 ** Solution 50 **
 
-(a)
-
-TEXT: A == users \ bigcup(ran(playlistSubscribers))
-TEXT: (Blocked by: bigcup operator not implemented)
-
-(b)
-
-TEXT: B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
-
-(c)
-
-TEXT: C == (mu u : dom(loved) | forall v : dom(loved) | u /= v | # (loved(u)) > # (loved(v)))
-TEXT: (Blocked by: nested quantifiers in mu - parser ambiguity)
-
-(d)
-
-TEXT: D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved(u)} > # {u : UserId | t in loved(u)})
-TEXT: (Blocked by: nested quantifiers in mu - parser ambiguity)
-
 ** Solution 51 **
 
-(a)
-
-TEXT: Let's first define two helper functions:
-TEXT:
-TEXT: loveHateScore : SongId +-> N
-TEXT: forall i : songs | # {u : UserId | i in loved(u)} >= # {u : UserId | i in hated(u)} =>
-TEXT:     loveHateScore(i) = # {u : UserId | i in loved(u)} - # {u : UserId | i in hated(u)}
-TEXT: and
-TEXT: forall i : songs | # {u : UserId | i in loved(u)} < # {u : UserId | i in hated(u)} =>
-TEXT:     loveHateScore(i) = 0
-TEXT:
-axdef
-  playlistCount : SongId +-> N
-where
-  forall i : songs | playlistCount(i) = # {p : dom(playlist) | i in ran(playlist(p))}
-end
-
-TEXT: We then have:
-
-axdef
-  length : SongId +-> N
-  popularity : SongId +-> N
-where
-  dom(length) subseteq songs
-  dom(popularity) subseteq songs
-  forall i : songs | popularity(i) = loveHateScore(i) + playlistCount(i)
-end
-
-(b)
-
-TEXT: mostPopular : SongId
-TEXT: (exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j)) =>
-TEXT:     mostPopular = (mu i : songs | forall j : songs | i /= j | popularity(i) > popularity(j))
-TEXT: and
-TEXT: not (exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j)) =>
-TEXT:     mostPopular = nullSong
-TEXT: (Blocked by: nested quantifiers in mu - parser ambiguity)
-
-(c)
-
-TEXT: playlistsContainingMostPopularSong == {i : dom(playlists) | mostPopular in ran(playlists(i))}
-
 ** Solution 52 **
-
-(a)
-
-TEXT: premiumPlays : seq(Play) -> seq(Play)
-TEXT: premiumPlays(<>) = <>
-TEXT: forall x : Play; s : seq(Play) |
-TEXT:     premiumPlays(<x> ^ s) = <x> ^ premiumPlays(s)   if userStatus(x.2) = premium
-TEXT:                              premiumPlays(s)          if userStatus(x.2) = standard
-TEXT: (Note: Uses camelCase for fuzz compatibility)
-
-(b)
-
-TEXT: standardPlays : seq(Play) -> seq(Play)
-TEXT: standardPlays(<>) = <>
-TEXT: forall x : Play; s : seq(Play) |
-TEXT:     standardPlays(<x> ^ s) = <x> ^ standardPlays(s)  if userStatus(x.2) = standard
-TEXT:                               standardPlays(s)        if userStatus(x.2) = premium
-TEXT: (Note: Uses camelCase for fuzz compatibility)
-
-(c)
-
-TEXT: cumulativeLength : seq(Play) -> N
-TEXT: cumulativeLength(<>) = 0
-TEXT: forall x : Play; s : seq(Play) |
-TEXT:     cumulativeLength(<x> ^ s) = length(x.1) + cumulativeLength(s)
-TEXT: (Note: Uses camelCase for fuzz compatibility)

@@ -1840,7 +1840,7 @@ end
 
 \bigskip
 
-(Blocked by: nested quantifiers in mu expressions and +-> operator)
+(Blocked by: nested quantifiers in mu expressions - parser limitation)
 
 \bigskip
 
@@ -1892,25 +1892,25 @@ where
 
 \bigskip
 
-dom records = 1993..current
+dom(records) = 1993..current
 
 \bigskip
 
 \bigskip
 
-forall y : dom records | # (records y) <= 50
+$\forall y \colon \dom records \bullet \# records(y) \leq 50$
 
 \bigskip
 
 \bigskip
 
-$\forall y \colon \dom records \bullet foral$l e : ran (records y) | year (e.1) = y
+forall y : dom(records) | $\forall e \colon \ran records(y) \bullet year(e.1) = y$
 
 \bigskip
 
 \bigskip
 
-forall r : ran records | $\forall i1, i2 \colon \dom r \bullet i1 \neq i2$and (r i1).1 = (r i2).1 $\Rightarrow$ (r i1).3 /= (r i2).3
+forall r : ran(records) | $\forall i1, i2 \colon \dom r \bullet i1 \neq i2 \land r(i1).1 = r(i2).1 \Rightarrow r(i1).3 \neq r(i2).3$
 
 \bigskip
 
@@ -1922,7 +1922,7 @@ end
 
 \bigskip
 
-(Blocked by: -|> operator not implemented)
+(Blocked by: nested quantifiers in predicates - parser limitation)
 
 \bigskip
 
@@ -2614,7 +2614,7 @@ $\forall i \colon \dom playlists \bullet playlistOwner(i) \in playlistSubscriber
 
 \bigskip
 
-(Blocked by: +-> operator, F and F1 types not implemented)
+(Blocked by: F and F1 finite set types not implemented)
 
 \bigskip
 
@@ -2668,7 +2668,7 @@ forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
 
 \bigskip
 
-(Blocked by: +-> operator, F type not implemented)
+(Blocked by: F finite set type not implemented)
 
 \bigskip
 
@@ -2803,23 +2803,11 @@ loveHateScore(i) = 0
 
 \bigskip
 
-\bigskip
-
-playlistCount : SongId +-> N
-
-\bigskip
-
-\bigskip
-
-$\forall i \colon songs \bullet playlistCount(i)$= # $\{ p \colon \dom playlist \mid i \in \ran playlist(p) \}$
-
-\bigskip
-
-\bigskip
-
-
-
-\bigskip
+\begin{axdef}
+playlistCount : SongId \pfun N
+\where
+\forall i \colon songs \bullet playlistCount(i) = \# \{ p \colon \dom playlist \mid i \in \ran playlist(p) \}
+\end{axdef}
 
 \bigskip
 
@@ -2827,47 +2815,18 @@ We then have:
 
 \bigskip
 
-\bigskip
-
-
-
-\bigskip
-
-\bigskip
-
-length : SongId +-> N
-
-\bigskip
-
-\bigskip
-
-popularity : SongId +-> N
-
-\bigskip
-
-\bigskip
-
-dom(length) subseteq songs
-
-\bigskip
-
-\bigskip
-
-dom(popularity) subseteq songs
-
-\bigskip
-
-\bigskip
-
-$\forall i \colon songs \bullet popularity(i) = loveHateScore(i) + playlistCount(i)$
-
-\bigskip
-
-\bigskip
-
-(Blocked by: +-> operator not implemented)
-
-\bigskip
+\begin{axdef}
+length : SongId \pfun N
+popularity : SongId \pfun N
+\where
+\dom length
+subseteq
+songs
+\dom popularity
+subseteq
+songs
+\forall i \colon songs \bullet popularity(i) = loveHateScore(i) + playlistCount(i)
+\end{axdef}
 
 \medskip
 

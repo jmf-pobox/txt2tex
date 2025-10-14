@@ -76,11 +76,12 @@ class TokenType(Enum):
     BAG_UNION = auto()  # ⊎ (bag union)
     OVERRIDE = auto()  # ++ (function/sequence override) - Phase 13
 
-    # Function type operators (Phase 11)
+    # Function type operators (Phase 11, enhanced Phase 18)
     TFUN = auto()  # -> (total function)
     PFUN = auto()  # +-> (partial function)
     TINJ = auto()  # >-> (total injection)
     PINJ = auto()  # >+> (partial injection)
+    PINJ_ALT = auto()  # -|> (partial injection, alternative notation)
     TSURJ = auto()  # -->> (total surjection)
     PSURJ = auto()  # +->> (partial surjection)
     BIJECTION = auto()  # >->> (bijection)
