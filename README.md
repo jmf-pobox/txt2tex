@@ -2,11 +2,11 @@
 
 Convert whiteboard-style mathematical notation to high-quality LaTeX for formal methods and Z notation.
 
-## Current Status: Phase 14 ✅
+## Current Status: Phase 15 ✅
 
-**Production Ready for Solutions 1-39!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, and **ASCII sequence brackets with pattern matching support**.
+**Production Ready for Solutions 1-39!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, **ASCII sequence brackets with pattern matching support**, and **multi-word identifiers with underscore**.
 
-- 🎯 23 phases complete (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12, 13.1-13.4, 14)
+- 🎯 24 phases complete (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12, 13.1-13.4, 14, 15)
 - ✅ 571 tests passing
 - 📚 19 example files demonstrating all features
 - 🔧 Makefile automation for building PDFs
@@ -908,7 +908,66 @@ end
 - Recursive case with cons: `f(<x> ^ s) = expr(x, f(s))`
 - Natural recursive structure matching mathematical definitions
 
-**Limitation**: Identifiers with underscores (like `cumulative_total`) don't parse correctly because `_` is treated as a subscript operator. Use camelCase (`cumulativeTotal`) as a workaround.
+---
+
+### Multi-Word Identifiers (Phase 15)
+
+Phase 15 enables identifiers with underscores for natural multi-word variable names.
+
+#### Underscore in Identifiers
+
+**Multi-word identifiers:**
+```
+cumulative_total             →  \mathit{cumulative\_total}
+not_yet_viewed               →  \mathit{not\_yet\_viewed}
+employee_count               →  \mathit{employee\_count}
+```
+
+**Subscript notation (backward compatible):**
+```
+a_i                          →  a_i  (simple subscript)
+a_1                          →  a_1
+x_max                        →  x_{max}  (multi-char subscript)
+```
+
+#### Smart LaTeX Rendering
+
+The system automatically determines the appropriate LaTeX rendering:
+
+1. **No underscore**: `x` → `x`
+2. **Simple subscript** (single char after `_`): `a_i` → `a_i`
+3. **Multi-char subscript** (2-3 chars after `_`): `x_max` → `x_{max}`
+4. **Multi-word identifier**: `cumulative_total` → `\mathit{cumulative\_total}`
+
+**Heuristic**: If any part is > 3 characters OR multiple underscores, treat as multi-word identifier.
+
+#### In Definitions
+
+**Function definitions:**
+```
+axdef
+  cumulative_total : seq(N) -> N
+where
+  cumulative_total(<>) = 0
+  forall x : N; s : seq(N) |
+    cumulative_total(<x> ^ s) = x + cumulative_total(s)
+end
+```
+
+**Schema variables:**
+```
+schema System
+  employee_count : N
+  not_yet_viewed : P Document
+where
+  employee_count >= 0
+end
+```
+
+**Use cases:**
+- Natural multi-word variable names from specifications
+- Backward compatible with existing subscript notation
+- Automatic LaTeX formatting without manual markup
 
 ---
 
@@ -1214,6 +1273,14 @@ PROOF:
 - Smart disambiguation: `<x>` vs `x > y` based on whitespace
 - Pattern matching support: `f(<>) = 0`, `f(<x> ^ s) = expr`
 - Enables recursive function definitions on sequences
+
+### ✅ Phase 15: Underscore in Identifiers
+- Multi-word identifiers: `cumulative_total`, `not_yet_viewed`
+- Smart LaTeX rendering based on word length
+- Simple subscripts: `a_i` → `a_i`
+- Multi-char subscripts: `x_max` → `x_{max}`
+- Multi-word identifiers: `cumulative_total` → `\mathit{cumulative\_total}`
+- Backward compatible with existing subscript notation
 
 ---
 
@@ -1566,36 +1633,37 @@ Contributions are welcome! Please:
 ✅ **Phase 13.3**: Override operator (`f ++ g`)
 ✅ **Phase 13.4**: General function application (`(f ++ g)(x)`, `s(i)`)
 ✅ **Phase 14**: ASCII sequence brackets and pattern matching (`<x> ^ s`)
+✅ **Phase 15**: Underscore in identifiers (`cumulative_total`, smart subscript rendering)
 
 ### Remaining Features (13 solutions to full coverage)
 
 **Current Status:** 39/52 solutions fully working, 4 partially working (30-70%)
 
-**Phase 14.2: Conditional Expressions** (Solutions 40-43 partial)
+**Next Priority: Conditional Expressions** (Solutions 40-43 completion)
 - Conditional syntax: `if condition`, `otherwise`
-- Pattern matching in function definitions
-- Identifier underscore fix for `cumulative_total` style names
+- Guards in pattern matching
+- Multi-branch conditionals
 
-**Phase 15: Schema Decoration & State Machines** (Solutions 40-43 completion)
+**Phase 16: Schema Decoration & State Machines** (Solutions 44-47)
 - Schema decoration: `S'`, `S?`, `S!`
 - Delta/Xi notation: `ΔS`, `ΞS`
 - Schema operations and composition
 - Pre/post-conditions
 
-**Phase 16: Recursive Free Types** (Solutions 44-47)
+**Phase 17: Recursive Free Types** (Solutions 48-51)
 - Recursive type definitions: `Tree ::= leaf | branch⟨Tree × Tree⟩`
 - Constructor functions with parameters
 - Pattern matching on constructors
 - Structural induction proofs
 
-**Supplementary** (Solutions 48-52)
+**Supplementary** (Solution 52)
 - Advanced Z notation features (varies by solution)
 
 **Estimated effort:**
-- Phase 14.2 + underscore fix: 5-8 hours → 80% coverage
-- Phase 15: 10-15 hours → 85% coverage
-- Phase 16: 15-20 hours → 90% coverage
-- Supplementary: 15-20 hours → 100% coverage
+- Conditional expressions: 5-8 hours → 80% coverage
+- Phase 16 (Schema decoration): 10-15 hours → 85% coverage
+- Phase 17 (Recursive types): 15-20 hours → 90% coverage
+- Supplementary: 5-10 hours → 100% coverage
 
 ### Future Enhancements
 - Better error recovery and messages
@@ -1622,8 +1690,8 @@ For bugs, feature requests, or questions, please open an issue on GitHub.
 
 ---
 
-**Last Updated**: Phase 11.9 Complete (Generic Type Instantiation)
-**Version**: 0.11.9
-**Status**: Production Ready for Solutions 1-36 - 69.2% Coverage (36/52 exercises)
-**Test Suite**: 469 tests passing
-**Remaining**: Solutions 37-52 (sequences, state machines, free types)
+**Last Updated**: Phase 15 Complete (Underscore in Identifiers)
+**Version**: 0.15.0
+**Status**: Production Ready for Solutions 1-39 - 75.0% Coverage (39/52 exercises)
+**Test Suite**: 571 tests passing
+**Remaining**: Solutions 40-52 (conditional expressions, schema decoration, recursive types)
