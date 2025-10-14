@@ -105,7 +105,8 @@ class LaTeXGenerator:
         "*": r"*",  # Multiplication (also postfix in relational context)
         "mod": r"\bmod",  # Modulo
         # Sequence operators (Phase 12)
-        "⌢": r"\cat",  # Sequence concatenation
+        "⌢": r"\cat",  # Sequence concatenation (Unicode)
+        "^": r"\cat",  # Sequence concatenation (ASCII alternative, Phase 14)
     }
 
     UNARY_OPS: ClassVar[dict[str, str]] = {

@@ -267,7 +267,20 @@ class Lexer:
             self._advance()
             return Token(TokenType.LESS_EQUAL, "<=", start_line, start_column)
 
+        # Phase 14: ASCII sequence brackets <> as alternative to Unicode ⟨⟩
+        # Recognize < as LANGLE when followed by: >, identifier, digit, (, or <
+        # This handles: <>, <x>, <1>, <(expr)>, <<nested>>
         if char == "<":
+            next_char = self._peek_char()
+            # < followed by > is always empty sequence: <>
+            # < followed by letter/digit is sequence literal: <x>, <1>
+            # < followed by ( could be sequence with tuple: <(a, b)>
+            # < followed by < is nested sequence: <<a>>
+            # Otherwise it's comparison: x < y
+            if next_char in (">", "(", "<") or next_char.isalnum():
+                self._advance()
+                return Token(TokenType.LANGLE, "<", start_line, start_column)
+            # It's a comparison operator
             self._advance()
             return Token(TokenType.LESS_THAN, "<", start_line, start_column)
 
@@ -303,7 +316,28 @@ class Lexer:
             self._advance()
             return Token(TokenType.TINJ, ">->", start_line, start_column)
 
+        # Phase 14: ASCII sequence brackets - recognize > as RANGLE
+        # Key distinction: <x> has NO space before >, but x > 0 HAS space
+        # > is RANGLE if: no space before AND previous char is alphanumeric/</)/ ,
+        # > is GREATER_THAN if: space before OR previous char is operator/etc
         if char == ">":
+            # Check if there's whitespace immediately before >
+            prev_pos = self.pos - 1
+            if prev_pos >= 0 and self.text[prev_pos] in " \t":
+                # There's whitespace before >, so it's a comparison: x > y
+                self._advance()
+                return Token(TokenType.GREATER_THAN, ">", start_line, start_column)
+
+            # No whitespace, check what character comes before
+            if prev_pos >= 0:
+                prev_char = self.text[prev_pos]
+                # If previous char suggests we're closing a sequence, this is RANGLE
+                # < for <>, alphanumeric for <x>, ) for <(a)>, , for <a, b>
+                if prev_char.isalnum() or prev_char in ("<", ">", ")", ","):
+                    self._advance()
+                    return Token(TokenType.RANGLE, ">", start_line, start_column)
+
+            # Otherwise it's a comparison operator
             self._advance()
             return Token(TokenType.GREATER_THAN, ">", start_line, start_column)
 
@@ -325,8 +359,22 @@ class Lexer:
             self._advance()
             return Token(TokenType.EQUALS, "=", start_line, start_column)
 
-        # Math operators (Phase 3)
+        # Math operators (Phase 3, enhanced Phase 14)
+        # Caret: ^ can mean superscript OR sequence concatenation
+        # Heuristic: after > (sequence bracket), treat as concatenation (CAT)
+        # Otherwise, treat as superscript (CARET)
         if char == "^":
+            # Look back to find previous non-whitespace character
+            prev_pos = self.pos - 1
+            while prev_pos >= 0 and self.text[prev_pos] in " \t":
+                prev_pos -= 1
+
+            # If previous char is > (end of sequence), this is concatenation
+            if prev_pos >= 0 and self.text[prev_pos] == ">":
+                self._advance()
+                return Token(TokenType.CAT, "^", start_line, start_column)
+
+            # Otherwise it's superscript
             self._advance()
             return Token(TokenType.CARET, "^", start_line, start_column)
 
