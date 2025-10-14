@@ -298,8 +298,42 @@ class LaTeXGenerator:
         raise TypeError(f"Unknown expression type: {type(expr)}")
 
     def _generate_identifier(self, node: Identifier) -> str:
-        """Generate LaTeX for identifier."""
-        return node.name
+        """Generate LaTeX for identifier (Phase 15: smart underscore handling).
+
+        Handles three cases:
+        1. No underscore: return as-is (e.g., 'x' → 'x')
+        2. Simple subscript: return as-is (e.g., 'a_i' → 'a_i', 'x_0' → 'x_0')
+        3. Multi-char subscript: add braces (e.g., 'a_max' → 'a_{max}')
+        4. Multi-word identifier: escape/mathit (e.g., 'cumulative_total')
+        """
+        name = node.name
+
+        # No underscore: return as-is
+        if "_" not in name:
+            return name
+
+        # Check for multi-word identifier pattern
+        # Heuristic: if prefix OR suffix is > 3 chars, it's a multi-word identifier
+        parts = name.split("_")
+
+        # Multiple underscores OR long words → multi-word identifier
+        if len(parts) > 2 or any(len(part) > 3 for part in parts):
+            escaped = name.replace("_", r"\_")
+            return rf"\mathit{{{escaped}}}"
+
+        # Single underscore with short parts: subscript
+        if len(parts) == 2:
+            prefix, suffix = parts
+            # Simple subscript: single character after underscore
+            if len(suffix) == 1:
+                return f"{prefix}_{suffix}"
+            # Multi-char subscript: needs braces
+            else:
+                return f"{prefix}_{{{suffix}}}"
+
+        # Fallback: escape and use mathit
+        escaped = name.replace("_", r"\_")
+        return rf"\mathit{{{escaped}}}"
 
     def _generate_number(self, node: Number) -> str:
         """Generate LaTeX for number."""
