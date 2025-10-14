@@ -1509,6 +1509,100 @@ $\mathit{not\_yet\_viewed}$
 
 ---
 
+### Phase 16: Conditional Expressions (if/then/else) ✅ COMPLETED
+**Timeline**: 3-4 hours actual
+**Goal**: Support conditional expressions in mathematical notation
+**Priority**: CRITICAL (needed for Solutions 40-52)
+**Status**: ✅ Completed (590 tests passing)
+
+**Problem**: Conditional expressions (`if condition then expr1 else expr2`) are commonly used in recursive function definitions and specifications, especially for pattern matching on sequences and free types.
+
+**Solution**: Add conditional expression syntax with proper precedence and LaTeX rendering.
+
+**Added**:
+- Conditional expression tokens: IF, THEN, ELSE, OTHERWISE
+- Conditional AST node with condition, then_expr, else_expr fields
+- Conditional parsing at expression entry level (before iff) for low precedence
+- Nested conditional support in then/else branches
+- MINUS token for arithmetic subtraction/negation
+- Unary minus operator (Phase 16 dependency)
+
+**Precedence**: Conditionals bind very loosely (lower than iff), allowing arbitrary expressions in condition but allowing conditionals in then/else branches for nesting.
+
+**Parsing Strategy**:
+- Condition: parsed with `_parse_iff()` (no quantifiers/lambdas/conditionals)
+- Then/else branches: parsed with `_parse_expr()` (allows nested conditionals)
+- Conditionals can appear as operands in arithmetic expressions
+
+**Input Format**:
+```
+if x > 0 then x else -x
+if s = <> then 0 else head s
+if x > 0 then 1 else if x < 0 then -1 else 0  # Nested
+abs(x) = if x > 0 then x else -x
+max(x, y) = if x > y then x else y
+y + if x > 0 then 1 else 0  # As operand
+```
+
+**LaTeX Output**:
+```latex
+$(\text{if } x > 0 \text{ then } x \text{ else } -x)$
+$(\text{if } s = \langle \rangle \text{ then } 0 \text{ else } \head s)$
+$(\text{if } x > 0 \text{ then } 1 \text{ else } (\text{if } x < 0 \text{ then } -1 \text{ else } 0))$
+$abs(x) = (\text{if } x > 0 \text{ then } x \text{ else } -x)$
+$max(x, y) = (\text{if } x > y \text{ then } x \text{ else } y)$
+$y + (\text{if } x > 0 \text{ then } 1 \text{ else } 0)$
+```
+
+**MINUS Token Implementation**:
+- Added MINUS to TokenType enum
+- Lexer recognizes standalone `-` (separate from multi-char operators like `->`, `-->>`)
+- Parser handles MINUS as both unary prefix (negation) and binary infix (subtraction)
+- LaTeX generator maps `-` to `-` for both contexts (no space for unary)
+
+**Implementation Details**:
+- Lexer: Added IF/THEN/ELSE/OTHERWISE keyword recognition
+- Lexer: Added standalone minus token handling
+- Parser: Added `_parse_conditional()` method at expression entry point
+- Parser: Added MINUS to unary operators and additive operators
+- Parser: Added IF and MINUS to `_is_operand_start()` for lookahead
+- LaTeX: Inline rendering with `\text{}` keywords, wrapped in parentheses
+- LaTeX: Unary minus renders without space (`-x` not `- x`)
+
+**Test Coverage**: 19 tests in test_phase16.py covering:
+- Simple conditionals (if x > 0 then x else -x)
+- Conditionals with comparisons (if s = <> then 0 else 1)
+- Nested conditionals (in then branch, in else branch)
+- Conditionals in binary operations (y + if x > 0 then 1 else 0)
+- LaTeX generation with proper formatting
+- Precedence and associativity
+- Integration tests (abs, max, sign functions)
+
+**Example Use Cases**:
+```
+# Absolute value
+abs(x) = if x > 0 then x else -x
+
+# Maximum of two values
+max(x, y) = if x > y then x else y
+
+# Sign function (nested conditionals)
+sign(x) = if x > 0 then 1 else if x < 0 then -1 else 0
+
+# Recursive sequence function
+f(s) = if s = <> then 0 else head s + f(tail s)
+
+# Pattern matching alternative
+total(<>) = 0
+total(<x> ^ s) = x + total(s)
+# Equivalent to: total(seq) = if seq = <> then 0 else ...
+```
+
+**Deliverable**: Can express conditional logic in mathematical specifications
+**Unblocks**: Solutions 40-52 (conditional expressions in recursive functions)
+
+---
+
 ### Phase 12: Sequences
 **Timeline**: 6-8 hours
 **Goal**: Sequence types and sequence operators

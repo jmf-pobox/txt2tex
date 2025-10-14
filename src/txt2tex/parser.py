@@ -8,6 +8,7 @@ from txt2tex.ast_nodes import (
     BagLiteral,
     BinaryOp,
     CaseAnalysis,
+    Conditional,
     Declaration,
     Document,
     DocumentItem,
@@ -547,7 +548,51 @@ class Parser:
         # Check for lambda expression (Phase 11d)
         if self._match(TokenType.LAMBDA):
             return self._parse_lambda()
+        # Check for conditional expression (Phase 16)
+        if self._match(TokenType.IF):
+            return self._parse_conditional()
         return self._parse_iff()
+
+    def _parse_conditional(self) -> Expr:
+        """Parse conditional expression: if condition then expr1 else expr2.
+
+        Phase 16: Conditional expressions.
+        Examples:
+        - if x > 0 then x else -x
+        - if s = <> then 0 else head s
+        - if x > 0 then 1 else if x < 0 then -1 else 0 (nested)
+
+        The condition is parsed with _parse_iff() (no quantifiers/lambdas/conditionals),
+        but the then/else branches use _parse_expr() to allow nested conditionals.
+        """
+        if_token = self._advance()  # Consume 'if'
+
+        # Parse condition (up to 'then') - no quantifiers/lambdas/conditionals
+        condition = self._parse_iff()
+
+        # Expect 'then'
+        if not self._match(TokenType.THEN):
+            raise ParserError("Expected 'then' after if condition", self._current())
+        self._advance()  # Consume 'then'
+
+        # Parse then branch - allow nested conditionals
+        then_expr = self._parse_expr()
+
+        # Expect 'else'
+        if not self._match(TokenType.ELSE):
+            raise ParserError("Expected 'else' after then expression", self._current())
+        self._advance()  # Consume 'else'
+
+        # Parse else branch - allow nested conditionals
+        else_expr = self._parse_expr()
+
+        return Conditional(
+            condition=condition,
+            then_expr=then_expr,
+            else_expr=else_expr,
+            line=if_token.line,
+            column=if_token.column,
+        )
 
     def _parse_iff(self) -> Expr:
         """Parse iff operation (<=>), lowest precedence."""
@@ -618,9 +663,10 @@ class Parser:
         return left
 
     def _parse_unary(self) -> Expr:
-        """Parse unary operation (not, #).
+        """Parse unary operation (not, #, -).
 
         Phase 8 enhancement: Added cardinality operator (#) as prefix unary.
+        Phase 16 enhancement: Added negation operator (-) as prefix unary.
         """
         if self._match(TokenType.NOT):
             op_token = self._advance()
@@ -643,6 +689,17 @@ class Parser:
                 column=op_token.column,
             )
 
+        # Unary negation (Phase 16)
+        if self._match(TokenType.MINUS):
+            op_token = self._advance()
+            operand = self._parse_unary()
+            return UnaryOp(
+                operator=op_token.value,
+                operand=operand,
+                line=op_token.line,
+                column=op_token.column,
+            )
+
         return self._parse_range()
 
     def _parse_additive(self) -> Expr:
@@ -654,9 +711,9 @@ class Parser:
         """
         left = self._parse_multiplicative()
 
-        while self._match(TokenType.PLUS, TokenType.CAT):
+        while self._match(TokenType.PLUS, TokenType.MINUS, TokenType.CAT):
             # Lookahead for +: only treat as infix if followed by operand
-            # CAT (⌢) is always infix, no ambiguity
+            # CAT (⌢) and MINUS are always infix, no ambiguity
             if self._match(TokenType.PLUS) and not self._is_operand_start():
                 break
             op_token = self._advance()
@@ -722,6 +779,8 @@ class Parser:
 
         Used for lookahead to disambiguate postfix +/* from infix +/*.
         Checks the NEXT token, not the current one.
+
+        Phase 16 enhancement: Added IF (conditional) and MINUS (unary negation)
         """
         next_token = self._peek_ahead(1)
         return next_token.type in (
@@ -732,6 +791,7 @@ class Parser:
             TokenType.LBRACKET,
             TokenType.NOT,
             TokenType.HASH,
+            TokenType.MINUS,  # Phase 16: unary negation
             TokenType.POWER,
             TokenType.POWER1,
             TokenType.FORALL,
@@ -739,6 +799,7 @@ class Parser:
             TokenType.EXISTS1,
             TokenType.MU,
             TokenType.LAMBDA,
+            TokenType.IF,  # Phase 16: conditional expressions
         )
 
     def _parse_quantifier(self) -> Expr:
@@ -1477,6 +1538,10 @@ class Parser:
         # Phase 11d: Lambda expressions
         if self._match(TokenType.LAMBDA):
             return self._parse_lambda()
+
+        # Phase 16: Conditional expressions (allow as atoms)
+        if self._match(TokenType.IF):
+            return self._parse_conditional()
 
         # Phase 11b / Phase 13: Identifiers
         # Note: Function application expr(...) is now handled in _parse_postfix()
