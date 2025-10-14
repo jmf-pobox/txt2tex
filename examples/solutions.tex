@@ -2566,55 +2566,55 @@ playlists : PlaylistId +-> Playlist
 
 \bigskip
 
-playlist_owner : PlaylistId +-> UserId
+playlistOwner : PlaylistId +-> UserId
 
 \bigskip
 
 \bigskip
 
-playlist_subscribers : PlaylistId +-> F1 UserId
+playlistSubscribers : PlaylistId +-> F1 UserId
 
 \bigskip
 
 \bigskip
 
-$\forall i \colon \dom playlists \bullet ran$(playlists i) subseteq songs
+$\forall i \colon \dom playlists \bullet \ran playlists(i)$subseteq songs
 
 \bigskip
 
 \bigskip
 
-dom playlist_owner subseteq dom playlists
+dom(playlistOwner) subseteq dom(playlists)
 
 \bigskip
 
 \bigskip
 
-ran playlist_owner subseteq users
+ran(playlistOwner) subseteq users
 
 \bigskip
 
 \bigskip
 
-dom playlist_subscribers subseteq dom playlists
+dom(playlistSubscribers) subseteq dom(playlists)
 
 \bigskip
 
 \bigskip
 
-$\forall i \colon \dom \mathit{playlist\_subscribers} \bullet \mathit{playlist\_subscribers}$i subseteq users
+$\forall i \colon \dom playlistSubscribers \bullet playlistSubscribers(i)$subseteq users
 
 \bigskip
 
 \bigskip
 
-forall i : dom playlists | (playlist_owner i) in playlist_subscribers i
+$\forall i \colon \dom playlists \bullet playlistOwner(i) \in playlistSubscribers(i)$
 
 \bigskip
 
 \bigskip
 
-(Blocked by: +-> operator, juxtaposition, underscores, F and F1 types)
+(Blocked by: +-> operator, F and F1 types not implemented)
 
 \bigskip
 
@@ -2638,37 +2638,37 @@ loved : UserId +-> F SongId
 
 \bigskip
 
-dom hated subseteq users
+dom(hated) subseteq users
 
 \bigskip
 
 \bigskip
 
-forall i : dom hated | (hated i) subseteq songs
+$\forall i \colon \dom hated \bullet hated(i)$subseteq songs
 
 \bigskip
 
 \bigskip
 
-dom loved subseteq users
+dom(loved) subseteq users
 
 \bigskip
 
 \bigskip
 
-forall i : dom loved | (loved i) subseteq songs
+$\forall i \colon \dom loved \bullet loved(i)$subseteq songs
 
 \bigskip
 
 \bigskip
 
-forall i : dom hated union dom loved | hated i intersect loved i = emptyset
+forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
 
 \bigskip
 
 \bigskip
 
-(Blocked by: +-> operator, juxtaposition, F type)
+(Blocked by: +-> operator, F type not implemented)
 
 \bigskip
 
@@ -2683,13 +2683,13 @@ forall i : dom hated union dom loved | hated i intersect loved i = emptyset
 \vspace{11pt}
 \bigskip
 
-A == users \ bigcup (ran playlist_subscribers)
+A == users \ bigcup(ran(playlistSubscribers))
 
 \bigskip
 
 \bigskip
 
-(Blocked by: underscore in identifier, bigcup operator)
+(Blocked by: bigcup operator not implemented)
 
 \bigskip
 
@@ -2700,13 +2700,7 @@ A == users \ bigcup (ran playlist_subscribers)
 \vspace{11pt}
 \bigskip
 
-B == {p : dom playlist_subscribers | # (playlist_subscribers p) >= 100}
-
-\bigskip
-
-\bigskip
-
-(Blocked by: underscore in identifier, juxtaposition)
+B == $\{ p \colon \dom playlistSubscribers \mid \# playlistSubscribers(p) \geq 100 \}$
 
 \bigskip
 
@@ -2717,13 +2711,13 @@ B == {p : dom playlist_subscribers | # (playlist_subscribers p) >= 100}
 \vspace{11pt}
 \bigskip
 
-C == (mu u : dom loved | $\forall v \colon \dom loved \bullet u \neq v$| # (loved u) > # (loved v))
+C == (mu u : dom(loved) | $\forall v \colon \dom loved \bullet u \neq v$| # (loved(u)) > # (loved(v)))
 
 \bigskip
 
 \bigskip
 
-(Blocked by: nested quantifiers in mu)
+(Blocked by: nested quantifiers in mu - parser ambiguity)
 
 \bigskip
 
@@ -2734,13 +2728,13 @@ C == (mu u : dom loved | $\forall v \colon \dom loved \bullet u \neq v$| # (love
 \vspace{11pt}
 \bigskip
 
-D == (mu s : songs | $\forall t \colon songs \bullet s \neq t$| # {u : UserId | s in loved u} > # {u : UserId | t in loved u})
+D == (mu s : songs | $\forall t \colon songs \bullet s \neq t$| # $\{ u \colon UserId \mid s \in loved(u) \}$ > # $\{ u \colon UserId \mid t \in loved(u) \}$)
 
 \bigskip
 
 \bigskip
 
-(Blocked by: nested quantifiers in mu, juxtaposition loved u)
+(Blocked by: nested quantifiers in mu - parser ambiguity)
 
 \bigskip
 
@@ -2769,19 +2763,19 @@ Let's first define two helper functions:
 
 \bigskip
 
-love_hate_score : SongId +-> N
+loveHateScore : SongId +-> N
 
 \bigskip
 
 \bigskip
 
-forall i : songs | # {u : UserId | i in loved u} >= # {u : UserId | i in hated u} $\Rightarrow$
+forall i : songs | # $\{ u \colon UserId \mid i \in loved(u) \}$ >= # $\{ u \colon UserId \mid i \in hated(u) \}$ $\Rightarrow$
 
 \bigskip
 
 \bigskip
 
-love_hate_score i = # {u : UserId | i in loved u} - # {u : UserId | i in hated u}
+loveHateScore(i) = # $\{ u \colon UserId \mid i \in loved(u) \}$ - # $\{ u \colon UserId \mid i \in hated(u) \}$
 
 \bigskip
 
@@ -2793,13 +2787,13 @@ and
 
 \bigskip
 
-forall i : songs | # {u : UserId | i in loved u} < # {u : UserId | i in hated u} $\Rightarrow$
+forall i : songs | # $\{ u \colon UserId \mid i \in loved(u) \}$ < # $\{ u \colon UserId \mid i \in hated(u) \}$ $\Rightarrow$
 
 \bigskip
 
 \bigskip
 
-love_hate_score i = 0
+loveHateScore(i) = 0
 
 \bigskip
 
@@ -2811,13 +2805,13 @@ love_hate_score i = 0
 
 \bigskip
 
-playlist_count : SongId +-> N
+playlistCount : SongId +-> N
 
 \bigskip
 
 \bigskip
 
-$\forall i \colon songs \bullet \mathit{playlist\_count}$i = # {p : dom playlist | i in ran playlist p}
+$\forall i \colon songs \bullet playlistCount(i)$= # $\{ p \colon \dom playlist \mid i \in \ran playlist(p) \}$
 
 \bigskip
 
@@ -2853,25 +2847,25 @@ popularity : SongId +-> N
 
 \bigskip
 
-dom length subseteq songs
+dom(length) subseteq songs
 
 \bigskip
 
 \bigskip
 
-dom popularity subseteq songs
+dom(popularity) subseteq songs
 
 \bigskip
 
 \bigskip
 
-$\forall i \colon songs \bullet popularity$i = love_hate_score i + playlist_count i
+$\forall i \colon songs \bullet popularity(i) = loveHateScore(i) + playlistCount(i)$
 
 \bigskip
 
 \bigskip
 
-(Blocked by: +-> operator, underscores, juxtaposition throughout)
+(Blocked by: +-> operator not implemented)
 
 \bigskip
 
@@ -2882,19 +2876,19 @@ $\forall i \colon songs \bullet popularity$i = love_hate_score i + playlist_coun
 \vspace{11pt}
 \bigskip
 
-most_popular : SongId
+mostPopular : SongId
 
 \bigskip
 
 \bigskip
 
-(exists1 i : songs | $\forall j \colon songs \bullet i \neq j$| popularity i > popularity j) $\Rightarrow$
+(exists1 i : songs | $\forall j \colon songs \bullet i \neq j$| popularity(i) > popularity(j)) $\Rightarrow$
 
 \bigskip
 
 \bigskip
 
-most_popular = (mu i : songs | $\forall j \colon songs \bullet i \neq j$| popularity i > popularity j)
+mostPopular = (mu i : songs | $\forall j \colon songs \bullet i \neq j$| popularity(i) > popularity(j))
 
 \bigskip
 
@@ -2906,19 +2900,19 @@ and
 
 \bigskip
 
-not (exists1 i : songs | $\forall j \colon songs \bullet i \neq j$| popularity i > popularity j) $\Rightarrow$
+not (exists1 i : songs | $\forall j \colon songs \bullet i \neq j$| popularity(i) > popularity(j)) $\Rightarrow$
 
 \bigskip
 
 \bigskip
 
-most_popular = null_song
+mostPopular = nullSong
 
 \bigskip
 
 \bigskip
 
-(Blocked by: underscore, nested quantifiers, juxtaposition)
+(Blocked by: nested quantifiers in mu - parser ambiguity)
 
 \bigskip
 
@@ -2929,13 +2923,7 @@ most_popular = null_song
 \vspace{11pt}
 \bigskip
 
-playlists_containing_most_popular_song == {i : dom playlists | most_popular in ran playlists i}
-
-\bigskip
-
-\bigskip
-
-(Blocked by: underscores, juxtaposition playlists i)
+playlistsContainingMostPopularSong == $\{ i \colon \dom playlists \mid mostPopular \in \ran playlists(i) \}$
 
 \bigskip
 
@@ -2952,37 +2940,37 @@ playlists_containing_most_popular_song == {i : dom playlists | most_popular in r
 \vspace{11pt}
 \bigskip
 
-premium_plays : seq Play -> seq Play
+premiumPlays : seq(Play) -> seq(Play)
 
 \bigskip
 
 \bigskip
 
-premium_plays (<>) = <>
+premiumPlays(<>) = <>
 
 \bigskip
 
 \bigskip
 
-forall x : Play; s : seq Play |
+forall x : Play; s : seq(Play) |
 
 \bigskip
 
 \bigskip
 
-premium_plays (<x> ^ s) = <x> ^ (premium_plays s)   if user_status (x.2) = premium
+premiumPlays(<x> ^ s) = <x> ^ premiumPlays(s)   if userStatus(x.2) = premium
 
 \bigskip
 
 \bigskip
 
-premium_plays s           if user_status (x.2) = standard
+premiumPlays(s)          if userStatus(x.2) = standard
 
 \bigskip
 
 \bigskip
 
-(Blocked by: underscores, juxtaposition user_status (x.2))
+(Note: Uses camelCase for fuzz compatibility)
 
 \bigskip
 
@@ -2993,37 +2981,37 @@ premium_plays s           if user_status (x.2) = standard
 \vspace{11pt}
 \bigskip
 
-standard_plays : seq Play -> seq Play
+standardPlays : seq(Play) -> seq(Play)
 
 \bigskip
 
 \bigskip
 
-standard_plays (<>) = <>
+standardPlays(<>) = <>
 
 \bigskip
 
 \bigskip
 
-forall x : Play; s : seq Play |
+forall x : Play; s : seq(Play) |
 
 \bigskip
 
 \bigskip
 
-standard_plays (<x> ^ s) = <x> ^ (standard_plays s)  if user_status (x.2) = standard
+standardPlays(<x> ^ s) = <x> ^ standardPlays(s)  if userStatus(x.2) = standard
 
 \bigskip
 
 \bigskip
 
-standard_plays s          if user_status (x.2) = premium
+standardPlays(s)        if userStatus(x.2) = premium
 
 \bigskip
 
 \bigskip
 
-(Blocked by: underscores, juxtaposition)
+(Note: Uses camelCase for fuzz compatibility)
 
 \bigskip
 
@@ -3034,31 +3022,31 @@ standard_plays s          if user_status (x.2) = premium
 \vspace{11pt}
 \bigskip
 
-cumulative_length : seq Play -> N
+cumulativeLength : seq(Play) -> N
 
 \bigskip
 
 \bigskip
 
-cumulative_length (<>) = 0
+cumulativeLength(<>) = 0
 
 \bigskip
 
 \bigskip
 
-forall x : Play; s : seq Play |
+forall x : Play; s : seq(Play) |
 
 \bigskip
 
 \bigskip
 
-cumulative_length (<x> ^ s) = length (x.1) + cumulative_length (s)
+cumulativeLength(<x> ^ s) = length(x.1) + cumulativeLength(s)
 
 \bigskip
 
 \bigskip
 
-(Blocked by: underscores, juxtaposition length (x.1))
+(Note: Uses camelCase for fuzz compatibility)
 
 \bigskip
 
