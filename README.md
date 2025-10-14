@@ -2,16 +2,16 @@
 
 Convert whiteboard-style mathematical notation to high-quality LaTeX for formal methods and Z notation.
 
-## Current Status: Phase 15 ✅
+## Current Status: Phase 16 ✅
 
-**Production Ready for Solutions 1-39!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, **ASCII sequence brackets with pattern matching support**, and **multi-word identifiers with underscore**.
+**Production Ready for Solutions 1-39!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, **ASCII sequence brackets with pattern matching support**, **multi-word identifiers with underscore**, and **conditional expressions (if/then/else)**.
 
-- 🎯 24 phases complete (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12, 13.1-13.4, 14, 15)
-- ✅ 571 tests passing
+- 🎯 25 phases complete (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12, 13.1-13.4, 14, 15, 16)
+- ✅ 590 tests passing
 - 📚 19 example files demonstrating all features
 - 🔧 Makefile automation for building PDFs
 - 📈 **75.0% solution coverage** (39/52 solutions fully working)
-- ⏳ Solutions 40-52 require conditional expressions, recursive free types, schema decoration
+- ⏳ Solutions 40-52 require recursive free types, schema decoration
 
 ## Quick Start
 
@@ -971,6 +971,84 @@ end
 
 ---
 
+### Conditional Expressions (Phase 16)
+
+Phase 16 adds conditional expressions (if/then/else) for mathematical specifications.
+
+#### Basic Conditionals
+
+```
+if x > 0 then x else -x      →  (\text{if } x > 0 \text{ then } x \text{ else } -x)
+if s = <> then 0 else head s →  (\text{if } s = \langle \rangle \text{ then } 0 \text{ else } \head s)
+```
+
+#### Nested Conditionals
+
+Conditionals can be nested in then/else branches:
+
+```
+if x > 0 then 1 else if x < 0 then -1 else 0
+→  (\text{if } x > 0 \text{ then } 1 \text{ else }
+    (\text{if } x < 0 \text{ then } -1 \text{ else } 0))
+```
+
+#### In Function Definitions
+
+**Absolute value:**
+```
+abs(x) = if x > 0 then x else -x
+→  abs(x) = (\text{if } x > 0 \text{ then } x \text{ else } -x)
+```
+
+**Maximum:**
+```
+max(x, y) = if x > y then x else y
+→  max(x, y) = (\text{if } x > y \text{ then } x \text{ else } y)
+```
+
+**Sign function:**
+```
+sign(x) = if x > 0 then 1 else if x < 0 then -1 else 0
+→  sign(x) = (\text{if } x > 0 \text{ then } 1 \text{ else }
+             (\text{if } x < 0 \text{ then } -1 \text{ else } 0))
+```
+
+#### Conditional as Operand
+
+Conditionals can appear as operands in arithmetic expressions:
+
+```
+y + if x > 0 then 1 else 0
+→  y + (\text{if } x > 0 \text{ then } 1 \text{ else } 0)
+```
+
+#### Recursive Functions
+
+Conditionals enable natural recursive definitions:
+
+```
+f(s) = if s = <> then 0 else head s + f(tail s)
+→  f(s) = (\text{if } s = \langle \rangle \text{ then } 0
+          \text{ else } \head s + f(\tail s))
+```
+
+#### Arithmetic Subtraction
+
+Phase 16 also adds the MINUS operator for arithmetic:
+
+```
+x - y                        →  x - y  (subtraction)
+-x                           →  -x  (negation)
+```
+
+**Use cases:**
+- Conditional logic in mathematical specifications
+- Recursive function definitions with base/recursive cases
+- Pattern matching alternative to separate equations
+- Natural expression of piecewise functions
+
+---
+
 ### Z Notation (Phase 4)
 
 #### Given Types
@@ -1281,6 +1359,15 @@ PROOF:
 - Multi-char subscripts: `x_max` → `x_{max}`
 - Multi-word identifiers: `cumulative_total` → `\mathit{cumulative\_total}`
 - Backward compatible with existing subscript notation
+
+### ✅ Phase 16: Conditional Expressions
+- Basic conditionals: `if condition then expr1 else expr2`
+- Nested conditionals in then/else branches
+- Conditionals as operands in expressions
+- Function definitions with conditionals: `abs(x) = if x > 0 then x else -x`
+- Recursive functions: `f(s) = if s = <> then 0 else head s + f(tail s)`
+- Arithmetic subtraction and negation: `-`, `x - y`
+- LaTeX rendering with inline text keywords
 
 ---
 
@@ -1634,23 +1721,18 @@ Contributions are welcome! Please:
 ✅ **Phase 13.4**: General function application (`(f ++ g)(x)`, `s(i)`)
 ✅ **Phase 14**: ASCII sequence brackets and pattern matching (`<x> ^ s`)
 ✅ **Phase 15**: Underscore in identifiers (`cumulative_total`, smart subscript rendering)
+✅ **Phase 16**: Conditional expressions (`if x > 0 then x else -x`, nested conditionals, MINUS operator)
 
 ### Remaining Features (13 solutions to full coverage)
 
 **Current Status:** 39/52 solutions fully working, 4 partially working (30-70%)
 
-**Next Priority: Conditional Expressions** (Solutions 40-43 completion)
-- Conditional syntax: `if condition`, `otherwise`
-- Guards in pattern matching
-- Multi-branch conditionals
+**Next Priority: Recursive Free Types** (Solutions 40-43 enhanced, 44-47 completion)
+- Recursive type definitions: `Tree ::= leaf | branch⟨Tree × Tree⟩`
+- Constructor functions with parameters
+- Pattern matching on constructors
 
-**Phase 16: Schema Decoration & State Machines** (Solutions 44-47)
-- Schema decoration: `S'`, `S?`, `S!`
-- Delta/Xi notation: `ΔS`, `ΞS`
-- Schema operations and composition
-- Pre/post-conditions
-
-**Phase 17: Recursive Free Types** (Solutions 48-51)
+**Phase 17: Recursive Free Types** (Solutions 44-47, 48-51)
 - Recursive type definitions: `Tree ::= leaf | branch⟨Tree × Tree⟩`
 - Constructor functions with parameters
 - Pattern matching on constructors
@@ -1690,8 +1772,8 @@ For bugs, feature requests, or questions, please open an issue on GitHub.
 
 ---
 
-**Last Updated**: Phase 15 Complete (Underscore in Identifiers)
-**Version**: 0.15.0
+**Last Updated**: Phase 16 Complete (Conditional Expressions - if/then/else)
+**Version**: 0.16.0
 **Status**: Production Ready for Solutions 1-39 - 75.0% Coverage (39/52 exercises)
-**Test Suite**: 571 tests passing
-**Remaining**: Solutions 40-52 (conditional expressions, schema decoration, recursive types)
+**Test Suite**: 590 tests passing
+**Remaining**: Solutions 40-52 (recursive free types, constructor pattern matching)
