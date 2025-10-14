@@ -38,7 +38,8 @@
       "Bash(/usr/local/bin/fuzz:*)",
       "Bash(python3 -m coverage report:*)",
       "Bash(python3:*)",
-      "Bash(timeout 10 hatch run test:*)"
+      "Bash(timeout 10 hatch run test:*)",
+      "Bash(/dev/null)"
     ],
     "deny": [],
     "ask": []
