@@ -541,13 +541,16 @@ class LaTeXGenerator:
         return f"{base}^{exponent}"
 
     def _generate_function_app(self, node: FunctionApp) -> str:
-        """Generate LaTeX for function application (Phase 11b).
+        """Generate LaTeX for function application (Phase 11b, enhanced in Phase 13).
+
+        Phase 13 enhancement: Supports applying any expression, not just identifiers.
 
         Examples:
         - f(x) → f(x)
         - g(x, y, z) → g(x, y, z)
         - seq(N) → \\seq~N
-        - parent(john) → parent(john)
+        - ⟨a, b, c⟩(2) → \\langle a, b, c \\rangle(2)
+        - (f ++ g)(x) → (f \\oplus g)(x)
         """
         # Special Z notation functions with LaTeX commands
         special_functions = {
@@ -557,17 +560,28 @@ class LaTeXGenerator:
             "P": r"\power",  # Power set
         }
 
-        # Check if this is a special function with single argument
-        if node.name in special_functions and len(node.args) == 1:
-            # Generic instantiation: \seq~N
-            func_latex = special_functions[node.name]
-            arg_latex = self.generate_expr(node.args[0])
-            return f"{func_latex}~{arg_latex}"
+        # Check if function is a simple identifier with special handling
+        if isinstance(node.function, Identifier):
+            func_name = node.function.name
+            if func_name in special_functions and len(node.args) == 1:
+                # Generic instantiation: \seq~N
+                func_latex = special_functions[func_name]
+                arg_latex = self.generate_expr(node.args[0])
+                return f"{func_latex}~{arg_latex}"
 
-        # Standard function application: f(x, y, z)
-        func_name = node.name
+            # Standard function application with identifier: f(x, y, z)
+            args_latex = ", ".join(self.generate_expr(arg) for arg in node.args)
+            return f"{func_name}({args_latex})"
+
+        # General function application: expr(args)
+        func_latex = self.generate_expr(node.function)
+
+        # Add parentheses around function if it's a binary operator
+        if isinstance(node.function, BinaryOp):
+            func_latex = f"({func_latex})"
+
         args_latex = ", ".join(self.generate_expr(arg) for arg in node.args)
-        return f"{func_name}({args_latex})"
+        return f"{func_latex}({args_latex})"
 
     def _generate_function_type(self, node: FunctionType) -> str:
         """Generate LaTeX for function type arrows (Phase 11c).

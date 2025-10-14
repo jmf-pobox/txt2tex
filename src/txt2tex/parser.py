@@ -1315,32 +1315,52 @@ class Parser:
                 column=lbracket_token.column,
             )
 
-        # Phase 12: Check for tuple projection .1, .2, .3
-        # Only treat . as tuple projection if followed by a number
-        while self._match(TokenType.PERIOD):
-            # Peek ahead to see if it's followed by a number
-            next_token = self._peek_ahead(1)
-            if next_token.type != TokenType.NUMBER:
-                # Not tuple projection, leave PERIOD for other uses
-                break
+        # Phase 12/13: Check for tuple projection and function application
+        # These need to be in the same loop so that f(x).1 works correctly
+        # Tuple projection: .1, .2, .3
+        # Function application: expr(...)
+        while self._match(TokenType.PERIOD, TokenType.LPAREN):
+            # Check for tuple projection .1, .2, .3
+            if self._match(TokenType.PERIOD):
+                # Peek ahead to see if it's followed by a number
+                next_token = self._peek_ahead(1)
+                if next_token.type != TokenType.NUMBER:
+                    # Not tuple projection, leave PERIOD for other uses
+                    break
 
-            period_token = self._advance()  # Consume '.'
-            number_token = self._advance()  # Consume number
+                period_token = self._advance()  # Consume '.'
+                number_token = self._advance()  # Consume number
 
-            # Convert number to integer index
-            index = int(number_token.value)
-            if index < 1:
-                raise ParserError(
-                    f"Tuple projection index must be >= 1, got {index}",
-                    number_token,
+                # Convert number to integer index
+                index = int(number_token.value)
+                if index < 1:
+                    raise ParserError(
+                        f"Tuple projection index must be >= 1, got {index}",
+                        number_token,
+                    )
+
+                base = TupleProjection(
+                    base=base,
+                    index=index,
+                    line=period_token.line,
+                    column=period_token.column,
                 )
 
-            base = TupleProjection(
-                base=base,
-                index=index,
-                line=period_token.line,
-                column=period_token.column,
-            )
+            # Check for function application expr(...)
+            elif self._match(TokenType.LPAREN):
+                lparen_token = self._advance()  # Consume '('
+                args = self._parse_argument_list()
+                if not self._match(TokenType.RPAREN):
+                    raise ParserError(
+                        "Expected ')' after function arguments", self._current()
+                    )
+                self._advance()  # Consume ')'
+                base = FunctionApp(
+                    function=base,
+                    args=args,
+                    line=lparen_token.line,
+                    column=lparen_token.column,
+                )
 
         # Keep applying other postfix operators
         while self._match(
@@ -1458,29 +1478,12 @@ class Parser:
         if self._match(TokenType.LAMBDA):
             return self._parse_lambda()
 
-        # Phase 11b: Check for identifier (function application or identifier)
+        # Phase 11b / Phase 13: Identifiers
+        # Note: Function application expr(...) is now handled in _parse_postfix()
+        # Note: Generic instantiation Type[X] is handled in _parse_postfix()
+        # Note: Relational image R(| S |) is handled in _parse_postfix()
         if self._match(TokenType.IDENTIFIER):
             name_token = self._advance()
-
-            # Check if followed by '(' for function application
-            if self._match(TokenType.LPAREN):
-                self._advance()  # Consume '('
-                args = self._parse_argument_list()
-                if not self._match(TokenType.RPAREN):
-                    raise ParserError(
-                        "Expected ')' after function arguments", self._current()
-                    )
-                self._advance()  # Consume ')'
-                return FunctionApp(
-                    name=name_token.value,
-                    args=args,
-                    line=name_token.line,
-                    column=name_token.column,
-                )
-
-            # Just an identifier
-            # Note: Generic instantiation Type[X] is handled in _parse_postfix()
-            # Note: Relational image R(| S |) is handled in _parse_postfix()
             return Identifier(
                 name=name_token.value, line=name_token.line, column=name_token.column
             )
