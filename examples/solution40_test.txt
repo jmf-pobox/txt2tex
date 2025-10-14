@@ -1,0 +1,30 @@
+=== Solution 40 Test (Conditional Expressions) ===
+
+** Solution 40 (c) - viewed function with conditional **
+
+TEXT: Recursive definition using conditional expression:
+
+TEXT: viewed <> = <>
+TEXT: viewed <x> ^ s = if x.3 = yes then <x> ^ viewed s else viewed s
+
+** Solution 40 (d) - cumulative_total recursive function **
+
+axdef
+  cumulative_total : seq (Title * Length * Viewed) -> N
+where
+  cumulative_total (<>) = 0
+end
+
+TEXT: Note: forall with semicolon-separated bindings not yet supported
+
+** Solution 41 (c) - 479_courses with conditional **
+
+TEXT: forall x : Entry; s : seq Entry |
+TEXT:   479_courses (<>) = <>
+TEXT:   479_courses (<x> ^ s) = if x.3 = 479 then <x> ^ 479_courses s else 479_courses s
+
+** Solution 41 (d) - total function **
+
+TEXT: forall x : Entry; s : seq Entry |
+TEXT:   total (<>) = 0
+TEXT:   total (<x> ^ s) = x.5 + total s

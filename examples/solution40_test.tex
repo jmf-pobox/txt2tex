@@ -1,0 +1,100 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Solution 40 Test ( Conditional Expressions )}
+
+\bigskip
+\noindent
+\textbf{Solution 40 ( c ) - viewed function with conditional}
+
+\medskip
+
+\bigskip
+
+Recursive definition using conditional expression:
+
+\bigskip
+
+\bigskip
+
+viewed <> = <>
+
+\bigskip
+
+\bigskip
+
+viewed <x> ^ s = if x.3 = yes then <x> ^ viewed s else viewed s
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 40 ( d ) - cumulative_total recursive function}
+
+\medskip
+
+\begin{axdef}
+cumulative_total : \seq~Title * Length * Viewed \fun N
+\where
+cumulative_total(\langle \rangle) = 0
+\end{axdef}
+
+\bigskip
+
+Note: forall with semicolon-separated bindings not yet supported
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 41 ( c ) - 479 _courses with conditional}
+
+\medskip
+
+\bigskip
+
+forall x : Entry; s : seq Entry |
+
+\bigskip
+
+\bigskip
+
+479_courses (<>) = <>
+
+\bigskip
+
+\bigskip
+
+479_courses (<x> ^ s) = if x.3 = 479 then <x> ^ 479_courses s else 479_courses s
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 41 ( d ) - total function}
+
+\medskip
+
+\bigskip
+
+forall x : Entry; s : seq Entry |
+
+\bigskip
+
+\bigskip
+
+total (<>) = 0
+
+\bigskip
+
+\bigskip
+
+total (<x> ^ s) = x.5 + total s
+
+\bigskip
+
+\end{document}
