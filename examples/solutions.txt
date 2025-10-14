@@ -1038,17 +1038,16 @@ end
 
 ** Solution 49 **
 
-TEXT: axdef
-TEXT:   hated : UserId +-> F SongId
-TEXT:   loved : UserId +-> F SongId
-TEXT: where
-TEXT:   dom(hated) subseteq users
-TEXT:   forall i : dom(hated) | hated(i) subseteq songs
-TEXT:   dom(loved) subseteq users
-TEXT:   forall i : dom(loved) | loved(i) subseteq songs
-TEXT:   forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
-TEXT: end
-TEXT: (Blocked by: union in quantifier domain - parser issue)
+axdef
+  hated : UserId +-> F SongId
+  loved : UserId +-> F SongId
+where
+  dom(hated) subseteq users
+  forall i : dom(hated) | hated(i) subseteq songs
+  dom(loved) subseteq users
+  forall i : dom(loved) | loved(i) subseteq songs
+  forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
+end
 
 ** Solution 50 **
 

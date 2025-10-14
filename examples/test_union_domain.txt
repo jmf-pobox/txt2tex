@@ -1,0 +1,12 @@
+=== Test: Union in Quantifier Domain ===
+
+given UserId, SongId
+
+axdef
+  users : F UserId
+  songs : F SongId
+  hated : UserId +-> F SongId
+  loved : UserId +-> F SongId
+where
+  forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
+end

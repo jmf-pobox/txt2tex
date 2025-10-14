@@ -842,8 +842,9 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Use _parse_intersect to allow ranges and generic instantiation
-            domain = self._parse_intersect()
+            # Phase 21: Use _parse_union to allow union/intersect in domain
+            # Allows: forall x : A union B | P
+            domain = self._parse_union()
 
         # Phase 17: Check for semicolon-separated bindings
         # If we see SEMICOLON, we have more binding groups: x : T; y : U | body
@@ -1128,8 +1129,9 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Use _parse_intersect to allow ranges and generic instantiation
-            domain = self._parse_intersect()
+            # Phase 21: Use _parse_union to allow union/intersect in domain
+            # Allows: forall x : A union B | P
+            domain = self._parse_union()
 
         # Parse separator |
         if not self._match(TokenType.PIPE):
@@ -1198,8 +1200,9 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Use _parse_intersect to allow ranges and generic instantiation
-            domain = self._parse_intersect()
+            # Phase 21: Use _parse_union to allow union/intersect in domain
+            # Allows: forall x : A union B | P
+            domain = self._parse_union()
 
         # Parse separator |
         if not self._match(TokenType.PIPE):
