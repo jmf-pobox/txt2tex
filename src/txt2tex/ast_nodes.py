@@ -128,19 +128,23 @@ class SetLiteral(ASTNode):
 
 @dataclass(frozen=True)
 class FunctionApp(ASTNode):
-    """Function application node (Phase 11b).
+    """Function application node (Phase 11b, enhanced in Phase 13).
 
-    Represents function application: f(x), g(x, y, z)
-    Also used for generic instantiation: seq(N), P(X)
+    Represents function application: f(x), g(x, y, z), ⟨a, b, c⟩(2)
+    Also used for sequence indexing and generic instantiation: seq(N), P(X)
+
+    Phase 13 enhancement: Supports applying any expression, not just identifiers.
 
     Examples:
-    - f(x) -> name="f", args=[Identifier("x")]
-    - g(x, y, z) -> name="g", args=[Identifier("x"), Identifier("y"), Identifier("z")]
-    - seq(N) -> name="seq", args=[Identifier("N")]
-    - f(g(h(x))) -> name="f", args=[FunctionApp("g", [FunctionApp("h", [...])])]
+    - f(x) -> function=Identifier("f"), args=[Identifier("x")]
+    - g(x, y, z) -> function=Identifier("g"), args=[Identifier("x"),...]
+    - seq(N) -> function=Identifier("seq"), args=[Identifier("N")]
+    - f(g(h(x))) -> function=Identifier("f"), args=[FunctionApp(...)]
+    - ⟨a, b, c⟩(2) -> function=SequenceLiteral([...]), args=[Number("2")]
+    - (f ++ g)(x) -> function=BinaryOp("++", ...), args=[Identifier("x")]
     """
 
-    name: str  # Function name
+    function: Expr  # Function expression (can be any expression)
     args: list[Expr]  # Argument list (can be empty for f())
 
 

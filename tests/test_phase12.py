@@ -204,7 +204,8 @@ class TestTupleProjectionParsing:
         ast = parse_expr("f(x).1")
         assert isinstance(ast, TupleProjection)
         assert isinstance(ast.base, FunctionApp)
-        assert ast.base.name == "f"
+        assert isinstance(ast.base.function, Identifier)
+        assert ast.base.function.name == "f"
         assert ast.index == 1
 
     def test_nested_projection(self):
