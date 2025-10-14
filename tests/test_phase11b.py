@@ -38,7 +38,8 @@ class TestPhase11bParsing:
         """Test f(x)."""
         ast = parse_expr("f(x)")
         assert isinstance(ast, FunctionApp)
-        assert ast.name == "f"
+        assert isinstance(ast.function, Identifier)
+        assert ast.function.name == "f"
         assert len(ast.args) == 1
         assert isinstance(ast.args[0], Identifier)
         assert ast.args[0].name == "x"
@@ -47,7 +48,8 @@ class TestPhase11bParsing:
         """Test g(x, y, z)."""
         ast = parse_expr("g(x, y, z)")
         assert isinstance(ast, FunctionApp)
-        assert ast.name == "g"
+        assert isinstance(ast.function, Identifier)
+        assert ast.function.name == "g"
         assert len(ast.args) == 3
         assert all(isinstance(arg, Identifier) for arg in ast.args)
         # Type narrowing: after isinstance check, we know all args are Identifiers
@@ -61,17 +63,20 @@ class TestPhase11bParsing:
         """Test f(g(h(x)))."""
         ast = parse_expr("f(g(h(x)))")
         assert isinstance(ast, FunctionApp)
-        assert ast.name == "f"
+        assert isinstance(ast.function, Identifier)
+        assert ast.function.name == "f"
         assert len(ast.args) == 1
 
         inner = ast.args[0]
         assert isinstance(inner, FunctionApp)
-        assert inner.name == "g"
+        assert isinstance(inner.function, Identifier)
+        assert inner.function.name == "g"
         assert len(inner.args) == 1
 
         innermost = inner.args[0]
         assert isinstance(innermost, FunctionApp)
-        assert innermost.name == "h"
+        assert isinstance(innermost.function, Identifier)
+        assert innermost.function.name == "h"
         assert len(innermost.args) == 1
         assert isinstance(innermost.args[0], Identifier)
 
@@ -79,14 +84,16 @@ class TestPhase11bParsing:
         """Test f() - empty argument list."""
         ast = parse_expr("f()")
         assert isinstance(ast, FunctionApp)
-        assert ast.name == "f"
+        assert isinstance(ast.function, Identifier)
+        assert ast.function.name == "f"
         assert len(ast.args) == 0
 
     def test_number_argument(self):
         """Test square(5)."""
         ast = parse_expr("square(5)")
         assert isinstance(ast, FunctionApp)
-        assert ast.name == "square"
+        assert isinstance(ast.function, Identifier)
+        assert ast.function.name == "square"
         assert len(ast.args) == 1
         assert isinstance(ast.args[0], Number)
         assert ast.args[0].value == "5"
@@ -95,7 +102,8 @@ class TestPhase11bParsing:
         """Test f(x and y)."""
         ast = parse_expr("f(x and y)")
         assert isinstance(ast, FunctionApp)
-        assert ast.name == "f"
+        assert isinstance(ast.function, Identifier)
+        assert ast.function.name == "f"
         assert len(ast.args) == 1
         assert isinstance(ast.args[0], BinaryOp)
         assert ast.args[0].operator == "and"
@@ -104,7 +112,8 @@ class TestPhase11bParsing:
         """Test g(x and y, p or q)."""
         ast = parse_expr("g(x and y, p or q)")
         assert isinstance(ast, FunctionApp)
-        assert ast.name == "g"
+        assert isinstance(ast.function, Identifier)
+        assert ast.function.name == "g"
         assert len(ast.args) == 2
         assert isinstance(ast.args[0], BinaryOp)
         assert ast.args[0].operator == "and"
@@ -143,9 +152,11 @@ class TestPhase11bInExpressions:
         """Test f(g(x))."""
         ast = parse_expr("f(g(x))")
         assert isinstance(ast, FunctionApp)
-        assert ast.name == "f"
+        assert isinstance(ast.function, Identifier)
+        assert ast.function.name == "f"
         assert isinstance(ast.args[0], FunctionApp)
-        assert ast.args[0].name == "g"
+        assert isinstance(ast.args[0].function, Identifier)
+        assert ast.args[0].function.name == "g"
 
     def test_chained_applications(self):
         """Test f(x) => g(x)."""
@@ -237,7 +248,8 @@ class TestPhase11bEdgeCases:
         # Function application
         ast2 = parse_expr("f(x and y)")
         assert isinstance(ast2, FunctionApp)
-        assert ast2.name == "f"
+        assert isinstance(ast2.function, Identifier)
+        assert ast2.function.name == "f"
         assert isinstance(ast2.args[0], BinaryOp)
 
     def test_underscore_in_name(self):
@@ -270,7 +282,8 @@ class TestPhase11bEdgeCases:
         # Need to check what actually happens
         ast = parse_expr("seq(seq(N))")
         assert isinstance(ast, FunctionApp)
-        assert ast.name == "seq"
+        assert isinstance(ast.function, Identifier)
+        assert ast.function.name == "seq"
         assert isinstance(ast.args[0], FunctionApp)
 
 
@@ -281,7 +294,8 @@ class TestPhase11bSolution5:
         """Test gentle(d) from Solution 5(a)."""
         ast = parse_expr("gentle(d)")
         assert isinstance(ast, FunctionApp)
-        assert ast.name == "gentle"
+        assert isinstance(ast.function, Identifier)
+        assert ast.function.name == "gentle"
         assert len(ast.args) == 1
         assert isinstance(ast.args[0], Identifier)
         assert ast.args[0].name == "d"
