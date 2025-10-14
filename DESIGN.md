@@ -1390,6 +1390,125 @@ $\forall x : seq[N] \bullet \# x > 0$
 
 ---
 
+### Phase 14: ASCII Sequence Brackets and Pattern Matching ✅ COMPLETED
+**Timeline**: 3-4 hours actual
+**Goal**: ASCII alternatives for sequence notation and pattern matching support
+**Priority**: CRITICAL (preparation for Phase 12, unblocks Solutions 40-43)
+**Status**: ✅ Completed (571 tests passing)
+
+**Added**:
+- ASCII sequence brackets: `<>` as alternative to Unicode `⟨⟩`
+- ASCII concatenation: `^` as alternative to Unicode `⌢`
+- Whitespace-based disambiguation for `<` and `>` operators
+- Context-sensitive `^` operator (concatenation after sequences, superscript elsewhere)
+- Pattern matching support for recursive functions on sequences
+
+**Key Features**:
+- Lookahead for `<`: recognizes `<>`, `<x>`, `<(expr)>`, `<<nested>>`
+- Whitespace check for `>`: `<x>` (no space) vs `x > y` (space before `>`)
+- Lookback for `^`: `<x> ^ s` (concatenation) vs `x^2` (superscript)
+
+**Input Format**:
+```
+<>                      # Empty sequence
+<a, b, c>              # Sequence literal
+<x> ^ s                # Concatenation
+f(<>)                  # Pattern matching - empty case
+f(<x> ^ s)             # Pattern matching - cons case
+total(<>) = 0          # Recursive function base case
+total(<x> ^ s) = x + total(s)  # Recursive function inductive case
+```
+
+**LaTeX Output**:
+```latex
+$\langle \rangle$
+$\langle a, b, c \rangle$
+$\langle x \rangle \cat s$
+$f(\langle \rangle)$
+$f(\langle x \rangle \cat s)$
+$total(\langle \rangle) = 0$
+$total(\langle x \rangle \cat s) = x + total(s)$
+```
+
+**Implementation Details**:
+- Lexer: Whitespace-sensitive recognition of `<`, `>`, and `^` tokens
+- Parser: Reuses `SequenceLiteral` AST node (from Phase 12)
+- LaTeX: Maps both Unicode and ASCII to same LaTeX commands
+- Disambiguation heuristics prevent conflicts with comparison operators
+
+**Test Coverage**: 21 tests in test_phase14.py covering:
+- ASCII sequence brackets (empty, single, multiple elements, nested)
+- ASCII concatenation (after sequences, chaining, with empty)
+- Pattern matching (empty pattern, cons pattern, equations)
+- Comparison operator disambiguation
+- Mixed Unicode/ASCII usage
+
+**Deliverable**: Can write sequences using ASCII or Unicode syntax
+**Unblocks**: Solutions 40-43 (pattern matching on sequences)
+
+---
+
+### Phase 15: Underscore in Identifiers ✅ COMPLETED
+**Timeline**: 2-3 hours actual
+**Goal**: Support multi-word identifiers with underscores
+**Priority**: CRITICAL (needed for Solutions 40-52)
+**Status**: ✅ Completed (571 tests passing)
+
+**Problem**: Previously, `_` was a subscript operator, so `cumulative_total` tokenized as three separate tokens: `cumulative`, `_`, `total`. Solutions 40-52 use multi-word identifiers extensively.
+
+**Solution**: Include underscore in identifiers at lexer level, handle subscript rendering in LaTeX generation.
+
+**Added**:
+- Underscore now part of identifier characters in lexer
+- Removed UNDERSCORE token type
+- Smart underscore rendering in LaTeX generator
+
+**LaTeX Rendering Heuristics**:
+1. **No underscore**: `x` → `x`
+2. **Simple subscript** (single char after `_`): `a_i` → `a_i`, `x_0` → `x_0`
+3. **Multi-char subscript** (2-3 chars after `_`): `a_max` → `a_{max}`
+4. **Multi-word identifier** (long words or multiple `_`): `cumulative_total` → `\mathit{cumulative\_total}`
+
+**Heuristic**: If any part is > 3 chars or multiple underscores, treat as multi-word identifier and use `\mathit{}` with escaped underscores.
+
+**Input Format**:
+```
+x_i                    # Simple subscript
+a_max                  # Multi-char subscript
+cumulative_total       # Multi-word identifier
+not_yet_viewed         # Multi-word identifier (3 underscores)
+```
+
+**LaTeX Output**:
+```latex
+$x_i$
+$a_{max}$
+$\mathit{cumulative\_total}$
+$\mathit{not\_yet\_viewed}$
+```
+
+**Backward Compatibility**:
+- Solutions 1-39 still work (subscripts like `a_i`, `x_n`)
+- Simple subscripts render identically
+- Only affects multi-char suffixes and long identifiers
+
+**Implementation Details**:
+- Lexer: Changed `_scan_identifier()` to include underscore in character loop
+- Lexer: Removed underscore token generation
+- LaTeX: Added smart heuristic in `_generate_identifier()`
+- Updated 6 tests to reflect new behavior
+
+**Test Coverage**: Existing tests + verification tests
+- Simple subscripts: `a_i`, `x_0`
+- Multi-char subscripts: `a_max`
+- Multi-word identifiers: `cumulative_total`, `not_yet_viewed`
+- In equations: `cumulative_total = x + y`
+
+**Deliverable**: Can use multi-word identifiers in Z specifications
+**Unblocks**: Solutions 40-52 (all use multi-word identifiers)
+
+---
+
 ### Phase 12: Sequences
 **Timeline**: 6-8 hours
 **Goal**: Sequence types and sequence operators

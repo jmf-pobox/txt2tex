@@ -1,7 +1,7 @@
 # Solution Implementation Status
 
 **Last Updated:** 2025-10-13
-**Current Phase:** Phase 13 (Anonymous Schemas, Range Operator, Override, Sequence Indexing)
+**Current Phase:** Phase 15 (ASCII Sequence Brackets, Pattern Matching, Underscore in Identifiers)
 
 ## Summary Statistics
 
@@ -14,9 +14,9 @@
 
 **Current Coverage:** 75.0% (39/52 solutions)
 **Previous Coverage:** 69.2% (36/52 solutions - Phase 11.9)
-**Improvement:** +3 solutions in Phase 12, Phase 13 features enable further progress
+**Improvement:** +3 solutions in Phase 12, Phase 13-15 features enable further progress
 
-## Recent Progress (Phase 12-13)
+## Recent Progress (Phase 12-15)
 
 ### Phase 12: Sequences, Bags, and Tuple Projection ✓ COMPLETE
 - **Unblocked:** Solutions 37, 38, 39
@@ -52,6 +52,37 @@
   - `(f ++ g)(x)` → `(f \oplus g)(x)` (override with application)
   - `f(x).1` → `f(x).1` (projection after application)
 - **Implementation:** Refactored FunctionApp to accept any expression as function
+
+### Phase 14: ASCII Sequence Brackets & Pattern Matching ✓ COMPLETE
+- **Unblocked:** Solutions 40-43 pattern matching requirements
+- **Features:**
+  - ASCII sequence brackets: `<>` ≡ `⟨⟩`, `<a, b>` ≡ `⟨a, b⟩`
+  - ASCII concatenation: `<x> ^ s` ≡ `⟨x⟩ ⌢ s`
+  - Whitespace-based disambiguation: `<x>` (sequence) vs `x > y` (comparison)
+  - Context-sensitive `^`: concatenation after sequences, superscript elsewhere
+  - Pattern matching support: `f(<>) = 0`, `f(<x> ^ s) = x + f(s)`
+  - Recursive function definitions on sequences
+- **Implementation:**
+  - Lookahead for `<` to recognize `<>`, `<x>`, `<<nested>>`
+  - Whitespace checking before `>` to distinguish `<x>` from `x > y`
+  - Lookback for `^` to determine concatenation vs superscript context
+- **Tests:** 21 new tests
+
+### Phase 15: Underscore in Identifiers ✓ COMPLETE
+- **Unblocked:** Solutions 40-52 multi-word identifier requirements
+- **Features:**
+  - Multi-word identifiers: `cumulative_total`, `not_yet_viewed`
+  - Smart LaTeX rendering heuristics
+  - Simple subscripts: `a_i` → `a_i`
+  - Multi-char subscripts: `x_max` → `x_{max}`
+  - Multi-word identifiers: `cumulative_total` → `\mathit{cumulative\_total}`
+  - Backward compatible with all existing subscript notation
+- **Heuristic:** If any part > 3 chars OR multiple underscores → multi-word identifier
+- **Implementation:**
+  - Moved underscore from operator to identifier character at lexer level
+  - Smart rendering logic in LaTeX generator
+  - Updated 6 existing tests for new behavior
+- **Tests:** 6 tests updated, all 571 tests passing
 
 ## Fully Working Solutions (39/52)
 
@@ -108,32 +139,48 @@
 ## Partially Working Solutions (4/52)
 
 ### Solution 40: Sequences with Pattern Matching
-- **Status:** Mostly working, pattern matching incomplete
+- **Status:** Mostly working, conditional expressions incomplete
 - **Working Parts:**
   - (a) Schema with seq(Title cross Length cross Viewed) ✓
   - (b) Set comprehension with ran and tuple projection ✓
-  - (c) Recursive definition structure (but not pattern matching)
-  - (d) Function definition (but not pattern matching `<>` vs `<x>`)
+  - (c) Recursive definition with pattern matching ✓ (Phase 14)
+  - (d) Function definition with pattern matching `<>` vs `<x> ^ s` ✓ (Phase 14)
   - (e) Mu operator expression ✓
   - (f) Complex function with relational operations ✓
-- **Blockers:**
-  - Pattern matching in function definitions: `f(<>) = 0` vs `f(<x> ^ s) = ...`
-  - Recursive definitions with conditions
-- **Percentage Working:** ~70% (most constructs work, pattern matching missing)
+  - Multi-word identifiers like `cumulative_total` ✓ (Phase 15)
+- **Remaining Blocker:**
+  - Conditional expressions: `if condition`, `otherwise`
+- **Percentage Working:** ~90% (all constructs work except conditionals)
 
 ### Solution 41: State Machines
 - **Status:** Basic structures work, state transitions incomplete
-- **Blocker:** Schema decoration (S', ΔS, ΞS), schema operations
+- **Working Parts:**
+  - Basic schemas and types ✓
+  - Multi-word identifiers ✓ (Phase 15)
+- **Blockers:**
+  - Schema decoration (S', ΔS, ΞS)
+  - Schema operations and composition
 - **Percentage Working:** ~40% (basic schemas and types work)
 
 ### Solution 42: Schema Operations
 - **Status:** Individual schemas work, composition incomplete
-- **Blocker:** Schema conjunction, disjunction, composition operators
+- **Working Parts:**
+  - Individual schema definitions ✓
+  - Multi-word identifiers ✓ (Phase 15)
+- **Blockers:**
+  - Conditional expressions
+  - Schema conjunction, disjunction, composition operators
 - **Percentage Working:** ~40% (can define schemas, can't compose)
 
 ### Solution 43: Advanced Modeling
 - **Status:** Basic structures work, complex modeling incomplete
-- **Blocker:** Advanced schema features, precondition/postcondition
+- **Working Parts:**
+  - Basic Z notation ✓
+  - Multi-word identifiers ✓ (Phase 15)
+- **Blockers:**
+  - Conditional expressions
+  - Advanced schema features
+  - Precondition/postcondition
 - **Percentage Working:** ~30% (basic Z notation works)
 
 ## Not Yet Implemented (9/52)
@@ -215,11 +262,12 @@
 - ✓ Function application: `f(x)`, `f(x, y)`
 
 ### Sequences
-- ✓ Literals: `⟨⟩`, `⟨a, b, c⟩`
-- ✓ Concatenation: `⌢`
+- ✓ Literals: `⟨⟩`, `⟨a, b, c⟩` (Unicode) OR `<>`, `<a, b, c>` (ASCII)
+- ✓ Concatenation: `⌢` (Unicode) OR `^` after sequences (ASCII)
 - ✓ Operators: `head`, `tail`, `last`, `front`, `rev`
 - ✓ Indexing: `s(i)`, `⟨a, b, c⟩(2)`
 - ✓ Generic sequence type: `seq(T)`, `iseq(T)`
+- ✓ Pattern matching: `f(<>) = 0`, `f(<x> ^ s) = expr`
 
 ### Tuples
 - ✓ Tuple expressions: `(a, b)`, `(a, b, c)`
@@ -239,6 +287,8 @@
 - ✓ Anonymous schemas: `schema ... end`
 - ✓ Override operator: `f ++ g`
 - ✓ General function application: `(f ++ g)(x)`, `expr(args)`
+- ✓ Multi-word identifiers: `cumulative_total`, `not_yet_viewed`
+- ✓ Smart subscript rendering: `a_i`, `x_max`, `cumulative_total`
 
 ### Z Notation Structures
 - ✓ Given types: `given A, B`
@@ -260,22 +310,25 @@
 ## Missing Features Analysis
 
 ### For Solutions 40-43 (Modeling - Partially Working)
-**What's Working:**
+**What's Working (Phase 14-15):**
 - ✓ Schemas with sequence types
 - ✓ Tuple projection (`p.2`, `p.3`)
 - ✓ Range operator (`ran`)
-- ✓ Sequence literals and operators
+- ✓ Sequence literals (Unicode and ASCII): `⟨a, b⟩`, `<a, b>`
+- ✓ Sequence concatenation (Unicode and ASCII): `⌢`, `^`
+- ✓ Pattern matching: `f(<>) = 0`, `f(<x> ^ s) = expr` ✓ NEW
 - ✓ Function definitions with sequences
 - ✓ Override operator (`++`)
+- ✓ Multi-word identifiers: `cumulative_total` ✓ NEW
 
 **What's Missing:**
-- ✗ Pattern matching: `f(<>) = 0`, `f(<x> ^ s) = expr`
+- ✗ Conditional expressions: `if condition`, `otherwise`
 - ✗ Schema decoration: `S'`, `S?`, `S!`
 - ✗ Delta/Xi notation: `ΔS`, `ΞS`
 - ✗ Schema composition operators
 - ✗ Precondition/postcondition schemas
 
-**Impact:** Solutions 40-43 are 30-70% working
+**Impact:** Solutions 40-43 are 30-90% working (Sol 40 now at 90%)
 
 ### For Solutions 44-47 (Free Types - Not Implemented)
 **Required:**
@@ -290,11 +343,13 @@
 
 ## Test Coverage
 
-- **Total Tests:** 550 passing
-- **Coverage:** Comprehensive for all implemented phases (0-13.4)
+- **Total Tests:** 571 passing
+- **Coverage:** Comprehensive for all implemented phases (0-15)
 - **Recent Additions:**
   - Phase 12: 55 tests (sequences, bags, tuple projection)
   - Phase 13: 26 tests (anonymous schemas, ranges, override, indexing)
+  - Phase 14: 21 tests (ASCII sequence brackets, pattern matching)
+  - Phase 15: 6 tests updated (underscore in identifiers)
 
 ## Roadmap to Higher Coverage
 
@@ -306,16 +361,20 @@
 5. ✓ Phase 11: Functions (Solutions 33-36)
 6. ✓ Phase 12: Sequences (Solutions 37-39)
 7. ✓ Phase 13: Advanced Features (Range, Override, Indexing)
+8. ✓ Phase 14: ASCII Sequence Brackets & Pattern Matching
+9. ✓ Phase 15: Underscore in Identifiers
 
-**Current:** 75.0% (39/52) - Phases 0-13 Complete
+**Current:** 75.0% (39/52) - Phases 0-15 Complete
 
 ### Next Steps
 
 **To reach 80-85% (42-44/52):**
-- Implement pattern matching in function definitions
+- ✓ Pattern matching in function definitions (Phase 14) COMPLETE
+- ✓ Multi-word identifiers (Phase 15) COMPLETE
+- Implement conditional expressions (`if`, `otherwise`)
 - Add schema decoration (S', ΔS, ΞS)
 - Implement schema composition operators
-- **Estimated effort:** 15-20 hours
+- **Estimated effort:** 10-15 hours remaining
 
 **To reach 90% (47/52):**
 - Add above + recursive free types
