@@ -7,7 +7,6 @@ from txt2tex.ast_nodes import (
     Document,
     GenericInstantiation,
     Identifier,
-    Subscript,
 )
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
@@ -249,14 +248,15 @@ class TestGenericInstantiationEdgeCases:
         assert param0.name == "A"
 
     def test_generic_vs_subscript(self) -> None:
-        """Test that subscript uses _, not []: a_1 is subscript, a[1] is generic."""
-        # Subscript
+        """Test underscore vs brackets: a_1 is identifier, a[1] generic (Phase 15)."""
+        # Subscript (Phase 15: now just identifier with underscore)
         lexer = Lexer("a_1")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         result = parser.parse()
 
-        assert isinstance(result, Subscript)
+        assert isinstance(result, Identifier)
+        assert result.name == "a_1"
 
         # Generic
         lexer = Lexer("a[1]")

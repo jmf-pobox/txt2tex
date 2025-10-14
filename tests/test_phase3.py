@@ -60,12 +60,13 @@ class TestLexer:
         assert types == ["IN", "SUBSET", "UNION", "INTERSECT"]
 
     def test_caret_and_underscore(self) -> None:
-        """Test lexing caret and underscore."""
+        """Test lexing caret (Phase 15: underscore now part of identifiers)."""
         lexer = Lexer("x^2 a_1")
         tokens = lexer.tokenize()
-        # x ^ 2 a _ 1 EOF
+        # x ^ 2 a_1 EOF (underscore now part of identifier)
         assert tokens[1].type.name == "CARET"
-        assert tokens[4].type.name == "UNDERSCORE"
+        assert tokens[3].type.name == "IDENTIFIER"
+        assert tokens[3].value == "a_1"
 
     def test_numbers(self) -> None:
         """Test lexing numbers."""
@@ -102,28 +103,25 @@ class TestParser:
         assert ast.exponent.value == "2"
 
     def test_subscript(self) -> None:
-        """Test parsing subscript."""
+        """Test parsing subscript (Phase 15: underscore in identifiers)."""
         lexer = Lexer("a_1")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Subscript)
-        assert isinstance(ast.base, Identifier)
-        assert ast.base.name == "a"
-        assert isinstance(ast.index, Number)
-        assert ast.index.value == "1"
+        # Phase 15: a_1 is now a single identifier, subscript handled in LaTeX
+        assert isinstance(ast, Identifier)
+        assert ast.name == "a_1"
 
     def test_multiple_postfix(self) -> None:
-        """Test parsing multiple postfix operators."""
+        """Test parsing multiple postfix operators (Phase 15)."""
         lexer = Lexer("x_i^2")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        # Should parse as (x_i)^2
+        # Phase 15: x_i is identifier, then superscript: (x_i)^2
         assert isinstance(ast, Superscript)
-        assert isinstance(ast.base, Subscript)
-        assert isinstance(ast.base.base, Identifier)
-        assert ast.base.base.name == "x"
+        assert isinstance(ast.base, Identifier)
+        assert ast.base.name == "x_i"
 
     def test_comparison_less_than(self) -> None:
         """Test parsing less than comparison."""
@@ -492,13 +490,15 @@ class TestIntegration:
         assert latex == "x^2"
 
     def test_simple_subscript(self) -> None:
-        """Test complete pipeline for subscript."""
+        """Test complete pipeline for subscript (Phase 15)."""
         text = "a_1"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Subscript)
+        # Phase 15: a_1 is identifier, subscript handled in LaTeX generation
+        assert isinstance(ast, Identifier)
+        assert ast.name == "a_1"
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == "a_1"
@@ -552,13 +552,15 @@ class TestIntegration:
         assert latex == r"\forall n \colon N \bullet n \geq 0 \land n < 100"
 
     def test_subscript_with_identifier_index(self) -> None:
-        """Test subscript with identifier index."""
+        """Test subscript with identifier index (Phase 15)."""
         text = "x_i"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Subscript)
+        # Phase 15: x_i is identifier, subscript handled in LaTeX generation
+        assert isinstance(ast, Identifier)
+        assert ast.name == "x_i"
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert latex == "x_i"

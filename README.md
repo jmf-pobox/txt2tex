@@ -2,16 +2,16 @@
 
 Convert whiteboard-style mathematical notation to high-quality LaTeX for formal methods and Z notation.
 
-## Current Status: Phase 12 ✅
+## Current Status: Phase 14 ✅
 
-**Production Ready for Solutions 1-39!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, and **sequences, bags, and tuple projection**.
+**Production Ready for Solutions 1-39!** Supports propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, and **ASCII sequence brackets with pattern matching support**.
 
-- 🎯 20 phases complete (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12)
-- ✅ 524 tests passing
+- 🎯 23 phases complete (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12, 13.1-13.4, 14)
+- ✅ 571 tests passing
 - 📚 19 example files demonstrating all features
 - 🔧 Makefile automation for building PDFs
-- 📈 **75.0% solution coverage** (39/52 exercises fully working)
-- ⏳ Solutions 40-52 require additional phases (state machines, free types)
+- 📈 **75.0% solution coverage** (39/52 solutions fully working)
+- ⏳ Solutions 40-52 require conditional expressions, recursive free types, schema decoration
 
 ## Quick Start
 
@@ -660,6 +660,258 @@ forall x : seq[N] | # x > 0
 
 ---
 
+### Sequences and Bags (Phase 12)
+
+Phase 12 adds support for sequences (ordered lists) and bags (multisets).
+
+#### Sequence Literals
+
+**Unicode Angle Brackets** (⟨⟩):
+```
+⟨⟩                           →  \langle \rangle  (empty sequence)
+⟨a⟩                          →  \langle a \rangle
+⟨a, b, c⟩                    →  \langle a, b, c \rangle
+```
+
+**ASCII Angle Brackets** (Phase 14):
+```
+<>                           →  \langle \rangle  (empty sequence)
+<a>                          →  \langle a \rangle
+<a, b, c>                    →  \langle a, b, c \rangle
+```
+
+Both Unicode and ASCII brackets work identically and produce the same LaTeX output.
+
+#### Sequence Operators
+
+**Concatenation** (Unicode):
+```
+⟨a⟩ ⌢ ⟨b⟩                   →  \langle a \rangle \cat \langle b \rangle
+s ⌢ t                        →  s \cat t
+```
+
+**Concatenation** (ASCII - Phase 14):
+```
+<a> ^ <b>                    →  \langle a \rangle \cat \langle b \rangle
+s ^ t                        →  s \cat t (when s ends with sequence)
+```
+
+**Note**: The `^` operator means concatenation only after a sequence closing bracket (`>` or `⟩`). Otherwise it means superscript.
+
+**Sequence Functions**:
+```
+head s                       →  head s  (first element)
+tail s                       →  tail s  (all but first)
+last s                       →  last s  (last element)
+front s                      →  front s (all but last)
+rev s                        →  rev s   (reverse)
+```
+
+#### Sequence Types
+
+```
+seq(N)                       →  \seq N     (sequences of N)
+iseq(N)                      →  \iseq N    (injective sequences)
+seq[N]                       →  seq[N]     (generic instantiation)
+```
+
+#### Tuple Projection
+
+Access tuple elements by position (1-indexed):
+```
+p.1                          →  p.1   (first element)
+p.2                          →  p.2   (second element)
+p.3                          →  p.3   (third element)
+```
+
+**In expressions:**
+```
+(trains(x)).2                →  (trains(x)).2
+x.2 + y.3                    →  x.2 + y.3
+```
+
+**Chained with function application:**
+```
+f(x).1                       →  f(x).1
+(g(a, b)).2                  →  (g(a, b)).2
+```
+
+#### Bag Literals
+
+Bags are multisets (unordered collections allowing duplicates):
+
+```
+[[x]]                        →  \lbag x \rbag
+[[a, b, c]]                  →  \lbag a, b, c \rbag
+```
+
+**Bag types:**
+```
+bag(X)                       →  \bag X
+```
+
+---
+
+### Advanced Features (Phase 13)
+
+Phase 13 adds powerful features for complex specifications.
+
+#### Anonymous Schemas (Phase 13.1)
+
+Schemas without names for inline use:
+
+```
+schema
+  x : N
+  y : N
+where
+  x + y = 10
+end
+```
+
+Generates anonymous `\begin{schema}` environment without a name parameter.
+
+#### Range Operator (Phase 13.2)
+
+Integer ranges for set notation:
+
+```
+1..10                        →  1 \upto 10
+1993..current                →  1993 \upto current
+x.2..x.3                     →  x.2 \upto x.3
+```
+
+**Semantics**: `m..n` represents `{m, m+1, m+2, ..., n}`
+
+**In expressions:**
+```
+x in 1..100                  →  x \in 1 \upto 100
+forall i : 1..n | P          →  \forall i : 1 \upto n \bullet P
+```
+
+#### Override Operator (Phase 13.3)
+
+Function/sequence override combines two functions, with the second taking precedence:
+
+```
+f ++ g                       →  f \oplus g
+f ++ g ++ h                  →  f \oplus g \oplus h  (left-associative)
+```
+
+**Use cases:**
+```
+dom (f ++ g) = dom f union dom g
+(f ++ g)(x)                  →  (f \oplus g)(x)
+```
+
+**Precedence**: Same as union (higher than intersection)
+
+#### General Function Application (Phase 13.4)
+
+Any expression can be applied as a function, not just identifiers:
+
+**Sequence indexing:**
+```
+s(i)                         →  s(i)
+⟨a, b, c⟩(2)                 →  \langle a, b, c \rangle(2)
+```
+
+**Override with application:**
+```
+(f ++ g)(x)                  →  (f \oplus g)(x)
+```
+
+**Composition:**
+```
+(R o9 S)(| A |)              →  (R \circ S)(\limg A \rimg)
+```
+
+**Chained projections:**
+```
+f(x).1                       →  f(x).1
+```
+
+---
+
+### Pattern Matching Support (Phase 14)
+
+Phase 14 enables pattern matching syntax for recursive function definitions using ASCII sequence brackets.
+
+#### ASCII Sequence Brackets
+
+Alternative to Unicode for easier typing:
+
+**Empty sequence:**
+```
+<>                           →  \langle \rangle
+f(<>)                        →  f(\langle \rangle)
+```
+
+**Sequence with elements:**
+```
+<x>                          →  \langle x \rangle
+<a, b, c>                    →  \langle a, b, c \rangle
+```
+
+**Nested sequences:**
+```
+<<a>, <b>>                   →  \langle \langle a \rangle, \langle b \rangle \rangle
+```
+
+#### ASCII Concatenation
+
+The `^` operator means concatenation when it follows a sequence closing bracket:
+
+**After sequences:**
+```
+<x> ^ s                      →  \langle x \rangle \cat s
+<a> ^ <b> ^ <c>              →  \langle a \rangle \cat \langle b \rangle \cat \langle c \rangle
+```
+
+**Regular superscript elsewhere:**
+```
+x^2                          →  x^2  (superscript, not concatenation)
+2^n                          →  2^n
+```
+
+**Disambiguation**: Whitespace before `>` distinguishes sequence closing from comparison:
+- `<x>` → sequence (no space before `>`)
+- `x > y` → comparison (space before `>`)
+
+#### Pattern Matching Examples
+
+**Empty sequence pattern:**
+```
+total(<>) = 0                →  total(\langle \rangle) = 0
+```
+
+**Cons pattern (head and tail):**
+```
+total(<x> ^ s) = x + total(s)
+→  total(\langle x \rangle \cat s) = x + total(s)
+```
+
+**In axiomatic definitions:**
+```
+axdef
+  cumulative_total : seq(N) -> N
+where
+  cumulative_total(<>) = 0
+  forall x : N; s : seq(N) |
+    cumulative_total(<x> ^ s) = x + cumulative_total(s)
+end
+```
+
+**Pattern matching use cases:**
+- Recursive function definitions on sequences
+- Base case with empty sequence: `f(<>) = value`
+- Recursive case with cons: `f(<x> ^ s) = expr(x, f(s))`
+- Natural recursive structure matching mathematical definitions
+
+**Limitation**: Identifiers with underscores (like `cumulative_total`) don't parse correctly because `_` is treated as a subscript operator. Use camelCase (`cumulativeTotal`) as a workaround.
+
+---
+
 ### Z Notation (Phase 4)
 
 #### Given Types
@@ -924,6 +1176,44 @@ PROOF:
 - Chained: `Type[N][M]`
 - In domains: `forall x : P[N] | ...`
 - Whitespace-sensitive parsing
+
+### ✅ Phase 12: Sequences and Bags
+- Sequence literals: `⟨⟩`, `⟨a, b, c⟩` (Unicode) or `<>`, `<a, b, c>` (ASCII)
+- Concatenation: `⌢` (Unicode) or `^` after sequences (ASCII)
+- Sequence operators: `head`, `tail`, `last`, `front`, `rev`
+- Sequence types: `seq(N)`, `iseq(N)`
+- Tuple projection: `.1`, `.2`, `.3`
+- Bag literals: `[[a, b, c]]`
+- Bag types: `bag(X)`
+
+### ✅ Phase 13.1: Anonymous Schemas
+- Schemas without names: `schema ... where ... end`
+- Inline schema expressions
+- Compatible with all schema features
+
+### ✅ Phase 13.2: Range Operator
+- Integer ranges: `m..n` → `m \upto n`
+- In expressions: `1..10`, `1993..current`, `x.2..x.3`
+- Set semantics: `{m, m+1, ..., n}`
+
+### ✅ Phase 13.3: Override Operator
+- Function/sequence override: `f ++ g` → `f \oplus g`
+- Left-associative: `f ++ g ++ h`
+- Same precedence as union
+- Use in expressions: `dom (f ++ g)`, `(f ++ g)(x)`
+
+### ✅ Phase 13.4: General Function Application
+- Any expression can be applied: `(f ++ g)(x)`, `⟨a, b, c⟩(2)`
+- Sequence indexing: `s(i)`
+- Chained with projection: `f(x).1`
+- Enables complex functional expressions
+
+### ✅ Phase 14: ASCII Sequence Brackets & Pattern Matching
+- ASCII alternative to Unicode: `<>` ≡ `⟨⟩`, `<a, b>` ≡ `⟨a, b⟩`
+- ASCII concatenation: `<x> ^ s` ≡ `⟨x⟩ ⌢ s`
+- Smart disambiguation: `<x>` vs `x > y` based on whitespace
+- Pattern matching support: `f(<>) = 0`, `f(<x> ^ s) = expr`
+- Enables recursive function definitions on sequences
 
 ---
 
@@ -1247,7 +1537,7 @@ Contributions are welcome! Please:
 
 ## Roadmap
 
-### Completed (Phase 0-11.9) - 90.4% Solution Coverage ✅
+### Completed (Phase 0-14) - 75.0% Solution Coverage ✅
 
 ✅ **Phase 0**: Propositional logic
 ✅ **Phase 1**: Document structure, truth tables
@@ -1270,49 +1560,42 @@ Contributions are welcome! Please:
 ✅ **Phase 11.7**: Set literals with maplets (`{1 |-> a, 2 |-> b}`)
 ✅ **Phase 11.8**: Relational image (`R(| S |)`)
 ✅ **Phase 11.9**: Generic type instantiation (`emptyset[N]`, `Type[X]`, `P[N]`)
+✅ **Phase 12**: Sequences and bags (`⟨a, b, c⟩`, `[[a, b]]`, `head`, `tail`, `.1`, `.2`)
+✅ **Phase 13.1**: Anonymous schemas (`schema ... end`)
+✅ **Phase 13.2**: Range operator (`m..n`)
+✅ **Phase 13.3**: Override operator (`f ++ g`)
+✅ **Phase 13.4**: General function application (`(f ++ g)(x)`, `s(i)`)
+✅ **Phase 14**: ASCII sequence brackets and pattern matching (`<x> ^ s`)
 
-### Remaining Features (16 solutions to implement)
+### Remaining Features (13 solutions to full coverage)
 
-**Solutions 37-52 Not Yet Implemented:**
+**Current Status:** 39/52 solutions fully working, 4 partially working (30-70%)
 
-**Phase 12: Sequences** (Solutions 37-39)
-- Sequence literals: `⟨a, b, c⟩`
-- Sequence operators: `⌢` (concatenation), `head`, `tail`, `rev`
-- Sequence functions: `squash`, `filter`
+**Phase 14.2: Conditional Expressions** (Solutions 40-43 partial)
+- Conditional syntax: `if condition`, `otherwise`
+- Pattern matching in function definitions
+- Identifier underscore fix for `cumulative_total` style names
 
-**Phase 13: State Machines** (Solutions 40-43)
+**Phase 15: Schema Decoration & State Machines** (Solutions 40-43 completion)
 - Schema decoration: `S'`, `S?`, `S!`
 - Delta/Xi notation: `ΔS`, `ΞS`
 - Schema operations and composition
-
-**Phase 14: Free Types** (Solutions 44-47)
-- Recursive type definitions
-- Pattern matching
-- Structural induction
-
-**Supplementary** (Solutions 48-52)
-- Advanced Z notation features
-
-**Estimated effort:** 30-45 hours for Phases 12-14
-
-### Future Phases (12-14)
-
-**Phase 12: Sequences**
-- Sequence types: `seq`, `seq1`, `iseq`
-- Sequence literals: `<a, b, c>`
-- Sequence operators: `^`, `head`, `tail`, `rev`, `#`
-
-**Phase 13: Schemas & State Machines**
-- Schema decoration: `S'`, `S?`, `S!`
-- Delta/Xi notation: `∆S`, `ΞS`
-- Schema composition and operations
 - Pre/post-conditions
 
-**Phase 14: Schema Calculus**
-- Schema conjunction, disjunction
-- Schema hiding, projection
-- Schema piping
-- Quantification over schemas
+**Phase 16: Recursive Free Types** (Solutions 44-47)
+- Recursive type definitions: `Tree ::= leaf | branch⟨Tree × Tree⟩`
+- Constructor functions with parameters
+- Pattern matching on constructors
+- Structural induction proofs
+
+**Supplementary** (Solutions 48-52)
+- Advanced Z notation features (varies by solution)
+
+**Estimated effort:**
+- Phase 14.2 + underscore fix: 5-8 hours → 80% coverage
+- Phase 15: 10-15 hours → 85% coverage
+- Phase 16: 15-20 hours → 90% coverage
+- Supplementary: 15-20 hours → 100% coverage
 
 ### Future Enhancements
 - Better error recovery and messages
