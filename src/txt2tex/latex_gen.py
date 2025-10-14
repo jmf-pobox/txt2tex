@@ -11,6 +11,7 @@ from txt2tex.ast_nodes import (
     BagLiteral,
     BinaryOp,
     CaseAnalysis,
+    Conditional,
     Document,
     DocumentItem,
     EquivChain,
@@ -102,6 +103,7 @@ class LaTeXGenerator:
         ">->>": r"\bij",  # Bijection
         # Arithmetic operators
         "+": r"+",  # Addition (also postfix in relational context)
+        "-": r"-",  # Subtraction (Phase 16)
         "*": r"*",  # Multiplication (also postfix in relational context)
         "mod": r"\bmod",  # Modulo
         # Sequence operators (Phase 12)
@@ -111,6 +113,7 @@ class LaTeXGenerator:
 
     UNARY_OPS: ClassVar[dict[str, str]] = {
         "not": r"\lnot",
+        "-": r"-",  # Unary negation (Phase 16)
         "#": r"\#",  # Cardinality (Phase 8)
         # Relation functions (Phase 10a)
         "dom": r"\dom",  # Domain of relation
@@ -294,6 +297,8 @@ class LaTeXGenerator:
             return self._generate_tuple_projection(expr)
         if isinstance(expr, BagLiteral):
             return self._generate_bag_literal(expr)
+        if isinstance(expr, Conditional):
+            return self._generate_conditional(expr)
 
         raise TypeError(f"Unknown expression type: {type(expr)}")
 
@@ -369,7 +374,11 @@ class LaTeXGenerator:
             return f"{op_latex}~{operand}"
         else:
             # Prefix: operator operand
-            return f"{op_latex} {operand}"
+            # Special case: no space for unary minus (Phase 16)
+            if node.operator == "-":
+                return f"{op_latex}{operand}"
+            else:
+                return f"{op_latex} {operand}"
 
     def _needs_parens(self, child: Expr, parent_op: str, is_left_child: bool) -> bool:
         """Check if child expression needs parentheses in parent context.
@@ -761,6 +770,26 @@ class LaTeXGenerator:
         # Generate comma-separated elements
         elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
         return f"\\lbag {elements_latex} \\rbag"
+
+    def _generate_conditional(self, node: Conditional) -> str:
+        """Generate LaTeX for conditional expression (Phase 16).
+
+        Examples:
+        - if x > 0 then x else -x
+        - if s = <> then 0 else head s
+
+        Rendered as: (\\text{if } condition \\text{ then } expr1 \\text{ else } expr2)
+        """
+        condition_latex = self.generate_expr(node.condition)
+        then_latex = self.generate_expr(node.then_expr)
+        else_latex = self.generate_expr(node.else_expr)
+
+        # Render as inline conditional with text keywords
+        return (
+            f"(\\text{{if }} {condition_latex} "
+            f"\\text{{ then }} {then_latex} "
+            f"\\text{{ else }} {else_latex})"
+        )
 
     def _generate_section(self, node: Section) -> list[str]:
         """Generate LaTeX for section."""
