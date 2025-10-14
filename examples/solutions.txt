@@ -703,9 +703,77 @@ TEXT: end
 
 ** Solution 37 **
 
+(a)
+
+<a>
+
+(b)
+
+{1 |-> a, 2 |-> b, 2 |-> a, 3 |-> c, 3 |-> b, 4 |-> d}
+
+(c)
+
+{2 |-> b, 3 |-> c, 4 |-> d}
+
+(d)
+
+{1, 2, 3, 4}
+
+(e)
+
+{a, b}
+
+(f)
+
+{a |-> 1, b |-> 2, c |-> 3, d |-> 4}
+
+(g)
+
+<a, b>
+
+(h)
+
+{3 |-> b}
+
+(i)
+
+{a}
+
+(j)
+
+c
+
 ** Solution 38 **
 
+(a)
+
+TEXT: f : Place -> P Place
+TEXT: forall p : Place | f p = {q : Place | p |-> q in ran trains}
+TEXT: (Blocked by: juxtaposition f p and P Place)
+
+(b)
+
+TEXT: {p : Place | exists1 x : dom trains | (trains x).2 = p}
+TEXT: (Blocked by: juxtaposition trains x)
+
+(c)
+
+TEXT: (mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains x).2 = p} > # {x : dom trains | (trains x).2 = q})
+TEXT: (Blocked by: nested quantifiers in mu with multiple pipes)
+
 ** Solution 39 **
+
+(a)
+
+TEXT: large_coins : Collection -> N
+TEXT: forall c : Collection | large_coins(c) = c(large)
+TEXT: (Blocked by: underscore in identifier for fuzz compatibility)
+
+(b)
+
+TEXT: add_coin : Collection * Coin -> Collection
+TEXT: forall c : Collection; d : Coin | add_coin(c, d) = c union [[d]]
+TEXT: (Blocked by: underscore in identifier and bag union)
 
 === Modelling ===
 
@@ -885,20 +953,182 @@ TEXT: (Blocked by: juxtaposition bookings i)
 
 ** Solution 44 **
 
+TEXT: The two cases of the proof are established by equational reasoning: the first by
+TEXT:
+TEXT: reverse (<> ^ t) = reverse t [cat.1a] = (reverse t) ^ <> [cat.1b]
+TEXT:
+TEXT: where cat.1a is <> ^ s = s and cat.1b is s ^ <> = s
+TEXT:
+TEXT: and the second by
+TEXT:
+TEXT: reverse ((<x> ^ u) ^ t) = reverse (<x> ^ (u ^ t)) [cat.2]
+TEXT:                          = reverse (u ^ t) ^ <x>    [reverse.2]
+TEXT:                          = (reverse t ^ reverse u) ^ <x>  [anti-distributive]
+TEXT:                          = reverse t ^ (reverse u ^ <x>)  [cat.2]
+TEXT:                          = reverse t ^ reverse (<x> ^ u)  [reverse.2]
+
 ** Solution 45 **
+
+TEXT: The base case:
+TEXT:
+TEXT: reverse (reverse <>) = reverse <> [reverse.1] = <> [reverse.1]
+TEXT:
+TEXT: The inductive step:
+TEXT:
+TEXT: reverse (reverse (<x> ^ t))
+TEXT:   = reverse ((reverse t) ^ <x>)  [reverse.2]
+TEXT:   = reverse (<x>) ^ reverse (reverse t)  [anti-distributive]
+TEXT:   = reverse (<x> ^ <>) ^ reverse (reverse t)  [cat.1]
+TEXT:   = ((reverse <>) ^ <x>) ^ reverse (reverse t)  [reverse.2]
+TEXT:   = (<> ^ <x>) ^ reverse (reverse t)  [reverse.1]
+TEXT:   = <x> ^ reverse (reverse t)  [cat.1]
+TEXT:   = <x> ^ t  [reverse (reverse t) = t]
 
 ** Solution 46 **
 
+(a)
+
+TEXT: count : Tree -> N
+TEXT: count stalk = 0
+TEXT: forall n : N | count (leaf n) = 1
+TEXT: forall t1, t2 : Tree | count (branch (t1, t2)) = count t1 + count t2
+TEXT: (Blocked by: recursive free types and pattern matching)
+
+(b)
+
+TEXT: flatten : Tree -> seq N
+TEXT: flatten stalk = <>
+TEXT: forall n : N | flatten (leaf n) = <n>
+TEXT: forall t1, t2 : Tree | flatten (branch (t1, t2)) = flatten t1 ^ flatten t2
+TEXT: (Blocked by: recursive free types and pattern matching)
+
 ** Solution 47 **
+
+TEXT: First, exhibit the induction principle for the free type:
+TEXT:
+TEXT: P stalk and (forall n : N | P (leaf n)) and (forall t1, t2 : Tree | P t1 and P t2 => P (branch (t1, t2)))
+TEXT: implies forall t : Tree | P t
+TEXT:
+TEXT: This gives three cases for the proof:
+TEXT:
+TEXT: # (flatten stalk) = # <> [flatten] = 0 [#] = count stalk [count]
+TEXT:
+TEXT: (Remaining cases omitted - require equational reasoning with recursive functions)
 
 === Supplementary material: assignment practice ===
 
 ** Solution 48 **
 
+TEXT: songs : F SongId
+TEXT: users : F UserId
+TEXT: playlists : PlaylistId +-> Playlist
+TEXT: playlist_owner : PlaylistId +-> UserId
+TEXT: playlist_subscribers : PlaylistId +-> F1 UserId
+TEXT: forall i : dom playlists | ran (playlists i) subseteq songs
+TEXT: dom playlist_owner subseteq dom playlists
+TEXT: ran playlist_owner subseteq users
+TEXT: dom playlist_subscribers subseteq dom playlists
+TEXT: forall i : dom playlist_subscribers | playlist_subscribers i subseteq users
+TEXT: forall i : dom playlists | (playlist_owner i) in playlist_subscribers i
+TEXT: (Blocked by: +-> operator, juxtaposition, underscores, F and F1 types)
+
 ** Solution 49 **
+
+TEXT: hated : UserId +-> F SongId
+TEXT: loved : UserId +-> F SongId
+TEXT: dom hated subseteq users
+TEXT: forall i : dom hated | (hated i) subseteq songs
+TEXT: dom loved subseteq users
+TEXT: forall i : dom loved | (loved i) subseteq songs
+TEXT: forall i : dom hated union dom loved | hated i intersect loved i = emptyset
+TEXT: (Blocked by: +-> operator, juxtaposition, F type)
 
 ** Solution 50 **
 
+(a)
+
+TEXT: A == users \ bigcup (ran playlist_subscribers)
+TEXT: (Blocked by: underscore in identifier, bigcup operator)
+
+(b)
+
+TEXT: B == {p : dom playlist_subscribers | # (playlist_subscribers p) >= 100}
+TEXT: (Blocked by: underscore in identifier, juxtaposition)
+
+(c)
+
+TEXT: C == (mu u : dom loved | forall v : dom loved | u /= v | # (loved u) > # (loved v))
+TEXT: (Blocked by: nested quantifiers in mu)
+
+(d)
+
+TEXT: D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved u} > # {u : UserId | t in loved u})
+TEXT: (Blocked by: nested quantifiers in mu, juxtaposition loved u)
+
 ** Solution 51 **
 
+(a)
+
+TEXT: Let's first define two helper functions:
+TEXT:
+TEXT: love_hate_score : SongId +-> N
+TEXT: forall i : songs | # {u : UserId | i in loved u} >= # {u : UserId | i in hated u} =>
+TEXT:     love_hate_score i = # {u : UserId | i in loved u} - # {u : UserId | i in hated u}
+TEXT: and
+TEXT: forall i : songs | # {u : UserId | i in loved u} < # {u : UserId | i in hated u} =>
+TEXT:     love_hate_score i = 0
+TEXT:
+TEXT: playlist_count : SongId +-> N
+TEXT: forall i : songs | playlist_count i = # {p : dom playlist | i in ran playlist p}
+TEXT:
+TEXT: We then have:
+TEXT:
+TEXT: length : SongId +-> N
+TEXT: popularity : SongId +-> N
+TEXT: dom length subseteq songs
+TEXT: dom popularity subseteq songs
+TEXT: forall i : songs | popularity i = love_hate_score i + playlist_count i
+TEXT: (Blocked by: +-> operator, underscores, juxtaposition throughout)
+
+(b)
+
+TEXT: most_popular : SongId
+TEXT: (exists1 i : songs | forall j : songs | i /= j | popularity i > popularity j) =>
+TEXT:     most_popular = (mu i : songs | forall j : songs | i /= j | popularity i > popularity j)
+TEXT: and
+TEXT: not (exists1 i : songs | forall j : songs | i /= j | popularity i > popularity j) =>
+TEXT:     most_popular = null_song
+TEXT: (Blocked by: underscore, nested quantifiers, juxtaposition)
+
+(c)
+
+TEXT: playlists_containing_most_popular_song == {i : dom playlists | most_popular in ran playlists i}
+TEXT: (Blocked by: underscores, juxtaposition playlists i)
+
 ** Solution 52 **
+
+(a)
+
+TEXT: premium_plays : seq Play -> seq Play
+TEXT: premium_plays (<>) = <>
+TEXT: forall x : Play; s : seq Play |
+TEXT:     premium_plays (<x> ^ s) = <x> ^ (premium_plays s)   if user_status (x.2) = premium
+TEXT:                                premium_plays s           if user_status (x.2) = standard
+TEXT: (Blocked by: underscores, juxtaposition user_status (x.2))
+
+(b)
+
+TEXT: standard_plays : seq Play -> seq Play
+TEXT: standard_plays (<>) = <>
+TEXT: forall x : Play; s : seq Play |
+TEXT:     standard_plays (<x> ^ s) = <x> ^ (standard_plays s)  if user_status (x.2) = standard
+TEXT:                                 standard_plays s          if user_status (x.2) = premium
+TEXT: (Blocked by: underscores, juxtaposition)
+
+(c)
+
+TEXT: cumulative_length : seq Play -> N
+TEXT: cumulative_length (<>) = 0
+TEXT: forall x : Play; s : seq Play |
+TEXT:     cumulative_length (<x> ^ s) = length (x.1) + cumulative_length (s)
+TEXT: (Blocked by: underscores, juxtaposition length (x.1))
