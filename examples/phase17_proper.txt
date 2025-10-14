@@ -1,0 +1,24 @@
+=== Phase 17: Proper Examples (not TEXT blocks) ===
+
+** Example: Semicolon bindings in axdef **
+
+axdef
+where
+  forall x : N; y : N | x + y > 0
+end
+
+** Example: Real usage from Solution 40 **
+
+axdef
+  cumulative_total : seq(Title * Length * Viewed) -> N
+where
+  cumulative_total (<>) = 0
+  forall x : Title * Length * Viewed; s : seq(Title * Length * Viewed) | cumulative_total (<x> ^ s) = x.2 + cumulative_total s
+end
+
+** Example: Simpler nested quantifier **
+
+axdef
+where
+  forall r : R; i : dom r | i > 0
+end
