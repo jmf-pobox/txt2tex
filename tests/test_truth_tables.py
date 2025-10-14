@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from txt2tex.ast_nodes import TruthTable
+from txt2tex.ast_nodes import Document, TruthTable
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
@@ -13,11 +13,12 @@ def parse_truth_table(text: str) -> TruthTable:
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-    doc = parser.parse()
+    result = parser.parse()
     # Find truth table in document
-    for item in doc.items:
-        if isinstance(item, TruthTable):
-            return item
+    if isinstance(result, Document):
+        for item in result.items:
+            if isinstance(item, TruthTable):
+                return item
     raise ValueError("No truth table found")
 
 
