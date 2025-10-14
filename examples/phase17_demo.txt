@@ -1,0 +1,41 @@
+=== Phase 17 Demo: Semicolon-Separated Bindings ===
+
+** Example 1: Two bindings **
+
+TEXT: Simple case with two binding groups:
+
+TEXT: forall x : N; y : N | x + y > 0
+
+** Example 2: Three bindings **
+
+TEXT: Three levels of nesting:
+
+TEXT: forall x : T; y : U; z : V | x = y
+
+** Example 3: Mixed comma and semicolon **
+
+TEXT: First quantifier has multiple variables with shared domain:
+
+TEXT: forall x, y : N; z : N | x + y = z
+
+** Example 4: Real-world example from Solution 41 **
+
+TEXT: forall r : ran records; i1, i2 : dom r | i1 /= i2 => true
+
+** Example 5: Conditional with semicolon bindings **
+
+TEXT: Combining Phase 16 and Phase 17:
+
+TEXT: forall x : N; y : N | if x > y then x else y
+
+** Example 6: Nested mu operator **
+
+TEXT: Definite description with multiple bindings:
+
+TEXT: (mu p : ran hd; q : ran hd | p /= q | p.2 > q.2)
+
+** Example 7: With exists quantifier **
+
+TEXT: Multiple bindings with exists:
+
+TEXT: exists x : N; y : N | x > y and y > 0
