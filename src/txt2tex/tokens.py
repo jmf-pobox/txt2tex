@@ -45,6 +45,7 @@ class TokenType(Enum):
     CIRC = auto()  # o9 (forward/backward composition)
     TILDE = auto()  # ~ (relational inverse postfix)
     PLUS = auto()  # + (transitive closure postfix / arithmetic)
+    MINUS = auto()  # - (subtraction / negation)
     STAR = auto()  # * (reflexive-transitive closure postfix / arithmetic)
     LIMG = auto()  # (| (relational image left)
     RIMG = auto()  # |) (relational image right)
@@ -138,6 +139,12 @@ class TokenType(Enum):
     SCHEMA = auto()  # schema
     WHERE = auto()  # where
     END = auto()  # end
+
+    # Conditional expressions (Phase 16)
+    IF = auto()  # if
+    THEN = auto()  # then
+    ELSE = auto()  # else
+    OTHERWISE = auto()  # otherwise
 
     # Proof trees (Phase 5)
     PROOF = auto()  # PROOF:

@@ -348,6 +348,27 @@ class BagLiteral(ASTNode):
     elements: list[Expr]  # List of bag elements (can have duplicates)
 
 
+@dataclass(frozen=True)
+class Conditional(ASTNode):
+    """Conditional expression node (Phase 16).
+
+    Represents conditional expressions: if condition then expr1 else expr2
+
+    Used in function definitions and mathematical expressions to express
+    conditional logic.
+
+    Examples:
+    - if x > 0 then x else -x -> condition=(x > 0), then_expr=x, else_expr=(-x)
+    - if s = <> then 0 else 1 -> condition=(s = <>), then_expr=0, else_expr=1
+
+    LaTeX rendering: Uses cases environment or inline conditional notation
+    """
+
+    condition: Expr  # The conditional predicate
+    then_expr: Expr  # Expression when condition is true
+    else_expr: Expr  # Expression when condition is false
+
+
 # Type alias for all expression types
 Expr = (
     BinaryOp
@@ -369,6 +390,7 @@ Expr = (
     | SequenceLiteral
     | TupleProjection
     | BagLiteral
+    | Conditional
 )
 
 

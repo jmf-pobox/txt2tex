@@ -445,6 +445,11 @@ class Lexer:
             self._advance()
             return Token(TokenType.TFUN, "->", start_line, start_column)
 
+        # Standalone minus (subtraction/negation)
+        if char == "-":
+            self._advance()
+            return Token(TokenType.MINUS, "-", start_line, start_column)
+
         # Identifiers and keywords (Phase 15: allow underscore in identifiers)
         if char.isalpha() or char == "_":
             return self._scan_identifier(start_line, start_column)
@@ -609,6 +614,16 @@ class Lexer:
             return Token(TokenType.WHERE, value, start_line, start_column)
         if value == "end":
             return Token(TokenType.END, value, start_line, start_column)
+
+        # Check for conditional expression keywords (Phase 16)
+        if value == "if":
+            return Token(TokenType.IF, value, start_line, start_column)
+        if value == "then":
+            return Token(TokenType.THEN, value, start_line, start_column)
+        if value == "else":
+            return Token(TokenType.ELSE, value, start_line, start_column)
+        if value == "otherwise":
+            return Token(TokenType.OTHERWISE, value, start_line, start_column)
 
         # Check for relation functions (Phase 10a)
         if value == "comp":
