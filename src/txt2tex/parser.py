@@ -1625,6 +1625,35 @@ class Parser:
                     column=op_token.column,
                 )
 
+            # Check if followed by a valid operand for prefix operator
+            # If not, treat as standalone identifier (e.g., "R \ id" not "id R")
+            if not self._match(
+                TokenType.IDENTIFIER,
+                TokenType.NUMBER,
+                TokenType.LPAREN,
+                TokenType.LBRACE,
+                TokenType.LANGLE,
+                TokenType.LAMBDA,
+                TokenType.IF,
+                TokenType.DOM,
+                TokenType.RAN,
+                TokenType.INV,
+                TokenType.ID,
+                TokenType.POWER,
+                TokenType.POWER1,
+                TokenType.HEAD,
+                TokenType.TAIL,
+                TokenType.LAST,
+                TokenType.FRONT,
+                TokenType.REV,
+            ):
+                # Not followed by valid operand, treat as identifier
+                return Identifier(
+                    name=op_token.value,
+                    line=op_token.line,
+                    column=op_token.column,
+                )
+
             # Not followed by '[', so it's a prefix operator
             operand = self._parse_atom()
             return UnaryOp(
