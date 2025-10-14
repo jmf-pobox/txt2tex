@@ -1,0 +1,54 @@
+=== Phase 20 Demo: bigcup (Distributed Union) ===
+
+** Example 1: Basic bigcup **
+
+TEXT: bigcup S is the union of all sets in the set of sets S:
+
+given X
+
+abbrev S == P(P(X))
+
+axdef
+  allElements : S -> P(X)
+where
+  forall s : S | allElements(s) = bigcup(s)
+end
+
+** Example 2: bigcup with ran **
+
+TEXT: Combining bigcup with ran to get all elements from a relation's range:
+
+given UserId, SongId
+
+axdef
+  loved : UserId +-> F SongId
+  allLovedSongs : F SongId
+where
+  allLovedSongs = bigcup(ran(loved))
+end
+
+** Example 3: Set difference with bigcup (Solution 50a) **
+
+TEXT: Users who are not subscribers of any playlist:
+
+given PlaylistId, UserId
+
+axdef
+  users : F UserId
+  playlistSubscribers : PlaylistId +-> F1 UserId
+  nonSubscribers : F UserId
+where
+  nonSubscribers = users \ bigcup(ran(playlistSubscribers))
+end
+
+** Example 4: Nested bigcup **
+
+TEXT: bigcup can be nested for multi-level set structures:
+
+given N
+
+axdef
+  nested : P(P(P(N)))
+where
+  bigcup(bigcup(nested)) subseteq N
+end
