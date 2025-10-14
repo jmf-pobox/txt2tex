@@ -2546,83 +2546,44 @@ This gives three cases for the proof:
 
 \medskip
 
-\bigskip
+\begin{zed}[SongId, UserId, PlaylistId, Playlist]\end{zed}
 
-songs : F SongId
-
-\bigskip
-
-\bigskip
-
-users : F UserId
-
-\bigskip
-
-\bigskip
-
-playlists : PlaylistId +-> Playlist
-
-\bigskip
-
-\bigskip
-
-playlistOwner : PlaylistId +-> UserId
-
-\bigskip
-
-\bigskip
-
-playlistSubscribers : PlaylistId +-> F1 UserId
-
-\bigskip
-
-\bigskip
-
-$\forall i \colon \dom playlists \bullet \ran playlists(i)$subseteq songs
-
-\bigskip
-
-\bigskip
-
-dom(playlistOwner) subseteq dom(playlists)
-
-\bigskip
-
-\bigskip
-
-ran(playlistOwner) subseteq users
-
-\bigskip
-
-\bigskip
-
-dom(playlistSubscribers) subseteq dom(playlists)
-
-\bigskip
-
-\bigskip
-
-$\forall i \colon \dom playlistSubscribers \bullet playlistSubscribers(i)$subseteq users
-
-\bigskip
-
-\bigskip
-
-$\forall i \colon \dom playlists \bullet playlistOwner(i) \in playlistSubscribers(i)$
-
-\bigskip
-
-\bigskip
-
-(Blocked by: F and F1 finite set types not implemented)
-
-\bigskip
+\begin{axdef}
+songs : \finset~SongId
+users : \finset~UserId
+playlists : PlaylistId \pfun Playlist
+playlistOwner : PlaylistId \pfun UserId
+playlistSubscribers : PlaylistId \pfun \finset_1~UserId
+\where
+\forall i \colon \dom playlists \bullet \ran playlists(i)
+subseteq
+songs
+\dom playlistOwner
+subseteq
+\dom playlists
+\ran playlistOwner
+subseteq
+users
+\dom playlistSubscribers
+subseteq
+\dom playlists
+\forall i \colon \dom playlistSubscribers \bullet playlistSubscribers(i)
+subseteq
+users
+\forall i \colon \dom playlists \bullet playlistOwner(i) \in playlistSubscribers(i)
+\end{axdef}
 
 \bigskip
 \noindent
 \textbf{Solution 49}
 
 \medskip
+
+\bigskip
+
+axdef
+
+\bigskip
 
 \bigskip
 
@@ -2633,6 +2594,12 @@ hated : UserId +-> F SongId
 \bigskip
 
 loved : UserId +-> F SongId
+
+\bigskip
+
+\bigskip
+
+where
 
 \bigskip
 
@@ -2668,7 +2635,13 @@ forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
 
 \bigskip
 
-(Blocked by: F finite set type not implemented)
+end
+
+\bigskip
+
+\bigskip
+
+(Blocked by: union in quantifier domain - parser issue)
 
 \bigskip
 

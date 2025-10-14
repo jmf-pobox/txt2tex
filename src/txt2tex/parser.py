@@ -451,18 +451,21 @@ class Parser:
             row: list[str] = []
 
             # Check if line starts with T/t or F/f (truth values)
-            if not self._match(TokenType.IDENTIFIER):
+            # Note: F may be lexed as FINSET, P as POWER (Phase 19)
+            if not self._match(TokenType.IDENTIFIER, TokenType.FINSET, TokenType.POWER):
                 break
 
             first_val = self._current().value
-            if first_val.upper() not in ("T", "F"):
+            if first_val.upper() not in ("T", "F", "P"):
                 break  # Not a truth table row
 
             # Collect row values separated by pipes, normalizing to uppercase
             while not self._match(TokenType.NEWLINE) and not self._at_end():
                 if self._match(TokenType.PIPE):
                     self._advance()  # Skip pipe
-                elif self._match(TokenType.IDENTIFIER):
+                elif self._match(
+                    TokenType.IDENTIFIER, TokenType.FINSET, TokenType.POWER
+                ):
                     val = self._current().value
                     # Normalize t/f to T/F
                     row.append(val.upper() if val.upper() in ("T", "F") else val)
@@ -794,6 +797,8 @@ class Parser:
             TokenType.MINUS,  # Phase 16: unary negation
             TokenType.POWER,
             TokenType.POWER1,
+            TokenType.FINSET,  # Phase 19: finite sets
+            TokenType.FINSET1,  # Phase 19: non-empty finite sets
             TokenType.FORALL,
             TokenType.EXISTS,
             TokenType.EXISTS1,
@@ -1597,6 +1602,7 @@ class Parser:
         # Phase 11.5: Prefix set functions (P, P1)
         # Phase 11.9: Check for generic instantiation P[X] before treating as prefix
         # Phase 12: Prefix sequence operators (head, tail, last, front, rev)
+        # Phase 19: Finite set types (F, F1)
         if self._match(
             TokenType.DOM,
             TokenType.RAN,
@@ -1604,6 +1610,8 @@ class Parser:
             TokenType.ID,
             TokenType.POWER,
             TokenType.POWER1,
+            TokenType.FINSET,
+            TokenType.FINSET1,
             TokenType.HEAD,
             TokenType.TAIL,
             TokenType.LAST,
@@ -1642,6 +1650,8 @@ class Parser:
                 TokenType.ID,
                 TokenType.POWER,
                 TokenType.POWER1,
+                TokenType.FINSET,
+                TokenType.FINSET1,
                 TokenType.HEAD,
                 TokenType.TAIL,
                 TokenType.LAST,
