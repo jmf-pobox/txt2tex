@@ -670,11 +670,15 @@ class Lexer:
         if value == "mod":
             return Token(TokenType.MOD, value, start_line, start_column)
 
-        # Check for power set functions (Phase 11.5)
+        # Check for power set and finite set functions (Phase 11.5, enhanced Phase 19)
         if value == "P1":
             return Token(TokenType.POWER1, value, start_line, start_column)
         if value == "P":
             return Token(TokenType.POWER, value, start_line, start_column)
+        if value == "F1":
+            return Token(TokenType.FINSET1, value, start_line, start_column)
+        if value == "F":
+            return Token(TokenType.FINSET, value, start_line, start_column)
 
         # Check for sequence operator keywords (Phase 12)
         # Note: seq and seq1 are left as identifiers to support seq(X) and seq[X]

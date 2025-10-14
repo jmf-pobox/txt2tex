@@ -1,0 +1,48 @@
+=== Phase 19 Demo: Finite Set Types ===
+
+** Example 1: F (finite sets) **
+
+TEXT: F X denotes all finite subsets of X:
+
+given SongId, UserId
+
+axdef
+  songs : F SongId
+  users : F UserId
+end
+
+** Example 2: F1 (non-empty finite sets) **
+
+TEXT: F1 X denotes all non-empty finite subsets of X:
+
+axdef
+  activeUsers : F1 UserId
+where
+  activeUsers subseteq users
+end
+
+** Example 3: Combined with function types **
+
+TEXT: Using F and F1 with partial functions:
+
+given PlaylistId, Playlist
+
+axdef
+  playlists : PlaylistId +-> Playlist
+  playlistOwner : PlaylistId +-> UserId
+  playlistSubscribers : PlaylistId +-> F1 UserId
+where
+  dom(playlistOwner) subseteq dom(playlists)
+  dom(playlistSubscribers) subseteq dom(playlists)
+  forall i : dom(playlistSubscribers) | playlistSubscribers(i) subseteq users
+end
+
+** Example 4: Comparison with P (power set) **
+
+TEXT: F X is a subset of P X (all finite subsets are subsets):
+
+axdef
+where
+  F(users) subseteq P(users)
+  F1(users) subseteq F(users)
+end
