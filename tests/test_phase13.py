@@ -255,3 +255,206 @@ end"""
         parser2 = Parser(tokens2)
         ast2 = parser2.parse()
         assert isinstance(ast2, Range)
+
+
+class TestOverrideOperator:
+    """Test override operator (++) parsing and LaTeX generation."""
+
+    def test_override_basic(self) -> None:
+        """Test basic override: f ++ g."""
+        txt = "f ++ g"
+        lexer = Lexer(txt)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        # Check AST structure
+        assert isinstance(ast, BinaryOp)
+        assert ast.operator == "++"
+        assert isinstance(ast.left, Identifier)
+        assert ast.left.name == "f"
+        assert isinstance(ast.right, Identifier)
+        assert ast.right.name == "g"
+
+    def test_override_latex_basic(self) -> None:
+        """Test LaTeX generation for basic override."""
+        txt = "f ++ g"
+        lexer = Lexer(txt)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        assert isinstance(ast, BinaryOp)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+
+        # Should use \\oplus command
+        assert latex == r"f \oplus g"
+
+    def test_override_chained(self) -> None:
+        """Test chained override: f ++ g ++ h."""
+        txt = "f ++ g ++ h"
+        lexer = Lexer(txt)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        # Check AST structure - should be left-associative
+        assert isinstance(ast, BinaryOp)
+        assert ast.operator == "++"
+        # Left side should be (f ++ g)
+        assert isinstance(ast.left, BinaryOp)
+        assert ast.left.operator == "++"
+        # Right side should be h
+        assert isinstance(ast.right, Identifier)
+        assert ast.right.name == "h"
+
+    def test_override_chained_latex(self) -> None:
+        """Test LaTeX generation for chained override."""
+        txt = "f ++ g ++ h"
+        lexer = Lexer(txt)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        assert isinstance(ast, BinaryOp)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+
+        assert latex == r"f \oplus g \oplus h"
+
+    def test_override_with_set_literals(self) -> None:
+        """Test override with set literals: {1 |-> a} ++ {2 |-> b}."""
+        txt = "{1 |-> a} ++ {2 |-> b}"
+        lexer = Lexer(txt)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        # Check AST structure
+        assert isinstance(ast, BinaryOp)
+        assert ast.operator == "++"
+
+    def test_override_precedence_with_union(self) -> None:
+        """Test override has same precedence as union."""
+        txt = "A union B ++ C"
+        lexer = Lexer(txt)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        # Should parse as (A union B) ++ C (left-associative)
+        assert isinstance(ast, BinaryOp)
+        assert ast.operator == "++"
+        assert isinstance(ast.left, BinaryOp)
+        assert ast.left.operator == "union"
+
+    def test_override_precedence_with_intersection(self) -> None:
+        """Test override binds looser than intersection."""
+        txt = "A intersect B ++ C intersect D"
+        lexer = Lexer(txt)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        # Should parse as (A intersect B) ++ (C intersect D)
+        assert isinstance(ast, BinaryOp)
+        assert ast.operator == "++"
+        # Both sides should be intersections
+        assert isinstance(ast.left, BinaryOp)
+        assert ast.left.operator == "intersect"
+        assert isinstance(ast.right, BinaryOp)
+        assert ast.right.operator == "intersect"
+
+    def test_override_in_schema_declaration(self) -> None:
+        """Test override in schema type declarations."""
+        txt = """schema
+  f : A -> B
+  g : A -> B
+where
+  f ++ g = h
+end"""
+        lexer = Lexer(txt)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        # Check AST structure
+        assert isinstance(ast, Document)
+        assert isinstance(ast.items[0], Schema)
+        schema = ast.items[0]
+        # Check predicate contains override
+        assert len(schema.predicates) == 1
+        pred = schema.predicates[0]
+        assert isinstance(pred, BinaryOp)
+        assert pred.operator == "="
+        # Left side should be override
+        assert isinstance(pred.left, BinaryOp)
+        assert pred.left.operator == "++"
+
+    def test_override_in_axdef(self) -> None:
+        """Test override in axdef predicate."""
+        txt = """axdef
+  f : A -> B
+  g : A -> B
+where
+  dom (f ++ g) = dom f union dom g
+end"""
+        lexer = Lexer(txt)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        # Check AST structure
+        assert isinstance(ast, Document)
+        # Should contain override in predicate
+        # (detailed structure checking omitted for brevity)
+
+    def test_override_not_confused_with_plus(self) -> None:
+        """Test that ++ is distinct from single + operator."""
+        # Single plus should be addition
+        txt1 = "a + b"
+        lexer1 = Lexer(txt1)
+        tokens1 = lexer1.tokenize()
+        parser1 = Parser(tokens1)
+        ast1 = parser1.parse()
+        assert isinstance(ast1, BinaryOp)
+        assert ast1.operator == "+"
+
+        # Double plus should be override
+        txt2 = "a ++ b"
+        lexer2 = Lexer(txt2)
+        tokens2 = lexer2.tokenize()
+        parser2 = Parser(tokens2)
+        ast2 = parser2.parse()
+        assert isinstance(ast2, BinaryOp)
+        assert ast2.operator == "++"
+
+    def test_override_with_parentheses(self) -> None:
+        """Test override with explicit grouping."""
+        txt = "(f ++ g) ++ h"
+        lexer = Lexer(txt)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        # Should still parse as left-associative
+        assert isinstance(ast, BinaryOp)
+        assert ast.operator == "++"
+
+    def test_override_complex_latex(self) -> None:
+        """Test LaTeX generation for complex override expressions."""
+        txt = "{1 |-> a, 2 |-> b} ++ {2 |-> c, 3 |-> d}"
+        lexer = Lexer(txt)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        assert isinstance(ast, BinaryOp)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+
+        # Should contain \\oplus
+        assert r"\oplus" in latex
+        # Should contain maplet arrows
+        assert r"\mapsto" in latex

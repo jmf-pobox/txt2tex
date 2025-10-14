@@ -73,6 +73,7 @@ class TokenType(Enum):
     LBAG = auto()  # [[ (bag literal left)
     RBAG = auto()  # ]] (bag literal right)
     BAG_UNION = auto()  # ⊎ (bag union)
+    OVERRIDE = auto()  # ++ (function/sequence override) - Phase 13
 
     # Function type operators (Phase 11)
     TFUN = auto()  # -> (total function)
