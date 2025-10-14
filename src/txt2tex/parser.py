@@ -1612,6 +1612,7 @@ class Parser:
             TokenType.POWER1,
             TokenType.FINSET,
             TokenType.FINSET1,
+            TokenType.BIGCUP,  # Phase 20: distributed union
             TokenType.HEAD,
             TokenType.TAIL,
             TokenType.LAST,
@@ -1652,6 +1653,7 @@ class Parser:
                 TokenType.POWER1,
                 TokenType.FINSET,
                 TokenType.FINSET1,
+                TokenType.BIGCUP,
                 TokenType.HEAD,
                 TokenType.TAIL,
                 TokenType.LAST,

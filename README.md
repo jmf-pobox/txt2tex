@@ -2,13 +2,13 @@
 
 Convert whiteboard-style mathematical notation to high-quality LaTeX for formal methods and Z notation.
 
-## Current Status: Phase 19 ✅
+## Current Status: Phase 20 ✅
 
-**Production Ready: Solutions 1-36, 48, 52a (73%)** - Fully inline parsing support for propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, **ASCII sequence brackets**, **multi-word identifiers with underscore**, **conditional expressions (if/then/else)**, **semicolon-separated bindings**, **partial function operators (+-> and -|>)**, and **finite set types (F and F1)**.
+**Production Ready: Solutions 1-36, 48, 50a-b, 52a (75%)** - Fully inline parsing support for propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, **ASCII sequence brackets**, **multi-word identifiers with underscore**, **conditional expressions (if/then/else)**, **semicolon-separated bindings**, **partial function operators (+-> and -|>)**, **finite set types (F and F1)**, and **distributed union (bigcup)**.
 
 ### Coverage Breakdown
 
-- 🎯 **28 phases complete** (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12, 13.1-13.4, 14, 15, 16, 17, 18, 19)
+- 🎯 **29 phases complete** (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12, 13.1-13.4, 14, 15, 16, 17, 18, 19, 20)
 - ✅ **599 tests passing** (100% pass rate)
 - 📚 **19 example files** demonstrating all features
 - 🔧 **Makefile automation** for building PDFs
@@ -165,13 +165,7 @@ Following the conventions used in the fuzz package test suite:
 
 The following features are not yet implemented and require TEXT blocks as workarounds:
 
-**1. Distributed Union** (affects Solution 50):
-```
-❌ Not implemented: bigcup S (distributed union)
-✅ Workaround: Use TEXT blocks
-```
-
-**2. Recursive Free Types** (affects Solutions 46-47):
+**1. Recursive Free Types** (affects Solutions 46-47):
 ```
 ❌ Not implemented: Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree * Tree⟩
 ❌ Not implemented: Pattern matching in function definitions
@@ -1496,6 +1490,12 @@ PROOF:
 - Truth table compatibility: F/P tokens handled in truth table rows
 - Used in database schema specifications
 
+### ✅ Phase 20: Distributed Union (bigcup)
+- Distributed union operator: `bigcup`
+- Prefix operator: `bigcup(S)` → `\bigcup S`
+- Combines with other operators: `bigcup(ran(f))` → `\bigcup \ran f`
+- Used for flattening sets of sets into single sets
+
 ---
 
 ## Command-Line Reference
@@ -1899,8 +1899,8 @@ For bugs, feature requests, or questions, please open an issue on GitHub.
 
 ---
 
-**Last Updated**: Phase 19 Complete (Finite Set Types - F and F1)
-**Version**: 0.19.0
-**Status**: Production Ready for Solutions 1-36, 48, 52a - 73% Coverage (38/52 exercises)
+**Last Updated**: Phase 20 Complete (Distributed Union - bigcup)
+**Version**: 0.20.0
+**Status**: Production Ready for Solutions 1-36, 48, 50a-b, 52a - 75% Coverage (40/52 exercises)
 **Test Suite**: 599 tests passing
-**Remaining**: Solutions 37-47, 49-52 (nested quantifiers, bigcup, recursive free types)
+**Remaining**: Solutions 37-47, 49-52 (nested quantifiers, recursive free types)
