@@ -4,7 +4,7 @@ Convert whiteboard-style mathematical notation to high-quality LaTeX for formal 
 
 ## Current Status: Phase 17 ✅
 
-**Production Ready: Solutions 1-36, 44-47 (77%)** - Fully inline parsing support for propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, **ASCII sequence brackets**, **multi-word identifiers with underscore**, **conditional expressions (if/then/else)**, and **recursive free types with constructor parameters**.
+**Production Ready: Solutions 1-36, 44-47 (75%)** - Fully inline parsing support for propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, **ASCII sequence brackets**, **multi-word identifiers with underscore**, **conditional expressions (if/then/else)**, and **recursive free types with constructor parameters**.
 
 ### Coverage Breakdown
 
@@ -12,6 +12,7 @@ Convert whiteboard-style mathematical notation to high-quality LaTeX for formal 
 - ✅ **773 tests passing** (100% pass rate)
 - 📚 **19+ example files** demonstrating all features
 - 🔧 **Makefile automation** for building PDFs
+- 📄 **40 garbled characters remaining** in solutions.pdf (down from 1400+)
 
 **Solution Coverage (Verified)**:
 - ✅ **Solutions 1-36**: 69% - Fully working with inline parsing
@@ -20,7 +21,7 @@ Convert whiteboard-style mathematical notation to high-quality LaTeX for formal 
 - ✅ **Solutions 44-47**: 8% - Fully working (recursive free types with constructor parameters)
 - ❌ **Solutions 48-52**: 10% - Partial/blocked (require pattern matching and advanced features)
 
-**Overall: ~77% solution coverage** (40/52 solutions, including partial Solutions 44-47)
+**Overall: 75% solution coverage** (39/52 solutions fully working, per COVERAGE.md)
 
 ## Quick Start
 
@@ -218,6 +219,13 @@ TEXT: The set { x : N | x > 0 } contains positive integers.
 TEXT: We know that forall x : N | x >= 0 is true.
 ```
 Generates: `$\{ x \colon N \mid x > 0 \}$` and `$\forall x \colon N \bullet x \geq 0$`
+
+**Sequence Literals in TEXT** (Phase 17.1): Sequence literals are converted to proper LaTeX math mode:
+```
+TEXT: The empty sequence <> has no elements.
+TEXT: The sequence <a, b, c> concatenated with <x> gives <a, b, c, x>.
+```
+Generates: `$\langle \rangle$` and `$\langle a, b, c \rangle$` with proper LaTeX angle brackets
 
 ---
 
@@ -1966,8 +1974,9 @@ For bugs, feature requests, or questions, please open an issue on GitHub.
 
 ---
 
-**Last Updated**: Phase 17 Complete (Recursive Free Types with Constructor Parameters)
-**Version**: 0.17.0
-**Status**: Production Ready for Solutions 1-36, 44-47 - 77% Coverage (40/52 solutions)
+**Last Updated**: Phase 17.1 Complete (Sequence Literal Fix in TEXT Blocks)
+**Version**: 0.17.1
+**Status**: Production Ready for Solutions 1-36, 44-47 - 75% Coverage (39/52 solutions)
 **Test Suite**: 773 tests passing
+**PDF Quality**: 40 garbled characters remaining (down from 1400+)
 **Remaining**: Solutions 37-43, 48-52 (pattern matching, schema operations, advanced features)

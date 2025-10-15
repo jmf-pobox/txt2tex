@@ -4,9 +4,32 @@
 Eliminate all garbled characters in generated PDFs (from 1441 to 0) by fixing parser bugs and implementing missing features.
 
 ## Current State
-- **1441 garbled characters** (¿, ¡, —) in 58 lines of solutions.pdf
+- **40 garbled characters** (¿, ¡, —) remaining in solutions.pdf (down from 1441)
 - **243 TEXT blocks** in solutions.txt
 - Root cause: TEXT blocks used as workarounds for missing/broken features
+
+## Completed Fixes
+
+### Phase 17.1: Sequence Literal Fix ✅
+**Completed**: 2025-10-15
+
+**Problem**: TEXT blocks containing sequence literals like `<>`, `<x>`, `<a, b>` were rendering as garbled characters (¡¿) in PDFs.
+
+**Root Cause**: LaTeX treats `<` and `>` as special characters in text mode, causing incorrect rendering.
+
+**Solution**: Added `_convert_sequence_literals()` method in `latex_gen.py`:
+- Detects sequence patterns: `<>`, `<x>`, `<a, b, c>`
+- Converts to math mode: `<x>` → `$\langle x \rangle$`
+- Carefully avoids operators: `<=>`, `<->`, `<`, `>`
+- Processes sequences BEFORE operator conversion to avoid conflicts
+
+**Impact**:
+- Reduced garbled characters from ~1400 to 40
+- All 773 tests continue passing
+- No regressions introduced
+
+**Files Modified**:
+- `src/txt2tex/latex_gen.py`: Added sequence literal conversion to `_generate_paragraph()`
 
 ## Implementation Phases
 
