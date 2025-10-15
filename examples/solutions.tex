@@ -16,28 +16,36 @@
 (a)
 \par
 \vspace{11pt}
-$false(as(true \Rightarrow false) \Leftrightarrow false)$
+\[
+  false(as(true \Rightarrow false) \Leftrightarrow false)
+\]
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-$true(as(false \Rightarrow false) \Leftrightarrow true)$
+\[
+  true(as(false \Rightarrow false) \Leftrightarrow true)
+\]
 
 \medskip
 
 (c)
 \par
 \vspace{11pt}
-$true(as(false \Rightarrow true) \Leftrightarrow true)$
+\[
+  true(as(false \Rightarrow true) \Leftrightarrow true)
+\]
 
 \medskip
 
 (d)
 \par
 \vspace{11pt}
-$true(as(false \Rightarrow false) \Leftrightarrow true)$
+\[
+  true(as(false \Rightarrow false) \Leftrightarrow true)
+\]
 
 \bigskip
 
@@ -231,14 +239,18 @@ p \lor q \Leftrightarrow p \\
 (a)
 \par
 \vspace{11pt}
-$\exists d \colon Dog \bullet gentle(d) \land well_trained(d)$
+\[
+  \exists d \colon Dog \bullet gentle(d) \land well_trained(d)
+\]
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-$\forall d \colon Dog \bullet neat(d) \land well_trained(d) \Rightarrow attractive(d)$
+\[
+  \forall d \colon Dog \bullet neat(d) \land well_trained(d) \Rightarrow attractive(d)
+\]
 
 \medskip
 
@@ -340,7 +352,9 @@ With the above choice of p, we require only that q is sometimes false when p is 
 (a)
 \par
 \vspace{11pt}
-$\forall x \colon N \bullet x \geq z$
+\[
+  \forall x \colon N \bullet x \geq z
+\]
 
 \medskip
 
@@ -384,7 +398,9 @@ So, as a simple example, as the proposition
 
 \bigskip
 
-$\exists_1 n \colon N \bullet \forall m \colon N \bullet n \leq m$
+\[
+  \exists_1 n \colon N \bullet \forall m \colon N \bullet n \leq m
+\]
 
 \bigskip
 
@@ -392,7 +408,9 @@ is equivalent to true, we can be certain that the statement
 
 \bigskip
 
-$\mu n \colon N \bullet \forall m \colon N \bullet n \leq m$
+\[
+  \mu n \colon N \bullet \forall m \colon N \bullet n \leq m
+\]
 
 \bigskip
 
@@ -465,14 +483,18 @@ will return a result (which happens to be 0).
 (a)
 \par
 \vspace{11pt}
-$\mu m \colon Mountain \mid \forall n \colon Mountain \bullet height(n) \leq height(m) \bullet height(m)$
+\[
+  \mu m \colon Mountain \mid \forall n \colon Mountain \bullet height(n) \leq height(m) \bullet height(m)
+\]
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-$\mu c \colon Chapter \mid \exists_1 d \colon Chapter \bullet length(d) > length(c) \bullet length(c)$
+\[
+  \mu c \colon Chapter \mid \exists_1 d \colon Chapter \bullet length(d) > length(c) \bullet length(c)
+\]
 
 \medskip
 
@@ -748,7 +770,9 @@ The empty set in {1, 2, 3, 4} is undefined.
 (a)
 \par
 \vspace{11pt}
-$\{1\} \cross \{2, 3\}$
+\[
+  \{1\} \cross \{2, 3\}
+\]
 
 \bigskip
 
@@ -772,7 +796,9 @@ The empty set cross {2, 3} is the empty set
 (c)
 \par
 \vspace{11pt}
-$\power~emptyset \cross \{1\}$
+\[
+  \power~emptyset \cross \{1\}
+\]
 
 \bigskip
 
@@ -808,21 +834,27 @@ There are various ways of describing these sets via set comprehensions. Examples
 (a)
 \par
 \vspace{11pt}
-$\{ z \colon Z \mid 0 \leq z \land z \leq 100 \}$
+\[
+  \{ z \colon Z \mid 0 \leq z \land z \leq 100 \}
+\]
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-$\{ z \colon Z \mid z = 10 \}$
+\[
+  \{ z \colon Z \mid z = 10 \}
+\]
 
 \medskip
 
 (c)
 \par
 \vspace{11pt}
-$\{ z \colon Z \mid z \bmod 2 = 0 \lor z \bmod 3 = 0 \lor z \bmod 5 = 0 \}$
+\[
+  \{ z \colon Z \mid z \bmod 2 = 0 \lor z \bmod 3 = 0 \lor z \bmod 5 = 0 \}
+\]
 
 \medskip
 
@@ -835,14 +867,18 @@ $\{ z \colon Z \mid z \bmod 2 = 0 \lor z \bmod 3 = 0 \lor z \bmod 5 = 0 \}$
 (a)
 \par
 \vspace{11pt}
-$\{ n \colon N \mid n \leq 4 \bullet n^2 \}$
+\[
+  \{ n \colon N \mid n \leq 4 \bullet n^2 \}
+\]
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-$\{ n \colon N \mid n \leq 4 \bullet (n, n^2) \}$
+\[
+  \{ n \colon N \mid n \leq 4 \bullet (n, n^2) \}
+\]
 
 \medskip
 
@@ -997,28 +1033,36 @@ The power set of {(0,0), (0,1), (1,0), (1,1)} is:
 
 \bigskip
 
-$\{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 0)\}, \{(1, 1)\}, \{(1, 0), (1, 1)\}, \{(0, 0), (0, 1)\}, \{(0, 1), (1, 1)\}, \{(0, 1), (1, 0)\}, \{(0, 0), (1, 1)\}, \{(0, 0), (1, 0)\}, \{(0, 0), (1, 0), (1, 1)\}, \{(0, 0), (0, 1), (1, 1)\}, \{(0, 0), (0, 1), (1, 0)\}, \{(0, 1), (1, 0), (1, 1)\}, \{(0, 0), (0, 1), (1, 0), (1, 1)\}\}$
+\[
+  \{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 0)\}, \{(1, 1)\}, \{(1, 0), (1, 1)\}, \{(0, 0), (0, 1)\}, \{(0, 1), (1, 1)\}, \{(0, 1), (1, 0)\}, \{(0, 0), (1, 1)\}, \{(0, 0), (1, 0)\}, \{(0, 0), (1, 0), (1, 1)\}, \{(0, 0), (0, 1), (1, 1)\}, \{(0, 0), (0, 1), (1, 0)\}, \{(0, 1), (1, 0), (1, 1)\}, \{(0, 0), (0, 1), (1, 0), (1, 1)\}\}
+\]
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-$\{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(0, 0), (0, 1)\}\}$
+\[
+  \{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(0, 0), (0, 1)\}\}
+\]
 
 \medskip
 
 (c)
 \par
 \vspace{11pt}
-$\{emptyset\}$
+\[
+  \{emptyset\}
+\]
 
 \medskip
 
 (d)
 \par
 \vspace{11pt}
-$\{emptyset\}$
+\[
+  \{emptyset\}
+\]
 
 \medskip
 
@@ -1031,21 +1075,27 @@ $\{emptyset\}$
 (a)
 \par
 \vspace{11pt}
-$\dom R = \{0, 1, 2\}$
+\[
+  \dom R = \{0, 1, 2\}
+\]
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-$\ran R = \{1, 2, 3\}$
+\[
+  \ran R = \{1, 2, 3\}
+\]
 
 \medskip
 
 (c)
 \par
 \vspace{11pt}
-$\{1, 2\} \dres R = \{1 \mapsto 2, 1 \mapsto 3, 2 \mapsto 3\}$
+\[
+  \{1, 2\} \dres R = \{1 \mapsto 2, 1 \mapsto 3, 2 \mapsto 3\}
+\]
 
 \medskip
 
@@ -1058,28 +1108,36 @@ $\{1, 2\} \dres R = \{1 \mapsto 2, 1 \mapsto 3, 2 \mapsto 3\}$
 (a)
 \par
 \vspace{11pt}
-$\{2 \mapsto 4, 3 \mapsto 3, 3 \mapsto 4, 4 \mapsto 2\}$
+\[
+  \{2 \mapsto 4, 3 \mapsto 3, 3 \mapsto 4, 4 \mapsto 2\}
+\]
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-$\{1 \mapsto 3, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 1\}$
+\[
+  \{1 \mapsto 3, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 1\}
+\]
 
 \medskip
 
 (c)
 \par
 \vspace{11pt}
-$\{1 \mapsto 1, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4 \mapsto 4\}$
+\[
+  \{1 \mapsto 1, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4 \mapsto 4\}
+\]
 
 \medskip
 
 (d)
 \par
 \vspace{11pt}
-$\{1 \mapsto 4, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4 \mapsto 1\}$
+\[
+  \{1 \mapsto 4, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4 \mapsto 1\}
+\]
 
 \medskip
 
@@ -1238,7 +1296,9 @@ The set of 9 functions:
 
 \bigskip
 
-$\{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 1)\}, \{(1, 0)\}, \{(0, 0), (1, 1)\}, \{(0, 1), (1, 1)\}, \{(1, 0), (0, 0)\}, \{(0, 1), (1, 0)\}\}$
+\[
+  \{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 1)\}, \{(1, 0)\}, \{(0, 0), (1, 1)\}, \{(0, 1), (1, 1)\}, \{(1, 0), (0, 0)\}, \{(0, 1), (1, 0)\}\}
+\]
 
 (a)
 \par
@@ -1249,7 +1309,9 @@ The set of total functions:
 
 \bigskip
 
-$\{\{(0, 0), (1, 1)\}, \{(0, 1), (1, 1)\}, \{(1, 0), (0, 0)\}, \{(0, 1), (1, 0)\}\}$
+\[
+  \{\{(0, 0), (1, 1)\}, \{(0, 1), (1, 1)\}, \{(1, 0), (0, 0)\}, \{(0, 1), (1, 0)\}\}
+\]
 
 \medskip
 
@@ -1262,7 +1324,9 @@ The set of functions which are neither injective nor surjective:
 
 \bigskip
 
-$\{\{(0, 1), (1, 1)\}, \{(0, 0), (1, 0)\}\}$
+\[
+  \{\{(0, 1), (1, 1)\}, \{(0, 0), (1, 0)\}\}
+\]
 
 \medskip
 
@@ -1275,7 +1339,9 @@ The set of functions which are injective but not surjective:
 
 \bigskip
 
-$\{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 0)\}, \{(1, 1)\}\}$
+\[
+  \{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 0)\}, \{(1, 1)\}\}
+\]
 
 \medskip
 
@@ -1299,7 +1365,9 @@ The set of bijective functions:
 
 \bigskip
 
-$\{\{(0, 0), (1, 1)\}, \{(0, 1), (1, 0)\}\}$
+\[
+  \{\{(0, 0), (1, 1)\}, \{(0, 1), (1, 0)\}\}
+\]
 
 \medskip
 
@@ -1312,28 +1380,36 @@ $\{\{(0, 0), (1, 1)\}, \{(0, 1), (1, 0)\}\}$
 (a)
 \par
 \vspace{11pt}
-$\{1 \mapsto a, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
+\[
+  \{1 \mapsto a, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}
+\]
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-$\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}$
+\[
+  \{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}
+\]
 
 \medskip
 
 (c)
 \par
 \vspace{11pt}
-$\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
+\[
+  \{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}
+\]
 
 \medskip
 
 (d)
 \par
 \vspace{11pt}
-$\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
+\[
+  \{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}
+\]
 
 \medskip
 
@@ -1472,70 +1548,90 @@ end
 (a)
 \par
 \vspace{11pt}
-$\langle a \rangle$
+\[
+  \langle a \rangle
+\]
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-$\{1 \mapsto a, 2 \mapsto b, 2 \mapsto a, 3 \mapsto c, 3 \mapsto b, 4 \mapsto d\}$
+\[
+  \{1 \mapsto a, 2 \mapsto b, 2 \mapsto a, 3 \mapsto c, 3 \mapsto b, 4 \mapsto d\}
+\]
 
 \medskip
 
 (c)
 \par
 \vspace{11pt}
-$\{2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}$
+\[
+  \{2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}
+\]
 
 \medskip
 
 (d)
 \par
 \vspace{11pt}
-$\{1, 2, 3, 4\}$
+\[
+  \{1, 2, 3, 4\}
+\]
 
 \medskip
 
 (e)
 \par
 \vspace{11pt}
-$\{a, b\}$
+\[
+  \{a, b\}
+\]
 
 \medskip
 
 (f)
 \par
 \vspace{11pt}
-$\{a \mapsto 1, b \mapsto 2, c \mapsto 3, d \mapsto 4\}$
+\[
+  \{a \mapsto 1, b \mapsto 2, c \mapsto 3, d \mapsto 4\}
+\]
 
 \medskip
 
 (g)
 \par
 \vspace{11pt}
-$\langle a, b \rangle$
+\[
+  \langle a, b \rangle
+\]
 
 \medskip
 
 (h)
 \par
 \vspace{11pt}
-$\{3 \mapsto b\}$
+\[
+  \{3 \mapsto b\}
+\]
 
 \medskip
 
 (i)
 \par
 \vspace{11pt}
-$\{a\}$
+\[
+  \{a\}
+\]
 
 \medskip
 
 (j)
 \par
 \vspace{11pt}
-$c$
+\[
+  c
+\]
 
 \medskip
 
@@ -1559,7 +1655,9 @@ f : Place \fun \power~Place
 (b)
 \par
 \vspace{11pt}
-$\{ p \colon Place \mid \exists_1 x \colon \dom trains \bullet trains(x).2 = p \}$
+\[
+  \{ p \colon Place \mid \exists_1 x \colon \dom trains \bullet trains(x).2 = p \}
+\]
 
 \medskip
 
@@ -1684,7 +1782,9 @@ Note that cumulative_total is defined in part (d).
 (b)
 \par
 \vspace{11pt}
-$\{ p \colon \ran hd \mid p.2 > 120 \bullet p.1 \}$
+\[
+  \{ p \colon \ran hd \mid p.2 > 120 \bullet p.1 \}
+\]
 
 \medskip
 
@@ -1936,21 +2036,37 @@ end
 (i)
 \par
 \vspace{11pt}
-$\{ e \colon Entry \mid \exists r \colon \ran records \bullet e \in \ran r \land e.3 = 479 \}$
+\[
+  \{ e \colon Entry \mid \exists r \colon \ran records \bullet e \in \ran r \land e.3 = 479 \}
+\]
 
-$ii$
+\[
+  ii
+\]
 
-$\{ e \colon Entry \mid \exists r \colon \ran records \bullet e \in \ran r \land e.6 > e.5 \}$
+\[
+  \{ e \colon Entry \mid \exists r \colon \ran records \bullet e \in \ran r \land e.6 > e.5 \}
+\]
 
-$iii$
+\[
+  iii
+\]
 
-$\{ e \colon Entry \mid \exists r \colon \ran records \bullet e \in \ran r \land e.7 \geq 70 \}$
+\[
+  \{ e \colon Entry \mid \exists r \colon \ran records \bullet e \in \ran r \land e.7 \geq 70 \}
+\]
 
-$iv$
+\[
+  iv
+\]
 
-$\{ c \colon Course \mid \forall r \colon \ran records \bullet \forall e \colon \ran r \bullet e.2 = c \Rightarrow e.7 \geq 70 \}$
+\[
+  \{ c \colon Course \mid \forall r \colon \ran records \bullet \forall e \colon \ran r \bullet e.2 = c \Rightarrow e.7 \geq 70 \}
+\]
 
-$v$
+\[
+  v
+\]
 
 \bigskip
 
@@ -2607,7 +2723,9 @@ songs
 (a)
 \par
 \vspace{11pt}
-$abbrev$
+\[
+  abbrev
+\]
 
 A == users \setminus \bigcup \ran playlistSubscribers
 
@@ -2616,7 +2734,9 @@ A == users \setminus \bigcup \ran playlistSubscribers
 (b)
 \par
 \vspace{11pt}
-$abbrev$
+\[
+  abbrev
+\]
 
 B == \{ p \colon \dom playlistSubscribers \mid \# playlistSubscribers(p) \geq 100 \}
 

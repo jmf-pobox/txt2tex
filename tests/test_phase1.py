@@ -149,8 +149,10 @@ class TestPhase1LaTeXGeneration:
 
         assert r"\documentclass{article}" in latex
         assert r"\usepackage{zed-cm}" in latex
-        assert r"$p \land q$" in latex
-        assert r"$p \lor q$" in latex
+        # Standalone expressions use display math \[...\], not inline $...$
+        assert r"\[" in latex
+        assert r"p \land q" in latex
+        assert r"p \lor q" in latex
         assert r"\end{document}" in latex
 
     def test_generate_empty_document(self) -> None:
@@ -201,9 +203,11 @@ class TestPhase1Integration:
         # Verify
         assert isinstance(ast, Document)
         assert len(ast.items) == 3
-        assert r"$p \land q$" in latex
-        assert r"$p \lor q$" in latex
-        assert r"$\lnot p$" in latex
+        # Standalone expressions use display math
+        assert r"\[" in latex
+        assert r"p \land q" in latex
+        assert r"p \lor q" in latex
+        assert r"\lnot p" in latex
 
     def test_solutions_expressions(self) -> None:
         """Test expressions from actual homework Solutions 1-3."""
@@ -222,11 +226,13 @@ not (p and q)"""
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
 
-        assert r"$p \land q \Rightarrow p$" in latex
+        # Standalone expressions use display math
+        assert r"\[" in latex
+        assert r"p \land q \Rightarrow p" in latex
         # Nested implications now have explicit parentheses for clarity
-        assert r"$p \Rightarrow (q \Rightarrow r)$" in latex
+        assert r"p \Rightarrow (q \Rightarrow r)" in latex
         # Fixed: Parentheses required around binary operand of not
-        assert r"$\lnot (p \land q)$" in latex
+        assert r"\lnot (p \land q)" in latex
 
     def test_paragraph_parsing(self) -> None:
         """Test parsing text paragraphs with TEXT: keyword."""

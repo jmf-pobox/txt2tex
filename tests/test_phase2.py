@@ -380,7 +380,8 @@ q or p [commutative]
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
 
-        # Should have both regular math mode and align* environment
-        assert r"$p \land q$" in latex
+        # Should have both display math mode and align* environment
+        assert r"\[" in latex
+        assert r"p \land q" in latex
         assert r"\begin{align*}" in latex
-        assert r"$\lnot p$" in latex
+        assert r"\lnot p" in latex

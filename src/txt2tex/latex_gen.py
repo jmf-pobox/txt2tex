@@ -259,9 +259,10 @@ class LaTeXGenerator:
         if isinstance(item, ProofTree):
             return self._generate_proof_tree(item)
 
-        # Item is an Expr - wrap in math mode
+        # Item is an Expr - wrap in display math mode
+        # Use \[...\] for standalone expressions (not inline $...$)
         latex_expr = self.generate_expr(item)
-        return [f"${latex_expr}$", ""]
+        return [r"\[", f"  {latex_expr}", r"\]", ""]
 
     def generate_expr(self, expr: Expr) -> str:
         """Generate LaTeX for expression (without wrapping in math mode)."""
