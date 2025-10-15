@@ -898,6 +898,19 @@ class LaTeXGenerator:
         text = text.replace("<=>", r"$\Leftrightarrow$")
         text = text.replace("=>", r"$\Rightarrow$")
 
+        # Convert Z notation operators (garbled character fix)
+        # Order matters: longer operators first to avoid partial matches
+        text = text.replace("|>>", r"$\nrres$")  # Range anti-restriction
+        text = text.replace("<<|", r"$\ndres$")  # Domain anti-restriction
+        text = text.replace("-|>", r"$\pinj$")  # Partial injection
+        text = text.replace("+->", r"$\pfun$")  # Partial function
+        text = text.replace(">->", r"$\inj$")   # Total injection
+        text = text.replace("<->", r"$\rel$")   # Relation type
+        text = text.replace("|->", r"$\mapsto$")  # Maplet
+        text = text.replace("<|", r"$\dres$")   # Domain restriction
+        text = text.replace("|>", r"$\rres$")   # Range restriction
+        text = text.replace("->", r"$\fun$")    # Total function
+
         # Convert keywords to symbols (QA fixes)
         # Negative lookbehind (?<!\\) ensures we don't match LaTeX commands like \forall
         # These are for standalone keywords in prose, not parsed quantifier expressions
@@ -907,11 +920,71 @@ class LaTeXGenerator:
         text = re.sub(r"(?<!\\)\bemptyset\b", r"$\\emptyset$", text)  # emptyset → ∅
         text = re.sub(r"(?<!\\)\bforall\b", r"$\\forall$", text)  # forall → ∀
 
+        # Convert bare comparison operators (garbled character fix - final pass)
+        # Catches cases not handled by _process_inline_math() (complex expressions)
+        # Tracks math mode to avoid nested $...$
+        text = self._convert_comparison_operators(text)
+
         lines.append(text)
         lines.append("")
         lines.append(r"\bigskip")  # Trailing vertical space
         lines.append("")
         return lines
+
+    def _convert_comparison_operators(self, text: str) -> str:
+        """Convert bare comparison operators to math mode, avoiding nested math.
+
+        Handles: >=, <=, >, <
+        Only converts when NOT inside existing $...$ math mode.
+        """
+        result = []
+        i = 0
+        in_math = False  # Track if we're inside $...$ math mode
+
+        while i < len(text):
+            # Check for $ to track math mode transitions
+            if text[i] == "$":
+                in_math = not in_math
+                result.append(text[i])
+                i += 1
+                continue
+
+            # Only try conversions if NOT in math mode
+            if not in_math:
+                # Try >= first (multi-char before single-char)
+                if i + 1 < len(text) and text[i : i + 2] == ">=":
+                    result.append(r"$\geq$")
+                    i += 2
+                    continue
+                # Try <=
+                if i + 1 < len(text) and text[i : i + 2] == "<=":
+                    result.append(r"$\leq$")
+                    i += 2
+                    continue
+                # Try > (only with surrounding spaces)
+                if (
+                    text[i] == ">"
+                    and (i == 0 or text[i - 1].isspace())
+                    and (i + 1 >= len(text) or text[i + 1].isspace())
+                ):
+                    result.append(r"$>$")
+                    i += 1
+                    continue
+                # Try < (only with surrounding spaces)
+                if (
+                    text[i] == "<"
+                    and (i == 0 or text[i - 1].isspace())
+                    and (i + 1 >= len(text) or text[i + 1].isspace())
+                ):
+                    result.append(r"$<$")
+                    i += 1
+                    continue
+
+            # No match, copy character as-is
+            result.append(text[i])
+            i += 1
+
+        return "".join(result)
 
     def _convert_sequence_literals(self, text: str) -> str:
         """Convert sequence literals <...> to math mode \\langle ... \\rangle.
