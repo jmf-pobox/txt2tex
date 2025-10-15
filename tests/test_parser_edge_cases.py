@@ -34,13 +34,13 @@ def test_missing_quantifier_pipe() -> None:
 
 
 def test_missing_set_comprehension_pipe() -> None:
-    """Test error when set comprehension is missing pipe."""
-    text = "{x : N  x > 0}"  # Missing |
+    """Test error when set comprehension is missing pipe or period."""
+    text = "{x : N  x > 0}"  # Missing | or .
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     with pytest.raises(
-        ParserError, match="Expected '\\|' after set comprehension binding"
+        ParserError, match="Expected '\\|' or '\\.' after set comprehension binding"
     ):
         parser.parse()
 

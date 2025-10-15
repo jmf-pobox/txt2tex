@@ -849,8 +849,9 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Phase 21: Use _parse_union to allow union/intersect in domain
+            # Phase 21/22: Use _parse_union to allow union/intersect in domain
             # Allows: forall x : A union B | P
+            # TODO Phase 23: Support relation types (A <-> B) in quantifier domains
             domain = self._parse_union()
 
         # Phase 17: Check for semicolon-separated bindings
@@ -951,7 +952,8 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            domain = self._parse_intersect()
+            # Phase 21/22: Use _parse_union to match main quantifier parser
+            domain = self._parse_union()
 
         # Check for another semicolon (more bindings)
         if self._match(TokenType.SEMICOLON):
@@ -1153,26 +1155,36 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Phase 21: Use _parse_union to allow union/intersect in domain
+            # Phase 21/22: Use _parse_union to allow union/intersect in domain
             # Allows: forall x : A union B | P
+            # TODO Phase 23: Support relation types (A <-> B) in quantifier domains
             domain = self._parse_union()
 
-        # Parse separator |
-        if not self._match(TokenType.PIPE):
-            raise ParserError(
-                "Expected '|' after set comprehension binding", self._current()
-            )
-        self._advance()  # Consume '|'
+        # Phase 22: Parse separator | or .
+        # Syntax: {x : T | predicate . expr} or {x : T . expr} (no predicate)
+        predicate: Expr | None
+        expression: Expr | None
 
-        # Parse predicate expression (up to . or })
-        predicate = self._parse_set_predicate()
-
-        # Parse optional expression part (. expression)
-        expression: Expr | None = None
         if self._match(TokenType.PERIOD):
+            # Period separator: no predicate, directly to expression
             self._advance()  # Consume '.'
-            # Parse expression (up to })
+            predicate = None
             expression = self._parse_set_expression()
+        elif self._match(TokenType.PIPE):
+            # Pipe separator: parse predicate, optionally followed by . expr
+            self._advance()  # Consume '|'
+            predicate = self._parse_set_predicate()
+
+            # Parse optional expression part (. expression)
+            expression = None
+            if self._match(TokenType.PERIOD):
+                self._advance()  # Consume '.'
+                # Parse expression (up to })
+                expression = self._parse_set_expression()
+        else:
+            raise ParserError(
+                "Expected '|' or '.' after set comprehension binding", self._current()
+            )
 
         # Expect closing brace
         if not self._match(TokenType.RBRACE):

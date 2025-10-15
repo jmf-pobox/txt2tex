@@ -693,12 +693,11 @@ end
 
 TEXT: (Requires power set, function types, and ran keyword)
 
-TEXT: axdef
-TEXT:   number_of_drivers : (Drivers <-> Cars) -> (Cars -> N)
-TEXT: where
-TEXT:   forall r : Drivers <-> Cars | number_of_drivers(r) = {c : ran r . c |-> #{d : Drivers | d |-> c in r}}
-TEXT: end
-TEXT: (Blocked by: relation types in quantifier domains - Phase 23)
+axdef
+  number_of_drivers : (Drivers <-> Cars) -> (Cars -> N)
+where
+  forall r : Drivers <-> Cars | number_of_drivers(r) = {c : ran r . c |-> #{d : Drivers | d |-> c in r}}
+end
 
 === Sequences ===
 
