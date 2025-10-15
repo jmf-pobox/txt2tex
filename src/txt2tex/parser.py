@@ -1039,6 +1039,9 @@ class Parser:
             raise ParserError("Expected '|' after quantifier binding", self._current())
         self._advance()  # Consume '|'
 
+        # Phase 21: Allow newlines after | (multi-line quantifiers)
+        self._skip_newlines()
+
         # Parse body
         # Phase 21: Use _parse_expr() to allow nested quantifiers
         # Phase 21b: Check for constrained quantifier (forall x : T | constraint | body)
@@ -1126,6 +1129,9 @@ class Parser:
         if not self._match(TokenType.PIPE):
             raise ParserError("Expected '|' after quantifier binding", self._current())
         self._advance()  # Consume '|'
+
+        # Phase 21: Allow newlines after | (multi-line quantifiers)
+        self._skip_newlines()
 
         # Parse body
         body = self._parse_iff()
