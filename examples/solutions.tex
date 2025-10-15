@@ -314,7 +314,7 @@ This is a true proposition. It is an implication whose antecedent part is false 
 \vspace{11pt}
 \bigskip
 
-We must define a predicate p that is false for at least one value of x, and is true for at least one other value. A suitable solution would be p $\Leftrightarrow$ x > 1.
+We must define a predicate p that is false for at least one value of x, and is true for at least one other value. A suitable solution would be $p \Leftrightarrow x > 1$.
 
 \bigskip
 
@@ -325,7 +325,7 @@ We must define a predicate p that is false for at least one value of x, and is t
 \vspace{11pt}
 \bigskip
 
-With the above choice of p, we require only that q is sometimes false when p is true (for else the universal quantification would hold). A suitable solution would be q $\Leftrightarrow$ x > 3.
+With the above choice of p, we require only that q is sometimes false when p is true (for else the universal quantification would hold). A suitable solution would be $q \Leftrightarrow x > 3$.
 
 \bigskip
 
@@ -558,7 +558,7 @@ and the other:
 
 \bigskip
 
-We can then combine these two proofs with $\Leftrightarrow$ intro.
+We can then combine these two proofs $with \Leftrightarrow intro$.
 
 \bigskip
 
@@ -1360,7 +1360,7 @@ axdef
 
 \bigskip
 
-children : Person -> P Person
+children : $Person \fun P$ Person
 
 \bigskip
 
@@ -1395,7 +1395,7 @@ axdef
 
 \bigskip
 
-number_of_grandchildren : Person -> N
+number_of_grandchildren : $Person \fun N$
 
 \bigskip
 
@@ -1439,7 +1439,7 @@ axdef
 
 \bigskip
 
-number_of_drivers : (Drivers <-> Cars) -> (Cars -> N)
+number_of_drivers : (Drivers <-> Cars) -> ($Cars \fun N$)
 
 \bigskip
 
@@ -1591,7 +1591,7 @@ $\{ p \colon Place \mid \exists_1 x \colon \dom trains \bullet trains(x).2 = p \
 \vspace{11pt}
 \bigskip
 
-large_coins : Collection -> N
+large_coins : $Collection \fun N$
 
 \bigskip
 
@@ -1614,7 +1614,7 @@ $\forall c \colon Collection \bullet large_coins(c) = c(large)$
 \vspace{11pt}
 \bigskip
 
-add_coin : Collection * Coin -> Collection
+add_coin : Collection * $Coin \fun Collection$
 
 \bigskip
 
@@ -1663,7 +1663,7 @@ hd : seq(Title * Length * Viewed)
 
 \bigskip
 
-cumulative_total hd <= 12000
+cumulative_total $hd \leq 12000$
 
 \bigskip
 
@@ -1705,7 +1705,7 @@ viewed <> = <>
 
 \bigskip
 
-viewed <x> ^ s = if x.3 = yes then <x> ^ viewed s else viewed s
+$viewed <x$> ^ $s = if$ x.3 = yes $then <x$> ^ viewed s else viewed s
 
 \bigskip
 
@@ -1880,7 +1880,7 @@ axdef
 
 \bigskip
 
-records : Year -|> Table
+records : $Year \pinj Table$
 
 \bigskip
 
@@ -1977,7 +1977,7 @@ where
 
 \bigskip
 
-$\forall x \colon Entry \bullet \forall s \colon \seq~Entry \bullet 479$_courses (<>) = <> and 479_courses (<x> ^ s) = if x.3 = 479 then <x> ^ 479_courses(s) else 479_courses(s)
+$\forall x \colon Entry \bullet \forall s \colon \seq~Entry \bullet 479$_courses (<>) = <> and 479_courses (<x> ^ s) = if x.3 = 479 $then <x$> ^ 479_courses(s) else 479_courses(s)
 
 \bigskip
 
@@ -2060,7 +2060,7 @@ axdef
 
 \bigskip
 
-add : N * Person * State -|> State
+add : N * Person * $State \pinj State$
 
 \bigskip
 
@@ -2254,7 +2254,7 @@ reverse (<> ^ t) = reverse t [cat.1a] = (reverse t) ^ <> [cat.1b]
 
 \bigskip
 
-where cat.1a is <> ^ s = s and cat.1b is s ^ <> = s
+where cat.1a is <> ^ $s = s$ and cat.1b is s ^ <> = s
 
 \bigskip
 
@@ -2407,13 +2407,13 @@ reverse (reverse (<x> ^ t))
 \vspace{11pt}
 \bigskip
 
-count : Tree -> N
+count : $Tree \fun N$
 
 \bigskip
 
 \bigskip
 
-count stalk = 0
+count $stalk = 0$
 
 \bigskip
 
@@ -2442,7 +2442,7 @@ $\forall t1, t2 \colon Tree \bullet count(branch(t1, t2)) = count$t1 + count t2
 \vspace{11pt}
 \bigskip
 
-flatten : Tree -> seq N
+flatten : $Tree \fun seq$ N
 
 \bigskip
 
@@ -2679,7 +2679,7 @@ Let's first define two helper functions:
 
 \bigskip
 
-loveHateScore : SongId +-> N
+loveHateScore : $SongId \pfun N$
 
 \bigskip
 
@@ -2781,7 +2781,7 @@ not (exists1 i : songs | $\forall j \colon songs \bullet i \neq j$| popularity(i
 
 \bigskip
 
-mostPopular = nullSong
+$mostPopular = nullSong$
 
 \bigskip
 

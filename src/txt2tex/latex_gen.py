@@ -971,6 +971,62 @@ class LaTeXGenerator:
                         # Try shorter substring
                         continue
 
+        # Pattern 3: Simple inline math expressions (x > 1, f +-> g, etc.)
+        # Match expressions with math operators that need wrapping
+        # Strategy: Match sequences of identifiers/numbers connected by operators
+
+        # All operators that need math mode
+        math_op_pattern = r"(\+->|-\|>|<-\||->|>->|>->>|<=>|=>|>=|<=|!=|>|<|=)"
+
+        # Pattern: identifier/number, followed by (operator identifier/number)+
+        # This matches chains like "p <=> x > 1"
+        full_pattern = (
+            r"\b([a-zA-Z_]\w*)\s*"  # First identifier
+            + math_op_pattern  # Operator
+            + r"\s*([a-zA-Z_0-9]\w*)"  # Second operand
+            + r"(?:\s*" + math_op_pattern + r"\s*([a-zA-Z_0-9]\w*))*"  # More ops
+        )
+
+        matches = list(re.finditer(full_pattern, result))
+
+        # Process matches in reverse order to preserve positions
+        for match in reversed(matches):
+            # Check if already in math mode (look for $ before)
+            start_pos = match.start()
+            end_pos = match.end()
+
+            # Look backwards for $
+            before = result[:start_pos]
+
+            # Count $ symbols before this position
+            dollars_before = before.count("$")
+            # If odd number of $, we're already in math mode
+            if dollars_before % 2 == 1:
+                continue
+
+            # Extract the matched expression
+            expr = match.group(0)
+
+            # Convert the operator to LaTeX
+            try:
+                # Try to parse and generate proper LaTeX
+                lexer = Lexer(expr)
+                tokens = lexer.tokenize()
+                parser = Parser(tokens)
+                ast = parser.parse()
+
+                # Generate LaTeX for the expression if it's an Expr
+                if isinstance(ast, Expr):
+                    math_latex = self.generate_expr(ast)
+                    # Wrap in $...$
+                    result = (
+                        result[:start_pos] + f"${math_latex}$" + result[end_pos:]
+                    )
+            except Exception:
+                # If parsing fails, just wrap as-is
+                # Still need to convert operators
+                result = result[:start_pos] + f"${expr}$" + result[end_pos:]
+
         return result
 
     def _generate_truth_table(self, node: TruthTable) -> list[str]:
