@@ -1664,17 +1664,9 @@ f : Place \fun \power~Place
 (c)
 \par
 \vspace{11pt}
-\bigskip
-
-(mu p : Place | $\forall q \colon Place \bullet p \neq q$| # $\{ x \colon \dom trains \mid trains(x).2 = p \}$ > # $\{ x \colon \dom trains \mid trains(x).2 = q \}$)
-
-\bigskip
-
-\bigskip
-
-(Blocked by: nested quantifiers in mu with multiple pipes - parser ambiguity)
-
-\bigskip
+\[
+  \mu p \colon Place \bullet \forall q \colon Place \bullet p \neq q \land \# \{ x \colon \dom trains \mid trains(x).2 = p \} > \# \{ x \colon \dom trains \mid trains(x).2 = q \}
+\]
 
 \medskip
 
@@ -1834,7 +1826,7 @@ cumulative_total(\langle \rangle) = 0
 \vspace{11pt}
 \bigskip
 
-(mu p : ran hd | $\forall q \colon \ran hd \bullet p \neq q$| p.2 > q.2 | p.1)
+(mu p : ran hd | $\forall q \colon \ran hd \bullet p \neq q \land p.2 > q.2$| p.1)
 
 \bigskip
 
@@ -1928,7 +1920,7 @@ where
 
 \bigskip
 
-$\forall s \colon \seq~Title * Length * Viewed \bullet longest_viewed(s)$= ($\mu p \colon \ran s \bullet p.3 = yes$and $\forall q \colon \ran s \bullet p \neq q \land q.3 = yes$| p.2 > q.2)
+$\forall s \colon \seq~Title * Length * Viewed \bullet longest_viewed(s)$= ($\mu p \colon \ran s \bullet p.3 = yes$and $\forall q \colon \ran s \bullet p \neq q \land q.3 = yes \land p.2 > q.2$)
 
 \bigskip
 
@@ -2149,7 +2141,7 @@ where
 
 \bigskip
 
-forall s : State | $\forall i, j \colon \dom s \bullet i \neq j$| ran(s(i)) intersect ran(s(j)) = {}
+forall s : State | $\forall i, j \colon \dom s \bullet i \neq j \land \ran s(i) \cap \ran s(j) = \{\}$
 
 \bigskip
 
@@ -2223,7 +2215,7 @@ end
 \vspace{11pt}
 \bigskip
 
-(i) forall i : dom bookings | $\forall x, y \colon bookings(i) \bullet x \neq y$| (x.2..x.3) intersect (y.2..y.3) = {}
+(i) forall i : dom bookings | $\forall x, y \colon bookings(i) \bullet x \neq y \land x.2 \upto x.3 \cap y.2 \upto y.3 = \{\}$
 
 \bigskip
 
@@ -2318,7 +2310,7 @@ end
 
 \bigskip
 
-(iv) {r : Room | $\exists i \colon \dom bookings \bullet i.1 = r$| # (bookings(i)) >= 10}
+(iv) {r : Room | $\exists i \colon \dom bookings \bullet i.1 = r \land \# bookings(i) \geq 10$}
 
 \bigskip
 
@@ -2745,34 +2737,14 @@ B == \{ p \colon \dom playlistSubscribers \mid \# playlistSubscribers(p) \geq 10
 (c)
 \par
 \vspace{11pt}
-\bigskip
-
-C == (mu u : dom(loved) | $\forall v \colon \dom loved \bullet u \neq v$| # (loved(u)) > # (loved(v)))
-
-\bigskip
-
-\bigskip
-
-(Blocked by: nested quantifiers in mu - parser ambiguity)
-
-\bigskip
+C == \mu u \colon \dom loved \bullet \forall v \colon \dom loved \bullet u \neq v \land \# loved(u) > \# loved(v)
 
 \medskip
 
 (d)
 \par
 \vspace{11pt}
-\bigskip
-
-D == (mu s : songs | $\forall t \colon songs \bullet s \neq t$| # $\{ u \colon UserId \mid s \in loved(u) \}$ > # $\{ u \colon UserId \mid t \in loved(u) \}$)
-
-\bigskip
-
-\bigskip
-
-(Blocked by: nested quantifiers in mu - parser ambiguity)
-
-\bigskip
+D == \mu s \colon songs \bullet \forall t \colon songs \bullet s \neq t \land \# \{ u \colon UserId \mid s \in loved(u) \} > \# \{ u \colon UserId \mid t \in loved(u) \}
 
 \medskip
 
@@ -2877,13 +2849,13 @@ mostPopular : SongId
 
 \bigskip
 
-(exists1 i : songs | $\forall j \colon songs \bullet i \neq j$| popularity(i) > popularity(j)) $\Rightarrow$
+(exists1 i : songs | $\forall j \colon songs \bullet i \neq j \land popularity(i) > popularity(j)$) $\Rightarrow$
 
 \bigskip
 
 \bigskip
 
-mostPopular = (mu i : songs | $\forall j \colon songs \bullet i \neq j$| popularity(i) > popularity(j))
+mostPopular = (mu i : songs | $\forall j \colon songs \bullet i \neq j \land popularity(i) > popularity(j)$)
 
 \bigskip
 
@@ -2893,23 +2865,9 @@ and
 
 \bigskip
 
-\bigskip
-
-not (exists1 i : songs | $\forall j \colon songs \bullet i \neq j$| popularity(i) > popularity(j)) $\Rightarrow$
-
-\bigskip
-
-\bigskip
-
-$mostPopular = nullSong$
-
-\bigskip
-
-\bigskip
-
-(Blocked by: nested quantifiers in mu - parser ambiguity)
-
-\bigskip
+\[
+  \lnot \exists_1 i \colon songs \bullet \forall j \colon songs \bullet i \neq j \land popularity(i) > popularity(j) \Rightarrow mostPopular = nullSong
+\]
 
 \medskip
 
