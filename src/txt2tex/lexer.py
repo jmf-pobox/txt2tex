@@ -472,6 +472,24 @@ class Lexer:
             self._advance()
             return Token(TokenType.TFUN, "->", start_line, start_column)
 
+        # Phase 20: Visual separator lines (-----, ===== etc.)
+        # If at start of line and followed by many more of the same character,
+        # treat as TEXT
+        if start_column == 1 and char == "-":
+            # Check if this is a separator line (many dashes)
+            consecutive_dashes = 1
+            temp_pos = self.pos + 1
+            while temp_pos < len(self.text) and self.text[temp_pos] == "-":
+                consecutive_dashes += 1
+                temp_pos += 1
+            # If 10+ consecutive dashes at start of line, treat as TEXT separator
+            if consecutive_dashes >= 10:
+                text_start = self.pos
+                while not self._at_end() and self._current_char() != "\n":
+                    self._advance()
+                text_content = self.text[text_start : self.pos]
+                return Token(TokenType.TEXT, text_content, start_line, start_column)
+
         # Standalone minus (subtraction/negation)
         if char == "-":
             self._advance()
@@ -627,6 +645,9 @@ class Lexer:
             "If", "Since", "Because", "Although", "While",
             "Each", "Every", "Some", "All", "Any",
             "By", "From", "To", "With", "Without",
+            "First", "Second", "Third", "Finally", "Next", "Then",
+            "Note", "Consider", "Suppose", "Recall", "Let",
+            "Given", "Assuming", "Hence", "Thus", "Therefore",
         }
 
         if start_column == 1 and value in prose_starters:
@@ -639,7 +660,8 @@ class Lexer:
             text_content = self.text[text_start : self.pos]
             return Token(TokenType.TEXT, text_content, start_line, start_column)
 
-        # Special handling for articles A/An - only treat as prose if followed by common English word
+        # Special handling for articles A/An - only treat as prose if followed
+        # by common English word
         if start_column == 1 and value in ("A", "An"):
             # Peek ahead to check if this is an article or a type name
             # Article: "A function is..." or "An element is..."
@@ -655,7 +677,9 @@ class Lexer:
                 if next_char.islower():
                     # Scan the next word
                     next_word_start = temp_pos
-                    while temp_pos < len(self.text) and (self.text[temp_pos].isalnum() or self.text[temp_pos] == "_"):
+                    while temp_pos < len(self.text) and (
+                        self.text[temp_pos].isalnum() or self.text[temp_pos] == "_"
+                    ):
                         temp_pos += 1
                     next_word = self.text[next_word_start:temp_pos]
 
@@ -674,7 +698,9 @@ class Lexer:
                         while not self._at_end() and self._current_char() != "\n":
                             self._advance()
                         text_content = self.text[text_start : self.pos]
-                        return Token(TokenType.TEXT, text_content, start_line, start_column)
+                        return Token(
+                            TokenType.TEXT, text_content, start_line, start_column
+                        )
 
         # Check for lowercase keywords at start of line that might be prose
         # Examples: "where cat.1a is", "and the second by"
