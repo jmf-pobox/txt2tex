@@ -48,7 +48,11 @@
       "Bash(PYTHONPATH=src python3:*)",
       "Bash(for:*)",
       "Bash(do echo \"=== Testing $f ===\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(chmod:*)",
+      "Bash(./qa_check.sh:*)",
+      "Bash(TEXINPUTS=/Users/jfreeman/Coding/fuzz/txt2tex/sem/latex//: pdflatex:*)",
+      "Bash(env TEXINPUTS=/Users/jfreeman/Coding/fuzz/txt2tex/sem/latex//: pdflatex:*)"
     ],
     "deny": [],
     "ask": []

@@ -153,8 +153,9 @@ def test_quantifier_without_pipe() -> None:
     latex_lines = gen._generate_paragraph(para)
     latex = "\n".join(latex_lines)
 
-    # Should not be processed as quantifier (no pipe)
-    assert "forall x" in latex
+    # "forall" keyword (one word) should convert to symbol (English uses "for all")
+    # Per user requirement: forall → ∀, but not processed as full quantifier
+    assert r"\forall" in latex
 
 
 def test_inline_math_parse_failure() -> None:
