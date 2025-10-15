@@ -72,9 +72,7 @@ def test_multiple_set_comprehensions() -> None:
 
 def test_nested_set_in_set_comprehension() -> None:
     """Test set comprehension containing a set literal."""
-    para = Paragraph(
-        text="Consider {x : N | x in {1, 2}}.", line=1, column=1
-    )
+    para = Paragraph(text="Consider {x : N | x in {1, 2}}.", line=1, column=1)
 
     gen = LaTeXGenerator()
     latex_lines = gen._generate_paragraph(para)

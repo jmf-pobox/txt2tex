@@ -1,0 +1,2928 @@
+\documentclass{article}
+\usepackage{fuzz}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Propositional logic}
+
+\bigskip
+\noindent
+\textbf{Solution 1}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$false(as(true \Rightarrow false) \Leftrightarrow false)$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$true(as(false \Rightarrow false) \Leftrightarrow true)$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$true(as(false \Rightarrow true) \Leftrightarrow true)$
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+$true(as(false \Rightarrow false) \Leftrightarrow true)$
+
+\bigskip
+
+(Assuming that pigs can't fly . . . )
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 2}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\begin{center}
+\begin{tabular}{c c c c}
+$p$ & $q$ & $p \land q$ & $( p \land q ) \Rightarrow p$ \\
+\hline
+t & t & t & t \\
+t & f & f & t \\
+f & t & f & t \\
+f & f & f & t \\
+\end{tabular}
+\end{center}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\begin{center}
+\begin{tabular}{c c c c c c}
+$p$ & $q$ & $p \land q$ & $\lnot p$ & $\lnot p \Rightarrow ( p \land q )$ & $( \lnot p \Rightarrow ( p \land q ) ) \Leftrightarrow p$ \\
+\hline
+t & t & t & f & t & t \\
+t & f & f & f & t & t \\
+f & t & f & t & f & t \\
+f & f & f & t & f & t \\
+\end{tabular}
+\end{center}
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\begin{center}
+\begin{tabular}{c c c c c}
+$p$ & $q$ & $p \Rightarrow q$ & $p \land ( p \Rightarrow q )$ & $( p \land ( p \Rightarrow q ) ) \Rightarrow q$ \\
+\hline
+t & t & t & t & t \\
+t & f & f & f & t \\
+f & t & t & f & t \\
+f & f & t & f & t \\
+\end{tabular}
+\end{center}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 3}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+p \Rightarrow \lnot p \\
+&\Leftrightarrow \lnot p \lor \lnot p && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot p && \text{[idempotence]}
+\end{align*}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+\lnot p \Rightarrow p \\
+&\Leftrightarrow \lnot \lnot p \lor p && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow p \lor p && \text{[$\lnot$ $\lnot$]} \\
+&\Leftrightarrow p && \text{[idempotence]}
+\end{align*}
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+p \Rightarrow (q \Rightarrow r) \\
+&\Leftrightarrow \lnot p \lor (q \Rightarrow r) && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot p \lor \lnot q \lor r && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot p \lor \lnot q \lor r && \text{[associativity]} \\
+&\Leftrightarrow \lnot (p \land q) \lor r && \text{[De Morgan]} \\
+&\Leftrightarrow p \land q \Rightarrow r && \text{[$\Rightarrow$]}
+\end{align*}
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+q \Rightarrow (p \Rightarrow r) \\
+&\Leftrightarrow \lnot q \lor (p \Rightarrow r) && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot q \lor \lnot p \lor r && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot p \lor \lnot q \lor r && \text{[associativity $\land$ commutativity]} \\
+&\Leftrightarrow \lnot p \lor (q \Rightarrow r) && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow p \Rightarrow (q \Rightarrow r) && \text{[$\Rightarrow$]}
+\end{align*}
+
+\medskip
+
+(e)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+p \land q \Leftrightarrow p \\
+&\Leftrightarrow (p \land q \Rightarrow p) \land (p \Rightarrow p \land q) && \text{[$\Leftrightarrow$]} \\
+&\Leftrightarrow (\lnot (p \land q) \lor p) \land (\lnot p \lor p \land q) && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow (\lnot p \lor \lnot q \lor p) \land (\lnot p \lor p \land q) && \text{[De Morgan]} \\
+&\Leftrightarrow (\lnot q \lor \lnot p \lor p) \land (\lnot p \lor p \land q) && \text{[associativity $\land$ comm .]} \\
+&\Leftrightarrow (\lnot q \lor true) \land (\lnot p \lor p \land q) && \text{[excluded middle]} \\
+&\Leftrightarrow true \land (\lnot p \lor p \land q) && \text{[$\lor$ $\land$ true]} \\
+&\Leftrightarrow \lnot p \lor p \land q && \text{[$\land$ $\land$ true]} \\
+&\Leftrightarrow (\lnot p \lor p) \land (\lnot p \lor q) && \text{[distribution]} \\
+&\Leftrightarrow true \land (\lnot p \lor q) && \text{[excluded middle]} \\
+&\Leftrightarrow \lnot p \lor q && \text{[$\land$ $\land$ true]} \\
+&\Leftrightarrow p \Rightarrow q && \text{[$\Rightarrow$]}
+\end{align*}
+
+\medskip
+
+(f)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+p \lor q \Leftrightarrow p \\
+&\Leftrightarrow (p \lor q \Rightarrow p) \land (p \Rightarrow p \lor q) && \text{[$\Leftrightarrow$]} \\
+&\Leftrightarrow (\lnot (p \lor q) \lor p) \land (\lnot p \lor p \lor q) && \text{[$\Rightarrow$]} \\
+&\Leftrightarrow (\lnot p \land \lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[De Morgan]} \\
+&\Leftrightarrow (\lnot p \lor p) \land (\lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[distribution]} \\
+&\Leftrightarrow true \land (\lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[excluded middle]} \\
+&\Leftrightarrow (\lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[$\land$ $\land$ true]} \\
+&\Leftrightarrow (\lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[associativity]} \\
+&\Leftrightarrow (\lnot q \lor p) \land (true \lor q) && \text{[excluded middle]} \\
+&\Leftrightarrow (\lnot q \lor p) \land true && \text{[$\lor$ $\land$ true]} \\
+&\Leftrightarrow \lnot q \lor p && \text{[$\land$ $\land$ true]} \\
+&\Leftrightarrow q \Rightarrow p && \text{[$\Rightarrow$]}
+\end{align*}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 4}
+
+\medskip
+
+\bigskip
+
+(a) (p or q) $\Leftrightarrow$ ((not p or not q) and q) is not a tautology. You might illustrate this via a truth table or via a chain of equivalences, showing that the proposition is not equivalent to true. Alternatively, you might try and find a combination of values for which the proposition is false. (In this case, the proposition is false when p and q are both true.)
+
+\bigskip
+
+\bigskip
+
+(b) (p or q) $\Leftrightarrow$ ((not p and not q) or q) is not a tautology. In this case, the proposition is false when p is true and q is false.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 5}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\exists d : Dog \spot gentle(d) \land well_trained(d)$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\forall d : Dog \spot neat(d) \land well_trained(d) \Rightarrow attractive(d)$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+(Requires nested quantifier in implication - parser limitation)
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 6}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+This is a true proposition: whatever the value of x, the expression x^2 - x + 1 denotes a natural number. If we choose y to be this natural number, we will find that p is true.
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+This is a false proposition. We cannot choose a large enough value for y such that p will hold for any value of x.
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+This is a false proposition. It is an implication whose antecedent part is true and whose consequent part is false.
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+This is a true proposition. It is an implication whose antecedent part is false and whose consequent part is true.
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 7}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+We must define a predicate p that is false for at least one value of x, and is true for at least one other value. A suitable solution would be p $\Leftrightarrow$ x > 1.
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+With the above choice of p, we require only that q is sometimes false when p is true (for else the universal quantification would hold). A suitable solution would be q $\Leftrightarrow$ x > 3.
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 8}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\forall x : N \spot x \geq z$
+
+\medskip
+
+\section*{Equality}
+
+\bigskip
+\noindent
+\textbf{Solution 9}
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+\exists x : N \spot x = 1 \land x > y \lor x = 2 \land x > z \\
+&\Leftrightarrow \exists x : N \spot x = 1 \land x > y \lor \exists x : N \spot x = 2 \land x > z \\
+&\Leftrightarrow 1 \in N \land 1 > y \lor \exists x : N \spot x = 2 \land x > z \\
+&\Leftrightarrow 1 \in N \land 1 > y \lor 2 \in N \land 2 > z \\
+&\Leftrightarrow 1 > y \lor 2 > z
+\end{align*}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 10}
+
+\medskip
+
+\bigskip
+
+As discussed, the quantifier exists1 can help give rise to a 'test' or 'precondition' to ensure that an application of mu will work.
+
+\bigskip
+
+\bigskip
+
+So, as a simple example, as the proposition
+
+\bigskip
+
+$\exists_1 n : N \spot \forall m : N \spot n \leq m$
+
+\bigskip
+
+is equivalent to true, we can be certain that the statement
+
+\bigskip
+
+$\mu n : N \spot \forall m : N \spot n \leq m$
+
+\bigskip
+
+will return a result (which happens to be 0).
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 11}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+($\mu a : N \spot a = a$) = 0 is a provable statement, since 0 is the only natural number with the specified property.
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+($\mu b : N \spot b = b$) = 1 is not provable. The specified property is true of both 0 and 1, and thus the value of the mu-expression is undefined.
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+($\mu c : N \spot c > c$) = ($\mu c : N \spot c > c$) is a provable statement. Neither expression is properly defined, but we may conclude that they are equal; there is little else that we can prove about them.
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+($\mu d : N \spot d = d$) = 1 is not a provable statement. We cannot confirm that 1 is the only natural number with the specified property; we do not know what value is taken by undefined operations.
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 12}
+
+\medskip
+
+\bigskip
+
+(Requires mu-operator with expression part - not yet implemented)
+
+\bigskip
+
+(a)
+\par
+\vspace{11pt}
+$\mu m : Mountain | \forall n : Mountain \spot height(n) \leq height(m) \spot height(m)$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\mu c : Chapter | \exists_1 d : Chapter \spot length(d) > length(c) \spot length(c)$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+Assuming the existence of a suitable function, max: ($\mu n : N \spot n = max$($\{ m : N | 8 * m < 100.8 * m \}$) . 100 - n)
+
+\bigskip
+
+\medskip
+
+\section*{Deductive proofs}
+
+\bigskip
+\noindent
+\textbf{Solution 13}
+
+\medskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{p \land (p \Rightarrow q) \Rightarrow p \land q}{
+  \ulcorner p \land (p \Rightarrow q) \urcorner^{[1]} & \infer[\text{$\land$ intro}]{p \land q}{
+  \infer[$\land$\text{-elim}^{[1]}]{p}{
+  p \land (p \Rightarrow q)
+} & \infer[\text{$\Rightarrow$ elim}]{q}{
+  \infer[$\land$\text{-elim}^{[1]}]{p \Rightarrow q}{
+  p \land (p \Rightarrow q)
+} & \infer[$\land$\text{-elim}^{[1]}]{p}{
+  p \land (p \Rightarrow q)
+}
+}
+}
+}
+\]
+
+\bigskip
+\noindent
+\textbf{Solution 14}
+
+\medskip
+
+\bigskip
+
+In one direction:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \land q \Leftrightarrow p) \Rightarrow (p \Rightarrow q)}{
+  \ulcorner p \land q \Leftrightarrow p \urcorner^{[1]} & \infer[$\Rightarrow$\text{-intro}^{[2]}]{p \Rightarrow q}{
+  \ulcorner p \urcorner^{[2]} & \infer[$\land$\text{-elim}^{[3]}]{q}{
+  \infer[\text{$\Rightarrow$ elim from 1 $\land$ 2}]{p \land q}{
+  \infer[derived]{p \land q}{}
+}
+}
+}
+}
+\]
+
+\bigskip
+
+and the other:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \Rightarrow q) \Rightarrow (p \land q \Leftrightarrow p)}{
+  \ulcorner p \Rightarrow q \urcorner^{[1]} & \infer[\text{$\Leftrightarrow$ intro}]{p \land q \Leftrightarrow p}{
+  \infer[$\Rightarrow$\text{-intro}^{[2]}]{p \land q \Rightarrow p}{
+  \ulcorner p \land q \urcorner^{[2]} & \ulcorner p \urcorner^{[2]}
+} & \infer[$\Rightarrow$\text{-intro}^{[3]}]{p \Rightarrow p \land q}{
+  \ulcorner p \urcorner^{[3]} & \ulcorner p \land q \urcorner^{[1]}
+}
+}
+}
+\]
+
+\bigskip
+
+We can then combine these two proofs with $\Leftrightarrow$ intro.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 15}
+
+\medskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \Rightarrow q) \land \lnot q \Rightarrow \lnot p}{
+  \ulcorner (p \Rightarrow q) \land \lnot q \urcorner^{[1]} & \infer[false\text{-elim}^{[2]}]{\lnot p}{
+  \ulcorner p \urcorner^{[2]} & \infer[\text{false intro}]{false}{
+  \infer[\text{$\Rightarrow$ elim}]{q}{
+  \ulcorner p \Rightarrow q \urcorner^{[1]} & \ulcorner p \urcorner^{[2]}
+} & \ulcorner \lnot q \urcorner^{[1]}
+}
+}
+}
+\]
+
+\bigskip
+\noindent
+\textbf{Solution 16}
+
+\medskip
+
+\bigskip
+
+In one direction:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{p \land (q \lor r) \Rightarrow p \land q \lor p \land r}{
+  \ulcorner p \land (q \lor r) \urcorner^{[1]} & \infer[$\lor$\text{-elim}^{[2]}]{p \land q \lor p \land r}{
+  \ulcorner q \lor r \urcorner^{[1]} & \raiseproof{10ex}{\infer[\text{$\land$ intro}]{p \land q}{
+  \ulcorner p \urcorner^{[1]} & \infer[\text{case assumption}]{q}{}
+} & \infer[\text{$\lor$ intro}]{p \land q \lor p \land r}{}} & \hskip 6em \raiseproof{26ex}{\infer[\text{$\land$ intro}]{p \land r}{
+  \ulcorner p \urcorner^{[1]} & \infer[\text{case assumption}]{r}{}
+} & \infer[\text{$\lor$ intro}]{p \land q \lor p \land r}{}}
+}
+}
+\]
+
+\bigskip
+
+In the other:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[3]}]{p \land q \lor p \land r \Rightarrow p \land (q \lor r)}{
+  \ulcorner p \land q \lor p \land r \urcorner^{[3]} & \infer[$\lor$\text{-elim}^{[4]}]{p \land (q \lor r)}{
+  \ulcorner case1 \lor case2 \urcorner^{[3]} & \raiseproof{8ex}{\infer[\text{$\land$ elim}]{p}{} & \infer[\text{$\lor$ intro}]{q \lor r}{} & \infer[\text{$\land$ intro}]{p \land (q \lor r)}{}} & \hskip 6em \raiseproof{22ex}{\infer[\text{$\land$ elim}]{p}{} & \infer[\text{$\lor$ intro}]{q \lor r}{} & \infer[\text{$\land$ intro}]{p \land (q \lor r)}{}}
+}
+}
+\]
+
+\bigskip
+\noindent
+\textbf{Solution 17}
+
+\medskip
+
+\bigskip
+
+In one direction:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[3]}]{p \lor q \land r \Rightarrow (p \lor q) \land (p \lor r)}{
+  \ulcorner p \lor q \land r \urcorner^{[3]} & \infer[\text{$\lor$ elim $\land$ $\land$ intro}]{(p \lor q) \land (p \lor r)}{}
+}
+\]
+
+\bigskip
+
+and the other:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \lor q) \land (p \lor r) \Rightarrow p \lor q \land r}{
+  \ulcorner (p \lor q) \land (p \lor r) \urcorner^{[1]} & \ulcorner p \lor q \land r \urcorner^{[2]}
+}
+\]
+
+\bigskip
+\noindent
+\textbf{Solution 18}
+
+\medskip
+
+\bigskip
+
+In one direction:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \Rightarrow q) \Rightarrow \lnot p \lor q}{
+  \ulcorner p \Rightarrow q \urcorner^{[1]} & \lnot p \lor q
+}
+\]
+
+\bigskip
+
+and the other:
+
+\bigskip
+
+\noindent
+\[
+\infer[$\Rightarrow$\text{-intro}^{[3]}]{\lnot p \lor q \Rightarrow (p \Rightarrow q)}{
+  \ulcorner \lnot p \lor q \urcorner^{[3]} & \infer[$\Rightarrow$\text{-intro}^{[4]}]{p \Rightarrow q}{
+  \ulcorner p \urcorner^{[4]} & \ulcorner q \urcorner^{[3]}
+}
+}
+\]
+
+\section*{Sets and types}
+
+\bigskip
+\noindent
+\textbf{Solution 19}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+1 in {4, 3, 2, 1} is true.
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+{1} in {1, 2, 3, 4} is undefined.
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+{1} in {{1}, {2}, {3}, {4}} is true.
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+The empty set in {1, 2, 3, 4} is undefined.
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 20}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\{1\} \cross \{2, 3\}$
+
+\bigskip
+
+is the set {(1, 2), (1, 3)}
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+The empty set cross {2, 3} is the empty set
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\power~emptyset \cross \{1\}$
+
+\bigskip
+
+is the set {(emptyset, 1)}
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+{(1, 2)} cross {3, 4} is the set {((1, 2), 3), ((1, 2), 4)}
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 21}
+
+\medskip
+
+\bigskip
+
+There are various ways of describing these sets via set comprehensions. Examples are given below.
+
+\bigskip
+
+(a)
+\par
+\vspace{11pt}
+$\{ z : Z | 0 \leq z \land z \leq 100 \}$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{ z : Z | z = 10 \}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\{ z : Z | z \bmod 2 = 0 \lor z \bmod 3 = 0 \lor z \bmod 5 = 0 \}$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 22}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\{ n : N | n \leq 4 \spot n^2 \}$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{ n : N | n \leq 4 \spot (n, n^2) \}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+{ n : P {0, 1} }
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+{ n : P {0, 1} | true . (n, # n) }
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 23}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+x \in a \cap a \\
+&\Leftrightarrow x \in a \land x \in a \\
+&\Leftrightarrow x \in a
+\end{align*}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+x \in a \cup a \\
+&\Leftrightarrow x \in a \lor x \in a \\
+&\Leftrightarrow x \in a
+\end{align*}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 24}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of all pairs of integers is Z cross Z. To give it a name, we could write:
+
+\bigskip
+
+Pairs == Z \cross Z
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of all integer pairs in which each element is strictly greater than zero could be defined by:
+
+\bigskip
+
+StrictlyPositivePairs == \{ m, n : Z | m > 0 \land n > 0 \spot (m, n) \}
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+It is intuitive to use a singular noun for the name of a basic type; we define the set of all people by writing:
+
+\bigskip
+
+\begin{zed}[Person]\end{zed}
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of all couples could be defined by:
+
+\bigskip
+
+Couples == \{ s : \power~Person | \# s = 2 \}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 25}
+
+\medskip
+
+\bigskip
+
+(Requires generic set notation and Cartesian product)
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 26}
+
+\medskip
+
+\bigskip
+
+(Requires generic parameters and relation type notation)
+
+\bigskip
+
+\section*{Relations}
+
+\bigskip
+\noindent
+\textbf{Solution 27}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+The power set of {(0,0), (0,1), (1,0), (1,1)} is:
+
+\bigskip
+
+$\{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 0)\}, \{(1, 1)\}, \{(1, 0), (1, 1)\}, \{(0, 0), (0, 1)\}, \{(0, 1), (1, 1)\}, \{(0, 1), (1, 0)\}, \{(0, 0), (1, 1)\}, \{(0, 0), (1, 0)\}, \{(0, 0), (1, 0), (1, 1)\}, \{(0, 0), (0, 1), (1, 1)\}, \{(0, 0), (0, 1), (1, 0)\}, \{(0, 1), (1, 0), (1, 1)\}, \{(0, 0), (0, 1), (1, 0), (1, 1)\}\}$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(0, 0), (0, 1)\}\}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\{emptyset\}$
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+$\{emptyset\}$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 28}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\dom R = \{0, 1, 2\}$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\ran R = \{1, 2, 3\}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\{1, 2\} \dres R = \{1 \mapsto 2, 1 \mapsto 3, 2 \mapsto 3\}$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 29}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\{2 \mapsto 4, 3 \mapsto 3, 3 \mapsto 4, 4 \mapsto 2\}$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{1 \mapsto 3, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 1\}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\{1 \mapsto 1, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4 \mapsto 4\}$
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+$\{1 \mapsto 4, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4 \mapsto 1\}$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 30}
+
+\medskip
+
+\begin{axdef}
+childOf : Person \rel Person
+\end{axdef}
+
+(a)
+\par
+\vspace{11pt}
+parentOf == childOf^{-1}
+
+\bigskip
+
+This is a good example of how there are many different ways of writing the same thing. An alternative abbreviation is:
+
+\bigskip
+
+parentOf == \{ x, y : Person | x \mapsto y \in childOf \spot y \mapsto x \}
+
+\bigskip
+
+Or, via an axiomatic definition:
+
+\bigskip
+
+\begin{axdef}
+parentOf : Person \rel Person
+\where
+parentOf = childOf^{-1}
+\end{axdef}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+siblingOf == (childOf \circ parentOf) \setminus id
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+cousinOf == childOf \circ siblingOf \circ parentOf
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+ancestorOf == parentOf^+
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 31}
+
+\medskip
+
+\bigskip
+
+(Requires compound identifiers with operators - R+, R*)
+
+\bigskip
+
+(a)
+\par
+\vspace{11pt}
+R == \{ a, b : N | b = a \lor b = a \}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+S == \{ a, b : N | b = a \lor b = a \}
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+R+ == $\{ a, b : N | b > a \}$
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+R* == $\{ a, b : N | b \geq a \}$
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 32}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+x \mapsto y \in A \dres B \dres R \\
+&\Leftrightarrow x \in A \land x \mapsto y \in (B \dres R) \\
+&\Leftrightarrow x \in A \land x \in B \land x \mapsto y \in R \\
+&\Leftrightarrow x \in A \cap B \land x \mapsto y \in R \\
+&\Leftrightarrow x \mapsto y \in A \cap B \dres R
+\end{align*}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\vspace{-10pt}
+\begin{align*}
+x \mapsto y \in R \cup S \rres C \\
+&\Leftrightarrow x \mapsto y \in R \cup S \land y \in C \\
+&\Leftrightarrow (x \mapsto y \in R \lor x \mapsto y \in S) \land y \in C \\
+&\Leftrightarrow x \mapsto y \in R \land y \in C \lor x \mapsto y \in S \land y \in C \\
+&\Leftrightarrow x \mapsto y \in R \rres C \lor x \mapsto y \in S \rres C \\
+&\Leftrightarrow x \mapsto y \in (R \rres C) \cup (S \rres C)
+\end{align*}
+
+\medskip
+
+\section*{Functions}
+
+\bigskip
+\noindent
+\textbf{Solution 33}
+
+\medskip
+
+\bigskip
+
+The set of 9 functions:
+
+\bigskip
+
+$\{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 1)\}, \{(1, 0)\}, \{(0, 0), (1, 1)\}, \{(0, 1), (1, 1)\}, \{(1, 0), (0, 0)\}, \{(0, 1), (1, 0)\}\}$
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of total functions:
+
+\bigskip
+
+$\{\{(0, 0), (1, 1)\}, \{(0, 1), (1, 1)\}, \{(1, 0), (0, 0)\}, \{(0, 1), (1, 0)\}\}$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of functions which are neither injective nor surjective:
+
+\bigskip
+
+$\{\{(0, 1), (1, 1)\}, \{(0, 0), (1, 0)\}\}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of functions which are injective but not surjective:
+
+\bigskip
+
+$\{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 0)\}, \{(1, 1)\}\}$
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+There are no functions (of this type) which are surjective but not injective.
+
+\bigskip
+
+\medskip
+
+(e)
+\par
+\vspace{11pt}
+\bigskip
+
+The set of bijective functions:
+
+\bigskip
+
+$\{\{(0, 0), (1, 1)\}, \{(0, 1), (1, 0)\}\}$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 34}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\{1 \mapsto a, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+$\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 35}
+
+\medskip
+
+\bigskip
+
+(Requires power set notation P and relational image)
+
+\bigskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+axdef
+
+\bigskip
+
+\bigskip
+
+children : Person -> P Person
+
+\bigskip
+
+\bigskip
+
+where
+
+\bigskip
+
+\bigskip
+
+children = {p : Person . p |-> parentOf(| {p} |)}
+
+\bigskip
+
+\bigskip
+
+end
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+axdef
+
+\bigskip
+
+\bigskip
+
+number_of_grandchildren : Person -> N
+
+\bigskip
+
+\bigskip
+
+where
+
+\bigskip
+
+\bigskip
+
+number_of_grandchildren = {p : Person . p |-> # (parentOf o9 parentOf)(| {p} |)}
+
+\bigskip
+
+\bigskip
+
+end
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 36}
+
+\medskip
+
+\bigskip
+
+(Requires power set, function types, and ran keyword)
+
+\bigskip
+
+\bigskip
+
+axdef
+
+\bigskip
+
+\bigskip
+
+number_of_drivers : (Drivers <-> Cars) -> (Cars -> N)
+
+\bigskip
+
+\bigskip
+
+where
+
+\bigskip
+
+\bigskip
+
+forall r : Drivers <-> Cars | number_of_drivers(r) = {c : ran r . c |-> #$\{ d : Drivers | d \mapsto c \in r \}$}
+
+\bigskip
+
+\bigskip
+
+end
+
+\bigskip
+
+\section*{Sequences}
+
+\bigskip
+\noindent
+\textbf{Solution 37}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$\langle a \rangle$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{1 \mapsto a, 2 \mapsto b, 2 \mapsto a, 3 \mapsto c, 3 \mapsto b, 4 \mapsto d\}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+$\{2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}$
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+$\{1, 2, 3, 4\}$
+
+\medskip
+
+(e)
+\par
+\vspace{11pt}
+$\{a, b\}$
+
+\medskip
+
+(f)
+\par
+\vspace{11pt}
+$\{a \mapsto 1, b \mapsto 2, c \mapsto 3, d \mapsto 4\}$
+
+\medskip
+
+(g)
+\par
+\vspace{11pt}
+$\langle a, b \rangle$
+
+\medskip
+
+(h)
+\par
+\vspace{11pt}
+$\{3 \mapsto b\}$
+
+\medskip
+
+(i)
+\par
+\vspace{11pt}
+$\{a\}$
+
+\medskip
+
+(j)
+\par
+\vspace{11pt}
+$c$
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 38}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\begin{axdef}
+f : Place \fun \power~Place
+\where
+\forall p : Place \spot f(p) = \{ q : Place | p \mapsto q \in \ran trains \}
+\end{axdef}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{ p : Place | \exists_1 x : \dom trains \spot trains(x).2 = p \}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+(mu p : Place | $\forall q : Place \spot p \neq q$| # $\{ x : \dom trains | trains(x).2 = p \}$ > # $\{ x : \dom trains | trains(x).2 = q \}$)
+
+\bigskip
+
+\bigskip
+
+(Blocked by: nested quantifiers in mu with multiple pipes - parser ambiguity)
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 39}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+large_coins : Collection -> N
+
+\bigskip
+
+\bigskip
+
+$\forall c : Collection \spot large_coins(c) = c(large)$
+
+\bigskip
+
+\bigskip
+
+(Blocked by: underscore in identifier for fuzz compatibility)
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+add_coin : Collection * Coin -> Collection
+
+\bigskip
+
+\bigskip
+
+$\forall c : Collection \spot \forall d : Coin \spot add_coin(c, d) = c \cup \lbag d \rbag$
+
+\bigskip
+
+\bigskip
+
+(Blocked by: underscore in identifier and bag union)
+
+\bigskip
+
+\medskip
+
+\section*{Modelling}
+
+\bigskip
+
+Solutions 40-52 are work in progress - many require features not yet implemented
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 40}
+
+\medskip
+
+\bigskip
+
+(Work in progress - requires semicolon-separated bindings in set comprehensions)
+
+\bigskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+hd : seq(Title * Length * Viewed)
+
+\bigskip
+
+\bigskip
+
+cumulative_total hd <= 12000
+
+\bigskip
+
+\bigskip
+
+$\forall p : \ran hd \spot p.2 \leq 360$
+
+\bigskip
+
+\bigskip
+
+Note that cumulative_total is defined in part (d).
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$\{ p : \ran hd | p.2 > 120 \spot p.1 \}$
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+These can be defined recursively:
+
+\bigskip
+
+\bigskip
+
+viewed <> = <>
+
+\bigskip
+
+\bigskip
+
+viewed <x> ^ s = if x.3 = yes then <x> ^ viewed s else viewed s
+
+\bigskip
+
+\bigskip
+
+or otherwise (omitted - requires semicolon-separated bindings in set comprehension)
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\begin{axdef}
+cumulative_total : \seq~Title * Length * Viewed \fun N
+\where
+cumulative_total(\langle \rangle) = 0
+\forall x : Title * Length * Viewed \spot \forall s : \seq~Title * Length * Viewed \spot cumulative_total(\langle x \rangle \cat s) = x.2 + cumulative_total(s)
+\end{axdef}
+
+\medskip
+
+(e)
+\par
+\vspace{11pt}
+\bigskip
+
+(mu p : ran hd | $\forall q : \ran hd \spot p \neq q$| p.2 > q.2 | p.1)
+
+\bigskip
+
+\bigskip
+
+(This, of course, assumes that there is a unique element with this property.)
+
+\bigskip
+
+\medskip
+
+(f)
+\par
+\vspace{11pt}
+\bigskip
+
+(f) Omitted - requires semicolon-separated bindings in nested set comprehension
+
+\bigskip
+
+\medskip
+
+(g)
+\par
+\vspace{11pt}
+\bigskip
+
+axdef
+
+\bigskip
+
+\bigskip
+
+g : seq(Title * Length * Viewed) -> seq(Title * Length * Viewed)
+
+\bigskip
+
+\bigskip
+
+where
+
+\bigskip
+
+\bigskip
+
+$\forall s : \seq~Title * Length * Viewed \spot g(s) = s$|> $\{ x : \ran s | x \neq longest_viewed(s) \}$
+
+\bigskip
+
+\bigskip
+
+end
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+Where longest_viewed is defined as
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+axdef
+
+\bigskip
+
+\bigskip
+
+longest_viewed : seq(Title * Length * Viewed) +-> Title * Length * Viewed
+
+\bigskip
+
+\bigskip
+
+where
+
+\bigskip
+
+\bigskip
+
+$\forall s : \seq~Title * Length * Viewed \spot longest_viewed(s)$= ($\mu p : \ran s \spot p.3 = yes$and $\forall q : \ran s \spot p \neq q \land q.3 = yes$| p.2 > q.2)
+
+\bigskip
+
+\bigskip
+
+end
+
+\bigskip
+
+\bigskip
+
+(Blocked by: nested quantifiers in mu expressions - parser limitation)
+
+\bigskip
+
+\bigskip
+
+This, of course, assumes that there is at least one viewed programme (and one of a unique maximum length).
+
+\bigskip
+
+\medskip
+
+(h)
+\par
+\vspace{11pt}
+\begin{axdef}
+s : \seq~Title * Length * Viewed \fun \seq~Title * Length * Viewed
+\where
+\forall x : \seq~Title * Length * Viewed \spot items(s(x)) = items(x) \land \forall i, j : \dom s(x) \spot i < j \Rightarrow s(x)(i).2 \geq s(x)(j).2
+\end{axdef}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 41}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+axdef
+
+\bigskip
+
+\bigskip
+
+records : Year -|> Table
+
+\bigskip
+
+\bigskip
+
+where
+
+\bigskip
+
+\bigskip
+
+dom(records) = 1993..current
+
+\bigskip
+
+\bigskip
+
+$\forall y : \dom records \spot \# records(y) \leq 50$
+
+\bigskip
+
+\bigskip
+
+forall y : dom(records) | $\forall e : \ran records(y) \spot year(e.1) = y$
+
+\bigskip
+
+\bigskip
+
+forall r : ran(records) | $\forall i1, i2 : \dom r \spot i1 \neq i2 \land r(i1).1 = r(i2).1 \Rightarrow r(i1).3 \neq r(i2).3$
+
+\bigskip
+
+\bigskip
+
+end
+
+\bigskip
+
+\bigskip
+
+(Blocked by: nested quantifiers in predicates - parser limitation)
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\medskip
+
+(i)
+\par
+\vspace{11pt}
+$\{ e : Entry | \exists r : \ran records \spot e \in \ran r \land e.3 = 479 \}$
+
+$ii$
+
+$\{ e : Entry | \exists r : \ran records \spot e \in \ran r \land e.6 > e.5 \}$
+
+$iii$
+
+$\{ e : Entry | \exists r : \ran records \spot e \in \ran r \land e.7 \geq 70 \}$
+
+$iv$
+
+$\{ c : Course | \forall r : \ran records \spot \forall e : \ran r \spot e.2 = c \Rightarrow e.7 \geq 70 \}$
+
+$v$
+
+\bigskip
+
+{y : Year | y in dom records . y |-> {l : Lecturer | # {c : ran (records y) | c.4 = l} > 6}}
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+axdef
+
+\bigskip
+
+\bigskip
+
+where
+
+\bigskip
+
+\bigskip
+
+$\forall x : Entry \spot \forall s : \seq~Entry \spot 479$_courses (<>) = <> and 479_courses (<x> ^ s) = if x.3 = 479 then <x> ^ 479_courses(s) else 479_courses(s)
+
+\bigskip
+
+\bigskip
+
+end
+
+\bigskip
+
+\bigskip
+
+(Blocked by: underscore in identifier - use camelCase for fuzz compatibility)
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\begin{axdef}
+\where
+\forall x : Entry \spot \forall s : \seq~Entry \spot total(\langle \rangle) = 0 \land total(\langle x \rangle \cat s) = x.5 + total(s)
+\end{axdef}
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 42}
+
+\medskip
+
+\begin{zed}[Person]\end{zed}
+
+\bigskip
+
+axdef
+
+\bigskip
+
+\bigskip
+
+State : P(seq(iseq(Person)))
+
+\bigskip
+
+\bigskip
+
+where
+
+\bigskip
+
+\bigskip
+
+forall s : State | $\forall i, j : \dom s \spot i \neq j$| ran(s(i)) intersect ran(s(j)) = {}
+
+\bigskip
+
+\bigskip
+
+end
+
+\bigskip
+
+\bigskip
+
+(Blocked by: nested quantifiers with semicolon bindings - parser limitation)
+
+\bigskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+axdef
+
+\bigskip
+
+\bigskip
+
+add : N * Person * State -|> State
+
+\bigskip
+
+\bigskip
+
+where
+
+\bigskip
+
+\bigskip
+
+$\forall n : N \spot \forall p : Person \spot \forall s : State \spot n \in \dom s \land p \notin \bigcup \ran \ran s$|
+
+\bigskip
+
+\bigskip
+
+add(n, p, s) = s ++ {n |-> s(n) ^ <p>}
+
+\bigskip
+
+\bigskip
+
+end
+
+\bigskip
+
+\bigskip
+
+(Blocked by: -|> operator not implemented)
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 43}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+(i) forall i : dom bookings | $\forall x, y : bookings(i) \spot x \neq y$| (x.2..x.3) intersect (y.2..y.3) = {}
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+(ii) forall i : dom bookings | $\forall x : bookings(i) \spot \{x.2, x.3\}$subseteq 1..max(i.1)
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+(iii) forall i : dom bookings | $\forall b : bookings(i) \spot b.2 \leq b.3$
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+(iv) This is enforced by the constraint for part (i).
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+(Blocked by: nested quantifiers - parser limitation)
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+(i) $\{ i : \dom bookings | i.1 = Banbury \spot i.2 \}$
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+(ii) {i : dom bookings | i.1 = Banbury and $\exists b : bookings(i) \spot 50 \in b.2 \upto b.3$}
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+(iii) {r : Room; s : N | $\exists i : \dom bookings \spot i.1 = r \land i.2 = s$. (r, s)}
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+(iv) {r : Room | $\exists i : \dom bookings \spot i.1 = r$| # (bookings(i)) >= 10}
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+(Blocked by: semicolon bindings in set comprehensions and nested quantifiers)
+
+\bigskip
+
+\medskip
+
+\section*{Free types and induction}
+
+\bigskip
+\noindent
+\textbf{Solution 44}
+
+\medskip
+
+\bigskip
+
+The two cases of the proof are established by equational reasoning: the first by
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+reverse (<> ^ t) = reverse t [cat.1a] = (reverse t) ^ <> [cat.1b]
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+where cat.1a is <> ^ s = s and cat.1b is s ^ <> = s
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+and the second by
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+reverse ((<x> ^ u) ^ t) = reverse (<x> ^ (u ^ t)) [cat.2]
+
+\bigskip
+
+\bigskip
+
+= reverse (u ^ t) ^ <x>    [reverse.2]
+
+\bigskip
+
+\bigskip
+
+= (reverse t ^ reverse u) ^ <x>  [anti-distributive]
+
+\bigskip
+
+\bigskip
+
+= reverse t ^ (reverse u ^ <x>)  [cat.2]
+
+\bigskip
+
+\bigskip
+
+= reverse t ^ reverse (<x> ^ u)  [reverse.2]
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 45}
+
+\medskip
+
+\bigskip
+
+The base case:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+reverse (reverse <>) = reverse <> [reverse.1] = <> [reverse.1]
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+The inductive step:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+reverse (reverse (<x> ^ t))
+
+\bigskip
+
+\bigskip
+
+= reverse ((reverse t) ^ <x>)  [reverse.2]
+
+\bigskip
+
+\bigskip
+
+= reverse (<x>) ^ reverse (reverse t)  [anti-distributive]
+
+\bigskip
+
+\bigskip
+
+= reverse (<x> ^ <>) ^ reverse (reverse t)  [cat.1]
+
+\bigskip
+
+\bigskip
+
+= ((reverse <>) ^ <x>) ^ reverse (reverse t)  [reverse.2]
+
+\bigskip
+
+\bigskip
+
+= (<> ^ <x>) ^ reverse (reverse t)  [reverse.1]
+
+\bigskip
+
+\bigskip
+
+= <x> ^ reverse (reverse t)  [cat.1]
+
+\bigskip
+
+\bigskip
+
+= <x> ^ t  [reverse (reverse t) = t]
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 46}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+count : Tree -> N
+
+\bigskip
+
+\bigskip
+
+count stalk = 0
+
+\bigskip
+
+\bigskip
+
+$\forall n : N \spot count$(leaf n) = 1
+
+\bigskip
+
+\bigskip
+
+$\forall t1, t2 : Tree \spot count(branch(t1, t2)) = count$t1 + count t2
+
+\bigskip
+
+\bigskip
+
+(Blocked by: recursive free types and pattern matching)
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+flatten : Tree -> seq N
+
+\bigskip
+
+\bigskip
+
+flatten stalk = <>
+
+\bigskip
+
+\bigskip
+
+$\forall n : N \spot flatten$(leaf n) = <n>
+
+\bigskip
+
+\bigskip
+
+$\forall t1, t2 : Tree \spot flatten(branch(t1, t2)) = flatten$t1 ^ flatten t2
+
+\bigskip
+
+\bigskip
+
+(Blocked by: recursive free types and pattern matching)
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 47}
+
+\medskip
+
+\bigskip
+
+First, exhibit the induction principle for the free type:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+P stalk and ($\forall n : N \spot P$(leaf n)) and ($\forall t1, t2 : Tree \spot \power~t1 \land \power~t2 \Rightarrow \power~branch(t1, t2)$)
+
+\bigskip
+
+\bigskip
+
+implies $\forall t : Tree \spot \power~t$
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+This gives three cases for the proof:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+# (flatten stalk) = # <> [flatten] = 0 [#] = count stalk [count]
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+(Remaining cases omitted - require equational reasoning with recursive functions)
+
+\bigskip
+
+\section*{Supplementary material : assignment practice}
+
+\bigskip
+\noindent
+\textbf{Solution 48}
+
+\medskip
+
+\begin{zed}[SongId, UserId, PlaylistId, Playlist]\end{zed}
+
+\begin{axdef}
+songs : \finset~SongId
+users : \finset~UserId
+playlists : PlaylistId \pfun Playlist
+playlistOwner : PlaylistId \pfun UserId
+playlistSubscribers : PlaylistId \pfun \finset_1~UserId
+\where
+\forall i : \dom playlists \spot \ran playlists(i)
+subseteq
+songs
+\dom playlistOwner
+subseteq
+\dom playlists
+\ran playlistOwner
+subseteq
+users
+\dom playlistSubscribers
+subseteq
+\dom playlists
+\forall i : \dom playlistSubscribers \spot playlistSubscribers(i)
+subseteq
+users
+\forall i : \dom playlists \spot playlistOwner(i) \in playlistSubscribers(i)
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Solution 49}
+
+\medskip
+
+\begin{axdef}
+hated : UserId \pfun \finset~SongId
+loved : UserId \pfun \finset~SongId
+\where
+\dom hated
+subseteq
+users
+\forall i : \dom hated \spot hated(i)
+subseteq
+songs
+\dom loved
+subseteq
+users
+\forall i : \dom loved \spot loved(i)
+subseteq
+songs
+\forall i : \dom hated \cup \dom loved \spot hated(i) \cap loved(i) = emptyset
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Solution 50}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+$abbrev$
+
+A == users \setminus \bigcup \ran playlistSubscribers
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+$abbrev$
+
+B == \{ p : \dom playlistSubscribers | \# playlistSubscribers(p) \geq 100 \}
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+C == (mu u : dom(loved) | $\forall v : \dom loved \spot u \neq v$| # (loved(u)) > # (loved(v)))
+
+\bigskip
+
+\bigskip
+
+(Blocked by: nested quantifiers in mu - parser ambiguity)
+
+\bigskip
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+D == (mu s : songs | $\forall t : songs \spot s \neq t$| # $\{ u : UserId | s \in loved(u) \}$ > # $\{ u : UserId | t \in loved(u) \}$)
+
+\bigskip
+
+\bigskip
+
+(Blocked by: nested quantifiers in mu - parser ambiguity)
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 51}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+Let's first define two helper functions:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+loveHateScore : SongId +-> N
+
+\bigskip
+
+\bigskip
+
+forall i : songs | # $\{ u : UserId | i \in loved(u) \}$ >= # $\{ u : UserId | i \in hated(u) \}$ $\Rightarrow$
+
+\bigskip
+
+\bigskip
+
+loveHateScore(i) = # $\{ u : UserId | i \in loved(u) \}$ - # $\{ u : UserId | i \in hated(u) \}$
+
+\bigskip
+
+\bigskip
+
+and
+
+\bigskip
+
+\bigskip
+
+forall i : songs | # $\{ u : UserId | i \in loved(u) \}$ < # $\{ u : UserId | i \in hated(u) \}$ $\Rightarrow$
+
+\bigskip
+
+\bigskip
+
+loveHateScore(i) = 0
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\begin{axdef}
+playlistCount : SongId \pfun N
+\where
+\forall i : songs \spot playlistCount(i) = \# \{ p : \dom playlist | i \in \ran playlist(p) \}
+\end{axdef}
+
+\bigskip
+
+We then have:
+
+\bigskip
+
+\begin{axdef}
+length : SongId \pfun N
+popularity : SongId \pfun N
+\where
+\dom length
+subseteq
+songs
+\dom popularity
+subseteq
+songs
+\forall i : songs \spot popularity(i) = loveHateScore(i) + playlistCount(i)
+\end{axdef}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+mostPopular : SongId
+
+\bigskip
+
+\bigskip
+
+(exists1 i : songs | $\forall j : songs \spot i \neq j$| popularity(i) > popularity(j)) $\Rightarrow$
+
+\bigskip
+
+\bigskip
+
+mostPopular = (mu i : songs | $\forall j : songs \spot i \neq j$| popularity(i) > popularity(j))
+
+\bigskip
+
+\bigskip
+
+and
+
+\bigskip
+
+\bigskip
+
+not (exists1 i : songs | $\forall j : songs \spot i \neq j$| popularity(i) > popularity(j)) $\Rightarrow$
+
+\bigskip
+
+\bigskip
+
+mostPopular = nullSong
+
+\bigskip
+
+\bigskip
+
+(Blocked by: nested quantifiers in mu - parser ambiguity)
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+playlistsContainingMostPopularSong == $\{ i : \dom playlists | mostPopular \in \ran playlists(i) \}$
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 52}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+premiumPlays : seq(Play) -> seq(Play)
+
+\bigskip
+
+\bigskip
+
+premiumPlays(<>) = <>
+
+\bigskip
+
+\bigskip
+
+forall x : Play; s : seq(Play) |
+
+\bigskip
+
+\bigskip
+
+premiumPlays(<x> ^ s) = <x> ^ premiumPlays(s)   if userStatus(x.2) = premium
+
+\bigskip
+
+\bigskip
+
+premiumPlays(s)          if userStatus(x.2) = standard
+
+\bigskip
+
+\bigskip
+
+(Note: Uses camelCase for fuzz compatibility)
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+standardPlays : seq(Play) -> seq(Play)
+
+\bigskip
+
+\bigskip
+
+standardPlays(<>) = <>
+
+\bigskip
+
+\bigskip
+
+forall x : Play; s : seq(Play) |
+
+\bigskip
+
+\bigskip
+
+standardPlays(<x> ^ s) = <x> ^ standardPlays(s)  if userStatus(x.2) = standard
+
+\bigskip
+
+\bigskip
+
+standardPlays(s)        if userStatus(x.2) = premium
+
+\bigskip
+
+\bigskip
+
+(Note: Uses camelCase for fuzz compatibility)
+
+\bigskip
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+cumulativeLength : seq(Play) -> N
+
+\bigskip
+
+\bigskip
+
+cumulativeLength(<>) = 0
+
+\bigskip
+
+\bigskip
+
+forall x : Play; s : seq(Play) |
+
+\bigskip
+
+\bigskip
+
+cumulativeLength(<x> ^ s) = length(x.1) + cumulativeLength(s)
+
+\bigskip
+
+\bigskip
+
+(Note: Uses camelCase for fuzz compatibility)
+
+\bigskip
+
+\medskip
+
+\end{document}
