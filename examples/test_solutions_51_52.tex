@@ -1,0 +1,81 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Supplementary : Advanced}
+
+\bigskip
+\noindent
+\textbf{Solution 51}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\begin{axdef}
+playlistCount : SongId \pfun N
+\where
+\forall i \colon songs \bullet playlistCount(i) = \# \{ p \colon \dom playlist \mid i \in \ran playlist(p) \}
+\end{axdef}
+
+\bigskip
+
+(Parts b-c use complex conditional logic - testing basic parts only)
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 52}
+
+\medskip
+
+\bigskip
+
+These solutions use pattern matching with conditionals like:
+
+\bigskip
+
+\bigskip
+
+premiumPlays($\langle \rangle$) = $\langle \rangle$
+
+\bigskip
+
+\bigskip
+
+forall x : Play; s : seq(Play) |
+
+\bigskip
+
+\bigskip
+
+premiumPlays($\langle x \rangle$ ^ s) = $\langle x \rangle$ ^ premiumPlays(s)   if userStatus(x.2) = premium
+
+\bigskip
+
+\bigskip
+
+premiumPlays(s)          if userStatus(x.2) = standard
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+(Blocked by: pattern matching in axiomatic definitions - Phase 18)
+
+\bigskip
+
+\end{document}

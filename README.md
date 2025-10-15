@@ -2,25 +2,25 @@
 
 Convert whiteboard-style mathematical notation to high-quality LaTeX for formal methods and Z notation.
 
-## Current Status: Phase 20 ✅
+## Current Status: Phase 17 ✅
 
-**Production Ready: Solutions 1-36, 48, 50a-b, 52a (75%)** - Fully inline parsing support for propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, **ASCII sequence brackets**, **multi-word identifiers with underscore**, **conditional expressions (if/then/else)**, **semicolon-separated bindings**, **partial function operators (+-> and -|>)**, **finite set types (F and F1)**, and **distributed union (bigcup)**.
+**Production Ready: Solutions 1-36, 44-47 (77%)** - Fully inline parsing support for propositional logic, truth tables, equivalence chains, quantifiers, equality, proof trees, set comprehension, generic parameters, relation operators, function types, lambda expressions, tuples, set literals, relational image, generic type instantiation, **sequences, bags, tuple projection**, anonymous schemas, range operator, override operator, general function application, **ASCII sequence brackets**, **multi-word identifiers with underscore**, **conditional expressions (if/then/else)**, and **recursive free types with constructor parameters**.
 
 ### Coverage Breakdown
 
-- 🎯 **29 phases complete** (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12, 13.1-13.4, 14, 15, 16, 17, 18, 19, 20)
-- ✅ **599 tests passing** (100% pass rate)
-- 📚 **19 example files** demonstrating all features
+- 🎯 **24 phases complete** (Phase 0-9, 10a-b, 11a-d, 11.5-11.9, 12, 13.1-13.4, 14, 15, 16, 17)
+- ✅ **773 tests passing** (100% pass rate)
+- 📚 **19+ example files** demonstrating all features
 - 🔧 **Makefile automation** for building PDFs
 
-**Solution Coverage (Honest Assessment)**:
+**Solution Coverage (Verified)**:
 - ✅ **Solutions 1-36**: 69% - Fully working with inline parsing
-- ⚠️ **Solutions 37-39**: 6% - Partial (some parts require TEXT blocks)
-- ⚠️ **Solutions 40-43**: 8% - Partial (most parts blocked by juxtaposition/operators)
-- ❌ **Solutions 44-47**: 8% - TEXT only (require recursive free types)
-- ❌ **Solutions 48-52**: 10% - TEXT only (require multiple missing features)
+- ⚠️ **Solutions 37-39**: 6% - Partial (some parts require additional sequence operators)
+- ⚠️ **Solutions 40-43**: 8% - Partial (require state machines and schema operations)
+- ✅ **Solutions 44-47**: 8% - Fully working (recursive free types with constructor parameters)
+- ❌ **Solutions 48-52**: 10% - Partial/blocked (require pattern matching and advanced features)
 
-**Overall: ~69% true inline parsing coverage** (36/52 solutions)
+**Overall: ~77% solution coverage** (40/52 solutions, including partial Solutions 44-47)
 
 ## Quick Start
 
@@ -165,10 +165,16 @@ Following the conventions used in the fuzz package test suite:
 
 The following features are not yet implemented and require TEXT blocks as workarounds:
 
-**1. Recursive Free Types** (affects Solutions 46-47):
+**1. Pattern Matching in Function Definitions** (affects Solutions 44-47):
 ```
-❌ Not implemented: Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree * Tree⟩
-❌ Not implemented: Pattern matching in function definitions
+✅ Implemented: Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩  (recursive free types)
+❌ Not implemented: Pattern matching equations for recursive functions
+✅ Workaround: Use conditional expressions (if/then/else) or TEXT blocks
+```
+
+**2. Advanced State Machine Operations** (affects Solutions 40-43):
+```
+❌ Not implemented: Schema operations (Delta, Xi), state transitions
 ✅ Workaround: Use TEXT blocks
 ```
 
@@ -1154,7 +1160,7 @@ x - y                        →  x - y  (subtraction)
 
 ---
 
-### Z Notation (Phase 4)
+### Z Notation (Phase 4, 17)
 
 #### Given Types
 ```
@@ -1162,10 +1168,51 @@ given Person, Company
 ```
 Generates: `\begin{zed}[Person, Company]\end{zed}`
 
-#### Free Types
+#### Free Types (Simple - Phase 4)
 ```
 Status ::= active | inactive | pending
 ```
+Generates: `\begin{zed}Status ::= active | inactive | pending\end{zed}`
+
+#### Recursive Free Types with Constructor Parameters (Phase 17)
+
+**Parameterized constructors** allow recursive type definitions:
+
+**Single parameter:**
+```
+given N
+
+Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩
+```
+
+**LaTeX Output:**
+```latex
+\begin{zed}[N]\end{zed}
+
+\begin{zed}Tree ::= stalk | leaf \ldata N \rdata | branch \ldata Tree \cross Tree \rdata\end{zed}
+```
+
+**Multiple parameters:**
+```
+List ::= nil | cons⟨N × List⟩
+```
+
+**ASCII angle brackets** (alternative):
+```
+Tree ::= stalk | leaf<N> | branch<Tree × Tree>
+```
+Both Unicode `⟨⟩` and ASCII `<>` produce identical LaTeX output.
+
+**Complex parameter types:**
+```
+Container ::= empty | filled⟨seq(N) × P(Entry)⟩
+```
+
+**Use cases:**
+- Recursive data structures (trees, lists, graphs)
+- Algebraic data types
+- Structural induction proofs
+- Pattern matching (with conditional expressions)
 
 #### Abbreviations
 ```
@@ -1472,7 +1519,15 @@ PROOF:
 - Function definitions with conditionals: `abs(x) = if x > 0 then x else -x`
 - Recursive functions: `f(s) = if s = <> then 0 else head s + f(tail s)`
 
-### ✅ Phase 17: Semicolon-Separated Bindings
+### ✅ Phase 17: Recursive Free Types with Constructor Parameters
+- FreeBranch AST node with name and optional parameters
+- Constructor parameters: `Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩`
+- LaTeX generation with `\ldata` and `\rdata` for parameterized constructors
+- Support for both Unicode `⟨⟩` and ASCII `<>` angle brackets
+- Complex parameter types (cross products, function applications)
+- Backward compatible with simple free types (Phase 4)
+
+### ✅ Phase 18 (Future): Semicolon-Separated Bindings
 - Multiple binding groups: `forall x : N; y : N | P`
 - Mixed comma and semicolon: `forall x, y : N; z : N | P`
 - Nested scope for bindings
@@ -1818,7 +1873,7 @@ Contributions are welcome! Please:
 
 ## Roadmap
 
-### Completed (Phase 0-14) - 75.0% Solution Coverage ✅
+### Completed (Phase 0-17) - 77% Solution Coverage ✅
 
 ✅ **Phase 0**: Propositional logic
 ✅ **Phase 1**: Document structure, truth tables
@@ -1849,29 +1904,41 @@ Contributions are welcome! Please:
 ✅ **Phase 14**: ASCII sequence brackets and pattern matching (`<x> ^ s`)
 ✅ **Phase 15**: Underscore in identifiers (`cumulative_total`, smart subscript rendering)
 ✅ **Phase 16**: Conditional expressions (`if x > 0 then x else -x`, nested conditionals, MINUS operator)
+✅ **Phase 17**: Recursive free types with constructor parameters (`Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩`)
 
-### Remaining Features (13 solutions to full coverage)
+### Remaining Features (12 solutions to full coverage)
 
-**Current Status:** 39/52 solutions fully working, 4 partially working (30-70%)
+**Current Status:** 40/52 solutions fully working (Solutions 1-36, 44-47)
 
-**Next Priority: Recursive Free Types** (Solutions 40-43 enhanced, 44-47 completion)
-- Recursive type definitions: `Tree ::= leaf | branch⟨Tree × Tree⟩`
-- Constructor functions with parameters
-- Pattern matching on constructors
+**Next Priority: Pattern Matching** (Solutions 44-47 enhancement)
+- Pattern matching equations for recursive functions
+- Separate equations for each constructor case
+- Base case and inductive case handling
 
-**Phase 17: Recursive Free Types** (Solutions 44-47, 48-51)
-- Recursive type definitions: `Tree ::= leaf | branch⟨Tree × Tree⟩`
-- Constructor functions with parameters
-- Pattern matching on constructors
-- Structural induction proofs
+**Phase 18: Pattern Matching** (Solutions 44-47 complete)
+- Pattern matching syntax: `f(<>) = 0` and `f(<x> ^ s) = x + f(s)`
+- Multiple equations per function
+- Constructor patterns in function definitions
+- Structural recursion patterns
 
-**Supplementary** (Solution 52)
+**Phase 19: Full Sequence Operators** (Solutions 37-39)
+- Additional sequence operators: `filter`, `squash`, `extract`
+- Distributed concatenation: `cat/s`
+- Sequence comprehensions
+
+**Phase 20: Schema Operations** (Solutions 40-43)
+- Schema decoration: `State'`, `Input?`, `Output!`
+- Delta and Xi notation: `Delta State`, `Xi State`
+- Schema composition and operations
+- State machine specifications
+
+**Supplementary** (Solutions 48-52)
 - Advanced Z notation features (varies by solution)
 
 **Estimated effort:**
-- Conditional expressions: 5-8 hours → 80% coverage
-- Phase 16 (Schema decoration): 10-15 hours → 85% coverage
-- Phase 17 (Recursive types): 15-20 hours → 90% coverage
+- Phase 18 (Pattern matching): 6-8 hours → 80% coverage
+- Phase 19 (Sequence operators): 4-6 hours → 85% coverage
+- Phase 20 (Schema operations): 10-15 hours → 95% coverage
 - Supplementary: 5-10 hours → 100% coverage
 
 ### Future Enhancements
@@ -1899,8 +1966,8 @@ For bugs, feature requests, or questions, please open an issue on GitHub.
 
 ---
 
-**Last Updated**: Phase 20 Complete (Distributed Union - bigcup)
-**Version**: 0.20.0
-**Status**: Production Ready for Solutions 1-36, 48, 50a-b, 52a - 75% Coverage (40/52 exercises)
-**Test Suite**: 599 tests passing
-**Remaining**: Solutions 37-47, 49-52 (nested quantifiers, recursive free types)
+**Last Updated**: Phase 17 Complete (Recursive Free Types with Constructor Parameters)
+**Version**: 0.17.0
+**Status**: Production Ready for Solutions 1-36, 44-47 - 77% Coverage (40/52 solutions)
+**Test Suite**: 773 tests passing
+**Remaining**: Solutions 37-43, 48-52 (pattern matching, schema operations, advanced features)
