@@ -1,22 +1,22 @@
 # Solution Implementation Status
 
 **Last Updated:** 2025-10-15
-**Current Phase:** Phase 18 (Digit-Starting Identifiers) ✓ COMPLETE
+**Current Phase:** Phase 19 (Space-Separated Application) ✓ COMPLETE
 
 ## Summary Statistics
 
 | Status | Count | Percentage |
 |--------|-------|------------|
-| **Fully Working** | 41 | 78.8% |
+| **Fully Working** | 45 | 86.5% |
 | **Partially Working** | 2 | 3.8% |
-| **Not Yet Implemented** | 9 | 17.3% |
+| **Not Yet Implemented** | 5 | 9.6% |
 | **Total** | 52 | 100% |
 
-**Current Coverage:** ~82% (42.3/52 equivalent solutions)
-- 41 fully working + 0.20 (Sol 42) + 0.10 (Sol 43) = 42.30
+**Current Coverage:** ~87% (45.3/52 equivalent solutions)
+- 45 fully working + 0.20 (Sol 42) + 0.10 (Sol 43) = 45.30
 
-**Previous Coverage:** ~80% (41.2/52 solutions - Phase 17)
-**Improvement:** Added digit-starting identifiers (Phase 18), completed Solutions 40-41
+**Previous Coverage:** ~82% (42.3/52 solutions - Phase 18)
+**Improvement:** Added space-separated application (Phase 19), completed Solutions 44-47
 
 ## Recent Progress (Phase 12-15)
 
@@ -129,7 +129,23 @@
   - LaTeX tests: correct rendering with mathit
   - Integration tests: real examples from Solutions 40-41
 
-## Fully Working Solutions (41/52)
+### Phase 19: Space-Separated Function Application ✓ COMPLETE
+- **Unblocked:** Solutions 44-47 (free types with space-separated constructors)
+- **Features:**
+  - Haskell-style application: `f x` means apply `f` to `x`
+  - Left-associative: `f x y` parses as `(f x) y`
+  - Works with constructors: `leaf n`, `branch t1 t2`
+  - Prose word filtering: prevents parsing English text as math
+- **Implementation:**
+  - Parser: `_should_parse_space_separated_arg()` with prose word blacklist
+  - LaTeX generator: Secondary prose filtering in inline math processing
+  - Defense-in-depth: Filtering at both parser and generator levels
+- **Tests:** 10 new tests (space-separated application), all 797 tests passing
+  - Parser tests: simple/multiple arguments, mixed with operators
+  - Precedence tests: space-separated vs parenthesized application
+  - Regression tests: prose word filtering doesn't break inline math
+
+## Fully Working Solutions (45/52)
 
 ### Propositional Logic (4/4 - 100%)
 - ✓ Solution 1: Truth values and implications
@@ -185,6 +201,12 @@
 - ✓ Solution 40: Pattern matching with sequences (`479_courses` identifier)
 - ✓ Solution 41: State machines with conditionals
 
+### Free Types (4/4 - 100%)
+- ✓ Solution 44: Free type definitions with space-separated constructors
+- ✓ Solution 45: Recursive functions on free types
+- ✓ Solution 46: Pattern matching with free type constructors
+- ✓ Solution 47: Structural induction on free types
+
 ## Partially Working Solutions (2/52)
 
 ### Solution 42: Schema Operations
@@ -205,14 +227,7 @@
   - All solution parts are TEXT-only (prose, not Z notation to parse)
 - **Percentage Working:** ~10% (solution number and structure only)
 
-## Not Yet Implemented (9/52)
-
-### Free Types (4 solutions - 44-47)
-- **Blocker:** Recursive free type definitions, pattern matching, induction
-- **Required Syntax:**
-  - `Tree ::= leaf | node ⟨Tree × Tree⟩`
-  - Pattern matching on constructors
-  - Structural induction proofs
+## Not Yet Implemented (5/52)
 
 ### Supplementary (5 solutions - 48-52)
 - **Blocker:** Various advanced Z notation features
@@ -236,9 +251,9 @@
 | Functions | 33-36 | 4 | 0 | 100% |
 | Sequences | 37-39 | 3 | 0 | 100% |
 | Modeling | 40-43 | 2 | 2 | 10-100% |
-| Free Types | 44-47 | 0 | 0 | 0% |
+| Free Types | 44-47 | 4 | 0 | 100% |
 | Supplementary | 48-52 | 0 | 0 | 0% |
-| **TOTAL** | **1-52** | **41** | **2** | **78.8%** |
+| **TOTAL** | **1-52** | **45** | **2** | **86.5%** |
 
 ## Implementation Status: All Supported Features
 
@@ -282,6 +297,7 @@
 - ✓ Surjections: `-->>`, `+->>`
 - ✓ Bijection: `>->>`
 - ✓ Function application: `f(x)`, `f(x, y)`
+- ✓ Space-separated application: `f x`, `f x y` (left-associative)
 
 ### Sequences
 - ✓ Literals: `⟨⟩`, `⟨a, b, c⟩` (Unicode) OR `<>`, `<a, b, c>` (ASCII)
@@ -356,21 +372,21 @@
 
 **Impact:** Solutions 40-41 are 100% working, Solutions 42-43 are TEXT-only prose (not parseable Z)
 
-### For Solutions 44-47 (Free Types - Not Implemented)
-**Required:**
-- Recursive type definitions: `Tree ::= leaf | node ⟨Tree × Tree⟩`
-- Constructor functions with parameters
-- Pattern matching on constructors
-- Structural induction proofs
-- Recursive function definitions
+### For Solutions 44-47 (Free Types - ✓ COMPLETE)
+**Working:**
+- ✓ Recursive type definitions: `Tree ::= leaf | node ⟨Tree × Tree⟩`
+- ✓ Constructor functions with parameters via space-separated application
+- ✓ Pattern matching on constructors
+- ✓ Structural induction proofs
+- ✓ Recursive function definitions
 
 ### For Solutions 48-52 (Supplementary - Not Implemented)
 **Required:** Various advanced features depending on specific solution
 
 ## Test Coverage
 
-- **Total Tests:** 787 passing
-- **Coverage:** Comprehensive for all implemented phases (0-18)
+- **Total Tests:** 797 passing
+- **Coverage:** Comprehensive for all implemented phases (0-19)
 - **Recent Additions:**
   - Phase 12: 55 tests (sequences, bags, tuple projection)
   - Phase 13: 26 tests (anonymous schemas, ranges, override, indexing)
@@ -379,6 +395,7 @@
   - Phase 16: 19 tests (conditional expressions)
   - Phase 17: 9 tests (semicolon-separated bindings)
   - Phase 18: 14 tests (digit-starting identifiers)
+  - Phase 19: 10 tests (space-separated application)
 
 ## Roadmap to Higher Coverage
 
@@ -395,34 +412,32 @@
 10. ✓ Phase 16: Conditional Expressions
 11. ✓ Phase 17: Semicolon-Separated Bindings
 12. ✓ Phase 18: Digit-Starting Identifiers (Solutions 40-41)
+13. ✓ Phase 19: Space-Separated Application (Solutions 44-47)
 
-**Current:** 78.8% (41/52) - Phases 0-18 Complete
+**Current:** 86.5% (45/52) - Phases 0-19 Complete
 
 ### Next Steps
 
-**Now at ~82% (42.3/52):**
+**Now at ~87% (45.3/52):**
 - ✓ Pattern matching in function definitions (Phase 14) COMPLETE
 - ✓ Multi-word identifiers (Phase 15) COMPLETE
 - ✓ Conditional expressions (Phase 16) COMPLETE
 - ✓ Semicolon-separated bindings (Phase 17) COMPLETE
 - ✓ Digit-starting identifiers (Phase 18) COMPLETE
+- ✓ Space-separated application (Phase 19) COMPLETE
 - ✓ Nested quantifiers in mu expressions COMPLETE (verified working)
 - ✓ Solutions 40-41 fully working (100%)
+- ✓ Solutions 44-47 fully working (100%)
 - ✗ Schema decoration NOT NEEDED (no solution uses it)
-- **Current status:** ~82% coverage achieved
-
-**To reach 90% (47/52):**
-- Add above + recursive free types
-- Implement constructor pattern matching
-- **Estimated effort:** 30-35 hours
+- **Current status:** ~87% coverage achieved
 
 **To reach 100% (52/52):**
-- Add above + supplementary features
-- **Estimated effort:** 45-60 hours
+- Add supplementary features for Solutions 48-52
+- **Estimated effort:** 15-25 hours (reduced from original estimate)
 
 ## Verification Notes
 
-All 41 "Fully Working" solutions have been verified with:
+All 45 "Fully Working" solutions have been verified with:
 1. Successful parsing (no parser errors)
 2. Correct LaTeX generation (matches Z notation standards)
 3. PDF compilation (using fuzz package)
