@@ -39,7 +39,12 @@
       "Bash(python3 -m coverage report:*)",
       "Bash(python3:*)",
       "Bash(timeout 10 hatch run test:*)",
-      "Bash(/dev/null)"
+      "Bash(/dev/null)",
+      "Bash(TEXINPUTS=../tex//: MFINPUTS=../tex//: pdflatex:*)",
+      "Bash(bash -c 'TEXINPUTS=../tex//: MFINPUTS=../tex//: pdflatex -interaction=nonstopmode solutions_fuzz.tex')",
+      "Bash(bash -c 'TEXINPUTS=./latex//: pdflatex -interaction=nonstopmode solutions_fuzz.tex')",
+      "Bash(1)",
+      "Read(///**)"
     ],
     "deny": [],
     "ask": []

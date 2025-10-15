@@ -136,5 +136,3 @@ def test_truth_table_no_headers() -> None:
     parser = Parser(tokens)
     with pytest.raises(ParserError, match="Expected truth table header"):
         parser.parse()
-
-
