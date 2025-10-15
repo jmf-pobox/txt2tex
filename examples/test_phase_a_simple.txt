@@ -1,0 +1,7 @@
+** Test Phase A **
+
+Simple test of pattern matching with sequences:
+
+viewed(<>) = <>
+
+viewed(<x> ^ s) = if x.3 = yes then <x> ^ viewed(s) else viewed(s)

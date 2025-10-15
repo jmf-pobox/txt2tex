@@ -1,0 +1,39 @@
+** Test: Phase A - Verify Phase 14-16 Features **
+
+(a) Test ASCII sequence brackets and pattern matching:
+
+axdef
+  viewed : seq(Entry) -> seq(Entry)
+where
+  viewed(<>) = <>
+  forall x : Entry; s : seq(Entry) |
+    viewed(<x> ^ s) = if x.3 = yes then <x> ^ viewed(s) else viewed(s)
+end
+
+(b) Test conditional expressions:
+
+axdef
+  abs : Z -> N
+where
+  forall x : Z | abs(x) = if x >= 0 then x else -x
+end
+
+(c) Test multi-word identifiers with underscore:
+
+axdef
+  cumulative_total : seq(N) -> N
+where
+  cumulative_total(<>) = 0
+  forall x : N; s : seq(N) |
+    cumulative_total(<x> ^ s) = x + cumulative_total(s)
+end
+
+(d) Test all three features combined:
+
+axdef
+  premium_plays : seq(Play) -> seq(Play)
+where
+  premium_plays(<>) = <>
+  forall x : Play; s : seq(Play) |
+    premium_plays(<x> ^ s) = if user_status(x.2) = premium then <x> ^ premium_plays(s) else premium_plays(s)
+end
