@@ -566,12 +566,18 @@ class Lexer:
             return Token(TokenType.CIRC, "o9", start_line, start_column)
 
         # Phase 15: Include underscore in identifiers
+        # Phase 24: Allow apostrophes in contractions (Let's, can't)
         # This allows multi-word identifiers like cumulative_total
         # Subscripts like a_i are now handled in LaTeX generation
-        while not self._at_end() and (
-            self._current_char().isalnum() or self._current_char() == "_"
-        ):
-            self._advance()
+        while not self._at_end():
+            current = self._current_char()
+            if current.isalnum() or current == "_":
+                self._advance()
+            elif current == "'" and self._peek_char().isalpha():
+                # Allow apostrophe if followed by a letter (contraction)
+                self._advance()
+            else:
+                break
 
         value = self.text[start_pos : self.pos]
 
@@ -635,6 +641,7 @@ class Lexer:
             return Token(TokenType.TEXT, text_content, start_line, start_column)
 
         # Phase 20: Auto-detect prose paragraphs BEFORE keyword checks
+        # Phase 24: Also detect prose after part labels (any column)
         # Check for capitalized prose starters
         # Exclude articles (A, An) that might be type names
         prose_starters = {
@@ -648,16 +655,23 @@ class Lexer:
             "First", "Second", "Third", "Finally", "Next", "Then",
             "Note", "Consider", "Suppose", "Recall", "Let",
             "Given", "Assuming", "Hence", "Thus", "Therefore",
+            # Phase 24: Common contractions
+            "Let's", "It's", "That's", "There's", "Here's",
+            "What's", "Who's", "Where's", "When's", "How's",
+            "We're", "They're", "You're",
+            "Don't", "Doesn't", "Didn't", "Can't", "Won't", "Shouldn't", "Wouldn't",
+            "Haven't", "Hasn't", "Hadn't", "Aren't", "Isn't", "Wasn't", "Weren't",
         }
 
-        if start_column == 1 and value in prose_starters:
+        # Prose detection at column 1 OR after whitespace (for prose after part labels)
+        if value in prose_starters:
             # Looks like prose, capture whole line
             text_start = start_pos
 
             while not self._at_end() and self._current_char() != "\n":
                 self._advance()
 
-            text_content = self.text[text_start : self.pos]
+            text_content = self.text[start_pos : self.pos]
             return Token(TokenType.TEXT, text_content, start_line, start_column)
 
         # Special handling for articles A/An - only treat as prose if followed
