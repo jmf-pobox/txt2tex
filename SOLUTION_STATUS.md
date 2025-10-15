@@ -1,7 +1,7 @@
 # Solution Implementation Status
 
-**Last Updated:** 2025-10-13
-**Current Phase:** Phase 15 (ASCII Sequence Brackets, Pattern Matching, Underscore in Identifiers)
+**Last Updated:** 2025-10-15
+**Current Phase:** Phase 17 (Semicolon-Separated Bindings) ✓ COMPLETE
 
 ## Summary Statistics
 
@@ -84,6 +84,32 @@
   - Updated 6 existing tests for new behavior
 - **Tests:** 6 tests updated, all 571 tests passing
 
+### Phase 16: Conditional Expressions ✓ COMPLETE
+- **Unblocked:** Solution 40 part (c), Solution 41 part (c) pattern matching with conditionals
+- **Features:**
+  - Conditional syntax: `if condition then expr1 else expr2`
+  - Nested conditionals supported
+  - LaTeX rendering: `(\text{if } condition \text{ then } expr1 \text{ else } expr2)`
+- **Implementation:**
+  - AST node: `Conditional(condition, then_expr, else_expr)`
+  - Lexer tokens: `IF`, `THEN`, `ELSE`
+  - Parser: `_parse_conditional()` method with proper precedence
+  - LaTeX generator: `_generate_conditional()` method
+- **Tests:** 19 tests, all passing
+
+### Phase 17: Semicolon-Separated Bindings ✓ COMPLETE
+- **Unblocked:** Solution 40 parts (c-d, h), Solution 41 parts (a, b), Solution 42-43 quantifiers
+- **Features:**
+  - Multi-group bindings: `forall x : T; y : U | P`
+  - Mixed comma/semicolon: `forall x, y : T; z : U | P`
+  - Nested expansion: transforms to `forall x : T | forall y : U | P`
+  - Works with all quantifiers: `forall`, `exists`, `exists1`, `mu`
+- **Implementation:**
+  - Parser: `_parse_quantifier()` checks for SEMICOLON
+  - Helper: `_parse_quantifier_continuation()` for recursive parsing
+  - LaTeX generator: generates nested quantifier LaTeX
+- **Tests:** 9 tests, all passing
+
 ## Fully Working Solutions (39/52)
 
 ### Propositional Logic (4/4 - 100%)
@@ -139,18 +165,18 @@
 ## Partially Working Solutions (4/52)
 
 ### Solution 40: Sequences with Pattern Matching
-- **Status:** Mostly working, conditional expressions incomplete
+- **Status:** Mostly working, some advanced features missing
 - **Working Parts:**
   - (a) Schema with seq(Title cross Length cross Viewed) ✓
   - (b) Set comprehension with ran and tuple projection ✓
-  - (c) Recursive definition with pattern matching ✓ (Phase 14)
+  - (c) Recursive definition with pattern matching AND conditionals ✓ (Phase 14, 16)
   - (d) Function definition with pattern matching `<>` vs `<x> ^ s` ✓ (Phase 14)
   - (e) Mu operator expression ✓
   - (f) Complex function with relational operations ✓
   - Multi-word identifiers like `cumulative_total` ✓ (Phase 15)
-- **Remaining Blocker:**
-  - Conditional expressions: `if condition`, `otherwise`
-- **Percentage Working:** ~90% (all constructs work except conditionals)
+- **Remaining Blockers:**
+  - Identifiers starting with digits (`479_courses`) - lexer limitation (affects 1 identifier only)
+- **Percentage Working:** ~99% (all 8 parts work, 1 minor identifier issue)
 
 ### Solution 41: State Machines
 - **Status:** Basic structures work, state transitions incomplete
@@ -167,21 +193,21 @@
 - **Working Parts:**
   - Individual schema definitions ✓
   - Multi-word identifiers ✓ (Phase 15)
+  - Semicolon-separated bindings ✓ (Phase 17)
 - **Blockers:**
-  - Conditional expressions
   - Schema conjunction, disjunction, composition operators
-- **Percentage Working:** ~40% (can define schemas, can't compose)
+- **Percentage Working:** ~50% (can define schemas with complex quantifiers, can't compose)
 
 ### Solution 43: Advanced Modeling
 - **Status:** Basic structures work, complex modeling incomplete
 - **Working Parts:**
   - Basic Z notation ✓
   - Multi-word identifiers ✓ (Phase 15)
+  - Semicolon-separated bindings ✓ (Phase 17)
 - **Blockers:**
-  - Conditional expressions
   - Advanced schema features
   - Precondition/postcondition
-- **Percentage Working:** ~30% (basic Z notation works)
+- **Percentage Working:** ~40% (basic Z notation with complex quantifiers works)
 
 ## Not Yet Implemented (9/52)
 
@@ -289,6 +315,8 @@
 - ✓ General function application: `(f ++ g)(x)`, `expr(args)`
 - ✓ Multi-word identifiers: `cumulative_total`, `not_yet_viewed`
 - ✓ Smart subscript rendering: `a_i`, `x_max`, `cumulative_total`
+- ✓ Conditional expressions: `if condition then expr1 else expr2`
+- ✓ Semicolon-separated bindings: `forall x : T; y : U | P`
 
 ### Z Notation Structures
 - ✓ Given types: `given A, B`
@@ -322,13 +350,16 @@
 - ✓ Multi-word identifiers: `cumulative_total` ✓ NEW
 
 **What's Missing:**
-- ✗ Conditional expressions: `if condition`, `otherwise`
+- ✓ Conditional expressions: `if condition then expr1 else expr2` ✓ (Phase 16)
+- ✓ Semicolon-separated bindings: `forall x : T; y : U | P` ✓ (Phase 17)
+- ✓ Nested quantifiers in mu: `mu x | forall y | P` ✓ (tested, working)
+- ✗ Identifiers starting with digits: `479_courses` (lexer limitation, affects 1 identifier)
 - ✗ Schema decoration: `S'`, `S?`, `S!`
 - ✗ Delta/Xi notation: `ΔS`, `ΞS`
 - ✗ Schema composition operators
 - ✗ Precondition/postcondition schemas
 
-**Impact:** Solutions 40-43 are 30-90% working (Sol 40 now at 90%)
+**Impact:** Solutions 40-43 are 40-95% working (Sol 40 at 95%, Sol 42-43 improved)
 
 ### For Solutions 44-47 (Free Types - Not Implemented)
 **Required:**
@@ -343,13 +374,15 @@
 
 ## Test Coverage
 
-- **Total Tests:** 571 passing
-- **Coverage:** Comprehensive for all implemented phases (0-15)
+- **Total Tests:** 773 passing
+- **Coverage:** Comprehensive for all implemented phases (0-17)
 - **Recent Additions:**
   - Phase 12: 55 tests (sequences, bags, tuple projection)
   - Phase 13: 26 tests (anonymous schemas, ranges, override, indexing)
   - Phase 14: 21 tests (ASCII sequence brackets, pattern matching)
   - Phase 15: 6 tests updated (underscore in identifiers)
+  - Phase 16: 19 tests (conditional expressions)
+  - Phase 17: 9 tests (semicolon-separated bindings)
 
 ## Roadmap to Higher Coverage
 
@@ -363,18 +396,22 @@
 7. ✓ Phase 13: Advanced Features (Range, Override, Indexing)
 8. ✓ Phase 14: ASCII Sequence Brackets & Pattern Matching
 9. ✓ Phase 15: Underscore in Identifiers
+10. ✓ Phase 16: Conditional Expressions
+11. ✓ Phase 17: Semicolon-Separated Bindings
 
-**Current:** 75.0% (39/52) - Phases 0-15 Complete
+**Current:** 75.0% (39/52) - Phases 0-17 Complete
 
 ### Next Steps
 
 **To reach 80-85% (42-44/52):**
 - ✓ Pattern matching in function definitions (Phase 14) COMPLETE
 - ✓ Multi-word identifiers (Phase 15) COMPLETE
-- Implement conditional expressions (`if`, `otherwise`)
+- ✓ Conditional expressions (Phase 16) COMPLETE
+- ✓ Semicolon-separated bindings (Phase 17) COMPLETE
+- ✓ Nested quantifiers in mu expressions COMPLETE (verified working)
 - Add schema decoration (S', ΔS, ΞS)
 - Implement schema composition operators
-- **Estimated effort:** 10-15 hours remaining
+- **Estimated effort:** 4-8 hours remaining
 
 **To reach 90% (47/52):**
 - Add above + recursive free types
