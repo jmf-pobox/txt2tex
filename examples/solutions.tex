@@ -2037,7 +2037,7 @@ where
 
 \bigskip
 
-$\forall x \colon Entry \bullet \forall s \colon \seq~Entry \bullet 479$_courses (<>) = <> and 479_courses (<x> ^ s) = if x.3 = 479 $then <x$> ^ 479_courses(s) else 479_courses(s)
+$\forall x \colon Entry \bullet \forall s \colon \seq~Entry \bullet 479$_courses ($\langle \rangle$) = $\langle \rangle$ and 479_courses ($\langle x \rangle$ ^ s) = if x.3 = 479 $then <x$> ^ 479_courses(s) else 479_courses(s)
 
 \bigskip
 
@@ -2138,7 +2138,7 @@ $\forall n \colon N \bullet \forall p \colon Person \bullet \forall s \colon Sta
 
 \bigskip
 
-add(n, p, s) = s ++ {n |-> s(n) ^ <p>}
+add(n, p, s) = s ++ {n |-> s(n) ^ $\langle p \rangle$}
 
 \bigskip
 
@@ -2282,6 +2282,10 @@ end
 
 \section*{Free types and induction}
 
+\begin{zed}[N]\end{zed}
+
+\begin{zed}Tree ::= stalk | leaf \ldata N \rdata | branch \ldata Tree \cross Tree \rdata\end{zed}
+
 \bigskip
 \noindent
 \textbf{Solution 44}
@@ -2302,7 +2306,7 @@ The two cases of the proof are established by equational reasoning: the first by
 
 \bigskip
 
-reverse (<> ^ t) = reverse t [cat.1a] = (reverse t) ^ <> [cat.1b]
+reverse ($\langle \rangle$ ^ t) = reverse t [cat.1a] = (reverse t) ^ $\langle \rangle$ [cat.1b]
 
 \bigskip
 
@@ -2314,7 +2318,7 @@ reverse (<> ^ t) = reverse t [cat.1a] = (reverse t) ^ <> [cat.1b]
 
 \bigskip
 
-where cat.1a is <> ^ $s = s$ and cat.1b is s ^ <> = s
+where cat.1a is $\langle \rangle$ ^ $s = s$ and cat.1b is s ^ $\langle \rangle$ = s
 
 \bigskip
 
@@ -2338,31 +2342,31 @@ and the second by
 
 \bigskip
 
-reverse ((<x> ^ u) ^ t) = reverse (<x> ^ (u ^ t)) [cat.2]
+reverse (($\langle x \rangle$ ^ u) ^ t) = reverse ($\langle x \rangle$ ^ (u ^ t)) [cat.2]
 
 \bigskip
 
 \bigskip
 
-= reverse (u ^ t) ^ <x>    [reverse.2]
+= reverse (u ^ t) ^ $\langle x \rangle$    [reverse.2]
 
 \bigskip
 
 \bigskip
 
-= (reverse t ^ reverse u) ^ <x>  [anti-distributive]
+= (reverse t ^ reverse u) ^ $\langle x \rangle$  [anti-distributive]
 
 \bigskip
 
 \bigskip
 
-= reverse t ^ (reverse u ^ <x>)  [cat.2]
+= reverse t ^ (reverse u ^ $\langle x \rangle$)  [cat.2]
 
 \bigskip
 
 \bigskip
 
-= reverse t ^ reverse (<x> ^ u)  [reverse.2]
+= reverse t ^ reverse ($\langle x \rangle$ ^ u)  [reverse.2]
 
 \bigskip
 
@@ -2386,7 +2390,7 @@ The base case:
 
 \bigskip
 
-reverse (reverse <>) = reverse <> [reverse.1] = <> [reverse.1]
+reverse (reverse $\langle \rangle$) = reverse $\langle \rangle$ [reverse.1] = $\langle \rangle$ [reverse.1]
 
 \bigskip
 
@@ -2410,49 +2414,49 @@ The inductive step:
 
 \bigskip
 
-reverse (reverse (<x> ^ t))
+reverse (reverse ($\langle x \rangle$ ^ t))
 
 \bigskip
 
 \bigskip
 
-= reverse ((reverse t) ^ <x>)  [reverse.2]
+= reverse ((reverse t) ^ $\langle x \rangle$)  [reverse.2]
 
 \bigskip
 
 \bigskip
 
-= reverse (<x>) ^ reverse (reverse t)  [anti-distributive]
+= reverse ($\langle x \rangle$) ^ reverse (reverse t)  [anti-distributive]
 
 \bigskip
 
 \bigskip
 
-= reverse (<x> ^ <>) ^ reverse (reverse t)  [cat.1]
+= reverse ($\langle x \rangle$ ^ $\langle \rangle$) ^ reverse (reverse t)  [cat.1]
 
 \bigskip
 
 \bigskip
 
-= ((reverse <>) ^ <x>) ^ reverse (reverse t)  [reverse.2]
+= ((reverse $\langle \rangle$) ^ $\langle x \rangle$) ^ reverse (reverse t)  [reverse.2]
 
 \bigskip
 
 \bigskip
 
-= (<> ^ <x>) ^ reverse (reverse t)  [reverse.1]
+= ($\langle \rangle$ ^ $\langle x \rangle$) ^ reverse (reverse t)  [reverse.1]
 
 \bigskip
 
 \bigskip
 
-= <x> ^ reverse (reverse t)  [cat.1]
+= $\langle x \rangle$ ^ reverse (reverse t)  [cat.1]
 
 \bigskip
 
 \bigskip
 
-= <x> ^ t  [reverse (reverse t) = t]
+= $\langle x \rangle$ ^ t  [reverse (reverse t) = t]
 
 \bigskip
 
@@ -2508,13 +2512,13 @@ flatten : $Tree \fun seq$ N
 
 \bigskip
 
-flatten stalk = <>
+flatten stalk = $\langle \rangle$
 
 \bigskip
 
 \bigskip
 
-$\forall n \colon N \bullet flatten$(leaf n) = <n>
+$\forall n \colon N \bullet flatten$(leaf n) = $\langle n \rangle$
 
 \bigskip
 
@@ -2582,7 +2586,7 @@ This gives three cases for the proof:
 
 \bigskip
 
-# (flatten stalk) = # <> [flatten] = 0 [#] = count stalk [count]
+# (flatten stalk) = # $\langle \rangle$ [flatten] = 0 [#] = count stalk [count]
 
 \bigskip
 
@@ -2851,7 +2855,7 @@ premiumPlays : seq(Play) -> seq(Play)
 
 \bigskip
 
-premiumPlays(<>) = <>
+premiumPlays($\langle \rangle$) = $\langle \rangle$
 
 \bigskip
 
@@ -2863,7 +2867,7 @@ forall x : Play; s : seq(Play) |
 
 \bigskip
 
-premiumPlays(<x> ^ s) = <x> ^ premiumPlays(s)   if userStatus(x.2) = premium
+premiumPlays($\langle x \rangle$ ^ s) = $\langle x \rangle$ ^ premiumPlays(s)   if userStatus(x.2) = premium
 
 \bigskip
 
@@ -2892,7 +2896,7 @@ standardPlays : seq(Play) -> seq(Play)
 
 \bigskip
 
-standardPlays(<>) = <>
+standardPlays($\langle \rangle$) = $\langle \rangle$
 
 \bigskip
 
@@ -2904,7 +2908,7 @@ forall x : Play; s : seq(Play) |
 
 \bigskip
 
-standardPlays(<x> ^ s) = <x> ^ standardPlays(s)  if userStatus(x.2) = standard
+standardPlays($\langle x \rangle$ ^ s) = $\langle x \rangle$ ^ standardPlays(s)  if userStatus(x.2) = standard
 
 \bigskip
 
@@ -2933,7 +2937,7 @@ cumulativeLength : seq(Play) -> N
 
 \bigskip
 
-cumulativeLength(<>) = 0
+cumulativeLength($\langle \rangle$) = 0
 
 \bigskip
 
@@ -2945,7 +2949,7 @@ forall x : Play; s : seq(Play) |
 
 \bigskip
 
-cumulativeLength(<x> ^ s) = length(x.1) + cumulativeLength(s)
+cumulativeLength($\langle x \rangle$ ^ s) = length(x.1) + cumulativeLength(s)
 
 \bigskip
 

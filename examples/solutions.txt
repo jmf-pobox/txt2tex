@@ -954,6 +954,10 @@ TEXT: (Blocked by: semicolon bindings in set comprehensions and nested quantifie
 
 === Free types and induction ===
 
+given N
+
+Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩
+
 ** Solution 44 **
 
 TEXT: The two cases of the proof are established by equational reasoning: the first by

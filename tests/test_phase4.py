@@ -8,6 +8,7 @@ from txt2tex.ast_nodes import (
     BinaryOp,
     Declaration,
     Document,
+    FreeBranch,
     FreeType,
     GivenType,
     Identifier,
@@ -108,7 +109,9 @@ class TestParser:
         free_type = ast.items[0]
         assert isinstance(free_type, FreeType)
         assert free_type.name == "Status"
-        assert free_type.branches == ["active"]
+        assert len(free_type.branches) == 1
+        assert free_type.branches[0].name == "active"
+        assert free_type.branches[0].parameters is None
 
     def test_free_type_multiple_branches(self) -> None:
         """Test parsing free type with multiple branches."""
@@ -120,7 +123,10 @@ class TestParser:
         free_type = ast.items[0]
         assert isinstance(free_type, FreeType)
         assert free_type.name == "Status"
-        assert free_type.branches == ["active", "inactive", "suspended"]
+        assert len(free_type.branches) == 3
+        assert free_type.branches[0].name == "active"
+        assert free_type.branches[1].name == "inactive"
+        assert free_type.branches[2].name == "suspended"
 
     def test_abbreviation_simple(self) -> None:
         """Test parsing simple abbreviation."""
@@ -235,7 +241,15 @@ class TestLaTeXGenerator:
     def test_free_type(self) -> None:
         """Test generating free type."""
         gen = LaTeXGenerator()
-        ast = FreeType(name="Status", branches=["active", "inactive"], line=1, column=1)
+        ast = FreeType(
+            name="Status",
+            branches=[
+                FreeBranch(name="active", parameters=None, line=1, column=10),
+                FreeBranch(name="inactive", parameters=None, line=1, column=19),
+            ],
+            line=1,
+            column=1,
+        )
         latex_lines = gen.generate_document_item(ast)
         latex = "".join(latex_lines)
         assert "Status ::= active | inactive" in latex

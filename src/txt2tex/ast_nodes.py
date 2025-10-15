@@ -459,11 +459,39 @@ class GivenType(ASTNode):
 
 
 @dataclass(frozen=True)
+class FreeBranch(ASTNode):
+    """A single branch in a free type definition (Phase 17: Recursive Free Types).
+
+    Represents constructor branches that may have parameters.
+
+    Examples:
+    - stalk (no parameters) -> name="stalk", parameters=None
+    - leaf⟨N⟩ (single parameter) -> name="leaf", parameters=Identifier("N")
+    - branch⟨Tree x Tree⟩ (multiple parameters) -> name="branch",
+      parameters=BinaryOp("cross", Tree, Tree)
+    """
+
+    name: str  # Constructor name (e.g., "leaf", "branch", "stalk")
+    parameters: (
+        Expr | None
+    )  # None for simple branches, Expr for parameterized constructors
+
+
+@dataclass(frozen=True)
 class FreeType(ASTNode):
-    """Free type definition (Type ::= branch1 | branch2)."""
+    """Free type definition (Type ::= branch1 | branch2).
+
+    Phase 17 enhancement: Supports recursive constructors with parameters.
+
+    Examples:
+    - Status ::= active | inactive (simple)
+      -> branches=[FreeBranch("active", None), ...]
+    - Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree x Tree⟩ (recursive)
+      -> branches=[FreeBranch("stalk", None), FreeBranch("leaf", N), ...]
+    """
 
     name: str
-    branches: list[str]
+    branches: list[FreeBranch]  # List of constructor branches
 
 
 @dataclass(frozen=True)
