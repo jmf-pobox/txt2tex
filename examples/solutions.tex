@@ -1748,7 +1748,7 @@ or otherwise (omitted - requires semicolon-separated bindings in set comprehensi
 \vspace{11pt}
 \bigskip
 
-(mu $p : ran hd | $$\forall q \colon \ran hd \bullet p \neq q \land p.2 > q.2$| p.1)
+(mu $p : ran hd | $$\forall q \colon \ran hd \bullet p \neq q \land p.2 > q.2$$\mid$ p.1)
 
 \bigskip
 
@@ -1995,7 +1995,7 @@ where
 
 \bigskip
 
-$\forall x \colon Entry \bullet \forall s \colon \seq~Entry \bullet 479$_courses ($\langle \rangle$) = $\langle \rangle$ and 479_courses ($\langle x \rangle$ ^ s) = if x.3 = 479 $then <x$> ^ 479_courses(s) else 479_courses(s)
+$\forall x \colon Entry \bullet \forall s \colon \seq~Entry \bullet 479$_courses ($\langle \rangle$) = $\langle \rangle$ and 479_courses ($\langle x \rangle$ ^ s) = if x.3 = 479 then $\langle x \rangle$ ^ 479_courses(s) else 479_courses(s)
 
 \bigskip
 
@@ -2084,13 +2084,13 @@ where
 
 \bigskip
 
-$\forall n \colon N \bullet \forall p \colon Person \bullet \forall s \colon State \bullet n \in \dom s \land p \notin \bigcup \ran \ran s$|
+$\forall n \colon N \bullet \forall p \colon Person \bullet \forall s \colon State \bullet n \in \dom s \land p \notin \bigcup \ran \ran s$$\mid$
 
 \bigskip
 
 \bigskip
 
-add(n, p, s) = s ++ $\{n \mapsto s(n)^{\langle p \rangle}\}$
+add(n, p, s) = s ++ {n $\mapsto$ s(n) ^ $\langle p \rangle$}
 
 \bigskip
 
