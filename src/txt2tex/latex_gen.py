@@ -886,12 +886,12 @@ class LaTeXGenerator:
         lines.append(r"\bigskip")  # Leading vertical space (larger than medskip)
         lines.append("")
 
-        # Process inline math expressions first
-        text = self._process_inline_math(node.text)
+        # Convert sequence literals FIRST to protect <x> patterns
+        # Must happen before _process_inline_math() which can break up < and >
+        text = self._convert_sequence_literals(node.text)
 
-        # Convert sequence literals to math mode before operator conversion
-        # This must happen BEFORE the <=> and => replacements to avoid conflicts
-        text = self._convert_sequence_literals(text)
+        # Process inline math expressions
+        text = self._process_inline_math(text)
 
         # Then convert remaining symbolic operators to LaTeX math symbols
         # Do NOT convert and/or/not - those are English words in prose context
@@ -934,7 +934,7 @@ class LaTeXGenerator:
     def _convert_comparison_operators(self, text: str) -> str:
         """Convert bare comparison operators to math mode, avoiding nested math.
 
-        Handles: >=, <=, >, <
+        Handles: >=, <=, >, <, | (pipe)
         Only converts when NOT inside existing $...$ math mode.
         """
         result = []
@@ -970,7 +970,8 @@ class LaTeXGenerator:
                     result.append(r"$>$")
                     i += 1
                     continue
-                # Try < (only with surrounding spaces)
+                # Try < (only with surrounding spaces or end of string)
+                # Special case: also convert at end like "then <x>"
                 if (
                     text[i] == "<"
                     and (i == 0 or text[i - 1].isspace())
@@ -979,6 +980,20 @@ class LaTeXGenerator:
                     result.append(r"$<$")
                     i += 1
                     continue
+                # Try | (pipe/bullet - causes garbled output in text mode)
+                # Only convert if preceded by space or $ (end of math mode)
+                # and followed by space/newline/end
+                if text[i] == "|":
+                    prev_ok = i == 0 or text[i - 1].isspace() or text[i - 1] == "$"
+                    next_ok = (
+                        i + 1 >= len(text)
+                        or text[i + 1].isspace()
+                        or text[i + 1] == "\n"
+                    )
+                    if prev_ok and next_ok:
+                        result.append(r"$\mid$")
+                        i += 1
+                        continue
 
             # No match, copy character as-is
             result.append(text[i])
