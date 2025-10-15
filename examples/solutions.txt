@@ -864,7 +864,6 @@ TEXT:   forall y : dom(records) | # (records(y)) <= 50
 TEXT:   forall y : dom(records) | forall e : ran(records(y)) | year(e.1) = y
 TEXT:   forall r : ran(records) | forall i1, i2 : dom(r) | i1 /= i2 and (r(i1)).1 = (r(i2)).1 => (r(i1)).3 /= (r(i2)).3
 TEXT: end
-TEXT: (Blocked by: nested quantifiers in predicates - parser limitation)
 
 (b)
 
@@ -912,7 +911,6 @@ TEXT:   State : P(seq(iseq(Person)))
 TEXT: where
 TEXT:   forall s : State | forall i, j : dom(s) | i /= j | ran(s(i)) intersect ran(s(j)) = {}
 TEXT: end
-TEXT: (Blocked by: nested quantifiers with semicolon bindings - parser limitation)
 
 (b)
 
@@ -936,7 +934,6 @@ TEXT: (iii) forall i : dom bookings | forall b : bookings(i) | b.2 <= b.3
 TEXT:
 TEXT: (iv) This is enforced by the constraint for part (i).
 TEXT:
-TEXT: (Blocked by: nested quantifiers - parser limitation)
 
 (b)
 
@@ -948,7 +945,6 @@ TEXT: (iii) {r : Room; s : N | exists i : dom bookings | i.1 = r and i.2 = s . (
 TEXT:
 TEXT: (iv) {r : Room | exists i : dom bookings | i.1 = r | # (bookings(i)) >= 10}
 TEXT:
-TEXT: (Blocked by: semicolon bindings in set comprehensions and nested quantifiers)
 
 === Free types and induction ===
 
