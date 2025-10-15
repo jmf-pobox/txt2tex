@@ -1007,7 +1007,9 @@ class LaTeXGenerator:
             r"\b([a-zA-Z_]\w*)\s*"  # First identifier
             + math_op_pattern  # Operator
             + r"\s*([a-zA-Z_0-9]\w*)"  # Second operand
-            + r"(?:\s*" + math_op_pattern + r"\s*([a-zA-Z_0-9]\w*))*"  # More ops
+            + r"(?:\s*"
+            + math_op_pattern
+            + r"\s*([a-zA-Z_0-9]\w*))*"  # More ops
         )
 
         matches = list(re.finditer(full_pattern, result))
@@ -1042,9 +1044,7 @@ class LaTeXGenerator:
                 if isinstance(ast, Expr):
                     math_latex = self.generate_expr(ast)
                     # Wrap in $...$
-                    result = (
-                        result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-                    )
+                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
             except Exception:
                 # If parsing fails, just wrap as-is
                 # Still need to convert operators
