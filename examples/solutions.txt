@@ -841,7 +841,6 @@ TEXT:   longest_viewed : seq(Title * Length * Viewed) +-> Title * Length * Viewe
 TEXT: where
 TEXT:   forall s : seq(Title * Length * Viewed) | longest_viewed(s) = (mu p : ran s | p.3 = yes and forall q : ran s | p /= q and q.3 = yes | p.2 > q.2)
 TEXT: end
-TEXT: (Blocked by: nested quantifiers in mu expressions - parser limitation)
 
 TEXT: This, of course, assumes that there is at least one viewed programme (and one of a unique maximum length).
 
