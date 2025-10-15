@@ -1789,17 +1789,11 @@ These can be defined recursively:
 
 \bigskip
 
-\bigskip
-
-viewed <> = <>
-
-\bigskip
-
-\bigskip
-
-$viewed <x$> ^ $s = if$ x.3 = yes $then <x$> ^ viewed s else viewed s
-
-\bigskip
+\begin{axdef}
+viewed : \seq~Programme \fun \seq~Programme
+\where
+viewed(\langle \rangle) = \langle \rangle \land \forall x \colon Programme \bullet \forall s \colon \seq~Programme \bullet viewed(\langle x \rangle \cat s) = (\text{if } x.3 = yes \text{ then } \langle x \rangle \cat viewed(s) \text{ else } viewed(s))
+\end{axdef}
 
 \bigskip
 
@@ -2286,7 +2280,7 @@ end
 
 \bigskip
 
-(ii) {i : dom bookings | i.1 = Banbury and $\exists b \colon bookings(i) \bullet 50 \in b.2 \upto b.3$}
+(ii) $\{ i \colon \dom bookings \mid i.1 = Banbury \land \exists b \colon bookings(i) \bullet 50 \in b.2 \upto b.3 \}$
 
 \bigskip
 

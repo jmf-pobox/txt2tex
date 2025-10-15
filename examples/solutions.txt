@@ -799,8 +799,11 @@ TEXT: Note that cumulative_total is defined in part (d).
 
 TEXT: These can be defined recursively:
 
-TEXT: viewed <> = <>
-TEXT: viewed <x> ^ s = if x.3 = yes then <x> ^ viewed s else viewed s
+axdef
+  viewed : seq(Programme) -> seq(Programme)
+where
+  viewed(<>) = <> and forall x : Programme; s : seq(Programme) | viewed(<x> ^ s) = if x.3 = yes then <x> ^ viewed(s) else viewed(s)
+end
 
 TEXT: or otherwise (omitted - requires semicolon-separated bindings in set comprehension)
 
