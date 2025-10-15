@@ -881,9 +881,9 @@ class Parser:
         self._advance()  # Consume '|'
 
         # Parse body
+        # Phase 21: Use _parse_expr() to allow nested quantifiers
         # For mu with expression part, we need to stop at PERIOD
-        # Use _parse_iff() to parse expression but not consume PERIOD
-        body = self._parse_iff()
+        body = self._parse_expr()
 
         # Phase 11.5: Check for optional expression part (mu only)
         expression: Expr | None = None
