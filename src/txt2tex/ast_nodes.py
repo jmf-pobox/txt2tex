@@ -370,6 +370,45 @@ class Conditional(ASTNode):
     else_expr: Expr  # Expression when condition is false
 
 
+@dataclass(frozen=True)
+class GuardedBranch(ASTNode):
+    """A single branch in a guarded cases expression (Phase 23).
+
+    Represents: expression if guard
+
+    Used in function definitions with multiple conditional branches.
+
+    Example:
+    - <x> ^ (premium_plays s) if user_status(x.2) = premium
+      -> expression=<x> ^ (premium_plays s), guard=(user_status(x.2) = premium)
+    """
+
+    expression: Expr  # The expression for this branch
+    guard: Expr  # The condition/guard for this branch
+
+
+@dataclass(frozen=True)
+class GuardedCases(ASTNode):
+    """Guarded cases expression (Phase 23).
+
+    Represents multiple conditional branches:
+      expr1 if cond1
+      expr2 if cond2
+      ...
+
+    Used in axiomatic definitions with case-based function definitions.
+
+    Example:
+    f(x) =
+      expr1 if cond1
+      expr2 if cond2
+
+    LaTeX rendering: Multiple lines with \text{if} guards
+    """
+
+    branches: list[GuardedBranch]  # List of conditional branches
+
+
 # Type alias for all expression types
 Expr = (
     BinaryOp
@@ -392,6 +431,8 @@ Expr = (
     | TupleProjection
     | BagLiteral
     | Conditional
+    | GuardedBranch
+    | GuardedCases
 )
 
 

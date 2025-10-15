@@ -21,6 +21,8 @@ from txt2tex.ast_nodes import (
     FunctionType,
     GenericInstantiation,
     GivenType,
+    GuardedBranch,
+    GuardedCases,
     Identifier,
     Lambda,
     Number,
@@ -308,6 +310,10 @@ class LaTeXGenerator:
             return self._generate_bag_literal(expr)
         if isinstance(expr, Conditional):
             return self._generate_conditional(expr)
+        if isinstance(expr, GuardedCases):
+            return self._generate_guarded_cases(expr)
+        if isinstance(expr, GuardedBranch):
+            return self._generate_guarded_branch(expr)
 
         raise TypeError(f"Unknown expression type: {type(expr)}")
 
@@ -830,6 +836,40 @@ class LaTeXGenerator:
             f"\\text{{ then }} {then_latex} "
             f"\\text{{ else }} {else_latex})"
         )
+
+    def _generate_guarded_cases(self, node: GuardedCases) -> str:
+        """Generate LaTeX for guarded cases expression (Phase 23).
+
+        Examples:
+        premium_plays(<x> ^ s) =
+          <x> ^ (premium_plays s) if user_status(x.2) = premium
+          premium_plays s if user_status(x.2) = standard
+
+        Rendered as multi-line with alignment and \\text{if} guards:
+          <x> ^ (premium_plays~s) \\\\
+          \\text{if } user_status(x.2) = premium \\\\
+          premium_plays~s \\\\
+          \\text{if } user_status(x.2) = standard
+        """
+        lines: list[str] = []
+        for branch in node.branches:
+            expr_latex = self.generate_expr(branch.expression)
+            guard_latex = self.generate_expr(branch.guard)
+            lines.append(f"{expr_latex} \\\\")
+            lines.append(f"\\text{{if }} {guard_latex}")
+            if branch != node.branches[-1]:  # Add line break between branches
+                lines.append("\\\\")
+
+        return "\n".join(lines)
+
+    def _generate_guarded_branch(self, node: GuardedBranch) -> str:
+        """Generate LaTeX for single guarded branch (Phase 23).
+
+        This is typically not called directly; GuardedCases handles the rendering.
+        """
+        expr_latex = self.generate_expr(node.expression)
+        guard_latex = self.generate_expr(node.guard)
+        return f"{expr_latex} \\text{{if }} {guard_latex}"
 
     def _generate_section(self, node: Section) -> list[str]:
         """Generate LaTeX for section."""
