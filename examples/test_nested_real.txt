@@ -1,0 +1,3 @@
+** Test Real Nested Quantifier **
+
+(mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains(x)).2 = p} > # {x : dom trains | (trains(x)).2 = q})
