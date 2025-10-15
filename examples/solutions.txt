@@ -759,8 +759,7 @@ end
 
 (c)
 
-TEXT: (mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains(x)).2 = p} > # {x : dom trains | (trains(x)).2 = q})
-TEXT: (Blocked by: nested quantifiers in mu with multiple pipes - parser ambiguity)
+(mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains(x)).2 = p} > # {x : dom trains | (trains(x)).2 = q})
 
 ** Solution 39 **
 
@@ -1061,13 +1060,11 @@ abbrev B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
 
 (c)
 
-TEXT: C == (mu u : dom(loved) | forall v : dom(loved) | u /= v | # (loved(u)) > # (loved(v)))
-TEXT: (Blocked by: nested quantifiers in mu - parser ambiguity)
+C == (mu u : dom(loved) | forall v : dom(loved) | u /= v | # (loved(u)) > # (loved(v)))
 
 (d)
 
-TEXT: D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved(u)} > # {u : UserId | t in loved(u)})
-TEXT: (Blocked by: nested quantifiers in mu - parser ambiguity)
+D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved(u)} > # {u : UserId | t in loved(u)})
 
 ** Solution 51 **
 
@@ -1105,9 +1102,7 @@ TEXT: mostPopular : SongId
 TEXT: (exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j)) =>
 TEXT:     mostPopular = (mu i : songs | forall j : songs | i /= j | popularity(i) > popularity(j))
 TEXT: and
-TEXT: not (exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j)) =>
-TEXT:     mostPopular = nullSong
-TEXT: (Blocked by: nested quantifiers in mu - parser ambiguity)
+not (exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j)) => mostPopular = nullSong
 
 (c)
 

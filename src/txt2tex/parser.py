@@ -882,8 +882,25 @@ class Parser:
 
         # Parse body
         # Phase 21: Use _parse_expr() to allow nested quantifiers
-        # For mu with expression part, we need to stop at PERIOD
+        # Phase 21b: Check for constrained quantifier (forall x : T | constraint | body)
+        # Parse first expression (constraint or full body)
         body = self._parse_expr()
+
+        # Phase 21b: Check for second pipe (constrained quantifier)
+        # Syntax: forall x : T | constraint | body
+        # Semantics: forall x : T | constraint and body
+        if self._match(TokenType.PIPE):
+            self._advance()  # Consume second '|'
+            constraint = body
+            actual_body = self._parse_expr()
+            # Combine constraint and body with AND
+            body = BinaryOp(
+                operator="and",
+                left=constraint,
+                right=actual_body,
+                line=constraint.line,
+                column=constraint.column,
+            )
 
         # Phase 11.5: Check for optional expression part (mu only)
         expression: Expr | None = None
