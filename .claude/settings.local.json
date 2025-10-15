@@ -53,7 +53,8 @@
       "Bash(./qa_check.sh:*)",
       "Bash(TEXINPUTS=/Users/jfreeman/Coding/fuzz/txt2tex/sem/latex//: pdflatex:*)",
       "Bash(env TEXINPUTS=/Users/jfreeman/Coding/fuzz/txt2tex/sem/latex//: pdflatex:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(PYTHONPATH=src pytest:*)"
     ],
     "deny": [],
     "ask": []

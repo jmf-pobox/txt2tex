@@ -21,6 +21,8 @@ from txt2tex.ast_nodes import (
     FunctionType,
     GenericInstantiation,
     GivenType,
+    GuardedBranch,
+    GuardedCases,
     Identifier,
     Lambda,
     Number,
@@ -1375,8 +1377,17 @@ class Parser:
         return self._parse_iff()
 
     def _parse_comparison(self) -> Expr:
-        """Parse comparison operators (<, >, <=, >=, =, !=)."""
+        """Parse comparison operators (<, >, <=, >=, =, !=).
+
+        Phase 21d: Allow newlines before and after comparison operators.
+        Phase 23: Support guarded cases after = operator.
+        """
         left = self._parse_function_type()
+
+        # Phase 21d: Peek ahead to see if there's a comparison operator
+        # We need to skip newlines to check, but restore position if no operator
+        saved_pos = self.pos
+        self._skip_newlines()
 
         if self._match(
             TokenType.LESS_THAN,
@@ -1386,8 +1397,17 @@ class Parser:
             TokenType.EQUALS,
             TokenType.NOT_EQUAL,
         ):
+            # Found comparison operator, consume it
             op_token = self._advance()
+            # Phase 21d: Allow newlines after comparison operator
+            self._skip_newlines()
             right = self._parse_function_type()
+
+            # Phase 23: Check for guarded cases after = operator
+            # Syntax: expr1 = expr2 \n if cond2 \n expr3 \n if cond3 ...
+            if op_token.type == TokenType.EQUALS:
+                right = self._try_parse_guarded_cases(right)
+
             left = BinaryOp(
                 operator=op_token.value,
                 left=left,
@@ -1395,8 +1415,104 @@ class Parser:
                 line=op_token.line,
                 column=op_token.column,
             )
+        else:
+            # No comparison operator, restore position to not consume newlines
+            self.pos = saved_pos
 
         return left
+
+    def _try_parse_guarded_cases(self, first_expr: Expr) -> Expr:
+        """Try to parse guarded cases (Phase 23).
+
+        Checks if the current position is followed by:
+          NEWLINE IF condition NEWLINE expr IF condition ...
+
+        If so, parses all guarded branches and returns GuardedCases.
+        Otherwise, returns the original expression unchanged.
+
+        Args:
+            first_expr: The first expression (already parsed)
+
+        Returns:
+            GuardedCases if guards found, otherwise first_expr unchanged
+        """
+        # Check if next is NEWLINE + IF (but not IF ... THEN)
+        if not self._match(TokenType.NEWLINE):
+            return first_expr
+
+        # Save position in case we need to backtrack
+        saved_pos = self.pos
+
+        # Skip the newline
+        self._advance()
+
+        # Check if next token is IF
+        if not self._match(TokenType.IF):
+            # Not a guarded case, restore position and return
+            self.pos = saved_pos
+            return first_expr
+
+        # It's a guarded case! Parse first branch
+        self._advance()  # Consume IF
+        first_guard = self._parse_expr()
+
+        branches: list[GuardedBranch] = [
+            GuardedBranch(
+                expression=first_expr,
+                guard=first_guard,
+                line=first_expr.line,
+                column=first_expr.column,
+            )
+        ]
+
+        # Parse remaining branches: NEWLINE expr NEWLINE IF guard
+        while True:
+            # Expect NEWLINE + expr
+            if not self._match(TokenType.NEWLINE):
+                break
+            self._advance()  # Consume NEWLINE
+
+            # Check if we're at the end or a structural element
+            if self._at_end() or self._match(TokenType.END, TokenType.WHERE):
+                # Restore the newline for parent parser
+                self.pos -= 1
+                break
+
+            # Parse branch expression
+            branch_expr = self._parse_function_type()
+
+            # Expect NEWLINE + IF
+            if not self._match(TokenType.NEWLINE):
+                # No more branches, this expression is something else
+                # This shouldn't happen in well-formed input
+                raise ParserError(
+                    "Expected newline after guarded branch expression", self._current()
+                )
+            self._advance()  # Consume NEWLINE
+
+            if not self._match(TokenType.IF):
+                # No IF, so we're done with guarded cases
+                # Restore position to before the expression
+                raise ParserError(
+                    "Expected 'if' guard after expression in guarded cases",
+                    self._current(),
+                )
+
+            self._advance()  # Consume IF
+            branch_guard = self._parse_expr()
+
+            branches.append(
+                GuardedBranch(
+                    expression=branch_expr,
+                    guard=branch_guard,
+                    line=branch_expr.line,
+                    column=branch_expr.column,
+                )
+            )
+
+        return GuardedCases(
+            branches=branches, line=first_expr.line, column=first_expr.column
+        )
 
     def _parse_function_type(self) -> Expr:
         """Parse function type operators (Phase 11c, enhanced Phase 18).
@@ -1834,11 +1950,12 @@ class Parser:
         if self._match(TokenType.IF):
             return self._parse_conditional()
 
-        # Phase 11b / Phase 13: Identifiers
+        # Phase 11b / Phase 13 / Phase 22: Identifiers
         # Note: Function application expr(...) is now handled in _parse_postfix()
         # Note: Generic instantiation Type[X] is handled in _parse_postfix()
         # Note: Relational image R(| S |) is handled in _parse_postfix()
-        if self._match(TokenType.IDENTIFIER):
+        # Phase 22: Allow keywords to be used as function names (union, intersect)
+        if self._match(TokenType.IDENTIFIER, TokenType.UNION, TokenType.INTERSECT):
             name_token = self._advance()
             return Identifier(
                 name=name_token.value, line=name_token.line, column=name_token.column
@@ -1854,6 +1971,9 @@ class Parser:
             # Parse first expression
             first_expr = self._parse_expr()
 
+            # Phase 21d: Allow newlines before checking what follows
+            self._skip_newlines()
+
             # Check for comma (tuple) vs single parenthesized expression
             if self._match(TokenType.COMMA):
                 # It's a tuple: (expr, expr, ...)
@@ -1861,10 +1981,14 @@ class Parser:
 
                 while self._match(TokenType.COMMA):
                     self._advance()  # Consume ','
+                    # Phase 21d: Allow newlines after comma
+                    self._skip_newlines()
                     # Check for trailing comma: (a, b,)
                     if self._match(TokenType.RPAREN):
                         break
                     elements.append(self._parse_expr())
+                    # Phase 21d: Allow newlines after element
+                    self._skip_newlines()
 
                 if not self._match(TokenType.RPAREN):
                     raise ParserError("Expected ')' after tuple", self._current())
