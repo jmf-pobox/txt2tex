@@ -675,19 +675,21 @@ TEXT: (Requires power set notation P and relational image)
 
 (a)
 
-axdef
-  children : Person -> P Person
-where
-  children = {p : Person . p |-> parentOf(| {p} |)}
-end
+TEXT: axdef
+TEXT:   children : Person -> P Person
+TEXT: where
+TEXT:   children = {p : Person . p |-> parentOf(| {p} |)}
+TEXT: end
+TEXT: (Blocked by: set comprehension with '.' separator not yet supported)
 
 (b)
 
-axdef
-  number_of_grandchildren : Person -> N
-where
-  number_of_grandchildren = {p : Person . p |-> # (parentOf o9 parentOf)(| {p} |)}
-end
+TEXT: axdef
+TEXT:   number_of_grandchildren : Person -> N
+TEXT: where
+TEXT:   number_of_grandchildren = {p : Person . p |-> # (parentOf o9 parentOf)(| {p} |)}
+TEXT: end
+TEXT: (Blocked by: set comprehension with '.' separator not yet supported)
 
 ** Solution 36 **
 
@@ -698,7 +700,7 @@ TEXT:   number_of_drivers : (Drivers <-> Cars) -> (Cars -> N)
 TEXT: where
 TEXT:   forall r : Drivers <-> Cars | number_of_drivers(r) = {c : ran r . c |-> #{d : Drivers | d |-> c in r}}
 TEXT: end
-TEXT: (Blocked by: relation types in quantifier domains - Phase 23)
+TEXT: (Blocked by: set comprehension with '.' separator not yet supported)
 
 === Sequences ===
 

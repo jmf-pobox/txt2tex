@@ -517,21 +517,23 @@ class LaTeXGenerator:
         return " ".join(parts)
 
     def _generate_set_comprehension(self, node: SetComprehension) -> str:
-        """Generate LaTeX for set comprehension (Phase 8).
+        """Generate LaTeX for set comprehension (Phase 8, enhanced Phase 22).
 
-        Supports two forms:
+        Supports three forms:
         - Set by predicate: { x : X | predicate }
           -> \\{ x \\colon X \\mid predicate \\}
-        - Set by expression: { x : X | pred . expr }
+        - Set by expression with predicate: { x : X | pred . expr }
           -> \\{ x \\colon X \\mid pred \\bullet expr \\}
+        - Set by expression only: { x : X . expr }
+          -> \\{ x \\colon X \\bullet expr \\}
 
         Examples:
         - { x : N | x > 0 }
           -> \\{ x \\colon \\mathbb{N} \\mid x > 0 \\}
         - { x : N | x > 0 . x^2 }
           -> \\{ x \\colon \\mathbb{N} \\mid x > 0 \\bullet x^{2} \\}
-        - { x, y : N | x + y = 4 }
-          -> \\{ x, y \\colon \\mathbb{N} \\mid x + y = 4 \\}
+        - { x : N . x^2 }
+          -> \\{ x \\colon \\mathbb{N} \\bullet x^{2} \\}
         """
         # Generate variables (comma-separated for multi-variable)
         variables_str = ", ".join(node.variables)
@@ -543,18 +545,26 @@ class LaTeXGenerator:
             parts.append(":" if self.use_fuzz else r"\colon")
             parts.append(domain_latex)
 
-        # Add mid/pipe separator
-        parts.append("|" if self.use_fuzz else r"\mid")
-
-        # Generate predicate
-        predicate_latex = self.generate_expr(node.predicate)
-        parts.append(predicate_latex)
-
-        # If expression is present, add bullet/spot and expression
-        if node.expression:
+        # Phase 22: Handle case with no predicate
+        if node.predicate is None:
+            # No predicate: { x : X . expr } -> use bullet directly
             parts.append(r"\spot" if self.use_fuzz else r"\bullet")
-            expression_latex = self.generate_expr(node.expression)
-            parts.append(expression_latex)
+            if node.expression:
+                expression_latex = self.generate_expr(node.expression)
+                parts.append(expression_latex)
+        else:
+            # Has predicate: add mid/pipe separator
+            parts.append("|" if self.use_fuzz else r"\mid")
+
+            # Generate predicate
+            predicate_latex = self.generate_expr(node.predicate)
+            parts.append(predicate_latex)
+
+            # If expression is present, add bullet/spot and expression
+            if node.expression:
+                parts.append(r"\spot" if self.use_fuzz else r"\bullet")
+                expression_latex = self.generate_expr(node.expression)
+                parts.append(expression_latex)
 
         # Close set
         parts.append(r"\}")
