@@ -82,6 +82,7 @@ class LaTeXGenerator:
         "union": r"\cup",
         "intersect": r"\cap",
         "cross": r"\cross",  # Cartesian product
+        "×": r"\cross",  # Cartesian product (Unicode)  # noqa: RUF001
         "\\": r"\setminus",  # Set difference
         "++": r"\oplus",  # Override (Phase 13)
         # Relation operators (Phase 10a)
@@ -187,6 +188,7 @@ class LaTeXGenerator:
         "subset": 7,
         "union": 8,
         "cross": 8,  # Cartesian product (Phase 11.5) - same as union
+        "×": 8,  # Cartesian product (Unicode) - same as union  # noqa: RUF001
         "intersect": 9,
         "\\": 9,  # Set difference (Phase 11.5) - same as intersect
     }
@@ -873,6 +875,10 @@ class LaTeXGenerator:
         # Process inline math expressions first
         text = self._process_inline_math(node.text)
 
+        # Convert sequence literals to math mode before operator conversion
+        # This must happen BEFORE the <=> and => replacements to avoid conflicts
+        text = self._convert_sequence_literals(text)
+
         # Then convert remaining symbolic operators to LaTeX math symbols
         # Do NOT convert and/or/not - those are English words in prose context
         text = text.replace("<=>", r"$\Leftrightarrow$")
@@ -883,6 +889,62 @@ class LaTeXGenerator:
         lines.append(r"\bigskip")  # Trailing vertical space
         lines.append("")
         return lines
+
+    def _convert_sequence_literals(self, text: str) -> str:
+        """Convert sequence literals <...> to math mode \\langle ... \\rangle.
+
+        Handles patterns like:
+        - <> → $\\langle \\rangle$
+        - <a> → $\\langle a \\rangle$
+        - <x, y> → $\\langle x, y \\rangle$
+        - <1, 2, 3> → $\\langle 1, 2, 3 \\rangle$
+
+        Uses regex to find angle bracket pairs and converts them to LaTeX.
+        Must NOT match operators like <=> or <-> or comparison operators.
+        """
+        # Strategy: Only match sequences where the content is:
+        # - Empty: <>
+        # - Word characters, numbers, spaces, commas, parentheses, dots, ^: <x>, <a, b>
+        # This prevents matching <=> (has =), <-> (has -), < > (comparison with space)
+        # Pattern: < followed by (empty OR word chars/nums/spaces/commas/parens/dots/^),
+        # then >
+        # We need to be careful not to match partial patterns
+        pattern = r"<([\w\s,\.\^\(\)]*)>"
+
+        def replace_sequence(match: re.Match[str]) -> str:
+            full_match = match.group(0)
+            content = match.group(1)
+
+            # Additional validation: check if this looks like an operator
+            # Reject if: contains = or - or if it's empty and followed/preceded by =
+            if "=" in full_match or "-" in full_match:
+                return full_match  # Don't convert operators
+            if "|" in full_match or "#" in full_match:
+                return full_match  # Don't convert other operators
+
+            # Check if this is truly a sequence or just < > comparison
+            # Sequences should have specific patterns:
+            # 1. Empty: <>
+            # 2. Single identifier: <x>, <abc>
+            # 3. Comma-separated: <x, y>, <a, b, c>
+            content_stripped = content.strip()
+
+            # Empty sequence
+            if not content_stripped:
+                return r"$\langle \rangle$"
+
+            # Check if it looks like a valid sequence content
+            # Valid: word characters, numbers, commas, spaces, parentheses, dots, ^
+            # Invalid: if it has suspicious patterns
+            # For safety, only convert if it matches common sequence patterns
+            if re.match(r"^[\w\s,\.\^\(\)]+$", content_stripped):
+                return rf"$\langle {content_stripped} \rangle$"
+
+            # Not a sequence, return as-is
+            return full_match
+
+        result = re.sub(pattern, replace_sequence, text)
+        return result
 
     def _find_balanced_braces(self, text: str) -> list[tuple[int, int]]:
         """Find all balanced brace pairs in text.
@@ -1159,11 +1221,31 @@ class LaTeXGenerator:
         return lines
 
     def _generate_free_type(self, node: FreeType) -> list[str]:
-        """Generate LaTeX for free type definition."""
+        """Generate LaTeX for free type definition (Phase 17: Recursive Free Types).
+
+        Examples:
+        - Status ::= active | inactive (simple branches)
+        - Tree ::= stalk | leaf \\ldata N \\rdata |
+          branch \\ldata Tree \\cross Tree \\rdata
+        """
         lines: list[str] = []
-        # Generate as: Type ::= branch1 | branch2 | ...
-        branches_str = " | ".join(node.branches)
-        lines.append(f"{node.name} ::= {branches_str}")
+
+        # Generate each branch with proper LaTeX formatting
+        branch_strs: list[str] = []
+        for branch in node.branches:
+            if branch.parameters is None:
+                # Simple branch: just the name
+                branch_strs.append(branch.name)
+            else:
+                # Parameterized constructor: name \\ldata params \\rdata
+                params_latex = self.generate_expr(branch.parameters)
+                branch_strs.append(f"{branch.name} \\ldata {params_latex} \\rdata")
+
+        # Join branches with |
+        branches_str = " | ".join(branch_strs)
+
+        # Wrap in zed environment for proper formatting
+        lines.append(f"\\begin{{zed}}{node.name} ::= {branches_str}\\end{{zed}}")
         lines.append("")
         return lines
 

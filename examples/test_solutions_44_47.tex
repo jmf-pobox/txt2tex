@@ -1,0 +1,330 @@
+\documentclass{article}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Free types and induction}
+
+\begin{zed}[N]\end{zed}
+
+\begin{zed}Tree ::= stalk | leaf \ldata N \rdata | branch \ldata Tree \cross Tree \rdata\end{zed}
+
+\bigskip
+\noindent
+\textbf{Solution 44}
+
+\medskip
+
+\bigskip
+
+The two cases of the proof are established by equational reasoning: the first by
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+reverse ($\langle \rangle$ ^ t) = reverse t [cat.1a] = (reverse t) ^ $\langle \rangle$ [cat.1b]
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+where cat.1a is $\langle \rangle$ ^ $s = s$ and cat.1b is s ^ $\langle \rangle$ = s
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+and the second by
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+reverse (($\langle x \rangle$ ^ u) ^ t) = reverse ($\langle x \rangle$ ^ (u ^ t)) [cat.2]
+
+\bigskip
+
+\bigskip
+
+= reverse (u ^ t) ^ $\langle x \rangle$    [reverse.2]
+
+\bigskip
+
+\bigskip
+
+= (reverse t ^ reverse u) ^ $\langle x \rangle$  [anti-distributive]
+
+\bigskip
+
+\bigskip
+
+= reverse t ^ (reverse u ^ $\langle x \rangle$)  [cat.2]
+
+\bigskip
+
+\bigskip
+
+= reverse t ^ reverse ($\langle x \rangle$ ^ u)  [reverse.2]
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 45}
+
+\medskip
+
+\bigskip
+
+The base case:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+reverse (reverse $\langle \rangle$) = reverse $\langle \rangle$ [reverse.1] = $\langle \rangle$ [reverse.1]
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+The inductive step:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+reverse (reverse ($\langle x \rangle$ ^ t))
+
+\bigskip
+
+\bigskip
+
+= reverse ((reverse t) ^ $\langle x \rangle$)  [reverse.2]
+
+\bigskip
+
+\bigskip
+
+= reverse ($\langle x \rangle$) ^ reverse (reverse t)  [anti-distributive]
+
+\bigskip
+
+\bigskip
+
+= reverse ($\langle x \rangle$ ^ $\langle \rangle$) ^ reverse (reverse t)  [cat.1]
+
+\bigskip
+
+\bigskip
+
+= ((reverse $\langle \rangle$) ^ $\langle x \rangle$) ^ reverse (reverse t)  [reverse.2]
+
+\bigskip
+
+\bigskip
+
+= ($\langle \rangle$ ^ $\langle x \rangle$) ^ reverse (reverse t)  [reverse.1]
+
+\bigskip
+
+\bigskip
+
+= $\langle x \rangle$ ^ reverse (reverse t)  [cat.1]
+
+\bigskip
+
+\bigskip
+
+= $\langle x \rangle$ ^ t  [reverse (reverse t) = t]
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Solution 46}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+count : $Tree \fun N$
+
+\bigskip
+
+\bigskip
+
+count $stalk = 0$
+
+\bigskip
+
+\bigskip
+
+$\forall n \colon N \bullet count$(leaf n) = 1
+
+\bigskip
+
+\bigskip
+
+$\forall t1, t2 \colon Tree \bullet count(branch(t1, t2)) = count$t1 + count t2
+
+\bigskip
+
+\bigskip
+
+(Blocked by: recursive free types and pattern matching)
+
+\bigskip
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+flatten : $Tree \fun seq$ N
+
+\bigskip
+
+\bigskip
+
+flatten stalk = $\langle \rangle$
+
+\bigskip
+
+\bigskip
+
+$\forall n \colon N \bullet flatten$(leaf n) = $\langle n \rangle$
+
+\bigskip
+
+\bigskip
+
+$\forall t1, t2 \colon Tree \bullet flatten(branch(t1, t2)) = flatten$t1 ^ flatten t2
+
+\bigskip
+
+\bigskip
+
+(Blocked by: recursive free types and pattern matching)
+
+\bigskip
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 47}
+
+\medskip
+
+\bigskip
+
+First, exhibit the induction principle for the free type:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+P stalk and ($\forall n \colon N \bullet P$(leaf n)) and ($\forall t1, t2 \colon Tree \bullet \power~t1 \land \power~t2 \Rightarrow \power~branch(t1, t2)$)
+
+\bigskip
+
+\bigskip
+
+implies $\forall t \colon Tree \bullet \power~t$
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+This gives three cases for the proof:
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+# (flatten stalk) = # $\langle \rangle$ [flatten] = 0 [#] = count stalk [count]
+
+\bigskip
+
+\bigskip
+
+
+
+\bigskip
+
+\bigskip
+
+(Remaining cases omitted - require equational reasoning with recursive functions)
+
+\bigskip
+
+\end{document}

@@ -15,6 +15,7 @@ from txt2tex.ast_nodes import (
     EquivChain,
     EquivStep,
     Expr,
+    FreeBranch,
     FreeType,
     FunctionApp,
     FunctionType,
@@ -1858,7 +1859,14 @@ class Parser:
         return GivenType(names=names, line=start_token.line, column=start_token.column)
 
     def _parse_free_type(self) -> FreeType:
-        """Parse free type: Type ::= branch1 | branch2 | branch3"""
+        """Parse free type: Type ::= branch1 | branch2⟨N⟩ | branch3⟨Tree x Tree⟩.
+
+        Phase 17 enhancement: Supports recursive constructors with parameters.
+
+        Examples:
+        - Status ::= active | inactive (simple branches)
+        - Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree x Tree⟩ (with parameters)
+        """
         # Identifier already consumed in _parse_document_item, need to back up
         name_token = self._current()
         type_name = name_token.value
@@ -1868,13 +1876,54 @@ class Parser:
             raise ParserError("Expected '::=' in free type definition", self._current())
         self._advance()  # Consume '::='
 
-        branches: list[str] = []
+        branches: list[FreeBranch] = []
 
         # Parse pipe-separated list of branches
         while not self._at_end() and not self._match(TokenType.NEWLINE):
             if self._match(TokenType.IDENTIFIER):
-                branches.append(self._current().value)
+                branch_token = self._current()
+                branch_name = branch_token.value
                 self._advance()
+
+                # Check for constructor parameters: ⟨...⟩
+                parameters: Expr | None = None
+                if self._match(TokenType.LANGLE):
+                    langle_token = self._current()
+                    self._advance()  # Consume '⟨'
+
+                    # Check for empty parameters: ⟨⟩
+                    if self._match(TokenType.RANGLE):
+                        # Empty parameters - create empty sequence literal
+                        parameters = SequenceLiteral(
+                            elements=[],
+                            line=langle_token.line,
+                            column=langle_token.column,
+                        )
+                        self._advance()  # Consume '⟩'
+                    else:
+                        # Parse parameter type expression (can be cross product)
+                        # Examples: ⟨N⟩, ⟨Tree⟩, ⟨Tree x Tree⟩
+                        # Use _parse_cross to parse identifiers and cross products
+                        # Stops at operators higher than cross (union, comparison)
+                        parameters = self._parse_cross()
+
+                        # Expect closing angle bracket
+                        if not self._match(TokenType.RANGLE):
+                            raise ParserError(
+                                "Expected '⟩' after constructor parameters",
+                                self._current(),
+                            )
+                        self._advance()  # Consume '⟩'
+
+                # Create FreeBranch
+                branches.append(
+                    FreeBranch(
+                        name=branch_name,
+                        parameters=parameters,
+                        line=branch_token.line,
+                        column=branch_token.column,
+                    )
+                )
 
             # Check for pipe separator
             if self._match(TokenType.PIPE):
