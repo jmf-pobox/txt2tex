@@ -481,8 +481,28 @@ class Lexer:
         if char.isalpha() or char == "_":
             return self._scan_identifier(start_line, start_column)
 
-        # Numbers
+        # Numbers and digit-starting identifiers (Phase 18)
+        # Digit-starting identifiers: 479_courses (digit followed by underscore+letter)
+        # Pure numbers: 479 (digits only)
         if char.isdigit():
+            # Peek ahead to determine if this is identifier or number
+            # Scan all digits first
+            temp_pos = self.pos
+            while temp_pos < len(self.text) and self.text[temp_pos].isdigit():
+                temp_pos += 1
+
+            # Check if followed by underscore and then letter/digit
+            # Pattern: 479_courses (digit+underscore+alphanumeric)
+            if (
+                temp_pos < len(self.text)
+                and self.text[temp_pos] == "_"
+                and temp_pos + 1 < len(self.text)
+                and (self.text[temp_pos + 1].isalnum())
+            ):
+                # It's an identifier starting with digits
+                return self._scan_identifier(start_line, start_column)
+
+            # It's a plain number
             return self._scan_number(start_line, start_column)
 
         # Unicode symbols (Phase 11.5)

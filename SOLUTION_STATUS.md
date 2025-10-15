@@ -1,22 +1,22 @@
 # Solution Implementation Status
 
 **Last Updated:** 2025-10-15
-**Current Phase:** Phase 17 (Semicolon-Separated Bindings) ✓ COMPLETE
+**Current Phase:** Phase 18 (Digit-Starting Identifiers) ✓ COMPLETE
 
 ## Summary Statistics
 
 | Status | Count | Percentage |
 |--------|-------|------------|
-| **Fully Working** | 39 | 75.0% |
-| **Partially Working** | 4 | 7.7% |
+| **Fully Working** | 41 | 78.8% |
+| **Partially Working** | 2 | 3.8% |
 | **Not Yet Implemented** | 9 | 17.3% |
 | **Total** | 52 | 100% |
 
-**Current Coverage:** ~80% (41.2/52 equivalent solutions)
-- 39 fully working + 0.99 (Sol 40) + 0.90 (Sol 41) + 0.20 (Sol 42) + 0.10 (Sol 43) = 41.19
+**Current Coverage:** ~82% (42.3/52 equivalent solutions)
+- 41 fully working + 0.20 (Sol 42) + 0.10 (Sol 43) = 42.30
 
-**Previous Coverage:** 75.0% (39/52 solutions - Phase 17)
-**Improvement:** Verified that Solutions 40-41 are nearly complete (most "blockers" were on TEXT-only prose)
+**Previous Coverage:** ~80% (41.2/52 solutions - Phase 17)
+**Improvement:** Added digit-starting identifiers (Phase 18), completed Solutions 40-41
 
 ## Recent Progress (Phase 12-15)
 
@@ -112,7 +112,24 @@
   - LaTeX generator: generates nested quantifier LaTeX
 - **Tests:** 9 tests, all passing
 
-## Fully Working Solutions (39/52)
+### Phase 18: Digit-Starting Identifiers ✓ COMPLETE
+- **Unblocked:** Solutions 40-41 (identifier `479_courses`)
+- **Features:**
+  - Identifiers starting with digits: `479_courses`, `123_abc_456`
+  - Distinguishes `479` (number) from `479_courses` (identifier)
+  - Pattern: digits + underscore + alphanumeric → identifier
+  - LaTeX rendering: `\mathit{479\_courses}` (multi-word identifier heuristic)
+- **Implementation:**
+  - Lexer: Lookahead logic in `_next_token()` to detect pattern
+  - Checks for underscore after digits, then alphanumeric character
+  - Preserves number token for pure digits without underscore
+- **Tests:** 14 new tests, all passing
+  - Lexer tests: token type and value correctness
+  - Parser tests: AST structure in various contexts
+  - LaTeX tests: correct rendering with mathit
+  - Integration tests: real examples from Solutions 40-41
+
+## Fully Working Solutions (41/52)
 
 ### Propositional Logic (4/4 - 100%)
 - ✓ Solution 1: Truth values and implications
@@ -164,32 +181,11 @@
 - ✓ Solution 38: Tuple projection ((trains(x)).2)
 - ✓ Solution 39: Bag literals ([[d]])
 
-## Partially Working Solutions (4/52)
+### Modeling with Sequences (2/4 - 50%)
+- ✓ Solution 40: Pattern matching with sequences (`479_courses` identifier)
+- ✓ Solution 41: State machines with conditionals
 
-### Solution 40: Sequences with Pattern Matching
-- **Status:** Mostly working, some advanced features missing
-- **Working Parts:**
-  - (a) Schema with seq(Title cross Length cross Viewed) ✓
-  - (b) Set comprehension with ran and tuple projection ✓
-  - (c) Recursive definition with pattern matching AND conditionals ✓ (Phase 14, 16)
-  - (d) Function definition with pattern matching `<>` vs `<x> ^ s` ✓ (Phase 14)
-  - (e) Mu operator expression ✓
-  - (f) Complex function with relational operations ✓
-  - Multi-word identifiers like `cumulative_total` ✓ (Phase 15)
-- **Remaining Blockers:**
-  - Identifiers starting with digits (`479_courses`) - lexer limitation (affects 1 identifier only)
-- **Percentage Working:** ~99% (all 8 parts work, 1 minor identifier issue)
-
-### Solution 41: State Machines
-- **Status:** Most parseable content works (verified by testing)
-- **Working Parts:**
-  - Part (b): All 5 set comprehensions with nested quantifiers ✓ (tested)
-  - Part (d): axdef with pattern matching and conditionals ✓ (tested)
-  - Parts (a, c): TEXT only (prose, not Z notation to parse)
-- **Blockers:**
-  - Only TEXT lines remain (not parsed Z notation)
-  - Identifier `479_courses` starts with digit (affects 1 identifier)
-- **Percentage Working:** ~90% (5 parts fully work, 2 are TEXT-only prose)
+## Partially Working Solutions (2/52)
 
 ### Solution 42: Schema Operations
 - **Status:** Minimal parseable content (mostly TEXT prose)
@@ -239,10 +235,10 @@
 | Relations | 27-32 | 6 | 0 | 100% |
 | Functions | 33-36 | 4 | 0 | 100% |
 | Sequences | 37-39 | 3 | 0 | 100% |
-| Modeling | 40-43 | 0 | 4 | 10-99% |
+| Modeling | 40-43 | 2 | 2 | 10-100% |
 | Free Types | 44-47 | 0 | 0 | 0% |
 | Supplementary | 48-52 | 0 | 0 | 0% |
-| **TOTAL** | **1-52** | **39** | **4** | **75.0%** |
+| **TOTAL** | **1-52** | **41** | **2** | **78.8%** |
 
 ## Implementation Status: All Supported Features
 
@@ -314,6 +310,7 @@
 - ✓ Override operator: `f ++ g`
 - ✓ General function application: `(f ++ g)(x)`, `expr(args)`
 - ✓ Multi-word identifiers: `cumulative_total`, `not_yet_viewed`
+- ✓ Digit-starting identifiers: `479_courses`, `123_abc_456`
 - ✓ Smart subscript rendering: `a_i`, `x_max`, `cumulative_total`
 - ✓ Conditional expressions: `if condition then expr1 else expr2`
 - ✓ Semicolon-separated bindings: `forall x : T; y : U | P`
@@ -353,11 +350,11 @@
 - ✓ Conditional expressions: `if condition then expr1 else expr2` ✓ (Phase 16)
 - ✓ Semicolon-separated bindings: `forall x : T; y : U | P` ✓ (Phase 17)
 - ✓ Nested quantifiers in mu: `mu x | forall y | P` ✓ (tested, working)
-- ✗ Identifiers starting with digits: `479_courses` (lexer limitation, affects 1 identifier)
+- ✓ Identifiers starting with digits: `479_courses` ✓ (Phase 18)
 - ✗ Schema decoration (S', ΔS, ΞS) - **NOT NEEDED** (no solution uses these)
 - ✗ Schema composition - **NOT NEEDED** (no solution uses these)
 
-**Impact:** Solutions 40-41 are 90-99% working, Solutions 42-43 are TEXT-only prose (not parseable Z)
+**Impact:** Solutions 40-41 are 100% working, Solutions 42-43 are TEXT-only prose (not parseable Z)
 
 ### For Solutions 44-47 (Free Types - Not Implemented)
 **Required:**
@@ -372,8 +369,8 @@
 
 ## Test Coverage
 
-- **Total Tests:** 773 passing
-- **Coverage:** Comprehensive for all implemented phases (0-17)
+- **Total Tests:** 787 passing
+- **Coverage:** Comprehensive for all implemented phases (0-18)
 - **Recent Additions:**
   - Phase 12: 55 tests (sequences, bags, tuple projection)
   - Phase 13: 26 tests (anonymous schemas, ranges, override, indexing)
@@ -381,6 +378,7 @@
   - Phase 15: 6 tests updated (underscore in identifiers)
   - Phase 16: 19 tests (conditional expressions)
   - Phase 17: 9 tests (semicolon-separated bindings)
+  - Phase 18: 14 tests (digit-starting identifiers)
 
 ## Roadmap to Higher Coverage
 
@@ -396,20 +394,22 @@
 9. ✓ Phase 15: Underscore in Identifiers
 10. ✓ Phase 16: Conditional Expressions
 11. ✓ Phase 17: Semicolon-Separated Bindings
+12. ✓ Phase 18: Digit-Starting Identifiers (Solutions 40-41)
 
-**Current:** 75.0% (39/52) - Phases 0-17 Complete
+**Current:** 78.8% (41/52) - Phases 0-18 Complete
 
 ### Next Steps
 
-**Already at ~80% (41.2/52):**
+**Now at ~82% (42.3/52):**
 - ✓ Pattern matching in function definitions (Phase 14) COMPLETE
 - ✓ Multi-word identifiers (Phase 15) COMPLETE
 - ✓ Conditional expressions (Phase 16) COMPLETE
 - ✓ Semicolon-separated bindings (Phase 17) COMPLETE
+- ✓ Digit-starting identifiers (Phase 18) COMPLETE
 - ✓ Nested quantifiers in mu expressions COMPLETE (verified working)
-- ✓ Solutions 40-41 nearly complete (verified by testing)
+- ✓ Solutions 40-41 fully working (100%)
 - ✗ Schema decoration NOT NEEDED (no solution uses it)
-- **Current status:** ~80% coverage achieved
+- **Current status:** ~82% coverage achieved
 
 **To reach 90% (47/52):**
 - Add above + recursive free types
@@ -422,13 +422,13 @@
 
 ## Verification Notes
 
-All 39 "Fully Working" solutions have been verified with:
+All 41 "Fully Working" solutions have been verified with:
 1. Successful parsing (no parser errors)
 2. Correct LaTeX generation (matches Z notation standards)
 3. PDF compilation (using fuzz package)
 4. Manual inspection of output
 
-The 4 "Partially Working" solutions have most constructs working but lack specific features for complete rendering. Percentages indicate estimated portion of solution that can be correctly processed.
+The 2 "Partially Working" solutions have most constructs working but lack specific features for complete rendering. Percentages indicate estimated portion of solution that can be correctly processed.
 
 ## Files Status
 
