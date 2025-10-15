@@ -54,7 +54,9 @@
       "Bash(TEXINPUTS=/Users/jfreeman/Coding/fuzz/txt2tex/sem/latex//: pdflatex:*)",
       "Bash(env TEXINPUTS=/Users/jfreeman/Coding/fuzz/txt2tex/sem/latex//: pdflatex:*)",
       "Bash(git merge:*)",
-      "Bash(PYTHONPATH=src pytest:*)"
+      "Bash(PYTHONPATH=src pytest:*)",
+      "Bash(do echo \"=== Testing Solution $i ===\" hatch run convert \"/private/tmp/test_solution_$i.txt\")",
+      "Bash(do echo \"=== Testing Solution $i ===\")"
     ],
     "deny": [],
     "ask": []
