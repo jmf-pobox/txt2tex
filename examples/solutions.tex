@@ -1794,7 +1794,7 @@ where
 
 \bigskip
 
-$\forall s \colon \seq~Title * Length * Viewed \bullet g(s) = s$|> $\{ x \colon \ran s \mid x \neq \mathit{longest\_viewed}(s) \}$
+$\forall s \colon \seq~Title * Length * Viewed \bullet g(s) = s$$\rres$ $\{ x \colon \ran s \mid x \neq \mathit{longest\_viewed}(s) \}$
 
 \bigskip
 
@@ -1854,12 +1854,6 @@ end
 
 \bigskip
 
-(Blocked $by : nested quantifiers in mu expressions - parser limitation)$
-
-\bigskip
-
-\bigskip
-
 This, of course, assumes that there is at least one viewed programme (and one of a unique maximum length).
 
 \bigskip
@@ -1894,7 +1888,7 @@ axdef
 
 \bigskip
 
-$records : Year -|> Table$
+$records : Year $\pinj$ Table$
 
 \bigskip
 
@@ -1931,12 +1925,6 @@ $\forall$ $r : ran(records) | $$\forall i1, i2 \colon \dom r \bullet i1 \neq i2 
 \bigskip
 
 end
-
-\bigskip
-
-\bigskip
-
-(Blocked $by : nested quantifiers in predicates - parser limitation)$
 
 \bigskip
 
@@ -1984,7 +1972,7 @@ end
 
 \bigskip
 
-{$y : Year | y in dom records $. y |-> {$l : Lecturer | $# {$c : ran (records y) | c$.4 = l} > 6}}
+{$y : Year | y in dom records $. y $\mapsto$ {$l : Lecturer | $# {$c : ran (records y) | c$.4 = l} $>$ 6}}
 
 \bigskip
 
@@ -2073,12 +2061,6 @@ end
 
 \bigskip
 
-\bigskip
-
-(Blocked $by : nested quantifiers with semicolon bindings - parser limitation)$
-
-\bigskip
-
 (b)
 \par
 \vspace{11pt}
@@ -2090,7 +2072,7 @@ axdef
 
 \bigskip
 
-$add : N * Person * State -|> State$
+$add : N * Person * State $\pinj$ State$
 
 \bigskip
 
@@ -2120,7 +2102,7 @@ end
 
 \bigskip
 
-(Blocked by: -|> operator not implemented)
+(Blocked by: $\pinj$ operator not implemented)
 
 \bigskip
 
@@ -2183,12 +2165,6 @@ end
 
 \bigskip
 
-\bigskip
-
-(Blocked $by : nested quantifiers - parser limitation)$
-
-\bigskip
-
 \medskip
 
 (b)
@@ -2239,12 +2215,6 @@ end
 \bigskip
 
 
-
-\bigskip
-
-\bigskip
-
-(Blocked $by : semicolon bindings in set comprehensions and nested quantifiers)$
 
 \bigskip
 
@@ -2703,7 +2673,7 @@ $loveHateScore : SongId +\fun N$
 
 \bigskip
 
-$\forall$ $i : songs | $# $\{ u \colon UserId \mid i \in loved(u) \}$ >= # $\{ u \colon UserId \mid i \in hated(u) \}$ $\Rightarrow$
+$\forall$ $i : songs | $# $\{ u \colon UserId \mid i \in loved(u) \}$ $\geq$ # $\{ u \colon UserId \mid i \in hated(u) \}$ $\Rightarrow$
 
 \bigskip
 
@@ -2721,7 +2691,7 @@ and
 
 \bigskip
 
-$\forall$ $i : songs | $# $\{ u \colon UserId \mid i \in loved(u) \}$ < # $\{ u \colon UserId \mid i \in hated(u) \}$ $\Rightarrow$
+$\forall$ $i : songs | $# $\{ u \colon UserId \mid i \in loved(u) \}$ $<$ # $\{ u \colon UserId \mid i \in hated(u) \}$ $\Rightarrow$
 
 \bigskip
 
