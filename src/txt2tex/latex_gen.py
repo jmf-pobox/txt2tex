@@ -873,11 +873,39 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
+    def _find_balanced_braces(self, text: str) -> list[tuple[int, int]]:
+        """Find all balanced brace pairs in text.
+
+        Returns list of (start_pos, end_pos) tuples for each balanced {...}.
+        Handles nested braces correctly.
+        """
+        matches: list[tuple[int, int]] = []
+        i = 0
+        while i < len(text):
+            if text[i] == "{":
+                # Found opening brace, find matching closing brace
+                depth = 1
+                start = i
+                i += 1
+                while i < len(text) and depth > 0:
+                    if text[i] == "{":
+                        depth += 1
+                    elif text[i] == "}":
+                        depth -= 1
+                    i += 1
+                if depth == 0:
+                    # Found balanced pair
+                    matches.append((start, i))
+            else:
+                i += 1
+        return matches
+
     def _process_inline_math(self, text: str) -> str:
         """Process inline math expressions in text.
 
         Detects patterns like:
         - Set comprehensions: { x : N | x > 0 }
+        - Set comprehensions with nested braces: {p : P . p |-> {p}}
         - Quantifiers: forall x : N | predicate
 
         Parses them and converts to $...$ wrapped LaTeX.
@@ -885,13 +913,12 @@ class LaTeXGenerator:
         result = text
 
         # Pattern 1: Set comprehensions { ... }
-        # Find balanced braces and try to parse as set comprehension
-        brace_pattern = r"\{[^{}]+\}"
-        matches = list(re.finditer(brace_pattern, text))
+        # Find balanced braces (handles nested braces)
+        brace_matches = self._find_balanced_braces(text)
 
         # Process matches in reverse order to preserve positions
-        for match in reversed(matches):
-            math_text = match.group(0)
+        for start_pos, end_pos in reversed(brace_matches):
+            math_text = text[start_pos:end_pos]
             try:
                 # Try to parse as math expression
                 lexer = Lexer(math_text)
@@ -904,11 +931,7 @@ class LaTeXGenerator:
                     # Generate LaTeX for the expression
                     math_latex = self.generate_expr(ast)
                     # Wrap in $...$
-                    result = (
-                        result[: match.start()]
-                        + f"${math_latex}$"
-                        + result[match.end() :]
-                    )
+                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
             except Exception:
                 # If parsing fails, leave as-is (might be prose)
                 pass

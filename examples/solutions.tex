@@ -862,7 +862,7 @@ $\{ n \colon N \mid n \leq 4 \bullet (n, n^2) \}$
 \vspace{11pt}
 \bigskip
 
-{ n : P {0, 1} | true . (n, # n) }
+$\{ n \colon \power~\{0, 1\} \mid true \bullet (n, \# n) \}$
 
 \bigskip
 
@@ -1451,7 +1451,7 @@ where
 
 \bigskip
 
-forall r : Drivers <-> Cars | number_of_drivers(r) = {c : ran r . c |-> #$\{ d \colon Drivers \mid d \mapsto c \in r \}$}
+forall r : Drivers <-> Cars | number_of_drivers(r) = {c : ran r . c |-> #{d : Drivers | d |-> c in r}}
 
 \bigskip
 
