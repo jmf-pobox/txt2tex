@@ -1428,70 +1428,22 @@ The set of bijective functions:
 (a)
 \par
 \vspace{11pt}
-\bigskip
-
-axdef
-
-\bigskip
-
-\bigskip
-
-children : $Person \fun P$ Person
-
-\bigskip
-
-\bigskip
-
-where
-
-\bigskip
-
-\bigskip
-
-children = {p : Person . p |-> parentOf(| {p} |)}
-
-\bigskip
-
-\bigskip
-
-end
-
-\bigskip
+\begin{axdef}
+children : Person \fun \power~Person
+\where
+children = \{ p \colon Person \bullet p \mapsto parentOf(\limg \{p\} \rimg) \}
+\end{axdef}
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-\bigskip
-
-axdef
-
-\bigskip
-
-\bigskip
-
-number_of_grandchildren : $Person \fun N$
-
-\bigskip
-
-\bigskip
-
-where
-
-\bigskip
-
-\bigskip
-
-number_of_grandchildren = {p : Person . p |-> # (parentOf o9 parentOf)(| {p} |)}
-
-\bigskip
-
-\bigskip
-
-end
-
-\bigskip
+\begin{axdef}
+number_of_grandchildren : Person \fun N
+\where
+\mathit{number\_of\_grandchildren} = \{ p \colon Person \bullet p \mapsto \# parentOf \circ parentOf(\limg \{p\} \rimg) \}
+\end{axdef}
 
 \medskip
 
@@ -1527,13 +1479,19 @@ where
 
 \bigskip
 
-forall r : Drivers <-> Cars | number_of_drivers(r) = {c : ran r . c |-> #{d : Drivers | d |-> c in r}}
+forall r : Drivers <-> Cars | number_of_drivers(r) = $\{ c \colon \ran r \bullet c \mapsto \# \{ d \colon Drivers \mid d \mapsto c \in r \} \}$
 
 \bigskip
 
 \bigskip
 
 end
+
+\bigskip
+
+\bigskip
+
+(Blocked by: relation types in quantifier domains - Phase 23)
 
 \bigskip
 

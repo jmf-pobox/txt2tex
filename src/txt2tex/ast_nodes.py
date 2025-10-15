@@ -90,24 +90,25 @@ class Superscript(ASTNode):
 
 @dataclass(frozen=True)
 class SetComprehension(ASTNode):
-    """Set comprehension node (Phase 8).
+    """Set comprehension node (Phase 8, enhanced Phase 22).
 
-    Supports two forms:
+    Supports three forms:
     - Set by predicate: { x : X | predicate } (expression=None)
-    - Set by expression: { x : X | predicate . expression }
+    - Set by expression with predicate: { x : X | predicate . expression }
+    - Set by expression only: { x : X . expression } (predicate=None, Phase 22)
 
     Examples:
     - { x : N | x > 0 } -> variables=["x"], domain=N, predicate=(x > 0),
                            expression=None
     - { x : N | x > 0 . x^2 } -> variables=["x"], domain=N,
                                   predicate=(x > 0), expression=(x^2)
-    - { x, y : N | x + y = 4 } -> variables=["x", "y"], domain=N,
-                                   predicate=(x+y=4)
+    - { x : N . x^2 } -> variables=["x"], domain=N, predicate=None,
+                          expression=(x^2)
     """
 
     variables: list[str]  # One or more variables (e.g., ["x"], ["x", "y"])
     domain: Expr | None  # Optional domain (e.g., N, Z, P X)
-    predicate: Expr  # The condition/predicate
+    predicate: Expr | None  # The condition/predicate (Phase 22: can be None)
     expression: Expr | None  # Optional expression (if present, set by expression)
 
 
