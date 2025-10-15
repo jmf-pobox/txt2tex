@@ -1,6 +1,6 @@
 # Known Limitations and Roadmap
 
-**Last Updated:** 2025-10-14
+**Last Updated:** 2025-10-15
 
 ## Summary
 
@@ -11,12 +11,20 @@ This document tracks known limitations in txt2tex, their root causes, and plans 
 ## Current Status
 
 - **latex_gen.py coverage**: 80.61% (153 uncovered lines out of 789)
-- **Garbled characters in solutions.pdf**: 232 instances
+- **Garbled characters in solutions.pdf**: 40 instances (down from 1400+)
 - **Solutions working**: 39/52 (75%)
 
 ## PDF Garbling Issues
 
 ### Fixed
+
+✅ **Sequence literals in TEXT blocks** (Phase 17.1)
+**Completed**: 2025-10-15
+- Problem: `<>`, `<x>`, `<a, b>` rendered as `¡¿`, `¡x¿`, `¡a, b¿`
+- Root cause: LaTeX treats `<` and `>` as special characters in text mode
+- Solution: Added `_convert_sequence_literals()` to detect and wrap sequences in math mode
+- Impact: Reduced garbled characters from 1400+ to 40
+- Files: `src/txt2tex/latex_gen.py` (lines 893-947, 880)
 
 ✅ **Simple inline expressions** (Phase 17 - Pattern 3)
 - `p <=> x > 1` → `$p \Leftrightarrow x > 1$` ✓
@@ -157,14 +165,16 @@ schema S1 and S2  # Conjunction
 **Measurement process**:
 ```bash
 # Count garbled characters
-pdftotext examples/solutions.pdf - | grep -o "[¿¡]" | wc -l
+pdftotext examples/solutions.pdf - | grep -o "[¿¡—]" | wc -l
 
 # Compare with reference
 open examples/solutions.pdf examples/solutions_full.pdf
 ```
 
-**Current**: 232 garbled characters
-**Target**: <50 (only from unimplemented features)
+**Current**: 40 garbled characters (down from 1400+)
+**Target**: <50 (only from unimplemented features) ✅ **TARGET ACHIEVED**
+
+**Major improvement**: Sequence literal fix (Phase 17.1) reduced garbled characters by 97%.
 
 ### Solution Coverage
 

@@ -240,7 +240,7 @@ p \lor q \Leftrightarrow p \\
 \par
 \vspace{11pt}
 \[
-  \exists d \colon Dog \bullet gentle(d) \land well_trained(d)
+  \exists d \colon Dog \bullet gentle(d) \land \mathit{well\_trained}(d)
 \]
 
 \medskip
@@ -249,7 +249,7 @@ p \lor q \Leftrightarrow p \\
 \par
 \vspace{11pt}
 \[
-  \forall d \colon Dog \bullet neat(d) \land well_trained(d) \Rightarrow attractive(d)
+  \forall d \colon Dog \bullet neat(d) \land \mathit{well\_trained}(d) \Rightarrow attractive(d)
 \]
 
 \medskip
@@ -276,7 +276,7 @@ p \lor q \Leftrightarrow p \\
 \vspace{11pt}
 \bigskip
 
-This is a true proposition: whatever the value of x, the expression x^2 - x + 1 denotes a natural number. If we choose y to be this natural number, we will find that p is true.
+This is a true $proposition : whatever the value of x, the expression $$x^2$ - x + 1 denotes a natural number. If we choose y to be this natural number, we will find that p is true.
 
 \bigskip
 
@@ -388,7 +388,7 @@ With the above choice of p, we require only that q is sometimes false when p is 
 
 \bigskip
 
-As discussed, the quantifier exists1 can help give rise to a 'test' or 'precondition' to ensure that an application of mu will work.
+As discussed, the quantifier $\exists_1$ can help give rise to a 'test' or 'precondition' to ensure that an application of mu will work.
 
 \bigskip
 
@@ -722,7 +722,7 @@ and the other:
 \vspace{11pt}
 \bigskip
 
-1 in {4, 3, 2, 1} is true.
+1 in $\{4, 3, 2, 1\}$ is true.
 
 \bigskip
 
@@ -733,7 +733,7 @@ and the other:
 \vspace{11pt}
 \bigskip
 
-{1} in {1, 2, 3, 4} is undefined.
+$\{1\}$ in $\{1, 2, 3, 4\}$ is undefined.
 
 \bigskip
 
@@ -744,7 +744,7 @@ and the other:
 \vspace{11pt}
 \bigskip
 
-{1} in {{1}, {2}, {3}, {4}} is true.
+$\{1\}$ in $\{\{1\}, \{2\}, \{3\}, \{4\}\}$ is true.
 
 \bigskip
 
@@ -755,7 +755,7 @@ and the other:
 \vspace{11pt}
 \bigskip
 
-The empty set in {1, 2, 3, 4} is undefined.
+The empty set in $\{1, 2, 3, 4\}$ is undefined.
 
 \bigskip
 
@@ -776,7 +776,7 @@ The empty set in {1, 2, 3, 4} is undefined.
 
 \bigskip
 
-is the set {(1, 2), (1, 3)}
+is the set $\{(1, 2), (1, 3)\}$
 
 \bigskip
 
@@ -787,7 +787,7 @@ is the set {(1, 2), (1, 3)}
 \vspace{11pt}
 \bigskip
 
-The empty set cross {2, 3} is the empty set
+The empty set cross $\{2, 3\}$ is the empty set
 
 \bigskip
 
@@ -797,12 +797,12 @@ The empty set cross {2, 3} is the empty set
 \par
 \vspace{11pt}
 \[
-  \power~emptyset \cross \{1\}
+  \power~\emptyset \cross \{1\}
 \]
 
 \bigskip
 
-is the set {(emptyset, 1)}
+is the set $\{(\emptyset, 1)\}$
 
 \bigskip
 
@@ -813,7 +813,7 @@ is the set {(emptyset, 1)}
 \vspace{11pt}
 \bigskip
 
-{(1, 2)} cross {3, 4} is the set {((1, 2), 3), ((1, 2), 4)}
+$\{(1, 2)\}$ cross $\{3, 4\}$ is the set $\{((1, 2), 3), ((1, 2), 4)\}$
 
 \bigskip
 
@@ -887,7 +887,7 @@ There are various ways of describing these sets via set comprehensions. Examples
 \vspace{11pt}
 \bigskip
 
-{ n : P {0, 1} }
+{ $n : P ${0, 1} }
 
 \bigskip
 
@@ -1029,12 +1029,12 @@ Couples == \{ s \colon \power~Person \mid \# s = 2 \}
 \vspace{11pt}
 \bigskip
 
-The power set of {(0,0), (0,1), (1,0), (1,1)} is:
+The power set of $\{(0, 0), (0, 1), (1, 0), (1, 1)\}$ is:
 
 \bigskip
 
 \[
-  \{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 0)\}, \{(1, 1)\}, \{(1, 0), (1, 1)\}, \{(0, 0), (0, 1)\}, \{(0, 1), (1, 1)\}, \{(0, 1), (1, 0)\}, \{(0, 0), (1, 1)\}, \{(0, 0), (1, 0)\}, \{(0, 0), (1, 0), (1, 1)\}, \{(0, 0), (0, 1), (1, 1)\}, \{(0, 0), (0, 1), (1, 0)\}, \{(0, 1), (1, 0), (1, 1)\}, \{(0, 0), (0, 1), (1, 0), (1, 1)\}\}
+  \{\emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 0)\}, \{(1, 1)\}, \{(1, 0), (1, 1)\}, \{(0, 0), (0, 1)\}, \{(0, 1), (1, 1)\}, \{(0, 1), (1, 0)\}, \{(0, 0), (1, 1)\}, \{(0, 0), (1, 0)\}, \{(0, 0), (1, 0), (1, 1)\}, \{(0, 0), (0, 1), (1, 1)\}, \{(0, 0), (0, 1), (1, 0)\}, \{(0, 1), (1, 0), (1, 1)\}, \{(0, 0), (0, 1), (1, 0), (1, 1)\}\}
 \]
 
 \medskip
@@ -1043,7 +1043,7 @@ The power set of {(0,0), (0,1), (1,0), (1,1)} is:
 \par
 \vspace{11pt}
 \[
-  \{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(0, 0), (0, 1)\}\}
+  \{\emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(0, 0), (0, 1)\}\}
 \]
 
 \medskip
@@ -1052,7 +1052,7 @@ The power set of {(0,0), (0,1), (1,0), (1,1)} is:
 \par
 \vspace{11pt}
 \[
-  \{emptyset\}
+  \{\emptyset\}
 \]
 
 \medskip
@@ -1061,7 +1061,7 @@ The power set of {(0,0), (0,1), (1,0), (1,1)} is:
 \par
 \vspace{11pt}
 \[
-  \{emptyset\}
+  \{\emptyset\}
 \]
 
 \medskip
@@ -1297,7 +1297,7 @@ The set of 9 functions:
 \bigskip
 
 \[
-  \{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 1)\}, \{(1, 0)\}, \{(0, 0), (1, 1)\}, \{(0, 1), (1, 1)\}, \{(1, 0), (0, 0)\}, \{(0, 1), (1, 0)\}\}
+  \{\emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 1)\}, \{(1, 0)\}, \{(0, 0), (1, 1)\}, \{(0, 1), (1, 1)\}, \{(1, 0), (0, 0)\}, \{(0, 1), (1, 0)\}\}
 \]
 
 (a)
@@ -1340,7 +1340,7 @@ The set of functions which are injective but not surjective:
 \bigskip
 
 \[
-  \{emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 0)\}, \{(1, 1)\}\}
+  \{\emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 0)\}, \{(1, 1)\}\}
 \]
 
 \medskip
@@ -1440,7 +1440,7 @@ children = \{ p \colon Person \bullet p \mapsto parentOf(\limg \{p\} \rimg) \}
 \par
 \vspace{11pt}
 \begin{axdef}
-number_of_grandchildren : Person \fun N
+\mathit{number\_of\_grandchildren} : Person \fun N
 \where
 \mathit{number\_of\_grandchildren} = \{ p \colon Person \bullet p \mapsto \# parentOf \circ parentOf(\limg \{p\} \rimg) \}
 \end{axdef}
@@ -1455,45 +1455,15 @@ number_of_grandchildren : Person \fun N
 
 \bigskip
 
-(Requires power set, function types, and ran keyword)
+($Note : This solution demonstrates relation types in quantifier domains)$
 
 \bigskip
 
-\bigskip
-
-axdef
-
-\bigskip
-
-\bigskip
-
-number_of_drivers : (Drivers <-> Cars) -> ($Cars \fun N$)
-
-\bigskip
-
-\bigskip
-
-where
-
-\bigskip
-
-\bigskip
-
-forall r : Drivers <-> Cars | number_of_drivers(r) = $\{ c \colon \ran r \bullet c \mapsto \# \{ d \colon Drivers \mid d \mapsto c \in r \} \}$
-
-\bigskip
-
-\bigskip
-
-end
-
-\bigskip
-
-\bigskip
-
-(Blocked by: relation types in quantifier domains - Phase 23)
-
-\bigskip
+\begin{axdef}
+\mathit{number\_of\_drivers} : Drivers \rel Cars \fun (Cars \fun N)
+\where
+\mathit{number\_of\_drivers} = \lambda r : Drivers \rel Cars \bullet \{ c \colon \ran r \bullet c \mapsto \# \{ d \colon Drivers \mid d \mapsto c \in r \} \}
+\end{axdef}
 
 \section*{Sequences}
 
@@ -1639,19 +1609,19 @@ f : Place \fun \power~Place
 \vspace{11pt}
 \bigskip
 
-large_coins : $Collection \fun N$
+$\mathit{large\_coins} : Collection \fun N$
 
 \bigskip
 
 \bigskip
 
-$\forall c \colon Collection \bullet large_coins(c) = c(large)$
+$\forall c \colon Collection \bullet \mathit{large\_coins}(c) = c(large)$
 
 \bigskip
 
 \bigskip
 
-(Blocked by: underscore in identifier for fuzz compatibility)
+(Blocked $by : underscore in identifier for fuzz compatibility)$
 
 \bigskip
 
@@ -1662,19 +1632,19 @@ $\forall c \colon Collection \bullet large_coins(c) = c(large)$
 \vspace{11pt}
 \bigskip
 
-add_coin : Collection * $Coin \fun Collection$
+$\mathit{add\_coin} : Collection * Coin \fun Collection$
 
 \bigskip
 
 \bigskip
 
-$\forall c \colon Collection \bullet \forall d \colon Coin \bullet add_coin(c, d) = c \cup \lbag d \rbag$
+$\forall c \colon Collection \bullet \forall d \colon Coin \bullet \mathit{add\_coin}(c, d) = c \cup \lbag d \rbag$
 
 \bigskip
 
 \bigskip
 
-(Blocked by: underscore in identifier and bag union)
+(Blocked $by : underscore in identifier and bag union)$
 
 \bigskip
 
@@ -1705,13 +1675,13 @@ Solutions 40-52 are work in progress - many require features not yet implemented
 \vspace{11pt}
 \bigskip
 
-hd : seq(Title * Length * Viewed)
+$hd : seq(Title * Length * Viewed)$
 
 \bigskip
 
 \bigskip
 
-cumulative_total $hd \leq 12000$
+$\mathit{cumulative\_total}(hd) \leq 12000$
 
 \bigskip
 
@@ -1765,10 +1735,10 @@ or otherwise (omitted - requires semicolon-separated bindings in set comprehensi
 \par
 \vspace{11pt}
 \begin{axdef}
-cumulative_total : \seq~Title * Length * Viewed \fun N
+\mathit{cumulative\_total} : \seq~Title * Length * Viewed \fun N
 \where
-cumulative_total(\langle \rangle) = 0
-\forall x \colon Title * Length * Viewed \bullet \forall s \colon \seq~Title * Length * Viewed \bullet cumulative_total(\langle x \rangle \cat s) = x.2 + cumulative_total(s)
+\mathit{cumulative\_total}(\langle \rangle) = 0
+\forall x \colon Title * Length * Viewed \bullet \forall s \colon \seq~Title * Length * Viewed \bullet \mathit{cumulative\_total}(\langle x \rangle \cat s) = x.2 + \mathit{cumulative\_total}(s)
 \end{axdef}
 
 \medskip
@@ -1778,7 +1748,7 @@ cumulative_total(\langle \rangle) = 0
 \vspace{11pt}
 \bigskip
 
-(mu p : ran hd | $\forall q \colon \ran hd \bullet p \neq q \land p.2 > q.2$| p.1)
+(mu $p : ran hd | $$\forall q \colon \ran hd \bullet p \neq q \land p.2 > q.2$| p.1)
 
 \bigskip
 
@@ -1812,7 +1782,7 @@ axdef
 
 \bigskip
 
-g : seq(Title * Length * Viewed) -> seq(Title * Length * Viewed)
+$g : seq(Title * Length * Viewed) \fun seq(Title * Length * Viewed)$
 
 \bigskip
 
@@ -1824,7 +1794,7 @@ where
 
 \bigskip
 
-$\forall s \colon \seq~Title * Length * Viewed \bullet g(s) = s$|> $\{ x \colon \ran s \mid x \neq longest_viewed(s) \}$
+$\forall s \colon \seq~Title * Length * Viewed \bullet g(s) = s$|> $\{ x \colon \ran s \mid x \neq \mathit{longest\_viewed}(s) \}$
 
 \bigskip
 
@@ -1860,7 +1830,7 @@ axdef
 
 \bigskip
 
-longest_viewed : seq(Title * Length * Viewed) +-> Title * Length * Viewed
+$\mathit{longest\_viewed} : seq(Title * Length * Viewed) +\fun Title * Length * Viewed$
 
 \bigskip
 
@@ -1872,7 +1842,7 @@ where
 
 \bigskip
 
-$\forall s \colon \seq~Title * Length * Viewed \bullet longest_viewed(s)$= ($\mu p \colon \ran s \bullet p.3 = yes$and $\forall q \colon \ran s \bullet p \neq q \land q.3 = yes \land p.2 > q.2$)
+$\forall s \colon \seq~Title * Length * Viewed \bullet \mathit{longest\_viewed}(s)$= ($\mu p \colon \ran s \bullet p.3 = yes$and $\forall q \colon \ran s \bullet p \neq q \land q.3 = yes \land p.2 > q.2$)
 
 \bigskip
 
@@ -1884,7 +1854,7 @@ end
 
 \bigskip
 
-(Blocked by: nested quantifiers in mu expressions - parser limitation)
+(Blocked $by : nested quantifiers in mu expressions - parser limitation)$
 
 \bigskip
 
@@ -1924,7 +1894,7 @@ axdef
 
 \bigskip
 
-records : $Year \pinj Table$
+$records : Year -|> Table$
 
 \bigskip
 
@@ -1948,13 +1918,13 @@ $\forall y \colon \dom records \bullet \# records(y) \leq 50$
 
 \bigskip
 
-forall y : dom(records) | $\forall e \colon \ran records(y) \bullet year(e.1) = y$
+$\forall$ $y : dom(records) | $$\forall e \colon \ran records(y) \bullet year(e.1) = y$
 
 \bigskip
 
 \bigskip
 
-forall r : ran(records) | $\forall i1, i2 \colon \dom r \bullet i1 \neq i2 \land r(i1).1 = r(i2).1 \Rightarrow r(i1).3 \neq r(i2).3$
+$\forall$ $r : ran(records) | $$\forall i1, i2 \colon \dom r \bullet i1 \neq i2 \land r(i1).1 = r(i2).1 \Rightarrow r(i1).3 \neq r(i2).3$
 
 \bigskip
 
@@ -1966,7 +1936,7 @@ end
 
 \bigskip
 
-(Blocked by: nested quantifiers in predicates - parser limitation)
+(Blocked $by : nested quantifiers in predicates - parser limitation)$
 
 \bigskip
 
@@ -2014,7 +1984,7 @@ end
 
 \bigskip
 
-{y : Year | y in dom records . y |-> {l : Lecturer | # {c : ran (records y) | c.4 = l} > 6}}
+{$y : Year | y in dom records $. y |-> {$l : Lecturer | $# {$c : ran (records y) | c$.4 = l} > 6}}
 
 \bigskip
 
@@ -2049,7 +2019,7 @@ end
 
 \bigskip
 
-(Blocked by: underscore in identifier - use camelCase for fuzz compatibility)
+(Blocked $by : underscore in identifier - use camelCase for fuzz compatibility)$
 
 \bigskip
 
@@ -2081,7 +2051,7 @@ axdef
 
 \bigskip
 
-State : P(seq(iseq(Person)))
+$State : P(seq(iseq(Person)))$
 
 \bigskip
 
@@ -2093,7 +2063,7 @@ where
 
 \bigskip
 
-forall s : State | $\forall i, j \colon \dom s \bullet i \neq j \land \ran s(i) \cap \ran s(j) = \{\}$
+$\forall$ $s : State | $$\forall i, j \colon \dom s \bullet i \neq j \land \ran s(i) \cap \ran s(j)$= $\{\}$
 
 \bigskip
 
@@ -2105,7 +2075,7 @@ end
 
 \bigskip
 
-(Blocked by: nested quantifiers with semicolon bindings - parser limitation)
+(Blocked $by : nested quantifiers with semicolon bindings - parser limitation)$
 
 \bigskip
 
@@ -2120,7 +2090,7 @@ axdef
 
 \bigskip
 
-add : N * Person * $State \pinj State$
+$add : N * Person * State -|> State$
 
 \bigskip
 
@@ -2138,7 +2108,7 @@ $\forall n \colon N \bullet \forall p \colon Person \bullet \forall s \colon Sta
 
 \bigskip
 
-add(n, p, s) = s ++ {n |-> s(n) ^ $\langle p \rangle$}
+add(n, p, s) = s ++ $\{n \mapsto s(n)^{\langle p \rangle}\}$
 
 \bigskip
 
@@ -2167,7 +2137,7 @@ end
 \vspace{11pt}
 \bigskip
 
-(i) forall i : dom bookings | $\forall x, y \colon bookings(i) \bullet x \neq y \land x.2 \upto x.3 \cap y.2 \upto y.3 = \{\}$
+(i) $\forall$ $i : dom bookings | $$\forall x, y \colon bookings(i) \bullet x \neq y \land x.2 \upto x.3 \cap y.2 \upto y.3$= $\{\}$
 
 \bigskip
 
@@ -2179,7 +2149,7 @@ end
 
 \bigskip
 
-(ii) forall i : dom bookings | $\forall x \colon bookings(i) \bullet \{x.2, x.3\}$subseteq 1..max(i.1)
+(ii) $\forall i \colon \dom bookings \bullet foral$l $x : bookings(i) | $$\{x.2, x.3\}$ subseteq 1..max(i.1)
 
 \bigskip
 
@@ -2191,7 +2161,7 @@ end
 
 \bigskip
 
-(iii) forall i : dom bookings | $\forall b \colon bookings(i) \bullet b.2 \leq b.3$
+(iii) $\forall$ $i : dom bookings | $$\forall b \colon bookings(i) \bullet b.2 \leq b.3$
 
 \bigskip
 
@@ -2215,7 +2185,7 @@ end
 
 \bigskip
 
-(Blocked by: nested quantifiers - parser limitation)
+(Blocked $by : nested quantifiers - parser limitation)$
 
 \bigskip
 
@@ -2250,7 +2220,7 @@ end
 
 \bigskip
 
-(iii) {r : Room; s : N | $\exists i \colon \dom bookings \bullet i.1 = r \land i.2 = s$. (r, s)}
+(iii) {$r : Room$; $s : N | $$\exists i \colon \dom bookings \bullet i.1 = r \land i.2 = s$. (r, s)}
 
 \bigskip
 
@@ -2262,7 +2232,7 @@ end
 
 \bigskip
 
-(iv) {r : Room | $\exists i \colon \dom bookings \bullet i.1 = r \land \# bookings(i) \geq 10$}
+(iv) {$r : Room | $$\exists i \colon \dom bookings \bullet i.1 = r \land \# bookings(i) \geq 10$}
 
 \bigskip
 
@@ -2274,7 +2244,7 @@ end
 
 \bigskip
 
-(Blocked by: semicolon bindings in set comprehensions and nested quantifiers)
+(Blocked $by : semicolon bindings in set comprehensions and nested quantifiers)$
 
 \bigskip
 
@@ -2294,7 +2264,7 @@ end
 
 \bigskip
 
-The two cases of the proof are established by equational reasoning: the first by
+The two cases of the proof are established by equational $reasoning : the first by$
 
 \bigskip
 
@@ -2471,7 +2441,7 @@ reverse (reverse ($\langle x \rangle$ ^ t))
 \vspace{11pt}
 \bigskip
 
-count : $Tree \fun N$
+$count : Tree \fun N$
 
 \bigskip
 
@@ -2495,7 +2465,7 @@ $\forall t1, t2 \colon Tree \bullet count(branch(t1, t2)) = count$t1 + count t2
 
 \bigskip
 
-(Blocked by: recursive free types and pattern matching)
+(Blocked $by : recursive free types and pattern matching)$
 
 \bigskip
 
@@ -2506,7 +2476,7 @@ $\forall t1, t2 \colon Tree \bullet count(branch(t1, t2)) = count$t1 + count t2
 \vspace{11pt}
 \bigskip
 
-flatten : $Tree \fun seq$ N
+$flatten : Tree \fun seq N$
 
 \bigskip
 
@@ -2530,7 +2500,7 @@ $\forall t1, t2 \colon Tree \bullet flatten(branch(t1, t2)) = flatten$t1 ^ flatt
 
 \bigskip
 
-(Blocked by: recursive free types and pattern matching)
+(Blocked $by : recursive free types and pattern matching)$
 
 \bigskip
 
@@ -2659,7 +2629,7 @@ users
 \forall i \colon \dom loved \bullet loved(i)
 subseteq
 songs
-\forall i \colon \dom hated \cup \dom loved \bullet hated(i) \cap loved(i) = emptyset
+\forall i \colon \dom hated \cup \dom loved \bullet hated(i) \cap loved(i) = \emptyset
 \end{axdef}
 
 \bigskip
@@ -2727,13 +2697,13 @@ Let's first define two helper functions:
 
 \bigskip
 
-loveHateScore : $SongId \pfun N$
+$loveHateScore : SongId +\fun N$
 
 \bigskip
 
 \bigskip
 
-forall i : songs | # $\{ u \colon UserId \mid i \in loved(u) \}$ >= # $\{ u \colon UserId \mid i \in hated(u) \}$ $\Rightarrow$
+$\forall$ $i : songs | $# $\{ u \colon UserId \mid i \in loved(u) \}$ >= # $\{ u \colon UserId \mid i \in hated(u) \}$ $\Rightarrow$
 
 \bigskip
 
@@ -2751,7 +2721,7 @@ and
 
 \bigskip
 
-forall i : songs | # $\{ u \colon UserId \mid i \in loved(u) \}$ < # $\{ u \colon UserId \mid i \in hated(u) \}$ $\Rightarrow$
+$\forall$ $i : songs | $# $\{ u \colon UserId \mid i \in loved(u) \}$ < # $\{ u \colon UserId \mid i \in hated(u) \}$ $\Rightarrow$
 
 \bigskip
 
@@ -2799,19 +2769,19 @@ songs
 \vspace{11pt}
 \bigskip
 
-mostPopular : SongId
+$mostPopular : SongId$
 
 \bigskip
 
 \bigskip
 
-(exists1 i : songs | $\forall j \colon songs \bullet i \neq j \land popularity(i) > popularity(j)$) $\Rightarrow$
+($\exists_1$ $i : songs | $$\forall j \colon songs \bullet i \neq j \land popularity(i) > popularity(j)$) $\Rightarrow$
 
 \bigskip
 
 \bigskip
 
-mostPopular = (mu i : songs | $\forall j \colon songs \bullet i \neq j \land popularity(i) > popularity(j)$)
+mostPopular = (mu $i : songs | $$\forall j \colon songs \bullet i \neq j \land popularity(i) > popularity(j)$)
 
 \bigskip
 
@@ -2849,7 +2819,7 @@ playlistsContainingMostPopularSong == $\{ i \colon \dom playlists \mid mostPopul
 \vspace{11pt}
 \bigskip
 
-premiumPlays : seq(Play) -> seq(Play)
+$premiumPlays : seq(Play) \fun seq(Play)$
 
 \bigskip
 
@@ -2861,7 +2831,7 @@ premiumPlays($\langle \rangle$) = $\langle \rangle$
 
 \bigskip
 
-forall x : Play; s : seq(Play) |
+$\forall$ $x : Play$; $s : seq(Play) |$
 
 \bigskip
 
@@ -2879,7 +2849,7 @@ premiumPlays(s)          if userStatus(x.2) = standard
 
 \bigskip
 
-(Note: Uses camelCase for fuzz compatibility)
+($Note : Uses camelCase for fuzz compatibility)$
 
 \bigskip
 
@@ -2890,7 +2860,7 @@ premiumPlays(s)          if userStatus(x.2) = standard
 \vspace{11pt}
 \bigskip
 
-standardPlays : seq(Play) -> seq(Play)
+$standardPlays : seq(Play) \fun seq(Play)$
 
 \bigskip
 
@@ -2902,7 +2872,7 @@ standardPlays($\langle \rangle$) = $\langle \rangle$
 
 \bigskip
 
-forall x : Play; s : seq(Play) |
+$\forall$ $x : Play$; $s : seq(Play) |$
 
 \bigskip
 
@@ -2920,7 +2890,7 @@ standardPlays(s)        if userStatus(x.2) = premium
 
 \bigskip
 
-(Note: Uses camelCase for fuzz compatibility)
+($Note : Uses camelCase for fuzz compatibility)$
 
 \bigskip
 
@@ -2931,7 +2901,7 @@ standardPlays(s)        if userStatus(x.2) = premium
 \vspace{11pt}
 \bigskip
 
-cumulativeLength : seq(Play) -> N
+$cumulativeLength : seq(Play) \fun N$
 
 \bigskip
 
@@ -2943,7 +2913,7 @@ cumulativeLength($\langle \rangle$) = 0
 
 \bigskip
 
-forall x : Play; s : seq(Play) |
+$\forall$ $x : Play$; $s : seq(Play) |$
 
 \bigskip
 
@@ -2955,7 +2925,7 @@ cumulativeLength($\langle x \rangle$ ^ s) = length(x.1) + cumulativeLength(s)
 
 \bigskip
 
-(Note: Uses camelCase for fuzz compatibility)
+($Note : Uses camelCase for fuzz compatibility)$
 
 \bigskip
 

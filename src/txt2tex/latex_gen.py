@@ -319,8 +319,20 @@ class LaTeXGenerator:
         2. Simple subscript: return as-is (e.g., 'a_i' → 'a_i', 'x_0' → 'x_0')
         3. Multi-char subscript: add braces (e.g., 'a_max' → 'a_{max}')
         4. Multi-word identifier: escape/mathit (e.g., 'cumulative_total')
+
+        Special keywords (Issue #3 from QA):
+        - emptyset → \\emptyset (empty set symbol)
         """
         name = node.name
+
+        # Special keywords (Issue #2 and #3 from QA)
+        special_keywords = {
+            "emptyset": r"\emptyset",
+            "forall": r"\forall",
+            "exists": r"\exists",
+        }
+        if name in special_keywords:
+            return special_keywords[name]
 
         # No underscore: return as-is
         if "_" not in name:
@@ -640,8 +652,10 @@ class LaTeXGenerator:
                 return f"{func_latex}~{arg_latex}"
 
             # Standard function application with identifier: f(x, y, z)
+            # Process identifier through _generate_identifier for underscore handling
+            func_latex = self._generate_identifier(node.function)
             args_latex = ", ".join(self.generate_expr(arg) for arg in node.args)
-            return f"{func_name}({args_latex})"
+            return f"{func_latex}({args_latex})"
 
         # General function application: expr(args)
         func_latex = self.generate_expr(node.function)
@@ -884,6 +898,15 @@ class LaTeXGenerator:
         text = text.replace("<=>", r"$\Leftrightarrow$")
         text = text.replace("=>", r"$\Rightarrow$")
 
+        # Convert keywords to symbols (QA fixes)
+        # Negative lookbehind (?<!\\) ensures we don't match LaTeX commands like \forall
+        # These are for standalone keywords in prose, not parsed quantifier expressions
+        # Order matters: exists1+ must come before exists1 to avoid partial match
+        text = re.sub(r"(?<!\\)exists1\+", r"$\\exists$", text)  # exists1+ → ∃
+        text = re.sub(r"(?<!\\)\bexists1\b", r"$\\exists_1$", text)  # exists1 → ∃₁
+        text = re.sub(r"(?<!\\)\bemptyset\b", r"$\\emptyset$", text)  # emptyset → ∅
+        text = re.sub(r"(?<!\\)\bforall\b", r"$\\forall$", text)  # forall → ∀
+
         lines.append(text)
         lines.append("")
         lines.append(r"\bigskip")  # Trailing vertical space
@@ -977,6 +1000,7 @@ class LaTeXGenerator:
         """Process inline math expressions in text.
 
         Detects patterns like:
+        - Superscripts: x^2, a_i^2, 2^n (wrap in math mode)
         - Set comprehensions: { x : N | x > 0 }
         - Set comprehensions with nested braces: {p : P . p |-> {p}}
         - Quantifiers: forall x : N | predicate
@@ -985,13 +1009,40 @@ class LaTeXGenerator:
         """
         result = text
 
-        # Pattern 1: Set comprehensions { ... }
+        # Pattern 0: Standalone superscripts (MUST come before other patterns)
+        # Match: identifier/number followed by ^ and exponent
+        # Examples: x^2, a_i^2, 2^n, x^{2n}
+        # Strategy: Match \w+^{?[\w]+}? but NOT if already in math mode
+        superscript_pattern = r"(\w+_?\w*)\^(\{[^}]+\}|\w+)"
+
+        matches = list(re.finditer(superscript_pattern, result))
+        for match in reversed(matches):
+            start_pos = match.start()
+            end_pos = match.end()
+
+            # Check if already in math mode
+            before = result[:start_pos]
+            dollars_before = before.count("$")
+            if dollars_before % 2 == 1:
+                continue  # Already in math mode
+
+            # Check if this looks like sequence concatenation (<x> ^ <y>)
+            # Look for closing > before the ^
+            context_before = result[max(0, start_pos - 10) : start_pos]
+            if ">" in context_before and context_before.rstrip().endswith(">"):
+                continue  # This is sequence concatenation, skip
+
+            expr = match.group(0)
+            # Wrap in math mode: x^2 → $x^{2}$
+            result = result[:start_pos] + f"${expr}$" + result[end_pos:]
+
+        # Pattern 1: Set expressions { ... }
         # Find balanced braces (handles nested braces)
-        brace_matches = self._find_balanced_braces(text)
+        brace_matches = self._find_balanced_braces(result)
 
         # Process matches in reverse order to preserve positions
         for start_pos, end_pos in reversed(brace_matches):
-            math_text = text[start_pos:end_pos]
+            math_text = result[start_pos:end_pos]
             try:
                 # Try to parse as math expression
                 lexer = Lexer(math_text)
@@ -999,8 +1050,8 @@ class LaTeXGenerator:
                 parser = Parser(tokens)
                 ast = parser.parse()
 
-                # Check if it's a single expression (not a document)
-                if isinstance(ast, SetComprehension):
+                # Check if it's a set expression (comprehension or literal)
+                if isinstance(ast, (SetComprehension, SetLiteral)):
                     # Generate LaTeX for the expression
                     math_latex = self.generate_expr(ast)
                     # Wrap in $...$
@@ -1067,12 +1118,129 @@ class LaTeXGenerator:
                         # Try shorter substring
                         continue
 
+        # Pattern 2.5: Type declarations (identifier : type_expression)
+        # Match patterns like "large_coins : Collection -> N"
+        # This must come before Pattern 3 to catch the identifier before the colon
+        type_decl_pattern = (
+            r"\b([a-zA-Z_]\w*)\s*:\s*([a-zA-Z_][\w\s\*\(\)\[\]<>,\+\->|]+)"
+        )
+
+        matches = list(re.finditer(type_decl_pattern, result))
+        for match in reversed(matches):
+            start_pos = match.start()
+            end_pos = match.end()
+
+            # Check if already in math mode
+            before = result[:start_pos]
+            dollars_before = before.count("$")
+            if dollars_before % 2 == 1:
+                continue  # Already in math mode
+
+            # Extract the matched expression
+            expr = match.group(0)
+
+            # Try to parse as a type declaration
+            try:
+                lexer = Lexer(expr)
+                tokens = lexer.tokenize()
+                parser = Parser(tokens)
+                ast = parser.parse()
+
+                # If it parses successfully, generate LaTeX
+                if isinstance(ast, Expr):
+                    math_latex = self.generate_expr(ast)
+                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
+            except Exception:
+                # If parsing fails, manually process the identifier and operators
+                # Extract identifier from "identifier : type_expr" pattern
+                match_parts = re.match(r"([a-zA-Z_]\w*)\s*:\s*(.+)", expr)
+                if match_parts:
+                    identifier_name = match_parts.group(1)
+                    type_part = match_parts.group(2)
+
+                    # Process identifier through normal logic for underscore handling
+                    id_node = Identifier(line=0, column=0, name=identifier_name)
+                    identifier_latex = self._generate_identifier(id_node)
+
+                    # Convert operators in type part
+                    type_latex = type_part.replace("->", r"\fun")
+
+                    # Combine
+                    full_latex = f"{identifier_latex} : {type_latex}"
+                    result = result[:start_pos] + f"${full_latex}$" + result[end_pos:]
+                else:
+                    # Fallback: just convert operators
+                    expr_with_ops = expr.replace("->", r"\fun")
+                    result = (
+                        result[:start_pos] + f"${expr_with_ops}$" + result[end_pos:]
+                    )
+
+        # Pattern 2.75: Function application followed by operator
+        # Match: func_name arg operator value (e.g., "cumulative_total hd <= 12000")
+        # ONLY matches identifiers with underscores to avoid false positives with prose
+        # This must come before Pattern 3 to catch function applications
+        math_op_pattern = r"(\+->|-\|>|<-\||->|>->|>->>|<=>|=>|>=|<=|!=|>|<|=)"
+        func_app_pattern = (
+            r"\b([a-zA-Z_]\w*_\w+)\s+"  # Function name (must contain underscore)
+            r"([a-zA-Z_]\w*)\s*"  # Argument
+            + math_op_pattern  # Operator
+            + r"\s*([a-zA-Z_0-9]\w*)"  # Value
+        )
+
+        matches = list(re.finditer(func_app_pattern, result))
+        for match in reversed(matches):
+            start_pos = match.start()
+            end_pos = match.end()
+
+            # Check if already in math mode
+            before = result[:start_pos]
+            dollars_before = before.count("$")
+            if dollars_before % 2 == 1:
+                continue  # Already in math mode
+
+            expr = match.group(0)
+
+            # Try to parse the full expression
+            try:
+                lexer = Lexer(expr)
+                tokens = lexer.tokenize()
+                parser = Parser(tokens)
+                ast = parser.parse()
+
+                if isinstance(ast, Expr):
+                    math_latex = self.generate_expr(ast)
+                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
+            except Exception:
+                # If parsing fails, manually process components
+                # Extract: func_name arg operator value
+                parts = expr.split()
+                if len(parts) >= 3:
+                    func_name = parts[0]
+                    arg_name = parts[1]
+                    op_and_value = " ".join(parts[2:])
+
+                    # Process function identifier
+                    func_node = Identifier(line=0, column=0, name=func_name)
+                    func_latex = self._generate_identifier(func_node)
+
+                    # Process argument identifier
+                    arg_node = Identifier(line=0, column=0, name=arg_name)
+                    arg_latex = self._generate_identifier(arg_node)
+
+                    # Convert operators in rest
+                    op_and_value_latex = op_and_value.replace("<=", r"\leq")
+                    op_and_value_latex = op_and_value_latex.replace(">=", r"\geq")
+                    op_and_value_latex = op_and_value_latex.replace("!=", r"\neq")
+
+                    # Combine as function application
+                    full_latex = f"{func_latex}({arg_latex}) {op_and_value_latex}"
+                    result = result[:start_pos] + f"${full_latex}$" + result[end_pos:]
+
         # Pattern 3: Simple inline math expressions (x > 1, f +-> g, etc.)
         # Match expressions with math operators that need wrapping
         # Strategy: Match sequences of identifiers/numbers connected by operators
 
-        # All operators that need math mode
-        math_op_pattern = r"(\+->|-\|>|<-\||->|>->|>->>|<=>|=>|>=|<=|!=|>|<|=)"
+        # All operators that need math mode (already defined above for Pattern 2.75)
 
         # Pattern: identifier/number, followed by (operator identifier/number)+
         # This matches chains like "p <=> x > 1"
@@ -1283,8 +1451,12 @@ class LaTeXGenerator:
 
         # Generate declarations
         for decl in node.declarations:
+            # Process variable through identifier logic for underscore handling
+            var_latex = self._generate_identifier(
+                Identifier(line=0, column=0, name=decl.variable)
+            )
             type_latex = self.generate_expr(decl.type_expr)
-            lines.append(f"{decl.variable} : {type_latex}")
+            lines.append(f"{var_latex} : {type_latex}")
 
         # Generate where clause if predicates exist
         if node.predicates:
@@ -1318,8 +1490,12 @@ class LaTeXGenerator:
 
         # Generate declarations
         for decl in node.declarations:
+            # Process variable through identifier logic for underscore handling
+            var_latex = self._generate_identifier(
+                Identifier(line=0, column=0, name=decl.variable)
+            )
             type_latex = self.generate_expr(decl.type_expr)
-            lines.append(f"{decl.variable} : {type_latex}")
+            lines.append(f"{var_latex} : {type_latex}")
 
         # Generate where clause if predicates exist
         if node.predicates:
