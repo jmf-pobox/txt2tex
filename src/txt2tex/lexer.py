@@ -616,6 +616,93 @@ class Lexer:
 
             return Token(TokenType.TEXT, text_content, start_line, start_column)
 
+        # Phase 20: Auto-detect prose paragraphs BEFORE keyword checks
+        # Check for capitalized prose starters
+        # Exclude articles (A, An) that might be type names
+        prose_starters = {
+            "The", "This", "These", "Those", "That",
+            "We", "It", "They", "There", "Here",
+            "In", "On", "At", "For",
+            "When", "Where", "Why", "How", "What",
+            "If", "Since", "Because", "Although", "While",
+            "Each", "Every", "Some", "All", "Any",
+            "By", "From", "To", "With", "Without",
+        }
+
+        if start_column == 1 and value in prose_starters:
+            # Looks like prose, capture whole line
+            text_start = start_pos
+
+            while not self._at_end() and self._current_char() != "\n":
+                self._advance()
+
+            text_content = self.text[text_start : self.pos]
+            return Token(TokenType.TEXT, text_content, start_line, start_column)
+
+        # Special handling for articles A/An - only treat as prose if followed by common English word
+        if start_column == 1 and value in ("A", "An"):
+            # Peek ahead to check if this is an article or a type name
+            # Article: "A function is..." or "An element is..."
+            # Type name: "A -> B" or "A union B" (union is Z keyword, not prose)
+            temp_pos = self.pos
+            # Skip whitespace
+            while temp_pos < len(self.text) and self.text[temp_pos] in " \t":
+                temp_pos += 1
+            # Check next word
+            if temp_pos < len(self.text):
+                next_char = self.text[temp_pos]
+                # If next word starts with lowercase, check if it's a Z keyword
+                if next_char.islower():
+                    # Scan the next word
+                    next_word_start = temp_pos
+                    while temp_pos < len(self.text) and (self.text[temp_pos].isalnum() or self.text[temp_pos] == "_"):
+                        temp_pos += 1
+                    next_word = self.text[next_word_start:temp_pos]
+
+                    # Z keywords that shouldn't trigger prose mode
+                    z_keywords = {
+                        "and", "or", "not", "union", "intersect", "in", "notin",
+                        "subset", "cross", "dom", "ran", "inv", "id", "comp",
+                        "forall", "exists", "exists1", "mu", "lambda",
+                        "given", "axdef", "schema", "where", "end",
+                        "if", "then", "else", "otherwise", "mod",
+                    }
+
+                    # If next word is NOT a Z keyword, treat as prose
+                    if next_word not in z_keywords:
+                        text_start = start_pos
+                        while not self._at_end() and self._current_char() != "\n":
+                            self._advance()
+                        text_content = self.text[text_start : self.pos]
+                        return Token(TokenType.TEXT, text_content, start_line, start_column)
+
+        # Check for lowercase keywords at start of line that might be prose
+        # Examples: "where cat.1a is", "and the second by"
+        if start_column == 1 and value in ("where", "and"):
+            # Peek ahead to see if this line looks like prose
+            temp_pos = self.pos
+            line_rest = ""
+            while temp_pos < len(self.text) and self.text[temp_pos] != "\n":
+                line_rest += self.text[temp_pos]
+                temp_pos += 1
+
+            # If line contains prose indicators, treat whole line as TEXT
+            # Check for both " word " (middle of line) and " word" (end of line)
+            full_line = value + line_rest
+            prose_indicators = [
+                " is ", " is", " by ", " by",
+                " are ", " are", " was ", " was", " were ", " were",
+            ]
+            if any(indicator in full_line for indicator in prose_indicators):
+                # This is prose, not Z notation
+                text_start = start_pos
+
+                while not self._at_end() and self._current_char() != "\n":
+                    self._advance()
+
+                text_content = self.text[text_start : self.pos]
+                return Token(TokenType.TEXT, text_content, start_line, start_column)
+
         # Check for keywords (propositional logic)
         if value == "and":
             return Token(TokenType.AND, value, start_line, start_column)
