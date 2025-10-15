@@ -440,3 +440,4 @@ If starting fresh from `/Users/jfreeman/Coding/fuzz/txt2tex/sem/`:
 4. Reference this document for context
 - always run hatch run check before each micro-commit and solve 100% of any issues reported
 - there are no pre-existing issues that should be used to justify anyting
+- success is defined as 100%. Do not ask to settle for lower standards of success.
