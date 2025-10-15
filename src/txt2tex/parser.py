@@ -157,15 +157,31 @@ class Parser:
         if self._match(TokenType.IDENTIFIER):
             next_token = self._peek_ahead(1)
             if next_token.type == TokenType.FREE_TYPE:
-                # This is a free type definition
-                return Document(
-                    items=[self._parse_free_type()], line=first_line, column=1
-                )
+                # Parse free type and check for more items
+                first_free_type = self._parse_free_type()
+                self._skip_newlines()
+                # Check if there are more items (multi-line document)
+                if not self._at_end():
+                    items_with_free: list[DocumentItem] = [first_free_type]
+                    while not self._at_end():
+                        items_with_free.append(self._parse_document_item())
+                        self._skip_newlines()
+                    return Document(items=items_with_free, line=first_line, column=1)
+                # Single free type
+                return Document(items=[first_free_type], line=first_line, column=1)
             if next_token.type == TokenType.ABBREV:
-                # This is an abbreviation
-                return Document(
-                    items=[self._parse_abbreviation()], line=first_line, column=1
-                )
+                # Parse abbreviation and check for more items
+                first_abbrev = self._parse_abbreviation()
+                self._skip_newlines()
+                # Check if there are more items (multi-line document)
+                if not self._at_end():
+                    items_with_abbrev: list[DocumentItem] = [first_abbrev]
+                    while not self._at_end():
+                        items_with_abbrev.append(self._parse_document_item())
+                        self._skip_newlines()
+                    return Document(items=items_with_abbrev, line=first_line, column=1)
+                # Single abbreviation
+                return Document(items=[first_abbrev], line=first_line, column=1)
 
         # Check for abbreviation with generic parameters (Phase 9)
         # [X, Y] Name == expression
@@ -183,10 +199,18 @@ class Parser:
                         self._current(),
                     )
                 return first_item
-            # It's an abbreviation with generic parameters
-            return Document(
-                items=[self._parse_abbreviation()], line=first_line, column=1
-            )
+            # Parse abbreviation with generic parameters and check for more items
+            first_generic_abbrev = self._parse_abbreviation()
+            self._skip_newlines()
+            # Check if there are more items (multi-line document)
+            if not self._at_end():
+                items_with_generic: list[DocumentItem] = [first_generic_abbrev]
+                while not self._at_end():
+                    items_with_generic.append(self._parse_document_item())
+                    self._skip_newlines()
+                return Document(items=items_with_generic, line=first_line, column=1)
+            # Single abbreviation with generic parameters
+            return Document(items=[first_generic_abbrev], line=first_line, column=1)
 
         # Try to parse as expression
         first_item = self._parse_expr()
@@ -815,6 +839,132 @@ class Parser:
             TokenType.IF,  # Phase 16: conditional expressions
         )
 
+    def _should_parse_space_separated_arg(self) -> bool:
+        """Check if we should parse next token as space-separated function argument.
+
+        Phase 19: Space-separated application (f x).
+        Returns True if next token could start an operand and we're not at
+        a delimiter, separator, or infix operator.
+        """
+        # At end of input
+        if self._at_end():
+            return False
+
+        current = self._current()
+
+        # Reject common English prose words to avoid parsing text as math
+        # This prevents "x >= 0 is true" from being parsed as function applications
+        if current.type == TokenType.IDENTIFIER:
+            prose_words = {
+                "is", "are", "be", "was", "were",
+                "true", "false", "the", "a", "an",
+                "to", "of", "for", "with", "as",
+                "by", "from", "that", "this", "these",
+                "those", "it", "its", "they", "them",
+                "syntax", "valid", "here", "there",
+            }
+            if current.value.lower() in prose_words:
+                return False
+
+        # Stop at delimiters
+        if current.type in (
+            TokenType.RPAREN,
+            TokenType.RBRACE,
+            TokenType.RBRACKET,
+            TokenType.RANGLE,
+            TokenType.COMMA,
+        ):
+            return False
+
+        # Stop at separators
+        if current.type in (
+            TokenType.NEWLINE,
+            TokenType.SEMICOLON,
+            TokenType.PIPE,
+        ):
+            return False
+
+        # Stop at keywords that end expressions
+        if current.type in (
+            TokenType.WHERE,
+            TokenType.END,
+            TokenType.THEN,
+            TokenType.ELSE,
+            TokenType.AND,
+            TokenType.OR,
+        ):
+            return False
+
+        # Stop at infix operators
+        if current.type in (
+            TokenType.PLUS,
+            TokenType.MINUS,
+            TokenType.STAR,
+            TokenType.MOD,
+            TokenType.CAT,  # ⌢ concatenation
+            TokenType.RANGE,  # ..
+            TokenType.EQUALS,
+            TokenType.NOT_EQUAL,
+            TokenType.LESS_THAN,
+            TokenType.GREATER_THAN,
+            TokenType.LESS_EQUAL,
+            TokenType.GREATER_EQUAL,
+            TokenType.IN,
+            TokenType.NOTIN,
+            TokenType.SUBSET,
+            TokenType.UNION,
+            TokenType.INTERSECT,
+            TokenType.SETMINUS,  # \ set difference
+            TokenType.CROSS,  # x cross product
+            TokenType.OVERRIDE,  # ++ override
+            TokenType.RELATION,  # <->
+            TokenType.MAPLET,  # |->
+            TokenType.DRES,  # <|
+            TokenType.RRES,  # |>
+            TokenType.NDRES,  # <<|
+            TokenType.NRRES,  # |>>
+            TokenType.CIRC,  # o9
+            TokenType.COMP,  # comp
+            TokenType.TFUN,  # ->
+            TokenType.PFUN,  # +->
+            TokenType.TINJ,  # >->
+            TokenType.PINJ,  # >+>
+            TokenType.PINJ_ALT,  # -|>
+            TokenType.TSURJ,  # -->>
+            TokenType.PSURJ,  # +->>
+            TokenType.BIJECTION,  # >->>
+            TokenType.IMPLIES,  # =>
+            TokenType.IFF,  # <=>
+        ):
+            return False
+
+        # Check if current token could start an operand
+        return current.type in (
+            TokenType.IDENTIFIER,
+            TokenType.NUMBER,
+            TokenType.LPAREN,
+            TokenType.LBRACE,
+            TokenType.LANGLE,
+            TokenType.NOT,
+            TokenType.HASH,
+            TokenType.DOM,
+            TokenType.RAN,
+            TokenType.INV,
+            TokenType.ID,
+            TokenType.POWER,
+            TokenType.POWER1,
+            TokenType.FINSET,
+            TokenType.FINSET1,
+            TokenType.BIGCUP,
+            TokenType.HEAD,
+            TokenType.TAIL,
+            TokenType.LAST,
+            TokenType.FRONT,
+            TokenType.REV,
+            TokenType.LAMBDA,
+            TokenType.IF,
+        )
+
     def _parse_quantifier(self) -> Expr:
         """Parse quantifier: (forall|exists|exists1|mu) var [, var]* : domain | body.
 
@@ -1380,17 +1530,22 @@ class Parser:
 
         return left
 
-    def _parse_postfix(self) -> Expr:
-        """Parse postfix operators.
+    def _parse_postfix(self, allow_space_separated: bool = True) -> Expr:
+        """Parse postfix operators and space-separated application.
 
         Phase 3: ^ (superscript), _ (subscript) - take operands
         Phase 10b: ~ (inverse), + (transitive closure),
                    * (reflexive-transitive closure) - no operands
         Phase 11.8: (| ... |) (relational image) - takes set argument
         Phase 11.9: [ ... ] (generic instantiation) - takes type parameters
+        Phase 19: Space-separated function application (f x y)
 
         Disambiguation: + and * are postfix only if NOT followed by operand.
         If followed by operand, they're infix arithmetic operators.
+
+        Space-separated application: f x y parses as (f x) y (left-associative).
+        The allow_space_separated parameter prevents right-associativity when
+        parsing arguments recursively.
         """
         base = self._parse_atom()
 
@@ -1555,6 +1710,26 @@ class Parser:
                     operand=base,
                     line=op_token.line,
                     column=op_token.column,
+                )
+
+        # Phase 19: Space-separated function application
+        # Pattern: f x y z → (((f x) y) z) (left-associative)
+        # Only parse if allow_space_separated is True (prevents right-associativity)
+        if allow_space_separated:
+            while self._should_parse_space_separated_arg():
+                # Save position for error reporting
+                arg_start_token = self._current()
+
+                # Parse argument with all its postfix operators
+                # but WITHOUT space-separated application (prevents right-associativity)
+                arg = self._parse_postfix(allow_space_separated=False)
+
+                # Wrap in function application
+                base = FunctionApp(
+                    function=base,
+                    args=[arg],
+                    line=arg_start_token.line,
+                    column=arg_start_token.column,
                 )
 
         return base

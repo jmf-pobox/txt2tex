@@ -904,12 +904,12 @@ class LaTeXGenerator:
         text = text.replace("<<|", r"$\ndres$")  # Domain anti-restriction
         text = text.replace("-|>", r"$\pinj$")  # Partial injection
         text = text.replace("+->", r"$\pfun$")  # Partial function
-        text = text.replace(">->", r"$\inj$")   # Total injection
-        text = text.replace("<->", r"$\rel$")   # Relation type
+        text = text.replace(">->", r"$\inj$")  # Total injection
+        text = text.replace("<->", r"$\rel$")  # Relation type
         text = text.replace("|->", r"$\mapsto$")  # Maplet
-        text = text.replace("<|", r"$\dres$")   # Domain restriction
-        text = text.replace("|>", r"$\rres$")   # Range restriction
-        text = text.replace("->", r"$\fun$")    # Total function
+        text = text.replace("<|", r"$\dres$")  # Domain restriction
+        text = text.replace("|>", r"$\rres$")  # Range restriction
+        text = text.replace("->", r"$\fun$")  # Total function
 
         # Convert keywords to symbols (QA fixes)
         # Negative lookbehind (?<!\\) ensures we don't match LaTeX commands like \forall
@@ -1193,6 +1193,35 @@ class LaTeXGenerator:
                         ast = parser.parse()
 
                         if isinstance(ast, Quantifier):
+                            # Check if parsed expression contains prose words
+                            # (due to space-separated application)
+                            prose_words = {
+                                "is", "are", "be", "was", "were",
+                                "true", "false", "the", "a", "an",
+                                "in", "on", "at", "to", "of", "for",
+                                "with", "as", "by", "from", "that",
+                                "syntax", "valid", "here", "there",
+                            }
+
+                            # Check if math_text ends with any prose words
+                            # Split and check last few tokens
+                            text_words = math_text.lower().split()
+                            if text_words and text_words[-1] in prose_words:
+                                # Contains prose word - try shorter substring
+                                continue
+                            if len(text_words) >= 2 and text_words[-2] in prose_words:
+                                # Second-to-last word is prose - try shorter
+                                continue
+
+                            # Check if we're cutting off a word ("is" -> "i" + "s")
+                            if end_pos < len(result) and end_pos > 0:
+                                prev_char = result[end_pos - 1]
+                                next_char = result[end_pos]
+                                # If both sides are alphanumeric, splitting a word
+                                if prev_char.isalnum() and next_char.isalnum():
+                                    # We're in the middle of a word - skip this
+                                    continue
+
                             # Successfully parsed! Generate LaTeX
                             math_latex = self.generate_expr(ast)
                             # Wrap in $...$
