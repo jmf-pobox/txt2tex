@@ -654,7 +654,14 @@ class Parser:
 
         while self._match(TokenType.AND):
             op_token = self._advance()
-            right = self._parse_comparison()
+            # Phase 21c: Allow quantifiers after 'and'
+            # Check if next token is a quantifier keyword
+            if self._match(
+                TokenType.FORALL, TokenType.EXISTS, TokenType.EXISTS1, TokenType.MU
+            ):
+                right = self._parse_quantifier()
+            else:
+                right = self._parse_comparison()
             left = BinaryOp(
                 operator=op_token.value,
                 left=left,
