@@ -904,8 +904,9 @@ class LaTeXGenerator:
     def _generate_part(self, node: Part) -> list[str]:
         """Generate LaTeX for part label.
 
-        If the part contains a single Paragraph, use hanging indent format.
-        Otherwise, use the traditional multi-line format.
+        - Single Paragraph: inline with hanging indent
+        - Single Expr: inline in display math
+        - Multiple items or structural elements: traditional multi-line format
         """
         lines: list[str] = []
 
@@ -926,6 +927,15 @@ class LaTeXGenerator:
                 lines.extend(para_lines[1:])
             else:
                 lines.append(f"({node.label})")
+            lines.append("")
+            lines.append(r"\medskip")
+        elif len(node.items) == 1 and isinstance(node.items[0], Expr):
+            # Single expression: inline display math (like Solution 1)
+            expr = node.items[0]
+            expr_latex = self.generate_expr(expr)
+            lines.append(r"\noindent")
+            lines.append(r"\hangindent=2em")  # Indent continuation lines
+            lines.append(f"({node.label}) \\[ {expr_latex} \\]")
             lines.append("")
             lines.append(r"\medskip")
         else:
