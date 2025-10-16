@@ -119,17 +119,9 @@ TEXT: (p or q) <=> ((not p and not q) or q) is not a tautology. In this case, th
 
 ** Solution 5 **
 
-(a)
-
-exists d : Dog | gentle(d) and well_trained(d)
-
-(b)
-
-forall d : Dog | neat(d) and well_trained(d) => attractive(d)
-
-(c)
-
-TEXT: (Requires nested quantifier in implication - parser limitation)
+(a) exists d : Dog | gentle(d) and well_trained(d)
+(b) forall d : Dog | neat(d) and well_trained(d) => attractive(d)
+(c) exists d : Dog | gentle(d) => forall t : Trainer | groomed(d, t)
 
 ** Solution 6 **
 
@@ -161,13 +153,38 @@ TEXT: With the above choice of p, we require only that q is sometimes false when
 
 ** Solution 8 **
 
-(a)
-
-forall x : N | x >= z
+(a) forall x : N | x >= z
+(b) forall z : N | z >= x + y
+(c) x + 3 > 0 and forall z : N | z >= x + 3
 
 === Equality ===
 
 ** Solution 9 **
+
+(a)
+
+EQUIV:
+exists y : N | y in {0, 1} and y != 1 and x != y
+<=> exists y : N | y = 0 and x != y [arithmetic]
+<=> 0 in N and x != 0 [one-point rule]
+<=> x != 0
+
+(b)
+
+EQUIV:
+exists x, y : N | x + y = 4 and x < y
+<=> exists x, y : N | y = 4 - x and x < y
+<=> exists x : N | 4 - x in N and x < 4 - x
+<=> true
+
+TEXT: The final equivalence holds because 0 in N, 4 - 0 in N, and 0 < 4.
+
+(c)
+
+EQUIV:
+forall x : N | exists y : N | x = y + 1
+<=> forall x : N | exists y : N | y = x - 1
+<=> forall x : N | x - 1 in N
 
 (d)
 
