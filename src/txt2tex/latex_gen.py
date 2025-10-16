@@ -209,6 +209,8 @@ class LaTeXGenerator:
 
         # Preamble
         lines.append(r"\documentclass{article}")
+        # Set margins to match reference PDF (sections at ~157px from left edge)
+        lines.append(r"\usepackage[left=1.55in,right=1in,top=1in,bottom=1in]{geometry}")
         if self.use_fuzz:
             lines.append(r"\usepackage{fuzz}")
         else:
@@ -900,18 +902,42 @@ class LaTeXGenerator:
         return lines
 
     def _generate_part(self, node: Part) -> list[str]:
-        """Generate LaTeX for part label."""
+        """Generate LaTeX for part label.
+
+        If the part contains a single Paragraph, put it on the same line as the label
+        for proper hanging indent. Otherwise, use the traditional multi-line format.
+        """
         lines: list[str] = []
-        lines.append(f"({node.label})")
-        lines.append(r"\par")  # End paragraph cleanly
-        lines.append(r"\vspace{11pt}")  # Explicit spacing for all content types
 
-        for item in node.items:
-            item_lines = self.generate_document_item(item)
-            lines.extend(item_lines)
+        # Check if part contains single paragraph (from TEXT: parsing)
+        if len(node.items) == 1 and isinstance(node.items[0], Paragraph):
+            # Inline format: (a) content here...
+            paragraph = node.items[0]
+            # Remove the leading \bigskip from paragraph generation
+            para_lines = self._generate_paragraph(paragraph)
+            # Filter out \bigskip and empty lines at start
+            while para_lines and (para_lines[0] == r"\bigskip" or para_lines[0] == ""):
+                para_lines.pop(0)
+            # Combine label and content on same line
+            if para_lines:
+                lines.append(f"({node.label}) {para_lines[0]}")
+                lines.extend(para_lines[1:])
+            else:
+                lines.append(f"({node.label})")
+            lines.append("")
+            lines.append(r"\medskip")
+        else:
+            # Traditional format: label on separate line
+            lines.append(f"({node.label})")
+            lines.append(r"\par")  # End paragraph cleanly
+            lines.append(r"\vspace{11pt}")  # Explicit spacing for all content types
 
-        lines.append(r"\medskip")
-        lines.append("")
+            for item in node.items:
+                item_lines = self.generate_document_item(item)
+                lines.extend(item_lines)
+
+            lines.append(r"\medskip")
+            lines.append("")
 
         return lines
 
