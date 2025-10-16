@@ -269,9 +269,7 @@ class Parser:
         text = text_token.value
 
         # Check if text starts with part label pattern: (letter) or (roman numeral)
-        part_match = re.match(
-            r'^\(([a-z]+|[ivxlcdm]+)\)\s+(.+)', text, re.IGNORECASE
-        )
+        part_match = re.match(r"^\(([a-z]+|[ivxlcdm]+)\)\s+(.+)", text, re.IGNORECASE)
         if part_match:
             label = part_match.group(1)
             content = part_match.group(2)
@@ -885,12 +883,35 @@ class Parser:
         # This prevents "x >= 0 is true" from being parsed as function applications
         if current.type == TokenType.IDENTIFIER:
             prose_words = {
-                "is", "are", "be", "was", "were",
-                "true", "false", "the", "a", "an",
-                "to", "of", "for", "with", "as",
-                "by", "from", "that", "this", "these",
-                "those", "it", "its", "they", "them",
-                "syntax", "valid", "here", "there",
+                "is",
+                "are",
+                "be",
+                "was",
+                "were",
+                "true",
+                "false",
+                "the",
+                "a",
+                "an",
+                "to",
+                "of",
+                "for",
+                "with",
+                "as",
+                "by",
+                "from",
+                "that",
+                "this",
+                "these",
+                "those",
+                "it",
+                "its",
+                "they",
+                "them",
+                "syntax",
+                "valid",
+                "here",
+                "there",
             }
             if current.value.lower() in prose_words:
                 return False

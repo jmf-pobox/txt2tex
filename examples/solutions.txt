@@ -213,21 +213,17 @@ TEXT: will return a result (which happens to be 0).
 
 ** Solution 11 **
 
-(a)
+(a) (mu a : N | a = a) = 0 
+TEXT: is a provable statement, since 0 is the only natural number with the specified property.
 
-TEXT: (mu a : N | a = a) = 0 is a provable statement, since 0 is the only natural number with the specified property.
+(b) (mu b : N | b = b) = 1 
+TEXT: is not provable. The specified property is true of both 0 and 1, and thus the value of the mu-expression is undefined.
 
-(b)
+(c) (mu c : N | c > c) = (mu c : N | c > c) 
+TEXT: is a provable statement. Neither expression is properly defined, but we may conclude that they are equal; there is little else that we can prove about them.
 
-TEXT: (mu b : N | b = b) = 1 is not provable. The specified property is true of both 0 and 1, and thus the value of the mu-expression is undefined.
-
-(c)
-
-TEXT: (mu c : N | c > c) = (mu c : N | c > c) is a provable statement. Neither expression is properly defined, but we may conclude that they are equal; there is little else that we can prove about them.
-
-(d)
-
-TEXT: (mu d : N | d = d) = 1 is not a provable statement. We cannot confirm that 1 is the only natural number with the specified property; we do not know what value is taken by undefined operations.
+(d) (mu d : N | d = d) = 1 
+TEXT: is not a provable statement. We cannot confirm that 1 is the only natural number with the specified property; we do not know what value is taken by undefined operations.
 
 ** Solution 12 **
 

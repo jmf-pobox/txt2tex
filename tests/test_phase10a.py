@@ -518,7 +518,7 @@ class TestPhase10aIntegration:
 
     def test_relation_with_set_operations(self) -> None:
         """Test relation operators have lower precedence than set operations."""
-        text = "(x |-> y) in R"
+        text = r"(x |-> y) in R"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)

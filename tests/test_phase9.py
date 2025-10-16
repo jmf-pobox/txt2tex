@@ -178,7 +178,7 @@ class TestPhase9LaTeXGeneration:
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
 
-        assert "Pair == N" in latex
+        assert "Pair == \\mathbb{N}" in latex
         assert "[X]" not in latex
 
     def test_generate_abbreviation_with_generics(self) -> None:

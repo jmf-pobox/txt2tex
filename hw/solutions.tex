@@ -1,15 +1,10 @@
-\documentclass{article}
+\documentclass[fleqn]{article}
+\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}
 \usepackage{zed-cm}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \usepackage{amsmath}
 \begin{document}
-
-\bigskip
-
-Student ID: XXXXXXX
-
-\bigskip
 
 \section*{Propositional Logic}
 
@@ -22,21 +17,18 @@ Student ID: XXXXXXX
 (a)
 \par
 \vspace{11pt}
-\begin{center}
 \begin{tabular}{c c c c}
 $p$ & $\lnot p$ & $( \lnot p \Rightarrow p )$ & $p \Rightarrow ( \lnot p \Rightarrow p )$ \\
 \hline
 t & f & t & t \\
 f & t & f & t \\
 \end{tabular}
-\end{center}
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-\begin{center}
 \begin{tabular}{c c c c c c c}
 $p$ & $q$ & $( q \Rightarrow p )$ & $\lnot p$ & $\lnot q$ & $( \lnot p \Rightarrow \lnot q )$ & $( \lnot p \Rightarrow \lnot q ) \Leftrightarrow ( q \Rightarrow p )$ \\
 \hline
@@ -45,14 +37,12 @@ t & f & t & f & t & t & t \\
 f & t & f & t & f & f & t \\
 f & f & t & t & t & t & t \\
 \end{tabular}
-\end{center}
 
 \medskip
 
 (c)
 \par
 \vspace{11pt}
-\begin{center}
 \begin{tabular}{c c c c c c c c c}
 $p$ & $q$ & $r$ & $( p \Rightarrow r )$ & $( q \Rightarrow r )$ & $( ( p \Rightarrow r ) \land ( q \Rightarrow r ) )$ & $( p \lor q )$ & $( ( p \lor q ) \Rightarrow r )$ & $\Leftrightarrow$ \\
 \hline
@@ -65,7 +55,6 @@ f & t & f & t & f & f & t & f & t \\
 f & f & t & t & t & t & f & t & t \\
 f & f & f & t & t & t & f & t & t \\
 \end{tabular}
-\end{center}
 
 \medskip
 
@@ -81,10 +70,10 @@ f & f & f & t & t & t & f & t & t \\
 \vspace{-10pt}
 \begin{align*}
 p \Rightarrow (\lnot p \Rightarrow p) \\
-&\Leftrightarrow p \Rightarrow \lnot \lnot p \lor p && \text{[$\Rightarrow$ disjunction]} \\
-&\Leftrightarrow p \Rightarrow p \lor p && \text{[$\lnot$ $\lnot$]} \\
-&\Leftrightarrow p \Rightarrow p && \text{[idempotence of p]} \\
-&\Leftrightarrow true && \text{[tautology]}
+&\Leftrightarrow p \Rightarrow \lnot \lnot p \lor p & \hfill \text{[$\Rightarrow$ disjunction]} \\
+&\Leftrightarrow p \Rightarrow p \lor p & \hfill \text{[$\lnot$ $\lnot$]} \\
+&\Leftrightarrow p \Rightarrow p & \hfill \text{[idempotence of p]} \\
+&\Leftrightarrow true & \hfill \text{[tautology]}
 \end{align*}
 
 \medskip
@@ -95,10 +84,10 @@ p \Rightarrow (\lnot p \Rightarrow p) \\
 \vspace{-10pt}
 \begin{align*}
 \lnot p \Rightarrow \lnot q \\
-&\Leftrightarrow \lnot \lnot p \lor \lnot q && \text{[$\Rightarrow$ disjunction]} \\
-&\Leftrightarrow p \lor \lnot q && \text{[$\lnot$ $\lnot$]} \\
-&\Leftrightarrow \lnot q \lor p && \text{[commutativity of $\lor$]} \\
-&\Leftrightarrow q \Rightarrow p && \text{[$\Rightarrow$ disjunction]}
+&\Leftrightarrow \lnot \lnot p \lor \lnot q & \hfill \text{[$\Rightarrow$ disjunction]} \\
+&\Leftrightarrow p \lor \lnot q & \hfill \text{[$\lnot$ $\lnot$]} \\
+&\Leftrightarrow \lnot q \lor p & \hfill \text{[commutativity of $\lor$]} \\
+&\Leftrightarrow q \Rightarrow p & \hfill \text{[$\Rightarrow$ disjunction]}
 \end{align*}
 
 \medskip
@@ -109,9 +98,9 @@ p \Rightarrow (\lnot p \Rightarrow p) \\
 \vspace{-10pt}
 \begin{align*}
 (p \Rightarrow r) \land (q \Rightarrow r) \\
-&\Leftrightarrow (\lnot p \lor r) \land (\lnot q \lor r) && \text{[$\Rightarrow$ disjunction]} \\
-&\Leftrightarrow r \land (\lnot p \lor \lnot q) && \text{[distributivity 2]} \\
-&\Leftrightarrow (\lnot p \lor \lnot q) \land r && \text{[associativity of $\lor$]} \\
+&\Leftrightarrow (\lnot p \lor r) \land (\lnot q \lor r) & \hfill \text{[$\Rightarrow$ disjunction]} \\
+&\Leftrightarrow r \land (\lnot p \lor \lnot q) & \hfill \text{[distributivity 2]} \\
+&\Leftrightarrow (\lnot p \lor \lnot q) \land r & \hfill \text{[associativity of $\lor$]} \\
 &\Leftrightarrow p \lor q \Rightarrow r
 \end{align*}
 
@@ -127,11 +116,11 @@ p \Rightarrow (\lnot p \Rightarrow p) \\
 \par
 \vspace{11pt}
 \noindent
-\[
+$\displaystyle
 \infer[$\Rightarrow$\text{-intro}^{[1]}]{p \Rightarrow (\lnot p \Rightarrow p)}{
   \infer[$\Rightarrow$\text{-intro}^{[2]}]{\lnot p \Rightarrow p}{\ulcorner \lnot p \urcorner^{[2]} & \ulcorner p \urcorner^{[1]}}
 }
-\]
+$
 
 \medskip
 
@@ -145,7 +134,7 @@ In one direction:
 \bigskip
 
 \noindent
-\[
+$\displaystyle
 \infer[$\Rightarrow$\text{-intro}^{[1]}]{(\lnot p \Rightarrow \lnot q) \Rightarrow (q \Rightarrow p)}{
   \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]} & \infer[$\Rightarrow$\text{-intro}^{[2]}]{q \Rightarrow p}{
   \ulcorner q \urcorner^{[2]} & \infer[false\text{-elim}^{[3]}]{p}{
@@ -157,7 +146,7 @@ In one direction:
 }
 }
 }
-\]
+$
 
 \bigskip
 
@@ -166,7 +155,7 @@ and the other:
 \bigskip
 
 \noindent
-\[
+$\displaystyle
 \infer[$\Rightarrow$\text{-intro}^{[1]}]{(q \Rightarrow p) \Rightarrow (\lnot p \Rightarrow \lnot q)}{
   \ulcorner q \Rightarrow p \urcorner^{[1]} & \infer[$\Rightarrow$\text{-intro}^{[2]}]{\lnot p \Rightarrow \lnot q}{
   \ulcorner \lnot p \urcorner^{[2]} & \infer[false\text{-elim}^{[3]}]{\lnot q}{
@@ -178,7 +167,7 @@ and the other:
 }
 }
 }
-\]
+$
 
 \bigskip
 
@@ -187,11 +176,11 @@ We then combine these two proofs with the $\Leftrightarrow$-intro rule, using th
 \bigskip
 
 \noindent
-\[
+$\displaystyle
 \infer[\text{$\Leftrightarrow$ intro}]{\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p}{
   (\lnot p \Rightarrow \lnot q) \Rightarrow (q \Rightarrow p) & (q \Rightarrow p) \Rightarrow (\lnot p \Rightarrow \lnot q)
 }
-\]
+$
 
 \medskip
 
@@ -205,7 +194,7 @@ In one direction:
 \bigskip
 
 \noindent
-\[
+$\displaystyle
 \infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \Rightarrow r) \land (q \Rightarrow r) \Rightarrow (p \lor q \Rightarrow r)}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]} & \infer[$\Rightarrow$\text{-intro}^{[2]}]{p \lor q \Rightarrow r}{
   \ulcorner p \lor q \urcorner^{[2]} & \infer[$\lor$\text{-elim}^{[3]}]{r}{
@@ -221,7 +210,7 @@ In one direction:
 }
 }
 }
-\]
+$
 
 \medskip
 

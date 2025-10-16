@@ -162,7 +162,7 @@ class TestGenericInstantiationLatex:
         generator = LaTeXGenerator()
         latex = generator.generate_expr(ast)
 
-        assert latex == "Type[N]"
+        assert latex == "Type[\\mathbb{N}]"
 
     def test_multi_param_generic_latex(self) -> None:
         """Test LaTeX for multi-param: Type[A, B, C] -> Type[A, B, C]."""
@@ -177,7 +177,7 @@ class TestGenericInstantiationLatex:
         assert latex == "Type[A, B, C]"
 
     def test_complex_type_param_latex(self) -> None:
-        """Test LaTeX for complex param: Type[N cross N] -> Type[N \\cross N]."""
+        """Test LaTeX for complex param: Type[N cross N] -> Type[N x N]."""
         lexer = Lexer("Type[N cross N]")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -186,10 +186,10 @@ class TestGenericInstantiationLatex:
         generator = LaTeXGenerator()
         latex = generator.generate_expr(ast)
 
-        assert latex == r"Type[N \cross N]"
+        assert latex == r"Type[\mathbb{N} \cross \mathbb{N}]"
 
     def test_seq_generic_latex(self) -> None:
-        """Test LaTeX for seq[N] -> seq[N]."""
+        """Test LaTeX for seq[N] -> seq[\\mathbb{N}]."""
         lexer = Lexer("seq[N]")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -203,7 +203,7 @@ class TestGenericInstantiationLatex:
         assert "[" in latex
 
     def test_nested_generic_latex(self) -> None:
-        """Test LaTeX for nested: Type[List[N]] -> Type[List[N]]."""
+        """Test LaTeX for nested: Type[List[N]] -> Type[List[\\mathbb{N}]]."""
         lexer = Lexer("Type[List[N]]")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -212,7 +212,7 @@ class TestGenericInstantiationLatex:
         generator = LaTeXGenerator()
         latex = generator.generate_expr(ast)
 
-        assert latex == "Type[List[N]]"
+        assert latex == "Type[List[\\mathbb{N}]]"
 
 
 class TestGenericInstantiationEdgeCases:

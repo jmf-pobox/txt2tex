@@ -196,23 +196,23 @@ class TestPhase11bLaTeX:
         assert result == r"f(x) \land g(y)"
 
     def test_in_quantifier_latex(self):
-        """Test forall x : N | f(x) > 0 → \\forall x : N \\bullet f(x) > 0."""
+        """Test forall x : N | f(x) > 0 → \\forall x : \\mathbb{N} \\bullet f(x) > 0."""
         result = generate_latex("forall x : N | f(x) > 0")
-        assert result == r"\forall x \colon N \bullet f(x) > 0"
+        assert result == r"\forall x \colon \mathbb{N} \bullet f(x) > 0"
 
 
 class TestPhase11bSpecialFunctions:
     """Test special Z notation functions."""
 
     def test_seq_function(self):
-        """Test seq(N) → \\seq~N."""
+        """Test seq(N) → \\seq~\\mathbb{N}."""
         result = generate_latex("seq(N)")
-        assert result == r"\seq~N"
+        assert result == r"\seq~\mathbb{N}"
 
     def test_iseq_function(self):
-        """Test iseq(N) → \\iseq~N."""
+        """Test iseq(N) → \\iseq~\\mathbb{N}."""
         result = generate_latex("iseq(N)")
-        assert result == r"\iseq~N"
+        assert result == r"\iseq~\mathbb{N}"
 
     def test_bag_function(self):
         """Test bag(X) → \\bag~X."""
@@ -227,12 +227,12 @@ class TestPhase11bSpecialFunctions:
     def test_special_function_multiple_args(self):
         """Test seq(N, N) → seq(N, N) (not special form)."""
         result = generate_latex("seq(N, N)")
-        assert result == "seq(N, N)"
+        assert result == "seq(\\mathbb{N}, \\mathbb{N})"
 
     def test_seq_in_expression(self):
         """Test x in seq(N)."""
         result = generate_latex("x in seq(N)")
-        assert result == r"x \in \seq~N"
+        assert result == r"x \in \seq~\mathbb{N}"
 
 
 class TestPhase11bEdgeCases:
@@ -278,7 +278,7 @@ class TestPhase11bEdgeCases:
     def test_nested_special_functions(self):
         """Test seq(seq(N))."""
         # Inner seq(N) is special, outer seq(...) is not (wrong arg count)
-        # Actually, the inner generates \\seq~N which is then passed to outer
+        # Actually, the inner generates \\seq~\mathbb{N} which is then passed to outer
         # Need to check what actually happens
         ast = parse_expr("seq(seq(N))")
         assert isinstance(ast, FunctionApp)
