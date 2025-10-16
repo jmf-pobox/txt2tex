@@ -292,7 +292,7 @@ class TestLaTeXGenerator:
         gen = LaTeXGenerator(use_fuzz=False)
         ast = Identifier(name="p", line=1, column=1)
         doc = gen.generate_document(ast)
-        assert r"\documentclass{article}" in doc
+        assert r"\documentclass[fleqn]{article}" in doc
         assert r"\usepackage{zed-cm}" in doc
         assert r"\usepackage{zed-maths}" in doc
         assert r"\usepackage{amsmath}" in doc
