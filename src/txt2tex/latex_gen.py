@@ -1365,6 +1365,20 @@ class LaTeXGenerator:
                     math_latex = self.generate_expr(ast)
                     result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
             except Exception:
+                # If parsing fails, check if this looks like prose (not math)
+                # Common English words that appear in prose but not in math
+                prose_words = {
+                    "the", "a", "an", "is", "are", "was", "were", "be", "been",
+                    "have", "has", "had", "do", "does", "did", "will", "would",
+                    "should", "could", "may", "might", "must", "can",
+                    "this", "that", "these", "those", "whatever", "whoever",
+                    "of", "for", "with", "as", "by", "from", "to", "in", "on", "at",
+                }
+                expr_words = set(expr.lower().split())
+                if expr_words & prose_words:
+                    # Contains prose words - skip this match
+                    continue
+
                 # If parsing fails, manually process the identifier and operators
                 # Extract identifier from "identifier : type_expr" pattern
                 match_parts = re.match(r"([a-zA-Z_]\w*)\s*:\s*(.+)", expr)
