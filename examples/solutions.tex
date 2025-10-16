@@ -14,33 +14,21 @@
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-\[
-  false(as(true \Rightarrow false) \Leftrightarrow false)
-\]
+\noindent
+\hangindent=2em
+(a) \[ false(as(true \Rightarrow false) \Leftrightarrow false) \]
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-\[
-  true(as(false \Rightarrow false) \Leftrightarrow true)
-\]
+\noindent
+\hangindent=2em
+(b) \[ true(as(false \Rightarrow false) \Leftrightarrow true) \]
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-\[
-  true(as(false \Rightarrow true) \Leftrightarrow true)
-\]
+\noindent
+\hangindent=2em
+(c) \[ true(as(false \Rightarrow true) \Leftrightarrow true) \]
 
 \medskip
-
 (d)
 \par
 \vspace{11pt}
@@ -241,24 +229,16 @@ p \lor q \Leftrightarrow p \\
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-\[
-  \exists d \colon Dog \bullet gentle(d) \land \mathit{well\_trained}(d)
-\]
+\noindent
+\hangindent=2em
+(a) \[ \exists d \colon Dog \bullet gentle(d) \land \mathit{well\_trained}(d) \]
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-\[
-  \forall d \colon Dog \bullet neat(d) \land \mathit{well\_trained}(d) \Rightarrow attractive(d)
-\]
+\noindent
+\hangindent=2em
+(b) \[ \forall d \colon Dog \bullet neat(d) \land \mathit{well\_trained}(d) \Rightarrow attractive(d) \]
 
 \medskip
-
 \noindent
 \hangindent=2em
 (c) (Requires nested quantifier in implication - parser limitation)
@@ -333,15 +313,11 @@ p \lor q \Leftrightarrow p \\
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-\[
-  \forall x \colon N \bullet x \geq z
-\]
+\noindent
+\hangindent=2em
+(a) \[ \forall x \colon N \bullet x \geq z \]
 
 \medskip
-
 \section*{Equality}
 
 \bigskip
@@ -452,24 +428,16 @@ will return a result (which happens to be 0).
 
 \bigskip
 
-(a)
-\par
-\vspace{11pt}
-\[
-  \mu m \colon Mountain \mid \forall n \colon Mountain \bullet height(n) \leq height(m) \bullet height(m)
-\]
+\noindent
+\hangindent=2em
+(a) \[ \mu m \colon Mountain \mid \forall n \colon Mountain \bullet height(n) \leq height(m) \bullet height(m) \]
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-\[
-  \mu c \colon Chapter \mid \exists_1 d \colon Chapter \bullet length(d) > length(c) \bullet length(c)
-\]
+\noindent
+\hangindent=2em
+(b) \[ \mu c \colon Chapter \mid \exists_1 d \colon Chapter \bullet length(d) > length(c) \bullet length(c) \]
 
 \medskip
-
 \noindent
 \hangindent=2em
 (c) Assuming the existence of a suitable function, max: ($\mu n \colon N \bullet n = max$($\{ m \colon N \mid 8 * m < 100.8 * m \}$) . 100 - n)
@@ -782,57 +750,37 @@ There are various ways of describing these sets via set comprehensions. Examples
 
 \bigskip
 
-(a)
-\par
-\vspace{11pt}
-\[
-  \{ z \colon Z \mid 0 \leq z \land z \leq 100 \}
-\]
+\noindent
+\hangindent=2em
+(a) \[ \{ z \colon Z \mid 0 \leq z \land z \leq 100 \} \]
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-\[
-  \{ z \colon Z \mid z = 10 \}
-\]
+\noindent
+\hangindent=2em
+(b) \[ \{ z \colon Z \mid z = 10 \} \]
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-\[
-  \{ z \colon Z \mid z \bmod 2 = 0 \lor z \bmod 3 = 0 \lor z \bmod 5 = 0 \}
-\]
+\noindent
+\hangindent=2em
+(c) \[ \{ z \colon Z \mid z \bmod 2 = 0 \lor z \bmod 3 = 0 \lor z \bmod 5 = 0 \} \]
 
 \medskip
-
 \bigskip
 \noindent
 \textbf{Solution 22}
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-\[
-  \{ n \colon N \mid n \leq 4 \bullet n^2 \}
-\]
+\noindent
+\hangindent=2em
+(a) \[ \{ n \colon N \mid n \leq 4 \bullet n^2 \} \]
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-\[
-  \{ n \colon N \mid n \leq 4 \bullet (n, n^2) \}
-\]
+\noindent
+\hangindent=2em
+(b) \[ \{ n \colon N \mid n \leq 4 \bullet (n, n^2) \} \]
 
 \medskip
-
 \noindent
 \hangindent=2em
 (c) { $n : P ${0, 1} }
@@ -984,108 +932,68 @@ The power set of $\{(0, 0), (0, 1), (1, 0), (1, 1)\}$ is:
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
-\[
-  \{\emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(0, 0), (0, 1)\}\}
-\]
+\noindent
+\hangindent=2em
+(b) \[ \{\emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(0, 0), (0, 1)\}\} \]
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-\[
-  \{\emptyset\}
-\]
+\noindent
+\hangindent=2em
+(c) \[ \{\emptyset\} \]
 
 \medskip
-
-(d)
-\par
-\vspace{11pt}
-\[
-  \{\emptyset\}
-\]
+\noindent
+\hangindent=2em
+(d) \[ \{\emptyset\} \]
 
 \medskip
-
 \bigskip
 \noindent
 \textbf{Solution 28}
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-\[
-  \dom R = \{0, 1, 2\}
-\]
+\noindent
+\hangindent=2em
+(a) \[ \dom R = \{0, 1, 2\} \]
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-\[
-  \ran R = \{1, 2, 3\}
-\]
+\noindent
+\hangindent=2em
+(b) \[ \ran R = \{1, 2, 3\} \]
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-\[
-  \{1, 2\} \dres R = \{1 \mapsto 2, 1 \mapsto 3, 2 \mapsto 3\}
-\]
+\noindent
+\hangindent=2em
+(c) \[ \{1, 2\} \dres R = \{1 \mapsto 2, 1 \mapsto 3, 2 \mapsto 3\} \]
 
 \medskip
-
 \bigskip
 \noindent
 \textbf{Solution 29}
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-\[
-  \{2 \mapsto 4, 3 \mapsto 3, 3 \mapsto 4, 4 \mapsto 2\}
-\]
+\noindent
+\hangindent=2em
+(a) \[ \{2 \mapsto 4, 3 \mapsto 3, 3 \mapsto 4, 4 \mapsto 2\} \]
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-\[
-  \{1 \mapsto 3, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 1\}
-\]
+\noindent
+\hangindent=2em
+(b) \[ \{1 \mapsto 3, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 1\} \]
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-\[
-  \{1 \mapsto 1, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4 \mapsto 4\}
-\]
+\noindent
+\hangindent=2em
+(c) \[ \{1 \mapsto 1, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4 \mapsto 4\} \]
 
 \medskip
-
-(d)
-\par
-\vspace{11pt}
-\[
-  \{1 \mapsto 4, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4 \mapsto 1\}
-\]
+\noindent
+\hangindent=2em
+(d) \[ \{1 \mapsto 4, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4 \mapsto 1\} \]
 
 \medskip
-
 \bigskip
 \noindent
 \textbf{Solution 30}
@@ -1313,42 +1221,26 @@ The set of bijective functions:
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-\[
-  \{1 \mapsto a, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}
-\]
+\noindent
+\hangindent=2em
+(a) \[ \{1 \mapsto a, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\} \]
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-\[
-  \{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}
-\]
+\noindent
+\hangindent=2em
+(b) \[ \{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto d\} \]
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-\[
-  \{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}
-\]
+\noindent
+\hangindent=2em
+(c) \[ \{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\} \]
 
 \medskip
-
-(d)
-\par
-\vspace{11pt}
-\[
-  \{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}
-\]
+\noindent
+\hangindent=2em
+(d) \[ \{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\} \]
 
 \medskip
-
 \bigskip
 \noindent
 \textbf{Solution 35}
@@ -1409,96 +1301,56 @@ children = \{ p \colon Person \bullet p \mapsto parentOf(\limg \{p\} \rimg) \}
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-\[
-  \langle a \rangle
-\]
+\noindent
+\hangindent=2em
+(a) \[ \langle a \rangle \]
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-\[
-  \{1 \mapsto a, 2 \mapsto b, 2 \mapsto a, 3 \mapsto c, 3 \mapsto b, 4 \mapsto d\}
-\]
+\noindent
+\hangindent=2em
+(b) \[ \{1 \mapsto a, 2 \mapsto b, 2 \mapsto a, 3 \mapsto c, 3 \mapsto b, 4 \mapsto d\} \]
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-\[
-  \{2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}
-\]
+\noindent
+\hangindent=2em
+(c) \[ \{2 \mapsto b, 3 \mapsto c, 4 \mapsto d\} \]
 
 \medskip
-
-(d)
-\par
-\vspace{11pt}
-\[
-  \{1, 2, 3, 4\}
-\]
+\noindent
+\hangindent=2em
+(d) \[ \{1, 2, 3, 4\} \]
 
 \medskip
-
-(e)
-\par
-\vspace{11pt}
-\[
-  \{a, b\}
-\]
+\noindent
+\hangindent=2em
+(e) \[ \{a, b\} \]
 
 \medskip
-
-(f)
-\par
-\vspace{11pt}
-\[
-  \{a \mapsto 1, b \mapsto 2, c \mapsto 3, d \mapsto 4\}
-\]
+\noindent
+\hangindent=2em
+(f) \[ \{a \mapsto 1, b \mapsto 2, c \mapsto 3, d \mapsto 4\} \]
 
 \medskip
-
-(g)
-\par
-\vspace{11pt}
-\[
-  \langle a, b \rangle
-\]
+\noindent
+\hangindent=2em
+(g) \[ \langle a, b \rangle \]
 
 \medskip
-
-(h)
-\par
-\vspace{11pt}
-\[
-  \{3 \mapsto b\}
-\]
+\noindent
+\hangindent=2em
+(h) \[ \{3 \mapsto b\} \]
 
 \medskip
-
-(i)
-\par
-\vspace{11pt}
-\[
-  \{a\}
-\]
+\noindent
+\hangindent=2em
+(i) \[ \{a\} \]
 
 \medskip
-
-(j)
-\par
-\vspace{11pt}
-\[
-  c
-\]
+\noindent
+\hangindent=2em
+(j) \[ c \]
 
 \medskip
-
 \bigskip
 \noindent
 \textbf{Solution 38}
@@ -1516,24 +1368,16 @@ f : Place \fun \power~Place
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
-\[
-  \{ p \colon Place \mid \exists_1 x \colon \dom trains \bullet trains(x).2 = p \}
-\]
+\noindent
+\hangindent=2em
+(b) \[ \{ p \colon Place \mid \exists_1 x \colon \dom trains \bullet trains(x).2 = p \} \]
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-\[
-  \mu p \colon Place \bullet \forall q \colon Place \bullet p \neq q \land \# \{ x \colon \dom trains \mid trains(x).2 = p \} > \# \{ x \colon \dom trains \mid trains(x).2 = q \}
-\]
+\noindent
+\hangindent=2em
+(c) \[ \mu p \colon Place \bullet \forall q \colon Place \bullet p \neq q \land \# \{ x \colon \dom trains \mid trains(x).2 = p \} > \# \{ x \colon \dom trains \mid trains(x).2 = q \} \]
 
 \medskip
-
 \bigskip
 \noindent
 \textbf{Solution 39}
@@ -1635,15 +1479,11 @@ Note that cumulative_total is defined in part (d).
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
-\[
-  \{ p \colon \ran hd \mid p.2 > 120 \bullet p.1 \}
-\]
+\noindent
+\hangindent=2em
+(b) \[ \{ p \colon \ran hd \mid p.2 > 120 \bullet p.1 \} \]
 
 \medskip
-
 (c)
 \par
 \vspace{11pt}
