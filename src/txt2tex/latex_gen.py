@@ -1541,26 +1541,36 @@ class LaTeXGenerator:
         """Generate LaTeX for truth table."""
         lines: list[str] = []
 
-        # Start table environment with vertical bars between columns
+        # Start table environment with vertical bars between columns (not at edges)
         # Spacing is controlled by part labels
         num_cols = len(node.headers)
-        col_spec = "|" + "|".join(["c"] * num_cols) + "|"
+        col_spec = "|".join(["c"] * num_cols)
         lines.append(r"\begin{tabular}{" + col_spec + r"}")
 
-        # Generate header row
+        # Generate header row (last column in bold as it's the overall assessment)
         header_parts: list[str] = []
-        for header in node.headers:
+        for i, header in enumerate(node.headers):
             # Convert operators to LaTeX symbols
             header_latex = self._convert_operators_to_latex(header)
-            # Wrap header in math mode
-            header_parts.append(f"${header_latex}$")
+            # Last column in bold, all in math mode
+            if i == len(node.headers) - 1:
+                header_parts.append(r"$\mathbf{" + header_latex + r"}$")
+            else:
+                header_parts.append(f"${header_latex}$")
         lines.append(" & ".join(header_parts) + r" \\")
         lines.append(r"\hline")
 
-        # Generate data rows (lowercase t/f in text mode, not math mode)
+        # Generate data rows (lowercase t/f in text mode, last column in bold)
         for row in node.rows:
-            # Don't wrap truth values in math mode - use text mode for lowercase t/f
-            row_parts = [val.lower() if val in ("T", "F") else val for val in row]
+            row_parts = []
+            for i, val in enumerate(row):
+                # Lowercase t/f for truth values
+                cell = val.lower() if val in ("T", "F") else val
+                # Last column in bold
+                if i == len(row) - 1:
+                    row_parts.append(r"\textbf{" + cell + r"}")
+                else:
+                    row_parts.append(cell)
             lines.append(" & ".join(row_parts) + r" \\")
 
         lines.append(r"\end{tabular}")
