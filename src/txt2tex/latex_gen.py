@@ -208,7 +208,8 @@ class LaTeXGenerator:
         lines: list[str] = []
 
         # Preamble
-        lines.append(r"\documentclass{article}")
+        # Use fleqn option to left-align all equations (no centering)
+        lines.append(r"\documentclass[fleqn]{article}")
         # Set margins to match reference PDF (symmetrical left/right at 1.55in)
         lines.append(r"\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}")
         if self.use_fuzz:
@@ -265,10 +266,10 @@ class LaTeXGenerator:
         if isinstance(item, ProofTree):
             return self._generate_proof_tree(item)
 
-        # Item is an Expr - wrap in display math mode
-        # Use \[...\] for standalone expressions (not inline $...$)
+        # Item is an Expr - render as left-aligned paragraph with inline math
+        # Don't center expressions - use noindent paragraph instead
         latex_expr = self.generate_expr(item)
-        return [r"\[", f"  {latex_expr}", r"\]", ""]
+        return [r"\noindent", f"${latex_expr}$", "", ""]
 
     def generate_expr(self, expr: Expr) -> str:
         """Generate LaTeX for expression (without wrapping in math mode)."""
@@ -905,7 +906,8 @@ class LaTeXGenerator:
         """Generate LaTeX for part label.
 
         - Single Paragraph: inline with hanging indent
-        - Single Expr: inline in display math
+        - Single Expr: inline math
+        - Starts with Expr + more content: inline Expr, then continue below
         - Multiple items or structural elements: traditional multi-line format
         """
         lines: list[str] = []
@@ -938,6 +940,23 @@ class LaTeXGenerator:
             lines.append(f"({node.label}) ${expr_latex}$")
             lines.append("")
             lines.append(r"\medskip")
+        elif len(node.items) >= 2 and isinstance(node.items[0], Expr):
+            # Starts with expression followed by more content
+            # Render first expression inline, then rest below
+            expr = node.items[0]
+            expr_latex = self.generate_expr(expr)
+            lines.append(r"\noindent")
+            lines.append(r"\hangindent=2em")  # Indent continuation lines
+            lines.append(f"({node.label}) ${expr_latex}$")
+            lines.append("")
+
+            # Render remaining items
+            for item in node.items[1:]:
+                item_lines = self.generate_document_item(item)
+                lines.extend(item_lines)
+
+            lines.append(r"\medskip")
+            lines.append("")
         else:
             # Traditional format: label on separate line
             lines.append(f"({node.label})")
@@ -1496,7 +1515,6 @@ class LaTeXGenerator:
         # Spacing is controlled by part labels
         num_cols = len(node.headers)
         col_spec = " ".join(["c"] * num_cols)
-        lines.append(r"\begin{center}")
         lines.append(r"\begin{tabular}{" + col_spec + r"}")
 
         # Generate header row
@@ -1516,7 +1534,6 @@ class LaTeXGenerator:
             lines.append(" & ".join(row_parts) + r" \\")
 
         lines.append(r"\end{tabular}")
-        lines.append(r"\end{center}")
         lines.append("")
 
         return lines
@@ -1708,13 +1725,13 @@ class LaTeXGenerator:
         """Generate LaTeX for proof tree using \\infer macros from zed-proof.sty."""
         lines: list[str] = []
 
-        # Generate the proof tree left-aligned using \noindent and display math mode
-        # Spacing is controlled by part labels (no additional spacing needed)
+        # Generate proof tree in display math without centering
+        # Use negative hspace to shift left and compensate for centering
         proof_latex = self._generate_proof_node_infer(node.conclusion)
         lines.append(r"\noindent")
-        lines.append(r"\[")
+        lines.append(r"$\displaystyle")
         lines.append(proof_latex)
-        lines.append(r"\]")
+        lines.append(r"$")
         lines.append("")
 
         return lines
