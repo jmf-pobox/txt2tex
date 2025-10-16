@@ -209,8 +209,8 @@ class LaTeXGenerator:
 
         # Preamble
         lines.append(r"\documentclass{article}")
-        # Set margins to match reference PDF (sections at ~157px from left edge)
-        lines.append(r"\usepackage[left=1.55in,right=1in,top=1in,bottom=1in]{geometry}")
+        # Set margins to match reference PDF (symmetrical left/right at 1.55in)
+        lines.append(r"\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}")
         if self.use_fuzz:
             lines.append(r"\usepackage{fuzz}")
         else:
@@ -904,21 +904,23 @@ class LaTeXGenerator:
     def _generate_part(self, node: Part) -> list[str]:
         """Generate LaTeX for part label.
 
-        If the part contains a single Paragraph, put it on the same line as the label
-        for proper hanging indent. Otherwise, use the traditional multi-line format.
+        If the part contains a single Paragraph, use hanging indent format.
+        Otherwise, use the traditional multi-line format.
         """
         lines: list[str] = []
 
         # Check if part contains single paragraph (from TEXT: parsing)
         if len(node.items) == 1 and isinstance(node.items[0], Paragraph):
-            # Inline format: (a) content here...
+            # Hanging indent format for prose paragraphs
             paragraph = node.items[0]
             # Remove the leading \bigskip from paragraph generation
             para_lines = self._generate_paragraph(paragraph)
             # Filter out \bigskip and empty lines at start
             while para_lines and (para_lines[0] == r"\bigskip" or para_lines[0] == ""):
                 para_lines.pop(0)
-            # Combine label and content on same line
+            # Use noindent and hangindent for proper alignment
+            lines.append(r"\noindent")
+            lines.append(r"\hangindent=2em")  # Indent continuation lines
             if para_lines:
                 lines.append(f"({node.label}) {para_lines[0]}")
                 lines.extend(para_lines[1:])
