@@ -1586,8 +1586,9 @@ class LaTeXGenerator:
         for i, step in enumerate(node.steps):
             expr_latex = self.generate_expr(step.expression)
 
-            # First step: just expression; subsequent: &\Leftrightarrow expression
-            line = expr_latex if i == 0 else r"&\Leftrightarrow " + expr_latex
+            # All lines start with & for consistent left alignment
+            # First step: & expression; subsequent: &\Leftrightarrow expression
+            line = r"& " + expr_latex if i == 0 else r"&\Leftrightarrow " + expr_latex
 
             # Add justification if present (flush right)
             if step.justification:
