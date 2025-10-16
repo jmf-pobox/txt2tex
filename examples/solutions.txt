@@ -438,11 +438,11 @@ TEXT: There are various ways of describing these sets via set comprehensions. Ex
 
 (c)
 
-TEXT: { n : P {0, 1} }
+{ n : P {0, 1} }
 
 (d)
 
-TEXT: { n : P {0, 1} | true . (n, # n) }
+{ n : P {0, 1} | true . (n, # n) }
 
 ** Solution 23 **
 
