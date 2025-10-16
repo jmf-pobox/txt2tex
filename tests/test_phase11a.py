@@ -106,7 +106,7 @@ class TestPhase11aLexer:
         assert tokens2[1].value == "+->>"
 
         # -->> should be recognized as TSURJ, not -> preceded by -
-        lexer3 = Lexer("M -->> N")
+        lexer3 = Lexer(r"M -->> \mathbb{N}")
         tokens3 = lexer3.tokenize()
 
         assert tokens3[1].type == TokenType.TSURJ

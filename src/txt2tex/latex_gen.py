@@ -211,7 +211,9 @@ class LaTeXGenerator:
         # Use fleqn option to left-align all equations (no centering)
         lines.append(r"\documentclass[fleqn]{article}")
         # Set margins to match reference PDF (symmetrical left/right at 1.55in)
-        lines.append(r"\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}")
+        lines.append(
+            r"\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}"
+        )
         if self.use_fuzz:
             lines.append(r"\usepackage{fuzz}")
         else:
@@ -219,6 +221,7 @@ class LaTeXGenerator:
             lines.append(r"\usepackage{zed-maths}")
             lines.append(r"\usepackage{zed-proof}")  # For \infer macros
         lines.append(r"\usepackage{amsmath}")
+        lines.append(r"\usepackage{amssymb}")  # For \mathbb
         lines.append(r"\begin{document}")
         lines.append("")
 
@@ -342,6 +345,12 @@ class LaTeXGenerator:
         }
         if name in special_keywords:
             return special_keywords[name]
+
+        # Mathematical type names: use blackboard bold
+        # N = naturals, Z = integers
+        # Only convert N and Z, not Q/R/C which are commonly used as variables
+        if name in {"N", "Z"}:
+            return rf"\mathbb{{{name}}}"
 
         # No underscore: return as-is
         if "_" not in name:
@@ -1309,11 +1318,31 @@ class LaTeXGenerator:
                             # Check if parsed expression contains prose words
                             # (due to space-separated application)
                             prose_words = {
-                                "is", "are", "be", "was", "were",
-                                "true", "false", "the", "a", "an",
-                                "in", "on", "at", "to", "of", "for",
-                                "with", "as", "by", "from", "that",
-                                "syntax", "valid", "here", "there",
+                                "is",
+                                "are",
+                                "be",
+                                "was",
+                                "were",
+                                "true",
+                                "false",
+                                "the",
+                                "a",
+                                "an",
+                                "in",
+                                "on",
+                                "at",
+                                "to",
+                                "of",
+                                "for",
+                                "with",
+                                "as",
+                                "by",
+                                "from",
+                                "that",
+                                "syntax",
+                                "valid",
+                                "here",
+                                "there",
                             }
 
                             # Check if math_text ends with any prose words
@@ -1384,11 +1413,45 @@ class LaTeXGenerator:
                 # If parsing fails, check if this looks like prose (not math)
                 # Common English words that appear in prose but not in math
                 prose_words = {
-                    "the", "a", "an", "is", "are", "was", "were", "be", "been",
-                    "have", "has", "had", "do", "does", "did", "will", "would",
-                    "should", "could", "may", "might", "must", "can",
-                    "this", "that", "these", "those", "whatever", "whoever",
-                    "of", "for", "with", "as", "by", "from", "to", "in", "on", "at",
+                    "the",
+                    "a",
+                    "an",
+                    "is",
+                    "are",
+                    "was",
+                    "were",
+                    "be",
+                    "been",
+                    "have",
+                    "has",
+                    "had",
+                    "do",
+                    "does",
+                    "did",
+                    "will",
+                    "would",
+                    "should",
+                    "could",
+                    "may",
+                    "might",
+                    "must",
+                    "can",
+                    "this",
+                    "that",
+                    "these",
+                    "those",
+                    "whatever",
+                    "whoever",
+                    "of",
+                    "for",
+                    "with",
+                    "as",
+                    "by",
+                    "from",
+                    "to",
+                    "in",
+                    "on",
+                    "at",
                 }
                 expr_words = set(expr.lower().split())
                 if expr_words & prose_words:
