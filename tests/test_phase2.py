@@ -253,7 +253,7 @@ class TestPhase2LaTeXGeneration:
         assert r"\begin{align*}" in latex
         assert r"\end{align*}" in latex
         assert r"p \land q" in latex
-        assert r"&\Leftrightarrow q \land p && \text{[commutative]}" in latex
+        assert r"&\Leftrightarrow q \land p & \hfill \text{[commutative]}" in latex
 
     def test_generate_document_with_equiv_chain(self) -> None:
         """Test complete document generation with equivalence chain."""
@@ -285,7 +285,7 @@ class TestPhase2LaTeXGeneration:
         assert r"\usepackage{amsmath}" in latex
         assert r"\begin{align*}" in latex
         assert r"p \\" in latex
-        assert r"&\Leftrightarrow q && \text{[assumption]}" in latex
+        assert r"&\Leftrightarrow q & \hfill \text{[assumption]}" in latex
         assert r"\end{align*}" in latex
         assert r"\end{document}" in latex
 
@@ -317,7 +317,7 @@ q and p [commutative]"""
         assert isinstance(ast.items[0], EquivChain)
         assert r"\begin{align*}" in latex
         assert r"p \land q" in latex
-        assert r"&\Leftrightarrow q \land p && \text{[commutative]}" in latex
+        assert r"&\Leftrightarrow q \land p & \hfill \text{[commutative]}" in latex
         assert r"\end{align*}" in latex
 
     def test_end_to_end_complex_equiv(self) -> None:

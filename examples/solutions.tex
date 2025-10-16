@@ -122,8 +122,8 @@ f & f & t & f & t \\
 \vspace{-10pt}
 \begin{align*}
 p \Rightarrow \lnot p \\
-&\Leftrightarrow \lnot p \lor \lnot p && \text{[$\Rightarrow$]} \\
-&\Leftrightarrow \lnot p && \text{[idempotence]}
+&\Leftrightarrow \lnot p \lor \lnot p & \hfill \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot p & \hfill \text{[idempotence]}
 \end{align*}
 
 \medskip
@@ -134,9 +134,9 @@ p \Rightarrow \lnot p \\
 \vspace{-10pt}
 \begin{align*}
 \lnot p \Rightarrow p \\
-&\Leftrightarrow \lnot \lnot p \lor p && \text{[$\Rightarrow$]} \\
-&\Leftrightarrow p \lor p && \text{[$\lnot$ $\lnot$]} \\
-&\Leftrightarrow p && \text{[idempotence]}
+&\Leftrightarrow \lnot \lnot p \lor p & \hfill \text{[$\Rightarrow$]} \\
+&\Leftrightarrow p \lor p & \hfill \text{[$\lnot$ $\lnot$]} \\
+&\Leftrightarrow p & \hfill \text{[idempotence]}
 \end{align*}
 
 \medskip
@@ -147,11 +147,11 @@ p \Rightarrow \lnot p \\
 \vspace{-10pt}
 \begin{align*}
 p \Rightarrow (q \Rightarrow r) \\
-&\Leftrightarrow \lnot p \lor (q \Rightarrow r) && \text{[$\Rightarrow$]} \\
-&\Leftrightarrow \lnot p \lor \lnot q \lor r && \text{[$\Rightarrow$]} \\
-&\Leftrightarrow \lnot p \lor \lnot q \lor r && \text{[associativity]} \\
-&\Leftrightarrow \lnot (p \land q) \lor r && \text{[De Morgan]} \\
-&\Leftrightarrow p \land q \Rightarrow r && \text{[$\Rightarrow$]}
+&\Leftrightarrow \lnot p \lor (q \Rightarrow r) & \hfill \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot p \lor \lnot q \lor r & \hfill \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot p \lor \lnot q \lor r & \hfill \text{[associativity]} \\
+&\Leftrightarrow \lnot (p \land q) \lor r & \hfill \text{[De Morgan]} \\
+&\Leftrightarrow p \land q \Rightarrow r & \hfill \text{[$\Rightarrow$]}
 \end{align*}
 
 \medskip
@@ -162,11 +162,11 @@ p \Rightarrow (q \Rightarrow r) \\
 \vspace{-10pt}
 \begin{align*}
 q \Rightarrow (p \Rightarrow r) \\
-&\Leftrightarrow \lnot q \lor (p \Rightarrow r) && \text{[$\Rightarrow$]} \\
-&\Leftrightarrow \lnot q \lor \lnot p \lor r && \text{[$\Rightarrow$]} \\
-&\Leftrightarrow \lnot p \lor \lnot q \lor r && \text{[associativity $\land$ commutativity]} \\
-&\Leftrightarrow \lnot p \lor (q \Rightarrow r) && \text{[$\Rightarrow$]} \\
-&\Leftrightarrow p \Rightarrow (q \Rightarrow r) && \text{[$\Rightarrow$]}
+&\Leftrightarrow \lnot q \lor (p \Rightarrow r) & \hfill \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot q \lor \lnot p \lor r & \hfill \text{[$\Rightarrow$]} \\
+&\Leftrightarrow \lnot p \lor \lnot q \lor r & \hfill \text{[associativity $\land$ commutativity]} \\
+&\Leftrightarrow \lnot p \lor (q \Rightarrow r) & \hfill \text{[$\Rightarrow$]} \\
+&\Leftrightarrow p \Rightarrow (q \Rightarrow r) & \hfill \text{[$\Rightarrow$]}
 \end{align*}
 
 \medskip
@@ -177,17 +177,17 @@ q \Rightarrow (p \Rightarrow r) \\
 \vspace{-10pt}
 \begin{align*}
 p \land q \Leftrightarrow p \\
-&\Leftrightarrow (p \land q \Rightarrow p) \land (p \Rightarrow p \land q) && \text{[$\Leftrightarrow$]} \\
-&\Leftrightarrow (\lnot (p \land q) \lor p) \land (\lnot p \lor p \land q) && \text{[$\Rightarrow$]} \\
-&\Leftrightarrow (\lnot p \lor \lnot q \lor p) \land (\lnot p \lor p \land q) && \text{[De Morgan]} \\
-&\Leftrightarrow (\lnot q \lor \lnot p \lor p) \land (\lnot p \lor p \land q) && \text{[associativity $\land$ comm .]} \\
-&\Leftrightarrow (\lnot q \lor true) \land (\lnot p \lor p \land q) && \text{[excluded middle]} \\
-&\Leftrightarrow true \land (\lnot p \lor p \land q) && \text{[$\lor$ $\land$ true]} \\
-&\Leftrightarrow \lnot p \lor p \land q && \text{[$\land$ $\land$ true]} \\
-&\Leftrightarrow (\lnot p \lor p) \land (\lnot p \lor q) && \text{[distribution]} \\
-&\Leftrightarrow true \land (\lnot p \lor q) && \text{[excluded middle]} \\
-&\Leftrightarrow \lnot p \lor q && \text{[$\land$ $\land$ true]} \\
-&\Leftrightarrow p \Rightarrow q && \text{[$\Rightarrow$]}
+&\Leftrightarrow (p \land q \Rightarrow p) \land (p \Rightarrow p \land q) & \hfill \text{[$\Leftrightarrow$]} \\
+&\Leftrightarrow (\lnot (p \land q) \lor p) \land (\lnot p \lor p \land q) & \hfill \text{[$\Rightarrow$]} \\
+&\Leftrightarrow (\lnot p \lor \lnot q \lor p) \land (\lnot p \lor p \land q) & \hfill \text{[De Morgan]} \\
+&\Leftrightarrow (\lnot q \lor \lnot p \lor p) \land (\lnot p \lor p \land q) & \hfill \text{[associativity $\land$ comm .]} \\
+&\Leftrightarrow (\lnot q \lor true) \land (\lnot p \lor p \land q) & \hfill \text{[excluded middle]} \\
+&\Leftrightarrow true \land (\lnot p \lor p \land q) & \hfill \text{[$\lor$ $\land$ true]} \\
+&\Leftrightarrow \lnot p \lor p \land q & \hfill \text{[$\land$ $\land$ true]} \\
+&\Leftrightarrow (\lnot p \lor p) \land (\lnot p \lor q) & \hfill \text{[distribution]} \\
+&\Leftrightarrow true \land (\lnot p \lor q) & \hfill \text{[excluded middle]} \\
+&\Leftrightarrow \lnot p \lor q & \hfill \text{[$\land$ $\land$ true]} \\
+&\Leftrightarrow p \Rightarrow q & \hfill \text{[$\Rightarrow$]}
 \end{align*}
 
 \medskip
@@ -198,17 +198,17 @@ p \land q \Leftrightarrow p \\
 \vspace{-10pt}
 \begin{align*}
 p \lor q \Leftrightarrow p \\
-&\Leftrightarrow (p \lor q \Rightarrow p) \land (p \Rightarrow p \lor q) && \text{[$\Leftrightarrow$]} \\
-&\Leftrightarrow (\lnot (p \lor q) \lor p) \land (\lnot p \lor p \lor q) && \text{[$\Rightarrow$]} \\
-&\Leftrightarrow (\lnot p \land \lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[De Morgan]} \\
-&\Leftrightarrow (\lnot p \lor p) \land (\lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[distribution]} \\
-&\Leftrightarrow true \land (\lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[excluded middle]} \\
-&\Leftrightarrow (\lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[$\land$ $\land$ true]} \\
-&\Leftrightarrow (\lnot q \lor p) \land (\lnot p \lor p \lor q) && \text{[associativity]} \\
-&\Leftrightarrow (\lnot q \lor p) \land (true \lor q) && \text{[excluded middle]} \\
-&\Leftrightarrow (\lnot q \lor p) \land true && \text{[$\lor$ $\land$ true]} \\
-&\Leftrightarrow \lnot q \lor p && \text{[$\land$ $\land$ true]} \\
-&\Leftrightarrow q \Rightarrow p && \text{[$\Rightarrow$]}
+&\Leftrightarrow (p \lor q \Rightarrow p) \land (p \Rightarrow p \lor q) & \hfill \text{[$\Leftrightarrow$]} \\
+&\Leftrightarrow (\lnot (p \lor q) \lor p) \land (\lnot p \lor p \lor q) & \hfill \text{[$\Rightarrow$]} \\
+&\Leftrightarrow (\lnot p \land \lnot q \lor p) \land (\lnot p \lor p \lor q) & \hfill \text{[De Morgan]} \\
+&\Leftrightarrow (\lnot p \lor p) \land (\lnot q \lor p) \land (\lnot p \lor p \lor q) & \hfill \text{[distribution]} \\
+&\Leftrightarrow true \land (\lnot q \lor p) \land (\lnot p \lor p \lor q) & \hfill \text{[excluded middle]} \\
+&\Leftrightarrow (\lnot q \lor p) \land (\lnot p \lor p \lor q) & \hfill \text{[$\land$ $\land$ true]} \\
+&\Leftrightarrow (\lnot q \lor p) \land (\lnot p \lor p \lor q) & \hfill \text{[associativity]} \\
+&\Leftrightarrow (\lnot q \lor p) \land (true \lor q) & \hfill \text{[excluded middle]} \\
+&\Leftrightarrow (\lnot q \lor p) \land true & \hfill \text{[$\lor$ $\land$ true]} \\
+&\Leftrightarrow \lnot q \lor p & \hfill \text{[$\land$ $\land$ true]} \\
+&\Leftrightarrow q \Rightarrow p & \hfill \text{[$\Rightarrow$]}
 \end{align*}
 
 \medskip
