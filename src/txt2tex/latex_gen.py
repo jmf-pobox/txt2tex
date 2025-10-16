@@ -1541,10 +1541,10 @@ class LaTeXGenerator:
         """Generate LaTeX for truth table."""
         lines: list[str] = []
 
-        # Start table environment (no vertical bars, only horizontal line after header)
+        # Start table environment with vertical bars between columns
         # Spacing is controlled by part labels
         num_cols = len(node.headers)
-        col_spec = " ".join(["c"] * num_cols)
+        col_spec = "|" + "|".join(["c"] * num_cols) + "|"
         lines.append(r"\begin{tabular}{" + col_spec + r"}")
 
         # Generate header row
