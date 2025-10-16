@@ -1,6 +1,8 @@
 \documentclass{article}
-\usepackage[left=1.55in,right=1in,top=1in,bottom=1in]{geometry}
-\usepackage{fuzz}
+\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
 \usepackage{amsmath}
 \begin{document}
 
@@ -217,12 +219,16 @@ p \lor q \Leftrightarrow p \\
 
 \medskip
 
+\noindent
+\hangindent=2em
 (a) (p or q) $\Leftrightarrow$ ((not p or not q) and q) is not a tautology. You might illustrate this via a truth table or via a chain of equivalences, showing that the proposition is not equivalent to true. Alternatively, you might try and find a combination of values for which the proposition is false. (In this case, the proposition is false when p and q are both true.)
 
 \bigskip
 
 
 \medskip
+\noindent
+\hangindent=2em
 (b) (p or q) $\Leftrightarrow$ ((not p and not q) or q) is not a tautology. In this case, the proposition is false when p is true and q is false.
 
 \bigskip
@@ -239,7 +245,7 @@ p \lor q \Leftrightarrow p \\
 \par
 \vspace{11pt}
 \[
-  \exists d : Dog \spot gentle(d) \land well_trained(d)
+  \exists d \colon Dog \bullet gentle(d) \land \mathit{well\_trained}(d)
 \]
 
 \medskip
@@ -248,11 +254,13 @@ p \lor q \Leftrightarrow p \\
 \par
 \vspace{11pt}
 \[
-  \forall d : Dog \spot neat(d) \land well_trained(d) \Rightarrow attractive(d)
+  \forall d \colon Dog \bullet neat(d) \land \mathit{well\_trained}(d) \Rightarrow attractive(d)
 \]
 
 \medskip
 
+\noindent
+\hangindent=2em
 (c) (Requires nested quantifier in implication - parser limitation)
 
 \bigskip
@@ -265,24 +273,32 @@ p \lor q \Leftrightarrow p \\
 
 \medskip
 
+\noindent
+\hangindent=2em
 (a) This is a true $proposition : whatever the value of x, the expression $$x^2$ - x + 1 denotes a natural number. If we choose y to be this natural number, we will find that p is true.
 
 \bigskip
 
 
 \medskip
+\noindent
+\hangindent=2em
 (b) This is a false proposition. We cannot choose a large enough value for y such that p will hold for any value of x.
 
 \bigskip
 
 
 \medskip
+\noindent
+\hangindent=2em
 (c) This is a false proposition. It is an implication whose antecedent part is true and whose consequent part is false.
 
 \bigskip
 
 
 \medskip
+\noindent
+\hangindent=2em
 (d) This is a true proposition. It is an implication whose antecedent part is false and whose consequent part is true.
 
 \bigskip
@@ -295,12 +311,16 @@ p \lor q \Leftrightarrow p \\
 
 \medskip
 
+\noindent
+\hangindent=2em
 (a) We must define a predicate p that is false for at least one value of x, and is true for at least one other value. A suitable solution would be $p \Leftrightarrow x > 1$.
 
 \bigskip
 
 
 \medskip
+\noindent
+\hangindent=2em
 (b) With the above choice of p, we require only that q is sometimes false when p is true (for else the universal quantification would hold). A suitable solution would be $q \Leftrightarrow x > 3$.
 
 \bigskip
@@ -317,7 +337,7 @@ p \lor q \Leftrightarrow p \\
 \par
 \vspace{11pt}
 \[
-  \forall x : N \spot x \geq z
+  \forall x \colon N \bullet x \geq z
 \]
 
 \medskip
@@ -335,9 +355,9 @@ p \lor q \Leftrightarrow p \\
 \vspace{11pt}
 \vspace{-10pt}
 \begin{align*}
-\exists x : N \spot x = 1 \land x > y \lor x = 2 \land x > z \\
-&\Leftrightarrow \exists x : N \spot x = 1 \land x > y \lor \exists x : N \spot x = 2 \land x > z \\
-&\Leftrightarrow 1 \in N \land 1 > y \lor \exists x : N \spot x = 2 \land x > z \\
+\exists x \colon N \bullet x = 1 \land x > y \lor x = 2 \land x > z \\
+&\Leftrightarrow \exists x \colon N \bullet x = 1 \land x > y \lor \exists x \colon N \bullet x = 2 \land x > z \\
+&\Leftrightarrow 1 \in N \land 1 > y \lor \exists x \colon N \bullet x = 2 \land x > z \\
 &\Leftrightarrow 1 \in N \land 1 > y \lor 2 \in N \land 2 > z \\
 &\Leftrightarrow 1 > y \lor 2 > z
 \end{align*}
@@ -363,7 +383,7 @@ So, as a simple example, as the proposition
 \bigskip
 
 \[
-  \exists_1 n : N \spot \forall m : N \spot n \leq m
+  \exists_1 n \colon N \bullet \forall m \colon N \bullet n \leq m
 \]
 
 \bigskip
@@ -373,7 +393,7 @@ is equivalent to true, we can be certain that the statement
 \bigskip
 
 \[
-  \mu n : N \spot \forall m : N \spot n \leq m
+  \mu n \colon N \bullet \forall m \colon N \bullet n \leq m
 \]
 
 \bigskip
@@ -388,25 +408,33 @@ will return a result (which happens to be 0).
 
 \medskip
 
+\noindent
+\hangindent=2em
 (a) (mu $a : N | a $= a) = 0 is a provable statement, since 0 is the only natural number with the specified property.
 
 \bigskip
 
 
 \medskip
-(b) ($\mu b : N \spot b = b$) = 1 is not provable. The specified property is true of both 0 and 1, and thus the value of the mu-expression is undefined.
+\noindent
+\hangindent=2em
+(b) ($\mu b \colon N \bullet b = b$) = 1 is not provable. The specified property is true of both 0 and 1, and thus the value of the mu-expression is undefined.
 
 \bigskip
 
 
 \medskip
-(c) ($\mu c : N \spot c > c$) = ($\mu c : N \spot c > c$) is a provable statement. Neither expression is properly defined, but we may conclude that they are equal; there is little else that we can prove about them.
+\noindent
+\hangindent=2em
+(c) ($\mu c \colon N \bullet c > c$) = ($\mu c \colon N \bullet c > c$) is a provable statement. Neither expression is properly defined, but we may conclude that they are equal; there is little else that we can prove about them.
 
 \bigskip
 
 
 \medskip
-(d) ($\mu d : N \spot d = d$) = 1 is not a provable statement. We cannot confirm that 1 is the only natural number with the specified property; we do not know what value is taken by undefined operations.
+\noindent
+\hangindent=2em
+(d) ($\mu d \colon N \bullet d = d$) = 1 is not a provable statement. We cannot confirm that 1 is the only natural number with the specified property; we do not know what value is taken by undefined operations.
 
 \bigskip
 
@@ -428,7 +456,7 @@ will return a result (which happens to be 0).
 \par
 \vspace{11pt}
 \[
-  \mu m : Mountain | \forall n : Mountain \spot height(n) \leq height(m) \spot height(m)
+  \mu m \colon Mountain \mid \forall n \colon Mountain \bullet height(n) \leq height(m) \bullet height(m)
 \]
 
 \medskip
@@ -437,12 +465,14 @@ will return a result (which happens to be 0).
 \par
 \vspace{11pt}
 \[
-  \mu c : Chapter | \exists_1 d : Chapter \spot length(d) > length(c) \spot length(c)
+  \mu c \colon Chapter \mid \exists_1 d \colon Chapter \bullet length(d) > length(c) \bullet length(c)
 \]
 
 \medskip
 
-(c) Assuming the existence of a suitable function, max: ($\mu n : N \spot n = max$($\{ m : N | 8 * m < 100.8 * m \}$) . 100 - n)
+\noindent
+\hangindent=2em
+(c) Assuming the existence of a suitable function, max: ($\mu n \colon N \bullet n = max$($\{ m \colon N \mid 8 * m < 100.8 * m \}$) . 100 - n)
 
 \bigskip
 
@@ -656,24 +686,32 @@ and the other:
 
 \medskip
 
+\noindent
+\hangindent=2em
 (a) 1 in $\{4, 3, 2, 1\}$ is true.
 
 \bigskip
 
 
 \medskip
+\noindent
+\hangindent=2em
 (b) $\{1\}$ in $\{1, 2, 3, 4\}$ is undefined.
 
 \bigskip
 
 
 \medskip
+\noindent
+\hangindent=2em
 (c) $\{1\}$ in $\{\{1\}, \{2\}, \{3\}, \{4\}\}$ is true.
 
 \bigskip
 
 
 \medskip
+\noindent
+\hangindent=2em
 (d) The empty set in $\{1, 2, 3, 4\}$ is undefined.
 
 \bigskip
@@ -701,6 +739,8 @@ is the set $\{(1, 2), (1, 3)\}$
 
 \medskip
 
+\noindent
+\hangindent=2em
 (b) The empty set cross $\{2, 3\}$ is the empty set
 
 \bigskip
@@ -722,6 +762,8 @@ is the set $\{(\emptyset, 1)\}$
 
 \medskip
 
+\noindent
+\hangindent=2em
 (d) $\{(1, 2)\}$ cross $\{3, 4\}$ is the set $\{((1, 2), 3), ((1, 2), 4)\}$
 
 \bigskip
@@ -744,7 +786,7 @@ There are various ways of describing these sets via set comprehensions. Examples
 \par
 \vspace{11pt}
 \[
-  \{ z : Z | 0 \leq z \land z \leq 100 \}
+  \{ z \colon Z \mid 0 \leq z \land z \leq 100 \}
 \]
 
 \medskip
@@ -753,7 +795,7 @@ There are various ways of describing these sets via set comprehensions. Examples
 \par
 \vspace{11pt}
 \[
-  \{ z : Z | z = 10 \}
+  \{ z \colon Z \mid z = 10 \}
 \]
 
 \medskip
@@ -762,7 +804,7 @@ There are various ways of describing these sets via set comprehensions. Examples
 \par
 \vspace{11pt}
 \[
-  \{ z : Z | z \bmod 2 = 0 \lor z \bmod 3 = 0 \lor z \bmod 5 = 0 \}
+  \{ z \colon Z \mid z \bmod 2 = 0 \lor z \bmod 3 = 0 \lor z \bmod 5 = 0 \}
 \]
 
 \medskip
@@ -777,7 +819,7 @@ There are various ways of describing these sets via set comprehensions. Examples
 \par
 \vspace{11pt}
 \[
-  \{ n : N | n \leq 4 \spot n^2 \}
+  \{ n \colon N \mid n \leq 4 \bullet n^2 \}
 \]
 
 \medskip
@@ -786,18 +828,22 @@ There are various ways of describing these sets via set comprehensions. Examples
 \par
 \vspace{11pt}
 \[
-  \{ n : N | n \leq 4 \spot (n, n^2) \}
+  \{ n \colon N \mid n \leq 4 \bullet (n, n^2) \}
 \]
 
 \medskip
 
+\noindent
+\hangindent=2em
 (c) { $n : P ${0, 1} }
 
 \bigskip
 
 
 \medskip
-(d) $\{ n : \power~\{0, 1\} | true \spot (n, \# n) \}$
+\noindent
+\hangindent=2em
+(d) $\{ n \colon \power~\{0, 1\} \mid true \bullet (n, \# n) \}$
 
 \bigskip
 
@@ -861,7 +907,7 @@ The set of all integer pairs in which each element is strictly greater than zero
 
 \bigskip
 
-StrictlyPositivePairs == \{ m, n : Z | m > 0 \land n > 0 \spot (m, n) \}
+StrictlyPositivePairs == \{ m, n \colon Z \mid m > 0 \land n > 0 \bullet (m, n) \}
 
 \medskip
 
@@ -887,7 +933,7 @@ The set of all couples could be defined by:
 
 \bigskip
 
-Couples == \{ s : \power~Person | \# s = 2 \}
+Couples == \{ s \colon \power~Person \mid \# s = 2 \}
 
 \medskip
 
@@ -1061,7 +1107,7 @@ This is a good example of how there are many different ways of writing the same 
 
 \bigskip
 
-parentOf == \{ x, y : Person | x \mapsto y \in childOf \spot y \mapsto x \}
+parentOf == \{ x, y \colon Person \mid x \mapsto y \in childOf \bullet y \mapsto x \}
 
 \bigskip
 
@@ -1113,24 +1159,28 @@ ancestorOf == parentOf^+
 (a)
 \par
 \vspace{11pt}
-R == \{ a, b : N | b = a \lor b = a \}
+R == \{ a, b \colon N \mid b = a \lor b = a \}
 
 \medskip
 
 (b)
 \par
 \vspace{11pt}
-S == \{ a, b : N | b = a \lor b = a \}
+S == \{ a, b \colon N \mid b = a \lor b = a \}
 
 \medskip
 
-(c) R+ == $\{ a, b : N | b > a \}$
+\noindent
+\hangindent=2em
+(c) R+ == $\{ a, b \colon N \mid b > a \}$
 
 \bigskip
 
 
 \medskip
-(d) R* == $\{ a, b : N | b \geq a \}$
+\noindent
+\hangindent=2em
+(d) R* == $\{ a, b \colon N \mid b \geq a \}$
 
 \bigskip
 
@@ -1234,6 +1284,8 @@ The set of functions which are injective but not surjective:
 
 \medskip
 
+\noindent
+\hangindent=2em
 (d) There are no functions (of this type) which are surjective but not injective.
 
 \bigskip
@@ -1315,7 +1367,7 @@ The set of bijective functions:
 \begin{axdef}
 children : Person \fun \power~Person
 \where
-children = \{ p : Person \spot p \mapsto parentOf(\limg \{p\} \rimg) \}
+children = \{ p \colon Person \bullet p \mapsto parentOf(\limg \{p\} \rimg) \}
 \end{axdef}
 
 \medskip
@@ -1324,9 +1376,9 @@ children = \{ p : Person \spot p \mapsto parentOf(\limg \{p\} \rimg) \}
 \par
 \vspace{11pt}
 \begin{axdef}
-number_of_grandchildren : Person \fun N
+\mathit{number\_of\_grandchildren} : Person \fun N
 \where
-number_of_grandchildren = \{ p : Person \spot p \mapsto \# parentOf \circ parentOf(\limg \{p\} \rimg) \}
+\mathit{number\_of\_grandchildren} = \{ p \colon Person \bullet p \mapsto \# parentOf \circ parentOf(\limg \{p\} \rimg) \}
 \end{axdef}
 
 \medskip
@@ -1344,9 +1396,9 @@ number_of_grandchildren = \{ p : Person \spot p \mapsto \# parentOf \circ parent
 \bigskip
 
 \begin{axdef}
-number_of_drivers : Drivers \rel Cars \fun (Cars \fun N)
+\mathit{number\_of\_drivers} : Drivers \rel Cars \fun (Cars \fun N)
 \where
-number_of_drivers = \lambda r : Drivers \rel Cars \bullet \{ c : \ran r \spot c \mapsto \# \{ d : Drivers | d \mapsto c \in r \} \}
+\mathit{number\_of\_drivers} = \lambda r : Drivers \rel Cars \bullet \{ c \colon \ran r \bullet c \mapsto \# \{ d \colon Drivers \mid d \mapsto c \in r \} \}
 \end{axdef}
 
 \section*{Sequences}
@@ -1459,7 +1511,7 @@ number_of_drivers = \lambda r : Drivers \rel Cars \bullet \{ c : \ran r \spot c 
 \begin{axdef}
 f : Place \fun \power~Place
 \where
-\forall p : Place \spot f(p) = \{ q : Place | p \mapsto q \in \ran trains \}
+\forall p \colon Place \bullet f(p) = \{ q \colon Place \mid p \mapsto q \in \ran trains \}
 \end{axdef}
 
 \medskip
@@ -1468,7 +1520,7 @@ f : Place \fun \power~Place
 \par
 \vspace{11pt}
 \[
-  \{ p : Place | \exists_1 x : \dom trains \spot trains(x).2 = p \}
+  \{ p \colon Place \mid \exists_1 x \colon \dom trains \bullet trains(x).2 = p \}
 \]
 
 \medskip
@@ -1477,7 +1529,7 @@ f : Place \fun \power~Place
 \par
 \vspace{11pt}
 \[
-  \mu p : Place \spot \forall q : Place \spot p \neq q \land \# \{ x : \dom trains | trains(x).2 = p \} > \# \{ x : \dom trains | trains(x).2 = q \}
+  \mu p \colon Place \bullet \forall q \colon Place \bullet p \neq q \land \# \{ x \colon \dom trains \mid trains(x).2 = p \} > \# \{ x \colon \dom trains \mid trains(x).2 = q \}
 \]
 
 \medskip
@@ -1493,13 +1545,13 @@ f : Place \fun \power~Place
 \vspace{11pt}
 \bigskip
 
-$large_coins : Collection \fun N$
+$\mathit{large\_coins} : Collection \fun N$
 
 \bigskip
 
 \bigskip
 
-$\forall c : Collection \spot large_coins(c) = c(large)$
+$\forall c \colon Collection \bullet \mathit{large\_coins}(c) = c(large)$
 
 \bigskip
 
@@ -1516,13 +1568,13 @@ $\forall c : Collection \spot large_coins(c) = c(large)$
 \vspace{11pt}
 \bigskip
 
-$add_coin : Collection * Coin \fun Collection$
+$\mathit{add\_coin} : Collection * Coin \fun Collection$
 
 \bigskip
 
 \bigskip
 
-$\forall c : Collection \spot \forall d : Coin \spot add_coin(c, d) = c \cup \lbag d \rbag$
+$\forall c \colon Collection \bullet \forall d \colon Coin \bullet \mathit{add\_coin}(c, d) = c \cup \lbag d \rbag$
 
 \bigskip
 
@@ -1565,13 +1617,13 @@ $hd : seq(Title * Length * Viewed)$
 
 \bigskip
 
-$cumulative_total(hd) \leq 12000$
+$\mathit{cumulative\_total}(hd) \leq 12000$
 
 \bigskip
 
 \bigskip
 
-$\forall p : \ran hd \spot p.2 \leq 360$
+$\forall p \colon \ran hd \bullet p.2 \leq 360$
 
 \bigskip
 
@@ -1587,7 +1639,7 @@ Note that cumulative_total is defined in part (d).
 \par
 \vspace{11pt}
 \[
-  \{ p : \ran hd | p.2 > 120 \spot p.1 \}
+  \{ p \colon \ran hd \mid p.2 > 120 \bullet p.1 \}
 \]
 
 \medskip
@@ -1604,7 +1656,7 @@ These can be defined recursively:
 \begin{axdef}
 viewed : \seq~Programme \fun \seq~Programme
 \where
-viewed(\langle \rangle) = \langle \rangle \land \forall x : Programme \spot \forall s : \seq~Programme \spot viewed(\langle x \rangle \cat s) = (\text{if } x.3 = yes \text{ then } \langle x \rangle \cat viewed(s) \text{ else } viewed(s))
+viewed(\langle \rangle) = \langle \rangle \land \forall x \colon Programme \bullet \forall s \colon \seq~Programme \bullet viewed(\langle x \rangle \cat s) = (\text{if } x.3 = yes \text{ then } \langle x \rangle \cat viewed(s) \text{ else } viewed(s))
 \end{axdef}
 
 \bigskip
@@ -1619,10 +1671,10 @@ or otherwise (omitted - requires semicolon-separated bindings in set comprehensi
 \par
 \vspace{11pt}
 \begin{axdef}
-cumulative_total : \seq~Title * Length * Viewed \fun N
+\mathit{cumulative\_total} : \seq~Title * Length * Viewed \fun N
 \where
-cumulative_total(\langle \rangle) = 0
-\forall x : Title * Length * Viewed \spot \forall s : \seq~Title * Length * Viewed \spot cumulative_total(\langle x \rangle \cat s) = x.2 + cumulative_total(s)
+\mathit{cumulative\_total}(\langle \rangle) = 0
+\forall x \colon Title * Length * Viewed \bullet \forall s \colon \seq~Title * Length * Viewed \bullet \mathit{cumulative\_total}(\langle x \rangle \cat s) = x.2 + \mathit{cumulative\_total}(s)
 \end{axdef}
 
 \medskip
@@ -1632,7 +1684,7 @@ cumulative_total(\langle \rangle) = 0
 \vspace{11pt}
 \bigskip
 
-(mu $p : ran hd | $$\forall q : \ran hd \spot p \neq q \land p.2 > q.2$$\mid$ p.1)
+(mu $p : ran hd | $$\forall q \colon \ran hd \bullet p \neq q \land p.2 > q.2$$\mid$ p.1)
 
 \bigskip
 
@@ -1647,6 +1699,8 @@ cumulative_total(\langle \rangle) = 0
 (f)
 \par
 \vspace{11pt}
+\noindent
+\hangindent=2em
 (f) Omitted - requires semicolon-separated bindings in nested set comprehension
 
 \bigskip
@@ -1678,7 +1732,7 @@ where
 
 \bigskip
 
-$\forall s : \seq~Title * Length * Viewed \spot g(s) = s$$\rres$ $\{ x : \ran s | x \neq longest_viewed(s) \}$
+$\forall s \colon \seq~Title * Length * Viewed \bullet g(s) = s$$\rres$ $\{ x \colon \ran s \mid x \neq \mathit{longest\_viewed}(s) \}$
 
 \bigskip
 
@@ -1714,7 +1768,7 @@ axdef
 
 \bigskip
 
-$longest_viewed : seq(Title * Length * Viewed) +\fun Title * Length * Viewed$
+$\mathit{longest\_viewed} : seq(Title * Length * Viewed) +\fun Title * Length * Viewed$
 
 \bigskip
 
@@ -1726,7 +1780,7 @@ where
 
 \bigskip
 
-$\forall s : \seq~Title * Length * Viewed \spot longest_viewed(s)$= ($\mu p : \ran s \spot p.3 = yes$and $\forall q : \ran s \spot p \neq q \land q.3 = yes \land p.2 > q.2$)
+$\forall s \colon \seq~Title * Length * Viewed \bullet \mathit{longest\_viewed}(s)$= ($\mu p \colon \ran s \bullet p.3 = yes$and $\forall q \colon \ran s \bullet p \neq q \land q.3 = yes \land p.2 > q.2$)
 
 \bigskip
 
@@ -1750,7 +1804,7 @@ This, of course, assumes that there is at least one viewed programme (and one of
 \begin{axdef}
 s : \seq~Title * Length * Viewed \fun \seq~Title * Length * Viewed
 \where
-\forall x : \seq~Title * Length * Viewed \spot items(s(x)) = items(x) \land \forall i, j : \dom s(x) \spot i < j \Rightarrow s(x)(i).2 \geq s(x)(j).2
+\forall x \colon \seq~Title * Length * Viewed \bullet items(s(x)) = items(x) \land \forall i, j \colon \dom s(x) \bullet i < j \Rightarrow s(x)(i).2 \geq s(x)(j).2
 \end{axdef}
 
 \medskip
@@ -1790,19 +1844,19 @@ dom(records) = 1993..current
 
 \bigskip
 
-$\forall y : \dom records \spot \# records(y) \leq 50$
+$\forall y \colon \dom records \bullet \# records(y) \leq 50$
 
 \bigskip
 
 \bigskip
 
-$\forall$ $y : dom(records) | $$\forall e : \ran records(y) \spot year(e.1) = y$
+$\forall$ $y : dom(records) | $$\forall e \colon \ran records(y) \bullet year(e.1) = y$
 
 \bigskip
 
 \bigskip
 
-$\forall$ $r : ran(records) | $$\forall i1, i2 : \dom r \spot i1 \neq i2 \land r(i1).1 = r(i2).1 \Rightarrow r(i1).3 \neq r(i2).3$
+$\forall$ $r : ran(records) | $$\forall i1, i2 \colon \dom r \bullet i1 \neq i2 \land r(i1).1 = r(i2).1 \Rightarrow r(i1).3 \neq r(i2).3$
 
 \bigskip
 
@@ -1823,7 +1877,7 @@ end
 \par
 \vspace{11pt}
 \[
-  \{ e : Entry | \exists r : \ran records \spot e \in \ran r \land e.3 = 479 \}
+  \{ e \colon Entry \mid \exists r \colon \ran records \bullet e \in \ran r \land e.3 = 479 \}
 \]
 
 \[
@@ -1831,7 +1885,7 @@ end
 \]
 
 \[
-  \{ e : Entry | \exists r : \ran records \spot e \in \ran r \land e.6 > e.5 \}
+  \{ e \colon Entry \mid \exists r \colon \ran records \bullet e \in \ran r \land e.6 > e.5 \}
 \]
 
 \[
@@ -1839,7 +1893,7 @@ end
 \]
 
 \[
-  \{ e : Entry | \exists r : \ran records \spot e \in \ran r \land e.7 \geq 70 \}
+  \{ e \colon Entry \mid \exists r \colon \ran records \bullet e \in \ran r \land e.7 \geq 70 \}
 \]
 
 \[
@@ -1847,7 +1901,7 @@ end
 \]
 
 \[
-  \{ c : Course | \forall r : \ran records \spot \forall e : \ran r \spot e.2 = c \Rightarrow e.7 \geq 70 \}
+  \{ c \colon Course \mid \forall r \colon \ran records \bullet \forall e \colon \ran r \bullet e.2 = c \Rightarrow e.7 \geq 70 \}
 \]
 
 \[
@@ -1856,7 +1910,7 @@ end
 
 \bigskip
 
-$\{ y : Year | y \in \dom records \spot y \mapsto \{ l : Lecturer | \# \{ c : \ran records(y) | c.4 = l \} > 6 \} \}$
+$\{ y \colon Year \mid y \in \dom records \bullet y \mapsto \{ l \colon Lecturer \mid \# \{ c \colon \ran records(y) \mid c.4 = l \} > 6 \} \}$
 
 \bigskip
 
@@ -1879,7 +1933,7 @@ where
 
 \bigskip
 
-$\forall x : Entry \spot \forall s : \seq~Entry \spot 479_courses$($\langle \rangle$) = $\langle \rangle$ and 479_courses ($\langle x \rangle$ ^ s) = if x.3 = 479 then $\langle x \rangle$ ^ 479_courses(s) else 479_courses(s)
+$\forall x \colon Entry \bullet \forall s \colon \seq~Entry \bullet \mathit{479\_courses}$($\langle \rangle$) = $\langle \rangle$ and 479_courses ($\langle x \rangle$ ^ s) = if x.3 = 479 then $\langle x \rangle$ ^ 479_courses(s) else 479_courses(s)
 
 \bigskip
 
@@ -1902,7 +1956,7 @@ end
 \vspace{11pt}
 \begin{axdef}
 \where
-\forall x : Entry \spot \forall s : \seq~Entry \spot total(\langle \rangle) = 0 \land total(\langle x \rangle \cat s) = x.5 + total(s)
+\forall x \colon Entry \bullet \forall s \colon \seq~Entry \bullet total(\langle \rangle) = 0 \land total(\langle x \rangle \cat s) = x.5 + total(s)
 \end{axdef}
 
 \medskip
@@ -1935,7 +1989,7 @@ where
 
 \bigskip
 
-$\forall$ $s : State | $$\forall i, j : \dom s \spot i \neq j \land \ran s(i) \cap \ran s(j)$= $\{\}$
+$\forall$ $s : State | $$\forall i, j \colon \dom s \bullet i \neq j \land \ran s(i) \cap \ran s(j)$= $\{\}$
 
 \bigskip
 
@@ -1968,7 +2022,7 @@ where
 
 \bigskip
 
-$\forall n : N \spot \forall p : Person \spot \forall s : State \spot n \in \dom s \land p \notin \bigcup \ran \ran s$$\mid$
+$\forall n \colon N \bullet \forall p \colon Person \bullet \forall s \colon State \bullet n \in \dom s \land p \notin \bigcup \ran \ran s$$\mid$
 
 \bigskip
 
@@ -2001,7 +2055,9 @@ end
 (a)
 \par
 \vspace{11pt}
-(i) $\forall$ $i : dom bookings | $$\forall x, y : bookings(i) \spot x \neq y \land x.2 \upto x.3 \cap y.2 \upto y.3$= $\{\}$
+\noindent
+\hangindent=2em
+(i) $\forall$ $i : dom bookings | $$\forall x, y \colon bookings(i) \bullet x \neq y \land x.2 \upto x.3 \cap y.2 \upto y.3$= $\{\}$
 
 \bigskip
 
@@ -2013,6 +2069,8 @@ end
 
 \bigskip
 
+\noindent
+\hangindent=2em
 (ii) $\forall$ $i : dom bookings | $\forall$ x $: bookings(i) $\mid$ $\{x.2, x.3\}$ subseteq 1..max(i.1)
 
 \bigskip
@@ -2025,7 +2083,9 @@ end
 
 \bigskip
 
-(iii) $\forall$ $i : dom bookings | $$\forall b : bookings(i) \spot b.2 \leq b.3$
+\noindent
+\hangindent=2em
+(iii) $\forall$ $i : dom bookings | $$\forall b \colon bookings(i) \bullet b.2 \leq b.3$
 
 \bigskip
 
@@ -2037,6 +2097,8 @@ end
 
 \bigskip
 
+\noindent
+\hangindent=2em
 (iv) This is enforced by the constraint for part (i).
 
 \bigskip
@@ -2054,7 +2116,9 @@ end
 (b)
 \par
 \vspace{11pt}
-(i) $\{ i : \dom bookings | i.1 = Banbury \spot i.2 \}$
+\noindent
+\hangindent=2em
+(i) $\{ i \colon \dom bookings \mid i.1 = Banbury \bullet i.2 \}$
 
 \bigskip
 
@@ -2066,7 +2130,9 @@ end
 
 \bigskip
 
-(ii) $\{ i : \dom bookings | i.1 = Banbury \land \exists b : bookings(i) \spot 50 \in b.2 \upto b.3 \}$
+\noindent
+\hangindent=2em
+(ii) $\{ i \colon \dom bookings \mid i.1 = Banbury \land \exists b \colon bookings(i) \bullet 50 \in b.2 \upto b.3 \}$
 
 \bigskip
 
@@ -2078,7 +2144,9 @@ end
 
 \bigskip
 
-(iii) {$r : Room$; $s : N | $$\exists i : \dom bookings \spot i.1 = r \land i.2 = s$. (r, s)}
+\noindent
+\hangindent=2em
+(iii) {$r : Room$; $s : N | $$\exists i \colon \dom bookings \bullet i.1 = r \land i.2 = s$. (r, s)}
 
 \bigskip
 
@@ -2090,7 +2158,9 @@ end
 
 \bigskip
 
-(iv) {$r : Room | $$\exists i : \dom bookings \spot i.1 = r \land \# bookings(i) \geq 10$}
+\noindent
+\hangindent=2em
+(iv) {$r : Room | $$\exists i \colon \dom bookings \bullet i.1 = r \land \# bookings(i) \geq 10$}
 
 \bigskip
 
@@ -2307,13 +2377,13 @@ count $stalk = 0$
 
 \bigskip
 
-$\forall n : N \spot count(leaf(n)) = 1$
+$\forall n \colon N \bullet count(leaf(n)) = 1$
 
 \bigskip
 
 \bigskip
 
-$\forall t1, t2 : Tree \spot count(branch(t1, t2)) = count(t1) + count(t2)$
+$\forall t1, t2 \colon Tree \bullet count(branch(t1, t2)) = count(t1) + count(t2)$
 
 \bigskip
 
@@ -2342,13 +2412,13 @@ flatten stalk = $\langle \rangle$
 
 \bigskip
 
-$\forall n : N \spot flatten(leaf(n))$= $\langle n \rangle$
+$\forall n \colon N \bullet flatten(leaf(n))$= $\langle n \rangle$
 
 \bigskip
 
 \bigskip
 
-$\forall t1, t2 : Tree \spot flatten(branch(t1, t2)) = flatten(t1^{flatten})(t2)$
+$\forall t1, t2 \colon Tree \bullet flatten(branch(t1, t2)) = flatten(t1^{flatten})(t2)$
 
 \bigskip
 
@@ -2380,13 +2450,13 @@ First, exhibit the induction principle for the free type:
 
 \bigskip
 
-P stalk and ($\forall n : N \spot \power~leaf(n)$) and ($\forall t1, t2 : Tree \spot \power~t1 \land \power~t2 \Rightarrow \power~branch(t1, t2)$)
+P stalk and ($\forall n \colon N \bullet \power~leaf(n)$) and ($\forall t1, t2 \colon Tree \bullet \power~t1 \land \power~t2 \Rightarrow \power~branch(t1, t2)$)
 
 \bigskip
 
 \bigskip
 
-implies $\forall t : Tree \spot \power~t$
+implies $\forall t \colon Tree \bullet \power~t$
 
 \bigskip
 
@@ -2443,12 +2513,12 @@ playlists : PlaylistId \pfun Playlist
 playlistOwner : PlaylistId \pfun UserId
 playlistSubscribers : PlaylistId \pfun \finset_1~UserId
 \where
-\forall i : \dom playlists \spot \ran playlists(i)(subseteq)(songs)
+\forall i \colon \dom playlists \bullet \ran playlists(i)(subseteq)(songs)
 \dom playlistOwner(subseteq)(\dom playlists)
 \ran playlistOwner(subseteq)(users)
 \dom playlistSubscribers(subseteq)(\dom playlists)
-\forall i : \dom playlistSubscribers \spot playlistSubscribers(i)(subseteq)(users)
-\forall i : \dom playlists \spot playlistOwner(i) \in playlistSubscribers(i)
+\forall i \colon \dom playlistSubscribers \bullet playlistSubscribers(i)(subseteq)(users)
+\forall i \colon \dom playlists \bullet playlistOwner(i) \in playlistSubscribers(i)
 \end{axdef}
 
 \bigskip
@@ -2462,10 +2532,10 @@ hated : UserId \pfun \finset~SongId
 loved : UserId \pfun \finset~SongId
 \where
 \dom hated(subseteq)(users)
-\forall i : \dom hated \spot hated(i)(subseteq)(songs)
+\forall i \colon \dom hated \bullet hated(i)(subseteq)(songs)
 \dom loved(subseteq)(users)
-\forall i : \dom loved \spot loved(i)(subseteq)(songs)
-\forall i : \dom hated \cup \dom loved \spot hated(i) \cap loved(i) = \emptyset
+\forall i \colon \dom loved \bullet loved(i)(subseteq)(songs)
+\forall i \colon \dom hated \cup \dom loved \bullet hated(i) \cap loved(i) = \emptyset
 \end{axdef}
 
 \bigskip
@@ -2484,21 +2554,21 @@ A == users \setminus \bigcup \ran playlistSubscribers
 (b)
 \par
 \vspace{11pt}
-B == \{ p : \dom playlistSubscribers | \# playlistSubscribers(p) \geq 100 \}
+B == \{ p \colon \dom playlistSubscribers \mid \# playlistSubscribers(p) \geq 100 \}
 
 \medskip
 
 (c)
 \par
 \vspace{11pt}
-C == \mu u : \dom loved \spot \forall v : \dom loved \spot u \neq v \land \# loved(u) > \# loved(v)
+C == \mu u \colon \dom loved \bullet \forall v \colon \dom loved \bullet u \neq v \land \# loved(u) > \# loved(v)
 
 \medskip
 
 (d)
 \par
 \vspace{11pt}
-D == \mu s : songs \spot \forall t : songs \spot s \neq t \land \# \{ u : UserId | s \in loved(u) \} > \# \{ u : UserId | t \in loved(u) \}
+D == \mu s \colon songs \bullet \forall t \colon songs \bullet s \neq t \land \# \{ u \colon UserId \mid s \in loved(u) \} > \# \{ u \colon UserId \mid t \in loved(u) \}
 
 \medskip
 
@@ -2531,13 +2601,13 @@ $loveHateScore : SongId +\fun N$
 
 \bigskip
 
-$\forall$ $i : songs | $# $\{ u : UserId | i \in loved(u) \}$ $\geq$ # $\{ u : UserId | i \in hated(u) \}$ $\Rightarrow$
+$\forall$ $i : songs | $# $\{ u \colon UserId \mid i \in loved(u) \}$ $\geq$ # $\{ u \colon UserId \mid i \in hated(u) \}$ $\Rightarrow$
 
 \bigskip
 
 \bigskip
 
-loveHateScore(i) = # $\{ u : UserId | i \in loved(u) \}$ - # $\{ u : UserId | i \in hated(u) \}$
+loveHateScore(i) = # $\{ u \colon UserId \mid i \in loved(u) \}$ - # $\{ u \colon UserId \mid i \in hated(u) \}$
 
 \bigskip
 
@@ -2549,7 +2619,7 @@ and
 
 \bigskip
 
-$\forall$ $i : songs | $# $\{ u : UserId | i \in loved(u) \}$ $<$ # $\{ u : UserId | i \in hated(u) \}$ $\Rightarrow$
+$\forall$ $i : songs | $# $\{ u \colon UserId \mid i \in loved(u) \}$ $<$ # $\{ u \colon UserId \mid i \in hated(u) \}$ $\Rightarrow$
 
 \bigskip
 
@@ -2568,7 +2638,7 @@ loveHateScore(i) = 0
 \begin{axdef}
 playlistCount : SongId \pfun N
 \where
-\forall i : songs \spot playlistCount(i) = \# \{ p : \dom playlist | i \in \ran playlist(p) \}
+\forall i \colon songs \bullet playlistCount(i) = \# \{ p \colon \dom playlist \mid i \in \ran playlist(p) \}
 \end{axdef}
 
 \bigskip
@@ -2583,7 +2653,7 @@ popularity : SongId \pfun N
 \where
 \dom length(subseteq)(songs)
 \dom popularity(subseteq)(songs)
-\forall i : songs \spot popularity(i) = loveHateScore(i) + playlistCount(i)
+\forall i \colon songs \bullet popularity(i) = loveHateScore(i) + playlistCount(i)
 \end{axdef}
 
 \medskip
@@ -2599,13 +2669,13 @@ $mostPopular : SongId$
 
 \bigskip
 
-($\exists_1$ $i : songs | $$\forall j : songs \spot i \neq j \land popularity(i) > popularity(j)$) $\Rightarrow$
+($\exists_1$ $i : songs | $$\forall j \colon songs \bullet i \neq j \land popularity(i) > popularity(j)$) $\Rightarrow$
 
 \bigskip
 
 \bigskip
 
-mostPopular = (mu $i : songs | $$\forall j : songs \spot i \neq j \land popularity(i) > popularity(j)$)
+mostPopular = (mu $i : songs | $$\forall j \colon songs \bullet i \neq j \land popularity(i) > popularity(j)$)
 
 \bigskip
 
@@ -2616,12 +2686,14 @@ and
 \bigskip
 
 \[
-  \lnot \exists_1 i : songs \spot \forall j : songs \spot i \neq j \land popularity(i) > popularity(j) \Rightarrow mostPopular = nullSong
+  \lnot \exists_1 i \colon songs \bullet \forall j \colon songs \bullet i \neq j \land popularity(i) > popularity(j) \Rightarrow mostPopular = nullSong
 \]
 
 \medskip
 
-(c) playlistsContainingMostPopularSong == $\{ i : \dom playlists | mostPopular \in \ran playlists(i) \}$
+\noindent
+\hangindent=2em
+(c) playlistsContainingMostPopularSong == $\{ i \colon \dom playlists \mid mostPopular \in \ran playlists(i) \}$
 
 \bigskip
 

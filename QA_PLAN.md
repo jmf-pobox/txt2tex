@@ -35,7 +35,7 @@ For each solution, verify:
 - [x] Input Correct
 - [x] Notation Correct
 - [x] Formatting Correct
-- **User Decision**: Pending
+- **User Decision**: **PASS**
 
 ### Solution 5
 - [ ] Input Correct
