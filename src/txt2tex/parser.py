@@ -1388,9 +1388,15 @@ class Parser:
                 self._advance()  # Consume '.'
                 # Parse expression (up to })
                 expression = self._parse_set_expression()
+        elif self._match(TokenType.RBRACE):
+            # No separator: both predicate and expression are omitted
+            # {x : T} means "all x of type T", equivalent to just T
+            predicate = None
+            expression = None
         else:
             raise ParserError(
-                "Expected '|' or '.' after set comprehension binding", self._current()
+                "Expected '|', '.', or '}' after set comprehension binding",
+                self._current(),
             )
 
         # Expect closing brace

@@ -40,7 +40,8 @@ def test_missing_set_comprehension_pipe() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     with pytest.raises(
-        ParserError, match="Expected '\\|' or '\\.' after set comprehension binding"
+        ParserError,
+        match="Expected '\\|', '\\.', or '\\}' after set comprehension binding",
     ):
         parser.parse()
 

@@ -580,10 +580,11 @@ class LaTeXGenerator:
         # Phase 22: Handle case with no predicate
         if node.predicate is None:
             # No predicate: { x : X . expr } -> use bullet directly
-            parts.append(r"\spot" if self.use_fuzz else r"\bullet")
             if node.expression:
+                parts.append(r"\spot" if self.use_fuzz else r"\bullet")
                 expression_latex = self.generate_expr(node.expression)
                 parts.append(expression_latex)
+            # else: {x : T} with no predicate or expression - just the binding
         else:
             # Has predicate: add mid/pipe separator
             parts.append("|" if self.use_fuzz else r"\mid")
