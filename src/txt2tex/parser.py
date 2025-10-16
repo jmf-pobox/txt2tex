@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from txt2tex.ast_nodes import (
     Abbreviation,
     AxDef,
@@ -251,10 +253,12 @@ class Parser:
             TokenType.PROOF,
         )
 
-    def _parse_paragraph(self) -> Paragraph:
+    def _parse_paragraph(self) -> Paragraph | Part:
         """Parse plain text paragraph from TEXT token.
 
         The TEXT token value contains the raw text content (no tokenization).
+        If the text starts with a part label like "(a) content...",
+        return a Part node containing a Paragraph instead.
         """
         text_token = self._advance()  # Consume TEXT token
 
@@ -263,6 +267,24 @@ class Parser:
 
         # The token value contains the raw text (already captured by lexer)
         text = text_token.value
+
+        # Check if text starts with part label pattern: (letter) or (roman numeral)
+        part_match = re.match(
+            r'^\(([a-z]+|[ivxlcdm]+)\)\s+(.+)', text, re.IGNORECASE
+        )
+        if part_match:
+            label = part_match.group(1)
+            content = part_match.group(2)
+            # Return a Part containing a Paragraph
+            paragraph = Paragraph(
+                text=content, line=text_token.line, column=text_token.column
+            )
+            return Part(
+                label=label,
+                items=[paragraph],
+                line=text_token.line,
+                column=text_token.column,
+            )
 
         return Paragraph(text=text, line=text_token.line, column=text_token.column)
 

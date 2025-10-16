@@ -2,21 +2,10 @@
 
 ** Solution 1 **
 
-(a)
-
-false (as (true => false) <=> false)
-
-(b)
-
-true (as (false => false) <=> true)
-
-(c)
-
-true (as (false => true) <=> true)
-
-(d)
-
-true (as (false => false) <=> true)
+(a) false (as (true => false) <=> false)
+(b) true (as (false => false) <=> true)
+(c) true (as (false => true) <=> true)
+(d) true (as (false => false) <=> true)
 
 TEXT: (Assuming that pigs can't fly . . . )
 
@@ -120,9 +109,13 @@ EQUIV:
 
 ** Solution 4 **
 
-TEXT: (a) (p or q) <=> ((not p or not q) and q) is not a tautology. You might illustrate this via a truth table or via a chain of equivalences, showing that the proposition is not equivalent to true. Alternatively, you might try and find a combination of values for which the proposition is false. (In this case, the proposition is false when p and q are both true.)
+(a)
 
-TEXT: (b) (p or q) <=> ((not p and not q) or q) is not a tautology. In this case, the proposition is false when p is true and q is false.
+TEXT: (p or q) <=> ((not p or not q) and q) is not a tautology. You might illustrate this via a truth table or via a chain of equivalences, showing that the proposition is not equivalent to true. Alternatively, you might try and find a combination of values for which the proposition is false. (In this case, the proposition is false when p and q are both true.)
+
+(b)
+
+TEXT: (p or q) <=> ((not p and not q) or q) is not a tautology. In this case, the proposition is false when p is true and q is false.
 
 ** Solution 5 **
 
@@ -1054,11 +1047,11 @@ end
 
 (a)
 
-abbrev A == users \ bigcup(ran(playlistSubscribers))
+A == users \ bigcup(ran(playlistSubscribers))
 
 (b)
 
-abbrev B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
+B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
 
 (c)
 
