@@ -664,12 +664,17 @@ class Parser:
         return left
 
     def _parse_implies(self) -> Expr:
-        """Parse implies operation (=>)."""
+        """Parse implies operation (=>).
+
+        Right side can be a quantifier to support patterns like:
+        exists d : Dog | gentle(d) => forall t : Trainer | groomed(d, t)
+        """
         left = self._parse_or()
 
         while self._match(TokenType.IMPLIES):
             op_token = self._advance()
-            right = self._parse_or()
+            # Use _parse_expr() to allow quantifiers on RHS
+            right = self._parse_expr()
             left = BinaryOp(
                 operator=op_token.value,
                 left=left,
