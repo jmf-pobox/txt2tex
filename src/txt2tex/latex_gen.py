@@ -1548,10 +1548,10 @@ class LaTeXGenerator:
             # First step: just expression; subsequent: &\Leftrightarrow expression
             line = expr_latex if i == 0 else r"&\Leftrightarrow " + expr_latex
 
-            # Add justification if present
+            # Add justification if present (flush right)
             if step.justification:
                 escaped_just = self._escape_justification(step.justification)
-                line += r" && \text{[" + escaped_just + "]}"
+                line += r" & \hfill \text{[" + escaped_just + "]}"
 
             # Add line break except for last line
             if i < len(node.steps) - 1:
