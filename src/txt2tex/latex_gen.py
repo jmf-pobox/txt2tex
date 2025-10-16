@@ -1017,6 +1017,22 @@ class LaTeXGenerator:
         text = re.sub(r"(?<!\\)\bemptyset\b", r"$\\emptyset$", text)  # emptyset → ∅
         text = re.sub(r"(?<!\\)\bforall\b", r"$\\forall$", text)  # forall → ∀
 
+        # Convert "not in" and "in" for set membership (e.g., "0 in N", "x not in S")
+        # Pattern: simple expression followed by "not in"/"in" + capitalized set name
+        # Matches: identifier/number, optionally with operators (-, +, *, /)
+        # Examples: "0 in N", "4 - 0 in N", "x - 1 not in N"
+        # Only convert when set name starts with capital to avoid "in" in English prose
+        text = re.sub(
+            r"\b(\w+(?:\s*[\+\-\*/]\s*\w+)*)\s+not\s+in\s+([A-Z]\w*)\b",
+            r"$\1 \\notin \2$",
+            text,
+        )  # x - 1 not in N → $x - 1 \notin N$
+        text = re.sub(
+            r"\b(\w+(?:\s*[\+\-\*/]\s*\w+)*)\s+in\s+([A-Z]\w*)\b",
+            r"$\1 \\in \2$",
+            text,
+        )  # 4 - 0 in N → $4 - 0 \in N$
+
         # Convert bare comparison operators (garbled character fix - final pass)
         # Catches cases not handled by _process_inline_math() (complex expressions)
         # Tracks math mode to avoid nested $...$

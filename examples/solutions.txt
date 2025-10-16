@@ -186,6 +186,8 @@ forall x : N | exists y : N | x = y + 1
 <=> forall x : N | exists y : N | y = x - 1
 <=> forall x : N | x - 1 in N
 
+TEXT: The final equivalence holds because 0 in N and yet 0 - 1 not in N. We may assume that the subtraction operator is defined for all integers.
+
 (d)
 
 EQUIV:
