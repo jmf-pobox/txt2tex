@@ -930,12 +930,12 @@ class LaTeXGenerator:
             lines.append("")
             lines.append(r"\medskip")
         elif len(node.items) == 1 and isinstance(node.items[0], Expr):
-            # Single expression: inline display math (like Solution 1)
+            # Single expression: inline math (like Solution 1)
             expr = node.items[0]
             expr_latex = self.generate_expr(expr)
             lines.append(r"\noindent")
             lines.append(r"\hangindent=2em")  # Indent continuation lines
-            lines.append(f"({node.label}) \\[ {expr_latex} \\]")
+            lines.append(f"({node.label}) ${expr_latex}$")
             lines.append("")
             lines.append(r"\medskip")
         else:
