@@ -286,7 +286,7 @@ class TestLaTeXGenerator:
         latex_lines = gen.generate_document_item(ast)
         latex = "".join(latex_lines)
         assert r"\begin{axdef}" in latex
-        assert "x : N" in latex
+        assert r"x : \mathbb{N}" in latex
         assert r"\end{axdef}" in latex
         assert r"\where" not in latex
 
@@ -341,7 +341,7 @@ class TestLaTeXGenerator:
         latex_lines = gen.generate_document_item(ast)
         latex = "".join(latex_lines)
         assert r"\begin{schema}{Library}" in latex
-        assert "books : N" in latex
+        assert r"books : \mathbb{N}" in latex
         assert r"\end{schema}" in latex
 
     def test_schema_with_predicates(self) -> None:
@@ -428,7 +428,7 @@ end"""
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
         assert r"\begin{axdef}" in doc
-        assert "population : N" in doc
+        assert r"population : \mathbb{N}" in doc
         assert r"\where" in doc
         assert r"population \leq capacity" in doc
         assert r"\end{axdef}" in doc
@@ -449,8 +449,8 @@ end"""
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
         assert r"\begin{schema}{Library}" in doc
-        assert "books : N" in doc
-        assert "members : N" in doc
+        assert r"books : \mathbb{N}" in doc
+        assert r"members : \mathbb{N}" in doc
         assert r"\where" in doc
         assert "books > 0" in doc
         assert r"members \geq 0" in doc

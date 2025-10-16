@@ -56,7 +56,11 @@
       "Bash(git merge:*)",
       "Bash(PYTHONPATH=src pytest:*)",
       "Bash(do echo \"=== Testing Solution $i ===\" hatch run convert \"/private/tmp/test_solution_$i.txt\")",
-      "Bash(do echo \"=== Testing Solution $i ===\")"
+      "Bash(do echo \"=== Testing Solution $i ===\")",
+      "Bash(sed:*)",
+      "Bash(do)",
+      "Bash(head -20 echo \"\" echo \"=== Solution 9 (a) ===\")",
+      "Bash(TEXINPUTS=../latex//: pdflatex:*)"
     ],
     "deny": [],
     "ask": []

@@ -332,7 +332,7 @@ class TestLaTeXGenerator:
             column=3,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"x \in N"
+        assert latex == r"x \in \mathbb{N}"
 
     def test_set_operator_subset(self) -> None:
         """Test generating 'subset' operator."""
@@ -411,7 +411,7 @@ class TestLaTeXGenerator:
             column=1,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"\forall x \colon N \bullet x > 0"
+        assert latex == r"\forall x \colon \mathbb{N} \bullet x > 0"
 
     def test_quantifier_exists(self) -> None:
         """Test generating exists."""
@@ -431,7 +431,7 @@ class TestLaTeXGenerator:
             column=1,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"\exists y \colon N \bullet y = 0"
+        assert latex == r"\exists y \colon \mathbb{N} \bullet y = 0"
 
     def test_quantifier_multi_variable(self) -> None:
         """Test generating multi-variable forall (Phase 6)."""
@@ -451,7 +451,7 @@ class TestLaTeXGenerator:
             column=1,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"\forall x, y \colon N \bullet x > y"
+        assert latex == r"\forall x, y \colon \mathbb{N} \bullet x > y"
 
     def test_quantifier_exists1(self) -> None:
         """Test generating exists1 (Phase 6)."""
@@ -471,7 +471,7 @@ class TestLaTeXGenerator:
             column=1,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"\exists_1 x \colon N \bullet x = 0"
+        assert latex == r"\exists_1 x \colon \mathbb{N} \bullet x = 0"
 
 
 class TestIntegration:
@@ -525,7 +525,7 @@ class TestIntegration:
         assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert latex == r"x \in N \land x > 0"
+        assert latex == r"x \in \mathbb{N} \land x > 0"
 
     def test_quantifier_expression(self) -> None:
         """Test complete pipeline for quantifier."""
@@ -537,7 +537,7 @@ class TestIntegration:
         assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert latex == r"\forall x \colon N \bullet x \geq 0"
+        assert latex == r"\forall x \colon \mathbb{N} \bullet x \geq 0"
 
     def test_complex_quantified_expression(self) -> None:
         """Test complete pipeline for complex quantified expression."""
@@ -549,7 +549,7 @@ class TestIntegration:
         assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert latex == r"\forall n \colon N \bullet n \geq 0 \land n < 100"
+        assert latex == r"\forall n \colon \mathbb{N} \bullet n \geq 0 \land n < 100"
 
     def test_subscript_with_identifier_index(self) -> None:
         """Test subscript with identifier index (Phase 15)."""
@@ -575,7 +575,7 @@ class TestIntegration:
         assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert latex == r"\forall x, y \colon N \bullet x > y"
+        assert latex == r"\forall x, y \colon \mathbb{N} \bullet x > y"
 
     def test_exists1_quantifier(self) -> None:
         """Test complete pipeline for exists1 quantifier (Phase 6)."""
@@ -587,7 +587,7 @@ class TestIntegration:
         assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert latex == r"\exists_1 x \colon N \bullet x = 0"
+        assert latex == r"\exists_1 x \colon \mathbb{N} \bullet x = 0"
 
     def test_complex_multi_variable_expression(self) -> None:
         """Test complete pipeline for complex multi-variable expression (Phase 6)."""
@@ -599,4 +599,7 @@ class TestIntegration:
         assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert latex == r"\exists x, y \colon N \bullet x > 0 \land y > 0 \land x > y"
+        assert (
+            latex
+            == r"\exists x, y \colon \mathbb{N} \bullet x > 0 \land y > 0 \land x > y"
+        )

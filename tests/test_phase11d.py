@@ -125,19 +125,19 @@ class TestPhase11dLaTeX:
         assert result == r"\lambda x : X \bullet x"
 
     def test_lambda_with_nat_latex(self):
-        """Test lambda x : N . x^2 → \\lambda x : N \\bullet x^2."""
+        """Test lambda x : N . x^2 → \\lambda x : \\mathbb{N} \\bullet x^2."""
         result = generate_latex("lambda x : N . x^2")
-        assert result == r"\lambda x : N \bullet x^2"
+        assert result == r"\lambda x : \mathbb{N} \bullet x^2"
 
     def test_lambda_multi_variable_latex(self):
         """Test lambda x, y : N . x and y."""
         result = generate_latex("lambda x, y : N . x and y")
-        assert result == r"\lambda x, y : N \bullet x \land y"
+        assert result == r"\lambda x, y : \mathbb{N} \bullet x \land y"
 
     def test_lambda_with_comparison_latex(self):
-        """Test lambda x : N . x > 0 → \\lambda x : N \\bullet x > 0."""
+        """Test lambda x : N . x > 0 → \\lambda x : \\mathbb{N} \\bullet x > 0."""
         result = generate_latex("lambda x : N . x > 0")
-        assert result == r"\lambda x : N \bullet x > 0"
+        assert result == r"\lambda x : \mathbb{N} \bullet x > 0"
 
 
 class TestPhase11dComplexExpressions:

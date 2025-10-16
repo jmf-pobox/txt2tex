@@ -229,7 +229,7 @@ class TestIntegration:
         assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"\mu x \colon N \bullet" in latex
+        assert r"\mu x \colon \mathbb{N} \bullet" in latex
         assert r"x^2 = 4" in latex
         assert r"\land" in latex
         assert "x > 0" in latex
@@ -268,7 +268,7 @@ class TestIntegration:
         assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"\exists y \colon N \bullet" in latex
+        assert r"\exists y \colon \mathbb{N} \bullet" in latex
         assert "y = 0" in latex
         assert r"\land" in latex
         assert r"x \neq y" in latex
@@ -285,7 +285,7 @@ class TestIntegration:
         doc = gen.generate_document(ast)
         assert r"\documentclass[fleqn]{article}" in doc
         assert r"\usepackage{zed-cm}" in doc
-        assert r"\mu x \colon N \bullet x > 0" in doc
+        assert r"\mu x \colon \mathbb{N} \bullet x > 0" in doc
         assert r"\end{document}" in doc
 
     def test_membership_in_document(self) -> None:
