@@ -280,7 +280,7 @@ class TestPhase2LaTeXGeneration:
 
         latex = gen.generate_document(doc)
 
-        assert r"\documentclass{article}" in latex
+        assert r"\documentclass[fleqn]{article}" in latex
         assert r"\usepackage{zed-cm}" in latex
         assert r"\usepackage{amsmath}" in latex
         assert r"\begin{align*}" in latex
@@ -380,8 +380,8 @@ q or p [commutative]
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
 
-        # Should have both display math mode and align* environment
-        assert r"\[" in latex
+        # Should have both left-aligned expressions and align* environment
+        assert r"\noindent" in latex
         assert r"p \land q" in latex
         assert r"\begin{align*}" in latex
         assert r"\lnot p" in latex

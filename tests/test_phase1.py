@@ -116,7 +116,7 @@ class TestPhase1LaTeXGeneration:
 
         latex = gen.generate_document(expr)
 
-        assert r"\documentclass{article}" in latex
+        assert r"\documentclass[fleqn]{article}" in latex
         assert r"\usepackage{zed-cm}" in latex
         assert r"$p \land q$" in latex
         assert r"\end{document}" in latex
@@ -147,10 +147,10 @@ class TestPhase1LaTeXGeneration:
 
         latex = gen.generate_document(doc)
 
-        assert r"\documentclass{article}" in latex
+        assert r"\documentclass[fleqn]{article}" in latex
         assert r"\usepackage{zed-cm}" in latex
-        # Standalone expressions use display math \[...\], not inline $...$
-        assert r"\[" in latex
+        # Standalone expressions are left-aligned, not centered
+        assert r"\noindent" in latex
         assert r"p \land q" in latex
         assert r"p \lor q" in latex
         assert r"\end{document}" in latex
@@ -162,7 +162,7 @@ class TestPhase1LaTeXGeneration:
 
         latex = gen.generate_document(doc)
 
-        assert r"\documentclass{article}" in latex
+        assert r"\documentclass[fleqn]{article}" in latex
         assert r"\begin{document}" in latex
         assert r"\end{document}" in latex
 
@@ -203,8 +203,8 @@ class TestPhase1Integration:
         # Verify
         assert isinstance(ast, Document)
         assert len(ast.items) == 3
-        # Standalone expressions use display math
-        assert r"\[" in latex
+        # Standalone expressions are left-aligned, not centered
+        assert r"\noindent" in latex
         assert r"p \land q" in latex
         assert r"p \lor q" in latex
         assert r"\lnot p" in latex
@@ -226,8 +226,8 @@ not (p and q)"""
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
 
-        # Standalone expressions use display math
-        assert r"\[" in latex
+        # Standalone expressions are left-aligned, not centered
+        assert r"\noindent" in latex
         assert r"p \land q \Rightarrow p" in latex
         # Nested implications now have explicit parentheses for clarity
         assert r"p \Rightarrow (q \Rightarrow r)" in latex
@@ -262,7 +262,7 @@ not (p and q)"""
         latex = gen.generate_document(doc)
 
         assert "In one direction:" in latex
-        assert r"\documentclass{article}" in latex
+        assert r"\documentclass[fleqn]{article}" in latex
         assert r"\end{document}" in latex
         assert r"\bigskip" in latex
 
