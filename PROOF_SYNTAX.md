@@ -60,11 +60,23 @@ The `::` means "these are siblings that together support the next step"
 ### 6. Case Analysis
 For or-elimination and case splits:
 ```
+case p:
+  :: p => r [and elim 1]
+    :: (p => r) and (q => r) [from 1]
+  :: r [=> elim]
+    [3] p [assumption]
 case q:
-    ...proof for this case...
-case r:
-    ...proof for this case...
+  :: q => r [and elim 2]
+    :: (p => r) and (q => r) [from 1]
+  :: r [=> elim]
+    [3] q [assumption]
 ```
+
+**Key pattern for cases with multiple sibling steps:**
+- When a case has multiple `::` siblings that build up to a conclusion
+- The LAST sibling step automatically wraps earlier siblings as its premises
+- Do NOT add explicit "from above" references - they create duplication
+- Each case should derive the same conclusion through different paths
 
 ### 7. Justifications
 Common patterns:
@@ -121,28 +133,30 @@ p and (p => q) => (p and q) [=> intro from 1]
 PROOF:
 p and (q or r) => (p and q) or (p and r) [=> intro from 1]
   [1] p and (q or r) [assumption]
-      p [and elim]
-      q or r [and elim]
-      (p and q) or (p and r) [or elim, cases below]
+      :: p [and elim]
+        :: p and (q or r) [from 1]
+      :: q or r [and elim]
+        :: p and (q or r) [from 1]
+      :: (p and q) or (p and r) [or elim]
         case q:
-          :: p [from above]
-          :: q [from case]
-          p and q [and intro]
-          (p and q) or (p and r) [or intro]
+          :: q [case assumption]
+          :: p and q [and intro]
+          :: (p and q) or (p and r) [or intro]
         case r:
-          :: p [from above]
-          :: r [from case]
-          p and r [and intro]
-          (p and q) or (p and r) [or intro]
+          :: r [case assumption]
+          :: p and r [and intro]
+          :: (p and q) or (p and r) [or intro]
 ```
 
 **Explanation**:
 - Assume `p and (q or r)` as [1]
-- Extract `p` and `q or r`
-- For `q or r`, do case analysis:
-  - If `q`: combine `p` and `q` to get `p and q`, then introduce to disjunction
-  - If `r`: combine `p` and `r` to get `p and r`, then introduce to disjunction
+- Extract `p` and `q or r` as siblings
+- For case analysis on `q or r`:
+  - **Case q**: Use case assumption `q`, build `p and q`, then introduce to disjunction
+  - **Case r**: Use case assumption `r`, build `p and r`, then introduce to disjunction
 - Both cases yield the same result
+
+**Important note on case structure**: When a case has multiple sibling steps (marked with `::`) that derive the case conclusion, the LAST step automatically includes earlier steps as premises. You do NOT need to explicitly reference "from above" - the earlier sibling derivations are automatically available to the final step in the case.
 
 ### Example 4: Modus Tollens
 **Goal**: Prove `(p => q) and not q => not p`

@@ -212,11 +212,10 @@ class LaTeXGenerator:
 
         # Preamble
         # Use fleqn option to left-align all equations (no centering)
-        lines.append(r"\documentclass[fleqn]{article}")
-        # Set margins to match reference PDF (symmetrical left/right at 1.55in)
-        lines.append(
-            r"\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}"
-        )
+        # a4paper for A4 page size, 10pt font (matches instructor's format)
+        lines.append(r"\documentclass[a4paper,10pt,fleqn]{article}")
+        # Standard 1 inch margins on all sides
+        lines.append(r"\usepackage[margin=1in]{geometry}")
         # Load amssymb for \mathbb{N} and \mathbb{Z} blackboard bold
         # Note: amsmath removed - using array{lll} instead of align* for EQUIV
         lines.append(r"\usepackage{amssymb}")  # For \mathbb{N} and \mathbb{Z}
@@ -2144,10 +2143,12 @@ class LaTeXGenerator:
                 if case_position == 0:
                     # First case: minimal height
                     height = 6 + (depth * 2)  # Conservative for first case
+                    # raiseproof naturally protects nested & from outer \infer alignment
                     raised = f"\\raiseproof{{{height}ex}}{{{case_latex}}}"
                 else:
                     # Subsequent cases: taller + horizontal spacing
                     height = 18 + (depth * 4)  # Much taller for subsequent cases
+                    # raiseproof naturally protects nested & from outer \infer alignment
                     raised = f"\\hskip 6em \\raiseproof{{{height}ex}}{{{case_latex}}}"
 
                 raised_cases.append(raised)
@@ -2447,10 +2448,46 @@ class LaTeXGenerator:
                 # Non-sibling - starts sequential derivations
                 sequential.append(step)
 
-        # Generate sibling group (horizontal with &)
+        # Generate sibling group
+        # When multiple siblings exist in a case, the LAST one wraps earlier
+        # This ensures each \raiseproof contains exactly ONE top-level \infer
         if sibling_group:
-            sibling_parts = [self._generate_proof_node_infer(s) for s in sibling_group]
-            current_result = " & ".join(sibling_parts)
+            if len(sibling_group) == 1:
+                # Single step - straightforward
+                current_result = self._generate_proof_node_infer(sibling_group[0])
+            else:
+                # Multiple sibling steps: last step wraps earlier ones as premises
+                # Generate earlier siblings as complete inference trees
+                earlier_parts = [
+                    self._generate_proof_node_infer(s) for s in sibling_group[:-1]
+                ]
+
+                # Last step becomes the outer wrapper
+                last_step = sibling_group[-1]
+                expr_latex = self.generate_expr(last_step.expression)
+
+                # Combine earlier siblings with last step's own premises
+                all_premises = earlier_parts.copy()
+                if last_step.children:
+                    # Last step has its own children/premises too
+                    for child in last_step.children:
+                        if isinstance(child, ProofNode):
+                            all_premises.append(self._generate_proof_node_infer(child))
+                        elif isinstance(child, CaseAnalysis):
+                            all_premises.append(self._generate_case_analysis(child))
+
+                premises_str = " & ".join(all_premises) if all_premises else ""
+
+                # Generate outer infer for last step
+                if last_step.justification:
+                    just = self._format_justification_label(
+                        last_step.justification
+                    )
+                    current_result = (
+                        f"\\infer[{just}]{{{expr_latex}}}{{{premises_str}}}"
+                    )
+                else:
+                    current_result = f"\\infer{{{expr_latex}}}{{{premises_str}}}"
         else:
             # No siblings, start with first sequential
             if not sequential:
