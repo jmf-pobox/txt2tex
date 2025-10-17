@@ -283,7 +283,7 @@ class TestIntegration:
         assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-        assert r"\documentclass[fleqn]{article}" in doc
+        assert r"\documentclass[a4paper,10pt,fleqn]{article}" in doc
         assert r"\usepackage{zed-cm}" in doc
         assert r"\mu x \colon \mathbb{N} \bullet x > 0" in doc
         assert r"\end{document}" in doc

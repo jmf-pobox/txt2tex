@@ -284,7 +284,7 @@ class TestPhase2LaTeXGeneration:
 
         latex = gen.generate_document(doc)
 
-        assert r"\documentclass[fleqn]{article}" in latex
+        assert r"\documentclass[a4paper,10pt,fleqn]{article}" in latex
         assert r"\usepackage{zed-cm}" in latex
         assert r"\usepackage{amssymb}" in latex  # amsmath removed - using array
         assert r"\[" in latex

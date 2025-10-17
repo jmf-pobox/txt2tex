@@ -116,7 +116,7 @@ class TestPhase1LaTeXGeneration:
 
         latex = gen.generate_document(expr)
 
-        assert r"\documentclass[fleqn]{article}" in latex
+        assert r"\documentclass[a4paper,10pt,fleqn]{article}" in latex
         assert r"\usepackage{zed-cm}" in latex
         assert r"$p \land q$" in latex
         assert r"\end{document}" in latex
@@ -147,7 +147,7 @@ class TestPhase1LaTeXGeneration:
 
         latex = gen.generate_document(doc)
 
-        assert r"\documentclass[fleqn]{article}" in latex
+        assert r"\documentclass[a4paper,10pt,fleqn]{article}" in latex
         assert r"\usepackage{zed-cm}" in latex
         # Standalone expressions are left-aligned, not centered
         assert r"\noindent" in latex
@@ -162,7 +162,7 @@ class TestPhase1LaTeXGeneration:
 
         latex = gen.generate_document(doc)
 
-        assert r"\documentclass[fleqn]{article}" in latex
+        assert r"\documentclass[a4paper,10pt,fleqn]{article}" in latex
         assert r"\begin{document}" in latex
         assert r"\end{document}" in latex
 
@@ -262,7 +262,7 @@ not (p and q)"""
         latex = gen.generate_document(doc)
 
         assert "In one direction:" in latex
-        assert r"\documentclass[fleqn]{article}" in latex
+        assert r"\documentclass[a4paper,10pt,fleqn]{article}" in latex
         assert r"\end{document}" in latex
         assert r"\bigskip" in latex
 
