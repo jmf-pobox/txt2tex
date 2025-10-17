@@ -50,6 +50,7 @@ TEXT: In this equivalence proof, we show that p => (not p => p) by using implica
 (not q or p) [commutativity of or]
 q => p [=> disjunction]
 
+TEXT: In this equivalance proof, we show that (not p => not q) <=> q => p by using implication disjunction, the distributivity 2 rule, and the associativity of logical or. 
 
 (c) EQUIV:
 ((p => r) and (q => r))
