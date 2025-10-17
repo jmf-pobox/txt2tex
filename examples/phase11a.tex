@@ -1,8 +1,8 @@
-\documentclass{article}
-\usepackage{zed-cm}
-\usepackage{zed-maths}
-\usepackage{zed-proof}
+\documentclass[fleqn]{article}
+\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}
+\usepackage{fuzz}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \begin{document}
 
 \section*{Phase 11 a : Function Types}
@@ -15,7 +15,7 @@ Total functions (every element in domain has a mapping):
 
 \begin{axdef}
 f : X \fun Y
-g : N \fun N
+g : \mathbb{N} \fun \mathbb{N}
 \end{axdef}
 
 \bigskip
@@ -67,9 +67,9 @@ Complex function types (nested and higher-order):
 \bigskip
 
 \begin{axdef}
-f : X \fun Y \fun Z
-g : X \fun Y \pfun Z
-h : N \fun N \fun N \fun N
+f : X \fun Y \fun \mathbb{Z}
+g : X \fun (Y \pfun \mathbb{Z})
+h : \mathbb{N} \fun \mathbb{N} \fun (\mathbb{N} \fun \mathbb{N})
 \end{axdef}
 
 \bigskip

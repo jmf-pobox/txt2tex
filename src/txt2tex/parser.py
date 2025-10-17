@@ -27,11 +27,14 @@ from txt2tex.ast_nodes import (
     GuardedCases,
     Identifier,
     Lambda,
+    LatexBlock,
     Number,
+    PageBreak,
     Paragraph,
     Part,
     ProofNode,
     ProofTree,
+    PureParagraph,
     Quantifier,
     Range,
     RelationalImage,
@@ -246,6 +249,9 @@ class Parser:
             TokenType.PART_LABEL,
             TokenType.TRUTH_TABLE,
             TokenType.TEXT,
+            TokenType.PURETEXT,
+            TokenType.LATEX,
+            TokenType.PAGEBREAK,
             TokenType.EQUIV,
             TokenType.GIVEN,
             TokenType.AXDEF,
@@ -286,6 +292,49 @@ class Parser:
 
         return Paragraph(text=text, line=text_token.line, column=text_token.column)
 
+    def _parse_pure_paragraph(self) -> PureParagraph:
+        """Parse pure text paragraph from PURETEXT token.
+
+        PURETEXT: blocks contain raw text with NO processing:
+        - No formula detection
+        - No operator conversion
+        - Only basic LaTeX escaping applied during generation
+        """
+        text_token = self._advance()  # Consume PURETEXT token
+        if text_token.type != TokenType.PURETEXT:
+            raise ParserError("Expected PURETEXT token for pure paragraph", text_token)
+
+        # The token value contains the raw text (already captured by lexer)
+        text = text_token.value
+
+        return PureParagraph(text=text, line=text_token.line, column=text_token.column)
+
+    def _parse_latex_block(self) -> LatexBlock:
+        """Parse raw LaTeX block from LATEX token.
+
+        LATEX: blocks contain raw LaTeX with NO escaping.
+        The LaTeX is passed directly through to the output.
+        """
+        latex_token = self._advance()  # Consume LATEX token
+        if latex_token.type != TokenType.LATEX:
+            raise ParserError("Expected LATEX token for LaTeX block", latex_token)
+
+        # The token value contains the raw LaTeX (already captured by lexer)
+        latex = latex_token.value
+
+        return LatexBlock(latex=latex, line=latex_token.line, column=latex_token.column)
+
+    def _parse_pagebreak(self) -> PageBreak:
+        """Parse page break from PAGEBREAK token.
+
+        PAGEBREAK: inserts a page break in the PDF output.
+        """
+        pagebreak_token = self._advance()  # Consume PAGEBREAK token
+        if pagebreak_token.type != TokenType.PAGEBREAK:
+            raise ParserError("Expected PAGEBREAK token", pagebreak_token)
+
+        return PageBreak(line=pagebreak_token.line, column=pagebreak_token.column)
+
     def _parse_document_item(self) -> DocumentItem:
         """Parse a document item (expression or structural element)."""
         if self._match(TokenType.SECTION_MARKER):
@@ -308,6 +357,12 @@ class Parser:
             return self._parse_proof_tree()
         if self._match(TokenType.TEXT):
             return self._parse_paragraph()
+        if self._match(TokenType.PURETEXT):
+            return self._parse_pure_paragraph()
+        if self._match(TokenType.LATEX):
+            return self._parse_latex_block()
+        if self._match(TokenType.PAGEBREAK):
+            return self._parse_pagebreak()
 
         # Check for abbreviation (identifier == expr) or free type (identifier ::= ...)
         if self._match(TokenType.IDENTIFIER):

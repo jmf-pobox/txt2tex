@@ -1,8 +1,8 @@
-\documentclass{article}
-\usepackage{zed-cm}
-\usepackage{zed-maths}
-\usepackage{zed-proof}
+\documentclass[fleqn]{article}
+\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}
+\usepackage{fuzz}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \begin{document}
 
 \section*{Phase 12 : Sequences , Bags , and Tuple Projection}
@@ -22,7 +22,9 @@ Empty sequence
 
 \bigskip
 
+\noindent
 $\langle \rangle$
+
 
 \medskip
 
@@ -35,7 +37,9 @@ Single element
 
 \bigskip
 
+\noindent
 $\langle a \rangle$
+
 
 \medskip
 
@@ -48,7 +52,9 @@ Multiple elements
 
 \bigskip
 
+\noindent
 $\langle 1, 2, 3, 4, 5 \rangle$
+
 
 \medskip
 
@@ -61,7 +67,9 @@ Sequence of identifiers
 
 \bigskip
 
+\noindent
 $\langle x, y, z \rangle$
+
 
 \medskip
 
@@ -71,129 +79,99 @@ $\langle x, y, z \rangle$
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-$\head \langle 1, 2, 3 \rangle$
+\noindent
+\hangindent=2em
+(a) $\head \langle 1, 2, 3 \rangle$
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-$\tail \langle 1, 2, 3 \rangle$
+\noindent
+\hangindent=2em
+(b) $\tail \langle 1, 2, 3 \rangle$
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-$\last \langle 1, 2, 3 \rangle$
+\noindent
+\hangindent=2em
+(c) $\last \langle 1, 2, 3 \rangle$
 
 \medskip
-
-(d)
-\par
-\vspace{11pt}
-$\front \langle 1, 2, 3 \rangle$
+\noindent
+\hangindent=2em
+(d) $\front \langle 1, 2, 3 \rangle$
 
 \medskip
-
-(e)
-\par
-\vspace{11pt}
-$\rev \langle 1, 2, 3 \rangle$
+\noindent
+\hangindent=2em
+(e) $\rev \langle 1, 2, 3 \rangle$
 
 \medskip
-
 \bigskip
 \noindent
 \textbf{Example 3 : Sequence Concatenation}
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-$\langle 1, 2 \rangle \cat \langle 3, 4 \rangle$
+\noindent
+\hangindent=2em
+(a) $\langle 1, 2 \rangle \cat \langle 3, 4 \rangle$
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-$s \cat t \cat u$
+\noindent
+\hangindent=2em
+(b) $s \cat t \cat u$
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-$\langle a \rangle \cat \langle b, c \rangle \cat \langle d \rangle$
+\noindent
+\hangindent=2em
+(c) $\langle a \rangle \cat \langle b, c \rangle \cat \langle d \rangle$
 
 \medskip
-
 \bigskip
 \noindent
 \textbf{Example 4 : Tuple Projection}
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-$x.1$
+\noindent
+\hangindent=2em
+(a) $x.1$
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-$x.2$
+\noindent
+\hangindent=2em
+(b) $x.2$
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-$(a, b, c).1$
+\noindent
+\hangindent=2em
+(c) $(a, b, c).1$
 
 \medskip
-
-(d)
-\par
-\vspace{11pt}
-$(a, b, c).2$
+\noindent
+\hangindent=2em
+(d) $(a, b, c).2$
 
 \medskip
-
 \bigskip
 \noindent
 \textbf{Example 5 : Bag Literals}
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-$\lbag x \rbag$
+\noindent
+\hangindent=2em
+(a) $\lbag x \rbag$
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-$\lbag 1, 2, 3 \rbag$
+\noindent
+\hangindent=2em
+(b) $\lbag 1, 2, 3 \rbag$
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-$\lbag a, b, c \rbag$
+\noindent
+\hangindent=2em
+(c) $\lbag a, b, c \rbag$
 
 \medskip
-
 (d)
 \par
 \vspace{11pt}
@@ -203,7 +181,9 @@ Bags with duplicates
 
 \bigskip
 
+\noindent
 $\lbag 1, 2, 2, 3, 3, 3 \rbag$
+
 
 \medskip
 
@@ -213,54 +193,42 @@ $\lbag 1, 2, 2, 3, 3, 3 \rbag$
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-$x \in \langle 1, 2, 3 \rangle$
+\noindent
+\hangindent=2em
+(a) $x \in \langle 1, 2, 3 \rangle$
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-$\head s = a$
+\noindent
+\hangindent=2em
+(b) $\head s = a$
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-$\tail \langle 1, 2, 3 \rangle = \langle 2, 3 \rangle$
+\noindent
+\hangindent=2em
+(c) $\tail \langle 1, 2, 3 \rangle = \langle 2, 3 \rangle$
 
 \medskip
-
 \bigskip
 \noindent
 \textbf{Example 7 : Complex Expressions}
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-$\forall i \colon N \bullet i \in \langle 1, 2, 3 \rangle \Rightarrow i > 0$
+\noindent
+\hangindent=2em
+(a) $\forall i : \mathbb{N} \spot i \in \langle 1, 2, 3 \rangle \Rightarrow i > 0$
 
 \medskip
-
-(b)
-\par
-\vspace{11pt}
-$\exists s \colon seq[N] \bullet \head s = 1$
+\noindent
+\hangindent=2em
+(b) $\exists s : seq[\mathbb{N}] \spot \head s = 1$
 
 \medskip
-
-(c)
-\par
-\vspace{11pt}
-$\{ x \colon N \mid x > 0 \bullet \langle x, x^2 \rangle \}$
+\noindent
+\hangindent=2em
+(c) $\{ x : \mathbb{N} | x > 0 \spot \langle x, x^2 \rangle \}$
 
 \medskip
-
 \bigskip
 \noindent
 \textbf{Example 8 : Real Examples}
@@ -276,7 +244,9 @@ From Solution 37
 
 \bigskip
 
+\noindent
 $\langle a \rangle$
+
 
 \medskip
 
@@ -289,7 +259,9 @@ Tuple projection from Solution 38
 
 \bigskip
 
+\noindent
 $trains(x).2$
+
 
 \medskip
 
@@ -302,7 +274,9 @@ Bags from Solution 39
 
 \bigskip
 
+\noindent
 $\lbag d \rbag$
+
 
 \medskip
 

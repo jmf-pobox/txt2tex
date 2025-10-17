@@ -25,11 +25,14 @@ from txt2tex.ast_nodes import (
     GuardedCases,
     Identifier,
     Lambda,
+    LatexBlock,
     Number,
+    PageBreak,
     Paragraph,
     Part,
     ProofNode,
     ProofTree,
+    PureParagraph,
     Quantifier,
     Range,
     RelationalImage,
@@ -215,11 +218,12 @@ class LaTeXGenerator:
             r"\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}"
         )
         if self.use_fuzz:
-            lines.append(r"\usepackage{fuzz}")
+            lines.append(r"\usepackage{fuzz}")  # Replaces zed-cm (fonts/styling)
         else:
-            lines.append(r"\usepackage{zed-cm}")
-            lines.append(r"\usepackage{zed-maths}")
-            lines.append(r"\usepackage{zed-proof}")  # For \infer macros
+            lines.append(r"\usepackage{zed-cm}")  # Computer Modern fonts/styling
+        # These packages work with both fuzz and zed-cm
+        lines.append(r"\usepackage{zed-maths}")  # Mathematical operators
+        lines.append(r"\usepackage{zed-proof}")  # Proof tree macros (\infer)
         lines.append(r"\usepackage{amsmath}")
         lines.append(r"\usepackage{amssymb}")  # For \mathbb
         lines.append(r"\begin{document}")
@@ -252,6 +256,12 @@ class LaTeXGenerator:
             return self._generate_part(item)
         if isinstance(item, Paragraph):
             return self._generate_paragraph(item)
+        if isinstance(item, PureParagraph):
+            return self._generate_pure_paragraph(item)
+        if isinstance(item, LatexBlock):
+            return self._generate_latex_block(item)
+        if isinstance(item, PageBreak):
+            return self._generate_pagebreak(item)
         if isinstance(item, TruthTable):
             return self._generate_truth_table(item)
         if isinstance(item, EquivChain):
@@ -1054,9 +1064,7 @@ class LaTeXGenerator:
         # Only when "not" is followed by a single identifier (variable name)
         # Examples: "not p", "not q", but NOT "not a tautology", "not every"
         # Pattern: \bnot\s+([a-zA-Z]\b) - "not" followed by single letter
-        text = re.sub(
-            r"\bnot\s+([a-zA-Z])\b", r"$\\lnot \1$", text
-        )  # not p → ¬p
+        text = re.sub(r"\bnot\s+([a-zA-Z])\b", r"$\\lnot \1$", text)  # not p → ¬p
 
         # Convert "not in" and "in" for set membership (e.g., "0 in N", "x not in S")
         # Pattern: simple expression followed by "not in"/"in" + capitalized set name
@@ -1084,6 +1092,47 @@ class LaTeXGenerator:
         lines.append(r"\bigskip")  # Trailing vertical space
         lines.append("")
         return lines
+
+    def _generate_pure_paragraph(self, node: PureParagraph) -> list[str]:
+        """Generate LaTeX for pure text paragraph with NO processing.
+
+        PURETEXT: blocks are output with:
+        - NO formula detection
+        - NO operator conversion
+        - NO inline math processing
+        - Only basic LaTeX character escaping
+        """
+        lines: list[str] = []
+        lines.append(r"\bigskip")  # Leading vertical space
+        lines.append("")
+
+        # Only escape LaTeX special characters, no other processing
+        text = self._escape_latex(node.text)
+
+        lines.append(text)
+        lines.append("")
+        lines.append(r"\bigskip")  # Trailing vertical space
+        lines.append("")
+        return lines
+
+    def _generate_latex_block(self, node: LatexBlock) -> list[str]:
+        """Generate LaTeX for raw LaTeX passthrough block.
+
+        LATEX: blocks output raw LaTeX with NO escaping.
+        The LaTeX is passed directly through to the output.
+        """
+        lines: list[str] = []
+        lines.append("")  # Blank line before
+        lines.append(node.latex)  # Raw LaTeX, no processing
+        lines.append("")  # Blank line after
+        return lines
+
+    def _generate_pagebreak(self, node: PageBreak) -> list[str]:
+        """Generate LaTeX for page break.
+
+        PAGEBREAK: inserts a page break in PDF output.
+        """
+        return [r"\newpage", ""]
 
     def _convert_comparison_operators(self, text: str) -> str:
         """Convert bare comparison operators to math mode, avoiding nested math.
@@ -1255,7 +1304,10 @@ class LaTeXGenerator:
         # Detect expressions like "p => (not p => p)" or "(not p => not q) <=> (q => p)"
         # Look for patterns starting with identifier/paren/not and containing => or <=>
         # Stop at sentence boundaries (is, as, are, etc.) or punctuation
-        formula_pattern = r"(\()?(?:not\s+)?([a-zA-Z]\w*)\s*(=>|<=>)\s*[^.!?]*?(?=\s+(?:is|as|are|for|to|be|a|an|the|in|on|at|by|with)\b|[.!?]|$)"
+        formula_pattern = (
+            r"(\()?(?:not\s+)?([a-zA-Z]\w*)\s*(=>|<=>)\s*[^.!?]*?"
+            r"(?=\s+(?:is|as|are|for|to|be|a|an|the|in|on|at|by|with)\b|[.!?]|$)"
+        )
 
         matches = list(re.finditer(formula_pattern, result))
         for match in reversed(matches):
@@ -1715,6 +1767,26 @@ class LaTeXGenerator:
         result = re.sub(r"\band\b", r"\\land", result)
         result = re.sub(r"\bor\b", r"\\lor", result)
         result = re.sub(r"\bnot\b", r"\\lnot", result)
+        return result
+
+    def _escape_latex(self, text: str) -> str:
+        """Escape LaTeX special characters.
+
+        Escapes: & % $ # _ { } ~ ^ \
+        Does NOT convert operators or detect formulas.
+        """
+        # Escape backslash first to avoid double-escaping
+        result = text.replace("\\", r"\textbackslash{}")
+        # Escape other special characters
+        result = result.replace("&", r"\&")
+        result = result.replace("%", r"\%")
+        result = result.replace("$", r"\$")
+        result = result.replace("#", r"\#")
+        result = result.replace("_", r"\_")
+        result = result.replace("{", r"\{")
+        result = result.replace("}", r"\}")
+        result = result.replace("~", r"\textasciitilde{}")
+        result = result.replace("^", r"\textasciicircum{}")
         return result
 
     def _escape_justification(self, text: str) -> str:

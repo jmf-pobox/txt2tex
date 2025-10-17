@@ -50,8 +50,12 @@ The `txt2pdf.sh` script automatically:
 # Convert txt to PDF in one command
 ./txt2pdf.sh examples/phase9.txt
 
-# Use fuzz package instead of zed-*
+# Use fuzz package with type checking
 ./txt2pdf.sh myfile.txt --fuzz
+# This will:
+# 1. Generate LaTeX with fuzz package syntax
+# 2. Run fuzz type checker for validation
+# 3. Compile to PDF only if type checking passes
 ```
 
 ### Using Hatch CLI
@@ -114,13 +118,19 @@ cd hw && make
 ✅ Workaround: Use TEXT blocks for complex nested quantifiers
 ```
 
-### Fuzz Typechecker Compatibility
+### Fuzz Type Checking
 
-When using `--fuzz` flag for typechecking:
+When using `--fuzz` flag, the fuzz type checker validates your Z notation before PDF compilation:
+
+**Type checking process**:
+1. Generates LaTeX with fuzz package syntax
+2. Runs `/usr/local/bin/fuzz` type checker
+3. If validation fails, shows errors and stops
+4. If validation passes, compiles to PDF
 
 **Identifiers with underscores are NOT supported by fuzz**:
 - `cumulative_total` will cause fuzz validation errors
-- The fuzz typechecker does not recognize underscores in identifiers
+- The fuzz type checker does not recognize underscores in identifiers
 
 **Recommended conventions for fuzz-compatible code**:
 
@@ -208,6 +218,8 @@ Generates: `\bigskip\noindent\textbf{Solution 1}\medskip`
 Generates: `(a)\par\vspace{11pt}` with proper spacing
 
 #### Text Paragraphs
+
+**TEXT: - Smart Text with Formula Detection**
 ```
 TEXT: This is a plain text paragraph with => and <=> symbols.
 ```
@@ -226,6 +238,36 @@ TEXT: The empty sequence <> has no elements.
 TEXT: The sequence <a, b, c> concatenated with <x> gives <a, b, c, x>.
 ```
 Generates: `$\langle \rangle$` and `$\langle a, b, c \rangle$` with proper LaTeX angle brackets
+
+---
+
+**PURETEXT: - Raw Text with LaTeX Escaping**
+```
+PURETEXT: Simpson, A. (2025) "Lecture notes" & references.
+```
+- Escapes LaTeX special characters (`&`, `%`, `$`, `#`, `_`, `{`, `}`, `~`, `^`, `\`)
+- NO formula detection
+- NO operator conversion
+- **Use case**: Bibliography entries, prose with punctuation that would confuse the lexer
+
+---
+
+**LATEX: - Raw LaTeX Passthrough**
+```
+LATEX: \begin{center}\textit{Custom formatting}\end{center}
+LATEX: \vspace{1cm}
+LATEX: \mycustomcommand{arg1}{arg2}
+```
+- NO escaping at all - raw LaTeX passed directly through
+- **Use cases**: Custom commands, environments not supported by txt2tex, tikz diagrams, special formatting
+
+---
+
+**PAGEBREAK: - Insert Page Break**
+```
+PAGEBREAK:
+```
+Generates: `\newpage` to start a new page in the PDF
 
 ---
 
@@ -1790,15 +1832,17 @@ Advantages:
 ```
 
 ```latex
-\usepackage{fuzz}         % Z notation package
+\usepackage{fuzz}         % Z notation fonts/styling (replaces zed-cm)
+\usepackage{zed-maths}    % Mathematical operators (same as default)
+\usepackage{zed-proof}    % Proof tree macros (same as default)
 ```
 
 Advantages:
 - Historical standard for Z notation
-- Single package simplicity
-- Custom fonts for Z notation
+- Custom Oxford fonts for Z notation
+- Type checking support with fuzz command
 
-Both packages are compatible - generated LaTeX works with either.
+**Package compatibility**: The `fuzz` package replaces only `zed-cm` (fonts/styling). The other packages (`zed-maths`, `zed-proof`) work with both `fuzz` and `zed-cm`.
 
 ---
 

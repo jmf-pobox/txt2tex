@@ -57,16 +57,47 @@ fi
 
 echo "  → Generated: $TEX_FILE"
 
-# Step 2: Compile to PDF
-echo "Step 2/2: Compiling PDF..."
+# Step 2: Type check with fuzz (if --fuzz flag is set)
+if [ -n "$FUZZ_FLAG" ]; then
+    echo "Step 2/3: Type checking with fuzz..."
+
+    # Check if fuzz command exists
+    if ! command -v fuzz > /dev/null 2>&1; then
+        echo "Error: fuzz command not found in PATH" >&2
+        echo "The fuzz type checker is required when using --fuzz option" >&2
+        exit 1
+    fi
+
+    # Run fuzz type checker
+    # Use full type check (not just -s syntax check)
+    cd "$INPUT_DIR" && fuzz "${INPUT_BASE}.tex" > "${INPUT_BASE}.fuzz.log" 2>&1
+    FUZZ_EXIT=$?
+
+    if [ $FUZZ_EXIT -ne 0 ]; then
+        echo "Error: Fuzz type checking failed (exit code: $FUZZ_EXIT)" >&2
+        echo "Check the fuzz log: ${INPUT_BASE}.fuzz.log" >&2
+        echo "" >&2
+        echo "Fuzz output:" >&2
+        cat "${INPUT_BASE}.fuzz.log" >&2
+        exit 1
+    fi
+
+    echo "  → Type check passed"
+    STEP_NUM="3/3"
+else
+    STEP_NUM="2/2"
+fi
+
+# Step 3: Compile to PDF
+echo "Step ${STEP_NUM}: Compiling PDF..."
 
 # Determine tex package directory (relative to script dir)
 TEX_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)/tex"
 
 # pdflatex may return non-zero even on success (warnings), so check PDF creation instead
-# Include both local latex/ and fuzz location in TEXINPUTS
+# Include both local latex/ and fuzz location in TEXINPUTS and MFINPUTS
 set +e  # Temporarily disable exit on error
-cd "$INPUT_DIR" && TEXINPUTS="${SCRIPT_DIR}/latex//:${TEX_DIR}//:" pdflatex -interaction=nonstopmode "${INPUT_BASE}.tex" > "${INPUT_BASE}.pdflatex.log" 2>&1
+cd "$INPUT_DIR" && TEXINPUTS="${SCRIPT_DIR}/latex//:${TEX_DIR}//:" MFINPUTS="${SCRIPT_DIR}/latex//:${TEX_DIR}//:" pdflatex -interaction=nonstopmode "${INPUT_BASE}.tex" > "${INPUT_BASE}.pdflatex.log" 2>&1
 PDFLATEX_EXIT=$?
 set -e  # Re-enable exit on error
 
