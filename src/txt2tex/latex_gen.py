@@ -2489,12 +2489,12 @@ class LaTeXGenerator:
             rule_name = match.group(2)
             label_num = match.group(3) or match.group(4)
 
-            # Convert operator to LaTeX
-            op_latex = operator_part.replace("<=>", r"$\Leftrightarrow$")
-            op_latex = op_latex.replace("=>", r"$\Rightarrow$")
-            op_latex = re.sub(r"\band\b", r"$\\land$", op_latex)
-            op_latex = re.sub(r"\bor\b", r"$\\lor$", op_latex)
-            op_latex = re.sub(r"\bnot\b", r"$\\lnot$", op_latex)
+            # Convert operator to LaTeX (no $ delimiters - already in math mode)
+            op_latex = operator_part.replace("<=>", r"\Leftrightarrow")
+            op_latex = op_latex.replace("=>", r"\Rightarrow")
+            op_latex = re.sub(r"\band\b", r"\\land", op_latex)
+            op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)
+            op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)
 
             # Format as: operator-rule^{[label]}
             # Use \textrm instead of \mbox to work correctly in math mode contexts
@@ -2510,12 +2510,12 @@ class LaTeXGenerator:
             rule_name = match.group(2)
             subscript_num = match.group(3)
 
-            # Convert operator to LaTeX
-            op_latex = operator_part.replace("<=>", r"$\Leftrightarrow$")
-            op_latex = op_latex.replace("=>", r"$\Rightarrow$")
-            op_latex = re.sub(r"\band\b", r"$\\land$", op_latex)
-            op_latex = re.sub(r"\bor\b", r"$\\lor$", op_latex)
-            op_latex = re.sub(r"\bnot\b", r"$\\lnot$", op_latex)
+            # Convert operator to LaTeX (no $ delimiters - already in math mode)
+            op_latex = operator_part.replace("<=>", r"\Leftrightarrow")
+            op_latex = op_latex.replace("=>", r"\Rightarrow")
+            op_latex = re.sub(r"\band\b", r"\\land", op_latex)
+            op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)
+            op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)
 
             # Format as: operator-rule-number (just regular text, no subscript)
             # Use \textrm instead of \mbox to work correctly in math mode contexts
@@ -2529,28 +2529,11 @@ class LaTeXGenerator:
         result = re.sub(r"\bor\b", r"\\lor", result)
         result = re.sub(r"\bnot\b", r"\\lnot", result)
 
-        # Wrap text parts in \mbox{} (standard LaTeX)
-        # If it contains "elim", "intro", "assumption", etc., wrap in \mbox{}
-        if any(
-            word in result
-            for word in [
-                "elim",
-                "intro",
-                "assumption",
-                "premise",
-                "from",
-                "case",
-                "contradiction",
-                "middle",
-            ]
-        ):
-            # Replace operators with proper spacing
-            result = result.replace(r"\land", r"$\land$")
-            result = result.replace(r"\lor", r"$\lor$")
-            result = result.replace(r"\lnot", r"$\lnot$")
-            result = result.replace(r"\Rightarrow", r"$\Rightarrow$")
-            result = result.replace(r"\Leftrightarrow", r"$\Leftrightarrow$")
-            # Use \textrm instead of \mbox to work correctly in math mode contexts
-            return r"\textrm{" + result + "}"
+        # Already in math mode - don't need extra wrapping
+        # Just use \mathrm{} for text parts to get roman font
+        for word in ["elim", "intro", "assumption", "premise", "from", "case",
+                     "contradiction", "middle", "excluded", "false"]:
+            # Replace text words with \mathrm{} for roman font in math mode
+            result = re.sub(rf"\b{word}\b", rf"\\mathrm{{{word}}}", result)
 
         return result
