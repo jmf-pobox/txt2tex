@@ -2119,7 +2119,8 @@ class LaTeXGenerator:
             child_groups.append(current_group)
 
         # Generate premises by joining siblings with &
-        non_case_premises = [" & ".join(group) for group in child_groups]
+        # Put & on its own line to avoid LaTeX parser issues with nested contexts
+        non_case_premises = ["\n&\n".join(group) for group in child_groups]
 
         # If we have case analysis, apply raiseproof for vertical layout
         if case_children:
@@ -2158,7 +2159,8 @@ class LaTeXGenerator:
                 # No disjunction - might be other premises before cases
                 all_premises = non_case_premises + raised_cases
 
-            premises = " & ".join(all_premises)
+            # Put & on its own line to avoid LaTeX parser issues with nested contexts
+            premises = "\n&\n".join(all_premises)
         else:
             # No case analysis - use normal premises
             premises = "\n  ".join(non_case_premises)
@@ -2495,7 +2497,8 @@ class LaTeXGenerator:
             op_latex = re.sub(r"\bnot\b", r"$\\lnot$", op_latex)
 
             # Format as: operator-rule^{[label]}
-            return f"{op_latex}\\mbox{{-{rule_name}}}^{{[{label_num}]}}"
+            # Use \textrm instead of \mbox to work correctly in math mode contexts
+            return f"{op_latex}\\textrm{{-{rule_name}}}^{{[{label_num}]}}"
 
         # Check for rule subscript pattern: "operator rule N" (like "and elim 1")
         # Match: operator + rule name + number (1 or 2)
@@ -2515,7 +2518,8 @@ class LaTeXGenerator:
             op_latex = re.sub(r"\bnot\b", r"$\\lnot$", op_latex)
 
             # Format as: operator-rule-number (just regular text, no subscript)
-            return f"{op_latex}\\mbox{{-{rule_name}-{subscript_num}}}"
+            # Use \textrm instead of \mbox to work correctly in math mode contexts
+            return f"{op_latex}\\textrm{{-{rule_name}-{subscript_num}}}"
 
         # No special pattern - process normally
         # Replace logical operators with LaTeX symbols
@@ -2546,6 +2550,7 @@ class LaTeXGenerator:
             result = result.replace(r"\lnot", r"$\lnot$")
             result = result.replace(r"\Rightarrow", r"$\Rightarrow$")
             result = result.replace(r"\Leftrightarrow", r"$\Leftrightarrow$")
-            return r"\mbox{" + result + "}"
+            # Use \textrm instead of \mbox to work correctly in math mode contexts
+            return r"\textrm{" + result + "}"
 
         return result
