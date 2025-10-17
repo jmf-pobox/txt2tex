@@ -1,0 +1,232 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% zed-maths.sty: unfinished style for Using Z additions
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\Zmeaning}[1]{{\cal M}\lceil#1\rceil}
+\newcommand{\SchemaRelation}[1]{{\cal R}\lceil#1\rceil}
+
+\def \Bottom    {\mathord{\perp}}
+\def \real      {{\bbold R}}
+\def \refinedby {\mathrel{\sqsubseteq}}
+
+\def\tuple#1{( #1 )} \def\name#1{\hbox{\em #1}}
+\def\con#1{\mathsf{#1}}
+
+\def\TM{${}^{\mathrm{TM}}$}
+\def\faren{\hbox{}^{\circ}\hbox{F}}
+\def\cel{\hbox{}^{\circ}\hbox{C}}
+\def\gtlt{\mathrel{{>}{<}}}
+
+\def\aside#1{\hbox{\footnotesize %
+        \tabular[b]{@{}l@{}} #1 \endtabular}}
+
+\def\disjointfrom{\mathrel{disjoint\_from}}
+
+\def\ddrop{\array[t]{@{}l@{\quad}l@{}}}
+\let\endddrop=\endarray
+
+\def\symm{^{\mathrm{s}}}
+\def\symclo#1{#1\symm}
+
+\def\refl{^{\mathrm{r}}}
+\def\refclo#1{#1\refl}
+
+\def\absolute#1{{\mid}~#1~{\mid}}
+
+\settowidth\arraycolsep{$\hbox{}\;{\mathrel{\hbox{}}}\;\hbox{}$}
+\divide\arraycolsep by 4
+
+\def\mathstrut{\vphantom{pf}}
+\def \nin       {\not\in}
+
+\def\Repeat{\mathrel{\uparrow}}
+\def\Sum{\mathop{\mathrm{sum}}}
+
+\def \sub#1for#2{[#1\,/\,#2]}
+
+\def\espec#1#2{[\,#1,\,#2\,]}
+\def\hspec#1#2#3{#1 : [\,#2,\,#3\,]}
+\def\vspec#1#2#3{#1 : \left[\begin{array}{ccc} \array[b]{c} #2
+      \endarray & , & \array[b]{c} #3 \endarray \end{array} \right]}
+
+\def\Reserved#1{\hbox{\sffamily #1}\@ifnextchar~{\hbox{ }}{}}
+\def\CReserved#1{\hbox to 1em{\sffamily #1\hss}\@ifnextchar~{\hbox{ }}{}}
+
+\def\BEGIN{\Reserved{begin}}
+\def\END{\Reserved{end}}
+\def\DO{\CReserved{do}}
+\def\OD{\CReserved{od}}
+\def\IF{\CReserved{if}}
+\def\BOX{\CReserved{$\Box$}}
+\def\FI{\CReserved{fi}}
+\def\SEQ{~\Reserved{$;$}~}
+
+\def\ABORT{\Reserved{abort}}
+\def\CHOOSE{\Reserved{choose}}
+\def\MAGIC{\Reserved{magic}}
+
+\def\VAR{\Reserved{var}}
+\def\CON{\Reserved{con}}
+\def\SKIP{\Reserved{skip}}
+
+\def\MODULE{\Reserved{module}}
+\def\OF{\Reserved{of}}
+\def\ARROW{\mathrel{\fun}}
+
+\def\ARRAY{\Reserved{array}}
+
+\def\CASE{\Reserved{case}}
+\def\CONST{\Reserved{const}}
+\def\ELSE{\Reserved{else}}
+\def\FOR{\Reserved{for}}
+\def\NOT{\Reserved{not}}
+\def\OF{\Reserved{of}}
+
+\def\PROC{\Reserved{proc}}
+\def\PROGRAM{\Reserved{program}}
+\def\RECORD{\Reserved{record}}
+\def\RES{\Reserved{res}}
+
+\def\THEN{\Reserved{then}}
+\def\TO{\Reserved{to}}
+\def\TYPE{\Reserved{type}}
+\def\VAL{\Reserved{val}}
+
+\def\WHILE{\Reserved{while}}
+\def\PROCEDURE{\Reserved{procedure}}
+\def\INITIALLY{\Reserved{initially}}
+\def\AND{\Reserved{and}}
+
+\def \paircat{%
+  \mathbin{\buildrel {\hbox{$\smallfrown$}} \over
+    {\smash{\hbox{$\smallfrown$}}}}}
+
+\def\fstrut{\vphantom{f}}
+
+\def\total#1{\mathord{\buildrel \bullet \over {#1}}}
+\def\lift#1{\mathord{\buildrel \circ \over {#1}}}
+
+\def\Total#1{\mathord{\buildrel \bullet \over {\fstrut #1}}}
+\def\Lift#1{\mathord{\buildrel \circ \over {\fstrut #1}}}
+
+\def\trash{\mathord{\sim}}
+
+\def \If        {\mathrel{\hbox{if}}}
+\def \Then      {\mathrel{\hbox{then}}}
+\def \Otherwise {\mathrel{\hbox{otherwise}}}
+\def \Else      {\mathrel{\hbox{else}}}
+\def \Fi        {\mathrel{\hbox{fi}}}
+
+\newcommand{\ticket}{{\sf ticket}}
+\newcommand{\shiftleft}{\ll}
+\newcommand{\impliedby}{\Leftarrow}
+
+\@ifpackageloaded{lucidabr}{%
+  \mathchardef    \eor "32F7
+  }{%
+  \def\eor{%
+    \mathrel{\buildrel \hbox{--} \over \vee}}}
+
+%% lawarray, based upon eqnarray in fleqn
+
+\newcounter{eqlaw} \setcounter{eqlaw}{0} \def\theeqlaw{\arabic{eqlaw}}
+
+\def\eqlawarray{%
+  \global\@eqnswtrue\m@th \global\@eqcnt\z@ \tabskip\mathindent
+  \let\\=\@eqncr \setlength\abovedisplayskip{\topsep} \ifvmode
+  \addtolength\abovedisplayskip{\partopsep} \fi
+  \setlength\belowdisplayskip{\abovedisplayskip}
+  \setlength\belowdisplayshortskip{\abovedisplayskip}
+  \setlength\abovedisplayshortskip{\abovedisplayskip}
+  $$\everycr{}\halign to\linewidth \bgroup \hskip\@centering
+  $\displaystyle\tabskip\z@skip{##}$\@eqnsel& \global\@eqcnt\@ne
+  \hskip \tw@\arraycolsep \hfil${##}$\hfil& \global\@eqcnt\tw@ \hskip
+  \tw@\arraycolsep $\displaystyle{##}$\hfil \tabskip\@centering&
+  \global\@eqcnt\thr@@ \hbox to
+  \z@\bgroup\hss##\egroup\tabskip\z@skip\cr }
+
+\def\endeqlawarray{\@@eqncr\egroup$$\global\@ignoretrue}
+
+% flag to tell us if we should be enumerating parts of the eqlaw
+
+\newif\if@numbered@eqlaw@ \@numbered@eqlaw@true
+
+\def\eqlaw{\@ifnextchar[{\name@eqlaw}{\@eqlaw}}
+\def\name@eqlaw[#1]{\def\eqlaw@name{#1} \@eqlaw}
+
+\def\@eqlaw{%
+  \ifx\undefined\eqlaw@name \relax
+    \def\@eqncr{\nonumber\@seqncr}  
+    \@numbered@eqlaw@false
+  \else                          
+    \if@numbered@eqlaw@ \relax
+      \@ifundefined{c@\eqlaw@name}{%
+        \newcounter{\eqlaw@name} \setcounter{\eqlaw@name}{1}}{}
+      \setcounter{eqlaw}{\value{\eqlaw@name}} 
+      \def\@eqnnum{\reset@font\rmfamily (\eqlaw@name.\theeqlaw)} %
+      \def\@currentlabel{\eqlaw@name.\theeqlaw}%
+      %
+      \def\@@eqncr{\let\@tempa\relax
+        \ifcase\@eqcnt \def\@tempa{& & &}\or \def\@tempa{& &}%
+        \or \def\@tempa{&}\else
+        \let\@tempa\@empty
+        \@latex@error{Too many columns in eqlawarray}\@ehc\fi
+        \@tempa \if@eqnsw\@eqnnum\stepcounter{eqlaw}\fi
+        \global\@eqnswtrue\global\@eqcnt\z@\cr
+        }
+    \else 
+      \def\@eqnnum{\reset@font\rmfamily (\eqlaw@name)} 
+      \def\@currentlabel{\eqlaw@name}
+    \fi 
+  \fi
+  \multiply \arraycolsep by 2
+  \multiply \jot by 2
+  \eqlawarray
+  }
+
+\def\endeqlaw{%
+  \endeqlawarray%
+  \if@numbered@eqlaw@\relax%
+  \setcounter{\eqlaw@name}{\value{eqlaw}}%
+  \fi}
+
+\@namedef{eqlaw*}{\@numbered@eqlaw@false\eqlaw}
+\@namedef{endeqlaw*}{\endeqlaw\@numbered@eqlaw@true}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% macros for rule names 
+
+\def\assume#1#2{\lceil #1 \rceil^{\scriptstyle[#2]}}
+\def\discharge#1{{}^{\scriptstyle[#1]}}
+
+\def\i@rule#1{{{#1}{-}intro}}
+\def\e@rule#1{{{#1}{-}elim}}
+\def\ni@rule#1#2{{{#1}{-}\mathrm intro#2}}
+\def\ne@rule#1#2{{{#1}{-}\mathrm elim#2}}
+\def \appI      {\i@rule{app}}
+\def \appE      {\e@rule{app}}
+\def \landI      {\i@rule{\land}}
+\def \lnotI      {\i@rule{\neg}}
+\def \impliesI  {\i@rule{\implies}}
+\def \iffI      {\i@rule{\iff}}
+\def \forallI   {\i@rule{\forall}}
+\def \existsI   {\i@rule{\exists}}
+\def \falseE    {\e@rule{\mathit{false}}}
+\def \falseI    {\i@rule{\mathit{false}}}
+\def \lorE       {\e@rule{\lor}}
+\def \lorI       {\ni@rule{\lor}}
+\def \landE      {\ne@rule{\land}}
+\def \lnotE      {\e@rule{\neg}}
+\def \impliesE  {\e@rule{\implies}}
+\def \iffE      {\ne@rule{\iff}}
+\def \forallE   {\e@rule{\forall}}
+\def \existsE   {\e@rule{\exists}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\endinput 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

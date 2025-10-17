@@ -40,9 +40,12 @@ hatch run convert examples/phase9.txt
 The `txt2pdf.sh` script automatically:
 - Sets PYTHONPATH for the CLI
 - Generates LaTeX from txt
-- Sets TEXINPUTS and MFINPUTS for packages
-- Compiles to PDF
+- Copies LaTeX dependencies (*.sty, *.mf) locally to build directory
+- Runs fuzz type checker (if --fuzz flag is set)
+- Compiles to PDF with local dependencies
 - Cleans up auxiliary files
+
+**Self-contained LaTeX**: All dependencies are copied to the build directory, making the LaTeX files portable and usable in any editor (Overleaf, TeXShop, etc.) without complex path configuration.
 
 ### Using the Shell Script (Options)
 
@@ -82,7 +85,13 @@ make -j4
 
 # In hw/ directory - build solutions
 cd hw && make
+
+# Clean targets
+make clean       # Remove auxiliary files (.aux, .log, fonts) - keep .tex and .pdf
+make distclean   # Remove all generated files - keep only source .txt files
 ```
+
+**Note**: LaTeX dependencies (.sty, .mf files) are automatically copied to the build directory, making the generated .tex files self-contained and portable.
 
 ## Syntax Requirements & Limitations
 
@@ -1848,19 +1857,34 @@ Advantages:
 
 ## Troubleshooting
 
+### LaTeX Workshop (VSCode/Cursor)
+
+**Error: "File `fuzz.sty' not found" when opening .tex files**
+
+The `.vscode/settings.json` and `.latexmkrc` files are configured to find local dependencies. If you still see errors:
+
+1. **Ensure dependencies were copied**: Run `make` or `./txt2pdf.sh` first to copy `.sty` and `.mf` files to the build directory
+2. **Reload VSCode/Cursor**: After first build, reload window (Cmd+Shift+P → "Reload Window")
+3. **Check files exist**: Verify `hw/*.sty` and `hw/*.mf` files are present
+
+The workspace is pre-configured with:
+- `.latexmkrc` in `hw/` and `examples/` directories
+- `.vscode/settings.json` with correct TEXINPUTS/MFINPUTS paths
+
 ### LaTeX Compilation Errors
 
-**Missing packages:**
+**Missing packages (command line):**
 ```
 ! LaTeX Error: File `zed-cm.sty' not found.
 ```
-Solution: The zed-* packages are included in `latex/`. Ensure `TEXINPUTS` is set correctly:
+Solution: Use `txt2pdf.sh` or `make` - they automatically copy dependencies locally.
+
+For manual compilation:
 ```bash
-export TEXINPUTS=./latex//:
+export TEXINPUTS=.:./latex//:
+export MFINPUTS=.:./latex//:
 pdflatex file.tex
 ```
-
-The `txt2pdf.sh` script handles this automatically.
 
 **Missing fonts (fuzz package):**
 ```

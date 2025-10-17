@@ -31,13 +31,20 @@ all: $(PDF_FILES)
 .PHONY: solutions
 solutions: solutions.pdf
 
-# Clean generated files
+# Clean auxiliary files (keep LaTeX source and PDF)
 .PHONY: clean
 clean:
-	@echo "Cleaning generated files..."
-	@rm -f $(TEX_FILES) $(PDF_FILES)
+	@echo "Cleaning auxiliary files..."
 	@rm -f *.aux *.log *.pdflatex.log *.fuzz.log
 	@rm -f *.tfm *.pk *.gf *.600pk *.600gf
+	@echo "Done."
+
+# Deep clean: remove everything except source .txt files
+.PHONY: distclean
+distclean: clean
+	@echo "Removing all generated files..."
+	@rm -f $(TEX_FILES) $(PDF_FILES)
+	@rm -f *.sty *.mf
 	@echo "Done."
 
 # List all available targets
