@@ -164,8 +164,8 @@ In this equivalence proof, we show that (($p \Rightarrow r$) and ($q \Rightarrow
 \vspace{11pt}
 \noindent
 $\displaystyle
-\infer[$\Rightarrow$\textrm{-intro}^{[1]}]{p \Rightarrow (\lnot p \Rightarrow p)}{
-  \infer[$\Rightarrow$\textrm{-intro}^{[2]}]{\lnot p \Rightarrow p}{\ulcorner \lnot p \urcorner^{[2]} & \ulcorner p \urcorner^{[1]}}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \Rightarrow (\lnot p \Rightarrow p)}{
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \Rightarrow p}{\ulcorner \lnot p \urcorner^{[2]} & \ulcorner p \urcorner^{[1]}}
 }
 $
 
@@ -194,15 +194,15 @@ In one direction, we are seeking to prove (not $p => not$ q) $\Rightarrow$ $q \R
 
 \noindent
 $\displaystyle
-\infer[$\Rightarrow$\textrm{-intro}^{[1]}]{(\lnot p \Rightarrow \lnot q) \Rightarrow (q \Rightarrow p)}{
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \Rightarrow \lnot q) \Rightarrow (q \Rightarrow p)}{
   \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]}
 &
-\infer[$\Rightarrow$\textrm{-intro}^{[2]}]{q \Rightarrow p}{
+\infer[\Rightarrow\textrm{-intro}^{[2]}]{q \Rightarrow p}{
   \ulcorner q \urcorner^{[2]}
 &
 \infer[false\textrm{-elim}^{[3]}]{p}{
-  \infer[\textrm{false intro}]{false}{
-  \infer[\textrm{$\Rightarrow$ elim}]{\lnot q}{
+  \infer[\mathrm{false} \mathrm{intro}]{false}{
+  \infer[\Rightarrow \mathrm{elim}]{\lnot q}{
   \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]}
 &
 \ulcorner \lnot p \urcorner^{[3]}
@@ -223,15 +223,15 @@ and in the other, we are seeking to prove ($q \Rightarrow p$) $\Rightarrow$ (not
 
 \noindent
 $\displaystyle
-\infer[$\Rightarrow$\textrm{-intro}^{[1]}]{(q \Rightarrow p) \Rightarrow (\lnot p \Rightarrow \lnot q)}{
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(q \Rightarrow p) \Rightarrow (\lnot p \Rightarrow \lnot q)}{
   \ulcorner q \Rightarrow p \urcorner^{[1]}
 &
-\infer[$\Rightarrow$\textrm{-intro}^{[2]}]{\lnot p \Rightarrow \lnot q}{
+\infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \Rightarrow \lnot q}{
   \ulcorner \lnot p \urcorner^{[2]}
 &
 \infer[false\textrm{-elim}^{[3]}]{\lnot q}{
-  \infer[\textrm{false intro}]{false}{
-  \infer[\textrm{$\Rightarrow$ elim}]{p}{
+  \infer[\mathrm{false} \mathrm{intro}]{false}{
+  \infer[\Rightarrow \mathrm{elim}]{p}{
   \ulcorner q \Rightarrow p \urcorner^{[1]}
 &
 \ulcorner q \urcorner^{[3]}
@@ -252,7 +252,7 @@ We then combine these two proofs with the $\Leftrightarrow$-intro rule, using th
 
 \noindent
 $\displaystyle
-\infer[\textrm{$\Leftrightarrow$ intro}]{\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p}{
+\infer[\Leftrightarrow \mathrm{intro}]{\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p}{
   (\lnot p \Rightarrow \lnot q) \Rightarrow (q \Rightarrow p)
 &
 (q \Rightarrow p) \Rightarrow (\lnot p \Rightarrow \lnot q)
@@ -272,24 +272,24 @@ In one direction:
 
 \noindent
 $\displaystyle
-\infer[$\Rightarrow$\textrm{-intro}^{[1]}]{(p \Rightarrow r) \land (q \Rightarrow r) \Rightarrow (p \lor q \Rightarrow r)}{
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \Rightarrow r) \land (q \Rightarrow r) \Rightarrow (p \lor q \Rightarrow r)}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
 &
-\infer[$\Rightarrow$\textrm{-intro}^{[2]}]{p \lor q \Rightarrow r}{
+\infer[\Rightarrow\textrm{-intro}^{[2]}]{p \lor q \Rightarrow r}{
   \ulcorner p \lor q \urcorner^{[2]}
 &
-\infer[$\lor$\textrm{-elim}^{[3]}]{r}{
-  \raiseproof{10ex}{\infer[$\land$\textrm{-elim-1}]{p \Rightarrow r}{
+\infer[\lor\textrm{-elim}^{[3]}]{r}{
+  \raiseproof{10ex}{\infer[\land\textrm{-elim-1}]{p \Rightarrow r}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
-} & \infer[\textrm{$\Rightarrow$ elim}]{r}{
+} & \infer[\Rightarrow \mathrm{elim}]{r}{
   p \Rightarrow r
 &
 \ulcorner p \urcorner^{[3]}
 }}
 &
-\hskip 6em \raiseproof{26ex}{\infer[$\land$\textrm{-elim-2}]{q \Rightarrow r}{
+\hskip 6em \raiseproof{26ex}{\infer[\land\textrm{-elim-2}]{q \Rightarrow r}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
-} & \infer[\textrm{$\Rightarrow$ elim}]{r}{
+} & \infer[\Rightarrow \mathrm{elim}]{r}{
   q \Rightarrow r
 &
 \ulcorner q \urcorner^{[3]}
