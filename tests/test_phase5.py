@@ -351,8 +351,8 @@ class TestLaTeXGenerator:
         latex_lines = gen.generate_document_item(ast)
         latex = "\n".join(latex_lines)
 
-        # Should use & to separate sibling premises
-        assert " & " in latex
+        # Should use & to separate sibling premises (on its own line)
+        assert "\n&\n" in latex
         assert r"\infer" in latex
 
 
