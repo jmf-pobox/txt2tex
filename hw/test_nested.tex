@@ -1,0 +1,21 @@
+\documentclass{article}
+\usepackage{zed-proof}
+\begin{document}
+Test with inline \&:
+$\displaystyle
+\infer[rule1]{conclusion}{
+  \infer[rule2]{subconclusion}{premise1 & premise2}
+}
+$
+
+Test with multiline \&:
+$\displaystyle
+\infer[rule1]{conclusion}{
+  \infer[rule2]{subconclusion}{
+premise1
+&
+premise2
+}
+}
+$
+\end{document}

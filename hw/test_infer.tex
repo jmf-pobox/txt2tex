@@ -1,0 +1,9 @@
+\documentclass{article}
+\usepackage{zed-proof}
+\begin{document}
+$\displaystyle
+\infer[$\Rightarrow$-intro$^{[1]}$]{p \Rightarrow (\lnot p \Rightarrow p)}{
+  \infer[$\Rightarrow$-intro$^{[2]}$]{\lnot p \Rightarrow p}{\ulcorner \lnot p \urcorner^{[2]} & \ulcorner p \urcorner^{[1]}}
+}
+$
+\end{document}
