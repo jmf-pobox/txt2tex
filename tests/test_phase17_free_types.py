@@ -240,7 +240,7 @@ class TestRecursiveFreeTypeIntegration:
         doc = gen.generate_document(ast)
 
         # Check document structure
-        assert r"\documentclass[fleqn]{article}" in doc
+        assert r"\documentclass[a4paper,10pt,fleqn]{article}" in doc
         assert r"\begin{document}" in doc
         assert r"\end{document}" in doc
 
