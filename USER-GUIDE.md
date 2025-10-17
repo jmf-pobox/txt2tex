@@ -929,6 +929,7 @@ PROOF:
 
 ### Example: Case Analysis
 
+**Simple case analysis:**
 ```
 PROOF:
   p or q => r [=> intro from 1]
@@ -942,6 +943,31 @@ PROOF:
         :: r [from 3]
           [3] q [assumption]
 ```
+
+**Case analysis with multiple sibling steps:**
+```
+PROOF:
+  ((p => r) and (q => r)) => ((p or q) => r) [=> intro from 1]
+    [1] (p => r) and (q => r) [assumption]
+    :: (p or q) => r [=> intro from 2]
+      [2] p or q [assumption]
+      :: r [or elim from 3]
+        case p:
+          :: p => r [and elim 1]
+            :: (p => r) and (q => r) [from 1]
+          :: r [=> elim]
+            [3] p [assumption]
+        case q:
+          :: q => r [and elim 2]
+            :: (p => r) and (q => r) [from 1]
+          :: r [=> elim]
+            [3] q [assumption]
+```
+
+**Important**: When a case has multiple sibling steps (marked with `::`) leading to the conclusion:
+- The LAST sibling step automatically includes earlier siblings as its premises
+- Do NOT write `:: result [from above]` - this creates duplication
+- The earlier derivations are automatically available to the final step
 
 ---
 
