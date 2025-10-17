@@ -206,7 +206,7 @@ class TestPhase2LaTeXGeneration:
         latex = "\n".join(lines)
 
         assert r"\[" in latex
-        assert r"\begin{array}{lll}" in latex
+        assert r"\begin{array}{ll@{\hspace{2em}}l}" in latex
         assert r"\end{array}" in latex
         assert r"\]" in latex
         assert r"p \land q" in latex
@@ -253,7 +253,7 @@ class TestPhase2LaTeXGeneration:
         latex = "\n".join(lines)
 
         assert r"\[" in latex
-        assert r"\begin{array}{lll}" in latex
+        assert r"\begin{array}{ll@{\hspace{2em}}l}" in latex
         assert r"\end{array}" in latex
         assert r"\]" in latex
         assert r"p \land q" in latex
@@ -288,7 +288,7 @@ class TestPhase2LaTeXGeneration:
         assert r"\usepackage{zed-cm}" in latex
         assert r"\usepackage{amssymb}" in latex  # amsmath removed - using array
         assert r"\[" in latex
-        assert r"\begin{array}{lll}" in latex
+        assert r"\begin{array}{ll@{\hspace{2em}}l}" in latex
         assert r"p \\" in latex
         assert r"&\Leftrightarrow q & [\mbox{assumption}]" in latex
         assert r"\end{array}" in latex
@@ -322,7 +322,7 @@ q and p [commutative]"""
         assert len(ast.items) == 1
         assert isinstance(ast.items[0], EquivChain)
         assert r"\[" in latex
-        assert r"\begin{array}{lll}" in latex
+        assert r"\begin{array}{ll@{\hspace{2em}}l}" in latex
         assert r"p \land q" in latex
         assert r"&\Leftrightarrow q \land p & [\mbox{commutative}]" in latex
         assert r"\end{array}" in latex
@@ -350,7 +350,7 @@ not p or not q [parentheses]"""
 
         # Check LaTeX output
         assert r"\[" in latex
-        assert r"\begin{array}{lll}" in latex
+        assert r"\begin{array}{ll@{\hspace{2em}}l}" in latex
         assert r"\lnot" in latex
         assert r"\land" in latex
         assert r"\lor" in latex
@@ -394,6 +394,6 @@ q or p [commutative]
         assert r"\noindent" in latex
         assert r"p \land q" in latex
         assert r"\[" in latex
-        assert r"\begin{array}{lll}" in latex
+        assert r"\begin{array}{ll@{\hspace{2em}}l}" in latex
         assert r"\lnot p" in latex
         assert r"\]" in latex
