@@ -1027,6 +1027,14 @@ class LaTeXGenerator:
         text = re.sub(r"(?<!\\)\bemptyset\b", r"$\\emptyset$", text)  # emptyset → ∅
         text = re.sub(r"(?<!\\)\bforall\b", r"$\\forall$", text)  # forall → ∀
 
+        # Convert "not <variable>" to logical not symbol
+        # Only when "not" is followed by a single identifier (variable name)
+        # Examples: "not p", "not q", but NOT "not a tautology", "not every"
+        # Pattern: \bnot\s+([a-zA-Z]\b) - "not" followed by single letter
+        text = re.sub(
+            r"\bnot\s+([a-zA-Z])\b", r"$\\lnot \1$", text
+        )  # not p → ¬p
+
         # Convert "not in" and "in" for set membership (e.g., "0 in N", "x not in S")
         # Pattern: simple expression followed by "not in"/"in" + capitalized set name
         # Matches: identifier/number, optionally with operators (-, +, *, /)
