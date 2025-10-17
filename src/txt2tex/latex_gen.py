@@ -217,6 +217,10 @@ class LaTeXGenerator:
         lines.append(
             r"\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}"
         )
+        # Load amsmath/amssymb BEFORE Z packages to avoid redefinition warnings
+        # Z packages will intentionally override \implies, \impliedby, \because
+        lines.append(r"\usepackage{amsmath}")
+        lines.append(r"\usepackage{amssymb}")  # For \mathbb
         if self.use_fuzz:
             lines.append(r"\usepackage{fuzz}")  # Replaces zed-cm (fonts/styling)
         else:
@@ -224,8 +228,6 @@ class LaTeXGenerator:
         # These packages work with both fuzz and zed-cm
         lines.append(r"\usepackage{zed-maths}")  # Mathematical operators
         lines.append(r"\usepackage{zed-proof}")  # Proof tree macros (\infer)
-        lines.append(r"\usepackage{amsmath}")
-        lines.append(r"\usepackage{amssymb}")  # For \mathbb
         lines.append(r"\begin{document}")
         lines.append("")
 
