@@ -1,7 +1,7 @@
-\documentclass[fleqn]{article}
-\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
-\usepackage{zed-cm}
+\usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \begin{document}
@@ -279,21 +279,13 @@ $\displaystyle
   \ulcorner p \lor q \urcorner^{[2]}
 &
 \infer[\lor\textrm{-elim}^{[3]}]{r}{
-  \raiseproof{10ex}{\infer[\land\textrm{-elim-1}]{p \Rightarrow r}{
+  \raiseproof{10ex}{\infer[\Rightarrow \mathrm{elim}]{r}{\infer[\land\textrm{-elim-1}]{p \Rightarrow r}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
-} & \infer[\Rightarrow \mathrm{elim}]{r}{
-  p \Rightarrow r
+} & \ulcorner p \urcorner^{[3]}}}
 &
-\ulcorner p \urcorner^{[3]}
-}}
-&
-\hskip 6em \raiseproof{26ex}{\infer[\land\textrm{-elim-2}]{q \Rightarrow r}{
+\hskip 6em \raiseproof{26ex}{\infer[\Rightarrow \mathrm{elim}]{r}{\infer[\land\textrm{-elim-2}]{q \Rightarrow r}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
-} & \infer[\Rightarrow \mathrm{elim}]{r}{
-  q \Rightarrow r
-&
-\ulcorner q \urcorner^{[3]}
-}}
+} & \ulcorner q \urcorner^{[3]}}}
 }
 }
 }

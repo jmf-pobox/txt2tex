@@ -236,7 +236,7 @@ class TestPhase8LaTeXGeneration:
 
         latex = gen.generate_document(doc)
 
-        assert r"\documentclass[fleqn]{article}" in latex
+        assert r"\documentclass[a4paper,10pt,fleqn]{article}" in latex
         assert r"\begin{document}" in latex
         assert r"\{" in latex
         assert r"\}" in latex
