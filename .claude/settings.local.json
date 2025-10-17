@@ -66,7 +66,9 @@
       "Bash(pdfinfo:*)",
       "Bash(mktextfm:*)",
       "Bash(test:*)",
-      "Bash(bash txt2pdf.sh:*)"
+      "Bash(bash txt2pdf.sh:*)",
+      "Bash(bash:*)",
+      "Bash(PYTHONPATH=src hatch run python:*)"
     ],
     "deny": [],
     "ask": []
