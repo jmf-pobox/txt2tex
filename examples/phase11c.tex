@@ -1,8 +1,8 @@
-\documentclass{article}
-\usepackage{zed-cm}
-\usepackage{zed-maths}
-\usepackage{zed-proof}
+\documentclass[fleqn]{article}
+\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}
+\usepackage{fuzz}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \begin{document}
 
 \section*{Phase 11 c Function Type Arrows}
@@ -13,23 +13,13 @@
 
 \bigskip
 
-$Total$
+\noindent
+$Total(function)$
 
-$function$
 
+\noindent
 $X \fun Y$
 
-\bigskip
-
-
-
-\bigskip
-
-$Partial$
-
-$function$
-
-$N \pfun N$
 
 \bigskip
 
@@ -37,73 +27,83 @@ $N \pfun N$
 
 \bigskip
 
-$Total$
+\noindent
+$Partial(function)$
 
-$injection$
 
+\noindent
+$\mathbb{N} \pfun \mathbb{N}$
+
+
+\bigskip
+
+
+
+\bigskip
+
+\noindent
+$Total(injection)$
+
+
+\noindent
 $A \inj B$
 
-\bigskip
-
-
 
 \bigskip
 
-$Partial$
 
-$injection$
 
+\bigskip
+
+\noindent
+$Partial(injection)$
+
+
+\noindent
 $X \pinj Y$
 
-\bigskip
-
-
 
 \bigskip
 
-$Total$
 
-$surjection$
 
+\bigskip
+
+\noindent
+$Total(surjection)$
+
+
+\noindent
 $A \surj B$
 
-\bigskip
-
-
 
 \bigskip
 
-$Partial$
 
-$surjection$
 
+\bigskip
+
+\noindent
+$Partial(surjection)$
+
+
+\noindent
 $X \psurj Y$
 
-\bigskip
-
-
 
 \bigskip
 
+
+
+\bigskip
+
+\noindent
 $Bijection$
 
+
+\noindent
 $A \bij B$
 
-\bigskip
-
-
-
-\bigskip
-
-$Higher$
-
-$order$
-
-$function$
-
-$type$
-
-$N \fun N \fun N$
 
 \bigskip
 
@@ -111,21 +111,35 @@ $N \fun N \fun N$
 
 \bigskip
 
-$Right$
+\noindent
+$Higher(order)(function)(type)$
 
-$associative$
 
-$function$
+\noindent
+$\mathbb{N} \fun \mathbb{N} \fun \mathbb{N}$
 
-$types$
 
+\bigskip
+
+
+
+\bigskip
+
+\noindent
+$Right(associative)(function)(types)$
+
+
+\noindent
 $A \fun (B \fun C)$
 
-$X \fun (Y \fun Z)$
+
+\noindent
+$X \fun (Y \fun \mathbb{Z})$
+
 
 \begin{axdef}
-square : N \fun N
-pdiv : N \pfun N
+square : \mathbb{N} \fun \mathbb{N}
+pdiv : \mathbb{N} \pfun \mathbb{N}
 bmap : A \bij B
 \end{axdef}
 

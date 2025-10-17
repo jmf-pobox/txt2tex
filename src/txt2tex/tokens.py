@@ -132,7 +132,10 @@ class TokenType(Enum):
     SOLUTION_MARKER = auto()  # **
     PART_LABEL = auto()  # (a), (b), (c), etc.
     TRUTH_TABLE = auto()  # TRUTH TABLE:
-    TEXT = auto()  # TEXT: (plain text paragraphs)
+    TEXT = auto()  # TEXT: (plain text paragraphs with formula detection)
+    PURETEXT = auto()  # PURETEXT: (raw text, no processing)
+    LATEX = auto()  # LATEX: (raw LaTeX passthrough, no escaping)
+    PAGEBREAK = auto()  # PAGEBREAK: (insert page break)
 
     # Environments (Phase 2)
     EQUIV = auto()  # EQUIV:

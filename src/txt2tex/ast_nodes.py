@@ -630,13 +630,42 @@ class ProofTree(ASTNode):
 
 @dataclass(frozen=True)
 class Paragraph(ASTNode):
-    """Plain text paragraph.
+    """Plain text paragraph with formula detection.
 
-    Simple text content that gets rendered as-is in LaTeX.
-    No inline math parsing yet - that's a future enhancement.
+    Text content that gets processed for inline math, operators, etc.
     """
 
     text: str  # The paragraph content
+
+
+@dataclass(frozen=True)
+class PureParagraph(ASTNode):
+    """Pure text paragraph with NO processing.
+
+    Raw text content with no formula detection, no operator conversion.
+    Only basic LaTeX character escaping is applied.
+    """
+
+    text: str  # The raw paragraph content
+
+
+@dataclass(frozen=True)
+class LatexBlock(ASTNode):
+    """Raw LaTeX passthrough block.
+
+    LaTeX code passed directly to output with NO escaping.
+    Use for custom LaTeX commands, environments, or formatting.
+    """
+
+    latex: str  # The raw LaTeX content
+
+
+@dataclass(frozen=True)
+class PageBreak(ASTNode):
+    """Page break in document.
+
+    Inserts a page break in the PDF output.
+    """
 
 
 # Type alias for document items (expressions or structural elements)
@@ -646,6 +675,9 @@ DocumentItem = (
     | Solution
     | Part
     | Paragraph
+    | PureParagraph
+    | LatexBlock
+    | PageBreak
     | TruthTable
     | EquivChain
     | GivenType

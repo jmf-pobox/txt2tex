@@ -1,8 +1,8 @@
 """Tests for logical formula detection in TEXT blocks (prose paragraphs)."""
 
+from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
-from txt2tex.latex_gen import LaTeXGenerator
 
 
 def test_simple_implication_formula():
@@ -10,15 +10,15 @@ def test_simple_implication_formula():
     text = """=== Test ===
 
 TEXT: The formula p => q is simple."""
-    
+
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     ast = parser.parse()
-    
+
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
-    
+
     assert r"$p \Rightarrow q$" in latex
     assert "is simple" in latex
 
@@ -28,15 +28,15 @@ def test_not_in_formula():
     text = """=== Test ===
 
 TEXT: The formula p => (not p => p) is a tautology."""
-    
+
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     ast = parser.parse()
-    
+
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
-    
+
     # Should be wrapped as one formula with not converted to \lnot
     assert r"$p \Rightarrow (\lnot p \Rightarrow p)$" in latex
     assert "is a tautology" in latex
@@ -47,15 +47,15 @@ def test_equivalence_formula():
     text = """=== Test ===
 
 TEXT: The statement (not p => not q) <=> (q => p) is true."""
-    
+
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     ast = parser.parse()
-    
+
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
-    
+
     # Should detect and parse the complete formula
     assert r"$\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$" in latex
     assert "is true" in latex
@@ -82,7 +82,7 @@ TEXT: The expression (p and q) => (p or q) is valid."""
 
 
 def test_not_in_prose_not_converted():
-    """Test that 'not' in English prose is NOT converted (when not followed by variable)."""
+    """Test 'not' in English prose not converted (not before variable)."""
     text = """=== Test ===
 
 TEXT: This is not relevant to the formula discussion."""
@@ -105,15 +105,15 @@ def test_standalone_not_variable():
     text = """=== Test ===
 
 TEXT: We assume not p and not q for this proof."""
-    
+
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     ast = parser.parse()
-    
+
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
-    
+
     # Standalone not p should be converted
     assert r"$\lnot p$" in latex
     assert r"$\lnot q$" in latex
@@ -125,15 +125,15 @@ def test_multiple_formulas_in_one_paragraph():
     text = """=== Test ===
 
 TEXT: First p => q and then q => r gives us p => r by transitivity."""
-    
+
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     ast = parser.parse()
-    
+
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
-    
+
     # Should detect all three formulas
     assert r"$p \Rightarrow q$" in latex
     assert r"$q \Rightarrow r$" in latex
@@ -167,15 +167,15 @@ def test_formula_stops_at_sentence_boundary():
     text = """=== Test ===
 
 TEXT: The formula p => q is valid for all values."""
-    
+
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     ast = parser.parse()
-    
+
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
-    
+
     # Should only capture "p => q", not continue past "is"
     assert r"$p \Rightarrow q$" in latex
     assert "is valid for all values" in latex
