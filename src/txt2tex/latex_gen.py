@@ -1802,15 +1802,15 @@ class LaTeXGenerator:
         return result
 
     def _generate_equiv_chain(self, node: EquivChain) -> list[str]:
-        """Generate LaTeX for equivalence chain using array environment.
+        r"""Generate LaTeX for equivalence chain using array environment.
 
         Uses standard LaTeX array{lll} instead of amsmath align* to avoid
-        package dependency. Wraps array in zed environment for proper spacing,
-        matching instructor's approach.
+        package dependency. Wraps array in display math \[...\] for proper
+        spacing without confusing fuzz type checker.
         """
         lines: list[str] = []
 
-        lines.append(r"\begin{zed}")
+        lines.append(r"\[")
         lines.append(r"\begin{array}{lll}")
 
         # Generate steps
@@ -1833,7 +1833,7 @@ class LaTeXGenerator:
             lines.append(line)
 
         lines.append(r"\end{array}")
-        lines.append(r"\end{zed}")
+        lines.append(r"\]")
         lines.append("")
 
         return lines
