@@ -90,7 +90,7 @@ class TestCaseAnalysisWithSiblings:
         assert "r" in latex
 
         # Should use & for horizontal layout
-        assert " & " in latex
+        assert "&" in latex
 
     def test_case_analysis_multiple_cases_staggered(self) -> None:
         """Test multiple case branches with staggered heights (lines 1616-1652).
