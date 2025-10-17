@@ -96,24 +96,24 @@ class TestConditionalLaTeX:
     def test_simple_conditional_latex(self):
         """Test if x > 0 then x else -x → LaTeX."""
         result = generate_latex("if x > 0 then x else -x")
-        assert r"\text{if }" in result
-        assert r"\text{ then }" in result
-        assert r"\text{ else }" in result
+        assert r"\mbox{if }" in result
+        assert r"\mbox{ then }" in result
+        assert r"\mbox{ else }" in result
         assert "x > 0" in result
         assert r"\lnot" in result or "-x" in result
 
     def test_conditional_empty_sequence_latex(self):
         """Test if s = <> then 0 else head s → LaTeX."""
         result = generate_latex("if s = <> then 0 else head s")
-        assert r"\text{if }" in result
+        assert r"\mbox{if }" in result
         assert r"s = \langle \rangle" in result
-        assert r"\text{ then } 0" in result
+        assert r"\mbox{ then } 0" in result
         assert r"\head" in result
 
     def test_conditional_with_arithmetic_latex(self):
         """Test if x > 0 then x * 2 else x - 1 → LaTeX."""
         result = generate_latex("if x > 0 then x * 2 else x - 1")
-        assert r"\text{if }" in result
+        assert r"\mbox{if }" in result
         assert "x > 0" in result
         assert "x * 2" in result or r"x \cdot 2" in result
         assert "x - 1" in result
@@ -122,15 +122,15 @@ class TestConditionalLaTeX:
         """Test nested conditional generates valid LaTeX."""
         result = generate_latex("if x > 0 then if x > 10 then 10 else x else 0")
         # Should have two sets of if/then/else
-        assert result.count(r"\text{if }") == 2
-        assert result.count(r"\text{ then }") == 2
-        assert result.count(r"\text{ else }") == 2
+        assert result.count(r"\mbox{if }") == 2
+        assert result.count(r"\mbox{ then }") == 2
+        assert result.count(r"\mbox{ else }") == 2
 
     def test_conditional_parenthesized(self):
         """Test that conditionals are wrapped in parentheses."""
         result = generate_latex("if x > 0 then x else -x")
         # The conditional should be wrapped in parentheses
-        assert result.startswith(r"(\text{if }")
+        assert result.startswith(r"(\mbox{if }")
         assert result.endswith(")")
 
 
@@ -167,7 +167,7 @@ class TestPhase16Integration:
         """Test abs(x) = if x > 0 then x else -x."""
         latex = generate_latex("abs(x) = if x > 0 then x else -x")
         assert "abs(x) =" in latex
-        assert r"\text{if }" in latex
+        assert r"\mbox{if }" in latex
 
     def test_conditional_in_sequence_pattern(self):
         """Test conditional in recursive sequence function."""
@@ -178,7 +178,7 @@ class TestPhase16Integration:
         assert isinstance(ast.right, Conditional)
 
         latex = generate_latex(text)
-        assert r"\text{if }" in latex
+        assert r"\mbox{if }" in latex
         assert r"s = \langle \rangle" in latex
         assert r"\head" in latex
         assert r"\tail" in latex
@@ -187,7 +187,7 @@ class TestPhase16Integration:
         """Test max(x, y) = if x > y then x else y."""
         latex = generate_latex("max(x, y) = if x > y then x else y")
         assert "max(x, y)" in latex
-        assert r"\text{if }" in latex
+        assert r"\mbox{if }" in latex
         assert "x > y" in latex
 
     def test_sign_function(self):
@@ -200,7 +200,7 @@ class TestPhase16Integration:
 
         latex = generate_latex(text)
         # Two nested conditionals
-        assert latex.count(r"\text{if }") == 2
+        assert latex.count(r"\mbox{if }") == 2
 
     def test_conditional_in_set_comprehension(self):
         """Test { x : N | pred . if x > 0 then x else 0 }."""
@@ -208,4 +208,4 @@ class TestPhase16Integration:
         # Should parse correctly - conditional in expression part
         latex = generate_latex(text)
         assert r"\{" in latex
-        assert r"\text{if }" in latex
+        assert r"\mbox{if }" in latex

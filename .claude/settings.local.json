@@ -65,7 +65,8 @@
       "Bash(timeout 5 hatch run test:*)",
       "Bash(pdfinfo:*)",
       "Bash(mktextfm:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(bash txt2pdf.sh:*)"
     ],
     "deny": [],
     "ask": []
