@@ -205,11 +205,11 @@ class TestPhase2LaTeXGeneration:
         lines = gen._generate_equiv_chain(equiv)
         latex = "\n".join(lines)
 
-        assert r"\begin{align*}" in latex
-        assert r"\end{align*}" in latex
+        assert r"\begin{array}{lll}" in latex
+        assert r"\end{array}" in latex
         assert r"p \land q" in latex
         assert r"&\Leftrightarrow q \land p" in latex
-        # Check that first line has \\ but last doesn't (before \end{align*})
+        # Check that first line has \\ but last doesn't (before \end{array})
         assert r"p \land q \\" in latex
         assert not latex.strip().endswith(r"\\")
 
@@ -250,10 +250,10 @@ class TestPhase2LaTeXGeneration:
         lines = gen._generate_equiv_chain(equiv)
         latex = "\n".join(lines)
 
-        assert r"\begin{align*}" in latex
-        assert r"\end{align*}" in latex
+        assert r"\begin{array}{lll}" in latex
+        assert r"\end{array}" in latex
         assert r"p \land q" in latex
-        assert r"&\Leftrightarrow q \land p & \hfill \text{[commutative]}" in latex
+        assert r"&\Leftrightarrow q \land p & [\mbox{commutative}]" in latex
 
     def test_generate_document_with_equiv_chain(self) -> None:
         """Test complete document generation with equivalence chain."""
@@ -282,11 +282,11 @@ class TestPhase2LaTeXGeneration:
 
         assert r"\documentclass[fleqn]{article}" in latex
         assert r"\usepackage{zed-cm}" in latex
-        assert r"\usepackage{amsmath}" in latex
-        assert r"\begin{align*}" in latex
+        assert r"\usepackage{amssymb}" in latex  # amsmath removed - using array
+        assert r"\begin{array}{lll}" in latex
         assert r"p \\" in latex
-        assert r"&\Leftrightarrow q & \hfill \text{[assumption]}" in latex
-        assert r"\end{align*}" in latex
+        assert r"&\Leftrightarrow q & [\mbox{assumption}]" in latex
+        assert r"\end{array}" in latex
         assert r"\end{document}" in latex
 
 
@@ -315,10 +315,10 @@ q and p [commutative]"""
         assert isinstance(ast, Document)
         assert len(ast.items) == 1
         assert isinstance(ast.items[0], EquivChain)
-        assert r"\begin{align*}" in latex
+        assert r"\begin{array}{lll}" in latex
         assert r"p \land q" in latex
-        assert r"&\Leftrightarrow q \land p & \hfill \text{[commutative]}" in latex
-        assert r"\end{align*}" in latex
+        assert r"&\Leftrightarrow q \land p & [\mbox{commutative}]" in latex
+        assert r"\end{array}" in latex
 
     def test_end_to_end_complex_equiv(self) -> None:
         """Test complete pipeline with complex equivalence chain."""
@@ -341,13 +341,13 @@ not p or not q [parentheses]"""
         assert len(equiv.steps) == 3
 
         # Check LaTeX output
-        assert r"\begin{align*}" in latex
+        assert r"\begin{array}{lll}" in latex
         assert r"\lnot" in latex
         assert r"\land" in latex
         assert r"\lor" in latex
-        assert r"\text{[De Morgan]}" in latex
-        assert r"\text{[parentheses]}" in latex
-        assert r"\end{align*}" in latex
+        assert r"[\mbox{De Morgan}]" in latex
+        assert r"[\mbox{parentheses}]" in latex
+        assert r"\end{array}" in latex
 
     def test_equiv_chain_mixed_with_expressions(self) -> None:
         """Test equivalence chain mixed with regular expressions."""
@@ -383,5 +383,5 @@ q or p [commutative]
         # Should have both left-aligned expressions and align* environment
         assert r"\noindent" in latex
         assert r"p \land q" in latex
-        assert r"\begin{align*}" in latex
+        assert r"\begin{array}{lll}" in latex
         assert r"\lnot p" in latex

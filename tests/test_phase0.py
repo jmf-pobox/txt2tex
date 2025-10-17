@@ -295,7 +295,7 @@ class TestLaTeXGenerator:
         assert r"\documentclass[fleqn]{article}" in doc
         assert r"\usepackage{zed-cm}" in doc
         assert r"\usepackage{zed-maths}" in doc
-        assert r"\usepackage{amsmath}" in doc
+        assert r"\usepackage{amssymb}" in doc  # amsmath removed - using array
         assert r"\begin{document}" in doc
         assert r"$p$" in doc
         assert r"\end{document}" in doc

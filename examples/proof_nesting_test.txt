@@ -1,0 +1,50 @@
+=== Proof Tree Nesting Depth Test ===
+
+** Test 1: Simple (depth 1) **
+
+PROOF:
+  p => q [=> intro from 1]
+    [1] p [assumption]
+    :: q [axiom]
+
+** Test 2: Moderate (depth 2) **
+
+PROOF:
+  p => (q => r) [=> intro from 1]
+    [1] p [assumption]
+    :: q => r [=> intro from 2]
+      [2] q [assumption]
+      :: r [axiom]
+
+** Test 3: Deep (depth 3) **
+
+PROOF:
+  p => (q => (r => s)) [=> intro from 1]
+    [1] p [assumption]
+    :: q => (r => s) [=> intro from 2]
+      [2] q [assumption]
+      :: r => s [=> intro from 3]
+        [3] r [assumption]
+        :: s [axiom]
+
+** Test 4: Very Deep (depth 4) **
+
+PROOF:
+  p => (q => (r => (s => t))) [=> intro from 1]
+    [1] p [assumption]
+    :: q => (r => (s => t)) [=> intro from 2]
+      [2] q [assumption]
+      :: r => (s => t) [=> intro from 3]
+        [3] r [assumption]
+        :: s => t [=> intro from 4]
+          [4] s [assumption]
+          :: t [axiom]
+
+** Test 5: Horizontal siblings (depth 2) **
+
+PROOF:
+  (p and q) => r [=> intro from 1]
+    [1] p and q [assumption]
+    :: r [and elim]
+      :: p [from 1]
+      :: q [from 1]

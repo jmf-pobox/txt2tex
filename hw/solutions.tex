@@ -1,6 +1,5 @@
 \documentclass[fleqn]{article}
 \usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}
-\usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{fuzz}
 \usepackage{zed-maths}
@@ -92,14 +91,13 @@ $p$ & $q$ & $r$ & $( p \Rightarrow r )$ & $( q \Rightarrow r )$ & $( ( p \Righta
 (a)
 \par
 \vspace{11pt}
-\vspace{-10pt}
-\begin{align*}
+\begin{array}{lll}
 & p \Rightarrow (\lnot p \Rightarrow p) \\
-&\Leftrightarrow p \Rightarrow \lnot \lnot p \lor p & \hfill \text{[$\Rightarrow$ disjunction]} \\
-&\Leftrightarrow p \Rightarrow p \lor p & \hfill \text{[$\lnot$ $\lnot$]} \\
-&\Leftrightarrow p \Rightarrow p & \hfill \text{[idempotence of p]} \\
-&\Leftrightarrow true & \hfill \text{[tautology]}
-\end{align*}
+&\Leftrightarrow p \Rightarrow \lnot \lnot p \lor p & [\mbox{$\Rightarrow$ disjunction}] \\
+&\Leftrightarrow p \Rightarrow p \lor p & [\mbox{$\lnot$ $\lnot$}] \\
+&\Leftrightarrow p \Rightarrow p & [\mbox{idempotence of p}] \\
+&\Leftrightarrow true & [\mbox{tautology}]
+\end{array}
 
 \bigskip
 
@@ -112,14 +110,13 @@ In this equivalence proof, we show that $p \Rightarrow (\lnot p \Rightarrow p)$ 
 (b)
 \par
 \vspace{11pt}
-\vspace{-10pt}
-\begin{align*}
+\begin{array}{lll}
 & \lnot p \Rightarrow \lnot q \\
-&\Leftrightarrow \lnot \lnot p \lor \lnot q & \hfill \text{[$\Rightarrow$ disjunction]} \\
-&\Leftrightarrow p \lor \lnot q & \hfill \text{[$\lnot$ $\lnot$]} \\
-&\Leftrightarrow \lnot q \lor p & \hfill \text{[commutativity of $\lor$]} \\
-&\Leftrightarrow q \Rightarrow p & \hfill \text{[$\Rightarrow$ disjunction]}
-\end{align*}
+&\Leftrightarrow \lnot \lnot p \lor \lnot q & [\mbox{$\Rightarrow$ disjunction}] \\
+&\Leftrightarrow p \lor \lnot q & [\mbox{$\lnot$ $\lnot$}] \\
+&\Leftrightarrow \lnot q \lor p & [\mbox{commutativity of $\lor$}] \\
+&\Leftrightarrow q \Rightarrow p & [\mbox{$\Rightarrow$ disjunction}]
+\end{array}
 
 \bigskip
 
@@ -132,16 +129,15 @@ In this equivalance proof, we show that $\lnot p \Rightarrow \lnot q \Leftrighta
 (c)
 \par
 \vspace{11pt}
-\vspace{-10pt}
-\begin{align*}
+\begin{array}{lll}
 & (p \Rightarrow r) \land (q \Rightarrow r) \\
-&\Leftrightarrow (\lnot p \lor r) \land (\lnot q \lor r) & \hfill \text{[$\Rightarrow$ disjunction]} \\
-&\Leftrightarrow (r \lor \lnot p) \land (r \lor \lnot q) & \hfill \text{[commutativity of $\lor$]} \\
-&\Leftrightarrow r \lor \lnot p \land \lnot q & \hfill \text{[distributivity 2]} \\
-&\Leftrightarrow \lnot p \land \lnot q \lor r & \hfill \text{[commutativity of $\lor$]} \\
-&\Leftrightarrow \lnot (p \lor q) \lor r & \hfill \text{[De Morgan]} \\
-&\Leftrightarrow p \lor q \Rightarrow r & \hfill \text{[$\Rightarrow$ disjunction]}
-\end{align*}
+&\Leftrightarrow (\lnot p \lor r) \land (\lnot q \lor r) & [\mbox{$\Rightarrow$ disjunction}] \\
+&\Leftrightarrow (r \lor \lnot p) \land (r \lor \lnot q) & [\mbox{commutativity of $\lor$}] \\
+&\Leftrightarrow r \lor \lnot p \land \lnot q & [\mbox{distributivity 2}] \\
+&\Leftrightarrow \lnot p \land \lnot q \lor r & [\mbox{commutativity of $\lor$}] \\
+&\Leftrightarrow \lnot (p \lor q) \lor r & [\mbox{De Morgan}] \\
+&\Leftrightarrow p \lor q \Rightarrow r & [\mbox{$\Rightarrow$ disjunction}]
+\end{array}
 
 \bigskip
 
@@ -162,8 +158,8 @@ In this equivalence proof, we show that (($p \Rightarrow r$) and ($q \Rightarrow
 \vspace{11pt}
 \noindent
 $\displaystyle
-\infer[$\Rightarrow$\text{-intro}^{[1]}]{p \Rightarrow (\lnot p \Rightarrow p)}{
-  \infer[$\Rightarrow$\text{-intro}^{[2]}]{\lnot p \Rightarrow p}{\ulcorner \lnot p \urcorner^{[2]} & \ulcorner p \urcorner^{[1]}}
+\infer[$\Rightarrow$\mbox{-intro}^{[1]}]{p \Rightarrow (\lnot p \Rightarrow p)}{
+  \infer[$\Rightarrow$\mbox{-intro}^{[2]}]{\lnot p \Rightarrow p}{\ulcorner \lnot p \urcorner^{[2]} & \ulcorner p \urcorner^{[1]}}
 }
 $
 
@@ -192,11 +188,11 @@ In one direction, we are seeking to prove (not $p => not$ q) $\Rightarrow$ $q \R
 
 \noindent
 $\displaystyle
-\infer[$\Rightarrow$\text{-intro}^{[1]}]{(\lnot p \Rightarrow \lnot q) \Rightarrow (q \Rightarrow p)}{
-  \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]} & \infer[$\Rightarrow$\text{-intro}^{[2]}]{q \Rightarrow p}{
-  \ulcorner q \urcorner^{[2]} & \infer[false\text{-elim}^{[3]}]{p}{
-  \infer[\text{false intro}]{false}{
-  \infer[\text{$\Rightarrow$ elim}]{\lnot q}{
+\infer[$\Rightarrow$\mbox{-intro}^{[1]}]{(\lnot p \Rightarrow \lnot q) \Rightarrow (q \Rightarrow p)}{
+  \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]} & \infer[$\Rightarrow$\mbox{-intro}^{[2]}]{q \Rightarrow p}{
+  \ulcorner q \urcorner^{[2]} & \infer[false\mbox{-elim}^{[3]}]{p}{
+  \infer[\mbox{false intro}]{false}{
+  \infer[\mbox{$\Rightarrow$ elim}]{\lnot q}{
   \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]} & \ulcorner \lnot p \urcorner^{[3]}
 } & \ulcorner q \urcorner^{[2]}
 }
@@ -213,11 +209,11 @@ and in the other, we are seeking to prove ($q \Rightarrow p$) $\Rightarrow$ (not
 
 \noindent
 $\displaystyle
-\infer[$\Rightarrow$\text{-intro}^{[1]}]{(q \Rightarrow p) \Rightarrow (\lnot p \Rightarrow \lnot q)}{
-  \ulcorner q \Rightarrow p \urcorner^{[1]} & \infer[$\Rightarrow$\text{-intro}^{[2]}]{\lnot p \Rightarrow \lnot q}{
-  \ulcorner \lnot p \urcorner^{[2]} & \infer[false\text{-elim}^{[3]}]{\lnot q}{
-  \infer[\text{false intro}]{false}{
-  \infer[\text{$\Rightarrow$ elim}]{p}{
+\infer[$\Rightarrow$\mbox{-intro}^{[1]}]{(q \Rightarrow p) \Rightarrow (\lnot p \Rightarrow \lnot q)}{
+  \ulcorner q \Rightarrow p \urcorner^{[1]} & \infer[$\Rightarrow$\mbox{-intro}^{[2]}]{\lnot p \Rightarrow \lnot q}{
+  \ulcorner \lnot p \urcorner^{[2]} & \infer[false\mbox{-elim}^{[3]}]{\lnot q}{
+  \infer[\mbox{false intro}]{false}{
+  \infer[\mbox{$\Rightarrow$ elim}]{p}{
   \ulcorner q \Rightarrow p \urcorner^{[1]} & \ulcorner q \urcorner^{[3]}
 } & \ulcorner \lnot p \urcorner^{[2]}
 }
@@ -234,7 +230,7 @@ We then combine these two proofs with the $\Leftrightarrow$-intro rule, using th
 
 \noindent
 $\displaystyle
-\infer[\text{$\Leftrightarrow$ intro}]{\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p}{
+\infer[\mbox{$\Leftrightarrow$ intro}]{\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p}{
   (\lnot p \Rightarrow \lnot q) \Rightarrow (q \Rightarrow p) & (q \Rightarrow p) \Rightarrow (\lnot p \Rightarrow \lnot q)
 }
 $
@@ -252,16 +248,16 @@ In one direction:
 
 \noindent
 $\displaystyle
-\infer[$\Rightarrow$\text{-intro}^{[1]}]{(p \Rightarrow r) \land (q \Rightarrow r) \Rightarrow (p \lor q \Rightarrow r)}{
-  \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]} & \infer[$\Rightarrow$\text{-intro}^{[2]}]{p \lor q \Rightarrow r}{
-  \ulcorner p \lor q \urcorner^{[2]} & \infer[$\lor$\text{-elim}^{[3]}]{r}{
-  \raiseproof{10ex}{\infer[$\land$\text{-elim-1}]{p \Rightarrow r}{
+\infer[$\Rightarrow$\mbox{-intro}^{[1]}]{(p \Rightarrow r) \land (q \Rightarrow r) \Rightarrow (p \lor q \Rightarrow r)}{
+  \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]} & \infer[$\Rightarrow$\mbox{-intro}^{[2]}]{p \lor q \Rightarrow r}{
+  \ulcorner p \lor q \urcorner^{[2]} & \infer[$\lor$\mbox{-elim}^{[3]}]{r}{
+  \raiseproof{10ex}{\infer[$\land$\mbox{-elim-1}]{p \Rightarrow r}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
-} & \infer[\text{$\Rightarrow$ elim}]{r}{
+} & \infer[\mbox{$\Rightarrow$ elim}]{r}{
   p \Rightarrow r & \ulcorner p \urcorner^{[3]}
-}} & \hskip 6em \raiseproof{26ex}{\infer[$\land$\text{-elim-2}]{q \Rightarrow r}{
+}} & \hskip 6em \raiseproof{26ex}{\infer[$\land$\mbox{-elim-2}]{q \Rightarrow r}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
-} & \infer[\text{$\Rightarrow$ elim}]{r}{
+} & \infer[\mbox{$\Rightarrow$ elim}]{r}{
   q \Rightarrow r & \ulcorner q \urcorner^{[3]}
 }}
 }

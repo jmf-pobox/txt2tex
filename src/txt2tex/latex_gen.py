@@ -217,10 +217,9 @@ class LaTeXGenerator:
         lines.append(
             r"\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}"
         )
-        # Load amsmath/amssymb BEFORE Z packages to avoid redefinition warnings
-        # Z packages will intentionally override \implies, \impliedby, \because
-        lines.append(r"\usepackage{amsmath}")
-        lines.append(r"\usepackage{amssymb}")  # For \mathbb
+        # Load amssymb for \mathbb{N} and \mathbb{Z} blackboard bold
+        # Note: amsmath removed - using array{lll} instead of align* for EQUIV
+        lines.append(r"\usepackage{amssymb}")  # For \mathbb{N} and \mathbb{Z}
         if self.use_fuzz:
             lines.append(r"\usepackage{fuzz}")  # Replaces zed-cm (fonts/styling)
         else:
@@ -849,17 +848,17 @@ class LaTeXGenerator:
         - if x > 0 then x else -x
         - if s = <> then 0 else head s
 
-        Rendered as: (\\text{if } condition \\text{ then } expr1 \\text{ else } expr2)
+        Rendered as: (\\mbox{if } condition \\mbox{ then } expr1 \\mbox{ else } expr2)
         """
         condition_latex = self.generate_expr(node.condition)
         then_latex = self.generate_expr(node.then_expr)
         else_latex = self.generate_expr(node.else_expr)
 
-        # Render as inline conditional with text keywords
+        # Render as inline conditional with mbox keywords (standard LaTeX)
         return (
-            f"(\\text{{if }} {condition_latex} "
-            f"\\text{{ then }} {then_latex} "
-            f"\\text{{ else }} {else_latex})"
+            f"(\\mbox{{if }} {condition_latex} "
+            f"\\mbox{{ then }} {then_latex} "
+            f"\\mbox{{ else }} {else_latex})"
         )
 
     def _generate_guarded_cases(self, node: GuardedCases) -> str:
@@ -870,18 +869,18 @@ class LaTeXGenerator:
           <x> ^ (premium_plays s) if user_status(x.2) = premium
           premium_plays s if user_status(x.2) = standard
 
-        Rendered as multi-line with alignment and \\text{if} guards:
+        Rendered as multi-line with alignment and \\mbox{if} guards:
           <x> ^ (premium_plays~s) \\\\
-          \\text{if } user_status(x.2) = premium \\\\
+          \\mbox{if } user_status(x.2) = premium \\\\
           premium_plays~s \\\\
-          \\text{if } user_status(x.2) = standard
+          \\mbox{if } user_status(x.2) = standard
         """
         lines: list[str] = []
         for branch in node.branches:
             expr_latex = self.generate_expr(branch.expression)
             guard_latex = self.generate_expr(branch.guard)
             lines.append(f"{expr_latex} \\\\")
-            lines.append(f"\\text{{if }} {guard_latex}")
+            lines.append(f"\\mbox{{if }} {guard_latex}")
             if branch != node.branches[-1]:  # Add line break between branches
                 lines.append("\\\\")
 
@@ -894,7 +893,7 @@ class LaTeXGenerator:
         """
         expr_latex = self.generate_expr(node.expression)
         guard_latex = self.generate_expr(node.guard)
-        return f"{expr_latex} \\text{{if }} {guard_latex}"
+        return f"{expr_latex} \\mbox{{if }} {guard_latex}"
 
     def _generate_section(self, node: Section) -> list[str]:
         """Generate LaTeX for section."""
@@ -1803,12 +1802,14 @@ class LaTeXGenerator:
         return result
 
     def _generate_equiv_chain(self, node: EquivChain) -> list[str]:
-        """Generate LaTeX for equivalence chain using align* environment."""
+        """Generate LaTeX for equivalence chain using array environment.
+
+        Uses standard LaTeX array{lll} instead of amsmath align* to avoid
+        package dependency. Format matches instructor's approach.
+        """
         lines: list[str] = []
 
-        # Compensate for align* automatic spacing (adds ~10px extra)
-        lines.append(r"\vspace{-10pt}")
-        lines.append(r"\begin{align*}")
+        lines.append(r"\begin{array}{lll}")
 
         # Generate steps
         for i, step in enumerate(node.steps):
@@ -1821,7 +1822,7 @@ class LaTeXGenerator:
             # Add justification if present (flush right)
             if step.justification:
                 escaped_just = self._escape_justification(step.justification)
-                line += r" & \hfill \text{[" + escaped_just + "]}"
+                line += r" & [\mbox{" + escaped_just + "}]"
 
             # Add line break except for last line
             if i < len(node.steps) - 1:
@@ -1829,7 +1830,7 @@ class LaTeXGenerator:
 
             lines.append(line)
 
-        lines.append(r"\end{align*}")
+        lines.append(r"\end{array}")
         lines.append("")
 
         return lines
@@ -2417,7 +2418,7 @@ class LaTeXGenerator:
         # For each case, generate the proof steps
         # Cases are typically rendered as separate inference branches
         if not case.steps:
-            return f"\\text{{case {case.case_name}}}"
+            return f"\\mbox{{case {case.case_name}}}"
 
         # Generate the first step (usually the conclusion of this case)
         # In many cases, there's just one step per case
@@ -2490,7 +2491,7 @@ class LaTeXGenerator:
             op_latex = re.sub(r"\bnot\b", r"$\\lnot$", op_latex)
 
             # Format as: operator-rule^{[label]}
-            return f"{op_latex}\\text{{-{rule_name}}}^{{[{label_num}]}}"
+            return f"{op_latex}\\mbox{{-{rule_name}}}^{{[{label_num}]}}"
 
         # Check for rule subscript pattern: "operator rule N" (like "and elim 1")
         # Match: operator + rule name + number (1 or 2)
@@ -2510,7 +2511,7 @@ class LaTeXGenerator:
             op_latex = re.sub(r"\bnot\b", r"$\\lnot$", op_latex)
 
             # Format as: operator-rule-number (just regular text, no subscript)
-            return f"{op_latex}\\text{{-{rule_name}-{subscript_num}}}"
+            return f"{op_latex}\\mbox{{-{rule_name}-{subscript_num}}}"
 
         # No special pattern - process normally
         # Replace logical operators with LaTeX symbols
@@ -2520,8 +2521,8 @@ class LaTeXGenerator:
         result = re.sub(r"\bor\b", r"\\lor", result)
         result = re.sub(r"\bnot\b", r"\\lnot", result)
 
-        # Wrap text parts in \text{}
-        # If it contains "elim", "intro", "assumption", etc., wrap in \text{}
+        # Wrap text parts in \mbox{} (standard LaTeX)
+        # If it contains "elim", "intro", "assumption", etc., wrap in \mbox{}
         if any(
             word in result
             for word in [
@@ -2541,6 +2542,6 @@ class LaTeXGenerator:
             result = result.replace(r"\lnot", r"$\lnot$")
             result = result.replace(r"\Rightarrow", r"$\Rightarrow$")
             result = result.replace(r"\Leftrightarrow", r"$\Leftrightarrow$")
-            return r"\text{" + result + "}"
+            return r"\mbox{" + result + "}"
 
         return result
