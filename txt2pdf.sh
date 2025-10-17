@@ -88,16 +88,28 @@ else
     STEP_NUM="2/2"
 fi
 
-# Step 3: Compile to PDF
-echo "Step ${STEP_NUM}: Compiling PDF..."
+# Step 3: Copy LaTeX dependencies locally
+echo "Step ${STEP_NUM}: Preparing LaTeX dependencies..."
 
-# Determine tex package directory (relative to script dir)
-TEX_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)/tex"
+# Copy LaTeX packages and METAFONT sources to build directory
+# This makes the LaTeX self-contained and portable
+cp "${SCRIPT_DIR}/latex"/*.sty "$INPUT_DIR/" 2>/dev/null || true
+cp "${SCRIPT_DIR}/latex"/*.mf "$INPUT_DIR/" 2>/dev/null || true
+
+echo "  → LaTeX dependencies copied locally"
+
+# Step 4: Compile to PDF
+COMPILE_STEP=$((${STEP_NUM%%/*} + 1))
+if [ -n "$FUZZ_FLAG" ]; then
+    echo "Step ${COMPILE_STEP}/4: Compiling PDF..."
+else
+    echo "Step ${COMPILE_STEP}/3: Compiling PDF..."
+fi
 
 # pdflatex may return non-zero even on success (warnings), so check PDF creation instead
-# Include both local latex/ and fuzz location in TEXINPUTS and MFINPUTS
+# No TEXINPUTS/MFINPUTS needed - files are local
 set +e  # Temporarily disable exit on error
-cd "$INPUT_DIR" && TEXINPUTS="${SCRIPT_DIR}/latex//:${TEX_DIR}//:" MFINPUTS="${SCRIPT_DIR}/latex//:${TEX_DIR}//:" pdflatex -interaction=nonstopmode "${INPUT_BASE}.tex" > "${INPUT_BASE}.pdflatex.log" 2>&1
+cd "$INPUT_DIR" && pdflatex -interaction=nonstopmode "${INPUT_BASE}.tex" > "${INPUT_BASE}.pdflatex.log" 2>&1
 PDFLATEX_EXIT=$?
 set -e  # Re-enable exit on error
 
