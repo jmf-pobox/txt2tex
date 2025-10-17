@@ -627,7 +627,7 @@ class Lexer:
             self._advance()  # Consume ':'
 
             # Skip any whitespace after the colon
-            while self._current_char() in " \t":
+            while not self._at_end() and self._current_char() in " \t":
                 self._advance()
 
             # Capture the rest of the line as raw text (don't tokenize)
@@ -639,6 +639,47 @@ class Lexer:
             text_content = self.text[text_start : self.pos]
 
             return Token(TokenType.TEXT, text_content, start_line, start_column)
+
+        # Check for PURETEXT: keyword - capture rest of line as completely raw text
+        if value == "PURETEXT" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+
+            # Skip any whitespace after the colon
+            while not self._at_end() and self._current_char() in " \t":
+                self._advance()
+
+            # Capture the rest of the line as raw text (don't tokenize)
+            text_start = self.pos
+            while not self._at_end() and self._current_char() != "\n":
+                self._advance()
+
+            # Extract the raw text content
+            text_content = self.text[text_start : self.pos]
+
+            return Token(TokenType.PURETEXT, text_content, start_line, start_column)
+
+        # Check for LATEX: keyword - capture rest of line as raw LaTeX (no escaping)
+        if value == "LATEX" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+
+            # Skip any whitespace after the colon
+            while not self._at_end() and self._current_char() in " \t":
+                self._advance()
+
+            # Capture the rest of the line as raw LaTeX (don't tokenize)
+            text_start = self.pos
+            while not self._at_end() and self._current_char() != "\n":
+                self._advance()
+
+            # Extract the raw LaTeX content
+            text_content = self.text[text_start : self.pos]
+
+            return Token(TokenType.LATEX, text_content, start_line, start_column)
+
+        # Check for PAGEBREAK: keyword
+        if value == "PAGEBREAK" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+            return Token(TokenType.PAGEBREAK, "PAGEBREAK:", start_line, start_column)
 
         # Phase 20: Auto-detect prose paragraphs BEFORE keyword checks
         # Phase 24: Also detect prose after part labels (any column)

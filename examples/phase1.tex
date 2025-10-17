@@ -1,8 +1,8 @@
-\documentclass{article}
-\usepackage{zed-cm}
-\usepackage{zed-maths}
-\usepackage{zed-proof}
+\documentclass[fleqn]{article}
+\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}
+\usepackage{fuzz}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \begin{document}
 
 \section*{Propositional Logic}
@@ -13,70 +13,58 @@
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-$p \land q \Rightarrow p$
+\noindent
+\hangindent=2em
+(a) $p \land q \Rightarrow p$
 
 \medskip
-
 (b)
 \par
 \vspace{11pt}
-\begin{center}
-\begin{tabular}{c c c}
-$p$ & $q$ & $p \Rightarrow q$ \\
+\begin{tabular}{c|c|c}
+$p$ & $q$ & $\mathbf{p \Rightarrow q}$ \\
 \hline
-t & t & t \\
-t & f & f \\
-f & t & t \\
-f & f & t \\
+\textit{t} & \textit{t} & \textbf{t} \\
+\textit{t} & \textit{f} & \textbf{f} \\
+\textit{f} & \textit{t} & \textbf{t} \\
+\textit{f} & \textit{f} & \textbf{t} \\
 \end{tabular}
-\end{center}
 
 \medskip
 
-(c)
-\par
-\vspace{11pt}
-$\lnot (p \land q) \Leftrightarrow \lnot p \lor \lnot q$
+\noindent
+\hangindent=2em
+(c) $\lnot (p \land q) \Leftrightarrow \lnot p \lor \lnot q$
 
 \medskip
-
 \bigskip
 \noindent
 \textbf{Solution 2}
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-$(p \lor q) \land r \Leftrightarrow p \land r \lor q \land r$
+\noindent
+\hangindent=2em
+(a) $(p \lor q) \land r \Leftrightarrow p \land r \lor q \land r$
 
 \medskip
-
 (b)
 \par
 \vspace{11pt}
-\begin{center}
-\begin{tabular}{c c c}
-$p$ & $q$ & $p \Leftrightarrow q$ \\
+\begin{tabular}{c|c|c}
+$p$ & $q$ & $\mathbf{p \Leftrightarrow q}$ \\
 \hline
-t & t & t \\
-t & f & f \\
-f & t & f \\
-f & f & t \\
+\textit{t} & \textit{t} & \textbf{t} \\
+\textit{t} & \textit{f} & \textbf{f} \\
+\textit{f} & \textit{t} & \textbf{f} \\
+\textit{f} & \textit{f} & \textbf{t} \\
 \end{tabular}
-\end{center}
 
 \medskip
 
-(c)
-\par
-\vspace{11pt}
-$(p \Rightarrow q) \Rightarrow r$
+\noindent
+\hangindent=2em
+(c) $p \Rightarrow (q \Rightarrow r)$
 
 \medskip
-
 \end{document}

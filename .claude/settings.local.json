@@ -60,7 +60,12 @@
       "Bash(sed:*)",
       "Bash(do)",
       "Bash(head -20 echo \"\" echo \"=== Solution 9 (a) ===\")",
-      "Bash(TEXINPUTS=../latex//: pdflatex:*)"
+      "Bash(TEXINPUTS=../latex//: pdflatex:*)",
+      "Bash(xxd:*)",
+      "Bash(timeout 5 hatch run test:*)",
+      "Bash(pdfinfo:*)",
+      "Bash(mktextfm:*)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []

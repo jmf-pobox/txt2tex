@@ -22,10 +22,10 @@ PDF_FILES := $(TXT_FILES:.txt=.pdf)
 .PHONY: all
 all: $(PDF_FILES)
 
-# Pattern rule: .txt -> .pdf (via txt2pdf.sh script)
+# Pattern rule: .txt -> .pdf (via txt2pdf.sh script with --fuzz option)
 %.pdf: %.txt ../txt2pdf.sh
 	@echo "Building $@..."
-	@../txt2pdf.sh $< > /dev/null 2>&1 || (echo "Error building $@"; exit 1)
+	@../txt2pdf.sh $< --fuzz > /dev/null 2>&1 || (echo "Error building $@"; exit 1)
 
 # Main solutions file
 .PHONY: solutions
@@ -36,7 +36,8 @@ solutions: solutions.pdf
 clean:
 	@echo "Cleaning generated files..."
 	@rm -f $(TEX_FILES) $(PDF_FILES)
-	@rm -f *.aux *.log *.pdflatex.log
+	@rm -f *.aux *.log *.pdflatex.log *.fuzz.log
+	@rm -f *.tfm *.pk *.gf *.600pk *.600gf
 	@echo "Done."
 
 # List all available targets

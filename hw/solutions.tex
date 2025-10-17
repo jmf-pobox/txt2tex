@@ -1,6 +1,6 @@
 \documentclass[fleqn]{article}
 \usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}
-\usepackage{zed-cm}
+\usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \usepackage{amsmath}
@@ -8,6 +8,12 @@
 \begin{document}
 
 \section*{Propositional Logic}
+
+\bigskip
+
+N.B. Many answers leverage the grammar's order of precedence (not, and, or, $\Rightarrow$, $\Leftrightarrow$) rather than pedagogical or clarifying parenthesis.
+
+\bigskip
 
 \bigskip
 \noindent
@@ -27,7 +33,7 @@ $p$ & $\lnot p$ & $( \lnot p \Rightarrow p )$ & $\mathbf{p \Rightarrow ( \lnot p
 
 \bigskip
 
-$p \Rightarrow (\lnot p \Rightarrow p)$ is a tautology as it is true for every interpretation as illustrated by the final column of truth values.
+$p \Rightarrow (\lnot p \Rightarrow p)$ is a tautology as it is true for every interpretation of p as illustrated by the final column of truth values.
 
 \bigskip
 
@@ -47,7 +53,7 @@ $p$ & $q$ & $( q \Rightarrow p )$ & $\lnot p$ & $\lnot q$ & $( \lnot p \Rightarr
 
 \bigskip
 
-$\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$ is a tautology as it is true for every interpretation of its constituent parts as illustrated by the final column of truth values.
+$\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$ is a tautology as it is true for every interpretation of p, q as illustrated by the final column of truth values.
 
 \bigskip
 
@@ -71,7 +77,7 @@ $p$ & $q$ & $r$ & $( p \Rightarrow r )$ & $( q \Rightarrow r )$ & $( ( p \Righta
 
 \bigskip
 
-(($p \Rightarrow r$) and ($q \Rightarrow r$)) $\Leftrightarrow$ ((p or q) $\Rightarrow$ r) is a tautology as it is true for every interpretation of its constituent parts as illustrated by the final column of truth values.
+(($p \Rightarrow r$) and ($q \Rightarrow r$)) $\Leftrightarrow$ ((p or q) $\Rightarrow$ r) is a tautology as it is true for every interpretation of p, q, r as illustrated by the final column of truth values.
 
 \bigskip
 
@@ -97,7 +103,7 @@ $p$ & $q$ & $r$ & $( p \Rightarrow r )$ & $( q \Rightarrow r )$ & $( ( p \Righta
 
 \bigskip
 
-In this equivalence proof, we show that $p \Rightarrow (\lnot p \Rightarrow p)$ by using implication disjunction, the definition of double negation, the application of the idempotence rule and the definition of true.
+In this equivalence proof, we show that $p \Rightarrow (\lnot p \Rightarrow p)$ by using implication disjunction to replace the implication with a logical or, the definition of double negation to simplify, the application of the idempotence rule to simplify, and the fact that $p \Rightarrow p$ is a tautology. 
 
 \bigskip
 
@@ -117,7 +123,7 @@ In this equivalence proof, we show that $p \Rightarrow (\lnot p \Rightarrow p)$ 
 
 \bigskip
 
-In this equivalance proof, we show that $\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$ by using implication disjunction, the distributivity 2 rule, and the commutitivity of logical or. 
+In this equivalance proof, we show that $\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$ by using implication disjunction to replace implication with logical or, the definition of double negation to simplify, the commutivity property of logical or to change the order of the elements, and the implication disjunction rule to reintroduce implication.
 
 \bigskip
 
@@ -130,10 +136,18 @@ In this equivalance proof, we show that $\lnot p \Rightarrow \lnot q \Leftrighta
 \begin{align*}
 & (p \Rightarrow r) \land (q \Rightarrow r) \\
 &\Leftrightarrow (\lnot p \lor r) \land (\lnot q \lor r) & \hfill \text{[$\Rightarrow$ disjunction]} \\
-&\Leftrightarrow r \land (\lnot p \lor \lnot q) & \hfill \text{[distributivity 2]} \\
-&\Leftrightarrow (\lnot p \lor \lnot q) \land r & \hfill \text{[associativity of $\lor$]} \\
-&\Leftrightarrow p \lor q \Rightarrow r
+&\Leftrightarrow (r \lor \lnot p) \land (r \lor \lnot q) & \hfill \text{[commutativity of $\lor$]} \\
+&\Leftrightarrow r \lor \lnot p \land \lnot q & \hfill \text{[distributivity 2]} \\
+&\Leftrightarrow \lnot p \land \lnot q \lor r & \hfill \text{[commutativity of $\lor$]} \\
+&\Leftrightarrow \lnot (p \lor q) \lor r & \hfill \text{[De Morgan]} \\
+&\Leftrightarrow p \lor q \Rightarrow r & \hfill \text{[$\Rightarrow$ disjunction]}
 \end{align*}
+
+\bigskip
+
+In this equivalence proof, we show that (($p \Rightarrow r$) and ($q \Rightarrow r$)) $\Leftrightarrow$ (p or q) $\Rightarrow$ r by using the implication disjunction rule to replace implication with logical or, the commutativity of or rule to change the order of the elements, the distributivity 2 rule to extract r, and the commutivity of logical or to change the order of the elements, De Morgan to extract negation for ($\lnot p$ and $\lnot q$), and the implication disjunction rule to reintroduce implication.
+
+\bigskip
 
 \medskip
 
@@ -153,6 +167,12 @@ $\displaystyle
 }
 $
 
+\bigskip
+
+In this proof, we assume p, assume $\lnot p$, use the implication introduction rule to arrive at not $p \Rightarrow p$ and to discharge $\lnot p$ as an assumption, use the implication introduction rule to arrive at p $\Rightarrow$ (not $p \Rightarrow p$) and to discharge the p assumption.
+
+\bigskip
+
 \medskip
 
 (b)
@@ -160,7 +180,13 @@ $
 \vspace{11pt}
 \bigskip
 
-In one direction:
+This proof involves equivalence or bi-implication, which requires us to show $p \Rightarrow q$ and $q \Rightarrow p$ given this is the definition of $p \Leftrightarrow q$.
+
+\bigskip
+
+\bigskip
+
+In one direction, we are seeking to prove (not $p => not$ q) $\Rightarrow$ $q \Rightarrow p$:
 
 \bigskip
 
@@ -181,7 +207,7 @@ $
 
 \bigskip
 
-and the other:
+and in the other, we are seeking to prove ($q \Rightarrow p$) $\Rightarrow$ (not $p => not$ q):
 
 \bigskip
 
@@ -202,7 +228,7 @@ $
 
 \bigskip
 
-We then combine these two proofs with the $\Leftrightarrow$-intro rule, using the results from above as premises.
+We then combine these two proofs with the $\Leftrightarrow$-intro rule, using the results from above:
 
 \bigskip
 
@@ -243,6 +269,130 @@ $\displaystyle
 }
 $
 
+\newpage
+
 \medskip
+
+\section*{Bibliography}
+
+\bigskip
+
+Course Notes
+
+\bigskip
+
+\bigskip
+
+Simpson A n.d. From Discrete Mathematics to State-Based Models SEM version. University of Oxford Department of Computer Science. Unpublished course notes.
+
+\bigskip
+
+\bigskip
+
+Primary Textbook
+
+\bigskip
+
+\bigskip
+
+Woodcock J. and Davies J. 1996 Using Z Specification Refinement and Proof. Upper Saddle River NJ Prentice Hall.
+
+\bigskip
+
+\bigskip
+
+Lecture Slides
+
+\bigskip
+
+\bigskip
+
+Simpson A 2025a Lecture schedule. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 00.
+
+\bigskip
+
+\bigskip
+
+Simpson A 2025b Introduction and propositions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 01.
+
+\bigskip
+
+\bigskip
+
+Simpson A 2025c Predicate logic and equality. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 02.
+
+\bigskip
+
+\bigskip
+
+Simpson A 2025d Deductive proofs. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 03.
+
+\bigskip
+
+\bigskip
+
+Simpson A 2025e Sets types and definitions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 04.
+
+\bigskip
+
+\bigskip
+
+Simpson A 2025f Relations. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 05.
+
+\bigskip
+
+\bigskip
+
+Simpson A 2025g Functions and sequences. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 06.
+
+\bigskip
+
+\bigskip
+
+Simpson A 2025h Free types and induction. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 07.
+
+\bigskip
+
+\bigskip
+
+Course Materials
+
+\bigskip
+
+\bigskip
+
+Simpson A 2025i Exercises for Software Engineering Mathematics. University of Oxford Department of Computer Science. Unpublished course materials.
+
+\bigskip
+
+\bigskip
+
+Simpson A 2025j Solutions for Software Engineering Mathematics. University of Oxford Department of Computer Science. Unpublished course materials.
+
+\bigskip
+
+\bigskip
+
+Additional References from Course Materials
+
+\bigskip
+
+\bigskip
+
+Abrial J-R 1996 The B-Book Assigning Meanings to Programs. Cambridge Cambridge University Press.
+
+\bigskip
+
+\bigskip
+
+Simpson A.C. 2002 Discrete Mathematics by Example. London McGraw-Hill.
+
+\bigskip
+
+\bigskip
+
+Spivey J.M. 1992 The Z Notation A Reference Manual. Upper Saddle River NJ Prentice Hall.
+
+\bigskip
 
 \end{document}

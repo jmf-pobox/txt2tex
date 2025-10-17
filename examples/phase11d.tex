@@ -1,8 +1,8 @@
-\documentclass{article}
-\usepackage{zed-cm}
-\usepackage{zed-maths}
-\usepackage{zed-proof}
+\documentclass[fleqn]{article}
+\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}
+\usepackage{fuzz}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \begin{document}
 
 \section*{Phase 11 d : Lambda Expressions}
@@ -22,7 +22,9 @@ Simple lambda expression
 
 \bigskip
 
-$\lambda x : N \bullet x^2$
+\noindent
+$\lambda x : \mathbb{N} \bullet x^2$
+
 
 \medskip
 
@@ -35,7 +37,9 @@ Multi-variable lambda
 
 \bigskip
 
-$\lambda x, y : N \bullet x \land y$
+\noindent
+$\lambda x, y : \mathbb{N} \bullet x \land y$
+
 
 \medskip
 
@@ -48,7 +52,9 @@ Lambda with comparison
 
 \bigskip
 
-$\lambda x : N \bullet x > 0$
+\noindent
+$\lambda x : \mathbb{N} \bullet x > 0$
+
 
 \medskip
 
@@ -61,7 +67,9 @@ Nested lambda expression
 
 \bigskip
 
+\noindent
 $\lambda x : X \bullet \lambda y : Y \bullet x \land y$
+
 
 \medskip
 
@@ -74,7 +82,9 @@ Lambda with quantifier in body
 
 \bigskip
 
-$\lambda x : X \bullet \forall y \colon Y \bullet x \lor y$
+\noindent
+$\lambda x : X \bullet \forall y : Y \spot x \lor y$
+
 
 \medskip
 

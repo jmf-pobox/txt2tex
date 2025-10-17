@@ -1,5 +1,7 @@
 === Propositional Logic ===
 
+TEXT: N.B. Many answers leverage the grammar's order of precedence (not, and, or, =>, <=>) rather than pedagogical or clarifying parenthesis.
+
 ** Question 1 **
 
 (a) TRUTH TABLE:                                                                            
@@ -7,7 +9,7 @@ p | not p | (not p => p) | p => (not p => p)
 T | F | T | T                                  
 F | T | F | T
 
-TEXT: p => (not p => p) is a tautology as it is true for every interpretation as illustrated by the final column of truth values.
+TEXT: p => (not p => p) is a tautology as it is true for every interpretation of p as illustrated by the final column of truth values.
 
 
 (b) TRUTH TABLE:                                                                            
@@ -17,7 +19,7 @@ t | f | t | f | t | t | t
 f | t | f | t | f | f | t
 f | f | t | t | t | t | t
 
-TEXT: (not p =>  not q) <=> (q => p) is a tautology as it is true for every interpretation of its constituent parts as illustrated by the final column of truth values.
+TEXT: (not p =>  not q) <=> (q => p) is a tautology as it is true for every interpretation of p, q as illustrated by the final column of truth values.
 
 (c) TRUTH TABLE:
 p | q | r | (p => r) | (q => r) | ((p =>r) and (q => r)) | (p or q) | ((p or q) => r) | <=>
@@ -30,7 +32,7 @@ f | t | f | t | f | f | t | f | t
 f | f | t | t | t | t | f | t | t
 f | f | f | t | t | t | f | t | t
 
-TEXT: ((p => r) and (q => r)) <=> ((p or q) => r) is a tautology as it is true for every interpretation of its constituent parts as illustrated by the final column of truth values.
+TEXT: ((p => r) and (q => r)) <=> ((p or q) => r) is a tautology as it is true for every interpretation of p, q, r as illustrated by the final column of truth values.
 
 ** Question 2 **
 
@@ -41,7 +43,7 @@ p => (p or p) [not not]
 p => p [idempotence of p]
 true [tautology]
 
-TEXT: In this equivalence proof, we show that p => (not p => p) by using implication disjunction, the definition of double negation, the application of the idempotence rule and the definition of true.
+TEXT: In this equivalence proof, we show that p => (not p => p) by using implication disjunction to replace the implication with a logical or, the definition of double negation to simplify, the application of the idempotence rule to simplify, and the fact that p => p is a tautology. 
 
 (b) EQUIV:
 (not p => not q)
@@ -50,14 +52,18 @@ TEXT: In this equivalence proof, we show that p => (not p => p) by using implica
 (not q or p) [commutativity of or]
 q => p [=> disjunction]
 
-TEXT: In this equivalance proof, we show that (not p => not q) <=> q => p by using implication disjunction, the distributivity 2 rule, and the commutitivity of logical or. 
+TEXT: In this equivalance proof, we show that (not p => not q) <=> q => p by using implication disjunction to replace implication with logical or, the definition of double negation to simplify, the commutivity property of logical or to change the order of the elements, and the implication disjunction rule to reintroduce implication.
 
 (c) EQUIV:
 ((p => r) and (q => r))
-(not p or r) and (not q or r) [=> disjunction]
-r and (not p or not q) [distributivity 2]
-(not p or not q) and r [associativity of or]
-(p or q) => r
+((not p or r) and (not q or r)) [=> disjunction]
+(r or not p) and (r or not q) [commutativity of or]
+r or (not p and not q) [distributivity 2]
+(not p and not q) or r [commutativity of or]
+not (p or q) or r [De Morgan]
+p or q => r [=> disjunction]
+
+TEXT: In this equivalence proof, we show that ((p => r) and (q => r)) <=> (p or q) => r by using the implication disjunction rule to replace implication with logical or, the commutativity of or rule to change the order of the elements, the distributivity 2 rule to extract r, and the commutivity of logical or to change the order of the elements, De Morgan to extract negation for (not p and not q), and the implication disjunction rule to reintroduce implication.
 
 ** Question 3 **
 
@@ -68,9 +74,13 @@ r and (not p or not q) [distributivity 2]
           [2] not p [assumption]
           :: p [from 1]
 
+TEXT: In this proof, we assume p, assume not p, use the implication introduction rule to arrive at not p => p and to discharge not p as an assumption, use the implication introduction rule to arrive at p => (not p => p) and to discharge the p assumption.
+
 (b) 
 
-TEXT: In one direction:
+TEXT: This proof involves equivalence or bi-implication, which requires us to show p => q and q => p given this is the definition of p <=> q.
+
+TEXT: In one direction, we are seeking to prove (not p => not q) => q => p:
 
 PROOF:
   (not p => not q) => (q => p) [=> intro from 1]
@@ -84,7 +94,7 @@ PROOF:
             [3] not p [assumption]
           :: q [from 2]
 
-TEXT: and the other:
+TEXT: and in the other, we are seeking to prove (q => p) => (not p => not q):
 
 PROOF:
   (q => p) => (not p => not q) [=> intro from 1]
@@ -98,7 +108,7 @@ PROOF:
             [3] q [assumption]
           :: not p [from 2]
 
-TEXT: We then combine these two proofs with the <=>-intro rule, using the results from above as premises.
+TEXT: We then combine these two proofs with the <=>-intro rule, using the results from above:
 
 PROOF:
   (not p => not q) <=> (q => p) [<=> intro]
@@ -128,4 +138,46 @@ PROOF:
             :: q => r [from above]
             [3] q [assumption]
 
+PAGEBREAK:
 
+=== Bibliography ===
+
+TEXT: Course Notes
+
+TEXT: Simpson A n.d. From Discrete Mathematics to State-Based Models SEM version. University of Oxford Department of Computer Science. Unpublished course notes.
+
+TEXT: Primary Textbook
+
+TEXT: Woodcock J. and Davies J. 1996 Using Z Specification Refinement and Proof. Upper Saddle River NJ Prentice Hall.
+
+TEXT: Lecture Slides
+
+TEXT: Simpson A 2025a Lecture schedule. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 00.
+
+TEXT: Simpson A 2025b Introduction and propositions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 01.
+
+TEXT: Simpson A 2025c Predicate logic and equality. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 02.
+
+TEXT: Simpson A 2025d Deductive proofs. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 03.
+
+TEXT: Simpson A 2025e Sets types and definitions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 04.
+
+TEXT: Simpson A 2025f Relations. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 05.
+
+TEXT: Simpson A 2025g Functions and sequences. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 06.
+
+TEXT: Simpson A 2025h Free types and induction. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 07.
+
+TEXT: Course Materials
+
+TEXT: Simpson A 2025i Exercises for Software Engineering Mathematics. University of Oxford Department of Computer Science. Unpublished course materials.
+
+TEXT: Simpson A 2025j Solutions for Software Engineering Mathematics. University of Oxford Department of Computer Science. Unpublished course materials.
+
+TEXT: Additional References from Course Materials
+
+TEXT: Abrial J-R 1996 The B-Book Assigning Meanings to Programs. Cambridge Cambridge University Press.
+
+TEXT: Simpson A.C. 2002 Discrete Mathematics by Example. London McGraw-Hill.
+
+TEXT: Spivey J.M. 1992 The Z Notation A Reference Manual. Upper Saddle River NJ Prentice Hall.

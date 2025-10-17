@@ -1,8 +1,8 @@
-\documentclass{article}
-\usepackage{zed-cm}
-\usepackage{zed-maths}
-\usepackage{zed-proof}
+\documentclass[fleqn]{article}
+\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}
+\usepackage{fuzz}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \begin{document}
 
 \bigskip
@@ -23,7 +23,9 @@ The relational image R(| S |) gives the image of set S under relation R.
 
 \medskip
 
+\noindent
 $R(\limg S \rimg)$
+
 
 \bigskip
 \noindent
@@ -31,7 +33,9 @@ $R(\limg S \rimg)$
 
 \medskip
 
+\noindent
 $R(\limg \{1, 2, 3\} \rimg)$
+
 
 \bigskip
 \noindent
@@ -39,7 +43,9 @@ $R(\limg \{1, 2, 3\} \rimg)$
 
 \medskip
 
+\noindent
 $parentOf(\limg \{john\} \rimg)$
+
 
 \bigskip
 \noindent
@@ -47,7 +53,9 @@ $parentOf(\limg \{john\} \rimg)$
 
 \medskip
 
+\noindent
 $R \circ S(\limg A \rimg)$
+
 
 \bigskip
 \noindent
@@ -55,7 +63,9 @@ $R \circ S(\limg A \rimg)$
 
 \medskip
 
+\noindent
 $R^{-1}(\limg S \rimg)$
+
 
 \bigskip
 \noindent
@@ -63,7 +73,9 @@ $R^{-1}(\limg S \rimg)$
 
 \medskip
 
-$\{ p \colon Person \mid p \in \dom parentOf \bullet (p, parentOf(\limg \{p\} \rimg)) \}$
+\noindent
+$\{ p : Person | p \in \dom parentOf \spot (p, parentOf(\limg \{p\} \rimg)) \}$
+
 
 \bigskip
 \noindent
@@ -71,6 +83,8 @@ $\{ p \colon Person \mid p \in \dom parentOf \bullet (p, parentOf(\limg \{p\} \r
 
 \medskip
 
+\noindent
 $R(\limg S \rimg)(\limg T \rimg)$
+
 
 \end{document}
