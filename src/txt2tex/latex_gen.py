@@ -1688,17 +1688,17 @@ class LaTeXGenerator:
         lines.append(" & ".join(header_parts) + r" \\")
         lines.append(r"\hline")
 
-        # Generate data rows (lowercase t/f in text mode, last column in bold)
+        # Generate data rows (lowercase t/f in italic, last column in bold non-italic)
         for row in node.rows:
             row_parts = []
             for i, val in enumerate(row):
                 # Lowercase t/f for truth values
                 cell = val.lower() if val in ("T", "F") else val
-                # Last column in bold
+                # Last column in bold (no italic), others in italic
                 if i == len(row) - 1:
                     row_parts.append(r"\textbf{" + cell + r"}")
                 else:
-                    row_parts.append(cell)
+                    row_parts.append(r"\textit{" + cell + r"}")
             lines.append(" & ".join(row_parts) + r" \\")
 
         lines.append(r"\end{tabular}")
