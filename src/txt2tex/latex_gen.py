@@ -982,6 +982,28 @@ class LaTeXGenerator:
 
         return lines
 
+    def _replace_outside_math(self, text: str, pattern: str, replacement: str) -> str:
+        """Replace pattern with LaTeX command only when NOT inside $...$ math mode."""
+        result = []
+        in_math = False
+        i = 0
+
+        while i < len(text):
+            # Check for $ to toggle math mode
+            if text[i] == "$":
+                in_math = not in_math
+                result.append("$")
+                i += 1
+            # Check for pattern match
+            elif not in_math and text[i : i + len(pattern)] == pattern:
+                result.append(f"${replacement}$")
+                i += len(pattern)
+            else:
+                result.append(text[i])
+                i += 1
+
+        return "".join(result)
+
     def _generate_paragraph(self, node: Paragraph) -> list[str]:
         """Generate LaTeX for plain text paragraph.
 
@@ -997,13 +1019,14 @@ class LaTeXGenerator:
         # Must happen before _process_inline_math() which can break up < and >
         text = self._convert_sequence_literals(node.text)
 
-        # Process inline math expressions
+        # Process inline math expressions (includes formula detection)
         text = self._process_inline_math(text)
 
         # Then convert remaining symbolic operators to LaTeX math symbols
+        # Only replace if NOT already wrapped in math mode
         # Do NOT convert and/or/not - those are English words in prose context
-        text = text.replace("<=>", r"$\Leftrightarrow$")
-        text = text.replace("=>", r"$\Rightarrow$")
+        text = self._replace_outside_math(text, "<=>", r"\Leftrightarrow")
+        text = self._replace_outside_math(text, "=>", r"\Rightarrow")
 
         # Convert Z notation operators (garbled character fix)
         # Order matters: longer operators first to avoid partial matches
@@ -1227,6 +1250,39 @@ class LaTeXGenerator:
         Parses them and converts to $...$ wrapped LaTeX.
         """
         result = text
+
+        # Pattern -1: Logical formulas with =>, <=>, not, and, or (MUST come FIRST)
+        # Detect expressions like "p => (not p => p)" or "(not p => not q) <=> (q => p)"
+        # Look for patterns starting with identifier/paren/not and containing => or <=>
+        # Stop at sentence boundaries (is, as, are, etc.) or punctuation
+        formula_pattern = r"(\()?(?:not\s+)?([a-zA-Z]\w*)\s*(=>|<=>)\s*[^.!?]*?(?=\s+(?:is|as|are|for|to|be|a|an|the|in|on|at|by|with)\b|[.!?]|$)"
+
+        matches = list(re.finditer(formula_pattern, result))
+        for match in reversed(matches):
+            start_pos = match.start()
+            end_pos = match.end()
+
+            # Check if already in math mode
+            before = result[:start_pos]
+            dollars_before = before.count("$")
+            if dollars_before % 2 == 1:
+                continue
+
+            formula_text = result[start_pos:end_pos].strip()
+
+            # Try to parse as logical expression
+            try:
+                lexer = Lexer(formula_text)
+                tokens = lexer.tokenize()
+                parser = Parser(tokens)
+                ast = parser.parse()
+
+                if isinstance(ast, Expr):
+                    math_latex = self.generate_expr(ast)
+                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
+            except Exception:
+                # Parsing failed, leave as-is
+                pass
 
         # Pattern 0: Standalone superscripts (MUST come before other patterns)
         # Match: identifier/number followed by ^ and exponent
