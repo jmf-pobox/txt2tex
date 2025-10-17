@@ -1811,7 +1811,8 @@ class LaTeXGenerator:
         lines: list[str] = []
 
         lines.append(r"\[")
-        lines.append(r"\begin{array}{lll}")
+        # Use ll@{\hspace{2em}}l to add extra space before justification column
+        lines.append(r"\begin{array}{ll@{\hspace{2em}}l}")
 
         # Generate steps
         for i, step in enumerate(node.steps):
