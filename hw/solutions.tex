@@ -21,8 +21,8 @@
 \begin{tabular}{c|c|c|c}
 $p$ & $\lnot p$ & $( \lnot p \Rightarrow p )$ & $\mathbf{p \Rightarrow ( \lnot p \Rightarrow p )}$ \\
 \hline
-t & f & t & \textbf{t} \\
-f & t & f & \textbf{t} \\
+\textit{t} & \textit{f} & \textit{t} & \textbf{t} \\
+\textit{f} & \textit{t} & \textit{f} & \textbf{t} \\
 \end{tabular}
 
 \bigskip
@@ -39,10 +39,10 @@ $p \Rightarrow (\lnot p \Rightarrow p)$ is a tautology as it is true for every i
 \begin{tabular}{c|c|c|c|c|c|c}
 $p$ & $q$ & $( q \Rightarrow p )$ & $\lnot p$ & $\lnot q$ & $( \lnot p \Rightarrow \lnot q )$ & $\mathbf{( \lnot p \Rightarrow \lnot q ) \Leftrightarrow ( q \Rightarrow p )}$ \\
 \hline
-t & t & t & f & f & t & \textbf{t} \\
-t & f & t & f & t & t & \textbf{t} \\
-f & t & f & t & f & f & \textbf{t} \\
-f & f & t & t & t & t & \textbf{t} \\
+\textit{t} & \textit{t} & \textit{t} & \textit{f} & \textit{f} & \textit{t} & \textbf{t} \\
+\textit{t} & \textit{f} & \textit{t} & \textit{f} & \textit{t} & \textit{t} & \textbf{t} \\
+\textit{f} & \textit{t} & \textit{f} & \textit{t} & \textit{f} & \textit{f} & \textbf{t} \\
+\textit{f} & \textit{f} & \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textbf{t} \\
 \end{tabular}
 
 \bigskip
@@ -59,14 +59,14 @@ $\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$ is a tautology as 
 \begin{tabular}{c|c|c|c|c|c|c|c|c}
 $p$ & $q$ & $r$ & $( p \Rightarrow r )$ & $( q \Rightarrow r )$ & $( ( p \Rightarrow r ) \land ( q \Rightarrow r ) )$ & $( p \lor q )$ & $( ( p \lor q ) \Rightarrow r )$ & $\mathbf{\Leftrightarrow}$ \\
 \hline
-t & t & t & t & t & t & t & t & \textbf{t} \\
-t & t & f & f & f & f & t & f & \textbf{t} \\
-t & f & t & t & t & t & t & t & \textbf{t} \\
-t & f & f & f & t & f & t & f & \textbf{t} \\
-f & t & t & t & t & t & t & t & \textbf{t} \\
-f & t & f & t & f & f & t & f & \textbf{t} \\
-f & f & t & t & t & t & f & t & \textbf{t} \\
-f & f & f & t & t & t & f & t & \textbf{t} \\
+\textit{t} & \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textbf{t} \\
+\textit{t} & \textit{t} & \textit{f} & \textit{f} & \textit{f} & \textit{f} & \textit{t} & \textit{f} & \textbf{t} \\
+\textit{t} & \textit{f} & \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textbf{t} \\
+\textit{t} & \textit{f} & \textit{f} & \textit{f} & \textit{t} & \textit{f} & \textit{t} & \textit{f} & \textbf{t} \\
+\textit{f} & \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textbf{t} \\
+\textit{f} & \textit{t} & \textit{f} & \textit{t} & \textit{f} & \textit{f} & \textit{t} & \textit{f} & \textbf{t} \\
+\textit{f} & \textit{f} & \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textit{f} & \textit{t} & \textbf{t} \\
+\textit{f} & \textit{f} & \textit{f} & \textit{t} & \textit{t} & \textit{t} & \textit{f} & \textit{t} & \textbf{t} \\
 \end{tabular}
 
 \bigskip
@@ -117,7 +117,7 @@ In this equivalence proof, we show that $p \Rightarrow (\lnot p \Rightarrow p)$ 
 
 \bigskip
 
-In this equivalance proof, we show that $\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$ by using implication disjunction, the distributivity 2 rule, and the associativity of logical or. 
+In this equivalance proof, we show that $\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$ by using implication disjunction, the distributivity 2 rule, and the commutitivity of logical or. 
 
 \bigskip
 
