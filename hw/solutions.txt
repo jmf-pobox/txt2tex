@@ -7,7 +7,7 @@ p | not p | (not p => p) | p => (not p => p)
 T | F | T | T                                  
 F | T | F | T
 
-TEXT: p => (not p => p) is a tautology as it is true for every interpretation.
+TEXT: p => (not p => p) is a tautology as it is true for every interpretation as illustrated by the final column of truth values.
 
 
 (b) TRUTH TABLE:                                                                            
@@ -17,7 +17,7 @@ t | f | t | f | t | t | t
 f | t | f | t | f | f | t
 f | f | t | t | t | t | t
 
-TEXT: (not p =>  not q) <=> (q => p) is a tautology as it is true for every interpretation of its constituent parts. 
+TEXT: (not p =>  not q) <=> (q => p) is a tautology as it is true for every interpretation of its constituent parts as illustrated by the final column of truth values.
 
 (c) TRUTH TABLE:
 p | q | r | (p => r) | (q => r) | ((p =>r) and (q => r)) | (p or q) | ((p or q) => r) | <=>
@@ -30,7 +30,7 @@ f | t | f | t | f | f | t | f | t
 f | f | t | t | t | t | f | t | t
 f | f | f | t | t | t | f | t | t
 
-TEXT: ((p => r) and (q => r)) <=> ((p or q) => r) is a tautology as it is true for every interpretation of its constituent parts.
+TEXT: ((p => r) and (q => r)) <=> ((p or q) => r) is a tautology as it is true for every interpretation of its constituent parts as illustrated by the final column of truth values.
 
 ** Question 2 **
 
