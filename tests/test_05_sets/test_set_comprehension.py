@@ -305,11 +305,9 @@ class TestPhase8Integration:
         assert "x" in latex
         assert "y" in latex
         assert "z" in latex
-"""Tests for set comprehension with '.' separator (Phase 22)."""
 
-from txt2tex.ast_nodes import SetComprehension
-from txt2tex.lexer import Lexer
-from txt2tex.parser import Parser
+
+# Set comprehension with period separator tests
 
 
 def test_set_comp_with_period_separator() -> None:
