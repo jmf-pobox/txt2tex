@@ -210,9 +210,11 @@ Each bug has a minimal test case in `tests/bugs/` for reproduction - see [tests/
 
 | Priority | Issue | Description | Workaround |
 |----------|-------|-------------|------------|
-| HIGH | #1 | Parser fails on prose with periods outside TEXT blocks | Use TEXT blocks for prose |
-| MEDIUM | #2 | Multiple pipes in TEXT close math mode prematurely | Use axdef/schema blocks |
-| MEDIUM | #3 | Cannot use identifiers with operator suffixes (R+, R*) | None available |
+| HIGH | [#1](https://github.com/jmf-pobox/txt2tex/issues/1) | Parser fails on prose with periods outside TEXT blocks | Use TEXT blocks for prose |
+| MEDIUM | [#2](https://github.com/jmf-pobox/txt2tex/issues/2) | Multiple pipes in TEXT close math mode prematurely | Use axdef/schema blocks |
+| MEDIUM | [#3](https://github.com/jmf-pobox/txt2tex/issues/3) | Cannot use identifiers with operator suffixes (R+, R*) | None available |
+| MEDIUM | [#4](https://github.com/jmf-pobox/txt2tex/issues/4) | Comma after parenthesized math not detected in TEXT | Avoid comma after parens |
+| MEDIUM-HIGH | [#5](https://github.com/jmf-pobox/txt2tex/issues/5) | Logical operators (or, and) not converted in TEXT | Use axdef/schema blocks |
 
 ### Recently Resolved
 

@@ -175,13 +175,15 @@
 
 **Test Cases**: All bugs have minimal reproducible test cases in `tests/bugs/`
 
-### Active Bugs (3 confirmed)
+### Active Bugs (5 confirmed)
 
 | Priority | Issue | Component | Test Case | Blocks |
 |----------|-------|-----------|-----------|--------|
-| HIGH | #1: Parser fails on prose with periods | parser | [bug1_prose_period.txt](tests/bugs/bug1_prose_period.txt) | Homework, natural writing |
-| MEDIUM | #2: Multiple pipes in TEXT blocks | latex-gen | [bug2_multiple_pipes.txt](tests/bugs/bug2_multiple_pipes.txt) | Solution 40(g) |
-| MEDIUM | #3: Compound identifiers with operators | lexer | [bug3_compound_id.txt](tests/bugs/bug3_compound_id.txt) | Solution 31 |
+| HIGH | [#1](https://github.com/jmf-pobox/txt2tex/issues/1): Parser fails on prose with periods | parser | [bug1_prose_period.txt](tests/bugs/bug1_prose_period.txt) | Homework, natural writing |
+| MEDIUM | [#2](https://github.com/jmf-pobox/txt2tex/issues/2): Multiple pipes in TEXT blocks | latex-gen | [bug2_multiple_pipes.txt](tests/bugs/bug2_multiple_pipes.txt) | Solution 40(g) |
+| MEDIUM | [#3](https://github.com/jmf-pobox/txt2tex/issues/3): Compound identifiers with operators | lexer | [bug3_compound_id.txt](tests/bugs/bug3_compound_id.txt) | Solution 31 |
+| MEDIUM | [#4](https://github.com/jmf-pobox/txt2tex/issues/4): Comma after parenthesized math not detected | latex-gen | [bug4_comma_after_parens.txt](tests/bugs/bug4_comma_after_parens.txt) | Homework prose |
+| MEDIUM-HIGH | [#5](https://github.com/jmf-pobox/txt2tex/issues/5): Logical operators (or, and) not converted | latex-gen | [bug5_or_operator.txt](tests/bugs/bug5_or_operator.txt) | Homework 1(c) |
 
 ### Recently Resolved (2 fixed)
 
