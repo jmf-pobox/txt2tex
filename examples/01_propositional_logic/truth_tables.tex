@@ -1,0 +1,115 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Equivalence Chains}
+
+\bigskip
+\noindent
+\textbf{Solution 1}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $Commutative(property)$
+
+\[
+\begin{array}{ll@{\hspace{2em}}l}
+& p \land q \\
+&\Leftrightarrow q \land p & [\mbox{commutative}]
+\end{array}
+\]
+
+\medskip
+
+\noindent
+\hangindent=2em
+(b) $De(Morgan)(law)$
+
+\[
+\begin{array}{ll@{\hspace{2em}}l}
+& \lnot (p \land q) \\
+&\Leftrightarrow \lnot p \lor \lnot q & [\mbox{De Morgan}] \\
+&\Leftrightarrow \lnot p \lor \lnot q & [\mbox{parentheses}]
+\end{array}
+\]
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 2}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $Definition$
+
+\noindent
+$of(implication)$
+
+
+\[
+\begin{array}{ll@{\hspace{2em}}l}
+& p \Rightarrow q \\
+&\Leftrightarrow \lnot p \lor q & [\mbox{definition}]
+\end{array}
+\]
+
+\medskip
+
+\noindent
+\hangindent=2em
+(b) $Multiple(equivalence)(steps)$
+
+\[
+\begin{array}{ll@{\hspace{2em}}l}
+& p \land q \lor p \land r \\
+&\Leftrightarrow p \land (q \lor r) & [\mbox{distributive}] \\
+&\Leftrightarrow (q \lor r) \land p & [\mbox{commutative}] \\
+&\Leftrightarrow p \land (r \lor q) & [\mbox{commutative}]
+\end{array}
+\]
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Solution 3}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $Equivalence(chain)(without)(justifications)$
+
+\[
+\begin{array}{ll@{\hspace{2em}}l}
+& p \lor p \\
+&\Leftrightarrow p
+\end{array}
+\]
+
+\medskip
+
+\noindent
+\hangindent=2em
+(b) $Mixed(justifications)$
+
+\[
+\begin{array}{ll@{\hspace{2em}}l}
+& p \Leftrightarrow q \\
+&\Leftrightarrow (p \Rightarrow q) \land (q \Rightarrow p) & [\mbox{definition}] \\
+&\Leftrightarrow (\lnot p \lor q) \land (\lnot q \lor p)
+\end{array}
+\]
+
+\medskip
+
+\end{document}

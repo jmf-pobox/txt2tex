@@ -1,0 +1,92 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Unique Existence}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Unique Quantifier ( exists1 )}
+
+\medskip
+
+\bigskip
+
+The unique existence quantifier asserts there is exactly one value satisfying the predicate:
+
+\bigskip
+
+\noindent
+$\exists_1 x \colon \mathbb{N} \bullet x = 5$
+
+
+\noindent
+$\exists_1 n \colon \mathbb{N} \bullet \forall m \colon \mathbb{N} \bullet n \leq m$
+
+
+\bigskip
+\noindent
+\textbf{Example 2 : Multiple Conditions}
+
+\medskip
+
+\bigskip
+
+Unique existence with compound predicates:
+
+\bigskip
+
+\noindent
+$\exists_1 y \colon \mathbb{N} \bullet y \in \{0, 1\} \land y \neq 1$
+
+
+\noindent
+$\exists_1 z \colon \mathbb{Z} \bullet z^2 = 4 \land z > 0$
+
+
+\bigskip
+\noindent
+\textbf{Example 3 : One - Point Rule}
+
+\medskip
+
+\bigskip
+
+When a unique value is specified by equality, we can apply the one-point rule:
+
+\bigskip
+
+\[
+\begin{array}{ll@{\hspace{2em}}l}
+& \exists y \colon \mathbb{N} \bullet y \in \{0, 1\} \land y \neq 1 \land x \neq y \\
+&\Leftrightarrow \exists y \colon \mathbb{N} \bullet y = 0 \land x \neq y & [\mbox{arithmetic}] \\
+&\Leftrightarrow 0 \in \mathbb{N} \land x \neq 0 & [\mbox{one - point rule}] \\
+&\Leftrightarrow x \neq 0
+\end{array}
+\]
+
+\bigskip
+\noindent
+\textbf{Example 4 : Unique in Domain}
+
+\medskip
+
+\bigskip
+
+Testing uniqueness within a specific domain:
+
+\bigskip
+
+\noindent
+$\exists_1 p \colon \power~\{0, 1\} \bullet \# p = 1$
+
+
+\noindent
+$\exists_1 x \colon \{1, 2, 3, 4\} \bullet x > 3$
+
+
+\end{document}

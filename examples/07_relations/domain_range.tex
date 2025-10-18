@@ -1,0 +1,89 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 11 a : Function Types}
+
+\bigskip
+
+Total functions (every element in domain has a mapping):
+
+\bigskip
+
+\begin{axdef}
+f : X \fun Y
+g : \mathbb{N} \fun \mathbb{N}
+\end{axdef}
+
+\bigskip
+
+Partial functions (some elements may not have a mapping):
+
+\bigskip
+
+\begin{axdef}
+f : X \pfun Y
+\end{axdef}
+
+\bigskip
+
+Injections (one-to-one mappings):
+
+\bigskip
+
+\begin{axdef}
+ftotal : X \inj Y
+fpartial : X \pinj Y
+\end{axdef}
+
+\bigskip
+
+Surjections (onto mappings):
+
+\bigskip
+
+\begin{axdef}
+ftotal : X \surj Y
+fpartial : X \psurj Y
+\end{axdef}
+
+\bigskip
+
+Bijections (one-to-one and onto):
+
+\bigskip
+
+\begin{axdef}
+f : X \bij Y
+\end{axdef}
+
+\bigskip
+
+Complex function types (nested and higher-order):
+
+\bigskip
+
+\begin{axdef}
+f : X \fun Y \fun \mathbb{Z}
+g : X \fun (Y \pfun \mathbb{Z})
+h : \mathbb{N} \fun \mathbb{N} \fun (\mathbb{N} \fun \mathbb{N})
+\end{axdef}
+
+\bigskip
+
+Mixed operators (relations and function types work together):
+
+\bigskip
+
+\begin{axdef}
+relation : X \rel Y
+function : X \fun Y
+\where
+function \subseteq relation
+\end{axdef}
+
+\end{document}
