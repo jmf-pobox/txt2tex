@@ -1,0 +1,35 @@
+=== Bags (Multisets) ===
+
+** Example 1: Bag Type **
+
+TEXT: Bags are unordered collections that allow duplicates:
+
+bag N
+
+bag Z
+
+** Example 2: Bag Literals **
+
+TEXT: Bags are written with double square brackets:
+
+[[x]]
+
+[[a, b, c]]
+
+[[1, 2, 2, 3, 3, 3]]
+
+** Example 3: Bags vs Sets **
+
+TEXT: Unlike sets, bags preserve multiplicity:
+
+TEXT: The bag [[1, 2, 2, 3]] is different from the set {1, 2, 3}
+
+TEXT: The bag [[a, a, a]] contains three copies of a
+
+** Example 4: Bags in Specifications **
+
+TEXT: Bags can model collections where order doesn't matter but quantity does:
+
+coins in bag Coin
+
+items in bag Item

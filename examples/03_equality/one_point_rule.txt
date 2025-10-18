@@ -1,0 +1,36 @@
+=== One-Point Rule Applications ===
+
+** Example 1: Simple One-Point Rule **
+
+TEXT: When a quantifier binds a variable that is constrained by equality, we can eliminate the quantifier:
+
+EQUIV:
+exists y : N | y = 5 and x > y
+<=> 5 in N and x > 5 [one-point rule]
+<=> x > 5
+
+** Example 2: One-Point with Set Membership **
+
+EQUIV:
+exists x, y : N | x + y = 4 and x < y
+<=> exists x, y : N | y = 4 - x and x < y
+<=> exists x : N | 4 - x in N and x < 4 - x
+<=> true
+
+TEXT: The final equivalence holds because 0 in N, 4 - 0 in N, and 0 < 4.
+
+** Example 3: One-Point with Disjunction **
+
+EQUIV:
+exists x : N | (x = 1 and x > y) or (x = 2 and x > z)
+<=> (exists x : N | x = 1 and x > y) or (exists x : N | x = 2 and x > z)
+<=> (1 in N and 1 > y) or (exists x : N | x = 2 and x > z)
+<=> (1 in N and 1 > y) or (2 in N and 2 > z)
+<=> 1 > y or 2 > z
+
+** Example 4: One-Point with Expression Part **
+
+EQUIV:
+exists y : N | y = x + 1 and y > 0
+<=> x + 1 in N and x + 1 > 0 [one-point rule]
+<=> x + 1 > 0

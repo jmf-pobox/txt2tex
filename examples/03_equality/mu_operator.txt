@@ -1,0 +1,43 @@
+=== Mu Operator (μ) ===
+
+** Example 1: Basic Mu Expression **
+
+TEXT: The mu operator returns "the unique value that" satisfies a predicate:
+
+mu x : N | x = 5
+
+mu n : N | forall m : N | n <= m
+
+** Example 2: Mu with Precondition **
+
+TEXT: The exists1 quantifier provides a precondition to ensure mu is well-defined:
+
+TEXT: Since the proposition
+
+exists1 n : N | forall m : N | n <= m
+
+TEXT: is equivalent to true, we can be certain that
+
+(mu n : N | forall m : N | n <= m)
+
+TEXT: will return a result (which is 0).
+
+** Example 3: Mu in Expressions **
+
+TEXT: Using mu to select unique values:
+
+(mu a : N | a = a) = 0
+
+(mu z : Z | z = 10) = 10
+
+** Example 4: Undefined Mu Expressions **
+
+TEXT: When no unique value exists, mu is undefined:
+
+(mu b : N | b = b)
+
+TEXT: This is undefined because the property holds for all natural numbers, not just one.
+
+(mu c : N | c > c)
+
+TEXT: This is also undefined because no natural number satisfies this property.
