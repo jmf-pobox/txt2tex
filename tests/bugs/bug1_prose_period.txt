@@ -1,0 +1,7 @@
+=== Bug 1 Test: Prose with Period (No TEXT Block) ===
+
+TEXT: This statement works fine in a TEXT block.
+
+The statement below should fail:
+
+1 in {4, 3, 2, 1} is true.

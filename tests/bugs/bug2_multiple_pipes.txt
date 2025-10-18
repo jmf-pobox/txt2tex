@@ -1,0 +1,5 @@
+=== Bug 2 Test: Multiple Pipes in TEXT Block ===
+
+TEXT: Consider the expression (mu p : ran hd; q : ran hd | p /= q | p.2 > q.2).
+
+TEXT: The second pipe is not properly enclosed in math mode, causing rendering issues.

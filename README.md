@@ -198,7 +198,30 @@ The following features are not yet implemented and require TEXT blocks as workar
 ✅ Workaround: Use TEXT blocks
 ```
 
-See [ROADMAP.md](ROADMAP.md) for implementation plans and [BUGS.md](BUGS.md) for complete list of known issues.
+See STATUS.md for implementation details.
+
+## Known Issues
+
+For complete bug tracking, see [GitHub Issues](https://github.com/USER/REPO/issues).
+
+Each bug has a minimal test case in `tests/bugs/` for reproduction - see [tests/bugs/README.md](tests/bugs/README.md).
+
+### Active Bugs
+
+| Priority | Issue | Description | Workaround |
+|----------|-------|-------------|------------|
+| HIGH | #1 | Parser fails on prose with periods outside TEXT blocks | Use TEXT blocks for prose |
+| MEDIUM | #2 | Multiple pipes in TEXT close math mode prematurely | Use axdef/schema blocks |
+| MEDIUM | #3 | Cannot use identifiers with operator suffixes (R+, R*) | None available |
+
+### Recently Resolved
+
+- ✅ Nested quantifiers in mu expressions (Phase 19)
+- ✅ emptyset keyword conversion
+
+**Report a Bug**: Follow the bug reporting workflow in [CLAUDE.md#bug-reporting-workflow](CLAUDE.md#bug-reporting-workflow).
+
+---
 
 ## User Guide: Text Format
 
