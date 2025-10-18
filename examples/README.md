@@ -17,8 +17,7 @@ Predicate logic with quantifiers and declarations.
 
 - `quantifiers.txt` - Universal (forall) and existential (exists) quantification
 - `declarations.txt` - Type declarations and predicates
-- `phase_a_test.txt` - Additional predicate logic tests
-- `phase_a_simple.txt` - Simplified predicate examples
+- `future/` - Examples using syntax not yet implemented (seq(T), pattern matching)
 
 ### 03_equality (Lecture 3)
 Equality and unique quantification.
