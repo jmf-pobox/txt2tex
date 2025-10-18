@@ -1,0 +1,90 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 19 Demo : Finite Set Types}
+
+\bigskip
+\noindent
+\textbf{Example 1 : F ( finite sets )}
+
+\medskip
+
+\bigskip
+
+F X denotes all finite subsets of X:
+
+\bigskip
+
+\begin{zed}[SongId, UserId]\end{zed}
+
+\begin{axdef}
+songs : \finset~SongId
+users : \finset~UserId
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 2 : F1 ( non - empty finite sets )}
+
+\medskip
+
+\bigskip
+
+F1 X denotes all non-empty finite subsets of X:
+
+\bigskip
+
+\begin{axdef}
+activeUsers : \finset_1~UserId
+\where
+activeUsers(subseteq)(users)
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 3 : Combined with function types}
+
+\medskip
+
+\bigskip
+
+Using F and F1 with partial functions:
+
+\bigskip
+
+\begin{zed}[PlaylistId, Playlist]\end{zed}
+
+\begin{axdef}
+playlists : PlaylistId \pfun Playlist
+playlistOwner : PlaylistId \pfun UserId
+playlistSubscribers : PlaylistId \pfun \finset_1~UserId
+\where
+\dom playlistOwner(subseteq)(\dom playlists)
+\dom playlistSubscribers(subseteq)(\dom playlists)
+\forall i \colon \dom playlistSubscribers \bullet playlistSubscribers(i)(subseteq)(users)
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 4 : Comparison with P ( power set )}
+
+\medskip
+
+\bigskip
+
+F X is a subset of P X (all finite subsets are subsets):
+
+\bigskip
+
+\begin{axdef}
+\where
+\finset~users(subseteq)(\power~users)
+\finset_1~users(subseteq)(\finset~users)
+\end{axdef}
+
+\end{document}

@@ -1,8 +1,9 @@
-\documentclass[fleqn]{article}
-\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}
-\usepackage{fuzz}
-\usepackage{amsmath}
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
 \begin{document}
 
 \section*{Phase 11 b : Function Application}
@@ -104,15 +105,15 @@ Function application in quantifiers:
 \bigskip
 
 \noindent
-$\forall x : \mathbb{N} \spot f(x) > 0$
+$\forall x \colon \mathbb{N} \bullet f(x) > 0$
 
 
 \noindent
-$\exists d : Dog \spot gentle(d) \land neat(d)$
+$\exists d \colon Dog \bullet gentle(d) \land neat(d)$
 
 
 \noindent
-$\forall x, y : \mathbb{N} \spot g(x, y) = g(y, x)$
+$\forall x, y \colon \mathbb{N} \bullet g(x, y) = g(y, x)$
 
 
 \bigskip
@@ -153,11 +154,11 @@ Complex predicates from Solution 5:
 \bigskip
 
 \noindent
-$\exists d : Dog \spot gentle(d) \land neat(d)$
+$\exists d \colon Dog \bullet gentle(d) \land neat(d)$
 
 
 \noindent
-$\forall d : Dog \spot neat(d) \Rightarrow attractive(d)$
+$\forall d \colon Dog \bullet neat(d) \Rightarrow attractive(d)$
 
 
 \bigskip
@@ -169,13 +170,13 @@ Function application in definitions:
 \begin{axdef}
 f : X \fun Y
 \where
-\forall x : X \spot f(x) \in Y
+\forall x \colon X \bullet f(x) \in Y
 \end{axdef}
 
 \begin{schema}{PersonHeight}
 height : Person \fun \mathbb{N}
 \where
-\forall p : Person \spot height(p) > 0 \land height(p) < 300
+\forall p \colon Person \bullet height(p) > 0 \land height(p) < 300
 \end{schema}
 
 \bigskip

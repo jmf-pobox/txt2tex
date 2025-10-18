@@ -1,8 +1,9 @@
-\documentclass{article}
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
 \usepackage{zed-cm}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage{amsmath}
 \begin{document}
 
 \section*{Solution 40 Test ( Conditional Expressions )}
@@ -21,13 +22,13 @@ Recursive definition using conditional expression:
 
 \bigskip
 
-viewed <> = <>
+viewed $\langle \rangle$ = $\langle \rangle$
 
 \bigskip
 
 \bigskip
 
-viewed <x> ^ s = if x.3 = yes then <x> ^ viewed s else viewed s
+viewed $\langle x \rangle$ ^ $s = if$ x.3 = yes then $\langle x \rangle$ ^ viewed s else viewed s
 
 \bigskip
 
@@ -38,38 +39,38 @@ viewed <x> ^ s = if x.3 = yes then <x> ^ viewed s else viewed s
 \medskip
 
 \begin{axdef}
-cumulative_total : \seq~Title * Length * Viewed \fun N
+\mathit{cumulative\_total} : \seq~Title * Length * Viewed \fun \mathbb{N}
 \where
-cumulative_total(\langle \rangle) = 0
+\mathit{cumulative\_total}(\langle \rangle) = 0
 \end{axdef}
 
 \bigskip
 
-Note: forall with semicolon-separated bindings not yet supported
+Note: $\forall$ with semicolon-separated bindings not yet supported
 
 \bigskip
 
 \bigskip
 \noindent
-\textbf{Solution 41 ( c ) - 479 _courses with conditional}
+\textbf{Solution 41 ( c ) - 479_courses with conditional}
 
 \medskip
 
 \bigskip
 
-forall x : Entry; s : seq Entry |
+$\forall$ $x : Entry$; $s : seq Entry |$
 
 \bigskip
 
 \bigskip
 
-479_courses (<>) = <>
+479_courses ($\langle \rangle$) = $\langle \rangle$
 
 \bigskip
 
 \bigskip
 
-479_courses (<x> ^ s) = if x.3 = 479 then <x> ^ 479_courses s else 479_courses s
+479_courses ($\langle x \rangle$ ^ s) = if x.3 = 479 then $\langle x \rangle$ ^ 479_courses s else 479_courses s
 
 \bigskip
 
@@ -81,19 +82,19 @@ forall x : Entry; s : seq Entry |
 
 \bigskip
 
-forall x : Entry; s : seq Entry |
+$\forall$ $x : Entry$; $s : seq Entry |$
 
 \bigskip
 
 \bigskip
 
-total (<>) = 0
+total ($\langle \rangle$) = 0
 
 \bigskip
 
 \bigskip
 
-total (<x> ^ s) = x.5 + total s
+total ($\langle x \rangle$ ^ s) = x.5 + total s
 
 \bigskip
 
