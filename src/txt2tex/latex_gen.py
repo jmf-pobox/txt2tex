@@ -2480,9 +2480,7 @@ class LaTeXGenerator:
 
                 # Generate outer infer for last step
                 if last_step.justification:
-                    just = self._format_justification_label(
-                        last_step.justification
-                    )
+                    just = self._format_justification_label(last_step.justification)
                     current_result = (
                         f"\\infer[{just}]{{{expr_latex}}}{{{premises_str}}}"
                     )
@@ -2568,8 +2566,18 @@ class LaTeXGenerator:
 
         # Already in math mode - don't need extra wrapping
         # Just use \mathrm{} for text parts to get roman font
-        for word in ["elim", "intro", "assumption", "premise", "from", "case",
-                     "contradiction", "middle", "excluded", "false"]:
+        for word in [
+            "elim",
+            "intro",
+            "assumption",
+            "premise",
+            "from",
+            "case",
+            "contradiction",
+            "middle",
+            "excluded",
+            "false",
+        ]:
             # Replace text words with \mathrm{} for roman font in math mode
             result = re.sub(rf"\b{word}\b", rf"\\mathrm{{{word}}}", result)
 
