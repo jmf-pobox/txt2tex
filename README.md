@@ -311,14 +311,13 @@ hatch run convert input.txt --fuzz
 
 ## Known Issues
 
-### Active Bugs (4 confirmed)
+### Active Bugs (3 confirmed)
 
 | Priority | Issue | Description | Workaround |
 |----------|-------|-------------|------------|
 | HIGH | [#1](https://github.com/jmf-pobox/txt2tex/issues/1) | Parser fails on prose with periods | Use TEXT blocks |
 | MEDIUM | [#2](https://github.com/jmf-pobox/txt2tex/issues/2) | Multiple pipes in TEXT close math mode | Use axdef/schema |
 | MEDIUM | [#3](https://github.com/jmf-pobox/txt2tex/issues/3) | Cannot use R+, R* identifiers | None available |
-| MEDIUM | [#4](https://github.com/jmf-pobox/txt2tex/issues/4) | Comma after parenthesized math not detected | Avoid comma after parens |
 
 **For bug details and test cases, see [tests/bugs/README.md](tests/bugs/README.md)**
 
