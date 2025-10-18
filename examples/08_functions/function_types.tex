@@ -1,0 +1,284 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 12 : Sequences , Bags , and Tuple Projection}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Sequence Literals}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+Empty sequence
+
+\bigskip
+
+\noindent
+$\langle \rangle$
+
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+Single element
+
+\bigskip
+
+\noindent
+$\langle a \rangle$
+
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+Multiple elements
+
+\bigskip
+
+\noindent
+$\langle 1, 2, 3, 4, 5 \rangle$
+
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+Sequence of identifiers
+
+\bigskip
+
+\noindent
+$\langle x, y, z \rangle$
+
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 2 : Sequence Operators}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $\head \langle 1, 2, 3 \rangle$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $\tail \langle 1, 2, 3 \rangle$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $\last \langle 1, 2, 3 \rangle$
+
+\medskip
+\noindent
+\hangindent=2em
+(d) $\front \langle 1, 2, 3 \rangle$
+
+\medskip
+\noindent
+\hangindent=2em
+(e) $\rev \langle 1, 2, 3 \rangle$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Example 3 : Sequence Concatenation}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $\langle 1, 2 \rangle \cat \langle 3, 4 \rangle$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $s \cat t \cat u$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $\langle a \rangle \cat \langle b, c \rangle \cat \langle d \rangle$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Example 4 : Tuple Projection}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $x.1$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $x.2$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $(a, b, c).1$
+
+\medskip
+\noindent
+\hangindent=2em
+(d) $(a, b, c).2$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Example 5 : Bag Literals}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $\lbag x \rbag$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $\lbag 1, 2, 3 \rbag$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $\lbag a, b, c \rbag$
+
+\medskip
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+Bags with duplicates
+
+\bigskip
+
+\noindent
+$\lbag 1, 2, 2, 3, 3, 3 \rbag$
+
+
+\medskip
+
+\bigskip
+\noindent
+\textbf{Example 6 : Sequences in Expressions}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $x \in \langle 1, 2, 3 \rangle$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $\head s = a$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $\tail \langle 1, 2, 3 \rangle = \langle 2, 3 \rangle$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Example 7 : Complex Expressions}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $\forall i \colon \mathbb{N} \bullet i \in \langle 1, 2, 3 \rangle \Rightarrow i > 0$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $\exists s \colon seq[\mathbb{N}] \bullet \head s = 1$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $\{ x \colon \mathbb{N} \mid x > 0 \bullet \langle x, x^2 \rangle \}$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Example 8 : Real Examples}
+
+\medskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+From Solution 37
+
+\bigskip
+
+\noindent
+$\langle a \rangle$
+
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+Tuple projection from Solution 38
+
+\bigskip
+
+\noindent
+$trains(x).2$
+
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+Bags from Solution 39
+
+\bigskip
+
+\noindent
+$\lbag d \rbag$
+
+
+\medskip
+
+\end{document}

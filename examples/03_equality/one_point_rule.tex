@@ -1,0 +1,82 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{One - Point Rule Applications}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Simple One - Point Rule}
+
+\medskip
+
+\bigskip
+
+When a quantifier binds a variable that is constrained by equality, we can eliminate the quantifier:
+
+\bigskip
+
+\[
+\begin{array}{ll@{\hspace{2em}}l}
+& \exists y \colon \mathbb{N} \bullet y = 5 \land x > y \\
+&\Leftrightarrow 5 \in \mathbb{N} \land x > 5 & [\mbox{one - point rule}] \\
+&\Leftrightarrow x > 5
+\end{array}
+\]
+
+\bigskip
+\noindent
+\textbf{Example 2 : One - Point with Set Membership}
+
+\medskip
+
+\[
+\begin{array}{ll@{\hspace{2em}}l}
+& \exists x, y \colon \mathbb{N} \bullet x + y = 4 \land x < y \\
+&\Leftrightarrow \exists x, y \colon \mathbb{N} \bullet y = 4 - x \land x < y \\
+&\Leftrightarrow \exists x \colon \mathbb{N} \bullet 4 - x \in \mathbb{N} \land x < 4 - x \\
+&\Leftrightarrow true
+\end{array}
+\]
+
+\bigskip
+
+The final equivalence holds because $0 \in N$, $4 - 0 \in N$, and 0 $<$ 4.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 3 : One - Point with Disjunction}
+
+\medskip
+
+\[
+\begin{array}{ll@{\hspace{2em}}l}
+& \exists x \colon \mathbb{N} \bullet x = 1 \land x > y \lor x = 2 \land x > z \\
+&\Leftrightarrow \exists x \colon \mathbb{N} \bullet x = 1 \land x > y \lor \exists x \colon \mathbb{N} \bullet x = 2 \land x > z \\
+&\Leftrightarrow 1 \in \mathbb{N} \land 1 > y \lor \exists x \colon \mathbb{N} \bullet x = 2 \land x > z \\
+&\Leftrightarrow 1 \in \mathbb{N} \land 1 > y \lor 2 \in \mathbb{N} \land 2 > z \\
+&\Leftrightarrow 1 > y \lor 2 > z
+\end{array}
+\]
+
+\bigskip
+\noindent
+\textbf{Example 4 : One - Point with Expression Part}
+
+\medskip
+
+\[
+\begin{array}{ll@{\hspace{2em}}l}
+& \exists y \colon \mathbb{N} \bullet y = x + 1 \land y > 0 \\
+&\Leftrightarrow x + 1 \in \mathbb{N} \land x + 1 > 0 & [\mbox{one - point rule}] \\
+&\Leftrightarrow x + 1 > 0
+\end{array}
+\]
+
+\end{document}

@@ -1,0 +1,92 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 18 Demo : Partial Function Operators}
+
+\bigskip
+\noindent
+\textbf{Example 1 : -|> operator ( partial injection )}
+
+\medskip
+
+\bigskip
+
+Basic function type $with \pinj operator$:
+
+\bigskip
+
+\begin{axdef}
+f : \mathbb{N} \pinj \mathbb{N}
+\where
+\dom f = \{1, 2, 3\}
+f(1) = 10
+f(2) = 20
+f(3) = 30
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 2 : +-> operator ( partial function )}
+
+\medskip
+
+\bigskip
+
+Basic function type $with \pfun operator$:
+
+\bigskip
+
+\begin{axdef}
+g : \mathbb{N} \pfun \mathbb{N}
+\where
+\dom g = \{1, 2\}
+g(1) = 100
+g(2) = 200
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 3 : Complex types with -|>}
+
+\medskip
+
+\bigskip
+
+$Using \pinj with$ custom types:
+
+\bigskip
+
+\begin{zed}[Year, Entry]\end{zed}
+
+Table == \seq~Entry
+
+\begin{axdef}
+records : Year \pinj Table
+\where
+\dom records = \{1993, 1994, 1995\}
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 4 : Mixed function type operators}
+
+\medskip
+
+\bigskip
+
+Different function type operators:
+
+\bigskip
+
+\begin{axdef}
+total : \mathbb{N} \fun \mathbb{N}
+partial : \mathbb{N} \pfun \mathbb{N}
+injection : \mathbb{N} \pinj \mathbb{N}
+\end{axdef}
+
+\end{document}
