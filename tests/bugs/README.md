@@ -70,6 +70,21 @@ Each bug has:
 - **Workaround**: Avoid comma immediately after closing parenthesis in TEXT blocks
 - **Impact**: Homework problems with multiple statements separated by commas
 
+### Bug 5: Logical operators (or, and) not converted in TEXT blocks
+- **File**: [bug5_or_operator.txt](bug5_or_operator.txt)
+- **Issue**: [#5](https://github.com/jmf-pobox/txt2tex/issues/5)
+- **Priority**: MEDIUM-HIGH
+- **Status**: ACTIVE
+- **Test Command**:
+  ```bash
+  hatch run convert tests/bugs/bug5_or_operator.txt
+  pdftotext tests/bugs/bug5_or_operator.pdf -
+  ```
+- **Expected**: `The statements ((p ⇒ r) ∧ (q ⇒ r)), ((p ∨ q) ⇒ r) are equivalent`
+- **Actual**: `The statements ((p ⇒ r) and (q ⇒ r)), ((p or q) ⇒ r) are equivalent` (operators not converted)
+- **Workaround**: Use proper Z notation blocks (axdef, schema) instead of TEXT
+- **Impact**: Homework Question 1(c) and similar prose with logical operators
+
 ## Resolved Issues
 
 ### Bug 4: Nested quantifiers in mu expressions - RESOLVED ✓
