@@ -5,3 +5,7 @@ TEXT: The statements ((p => r) and (q => r)), ((p or q) => r) are equivalent
 TEXT: Simple case: (p or q) should show symbol
 
 TEXT: With and: (p and q) should show symbol
+
+TEXT: Manual markup test: ([not], [and], [or], [=>], [<=>], [forall], [exists]) converts all to symbols
+
+TEXT: Auto-detection still works without brackets: (p or q) and (not p => q) need no manual markup
