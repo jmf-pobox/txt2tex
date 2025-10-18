@@ -1287,6 +1287,33 @@ class LaTeXGenerator:
                 i += 1
         return matches
 
+    def _find_balanced_parens(self, text: str) -> list[tuple[int, int]]:
+        """Find all balanced parenthesis pairs in text.
+
+        Returns list of (start_pos, end_pos) tuples for each balanced (...).
+        Handles nested parentheses correctly.
+        """
+        matches: list[tuple[int, int]] = []
+        i = 0
+        while i < len(text):
+            if text[i] == "(":
+                # Found opening paren, find matching closing paren
+                depth = 1
+                start = i
+                i += 1
+                while i < len(text) and depth > 0:
+                    if text[i] == "(":
+                        depth += 1
+                    elif text[i] == ")":
+                        depth -= 1
+                    i += 1
+                if depth == 0:
+                    # Found balanced pair
+                    matches.append((start, i))
+            else:
+                i += 1
+        return matches
+
     def _process_inline_math(self, text: str) -> str:
         """Process inline math expressions in text.
 
@@ -1334,6 +1361,42 @@ class LaTeXGenerator:
                     result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
             except Exception:
                 # Parsing failed, leave as-is
+                pass
+
+        # Pattern -0.5: Parenthesized logical expressions with or/and
+        # Detect expressions like "(p or q)", "(p and q)", "((p => r) and (q => r))"
+        # This pattern handles the case where or/and operators are in parentheses
+        # but there's no => or <=> to trigger Pattern -1
+        # Use balanced parenthesis matching to handle nested expressions
+        paren_matches = self._find_balanced_parens(result)
+
+        for start_pos, end_pos in reversed(paren_matches):
+            # Check if already in math mode
+            before = result[:start_pos]
+            dollars_before = before.count("$")
+            if dollars_before % 2 == 1:
+                continue
+
+            paren_text = result[start_pos:end_pos]
+
+            # Only process if it contains 'or' or 'and' keywords with word boundaries
+            if not (
+                re.search(r"\bor\b", paren_text) or re.search(r"\band\b", paren_text)
+            ):
+                continue
+
+            # Try to parse as logical expression
+            try:
+                lexer = Lexer(paren_text)
+                tokens = lexer.tokenize()
+                parser = Parser(tokens)
+                ast = parser.parse()
+
+                if isinstance(ast, Expr):
+                    math_latex = self.generate_expr(ast)
+                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
+            except Exception:
+                # Parsing failed, leave as-is (might be prose)
                 pass
 
         # Pattern 0: Standalone superscripts (MUST come before other patterns)
