@@ -2060,21 +2060,39 @@ class LaTeXGenerator:
         # Generate expression for conclusion
         expr_latex = self.generate_expr(node.expression)
 
+        # Check for assumption reference FIRST (before checking children)
+        # Pattern: "from N" where N is a digit
+        # This should render as boxed assumption notation regardless of children
+        if node.justification:
+            just_lower = node.justification.lower()
+            # Check if this is purely a "from N" reference (not "rule from N")
+            from_only_match = re.match(r"^\s*from\s+(\d+)\s*$", just_lower)
+            if from_only_match:
+                ref_label = from_only_match.group(1)
+                # Render as boxed assumption reference
+                # If this node has children, they should be rendered below
+                if node.children:
+                    # Generate children as premises
+                    child_latexes = [
+                        self._generate_proof_node_infer(child)
+                        for child in node.children
+                        if isinstance(child, ProofNode)
+                    ]
+                    premises = "\n  ".join(child_latexes)
+                    boxed = f"\\ulcorner {expr_latex} \\urcorner^{{[{ref_label}]}}"
+                    return f"\\infer{{{boxed}}}{{\n  {premises}\n}}"
+                else:
+                    # Leaf node - just return the boxed reference
+                    return f"\\ulcorner {expr_latex} \\urcorner^{{[{ref_label}]}}"
+
         # If no children, return expression (possibly with justification)
         if not node.children:
             # Check if justification indicates a reference (not a derivation rule)
             if node.justification:
                 just_lower = node.justification.lower()
-                # References like "from 1", "copy", etc. should not be wrapped in \infer
-                # They're just referencing an existing fact
-                if "from" in just_lower or "copy" in just_lower:
-                    # Extract assumption label if present (e.g., "from 1" -> "1")
-                    from_match = re.search(r"from\s+(\d+)", just_lower)
-                    if from_match:
-                        ref_label = from_match.group(1)
-                        # Render as boxed assumption reference
-                        return f"\\ulcorner {expr_latex} \\urcorner^{{[{ref_label}]}}"
-                    # Just return the expression - it's a reference without label
+                # References like "copy", etc. should not be wrapped in \infer
+                if "copy" in just_lower:
+                    # Just return the expression - it's a reference
                     return expr_latex
                 # Otherwise it's a derivation rule, wrap in \infer
                 just = self._format_justification_label(node.justification)
