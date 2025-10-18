@@ -55,6 +55,21 @@ Each bug has:
 - **Workaround**: None available
 - **Impact**: Blocks Solution 31 (transitive closure R+)
 
+### Bug 4: Comma after parenthesized math not detected in TEXT blocks
+- **File**: [bug4_comma_after_parens.txt](bug4_comma_after_parens.txt)
+- **Issue**: [#4](https://github.com/jmf-pobox/txt2tex/issues/4)
+- **Priority**: MEDIUM
+- **Status**: ACTIVE
+- **Test Command**:
+  ```bash
+  hatch run convert tests/bugs/bug4_comma_after_parens.txt
+  pdftotext tests/bugs/bug4_comma_after_parens.pdf -
+  ```
+- **Expected**: `The statements (¬ p ⇒ ¬ q), (q ⇒ p) are equivalent.`
+- **Actual**: `The statements (not p => not q), (q ⇒ p) are equivalent.` (first expression not converted)
+- **Workaround**: Avoid comma immediately after closing parenthesis in TEXT blocks
+- **Impact**: Homework problems with multiple statements separated by commas
+
 ## Resolved Issues
 
 ### Bug 4: Nested quantifiers in mu expressions - RESOLVED ✓
