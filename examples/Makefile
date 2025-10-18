@@ -9,8 +9,8 @@
 
 SHELL := /bin/bash
 
-# Find all .txt files in this directory
-TXT_FILES := $(wildcard phase*.txt)
+# Find all .txt files in this directory (excluding test_ and solutions_ files)
+TXT_FILES := $(filter-out test_% solutions_%, $(wildcard *.txt))
 
 # Generate corresponding .tex and .pdf targets
 TEX_FILES := $(TXT_FILES:.txt=.tex)
@@ -23,7 +23,7 @@ all: $(PDF_FILES)
 # Pattern rule: .txt -> .pdf (via txt2pdf.sh script with --fuzz option)
 %.pdf: %.txt ../txt2pdf.sh
 	@echo "Building $@..."
-	@../txt2pdf.sh $< --fuzz > /dev/null 2>&1 || (echo "Error building $@"; exit 1)
+	@../txt2pdf.sh $< > /dev/null 2>&1 || (echo "Error building $@"; exit 1)
 
 # Individual phase targets for convenience
 .PHONY: phase0 phase1 phase2 phase3 phase4 phase5 phase6 phase7 phase8 phase9 phase10a phase10b phase11a

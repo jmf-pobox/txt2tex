@@ -32,6 +32,7 @@ class Lexer:
         self.pos = 0
         self.line = 1
         self.column = 1
+        self._in_solution_marker = False  # Track if inside ** ... **
 
     def tokenize(self) -> list[Token]:
         """Tokenize entire input and return list of tokens."""
@@ -124,6 +125,8 @@ class Lexer:
         if char == "*" and self._peek_char() == "*":
             self._advance()
             self._advance()
+            # Toggle solution marker context (opening or closing **)
+            self._in_solution_marker = not self._in_solution_marker
             return Token(TokenType.SOLUTION_MARKER, "**", start_line, start_column)
 
         # Part label: (a), (b), (c), etc. - restrict to a-j for homework parts
@@ -767,7 +770,8 @@ class Lexer:
         }
 
         # Prose detection at column 1 OR after whitespace (for prose after part labels)
-        if value in prose_starters:
+        # BUT NOT inside solution markers (** ... **) to avoid consuming closing **
+        if value in prose_starters and not self._in_solution_marker:
             # Looks like prose, capture whole line
             text_start = start_pos
 
