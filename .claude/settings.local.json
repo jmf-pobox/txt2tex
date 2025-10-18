@@ -69,7 +69,22 @@
       "Bash(bash txt2pdf.sh:*)",
       "Bash(bash:*)",
       "Bash(PYTHONPATH=src hatch run python:*)",
-      "Bash(timeout 5 bash:*)"
+      "Bash(timeout 5 bash:*)",
+      "Bash(../txt2pdf.sh phase2.txt)",
+      "Bash(../txt2pdf.sh phase17_demo.txt)",
+      "Bash(do echo \"=== $f ===\")",
+      "Bash(../txt2pdf.sh \"$f\")",
+      "Bash(../txt2pdf.sh phase3.txt)",
+      "Bash(../txt2pdf.sh phase10a_relations.txt)",
+      "Bash(do echo \"Testing $f:\")",
+      "Bash(do ../txt2pdf.sh \"$f\")",
+      "Bash(../txt2pdf.sh phase17_proper.txt)",
+      "Bash(../txt2pdf.sh phase18_demo.txt)",
+      "Bash(../txt2pdf.sh phase19_demo.txt)",
+      "Bash(../txt2pdf.sh phase20_demo.txt)",
+      "Bash(../txt2pdf.sh solutions.txt)",
+      "Bash(git mv:*)",
+      "Bash(do echo \"=== $dir ===\")"
     ],
     "deny": [],
     "ask": []
