@@ -50,10 +50,28 @@ ENV/
 *.pdf
 *.600pk
 *.600gf
+*.fuzz.log
+*.pdflatex.log
+
+# Generated LaTeX source files
+*.tex
+*.tfm
+*.pk
+*.gf
+
+# LaTeX infrastructure (copied during build, originals in examples/infrastructure/)
+examples/*/*.sty
+examples/*/*.mf
+hw/*.sty
+hw/*.mf
 
 # But keep example PDFs
 !examples/*.pdf
 !docs/*.pdf
+
+# But keep reference LaTeX files and test files
+!examples/reference/*.tex
+!examples/04_proof_trees/*.tex
 
 # Temporary files
 *.tmp
