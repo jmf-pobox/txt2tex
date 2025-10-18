@@ -1327,6 +1327,25 @@ class LaTeXGenerator:
         """
         result = text
 
+        # Pattern -1.5: Manual operator markup [operator]
+        # Convert bracketed operator keywords to symbols
+        # Example: "([not], [and], [or])" becomes "(symbols)" in LaTeX
+        # Must come FIRST before any expression parsing
+        # This provides explicit markup when auto-detection doesn't work
+        markup_operators = {
+            r"\[not\]": r"$\\lnot$",
+            r"\[and\]": r"$\\land$",
+            r"\[or\]": r"$\\lor$",
+            r"\[=>\]": r"$\\Rightarrow$",
+            r"\[<=>\]": r"$\\Leftrightarrow$",
+            r"\[forall\]": r"$\\forall$",
+            r"\[exists\]": r"$\\exists$",
+            r"\[exists1\]": r"$\\exists_1$",
+        }
+
+        for pattern, replacement in markup_operators.items():
+            result = re.sub(pattern, replacement, result)
+
         # Pattern -1: Logical formulas with =>, <=>, not, and, or (MUST come FIRST)
         # Detect expressions like "p => (not p => p)" or "(not p => not q) <=> (q => p)"
         # Look for patterns starting with identifier/paren/not and containing => or <=>
