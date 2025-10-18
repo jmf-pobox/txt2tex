@@ -55,22 +55,20 @@ Each bug has:
 - **Workaround**: None available
 - **Impact**: Blocks Solution 31 (transitive closure R+)
 
-### Bug 4: Comma after parenthesized math not detected in TEXT blocks
+## Resolved Issues
+
+### Bug 4: Comma after parenthesized math not detected in TEXT blocks - RESOLVED ✓
 - **File**: [bug4_comma_after_parens.txt](bug4_comma_after_parens.txt)
 - **Issue**: [#4](https://github.com/jmf-pobox/txt2tex/issues/4)
-- **Priority**: MEDIUM
-- **Status**: ACTIVE
+- **Status**: RESOLVED in commit 7f6a932
 - **Test Command**:
   ```bash
   hatch run convert tests/bugs/bug4_comma_after_parens.txt
   pdftotext tests/bugs/bug4_comma_after_parens.pdf -
   ```
-- **Expected**: `The statements (¬ p ⇒ ¬ q), (q ⇒ p) are equivalent.`
-- **Actual**: `The statements (not p => not q), (q ⇒ p) are equivalent.` (first expression not converted)
-- **Workaround**: Avoid comma immediately after closing parenthesis in TEXT blocks
-- **Impact**: Homework problems with multiple statements separated by commas
-
-## Resolved Issues
+- **Result**: Both expressions now correctly converted:
+  - `(not p => not q), (q => p)` → `¬ p ⇒ ¬ q, q ⇒ p` ✓
+- **Fix**: Pattern -0.5 uses balanced parenthesis matching instead of greedy regex
 
 ### Bug 5: Logical operators (or, and) not converted in TEXT blocks - RESOLVED ✓
 - **File**: [bug5_or_operator.txt](bug5_or_operator.txt)
