@@ -1,6 +1,6 @@
 === Propositional Logic ===
 
-TEXT: Answers typically leverage the grammar's order of precedence (not, and, or, =>, <=>) rather than clarifying parenthesis (Simpson, 2025a, slide 20).
+TEXT: Answers leverage the grammar's order of precedence ([not], [and], [or], [=>], [<=>]) rather than clarifying parenthesis (Simpson, 2025a, slide 20).
 
 ** Question 1 **
 
@@ -142,19 +142,20 @@ PROOF:
     [1] (p => r) and (q => r) [assumption]
     :: (p or q) => r [=> intro from 2]
       [2] p or q [assumption]
-      :: r [or elim from 3]
+      :: r [or elim from 2]
+        :: p or q [from 2]
         case p:
-          :: p => r [and elim 1]
-            :: (p => r) and (q => r) [from 1]
           :: r [=> elim]
-            [3] p [assumption]
+            :: p [from 2]
+            :: (p => r) [and elim 1]
+              (p => r) and (q => r) [from 1]
         case q:
-          :: q => r [and elim 2]
-            :: (p => r) and (q => r) [from 1]
           :: r [=> elim]
-            [3] q [assumption]
-
-TEXT: In this proof, I start by working from the bottom mechanically, taking (p => r) and (q => r) as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need (p or q) and r as inputs to the implication introduction rule.  I take (p or q) as assumption [2] and discharge this assumption via this rule.  That leaves me with r as the result of my bottom up process.
+            :: q [from 2]
+            :: (q => r) [and elim 2]
+              (p => r) and (q => r) [from 1]
+  
+TEXT: In this proof, I start by working from the bottom mechanically, taking (p => r) and (q => r) as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need (p or q) and r as inputs to the implication introduction rule.  I take (p or q) as assumption [2] and discharge this assumption via this rule.  That leaves me with r as the result of my bottom up process.  As I have already made assumptions ((p => r) and (q => r)) [1] and (p or q) [2] and they are related, I start by working with both top-down. I begin with (p or q) [2] and create cases for p and q working towards or elimination.  The p and q sub-branches are marked with [2] as the assumption as these are just the cases for (p or q) [2] (Simpson, 2025c, slide 41). First, I apply and elimination in each case to get (p => r), (q => r) with p, q respectively in the sub-branches.  From there, I apply implication elimination to arrive at r in both cases.  This enables me to use the or elimation together with (p or q) [2] to simplify to r.  At this stage, I do not discharge assumption [2], as this is deferred until the next step. I use implication introduction together with (p or q) [2] and r from the or elimination to discharge assumption [2], which connects the top-down and bottom-up process. All assumptions are properly discharged.  
 
 TEXT: In the other direction, we are seeking to prove (p or q => r) => (p => r) and (q => r):
 
@@ -172,8 +173,10 @@ PROOF:
       [3] q [assumption]
       :: r [=> elim]
         :: (p or q) => r [from 1]
-        :: p or q [or intro1]
-          [2] p [assumption]
+        :: p or q [or intro2]
+          [3] q [assumption]
+
+TEXT: Working mechanically from the bottom, we start by taking (p or q => r) as assumption [1] and applying the implication introduction rule to discharge assumption [1].  This leaves us with (p => r) and (q => r), which is derived from p => r, q => r and the application of the and introduction rule. Fairly clearly, we need two sub-branches to be developed top-down. Since we have (p or q => r) and we want p => r and q => r, I start with p [2] and q [3] to start the top-down sub-trees.  I struggled here until I recalled that I could use the or intro rule to satisfy (p or q).  I also had to recall that this does not generate additional assumptions to discharge (Simpson, 2025c, slide 38).  From here, it was not difficult to use implication elimation to arrive at r in both sub-trees and to apply p [2] and q [3] in each tree respectively with the implication introduction rule to discharge those assumptions.  This gave me p => r, q => r and I used the and introduction rule to connect the top and bottom portions of the proof. All assumptions are properly discharged.  
 
 TEXT: We then combine these two proofs with the <=>-intro rule, using the results from above:
 
@@ -197,31 +200,19 @@ TEXT: Woodcock J. and Davies J. 1996 Using Z Specification Refinement and Proof.
 
 TEXT: Lecture Slides
 
-TEXT: Simpson A 2025a Lecture schedule. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 00.
+TEXT: Simpson A 2025a Introduction and propositions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 01.
 
-TEXT: Simpson A 2025b Introduction and propositions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 01.
+TEXT: Simpson A 2025b Predicate logic and equality. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 02.
 
-TEXT: Simpson A 2025c Predicate logic and equality. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 02.
+TEXT: Simpson A 2025c Deductive proofs. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 03.
 
-TEXT: Simpson A 2025d Deductive proofs. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 03.
+TEXT: Simpson A 2025d Sets types and definitions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 04.
 
-TEXT: Simpson A 2025e Sets types and definitions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 04.
+TEXT: Simpson A 2025e Relations. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 05.
 
-TEXT: Simpson A 2025f Relations. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 05.
+TEXT: Simpson A 2025f Functions and sequences. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 06.
 
-TEXT: Simpson A 2025g Functions and sequences. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 06.
-
-TEXT: Simpson A 2025h Free types and induction. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 07.
-
-TEXT: Course Materials
-
-TEXT: Simpson A 2025i Exercises for Software Engineering Mathematics. University of Oxford Department of Computer Science. Unpublished course materials.
-
-TEXT: Simpson A 2025j Solutions for Software Engineering Mathematics. University of Oxford Department of Computer Science. Unpublished course materials.
-
-TEXT: Additional References from Course Materials
-
-TEXT: Abrial J-R 1996 The B-Book Assigning Meanings to Programs. Cambridge Cambridge University Press.
+TEXT: Simpson A 2025g Free types and induction. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 07.
 
 TEXT: Simpson A.C. 2002 Discrete Mathematics by Example. London McGraw-Hill.
 
