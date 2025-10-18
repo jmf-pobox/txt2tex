@@ -14,7 +14,7 @@ Each bug has:
 
 ### Bug 1: Parser fails on prose mixed with inline math (periods)
 - **File**: [bug1_prose_period.txt](bug1_prose_period.txt)
-- **Issue**: #1 (to be created)
+- **Issue**: [#1](https://github.com/jmf-pobox/txt2tex/issues/1)
 - **Priority**: HIGH
 - **Status**: ACTIVE
 - **Test Command**:
@@ -28,7 +28,7 @@ Each bug has:
 
 ### Bug 2: TEXT blocks with multiple pipes close math mode prematurely
 - **File**: [bug2_multiple_pipes.txt](bug2_multiple_pipes.txt)
-- **Issue**: #2 (to be created)
+- **Issue**: [#2](https://github.com/jmf-pobox/txt2tex/issues/2)
 - **Priority**: MEDIUM
 - **Status**: ACTIVE
 - **Test Command**:
@@ -43,7 +43,7 @@ Each bug has:
 
 ### Bug 3: Compound identifiers with operator suffixes fail
 - **File**: [bug3_compound_id.txt](bug3_compound_id.txt)
-- **Issue**: #3 (to be created)
+- **Issue**: [#3](https://github.com/jmf-pobox/txt2tex/issues/3)
 - **Priority**: MEDIUM
 - **Status**: ACTIVE
 - **Test Command**:
