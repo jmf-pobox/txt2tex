@@ -1,0 +1,7 @@
+=== Bug 4 Test: Comma After Parenthesized Math in TEXT ===
+
+TEXT: The statements (not p => not q), (q => p) are equivalent.
+
+TEXT: Without comma it works: (not p => not q) is correct.
+
+TEXT: The issue is specifically when a comma immediately follows the closing parenthesis.
