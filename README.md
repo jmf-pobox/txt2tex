@@ -185,8 +185,8 @@ For batch processing of examples:
 # Build all examples
 cd examples && make
 
-# Build specific file
-make phase8
+# Build specific topic
+cd 01_propositional_logic && make
 
 # Parallel build
 make -j4
@@ -349,8 +349,8 @@ hatch run test
 # With coverage
 hatch run test-cov
 
-# Specific test file
-hatch run test tests/test_phase9.py
+# Specific test directory
+hatch run test tests/01_propositional/
 
 # Verbose output
 hatch run test -v
@@ -494,29 +494,30 @@ hatch run convert input.txt --fuzz
 
 ## Examples
 
-The `examples/` directory contains working examples for all implemented features:
+The `examples/` directory contains working examples organized by topic:
 
 ```bash
-# View available examples
-ls examples/*.txt
+# View available topics
+ls examples/
 
 # Build specific example
-hatch run convert examples/phase9.txt
+hatch run convert examples/01_propositional_logic/hello_world.txt
 
 # Build all examples
 cd examples && make
 ```
 
-Examples include:
-- **phase0.txt** - Propositional logic
-- **phase1.txt** - Document structure, truth tables
-- **phase2.txt** - Equivalence chains
-- **phase3.txt** - Quantifiers and mathematical notation
-- **phase4.txt** - Z notation definitions
-- **phase5.txt** - Natural deduction proof trees
-- **phase8.txt** - Set comprehension
-- **phase9.txt** - Generic parameters
-- And many more...
+Example topics include:
+- **01_propositional_logic/** - Basic operators, truth tables
+- **02_predicate_logic/** - Quantifiers and set comprehension
+- **03_equality/** - Equality reasoning
+- **04_proof_trees/** - Natural deduction proofs
+- **05_sets/** - Set notation and operations
+- **06_definitions/** - Z notation schemas and axdefs
+- **07_relations/** - Relation operators
+- **08_functions/** - Function types and lambda expressions
+- **09_sequences/** - Sequence notation and operations
+- And more...
 
 ## Contributing
 
