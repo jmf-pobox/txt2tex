@@ -22,7 +22,10 @@ Predicate logic with quantifiers and declarations.
 ### 03_equality (Lecture 3)
 Equality and unique quantification.
 
-*Examples to be added*
+- `equality_operators.txt` - Basic equality (=, !=) and equality in predicates
+- `unique_existence.txt` - Unique quantifier (exists1) and uniqueness conditions
+- `mu_operator.txt` - Mu operator (μ) for selecting unique values
+- `one_point_rule.txt` - Applications of the one-point rule in quantifier elimination
 
 ### 04_proof_trees
 Natural deduction proof trees with inference rules.
@@ -77,7 +80,11 @@ Functions, lambda expressions, and function types.
 ### 09_sequences (Lecture 9)
 Sequences, bags, and sequence operations.
 
-*Examples to be added*
+- `sequence_basics.txt` - Sequence types and literals (⟨⟩, <>, ⟨a,b,c⟩)
+- `concatenation.txt` - Sequence concatenation (⌢, ^) and cons patterns
+- `sequence_operations.txt` - Length (#), head, tail, last, front, reverse
+- `pattern_matching.txt` - Pattern matching with sequences in recursive definitions
+- `bags.txt` - Bag types and bag literals ([[x]], [[a,b,c]])
 
 ### infrastructure/
 LaTeX support files (not examples):

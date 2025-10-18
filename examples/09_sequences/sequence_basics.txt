@@ -1,0 +1,45 @@
+=== Sequence Basics ===
+
+** Example 1: Sequence Types **
+
+TEXT: Sequence types define collections of ordered elements:
+
+seq N
+
+seq Z
+
+iseq N
+
+** Example 2: Sequence Literals (Unicode) **
+
+TEXT: Sequences can be written with Unicode angle brackets:
+
+⟨⟩
+
+⟨a⟩
+
+⟨a, b, c⟩
+
+⟨1, 2, 3, 4⟩
+
+** Example 3: Sequence Literals (ASCII) **
+
+TEXT: ASCII angle brackets are also supported:
+
+<>
+
+<a>
+
+<a, b, c>
+
+<1, 2, 3, 4>
+
+** Example 4: Sequences in Expressions **
+
+TEXT: Sequences can appear in various contexts:
+
+s in seq N
+
+# <>
+
+# <a, b, c, d>

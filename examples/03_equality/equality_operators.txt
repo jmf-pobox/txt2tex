@@ -1,0 +1,33 @@
+=== Equality Operators ===
+
+** Example 1: Basic Equality **
+
+TEXT: The equality operator compares values:
+
+x = y
+
+x != y
+
+** Example 2: Equality in Predicates **
+
+TEXT: Equality is commonly used in quantified predicates:
+
+forall x : N | x = x
+
+exists y : Z | y = 0
+
+** Example 3: Equality in Set Comprehension **
+
+TEXT: Using equality to define sets:
+
+{ z : Z | z = 10 }
+
+{ n : N | n = n }
+
+** Example 4: Equality with Expressions **
+
+TEXT: Equality can compare complex expressions:
+
+forall x, y : N | x + y = y + x
+
+exists a, b : Z | a * b = 0

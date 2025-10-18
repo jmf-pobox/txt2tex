@@ -1,0 +1,57 @@
+=== Sequence Operations ===
+
+** Example 1: Sequence Length **
+
+TEXT: The cardinality operator gives the length of a sequence:
+
+# <>
+
+# <a, b, c>
+
+# s
+
+** Example 2: Head and Tail **
+
+TEXT: Basic sequence decomposition:
+
+head <a, b, c>
+
+tail <a, b, c>
+
+head s
+
+tail s
+
+** Example 3: Last and Front **
+
+TEXT: Operations on the end of sequences:
+
+last <a, b, c>
+
+front <a, b, c>
+
+last s
+
+front s
+
+** Example 4: Reverse **
+
+TEXT: Reversing a sequence:
+
+rev <>
+
+rev <a>
+
+rev <a, b, c>
+
+rev (rev s)
+
+** Example 5: Domain and Range **
+
+TEXT: Sequences are functions from indices to elements:
+
+dom <>
+
+dom <a, b, c, d>
+
+ran <a, b, c>
