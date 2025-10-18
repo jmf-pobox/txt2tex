@@ -1,0 +1,23 @@
+\documentclass{article}
+\usepackage{zed-proof}
+\begin{document}
+
+% Test 1: Simple case - this SHOULD work
+\[
+\infer[rule1]{conclusion}{
+  premise1
+&
+  premise2
+}
+\]
+
+% Test 2: Nested infer with & inside raiseproof - this FAILS
+\[
+\infer[rule1]{conclusion}{
+  premise1
+&
+  \raiseproof{10ex}{\infer[rule2]{subconc}{subprem1 & subprem2}}
+}
+\]
+
+\end{document}
