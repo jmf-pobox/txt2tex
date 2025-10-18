@@ -402,13 +402,13 @@ Generates: `\begin{zed}[Person, Company]\end{zed}`
 ### Abbreviations
 
 ```
-Pairs == N cross N
+Pairs == N cross N      →  Pairs == ℕ × ℕ
 ```
 
 **With generic parameters:**
 ```
-[X] Pair == X
-[X, Y] Product == X cross Y
+[X] Pair == X           →  [X] Pair == X
+[X, Y] Product == X cross Y  →  [X, Y] Product == X × Y
 ```
 
 ### Free Types
