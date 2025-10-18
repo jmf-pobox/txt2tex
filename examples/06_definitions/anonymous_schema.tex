@@ -1,0 +1,48 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Testing Anonymous Schemas}
+
+\bigskip
+\noindent
+\textbf{Test 1 : Named Schema}
+
+\medskip
+
+\begin{schema}{State}
+count : \mathbb{N}
+\where
+count \geq 0
+\end{schema}
+
+\bigskip
+\noindent
+\textbf{Test 2 : Anonymous Schema}
+
+\medskip
+
+\begin{schema}{}
+hd : seq[\mathbb{N}]
+\where
+\# hd \leq 100
+\end{schema}
+
+\bigskip
+\noindent
+\textbf{Test 3 : Another Anonymous Schema}
+
+\medskip
+
+\begin{schema}{}
+x : \mathbb{N}
+y : \mathbb{N}
+\where
+x + y < 100
+\end{schema}
+
+\end{document}

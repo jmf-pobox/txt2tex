@@ -1,0 +1,20 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\bigskip
+\noindent
+\textbf{Test Pattern Matching}
+
+\medskip
+
+\begin{axdef}
+\where
+\forall x \colon Entry \bullet \forall s \colon \seq~Entry \bullet courses(\langle \rangle) = \langle \rangle \land courses(\langle x \rangle \cat s) = (\mbox{if } x.3 = 479 \mbox{ then } \langle x \rangle \cat courses(s) \mbox{ else } courses(s))
+\end{axdef}
+
+\end{document}

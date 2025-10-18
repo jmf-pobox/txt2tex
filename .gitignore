@@ -53,8 +53,7 @@ ENV/
 *.fuzz.log
 *.pdflatex.log
 
-# Generated LaTeX source files
-*.tex
+# Generated font files
 *.tfm
 *.pk
 *.gf
@@ -68,10 +67,6 @@ hw/*.mf
 # But keep example PDFs
 !examples/*.pdf
 !docs/*.pdf
-
-# But keep reference LaTeX files and test files
-!examples/reference/*.tex
-!examples/04_proof_trees/*.tex
 
 # Temporary files
 *.tmp

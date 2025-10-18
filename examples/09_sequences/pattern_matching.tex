@@ -1,0 +1,105 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Pattern Matching with Sequences}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Empty Sequence Pattern}
+
+\medskip
+
+\bigskip
+
+Pattern matching on the empty sequence:
+
+\bigskip
+
+\begin{axdef}
+f : \seq~\mathbb{N} \fun \mathbb{N}
+\where
+f(\langle \rangle) = 0
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 2 : Cons Pattern ( Head and Tail )}
+
+\medskip
+
+\bigskip
+
+Decomposing a sequence into head and tail:
+
+\bigskip
+
+\begin{axdef}
+g : \seq~\mathbb{N} \fun \mathbb{N}
+\where
+g(\langle \rangle) = 0
+\forall x \colon \mathbb{N} \bullet \forall s \colon \seq~\mathbb{N} \bullet g(\langle x \rangle \cat s) = x
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 3 : Recursive Sum}
+
+\medskip
+
+\bigskip
+
+Computing the sum of elements using pattern matching:
+
+\bigskip
+
+\begin{axdef}
+total : \seq~\mathbb{N} \fun \mathbb{N}
+\where
+total(\langle \rangle) = 0
+\forall x \colon \mathbb{N} \bullet \forall s \colon \seq~\mathbb{N} \bullet total(\langle x \rangle \cat s) = x + total(s)
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 4 : Cumulative Total}
+
+\medskip
+
+\bigskip
+
+A more descriptive example from the solutions:
+
+\bigskip
+
+\begin{axdef}
+\mathit{cumulative\_total} : \seq~\mathbb{N} \fun \mathbb{N}
+\where
+\mathit{cumulative\_total}(\langle \rangle) = 0
+\forall x \colon \mathbb{N} \bullet \forall s \colon \seq~\mathbb{N} \bullet \mathit{cumulative\_total}(\langle x \rangle \cat s) = x + \mathit{cumulative\_total}(s)
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 5 : Filter Pattern}
+
+\medskip
+
+\bigskip
+
+Filtering sequences based on a condition:
+
+\bigskip
+
+\begin{axdef}
+positives : \seq~\mathbb{Z} \fun \seq~\mathbb{Z}
+\where
+positives(\langle \rangle) = \langle \rangle
+\forall x \colon \mathbb{Z} \bullet \forall s \colon \seq~\mathbb{Z} \bullet positives(\langle x \rangle \cat s) = (\mbox{if } x > 0 \mbox{ then } \langle x \rangle \cat positives(s) \mbox{ else } positives(s))
+\end{axdef}
+
+\end{document}

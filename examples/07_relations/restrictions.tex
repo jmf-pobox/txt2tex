@@ -1,0 +1,236 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 11 b : Function Application}
+
+\bigskip
+
+Basic function application (single argument):
+
+\bigskip
+
+\noindent
+$f(x)$
+
+
+\noindent
+$square(5)$
+
+
+\noindent
+$parent(john)$
+
+
+\bigskip
+
+Multiple arguments:
+
+\bigskip
+
+\noindent
+$g(x, y, z)$
+
+
+\noindent
+$sum(a, b, c, d)$
+
+
+\noindent
+$max(x, y)$
+
+
+\bigskip
+
+Nested function application:
+
+\bigskip
+
+\noindent
+$f(g(x))$
+
+
+\noindent
+$f(g(h(x)))$
+
+
+\noindent
+$outer(middle(inner(value)))$
+
+
+\bigskip
+
+Empty argument list:
+
+\bigskip
+
+\noindent
+$f()$
+
+
+\noindent
+$initialize()$
+
+
+\bigskip
+
+Function application in expressions:
+
+\bigskip
+
+\noindent
+$f(x) \land g(y)$
+
+
+\noindent
+$f(x) \Rightarrow g(x)$
+
+
+\noindent
+$f(x) > 0$
+
+
+\noindent
+$height(m) < 10$
+
+
+\bigskip
+
+Function application in quantifiers:
+
+\bigskip
+
+\noindent
+$\forall x \colon \mathbb{N} \bullet f(x) > 0$
+
+
+\noindent
+$\exists d \colon Dog \bullet gentle(d) \land neat(d)$
+
+
+\noindent
+$\forall x, y \colon \mathbb{N} \bullet g(x, y) = g(y, x)$
+
+
+\bigskip
+
+Special Z notation functions (generic instantiation):
+
+\bigskip
+
+\begin{axdef}
+items : \seq~\mathbb{N}
+possibilities : \power~Item
+collection : \bag~X
+sequence : \iseq~\mathbb{N}
+\end{axdef}
+
+\bigskip
+
+Function application with set membership:
+
+\bigskip
+
+\noindent
+$x \in f(S)$
+
+
+\noindent
+$y \in \power~X$
+
+
+\noindent
+$z \in \seq~\mathbb{N}$
+
+
+\bigskip
+
+Complex predicates from Solution 5:
+
+\bigskip
+
+\noindent
+$\exists d \colon Dog \bullet gentle(d) \land neat(d)$
+
+
+\noindent
+$\forall d \colon Dog \bullet neat(d) \Rightarrow attractive(d)$
+
+
+\bigskip
+
+Function application in definitions:
+
+\bigskip
+
+\begin{axdef}
+f : X \fun Y
+\where
+\forall x \colon X \bullet f(x) \in Y
+\end{axdef}
+
+\begin{schema}{PersonHeight}
+height : Person \fun \mathbb{N}
+\where
+\forall p \colon Person \bullet height(p) > 0 \land height(p) < 300
+\end{schema}
+
+\bigskip
+
+Function application with comparisons:
+
+\bigskip
+
+\noindent
+$f(x, y) > g(x, y)$
+
+
+\noindent
+$max(x, y) = max(y, x)$
+
+
+\noindent
+$f(0) = 1$
+
+
+\bigskip
+
+Expression arguments:
+
+\bigskip
+
+\noindent
+$f(x \land y)$
+
+
+\noindent
+$g(x \lor y, p \Rightarrow q)$
+
+
+\noindent
+$h(a > b, c < d)$
+
+
+\bigskip
+
+Function application with subscripts and superscripts:
+
+\bigskip
+
+\noindent
+$f(x_i)$
+
+
+\noindent
+$g(x^2)$
+
+
+\noindent
+$h(a_1, a_2)$
+
+
+\end{document}
