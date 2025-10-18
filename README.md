@@ -311,7 +311,7 @@ hatch run convert input.txt --fuzz
 
 ## Known Issues
 
-### Active Bugs (5 confirmed)
+### Active Bugs (4 confirmed)
 
 | Priority | Issue | Description | Workaround |
 |----------|-------|-------------|------------|
@@ -319,7 +319,6 @@ hatch run convert input.txt --fuzz
 | MEDIUM | [#2](https://github.com/jmf-pobox/txt2tex/issues/2) | Multiple pipes in TEXT close math mode | Use axdef/schema |
 | MEDIUM | [#3](https://github.com/jmf-pobox/txt2tex/issues/3) | Cannot use R+, R* identifiers | None available |
 | MEDIUM | [#4](https://github.com/jmf-pobox/txt2tex/issues/4) | Comma after parenthesized math not detected | Avoid comma after parens |
-| MEDIUM-HIGH | [#5](https://github.com/jmf-pobox/txt2tex/issues/5) | Logical operators (or, and) not converted | Use axdef/schema |
 
 **For bug details and test cases, see [tests/bugs/README.md](tests/bugs/README.md)**
 
@@ -330,7 +329,7 @@ hatch run convert input.txt --fuzz
 **Parser Limitations:**
 - Prose mixed with inline math outside TEXT blocks causes parse errors
 - Identifiers with operator suffixes (R+, R*) not supported
-- TEXT block inline math detection has edge cases with commas and logical operators
+- TEXT block inline math detection has edge cases with commas
 
 **Unimplemented Features:**
 - Schema decoration (S', ΔS, ΞS)
