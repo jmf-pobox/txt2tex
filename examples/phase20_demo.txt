@@ -6,7 +6,7 @@ TEXT: bigcup S is the union of all sets in the set of sets S:
 
 given X
 
-abbrev S == P(P(X))
+S == P(P(X))
 
 axdef
   allElements : S -> P(X)
