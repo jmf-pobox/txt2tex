@@ -1363,10 +1363,9 @@ class LaTeXGenerator:
                 # Parsing failed, leave as-is
                 pass
 
-        # Pattern -0.5: Parenthesized logical expressions with or/and
+        # Pattern -0.5: Parenthesized logical expressions
         # Detect expressions like "(p or q)", "(p and q)", "((p => r) and (q => r))"
-        # This pattern handles the case where or/and operators are in parentheses
-        # but there's no => or <=> to trigger Pattern -1
+        # Also handles "(not p => not q)" which Pattern -1 misses due to greedy matching
         # Use balanced parenthesis matching to handle nested expressions
         paren_matches = self._find_balanced_parens(result)
 
@@ -1379,10 +1378,17 @@ class LaTeXGenerator:
 
             paren_text = result[start_pos:end_pos]
 
-            # Only process if it contains 'or' or 'and' keywords with word boundaries
-            if not (
-                re.search(r"\bor\b", paren_text) or re.search(r"\band\b", paren_text)
-            ):
+            # Only process if it contains logical operators or keywords
+            # Look for: or, and, not, =>, <=>
+            has_logic = bool(
+                re.search(r"\bor\b", paren_text)
+                or re.search(r"\band\b", paren_text)
+                or re.search(r"\bnot\b", paren_text)
+                or "=>" in paren_text
+                or "<=>" in paren_text
+            )
+
+            if not has_logic:
                 continue
 
             # Try to parse as logical expression
