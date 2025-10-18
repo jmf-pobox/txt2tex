@@ -1,0 +1,13 @@
+\documentclass{article}
+\usepackage{zed-proof}
+\begin{document}
+\[
+\infer[outer]{conclusion}{
+  prem1
+&
+  \raiseproof{10ex}\bgroup\infer[inner1]{c1}{p1} & \infer[inner2]{c2}{p2a & p2b}\egroup
+&
+  \raiseproof{10ex}\bgroup\infer[inner3]{c3}{p3} & \infer[inner4]{c4}{p4a & p4b}\egroup
+}
+\]
+\end{document}

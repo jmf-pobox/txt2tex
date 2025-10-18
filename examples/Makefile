@@ -1,70 +1,91 @@
 # Makefile for txt2tex examples
 #
 # Usage:
-#   make          # Build all PDFs
-#   make all      # Build all PDFs
-#   make phase8   # Build phase8.pdf
-#   make clean    # Remove all generated files
-#   make -j       # Build in parallel
+#   make                    # Build all PDFs in all subdirectories
+#   make all                # Build all PDFs
+#   make 01_propositional   # Build all examples in 01_propositional_logic/
+#   make clean              # Remove all generated files
+#   make -j                 # Build in parallel
 
 SHELL := /bin/bash
 
-# Find all .txt files in this directory (excluding test_ and solutions_ files)
-TXT_FILES := $(filter-out test_% solutions_%, $(wildcard *.txt))
+# Find all .txt files in subdirectories (excluding reference/)
+TXT_FILES := $(shell find . -type f -name "*.txt" ! -path "./reference/*" ! -path "./infrastructure/*")
 
 # Generate corresponding .tex and .pdf targets
 TEX_FILES := $(TXT_FILES:.txt=.tex)
 PDF_FILES := $(TXT_FILES:.txt=.pdf)
 
+# Subdirectory targets
+SUBDIRS := 01_propositional_logic 02_predicate_logic 03_equality 04_proof_trees \
+           05_sets 06_definitions 07_relations 08_functions 09_sequences
+
 # Default target: build all PDFs
 .PHONY: all
 all: $(PDF_FILES)
 
-# Pattern rule: .txt -> .pdf (via txt2pdf.sh script with --fuzz option)
-%.pdf: %.txt ../txt2pdf.sh
+# Pattern rule: .txt -> .pdf (using hatch run convert)
+%.pdf: %.txt
 	@echo "Building $@..."
-	@../txt2pdf.sh $< > /dev/null 2>&1 || (echo "Error building $@"; exit 1)
+	@cd .. && hatch run convert $< > /dev/null 2>&1 || (echo "Error building $@"; exit 1)
 
-# Individual phase targets for convenience
-.PHONY: phase0 phase1 phase2 phase3 phase4 phase5 phase6 phase7 phase8 phase9 phase10a phase10b phase11a
-phase0: phase0.pdf
-phase1: phase1.pdf
-phase2: phase2.pdf
-phase3: phase3.pdf
-phase4: phase4.pdf
-phase5: phase5.pdf
-phase6: phase6.pdf
-phase7: phase7.pdf
-phase8: phase8.pdf
-phase9: phase9.pdf
-phase10a: phase10a.pdf
-phase10b: phase10b.pdf
-phase11a: phase11a.pdf
+# Subdirectory targets for convenience
+.PHONY: $(SUBDIRS)
+$(SUBDIRS):
+	@echo "Building examples in $@..."
+	@for f in $@/*.txt; do \
+		if [ -f "$$f" ]; then \
+			cd .. && hatch run convert "$$f" > /dev/null 2>&1 || (echo "Error building $$f"; exit 1); \
+		fi; \
+	done
 
-# Clean auxiliary files (keep LaTeX source and PDF)
+# Convenient short aliases
+.PHONY: 01 02 03 04 05 06 07 08 09
+01: 01_propositional_logic
+02: 02_predicate_logic
+03: 03_equality
+04: 04_proof_trees
+05: 05_sets
+06: 06_definitions
+07: 07_relations
+08: 08_functions
+09: 09_sequences
+
+# Clean auxiliary files in all subdirectories
 .PHONY: clean
 clean:
 	@echo "Cleaning auxiliary files..."
-	@rm -f *.aux *.log *.pdflatex.log *.fuzz.log
-	@rm -f *.tfm *.pk *.gf *.600pk *.600gf
+	@find . -type f \( -name "*.aux" -o -name "*.log" -o -name "*.synctex.gz" \
+		-o -name "*.fuzz.log" -o -name "*.pdflatex.log" \
+		-o -name "*.tfm" -o -name "*.pk" -o -name "*.gf" \
+		-o -name "*.600pk" -o -name "*.600gf" \) -delete
 	@echo "Done."
 
 # Deep clean: remove everything except source .txt files
 .PHONY: distclean
 distclean: clean
 	@echo "Removing all generated files..."
-	@rm -f $(TEX_FILES) $(PDF_FILES)
-	@rm -f *.sty *.mf
+	@find . -type f \( -name "*.tex" -o -name "*.pdf" \) ! -path "./reference/*" -delete
 	@echo "Done."
 
 # List all available targets
 .PHONY: list
 list:
 	@echo "Available targets:"
-	@echo "  all          - Build all PDFs (default)"
-	@echo "  phase0-11a   - Build specific phase PDF"
-	@echo "  clean        - Remove all generated files"
-	@echo "  list         - Show this help"
+	@echo "  all                    - Build all PDFs (default)"
+	@echo "  01-09                  - Build all examples in specific lecture directory"
+	@echo "  01_propositional_logic - Build examples in 01_propositional_logic/"
+	@echo "  02_predicate_logic     - Build examples in 02_predicate_logic/"
+	@echo "  03_equality            - Build examples in 03_equality/"
+	@echo "  04_proof_trees         - Build examples in 04_proof_trees/"
+	@echo "  05_sets                - Build examples in 05_sets/"
+	@echo "  06_definitions         - Build examples in 06_definitions/"
+	@echo "  07_relations           - Build examples in 07_relations/"
+	@echo "  08_functions           - Build examples in 08_functions/"
+	@echo "  09_sequences           - Build examples in 09_sequences/"
+	@echo "  clean                  - Remove auxiliary files"
+	@echo "  distclean              - Remove all generated files"
+	@echo "  list                   - Show this help"
 	@echo ""
 	@echo "Available .txt files:"
 	@for f in $(TXT_FILES); do echo "  $$f"; done
