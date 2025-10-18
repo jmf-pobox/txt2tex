@@ -116,7 +116,7 @@ hatch run convert input.txt --fuzz
 ```
 
 The conversion process:
-1. Parses your whiteboard notation
+1. Parses your plain text input
 2. Generates LaTeX with proper Z notation formatting
 3. Copies LaTeX dependencies locally (portable)
 4. Compiles to PDF
