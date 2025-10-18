@@ -1,8 +1,9 @@
-\documentclass[fleqn]{article}
-\usepackage[left=1.55in,right=1.55in,top=1in,bottom=1in]{geometry}
-\usepackage{fuzz}
-\usepackage{amsmath}
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
 \begin{document}
 
 \section*{Phase 12 : Sequences , Bags , and Tuple Projection}
@@ -216,17 +217,17 @@ $\lbag 1, 2, 2, 3, 3, 3 \rbag$
 
 \noindent
 \hangindent=2em
-(a) $\forall i : \mathbb{N} \spot i \in \langle 1, 2, 3 \rangle \Rightarrow i > 0$
+(a) $\forall i \colon \mathbb{N} \bullet i \in \langle 1, 2, 3 \rangle \Rightarrow i > 0$
 
 \medskip
 \noindent
 \hangindent=2em
-(b) $\exists s : seq[\mathbb{N}] \spot \head s = 1$
+(b) $\exists s \colon seq[\mathbb{N}] \bullet \head s = 1$
 
 \medskip
 \noindent
 \hangindent=2em
-(c) $\{ x : \mathbb{N} | x > 0 \spot \langle x, x^2 \rangle \}$
+(c) $\{ x \colon \mathbb{N} \mid x > 0 \bullet \langle x, x^2 \rangle \}$
 
 \medskip
 \bigskip
