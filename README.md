@@ -1,17 +1,20 @@
 # txt2tex
 
-Convert whiteboard-style mathematical notation to high-quality LaTeX for formal methods and Z notation.
+Convert plain text notation to high-quality LaTeX for formal methods and Z notation.
 
 ## What is txt2tex?
 
-txt2tex lets you write mathematical specifications in natural, whiteboard-style notation and automatically converts them to professionally typeset LaTeX documents. It's designed for:
+txt2tex converts mathematical specifications written in a simple plain text format to professionally typeset LaTeX documents. The primary advantage is that the input is plain text, not a markup language - you write expressions almost as you would on paper or a whiteboard.
 
+Designed for:
 - **Z notation** and formal specification languages
 - **Mathematical proofs** with natural deduction trees
 - **Academic assignments** requiring formal methods
 - **Technical documentation** with precise mathematical notation
 
-Write expressions like `forall x : N | x > 0` and get beautifully formatted LaTeX: ∀ x : ℕ • x > 0
+Write `forall x : N | x > 0` in plain text and get LaTeX: ∀ x : ℕ • x > 0
+
+**Note**: The proof syntax requires some structure (indentation-based), but mathematical expressions use natural notation.
 
 ## Quick Start
 
