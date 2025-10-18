@@ -1,0 +1,94 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 9 : Generic Parameters}
+
+\bigskip
+
+This example demonstrates Z notation definitions with generic (polymorphic) type parameters.
+
+\bigskip
+
+\begin{zed}[X, Y, Z]\end{zed}
+
+\bigskip
+
+Basic generic abbreviation for a Pair type:
+
+\bigskip
+
+[X] Pair == X
+
+\bigskip
+
+Generic abbreviation with two type parameters:
+
+\bigskip
+
+[X, Y] Product == X
+
+\bigskip
+
+Generic axiomatic definition with constraints:
+
+\bigskip
+
+\begin{axdef}[T]
+identity : T
+\where
+identity = identity
+\end{axdef}
+
+\bigskip
+
+Generic schema for a Stack data structure:
+
+\bigskip
+
+\begin{schema}{Stack}[X]
+items : X
+top : X
+\where
+top \in items
+\end{schema}
+
+\bigskip
+
+Generic schema with multiple parameters:
+
+\bigskip
+
+\begin{schema}{Relation}[X, Y]
+domain : X
+range : Y
+\where
+domain \in X
+range \in Y
+\end{schema}
+
+\bigskip
+
+Non-generic definitions still work as before:
+
+\bigskip
+
+Naturals == \mathbb{N}
+
+\begin{axdef}
+zero : \mathbb{N}
+\where
+zero = 0
+\end{axdef}
+
+\begin{schema}{Counter}
+value : \mathbb{N}
+\where
+value \geq 0
+\end{schema}
+
+\end{document}

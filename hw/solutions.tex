@@ -52,7 +52,7 @@ $p$ & $q$ & $( q \Rightarrow p )$ & $\lnot p$ & $\lnot q$ & $( \lnot p \Rightarr
 
 \bigskip
 
-$\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$ is a tautology as it is true for every interpretation of p, q as illustrated by the final column of truth values.
+The statements (not $p =>  not$ q), ($q \Rightarrow p$) are equivalent and $\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$ is a tautology as it is true for every interpretation of p, q as illustrated by the final column of truth values.
 
 \bigskip
 
@@ -76,7 +76,7 @@ $p$ & $q$ & $r$ & $( p \Rightarrow r )$ & $( q \Rightarrow r )$ & $( ( p \Righta
 
 \bigskip
 
-(($p \Rightarrow r$) and ($q \Rightarrow r$)) $\Leftrightarrow$ ((p or q) $\Rightarrow$ r) is a tautology as it is true for every interpretation of p, q, r as illustrated by the final column of truth values.
+The statements (($p \Rightarrow r$) and ($q \Rightarrow r$)), ((p or q) $\Rightarrow$ r) are equivalent and (($p \Rightarrow r$) and ($q \Rightarrow r$)) $\Leftrightarrow$ ((p or q) $\Rightarrow$ r) is a tautology as it is true for every interpretation of p, q, r as illustrated by the final column of truth values.
 
 \bigskip
 
@@ -266,7 +266,7 @@ $
 \vspace{11pt}
 \bigskip
 
-In one direction:
+In one direction, we are seeking to prove ($p \Rightarrow r$) and ($q \Rightarrow r$) $\Rightarrow$ (p or $q \Rightarrow r$):
 
 \bigskip
 
@@ -286,6 +286,74 @@ $\displaystyle
 \hskip 6em \raiseproof{26ex}{\infer[\Rightarrow \mathrm{elim}]{r}{\infer[\land\textrm{-elim-2}]{q \Rightarrow r}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
 } & \ulcorner q \urcorner^{[3]}}}
+}
+}
+}
+$
+
+\bigskip
+
+In the other direction, we are seeking to prove (p or $q \Rightarrow r$) $\Rightarrow$ ($p \Rightarrow r$) and ($q \Rightarrow r$):
+
+\bigskip
+
+\noindent
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \lor q \Rightarrow r) \Rightarrow (p \Rightarrow r) \land (q \Rightarrow r)}{
+  \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
+&
+\infer[\land \mathrm{intro}]{(p \Rightarrow r) \land (q \Rightarrow r)}{
+  \infer{p \Rightarrow r}{
+  \ulcorner p \urcorner^{[2]}
+&
+\infer{r}{
+  \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
+&
+p \lor q
+}
+}
+&
+\infer{q \Rightarrow r}{
+  \ulcorner q \urcorner^{[3]}
+&
+\infer{r}{
+  \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
+&
+p \lor q
+}
+}
+}
+}
+$
+
+\bigskip
+
+In the other direction, we are seeking to prove (p or $q \Rightarrow r$) $\Rightarrow$ ($p \Rightarrow r$) and ($q \Rightarrow r$):
+
+\bigskip
+
+\noindent
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \lor q \Rightarrow r) \Rightarrow (p \Rightarrow r) \land (q \Rightarrow r)}{
+  \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
+&
+\infer[\land \mathrm{intro}]{(p \Rightarrow r) \land (q \Rightarrow r)}{
+  \infer[\Rightarrow\textrm{-intro}^{[3]}]{p \Rightarrow r}{
+  \ulcorner p \urcorner^{[3]}
+&
+\infer[\Rightarrow \mathrm{elim}]{r}{
+  \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
+  \ulcorner p \lor q \urcorner^{[2]}
+}
+}
+&
+\infer[\Rightarrow\textrm{-intro}^{[3]}]{q \Rightarrow r}{
+  \ulcorner q \urcorner^{[3]}
+&
+\infer[\Rightarrow \mathrm{elim}]{r}{
+  \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
+  \ulcorner p \lor q \urcorner^{[2]}
+}
 }
 }
 }
