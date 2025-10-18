@@ -1,0 +1,14 @@
+# Generated LaTeX files
+*.tex
+*.pdf
+*.aux
+*.log
+*.out
+
+# LaTeX dependencies (copied during build)
+*.sty
+*.mf
+
+# Font files
+*.tfm
+*.pk
