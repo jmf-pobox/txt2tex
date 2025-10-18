@@ -1,8 +1,10 @@
 === Propositional Logic ===
 
-TEXT: N.B. Many answers leverage the grammar's order of precedence (not, and, or, =>, <=>) rather than pedagogical or clarifying parenthesis.
+TEXT: Answers typically leverage the grammar's order of precedence (not, and, or, =>, <=>) rather than clarifying parenthesis (Simpson, 2025a, slide 20).
 
 ** Question 1 **
+
+TEXT: Lecture 1 - Propositions
 
 (a) TRUTH TABLE:                                                                            
 p | not p | (not p => p) | p => (not p => p)
@@ -34,7 +36,11 @@ f | f | f | t | t | t | f | t | t
 
 TEXT: The statements ((p => r) and (q => r)), ((p or q) => r) are equivalent and ((p => r) and (q => r)) <=> ((p or q) => r) is a tautology as it is true for every interpretation of p, q, r as illustrated by the final column of truth values.
 
+PAGEBREAK:
+
 ** Question 2 **
+
+TEXT: Lecture 1 - Propositions
 
 (a) EQUIV:
 p => (not p => p) 
@@ -65,7 +71,11 @@ p or q => r [=> disjunction]
 
 TEXT: In this equivalence proof, we show that ((p => r) and (q => r)) <=> (p or q) => r by using the implication disjunction rule to replace implication with logical or, the commutativity of or rule to change the order of the elements, the distributivity 2 rule to extract r, and the commutivity of logical or to change the order of the elements, De Morgan to extract negation for (not p and not q), and the implication disjunction rule to reintroduce implication.
 
+PAGEBREAK:
+
 ** Question 3 **
+
+TEXT: Lecture 3 - Deductive Proofs
 
 (a) PROOF: 
   p => (not p => p) [=> intro from 1]
@@ -143,6 +153,8 @@ PROOF:
             :: (p => r) and (q => r) [from 1]
           :: r [=> elim]
             [3] q [assumption]
+
+TEXT: In this proof, I start by working from the bottom mechanically, taking (p => r) and (q => r) as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need (p or q) and r as inputs to the implication introduction rule.  I take (p or q) as assumption [2] and discharge this assumption via this rule.  That leaves me with r as the result of my bottom up process.
 
 TEXT: In the other direction, we are seeking to prove (p or q => r) => (p => r) and (q => r):
 

@@ -84,7 +84,9 @@
       "Bash(../txt2pdf.sh phase20_demo.txt)",
       "Bash(../txt2pdf.sh solutions.txt)",
       "Bash(git mv:*)",
-      "Bash(do echo \"=== $dir ===\")"
+      "Bash(do echo \"=== $dir ===\")",
+      "Bash(do touch \"$dir/__init__.py\")",
+      "Bash(timeout 120 hatch run test:*)"
     ],
     "deny": [],
     "ask": []

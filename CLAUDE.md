@@ -343,6 +343,38 @@ pdftotext output.pdf - | less
 grep -i error output.log
 ```
 
+## Bug Reporting Workflow
+
+When you encounter a bug:
+
+1. **Create minimal test case**:
+   ```bash
+   echo "=== Bug N Test: Description ===" > tests/bugs/bugN_short_name.txt
+   echo "[minimal failing example]" >> tests/bugs/bugN_short_name.txt
+   ```
+
+2. **Verify it fails**:
+   ```bash
+   hatch run convert tests/bugs/bugN_short_name.txt
+   ```
+
+3. **Create GitHub issue**:
+   - Use bug report template at `.github/ISSUE_TEMPLATE/bug_report.md`
+   - Include test case location and exact error/output
+   - See `.github/ISSUES_TO_CREATE.md` for examples
+
+4. **Update documentation**:
+   - Add bug to STATUS.md bug tracking table
+   - Reference issue number and test case file
+
+5. **Link in code** (if fixing):
+   - Reference issue number in commit messages
+   - Link to test file from code comments
+
+**Known Bugs**: See [STATUS.md#bug-tracking](STATUS.md#bug-tracking) for active bugs with test cases.
+
+**Bug Test Cases**: All bugs have minimal reproducible test cases in `tests/bugs/` - see [tests/bugs/README.md](tests/bugs/README.md).
+
 ## File Locations
 
 ```

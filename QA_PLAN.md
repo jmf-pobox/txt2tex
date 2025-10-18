@@ -1,5 +1,21 @@
 # txt2tex Quality Assurance Checklist
 
+## Bug Reporting
+
+Found a new bug during QA? Follow the bug reporting workflow:
+
+1. **Create minimal test case** in `tests/bugs/bugN_name.txt`
+2. **Verify bug** with `hatch run convert tests/bugs/bugN_name.txt`
+3. **Create GitHub issue** at [Issues](https://github.com/USER/REPO/issues/new?template=bug_report.md)
+4. **Include test case** in issue description
+5. **Update STATUS.md** with issue reference
+
+See [tests/bugs/README.md](tests/bugs/README.md) for bug test case format.
+
+**Known Bugs**: See [STATUS.md Bug Tracking section](STATUS.md#bug-tracking) for active bugs.
+
+---
+
 ## Success Criteria
 100% correctness across all 52 solutions. All three checks must pass for each solution.
 

@@ -169,38 +169,36 @@
 
 ---
 
-## Active Bugs
+## Bug Tracking
 
-### High Priority
+**See**: [GitHub Issues](https://github.com/USER/REPO/issues) for complete bug tracking
 
-**Parser: Prose mixed with inline math fails**
-- Periods cause parse errors outside TEXT blocks
-- Affects: Solutions 19-20 and many others
-- Status: Open - major parser limitation
+**Test Cases**: All bugs have minimal reproducible test cases in `tests/bugs/`
 
-### Medium Priority
+### Active Bugs (3 confirmed)
 
-**TEXT blocks: Multiple pipes close math mode prematurely**
-- Complex mu/forall expressions render incorrectly in TEXT
-- Affects: Solution 40(g) and similar
-- Status: Open - requires inline math detection fix
+| Priority | Issue | Component | Test Case | Blocks |
+|----------|-------|-----------|-----------|--------|
+| HIGH | #1: Parser fails on prose with periods | parser | [bug1_prose_period.txt](tests/bugs/bug1_prose_period.txt) | Homework, natural writing |
+| MEDIUM | #2: Multiple pipes in TEXT blocks | latex-gen | [bug2_multiple_pipes.txt](tests/bugs/bug2_multiple_pipes.txt) | Solution 40(g) |
+| MEDIUM | #3: Compound identifiers with operators | lexer | [bug3_compound_id.txt](tests/bugs/bug3_compound_id.txt) | Solution 31 |
 
-**Parser: Nested quantifiers in mu predicates fail**
-- Cannot handle multiple `|` characters in nested quantifiers
-- Affects: Solution 40(g)
-- Status: Open - needs Phase 21
+### Recently Resolved (2 fixed)
 
-**Compound identifiers with operators**
-- Cannot create identifiers like `R+`, `R*`
-- Affects: Solution 31
-- Status: Open - lexer limitation
+| Issue | Status | Fixed In |
+|-------|--------|----------|
+| Nested quantifiers in mu expressions | ✅ RESOLVED | Phase 19 |
+| emptyset keyword not converted | ✅ RESOLVED | Recent update |
 
-### Low Priority
+### Bug Reporting
 
-**TEXT block misuse**
-- Mathematical expressions incorrectly wrapped in TEXT
-- Should use direct expressions or proper Z blocks
-- Status: Documentation issue
+Found a new bug? Follow the workflow:
+1. Create minimal test case in `tests/bugs/bugN_name.txt`
+2. Verify with `hatch run convert tests/bugs/bugN_name.txt`
+3. Create [GitHub issue](https://github.com/USER/REPO/issues/new?template=bug_report.md)
+4. Reference test case in issue description
+
+See [tests/bugs/README.md](tests/bugs/README.md) for details.
 
 ---
 
@@ -233,12 +231,17 @@
 
 ## Test Coverage
 
-- **Total Tests:** 797 passing
+- **Total Tests:** 845 passing (reorganized October 2025)
 - **Component Coverage:**
   - parser.py: 88.91%
   - latex_gen.py: 80.61%
   - lexer.py: 94.56%
   - Overall: 88.49%
+
+**Test Organization:**
+- Tests reorganized by glossary lectures (01-09)
+- Test suite documentation: [tests/README.md](tests/README.md)
+- Bug test cases: [tests/bugs/](tests/bugs/)
 
 **Recent Test Additions:**
 - Phase 12: 55 tests (sequences, bags, tuple projection)
