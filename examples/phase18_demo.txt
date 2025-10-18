@@ -31,7 +31,7 @@ TEXT: Using -|> with custom types:
 
 given Year, Entry
 
-abbrev Table == seq(Entry)
+Table == seq(Entry)
 
 axdef
   records : Year -|> Table
