@@ -303,47 +303,15 @@ $\displaystyle
   \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
 &
 \infer[\land \mathrm{intro}]{(p \Rightarrow r) \land (q \Rightarrow r)}{
-  \infer{p \Rightarrow r}{
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{p \Rightarrow r}{
   \ulcorner p \urcorner^{[2]}
-&
-\infer{r}{
-  \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
-&
-p \lor q
-}
-}
-&
-\infer{q \Rightarrow r}{
-  \ulcorner q \urcorner^{[3]}
-&
-\infer{r}{
-  \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
-&
-p \lor q
-}
-}
-}
-}
-$
-
-\bigskip
-
-In the other direction, we are seeking to prove (p or $q \Rightarrow r$) $\Rightarrow$ ($p \Rightarrow r$) and ($q \Rightarrow r$):
-
-\bigskip
-
-\noindent
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \lor q \Rightarrow r) \Rightarrow (p \Rightarrow r) \land (q \Rightarrow r)}{
-  \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
-&
-\infer[\land \mathrm{intro}]{(p \Rightarrow r) \land (q \Rightarrow r)}{
-  \infer[\Rightarrow\textrm{-intro}^{[3]}]{p \Rightarrow r}{
-  \ulcorner p \urcorner^{[3]}
 &
 \infer[\Rightarrow \mathrm{elim}]{r}{
   \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
-  \ulcorner p \lor q \urcorner^{[2]}
+&
+\infer[\lor\textrm{-intro-1}]{p \lor q}{
+  \ulcorner p \urcorner^{[2]}
+}
 }
 }
 &
@@ -352,10 +320,28 @@ $\displaystyle
 &
 \infer[\Rightarrow \mathrm{elim}]{r}{
   \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
-  \ulcorner p \lor q \urcorner^{[2]}
+&
+\infer[\lor\textrm{-intro-1}]{p \lor q}{
+  \ulcorner p \urcorner^{[2]}
 }
 }
 }
+}
+}
+$
+
+\bigskip
+
+We then combine these two proofs with the $\Leftrightarrow$-intro rule, using the results from above:
+
+\bigskip
+
+\noindent
+$\displaystyle
+\infer[\Leftrightarrow \mathrm{intro}]{(p \Rightarrow r) \land (q \Rightarrow r) \Leftrightarrow p \lor q \Rightarrow r}{
+  (p \Rightarrow r) \land (q \Rightarrow r) \Rightarrow (p \lor q \Rightarrow r)
+&
+(p \lor q \Rightarrow r) \Rightarrow (p \Rightarrow r) \land (q \Rightarrow r)
 }
 $
 
