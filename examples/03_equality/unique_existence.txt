@@ -1,0 +1,35 @@
+=== Unique Existence ===
+
+** Example 1: Unique Quantifier (exists1) **
+
+TEXT: The unique existence quantifier asserts there is exactly one value satisfying the predicate:
+
+exists1 x : N | x = 5
+
+exists1 n : N | forall m : N | n <= m
+
+** Example 2: Multiple Conditions **
+
+TEXT: Unique existence with compound predicates:
+
+exists1 y : N | y in {0, 1} and y != 1
+
+exists1 z : Z | z^2 = 4 and z > 0
+
+** Example 3: One-Point Rule **
+
+TEXT: When a unique value is specified by equality, we can apply the one-point rule:
+
+EQUIV:
+exists y : N | y in {0, 1} and y != 1 and x != y
+<=> exists y : N | y = 0 and x != y [arithmetic]
+<=> 0 in N and x != 0 [one-point rule]
+<=> x != 0
+
+** Example 4: Unique in Domain **
+
+TEXT: Testing uniqueness within a specific domain:
+
+exists1 p : P {0, 1} | # p = 1
+
+exists1 x : {1, 2, 3, 4} | x > 3
