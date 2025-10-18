@@ -149,23 +149,23 @@ These ensure LaTeX Workshop can find the local dependencies (`.sty` and `.mf` fi
 # Terminal 1: Watch for changes and rebuild
 cd examples  # or hw/
 while true; do
-  inotifywait -e modify phase5.txt 2>/dev/null && \
-  hatch run convert phase5.txt
+  inotifywait -e modify myfile.txt 2>/dev/null && \
+  hatch run convert myfile.txt
   sleep 1
 done
 ```
 
 Then in VSCode/Cursor:
-- Open `phase5.tex`
+- Open `myfile.tex`
 - LaTeX Workshop auto-compiles and shows PDF preview
 
 **Option B: Manual rebuild** (simpler)
 
 ```bash
-# 1. Edit: examples/phase5.txt
+# 1. Edit your .txt file in examples/ or hw/
 # 2. Convert when ready:
-hatch run convert examples/phase5.txt
-# 3. Open: examples/phase5.tex in VSCode/Cursor
+hatch run convert examples/myfile.txt
+# 3. Open the generated .tex file in VSCode/Cursor
 # LaTeX Workshop shows PDF preview automatically
 ```
 
