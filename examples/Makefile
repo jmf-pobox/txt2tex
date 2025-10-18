@@ -9,8 +9,8 @@
 
 SHELL := /bin/bash
 
-# Find all .txt files in subdirectories (excluding reference/)
-TXT_FILES := $(shell find . -type f -name "*.txt" ! -path "./reference/*" ! -path "./infrastructure/*")
+# Find all .txt files in subdirectories (excluding reference/, infrastructure/, and future/)
+TXT_FILES := $(shell find . -type f -name "*.txt" ! -path "./reference/*" ! -path "./infrastructure/*" ! -path "*/future/*")
 
 # Generate corresponding .tex and .pdf targets
 TEX_FILES := $(TXT_FILES:.txt=.tex)
@@ -27,7 +27,7 @@ all: $(PDF_FILES)
 # Pattern rule: .txt -> .pdf (using hatch run convert)
 %.pdf: %.txt
 	@echo "Building $@..."
-	@cd .. && hatch run convert $< > /dev/null 2>&1 || (echo "Error building $@"; exit 1)
+	@cd .. && hatch run convert examples/$< > /dev/null 2>&1 || (echo "Error building $@"; exit 1)
 
 # Subdirectory targets for convenience
 .PHONY: $(SUBDIRS)
