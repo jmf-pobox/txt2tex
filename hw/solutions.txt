@@ -69,12 +69,16 @@ TEXT: In this equivalence proof, we show that ((p => r) and (q => r)) <=> (p or 
 
 (a) PROOF: 
   p => (not p => p) [=> intro from 1]
+    p [from 1]
     [1] p [assumption]
         not p => p [=> intro from 2]
-          [2] not p [assumption]
-          :: p [from 1]
+          p [from 1]
+          not p [false elim from 3]
+            false [false-intro]
+              [2] not p [assumption]
+              [3] p [assumption]
 
-TEXT: In this proof, we assume p, assume not p, use the implication introduction rule to arrive at not p => p and to discharge not p as an assumption, use the implication introduction rule to arrive at p => (not p => p) and to discharge the p assumption.
+TEXT: For this proof we are seeking to prove that p => (not p => p), which we know holds given the truth table in 1(a). Working mechanically from the bottom, I started by applying the => introduction rule with assumption [1] to gain our conclusion, => introduction rule with assumption [2] to gain (not p => p).  This statement requires that I have both p and not p as premisses, which is a bit odd and implied I needed to use false in the proof.  Since I had p as assumption [1], I knew I wanted not p as the output of the false rules.  It took some experimentation, but eventually I realized I needed three assumptions not two and it was obvious that I wanted to preserve not p as assumption [2], which meant I needed p as assumption [3] and that assumption [3] would be discharged by the false-elim rule.  In the final proof, all assumptions are discharged properly. The key insight was to have p as an assumption twice at different scopes.
 
 (b) 
 
