@@ -2045,6 +2045,7 @@ class LaTeXGenerator:
         """Generate LaTeX for axiomatic definition.
 
         Phase 9 enhancement: Supports optional generic parameters.
+        Multiple declarations appear on separate lines with line breaks.
         """
         lines: list[str] = []
 
@@ -2055,14 +2056,20 @@ class LaTeXGenerator:
         else:
             lines.append(r"\begin{axdef}")
 
-        # Generate declarations
-        for decl in node.declarations:
-            # Process variable through identifier logic for underscore handling
-            var_latex = self._generate_identifier(
-                Identifier(line=0, column=0, name=decl.variable)
-            )
-            type_latex = self.generate_expr(decl.type_expr)
-            lines.append(f"{var_latex} : {type_latex}")
+        # Generate declarations on separate lines
+        if node.declarations:
+            for i, decl in enumerate(node.declarations):
+                # Process variable through identifier logic for underscore handling
+                var_latex = self._generate_identifier(
+                    Identifier(line=0, column=0, name=decl.variable)
+                )
+                type_latex = self.generate_expr(decl.type_expr)
+
+                # Add line break after each declaration except the last
+                if i < len(node.declarations) - 1:
+                    lines.append(f"{var_latex} : {type_latex} \\\\")
+                else:
+                    lines.append(f"{var_latex} : {type_latex}")
 
         # Generate where clause if predicates exist
         if node.predicates:
@@ -2080,7 +2087,7 @@ class LaTeXGenerator:
         """Generate LaTeX for generic definition.
 
         Generic definitions always have generic parameters (required).
-        Adds indentation to match txt structure.
+        Multiple declarations appear on separate lines with line breaks.
         """
         lines: list[str] = []
 
@@ -2088,14 +2095,20 @@ class LaTeXGenerator:
         params_str = ", ".join(node.generic_params)
         lines.append(f"\\begin{{gendef}}[{params_str}]")
 
-        # Generate declarations with indentation
-        for decl in node.declarations:
-            # Process variable through identifier logic for underscore handling
-            var_latex = self._generate_identifier(
-                Identifier(line=0, column=0, name=decl.variable)
-            )
-            type_latex = self.generate_expr(decl.type_expr)
-            lines.append(f"  {var_latex}: {type_latex}")
+        # Generate declarations on separate lines
+        if node.declarations:
+            for i, decl in enumerate(node.declarations):
+                # Process variable through identifier logic for underscore handling
+                var_latex = self._generate_identifier(
+                    Identifier(line=0, column=0, name=decl.variable)
+                )
+                type_latex = self.generate_expr(decl.type_expr)
+
+                # Add line break after each declaration except the last
+                if i < len(node.declarations) - 1:
+                    lines.append(f"  {var_latex}: {type_latex} \\\\")
+                else:
+                    lines.append(f"  {var_latex}: {type_latex}")
 
         # Generate where clause if predicates exist
         if node.predicates:
@@ -2115,6 +2128,7 @@ class LaTeXGenerator:
 
         Phase 9 enhancement: Supports optional generic parameters.
         Phase 13 enhancement: Supports anonymous schemas (name=None).
+        Multiple declarations appear on separate lines with line breaks.
         """
         lines: list[str] = []
 
@@ -2128,14 +2142,20 @@ class LaTeXGenerator:
         else:
             lines.append(r"\begin{schema}{" + schema_name + "}")
 
-        # Generate declarations
-        for decl in node.declarations:
-            # Process variable through identifier logic for underscore handling
-            var_latex = self._generate_identifier(
-                Identifier(line=0, column=0, name=decl.variable)
-            )
-            type_latex = self.generate_expr(decl.type_expr)
-            lines.append(f"{var_latex} : {type_latex}")
+        # Generate declarations on separate lines
+        if node.declarations:
+            for i, decl in enumerate(node.declarations):
+                # Process variable through identifier logic for underscore handling
+                var_latex = self._generate_identifier(
+                    Identifier(line=0, column=0, name=decl.variable)
+                )
+                type_latex = self.generate_expr(decl.type_expr)
+
+                # Add line break after each declaration except the last
+                if i < len(node.declarations) - 1:
+                    lines.append(f"{var_latex} : {type_latex} \\\\")
+                else:
+                    lines.append(f"{var_latex} : {type_latex}")
 
         # Generate where clause if predicates exist
         if node.predicates:

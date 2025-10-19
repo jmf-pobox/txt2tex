@@ -464,7 +464,7 @@ where
 end
 ```
 
-**Multiple declarations:**
+**Multiple declarations (separate lines):**
 ```
 gendef [X, Y]
   fst : X cross Y -> X
@@ -473,6 +473,27 @@ where
   forall x : X; y : Y | fst(x, y) = x and snd(x, y) = y
 end
 ```
+
+**Multiple declarations (semicolon-separated on one line):**
+```
+gendef [X, Y]
+  fst : X cross Y -> X; snd : X cross Y -> Y
+where
+  forall x : X; y : Y | fst(x, y) = x and snd(x, y) = y
+end
+```
+
+Generates:
+```latex
+\begin{gendef}[X, Y]
+  fst: X \cross Y \fun X \\
+  snd: X \cross Y \fun Y
+\where
+  \forall x : X @ \forall y : Y @ fst(x, y) = x \land snd(x, y) = y \\
+\end{gendef}
+```
+
+**Note:** Both separate lines and semicolon-separated formats in the input generate the same LaTeX output - declarations appear on separate lines with `\\` line breaks. This ensures proper rendering in PDF where each declaration appears on its own line.
 
 Generic definitions are used for:
 - Polymorphic functions (like `fst`, `snd`, `head`, `tail`)
@@ -541,9 +562,11 @@ R(| {1, 2, 3} |)
 ### Relational Composition
 
 ```
-R ; S            →  R ; S       [relational composition]
-R o9 S           →  R ∘ S       [relational composition alternative]
+R o9 S           →  R ∘ S       [relational composition]
+R comp S         →  R ∘ S       [relational composition alternative]
 ```
+
+**Note:** Semicolon (`;`) is NOT supported for relational composition - it is reserved for separating declarations in `gendef`, `axdef`, and `schema` blocks. Always use `o9` or `comp` for relational composition.
 
 ### Closures
 
@@ -812,6 +835,25 @@ where
 end
 ```
 
+**Multiple declarations (semicolon-separated):**
+```
+axdef
+  x : N; y : N
+where
+  x > y
+end
+```
+
+Generates:
+```latex
+\begin{axdef}
+  x : \mathbb{N} \\
+  y : \mathbb{N}
+\where
+  x > y \\
+\end{axdef}
+```
+
 ### Schemas
 
 Define state spaces and operations:
@@ -836,6 +878,25 @@ schema Relation[X, Y]
   domain : P X
   range : P Y
 end
+```
+
+**Multiple declarations (semicolon-separated):**
+```
+schema Point
+  x : N; y : N
+where
+  x > 0 and y > 0
+end
+```
+
+Generates:
+```latex
+\begin{schema}{Point}
+  x : \mathbb{N} \\
+  y : \mathbb{N}
+\where
+  x > 0 \land y > 0
+\end{schema}
 ```
 
 ### Anonymous Schemas

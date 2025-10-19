@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
-**Last Updated:** 2025-10-18
-**Current Phase:** Phase 19 (Space-Separated Application) ✓ COMPLETE
+**Last Updated:** 2025-10-19
+**Current Phase:** Phase 20 (Semicolon-Separated Declarations) ✓ COMPLETE
 
 ---
 
@@ -18,7 +18,9 @@
 - 45 fully working + 0.20 (Sol 42) + 0.10 (Sol 43) = 45.30
 
 **Previous Coverage:** ~82% (42.3/52 solutions - Phase 18)
-**Improvement:** Added space-separated application (Phase 19), completed Solutions 44-47
+**Recent Improvements:**
+- Phase 19: Added space-separated application, completed Solutions 44-47
+- Phase 20: Added semicolon-separated declarations for gendef/axdef/schema
 
 ---
 
@@ -72,7 +74,7 @@
 - ✓ Maplet: `|->`
 - ✓ Domain/Range: `dom`, `ran`
 - ✓ Restrictions: `<|`, `|>`, `<<|`, `|>>`
-- ✓ Composition: `comp`, `;`, `o9`
+- ✓ Composition: `comp`, `o9` (Note: `;` is reserved for declaration separators)
 - ✓ Inverse: `~`, `inv`
 - ✓ Closures: `+` (transitive), `*` (reflexive-transitive)
 - ✓ Identity: `id`
@@ -110,9 +112,11 @@
 - ✓ Recursive free types: `Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩`
 - ✓ Abbreviations: `Name == expr`, `[X] Name == expr`
 - ✓ Axiomatic definitions: `axdef ... where ... end`
+- ✓ Generic definitions: `gendef [X] ... where ... end`
 - ✓ Schemas: `schema Name ... where ... end`
 - ✓ Generic axdef/schema: `axdef [X] ...`, `schema S[X] ...`
 - ✓ Anonymous schemas: `schema ... end`
+- ✓ Semicolon-separated declarations: `f : X -> X; g : X -> X` (renders on separate lines)
 
 ### Document Structure
 - ✓ Sections: `=== Title ===`
@@ -344,11 +348,13 @@
 - Generic instantiation distinguished: `seq[N]` vs `seq N`
 - Completed Solutions 44-47 (free type induction)
 
-### ✅ Phase 20: Distributed Union (bigcup)
-- Distributed union operator: `bigcup`
-- Prefix operator: `bigcup(S)` → `\bigcup S`
-- Combines with other operators: `bigcup(ran(f))` → `\bigcup \ran f`
-- Used for flattening sets of sets
+### ✅ Phase 20: Semicolon-Separated Declarations
+- Semicolon separators in declarations: `f : X -> X; g : X -> X`
+- Supported in `gendef`, `axdef`, and `schema` blocks
+- Both input formats (separate lines OR semicolons) render identically
+- LaTeX output uses `\\` line breaks for proper rendering
+- Each declaration appears on its own line in PDF
+- Note: Semicolon (`;`) no longer supported for relational composition - use `o9` or `comp`
 
 ---
 
@@ -527,7 +533,7 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 845 passing (reorganized October 2025)
+- **Total Tests:** 878 passing (as of Phase 20, October 2025)
 - **Component Coverage:**
   - parser.py: 88.91%
   - latex_gen.py: 80.61%
@@ -548,6 +554,7 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 - Phase 17: 9 tests (semicolon-separated bindings)
 - Phase 18: 14 tests (digit-starting identifiers)
 - Phase 19: 10 tests (space-separated application)
+- Phase 20: 20 tests (semicolon-separated declarations in gendef/axdef/schema)
 
 ---
 
