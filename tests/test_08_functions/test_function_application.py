@@ -205,24 +205,24 @@ class TestPhase11bSpecialFunctions:
     """Test special Z notation functions."""
 
     def test_seq_function(self):
-        """Test seq(N) → \\seq~\\mathbb{N}."""
+        """Test seq(N) → \\seq \\mathbb{N} (space, no tilde per fuzz manual)."""
         result = generate_latex("seq(N)")
-        assert result == r"\seq~\mathbb{N}"
+        assert result == r"\seq \mathbb{N}"
 
     def test_iseq_function(self):
-        """Test iseq(N) → \\iseq~\\mathbb{N}."""
+        """Test iseq(N) → \\iseq \\mathbb{N} (space, no tilde per fuzz manual)."""
         result = generate_latex("iseq(N)")
-        assert result == r"\iseq~\mathbb{N}"
+        assert result == r"\iseq \mathbb{N}"
 
     def test_bag_function(self):
-        """Test bag(X) → \\bag~X."""
+        """Test bag(X) → \\bag X (space, no tilde per fuzz manual)."""
         result = generate_latex("bag(X)")
-        assert result == r"\bag~X"
+        assert result == r"\bag X"
 
     def test_power_set(self):
-        """Test P(X) → \\power~X."""
+        """Test P(X) → \\power X (space, no tilde per fuzz manual)."""
         result = generate_latex("P(X)")
-        assert result == r"\power~X"
+        assert result == r"\power X"
 
     def test_special_function_multiple_args(self):
         """Test seq(N, N) → seq(N, N) (not special form)."""
@@ -230,9 +230,9 @@ class TestPhase11bSpecialFunctions:
         assert result == "seq(\\mathbb{N}, \\mathbb{N})"
 
     def test_seq_in_expression(self):
-        """Test x in seq(N)."""
+        """Test x in seq(N) (space, no tilde per fuzz manual)."""
         result = generate_latex("x in seq(N)")
-        assert result == r"x \in \seq~\mathbb{N}"
+        assert result == r"x \in \seq \mathbb{N}"
 
 
 class TestPhase11bEdgeCases:
