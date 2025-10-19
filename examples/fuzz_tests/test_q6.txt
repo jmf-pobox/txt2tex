@@ -1,0 +1,10 @@
+=== Test ===
+
+** Question 6 **
+
+(a)
+axdef
+  SquaresOfEvens : P Z
+where
+  SquaresOfEvens = { z : Z | z mod 2 = 0 . z^2 }
+end

@@ -1,0 +1,19 @@
+\documentclass{article}
+\usepackage{fuzz}
+\begin{document}
+
+\begin{zed}[Person]\end{zed}
+
+\begin{axdef}
+childOf : Person \rel Person
+\end{axdef}
+
+\begin{zed}parentOf == childOf^{-1}\end{zed}
+
+\begin{axdef}
+children : Person \fun \power Person
+\where
+children = \{ p : Person @ p \mapsto parentOf \limg \{p\} \rimg \}
+\end{axdef}
+
+\end{document}
