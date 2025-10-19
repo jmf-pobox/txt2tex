@@ -366,8 +366,8 @@ class LaTeXGenerator:
             # Fuzz uses \num for integers, LaTeX uses \mathbb{Z}
             return r"\num" if self.use_fuzz else r"\mathbb{Z}"
         if name == "N":
-            # Both fuzz and LaTeX use \mathbb{N} for naturals
-            return r"\mathbb{N}"
+            # Fuzz uses \nat for naturals, LaTeX uses \mathbb{N}
+            return r"\nat" if self.use_fuzz else r"\mathbb{N}"
 
         # No underscore: return as-is
         if "_" not in name:
