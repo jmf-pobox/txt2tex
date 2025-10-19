@@ -1,0 +1,7 @@
+=== Test Mod Proper ===
+
+axdef
+  remainder : N cross N -> N
+where
+  forall x, y : N | remainder(x, y) = x mod y
+end

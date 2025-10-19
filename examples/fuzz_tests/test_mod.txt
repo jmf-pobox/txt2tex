@@ -1,0 +1,5 @@
+=== Test Mod ===
+
+TEXT: The modulus operator gives the remainder: x mod 5 = 2 and 7 mod 3 = 1.
+
+TEXT: We can also use it in expressions: (x + y) mod n.

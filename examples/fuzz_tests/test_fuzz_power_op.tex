@@ -1,0 +1,14 @@
+\documentclass{article}
+\usepackage{fuzz}
+\begin{document}
+
+%%inop mod 4
+%%inop ^ 6
+
+\begin{axdef}
+SquaresOfEvens : \power \num
+\where
+SquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z ^ 2 \}
+\end{axdef}
+
+\end{document}
