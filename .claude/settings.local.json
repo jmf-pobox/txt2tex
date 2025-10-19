@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(gh issue create --title \"TEXT blocks: Inline math with comma after parenthesis not detected\" --body \"$(cat <<''EOF''\n## Description\nIn TEXT blocks, when a parenthesized mathematical expression is immediately followed by a comma, the inline math detection fails to convert operators like `not`, `=>`, etc.\n\n## Test Case\n\n**Location**: `tests/bugs/bug4_comma_after_parens.txt`\n\n**Input**:\n```txt\nTEXT: The statements (not p => not q), (q => p) are equivalent.\n```\n\n## Reproduction Steps\n\n```bash\nhatch run convert tests/bugs/bug4_comma_after_parens.txt\npdftotext tests/bugs/bug4_comma_after_parens.pdf -\n```\n\n## Expected Behavior\nAll operators should be converted:\n```\nThe statements (¬ p ⇒ ¬ q), (q ⇒ p) are equivalent.\n```\n\n## Actual Behavior\nFirst expression appears as plain text, second is correct:\n```\nThe statements (not p => not q), (q ⇒ p) are equivalent.\n```\n\n## Comparison\n\nWorks correctly (without comma):\n```txt\nTEXT: The statements (not p => not q) are equivalent.\n→ The statements (¬ p ⇒ ¬ q) are equivalent.\n```\n\nFails (with comma):\n```txt\nTEXT: The statements (not p => not q), (q => p) are equivalent.\n→ The statements (not p => not q), (q ⇒ p) are equivalent.\n```\n\n## Workaround\nAvoid comma immediately after closing parenthesis, or use proper Z notation blocks.\n\n## Impact\n- **Severity**: MEDIUM\n- **Blocks**: Homework problems with multiple statements separated by commas\n- **Component**: latex-gen (inline math detection in TEXT blocks)\n- **Affects**: TEXT blocks with parenthesized expressions followed by commas\n\n## Environment\n- txt2tex commit: $(git rev-parse HEAD)\n- Python version: 3.13\n- OS: macOS\n\n## Technical Details\n- Root cause: Inline math detection pattern doesn''t handle comma as valid boundary after parenthesized expressions\n- The pattern likely stops at the comma before processing the parenthesized content\n- Similar to Bug #2 (multiple pipes), this is another edge case in inline math detection\n\n## Related Issues\n- Related to #2 (TEXT blocks inline math detection issues)\nEOF\n)\")"
+      "Bash(python3:*)",
+      "Bash(TEXINPUTS=.:../latex//: fuzz:*)",
+      "Bash(TEXINPUTS=.:./latex//: fuzz test:*)",
+      "Bash(TEXINPUTS=.:./latex//: fuzz test_fuzz_abbrev.tex)",
+      "Bash(env TEXINPUTS=.:../latex//: fuzz:*)",
+      "Bash(TEXINPUTS=.:./latex//: fuzz:*)",
+      "Bash(timeout 10 hatch run:*)",
+      "Bash(find:*)",
+      "Bash(hatch env show:*)",
+      "Bash(git reset:*)",
+      "Bash(env TEXINPUTS=.:/Users/jfreeman/Coding/fuzz/txt2tex/sem/latex//: fuzz:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []
