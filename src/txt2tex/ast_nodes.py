@@ -575,6 +575,26 @@ class AxDef(ASTNode):
 
 
 @dataclass(frozen=True)
+class GenDef(ASTNode):
+    """Generic definition block.
+
+    Generic definitions define polymorphic functions and constants.
+    Generic parameters are required (not optional like in AxDef).
+
+    Example:
+    gendef [X, Y]
+      fst : X cross Y -> X
+    where
+      forall x : X; y : Y @ fst(x, y) = x
+    end
+    """
+
+    generic_params: list[str]  # Required generic parameters
+    declarations: list[Declaration]
+    predicates: list[Expr]
+
+
+@dataclass(frozen=True)
 class Schema(ASTNode):
     """Schema definition block.
 
@@ -684,6 +704,7 @@ DocumentItem = (
     | FreeType
     | Abbreviation
     | AxDef
+    | GenDef
     | Schema
     | ProofTree
 )
