@@ -312,6 +312,8 @@ A \ B            →  A ∖ B       [set difference]
 P S              →  P S         [power set - set of all subsets]
 P1 S             →  P₁ S        [non-empty power set]
 F S              →  F S         [set of finite subsets]
+P (A cross B)    →  P (A × B)   [power set of Cartesian product - needs parentheses]
+P (Z cross Z)    →  P (ℤ × ℤ)   [set of all relations on integers]
 ```
 
 ### Cardinality
