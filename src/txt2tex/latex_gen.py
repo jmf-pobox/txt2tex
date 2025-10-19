@@ -523,13 +523,15 @@ class LaTeXGenerator:
             parts.append("|" if self.use_fuzz else r"\mid")
             body_latex = self.generate_expr(node.body)
             parts.append(body_latex)
-            # Add bullet/spot separator and expression
-            parts.append(r"\spot" if self.use_fuzz else r"\bullet")
+            # Add @ or bullet separator and expression
+            # Fuzz uses @ (at sign), LaTeX uses \bullet
+            parts.append("@" if self.use_fuzz else r"\bullet")
             expr_latex = self.generate_expr(node.expression)
             parts.append(expr_latex)
         else:
-            # Standard quantifier: bullet/spot separator and body
-            parts.append(r"\spot" if self.use_fuzz else r"\bullet")
+            # Standard quantifier: @ or bullet separator and body
+            # Fuzz uses @ (at sign), LaTeX uses \bullet
+            parts.append("@" if self.use_fuzz else r"\bullet")
             body_latex = self.generate_expr(node.body)
             parts.append(body_latex)
 
@@ -581,6 +583,7 @@ class LaTeXGenerator:
         """
         # Generate variables (comma-separated for multi-variable)
         variables_str = ", ".join(node.variables)
+        # Both fuzz and LaTeX use \{ \} for set braces
         parts = [r"\{", variables_str]
 
         if node.domain:
@@ -591,9 +594,10 @@ class LaTeXGenerator:
 
         # Phase 22: Handle case with no predicate
         if node.predicate is None:
-            # No predicate: { x : X . expr } -> use bullet directly
+            # No predicate: { x : X . expr } -> use bullet/@ directly
             if node.expression:
-                parts.append(r"\spot" if self.use_fuzz else r"\bullet")
+                # Fuzz uses @ (at sign) inside Z environments, LaTeX uses \bullet
+                parts.append("@" if self.use_fuzz else r"\bullet")
                 expression_latex = self.generate_expr(node.expression)
                 parts.append(expression_latex)
             # else: {x : T} with no predicate or expression - just the binding
@@ -605,9 +609,10 @@ class LaTeXGenerator:
             predicate_latex = self.generate_expr(node.predicate)
             parts.append(predicate_latex)
 
-            # If expression is present, add bullet/spot and expression
+            # If expression is present, add bullet/@ and expression
             if node.expression:
-                parts.append(r"\spot" if self.use_fuzz else r"\bullet")
+                # Fuzz uses @ (at sign) inside Z environments, LaTeX uses \bullet
+                parts.append("@" if self.use_fuzz else r"\bullet")
                 expression_latex = self.generate_expr(node.expression)
                 parts.append(expression_latex)
 
