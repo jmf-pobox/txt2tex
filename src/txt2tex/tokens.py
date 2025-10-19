@@ -144,6 +144,7 @@ class TokenType(Enum):
     GIVEN = auto()  # given
     AXDEF = auto()  # axdef
     SCHEMA = auto()  # schema
+    GENDEF = auto()  # gendef (generic definition)
     WHERE = auto()  # where
     END = auto()  # end
 

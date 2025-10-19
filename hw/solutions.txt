@@ -188,23 +188,16 @@ PROOF:
 
 ** Question 4 **
 
-(a)
-
-given Person
-
-axdef
-  childOf : Person <-> Person
-end
-
-parentOf == childOf~
-
-axdef
-  children : Person -> P Person
+gendef [X, Y]
+  fst : X cross Y -> X
 where
-  children = {p : Person . p |-> parentOf(| {p} |)}
+  forall x : X; y : Y | fst(x, y) = x
 end
+
 
 ** Question 5 **
+
+PAGEBREAK:
 
 ** Question 6 **
 

@@ -431,6 +431,54 @@ Both Unicode `⟨⟩` and ASCII `<>` angle brackets are supported:
 Tree ::= stalk | leaf<N> | branch<Tree × Tree>
 ```
 
+### Generic Definitions
+
+Generic definitions (gendef) define polymorphic functions and constants with type parameters:
+
+**Basic generic definition:**
+```
+gendef [X, Y]
+  fst : X cross Y -> X
+where
+  forall x : X; y : Y | fst(x, y) = x
+end
+```
+
+**Note**: Use `|` (pipe) as the separator in quantifiers, not `@`. The LaTeX generator will produce fuzz-compatible output with `@` when using the `--fuzz` flag.
+
+Generates:
+```latex
+\begin{gendef}[X, Y]
+fst: X \cross Y \fun X
+\where
+\forall x : X @ \forall y : Y @ fst(x, y) = x \\
+\end{gendef}
+```
+
+**Single type parameter:**
+```
+gendef [X]
+  identity : X -> X
+where
+  forall x : X | identity(x) = x
+end
+```
+
+**Multiple declarations:**
+```
+gendef [X, Y]
+  fst : X cross Y -> X
+  snd : X cross Y -> Y
+where
+  forall x : X; y : Y | fst(x, y) = x and snd(x, y) = y
+end
+```
+
+Generic definitions are used for:
+- Polymorphic functions (like `fst`, `snd`, `head`, `tail`)
+- Generic constants that work across types
+- Type-parameterized operations
+
 ---
 
 ## Relations
