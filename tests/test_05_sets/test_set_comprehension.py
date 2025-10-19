@@ -342,3 +342,76 @@ def test_set_comp_period_vs_pipe() -> None:
     assert isinstance(result2, SetComprehension)
     assert result2.predicate is not None
     assert result2.expression is not None
+
+
+class TestUnaryOperatorsInSetComprehensions:
+    """Test unary operators (# , not, -) in set comprehension contexts."""
+
+    def test_hash_in_predicate(self) -> None:
+        """Test # operator in set comprehension predicate."""
+        text = "{i : 1 .. 5 | # s(i) > 0}"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, SetComprehension)
+        # Verify it parsed successfully
+
+    def test_hash_in_expression(self) -> None:
+        """Test # operator in set comprehension expression part."""
+        text = "{i : 1 .. 5 . # s(i)}"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, SetComprehension)
+        # Verify it parsed successfully
+
+    def test_nested_set_with_hash(self) -> None:
+        """Test nested set comprehensions with # in predicate."""
+        text = "{i : 1 .. n | # {j : 1 .. i | j > 0} > 0}"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, SetComprehension)
+
+    def test_hash_with_function_application(self) -> None:
+        """Test # applied to function application in predicate."""
+        text = "{i : 1 .. # s | # s(i) = i}"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, SetComprehension)
+
+    def test_not_in_predicate(self) -> None:
+        """Test not operator in set comprehension predicate."""
+        text = "{x : N | not x > 0}"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, SetComprehension)
+
+    def test_minus_in_predicate(self) -> None:
+        """Test unary minus in set comprehension predicate."""
+        text = "{x : N | -x > 0}"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, SetComprehension)
+
+    def test_latex_generation_hash_predicate(self) -> None:
+        """Test LaTeX generation for # in predicate."""
+        text = "{i : 1 .. n | # s(i) > 0}"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert not isinstance(ast, Document)
+        generator = LaTeXGenerator()
+        latex = generator.generate_expr(ast)
+        assert r"\#" in latex
+        assert "s(i)" in latex
