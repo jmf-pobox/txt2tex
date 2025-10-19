@@ -208,11 +208,43 @@ end
 
 ** Question 6 **
 
-(a) { z : Z | z mod 2 = 0 . z^2 }
-(b) { z : Z | z mod 2 = 0 . z^2 }
-(c) { z : Z | z mod 2 = 0 . z^2 }
-(d) { z : Z | z mod 2 = 0 . z^2 }
-(e) { z : Z | z mod 2 = 0 . z^2 }
+TEXT: Lecture 4 - Sets, Types, and Definitions
+
+(a)
+axdef
+  SquaresOfEvens : P Z
+where
+  SquaresOfEvens = { z : Z | z mod 2 = 0 . z * z}
+end
+
+(b)
+axdef
+  CubesOfSquaresOfEvens : P Z
+where
+  CubesOfSquaresOfEvens = { z : Z | z mod 2 = 0 . (z * z) * (z * z) * (z * z)}
+end
+
+(c)
+axdef
+  SquareCubePairsOfEvens : P (Z cross Z)
+where
+  SquareCubePairsOfEvens = { z_1, z_2: Z | z_1 mod 2 = 0 and z_2 mod 2 = 0 . (z_1 * z_1, z_2 * z_2 * z_2)}
+end
+
+(d)
+axdef
+  SquareCubeIdentityPairsOfEvens : P (Z cross Z)
+where
+  SquareCubeIdentityPairsOfEvens = { z : Z | z mod 2 = 0 . (z * z, z * z * z)}
+end
+
+(e)
+axdef
+  SquareOrCubeIntegers : P (Z)
+where
+  SquareOrCubeIntegers = { z, z_0 : Z | z = z_0 * z_0 or z = z_0 * z_0 * z_0 . z}
+end
+
 
 PAGEBREAK:
 
