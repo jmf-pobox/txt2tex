@@ -186,6 +186,34 @@ PROOF:
     :: ((p or q) => r) => ((p => r) and (q => r)) 
 
 
+** Question 4 **
+
+(a)
+
+given Person
+
+axdef
+  childOf : Person <-> Person
+end
+
+parentOf == childOf~
+
+axdef
+  children : Person -> P Person
+where
+  children = {p : Person . p |-> parentOf(| {p} |)}
+end
+
+** Question 5 **
+
+** Question 6 **
+
+(a) { z : Z | z mod 2 = 0 . z^2 }
+(b) { z : Z | z mod 2 = 0 . z^2 }
+(c) { z : Z | z mod 2 = 0 . z^2 }
+(d) { z : Z | z mod 2 = 0 . z^2 }
+(e) { z : Z | z mod 2 = 0 . z^2 }
+
 PAGEBREAK:
 
 === Bibliography ===

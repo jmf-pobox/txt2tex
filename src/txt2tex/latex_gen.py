@@ -421,10 +421,12 @@ class LaTeXGenerator:
         if node.operator in {"~", "+", "*"}:
             # Postfix: operand^{superscript}
             return f"{operand}{op_latex}"
-        # Phase 11.5, 19: Generic instantiation operators (P, P1, F, F1) use tilde
+        # Phase 11.5, 19: Generic instantiation operators (P, P1, F, F1)
+        # Per fuzz manual p.23: prefix generic symbols are operator symbols,
+        # LaTeX inserts thin space automatically - NO TILDE needed
         elif node.operator in {"P", "P1", "F", "F1"}:
-            # Generic instantiation: \power~X or \finset~X
-            return f"{op_latex}~{operand}"
+            # Generic instantiation: \power X or \finset X (no tilde)
+            return f"{op_latex} {operand}"
         else:
             # Prefix: operator operand
             # Special case: no space for unary minus (Phase 16)
@@ -675,10 +677,12 @@ class LaTeXGenerator:
         if isinstance(node.function, Identifier):
             func_name = node.function.name
             if func_name in special_functions and len(node.args) == 1:
-                # Generic instantiation: \seq~N
+                # Generic instantiation: \seq N (no tilde)
+                # Per fuzz manual p.23: prefix generic symbols are operator symbols,
+                # LaTeX inserts thin space automatically
                 func_latex = special_functions[func_name]
                 arg_latex = self.generate_expr(node.args[0])
-                return f"{func_latex}~{arg_latex}"
+                return f"{func_latex} {arg_latex}"
 
             # Standard function application with identifier: f(x, y, z)
             # Process identifier through _generate_identifier for underscore handling
@@ -739,15 +743,17 @@ class LaTeXGenerator:
         The relational image R(| S |) gives the image of set S under relation R.
 
         Examples:
-        - R(| {1, 2} |) -> R(\\limg \\{1, 2\\} \\rimg)
-        - parentOf(| {john} |) -> parentOf(\\limg \\{john\\} \\rimg)
-        - (R o9 S)(| A |) -> (R \\circ S)(\\limg A \\rimg)
+        - R(| {1, 2} |) -> (R \\limg \\{1, 2\\} \\rimg)
+        - parentOf(| {john} |) -> (parentOf \\limg \\{john\\} \\rimg)
+        - (R o9 S)(| A |) -> ((R \\circ S) \\limg A \\rimg)
 
-        LaTeX rendering uses \\limg and \\rimg delimiters.
+        LaTeX rendering uses \\limg and \\rimg delimiters with spaces.
+        Note: fuzz requires the entire expression wrapped in parentheses with
+        spaces around \\limg/\\rimg, not function application syntax.
         """
         relation_latex = self.generate_expr(node.relation)
         set_latex = self.generate_expr(node.set)
-        return f"{relation_latex}(\\limg {set_latex} \\rimg)"
+        return f"({relation_latex} \\limg {set_latex} \\rimg)"
 
     def _generate_generic_instantiation(self, node: GenericInstantiation) -> str:
         """Generate LaTeX for generic type instantiation (Phase 11.9).
@@ -1965,19 +1971,24 @@ class LaTeXGenerator:
         return lines
 
     def _generate_abbreviation(self, node: Abbreviation) -> list[str]:
-        """Generate LaTeX for abbreviation definition.
+        r"""Generate LaTeX for abbreviation definition.
 
         Phase 9 enhancement: Supports optional generic parameters.
+
+        Note: Abbreviations must be wrapped in \begin{zed}...\end{zed}
+        for fuzz type checker to recognize them.
         """
         lines: list[str] = []
         expr_latex = self.generate_expr(node.expression)
 
-        # Add generic parameters if present
+        # Wrap in zed environment for fuzz compatibility
         if node.generic_params:
             params_str = ", ".join(node.generic_params)
-            lines.append(f"[{params_str}] {node.name} == {expr_latex}")
+            abbrev = f"[{params_str}]{node.name} == {expr_latex}"
+            lines.append(f"\\begin{{zed}}{abbrev}\\end{{zed}}")
         else:
-            lines.append(f"{node.name} == {expr_latex}")
+            abbrev = f"{node.name} == {expr_latex}"
+            lines.append(f"\\begin{{zed}}{abbrev}\\end{{zed}}")
 
         lines.append("")
         return lines
