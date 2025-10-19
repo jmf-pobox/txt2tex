@@ -424,6 +424,12 @@ class LaTeXGenerator:
         if isinstance(node.operand, BinaryOp):
             operand = f"({operand})"
 
+        # Add parentheses for function application with fuzz mode
+        # Fuzz has different precedence: # binds less tightly than application
+        # So # s(i) means (# s)(i), but we want # (s(i))
+        if self.use_fuzz and isinstance(node.operand, FunctionApp):
+            operand = f"({operand})"
+
         # Phase 10b: Check if this is a postfix operator (rendered as superscript)
         if node.operator in {"~", "+", "*"}:
             # Postfix: operand^{superscript}

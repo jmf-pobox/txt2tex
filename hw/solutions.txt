@@ -188,14 +188,34 @@ PROOF:
 
 ** Question 4 **
 
-gendef [X, Y]
-  fst : X cross Y -> X
+gendef [X]
+  outerLen : seq1 seq X -> N
 where
-  forall x : X; y : Y | fst(x, y) = x
+  forall s : seq1 seq X | outerLen(s) = # s
+end
+
+gendef [X]
+  maxInnerLen : seq1 seq X -> N
+where
+  forall s : seq1 seq X | forall i : 1 .. # s | # (s(i)) <= maxInnerLen(s)
+  forall s : seq1 seq X | exists i : 1 .. # s | # (s(i)) = maxInnerLen(s)
 end
 
 
 ** Question 5 **
+
+TEXT: The relational composition operator is associative:
+
+LATEX: \hspace*{1em} $(R \circ S) \circ T = R \circ (S \circ T)$
+
+TEXT: if R in W <-> X, S in W <-> X, and T in W <-> X.
+
+EQUIV:
+w |-> z in (R o9 S) o9 T
+w |-> z in R o9 (S o9 T)
+
+TEXT: In this equivalence proof, we show 
+
 
 PAGEBREAK:
 
