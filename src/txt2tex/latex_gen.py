@@ -114,7 +114,7 @@ class LaTeXGenerator:
         "+": r"+",  # Addition (also postfix in relational context)
         "-": r"-",  # Subtraction (Phase 16)
         "*": r"*",  # Multiplication (also postfix in relational context)
-        "mod": r"\bmod",  # Modulo
+        "mod": r"\mod",  # Modulo (use \mod not \bmod for fuzz compatibility)
         # Sequence operators (Phase 12)
         "⌢": r"\cat",  # Sequence concatenation (Unicode)
         "^": r"\cat",  # Sequence concatenation (ASCII alternative, Phase 14)
@@ -356,11 +356,15 @@ class LaTeXGenerator:
         if name in special_keywords:
             return special_keywords[name]
 
-        # Mathematical type names: use blackboard bold
+        # Mathematical type names: use blackboard bold (or fuzz built-in types)
         # N = naturals, Z = integers
         # Only convert N and Z, not Q/R/C which are commonly used as variables
-        if name in {"N", "Z"}:
-            return rf"\mathbb{{{name}}}"
+        if name == "Z":
+            # Fuzz uses \num for integers, LaTeX uses \mathbb{Z}
+            return r"\num" if self.use_fuzz else r"\mathbb{Z}"
+        if name == "N":
+            # Both fuzz and LaTeX use \mathbb{N} for naturals
+            return r"\mathbb{N}"
 
         # No underscore: return as-is
         if "_" not in name:
