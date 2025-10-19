@@ -206,15 +206,19 @@ class TestPhase10aParser:
         assert isinstance(ast.right, Identifier)
         assert ast.right.name == "S"
 
-    def test_parse_semicolon_operator(self) -> None:
-        """Test parsing semicolon operator ;."""
-        lexer = Lexer("R ; S")
+    def test_parse_circ_operator(self) -> None:
+        """Test parsing o9 (circ) composition operator.
+
+        Note: Semicolon (;) is reserved for declaration separators.
+        Use o9 for relational composition instead.
+        """
+        lexer = Lexer("R o9 S")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
 
         assert isinstance(ast, BinaryOp)
-        assert ast.operator == ";"
+        assert ast.operator == "o9"
         assert isinstance(ast.left, Identifier)
         assert ast.left.name == "R"
         assert isinstance(ast.right, Identifier)
@@ -258,17 +262,20 @@ class TestPhase10aParser:
         assert ast.operand.operator == "<|"
 
     def test_parse_chained_relations(self) -> None:
-        """Test parsing chained relation operators."""
-        lexer = Lexer("R ; S ; T")
+        """Test parsing chained relation operators.
+
+        Note: Using o9 for composition, not semicolon.
+        """
+        lexer = Lexer("R o9 S o9 T")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
 
-        # Should parse as: (R ; S) ; T (left-associative)
+        # Should parse as: (R o9 S) o9 T (left-associative)
         assert isinstance(ast, BinaryOp)
-        assert ast.operator == ";"
+        assert ast.operator == "o9"
         assert isinstance(ast.left, BinaryOp)
-        assert ast.left.operator == ";"
+        assert ast.left.operator == "o9"
 
 
 class TestPhase10aLaTeXGeneration:
@@ -339,18 +346,21 @@ class TestPhase10aLaTeXGeneration:
         latex = gen.generate_expr(ast)
         assert latex == r"R \comp S"
 
-    def test_generate_semicolon_operator(self) -> None:
-        """Test generating LaTeX for semicolon operator."""
+    def test_generate_circ_operator(self) -> None:
+        """Test generating LaTeX for o9 (circ) operator.
+
+        Note: Semicolon is reserved for declarations, use o9 for composition.
+        """
         gen = LaTeXGenerator()
         ast = BinaryOp(
-            operator=";",
+            operator="o9",
             left=Identifier(name="R", line=1, column=1),
-            right=Identifier(name="S", line=1, column=5),
+            right=Identifier(name="S", line=1, column=7),
             line=1,
             column=3,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"R \semi S"
+        assert latex == r"R \circ S"
 
     def test_generate_dom_function(self) -> None:
         """Test generating LaTeX for dom function."""
@@ -455,9 +465,12 @@ class TestPhase10aIntegration:
         assert ast.operator == "comp"
         assert latex == r"R \comp S"
 
-    def test_end_to_end_semicolon(self) -> None:
-        """Test complete pipeline for semicolon operator."""
-        text = "R ; S"
+    def test_end_to_end_circ(self) -> None:
+        """Test complete pipeline for o9 (circ) operator.
+
+        Note: Semicolon is reserved for declarations, use o9 for composition.
+        """
+        text = "R o9 S"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -467,8 +480,8 @@ class TestPhase10aIntegration:
         latex = gen.generate_expr(ast)
 
         assert isinstance(ast, BinaryOp)
-        assert ast.operator == ";"
-        assert latex == r"R \semi S"
+        assert ast.operator == "o9"
+        assert latex == r"R \circ S"
 
     def test_end_to_end_dom_function(self) -> None:
         """Test complete pipeline for dom function."""

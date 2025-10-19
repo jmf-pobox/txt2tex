@@ -1028,10 +1028,12 @@ PROOF:
 - **Tuple Expressions**: `(a, b, c)` in set comprehensions and expressions
 - **Equality**: =, != in predicates and equivalence chains
 - **Arithmetic**: +, *, mod, -, unary minus operators
-- **Relations**: Relation type (<->), maplet (|->), domain restriction (<|), range restriction (|>), domain/range subtraction (<<|, |>>), composition (comp, ;, o9), inverse (~), transitive closure (+, *), dom, ran, inv, id, relational image (R(| S |))
+- **Relations**: Relation type (<->), maplet (|->), domain restriction (<|), range restriction (|>), domain/range subtraction (<<|, |>>), composition (comp, o9), inverse (~), transitive closure (+, *), dom, ran, inv, id, relational image (R(| S |))
+  - **Note**: Semicolon (;) is NOT used for composition - it's reserved for declaration separators
 - **Functions**: All function types (partial, total, injection, surjection, bijection), lambda expressions
 - **Generic Parameters**: Generic definitions with [X] prefix, generic type instantiation (Type[A, B], emptyset[N], seq[N], P[X])
-- **Z Notation**: Given types, free types (::=) with recursive constructors and parameters, abbreviations (==), axiomatic definitions (axdef), schemas (schema)
+- **Z Notation**: Given types, free types (::=) with recursive constructors and parameters, abbreviations (==), axiomatic definitions (axdef), generic definitions (gendef), schemas (schema)
+  - **Semicolon-separated declarations**: Multiple declarations in gendef/axdef/schema can be separated by semicolons on one line or across multiple lines - both render as separate lines in PDF
 - **Sequences**: Sequence literals `<>`, `<a, b>`, concatenation `^`, ASCII bracket alternatives
 - **Identifiers**: Multi-word identifiers with underscores (cumulative_total, not_yet_viewed)
 - **Conditionals**: if/then/else expressions with proper nesting
@@ -1248,8 +1250,8 @@ Pairs == \mathbb{Z} \times \mathbb{Z}
 - Domain/range: `dom R`, `ran R`
 - Domain/range restriction: `A <| R`, `R |> B`
 - Domain/range subtraction: `A <<| R`, `R |>> B`
-- Relational composition: `R comp S` or `R ; S`
-- Forward/backward composition: `R o9 S`
+- Relational composition: `R comp S` or `R o9 S`
+  - **Note**: `R ; S` is NOT supported - semicolon is reserved for declaration separators
 - Relational inverse: `R~` or `inv R`
 - Transitive closure: `R+`, `R*`
 - Identity relation: `id[X]`
