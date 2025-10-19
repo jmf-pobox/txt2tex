@@ -256,6 +256,7 @@ class Parser:
             TokenType.EQUIV,
             TokenType.GIVEN,
             TokenType.AXDEF,
+            TokenType.GENDEF,
             TokenType.SCHEMA,
             TokenType.PROOF,
         )
@@ -1667,6 +1668,8 @@ class Parser:
         left = self._parse_set_op()
 
         # Phase 10a-b: Infix relation operators (left-associative)
+        # Note: SEMICOLON is NOT included here - it's used for declaration separators
+        # Use 'o9' for relational composition instead
         while self._match(
             # Relation operators (Phase 10)
             TokenType.RELATION,  # <->
@@ -1677,7 +1680,6 @@ class Parser:
             TokenType.NRRES,  # |>> (Phase 10b)
             TokenType.CIRC,  # o9 (Phase 10b)
             TokenType.COMP,  # comp
-            TokenType.SEMICOLON,  # ;
         ):
             op_token = self._advance()
             right = self._parse_set_op()
@@ -2438,6 +2440,7 @@ class Parser:
 
         Phase 9 enhancement: Supports optional generic parameters.
         Syntax: axdef [X, Y] ... end
+        Supports semicolon-separated declarations: x : N; y : N
         """
         start_token = self._advance()  # Consume 'axdef'
         self._skip_newlines()
@@ -2476,7 +2479,14 @@ class Parser:
                         column=var_token.column,
                     )
                 )
-                self._skip_newlines()
+
+                # Check for semicolon separator (allows multiple declarations)
+                if self._match(TokenType.SEMICOLON):
+                    self._advance()  # Consume ';'
+                    self._skip_newlines()
+                    # Continue to parse next declaration
+                else:
+                    self._skip_newlines()
             else:
                 break
 
@@ -2512,6 +2522,7 @@ class Parser:
 
         Generic definitions require generic parameters.
         Syntax: gendef [X, Y] ... end
+        Supports semicolon-separated declarations: f : X -> Y; g : X -> Y
         """
         start_token = self._advance()  # Consume 'gendef'
         self._skip_newlines()
@@ -2555,7 +2566,14 @@ class Parser:
                         column=var_token.column,
                     )
                 )
-                self._skip_newlines()
+
+                # Check for semicolon separator (allows multiple declarations)
+                if self._match(TokenType.SEMICOLON):
+                    self._advance()  # Consume ';'
+                    self._skip_newlines()
+                    # Continue to parse next declaration
+                else:
+                    self._skip_newlines()
             else:
                 break
 
@@ -2595,6 +2613,7 @@ class Parser:
         - schema Name[X, Y] ... end (named with generics)
         - schema Name ... end (named)
         - schema ... end (anonymous)
+        Supports semicolon-separated declarations: x : N; y : N
         """
         start_token = self._advance()  # Consume 'schema'
 
@@ -2640,7 +2659,14 @@ class Parser:
                         column=var_token.column,
                     )
                 )
-                self._skip_newlines()
+
+                # Check for semicolon separator (allows multiple declarations)
+                if self._match(TokenType.SEMICOLON):
+                    self._advance()  # Consume ';'
+                    self._skip_newlines()
+                    # Continue to parse next declaration
+                else:
+                    self._skip_newlines()
             else:
                 break
 
