@@ -664,3 +664,52 @@ class TestPhase14Integration:
         latex = generate_latex(text)
         assert r"\langle a \rangle" in latex
         assert r"\cat" in latex
+
+
+class TestNonEmptySequences:
+    """Test seq1 (non-empty sequences) support."""
+
+    def test_seq1_simple(self):
+        """Test seq1 X → \\seq_1 X."""
+        text = "seq1 X"
+        ast = parse_expr(text)
+        assert isinstance(ast, FunctionApp)
+        assert isinstance(ast.function, Identifier)
+        assert ast.function.name == "seq1"
+        latex = generate_latex(text)
+        assert latex == r"\seq_1 X"
+
+    def test_seq1_with_nat(self):
+        """Test seq1 N → \\seq_1 \\nat (with fuzz) or \\seq_1 \\mathbb{N} (LaTeX)."""
+        text = "seq1 N"
+        ast = parse_expr(text)
+        assert not isinstance(ast, Document)
+
+        # Test with fuzz mode
+        generator_fuzz = LaTeXGenerator(use_fuzz=True)
+        latex_fuzz = generator_fuzz.generate_expr(ast)
+        assert latex_fuzz == r"\seq_1 \nat"
+
+        # Test with LaTeX mode
+        generator_latex = LaTeXGenerator(use_fuzz=False)
+        latex_regular = generator_latex.generate_expr(ast)
+        assert latex_regular == r"\seq_1 \mathbb{N}"
+
+    def test_seq1_in_function_type(self):
+        """Test seq1 X -> Y → \\seq_1 X \\fun Y."""
+        text = "seq1 X -> Y"
+        latex = generate_latex(text)
+        assert latex == r"\seq_1 X \fun Y"
+
+    def test_seq1_in_declaration(self):
+        """Test axdef with seq1 X."""
+        text = """axdef
+  s : seq1 N
+end"""
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        assert r"\seq_1 \nat" in latex
