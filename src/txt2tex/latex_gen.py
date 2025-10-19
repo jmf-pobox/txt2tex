@@ -643,9 +643,13 @@ class LaTeXGenerator:
         return f"{base}_{index}"
 
     def _generate_superscript(self, node: Superscript) -> str:
-        """Generate LaTeX for superscript (x^2, 2^n)."""
+        """Generate LaTeX for superscript (x^2, 2^n, (z^2)^3)."""
         base = self.generate_expr(node.base)
         exponent = self.generate_expr(node.exponent)
+
+        # Wrap base in braces if it contains a superscript (for nesting)
+        if isinstance(node.base, Superscript):
+            base = f"{{{base}}}"
 
         # Wrap exponent in braces if it's more than one character
         if len(exponent) > 1:
