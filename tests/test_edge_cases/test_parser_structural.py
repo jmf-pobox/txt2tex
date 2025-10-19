@@ -185,8 +185,11 @@ def test_nested_set_operations() -> None:
 
 
 def test_function_composition() -> None:
-    """Test function composition operator."""
-    text = "f ; g"
+    """Test function composition operator.
+
+    Note: Using o9 for composition - semicolon is reserved for declarations.
+    """
+    text = "f o9 g"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
