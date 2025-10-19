@@ -677,6 +677,8 @@ class LaTeXGenerator:
         - f(x) → f(x)
         - g(x, y, z) → g(x, y, z)
         - seq(N) → \\seq~N
+        - seq seq N → \\seq \\seq N (nested special functions)
+        - seq1 seq X → \\seq_1 \\seq X (nested special functions)
         - ⟨a, b, c⟩(2) → \\langle a, b, c \\rangle(2)
         - (f ++ g)(x) → (f \\oplus g)(x)
         """
@@ -699,6 +701,9 @@ class LaTeXGenerator:
                 # LaTeX inserts thin space automatically
                 func_latex = special_functions[func_name]
                 arg_latex = self.generate_expr(node.args[0])
+                # Add parentheses if arg is a function app (e.g., seq1 (seq X))
+                if isinstance(node.args[0], FunctionApp):
+                    arg_latex = f"({arg_latex})"
                 return f"{func_latex} {arg_latex}"
 
             # Standard function application with identifier: f(x, y, z)
@@ -706,6 +711,26 @@ class LaTeXGenerator:
             func_latex = self._generate_identifier(node.function)
             args_latex = ", ".join(self.generate_expr(arg) for arg in node.args)
             return f"{func_latex}({args_latex})"
+
+        # Check for nested special functions: seq seq X or seq1 seq X
+        # Parser treats "seq seq X" as ((seq seq) X) due to left-associativity
+        # We need to recognize this pattern and generate \seq (\seq X) with parens
+        if isinstance(node.function, FunctionApp):
+            inner_func = node.function.function
+            # Check if inner function is special and has one special function arg
+            if (
+                isinstance(inner_func, Identifier)
+                and inner_func.name in special_functions
+                and len(node.function.args) == 1
+                and isinstance(node.function.args[0], Identifier)
+                and node.function.args[0].name in special_functions
+            ):
+                # Pattern: (special_fn1(special_fn2))(args)
+                # Generate: special_fn1 (special_fn2 args) with parens
+                outer_latex = special_functions[inner_func.name]
+                inner_latex = special_functions[node.function.args[0].name]
+                args_latex = " ".join(self.generate_expr(arg) for arg in node.args)
+                return f"{outer_latex} ({inner_latex} {args_latex})"
 
         # General function application: expr(args)
         func_latex = self.generate_expr(node.function)
