@@ -189,18 +189,18 @@ PROOF:
 ** Question 4 **
 
 gendef [X]
-  outerLen : seq1 seq X -> N
+  outerLen : seq1 seq X -> N; maxInnerLen : seq1 seq X -> N
 where
   forall s : seq1 seq X | outerLen(s) = # s
-end
-
-gendef [X]
-  maxInnerLen : seq1 seq X -> N
-where
   forall s : seq1 seq X | forall i : 1 .. # s | # (s(i)) <= maxInnerLen(s)
   forall s : seq1 seq X | exists i : 1 .. # s | # (s(i)) = maxInnerLen(s)
 end
 
+gendef [X]
+  f : X -> X; g : X -> X
+where
+  forall x : X | f(x) = g(x)
+end
 
 ** Question 5 **
 
@@ -263,15 +263,9 @@ PAGEBREAK:
 
 === Bibliography ===
 
-TEXT: Course Notes
-
 TEXT: Simpson A n.d. From Discrete Mathematics to State-Based Models SEM version. University of Oxford Department of Computer Science. Unpublished course notes.
 
-TEXT: Primary Textbook
-
 TEXT: Woodcock J. and Davies J. 1996 Using Z Specification Refinement and Proof. Upper Saddle River NJ Prentice Hall.
-
-TEXT: Lecture Slides
 
 TEXT: Simpson A 2025a Introduction and propositions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 01.
 

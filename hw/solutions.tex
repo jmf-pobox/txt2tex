@@ -10,7 +10,7 @@
 
 \bigskip
 
-Answers typically leverage the grammar's order of precedence (not, and, or, $\Rightarrow$, $\Leftrightarrow$) rather than clarifying parenthesis (Simpson, 2025a, slide 20).
+Answers leverage the grammar's order of precedence ($\lnot$, $\land$, $\lor$, $\Rightarrow$, $\Leftrightarrow$) rather than clarifying parenthesis (Simpson, 2025a, slide 20).
 
 \bigskip
 
@@ -58,7 +58,7 @@ $p$ & $q$ & $( q \Rightarrow p )$ & $\lnot p$ & $\lnot q$ & $( \lnot p \Rightarr
 
 \bigskip
 
-The statements (not $p =>  not$ q), ($q \Rightarrow p$) are equivalent and $\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$ is a tautology as it is true for every interpretation of p, q as illustrated by the final column of truth values.
+The statements $\lnot p \Rightarrow \lnot q$, $q \Rightarrow p$ are equivalent and $\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$ is a tautology as it is true for every interpretation of p, q as illustrated by the final column of truth values.
 
 \bigskip
 
@@ -82,7 +82,7 @@ $p$ & $q$ & $r$ & $( p \Rightarrow r )$ & $( q \Rightarrow r )$ & $( ( p \Righta
 
 \bigskip
 
-The statements (($p \Rightarrow r$) and ($q \Rightarrow r$)), ((p or q) $\Rightarrow$ r) are equivalent and (($p \Rightarrow r$) and ($q \Rightarrow r$)) $\Leftrightarrow$ ((p or q) $\Rightarrow$ r) is a tautology as it is true for every interpretation of p, q, r as illustrated by the final column of truth values.
+The statements $(p \Rightarrow r) \land (q \Rightarrow r)$, $p \lor q \Rightarrow r$ are equivalent and $(p \Rightarrow r) \land (q \Rightarrow r)$ $\Leftrightarrow$ $p \lor q \Rightarrow r$ is a tautology as it is true for every interpretation of p, q, r as illustrated by the final column of truth values.
 
 \bigskip
 
@@ -161,7 +161,7 @@ In this equivalance proof, we show that $\lnot p \Rightarrow \lnot q \Leftrighta
 
 \bigskip
 
-In this equivalence proof, we show that (($p \Rightarrow r$) and ($q \Rightarrow r$)) $\Leftrightarrow$ (p or q) $\Rightarrow$ r by using the implication disjunction rule to replace implication with logical or, the commutativity of or rule to change the order of the elements, the distributivity 2 rule to extract r, and the commutivity of logical or to change the order of the elements, De Morgan to extract negation for ($\lnot p$ and $\lnot q$), and the implication disjunction rule to reintroduce implication.
+In this equivalence proof, we show that $(p \Rightarrow r) \land (q \Rightarrow r)$ $\Leftrightarrow$ $p \lor q$ $\Rightarrow$ r by using the implication disjunction rule to replace implication with logical or, the commutativity of or rule to change the order of the elements, the distributivity 2 rule to extract r, and the commutivity of logical or to change the order of the elements, De Morgan to extract negation for $\lnot p \land \lnot q$, and the implication disjunction rule to reintroduce implication.
 
 \bigskip
 
@@ -195,7 +195,7 @@ $
 
 \bigskip
 
-For this proof we are seeking to prove that p $\Rightarrow$ (not $p \Rightarrow p$), which we know holds given the truth table in 1(a). Working mechanically from the bottom, I started by applying the implication introduction rule with assumption [1] to gain our conclusion, implication introduction rule with assumption [2] to gain $\lnot p \Rightarrow p$.  This statement requires that I have both p and $\lnot p$ as premisses, which is a bit odd and implied I needed to use false in the proof.  Since I had p as assumption [1], I knew I wanted $\lnot p$ as the output of the false rules.  It took some experimentation, but eventually I realized I needed three assumptions not two and it was obvious that I wanted to preserve $\lnot p$ as assumption [2], which meant I needed p as assumption [3] and that assumption [3] would be discharged by the false-elim rule.  In the final proof, all assumptions are discharged properly. The key insight was to have p as an assumption twice at different scopes.
+For this proof we are seeking to prove that p $\Rightarrow$ $\lnot p \Rightarrow p$, which we know holds given the truth table in 1(a). Working mechanically from the bottom, I started by applying the implication introduction rule with assumption [1] to gain our conclusion, implication introduction rule with assumption [2] to gain $\lnot p \Rightarrow p$.  This statement requires that I have both p and $\lnot p$ as premisses, which is a bit odd and implied I needed to use false in the proof.  Since I had p as assumption [1], I knew I wanted $\lnot p$ as the output of the false rules.  It took some experimentation, but eventually I realized I needed three assumptions not two and it was obvious that I wanted to preserve $\lnot p$ as assumption [2], which meant I needed p as assumption [3] and that assumption [3] would be discharged by the false-elim rule.  In the final proof, all assumptions are discharged properly. The key insight was to have p as an assumption twice at different scopes.
 
 \bigskip
 
@@ -212,7 +212,7 @@ This proof involves equivalence or bi-implication, which requires us to show $p 
 
 \bigskip
 
-In one direction, we are seeking to prove (not $p => not$ q) $\Rightarrow$ $q \Rightarrow p$:
+In one direction, we are seeking to prove $\lnot p \Rightarrow \lnot q$ $\Rightarrow$ $q \Rightarrow p$:
 
 \bigskip
 
@@ -247,7 +247,7 @@ I started working mechanically from the bottom by applying the implication intro
 
 \bigskip
 
-and in the other, we are seeking to prove ($q \Rightarrow p$) $\Rightarrow$ (not $p => not$ q):
+and in the other, we are seeking to prove $q \Rightarrow p$ $\Rightarrow$ $\lnot p \Rightarrow \lnot q$:
 
 \bigskip
 
@@ -276,7 +276,7 @@ $
 
 \bigskip
 
-Working mechanically from the bottom, I apply the implication rule to $q \Rightarrow p$ as assumption [1] to gain the conclusion.  I need (not $p => not$ q), which shows me to use the implication rule again with ($\lnot p$) as assumption [2].  From there, the question is how to get $\lnot q$.  Now working from the top, given assumption [1] has q, it makes sense to use the implication elimation rule with q as assumption [3]. This gives me p, when what I want is $\lnot q$.  I see that if I introduce $\lnot p$ as assumption [3] that I can negate q via the false-intro and false-elim rules and successfully discharge assumption [3]. This gives me $\lnot q$, which is what I need to connect to the top tree to the bottom of the proof. This proof came more quickly because $q \Rightarrow p$ as assumption [1] gave clear direction for the top portion. All assumptions are discharged and scopes are appropriate.
+Working mechanically from the bottom, I apply the implication rule to $q \Rightarrow p$ as assumption [1] to gain the conclusion.  I need $\lnot p \Rightarrow \lnot q$, which shows me to use the implication rule again with $\lnot p$ as assumption [2].  From there, the question is how to get $\lnot q$.  Now working from the top, given assumption [1] has q, it makes sense to use the implication elimation rule with q as assumption [3]. This gives me p, when what I want is $\lnot q$.  I see that if I introduce $\lnot p$ as assumption [3] that I can negate q via the false-intro and false-elim rules and successfully discharge assumption [3]. This gives me $\lnot q$, which is what I need to connect to the top tree to the bottom of the proof. This proof came more quickly because $q \Rightarrow p$ as assumption [1] gave clear direction for the top portion. All assumptions are discharged and scopes are appropriate.
 
 \bigskip
 
@@ -302,7 +302,7 @@ $
 \vspace{11pt}
 \bigskip
 
-In one direction, we are seeking to prove ($p \Rightarrow r$) and ($q \Rightarrow r$) $\Rightarrow$ (p or $q \Rightarrow r$):
+In one direction, we are seeking to prove $p \Rightarrow r$ and $q \Rightarrow r$ $\Rightarrow$ $p \lor q \Rightarrow r$:
 
 \bigskip
 
@@ -314,14 +314,24 @@ $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[2]}]{p \lor q \Rightarrow r}{
   \ulcorner p \lor q \urcorner^{[2]}
 &
-\infer[\lor\textrm{-elim}^{[3]}]{r}{
-  \raiseproof{10ex}{\infer[\Rightarrow \mathrm{elim}]{r}{\infer[\land\textrm{-elim-1}]{p \Rightarrow r}{
-  \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
-} & \ulcorner p \urcorner^{[3]}}}
+\infer[\lor\textrm{-elim}^{[2]}]{r}{
+  \ulcorner p \lor q \urcorner^{[2]}
 &
-\hskip 6em \raiseproof{26ex}{\infer[\Rightarrow \mathrm{elim}]{r}{\infer[\land\textrm{-elim-2}]{q \Rightarrow r}{
+\raiseproof{12ex}{\infer[\Rightarrow \mathrm{elim}]{r}{
+  \ulcorner p \urcorner^{[2]}
+&
+\infer[\land\textrm{-elim-1}]{p \Rightarrow r}{
   \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
-} & \ulcorner q \urcorner^{[3]}}}
+}
+}}
+&
+\hskip 6em \raiseproof{30ex}{\infer[\Rightarrow \mathrm{elim}]{r}{
+  \ulcorner q \urcorner^{[2]}
+&
+\infer[\land\textrm{-elim-2}]{q \Rightarrow r}{
+  \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
+}
+}}
 }
 }
 }
@@ -329,13 +339,13 @@ $
 
 \bigskip
 
-In this proof, I start by working from the bottom mechanically, taking $(p \Rightarrow r) \land (q \Rightarrow r)$ as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need (p or q) and r as inputs to the implication introduction rule.  I take (p or q) as assumption [2] and discharge this assumption via this rule.  That leaves me with r as the result of my bottom up process.
+In this proof, I start by working from the bottom mechanically, taking $(p \Rightarrow r) \land (q \Rightarrow r)$ as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need $p \lor q$ and r as inputs to the implication introduction rule.  I take $p \lor q$ as assumption [2] and discharge this assumption via this rule.  That leaves me with r as the result of my bottom up process.  As I have already made assumptions $(p \Rightarrow r) \land (q \Rightarrow r)$ [1] and $p \lor q$ [2] and they are related, I start by working with both top-down. I begin with $p \lor q$ [2] and create cases for p and q working towards or elimination.  The p and q sub-branches are marked with [2] as the assumption as these are just the cases for $p \lor q$ [2] (Simpson, 2025c, slide 41). First, I apply and elimination in each case to get $p \Rightarrow r$, $q \Rightarrow r$ with p, q respectively in the sub-branches.  From there, I apply implication elimination to arrive at r in both cases.  This enables me to use the or elimation together with $p \lor q$ [2] to simplify to r.  At this stage, I do not discharge assumption [2], as this is deferred until the next step. I use implication introduction together with $p \lor q$ [2] and r from the or elimination to discharge assumption [2], which connects the top-down and bottom-up process. All assumptions are properly discharged.  
 
 \bigskip
 
 \bigskip
 
-In the other direction, we are seeking to prove (p or $q \Rightarrow r$) $\Rightarrow$ ($p \Rightarrow r$) and ($q \Rightarrow r$):
+In the other direction, we are seeking to prove $p \lor q \Rightarrow r$ $\Rightarrow$ $p \Rightarrow r$ and $q \Rightarrow r$:
 
 \bigskip
 
@@ -363,14 +373,20 @@ $\displaystyle
 \infer[\Rightarrow \mathrm{elim}]{r}{
   \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
 &
-\infer[\lor\textrm{-intro-1}]{p \lor q}{
-  \ulcorner p \urcorner^{[2]}
+\infer[\lor\textrm{-intro-2}]{p \lor q}{
+  \ulcorner q \urcorner^{[3]}
 }
 }
 }
 }
 }
 $
+
+\bigskip
+
+Working mechanically from the bottom, we start by taking $p \lor q \Rightarrow r$ as assumption [1] and applying the implication introduction rule to discharge assumption [1].  This leaves us with $p \Rightarrow r$ and $q \Rightarrow r$, which is derived from $p \Rightarrow r$, $q \Rightarrow r$ and the application of the and introduction rule. Fairly clearly, we need two sub-branches to be developed top-down. Since we have $p \lor q \Rightarrow r$ and we want $p \Rightarrow r$ and $q \Rightarrow r$, I start with p [2] and q [3] to start the top-down sub-trees.  I struggled here until I recalled that I could use the or intro rule to satisfy $p \lor q$.  I also had to recall that this does not generate additional assumptions to discharge (Simpson, 2025c, slide 38).  From here, it was not difficult to use implication elimation to arrive at r in both sub-trees and to apply p [2] and q [3] in each tree respectively with the implication introduction rule to discharge those assumptions.  This gave me $p \Rightarrow r$, $q \Rightarrow r$ and I used the and introduction rule to connect the top and bottom portions of the proof. All assumptions are properly discharged.  
+
+\bigskip
 
 \bigskip
 
@@ -387,6 +403,131 @@ $\displaystyle
 }
 $
 
+\medskip
+
+\bigskip
+\noindent
+\textbf{Question 4}
+
+\medskip
+
+\begin{gendef}[X]
+  outerLen: \seq_1 (\seq X) \fun \nat \\
+  maxInnerLen: \seq_1 (\seq X) \fun \nat
+\where
+  \forall s : \seq_1 (\seq X) @ outerLen(s) = \# s \\
+  \forall s : \seq_1 (\seq X) @ \forall i : 1 \upto \# s @ \# (s(i)) \leq maxInnerLen(s) \\
+  \forall s : \seq_1 (\seq X) @ \exists i : 1 \upto \# s @ \# (s(i)) = maxInnerLen(s) \\
+\end{gendef}
+
+\begin{gendef}[X]
+  f: X \fun X \\
+  g: X \fun X
+\where
+  \forall x : X @ f(x) = g(x) \\
+\end{gendef}
+
+\bigskip
+\noindent
+\textbf{Question 5}
+
+\medskip
+
+\bigskip
+
+The relational composition operator is associative:
+
+\bigskip
+
+
+\hspace*{1em} $(R \circ S) \circ T = R \circ (S \circ T)$
+
+\bigskip
+
+if $R \in W$ $\rel$ X, $S \in W$ $\rel$ X, and $T \in W$ $\rel$ X.
+
+\bigskip
+
+\[
+\begin{array}{ll@{\hspace{2em}}l}
+& w \mapsto z \in (R \circ S) \circ T \\
+&\Leftrightarrow w \mapsto z \in R \circ S \circ T
+\end{array}
+\]
+
+\bigskip
+
+In this equivalence proof, we show 
+
+\bigskip
+
+\newpage
+
+\bigskip
+\noindent
+\textbf{Question 6}
+
+\medskip
+
+\bigskip
+
+Lecture 4 - Sets, Types, and Definitions
+
+\bigskip
+
+(a)
+\par
+\vspace{11pt}
+\begin{axdef}
+SquaresOfEvens : \power \num
+\where
+SquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z * z \}
+\end{axdef}
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\begin{axdef}
+CubesOfSquaresOfEvens : \power \num
+\where
+CubesOfSquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z * z * z * z * z * z \}
+\end{axdef}
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\begin{axdef}
+SquareCubePairsOfEvens : \power (\num \cross \num)
+\where
+SquareCubePairsOfEvens = \{ z_1, z_2 : \num | z_1 \mod 2 = 0 \land z_2 \mod 2 = 0 @ (z_1 * z_1, z_2 * z_2 * z_2) \}
+\end{axdef}
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\begin{axdef}
+SquareCubeIdentityPairsOfEvens : \power (\num \cross \num)
+\where
+SquareCubeIdentityPairsOfEvens = \{ z : \num | z \mod 2 = 0 @ (z * z, z * z * z) \}
+\end{axdef}
+
+\medskip
+
+(e)
+\par
+\vspace{11pt}
+\begin{axdef}
+SquareOrCubeIntegers : \power \num
+\where
+SquareOrCubeIntegers = \{ z, z_0 : \num | z = z_0 * z_0 \lor z = z_0 * z_0 * z_0 @ z \}
+\end{axdef}
+
 \newpage
 
 \medskip
@@ -395,19 +536,7 @@ $
 
 \bigskip
 
-Course Notes
-
-\bigskip
-
-\bigskip
-
 Simpson A n.d. From Discrete Mathematics to State-Based Models SEM version. University of Oxford Department of Computer Science. Unpublished course notes.
-
-\bigskip
-
-\bigskip
-
-Primary Textbook
 
 \bigskip
 
@@ -419,85 +548,43 @@ Woodcock J. and Davies J. 1996 Using Z Specification Refinement and Proof. Upper
 
 \bigskip
 
-Lecture Slides
+Simpson A 2025a Introduction and propositions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 01.
 
 \bigskip
 
 \bigskip
 
-Simpson A 2025a Lecture schedule. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 00.
+Simpson A 2025b Predicate logic and equality. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 02.
 
 \bigskip
 
 \bigskip
 
-Simpson A 2025b Introduction and propositions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 01.
+Simpson A 2025c Deductive proofs. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 03.
 
 \bigskip
 
 \bigskip
 
-Simpson A 2025c Predicate logic and equality. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 02.
+Simpson A 2025d Sets types and definitions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 04.
 
 \bigskip
 
 \bigskip
 
-Simpson A 2025d Deductive proofs. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 03.
+Simpson A 2025e Relations. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 05.
 
 \bigskip
 
 \bigskip
 
-Simpson A 2025e Sets types and definitions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 04.
+Simpson A 2025f Functions and sequences. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 06.
 
 \bigskip
 
 \bigskip
 
-Simpson A 2025f Relations. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 05.
-
-\bigskip
-
-\bigskip
-
-Simpson A 2025g Functions and sequences. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 06.
-
-\bigskip
-
-\bigskip
-
-Simpson A 2025h Free types and induction. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 07.
-
-\bigskip
-
-\bigskip
-
-Course Materials
-
-\bigskip
-
-\bigskip
-
-Simpson A 2025i Exercises for Software Engineering Mathematics. University of Oxford Department of Computer Science. Unpublished course materials.
-
-\bigskip
-
-\bigskip
-
-Simpson A 2025j Solutions for Software Engineering Mathematics. University of Oxford Department of Computer Science. Unpublished course materials.
-
-\bigskip
-
-\bigskip
-
-Additional References from Course Materials
-
-\bigskip
-
-\bigskip
-
-Abrial J-R 1996 The B-Book Assigning Meanings to Programs. Cambridge Cambridge University Press.
+Simpson A 2025g Free types and induction. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 07.
 
 \bigskip
 
