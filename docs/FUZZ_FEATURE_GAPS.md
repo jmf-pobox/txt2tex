@@ -4,6 +4,8 @@
 **Status:** All homework features working ✅
 **Recent Achievement:** Implemented `gendef` (generic definitions)
 
+**See also:** [FUZZ_VS_STD_LATEX.md](FUZZ_VS_STD_LATEX.md) for differences between fuzz and standard LaTeX that affect how features render in PDFs.
+
 ---
 
 ## Executive Summary

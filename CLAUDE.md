@@ -26,6 +26,21 @@ This is `txt2tex` - a tool to convert whiteboard-style mathematical notation to 
 
 **Goal**: Enable users to write mathematical proofs and solutions in plain ASCII (as they would on a whiteboard) and automatically convert them to properly formatted LaTeX documents.
 
+## Key Documentation Files
+
+Essential reading for understanding the project:
+
+- **[CLAUDE.md](CLAUDE.md)** (this file) - Project context, workflow commands, coding standards, session management
+- **[STATUS.md](STATUS.md)** - Current implementation status, phase tracking, test counts, recent changes
+- **[DESIGN.md](DESIGN.md)** - Architecture, design decisions, operator precedence, AST structure
+- **[USER-GUIDE.md](USER-GUIDE.md)** - User-facing syntax guide, whiteboard notation reference
+- **[PROOF_SYNTAX.md](PROOF_SYNTAX.md)** - Proof tree syntax and formatting rules
+- **[QA_PLAN.md](QA_PLAN.md)** - Quality assurance checklist, testing procedures
+- **[docs/FUZZ_VS_STD_LATEX.md](docs/FUZZ_VS_STD_LATEX.md)** - Fuzz vs standard LaTeX differences (critical for understanding fuzz quirks)
+- **[docs/FUZZ_FEATURE_GAPS.md](docs/FUZZ_FEATURE_GAPS.md)** - Missing Z notation features, implementation roadmap
+
+**Note**: Always check FUZZ_VS_STD_LATEX.md when debugging LaTeX/PDF rendering issues - fuzz has different requirements than standard LaTeX.
+
 ## CRITICAL: Code Quality Standards (MANDATORY)
 
 **🚨 ABSOLUTE REQUIREMENTS - NO EXCEPTIONS:**
@@ -67,10 +82,12 @@ hatch run test-cov       # 5. Coverage maintained
 - ❌ Never claim "fixed" without user confirmation
 - ❌ No buzzwords, jargon, or superlatives
 - ❌ No exaggeration or enthusiasm about unverified results
+- ❌ **DO NOT CODE when asked yes/no questions** - just answer the question
 - ✅ State what changed and why
 - ✅ Explain what needs user verification
 - ✅ Use plain, accurate language
 - ✅ Modest, short commit messages
+- ✅ Answer questions directly without over-engineering
 
 ## Workflow Commands
 
