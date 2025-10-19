@@ -112,8 +112,8 @@ class TestRelationalImageLatex:
         assert r"\rimg" in latex
         assert "R" in latex
         assert "S" in latex
-        # Should be: R(\limg S \rimg)
-        assert latex == r"R(\limg S \rimg)"
+        # Should be: (R \limg S \rimg) - fuzz requires spaces and wrapping parens
+        assert latex == r"(R \limg S \rimg)"
 
     def test_relational_image_with_set_literal_latex(self) -> None:
         """Test LaTeX generation for R(| {1, 2} |)."""
@@ -126,8 +126,8 @@ class TestRelationalImageLatex:
         assert r"\rimg" in latex
         assert r"\{" in latex
         assert r"\}" in latex
-        # Should be: R(\limg \{1, 2\} \rimg)
-        assert latex == r"R(\limg \{1, 2\} \rimg)"
+        # Should be: (R \limg \{1, 2\} \rimg) - fuzz requires spaces and wrapping parens
+        assert latex == r"(R \limg \{1, 2\} \rimg)"
 
     def test_relational_image_with_composition_latex(self) -> None:
         """Test LaTeX generation for (R o9 S)(| A |)."""
@@ -156,8 +156,9 @@ class TestRelationalImageLatex:
         assert r"\limg" in latex
         assert r"\rimg" in latex
         assert "john" in latex
-        # Should be: parentOf(\limg \{john\} \rimg)
-        assert latex == r"parentOf(\limg \{john\} \rimg)"
+        # Should be: (parentOf \limg \{john\} \rimg)
+        # fuzz requires spaces and wrapping parens
+        assert latex == r"(parentOf \limg \{john\} \rimg)"
 
     def test_relational_image_with_inverse_latex(self) -> None:
         """Test LaTeX generation for R~(| S |)."""
@@ -169,8 +170,8 @@ class TestRelationalImageLatex:
         assert "R^{-1}" in latex  # ~ -> ^{-1}
         assert r"\limg" in latex
         assert r"\rimg" in latex
-        # Should be: R^{-1}(\limg S \rimg)
-        assert latex == r"R^{-1}(\limg S \rimg)"
+        # Should be: (R^{-1} \limg S \rimg) - fuzz requires spaces and wrapping parens
+        assert latex == r"(R^{-1} \limg S \rimg)"
 
 
 class TestRelationalImageEdgeCases:
