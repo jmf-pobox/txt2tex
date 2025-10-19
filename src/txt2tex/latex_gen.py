@@ -683,6 +683,7 @@ class LaTeXGenerator:
         # Special Z notation functions with LaTeX commands
         special_functions = {
             "seq": r"\seq",
+            "seq1": r"\seq_1",  # Non-empty sequences
             "iseq": r"\iseq",
             "bag": r"\bag",
             "P": r"\power",  # Power set
