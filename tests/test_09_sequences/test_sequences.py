@@ -679,6 +679,18 @@ class TestNonEmptySequences:
         latex = generate_latex(text)
         assert latex == r"\seq_1 X"
 
+    def test_seq_seq(self):
+        """Test seq seq N → \\seq (\\seq \\mathbb{N}) (sequence of sequences)."""
+        text = "seq seq N"
+        latex = generate_latex(text)
+        assert latex == r"\seq (\seq \mathbb{N})"
+
+    def test_seq1_seq(self):
+        """Test seq1 seq X → \\seq_1 (\\seq X) (non-empty sequences)."""
+        text = "seq1 seq X"
+        latex = generate_latex(text)
+        assert latex == r"\seq_1 (\seq X)"
+
     def test_seq1_with_nat(self):
         """Test seq1 N → \\seq_1 \\nat (with fuzz) or \\seq_1 \\mathbb{N} (LaTeX)."""
         text = "seq1 N"
