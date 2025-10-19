@@ -21,6 +21,7 @@ from txt2tex.ast_nodes import (
     FreeType,
     FunctionApp,
     FunctionType,
+    GenDef,
     GenericInstantiation,
     GivenType,
     GuardedBranch,
@@ -351,6 +352,8 @@ class Parser:
             return self._parse_given_type()
         if self._match(TokenType.AXDEF):
             return self._parse_axdef()
+        if self._match(TokenType.GENDEF):
+            return self._parse_gendef()
         if self._match(TokenType.SCHEMA):
             return self._parse_schema()
         if self._match(TokenType.PROOF):
@@ -2494,6 +2497,85 @@ class Parser:
             declarations=declarations,
             predicates=predicates,
             generic_params=generic_params,
+            line=start_token.line,
+            column=start_token.column,
+        )
+
+    def _parse_gendef(self) -> GenDef:
+        """Parse generic definition block.
+
+        Generic definitions require generic parameters.
+        Syntax: gendef [X, Y] ... end
+        """
+        start_token = self._advance()  # Consume 'gendef'
+        self._skip_newlines()
+
+        # Generic parameters are REQUIRED for gendef
+        generic_params = self._parse_generic_params()
+        if not generic_params:
+            raise ParserError(
+                "Generic parameters required for gendef (e.g., gendef [X, Y])",
+                self._current(),
+            )
+        self._skip_newlines()
+
+        declarations: list[Declaration] = []
+        predicates: list[Expr] = []
+
+        # Parse declarations until 'where' or 'end'
+        while not self._at_end() and not self._match(TokenType.WHERE, TokenType.END):
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+                continue
+
+            # Parse declaration: var : Type
+            if self._match(TokenType.IDENTIFIER):
+                var_token = self._current()
+                var_name = var_token.value
+                self._advance()
+
+                if not self._match(TokenType.COLON):
+                    raise ParserError("Expected ':' in declaration", self._current())
+                self._advance()  # Consume ':'
+
+                # Parse type expression
+                type_expr = self._parse_expr()
+
+                declarations.append(
+                    Declaration(
+                        variable=var_name,
+                        type_expr=type_expr,
+                        line=var_token.line,
+                        column=var_token.column,
+                    )
+                )
+                self._skip_newlines()
+            else:
+                break
+
+        # Parse 'where' clause (optional)
+        if self._match(TokenType.WHERE):
+            self._advance()  # Consume 'where'
+            self._skip_newlines()
+
+            # Parse predicates until 'end'
+            while not self._at_end() and not self._match(TokenType.END):
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                    continue
+
+                predicates.append(self._parse_expr())
+                self._skip_newlines()
+
+        # Expect 'end'
+        if not self._match(TokenType.END):
+            raise ParserError("Expected 'end' to close gendef block", self._current())
+        self._advance()  # Consume 'end'
+
+        return GenDef(
+            generic_params=generic_params,
+            declarations=declarations,
+            predicates=predicates,
             line=start_token.line,
             column=start_token.column,
         )

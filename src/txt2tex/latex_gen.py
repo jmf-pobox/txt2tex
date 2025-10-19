@@ -19,6 +19,7 @@ from txt2tex.ast_nodes import (
     FreeType,
     FunctionApp,
     FunctionType,
+    GenDef,
     GenericInstantiation,
     GivenType,
     GuardedBranch,
@@ -274,6 +275,8 @@ class LaTeXGenerator:
             return self._generate_abbreviation(item)
         if isinstance(item, AxDef):
             return self._generate_axdef(item)
+        if isinstance(item, GenDef):
+            return self._generate_gendef(item)
         if isinstance(item, Schema):
             return self._generate_schema(item)
         if isinstance(item, ProofTree):
@@ -2037,6 +2040,40 @@ class LaTeXGenerator:
                 lines.append(pred_latex)
 
         lines.append(r"\end{axdef}")
+        lines.append("")
+
+        return lines
+
+    def _generate_gendef(self, node: GenDef) -> list[str]:
+        """Generate LaTeX for generic definition.
+
+        Generic definitions always have generic parameters (required).
+        Adds indentation to match txt structure.
+        """
+        lines: list[str] = []
+
+        # Generic parameters are always present for gendef
+        params_str = ", ".join(node.generic_params)
+        lines.append(f"\\begin{{gendef}}[{params_str}]")
+
+        # Generate declarations with indentation
+        for decl in node.declarations:
+            # Process variable through identifier logic for underscore handling
+            var_latex = self._generate_identifier(
+                Identifier(line=0, column=0, name=decl.variable)
+            )
+            type_latex = self.generate_expr(decl.type_expr)
+            lines.append(f"  {var_latex}: {type_latex}")
+
+        # Generate where clause if predicates exist
+        if node.predicates:
+            lines.append(r"\where")
+            for pred in node.predicates:
+                pred_latex = self.generate_expr(pred)
+                # Add indentation and line break for predicates
+                lines.append(f"  {pred_latex} \\\\")
+
+        lines.append(r"\end{gendef}")
         lines.append("")
 
         return lines
