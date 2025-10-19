@@ -2138,6 +2138,12 @@ class Parser:
                 self._current(),
             )
 
+        # Handle unary prefix operators in restricted contexts
+        # This allows # and not to work in set comprehension predicates
+        # and other contexts where _parse_atom() is called directly
+        if self._match(TokenType.HASH, TokenType.NOT, TokenType.MINUS):
+            return self._parse_unary()
+
         raise ParserError(
             f"Expected identifier, number, '(', '{{', '⟨', or lambda,"
             f" got {self._current().type.name}",
