@@ -1,0 +1,31 @@
+=== Zed Block Test ===
+
+** Test 1: Simple Predicate **
+
+zed
+  x > 0
+end
+
+** Test 2: Forall Quantifier **
+
+zed
+  forall x : N | x >= 0
+end
+
+** Test 3: Exists Quantifier **
+
+zed
+  exists n : N | n * n = 4
+end
+
+** Test 4: Mu Expression **
+
+zed
+  (mu n : N | n > 0)
+end
+
+** Test 5: Nested Quantifiers **
+
+zed
+  forall x : N | exists y : N | x + y = 10
+end
