@@ -33,7 +33,8 @@
       "Read(//Users/jfreeman/Coding/fuzz/txt2tex/**)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "ask": []
