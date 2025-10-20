@@ -688,6 +688,22 @@ class PageBreak(ASTNode):
     """
 
 
+@dataclass(frozen=True)
+class Zed(ASTNode):
+    """Zed block for standalone predicates and declarations.
+
+    Unboxed Z notation paragraphs for:
+    - Standalone predicates (e.g., global constraints)
+    - Basic type declarations
+    - Abbreviations
+    - Free type definitions
+
+    Generates: \\begin{zed}...\\end{zed}
+    """
+
+    content: Expr  # Can be a predicate, declaration, or other expression
+
+
 # Type alias for document items (expressions or structural elements)
 DocumentItem = (
     Expr
@@ -706,6 +722,7 @@ DocumentItem = (
     | AxDef
     | GenDef
     | Schema
+    | Zed
     | ProofTree
 )
 
