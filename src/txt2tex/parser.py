@@ -51,6 +51,7 @@ from txt2tex.ast_nodes import (
     Tuple,
     TupleProjection,
     UnaryOp,
+    Zed,
 )
 from txt2tex.tokens import Token, TokenType
 
@@ -257,6 +258,7 @@ class Parser:
             TokenType.GIVEN,
             TokenType.AXDEF,
             TokenType.GENDEF,
+            TokenType.ZED,
             TokenType.SCHEMA,
             TokenType.PROOF,
         )
@@ -355,6 +357,8 @@ class Parser:
             return self._parse_axdef()
         if self._match(TokenType.GENDEF):
             return self._parse_gendef()
+        if self._match(TokenType.ZED):
+            return self._parse_zed()
         if self._match(TokenType.SCHEMA):
             return self._parse_schema()
         if self._match(TokenType.PROOF):
@@ -2064,6 +2068,13 @@ class Parser:
         if self._match(TokenType.IF):
             return self._parse_conditional()
 
+        # Phase 7: Quantified expressions (forall, exists, exists1, mu) as atoms
+        # These can appear in expressions like: BadMu = mu n : N | n > 0
+        if self._match(
+            TokenType.FORALL, TokenType.EXISTS, TokenType.EXISTS1, TokenType.MU
+        ):
+            return self._parse_quantifier()
+
         # Phase 11b / Phase 13 / Phase 22: Identifiers
         # Note: Function application expr(...) is now handled in _parse_postfix()
         # Note: Generic instantiation Type[X] is handled in _parse_postfix()
@@ -2600,6 +2611,37 @@ class Parser:
             generic_params=generic_params,
             declarations=declarations,
             predicates=predicates,
+            line=start_token.line,
+            column=start_token.column,
+        )
+
+    def _parse_zed(self) -> Zed:
+        """Parse zed block for standalone predicates.
+
+        Zed blocks contain unboxed Z notation paragraphs.
+        Syntax: zed <content> end
+
+        The content can be:
+        - Standalone predicates (quantified or not)
+        - Basic type declarations
+        - Abbreviations
+        - Free type definitions
+        """
+        start_token = self._advance()  # Consume 'zed'
+        self._skip_newlines()
+
+        # Parse the content as a single expression
+        # This handles predicates, quantifiers, etc.
+        content = self._parse_expr()
+        self._skip_newlines()
+
+        # Expect 'end'
+        if not self._match(TokenType.END):
+            raise ParserError("Expected 'end' to close zed block", self._current())
+        self._advance()  # Consume 'end'
+
+        return Zed(
+            content=content,
             line=start_token.line,
             column=start_token.column,
         )
