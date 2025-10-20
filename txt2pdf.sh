@@ -106,23 +106,26 @@ else
     echo "Step ${COMPILE_STEP}/3: Compiling PDF..."
 fi
 
-# pdflatex may return non-zero even on success (warnings), so check PDF creation instead
+# Use latexmk to handle multiple passes automatically
+# It runs pdflatex as many times as needed until citations/references resolve
 # No TEXINPUTS/MFINPUTS needed - files are local
 set +e  # Temporarily disable exit on error
-cd "$INPUT_DIR" && pdflatex -interaction=nonstopmode "${INPUT_BASE}.tex" > "${INPUT_BASE}.pdflatex.log" 2>&1
-PDFLATEX_EXIT=$?
-set -e  # Re-enable exit on error
+cd "$INPUT_DIR" && latexmk -pdf -interaction=nonstopmode -file-line-error "${INPUT_BASE}.tex" > "${INPUT_BASE}.latexmk.log" 2>&1
+LATEXMK_EXIT=$?
 
 if [ ! -f "${INPUT_BASE}.pdf" ]; then
-    echo "Error: PDF compilation failed (exit code: $PDFLATEX_EXIT)" >&2
-    echo "Check the LaTeX log: ${INPUT_BASE}.pdflatex.log" >&2
+    echo "Error: PDF compilation failed (exit code: $LATEXMK_EXIT)" >&2
+    echo "Check the LaTeX log: ${INPUT_BASE}.latexmk.log" >&2
+    set -e
     exit 1
 fi
 
+set -e  # Re-enable exit on error
+
 echo "  → Generated: $PDF_FILE"
 
-# Clean up auxiliary files
-rm -f "${INPUT_BASE}.aux" "${INPUT_BASE}.log"
+# Clean up auxiliary files (latexmk creates several)
+cd "$INPUT_DIR" && latexmk -c "${INPUT_BASE}.tex" > /dev/null 2>&1 || true
 
 echo ""
 echo "✓ Success: $PDF_FILE"
