@@ -75,7 +75,7 @@ Based on fuzz manual Section 7 (Syntax Summary, pages 54-59).
 | Schema box | `\begin{schema}{Name}...\end{schema}` | ✅ | parser.py:2580 | Optional generic params |
 | **Generic box** | `\begin{gendef}[Formals]...\end{gendef}` | ✅ | parser.py:2501 | **Just implemented!** |
 | **Horizontal schema def** 🔹 | `Schema-Name[Formals] \defs Schema-Exp` | ❌ | - | Alternative schema syntax |
-| Predicate paragraph | Bare `Predicate` in zed block | ⚠️ | - | Need verification |
+| **Zed blocks (unboxed paragraphs)** | `\begin{zed}...\end{zed}` | ✅ | parser.py:2616 | Standalone predicates, types, abbrevs |
 
 ---
 
