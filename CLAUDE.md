@@ -89,6 +89,13 @@ hatch run test-cov       # 5. Coverage maintained
 - ✅ Modest, short commit messages
 - ✅ Answer questions directly without over-engineering
 
+### Solution Standards (MANDATORY)
+- ✅ **Proper solution first**: Identify and implement the correct solution immediately
+- ✅ **No compromises on false warnings**: False warnings train you to ignore logs - unacceptable
+- ✅ **Industry standard tools**: Use professional tools (e.g., latexmk) not manual workarounds
+- ❌ **No shortcuts or hacks**: Don't offer inferior alternatives to save time
+- ❌ **No warning filters to hide problems**: Fix the root cause, don't mask symptoms
+
 ## Workflow Commands
 
 **ALWAYS use these commands (defined in pyproject.toml):**
