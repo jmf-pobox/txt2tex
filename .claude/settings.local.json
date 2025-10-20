@@ -34,7 +34,8 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(ls:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(../txt2pdf.sh:*)"
     ],
     "deny": [],
     "ask": []
