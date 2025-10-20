@@ -63,6 +63,23 @@ TEXT: We know that forall x : N | x >= 0 is true.
 - Operators converted: `=>` → $\Rightarrow$, `<=>` → $\Leftrightarrow$
 - Formulas automatically detected: `{ x : N | x > 0 }` → $\{ x : \mathbb{N} \mid x > 0 \}$
 - Sequence literals converted: `<a, b, c>` → $\langle a, b, c \rangle$
+- Citations supported: `[cite key]` → (Author, Year) in Harvard style
+
+**Citations in TEXT blocks:**
+
+```
+TEXT: The proof technique follows [cite simpson25a].
+TEXT: This is discussed in [cite simpson25a slide 20].
+TEXT: See the definition in [cite spivey92 p. 42].
+TEXT: Multiple examples appear in [cite woodcock96 pp. 10-15].
+```
+
+Renders as:
+- `[cite simpson25a]` → (Simpson, 2025a)
+- `[cite simpson25a slide 20]` → (Simpson, 2025a, slide 20)
+- `[cite spivey92 p. 42]` → (Spivey, 1992, p. 42)
+
+**Note**: Citation keys match those defined in your bibliography (see LATEX: blocks for bibliography setup). You can add any locator text (slide, p., pp., etc.) after the citation key.
 
 ### PURETEXT: - Raw Text with LaTeX Escaping
 
@@ -92,6 +109,25 @@ LATEX: \mycustomcommand{arg1}{arg2}
 **Features:**
 - NO escaping - raw LaTeX passed directly through
 - Perfect for tikz diagrams, custom environments, special commands
+- Used for bibliography setup with natbib
+
+**Bibliography Setup (Harvard Style):**
+
+txt2tex automatically includes the `natbib` package for author-year citations. Use LATEX: blocks to define your bibliography:
+
+```
+=== Bibliography ===
+
+LATEX: \begin{thebibliography}{Simpson, n.d.}
+LATEX:
+LATEX: \bibitem[Simpson, 2025a]{simpson25a} Simpson, A. (2025a). \textit{Introduction and propositions}. Lecture 01.
+LATEX:
+LATEX: \bibitem[Woodcock and Davies, 1996]{woodcock96} Woodcock, J. and Davies, J. (1996). \textit{Using Z}. Prentice Hall.
+LATEX:
+LATEX: \end{thebibliography}
+```
+
+The `\bibitem[Author, Year]{key}` format creates Harvard-style citations. Use `[cite key]` in TEXT: blocks to reference them (see TEXT: section above).
 
 ### PAGEBREAK: - Insert Page Break
 
@@ -215,6 +251,34 @@ Generates: $\forall x : \mathbb{N} \bullet x > 0$
 exists y : Z | y < 0
 ```
 Generates: $\exists y : \mathbb{Z} \bullet y < 0$
+
+#### Unique Existential Quantification (∃₁)
+
+```
+exists1 x : N | x * x = 4
+```
+Generates: $\exists_1 x : \mathbb{N} \bullet x \times x = 4$
+
+#### Definite Description (μ)
+
+The mu operator (μ) denotes "the unique value satisfying a predicate":
+
+```
+mu x : N | x * x = 4 and x > 0
+```
+
+Generates (in fuzz mode): $(\mu x : \mathbb{N} \mid x \times x = 4 \land x > 0)$
+
+**Note**: In fuzz mode, mu expressions use `|` as the separator and are wrapped in parentheses. The syntax is: `mu variable : Type | predicate`
+
+**With expression part** (selecting from a set):
+```
+mu x : N | x in S . f(x)
+```
+
+Generates: `(\mu x : \mathbb{N} \mid x \in S @ f(x))`
+
+The mu operator is typically used when you know there exists exactly one element satisfying the predicate and you want to refer to that element directly.
 
 ### Multi-Variable Quantifiers
 
@@ -568,6 +632,24 @@ R comp S         →  R ∘ S       [relational composition alternative]
 
 **Note:** Semicolon (`;`) is NOT supported for relational composition - it is reserved for separating declarations in `gendef`, `axdef`, and `schema` blocks. Always use `o9` or `comp` for relational composition.
 
+**Composition vs Nested Application:**
+
+| Syntax | Meaning | Type | Usage |
+|--------|---------|------|-------|
+| `g o9 f` | Function composition | `A -> C` (function) | Creates new function |
+| `g(f(x))` | Nested application | `C` (value) | Computes specific result |
+
+**Example:**
+```
+successor : N -> N
+square : N -> N
+
+squareSuccessor == square o9 successor    ← Defines a new function
+result = square(successor(5))             ← Computes the value 36
+```
+
+Both evaluate the same when applied to arguments: `(g o9 f)(x) = g(f(x))`, but composition creates a reusable function while nested application computes a specific value.
+
 ### Closures
 
 ```
@@ -813,6 +895,120 @@ bag(X)           →  bag X       [set of all bags of type X]
 ---
 
 ## Schema Notation
+
+### Zed Blocks (Unboxed Paragraphs)
+
+Zed blocks provide a way to write standalone Z notation content without the visual boxing of axdef/schema blocks.
+
+**What can go in zed blocks:**
+- ✅ **Predicates**: `forall x : N | x >= 0`
+- ✅ **Abbreviations**: `Evens == { n : N | n mod 2 = 0 }`
+- ✅ **Type declarations**: `[NAME, DATE]`
+- ❌ **NOT bare expressions**: Cannot use standalone `{ x : N | x > 0 }` or `x + y`
+
+**Simple predicate:**
+```
+zed
+  x > 0
+end
+```
+
+**Quantified predicates:**
+```
+zed
+  forall x : N | x >= 0
+end
+```
+
+```
+zed
+  exists n : NAME | birthday(n) in December
+end
+```
+
+**Abbreviations (assignment):**
+```
+zed
+  Evens == { n : N | n mod 2 = 0 }
+end
+```
+
+**Complex predicates:**
+```
+zed
+  forall x : S | exists y : T | x in y
+end
+```
+
+Generates:
+```latex
+\begin{zed}
+  \forall x : S \mid \exists y : T \mid x \in y
+\end{zed}
+```
+
+**Key differences from axdef/schema:**
+- No visual box in PDF output
+- No separate declaration and where sections
+- Content must be a predicate or abbreviation (not a bare expression)
+- Typically used for global constraints or simple definitions
+
+### Container Comparison: What Goes Where
+
+| Content Type | zed | axdef | schema | Standalone |
+|--------------|-----|-------|--------|------------|
+| **Predicates** | ✅ `forall x : N \| x >= 0` | ✅ In `where` clause | ✅ In `where` clause | ✅ Direct |
+| **Abbreviations** | ✅ `Evens == {...}` | ❌ Use top-level | ❌ Use top-level | ✅ Direct |
+| **Type declarations** | ✅ `[NAME, DATE]` | ❌ Use `given` | ❌ Use `given` | ✅ `given` |
+| **Variable declarations** | ❌ | ✅ Before `where` | ✅ Before `where` | ❌ |
+| **Bare expressions** | ❌ | ❌ | ❌ | ✅ Direct |
+| **Set comprehensions** | ❌ Alone ✅ In abbrev | ✅ In `where` clause | ✅ In `where` clause | ✅ Direct |
+| **Visual box in PDF** | ❌ No box | ✅ Boxed | ✅ Boxed | ❌ No box |
+
+**Examples:**
+
+**Standalone (no container):**
+```
+{ x : N | x > 0 . x * x }          ← Bare expression, renders inline
+```
+
+**Zed block (unboxed paragraph):**
+```
+zed
+  forall x : N | x >= 0            ← Predicate: OK
+end
+
+zed
+  Evens == { n : N | n mod 2 = 0 } ← Abbreviation: OK
+end
+
+zed
+  { x : N | x > 0 }                ← ERROR: Bare expression not allowed
+end
+```
+
+**Axdef (boxed, with declarations):**
+```
+axdef
+  SquaresOfEvens : P Z             ← Declaration required
+where
+  SquaresOfEvens = { z : Z | z mod 2 = 0 . z * z }  ← Expression in where: OK
+end
+```
+
+**Schema (boxed, with declarations):**
+```
+schema State
+  count : N                        ← Declaration required
+where
+  count >= 0                       ← Predicate in where: OK
+end
+```
+
+**Key principle:**
+- **zed blocks** are for predicates and abbreviations that don't need variable declarations
+- **axdef/schema** are for definitions with typed variable declarations
+- **Standalone** (no container) is for expressions you want rendered inline with math mode
 
 ### Axiomatic Definitions
 

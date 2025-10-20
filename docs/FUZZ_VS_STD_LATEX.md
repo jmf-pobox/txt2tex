@@ -211,6 +211,55 @@ if (
 
 ---
 
+## Mu Expressions (Definite Description)
+
+### Syntax Requirements
+
+**Issue discovered**: Mu expressions require special handling in fuzz mode.
+
+**Standard LaTeX**: May work with various formats
+**Fuzz requirement**: Parentheses around the **entire mu expression**
+
+**txt2tex solution**: In fuzz mode, wrap entire mu expression in parentheses:
+
+```python
+# For mu x : N | predicate:
+if node.quantifier == "mu" and self.use_fuzz:
+    return f"({quant_latex} {vars} : {domain} | {body})"
+```
+
+**Reference**: [latex_gen.py:535-554](../src/txt2tex/latex_gen.py:535-554)
+
+**Examples**:
+
+Input:
+```
+mu n : N | n > 0
+```
+
+Fuzz mode generates:
+```latex
+(\mu n : \nat | n > 0)
+```
+
+With expression part:
+```
+mu n : N | n in S . f(n)
+```
+
+Generates:
+```latex
+(\mu n : \nat | n \in S @ f(n))
+```
+
+**Key points**:
+- Parentheses wrap the ENTIRE mu expression, not just the schema text
+- Use `|` for predicate separator (not `@`)
+- Use `@` only when there's an expression part after the predicate
+- The error "Opening parenthesis expected at symbol `\mu`" means fuzz is expecting `(` before `\mu`
+
+---
+
 ## Key Lessons for Future Development
 
 ### 1. Always Test with Fuzz
@@ -223,6 +272,8 @@ hatch run convert file.txt
 # Fuzz mode (type checking enabled)
 hatch run convert file.txt --fuzz
 ```
+
+**Important**: Create minimal test cases in /tmp first before modifying production code.
 
 ### 2. Check Operator Precedence
 
@@ -239,6 +290,60 @@ Fuzz supports a specific set of Z notation operators. Check the fuzz manual befo
 ### 5. Type Checking is Strict
 
 Fuzz type checking is much stricter than LaTeX. Code that "looks right" in PDF may fail fuzz validation.
+
+### 6. Test Minimal Examples First
+
+When debugging fuzz errors, create minimal test cases with raw LaTeX to isolate the issue before modifying the generator.
+
+---
+
+## Zed Blocks (Unboxed Paragraphs)
+
+### Purpose
+
+Zed blocks (`\begin{zed}...\end{zed}`) are unboxed Z notation paragraphs. Unlike `axdef` and `schema`, they don't render with a visual box in the PDF.
+
+### Common Uses
+
+1. **Standalone predicates**: Global constraints that don't need visual boxing
+2. **Type declarations**: Basic type introductions
+3. **Quantified statements**: Universal or existential claims
+4. **Abbreviations**: Simple definitions without declarations
+
+### Syntax Difference
+
+**txt2tex input:**
+```
+zed
+  forall x : N | x >= 0
+end
+```
+
+**LaTeX output:**
+```latex
+\begin{zed}
+  \forall x : \nat \mid x \geq 0
+\end{zed}
+```
+
+### Fuzz Mode Considerations
+
+- Content is typechecked by fuzz like any other Z notation
+- Type annotations (e.g., `N` → `\nat`) apply normally
+- Quantifiers must follow fuzz syntax requirements
+- No special fuzz-specific handling needed for the environment itself
+
+### When to Use zed vs axdef
+
+**Use `zed`** when:
+- Content is a single predicate/expression
+- No visual box needed in PDF
+- No separate declaration section needed
+
+**Use `axdef`** when:
+- Need declaration and where sections
+- Want visual box in PDF
+- Defining global constants with types
 
 ---
 
