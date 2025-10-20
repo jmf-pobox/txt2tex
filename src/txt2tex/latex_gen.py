@@ -49,6 +49,7 @@ from txt2tex.ast_nodes import (
     Tuple,
     TupleProjection,
     UnaryOp,
+    Zed,
 )
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
@@ -220,6 +221,8 @@ class LaTeXGenerator:
         # Load amssymb for \mathbb{N} and \mathbb{Z} blackboard bold
         # Note: amsmath removed - using array{lll} instead of align* for EQUIV
         lines.append(r"\usepackage{amssymb}")  # For \mathbb{N} and \mathbb{Z}
+        # Load natbib for author-year citations (Harvard style)
+        lines.append(r"\usepackage{natbib}")
         if self.use_fuzz:
             lines.append(r"\usepackage{fuzz}")  # Replaces zed-cm (fonts/styling)
         else:
@@ -277,6 +280,8 @@ class LaTeXGenerator:
             return self._generate_axdef(item)
         if isinstance(item, GenDef):
             return self._generate_gendef(item)
+        if isinstance(item, Zed):
+            return self._generate_zed(item)
         if isinstance(item, Schema):
             return self._generate_schema(item)
         if isinstance(item, ProofTree):
@@ -530,7 +535,28 @@ class LaTeXGenerator:
             parts.append(":" if self.use_fuzz else r"\colon")
             parts.append(domain_latex)
 
-        # Phase 11.5: Check if mu has expression part
+        # Special handling for mu operator in fuzz mode
+        # Fuzz requires: (\mu decl | pred) with parentheses around ENTIRE mu expression
+        if node.quantifier == "mu" and self.use_fuzz:
+            mu_parts = [quant_latex, variables_str]
+            if node.domain:
+                domain_latex = self.generate_expr(node.domain)
+                mu_parts.append(f": {domain_latex}")
+            # Always use | for predicate separator in mu
+            mu_parts.append("|")
+            body_latex = self.generate_expr(node.body)
+            mu_parts.append(body_latex)
+
+            # If there's an expression part, add @ separator and expression
+            if node.expression:
+                mu_parts.append("@")
+                expr_latex = self.generate_expr(node.expression)
+                mu_parts.append(expr_latex)
+
+            # Wrap ENTIRE mu expression in parentheses
+            return f"({' '.join(mu_parts)})"
+
+        # Phase 11.5: Check if mu has expression part (non-fuzz or other quantifiers)
         if node.quantifier == "mu" and node.expression:
             # Use | or \mid for predicate separator
             parts.append("|" if self.use_fuzz else r"\mid")
@@ -1086,6 +1112,9 @@ class LaTeXGenerator:
         # Process inline math expressions (includes formula detection)
         text = self._process_inline_math(text)
 
+        # Process citations: [cite key] → \citep{key}
+        text = self._process_citations(text)
+
         # Then convert remaining symbolic operators to LaTeX math symbols
         # Only replace if NOT already wrapped in math mode
         # Do NOT convert and/or/not - those are English words in prose context
@@ -1367,6 +1396,39 @@ class LaTeXGenerator:
             else:
                 i += 1
         return matches
+
+    def _process_citations(self, text: str) -> str:
+        """Process citation markup in text.
+
+        Converts [cite key] to \\citep{key} for Harvard-style parenthetical citations.
+        Supports optional page/slide numbers.
+
+        Examples:
+            "[cite simpson25a]" → "\\citep{simpson25a}"
+            "[cite simpson25a slide 20]" → "\\citep[slide 20]{simpson25a}"
+            "[cite spivey92 p. 42]" → "\\citep[p. 42]{spivey92}"
+            "[cite woodcock96 pp. 10-15]" → "\\citep[pp. 10-15]{woodcock96}"
+
+        The citation key can contain letters, numbers, hyphens, and underscores.
+        The locator (page/slide) can contain any text after the key.
+        """
+        # Pattern: [cite key optional-locator]
+        # Capture key (alphanumeric with hyphens/underscores) and optional locator text
+        # Example: [cite simpson25a slide 20] → \citep[slide 20]{simpson25a}
+        pattern = r"\[cite\s+([a-zA-Z0-9_-]+)(?:\s+([^\]]+))?\]"
+
+        def replace_citation(match: re.Match[str]) -> str:
+            key = match.group(1)
+            locator = match.group(2)
+            if locator:
+                # Strip leading/trailing whitespace from locator
+                locator = locator.strip()
+                return f"\\citep[{locator}]{{{key}}}"
+            else:
+                return f"\\citep{{{key}}}"
+
+        result = re.sub(pattern, replace_citation, text)
+        return result
 
     def _process_inline_math(self, text: str) -> str:
         """Process inline math expressions in text.
@@ -2119,6 +2181,22 @@ class LaTeXGenerator:
                 lines.append(f"  {pred_latex} \\\\")
 
         lines.append(r"\end{gendef}")
+        lines.append("")
+
+        return lines
+
+    def _generate_zed(self, node: Zed) -> list[str]:
+        """Generate LaTeX for zed block (unboxed paragraph).
+
+        Zed blocks contain standalone predicates, types, or other expressions
+        without the visual box styling of axdef/schema.
+        """
+        lines: list[str] = []
+
+        lines.append(r"\begin{zed}")
+        content_latex = self.generate_expr(node.content)
+        lines.append(f"  {content_latex}")
+        lines.append(r"\end{zed}")
         lines.append("")
 
         return lines

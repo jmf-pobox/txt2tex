@@ -145,6 +145,7 @@ class TokenType(Enum):
     AXDEF = auto()  # axdef
     SCHEMA = auto()  # schema
     GENDEF = auto()  # gendef (generic definition)
+    ZED = auto()  # zed (unboxed paragraph block)
     WHERE = auto()  # where
     END = auto()  # end
 

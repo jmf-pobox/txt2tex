@@ -828,6 +828,8 @@ class Lexer:
                         "given",
                         "axdef",
                         "schema",
+                        "gendef",
+                        "zed",
                         "where",
                         "end",
                         "if",
@@ -925,6 +927,8 @@ class Lexer:
             return Token(TokenType.SCHEMA, value, start_line, start_column)
         if value == "gendef":
             return Token(TokenType.GENDEF, value, start_line, start_column)
+        if value == "zed":
+            return Token(TokenType.ZED, value, start_line, start_column)
         if value == "where":
             return Token(TokenType.WHERE, value, start_line, start_column)
         if value == "end":
