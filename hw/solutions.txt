@@ -1,6 +1,7 @@
-=== Propositional Logic ===
+=== Software Engineering Mathematics ===
+TEXT: October 2025
 
-TEXT: Answers leverage the grammar's order of precedence ([not], [and], [or], [=>], [<=>]) rather than clarifying parenthesis (Simpson, 2025a, slide 20).
+TEXT: Answers use the order of precedence ([not], [and], [or], [=>], [<=>]) [cite simpson25a Slide 20].
 
 ** Question 1 **
 
@@ -155,7 +156,7 @@ PROOF:
             :: (q => r) [and elim 2]
               (p => r) and (q => r) [from 1]
   
-TEXT: In this proof, I start by working from the bottom mechanically, taking (p => r) and (q => r) as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need (p or q) and r as inputs to the implication introduction rule.  I take (p or q) as assumption [2] and discharge this assumption via this rule.  That leaves me with r as the result of my bottom up process.  As I have already made assumptions ((p => r) and (q => r)) [1] and (p or q) [2] and they are related, I start by working with both top-down. I begin with (p or q) [2] and create cases for p and q working towards or elimination.  The p and q sub-branches are marked with [2] as the assumption as these are just the cases for (p or q) [2] (Simpson, 2025c, slide 41). First, I apply and elimination in each case to get (p => r), (q => r) with p, q respectively in the sub-branches.  From there, I apply implication elimination to arrive at r in both cases.  This enables me to use the or elimation together with (p or q) [2] to simplify to r.  At this stage, I do not discharge assumption [2], as this is deferred until the next step. I use implication introduction together with (p or q) [2] and r from the or elimination to discharge assumption [2], which connects the top-down and bottom-up process. All assumptions are properly discharged.  
+TEXT: In this proof, I start by working from the bottom mechanically, taking (p => r) and (q => r) as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need (p or q) and r as inputs to the implication introduction rule.  I take (p or q) as assumption [2] and discharge this assumption via this rule.  That leaves me with r as the result of my bottom up process.  As I have already made assumptions ((p => r) and (q => r)) [1] and (p or q) [2] and they are related, I start by working with both top-down. I begin with (p or q) [2] and create cases for p and q working towards or elimination.  The p and q sub-branches are marked with [2] as the assumption as these are just the cases for (p or q) [2] [cite simpson25c slide 41]. First, I apply and elimination in each case to get (p => r), (q => r) with p, q respectively in the sub-branches.  From there, I apply implication elimination to arrive at r in both cases.  This enables me to use the or elimation together with (p or q) [2] to simplify to r.  At this stage, I do not discharge assumption [2], as this is deferred until the next step. I use implication introduction together with (p or q) [2] and r from the or elimination to discharge assumption [2], which connects the top-down and bottom-up process. All assumptions are properly discharged.  
 
 TEXT: In the other direction, we are seeking to prove (p or q => r) => (p => r) and (q => r):
 
@@ -176,7 +177,7 @@ PROOF:
         :: p or q [or intro2]
           [3] q [assumption]
 
-TEXT: Working mechanically from the bottom, we start by taking (p or q => r) as assumption [1] and applying the implication introduction rule to discharge assumption [1].  This leaves us with (p => r) and (q => r), which is derived from p => r, q => r and the application of the and introduction rule. Fairly clearly, we need two sub-branches to be developed top-down. Since we have (p or q => r) and we want p => r and q => r, I start with p [2] and q [3] to start the top-down sub-trees.  I struggled here until I recalled that I could use the or intro rule to satisfy (p or q).  I also had to recall that this does not generate additional assumptions to discharge (Simpson, 2025c, slide 38).  From here, it was not difficult to use implication elimation to arrive at r in both sub-trees and to apply p [2] and q [3] in each tree respectively with the implication introduction rule to discharge those assumptions.  This gave me p => r, q => r and I used the and introduction rule to connect the top and bottom portions of the proof. All assumptions are properly discharged.  
+TEXT: Working mechanically from the bottom, we start by taking (p or q => r) as assumption [1] and applying the implication introduction rule to discharge assumption [1].  This leaves us with (p => r) and (q => r), which is derived from p => r, q => r and the application of the and introduction rule. Fairly clearly, we need two sub-branches to be developed top-down. Since we have (p or q => r) and we want p => r and q => r, I start with p [2] and q [3] to start the top-down sub-trees.  I struggled here until I recalled that I could use the or intro rule to satisfy (p or q).  I also had to recall that this does not generate additional assumptions to discharge [cite simpson25c slide 38]. From here, it was not difficult to use implication elimation to arrive at r in both sub-trees and to apply p [2] and q [3] in each tree respectively with the implication introduction rule to discharge those assumptions.  This gave me p => r, q => r and I used the and introduction rule to connect the top and bottom portions of the proof. All assumptions are properly discharged.  
 
 TEXT: We then combine these two proofs with the <=>-intro rule, using the results from above:
 
@@ -230,6 +231,10 @@ where
   SquaresOfEvens = { z : Z | z mod 2 = 0 . z * z}
 end
 
+zed
+  SquaresOfEvens = { z : Z | z mod 2 = 0 . z * z}
+end
+
 (b)
 axdef
   CubesOfSquaresOfEvens : P Z
@@ -261,26 +266,58 @@ end
 
 PAGEBREAK:
 
+** Question n **
+
+axdef
+  Naturals : N
+where
+  forall x : N | x >= 0
+end
+
+axdef
+  NaturalsExist : N
+where
+  exists x : N | x > 100
+end
+
+axdef
+  NaturalsExistOne : N
+where
+  exists1 x : N | x = 100
+end
+
+axdef
+  BadMu : N
+where
+  BadMu = mu n : N | n > 0
+end
+
+PAGEBREAK:
+
 === Bibliography ===
 
-TEXT: Simpson A n.d. From Discrete Mathematics to State-Based Models SEM version. University of Oxford Department of Computer Science. Unpublished course notes.
-
-TEXT: Woodcock J. and Davies J. 1996 Using Z Specification Refinement and Proof. Upper Saddle River NJ Prentice Hall.
-
-TEXT: Simpson A 2025a Introduction and propositions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 01.
-
-TEXT: Simpson A 2025b Predicate logic and equality. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 02.
-
-TEXT: Simpson A 2025c Deductive proofs. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 03.
-
-TEXT: Simpson A 2025d Sets types and definitions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 04.
-
-TEXT: Simpson A 2025e Relations. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 05.
-
-TEXT: Simpson A 2025f Functions and sequences. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 06.
-
-TEXT: Simpson A 2025g Free types and induction. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 07.
-
-TEXT: Simpson A.C. 2002 Discrete Mathematics by Example. London McGraw-Hill.
-
-TEXT: Spivey J.M. 1992 The Z Notation A Reference Manual. Upper Saddle River NJ Prentice Hall.
+LATEX: \begin{thebibliography}{Simpson, n.d.}
+LATEX:
+LATEX: \bibitem[Simpson, n.d.]{simpson-notes} Simpson, A. (n.d.). \textit{From Discrete Mathematics to State-Based Models, SEM version}. University of Oxford Department of Computer Science. Unpublished course notes.
+LATEX:
+LATEX: \bibitem[Simpson, 2002]{simpson02} Simpson, A.C. (2002). \textit{Discrete Mathematics by Example}. London: McGraw-Hill.
+LATEX:
+LATEX: \bibitem[Simpson, 2025a]{simpson25a} Simpson, A. (2025a). \textit{Introduction and propositions}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 01.
+LATEX:
+LATEX: \bibitem[Simpson, 2025b]{simpson25b} Simpson, A. (2025b). \textit{Predicate logic and equality}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 02.
+LATEX:
+LATEX: \bibitem[Simpson, 2025c]{simpson25c} Simpson, A. (2025c). \textit{Deductive proofs}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 03.
+LATEX:
+LATEX: \bibitem[Simpson, 2025d]{simpson25d} Simpson, A. (2025d). \textit{Sets, types and definitions}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 04.
+LATEX:
+LATEX: \bibitem[Simpson, 2025e]{simpson25e} Simpson, A. (2025e). \textit{Relations}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 05.
+LATEX:
+LATEX: \bibitem[Simpson, 2025f]{simpson25f} Simpson, A. (2025f). \textit{Functions and sequences}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 06.
+LATEX:
+LATEX: \bibitem[Simpson, 2025g]{simpson25g} Simpson, A. (2025g). \textit{Free types and induction}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 07.
+LATEX:
+LATEX: \bibitem[Spivey, 1992]{spivey92} Spivey, J.M. (1992). \textit{The Z Notation: A Reference Manual}. Upper Saddle River, NJ: Prentice Hall.
+LATEX:
+LATEX: \bibitem[Woodcock and Davies, 1996]{woodcock96} Woodcock, J. and Davies, J. (1996). \textit{Using Z: Specification, Refinement and Proof}. Upper Saddle River, NJ: Prentice Hall.
+LATEX:
+LATEX: \end{thebibliography}

@@ -1,16 +1,23 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \begin{document}
 
-\section*{Propositional Logic}
+\section*{Software Engineering Mathematics}
 
 \bigskip
 
-Answers leverage the grammar's order of precedence ($\lnot$, $\land$, $\lor$, $\Rightarrow$, $\Leftrightarrow$) rather than clarifying parenthesis (Simpson, 2025a, slide 20).
+October 2025
+
+\bigskip
+
+\bigskip
+
+Answers use the order of precedence ($\lnot$, $\land$, $\lor$, $\Rightarrow$, $\Leftrightarrow$) \citep[Slide 20]{simpson25a}.
 
 \bigskip
 
@@ -339,7 +346,7 @@ $
 
 \bigskip
 
-In this proof, I start by working from the bottom mechanically, taking $(p \Rightarrow r) \land (q \Rightarrow r)$ as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need $p \lor q$ and r as inputs to the implication introduction rule.  I take $p \lor q$ as assumption [2] and discharge this assumption via this rule.  That leaves me with r as the result of my bottom up process.  As I have already made assumptions $(p \Rightarrow r) \land (q \Rightarrow r)$ [1] and $p \lor q$ [2] and they are related, I start by working with both top-down. I begin with $p \lor q$ [2] and create cases for p and q working towards or elimination.  The p and q sub-branches are marked with [2] as the assumption as these are just the cases for $p \lor q$ [2] (Simpson, 2025c, slide 41). First, I apply and elimination in each case to get $p \Rightarrow r$, $q \Rightarrow r$ with p, q respectively in the sub-branches.  From there, I apply implication elimination to arrive at r in both cases.  This enables me to use the or elimation together with $p \lor q$ [2] to simplify to r.  At this stage, I do not discharge assumption [2], as this is deferred until the next step. I use implication introduction together with $p \lor q$ [2] and r from the or elimination to discharge assumption [2], which connects the top-down and bottom-up process. All assumptions are properly discharged.  
+In this proof, I start by working from the bottom mechanically, taking $(p \Rightarrow r) \land (q \Rightarrow r)$ as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need $p \lor q$ and r as inputs to the implication introduction rule.  I take $p \lor q$ as assumption [2] and discharge this assumption via this rule.  That leaves me with r as the result of my bottom up process.  As I have already made assumptions $(p \Rightarrow r) \land (q \Rightarrow r)$ [1] and $p \lor q$ [2] and they are related, I start by working with both top-down. I begin with $p \lor q$ [2] and create cases for p and q working towards or elimination.  The p and q sub-branches are marked with [2] as the assumption as these are just the cases for $p \lor q$ [2] \citep[slide 41]{simpson25c}. First, I apply and elimination in each case to get $p \Rightarrow r$, $q \Rightarrow r$ with p, q respectively in the sub-branches.  From there, I apply implication elimination to arrive at r in both cases.  This enables me to use the or elimation together with $p \lor q$ [2] to simplify to r.  At this stage, I do not discharge assumption [2], as this is deferred until the next step. I use implication introduction together with $p \lor q$ [2] and r from the or elimination to discharge assumption [2], which connects the top-down and bottom-up process. All assumptions are properly discharged.  
 
 \bigskip
 
@@ -384,7 +391,7 @@ $
 
 \bigskip
 
-Working mechanically from the bottom, we start by taking $p \lor q \Rightarrow r$ as assumption [1] and applying the implication introduction rule to discharge assumption [1].  This leaves us with $p \Rightarrow r$ and $q \Rightarrow r$, which is derived from $p \Rightarrow r$, $q \Rightarrow r$ and the application of the and introduction rule. Fairly clearly, we need two sub-branches to be developed top-down. Since we have $p \lor q \Rightarrow r$ and we want $p \Rightarrow r$ and $q \Rightarrow r$, I start with p [2] and q [3] to start the top-down sub-trees.  I struggled here until I recalled that I could use the or intro rule to satisfy $p \lor q$.  I also had to recall that this does not generate additional assumptions to discharge (Simpson, 2025c, slide 38).  From here, it was not difficult to use implication elimation to arrive at r in both sub-trees and to apply p [2] and q [3] in each tree respectively with the implication introduction rule to discharge those assumptions.  This gave me $p \Rightarrow r$, $q \Rightarrow r$ and I used the and introduction rule to connect the top and bottom portions of the proof. All assumptions are properly discharged.  
+Working mechanically from the bottom, we start by taking $p \lor q \Rightarrow r$ as assumption [1] and applying the implication introduction rule to discharge assumption [1].  This leaves us with $p \Rightarrow r$ and $q \Rightarrow r$, which is derived from $p \Rightarrow r$, $q \Rightarrow r$ and the application of the and introduction rule. Fairly clearly, we need two sub-branches to be developed top-down. Since we have $p \lor q \Rightarrow r$ and we want $p \Rightarrow r$ and $q \Rightarrow r$, I start with p [2] and q [3] to start the top-down sub-trees.  I struggled here until I recalled that I could use the or intro rule to satisfy $p \lor q$.  I also had to recall that this does not generate additional assumptions to discharge \citep[slide 38]{simpson25c}. From here, it was not difficult to use implication elimation to arrive at r in both sub-trees and to apply p [2] and q [3] in each tree respectively with the implication introduction rule to discharge those assumptions.  This gave me $p \Rightarrow r$, $q \Rightarrow r$ and I used the and introduction rule to connect the top and bottom portions of the proof. All assumptions are properly discharged.  
 
 \bigskip
 
@@ -484,6 +491,10 @@ SquaresOfEvens : \power \num
 SquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z * z \}
 \end{axdef}
 
+\begin{zed}
+  SquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z * z \}
+\end{zed}
+
 \medskip
 
 (b)
@@ -532,72 +543,113 @@ SquareOrCubeIntegers = \{ z, z_0 : \num | z = z_0 * z_0 \lor z = z_0 * z_0 * z_0
 
 \medskip
 
+\bigskip
+\noindent
+\textbf{Question n}
+
+\medskip
+
+\begin{axdef}
+Naturals : \nat
+\where
+\forall x : \nat @ x \geq 0
+\end{axdef}
+
+\begin{axdef}
+NaturalsExist : \nat
+\where
+\exists x : \nat @ x > 100
+\end{axdef}
+
+\begin{axdef}
+NaturalsExistOne : \nat
+\where
+\exists_1 x : \nat @ x = 100
+\end{axdef}
+
+\begin{axdef}
+BadMu : \nat
+\where
+BadMu = (\mu n : \nat | n > 0)
+\end{axdef}
+
+\newpage
+
 \section*{Bibliography}
 
-\bigskip
 
-Simpson A n.d. From Discrete Mathematics to State-Based Models SEM version. University of Oxford Department of Computer Science. Unpublished course notes.
+\begin{thebibliography}{Simpson, n.d.}
 
-\bigskip
 
-\bigskip
 
-Woodcock J. and Davies J. 1996 Using Z Specification Refinement and Proof. Upper Saddle River NJ Prentice Hall.
 
-\bigskip
 
-\bigskip
+\bibitem[Simpson, n.d.]{simpson-notes} Simpson, A. (n.d.). \textit{From Discrete Mathematics to State-Based Models, SEM version}. University of Oxford Department of Computer Science. Unpublished course notes.
 
-Simpson A 2025a Introduction and propositions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 01.
 
-\bigskip
 
-\bigskip
 
-Simpson A 2025b Predicate logic and equality. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 02.
 
-\bigskip
+\bibitem[Simpson, 2002]{simpson02} Simpson, A.C. (2002). \textit{Discrete Mathematics by Example}. London: McGraw-Hill.
 
-\bigskip
 
-Simpson A 2025c Deductive proofs. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 03.
 
-\bigskip
 
-\bigskip
 
-Simpson A 2025d Sets types and definitions. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 04.
+\bibitem[Simpson, 2025a]{simpson25a} Simpson, A. (2025a). \textit{Introduction and propositions}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 01.
 
-\bigskip
 
-\bigskip
 
-Simpson A 2025e Relations. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 05.
 
-\bigskip
 
-\bigskip
+\bibitem[Simpson, 2025b]{simpson25b} Simpson, A. (2025b). \textit{Predicate logic and equality}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 02.
 
-Simpson A 2025f Functions and sequences. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 06.
 
-\bigskip
 
-\bigskip
 
-Simpson A 2025g Free types and induction. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 07.
 
-\bigskip
+\bibitem[Simpson, 2025c]{simpson25c} Simpson, A. (2025c). \textit{Deductive proofs}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 03.
 
-\bigskip
 
-Simpson A.C. 2002 Discrete Mathematics by Example. London McGraw-Hill.
 
-\bigskip
 
-\bigskip
 
-Spivey J.M. 1992 The Z Notation A Reference Manual. Upper Saddle River NJ Prentice Hall.
+\bibitem[Simpson, 2025d]{simpson25d} Simpson, A. (2025d). \textit{Sets, types and definitions}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 04.
 
-\bigskip
+
+
+
+
+\bibitem[Simpson, 2025e]{simpson25e} Simpson, A. (2025e). \textit{Relations}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 05.
+
+
+
+
+
+\bibitem[Simpson, 2025f]{simpson25f} Simpson, A. (2025f). \textit{Functions and sequences}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 06.
+
+
+
+
+
+\bibitem[Simpson, 2025g]{simpson25g} Simpson, A. (2025g). \textit{Free types and induction}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 07.
+
+
+
+
+
+\bibitem[Spivey, 1992]{spivey92} Spivey, J.M. (1992). \textit{The Z Notation: A Reference Manual}. Upper Saddle River, NJ: Prentice Hall.
+
+
+
+
+
+\bibitem[Woodcock and Davies, 1996]{woodcock96} Woodcock, J. and Davies, J. (1996). \textit{Using Z: Specification, Refinement and Proof}. Upper Saddle River, NJ: Prentice Hall.
+
+
+
+
+
+\end{thebibliography}
 
 \end{document}
