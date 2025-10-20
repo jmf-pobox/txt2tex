@@ -22,7 +22,7 @@ R |> T
 
 R comp S
 
-R ; S
+R o9 S
 
 ** Example 6: Relation Functions **
 
@@ -40,7 +40,7 @@ ran (R |> T)
 
 ** Example 8: Chained Relations **
 
-R ; S ; T
+R o9 S o9 T
 
 A <| R |> B
 

@@ -25,7 +25,7 @@ all: $(PDF_FILES)
 # Pattern rule: .txt -> .pdf (via txt2pdf.sh script with --fuzz option)
 %.pdf: %.txt ../txt2pdf.sh
 	@echo "Building $@..."
-	@../txt2pdf.sh $< --fuzz > /dev/null 2>&1 || (echo "Error building $@"; exit 1)
+	@../txt2pdf.sh $< --fuzz || (echo "Error building $@"; exit 1)
 
 # Main solutions file
 .PHONY: solutions
