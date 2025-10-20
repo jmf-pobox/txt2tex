@@ -1,0 +1,36 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% zed-float.sty: floats in Using Z - February 1999
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\RequirePackage{graphicx}
+
+\def\ruledtable{%
+  \table[t]
+  \hrule width \textwidth \par \vskip \baselineskip \par
+  \center}
+
+\def\endruledtable{%
+  \endcenter
+  \par \noindent \hrule width \textwidth 
+  \endtable}
+
+\def\ruledfigure{%
+  \@ifnextchar[%
+  {\optionalruledfigure}
+  {\plainruledfigure}
+  }
+
+\def\optionalruledfigure[#1]#2#3#4{%
+  \begin{figure}[t] \hrule width\textwidth \vskip\abovedisplayskip
+  \par \center \leavevmode \includegraphics[#1]{#2}
+  \caption{#3} \label{figure:#4} \endcenter \par \hrule width\textwidth
+  \end{figure}}
+
+\def\plainruledfigure#1#2#3{%
+  \begin{figure}[t] \hrule width\textwidth \vskip\abovedisplayskip
+  \par \center \leavevmode \includegraphics{#1}
+  \caption{#2} \label{figure:#3} \endcenter \par \hrule width\textwidth
+  \end{figure}}
+
