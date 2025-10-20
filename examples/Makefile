@@ -18,7 +18,7 @@ PDF_FILES := $(TXT_FILES:.txt=.pdf)
 
 # Subdirectory targets
 SUBDIRS := 01_propositional_logic 02_predicate_logic 03_equality 04_proof_trees \
-           05_sets 06_definitions 07_relations 08_functions 09_sequences
+           05_sets 06_definitions 07_relations 08_functions 09_sequences fuzz_tests
 
 # Default target: build all PDFs
 .PHONY: all
@@ -27,7 +27,7 @@ all: $(PDF_FILES)
 # Pattern rule: .txt -> .pdf (using hatch run convert)
 %.pdf: %.txt
 	@echo "Building $@..."
-	@cd .. && hatch run convert examples/$< > /dev/null 2>&1 || (echo "Error building $@"; exit 1)
+	@cd .. && hatch run convert examples/$< || (echo "Error building $@"; exit 1)
 
 # Subdirectory targets for convenience
 .PHONY: $(SUBDIRS)
