@@ -369,6 +369,13 @@ class LaTeXGenerator:
         if name in special_keywords:
             return special_keywords[name]
 
+        # Check if this is an operator/function from UNARY_OPS dictionary
+        # This handles operators like id, inv, dom, ran when used as identifiers
+        # (e.g., in generic instantiations like id[Person])
+        # Skip postfix operators (~, +, *) which have special handling
+        if name in self.UNARY_OPS and name not in ["~", "+", "*"]:
+            return self.UNARY_OPS[name]
+
         # Mathematical type names: use blackboard bold (or fuzz built-in types)
         # N = naturals, Z = integers
         # Only convert N and Z, not Q/R/C which are commonly used as variables
