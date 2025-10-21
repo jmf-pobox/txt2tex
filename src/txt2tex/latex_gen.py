@@ -292,52 +292,57 @@ class LaTeXGenerator:
         latex_expr = self.generate_expr(item)
         return [r"\noindent", f"${latex_expr}$", "", ""]
 
-    def generate_expr(self, expr: Expr) -> str:
-        """Generate LaTeX for expression (without wrapping in math mode)."""
+    def generate_expr(self, expr: Expr, parent: Expr | None = None) -> str:
+        """Generate LaTeX for expression (without wrapping in math mode).
+
+        Args:
+            expr: The expression to generate LaTeX for
+            parent: The parent expression context (None if top-level)
+        """
         if isinstance(expr, Identifier):
             return self._generate_identifier(expr)
         if isinstance(expr, Number):
             return self._generate_number(expr)
         if isinstance(expr, UnaryOp):
-            return self._generate_unary_op(expr)
+            return self._generate_unary_op(expr, parent)
         if isinstance(expr, BinaryOp):
-            return self._generate_binary_op(expr)
+            return self._generate_binary_op(expr, parent)
         if isinstance(expr, Quantifier):
-            return self._generate_quantifier(expr)
+            return self._generate_quantifier(expr, parent)
         if isinstance(expr, Lambda):
-            return self._generate_lambda(expr)
+            return self._generate_lambda(expr, parent)
         if isinstance(expr, Subscript):
-            return self._generate_subscript(expr)
+            return self._generate_subscript(expr, parent)
         if isinstance(expr, Superscript):
-            return self._generate_superscript(expr)
+            return self._generate_superscript(expr, parent)
         if isinstance(expr, SetComprehension):
-            return self._generate_set_comprehension(expr)
+            return self._generate_set_comprehension(expr, parent)
         if isinstance(expr, SetLiteral):
-            return self._generate_set_literal(expr)
+            return self._generate_set_literal(expr, parent)
         if isinstance(expr, FunctionApp):
-            return self._generate_function_app(expr)
+            return self._generate_function_app(expr, parent)
         if isinstance(expr, FunctionType):
-            return self._generate_function_type(expr)
+            return self._generate_function_type(expr, parent)
         if isinstance(expr, Tuple):
-            return self._generate_tuple(expr)
+            return self._generate_tuple(expr, parent)
         if isinstance(expr, RelationalImage):
-            return self._generate_relational_image(expr)
+            return self._generate_relational_image(expr, parent)
         if isinstance(expr, GenericInstantiation):
-            return self._generate_generic_instantiation(expr)
+            return self._generate_generic_instantiation(expr, parent)
         if isinstance(expr, Range):
-            return self._generate_range(expr)
+            return self._generate_range(expr, parent)
         if isinstance(expr, SequenceLiteral):
-            return self._generate_sequence_literal(expr)
+            return self._generate_sequence_literal(expr, parent)
         if isinstance(expr, TupleProjection):
-            return self._generate_tuple_projection(expr)
+            return self._generate_tuple_projection(expr, parent)
         if isinstance(expr, BagLiteral):
-            return self._generate_bag_literal(expr)
+            return self._generate_bag_literal(expr, parent)
         if isinstance(expr, Conditional):
-            return self._generate_conditional(expr)
+            return self._generate_conditional(expr, parent)
         if isinstance(expr, GuardedCases):
-            return self._generate_guarded_cases(expr)
+            return self._generate_guarded_cases(expr, parent)
         if isinstance(expr, GuardedBranch):
-            return self._generate_guarded_branch(expr)
+            return self._generate_guarded_branch(expr, parent)
 
         raise TypeError(f"Unknown expression type: {type(expr)}")
 
@@ -378,27 +383,35 @@ class LaTeXGenerator:
         if "_" not in name:
             return name
 
-        # Fuzz: keep underscores as-is, no escaping or mathit wrapper
-        if self.use_fuzz:
-            return name
-
         # Check for multi-word identifier pattern
-        # Heuristic: if prefix OR suffix is > 3 chars, it's a multi-word identifier
+        # Heuristic: subscripts only for 1-2 char suffixes (e.g., z_1, x_10)
+        # Anything 3+ chars is a multi-word identifier (e.g., cumulative_total)
         parts = name.split("_")
 
-        # Multiple underscores OR long words → multi-word identifier
-        if len(parts) > 2 or any(len(part) > 3 for part in parts):
+        # Multiple underscores → multi-word identifier
+        if len(parts) > 2:
             escaped = name.replace("_", r"\_")
+            # Fuzz: escape but no mathit wrapper
+            if self.use_fuzz:
+                return escaped
+            # Standard LaTeX: escape and wrap in mathit
             return rf"\mathit{{{escaped}}}"
 
-        # Single underscore with short parts: subscript
+        # Single underscore: check suffix length
         if len(parts) == 2:
             prefix, suffix = parts
-            # Simple subscript: single character after underscore
-            if len(suffix) == 1:
+            # 3+ char suffix → multi-word identifier (e.g., x_max, cumulative_total)
+            if len(suffix) >= 3 or len(prefix) >= 4:
+                escaped = name.replace("_", r"\_")
+                # Fuzz: escape but no mathit wrapper
+                if self.use_fuzz:
+                    return escaped
+                # Standard LaTeX: escape and wrap in mathit
+                return rf"\mathit{{{escaped}}}"
+            # 1-2 char suffix → subscript (e.g., z_1, x_10)
+            elif len(suffix) == 1:
                 return f"{prefix}_{suffix}"
-            # Multi-char subscript: needs braces
-            else:
+            else:  # len(suffix) == 2
                 return f"{prefix}_{{{suffix}}}"
 
         # Fallback: escape and use mathit
@@ -409,7 +422,7 @@ class LaTeXGenerator:
         """Generate LaTeX for number."""
         return node.value
 
-    def _generate_unary_op(self, node: UnaryOp) -> str:
+    def _generate_unary_op(self, node: UnaryOp, parent: Expr | None = None) -> str:
         """Generate LaTeX for unary operation.
 
         Unary operators have higher precedence than all binary operators,
@@ -491,14 +504,46 @@ class LaTeXGenerator:
 
         return False
 
-    def _generate_binary_op(self, node: BinaryOp) -> str:
+    def _quantifier_needs_parens(self, node: Quantifier, parent: Expr | None) -> bool:
+        """Check if quantifier needs parentheses in fuzz mode.
+
+        In fuzz, quantifiers need parens when nested in expressions,
+        but not when they're:
+        - Top-level predicates (parent=None)
+        - Bodies of other quantifiers (separated by @ or bullet)
+        - Bodies of lambda expressions (separated by bullet)
+
+        Args:
+            node: The quantifier node
+            parent: The parent expression (None if top-level)
+
+        Returns:
+            True if parentheses are needed in fuzz mode
+        """
+        if not self.use_fuzz:
+            return False
+
+        # Top-level: no parens needed
+        if parent is None:
+            return False
+
+        # Body of quantifier/lambda: no parens (separated by @ or bullet)
+        # Otherwise, nested in expression: needs parens
+        return not isinstance(parent, (Quantifier, Lambda))
+
+    def _generate_binary_op(self, node: BinaryOp, parent: Expr | None = None) -> str:
         """Generate LaTeX for binary operation."""
         op_latex = self.BINARY_OPS.get(node.operator)
         if op_latex is None:
             raise ValueError(f"Unknown binary operator: {node.operator}")
 
-        left = self.generate_expr(node.left)
-        right = self.generate_expr(node.right)
+        # Fuzz uses \implies instead of \Rightarrow for implication
+        if self.use_fuzz and node.operator == "=>":
+            op_latex = r"\implies"
+
+        # Pass this node as parent to children
+        left = self.generate_expr(node.left, parent=node)
+        right = self.generate_expr(node.right, parent=node)
 
         # Add parentheses if needed for precedence and associativity
         if self._needs_parens(node.left, node.operator, is_left_child=True):
@@ -508,12 +553,17 @@ class LaTeXGenerator:
 
         return f"{left} {op_latex} {right}"
 
-    def _generate_quantifier(self, node: Quantifier) -> str:
+    def _generate_quantifier(self, node: Quantifier, parent: Expr | None = None) -> str:
         """Generate LaTeX for quantifier (forall, exists, exists1, mu).
 
         Phase 6 enhancement: Supports multiple variables.
         Phase 7 enhancement: Supports mu-operator (definite description).
         Phase 11.5 enhancement: Supports mu with expression part (mu x : X | P . E).
+
+        Args:
+            node: The quantifier node to generate
+            parent: The parent expression context (None if top-level)
+
         Examples:
         - forall x : N | pred -> \\forall x \\colon N \\bullet pred
         - forall x, y : N | pred -> \\forall x, y \\colon N \\bullet pred
@@ -530,7 +580,7 @@ class LaTeXGenerator:
         parts = [quant_latex, variables_str]
 
         if node.domain:
-            domain_latex = self.generate_expr(node.domain)
+            domain_latex = self.generate_expr(node.domain, parent=node)
             # Fuzz uses : instead of \colon
             parts.append(":" if self.use_fuzz else r"\colon")
             parts.append(domain_latex)
@@ -540,17 +590,17 @@ class LaTeXGenerator:
         if node.quantifier == "mu" and self.use_fuzz:
             mu_parts = [quant_latex, variables_str]
             if node.domain:
-                domain_latex = self.generate_expr(node.domain)
+                domain_latex = self.generate_expr(node.domain, parent=node)
                 mu_parts.append(f": {domain_latex}")
             # Always use | for predicate separator in mu
             mu_parts.append("|")
-            body_latex = self.generate_expr(node.body)
+            body_latex = self.generate_expr(node.body, parent=node)
             mu_parts.append(body_latex)
 
             # If there's an expression part, add @ separator and expression
             if node.expression:
                 mu_parts.append("@")
-                expr_latex = self.generate_expr(node.expression)
+                expr_latex = self.generate_expr(node.expression, parent=node)
                 mu_parts.append(expr_latex)
 
             # Wrap ENTIRE mu expression in parentheses
@@ -560,23 +610,30 @@ class LaTeXGenerator:
         if node.quantifier == "mu" and node.expression:
             # Use | or \mid for predicate separator
             parts.append("|" if self.use_fuzz else r"\mid")
-            body_latex = self.generate_expr(node.body)
+            body_latex = self.generate_expr(node.body, parent=node)
             parts.append(body_latex)
             # Add @ or bullet separator and expression
             # Fuzz uses @ (at sign), LaTeX uses \bullet
             parts.append("@" if self.use_fuzz else r"\bullet")
-            expr_latex = self.generate_expr(node.expression)
+            expr_latex = self.generate_expr(node.expression, parent=node)
             parts.append(expr_latex)
         else:
             # Standard quantifier: @ or bullet separator and body
             # Fuzz uses @ (at sign), LaTeX uses \bullet
             parts.append("@" if self.use_fuzz else r"\bullet")
-            body_latex = self.generate_expr(node.body)
+            body_latex = self.generate_expr(node.body, parent=node)
             parts.append(body_latex)
 
-        return " ".join(parts)
+        result = " ".join(parts)
 
-    def _generate_lambda(self, node: Lambda) -> str:
+        # Smart parenthesization for fuzz mode (non-mu quantifiers only)
+        # Mu expressions have special handling above (lines 593-610)
+        if node.quantifier != "mu" and self._quantifier_needs_parens(node, parent):
+            return f"({result})"
+
+        return result
+
+    def _generate_lambda(self, node: Lambda, parent: Expr | None = None) -> str:
         """Generate LaTeX for lambda expression (Phase 11d).
 
         Examples:
@@ -601,7 +658,9 @@ class LaTeXGenerator:
 
         return " ".join(parts)
 
-    def _generate_set_comprehension(self, node: SetComprehension) -> str:
+    def _generate_set_comprehension(
+        self, node: SetComprehension, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for set comprehension (Phase 8, enhanced Phase 22).
 
         Supports three forms:
@@ -660,7 +719,9 @@ class LaTeXGenerator:
 
         return " ".join(parts)
 
-    def _generate_set_literal(self, node: SetLiteral) -> str:
+    def _generate_set_literal(
+        self, node: SetLiteral, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for set literal (Phase 11.5).
 
         Examples:
@@ -676,7 +737,7 @@ class LaTeXGenerator:
         elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
         return f"\\{{{elements_latex}\\}}"
 
-    def _generate_subscript(self, node: Subscript) -> str:
+    def _generate_subscript(self, node: Subscript, parent: Expr | None = None) -> str:
         """Generate LaTeX for subscript (a_1, x_i)."""
         base = self.generate_expr(node.base)
         index = self.generate_expr(node.index)
@@ -686,7 +747,9 @@ class LaTeXGenerator:
             return f"{base}_{{{index}}}"
         return f"{base}_{index}"
 
-    def _generate_superscript(self, node: Superscript) -> str:
+    def _generate_superscript(
+        self, node: Superscript, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for superscript (x^2, 2^n, (z^2)^3)."""
         base = self.generate_expr(node.base)
         exponent = self.generate_expr(node.exponent)
@@ -700,7 +763,9 @@ class LaTeXGenerator:
             return f"{base}^{{{exponent}}}"
         return f"{base}^{exponent}"
 
-    def _generate_function_app(self, node: FunctionApp) -> str:
+    def _generate_function_app(
+        self, node: FunctionApp, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for function application (Phase 11b, enhanced in Phase 13).
 
         Phase 13 enhancement: Supports applying any expression, not just identifiers.
@@ -774,7 +839,9 @@ class LaTeXGenerator:
         args_latex = ", ".join(self.generate_expr(arg) for arg in node.args)
         return f"{func_latex}({args_latex})"
 
-    def _generate_function_type(self, node: FunctionType) -> str:
+    def _generate_function_type(
+        self, node: FunctionType, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for function type arrows (Phase 11c).
 
         Examples:
@@ -798,7 +865,7 @@ class LaTeXGenerator:
 
         return f"{domain_latex} {arrow_latex} {range_latex}"
 
-    def _generate_tuple(self, node: Tuple) -> str:
+    def _generate_tuple(self, node: Tuple, parent: Expr | None = None) -> str:
         """Generate LaTeX for tuple expression (Phase 11.6).
 
         Examples:
@@ -811,7 +878,9 @@ class LaTeXGenerator:
         elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
         return f"({elements_latex})"
 
-    def _generate_relational_image(self, node: RelationalImage) -> str:
+    def _generate_relational_image(
+        self, node: RelationalImage, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for relational image (Phase 11.8).
 
         The relational image R(| S |) gives the image of set S under relation R.
@@ -829,7 +898,9 @@ class LaTeXGenerator:
         set_latex = self.generate_expr(node.set)
         return f"({relation_latex} \\limg {set_latex} \\rimg)"
 
-    def _generate_generic_instantiation(self, node: GenericInstantiation) -> str:
+    def _generate_generic_instantiation(
+        self, node: GenericInstantiation, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for generic type instantiation (Phase 11.9).
 
         Generic types can be instantiated with specific type parameters using
@@ -857,7 +928,7 @@ class LaTeXGenerator:
         # Future enhancement: Could use special notation like \emptyset~N
         return f"{base_latex}[{type_params_latex}]"
 
-    def _generate_range(self, node: Range) -> str:
+    def _generate_range(self, node: Range, parent: Expr | None = None) -> str:
         """Generate LaTeX for range expression (Phase 13).
 
         Represents integer range expressions: m..n represents {m, m+1, ..., n}
@@ -873,7 +944,9 @@ class LaTeXGenerator:
         end_latex = self.generate_expr(node.end)
         return f"{start_latex} \\upto {end_latex}"
 
-    def _generate_sequence_literal(self, node: SequenceLiteral) -> str:
+    def _generate_sequence_literal(
+        self, node: SequenceLiteral, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for sequence literal (Phase 12).
 
         Examples:
@@ -889,7 +962,9 @@ class LaTeXGenerator:
         elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
         return f"\\langle {elements_latex} \\rangle"
 
-    def _generate_tuple_projection(self, node: TupleProjection) -> str:
+    def _generate_tuple_projection(
+        self, node: TupleProjection, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for tuple projection (Phase 12).
 
         Examples:
@@ -907,7 +982,9 @@ class LaTeXGenerator:
 
         return f"{base_latex}.{node.index}"
 
-    def _generate_bag_literal(self, node: BagLiteral) -> str:
+    def _generate_bag_literal(
+        self, node: BagLiteral, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for bag literal (Phase 12).
 
         Examples:
@@ -920,27 +997,40 @@ class LaTeXGenerator:
         elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
         return f"\\lbag {elements_latex} \\rbag"
 
-    def _generate_conditional(self, node: Conditional) -> str:
+    def _generate_conditional(
+        self, node: Conditional, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for conditional expression (Phase 16).
 
         Examples:
         - if x > 0 then x else -x
         - if s = <> then 0 else head s
 
-        Rendered as: (\\mbox{if } condition \\mbox{ then } expr1 \\mbox{ else } expr2)
+        Fuzz mode: \\IF condition \\THEN expr1 \\ELSE expr2
+        Standard LaTeX: (\\mbox{if } ... \\mbox{ then } ... \\mbox{ else } ...)
         """
         condition_latex = self.generate_expr(node.condition)
         then_latex = self.generate_expr(node.then_expr)
         else_latex = self.generate_expr(node.else_expr)
 
-        # Render as inline conditional with mbox keywords (standard LaTeX)
+        # Fuzz uses \IF \THEN \ELSE keywords
+        if self.use_fuzz:
+            return (
+                f"\\IF {condition_latex} "
+                f"\\THEN {then_latex} "
+                f"\\ELSE {else_latex}"
+            )
+
+        # Standard LaTeX uses mbox keywords
         return (
             f"(\\mbox{{if }} {condition_latex} "
             f"\\mbox{{ then }} {then_latex} "
             f"\\mbox{{ else }} {else_latex})"
         )
 
-    def _generate_guarded_cases(self, node: GuardedCases) -> str:
+    def _generate_guarded_cases(
+        self, node: GuardedCases, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for guarded cases expression (Phase 23).
 
         Examples:
@@ -965,7 +1055,9 @@ class LaTeXGenerator:
 
         return "\n".join(lines)
 
-    def _generate_guarded_branch(self, node: GuardedBranch) -> str:
+    def _generate_guarded_branch(
+        self, node: GuardedBranch, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for single guarded branch (Phase 23).
 
         This is typically not called directly; GuardedCases handles the rendering.
@@ -2087,18 +2179,26 @@ class LaTeXGenerator:
 
         Note: Abbreviations must be wrapped in \begin{zed}...\end{zed}
         for fuzz type checker to recognize them.
+
+        Fuzz syntax requires generic parameters AFTER the name: Name[X, Y]
+        not before: [X, Y]Name
         """
         lines: list[str] = []
         expr_latex = self.generate_expr(node.expression)
 
         # Wrap in zed environment for fuzz compatibility
+        # Fuzz requires: Name[X] not [X]Name
         if node.generic_params:
             params_str = ", ".join(node.generic_params)
-            abbrev = f"[{params_str}]{node.name} == {expr_latex}"
-            lines.append(f"\\begin{{zed}}{abbrev}\\end{{zed}}")
+            abbrev = f"{node.name}[{params_str}] == {expr_latex}"
+            lines.append("\\begin{zed}")
+            lines.append(abbrev)
+            lines.append("\\end{zed}")
         else:
             abbrev = f"{node.name} == {expr_latex}"
-            lines.append(f"\\begin{{zed}}{abbrev}\\end{{zed}}")
+            lines.append("\\begin{zed}")
+            lines.append(abbrev)
+            lines.append("\\end{zed}")
 
         lines.append("")
         return lines
@@ -2136,9 +2236,14 @@ class LaTeXGenerator:
         # Generate where clause if predicates exist
         if node.predicates:
             lines.append(r"\where")
-            for pred in node.predicates:
-                pred_latex = self.generate_expr(pred)
-                lines.append(pred_latex)
+            for i, pred in enumerate(node.predicates):
+                # Top-level predicates: pass parent=None for smart parenthesization
+                pred_latex = self.generate_expr(pred, parent=None)
+                # Fuzz requires \\ after each predicate except the last
+                if self.use_fuzz and i < len(node.predicates) - 1:
+                    lines.append(f"{pred_latex} \\\\")
+                else:
+                    lines.append(pred_latex)
 
         lines.append(r"\end{axdef}")
         lines.append("")
@@ -2175,10 +2280,14 @@ class LaTeXGenerator:
         # Generate where clause if predicates exist
         if node.predicates:
             lines.append(r"\where")
-            for pred in node.predicates:
-                pred_latex = self.generate_expr(pred)
-                # Add indentation and line break for predicates
-                lines.append(f"  {pred_latex} \\\\")
+            for i, pred in enumerate(node.predicates):
+                # Top-level predicates: pass parent=None for smart parenthesization
+                pred_latex = self.generate_expr(pred, parent=None)
+                # Fuzz requires \\ after each predicate except the last
+                if self.use_fuzz and i < len(node.predicates) - 1:
+                    lines.append(f"  {pred_latex} \\\\")
+                else:
+                    lines.append(f"  {pred_latex}")
 
         lines.append(r"\end{gendef}")
         lines.append("")
@@ -2238,9 +2347,14 @@ class LaTeXGenerator:
         # Generate where clause if predicates exist
         if node.predicates:
             lines.append(r"\where")
-            for pred in node.predicates:
-                pred_latex = self.generate_expr(pred)
-                lines.append(pred_latex)
+            for i, pred in enumerate(node.predicates):
+                # Top-level predicates: pass parent=None for smart parenthesization
+                pred_latex = self.generate_expr(pred, parent=None)
+                # Fuzz requires \\ after each predicate except the last
+                if self.use_fuzz and i < len(node.predicates) - 1:
+                    lines.append(f"{pred_latex} \\\\")
+                else:
+                    lines.append(pred_latex)
 
         lines.append(r"\end{schema}")
         lines.append("")
