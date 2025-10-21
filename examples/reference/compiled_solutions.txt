@@ -558,21 +558,11 @@ end
 
 parentOf == childOf~
 
-TEXT: This is a good example of how there are many different ways of writing the same thing. An alternative abbreviation is:
-
-parentOf == {x, y : Person | x |-> y in childOf . y |-> x}
-
-TEXT: Or, via an axiomatic definition:
-
-axdef
-  parentOf : Person <-> Person
-where
-  parentOf = childOf~
-end
+TEXT: This is a good example of how there are many different ways of writing the same thing. An alternative abbreviation would be: parentOf == {x, y : Person | x |-> y in childOf . y |-> x}. Or via an axiomatic definition with parentOf : Person <-> Person and where clause parentOf = childOf~.
 
 (b)
 
-siblingOf == (childOf o9 parentOf) \ id
+siblingOf == (childOf o9 parentOf) \ id[Person]
 
 (c)
 
