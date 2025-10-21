@@ -1,0 +1,99 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 18 Demo : Partial Function Operators}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Partial injection operator}
+
+\medskip
+
+\bigskip
+
+Basic function type with partial injection ($\pinj$) operator:
+
+\bigskip
+
+\begin{axdef}
+f : \nat \pinj \nat
+\where
+\dom f = \{1, 2, 3\} \\
+f(1) = 10 \\
+f(2) = 20 \\
+f(3) = 30
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 2 : Partial function operator}
+
+\medskip
+
+\bigskip
+
+Basic function type with partial function ($\pfun$) operator:
+
+\bigskip
+
+\begin{axdef}
+g : \nat \pfun \nat
+\where
+\dom g = \{1, 2\} \\
+g(1) = 100 \\
+g(2) = 200
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 3 : Complex types with partial injection}
+
+\medskip
+
+\bigskip
+
+Using partial injection ($\pinj$) with custom types:
+
+\bigskip
+
+\begin{zed}
+Year == \nat
+\end{zed}
+
+\begin{zed}[Entry]\end{zed}
+
+\begin{zed}
+Table == \seq Entry
+\end{zed}
+
+\begin{axdef}
+records : Year \pinj Table
+\where
+\dom records = \{1993, 1994, 1995\}
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 4 : Mixed function type operators}
+
+\medskip
+
+\bigskip
+
+Different function type operators:
+
+\bigskip
+
+\begin{axdef}
+total : \nat \fun \nat \\
+partial : \nat \pfun \nat \\
+injection : \nat \pinj \nat
+\end{axdef}
+
+\end{document}

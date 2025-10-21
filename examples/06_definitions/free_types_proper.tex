@@ -1,0 +1,55 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 17 : Proper Examples ( not TEXT blocks )}
+
+\bigskip
+\noindent
+\textbf{Example : Semicolon bindings in axdef}
+
+\medskip
+
+\begin{axdef}
+dummy : \nat
+\where
+dummy = 0 \\
+\forall x : \nat @ \forall y : \nat @ x + y > 0
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example : Function on sequences}
+
+\medskip
+
+\begin{zed}[Entry]\end{zed}
+
+\begin{axdef}
+seqlen : \seq Entry \fun \nat
+\where
+seqlen(\langle \rangle) = 0 \\
+\forall x : Entry @ \forall s : \seq Entry @ seqlen(\langle x \rangle \cat s) = 1 + seqlen(s)
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example : Nested quantifier}
+
+\medskip
+
+\begin{zed}[Person]\end{zed}
+
+\begin{axdef}
+constraint : \nat
+\where
+constraint = 1 \\
+\forall p : Person @ \forall n : \nat @ n > 0
+\end{axdef}
+
+\end{document}

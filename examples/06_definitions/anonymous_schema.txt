@@ -1,6 +1,6 @@
-=== Testing Anonymous Schemas ===
+=== Testing Named Schemas ===
 
-** Test 1: Named Schema **
+** Test 1: Simple Schema **
 
 schema State
   count : N
@@ -8,17 +8,17 @@ where
   count >= 0
 end
 
-** Test 2: Anonymous Schema **
+** Test 2: Schema with Set **
 
-schema
-  hd : seq[N]
+schema Items
+  items : P(N)
 where
-  # hd <= 100
+  # items <= 100
 end
 
-** Test 3: Another Anonymous Schema **
+** Test 3: Schema with Multiple Fields **
 
-schema
+schema Coordinates
   x : N
   y : N
 where
