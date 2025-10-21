@@ -1636,7 +1636,7 @@ or otherwise (omitted - requires semicolon-separated bindings in set comprehensi
 \begin{axdef}
 cumulative\_total : \seq Title * Length * Viewed \fun \nat
 \where
-cumulative\_total(\langle \rangle) = 0 \land
+cumulative\_total(\langle \rangle) = 0 \\
 \forall x : Title * Length * Viewed @ \forall s : \seq Title * Length * Viewed @ cumulative\_total(\langle x \rangle \cat s) = x.2 + cumulative\_total(s)
 \end{axdef}
 
@@ -2473,11 +2473,11 @@ playlists : PlaylistId \pfun Playlist \\
 playlistOwner : PlaylistId \pfun UserId \\
 playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 \where
-\forall i : \dom playlists @ \ran (playlists(i))(subseteq)(songs) \land
-\dom playlistOwner(subseteq)(\dom playlists) \land
-\ran playlistOwner(subseteq)(users) \land
-\dom playlistSubscribers(subseteq)(\dom playlists) \land
-\forall i : \dom playlistSubscribers @ playlistSubscribers(i)(subseteq)(users) \land
+\forall i : \dom playlists @ \ran (playlists(i)) \subseteq songs \\
+\dom playlistOwner \subseteq \dom playlists \\
+\ran playlistOwner \subseteq users \\
+\dom playlistSubscribers \subseteq \dom playlists \\
+\forall i : \dom playlistSubscribers @ playlistSubscribers(i) \subseteq users \\
 \forall i : \dom playlists @ playlistOwner(i) \in playlistSubscribers(i)
 \end{axdef}
 
@@ -2491,10 +2491,10 @@ playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 hated : UserId \pfun \finset SongId \\
 loved : UserId \pfun \finset SongId
 \where
-\dom hated(subseteq)(users) \land
-\forall i : \dom hated @ hated(i)(subseteq)(songs) \land
-\dom loved(subseteq)(users) \land
-\forall i : \dom loved @ loved(i)(subseteq)(songs) \land
+\dom hated \subseteq users \\
+\forall i : \dom hated @ hated(i) \subseteq songs \\
+\dom loved \subseteq users \\
+\forall i : \dom loved @ loved(i) \subseteq songs \\
 \forall i : \dom hated \cup \dom loved @ hated(i) \cap loved(i) = \emptyset
 \end{axdef}
 
@@ -2619,8 +2619,8 @@ We then have:
 length : SongId \pfun \nat \\
 popularity : SongId \pfun \nat
 \where
-\dom length(subseteq)(songs) \land
-\dom popularity(subseteq)(songs) \land
+\dom length \subseteq songs \\
+\dom popularity \subseteq songs \\
 \forall i : songs @ popularity(i) = loveHateScore(i) + playlistCount(i)
 \end{axdef}
 
