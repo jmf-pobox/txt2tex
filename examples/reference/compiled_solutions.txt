@@ -757,11 +757,11 @@ end
 
 (b)
 
-{p : Place | (exists1 x : dom trains | (trains(x)).2 = p)}
+TEXT: {p : Place | (exists1 x : dom trains | (trains(x)).2 = p)}
 
 (c)
 
-(mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains(x)).2 = p} > # {x : dom trains | (trains(x)).2 = q})
+TEXT: (mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains(x)).2 = p} > # {x : dom trains | (trains(x)).2 = q})
 
 ** Solution 39 **
 
@@ -795,28 +795,28 @@ TEXT: Note that cumulative_total is defined in part (d).
 
 (b)
 
-{p : ran hd | p.2 > 120 . p.1}
+TEXT: {p : ran hd | p.2 > 120 . p.1}
 
 (c)
 
 TEXT: These can be defined recursively:
 
-axdef
-  viewed : seq(Programme) -> seq(Programme)
-where
-  viewed(<>) = <> and forall x : Programme; s : seq(Programme) | viewed(<x> ^ s) = if x.3 = yes then <x> ^ viewed(s) else viewed(s)
-end
+TEXT: axdef
+TEXT:   viewed : seq(Programme) -> seq(Programme)
+TEXT: where
+TEXT:   viewed(<>) = <> and forall x : Programme; s : seq(Programme) | viewed(<x> ^ s) = if x.3 = yes then <x> ^ viewed(s) else viewed(s)
+TEXT: end
 
 TEXT: or otherwise (omitted - requires semicolon-separated bindings in set comprehension)
 
 (d)
 
-axdef
-  cumulative_total : seq(Title * Length * Viewed) -> N
-where
-  cumulative_total (<>) = 0
-  forall x : Title * Length * Viewed; s : seq(Title * Length * Viewed) | cumulative_total (<x> ^ s) = x.2 + cumulative_total(s)
-end
+TEXT: axdef
+TEXT:   cumulative_total : seq(Title * Length * Viewed) -> N
+TEXT: where
+TEXT:   cumulative_total (<>) = 0
+TEXT:   forall x : Title * Length * Viewed; s : seq(Title * Length * Viewed) | cumulative_total (<x> ^ s) = x.2 + cumulative_total(s)
+TEXT: end
 
 (e)
 
@@ -848,63 +848,78 @@ TEXT: This, of course, assumes that there is at least one viewed programme (and 
 
 (h)
 
-axdef
-  s : seq(Title * Length * Viewed) -> seq(Title * Length * Viewed)
-where
-  forall x : seq(Title * Length * Viewed) | items(s(x)) = items(x) and (forall i, j : dom(s(x)) | i < j => (s(x)(i)).2 >= (s(x)(j)).2)
-end
+TEXT: axdef
+TEXT:   s : seq(Title * Length * Viewed) -> seq(Title * Length * Viewed)
+TEXT: where
+TEXT:   forall x : seq(Title * Length * Viewed) | items(s(x)) = items(x) and (forall i, j : dom(s(x)) | i < j => (s(x)(i)).2 >= (s(x)(j)).2)
+TEXT: end
 
 ** Solution 41 **
 
+given Year, Course, Lecturer
+
+schema Entry
+  year: Year
+  course: Course
+  code: N
+  lecturer: Lecturer
+  enrolled: N
+  completed: N
+  grade: N
+end
+
+Table == N -|> Entry
+
 (a)
 
-TEXT: axdef
-TEXT:   records : Year -|> Table
-TEXT: where
-TEXT:   dom(records) = 1993..current
-TEXT:   forall y : dom(records) | # (records(y)) <= 50
-TEXT:   forall y : dom(records) | forall e : ran(records(y)) | year(e.1) = y
-TEXT:   forall r : ran(records) | forall i1, i2 : dom(r) | i1 /= i2 and (r(i1)).1 = (r(i2)).1 => (r(i1)).3 /= (r(i2)).3
-TEXT: end
+axdef
+  records : Year -|> Table
+where
+  dom(records) = 1993..current
+  forall y : dom(records) | # (records(y)) <= 50
+  forall y : dom(records) | forall e : ran(records(y)) | e.year = y
+  forall r : ran(records) | forall i1, i2 : dom(r) | i1 /= i2 and (r(i1)).year = (r(i2)).year => (r(i1)).code /= (r(i2)).code
+end
 
 (b)
 
 (i)
 
-{e : Entry | (exists r : ran records | e in ran r and e.3 = 479)}
+{e : Entry | (exists r : ran records | e in ran r and e.code = 479)}
 
 (ii)
 
-{e : Entry | (exists r : ran records | e in ran r and e.6 > e.5)}
+{e : Entry | (exists r : ran records | e in ran r and e.completed > e.enrolled)}
 
 (iii)
 
-{e : Entry | (exists r : ran records | e in ran r and e.7 >= 70)}
+{e : Entry | (exists r : ran records | e in ran r and e.grade >= 70)}
 
 (iv)
 
-{c : Course | (forall r : ran records | (forall e : ran r | e.2 = c => e.7 >= 70))}
+{c : Course | (forall r : ran records | (forall e : ran r | e.course = c => e.grade >= 70))}
 
 (v)
 
-TEXT: {y : Year | y in dom records . y |-> {l : Lecturer | # {c : ran (records y) | c.4 = l} > 6}}
+{y : Year | y in dom records . y |-> {l : Lecturer | # {e : ran (records y) | e.lecturer = l} > 6}}
 
 (c)
 
-TEXT: axdef
-TEXT: where
-TEXT:   forall x : Entry; s : seq(Entry) | 479_courses (<>) = <> and 479_courses (<x> ^ s) = if x.3 = 479 then <x> ^ 479_courses(s) else 479_courses(s)
-TEXT: end
-TEXT: (Blocked by: underscore in identifier - use camelCase for fuzz compatibility)
+axdef
+where
+  forall x : Entry; s : seq(Entry) | courses479 (<>) = <> and courses479 (<x> ^ s) = if x.code = 479 then <x> ^ courses479(s) else courses479(s)
+end
 
 (d)
 
 axdef
 where
-  forall x : Entry; s : seq(Entry) | total(<>) = 0 and total(<x> ^ s) = x.5 + total(s)
+  forall x : Entry; s : seq(Entry) | total(<>) = 0 and total(<x> ^ s) = x.enrolled + total(s)
 end
 
 ** Solution 42 **
+
+(a)
 
 given Person
 

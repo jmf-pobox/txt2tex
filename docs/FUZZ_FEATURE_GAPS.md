@@ -113,7 +113,7 @@ Based on fuzz manual Section 7 (Syntax Summary, pages 54-59).
 | Bag literal | `\lbag [Expr, ..., Expr] \rbag` | ✅ | parser.py:1530 | Phase 12 |
 | Tuple | `(Expression, ..., Expression)` | ✅ | parser.py:1615 | |
 | Theta expression | `\theta Schema-Name Decoration [Renaming]` | ⚠️ | parser.py:1590 | Renaming needed |
-| Tuple projection | `Expression-4 . Var-Name` | ✅ | parser.py:1570 | |
+| Tuple projection | `Expression-4 . Var-Name` | ⚠️ | parser.py:1570 | Named fields only; numeric (.1, .2) NOT supported |
 | Subscript | `Expression \bsup Expression \esup` | ✅ | parser.py:1655 | |
 
 ---
