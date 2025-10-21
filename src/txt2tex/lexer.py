@@ -814,6 +814,7 @@ class Lexer:
                         "in",
                         "notin",
                         "subset",
+                        "subseteq",
                         "cross",
                         "dom",
                         "ran",
@@ -909,7 +910,7 @@ class Lexer:
             return Token(TokenType.NOTIN, value, start_line, start_column)
         if value == "in":
             return Token(TokenType.IN, value, start_line, start_column)
-        if value == "subset":
+        if value == "subset" or value == "subseteq":
             return Token(TokenType.SUBSET, value, start_line, start_column)
         if value == "union":
             return Token(TokenType.UNION, value, start_line, start_column)

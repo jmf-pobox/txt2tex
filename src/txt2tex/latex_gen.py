@@ -86,6 +86,7 @@ class LaTeXGenerator:
         "notin": r"\notin",
         "/in": r"\notin",  # Z notation slash negation (Phase 16+)
         "subset": r"\subseteq",
+        "subseteq": r"\subseteq",  # Alternative notation for subset
         "union": r"\cup",
         "intersect": r"\cap",
         "cross": r"\cross",  # Cartesian product
@@ -193,6 +194,7 @@ class LaTeXGenerator:
         "in": 7,
         "notin": 7,
         "subset": 7,
+        "subseteq": 7,  # Alternative notation for subset
         "union": 8,
         "cross": 8,  # Cartesian product (Phase 11.5) - same as union
         "×": 8,  # Cartesian product (Unicode) - same as union  # noqa: RUF001
@@ -2258,9 +2260,9 @@ class LaTeXGenerator:
             for i, pred in enumerate(node.predicates):
                 # Top-level predicates: pass parent=None for smart parenthesization
                 pred_latex = self.generate_expr(pred, parent=None)
-                # Fuzz requires explicit conjunction between predicates
-                if self.use_fuzz and i < len(node.predicates) - 1:
-                    lines.append(f"{pred_latex} \\land")
+                # Use \\ as separator (fuzz Sep: ; | \\ | \also)
+                if i < len(node.predicates) - 1:
+                    lines.append(f"{pred_latex} \\\\")
                 else:
                     lines.append(pred_latex)
 
@@ -2369,9 +2371,9 @@ class LaTeXGenerator:
             for i, pred in enumerate(node.predicates):
                 # Top-level predicates: pass parent=None for smart parenthesization
                 pred_latex = self.generate_expr(pred, parent=None)
-                # Fuzz requires explicit conjunction between predicates
-                if self.use_fuzz and i < len(node.predicates) - 1:
-                    lines.append(f"{pred_latex} \\land")
+                # Use \\ as separator (fuzz Sep: ; | \\ | \also)
+                if i < len(node.predicates) - 1:
+                    lines.append(f"{pred_latex} \\\\")
                 else:
                     lines.append(pred_latex)
 
