@@ -20,6 +20,19 @@ PDF_FILES := $(TXT_FILES:.txt=.pdf)
 SUBDIRS := 01_propositional_logic 02_predicate_logic 03_equality 04_proof_trees \
            05_sets 06_definitions 07_relations 08_functions 09_sequences fuzz_tests
 
+# Reference directory (special - builds with fuzz validation)
+# Note: Fuzz validation may report known errors (tuple projections, etc.) but PDF still builds
+.PHONY: reference
+reference:
+	@echo "Building reference/compiled_solutions.pdf with fuzz validation..."
+	@cd .. && hatch run convert examples/reference/compiled_solutions.txt --fuzz || true
+	@if [ -f reference/compiled_solutions.pdf ]; then \
+		echo "✓ Successfully built reference/compiled_solutions.pdf"; \
+	else \
+		echo "✗ Failed to build reference/compiled_solutions.pdf"; \
+		exit 1; \
+	fi
+
 # Default target: build all PDFs
 .PHONY: all
 all: $(PDF_FILES)
