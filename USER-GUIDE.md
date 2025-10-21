@@ -395,12 +395,42 @@ A cross B        →  A × B       [Cartesian product]
 (a, b, c)        →  (a, b, c)   [tuple]
 ```
 
-### Tuple Component Selection
+### Tuple Component Selection and Field Projection
 
+**Numeric projection (tuples):**
 ```
 p.1              →  p.1         [first component]
 p.2              →  p.2         [second component]
 p.3              →  p.3         [third component]
+```
+
+**Note:** Numeric projections (`.1`, `.2`, `.3`) are **not supported by fuzz** - they violate the fuzz grammar which requires identifiers after the period, not numbers. Use named schema fields instead (see below).
+
+**Named field projection (schemas):**
+```
+e.name           →  e.name      [access 'name' field]
+record.status    →  record.status [access 'status' field]
+person.age       →  person.age  [access 'age' field]
+```
+
+Named field projections work with schema types:
+```
+schema Entry
+  year: Year
+  course: Course
+  code: N
+end
+
+axdef
+  e : Entry
+where
+  e.year = 2025 and e.code = 479
+end
+```
+
+**Chained projections:**
+```
+record.inner.field    →  record.inner.field
 ```
 
 ### Set Comprehension
