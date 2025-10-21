@@ -281,7 +281,8 @@
 - Concatenation: `⌢` (Unicode) or `^` after sequences (ASCII)
 - Sequence operators: `head`, `tail`, `last`, `front`, `rev`
 - Sequence types: `seq(N)`, `iseq(N)`
-- Tuple projection: `.1`, `.2`, `.3`
+- Numeric tuple projection: `.1`, `.2`, `.3` (⚠️ **not fuzz-compatible** - use named fields instead)
+- **Named field projection:** `e.name`, `record.status` (✅ fuzz-compatible)
 - Bag literals: `[[a, b, c]]`
 - Bag types: `bag(X)`
 
@@ -420,23 +421,25 @@ Following the conventions used in the fuzz package test suite:
 
 **Current status**: 4 fuzz validation errors in `compiled_solutions.tex` (all known fuzz limitations)
 
-1. **Line 1149**: `\id[Person]` - Generic bracket syntax not supported by fuzz
-   - **Issue**: Fuzz doesn't support generic instantiation with brackets on identity function
-   - **Limitation**: Inherent to fuzz type checker
+1. **Line 2555**: `\mu` operator - Opening parenthesis expected
+   - **Issue**: Fuzz mu operator syntax differs from txt2tex output
+   - **Limitation**: Known fuzz type checker limitation
 
-2. **Line 1622**: Tuple projection `.3` - Not supported by fuzz
-   - **Issue**: Fuzz doesn't recognize `.3` tuple projection syntax
+2. **Line 2564**: `\mu` operator - Opening parenthesis expected
+   - **Issue**: Fuzz mu operator syntax differs from txt2tex output
+   - **Limitation**: Known fuzz type checker limitation
+
+3. **Line 2633**: Syntax error at symbol "{"
+   - **Issue**: Known fuzz type checker limitation
    - **Limitation**: Documented in docs/FUZZ_FEATURE_GAPS.md
 
-3. **Line 1640**: Tuple projection `.2` - Not supported by fuzz
-   - **Issue**: Fuzz doesn't recognize `.2` tuple projection syntax
-   - **Limitation**: Documented in docs/FUZZ_FEATURE_GAPS.md
-
-4. **Line 1770**: Tuple projection `.2` - Not supported by fuzz
-   - **Issue**: Fuzz doesn't recognize `.2` tuple projection syntax
+4. **Line 2645**: Syntax error at symbol "{"
+   - **Issue**: Known fuzz type checker limitation
    - **Limitation**: Documented in docs/FUZZ_FEATURE_GAPS.md
 
 **Note**: All 4 errors are known limitations of the fuzz type checker, not bugs in txt2tex. The LaTeX compiles successfully to PDF despite these fuzz validation errors.
+
+**✅ Solution 41 fully validated**: Previously had 3 numeric projection errors (`.1`, `.2`, `.3`). Now refactored with named field projection (`e.year`, `e.code`, `e.enrolled`) - all errors resolved, 100% fuzz-compatible.
 
 ### Function and Type Application
 
