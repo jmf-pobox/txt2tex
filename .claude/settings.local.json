@@ -35,7 +35,12 @@
       "Bash(git commit:*)",
       "Bash(ls:*)",
       "Bash(git log:*)",
-      "Bash(../txt2pdf.sh:*)"
+      "Bash(../txt2pdf.sh:*)",
+      "Bash(tee:*)",
+      "Bash(for dir in 01 02 03 04 05 06 07 08 09 fuzz_tests)",
+      "Bash(do echo \"=== Testing $dir ===\")",
+      "Bash(done)",
+      "Bash(pdftotext:*)"
     ],
     "deny": [],
     "ask": []
