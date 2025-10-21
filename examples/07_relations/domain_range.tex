@@ -9,6 +9,8 @@
 
 \section*{Phase 11 a : Function Types}
 
+\begin{zed}[X, Y, Z]\end{zed}
+
 \bigskip
 
 Total functions (every element in domain has a mapping):
@@ -16,8 +18,8 @@ Total functions (every element in domain has a mapping):
 \bigskip
 
 \begin{axdef}
-f : X \fun Y \\
-g : \nat \fun \nat
+totalF1 : X \fun Y \\
+totalF2 : \nat \fun \nat
 \end{axdef}
 
 \bigskip
@@ -27,7 +29,7 @@ Partial functions (some elements may not have a mapping):
 \bigskip
 
 \begin{axdef}
-f : X \pfun Y
+partialF : X \pfun Y
 \end{axdef}
 
 \bigskip
@@ -37,8 +39,8 @@ Injections (one-to-one mappings):
 \bigskip
 
 \begin{axdef}
-ftotal : X \inj Y \\
-fpartial : X \pinj Y
+injTotal : X \inj Y \\
+injPartial : X \pinj Y
 \end{axdef}
 
 \bigskip
@@ -48,8 +50,8 @@ Surjections (onto mappings):
 \bigskip
 
 \begin{axdef}
-ftotal : X \surj Y \\
-fpartial : X \psurj Y
+surjTotal : X \surj Y \\
+surjPartial : X \psurj Y
 \end{axdef}
 
 \bigskip
@@ -59,19 +61,7 @@ Bijections $one - to - one \land onto$:
 \bigskip
 
 \begin{axdef}
-f : X \bij Y
-\end{axdef}
-
-\bigskip
-
-Complex function types $nested \land higher - order$:
-
-\bigskip
-
-\begin{axdef}
-f : X \fun Y \fun \num \\
-g : X \fun (Y \pfun \num) \\
-h : \nat \fun \nat \fun (\nat \fun \nat)
+bijection : X \bij Y
 \end{axdef}
 
 \bigskip
@@ -83,8 +73,6 @@ Mixed operators $relations \land function(types)(work)(together)$:
 \begin{axdef}
 relation : X \rel Y \\
 function : X \fun Y
-\where
-function \subseteq relation
 \end{axdef}
 
 \end{document}

@@ -1,0 +1,34 @@
+=== Recursive Function Examples ===
+
+given Entry
+
+TEXT: This file demonstrates recursive functions on sequences.
+
+** Example 1: Simple recursive function **
+
+axdef
+  length : seq Entry -> N
+where
+  length(<>) = 0
+  forall x : Entry; s : seq Entry | length(<x> ^ s) = 1 + length(s)
+end
+
+** Example 2: Identity function on sequences **
+
+axdef
+  identity : seq Entry -> seq Entry
+where
+  identity(<>) = <>
+  forall x : Entry; s : seq Entry | identity(<x> ^ s) = <x> ^ identity(s)
+end
+
+** Example 3: Sequence doubling **
+
+axdef
+  duplicate : seq N -> seq N
+where
+  duplicate(<>) = <>
+  forall n : N; s : seq N | duplicate(<n> ^ s) = <n, n> ^ duplicate(s)
+end
+
+TEXT: These examples show pattern matching on sequences with base cases and recursive cases.

@@ -1,0 +1,23 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Test : Union in Quantifier Domain}
+
+\begin{zed}[UserId, SongId]\end{zed}
+
+\begin{axdef}
+users : \finset UserId \\
+songs : \finset SongId \\
+hated : UserId \pfun \finset SongId \\
+loved : UserId \pfun \finset SongId
+\where
+\forall i : \dom hated \cup \dom loved @ hated(i) \cap loved(i) = \emptyset
+\end{axdef}
+
+\end{document}

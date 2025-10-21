@@ -1,0 +1,126 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 7 : Equality and Special Operators}
+
+\bigskip
+\noindent
+\textbf{Test 1 : Mu Operator}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $(\mu x : \nat | x^2 = 4 \land x > 0)$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $(\mu x | x > 0 \land x < 10)$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Test 2 : Not Equal Operator}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $x \neq 0$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $x \neq 0 \land y \neq 0$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $x \neq y \lor y \neq z$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Test 3 : Not In Operator}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $x \notin S$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $x \in A \land x \notin B$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $x \notin S \Leftrightarrow \lnot (x \in S)$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Test 4 : One Point Rule}
+
+\medskip
+
+\[
+\begin{array}{ll@{\hspace{2em}}l}
+& \exists y : \nat @ y = 0 \land x \neq y \\
+&\Leftrightarrow 0 \in \nat \land x \neq 0 \\
+&\Leftrightarrow x \neq 0
+\end{array}
+\]
+
+\bigskip
+\noindent
+\textbf{Test 5 : Complex Reasoning}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $(\mu x : \nat | x^2 = 9 \land x \neq 3)$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $\forall x : \nat @ \exists y : \nat @ x \neq y$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $\forall x : \nat @ x \in S \implies x \notin T$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Test 6 : Mixed Operators}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $x = y \lor x \neq y$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $x \in A \lor x \notin A$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $(\mu x : \nat | x \in S \land x \neq 0 \land x^2 < 10)$
+
+\medskip
+\end{document}

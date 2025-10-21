@@ -1,0 +1,61 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Zed Block Test}
+
+\bigskip
+\noindent
+\textbf{Test 1 : Simple Abbreviation}
+
+\medskip
+
+\begin{zed}
+SimpleConst == 42
+\end{zed}
+
+\bigskip
+\noindent
+\textbf{Test 2 : Forall in Axiom}
+
+\medskip
+
+\begin{axdef}
+constraint : \nat
+\where
+constraint = 0 \\
+\forall x : \nat @ x \geq 0
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Test 3 : Exists in Axiom}
+
+\medskip
+
+\begin{axdef}
+hasRoot : \nat
+\where
+hasRoot = 4 \\
+\exists n : \nat @ n * n = hasRoot
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Test 4 : Nested Quantifiers in Axiom}
+
+\medskip
+
+\begin{axdef}
+sumTen : \nat
+\where
+sumTen = 10 \\
+\forall x : \nat @ \exists y : \nat @ x + y = sumTen
+\end{axdef}
+
+\end{document}

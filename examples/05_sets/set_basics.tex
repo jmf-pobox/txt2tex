@@ -1,0 +1,70 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Predicate Logic Phase 6 Tests}
+
+\bigskip
+\noindent
+\textbf{Test 1 : Simple Quantifiers}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $\forall x : \nat @ x > 0$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $\exists y : \nat @ y = 0$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $\exists_1 z : \nat @ z < 10$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Test 2 : Multi Variable Quantifiers}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $\forall x, y : \nat @ x > y$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $\exists a, b : \nat @ a > 0 \land b > 0$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $\forall m, n, p : \nat @ m \geq n \land n \geq p$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Test 3 : Nested Quantifiers}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $\forall x : \nat @ \exists y : \nat @ x > y$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $\exists x : \nat @ \forall y : \nat @ x \leq y$
+
+\medskip
+\end{document}
