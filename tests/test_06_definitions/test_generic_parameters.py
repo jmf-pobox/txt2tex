@@ -193,7 +193,8 @@ class TestPhase9LaTeXGeneration:
         latex = gen.generate_document(ast)
 
         # Abbreviations now wrapped in zed environment for fuzz compatibility
-        assert r"\begin{zed}[X]Pair == X\end{zed}" in latex
+        # Fuzz requires generics AFTER name: Pair[X] not [X]Pair
+        assert r"Pair[X] == X" in latex
 
     def test_generate_axdef_without_generics(self) -> None:
         """Test LaTeX generation for axdef without generics."""
@@ -294,6 +295,7 @@ end
         assert r"\section*{Phase 9 Test}" in latex
         assert r"\begin{zed}[A, B]\end{zed}" in latex
         # Abbreviations now wrapped in zed environment for fuzz compatibility
-        assert r"\begin{zed}[X]Pair == X\end{zed}" in latex
+        # Fuzz requires generics AFTER name: Pair[X] not [X]Pair
+        assert r"Pair[X] == X" in latex
         assert r"\begin{axdef}[T]" in latex
         assert r"\begin{schema}{Container}[X]" in latex
