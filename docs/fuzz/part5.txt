@@ -1,0 +1,488 @@
+6 Error Messages
+
+53
+
+The type *errtype* never appears in the output produced from a correct specification; it is simply a device which allows more checking to be
+done on a specification after errors have been detected.
+Types appearing in error messages may also contain ‘place-markers’,
+indicated by ? . These place-markers are generated when generic constants are written without explicit parameters, and the type checker
+works out from the context what the parameters must be. If ? appears
+in an error message, it means that the type checker has not completely
+worked out the type of a phrase, but the type it has found so far has
+the wrong shape to match the context. For example, the predicate
+=3
+results in the error message
+Types do not agree in equation
+> Predicate: \emptyset = 3
+> LHS type: P ?
+> RHS type: NN
+This indicates that always has a set type, but whatever type is given
+to the elements of the set, this cannot be the same as the type ascribed
+to 3.
+
+7 Syntax Summary
+
+This chapter contains a syntax summary of the input language recognized by the f uzz type checker, showing the LaTEX commands for the
+constructs of Z rather than the way they look when printed. Except for
+the use of LaTEX commands in place of the printed symbols, this syntax
+is identical with the one in the ZRM. Only the formal parts of the specification are shown in the summary, but of course one Paragraph should
+be separated from the next by plenty of explanatory text.
+The following conventions about repeated and optional phrases are
+used: S, . . . , S stands for a list of one or more instances of the class S
+separated by commas, and S; . . . ; S stands for one or more instances of
+S separated by semicolons. The notation S . . . S stands for one or more
+adjacent instances of S with no separators. Phrases enclosed in slanted
+square brackets [ . . . ] are optional.
+Certain collections of symbols have a range of binding powers: they
+are the logical connectives, used in predicates and schema expressions,
+the special-purpose schema operators, and infix function symbols, used
+in expressions. The relative binding powers of the logical connectives
+are indicated by listing them in decreasing order of binding power; the
+binding powers of infix function symbols are given in Section 3.2. Each
+production for which a binding power is relevant has been marked with
+an upper-case letter at the right margin; ‘L’ marks a symbol which
+associates to the left – so A ∧ B ∧ C means (A ∧ B ) ∧ C – and
+‘R’ marks a symbol which associates to the right. Unary symbols are
+marked with ‘U’.
+
+54
+
+7 Syntax Summary
+
+Specification
+
+::= Paragraph . . . Paragraph
+
+Paragraph
+
+::= Unboxed-Para
+| Axiomatic-Box
+| Schema-Box
+| Generic-Box
+
+Unboxed-Para ::= \begin{zed}
+Item Sep . . . Sep Item
+\end{zed}
+Item
+
+::= [Ident, . . . , Ident]
+| Schema-Name[ Gen-Formals] \defs Schema-Exp
+| Def-Lhs == Expression
+| Ident ::= Branch | . . . | Branch
+| Predicate
+
+Axiomatic-Box ::= \begin{axdef}
+Decl-Part
+[ \where
+Axiom-Part ]
+\end{axdef}
+Schema-Box
+
+::= \begin{schema}{Schema-Name}[ Gen-Formals]
+Decl-Part
+[ \where
+Axiom-Part ]
+\end{schema}
+
+Generic-Box
+
+::= \begin{gendef}[ Gen-Formals]
+Decl-Part
+[ \where
+Axiom-Part ]
+\end{gendef}
+
+Decl-Part
+
+::= Basic-Decl Sep . . . Sep Basic-Decl
+
+Axiom-Part
+
+::= Predicate Sep . . . Sep Predicate
+
+Sep
+
+::= ; | \\ | \also
+
+55
+
+56
+
+Def-Lhs
+
+The f uzz manual
+
+::= Var-Name[ Gen-Formals]
+| Pre-Gen Decoration Ident
+| Ident In-Gen Decoration Ident
+Branch
+::= Ident
+| Var-Name \ldata Expression \rdata
+Schema-Exp
+::= \forall Schema-Text @ Schema-Exp
+| \exists Schema-Text @ Schema-Exp
+| \exists_1 Schema-Text @ Schema-Exp
+| Schema-Exp-1
+Schema-Exp-1 ::= [ Schema-Text ]
+| Schema-Ref
+| \lnot Schema-Exp-1
+U
+| \pre Schema-Exp-1
+U
+| Schema-Exp-1 \land Schema-Exp-1
+L
+| Schema-Exp-1 \lor Schema-Exp-1
+L
+| Schema-Exp-1 \implies Schema-Exp-1
+R
+| Schema-Exp-1 \iff Schema-Exp-1
+L
+| Schema-Exp-1 \project Schema-Exp-1
+L
+| Schema-Exp-1 \hide
+(Decl-Name, . . . , Decl-Name)
+L
+| Schema-Exp-1 \semi Schema-Exp-1
+L
+| Schema-Exp-1 \pipe Schema-Exp-1
+L
+| ( Schema-Exp )
+Schema-Text ::= Declaration [ | Predicate]
+Schema-Ref
+::= Schema-Name Decoration [ Gen-Actuals] [ Renaming]
+Renaming
+::= [Decl-Name/Decl-Name, . . . , Decl-Name/Decl-Name]
+Declaration
+::= Basic-Decl; . . . ; Basic-Decl
+Basic-Decl
+::= Decl-Name, . . . , Decl-Name : Expression
+| Schema-Ref
+Predicate
+::= \forall Schema-Text @ Predicate
+| \exists Schema-Text @ Predicate
+| \exists_1 Schema-Text @ Predicate
+| \LET Let-Def; . . . ; Let-Def @ Predicate
+| Predicate-1
+
+7 Syntax Summary
+
+Predicate-1
+
+::= Expression Rel Expression Rel . . . Rel Expression
+| Pre-Rel Decoration Expression
+| Schema-Ref
+| \pre Schema-Ref
+| true
+| false
+| \lnot Predicate-1
+| Predicate-1 \land Predicate-1
+| Predicate-1 \lor Predicate-1
+| Predicate-1 \implies Predicate-1
+| Predicate-1 \iff Predicate-1
+| ( Predicate )
+
+57
+
+U
+L
+L
+R
+L
+
+Rel
+
+::= = | \in | In-Rel Decoration | \inrel{ Ident }
+
+Let-Def
+
+::= Var-Name == Expression
+
+Expression-0
+
+::= \lambda Schema-Text @ Expression
+| \mu Schema-Text [ @ Expression]
+| \LET Let-Def; . . . ; Let-Def @ Expression
+| Expression
+
+Expression
+
+::= \IF Predicate \THEN Expression \ELSE Expression
+| Expression-1
+
+Expression-1
+
+::= Expression-1 In-Gen Decoration Expression-1
+| Expression-2 \cross Expression-2
+\cross . . . \cross Expression-2
+| Expression-2
+
+Expression-2
+
+::= Expression-2 In-Fun Decoration Expression-2
+L
+| \power Expression-4
+| Pre-Gen Decoration Expression-4
+| - Decoration Expression-4
+| Expression-4 \limg Expression-0 \rimg Decoration
+| Expression-3
+
+Expression-3
+
+::= Expression-3 Expression-4
+| Expression-4
+
+R
+
+The f uzz manual
+
+58
+
+Expression-4
+
+::= Var-Name[ Gen-Actuals]
+| Number
+| Schema-Ref
+| Set-Exp
+| \langle[ Expression, . . . , Expression] \rangle
+| \lbag[ Expression, . . . , Expression] \rbag
+| ( Expression, . . . , Expression )
+| \theta Schema-Name Decoration [ Renaming]
+| Expression-4 . Var-Name
+| Expression-4 Post-Fun Decoration
+| Expression-4 \bsup Expression \esup
+| ( Expression-0 )
+
+Set-Exp
+
+::= \{ [ Expression, . . . , Expression] \}
+| \{ Schema-Text [ @ Expression ] \}
+
+Ident
+
+::= Word Decoration
+
+Decl-Name
+
+::= Ident | Op-Name
+
+Var-Name
+
+::= Ident | (Op-Name)
+
+Op-Name
+
+::= \_ In-Sym Decoration \_
+| Pre-Sym Decoration \_
+| \_ Post-Sym Decoration
+| \_ \limg \_ \rimg Decoration
+| - Decoration
+
+In-Sym
+
+::= In-Fun | In-Gen | In-Rel
+
+Pre-Sym
+
+::= Pre-Gen | Pre-Rel
+
+Post-Sym
+
+::= Post-Fun
+
+Decoration
+
+::= [ Stroke . . . Stroke]
+
+Gen-Formals
+
+::= [Ident, . . . , Ident]
+
+Gen-Actuals
+
+::= [Expression, . . . , Expression]
+
+7 Syntax Summary
+
+59
+
+The syntax summary uses several classes of terminal symbol that are
+defined as follows:
+• a Word is an undecorated name or special symbol. It may be either a
+non-empty sequence of letters, digits and underscores (written using
+the \_ command) that starts with a letter, a non-empty sequence
+of characters drawn from the list +-*.=<>, or a LaTEX command.
+Some strings that would otherwise be Word’s are reserved for other
+purposes, and others are taken as Schema-Name’s or operator symbols.
+• a Schema-Name is either a Word that has been defined as a schema,
+or one of the Greek letters \Delta or \Xi followed by a single space
+and a Word.
+• the classes In-Fun, Pre-Rel, etc., stand for members of the class Word
+that have been announced as infix function symbols, prefix relation
+symbols, etc., either in the prelude or by an explicit directive.
+• a Number is a non-empty sequence of decimal digits.
+• a Stroke is a single decoration: one of ’, ?, !, or a subscript digit
+entered as _0, _1, and so on.
+
+Another essential Mikronella design
+
+Index
+
+%% directive, 31, 36, 45
+& (alignment tab), ignored by
+type checker, 17
+? as type, 53
+\[ ... \], 25
+\\ (newline), 13
+\_ (underscore), 18
+^ (superscript), 22
+{} (empty operand), 25
+~ (thin space)
+between function and
+argument, 24
+in set comprehension, 24
+
+\comp ( )
+vs. \semi, 18
+concatenation ( ), 43
+constant symbols, 21
+constraint, 16
+
+
+default definition, of ∆ and Ξ, 31
+definition before use, 29,
+30–31, 46
+\Delta (∆), 31
+directives, 35–7
+dummy argument (\_), 18
+empty operand ({}), 25
+\empty ( )
+vs. \emptyset ( ), 21
+*errtype*, 52
+
+-a flag, 29
+abbreviation definition, 16
+\also, 14
+argue environment, 26
+arrows, 23
+\axdef environment, 15
+axiomatic description, 15
+
+\filter ( )
+vs. \project, 19
+flags, on command line, 29–30
+font, significance to
+type-checker, 19
+free type definition, 16, 17
+full stop, allowed before \end, 17
+function, separated from
+argument by ~, 24
+
+basic symbols, 19
+basic type definition, 16
+bracket symbols, 20
+comment, ignored by type
+checker, 35
+
+60
+
+Index
+
+fuzz style option, 12
+FUZZLIB, environment
+variable, 30
+gendef environment, 16, 38
+generic definition, 16
+generic parameter, 14, 16
+generic symbols, 23
+\hide (\)
+vs. \setminus, 18
+identifier, syntax rules, 59
+implicit quantifier, 30, 31
+\include, ignored by type
+checker, 29
+infrule environment, 27
+%%ingen directive, 36
+%%inop directive, 36, 38
+\input, ignored by type
+checker, 29
+%%inrel directive, 36, 39
+\inrel, 22
+logical symbols, 20
+mathematical tool-kit, 29
+monotonicity, of type
+abbreviations, 42
+multi-character identifier, 18
+operator symbol, 21–2
+user-defined, 37–40
+-p flag, 30
+%%postop directive, 36
+
+61
+
+%%pregen directive, 36
+prelude file, 29, 30
+search rules, 30
+%%prerel directive, 36
+\project ( )
+vs. \filter, 19
+-q flag, 30, 31
+reflexive–transitive closure
+( ∗ ), 44
+relation symbols, 22
+reports, 30, 31–4
+-s flag, 30
+schema definition
+horizontal, 16
+vertical, 13
+schema name
+containing special
+characters, 40
+syntax rules, 59
+schema environment, 13
+schema* environment, 26
+\semi ( )
+vs. \comp, 18
+\setminus (\)
+vs. \hide, 18
+SliTEX, 12
+space commands, ignored by
+type checker, 24
+spacing rules of TEX, 18, 23–5
+standard symbols, 19–23
+style parameters, 27
+superscript, 22
+syntax environment, 17
+
+The f uzz manual
+
+62
+
+-t flag, 30, 32
+\t, 15
+tame functions, 43–4
+%%tame directive, 36, 44
+tie-after accent (Äoo), 15
+total functions ( ), 42
+type abbreviation, 29
+type abbreviations, 41–4
+expansion, 41
+%%type directive, 36, 43
+
+
+
+%%unchecked directive, 31, 36, 44
+underlined relation symbol, 22
+underscore, in identifier, 18
+upward compatibility, 14, 20, 22
+-v flag, 30, 31
+\where, 13
+\Xi (Ξ), 31
+zed environment, 16
+\zedbar, 28
+\zedindent, 27
+\zedleftsep, 27
+\zedsize, 28
+\zedskip, 28
+\zedtab, 27
+
+
