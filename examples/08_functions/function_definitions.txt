@@ -1,0 +1,274 @@
+=== Function Definitions ===
+
+TEXT: This file demonstrates various types of function definitions in Z notation, from simple total functions to complex generic and higher-order functions.
+
+** Example 1: Simple Total Functions **
+
+TEXT: Total functions are defined over their entire domain. Every input has a corresponding output.
+
+axdef
+  square : N -> N
+where
+  forall n : N | square(n) = n * n
+end
+
+axdef
+  successor : N -> N
+where
+  forall n : N | successor(n) = n + 1
+end
+
+axdef
+  isEven : N -> N
+where
+  forall n : N | (isEven(n) = 1 <=> exists k : N | n = 2 * k) and (isEven(n) = 0 or isEven(n) = 1)
+end
+
+TEXT: isEven returns 1 for even numbers and 0 for odd numbers.
+
+** Example 2: Partial Functions **
+
+TEXT: Partial functions are not defined over their entire domain. Some inputs may not have outputs.
+
+axdef
+  double : N -> N
+where
+  forall n : N | double(n) = 2 * n
+end
+
+TEXT: double is a total function that multiplies its input by 2.
+
+axdef
+  predecessor : N +-> N
+where
+  forall n : N | n > 0 => predecessor(n) = n - 1
+end
+
+TEXT: predecessor is partial on natural numbers since 0 has no predecessor in N.
+
+axdef
+  half : N +-> N
+where
+  forall n : N | n mod 2 = 0 => half(n) * 2 = n
+end
+
+TEXT: half is partial because only even numbers have integer halves.
+
+** Example 3: Generic (Polymorphic) Functions **
+
+TEXT: Generic functions work with any type parameter.
+
+gendef [X]
+  identity : X -> X
+where
+  forall x : X | identity(x) = x
+end
+
+gendef [X]
+  constant : X cross X -> X
+where
+  forall x, y : X | constant(x, y) = x
+end
+
+gendef [X, Y]
+  first : X cross Y -> X
+where
+  forall x : X; y : Y | first(x, y) = x
+end
+
+gendef [X, Y]
+  second : X cross Y -> Y
+where
+  forall x : X; y : Y | second(x, y) = y
+end
+
+gendef [X]
+  swap : (X cross X) -> (X cross X)
+where
+  forall x, y : X | swap(x, y) = (y, x)
+end
+
+** Example 4: Functions on Sequences **
+
+TEXT: Functions that operate on sequences.
+
+gendef [X]
+  append : seq X cross X -> seq X
+where
+  forall s : seq X; x : X | append(s, x) = s ^ <x>
+end
+
+gendef [X]
+  first : seq X +-> X
+where
+  forall s : seq X | s /= <> => first(s) = head s
+end
+
+TEXT: first is partial because it is not defined on the empty sequence.
+
+gendef [X]
+  rest : seq X +-> seq X
+where
+  forall s : seq X | s /= <> => rest(s) = tail s
+end
+
+TEXT: For pattern matching examples with recursive definitions, see examples/09_sequences/pattern_matching.txt
+
+** Example 5: Higher-Order Functions **
+
+TEXT: Higher-order functions take other functions as arguments or return functions. These are advanced constructs that may require specialized type system support.
+
+TEXT: Example signatures (axiomatization omitted for simplicity):
+
+gendef [X]
+  apply : (X -> X) cross X -> X
+end
+
+gendef [X, Y, Z]
+  compose : (Y -> Z) cross (X -> Y) -> (X -> Z)
+end
+
+gendef [X]
+  twice : (X -> X) -> (X -> X)
+end
+
+TEXT: Note: Full axiomatization of higher-order functions requires quantification over function types, which may have limited support in some Z type checkers.
+
+** Example 6: Functions with Complex Domains **
+
+TEXT: Functions can have complex domain constraints.
+
+given Person, Date
+
+axdef
+  age : Person cross Date -> N
+where
+  forall p : Person; d : Date | age(p, d) >= 0
+end
+
+axdef
+  eligible : Person cross Date -> N
+where
+  forall p : Person; d : Date | (eligible(p, d) = 1 <=> age(p, d) >= 18) and (eligible(p, d) = 0 or eligible(p, d) = 1)
+end
+
+TEXT: eligible returns 1 if the person is 18 or older on the given date, 0 otherwise.
+
+** Example 7: Set-Valued Functions **
+
+TEXT: Functions can return sets as their range.
+
+gendef [X]
+  powerset : P(X) -> P(P(X))
+where
+  forall s : P(X) | powerset(s) = P(s)
+end
+
+given Student, Course
+
+axdef
+  enrolled : Student -> P Course
+where
+  forall s : Student | # enrolled(s) <= 8
+end
+
+TEXT: Each student is enrolled in at most 8 courses.
+
+** Example 8: Injective Functions **
+
+TEXT: Injective (one-to-one) functions map distinct inputs to distinct outputs.
+
+given StudentId, Student
+
+axdef
+  studentRecord : StudentId >-> Student
+where
+  forall id1, id2 : StudentId |
+    id1 /= id2 => studentRecord(id1) /= studentRecord(id2)
+end
+
+TEXT: Each student ID maps to a unique student record.
+
+** Example 9: Surjective Functions **
+
+TEXT: Surjective (onto) functions cover the entire range.
+
+axdef
+  modulo3 : N -->> {0, 1, 2}
+where
+  forall n : N | modulo3(n) = n mod 3
+end
+
+TEXT: modulo3 is surjective because every value in {0, 1, 2} is reached.
+
+** Example 10: Bijective Functions **
+
+TEXT: Bijective functions are both injective and surjective.
+
+axdef
+  encode : N >->> N
+where
+  forall n : N | encode(n) = 2 * n + 1
+end
+
+TEXT: This encodes natural numbers to odd numbers bijectively.
+
+** Example 11: Recursive Functions on Natural Numbers **
+
+TEXT: Functions defined recursively using mathematical induction.
+
+axdef
+  triple : N -> N
+where
+  forall n : N | triple(n) = 3 * n
+end
+
+axdef
+  powerOfTwo : N -> N
+where
+  forall n : N | powerOfTwo(n) = 2 * powerOfTwo(n - 1) and powerOfTwo(0) = 1
+end
+
+TEXT: Note: More complex recursive definitions like factorial and fibonacci typically require pattern matching or additional axioms not shown here.
+
+** Example 12: Functions Using mu (Definite Description) **
+
+TEXT: The mu operator selects the unique element satisfying a property.
+
+gendef [X]
+  minimum : seq1 X -> X
+where
+  forall s : seq1 X |
+    minimum(s) = mu x : X | x in ran s and (forall y : X | y in ran s => x <= y)
+end
+
+TEXT: minimum selects the unique smallest element from a non-empty sequence.
+
+** Example 13: Piecewise-Defined Functions **
+
+TEXT: Functions defined by cases using conditional expressions.
+
+axdef
+  absolute : Z -> N
+where
+  forall n : Z | absolute(n) = if n >= 0 then n else -n
+end
+
+axdef
+  signum : Z -> {-1, 0, 1}
+where
+  forall n : Z |
+    signum(n) = if n > 0 then 1 else if n = 0 then 0 else -1
+end
+
+axdef
+  max : N cross N -> N
+where
+  forall a, b : N | max(a, b) = if a >= b then a else b
+end
+
+axdef
+  min : N cross N -> N
+where
+  forall a, b : N | min(a, b) = if a <= b then a else b
+end
