@@ -97,12 +97,14 @@ TEXT: grades maps students to their grades.
 axdef
   f : N -> N
   g : N -> N
+  h : N -> N
 where
   forall n : N | f(n) = 2 * n
   forall n : N | g(n) = n + 1
+  h = f o9 g
 end
 
-TEXT: f doubles its input, g adds one to its input.
+TEXT: f doubles its input, g adds one to its input. h is their forward composition: h(n) = f(g(n)) = 2 * (n + 1).
 
 ** Example 8: Modulo Function **
 
