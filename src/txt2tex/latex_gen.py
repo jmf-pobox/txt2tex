@@ -988,12 +988,21 @@ class LaTeXGenerator:
     ) -> str:
         """Generate LaTeX for tuple projection (Phase 12).
 
-        Examples:
+        Supports both numeric projection and named field projection.
+
+        Examples (numeric):
         - x.1 -> x.1
         - (a, b).2 -> (a, b).2
         - f(x).3 -> f(x).3
 
-        Tuple projection is rendered as-is (stays the same in LaTeX).
+        Examples (named fields):
+        - e.name -> e.name
+        - record.status -> record.status
+        - person.age -> person.age
+
+        Note: Fuzz only supports named field projection (identifiers).
+        Numeric projections (.1, .2) violate fuzz grammar
+        (requires Var-Name, not Number).
         """
         base_latex = self.generate_expr(node.base)
 
@@ -1001,6 +1010,7 @@ class LaTeXGenerator:
         if isinstance(node.base, BinaryOp):
             base_latex = f"({base_latex})"
 
+        # Generate projection suffix (works for both int and str)
         return f"{base_latex}.{node.index}"
 
     def _generate_bag_literal(
@@ -1036,11 +1046,7 @@ class LaTeXGenerator:
 
         # Fuzz uses \IF \THEN \ELSE keywords
         if self.use_fuzz:
-            return (
-                f"\\IF {condition_latex} "
-                f"\\THEN {then_latex} "
-                f"\\ELSE {else_latex}"
-            )
+            return f"\\IF {condition_latex} \\THEN {then_latex} \\ELSE {else_latex}"
 
         # Standard LaTeX uses mbox keywords
         return (

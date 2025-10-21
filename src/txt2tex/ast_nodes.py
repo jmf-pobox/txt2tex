@@ -314,20 +314,26 @@ class SequenceLiteral(ASTNode):
 class TupleProjection(ASTNode):
     """Tuple projection node (Phase 12).
 
-    Represents tuple component access: x.1, x.2, x.3
+    Represents tuple component access: x.1, x.2, x.3, or schema field access: e.name
 
-    Used to access specific components of tuples in sequences and relations.
+    Used to access specific components of tuples or named fields of schemas.
 
     Examples:
-    - x.1 -> base=Identifier("x"), index=1
-    - (a, b, c).2 -> base=Tuple([...]), index=2
-    - f(x).3 -> base=FunctionApp(...), index=3
+    - x.1 -> base=Identifier("x"), index=1 (numeric projection)
+    - (a, b, c).2 -> base=Tuple([...]), index=2 (numeric projection)
+    - f(x).3 -> base=FunctionApp(...), index=3 (numeric projection)
+    - e.name -> base=Identifier("e"), index="name" (named field projection)
+    - record.status -> base=Identifier("record"), index="status"
+                        (named field projection)
 
     LaTeX rendering: base.index (stays the same)
+
+    Note: Fuzz only supports named field projection (identifiers),
+    not numeric projection.
     """
 
-    base: Expr  # The tuple expression
-    index: int  # Component index (1-based: 1, 2, 3, ...)
+    base: Expr  # The tuple or schema expression
+    index: int | str  # Component index (1-based: 1, 2, 3, ...) or field name
 
 
 @dataclass(frozen=True)

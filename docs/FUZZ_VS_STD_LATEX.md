@@ -180,16 +180,63 @@ if (
 
 ## Tuple Projection
 
-### NOT Supported by Fuzz
+### Named Field Projection: Supported ✅
 
-**Standard Z**: Tuple projection with `.1`, `.2`, etc.
-**Fuzz**: Does **NOT** support tuple projection syntax
+**Fuzz grammar**: `Expression-4 . Var-Name` where `Var-Name ::= Ident`
 
-**txt2tex behavior**: Generates the syntax, but fuzz validation will fail
+Fuzz DOES support tuple projection when using **named fields** (identifiers):
 
-**User workaround**: Don't use tuple projection in fuzz mode, or define custom projection functions
+```
+tuple.fieldname    ✅ Supported - Var-Name is an identifier
+record.status      ✅ Supported - Var-Name is an identifier
+person.name        ✅ Supported - Var-Name is an identifier
+```
 
-**Note**: This is documented in [FUZZ_FEATURE_GAPS.md](FUZZ_FEATURE_GAPS.md)
+**Example with schemas**:
+```z
+Entry == [name: NAME, course: Course, grade: N]
+
+% Access fields by name:
+e.name      ← Works in fuzz
+e.course    ← Works in fuzz
+e.grade     ← Works in fuzz
+```
+
+### Numeric Positional Projection: NOT Supported ❌
+
+**Problem**: Fuzz grammar requires `Var-Name` which must be an **identifier**, not a number.
+
+Fuzz does NOT support numeric positional projection:
+
+```
+e.1        ❌ NOT supported - "1" is a Number, not Var-Name
+e.2        ❌ NOT supported - "2" is a Number, not Var-Name
+e.3        ❌ NOT supported - "3" is a Number, not Var-Name
+(r(i)).1   ❌ NOT supported - violates grammar
+```
+
+**Standard Z Mathematical Toolkit** provides projection functions only for pairs:
+- `first : X × Y → X` where `first(x,y) = x`
+- `second : X × Y → Y` where `second(x,y) = y`
+
+No standard functions exist for 3-tuples, 4-tuples, or n-tuples.
+
+### txt2tex Behavior
+
+**txt2tex generates** the numeric projection syntax when requested, but:
+- Fuzz validation will report syntax errors
+- Solutions using numeric projections must be wrapped in TEXT blocks
+
+**User workarounds**:
+1. Use schemas with named fields instead of anonymous tuples
+2. Define custom projection functions for n-tuples
+3. Wrap numeric projections in TEXT blocks (renders as plain text, no type checking)
+
+**Examples in compiled_solutions.txt**:
+- Solution 41(a): Uses `e.1`, `(r(i1)).1`, `(r(i1)).3` → Wrapped in TEXT blocks
+- Solution 41(b): Uses `e.2`, `e.3`, `e.5`, `e.6`, `e.7` → Currently unwrapped (generates fuzz errors)
+
+**See also**: [FUZZ_FEATURE_GAPS.md](FUZZ_FEATURE_GAPS.md) for implementation status
 
 ---
 
