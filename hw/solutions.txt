@@ -186,21 +186,18 @@ PROOF:
     :: ((p => r) and (q => r)) => ((p or q) => r)
     :: ((p or q) => r) => ((p => r) and (q => r)) 
 
-
 ** Question 4 **
 
 gendef [X]
-  outerLen : seq1 seq X -> N; maxInnerLen : seq1 seq X -> N
+  maxSeq : seq1 seq X -> seq X
 where
-  forall s : seq1 seq X | outerLen(s) = # s
-  forall s : seq1 seq X | forall i : 1 .. # s | # (s(i)) <= maxInnerLen(s)
-  forall s : seq1 seq X | exists i : 1 .. # s | # (s(i)) = maxInnerLen(s)
+  forall ss : seq1 seq X | maxSeq(ss) in ran ss and (forall t : seq X | t in ran ss => # (maxSeq(ss)) >= # t)
 end
 
 gendef [X]
-  f : X -> X; g : X -> X
+  minSeq : seq1 seq X -> seq X
 where
-  forall x : X | f(x) = g(x)
+  forall ss : seq1 seq X | minSeq(ss) in ran ss and (forall t : seq X | t in ran ss => # (minSeq(ss)) <= # t)
 end
 
 ** Question 5 **
@@ -291,6 +288,13 @@ axdef
 where
   BadMu = mu n : N | n > 0
 end
+
+gendef [X, Y]
+  fst : X cross Y -> X
+where
+  forall x : X; y : Y | fst(x, y) = x
+end
+
 
 PAGEBREAK:
 
