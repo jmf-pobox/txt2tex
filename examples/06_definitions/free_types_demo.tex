@@ -1,0 +1,132 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 17 Demo : Semicolon - Separated Bindings}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Two bindings}
+
+\medskip
+
+\bigskip
+
+Simple case with two binding groups:
+
+\bigskip
+
+\bigskip
+
+$\forall x : \nat @ \forall y : \nat @ x + y > 0$
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 2 : Three bindings}
+
+\medskip
+
+\bigskip
+
+Three levels of nesting:
+
+\bigskip
+
+\bigskip
+
+$\forall x : T @ \forall y : U @ \forall z : V @ x = y$
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 3 : Mixed comma and semicolon}
+
+\medskip
+
+\bigskip
+
+First quantifier has multiple variables with shared domain:
+
+\bigskip
+
+\bigskip
+
+$\forall x, y : \nat @ \forall z : \nat @ x + y = z$
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 4 : Real - world example from Solution 41}
+
+\medskip
+
+\bigskip
+
+$\forall r : \ran records @ \forall i1, i2 : \dom r @ i1$/= $i2 \implies true$
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 5 : Conditional with semicolon bindings}
+
+\medskip
+
+\bigskip
+
+Combining Phase 16 and Phase 17:
+
+\bigskip
+
+\bigskip
+
+$\forall x : \nat @ \forall y : \nat @ \IF x > y \THEN x \ELSE y$
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 6 : Nested mu operator}
+
+\medskip
+
+\bigskip
+
+Definite description with multiple bindings:
+
+\bigskip
+
+\bigskip
+
+($(\mu p : \ran hd | (\mu q : \ran hd | p \neq q))$$\mid$ p.2 $>$ q.2)
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 7 : With exists quantifier}
+
+\medskip
+
+\bigskip
+
+Multiple bindings with exists:
+
+\bigskip
+
+\bigskip
+
+$\exists x : \nat @ \exists y : \nat @ x > y \land y > 0$
+
+\bigskip
+
+\end{document}

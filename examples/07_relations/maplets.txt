@@ -47,6 +47,8 @@ A -> B -> C
 
 X -> (Y -> Z)
 
+given A, B
+
 axdef
   square : N -> N
   pdiv : N +-> N

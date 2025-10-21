@@ -1,0 +1,134 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 11 . 9 : Generic Type Instantiation}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Basic Generic Instantiation}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $\emptyset[\nat]$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $seq[\nat]$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $P[X]$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Example 2 : Complex Type Parameters}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $\emptyset[\nat \cross \nat]$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $P[\power X]$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $seq[\nat \cross \nat]$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Example 3 : Multiple Type Parameters}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $Type[A, B]$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $Container[X, Y, \num]$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Example 4 : Nested Generic Instantiation}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $Type[List[\nat]]$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $Container[seq[\nat]]$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Example 5 : Chained Generic Instantiation}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $Type[\nat][M]$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Example 6 : Generic Types in Expressions}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $x \in Type[\nat]$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $A \subseteq P[X]$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $\emptyset[\nat] \cup \{x\}$
+
+\medskip
+\bigskip
+\noindent
+\textbf{Example 7 : Generic Types in Set Comprehensions}
+
+\medskip
+
+\noindent
+\hangindent=2em
+(a) $\{ s : P[\nat] | s = \emptyset[\nat] \}$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $\{ x : seq[\nat] | \# x > 0 \}$
+
+\medskip
+\end{document}

@@ -1,0 +1,65 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Schema Examples}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Simple Schema}
+
+\medskip
+
+\begin{schema}{Counter}
+count : \nat
+\where
+count \geq 0
+\end{schema}
+
+\bigskip
+\noindent
+\textbf{Example 2 : Schema with Multiple Fields}
+
+\medskip
+
+\begin{schema}{Point}
+x : \num \\
+y : \num
+\end{schema}
+
+\bigskip
+\noindent
+\textbf{Example 3 : Schema with Constraints}
+
+\medskip
+
+\begin{schema}{BoundedPoint}
+x : \nat \\
+y : \nat
+\where
+x \leq 100 \\
+y \leq 100
+\end{schema}
+
+\bigskip
+\noindent
+\textbf{Example 4 : Schema with Given Types}
+
+\medskip
+
+\begin{zed}[Person]\end{zed}
+
+\begin{schema}{PersonData}
+name : Person \\
+age : \nat
+\where
+age \geq 0 \\
+age \leq 150
+\end{schema}
+
+\end{document}

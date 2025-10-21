@@ -1,0 +1,80 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 4 : Z Notation Basics}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Given Types}
+
+\medskip
+
+\begin{zed}[Person, Company]\end{zed}
+
+\bigskip
+\noindent
+\textbf{Example 2 : Free Types}
+
+\medskip
+
+\begin{zed}Status ::= active | inactive | suspended\end{zed}
+
+\begin{zed}Answer ::= yes | no\end{zed}
+
+\bigskip
+\noindent
+\textbf{Example 3 : Abbreviations}
+
+\medskip
+
+\begin{zed}
+adult == age \geq 18
+\end{zed}
+
+\begin{zed}
+positive == x > 0
+\end{zed}
+
+\bigskip
+\noindent
+\textbf{Example 4 : Axiomatic Definitions}
+
+\medskip
+
+\begin{axdef}
+population : \nat \\
+capacity : \nat
+\where
+population \leq capacity \\
+capacity > 0
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 5 : Schema Definitions}
+
+\medskip
+
+\begin{schema}{Library}
+books : \nat \\
+members : \nat
+\where
+books > 0 \\
+members \geq 0
+\end{schema}
+
+\begin{schema}{BankAccount}
+balance : \nat \\
+overdraft : \nat
+\where
+balance \geq 0 \\
+overdraft \geq 0
+\end{schema}
+
+\end{document}

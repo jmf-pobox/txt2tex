@@ -1,0 +1,67 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 19 Demo : Finite Set Types}
+
+\bigskip
+\noindent
+\textbf{Example 1 : F ( finite sets )}
+
+\medskip
+
+\bigskip
+
+F X denotes all finite subsets of X:
+
+\bigskip
+
+\begin{zed}[SongId, UserId]\end{zed}
+
+\begin{axdef}
+songs : \finset SongId \\
+users : \finset UserId
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 2 : F1 ( non - empty finite sets )}
+
+\medskip
+
+\bigskip
+
+F1 X denotes all non-empty finite subsets of X:
+
+\bigskip
+
+\begin{axdef}
+activeUsers : \finset_1 UserId
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 3 : Combined with function types}
+
+\medskip
+
+\bigskip
+
+Using F and F1 with partial functions:
+
+\bigskip
+
+\begin{zed}[PlaylistId, Playlist]\end{zed}
+
+\begin{axdef}
+playlists : PlaylistId \pfun Playlist \\
+playlistOwner : PlaylistId \pfun UserId \\
+playlistSubscribers : PlaylistId \pfun \finset_1 UserId
+\end{axdef}
+
+\end{document}

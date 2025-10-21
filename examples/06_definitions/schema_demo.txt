@@ -1,54 +1,38 @@
-=== Phase 20 Demo: bigcup (Distributed Union) ===
+=== Schema Examples ===
 
-** Example 1: Basic bigcup **
+** Example 1: Simple Schema **
 
-TEXT: bigcup S is the union of all sets in the set of sets S:
-
-given X
-
-S == P(P(X))
-
-axdef
-  allElements : S -> P(X)
+schema Counter
+  count : N
 where
-  forall s : S | allElements(s) = bigcup(s)
+  count >= 0
 end
 
-** Example 2: bigcup with ran **
+** Example 2: Schema with Multiple Fields **
 
-TEXT: Combining bigcup with ran to get all elements from a relation's range:
-
-given UserId, SongId
-
-axdef
-  loved : UserId +-> F SongId
-  allLovedSongs : F SongId
-where
-  allLovedSongs = bigcup(ran(loved))
+schema Point
+  x : Z
+  y : Z
 end
 
-** Example 3: Set difference with bigcup (Solution 50a) **
+** Example 3: Schema with Constraints **
 
-TEXT: Users who are not subscribers of any playlist:
-
-given PlaylistId, UserId
-
-axdef
-  users : F UserId
-  playlistSubscribers : PlaylistId +-> F1 UserId
-  nonSubscribers : F UserId
+schema BoundedPoint
+  x : N
+  y : N
 where
-  nonSubscribers = users \ bigcup(ran(playlistSubscribers))
+  x <= 100
+  y <= 100
 end
 
-** Example 4: Nested bigcup **
+** Example 4: Schema with Given Types **
 
-TEXT: bigcup can be nested for multi-level set structures:
+given Person
 
-given N
-
-axdef
-  nested : P(P(P(N)))
+schema PersonData
+  name : Person
+  age : N
 where
-  bigcup(bigcup(nested)) subseteq N
+  age >= 0
+  age <= 150
 end

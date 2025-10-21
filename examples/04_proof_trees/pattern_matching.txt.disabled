@@ -1,0 +1,10 @@
+** Test Pattern Matching **
+
+given Entry
+
+axdef
+  courses : seq Entry -> seq Entry
+where
+  courses(<>) = <>
+  forall x : Entry; s : seq Entry | courses(<x> ^ s) = if x.3 = 479 then <x> ^ courses(s) else courses(s)
+end
