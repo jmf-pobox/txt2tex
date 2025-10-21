@@ -1,0 +1,49 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Testing Named Schemas}
+
+\bigskip
+\noindent
+\textbf{Test 1 : Simple Schema}
+
+\medskip
+
+\begin{schema}{State}
+count : \nat
+\where
+count \geq 0
+\end{schema}
+
+\bigskip
+\noindent
+\textbf{Test 2 : Schema with Set}
+
+\medskip
+
+\begin{schema}{Items}
+items : \power \nat
+\where
+\# items \leq 100
+\end{schema}
+
+\bigskip
+\noindent
+\textbf{Test 3 : Schema with Multiple Fields}
+
+\medskip
+
+\begin{schema}{Coordinates}
+x : \nat \\
+y : \nat
+\where
+x + y < 100
+\end{schema}
+
+\end{document}

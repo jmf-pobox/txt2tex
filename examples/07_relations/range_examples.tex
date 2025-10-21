@@ -1,0 +1,94 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Testing Range Operator}
+
+\bigskip
+\noindent
+\textbf{Test 1 : Simple Numeric Range}
+
+\medskip
+
+\noindent
+$1 \upto 10$
+
+
+\bigskip
+\noindent
+\textbf{Test 2 : Range with Identifiers}
+
+\medskip
+
+\noindent
+$1993 \upto current$
+
+
+\bigskip
+\noindent
+\textbf{Test 3 : Range in Set Comprehension}
+
+\medskip
+
+\noindent
+$\{ x : 1 \upto 20 | x \mod 2 = 0 \}$
+
+
+\bigskip
+\noindent
+\textbf{Test 4 : Range with Expressions}
+
+\medskip
+
+\noindent
+$a + 1 \upto b + 2$
+
+
+\bigskip
+\noindent
+\textbf{Test 5 : Range in Schema}
+
+\medskip
+
+\begin{schema}{ValidYear}
+year : 1900 \upto 2100
+\where
+year \geq 1900
+\end{schema}
+
+\bigskip
+\noindent
+\textbf{Test 6 : Union of Ranges}
+
+\medskip
+
+\noindent
+$1 \upto 5 \cup 10 \upto 15$
+
+
+\bigskip
+\noindent
+\textbf{Test 7 : Range with Tuple Projections}
+
+\medskip
+
+\noindent
+$p.1 \upto p.2$
+
+
+\bigskip
+\noindent
+\textbf{Test 8 : Complex Set Comprehension}
+
+\medskip
+
+\noindent
+$\{ x : 1 \upto 10 | x > 3 @ x^2 \}$
+
+
+\end{document}

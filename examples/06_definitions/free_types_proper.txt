@@ -3,22 +3,30 @@
 ** Example: Semicolon bindings in axdef **
 
 axdef
+  dummy : N
 where
+  dummy = 0
   forall x : N; y : N | x + y > 0
 end
 
-** Example: Real usage from Solution 40 **
+** Example: Function on sequences **
+
+given Entry
 
 axdef
-  cumulative_total : seq(Title * Length * Viewed) -> N
+  seqlen : seq Entry -> N
 where
-  cumulative_total (<>) = 0
-  forall x : Title * Length * Viewed; s : seq(Title * Length * Viewed) | cumulative_total (<x> ^ s) = x.2 + cumulative_total s
+  seqlen (<>) = 0
+  forall x : Entry; s : seq Entry | seqlen (<x> ^ s) = 1 + seqlen (s)
 end
 
-** Example: Simpler nested quantifier **
+** Example: Nested quantifier **
+
+given Person
 
 axdef
+  constraint : N
 where
-  forall r : R; i : dom r | i > 0
+  constraint = 1
+  forall p : Person; n : N | n > 0
 end

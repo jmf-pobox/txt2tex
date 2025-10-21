@@ -1,8 +1,8 @@
 === Phase 18 Demo: Partial Function Operators ===
 
-** Example 1: -|> operator (partial injection) **
+** Example 1: Partial injection operator **
 
-TEXT: Basic function type with -|> operator:
+TEXT: Basic function type with partial injection (-|>) operator:
 
 axdef
   f : N -|> N
@@ -13,9 +13,9 @@ where
   f(3) = 30
 end
 
-** Example 2: +-> operator (partial function) **
+** Example 2: Partial function operator **
 
-TEXT: Basic function type with +-> operator:
+TEXT: Basic function type with partial function (+->) operator:
 
 axdef
   g : N +-> N
@@ -25,11 +25,13 @@ where
   g(2) = 200
 end
 
-** Example 3: Complex types with -|> **
+** Example 3: Complex types with partial injection **
 
-TEXT: Using -|> with custom types:
+TEXT: Using partial injection (-|>) with custom types:
 
-given Year, Entry
+Year == N
+
+given Entry
 
 Table == seq(Entry)
 

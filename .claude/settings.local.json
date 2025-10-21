@@ -40,7 +40,9 @@
       "Bash(for dir in 01 02 03 04 05 06 07 08 09 fuzz_tests)",
       "Bash(do echo \"=== Testing $dir ===\")",
       "Bash(done)",
-      "Bash(pdftotext:*)"
+      "Bash(pdftotext:*)",
+      "Bash(env TEXINPUTS=tex//: fuzz examples/06_definitions/free_types_proper.tex)",
+      "Bash(env TEXINPUTS=tex//: fuzz:*)"
     ],
     "deny": [],
     "ask": []

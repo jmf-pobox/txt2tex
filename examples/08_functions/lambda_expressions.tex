@@ -1,0 +1,93 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 11 d : Lambda Expressions}
+
+\bigskip
+
+Lambda expressions provide a concise way to define anonymous functions.
+
+\bigskip
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+Simple lambda expression
+
+\bigskip
+
+\noindent
+$\lambda x : \nat \bullet x^2$
+
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+Multi-variable lambda
+
+\bigskip
+
+\noindent
+$\lambda x, y : \nat \bullet x \land y$
+
+
+\medskip
+
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+Lambda with comparison
+
+\bigskip
+
+\noindent
+$\lambda x : \nat \bullet x > 0$
+
+
+\medskip
+
+(d)
+\par
+\vspace{11pt}
+\bigskip
+
+Nested lambda expression
+
+\bigskip
+
+\noindent
+$\lambda x : X \bullet \lambda y : Y \bullet x \land y$
+
+
+\medskip
+
+(e)
+\par
+\vspace{11pt}
+\bigskip
+
+Lambda with quantifier in body
+
+\bigskip
+
+\noindent
+$\lambda x : X \bullet \forall y : Y @ x \lor y$
+
+
+\medskip
+
+\end{document}

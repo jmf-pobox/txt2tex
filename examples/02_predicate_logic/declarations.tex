@@ -1,0 +1,99 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 9 : Generic Parameters}
+
+\bigskip
+
+This example demonstrates Z notation definitions with generic (polymorphic) type parameters.
+
+\bigskip
+
+\bigskip
+
+Basic generic abbreviation for a Pair type:
+
+\bigskip
+
+\begin{zed}
+Pair[X] == X \cross X
+\end{zed}
+
+\bigskip
+
+Generic abbreviation with two type parameters:
+
+\bigskip
+
+\begin{zed}
+Product[X, Y] == X \cross Y
+\end{zed}
+
+\bigskip
+
+Generic axiomatic definition with constraints:
+
+\bigskip
+
+\begin{gendef}[T]
+  identity: T
+\where
+  identity = identity
+\end{gendef}
+
+\bigskip
+
+Generic schema for a Stack data structure:
+
+\bigskip
+
+\begin{schema}{Stack}[X]
+items : X \\
+top : X
+\where
+top \in items
+\end{schema}
+
+\bigskip
+
+Generic schema with multiple parameters:
+
+\bigskip
+
+\begin{schema}{Relation}[X, Y]
+domain : X \\
+range : Y
+\where
+domain \in X \\
+range \in Y
+\end{schema}
+
+\bigskip
+
+Non-generic definitions still work as before:
+
+\bigskip
+
+\begin{zed}
+Naturals == \nat
+\end{zed}
+
+\begin{axdef}
+zero : \nat
+\where
+zero = 0
+\end{axdef}
+
+\begin{schema}{Counter}
+value : \nat
+\where
+value \geq 0
+\end{schema}
+
+\end{document}

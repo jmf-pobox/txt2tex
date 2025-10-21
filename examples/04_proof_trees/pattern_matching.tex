@@ -1,0 +1,25 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\bigskip
+\noindent
+\textbf{Test Pattern Matching}
+
+\medskip
+
+\begin{zed}[Entry]\end{zed}
+
+\begin{axdef}
+courses : \seq Entry \fun \seq Entry
+\where
+courses(\langle \rangle) = \langle \rangle \\
+\forall x : Entry @ \forall s : \seq Entry @ courses(\langle x \rangle \cat s) = \IF x.3 = 479 \THEN \langle x \rangle \cat courses(s) \ELSE courses(s)
+\end{axdef}
+
+\end{document}

@@ -12,7 +12,7 @@ TEXT: Generic abbreviation with two type parameters:
 
 TEXT: Generic axiomatic definition with constraints:
 
-axdef [T]
+gendef [T]
   identity : T
 where
   identity = identity
