@@ -139,6 +139,10 @@ class Parser:
         # Track whether we're parsing schema text (lambda/set comp declarations)
         # where periods are separators, not projection operators
         self._parsing_schema_text = False
+        # Track whether we're in a comprehension/quantifier body where
+        # periods can be expression separators
+        # ({ x : X | pred . expr } or mu x : X | pred . expr)
+        self._in_comprehension_body = False
 
     def parse(self) -> Document | Expr:
         """
@@ -1163,33 +1167,39 @@ class Parser:
         # Phase 21: Allow newlines after | (multi-line quantifiers)
         self._skip_newlines()
 
-        # Parse body
-        # Phase 21: Use _parse_expr() to allow nested quantifiers
-        # Phase 21b: Check for constrained quantifier (forall x : T | constraint | body)
-        # Parse first expression (constraint or full body)
-        body = self._parse_expr()
+        # Set flag: we're in quantifier body where . can be separator (for mu)
+        self._in_comprehension_body = True
+        try:
+            # Parse body
+            # Phase 21: Use _parse_expr() to allow nested quantifiers
+            # Phase 21b: Check for constrained quantifier
+            # (forall x : T | constraint | body)
+            # Parse first expression (constraint or full body)
+            body = self._parse_expr()
 
-        # Phase 21b: Check for second pipe (constrained quantifier)
-        # Syntax: forall x : T | constraint | body
-        # Semantics: forall x : T | constraint and body
-        if self._match(TokenType.PIPE):
-            self._advance()  # Consume second '|'
-            constraint = body
-            actual_body = self._parse_expr()
-            # Combine constraint and body with AND
-            body = BinaryOp(
-                operator="and",
-                left=constraint,
-                right=actual_body,
-                line=constraint.line,
-                column=constraint.column,
-            )
+            # Phase 21b: Check for second pipe (constrained quantifier)
+            # Syntax: forall x : T | constraint | body
+            # Semantics: forall x : T | constraint and body
+            if self._match(TokenType.PIPE):
+                self._advance()  # Consume second '|'
+                constraint = body
+                actual_body = self._parse_expr()
+                # Combine constraint and body with AND
+                body = BinaryOp(
+                    operator="and",
+                    left=constraint,
+                    right=actual_body,
+                    line=constraint.line,
+                    column=constraint.column,
+                )
 
-        # Phase 11.5: Check for optional expression part (mu only)
-        expression: Expr | None = None
-        if quant_token.value == "mu" and self._match(TokenType.PERIOD):
-            self._advance()  # Consume '.'
-            expression = self._parse_iff()  # Parse the expression part
+            # Phase 11.5: Check for optional expression part (mu only)
+            expression: Expr | None = None
+            if quant_token.value == "mu" and self._match(TokenType.PERIOD):
+                self._advance()  # Consume '.'
+                expression = self._parse_iff()  # Parse the expression part
+        finally:
+            self._in_comprehension_body = False
 
         return Quantifier(
             quantifier=quant_token.value,
@@ -1254,14 +1264,19 @@ class Parser:
         # Phase 21: Allow newlines after | (multi-line quantifiers)
         self._skip_newlines()
 
-        # Parse body
-        body = self._parse_iff()
+        # Set flag: we're in quantifier body where . can be separator (for mu)
+        self._in_comprehension_body = True
+        try:
+            # Parse body
+            body = self._parse_iff()
 
-        # Check for mu expression part
-        expression: Expr | None = None
-        if quantifier == "mu" and self._match(TokenType.PERIOD):
-            self._advance()  # Consume '.'
-            expression = self._parse_iff()
+            # Check for mu expression part
+            expression: Expr | None = None
+            if quantifier == "mu" and self._match(TokenType.PERIOD):
+                self._advance()  # Consume '.'
+                expression = self._parse_iff()
+        finally:
+            self._in_comprehension_body = False
 
         return Quantifier(
             quantifier=quantifier,
@@ -1461,14 +1476,19 @@ class Parser:
         elif self._match(TokenType.PIPE):
             # Pipe separator: parse predicate, optionally followed by . expr
             self._advance()  # Consume '|'
-            predicate = self._parse_set_predicate()
+            # Set flag: we're in comprehension body where . can be separator
+            self._in_comprehension_body = True
+            try:
+                predicate = self._parse_set_predicate()
 
-            # Parse optional expression part (. expression)
-            expression = None
-            if self._match(TokenType.PERIOD):
-                self._advance()  # Consume '.'
-                # Parse expression (up to })
-                expression = self._parse_set_expression()
+                # Parse optional expression part (. expression)
+                expression = None
+                if self._match(TokenType.PERIOD):
+                    self._advance()  # Consume '.'
+                    # Parse expression (up to })
+                    expression = self._parse_set_expression()
+            finally:
+                self._in_comprehension_body = False
         elif self._match(TokenType.RBRACE):
             # No separator: both predicate and expression are omitted
             # {x : T} means "all x of type T", equivalent to just T
@@ -1933,9 +1953,23 @@ class Parser:
                         # Numbers don't have named fields
                         break
 
+                    # Check if we're in a comprehension/quantifier body where
+                    # period could be expression separator
+                    # If so, check what follows the identifier
+                    token_after_id = self._peek_ahead(2)
+
+                    # In comprehension body, .identifier} likely means separator + expr
+                    # Example: {z : Z | z = z_0 * z_0 * z_0 . z}
+                    #          period is separator, not projection
+                    if (
+                        self._in_comprehension_body
+                        and token_after_id.type == TokenType.RBRACE
+                    ):
+                        # Likely expression separator, not projection
+                        break
+
                     # Only parse if followed by safe token
                     # (not ambiguous with separator)
-                    token_after_id = self._peek_ahead(2)
 
                     # Safe followers that indicate this is field projection,
                     # not separator
