@@ -16,10 +16,16 @@
 \begin{zed}[Entry]\end{zed}
 
 \begin{axdef}
-courses : \seq Entry \fun \seq Entry
+filter : \seq Entry \fun \seq Entry
 \where
-courses(\langle \rangle) = \langle \rangle \\
-\forall x : Entry @ \forall s : \seq Entry @ courses(\langle x \rangle \cat s) = \IF x.3 = 479 \THEN \langle x \rangle \cat courses(s) \ELSE courses(s)
+filter(\langle \rangle) = \langle \rangle \\
+\forall x : Entry @ \forall s : \seq Entry @ filter(\langle x \rangle \cat s) = \langle x \rangle \cat filter(s)
 \end{axdef}
+
+\bigskip
+
+This demonstrates pattern matching on sequences with base case ($\langle \rangle$) and recursive case ($\langle x \rangle$ ^ s).
+
+\bigskip
 
 \end{document}

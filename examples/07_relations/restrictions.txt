@@ -1,0 +1,57 @@
+=== Function Application Examples ===
+
+given Item, Dog, Person, X
+
+TEXT: This file demonstrates function application in Z notation definitions.
+
+** Example 1: Basic function definitions **
+
+axdef
+  square : N -> N
+  double : N -> N
+where
+  forall n : N | square(n) = n * n
+  forall n : N | double(n) = 2 * n
+end
+
+** Example 2: Functions with multiple arguments **
+
+axdef
+  add : N cross N -> N
+  maximum : N cross N -> N
+where
+  forall a, b : N | add(a, b) = a + b
+  forall a, b : N | (maximum(a, b) = a or maximum(a, b) = b) and maximum(a, b) >= a and maximum(a, b) >= b
+end
+
+** Example 3: Generic functions **
+
+gendef [X]
+  collection : seq X
+end
+
+** Example 4: Function application in quantifiers **
+
+axdef
+  posFunc : N -> N
+where
+  forall x : N | posFunc(x) > 0 => posFunc(x) > 0
+end
+
+** Example 5: Schema with function type **
+
+schema Heights
+  height : Person -> N
+where
+  forall p : Person | height(p) > 0 and height(p) < 300
+end
+
+** Example 6: Nested function application **
+
+axdef
+  func1 : N -> N
+  func2 : N -> N
+  func3 : N -> N
+where
+  forall x : N | func1(func2(func3(x))) >= 0
+end

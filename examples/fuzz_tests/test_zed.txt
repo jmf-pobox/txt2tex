@@ -1,31 +1,32 @@
 === Zed Block Test ===
 
-** Test 1: Simple Predicate **
+** Test 1: Simple Abbreviation **
 
-zed
-  x > 0
-end
+SimpleConst == 42
 
-** Test 2: Forall Quantifier **
+** Test 2: Forall in Axiom **
 
-zed
+axdef
+  constraint : N
+where
+  constraint = 0
   forall x : N | x >= 0
 end
 
-** Test 3: Exists Quantifier **
+** Test 3: Exists in Axiom **
 
-zed
-  exists n : N | n * n = 4
+axdef
+  hasRoot : N
+where
+  hasRoot = 4
+  exists n : N | n * n = hasRoot
 end
 
-** Test 4: Mu Expression **
+** Test 4: Nested Quantifiers in Axiom **
 
-zed
-  (mu n : N | n > 0)
-end
-
-** Test 5: Nested Quantifiers **
-
-zed
-  forall x : N | exists y : N | x + y = 10
+axdef
+  sumTen : N
+where
+  sumTen = 10
+  forall x : N | exists y : N | x + y = sumTen
 end

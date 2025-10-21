@@ -12,9 +12,9 @@ Answer ::= yes | no
 
 ** Example 3: Abbreviations **
 
-adult == age >= 18
+MaxCapacity == 100
 
-positive == x > 0
+DefaultSize == 10
 
 ** Example 4: Axiomatic Definitions **
 

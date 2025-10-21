@@ -7,231 +7,90 @@
 \usepackage{zed-proof}
 \begin{document}
 
-\section*{Phase 11 b : Function Application}
+\section*{Function Application Examples}
+
+\begin{zed}[Item, Dog, Person, X]\end{zed}
 
 \bigskip
 
-Basic function application (single argument):
+This file demonstrates function $application \in Z$ notation definitions.
 
 \bigskip
 
-\noindent
-$f(x)$
-
-
-\noindent
-$square(5)$
-
-
-\noindent
-$parent(john)$
-
-
 \bigskip
-
-Multiple arguments:
-
-\bigskip
-
 \noindent
-$g(x, y, z)$
+\textbf{Example 1 : Basic function definitions}
 
-
-\noindent
-$sum(a, b, c, d)$
-
-
-\noindent
-$max(x, y)$
-
-
-\bigskip
-
-Nested function application:
-
-\bigskip
-
-\noindent
-$f(g(x))$
-
-
-\noindent
-$f(g(h(x)))$
-
-
-\noindent
-$outer(middle(inner(value)))$
-
-
-\bigskip
-
-Empty argument list:
-
-\bigskip
-
-\noindent
-$f()$
-
-
-\noindent
-$initialize()$
-
-
-\bigskip
-
-Function application in expressions:
-
-\bigskip
-
-\noindent
-$f(x) \land g(y)$
-
-
-\noindent
-$f(x) \implies g(x)$
-
-
-\noindent
-$f(x) > 0$
-
-
-\noindent
-$height(m) < 10$
-
-
-\bigskip
-
-Function application in quantifiers:
-
-\bigskip
-
-\noindent
-$\forall x : \nat @ f(x) > 0$
-
-
-\noindent
-$\exists d : Dog @ gentle(d) \land neat(d)$
-
-
-\noindent
-$\forall x, y : \nat @ g(x, y) = g(y, x)$
-
-
-\bigskip
-
-Special Z notation functions (generic instantiation):
-
-\bigskip
+\medskip
 
 \begin{axdef}
-items : \seq \nat \\
-possibilities : \power Item \\
-collection : \bag X \\
-sequence : \iseq \nat
-\end{axdef}
-
-\bigskip
-
-Function application with set membership:
-
-\bigskip
-
-\noindent
-$x \in f(S)$
-
-
-\noindent
-$y \in \power X$
-
-
-\noindent
-$z \in \seq \nat$
-
-
-\bigskip
-
-Complex predicates from Solution 5:
-
-\bigskip
-
-\noindent
-$\exists d : Dog @ gentle(d) \land neat(d)$
-
-
-\noindent
-$\forall d : Dog @ neat(d) \implies attractive(d)$
-
-
-\bigskip
-
-Function application in definitions:
-
-\bigskip
-
-\begin{axdef}
-f : X \fun Y
+square : \nat \fun \nat \\
+double : \nat \fun \nat
 \where
-\forall x : X @ f(x) \in Y
+\forall n : \nat @ square(n) = n * n \\
+\forall n : \nat @ double(n) = 2 * n
 \end{axdef}
 
-\begin{schema}{PersonHeight}
+\bigskip
+\noindent
+\textbf{Example 2 : Functions with multiple arguments}
+
+\medskip
+
+\begin{axdef}
+add : \nat \cross \nat \fun \nat \\
+maximum : \nat \cross \nat \fun \nat
+\where
+\forall a, b : \nat @ add(a, b) = a + b \\
+\forall a, b : \nat @ (maximum(a, b) = a \lor maximum(a, b) = b) \land maximum(a, b) \geq a \land maximum(a, b) \geq b
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 3 : Generic functions}
+
+\medskip
+
+\begin{gendef}[X]
+  collection: \seq X
+\end{gendef}
+
+\bigskip
+\noindent
+\textbf{Example 4 : Function application in quantifiers}
+
+\medskip
+
+\begin{axdef}
+posFunc : \nat \fun \nat
+\where
+\forall x : \nat @ posFunc(x) > 0 \implies posFunc(x) > 0
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 5 : Schema with function type}
+
+\medskip
+
+\begin{schema}{Heights}
 height : Person \fun \nat
 \where
 \forall p : Person @ height(p) > 0 \land height(p) < 300
 \end{schema}
 
 \bigskip
-
-Function application with comparisons:
-
-\bigskip
-
 \noindent
-$f(x, y) > g(x, y)$
+\textbf{Example 6 : Nested function application}
 
+\medskip
 
-\noindent
-$max(x, y) = max(y, x)$
-
-
-\noindent
-$f(0) = 1$
-
-
-\bigskip
-
-Expression arguments:
-
-\bigskip
-
-\noindent
-$f(x \land y)$
-
-
-\noindent
-$g(x \lor y, p \implies q)$
-
-
-\noindent
-$h(a > b, c < d)$
-
-
-\bigskip
-
-Function application with subscripts and superscripts:
-
-\bigskip
-
-\noindent
-$f(x_i)$
-
-
-\noindent
-$g(x^2)$
-
-
-\noindent
-$h(a_1, a_2)$
-
+\begin{axdef}
+func1 : \nat \fun \nat \\
+func2 : \nat \fun \nat \\
+func3 : \nat \fun \nat
+\where
+\forall x : \nat @ func1(func2(func3(x))) \geq 0
+\end{axdef}
 
 \end{document}

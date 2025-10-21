@@ -7,95 +7,58 @@
 \usepackage{zed-proof}
 \begin{document}
 
-\section*{Solution 40 Test ( Conditional Expressions )}
+\section*{Recursive Function Examples}
 
-\bigskip
-\noindent
-\textbf{Solution 40 ( c ) - viewed function with conditional}
-
-\medskip
+\begin{zed}[Entry]\end{zed}
 
 \bigskip
 
-Recursive definition using conditional expression:
-
-\bigskip
-
-\bigskip
-
-viewed $\langle \rangle$ = $\langle \rangle$
-
-\bigskip
-
-\bigskip
-
-viewed $\langle x \rangle$ ^ $s = if$ x.3 = yes then $\langle x \rangle$ ^ viewed s else viewed s
+This file demonstrates recursive functions on sequences.
 
 \bigskip
 
 \bigskip
 \noindent
-\textbf{Solution 40 ( d ) - cumulative_total recursive function}
+\textbf{Example 1 : Simple recursive function}
 
 \medskip
 
 \begin{axdef}
-cumulative\_total : \seq Title * Length * Viewed \fun \nat
+length : \seq Entry \fun \nat
 \where
-cumulative\_total(\langle \rangle) = 0
+length(\langle \rangle) = 0 \\
+\forall x : Entry @ \forall s : \seq Entry @ length(\langle x \rangle \cat s) = 1 + length(s)
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 2 : Identity function on sequences}
+
+\medskip
+
+\begin{axdef}
+identity : \seq Entry \fun \seq Entry
+\where
+identity(\langle \rangle) = \langle \rangle \\
+\forall x : Entry @ \forall s : \seq Entry @ identity(\langle x \rangle \cat s) = \langle x \rangle \cat identity(s)
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 3 : Sequence doubling}
+
+\medskip
+
+\begin{axdef}
+duplicate : \seq \nat \fun \seq \nat
+\where
+duplicate(\langle \rangle) = \langle \rangle \\
+\forall n : \nat @ \forall s : \seq \nat @ duplicate(\langle n \rangle \cat s) = \langle n, n \rangle \cat duplicate(s)
 \end{axdef}
 
 \bigskip
 
-Note: $\forall$ with semicolon-separated bindings not yet supported
-
-\bigskip
-
-\bigskip
-\noindent
-\textbf{Solution 41 ( c ) - 479_courses with conditional}
-
-\medskip
-
-\bigskip
-
-$\forall$ $x : Entry$; $s : seq Entry |$
-
-\bigskip
-
-\bigskip
-
-479_courses ($\langle \rangle$) = $\langle \rangle$
-
-\bigskip
-
-\bigskip
-
-479_courses ($\langle x \rangle$ ^ s) = if x.3 = 479 then $\langle x \rangle$ ^ 479_courses s else 479_courses s
-
-\bigskip
-
-\bigskip
-\noindent
-\textbf{Solution 41 ( d ) - total function}
-
-\medskip
-
-\bigskip
-
-$\forall$ $x : Entry$; $s : seq Entry |$
-
-\bigskip
-
-\bigskip
-
-total ($\langle \rangle$) = 0
-
-\bigskip
-
-\bigskip
-
-total ($\langle x \rangle$ ^ s) = x.5 + total s
+These examples show pattern matching on sequences with base cases and recursive cases.
 
 \bigskip
 
