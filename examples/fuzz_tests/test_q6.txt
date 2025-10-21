@@ -4,7 +4,7 @@
 
 (a)
 axdef
-  SquaresOfEvens : P Z
+  Squares : P Z
 where
-  SquaresOfEvens = { z : Z | z mod 2 = 0 . z^2 }
+  Squares = { z : Z | z > 0 . z * z }
 end

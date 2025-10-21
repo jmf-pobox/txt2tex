@@ -18,23 +18,20 @@ where
   identity = identity
 end
 
-TEXT: Generic schema for a Stack data structure:
+TEXT: Generic schema for a collection:
 
-schema Stack[X]
-  items : X
-  top : X
+schema Collection[X]
+  items : seq X
+  count : N
 where
-  top in items
+  count = # items
 end
 
 TEXT: Generic schema with multiple parameters:
 
-schema Relation[X, Y]
-  domain : X
-  range : Y
-where
-  domain in X
-  range in Y
+schema Tuple[X, Y]
+  first : X
+  second : Y
 end
 
 TEXT: Non-generic definitions still work as before:

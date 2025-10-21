@@ -1,0 +1,122 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Mu Operator ( μ )}
+
+\bigskip
+\noindent
+\textbf{Example 1 : Basic Mu Expression}
+
+\medskip
+
+\bigskip
+
+The mu operator returns "the unique value that" satisfies a predicate:
+
+\bigskip
+
+\noindent
+$(\mu x : \nat | x = 5)$
+
+
+\noindent
+$(\mu n : \nat | \forall m : \nat @ n \leq m)$
+
+
+\bigskip
+\noindent
+\textbf{Example 2 : Mu with Precondition}
+
+\medskip
+
+\bigskip
+
+The $\exists_1$ quantifier provides a precondition to ensure mu is well-defined:
+
+\bigskip
+
+\bigskip
+
+Since the proposition
+
+\bigskip
+
+\noindent
+$\exists_1 n : \nat @ \forall m : \nat @ n \leq m$
+
+
+\bigskip
+
+is equivalent to true, we can be certain that
+
+\bigskip
+
+\noindent
+$(\mu n : \nat | \forall m : \nat @ n \leq m)$
+
+
+\bigskip
+
+will return a result (which is 0).
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 3 : Mu in Expressions}
+
+\medskip
+
+\bigskip
+
+Using mu to select unique values:
+
+\bigskip
+
+\noindent
+$(\mu a : \nat | a = a) = 0$
+
+
+\noindent
+$(\mu z : \num | z = 10) = 10$
+
+
+\bigskip
+\noindent
+\textbf{Example 4 : Undefined Mu Expressions}
+
+\medskip
+
+\bigskip
+
+When no unique value exists, mu is undefined:
+
+\bigskip
+
+\noindent
+$(\mu b : \nat | b = b)$
+
+
+\bigskip
+
+This is undefined because the property holds for all natural numbers, not just one.
+
+\bigskip
+
+\noindent
+$(\mu c : \nat | c > c)$
+
+
+\bigskip
+
+This is also undefined because no natural number satisfies this property.
+
+\bigskip
+
+\end{document}

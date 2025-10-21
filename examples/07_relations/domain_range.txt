@@ -1,44 +1,38 @@
 === Phase 11a: Function Types ===
 
+given X, Y, Z
+
 TEXT: Total functions (every element in domain has a mapping):
 
 axdef
-  f : X -> Y
-  g : N -> N
+  totalF1 : X -> Y
+  totalF2 : N -> N
 end
 
 TEXT: Partial functions (some elements may not have a mapping):
 
 axdef
-  f : X +-> Y
+  partialF : X +-> Y
 end
 
 TEXT: Injections (one-to-one mappings):
 
 axdef
-  ftotal : X >-> Y
-  fpartial : X >+> Y
+  injTotal : X >-> Y
+  injPartial : X >+> Y
 end
 
 TEXT: Surjections (onto mappings):
 
 axdef
-  ftotal : X -->> Y
-  fpartial : X +->> Y
+  surjTotal : X -->> Y
+  surjPartial : X +->> Y
 end
 
 TEXT: Bijections (one-to-one and onto):
 
 axdef
-  f : X >->> Y
-end
-
-TEXT: Complex function types (nested and higher-order):
-
-axdef
-  f : (X -> Y) -> Z
-  g : X -> (Y +-> Z)
-  h : (N -> N) -> (N -> N)
+  bijection : X >->> Y
 end
 
 TEXT: Mixed operators (relations and function types work together):
@@ -46,6 +40,4 @@ TEXT: Mixed operators (relations and function types work together):
 axdef
   relation : X <-> Y
   function : X -> Y
-where
-  function subset relation
 end

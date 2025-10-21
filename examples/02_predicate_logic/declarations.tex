@@ -49,15 +49,15 @@ Generic axiomatic definition with constraints:
 
 \bigskip
 
-Generic schema for a Stack data structure:
+Generic schema for a collection:
 
 \bigskip
 
-\begin{schema}{Stack}[X]
-items : X \\
-top : X
+\begin{schema}{Collection}[X]
+items : \seq X \\
+count : \nat
 \where
-top \in items
+count = \# items
 \end{schema}
 
 \bigskip
@@ -66,12 +66,9 @@ Generic schema with multiple parameters:
 
 \bigskip
 
-\begin{schema}{Relation}[X, Y]
-domain : X \\
-range : Y
-\where
-domain \in X \\
-range \in Y
+\begin{schema}{Tuple}[X, Y]
+first : X \\
+second : Y
 \end{schema}
 
 \bigskip
