@@ -146,8 +146,8 @@ class LaTeXGenerator:
         "rev": r"\rev",  # Reverse sequence
         # Postfix operators (Phase 10b) - special handling needed
         "~": r"^{-1}",  # Relational inverse (superscript -1)
-        "+": r"^+",  # Transitive closure (superscript +)
-        "*": r"^*",  # Reflexive-transitive closure (superscript *)
+        "+": r"^{+}",  # Transitive closure (superscript +)
+        "*": r"^{*}",  # Reflexive-transitive closure (superscript *)
     }
 
     # Quantifier mappings (Phase 3, enhanced in Phase 6-7)
@@ -457,7 +457,12 @@ class LaTeXGenerator:
 
         # Phase 10b: Check if this is a postfix operator (rendered as superscript)
         if node.operator in {"~", "+", "*"}:
-            # Postfix: operand^{superscript}
+            # Fuzz uses special commands for transitive closure operators
+            if self.use_fuzz and node.operator == "+":
+                return rf"{operand} \plus"
+            if self.use_fuzz and node.operator == "*":
+                return rf"{operand} \star"
+            # Standard LaTeX or inverse: operand^{superscript}
             return f"{operand}{op_latex}"
         # Phase 11.5, 19: Generic instantiation operators (P, P1, F, F1)
         # Per fuzz manual p.23: prefix generic symbols are operator symbols,
@@ -644,11 +649,12 @@ class LaTeXGenerator:
         """Generate LaTeX for lambda expression (Phase 11d).
 
         Examples:
-        - lambda x : N . x^2 -> \\lambda x : \\nat \\bullet x^{2}
-        - lambda x, y : N . x + y -> \\lambda x, y : \\nat \\bullet x + y
-        - lambda f : X -> Y . f(x) -> \\lambda f : X \\fun Y \\bullet f(x)
+        - lambda x : N . x^2 -> (\\lambda x : \\nat @ x^{2}) in fuzz mode
+        - lambda x, y : N . x + y -> (\\lambda x, y : \\nat @ x + y) in fuzz mode
+        - lambda f : X -> Y . f(x) -> (\\lambda f : X \\fun Y @ f(x)) in fuzz mode
 
         Note: Uses : (colon) for lambda binding, not \\colon.
+        Fuzz requires @ separator and parentheses around lambdas in expressions.
         """
         # Generate variables (comma-separated for multi-variable)
         variables_str = ", ".join(node.variables)
@@ -658,12 +664,18 @@ class LaTeXGenerator:
         domain_latex = self.generate_expr(node.domain)
         parts.append(domain_latex)
 
-        # Add bullet separator and body
-        parts.append(r"\bullet")
+        # Add bullet/@ separator (fuzz uses @, standard LaTeX uses \bullet)
+        parts.append("@" if self.use_fuzz else r"\bullet")
         body_latex = self.generate_expr(node.body)
         parts.append(body_latex)
 
-        return " ".join(parts)
+        result = " ".join(parts)
+
+        # Fuzz requires lambdas to be parenthesized when appearing in expressions
+        if self.use_fuzz and parent is not None:
+            result = f"({result})"
+
+        return result
 
     def _generate_set_comprehension(
         self, node: SetComprehension, parent: Expr | None = None
@@ -2246,9 +2258,9 @@ class LaTeXGenerator:
             for i, pred in enumerate(node.predicates):
                 # Top-level predicates: pass parent=None for smart parenthesization
                 pred_latex = self.generate_expr(pred, parent=None)
-                # Fuzz requires \\ after each predicate except the last
+                # Fuzz requires explicit conjunction between predicates
                 if self.use_fuzz and i < len(node.predicates) - 1:
-                    lines.append(f"{pred_latex} \\\\")
+                    lines.append(f"{pred_latex} \\land")
                 else:
                     lines.append(pred_latex)
 
@@ -2357,9 +2369,9 @@ class LaTeXGenerator:
             for i, pred in enumerate(node.predicates):
                 # Top-level predicates: pass parent=None for smart parenthesization
                 pred_latex = self.generate_expr(pred, parent=None)
-                # Fuzz requires \\ after each predicate except the last
+                # Fuzz requires explicit conjunction between predicates
                 if self.use_fuzz and i < len(node.predicates) - 1:
-                    lines.append(f"{pred_latex} \\\\")
+                    lines.append(f"{pred_latex} \\land")
                 else:
                     lines.append(pred_latex)
 
