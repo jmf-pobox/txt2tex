@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
-**Last Updated:** 2025-10-19
-**Current Phase:** Phase 20 (Semicolon-Separated Declarations) ✓ COMPLETE
+**Last Updated:** 2025-10-21
+**Current Phase:** Phase 21 (Schema Separator and subseteq Operator) ✓ COMPLETE
 
 ---
 
@@ -21,6 +21,7 @@
 **Recent Improvements:**
 - Phase 19: Added space-separated application, completed Solutions 44-47
 - Phase 20: Added semicolon-separated declarations for gendef/axdef/schema
+- Phase 21: Fixed schema predicate separators, added subseteq operator (7→4 fuzz errors)
 
 ---
 
@@ -61,7 +62,7 @@
 - ✓ Semicolon-separated bindings: `forall x : T; y : U | P`
 
 ### Sets
-- ✓ Operators: `in`, `notin`, `subset`, `union`, `intersect`, `\`
+- ✓ Operators: `in`, `notin`, `subset`, `subseteq`, `union`, `intersect`, `\`
 - ✓ Cartesian product: `cross`, `×`
 - ✓ Power set: `P`, `P1`, `F` (finite sets), `F1`
 - ✓ Cardinality: `#`
@@ -356,6 +357,13 @@
 - Each declaration appears on its own line in PDF
 - Note: Semicolon (`;`) no longer supported for relational composition - use `o9` or `comp`
 
+### ✅ Phase 21: Schema Separator and subseteq Operator
+- Fixed predicate separator in schemas: Changed from `\land` to `\\`
+- Fuzz requires `\\` separator (not conjunction operator `\land`) between predicates
+- Fixed all 3 schema formatting errors in compiled_solutions.tex
+- Added `subseteq` as alternative notation for `subset` (both → `\subseteq`)
+- Reduced fuzz validation errors from 7 to 4 (all remaining are known fuzz limitations)
+
 ---
 
 ## Syntax Requirements & Limitations
@@ -407,6 +415,28 @@ Following the conventions used in the fuzz package test suite:
 - With `--fuzz`: Generates `cumulative_total` for fuzz package (but fuzz will reject it)
 
 **Note**: This is a fuzz limitation, not a txt2tex limitation. The tool fully supports underscores in identifiers.
+
+#### Fuzz Validation Status (Phase 21)
+
+**Current status**: 4 fuzz validation errors in `compiled_solutions.tex` (all known fuzz limitations)
+
+1. **Line 1149**: `\id[Person]` - Generic bracket syntax not supported by fuzz
+   - **Issue**: Fuzz doesn't support generic instantiation with brackets on identity function
+   - **Limitation**: Inherent to fuzz type checker
+
+2. **Line 1622**: Tuple projection `.3` - Not supported by fuzz
+   - **Issue**: Fuzz doesn't recognize `.3` tuple projection syntax
+   - **Limitation**: Documented in docs/FUZZ_FEATURE_GAPS.md
+
+3. **Line 1640**: Tuple projection `.2` - Not supported by fuzz
+   - **Issue**: Fuzz doesn't recognize `.2` tuple projection syntax
+   - **Limitation**: Documented in docs/FUZZ_FEATURE_GAPS.md
+
+4. **Line 1770**: Tuple projection `.2` - Not supported by fuzz
+   - **Issue**: Fuzz doesn't recognize `.2` tuple projection syntax
+   - **Limitation**: Documented in docs/FUZZ_FEATURE_GAPS.md
+
+**Note**: All 4 errors are known limitations of the fuzz type checker, not bugs in txt2tex. The LaTeX compiles successfully to PDF despite these fuzz validation errors.
 
 ### Function and Type Application
 
@@ -533,7 +563,7 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 878 passing (as of Phase 20, October 2025)
+- **Total Tests:** 897 passing (as of Phase 21, October 2025)
 - **Component Coverage:**
   - parser.py: 88.91%
   - latex_gen.py: 80.61%
@@ -555,6 +585,7 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 - Phase 18: 14 tests (digit-starting identifiers)
 - Phase 19: 10 tests (space-separated application)
 - Phase 20: 20 tests (semicolon-separated declarations in gendef/axdef/schema)
+- Phase 21: Covered by existing tests (schema separator and subseteq fixes)
 
 ---
 
