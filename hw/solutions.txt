@@ -158,7 +158,7 @@ PROOF:
   
 TEXT: In this proof, I start by working from the bottom mechanically, taking (p => r) and (q => r) as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need (p or q) and r as inputs to the implication introduction rule.  I take (p or q) as assumption [2] and discharge this assumption via this rule.  That leaves me with r as the result of my bottom up process.  As I have already made assumptions ((p => r) and (q => r)) [1] and (p or q) [2] and they are related, I start by working with both top-down. I begin with (p or q) [2] and create cases for p and q working towards or elimination.  The p and q sub-branches are marked with [2] as the assumption as these are just the cases for (p or q) [2] [cite simpson25c slide 41]. First, I apply and elimination in each case to get (p => r), (q => r) with p, q respectively in the sub-branches.  From there, I apply implication elimination to arrive at r in both cases.  This enables me to use the or elimation together with (p or q) [2] to simplify to r.  At this stage, I do not discharge assumption [2], as this is deferred until the next step. I use implication introduction together with (p or q) [2] and r from the or elimination to discharge assumption [2], which connects the top-down and bottom-up process. All assumptions are properly discharged.  
 
-TEXT: In the other direction, we are seeking to prove (p or q => r) => (p => r) and (q => r):
+TEXT: In the other direction, we are seeking to prove (p or q => r) => ((p => r) and (q => r)):
 
 PROOF:
 ((p or q) => r) => ((p => r) and (q => r))  [=> intro from 1]

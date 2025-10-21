@@ -331,7 +331,7 @@ class TestPhase10bLaTeXGeneration:
             column=2,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"R^+"
+        assert latex == r"R^{+}"
 
     def test_generate_star_postfix(self) -> None:
         """Test generating LaTeX for star postfix operator."""
@@ -343,7 +343,7 @@ class TestPhase10bLaTeXGeneration:
             column=2,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"R^*"
+        assert latex == r"R^{*}"
 
 
 class TestPhase10bIntegration:
@@ -452,7 +452,7 @@ class TestPhase10bIntegration:
 
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "+"
-        assert latex == r"R^+"
+        assert latex == r"R^{+}"
 
     def test_end_to_end_star_postfix(self) -> None:
         """Test complete pipeline for star postfix operator."""
@@ -467,7 +467,7 @@ class TestPhase10bIntegration:
 
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "*"
-        assert latex == r"R^*"
+        assert latex == r"R^{*}"
 
     def test_complex_extended_relation_expression(self) -> None:
         """Test complex expression with multiple extended operators."""
@@ -498,7 +498,7 @@ class TestPhase10bIntegration:
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "+"
         assert isinstance(ast.operand, BinaryOp)
-        assert latex == r"(R \circ S)^+"
+        assert latex == r"(R \circ S)^{+}"
 
     def test_mixed_phase10a_and_10b_operators(self) -> None:
         """Test mixing Phase 10a and 10b operators."""
