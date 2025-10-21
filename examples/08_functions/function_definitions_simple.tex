@@ -161,15 +161,17 @@ grades maps students to their grades.
 
 \begin{axdef}
 f : \nat \fun \nat \\
-g : \nat \fun \nat
+g : \nat \fun \nat \\
+h : \nat \fun \nat
 \where
 \forall n : \nat @ f(n) = 2 * n \\
-\forall n : \nat @ g(n) = n + 1
+\forall n : \nat @ g(n) = n + 1 \\
+h = f \circ g
 \end{axdef}
 
 \bigskip
 
-f doubles its input, g adds one to its input.
+f doubles its input, g adds one to its input. h is their forward $composition : h(n) $= f(g(n)) = 2 * (n + 1).
 
 \bigskip
 
