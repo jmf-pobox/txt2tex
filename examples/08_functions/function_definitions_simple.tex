@@ -1,0 +1,194 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Simple Function Definitions}
+
+\bigskip
+
+This file demonstrates basic function $definitions \in Z$ notation that work well with fuzz type checking.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 1 : Simple Total Functions}
+
+\medskip
+
+\bigskip
+
+Total functions are defined over their entire domain.
+
+\bigskip
+
+\begin{axdef}
+square : \nat \fun \nat
+\where
+\forall n : \nat @ square(n) = n * n
+\end{axdef}
+
+\begin{axdef}
+successor : \nat \fun \nat
+\where
+\forall n : \nat @ successor(n) = n + 1
+\end{axdef}
+
+\begin{axdef}
+double : \nat \fun \nat
+\where
+\forall n : \nat @ double(n) = 2 * n
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 2 : Partial Functions}
+
+\medskip
+
+\bigskip
+
+Partial functions are not defined over their entire domain.
+
+\bigskip
+
+\begin{axdef}
+predecessor : \nat \pfun \nat
+\where
+\forall n : \nat @ n > 0 \implies predecessor(n) = n - 1
+\end{axdef}
+
+\bigskip
+
+predecessor is partial on natural numbers since 0 has no $predecessor \in N$.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 3 : Generic Functions}
+
+\medskip
+
+\bigskip
+
+Generic functions work with any type parameter.
+
+\bigskip
+
+\begin{gendef}[X]
+  identity: X \fun X
+\where
+  \forall x : X @ identity(x) = x
+\end{gendef}
+
+\begin{gendef}[X, Y]
+  fst: X \cross Y \fun X
+\where
+  \forall x : X @ \forall y : Y @ fst(x, y) = x
+\end{gendef}
+
+\begin{gendef}[X, Y]
+  snd: X \cross Y \fun Y
+\where
+  \forall x : X @ \forall y : Y @ snd(x, y) = y
+\end{gendef}
+
+\bigskip
+\noindent
+\textbf{Example 4 : Functions with Given Types}
+
+\medskip
+
+\begin{zed}[Person, Department]\end{zed}
+
+\begin{axdef}
+assignment : Person \pfun Department
+\end{axdef}
+
+\bigskip
+
+assignment is a partial function from Person to Department.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 5 : Functions on Numbers}
+
+\medskip
+
+\begin{axdef}
+triple : \nat \fun \nat
+\where
+\forall n : \nat @ triple(n) = 3 * n
+\end{axdef}
+
+\begin{axdef}
+addOne : \num \fun \num
+\where
+\forall n : \num @ addOne(n) = n + 1
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 6 : Function with Given Types}
+
+\medskip
+
+\begin{zed}[Student, Grade]\end{zed}
+
+\begin{axdef}
+grades : Student \pfun Grade
+\end{axdef}
+
+\bigskip
+
+grades maps students to their grades.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 7 : Function Composition Example}
+
+\medskip
+
+\begin{axdef}
+f : \nat \fun \nat \\
+g : \nat \fun \nat
+\where
+\forall n : \nat @ f(n) = 2 * n \\
+\forall n : \nat @ g(n) = n + 1
+\end{axdef}
+
+\bigskip
+
+f doubles its input, g adds one to its input.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 8 : Modulo Function}
+
+\medskip
+
+\begin{axdef}
+modulo3 : \nat \fun \nat
+\where
+\forall n : \nat @ modulo3(n) = n \mod 3
+\end{axdef}
+
+\bigskip
+
+For comprehensive function examples including recursive functions, higher-order functions, and advanced patterns, see examples/09_sequences/pattern_matching.txt.
+
+\bigskip
+
+\end{document}

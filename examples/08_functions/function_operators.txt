@@ -1,0 +1,344 @@
+=== Function Operators ===
+
+TEXT: This file demonstrates operators that work with functions: domain, range, application, override, composition, and restrictions.
+
+** Example 1: Domain and Range **
+
+TEXT: Every function has a domain (inputs) and range (possible outputs).
+
+given Employee, Department
+
+axdef
+  assignment : Employee +-> Department
+where
+  # dom assignment <= 100 and
+  ran assignment subseteq {Engineering, Sales, HR, Finance}
+end
+
+TEXT: domain of assignment is the set of employees who have department assignments.
+TEXT: range of assignment is the set of departments that have at least one employee.
+
+axdef
+  salary : Employee +-> N
+where
+  dom salary = dom assignment and
+  forall e : dom salary | salary(e) >= 30000 and salary(e) <= 200000
+end
+
+TEXT: Every assigned employee has a salary between 30000 and 200000.
+
+** Example 2: Domain Restriction **
+
+TEXT: Domain restriction (<| , dsub) limits a function to a subset of its domain.
+
+given Student, Grade
+
+axdef
+  grades : Student +-> Grade
+  honors : P Student
+where
+  honors = {s : Student | s in dom grades and grades(s) in {A, B}}
+end
+
+axdef
+  honorGrades : Student +-> Grade
+where
+  honorGrades = honors <| grades
+end
+
+TEXT: honorGrades is grades restricted to honor students only.
+
+** Example 3: Range Restriction **
+
+TEXT: Range restriction (|>, rsub) limits a function to a subset of its range.
+
+axdef
+  passingGrades : Student +-> Grade
+where
+  passingGrades = grades |> {A, B, C, D}
+end
+
+TEXT: passingGrades includes only students with passing grades.
+
+** Example 4: Domain Subtraction **
+
+TEXT: Domain subtraction (⩤, ndres) removes elements from the domain.
+
+given Account, Balance
+
+axdef
+  accounts : Account +-> Balance
+  closed : P Account
+where
+  closed subseteq dom accounts
+end
+
+axdef
+  activeAccounts : Account +-> Balance
+where
+  activeAccounts = closed <-| accounts
+end
+
+TEXT: activeAccounts excludes all closed accounts from the function.
+
+** Example 5: Range Subtraction **
+
+TEXT: Range subtraction (⩥, nrres) removes elements from the range.
+
+axdef
+  failingGrades : Student +-> Grade
+where
+  failingGrades = grades |> {F}
+end
+
+axdef
+  nonFailingGrades : Student +-> Grade
+where
+  nonFailingGrades = grades |->> {F}
+end
+
+TEXT: nonFailingGrades excludes all F grades.
+
+** Example 6: Function Override **
+
+TEXT: Function override (⊕, ++) gives precedence to the second function for overlapping domains.
+
+given User, Preference
+
+axdef
+  defaultPrefs : User -> Preference
+  customPrefs : User +-> Preference
+where
+  dom customPrefs subseteq dom defaultPrefs
+end
+
+axdef
+  effectivePrefs : User -> Preference
+where
+  effectivePrefs = defaultPrefs ++ customPrefs
+end
+
+TEXT: effectivePrefs uses custom preferences when available, otherwise defaults.
+
+** Example 7: Multiple Overrides **
+
+TEXT: Override is left-associative: f ++ g ++ h = (f ++ g) ++ h
+
+axdef
+  systemDefault : User -> Preference
+  userCustom : User +-> Preference
+  sessionOverride : User +-> Preference
+where
+  effectivePrefs = systemDefault ++ userCustom ++ sessionOverride
+end
+
+TEXT: Priority order: sessionOverride > userCustom > systemDefault
+
+** Example 8: Function Application **
+
+TEXT: Functions can be applied to arguments using standard notation.
+
+given Product, Price
+
+axdef
+  pricing : Product -> Price
+  discount : Product +-> N
+where
+  forall p : Product | p in dom discount => discount(p) <= 100
+end
+
+axdef
+  finalPrice : Product -> Price
+where
+  forall p : Product |
+    finalPrice(p) = if p in dom discount
+                    then pricing(p) * (100 - discount(p)) / 100
+                    else pricing(p)
+end
+
+** Example 9: Function Composition **
+
+TEXT: Forward composition (o9, ;) chains functions left-to-right.
+
+given Person, SSN, Account
+
+axdef
+  personToSSN : Person >-> SSN
+  ssnToAccount : SSN +-> Account
+where
+  dom ssnToAccount subseteq ran personToSSN
+end
+
+axdef
+  personToAccount : Person +-> Account
+where
+  personToAccount = personToSSN o9 ssnToAccount
+end
+
+TEXT: personToAccount(p) = ssnToAccount(personToSSN(p))
+
+** Example 10: Backward Composition **
+
+TEXT: Backward composition (o, circ) chains functions right-to-left.
+
+axdef
+  accountToPerson : Person +-> Account
+where
+  accountToPerson = ssnToAccount o personToSSN
+end
+
+TEXT: Same result as forward composition, just different notation.
+
+** Example 11: Relational Image **
+
+TEXT: Relational image (|, limg/rimg) applies a relation to a set.
+
+given City, Country
+
+axdef
+  cityCountry : City +-> Country
+  europeanCities : P City
+where
+  europeanCities = {c : City | c in dom cityCountry and
+                                cityCountry(c) in {UK, France, Germany, Spain}}
+end
+
+axdef
+  europeanCountries : P Country
+where
+  europeanCountries = cityCountry(| europeanCities |)
+end
+
+TEXT: europeanCountries is the image of europeanCities under cityCountry.
+
+** Example 12: Function Inverse **
+
+TEXT: The inverse (~, inv) swaps domain and range (only for injective functions).
+
+given StudentId, Student
+
+axdef
+  idToStudent : StudentId >-> Student
+where
+  # dom idToStudent <= 10000
+end
+
+axdef
+  studentToId : Student >-> StudentId
+where
+  studentToId = idToStudent~
+end
+
+TEXT: For injective functions, inverse is also injective.
+
+** Example 13: Function Union **
+
+TEXT: Functions with disjoint domains can be combined with union.
+
+axdef
+  undergraduateAdvising : Student +-> Professor
+  graduateAdvising : Student +-> Professor
+where
+  dom undergraduateAdvising inter dom graduateAdvising = {}
+end
+
+axdef
+  allAdvising : Student +-> Professor
+where
+  allAdvising = undergraduateAdvising union graduateAdvising
+end
+
+TEXT: Union is only valid when domains don't overlap.
+
+** Example 14: Iteration (Transitive Closure) **
+
+TEXT: Function iteration applies a function multiple times.
+
+gendef [X]
+  iterate : (X -> X) cross N -> (X -> X)
+where
+  forall f : X -> X; x : X |
+    iterate(f, 0)(x) = x and
+  forall f : X -> X; n : N; x : X |
+    n > 0 => iterate(f, n)(x) = f(iterate(f, n - 1)(x))
+end
+
+TEXT: iterate(f, n) applies f exactly n times.
+
+** Example 15: Function Update (Single Point Override) **
+
+TEXT: Updating a single point in a function using override.
+
+given Key, Value
+
+axdef
+  cache : Key +-> Value
+  k : Key
+  v : Value
+where
+  k in dom cache
+end
+
+axdef
+  updatedCache : Key +-> Value
+where
+  updatedCache = cache ++ {k |-> v}
+end
+
+TEXT: updatedCache is cache with k mapped to v.
+
+** Example 16: Combining Multiple Operators **
+
+TEXT: Complex expressions can combine multiple operators.
+
+given Request, Response, Handler
+
+axdef
+  defaultHandlers : Request -> Handler
+  customHandlers : Request +-> Handler
+  adminHandlers : Request +-> Handler
+  adminRequests : P Request
+where
+  adminRequests subseteq dom adminHandlers
+end
+
+axdef
+  activeHandlers : Request -> Handler
+where
+  activeHandlers = (defaultHandlers ++ customHandlers) ++
+                   (adminRequests <| adminHandlers)
+end
+
+TEXT: Priority: admin handlers for admin requests, then custom handlers, then defaults.
+
+** Example 17: Function Extension **
+
+TEXT: Extending a function by adding new domain elements.
+
+axdef
+  existing : Key +-> Value
+  newMappings : Key +-> Value
+where
+  dom existing inter dom newMappings = {}
+end
+
+axdef
+  extended : Key +-> Value
+where
+  extended = existing union newMappings
+end
+
+TEXT: Since domains are disjoint, union safely extends the function.
+
+** Example 18: Generic Function Composition **
+
+TEXT: Type-polymorphic composition works with any compatible functions.
+
+gendef [X, Y, Z]
+  pipeline : (X -> Y) cross (Y -> Z) -> (X -> Z)
+where
+  forall f : X -> Y; g : Y -> Z; x : X |
+    pipeline(f, g)(x) = g(f(x))
+end
+
+TEXT: pipeline composes two functions in reading order (left to right).
