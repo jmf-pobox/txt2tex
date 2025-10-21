@@ -42,7 +42,8 @@
       "Bash(done)",
       "Bash(pdftotext:*)",
       "Bash(env TEXINPUTS=tex//: fuzz examples/06_definitions/free_types_proper.tex)",
-      "Bash(env TEXINPUTS=tex//: fuzz:*)"
+      "Bash(env TEXINPUTS=tex//: fuzz:*)",
+      "Bash(env TEXINPUTS=../../tex//: fuzz:*)"
     ],
     "deny": [],
     "ask": []
