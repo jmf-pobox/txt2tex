@@ -904,11 +904,11 @@ end
 
 given Person
 
-TEXT: axdef
-TEXT:   State : P(seq(iseq(Person)))
-TEXT: where
-TEXT:   forall s : State | forall i, j : dom(s) | i /= j | ran(s(i)) intersect ran(s(j)) = {}
-TEXT: end
+axdef
+  State : P(seq(iseq(Person)))
+where
+  forall s : State | forall i, j : dom(s) | i /= j | ran(s(i)) intersect ran(s(j)) = {}
+end
 
 (b)
 
