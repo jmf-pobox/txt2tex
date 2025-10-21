@@ -1,0 +1,115 @@
+=== Simple Function Definitions ===
+
+TEXT: This file demonstrates basic function definitions in Z notation that work well with fuzz type checking.
+
+** Example 1: Simple Total Functions **
+
+TEXT: Total functions are defined over their entire domain.
+
+axdef
+  square : N -> N
+where
+  forall n : N | square(n) = n * n
+end
+
+axdef
+  successor : N -> N
+where
+  forall n : N | successor(n) = n + 1
+end
+
+axdef
+  double : N -> N
+where
+  forall n : N | double(n) = 2 * n
+end
+
+** Example 2: Partial Functions **
+
+TEXT: Partial functions are not defined over their entire domain.
+
+axdef
+  predecessor : N +-> N
+where
+  forall n : N | n > 0 => predecessor(n) = n - 1
+end
+
+TEXT: predecessor is partial on natural numbers since 0 has no predecessor in N.
+
+** Example 3: Generic Functions **
+
+TEXT: Generic functions work with any type parameter.
+
+gendef [X]
+  identity : X -> X
+where
+  forall x : X | identity(x) = x
+end
+
+gendef [X, Y]
+  fst : X cross Y -> X
+where
+  forall x : X; y : Y | fst(x, y) = x
+end
+
+gendef [X, Y]
+  snd : X cross Y -> Y
+where
+  forall x : X; y : Y | snd(x, y) = y
+end
+
+** Example 4: Functions with Given Types **
+
+given Person, Department
+
+axdef
+  assignment : Person +-> Department
+end
+
+TEXT: assignment is a partial function from Person to Department.
+
+** Example 5: Functions on Numbers **
+
+axdef
+  triple : N -> N
+where
+  forall n : N | triple(n) = 3 * n
+end
+
+axdef
+  addOne : Z -> Z
+where
+  forall n : Z | addOne(n) = n + 1
+end
+
+** Example 6: Function with Given Types **
+
+given Student, Grade
+
+axdef
+  grades : Student +-> Grade
+end
+
+TEXT: grades maps students to their grades.
+
+** Example 7: Function Composition Example **
+
+axdef
+  f : N -> N
+  g : N -> N
+where
+  forall n : N | f(n) = 2 * n
+  forall n : N | g(n) = n + 1
+end
+
+TEXT: f doubles its input, g adds one to its input.
+
+** Example 8: Modulo Function **
+
+axdef
+  modulo3 : N -> N
+where
+  forall n : N | modulo3(n) = n mod 3
+end
+
+TEXT: For comprehensive function examples including recursive functions, higher-order functions, and advanced patterns, see examples/09_sequences/pattern_matching.txt.

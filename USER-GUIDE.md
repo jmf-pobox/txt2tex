@@ -771,6 +771,140 @@ The second function takes precedence for overlapping domains.
 
 Represents the set `{1, 2, 3, ..., 10}`.
 
+### Function Definitions
+
+Functions are typically defined using `axdef` or `gendef` (for generic functions).
+
+**Simple total function:**
+```
+axdef
+  square : N -> N
+where
+  forall n : N | square(n) = n * n
+end
+```
+
+**Partial function:**
+```
+axdef
+  predecessor : N +-> N
+where
+  forall n : N | n > 0 => predecessor(n) = n - 1
+end
+```
+
+Note: `predecessor` is partial because 0 has no predecessor in N.
+
+**Generic function:**
+```
+gendef [X]
+  identity : X -> X
+where
+  forall x : X | identity(x) = x
+end
+```
+
+**Generic function with multiple type parameters:**
+```
+gendef [X, Y]
+  first : X cross Y -> X
+where
+  forall x : X; y : Y | first(x, y) = x
+end
+```
+
+### Function Operators
+
+**Domain and Range:**
+```
+dom f            →  dom f       [domain of function]
+ran f            →  ran f       [range of function]
+```
+
+**Domain Restriction:**
+```
+A <| f           →  A ⩤ f       [restrict f to domain A]
+```
+
+**Range Restriction:**
+```
+f |> B           →  f ⩥ B       [restrict f to range B]
+```
+
+**Domain Subtraction:**
+```
+A <-| f          →  A ⩤ f       [remove A from domain]
+```
+
+**Range Subtraction:**
+```
+f |->> B         →  f ⩥ B       [remove B from range]
+```
+
+**Function Composition:**
+```
+f o9 g           →  f ∘ g       [forward composition: (f ; g)(x) = g(f(x))]
+f o g            →  f ∘ g       [backward composition: (f ∘ g)(x) = f(g(x))]
+```
+
+**Function Inverse:**
+```
+f~               →  f⁻¹         [inverse function (only for injective)]
+```
+
+**Relational Image:**
+```
+f(| A |)         →  f⟦A⟧        [image of set A under f]
+```
+
+### Examples of Function Properties
+
+**Injective (one-to-one):**
+```
+given StudentId, Student
+
+axdef
+  studentRecord : StudentId >-> Student
+where
+  forall id1, id2 : StudentId |
+    id1 /= id2 => studentRecord(id1) /= studentRecord(id2)
+end
+```
+
+**Surjective (onto):**
+```
+axdef
+  modulo3 : N -->> {0, 1, 2}
+where
+  forall n : N | modulo3(n) = n mod 3 and
+  forall r : {0, 1, 2} | exists n : N | modulo3(n) = r
+end
+```
+
+**Recursive function on sequences:**
+```
+gendef [X]
+  length : seq X -> N
+where
+  length(<>) = 0 and
+  forall x : X; s : seq X | length(<x> ^ s) = 1 + length(s)
+end
+```
+
+**Higher-order function:**
+```
+gendef [X, Y, Z]
+  compose : (Y -> Z) cross (X -> Y) -> (X -> Z)
+where
+  forall f : Y -> Z; g : X -> Y; x : X |
+    compose(f, g)(x) = f(g(x))
+end
+```
+
+**See [examples/08_functions/function_definitions_simple.txt](examples/08_functions/function_definitions_simple.txt) for working function examples that pass fuzz validation.**
+
+**Note:** Additional advanced examples are available in function_definitions.txt and function_operators.txt, but may require further refinement for full fuzz compatibility.
+
 ---
 
 ## Sequences
