@@ -136,6 +136,9 @@ class Parser:
         # Track the end position of the last consumed token for whitespace detection
         self.last_token_end_column = 0
         self.last_token_line = 1
+        # Track whether we're parsing schema text (lambda/set comp declarations)
+        # where periods are separators, not projection operators
+        self._parsing_schema_text = False
 
     def parse(self) -> Document | Expr:
         """
@@ -1116,7 +1119,12 @@ class Parser:
             # Phase 21/22: Use _parse_union to allow union/intersect in domain
             # Allows: forall x : A union B | P
             # TODO Phase 23: Support relation types (A <-> B) in quantifier domains
-            domain = self._parse_union()
+            # Set flag to prevent .identifier from being parsed as projection
+            self._parsing_schema_text = True
+            try:
+                domain = self._parse_union()
+            finally:
+                self._parsing_schema_text = False
 
         # Phase 17: Check for semicolon-separated bindings
         # If we see SEMICOLON, we have more binding groups: x : T; y : U | body
@@ -1294,7 +1302,12 @@ class Parser:
         self._advance()  # Consume ':'
         # Parse domain as full type expression (can be complex like X -> Y)
         # Use _parse_comparison() to get function types but stop at PERIOD
-        domain = self._parse_comparison()
+        # Set flag to prevent .identifier from being parsed as projection
+        self._parsing_schema_text = True
+        try:
+            domain = self._parse_comparison()
+        finally:
+            self._parsing_schema_text = False
 
         # Parse separator . (period)
         if not self._match(TokenType.PERIOD):
@@ -1428,7 +1441,12 @@ class Parser:
             # Phase 21/22: Use _parse_union to allow union/intersect in domain
             # Allows: forall x : A union B | P
             # TODO Phase 23: Support relation types (A <-> B) in quantifier domains
-            domain = self._parse_union()
+            # Set flag to prevent .identifier from being parsed as projection
+            self._parsing_schema_text = True
+            try:
+                domain = self._parse_union()
+            finally:
+                self._parsing_schema_text = False
 
         # Phase 22: Parse separator | or .
         # Syntax: {x : T | predicate . expr} or {x : T . expr} (no predicate)
@@ -1850,31 +1868,122 @@ class Parser:
         # Tuple projection: .1, .2, .3
         # Function application: expr(...)
         while self._match(TokenType.PERIOD, TokenType.LPAREN):
-            # Check for tuple projection .1, .2, .3
+            # Check for tuple projection .1, .2, .3 or field projection .fieldname
             if self._match(TokenType.PERIOD):
-                # Peek ahead to see if it's followed by a number
+                # Peek ahead to see if it's followed by a number or identifier
                 next_token = self._peek_ahead(1)
-                if next_token.type != TokenType.NUMBER:
-                    # Not tuple projection, leave PERIOD for other uses
-                    break
 
-                period_token = self._advance()  # Consume '.'
-                number_token = self._advance()  # Consume number
+                if next_token.type == TokenType.NUMBER:
+                    # Numeric tuple projection: .1, .2, .3 (mostly original behavior)
+                    # Add context-sensitive safety check:
+                    # - If in schema text AND base is simple Identifier
+                    #   AND followed by binary op
+                    #   → likely separator (lambda x : X . 2 * x)
+                    # - Otherwise → safe to parse as projection
 
-                # Convert number to integer index
-                index = int(number_token.value)
-                if index < 1:
-                    raise ParserError(
-                        f"Tuple projection index must be >= 1, got {index}",
-                        number_token,
+                    # Only apply safety check in schema text
+                    # (lambda/set comp declarations)
+                    if self._parsing_schema_text and isinstance(base, Identifier):
+                        token_after_num = self._peek_ahead(2)
+
+                        # In lambda/set comp, simple type name followed by
+                        # . NUMBER OP suggests separator
+                        likely_separator = (
+                            TokenType.STAR,  # X . 2 * x (separator in lambda)
+                            TokenType.PLUS,  # X . 2 + x (separator)
+                            TokenType.MINUS,  # X . 2 - x (separator)
+                        )
+
+                        if token_after_num.type in likely_separator:
+                            # Ambiguous context - don't parse as projection
+                            break
+
+                    # Safe to parse as numeric projection
+                    period_token = self._advance()  # Consume '.'
+                    number_token = self._advance()  # Consume number
+
+                    # Convert number to integer index
+                    index = int(number_token.value)
+                    if index < 1:
+                        raise ParserError(
+                            f"Tuple projection index must be >= 1, got {index}",
+                            number_token,
+                        )
+
+                    base = TupleProjection(
+                        base=base,
+                        index=index,
+                        line=period_token.line,
+                        column=period_token.column,
                     )
 
-                base = TupleProjection(
-                    base=base,
-                    index=index,
-                    line=period_token.line,
-                    column=period_token.column,
-                )
+                elif next_token.type == TokenType.IDENTIFIER:
+                    # Named field projection: .fieldname (new feature)
+                    # Don't parse as projection if we're in schema text
+                    # (lambda/set comp) where periods are separators, not operators
+                    if self._parsing_schema_text:
+                        # In schema text - leave period unparsed (separator)
+                        break
+
+                    # Don't allow field projections on number literals
+                    # (only tuples/records have named fields)
+                    # This prevents parsing "0 . x" as projection in
+                    # "x > 0 . x + 1"
+                    if isinstance(base, Number):
+                        # Numbers don't have named fields
+                        break
+
+                    # Only parse if followed by safe token
+                    # (not ambiguous with separator)
+                    token_after_id = self._peek_ahead(2)
+
+                    # Safe followers that indicate this is field projection,
+                    # not separator
+                    safe_followers = (
+                        TokenType.PERIOD,  # .field.other (chained)
+                        TokenType.LPAREN,  # .field(x)
+                        TokenType.RPAREN,  # .field)
+                        TokenType.RBRACE,  # .field}
+                        TokenType.RBRACKET,  # .field]
+                        TokenType.RANGLE,  # .field>
+                        TokenType.COMMA,  # .field,
+                        TokenType.SEMICOLON,  # .field;
+                        TokenType.EQUALS,  # .field =
+                        TokenType.NOT_EQUAL,  # .field !=
+                        TokenType.IN,  # .field in
+                        TokenType.NOTIN,  # .field notin
+                        TokenType.SUBSET,  # .field subset
+                        TokenType.LESS_THAN,  # .field <
+                        TokenType.GREATER_THAN,  # .field >
+                        TokenType.LESS_EQUAL,  # .field <=
+                        TokenType.GREATER_EQUAL,  # .field >=
+                        TokenType.IMPLIES,  # .field =>
+                        TokenType.IFF,  # .field <=>
+                        TokenType.AND,  # .field and
+                        TokenType.OR,  # .field or
+                        TokenType.PLUS,  # .field +
+                        TokenType.MINUS,  # .field -
+                        TokenType.EOF,  # .field (standalone)
+                        TokenType.NEWLINE,  # .field\n (end of line)
+                    )
+
+                    if token_after_id.type in safe_followers:
+                        # Safe context - parse as field projection
+                        period_token = self._advance()  # Consume '.'
+                        field_token = self._advance()  # Consume identifier
+
+                        base = TupleProjection(
+                            base=base,
+                            index=field_token.value,  # Field name as string
+                            line=period_token.line,
+                            column=period_token.column,
+                        )
+                    else:
+                        # Not safe - likely a separator, leave PERIOD unparsed
+                        break
+                else:
+                    # Not projection, leave PERIOD for other uses
+                    break
 
             # Check for function application expr(...)
             elif self._match(TokenType.LPAREN):
