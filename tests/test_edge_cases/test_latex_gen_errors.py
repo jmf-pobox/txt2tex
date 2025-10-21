@@ -32,8 +32,8 @@ def test_identifier_with_fuzz_flag() -> None:
     gen = LaTeXGenerator(use_fuzz=True)
     latex = gen._generate_identifier(node)
 
-    # With fuzz, underscores are kept as-is (no escaping)
-    assert latex == "x_max"
+    # With fuzz, underscores must be escaped (required in Z environments)
+    assert latex == r"x\_max"
 
 
 def test_identifier_fallback_case() -> None:
