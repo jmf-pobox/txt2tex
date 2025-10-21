@@ -488,11 +488,15 @@ Couples == { s : P Person | # s = 2 }
 
 ** Solution 25 **
 
-TEXT: (Requires generic set notation and Cartesian product)
+(a) emptyset[N] in emptyset[P(N)]
+
+(b) emptyset[N cross N] subseteq (emptyset[N] cross emptyset[N])
+
+(c) (emptyset[N] cross {emptyset[N]}) subseteq emptyset[N cross P(N)]
 
 ** Solution 26 **
 
-TEXT: (Requires generic parameters and relation type notation)
+TEXT: We may define notin using our built-in operator (notin is already implemented as a binary operator mapping to \notin)
 
 === Relations ===
 
