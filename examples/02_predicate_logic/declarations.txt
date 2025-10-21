@@ -2,15 +2,13 @@
 
 TEXT: This example demonstrates Z notation definitions with generic (polymorphic) type parameters.
 
-given X, Y, Z
-
 TEXT: Basic generic abbreviation for a Pair type:
 
-[X] Pair == X
+[X] Pair == X cross X
 
 TEXT: Generic abbreviation with two type parameters:
 
-[X, Y] Product == X
+[X, Y] Product == X cross Y
 
 TEXT: Generic axiomatic definition with constraints:
 
