@@ -11,27 +11,21 @@ TEXT: (Assuming that pigs can't fly . . . )
 
 ** Solution 2 **
 
-(a)
-
-TRUTH TABLE:
+(a) TRUTH TABLE:
 p | q | p and q | (p and q) => p
 T | T | T | T
 T | F | F | T
 F | T | F | T
 F | F | F | T
 
-(b)
-
-TRUTH TABLE:
+(b) TRUTH TABLE:
 p | q | p and q | not p | not p => (p and q) | (not p => (p and q)) <=> p
 T | T | T | F | T | T
 T | F | F | F | T | T
 F | T | F | T | F | T
 F | F | F | T | F | T
 
-(c)
-
-TRUTH TABLE:
+(c) TRUTH TABLE:
 p | q | p => q | p and (p => q) | (p and (p => q)) => q
 T | T | T | T | T
 T | F | F | F | T
@@ -40,24 +34,18 @@ F | F | T | F | T
 
 ** Solution 3 **
 
-(a)
-
-EQUIV:
+(a) EQUIV:
 p => not p
 <=> not p or not p [=>]
 <=> not p [idempotence]
 
-(b)
-
-EQUIV:
+(b) EQUIV:
 not p => p
 <=> not not p or p [=>]
 <=> p or p [not not]
 <=> p [idempotence]
 
-(c)
-
-EQUIV:
+(c) EQUIV:
 p => (q => r)
 <=> not p or (q => r) [=>]
 <=> not p or (not q or r) [=>]
@@ -65,9 +53,7 @@ p => (q => r)
 <=> not (p and q) or r [De Morgan]
 <=> (p and q) => r [=>]
 
-(d)
-
-EQUIV:
+(d) EQUIV:
 q => (p => r)
 <=> not q or (p => r) [=>]
 <=> not q or (not p or r) [=>]
@@ -75,9 +61,7 @@ q => (p => r)
 <=> not p or (q => r) [=>]
 <=> p => (q => r) [=>]
 
-(e)
-
-EQUIV:
+(e) EQUIV:
 ((p and q) <=> p)
 <=> ((p and q) => p) and (p => (p and q)) [<=>]
 <=> (not (p and q) or p) and (not p or (p and q)) [=>]
@@ -91,9 +75,7 @@ EQUIV:
 <=> not p or q [and and true]
 <=> p => q [=>]
 
-(f)
-
-EQUIV:
+(f) EQUIV:
 ((p or q) <=> p)
 <=> ((p or q) => p) and (p => (p or q)) [<=>]
 <=> (not (p or q) or p) and (not p or (p or q)) [=>]
@@ -109,13 +91,9 @@ EQUIV:
 
 ** Solution 4 **
 
-(a)
+(a) TEXT: (p or q) <=> ((not p or not q) and q) is not a tautology. You might illustrate this via a truth table or via a chain of equivalences, showing that the proposition is not equivalent to true. Alternatively, you might try and find a combination of values for which the proposition is false. (In this case, the proposition is false when p and q are both true.)
 
-TEXT: (p or q) <=> ((not p or not q) and q) is not a tautology. You might illustrate this via a truth table or via a chain of equivalences, showing that the proposition is not equivalent to true. Alternatively, you might try and find a combination of values for which the proposition is false. (In this case, the proposition is false when p and q are both true.)
-
-(b)
-
-TEXT: (p or q) <=> ((not p and not q) or q) is not a tautology. In this case, the proposition is false when p is true and q is false.
+(b) TEXT: (p or q) <=> ((not p and not q) or q) is not a tautology. In this case, the proposition is false when p is true and q is false.
 
 ** Solution 5 **
 
@@ -125,31 +103,19 @@ TEXT: (p or q) <=> ((not p and not q) or q) is not a tautology. In this case, th
 
 ** Solution 6 **
 
-(a)
+(a) TEXT: This is a true proposition: whatever the value of x, the expression x^2 - x + 1 denotes a natural number. If we choose y to be this natural number, we will find that p is true.
 
-TEXT: This is a true proposition: whatever the value of x, the expression x^2 - x + 1 denotes a natural number. If we choose y to be this natural number, we will find that p is true.
+(b) TEXT: This is a false proposition. We cannot choose a large enough value for y such that p will hold for any value of x.
 
-(b)
+(c) TEXT: This is a false proposition. It is an implication whose antecedent part is true and whose consequent part is false.
 
-TEXT: This is a false proposition. We cannot choose a large enough value for y such that p will hold for any value of x.
-
-(c)
-
-TEXT: This is a false proposition. It is an implication whose antecedent part is true and whose consequent part is false.
-
-(d)
-
-TEXT: This is a true proposition. It is an implication whose antecedent part is false and whose consequent part is true.
+(d) TEXT: This is a true proposition. It is an implication whose antecedent part is false and whose consequent part is true.
 
 ** Solution 7 **
 
-(a)
+(a) TEXT: We must define a predicate p that is false for at least one value of x, and is true for at least one other value. A suitable solution would be p <=> x > 1.
 
-TEXT: We must define a predicate p that is false for at least one value of x, and is true for at least one other value. A suitable solution would be p <=> x > 1.
-
-(b)
-
-TEXT: With the above choice of p, we require only that q is sometimes false when p is true (for else the universal quantification would hold). A suitable solution would be q <=> x > 3.
+(b) TEXT: With the above choice of p, we require only that q is sometimes false when p is true (for else the universal quantification would hold). A suitable solution would be q <=> x > 3.
 
 ** Solution 8 **
 
@@ -161,17 +127,13 @@ TEXT: With the above choice of p, we require only that q is sometimes false when
 
 ** Solution 9 **
 
-(a)
-
-EQUIV:
+(a) EQUIV:
 exists y : N | y in {0, 1} and y != 1 and x != y
 <=> exists y : N | y = 0 and x != y [arithmetic]
 <=> 0 in N and x != 0 [one-point rule]
 <=> x != 0
 
-(b)
-
-EQUIV:
+(b) EQUIV:
 exists x, y : N | x + y = 4 and x < y
 <=> exists x, y : N | y = 4 - x and x < y
 <=> exists x : N | 4 - x in N and x < 4 - x
@@ -179,18 +141,14 @@ exists x, y : N | x + y = 4 and x < y
 
 TEXT: The final equivalence holds because 0 in N, 4 - 0 in N, and 0 < 4.
 
-(c)
-
-EQUIV:
+(c) EQUIV:
 forall x : N | exists y : N | x = y + 1
 <=> forall x : N | exists y : N | y = x - 1
 <=> forall x : N | x - 1 in N
 
 TEXT: The final equivalence holds because 0 in N and yet 0 - 1 not in N. We may assume that the subtraction operator is defined for all integers.
 
-(d)
-
-EQUIV:
+(d) EQUIV:
 exists x : N | (x = 1 and x > y) or (x = 2 and x > z)
 <=> (exists x : N | x = 1 and x > y) or (exists x : N | x = 2 and x > z)
 <=> (1 in N and 1 > y) or (exists x : N | x = 2 and x > z)
@@ -227,19 +185,11 @@ TEXT: is not a provable statement. We cannot confirm that 1 is the only natural 
 
 ** Solution 12 **
 
-TEXT: (Requires mu-operator with expression part - not yet implemented)
+(a) (mu m : Mountain | (forall n : Mountain | height(n) <= height(m)) . height(m))
 
-(a)
+(b) (mu c : Chapter | (exists1 d : Chapter | length(d) > length(c)) . length(c))
 
-(mu m : Mountain | (forall n : Mountain | height(n) <= height(m)) . height(m))
-
-(b)
-
-(mu c : Chapter | (exists1 d : Chapter | length(d) > length(c)) . length(c))
-
-(c)
-
-TEXT: Assuming the existence of a suitable function, max: (mu n : N | n = max({ m : N | 8 * m < 100 . 8 * m }) . 100 - n)
+(c) TEXT: Assuming the existence of a suitable function, max: (mu n : N | n = max({ m : N | 8 * m < 100 . 8 * m }) . 100 - n)
 
 === Deductive proofs ===
 
@@ -372,117 +322,75 @@ PROOF:
 
 ** Solution 19 **
 
-(a)
+(a) TEXT: 1 in {4, 3, 2, 1} is true.
 
-TEXT: 1 in {4, 3, 2, 1} is true.
+(b) TEXT: {1} in {1, 2, 3, 4} is undefined.
 
-(b)
+(c) TEXT: {1} in {{1}, {2}, {3}, {4}} is true.
 
-TEXT: {1} in {1, 2, 3, 4} is undefined.
-
-(c)
-
-TEXT: {1} in {{1}, {2}, {3}, {4}} is true.
-
-(d)
-
-TEXT: The empty set in {1, 2, 3, 4} is undefined.
+(d) TEXT: The empty set in {1, 2, 3, 4} is undefined.
 
 ** Solution 20 **
 
-(a)
-
-{1} cross {2, 3}
+(a) {1} cross {2, 3}
 
 TEXT: is the set {(1, 2), (1, 3)}
 
-(b)
+(b) TEXT: The empty set cross {2, 3} is the empty set
 
-TEXT: The empty set cross {2, 3} is the empty set
-
-(c)
-
-(P emptyset) cross {1}
+(c) (P emptyset) cross {1}
 
 TEXT: is the set {(emptyset, 1)}
 
-(d)
-
-TEXT: {(1, 2)} cross {3, 4} is the set {((1, 2), 3), ((1, 2), 4)}
+(d) TEXT: {(1, 2)} cross {3, 4} is the set {((1, 2), 3), ((1, 2), 4)}
 
 ** Solution 21 **
 
 TEXT: There are various ways of describing these sets via set comprehensions. Examples are given below.
 
-(a)
+(a) { z : Z | 0 <= z and z <= 100 }
 
-{ z : Z | 0 <= z and z <= 100 }
+(b) { z : Z | z = 10 }
 
-(b)
-
-{ z : Z | z = 10 }
-
-(c)
-
-{ z : Z | z mod 2 = 0 or z mod 3 = 0 or z mod 5 = 0 }
+(c) { z : Z | z mod 2 = 0 or z mod 3 = 0 or z mod 5 = 0 }
 
 ** Solution 22 **
 
-(a)
+(a) { n : N | n <= 4 . n^2 }
 
-{ n : N | n <= 4 . n^2 }
+(b) { n : N | n <= 4 . (n, n^2) }
 
-(b)
+(c) { n : P {0, 1} }
 
-{ n : N | n <= 4 . (n, n^2) }
-
-(c)
-
-{ n : P {0, 1} }
-
-(d)
-
-{ n : P {0, 1} | true . (n, # n) }
+(d) { n : P {0, 1} | true . (n, # n) }
 
 ** Solution 23 **
 
-(a)
-
-EQUIV:
+(a) EQUIV:
 x in a intersect a
 <=> x in a and x in a
 <=> x in a
 
-(b)
-
-EQUIV:
+(b) EQUIV:
 x in a union a
 <=> x in a or x in a
 <=> x in a
 
 ** Solution 24 **
 
-(a)
-
-TEXT: The set of all pairs of integers is Z cross Z. To give it a name, we could write:
+(a) TEXT: The set of all pairs of integers is Z cross Z. To give it a name, we could write:
 
 Pairs == Z cross Z
 
-(b)
-
-TEXT: The set of all integer pairs in which each element is strictly greater than zero could be defined by:
+(b) TEXT: The set of all integer pairs in which each element is strictly greater than zero could be defined by:
 
 StrictlyPositivePairs == { m, n : Z | m > 0 and n > 0 . (m, n) }
 
-(c)
-
-TEXT: It is intuitive to use a singular noun for the name of a basic type; we define the set of all people by writing:
+(c) TEXT: It is intuitive to use a singular noun for the name of a basic type; we define the set of all people by writing:
 
 given Person
 
-(d)
-
-TEXT: The set of all couples could be defined by:
+(d) TEXT: The set of all couples could be defined by:
 
 Couples == { s : P Person | # s = 2 }
 
@@ -502,55 +410,33 @@ TEXT: We may define notin using our built-in operator (notin is already implemen
 
 ** Solution 27 **
 
-(a)
-
-TEXT: The power set of {(0,0), (0,1), (1,0), (1,1)} is:
+(a) TEXT: The power set of {(0,0), (0,1), (1,0), (1,1)} is:
 
 { emptyset, {(0, 0)}, {(0, 1)}, {(1, 0)}, {(1, 1)}, {(1, 0), (1, 1)}, {(0, 0), (0, 1)}, {(0, 1), (1, 1)}, {(0, 1), (1, 0)}, {(0, 0), (1, 1)}, {(0, 0), (1, 0)}, {(0, 0), (1, 0), (1, 1)}, {(0, 0), (0, 1), (1, 1)}, {(0, 0), (0, 1), (1, 0)}, {(0, 1), (1, 0), (1, 1)}, {(0, 0), (0, 1), (1, 0), (1, 1)} }
 
-(b)
+(b) { emptyset, {(0, 0)}, {(0, 1)}, {(0, 0), (0, 1)} }
 
-{ emptyset, {(0, 0)}, {(0, 1)}, {(0, 0), (0, 1)} }
+(c) { emptyset }
 
-(c)
-
-{ emptyset }
-
-(d)
-
-{ emptyset }
+(d) { emptyset }
 
 ** Solution 28 **
 
-(a)
+(a) dom R = {0, 1, 2}
 
-dom R = {0, 1, 2}
+(b) ran R = {1, 2, 3}
 
-(b)
-
-ran R = {1, 2, 3}
-
-(c)
-
-{1, 2} <| R = {1 |-> 2, 1 |-> 3, 2 |-> 3}
+(c) {1, 2} <| R = {1 |-> 2, 1 |-> 3, 2 |-> 3}
 
 ** Solution 29 **
 
-(a)
+(a) {2 |-> 4, 3 |-> 3, 3 |-> 4, 4 |-> 2}
 
-{2 |-> 4, 3 |-> 3, 3 |-> 4, 4 |-> 2}
+(b) {1 |-> 3, 2 |-> 2, 2 |-> 3, 3 |-> 1}
 
-(b)
+(c) {1 |-> 1, 2 |-> 2, 2 |-> 3, 3 |-> 2, 3 |-> 3, 4 |-> 4}
 
-{1 |-> 3, 2 |-> 2, 2 |-> 3, 3 |-> 1}
-
-(c)
-
-{1 |-> 1, 2 |-> 2, 2 |-> 3, 3 |-> 2, 3 |-> 3, 4 |-> 4}
-
-(d)
-
-{1 |-> 4, 2 |-> 2, 2 |-> 3, 3 |-> 2, 3 |-> 3, 4 |-> 1}
+(d) {1 |-> 4, 2 |-> 2, 2 |-> 3, 3 |-> 2, 3 |-> 3, 4 |-> 1}
 
 ** Solution 30 **
 
@@ -558,58 +444,38 @@ axdef
   childOf : Person <-> Person
 end
 
-(a)
-
-parentOf == childOf~
+(a) parentOf == childOf~
 
 TEXT: This is a good example of how there are many different ways of writing the same thing. An alternative abbreviation would be: parentOf == {x, y : Person | x |-> y in childOf . y |-> x}. Or via an axiomatic definition with parentOf : Person <-> Person and where clause parentOf = childOf~.
 
-(b)
+(b) siblingOf == (childOf o9 parentOf) \ id[Person]
 
-siblingOf == (childOf o9 parentOf) \ id[Person]
+(c) cousinOf == childOf o9 siblingOf o9 parentOf
 
-(c)
-
-cousinOf == childOf o9 siblingOf o9 parentOf
-
-(d)
-
-ancestorOf == parentOf+
+(d) ancestorOf == parentOf+
 
 ** Solution 31 **
 
 TEXT: (Requires compound identifiers with operators - R+, R*)
 
-(a)
+(a) R == {a, b : N | b = a or b = a}
 
-R == {a, b : N | b = a or b = a}
+(b) S == {a, b : N | b = a or b = a}
 
-(b)
+(c) TEXT: R+ == {a, b : N | b > a}
 
-S == {a, b : N | b = a or b = a}
-
-(c)
-
-TEXT: R+ == {a, b : N | b > a}
-
-(d)
-
-TEXT: R* == {a, b : N | b >= a}
+(d) TEXT: R* == {a, b : N | b >= a}
 
 ** Solution 32 **
 
-(a)
-
-EQUIV:
+(a) EQUIV:
 x |-> y in A <| (B <| R)
 <=> x in A and x |-> y in (B <| R)
 <=> x in A and x in B and x |-> y in R
 <=> x in A intersect B and x |-> y in R
 <=> x |-> y in (A intersect B) <| R
 
-(b)
-
-EQUIV:
+(b) EQUIV:
 x |-> y in (R union S) |> C
 <=> x |-> y in (R union S) and y in C
 <=> (x |-> y in R or x |-> y in S) and y in C
@@ -625,67 +491,43 @@ TEXT: The set of 9 functions:
 
 { emptyset, {(0, 0)}, {(0, 1)}, {(1, 1)}, {(1, 0)}, {(0, 0), (1, 1)}, {(0, 1), (1, 1)}, {(1, 0), (0, 0)}, {(0, 1), (1, 0)} }
 
-(a)
-
-TEXT: The set of total functions:
+(a) TEXT: The set of total functions:
 
 { {(0, 0), (1, 1)}, {(0, 1), (1, 1)}, {(1, 0), (0, 0)}, {(0, 1), (1, 0)} }
 
-(b)
-
-TEXT: The set of functions which are neither injective nor surjective:
+(b) TEXT: The set of functions which are neither injective nor surjective:
 
 { {(0, 1), (1, 1)}, {(0, 0), (1, 0)} }
 
-(c)
-
-TEXT: The set of functions which are injective but not surjective:
+(c) TEXT: The set of functions which are injective but not surjective:
 
 { emptyset, {(0, 0)}, {(0, 1)}, {(1, 0)}, {(1, 1)} }
 
-(d)
+(d) TEXT: There are no functions (of this type) which are surjective but not injective.
 
-TEXT: There are no functions (of this type) which are surjective but not injective.
-
-(e)
-
-TEXT: The set of bijective functions:
+(e) TEXT: The set of bijective functions:
 
 { {(0, 0), (1, 1)}, {(0, 1), (1, 0)} }
 
 ** Solution 34 **
 
-(a)
+(a) {1 |-> a, 2 |-> b, 3 |-> c, 4 |-> b}
 
-{1 |-> a, 2 |-> b, 3 |-> c, 4 |-> b}
+(b) {1 |-> c, 2 |-> b, 3 |-> c, 4 |-> d}
 
-(b)
+(c) {1 |-> c, 2 |-> b, 3 |-> c, 4 |-> b}
 
-{1 |-> c, 2 |-> b, 3 |-> c, 4 |-> d}
-
-(c)
-
-{1 |-> c, 2 |-> b, 3 |-> c, 4 |-> b}
-
-(d)
-
-{1 |-> c, 2 |-> b, 3 |-> c, 4 |-> b}
+(d) {1 |-> c, 2 |-> b, 3 |-> c, 4 |-> b}
 
 ** Solution 35 **
 
-TEXT: (Requires power set notation P and relational image)
-
-(a)
-
-axdef
+(a) axdef
   children : Person -> P Person
 where
   children = {p : Person . p |-> parentOf(| {p} |)}
 end
 
-(b)
-
-axdef
+(b) axdef
   number_of_grandchildren : Person -> N
 where
   number_of_grandchildren = {p : Person . p |-> # (parentOf o9 parentOf)(| {p} |)}
@@ -705,154 +547,136 @@ end
 
 ** Solution 37 **
 
-(a)
+(a) <a>
 
-<a>
+(b) {1 |-> a, 2 |-> b, 2 |-> a, 3 |-> c, 3 |-> b, 4 |-> d}
 
-(b)
+(c) {2 |-> b, 3 |-> c, 4 |-> d}
 
-{1 |-> a, 2 |-> b, 2 |-> a, 3 |-> c, 3 |-> b, 4 |-> d}
+(d) {1, 2, 3, 4}
 
-(c)
+(e) {a, b}
 
-{2 |-> b, 3 |-> c, 4 |-> d}
+(f) {a |-> 1, b |-> 2, c |-> 3, d |-> 4}
 
-(d)
+(g) <a, b>
 
-{1, 2, 3, 4}
+(h) {3 |-> b}
 
-(e)
+(i) {a}
 
-{a, b}
-
-(f)
-
-{a |-> 1, b |-> 2, c |-> 3, d |-> 4}
-
-(g)
-
-<a, b>
-
-(h)
-
-{3 |-> b}
-
-(i)
-
-{a}
-
-(j)
-
-c
+(j) c
 
 ** Solution 38 **
 
-(a)
-
-axdef
+(a) axdef
   f : Place -> P(Place)
 where
   forall p : Place | f(p) = {q : Place | p |-> q in ran trains}
 end
 
-(b)
+(b) TEXT: {p : Place | (exists1 x : dom trains | (trains(x)).2 = p)}
 
-TEXT: {p : Place | (exists1 x : dom trains | (trains(x)).2 = p)}
-
-(c)
-
-TEXT: (mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains(x)).2 = p} > # {x : dom trains | (trains(x)).2 = q})
+(c) TEXT: (mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains(x)).2 = p} > # {x : dom trains | (trains(x)).2 = q})
 
 ** Solution 39 **
 
-(a)
+(a) axdef
+  largeCoins : Collection -> N
+where
+  forall c : Collection | largeCoins(c) = c(large)
+end
 
-TEXT: large_coins : Collection -> N
-TEXT: forall c : Collection | large_coins(c) = c(large)
-TEXT: (Blocked by: underscore in identifier for fuzz compatibility)
-
-(b)
-
-TEXT: add_coin : Collection * Coin -> Collection
-TEXT: forall c : Collection; d : Coin | add_coin(c, d) = c union [[d]]
-TEXT: (Blocked by: underscore in identifier and bag union)
+(b) axdef
+  addCoin : Collection cross Coin -> Collection
+where
+  forall c : Collection; d : Coin | addCoin(c, d) = c union [[d]]
+end
 
 === Modelling ===
 
-TEXT: Solutions 40-52 are work in progress - many require features not yet implemented
-
 ** Solution 40 **
 
-TEXT: (Work in progress - requires semicolon-separated bindings in set comprehensions)
+TEXT: Note: Refactored to use schemas with named fields instead of tuples for fuzz compatibility.
+TEXT: Changed underscore identifiers to camelCase for fuzz compatibility.
 
-(a)
+given Title, Length, Viewed
 
-TEXT: hd : seq(Title * Length * Viewed)
-TEXT: cumulative_total hd <= 12000
-TEXT: forall p : ran hd | p.2 <= 360
+schema Programme
+  title: Title
+  length: Length
+  viewed: Viewed
+end
 
-TEXT: Note that cumulative_total is defined in part (d).
+(a) axdef
+  hd : seq(Programme)
+where
+  cumulativeTotal(hd) <= 12000
+  forall p : ran hd | p.length <= 360
+end
 
-(b)
+TEXT: Note that cumulativeTotal is defined in part (d).
 
-TEXT: {p : ran hd | p.2 > 120 . p.1}
+(b) TEXT: Assuming hd is defined as in part (a):
 
-(c)
+TEXT: {p : ran hd | p.length > 120 . p.title}
 
-TEXT: These can be defined recursively:
+(c) TEXT: These can be defined recursively:
 
-TEXT: axdef
-TEXT:   viewed : seq(Programme) -> seq(Programme)
-TEXT: where
-TEXT:   viewed(<>) = <> and forall x : Programme; s : seq(Programme) | viewed(<x> ^ s) = if x.3 = yes then <x> ^ viewed(s) else viewed(s)
-TEXT: end
+axdef
+  viewedProgrammes : seq(Programme) -> seq(Programme)
+where
+  viewedProgrammes(<>) = <>
+  forall x : Programme; s : seq(Programme) |
+    viewedProgrammes(<x> ^ s) = if x.viewed = yes then <x> ^ viewedProgrammes(s) else viewedProgrammes(s)
+end
 
-TEXT: or otherwise (omitted - requires semicolon-separated bindings in set comprehension)
+(d) axdef
+  cumulativeTotal : seq(Programme) -> N
+where
+  cumulativeTotal(<>) = 0
+  forall x : Programme; s : seq(Programme) |
+    cumulativeTotal(<x> ^ s) = x.length + cumulativeTotal(s)
+end
 
-(d)
+(e) TEXT: Assuming hd is defined as in part (a), the title of the longest programme:
 
-TEXT: axdef
-TEXT:   cumulative_total : seq(Title * Length * Viewed) -> N
-TEXT: where
-TEXT:   cumulative_total (<>) = 0
-TEXT:   forall x : Title * Length * Viewed; s : seq(Title * Length * Viewed) | cumulative_total (<x> ^ s) = x.2 + cumulative_total(s)
-TEXT: end
-
-(e)
-
-TEXT: (mu p : ran hd | forall q : ran hd | p /= q | p.2 > q.2 | p.1)
+TEXT: (mu p : ran hd | forall q : ran hd | p /= q | p.length > q.length | p.title)
 
 TEXT: (This, of course, assumes that there is a unique element with this property.)
 
-(f)
-
-TEXT: (f) Omitted - requires semicolon-separated bindings in nested set comprehension
-
-(g)
-
-TEXT: axdef
-TEXT:   g : seq(Title * Length * Viewed) -> seq(Title * Length * Viewed)
+(f) TEXT: axdef
+TEXT:   totalsByTitle : seq(Programme) -> (Title +-> Length)
 TEXT: where
-TEXT:   forall s : seq(Title * Length * Viewed) | g(s) = s |> {x : ran s | x /= longest_viewed(s)}
+TEXT:   forall s : seq(Programme) |
+TEXT:     totalsByTitle(s) = {t : Title | (exists p : ran s | p.title = t) .
+TEXT:       t |-> cumulativeTotal(s |> {l : Length; v : Viewed . (t, l, v)})}
 TEXT: end
 TEXT:
-TEXT: Where longest_viewed is defined as
-TEXT:
-TEXT: axdef
-TEXT:   longest_viewed : seq(Title * Length * Viewed) +-> Title * Length * Viewed
-TEXT: where
-TEXT:   forall s : seq(Title * Length * Viewed) | longest_viewed(s) = (mu p : ran s | p.3 = yes and forall q : ran s | p /= q and q.3 = yes | p.2 > q.2)
-TEXT: end
+TEXT: (Note: Complex nested set comprehensions - may require simplification for implementation)
+
+(g) axdef
+  removeTheLongestViewed : seq(Programme) -> seq(Programme)
+where
+  forall s : seq(Programme) |
+    removeTheLongestViewed(s) = s |> {x : ran s | x /= longestViewed(s)}
+end
+
+TEXT: Where longestViewed is defined as:
+
+axdef
+  longestViewed : seq(Programme) +-> Programme
+where
+  forall s : seq(Programme) | longestViewed(s) = (mu p : ran s | p.viewed = yes and forall q : ran s | p /= q and q.viewed = yes | p.length > q.length)
+end
 
 TEXT: This, of course, assumes that there is at least one viewed programme (and one of a unique maximum length).
 
-(h)
-
-TEXT: axdef
-TEXT:   s : seq(Title * Length * Viewed) -> seq(Title * Length * Viewed)
-TEXT: where
-TEXT:   forall x : seq(Title * Length * Viewed) | items(s(x)) = items(x) and (forall i, j : dom(s(x)) | i < j => (s(x)(i)).2 >= (s(x)(j)).2)
-TEXT: end
+(h) axdef
+  sortByLength : seq(Programme) -> seq(Programme)
+where
+  forall x : seq(Programme) | items(sortByLength(x)) = items(x) and (forall i, j : dom(sortByLength(x)) | i < j => (sortByLength(x)(i)).length >= (sortByLength(x)(j)).length)
+end
 
 ** Solution 41 **
 
@@ -870,9 +694,7 @@ end
 
 Table == N -|> Entry
 
-(a)
-
-axdef
+(a) axdef
   records : Year -|> Table
 where
   dom(records) = 1993..current
@@ -881,47 +703,29 @@ where
   forall r : ran(records) | forall i1, i2 : dom(r) | i1 /= i2 and (r(i1)).year = (r(i2)).year => (r(i1)).code /= (r(i2)).code
 end
 
-(b)
+(b) (i) {e : Entry | (exists r : ran records | e in ran r and e.code = 479)}
 
-(i)
+(ii) {e : Entry | (exists r : ran records | e in ran r and e.completed > e.enrolled)}
 
-{e : Entry | (exists r : ran records | e in ran r and e.code = 479)}
+(iii) {e : Entry | (exists r : ran records | e in ran r and e.grade >= 70)}
 
-(ii)
+(iv) {c : Course | (forall r : ran records | (forall e : ran r | e.course = c => e.grade >= 70))}
 
-{e : Entry | (exists r : ran records | e in ran r and e.completed > e.enrolled)}
+(v) {y : Year | y in dom records . y |-> {l : Lecturer | # {e : ran (records y) | e.lecturer = l} > 6}}
 
-(iii)
-
-{e : Entry | (exists r : ran records | e in ran r and e.grade >= 70)}
-
-(iv)
-
-{c : Course | (forall r : ran records | (forall e : ran r | e.course = c => e.grade >= 70))}
-
-(v)
-
-{y : Year | y in dom records . y |-> {l : Lecturer | # {e : ran (records y) | e.lecturer = l} > 6}}
-
-(c)
-
-axdef
+(c) axdef
 where
   forall x : Entry; s : seq(Entry) | courses479 (<>) = <> and courses479 (<x> ^ s) = if x.code = 479 then <x> ^ courses479(s) else courses479(s)
 end
 
-(d)
-
-axdef
+(d) axdef
 where
   forall x : Entry; s : seq(Entry) | total(<>) = 0 and total(<x> ^ s) = x.enrolled + total(s)
 end
 
 ** Solution 42 **
 
-(a)
-
-given Person
+(a) given Person
 
 axdef
   State : P(seq(iseq(Person)))
@@ -929,39 +733,49 @@ where
   forall s : State | forall i, j : dom(s) | i /= j | ran(s(i)) intersect ran(s(j)) = {}
 end
 
-(b)
-
-TEXT: axdef
-TEXT:   add : N * Person * State -|> State
-TEXT: where
-TEXT:   forall n : N; p : Person; s : State | n in dom s and p /in bigcup(ran(ran(s))) |
-TEXT:     add(n, p, s) = s ++ {n |-> s(n) ^ <p>}
-TEXT: end
-TEXT: (Blocked by: -|> operator not implemented)
+(b) axdef
+  add : N cross Person cross State -|> State
+where
+  forall n : N; p : Person; s : State | n in dom(s) and p notin bigcup(ran(ran(s))) . add(n, p, s) = s ++ {n |-> s(n) ^ <p>}
+end
 
 ** Solution 43 **
 
-(a)
+TEXT: Note: Assuming given types Cinema, Film, Date, Booking and a bookings relation.
+TEXT: The problem statement defines: bookings : (Cinema cross Film) +-> seq Booking
+TEXT: where Booking is a triple of (bookingRef, startDay, endDay) : (N cross N cross N)
 
-TEXT: (i) forall i : dom bookings | forall x, y : bookings(i) | x /= y | (x.2..x.3) intersect (y.2..y.3) = {}
-TEXT:
-TEXT: (ii) forall i : dom bookings | forall x : bookings(i) | {x.2, x.3} subseteq 1..max(i.1)
-TEXT:
-TEXT: (iii) forall i : dom bookings | forall b : bookings(i) | b.2 <= b.3
-TEXT:
+given Cinema, Film, Date
+
+schema Booking
+  ref: N
+  startDay: N
+  endDay: N
+end
+
+TEXT: Assuming: bookings : (Cinema cross Film) +-> seq Booking
+
+(a) TEXT: (i) forall i : dom bookings | forall x, y : bookings(i) | x /= y | (x.startDay..x.endDay) intersect (y.startDay..y.endDay) = emptyset
+
+TEXT: (ii) forall i : dom bookings | forall x : bookings(i) | {x.startDay, x.endDay} subseteq 1..max(i.1)
+
+TEXT: (Note: Assuming max is a function on Cinema that returns the maximum day number)
+
+TEXT: (iii) forall i : dom bookings | forall b : bookings(i) | b.startDay <= b.endDay
+
 TEXT: (iv) This is enforced by the constraint for part (i).
-TEXT:
 
-(b)
+(b) TEXT: Assuming Banbury : Cinema and bookings is defined
 
 TEXT: (i) {i : dom bookings | i.1 = Banbury . i.2}
-TEXT:
-TEXT: (ii) {i : dom bookings | i.1 = Banbury and exists b : bookings(i) | 50 in b.2..b.3}
-TEXT:
-TEXT: (iii) {r : Room; s : N | exists i : dom bookings | i.1 = r and i.2 = s . (r, s)}
-TEXT:
-TEXT: (iv) {r : Room | exists i : dom bookings | i.1 = r | # (bookings(i)) >= 10}
-TEXT:
+
+TEXT: (ii) {i : dom bookings | i.1 = Banbury and exists b : bookings(i) | 50 in b.startDay..b.endDay}
+
+TEXT: (iii) Assuming Room is Cinema, returning unique cinema/film pairs:
+
+TEXT: {c : Cinema; f : Film | exists i : dom bookings | i.1 = c and i.2 = f . (c, f)}
+
+TEXT: (iv) {c : Cinema | exists i : dom bookings | i.1 = c | # (bookings(i)) >= 10}
 
 === Free types and induction ===
 
@@ -1004,21 +818,21 @@ TEXT:   = <x> ^ t  [reverse (reverse t) = t]
 
 ** Solution 46 **
 
-(a)
+(a) axdef
+  count : Tree -> N
+where
+  count(stalk) = 0
+  forall n : N | count(leaf(n)) = 1
+  forall t1, t2 : Tree | count(branch(t1, t2)) = count(t1) + count(t2)
+end
 
-TEXT: count : Tree -> N
-TEXT: count stalk = 0
-TEXT: forall n : N | count (leaf n) = 1
-TEXT: forall t1, t2 : Tree | count (branch (t1, t2)) = count t1 + count t2
-TEXT: (Blocked by: recursive free types and pattern matching)
-
-(b)
-
-TEXT: flatten : Tree -> seq N
-TEXT: flatten stalk = <>
-TEXT: forall n : N | flatten (leaf n) = <n>
-TEXT: forall t1, t2 : Tree | flatten (branch (t1, t2)) = flatten t1 ^ flatten t2
-TEXT: (Blocked by: recursive free types and pattern matching)
+(b) axdef
+  flatten : Tree -> seq(N)
+where
+  flatten(stalk) = <>
+  forall n : N | flatten(leaf(n)) = <n>
+  forall t1, t2 : Tree | flatten(branch(t1, t2)) = flatten(t1) ^ flatten(t2)
+end
 
 ** Solution 47 **
 
@@ -1069,42 +883,27 @@ end
 
 ** Solution 50 **
 
-(a)
+(a) A == users \ bigcup(ran(playlistSubscribers))
 
-A == users \ bigcup(ran(playlistSubscribers))
+(b) B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
 
-(b)
+(c) C == (mu u : dom(loved) | forall v : dom(loved) | u /= v | # (loved(u)) > # (loved(v)))
 
-B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
-
-(c)
-
-C == (mu u : dom(loved) | forall v : dom(loved) | u /= v | # (loved(u)) > # (loved(v)))
-
-(d)
-
-D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved(u)} > # {u : UserId | t in loved(u)})
+(d) D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved(u)} > # {u : UserId | t in loved(u)})
 
 ** Solution 51 **
 
-(a)
+(a) axdef
+  loveHateScore : SongId +-> N
+where
+  forall i : songs | loveHateScore(i) = if # {u : UserId | i in loved(u)} >= # {u : UserId | i in hated(u)} then # {u : UserId | i in loved(u)} - # {u : UserId | i in hated(u)} else 0
+end
 
-TEXT: Let's first define two helper functions:
-TEXT:
-TEXT: loveHateScore : SongId +-> N
-TEXT: forall i : songs | # {u : UserId | i in loved(u)} >= # {u : UserId | i in hated(u)} =>
-TEXT:     loveHateScore(i) = # {u : UserId | i in loved(u)} - # {u : UserId | i in hated(u)}
-TEXT: and
-TEXT: forall i : songs | # {u : UserId | i in loved(u)} < # {u : UserId | i in hated(u)} =>
-TEXT:     loveHateScore(i) = 0
-TEXT:
 axdef
   playlistCount : SongId +-> N
 where
   forall i : songs | playlistCount(i) = # {p : dom(playlist) | i in ran(playlist(p))}
 end
-
-TEXT: We then have:
 
 axdef
   length : SongId +-> N
@@ -1115,42 +914,33 @@ where
   forall i : songs | popularity(i) = loveHateScore(i) + playlistCount(i)
 end
 
-(b)
+(b) axdef
+  mostPopular : SongId
+where
+  mostPopular = if (exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j)) then (mu i : songs | forall j : songs | i /= j | popularity(i) > popularity(j)) else nullSong
+end
 
-TEXT: mostPopular : SongId
-TEXT: (exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j)) =>
-TEXT:     mostPopular = (mu i : songs | forall j : songs | i /= j | popularity(i) > popularity(j))
-TEXT: and
-not (exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j)) => mostPopular = nullSong
-
-(c)
-
-TEXT: playlistsContainingMostPopularSong == {i : dom(playlists) | mostPopular in ran(playlists(i))}
+(c) playlistsContainingMostPopularSong == {i : dom(playlists) | mostPopular in ran(playlists(i))}
 
 ** Solution 52 **
 
-(a)
+(a) axdef
+  premiumPlays : seq(Play) -> seq(Play)
+where
+  premiumPlays(<>) = <>
+  forall x : Play; s : seq(Play) | premiumPlays(<x> ^ s) = if userStatus(x.2) = premium then <x> ^ premiumPlays(s) else premiumPlays(s)
+end
 
-TEXT: premiumPlays : seq(Play) -> seq(Play)
-TEXT: premiumPlays(<>) = <>
-TEXT: forall x : Play; s : seq(Play) |
-TEXT:     premiumPlays(<x> ^ s) = <x> ^ premiumPlays(s)   if userStatus(x.2) = premium
-TEXT:                              premiumPlays(s)          if userStatus(x.2) = standard
-TEXT: (Note: Uses camelCase for fuzz compatibility)
+(b) axdef
+  standardPlays : seq(Play) -> seq(Play)
+where
+  standardPlays(<>) = <>
+  forall x : Play; s : seq(Play) | standardPlays(<x> ^ s) = if userStatus(x.2) = standard then <x> ^ standardPlays(s) else standardPlays(s)
+end
 
-(b)
-
-TEXT: standardPlays : seq(Play) -> seq(Play)
-TEXT: standardPlays(<>) = <>
-TEXT: forall x : Play; s : seq(Play) |
-TEXT:     standardPlays(<x> ^ s) = <x> ^ standardPlays(s)  if userStatus(x.2) = standard
-TEXT:                               standardPlays(s)        if userStatus(x.2) = premium
-TEXT: (Note: Uses camelCase for fuzz compatibility)
-
-(c)
-
-TEXT: cumulativeLength : seq(Play) -> N
-TEXT: cumulativeLength(<>) = 0
-TEXT: forall x : Play; s : seq(Play) |
-TEXT:     cumulativeLength(<x> ^ s) = length(x.1) + cumulativeLength(s)
-TEXT: (Note: Uses camelCase for fuzz compatibility)
+(c) axdef
+  cumulativeLength : seq(Play) -> N
+where
+  cumulativeLength(<>) = 0
+  forall x : Play; s : seq(Play) | cumulativeLength(<x> ^ s) = length(x.1) + cumulativeLength(s)
+end
