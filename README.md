@@ -311,13 +311,15 @@ hatch run convert input.txt --fuzz
 
 ## Known Issues
 
-### Active Bugs (3 confirmed)
+### Active Bugs (5 confirmed)
 
 | Priority | Issue | Description | Workaround |
 |----------|-------|-------------|------------|
 | HIGH | [#1](https://github.com/jmf-pobox/txt2tex/issues/1) | Parser fails on prose with periods | Use TEXT blocks |
 | MEDIUM | [#2](https://github.com/jmf-pobox/txt2tex/issues/2) | Multiple pipes in TEXT close math mode | Use axdef/schema |
 | MEDIUM | [#3](https://github.com/jmf-pobox/txt2tex/issues/3) | Cannot use R+, R* identifiers | None available |
+| MEDIUM | [#4](https://github.com/jmf-pobox/txt2tex/issues/4) | Comma after parenthesized math not detected | Use TEXT blocks |
+| MEDIUM-HIGH | [#5](https://github.com/jmf-pobox/txt2tex/issues/5) | Logical operators in prose not converted | Use TEXT blocks |
 
 **For bug details and test cases, see [tests/bugs/README.md](tests/bugs/README.md)**
 
@@ -341,14 +343,14 @@ hatch run convert input.txt --fuzz
 ### Running Tests
 
 ```bash
-# All tests (845 passing)
+# All tests (906 passing)
 hatch run test
 
 # With coverage
 hatch run test-cov
 
 # Specific test directory
-hatch run test tests/01_propositional/
+hatch run test tests/test_01_propositional_logic/
 
 # Verbose output
 hatch run test -v
@@ -374,9 +376,9 @@ sem/
 │   ├── parser.py             # Parsing to AST
 │   ├── latex_gen.py          # LaTeX generation
 │   └── cli.py                # Command-line interface
-├── tests/                    # Test suite (845 tests)
-│   ├── 01_propositional/     # Organized by lecture
-│   ├── 02_quantifiers/
+├── tests/                    # Test suite (906 tests)
+│   ├── test_01_propositional_logic/  # Organized by topic
+│   ├── test_02_predicate_logic/
 │   ├── ...
 │   └── bugs/                 # Bug test cases
 ├── examples/                 # Example files
@@ -554,4 +556,4 @@ For bugs, feature requests, or questions, please open an issue on [GitHub](https
 
 ---
 
-**Last Updated**: 2025-10-18
+**Last Updated**: 2025-10-23
