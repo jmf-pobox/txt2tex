@@ -2,7 +2,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
 \usepackage{natbib}
-\usepackage{fuzz}
+\usepackage{zed-cm}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \begin{document}
@@ -45,7 +45,7 @@ $p$ & $\lnot p$ & $( \lnot p \Rightarrow p )$ & $\mathbf{p \Rightarrow ( \lnot p
 
 \bigskip
 
-$p \implies (\lnot p \implies p)$ is a tautology as it is true for every interpretation of p as illustrated by the final column of truth values.
+$p \Rightarrow (\lnot p \Rightarrow p)$ is a tautology as it is true for every interpretation of p as illustrated by the final column of truth values.
 
 \bigskip
 
@@ -65,7 +65,7 @@ $p$ & $q$ & $( q \Rightarrow p )$ & $\lnot p$ & $\lnot q$ & $( \lnot p \Rightarr
 
 \bigskip
 
-The statements $\lnot p \implies \lnot q$, $q \implies p$ are equivalent and $\lnot p \implies \lnot q \Leftrightarrow q \implies p$ is a tautology as it is true for every interpretation of p, q as illustrated by the final column of truth values.
+The statements $\lnot p \Rightarrow \lnot q$, $q \Rightarrow p$ are equivalent and $\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$ is a tautology as it is true for every interpretation of p, q as illustrated by the final column of truth values.
 
 \bigskip
 
@@ -89,7 +89,7 @@ $p$ & $q$ & $r$ & $( p \Rightarrow r )$ & $( q \Rightarrow r )$ & $( ( p \Righta
 
 \bigskip
 
-The statements $(p \implies r) \land (q \implies r)$, $p \lor q \implies r$ are equivalent and $(p \implies r) \land (q \implies r)$ $\Leftrightarrow$ $p \lor q \implies r$ is a tautology as it is true for every interpretation of p, q, r as illustrated by the final column of truth values.
+The statements $(p \Rightarrow r) \land (q \Rightarrow r)$, $p \lor q \Rightarrow r$ are equivalent and $(p \Rightarrow r) \land (q \Rightarrow r)$ $\Leftrightarrow$ $p \lor q \Rightarrow r$ is a tautology as it is true for every interpretation of p, q, r as illustrated by the final column of truth values.
 
 \bigskip
 
@@ -114,17 +114,17 @@ Lecture 1 - Propositions
 \vspace{11pt}
 \[
 \begin{array}{ll@{\hspace{2em}}l}
-& p \implies (\lnot p \implies p) \\
-&\Leftrightarrow p \implies \lnot \lnot p \lor p & [\mbox{$\Rightarrow$ disjunction}] \\
-&\Leftrightarrow p \implies p \lor p & [\mbox{$\lnot$ $\lnot$}] \\
-&\Leftrightarrow p \implies p & [\mbox{idempotence of p}] \\
+& p \Rightarrow (\lnot p \Rightarrow p) \\
+&\Leftrightarrow p \Rightarrow \lnot \lnot p \lor p & [\mbox{$\Rightarrow$ disjunction}] \\
+&\Leftrightarrow p \Rightarrow p \lor p & [\mbox{$\lnot$ $\lnot$}] \\
+&\Leftrightarrow p \Rightarrow p & [\mbox{idempotence of p}] \\
 &\Leftrightarrow true & [\mbox{tautology}]
 \end{array}
 \]
 
 \bigskip
 
-In this equivalence proof, we show that $p \implies (\lnot p \implies p)$ by using implication disjunction to replace the implication with a logical or, the definition of double negation to simplify, the application of the idempotence rule to simplify, and the fact that $p \implies p$ is a tautology. 
+In this equivalence proof, we show that $p \Rightarrow (\lnot p \Rightarrow p)$ by using implication disjunction to replace the implication with a logical or, the definition of double negation to simplify, the application of the idempotence rule to simplify, and the fact that $p \Rightarrow p$ is a tautology. 
 
 \bigskip
 
@@ -135,17 +135,17 @@ In this equivalence proof, we show that $p \implies (\lnot p \implies p)$ by usi
 \vspace{11pt}
 \[
 \begin{array}{ll@{\hspace{2em}}l}
-& \lnot p \implies \lnot q \\
+& \lnot p \Rightarrow \lnot q \\
 &\Leftrightarrow \lnot \lnot p \lor \lnot q & [\mbox{$\Rightarrow$ disjunction}] \\
 &\Leftrightarrow p \lor \lnot q & [\mbox{$\lnot$ $\lnot$}] \\
 &\Leftrightarrow \lnot q \lor p & [\mbox{commutativity of $\lor$}] \\
-&\Leftrightarrow q \implies p & [\mbox{$\Rightarrow$ disjunction}]
+&\Leftrightarrow q \Rightarrow p & [\mbox{$\Rightarrow$ disjunction}]
 \end{array}
 \]
 
 \bigskip
 
-In this equivalance proof, we show that $\lnot p \implies \lnot q \Leftrightarrow q \implies p$ by using implication disjunction to replace implication with logical or, the definition of double negation to simplify, the commutivity property of logical or to change the order of the elements, and the implication disjunction rule to reintroduce implication.
+In this equivalance proof, we show that $\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$ by using implication disjunction to replace implication with logical or, the definition of double negation to simplify, the commutivity property of logical or to change the order of the elements, and the implication disjunction rule to reintroduce implication.
 
 \bigskip
 
@@ -156,19 +156,19 @@ In this equivalance proof, we show that $\lnot p \implies \lnot q \Leftrightarro
 \vspace{11pt}
 \[
 \begin{array}{ll@{\hspace{2em}}l}
-& (p \implies r) \land (q \implies r) \\
+& (p \Rightarrow r) \land (q \Rightarrow r) \\
 &\Leftrightarrow (\lnot p \lor r) \land (\lnot q \lor r) & [\mbox{$\Rightarrow$ disjunction}] \\
 &\Leftrightarrow (r \lor \lnot p) \land (r \lor \lnot q) & [\mbox{commutativity of $\lor$}] \\
 &\Leftrightarrow r \lor \lnot p \land \lnot q & [\mbox{distributivity 2}] \\
 &\Leftrightarrow \lnot p \land \lnot q \lor r & [\mbox{commutativity of $\lor$}] \\
 &\Leftrightarrow \lnot (p \lor q) \lor r & [\mbox{De Morgan}] \\
-&\Leftrightarrow p \lor q \implies r & [\mbox{$\Rightarrow$ disjunction}]
+&\Leftrightarrow p \lor q \Rightarrow r & [\mbox{$\Rightarrow$ disjunction}]
 \end{array}
 \]
 
 \bigskip
 
-In this equivalence proof, we show that $(p \implies r) \land (q \implies r)$ $\Leftrightarrow$ $p \lor q$ $\Rightarrow$ r by using the implication disjunction rule to replace implication with logical or, the commutativity of or rule to change the order of the elements, the distributivity 2 rule to extract r, and the commutivity of logical or to change the order of the elements, De Morgan to extract negation for $\lnot p \land \lnot q$, and the implication disjunction rule to reintroduce implication.
+In this equivalence proof, we show that $(p \Rightarrow r) \land (q \Rightarrow r)$ $\Leftrightarrow$ $p \lor q$ $\Rightarrow$ r by using the implication disjunction rule to replace implication with logical or, the commutativity of or rule to change the order of the elements, the distributivity 2 rule to extract r, and the commutivity of logical or to change the order of the elements, De Morgan to extract negation for $\lnot p \land \lnot q$, and the implication disjunction rule to reintroduce implication.
 
 \bigskip
 
@@ -193,16 +193,16 @@ Lecture 3 - Deductive Proofs
 \vspace{11pt}
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (\lnot p \implies p)}{
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \Rightarrow (\lnot p \Rightarrow p)}{
   \ulcorner p \urcorner^{[1]}
 &
-\infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \implies p}{\ulcorner p \urcorner^{[1]} & \infer[false\textrm{-elim}^{[3]}]{\lnot p}{\infer[\mathrm{false} - \mathrm{intro}]{false}{\ulcorner \lnot p \urcorner^{[2]} & \ulcorner p \urcorner^{[3]}}}}
+\infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \Rightarrow p}{\ulcorner p \urcorner^{[1]} & \infer[false\textrm{-elim}^{[3]}]{\lnot p}{\infer[\mathrm{false} - \mathrm{intro}]{false}{\ulcorner \lnot p \urcorner^{[2]} & \ulcorner p \urcorner^{[3]}}}}
 }
 $
 
 \bigskip
 
-For this proof we are seeking to prove that p $\Rightarrow$ $\lnot p \implies p$, which we know holds given the truth table in 1(a). Working mechanically from the bottom, I started by applying the implication introduction rule with assumption [1] to gain our conclusion, implication introduction rule with assumption [2] to gain $\lnot p \implies p$.  This statement requires that I have both p and $\lnot p$ as premisses, which is a bit odd and implied I needed to use false in the proof.  Since I had p as assumption [1], I knew I wanted $\lnot p$ as the output of the false rules.  It took some experimentation, but eventually I realized I needed three assumptions not two and it was obvious that I wanted to preserve $\lnot p$ as assumption [2], which meant I needed p as assumption [3] and that assumption [3] would be discharged by the false-elim rule.  In the final proof, all assumptions are discharged properly. The key insight was to have p as an assumption twice at different scopes.
+For this proof we are seeking to prove that p $\Rightarrow$ $\lnot p \Rightarrow p$, which we know holds given the truth table in 1(a). Working mechanically from the bottom, I started by applying the implication introduction rule with assumption [1] to gain our conclusion, implication introduction rule with assumption [2] to gain $\lnot p \Rightarrow p$.  This statement requires that I have both p and $\lnot p$ as premisses, which is a bit odd and implied I needed to use false in the proof.  Since I had p as assumption [1], I knew I wanted $\lnot p$ as the output of the false rules.  It took some experimentation, but eventually I realized I needed three assumptions not two and it was obvious that I wanted to preserve $\lnot p$ as assumption [2], which meant I needed p as assumption [3] and that assumption [3] would be discharged by the false-elim rule.  In the final proof, all assumptions are discharged properly. The key insight was to have p as an assumption twice at different scopes.
 
 \bigskip
 
@@ -213,28 +213,28 @@ For this proof we are seeking to prove that p $\Rightarrow$ $\lnot p \implies p$
 \vspace{11pt}
 \bigskip
 
-This proof involves equivalence or bi-implication, which requires us to show $p \implies q$ and $q \implies p$ given this is the definition of $p \Leftrightarrow q$.
+This proof involves equivalence or bi-implication, which requires us to show $p \Rightarrow q$ and $q \Rightarrow p$ given this is the definition of $p \Leftrightarrow q$.
 
 \bigskip
 
 \bigskip
 
-In one direction, we are seeking to prove $\lnot p \implies \lnot q$ $\Rightarrow$ $q \implies p$:
+In one direction, we are seeking to prove $\lnot p \Rightarrow \lnot q$ $\Rightarrow$ $q \Rightarrow p$:
 
 \bigskip
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \implies \lnot q) \implies (q \implies p)}{
-  \ulcorner \lnot p \implies \lnot q \urcorner^{[1]}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \Rightarrow \lnot q) \Rightarrow (q \Rightarrow p)}{
+  \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]}
 &
-\infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies p}{
+\infer[\Rightarrow\textrm{-intro}^{[2]}]{q \Rightarrow p}{
   \ulcorner q \urcorner^{[2]}
 &
 \infer[false\textrm{-elim}^{[3]}]{p}{
   \infer[\mathrm{false} - \mathrm{intro}]{false}{
   \infer[\Rightarrow \mathrm{elim}]{\lnot q}{
-  \ulcorner \lnot p \implies \lnot q \urcorner^{[1]}
+  \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]}
 &
 \ulcorner \lnot p \urcorner^{[3]}
 }
@@ -248,28 +248,28 @@ $
 
 \bigskip
 
-I started working mechanically from the bottom by applying the implication introduction rule to construct the conclusion.  This gave me $q \implies p$ as the key premise to build up, which requires applying the implication introduction rule to q and p. Looking at the need for q and looking at the need for p and $\lnot p \implies \lnot q$ as assumption [1], I felt it would be best to try $\lnot p$ as an assumption to at least get going.  This enabled me to work top down to get $\lnot q$ from the implication elimination rule. From there, I realized that I needed the negation of both $\lnot q$ and $\lnot p$. I knew the false-intro and false-elim were required, but it took some experimentation to see that I could get both $\lnot q$ and $\lnot p$ transformed into p and q by making $\lnot p$ assumption [3] instead of [2] and introducing q as assumption [2]. Once that insight was made, I could arrive at p as a result of the top of the tree and retain q [2] as an assumption coming out of false-elim. This is what I needed to arrive at $q \implies p$ and to connect the bottom and top portions of my proof.  All assumptions are properly discharged.
+I started working mechanically from the bottom by applying the implication introduction rule to construct the conclusion.  This gave me $q \Rightarrow p$ as the key premise to build up, which requires applying the implication introduction rule to q and p. Looking at the need for q and looking at the need for p and $\lnot p \Rightarrow \lnot q$ as assumption [1], I felt it would be best to try $\lnot p$ as an assumption to at least get going.  This enabled me to work top down to get $\lnot q$ from the implication elimination rule. From there, I realized that I needed the negation of both $\lnot q$ and $\lnot p$. I knew the false-intro and false-elim were required, but it took some experimentation to see that I could get both $\lnot q$ and $\lnot p$ transformed into p and q by making $\lnot p$ assumption [3] instead of [2] and introducing q as assumption [2]. Once that insight was made, I could arrive at p as a result of the top of the tree and retain q [2] as an assumption coming out of false-elim. This is what I needed to arrive at $q \Rightarrow p$ and to connect the bottom and top portions of my proof.  All assumptions are properly discharged.
 
 \bigskip
 
 \bigskip
 
-and in the other, we are seeking to prove $q \implies p$ $\Rightarrow$ $\lnot p \implies \lnot q$:
+and in the other, we are seeking to prove $q \Rightarrow p$ $\Rightarrow$ $\lnot p \Rightarrow \lnot q$:
 
 \bigskip
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(q \implies p) \implies (\lnot p \implies \lnot q)}{
-  \ulcorner q \implies p \urcorner^{[1]}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(q \Rightarrow p) \Rightarrow (\lnot p \Rightarrow \lnot q)}{
+  \ulcorner q \Rightarrow p \urcorner^{[1]}
 &
-\infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \implies \lnot q}{
+\infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \Rightarrow \lnot q}{
   \ulcorner \lnot p \urcorner^{[2]}
 &
 \infer[false\textrm{-elim}^{[3]}]{\lnot q}{
   \infer[\mathrm{false} - \mathrm{intro}]{false}{
   \infer[\Rightarrow \mathrm{elim}]{p}{
-  \ulcorner q \implies p \urcorner^{[1]}
+  \ulcorner q \Rightarrow p \urcorner^{[1]}
 &
 \ulcorner q \urcorner^{[3]}
 }
@@ -283,7 +283,7 @@ $
 
 \bigskip
 
-Working mechanically from the bottom, I apply the implication rule to $q \implies p$ as assumption [1] to gain the conclusion.  I need $\lnot p \implies \lnot q$, which shows me to use the implication rule again with $\lnot p$ as assumption [2].  From there, the question is how to get $\lnot q$.  Now working from the top, given assumption [1] has q, it makes sense to use the implication elimation rule with q as assumption [3]. This gives me p, when what I want is $\lnot q$.  I see that if I introduce $\lnot p$ as assumption [3] that I can negate q via the false-intro and false-elim rules and successfully discharge assumption [3]. This gives me $\lnot q$, which is what I need to connect to the top tree to the bottom of the proof. This proof came more quickly because $q \implies p$ as assumption [1] gave clear direction for the top portion. All assumptions are discharged and scopes are appropriate.
+Working mechanically from the bottom, I apply the implication rule to $q \Rightarrow p$ as assumption [1] to gain the conclusion.  I need $\lnot p \Rightarrow \lnot q$, which shows me to use the implication rule again with $\lnot p$ as assumption [2].  From there, the question is how to get $\lnot q$.  Now working from the top, given assumption [1] has q, it makes sense to use the implication elimation rule with q as assumption [3]. This gives me p, when what I want is $\lnot q$.  I see that if I introduce $\lnot p$ as assumption [3] that I can negate q via the false-intro and false-elim rules and successfully discharge assumption [3]. This gives me $\lnot q$, which is what I need to connect to the top tree to the bottom of the proof. This proof came more quickly because $q \Rightarrow p$ as assumption [1] gave clear direction for the top portion. All assumptions are discharged and scopes are appropriate.
 
 \bigskip
 
@@ -295,10 +295,10 @@ We then combine these two proofs with the $\Leftrightarrow$-intro rule, using th
 
 \noindent
 $\displaystyle
-\infer[\Leftrightarrow \mathrm{intro}]{\lnot p \implies \lnot q \Leftrightarrow q \implies p}{
-  (\lnot p \implies \lnot q) \implies (q \implies p)
+\infer[\Leftrightarrow \mathrm{intro}]{\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p}{
+  (\lnot p \Rightarrow \lnot q) \Rightarrow (q \Rightarrow p)
 &
-(q \implies p) \implies (\lnot p \implies \lnot q)
+(q \Rightarrow p) \Rightarrow (\lnot p \Rightarrow \lnot q)
 }
 $
 
@@ -309,16 +309,16 @@ $
 \vspace{11pt}
 \bigskip
 
-In one direction, we are seeking to prove $p \implies r$ and $q \implies r$ $\Rightarrow$ $p \lor q \implies r$:
+In one direction, we are seeking to prove $p \Rightarrow r$ and $q \Rightarrow r$ $\Rightarrow$ $p \lor q \Rightarrow r$:
 
 \bigskip
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \implies r) \land (q \implies r) \implies (p \lor q \implies r)}{
-  \ulcorner (p \implies r) \land (q \implies r) \urcorner^{[1]}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \Rightarrow r) \land (q \Rightarrow r) \Rightarrow (p \lor q \Rightarrow r)}{
+  \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
 &
-\infer[\Rightarrow\textrm{-intro}^{[2]}]{p \lor q \implies r}{
+\infer[\Rightarrow\textrm{-intro}^{[2]}]{p \lor q \Rightarrow r}{
   \ulcorner p \lor q \urcorner^{[2]}
 &
 \infer[\lor\textrm{-elim}^{[2]}]{r}{
@@ -327,16 +327,16 @@ $\displaystyle
 \raiseproof{12ex}{\infer[\Rightarrow \mathrm{elim}]{r}{
   \ulcorner p \urcorner^{[2]}
 &
-\infer[\land\textrm{-elim-1}]{p \implies r}{
-  \ulcorner (p \implies r) \land (q \implies r) \urcorner^{[1]}
+\infer[\land\textrm{-elim-1}]{p \Rightarrow r}{
+  \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
 }
 }}
 &
 \hskip 6em \raiseproof{30ex}{\infer[\Rightarrow \mathrm{elim}]{r}{
   \ulcorner q \urcorner^{[2]}
 &
-\infer[\land\textrm{-elim-2}]{q \implies r}{
-  \ulcorner (p \implies r) \land (q \implies r) \urcorner^{[1]}
+\infer[\land\textrm{-elim-2}]{q \Rightarrow r}{
+  \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
 }
 }}
 }
@@ -346,27 +346,27 @@ $
 
 \bigskip
 
-In this proof, I start by working from the bottom mechanically, taking $(p \implies r) \land (q \implies r)$ as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need $p \lor q$ and r as inputs to the implication introduction rule.  I take $p \lor q$ as assumption [2] and discharge this assumption via this rule.  That leaves me with r as the result of my bottom up process.  As I have already made assumptions $(p \implies r) \land (q \implies r)$ [1] and $p \lor q$ [2] and they are related, I start by working with both top-down. I begin with $p \lor q$ [2] and create cases for p and q working towards or elimination.  The p and q sub-branches are marked with [2] as the assumption as these are just the cases for $p \lor q$ [2] \citep[slide 41]{simpson25c}. First, I apply and elimination in each case to get $p \implies r$, $q \implies r$ with p, q respectively in the sub-branches.  From there, I apply implication elimination to arrive at r in both cases.  This enables me to use the or elimation together with $p \lor q$ [2] to simplify to r.  At this stage, I do not discharge assumption [2], as this is deferred until the next step. I use implication introduction together with $p \lor q$ [2] and r from the or elimination to discharge assumption [2], which connects the top-down and bottom-up process. All assumptions are properly discharged.  
+In this proof, I start by working from the bottom mechanically, taking $(p \Rightarrow r) \land (q \Rightarrow r)$ as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need $p \lor q$ and r as inputs to the implication introduction rule.  I take $p \lor q$ as assumption [2] and discharge this assumption via this rule.  That leaves me with r as the result of my bottom up process.  As I have already made assumptions $(p \Rightarrow r) \land (q \Rightarrow r)$ [1] and $p \lor q$ [2] and they are related, I start by working with both top-down. I begin with $p \lor q$ [2] and create cases for p and q working towards or elimination.  The p and q sub-branches are marked with [2] as the assumption as these are just the cases for $p \lor q$ [2] \citep[slide 41]{simpson25c}. First, I apply and elimination in each case to get $p \Rightarrow r$, $q \Rightarrow r$ with p, q respectively in the sub-branches.  From there, I apply implication elimination to arrive at r in both cases.  This enables me to use the or elimation together with $p \lor q$ [2] to simplify to r.  At this stage, I do not discharge assumption [2], as this is deferred until the next step. I use implication introduction together with $p \lor q$ [2] and r from the or elimination to discharge assumption [2], which connects the top-down and bottom-up process. All assumptions are properly discharged.  
 
 \bigskip
 
 \bigskip
 
-In the other direction, we are seeking to prove $p \lor q \implies r$ $\Rightarrow$ $(p \implies r) \land (q \implies r)$:
+In the other direction, we are seeking to prove $p \lor q \Rightarrow r$ $\Rightarrow$ $(p \Rightarrow r) \land (q \Rightarrow r)$:
 
 \bigskip
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \lor q \implies r) \implies (p \implies r) \land (q \implies r)}{
-  \ulcorner p \lor q \implies r \urcorner^{[1]}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \lor q \Rightarrow r) \Rightarrow (p \Rightarrow r) \land (q \Rightarrow r)}{
+  \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
 &
-\infer[\land \mathrm{intro}]{(p \implies r) \land (q \implies r)}{
-  \infer[\Rightarrow\textrm{-intro}^{[2]}]{p \implies r}{
+\infer[\land \mathrm{intro}]{(p \Rightarrow r) \land (q \Rightarrow r)}{
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{p \Rightarrow r}{
   \ulcorner p \urcorner^{[2]}
 &
 \infer[\Rightarrow \mathrm{elim}]{r}{
-  \ulcorner p \lor q \implies r \urcorner^{[1]}
+  \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
 &
 \infer[\lor\textrm{-intro-1}]{p \lor q}{
   \ulcorner p \urcorner^{[2]}
@@ -374,11 +374,11 @@ $\displaystyle
 }
 }
 &
-\infer[\Rightarrow\textrm{-intro}^{[3]}]{q \implies r}{
+\infer[\Rightarrow\textrm{-intro}^{[3]}]{q \Rightarrow r}{
   \ulcorner q \urcorner^{[3]}
 &
 \infer[\Rightarrow \mathrm{elim}]{r}{
-  \ulcorner p \lor q \implies r \urcorner^{[1]}
+  \ulcorner p \lor q \Rightarrow r \urcorner^{[1]}
 &
 \infer[\lor\textrm{-intro-2}]{p \lor q}{
   \ulcorner q \urcorner^{[3]}
@@ -391,7 +391,7 @@ $
 
 \bigskip
 
-Working mechanically from the bottom, we start by taking $p \lor q \implies r$ as assumption [1] and applying the implication introduction rule to discharge assumption [1].  This leaves us with $p \implies r$ and $q \implies r$, which is derived from $p \implies r$, $q \implies r$ and the application of the and introduction rule. Fairly clearly, we need two sub-branches to be developed top-down. Since we have $p \lor q \implies r$ and we want $p \implies r$ and $q \implies r$, I start with p [2] and q [3] to start the top-down sub-trees.  I struggled here until I recalled that I could use the or intro rule to satisfy $p \lor q$.  I also had to recall that this does not generate additional assumptions to discharge \citep[slide 38]{simpson25c}. From here, it was not difficult to use implication elimation to arrive at r in both sub-trees and to apply p [2] and q [3] in each tree respectively with the implication introduction rule to discharge those assumptions.  This gave me $p \implies r$, $q \implies r$ and I used the and introduction rule to connect the top and bottom portions of the proof. All assumptions are properly discharged.  
+Working mechanically from the bottom, we start by taking $p \lor q \Rightarrow r$ as assumption [1] and applying the implication introduction rule to discharge assumption [1].  This leaves us with $p \Rightarrow r$ and $q \Rightarrow r$, which is derived from $p \Rightarrow r$, $q \Rightarrow r$ and the application of the and introduction rule. Fairly clearly, we need two sub-branches to be developed top-down. Since we have $p \lor q \Rightarrow r$ and we want $p \Rightarrow r$ and $q \Rightarrow r$, I start with p [2] and q [3] to start the top-down sub-trees.  I struggled here until I recalled that I could use the or intro rule to satisfy $p \lor q$.  I also had to recall that this does not generate additional assumptions to discharge \citep[slide 38]{simpson25c}. From here, it was not difficult to use implication elimation to arrive at r in both sub-trees and to apply p [2] and q [3] in each tree respectively with the implication introduction rule to discharge those assumptions.  This gave me $p \Rightarrow r$, $q \Rightarrow r$ and I used the and introduction rule to connect the top and bottom portions of the proof. All assumptions are properly discharged.  
 
 \bigskip
 
@@ -403,10 +403,10 @@ We then combine these two proofs with the $\Leftrightarrow$-intro rule, using th
 
 \noindent
 $\displaystyle
-\infer[\Leftrightarrow \mathrm{intro}]{(p \implies r) \land (q \implies r) \Leftrightarrow p \lor q \implies r}{
-  (p \implies r) \land (q \implies r) \implies (p \lor q \implies r)
+\infer[\Leftrightarrow \mathrm{intro}]{(p \Rightarrow r) \land (q \Rightarrow r) \Leftrightarrow p \lor q \Rightarrow r}{
+  (p \Rightarrow r) \land (q \Rightarrow r) \Rightarrow (p \lor q \Rightarrow r)
 &
-(p \lor q \implies r) \implies (p \implies r) \land (q \implies r)
+(p \lor q \Rightarrow r) \Rightarrow (p \Rightarrow r) \land (q \Rightarrow r)
 }
 $
 
@@ -421,13 +421,13 @@ $
 \begin{gendef}[X]
   maxSeq: \seq_1 (\seq X) \fun \seq X
 \where
-  \forall ss : \seq_1 (\seq X) @ maxSeq(ss) \in \ran ss \land (\forall t : \seq X @ t \in \ran ss \implies \# (maxSeq(ss)) \geq \# t)
+  \forall ss \colon \seq_1 (\seq X) \bullet maxSeq(ss) \in \ran ss \land \forall t \colon \seq X \bullet t \in \ran ss \Rightarrow \# maxSeq(ss) \geq \# t
 \end{gendef}
 
 \begin{gendef}[X]
   minSeq: \seq_1 (\seq X) \fun \seq X
 \where
-  \forall ss : \seq_1 (\seq X) @ minSeq(ss) \in \ran ss \land (\forall t : \seq X @ t \in \ran ss \implies \# (minSeq(ss)) \leq \# t)
+  \forall ss \colon \seq_1 (\seq X) \bullet minSeq(ss) \in \ran ss \land \forall t \colon \seq X \bullet t \in \ran ss \Rightarrow \# minSeq(ss) \leq \# t
 \end{gendef}
 
 \bigskip
@@ -482,13 +482,13 @@ Lecture 4 - Sets, Types, and Definitions
 \par
 \vspace{11pt}
 \begin{axdef}
-SquaresOfEvens : \power \num
+SquaresOfEvens : \power \mathbb{Z}
 \where
-SquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z * z \}
+SquaresOfEvens = \{ z \colon \mathbb{Z} \mid z \mod 2 = 0 \bullet z * z \}
 \end{axdef}
 
 \begin{zed}
-  SquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z * z \}
+  SquaresOfEvens = \{ z \colon \mathbb{Z} \mid z \mod 2 = 0 \bullet z * z \}
 \end{zed}
 
 \medskip
@@ -497,9 +497,9 @@ SquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z * z \}
 \par
 \vspace{11pt}
 \begin{axdef}
-CubesOfSquaresOfEvens : \power \num
+CubesOfSquaresOfEvens : \power \mathbb{Z}
 \where
-CubesOfSquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z * z * z * z * z * z \}
+CubesOfSquaresOfEvens = \{ z \colon \mathbb{Z} \mid z \mod 2 = 0 \bullet z * z * z * z * z * z \}
 \end{axdef}
 
 \medskip
@@ -508,9 +508,9 @@ CubesOfSquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z * z * z * z * z * z \}
 \par
 \vspace{11pt}
 \begin{axdef}
-SquareCubePairsOfEvens : \power (\num \cross \num)
+SquareCubePairsOfEvens : \power (\mathbb{Z} \cross \mathbb{Z})
 \where
-SquareCubePairsOfEvens = \{ z_1, z_2 : \num | z_1 \mod 2 = 0 \land z_2 \mod 2 = 0 @ (z_1 * z_1, z_2 * z_2 * z_2) \}
+SquareCubePairsOfEvens = \{ z_1, z_2 \colon \mathbb{Z} \mid z_1 \mod 2 = 0 \land z_2 \mod 2 = 0 \bullet (z_1 * z_1, z_2 * z_2 * z_2) \}
 \end{axdef}
 
 \medskip
@@ -519,9 +519,9 @@ SquareCubePairsOfEvens = \{ z_1, z_2 : \num | z_1 \mod 2 = 0 \land z_2 \mod 2 = 
 \par
 \vspace{11pt}
 \begin{axdef}
-SquareCubeIdentityPairsOfEvens : \power (\num \cross \num)
+SquareCubeIdentityPairsOfEvens : \power (\mathbb{Z} \cross \mathbb{Z})
 \where
-SquareCubeIdentityPairsOfEvens = \{ z : \num | z \mod 2 = 0 @ (z * z, z * z * z) \}
+SquareCubeIdentityPairsOfEvens = \{ z \colon \mathbb{Z} \mid z \mod 2 = 0 \bullet (z * z, z * z * z) \}
 \end{axdef}
 
 \medskip
@@ -530,9 +530,9 @@ SquareCubeIdentityPairsOfEvens = \{ z : \num | z \mod 2 = 0 @ (z * z, z * z * z)
 \par
 \vspace{11pt}
 \begin{axdef}
-SquareOrCubeIntegers : \power \num
+SquareOrCubeIntegers : \power \mathbb{Z}
 \where
-SquareOrCubeIntegers = \{ z, z_0 : \num | z = z_0 * z_0 \lor z = z_0 * z_0 * z_0 @ z \}
+SquareOrCubeIntegers = \{ z, z_0 \colon \mathbb{Z} \mid z = z_0 * z_0 \lor z = z_0 * z_0 * z_0 \bullet z \}
 \end{axdef}
 
 \newpage
@@ -546,33 +546,33 @@ SquareOrCubeIntegers = \{ z, z_0 : \num | z = z_0 * z_0 \lor z = z_0 * z_0 * z_0
 \medskip
 
 \begin{axdef}
-Naturals : \nat
+Naturals : \mathbb{N}
 \where
-\forall x : \nat @ x \geq 0
+\forall x \colon \mathbb{N} \bullet x \geq 0
 \end{axdef}
 
 \begin{axdef}
-NaturalsExist : \nat
+NaturalsExist : \mathbb{N}
 \where
-\exists x : \nat @ x > 100
+\exists x \colon \mathbb{N} \bullet x > 100
 \end{axdef}
 
 \begin{axdef}
-NaturalsExistOne : \nat
+NaturalsExistOne : \mathbb{N}
 \where
-\exists_1 x : \nat @ x = 100
+\exists_1 x \colon \mathbb{N} \bullet x = 100
 \end{axdef}
 
 \begin{axdef}
-BadMu : \nat
+BadMu : \mathbb{N}
 \where
-BadMu = (\mu n : \nat | n > 0)
+BadMu = \mu n \colon \mathbb{N} \bullet n > 0
 \end{axdef}
 
 \begin{gendef}[X, Y]
   fst: X \cross Y \fun X
 \where
-  \forall x : X @ \forall y : Y @ fst(x, y) = x
+  \forall x \colon X \bullet \forall y \colon Y \bullet fst(x, y) = x
 \end{gendef}
 
 \newpage

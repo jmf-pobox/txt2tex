@@ -95,7 +95,7 @@ TEXT: For this proof we are seeking to prove that p => (not p => p), which we kn
 
 TEXT: This proof involves equivalence or bi-implication, which requires us to show p => q and q => p given this is the definition of p <=> q.
 
-TEXT: In one direction, we are seeking to prove (not p => not q) => q => p:
+TEXT: In one direction, we are seeking to prove (not p => not q) => (q => p):
 
 PROOF:
   (not p => not q) => (q => p) [=> intro from 1]

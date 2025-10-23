@@ -20,8 +20,8 @@ PDF_FILES := $(TXT_FILES:.txt=.pdf)
 SUBDIRS := 01_propositional_logic 02_predicate_logic 03_equality 04_proof_trees \
            05_sets 06_definitions 07_relations 08_functions 09_sequences fuzz_tests
 
-# Reference directory (special - builds with fuzz validation)
-# Note: Fuzz validation may report known errors (tuple projections, etc.) but PDF still builds
+# Reference directory (special - continues despite fuzz validation errors)
+# Note: All directories use fuzz validation, but reference allows known errors (tuple projections, etc.)
 .PHONY: reference
 reference:
 	@echo "Building reference/compiled_solutions.pdf with fuzz validation..."
