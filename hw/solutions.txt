@@ -189,16 +189,16 @@ PROOF:
 ** Question 4 **
 
 gendef [X]
-  maxSeq : seq1 seq X -> seq X
+  maxSeq : seq1 seq X -> seq X ; minSeq : seq1 seq X -> seq X; maxDiff : seq1 seq X -> N
 where
-  forall ss : seq1 seq X | maxSeq(ss) in ran ss and (forall t : seq X | t in ran ss => # (maxSeq(ss)) >= # t)
+  forall ss : seq1 seq X | maxSeq(ss) = (mu s : ran ss | forall t : ran ss | # s >= # t)
+  forall ss : seq1 seq X | minSeq(ss) = (mu s : ran ss | forall t : ran ss | # s <= # t)
+  forall ss : seq1 seq X | maxDiff(ss) = ((# maxSeq(ss)) - (# minSeq(ss)))
 end
 
-gendef [X]
-  minSeq : seq1 seq X -> seq X
-where
-  forall ss : seq1 seq X | minSeq(ss) in ran ss and (forall t : seq X | t in ran ss => # (minSeq(ss)) <= # t)
-end
+TEXT: We are defining a function that will tell us the difference in cardinality between the length of the longest and shorest sequences from an input type that is a non-empty sequences of sequences. The input could be < <x, y, z>, <> > or < <x> > for example. I specify three generic functions: maxSeq returns the longest sequence from a non-empty sequence of sequences; minSeq returns the shortest sequence from a non-empty sequence of sequences; and maxDiff, which fulfills the specification for Question 4.
+
+TEXT: For each function, a mu function is defined that selects a single element meeting the specification based on comparing each sequence s with every sequence t. This is enabled with the ran range operator so that we can go from ss < 1 |-> <x, y, z>, 2 |-> <> > as the data structure to s, t <x, y, z>, <> . maxSeq and minSeq use the cardinality operator and maxDiff uses subtraction with the condition that maxSeq must already be >= minDiff and therefore the subtraction is guaranteed to return a natural number as defined in the specification. This solution passes fuzz validation.
 
 ** Question 5 **
 
@@ -228,10 +228,6 @@ where
   SquaresOfEvens = { z : Z | z mod 2 = 0 . z * z}
 end
 
-zed
-  SquaresOfEvens = { z : Z | z mod 2 = 0 . z * z}
-end
-
 (b)
 axdef
   CubesOfSquaresOfEvens : P Z
@@ -258,41 +254,6 @@ axdef
   SquareOrCubeIntegers : P (Z)
 where
   SquareOrCubeIntegers = { z, z_0 : Z | z = z_0 * z_0 or z = z_0 * z_0 * z_0 . z}
-end
-
-
-PAGEBREAK:
-
-** Question n **
-
-axdef
-  Naturals : N
-where
-  forall x : N | x >= 0
-end
-
-axdef
-  NaturalsExist : N
-where
-  exists x : N | x > 100
-end
-
-axdef
-  NaturalsExistOne : N
-where
-  exists1 x : N | x = 100
-end
-
-axdef
-  BadMu : N
-where
-  BadMu = mu n : N | n > 0
-end
-
-gendef [X, Y]
-  fst : X cross Y -> X
-where
-  forall x : X; y : Y | fst(x, y) = x
 end
 
 
