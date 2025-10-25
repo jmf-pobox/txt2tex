@@ -202,6 +202,39 @@ class Lexer:
         pass
 ```
 
+**Phase 24: Whitespace-Sensitive Operator Disambiguation**
+
+The lexer uses whitespace to disambiguate the `^` operator, which has dual meaning:
+
+**Disambiguation Rule**:
+- **Space/tab/newline before `^`** → CAT token (sequence concatenation)
+- **No space before `^`** → CARET token (exponentiation/superscript)
+- **Special case `>^<`** → LexerError with helpful message
+
+**Rationale**: The `^` operator's meaning depends on operand types (sequences vs numbers),
+which cannot be determined at lexing time. Previous heuristic (checking if previous
+char was `>`) failed for function results `f() ^ <x>`, variables `s ^ t`, and
+parenthesized expressions `(s) ^ <x>`. Whitespace-based disambiguation is simple,
+consistent, and matches mathematical convention (e.g., `4^2` vs `s ^ t`).
+
+**Examples**:
+```
+<x> ^ <y>     → CAT token (space before ^) → \langle x \rangle \cat \langle y \rangle
+x^2           → CARET token (no space) → x^{2}
+s ^ t         → CAT token (space before ^) → s \cat t
+n^k           → CARET token (no space) → n^{k}
+f(x) ^ <y>    → CAT token (space before ^) → f(x) \cat \langle y \rangle
+<x>^<y>       → ERROR: "Sequence concatenation requires space: use '> ^ <' not '>^<'"
+```
+
+**Error Handling**: The `>^<` pattern is explicitly detected and produces a clear
+error message directing users to add space. This prevents a common mistake when
+writing sequence concatenation.
+
+**Token Types**:
+- `CAT`: Sequence concatenation operator (renders as `\cat` in LaTeX)
+- `CARET`: Superscript/exponentiation operator (renders as `^{...}` in LaTeX)
+
 ### 2. Parser
 
 **Responsibility**: Build Abstract Syntax Tree from token stream.
@@ -337,11 +370,16 @@ class Application(MathExpr):
 5. not (negation)
 6. Comparison (=, <, >, <=, >=)
 7. Arithmetic (+, -)
-8. Multiplication (*, /)
+8. Multiplication (*, /, sequence concatenation ^)
 9. Exponentiation (^)
 10. Function application
 11. Atoms (identifiers, numbers, parenthesized expressions)
 ```
+
+**Note on `^` operator (Phase 24)**:
+The `^` symbol has dual meaning based on whitespace (disambiguated at lexing):
+- **With space before**: CAT token → sequence concatenation (level 8, same as multiplication)
+- **No space before**: CARET token → exponentiation/superscript (level 9, higher precedence)
 
 **Context Handling**:
 
