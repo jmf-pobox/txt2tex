@@ -1213,6 +1213,32 @@ class LaTeXGenerator:
 
         return "".join(result)
 
+    def _convert_operators_bare(self, text: str) -> str:
+        r"""Convert Z operators to LaTeX commands without wrapping in $...$.
+
+        Used when content will be wrapped in math mode externally.
+        Converts operators like |-> to \mapsto, <-> to \rel, etc.
+        """
+        # Order matters: longer operators first to avoid partial matches
+        replacements = [
+            ("|>>", r"\nrres"),
+            ("<<|", r"\ndres"),
+            ("-|>", r"\pinj"),
+            ("+->", r"\pfun"),
+            (">->", r"\inj"),
+            ("<->", r"\rel"),
+            ("|->", r"\mapsto"),
+            ("<|", r"\dres"),
+            ("|>", r"\rres"),
+            ("->", r"\fun"),
+        ]
+
+        result = text
+        for pattern, replacement in replacements:
+            result = result.replace(pattern, f" {replacement} ")
+
+        return result
+
     def _generate_paragraph(self, node: Paragraph) -> list[str]:
         """Generate LaTeX for plain text paragraph.
 
@@ -1242,16 +1268,21 @@ class LaTeXGenerator:
 
         # Convert Z notation operators (garbled character fix)
         # Order matters: longer operators first to avoid partial matches
-        text = text.replace("|>>", r"$\nrres$")  # Range anti-restriction
-        text = text.replace("<<|", r"$\ndres$")  # Domain anti-restriction
-        text = text.replace("-|>", r"$\pinj$")  # Partial injection
-        text = text.replace("+->", r"$\pfun$")  # Partial function
-        text = text.replace(">->", r"$\inj$")  # Total injection
-        text = text.replace("<->", r"$\rel$")  # Relation type
-        text = text.replace("|->", r"$\mapsto$")  # Maplet
-        text = text.replace("<|", r"$\dres$")  # Domain restriction
-        text = text.replace("|>", r"$\rres$")  # Range restriction
-        text = text.replace("->", r"$\fun$")  # Total function
+        # Use _replace_outside_math to avoid nested $ delimiters
+        text = self._replace_outside_math(
+            text, "|>>", r"\nrres"
+        )  # Range anti-restriction
+        text = self._replace_outside_math(
+            text, "<<|", r"\ndres"
+        )  # Domain anti-restriction
+        text = self._replace_outside_math(text, "-|>", r"\pinj")  # Partial injection
+        text = self._replace_outside_math(text, "+->", r"\pfun")  # Partial function
+        text = self._replace_outside_math(text, ">->", r"\inj")  # Total injection
+        text = self._replace_outside_math(text, "<->", r"\rel")  # Relation type
+        text = self._replace_outside_math(text, "|->", r"\mapsto")  # Maplet
+        text = self._replace_outside_math(text, "<|", r"\dres")  # Domain restriction
+        text = self._replace_outside_math(text, "|>", r"\rres")  # Range restriction
+        text = self._replace_outside_math(text, "->", r"\fun")  # Total function
 
         # Convert keywords to symbols (QA fixes)
         # Negative lookbehind (?<!\\) ensures we don't match LaTeX commands like \forall
@@ -1406,7 +1437,7 @@ class LaTeXGenerator:
 
         return "".join(result)
 
-    def _convert_sequence_literals(self, text: str) -> str:
+    def _convert_sequence_literals(self, text: str, wrap_math: bool = True) -> str:
         """Convert sequence literals <...> to math mode \\langle ... \\rangle.
 
         Handles patterns like:
@@ -1414,52 +1445,105 @@ class LaTeXGenerator:
         - <a> → $\\langle a \\rangle$
         - <x, y> → $\\langle x, y \\rangle$
         - <1, 2, 3> → $\\langle 1, 2, 3 \\rangle$
+        - <<x, y>, <>> → $\\langle \\langle x, y \\rangle, \\langle \\rangle \\rangle$
 
-        Uses regex to find angle bracket pairs and converts them to LaTeX.
+        Uses balanced bracket matching to handle nested sequences correctly.
         Must NOT match operators like <=> or <-> or comparison operators.
+
+        Args:
+            text: Text containing sequence literals
+            wrap_math: If True, wrap results in $...$. False for recursive calls.
         """
-        # Strategy: Only match sequences where the content is:
-        # - Empty: <>
-        # - Word characters, numbers, spaces, commas, parentheses, dots, ^: <x>, <a, b>
-        # This prevents matching <=> (has =), <-> (has -), < > (comparison with space)
-        # Pattern: < followed by (empty OR word chars/nums/spaces/commas/parens/dots/^),
-        # then >
-        # We need to be careful not to match partial patterns
-        pattern = r"<([\w\s,\.\^\(\)]*)>"
+        # Keep processing until no more angle brackets remain
+        # This handles cases where parsing fails and we need multiple passes
+        result = text
+        max_iterations = 10  # Prevent infinite loops
+        iteration = 0
 
-        def replace_sequence(match: re.Match[str]) -> str:
-            full_match = match.group(0)
-            content = match.group(1)
+        while iteration < max_iterations:
+            # Find all balanced angle bracket pairs (handles nesting)
+            all_matches = self._find_balanced_angles(result)
 
-            # Additional validation: check if this looks like an operator
-            # Reject if: contains = or - or if it's empty and followed/preceded by =
-            if "=" in full_match or "-" in full_match:
-                return full_match  # Don't convert operators
-            if "|" in full_match or "#" in full_match:
-                return full_match  # Don't convert other operators
+            if not all_matches:
+                # No more sequences to convert
+                break
 
-            # Check if this is truly a sequence or just < > comparison
-            # Sequences should have specific patterns:
-            # 1. Empty: <>
-            # 2. Single identifier: <x>, <abc>
-            # 3. Comma-separated: <x, y>, <a, b, c>
-            content_stripped = content.strip()
+            # Filter to find only outermost, non-overlapping matches
+            # A match is outermost if it's not contained within any other match
+            def is_contained(match: tuple[int, int], other: tuple[int, int]) -> bool:
+                """Check if match is strictly contained within other."""
+                return (
+                    other[0] < match[0] < other[1] or other[0] < match[1] < other[1]
+                ) and match != other
 
-            # Empty sequence
-            if not content_stripped:
-                return r"$\langle \rangle$"
+            outermost_matches = [
+                m
+                for m in all_matches
+                if not any(is_contained(m, other) for other in all_matches)
+            ]
 
-            # Check if it looks like a valid sequence content
-            # Valid: word characters, numbers, commas, spaces, parentheses, dots, ^
-            # Invalid: if it has suspicious patterns
-            # For safety, only convert if it matches common sequence patterns
-            if re.match(r"^[\w\s,\.\^\(\)]+$", content_stripped):
-                return rf"$\langle {content_stripped} \rangle$"
+            # Sort by start position (descending) to process rightmost first
+            # This preserves positions during replacement
+            matches_sorted = sorted(outermost_matches, key=lambda m: m[0], reverse=True)
 
-            # Not a sequence, return as-is
-            return full_match
+            # Process matches from right to left
+            for start_pos, end_pos in matches_sorted:
+                sequence_text = result[start_pos:end_pos]
 
-        result = re.sub(pattern, replace_sequence, text)
+                # Sanity check: should still start/end with angle brackets
+                if not sequence_text.startswith("<") or not sequence_text.endswith(">"):
+                    continue
+
+                content = sequence_text[1:-1]  # Strip < and >
+
+                # Try to parse the ORIGINAL content (not converted)
+                # The parser will handle nested sequences correctly
+                try:
+                    lexer = Lexer(content)
+                    tokens = lexer.tokenize()
+                    parser = Parser(tokens)
+                    ast = parser.parse()
+
+                    # Generate LaTeX for the sequence content
+                    # Note: parser.parse() returns Document | Expr
+                    if isinstance(ast, Document):
+                        # Not an expression, fall back to simple wrap
+                        raise ValueError("Expected expression, got document")
+
+                    # Wrap in \langle \rangle (we stripped outer brackets)
+                    if content.strip() == "":
+                        # Empty sequence
+                        latex = r"\langle \rangle"
+                    else:
+                        # Generate LaTeX from AST and wrap in sequence brackets
+                        latex_content = self.generate_expr(ast)
+                        latex = rf"\langle {latex_content} \rangle"
+
+                    # Wrap in math mode only on first iteration (outermost sequences)
+                    if wrap_math and iteration == 0:
+                        result = result[:start_pos] + f"${latex}$" + result[end_pos:]
+                    else:
+                        result = result[:start_pos] + latex + result[end_pos:]
+                except Exception:
+                    # Parsing failed (e.g., comma-separated expressions)
+                    # Convert operators; later iterations handle inner sequences
+                    if not content.strip():
+                        # Empty sequence
+                        latex = r"\langle \rangle"
+                    else:
+                        # Convert operators without wrapping (wrap whole sequence)
+                        content_with_ops = self._convert_operators_bare(content)
+                        # Inner sequences processed in next iteration
+                        latex = rf"\langle {content_with_ops} \rangle"
+
+                    # Wrap in math mode only on first iteration (outermost sequences)
+                    if wrap_math and iteration == 0:
+                        result = result[:start_pos] + f"${latex}$" + result[end_pos:]
+                    else:
+                        result = result[:start_pos] + latex + result[end_pos:]
+
+            iteration += 1
+
         return result
 
     def _find_balanced_braces(self, text: str) -> list[tuple[int, int]]:
@@ -1512,6 +1596,58 @@ class LaTeXGenerator:
                 if depth == 0:
                     # Found balanced pair
                     matches.append((start, i))
+            else:
+                i += 1
+        return matches
+
+    def _find_balanced_angles(self, text: str) -> list[tuple[int, int]]:
+        """Find all balanced angle bracket pairs in text for sequences.
+
+        Returns list of (start_pos, end_pos) tuples for each balanced <...>.
+        Handles nested angle brackets correctly by finding ALL pairs, including nested.
+
+        Distinguishes sequences from operators:
+        - Sequences: <>, <x>, <a, b>, <<x>, <y>>
+        - Operators: <=>, <->, <|, |>, <<|, |>>
+
+        Strategy: For each opening <, find its matching >, record the pair,
+        then continue searching from just after the opening < to find nested pairs.
+        """
+        matches: list[tuple[int, int]] = []
+        i = 0
+        while i < len(text):
+            if text[i] == "<":
+                # Check if this is part of an operator
+                if i + 1 < len(text):
+                    next_char = text[i + 1]
+                    # Skip operators: <=>, <->, <|, <<|
+                    if next_char in "=-|":
+                        i += 1
+                        continue
+
+                # Found opening angle, find matching closing angle
+                depth = 1
+                start = i
+                j = i + 1
+                while j < len(text) and depth > 0:
+                    if text[j] == "<":
+                        # Check if operator start
+                        if j + 1 < len(text) and text[j + 1] in "=-|":
+                            j += 2  # Skip operator
+                            continue
+                        depth += 1
+                    elif text[j] == ">":
+                        # Check if operator end (=>, ->, |>, |>>)
+                        if j > 0 and text[j - 1] in "=-|":
+                            j += 1
+                            continue
+                        depth -= 1
+                    j += 1
+                if depth == 0:
+                    # Found balanced pair
+                    matches.append((start, j))
+                # Continue from next position to find nested/adjacent pairs
+                i += 1
             else:
                 i += 1
         return matches
