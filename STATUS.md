@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
-**Last Updated:** 2025-10-23
-**Current Phase:** Phase 22 (False Blocker Removal and Solutions 48-52) ✓ COMPLETE
+**Last Updated:** 2025-10-25
+**Current Phase:** Phase 24 (Whitespace-Sensitive ^ Operator) ✓ COMPLETE
 
 ---
 
@@ -94,7 +94,7 @@
 
 ### Sequences
 - ✓ Literals: `⟨⟩`, `⟨a, b, c⟩` (Unicode) OR `<>`, `<a, b, c>` (ASCII)
-- ✓ Concatenation: `⌢` (Unicode) OR `^` after sequences (ASCII)
+- ✓ Concatenation: `⌢` (Unicode) OR ` ^ ` with spaces (ASCII, Phase 24)
 - ✓ Operators: `head`, `tail`, `last`, `front`, `rev`
 - ✓ Indexing: `s(i)`, `⟨a, b, c⟩(2)`
 - ✓ Generic sequence type: `seq(T)`, `iseq(T)`
@@ -312,7 +312,7 @@
 
 ### ✅ Phase 14: ASCII Sequence Brackets & Pattern Matching
 - ASCII alternative to Unicode: `<>` ≡ `⟨⟩`, `<a, b>` ≡ `⟨a, b⟩`
-- ASCII concatenation: `<x> ^ s` ≡ `⟨x⟩ ⌢ s`
+- ASCII concatenation: `<x> ^ s` ≡ `⟨x⟩ ⌢ s` (enhanced in Phase 24 with whitespace sensitivity)
 - Smart disambiguation: `<x>` vs `x > y` based on whitespace
 - Pattern matching support: `f(<>) = 0`, `f(<x> ^ s) = expr`
 - Enables recursive function definitions on sequences
@@ -376,6 +376,16 @@
 - Solutions 48-50 already written with proper Z notation - verified compilation
 - Coverage increased from 87% to 98% (45 → 51 solutions)
 - Only 1 solution remaining: Solution 31 blocked by Bug #3 (compound identifiers)
+
+### ✅ Phase 24: Whitespace-Sensitive ^ Operator
+- Implemented whitespace-based disambiguation for dual-meaning `^` operator
+- Space before `^` → CAT token (sequence concatenation)
+- No space before `^` → CARET token (exponentiation/superscript)
+- Special error for common mistake `>^<` → helpful message directing to `> ^ <`
+- Replaced context-based heuristic (checking prev char `>`) with whitespace check
+- Fixes issue where `reverseSeq(s) ^ <x>` incorrectly tokenized as superscript
+- 27 comprehensive tests covering all usage patterns
+- Documentation updated in USER-GUIDE.md and DESIGN.md
 
 ---
 
@@ -568,8 +578,9 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 14. ✓ Phase 20: Semicolon-Separated Declarations
 15. ✓ Phase 21: Schema Separator and subseteq
 16. ✓ Phase 22: False Blocker Removal (Solutions 39, 48-52)
+17. ✓ Phase 24: Whitespace-Sensitive ^ Operator (concat vs exponent disambiguation)
 
-**Current:** 98.1% (51/52) - Phase 22 Complete
+**Current:** 98.1% (51/52) - Phase 24 Complete
 
 ### Next Steps
 
@@ -582,7 +593,7 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 897 passing (as of Phase 21, October 2025)
+- **Total Tests:** 941 passing (as of Phase 24, October 2025)
 - **Component Coverage:**
   - parser.py: 88.91%
   - latex_gen.py: 80.61%
@@ -605,6 +616,7 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 - Phase 19: 10 tests (space-separated application)
 - Phase 20: 20 tests (semicolon-separated declarations in gendef/axdef/schema)
 - Phase 21: Covered by existing tests (schema separator and subseteq fixes)
+- Phase 24: 27 tests (whitespace-sensitive ^ operator disambiguation)
 
 ---
 
