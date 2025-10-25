@@ -974,23 +974,45 @@ Both produce identical LaTeX output.
 
 ### Concatenation (⌢)
 
-**Unicode:**
+**Unicode operator (always works):**
 ```
 ⟨a⟩ ⌢ ⟨b⟩       →  ⟨a⟩ ⌢ ⟨b⟩
 s ⌢ t            →  s ⌢ t
 ```
 
-**ASCII (using `^` after sequences):**
+**ASCII alternative using `^` (whitespace-sensitive):**
+
+The `^` operator has dual meaning based on whitespace:
+
+| Pattern | Meaning | LaTeX | Example |
+|---------|---------|-------|---------|
+| `... ^ ...` (with space) | Concatenation | `\cat` | `<x> ^ <y>` |
+| `...^...` (no space) | Exponentiation | `^{...}` | `x^2` |
+
+**Concatenation examples (MUST have space before `^`):**
 ```
-<a> ^ <b>        →  ⟨a⟩ ⌢ ⟨b⟩
-<x> ^ s          →  ⟨x⟩ ⌢ s
+<a> ^ <b>        →  ⟨a⟩ ⌢ ⟨b⟩      [sequence literals]
+s ^ t            →  s ⌢ t           [sequence variables]
+f(x) ^ <y>       →  f(x) ⌢ ⟨y⟩     [function result]
+<x>              →  ⟨x⟩ ⌢ ⟨y⟩      [line break counts as space]
+ ^ <y>
 ```
 
-**Note:** The `^` operator means concatenation only after a sequence closing bracket (`>` or `⟩`). Otherwise it means superscript:
+**Exponentiation examples (NO space before `^`):**
 ```
-<a> ^ <b>        →  concatenation
-x^2              →  superscript
+x^2              →  x²
+4^2              →  4²
+n^k              →  nᵏ
+(x+1)^2          →  (x+1)²
 ```
+
+**Common mistake:**
+```
+❌ <x>^<y>       →  ERROR: "use '> ^ <' not '>^<'"
+✅ <x> ^ <y>     →  ⟨x⟩ ⌢ ⟨y⟩
+```
+
+**Note:** If typing `⌢` (U+2040) is difficult, remember you can use ` ^ ` (with spaces) as ASCII alternative.
 
 ### Filter
 
@@ -1537,7 +1559,7 @@ Container[seq[N]]            →  Container[seq[N]]
 
 - **Sequence closing:** `<x>` (no space before `>`) vs `x > y` (space before `>`)
 - **Generic instantiation:** `Type[X]` (no space before `[`) vs `p [just]` (space before `[`)
-- **Concatenation:** `<x> ^` triggers concatenation, `x^2` is superscript
+- **Caret operator:** `s ^ t` (space before `^`) is concatenation, `x^2` (no space) is exponentiation
 
 ### Parentheses Requirements
 
@@ -1551,6 +1573,7 @@ Container[seq[N]]            →  Container[seq[N]]
 2. **Nested quantifiers** without proper parenthesization
 3. **Smart quotes** in text - use ASCII quotes or PURETEXT blocks
 4. **Underscore in identifiers** not supported by fuzz typechecker (but works in txt2tex)
+5. **Concatenation without space** - `<x>^<y>` is an error, use `<x> ^ <y>` with spaces
 
 ---
 

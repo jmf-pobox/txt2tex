@@ -382,22 +382,36 @@ class Lexer:
             self._advance()
             return Token(TokenType.EQUALS, "=", start_line, start_column)
 
-        # Math operators (Phase 3, enhanced Phase 14)
+        # Math operators (Phase 3, enhanced Phase 14, Phase 24)
         # Caret: ^ can mean superscript OR sequence concatenation
-        # Heuristic: after > (sequence bracket), treat as concatenation (CAT)
-        # Otherwise, treat as superscript (CARET)
+        # Phase 24: Whitespace-sensitive disambiguation
+        # - Space/tab/newline before ^ → concatenation (CAT)
+        # - No space before ^ → exponentiation (CARET)
+        # - Special case: >^< → error (missing required space)
         if char == "^":
-            # Look back to find previous non-whitespace character
-            prev_pos = self.pos - 1
-            while prev_pos >= 0 and self.text[prev_pos] in " \t":
-                prev_pos -= 1
+            # Check if there's whitespace immediately before ^
+            has_space_before = self.pos > 0 and self.text[self.pos - 1] in " \t\n"
 
-            # If previous char is > (end of sequence), this is concatenation
-            if prev_pos >= 0 and self.text[prev_pos] == ">":
+            # Special case: >^< pattern (sequence concat without space)
+            # This is a common mistake - provide helpful error message
+            if (
+                self.pos > 0
+                and self.text[self.pos - 1] == ">"
+                and self.pos + 1 < len(self.text)
+                and self.text[self.pos + 1] == "<"
+            ):
+                raise LexerError(
+                    "Sequence concatenation requires space: use '> ^ <' not '>^<'",
+                    line=start_line,
+                    column=start_column,
+                )
+
+            # Space before ^ → concatenation
+            if has_space_before:
                 self._advance()
                 return Token(TokenType.CAT, "^", start_line, start_column)
 
-            # Otherwise it's superscript
+            # No space → exponentiation
             self._advance()
             return Token(TokenType.CARET, "^", start_line, start_column)
 
