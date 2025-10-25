@@ -418,6 +418,12 @@ $
 
 \medskip
 
+\bigskip
+
+We are defining a generic function that will tell us the difference in length between the longest and shorest sequences from an input type that is a non-empty sequences of sequences. The input could be $\langle  \langle x, y, z \rangle, \langle \rangle  \rangle$ yielding 3 as output or $\langle \langle x \rangle \rangle$ yielding 0, for example. I specify three generic functions: maxSeq yields the longest sequence from a non-empty sequence of sequences; minSeq yields the shortest sequence from a non-empty sequence of sequences; and maxDiff, which fulfills the specification for Question 4.
+
+\bigskip
+
 \begin{gendef}[X]
   maxSeq: \seq_1 (\seq X) \fun \seq X \\
   minSeq: \seq_1 (\seq X) \fun \seq X \\
@@ -430,13 +436,7 @@ $
 
 \bigskip
 
-We are defining a function that will tell us the difference in length between the longest and shorest sequences from an input type that is a non-empty sequences of sequences. The input could be $<$ $\langle x, y, z \rangle$, $\langle \rangle$ $>$ or $<$ $\langle x \rangle$ $>$ for example. I specify three generic functions: maxSeq returns the longest sequence from a non-empty sequence of sequences; minSeq returns the shortest sequence from a non-empty sequence of sequences; and maxDiff, which fulfills the specification for Question 4.
-
-\bigskip
-
-\bigskip
-
-For each function, a mu function is defined that selects a single element meeting the specification based on comparing each sequence s with every sequence t. This is enabled with the ran range operator so that we can go from $ss < 1$ $\mapsto$ $\langle x, y, z \rangle$, 2 $\mapsto$ $\langle \rangle$ $>$ as the data structure to s, t $\langle x, y, z \rangle$, $\langle \rangle$ . maxSeq and minSeq use the cardinality operator and maxDiff uses subtraction with the condition that maxSeq must already $be \geq minDiff$ and therefore the subtraction is guaranteed to return a natural number as defined in the specification. This solution passes fuzz validation.
+For maxSeq and minSeq, a mu function is defined that selects a single element meeting the specification based on comparing each sequence s with every sequence t. First, the range operator moves us from a sequence of sequences with ss values such as $\langle  1  \mapsto  \langle x, y, z \rangle, 2  \mapsto  \langle \rangle  \rangle$ to sequences s, t with values like $\langle x, y, z \rangle$, $\langle \rangle$ to enable seq operators. maxSeq and minSeq use the length operators and maxDiff uses the length operators with subtraction. For maxDiff, $maxSeq \geq minDiff$ is a valid pre-condition by virtue of maxSeq and minSeq and therefore the subtraction is guaranteed to return a natural number as defined in the specification. This solution passes fuzz validation.
 
 \bigskip
 
@@ -473,6 +473,26 @@ if $R \in W$ $\rel$ X, $S \in W$ $\rel$ X, and $T \in W$ $\rel$ X.
 In this equivalence proof, we show 
 
 \bigskip
+
+\bigskip
+\noindent
+\textbf{Question n}
+
+\medskip
+
+\begin{gendef}[X]
+  count\_s: \seq X \fun \nat
+\where
+  count\_s(\langle \rangle) = 0 \\
+  \forall x : X @ \forall s : \seq X @ count\_s(\langle x \rangle \cat s) = 1 + count\_s(s)
+\end{gendef}
+
+\begin{gendef}[X]
+  reverseSeq: \seq X \fun \seq X
+\where
+  reverseSeq(\langle \rangle) = \langle \rangle \\
+  \forall x : X @ \forall s : \seq X @ reverseSeq(\langle x \rangle \cat s) = reverseSeq(s) \cat \langle x \rangle
+\end{gendef}
 
 \newpage
 
