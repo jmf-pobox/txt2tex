@@ -206,10 +206,16 @@ TEXT: The relational composition operator is associative:
 
 LATEX: \hspace*{1em} $(R \circ S) \circ T = R \circ (S \circ T)$
 
-TEXT: if R in W <-> X, S in W <-> X, and T in W <-> X.
+TEXT: if R in W <-> X, S in X <-> Y, and T in Y <-> Z.
 
 EQUIV:
 w |-> z in (R o9 S) o9 T
+(exists y : Y | w |-> y in (R o9 S) and y |-> z in T)                                       [definition of o9]
+(exists y : Y | w |-> y in (exists x : X | w |-> x in R and x |-> y in S) and y |-> z in T) [definition of o9]
+(exists y : Y | (exists x : X | w |-> x in R and x |-> y in S) and y |-> z in T)            [definition of o9]
+(exists y : Y | (exists x : X | w |-> x in R and x |-> y in S and y |-> z in T))            [x is not free in (y, z) in T]
+(exists x : X | w |-> x in R and x |-> z in (exists y : Y | x |-> y in S and y |-> z in T)) [y is not free in (w, x) in R and (x, z) in S o9 T]
+(exists x : X | w |-> x in R and x |-> z in (S o9 T))                                       [definition of o9]
 w |-> z in R o9 (S o9 T)
 
 TEXT: In this equivalence proof, we show 
