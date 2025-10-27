@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
 **Last Updated:** 2025-10-26
-**Current Phase:** Phase 25 (Justification Operator Conversion) ✓ COMPLETE
+**Current Phase:** Phase 26 (TEXT Block Operator Support) ✓ COMPLETE
 
 ---
 
@@ -397,6 +397,25 @@
 - Fixed user homework: `[definition of o9]` now renders as `[definition of ∘]`
 - Documentation updated in USER-GUIDE.md (both EQUIV and PROOF sections)
 
+### ✅ Phase 26: TEXT Block Operator Support
+- Extended TEXT block processing to support all operators in prose
+- Updated `_convert_operators_bare` to include all operators with length-based ordering
+  - Added 4-character operators: `>->>`, `+->>`, `-->>` (bijection, partial/total surjection)
+  - Added 3-character operators: `<=>`, `>+>` (equivalence, partial injection alt)
+  - Added 2-character operators: `o9`, `++`, `⌢` (composition, override, concatenation)
+- Fixed `_process_inline_math` to use `_convert_operators_bare` for type signatures
+  - Replaced manual `->` conversion with comprehensive operator handling
+  - Prevents operator splitting (e.g., `+->` becoming `+\fun` instead of `\pfun`)
+- Extended TEXT block operator replacement in `_generate_paragraph`
+  - Added missing operators to `_replace_outside_math` calls
+  - Maintained length-based ordering to prevent partial matches
+- Created test_text_block_operators.py (23 comprehensive tests)
+  - Tests relation, function, and sequence operators in TEXT blocks
+  - Tests operator ordering (no partial matches)
+  - Tests homework scenarios with mixed operators
+- Result: All operators now convert correctly in TEXT blocks (prose)
+- Homework verification: `o9` → `\circ` throughout solutions.tex (user's primary issue solved)
+
 ---
 
 ## Syntax Requirements & Limitations
@@ -590,8 +609,9 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 16. ✓ Phase 22: False Blocker Removal (Solutions 39, 48-52)
 17. ✓ Phase 24: Whitespace-Sensitive ^ Operator (concat vs exponent disambiguation)
 18. ✓ Phase 25: Justification Operator Conversion (relation/function operators in justifications)
+19. ✓ Phase 26: TEXT Block Operator Support (all operators in prose)
 
-**Current:** 98.1% (51/52) - Phase 25 Complete
+**Current:** 98.1% (51/52) - Phase 26 Complete
 
 ### Next Steps
 
@@ -604,7 +624,7 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 951 passing (as of Phase 25, October 2025)
+- **Total Tests:** 973 passing (as of Phase 26, October 2025)
 - **Component Coverage:**
   - parser.py: 88.91%
   - latex_gen.py: 80.61%
@@ -629,6 +649,7 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 - Phase 21: Covered by existing tests (schema separator and subseteq fixes)
 - Phase 24: 27 tests (whitespace-sensitive ^ operator disambiguation)
 - Phase 25: 10 tests (relation/function operator conversion in justifications)
+- Phase 26: 23 tests (operator conversion in TEXT blocks)
 
 ---
 
