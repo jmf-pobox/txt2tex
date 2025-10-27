@@ -2251,12 +2251,42 @@ class LaTeXGenerator:
     def _escape_justification(self, text: str) -> str:
         """Escape operators in justification text for LaTeX."""
         # Replace operators with LaTeX commands using word boundaries
-        # Order matters: replace longer operators first
+        # Order matters: replace longer operators first to avoid partial matches
+
+        # Logical operators
         result = text.replace("<=>", r"$\Leftrightarrow$")
         result = result.replace("=>", r"$\Rightarrow$")
         result = re.sub(r"\band\b", r"$\\land$", result)
         result = re.sub(r"\bor\b", r"$\\lor$", result)
         result = re.sub(r"\bnot\b", r"$\\lnot$", result)
+
+        # Function type operators (longer first to avoid partial matches)
+        result = result.replace(">->>", r"$\bij$")  # Bijection
+        result = result.replace("+->>", r"$\psurj$")  # Partial surjection
+        result = result.replace("-->>", r"$\surj$")  # Total surjection
+        result = result.replace(">+>", r"$\pinj$")  # Partial injection
+        result = result.replace("-|>", r"$\pinj$")  # Partial injection (alt)
+        result = result.replace(">->", r"$\inj$")  # Total injection
+        result = result.replace("+->", r"$\pfun$")  # Partial function
+        result = result.replace("->", r"$\fun$")  # Total function (after others)
+
+        # Relation operators (longer first)
+        result = result.replace("<<|", r"$\ndres$")  # Domain corestriction
+        result = result.replace("|>>", r"$\nrres$")  # Range corestriction
+        result = result.replace("|->", r"$\mapsto$")  # Maplet
+        result = result.replace("<->", r"$\rel$")  # Relation type
+        result = result.replace("<|", r"$\dres$")  # Domain restriction
+        result = result.replace("|>", r"$\rres$")  # Range restriction
+        result = result.replace("o9", r"$\circ$")  # Composition
+        result = result.replace("++", r"$\oplus$")  # Override
+
+        # Relation functions (with word boundaries)
+        result = re.sub(r"\bdom\b", r"$\\dom$", result)
+        result = re.sub(r"\bran\b", r"$\\ran$", result)
+        result = re.sub(r"\bcomp\b", r"$\\comp$", result)
+        result = re.sub(r"\binv\b", r"$\\inv$", result)
+        result = re.sub(r"\bid\b", r"$\\id$", result)
+
         return result
 
     def _generate_equiv_chain(self, node: EquivChain) -> list[str]:
@@ -3099,11 +3129,39 @@ class LaTeXGenerator:
             label_num = match.group(3) or match.group(4)
 
             # Convert operator to LaTeX (no $ delimiters - already in math mode)
+            # Logical operators
             op_latex = operator_part.replace("<=>", r"\Leftrightarrow")
             op_latex = op_latex.replace("=>", r"\Rightarrow")
             op_latex = re.sub(r"\band\b", r"\\land", op_latex)
             op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)
             op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)
+
+            # Function type operators (longer first)
+            op_latex = op_latex.replace(">->>", r"\bij")
+            op_latex = op_latex.replace("+->>", r"\psurj")
+            op_latex = op_latex.replace("-->>", r"\surj")
+            op_latex = op_latex.replace(">+>", r"\pinj")
+            op_latex = op_latex.replace("-|>", r"\pinj")
+            op_latex = op_latex.replace(">->", r"\inj")
+            op_latex = op_latex.replace("+->", r"\pfun")
+            op_latex = op_latex.replace("->", r"\fun")
+
+            # Relation operators (longer first)
+            op_latex = op_latex.replace("<<|", r"\ndres")
+            op_latex = op_latex.replace("|>>", r"\nrres")
+            op_latex = op_latex.replace("|->", r"\mapsto")
+            op_latex = op_latex.replace("<->", r"\rel")
+            op_latex = op_latex.replace("<|", r"\dres")
+            op_latex = op_latex.replace("|>", r"\rres")
+            op_latex = op_latex.replace("o9", r"\circ")
+            op_latex = op_latex.replace("++", r"\oplus")
+
+            # Relation functions
+            op_latex = re.sub(r"\bdom\b", r"\\dom", op_latex)
+            op_latex = re.sub(r"\bran\b", r"\\ran", op_latex)
+            op_latex = re.sub(r"\bcomp\b", r"\\comp", op_latex)
+            op_latex = re.sub(r"\binv\b", r"\\inv", op_latex)
+            op_latex = re.sub(r"\bid\b", r"\\id", op_latex)
 
             # Format as: operator-rule^{[label]}
             # Use \textrm instead of \mbox to work correctly in math mode contexts
@@ -3120,11 +3178,39 @@ class LaTeXGenerator:
             subscript_num = match.group(3)
 
             # Convert operator to LaTeX (no $ delimiters - already in math mode)
+            # Logical operators
             op_latex = operator_part.replace("<=>", r"\Leftrightarrow")
             op_latex = op_latex.replace("=>", r"\Rightarrow")
             op_latex = re.sub(r"\band\b", r"\\land", op_latex)
             op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)
             op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)
+
+            # Function type operators (longer first)
+            op_latex = op_latex.replace(">->>", r"\bij")
+            op_latex = op_latex.replace("+->>", r"\psurj")
+            op_latex = op_latex.replace("-->>", r"\surj")
+            op_latex = op_latex.replace(">+>", r"\pinj")
+            op_latex = op_latex.replace("-|>", r"\pinj")
+            op_latex = op_latex.replace(">->", r"\inj")
+            op_latex = op_latex.replace("+->", r"\pfun")
+            op_latex = op_latex.replace("->", r"\fun")
+
+            # Relation operators (longer first)
+            op_latex = op_latex.replace("<<|", r"\ndres")
+            op_latex = op_latex.replace("|>>", r"\nrres")
+            op_latex = op_latex.replace("|->", r"\mapsto")
+            op_latex = op_latex.replace("<->", r"\rel")
+            op_latex = op_latex.replace("<|", r"\dres")
+            op_latex = op_latex.replace("|>", r"\rres")
+            op_latex = op_latex.replace("o9", r"\circ")
+            op_latex = op_latex.replace("++", r"\oplus")
+
+            # Relation functions
+            op_latex = re.sub(r"\bdom\b", r"\\dom", op_latex)
+            op_latex = re.sub(r"\bran\b", r"\\ran", op_latex)
+            op_latex = re.sub(r"\bcomp\b", r"\\comp", op_latex)
+            op_latex = re.sub(r"\binv\b", r"\\inv", op_latex)
+            op_latex = re.sub(r"\bid\b", r"\\id", op_latex)
 
             # Format as: operator-rule-number (just regular text, no subscript)
             # Use \textrm instead of \mbox to work correctly in math mode contexts
@@ -3137,6 +3223,33 @@ class LaTeXGenerator:
         result = re.sub(r"\band\b", r"\\land", result)
         result = re.sub(r"\bor\b", r"\\lor", result)
         result = re.sub(r"\bnot\b", r"\\lnot", result)
+
+        # Function type operators (longer first)
+        result = result.replace(">->>", r"\bij")
+        result = result.replace("+->>", r"\psurj")
+        result = result.replace("-->>", r"\surj")
+        result = result.replace(">+>", r"\pinj")
+        result = result.replace("-|>", r"\pinj")
+        result = result.replace(">->", r"\inj")
+        result = result.replace("+->", r"\pfun")
+        result = result.replace("->", r"\fun")
+
+        # Relation operators (longer first)
+        result = result.replace("<<|", r"\ndres")
+        result = result.replace("|>>", r"\nrres")
+        result = result.replace("|->", r"\mapsto")
+        result = result.replace("<->", r"\rel")
+        result = result.replace("<|", r"\dres")
+        result = result.replace("|>", r"\rres")
+        result = result.replace("o9", r"\circ")
+        result = result.replace("++", r"\oplus")
+
+        # Relation functions
+        result = re.sub(r"\bdom\b", r"\\dom", result)
+        result = re.sub(r"\bran\b", r"\\ran", result)
+        result = re.sub(r"\bcomp\b", r"\\comp", result)
+        result = re.sub(r"\binv\b", r"\\inv", result)
+        result = re.sub(r"\bid\b", r"\\id", result)
 
         # Already in math mode - don't need extra wrapping
         # Just use \mathrm{} for text parts to get roman font
