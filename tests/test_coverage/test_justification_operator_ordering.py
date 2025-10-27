@@ -50,8 +50,8 @@ y |-> x [x is not free in y |-> z]"""
         assert r"y $\mapsto$ z" in latex
         # Should NOT have the bug pattern |$\fun$
         assert r"|$\fun$" not in latex
-        # Verify full justification
-        assert r"\mbox{x is $\lnot$ free in y $\mapsto$ z}" in latex
+        # Verify full justification (with "in" converted to \in)
+        assert r"\mbox{x is $\lnot$ free $\in$ y $\mapsto$ z}" in latex
 
     def test_domain_corestriction_not_split(self) -> None:
         """Test that <<| is not split into < and <|."""

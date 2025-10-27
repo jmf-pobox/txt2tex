@@ -2314,6 +2314,7 @@ class LaTeXGenerator:
         result = re.sub(r"\band\b", r"$\\land$", result)
         result = re.sub(r"\bor\b", r"$\\lor$", result)
         result = re.sub(r"\bnot\b", r"$\\lnot$", result)
+        result = re.sub(r"\bin\b", r"$\\in$", result)  # Set membership
         result = re.sub(r"\bdom\b", r"$\\dom$", result)
         result = re.sub(r"\bran\b", r"$\\ran$", result)
         result = re.sub(r"\bcomp\b", r"$\\comp$", result)
@@ -3193,6 +3194,7 @@ class LaTeXGenerator:
             op_latex = re.sub(r"\band\b", r"\\land", op_latex)
             op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)
             op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)
+            op_latex = re.sub(r"\bin\b", r"\\in", op_latex)  # Set membership
             op_latex = re.sub(r"\bdom\b", r"\\dom", op_latex)
             op_latex = re.sub(r"\bran\b", r"\\ran", op_latex)
             op_latex = re.sub(r"\bcomp\b", r"\\comp", op_latex)
@@ -3245,6 +3247,7 @@ class LaTeXGenerator:
             op_latex = re.sub(r"\band\b", r"\\land", op_latex)
             op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)
             op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)
+            op_latex = re.sub(r"\bin\b", r"\\in", op_latex)  # Set membership
             op_latex = re.sub(r"\bdom\b", r"\\dom", op_latex)
             op_latex = re.sub(r"\bran\b", r"\\ran", op_latex)
             op_latex = re.sub(r"\bcomp\b", r"\\comp", op_latex)
@@ -3287,6 +3290,7 @@ class LaTeXGenerator:
         result = re.sub(r"\band\b", r"\\land", result)
         result = re.sub(r"\bor\b", r"\\lor", result)
         result = re.sub(r"\bnot\b", r"\\lnot", result)
+        result = re.sub(r"\bin\b", r"\\in", result)  # Set membership
         result = re.sub(r"\bdom\b", r"\\dom", result)
         result = re.sub(r"\bran\b", r"\\ran", result)
         result = re.sub(r"\bcomp\b", r"\\comp", result)
