@@ -2249,38 +2249,42 @@ class LaTeXGenerator:
         return result
 
     def _escape_justification(self, text: str) -> str:
-        """Escape operators in justification text for LaTeX."""
-        # Replace operators with LaTeX commands using word boundaries
-        # Order matters: replace longer operators first to avoid partial matches
+        """Escape operators in justification text for LaTeX.
 
-        # Logical operators
-        result = text.replace("<=>", r"$\Leftrightarrow$")
-        result = result.replace("=>", r"$\Rightarrow$")
-        result = re.sub(r"\band\b", r"$\\land$", result)
-        result = re.sub(r"\bor\b", r"$\\lor$", result)
-        result = re.sub(r"\bnot\b", r"$\\lnot$", result)
+        CRITICAL: Operators must be replaced in order of length (longest first)
+        to avoid partial matches. For example, |-> must be replaced before ->
+        otherwise -> gets replaced first, leaving | and causing incorrect output.
+        """
+        result = text
 
-        # Function type operators (longer first to avoid partial matches)
+        # 4-character operators (process first)
         result = result.replace(">->>", r"$\bij$")  # Bijection
         result = result.replace("+->>", r"$\psurj$")  # Partial surjection
         result = result.replace("-->>", r"$\surj$")  # Total surjection
+
+        # 3-character operators (process before 2-character)
+        result = result.replace("<=>", r"$\Leftrightarrow$")  # Logical equivalence
+        result = result.replace("<<|", r"$\ndres$")  # Domain corestriction
+        result = result.replace("|>>", r"$\nrres$")  # Range corestriction
+        result = result.replace("|->", r"$\mapsto$")  # Maplet (MUST be before ->)
+        result = result.replace("<->", r"$\rel$")  # Relation type
         result = result.replace(">+>", r"$\pinj$")  # Partial injection
         result = result.replace("-|>", r"$\pinj$")  # Partial injection (alt)
         result = result.replace(">->", r"$\inj$")  # Total injection
         result = result.replace("+->", r"$\pfun$")  # Partial function
-        result = result.replace("->", r"$\fun$")  # Total function (after others)
 
-        # Relation operators (longer first)
-        result = result.replace("<<|", r"$\ndres$")  # Domain corestriction
-        result = result.replace("|>>", r"$\nrres$")  # Range corestriction
-        result = result.replace("|->", r"$\mapsto$")  # Maplet
-        result = result.replace("<->", r"$\rel$")  # Relation type
+        # 2-character operators (process after all longer operators)
+        result = result.replace("=>", r"$\Rightarrow$")  # Logical implication
         result = result.replace("<|", r"$\dres$")  # Domain restriction
         result = result.replace("|>", r"$\rres$")  # Range restriction
-        result = result.replace("o9", r"$\circ$")  # Composition
+        result = result.replace("->", r"$\fun$")  # Total function (AFTER |-> and +->)
         result = result.replace("++", r"$\oplus$")  # Override
+        result = result.replace("o9", r"$\circ$")  # Composition
 
-        # Relation functions (with word boundaries)
+        # Word-based operators (use word boundaries to avoid partial matches)
+        result = re.sub(r"\band\b", r"$\\land$", result)
+        result = re.sub(r"\bor\b", r"$\\lor$", result)
+        result = re.sub(r"\bnot\b", r"$\\lnot$", result)
         result = re.sub(r"\bdom\b", r"$\\dom$", result)
         result = re.sub(r"\bran\b", r"$\\ran$", result)
         result = re.sub(r"\bcomp\b", r"$\\comp$", result)
@@ -3129,34 +3133,37 @@ class LaTeXGenerator:
             label_num = match.group(3) or match.group(4)
 
             # Convert operator to LaTeX (no $ delimiters - already in math mode)
-            # Logical operators
-            op_latex = operator_part.replace("<=>", r"\Leftrightarrow")
-            op_latex = op_latex.replace("=>", r"\Rightarrow")
-            op_latex = re.sub(r"\band\b", r"\\land", op_latex)
-            op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)
-            op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)
+            # CRITICAL: Process by length (longest first) to avoid partial matches
+            op_latex = operator_part
 
-            # Function type operators (longer first)
+            # 4-character operators
             op_latex = op_latex.replace(">->>", r"\bij")
             op_latex = op_latex.replace("+->>", r"\psurj")
             op_latex = op_latex.replace("-->>", r"\surj")
+
+            # 3-character operators (process before 2-character)
+            op_latex = op_latex.replace("<=>", r"\Leftrightarrow")
+            op_latex = op_latex.replace("<<|", r"\ndres")
+            op_latex = op_latex.replace("|>>", r"\nrres")
+            op_latex = op_latex.replace("|->", r"\mapsto")  # MUST be before ->
+            op_latex = op_latex.replace("<->", r"\rel")
             op_latex = op_latex.replace(">+>", r"\pinj")
             op_latex = op_latex.replace("-|>", r"\pinj")
             op_latex = op_latex.replace(">->", r"\inj")
             op_latex = op_latex.replace("+->", r"\pfun")
-            op_latex = op_latex.replace("->", r"\fun")
 
-            # Relation operators (longer first)
-            op_latex = op_latex.replace("<<|", r"\ndres")
-            op_latex = op_latex.replace("|>>", r"\nrres")
-            op_latex = op_latex.replace("|->", r"\mapsto")
-            op_latex = op_latex.replace("<->", r"\rel")
+            # 2-character operators (process after longer operators)
+            op_latex = op_latex.replace("=>", r"\Rightarrow")
             op_latex = op_latex.replace("<|", r"\dres")
             op_latex = op_latex.replace("|>", r"\rres")
-            op_latex = op_latex.replace("o9", r"\circ")
+            op_latex = op_latex.replace("->", r"\fun")  # AFTER |-> and +->
             op_latex = op_latex.replace("++", r"\oplus")
+            op_latex = op_latex.replace("o9", r"\circ")
 
-            # Relation functions
+            # Word-based operators
+            op_latex = re.sub(r"\band\b", r"\\land", op_latex)
+            op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)
+            op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)
             op_latex = re.sub(r"\bdom\b", r"\\dom", op_latex)
             op_latex = re.sub(r"\bran\b", r"\\ran", op_latex)
             op_latex = re.sub(r"\bcomp\b", r"\\comp", op_latex)
@@ -3178,34 +3185,37 @@ class LaTeXGenerator:
             subscript_num = match.group(3)
 
             # Convert operator to LaTeX (no $ delimiters - already in math mode)
-            # Logical operators
-            op_latex = operator_part.replace("<=>", r"\Leftrightarrow")
-            op_latex = op_latex.replace("=>", r"\Rightarrow")
-            op_latex = re.sub(r"\band\b", r"\\land", op_latex)
-            op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)
-            op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)
+            # CRITICAL: Process by length (longest first) to avoid partial matches
+            op_latex = operator_part
 
-            # Function type operators (longer first)
+            # 4-character operators
             op_latex = op_latex.replace(">->>", r"\bij")
             op_latex = op_latex.replace("+->>", r"\psurj")
             op_latex = op_latex.replace("-->>", r"\surj")
+
+            # 3-character operators (process before 2-character)
+            op_latex = op_latex.replace("<=>", r"\Leftrightarrow")
+            op_latex = op_latex.replace("<<|", r"\ndres")
+            op_latex = op_latex.replace("|>>", r"\nrres")
+            op_latex = op_latex.replace("|->", r"\mapsto")  # MUST be before ->
+            op_latex = op_latex.replace("<->", r"\rel")
             op_latex = op_latex.replace(">+>", r"\pinj")
             op_latex = op_latex.replace("-|>", r"\pinj")
             op_latex = op_latex.replace(">->", r"\inj")
             op_latex = op_latex.replace("+->", r"\pfun")
-            op_latex = op_latex.replace("->", r"\fun")
 
-            # Relation operators (longer first)
-            op_latex = op_latex.replace("<<|", r"\ndres")
-            op_latex = op_latex.replace("|>>", r"\nrres")
-            op_latex = op_latex.replace("|->", r"\mapsto")
-            op_latex = op_latex.replace("<->", r"\rel")
+            # 2-character operators (process after longer operators)
+            op_latex = op_latex.replace("=>", r"\Rightarrow")
             op_latex = op_latex.replace("<|", r"\dres")
             op_latex = op_latex.replace("|>", r"\rres")
-            op_latex = op_latex.replace("o9", r"\circ")
+            op_latex = op_latex.replace("->", r"\fun")  # AFTER |-> and +->
             op_latex = op_latex.replace("++", r"\oplus")
+            op_latex = op_latex.replace("o9", r"\circ")
 
-            # Relation functions
+            # Word-based operators
+            op_latex = re.sub(r"\band\b", r"\\land", op_latex)
+            op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)
+            op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)
             op_latex = re.sub(r"\bdom\b", r"\\dom", op_latex)
             op_latex = re.sub(r"\bran\b", r"\\ran", op_latex)
             op_latex = re.sub(r"\bcomp\b", r"\\comp", op_latex)
@@ -3217,34 +3227,37 @@ class LaTeXGenerator:
             return f"{op_latex}\\textrm{{-{rule_name}-{subscript_num}}}"
 
         # No special pattern - process normally
-        # Replace logical operators with LaTeX symbols
-        result = just.replace("<=>", r"\Leftrightarrow")
-        result = result.replace("=>", r"\Rightarrow")
-        result = re.sub(r"\band\b", r"\\land", result)
-        result = re.sub(r"\bor\b", r"\\lor", result)
-        result = re.sub(r"\bnot\b", r"\\lnot", result)
+        # CRITICAL: Process by length (longest first) to avoid partial matches
+        result = just
 
-        # Function type operators (longer first)
+        # 4-character operators
         result = result.replace(">->>", r"\bij")
         result = result.replace("+->>", r"\psurj")
         result = result.replace("-->>", r"\surj")
+
+        # 3-character operators (process before 2-character)
+        result = result.replace("<=>", r"\Leftrightarrow")
+        result = result.replace("<<|", r"\ndres")
+        result = result.replace("|>>", r"\nrres")
+        result = result.replace("|->", r"\mapsto")  # MUST be before ->
+        result = result.replace("<->", r"\rel")
         result = result.replace(">+>", r"\pinj")
         result = result.replace("-|>", r"\pinj")
         result = result.replace(">->", r"\inj")
         result = result.replace("+->", r"\pfun")
-        result = result.replace("->", r"\fun")
 
-        # Relation operators (longer first)
-        result = result.replace("<<|", r"\ndres")
-        result = result.replace("|>>", r"\nrres")
-        result = result.replace("|->", r"\mapsto")
-        result = result.replace("<->", r"\rel")
+        # 2-character operators (process after longer operators)
+        result = result.replace("=>", r"\Rightarrow")
         result = result.replace("<|", r"\dres")
         result = result.replace("|>", r"\rres")
-        result = result.replace("o9", r"\circ")
+        result = result.replace("->", r"\fun")  # AFTER |-> and +->
         result = result.replace("++", r"\oplus")
+        result = result.replace("o9", r"\circ")
 
-        # Relation functions
+        # Word-based operators
+        result = re.sub(r"\band\b", r"\\land", result)
+        result = re.sub(r"\bor\b", r"\\lor", result)
+        result = re.sub(r"\bnot\b", r"\\lnot", result)
         result = re.sub(r"\bdom\b", r"\\dom", result)
         result = re.sub(r"\bran\b", r"\\ran", result)
         result = re.sub(r"\bcomp\b", r"\\comp", result)
