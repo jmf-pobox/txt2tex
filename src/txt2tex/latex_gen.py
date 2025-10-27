@@ -1218,19 +1218,34 @@ class LaTeXGenerator:
 
         Used when content will be wrapped in math mode externally.
         Converts operators like |-> to \mapsto, <-> to \rel, etc.
+
+        CRITICAL: Operators are processed by length (longest first) to avoid
+        partial matches. For example, +-> must be replaced before ->.
         """
         # Order matters: longer operators first to avoid partial matches
         replacements = [
+            # 4-character operators (process first)
+            (">->>", r"\bij"),  # Bijection
+            ("+->>", r"\psurj"),  # Partial surjection
+            ("-->>", r"\surj"),  # Total surjection
+            # 3-character operators
+            ("<=>", r"\Leftrightarrow"),
             ("|>>", r"\nrres"),
             ("<<|", r"\ndres"),
-            ("-|>", r"\pinj"),
-            ("+->", r"\pfun"),
-            (">->", r"\inj"),
+            ("|->", r"\mapsto"),  # Maplet (before ->)
             ("<->", r"\rel"),
-            ("|->", r"\mapsto"),
+            ("-|>", r"\pinj"),
+            (">+>", r"\pinj"),  # Partial injection (alt)
+            (">->", r"\inj"),
+            ("+->", r"\pfun"),  # Partial function (before ->)
+            # 2-character operators
+            ("=>", r"\Rightarrow"),
             ("<|", r"\dres"),
             ("|>", r"\rres"),
-            ("->", r"\fun"),
+            ("->", r"\fun"),  # After +-> and |->
+            ("++", r"\oplus"),
+            ("o9", r"\circ"),
+            ("⌢", r"\cat"),
         ]
 
         result = text
@@ -1263,26 +1278,40 @@ class LaTeXGenerator:
         # Then convert remaining symbolic operators to LaTeX math symbols
         # Only replace if NOT already wrapped in math mode
         # Do NOT convert and/or/not - those are English words in prose context
-        text = self._replace_outside_math(text, "<=>", r"\Leftrightarrow")
-        text = self._replace_outside_math(text, "=>", r"\Rightarrow")
+        # CRITICAL: Process by length (longest first) to avoid partial matches
 
-        # Convert Z notation operators (garbled character fix)
-        # Order matters: longer operators first to avoid partial matches
-        # Use _replace_outside_math to avoid nested $ delimiters
+        # 4-character operators (process first)
+        text = self._replace_outside_math(text, ">->>", r"\bij")  # Bijection
+        text = self._replace_outside_math(text, "+->>", r"\psurj")  # Partial surjection
+        text = self._replace_outside_math(text, "-->>", r"\surj")  # Total surjection
+
+        # 3-character operators (process before 2-character)
         text = self._replace_outside_math(
-            text, "|>>", r"\nrres"
-        )  # Range anti-restriction
+            text, "<=>", r"\Leftrightarrow"
+        )  # Equivalence
+        text = self._replace_outside_math(text, "|>>", r"\nrres")  # Range corestriction
         text = self._replace_outside_math(
             text, "<<|", r"\ndres"
-        )  # Domain anti-restriction
-        text = self._replace_outside_math(text, "-|>", r"\pinj")  # Partial injection
-        text = self._replace_outside_math(text, "+->", r"\pfun")  # Partial function
-        text = self._replace_outside_math(text, ">->", r"\inj")  # Total injection
+        )  # Domain corestriction
+        text = self._replace_outside_math(text, "|->", r"\mapsto")  # Maplet (before ->)
         text = self._replace_outside_math(text, "<->", r"\rel")  # Relation type
-        text = self._replace_outside_math(text, "|->", r"\mapsto")  # Maplet
+        text = self._replace_outside_math(text, "-|>", r"\pinj")  # Partial injection
+        text = self._replace_outside_math(
+            text, ">+>", r"\pinj"
+        )  # Partial injection (alt)
+        text = self._replace_outside_math(text, ">->", r"\inj")  # Total injection
+        text = self._replace_outside_math(text, "+->", r"\pfun")  # Partial function
+
+        # 2-character operators (process after all longer operators)
+        text = self._replace_outside_math(text, "=>", r"\Rightarrow")  # Implication
         text = self._replace_outside_math(text, "<|", r"\dres")  # Domain restriction
         text = self._replace_outside_math(text, "|>", r"\rres")  # Range restriction
-        text = self._replace_outside_math(text, "->", r"\fun")  # Total function
+        text = self._replace_outside_math(
+            text, "->", r"\fun"
+        )  # Total function (after |->)
+        text = self._replace_outside_math(text, "++", r"\oplus")  # Override
+        text = self._replace_outside_math(text, "o9", r"\circ")  # Composition
+        text = self._replace_outside_math(text, "⌢", r"\cat")  # Sequence concatenation
 
         # Convert keywords to symbols (QA fixes)
         # Negative lookbehind (?<!\\) ensures we don't match LaTeX commands like \forall
@@ -2045,15 +2074,15 @@ class LaTeXGenerator:
                     id_node = Identifier(line=0, column=0, name=identifier_name)
                     identifier_latex = self._generate_identifier(id_node)
 
-                    # Convert operators in type part
-                    type_latex = type_part.replace("->", r"\fun")
+                    # Convert operators in type part (use comprehensive converter)
+                    type_latex = self._convert_operators_bare(type_part)
 
                     # Combine
                     full_latex = f"{identifier_latex} : {type_latex}"
                     result = result[:start_pos] + f"${full_latex}$" + result[end_pos:]
                 else:
                     # Fallback: just convert operators
-                    expr_with_ops = expr.replace("->", r"\fun")
+                    expr_with_ops = self._convert_operators_bare(expr)
                     result = (
                         result[:start_pos] + f"${expr_with_ops}$" + result[end_pos:]
                     )
