@@ -208,21 +208,20 @@ LATEX: \hspace*{1em} $(R \circ S) \circ T = R \circ (S \circ T)$
 
 TEXT: if R in W <-> X, S in X <-> Y, and T in Y <-> Z.
 
-TEXT: In this equivalence proof, we show that composition is associative using the definition of relational composition and by repositioning quantifiers and predicates where we are permitted to do so, which is only when there is no impact to the truthity of the predicates involved. Each such repositioning or regrouping will be justified. 
-
-TEXT: Given a relation R in X <-> Y and a second relation S in Y <-> Z, and two elements x in X and z in Z, x |-> z in R o9 S <=> (exists y : Y | x |-> y in R and y |-> z in S) [cite simpson-notes page 107].
+TEXT: In this equivalence proof, we show that composition is associative using the definition of relational composition and by repositioning quantifiers and predicates where we are permitted to do so, which is only when there is no impact to the truthity of the predicates involved. Each such repositioning or regrouping will be justified. Given a relation R in X <-> Y and a second relation S in Y <-> Z, and two elements x in X and z in Z, x |-> z in R o9 S <=> (exists y : Y | x |-> y in R and y |-> z in S) [cite simpson-notes page 107].
 
 EQUIV:
 w |-> z in (R o9 S) o9 T
 (exists y : Y | w |-> y in (R o9 S) and y |-> z in T)                                       [definition of o9]
-(exists y : Y | w |-> y in (exists x : X | w |-> x in R and x |-> y in S) and y |-> z in T) [definition of o9]
 (exists y : Y | (exists x : X | w |-> x in R and x |-> y in S) and y |-> z in T)            [definition of o9]
-(exists y : Y | (exists x : X | w |-> x in R and x |-> y in S and y |-> z in T))            [x is not free in y |-> z]
-(exists x : X | w |-> x in R and x |-> z in (exists y : Y | x |-> y in S and y |-> z in T)) [y is not free in w |-> x, x |-> z]
+(exists y : Y | (exists x : X | w |-> x in R and x |-> y in S and y |-> z in T))            [x is not free in y |-> z in T]
+(exists x : X | w |-> x in R and (exists y : Y | x |-> y in S and y |-> z in T))            [y is not free in w |-> x in R]
 (exists x : X | w |-> x in R and x |-> z in (S o9 T))                                       [definition of o9]
 w |-> z in R o9 (S o9 T)
 
-TEXT: In step 1, we apply the composition equivalence based on the parenthesis, replacing the outer composition of (R o9 S) o9 T. In step 2, we apply our equivlence for composition to (R o9 S).
+TEXT: In step 1, we apply the composition equivalence to the outer composition of (R o9 S) o9 T. In step 2, we apply our equivalence to the inner composition (R o9 S).  In step 3, we include the predicate y |-> z in T in the scope of x : X. We can do this because this does not affect the truthity of y |-> z in T as x is not free in this predicate. In step 4, we reposition the exists y : Y quantifier to be after the w |-> x in R predicate without affecting its truthity because y is not free in w |-> x in R.  In step 5, we apply the equivalence for composition to S o9 T.  In step 6, we apply the equivalence for composition to R o9 (S o9 T).
+
+TEXT: I worked on this proof both top-down and bottom-up.  After doing the obvious equivalence substitutions, I was left with step 3 and 4 to work out. In working out step 3, I could see from step 6 that I wanted S o9 T together.  In working out step 4, I could see that y : Y needed to be repositioned to setup step 6.  The reasoning about both of these steps was not obvious at first, but I realized that these moves had no impact on the truth values of the affected predicates.  This led me to think about free and bound variables and what rules might apply in various cases.  I was not able to find a specific justification in the materials that maps to the idea that one can reposition quantifiers or predicates provided there is no inpact to the truthity, but this seems logical and sound provided x is not free in P for the affected P.
 
 ** Question n **
 

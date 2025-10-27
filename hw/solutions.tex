@@ -463,13 +463,7 @@ if $R \in W$ $\rel$ X, $S \in X$ $\rel$ Y, and $T \in Y$ $\rel$ Z.
 
 \bigskip
 
-In this equivalence proof, we show that composition is associative using the definition of relational composition and by repositioning quantifiers and predicates where we are permitted to do so, which is only when there is no impact to the truthity of the predicates involved. Each such repositioning or regrouping will be justified. 
-
-\bigskip
-
-\bigskip
-
-Given a relation $R \in X$ $\rel$ Y and a second relation $S \in Y$ $\rel$ Z, and two elements $x \in X$ and $z \in Z$, x $\mapsto$ $z \in R$ o9 S $\Leftrightarrow$ $\exists y : Y @ x \mapsto y \in R \land y \mapsto z \in S$ \citep[page 107]{simpson-notes}.
+In this equivalence proof, we show that composition is associative using the definition of relational composition and by repositioning quantifiers and predicates where we are permitted to do so, which is only when there is no impact to the truthity of the predicates involved. Each such repositioning or regrouping will be justified. Given a relation $R \in X$ $\rel$ Y and a second relation $S \in Y$ $\rel$ Z, and two elements $x \in X$ and $z \in Z$, x $\mapsto$ $z \in R$ $\circ$ S $\Leftrightarrow$ $\exists y : Y @ x \mapsto y \in R \land y \mapsto z \in S$ \citep[page 107]{simpson-notes}.
 
 \bigskip
 
@@ -477,10 +471,9 @@ Given a relation $R \in X$ $\rel$ Y and a second relation $S \in Y$ $\rel$ Z, an
 \begin{array}{ll@{\hspace{2em}}l}
 & w \mapsto z \in (R \circ S) \circ T \\
 &\Leftrightarrow \exists y : Y @ w \mapsto y \in (R \circ S) \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
-&\Leftrightarrow \exists y : Y @ w \mapsto y \in (\exists x : X @ w \mapsto x \in R \land x \mapsto y \in S) \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
 &\Leftrightarrow \exists y : Y @ (\exists x : X @ w \mapsto x \in R \land x \mapsto y \in S) \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
-&\Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is $\lnot$ free in y $\mapsto$ z}] \\
-&\Leftrightarrow \exists x : X @ w \mapsto x \in R \land x \mapsto z \in (\exists y : Y @ x \mapsto y \in S \land y \mapsto z \in T) & [\mbox{y is $\lnot$ free in w $\mapsto$ x , x $\mapsto$ z}] \\
+&\Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is $\lnot$ free \ $\in$ y $\mapsto$ z $\in$ T}] \\
+&\Leftrightarrow \exists x : X @ w \mapsto x \in R \land (\exists y : Y @ x \mapsto y \in S \land y \mapsto z \in T) & [\mbox{y is $\lnot$ free \ $\in$ w $\mapsto$ x $\in$ R}] \\
 &\Leftrightarrow \exists x : X @ w \mapsto x \in R \land x \mapsto z \in (S \circ T) & [\mbox{definition of $\circ$}] \\
 &\Leftrightarrow w \mapsto z \in R \circ S \circ T
 \end{array}
@@ -488,7 +481,13 @@ Given a relation $R \in X$ $\rel$ Y and a second relation $S \in Y$ $\rel$ Z, an
 
 \bigskip
 
-In step 1, we apply the composition equivalence based on the parenthesis, replacing the outer composition of (R o9 S) o9 T. In step 2, we apply our equivlence for composition to (R o9 S).
+In step 1, we apply the composition equivalence to the outer composition of (R $\circ$ S) $\circ$ T. In step 2, we apply our equivalence to the inner composition (R $\circ$ S).  In step 3, we include the predicate y $\mapsto$ $z \in T$ in the scope of x : X. We can do this because this does not affect the truthity of y $\mapsto$ $z \in T$ as x is not free in this predicate. In step 4, we reposition the exists y : Y quantifier to be after the w $\mapsto$ $x \in R$ predicate without affecting its truthity because y is not free in w $\mapsto$ $x \in R$.  In step 5, we apply the equivalence for composition to S $\circ$ T.  In step 6, we apply the equivalence for composition to R $\circ$ (S $\circ$ T).
+
+\bigskip
+
+\bigskip
+
+I worked on this proof both top-down and bottom-up.  After doing the obvious equivalence substitutions, I was left with step 3 and 4 to work out. In working out step 3, I could see from step 6 that I wanted S $\circ$ T together.  In working out step 4, I could see that y : Y needed to be repositioned to setup step 6.  The reasoning about both of these steps was not obvious at first, but I realized that these moves had no impact on the truth values of the affected predicates.  This led me to think about free and bound variables and what rules might apply in various cases.  I was not able to find a specific justification in the materials that maps to the idea that one can reposition quantifiers or predicates provided there is no inpact to the truthity, but this seems logical and sound provided x is not $free \in P$ for the affected P.
 
 \bigskip
 
