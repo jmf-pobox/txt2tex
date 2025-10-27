@@ -208,7 +208,9 @@ LATEX: \hspace*{1em} $(R \circ S) \circ T = R \circ (S \circ T)$
 
 TEXT: if R in W <-> X, S in X <-> Y, and T in Y <-> Z.
 
-TEXT: In this equivalence proof, we show that composition is associative using the definition of relational composition and by repositioning quantifiers and predicates where we are permitted to do so, which is only when there is no impact to the truthity of the predicates involved. Each such repositioning or regrouping will be justified. Given a relation R in X <-> Y and a second relation S in Y <-> Z, and two elements x in X and z in Z, x |-> z in R o9 S <=> (exists y : Y | x |-> y in R and y |-> z in S) [cite simpson-notes page 107].
+TEXT: In this equivalence proof, we show that composition is associative using the definition of relational composition and by repositioning quantifiers and predicates where we are permitted to do so, which is only when there is no impact to the truthity of the predicates involved. Each such repositioning or regrouping will be justified. 
+
+TEXT: Given a relation R in X <-> Y and a second relation S in Y <-> Z, and two elements x in X and z in Z, x |-> z in R o9 S <=> (exists y : Y | x |-> y in R and y |-> z in S) [cite simpson-notes page 107].
 
 EQUIV:
 w |-> z in (R o9 S) o9 T

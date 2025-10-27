@@ -429,8 +429,8 @@ We are defining a generic function that will tell us the difference in length be
   minSeq: \seq_1 (\seq X) \fun \seq X \\
   maxDiff: \seq_1 (\seq X) \fun \nat
 \where
-  \forall ss : \seq_1 (\seq X) @ maxSeq(ss) = ((\mu s : \ran ss | \forall t : \ran ss @ \# s \geq \# t)) \\
-  \forall ss : \seq_1 (\seq X) @ minSeq(ss) = ((\mu s : \ran ss | \forall t : \ran ss @ \# s \leq \# t)) \\
+  \forall ss : \seq_1 (\seq X) @ maxSeq(ss) = (\mu s : \ran ss | \forall t : \ran ss @ \# s \geq \# t) \\
+  \forall ss : \seq_1 (\seq X) @ minSeq(ss) = (\mu s : \ran ss | \forall t : \ran ss @ \# s \leq \# t) \\
   \forall ss : \seq_1 (\seq X) @ maxDiff(ss) = \# (maxSeq(ss)) - \# (minSeq(ss))
 \end{gendef}
 
@@ -463,7 +463,13 @@ if $R \in W$ $\rel$ X, $S \in X$ $\rel$ Y, and $T \in Y$ $\rel$ Z.
 
 \bigskip
 
-In this equivalence proof, we show that composition is associative using the definition of relational composition and by repositioning quantifiers and predicates where we are permitted to do so, which is only when there is no impact to the truthity of the predicates involved. Each such repositioning or regrouping will be justified. Given a relation $R \in X$ $\rel$ Y and a second relation $S \in Y$ $\rel$ Z, and two elements $x \in X$ and $z \in Z$, x $\mapsto$ $z \in R$ $\circ$ S $\Leftrightarrow$ $\exists y : Y @ x \mapsto y \in R \land y \mapsto z \in S$ \citep[page 107]{simpson-notes}.
+In this equivalence proof, we show that composition is associative using the definition of relational composition and by repositioning quantifiers and predicates where we are permitted to do so, which is only when there is no impact to the truthity of the predicates involved. Each such repositioning or regrouping will be justified. 
+
+\bigskip
+
+\bigskip
+
+Given a relation $R \in X$ $\rel$ Y and a second relation $S \in Y$ $\rel$ Z, and two elements $x \in X$ and $z \in Z$, x $\mapsto$ $z \in R$ $\circ$ S $\Leftrightarrow$ $\exists y : Y @ x \mapsto y \in R \land y \mapsto z \in S$ \citep[page 107]{simpson-notes}.
 
 \bigskip
 
@@ -471,9 +477,9 @@ In this equivalence proof, we show that composition is associative using the def
 \begin{array}{ll@{\hspace{2em}}l}
 & w \mapsto z \in (R \circ S) \circ T \\
 &\Leftrightarrow \exists y : Y @ w \mapsto y \in (R \circ S) \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
-&\Leftrightarrow \exists y : Y @ ((\exists x : X @ w \mapsto x \in R \land x \mapsto y \in S)) \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
+&\Leftrightarrow \exists y : Y @ (\exists x : X @ w \mapsto x \in R \land x \mapsto y \in S) \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
 &\Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is $\lnot$ free $\in$ y $\mapsto$ z $\in$ T}] \\
-&\Leftrightarrow \exists x : X @ w \mapsto x \in R \land ((\exists y : Y @ x \mapsto y \in S \land y \mapsto z \in T)) & [\mbox{y is $\lnot$ free $\in$ w $\mapsto$ x $\in$ R}] \\
+&\Leftrightarrow \exists x : X @ w \mapsto x \in R \land (\exists y : Y @ x \mapsto y \in S \land y \mapsto z \in T) & [\mbox{y is $\lnot$ free $\in$ w $\mapsto$ x $\in$ R}] \\
 &\Leftrightarrow \exists x : X @ w \mapsto x \in R \land x \mapsto z \in (S \circ T) & [\mbox{definition of $\circ$}] \\
 &\Leftrightarrow w \mapsto z \in R \circ (S \circ T)
 \end{array}
