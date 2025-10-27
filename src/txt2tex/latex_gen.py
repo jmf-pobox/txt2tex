@@ -491,6 +491,12 @@ class LaTeXGenerator:
         Returns:
             True if parentheses are needed
         """
+        # Quantifiers and lambdas have lowest precedence (bind most loosely)
+        # Per Woodcock: "quantifiers bind very loosely, scope extends to next bracket"
+        # Always need parens when used as operands of binary operators
+        if isinstance(child, (Quantifier, Lambda)):
+            return True
+
         # Only binary ops need precedence checking
         if not isinstance(child, BinaryOp):
             return False
@@ -510,11 +516,12 @@ class LaTeXGenerator:
             if parent_op in {"=>", "<=>"}:
                 return True
 
-            # For right-associative operators (general case), left child needs parens
-            if parent_op in self.RIGHT_ASSOCIATIVE and is_left_child:
-                return True
             # For left-associative operators, right child needs parens
-            # Note: and/or are associative so they don't need parens
+            # E.g., R o9 (S o9 T) requires parens on right
+            # but (R o9 S) o9 T doesn't need parens on left
+            # All operators except => and <=> are left-associative
+            if not is_left_child:
+                return True
 
         return False
 

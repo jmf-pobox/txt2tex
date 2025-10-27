@@ -429,8 +429,8 @@ We are defining a generic function that will tell us the difference in length be
   minSeq: \seq_1 (\seq X) \fun \seq X \\
   maxDiff: \seq_1 (\seq X) \fun \nat
 \where
-  \forall ss : \seq_1 (\seq X) @ maxSeq(ss) = (\mu s : \ran ss | \forall t : \ran ss @ \# s \geq \# t) \\
-  \forall ss : \seq_1 (\seq X) @ minSeq(ss) = (\mu s : \ran ss | \forall t : \ran ss @ \# s \leq \# t) \\
+  \forall ss : \seq_1 (\seq X) @ maxSeq(ss) = ((\mu s : \ran ss | \forall t : \ran ss @ \# s \geq \# t)) \\
+  \forall ss : \seq_1 (\seq X) @ minSeq(ss) = ((\mu s : \ran ss | \forall t : \ran ss @ \# s \leq \# t)) \\
   \forall ss : \seq_1 (\seq X) @ maxDiff(ss) = \# (maxSeq(ss)) - \# (minSeq(ss))
 \end{gendef}
 
@@ -471,11 +471,11 @@ In this equivalence proof, we show that composition is associative using the def
 \begin{array}{ll@{\hspace{2em}}l}
 & w \mapsto z \in (R \circ S) \circ T \\
 &\Leftrightarrow \exists y : Y @ w \mapsto y \in (R \circ S) \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
-&\Leftrightarrow \exists y : Y @ (\exists x : X @ w \mapsto x \in R \land x \mapsto y \in S) \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
-&\Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is $\lnot$ free \ $\in$ y $\mapsto$ z $\in$ T}] \\
-&\Leftrightarrow \exists x : X @ w \mapsto x \in R \land (\exists y : Y @ x \mapsto y \in S \land y \mapsto z \in T) & [\mbox{y is $\lnot$ free \ $\in$ w $\mapsto$ x $\in$ R}] \\
+&\Leftrightarrow \exists y : Y @ ((\exists x : X @ w \mapsto x \in R \land x \mapsto y \in S)) \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
+&\Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is $\lnot$ free $\in$ y $\mapsto$ z $\in$ T}] \\
+&\Leftrightarrow \exists x : X @ w \mapsto x \in R \land ((\exists y : Y @ x \mapsto y \in S \land y \mapsto z \in T)) & [\mbox{y is $\lnot$ free $\in$ w $\mapsto$ x $\in$ R}] \\
 &\Leftrightarrow \exists x : X @ w \mapsto x \in R \land x \mapsto z \in (S \circ T) & [\mbox{definition of $\circ$}] \\
-&\Leftrightarrow w \mapsto z \in R \circ S \circ T
+&\Leftrightarrow w \mapsto z \in R \circ (S \circ T)
 \end{array}
 \]
 
@@ -490,26 +490,6 @@ In step 1, we apply the composition equivalence to the outer composition of (R $
 I worked on this proof both top-down and bottom-up.  After doing the obvious equivalence substitutions, I was left with step 3 and 4 to work out. In working out step 3, I could see from step 6 that I wanted S $\circ$ T together.  In working out step 4, I could see that y : Y needed to be repositioned to setup step 6.  The reasoning about both of these steps was not obvious at first, but I realized that these moves had no impact on the truth values of the affected predicates.  This led me to think about free and bound variables and what rules might apply in various cases.  I was not able to find a specific justification in the materials that maps to the idea that one can reposition quantifiers or predicates provided there is no inpact to the truthity, but this seems logical and sound provided x is not $free \in P$ for the affected P.
 
 \bigskip
-
-\bigskip
-\noindent
-\textbf{Question n}
-
-\medskip
-
-\begin{gendef}[X]
-  count\_s: \seq X \fun \nat
-\where
-  count\_s(\langle \rangle) = 0 \\
-  \forall x : X @ \forall s : \seq X @ count\_s(\langle x \rangle \cat s) = 1 + count\_s(s)
-\end{gendef}
-
-\begin{gendef}[X]
-  reverseSeq: \seq X \fun \seq X
-\where
-  reverseSeq(\langle \rangle) = \langle \rangle \\
-  \forall x : X @ \forall s : \seq X @ reverseSeq(\langle x \rangle \cat s) = reverseSeq(s) \cat \langle x \rangle
-\end{gendef}
 
 \newpage
 
@@ -542,7 +522,7 @@ SquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z * z \}
 \begin{axdef}
 CubesOfSquaresOfEvens : \power \num
 \where
-CubesOfSquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z * z * z * z * z * z \}
+CubesOfSquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z * z * (z * z) * (z * z) \}
 \end{axdef}
 
 \medskip
@@ -591,7 +571,7 @@ SquareOrCubeIntegers = \{ z, z_0 : \num | z = z_0 * z_0 \lor z = z_0 * z_0 * z_0
 
 
 
-\bibitem[Simpson, 2025]{simpson-notes} Simpson, A. (n.d.). \textit{From Discrete Mathematics to State-Based Models, SEM version}. University of Oxford Department of Computer Science. Unpublished course notes.
+\bibitem[Simpson, n.d.]{simpson-notes} Simpson, A. (n.d.). \textit{From Discrete Mathematics to State-Based Models, SEM version}. University of Oxford Department of Computer Science. Unpublished course notes.
 
 
 

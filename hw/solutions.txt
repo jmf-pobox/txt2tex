@@ -223,22 +223,6 @@ TEXT: In step 1, we apply the composition equivalence to the outer composition o
 
 TEXT: I worked on this proof both top-down and bottom-up.  After doing the obvious equivalence substitutions, I was left with step 3 and 4 to work out. In working out step 3, I could see from step 6 that I wanted S o9 T together.  In working out step 4, I could see that y : Y needed to be repositioned to setup step 6.  The reasoning about both of these steps was not obvious at first, but I realized that these moves had no impact on the truth values of the affected predicates.  This led me to think about free and bound variables and what rules might apply in various cases.  I was not able to find a specific justification in the materials that maps to the idea that one can reposition quantifiers or predicates provided there is no inpact to the truthity, but this seems logical and sound provided x is not free in P for the affected P.
 
-** Question n **
-
-gendef [X]
-  count_s : seq X -> N
-where
-  count_s <> = 0
-  forall x : X; s : seq X | (count_s (<x> ^ s) = 1 + count_s(s))
-end
-
-gendef [X]
-  reverseSeq : seq X -> seq X
-where
-  reverseSeq <> = <>
-  forall x : X; s : seq X | reverseSeq (<x> ^ s) = reverseSeq (s) ^ <x>
-end
-
 PAGEBREAK:
 
 ** Question 6 **
@@ -281,13 +265,14 @@ where
 end
 
 
+
 PAGEBREAK:
 
 === Bibliography ===
 
 LATEX: \begin{thebibliography}{Simpson, n.d.}
 LATEX:
-LATEX: \bibitem[Simpson, 2025]{simpson-notes} Simpson, A. (n.d.). \textit{From Discrete Mathematics to State-Based Models, SEM version}. University of Oxford Department of Computer Science. Unpublished course notes.
+LATEX: \bibitem[Simpson, n.d.]{simpson-notes} Simpson, A. (n.d.). \textit{From Discrete Mathematics to State-Based Models, SEM version}. University of Oxford Department of Computer Science. Unpublished course notes.
 LATEX:
 LATEX: \bibitem[Simpson, 2002]{simpson02} Simpson, A.C. (2002). \textit{Discrete Mathematics by Example}. London: McGraw-Hill.
 LATEX:
