@@ -493,8 +493,10 @@ class LaTeXGenerator:
         """
         # Quantifiers and lambdas have lowest precedence (bind most loosely)
         # Per Woodcock: "quantifiers bind very loosely, scope extends to next bracket"
-        # Always need parens when used as operands of binary operators
-        if isinstance(child, (Quantifier, Lambda)):
+        # Need parens when used as operands of binary operators
+        # In fuzz mode, _quantifier_needs_parens handles this separately
+        # In non-fuzz mode, we handle it here
+        if isinstance(child, (Quantifier, Lambda)) and not self.use_fuzz:
             return True
 
         # Only binary ops need precedence checking
