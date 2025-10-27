@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
-**Last Updated:** 2025-10-25
-**Current Phase:** Phase 24 (Whitespace-Sensitive ^ Operator) ✓ COMPLETE
+**Last Updated:** 2025-10-26
+**Current Phase:** Phase 25 (Justification Operator Conversion) ✓ COMPLETE
 
 ---
 
@@ -387,6 +387,16 @@
 - 27 comprehensive tests covering all usage patterns
 - Documentation updated in USER-GUIDE.md and DESIGN.md
 
+### ✅ Phase 25: Justification Operator Conversion
+- Extended `_escape_justification` method to convert relation and function operators
+- Extended `_format_justification_label` method for PROOF tree justifications
+- Added conversion for relation operators: `o9`, `|->`, `<->`, `<|`, `|>`, `<<|`, `|>>`
+- Added conversion for function type operators: `->`, `+->`, `>->`, `-->>`, `>->>`, etc.
+- Added conversion for relation functions: `dom`, `ran`, `comp`, `inv`, `id`
+- 10 comprehensive tests covering all operator types in justifications
+- Fixed user homework: `[definition of o9]` now renders as `[definition of ∘]`
+- Documentation updated in USER-GUIDE.md (both EQUIV and PROOF sections)
+
 ---
 
 ## Syntax Requirements & Limitations
@@ -579,8 +589,9 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 15. ✓ Phase 21: Schema Separator and subseteq
 16. ✓ Phase 22: False Blocker Removal (Solutions 39, 48-52)
 17. ✓ Phase 24: Whitespace-Sensitive ^ Operator (concat vs exponent disambiguation)
+18. ✓ Phase 25: Justification Operator Conversion (relation/function operators in justifications)
 
-**Current:** 98.1% (51/52) - Phase 24 Complete
+**Current:** 98.1% (51/52) - Phase 25 Complete
 
 ### Next Steps
 
@@ -593,7 +604,7 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 941 passing (as of Phase 24, October 2025)
+- **Total Tests:** 951 passing (as of Phase 25, October 2025)
 - **Component Coverage:**
   - parser.py: 88.91%
   - latex_gen.py: 80.61%
@@ -617,6 +628,7 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 - Phase 20: 20 tests (semicolon-separated declarations in gendef/axdef/schema)
 - Phase 21: Covered by existing tests (schema separator and subseteq fixes)
 - Phase 24: 27 tests (whitespace-sensitive ^ operator disambiguation)
+- Phase 25: 10 tests (relation/function operator conversion in justifications)
 
 ---
 
