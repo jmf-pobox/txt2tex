@@ -457,20 +457,38 @@ The relational composition operator is associative:
 
 \bigskip
 
-if $R \in W$ $\rel$ X, $S \in W$ $\rel$ X, and $T \in W$ $\rel$ X.
+if $R \in W$ $\rel$ X, $S \in X$ $\rel$ Y, and $T \in Y$ $\rel$ Z.
+
+\bigskip
+
+\bigskip
+
+In this equivalence proof, we show that composition is associative using the definition of relational composition and by repositioning quantifiers and predicates where we are permitted to do so, which is only when there is no impact to the truthity of the predicates involved. Each such repositioning or regrouping will be justified. 
+
+\bigskip
+
+\bigskip
+
+Given a relation $R \in X$ $\rel$ Y and a second relation $S \in Y$ $\rel$ Z, and two elements $x \in X$ and $z \in Z$, x $\mapsto$ $z \in R$ o9 S $\Leftrightarrow$ $\exists y : Y @ x \mapsto y \in R \land y \mapsto z \in S$ \citep[page 107]{simpson-notes}.
 
 \bigskip
 
 \[
 \begin{array}{ll@{\hspace{2em}}l}
 & w \mapsto z \in (R \circ S) \circ T \\
+&\Leftrightarrow \exists y : Y @ w \mapsto y \in (R \circ S) \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
+&\Leftrightarrow \exists y : Y @ w \mapsto y \in (\exists x : X @ w \mapsto x \in R \land x \mapsto y \in S) \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
+&\Leftrightarrow \exists y : Y @ (\exists x : X @ w \mapsto x \in R \land x \mapsto y \in S) \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
+&\Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is $\lnot$ free in y $\mapsto$ z}] \\
+&\Leftrightarrow \exists x : X @ w \mapsto x \in R \land x \mapsto z \in (\exists y : Y @ x \mapsto y \in S \land y \mapsto z \in T) & [\mbox{y is $\lnot$ free in w $\mapsto$ x , x $\mapsto$ z}] \\
+&\Leftrightarrow \exists x : X @ w \mapsto x \in R \land x \mapsto z \in (S \circ T) & [\mbox{definition of $\circ$}] \\
 &\Leftrightarrow w \mapsto z \in R \circ S \circ T
 \end{array}
 \]
 
 \bigskip
 
-In this equivalence proof, we show 
+In step 1, we apply the composition equivalence based on the parenthesis, replacing the outer composition of (R o9 S) o9 T. In step 2, we apply our equivlence for composition to (R o9 S).
 
 \bigskip
 
@@ -574,7 +592,7 @@ SquareOrCubeIntegers = \{ z, z_0 : \num | z = z_0 * z_0 \lor z = z_0 * z_0 * z_0
 
 
 
-\bibitem[Simpson, n.d.]{simpson-notes} Simpson, A. (n.d.). \textit{From Discrete Mathematics to State-Based Models, SEM version}. University of Oxford Department of Computer Science. Unpublished course notes.
+\bibitem[Simpson, 2025]{simpson-notes} Simpson, A. (n.d.). \textit{From Discrete Mathematics to State-Based Models, SEM version}. University of Oxford Department of Computer Science. Unpublished course notes.
 
 
 

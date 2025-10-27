@@ -208,17 +208,21 @@ LATEX: \hspace*{1em} $(R \circ S) \circ T = R \circ (S \circ T)$
 
 TEXT: if R in W <-> X, S in X <-> Y, and T in Y <-> Z.
 
+TEXT: In this equivalence proof, we show that composition is associative using the definition of relational composition and by repositioning quantifiers and predicates where we are permitted to do so, which is only when there is no impact to the truthity of the predicates involved. Each such repositioning or regrouping will be justified. 
+
+TEXT: Given a relation R in X <-> Y and a second relation S in Y <-> Z, and two elements x in X and z in Z, x |-> z in R o9 S <=> (exists y : Y | x |-> y in R and y |-> z in S) [cite simpson-notes page 107].
+
 EQUIV:
 w |-> z in (R o9 S) o9 T
 (exists y : Y | w |-> y in (R o9 S) and y |-> z in T)                                       [definition of o9]
 (exists y : Y | w |-> y in (exists x : X | w |-> x in R and x |-> y in S) and y |-> z in T) [definition of o9]
 (exists y : Y | (exists x : X | w |-> x in R and x |-> y in S) and y |-> z in T)            [definition of o9]
-(exists y : Y | (exists x : X | w |-> x in R and x |-> y in S and y |-> z in T))            [x is not free in (y, z) in T]
-(exists x : X | w |-> x in R and x |-> z in (exists y : Y | x |-> y in S and y |-> z in T)) [y is not free in (w, x) in R and (x, z) in S o9 T]
+(exists y : Y | (exists x : X | w |-> x in R and x |-> y in S and y |-> z in T))            [x is not free in y |-> z]
+(exists x : X | w |-> x in R and x |-> z in (exists y : Y | x |-> y in S and y |-> z in T)) [y is not free in w |-> x, x |-> z]
 (exists x : X | w |-> x in R and x |-> z in (S o9 T))                                       [definition of o9]
 w |-> z in R o9 (S o9 T)
 
-TEXT: In this equivalence proof, we show 
+TEXT: In step 1, we apply the composition equivalence based on the parenthesis, replacing the outer composition of (R o9 S) o9 T. In step 2, we apply our equivlence for composition to (R o9 S).
 
 ** Question n **
 
@@ -284,7 +288,7 @@ PAGEBREAK:
 
 LATEX: \begin{thebibliography}{Simpson, n.d.}
 LATEX:
-LATEX: \bibitem[Simpson, n.d.]{simpson-notes} Simpson, A. (n.d.). \textit{From Discrete Mathematics to State-Based Models, SEM version}. University of Oxford Department of Computer Science. Unpublished course notes.
+LATEX: \bibitem[Simpson, 2025]{simpson-notes} Simpson, A. (n.d.). \textit{From Discrete Mathematics to State-Based Models, SEM version}. University of Oxford Department of Computer Science. Unpublished course notes.
 LATEX:
 LATEX: \bibitem[Simpson, 2002]{simpson02} Simpson, A.C. (2002). \textit{Discrete Mathematics by Example}. London: McGraw-Hill.
 LATEX:
