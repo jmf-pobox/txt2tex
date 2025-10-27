@@ -217,18 +217,46 @@ not (p and q)
 - `[arithmetic]` - Arithmetic simplification
 - Any custom text describing your reasoning
 
-**Operator conversion:** Logical operators in justifications are automatically converted to LaTeX:
+**Operator conversion:** Mathematical operators in justifications are automatically converted to LaTeX:
+
+**Logical operators:**
 - `and` → $\land$
 - `or` → $\lor$
 - `not` → $\lnot$
 - `=>` → $\Rightarrow$
 - `<=>` → $\Leftrightarrow$
 
-Example with operators:
+**Relation operators:**
+- `o9` → $\circ$ (composition)
+- `|->` → $\mapsto$ (maplet)
+- `<->` → $\rel$ (relation type)
+- `<|` → $\dres$ (domain restriction)
+- `|>` → $\rres$ (range restriction)
+- `<<|` → $\ndres$ (domain corestriction)
+- `|>>` → $\nrres$ (range corestriction)
+- `++` → $\oplus$ (override)
+
+**Function type operators:**
+- `->` → $\fun$ (total function)
+- `+->` → $\pfun$ (partial function)
+- `>->` → $\inj$ (injection)
+- `-->>` → $\surj$ (surjection)
+- `>->>` → $\bij$ (bijection)
+
+**Relation functions:**
+- `dom`, `ran`, `comp`, `inv`, `id`
+
+Example with logical operators:
 ```
 <=> p or (not p and q) [and and true]
 ```
 Renders as: $\Leftrightarrow p \lor (\lnot p \land q)$ with justification $[\land$ and true]
+
+Example with relation operators:
+```
+<=> (exists y : Y | w |-> y in (R o9 S) and y |-> z in T) [definition of o9]
+```
+Renders as: $\Leftrightarrow \exists y : Y \bullet w \mapsto y \in (R \circ S) \land y \mapsto z \in T$ with justification [definition of $\circ$]
 
 ---
 
@@ -1365,17 +1393,34 @@ Free-form text, wrapped in `\text{}` for proper spacing
 
 #### Operator Conversion in Justifications
 
-Logical operators are automatically converted:
+Mathematical operators in justifications are automatically converted to LaTeX symbols:
+
+**Logical operators:**
 - `and` → $\land$
 - `or` → $\lor$
 - `not` → $\lnot$
 - `=>` → $\Rightarrow$
 - `<=>` → $\Leftrightarrow$
 
+**Relation operators:**
+- `o9` → $\circ$ (composition)
+- `|->` → $\mapsto$ (maplet)
+- `<->` → $\rel$ (relation type)
+- `<|` → $\dres$, `|>` → $\rres$, `<<|` → $\ndres$, `|>>` → $\nrres$
+- `++` → $\oplus$ (override)
+
+**Function type operators:**
+- `->` → $\fun$, `+->` → $\pfun$, `>->` → $\inj$, `-->>` → $\surj$, `>->>` → $\bij$
+
+**Relation functions:**
+- `dom`, `ran`, `comp`, `inv`, `id`
+
 Examples:
 - `[=> intro from 1]` → $\Rightarrow$-intro$^{[1]}$
 - `[and elim 1]` → $\land$-elim-1
 - `[or elim from 2]` → $\lor$-elim (from 2)
+- `[definition of o9]` → [definition of $\circ$]
+- `[definition of |->]` → [definition of $\mapsto$]
 
 ### Supported Rules
 
