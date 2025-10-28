@@ -379,7 +379,7 @@ class LaTeXGenerator:
             return self.UNARY_OPS[name]
 
         # Mathematical type names: use blackboard bold (or fuzz built-in types)
-        # N = naturals, Z = integers
+        # N = naturals, Z = integers, N1 = positive integers (≥ 1)
         # Only convert N and Z, not Q/R/C which are commonly used as variables
         if name == "Z":
             # Fuzz uses \num for integers, LaTeX uses \mathbb{Z}
@@ -387,6 +387,10 @@ class LaTeXGenerator:
         if name == "N":
             # Fuzz uses \nat for naturals, LaTeX uses \mathbb{N}
             return r"\nat" if self.use_fuzz else r"\mathbb{N}"
+        if name == "N1":
+            # N1 = positive integers {1, 2, 3, ...}
+            # Render with subscript like exists1 → \exists_1
+            return r"\nat_1" if self.use_fuzz else r"\mathbb{N}_1"
 
         # No underscore: return as-is
         if "_" not in name:
