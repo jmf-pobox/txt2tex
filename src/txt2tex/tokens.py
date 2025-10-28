@@ -108,6 +108,7 @@ class TokenType(Enum):
     CARET = auto()  # ^ for superscripts
     UNDERSCORE = auto()  # _ for subscripts
     MOD = auto()  # mod (modulo arithmetic)
+    CONTINUATION = auto()  # \ at end of line (Phase 27 - line break marker)
 
     # Grouping
     LPAREN = auto()

@@ -559,7 +559,10 @@ class LaTeXGenerator:
         return not isinstance(parent, (Quantifier, Lambda))
 
     def _generate_binary_op(self, node: BinaryOp, parent: Expr | None = None) -> str:
-        """Generate LaTeX for binary operation."""
+        """Generate LaTeX for binary operation.
+
+        Phase 27: Support line breaks with \\\\ for long expressions.
+        """
         op_latex = self.BINARY_OPS.get(node.operator)
         if op_latex is None:
             raise ValueError(f"Unknown binary operator: {node.operator}")
@@ -578,7 +581,13 @@ class LaTeXGenerator:
         if self._needs_parens(node.right, node.operator, is_left_child=False):
             right = f"({right})"
 
-        return f"{left} {op_latex} {right}"
+        # Phase 27: Check for line break after operator
+        if node.line_break_after:
+            # Multi-line expression: insert \\ and indent continuation
+            return f"{left} {op_latex} \\\\\n\\quad {right}"
+        else:
+            # Single-line expression
+            return f"{left} {op_latex} {right}"
 
     def _generate_quantifier(self, node: Quantifier, parent: Expr | None = None) -> str:
         """Generate LaTeX for quantifier (forall, exists, exists1, mu).
