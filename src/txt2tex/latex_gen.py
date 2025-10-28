@@ -584,7 +584,8 @@ class LaTeXGenerator:
         # Phase 27: Check for line break after operator
         if node.line_break_after:
             # Multi-line expression: insert \\ and indent continuation
-            return f"{left} {op_latex} \\\\\n\\quad {right}"
+            # EQUIV blocks use array format and need & prefix for column alignment
+            return f"{left} {op_latex} \\\\\n& \\quad {right}"
         else:
             # Single-line expression
             return f"{left} {op_latex} {right}"
