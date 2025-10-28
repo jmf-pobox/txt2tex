@@ -223,8 +223,10 @@ not (p and q)
 - `and` → $\land$
 - `or` → $\lor$
 - `not` → $\lnot$
-- `=>` → $\Rightarrow$
-- `<=>` → $\Leftrightarrow$
+- `=>` → $\Rightarrow$ (or `\implies` in fuzz mode)
+- `<=>` → $\Leftrightarrow$ (always, even in fuzz mode for EQUIV blocks)
+
+**Note on fuzz mode**: When using `--fuzz`, implication renders as `\implies` everywhere. Equivalence uses `\Leftrightarrow` in EQUIV blocks (equational reasoning) but `\iff` in predicates.
 
 **Relation operators:**
 - `o9` → $\circ$ (composition)
@@ -1399,8 +1401,10 @@ Mathematical operators in justifications are automatically converted to LaTeX sy
 - `and` → $\land$
 - `or` → $\lor$
 - `not` → $\lnot$
-- `=>` → $\Rightarrow$
-- `<=>` → $\Leftrightarrow$
+- `=>` → $\Rightarrow$ (or `\implies` in fuzz mode)
+- `<=>` → $\Leftrightarrow$ (or `\iff` in fuzz mode)
+
+**Note**: In `--fuzz` mode, predicates use `\implies` and `\iff` to match fuzz package conventions.
 
 **Relation operators:**
 - `o9` → $\circ$ (composition)
