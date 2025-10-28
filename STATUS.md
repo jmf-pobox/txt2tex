@@ -444,6 +444,17 @@
 - User verification: Long homework predicates now fit within margins
 - Test count: 995 tests (16 new line break tests added)
 
+### ✅ Fuzz Mode: Context-Aware Equivalence Operator
+- Fixed `<=>` operator to render context-sensitively in fuzz mode
+- **EQUIV blocks**: `<=>` → `\Leftrightarrow` (equivalence in equational reasoning)
+- **Predicates** (schemas, axioms, proofs): `<=>` → `\iff` (logical "if and only if")
+- Non-fuzz mode: Always uses `\Leftrightarrow` for backward compatibility
+- Matches fuzz package conventions where:
+  - `\iff` is the logical connective for predicates (like `\land`, `\lor`, `\implies`)
+  - `\Leftrightarrow` is meta-level equivalence for equational reasoning (like in EQUIV chains)
+- Consistent with existing `=>` handling which uses `\implies` in fuzz mode
+- All 995 tests pass
+
 ---
 
 ## Syntax Requirements & Limitations

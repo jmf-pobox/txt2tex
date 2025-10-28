@@ -2,7 +2,7 @@
 
 **Purpose**: This document captures important differences between fuzz (Mike Spivey's Z notation typesetter) and standard LaTeX that affect txt2tex code generation.
 
-**Last Updated**: 2025-10-19
+**Last Updated**: 2025-10-27
 
 ---
 
@@ -12,6 +12,8 @@
 |---------|----------------|------|-------------------|
 | Natural numbers | `\mathbb{N}` | `\nat` | Context-aware generation |
 | Integers | `\mathbb{Z}` | `\num` | Context-aware generation |
+| Implication (`=>`) | `\Rightarrow` | `\implies` | Use `\implies` in fuzz mode |
+| Equivalence (`<=>`) | `\Leftrightarrow` | `\iff` (predicates) or `\Leftrightarrow` (EQUIV) | Context-aware in fuzz mode |
 | Semicolon (`;`) | Can be operator | **NOT** for composition | Removed from relational operators |
 | Multiple declarations | Any format | **Requires** line breaks (`\\`) | Generator adds `\\` between declarations |
 | Operator precedence | Standard | **Different** for `#`, etc. | Add parens around function app in fuzz mode |
@@ -41,6 +43,48 @@ if name == "Z":
 ```
 
 **Reference**: [latex_gen.py:368-373](../src/txt2tex/latex_gen.py:368-373)
+
+---
+
+## Logical Operators
+
+### Implication (`=>`)
+
+**Standard LaTeX**: `\Rightarrow` (arrow symbol)
+**Fuzz**: `\implies` (logical connective)
+
+**txt2tex behavior**:
+```python
+# In _generate_binary_op():
+if self.use_fuzz and node.operator == "=>":
+    op_latex = r"\implies"
+```
+
+**Why**: Fuzz uses `\implies` for logical implication to match mathematical logic conventions, distinguishing it from meta-level reasoning.
+
+### Equivalence (`<=>`)
+
+**Standard LaTeX**: `\Leftrightarrow` (double arrow symbol)
+**Fuzz**: Context-dependent
+- **Predicates** (schemas, axioms, proofs): `\iff` (logical "if and only if")
+- **EQUIV blocks**: `\Leftrightarrow` (equational reasoning)
+
+**txt2tex behavior**:
+```python
+# In _generate_binary_op():
+if self.use_fuzz:
+    if node.operator == "<=>" and not self._in_equiv_block:
+        op_latex = r"\iff"
+    # Otherwise uses \Leftrightarrow
+```
+
+**Why**: Fuzz distinguishes between:
+- `\iff` - logical connective in predicates (same level as `\land`, `\lor`, `\implies`)
+- `\Leftrightarrow` - meta-level equivalence for equational reasoning (EQUIV chains)
+
+This matches the fuzz package conventions where predicates use logical connectives (`\implies`, `\iff`) while equational reasoning uses arrows (`\Rightarrow`, `\Leftrightarrow`).
+
+**Reference**: [latex_gen.py:571-579](../src/txt2tex/latex_gen.py:571-579)
 
 ---
 
