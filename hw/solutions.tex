@@ -594,6 +594,12 @@ Timestamp == \nat
   \forall a : X @ \forall b : Y @ snd(a, b) = b
 \end{gendef}
 
+\bigskip
+
+This needs to be simplified $using <=> and$ by using dom(function) to declare the types.
+
+\bigskip
+
 \begin{schema}{PodcastPlatform}
 shows : \finset ShowId \\
 show\_episodes : ShowId \pfun \finset EpisodeId \\
@@ -605,7 +611,8 @@ shows \subseteq \dom show\_episodes \land \dom show\_episodes \subseteq shows \\
 \forall s : ShowId @ \forall e : EpisodeId @ s \in \dom show\_episodes \land e \in show\_episodes(s) \implies (s, e) \in \dom episode\_info \\
 \forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \dom episode\_info \implies s \in \dom show\_episodes \land e \in show\_episodes(s) \\
 shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows \\
-\forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ (s, e) \in \dom episode\_info \land p \in fst(episode\_info(s, e)) \implies p \in show\_info(s)
+\forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ (s, e) \in \dom episode\_info \land \\
+& \quad p \in fst(episode\_info(s, e)) \implies p \in show\_info(s)
 \end{schema}
 
 \newpage

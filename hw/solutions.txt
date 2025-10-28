@@ -298,7 +298,8 @@ where
   forall s : ShowId | forall e : EpisodeId | s in dom show_episodes and e in show_episodes s => (s, e) in dom episode_info
   forall s : ShowId | forall e : EpisodeId | (s, e) in dom episode_info => s in dom show_episodes and e in show_episodes s
   shows subset dom (show_info) and dom (show_info) subset shows
-  forall s : ShowId | forall p : PeopleId | (exists e : EpisodeId | (s, e) in dom episode_info and p in fst(episode_info(s, e)) => p in show_info s)
+  forall s : ShowId | forall p : PeopleId | (exists e : EpisodeId | (s, e) in dom episode_info and \
+  p in fst(episode_info(s, e)) => p in show_info s)
 end
 
 PAGEBREAK:
