@@ -18,11 +18,16 @@ class ASTNode:
 
 @dataclass(frozen=True)
 class BinaryOp(ASTNode):
-    """Binary operation node (and, or, =>, <=>)."""
+    """Binary operation node (and, or, =>, <=>).
+
+    Phase 27: Added line_break_after to support multi-line expressions.
+    When line_break_after is True, LaTeX generator inserts \\\\ after the operator.
+    """
 
     operator: str
     left: Expr
     right: Expr
+    line_break_after: bool = False  # True if \\ continuation follows operator
 
 
 @dataclass(frozen=True)

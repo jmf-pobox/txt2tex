@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
-**Last Updated:** 2025-10-26
-**Current Phase:** Phase 26 (TEXT Block Operator Support) ✓ COMPLETE
+**Last Updated:** 2025-10-27
+**Current Phase:** Phase 27 (Line Continuation with Backslash) ✓ COMPLETE
 
 ---
 
@@ -415,6 +415,34 @@
   - Tests homework scenarios with mixed operators
 - Result: All operators now convert correctly in TEXT blocks (prose)
 - Homework verification: `o9` → `\circ` throughout solutions.tex (user's primary issue solved)
+
+### ✅ Phase 27: Line Continuation with Backslash
+- Implemented backslash continuation for multi-line expressions
+- Added CONTINUATION token type to distinguish `\` + newline (continuation) from `\` alone (set difference)
+- Modified lexer to recognize context-sensitive backslash handling:
+  - `\` followed by newline → CONTINUATION token (line break marker)
+  - `\` not followed by newline → SETMINUS token (set difference operator)
+- Added `line_break_after: bool` field to BinaryOp AST node
+- Modified parser to detect CONTINUATION tokens after operators and set flag
+- Supported operators: `<=>`, `=>`, `or`, `and`
+- Modified LaTeX generator to emit `\\` and `\quad` for line breaks
+- LaTeX output: `expr1 op \\\n\quad expr2` (breaks line and indents continuation)
+- Use case: Prevents long predicates from running off page margins
+- Example input:
+  ```
+  forall s : ShowId | s in dom show_episodes and \
+    e in show_episodes s
+  ```
+- Example output:
+  ```
+  \forall s : ShowId \bullet s \in \dom show\_episodes \land \\
+  \quad e \in show\_episodes(s)
+  ```
+- Created test_line_breaks/ with 16 comprehensive tests
+- Tests cover: basic continuation, multiple continuations, all operators, schemas, proofs, quantifiers
+- Set difference still works: `A \ B` (no newline after backslash)
+- User verification: Long homework predicates now fit within margins
+- Test count: 995 tests (16 new line break tests added)
 
 ---
 

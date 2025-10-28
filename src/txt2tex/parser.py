@@ -720,11 +720,21 @@ class Parser:
 
         while self._match(TokenType.IFF):
             op_token = self._advance()
+            # Phase 27: Check for continuation marker (\ at end of line)
+            has_continuation = False
+            if self._match(TokenType.CONTINUATION):
+                self._advance()  # consume \
+                has_continuation = True
+                # Skip newline and any leading whitespace on next line
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
             right = self._parse_implies()
             left = BinaryOp(
                 operator=op_token.value,
                 left=left,
                 right=right,
+                line_break_after=has_continuation,
                 line=op_token.line,
                 column=op_token.column,
             )
@@ -741,12 +751,22 @@ class Parser:
 
         while self._match(TokenType.IMPLIES):
             op_token = self._advance()
+            # Phase 27: Check for continuation marker (\ at end of line)
+            has_continuation = False
+            if self._match(TokenType.CONTINUATION):
+                self._advance()  # consume \
+                has_continuation = True
+                # Skip newline and any leading whitespace on next line
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
             # Use _parse_expr() to allow quantifiers on RHS
             right = self._parse_expr()
             left = BinaryOp(
                 operator=op_token.value,
                 left=left,
                 right=right,
+                line_break_after=has_continuation,
                 line=op_token.line,
                 column=op_token.column,
             )
@@ -759,11 +779,21 @@ class Parser:
 
         while self._match(TokenType.OR):
             op_token = self._advance()
+            # Phase 27: Check for continuation marker (\ at end of line)
+            has_continuation = False
+            if self._match(TokenType.CONTINUATION):
+                self._advance()  # consume \
+                has_continuation = True
+                # Skip newline and any leading whitespace on next line
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
             right = self._parse_and()
             left = BinaryOp(
                 operator=op_token.value,
                 left=left,
                 right=right,
+                line_break_after=has_continuation,
                 line=op_token.line,
                 column=op_token.column,
             )
@@ -776,6 +806,15 @@ class Parser:
 
         while self._match(TokenType.AND):
             op_token = self._advance()
+            # Phase 27: Check for continuation marker (\ at end of line)
+            has_continuation = False
+            if self._match(TokenType.CONTINUATION):
+                self._advance()  # consume \
+                has_continuation = True
+                # Skip newline and any leading whitespace on next line
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
             # Phase 21c: Allow quantifiers after 'and'
             # Check if next token is a quantifier keyword
             if self._match(
@@ -788,6 +827,7 @@ class Parser:
                 operator=op_token.value,
                 left=left,
                 right=right,
+                line_break_after=has_continuation,
                 line=op_token.line,
                 column=op_token.column,
             )

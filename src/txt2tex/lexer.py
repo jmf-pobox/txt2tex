@@ -545,8 +545,24 @@ class Lexer:
             self._advance()
             return Token(TokenType.CROSS, "×", start_line, start_column)  # noqa: RUF001
 
-        # Set difference operator (Phase 11.5)
+        # Set difference operator OR line continuation (Phase 11.5, enhanced Phase 27)
         if char == "\\":
+            # Look ahead for newline (continuation marker)
+            peek_pos = 1
+            # Skip optional whitespace after backslash
+            while self._peek_char(peek_pos) in " \t":
+                peek_pos += 1
+
+            # If followed by newline, it's a continuation marker
+            if self._peek_char(peek_pos) == "\n":
+                self._advance()  # consume \
+                # Consume optional trailing whitespace
+                while self._current_char() in " \t":
+                    self._advance()
+                # Don't consume newline - let it be a separate token
+                return Token(TokenType.CONTINUATION, "\\", start_line, start_column)
+
+            # Not followed by newline → set difference operator
             self._advance()
             return Token(TokenType.SETMINUS, "\\", start_line, start_column)
 
