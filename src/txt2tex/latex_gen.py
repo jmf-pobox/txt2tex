@@ -568,9 +568,15 @@ class LaTeXGenerator:
         if op_latex is None:
             raise ValueError(f"Unknown binary operator: {node.operator}")
 
-        # Fuzz uses \implies instead of \Rightarrow for implication
-        if self.use_fuzz and node.operator == "=>":
-            op_latex = r"\implies"
+        # Fuzz-specific operator mappings
+        if self.use_fuzz:
+            # Fuzz uses \implies instead of \Rightarrow for implication
+            if node.operator == "=>":
+                op_latex = r"\implies"
+            # Fuzz uses \iff for logical equivalence in predicates (schemas, etc.)
+            # but \Leftrightarrow for equivalence in EQUIV blocks
+            elif node.operator == "<=>" and not self._in_equiv_block:
+                op_latex = r"\iff"
 
         # Pass this node as parent to children
         left = self.generate_expr(node.left, parent=node)
