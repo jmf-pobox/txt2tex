@@ -614,10 +614,10 @@ shows \subseteq \dom show\_episodes \land \dom show\_episodes \subseteq shows \\
 shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows \\
 \forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ \\
 \quad (s, e) \in \dom episode\_info \land \\
-\quad p \in fst(episode\_info(s, e)) \iff \\
-\quad p \in show\_info(s) \\
-\forall s : ShowId @ \forall t_1, t_2 : Timestamp @ \forall e_1, e_2 : EpisodeId @ (s, e_1) \in \dom episode\_info \land \\
-\quad (s, e_2) \in \dom episode\_info \land (e_1 < e_2 \implies snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))
+\quad (p \in fst(episode\_info(s, e)) \iff \\
+\quad p \in show\_info(s)) \\
+\forall s : ShowId @ \forall t_1, t_2 : Timestamp @ \forall e_1, e_2 : EpisodeId @ \\
+\quad (s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom episode\_info \land (e_1 < e_2 \implies snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))
 \end{schema}
 
 \noindent
