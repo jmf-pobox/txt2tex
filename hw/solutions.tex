@@ -564,9 +564,37 @@ SquareOrCubeIntegers : \power \num
 SquareOrCubeIntegers = \{ z, z_0 : \num | z = z_0 * z_0 \lor z = z_0 * z_0 * z_0 @ z \}
 \end{axdef}
 
-\newpage
+\medskip
+
+\bigskip
+\noindent
+\textbf{Question 7}
 
 \medskip
+
+\begin{zed}[ShowId, PeopleId]\end{zed}
+
+\begin{zed}
+EpisodeId == \nat
+\end{zed}
+
+\begin{zed}
+Timestamp == \nat
+\end{zed}
+
+\begin{schema}{PodcastPlatform}
+shows : \finset ShowId \\
+show\_episodes : ShowId \pfun \finset EpisodeId \\
+episode\_info : ShowId \cross EpisodeId \pfun \finset PeopleId \cross Timestamp \\
+show\_info : ShowId \pfun \finset PeopleId
+\where
+shows \subseteq \dom show\_episodes \land \dom show\_episodes \subseteq shows \\
+\forall eps : \ran show\_episodes @ \exists n : \nat @ eps = 1 \upto n \\
+\ran show\_episodes \subseteq (\forall s : ShowId @ \forall ep : EpisodeId @ s \mapsto ep \in \dom episode\_info.ep) \\
+shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows
+\end{schema}
+
+\newpage
 
 \section*{Bibliography}
 

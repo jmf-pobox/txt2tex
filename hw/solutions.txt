@@ -267,6 +267,24 @@ where
 end
 
 
+** Question 7 **
+
+given ShowId, PeopleId
+EpisodeId == N
+Timestamp == N
+
+schema PodcastPlatform
+  shows : F ShowId
+  show_episodes : ShowId +-> F EpisodeId
+  episode_info : ShowId cross EpisodeId +-> (F PeopleId cross Timestamp)
+  show_info : ShowId +-> F PeopleId
+where
+  shows subset dom (show_episodes) and dom (show_episodes) subset shows
+  forall eps : ran show_episodes | (exists n : N | eps = 1..n)
+  ran show_episodes subset { epInfo : ShowId cross EpisodeId | epInfo.ShowId |-> epInfo.EpisodeId in dom episode_info . epInfo.episodeId }
+  shows subset dom (show_info) and dom (show_info) subset shows
+  
+end
 
 PAGEBREAK:
 
