@@ -575,12 +575,24 @@ SquareOrCubeIntegers = \{ z, z_0 : \num | z = z_0 * z_0 \lor z = z_0 * z_0 * z_0
 \begin{zed}[ShowId, PeopleId]\end{zed}
 
 \begin{zed}
-EpisodeId == \nat
+EpisodeId == \nat_1
 \end{zed}
 
 \begin{zed}
 Timestamp == \nat
 \end{zed}
+
+\begin{gendef}[X, Y]
+  fst: X \cross Y \fun X
+\where
+  \forall a : X @ \forall b : Y @ fst(a, b) = a
+\end{gendef}
+
+\begin{gendef}[X, Y]
+  snd: X \cross Y \fun Y
+\where
+  \forall a : X @ \forall b : Y @ snd(a, b) = b
+\end{gendef}
 
 \begin{schema}{PodcastPlatform}
 shows : \finset ShowId \\
@@ -589,9 +601,11 @@ episode\_info : ShowId \cross EpisodeId \pfun \finset PeopleId \cross Timestamp 
 show\_info : ShowId \pfun \finset PeopleId
 \where
 shows \subseteq \dom show\_episodes \land \dom show\_episodes \subseteq shows \\
-\forall eps : \ran show\_episodes @ \exists n : \nat @ eps = 1 \upto n \\
-\ran show\_episodes \subseteq (\forall s : ShowId @ \forall ep : EpisodeId @ s \mapsto ep \in \dom episode\_info.ep) \\
-shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows
+\forall es : \ran show\_episodes @ \exists n : \nat @ es = 1 \upto n \\
+\forall s : ShowId @ \forall e : EpisodeId @ s \in \dom show\_episodes \land e \in show\_episodes(s) \implies (s, e) \in \dom episode\_info \\
+\forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \dom episode\_info \implies s \in \dom show\_episodes \land e \in show\_episodes(s) \\
+shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows \\
+\forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ (s, e) \in \dom episode\_info \land p \in fst(episode\_info(s, e)) \implies p \in show\_info(s)
 \end{schema}
 
 \newpage

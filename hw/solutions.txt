@@ -270,8 +270,22 @@ end
 ** Question 7 **
 
 given ShowId, PeopleId
-EpisodeId == N
+EpisodeId == N1
 Timestamp == N
+
+gendef[X, Y]
+  fst : X cross Y -> X
+where
+  forall a : X | forall b : Y | fst(a, b) = a
+end
+
+gendef[X, Y]
+  snd : X cross Y -> Y
+where
+  forall a : X | forall b : Y | snd(a, b) = b
+end
+
+TEXT: This needs to be simplified using <=> and by using dom(function) to declare the types.
 
 schema PodcastPlatform
   shows : F ShowId
@@ -280,10 +294,11 @@ schema PodcastPlatform
   show_info : ShowId +-> F PeopleId
 where
   shows subset dom (show_episodes) and dom (show_episodes) subset shows
-  forall eps : ran show_episodes | (exists n : N | eps = 1..n)
-  ran show_episodes subset { epInfo : ShowId cross EpisodeId | epInfo.ShowId |-> epInfo.EpisodeId in dom episode_info . epInfo.episodeId }
+  forall es : ran show_episodes | (exists n : N | es = 1..n)
+  forall s : ShowId | forall e : EpisodeId | s in dom show_episodes and e in show_episodes s => (s, e) in dom episode_info
+  forall s : ShowId | forall e : EpisodeId | (s, e) in dom episode_info => s in dom show_episodes and e in show_episodes s
   shows subset dom (show_info) and dom (show_info) subset shows
-  
+  forall s : ShowId | forall p : PeopleId | (exists e : EpisodeId | (s, e) in dom episode_info and p in fst(episode_info(s, e)) => p in show_info s)
 end
 
 PAGEBREAK:
