@@ -209,6 +209,7 @@ class LaTeXGenerator:
     def __init__(self, use_fuzz: bool = False) -> None:
         """Initialize generator with package choice."""
         self.use_fuzz = use_fuzz
+        self._in_equiv_block = False  # Track context for line break formatting
 
     def generate_document(self, ast: Document | Expr) -> str:
         """Generate complete LaTeX document with preamble and postamble."""
@@ -585,7 +586,11 @@ class LaTeXGenerator:
         if node.line_break_after:
             # Multi-line expression: insert \\ and indent continuation
             # EQUIV blocks use array format and need & prefix for column alignment
-            return f"{left} {op_latex} \\\\\n& \\quad {right}"
+            # Schemas and proofs use plain \\ without & prefix
+            if self._in_equiv_block:
+                return f"{left} {op_latex} \\\\\n& \\quad {right}"
+            else:
+                return f"{left} {op_latex} \\\\\n\\quad {right}"
         else:
             # Single-line expression
             return f"{left} {op_latex} {right}"
@@ -2359,6 +2364,9 @@ class LaTeXGenerator:
         # Use ll@{\hspace{2em}}l to add extra space before justification column
         lines.append(r"\begin{array}{ll@{\hspace{2em}}l}")
 
+        # Set context for line break formatting
+        self._in_equiv_block = True
+
         # Generate steps
         for i, step in enumerate(node.steps):
             expr_latex = self.generate_expr(step.expression)
@@ -2377,6 +2385,9 @@ class LaTeXGenerator:
                 line += r" \\"
 
             lines.append(line)
+
+        # Reset context
+        self._in_equiv_block = False
 
         lines.append(r"\end{array}")
         lines.append(r"\]")
