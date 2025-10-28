@@ -65,7 +65,7 @@ $p$ & $q$ & $( q \Rightarrow p )$ & $\lnot p$ & $\lnot q$ & $( \lnot p \Rightarr
 
 \bigskip
 
-The statements $\lnot p \implies \lnot q$, $q \implies p$ are equivalent and $\lnot p \implies \lnot q \Leftrightarrow q \implies p$ is a tautology as it is true for every interpretation of p, q as illustrated by the final column of truth values.
+The statements $\lnot p \implies \lnot q$, $q \implies p$ are equivalent and $\lnot p \implies \lnot q \iff q \implies p$ is a tautology as it is true for every interpretation of p, q as illustrated by the final column of truth values.
 
 \bigskip
 
@@ -145,7 +145,7 @@ In this equivalence proof, we show that $p \implies (\lnot p \implies p)$ by usi
 
 \bigskip
 
-In this equivalance proof, we show that $\lnot p \implies \lnot q \Leftrightarrow q \implies p$ by using implication disjunction to replace implication with logical or, the definition of double negation to simplify, the commutivity property of logical or to change the order of the elements, and the implication disjunction rule to reintroduce implication.
+In this equivalance proof, we show that $\lnot p \implies \lnot q \iff q \implies p$ by using implication disjunction to replace implication with logical or, the definition of double negation to simplify, the commutivity property of logical or to change the order of the elements, and the implication disjunction rule to reintroduce implication.
 
 \bigskip
 
@@ -213,7 +213,7 @@ For this proof we are seeking to prove that p $\Rightarrow$ $\lnot p \implies p$
 \vspace{11pt}
 \bigskip
 
-This proof involves equivalence or bi-implication, which requires us to show $p \implies q$ and $q \implies p$ given this is the definition of $p \Leftrightarrow q$.
+This proof involves equivalence or bi-implication, which requires us to show $p \implies q$ and $q \implies p$ given this is the definition of $p \iff q$.
 
 \bigskip
 
@@ -295,7 +295,7 @@ We then combine these two proofs with the $\Leftrightarrow$-intro rule, using th
 
 \noindent
 $\displaystyle
-\infer[\Leftrightarrow \mathrm{intro}]{\lnot p \implies \lnot q \Leftrightarrow q \implies p}{
+\infer[\Leftrightarrow \mathrm{intro}]{\lnot p \implies \lnot q \iff q \implies p}{
   (\lnot p \implies \lnot q) \implies (q \implies p)
 &
 (q \implies p) \implies (\lnot p \implies \lnot q)
@@ -403,7 +403,7 @@ We then combine these two proofs with the $\Leftrightarrow$-intro rule, using th
 
 \noindent
 $\displaystyle
-\infer[\Leftrightarrow \mathrm{intro}]{(p \implies r) \land (q \implies r) \Leftrightarrow p \lor q \implies r}{
+\infer[\Leftrightarrow \mathrm{intro}]{(p \implies r) \land (q \implies r) \iff p \lor q \implies r}{
   (p \implies r) \land (q \implies r) \implies (p \lor q \implies r)
 &
 (p \lor q \implies r) \implies (p \implies r) \land (q \implies r)
@@ -608,13 +608,11 @@ show\_info : ShowId \pfun \finset PeopleId
 \where
 shows \subseteq \dom show\_episodes \land \dom show\_episodes \subseteq shows \\
 \forall es : \ran show\_episodes @ \exists n : \nat @ es = 1 \upto n \\
-\forall s : ShowId @ \forall e : EpisodeId @ (s \in \dom show\_episodes \land e \in show\_episodes(s) \implies (s, e) \in \dom episode\_info) \land \\
-\quad ((s, e) \in \dom episode\_info \implies s \in \dom show\_episodes \land e \in show\_episodes(s)) \\
-\forall s : ShowId @ \forall e : EpisodeId @ s \in \dom show\_episodes \land e \in show\_episodes(s) \Leftrightarrow (s, e) \in \dom episode\_info \\
+\forall s : ShowId @ \forall e : EpisodeId @ s \in \dom show\_episodes \land e \in show\_episodes(s) \iff \\
+\quad (s, e) \in \dom episode\_info \\
 shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows \\
-\forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ (s, e) \in \dom episode\_info \land p \in fst(episode\_info(s, e)) \implies \\
-\quad p \in show\_info(s) \\
-\forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ (s, e) \in \dom episode\_info \land p \in fst(episode\_info(s, e)) \implies \\
+\forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ (s, e) \in \dom episode\_info \land \\
+\quad p \in fst(episode\_info(s, e)) \iff \\
 \quad p \in show\_info(s)
 \end{schema}
 
