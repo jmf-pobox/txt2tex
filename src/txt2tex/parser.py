@@ -1231,6 +1231,17 @@ class Parser:
             # Semantics: forall x : T | constraint and body
             if self._match(TokenType.PIPE):
                 self._advance()  # Consume second '|'
+
+                # Phase 27: Check for continuation marker after second pipe
+                constraint_continuation = False
+                if self._match(TokenType.CONTINUATION):
+                    self._advance()  # consume \
+                    constraint_continuation = True
+                    # Skip newline and any leading whitespace on next line
+                    if self._match(TokenType.NEWLINE):
+                        self._advance()
+                    self._skip_newlines()
+
                 constraint = body
                 actual_body = self._parse_expr()
                 # Combine constraint and body with AND
@@ -1238,6 +1249,7 @@ class Parser:
                     operator="and",
                     left=constraint,
                     right=actual_body,
+                    line_break_after=constraint_continuation,
                     line=constraint.line,
                     column=constraint.column,
                 )
