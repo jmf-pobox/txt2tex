@@ -1204,6 +1204,15 @@ class Parser:
             raise ParserError("Expected '|' after quantifier binding", self._current())
         self._advance()  # Consume '|'
 
+        # Phase 27: Check for continuation marker (\ at end of line)
+        has_continuation = False
+        if self._match(TokenType.CONTINUATION):
+            self._advance()  # consume \
+            has_continuation = True
+            # Skip newline and any leading whitespace on next line
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+
         # Phase 21: Allow newlines after | (multi-line quantifiers)
         self._skip_newlines()
 
@@ -1247,6 +1256,7 @@ class Parser:
             domain=domain,
             body=body,
             expression=expression,
+            line_break_after_pipe=has_continuation,
             line=quant_token.line,
             column=quant_token.column,
         )

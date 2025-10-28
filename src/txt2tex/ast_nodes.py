@@ -75,6 +75,7 @@ class Quantifier(ASTNode):
     domain: Expr | None  # Optional domain shared by all variables (e.g., N, Z)
     body: Expr  # Predicate/body expression
     expression: Expr | None = None  # Optional expression part (mu only)
+    line_break_after_pipe: bool = False  # True if \ continuation after | (Phase 27)
 
 
 @dataclass(frozen=True)
