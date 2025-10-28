@@ -596,7 +596,7 @@ Timestamp == \nat
 
 \bigskip
 
-This needs to be simplified $using <=> and$ by using dom(function) to declare the types.
+This needs to be simplified by using dom(function) to declare the types.
 
 \bigskip
 
@@ -608,15 +608,55 @@ show\_info : ShowId \pfun \finset PeopleId
 \where
 shows \subseteq \dom show\_episodes \land \dom show\_episodes \subseteq shows \\
 \forall es : \ran show\_episodes @ \exists n : \nat @ es = 1 \upto n \\
-\forall s : ShowId @ \forall e : EpisodeId @ s \in \dom show\_episodes \land e \in show\_episodes(s) \iff \\
+\forall s : ShowId @ \forall e : EpisodeId @ s \in \dom show\_episodes \land \\
+\quad e \in show\_episodes(s) \iff \\
 \quad (s, e) \in \dom episode\_info \\
 shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows \\
-\forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ (s, e) \in \dom episode\_info \land \\
+\forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ \\
+\quad (s, e) \in \dom episode\_info \land \\
 \quad p \in fst(episode\_info(s, e)) \iff \\
-\quad p \in show\_info(s)
+\quad p \in show\_info(s) \\
+\forall s : ShowId @ \forall t_1, t_2 : Timestamp @ \forall e_1, e_2 : EpisodeId @ (s, e_1) \in \dom episode\_info \land \\
+\quad (s, e_2) \in \dom episode\_info \land (e_1 < e_2 \implies snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))
 \end{schema}
 
+\noindent
+\hangindent=2em
+(a) $shows \subseteq \dom show\_episodes \land \dom show\_episodes \subseteq shows$
+
+\medskip
+\noindent
+\hangindent=2em
+(b) $\forall es : \ran show\_episodes @ \exists n : \nat @ es = 1 \upto n$
+
+\medskip
+\noindent
+\hangindent=2em
+(c) $\forall s : ShowId @ \forall e : EpisodeId @ s \in \dom show\_episodes \land \\
+\quad e \in show\_episodes(s) \iff \\
+\quad (s, e) \in \dom episode\_info$
+
+\medskip
+\noindent
+\hangindent=2em
+(d) $shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows$
+
+\medskip
+\noindent
+\hangindent=2em
+(e) $\forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ (s, e) \in \dom episode\_info \land \\
+\quad p \in fst(episode\_info(s, e)) \iff \\
+\quad p \in show\_info(s)$
+
+\medskip
+\noindent
+\hangindent=2em
+(f) $\forall s : ShowId @ \forall t_1, t_2 : Timestamp @ \forall e_1, e_2 : EpisodeId @ (s, e_1) \in \dom episode\_info \land \\
+\quad (s, e_2) \in \dom episode\_info \land (e_1 < e_2 \implies snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))$
+
 \newpage
+
+\medskip
 
 \section*{Bibliography}
 

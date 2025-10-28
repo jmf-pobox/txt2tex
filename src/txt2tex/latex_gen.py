@@ -641,9 +641,15 @@ class LaTeXGenerator:
                 domain_latex = self.generate_expr(node.domain, parent=node)
                 mu_parts.append(f": {domain_latex}")
             # Always use | for predicate separator in mu
-            mu_parts.append("|")
             body_latex = self.generate_expr(node.body, parent=node)
-            mu_parts.append(body_latex)
+
+            # Phase 27: Check for line break after pipe (|)
+            if node.line_break_after_pipe:
+                # Note: Fuzz mu is parenthesized, doesn't use array format
+                mu_parts.append(f"| \\\\\n\\quad {body_latex}")
+            else:
+                mu_parts.append("|")
+                mu_parts.append(body_latex)
 
             # If there's an expression part, add @ separator and expression
             if node.expression:
@@ -657,9 +663,19 @@ class LaTeXGenerator:
         # Phase 11.5: Check if mu has expression part (non-fuzz or other quantifiers)
         if node.quantifier == "mu" and node.expression:
             # Use | or \mid for predicate separator
-            parts.append("|" if self.use_fuzz else r"\mid")
+            pipe_sep = "|" if self.use_fuzz else r"\mid"
             body_latex = self.generate_expr(node.body, parent=node)
-            parts.append(body_latex)
+
+            # Phase 27: Check for line break after pipe (|)
+            if node.line_break_after_pipe:
+                if self._in_equiv_block:
+                    parts.append(f"{pipe_sep} \\\\\n& \\quad {body_latex}")
+                else:
+                    parts.append(f"{pipe_sep} \\\\\n\\quad {body_latex}")
+            else:
+                parts.append(pipe_sep)
+                parts.append(body_latex)
+
             # Add @ or bullet separator and expression
             # Fuzz uses @ (at sign), LaTeX uses \bullet
             parts.append("@" if self.use_fuzz else r"\bullet")
@@ -668,9 +684,22 @@ class LaTeXGenerator:
         else:
             # Standard quantifier: @ or bullet separator and body
             # Fuzz uses @ (at sign), LaTeX uses \bullet
-            parts.append("@" if self.use_fuzz else r"\bullet")
+            separator = "@" if self.use_fuzz else r"\bullet"
             body_latex = self.generate_expr(node.body, parent=node)
-            parts.append(body_latex)
+
+            # Phase 27: Check for line break after pipe (|)
+            if node.line_break_after_pipe:
+                # Multi-line quantifier: insert \\ and indent body
+                # EQUIV blocks use array format and need & prefix
+                # Schemas and proofs use plain \\ without &
+                if self._in_equiv_block:
+                    parts.append(f"{separator} \\\\\n& \\quad {body_latex}")
+                else:
+                    parts.append(f"{separator} \\\\\n\\quad {body_latex}")
+            else:
+                # Single-line quantifier
+                parts.append(separator)
+                parts.append(body_latex)
 
         result = " ".join(parts)
 
