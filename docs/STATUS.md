@@ -664,13 +664,13 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 973 passing (as of Phase 26, October 2025)
+- **Total Tests:** 1028 passing (as of Phase 27, October 2025)
 
 **Component Coverage:**
-- parser.py: 88.91%
-- latex_gen.py: 80.61%
-- lexer.py: 94.56%
-- Overall: 88.49%
+- parser.py: 86.17%
+- latex_gen.py: 82.65%
+- lexer.py: 92.10%
+- Overall: 86.98%
 
 **Test Organization:**
 - Tests reorganized by glossary lectures (01-09)
