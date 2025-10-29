@@ -356,7 +356,12 @@ axdef
   status : ShowId cross EpisodeId +-> (PlayedOrNot cross SavedOrNot)
 where
   my_shows subset shows
-  forall (s, e) : ran my_episodes | s > 0
+  forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes and \
+    e in show_episodes s
+  forall s : ShowId | forall e : EpisodeId | s in my_shows and \
+    (s, e) in ran my_episodes
+  forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes => (s, e) in dom status and \
+    (s, e) in dom status => (s, e) in ran my_episodes
 end
 
 PAGEBREAK:

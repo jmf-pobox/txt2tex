@@ -721,11 +721,16 @@ The above are given as abbreviations to enable fuzz validation, which passes for
 
 \begin{axdef}
 my\_shows : \finset ShowId \\
-my\_episodes : \iseq ShowId \cross EpisodeId \\
+my\_episodes : \iseq (ShowId \cross EpisodeId) \\
 status : ShowId \cross EpisodeId \pfun PlayedOrNot \cross SavedOrNot
 \where
 my\_shows \subseteq shows \\
-\forall s : fst(\ran my\_episodes) @ s > 0
+\forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran my\_episodes \land \\
+\quad e \in show\_episodes(s) \\
+\forall s : ShowId @ \forall e : EpisodeId @ s \in my\_shows \land \\
+\quad (s, e) \in \ran my\_episodes \\
+\forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran my\_episodes \implies ((s, e) \in \dom status \land \\
+\quad (s, e) \in \dom status \implies (s, e) \in \ran my\_episodes)
 \end{axdef}
 
 \newpage
