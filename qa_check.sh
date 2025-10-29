@@ -43,9 +43,9 @@ PDF_TEXT=$(pdftotext "$PDF_FILE" -)
 # 1. Check for garbled characters in PDF
 echo "=== 1. Garbled Characters in PDF ==="
 GARBLED_CHARS=$(echo "$PDF_TEXT" | grep -o "[¿¡—]" || true)
-GARBLED_COUNT=$(echo "$GARBLED_CHARS" | grep -c . || echo "0")
+GARBLED_COUNT=$(echo "$GARBLED_CHARS" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
 
-if [ "$GARBLED_COUNT" -gt 0 ]; then
+if [ "${GARBLED_COUNT:-0}" -gt 0 ]; then
     echo -e "${RED}FAIL: Found $GARBLED_COUNT garbled characters (¿, ¡, —)${NC}"
 
     # Show which solutions have garbled characters
@@ -68,9 +68,9 @@ echo ""
 # 2. Check for "forall" text instead of symbol
 echo "=== 2. Text 'forall' instead of Symbol ==="
 FORALL_TEXT=$(echo "$PDF_TEXT" | grep -o "forall" || true)
-FORALL_COUNT=$(echo "$FORALL_TEXT" | grep -c . || echo "0")
+FORALL_COUNT=$(echo "$FORALL_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
 
-if [ "$FORALL_COUNT" -gt 0 ]; then
+if [ "${FORALL_COUNT:-0}" -gt 0 ]; then
     echo -e "${RED}FAIL: Found $FORALL_COUNT instances of text 'forall' (should be ∀ symbol)${NC}"
     # Show context
     echo "$PDF_TEXT" | grep -n "forall" | head -5
@@ -82,9 +82,9 @@ echo ""
 # 3. Check for "emptyset" text instead of symbol
 echo "=== 3. Text 'emptyset' instead of Symbol ==="
 EMPTYSET_TEXT=$(echo "$PDF_TEXT" | grep -o "emptyset" || true)
-EMPTYSET_COUNT=$(echo "$EMPTYSET_TEXT" | grep -c . || echo "0")
+EMPTYSET_COUNT=$(echo "$EMPTYSET_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
 
-if [ "$EMPTYSET_COUNT" -gt 0 ]; then
+if [ "${EMPTYSET_COUNT:-0}" -gt 0 ]; then
     echo -e "${RED}FAIL: Found $EMPTYSET_COUNT instances of text 'emptyset' (should be ∅ symbol)${NC}"
     echo "$PDF_TEXT" | grep -n "emptyset" | head -5
 else
@@ -95,9 +95,9 @@ echo ""
 # 4. Check for runon text (lines without spaces)
 echo "=== 4. Runon Text (no spaces) ==="
 RUNON_LINES=$(echo "$PDF_TEXT" | awk 'length($0) > 80 && gsub(/[^ ]/,"&") > length($0) * 0.95' || true)
-RUNON_COUNT=$(echo "$RUNON_LINES" | grep -c . || echo "0")
+RUNON_COUNT=$(echo "$RUNON_LINES" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
 
-if [ "$RUNON_COUNT" -gt 0 ]; then
+if [ "${RUNON_COUNT:-0}" -gt 0 ]; then
     echo -e "${YELLOW}WARNING: Found $RUNON_COUNT potential runon lines (>80 chars, >95% non-space)${NC}"
     echo "This may indicate missing spaces or math mode issues"
 else
@@ -111,9 +111,9 @@ if [ -n "$TEX_FILE" ]; then
 
     # Check for bare < and > outside math mode
     BARE_ANGLES=$(grep -n "[^$]<[^>]*>[^$]" "$TEX_FILE" | grep -v "\\langle\\|\\rangle\\|\\begin\\|\\end\\|%\\|\\usepackage" || true)
-    BARE_COUNT=$(echo "$BARE_ANGLES" | grep -c . || echo "0")
+    BARE_COUNT=$(echo "$BARE_ANGLES" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
 
-    if [ "$BARE_COUNT" -gt 0 ]; then
+    if [ "${BARE_COUNT:-0}" -gt 0 ]; then
         echo -e "${RED}FAIL: Found $BARE_COUNT potential bare < > characters (should be \\langle \\rangle)${NC}"
         echo "$BARE_ANGLES" | head -5
     else
@@ -123,9 +123,9 @@ if [ -n "$TEX_FILE" ]; then
 
     # Check for \forall vs forall
     TEX_FORALL_TEXT=$(grep -n "[^\\]forall" "$TEX_FILE" | grep -v "^[[:space:]]*%" || true)
-    TEX_FORALL_COUNT=$(echo "$TEX_FORALL_TEXT" | grep -c . || echo "0")
+    TEX_FORALL_COUNT=$(echo "$TEX_FORALL_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
 
-    if [ "$TEX_FORALL_COUNT" -gt 0 ]; then
+    if [ "${TEX_FORALL_COUNT:-0}" -gt 0 ]; then
         echo -e "${RED}FAIL: Found $TEX_FORALL_COUNT instances of plain 'forall' (should be \\forall)${NC}"
         echo "$TEX_FORALL_TEXT" | head -5
     else
@@ -135,9 +135,9 @@ if [ -n "$TEX_FILE" ]; then
 
     # Check for emptyset vs \emptyset
     TEX_EMPTYSET_TEXT=$(grep -n "[^\\]emptyset" "$TEX_FILE" | grep -v "^[[:space:]]*%" || true)
-    TEX_EMPTYSET_COUNT=$(echo "$TEX_EMPTYSET_TEXT" | grep -c . || echo "0")
+    TEX_EMPTYSET_COUNT=$(echo "$TEX_EMPTYSET_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
 
-    if [ "$TEX_EMPTYSET_COUNT" -gt 0 ]; then
+    if [ "${TEX_EMPTYSET_COUNT:-0}" -gt 0 ]; then
         echo -e "${RED}FAIL: Found $TEX_EMPTYSET_COUNT instances of plain 'emptyset' (should be \\emptyset)${NC}"
         echo "$TEX_EMPTYSET_TEXT" | head -5
     else
@@ -161,8 +161,8 @@ else
     echo -e "${RED}✗ Found $TOTAL_ISSUES issue(s)${NC}"
     echo ""
     echo "Issues found:"
-    [ $GARBLED_COUNT -gt 0 ] && echo "  - $GARBLED_COUNT garbled characters"
-    [ $FORALL_COUNT -gt 0 ] && echo "  - $FORALL_COUNT text 'forall' (should be symbol)"
-    [ $EMPTYSET_COUNT -gt 0 ] && echo "  - $EMPTYSET_COUNT text 'emptyset' (should be symbol)"
+    [ ${GARBLED_COUNT:-0} -gt 0 ] && echo "  - $GARBLED_COUNT garbled characters"
+    [ ${FORALL_COUNT:-0} -gt 0 ] && echo "  - $FORALL_COUNT text 'forall' (should be symbol)"
+    [ ${EMPTYSET_COUNT:-0} -gt 0 ] && echo "  - $EMPTYSET_COUNT text 'emptyset' (should be symbol)"
     exit 1
 fi
