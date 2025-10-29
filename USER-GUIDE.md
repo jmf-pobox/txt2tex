@@ -1226,6 +1226,55 @@ end
 - **axdef/schema** are for definitions with typed variable declarations
 - **Standalone** (no container) is for expressions you want rendered inline with math mode
 
+### Scoping Rules: Schema vs Axdef
+
+**CRITICAL: Understanding scope is essential for fuzz validation.**
+
+**Named schemas** have **LOCAL scope** - components are encapsulated within the schema and cannot be referenced outside:
+
+```
+schema PodcastPlatform
+  shows : F ShowId
+  show_episodes : ShowId +-> F EpisodeId
+where
+  shows subset dom show_episodes
+end
+
+** Later in document **
+Answer == {s : dom show_episodes | ...}  ❌ FUZZ ERROR: show_episodes not declared
+```
+
+The identifiers `shows` and `show_episodes` exist only within the `PodcastPlatform` schema. They are LOCAL components that define the schema's type structure.
+
+**axdef blocks** have **GLOBAL scope** - all declared identifiers are accessible throughout the entire document:
+
+```
+axdef
+  shows : F ShowId
+  show_episodes : ShowId +-> F EpisodeId
+where
+  shows subset dom show_episodes
+end
+
+** Later in document **
+Answer == {s : dom show_episodes | ...}  ✅ OK: show_episodes is globally accessible
+```
+
+All identifiers declared in `axdef` are GLOBAL and can be referenced anywhere after the declaration.
+
+**When to use which:**
+
+- **Use schema** to define reusable types/templates (like data structures or state spaces) that represent encapsulated components
+- **Use axdef** to declare global constants, variables, or functions that need to be referenced elsewhere in your specification
+
+**Other globally scoped declarations:**
+- `given` types → `given ShowId, PeopleId`
+- Abbreviations → `EpisodeId == N1`
+- Generic definitions → `gendef [X, Y] fst : X cross Y -> X`
+- Free types → `Color ::= red | blue | green`
+
+**Common mistake:** Using a named schema when you need global identifiers. If other parts of your specification need to reference the declared components, use `axdef` instead.
+
 ### Axiomatic Definitions
 
 Define global constants and their properties:
@@ -1277,6 +1326,8 @@ where
   count >= 0
 end
 ```
+
+**Important:** Schema components (`count` in this example) have LOCAL scope and cannot be referenced outside the schema. If you need globally accessible identifiers, use `axdef` instead (see "Scoping Rules" above).
 
 **With generic parameters:**
 ```
