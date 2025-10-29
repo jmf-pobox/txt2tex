@@ -105,8 +105,9 @@ TEXT block formatting and inline math.
 
 - `test_text_blocks.py` - Formula detection in TEXT, PURETEXT blocks, PAGEBREAK
 - `test_inline_math.py` - Inline math expression wrapping in paragraphs
+- `test_citations.py` - Citation syntax processing in TEXT blocks (`[cite key]`)
 
-**Key features tested**: TEXT vs PURETEXT, inline math detection, paragraph formatting, page breaks
+**Key features tested**: TEXT vs PURETEXT, inline math detection, paragraph formatting, page breaks, citations
 
 #### test_coverage/
 Coverage-specific tests for comprehensive code testing.
@@ -258,7 +259,7 @@ This test suite was reorganized in October 2025 from a phase-based system (test_
 
 ## References
 
-- [USER-GUIDE.md](../USER-GUIDE.md) - Syntax guide for features tested here
-- [DESIGN.md](../DESIGN.md) - Architecture behind the tested code
-- [STATUS.md](../STATUS.md) - Current implementation status and coverage
+- [docs/USER_GUIDE.md](../docs/USER_GUIDE.md) - Syntax guide for features tested here
+- [docs/DESIGN.md](../docs/DESIGN.md) - Architecture behind the tested code
+- [docs/STATUS.md](../docs/STATUS.md) - Current implementation status and coverage
 - [glossary.pdf](../examples/reference/glossary.pdf) - Course symbol reference
