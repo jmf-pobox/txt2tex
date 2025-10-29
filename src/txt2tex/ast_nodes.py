@@ -62,9 +62,11 @@ class Quantifier(ASTNode):
     Phase 6 enhancement: Supports multiple variables with shared domain.
     Phase 7 enhancement: Supports mu-operator (definite description).
     Phase 11.5 enhancement: Supports mu with expression part (mu x : X | P . E).
+    Phase 28 enhancement: Supports tuple patterns for destructuring.
     Examples:
     - forall x : N | pred  -> variables=["x"], domain=N, body=pred
     - forall x, y : N | pred -> variables=["x", "y"], domain=N, body=pred
+    - forall (x, y) : T | pred -> variables=["x", "y"], tuple_pattern=Tuple(...), body=pred
     - exists1 x : N | pred -> quantifier="exists1", variables=["x"], body=pred
     - mu x : N | pred -> quantifier="mu", variables=["x"], body=pred, expression=None
     - mu x : N | pred . expr -> quantifier="mu", body=pred, expression=expr
@@ -76,6 +78,7 @@ class Quantifier(ASTNode):
     body: Expr  # Predicate/body expression
     expression: Expr | None = None  # Optional expression part (mu only)
     line_break_after_pipe: bool = False  # True if \ continuation after | (Phase 27)
+    tuple_pattern: Expr | None = None  # Tuple pattern for destructuring (Phase 28)
 
 
 @dataclass(frozen=True)

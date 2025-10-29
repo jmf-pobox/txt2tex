@@ -327,7 +327,7 @@ TEXT: Shows with at least 100 episodes.  We use the cardinality operator on F Ep
 
 EightB == {p : PeopleId | exists s_1, s_2 : dom show_info | s_1 != s_2 and p in show_info s_1 and p in show_info s_2}
 
-TEXT: The set of PeopleId, which appear in 2 or more shows.  We make sure two such shows are distinct and we validate each PeopleId is in F PeopleId.
+TEXT: The set of PeopleId, which appear in 2 or more shows.  We make sure two such shows are distinct and we validate each PeopleId in F PeopleId.
 
 axdef
   first_episode_timestamp : ShowId +-> Timestamp
@@ -344,6 +344,20 @@ TEXT: We are given that there is exactly one show with the most people and we wa
 TEXT: For the second operation, we define a partial function first\_episode\_timestamp that yields the Timestamp for EpisodeId = 1 for s : ShowId.  We are guaranteed that EpisodeId = 1 exists by constraint 7(b). In addition, calling this function with the s from the mu expression is valid because the constraint defined in 7(e) guarantees that the set of EpisodeId in the domain of show\_info and in the first element of the domain of episode\_info are identical.
 
 TEXT: The above are given as abbreviations to enable fuzz validation, which passes for the above expressions.
+
+** Question 9**
+
+PlayedOrNot ::= P | NotP
+SavedOrNot ::= S | NotS
+
+axdef
+  my_shows : F ShowId
+  my_episodes : iseq(ShowId cross EpisodeId)
+  status : ShowId cross EpisodeId +-> (PlayedOrNot cross SavedOrNot)
+where
+  my_shows subset shows
+  forall (s, e) : ran my_episodes | s > 0
+end
 
 PAGEBREAK:
 

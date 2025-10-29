@@ -675,7 +675,7 @@ EightB == \{ p : PeopleId | \exists s_1, s_2 : \dom show\_info @ s_1 \neq s_2 \l
 
 \bigskip
 
-The set of PeopleId, which appear in 2 or more shows.  We make sure two such shows are distinct and we validate each PeopleId $is \in F$ PeopleId.
+The set of PeopleId, which appear in 2 or more shows.  We make sure two such shows are distinct and we validate each $PeopleId \in F$ PeopleId.
 
 \bigskip
 
@@ -708,6 +708,25 @@ For the second operation, we define a partial function first\_episode\_timestamp
 The above are given as abbreviations to enable fuzz validation, which passes for the above expressions.
 
 \bigskip
+
+\bigskip
+\noindent
+\textbf{Question 9}
+
+\medskip
+
+\begin{zed}PlayedOrNot ::= P | NotP\end{zed}
+
+\begin{zed}SavedOrNot ::= S | NotS\end{zed}
+
+\begin{axdef}
+my\_shows : \finset ShowId \\
+my\_episodes : \iseq ShowId \cross EpisodeId \\
+status : ShowId \cross EpisodeId \pfun PlayedOrNot \cross SavedOrNot
+\where
+my\_shows \subseteq shows \\
+\forall s : fst(\ran my\_episodes) @ s > 0
+\end{axdef}
 
 \newpage
 
