@@ -66,7 +66,7 @@ class Quantifier(ASTNode):
     Examples:
     - forall x : N | pred  -> variables=["x"], domain=N, body=pred
     - forall x, y : N | pred -> variables=["x", "y"], domain=N, body=pred
-    - forall (x, y) : T | pred -> variables=["x", "y"], tuple_pattern=Tuple(...), body=pred
+    - forall (x, y) : T | pred -> variables=["x", "y"], tuple_pattern, body=pred
     - exists1 x : N | pred -> quantifier="exists1", variables=["x"], body=pred
     - mu x : N | pred -> quantifier="mu", variables=["x"], body=pred, expression=None
     - mu x : N | pred . expr -> quantifier="mu", body=pred, expression=expr
