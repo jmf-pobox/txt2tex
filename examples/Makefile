@@ -10,7 +10,8 @@
 SHELL := /bin/bash
 
 # Find all .txt files in subdirectories (excluding reference/, infrastructure/, and future/)
-TXT_FILES := $(shell find . -type f -name "*.txt" ! -path "./reference/*" ! -path "./infrastructure/*" ! -path "*/future/*")
+# Strip leading "./" prefix for proper pattern matching
+TXT_FILES := $(shell find . -type f -name "*.txt" ! -path "./reference/*" ! -path "./infrastructure/*" ! -path "*/future/*" | sed 's|^\./||')
 
 # Generate corresponding .tex and .pdf targets
 TEX_FILES := $(TXT_FILES:.txt=.tex)
@@ -19,6 +20,9 @@ PDF_FILES := $(TXT_FILES:.txt=.pdf)
 # Subdirectory targets
 SUBDIRS := 01_propositional_logic 02_predicate_logic 03_equality 04_proof_trees \
            05_sets 06_definitions 07_relations 08_functions 09_sequences fuzz_tests
+
+# Set default goal to build all PDFs
+.DEFAULT_GOAL := all
 
 # Reference directory (special - continues despite fuzz validation errors)
 # Note: All directories use fuzz validation, but reference allows known errors (tuple projections, etc.)

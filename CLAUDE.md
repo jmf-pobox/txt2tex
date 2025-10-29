@@ -31,11 +31,11 @@ This is `txt2tex` - a tool to convert whiteboard-style mathematical notation to 
 Essential reading for understanding the project:
 
 - **[CLAUDE.md](CLAUDE.md)** (this file) - Project context, workflow commands, coding standards, session management
-- **[STATUS.md](STATUS.md)** - Current implementation status, phase tracking, test counts, recent changes
-- **[DESIGN.md](DESIGN.md)** - Architecture, design decisions, operator precedence, AST structure
-- **[USER-GUIDE.md](USER-GUIDE.md)** - User-facing syntax guide, whiteboard notation reference
-- **[PROOF_SYNTAX.md](PROOF_SYNTAX.md)** - Proof tree syntax and formatting rules
-- **[QA_PLAN.md](QA_PLAN.md)** - Quality assurance checklist, testing procedures
+- **[docs/STATUS.md](docs/STATUS.md)** - Current implementation status, phase tracking, test counts, recent changes
+- **[docs/DESIGN.md](docs/DESIGN.md)** - Architecture, design decisions, operator precedence, AST structure
+- **[docs/USER_GUIDE.md](docs/USER_GUIDE.md)** - User-facing syntax guide, whiteboard notation reference
+- **[docs/PROOF_SYNTAX.md](docs/PROOF_SYNTAX.md)** - Proof tree syntax and formatting rules
+- **[docs/QA_PLAN.md](docs/QA_PLAN.md)** - Quality assurance checklist, testing procedures
 - **[docs/FUZZ_VS_STD_LATEX.md](docs/FUZZ_VS_STD_LATEX.md)** - Fuzz vs standard LaTeX differences (critical for understanding fuzz quirks)
 - **[docs/FUZZ_FEATURE_GAPS.md](docs/FUZZ_FEATURE_GAPS.md)** - Missing Z notation features, implementation roadmap
 
