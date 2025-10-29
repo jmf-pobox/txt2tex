@@ -2521,7 +2521,14 @@ class Parser:
 
         # Parse pipe-separated list of branches
         while not self._at_end() and not self._match(TokenType.NEWLINE):
-            if self._match(TokenType.IDENTIFIER):
+            # Accept IDENTIFIER or keywords that could be branch names (P, F, etc.)
+            if (
+                self._match(TokenType.IDENTIFIER)
+                or self._match(TokenType.POWER)
+                or self._match(TokenType.POWER1)
+                or self._match(TokenType.FINSET)
+                or self._match(TokenType.FINSET1)
+            ):
                 branch_token = self._current()
                 branch_name = branch_token.value
                 self._advance()
@@ -2570,8 +2577,20 @@ class Parser:
             if self._match(TokenType.PIPE):
                 self._advance()
             elif not self._match(TokenType.NEWLINE) and not self._at_end():
-                # Allow end of line or more branches
-                pass
+                # Unexpected token - raise error to prevent infinite loop
+                current = self._current()
+                if current.type == TokenType.EQUALS:
+                    raise ParserError(
+                        "Unexpected '=' in free type definition. "
+                        "Did you mean '::=' instead of '::=='?",
+                        current,
+                    )
+                else:
+                    raise ParserError(
+                        f"Expected branch name or '|' in free type definition, "
+                        f"got {current.type.name}",
+                        current,
+                    )
 
         if not branches:
             raise ParserError(

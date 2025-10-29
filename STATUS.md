@@ -442,7 +442,7 @@
 - Tests cover: basic continuation, multiple continuations, all operators, schemas, proofs, quantifiers
 - Set difference still works: `A \ B` (no newline after backslash)
 - User verification: Long homework predicates now fit within margins
-- Test count: 995 tests (16 new line break tests added)
+- Test count: 999 tests (all passing)
 
 ### ✅ Fuzz Mode: Context-Aware Equivalence Operator
 - Fixed `<=>` operator to render context-sensitively in fuzz mode
@@ -453,7 +453,7 @@
   - `\iff` is the logical connective for predicates (like `\land`, `\lor`, `\implies`)
   - `\Leftrightarrow` is meta-level equivalence for equational reasoning (like in EQUIV chains)
 - Consistent with existing `=>` handling which uses `\implies` in fuzz mode
-- All 995 tests pass
+- All 999 tests pass
 
 ---
 
@@ -708,7 +708,7 @@ The 1 "Not Yet Implemented" solution (31) is blocked by Bug #3: compound identif
 
 - [README.md](README.md) - Project overview, setup, and usage
 - [USER-GUIDE.md](USER-GUIDE.md) - User-facing syntax guide
-- [DESIGN.md](DESIGN.md) - Architecture and design decisions
+- [docs/DESIGN.md](docs/DESIGN.md) - Architecture and design decisions
 - [QA_PLAN.md](QA_PLAN.md) - Quality assurance process
 - [tests/bugs/README.md](tests/bugs/README.md) - Bug reports and test cases
 
