@@ -1132,9 +1132,11 @@ class Parser:
         Phase 7 enhancement: Supports mu-operator (definite description).
         Phase 11.5 enhancement: Supports mu with expression part (mu x : X | P . E).
         Phase 17: Supports semicolon-separated bindings (x : T; y : U).
+        Phase 28: Supports tuple patterns for destructuring (forall (x, y) : T | P).
         Examples:
         - forall x : N | pred
         - forall x, y : N | pred
+        - forall (x, y) : T | pred (Phase 28: tuple pattern)
         - forall x : T; y : U | pred (Phase 17: nested quantifiers)
         - exists1 x : N | pred
         - mu x : N | pred
@@ -1142,19 +1144,51 @@ class Parser:
         """
         quant_token = self._advance()  # Consume 'forall', 'exists', 'exists1', or 'mu'
 
-        # Parse first variable
-        if not self._match(TokenType.IDENTIFIER):
-            raise ParserError(
-                f"Expected variable name after {quant_token.value}", self._current()
-            )
-        variables: list[str] = [self._advance().value]
+        # Phase 28: Parse variable pattern (simple identifiers or tuple pattern)
+        tuple_pattern: Expr | None = None
+        variables: list[str]
 
-        # Parse additional variables if comma-separated
-        while self._match(TokenType.COMMA):
-            self._advance()  # Consume ','
-            if not self._match(TokenType.IDENTIFIER):
-                raise ParserError("Expected variable name after ','", self._current())
-            variables.append(self._advance().value)
+        if self._match(TokenType.LPAREN):
+            # Tuple pattern: forall (x, y) : T | P
+            tuple_pattern = self._parse_parenthesized_expr_or_tuple()
+
+            # Extract variable names from tuple (validation: must be all identifiers)
+            variables = []
+            if isinstance(tuple_pattern, Tuple):
+                for element in tuple_pattern.elements:
+                    if isinstance(element, Identifier):
+                        variables.append(element.name)
+                    else:
+                        raise ParserError(
+                            "Tuple pattern in quantifier must contain only "
+                            f"identifiers, not {type(element).__name__}",
+                            self._current(),
+                        )
+            else:
+                raise ParserError("Expected tuple pattern after '('", self._current())
+
+            if not variables:
+                raise ParserError(
+                    "Tuple pattern in quantifier cannot be empty", self._current()
+                )
+
+        elif self._match(TokenType.IDENTIFIER):
+            # Simple variable pattern: forall x : T | P
+            variables = [self._advance().value]
+
+            # Parse additional variables if comma-separated
+            while self._match(TokenType.COMMA):
+                self._advance()  # Consume ','
+                if not self._match(TokenType.IDENTIFIER):
+                    raise ParserError(
+                        "Expected variable name after ','", self._current()
+                    )
+                variables.append(self._advance().value)
+        else:
+            raise ParserError(
+                f"Expected variable name or tuple pattern after {quant_token.value}",
+                self._current(),
+            )
 
         # Parse optional domain (: domain)
         domain: Expr | None = None
@@ -1195,6 +1229,7 @@ class Parser:
                 domain=domain,
                 body=nested_quant,
                 expression=None,
+                tuple_pattern=tuple_pattern,
                 line=quant_token.line,
                 column=quant_token.column,
             )
@@ -1269,6 +1304,7 @@ class Parser:
             body=body,
             expression=expression,
             line_break_after_pipe=has_continuation,
+            tuple_pattern=tuple_pattern,
             line=quant_token.line,
             column=quant_token.column,
         )
@@ -1314,6 +1350,7 @@ class Parser:
                 domain=domain,
                 body=nested_quant,
                 expression=None,
+                tuple_pattern=None,  # No tuple pattern in continuation
                 line=line,
                 column=column,
             )
@@ -1346,6 +1383,7 @@ class Parser:
             domain=domain,
             body=body,
             expression=expression,
+            tuple_pattern=None,  # No tuple pattern in continuation
             line=line,
             column=column,
         )
@@ -2179,6 +2217,52 @@ class Parser:
 
         return base
 
+    def _parse_parenthesized_expr_or_tuple(self) -> Expr:
+        """Parse parenthesized expression or tuple (Phase 28 helper).
+
+        This parses (expr), (expr,), or (expr1, expr2, ...).
+        Used by both _parse_atom and _parse_quantifier for tuple patterns.
+        """
+        lparen_token = self._advance()  # Consume '('
+
+        # Parse first expression
+        first_expr = self._parse_expr()
+
+        # Phase 21d: Allow newlines before checking what follows
+        self._skip_newlines()
+
+        # Check for comma (tuple) vs single parenthesized expression
+        if self._match(TokenType.COMMA):
+            # It's a tuple: (expr, expr, ...)
+            elements: list[Expr] = [first_expr]
+
+            while self._match(TokenType.COMMA):
+                self._advance()  # Consume ','
+                # Phase 21d: Allow newlines after comma
+                self._skip_newlines()
+                # Check for trailing comma: (a, b,)
+                if self._match(TokenType.RPAREN):
+                    break
+                elements.append(self._parse_expr())
+                # Phase 21d: Allow newlines after element
+                self._skip_newlines()
+
+            if not self._match(TokenType.RPAREN):
+                raise ParserError("Expected ')' after tuple", self._current())
+            self._advance()  # Consume ')'
+
+            return Tuple(
+                elements=elements,
+                line=lparen_token.line,
+                column=lparen_token.column,
+            )
+
+        # Single parenthesized expression
+        if not self._match(TokenType.RPAREN):
+            raise ParserError("Expected ')' after expression", self._current())
+        self._advance()  # Consume ')'
+        return first_expr
+
     def _parse_atom(self) -> Expr:
         """Parse atom.
 
@@ -2296,45 +2380,7 @@ class Parser:
             return Number(value=token.value, line=token.line, column=token.column)
 
         if self._match(TokenType.LPAREN):
-            lparen_token = self._advance()  # Consume '('
-
-            # Parse first expression
-            first_expr = self._parse_expr()
-
-            # Phase 21d: Allow newlines before checking what follows
-            self._skip_newlines()
-
-            # Check for comma (tuple) vs single parenthesized expression
-            if self._match(TokenType.COMMA):
-                # It's a tuple: (expr, expr, ...)
-                elements: list[Expr] = [first_expr]
-
-                while self._match(TokenType.COMMA):
-                    self._advance()  # Consume ','
-                    # Phase 21d: Allow newlines after comma
-                    self._skip_newlines()
-                    # Check for trailing comma: (a, b,)
-                    if self._match(TokenType.RPAREN):
-                        break
-                    elements.append(self._parse_expr())
-                    # Phase 21d: Allow newlines after element
-                    self._skip_newlines()
-
-                if not self._match(TokenType.RPAREN):
-                    raise ParserError("Expected ')' after tuple", self._current())
-                self._advance()  # Consume ')'
-
-                return Tuple(
-                    elements=elements,
-                    line=lparen_token.line,
-                    column=lparen_token.column,
-                )
-
-            # Single parenthesized expression
-            if not self._match(TokenType.RPAREN):
-                raise ParserError("Expected ')' after expression", self._current())
-            self._advance()  # Consume ')'
-            return first_expr
+            return self._parse_parenthesized_expr_or_tuple()
 
         # Phase 8 + 11.5: Set comprehension or set literal
         if self._match(TokenType.LBRACE):

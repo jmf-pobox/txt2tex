@@ -607,6 +607,7 @@ class LaTeXGenerator:
         Phase 6 enhancement: Supports multiple variables.
         Phase 7 enhancement: Supports mu-operator (definite description).
         Phase 11.5 enhancement: Supports mu with expression part (mu x : X | P . E).
+        Phase 28 enhancement: Supports tuple patterns for destructuring.
 
         Args:
             node: The quantifier node to generate
@@ -615,6 +616,7 @@ class LaTeXGenerator:
         Examples:
         - forall x : N | pred -> \\forall x \\colon N \\bullet pred
         - forall x, y : N | pred -> \\forall x, y \\colon N \\bullet pred
+        - forall (x, y) : T | pred -> \\forall (x, y) \\colon T \\bullet pred
         - exists1 x : N | pred -> \\exists_1 x \\colon N \\bullet pred
         - mu x : N | pred -> \\mu x \\colon N \\bullet pred
         - mu x : N | pred . expr -> \\mu x \\colon N \\mid pred \\bullet expr
@@ -623,8 +625,13 @@ class LaTeXGenerator:
         if quant_latex is None:
             raise ValueError(f"Unknown quantifier: {node.quantifier}")
 
-        # Generate variables (comma-separated for multi-variable quantifiers)
-        variables_str = ", ".join(node.variables)
+        # Phase 28: Generate variables (tuple pattern or comma-separated list)
+        if node.tuple_pattern:
+            # Tuple pattern: forall (x, y) : T | P
+            variables_str = self.generate_expr(node.tuple_pattern, parent=node)
+        else:
+            # Simple variables: forall x, y : T | P
+            variables_str = ", ".join(node.variables)
         parts = [quant_latex, variables_str]
 
         if node.domain:
@@ -882,8 +889,10 @@ class LaTeXGenerator:
                 # LaTeX inserts thin space automatically
                 func_latex = special_functions[func_name]
                 arg_latex = self.generate_expr(node.args[0])
-                # Add parentheses if arg is a function app (e.g., seq1 (seq X))
-                if isinstance(node.args[0], FunctionApp):
+                # Add parentheses if arg needs them for correct precedence
+                # FunctionApp: seq1 (seq X)
+                # BinaryOp: iseq (X cross Y), seq (X union Y)
+                if isinstance(node.args[0], (FunctionApp, BinaryOp)):
                     arg_latex = f"({arg_latex})"
                 return f"{func_latex} {arg_latex}"
 
