@@ -4,6 +4,8 @@
 
 The `qa_check.sh` script performs systematic quality checks on generated PDFs and LaTeX files to catch rendering issues before they make it into final documents.
 
+**Relationship to QA Process**: This script automates **Check #2 (Notation Correct)** from [QA_PLAN.md](QA_PLAN.md). Run this before manual solution-by-solution review to catch symbol rendering issues automatically.
+
 ## What the Script Checks
 
 ### 1. Garbled Characters in PDF (¿, ¡, —)
@@ -184,11 +186,28 @@ hatch run check
 # 3. Regenerate PDF
 hatch run convert examples/solutions.txt
 
-# 4. QA check
+# 4. QA check (automated notation verification)
 ./qa_check.sh examples/solutions.pdf
 
 # 5. If issues found, investigate and fix
 # 6. Repeat
+```
+
+### Solution Review Workflow
+
+When reviewing solutions per [QA_PLAN.md](QA_PLAN.md):
+
+```bash
+# Step 1: Generate PDF
+hatch run convert examples/solutions.txt
+
+# Step 2: Run automated checks (supports Check #2: Notation Correct)
+./qa_check.sh examples/solutions.pdf
+
+# Step 3: Fix any automated issues found
+
+# Step 4: Manual review (Check #1: Input Correct, Check #3: Formatting Correct)
+# Review each solution manually in QA_PLAN.md checklist
 ```
 
 ### Pre-Commit Checklist

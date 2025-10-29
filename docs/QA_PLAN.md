@@ -25,6 +25,9 @@ For each solution, verify:
 
 1. **Input Correct (.txt)** - Is solutions.txt notation correct vs reference? TEXT: blocks only for prose?
 2. **Notation Correct (PDF)** - All mathematical symbols rendered correctly?
+   - **Automated check**: Run `./qa_check.sh examples/solutions.pdf` first to detect rendering issues
+   - Verify no garbled characters (¿, ¡, —), no text "forall"/"emptyset", no runon text
+   - See [docs/QA_CHECKS.md](QA_CHECKS.md) for details on automated checks
 3. **Formatting Correct (PDF)** - Line breaks, spacing, alignment match reference?
 
 ## Solution Assessment
@@ -340,6 +343,29 @@ For each solution, verify:
 - [ ] Notation Correct
 - [ ] Formatting Correct
 - **User Decision**: Pending
+
+## Automated QA Checks
+
+Before manual review, run automated checks:
+
+```bash
+# Generate PDF if not already done
+hatch run convert examples/solutions.txt
+
+# Run automated quality checks
+./qa_check.sh examples/solutions.pdf
+```
+
+This will check for:
+- Garbled characters (rendering issues)
+- Text "forall" instead of ∀ symbol
+- Text "emptyset" instead of ∅ symbol
+- Runon text (missing spaces)
+- LaTeX source issues
+
+Fix any issues found before proceeding with manual solution-by-solution review.
+
+**See [docs/QA_CHECKS.md](QA_CHECKS.md) for detailed documentation of the QA script.**
 
 ## README.md Verification
 - [ ] All Phase 0-24 examples correct
