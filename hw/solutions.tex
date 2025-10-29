@@ -564,6 +564,8 @@ SquareOrCubeIntegers : \power \num
 SquareOrCubeIntegers = \{ z, z_0 : \num | z = z_0 * z_0 \lor z = z_0 * z_0 * z_0 @ z \}
 \end{axdef}
 
+\newpage
+
 \medskip
 
 \bigskip
@@ -594,13 +596,7 @@ Timestamp == \nat
   \forall a : X @ \forall b : Y @ snd(a, b) = b
 \end{gendef}
 
-\bigskip
-
-This needs to be simplified by using dom(function) to declare the types.
-
-\bigskip
-
-\begin{schema}{PodcastPlatform}
+\begin{axdef}
 shows : \finset ShowId \\
 show\_episodes : ShowId \pfun \finset EpisodeId \\
 episode\_info : ShowId \cross EpisodeId \pfun \finset PeopleId \cross Timestamp \\
@@ -608,17 +604,16 @@ show\_info : ShowId \pfun \finset PeopleId
 \where
 shows \subseteq \dom show\_episodes \land \dom show\_episodes \subseteq shows \\
 \forall es : \ran show\_episodes @ \exists n : \nat @ es = 1 \upto n \\
-\forall s : ShowId @ \forall e : EpisodeId @ s \in \dom show\_episodes \land \\
-\quad e \in show\_episodes(s) \iff \\
-\quad (s, e) \in \dom episode\_info \\
+\forall s : \dom show\_episodes @ \forall e : show\_episodes(s) @ \\
+\quad (s, e) \in \dom episode\_info \iff s \in \dom show\_episodes \\
 shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows \\
 \forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ \\
 \quad (s, e) \in \dom episode\_info \land \\
-\quad (p \in fst(episode\_info(s, e)) \iff \\
-\quad p \in show\_info(s)) \\
+\quad (p \in fst(episode\_info(s, e)) \iff p \in show\_info(s)) \\
 \forall s : ShowId @ \forall t_1, t_2 : Timestamp @ \forall e_1, e_2 : EpisodeId @ \\
-\quad (s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom episode\_info \land (e_1 < e_2 \implies snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))
-\end{schema}
+\quad (s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom episode\_info \land \\
+\quad (e_1 < e_2 \implies snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))
+\end{axdef}
 
 \noindent
 \hangindent=2em
@@ -632,9 +627,8 @@ shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows \\
 \medskip
 \noindent
 \hangindent=2em
-(c) $\forall s : ShowId @ \forall e : EpisodeId @ s \in \dom show\_episodes \land \\
-\quad e \in show\_episodes(s) \iff \\
-\quad (s, e) \in \dom episode\_info$
+(c) $\forall s : \dom show\_episodes @ \forall e : show\_episodes(s) @ \\
+\quad (s, e) \in \dom episode\_info \iff s \in \dom show\_episodes$
 
 \medskip
 \noindent
@@ -644,19 +638,78 @@ shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows \\
 \medskip
 \noindent
 \hangindent=2em
-(e) $\forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ (s, e) \in \dom episode\_info \land \\
-\quad p \in fst(episode\_info(s, e)) \iff \\
-\quad p \in show\_info(s)$
+(e) $\forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ \\
+\quad (s, e) \in \dom episode\_info \land \\
+\quad (p \in fst(episode\_info(s, e)) \iff p \in show\_info(s))$
 
 \medskip
 \noindent
 \hangindent=2em
-(f) $\forall s : ShowId @ \forall t_1, t_2 : Timestamp @ \forall e_1, e_2 : EpisodeId @ (s, e_1) \in \dom episode\_info \land \\
-\quad (s, e_2) \in \dom episode\_info \land (e_1 < e_2 \implies snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))$
+(f) $\forall s : ShowId @ \forall t_1, t_2 : Timestamp @ \forall e_1, e_2 : EpisodeId @ \\
+\quad (s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom episode\_info \land \\
+\quad (e_1 < e_2 \implies snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))$
 
 \newpage
 
 \medskip
+
+\bigskip
+\noindent
+\textbf{Question 8}
+
+\medskip
+
+\begin{zed}
+EightA == \{ s : \dom show\_episodes | \# (show\_episodes(s)) \geq 100 \}
+\end{zed}
+
+\bigskip
+
+Shows with at least 100 episodes.  We use the cardinality operator on F EpisodeId after ensuring s is in the domain of show\_episodes.
+
+\bigskip
+
+\begin{zed}
+EightB == \{ p : PeopleId | \exists s_1, s_2 : \dom show\_info @ s_1 \neq s_2 \land p \in show\_info(s_1) \land p \in show\_info(s_2) \}
+\end{zed}
+
+\bigskip
+
+The set of PeopleId, which appear in 2 or more shows.  We make sure two such shows are distinct and we validate each PeopleId $is \in F$ PeopleId.
+
+\bigskip
+
+\begin{axdef}
+first\_episode\_timestamp : ShowId \pfun Timestamp
+\where
+\forall s : ShowId @ (s, 1) \in \dom episode\_info \land first\_episode\_timestamp(s) = snd(episode\_info(s, 1))
+\end{axdef}
+
+\begin{zed}
+EightC == first\_episode\_timestamp((\mu s : \dom show\_info | \\
+\quad \forall t : \dom show\_info @ s \neq t \land \\
+\quad \# (show\_info(s)) > \# (show\_info(t))))
+\end{zed}
+
+\bigskip
+
+We are given that there is exactly one show with the most people and we want the timestamp for the first episode of that show. This involves two operations, finding the show with the most people and finding the timestamp for the first episode of that show.  For the first operation, we compare the cardinality of the F PeopleId for every pair s, t : ShowId in the domain of show\_info. This is captured in the mu expression, which returns the single matching value.
+
+\bigskip
+
+\bigskip
+
+For the second operation, we define a partial function first\_episode\_timestamp that yields the Timestamp for $EpisodeId = 1$ for $s : ShowId$.  We are guaranteed that $EpisodeId = 1$ exists by constraint 7(b). In addition, calling this function with the s from the mu expression is valid because the constraint defined in 7(e) guarantees that the set of EpisodeId in the domain of show\_info and in the first element of the domain of episode\_info are identical.
+
+\bigskip
+
+\bigskip
+
+The above are given as abbreviations to enable fuzz validation, which passes for the above expressions.
+
+\bigskip
+
+\newpage
 
 \section*{Bibliography}
 

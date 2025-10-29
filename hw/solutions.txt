@@ -266,6 +266,7 @@ where
   SquareOrCubeIntegers = { z, z_0 : Z | z = z_0 * z_0 or z = z_0 * z_0 * z_0 . z}
 end
 
+PAGEBREAK:
 
 ** Question 7 **
 
@@ -285,9 +286,7 @@ where
   forall a : X | forall b : Y | snd(a, b) = b
 end
 
-TEXT: This needs to be simplified by using dom(function) to declare the types.
-
-schema PodcastPlatform
+axdef
   shows : F ShowId
   show_episodes : ShowId +-> F EpisodeId
   episode_info : ShowId cross EpisodeId +-> (F PeopleId cross Timestamp)
@@ -295,14 +294,12 @@ schema PodcastPlatform
 where
   shows subset dom (show_episodes) and dom (show_episodes) subset shows
   forall es : ran show_episodes | (exists n : N | es = 1..n)
-  forall s : ShowId | forall e : EpisodeId | s in dom show_episodes and \
-    e in show_episodes s <=> \
-    (s, e) in dom episode_info
+  forall s : dom show_episodes | forall e : show_episodes s | \
+    (s, e) in dom episode_info <=> s in dom show_episodes
   shows subset dom (show_info) and dom (show_info) subset shows
   forall s : ShowId | forall p : PeopleId | (exists e : EpisodeId | \
     (s, e) in dom episode_info and \
-    (p in fst(episode_info(s, e)) <=> \
-    p in show_info s))
+    (p in fst(episode_info(s, e)) <=> p in show_info s))
   forall s : ShowId | forall t_1, t_2 : Timestamp | (forall e_1, e_2 : EpisodeId | \
     ((s, e_1) in dom episode_info and (s, e_2) in dom episode_info) | \
     (e_1 < e_2) => (snd(episode_info(s, e_1)) <= (snd(episode_info(s, e_2)))))
@@ -310,15 +307,43 @@ end
 
 (a) shows subset dom (show_episodes) and dom (show_episodes) subset shows
 (b) forall es : ran show_episodes | (exists n : N | es = 1..n)
-(c) forall s : ShowId | forall e : EpisodeId | s in dom show_episodes and \
-    e in show_episodes s <=> \
-    (s, e) in dom episode_info
+(c) forall s : dom show_episodes | forall e : show_episodes s | \
+  (s, e) in dom episode_info <=> s in dom show_episodes
 (d) shows subset dom (show_info) and dom (show_info) subset shows
-(e) forall s : ShowId | forall p : PeopleId | (exists e : EpisodeId | (s, e) in dom episode_info and \
-    p in fst(episode_info(s, e)) <=> \
-    p in show_info s)
-(f) forall s : ShowId | forall t_1, t_2 : Timestamp | (forall e_1, e_2 : EpisodeId | (s, e_1) in dom episode_info and \
-    (s, e_2) in dom episode_info | (e_1 < e_2) => (snd(episode_info(s, e_1)) <= (snd(episode_info(s, e_2)))))
+(e) forall s : ShowId | forall p : PeopleId | (exists e : EpisodeId | \
+    (s, e) in dom episode_info and \
+    (p in fst(episode_info(s, e)) <=> p in show_info s))
+(f) forall s : ShowId | forall t_1, t_2 : Timestamp | (forall e_1, e_2 : EpisodeId | \
+    ((s, e_1) in dom episode_info and (s, e_2) in dom episode_info) | \
+    (e_1 < e_2) => (snd(episode_info(s, e_1)) <= (snd(episode_info(s, e_2)))))
+
+PAGEBREAK:
+
+** Question 8 **
+
+EightA == {s : dom show_episodes | #(show_episodes(s)) >= 100}
+
+TEXT: Shows with at least 100 episodes.  We use the cardinality operator on F EpisodeId after ensuring s is in the domain of show\_episodes.
+
+EightB == {p : PeopleId | exists s_1, s_2 : dom show_info | s_1 != s_2 and p in show_info s_1 and p in show_info s_2}
+
+TEXT: The set of PeopleId, which appear in 2 or more shows.  We make sure two such shows are distinct and we validate each PeopleId is in F PeopleId.
+
+axdef
+  first_episode_timestamp : ShowId +-> Timestamp
+where
+  forall s : ShowId | (s, 1) in dom episode_info | first_episode_timestamp(s) = snd(episode_info(s, 1))
+end
+
+EightC == first_episode_timestamp(mu s : dom show_info | \
+  forall t : dom show_info | s != t and \
+  #(show_info s) > #(show_info t))
+
+TEXT: We are given that there is exactly one show with the most people and we want the timestamp for the first episode of that show. This involves two operations, finding the show with the most people and finding the timestamp for the first episode of that show.  For the first operation, we compare the cardinality of the F PeopleId for every pair s, t : ShowId in the domain of show\_info. This is captured in the mu expression, which returns the single matching value.
+
+TEXT: For the second operation, we define a partial function first\_episode\_timestamp that yields the Timestamp for EpisodeId = 1 for s : ShowId.  We are guaranteed that EpisodeId = 1 exists by constraint 7(b). In addition, calling this function with the s from the mu expression is valid because the constraint defined in 7(e) guarantees that the set of EpisodeId in the domain of show\_info and in the first element of the domain of episode\_info are identical.
+
+TEXT: The above are given as abbreviations to enable fuzz validation, which passes for the above expressions.
 
 PAGEBREAK:
 
