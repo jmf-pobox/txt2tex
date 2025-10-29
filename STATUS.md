@@ -675,21 +675,6 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 - Test suite documentation: [tests/README.md](tests/README.md)
 - Bug test cases: [tests/bugs/](tests/bugs/)
 
-**Recent Test Additions:**
-- Phase 12: 55 tests (sequences, bags, tuple projection)
-- Phase 13: 26 tests (anonymous schemas, ranges, override, indexing)
-- Phase 14: 21 tests (ASCII sequence brackets, pattern matching)
-- Phase 15: 6 tests updated (underscore in identifiers)
-- Phase 16: 19 tests (conditional expressions)
-- Phase 17: 9 tests (semicolon-separated bindings)
-- Phase 18: 14 tests (digit-starting identifiers)
-- Phase 19: 10 tests (space-separated application)
-- Phase 20: 20 tests (semicolon-separated declarations in gendef/axdef/schema)
-- Phase 21: Covered by existing tests (schema separator and subseteq fixes)
-- Phase 24: 27 tests (whitespace-sensitive ^ operator disambiguation)
-- Phase 25: 10 tests (relation/function operator conversion in justifications)
-- Phase 26: 23 tests (operator conversion in TEXT blocks)
-
 ---
 
 ## Verification Notes
