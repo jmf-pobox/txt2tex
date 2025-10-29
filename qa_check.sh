@@ -152,9 +152,9 @@ echo "QA Check Summary"
 echo "=========================================="
 echo ""
 
-TOTAL_ISSUES=$((GARBLED_COUNT + FORALL_COUNT + EMPTYSET_COUNT))
+TOTAL_ISSUES=$((${GARBLED_COUNT:-0} + ${FORALL_COUNT:-0} + ${EMPTYSET_COUNT:-0}))
 
-if [ $TOTAL_ISSUES -eq 0 ]; then
+if [ ${TOTAL_ISSUES:-0} -eq 0 ]; then
     echo -e "${GREEN}✓ All checks passed!${NC}"
     exit 0
 else
