@@ -159,4 +159,4 @@ Package natbib: Citation(s) may have changed. Rerun to get citations correct.
 - **txt2pdf.sh**: [txt2pdf.sh:113-124](../txt2pdf.sh#L113-L124) - Double pdflatex pass
 - **LaTeX Workshop**: [.vscode/settings.json](../.vscode/settings.json) - IDE configuration
 - **Makefiles**: [hw/Makefile](../hw/Makefile), [examples/Makefile](../examples/Makefile)
-- **Citation syntax**: [USER-GUIDE.md:68-82](../USER-GUIDE.md#L68-L82)
+- **Citation syntax**: [USER_GUIDE.md:68-82](../USER_GUIDE.md#L68-L82)
