@@ -526,6 +526,8 @@ class LaTeXGenerator:
             if self.has_floats:
                 self.output.append(r'\usepackage{zed-float}')
         self.output.append(r'\usepackage{amsmath}')
+        # Load natbib for author-year citations (Harvard style)
+        self.output.append(r'\usepackage{natbib}')
         self.output.append(r'\begin{document}')
 
     def visit_solution(self, node: Solution):
@@ -561,7 +563,32 @@ class LaTeXGenerator:
                 math_expr.original_text,
                 f'${math_latex}$'
             )
+        
+        # Process citations: [cite key] → \citep{key}
+        text = self._process_citations(text)
+        
         self.output.append(text)
+
+    def _process_citations(self, text: str) -> str:
+        """Process citation markup in text.
+        
+        Converts [cite key] to \\citep{key} for Harvard-style parenthetical citations.
+        Supports optional page/slide numbers.
+        
+        Examples:
+            "[cite simpson25a]" → "\\citep{simpson25a}"
+            "[cite simpson25a slide 20]" → "\\citep[slide 20]{simpson25a}"
+            "[cite spivey92 p. 42]" → "\\citep[p. 42]{spivey92}"
+        """
+        pattern = r"\[cite\s+([a-zA-Z0-9_-]+)(?:\s+([^\]]+))?\]"
+        def replace_citation(match: re.Match[str]) -> str:
+            key = match.group(1)
+            locator = match.group(2)
+            if locator:
+                return f"\\citep[{locator.strip()}]{{{key}}}"
+            else:
+                return f"\\citep{{{key}}}"
+        return re.sub(pattern, replace_citation, text)
 ```
 
 **LaTeX Templates**:
