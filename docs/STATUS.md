@@ -664,17 +664,18 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 1013 passing (as of Phase 27, October 2025)
-- **Component Coverage:**
-  - parser.py: 88.91%
-  - latex_gen.py: 80.61%
-  - lexer.py: 94.56%
-  - Overall: 88.49%
+- **Total Tests:** 973 passing (as of Phase 26, October 2025)
+
+**Component Coverage:**
+- parser.py: 88.91%
+- latex_gen.py: 80.61%
+- lexer.py: 94.56%
+- Overall: 88.49%
 
 **Test Organization:**
 - Tests reorganized by glossary lectures (01-09)
 - Test suite documentation: [tests/README.md](../tests/README.md)
-- Bug test cases: [tests/bugs/](tests/bugs/)
+- Bug test cases: [tests/bugs/](../tests/bugs/)
 
 **Recent Test Additions:**
 - Phase 12: 55 tests (sequences, bags, tuple projection)
