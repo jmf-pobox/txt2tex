@@ -1,10 +1,11 @@
 # Z Notation Feature Gap Analysis
 
-**Last Updated:** 2025-10-19
+**Last Updated:** 2025-10-27
 **Status:** All homework features working ✅
-**Recent Achievement:** Implemented `gendef` (generic definitions)
 
 **See also:** [FUZZ_VS_STD_LATEX.md](FUZZ_VS_STD_LATEX.md) for differences between fuzz and standard LaTeX that affect how features render in PDFs.
+
+**Note:** This document was validated against source code and fuzz manual on 2025-10-27.
 
 ---
 
@@ -81,22 +82,26 @@ Based on fuzz manual Section 7 (Syntax Summary, pages 54-59).
 
 ### 2. Schema Expressions (Schema Calculus)
 
+**Important:** Schema expressions operate on schemas and return schemas (schema calculus). This is distinct from using schemas as predicates (see Predicate Constructs section below).
+
 | Feature | Fuzz Syntax | Status | Location | Notes |
 |---------|-------------|--------|----------|-------|
-| **Schema quantification** 🔹 | `\forall Schema-Text @ Schema-Exp` | ❌ | - | Different from predicate |
-| **Schema existential** 🔹 | `\exists Schema-Text @ Schema-Exp` | ❌ | - | Schema-level exists |
-| **Schema unique exists** 🔹 | `\exists_1 Schema-Text @ Schema-Exp` | ❌ | - | Schema-level exists1 |
-| Schema negation | `\lnot Schema-Exp` | ✅ | parser.py:800 | |
-| Schema pre | `\pre Schema-Exp` | ✅ | parser.py:800 | Precondition |
-| Schema conjunction | `Schema-Exp \land Schema-Exp` | ✅ | parser.py:800 | And |
-| Schema disjunction | `Schema-Exp \lor Schema-Exp` | ✅ | parser.py:800 | Or |
-| Schema implication | `Schema-Exp \implies Schema-Exp` | ✅ | parser.py:800 | |
-| Schema equivalence | `Schema-Exp \iff Schema-Exp` | ✅ | parser.py:800 | |
-| Schema projection | `Schema-Exp \project Schema-Exp` | ✅ | parser.py:800 | |
-| Schema hiding | `Schema-Exp \hide (Names)` | ✅ | parser.py:800 | |
-| Schema composition | `Schema-Exp \semi Schema-Exp` | ✅ | parser.py:800 | Sequential |
-| **Schema piping** 🔹 | `Schema-Exp \pipe Schema-Exp` | ✅ | parser.py:800 | Piping (>>) |
+| **Schema quantification** 🔹 | `\forall Schema-Text @ Schema-Exp` | ❌ | - | Schema-level quantifier (returns schema) |
+| **Schema existential** 🔹 | `\exists Schema-Text @ Schema-Exp` | ❌ | - | Schema-level exists (returns schema) |
+| **Schema unique exists** 🔹 | `\exists_1 Schema-Text @ Schema-Exp` | ❌ | - | Schema-level exists1 (returns schema) |
+| Schema negation | `\lnot Schema-Exp` | ❌ | - | Schema-level negation (returns schema) |
+| Schema pre | `\pre Schema-Exp` | ❌ | - | Schema-level precondition (returns schema) |
+| Schema conjunction | `Schema-Exp \land Schema-Exp` | ❌ | - | Schema-level conjunction (returns schema) |
+| Schema disjunction | `Schema-Exp \lor Schema-Exp` | ❌ | - | Schema-level disjunction (returns schema) |
+| Schema implication | `Schema-Exp \implies Schema-Exp` | ❌ | - | Schema-level implication (returns schema) |
+| Schema equivalence | `Schema-Exp \iff Schema-Exp` | ❌ | - | Schema-level equivalence (returns schema) |
+| Schema projection | `Schema-Exp \project Schema-Exp` | ❌ | - | Schema projection operator |
+| Schema hiding | `Schema-Exp \hide (Names)` | ❌ | - | Schema hiding operator |
+| Schema composition | `Schema-Exp \semi Schema-Exp` | ❌ | - | Schema sequential composition |
+| **Schema piping** 🔹 | `Schema-Exp \pipe Schema-Exp` | ❌ | - | Schema piping operator (>>) |
 | **Schema renaming** 🔹 | `Schema-Ref[Name/Name, ...]` | ❌ | - | **High priority** |
+
+**Note:** Predicate-level logical operators on schema references ARE implemented (e.g., `S1 and S2` where both schemas are used as predicates). However, true schema calculus operators that return schemas (not predicates) are NOT implemented.
 
 ---
 
@@ -112,7 +117,7 @@ Based on fuzz manual Section 7 (Syntax Summary, pages 54-59).
 | Sequence literal | `\langle [Expr, ..., Expr] \rangle` | ✅ | parser.py:1508 | Phase 12 |
 | Bag literal | `\lbag [Expr, ..., Expr] \rbag` | ✅ | parser.py:1530 | Phase 12 |
 | Tuple | `(Expression, ..., Expression)` | ✅ | parser.py:1615 | |
-| Theta expression | `\theta Schema-Name Decoration [Renaming]` | ⚠️ | parser.py:1590 | Renaming needed |
+| Theta expression | `\theta Schema-Name Decoration [Renaming]` | ❌ | - | Requires renaming (not implemented) |
 | Tuple projection | `Expression-4 . Var-Name` | ⚠️ | parser.py:1570 | Named fields only; numeric (.1, .2) NOT supported |
 | Subscript | `Expression \bsup Expression \esup` | ✅ | parser.py:1655 | |
 
@@ -126,8 +131,8 @@ Based on fuzz manual Section 7 (Syntax Summary, pages 54-59).
 | Existential predicate | `\exists Schema-Text @ Predicate` | ✅ | parser.py:1076 | |
 | Unique exists predicate | `\exists_1 Schema-Text @ Predicate` | ✅ | parser.py:1076 | |
 | **Let predicate** 🔹 | `\LET Let-Def; ...; Let-Def @ Predicate` | ❌ | - | **High priority** |
-| Schema reference as predicate | `Schema-Ref` | ✅ | parser.py:800 | |
-| Pre schema | `\pre Schema-Ref` | ✅ | parser.py:800 | |
+| Schema reference as predicate | `Schema-Ref` | ✅ | parser.py | Schema used as predicate (not schema calculus) |
+| Pre schema | `\pre Schema-Ref` | ✅ | parser.py | Precondition schema used as predicate |
 | Chained relations | `Expr Rel Expr Rel ... Rel Expr` | ✅ | parser.py:995 | |
 
 ---
@@ -161,262 +166,41 @@ All features needed for Questions 1-6 are implemented and working:
 
 ### Tier 2: High-Value Features (Next Priority)
 
-These are **Release 2 features** (ZRM Second Edition) that are commonly used:
+**Release 2 features** (ZRM Second Edition) that are commonly used:
 
 #### 1. `\LET` Construct (Local Definitions) 🔹
 
-**Priority:** HIGH
-**Reason:** Commonly used for complex expressions/predicates
-
-**Syntax:**
-```latex
-\LET x == e1; y == e2 @ body
-```
-
-**Use Case:**
-```z
-{ n : N | \LET sq == n * n @ sq < 100 . sq }
-```
-
-**Implementation Estimate:** 2-3 hours
-- Add `LET` token type
-- Add `Let` and `LetDef` AST nodes
-- Update parser for `\LET` in expressions and predicates
-- Update LaTeX generator
-- Add test cases
-
-**Fuzz Manual Reference:** Page 56 (Expression-0, Predicate)
-
----
+**Priority:** HIGH  
+**Syntax:** `\LET x == e1; y == e2 @ body`  
+**Fuzz Manual:** Expression-0, Predicate (line 204, 164 in part5.txt)  
+**Estimate:** 2-3 hours
 
 #### 2. Schema Renaming 🔹
 
-**Priority:** HIGH
-**Reason:** Essential for schema composition patterns
-
-**Syntax:**
-```latex
-Schema[new1/old1, new2/old2, ...]
-```
-
-**Use Case:**
-```z
-State[in/out, out/in]  % Swap input/output names
-```
-
-**Implementation Estimate:** 1-2 hours
-- Add `Renaming` AST node
-- Update `Schema-Ref` parsing to support optional renaming
-- Update LaTeX generator
-- Add test cases
-
-**Fuzz Manual Reference:** Page 56 (Schema-Ref, Renaming)
+**Priority:** HIGH  
+**Syntax:** `Schema[new1/old1, new2/old2, ...]`  
+**Fuzz Manual:** Schema-Ref, Renaming (line 152-154 in part5.txt)  
+**Estimate:** 1-2 hours
 
 ---
 
 ### Tier 3: Completeness Features (Lower Priority)
 
-#### 3. Horizontal Schema Definitions
-
-**Priority:** MEDIUM
-**Reason:** Alternative syntax, not required but convenient
-
-**Syntax:**
-```latex
-Name[X, Y] \defs [ declarations | predicates ]
-```
-
-**Use Case:**
-```z
-Pair[X] \defs [ first, second : X ]
-```
-
-**Implementation Estimate:** 2-3 hours
-
-**Fuzz Manual Reference:** Page 55 (Item production)
+| Feature | Priority | Estimate | Fuzz Manual Reference |
+|---------|----------|----------|----------------------|
+| Horizontal schema definitions | MEDIUM | 2-3h | Item production (line 69 in part5.txt) |
+| Schema-level quantifiers | LOW | 3-4h | Schema-Exp (line 121-125 in part5.txt) |
+| User-defined operators | LOW | 5-6h | Chapter 5.1-5.2 (requires directive system) |
+| Type abbreviations | LOW | 2-3h | Chapter 5.3 |
 
 ---
 
-#### 4. Schema-Level Quantifiers
+## Implementation Plan
 
-**Priority:** LOW
-**Reason:** Rarely used, advanced schema calculus
+**High Priority (Tier 2):** `\LET` construct and schema renaming - implement when homework requires.
 
-**Syntax:**
-```latex
-\forall Schema-Text @ Schema-Exp  % Returns schema, not predicate
-```
+**Low Priority (Tier 3):** Schema-level quantifiers, horizontal schema definitions, user-defined operators, type abbreviations - implement as needed.
 
-**Implementation Estimate:** 3-4 hours
-
-**Fuzz Manual Reference:** Page 56 (Schema-Exp)
-
----
-
-#### 5. User-Defined Operators
-
-**Priority:** LOW
-**Reason:** Advanced feature, directives system needed
-
-**Examples:**
-```latex
-%%inop \oplus 4      % Define infix operator at priority 4
-%%ingen \mapsto 3    % Define infix generic at priority 3
-```
-
-**Implementation Estimate:** 5-6 hours (requires directive system)
-
-**Fuzz Manual Reference:** Pages 35-40 (Chapter 5.1-5.2)
-
----
-
-#### 6. Type Abbreviations
-
-**Priority:** LOW
-**Reason:** Convenience feature, not essential
-
-**Syntax:**
-```latex
-%%type SEQ X == seq X
-```
-
-**Implementation Estimate:** 2-3 hours
-
-**Fuzz Manual Reference:** Pages 41-44 (Chapter 5.3)
-
----
-
-## Implementation Roadmap
-
-### Phase 1: Current State ✅ COMPLETE
-
-**Achievements:**
-- All basic Z notation constructs implemented
-- Generic definitions (`gendef`) added
-- All homework questions (1-6) working
-- Fuzz validation passing
-- 845 tests passing, mypy strict mode clean
-
-**Test Coverage:** Comprehensive
-- Unit tests for all features
-- Integration tests with fuzz validation
-- Real homework examples
-
----
-
-### Phase 2: High-Value Release 2 Features
-
-**Trigger:** When homework requires `\LET` or schema renaming
-
-#### Step 1: Implement `\LET` Construct
-1. Add token types: `LET`, `AT` (if not exists)
-2. Add AST nodes:
-   ```python
-   @dataclass(frozen=True)
-   class LetDef(ASTNode):
-       name: str
-       definition: Expr
-
-   @dataclass(frozen=True)
-   class Let(ASTNode):
-       definitions: list[LetDef]
-       body: Expr | Predicate
-   ```
-3. Update parser:
-   - Recognize `\LET` in expression/predicate context
-   - Parse semicolon-separated let-defs
-   - Parse `@` separator and body
-4. Update LaTeX generator:
-   ```latex
-   \LET x == e1; y == e2 @ body
-   ```
-5. Add tests:
-   - Simple let in expression
-   - Multiple definitions
-   - Let in predicate
-   - Nested lets
-
-**Estimated Time:** 2-3 hours
-**Testing Time:** 1 hour
-
----
-
-#### Step 2: Implement Schema Renaming
-1. Add AST node:
-   ```python
-   @dataclass(frozen=True)
-   class Renaming(ASTNode):
-       mappings: list[tuple[str, str]]  # [(new_name, old_name), ...]
-   ```
-2. Update `SchemaRef` AST node:
-   ```python
-   renaming: Renaming | None = None
-   ```
-3. Update parser:
-   - Parse `[name/name, ..., name/name]` after schema reference
-   - Handle empty renaming
-4. Update LaTeX generator:
-   ```latex
-   SchemaName[new1/old1, new2/old2]
-   ```
-5. Add tests:
-   - Single renaming
-   - Multiple renamings
-   - Renaming with generic actuals
-   - Renaming in theta expressions
-
-**Estimated Time:** 1-2 hours
-**Testing Time:** 1 hour
-
----
-
-### Phase 3: Completeness Features (As Needed)
-
-Implement when:
-- Course requires advanced features
-- User requests specific functionality
-- Aiming for 100% ZRM compliance
-
-**Order of implementation:**
-1. Horizontal schema definitions (if schemas become verbose)
-2. User-defined operators (if custom notation needed)
-3. Type abbreviations (if type expressions get complex)
-4. Schema-level quantifiers (if advanced schema calculus used)
-
----
-
-## Testing Strategy
-
-### For Each New Feature
-
-1. **Unit Tests**
-   - Minimal example
-   - Edge cases
-   - Error conditions
-
-2. **Integration Tests**
-   - Combine with existing features
-   - Verify LaTeX output format
-   - Run through fuzz validator
-
-3. **Real-World Tests**
-   - Extract patterns from fuzz manual examples
-   - Test with homework-style problems
-   - Compare output with expected results
-
-4. **Quality Gates** (Before Each Commit)
-   ```bash
-   hatch run format    # Code formatting
-   hatch run lint      # Linting
-   hatch run type      # Type checking (mypy strict)
-   hatch run test      # All tests pass
-   ```
-
-### Test Coverage Goals
-- All code paths exercised
-- All error messages tested
-- All LaTeX output variants verified
-- Fuzz validation passes for all examples
 
 ---
 
@@ -424,96 +208,26 @@ Implement when:
 
 ### Fuzz Manual Cross-Reference
 
-| Feature | Manual Section | Pages |
-|---------|----------------|-------|
-| Syntax Summary | Chapter 7 | 54-59 |
-| Generic Definitions | 3.1, 7 | 13-16, 55 |
-| LET Construct | 5, 7 | 35, 56-57 |
-| Schema Renaming | 6 | 56 |
-| User-Defined Operators | 5.2 | 37-40 |
-| Type Abbreviations | 5.3 | 41-44 |
+All references verified against `docs/fuzz/part5.txt` (syntax summary). Page numbers may differ between PDF and text versions.
+
+| Feature | Manual Location | Verified |
+|---------|----------------|---------|
+| LET in Expression-0 | Line 204 | ✅ |
+| LET in Predicate | Line 164 | ✅ |
+| Schema-Ref Renaming | Line 152-154 | ✅ |
+| Schema-Exp operators | Line 121-149 | ✅ |
+| Horizontal schema def | Line 69 | ✅ |
+| Syntax Summary | Lines 50-305 | ✅ |
 
 ### ZRM References
 
 All features are from **The Z Notation: A Reference Manual, Second Edition** (Spivey, 1992).
 
-Release 2 features (pages 6, 54):
-- Renaming of schema components
-- `let` construct for local definitions
-- Conditional `if then else` expressions ✅ (implemented)
-- Piping of operation schemas (`>>`) ✅ (implemented)
-
-### Current Implementation Status
-
-**Source Files:**
-- `src/txt2tex/tokens.py` - Token definitions
-- `src/txt2tex/lexer.py` - Lexical analysis
-- `src/txt2tex/ast_nodes.py` - AST node definitions
-- `src/txt2tex/parser.py` - Parser implementation
-- `src/txt2tex/latex_gen.py` - LaTeX code generation
-
-**Test Files:**
-- `tests/test_*` - Comprehensive test suite (845 tests)
-
-**Documentation:**
-- `USER-GUIDE.md` - User-facing syntax guide
-- `DESIGN.md` - Architecture and design decisions
-- `CLAUDE.md` - Development context and standards
+**Release 2 features:**
+- ✅ Conditional `if then else` expressions (implemented)
+- ❌ `let` construct for local definitions (not implemented)
+- ❌ Renaming of schema components (not implemented)
+- ❌ Schema-level piping (`>>`) - schema calculus operators not implemented
 
 ---
 
-## Monitoring and Maintenance
-
-### When to Revisit This Document
-
-1. **New homework assignment received**
-   - Check if new features are required
-   - Update homework status section
-   - Escalate priority if blockers found
-
-2. **Feature requests from user**
-   - Evaluate against priority tiers
-   - Update roadmap if needed
-
-3. **After implementing features**
-   - Update status from ❌ to ✅
-   - Document location in codebase
-   - Add test coverage info
-
-4. **Quarterly review**
-   - Reassess priorities based on usage patterns
-   - Update implementation estimates
-   - Check for new ZRM features or fuzz updates
-
-### Success Metrics
-
-- **Homework Completion:** 100% (6/6 questions working)
-- **Feature Coverage:** ~85% (core Z notation)
-- **Test Pass Rate:** 100% (845/845 tests)
-- **Type Safety:** 100% (mypy strict mode, no errors)
-- **Code Quality:** 100% (ruff format + lint passing)
-
----
-
-## Conclusion
-
-**Current State:** Excellent ✅
-
-The txt2tex project successfully supports all features needed for the current homework (Questions 1-6), including the recently added generic definitions feature. No immediate action required.
-
-**Future Planning:** Clear Roadmap 🗺️
-
-When future homework assignments require additional features, we have:
-1. A prioritized list of missing features
-2. Implementation estimates for each
-3. A clear testing strategy
-4. Quality standards to maintain
-
-**Next Steps:**
-1. Monitor upcoming homework for new feature requirements
-2. If `\LET` or schema renaming needed: Implement Tier 2 features
-3. Otherwise: Use current implementation, revisit as needed
-4. Continue maintaining code quality standards (format, lint, type, test)
-
-**Recommendation:**
-Wait for actual need before implementing Tier 2/3 features. Current implementation is solid and unblocked.
