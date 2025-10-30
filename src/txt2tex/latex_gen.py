@@ -523,6 +523,14 @@ class LaTeXGenerator:
             if parent_op in {"=>", "<=>"}:
                 return True
 
+            # Special case for cross product: fuzz's type system requires
+            # explicit parenthesization for nested cross products to ensure
+            # correct type checking. E.g., seq((A cross B) cross C) needs
+            # parens even though mathematically (A cross B) cross C is
+            # the default left-associative parsing.
+            if parent_op in {"cross", "×"}:  # noqa: RUF001
+                return True
+
             # For left-associative operators, right child needs parens
             # E.g., R o9 (S o9 T) requires parens on right
             # but (R o9 S) o9 T doesn't need parens on left
