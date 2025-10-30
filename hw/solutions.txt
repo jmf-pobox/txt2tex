@@ -357,12 +357,31 @@ axdef
 where
   my_shows subset shows
   forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes and \
-    e in show_episodes s
+e in show_episodes s
   forall s : ShowId | forall e : EpisodeId | s in my_shows and \
     (s, e) in ran my_episodes
-  forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes => (s, e) in dom status and \
+  forall s : ShowId | forall e : EpisodeId | \
+    (s, e) in ran my_episodes => (s, e) in dom status and \
     (s, e) in dom status => (s, e) in ran my_episodes
 end
+
+PAGEBREAK:
+
+** Question 10 **
+
+Playlist == seq((ShowId cross EpisodeId) cross N)
+
+axdef
+  PossiblePlaylist : P Playlist
+where
+  PossiblePlaylist = seq((dom status) cross N)
+end
+
+TenA == Z
+
+TenB == Z
+
+TenC == Z
 
 PAGEBREAK:
 

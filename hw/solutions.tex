@@ -729,9 +729,40 @@ my\_shows \subseteq shows \\
 \quad e \in show\_episodes(s) \\
 \forall s : ShowId @ \forall e : EpisodeId @ s \in my\_shows \land \\
 \quad (s, e) \in \ran my\_episodes \\
-\forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran my\_episodes \implies ((s, e) \in \dom status \land \\
+\forall s : ShowId @ \forall e : EpisodeId @ \\
+\quad (s, e) \in \ran my\_episodes \implies ((s, e) \in \dom status \land \\
 \quad (s, e) \in \dom status \implies (s, e) \in \ran my\_episodes)
 \end{axdef}
+
+\newpage
+
+\bigskip
+\noindent
+\textbf{Question 10}
+
+\medskip
+
+\begin{zed}
+Playlist == \seq ((ShowId \cross EpisodeId) \cross \nat)
+\end{zed}
+
+\begin{axdef}
+PossiblePlaylist : \power Playlist
+\where
+PossiblePlaylist = \seq (\dom status \cross \nat)
+\end{axdef}
+
+\begin{zed}
+TenA == \num
+\end{zed}
+
+\begin{zed}
+TenB == \num
+\end{zed}
+
+\begin{zed}
+TenC == \num
+\end{zed}
 
 \newpage
 
