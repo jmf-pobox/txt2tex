@@ -11,8 +11,8 @@ $pdf_mode = 1;
 $postscript_mode = $dvi_mode = 0;
 
 # Don't stop on errors (match our build script behavior)
-$pdflatex = 'pdflatex -interaction=nonstopmode %O %S';
+$pdflatex = 'pdflatex -interaction=nonstopmode -file-line-error %O %S';
 
-# Run pdflatex twice minimum (for natbib citations)
-# This eliminates "Citation may have changed" warnings
+# Run pdflatex multiple times for natbib citations
+# With manual \begin{thebibliography}, citations need 3+ passes to resolve
 $max_repeat = 5;
