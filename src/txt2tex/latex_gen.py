@@ -372,6 +372,28 @@ class LaTeXGenerator:
         if name in special_keywords:
             return special_keywords[name]
 
+        # Handle compound identifiers with postfix closure operators (R+, R*, R~)
+        # These appear in abbreviation and schema names from Bug #3 fix
+        if name.endswith("+"):
+            base = name[:-1]
+            # Render as R^+ (transitive closure)
+            base_id = Identifier(line=0, column=0, name=base)
+            return f"{self._generate_identifier(base_id)}^+"
+        elif name.endswith("*"):
+            base = name[:-1]
+            # Render as R^* (reflexive-transitive closure)
+            base_id = Identifier(line=0, column=0, name=base)
+            return f"{self._generate_identifier(base_id)}^*"
+        elif name.endswith("~"):
+            base = name[:-1]
+            # Render as R^{-1} (relational inverse) or R^{\sim} in fuzz
+            base_id = Identifier(line=0, column=0, name=base)
+            base_latex = self._generate_identifier(base_id)
+            if not self.use_fuzz:
+                return f"{base_latex}^{{-1}}"
+            else:
+                return f"{base_latex}^{{\\sim}}"
+
         # Check if this is an operator/function from UNARY_OPS dictionary
         # This handles operators like id, inv, dom, ran when used as identifiers
         # (e.g., in generic instantiations like id[Person])
@@ -2510,20 +2532,28 @@ class LaTeXGenerator:
 
         Fuzz syntax requires generic parameters AFTER the name: Name[X, Y]
         not before: [X, Y]Name
+
+        Bug #3: Process abbreviation names through _generate_identifier() to handle
+        compound identifiers like R+, R*, R~ correctly.
         """
         lines: list[str] = []
         expr_latex = self.generate_expr(node.expression)
+
+        # Bug #3: Process name through _generate_identifier() for compound identifiers
+        name_latex = self._generate_identifier(
+            Identifier(line=0, column=0, name=node.name)
+        )
 
         # Wrap in zed environment for fuzz compatibility
         # Fuzz requires: Name[X] not [X]Name
         if node.generic_params:
             params_str = ", ".join(node.generic_params)
-            abbrev = f"{node.name}[{params_str}] == {expr_latex}"
+            abbrev = f"{name_latex}[{params_str}] == {expr_latex}"
             lines.append("\\begin{zed}")
             lines.append(abbrev)
             lines.append("\\end{zed}")
         else:
-            abbrev = f"{node.name} == {expr_latex}"
+            abbrev = f"{name_latex} == {expr_latex}"
             lines.append("\\begin{zed}")
             lines.append(abbrev)
             lines.append("\\end{zed}")
@@ -2644,11 +2674,20 @@ class LaTeXGenerator:
         Phase 9 enhancement: Supports optional generic parameters.
         Phase 13 enhancement: Supports anonymous schemas (name=None).
         Multiple declarations appear on separate lines with line breaks.
+
+        Bug #3: Process schema names through _generate_identifier() to handle
+        compound identifiers like S+, S*, S~ correctly.
         """
         lines: list[str] = []
 
         # Determine schema name (empty string for anonymous)
-        schema_name = node.name if node.name is not None else ""
+        # Bug #3: Process name through _generate_identifier() for compound identifiers
+        if node.name is not None:
+            schema_name = self._generate_identifier(
+                Identifier(line=0, column=0, name=node.name)
+            )
+        else:
+            schema_name = ""
 
         # Add generic parameters if present
         if node.generic_params:

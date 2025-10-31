@@ -171,6 +171,7 @@ class Parser:
 
         # Check for abbreviation or free type (Phase 4)
         # Look ahead to see if this is "identifier ::=" or "identifier =="
+        # Bug #3: Also check for compound identifiers like "R+ =="
         if self._match(TokenType.IDENTIFIER):
             next_token = self._peek_ahead(1)
             if next_token.type == TokenType.FREE_TYPE:
@@ -186,7 +187,18 @@ class Parser:
                     return Document(items=items_with_free, line=first_line, column=1)
                 # Single free type
                 return Document(items=[first_free_type], line=first_line, column=1)
-            if next_token.type == TokenType.ABBREV:
+            # Bug #3: Check for abbreviation with or without postfix operator
+            # Cases: "R ==", "R+ ==", "R* ==", "R~ =="
+            is_abbrev = next_token.type == TokenType.ABBREV
+            if not is_abbrev and next_token.type in (
+                TokenType.PLUS,
+                TokenType.STAR,
+                TokenType.TILDE,
+            ):
+                # Check if postfix operator is followed by ==
+                token_after_postfix = self._peek_ahead(2)
+                is_abbrev = token_after_postfix.type == TokenType.ABBREV
+            if is_abbrev:
                 # Parse abbreviation and check for more items
                 first_abbrev = self._parse_abbreviation()
                 self._skip_newlines()
@@ -381,11 +393,24 @@ class Parser:
             return self._parse_pagebreak()
 
         # Check for abbreviation (identifier == expr) or free type (identifier ::= ...)
+        # Bug #3: Also check for compound identifiers like "R+ =="
         if self._match(TokenType.IDENTIFIER):
             # Look ahead to determine type
-            if self._peek_ahead(1).type == TokenType.FREE_TYPE:
+            next_token = self._peek_ahead(1)
+            if next_token.type == TokenType.FREE_TYPE:
                 return self._parse_free_type()
-            if self._peek_ahead(1).type == TokenType.ABBREV:
+            # Bug #3: Check for abbreviation with or without postfix operator
+            # Cases: "R ==", "R+ ==", "R* ==", "R~ =="
+            is_abbrev = next_token.type == TokenType.ABBREV
+            if not is_abbrev and next_token.type in (
+                TokenType.PLUS,
+                TokenType.STAR,
+                TokenType.TILDE,
+            ):
+                # Check if postfix operator is followed by ==
+                token_after_postfix = self._peek_ahead(2)
+                is_abbrev = token_after_postfix.type == TokenType.ABBREV
+            if is_abbrev:
                 return self._parse_abbreviation()
             # Otherwise fall through to expression parsing
 
@@ -2691,6 +2716,35 @@ class Parser:
 
         return params if params else None
 
+    def _parse_compound_identifier_name(self) -> str:
+        """Parse identifier name that may have postfix operator suffix.
+
+        Handles compound identifiers like R+, R*, R~ used in abbreviations
+        and schema names where the postfix operator is part of the name itself,
+        not an operation on the identifier.
+
+        Examples:
+            R+ == {a, b : N | b > a}  # R+ is the abbreviation name
+            R* == R+ o9 R+             # R* is the abbreviation name
+            R~ == inv R                # R~ is the abbreviation name
+
+        Returns:
+            Compound identifier string (e.g., "R+", "R*", "R~")
+        """
+        if not self._match(TokenType.IDENTIFIER):
+            raise ParserError("Expected identifier", self._current())
+
+        name_token = self._advance()
+        name = name_token.value
+
+        # Check for postfix closure operators as part of the name
+        # These are valid in definition contexts (not expression contexts)
+        if self._match(TokenType.PLUS, TokenType.STAR, TokenType.TILDE):
+            op_token = self._advance()
+            name = name + op_token.value  # "R" + "+" → "R+"
+
+        return name
+
     def _parse_abbreviation(self) -> Abbreviation:
         """Parse abbreviation: [X] name == expression or name == expression.
 
@@ -2701,12 +2755,9 @@ class Parser:
         # Check for generic parameters before name
         generic_params = self._parse_generic_params()
 
-        # Parse name
-        if not self._match(TokenType.IDENTIFIER):
-            raise ParserError("Expected identifier in abbreviation", self._current())
-        name_token = self._current()
-        name = name_token.value
-        self._advance()  # Move to ==
+        # Parse name (may include postfix operator suffix like R+, R*, R~)
+        name_token = self._current()  # Save for line/column info
+        name = self._parse_compound_identifier_name()
 
         if not self._match(TokenType.ABBREV):
             raise ParserError("Expected '==' in abbreviation", self._current())
@@ -2937,12 +2988,12 @@ class Parser:
         start_token = self._advance()  # Consume 'schema'
 
         # Parse optional schema name
+        # Bug #3: May include postfix operator suffix like S+, S*, S~
         name: str | None = None
         generic_params: list[str] | None = None
 
         if self._match(TokenType.IDENTIFIER):
-            name = self._current().value
-            self._advance()
+            name = self._parse_compound_identifier_name()
             # Check for generic parameters after name
             generic_params = self._parse_generic_params()
 
