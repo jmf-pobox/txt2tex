@@ -719,6 +719,40 @@ R*               →  R*          [reflexive, transitive closure]
 
 Note: Reflexive closure (`r`) and symmetric closure (`s`) are not yet implemented.
 
+### Compound Identifiers in Definitions
+
+Postfix operators (`+`, `*`, `~`) can be used as part of identifier names in abbreviations and schema definitions:
+
+```
+R+ == {a, b : N | b > a}         →  R⁺ ≙ {a, b : ℕ | b > a}
+R* == R+ union id[N]             →  R* ≙ R⁺ ∪ id[ℕ]
+R~ == inv R                      →  R⁻¹ ≙ inv R
+
+schema S+                        →  \begin{schema}{S⁺}
+  x : N
+end
+```
+
+**Context matters:** The same operator has different meanings in different contexts:
+
+| Context | Syntax | Meaning | LaTeX |
+|---------|--------|---------|-------|
+| Abbreviation name | `R+ == expr` | Name is "R+" | `R⁺` |
+| Expression | `S == R+` | Transitive closure operator | `R⁺` |
+| Binary operator | `x + y` | Addition | `x + y` |
+
+**Examples:**
+```
+# R+ is the abbreviation name (compound identifier)
+R+ == {a, b : N | b > a}
+
+# R+ in expression context (operator applied to R)
+S == R+
+
+# Works with underscores
+rel_1+ == {x, y : N | x < y}     →  rel_1⁺
+```
+
 ---
 
 ## Functions

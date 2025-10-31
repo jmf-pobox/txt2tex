@@ -9,21 +9,22 @@
 
 | Status | Count | Percentage |
 |--------|-------|------------|
-| **Fully Working** | 51 | 98.1% |
+| **Fully Working** | 52 | 100% |
 | **Partially Working** | 0 | 0% |
-| **Not Yet Implemented** | 1 | 1.9% |
+| **Not Yet Implemented** | 0 | 0% |
 | **Total** | 52 | 100% |
 
-**Current Coverage:** ~98% (51/52 solutions)
-- 51 fully working solutions
-- Only Solution 31 blocked by Bug #3 (compound identifiers R+, R*)
+**Current Coverage:** 100% (52/52 solutions)
+- All 52 solutions fully working
+- Bug #3 resolved in Phase 31
 
-**Previous Coverage:** ~87% (45.3/52 solutions - Phase 21)
+**Previous Coverage:** ~98% (51/52 solutions - Phase 30)
 **Recent Improvements:**
 - Phase 19: Added space-separated application, completed Solutions 44-47
 - Phase 20: Added semicolon-separated declarations for gendef/axdef/schema
 - Phase 21: Fixed schema predicate separators, added subseteq operator (7→4 fuzz errors)
 - Phase 22: Removed false blockers, completed Solutions 39, 48-52 (+6 solutions)
+- **Phase 31**: Fixed Bug #3 (compound identifiers), completed Solution 31, achieved 100% (52/52) ✅
 
 ---
 
@@ -36,7 +37,7 @@
 | Equality | 9-12 | 4 | 0 | 100% |
 | Deductive Proofs | 13-18 | 6 | 0 | 100% |
 | Sets and Types | 19-26 | 8 | 0 | 100% |
-| Relations | 27-32 | 5 | 0 | 83% (Sol 31: Bug #3) |
+| Relations | 27-32 | 6 | 0 | 100% |
 | Functions | 33-36 | 4 | 0 | 100% |
 | Sequences | 37-39 | 3 | 0 | 100% |
 | Modeling | 40-43 | 4 | 0 | 100% |
@@ -376,7 +377,6 @@
 - Converted Solution 52 from TEXT to proper axdef blocks with pattern matching and conditionals
 - Solutions 48-50 already written with proper Z notation - verified compilation
 - Coverage increased from 87% to 98% (45 → 51 solutions)
-- Only 1 solution remaining: Solution 31 blocked by Bug #3 (compound identifiers)
 
 ### ✅ Phase 24: Whitespace-Sensitive ^ Operator
 - Implemented whitespace-based disambiguation for dual-meaning `^` operator
@@ -444,6 +444,25 @@
 - Set difference still works: `A \ B` (no newline after backslash)
 - User verification: Long homework predicates now fit within margins
 - Test count: 1013 tests (all passing)
+
+### ✅ Phase 31: Compound Identifiers (Bug #3 Fix)
+- Fixed Bug #3: Parser now recognizes compound identifiers with postfix operators
+- Added `_parse_compound_identifier_name()` helper method to combine identifier + postfix operator
+- Modified parser lookahead to detect patterns like `R+ ==`, `S* ==`, `R~ ==`
+- Updated abbreviation and schema name parsing to use compound identifier parsing
+- Updated LaTeX generator to render compound names correctly:
+  - `R+` → `R^+` (transitive closure)
+  - `R*` → `R^*` (reflexive-transitive closure)
+  - `R~` → `R^{-1}` (relational inverse)
+- Context-aware: Same operator has different meaning in different contexts:
+  - `R+ == expr` → R+ is the abbreviation name (compound identifier)
+  - `S == R+` → R+ is transitive closure operator applied to R
+- Created comprehensive test suite: 18 new tests in test_compound_identifiers.py
+  - Covers: lexer behavior, parser behavior, LaTeX generation, integration, edge cases
+- Completed Solution 31 (Relations) - the last remaining solution
+- **Achievement**: 100% solution coverage (52/52) ✅
+- Test count: 1070 tests (all passing)
+- All quality gates pass: type, lint, format, test
 
 ### ✅ Fuzz Mode: Context-Aware Equivalence Operator
 - Fixed `<=>` operator to render context-sensitively in fuzz mode
@@ -586,8 +605,7 @@ Following the conventions used in the fuzz package test suite:
 
 ### Unimplemented Features
 
-**For Solution 31 (Relations)**:
-- Compound identifiers with operator suffixes (R+, R*) - Bug #3
+**For the 52 Solutions**: All features needed are now implemented ✅
 
 **Note**: Schema decoration (S', ΔS, ΞS) and schema composition operators are NOT needed for any of the 52 solutions. All supplementary solutions (48-52) use only currently implemented features.
 
@@ -599,20 +617,20 @@ Following the conventions used in the fuzz package test suite:
 
 **Test Cases**: All bugs have minimal reproducible test cases in `tests/bugs/`
 
-### Active Bugs (5 confirmed)
+### Active Bugs (4 confirmed)
 
 | Priority | Issue | Component | Test Case | Blocks |
 |----------|-------|-----------|-----------|--------|
 | HIGH | [#1](https://github.com/jmf-pobox/txt2tex/issues/1): Parser fails on prose with periods | parser | [bug1_prose_period.txt](tests/bugs/bug1_prose_period.txt) | Homework, natural writing |
 | MEDIUM | [#2](https://github.com/jmf-pobox/txt2tex/issues/2): Multiple pipes in TEXT blocks | latex-gen | [bug2_multiple_pipes.txt](tests/bugs/bug2_multiple_pipes.txt) | Solution 40(g) |
-| MEDIUM | [#3](https://github.com/jmf-pobox/txt2tex/issues/3): Compound identifiers with operators | lexer | [bug3_compound_id.txt](tests/bugs/bug3_compound_id.txt) | Solution 31 |
 | MEDIUM | [#4](https://github.com/jmf-pobox/txt2tex/issues/4): Comma after parenthesized math not detected | latex-gen | [bug4_comma_after_parens.txt](tests/bugs/bug4_comma_after_parens.txt) | Homework prose |
 | MEDIUM-HIGH | [#5](https://github.com/jmf-pobox/txt2tex/issues/5): Logical operators (or, and) not converted | latex-gen | [bug5_or_operator.txt](tests/bugs/bug5_or_operator.txt) | Homework 1(c) |
 
-### Recently Resolved (2 fixed)
+### Recently Resolved (3 fixed)
 
 | Issue | Status | Fixed In |
 |-------|--------|----------|
+| [#3](https://github.com/jmf-pobox/txt2tex/issues/3): Compound identifiers with operators (R+, R*, R~) | ✅ RESOLVED | Phase 31 (Bug #3 fix) |
 | Nested quantifiers in mu expressions | ✅ RESOLVED | Phase 19 |
 | emptyset keyword not converted | ✅ RESOLVED | Recent update |
 
@@ -655,16 +673,16 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 
 ### Next Steps
 
-**To reach 100% (52/52)**:
-- Fix Bug #3: Compound identifiers with operator suffixes (R+, R*)
-- Complete Solution 31
-- **Estimated effort**: 2-4 hours
+**100% (52/52) Achievement**: ✅ Completed in Phase 31
+- Fixed Bug #3: Compound identifiers with operator suffixes (R+, R*, R~)
+- Completed Solution 31
+- All 52 homework solutions now fully working
 
 ---
 
 ## Test Coverage
 
-- **Total Tests:** 1028 passing (as of Phase 27, October 2025)
+- **Total Tests:** 1070 passing (as of Phase 31, October 2025)
 
 **Component Coverage:**
 - parser.py: 86.17%
@@ -702,7 +720,7 @@ All 51 "Fully Working" solutions have been verified with:
 3. PDF compilation (using fuzz package)
 4. Manual inspection of output
 
-The 1 "Not Yet Implemented" solution (31) is blocked by Bug #3: compound identifiers with operator suffixes (R+, R*).
+All 52 solutions have been implemented and verified. Bug #3 (compound identifiers) was resolved in Phase 31.
 
 ---
 
