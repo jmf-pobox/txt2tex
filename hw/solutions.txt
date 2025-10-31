@@ -411,6 +411,16 @@ end
 
 PAGEBREAK:
 
+**Question 11**
+
+TEXT: Prove forall p : PossiblePlaylist | length(played(p)) + length(unplayed(p)) = length(p)
+
+
+PROOF:
+forall p : PossiblePlaylist | length(p)
+  forall p : PossiblePlaylist | length(played(p)) + length(unplayed(p))
+PAGEBREAK:
+
 === Bibliography ===
 
 LATEX: \begin{thebibliography}{Simpson, n.d.}
