@@ -30,9 +30,10 @@ def test_nested_cross_in_seq_fuzz() -> None:
     latex = generator.generate_document(doc)
 
     # Should preserve parentheses: \seq ((ShowId \cross EpisodeId) \cross N)
-    assert r"\seq ((ShowId \cross EpisodeId) \cross" in latex or \
-           r"\seq ((ShowId \cross EpisodeId) \cross \nat)" in latex, \
-           f"Expected parenthesized cross product, got: {latex}"
+    assert (
+        r"\seq ((ShowId \cross EpisodeId) \cross" in latex
+        or r"\seq ((ShowId \cross EpisodeId) \cross \nat)" in latex
+    ), f"Expected parenthesized cross product, got: {latex}"
 
 
 def test_nested_cross_in_seq_standard() -> None:
@@ -49,9 +50,10 @@ def test_nested_cross_in_seq_standard() -> None:
     latex = generator.generate_document(doc)
 
     # Should preserve parentheses
-    assert r"\seq ((ShowId \cross EpisodeId) \cross" in latex or \
-           r"\seq ((ShowId \cross EpisodeId) \cross \nat)" in latex, \
-           f"Expected parenthesized cross product, got: {latex}"
+    assert (
+        r"\seq ((ShowId \cross EpisodeId) \cross" in latex
+        or r"\seq ((ShowId \cross EpisodeId) \cross \nat)" in latex
+    ), f"Expected parenthesized cross product, got: {latex}"
 
 
 def test_triple_cross_product() -> None:
@@ -68,8 +70,9 @@ def test_triple_cross_product() -> None:
 
     # Left-associative: should be (A cross B) cross C
     # With our fix, this should add parens for clarity in type contexts
-    assert "(A \\cross B) \\cross C" in latex, \
-           f"Expected left-associative grouping with parens, got: {latex}"
+    assert "(A \\cross B) \\cross C" in latex, (
+        f"Expected left-associative grouping with parens, got: {latex}"
+    )
 
 
 def test_cross_in_axdef() -> None:
@@ -89,5 +92,6 @@ end"""
     latex = generator.generate_document(doc)
 
     # Should preserve parentheses in function type
-    assert "(A \\cross B) \\cross C" in latex, \
-           f"Expected parenthesized cross product in function type, got: {latex}"
+    assert "(A \\cross B) \\cross C" in latex, (
+        f"Expected parenthesized cross product in function type, got: {latex}"
+    )
