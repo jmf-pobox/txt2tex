@@ -347,8 +347,8 @@ TEXT: The above are given as abbreviations to enable fuzz validation, which pass
 
 ** Question 9**
 
-PlayedOrNot ::= P | NotP
-SavedOrNot ::= S | NotS
+PlayedOrNot ::= Played | NotP
+SavedOrNot ::= Saved | NotS
 
 axdef
   my_shows : F ShowId
@@ -377,11 +377,37 @@ where
   PossiblePlaylist = seq((dom status) cross N)
 end
 
-TenA == Z
+(a)
 
-TenB == Z
+axdef
+  length : PossiblePlaylist -> N
+where
+  length(<>) = 0 and \
+    forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) | \
+      length(<ple> ^ pl) = snd(ple) + length(pl))
+end
 
-TenC == Z
+(b)
+
+axdef
+  unplayed : PossiblePlaylist -> PossiblePlaylist
+where
+  unplayed(<>) = <> and \
+    forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) | \
+      (fst(status fst(ple)) = Played and unplayed(<ple> ^ pl) = (unplayed(pl))) and \
+      unplayed(<ple> ^ pl) = <ple> ^ (unplayed(pl)))
+end
+
+(c)
+
+axdef
+  played : PossiblePlaylist -> PossiblePlaylist
+where
+  played(<>) = <> and \
+    forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) | \
+      (fst(status fst(ple)) = NotP and played(<ple> ^ pl) = (played(pl))) and \
+      played(<ple> ^ pl) = <ple> ^ (played(pl)))
+end
 
 PAGEBREAK:
 
