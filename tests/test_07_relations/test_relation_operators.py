@@ -524,10 +524,11 @@ class TestPhase10aIntegration:
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
 
-        # Parentheses redundant - same precedence (left-associative)
+        # Phase 29: Explicit parentheses are now preserved
+        # The inner (S <| R) has explicit parens, outer parens are function arg syntax
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "dom"
-        assert latex == r"\dom (S \dres R \rres T)"
+        assert latex == r"\dom ((S \dres R) \rres T)"
 
     def test_relation_with_set_operations(self) -> None:
         """Test relation operators have lower precedence than set operations."""

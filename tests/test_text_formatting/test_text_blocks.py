@@ -66,8 +66,9 @@ TEXT: The statement (not p => not q) <=> (q => p) is true."""
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
 
-    # Should detect and parse the complete formula
-    assert r"$\lnot p \Rightarrow \lnot q \Leftrightarrow q \Rightarrow p$" in latex
+    # Phase 29: Explicit parentheses are now preserved
+    # The formula has explicit parens around both sides of <=>, so they're preserved
+    assert r"$(\lnot p \Rightarrow \lnot q) \Leftrightarrow (q \Rightarrow p)$" in latex
     assert "is true" in latex
 
 
