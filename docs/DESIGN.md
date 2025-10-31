@@ -327,6 +327,7 @@ class BinaryOp(MathExpr):
     op: str              # "and", "or", "=>", etc.
     left: MathExpr
     right: MathExpr
+    explicit_parens: bool = False  # Phase 29: Preserves user-written parentheses
 
 @dataclass
 class UnaryOp(MathExpr):
@@ -380,6 +381,27 @@ class Application(MathExpr):
 The `^` symbol has dual meaning based on whitespace (disambiguated at lexing):
 - **With space before**: CAT token → sequence concatenation (level 8, same as multiplication)
 - **No space before**: CARET token → exponentiation/superscript (level 9, higher precedence)
+
+**Phase 29: Explicit Parentheses Preservation**:
+
+When users write explicit parentheses like `(A and B) and C`, these are preserved in the LaTeX output even if not strictly required by precedence rules. This maintains semantic grouping clarity from the source text.
+
+**Implementation**:
+- Parser marks `BinaryOp` nodes with `explicit_parens=True` when wrapped in parentheses
+- LaTeX generator always adds parentheses for expressions with `explicit_parens=True`
+- Prevents double parenthesization by checking flag before adding precedence-based parens
+
+**Examples**:
+```
+(A and B) and C      → (A \land B) \land C   (left parens preserved)
+A and (B and C)      → A \land (B \land C)   (right parens preserved)
+A and B and C        → A \land B \land C     (no parens, left-associative)
+((A and B) and C)    → ((A \land B) \land C) (both levels preserved)
+```
+
+**Rationale**: User-written parentheses indicate semantic intent beyond operator precedence. In formal specifications, explicit grouping conveys important meaning about logical structure. The parser must distinguish between:
+- **Precedence-required parens**: `(A or B) and C` (needed because `or` has lower precedence)
+- **Explicit clarity parens**: `(A and B) and C` (not needed by precedence, but preserves grouping)
 
 **Context Handling**:
 
@@ -1912,12 +1934,12 @@ count~stalk = 0 \\
 
 ## Updated Timeline Summary
 
-### Completed (Phase 0-22) ✅
+### Completed (Phase 0-29) ✅
 - **Total time invested**: ~75-95 hours
 - **Coverage**: 98.1% of course material (51/52 solutions fully working)
-- **Status**: ✅ Phase 22 complete - false blockers removed, Solutions 48-52 completed
-- **Phases complete**: 0, 1, 2, 3, 4, 5, 5b, 6, 7, 8, 9, 10a, 10b, 11a, 11b, 11c, 11d, 11.5, 11.6, 11.7, 11.8, 11.9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22
-- **Test coverage**: 906 tests passing
+- **Status**: ✅ Phase 29 complete - explicit parentheses preservation
+- **Phases complete**: 0, 1, 2, 3, 4, 5, 5b, 6, 7, 8, 9, 10a, 10b, 11a, 11b, 11c, 11d, 11.5, 11.6, 11.7, 11.8, 11.9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 27, 29
+- **Test coverage**: 1052 tests passing
 
 ### Remaining for 100% Coverage
 - **Bug #3 Fix**: Compound identifiers with operator suffixes (R+, R*) (2-4h) → 100% coverage (Solution 31)

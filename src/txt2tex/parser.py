@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import re
 
 from txt2tex.ast_nodes import (
@@ -2261,6 +2262,12 @@ class Parser:
         if not self._match(TokenType.RPAREN):
             raise ParserError("Expected ')' after expression", self._current())
         self._advance()  # Consume ')'
+
+        # Phase 29: Mark BinaryOp as explicitly parenthesized
+        # This preserves user intent for clarity in LaTeX output
+        if isinstance(first_expr, BinaryOp):
+            return dataclasses.replace(first_expr, explicit_parens=True)
+
         return first_expr
 
     def _parse_atom(self) -> Expr:
