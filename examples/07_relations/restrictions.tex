@@ -9,7 +9,8 @@
 
 \section*{Function Application Examples}
 
-\begin{zed}[Item, Dog, Person, X]\end{zed}
+\begin{zed}[Item, Dog, Person, X]
+\end{zed}
 
 \bigskip
 
@@ -24,11 +25,11 @@ This file demonstrates function $application \in Z$ notation definitions.
 \medskip
 
 \begin{axdef}
-square : \nat \fun \nat \\
-double : \nat \fun \nat
-\where
-\forall n : \nat @ square(n) = n * n \\
-\forall n : \nat @ double(n) = 2 * n
+  square : \nat \fun \nat \\
+  double : \nat \fun \nat
+  \where
+  \forall n : \nat @ square(n) = n * n \\
+  \forall n : \nat @ double(n) = 2 * n
 \end{axdef}
 
 \bigskip
@@ -38,11 +39,12 @@ double : \nat \fun \nat
 \medskip
 
 \begin{axdef}
-add : \nat \cross \nat \fun \nat \\
-maximum : \nat \cross \nat \fun \nat
-\where
-\forall a, b : \nat @ add(a, b) = a + b \\
-\forall a, b : \nat @ (maximum(a, b) = a \lor maximum(a, b) = b) \land maximum(a, b) \geq a \land maximum(a, b) \geq b
+  add : \nat \cross \nat \fun \nat \\
+  maximum : \nat \cross \nat \fun \nat
+  \where
+  \forall a, b : \nat @ add(a, b) = a + b \\
+  \forall a, b : \nat @ (maximum(a, b) = a \lor maximum(a, b) = b)
+  \land maximum(a, b) \geq a \land maximum(a, b) \geq b
 \end{axdef}
 
 \bigskip
@@ -62,9 +64,9 @@ maximum : \nat \cross \nat \fun \nat
 \medskip
 
 \begin{axdef}
-posFunc : \nat \fun \nat
-\where
-\forall x : \nat @ posFunc(x) > 0 \implies posFunc(x) > 0
+  posFunc : \nat \fun \nat
+  \where
+  \forall x : \nat @ posFunc(x) > 0 \implies posFunc(x) > 0
 \end{axdef}
 
 \bigskip
@@ -74,9 +76,9 @@ posFunc : \nat \fun \nat
 \medskip
 
 \begin{schema}{Heights}
-height : Person \fun \nat
-\where
-\forall p : Person @ height(p) > 0 \land height(p) < 300
+  height : Person \fun \nat
+  \where
+  \forall p : Person @ height(p) > 0 \land height(p) < 300
 \end{schema}
 
 \bigskip
@@ -86,11 +88,11 @@ height : Person \fun \nat
 \medskip
 
 \begin{axdef}
-func1 : \nat \fun \nat \\
-func2 : \nat \fun \nat \\
-func3 : \nat \fun \nat
-\where
-\forall x : \nat @ func1(func2(func3(x))) \geq 0
+  func1 : \nat \fun \nat \\
+  func2 : \nat \fun \nat \\
+  func3 : \nat \fun \nat
+  \where
+  \forall x : \nat @ func1(func2(func3(x))) \geq 0
 \end{axdef}
 
 \end{document}

@@ -17,17 +17,16 @@
 
 \bigskip
 
-The unique existence quantifier asserts there is exactly one value satisfying the predicate:
+The unique existence quantifier asserts there is exactly one value
+satisfying the predicate:
 
 \bigskip
 
 \noindent
 $\exists_1 x : \nat @ x = 5$
 
-
 \noindent
 $\exists_1 n : \nat @ \forall m : \nat @ n \leq m$
-
 
 \bigskip
 \noindent
@@ -44,10 +43,8 @@ Unique existence with compound predicates:
 \noindent
 $\exists_1 y : \nat @ y \in \{0, 1\} \land y \neq 1$
 
-
 \noindent
 $\exists_1 z : \num @ z^2 = 4 \land z > 0$
-
 
 \bigskip
 \noindent
@@ -62,12 +59,13 @@ When a unique value is specified by equality, we can apply the one-point rule:
 \bigskip
 
 \[
-\begin{array}{ll@{\hspace{2em}}l}
-& \exists y : \nat @ y \in \{0, 1\} \land y \neq 1 \land x \neq y \\
-&\Leftrightarrow \exists y : \nat @ y = 0 \land x \neq y & [\mbox{arithmetic}] \\
-&\Leftrightarrow 0 \in \nat \land x \neq 0 & [\mbox{one - point rule}] \\
-&\Leftrightarrow x \neq 0
-\end{array}
+  \begin{array}{ll@{\hspace{2em}}l}
+    & \exists y : \nat @ y \in \{0, 1\} \land y \neq 1 \land x \neq y \\
+    &\Leftrightarrow \exists y : \nat @ y = 0 \land x \neq y &
+    [\mbox{arithmetic}] \\
+    &\Leftrightarrow 0 \in \nat \land x \neq 0 & [\mbox{one - point rule}] \\
+    &\Leftrightarrow x \neq 0
+  \end{array}
 \]
 
 \bigskip
@@ -85,9 +83,7 @@ Testing uniqueness within a specific domain:
 \noindent
 $\exists_1 p : \power \{0, 1\} @ \# p = 1$
 
-
 \noindent
 $\exists_1 x : \{1, 2, 3, 4\} @ x > 3$
-
 
 \end{document}

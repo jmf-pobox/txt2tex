@@ -19,8 +19,8 @@
 $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies q}{
   \ulcorner p \urcorner^{[1]}
-&
-\infer[axiom]{q}{}
+  &
+  \infer[axiom]{q}{}
 }
 $
 
@@ -34,12 +34,12 @@ $
 $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (q \implies r)}{
   \ulcorner p \urcorner^{[1]}
-&
-\infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies r}{
-  \ulcorner q \urcorner^{[2]}
-&
-\infer[axiom]{r}{}
-}
+  &
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies r}{
+    \ulcorner q \urcorner^{[2]}
+    &
+    \infer[axiom]{r}{}
+  }
 }
 $
 
@@ -51,18 +51,19 @@ $
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (q \implies (r \implies s))}{
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (q \implies (r
+\implies s))}{
   \ulcorner p \urcorner^{[1]}
-&
-\infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies (r \implies s)}{
-  \ulcorner q \urcorner^{[2]}
-&
-\infer[\Rightarrow\textrm{-intro}^{[3]}]{r \implies s}{
-  \ulcorner r \urcorner^{[3]}
-&
-\infer[axiom]{s}{}
-}
-}
+  &
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies (r \implies s)}{
+    \ulcorner q \urcorner^{[2]}
+    &
+    \infer[\Rightarrow\textrm{-intro}^{[3]}]{r \implies s}{
+      \ulcorner r \urcorner^{[3]}
+      &
+      \infer[axiom]{s}{}
+    }
+  }
 }
 $
 
@@ -74,22 +75,24 @@ $
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (q \implies (r \implies (s \implies t)))}{
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (q \implies (r
+\implies (s \implies t)))}{
   \ulcorner p \urcorner^{[1]}
-&
-\infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies (r \implies (s \implies t))}{
-  \ulcorner q \urcorner^{[2]}
-&
-\infer[\Rightarrow\textrm{-intro}^{[3]}]{r \implies (s \implies t)}{
-  \ulcorner r \urcorner^{[3]}
-&
-\infer[\Rightarrow\textrm{-intro}^{[4]}]{s \implies t}{
-  \ulcorner s \urcorner^{[4]}
-&
-\infer[axiom]{t}{}
-}
-}
-}
+  &
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies (r \implies (s
+  \implies t))}{
+    \ulcorner q \urcorner^{[2]}
+    &
+    \infer[\Rightarrow\textrm{-intro}^{[3]}]{r \implies (s \implies t)}{
+      \ulcorner r \urcorner^{[3]}
+      &
+      \infer[\Rightarrow\textrm{-intro}^{[4]}]{s \implies t}{
+        \ulcorner s \urcorner^{[4]}
+        &
+        \infer[axiom]{t}{}
+      }
+    }
+  }
 }
 $
 
@@ -103,12 +106,12 @@ $
 $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land q) \implies r}{
   \ulcorner p \land q \urcorner^{[1]}
-&
-\infer[\land \mathrm{elim}]{r}{
-  \ulcorner p \urcorner^{[1]}
-&
-\ulcorner q \urcorner^{[1]}
-}
+  &
+  \infer[\land \mathrm{elim}]{r}{
+    \ulcorner p \urcorner^{[1]}
+    &
+    \ulcorner q \urcorner^{[1]}
+  }
 }
 $
 

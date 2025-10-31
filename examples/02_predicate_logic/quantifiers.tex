@@ -15,7 +15,8 @@
 
 \medskip
 
-\begin{zed}[Person, Company]\end{zed}
+\begin{zed}[Person, Company]
+\end{zed}
 
 \bigskip
 \noindent
@@ -23,9 +24,11 @@
 
 \medskip
 
-\begin{zed}Status ::= active | inactive | suspended\end{zed}
+\begin{zed}Status ::= active | inactive | suspended
+\end{zed}
 
-\begin{zed}Answer ::= yes | no\end{zed}
+\begin{zed}Answer ::= yes | no
+\end{zed}
 
 \bigskip
 \noindent
@@ -34,11 +37,11 @@
 \medskip
 
 \begin{zed}
-MaxCapacity == 100
+  MaxCapacity == 100
 \end{zed}
 
 \begin{zed}
-DefaultSize == 10
+  DefaultSize == 10
 \end{zed}
 
 \bigskip
@@ -48,11 +51,11 @@ DefaultSize == 10
 \medskip
 
 \begin{axdef}
-population : \nat \\
-capacity : \nat
-\where
-population \leq capacity \\
-capacity > 0
+  population : \nat \\
+  capacity : \nat
+  \where
+  population \leq capacity \\
+  capacity > 0
 \end{axdef}
 
 \bigskip
@@ -62,19 +65,19 @@ capacity > 0
 \medskip
 
 \begin{schema}{Library}
-books : \nat \\
-members : \nat
-\where
-books > 0 \\
-members \geq 0
+  books : \nat \\
+  members : \nat
+  \where
+  books > 0 \\
+  members \geq 0
 \end{schema}
 
 \begin{schema}{BankAccount}
-balance : \nat \\
-overdraft : \nat
-\where
-balance \geq 0 \\
-overdraft \geq 0
+  balance : \nat \\
+  overdraft : \nat
+  \where
+  balance \geq 0 \\
+  overdraft \geq 0
 \end{schema}
 
 \end{document}

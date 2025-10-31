@@ -9,7 +9,8 @@
 
 \section*{Recursive Function Examples}
 
-\begin{zed}[Entry]\end{zed}
+\begin{zed}[Entry]
+\end{zed}
 
 \bigskip
 
@@ -24,10 +25,11 @@ This file demonstrates recursive functions on sequences.
 \medskip
 
 \begin{axdef}
-length : \seq Entry \fun \nat
-\where
-length(\langle \rangle) = 0 \\
-\forall x : Entry @ \forall s : \seq Entry @ length(\langle x \rangle \cat s) = 1 + length(s)
+  length : \seq Entry \fun \nat
+  \where
+  length(\langle \rangle) = 0 \\
+  \forall x : Entry @ \forall s : \seq Entry @ length(\langle x
+  \rangle \cat s) = 1 + length(s)
 \end{axdef}
 
 \bigskip
@@ -37,10 +39,11 @@ length(\langle \rangle) = 0 \\
 \medskip
 
 \begin{axdef}
-identity : \seq Entry \fun \seq Entry
-\where
-identity(\langle \rangle) = \langle \rangle \\
-\forall x : Entry @ \forall s : \seq Entry @ identity(\langle x \rangle \cat s) = \langle x \rangle \cat identity(s)
+  identity : \seq Entry \fun \seq Entry
+  \where
+  identity(\langle \rangle) = \langle \rangle \\
+  \forall x : Entry @ \forall s : \seq Entry @ identity(\langle x
+  \rangle \cat s) = \langle x \rangle \cat identity(s)
 \end{axdef}
 
 \bigskip
@@ -50,15 +53,17 @@ identity(\langle \rangle) = \langle \rangle \\
 \medskip
 
 \begin{axdef}
-duplicate : \seq \nat \fun \seq \nat
-\where
-duplicate(\langle \rangle) = \langle \rangle \\
-\forall n : \nat @ \forall s : \seq \nat @ duplicate(\langle n \rangle \cat s) = \langle n, n \rangle \cat duplicate(s)
+  duplicate : \seq \nat \fun \seq \nat
+  \where
+  duplicate(\langle \rangle) = \langle \rangle \\
+  \forall n : \nat @ \forall s : \seq \nat @ duplicate(\langle n
+  \rangle \cat s) = \langle n, n \rangle \cat duplicate(s)
 \end{axdef}
 
 \bigskip
 
-These examples show pattern matching on sequences with base cases and recursive cases.
+These examples show pattern matching on sequences with base cases and
+recursive cases.
 
 \bigskip
 
