@@ -58,10 +58,10 @@ The final equivalence holds because $0 \in N$, $4 - 0 \in N$, and 0 $<$ 4.
 
 \[
 \begin{array}{ll@{\hspace{2em}}l}
-& \exists x : \nat @ x = 1 \land x > y \lor x = 2 \land x > z \\
+& \exists x : \nat @ (x = 1 \land x > y) \lor (x = 2 \land x > z) \\
 &\Leftrightarrow (\exists x : \nat @ x = 1 \land x > y) \lor (\exists x : \nat @ x = 2 \land x > z) \\
-&\Leftrightarrow 1 \in \nat \land 1 > y \lor (\exists x : \nat @ x = 2 \land x > z) \\
-&\Leftrightarrow 1 \in \nat \land 1 > y \lor 2 \in \nat \land 2 > z \\
+&\Leftrightarrow (1 \in \nat \land 1 > y) \lor (\exists x : \nat @ x = 2 \land x > z) \\
+&\Leftrightarrow (1 \in \nat \land 1 > y) \lor (2 \in \nat \land 2 > z) \\
 &\Leftrightarrow 1 > y \lor 2 > z
 \end{array}
 \]
