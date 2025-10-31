@@ -18,8 +18,6 @@ The `txt2pdf.sh` script handles all the complexity:
 - Compiles with pdflatex
 - Cleans up auxiliary files
 
-**DO NOT** manually run `pdflatex` with environment variables - you will forget steps and it will fail.
-
 ## Project Overview
 
 This is `txt2tex` - a tool to convert whiteboard-style mathematical notation to high-quality LaTeX that can be typechecked with fuzz and compiled to PDF.
@@ -128,15 +126,6 @@ hatch run check          # lint + type + test
 hatch run check-cov      # lint + type + test-cov
 ```
 
-### Direct Python Invocation (if needed)
-```bash
-# CLI (from sem/ directory)
-PYTHONPATH=src python -m txt2tex.cli <file>
-
-# Running tests
-PYTHONPATH=src pytest tests
-```
-
 **Important**: The `txt2pdf.sh` script handles TEXINPUTS/MFINPUTS automatically. Don't manually invoke pdflatex unless debugging LaTeX compilation issues.
 
 ## Environment Setup
@@ -147,7 +136,6 @@ PYTHONPATH=src pytest tests
    - Location: `/Users/jfreeman/Coding/fuzz/txt2tex/tex/`
    - Main file: `fuzz.sty`
    - Fonts: `oxsz*.mf`, `zarrow.mf`, `zletter.mf`, `zsymbol.mf`
-   - When compiling: Use `TEXINPUTS=../tex//: MFINPUTS=../tex//: pdflatex ...`
 
 2. **Instructor's Z packages** (in this `sem/` directory):
    - `zed-cm.sty` - Z notation in Computer Modern fonts
@@ -164,43 +152,6 @@ PYTHONPATH=src pytest tests
 The project has been using **fuzz** (`../tex/fuzz.sty`) which provides its own Z notation support. The instructor's materials use **zed-*** packages. These are different implementations:
 - **fuzz**: Mike Spivey's Z notation package (what we've been using)
 - **zed-***: Alternative Z notation packages (instructor's preference)
-
-**Decision needed**: The new system should support both, or choose one. The current txt2tex_v3.py generates LaTeX that uses fuzz.
-
-## Previous Work
-
-### Version History
-
-1. **txt2tex_v1.py** - Initial attempt (not in current directory)
-2. **txt2tex_v2.py** - Iteration (not in current directory)
-3. **txt2tex_v3.py** - Current implementation (in parent directory: `/Users/jfreeman/Coding/fuzz/txt2tex/`)
-
-### txt2tex_v3.py Architecture (Current - Regex-based)
-
-**Location**: `/Users/jfreeman/Coding/fuzz/txt2tex/txt2tex_v3.py`
-
-**Approach**: Pure regex/string replacement
-- Dictionary of operator mappings (`self.ops`)
-- Regex patterns for structural elements
-- Character-by-character iteration for escaping
-- No parser, no AST, no semantic understanding
-
-**Key Issues Fixed** (chronologically):
-1. ✅ Solution spacing (added `\bigskip`, `\noindent`)
-2. ✅ Line spacing between parts (added `\medskip`)
-3. ✅ Implication symbol `[=>]` in justifications
-4. ✅ "De Morgan" corruption (word boundaries)
-5. ✅ `[<=>]` operator ordering
-6. ✅ `[or and true]` position-based replacement
-7. ✅ Bullet symbol `|` → `\bullet`
-8. ✅ Superscript handling `x^2` → `$x^{2}$`
-
-**Current Problems with Regex Approach**:
-- Fragile: Each fix creates new edge cases
-- Context-blind: Can't distinguish math from prose reliably
-- Order-dependent: Replacement order matters critically
-- Hard to maintain: Growing complexity with each feature
-- No semantic understanding: Just pattern matching
 
 ### Test Files
 
@@ -297,50 +248,26 @@ where
 end
 ```
 
-## Git Repository
-
-- **Current**: Not in version control
-- **Needed**: Initialize git in `/Users/jfreeman/Coding/fuzz/txt2tex/sem/`
-
 ## User's Preferences
 
 From conversation:
-1. ✅ "OK to require non-ASCII symbols in txt format" - User is willing to type Unicode directly
-2. ✅ "Want to write like on a whiteboard" - Natural, minimal syntax
-3. ✅ "Willing to hunt down very small issues in LaTeX" - Doesn't need 100% perfection
-4. ✅ "Want fuzz validation as a feature" - Typechecking is important
-5. ✅ "Need submission-ready PDFs" - High quality output required
+1. ✅ "Want to write like on a whiteboard"
+2. ✅ "Willing to hunt down very small issues in LaTeX"
+3. ✅ "Want fuzz validation as a feature" - Typechecking is important
+4. ✅ "Need submission-ready PDFs" - High quality output required
 
-## Next Steps (As of Session Pause)
-
-1. ❌ **Pause regex approach** - Acknowledged it's fragile
-2. ⏳ **Design proper rewrite** - Need parser-based approach
-3. ⏳ **Set up sem/ directory** - New project location
-4. ⏳ **Initialize git** - Version control
-5. ⏳ **Create documentation**:
+⏳ **Create documentation**:
    - CLAUDE.md (this file) ✅
-   - DESIGN.md (software design)
    - README.md (user-facing)
+   - docs/DESIGN.md (software design)
 
 ## Important Notes for Claude
-
-### When Compiling LaTeX
-Always use the TEXINPUTS and MFINPUTS environment variables to ensure fuzz fonts and styles are found:
-```bash
-TEXINPUTS=../tex//: MFINPUTS=../tex//: pdflatex file.tex
-```
-
-### When Testing
-Compare output against `/Users/jfreeman/Coding/fuzz/txt2tex/solutions.pdf` (reference).
 
 ### When Making Design Decisions
 - Prioritize correctness over convenience
 - User prefers robust solution over quick hacks
 - Typechecking with fuzz is a core feature, not optional
 - Output must be submission-quality
-
-### Code Quality
-User noticed we were "refining regex over and over again" and wants a proper architecture. They value understanding the approach, not just making it work.
 
 ## Debugging Tips
 
@@ -399,32 +326,6 @@ When you encounter a bug:
 
 **Bug Test Cases**: All bugs have minimal reproducible test cases in `tests/bugs/` - see [tests/bugs/README.md](tests/bugs/README.md).
 
-## File Locations
-
-```
-/Users/jfreeman/Coding/fuzz/txt2tex/
-├── tex/                          # fuzz package and fonts
-│   ├── fuzz.sty
-│   ├── oxsz*.mf
-│   └── z*.mf
-├── txt2tex_v3.py                 # Current implementation (regex-based)
-├── solutions_complete.txt        # Test input
-├── solutions.pdf                 # Reference output
-├── solutions_complete.tex        # Generated LaTeX
-├── solutions_complete.pdf        # Generated PDF
-└── sem/                          # NEW PROJECT DIRECTORY
-    ├── zed-cm.sty               # Instructor's Z packages
-    ├── zed-float.sty
-    ├── zed-lbr.sty
-    ├── zed-maths.sty
-    ├── zed-proof.sty
-    ├── test.tex                  # Instructor's example
-    ├── glossary.pdf              # Reference material
-    ├── CLAUDE.md                 # This file
-    ├── DESIGN.md                 # Software design (to create)
-    └── README.md                 # User documentation (to create)
-```
-
 ## Measuring Completeness
 
 **CRITICAL: Run this measurement at the END of EVERY phase of work.**
@@ -467,33 +368,21 @@ After each phase, record:
 
 ### Current Status
 
-**Last measured**: Phase 11d (Lambda expressions)
-**Solutions implemented**: Partial (exact count TBD - need to measure)
-**Total solutions**: 52 (Solutions 1-52 in solutions_full.pdf)
-**Coverage**: ~35% estimated (needs verification)
-
 **Known gaps**:
 - Schema composition operators (not yet implemented)
 - Function override syntax (not yet implemented)
 - Sequence notation (not yet implemented)
 - Free type induction (partially implemented)
 
-### Improvement Strategy
-
-1. After each phase, try to add 2-5 more solutions to solutions.txt
-2. Focus on solutions that use newly implemented features
-3. Keep solutions.txt rendering successfully (don't break it)
-4. Document which solutions are blocked by missing features
-
 ## Session Management
 
 User mentioned: "I can exit our session and resume our session from the sem directory if that will make things easier."
 
 If starting fresh from `/Users/jfreeman/Coding/fuzz/txt2tex/sem/`:
-1. Remember fuzz is in `../tex/`
-2. Test files are in parent directory `../`
+1. Remember fuzz is in `./latex/`
+2. Test files are in parent directory `./tests/`
 3. Use workflow commands at the top of this document
 4. Reference this document for context
 - always run hatch run check before each micro-commit and solve 100% of any issues reported
-- there are no pre-existing issues that should be used to justify anyting
+- there are no pre-existing issues that should be used to justify anything
 - success is defined as 100%. Do not ask to settle for lower standards of success.
