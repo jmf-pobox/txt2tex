@@ -453,7 +453,8 @@ class LaTeXGenerator:
 
         # Add parentheses if operand is a binary operator
         # (unary has higher precedence than all binary operators)
-        if isinstance(node.operand, BinaryOp):
+        # Phase 29: Skip if operand has explicit_parens (it will add its own)
+        if isinstance(node.operand, BinaryOp) and not node.operand.explicit_parens:
             operand = f"({operand})"
 
         # Add parentheses for function application with fuzz mode
@@ -506,6 +507,12 @@ class LaTeXGenerator:
 
         # Only binary ops need precedence checking
         if not isinstance(child, BinaryOp):
+            return False
+
+        # Phase 29: If child has explicit parentheses from source, don't add
+        # precedence-based parentheses. The child will add its own parens
+        # when generated. Prevents double parenthesization ((A \land B))
+        if child.explicit_parens:
             return False
 
         child_prec = self.PRECEDENCE.get(child.operator, 999)
@@ -602,12 +609,20 @@ class LaTeXGenerator:
             # EQUIV blocks use array format and need & prefix for column alignment
             # Schemas and proofs use plain \\ without & prefix
             if self._in_equiv_block:
-                return f"{left} {op_latex} \\\\\n& \\quad {right}"
+                result = f"{left} {op_latex} \\\\\n& \\quad {right}"
             else:
-                return f"{left} {op_latex} \\\\\n\\quad {right}"
+                result = f"{left} {op_latex} \\\\\n\\quad {right}"
         else:
             # Single-line expression
-            return f"{left} {op_latex} {right}"
+            result = f"{left} {op_latex} {right}"
+
+        # Phase 29: Honor explicit parentheses from source
+        # If the user explicitly wrote (expr), preserve those parentheses
+        # regardless of precedence rules. This maintains semantic grouping clarity.
+        if node.explicit_parens:
+            result = f"({result})"
+
+        return result
 
     def _generate_quantifier(self, node: Quantifier, parent: Expr | None = None) -> str:
         """Generate LaTeX for quantifier (forall, exists, exists1, mu).

@@ -22,12 +22,18 @@ class BinaryOp(ASTNode):
 
     Phase 27: Added line_break_after to support multi-line expressions.
     When line_break_after is True, LaTeX generator inserts \\\\ after the operator.
+
+    Phase 29: Added explicit_parens to preserve user-written parentheses.
+    When explicit_parens is True, parentheses are always generated in LaTeX output,
+    even if not required by precedence rules. This preserves semantic grouping and
+    clarity from the source text.
     """
 
     operator: str
     left: Expr
     right: Expr
     line_break_after: bool = False  # True if \\ continuation follows operator
+    explicit_parens: bool = False  # True if expression was explicitly wrapped in ()
 
 
 @dataclass(frozen=True)
