@@ -17,16 +17,17 @@
 
 \bigskip
 
-When a quantifier binds a variable that is constrained by equality, we can eliminate the quantifier:
+When a quantifier binds a variable that is constrained by equality,
+we can eliminate the quantifier:
 
 \bigskip
 
 \[
-\begin{array}{ll@{\hspace{2em}}l}
-& \exists y : \nat @ y = 5 \land x > y \\
-&\Leftrightarrow 5 \in \nat \land x > 5 & [\mbox{one - point rule}] \\
-&\Leftrightarrow x > 5
-\end{array}
+  \begin{array}{ll@{\hspace{2em}}l}
+    & \exists y : \nat @ y = 5 \land x > y \\
+    &\Leftrightarrow 5 \in \nat \land x > 5 & [\mbox{one - point rule}] \\
+    &\Leftrightarrow x > 5
+  \end{array}
 \]
 
 \bigskip
@@ -36,12 +37,12 @@ When a quantifier binds a variable that is constrained by equality, we can elimi
 \medskip
 
 \[
-\begin{array}{ll@{\hspace{2em}}l}
-& \exists x, y : \nat @ x + y = 4 \land x < y \\
-&\Leftrightarrow \exists x, y : \nat @ y = 4 - x \land x < y \\
-&\Leftrightarrow \exists x : \nat @ 4 - x \in \nat \land x < 4 - x \\
-&\Leftrightarrow true
-\end{array}
+  \begin{array}{ll@{\hspace{2em}}l}
+    & \exists x, y : \nat @ x + y = 4 \land x < y \\
+    &\Leftrightarrow \exists x, y : \nat @ y = 4 - x \land x < y \\
+    &\Leftrightarrow \exists x : \nat @ 4 - x \in \nat \land x < 4 - x \\
+    &\Leftrightarrow true
+  \end{array}
 \]
 
 \bigskip
@@ -57,13 +58,15 @@ The final equivalence holds because $0 \in N$, $4 - 0 \in N$, and 0 $<$ 4.
 \medskip
 
 \[
-\begin{array}{ll@{\hspace{2em}}l}
-& \exists x : \nat @ (x = 1 \land x > y) \lor (x = 2 \land x > z) \\
-&\Leftrightarrow (\exists x : \nat @ x = 1 \land x > y) \lor (\exists x : \nat @ x = 2 \land x > z) \\
-&\Leftrightarrow (1 \in \nat \land 1 > y) \lor (\exists x : \nat @ x = 2 \land x > z) \\
-&\Leftrightarrow (1 \in \nat \land 1 > y) \lor (2 \in \nat \land 2 > z) \\
-&\Leftrightarrow 1 > y \lor 2 > z
-\end{array}
+  \begin{array}{ll@{\hspace{2em}}l}
+    & \exists x : \nat @ (x = 1 \land x > y) \lor (x = 2 \land x > z) \\
+    &\Leftrightarrow (\exists x : \nat @ x = 1 \land x > y) \lor
+    (\exists x : \nat @ x = 2 \land x > z) \\
+    &\Leftrightarrow (1 \in \nat \land 1 > y) \lor (\exists x : \nat
+    @ x = 2 \land x > z) \\
+    &\Leftrightarrow (1 \in \nat \land 1 > y) \lor (2 \in \nat \land 2 > z) \\
+    &\Leftrightarrow 1 > y \lor 2 > z
+  \end{array}
 \]
 
 \bigskip
@@ -73,11 +76,12 @@ The final equivalence holds because $0 \in N$, $4 - 0 \in N$, and 0 $<$ 4.
 \medskip
 
 \[
-\begin{array}{ll@{\hspace{2em}}l}
-& \exists y : \nat @ y = x + 1 \land y > 0 \\
-&\Leftrightarrow x + 1 \in \nat \land x + 1 > 0 & [\mbox{one - point rule}] \\
-&\Leftrightarrow x + 1 > 0
-\end{array}
+  \begin{array}{ll@{\hspace{2em}}l}
+    & \exists y : \nat @ y = x + 1 \land y > 0 \\
+    &\Leftrightarrow x + 1 \in \nat \land x + 1 > 0 & [\mbox{one -
+    point rule}] \\
+    &\Leftrightarrow x + 1 > 0
+  \end{array}
 \]
 
 \end{document}

@@ -13,18 +13,21 @@
 
 \medskip
 
-\begin{zed}[Entry]\end{zed}
+\begin{zed}[Entry]
+\end{zed}
 
 \begin{axdef}
-filter : \seq Entry \fun \seq Entry
-\where
-filter(\langle \rangle) = \langle \rangle \\
-\forall x : Entry @ \forall s : \seq Entry @ filter(\langle x \rangle \cat s) = \langle x \rangle \cat filter(s)
+  filter : \seq Entry \fun \seq Entry
+  \where
+  filter(\langle \rangle) = \langle \rangle \\
+  \forall x : Entry @ \forall s : \seq Entry @ filter(\langle x
+  \rangle \cat s) = \langle x \rangle \cat filter(s)
 \end{axdef}
 
 \bigskip
 
-This demonstrates pattern matching on sequences with base case ($\langle \rangle$) and recursive case ($\langle x \rangle$ ^ s).
+This demonstrates pattern matching on sequences with base case
+($\langle \rangle$) and recursive case ($\langle x \rangle$ ^ s).
 
 \bigskip
 

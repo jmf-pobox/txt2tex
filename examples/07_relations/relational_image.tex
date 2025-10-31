@@ -28,7 +28,6 @@ The relational image R(| S |) gives the image of set S under relation R.
 \noindent
 $(R \limg S \rimg)$
 
-
 \bigskip
 \noindent
 \textbf{Example 2 : Relational image with set literal}
@@ -37,7 +36,6 @@ $(R \limg S \rimg)$
 
 \noindent
 $(R \limg \{1, 2, 3\} \rimg)$
-
 
 \bigskip
 \noindent
@@ -48,7 +46,6 @@ $(R \limg \{1, 2, 3\} \rimg)$
 \noindent
 $(parentOf \limg \{john\} \rimg)$
 
-
 \bigskip
 \noindent
 \textbf{Example 4 : Relational image with composition}
@@ -57,7 +54,6 @@ $(parentOf \limg \{john\} \rimg)$
 
 \noindent
 $((R \circ S) \limg A \rimg)$
-
 
 \bigskip
 \noindent
@@ -68,16 +64,15 @@ $((R \circ S) \limg A \rimg)$
 \noindent
 $(R^{-1} \limg S \rimg)$
 
-
 \bigskip
 \noindent
-\textbf{Example 6 : Set comprehension with relational image ( Solution 35 pattern )}
+\textbf{Example 6 : Set comprehension with relational image (
+Solution 35 pattern )}
 
 \medskip
 
 \noindent
 $\{ p : Person | p \in \dom parentOf @ (p, (parentOf \limg \{p\} \rimg)) \}$
-
 
 \bigskip
 \noindent
@@ -87,6 +82,5 @@ $\{ p : Person | p \in \dom parentOf @ (p, (parentOf \limg \{p\} \rimg)) \}$
 
 \noindent
 $((R \limg S \rimg) \limg T \rimg)$
-
 
 \end{document}

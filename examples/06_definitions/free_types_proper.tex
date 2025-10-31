@@ -16,10 +16,10 @@
 \medskip
 
 \begin{axdef}
-dummy : \nat
-\where
-dummy = 0 \\
-\forall x : \nat @ \forall y : \nat @ x + y > 0
+  dummy : \nat
+  \where
+  dummy = 0 \\
+  \forall x : \nat @ \forall y : \nat @ x + y > 0
 \end{axdef}
 
 \bigskip
@@ -28,13 +28,15 @@ dummy = 0 \\
 
 \medskip
 
-\begin{zed}[Entry]\end{zed}
+\begin{zed}[Entry]
+\end{zed}
 
 \begin{axdef}
-seqlen : \seq Entry \fun \nat
-\where
-seqlen(\langle \rangle) = 0 \\
-\forall x : Entry @ \forall s : \seq Entry @ seqlen(\langle x \rangle \cat s) = 1 + seqlen(s)
+  seqlen : \seq Entry \fun \nat
+  \where
+  seqlen(\langle \rangle) = 0 \\
+  \forall x : Entry @ \forall s : \seq Entry @ seqlen(\langle x
+  \rangle \cat s) = 1 + seqlen(s)
 \end{axdef}
 
 \bigskip
@@ -43,13 +45,14 @@ seqlen(\langle \rangle) = 0 \\
 
 \medskip
 
-\begin{zed}[Person]\end{zed}
+\begin{zed}[Person]
+\end{zed}
 
 \begin{axdef}
-constraint : \nat
-\where
-constraint = 1 \\
-\forall p : Person @ \forall n : \nat @ n > 0
+  constraint : \nat
+  \where
+  constraint = 1 \\
+  \forall p : Person @ \forall n : \nat @ n > 0
 \end{axdef}
 
 \end{document}

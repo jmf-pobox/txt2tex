@@ -18,7 +18,6 @@
 \noindent
 $1 \upto 10$
 
-
 \bigskip
 \noindent
 \textbf{Test 2 : Range with Identifiers}
@@ -27,7 +26,6 @@ $1 \upto 10$
 
 \noindent
 $1993 \upto current$
-
 
 \bigskip
 \noindent
@@ -38,7 +36,6 @@ $1993 \upto current$
 \noindent
 $\{ x : 1 \upto 20 | x \mod 2 = 0 \}$
 
-
 \bigskip
 \noindent
 \textbf{Test 4 : Range with Expressions}
@@ -48,7 +45,6 @@ $\{ x : 1 \upto 20 | x \mod 2 = 0 \}$
 \noindent
 $a + 1 \upto b + 2$
 
-
 \bigskip
 \noindent
 \textbf{Test 5 : Range in Schema}
@@ -56,9 +52,9 @@ $a + 1 \upto b + 2$
 \medskip
 
 \begin{schema}{ValidYear}
-year : 1900 \upto 2100
-\where
-year \geq 1900
+  year : 1900 \upto 2100
+  \where
+  year \geq 1900
 \end{schema}
 
 \bigskip
@@ -70,7 +66,6 @@ year \geq 1900
 \noindent
 $1 \upto 5 \cup 10 \upto 15$
 
-
 \bigskip
 \noindent
 \textbf{Test 7 : Range with Tuple Projections}
@@ -80,7 +75,6 @@ $1 \upto 5 \cup 10 \upto 15$
 \noindent
 $p.1 \upto p.2$
 
-
 \bigskip
 \noindent
 \textbf{Test 8 : Complex Set Comprehension}
@@ -89,6 +83,5 @@ $p.1 \upto p.2$
 
 \noindent
 $\{ x : 1 \upto 10 | x > 3 @ x^2 \}$
-
 
 \end{document}

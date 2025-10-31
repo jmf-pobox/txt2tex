@@ -11,7 +11,8 @@
 
 \bigskip
 
-This file demonstrates basic function $definitions \in Z$ notation that work well with fuzz type checking.
+This file demonstrates basic function $definitions \in Z$ notation
+that work well with fuzz type checking.
 
 \bigskip
 
@@ -28,21 +29,21 @@ Total functions are defined over their entire domain.
 \bigskip
 
 \begin{axdef}
-square : \nat \fun \nat
-\where
-\forall n : \nat @ square(n) = n * n
+  square : \nat \fun \nat
+  \where
+  \forall n : \nat @ square(n) = n * n
 \end{axdef}
 
 \begin{axdef}
-successor : \nat \fun \nat
-\where
-\forall n : \nat @ successor(n) = n + 1
+  successor : \nat \fun \nat
+  \where
+  \forall n : \nat @ successor(n) = n + 1
 \end{axdef}
 
 \begin{axdef}
-double : \nat \fun \nat
-\where
-\forall n : \nat @ double(n) = 2 * n
+  double : \nat \fun \nat
+  \where
+  \forall n : \nat @ double(n) = 2 * n
 \end{axdef}
 
 \bigskip
@@ -58,9 +59,9 @@ Partial functions are not defined over their entire domain.
 \bigskip
 
 \begin{axdef}
-predecessor : \nat \pfun \nat
-\where
-\forall n : \nat @ n > 0 \implies predecessor(n) = n - 1
+  predecessor : \nat \pfun \nat
+  \where
+  \forall n : \nat @ n > 0 \implies predecessor(n) = n - 1
 \end{axdef}
 
 \bigskip
@@ -83,19 +84,19 @@ Generic functions work with any type parameter.
 
 \begin{gendef}[X]
   identity: X \fun X
-\where
+  \where
   \forall x : X @ identity(x) = x
 \end{gendef}
 
 \begin{gendef}[X, Y]
   fst: X \cross Y \fun X
-\where
+  \where
   \forall x : X @ \forall y : Y @ fst(x, y) = x
 \end{gendef}
 
 \begin{gendef}[X, Y]
   snd: X \cross Y \fun Y
-\where
+  \where
   \forall x : X @ \forall y : Y @ snd(x, y) = y
 \end{gendef}
 
@@ -105,10 +106,11 @@ Generic functions work with any type parameter.
 
 \medskip
 
-\begin{zed}[Person, Department]\end{zed}
+\begin{zed}[Person, Department]
+\end{zed}
 
 \begin{axdef}
-assignment : Person \pfun Department
+  assignment : Person \pfun Department
 \end{axdef}
 
 \bigskip
@@ -124,15 +126,15 @@ assignment is a partial function from Person to Department.
 \medskip
 
 \begin{axdef}
-triple : \nat \fun \nat
-\where
-\forall n : \nat @ triple(n) = 3 * n
+  triple : \nat \fun \nat
+  \where
+  \forall n : \nat @ triple(n) = 3 * n
 \end{axdef}
 
 \begin{axdef}
-addOne : \num \fun \num
-\where
-\forall n : \num @ addOne(n) = n + 1
+  addOne : \num \fun \num
+  \where
+  \forall n : \num @ addOne(n) = n + 1
 \end{axdef}
 
 \bigskip
@@ -141,10 +143,11 @@ addOne : \num \fun \num
 
 \medskip
 
-\begin{zed}[Student, Grade]\end{zed}
+\begin{zed}[Student, Grade]
+\end{zed}
 
 \begin{axdef}
-grades : Student \pfun Grade
+  grades : Student \pfun Grade
 \end{axdef}
 
 \bigskip
@@ -160,18 +163,19 @@ grades maps students to their grades.
 \medskip
 
 \begin{axdef}
-f : \nat \fun \nat \\
-g : \nat \fun \nat \\
-h : \nat \fun \nat
-\where
-\forall n : \nat @ f(n) = 2 * n \\
-\forall n : \nat @ g(n) = n + 1 \\
-h = f \circ g
+  f : \nat \fun \nat \\
+  g : \nat \fun \nat \\
+  h : \nat \fun \nat
+  \where
+  \forall n : \nat @ f(n) = 2 * n \\
+  \forall n : \nat @ g(n) = n + 1 \\
+  h = f \circ g
 \end{axdef}
 
 \bigskip
 
-f doubles its input, g adds one to its input. h is their forward $composition : h(n) $= f(g(n)) = 2 * (n + 1).
+f doubles its input, g adds one to its input. h is their forward
+$composition : h(n) $= f(g(n)) = 2 * (n + 1).
 
 \bigskip
 
@@ -182,14 +186,16 @@ f doubles its input, g adds one to its input. h is their forward $composition : 
 \medskip
 
 \begin{axdef}
-modulo3 : \nat \fun \nat
-\where
-\forall n : \nat @ modulo3(n) = n \mod 3
+  modulo3 : \nat \fun \nat
+  \where
+  \forall n : \nat @ modulo3(n) = n \mod 3
 \end{axdef}
 
 \bigskip
 
-For comprehensive function examples including recursive functions, higher-order functions, and advanced patterns, see examples/09_sequences/pattern_matching.txt.
+For comprehensive function examples including recursive functions,
+higher-order functions, and advanced patterns, see
+examples/09_sequences/pattern_matching.txt.
 
 \bigskip
 
