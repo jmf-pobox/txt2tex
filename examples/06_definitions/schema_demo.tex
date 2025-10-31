@@ -16,9 +16,9 @@
 \medskip
 
 \begin{schema}{Counter}
-count : \nat
-\where
-count \geq 0
+  count : \nat
+  \where
+  count \geq 0
 \end{schema}
 
 \bigskip
@@ -28,8 +28,8 @@ count \geq 0
 \medskip
 
 \begin{schema}{Point}
-x : \num \\
-y : \num
+  x : \num \\
+  y : \num
 \end{schema}
 
 \bigskip
@@ -39,11 +39,11 @@ y : \num
 \medskip
 
 \begin{schema}{BoundedPoint}
-x : \nat \\
-y : \nat
-\where
-x \leq 100 \\
-y \leq 100
+  x : \nat \\
+  y : \nat
+  \where
+  x \leq 100 \\
+  y \leq 100
 \end{schema}
 
 \bigskip
@@ -52,14 +52,15 @@ y \leq 100
 
 \medskip
 
-\begin{zed}[Person]\end{zed}
+\begin{zed}[Person]
+\end{zed}
 
 \begin{schema}{PersonData}
-name : Person \\
-age : \nat
-\where
-age \geq 0 \\
-age \leq 150
+  name : Person \\
+  age : \nat
+  \where
+  age \geq 0 \\
+  age \leq 150
 \end{schema}
 
 \end{document}

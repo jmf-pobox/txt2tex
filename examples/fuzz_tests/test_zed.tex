@@ -16,7 +16,7 @@
 \medskip
 
 \begin{zed}
-SimpleConst == 42
+  SimpleConst == 42
 \end{zed}
 
 \bigskip
@@ -26,10 +26,10 @@ SimpleConst == 42
 \medskip
 
 \begin{axdef}
-constraint : \nat
-\where
-constraint = 0 \\
-\forall x : \nat @ x \geq 0
+  constraint : \nat
+  \where
+  constraint = 0 \\
+  \forall x : \nat @ x \geq 0
 \end{axdef}
 
 \bigskip
@@ -39,10 +39,10 @@ constraint = 0 \\
 \medskip
 
 \begin{axdef}
-hasRoot : \nat
-\where
-hasRoot = 4 \\
-\exists n : \nat @ n * n = hasRoot
+  hasRoot : \nat
+  \where
+  hasRoot = 4 \\
+  \exists n : \nat @ n * n = hasRoot
 \end{axdef}
 
 \bigskip
@@ -52,10 +52,10 @@ hasRoot = 4 \\
 \medskip
 
 \begin{axdef}
-sumTen : \nat
-\where
-sumTen = 10 \\
-\forall x : \nat @ \exists y : \nat @ x + y = sumTen
+  sumTen : \nat
+  \where
+  sumTen = 10 \\
+  \forall x : \nat @ \exists y : \nat @ x + y = sumTen
 \end{axdef}
 
 \end{document}

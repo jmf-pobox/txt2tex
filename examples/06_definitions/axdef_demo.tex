@@ -21,11 +21,12 @@ F X denotes all finite subsets of X:
 
 \bigskip
 
-\begin{zed}[SongId, UserId]\end{zed}
+\begin{zed}[SongId, UserId]
+\end{zed}
 
 \begin{axdef}
-songs : \finset SongId \\
-users : \finset UserId
+  songs : \finset SongId \\
+  users : \finset UserId
 \end{axdef}
 
 \bigskip
@@ -41,7 +42,7 @@ F1 X denotes all non-empty finite subsets of X:
 \bigskip
 
 \begin{axdef}
-activeUsers : \finset_1 UserId
+  activeUsers : \finset_1 UserId
 \end{axdef}
 
 \bigskip
@@ -56,12 +57,13 @@ Using F and F1 with partial functions:
 
 \bigskip
 
-\begin{zed}[PlaylistId, Playlist]\end{zed}
+\begin{zed}[PlaylistId, Playlist]
+\end{zed}
 
 \begin{axdef}
-playlists : PlaylistId \pfun Playlist \\
-playlistOwner : PlaylistId \pfun UserId \\
-playlistSubscribers : PlaylistId \pfun \finset_1 UserId
+  playlists : PlaylistId \pfun Playlist \\
+  playlistOwner : PlaylistId \pfun UserId \\
+  playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 \end{axdef}
 
 \end{document}

@@ -24,10 +24,8 @@ The mu operator returns "the unique value that" satisfies a predicate:
 \noindent
 $(\mu x : \nat | x = 5)$
 
-
 \noindent
 $(\mu n : \nat | \forall m : \nat @ n \leq m)$
-
 
 \bigskip
 \noindent
@@ -50,7 +48,6 @@ Since the proposition
 \noindent
 $\exists_1 n : \nat @ \forall m : \nat @ n \leq m$
 
-
 \bigskip
 
 is equivalent to true, we can be certain that
@@ -59,7 +56,6 @@ is equivalent to true, we can be certain that
 
 \noindent
 $(\mu n : \nat | \forall m : \nat @ n \leq m)$
-
 
 \bigskip
 
@@ -82,10 +78,8 @@ Using mu to select unique values:
 \noindent
 $(\mu a : \nat | a = a) = 0$
 
-
 \noindent
 $(\mu z : \num | z = 10) = 10$
-
 
 \bigskip
 \noindent
@@ -102,16 +96,15 @@ When no unique value exists, mu is undefined:
 \noindent
 $(\mu b : \nat | b = b)$
 
-
 \bigskip
 
-This is undefined because the property holds for all natural numbers, not just one.
+This is undefined because the property holds for all natural numbers,
+not just one.
 
 \bigskip
 
 \noindent
 $(\mu c : \nat | c > c)$
-
 
 \bigskip
 

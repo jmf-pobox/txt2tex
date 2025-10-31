@@ -11,7 +11,8 @@
 
 \bigskip
 
-This example demonstrates Z notation definitions with generic (polymorphic) type parameters.
+This example demonstrates Z notation definitions with generic
+(polymorphic) type parameters.
 
 \bigskip
 
@@ -22,7 +23,7 @@ Basic generic abbreviation for a Pair type:
 \bigskip
 
 \begin{zed}
-Pair[X] == X \cross X
+  Pair[X] == X \cross X
 \end{zed}
 
 \bigskip
@@ -32,7 +33,7 @@ Generic abbreviation with two type parameters:
 \bigskip
 
 \begin{zed}
-Product[X, Y] == X \cross Y
+  Product[X, Y] == X \cross Y
 \end{zed}
 
 \bigskip
@@ -43,7 +44,7 @@ Generic axiomatic definition with constraints:
 
 \begin{gendef}[T]
   identity: T
-\where
+  \where
   identity = identity
 \end{gendef}
 
@@ -54,10 +55,10 @@ Generic schema for a collection:
 \bigskip
 
 \begin{schema}{Collection}[X]
-items : \seq X \\
-count : \nat
-\where
-count = \# items
+  items : \seq X \\
+  count : \nat
+  \where
+  count = \# items
 \end{schema}
 
 \bigskip
@@ -67,8 +68,8 @@ Generic schema with multiple parameters:
 \bigskip
 
 \begin{schema}{Tuple}[X, Y]
-first : X \\
-second : Y
+  first : X \\
+  second : Y
 \end{schema}
 
 \bigskip
@@ -78,19 +79,19 @@ Non-generic definitions still work as before:
 \bigskip
 
 \begin{zed}
-Naturals == \nat
+  Naturals == \nat
 \end{zed}
 
 \begin{axdef}
-zero : \nat
-\where
-zero = 0
+  zero : \nat
+  \where
+  zero = 0
 \end{axdef}
 
 \begin{schema}{Counter}
-value : \nat
-\where
-value \geq 0
+  value : \nat
+  \where
+  value \geq 0
 \end{schema}
 
 \end{document}
