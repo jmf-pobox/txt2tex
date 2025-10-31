@@ -46,8 +46,18 @@ echo "Converting: $INPUT"
 echo "Output: $PDF_FILE"
 echo ""
 
+# Calculate total steps for progress display
+TOTAL_STEPS=3  # Generate, Copy deps, Compile
+if command -v tex-fmt > /dev/null 2>&1; then
+    TOTAL_STEPS=$((TOTAL_STEPS + 1))
+fi
+if [ -n "$FUZZ_FLAG" ]; then
+    TOTAL_STEPS=$((TOTAL_STEPS + 1))
+fi
+
 # Step 1: Generate LaTeX
-echo "Step 1/2: Generating LaTeX..."
+CURRENT_STEP=1
+echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Generating LaTeX..."
 (cd "$SCRIPT_DIR" && PYTHONPATH="${SCRIPT_DIR}/src" python -m txt2tex.cli "$INPUT" -o "$TEX_FILE" $FUZZ_FLAG)
 
 if [ ! -f "$TEX_FILE" ]; then
@@ -57,9 +67,18 @@ fi
 
 echo "  → Generated: $TEX_FILE"
 
-# Step 2: Type check with fuzz (if --fuzz flag is set)
+# Step 2: Format LaTeX with tex-fmt (if available)
+if command -v tex-fmt > /dev/null 2>&1; then
+    CURRENT_STEP=$((CURRENT_STEP + 1))
+    echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Formatting LaTeX..."
+    cd "$INPUT_DIR" && tex-fmt "${INPUT_BASE}.tex" 2>&1 || echo "  ⚠ Warning: tex-fmt formatting had issues (continuing anyway)"
+    echo "  → Formatted: $TEX_FILE"
+fi
+
+# Step 3: Type check with fuzz (if --fuzz flag is set)
 if [ -n "$FUZZ_FLAG" ]; then
-    echo "Step 2/3: Type checking with fuzz..."
+    CURRENT_STEP=$((CURRENT_STEP + 1))
+    echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Type checking with fuzz..."
 
     # Check if fuzz command exists
     if ! command -v fuzz > /dev/null 2>&1; then
@@ -83,13 +102,11 @@ if [ -n "$FUZZ_FLAG" ]; then
     fi
 
     echo "  → Type check passed"
-    STEP_NUM="3/3"
-else
-    STEP_NUM="2/2"
 fi
 
-# Step 3: Copy LaTeX dependencies locally
-echo "Step ${STEP_NUM}: Preparing LaTeX dependencies..."
+# Step 4: Copy LaTeX dependencies locally
+CURRENT_STEP=$((CURRENT_STEP + 1))
+echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Preparing LaTeX dependencies..."
 
 # Copy LaTeX packages and METAFONT sources to build directory
 # This makes the LaTeX self-contained and portable
@@ -98,13 +115,9 @@ cp "${SCRIPT_DIR}/latex"/*.mf "$INPUT_DIR/" 2>/dev/null || true
 
 echo "  → LaTeX dependencies copied locally"
 
-# Step 4: Compile to PDF
-COMPILE_STEP=$((${STEP_NUM%%/*} + 1))
-if [ -n "$FUZZ_FLAG" ]; then
-    echo "Step ${COMPILE_STEP}/4: Compiling PDF..."
-else
-    echo "Step ${COMPILE_STEP}/3: Compiling PDF..."
-fi
+# Step 5: Compile to PDF
+CURRENT_STEP=$((CURRENT_STEP + 1))
+echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Compiling PDF..."
 
 # Use latexmk to handle multiple passes automatically
 # It runs pdflatex as many times as needed until citations/references resolve
