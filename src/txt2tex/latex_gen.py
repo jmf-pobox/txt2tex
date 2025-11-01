@@ -113,6 +113,7 @@ class LaTeXGenerator:
         "-->>": r"\surj",  # Total surjection
         "+->>": r"\psurj",  # Partial surjection
         ">->>": r"\bij",  # Bijection
+        ">7->": r"\pbij",  # Partial bijection (Phase 33)
         # Arithmetic operators
         "+": r"+",  # Addition (also postfix in relational context)
         "-": r"-",  # Subtraction (Phase 16)
@@ -191,6 +192,7 @@ class LaTeXGenerator:
         "-->>": 6,
         "+->>": 6,
         ">->>": 6,
+        ">7->": 6,  # Partial bijection (Phase 33)
         # Set operators - highest precedence
         "in": 7,
         "notin": 7,
@@ -1344,6 +1346,7 @@ class LaTeXGenerator:
         replacements = [
             # 4-character operators (process first)
             (">->>", r"\bij"),  # Bijection
+            (">7->", r"\pbij"),  # Partial bijection (Phase 33)
             ("+->>", r"\psurj"),  # Partial surjection
             ("-->>", r"\surj"),  # Total surjection
             # 3-character operators
@@ -1400,6 +1403,9 @@ class LaTeXGenerator:
 
         # 4-character operators (process first)
         text = self._replace_outside_math(text, ">->>", r"\bij")  # Bijection
+        text = self._replace_outside_math(
+            text, ">7->", r"\pbij"
+        )  # Partial bijection (Phase 33)
         text = self._replace_outside_math(text, "+->>", r"\psurj")  # Partial surjection
         text = self._replace_outside_math(text, "-->>", r"\surj")  # Total surjection
 
@@ -2209,7 +2215,7 @@ class LaTeXGenerator:
         # Match: func_name arg operator value (e.g., "cumulative_total hd <= 12000")
         # ONLY matches identifiers with underscores to avoid false positives with prose
         # This must come before Pattern 3 to catch function applications
-        math_op_pattern = r"(\+->|-\|>|<-\||->|>->|>->>|<=>|=>|>=|<=|!=|>|<|=)"
+        math_op_pattern = r"(\+->|-\|>|<-\||->|>->|>->>|>7->|<=>|=>|>=|<=|!=|>|<|=)"
         func_app_pattern = (
             r"\b([a-zA-Z_]\w*_\w+)\s+"  # Function name (must contain underscore)
             r"([a-zA-Z_]\w*)\s*"  # Argument
@@ -2406,6 +2412,7 @@ class LaTeXGenerator:
 
         # 4-character operators (process first)
         result = result.replace(">->>", r"$\bij$")  # Bijection
+        result = result.replace(">7->", r"$\pbij$")  # Partial bijection (Phase 33)
         result = result.replace("+->>", r"$\psurj$")  # Partial surjection
         result = result.replace("-->>", r"$\surj$")  # Total surjection
 
@@ -3309,6 +3316,7 @@ class LaTeXGenerator:
 
             # 4-character operators
             op_latex = op_latex.replace(">->>", r"\bij")
+            op_latex = op_latex.replace(">7->", r"\pbij")  # Phase 33
             op_latex = op_latex.replace("+->>", r"\psurj")
             op_latex = op_latex.replace("-->>", r"\surj")
 
@@ -3362,6 +3370,7 @@ class LaTeXGenerator:
 
             # 4-character operators
             op_latex = op_latex.replace(">->>", r"\bij")
+            op_latex = op_latex.replace(">7->", r"\pbij")  # Phase 33
             op_latex = op_latex.replace("+->>", r"\psurj")
             op_latex = op_latex.replace("-->>", r"\surj")
 
@@ -3405,6 +3414,7 @@ class LaTeXGenerator:
 
         # 4-character operators
         result = result.replace(">->>", r"\bij")
+        result = result.replace(">7->", r"\pbij")  # Phase 33
         result = result.replace("+->>", r"\psurj")
         result = result.replace("-->>", r"\surj")
 

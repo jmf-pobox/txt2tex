@@ -243,7 +243,8 @@ not (p and q)
 - `+->` → $\pfun$ (partial function)
 - `>->` → $\inj$ (injection)
 - `-->>` → $\surj$ (surjection)
-- `>->>` → $\bij$ (bijection)
+- `>->>` → $\bij$ (total bijection)
+- `>7->` → $\pbij$ (partial bijection)
 
 **Relation functions:**
 - `dom`, `ran`, `comp`, `inv`, `id`
@@ -782,6 +783,7 @@ f : X -->> Y     →  X ↠ Y       [total surjection]
 **Bijections (one-to-one and onto):**
 ```
 f : X >->> Y     →  X ⤖ Y       [total bijection]
+f : X >7-> Y     →  X ↣→ Y      [partial bijection]
 ```
 
 **Finite Functions:**
@@ -1498,7 +1500,7 @@ Mathematical operators in justifications are automatically converted to LaTeX sy
 - `++` → $\oplus$ (override)
 
 **Function type operators:**
-- `->` → $\fun$, `+->` → $\pfun$, `>->` → $\inj$, `-->>` → $\surj$, `>->>` → $\bij$
+- `->` → $\fun$, `+->` → $\pfun$, `>->` → $\inj$, `-->>` → $\surj$, `>->>` → $\bij$, `>7->` → $\pbij$
 
 **Relation functions:**
 - `dom`, `ran`, `comp`, `inv`, `id`
