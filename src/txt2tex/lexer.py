@@ -306,6 +306,19 @@ class Lexer:
             self._advance()
             return Token(TokenType.BIJECTION, ">->>", start_line, start_column)
 
+        # Check 4-character: >7-> (partial bijection, Phase 33)
+        if (
+            char == ">"
+            and self._peek_char() == "7"
+            and self._peek_char(2) == "-"
+            and self._peek_char(3) == ">"
+        ):
+            self._advance()
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.PBIJECTION, ">7->", start_line, start_column)
+
         # Check 3-character: >+>, >->
         if char == ">" and self._peek_char() == "+" and self._peek_char(2) == ">":
             self._advance()
