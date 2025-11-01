@@ -1086,16 +1086,20 @@ n^k              →  nᵏ
 
 ```
 s ↾ A            →  s ↾ A       [sequence filter - restricts sequence s to elements in set A]
+s filter A       →  s ↾ A       [ASCII alternative using 'filter' keyword]
 ```
 
-The filter operator `↾` (U+21BE) filters a sequence to only include elements from a given set.
+The filter operator restricts a sequence to only include elements from a given set.
+
+**ASCII Notation:** Use the `filter` keyword (e.g., `s filter A`)
+**Unicode Alternative:** Use `↾` (U+21BE) if preferred
 
 **Example:**
 ```
-records ↾ {x : Entry | x.viewed = yes}    [filter sequence to viewed entries]
+records filter {x : Entry | x.viewed = yes}    [filter sequence to viewed entries]
 ```
 
-**Note:** The filter operator is Unicode-only (no ASCII alternative). It's distinct from `|>` (range restriction for relations).
+**Note:** The filter operator is distinct from `|>` (range restriction for relations).
 
 ### Sequence Length
 
@@ -1152,6 +1156,17 @@ bag(X)           →  bag X       [set of all bags of type X]
 [[x]]            →  ⟦x⟧         [bag]
 [[a, b, c]]      →  ⟦a, b, c⟧
 ```
+
+**Bag union:**
+```
+b1 ⊎ b2          →  b1 ⊎ b2     [bag union - combines two bags]
+b1 bag_union b2  →  b1 ⊎ b2     [ASCII alternative using 'bag_union' keyword]
+```
+
+The bag union operator combines two bags, preserving multiplicities (unlike set union which removes duplicates).
+
+**ASCII Notation:** Use the `bag_union` keyword (e.g., `b1 bag_union b2`)
+**Unicode Alternative:** Use `⊎` (U+228E) if preferred
 
 ---
 

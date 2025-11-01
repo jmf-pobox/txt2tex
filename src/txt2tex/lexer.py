@@ -1055,6 +1055,14 @@ class Lexer:
         if value == "bigcap":
             return Token(TokenType.BIGCAP, value, start_line, start_column)
 
+        # Check for sequence filter operator (Phase 35 - ASCII alternative)
+        if value == "filter":
+            return Token(TokenType.FILTER, value, start_line, start_column)
+
+        # Check for bag union operator (Phase 35 - ASCII alternative)
+        if value == "bag_union":
+            return Token(TokenType.BAG_UNION, value, start_line, start_column)
+
         # Regular identifier (includes seq, seq1)
         return Token(TokenType.IDENTIFIER, value, start_line, start_column)
 
