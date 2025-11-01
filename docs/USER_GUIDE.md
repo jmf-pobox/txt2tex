@@ -245,6 +245,7 @@ not (p and q)
 - `-->>` → $\surj$ (surjection)
 - `>->>` → $\bij$ (total bijection)
 - `>7->` → $\pbij$ (partial bijection)
+- `7 7->` → $\ffun$ (finite partial function)
 
 **Relation functions:**
 - `dom`, `ran`, `comp`, `inv`, `id`
@@ -786,8 +787,10 @@ f : X >->> Y     →  X ⤖ Y       [total bijection]
 f : X >7-> Y     →  X ↣→ Y      [partial bijection]
 ```
 
-**Finite Functions:**
-Note: Finite functions are not yet implemented.
+**Finite partial functions:**
+```
+f : Year 7 7-> Table     →  Year ⇸ Table    [finite partial function]
+```
 
 ### Function Application
 
@@ -1500,7 +1503,7 @@ Mathematical operators in justifications are automatically converted to LaTeX sy
 - `++` → $\oplus$ (override)
 
 **Function type operators:**
-- `->` → $\fun$, `+->` → $\pfun$, `>->` → $\inj$, `-->>` → $\surj$, `>->>` → $\bij$, `>7->` → $\pbij$
+- `->` → $\fun$, `+->` → $\pfun$, `>->` → $\inj$, `-->>` → $\surj$, `>->>` → $\bij$, `>7->` → $\pbij$, `7 7->` → $\ffun$
 
 **Relation functions:**
 - `dom`, `ran`, `comp`, `inv`, `id`

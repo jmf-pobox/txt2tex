@@ -1120,6 +1120,7 @@ class Parser:
             TokenType.PSURJ,  # +->>
             TokenType.BIJECTION,  # >->>
             TokenType.PBIJECTION,  # >7-> (Phase 33)
+            TokenType.FINFUN,  # 7 7-> (Phase 34)
             TokenType.IMPLIES,  # =>
             TokenType.IFF,  # <=>
         ):
@@ -1816,6 +1817,7 @@ class Parser:
             TokenType.PSURJ,  # +->>
             TokenType.BIJECTION,  # >->>
             TokenType.PBIJECTION,  # >7-> (Phase 33)
+            TokenType.FINFUN,  # 7 7-> (Phase 34)
         ):
             arrow_token = self._advance()
             # Right-associative: recursively parse the right side as function type
