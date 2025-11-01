@@ -110,7 +110,7 @@ class Parser:
         union      ::= intersect ( 'union' intersect )*
         intersect  ::= unary ( 'intersect' unary )*
         unary      ::= 'not' unary | postfix
-        postfix    ::= atom ( '^' atom | '_' atom | '~' | '+' | '*' )*
+        postfix    ::= atom ( '^' atom | '_' atom | '~' | '+' | '*' | 'r' )*
         atom       ::= ('dom' | 'ran' | 'inv' | 'id') atom |
                        IDENTIFIER | NUMBER | '(' expr ')'
 
@@ -1128,7 +1128,6 @@ class Parser:
             TokenType.TSURJ,  # -->>
             TokenType.PSURJ,  # +->>
             TokenType.BIJECTION,  # >->>
-            TokenType.PBIJECTION,  # >7-> (Phase 33)
             TokenType.FINFUN,  # 77-> (Phase 34)
             TokenType.IMPLIES,  # =>
             TokenType.IFF,  # <=>
@@ -1825,7 +1824,6 @@ class Parser:
             TokenType.TSURJ,  # -->>
             TokenType.PSURJ,  # +->>
             TokenType.BIJECTION,  # >->>
-            TokenType.PBIJECTION,  # >7-> (Phase 33)
             TokenType.FINFUN,  # 77-> (Phase 34)
         ):
             arrow_token = self._advance()
@@ -1959,6 +1957,7 @@ class Parser:
         Phase 11.8: (| ... |) (relational image) - takes set argument
         Phase 11.9: [ ... ] (generic instantiation) - takes type parameters
         Phase 19: Space-separated function application (f x y)
+        Phase 36: rcl (reflexive closure) - no operands
 
         Disambiguation: + and * are postfix only if NOT followed by operand.
         If followed by operand, they're infix arithmetic operators.
@@ -2185,6 +2184,7 @@ class Parser:
             TokenType.TILDE,
             TokenType.PLUS,
             TokenType.STAR,
+            TokenType.REFLEXIVE_CLOSURE,  # r (Phase 36)
             TokenType.LIMG,  # (| for relational image
         ):
             # Check for postfix +/* disambiguation
@@ -2758,7 +2758,9 @@ class Parser:
 
         # Check for postfix closure operators as part of the name
         # These are valid in definition contexts (not expression contexts)
-        if self._match(TokenType.PLUS, TokenType.STAR, TokenType.TILDE):
+        if self._match(
+            TokenType.PLUS, TokenType.STAR, TokenType.TILDE, TokenType.REFLEXIVE_CLOSURE
+        ):
             op_token = self._advance()
             name = name + op_token.value  # "R" + "+" → "R+"
 

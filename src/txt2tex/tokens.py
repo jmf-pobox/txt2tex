@@ -48,6 +48,7 @@ class TokenType(Enum):
     PLUS = auto()  # + (transitive closure postfix / arithmetic)
     MINUS = auto()  # - (subtraction / negation)
     STAR = auto()  # * (reflexive-transitive closure postfix / arithmetic)
+    REFLEXIVE_CLOSURE = auto()  # rcl (reflexive closure postfix - Phase 36)
     LIMG = auto()  # (| (relational image left)
     RIMG = auto()  # |) (relational image right)
 
@@ -91,7 +92,6 @@ class TokenType(Enum):
     TSURJ = auto()  # -->> (total surjection)
     PSURJ = auto()  # +->> (partial surjection)
     BIJECTION = auto()  # >->> (bijection)
-    PBIJECTION = auto()  # >7-> (partial bijection)
     FINFUN = auto()  # 77-> (finite partial function)
 
     # Comparison operators (Phase 3, enhanced in Phase 7)
