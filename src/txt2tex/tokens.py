@@ -48,7 +48,6 @@ class TokenType(Enum):
     PLUS = auto()  # + (transitive closure postfix / arithmetic)
     MINUS = auto()  # - (subtraction / negation)
     STAR = auto()  # * (reflexive-transitive closure postfix / arithmetic)
-    REFLEXIVE_CLOSURE = auto()  # rcl (reflexive closure postfix - Phase 36)
     LIMG = auto()  # (| (relational image left)
     RIMG = auto()  # |) (relational image right)
 
