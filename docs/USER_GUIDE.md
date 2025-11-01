@@ -716,10 +716,14 @@ Both evaluate the same when applied to arguments: `(g o9 f)(x) = g(f(x))`, but c
 
 ```
 R+               →  R⁺          [transitive closure]
-R*               →  R*          [reflexive, transitive closure]
+R*               →  R*          [reflexive-transitive closure]
 ```
 
-Note: Reflexive closure (`r`) and symmetric closure (`s`) are not yet implemented.
+**Closure operators** (postfix):
+- `+` (transitive): follow relation one or more times
+- `*` (reflexive-transitive): follow relation zero or more times
+
+Note: Reflexive closure (`rcl`) and symmetric closure (`s`) are not yet implemented.
 
 ### Compound Identifiers in Definitions
 

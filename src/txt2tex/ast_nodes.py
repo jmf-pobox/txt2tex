@@ -640,7 +640,7 @@ class Schema(ASTNode):
 class CaseAnalysis(ASTNode):
     """Case analysis branch (case q: ... case r: ...)."""
 
-    case_name: str  # "q", "r", etc.
+    case_name: str  # "q", etc.
     steps: list[ProofNode]  # Proof steps for this case
 
 
