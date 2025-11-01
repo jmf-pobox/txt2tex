@@ -62,6 +62,7 @@ class TokenType(Enum):
     FINSET = auto()  # F (finite set)
     FINSET1 = auto()  # F1 (non-empty finite set)
     BIGCUP = auto()  # bigcup (distributed union)
+    BIGCAP = auto()  # bigcap (distributed intersection)
 
     # Sequence operators (Phase 12)
     LANGLE = auto()  # ⟨ (sequence literal left)

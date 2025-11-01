@@ -499,9 +499,8 @@ Generates: $\{1 \mapsto a, 2 \mapsto b, 3 \mapsto c\}$
 
 ```
 bigcup S         →  ⋃ S         [distributed union]
+bigcap S         →  ⋂ S         [distributed intersection]
 ```
-
-Note: Distributed intersection is not yet implemented.
 
 ### Standard Sets
 
