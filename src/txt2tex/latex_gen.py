@@ -120,9 +120,10 @@ class LaTeXGenerator:
         "-": r"-",  # Subtraction (Phase 16)
         "*": r"*",  # Multiplication (also postfix in relational context)
         "mod": r"\mod",  # Modulo (use \mod not \bmod for fuzz compatibility)
-        # Sequence operators (Phase 12)
+        # Sequence operators (Phase 12, enhanced Phase 35)
         "⌢": r"\cat",  # Sequence concatenation (Unicode)
         "^": r"\cat",  # Sequence concatenation (ASCII alternative, Phase 14)
+        "↾": r"\filter",  # Sequence filter (Phase 35)
     }
 
     UNARY_OPS: ClassVar[dict[str, str]] = {
@@ -1371,6 +1372,7 @@ class LaTeXGenerator:
             ("++", r"\oplus"),
             ("o9", r"\circ"),
             ("⌢", r"\cat"),
+            ("↾", r"\filter"),  # Sequence filter (Phase 35)
         ]
 
         result = text
@@ -1443,6 +1445,7 @@ class LaTeXGenerator:
         text = self._replace_outside_math(text, "++", r"\oplus")  # Override
         text = self._replace_outside_math(text, "o9", r"\circ")  # Composition
         text = self._replace_outside_math(text, "⌢", r"\cat")  # Sequence concatenation
+        text = self._replace_outside_math(text, "↾", r"\filter")  # Sequence filter
 
         # Convert keywords to symbols (QA fixes)
         # Negative lookbehind (?<!\\) ensures we don't match LaTeX commands like \forall
