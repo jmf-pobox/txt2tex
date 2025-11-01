@@ -532,20 +532,18 @@ class Lexer:
         # Numbers and digit-starting identifiers (Phase 18)
         # Digit-starting identifiers: 479_courses (digit followed by underscore+letter)
         # Pure numbers: 479 (digits only)
-        # Finite function operator: 7 7-> (Phase 34)
+        # Finite function operator: 77-> (Phase 34)
         if (
             char == "7"
-            and self._peek_char() == " "
-            and self._peek_char(2) == "7"
-            and self._peek_char(3) == "-"
-            and self._peek_char(4) == ">"
+            and self._peek_char() == "7"
+            and self._peek_char(2) == "-"
+            and self._peek_char(3) == ">"
         ):
             self._advance()  # 7
-            self._advance()  # space
             self._advance()  # 7
             self._advance()  # -
             self._advance()  # >
-            return Token(TokenType.FINFUN, "7 7->", start_line, start_column)
+            return Token(TokenType.FINFUN, "77->", start_line, start_column)
 
         if char.isdigit():
             # Peek ahead to determine if this is identifier or number
@@ -878,6 +876,7 @@ class Lexer:
                         "notin",
                         "subset",
                         "subseteq",
+                        "psubset",
                         "cross",
                         "dom",
                         "ran",
@@ -975,6 +974,9 @@ class Lexer:
             return Token(TokenType.IN, value, start_line, start_column)
         if value == "subset" or value == "subseteq":
             return Token(TokenType.SUBSET, value, start_line, start_column)
+        # Check for strict/proper subset (Phase 39)
+        if value == "psubset":
+            return Token(TokenType.PSUBSET, value, start_line, start_column)
         if value == "union":
             return Token(TokenType.UNION, value, start_line, start_column)
         if value == "intersect":

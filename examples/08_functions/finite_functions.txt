@@ -1,0 +1,91 @@
+=== Phase 34: Finite Partial Functions ===
+
+TEXT: Finite partial functions are partial functions with a finite domain. The operator 77-> denotes a finite partial function, meaning the function may not be defined everywhere, and its domain must be finite.
+
+** Example 1: Basic Finite Function Type **
+
+TEXT: A finite partial function from X to Y is a partial function whose domain is finite. This is useful when modeling resources with limited capacity or databases with a bounded number of entries.
+
+given Year, Table
+
+axdef
+  records : Year 77-> Table
+where
+  # (dom records) <= 1000
+end
+
+TEXT: The records relation is a finite partial function because:
+TEXT: 1. It is partial: not all years need to have a table
+TEXT: 2. Its domain is finite: at most 1000 years have records
+TEXT: 3. It is functional: each year maps to at most one table
+
+** Example 2: Comparison with Other Function Types **
+
+TEXT: Comparison of function type operators:
+
+TEXT: - Total function (->): defined for all inputs, domain is entire source set
+TEXT: - Partial function (+->): may not be defined for all inputs, domain may be infinite
+TEXT: - Finite partial function (77->): partial function with finite domain
+TEXT: - Total bijection (>->>): defined everywhere, injective and surjective
+TEXT: - Partial bijection (>7->): may not be defined everywhere, but injective
+
+given X, Y
+
+axdef
+  totalFunc : X -> Y
+  partialFunc : X +-> Y
+  finitePartialFunc : X 77-> Y
+  totalBij : X >->> Y
+  partialBij : X >7-> Y
+where
+  dom totalFunc = X and # (dom finitePartialFunc) < infinity and dom totalBij = X and (forall x1, x2 : X | totalBij(x1) = totalBij(x2) => x1 = x2) and ran totalBij = Y
+end
+
+** Example 3: Finite Functions in Practice **
+
+TEXT: Real-world example: A database table storing customer preferences.
+
+given CustomerID, Preference
+
+axdef
+  preferences : CustomerID 77-> Preference
+where
+  # (dom preferences) <= 10000 and forall c : CustomerID | c in dom preferences => preferences(c) != {}
+end
+
+TEXT: This models a preference database where:
+TEXT: - Not all customers have preferences recorded (partial)
+TEXT: - The database has a capacity limit (finite domain)
+TEXT: - Each customer maps to one preference value (functional)
+
+** Example 4: Operations on Finite Functions **
+
+axdef
+  f : N 77-> N
+  g : N 77-> N
+where
+  f = {1 |-> 10, 2 |-> 20, 3 |-> 30} and g = {10 |-> 100, 20 |-> 200} and # (dom f) = 3 and # (dom g) = 2
+end
+
+TEXT: We can compose finite functions, but the result may not be finite unless proven.
+
+axdef
+  f_composed : N 77-> N
+where
+  f_composed = g o9 f and # (dom f_composed) <= # (dom f)
+end
+
+TEXT: The composition has a domain size bounded by the domain of f, since we can only compose where f's range intersects g's domain.
+
+** Example 5: Domain Restrictions and Finiteness **
+
+given Title, Length, ViewDate
+
+axdef
+  viewed : Title 77-> ViewDate
+  recent_viewed : Title 77-> ViewDate
+where
+  # (dom viewed) < infinity and recent_viewed = {t : Title | t in dom viewed} and # (dom recent_viewed) <= # (dom viewed)
+end
+
+TEXT: Restricting a finite partial function preserves finiteness. The recent_viewed function has a domain that is a subset of viewed's domain, so it remains finite.

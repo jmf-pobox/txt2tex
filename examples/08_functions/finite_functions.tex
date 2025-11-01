@@ -1,0 +1,231 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 34 : Finite Partial Functions}
+
+\bigskip
+
+Finite partial functions are partial functions with a finite domain.
+The $operator \ffun denotes$ a finite partial function, meaning the
+function may not be defined everywhere, and its domain must be finite.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 1 : Basic Finite Function Type}
+
+\medskip
+
+\bigskip
+
+A finite partial function from X to Y is a partial function whose
+domain is finite. This is useful when modeling resources with limited
+capacity or databases with a bounded number of entries.
+
+\bigskip
+
+\begin{zed}[Year, Table]
+\end{zed}
+
+\begin{axdef}
+  records : Year \ffun Table
+  \where
+  \# \dom records \leq 1000
+\end{axdef}
+
+\bigskip
+
+The records relation is a finite partial function because:
+
+\bigskip
+
+\bigskip
+
+1. It is partial: not all years need to have a table
+
+\bigskip
+
+\bigskip
+
+2. Its domain is finite: at most 1000 years have records
+
+\bigskip
+
+\bigskip
+
+3. It is functional: each year maps to at most one table
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 2 : Comparison with Other Function Types}
+
+\medskip
+
+\bigskip
+
+Comparison of function type operators:
+
+\bigskip
+
+\bigskip
+
+- Total function ($\fun$): defined for all inputs, domain is entire source set
+
+\bigskip
+
+\bigskip
+
+- Partial function ($\pfun$): may not be defined for all inputs,
+domain may be infinite
+
+\bigskip
+
+\bigskip
+
+- Finite partial function ($\ffun$): partial function with finite domain
+
+\bigskip
+
+\bigskip
+
+- Total bijection ($\bij$): defined everywhere, injective and surjective
+
+\bigskip
+
+\bigskip
+
+- Partial bijection ($\pbij$): may not be defined everywhere, but injective
+
+\bigskip
+
+\begin{zed}[X, Y]
+\end{zed}
+
+\begin{axdef}
+  totalFunc : X \fun Y \\
+  partialFunc : X \pfun Y \\
+  finitePartialFunc : X \ffun Y \\
+  totalBij : X \bij Y \\
+  partialBij : X \pbij Y
+  \where
+  \dom totalFunc = X \land \# \dom finitePartialFunc < infinity \land
+  \dom totalBij = X \land (\forall x1, x2 \colon X \bullet
+  totalBij(x1) = totalBij(x2) \Rightarrow x1 = x2) \land \ran totalBij = Y
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 3 : Finite Functions in Practice}
+
+\medskip
+
+\bigskip
+
+Real-world example: A database table storing customer preferences.
+
+\bigskip
+
+\begin{zed}[CustomerID, Preference]
+\end{zed}
+
+\begin{axdef}
+  preferences : CustomerID \ffun Preference
+  \where
+  \# \dom preferences \leq 10000 \land (\forall c \colon CustomerID
+  \bullet c \in \dom preferences \Rightarrow preferences(c) \neq \{\})
+\end{axdef}
+
+\bigskip
+
+This models a preference database where:
+
+\bigskip
+
+\bigskip
+
+- Not all customers have preferences recorded (partial)
+
+\bigskip
+
+\bigskip
+
+- The database has a capacity limit (finite domain)
+
+\bigskip
+
+\bigskip
+
+- Each customer maps to one preference value (functional)
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 4 : Operations on Finite Functions}
+
+\medskip
+
+\begin{axdef}
+  f : \mathbb{N} \ffun \mathbb{N} \\
+  g : \mathbb{N} \ffun \mathbb{N}
+  \where
+  f = \{1 \mapsto 10, 2 \mapsto 20, 3 \mapsto 30\} \land g = \{10
+  \mapsto 100, 20 \mapsto 200\} \land \# \dom f = 3 \land \# \dom g = 2
+\end{axdef}
+
+\bigskip
+
+We can compose finite functions, but the result may not be finite unless proven.
+
+\bigskip
+
+\begin{axdef}
+  \mathit{f\_composed} : \mathbb{N} \ffun \mathbb{N}
+  \where
+  \mathit{f\_composed} = g \circ f \land \# \dom \mathit{f\_composed}
+  \leq \# \dom f
+\end{axdef}
+
+\bigskip
+
+The composition has a domain size bounded by the domain of f, since
+we can only compose where f's range intersects g's domain.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 5 : Domain Restrictions and Finiteness}
+
+\medskip
+
+\begin{zed}[Title, Length, ViewDate]
+\end{zed}
+
+\begin{axdef}
+  viewed : Title \ffun ViewDate \\
+  \mathit{recent\_viewed} : Title \ffun ViewDate
+  \where
+  \# \dom viewed < infinity \land \mathit{recent\_viewed} = \{ t
+  \colon Title \mid t \in \dom viewed \} \land \# \dom
+  \mathit{recent\_viewed} \leq \# \dom viewed
+\end{axdef}
+
+\bigskip
+
+Restricting a finite partial function preserves finiteness. The
+recent_viewed function has a domain that is a subset of viewed's
+domain, so it remains finite.
+
+\bigskip
+
+\end{document}

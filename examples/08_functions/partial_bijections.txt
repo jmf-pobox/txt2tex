@@ -1,0 +1,84 @@
+=== Phase 33: Partial Bijections ===
+
+TEXT: Partial bijections are functions that are both injective (one-to-one) and surjective (onto), but defined only on a subset of their domain. The operator >7-> denotes a partial bijection.
+
+** Example 1: Basic Partial Bijection Type **
+
+TEXT: A partial bijection from X to Y is a subset of X cross Y where each element in the domain maps to a unique element in the range, and each element in the range has at most one preimage.
+
+axdef
+  partialMap : N >7-> N
+where
+  partialMap = {1 |-> 10, 2 |-> 20, 3 |-> 30}
+end
+
+TEXT: This is a partial bijection because:
+TEXT: 1. It is injective: different inputs map to different outputs
+TEXT: 2. It is partial: not defined for all natural numbers
+TEXT: 3. It is bijective on its domain: the restriction is a bijection
+
+** Example 2: Partial Bijection in Type Signatures **
+
+given Student, Course
+
+axdef
+  enrollment : Student >7-> Course
+where
+  # (dom enrollment) <= 100 and (forall s1, s2 : Student | s1 in dom enrollment and s2 in dom enrollment => (s1 != s2 => enrollment(s1) != enrollment(s2)))
+end
+
+TEXT: The enrollment relation is a partial bijection because each enrolled student is assigned to exactly one course, and each course has at most one student assigned to it. Not all students need to be enrolled.
+
+** Example 3: Comparison with Other Function Types **
+
+TEXT: Comparison of function type operators:
+
+TEXT: - Total function (->): defined for all inputs, no uniqueness constraint
+TEXT: - Partial function (+->): may not be defined for all inputs
+TEXT: - Total bijection (>->>): defined everywhere, injective and surjective
+TEXT: - Partial bijection (>7->): may not be defined everywhere, but injective and surjective on domain
+
+given X, Y
+
+axdef
+  totalFunc : X -> Y
+  partialFunc : X +-> Y
+  totalBij : X >->> Y
+  partialBij : X >7-> Y
+where
+  dom totalFunc = X and dom totalBij = X and (forall x1, x2 : X | totalBij(x1) = totalBij(x2) => x1 = x2) and ran totalBij = Y
+end
+
+** Example 4: Nested Partial Bijection Types **
+
+TEXT: Function types are right-associative, so X >7-> Y >7-> Z means X >7-> (Y >7-> Z), which is a partial bijection from X to partial bijections from Y to Z.
+
+given A, B, C
+
+axdef
+  higherOrder : A >7-> B >7-> C
+where
+  # (dom higherOrder) > 0
+end
+
+TEXT: This represents a partially defined function that, when given an element of A, returns a partial bijection from B to C.
+
+** Example 5: Operations on Partial Bijections **
+
+axdef
+  f : N >7-> N
+  g : N >7-> N
+where
+  f = {1 |-> 2, 2 |-> 4, 3 |-> 6} and g = {10 |-> 20, 20 |-> 40, 30 |-> 60} and dom f intersect dom g = {} and ran f intersect ran g = {}
+end
+
+TEXT: Since partial bijections are relations, we can use relational operators like domain, range, inverse, and composition.
+
+axdef
+  f_inv : N >7-> N
+  f_composed : N >7-> N
+where
+  f_inv = f~ and f_composed = g o9 f
+end
+
+TEXT: The inverse f~ is also a partial bijection because f is injective and surjective on its domain. Composition of partial bijections may not preserve the bijective property in general.

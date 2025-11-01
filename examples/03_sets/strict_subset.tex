@@ -1,0 +1,156 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 39 : Strict Subset Operator}
+
+\bigskip
+
+The strict subset operator (psubset, ⊂) represents proper subset
+relationships, where A is a subset of B AND A is not equal to B.
+
+\bigskip
+
+\bigskip
+
+Distinction from subset (⊆):
+
+\bigskip
+
+\bigskip
+
+- A subset B means: every element of A $is \in B$ (may be equal)
+
+\bigskip
+
+\bigskip
+
+- A psubset B means: every element of A $is \in B$ AND $A \neq B$
+(strict inequality)
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 1 : Basic Strict Subset}
+
+\medskip
+
+\begin{axdef}
+  A : \power \mathbb{N} \\
+  B : \power \mathbb{N}
+  \where
+  A = \{1, 2, 3\} \land B = \{1, 2, 3, 4, 5\} \land A \subset B
+\end{axdef}
+
+\bigskip
+
+Here A psubset B holds because all elements of A $are \in B$, and A
+contains fewer elements than B.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 2 : Comparing subset and psubset}
+
+\medskip
+
+\begin{axdef}
+  X : \power \mathbb{N} \\
+  Y : \power \mathbb{N} \\
+  \mathbb{Z} : \power \mathbb{N}
+  \where
+  X = \{1, 2\} \land Y = \{1, 2, 3\} \land \mathbb{Z} = \{1, 2\}
+  \land X \subset Y \land X \subseteq \mathbb{Z}
+\end{axdef}
+
+\bigskip
+
+X psubset Y is true (X is strictly $contained \in Y$)
+
+\bigskip
+
+\bigskip
+
+X subset Z is true (X is a subset of Z, including the case where $X =
+\mathbb{Z}$)
+
+\bigskip
+
+\bigskip
+
+X psubset Z would be FALSE (they are equal sets)
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 3 : Empty Set}
+
+\medskip
+
+\begin{axdef}
+  emptySet : \power \mathbb{N} \\
+  anySet : \power \mathbb{N}
+  \where
+  emptySet = \{\} \land anySet = \{1, 2, 3\} \land emptySet \subset anySet
+\end{axdef}
+
+\bigskip
+
+The empty set is a strict subset of any non-empty set.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 4 : Transitive Property}
+
+\medskip
+
+\bigskip
+
+If A psubset B and B psubset C, then A psubset C.
+
+\bigskip
+
+\begin{axdef}
+  A : \power \mathbb{N} \\
+  B : \power \mathbb{N} \\
+  C : \power \mathbb{N}
+  \where
+  A = \{1\} \land B = \{1, 2\} \land C = \{1, 2, 3\} \land A \subset
+  B \land B \subset C \land A \subset C
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 5 : Set Hierarchy}
+
+\medskip
+
+\begin{zed}[Student, GradStudent, PhDStudent]
+\end{zed}
+
+\begin{axdef}
+  students : \power Student \\
+  grads : \power GradStudent \\
+  phds : \power PhDStudent
+  \where
+  phds \subset grads \land grads \subset students
+\end{axdef}
+
+\bigskip
+
+PhD students are a strict subset of graduate students, which are a
+strict subset of all students.
+
+\bigskip
+
+\end{document}

@@ -1,0 +1,207 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 33 : Partial Bijections}
+
+\bigskip
+
+Partial bijections are functions that are both injective (one-to-one)
+and surjective (onto), but defined only on a subset of their domain.
+The $operator \pbij denotes$ a partial bijection.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 1 : Basic Partial Bijection Type}
+
+\medskip
+
+\bigskip
+
+A partial bijection from X to Y is a subset of X cross Y where each
+element in the domain maps to a unique element in the range, and each
+element in the range has at most one preimage.
+
+\bigskip
+
+\begin{axdef}
+  partialMap : \mathbb{N} \pbij \mathbb{N}
+  \where
+  partialMap = \{1 \mapsto 10, 2 \mapsto 20, 3 \mapsto 30\}
+\end{axdef}
+
+\bigskip
+
+This is a partial bijection because:
+
+\bigskip
+
+\bigskip
+
+1. It is injective: different inputs map to different outputs
+
+\bigskip
+
+\bigskip
+
+2. It is partial: not defined for all natural numbers
+
+\bigskip
+
+\bigskip
+
+3. It is bijective on its domain: the restriction is a bijection
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 2 : Partial Bijection in Type Signatures}
+
+\medskip
+
+\begin{zed}[Student, Course]
+\end{zed}
+
+\begin{axdef}
+  enrollment : Student \pbij Course
+  \where
+  \# \dom enrollment \leq 100 \land (\forall s1, s2 \colon Student
+    \bullet s1 \in \dom enrollment \land s2 \in \dom enrollment
+  \Rightarrow (s1 \neq s2 \Rightarrow enrollment(s1) \neq enrollment(s2)))
+\end{axdef}
+
+\bigskip
+
+The enrollment relation is a partial bijection because each enrolled
+student is assigned to exactly one course, and each course has at
+most one student assigned to it. Not all students need to be enrolled.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 3 : Comparison with Other Function Types}
+
+\medskip
+
+\bigskip
+
+Comparison of function type operators:
+
+\bigskip
+
+\bigskip
+
+- Total function ($\fun$): defined for all inputs, no uniqueness constraint
+
+\bigskip
+
+\bigskip
+
+- Partial function ($\pfun$): may not be defined for all inputs
+
+\bigskip
+
+\bigskip
+
+- Total bijection ($\bij$): defined everywhere, injective and surjective
+
+\bigskip
+
+\bigskip
+
+- Partial bijection ($\pbij$): may not be defined everywhere, but
+injective and surjective on domain
+
+\bigskip
+
+\begin{zed}[X, Y]
+\end{zed}
+
+\begin{axdef}
+  totalFunc : X \fun Y \\
+  partialFunc : X \pfun Y \\
+  totalBij : X \bij Y \\
+  partialBij : X \pbij Y
+  \where
+  \dom totalFunc = X \land \dom totalBij = X \land (\forall x1, x2
+  \colon X \bullet totalBij(x1) = totalBij(x2) \Rightarrow x1 = x2)
+  \land \ran totalBij = Y
+\end{axdef}
+
+\bigskip
+\noindent
+\textbf{Example 4 : Nested Partial Bijection Types}
+
+\medskip
+
+\bigskip
+
+Function types are right-associative, so $X \pbij (Y \pbij
+\mathbb{Z})$ means $X > 7$$\fun$ ($Y \pbij \mathbb{Z}$), which is a
+partial bijection from X to partial bijections from Y to Z.
+
+\bigskip
+
+\begin{zed}[A, B, C]
+\end{zed}
+
+\begin{axdef}
+  higherOrder : A \pbij (B \pbij C)
+  \where
+  \# \dom higherOrder > 0
+\end{axdef}
+
+\bigskip
+
+This represents a partially defined function that, when given an
+element of A, returns a partial bijection from B to C.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 5 : Operations on Partial Bijections}
+
+\medskip
+
+\begin{axdef}
+  f : \mathbb{N} \pbij \mathbb{N} \\
+  g : \mathbb{N} \pbij \mathbb{N}
+  \where
+  f = \{1 \mapsto 2, 2 \mapsto 4, 3 \mapsto 6\} \land g = \{10
+  \mapsto 20, 20 \mapsto 40, 30 \mapsto 60\} \land \dom f \cap \dom g
+  = \{\} \land \ran f \cap \ran g = \{\}
+\end{axdef}
+
+\bigskip
+
+Since partial bijections are relations, we can use relational
+operators like domain, range, inverse, and composition.
+
+\bigskip
+
+\begin{axdef}
+  \mathit{f\_inv} : \mathbb{N} \pbij \mathbb{N} \\
+  \mathit{f\_composed} : \mathbb{N} \pbij \mathbb{N}
+  \where
+  \mathit{f\_inv} = f^{-1} \land \mathit{f\_composed} = g \circ f
+\end{axdef}
+
+\bigskip
+
+The inverse f~ is also a partial bijection because f is injective and
+surjective on its domain. Composition of partial bijections may not
+preserve the bijective property in general.
+
+\bigskip
+
+\end{document}
