@@ -231,21 +231,21 @@ not (p and q)
 **Relation operators:**
 - `o9` → $\circ$ (composition)
 - `|->` → $\mapsto$ (maplet)
-- `<->` → $\rel$ (relation type)
-- `<|` → $\dres$ (domain restriction)
-- `|>` → $\rres$ (range restriction)
-- `<<|` → $\ndres$ (domain corestriction)
-- `|>>` → $\nrres$ (range corestriction)
+- `<->` → `\rel` (relation type)
+- `<|` → `\dres` (domain restriction)
+- `|>` → `\rres` (range restriction)
+- `<<|` → `\ndres` (domain corestriction)
+- `|>>` → `\nrres` (range corestriction)
 - `++` → $\oplus$ (override)
 
 **Function type operators:**
-- `->` → $\fun$ (total function)
-- `+->` → $\pfun$ (partial function)
-- `>->` → $\inj$ (injection)
-- `-->>` → $\surj$ (surjection)
-- `>->>` → $\bij$ (total bijection)
-- `>7->` → $\pbij$ (partial bijection)
-- `7 7->` → $\ffun$ (finite partial function)
+- `->` → `\fun` (total function)
+- `+->` → `\pfun` (partial function)
+- `>->` → `\inj` (injection)
+- `-->>` → `\surj` (surjection)
+- `>->>` → `\bij` (total bijection)
+- `>7->` → `\pbij` (partial bijection)
+- `77->` → `\ffun` (finite partial function)
 
 **Relation functions:**
 - `dom`, `ran`, `comp`, `inv`, `id`
@@ -396,7 +396,8 @@ x notin B        →  x ∉ B       ['not an element of']
 ### Set Relations
 
 ```
-A subset B       →  A ⊆ B       [subset]
+A subset B       →  A ⊆ B       [subset - includes equality]
+A psubset B      →  A ⊂ B       [strict/proper subset - excludes equality]
 A union B        →  A ∪ B       [union]
 A intersect C    →  A ∩ C       [intersection]
 A \ B            →  A ∖ B       [set difference]
@@ -789,7 +790,7 @@ f : X >7-> Y     →  X ↣→ Y      [partial bijection]
 
 **Finite partial functions:**
 ```
-f : Year 7 7-> Table     →  Year ⇸ Table    [finite partial function]
+f : Year 77-> Table     →  Year ⇸ Table    [finite partial function]
 ```
 
 ### Function Application
@@ -1520,12 +1521,12 @@ Mathematical operators in justifications are automatically converted to LaTeX sy
 **Relation operators:**
 - `o9` → $\circ$ (composition)
 - `|->` → $\mapsto$ (maplet)
-- `<->` → $\rel$ (relation type)
-- `<|` → $\dres$, `|>` → $\rres$, `<<|` → $\ndres$, `|>>` → $\nrres$
+- `<->` → `\rel` (relation type)
+- `<|` → `\dres`, `|>` → `\rres`, `<<|` → `\ndres`, `|>>` → `\nrres`
 - `++` → $\oplus$ (override)
 
 **Function type operators:**
-- `->` → $\fun$, `+->` → $\pfun$, `>->` → $\inj$, `-->>` → $\surj$, `>->>` → $\bij$, `>7->` → $\pbij$, `7 7->` → $\ffun$
+- `->` → `\fun`, `+->` → `\pfun`, `>->` → `\inj`, `-->>` → `\surj`, `>->>` → `\bij`, `>7->` → `\pbij`, `77->` → `\ffun`
 
 **Relation functions:**
 - `dom`, `ran`, `comp`, `inv`, `id`

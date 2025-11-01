@@ -23,10 +23,11 @@ class TokenType(Enum):
     MU = auto()  # Definite description (mu-operator)
     LAMBDA = auto()  # Lambda expression (Phase 11d)
 
-    # Set operators (Phase 3, enhanced in Phase 7-8, Phase 11.5)
+    # Set operators (Phase 3, enhanced in Phase 7-8, Phase 11.5, Phase 39)
     IN = auto()
     NOTIN = auto()  # not in (set non-membership)
     SUBSET = auto()
+    PSUBSET = auto()  # psubset or ⊂ (strict/proper subset - Phase 39)
     UNION = auto()
     INTERSECT = auto()
     CROSS = auto()  # cross or × (Cartesian product)  # noqa: RUF003
@@ -91,7 +92,7 @@ class TokenType(Enum):
     PSURJ = auto()  # +->> (partial surjection)
     BIJECTION = auto()  # >->> (bijection)
     PBIJECTION = auto()  # >7-> (partial bijection)
-    FINFUN = auto()  # 7 7-> (finite partial function)
+    FINFUN = auto()  # 77-> (finite partial function)
 
     # Comparison operators (Phase 3, enhanced in Phase 7)
     LESS_THAN = auto()  # <

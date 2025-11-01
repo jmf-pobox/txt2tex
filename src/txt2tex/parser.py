@@ -1106,6 +1106,7 @@ class Parser:
             TokenType.IN,
             TokenType.NOTIN,
             TokenType.SUBSET,
+            TokenType.PSUBSET,  # psubset (strict subset - Phase 39)
             TokenType.UNION,
             TokenType.INTERSECT,
             TokenType.SETMINUS,  # \ set difference
@@ -1128,7 +1129,7 @@ class Parser:
             TokenType.PSURJ,  # +->>
             TokenType.BIJECTION,  # >->>
             TokenType.PBIJECTION,  # >7-> (Phase 33)
-            TokenType.FINFUN,  # 7 7-> (Phase 34)
+            TokenType.FINFUN,  # 77-> (Phase 34)
             TokenType.IMPLIES,  # =>
             TokenType.IFF,  # <=>
         ):
@@ -1825,7 +1826,7 @@ class Parser:
             TokenType.PSURJ,  # +->>
             TokenType.BIJECTION,  # >->>
             TokenType.PBIJECTION,  # >7-> (Phase 33)
-            TokenType.FINFUN,  # 7 7-> (Phase 34)
+            TokenType.FINFUN,  # 77-> (Phase 34)
         ):
             arrow_token = self._advance()
             # Right-associative: recursively parse the right side as function type
@@ -1875,10 +1876,12 @@ class Parser:
         return left
 
     def _parse_set_op(self) -> Expr:
-        """Parse set operators (in, notin, subset)."""
+        """Parse set operators (in, notin, subset, psubset)."""
         left = self._parse_union()
 
-        if self._match(TokenType.IN, TokenType.NOTIN, TokenType.SUBSET):
+        if self._match(
+            TokenType.IN, TokenType.NOTIN, TokenType.SUBSET, TokenType.PSUBSET
+        ):
             op_token = self._advance()
             right = self._parse_union()
             left = BinaryOp(
@@ -2126,6 +2129,7 @@ class Parser:
                         TokenType.IN,  # .field in
                         TokenType.NOTIN,  # .field notin
                         TokenType.SUBSET,  # .field subset
+                        TokenType.PSUBSET,  # .field psubset (Phase 39)
                         TokenType.LESS_THAN,  # .field <
                         TokenType.GREATER_THAN,  # .field >
                         TokenType.LESS_EQUAL,  # .field <=

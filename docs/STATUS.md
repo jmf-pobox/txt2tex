@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
 **Last Updated:** 2025-11-01
-**Current Phase:** Phase 35 (Sequence Filter & Bag Union - ASCII alternatives added) ✓ COMPLETE
+**Current Phase:** Phase 39 (Strict Subset Operator) ✓ COMPLETE
 
 ---
 
@@ -91,7 +91,7 @@
 - ✓ Injections: `>->`, `>+>`, `-|>`
 - ✓ Surjections: `-->>`, `+->>`
 - ✓ Bijections: `>->>` (total), `>7->` (partial)
-- ✓ Finite partial functions: `7 7->` (Phase 34)
+- ✓ Finite partial functions: `77->` (Phase 34)
 - ✓ Function application: `f(x)`, `f(x, y)`
 - ✓ Space-separated application: `f x`, `f x y` (left-associative)
 
@@ -493,16 +493,17 @@
   - Tests right-associativity
 - Test count: 1086 tests (1078 + 8 new partial bijection tests, all passing)
 - All quality gates pass: type, lint, format, test
+- Example file: [examples/08_functions/partial_bijections.txt](examples/08_functions/partial_bijections.txt) ✓
 
 ### ✅ Phase 34: Finite Partial Function Operator
-- Implemented `7 7->` finite partial function operator (from glossary)
-- Used in Solutions 36, 40, 41 (e.g., `records : Year 7 7-> Table`)
+- Implemented `77->` finite partial function operator (from glossary)
+- Used in Solutions 36, 40, 41 (e.g., `records : Year 77-> Table`)
 - Added `FINFUN` token type to lexer
-- Added "7 7->" operator recognition in lexer (5-character pattern with space)
-  - Special handling before general digit parsing to recognize `7 7->`
+- Added "77->" operator recognition in lexer (5-character pattern with space)
+  - Special handling before general digit parsing to recognize `77->`
   - Distinguishes from plain number `7` and other digit patterns
 - Added `TokenType.FINFUN` to parser's function type operator lists (2 locations)
-- Added `7 7->` → `\ffun` mapping in LaTeX generator
+- Added `77->` → `\ffun` mapping in LaTeX generator
 - Added to all replacement functions in latex_gen.py (9 locations)
   - BINARY_OPS and PRECEDENCE dictionaries
   - _convert_operators_bare replacements list (2 locations)
@@ -517,6 +518,7 @@
   - Tests realistic usage from Solutions 36, 40, 41
 - Test count: 1097 tests (1086 + 11 new finite function tests, all passing)
 - All quality gates pass: type, lint, format, test
+- Example file: [examples/08_functions/finite_functions.txt](examples/08_functions/finite_functions.txt) ✓
 
 ### ✅ Phase 35: Sequence Filter Operator (with ASCII alternatives fix)
 - Implemented `↾` / `filter` sequence filter operator (from glossary)
@@ -544,6 +546,31 @@
   - Tests realistic usage from Solutions 40, 41
 - Test count: 1125 tests (1107 + 7 new filter tests + 11 new bag union tests, all passing)
 - All quality gates pass: type, lint, format, test
+- Example file: [examples/09_sequences/sequence_filter.txt](examples/09_sequences/sequence_filter.txt) ✓
+
+### ✅ Phase 39: Strict Subset Operator
+- Implemented `psubset` strict/proper subset operator (from glossary)
+- ASCII keyword: `psubset` (e.g., `A psubset B`)
+- Distinction from `subset`:
+  - `subset` → `\subseteq` (A ⊆ B, includes equality)
+  - `psubset` → `\subset` (A ⊂ B, strict/proper subset, excludes equality)
+- Added `PSUBSET` token type to lexer
+- Added `psubset` keyword recognition in lexer
+- Added `psubset` to z_keywords set (prevents prose mode)
+- Added `TokenType.PSUBSET` to parser's set operator lists (3 locations):
+  - _is_operand_start method
+  - _parse_set_op method
+  - Field access context
+- Added `psubset` → `\subset` mapping in LaTeX generator
+- Added to BINARY_OPS and PRECEDENCE dictionaries (precedence 7, same as subset)
+- Updated USER_GUIDE.md with distinction between subset and psubset
+- Created comprehensive test suite: 8 new tests in test_psubset.py
+  - Covers: lexer, parser, LaTeX generation, integration
+  - Tests psubset vs subset distinction
+  - Tests precedence with other set operators
+- Test count: 1133 tests (1125 + 8 new psubset tests, all passing)
+- All quality gates pass: type, lint, format, test
+- Example file: [examples/03_sets/strict_subset.txt](examples/03_sets/strict_subset.txt) ✓
 
 ### ✅ Fuzz Mode: Context-Aware Equivalence Operator
 - Fixed `<=>` operator to render context-sensitively in fuzz mode
@@ -749,8 +776,12 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 17. ✓ Phase 24: Whitespace-Sensitive ^ Operator (concat vs exponent disambiguation)
 18. ✓ Phase 25: Justification Operator Conversion (relation/function operators in justifications)
 19. ✓ Phase 26: TEXT Block Operator Support (all operators in prose)
+20. ✓ Phase 33: Partial Bijection Operator (`>7->`)
+21. ✓ Phase 34: Finite Partial Function Operator (`77->`)
+22. ✓ Phase 35: Sequence Filter & Bag Union (`filter`, `bag_union`)
+23. ✓ Phase 39: Strict Subset Operator (`psubset`)
 
-**Current:** 98.1% (51/52) - Phase 26 Complete
+**Current:** 98.1% (51/52) - Phase 39 Complete
 
 ### Next Steps
 
@@ -763,7 +794,7 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 1125 passing (as of Phase 35 with ASCII alternatives, November 2025)
+- **Total Tests:** 1133 passing (as of Phase 39, November 2025)
 
 **Component Coverage:**
 - parser.py: 86.17%
