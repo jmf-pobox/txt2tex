@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
 **Last Updated:** 2025-11-01
-**Current Phase:** Phase 35 (Sequence Filter Operator) ✓ COMPLETE
+**Current Phase:** Phase 35 (Sequence Filter & Bag Union - ASCII alternatives added) ✓ COMPLETE
 
 ---
 
@@ -98,7 +98,7 @@
 ### Sequences
 - ✓ Literals: `⟨⟩`, `⟨a, b, c⟩` (Unicode) OR `<>`, `<a, b, c>` (ASCII)
 - ✓ Concatenation: `⌢` (Unicode) OR ` ^ ` with spaces (ASCII, Phase 24)
-- ✓ Filter: `s ↾ A` (sequence filter - Phase 35)
+- ✓ Filter: `s filter A` or `s ↾ A` (sequence filter - Phase 35, ASCII/Unicode)
 - ✓ Operators: `head`, `tail`, `last`, `front`, `rev`
 - ✓ Indexing: `s(i)`, `⟨a, b, c⟩(2)`
 - ✓ Generic sequence type: `seq(T)`, `iseq(T)`
@@ -106,7 +106,7 @@
 
 ### Other Features
 - ✓ Tuples: `(a, b)`, projection `.1`, `.2`
-- ✓ Bags: `[[x]]`, `[[a, b, c]]`, `bag(T)`
+- ✓ Bags: `[[x]]`, `[[a, b, c]]`, `bag(T)`, `b1 bag_union b2` or `b1 ⊎ b2` (Phase 35, ASCII/Unicode)
 - ✓ Ranges: `m..n` → `{m, m+1, ..., n}`
 - ✓ Override: `f ++ g`
 - ✓ Conditional expressions: `if condition then expr1 else expr2`
@@ -518,26 +518,31 @@
 - Test count: 1097 tests (1086 + 11 new finite function tests, all passing)
 - All quality gates pass: type, lint, format, test
 
-### ✅ Phase 35: Sequence Filter Operator
-- Implemented `↾` sequence filter operator (from glossary)
-- Used extensively in Solutions 40, 41 (e.g., `s ↾ {t : Title | condition}`)
+### ✅ Phase 35: Sequence Filter Operator (with ASCII alternatives fix)
+- Implemented `↾` / `filter` sequence filter operator (from glossary)
+- Used extensively in Solutions 40, 41 (e.g., `s filter {t : Title | condition}`)
 - Added `FILTER` token type to lexer
 - Added "↾" operator recognition in lexer (Unicode character U+21BE)
   - Placed with other sequence operators (`⟨`, `⟩`, `⌢`)
-  - No ASCII alternative (like `⌢` for concatenation, Unicode-only)
+  - **ASCII alternative:** Added `filter` keyword (e.g., `s filter A`)
 - Added `TokenType.FILTER` to parser as binary infix operator (2 locations)
-  - Added to `_parse_additive()` alongside CAT, PLUS, MINUS
-  - Added to `_should_parse_space_separated_arg()` infix operator list
-- Added `↾` → `\filter` mapping in LaTeX generator (3 locations)
+  - Added to `_parse_additive()` alongside CAT, PLUS, MINUS, BAG_UNION
+  - Added to `_is_operand_start()` infix operator list
+- Added both `↾` and `filter` → `\filter` mappings in LaTeX generator (3 locations)
   - BINARY_OPS dictionary
   - _convert_operators_bare replacements list
   - _generate_paragraph TEXT block processing
-- Created comprehensive test suite: 10 new tests in test_sequence_filter.py
-  - Covers: lexer (Unicode recognition), parser, LaTeX generation, integration
+- **Bag union operator:** Also added ASCII alternative for `⊎`
+  - Added `bag_union` keyword as ASCII alternative to `⊎` (U+228E)
+  - Added `TokenType.BAG_UNION` to parser as binary infix operator
+  - Added both `⊎` and `bag_union` → `\uplus` mappings in LaTeX generator
+- Created comprehensive test suite: 17 filter tests + 11 bag union tests
+  - test_sequence_filter.py: Covers both Unicode and ASCII alternatives
+  - test_bag_union.py: New test file for bag union operator
   - Tests filter vs range restriction distinction (↾ vs |>)
-  - Tests left-associativity
+  - Tests left-associativity for both operators
   - Tests realistic usage from Solutions 40, 41
-- Test count: 1107 tests (1097 + 10 new filter tests, all passing)
+- Test count: 1125 tests (1107 + 7 new filter tests + 11 new bag union tests, all passing)
 - All quality gates pass: type, lint, format, test
 
 ### ✅ Fuzz Mode: Context-Aware Equivalence Operator
@@ -758,7 +763,7 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 1107 passing (as of Phase 35, November 2025)
+- **Total Tests:** 1125 passing (as of Phase 35 with ASCII alternatives, November 2025)
 
 **Component Coverage:**
 - parser.py: 86.17%

@@ -23,6 +23,17 @@ class TestSequenceFilterLexer:
         assert tokens[2].type == TokenType.IDENTIFIER
         assert tokens[2].value == "A"
 
+    def test_filter_operator_ascii(self) -> None:
+        """Test lexing filter operator (ASCII keyword)."""
+        lexer = Lexer("s filter A")
+        tokens = lexer.tokenize()
+        assert tokens[0].type == TokenType.IDENTIFIER
+        assert tokens[0].value == "s"
+        assert tokens[1].type == TokenType.FILTER
+        assert tokens[1].value == "filter"
+        assert tokens[2].type == TokenType.IDENTIFIER
+        assert tokens[2].value == "A"
+
 
 class TestSequenceFilterParser:
     """Tests for sequence filter parser features."""
@@ -63,6 +74,30 @@ class TestSequenceFilterParser:
         assert isinstance(ast.left, BinaryOp)
         assert ast.left.operator == "↾"
 
+    def test_parse_simple_filter_ascii(self) -> None:
+        """Test parsing s filter A (ASCII keyword)."""
+        lexer = Lexer("s filter A")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, BinaryOp)
+        assert ast.operator == "filter"
+        assert isinstance(ast.left, Identifier)
+        assert ast.left.name == "s"
+        assert isinstance(ast.right, Identifier)
+        assert ast.right.name == "A"
+
+    def test_parse_filter_with_set_literal_ascii(self) -> None:
+        """Test parsing s filter {1, 2, 3} (ASCII keyword)."""
+        lexer = Lexer("s filter {1, 2, 3}")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, BinaryOp)
+        assert ast.operator == "filter"
+        assert isinstance(ast.left, Identifier)
+        assert isinstance(ast.right, SetLiteral)
+
 
 class TestSequenceFilterLaTeX:
     """Tests for sequence filter LaTeX generation."""
@@ -85,6 +120,35 @@ class TestSequenceFilterLaTeX:
     def test_filter_in_document(self) -> None:
         """Test filter in complete document."""
         text = "s ↾ A"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, BinaryOp)
+        gen = LaTeXGenerator()
+        doc = gen.generate_document(ast)
+        assert r"\filter" in doc
+        assert r"\documentclass" in doc
+        assert r"\end{document}" in doc
+
+    def test_filter_latex_generation_ascii(self) -> None:
+        """Test generating LaTeX for filter operator (ASCII keyword)."""
+        gen = LaTeXGenerator()
+        ast = BinaryOp(
+            operator="filter",
+            left=Identifier(name="s", line=1, column=1),
+            right=Identifier(name="A", line=1, column=9),
+            line=1,
+            column=3,
+        )
+        latex = gen.generate_expr(ast)
+        assert r"\filter" in latex
+        assert "s" in latex
+        assert "A" in latex
+
+    def test_filter_in_document_ascii(self) -> None:
+        """Test filter in complete document (ASCII keyword)."""
+        text = "s filter A"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -177,3 +241,30 @@ class TestSequenceFilterIntegration:
         assert ast.left.right.name == "A"
         assert isinstance(ast.right, Identifier)
         assert ast.right.name == "B"
+
+    def test_filter_pipeline_ascii(self) -> None:
+        """Test complete pipeline for filter operator (ASCII keyword)."""
+        text = "s filter A"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, BinaryOp)
+        assert ast.operator == "filter"
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        assert r"s \filter A" in latex
+
+    def test_filter_real_usage_ascii(self) -> None:
+        """Test realistic usage with ASCII keyword."""
+        # From Solution 40: s filter {t : Title | true}
+        text = "s filter {t : Title | true}"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, BinaryOp)
+        assert ast.operator == "filter"
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        assert r"\filter" in latex
