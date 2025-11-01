@@ -1,0 +1,261 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{Phase 35 : Sequence Filter Operator}
+
+\bigskip
+
+The sequence$ \filter $operator restricts a sequence to elements from
+a specified set. It removes elements not in the$ \filter $set while
+preserving order.
+
+\bigskip
+
+\bigskip
+
+ASCII notation: s$ \filter $A
+
+\bigskip
+
+\bigskip
+
+Unicode $alternative : s $$\filter$ A (U+21BE)
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 1 : Basic Filter Operation}
+
+\medskip
+
+\bigskip
+
+Filter a sequence to only include elements from a set.
+
+\bigskip
+
+\begin{axdef}
+  s : \seq \mathbb{N} \\
+  evens : \power \mathbb{N} \\
+  filtered : \seq \mathbb{N}
+  \where
+  s = \langle 1, 2, 3, 4, 5, 6 \rangle \land evens = \{2, 4, 6, 8\}
+  \land filtered = (s \filter evens)
+\end{axdef}
+
+\bigskip
+
+The filtered sequence is $\langle 2, 4, 6 \rangle$, keeping only
+elements that are in evens and preserving their original order.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 2 : Filter with Set Comprehension}
+
+\medskip
+
+\begin{zed}[Title, Length]
+\end{zed}
+
+\begin{axdef}
+  \mathit{all\_titles} : \seq Title \\
+  \mathit{long\_titles} : \power Title \\
+  \mathit{filtered\_titles} : \seq Title
+  \where
+  \mathit{long\_titles} = \{ t \colon Title \mid true \} \land
+  \mathit{filtered\_titles} = \mathit{all\_titles} \filter \mathit{long\_titles}
+\end{axdef}
+
+\bigskip
+
+This filters a sequence of titles to include only titles with length
+greater than 120 minutes.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 3 : Comparison with Range Restriction}
+
+\medskip
+
+\bigskip
+
+Sequence$ \filter $(filter) is different from range restriction ($\rres$):
+
+\bigskip
+
+\bigskip
+
+- filter: operates on sequences, preserves order
+
+\bigskip
+
+\bigskip
+
+- $\rres$: operates on relations, restricts range
+
+\bigskip
+
+\begin{axdef}
+  s : \seq \mathbb{N} \\
+  R : \mathbb{N} \rel \mathbb{N} \\
+  A : \power \mathbb{N} \\
+  \mathit{filtered\_seq} : \seq \mathbb{N} \\
+  \mathit{restricted\_rel} : \mathbb{N} \rel \mathbb{N}
+  \where
+  s = \langle 1, 2, 3, 4, 5 \rangle \land R = \{1 \mapsto 10, 2
+  \mapsto 20, 3 \mapsto 30\} \land A = \{2, 3, 4\} \land
+  \mathit{filtered\_seq} = s \filter A \land \mathit{restricted\_rel}
+  = R \rres \{10, 20\}
+\end{axdef}
+
+\bigskip
+
+filtered_seq is $\langle 2, 3, 4 \rangle$ (sequence $elements \in A$)
+
+\bigskip
+
+\bigskip
+
+restricted_rel is $\{1 \mapsto 10, 2 \mapsto 20\}$ (relation pairs
+with range in $\{10, 20\}$)
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 4 : Practical Example - Video Database}
+
+\medskip
+
+\begin{zed}[Title, Length, Rating]
+\end{zed}
+
+\begin{axdef}
+  catalog : \seq ((Title \cross Length) \cross Rating) \\
+  \mathit{family\_friendly} : \power Rating
+  \where
+  \mathit{family\_friendly} = \{G, PG\}
+\end{axdef}
+
+\bigskip
+
+The family_friendly set contains ratings G and PG. A$ \filter $could
+be applied to the catalog sequence to only include entries with
+ratings in this set.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 5 : Multiple Filters}
+
+\medskip
+
+\begin{axdef}
+  s : \seq \mathbb{N} \\
+  evens : \power \mathbb{N} \\
+  large : \power \mathbb{N} \\
+  result : \seq \mathbb{N}
+  \where
+  s = \langle 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 \rangle \land evens =
+  \{2, 4, 6, 8, 10, 12\} \land large = \{5, 6, 7, 8, 9, 10, 11\}
+  \land result = (s \filter evens) \filter large
+\end{axdef}
+
+\bigskip
+
+Multiple filters can be applied sequentially. First$ \filter $to
+evens gives $\langle 2, 4, 6, 8, 10 \rangle$, then$ \filter $to large
+gives $\langle 6, 8, 10 \rangle$.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 6 : Empty Filter}
+
+\medskip
+
+\begin{axdef}
+  s : \seq \mathbb{N} \\
+  \mathit{empty\_set} : \power \mathbb{N} \\
+  \mathit{disjoint\_set} : \power \mathbb{N} \\
+  result1 : \seq \mathbb{N} \\
+  result2 : \seq \mathbb{N}
+  \where
+  s = \langle 1, 2, 3 \rangle \land \mathit{empty\_set} = \{\} \land
+  \mathit{disjoint\_set} = \{10, 20, 30\} \land result1 = s \filter
+  \mathit{empty\_set} \land result2 = s \filter \mathit{disjoint\_set}
+\end{axdef}
+
+\bigskip
+
+Filtering by an empty set or disjoint set results in an empty sequence.
+
+\bigskip
+
+\bigskip
+
+result1 = $\langle \rangle$ and result2 = $\langle \rangle$
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 7 : Bag Union ( Related Phase 35 Feature )}
+
+\medskip
+
+\bigskip
+
+Phase 35 also includes the bag union operator.
+
+\bigskip
+
+\bigskip
+
+ASCII $notation : b1  \uplus  b2$
+
+\bigskip
+
+\bigskip
+
+Unicode $alternative : b1 $$\uplus$ b2 (U+228E)
+
+\bigskip
+
+\begin{axdef}
+  b1 : \bag \mathbb{N} \\
+  b2 : \bag \mathbb{N} \\
+  combined : \bag \mathbb{N}
+  \where
+  b1 = \lbag 1, 1, 2, 3 \rbag \land b2 = \lbag 2, 3, 3, 4 \rbag \land
+  combined = b1 \uplus b2
+\end{axdef}
+
+\bigskip
+
+Bag union adds $multiplicities : combined $= [[1, 1, 2, 2, 3, 3, 3, 4]]
+
+\bigskip
+
+\bigskip
+
+Element 1 appears 2 times (2 from b1), element 2 appears 2 times (1
+from each), element 3 appears 3 times (1 from b1, 2 from b2), element
+4 appears 1 time (1 from b2).
+
+\bigskip
+
+\end{document}

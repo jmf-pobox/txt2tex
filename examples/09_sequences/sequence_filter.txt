@@ -1,0 +1,111 @@
+=== Phase 35: Sequence Filter Operator ===
+
+TEXT: The sequence filter operator restricts a sequence to elements from a specified set. It removes elements not in the filter set while preserving order.
+
+TEXT: ASCII notation: s filter A
+TEXT: Unicode alternative: s ↾ A (U+21BE)
+
+** Example 1: Basic Filter Operation **
+
+TEXT: Filter a sequence to only include elements from a set.
+
+axdef
+  s : seq N
+  evens : P N
+  filtered : seq N
+where
+  s = <1, 2, 3, 4, 5, 6> and evens = {2, 4, 6, 8} and filtered = (s filter evens)
+end
+
+TEXT: The filtered sequence is <2, 4, 6>, keeping only elements that are in evens and preserving their original order.
+
+** Example 2: Filter with Set Comprehension **
+
+given Title, Length
+
+axdef
+  all_titles : seq Title
+  long_titles : P Title
+  filtered_titles : seq Title
+where
+  long_titles = {t : Title | true} and filtered_titles = all_titles filter long_titles
+end
+
+TEXT: This filters a sequence of titles to include only titles with length greater than 120 minutes.
+
+** Example 3: Comparison with Range Restriction **
+
+TEXT: Sequence filter (filter) is different from range restriction (|>):
+TEXT: - filter: operates on sequences, preserves order
+TEXT: - |>: operates on relations, restricts range
+
+axdef
+  s : seq N
+  R : N <-> N
+  A : P N
+  filtered_seq : seq N
+  restricted_rel : N <-> N
+where
+  s = <1, 2, 3, 4, 5> and R = {1 |-> 10, 2 |-> 20, 3 |-> 30} and A = {2, 3, 4} and filtered_seq = s filter A and restricted_rel = R |> {10, 20}
+end
+
+TEXT: filtered_seq is <2, 3, 4> (sequence elements in A)
+TEXT: restricted_rel is {1 |-> 10, 2 |-> 20} (relation pairs with range in {10, 20})
+
+** Example 4: Practical Example - Video Database **
+
+given Title, Length, Rating
+
+axdef
+  catalog : seq (Title cross Length cross Rating)
+  family_friendly : P Rating
+where
+  family_friendly = {G, PG}
+end
+
+TEXT: The family_friendly set contains ratings G and PG. A filter could be applied to the catalog sequence to only include entries with ratings in this set.
+
+** Example 5: Multiple Filters **
+
+axdef
+  s : seq N
+  evens : P N
+  large : P N
+  result : seq N
+where
+  s = <1, 2, 3, 4, 5, 6, 7, 8, 9, 10> and evens = {2, 4, 6, 8, 10, 12} and large = {5, 6, 7, 8, 9, 10, 11} and result = (s filter evens) filter large
+end
+
+TEXT: Multiple filters can be applied sequentially. First filter to evens gives <2, 4, 6, 8, 10>, then filter to large gives <6, 8, 10>.
+
+** Example 6: Empty Filter **
+
+axdef
+  s : seq N
+  empty_set : P N
+  disjoint_set : P N
+  result1 : seq N
+  result2 : seq N
+where
+  s = <1, 2, 3> and empty_set = {} and disjoint_set = {10, 20, 30} and result1 = s filter empty_set and result2 = s filter disjoint_set
+end
+
+TEXT: Filtering by an empty set or disjoint set results in an empty sequence.
+TEXT: result1 = <> and result2 = <>
+
+** Example 7: Bag Union (Related Phase 35 Feature) **
+
+TEXT: Phase 35 also includes the bag union operator.
+TEXT: ASCII notation: b1 bag_union b2
+TEXT: Unicode alternative: b1 ⊎ b2 (U+228E)
+
+axdef
+  b1 : bag N
+  b2 : bag N
+  combined : bag N
+where
+  b1 = [[1, 1, 2, 3]] and b2 = [[2, 3, 3, 4]] and combined = b1 bag_union b2
+end
+
+TEXT: Bag union adds multiplicities: combined = [[1, 1, 2, 2, 3, 3, 3, 4]]
+TEXT: Element 1 appears 2 times (2 from b1), element 2 appears 2 times (1 from each), element 3 appears 3 times (1 from b1, 2 from b2), element 4 appears 1 time (1 from b2).

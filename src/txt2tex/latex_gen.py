@@ -87,6 +87,7 @@ class LaTeXGenerator:
         "/in": r"\notin",  # Z notation slash negation (Phase 16+)
         "subset": r"\subseteq",
         "subseteq": r"\subseteq",  # Alternative notation for subset
+        "psubset": r"\subset",  # Strict/proper subset (Phase 39)
         "union": r"\cup",
         "intersect": r"\cap",
         "cross": r"\cross",  # Cartesian product
@@ -114,7 +115,7 @@ class LaTeXGenerator:
         "+->>": r"\psurj",  # Partial surjection
         ">->>": r"\bij",  # Bijection
         ">7->": r"\pbij",  # Partial bijection (Phase 33)
-        "7 7->": r"\ffun",  # Finite partial function (Phase 34)
+        "77->": r"\ffun",  # Finite partial function (Phase 34)
         # Arithmetic operators
         "+": r"+",  # Addition (also postfix in relational context)
         "-": r"-",  # Subtraction (Phase 16)
@@ -199,12 +200,13 @@ class LaTeXGenerator:
         "+->>": 6,
         ">->>": 6,
         ">7->": 6,  # Partial bijection (Phase 33)
-        "7 7->": 6,  # Finite partial function (Phase 34)
+        "77->": 6,  # Finite partial function (Phase 34)
         # Set operators - highest precedence
         "in": 7,
         "notin": 7,
         "subset": 7,
         "subseteq": 7,  # Alternative notation for subset
+        "psubset": 7,  # Strict/proper subset (Phase 39)
         "union": 8,
         "cross": 8,  # Cartesian product (Phase 11.5) - same as union
         "×": 8,  # Cartesian product (Unicode) - same as union  # noqa: RUF001
@@ -1352,7 +1354,7 @@ class LaTeXGenerator:
         # Order matters: longer operators first to avoid partial matches
         replacements = [
             # 5-character operators (process first)
-            ("7 7->", r"\ffun"),  # Finite partial function (Phase 34)
+            ("77->", r"\ffun"),  # Finite partial function (Phase 34)
             # 4-character operators
             (">->>", r"\bij"),  # Bijection
             (">7->", r"\pbij"),  # Partial bijection (Phase 33)
@@ -1415,7 +1417,7 @@ class LaTeXGenerator:
         # CRITICAL: Process by length (longest first) to avoid partial matches
 
         # 5-character operators (process first)
-        text = self._replace_outside_math(text, "7 7->", r"\ffun")  # Finite pfun
+        text = self._replace_outside_math(text, "77->", r"\ffun")  # Finite pfun
 
         # 4-character operators
         text = self._replace_outside_math(text, ">->>", r"\bij")  # Bijection
@@ -2238,7 +2240,7 @@ class LaTeXGenerator:
         # ONLY matches identifiers with underscores to avoid false positives with prose
         # This must come before Pattern 3 to catch function applications
         math_op_pattern = (
-            r"(7 7->|\+->|-\|>|<-\||->|>->|>->>|>7->|<=>|=>|>=|<=|!=|>|<|=)"
+            r"(77->|\+->|-\|>|<-\||->|>->|>->>|>7->|<=>|=>|>=|<=|!=|>|<|=)"
         )
         func_app_pattern = (
             r"\b([a-zA-Z_]\w*_\w+)\s+"  # Function name (must contain underscore)
@@ -2435,7 +2437,7 @@ class LaTeXGenerator:
         result = text
 
         # 5-character operators (process first)
-        result = result.replace("7 7->", r"$\ffun$")  # Finite partial function
+        result = result.replace("77->", r"$\ffun$")  # Finite partial function
 
         # 4-character operators
         result = result.replace(">->>", r"$\bij$")  # Bijection
@@ -3342,7 +3344,7 @@ class LaTeXGenerator:
             op_latex = operator_part
 
             # 5-character operators
-            op_latex = op_latex.replace("7 7->", r"\ffun")
+            op_latex = op_latex.replace("77->", r"\ffun")
 
             # 4-character operators
             op_latex = op_latex.replace(">->>", r"\bij")
@@ -3399,7 +3401,7 @@ class LaTeXGenerator:
             op_latex = operator_part
 
             # 5-character operators
-            op_latex = op_latex.replace("7 7->", r"\ffun")
+            op_latex = op_latex.replace("77->", r"\ffun")
 
             # 4-character operators
             op_latex = op_latex.replace(">->>", r"\bij")
@@ -3446,7 +3448,7 @@ class LaTeXGenerator:
         result = just
 
         # 5-character operators
-        result = result.replace("7 7->", r"\ffun")
+        result = result.replace("77->", r"\ffun")
 
         # 4-character operators
         result = result.replace(">->>", r"\bij")
