@@ -321,6 +321,8 @@ PAGEBREAK:
 
 ** Question 8 **
 
+TEXT: The following are given as abbreviations to enable fuzz validation, which passes for each expression.
+
 EightA == {s : dom show_episodes | #(show_episodes(s)) >= 100}
 
 TEXT: Shows with at least 100 episodes.  We use the cardinality operator on F EpisodeId after ensuring s is in the domain of show\_episodes.
@@ -342,8 +344,6 @@ EightC == first_episode_timestamp(mu s : dom show_info | \
 TEXT: We are given that there is exactly one show with the most people and we want the timestamp for the first episode of that show. This involves two operations, finding the show with the most people and finding the timestamp for the first episode of that show.  For the first operation, we compare the cardinality of the F PeopleId for every pair s, t : ShowId in the domain of show\_info. This is captured in the mu expression, which returns the single matching value.
 
 TEXT: For the second operation, we define a partial function first\_episode\_timestamp that yields the Timestamp for EpisodeId = 1 for s : ShowId.  We are guaranteed that EpisodeId = 1 exists by constraint 7(b). In addition, calling this function with the s from the mu expression is valid because the constraint defined in 7(e) guarantees that the set of EpisodeId in the domain of show\_info and in the first element of the domain of episode\_info are identical.
-
-TEXT: The above are given as abbreviations to enable fuzz validation, which passes for the above expressions.
 
 ** Question 9**
 

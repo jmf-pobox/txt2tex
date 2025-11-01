@@ -878,6 +878,13 @@ snd(episode\_info(s, e_2))))$
 
 \medskip
 
+\bigskip
+
+The following are given as abbreviations to enable fuzz validation,
+which passes for each expression.
+
+\bigskip
+
 \begin{zed}
   EightA == \{ s : \dom show\_episodes | \# (show\_episodes(s)) \geq 100 \}
 \end{zed}
@@ -935,13 +942,6 @@ by constraint 7(b). In addition, calling this function with the s
 from the mu expression is valid because the constraint defined in
 7(e) guarantees that the set of EpisodeId in the domain of show\_info
 and in the first element of the domain of episode\_info are identical.
-
-\bigskip
-
-\bigskip
-
-The above are given as abbreviations to enable fuzz validation, which
-passes for the above expressions.
 
 \bigskip
 
