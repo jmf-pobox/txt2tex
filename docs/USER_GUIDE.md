@@ -1085,10 +1085,17 @@ n^k              →  nᵏ
 ### Filter
 
 ```
-s |> A           →  s ⊳ A       [filter]
+s ↾ A            →  s ↾ A       [sequence filter - restricts sequence s to elements in set A]
 ```
 
-Note: The filter operator syntax may vary.
+The filter operator `↾` (U+21BE) filters a sequence to only include elements from a given set.
+
+**Example:**
+```
+records ↾ {x : Entry | x.viewed = yes}    [filter sequence to viewed entries]
+```
+
+**Note:** The filter operator is Unicode-only (no ASCII alternative). It's distinct from `|>` (range restriction for relations).
 
 ### Sequence Length
 
