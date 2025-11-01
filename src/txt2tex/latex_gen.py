@@ -123,7 +123,11 @@ class LaTeXGenerator:
         # Sequence operators (Phase 12, enhanced Phase 35)
         "⌢": r"\cat",  # Sequence concatenation (Unicode)
         "^": r"\cat",  # Sequence concatenation (ASCII alternative, Phase 14)
-        "↾": r"\filter",  # Sequence filter (Phase 35)
+        "↾": r"\filter",  # Sequence filter (Phase 35 - Unicode)
+        "filter": r"\filter",  # Sequence filter (Phase 35 - ASCII alternative)
+        # Bag operators (Phase 12, enhanced Phase 35)
+        "⊎": r"\uplus",  # Bag union (Phase 35 - Unicode)
+        "bag_union": r"\uplus",  # Bag union (Phase 35 - ASCII alternative)
     }
 
     UNARY_OPS: ClassVar[dict[str, str]] = {
@@ -1372,7 +1376,10 @@ class LaTeXGenerator:
             ("++", r"\oplus"),
             ("o9", r"\circ"),
             ("⌢", r"\cat"),
-            ("↾", r"\filter"),  # Sequence filter (Phase 35)
+            ("↾", r"\filter"),  # Sequence filter (Phase 35 - Unicode)
+            ("filter", r"\filter"),  # Sequence filter (Phase 35 - ASCII)
+            ("⊎", r"\uplus"),  # Bag union (Phase 35 - Unicode)
+            ("bag_union", r"\uplus"),  # Bag union (Phase 35 - ASCII)
         ]
 
         result = text
@@ -1444,8 +1451,13 @@ class LaTeXGenerator:
         )  # Total function (after |->)
         text = self._replace_outside_math(text, "++", r"\oplus")  # Override
         text = self._replace_outside_math(text, "o9", r"\circ")  # Composition
-        text = self._replace_outside_math(text, "⌢", r"\cat")  # Sequence concatenation
-        text = self._replace_outside_math(text, "↾", r"\filter")  # Sequence filter
+        text = self._replace_outside_math(text, "⌢", r"\cat")  # Concatenation
+        text = self._replace_outside_math(text, "↾", r"\filter")  # Filter (Unicode)
+        # Sequence filter (ASCII)
+        text = self._replace_outside_math(text, " filter ", r" \filter ")
+        text = self._replace_outside_math(text, "⊎", r"\uplus")  # Bag union (Unicode)
+        # Bag union (ASCII)
+        text = self._replace_outside_math(text, " bag_union ", r" \uplus ")
 
         # Convert keywords to symbols (QA fixes)
         # Negative lookbehind (?<!\\) ensures we don't match LaTeX commands like \forall

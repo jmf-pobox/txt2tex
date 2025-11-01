@@ -910,10 +910,14 @@ class Parser:
         left = self._parse_multiplicative()
 
         while self._match(
-            TokenType.PLUS, TokenType.MINUS, TokenType.CAT, TokenType.FILTER
+            TokenType.PLUS,
+            TokenType.MINUS,
+            TokenType.CAT,
+            TokenType.FILTER,
+            TokenType.BAG_UNION,
         ):
             # Lookahead for +: only treat as infix if followed by operand
-            # CAT (⌢), FILTER (↾), and MINUS are always infix, no ambiguity
+            # CAT, FILTER, BAG_UNION, and MINUS are always infix
             if self._match(TokenType.PLUS) and not self._is_operand_start():
                 break
             op_token = self._advance()
@@ -1091,6 +1095,7 @@ class Parser:
             TokenType.MOD,
             TokenType.CAT,  # ⌢ concatenation
             TokenType.FILTER,  # ↾ sequence filter (Phase 35)
+            TokenType.BAG_UNION,  # ⊎ bag union (Phase 35)
             TokenType.RANGE,  # ..
             TokenType.EQUALS,
             TokenType.NOT_EQUAL,
