@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
 **Last Updated:** 2025-11-01
-**Current Phase:** Phase 33 (Partial Bijection Operator) ✓ COMPLETE
+**Current Phase:** Phase 34 (Finite Partial Functions) ✓ COMPLETE
 
 ---
 
@@ -91,6 +91,7 @@
 - ✓ Injections: `>->`, `>+>`, `-|>`
 - ✓ Surjections: `-->>`, `+->>`
 - ✓ Bijections: `>->>` (total), `>7->` (partial)
+- ✓ Finite partial functions: `7 7->` (Phase 34)
 - ✓ Function application: `f(x)`, `f(x, y)`
 - ✓ Space-separated application: `f x`, `f x y` (left-associative)
 
@@ -492,6 +493,30 @@
 - Test count: 1086 tests (1078 + 8 new partial bijection tests, all passing)
 - All quality gates pass: type, lint, format, test
 
+### ✅ Phase 34: Finite Partial Function Operator
+- Implemented `7 7->` finite partial function operator (from glossary)
+- Used in Solutions 36, 40, 41 (e.g., `records : Year 7 7-> Table`)
+- Added `FINFUN` token type to lexer
+- Added "7 7->" operator recognition in lexer (5-character pattern with space)
+  - Special handling before general digit parsing to recognize `7 7->`
+  - Distinguishes from plain number `7` and other digit patterns
+- Added `TokenType.FINFUN` to parser's function type operator lists (2 locations)
+- Added `7 7->` → `\ffun` mapping in LaTeX generator
+- Added to all replacement functions in latex_gen.py (9 locations)
+  - BINARY_OPS and PRECEDENCE dictionaries
+  - _convert_operators_bare replacements list (2 locations)
+  - _generate_paragraph TEXT block processing
+  - _process_inline_math regex pattern
+  - EQUIV label conversion (2 locations)
+  - PROOF justification conversion
+- Created comprehensive test suite: 11 new tests in test_finite_functions.py
+  - Covers: lexer (operator vs plain number), parser, LaTeX generation, integration
+  - Tests finite function vs partial function distinction
+  - Tests right-associativity
+  - Tests realistic usage from Solutions 36, 40, 41
+- Test count: 1097 tests (1086 + 11 new finite function tests, all passing)
+- All quality gates pass: type, lint, format, test
+
 ### ✅ Fuzz Mode: Context-Aware Equivalence Operator
 - Fixed `<=>` operator to render context-sensitively in fuzz mode
 - **EQUIV blocks**: `<=>` → `\Leftrightarrow` (equivalence in equational reasoning)
@@ -710,7 +735,7 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 1086 passing (as of Phase 33, November 2025)
+- **Total Tests:** 1097 passing (as of Phase 34, November 2025)
 
 **Component Coverage:**
 - parser.py: 86.17%
