@@ -153,11 +153,10 @@ class LaTeXGenerator:
         "last": r"\last",  # Last element
         "front": r"\front",  # All but last
         "rev": r"\rev",  # Reverse sequence
-        # Postfix operators (Phase 10b, Phase 36) - special handling needed
+        # Postfix operators (Phase 10b) - special handling needed
         "~": r"^{-1}",  # Relational inverse (superscript -1)
         "+": r"^{+}",  # Transitive closure (superscript +)
         "*": r"^{*}",  # Reflexive-transitive closure (superscript *)
-        "rcl": r"^{r}",  # Reflexive closure (superscript r) - Phase 36
     }
 
     # Quantifier mappings (Phase 3, enhanced in Phase 6-7)
@@ -404,16 +403,6 @@ class LaTeXGenerator:
                 return f"{base_latex}^{{-1}}"
             else:
                 return f"{base_latex}^{{\\sim}}"
-        elif name.endswith("rcl") and len(name) > 1:
-            # Check if this is a compound identifier (e.g., Rr, rel_1r)
-            # Only treat as closure if preceded by non-lowercase letter or underscore
-            # This prevents "car", "var", "for" from being treated as closures
-            base = name[:-1]
-            if base and (base[-1].isupper() or base[-1] == "_" or base[-1].isdigit()):
-                # Render as R^r (reflexive closure) - Phase 36
-                base_id = Identifier(line=0, column=0, name=base)
-                return f"{self._generate_identifier(base_id)}^r"
-            # Otherwise fall through to normal identifier handling
 
         # Check if this is an operator/function from UNARY_OPS dictionary
         # This handles operators like id, inv, dom, ran when used as identifiers
@@ -535,15 +524,13 @@ class LaTeXGenerator:
         ):
             operand = f"({operand})"
 
-        # Phase 10b, 36: Check if this is a postfix operator (rendered as superscript)
-        if node.operator in {"~", "+", "*", "rcl"}:
+        # Phase 10b: Check if this is a postfix operator (rendered as superscript)
+        if node.operator in {"~", "+", "*"}:
             # Fuzz uses special commands for closure operators
             if self.use_fuzz and node.operator == "+":
                 return rf"{operand} \plus"
             if self.use_fuzz and node.operator == "*":
                 return rf"{operand} \star"
-            if self.use_fuzz and node.operator == "rcl":
-                return rf"{operand} \rcl"
             # Standard LaTeX or inverse: operand^{superscript}
             return f"{operand}{op_latex}"
         # Phase 11.5, 19: Generic instantiation operators (P, P1, F, F1)
@@ -2275,9 +2262,7 @@ class LaTeXGenerator:
         # Match: func_name arg operator value (e.g., "cumulative_total hd <= 12000")
         # ONLY matches identifiers with underscores to avoid false positives with prose
         # This must come before Pattern 3 to catch function applications
-        math_op_pattern = (
-            r"(77->|\+->|-\|>|<-\||->|>->|>->>|<=>|=>|>=|<=|!=|>|<|=)"
-        )
+        math_op_pattern = r"(77->|\+->|-\|>|<-\||->|>->|>->>|<=>|=>|>=|<=|!=|>|<|=)"
         func_app_pattern = (
             r"\b([a-zA-Z_]\w*_\w+)\s+"  # Function name (must contain underscore)
             r"([a-zA-Z_]\w*)\s*"  # Argument

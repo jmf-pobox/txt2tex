@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
 **Last Updated:** 2025-11-01
-**Current Phase:** Phase 36 (Reflexive Closure Operator) ✓ COMPLETE
+**Current Phase:** Phase 39 (Strict Subset Operator) ✓ COMPLETE
 
 ---
 
@@ -533,38 +533,6 @@
 - All quality gates pass: type, lint, format, test
 - Example file: [examples/09_sequences/sequence_filter.txt](examples/09_sequences/sequence_filter.txt) ✓
 
-### ✅ Phase 36: Reflexive Closure Operator
-- Implemented `r` reflexive closure operator (from glossary)
-- ASCII keyword: `r` (e.g., `R rcl` or `parentOf r`)
-- Definition: reflexive closure of R is R ∪ id[X]
-- Added `REFLEXIVE_CLOSURE` token type to lexer
-- Added `r` keyword recognition in lexer (postfix operator)
-- Added `r` to z_keywords set (prevents prose mode)
-- Updated parser to handle reflexive closure as postfix operator:
-  - Added to _parse_postfix method (3 locations)
-  - Added to _parse_compound_identifier_name (for Rr definitions)
-  - Updated grammar comment to include 'r' in postfix operators
-  - Updated docstring to document Phase 36
-- Added LaTeX generation for reflexive closure:
-  - Standard LaTeX: `^{r}` (superscript r)
-  - Fuzz mode: `\rcl` (reflexive closure command)
-  - Added to UNARY_OPS dictionary
-- Created comprehensive test suite: 30+ tests in test_reflexive_closure.py
-  - Covers: lexer, parser, LaTeX generation (standard and fuzz), integration
-  - Tests reflexive closure as expression operator (R r)
-  - Tests reflexive closure in abbreviations (Rr == ...)
-  - Tests reflexive closure in schema names (schema Sr)
-  - Tests comparison with other closures (+, *, ~)
-  - Tests precedence with union and other operators
-  - Tests compound identifiers with underscore (rel_1r)
-- Documentation updates:
-  - RESERVED_WORDS.md: Added 'r' to Relation Operators table
-  - USER_GUIDE.md: Added reflexive closure to Closures section
-  - Updated z_keywords example and counts
-- Test count: 1164 tests (1133 + 31 new reflexive closure tests, all passing)
-- All quality gates pass: type, lint, format, test
-- Example file: [examples/07_relations/reflexive_closure.txt](examples/07_relations/reflexive_closure.txt) ✓
-
 ### ✅ Phase 39: Strict Subset Operator
 - Implemented `psubset` strict/proper subset operator (from glossary)
 - ASCII keyword: `psubset` (e.g., `A psubset B`)
@@ -795,10 +763,9 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 19. ✓ Phase 26: TEXT Block Operator Support (all operators in prose)
 20. ✓ Phase 34: Finite Partial Function Operator (`77->`)
 21. ✓ Phase 35: Sequence Filter & Bag Union (`filter`, `bag_union`)
-22. ✓ Phase 36: Reflexive Closure Operator (`r`)
-23. ✓ Phase 39: Strict Subset Operator (`psubset`)
+22. ✓ Phase 39: Strict Subset Operator (`psubset`)
 
-**Current:** 98.1% (51/52) - Phase 36 Complete
+**Current:** 96.2% (50/52) - Phase 39 Complete
 
 ### Next Steps
 

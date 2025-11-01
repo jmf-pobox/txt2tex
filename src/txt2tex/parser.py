@@ -2184,7 +2184,6 @@ class Parser:
             TokenType.TILDE,
             TokenType.PLUS,
             TokenType.STAR,
-            TokenType.REFLEXIVE_CLOSURE,  # r (Phase 36)
             TokenType.LIMG,  # (| for relational image
         ):
             # Check for postfix +/* disambiguation
@@ -2758,9 +2757,7 @@ class Parser:
 
         # Check for postfix closure operators as part of the name
         # These are valid in definition contexts (not expression contexts)
-        if self._match(
-            TokenType.PLUS, TokenType.STAR, TokenType.TILDE, TokenType.REFLEXIVE_CLOSURE
-        ):
+        if self._match(TokenType.PLUS, TokenType.STAR, TokenType.TILDE):
             op_token = self._advance()
             name = name + op_token.value  # "R" + "+" → "R+"
 

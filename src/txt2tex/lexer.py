@@ -887,7 +887,6 @@ class Lexer:
                         "else",
                         "otherwise",
                         "mod",
-                        "rcl",
                     }
 
                     # If next word is NOT a Z keyword, treat as prose
@@ -1011,10 +1010,6 @@ class Lexer:
             return Token(TokenType.INV, value, start_line, start_column)
         if value == "id":
             return Token(TokenType.ID, value, start_line, start_column)
-
-        # Check for reflexive closure operator (Phase 36)
-        if value == "rcl":
-            return Token(TokenType.REFLEXIVE_CLOSURE, value, start_line, start_column)
 
         # Check for arithmetic operators (modulo)
         if value == "mod":
