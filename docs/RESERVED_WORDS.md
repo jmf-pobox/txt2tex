@@ -75,6 +75,7 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 | `;` | — | `\comp` | Relational composition | 10 |
 | `o9` | ∘ (U+2218) | `\circ` | Forward/backward composition | 10 |
 | `~` | — | `\inv` | Relational inverse (postfix) | 10 |
+| `rcl` | — | `\rcl` | Reflexive closure (postfix) | 36 |
 | `(+)` | ⊕ (U+2295) | `\limg` | Relational image | 10 |
 | `+)` | — | `\rimg` | Relational image (right) | 10 |
 
@@ -104,7 +105,6 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 | `-->>` | ↠ (U+21A0) | `\surj` | Total surjection | 10 |
 | `+->>` | ⤀ (U+2900) | `\psurj` | Partial surjection | 10 |
 | `>->>` | ⤖ (U+2916) | `\bij` | Total bijection | 10 |
-| `>7->` | ⤕ (U+2915) | `\pbij` | Partial bijection | 33 |
 
 ---
 
@@ -235,8 +235,8 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 **Categories:**
 - Logical operators: 8
 - Set operators/functions: 14
-- Relation operators/functions: 19
-- Function types: 10
+- Relation operators/functions: 20
+- Function types: 9
 - Sequence operators: 9
 - Bag operators: 2
 - Arithmetic: 6
@@ -264,7 +264,7 @@ z_keywords = {
     "subset", "subseteq", "psubset", "cross", "dom", "ran", "inv", "id",
     "comp", "forall", "exists", "exists1", "mu", "lambda",
     "given", "axdef", "schema", "gendef", "zed",
-    "where", "end", "if", "then", "else", "otherwise", "mod",
+    "where", "end", "if", "then", "else", "otherwise", "mod", "rcl",
     # ... and more
 }
 ```

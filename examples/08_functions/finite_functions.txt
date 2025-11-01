@@ -27,7 +27,6 @@ TEXT: - Total function (->): defined for all inputs, domain is entire source set
 TEXT: - Partial function (+->): may not be defined for all inputs, domain may be infinite
 TEXT: - Finite partial function (77->): partial function with finite domain
 TEXT: - Total bijection (>->>): defined everywhere, injective and surjective
-TEXT: - Partial bijection (>7->): may not be defined everywhere, but injective
 
 given X, Y
 
@@ -36,9 +35,8 @@ axdef
   partialFunc : X +-> Y
   finitePartialFunc : X 77-> Y
   totalBij : X >->> Y
-  partialBij : X >7-> Y
 where
-  dom totalFunc = X and # (dom finitePartialFunc) < infinity and dom totalBij = X and (forall x1, x2 : X | totalBij(x1) = totalBij(x2) => x1 = x2) and ran totalBij = Y
+  dom totalFunc = X and dom totalBij = X and (forall x1, x2 : X | totalBij(x1) = totalBij(x2) => x1 = x2) and ran totalBij = Y
 end
 
 ** Example 3: Finite Functions in Practice **
@@ -50,7 +48,7 @@ given CustomerID, Preference
 axdef
   preferences : CustomerID 77-> Preference
 where
-  # (dom preferences) <= 10000 and forall c : CustomerID | c in dom preferences => preferences(c) != {}
+  # (dom preferences) <= 10000
 end
 
 TEXT: This models a preference database where:
@@ -84,8 +82,9 @@ given Title, Length, ViewDate
 axdef
   viewed : Title 77-> ViewDate
   recent_viewed : Title 77-> ViewDate
+  recentSet : P Title
 where
-  # (dom viewed) < infinity and recent_viewed = {t : Title | t in dom viewed} and # (dom recent_viewed) <= # (dom viewed)
+  recentSet = {t : Title | t in dom viewed} and recent_viewed = recentSet <| viewed and # (dom recent_viewed) <= # (dom viewed)
 end
 
 TEXT: Restricting a finite partial function preserves finiteness. The recent_viewed function has a domain that is a subset of viewed's domain, so it remains finite.

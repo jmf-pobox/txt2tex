@@ -306,19 +306,6 @@ class Lexer:
             self._advance()
             return Token(TokenType.BIJECTION, ">->>", start_line, start_column)
 
-        # Check 4-character: >7-> (partial bijection, Phase 33)
-        if (
-            char == ">"
-            and self._peek_char() == "7"
-            and self._peek_char(2) == "-"
-            and self._peek_char(3) == ">"
-        ):
-            self._advance()
-            self._advance()
-            self._advance()
-            self._advance()
-            return Token(TokenType.PBIJECTION, ">7->", start_line, start_column)
-
         # Check 3-character: >+>, >->
         if char == ">" and self._peek_char() == "+" and self._peek_char(2) == ">":
             self._advance()
@@ -900,6 +887,7 @@ class Lexer:
                         "else",
                         "otherwise",
                         "mod",
+                        "rcl",
                     }
 
                     # If next word is NOT a Z keyword, treat as prose
@@ -1023,6 +1011,10 @@ class Lexer:
             return Token(TokenType.INV, value, start_line, start_column)
         if value == "id":
             return Token(TokenType.ID, value, start_line, start_column)
+
+        # Check for reflexive closure operator (Phase 36)
+        if value == "rcl":
+            return Token(TokenType.REFLEXIVE_CLOSURE, value, start_line, start_column)
 
         # Check for arithmetic operators (modulo)
         if value == "mod":

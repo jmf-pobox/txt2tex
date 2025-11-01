@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
 **Last Updated:** 2025-11-01
-**Current Phase:** Phase 39 (Strict Subset Operator) ✓ COMPLETE
+**Current Phase:** Phase 36 (Reflexive Closure Operator) ✓ COMPLETE
 
 ---
 
@@ -480,21 +480,6 @@
 - Test count: 1078 tests (1070 + 8 new bigcap tests, all passing)
 - All quality gates pass: type, lint, format, test
 
-### ✅ Phase 33: Partial Bijection Operator
-- Implemented `>7->` partial bijection operator (from glossary)
-- Added `PBIJECTION` token type to lexer
-- Added ">7->" operator recognition in lexer (4-character pattern)
-- Added `TokenType.PBIJECTION` to parser's function type operator lists (2 locations)
-- Added `>7->` → `\pbij` mapping in LaTeX generator
-- Added to all replacement functions in latex_gen.py (6 locations)
-- Created comprehensive test suite: 8 new tests in test_partial_bijections.py
-  - Covers: lexer, parser, LaTeX generation, integration
-  - Tests partial bijection vs bijection distinction
-  - Tests right-associativity
-- Test count: 1086 tests (1078 + 8 new partial bijection tests, all passing)
-- All quality gates pass: type, lint, format, test
-- Example file: [examples/08_functions/partial_bijections.txt](examples/08_functions/partial_bijections.txt) ✓
-
 ### ✅ Phase 34: Finite Partial Function Operator
 - Implemented `77->` finite partial function operator (from glossary)
 - Used in Solutions 36, 40, 41 (e.g., `records : Year 77-> Table`)
@@ -547,6 +532,38 @@
 - Test count: 1125 tests (1107 + 7 new filter tests + 11 new bag union tests, all passing)
 - All quality gates pass: type, lint, format, test
 - Example file: [examples/09_sequences/sequence_filter.txt](examples/09_sequences/sequence_filter.txt) ✓
+
+### ✅ Phase 36: Reflexive Closure Operator
+- Implemented `r` reflexive closure operator (from glossary)
+- ASCII keyword: `r` (e.g., `R rcl` or `parentOf r`)
+- Definition: reflexive closure of R is R ∪ id[X]
+- Added `REFLEXIVE_CLOSURE` token type to lexer
+- Added `r` keyword recognition in lexer (postfix operator)
+- Added `r` to z_keywords set (prevents prose mode)
+- Updated parser to handle reflexive closure as postfix operator:
+  - Added to _parse_postfix method (3 locations)
+  - Added to _parse_compound_identifier_name (for Rr definitions)
+  - Updated grammar comment to include 'r' in postfix operators
+  - Updated docstring to document Phase 36
+- Added LaTeX generation for reflexive closure:
+  - Standard LaTeX: `^{r}` (superscript r)
+  - Fuzz mode: `\rcl` (reflexive closure command)
+  - Added to UNARY_OPS dictionary
+- Created comprehensive test suite: 30+ tests in test_reflexive_closure.py
+  - Covers: lexer, parser, LaTeX generation (standard and fuzz), integration
+  - Tests reflexive closure as expression operator (R r)
+  - Tests reflexive closure in abbreviations (Rr == ...)
+  - Tests reflexive closure in schema names (schema Sr)
+  - Tests comparison with other closures (+, *, ~)
+  - Tests precedence with union and other operators
+  - Tests compound identifiers with underscore (rel_1r)
+- Documentation updates:
+  - RESERVED_WORDS.md: Added 'r' to Relation Operators table
+  - USER_GUIDE.md: Added reflexive closure to Closures section
+  - Updated z_keywords example and counts
+- Test count: 1164 tests (1133 + 31 new reflexive closure tests, all passing)
+- All quality gates pass: type, lint, format, test
+- Example file: [examples/07_relations/reflexive_closure.txt](examples/07_relations/reflexive_closure.txt) ✓
 
 ### ✅ Phase 39: Strict Subset Operator
 - Implemented `psubset` strict/proper subset operator (from glossary)
@@ -776,12 +793,12 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 17. ✓ Phase 24: Whitespace-Sensitive ^ Operator (concat vs exponent disambiguation)
 18. ✓ Phase 25: Justification Operator Conversion (relation/function operators in justifications)
 19. ✓ Phase 26: TEXT Block Operator Support (all operators in prose)
-20. ✓ Phase 33: Partial Bijection Operator (`>7->`)
-21. ✓ Phase 34: Finite Partial Function Operator (`77->`)
-22. ✓ Phase 35: Sequence Filter & Bag Union (`filter`, `bag_union`)
+20. ✓ Phase 34: Finite Partial Function Operator (`77->`)
+21. ✓ Phase 35: Sequence Filter & Bag Union (`filter`, `bag_union`)
+22. ✓ Phase 36: Reflexive Closure Operator (`r`)
 23. ✓ Phase 39: Strict Subset Operator (`psubset`)
 
-**Current:** 98.1% (51/52) - Phase 39 Complete
+**Current:** 98.1% (51/52) - Phase 36 Complete
 
 ### Next Steps
 
