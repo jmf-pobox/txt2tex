@@ -114,7 +114,6 @@ class LaTeXGenerator:
         "-->>": r"\surj",  # Total surjection
         "+->>": r"\psurj",  # Partial surjection
         ">->>": r"\bij",  # Bijection
-        ">7->": r"\pbij",  # Partial bijection (Phase 33)
         "77->": r"\ffun",  # Finite partial function (Phase 34)
         # Arithmetic operators
         "+": r"+",  # Addition (also postfix in relational context)
@@ -154,10 +153,11 @@ class LaTeXGenerator:
         "last": r"\last",  # Last element
         "front": r"\front",  # All but last
         "rev": r"\rev",  # Reverse sequence
-        # Postfix operators (Phase 10b) - special handling needed
+        # Postfix operators (Phase 10b, Phase 36) - special handling needed
         "~": r"^{-1}",  # Relational inverse (superscript -1)
         "+": r"^{+}",  # Transitive closure (superscript +)
         "*": r"^{*}",  # Reflexive-transitive closure (superscript *)
+        "rcl": r"^{r}",  # Reflexive closure (superscript r) - Phase 36
     }
 
     # Quantifier mappings (Phase 3, enhanced in Phase 6-7)
@@ -199,7 +199,6 @@ class LaTeXGenerator:
         "-->>": 6,
         "+->>": 6,
         ">->>": 6,
-        ">7->": 6,  # Partial bijection (Phase 33)
         "77->": 6,  # Finite partial function (Phase 34)
         # Set operators - highest precedence
         "in": 7,
@@ -384,7 +383,7 @@ class LaTeXGenerator:
         if name in special_keywords:
             return special_keywords[name]
 
-        # Handle compound identifiers with postfix closure operators (R+, R*, R~)
+        # Handle compound identifiers with postfix closure operators (R+, R*, R~, Rr)
         # These appear in abbreviation and schema names from Bug #3 fix
         if name.endswith("+"):
             base = name[:-1]
@@ -405,6 +404,16 @@ class LaTeXGenerator:
                 return f"{base_latex}^{{-1}}"
             else:
                 return f"{base_latex}^{{\\sim}}"
+        elif name.endswith("rcl") and len(name) > 1:
+            # Check if this is a compound identifier (e.g., Rr, rel_1r)
+            # Only treat as closure if preceded by non-lowercase letter or underscore
+            # This prevents "car", "var", "for" from being treated as closures
+            base = name[:-1]
+            if base and (base[-1].isupper() or base[-1] == "_" or base[-1].isdigit()):
+                # Render as R^r (reflexive closure) - Phase 36
+                base_id = Identifier(line=0, column=0, name=base)
+                return f"{self._generate_identifier(base_id)}^r"
+            # Otherwise fall through to normal identifier handling
 
         # Check if this is an operator/function from UNARY_OPS dictionary
         # This handles operators like id, inv, dom, ran when used as identifiers
@@ -478,6 +487,7 @@ class LaTeXGenerator:
 
         Phase 10b: Postfix operators (~, +, *) are rendered as superscripts
         on the operand, not as prefix operators.
+        Phase 36: Postfix operator (rcl) for reflexive closure.
         """
         op_latex = self.UNARY_OPS.get(node.operator)
         if op_latex is None:
@@ -497,13 +507,43 @@ class LaTeXGenerator:
         if self.use_fuzz and isinstance(node.operand, FunctionApp):
             operand = f"({operand})"
 
-        # Phase 10b: Check if this is a postfix operator (rendered as superscript)
-        if node.operator in {"~", "+", "*"}:
-            # Fuzz uses special commands for transitive closure operators
+        # Add parentheses when # is applied to function-like unary operators
+        # in fuzz mode (e.g., # dom R needs to be # (dom R))
+        # Otherwise fuzz parses it as (# dom) R
+        function_like_ops = {
+            "dom",
+            "ran",
+            "inv",
+            "id",
+            "head",
+            "tail",
+            "last",
+            "front",
+            "rev",
+            "P",
+            "P1",
+            "F",
+            "F1",
+            "bigcup",
+            "bigcap",
+        }
+        if (
+            self.use_fuzz
+            and node.operator == "#"
+            and isinstance(node.operand, UnaryOp)
+            and node.operand.operator in function_like_ops
+        ):
+            operand = f"({operand})"
+
+        # Phase 10b, 36: Check if this is a postfix operator (rendered as superscript)
+        if node.operator in {"~", "+", "*", "rcl"}:
+            # Fuzz uses special commands for closure operators
             if self.use_fuzz and node.operator == "+":
                 return rf"{operand} \plus"
             if self.use_fuzz and node.operator == "*":
                 return rf"{operand} \star"
+            if self.use_fuzz and node.operator == "rcl":
+                return rf"{operand} \rcl"
             # Standard LaTeX or inverse: operand^{superscript}
             return f"{operand}{op_latex}"
         # Phase 11.5, 19: Generic instantiation operators (P, P1, F, F1)
@@ -1357,7 +1397,6 @@ class LaTeXGenerator:
             ("77->", r"\ffun"),  # Finite partial function (Phase 34)
             # 4-character operators
             (">->>", r"\bij"),  # Bijection
-            (">7->", r"\pbij"),  # Partial bijection (Phase 33)
             ("+->>", r"\psurj"),  # Partial surjection
             ("-->>", r"\surj"),  # Total surjection
             # 3-character operators
@@ -1421,9 +1460,6 @@ class LaTeXGenerator:
 
         # 4-character operators
         text = self._replace_outside_math(text, ">->>", r"\bij")  # Bijection
-        text = self._replace_outside_math(
-            text, ">7->", r"\pbij"
-        )  # Partial bijection (Phase 33)
         text = self._replace_outside_math(text, "+->>", r"\psurj")  # Partial surjection
         text = self._replace_outside_math(text, "-->>", r"\surj")  # Total surjection
 
@@ -2240,7 +2276,7 @@ class LaTeXGenerator:
         # ONLY matches identifiers with underscores to avoid false positives with prose
         # This must come before Pattern 3 to catch function applications
         math_op_pattern = (
-            r"(77->|\+->|-\|>|<-\||->|>->|>->>|>7->|<=>|=>|>=|<=|!=|>|<|=)"
+            r"(77->|\+->|-\|>|<-\||->|>->|>->>|<=>|=>|>=|<=|!=|>|<|=)"
         )
         func_app_pattern = (
             r"\b([a-zA-Z_]\w*_\w+)\s+"  # Function name (must contain underscore)
@@ -2441,7 +2477,6 @@ class LaTeXGenerator:
 
         # 4-character operators
         result = result.replace(">->>", r"$\bij$")  # Bijection
-        result = result.replace(">7->", r"$\pbij$")  # Partial bijection (Phase 33)
         result = result.replace("+->>", r"$\psurj$")  # Partial surjection
         result = result.replace("-->>", r"$\surj$")  # Total surjection
 
@@ -3348,7 +3383,6 @@ class LaTeXGenerator:
 
             # 4-character operators
             op_latex = op_latex.replace(">->>", r"\bij")
-            op_latex = op_latex.replace(">7->", r"\pbij")  # Phase 33
             op_latex = op_latex.replace("+->>", r"\psurj")
             op_latex = op_latex.replace("-->>", r"\surj")
 
@@ -3405,7 +3439,6 @@ class LaTeXGenerator:
 
             # 4-character operators
             op_latex = op_latex.replace(">->>", r"\bij")
-            op_latex = op_latex.replace(">7->", r"\pbij")  # Phase 33
             op_latex = op_latex.replace("+->>", r"\psurj")
             op_latex = op_latex.replace("-->>", r"\surj")
 
@@ -3452,7 +3485,6 @@ class LaTeXGenerator:
 
         # 4-character operators
         result = result.replace(">->>", r"\bij")
-        result = result.replace(">7->", r"\pbij")  # Phase 33
         result = result.replace("+->>", r"\psurj")
         result = result.replace("-->>", r"\surj")
 
