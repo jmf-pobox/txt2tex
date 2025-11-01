@@ -1019,6 +1019,8 @@ class Lexer:
         # Check for set operators (Phase 20)
         if value == "bigcup":
             return Token(TokenType.BIGCUP, value, start_line, start_column)
+        if value == "bigcap":
+            return Token(TokenType.BIGCAP, value, start_line, start_column)
 
         # Regular identifier (includes seq, seq1)
         return Token(TokenType.IDENTIFIER, value, start_line, start_column)

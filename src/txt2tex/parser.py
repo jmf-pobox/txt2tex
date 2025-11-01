@@ -1142,6 +1142,7 @@ class Parser:
             TokenType.FINSET,
             TokenType.FINSET1,
             TokenType.BIGCUP,
+            TokenType.BIGCAP,
             TokenType.HEAD,
             TokenType.TAIL,
             TokenType.LAST,
@@ -2318,6 +2319,7 @@ class Parser:
             TokenType.FINSET,
             TokenType.FINSET1,
             TokenType.BIGCUP,  # Phase 20: distributed union
+            TokenType.BIGCAP,  # Phase 32: distributed intersection
             TokenType.HEAD,
             TokenType.TAIL,
             TokenType.LAST,
@@ -2359,6 +2361,7 @@ class Parser:
                 TokenType.FINSET,
                 TokenType.FINSET1,
                 TokenType.BIGCUP,
+                TokenType.BIGCAP,
                 TokenType.HEAD,
                 TokenType.TAIL,
                 TokenType.LAST,

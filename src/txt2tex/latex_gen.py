@@ -139,6 +139,7 @@ class LaTeXGenerator:
         "F": r"\finset",  # Finite set
         "F1": r"\finset_1",  # Non-empty finite set
         "bigcup": r"\bigcup",  # Distributed union (Phase 20)
+        "bigcap": r"\bigcap",  # Distributed intersection (Phase 32)
         # Sequence operators (Phase 12)
         "head": r"\head",  # First element
         "tail": r"\tail",  # All but first
