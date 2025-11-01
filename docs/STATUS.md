@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
-**Last Updated:** 2025-10-31
-**Current Phase:** Phase 32 (Distributed Intersection Operator) ✓ COMPLETE
+**Last Updated:** 2025-11-01
+**Current Phase:** Phase 33 (Partial Bijection Operator) ✓ COMPLETE
 
 ---
 
@@ -90,7 +90,7 @@
 - ✓ Partial function: `+->`
 - ✓ Injections: `>->`, `>+>`, `-|>`
 - ✓ Surjections: `-->>`, `+->>`
-- ✓ Bijection: `>->>`
+- ✓ Bijections: `>->>` (total), `>7->` (partial)
 - ✓ Function application: `f(x)`, `f(x, y)`
 - ✓ Space-separated application: `f x`, `f x y` (left-associative)
 
@@ -478,6 +478,20 @@
 - Test count: 1078 tests (1070 + 8 new bigcap tests, all passing)
 - All quality gates pass: type, lint, format, test
 
+### ✅ Phase 33: Partial Bijection Operator
+- Implemented `>7->` partial bijection operator (from glossary)
+- Added `PBIJECTION` token type to lexer
+- Added ">7->" operator recognition in lexer (4-character pattern)
+- Added `TokenType.PBIJECTION` to parser's function type operator lists (2 locations)
+- Added `>7->` → `\pbij` mapping in LaTeX generator
+- Added to all replacement functions in latex_gen.py (6 locations)
+- Created comprehensive test suite: 8 new tests in test_partial_bijections.py
+  - Covers: lexer, parser, LaTeX generation, integration
+  - Tests partial bijection vs bijection distinction
+  - Tests right-associativity
+- Test count: 1086 tests (1078 + 8 new partial bijection tests, all passing)
+- All quality gates pass: type, lint, format, test
+
 ### ✅ Fuzz Mode: Context-Aware Equivalence Operator
 - Fixed `<=>` operator to render context-sensitively in fuzz mode
 - **EQUIV blocks**: `<=>` → `\Leftrightarrow` (equivalence in equational reasoning)
@@ -696,7 +710,7 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 1078 passing (as of Phase 32, October 2025)
+- **Total Tests:** 1086 passing (as of Phase 33, November 2025)
 
 **Component Coverage:**
 - parser.py: 86.17%

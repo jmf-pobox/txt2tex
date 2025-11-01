@@ -89,6 +89,7 @@ class TokenType(Enum):
     TSURJ = auto()  # -->> (total surjection)
     PSURJ = auto()  # +->> (partial surjection)
     BIJECTION = auto()  # >->> (bijection)
+    PBIJECTION = auto()  # >7-> (partial bijection)
 
     # Comparison operators (Phase 3, enhanced in Phase 7)
     LESS_THAN = auto()  # <
