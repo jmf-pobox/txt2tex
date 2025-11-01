@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
 **Last Updated:** 2025-11-01
-**Current Phase:** Phase 34 (Finite Partial Functions) ✓ COMPLETE
+**Current Phase:** Phase 35 (Sequence Filter Operator) ✓ COMPLETE
 
 ---
 
@@ -98,6 +98,7 @@
 ### Sequences
 - ✓ Literals: `⟨⟩`, `⟨a, b, c⟩` (Unicode) OR `<>`, `<a, b, c>` (ASCII)
 - ✓ Concatenation: `⌢` (Unicode) OR ` ^ ` with spaces (ASCII, Phase 24)
+- ✓ Filter: `s ↾ A` (sequence filter - Phase 35)
 - ✓ Operators: `head`, `tail`, `last`, `front`, `rev`
 - ✓ Indexing: `s(i)`, `⟨a, b, c⟩(2)`
 - ✓ Generic sequence type: `seq(T)`, `iseq(T)`
@@ -517,6 +518,28 @@
 - Test count: 1097 tests (1086 + 11 new finite function tests, all passing)
 - All quality gates pass: type, lint, format, test
 
+### ✅ Phase 35: Sequence Filter Operator
+- Implemented `↾` sequence filter operator (from glossary)
+- Used extensively in Solutions 40, 41 (e.g., `s ↾ {t : Title | condition}`)
+- Added `FILTER` token type to lexer
+- Added "↾" operator recognition in lexer (Unicode character U+21BE)
+  - Placed with other sequence operators (`⟨`, `⟩`, `⌢`)
+  - No ASCII alternative (like `⌢` for concatenation, Unicode-only)
+- Added `TokenType.FILTER` to parser as binary infix operator (2 locations)
+  - Added to `_parse_additive()` alongside CAT, PLUS, MINUS
+  - Added to `_should_parse_space_separated_arg()` infix operator list
+- Added `↾` → `\filter` mapping in LaTeX generator (3 locations)
+  - BINARY_OPS dictionary
+  - _convert_operators_bare replacements list
+  - _generate_paragraph TEXT block processing
+- Created comprehensive test suite: 10 new tests in test_sequence_filter.py
+  - Covers: lexer (Unicode recognition), parser, LaTeX generation, integration
+  - Tests filter vs range restriction distinction (↾ vs |>)
+  - Tests left-associativity
+  - Tests realistic usage from Solutions 40, 41
+- Test count: 1107 tests (1097 + 10 new filter tests, all passing)
+- All quality gates pass: type, lint, format, test
+
 ### ✅ Fuzz Mode: Context-Aware Equivalence Operator
 - Fixed `<=>` operator to render context-sensitively in fuzz mode
 - **EQUIV blocks**: `<=>` → `\Leftrightarrow` (equivalence in equational reasoning)
@@ -735,7 +758,7 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 1097 passing (as of Phase 34, November 2025)
+- **Total Tests:** 1107 passing (as of Phase 35, November 2025)
 
 **Component Coverage:**
 - parser.py: 86.17%

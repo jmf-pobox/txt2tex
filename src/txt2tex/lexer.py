@@ -608,6 +608,11 @@ class Lexer:
             self._advance()
             return Token(TokenType.CAT, "⌢", start_line, start_column)
 
+        # Sequence filter (Phase 35)
+        if char == "↾":
+            self._advance()
+            return Token(TokenType.FILTER, "↾", start_line, start_column)
+
         # Bag union (Phase 12)
         if char == "⊎":
             self._advance()
