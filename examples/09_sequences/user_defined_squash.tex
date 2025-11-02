@@ -44,13 +44,19 @@ only fuzz-compatible notation.
 
 \begin{axdef}
   squash : \mathbb{N}_1 \pfun X \fun \seq X
+  \where
+  \forall f \colon \mathbb{N}_1 \pfun X \bullet \ran squash(f) = \ran
+  f \land \# squash(f) = \# \ran f
 \end{axdef}
 
 \bigskip
 
-This declares squash as a function that takes a partial function from
-N1 to X and returns a sequence of X. The function compacts the
-partial function by removing gaps in the domain while preserving order.
+This axiomatically defines squash with two key properties that hold
+for all partial functions f from N1 to X: (1) squash preserves the
+$range : ran (squash f) $= ran f, and (2) the resulting sequence
+length equals the range cardinality: # (squash f) = # (ran f). These
+properties characterize squash as compacting partial functions by
+removing domain gaps while preserving all elements and their relative order.
 
 \bigskip
 

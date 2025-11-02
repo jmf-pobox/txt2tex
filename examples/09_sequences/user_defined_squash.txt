@@ -12,9 +12,11 @@ TEXT: We define squash axiomatically by specifying its key properties using only
 
 axdef
   squash : (N1 +-> X) -> seq X
+where
+  (forall f : (N1 +-> X) | ran (squash f) = ran f and # (squash f) = # (ran f))
 end
 
-TEXT: This declares squash as a function that takes a partial function from N1 to X and returns a sequence of X. The function compacts the partial function by removing gaps in the domain while preserving order.
+TEXT: This axiomatically defines squash with two key properties that hold for all partial functions f from N1 to X: (1) squash preserves the range: ran (squash f) = ran f, and (2) the resulting sequence length equals the range cardinality: # (squash f) = # (ran f). These properties characterize squash as compacting partial functions by removing domain gaps while preserving all elements and their relative order.
 
 ** Example 2: Using Squash on a Simple Function **
 
