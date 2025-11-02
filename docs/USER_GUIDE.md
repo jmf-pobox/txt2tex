@@ -1122,7 +1122,7 @@ front s          →  front s     [all but last]
 rev s            →  rev s       [reverse]
 ```
 
-Note: `reverse` and `squash` functions use abbreviated forms in txt2tex.
+Note: `reverse` is abbreviated as `rev` in txt2tex.
 
 ### Pattern Matching with Sequences
 

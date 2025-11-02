@@ -3,10 +3,10 @@
 given Entry
 
 axdef
-  filter : seq Entry -> seq Entry
+  filterSeq : seq Entry -> seq Entry
 where
-  filter(<>) = <>
-  forall x : Entry; s : seq Entry | filter(<x> ^ s) = <x> ^ filter(s)
+  filterSeq(<>) = <>
+  forall x : Entry; s : seq Entry | filterSeq(<x> ^ s) = <x> ^ filterSeq(s)
 end
 
 TEXT: This demonstrates pattern matching on sequences with base case (<>) and recursive case (<x> ^ s).
