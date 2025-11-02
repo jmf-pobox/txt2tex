@@ -22,14 +22,14 @@ TEXT: Here A psubset B holds because all elements of A are in B, and A contains 
 axdef
   X : P N
   Y : P N
-  Z : P N
+  W : P N
 where
-  X = {1, 2} and Y = {1, 2, 3} and Z = {1, 2} and X psubset Y and X subset Z
+  X = {1, 2} and Y = {1, 2, 3} and W = {1, 2} and X psubset Y and X subset W
 end
 
 TEXT: X psubset Y is true (X is strictly contained in Y)
-TEXT: X subset Z is true (X is a subset of Z, including the case where X = Z)
-TEXT: X psubset Z would be FALSE (they are equal sets)
+TEXT: X subset W is true (X is a subset of W, including the case where X = W)
+TEXT: X psubset W would be FALSE (they are equal sets)
 
 ** Example 3: Empty Set **
 
@@ -47,21 +47,21 @@ TEXT: The empty set is a strict subset of any non-empty set.
 TEXT: If A psubset B and B psubset C, then A psubset C.
 
 axdef
-  A : P N
-  B : P N
-  C : P N
+  A1 : P N
+  B1 : P N
+  C1 : P N
 where
-  A = {1} and B = {1, 2} and C = {1, 2, 3} and A psubset B and B psubset C and A psubset C
+  A1 = {1} and B1 = {1, 2} and C1 = {1, 2, 3} and A1 psubset B1 and B1 psubset C1 and A1 psubset C1
 end
 
 ** Example 5: Set Hierarchy **
 
-given Student, GradStudent, PhDStudent
+given Person
 
 axdef
-  students : P Student
-  grads : P GradStudent
-  phds : P PhDStudent
+  students : P Person
+  grads : P Person
+  phds : P Person
 where
   phds psubset grads and grads psubset students
 end

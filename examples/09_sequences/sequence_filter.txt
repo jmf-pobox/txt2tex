@@ -10,25 +10,25 @@ TEXT: Unicode alternative: s ↾ A (U+21BE)
 TEXT: Filter a sequence to only include elements from a set.
 
 axdef
-  s : seq N
-  evens : P N
-  filtered : seq N
+  s1 : seq N
+  evens1 : P N
+  filtered1 : seq N
 where
-  s = <1, 2, 3, 4, 5, 6> and evens = {2, 4, 6, 8} and filtered = (s filter evens)
+  s1 = <1, 2, 3, 4, 5, 6> and evens1 = {2, 4, 6, 8} and filtered1 = (s1 filter evens1)
 end
 
 TEXT: The filtered sequence is <2, 4, 6>, keeping only elements that are in evens and preserving their original order.
 
 ** Example 2: Filter with Set Comprehension **
 
-given Title, Length
+given Title2, Length2
 
 axdef
-  all_titles : seq Title
-  long_titles : P Title
-  filtered_titles : seq Title
+  all_titles : seq Title2
+  long_titles : P Title2
+  filtered_titles : seq Title2
 where
-  long_titles = {t : Title | true} and filtered_titles = all_titles filter long_titles
+  long_titles = {t : Title2 | true} and filtered_titles = all_titles filter long_titles
 end
 
 TEXT: This filters a sequence of titles to include only titles with length greater than 120 minutes.
@@ -40,13 +40,13 @@ TEXT: - filter: operates on sequences, preserves order
 TEXT: - |>: operates on relations, restricts range
 
 axdef
-  s : seq N
-  R : N <-> N
-  A : P N
-  filtered_seq : seq N
-  restricted_rel : N <-> N
+  s3 : seq N
+  R3 : N <-> N
+  A3 : P N
+  filtered_seq3 : seq N
+  restricted_rel3 : N <-> N
 where
-  s = <1, 2, 3, 4, 5> and R = {1 |-> 10, 2 |-> 20, 3 |-> 30} and A = {2, 3, 4} and filtered_seq = s filter A and restricted_rel = R |> {10, 20}
+  s3 = <1, 2, 3, 4, 5> and R3 = {1 |-> 10, 2 |-> 20, 3 |-> 30} and A3 = {2, 3, 4} and filtered_seq3 = s3 filter A3 and restricted_rel3 = R3 |> {10, 20}
 end
 
 TEXT: filtered_seq is <2, 3, 4> (sequence elements in A)
@@ -54,13 +54,15 @@ TEXT: restricted_rel is {1 |-> 10, 2 |-> 20} (relation pairs with range in {10, 
 
 ** Example 4: Practical Example - Video Database **
 
-given Title, Length, Rating
+given Title4, Length4
+
+Rating4 ::= G4 | PG4 | PG13_4 | R4
 
 axdef
-  catalog : seq (Title cross Length cross Rating)
-  family_friendly : P Rating
+  catalog4 : seq (Title4 cross Length4 cross Rating4)
+  family_friendly4 : P Rating4
 where
-  family_friendly = {G, PG}
+  family_friendly4 = {G4, PG4}
 end
 
 TEXT: The family_friendly set contains ratings G and PG. A filter could be applied to the catalog sequence to only include entries with ratings in this set.
@@ -68,12 +70,12 @@ TEXT: The family_friendly set contains ratings G and PG. A filter could be appli
 ** Example 5: Multiple Filters **
 
 axdef
-  s : seq N
-  evens : P N
-  large : P N
-  result : seq N
+  s5 : seq N
+  evens5 : P N
+  large5 : P N
+  result5 : seq N
 where
-  s = <1, 2, 3, 4, 5, 6, 7, 8, 9, 10> and evens = {2, 4, 6, 8, 10, 12} and large = {5, 6, 7, 8, 9, 10, 11} and result = (s filter evens) filter large
+  s5 = <1, 2, 3, 4, 5, 6, 7, 8, 9, 10> and evens5 = {2, 4, 6, 8, 10, 12} and large5 = {5, 6, 7, 8, 9, 10, 11} and result5 = (s5 filter evens5) filter large5
 end
 
 TEXT: Multiple filters can be applied sequentially. First filter to evens gives <2, 4, 6, 8, 10>, then filter to large gives <6, 8, 10>.
@@ -81,13 +83,13 @@ TEXT: Multiple filters can be applied sequentially. First filter to evens gives 
 ** Example 6: Empty Filter **
 
 axdef
-  s : seq N
-  empty_set : P N
-  disjoint_set : P N
-  result1 : seq N
-  result2 : seq N
+  s6 : seq N
+  empty_set6 : P N
+  disjoint_set6 : P N
+  result6a : seq N
+  result6b : seq N
 where
-  s = <1, 2, 3> and empty_set = {} and disjoint_set = {10, 20, 30} and result1 = s filter empty_set and result2 = s filter disjoint_set
+  s6 = <1, 2, 3> and empty_set6 = {} and disjoint_set6 = {10, 20, 30} and result6a = s6 filter empty_set6 and result6b = s6 filter disjoint_set6
 end
 
 TEXT: Filtering by an empty set or disjoint set results in an empty sequence.
