@@ -1,0 +1,229 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\begin{document}
+
+\section*{User - Defined Squash Function}
+
+\begin{zed}[X]
+\end{zed}
+
+\bigskip
+
+The squash operator appears in the Z notation glossary but is not
+built into the fuzz type-checker. However, we can define it ourselves
+as a user-defined function using an axiomatic specification.
+
+\bigskip
+
+\bigskip
+
+Squash takes a partial function from N1 (positive naturals) to some
+type X and compacts it into a sequence by removing gaps in the
+domain. For example, $\{1 \mapsto a, 3 \mapsto b, 7 \mapsto c\}$
+becomes $\langle a, b, c \rangle$.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 1 : Axiomatic Definition of Squash}
+
+\medskip
+
+\bigskip
+
+We define squash axiomatically by specifying its key properties using
+only fuzz-compatible notation.
+
+\bigskip
+
+\begin{axdef}
+  squash : \mathbb{N}_1(pfun)(X) \fun \seq X
+  \where
+  \forall f \colon \mathbb{N}_1(pfun)(X) \bullet \ran squash(f) =
+  \ran f \land \# squash(f) = \# \ran f
+\end{axdef}
+
+\bigskip
+
+This definition states that squash preserves the range and has length
+equal to the cardinality of the range. The function compacts the
+partial function into a sequence by removing gaps while maintaining
+relative order.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 2 : Using Squash on a Simple Function}
+
+\medskip
+
+\bigskip
+
+Demonstrate squash on a sparse partial function.
+
+\bigskip
+
+\begin{axdef}
+  f1 : \mathbb{N}_1(pfun)(\mathbb{N}) \\
+  s1 : \seq \mathbb{N}
+  \where
+  f1 = \{1 \mapsto 10, 3 \mapsto 30, 5 \mapsto 50\} \land s1 = squash(f1)
+\end{axdef}
+
+\bigskip
+
+The result s1 is $\langle 10, 30, 50 \rangle$, containing exactly the
+range elements in the order of their original indices.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 3 : Squash with Letters}
+
+\medskip
+
+\begin{zed}[Letter]
+\end{zed}
+
+\begin{axdef}
+  f2 : \mathbb{N}_1(pfun)(Letter) \\
+  s2 : \seq Letter
+  \where
+  f2 = \{2 \mapsto a, 4 \mapsto b, 7 \mapsto c, 9 \mapsto d\} \land
+  s2 = squash(f2)
+\end{axdef}
+
+\bigskip
+
+The result s2 is $\langle a, b, c, d \rangle$. The gaps at positions
+1, 3, 5, 6, 8 are removed.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 4 : Empty Function}
+
+\medskip
+
+\begin{axdef}
+  f3 : \mathbb{N}_1(pfun)(\mathbb{N}) \\
+  s3 : \seq \mathbb{N}
+  \where
+  f3 = \{\} \land s3 = squash(f3)
+\end{axdef}
+
+\bigskip
+
+Squashing an empty function yields an empty $sequence : s3 $= $\langle \rangle$.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 5 : Continuous Function ( No Gaps )}
+
+\medskip
+
+\begin{axdef}
+  f4 : \mathbb{N}_1(pfun)(\mathbb{N}) \\
+  s4 : \seq \mathbb{N}
+  \where
+  f4 = \{1 \mapsto 100, 2 \mapsto 200, 3 \mapsto 300\} \land s4 = squash(f4)
+\end{axdef}
+
+\bigskip
+
+When the function has no gaps (dom $f4 = 1$..3), squash simply
+converts it to a $sequence : s4 $= $\langle 100, 200, 300 \rangle$.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 6 : Relationship Between Function and Sequence}
+
+\medskip
+
+\bigskip
+
+For any partial function f with a continuous domain starting at 1,
+squash is the identity.
+
+\bigskip
+
+\begin{axdef}
+  continuous : \mathbb{N}_1(pfun)(X) \\
+  \mathit{s\_continuous} : \seq X
+  \where
+  \dom continuous = 1 \upto \# \ran continuous \land
+  \mathit{s\_continuous} = squash(continuous)
+\end{axdef}
+
+\bigskip
+
+In this case, continuous is already a sequence, and squash
+$continuous = continuous$ as a sequence.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 7 : Squash Preserves Injectivity}
+
+\medskip
+
+\bigskip
+
+If the input function is injective, the output sequence has no duplicates.
+
+\bigskip
+
+\begin{axdef}
+  \mathit{inj\_func} : \mathbb{N}_1(pfun)(\mathbb{N}) \\
+  \mathit{inj\_seq} : \seq \mathbb{N}
+  \where
+  (\forall i, j \colon \dom \mathit{inj\_func} \bullet
+  \mathit{inj\_func}(i) = \mathit{inj\_func}(j) \Rightarrow i = j)
+  \land \mathit{inj\_seq} = squash(\mathit{inj\_func})
+\end{axdef}
+
+\bigskip
+
+Since inj_func is injective (one-to-one), inj_seq contains no
+duplicate elements.
+
+\bigskip
+
+\bigskip
+\noindent
+\textbf{Example 8 : Practical Use Case - Video Database}
+
+\medskip
+
+\begin{zed}[VideoID, Title]
+\end{zed}
+
+\begin{axdef}
+  \mathit{sparse\_catalog} : \mathbb{N}_1(pfun(VideoID \cross Title)) \\
+  \mathit{compact\_catalog} : \seq (VideoID \cross Title)
+  \where
+  \mathit{compact\_catalog} = squash(\mathit{sparse\_catalog})
+\end{axdef}
+
+\bigskip
+
+A sparse catalog with gaps (deleted entries) can be compacted into a
+continuous sequence while preserving the order of remaining entries.
+
+\bigskip
+
+\end{document}
