@@ -43,18 +43,14 @@ only fuzz-compatible notation.
 \bigskip
 
 \begin{axdef}
-  squash : \mathbb{N}_1(pfun)(X) \fun \seq X
-  \where
-  \forall f \colon \mathbb{N}_1(pfun)(X) \bullet \ran squash(f) =
-  \ran f \land \# squash(f) = \# \ran f
+  squash : \mathbb{N}_1 \pfun X \fun \seq X
 \end{axdef}
 
 \bigskip
 
-This definition states that squash preserves the range and has length
-equal to the cardinality of the range. The function compacts the
-partial function into a sequence by removing gaps while maintaining
-relative order.
+This declares squash as a function that takes a partial function from
+N1 to X and returns a sequence of X. The function compacts the
+partial function by removing gaps in the domain while preserving order.
 
 \bigskip
 
@@ -71,7 +67,7 @@ Demonstrate squash on a sparse partial function.
 \bigskip
 
 \begin{axdef}
-  f1 : \mathbb{N}_1(pfun)(\mathbb{N}) \\
+  f1 : \mathbb{N}_1 \pfun \mathbb{N} \\
   s1 : \seq \mathbb{N}
   \where
   f1 = \{1 \mapsto 10, 3 \mapsto 30, 5 \mapsto 50\} \land s1 = squash(f1)
@@ -94,7 +90,7 @@ range elements in the order of their original indices.
 \end{zed}
 
 \begin{axdef}
-  f2 : \mathbb{N}_1(pfun)(Letter) \\
+  f2 : \mathbb{N}_1 \pfun Letter \\
   s2 : \seq Letter
   \where
   f2 = \{2 \mapsto a, 4 \mapsto b, 7 \mapsto c, 9 \mapsto d\} \land
@@ -115,7 +111,7 @@ The result s2 is $\langle a, b, c, d \rangle$. The gaps at positions
 \medskip
 
 \begin{axdef}
-  f3 : \mathbb{N}_1(pfun)(\mathbb{N}) \\
+  f3 : \mathbb{N}_1 \pfun \mathbb{N} \\
   s3 : \seq \mathbb{N}
   \where
   f3 = \{\} \land s3 = squash(f3)
@@ -134,7 +130,7 @@ Squashing an empty function yields an empty $sequence : s3 $= $\langle \rangle$.
 \medskip
 
 \begin{axdef}
-  f4 : \mathbb{N}_1(pfun)(\mathbb{N}) \\
+  f4 : \mathbb{N}_1 \pfun \mathbb{N} \\
   s4 : \seq \mathbb{N}
   \where
   f4 = \{1 \mapsto 100, 2 \mapsto 200, 3 \mapsto 300\} \land s4 = squash(f4)
@@ -161,7 +157,7 @@ squash is the identity.
 \bigskip
 
 \begin{axdef}
-  continuous : \mathbb{N}_1(pfun)(X) \\
+  continuous : \mathbb{N}_1 \pfun X \\
   \mathit{s\_continuous} : \seq X
   \where
   \dom continuous = 1 \upto \# \ran continuous \land
@@ -188,7 +184,7 @@ If the input function is injective, the output sequence has no duplicates.
 \bigskip
 
 \begin{axdef}
-  \mathit{inj\_func} : \mathbb{N}_1(pfun)(\mathbb{N}) \\
+  \mathit{inj\_func} : \mathbb{N}_1 \pfun \mathbb{N} \\
   \mathit{inj\_seq} : \seq \mathbb{N}
   \where
   (\forall i, j \colon \dom \mathit{inj\_func} \bullet
@@ -213,7 +209,7 @@ duplicate elements.
 \end{zed}
 
 \begin{axdef}
-  \mathit{sparse\_catalog} : \mathbb{N}_1(pfun(VideoID \cross Title)) \\
+  \mathit{sparse\_catalog} : \mathbb{N}_1 \pfun (VideoID \cross Title) \\
   \mathit{compact\_catalog} : \seq (VideoID \cross Title)
   \where
   \mathit{compact\_catalog} = squash(\mathit{sparse\_catalog})
