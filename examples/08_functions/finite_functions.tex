@@ -2,7 +2,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
 \usepackage{natbib}
-\usepackage{zed-cm}
+\usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \begin{document}
@@ -37,7 +37,7 @@ capacity or databases with a bounded number of entries.
 \begin{axdef}
   records : Year \ffun Table
   \where
-  \# \dom records \leq 1000
+  \# (\dom records) \leq 1000
 \end{axdef}
 
 \bigskip
@@ -101,12 +101,6 @@ domain may be infinite
 
 \bigskip
 
-\bigskip
-
-- Partial bijection ($\pbij$): may not be defined everywhere, but injective
-
-\bigskip
-
 \begin{zed}[X, Y]
 \end{zed}
 
@@ -114,12 +108,10 @@ domain may be infinite
   totalFunc : X \fun Y \\
   partialFunc : X \pfun Y \\
   finitePartialFunc : X \ffun Y \\
-  totalBij : X \bij Y \\
-  partialBij : X \pbij Y
+  totalBij : X \bij Y
   \where
-  \dom totalFunc = X \land \# \dom finitePartialFunc < infinity \land
-  \dom totalBij = X \land (\forall x1, x2 \colon X \bullet
-  totalBij(x1) = totalBij(x2) \Rightarrow x1 = x2) \land \ran totalBij = Y
+  \dom totalFunc = X \land \dom totalBij = X \land (\forall x1, x2 :
+  X @ totalBij(x1) = totalBij(x2) \implies x1 = x2) \land \ran totalBij = Y
 \end{axdef}
 
 \bigskip
@@ -140,8 +132,7 @@ Real-world example: A database table storing customer preferences.
 \begin{axdef}
   preferences : CustomerID \ffun Preference
   \where
-  \# \dom preferences \leq 10000 \land (\forall c \colon CustomerID
-  \bullet c \in \dom preferences \Rightarrow preferences(c) \neq \{\})
+  \# (\dom preferences) \leq 10000
 \end{axdef}
 
 \bigskip
@@ -175,11 +166,11 @@ This models a preference database where:
 \medskip
 
 \begin{axdef}
-  f : \mathbb{N} \ffun \mathbb{N} \\
-  g : \mathbb{N} \ffun \mathbb{N}
+  f : \nat \ffun \nat \\
+  g : \nat \ffun \nat
   \where
   f = \{1 \mapsto 10, 2 \mapsto 20, 3 \mapsto 30\} \land g = \{10
-  \mapsto 100, 20 \mapsto 200\} \land \# \dom f = 3 \land \# \dom g = 2
+  \mapsto 100, 20 \mapsto 200\} \land \# (\dom f) = 3 \land \# (\dom g) = 2
 \end{axdef}
 
 \bigskip
@@ -189,10 +180,9 @@ We can compose finite functions, but the result may not be finite unless proven.
 \bigskip
 
 \begin{axdef}
-  \mathit{f\_composed} : \mathbb{N} \ffun \mathbb{N}
+  f\_composed : \nat \ffun \nat
   \where
-  \mathit{f\_composed} = g \circ f \land \# \dom \mathit{f\_composed}
-  \leq \# \dom f
+  f\_composed = g \circ f \land \# (\dom f\_composed) \leq \# (\dom f)
 \end{axdef}
 
 \bigskip
@@ -213,11 +203,12 @@ we can only compose where f's range intersects g's domain.
 
 \begin{axdef}
   viewed : Title \ffun ViewDate \\
-  \mathit{recent\_viewed} : Title \ffun ViewDate
+  recent\_viewed : Title \ffun ViewDate \\
+  recentSet : \power Title
   \where
-  \# \dom viewed < infinity \land \mathit{recent\_viewed} = \{ t
-  \colon Title \mid t \in \dom viewed \} \land \# \dom
-  \mathit{recent\_viewed} \leq \# \dom viewed
+  recentSet = \{ t : Title | t \in \dom viewed \} \land
+  recent\_viewed = recentSet \dres viewed \land \# (\dom
+  recent\_viewed) \leq \# (\dom viewed)
 \end{axdef}
 
 \bigskip

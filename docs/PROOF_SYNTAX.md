@@ -205,7 +205,7 @@ class ProofStep:
 
 @dataclass
 class CaseAnalysis:
-    cases: list[tuple[str, list[ProofStep]]]  # ("q", steps), ("r", steps)
+    cases: list[tuple[str, list[ProofStep]]]  # ("q", steps), ("rcl", steps)
 ```
 
 ## LaTeX Generation Strategy

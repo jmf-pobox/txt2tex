@@ -17,11 +17,11 @@
 \end{zed}
 
 \begin{axdef}
-  filter : \seq Entry \fun \seq Entry
+  filterSeq : \seq Entry \fun \seq Entry
   \where
-  filter(\langle \rangle) = \langle \rangle \\
-  \forall x : Entry @ \forall s : \seq Entry @ filter(\langle x
-  \rangle \cat s) = \langle x \rangle \cat filter(s)
+  filterSeq(\langle \rangle) = \langle \rangle \\
+  \forall x : Entry @ \forall s : \seq Entry @ filterSeq(\langle x
+  \rangle \cat s) = \langle x \rangle \cat filterSeq(s)
 \end{axdef}
 
 \bigskip

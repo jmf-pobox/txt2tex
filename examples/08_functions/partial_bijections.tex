@@ -2,7 +2,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
 \usepackage{natbib}
-\usepackage{zed-cm}
+\usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \begin{document}
@@ -32,7 +32,7 @@ element in the range has at most one preimage.
 \bigskip
 
 \begin{axdef}
-  partialMap : \mathbb{N} \pbij \mathbb{N}
+  partialMap : \nat \pbij \nat
   \where
   partialMap = \{1 \mapsto 10, 2 \mapsto 20, 3 \mapsto 30\}
 \end{axdef}
@@ -73,9 +73,9 @@ This is a partial bijection because:
 \begin{axdef}
   enrollment : Student \pbij Course
   \where
-  \# \dom enrollment \leq 100 \land (\forall s1, s2 \colon Student
-    \bullet s1 \in \dom enrollment \land s2 \in \dom enrollment
-  \Rightarrow (s1 \neq s2 \Rightarrow enrollment(s1) \neq enrollment(s2)))
+  \# (\dom enrollment) \leq 100 \land (\forall s1, s2 : Student @ s1
+    \in \dom enrollment \land s2 \in \dom enrollment \implies (s1 \neq
+  s2 \implies enrollment(s1) \neq enrollment(s2)))
 \end{axdef}
 
 \bigskip
@@ -132,9 +132,8 @@ injective and surjective on domain
   totalBij : X \bij Y \\
   partialBij : X \pbij Y
   \where
-  \dom totalFunc = X \land \dom totalBij = X \land (\forall x1, x2
-  \colon X \bullet totalBij(x1) = totalBij(x2) \Rightarrow x1 = x2)
-  \land \ran totalBij = Y
+  \dom totalFunc = X \land \dom totalBij = X \land (\forall x1, x2 :
+  X @ totalBij(x1) = totalBij(x2) \implies x1 = x2) \land \ran totalBij = Y
 \end{axdef}
 
 \bigskip
@@ -145,9 +144,9 @@ injective and surjective on domain
 
 \bigskip
 
-Function types are right-associative, so $X \pbij (Y \pbij
-\mathbb{Z})$ means $X > 7$$\fun$ ($Y \pbij \mathbb{Z}$), which is a
-partial bijection from X to partial bijections from Y to Z.
+Function types are right-associative, so $X \pbij (Y \pbij \num)$
+means $X > 7$$\fun$ ($Y \pbij \num$), which is a partial bijection
+from X to partial bijections from Y to Z.
 
 \bigskip
 
@@ -157,7 +156,7 @@ partial bijection from X to partial bijections from Y to Z.
 \begin{axdef}
   higherOrder : A \pbij (B \pbij C)
   \where
-  \# \dom higherOrder > 0
+  \# (\dom higherOrder) > 0
 \end{axdef}
 
 \bigskip
@@ -174,8 +173,8 @@ element of A, returns a partial bijection from B to C.
 \medskip
 
 \begin{axdef}
-  f : \mathbb{N} \pbij \mathbb{N} \\
-  g : \mathbb{N} \pbij \mathbb{N}
+  f : \nat \pbij \nat \\
+  g : \nat \pbij \nat
   \where
   f = \{1 \mapsto 2, 2 \mapsto 4, 3 \mapsto 6\} \land g = \{10
   \mapsto 20, 20 \mapsto 40, 30 \mapsto 60\} \land \dom f \cap \dom g
@@ -190,10 +189,10 @@ operators like domain, range, inverse, and composition.
 \bigskip
 
 \begin{axdef}
-  \mathit{f\_inv} : \mathbb{N} \pbij \mathbb{N} \\
-  \mathit{f\_composed} : \mathbb{N} \pbij \mathbb{N}
+  f\_inv : \nat \pbij \nat \\
+  f\_composed : \nat \pbij \nat
   \where
-  \mathit{f\_inv} = f^{-1} \land \mathit{f\_composed} = g \circ f
+  f\_inv = f^{-1} \land f\_composed = g \circ f
 \end{axdef}
 
 \bigskip

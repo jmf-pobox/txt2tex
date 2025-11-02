@@ -43,7 +43,7 @@
 | Modeling | 40-43 | 4 | 0 | 100% |
 | Free Types | 44-47 | 4 | 0 | 100% |
 | Supplementary | 48-52 | 5 | 0 | 100% |
-| **TOTAL** | **1-52** | **51** | **0** | **98.1%** |
+| **TOTAL** | **1-52** | **50** | **0** | **96.2%** |
 
 ---
 
@@ -778,7 +778,7 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 1133 passing (as of Phase 39, November 2025)
+- **Total Tests:** 1125 passing (as of Phase 39, November 2025)
 
 **Component Coverage:**
 - parser.py: 86.17%

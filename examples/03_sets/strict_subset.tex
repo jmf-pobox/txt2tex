@@ -2,7 +2,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
 \usepackage{natbib}
-\usepackage{zed-cm}
+\usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \begin{document}
@@ -42,8 +42,8 @@ Distinction from subset (⊆):
 \medskip
 
 \begin{axdef}
-  A : \power \mathbb{N} \\
-  B : \power \mathbb{N}
+  A : \power \nat \\
+  B : \power \nat
   \where
   A = \{1, 2, 3\} \land B = \{1, 2, 3, 4, 5\} \land A \subset B
 \end{axdef}
@@ -62,12 +62,12 @@ contains fewer elements than B.
 \medskip
 
 \begin{axdef}
-  X : \power \mathbb{N} \\
-  Y : \power \mathbb{N} \\
-  \mathbb{Z} : \power \mathbb{N}
+  X : \power \nat \\
+  Y : \power \nat \\
+  W : \power \nat
   \where
-  X = \{1, 2\} \land Y = \{1, 2, 3\} \land \mathbb{Z} = \{1, 2\}
-  \land X \subset Y \land X \subseteq \mathbb{Z}
+  X = \{1, 2\} \land Y = \{1, 2, 3\} \land W = \{1, 2\} \land X
+  \subset Y \land X \subseteq W
 \end{axdef}
 
 \bigskip
@@ -78,14 +78,13 @@ X psubset Y is true (X is strictly $contained \in Y$)
 
 \bigskip
 
-X subset Z is true (X is a subset of Z, including the case where $X =
-\mathbb{Z}$)
+X subset W is true (X is a subset of W, including the case where $X = W$)
 
 \bigskip
 
 \bigskip
 
-X psubset Z would be FALSE (they are equal sets)
+X psubset W would be FALSE (they are equal sets)
 
 \bigskip
 
@@ -96,8 +95,8 @@ X psubset Z would be FALSE (they are equal sets)
 \medskip
 
 \begin{axdef}
-  emptySet : \power \mathbb{N} \\
-  anySet : \power \mathbb{N}
+  emptySet : \power \nat \\
+  anySet : \power \nat
   \where
   emptySet = \{\} \land anySet = \{1, 2, 3\} \land emptySet \subset anySet
 \end{axdef}
@@ -121,12 +120,12 @@ If A psubset B and B psubset C, then A psubset C.
 \bigskip
 
 \begin{axdef}
-  A : \power \mathbb{N} \\
-  B : \power \mathbb{N} \\
-  C : \power \mathbb{N}
+  A1 : \power \nat \\
+  B1 : \power \nat \\
+  C1 : \power \nat
   \where
-  A = \{1\} \land B = \{1, 2\} \land C = \{1, 2, 3\} \land A \subset
-  B \land B \subset C \land A \subset C
+  A1 = \{1\} \land B1 = \{1, 2\} \land C1 = \{1, 2, 3\} \land A1
+  \subset B1 \land B1 \subset C1 \land A1 \subset C1
 \end{axdef}
 
 \bigskip
@@ -135,13 +134,13 @@ If A psubset B and B psubset C, then A psubset C.
 
 \medskip
 
-\begin{zed}[Student, GradStudent, PhDStudent]
+\begin{zed}[Person]
 \end{zed}
 
 \begin{axdef}
-  students : \power Student \\
-  grads : \power GradStudent \\
-  phds : \power PhDStudent
+  students : \power Person \\
+  grads : \power Person \\
+  phds : \power Person
   \where
   phds \subset grads \land grads \subset students
 \end{axdef}
