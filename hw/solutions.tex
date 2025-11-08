@@ -1037,8 +1037,6 @@ and in the first element of the domain of episode\_info are identical.
   \cat played(pl))
 \end{axdef}
 
-\newpage
-
 \medskip
 
 \bigskip
@@ -1049,10 +1047,39 @@ and in the first element of the domain of episode\_info are identical.
 
 \bigskip
 
-Prove $\forall p : PossiblePlaylist @ length(played(p)) +
+Prove via structural induction: \
+
+\bigskip
+
+\noindent
+$\forall p : PossiblePlaylist @ length(played(p)) +
 length(unplayed(p)) = length(p)$
 
 \bigskip
+
+To use proof by induction, we need to prove the base case and the
+inductive case.  A PossiblePlaylist belongs to P Playlist where
+Playlist is of type seq((ShowId cross EpisodeId) cross N).
+
+\bigskip
+
+\bigskip
+
+The Base Case occurs when p = $\langle \rangle$. Therefore, we must
+first prove length(played($\langle \rangle$)) +
+length(unplayed($\langle \rangle$)) = length($\langle \rangle$).
+
+\bigskip
+
+\[
+  \begin{array}{ll@{\hspace{2em}}l}
+    & length(played(\langle \rangle)) + length(unplayed(\langle \rangle)) \\
+    &\Leftrightarrow length(\langle \rangle) + length(\langle
+    \rangle) & [\mbox{played ( < > ) = < > $\land$ unplayed ( < > ) = < >}] \\
+    &\Leftrightarrow 0 + 0 & [\mbox{length ( < > ) = 0}] \\
+    &\Leftrightarrow length(\langle \rangle) & [\mbox{length ( < > ) = 0}]
+  \end{array}
+\]
 
 \noindent
 $\displaystyle

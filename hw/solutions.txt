@@ -409,16 +409,29 @@ where
       played(<ple> ^ pl) = <ple> ^ (played(pl)))
 end
 
-PAGEBREAK:
-
 **Question 11**
 
-TEXT: Prove forall p : PossiblePlaylist | length(played(p)) + length(unplayed(p)) = length(p)
+TEXT: Prove via structural induction: \
+  forall p : PossiblePlaylist | length(played(p)) + length(unplayed(p)) = length(p)
 
+TEXT: To use proof by induction, we need to prove the base case and the inductive case.  A PossiblePlaylist belongs to P Playlist where Playlist is of type seq((ShowId cross EpisodeId) cross N). 
+
+TEXT: The Base Case occurs when p = <>. Therefore, we must first prove length(played(<>)) + length(unplayed(<>)) = length(<>).
+
+EQUIV:
+length(played(<>)) + length(unplayed(<>))
+length(<>) + length(<>)     [played(<>) = <> and unplayed(<>) = <>]
+0 + 0                       [length(<>) = 0]
+0                           [0 + 0 = 0]
+length(<>)                  [length(<>) = 0]
+
+TEXT: In the above, we use the played(), unplayed(), and length() base cases to prove the base case.
 
 PROOF:
 forall p : PossiblePlaylist | length(p)
   forall p : PossiblePlaylist | length(played(p)) + length(unplayed(p))
+
+
 PAGEBREAK:
 
 === Bibliography ===

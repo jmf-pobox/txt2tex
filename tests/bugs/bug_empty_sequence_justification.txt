@@ -1,0 +1,7 @@
+=== Bug: Empty Sequence in Justification ===
+
+TEXT: Testing empty sequence rendering inside EQUIV justifications.
+
+EQUIV:
+length(<>)
+0 [length(<>) = 0]
