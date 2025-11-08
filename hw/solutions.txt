@@ -411,44 +411,57 @@ end
 
 **Question 11**
 
-TEXT: Prove via structural induction: \
-  forall p : PossiblePlaylist | length(played(p)) + length(unplayed(p)) = length(p)
-
-TEXT: To use proof by induction, we need to prove the base case and the inductive case.  A PossiblePlaylist belongs to P Playlist where Playlist is of type seq((ShowId cross EpisodeId) cross N). 
-
-TEXT: The base case occurs when p = <>. Therefore, we must first prove 
-
-length(played(<>)) + length(unplayed(<>)) = length(<>)
+TEXT: To use proof by induction, we need to prove the base case and the inductive case.  A PossiblePlaylist belongs to P Playlist where Playlist is of type seq((ShowId cross EpisodeId) cross N). The base case occurs when p = <>. Therefore, we must first prove length(played(<>)) + length(unplayed(<>)) = length(<>)
 
 EQUIV:
 length(played(<>)) + length(unplayed(<>))
 length(<>) + length(<>)     [played(<>) = <> and unplayed(<>) = <>]
 0 + 0                       [length(<>) = 0]
-0                           [0 + 0 = 0]
+0                           [0+0 = 0]
 length(<>)                  [length(<>) = 0]
 
 TEXT: In the above, we use each of the individual played(), unplayed(), and length() base cases to justify our rewrites.
 
-TEXT: A playlist element is of type ((dom status) cross N).  We now seek to prove the inductive hypothesis, which is an implication.
+TEXT: A playlist element is of type ((dom status) cross N).  We now seek to prove the inductive hypothesis, which follows the form of induction for sequences and which is an implication [cite simpson-notes page 157].
 
 forall t : PossiblePlaylist | (forall ple : ((dom status) cross N) | \
   length(played(t)) + length(unplayed(t)) = length(t) => \
-  length(played(ple⌢t)) + length(unplayed(ple⌢t)) = length(ple⌢t))
+  length(played(<ple> ^ t)) + length(unplayed(<ple> ^ t)) = length(<ple> ^ t))
 
-TEXT: A playlist element is of type ((dom status) cross N) and status is of type (PlayedOrNot, SavedOrNot). The inductive hypothesis proof begins by establishing that there are two mutually exclusive and exhaustive cases: one where the playlist element's PlayedOrNot free type value is Played and another where it is NotP.  The proof will establish that for both cases, the same conclusion can be proven. In addition, the inductive proof relies upon the inductive hypothesis length(played(t)) + length(unplayed(t)) = length(t). 
+TEXT: The status of a playlist element is of type (PlayedOrNot, SavedOrNot). The inductive hypothesis proof begins by establishing that there are two mutually exclusive and exhaustive cases: one where the playlist element's PlayedOrNot free type value is Played and another where it is NotP.  The proof will establish that for both cases, the same conclusion can be proven. The proof relies upon the inductive hypothesis length(played(t)) + length(unplayed(t)) = length(t). 
 
-TEXT: The playlist element is Played, which is represented by fst(status fst(ple)) = Played, which says take the status of the ple and inspect the first element of the status tuple and determine whether PlayedOrNot = Played.
+TEXT: Case 1: The playlist element is played, which is represented by fst(status fst(ple)) = Played, which says take the status of the ple and inspect the first element of the status tuple and determine whether PlayedOrNot = Played.
 
 EQUIV:
-length(played(ple⌢t)) + length(unplayed(ple⌢t))
+length(played(<ple> ^ t)) + length(unplayed(<ple> ^ t))
+length(<ple> ^ played(t)) + length(unplayed(<ple> ^ t)) [played(<ple> ^ pl) = <ple> ^ (played(pl))]
+length(<ple> ^ played(t)) + length(unplayed(t))         [unplayed(<ple> ^ pl) = unplayed(pl)] 
+snd(ple) + length(played(t)) + length(unplayed(t))      [length(<ple> ^ pl) = snd(ple) + length(pl)]
+snd(ple) + (length(played(t)) + length(unplayed(t)))    [associativity of addition]
+snd(ple) + length (t)                                   [length(played(p)) + length(unplayed(p)) = length(p)]
+length(<ple> ^ t)                                       [length(<ple> ^ pl) = snd(ple) + length(pl)]
 
-snd(ple) + length (t)
-length(ple⌢t)             [length(<ple>⌢pl) = snd(ple) + length(pl)]
+TEXT: We first rewrite the played term as we know ple is Played and then we simplify the unplayed term as we know ple is not NotP. From here, we apply the definition of length for a single sequence element concatenated to a sequence. Using the associative property of addition, we arrive at a form of the inductive hypothesis that we can simplify.  From there, we apply our definition of length again to arrive at our final form.
+
+TEXT: Case 2: The playlist element is not played, which is represented by fst(status fst(ple)) = NotP, which says take the status of the ple and inspect the first element of the status tuple and determine whether PlayedOrNot = NotP.
+
+EQUIV:
+length(played(<ple> ^ t)) + length(unplayed(<ple> ^ t))
+length(played(<ple> ^ t)) + length(<ple> ^ unplayed(t)) [unplayed(<ple> ^ pl) = <ple> ^ (unplayed(pl))]
+length(played(t)) + length(<ple> ^ unplayed(t))         [played(<ple> ^ pl) = played(pl)]
+length(played(t)) + snd(ple) + length(unplayed(t))      [length(<ple> ^ pl) = snd(ple) + length(pl)]
+snd(ple) + length(played(t)) + length(unplayed(t))      [commutativity of addition]
+snd(ple) + (length(played(t)) + length(unplayed(t)))    [associativity of addition]
+snd(ple) + length(t)                                    [length(played(p)) + length(unplayed(p)) = length(p)]
+length(<ple> ^ t)                                       [length(<ple> ^ pl) = snd(ple) + length(pl)]
+
+TEXT: We first rewrite the unplayed term as we know ple is NotP and then we simplify the played term as we know ple is not Played. From here, we apply the definition of length for a single sequence element concatenated to a sequence. We must re-arrange our addends using the commutative property of addition.  Next, we use the associative property of addition to arrive at a form of the inductive hypothesis that we can simplify.  From there, we apply our definition of length again to arrive at our final form.
+
+TEXT: Since the base case is proven and both inductive cases result in the same outcome, we can use the implication introduction rule to unify our cases and conclude:
 
 PROOF:
 forall p : PossiblePlaylist | length(p)
   forall p : PossiblePlaylist | length(played(p)) + length(unplayed(p))
-
 
 PAGEBREAK:
 

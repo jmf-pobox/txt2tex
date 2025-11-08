@@ -142,7 +142,7 @@ Lecture 1 - Propositions
   \begin{array}{ll@{\hspace{2em}}l}
     & p \implies (\lnot p \implies p) \\
     &\Leftrightarrow p \implies (\lnot \lnot p \lor p) &
-    [\mbox{$\Rightarrow$disjunction}] \\
+    [\mbox{$\Rightarrow$ disjunction}] \\
     &\Leftrightarrow p \implies (p \lor p) & [\mbox{$\lnot$ $\lnot$}] \\
     &\Leftrightarrow p \implies p & [\mbox{idempotence of p}] \\
     &\Leftrightarrow true & [\mbox{tautology}]
@@ -168,10 +168,10 @@ application of the idempotence rule to simplify, and the fact that $p
   \begin{array}{ll@{\hspace{2em}}l}
     & (\lnot p \implies \lnot q) \\
     &\Leftrightarrow (\lnot \lnot p \lor \lnot q) &
-    [\mbox{$\Rightarrow$disjunction}] \\
+    [\mbox{$\Rightarrow$ disjunction}] \\
     &\Leftrightarrow (p \lor \lnot q) & [\mbox{$\lnot$ $\lnot$}] \\
     &\Leftrightarrow (\lnot q \lor p) & [\mbox{commutativity of $\lor$}] \\
-    &\Leftrightarrow q \implies p & [\mbox{$\Rightarrow$disjunction}]
+    &\Leftrightarrow q \implies p & [\mbox{$\Rightarrow$ disjunction}]
   \end{array}
 \]
 
@@ -195,7 +195,7 @@ implication.
   \begin{array}{ll@{\hspace{2em}}l}
     & ((p \implies r) \land (q \implies r)) \\
     &\Leftrightarrow ((\lnot p \lor r) \land (\lnot q \lor r)) &
-    [\mbox{$\Rightarrow$disjunction}] \\
+    [\mbox{$\Rightarrow$ disjunction}] \\
     &\Leftrightarrow (r \lor \lnot p) \land (r \lor \lnot q) &
     [\mbox{commutativity of $\lor$}] \\
     &\Leftrightarrow r \lor (\lnot p \land \lnot q) &
@@ -203,7 +203,7 @@ implication.
     &\Leftrightarrow (\lnot p \land \lnot q) \lor r &
     [\mbox{commutativity of $\lor$}] \\
     &\Leftrightarrow \lnot (p \lor q) \lor r & [\mbox{De Morgan}] \\
-    &\Leftrightarrow p \lor q \implies r & [\mbox{$\Rightarrow$disjunction}]
+    &\Leftrightarrow p \lor q \implies r & [\mbox{$\Rightarrow$ disjunction}]
   \end{array}
 \]
 
@@ -241,10 +241,10 @@ Lecture 3 - Deductive Proofs
 \vspace{11pt}
 \noindent
 $\displaystyle
-\infer[\Rightarrowintro \mathrm{from} 1]{p \implies (\lnot p \implies p)}{
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (\lnot p \implies p)}{
   \ulcorner p \urcorner^{[1]}
   &
-  \infer[\Rightarrowintro \mathrm{from} 2]{\lnot p \implies
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \implies
   p}{\ulcorner p \urcorner^{[1]} &
     \infer[false\textrm{-elim}^{[3]}]{\lnot p}{\infer[\mathrm{false} -
       \mathrm{intro}]{false}{\ulcorner \lnot p \urcorner^{[2]} &
@@ -294,16 +294,16 @@ q)$ $\Rightarrow$ $(q \implies p)$:
 
 \noindent
 $\displaystyle
-\infer[\Rightarrowintro \mathrm{from} 1]{(\lnot p \implies \lnot q)
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \implies \lnot q)
 \implies (q \implies p)}{
   \ulcorner \lnot p \implies \lnot q \urcorner^{[1]}
   &
-  \infer[\Rightarrowintro \mathrm{from} 2]{q \implies p}{
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies p}{
     \ulcorner q \urcorner^{[2]}
     &
     \infer[false\textrm{-elim}^{[3]}]{p}{
       \infer[\mathrm{false} - \mathrm{intro}]{false}{
-        \infer[\Rightarrowelim]{\lnot q}{
+        \infer[\Rightarrow \mathrm{elim}]{\lnot q}{
           \ulcorner \lnot p \implies \lnot q \urcorner^{[1]}
           &
           \ulcorner \lnot p \urcorner^{[3]}
@@ -347,16 +347,16 @@ $\Rightarrow$ $(\lnot p \implies \lnot q)$:
 
 \noindent
 $\displaystyle
-\infer[\Rightarrowintro \mathrm{from} 1]{(q \implies p) \implies
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(q \implies p) \implies
 (\lnot p \implies \lnot q)}{
   \ulcorner q \implies p \urcorner^{[1]}
   &
-  \infer[\Rightarrowintro \mathrm{from} 2]{\lnot p \implies \lnot q}{
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \implies \lnot q}{
     \ulcorner \lnot p \urcorner^{[2]}
     &
     \infer[false\textrm{-elim}^{[3]}]{\lnot q}{
       \infer[\mathrm{false} - \mathrm{intro}]{false}{
-        \infer[\Rightarrowelim]{p}{
+        \infer[\Rightarrow \mathrm{elim}]{p}{
           \ulcorner q \implies p \urcorner^{[1]}
           &
           \ulcorner q \urcorner^{[3]}
@@ -397,7 +397,8 @@ rule, using the results from above:
 
 \noindent
 $\displaystyle
-\infer[\Leftrightarrowintro]{(\lnot p \implies \lnot q) \iff (q \implies p)}{
+\infer[\Leftrightarrow \mathrm{intro}]{(\lnot p \implies \lnot q)
+\iff (q \implies p)}{
   (\lnot p \implies \lnot q) \implies (q \implies p)
   &
   (q \implies p) \implies (\lnot p \implies \lnot q)
@@ -418,17 +419,17 @@ In one direction, we are seeking to prove $(p \implies r)$ and $(q
 
 \noindent
 $\displaystyle
-\infer[\Rightarrowintro \mathrm{from} 1]{((p \implies r) \land (q
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \implies r) \land (q
 \implies r)) \implies ((p \lor q) \implies r)}{
   \ulcorner (p \implies r) \land (q \implies r) \urcorner^{[1]}
   &
-  \infer[\Rightarrowintro \mathrm{from} 2]{(p \lor q) \implies r}{
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{(p \lor q) \implies r}{
     \ulcorner p \lor q \urcorner^{[2]}
     &
     \infer[\lor\textrm{-elim}^{[2]}]{r}{
       \ulcorner p \lor q \urcorner^{[2]}
       &
-      \raiseproof{12ex}{\infer[\Rightarrowelim]{r}{
+      \raiseproof{12ex}{\infer[\Rightarrow \mathrm{elim}]{r}{
           \ulcorner p \urcorner^{[2]}
           &
           \infer[\land\textrm{-elim-1}]{(p \implies r)}{
@@ -436,7 +437,7 @@ $\displaystyle
           }
       }}
       &
-      \hskip 6em \raiseproof{30ex}{\infer[\Rightarrowelim]{r}{
+      \hskip 6em \raiseproof{30ex}{\infer[\Rightarrow \mathrm{elim}]{r}{
           \ulcorner q \urcorner^{[2]}
           &
           \infer[\land\textrm{-elim-2}]{(q \implies r)}{
@@ -484,15 +485,15 @@ r)$ $\Rightarrow$ $((p \implies r) \land (q \implies r))$:
 
 \noindent
 $\displaystyle
-\infer[\Rightarrowintro \mathrm{from} 1]{((p \lor q) \implies r)
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \implies r)
 \implies ((p \implies r) \land (q \implies r))}{
   \ulcorner ((p \lor q) \implies r) \urcorner^{[1]}
   &
   \infer[\land \mathrm{intro}]{((p \implies r) \land (q \implies r))}{
-    \infer[\Rightarrowintro \mathrm{from} 2]{p \implies r}{
+    \infer[\Rightarrow\textrm{-intro}^{[2]}]{p \implies r}{
       \ulcorner p \urcorner^{[2]}
       &
-      \infer[\Rightarrowelim]{r}{
+      \infer[\Rightarrow \mathrm{elim}]{r}{
         \ulcorner (p \lor q) \implies r \urcorner^{[1]}
         &
         \infer[\lor\textrm{-intro-1}]{p \lor q}{
@@ -501,10 +502,10 @@ $\displaystyle
       }
     }
     &
-    \infer[\Rightarrowintro \mathrm{from} 3]{q \implies r}{
+    \infer[\Rightarrow\textrm{-intro}^{[3]}]{q \implies r}{
       \ulcorner q \urcorner^{[3]}
       &
-      \infer[\Rightarrowelim]{r}{
+      \infer[\Rightarrow \mathrm{elim}]{r}{
         \ulcorner (p \lor q) \implies r \urcorner^{[1]}
         &
         \infer[\lor\textrm{-intro-2}]{p \lor q}{
@@ -548,8 +549,8 @@ rule, using the results from above:
 
 \noindent
 $\displaystyle
-\infer[\Leftrightarrowintro]{((p \implies r) \land (q \implies r))
-\iff ((p \lor q) \implies r)}{
+\infer[\Leftrightarrow \mathrm{intro}]{((p \implies r) \land (q
+\implies r)) \iff ((p \lor q) \implies r)}{
   ((p \implies r) \land (q \implies r)) \implies ((p \lor q) \implies r)
   &
   ((p \lor q) \implies r) \implies ((p \implies r) \land (q \implies r))
@@ -657,10 +658,10 @@ $\rel$ Z, and two elements $x \in X$ and $z \in Z$, x $\mapsto$ $z
     [\mbox{definition of $\circ$}] \\
     &\Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in
     R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is
-    $\lnot$ free $\in$ y $\mapsto$z $\in$ T}] \\
+    $\lnot$ free $\in$ y $\mapsto$ z $\in$ T}] \\
     &\Leftrightarrow \exists x : X @ w \mapsto x \in R \land (\exists
     y : Y @ x \mapsto y \in S \land y \mapsto z \in T) & [\mbox{y is
-    $\lnot$ free $\in$ w $\mapsto$x $\in$ R}] \\
+    $\lnot$ free $\in$ w $\mapsto$ x $\in$ R}] \\
     &\Leftrightarrow \exists x : X @ w \mapsto x \in R \land x
     \mapsto z \in (S \circ T) & [\mbox{definition of $\circ$}] \\
     &\Leftrightarrow w \mapsto z \in R \circ (S \circ T)
@@ -1046,38 +1047,21 @@ and in the first element of the domain of episode\_info are identical.
 
 \bigskip
 
-Prove via structural induction: \
-
-\bigskip
-
-\noindent
-$\forall p : PossiblePlaylist @ length(played(p)) +
-length(unplayed(p)) = length(p)$
-
-\bigskip
-
 To use proof by induction, we need to prove the base case and the
 inductive case.  A PossiblePlaylist belongs to P Playlist where
-Playlist is of type seq((ShowId cross EpisodeId) cross N).
+Playlist is of type seq((ShowId cross EpisodeId) cross N). The base
+case occurs when p = $\langle \rangle$. Therefore, we must first
+prove length(played($\langle \rangle$)) + length(unplayed($\langle
+\rangle$)) = length($\langle \rangle$)
 
 \bigskip
-
-\bigskip
-
-The base case occurs when p = $\langle \rangle$. Therefore, we must first prove
-
-\bigskip
-
-\noindent
-$length(played(\langle \rangle)) + length(unplayed(\langle \rangle))
-= length(\langle \rangle)$
 
 \[
   \begin{array}{ll@{\hspace{2em}}l}
     & length(played(\langle \rangle)) + length(unplayed(\langle \rangle)) \\
     &\Leftrightarrow length(\langle \rangle) + length(\langle
-    \rangle) & [\mbox{played($\langle \rangle$)=$\langle
-    \rangle$$\land$ unplayed($\langle \rangle$)=$\langle \rangle$}] \\
+    \rangle) & [\mbox{played($\langle \rangle$)=$\langle \rangle$
+    $\land$ unplayed($\langle \rangle$)=$\langle \rangle$}] \\
     &\Leftrightarrow 0 + 0 & [\mbox{length($\langle \rangle$)=0}] \\
     &\Leftrightarrow 0 & [\mbox{0 + 0=0}] \\
     &\Leftrightarrow length(\langle \rangle) & [\mbox{length($\langle
@@ -1095,35 +1079,126 @@ length() base cases to justify our rewrites.
 \bigskip
 
 A playlist element is of type ((dom status) cross N).  We now seek to
-prove the inductive hypothesis, which is an implication.
+prove the inductive hypothesis, which follows the form of induction
+for sequences and which is an implication \citep[page 157]{simpson-notes}.
 
 \bigskip
 
 \noindent
 $\forall t : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
 \quad length(played(t)) + length(unplayed(t)) = length(t) \implies \\
-\quad length(played(ple \cat t)) + length(unplayed(ple \cat t)) =
-length(ple \cat t)$
+\quad length(played(\langle ple \rangle \cat t)) +
+length(unplayed(\langle ple \rangle \cat t)) = length(\langle ple
+\rangle \cat t)$
+
+\bigskip
+
+The status of a playlist element is of type (PlayedOrNot,
+SavedOrNot). The inductive hypothesis proof begins by establishing
+that there are two mutually exclusive and exhaustive cases: one where
+the playlist element's PlayedOrNot free type value is Played and
+another where it is NotP.  The proof will establish that for both
+cases, the same conclusion can be proven. The proof relies upon the
+inductive hypothesis length(played(t)) + length(unplayed(t)) = length(t).
+
+\bigskip
+
+\bigskip
+
+Case 1: The playlist element is played, which is represented by
+fst(status fst(ple)) = Played, which says take the status of the ple
+and inspect the first element of the status tuple and determine
+whether $PlayedOrNot = Played$.
+
+\bigskip
 
 \[
   \begin{array}{ll@{\hspace{2em}}l}
-    & length(played(ple \cat t)) + length(unplayed(ple \cat t)) \\
-    &\Leftrightarrow snd(ple) + length(t) \\
-    &\Leftrightarrow length(ple \cat t) & [\mbox{length($\langle ple
-    \rangle$⌢ pl)=snd(ple)+ length(pl)}]
+    & length(played(\langle ple \rangle \cat t)) +
+    length(unplayed(\langle ple \rangle \cat t)) \\
+    &\Leftrightarrow length(\langle ple \rangle \cat played(t)) +
+    length(unplayed(\langle ple \rangle \cat t)) &
+    [\mbox{played($\langle  ple  \rangle$ $\cat$ pl)=$\langle  ple
+    \rangle$ $\cat$(played(pl))}] \\
+    &\Leftrightarrow length(\langle ple \rangle \cat played(t)) +
+    length(unplayed(t)) & [\mbox{unplayed($\langle  ple  \rangle$
+    $\cat$ pl)=unplayed(pl)}] \\
+    &\Leftrightarrow snd(ple) + length(played(t)) +
+    length(unplayed(t)) & [\mbox{length($\langle  ple  \rangle$
+    $\cat$ pl)=snd(ple)+ length(pl)}] \\
+    &\Leftrightarrow snd(ple) + (length(played(t)) +
+    length(unplayed(t))) & [\mbox{associativity of addition}] \\
+    &\Leftrightarrow snd(ple) + length(t) & [\mbox{length(played(p))+
+    length(unplayed(p))=length(p)}] \\
+    &\Leftrightarrow length(\langle ple \rangle \cat t) &
+    [\mbox{length($\langle  ple  \rangle$ $\cat$ pl)=snd(ple)+ length(pl)}]
   \end{array}
 \]
 
 \bigskip
 
-A playlist element is of type ((dom status) cross N) and status is of
-type (PlayedOrNot, SavedOrNot). The inductive hypothesis proof begins
-by establishing that there are two mutually exclusive and exhaustive
-cases: one where the playlist element's PlayedOrNot free type value
-is Played and another where it is NotP.  The proof will establish
-that for both cases, the same conclusion can be proven. In addition,
-the inductive proof relies upon the inductive hypothesis
-length(played(t)) + length(unplayed(t)) = length(t).
+We first rewrite the played term as we know ple is Played and then we
+simplify the unplayed term as we know ple is not NotP. From here, we
+apply the definition of length for a single sequence element
+concatenated to a sequence. Using the associative property of
+addition, we arrive at a form of the inductive hypothesis that we can
+simplify.  From there, we apply our definition of length again to
+arrive at our final form.
+
+\bigskip
+
+\bigskip
+
+Case 2: The playlist element is not played, which is represented by
+fst(status fst(ple)) = NotP, which says take the status of the ple
+and inspect the first element of the status tuple and determine
+whether $PlayedOrNot = NotP$.
+
+\bigskip
+
+\[
+  \begin{array}{ll@{\hspace{2em}}l}
+    & length(played(\langle ple \rangle \cat t)) +
+    length(unplayed(\langle ple \rangle \cat t)) \\
+    &\Leftrightarrow length(played(\langle ple \rangle \cat t)) +
+    length(\langle ple \rangle \cat unplayed(t)) &
+    [\mbox{unplayed($\langle  ple  \rangle$ $\cat$ pl)=$\langle  ple
+    \rangle$ $\cat$(unplayed(pl))}] \\
+    &\Leftrightarrow length(played(t)) + length(\langle ple \rangle
+    \cat unplayed(t)) & [\mbox{played($\langle  ple  \rangle$ $\cat$
+    pl)=played(pl)}] \\
+    &\Leftrightarrow length(played(t)) + snd(ple) +
+    length(unplayed(t)) & [\mbox{length($\langle  ple  \rangle$
+    $\cat$ pl)=snd(ple)+ length(pl)}] \\
+    &\Leftrightarrow snd(ple) + length(played(t)) +
+    length(unplayed(t)) & [\mbox{commutativity of addition}] \\
+    &\Leftrightarrow snd(ple) + (length(played(t)) +
+    length(unplayed(t))) & [\mbox{associativity of addition}] \\
+    &\Leftrightarrow snd(ple) + length(t) & [\mbox{length(played(p))+
+    length(unplayed(p))=length(p)}] \\
+    &\Leftrightarrow length(\langle ple \rangle \cat t) &
+    [\mbox{length($\langle  ple  \rangle$ $\cat$ pl)=snd(ple)+ length(pl)}]
+  \end{array}
+\]
+
+\bigskip
+
+We first rewrite the unplayed term as we know ple is NotP and then we
+simplify the played term as we know ple is not Played. From here, we
+apply the definition of length for a single sequence element
+concatenated to a sequence. We must re-arrange our addends using the
+commutative property of addition.  Next, we use the associative
+property of addition to arrive at a form of the inductive hypothesis
+that we can simplify.  From there, we apply our definition of length
+again to arrive at our final form.
+
+\bigskip
+
+\bigskip
+
+Since the base case is proven and both inductive cases result in the
+same outcome, we can use the implication introduction rule to unify
+our cases and conclude:
 
 \bigskip
 
