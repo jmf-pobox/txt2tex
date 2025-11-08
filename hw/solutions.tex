@@ -246,9 +246,9 @@ $\displaystyle
   &
   \infer[\Rightarrowintro \mathrm{from} 2]{\lnot p \implies
   p}{\ulcorner p \urcorner^{[1]} &
-    \infer[false\textrm{-elim}^{[3]}]{\lnot
-    p}{\infer[\mathrm{false}-\mathrm{intro}]{false}{\ulcorner \lnot p
-  \urcorner^{[2]} & \ulcorner p \urcorner^{[3]}}}}
+    \infer[false\textrm{-elim}^{[3]}]{\lnot p}{\infer[\mathrm{false} -
+      \mathrm{intro}]{false}{\ulcorner \lnot p \urcorner^{[2]} &
+  \ulcorner p \urcorner^{[3]}}}}
 }
 $
 
@@ -302,7 +302,7 @@ $\displaystyle
     \ulcorner q \urcorner^{[2]}
     &
     \infer[false\textrm{-elim}^{[3]}]{p}{
-      \infer[\mathrm{false}-\mathrm{intro}]{false}{
+      \infer[\mathrm{false} - \mathrm{intro}]{false}{
         \infer[\Rightarrowelim]{\lnot q}{
           \ulcorner \lnot p \implies \lnot q \urcorner^{[1]}
           &
@@ -355,7 +355,7 @@ $\displaystyle
     \ulcorner \lnot p \urcorner^{[2]}
     &
     \infer[false\textrm{-elim}^{[3]}]{\lnot q}{
-      \infer[\mathrm{false}-\mathrm{intro}]{false}{
+      \infer[\mathrm{false} - \mathrm{intro}]{false}{
         \infer[\Rightarrowelim]{p}{
           \ulcorner q \implies p \urcorner^{[1]}
           &
@@ -657,10 +657,10 @@ $\rel$ Z, and two elements $x \in X$ and $z \in Z$, x $\mapsto$ $z
     [\mbox{definition of $\circ$}] \\
     &\Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in
     R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is
-    $\lnot$ free $\in$ y$\mapsto$z $\in$ T}] \\
+    $\lnot$ free $\in$ y $\mapsto$z $\in$ T}] \\
     &\Leftrightarrow \exists x : X @ w \mapsto x \in R \land (\exists
     y : Y @ x \mapsto y \in S \land y \mapsto z \in T) & [\mbox{y is
-    $\lnot$ free $\in$ w$\mapsto$x $\in$ R}] \\
+    $\lnot$ free $\in$ w $\mapsto$x $\in$ R}] \\
     &\Leftrightarrow \exists x : X @ w \mapsto x \in R \land x
     \mapsto z \in (S \circ T) & [\mbox{definition of $\circ$}] \\
     &\Leftrightarrow w \mapsto z \in R \circ (S \circ T)
@@ -1013,10 +1013,10 @@ and in the first element of the domain of episode\_info are identical.
   unplayed(\langle \rangle) = \langle \rangle \land \\
   \quad (\forall pl : PossiblePlaylist @ \forall ple : (\dom status
     \cross \nat) @ \\
-    \quad (fst(status(fst(ple))) = Played \land unplayed(\langle ple
-    \rangle \cat pl) = unplayed(pl)) \land \\
-    \quad unplayed(\langle ple \rangle \cat pl) = \langle ple \rangle
-  \cat unplayed(pl))
+    \quad (fst(status(fst(ple))) = Played) \implies
+    ((unplayed(\langle ple \rangle \cat pl) = unplayed(pl)) \land \\
+      \quad (fst(status(fst(ple))) = NotP) \implies (unplayed(\langle ple
+  \rangle \cat pl) = \langle ple \rangle \cat unplayed(pl))))
 \end{axdef}
 
 \medskip
@@ -1030,10 +1030,10 @@ and in the first element of the domain of episode\_info are identical.
   played(\langle \rangle) = \langle \rangle \land \\
   \quad (\forall pl : PossiblePlaylist @ \forall ple : (\dom status
     \cross \nat) @ \\
-    \quad (fst(status(fst(ple))) = NotP \land played(\langle ple
-    \rangle \cat pl) = played(pl)) \land \\
-    \quad played(\langle ple \rangle \cat pl) = \langle ple \rangle
-  \cat played(pl))
+    \quad (fst(status(fst(ple))) = NotP) \implies ((played(\langle
+      ple \rangle \cat pl) = played(pl)) \land \\
+      \quad (fst(status(fst(ple))) = Played) \implies (played(\langle ple
+  \rangle \cat pl) = \langle ple \rangle \cat played(pl))))
 \end{axdef}
 
 \medskip
@@ -1079,7 +1079,7 @@ $length(played(\langle \rangle)) + length(unplayed(\langle \rangle))
     \rangle) & [\mbox{played($\langle \rangle$)=$\langle
     \rangle$$\land$ unplayed($\langle \rangle$)=$\langle \rangle$}] \\
     &\Leftrightarrow 0 + 0 & [\mbox{length($\langle \rangle$)=0}] \\
-    &\Leftrightarrow 0 & [\mbox{0+0=0}] \\
+    &\Leftrightarrow 0 & [\mbox{0 + 0=0}] \\
     &\Leftrightarrow length(\langle \rangle) & [\mbox{length($\langle
     \rangle$)=0}]
   \end{array}
@@ -1110,20 +1110,20 @@ length(ple \cat t)$
     & length(played(ple \cat t)) + length(unplayed(ple \cat t)) \\
     &\Leftrightarrow snd(ple) + length(t) \\
     &\Leftrightarrow length(ple \cat t) & [\mbox{length($\langle ple
-    \rangle$⌢pl)=snd(ple)+length(pl)}]
+    \rangle$⌢ pl)=snd(ple)+ length(pl)}]
   \end{array}
 \]
 
 \bigskip
 
-The inductive proof relies upon the inductive hypothesis
-length(played(t)) + length(unplayed(t)) = length(t)
-
-\bigskip
-
-\bigskip
-
-foo
+A playlist element is of type ((dom status) cross N) and status is of
+type (PlayedOrNot, SavedOrNot). The inductive hypothesis proof begins
+by establishing that there are two mutually exclusive and exhaustive
+cases: one where the playlist element's PlayedOrNot free type value
+is Played and another where it is NotP.  The proof will establish
+that for both cases, the same conclusion can be proven. In addition,
+the inductive proof relies upon the inductive hypothesis
+length(played(t)) + length(unplayed(t)) = length(t).
 
 \bigskip
 
