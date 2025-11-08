@@ -1065,21 +1065,67 @@ Playlist is of type seq((ShowId cross EpisodeId) cross N).
 
 \bigskip
 
-The Base Case occurs when p = $\langle \rangle$. Therefore, we must
-first prove length(played($\langle \rangle$)) +
-length(unplayed($\langle \rangle$)) = length($\langle \rangle$).
+The base case occurs when p = $\langle \rangle$. Therefore, we must first prove
 
 \bigskip
+
+\noindent
+$length(played(\langle \rangle)) + length(unplayed(\langle \rangle))
+= length(\langle \rangle)$
 
 \[
   \begin{array}{ll@{\hspace{2em}}l}
     & length(played(\langle \rangle)) + length(unplayed(\langle \rangle)) \\
     &\Leftrightarrow length(\langle \rangle) + length(\langle
-    \rangle) & [\mbox{played ( < > ) = < > $\land$ unplayed ( < > ) = < >}] \\
-    &\Leftrightarrow 0 + 0 & [\mbox{length ( < > ) = 0}] \\
-    &\Leftrightarrow length(\langle \rangle) & [\mbox{length ( < > ) = 0}]
+    \rangle) & [\mbox{played ( $\langle \rangle$ ) = $\langle
+    \rangle$ $\land$ unplayed ( $\langle \rangle$ ) = $\langle \rangle$}] \\
+    &\Leftrightarrow 0 + 0 & [\mbox{length ( $\langle \rangle$ ) = 0}] \\
+    &\Leftrightarrow 0 & [\mbox{0 + 0 = 0}] \\
+    &\Leftrightarrow length(\langle \rangle) & [\mbox{length (
+    $\langle \rangle$ ) = 0}]
   \end{array}
 \]
+
+\bigskip
+
+In the above, we use each of the individual played(), unplayed(), and
+length() base cases to justify our rewrites.
+
+\bigskip
+
+\bigskip
+
+A playlist element is of type ((dom status) cross N).  We now seek to
+prove the inductive hypothesis, which is an implication.
+
+\bigskip
+
+\noindent
+$\forall t : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
+\quad length(played(t)) + length(unplayed(t)) = length(t) \implies \\
+\quad length(played(ple^t)) + length(unplayed(ple^t)) = length(ple^t)$
+
+\[
+  \begin{array}{ll@{\hspace{2em}}l}
+    & length(played(ple^t)) + length(unplayed(ple^t)) \\
+    &\Leftrightarrow snd(ple) + length(t) \\
+    &\Leftrightarrow length(ple^t) & [\mbox{length ( $\langle  ple
+    \rangle$ ^ pl ) = snd ( ple ) + length ( pl )}]
+  \end{array}
+\]
+
+\bigskip
+
+The inductive proof relies upon the inductive hypothesis
+length(played(t)) + length(unplayed(t)) = length(t)
+
+\bigskip
+
+\bigskip
+
+foo
+
+\bigskip
 
 \noindent
 $\displaystyle

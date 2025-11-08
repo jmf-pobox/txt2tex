@@ -416,7 +416,9 @@ TEXT: Prove via structural induction: \
 
 TEXT: To use proof by induction, we need to prove the base case and the inductive case.  A PossiblePlaylist belongs to P Playlist where Playlist is of type seq((ShowId cross EpisodeId) cross N). 
 
-TEXT: The Base Case occurs when p = <>. Therefore, we must first prove length(played(<>)) + length(unplayed(<>)) = length(<>).
+TEXT: The base case occurs when p = <>. Therefore, we must first prove 
+
+length(played(<>)) + length(unplayed(<>)) = length(<>)
 
 EQUIV:
 length(played(<>)) + length(unplayed(<>))
@@ -425,7 +427,25 @@ length(<>) + length(<>)     [played(<>) = <> and unplayed(<>) = <>]
 0                           [0 + 0 = 0]
 length(<>)                  [length(<>) = 0]
 
-TEXT: In the above, we use the played(), unplayed(), and length() base cases to prove the base case.
+TEXT: In the above, we use each of the individual played(), unplayed(), and length() base cases to justify our rewrites.
+
+TEXT: A playlist element is of type ((dom status) cross N).  We now seek to prove the inductive hypothesis, which is an implication.
+
+forall t : PossiblePlaylist | (forall ple : ((dom status) cross N) | \
+  length(played(t)) + length(unplayed(t)) = length(t) => \
+  length(played(ple^t)) + length(unplayed(ple^t)) = length(ple^t))
+
+EQUIV:
+length(played(ple^t)) + length(unplayed(ple^t))
+snd(ple) + length (t)
+length(ple^t)             [length(<ple>^pl) = snd(ple) + length(pl)]
+
+TEXT: The inductive proof relies upon the inductive hypothesis length(played(t)) + length(unplayed(t)) = length(t)
+
+
+
+
+TEXT: foo
 
 PROOF:
 forall p : PossiblePlaylist | length(p)
