@@ -1,0 +1,7 @@
+=== Bug: Extra Spaces in Justification ===
+
+TEXT: Testing that justifications preserve spacing without adding extra spaces.
+
+EQUIV:
+length(<ple> ^ pl)
+snd(ple) + length(pl) [length(<ple>^pl)=snd(ple)+length(pl)]
