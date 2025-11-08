@@ -1,0 +1,7 @@
+=== Bug: Non-Empty Sequence in Justification ===
+
+TEXT: Testing non-empty sequence rendering inside EQUIV justifications.
+
+EQUIV:
+head(<1, 2, 3>)
+1 [head of <1, 2, 3> is 1]
