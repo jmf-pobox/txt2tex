@@ -2493,6 +2493,9 @@ class LaTeXGenerator:
         result = result.replace("++", r"$\oplus$")  # Override
         result = result.replace("o9", r"$\circ$")  # Composition
 
+        # Single-character operators
+        result = result.replace("^", r"$\cat$")  # Sequence concatenation
+
         # Word-based operators (use word boundaries to avoid partial matches)
         result = re.sub(r"\band\b", r"$\\land$", result)
         result = re.sub(r"\bor\b", r"$\\lor$", result)
