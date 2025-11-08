@@ -2454,8 +2454,17 @@ class LaTeXGenerator:
         CRITICAL: Operators must be replaced in order of length (longest first)
         to avoid partial matches. For example, |-> must be replaced before ->
         otherwise -> gets replaced first, leaving | and causing incorrect output.
+
+        Also handles sequences like <> and <a, b, c> which must be processed
+        BEFORE other operators containing < or >.
         """
         result = text
+
+        # Handle sequences FIRST (before operators containing < or >)
+        # Match sequences: < followed by anything except < or >, then >
+        # This handles both <> (empty) and <a, b, c> (non-empty)
+        result = re.sub(r'<\s*>', r'$\\langle \\rangle$', result)  # Empty sequence
+        result = re.sub(r'<([^<>]+)>', r'$\\langle \1 \\rangle$', result)  # Non-empty
 
         # 5-character operators (process first)
         result = result.replace("77->", r"$\ffun$")  # Finite partial function
