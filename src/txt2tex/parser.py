@@ -463,6 +463,38 @@ class Parser:
         while self._match(TokenType.NEWLINE) and not self._at_end():
             self._advance()
 
+    def _smart_join_justification(self, parts: list[str]) -> str:
+        """Join justification tokens intelligently.
+
+        Strategy: Join with spaces (preserving word separation), then remove
+        spaces around parentheses, brackets, and equals signs to compact
+        mathematical notation.
+
+        Examples:
+        - ["length", "(", "<", "ple", ">", "^", "pl", ")"] → "length(<ple>^pl)"
+        - ["commutativity", "of", "or"] → "commutativity of or"
+        - ["x", "is", "not", "free", "in", "y", "|->", "z"] → "x is not free in y|->z"
+        """
+        if not parts:
+            return ""
+
+        # First join with spaces (preserves all word separation)
+        result = " ".join(parts)
+
+        # Remove spaces around specific punctuation to compact notation
+        # Be careful not to remove spaces around LaTeX commands (don't touch $)
+        result = re.sub(r'\s*\(\s*', '(', result)  # Remove space before/after (
+        result = re.sub(r'\s*\)\s*', ')', result)  # Remove space before/after )
+        result = re.sub(r'\s*=\s*', '=', result)   # Remove space around =
+        result = re.sub(r'\s*,\s*', ',', result)   # Remove space around ,
+
+        # Only remove spaces around < > when NOT preceded/followed by $
+        # This preserves "$\mapsto$ $\land$" but removes spaces in "<ple>"
+        result = re.sub(r'(?<!\$)\s*<\s*', '<', result)  # < not after $
+        result = re.sub(r'\s*>\s*(?!\$)', '>', result)   # > not before $
+
+        return result
+
     def _parse_section(self) -> Section:
         """Parse section: === Title ==="""
         start_token = self._advance()  # Consume first '==='
@@ -663,7 +695,8 @@ class Parser:
                     )
 
                 self._advance()  # Consume ']'
-                justification = " ".join(just_parts)
+                # Join tokens smartly: add spaces only between consecutive identifiers
+                justification = self._smart_join_justification(just_parts)
 
             # Create step
             steps.append(
@@ -3160,7 +3193,8 @@ class Parser:
 
             if self._match(TokenType.RBRACKET):
                 self._advance()  # Consume ']'
-                justification = " ".join(just_parts)
+                # Join tokens smartly: add spaces only between consecutive identifiers
+                justification = self._smart_join_justification(just_parts)
                 # Check if this is the [assumption] keyword
                 if justification == "assumption":
                     is_assumption = True

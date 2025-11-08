@@ -1,0 +1,7 @@
+=== Test: Word-based Justification ===
+
+TEXT: Testing that text justifications preserve spacing between words.
+
+EQUIV:
+p => (q => r)
+(p and q) => r [commutativity of and]

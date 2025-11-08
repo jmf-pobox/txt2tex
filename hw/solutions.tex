@@ -142,7 +142,7 @@ Lecture 1 - Propositions
   \begin{array}{ll@{\hspace{2em}}l}
     & p \implies (\lnot p \implies p) \\
     &\Leftrightarrow p \implies (\lnot \lnot p \lor p) &
-    [\mbox{$\Rightarrow$ disjunction}] \\
+    [\mbox{$\Rightarrow$disjunction}] \\
     &\Leftrightarrow p \implies (p \lor p) & [\mbox{$\lnot$ $\lnot$}] \\
     &\Leftrightarrow p \implies p & [\mbox{idempotence of p}] \\
     &\Leftrightarrow true & [\mbox{tautology}]
@@ -168,10 +168,10 @@ application of the idempotence rule to simplify, and the fact that $p
   \begin{array}{ll@{\hspace{2em}}l}
     & (\lnot p \implies \lnot q) \\
     &\Leftrightarrow (\lnot \lnot p \lor \lnot q) &
-    [\mbox{$\Rightarrow$ disjunction}] \\
+    [\mbox{$\Rightarrow$disjunction}] \\
     &\Leftrightarrow (p \lor \lnot q) & [\mbox{$\lnot$ $\lnot$}] \\
     &\Leftrightarrow (\lnot q \lor p) & [\mbox{commutativity of $\lor$}] \\
-    &\Leftrightarrow q \implies p & [\mbox{$\Rightarrow$ disjunction}]
+    &\Leftrightarrow q \implies p & [\mbox{$\Rightarrow$disjunction}]
   \end{array}
 \]
 
@@ -195,7 +195,7 @@ implication.
   \begin{array}{ll@{\hspace{2em}}l}
     & ((p \implies r) \land (q \implies r)) \\
     &\Leftrightarrow ((\lnot p \lor r) \land (\lnot q \lor r)) &
-    [\mbox{$\Rightarrow$ disjunction}] \\
+    [\mbox{$\Rightarrow$disjunction}] \\
     &\Leftrightarrow (r \lor \lnot p) \land (r \lor \lnot q) &
     [\mbox{commutativity of $\lor$}] \\
     &\Leftrightarrow r \lor (\lnot p \land \lnot q) &
@@ -203,7 +203,7 @@ implication.
     &\Leftrightarrow (\lnot p \land \lnot q) \lor r &
     [\mbox{commutativity of $\lor$}] \\
     &\Leftrightarrow \lnot (p \lor q) \lor r & [\mbox{De Morgan}] \\
-    &\Leftrightarrow p \lor q \implies r & [\mbox{$\Rightarrow$ disjunction}]
+    &\Leftrightarrow p \lor q \implies r & [\mbox{$\Rightarrow$disjunction}]
   \end{array}
 \]
 
@@ -241,14 +241,14 @@ Lecture 3 - Deductive Proofs
 \vspace{11pt}
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (\lnot p \implies p)}{
+\infer[\Rightarrowintro \mathrm{from} 1]{p \implies (\lnot p \implies p)}{
   \ulcorner p \urcorner^{[1]}
   &
-  \infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \implies
+  \infer[\Rightarrowintro \mathrm{from} 2]{\lnot p \implies
   p}{\ulcorner p \urcorner^{[1]} &
-    \infer[false\textrm{-elim}^{[3]}]{\lnot p}{\infer[\mathrm{false} -
-      \mathrm{intro}]{false}{\ulcorner \lnot p \urcorner^{[2]} &
-  \ulcorner p \urcorner^{[3]}}}}
+    \infer[false\textrm{-elim}^{[3]}]{\lnot
+    p}{\infer[\mathrm{false}-\mathrm{intro}]{false}{\ulcorner \lnot p
+  \urcorner^{[2]} & \ulcorner p \urcorner^{[3]}}}}
 }
 $
 
@@ -294,16 +294,16 @@ q)$ $\Rightarrow$ $(q \implies p)$:
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \implies \lnot q)
+\infer[\Rightarrowintro \mathrm{from} 1]{(\lnot p \implies \lnot q)
 \implies (q \implies p)}{
   \ulcorner \lnot p \implies \lnot q \urcorner^{[1]}
   &
-  \infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies p}{
+  \infer[\Rightarrowintro \mathrm{from} 2]{q \implies p}{
     \ulcorner q \urcorner^{[2]}
     &
     \infer[false\textrm{-elim}^{[3]}]{p}{
-      \infer[\mathrm{false} - \mathrm{intro}]{false}{
-        \infer[\Rightarrow \mathrm{elim}]{\lnot q}{
+      \infer[\mathrm{false}-\mathrm{intro}]{false}{
+        \infer[\Rightarrowelim]{\lnot q}{
           \ulcorner \lnot p \implies \lnot q \urcorner^{[1]}
           &
           \ulcorner \lnot p \urcorner^{[3]}
@@ -347,16 +347,16 @@ $\Rightarrow$ $(\lnot p \implies \lnot q)$:
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(q \implies p) \implies
+\infer[\Rightarrowintro \mathrm{from} 1]{(q \implies p) \implies
 (\lnot p \implies \lnot q)}{
   \ulcorner q \implies p \urcorner^{[1]}
   &
-  \infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \implies \lnot q}{
+  \infer[\Rightarrowintro \mathrm{from} 2]{\lnot p \implies \lnot q}{
     \ulcorner \lnot p \urcorner^{[2]}
     &
     \infer[false\textrm{-elim}^{[3]}]{\lnot q}{
-      \infer[\mathrm{false} - \mathrm{intro}]{false}{
-        \infer[\Rightarrow \mathrm{elim}]{p}{
+      \infer[\mathrm{false}-\mathrm{intro}]{false}{
+        \infer[\Rightarrowelim]{p}{
           \ulcorner q \implies p \urcorner^{[1]}
           &
           \ulcorner q \urcorner^{[3]}
@@ -397,8 +397,7 @@ rule, using the results from above:
 
 \noindent
 $\displaystyle
-\infer[\Leftrightarrow \mathrm{intro}]{(\lnot p \implies \lnot q)
-\iff (q \implies p)}{
+\infer[\Leftrightarrowintro]{(\lnot p \implies \lnot q) \iff (q \implies p)}{
   (\lnot p \implies \lnot q) \implies (q \implies p)
   &
   (q \implies p) \implies (\lnot p \implies \lnot q)
@@ -419,17 +418,17 @@ In one direction, we are seeking to prove $(p \implies r)$ and $(q
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \implies r) \land (q
+\infer[\Rightarrowintro \mathrm{from} 1]{((p \implies r) \land (q
 \implies r)) \implies ((p \lor q) \implies r)}{
   \ulcorner (p \implies r) \land (q \implies r) \urcorner^{[1]}
   &
-  \infer[\Rightarrow\textrm{-intro}^{[2]}]{(p \lor q) \implies r}{
+  \infer[\Rightarrowintro \mathrm{from} 2]{(p \lor q) \implies r}{
     \ulcorner p \lor q \urcorner^{[2]}
     &
     \infer[\lor\textrm{-elim}^{[2]}]{r}{
       \ulcorner p \lor q \urcorner^{[2]}
       &
-      \raiseproof{12ex}{\infer[\Rightarrow \mathrm{elim}]{r}{
+      \raiseproof{12ex}{\infer[\Rightarrowelim]{r}{
           \ulcorner p \urcorner^{[2]}
           &
           \infer[\land\textrm{-elim-1}]{(p \implies r)}{
@@ -437,7 +436,7 @@ $\displaystyle
           }
       }}
       &
-      \hskip 6em \raiseproof{30ex}{\infer[\Rightarrow \mathrm{elim}]{r}{
+      \hskip 6em \raiseproof{30ex}{\infer[\Rightarrowelim]{r}{
           \ulcorner q \urcorner^{[2]}
           &
           \infer[\land\textrm{-elim-2}]{(q \implies r)}{
@@ -485,15 +484,15 @@ r)$ $\Rightarrow$ $((p \implies r) \land (q \implies r))$:
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \implies r)
+\infer[\Rightarrowintro \mathrm{from} 1]{((p \lor q) \implies r)
 \implies ((p \implies r) \land (q \implies r))}{
   \ulcorner ((p \lor q) \implies r) \urcorner^{[1]}
   &
   \infer[\land \mathrm{intro}]{((p \implies r) \land (q \implies r))}{
-    \infer[\Rightarrow\textrm{-intro}^{[2]}]{p \implies r}{
+    \infer[\Rightarrowintro \mathrm{from} 2]{p \implies r}{
       \ulcorner p \urcorner^{[2]}
       &
-      \infer[\Rightarrow \mathrm{elim}]{r}{
+      \infer[\Rightarrowelim]{r}{
         \ulcorner (p \lor q) \implies r \urcorner^{[1]}
         &
         \infer[\lor\textrm{-intro-1}]{p \lor q}{
@@ -502,10 +501,10 @@ $\displaystyle
       }
     }
     &
-    \infer[\Rightarrow\textrm{-intro}^{[3]}]{q \implies r}{
+    \infer[\Rightarrowintro \mathrm{from} 3]{q \implies r}{
       \ulcorner q \urcorner^{[3]}
       &
-      \infer[\Rightarrow \mathrm{elim}]{r}{
+      \infer[\Rightarrowelim]{r}{
         \ulcorner (p \lor q) \implies r \urcorner^{[1]}
         &
         \infer[\lor\textrm{-intro-2}]{p \lor q}{
@@ -549,8 +548,8 @@ rule, using the results from above:
 
 \noindent
 $\displaystyle
-\infer[\Leftrightarrow \mathrm{intro}]{((p \implies r) \land (q
-\implies r)) \iff ((p \lor q) \implies r)}{
+\infer[\Leftrightarrowintro]{((p \implies r) \land (q \implies r))
+\iff ((p \lor q) \implies r)}{
   ((p \implies r) \land (q \implies r)) \implies ((p \lor q) \implies r)
   &
   ((p \lor q) \implies r) \implies ((p \implies r) \land (q \implies r))
@@ -658,10 +657,10 @@ $\rel$ Z, and two elements $x \in X$ and $z \in Z$, x $\mapsto$ $z
     [\mbox{definition of $\circ$}] \\
     &\Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in
     R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is
-    $\lnot$ free $\in$ y $\mapsto$ z $\in$ T}] \\
+    $\lnot$ free $\in$ y$\mapsto$z $\in$ T}] \\
     &\Leftrightarrow \exists x : X @ w \mapsto x \in R \land (\exists
     y : Y @ x \mapsto y \in S \land y \mapsto z \in T) & [\mbox{y is
-    $\lnot$ free $\in$ w $\mapsto$ x $\in$ R}] \\
+    $\lnot$ free $\in$ w$\mapsto$x $\in$ R}] \\
     &\Leftrightarrow \exists x : X @ w \mapsto x \in R \land x
     \mapsto z \in (S \circ T) & [\mbox{definition of $\circ$}] \\
     &\Leftrightarrow w \mapsto z \in R \circ (S \circ T)
@@ -1077,12 +1076,12 @@ $length(played(\langle \rangle)) + length(unplayed(\langle \rangle))
   \begin{array}{ll@{\hspace{2em}}l}
     & length(played(\langle \rangle)) + length(unplayed(\langle \rangle)) \\
     &\Leftrightarrow length(\langle \rangle) + length(\langle
-    \rangle) & [\mbox{played ( $\langle \rangle$ ) = $\langle
-    \rangle$ $\land$ unplayed ( $\langle \rangle$ ) = $\langle \rangle$}] \\
-    &\Leftrightarrow 0 + 0 & [\mbox{length ( $\langle \rangle$ ) = 0}] \\
-    &\Leftrightarrow 0 & [\mbox{0 + 0 = 0}] \\
-    &\Leftrightarrow length(\langle \rangle) & [\mbox{length (
-    $\langle \rangle$ ) = 0}]
+    \rangle) & [\mbox{played($\langle \rangle$)=$\langle
+    \rangle$$\land$ unplayed($\langle \rangle$)=$\langle \rangle$}] \\
+    &\Leftrightarrow 0 + 0 & [\mbox{length($\langle \rangle$)=0}] \\
+    &\Leftrightarrow 0 & [\mbox{0+0=0}] \\
+    &\Leftrightarrow length(\langle \rangle) & [\mbox{length($\langle
+    \rangle$)=0}]
   \end{array}
 \]
 
@@ -1103,14 +1102,15 @@ prove the inductive hypothesis, which is an implication.
 \noindent
 $\forall t : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
 \quad length(played(t)) + length(unplayed(t)) = length(t) \implies \\
-\quad length(played(ple^t)) + length(unplayed(ple^t)) = length(ple^t)$
+\quad length(played(ple \cat t)) + length(unplayed(ple \cat t)) =
+length(ple \cat t)$
 
 \[
   \begin{array}{ll@{\hspace{2em}}l}
-    & length(played(ple^t)) + length(unplayed(ple^t)) \\
+    & length(played(ple \cat t)) + length(unplayed(ple \cat t)) \\
     &\Leftrightarrow snd(ple) + length(t) \\
-    &\Leftrightarrow length(ple^t) & [\mbox{length ( $\langle  ple
-    \rangle$ ^ pl ) = snd ( ple ) + length ( pl )}]
+    &\Leftrightarrow length(ple \cat t) & [\mbox{length($\langle ple
+    \rangle$⌢pl)=snd(ple)+length(pl)}]
   \end{array}
 \]
 

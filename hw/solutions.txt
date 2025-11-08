@@ -394,8 +394,9 @@ axdef
 where
   unplayed(<>) = <> and \
     forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) | \
-      (fst(status fst(ple)) = Played and unplayed(<ple> ^ pl) = (unplayed(pl))) and \
-      unplayed(<ple> ^ pl) = <ple> ^ (unplayed(pl)))
+      (fst(status fst(ple)) = Played => unplayed(<ple> ^ pl) = (unplayed(pl))) \
+      and \
+      (fst(status fst(ple)) = NotP => unplayed(<ple> ^ pl) = <ple> ^ (unplayed(pl))))
 end
 
 (c)
@@ -405,8 +406,9 @@ axdef
 where
   played(<>) = <> and \
     forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) | \
-      (fst(status fst(ple)) = NotP and played(<ple> ^ pl) = (played(pl))) and \
-      played(<ple> ^ pl) = <ple> ^ (played(pl)))
+      (fst(status fst(ple)) = NotP => played(<ple> ^ pl) = (played(pl))) \
+      and \
+      (fst(status fst(ple)) = Played => played(<ple> ^ pl) = <ple> ^ (played(pl))))
 end
 
 **Question 11**
@@ -433,12 +435,13 @@ TEXT: A playlist element is of type ((dom status) cross N).  We now seek to prov
 
 forall t : PossiblePlaylist | (forall ple : ((dom status) cross N) | \
   length(played(t)) + length(unplayed(t)) = length(t) => \
-  length(played(ple^t)) + length(unplayed(ple^t)) = length(ple^t))
+  length(played(ple⌢t)) + length(unplayed(ple⌢t)) = length(ple⌢t))
 
 EQUIV:
-length(played(ple^t)) + length(unplayed(ple^t))
+length(played(ple⌢t)) + length(unplayed(ple⌢t))
+
 snd(ple) + length (t)
-length(ple^t)             [length(<ple>^pl) = snd(ple) + length(pl)]
+length(ple⌢t)             [length(<ple>⌢pl) = snd(ple) + length(pl)]
 
 TEXT: The inductive proof relies upon the inductive hypothesis length(played(t)) + length(unplayed(t)) = length(t)
 
