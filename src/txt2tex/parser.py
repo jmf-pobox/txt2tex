@@ -482,16 +482,15 @@ class Parser:
         result = " ".join(parts)
 
         # Remove spaces around specific punctuation to compact notation
-        # Be careful not to remove spaces around LaTeX commands (don't touch $)
+        # ONLY touch safe characters that aren't part of operators
         result = re.sub(r'\s*\(\s*', '(', result)  # Remove space before/after (
         result = re.sub(r'\s*\)\s*', ')', result)  # Remove space before/after )
         result = re.sub(r'\s*=\s*', '=', result)   # Remove space around =
         result = re.sub(r'\s*,\s*', ',', result)   # Remove space around ,
 
-        # Only remove spaces around < > when NOT preceded/followed by $
-        # This preserves "$\mapsto$ $\land$" but removes spaces in "<ple>"
-        result = re.sub(r'(?<!\$)\s*<\s*', '<', result)  # < not after $
-        result = re.sub(r'\s*>\s*(?!\$)', '>', result)   # > not before $
+        # DO NOT touch < or > as they appear in many operators (=>, ->>, etc.)
+        # Sequences like <ple> will have internal spacing, but that's acceptable
+        # to avoid breaking operator conversion in _escape_justification
 
         return result
 
