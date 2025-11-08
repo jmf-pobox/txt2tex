@@ -1,0 +1,7 @@
+=== Bug: Caret (Concatenation) in Justification ===
+
+TEXT: Testing concatenation operator in EQUIV justifications.
+
+EQUIV:
+length(<ple> ^ pl)
+snd(ple) + length(pl) [length(<ple>^pl) = snd(ple) + length(pl)]
