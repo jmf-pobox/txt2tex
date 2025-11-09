@@ -483,10 +483,10 @@ class Parser:
 
         # Remove spaces around specific punctuation to compact notation
         # ONLY touch safe characters that aren't part of operators
-        result = re.sub(r'\s*\(\s*', '(', result)  # Remove space before/after (
-        result = re.sub(r'\s*\)\s*', ')', result)  # Remove space before/after )
-        result = re.sub(r'\s*=\s*', '=', result)   # Remove space around =
-        result = re.sub(r'\s*,\s*', ',', result)   # Remove space around ,
+        result = re.sub(r"\s*\(\s*", "(", result)  # Remove space before/after (
+        result = re.sub(r"\s*\)\s*", ")", result)  # Remove space before/after )
+        result = re.sub(r"\s*=\s*", "=", result)  # Remove space around =
+        result = re.sub(r"\s*,\s*", ",", result)  # Remove space around ,
 
         # DO NOT touch < or > as they appear in many operators (=>, ->>, etc.)
         # Sequences like <ple> will have internal spacing, but that's acceptable

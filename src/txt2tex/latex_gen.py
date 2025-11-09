@@ -592,15 +592,12 @@ class LaTeXGenerator:
             if parent_op in {"=>", "<=>"}:
                 return True
 
-            # Special case for cross product: fuzz's type system requires
-            # explicit parenthesization for nested cross products to ensure
-            # correct type checking. E.g., seq((A cross B) cross C) needs
-            # parens even though mathematically (A cross B) cross C is
-            # the default left-associative parsing.
-            # However, if parent already has explicit parens, skip these
-            # nested parens to avoid double parenthesization.
-            if parent_op in {"cross", "×"} and not parent.explicit_parens:  # noqa: RUF001
-                return True
+            # Note: Cross product does NOT automatically get nested parens.
+            # Fuzz distinguishes between:
+            # - A x B x C (flat 3-tuple, no parens)
+            # - (A x B) x C (nested pairs, with parens)
+            # Only add parens where user explicitly wrote them in source.
+            # Removed automatic parenthesization that was breaking fuzz 3-tuples.
 
             # For left-associative operators, right child needs parens
             # E.g., R o9 (S o9 T) requires parens on right
@@ -2466,8 +2463,8 @@ class LaTeXGenerator:
         # Handle sequences FIRST (before operators containing < or >)
         # Match sequences: < followed by anything except < or >, then >
         # This handles both <> (empty) and <a, b, c> (non-empty)
-        result = re.sub(r'<\s*>', r'$\\langle \\rangle$', result)  # Empty sequence
-        result = re.sub(r'<([^<>]+)>', r'$\\langle \1 \\rangle$', result)  # Non-empty
+        result = re.sub(r"<\s*>", r"$\\langle \\rangle$", result)  # Empty sequence
+        result = re.sub(r"<([^<>]+)>", r"$\\langle \1 \\rangle$", result)  # Non-empty
 
         # 5-character operators (process first)
         result = result.replace("77->", r"$\ffun$")  # Finite partial function
