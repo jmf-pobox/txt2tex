@@ -463,20 +463,68 @@ PROOF:
 forall p : PossiblePlaylist | length(p)
   forall p : PossiblePlaylist | length(played(p)) + length(unplayed(p))
 
+
+
+
 PAGEBREAK:
 
 **Question 12**
 
-List ::= nil | join <<(ShowId cross EpisodeId) cross (N cross PlayedOrNot cross SavedOrNot) cross List>>
+TEXT: First, we can create an abbreviation for the elements of our list to make our expressions less cumbersome.
 
-(a) 
-TEXT: A suitable induction principle would be 
+ListElement == (ShowId cross EpisodeId) cross (N cross PlayedOrNot cross SavedOrNot)
+List ::= nil | join <<ListElement cross List>>
+
+TEXT: An example for such a list could be (List((1, 2), (3600, NotP, Saved)), List((1, 1), (3600, Played, Saved)), List(nil)).
+
+TEXT: I will also define some convenience functions to enable fuzz-compliant access to elements of the triple (N cross PlayedOrNot cross SavedOrNot)
+
+gendef [A, B, C]
+  fstOfTriple : A cross B cross C -> A
+where
+  forall a : A | forall b : B | forall c : C | fstOfTriple(a, b, c) = a
+end
+
+gendef [A, B, C]
+  sndOfTriple : A cross B cross C -> B
+where
+  forall a : A | forall b : B | forall c : C | sndOfTriple(a, b, c) = b
+end
+
+gendef [A, B, C]
+  thrdOfTriple : A cross B cross C -> C
+where
+  forall a : A | forall b : B | forall c : C | thrdOfTriple(a, b, c) = c
+end
+
+(a) TEXT: Now can now define simply the induction principle for this list [cite simpson-notes page 161].
 
 PROOF:
 forall l : List | P l
   :: P nil
-  :: forall n : N | forall l : List | P l => P(join(n, l))
+  :: forall e : ListElement | forall l : List | P l => P(join(e, l))
   
+(b)
+
+axdef
+  length_L : List -> N
+where
+  length_L(nil) = 0
+  forall e : ListElement | (forall l : List | length_L(join(e, l)) = fstOfTriple(snd(e)) + length_L(l))
+end
+
+axdef
+  unplayed_L : List -> List
+where
+  unplayed_L(nil) = nil
+end
+
+axdef
+  played_L : List -> List
+where
+  played_L(nil) = nil
+end
+
 PAGEBREAK:
 
 === Bibliography ===

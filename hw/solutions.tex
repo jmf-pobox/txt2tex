@@ -1217,16 +1217,61 @@ $
 
 \medskip
 
-\begin{zed}List ::= nil | join \ldata ((ShowId \cross EpisodeId)
-  \cross ((\nat \cross PlayedOrNot) \cross SavedOrNot)) \cross List \rdata
+\bigskip
+
+First, we can create an abbreviation for the elements of our list to
+make our expressions less cumbersome.
+
+\bigskip
+
+\begin{zed}
+  ListElement == (ShowId \cross EpisodeId) \cross (\nat \cross
+  PlayedOrNot \cross SavedOrNot)
 \end{zed}
+
+\begin{zed}List ::= nil | join \ldata ListElement \cross List \rdata
+\end{zed}
+
+\bigskip
+
+An example for such a list could be (List((1, 2), (3600, NotP,
+Saved)), List((1, 1), (3600, Played, Saved)), List(nil)).
+
+\bigskip
+
+\bigskip
+
+I will also define some convenience functions to enable
+fuzz-compliant access to elements of the triple (N cross PlayedOrNot
+cross SavedOrNot)
+
+\bigskip
+
+\begin{gendef}[A, B, C]
+  fstOfTriple: A \cross B \cross C \fun A
+  \where
+  \forall a : A @ \forall b : B @ \forall c : C @ fstOfTriple(a, b, c) = a
+\end{gendef}
+
+\begin{gendef}[A, B, C]
+  sndOfTriple: A \cross B \cross C \fun B
+  \where
+  \forall a : A @ \forall b : B @ \forall c : C @ sndOfTriple(a, b, c) = b
+\end{gendef}
+
+\begin{gendef}[A, B, C]
+  thrdOfTriple: A \cross B \cross C \fun C
+  \where
+  \forall a : A @ \forall b : B @ \forall c : C @ thrdOfTriple(a, b, c) = c
+\end{gendef}
 
 (a)
 \par
 \vspace{11pt}
 \bigskip
 
-A suitable induction principle would be
+Now can now define simply the induction principle for this list
+\citep[page 161]{simpson-notes}.
 
 \bigskip
 
@@ -1235,9 +1280,35 @@ $\displaystyle
 \infer{\forall l : List @ \power l}{
   \power nil
   &
-  \forall n : \nat @ \forall l : List @ \power l \implies \power (join(n, l))
+  \forall e : ListElement @ \forall l : List @ \power l \implies
+  \power (join(e, l))
 }
 $
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\begin{axdef}
+  length\_L : List \fun \nat
+  \where
+  length\_L(nil) = 0 \\
+  \forall e : ListElement @ \forall l : List @ length\_L(join(e, l))
+  = fstOfTriple(snd(e)) + length\_L(l)
+\end{axdef}
+
+\begin{axdef}
+  unplayed\_L : List \fun List
+  \where
+  unplayed\_L(nil) = nil
+\end{axdef}
+
+\begin{axdef}
+  played\_L : List \fun List
+  \where
+  played\_L(nil) = nil
+\end{axdef}
 
 \newpage
 
