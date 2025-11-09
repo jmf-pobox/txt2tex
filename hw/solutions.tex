@@ -1197,8 +1197,8 @@ again to arrive at our final form.
 \bigskip
 
 Since the base case is proven and both inductive cases result in the
-same outcome, we can use the implication introduction rule to unify
-our cases and conclude:
+same outcome, we can use the implication introduction rule
+[$\Rightarrow$ intro] to unify our cases and conclude:
 
 \bigskip
 
@@ -1210,6 +1210,17 @@ $\displaystyle
 $
 
 \newpage
+
+\bigskip
+\noindent
+\textbf{Question 12}
+
+\medskip
+
+\begin{zed}List ::= nil | join \ldata \langle ((ShowId \cross
+  EpisodeId) \cross ((\nat \cross PlayedOrNot) \cross SavedOrNot))
+  \cross List \rangle \rdata
+\end{zed}
 
 \section*{Bibliography}
 

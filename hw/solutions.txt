@@ -457,13 +457,24 @@ length(<ple> ^ t)                                       [length(<ple> ^ pl) = sn
 
 TEXT: We first rewrite the unplayed term as we know ple is NotP and then we simplify the played term as we know ple is not Played. From here, we apply the definition of length for a single sequence element concatenated to a sequence. We must re-arrange our addends using the commutative property of addition.  Next, we use the associative property of addition to arrive at a form of the inductive hypothesis that we can simplify.  From there, we apply our definition of length again to arrive at our final form.
 
-TEXT: Since the base case is proven and both inductive cases result in the same outcome, we can use the implication introduction rule to unify our cases and conclude:
+TEXT: Since the base case is proven and both inductive cases result in the same outcome, we can use the implication introduction rule [=> intro] to unify our cases and conclude:
 
 PROOF:
 forall p : PossiblePlaylist | length(p)
   forall p : PossiblePlaylist | length(played(p)) + length(unplayed(p))
 
 PAGEBREAK:
+
+**Question 12**
+
+List ::= nil | join <<(ShowId cross EpisodeId) cross (N cross PlayedOrNot cross SavedOrNot) cross List>>
+
+(a) A suitable induction principle would be: 
+
+PROOF:
+forall l : List | P l
+  forall l : List | length(played(l)) + length(unplayed(l))
+  
 
 === Bibliography ===
 
