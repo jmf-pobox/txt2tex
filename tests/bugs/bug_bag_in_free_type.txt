@@ -1,0 +1,5 @@
+=== Bug: Bag in Free Type Constructor ===
+
+given ShowId, EpisodeId, PlayedOrNot, SavedOrNot
+
+List ::= nil | join <<(ShowId cross EpisodeId) cross (N cross PlayedOrNot cross SavedOrNot) cross List>>
