@@ -469,12 +469,15 @@ PAGEBREAK:
 
 List ::= nil | join <<(ShowId cross EpisodeId) cross (N cross PlayedOrNot cross SavedOrNot) cross List>>
 
-(a) A suitable induction principle would be: 
+(a) 
+TEXT: A suitable induction principle would be 
 
 PROOF:
 forall l : List | P l
-  forall l : List | length(played(l)) + length(unplayed(l))
+  :: P nil
+  :: forall n : N | forall l : List | P l => P(join(n, l))
   
+PAGEBREAK:
 
 === Bibliography ===
 

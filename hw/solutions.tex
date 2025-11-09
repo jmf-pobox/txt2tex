@@ -1217,10 +1217,31 @@ $
 
 \medskip
 
-\begin{zed}List ::= nil | join \ldata \langle ((ShowId \cross
-  EpisodeId) \cross ((\nat \cross PlayedOrNot) \cross SavedOrNot))
-  \cross List \rangle \rdata
+\begin{zed}List ::= nil | join \ldata ((ShowId \cross EpisodeId)
+  \cross ((\nat \cross PlayedOrNot) \cross SavedOrNot)) \cross List \rdata
 \end{zed}
+
+(a)
+\par
+\vspace{11pt}
+\bigskip
+
+A suitable induction principle would be
+
+\bigskip
+
+\noindent
+$\displaystyle
+\infer{\forall l : List @ \power l}{
+  \power nil
+  &
+  \forall n : \nat @ \forall l : List @ \power l \implies \power (join(n, l))
+}
+$
+
+\newpage
+
+\medskip
 
 \section*{Bibliography}
 
