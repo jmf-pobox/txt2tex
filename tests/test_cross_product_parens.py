@@ -57,7 +57,7 @@ def test_nested_cross_in_seq_standard() -> None:
 
 
 def test_triple_cross_product() -> None:
-    """Test triple cross product: A cross B cross C should be (A cross B) cross C."""
+    """Test triple cross product: A cross B cross C stays flat (no auto parens)."""
     txt = "Type == A cross B cross C"
 
     lexer = Lexer(txt)
@@ -68,10 +68,10 @@ def test_triple_cross_product() -> None:
     generator = LaTeXGenerator(use_fuzz=True)
     latex = generator.generate_document(doc)
 
-    # Left-associative: should be (A cross B) cross C
-    # With our fix, this should add parens for clarity in type contexts
-    assert "(A \\cross B) \\cross C" in latex, (
-        f"Expected left-associative grouping with parens, got: {latex}"
+    # Should stay flat for fuzz 3-tuple semantics
+    # NOT: (A \cross B) \cross C (nested pairs)
+    assert "A \\cross B \\cross C" in latex, (
+        f"Expected flat 3-tuple (no auto parens), got: {latex}"
     )
 
 
