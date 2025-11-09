@@ -547,17 +547,18 @@ class LaTeXGenerator:
             else:
                 return f"{op_latex} {operand}"
 
-    def _needs_parens(self, child: Expr, parent_op: str, is_left_child: bool) -> bool:
+    def _needs_parens(self, child: Expr, parent: BinaryOp, is_left_child: bool) -> bool:
         """Check if child expression needs parentheses in parent context.
 
         Args:
             child: The child expression to check
-            parent_op: The parent operator
+            parent: The parent BinaryOp node
             is_left_child: True if this is the left child, False if right
 
         Returns:
             True if parentheses are needed
         """
+        parent_op = parent.operator
         # Quantifiers and lambdas have lowest precedence (bind most loosely)
         # Per Woodcock: "quantifiers bind very loosely, scope extends to next bracket"
         # Need parens when used as operands of binary operators
@@ -596,7 +597,9 @@ class LaTeXGenerator:
             # correct type checking. E.g., seq((A cross B) cross C) needs
             # parens even though mathematically (A cross B) cross C is
             # the default left-associative parsing.
-            if parent_op in {"cross", "×"}:  # noqa: RUF001
+            # However, if parent already has explicit parens, skip these
+            # nested parens to avoid double parenthesization.
+            if parent_op in {"cross", "×"} and not parent.explicit_parens:  # noqa: RUF001
                 return True
 
             # For left-associative operators, right child needs parens
@@ -659,9 +662,9 @@ class LaTeXGenerator:
         right = self.generate_expr(node.right, parent=node)
 
         # Add parentheses if needed for precedence and associativity
-        if self._needs_parens(node.left, node.operator, is_left_child=True):
+        if self._needs_parens(node.left, node, is_left_child=True):
             left = f"({left})"
-        if self._needs_parens(node.right, node.operator, is_left_child=False):
+        if self._needs_parens(node.right, node, is_left_child=False):
             right = f"({right})"
 
         # Phase 27: Check for line break after operator
