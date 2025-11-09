@@ -2580,7 +2580,17 @@ class LaTeXGenerator:
                 branch_strs.append(branch.name)
             else:
                 # Parameterized constructor: name \\ldata params \\rdata
-                params_latex = self.generate_expr(branch.parameters)
+                # Special handling: if params is SequenceLiteral, extract contents
+                # (user writes <<...>> in ASCII to represent constructor delimiters)
+                if isinstance(branch.parameters, SequenceLiteral):
+                    # Generate contents without sequence delimiters
+                    # \ldata ... \rdata already provide the delimiters
+                    if branch.parameters.elements:
+                        params_latex = self.generate_expr(branch.parameters.elements[0])
+                    else:
+                        params_latex = ""
+                else:
+                    params_latex = self.generate_expr(branch.parameters)
                 branch_strs.append(f"{branch.name} \\ldata {params_latex} \\rdata")
 
         # Join branches with |
