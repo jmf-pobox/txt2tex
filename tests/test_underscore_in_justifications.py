@@ -30,10 +30,10 @@ length_L(nil) = 0
         # Expression should use subscript: length_L
         assert "length_L(nil)" in latex
 
-        # Justification should wrap identifier in math mode for subscript
+        # Justification should escape underscore for prose rendering
         # Note: Spacing may be compressed in justification text
-        assert r"\mbox{$length_L$(nil)" in latex
-        assert "$length_L$" in latex  # Identifier wrapped in math mode
+        assert r"\mbox{length\_L(nil)" in latex
+        assert r"length\_L" in latex  # Identifier with escaped underscore
 
     def test_multiple_underscore_identifiers_in_justification(self) -> None:
         """Test multiple identifiers with underscores in same justification."""
@@ -48,9 +48,9 @@ unplayed_L(nil) = nil [played_L(nil) = nil and unplayed_L(nil) = nil]"""
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
 
-        # Both identifiers should be wrapped in math mode
-        assert "$played_L$" in latex
-        assert "$unplayed_L$" in latex
+        # Both identifiers should have escaped underscores
+        assert r"played\_L" in latex
+        assert r"unplayed\_L" in latex
 
         # The 'and' operator should also be converted
         assert r"$\land$" in latex
@@ -68,16 +68,15 @@ y in S [x_i in S => y_i in S]"""
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
 
-        # Underscore identifiers wrapped in math mode
-        assert "$x_i$" in latex or "x_i" in latex  # May appear in expression too
+        # Underscore identifiers have escaped underscores in justification
+        assert r"x\_i" in latex  # Justification uses escaped underscore
 
         # Operators converted
         assert r"$\in$" in latex
         assert r"$\Rightarrow$" in latex
 
-        # Identifiers with underscores wrapped
-        assert "$x_i$" in latex
-        assert "$y_i$" in latex
+        # Both identifiers should appear with escaped underscores
+        assert r"y\_i" in latex
 
     def test_function_name_with_underscore_in_justification(self) -> None:
         """Test function names with underscores appear in justifications."""
@@ -92,11 +91,11 @@ n + length_L(l) = length_L(l) + n [definition of length_L]"""
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
 
-        # Function name in justification wrapped in math mode
-        assert r"definition of $length_L$" in latex
+        # Function name in justification has escaped underscore
+        assert r"definition of length\_L" in latex
 
     def test_multi_word_identifier_not_affected(self) -> None:
-        """Test that multi-word identifiers (3+ char suffix) are not affected."""
+        """Test that multi-word identifiers (3+ char suffix) get escaped."""
         text = """EQUIV:
 cumulative_total = 0
 0 = 0 [cumulative_total = 0]"""
@@ -108,9 +107,8 @@ cumulative_total = 0
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
 
-        # Multi-word identifiers should be wrapped in math mode with subscript
-        # (3+ char suffix becomes multi-word, but regex will still wrap it)
-        assert "$cumulative_total$" in latex
+        # Multi-word identifiers should have escaped underscores in justification
+        assert r"cumulative\_total" in latex
 
 
 class TestUnderscoreInProofJustifications:
@@ -172,8 +170,8 @@ length_L(nil) = 0
         # Expression: length_L(nil) in math mode
         assert "length_L(nil)" in latex
 
-        # Justification: $length_L$(nil) wrapped for subscript rendering
-        assert "$length_L$" in latex
+        # Justification: length\_L(nil) with escaped underscore for prose
+        assert r"length\_L(nil)" in latex
 
         # Should NOT have escaped underscore in mathit
         assert r"\mathit{length\_L}" not in latex
