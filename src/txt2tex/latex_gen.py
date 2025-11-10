@@ -1420,8 +1420,15 @@ class LaTeXGenerator:
                 result.append("}")
                 i += 1
             # Escape underscore only outside math mode and citations
+            # Skip if already escaped (preceded by backslash)
             elif not in_math and not in_citation and text[i] == "_":
-                result.append(r"\_")
+                # Check if underscore is already escaped
+                if i > 0 and text[i - 1] == "\\":
+                    # Already escaped, just append as-is
+                    result.append("_")
+                else:
+                    # Not escaped, escape it
+                    result.append(r"\_")
                 i += 1
             else:
                 result.append(text[i])
