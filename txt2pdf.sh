@@ -58,7 +58,7 @@ fi
 # Step 1: Generate LaTeX
 CURRENT_STEP=1
 echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Generating LaTeX..."
-(cd "$SCRIPT_DIR" && PYTHONPATH="${SCRIPT_DIR}/src" python -m txt2tex.cli "$INPUT" -o "$TEX_FILE" $FUZZ_FLAG)
+(cd "$SCRIPT_DIR" && PYTHONPATH="${SCRIPT_DIR}/src" python -m txt2tex.cli "$INPUT" -o "$TEX_FILE" --fuzz)
 
 if [ ! -f "$TEX_FILE" ]; then
     echo "Error: LaTeX generation failed" >&2

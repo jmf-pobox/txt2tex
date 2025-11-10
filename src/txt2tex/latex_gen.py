@@ -446,11 +446,19 @@ class LaTeXGenerator:
         # Single underscore: prioritize suffix length for subscript detection
         if len(parts) == 2:
             prefix, suffix = parts
-            # Priority 1: Single-char suffix → always subscript (e.g., x_1, length_L)
+            # Priority 1: Single-char suffix → subscript (e.g., x_1, length_L)
             if len(suffix) == 1:
+                # Fuzz mode: escape underscore (fuzz requires escaped _ in Z notation)
+                if self.use_fuzz:
+                    return f"{prefix}\\_{suffix}"
+                # Standard LaTeX: bare underscore for subscript
                 return f"{prefix}_{suffix}"
             # Priority 2: Two-char suffix → subscript with braces (e.g., x_10)
             elif len(suffix) == 2:
+                # Fuzz mode: escape underscore
+                if self.use_fuzz:
+                    return f"{prefix}\\_{{{suffix}}}"
+                # Standard LaTeX: bare underscore
                 return f"{prefix}_{{{suffix}}}"
             # Priority 3: Long suffix → multi-word identifier (e.g., cumulative_total)
             else:  # len(suffix) >= 3
