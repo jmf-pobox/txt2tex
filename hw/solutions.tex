@@ -2,7 +2,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
 \usepackage{natbib}
-\usepackage{zed-cm}
+\usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \begin{document}
@@ -47,9 +47,8 @@ Lecture 1 - Propositions
 
 \bigskip
 
-$p \Rightarrow (\lnot p \Rightarrow p)$ is a tautology as it is true
-for every interpretation of p as illustrated by the final column of
-truth values.
+$p \implies (\lnot p \implies p)$ is a tautology as it is true for
+every interpretation of p as illustrated by the final column of truth values.
 
 \bigskip
 
@@ -75,10 +74,10 @@ truth values.
 
 \bigskip
 
-The statements $(\lnot p \Rightarrow \lnot q)$, $(q \Rightarrow p)$
-are equivalent and $(\lnot p \Rightarrow \lnot q) \Leftrightarrow (q
-\Rightarrow p)$ is a tautology as it is true for every interpretation
-of p, q as illustrated by the final column of truth values.
+The statements $(\lnot p \implies \lnot q)$, $(q \implies p)$ are
+equivalent and $(\lnot p \implies \lnot q) \iff (q \implies p)$ is a
+tautology as it is true for every interpretation of p, q as
+illustrated by the final column of truth values.
 
 \bigskip
 
@@ -112,11 +111,11 @@ of p, q as illustrated by the final column of truth values.
 
 \bigskip
 
-The statements $((p \Rightarrow r) \land (q \Rightarrow r))$, $((p
-\lor q) \Rightarrow r)$ are equivalent and $((p \Rightarrow r) \land
-(q \Rightarrow r))$ $\Leftrightarrow$ $((p \lor q) \Rightarrow r)$ is
-a tautology as it is true for every interpretation of p, q, r as
-illustrated by the final column of truth values.
+The statements $((p \implies r) \land (q \implies r))$, $((p \lor q)
+\implies r)$ are equivalent and $((p \implies r) \land (q \implies
+r))$ $\Leftrightarrow$ $((p \lor q) \implies r)$ is a tautology as it
+is true for every interpretation of p, q, r as illustrated by the
+final column of truth values.
 
 \bigskip
 
@@ -141,22 +140,22 @@ Lecture 1 - Propositions
 \vspace{11pt}
 \[
   \begin{array}{ll@{\hspace{2em}}l}
-    & p \Rightarrow (\lnot p \Rightarrow p) \\
-    &\Leftrightarrow p \Rightarrow (\lnot \lnot p \lor p) &
+    & p \implies (\lnot p \implies p) \\
+    &\Leftrightarrow p \implies (\lnot \lnot p \lor p) &
     [\mbox{$\Rightarrow$ disjunction}] \\
-    &\Leftrightarrow p \Rightarrow (p \lor p) & [\mbox{$\lnot$ $\lnot$}] \\
-    &\Leftrightarrow p \Rightarrow p & [\mbox{idempotence of p}] \\
+    &\Leftrightarrow p \implies (p \lor p) & [\mbox{$\lnot$ $\lnot$}] \\
+    &\Leftrightarrow p \implies p & [\mbox{idempotence of p}] \\
     &\Leftrightarrow true & [\mbox{tautology}]
   \end{array}
 \]
 
 \bigskip
 
-In this equivalence proof, we show that $p \Rightarrow (\lnot p
-\Rightarrow p)$ by using implication disjunction to replace the
-implication with a logical or, the definition of double negation to
-simplify, the application of the idempotence rule to simplify, and
-the fact that $p \Rightarrow p$ is a tautology.
+In this equivalence proof, we show that $p \implies (\lnot p \implies
+p)$ by using implication disjunction to replace the implication with
+a logical or, the definition of double negation to simplify, the
+application of the idempotence rule to simplify, and the fact that $p
+\implies p$ is a tautology.
 
 \bigskip
 
@@ -167,23 +166,23 @@ the fact that $p \Rightarrow p$ is a tautology.
 \vspace{11pt}
 \[
   \begin{array}{ll@{\hspace{2em}}l}
-    & (\lnot p \Rightarrow \lnot q) \\
+    & (\lnot p \implies \lnot q) \\
     &\Leftrightarrow (\lnot \lnot p \lor \lnot q) &
     [\mbox{$\Rightarrow$ disjunction}] \\
     &\Leftrightarrow (p \lor \lnot q) & [\mbox{$\lnot$ $\lnot$}] \\
     &\Leftrightarrow (\lnot q \lor p) & [\mbox{commutativity of $\lor$}] \\
-    &\Leftrightarrow q \Rightarrow p & [\mbox{$\Rightarrow$ disjunction}]
+    &\Leftrightarrow q \implies p & [\mbox{$\Rightarrow$ disjunction}]
   \end{array}
 \]
 
 \bigskip
 
-In this equivalance proof, we show that $(\lnot p \Rightarrow \lnot
-q) \Leftrightarrow q \Rightarrow p$ by using implication disjunction
-to replace implication with logical or, the definition of double
-negation to simplify, the commutivity property of logical or to
-change the order of the elements, and the implication disjunction
-rule to reintroduce implication.
+In this equivalance proof, we show that $(\lnot p \implies \lnot q)
+\iff q \implies p$ by using implication disjunction to replace
+implication with logical or, the definition of double negation to
+simplify, the commutivity property of logical or to change the order
+of the elements, and the implication disjunction rule to reintroduce
+implication.
 
 \bigskip
 
@@ -194,7 +193,7 @@ rule to reintroduce implication.
 \vspace{11pt}
 \[
   \begin{array}{ll@{\hspace{2em}}l}
-    & ((p \Rightarrow r) \land (q \Rightarrow r)) \\
+    & ((p \implies r) \land (q \implies r)) \\
     &\Leftrightarrow ((\lnot p \lor r) \land (\lnot q \lor r)) &
     [\mbox{$\Rightarrow$ disjunction}] \\
     &\Leftrightarrow (r \lor \lnot p) \land (r \lor \lnot q) &
@@ -204,19 +203,19 @@ rule to reintroduce implication.
     &\Leftrightarrow (\lnot p \land \lnot q) \lor r &
     [\mbox{commutativity of $\lor$}] \\
     &\Leftrightarrow \lnot (p \lor q) \lor r & [\mbox{De Morgan}] \\
-    &\Leftrightarrow p \lor q \Rightarrow r & [\mbox{$\Rightarrow$ disjunction}]
+    &\Leftrightarrow p \lor q \implies r & [\mbox{$\Rightarrow$ disjunction}]
   \end{array}
 \]
 
 \bigskip
 
-In this equivalence proof, we show that $((p \Rightarrow r) \land (q
-\Rightarrow r))$ $\Leftrightarrow$ $(p \lor q)$ $\Rightarrow$ r by
-using the implication disjunction rule to replace implication with
-logical or, the commutativity of or rule to change the order of the
-elements, the distributivity 2 rule to extract r, and the commutivity
-of logical or to change the order of the elements, De Morgan to
-extract negation for $(\lnot p \land \lnot q)$, and the implication
+In this equivalence proof, we show that $((p \implies r) \land (q
+\implies r))$ $\Leftrightarrow$ $(p \lor q)$ $\Rightarrow$ r by using
+the implication disjunction rule to replace implication with logical
+or, the commutativity of or rule to change the order of the elements,
+the distributivity 2 rule to extract r, and the commutivity of
+logical or to change the order of the elements, De Morgan to extract
+negation for $(\lnot p \land \lnot q)$, and the implication
 disjunction rule to reintroduce implication.
 
 \bigskip
@@ -242,10 +241,10 @@ Lecture 3 - Deductive Proofs
 \vspace{11pt}
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \Rightarrow (\lnot p \Rightarrow p)}{
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (\lnot p \implies p)}{
   \ulcorner p \urcorner^{[1]}
   &
-  \infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \Rightarrow
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \implies
   p}{\ulcorner p \urcorner^{[1]} &
     \infer[false\textrm{-elim}^{[3]}]{\lnot p}{\infer[\mathrm{false} -
       \mathrm{intro}]{false}{\ulcorner \lnot p \urcorner^{[2]} &
@@ -256,12 +255,12 @@ $
 \bigskip
 
 For this proof we are seeking to prove that p $\Rightarrow$ $(\lnot p
-\Rightarrow p)$, which we know holds given the truth table in 1(a).
+\implies p)$, which we know holds given the truth table in 1(a).
 Working mechanically from the bottom, I started by applying the
 implication introduction rule with assumption [1] to gain our
 conclusion, implication introduction rule with assumption [2] to gain
-$(\lnot p \Rightarrow p)$.  This statement requires that I have both
-p and $\lnot p$ as premisses, which is a bit odd and implied I needed
+$(\lnot p \implies p)$.  This statement requires that I have both p
+and $\lnot p$ as premisses, which is a bit odd and implied I needed
 to use false in the proof.  Since I had p as assumption [1], I knew I
 wanted $\lnot p$ as the output of the false rules.  It took some
 experimentation, but eventually I realized I needed three assumptions
@@ -281,31 +280,31 @@ was to have p as an assumption twice at different scopes.
 \bigskip
 
 This proof involves equivalence or bi-implication, which requires us
-to show $p \Rightarrow q$ and $q \Rightarrow p$ given this is the
-definition of $p \Leftrightarrow q$.
+to show $p \implies q$ and $q \implies p$ given this is the
+definition of $p \iff q$.
 
 \bigskip
 
 \bigskip
 
-In one direction, we are seeking to prove $(\lnot p \Rightarrow \lnot
-q)$ $\Rightarrow$ $(q \Rightarrow p)$:
+In one direction, we are seeking to prove $(\lnot p \implies \lnot
+q)$ $\Rightarrow$ $(q \implies p)$:
 
 \bigskip
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \Rightarrow \lnot
-q) \Rightarrow (q \Rightarrow p)}{
-  \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \implies \lnot q)
+\implies (q \implies p)}{
+  \ulcorner \lnot p \implies \lnot q \urcorner^{[1]}
   &
-  \infer[\Rightarrow\textrm{-intro}^{[2]}]{q \Rightarrow p}{
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies p}{
     \ulcorner q \urcorner^{[2]}
     &
     \infer[false\textrm{-elim}^{[3]}]{p}{
       \infer[\mathrm{false} - \mathrm{intro}]{false}{
         \infer[\Rightarrow \mathrm{elim}]{\lnot q}{
-          \ulcorner \lnot p \Rightarrow \lnot q \urcorner^{[1]}
+          \ulcorner \lnot p \implies \lnot q \urcorner^{[1]}
           &
           \ulcorner \lnot p \urcorner^{[3]}
         }
@@ -321,44 +320,44 @@ $
 
 I started working mechanically from the bottom by applying the
 implication introduction rule to construct the conclusion.  This gave
-me $q \Rightarrow p$ as the key premise to build up, which requires
+me $q \implies p$ as the key premise to build up, which requires
 applying the implication introduction rule to q and p. Looking at the
-need for q and looking at the need for p and $(\lnot p \Rightarrow
-\lnot q)$ as assumption [1], I felt it would be best to try $\lnot p$
-as an assumption to at least get going.  This enabled me to work top
-down to get $\lnot q$ from the implication elimination rule. From
-there, I realized that I needed the negation of both $\lnot q$ and
-$\lnot p$. I knew the false-intro and false-elim were required, but
-it took some experimentation to see that I could get both $\lnot q$
-and $\lnot p$ transformed into p and q by making $\lnot p$ assumption
-[3] instead of [2] and introducing q as assumption [2]. Once that
-insight was made, I could arrive at p as a result of the top of the
-tree and retain q [2] as an assumption coming out of false-elim. This
-is what I needed to arrive at $q \Rightarrow p$ and to connect the
-bottom and top portions of my proof.  All assumptions are properly discharged.
+need for q and looking at the need for p and $(\lnot p \implies \lnot
+q)$ as assumption [1], I felt it would be best to try $\lnot p$ as an
+assumption to at least get going.  This enabled me to work top down
+to get $\lnot q$ from the implication elimination rule. From there, I
+realized that I needed the negation of both $\lnot q$ and $\lnot p$.
+I knew the false-intro and false-elim were required, but it took some
+experimentation to see that I could get both $\lnot q$ and $\lnot p$
+transformed into p and q by making $\lnot p$ assumption [3] instead
+of [2] and introducing q as assumption [2]. Once that insight was
+made, I could arrive at p as a result of the top of the tree and
+retain q [2] as an assumption coming out of false-elim. This is what
+I needed to arrive at $q \implies p$ and to connect the bottom and
+top portions of my proof.  All assumptions are properly discharged.
 
 \bigskip
 
 \bigskip
 
-and in the other, we are seeking to prove $(q \Rightarrow p)$
-$\Rightarrow$ $(\lnot p \Rightarrow \lnot q)$:
+and in the other, we are seeking to prove $(q \implies p)$
+$\Rightarrow$ $(\lnot p \implies \lnot q)$:
 
 \bigskip
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(q \Rightarrow p)
-\Rightarrow (\lnot p \Rightarrow \lnot q)}{
-  \ulcorner q \Rightarrow p \urcorner^{[1]}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(q \implies p) \implies
+(\lnot p \implies \lnot q)}{
+  \ulcorner q \implies p \urcorner^{[1]}
   &
-  \infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \Rightarrow \lnot q}{
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \implies \lnot q}{
     \ulcorner \lnot p \urcorner^{[2]}
     &
     \infer[false\textrm{-elim}^{[3]}]{\lnot q}{
       \infer[\mathrm{false} - \mathrm{intro}]{false}{
         \infer[\Rightarrow \mathrm{elim}]{p}{
-          \ulcorner q \Rightarrow p \urcorner^{[1]}
+          \ulcorner q \implies p \urcorner^{[1]}
           &
           \ulcorner q \urcorner^{[3]}
         }
@@ -373,18 +372,18 @@ $
 \bigskip
 
 Working mechanically from the bottom, I apply the implication rule to
-$q \Rightarrow p$ as assumption [1] to gain the conclusion.  I need
-$(\lnot p \Rightarrow \lnot q)$, which shows me to use the
-implication rule again with $\lnot p$ as assumption [2].  From there,
-the question is how to get $\lnot q$.  Now working from the top,
-given assumption [1] has q, it makes sense to use the implication
-elimation rule with q as assumption [3]. This gives me p, when what I
-want is $\lnot q$.  I see that if I introduce $\lnot p$ as assumption
-[3] that I can negate q via the false-intro and false-elim rules and
+$q \implies p$ as assumption [1] to gain the conclusion.  I need
+$(\lnot p \implies \lnot q)$, which shows me to use the implication
+rule again with $\lnot p$ as assumption [2].  From there, the
+question is how to get $\lnot q$.  Now working from the top, given
+assumption [1] has q, it makes sense to use the implication elimation
+rule with q as assumption [3]. This gives me p, when what I want is
+$\lnot q$.  I see that if I introduce $\lnot p$ as assumption [3]
+that I can negate q via the false-intro and false-elim rules and
 successfully discharge assumption [3]. This gives me $\lnot q$, which
 is what I need to connect to the top tree to the bottom of the proof.
-This proof came more quickly because $q \Rightarrow p$ as assumption
-[1] gave clear direction for the top portion. All assumptions are
+This proof came more quickly because $q \implies p$ as assumption [1]
+gave clear direction for the top portion. All assumptions are
 discharged and scopes are appropriate.
 
 \bigskip
@@ -398,11 +397,11 @@ rule, using the results from above:
 
 \noindent
 $\displaystyle
-\infer[\Leftrightarrow \mathrm{intro}]{(\lnot p \Rightarrow \lnot q)
-\Leftrightarrow (q \Rightarrow p)}{
-  (\lnot p \Rightarrow \lnot q) \Rightarrow (q \Rightarrow p)
+\infer[\Leftrightarrow \mathrm{intro}]{(\lnot p \implies \lnot q)
+\iff (q \implies p)}{
+  (\lnot p \implies \lnot q) \implies (q \implies p)
   &
-  (q \Rightarrow p) \Rightarrow (\lnot p \Rightarrow \lnot q)
+  (q \implies p) \implies (\lnot p \implies \lnot q)
 }
 $
 
@@ -413,18 +412,18 @@ $
 \vspace{11pt}
 \bigskip
 
-In one direction, we are seeking to prove $(p \Rightarrow r)$ and $(q
-\Rightarrow r)$ $\Rightarrow$ $(p \lor q \Rightarrow r)$:
+In one direction, we are seeking to prove $(p \implies r)$ and $(q
+\implies r)$ $\Rightarrow$ $(p \lor q \implies r)$:
 
 \bigskip
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \Rightarrow r) \land (q
-\Rightarrow r)) \Rightarrow ((p \lor q) \Rightarrow r)}{
-  \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \implies r) \land (q
+\implies r)) \implies ((p \lor q) \implies r)}{
+  \ulcorner (p \implies r) \land (q \implies r) \urcorner^{[1]}
   &
-  \infer[\Rightarrow\textrm{-intro}^{[2]}]{(p \lor q) \Rightarrow r}{
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{(p \lor q) \implies r}{
     \ulcorner p \lor q \urcorner^{[2]}
     &
     \infer[\lor\textrm{-elim}^{[2]}]{r}{
@@ -433,16 +432,16 @@ $\displaystyle
       \raiseproof{12ex}{\infer[\Rightarrow \mathrm{elim}]{r}{
           \ulcorner p \urcorner^{[2]}
           &
-          \infer[\land\textrm{-elim-1}]{(p \Rightarrow r)}{
-            \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
+          \infer[\land\textrm{-elim-1}]{(p \implies r)}{
+            \ulcorner (p \implies r) \land (q \implies r) \urcorner^{[1]}
           }
       }}
       &
       \hskip 6em \raiseproof{30ex}{\infer[\Rightarrow \mathrm{elim}]{r}{
           \ulcorner q \urcorner^{[2]}
           &
-          \infer[\land\textrm{-elim-2}]{(q \Rightarrow r)}{
-            \ulcorner (p \Rightarrow r) \land (q \Rightarrow r) \urcorner^{[1]}
+          \infer[\land\textrm{-elim-2}]{(q \implies r)}{
+            \ulcorner (p \implies r) \land (q \implies r) \urcorner^{[1]}
           }
       }}
     }
@@ -453,50 +452,49 @@ $
 \bigskip
 
 In this proof, I start by working from the bottom mechanically,
-taking $(p \Rightarrow r) \land (q \Rightarrow r)$ as assumption [1]
-and applying the implication introduction rule to arrive at our
+taking $(p \implies r) \land (q \implies r)$ as assumption [1] and
+applying the implication introduction rule to arrive at our
 conclusion and discharge assumption [1]. From there, I can see that I
 need $(p \lor q)$ and r as inputs to the implication introduction
 rule.  I take $(p \lor q)$ as assumption [2] and discharge this
 assumption via this rule.  That leaves me with r as the result of my
-bottom up process.  As I have already made assumptions $((p
-\Rightarrow r) \land (q \Rightarrow r))$ [1] and $(p \lor q)$ [2] and
-they are related, I start by working with both top-down. I begin with
-$(p \lor q)$ [2] and create cases for p and q working towards or
-elimination.  The p and q sub-branches are marked with [2] as the
-assumption as these are just the cases for $(p \lor q)$ [2]
-\citep[slide 41]{simpson25c}. First, I apply and elimination in each
-case to get $(p \Rightarrow r)$, $(q \Rightarrow r)$ with p, q
-respectively in the sub-branches.  From there, I apply implication
-elimination to arrive at r in both cases.  This enables me to use the
-or elimation together with $(p \lor q)$ [2] to simplify to r.  At
-this stage, I do not discharge assumption [2], as this is deferred
-until the next step. I use implication introduction together with $(p
-\lor q)$ [2] and r from the or elimination to discharge assumption
-[2], which connects the top-down and bottom-up process. All
-assumptions are properly discharged.
+bottom up process.  As I have already made assumptions $((p \implies
+r) \land (q \implies r))$ [1] and $(p \lor q)$ [2] and they are
+related, I start by working with both top-down. I begin with $(p \lor
+q)$ [2] and create cases for p and q working towards or elimination.
+The p and q sub-branches are marked with [2] as the assumption as
+these are just the cases for $(p \lor q)$ [2] \citep[slide
+41]{simpson25c}. First, I apply and elimination in each case to get
+$(p \implies r)$, $(q \implies r)$ with p, q respectively in the
+sub-branches.  From there, I apply implication elimination to arrive
+at r in both cases.  This enables me to use the or elimation together
+with $(p \lor q)$ [2] to simplify to r.  At this stage, I do not
+discharge assumption [2], as this is deferred until the next step. I
+use implication introduction together with $(p \lor q)$ [2] and r
+from the or elimination to discharge assumption [2], which connects
+the top-down and bottom-up process. All assumptions are properly discharged.
 
 \bigskip
 
 \bigskip
 
-In the other direction, we are seeking to prove $(p \lor q
-\Rightarrow r)$ $\Rightarrow$ $((p \Rightarrow r) \land (q \Rightarrow r))$:
+In the other direction, we are seeking to prove $(p \lor q \implies
+r)$ $\Rightarrow$ $((p \implies r) \land (q \implies r))$:
 
 \bigskip
 
 \noindent
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \Rightarrow r)
-\Rightarrow ((p \Rightarrow r) \land (q \Rightarrow r))}{
-  \ulcorner ((p \lor q) \Rightarrow r) \urcorner^{[1]}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \implies r)
+\implies ((p \implies r) \land (q \implies r))}{
+  \ulcorner ((p \lor q) \implies r) \urcorner^{[1]}
   &
-  \infer[\land \mathrm{intro}]{((p \Rightarrow r) \land (q \Rightarrow r))}{
-    \infer[\Rightarrow\textrm{-intro}^{[2]}]{p \Rightarrow r}{
+  \infer[\land \mathrm{intro}]{((p \implies r) \land (q \implies r))}{
+    \infer[\Rightarrow\textrm{-intro}^{[2]}]{p \implies r}{
       \ulcorner p \urcorner^{[2]}
       &
       \infer[\Rightarrow \mathrm{elim}]{r}{
-        \ulcorner (p \lor q) \Rightarrow r \urcorner^{[1]}
+        \ulcorner (p \lor q) \implies r \urcorner^{[1]}
         &
         \infer[\lor\textrm{-intro-1}]{p \lor q}{
           \ulcorner p \urcorner^{[2]}
@@ -504,11 +502,11 @@ $\displaystyle
       }
     }
     &
-    \infer[\Rightarrow\textrm{-intro}^{[3]}]{q \Rightarrow r}{
+    \infer[\Rightarrow\textrm{-intro}^{[3]}]{q \implies r}{
       \ulcorner q \urcorner^{[3]}
       &
       \infer[\Rightarrow \mathrm{elim}]{r}{
-        \ulcorner (p \lor q) \Rightarrow r \urcorner^{[1]}
+        \ulcorner (p \lor q) \implies r \urcorner^{[1]}
         &
         \infer[\lor\textrm{-intro-2}]{p \lor q}{
           \ulcorner q \urcorner^{[3]}
@@ -522,21 +520,21 @@ $
 \bigskip
 
 Working mechanically from the bottom, we start by taking $(p \lor q
-\Rightarrow r)$ as assumption [1] and applying the implication
+\implies r)$ as assumption [1] and applying the implication
 introduction rule to discharge assumption [1].  This leaves us with
-$(p \Rightarrow r)$ and $(q \Rightarrow r)$, which is derived from $p
-\Rightarrow r$, $q \Rightarrow r$ and the application of the and
+$(p \implies r)$ and $(q \implies r)$, which is derived from $p
+\implies r$, $q \implies r$ and the application of the and
 introduction rule. Fairly clearly, we need two sub-branches to be
-developed top-down. Since we have $(p \lor q \Rightarrow r)$ and we
-want $p \Rightarrow r$ and $q \Rightarrow r$, I start with p [2] and
-q [3] to start the top-down sub-trees.  I struggled here until I
-recalled that I could use the or intro rule to satisfy $(p \lor q)$.
-I also had to recall that this does not generate additional
-assumptions to discharge \citep[slide 38]{simpson25c}. From here, it
-was not difficult to use implication elimation to arrive at r in both
+developed top-down. Since we have $(p \lor q \implies r)$ and we want
+$p \implies r$ and $q \implies r$, I start with p [2] and q [3] to
+start the top-down sub-trees.  I struggled here until I recalled that
+I could use the or intro rule to satisfy $(p \lor q)$.  I also had to
+recall that this does not generate additional assumptions to
+discharge \citep[slide 38]{simpson25c}. From here, it was not
+difficult to use implication elimation to arrive at r in both
 sub-trees and to apply p [2] and q [3] in each tree respectively with
 the implication introduction rule to discharge those assumptions.
-This gave me $p \Rightarrow r$, $q \Rightarrow r$ and I used the and
+This gave me $p \implies r$, $q \implies r$ and I used the and
 introduction rule to connect the top and bottom portions of the
 proof. All assumptions are properly discharged.
 
@@ -551,13 +549,11 @@ rule, using the results from above:
 
 \noindent
 $\displaystyle
-\infer[\Leftrightarrow \mathrm{intro}]{((p \Rightarrow r) \land (q
-\Rightarrow r)) \Leftrightarrow ((p \lor q) \Rightarrow r)}{
-  ((p \Rightarrow r) \land (q \Rightarrow r)) \Rightarrow ((p \lor q)
-  \Rightarrow r)
+\infer[\Leftrightarrow \mathrm{intro}]{((p \implies r) \land (q
+\implies r)) \iff ((p \lor q) \implies r)}{
+  ((p \implies r) \land (q \implies r)) \implies ((p \lor q) \implies r)
   &
-  ((p \lor q) \Rightarrow r) \Rightarrow ((p \Rightarrow r) \land (q
-  \Rightarrow r))
+  ((p \lor q) \implies r) \implies ((p \implies r) \land (q \implies r))
 }
 $
 
@@ -586,14 +582,14 @@ maxDiff, which fulfills the specification for Question 4.
 \begin{gendef}[X]
   maxSeq: \seq_1 (\seq X) \fun \seq X \\
   minSeq: \seq_1 (\seq X) \fun \seq X \\
-  maxDiff: \seq_1 (\seq X) \fun \mathbb{N}
+  maxDiff: \seq_1 (\seq X) \fun \nat
   \where
-  \forall ss \colon \seq_1 (\seq X) \bullet maxSeq(ss) = (\mu s
-  \colon \ran ss \bullet \forall t \colon \ran ss \bullet \# s \geq \# t)
-  \forall ss \colon \seq_1 (\seq X) \bullet minSeq(ss) = (\mu s
-  \colon \ran ss \bullet \forall t \colon \ran ss \bullet \# s \leq \# t)
-  \forall ss \colon \seq_1 (\seq X) \bullet maxDiff(ss) = (\#
-  maxSeq(ss) - \# minSeq(ss))
+  \forall ss : \seq_1 (\seq X) @ maxSeq(ss) = (\mu s : \ran ss |
+  \forall t : \ran ss @ \# s \geq \# t) \\
+  \forall ss : \seq_1 (\seq X) @ minSeq(ss) = (\mu s : \ran ss |
+  \forall t : \ran ss @ \# s \leq \# t) \\
+  \forall ss : \seq_1 (\seq X) @ maxDiff(ss) = (\# (maxSeq(ss)) - \#
+  (minSeq(ss)))
 \end{gendef}
 
 \bigskip
@@ -647,27 +643,27 @@ involved. Each such repositioning or regrouping will be justified.
 
 Given a relation $R \in X$ $\rel$ Y and a second relation $S \in Y$
 $\rel$ Z, and two elements $x \in X$ and $z \in Z$, x $\mapsto$ $z
-\in R$ $\circ$ S $\Leftrightarrow$ $\exists y \colon Y \bullet x
-\mapsto y \in R \land y \mapsto z \in S$ \citep[page 107]{simpson-notes}.
+\in R$ $\circ$ S $\Leftrightarrow$ $\exists y : Y @ x \mapsto y \in R
+\land y \mapsto z \in S$ \citep[page 107]{simpson-notes}.
 
 \bigskip
 
 \[
   \begin{array}{ll@{\hspace{2em}}l}
     & w \mapsto z \in (R \circ S) \circ T \\
-    &\Leftrightarrow \exists y \colon Y \bullet w \mapsto y \in (R
-    \circ S) \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
-    &\Leftrightarrow \exists y \colon Y \bullet (\exists x \colon X
-    \bullet w \mapsto x \in R \land x \mapsto y \in S) \land y
-    \mapsto z \in T & [\mbox{definition of $\circ$}] \\
-    &\Leftrightarrow \exists y \colon Y \bullet \exists x \colon X
-    \bullet w \mapsto x \in R \land x \mapsto y \in S \land y \mapsto
-    z \in T & [\mbox{x is $\lnot$ free $\in$ y $\mapsto$ z $\in$ T}] \\
-    &\Leftrightarrow \exists x \colon X \bullet w \mapsto x \in R
-    \land (\exists y \colon Y \bullet x \mapsto y \in S \land y
-    \mapsto z \in T) & [\mbox{y is $\lnot$ free $\in$ w $\mapsto$ x $\in$ R}] \\
-    &\Leftrightarrow \exists x \colon X \bullet w \mapsto x \in R
-    \land x \mapsto z \in (S \circ T) & [\mbox{definition of $\circ$}] \\
+    &\Leftrightarrow \exists y : Y @ w \mapsto y \in (R \circ S)
+    \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
+    &\Leftrightarrow \exists y : Y @ (\exists x : X @ w \mapsto x \in
+    R \land x \mapsto y \in S) \land y \mapsto z \in T &
+    [\mbox{definition of $\circ$}] \\
+    &\Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in
+    R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is
+    $\lnot$ free $\in$ y $\mapsto$ z $\in$ T}] \\
+    &\Leftrightarrow \exists x : X @ w \mapsto x \in R \land (\exists
+    y : Y @ x \mapsto y \in S \land y \mapsto z \in T) & [\mbox{y is
+    $\lnot$ free $\in$ w $\mapsto$ x $\in$ R}] \\
+    &\Leftrightarrow \exists x : X @ w \mapsto x \in R \land x
+    \mapsto z \in (S \circ T) & [\mbox{definition of $\circ$}] \\
     &\Leftrightarrow w \mapsto z \in R \circ (S \circ T)
   \end{array}
 \]
@@ -724,9 +720,9 @@ Lecture 4 - Sets, Types, and Definitions
 \par
 \vspace{11pt}
 \begin{axdef}
-  SquaresOfEvens : \power \mathbb{Z}
+  SquaresOfEvens : \power \num
   \where
-  SquaresOfEvens = \{ z \colon \mathbb{Z} \mid z \mod 2 = 0 \bullet z * z \}
+  SquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ z * z \}
 \end{axdef}
 
 \medskip
@@ -735,10 +731,10 @@ Lecture 4 - Sets, Types, and Definitions
 \par
 \vspace{11pt}
 \begin{axdef}
-  CubesOfSquaresOfEvens : \power \mathbb{Z}
+  CubesOfSquaresOfEvens : \power \num
   \where
-  CubesOfSquaresOfEvens = \{ z \colon \mathbb{Z} \mid z \mod 2 = 0
-  \bullet (z * z) * (z * z) * (z * z) \}
+  CubesOfSquaresOfEvens = \{ z : \num | z \mod 2 = 0 @ (z * z) * (z *
+  z) * (z * z) \}
 \end{axdef}
 
 \medskip
@@ -747,10 +743,10 @@ Lecture 4 - Sets, Types, and Definitions
 \par
 \vspace{11pt}
 \begin{axdef}
-  SquareCubePairsOfEvens : \power (\mathbb{Z} \cross \mathbb{Z})
+  SquareCubePairsOfEvens : \power (\num \cross \num)
   \where
-  SquareCubePairsOfEvens = \{ z_1, z_2 \colon \mathbb{Z} \mid z_1
-  \mod 2 = 0 \land z_2 \mod 2 = 0 \bullet (z_1 * z_1, z_2 * z_2 * z_2) \}
+  SquareCubePairsOfEvens = \{ z_1, z_2 : \num | z\_1 \mod 2 = 0 \land
+  z\_2 \mod 2 = 0 @ (z\_1 * z\_1, z\_2 * z\_2 * z\_2) \}
 \end{axdef}
 
 \medskip
@@ -759,10 +755,10 @@ Lecture 4 - Sets, Types, and Definitions
 \par
 \vspace{11pt}
 \begin{axdef}
-  SquareCubeIdentityPairsOfEvens : \power (\mathbb{Z} \cross \mathbb{Z})
+  SquareCubeIdentityPairsOfEvens : \power (\num \cross \num)
   \where
-  SquareCubeIdentityPairsOfEvens = \{ z \colon \mathbb{Z} \mid z \mod
-  2 = 0 \bullet (z * z, z * z * z) \}
+  SquareCubeIdentityPairsOfEvens = \{ z : \num | z \mod 2 = 0 @ (z *
+  z, z * z * z) \}
 \end{axdef}
 
 \medskip
@@ -771,10 +767,10 @@ Lecture 4 - Sets, Types, and Definitions
 \par
 \vspace{11pt}
 \begin{axdef}
-  SquareOrCubeIntegers : \power \mathbb{Z}
+  SquareOrCubeIntegers : \power \num
   \where
-  SquareOrCubeIntegers = \{ z, z_0 \colon \mathbb{Z} \mid z = z_0 *
-  z_0 \lor z = z_0 * z_0 * z_0 \bullet z \}
+  SquareOrCubeIntegers = \{ z, z_0 : \num | z = z\_0 * z\_0 \lor z =
+  z\_0 * z\_0 * z\_0 @ z \}
 \end{axdef}
 
 \newpage
@@ -791,98 +787,86 @@ Lecture 4 - Sets, Types, and Definitions
 \end{zed}
 
 \begin{zed}
-  EpisodeId == \mathbb{N}_1
+  EpisodeId == \nat_1
 \end{zed}
 
 \begin{zed}
-  Timestamp == \mathbb{N}
+  Timestamp == \nat
 \end{zed}
 
 \begin{gendef}[X, Y]
   fst: X \cross Y \fun X
   \where
-  \forall a \colon X \bullet \forall b \colon Y \bullet fst(a, b) = a
+  \forall a : X @ \forall b : Y @ fst(a, b) = a
 \end{gendef}
 
 \begin{gendef}[X, Y]
   snd: X \cross Y \fun Y
   \where
-  \forall a \colon X \bullet \forall b \colon Y \bullet snd(a, b) = b
+  \forall a : X @ \forall b : Y @ snd(a, b) = b
 \end{gendef}
 
 \begin{axdef}
   shows : \finset ShowId \\
-  \mathit{show\_episodes} : ShowId \pfun \finset EpisodeId \\
-  \mathit{episode\_info} : ShowId \cross EpisodeId \pfun (\finset
-  PeopleId \cross Timestamp) \\
-  \mathit{show\_info} : ShowId \pfun \finset PeopleId
+  show\_episodes : ShowId \pfun \finset EpisodeId \\
+  episode\_info : ShowId \cross EpisodeId \pfun (\finset PeopleId
+  \cross Timestamp) \\
+  show\_info : ShowId \pfun \finset PeopleId
   \where
-  shows \subseteq \dom \mathit{show\_episodes} \land \dom
-  \mathit{show\_episodes} \subseteq shows \\
-  \forall es \colon \ran \mathit{show\_episodes} \bullet \exists n
-  \colon \mathbb{N} \bullet es = 1 \upto n \\
-  \forall s \colon \dom \mathit{show\_episodes} \bullet \forall e
-  \colon \mathit{show\_episodes}(s) \bullet \\
-  \quad (s, e) \in \dom \mathit{episode\_info} \Leftrightarrow s \in
-  \dom \mathit{show\_episodes} \\
-  shows \subseteq \dom \mathit{show\_info} \land \dom
-  \mathit{show\_info} \subseteq shows \\
-  \forall s \colon ShowId \bullet \forall p \colon PeopleId \bullet
-  \exists e \colon EpisodeId \bullet \\
-  \quad (s, e) \in \dom \mathit{episode\_info} \land \\
-  \quad (p \in fst(\mathit{episode\_info}(s, e)) \Leftrightarrow p
-  \in \mathit{show\_info}(s)) \\
-  \forall s \colon ShowId \bullet \forall t_1, t_2 \colon Timestamp
-  \bullet \forall e_1, e_2 \colon EpisodeId \bullet \\
-  \quad ((s, e_1) \in \dom \mathit{episode\_info} \land (s, e_2) \in
-  \dom \mathit{episode\_info}) \land \\
-  \quad ((e_1 < e_2) \Rightarrow (snd(\mathit{episode\_info}(s, e_1))
-  \leq snd(\mathit{episode\_info}(s, e_2))))
+  shows \subseteq \dom show\_episodes \land \dom show\_episodes
+  \subseteq shows \\
+  \forall es : \ran show\_episodes @ \exists n : \nat @ es = 1 \upto n \\
+  \forall s : \dom show\_episodes @ \forall e : show\_episodes(s) @ \\
+  \quad (s, e) \in \dom episode\_info \iff s \in \dom show\_episodes \\
+  shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows \\
+  \forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ \\
+  \quad (s, e) \in \dom episode\_info \land \\
+  \quad (p \in fst(episode\_info(s, e)) \iff p \in show\_info(s)) \\
+  \forall s : ShowId @ \forall t_1, t_2 : Timestamp @ \forall e_1,
+  e_2 : EpisodeId @ \\
+  \quad ((s, e\_1) \in \dom episode\_info \land (s, e\_2) \in \dom
+  episode\_info) \land \\
+  \quad ((e\_1 < e\_2) \implies (snd(episode\_info(s, e\_1)) \leq
+  snd(episode\_info(s, e\_2))))
 \end{axdef}
 
 \noindent
 \hangindent=2em
-(a) $shows \subseteq \dom \mathit{show\_episodes} \land \dom
-\mathit{show\_episodes} \subseteq shows$
+(a) $shows \subseteq \dom show\_episodes \land \dom show\_episodes
+\subseteq shows$
 
 \medskip
 \noindent
 \hangindent=2em
-(b) $\forall es \colon \ran \mathit{show\_episodes} \bullet \exists n
-\colon \mathbb{N} \bullet es = 1 \upto n$
+(b) $\forall es : \ran show\_episodes @ \exists n : \nat @ es = 1 \upto n$
 
 \medskip
 \noindent
 \hangindent=2em
-(c) $\forall s \colon \dom \mathit{show\_episodes} \bullet \forall e
-\colon \mathit{show\_episodes}(s) \bullet \\
-\quad (s, e) \in \dom \mathit{episode\_info} \Leftrightarrow s \in
-\dom \mathit{show\_episodes}$
+(c) $\forall s : \dom show\_episodes @ \forall e : show\_episodes(s) @ \\
+\quad (s, e) \in \dom episode\_info \iff s \in \dom show\_episodes$
 
 \medskip
 \noindent
 \hangindent=2em
-(d) $shows \subseteq \dom \mathit{show\_info} \land \dom
-\mathit{show\_info} \subseteq shows$
+(d) $shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows$
 
 \medskip
 \noindent
 \hangindent=2em
-(e) $\forall s \colon ShowId \bullet \forall p \colon PeopleId
-\bullet \exists e \colon EpisodeId \bullet \\
-\quad (s, e) \in \dom \mathit{episode\_info} \land \\
-\quad (p \in fst(\mathit{episode\_info}(s, e)) \Leftrightarrow p \in
-\mathit{show\_info}(s))$
+(e) $\forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ \\
+\quad (s, e) \in \dom episode\_info \land \\
+\quad (p \in fst(episode\_info(s, e)) \iff p \in show\_info(s))$
 
 \medskip
 \noindent
 \hangindent=2em
-(f) $\forall s \colon ShowId \bullet \forall t_1, t_2 \colon
-Timestamp \bullet \forall e_1, e_2 \colon EpisodeId \bullet \\
-\quad ((s, e_1) \in \dom \mathit{episode\_info} \land (s, e_2) \in
-\dom \mathit{episode\_info}) \land \\
-\quad ((e_1 < e_2) \Rightarrow (snd(\mathit{episode\_info}(s, e_1))
-\leq snd(\mathit{episode\_info}(s, e_2))))$
+(f) $\forall s : ShowId @ \forall t_1, t_2 : Timestamp @ \forall e_1,
+e_2 : EpisodeId @ \\
+\quad ((s, e\_1) \in \dom episode\_info \land (s, e\_2) \in \dom
+episode\_info) \land \\
+\quad ((e\_1 < e\_2) \implies (snd(episode\_info(s, e\_1)) \leq
+snd(episode\_info(s, e\_2))))$
 
 \newpage
 
@@ -902,8 +886,7 @@ which passes for each expression.
 \bigskip
 
 \begin{zed}
-  EightA == \{ s \colon \dom \mathit{show\_episodes} \mid \#
-  \mathit{show\_episodes}(s) \geq 100 \}
+  EightA == \{ s : \dom show\_episodes | \# (show\_episodes(s)) \geq 100 \}
 \end{zed}
 
 \bigskip
@@ -914,9 +897,8 @@ F EpisodeId after ensuring s is in the domain of show\_episodes.
 \bigskip
 
 \begin{zed}
-  EightB == \{ p \colon PeopleId \mid \exists s_1, s_2 \colon \dom
-    \mathit{show\_info} \bullet s_1 \neq s_2 \land p \in
-  \mathit{show\_info}(s_1) \land p \in \mathit{show\_info}(s_2) \}
+  EightB == \{ p : PeopleId | \exists s_1, s_2 : \dom show\_info @
+  s\_1 \neq s\_2 \land p \in show\_info(s\_1) \land p \in show\_info(s\_2) \}
 \end{zed}
 
 \bigskip
@@ -927,18 +909,16 @@ two such shows are distinct and we validate each $PeopleId \in F$ PeopleId.
 \bigskip
 
 \begin{axdef}
-  \mathit{first\_episode\_timestamp} : ShowId \pfun Timestamp
+  first\_episode\_timestamp : ShowId \pfun Timestamp
   \where
-  \forall s \colon ShowId \bullet (s, 1) \in \dom
-  \mathit{episode\_info} \land \mathit{first\_episode\_timestamp}(s)
-  = snd(\mathit{episode\_info}(s, 1))
+  \forall s : ShowId @ (s, 1) \in \dom episode\_info \land
+  first\_episode\_timestamp(s) = snd(episode\_info(s, 1))
 \end{axdef}
 
 \begin{zed}
-  EightC == \mathit{first\_episode\_timestamp}(\mu s \colon \dom
-    \mathit{show\_info} \bullet \\
-    \quad \forall t \colon \dom \mathit{show\_info} \bullet s \neq t \land \\
-  \quad \# \mathit{show\_info}(s) > \# \mathit{show\_info}(t))
+  EightC == first\_episode\_timestamp((\mu s : \dom show\_info | \\
+      \quad \forall t : \dom show\_info @ s \neq t \land \\
+  \quad \# (show\_info(s)) > \# (show\_info(t))))
 \end{zed}
 
 \bigskip
@@ -978,22 +958,19 @@ and in the first element of the domain of episode\_info are identical.
 \end{zed}
 
 \begin{axdef}
-  \mathit{my\_shows} : \finset ShowId \\
-  \mathit{my\_episodes} : \iseq (ShowId \cross EpisodeId) \\
+  my\_shows : \finset ShowId \\
+  my\_episodes : \iseq (ShowId \cross EpisodeId) \\
   status : ShowId \cross EpisodeId \pfun (PlayedOrNot \cross SavedOrNot)
   \where
-  \mathit{my\_shows} \subseteq shows \\
-  \forall s \colon ShowId \bullet \forall e \colon EpisodeId \bullet
-  (s, e) \in \ran \mathit{my\_episodes} \land \\
-  \quad e \in \mathit{show\_episodes}(s) \\
-  \forall s \colon ShowId \bullet \forall e \colon EpisodeId \bullet
-  s \in \mathit{my\_shows} \land \\
-  \quad (s, e) \in \ran \mathit{my\_episodes} \\
-  \forall s \colon ShowId \bullet \forall e \colon EpisodeId \bullet \\
-  \quad (s, e) \in \ran \mathit{my\_episodes} \Rightarrow ((s, e) \in
-    \dom status \land \\
-    \quad (s, e) \in \dom status \Rightarrow (s, e) \in \ran
-  \mathit{my\_episodes})
+  my\_shows \subseteq shows \\
+  \forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran
+  my\_episodes \land \\
+  \quad e \in show\_episodes(s) \\
+  \forall s : ShowId @ \forall e : EpisodeId @ s \in my\_shows \land \\
+  \quad (s, e) \in \ran my\_episodes \\
+  \forall s : ShowId @ \forall e : EpisodeId @ \\
+  \quad (s, e) \in \ran my\_episodes \implies ((s, e) \in \dom status \land \\
+  \quad (s, e) \in \dom status \implies (s, e) \in \ran my\_episodes)
 \end{axdef}
 
 \newpage
@@ -1005,24 +982,24 @@ and in the first element of the domain of episode\_info are identical.
 \medskip
 
 \begin{zed}
-  Playlist == \seq ((ShowId \cross EpisodeId) \cross \mathbb{N})
+  Playlist == \seq ((ShowId \cross EpisodeId) \cross \nat)
 \end{zed}
 
 \begin{axdef}
   PossiblePlaylist : \power Playlist
   \where
-  PossiblePlaylist = \seq (\dom status \cross \mathbb{N})
+  PossiblePlaylist = \seq (\dom status \cross \nat)
 \end{axdef}
 
 (a)
 \par
 \vspace{11pt}
 \begin{axdef}
-  length : PossiblePlaylist \fun \mathbb{N}
+  length : PossiblePlaylist \fun \nat
   \where
   length(\langle \rangle) = 0 \land \\
-  \quad (\forall pl \colon PossiblePlaylist \bullet \forall ple
-    \colon (\dom status \cross \mathbb{N}) \bullet \\
+  \quad (\forall pl : PossiblePlaylist @ \forall ple : (\dom status
+    \cross \nat) @ \\
   \quad length(\langle ple \rangle \cat pl) = snd(ple) + length(pl))
 \end{axdef}
 
@@ -1035,12 +1012,12 @@ and in the first element of the domain of episode\_info are identical.
   unplayed : PossiblePlaylist \fun PossiblePlaylist
   \where
   unplayed(\langle \rangle) = \langle \rangle \land \\
-  \quad (\forall pl \colon PossiblePlaylist \bullet \forall ple
-    \colon (\dom status \cross \mathbb{N}) \bullet \\
-    \quad (fst(status(fst(ple))) = Played) \Rightarrow
+  \quad (\forall pl : PossiblePlaylist @ \forall ple : (\dom status
+    \cross \nat) @ \\
+    \quad (fst(status(fst(ple))) = Played) \implies
     ((unplayed(\langle ple \rangle \cat pl) = unplayed(pl)) \land \\
-      \quad (fst(status(fst(ple))) = NotP) \Rightarrow (unplayed(\langle
-  ple \rangle \cat pl) = \langle ple \rangle \cat unplayed(pl))))
+      \quad (fst(status(fst(ple))) = NotP) \implies (unplayed(\langle ple
+  \rangle \cat pl) = \langle ple \rangle \cat unplayed(pl))))
 \end{axdef}
 
 \medskip
@@ -1052,12 +1029,12 @@ and in the first element of the domain of episode\_info are identical.
   played : PossiblePlaylist \fun PossiblePlaylist
   \where
   played(\langle \rangle) = \langle \rangle \land \\
-  \quad (\forall pl \colon PossiblePlaylist \bullet \forall ple
-    \colon (\dom status \cross \mathbb{N}) \bullet \\
-    \quad (fst(status(fst(ple))) = NotP) \Rightarrow ((played(\langle
+  \quad (\forall pl : PossiblePlaylist @ \forall ple : (\dom status
+    \cross \nat) @ \\
+    \quad (fst(status(fst(ple))) = NotP) \implies ((played(\langle
       ple \rangle \cat pl) = played(pl)) \land \\
-      \quad (fst(status(fst(ple))) = Played) \Rightarrow (played(\langle
-  ple \rangle \cat pl) = \langle ple \rangle \cat played(pl))))
+      \quad (fst(status(fst(ple))) = Played) \implies (played(\langle ple
+  \rangle \cat pl) = \langle ple \rangle \cat played(pl))))
 \end{axdef}
 
 \medskip
@@ -1108,9 +1085,8 @@ for sequences and which is an implication \citep[page 157]{simpson-notes}.
 \bigskip
 
 \noindent
-$\forall t \colon PossiblePlaylist \bullet \forall ple \colon (\dom
-status \cross \mathbb{N}) \bullet \\
-\quad length(played(t)) + length(unplayed(t)) = length(t) \Rightarrow \\
+$\forall t : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
+\quad length(played(t)) + length(unplayed(t)) = length(t) \implies \\
 \quad length(played(\langle ple \rangle \cat t)) +
 length(unplayed(\langle ple \rangle \cat t)) = length(\langle ple
 \rangle \cat t)$
@@ -1228,9 +1204,8 @@ same outcome, we can use the implication introduction rule
 
 \noindent
 $\displaystyle
-\infer{\forall p \colon PossiblePlaylist \bullet length(p)}{
-  \forall p \colon PossiblePlaylist \bullet length(played(p)) +
-  length(unplayed(p))
+\infer{\forall p : PossiblePlaylist @ length(p)}{
+  \forall p : PossiblePlaylist @ length(played(p)) + length(unplayed(p))
 }
 $
 
@@ -1250,7 +1225,7 @@ make our expressions less cumbersome.
 \bigskip
 
 \begin{zed}
-  ListElement == (ShowId \cross EpisodeId) \cross (\mathbb{N} \cross
+  ListElement == (ShowId \cross EpisodeId) \cross (\nat \cross
   PlayedOrNot \cross SavedOrNot)
 \end{zed}
 
@@ -1284,11 +1259,10 @@ Q, building upon the List of natural numbers example found in section
 
 \noindent
 $\displaystyle
-\infer{\forall l \colon List \bullet Q(l)}{
+\infer{\forall l : List @ Q(l)}{
   Q(nil)
   &
-  \forall e \colon ListElement \bullet \forall l \colon List \bullet
-  Q(l) \Rightarrow Q(join(e, l))
+  \forall e : ListElement @ \forall l : List @ Q(l) \implies Q(join(e, l))
 }
 $
 
@@ -1309,22 +1283,19 @@ fst() and snd() for tuples.
 \begin{gendef}[A, B, C]
   fstOfTriple: A \cross B \cross C \fun A
   \where
-  \forall a \colon A \bullet \forall b \colon B \bullet \forall c
-  \colon C \bullet fstOfTriple(a, b, c) = a
+  \forall a : A @ \forall b : B @ \forall c : C @ fstOfTriple(a, b, c) = a
 \end{gendef}
 
 \begin{gendef}[A, B, C]
   sndOfTriple: A \cross B \cross C \fun B
   \where
-  \forall a \colon A \bullet \forall b \colon B \bullet \forall c
-  \colon C \bullet sndOfTriple(a, b, c) = b
+  \forall a : A @ \forall b : B @ \forall c : C @ sndOfTriple(a, b, c) = b
 \end{gendef}
 
 \begin{gendef}[A, B, C]
   thrdOfTriple: A \cross B \cross C \fun C
   \where
-  \forall a \colon A \bullet \forall b \colon B \bullet \forall c
-  \colon C \bullet thrdOfTriple(a, b, c) = c
+  \forall a : A @ \forall b : B @ \forall c : C @ thrdOfTriple(a, b, c) = c
 \end{gendef}
 
 \bigskip
@@ -1334,11 +1305,11 @@ Next, we specify our recursive functions
 \bigskip
 
 \begin{axdef}
-  length_L : List \fun \mathbb{N}
+  length\_L : List \fun \nat
   \where
-  length_L(nil) = 0 \\
-  \forall e \colon ListElement \bullet \forall l \colon List \bullet
-  length_L(join(e, l)) = fstOfTriple(snd(e)) + length_L(l)
+  length\_L(nil) = 0 \\
+  \forall e : ListElement @ \forall l : List @ length\_L(join(e, l))
+  = fstOfTriple(snd(e)) + length\_L(l)
 \end{axdef}
 
 \bigskip
@@ -1350,14 +1321,13 @@ tuple of each ListElement.
 \bigskip
 
 \begin{axdef}
-  unplayed_L : List \fun List
+  unplayed\_L : List \fun List
   \where
-  unplayed_L(nil) = nil \\
-  \forall e \colon ListElement \bullet \forall l \colon List \bullet
-  sndOfTriple(snd(e)) = NotP \land unplayed_L(join(e, l)) = join(e,
-  unplayed_L(l)) \\
-  \forall e \colon ListElement \bullet \forall l \colon List \bullet
-  sndOfTriple(snd(e)) = Played \land unplayed_L(join(e, l)) = unplayed_L(l)
+  unplayed\_L(nil) = nil \\
+  \forall e : ListElement @ \forall l : List @ sndOfTriple(snd(e)) =
+  NotP \land unplayed\_L(join(e, l)) = join(e, unplayed\_L(l)) \\
+  \forall e : ListElement @ \forall l : List @ sndOfTriple(snd(e)) =
+  Played \land unplayed\_L(join(e, l)) = unplayed\_L(l)
 \end{axdef}
 
 \bigskip
@@ -1370,14 +1340,13 @@ in the second element of the tuple of each ListElement.
 \bigskip
 
 \begin{axdef}
-  played_L : List \fun List
+  played\_L : List \fun List
   \where
-  played_L(nil) = nil \\
-  \forall e \colon ListElement \bullet \forall l \colon List \bullet
-  sndOfTriple(snd(e)) = Played \land played_L(join(e, l)) = join(e,
-  played_L(l)) \\
-  \forall e \colon ListElement \bullet \forall l \colon List \bullet
-  sndOfTriple(snd(e)) = NotP \land played_L(join(e, l)) = played_L(l)
+  played\_L(nil) = nil \\
+  \forall e : ListElement @ \forall l : List @ sndOfTriple(snd(e)) =
+  Played \land played\_L(join(e, l)) = join(e, played\_L(l)) \\
+  \forall e : ListElement @ \forall l : List @ sndOfTriple(snd(e)) =
+  NotP \land played\_L(join(e, l)) = played\_L(l)
 \end{axdef}
 
 \bigskip
@@ -1393,8 +1362,8 @@ in the second element of the tuple of each ListElement.
 
 \noindent
 \hangindent=2em
-(c) $\forall l \colon List \bullet length_L(played_L(l)) +
-length_L(unplayed_L(l)) = length_L(l)$
+(c) $\forall l : List @ length\_L(played\_L(l)) +
+length\_L(unplayed\_L(l)) = length\_L(l)$
 
 \bigskip
 
@@ -1405,12 +1374,12 @@ inductive case. The base case occurs when the List is nil.
 
 \[
   \begin{array}{ll@{\hspace{2em}}l}
-    & length_L(played_L(nil)) + length_L(unplayed_L(nil)) \\
-    &\Leftrightarrow length_L(nil) + length_L(nil) &
+    & length\_L(played\_L(nil)) + length\_L(unplayed\_L(nil)) \\
+    &\Leftrightarrow length\_L(nil) + length\_L(nil) &
     [\mbox{(un)played(nil)=nil}] \\
     &\Leftrightarrow 0 + 0 & [\mbox{length(nil)=0}] \\
     &\Leftrightarrow 0 & [\mbox{arithmetic}] \\
-    &\Leftrightarrow length_L(nil) & [\mbox{length(nil)=0}]
+    &\Leftrightarrow length\_L(nil) & [\mbox{length(nil)=0}]
   \end{array}
 \]
 
