@@ -443,22 +443,23 @@ class LaTeXGenerator:
             # Standard LaTeX: escape and wrap in mathit
             return rf"\mathit{{{escaped}}}"
 
-        # Single underscore: check suffix length
+        # Single underscore: prioritize suffix length for subscript detection
         if len(parts) == 2:
             prefix, suffix = parts
-            # 3+ char suffix → multi-word identifier (e.g., x_max, cumulative_total)
-            if len(suffix) >= 3 or len(prefix) >= 4:
+            # Priority 1: Single-char suffix → always subscript (e.g., x_1, length_L)
+            if len(suffix) == 1:
+                return f"{prefix}_{suffix}"
+            # Priority 2: Two-char suffix → subscript with braces (e.g., x_10)
+            elif len(suffix) == 2:
+                return f"{prefix}_{{{suffix}}}"
+            # Priority 3: Long suffix → multi-word identifier (e.g., cumulative_total)
+            else:  # len(suffix) >= 3
                 escaped = name.replace("_", r"\_")
                 # Fuzz: escape but no mathit wrapper
                 if self.use_fuzz:
                     return escaped
                 # Standard LaTeX: escape and wrap in mathit
                 return rf"\mathit{{{escaped}}}"
-            # 1-2 char suffix → subscript (e.g., z_1, x_10)
-            elif len(suffix) == 1:
-                return f"{prefix}_{suffix}"
-            else:  # len(suffix) == 2
-                return f"{prefix}_{{{suffix}}}"
 
         # Fallback: escape and use mathit
         escaped = name.replace("_", r"\_")
@@ -2506,6 +2507,12 @@ class LaTeXGenerator:
         result = re.sub(r"\bcomp\b", r"$\\comp$", result)
         result = re.sub(r"\binv\b", r"$\\inv$", result)
         result = re.sub(r"\bid\b", r"$\\id$", result)
+
+        # Wrap identifiers with underscores in math mode for subscript rendering
+        # Must happen AFTER all operator replacements to avoid interfering
+        # Pattern: word characters around underscore, not already in math mode
+        # This handles cases like length_L, played_L in justification text
+        result = re.sub(r"(?<!\$)(\w+_\w+)(?!\$)", r"$\1$", result)
 
         return result
 
