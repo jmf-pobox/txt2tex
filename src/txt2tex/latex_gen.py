@@ -448,16 +448,24 @@ class LaTeXGenerator:
             prefix, suffix = parts
             # Priority 1: Single-char suffix → subscript (e.g., x_1, length_L)
             if len(suffix) == 1:
-                # Fuzz mode: escape underscore (fuzz requires escaped _ in Z notation)
                 if self.use_fuzz:
-                    return f"{prefix}\\_{suffix}"
+                    # Fuzz: numeric subscripts are decorations (bare _)
+                    # Letter suffixes are identifier parts (escaped \_)
+                    if suffix.isdigit():
+                        return f"{prefix}_{suffix}"  # z_1 (decoration)
+                    else:
+                        return f"{prefix}\\_{suffix}"  # length\_L (identifier)
                 # Standard LaTeX: bare underscore for subscript
                 return f"{prefix}_{suffix}"
             # Priority 2: Two-char suffix → subscript with braces (e.g., x_10)
             elif len(suffix) == 2:
-                # Fuzz mode: escape underscore
                 if self.use_fuzz:
-                    return f"{prefix}\\_{{{suffix}}}"
+                    # Fuzz: all-numeric subscripts are decorations (bare _)
+                    # Mixed/letter suffixes are identifier parts (escaped \_)
+                    if suffix.isdigit():
+                        return f"{prefix}_{{{suffix}}}"  # z_10 (decoration)
+                    else:
+                        return f"{prefix}\\_{{{suffix}}}"  # state\_AB (identifier)
                 # Standard LaTeX: bare underscore
                 return f"{prefix}_{{{suffix}}}"
             # Priority 3: Long suffix → multi-word identifier (e.g., cumulative_total)
