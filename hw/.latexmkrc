@@ -15,4 +15,7 @@ $pdflatex = 'pdflatex -interaction=nonstopmode -file-line-error %O %S';
 
 # Run pdflatex multiple times for natbib citations
 # With manual \begin{thebibliography}, citations need 3+ passes to resolve
-$max_repeat = 5;
+$max_repeat = 10;  # Allow up to 10 passes
+
+# Force latexmk to always check for changes and not stop early
+$force_mode = 1;

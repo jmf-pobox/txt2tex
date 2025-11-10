@@ -473,11 +473,21 @@ PAGEBREAK:
 TEXT: First, we can create an abbreviation for the elements of our list to make our expressions less cumbersome.
 
 ListElement == (ShowId cross EpisodeId) cross (N cross PlayedOrNot cross SavedOrNot)
+
+TEXT: Using this abbreviation, we can simplify our free type definition.
+
 List ::= nil | join <<ListElement cross List>>
 
-TEXT: An example for such a list could be (List((1, 2), (3600, NotP, Saved)), List((1, 1), (3600, Played, Saved)), List(nil)).
+TEXT: An example for such a List would include (List((1, 2), (3600, NotP, Saved)), List((1, 1), (3600, Played, Saved)), List(nil)).
 
-TEXT: I will also define some convenience functions to enable fuzz-compliant access to elements of the triple (N cross PlayedOrNot cross SavedOrNot)
+(a) TEXT: Having thus simplified our notation, we define the induction principle for List, which builds on the example for a List of natural numbers found in section 13.3 of the course notes [cite simpson-notes page 162].
+
+PROOF:
+forall l : List | P l
+  :: P nil
+  :: forall e : ListElement | forall l : List | P l => P(join(e, l))
+  
+(b) TEXT: Fuzz does not support validation of Z with tuple projection (e.g., x.1). Therefore, we define generic access functions for each element of any triple as we need access to various elements of (N cross PlayedOrNot cross SavedOrNot) for our recursive functions.
 
 gendef [A, B, C]
   fstOfTriple : A cross B cross C -> A
@@ -496,15 +506,6 @@ gendef [A, B, C]
 where
   forall a : A | forall b : B | forall c : C | thrdOfTriple(a, b, c) = c
 end
-
-(a) TEXT: Now can now define simply the induction principle for this list [cite simpson-notes page 161].
-
-PROOF:
-forall l : List | P l
-  :: P nil
-  :: forall e : ListElement | forall l : List | P l => P(join(e, l))
-  
-(b)
 
 axdef
   length_L : List -> N

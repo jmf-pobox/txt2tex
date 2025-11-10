@@ -122,9 +122,10 @@ echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Compiling PDF..."
 # Use latexmk to handle multiple passes automatically
 # It runs pdflatex as many times as needed until citations/references resolve
 # Use -g to force at least one extra pass (needed for natbib citations)
+# Use -bibtex- to disable bibtex (for inline bibliographies using thebibliography environment)
 # No TEXINPUTS/MFINPUTS needed - files are local
 set +e  # Temporarily disable exit on error
-cd "$INPUT_DIR" && latexmk -pdf -g -interaction=nonstopmode -file-line-error "${INPUT_BASE}.tex" > "${INPUT_BASE}.latexmk.log" 2>&1
+cd "$INPUT_DIR" && latexmk -pdf -g -bibtex- -interaction=nonstopmode -file-line-error "${INPUT_BASE}.tex" > "${INPUT_BASE}.latexmk.log" 2>&1
 LATEXMK_EXIT=$?
 
 if [ ! -f "${INPUT_BASE}.pdf" ]; then

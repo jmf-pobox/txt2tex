@@ -1229,21 +1229,55 @@ make our expressions less cumbersome.
   PlayedOrNot \cross SavedOrNot)
 \end{zed}
 
+\bigskip
+
+Using this abbreviation, we can simplify our free type definition.
+
+\bigskip
+
 \begin{zed}List ::= nil | join \ldata ListElement \cross List \rdata
 \end{zed}
 
 \bigskip
 
-An example for such a list could be (List((1, 2), (3600, NotP,
+An example for such a List would include (List((1, 2), (3600, NotP,
 Saved)), List((1, 1), (3600, Played, Saved)), List(nil)).
 
 \bigskip
 
+(a)
+\par
+\vspace{11pt}
 \bigskip
 
-I will also define some convenience functions to enable
-fuzz-compliant access to elements of the triple (N cross PlayedOrNot
-cross SavedOrNot)
+Having thus simplified our notation, we define the induction
+principle for List, which builds on the example for a List of natural
+numbers found in section 13.3 of the course notes \citep[page
+162]{simpson-notes}.
+
+\bigskip
+
+\noindent
+$\displaystyle
+\infer{\forall l : List @ \power l}{
+  \power nil
+  &
+  \forall e : ListElement @ \forall l : List @ \power l \implies
+  \power (join(e, l))
+}
+$
+
+\medskip
+
+(b)
+\par
+\vspace{11pt}
+\bigskip
+
+Fuzz does not support validation of Z with tuple projection (e.g.,
+x.1). Therefore, we define generic access functions for each element
+of any triple as we need access to various elements of (N cross
+PlayedOrNot cross SavedOrNot) for our recursive functions.
 
 \bigskip
 
@@ -1265,31 +1299,6 @@ cross SavedOrNot)
   \forall a : A @ \forall b : B @ \forall c : C @ thrdOfTriple(a, b, c) = c
 \end{gendef}
 
-(a)
-\par
-\vspace{11pt}
-\bigskip
-
-Now can now define simply the induction principle for this list
-\citep[page 161]{simpson-notes}.
-
-\bigskip
-
-\noindent
-$\displaystyle
-\infer{\forall l : List @ \power l}{
-  \power nil
-  &
-  \forall e : ListElement @ \forall l : List @ \power l \implies
-  \power (join(e, l))
-}
-$
-
-\medskip
-
-(b)
-\par
-\vspace{11pt}
 \begin{axdef}
   length\_L : List \fun \nat
   \where
