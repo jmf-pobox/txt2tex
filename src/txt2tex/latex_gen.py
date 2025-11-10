@@ -1386,6 +1386,49 @@ class LaTeXGenerator:
 
         return "".join(result)
 
+    def _escape_underscores_outside_math(self, text: str) -> str:
+        r"""Escape underscores only when NOT inside $...$ math mode or citations.
+
+        Prevents LaTeX errors when identifiers like length_L appear in prose.
+        Math mode already handles underscores as subscripts, so only escape
+        underscores in text mode. Also skip underscores in citation keys like
+        \citep{author_name_2025}.
+        """
+        result = []
+        in_math = False
+        in_citation = False
+        i = 0
+
+        while i < len(text):
+            # Check for $ to toggle math mode
+            if text[i] == "$":
+                in_math = not in_math
+                result.append("$")
+                i += 1
+            # Check for \citep{ or \cite{ to enter citation mode
+            elif not in_math and not in_citation and text[i : i + 7] == r"\citep{":
+                in_citation = True
+                result.append(r"\citep{")
+                i += 7
+            elif not in_math and not in_citation and text[i : i + 6] == r"\cite{":
+                in_citation = True
+                result.append(r"\cite{")
+                i += 6
+            # Check for } to exit citation mode
+            elif in_citation and text[i] == "}":
+                in_citation = False
+                result.append("}")
+                i += 1
+            # Escape underscore only outside math mode and citations
+            elif not in_math and not in_citation and text[i] == "_":
+                result.append(r"\_")
+                i += 1
+            else:
+                result.append(text[i])
+                i += 1
+
+        return "".join(result)
+
     def _convert_operators_bare(self, text: str) -> str:
         r"""Convert Z operators to LaTeX commands without wrapping in $...$.
 
@@ -1536,6 +1579,10 @@ class LaTeXGenerator:
         # Catches cases not handled by _process_inline_math() (complex expressions)
         # Tracks math mode to avoid nested $...$
         text = self._convert_comparison_operators(text)
+
+        # Escape underscores outside math mode (final pass)
+        # Prevents LaTeX errors when identifiers like length_L appear in prose
+        text = self._escape_underscores_outside_math(text)
 
         lines.append(text)
         lines.append("")
@@ -2524,11 +2571,14 @@ class LaTeXGenerator:
         result = re.sub(r"\binv\b", r"$\\inv$", result)
         result = re.sub(r"\bid\b", r"$\\id$", result)
 
-        # Wrap identifiers with underscores in math mode for subscript rendering
+        # Escape underscores in identifiers for prose rendering (not subscripts)
         # Must happen AFTER all operator replacements to avoid interfering
         # Pattern: word characters around underscore, not already in math mode
         # This handles cases like length_L, played_L in justification text
-        result = re.sub(r"(?<!\$)(\w+_\w+)(?!\$)", r"$\1$", result)
+        # Escapes as length\_L (prose) not $length_L$ (subscript)
+        result = re.sub(
+            r"(?<!\$)(\w+_\w+)(?!\$)", lambda m: m.group(1).replace("_", r"\_"), result
+        )
 
         return result
 
