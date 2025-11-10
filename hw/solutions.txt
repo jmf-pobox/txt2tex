@@ -464,8 +464,6 @@ forall p : PossiblePlaylist | length(p)
   forall p : PossiblePlaylist | length(played(p)) + length(unplayed(p))
 
 
-
-
 PAGEBREAK:
 
 **Question 12**
@@ -474,20 +472,20 @@ TEXT: First, we can create an abbreviation for the elements of our list to make 
 
 ListElement == (ShowId cross EpisodeId) cross (N cross PlayedOrNot cross SavedOrNot)
 
-TEXT: Using this abbreviation, we can simplify our free type definition.
+TEXT: We restate our List free type definition using the abbreviation as
 
 List ::= nil | join <<ListElement cross List>>
 
-TEXT: An example for such a List would include (List((1, 2), (3600, NotP, Saved)), List((1, 1), (3600, Played, Saved)), List(nil)).
+TEXT: For example, such a List could include (join((1, 2), (3600, NotP, Saved), (join((1, 1), (3600, Played, Saved)), nil))) which is of the form (join(e, join(e, nil))).
 
-(a) TEXT: Having thus simplified our notation, we define the induction principle for List, which builds on the example for a List of natural numbers found in section 13.3 of the course notes [cite simpson-notes page 162].
+(a) TEXT: We define the induction principle for this List for the proposition Q, building upon the List of natural numbers example found in section 13.3 of the course notes [cite simpson-notes page 162].
 
 PROOF:
-forall l : List | P l
-  :: P nil
-  :: forall e : ListElement | forall l : List | P l => P(join(e, l))
+forall l : List | Q l
+  :: Q nil
+  :: forall e : ListElement | forall l : List | Q l => Q(join(e, l))
   
-(b) TEXT: Fuzz does not support validation of Z with tuple projection (e.g., x.1). Therefore, we define generic access functions for each element of any triple as we need access to various elements of (N cross PlayedOrNot cross SavedOrNot) for our recursive functions.
+(b) TEXT: Fuzz does not support Z tuple projection such as e.2. Therefore, we define generic access functions for each element of any triple, which we will use with ListElement, together with the previously specified fst() and snd() for tuples.
 
 gendef [A, B, C]
   fstOfTriple : A cross B cross C -> A
@@ -507,6 +505,8 @@ where
   forall a : A | forall b : B | forall c : C | thrdOfTriple(a, b, c) = c
 end
 
+TEXT: Next, we specify our recursive functions
+
 axdef
   length_L : List -> N
 where
@@ -514,17 +514,40 @@ where
   forall e : ListElement | (forall l : List | length_L(join(e, l)) = fstOfTriple(snd(e)) + length_L(l))
 end
 
+TEXT: The length of a List is the recursive sum of seconds : N, found in the first position of the triple found in the second element of the tuple of each ListElement.
+
 axdef
   unplayed_L : List -> List
 where
   unplayed_L(nil) = nil
+  forall e : ListElement | (forall l : List | sndOfTriple(snd(e)) = NotP | unplayed_L(join(e, l)) = join(e, unplayed_L(l)))
+  forall e : ListElement | (forall l : List | sndOfTriple(snd(e)) = Played | unplayed_L(join(e, l)) = unplayed_L(l))
 end
+
+TEXT: The unplayed list of any given list is a new list, which recursively includes or excludes each ListElement based on the PlayedOrNot free type value of NotP found in the second position of the triple found in the second element of the tuple of each ListElement. 
 
 axdef
   played_L : List -> List
 where
   played_L(nil) = nil
+  forall e : ListElement | (forall l : List | sndOfTriple(snd(e)) = Played | played_L(join(e, l)) = join(e, played_L(l)))
+  forall e : ListElement | (forall l : List | sndOfTriple(snd(e)) = NotP | played_L(join(e, l)) = played_L(l))
 end
+
+TEXT: The played list of any given list is a new list, which recursively includes or excludes each ListElement based on the PlayedOrNot free type value of Played found in the second position of the triple found in the second element of the tuple of each ListElement. 
+
+(c) forall l : List | length_L(played_L(l)) + length_L(unplayed_L(l)) = length_L(l)
+
+TEXT: To use proof by induction, we need to prove the base case and the inductive case. The base case occurs when the List is nil.
+
+EQUIV:
+length_L(played_L(nil)) + length_L(unplayed_L(nil))
+length_L(nil) + length_L(nil)             [(un)played(nil) = nil]
+0 + 0                                     [length(nil) = 0]
+0                                         [arithmetic]
+length_L(nil)                             [length(nil) = 0]
+
+TEXT: In the above, we use each of the definitions of played(nil), unplayed(nil), and length(nil) to prove our base case. 
 
 PAGEBREAK:
 

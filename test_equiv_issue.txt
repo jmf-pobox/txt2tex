@@ -1,0 +1,9 @@
+=== Test EQUIV Block ===
+
+EQUIV:
+length_L(played_L(nil)) + length_L(unplayed_L(nil))
+length_L(nil) + length_L(unplayed_L(nil)) [played_L(nil) = nil]
+length_L(nil) + length_L(nil)             [unplayed_L(nil) = nil]
+0 + 0                                     [length_L(nil) = 0]
+0                                         [arithmetic]
+length_L(nil)                             [length_L(nil) = 0]
