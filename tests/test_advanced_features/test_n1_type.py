@@ -110,5 +110,5 @@ def test_n1_not_confused_with_n_subscript():
 
     # N1 should render as \nat_1
     assert r"\nat_1" in latex1
-    # N_1 should render as N\_1 (escaped in fuzz mode)
-    assert r"N\_1" in latex2
+    # N_1 should render as N_1 (bare _ for numeric subscript in fuzz mode)
+    assert "N_1" in latex2
