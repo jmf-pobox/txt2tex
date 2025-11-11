@@ -325,7 +325,7 @@ TEXT: The following are given as abbreviations to enable fuzz validation, which 
 
 EightA == {s : dom show_episodes | #(show_episodes(s)) >= 100}
 
-TEXT: Shows with at least 100 episodes.  We use the cardinality operator on F EpisodeId after ensuring s is in the domain of show\_episodes.
+TEXT: Shows with at least 100 episodes.  We use the cardinality operator on F EpisodeId after ensuring s is in the domain of show_episodes.
 
 EightB == {p : PeopleId | exists s_1, s_2 : dom show_info | s_1 != s_2 and p in show_info s_1 and p in show_info s_2}
 
@@ -542,12 +542,12 @@ TEXT: To use proof by induction, we need to prove the base case and the inductiv
 
 EQUIV:
 length_L(played_L(nil)) + length_L(unplayed_L(nil))
-length_L(nil) + length_L(nil)             [(un)played(nil) = nil]
-0 + 0                                     [length(nil) = 0]
+length_L(nil) + length_L(nil)             [(un)played_L(nil) = nil]
+0 + 0                                     [length_L(nil) = 0]
 0                                         [arithmetic]
-length_L(nil)                             [length(nil) = 0]
+length_L(nil)                             [length_L(nil) = 0]
 
-TEXT: In the above, we use each of the definitions of played(nil), unplayed(nil), and length(nil) to prove our base case. 
+TEXT: In the above, we use each of the definitions of played_L(nil), unplayed_L(nil), and length_L(nil) to prove our base case. 
 
 PAGEBREAK:
 

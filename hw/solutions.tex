@@ -745,8 +745,8 @@ Lecture 4 - Sets, Types, and Definitions
 \begin{axdef}
   SquareCubePairsOfEvens : \power (\num \cross \num)
   \where
-  SquareCubePairsOfEvens = \{ z_1, z_2 : \num | z\_1 \mod 2 = 0 \land
-  z\_2 \mod 2 = 0 @ (z\_1 * z\_1, z\_2 * z\_2 * z\_2) \}
+  SquareCubePairsOfEvens = \{ z_1, z_2 : \num | z_1 \mod 2 = 0 \land
+  z_2 \mod 2 = 0 @ (z_1 * z_1, z_2 * z_2 * z_2) \}
 \end{axdef}
 
 \medskip
@@ -769,8 +769,8 @@ Lecture 4 - Sets, Types, and Definitions
 \begin{axdef}
   SquareOrCubeIntegers : \power \num
   \where
-  SquareOrCubeIntegers = \{ z, z_0 : \num | z = z\_0 * z\_0 \lor z =
-  z\_0 * z\_0 * z\_0 @ z \}
+  SquareOrCubeIntegers = \{ z, z_0 : \num | z = z_0 * z_0 \lor z =
+  z_0 * z_0 * z_0 @ z \}
 \end{axdef}
 
 \newpage
@@ -824,10 +824,10 @@ Lecture 4 - Sets, Types, and Definitions
   \quad (p \in fst(episode\_info(s, e)) \iff p \in show\_info(s)) \\
   \forall s : ShowId @ \forall t_1, t_2 : Timestamp @ \forall e_1,
   e_2 : EpisodeId @ \\
-  \quad ((s, e\_1) \in \dom episode\_info \land (s, e\_2) \in \dom
+  \quad ((s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom
   episode\_info) \land \\
-  \quad ((e\_1 < e\_2) \implies (snd(episode\_info(s, e\_1)) \leq
-  snd(episode\_info(s, e\_2))))
+  \quad ((e_1 < e_2) \implies (snd(episode\_info(s, e_1)) \leq
+  snd(episode\_info(s, e_2))))
 \end{axdef}
 
 \noindent
@@ -863,10 +863,10 @@ Lecture 4 - Sets, Types, and Definitions
 \hangindent=2em
 (f) $\forall s : ShowId @ \forall t_1, t_2 : Timestamp @ \forall e_1,
 e_2 : EpisodeId @ \\
-\quad ((s, e\_1) \in \dom episode\_info \land (s, e\_2) \in \dom
+\quad ((s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom
 episode\_info) \land \\
-\quad ((e\_1 < e\_2) \implies (snd(episode\_info(s, e\_1)) \leq
-snd(episode\_info(s, e\_2))))$
+\quad ((e_1 < e_2) \implies (snd(episode\_info(s, e_1)) \leq
+snd(episode\_info(s, e_2))))$
 
 \newpage
 
@@ -898,7 +898,7 @@ F EpisodeId after ensuring s is in the domain of show\_episodes.
 
 \begin{zed}
   EightB == \{ p : PeopleId | \exists s_1, s_2 : \dom show\_info @
-  s\_1 \neq s\_2 \land p \in show\_info(s\_1) \land p \in show\_info(s\_2) \}
+  s_1 \neq s_2 \land p \in show\_info(s_1) \land p \in show\_info(s_2) \}
 \end{zed}
 
 \bigskip
@@ -1376,17 +1376,17 @@ inductive case. The base case occurs when the List is nil.
   \begin{array}{ll@{\hspace{2em}}l}
     & length\_L(played\_L(nil)) + length\_L(unplayed\_L(nil)) \\
     &\Leftrightarrow length\_L(nil) + length\_L(nil) &
-    [\mbox{(un)played(nil)=nil}] \\
-    &\Leftrightarrow 0 + 0 & [\mbox{length(nil)=0}] \\
+    [\mbox{(un)played\_L(nil)=nil}] \\
+    &\Leftrightarrow 0 + 0 & [\mbox{length\_L(nil)=0}] \\
     &\Leftrightarrow 0 & [\mbox{arithmetic}] \\
-    &\Leftrightarrow length\_L(nil) & [\mbox{length(nil)=0}]
+    &\Leftrightarrow length\_L(nil) & [\mbox{length\_L(nil)=0}]
   \end{array}
 \]
 
 \bigskip
 
-In the above, we use each of the definitions of played(nil),
-unplayed(nil), and length(nil) to prove our base case.
+In the above, we use each of the definitions of played\_L(nil),
+unplayed\_L(nil), and length\_L(nil) to prove our base case.
 
 \bigskip
 
