@@ -49,9 +49,9 @@ def test_explicit_parens_create_nested_pairs() -> None:
     # NOT nested: ((\mathbb{N} \cross PlayedOrNot) \cross SavedOrNot)
     # Fuzz needs flat 3-tuples for (a, b, c) tuple syntax
 
-    assert (
-        r"(\mathbb{N} \cross PlayedOrNot \cross SavedOrNot)" in abbrev_latex
-    ), f"Expected flat 3-tuple (N x PlayedOrNot x SavedOrNot), got: {abbrev_latex}"
+    assert r"(\mathbb{N} \cross PlayedOrNot \cross SavedOrNot)" in abbrev_latex, (
+        f"Expected flat 3-tuple (N x PlayedOrNot x SavedOrNot), got: {abbrev_latex}"
+    )
 
 
 def test_three_way_cross_without_explicit_parens() -> None:
