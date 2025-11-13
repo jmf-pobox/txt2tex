@@ -1360,9 +1360,17 @@ in the second element of the tuple of each ListElement.
 
 \medskip
 
+(c)
+\par
+\vspace{11pt}
+\bigskip
+
+Prove
+
+\bigskip
+
 \noindent
-\hangindent=2em
-(c) $\forall l : List @ length\_L(played\_L(l)) +
+$\forall l : List @ length\_L(played\_L(l)) +
 length\_L(unplayed\_L(l)) = length\_L(l)$
 
 \bigskip
@@ -1386,9 +1394,88 @@ inductive case. The base case occurs when the List is nil.
 \bigskip
 
 In the above, we use each of the definitions of played\_L(nil),
-unplayed\_L(nil), and length\_L(nil) to prove our base case.
+unplayed\_L(nil), and length\_L(nil) to prove our base case.  Now we
+have to move to our inductive case
 
 \bigskip
+
+\noindent
+$length\_L(played(l)) + length\_L(unplayed(l)) = length\_L(l) \implies \\
+\quad length\_L(played(join(e, l))) + length\_L(unplayed(join(e, l)))
+= length\_L(join(e, l))$
+
+\bigskip
+
+To establish this implication is true, we must prove it all cases.
+For this statement, e : ListElement is included in played\_L's output
+or unplayed\_L's output based on the value of its free type
+PlayedOrNot, which can only have one of two states that map directly
+to these two outcomes.  Therefore, we have two cases, one where e's
+PlayedOrNot value is Played and another where the value is NotP.
+
+\bigskip
+
+\newpage
+
+\bigskip
+
+Case 1: e's $PlayedOrNot = Played$
+
+\bigskip
+
+\[
+  \begin{array}{ll@{\hspace{2em}}l}
+    & length\_L(played(join(e, l))) + length\_L(unplayed(join(e, l))) \\
+    &\Leftrightarrow length\_L(played(join(e, l))) +
+    length\_L(unplayed(l)) & [\mbox{def . of unplayed\_L(join(e,l))}] \\
+    &\Leftrightarrow length\_L(join(e, played(l))) +
+    length\_L(unplayed(l)) & [\mbox{def . of unplayed\_L(join(e,l))}] \\
+    &\Leftrightarrow fstOfTriple(snd(e)) + length\_L(played(l)) +
+    length\_L(unplayed(l)) & [\mbox{def . of length\_L(join(e,l))}] \\
+    &\Leftrightarrow fstOfTriple(snd(e)) + (length\_L(played(l)) +
+    length\_L(unplayed(l))) & [\mbox{associativity of addition}] \\
+    &\Leftrightarrow fstOfTriple(snd(e)) + length\_L(l) &
+    [\mbox{inductive hypothesis}] \\
+    &\Leftrightarrow length\_L(join(e, l)) & [\mbox{def . of
+    length\_L(join(e,l))}]
+  \end{array}
+\]
+
+\bigskip
+
+Case 2: e's $PlayedOrNot = NotP$
+
+\bigskip
+
+\[
+  \begin{array}{ll@{\hspace{2em}}l}
+    & length\_L(played(join(e, l))) + length\_L(unplayed(join(e, l))) \\
+    &\Leftrightarrow length\_L(played(join(e, l))) +
+    length\_L(unplayed(l)) & [\mbox{def . of unplayed\_L(join(e,l))}] \\
+    &\Leftrightarrow length\_L(join(e, played(l))) +
+    length\_L(unplayed(l)) & [\mbox{def . of unplayed\_L(join(e,l))}] \\
+    &\Leftrightarrow fstOfTriple(snd(e)) + length\_L(played(l)) +
+    length\_L(unplayed(l)) & [\mbox{def . of length\_L(join(e,l))}] \\
+    &\Leftrightarrow fstOfTriple(snd(e)) + (length\_L(played(l)) +
+    length\_L(unplayed(l))) & [\mbox{associativity of addition}] \\
+    &\Leftrightarrow fstOfTriple(snd(e)) + length\_L(l) &
+    [\mbox{inductive hypothesis}] \\
+    &\Leftrightarrow length\_L(join(e, l)) & [\mbox{def . of
+    length\_L(join(e,l))}]
+  \end{array}
+\]
+
+\bigskip
+
+Having shown both cases result in the same outcome, we can unify our
+cases and conclude:
+
+\bigskip
+
+\noindent
+$length\_L(played(l)) + length\_L(unplayed(l)) = length\_L(l) \implies \\
+\quad length\_L(played(join(e, l))) + length\_L(unplayed(join(e, l)))
+= length\_L(join(e, l))$
 
 \newpage
 

@@ -536,7 +536,8 @@ end
 
 TEXT: The played list of any given list is a new list, which recursively includes or excludes each ListElement based on the PlayedOrNot free type value of Played found in the second position of the triple found in the second element of the tuple of each ListElement. 
 
-(c) forall l : List | length_L(played_L(l)) + length_L(unplayed_L(l)) = length_L(l)
+(c) TEXT: Prove 
+forall l : List | length_L(played_L(l)) + length_L(unplayed_L(l)) = length_L(l)
 
 TEXT: To use proof by induction, we need to prove the base case and the inductive case. The base case occurs when the List is nil.
 
@@ -547,7 +548,42 @@ length_L(nil) + length_L(nil)             [(un)played_L(nil) = nil]
 0                                         [arithmetic]
 length_L(nil)                             [length_L(nil) = 0]
 
-TEXT: In the above, we use each of the definitions of played_L(nil), unplayed_L(nil), and length_L(nil) to prove our base case. 
+TEXT: In the above, we use each of the definitions of played_L(nil), unplayed_L(nil), and length_L(nil) to prove our base case.  Now we have to move to our inductive case 
+
+length_L(played(l)) + length_L(unplayed(l)) = length_L(l) => \
+  length_L(played(join(e, l))) + length_L(unplayed(join(e, l))) = length_L(join(e, l))
+
+TEXT: To establish this implication is true, we must prove it all cases. For this statement, e : ListElement is included in played_L's output or unplayed_L's output based on the value of its free type PlayedOrNot, which can only have one of two states that map directly to these two outcomes.  Therefore, we have two cases, one where e's PlayedOrNot value is Played and another where the value is NotP.
+
+PAGEBREAK:
+
+TEXT: Case 1: e's PlayedOrNot = Played
+
+EQUIV:
+length_L(played(join(e, l))) + length_L(unplayed(join(e, l)))
+length_L(played(join(e, l))) + length_L(unplayed(l))                [def. of unplayed_L(join(e, l))]
+length_L(join(e, played(l))) + length_L(unplayed(l))                [def. of unplayed_L(join(e, l))]
+fstOfTriple(snd(e)) + length_L(played(l)) + length_L(unplayed(l))   [def. of length_L(join(e, l))]
+fstOfTriple(snd(e)) + (length_L(played(l)) + length_L(unplayed(l))) [associativity of addition]
+fstOfTriple(snd(e)) + length_L(l)                                   [inductive hypothesis]
+length_L(join(e, l))                                                [def. of length_L(join(e, l))]
+
+TEXT: Case 2: e's PlayedOrNot = NotP
+
+EQUIV:
+length_L(played(join(e, l))) + length_L(unplayed(join(e, l)))
+length_L(played(join(e, l))) + length_L(unplayed(l))                [def. of unplayed_L(join(e, l))]
+length_L(join(e, played(l))) + length_L(unplayed(l))                [def. of unplayed_L(join(e, l))]
+fstOfTriple(snd(e)) + length_L(played(l)) + length_L(unplayed(l))   [def. of length_L(join(e, l))]
+fstOfTriple(snd(e)) + (length_L(played(l)) + length_L(unplayed(l))) [associativity of addition]
+fstOfTriple(snd(e)) + length_L(l)                                   [inductive hypothesis]
+length_L(join(e, l))                                                [def. of length_L(join(e, l))]
+
+TEXT: Having shown both cases result in the same outcome, we can unify our cases and conclude:
+
+length_L(played(l)) + length_L(unplayed(l)) = length_L(l) => \
+  length_L(played(join(e, l))) + length_L(unplayed(join(e, l))) = length_L(join(e, l))
+
 
 PAGEBREAK:
 
