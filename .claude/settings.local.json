@@ -1,8 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Read(//Users/jfreeman/Coding/fuzz/**)",
-      "Read(//tmp/**)",
+      "Read(//Users/jfreeman/Coding/fuzz/txt2tex/sem/**)",
       "Bash(hatch run convert:*)",
       "Bash(git add:*)",
       "Bash(git push:*)",
@@ -11,15 +10,12 @@
       "Bash(hatch run format:*)",
       "Bash(hatch run lint:*)",
       "Bash(hatch run:*)",
-      "Bash(python:*)",
       "Bash(../txt2pdf.sh:*)",
       "Bash(find:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nUpdate STATUS.md for Phase 24\n\n- Updated current phase to Phase 24 (Whitespace-Sensitive ^ Operator)\n- Updated test count from 897 to 941 tests\n- Added Phase 24 to completed milestones list\n- Added Phase 24 to phase history with details\n- Updated sequences feature to clarify space requirement for ^ concatenation\n- Referenced Phase 24 enhancement in Phase 14 ASCII sequences section\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git commit:*)",
       "Bash(fuzz:*)",
       "Bash(sed:*)",
       "Bash(./txt2pdf.sh:*)",
-      "Bash(python3:*)",
       "Bash(make)",
       "Bash(make clean:*)"
     ],
