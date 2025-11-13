@@ -1,11 +1,11 @@
 # Z Notation Feature Gap Analysis
 
-**Last Updated:** 2025-10-27
+**Last Updated:** 2025-11-01
 **Status:** All homework features working ✅
 
 **See also:** [FUZZ_VS_STD_LATEX.md](FUZZ_VS_STD_LATEX.md) for differences between fuzz and standard LaTeX that affect how features render in PDFs.
 
-**Note:** This document was validated against source code and fuzz manual on 2025-10-27.
+**Note:** This document was validated against source code and fuzz manual on 2025-11-01.
 
 ---
 
@@ -116,6 +116,7 @@ Based on fuzz manual Section 7 (Syntax Summary, pages 54-59).
 | Set comprehension | `\{ Schema-Text [@ Expression] \}` | ✅ | parser.py:1295 | |
 | Sequence literal | `\langle [Expr, ..., Expr] \rangle` | ✅ | parser.py:1508 | Phase 12 |
 | Bag literal | `\lbag [Expr, ..., Expr] \rbag` | ✅ | parser.py:1530 | Phase 12 |
+| Sequence functions | `\head`, `\tail`, `\rev`, etc. | ✅ | parser.py:1188 | Phase 12 |
 | Tuple | `(Expression, ..., Expression)` | ✅ | parser.py:1615 | |
 | Theta expression | `\theta Schema-Name Decoration [Renaming]` | ❌ | - | Requires renaming (not implemented) |
 | Tuple projection | `Expression-4 . Var-Name` | ⚠️ | parser.py:1570 | Named fields only; numeric (.1, .2) NOT supported |

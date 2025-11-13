@@ -1786,7 +1786,7 @@ List ::= nil | cons⟨N × List⟩
 - Reverse: `rev s`
 - Extraction: `s(i)` (element at position)
 - Distributed concatenation: `cat/s`
-- Squash: `squash R`
+- Squash: `squash R` (not implemented - not built into fuzz)
 
 **Input Format**:
 ```
