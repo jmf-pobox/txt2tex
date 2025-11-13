@@ -1,7 +1,5 @@
 === User-Defined Squash Function ===
 
-given X
-
 TEXT: The squash operator appears in the Z notation glossary but is not built into the fuzz type-checker. However, we can define it ourselves as a user-defined function using an axiomatic specification.
 
 TEXT: Squash takes a partial function from N1 (positive naturals) to some type X and compacts it into a sequence by removing gaps in the domain. For example, {1 |-> a, 3 |-> b, 7 |-> c} becomes <a, b, c>.
@@ -10,13 +8,13 @@ TEXT: Squash takes a partial function from N1 (positive naturals) to some type X
 
 TEXT: We define squash axiomatically by specifying its key properties using only fuzz-compatible notation.
 
-axdef
-  squash : (N1 +-> X) -> seq X
+gendef [X]
+  squashFunc : (N1 +-> X) -> seq X
 where
-  (forall f : (N1 +-> X) | ran (squash f) = ran f and # (squash f) = # (ran f))
+  (forall f : (N1 +-> X) | ran (squashFunc f) = ran f and # (squashFunc f) = # (ran f))
 end
 
-TEXT: This axiomatically defines squash with two key properties that hold for all partial functions f from N1 to X: (1) squash preserves the range: ran (squash f) = ran f, and (2) the resulting sequence length equals the range cardinality: # (squash f) = # (ran f). These properties characterize squash as compacting partial functions by removing domain gaps while preserving all elements and their relative order.
+TEXT: This axiomatically defines squashFunc (a user-defined version of squash) with two key properties that hold for all partial functions f from N1 to X: (1) squashFunc preserves the range: ran (squashFunc f) = ran f, and (2) the resulting sequence length equals the range cardinality: # (squashFunc f) = # (ran f). These properties characterize squashFunc as compacting partial functions by removing domain gaps while preserving all elements and their relative order.
 
 ** Example 2: Using Squash on a Simple Function **
 
@@ -26,7 +24,7 @@ axdef
   f1 : N1 +-> N
   s1 : seq N
 where
-  f1 = {1 |-> 10, 3 |-> 30, 5 |-> 50} and s1 = squash f1
+  f1 = {1 |-> 10, 3 |-> 30, 5 |-> 50} and s1 = squashFunc f1
 end
 
 TEXT: The result s1 is <10, 30, 50>, containing exactly the range elements in the order of their original indices.
@@ -36,10 +34,14 @@ TEXT: The result s1 is <10, 30, 50>, containing exactly the range elements in th
 given Letter
 
 axdef
+  a : Letter
+  b : Letter
+  c : Letter
+  d : Letter
   f2 : N1 +-> Letter
   s2 : seq Letter
 where
-  f2 = {2 |-> a, 4 |-> b, 7 |-> c, 9 |-> d} and s2 = squash f2
+  f2 = {2 |-> a, 4 |-> b, 7 |-> c, 9 |-> d} and s2 = squashFunc f2
 end
 
 TEXT: The result s2 is <a, b, c, d>. The gaps at positions 1, 3, 5, 6, 8 are removed.
@@ -50,7 +52,7 @@ axdef
   f3 : N1 +-> N
   s3 : seq N
 where
-  f3 = {} and s3 = squash f3
+  f3 = {} and s3 = squashFunc f3
 end
 
 TEXT: Squashing an empty function yields an empty sequence: s3 = <>.
@@ -61,23 +63,23 @@ axdef
   f4 : N1 +-> N
   s4 : seq N
 where
-  f4 = {1 |-> 100, 2 |-> 200, 3 |-> 300} and s4 = squash f4
+  f4 = {1 |-> 100, 2 |-> 200, 3 |-> 300} and s4 = squashFunc f4
 end
 
-TEXT: When the function has no gaps (dom f4 = 1..3), squash simply converts it to a sequence: s4 = <100, 200, 300>.
+TEXT: When the function has no gaps (dom f4 = 1..3), squashFunc simply converts it to a sequence: s4 = <100, 200, 300>.
 
 ** Example 6: Relationship Between Function and Sequence **
 
-TEXT: For any partial function f with a continuous domain starting at 1, squash is the identity.
+TEXT: For any partial function f with a continuous domain starting at 1, squashFunc is the identity.
 
 axdef
-  continuous : N1 +-> X
-  s_continuous : seq X
+  continuous_N : N1 +-> N
+  s_continuous_N : seq N
 where
-  dom continuous = 1 .. # (ran continuous) and s_continuous = squash continuous
+  dom continuous_N = 1 .. # (ran continuous_N) and s_continuous_N = squashFunc continuous_N
 end
 
-TEXT: In this case, continuous is already a sequence, and squash continuous = continuous as a sequence.
+TEXT: In this case, continuous_N is already a sequence, and squashFunc continuous_N = continuous_N as a sequence.
 
 ** Example 7: Squash Preserves Injectivity **
 
@@ -87,7 +89,7 @@ axdef
   inj_func : N1 +-> N
   inj_seq : seq N
 where
-  (forall i, j : dom inj_func | inj_func i = inj_func j => i = j) and inj_seq = squash inj_func
+  (forall i, j : dom inj_func | inj_func i = inj_func j => i = j) and inj_seq = squashFunc inj_func
 end
 
 TEXT: Since inj_func is injective (one-to-one), inj_seq contains no duplicate elements.
@@ -100,7 +102,7 @@ axdef
   sparse_catalog : N1 +-> (VideoID cross Title)
   compact_catalog : seq (VideoID cross Title)
 where
-  compact_catalog = squash sparse_catalog
+  compact_catalog = squashFunc sparse_catalog
 end
 
 TEXT: A sparse catalog with gaps (deleted entries) can be compacted into a continuous sequence while preserving the order of remaining entries.
