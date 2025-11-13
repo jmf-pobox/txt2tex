@@ -1052,6 +1052,11 @@ class LaTeXGenerator:
         domain_latex = self.generate_expr(node.domain)
         range_latex = self.generate_expr(node.range)
 
+        # Add parentheses to domain if it's a function type
+        # (N1 +-> X) -> seq X should generate as (\nat_1 \pfun X) \fun \seq X
+        if isinstance(node.domain, FunctionType):
+            domain_latex = f"({domain_latex})"
+
         # Add parentheses to range if it's also a function type (for clarity)
         # Function types are right-associative: A -> B -> C means A -> (B -> C)
         if isinstance(node.range, FunctionType):
