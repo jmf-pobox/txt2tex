@@ -120,13 +120,13 @@ Sequence$ \filter $(filter) is different from range restriction ($\rres$):
 
 \bigskip
 
-filtered_seq is $\langle 2, 3, 4 \rangle$ (sequence $elements \in A$)
+filtered\_seq is $\langle 2, 3, 4 \rangle$ (sequence $elements \in A$)
 
 \bigskip
 
 \bigskip
 
-restricted_rel is $\{1 \mapsto 10, 2 \mapsto 20\}$ (relation pairs
+restricted\_rel is $\{1 \mapsto 10, 2 \mapsto 20\}$ (relation pairs
 with range in $\{10, 20\}$)
 
 \bigskip
@@ -144,7 +144,7 @@ with range in $\{10, 20\}$)
 \end{zed}
 
 \begin{axdef}
-  catalog4 : \seq ((Title4 \cross Length4) \cross Rating4) \\
+  catalog4 : \seq (Title4 \cross Length4 \cross Rating4) \\
   family\_friendly4 : \power Rating4
   \where
   family\_friendly4 = \{G4, PG4\}
@@ -152,7 +152,7 @@ with range in $\{10, 20\}$)
 
 \bigskip
 
-The family_friendly set contains ratings G and PG. A$ \filter $could
+The family\_friendly set contains ratings G and PG. A$ \filter $could
 be applied to the catalog sequence to only include entries with
 ratings in this set.
 
