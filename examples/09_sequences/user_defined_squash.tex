@@ -2,15 +2,12 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
 \usepackage{natbib}
-\usepackage{zed-cm}
+\usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \begin{document}
 
 \section*{User - Defined Squash Function}
-
-\begin{zed}[X]
-\end{zed}
 
 \bigskip
 
@@ -42,21 +39,22 @@ only fuzz-compatible notation.
 
 \bigskip
 
-\begin{axdef}
-  squash : \mathbb{N}_1 \pfun X \fun \seq X
+\begin{gendef}[X]
+  squashFunc: (\nat_1 \pfun X) \fun \seq X
   \where
-  \forall f \colon \mathbb{N}_1 \pfun X \bullet \ran squash(f) = \ran
-  f \land \# squash(f) = \# \ran f
-\end{axdef}
+  \forall f : \nat_1 \pfun X @ \ran (squashFunc(f)) = \ran f \land \#
+  (squashFunc(f)) = \# (\ran f)
+\end{gendef}
 
 \bigskip
 
-This axiomatically defines squash with two key properties that hold
-for all partial functions f from N1 to X: (1) squash preserves the
-$range : ran (squash f) $= ran f, and (2) the resulting sequence
-length equals the range cardinality: # (squash f) = # (ran f). These
-properties characterize squash as compacting partial functions by
-removing domain gaps while preserving all elements and their relative order.
+This axiomatically defines squashFunc (a user-defined version of
+squash) with two key properties that hold for all partial functions f
+from N1 to X: (1) squashFunc preserves the $range : ran (squashFunc
+f) $= ran f, and (2) the resulting sequence length equals the range
+cardinality: # (squashFunc f) = # (ran f). These properties
+characterize squashFunc as compacting partial functions by removing
+domain gaps while preserving all elements and their relative order.
 
 \bigskip
 
@@ -73,10 +71,10 @@ Demonstrate squash on a sparse partial function.
 \bigskip
 
 \begin{axdef}
-  f1 : \mathbb{N}_1 \pfun \mathbb{N} \\
-  s1 : \seq \mathbb{N}
+  f1 : \nat_1 \pfun \nat \\
+  s1 : \seq \nat
   \where
-  f1 = \{1 \mapsto 10, 3 \mapsto 30, 5 \mapsto 50\} \land s1 = squash(f1)
+  f1 = \{1 \mapsto 10, 3 \mapsto 30, 5 \mapsto 50\} \land s1 = squashFunc(f1)
 \end{axdef}
 
 \bigskip
@@ -96,11 +94,15 @@ range elements in the order of their original indices.
 \end{zed}
 
 \begin{axdef}
-  f2 : \mathbb{N}_1 \pfun Letter \\
+  a : Letter \\
+  b : Letter \\
+  c : Letter \\
+  d : Letter \\
+  f2 : \nat_1 \pfun Letter \\
   s2 : \seq Letter
   \where
   f2 = \{2 \mapsto a, 4 \mapsto b, 7 \mapsto c, 9 \mapsto d\} \land
-  s2 = squash(f2)
+  s2 = squashFunc(f2)
 \end{axdef}
 
 \bigskip
@@ -117,10 +119,10 @@ The result s2 is $\langle a, b, c, d \rangle$. The gaps at positions
 \medskip
 
 \begin{axdef}
-  f3 : \mathbb{N}_1 \pfun \mathbb{N} \\
-  s3 : \seq \mathbb{N}
+  f3 : \nat_1 \pfun \nat \\
+  s3 : \seq \nat
   \where
-  f3 = \{\} \land s3 = squash(f3)
+  f3 = \{\} \land s3 = squashFunc(f3)
 \end{axdef}
 
 \bigskip
@@ -136,15 +138,15 @@ Squashing an empty function yields an empty $sequence : s3 $= $\langle \rangle$.
 \medskip
 
 \begin{axdef}
-  f4 : \mathbb{N}_1 \pfun \mathbb{N} \\
-  s4 : \seq \mathbb{N}
+  f4 : \nat_1 \pfun \nat \\
+  s4 : \seq \nat
   \where
-  f4 = \{1 \mapsto 100, 2 \mapsto 200, 3 \mapsto 300\} \land s4 = squash(f4)
+  f4 = \{1 \mapsto 100, 2 \mapsto 200, 3 \mapsto 300\} \land s4 = squashFunc(f4)
 \end{axdef}
 
 \bigskip
 
-When the function has no gaps (dom $f4 = 1$..3), squash simply
+When the function has no gaps (dom $f4 = 1$..3), squashFunc simply
 converts it to a $sequence : s4 $= $\langle 100, 200, 300 \rangle$.
 
 \bigskip
@@ -158,22 +160,22 @@ converts it to a $sequence : s4 $= $\langle 100, 200, 300 \rangle$.
 \bigskip
 
 For any partial function f with a continuous domain starting at 1,
-squash is the identity.
+squashFunc is the identity.
 
 \bigskip
 
 \begin{axdef}
-  continuous : \mathbb{N}_1 \pfun X \\
-  \mathit{s\_continuous} : \seq X
+  continuous\_N : \nat_1 \pfun \nat \\
+  s\_continuous\_N : \seq \nat
   \where
-  \dom continuous = 1 \upto \# \ran continuous \land
-  \mathit{s\_continuous} = squash(continuous)
+  \dom continuous\_N = 1 \upto \# (\ran continuous\_N) \land
+  s\_continuous\_N = squashFunc(continuous\_N)
 \end{axdef}
 
 \bigskip
 
-In this case, continuous is already a sequence, and squash
-$continuous = continuous$ as a sequence.
+In this case, continuous\_N is already a sequence, and squashFunc
+$continuous\_N = continuous\_N$ as a sequence.
 
 \bigskip
 
@@ -190,17 +192,16 @@ If the input function is injective, the output sequence has no duplicates.
 \bigskip
 
 \begin{axdef}
-  \mathit{inj\_func} : \mathbb{N}_1 \pfun \mathbb{N} \\
-  \mathit{inj\_seq} : \seq \mathbb{N}
+  inj\_func : \nat_1 \pfun \nat \\
+  inj\_seq : \seq \nat
   \where
-  (\forall i, j \colon \dom \mathit{inj\_func} \bullet
-  \mathit{inj\_func}(i) = \mathit{inj\_func}(j) \Rightarrow i = j)
-  \land \mathit{inj\_seq} = squash(\mathit{inj\_func})
+  (\forall i, j : \dom inj\_func @ inj\_func(i) = inj\_func(j)
+  \implies i = j) \land inj\_seq = squashFunc(inj\_func)
 \end{axdef}
 
 \bigskip
 
-Since inj_func is injective (one-to-one), inj_seq contains no
+Since inj\_func is injective (one-to-one), inj\_seq contains no
 duplicate elements.
 
 \bigskip
@@ -215,10 +216,10 @@ duplicate elements.
 \end{zed}
 
 \begin{axdef}
-  \mathit{sparse\_catalog} : \mathbb{N}_1 \pfun (VideoID \cross Title) \\
-  \mathit{compact\_catalog} : \seq (VideoID \cross Title)
+  sparse\_catalog : \nat_1 \pfun (VideoID \cross Title) \\
+  compact\_catalog : \seq (VideoID \cross Title)
   \where
-  \mathit{compact\_catalog} = squash(\mathit{sparse\_catalog})
+  compact\_catalog = squashFunc(sparse\_catalog)
 \end{axdef}
 
 \bigskip
