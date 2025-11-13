@@ -2,7 +2,7 @@
 
 **Purpose**: This document captures important differences between fuzz (Mike Spivey's Z notation typesetter) and standard LaTeX that affect txt2tex code generation.
 
-**Last Updated**: 2025-10-27
+**Last Updated**: 2025-11-01
 
 ---
 
@@ -105,13 +105,43 @@ if self.use_fuzz and isinstance(node.operand, FunctionApp):
     operand = f"({operand})"  # Generates: # (s(i))
 ```
 
-**Reference**: [latex_gen.py:427-431](../src/txt2tex/latex_gen.py:427-431)
+**Reference**: [latex_gen.py:510-514](../src/txt2tex/latex_gen.py:510-514)
 
 **Example**:
 ```
 Input:  # s(i)
 Fuzz:   # (s(i))    ← Parentheses required
 LaTeX:  \# s(i)     ← No parentheses needed
+```
+
+### Cardinality with Function-Like Operators
+
+**Issue**: In fuzz, `#` also binds less tightly than function-like unary operators (e.g., `dom`, `ran`, `head`, `squash`)
+
+**Standard LaTeX/Z**: `# dom R` might be ambiguous
+**Fuzz**: `# dom R` is parsed as `(# dom) R`, not `# (dom R)`
+
+**txt2tex solution**: Add parentheses around function-like operators when they're operands of `#` in fuzz mode:
+
+```python
+# Function-like operators that need parentheses with #
+function_like_ops = {
+    "dom", "ran", "inv", "id",
+    "head", "tail", "last", "front", "rev",
+    "P", "P1", "F", "F1", "bigcup", "bigcap",
+}
+if self.use_fuzz and node.operator == "#" and isinstance(node.operand, UnaryOp):
+    if node.operand.operator in function_like_ops:
+        operand = f"({operand})"  # Generates: # (squash f)
+```
+
+**Reference**: [latex_gen.py:519-542](../src/txt2tex/latex_gen.py:519-542)
+
+**Example**:
+```
+Input:  # head s
+Fuzz:   # (\head s)     ← Parentheses required
+LaTeX:  \# \head s      ← No parentheses needed
 ```
 
 ---
