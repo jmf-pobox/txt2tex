@@ -113,9 +113,9 @@ LATEX: \mycustomcommand{arg1}{arg2}
 
 **Bibliography Setup (Harvard Style):**
 
-txt2tex automatically includes the `natbib` package for author-year citations. You can manage bibliographies in two ways:
+txt2tex automatically includes the `natbib` package for author-year citations. You can manage bibliographies using either approach:
 
-**Option 1: Bibliography File (Recommended)**
+**Bibliography File Approach (Recommended)**
 
 Use a separate `.bib` file with document-level directives:
 
@@ -134,9 +134,9 @@ The build process will automatically run BibTeX to process citations. The biblio
 
 Note: The `harvard` style is not a standard BibTeX style. Use `plainnat` for author-year citations similar to Harvard style.
 
-**Option 2: Manual LATEX Blocks**
+**Manual Bibliography Approach**
 
-Use LATEX: blocks to define your bibliography manually:
+For custom formatting or when you don't have a `.bib` file, use LATEX: blocks to define your bibliography manually:
 
 ```
 LATEX: \setlength{\leftskip}{0pt}
