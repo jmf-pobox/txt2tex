@@ -240,6 +240,8 @@ class LaTeXGenerator:
         # Load amssymb for \mathbb{N} and \mathbb{Z} blackboard bold
         # Note: amsmath removed - using array{lll} instead of align* for EQUIV
         lines.append(r"\usepackage{amssymb}")  # For \mathbb{N} and \mathbb{Z}
+        # Load adjustbox for scaling wide elements to fit page width
+        lines.append(r"\usepackage{adjustbox}")
         # Load natbib for author-year citations (Harvard style)
         lines.append(r"\usepackage{natbib}")
         if self.use_fuzz:
@@ -2709,11 +2711,20 @@ class LaTeXGenerator:
         return result
 
     def _generate_truth_table(self, node: TruthTable) -> list[str]:
-        """Generate LaTeX for truth table (centered)."""
+        """Generate LaTeX for truth table (centered, with auto-scaling if needed)."""
         lines: list[str] = []
 
         # Center the table
         lines.append(r"\begin{center}")
+
+        # Calculate available width (account for \leftskip if in inline part)
+        if self._in_inline_part:
+            max_width = r"\dimexpr\textwidth-\leftskip\relax"
+        else:
+            max_width = r"\textwidth"
+
+        # Wrap table in adjustbox to scale if wider than available width
+        lines.append(r"\adjustbox{max width=" + max_width + r"}{%")
 
         # Start table environment with vertical bars between columns (not at edges)
         # Spacing is controlled by part labels
@@ -2747,7 +2758,9 @@ class LaTeXGenerator:
                     row_parts.append(r"\textit{" + cell + r"}")
             lines.append(" & ".join(row_parts) + r" \\")
 
-        lines.append(r"\end{tabular}")
+        lines.append(r"\end{tabular}%")
+        # Close adjustbox wrapper
+        lines.append(r"}")
         lines.append(r"\end{center}")
         lines.append("")
 
@@ -2860,13 +2873,23 @@ class LaTeXGenerator:
         Uses standard LaTeX array instead of amsmath align* to avoid
         package dependency. Wraps array in display math \[...\] for proper
         spacing without confusing fuzz type checker. Centers the entire block
-        and right-aligns justifications.
+        and right-aligns justifications. Auto-scales if wider than page.
         """
         lines: list[str] = []
 
         # Center the entire equivalence chain
         # The center environment will center the display math block
         lines.append(r"\begin{center}")
+
+        # Calculate available width (account for \leftskip if in inline part)
+        if self._in_inline_part:
+            max_width = r"\dimexpr\textwidth-\leftskip\relax"
+        else:
+            max_width = r"\textwidth"
+
+        # Wrap in adjustbox to scale if wider than available width
+        lines.append(r"\adjustbox{max width=" + max_width + r"}{%")
+
         lines.append(r"$\displaystyle")
         # Use l@{\hspace{2em}}r: left-aligned expressions, right-aligned justifications
         lines.append(r"\begin{array}{l@{\hspace{2em}}r}")
@@ -2896,7 +2919,9 @@ class LaTeXGenerator:
         # Reset context
         self._in_equiv_block = False
 
-        lines.append(r"\end{array}$")
+        lines.append(r"\end{array}$%")
+        # Close adjustbox wrapper
+        lines.append(r"}")
         lines.append(r"\end{center}")
         lines.append("")
 
@@ -3157,7 +3182,7 @@ class LaTeXGenerator:
         return lines
 
     def _generate_proof_tree(self, node: ProofTree) -> list[str]:
-        """Generate LaTeX for proof tree using \\infer macros from zed-proof.sty."""
+        """Generate LaTeX for proof tree (auto-scales if needed)."""
         lines: list[str] = []
 
         # Start PROOF block on a new line relative to part label
@@ -3165,11 +3190,23 @@ class LaTeXGenerator:
 
         # Center the proof tree
         lines.append(r"\begin{center}")
+
+        # Calculate available width (account for \leftskip if in inline part)
+        if self._in_inline_part:
+            max_width = r"\dimexpr\textwidth-\leftskip\relax"
+        else:
+            max_width = r"\textwidth"
+
+        # Wrap in adjustbox to scale if wider than available width
+        lines.append(r"\adjustbox{max width=" + max_width + r"}{%")
+
         # Generate proof tree in display math
         proof_latex = self._generate_proof_node_infer(node.conclusion)
         lines.append(r"$\displaystyle")
         lines.append(proof_latex)
-        lines.append(r"$")
+        lines.append(r"$%")
+        # Close adjustbox wrapper
+        lines.append(r"}")
         lines.append(r"\end{center}")
         lines.append("")
 
