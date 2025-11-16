@@ -1,6 +1,6 @@
 TITLE: Software Engineering Mathematics
+AUTHOR: Anonymised Submission
 SUBTITLE: Software Engineering Programme
-AUTHOR: Dr. Andrew Simpson
 DATE: October 2025
 INSTITUTION: University of Oxford
 
@@ -431,9 +431,13 @@ TEXT: In the above, we use each of the individual played(), unplayed(), and leng
 
 TEXT: A playlist element is of type ((dom status) cross N).  We now seek to prove the inductive hypothesis, which follows the form of induction for sequences and which is an implication [cite simpson-notes page 157].
 
+zed
+
 forall t : PossiblePlaylist | (forall ple : ((dom status) cross N) | \
   length(played(t)) + length(unplayed(t)) = length(t) => \
   length(played(<ple> ^ t)) + length(unplayed(<ple> ^ t)) = length(<ple> ^ t))
+
+end
 
 TEXT: The status of a playlist element is of type (PlayedOrNot, SavedOrNot). The inductive hypothesis proof begins by establishing that there are two mutually exclusive and exhaustive cases: one where the playlist element's PlayedOrNot free type value is Played and another where it is NotP.  The proof will establish that for both cases, the same conclusion can be proven. The proof relies upon the inductive hypothesis length(played(t)) + length(unplayed(t)) = length(t). 
 

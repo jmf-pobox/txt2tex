@@ -7,7 +7,7 @@
 \usepackage{zed-proof}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \title{Software Engineering Mathematics}
-\author{Dr. Andrew Simpson \thanks{Software Engineering Programme}
+\author{Anonymised Submission \thanks{Software Engineering Programme}
 \thanks{University of Oxford}}
 \date{October 2025}
 \begin{document}
@@ -967,12 +967,13 @@ now seek to prove the inductive hypothesis, which follows the form of
 induction for sequences and which is an implication \citep[page
 157]{simpson-notes}.
 
-\noindent
-$\forall t : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
-\quad length(played(t)) + length(unplayed(t)) = length(t) \implies \\
-\quad length(played(\langle ple \rangle \cat t)) +
-length(unplayed(\langle ple \rangle \cat t)) = length(\langle ple
-\rangle \cat t)$
+\begin{zed}
+  \forall t : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
+  \quad length(played(t)) + length(unplayed(t)) = length(t) \implies \\
+  \quad length(played(\langle ple \rangle \cat t)) +
+  length(unplayed(\langle ple \rangle \cat t)) = length(\langle ple
+  \rangle \cat t)
+\end{zed}
 
 \bigskip
 
@@ -1241,9 +1242,12 @@ played\_L(nil), unplayed\_L(nil), and length\_L(nil) to prove our
 base case.  Now we have to move to our inductive case
 
 \noindent
-$length\_L(played(l)) + length\_L(unplayed(l)) = length\_L(l) \implies \\
-\quad length\_L(played(join(e, l))) + length\_L(unplayed(join(e, l)))
-= length\_L(join(e, l))$
+$\displaystyle
+\begin{array}{l}
+  length\_L(played(l)) + length\_L(unplayed(l)) = length\_L(l) \implies \\
+  \quad length\_L(played(join(e, l))) + length\_L(unplayed(join(e,
+  l))) = length\_L(join(e, l))
+\end{array}$
 
 \bigskip
 
