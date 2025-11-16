@@ -15,12 +15,20 @@ October 2025
 
 \bigskip
 
+Dr. Andrew Simpson
+
+\bigskip
+
+University of Oxford
+
+\bigskip
+
+Software Engineering Progamme
+
 \bigskip
 
 Answers use the order of precedence ($\lnot$, $\land$, $\lor$,
 $\Rightarrow$, $\Leftrightarrow$) \citep[Slide 20]{simpson25a}.
-
-\bigskip
 
 \bigskip
 \noindent
@@ -31,8 +39,6 @@ $\Rightarrow$, $\Leftrightarrow$) \citep[Slide 20]{simpson25a}.
 \bigskip
 
 Lecture 1 - Propositions
-
-\bigskip
 
 (a)
 \par
@@ -49,8 +55,6 @@ Lecture 1 - Propositions
 
 $p \implies (\lnot p \implies p)$ is a tautology as it is true for
 every interpretation of p as illustrated by the final column of truth values.
-
-\bigskip
 
 \medskip
 
@@ -78,8 +82,6 @@ The statements $(\lnot p \implies \lnot q)$, $(q \implies p)$ are
 equivalent and $(\lnot p \implies \lnot q) \iff (q \implies p)$ is a
 tautology as it is true for every interpretation of p, q as
 illustrated by the final column of truth values.
-
-\bigskip
 
 \medskip
 
@@ -117,8 +119,6 @@ r))$ $\Leftrightarrow$ $((p \lor q) \implies r)$ is a tautology as it
 is true for every interpretation of p, q, r as illustrated by the
 final column of truth values.
 
-\bigskip
-
 \newpage
 
 \medskip
@@ -133,19 +133,18 @@ final column of truth values.
 
 Lecture 1 - Propositions
 
-\bigskip
-
 (a)
 \par
 \vspace{11pt}
+\noindent
 \[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & p \implies (\lnot p \implies p) \\
-    &\Leftrightarrow p \implies (\lnot \lnot p \lor p) &
+  \begin{array}{l@{\hspace{2em}}l}
+    p \implies (\lnot p \implies p) \\
+    \Leftrightarrow p \implies (\lnot \lnot p \lor p) &
     [\mbox{$\Rightarrow$ disjunction}] \\
-    &\Leftrightarrow p \implies (p \lor p) & [\mbox{$\lnot$ $\lnot$}] \\
-    &\Leftrightarrow p \implies p & [\mbox{idempotence of p}] \\
-    &\Leftrightarrow true & [\mbox{tautology}]
+    \Leftrightarrow p \implies (p \lor p) & [\mbox{$\lnot$ $\lnot$}] \\
+    \Leftrightarrow p \implies p & [\mbox{idempotence of p}] \\
+    \Leftrightarrow true & [\mbox{tautology}]
   \end{array}
 \]
 
@@ -157,21 +156,20 @@ a logical or, the definition of double negation to simplify, the
 application of the idempotence rule to simplify, and the fact that $p
 \implies p$ is a tautology.
 
-\bigskip
-
 \medskip
 
 (b)
 \par
 \vspace{11pt}
+\noindent
 \[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & (\lnot p \implies \lnot q) \\
-    &\Leftrightarrow (\lnot \lnot p \lor \lnot q) &
+  \begin{array}{l@{\hspace{2em}}l}
+    (\lnot p \implies \lnot q) \\
+    \Leftrightarrow (\lnot \lnot p \lor \lnot q) &
     [\mbox{$\Rightarrow$ disjunction}] \\
-    &\Leftrightarrow (p \lor \lnot q) & [\mbox{$\lnot$ $\lnot$}] \\
-    &\Leftrightarrow (\lnot q \lor p) & [\mbox{commutativity of $\lor$}] \\
-    &\Leftrightarrow q \implies p & [\mbox{$\Rightarrow$ disjunction}]
+    \Leftrightarrow (p \lor \lnot q) & [\mbox{$\lnot$ $\lnot$}] \\
+    \Leftrightarrow (\lnot q \lor p) & [\mbox{commutativity of $\lor$}] \\
+    \Leftrightarrow q \implies p & [\mbox{$\Rightarrow$ disjunction}]
   \end{array}
 \]
 
@@ -184,26 +182,25 @@ simplify, the commutivity property of logical or to change the order
 of the elements, and the implication disjunction rule to reintroduce
 implication.
 
-\bigskip
-
 \medskip
 
 (c)
 \par
 \vspace{11pt}
+\noindent
 \[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & ((p \implies r) \land (q \implies r)) \\
-    &\Leftrightarrow ((\lnot p \lor r) \land (\lnot q \lor r)) &
+  \begin{array}{l@{\hspace{2em}}l}
+    ((p \implies r) \land (q \implies r)) \\
+    \Leftrightarrow ((\lnot p \lor r) \land (\lnot q \lor r)) &
     [\mbox{$\Rightarrow$ disjunction}] \\
-    &\Leftrightarrow (r \lor \lnot p) \land (r \lor \lnot q) &
+    \Leftrightarrow (r \lor \lnot p) \land (r \lor \lnot q) &
     [\mbox{commutativity of $\lor$}] \\
-    &\Leftrightarrow r \lor (\lnot p \land \lnot q) &
+    \Leftrightarrow r \lor (\lnot p \land \lnot q) &
     [\mbox{distributivity 2}] \\
-    &\Leftrightarrow (\lnot p \land \lnot q) \lor r &
+    \Leftrightarrow (\lnot p \land \lnot q) \lor r &
     [\mbox{commutativity of $\lor$}] \\
-    &\Leftrightarrow \lnot (p \lor q) \lor r & [\mbox{De Morgan}] \\
-    &\Leftrightarrow p \lor q \implies r & [\mbox{$\Rightarrow$ disjunction}]
+    \Leftrightarrow \lnot (p \lor q) \lor r & [\mbox{De Morgan}] \\
+    \Leftrightarrow p \lor q \implies r & [\mbox{$\Rightarrow$ disjunction}]
   \end{array}
 \]
 
@@ -218,8 +215,6 @@ logical or to change the order of the elements, De Morgan to extract
 negation for $(\lnot p \land \lnot q)$, and the implication
 disjunction rule to reintroduce implication.
 
-\bigskip
-
 \newpage
 
 \medskip
@@ -233,8 +228,6 @@ disjunction rule to reintroduce implication.
 \bigskip
 
 Lecture 3 - Deductive Proofs
-
-\bigskip
 
 (a)
 \par
@@ -270,8 +263,6 @@ assumption [3] would be discharged by the false-elim rule.  In the
 final proof, all assumptions are discharged properly. The key insight
 was to have p as an assumption twice at different scopes.
 
-\bigskip
-
 \medskip
 
 (b)
@@ -285,12 +276,8 @@ definition of $p \iff q$.
 
 \bigskip
 
-\bigskip
-
 In one direction, we are seeking to prove $(\lnot p \implies \lnot
 q)$ $\Rightarrow$ $(q \implies p)$:
-
-\bigskip
 
 \noindent
 $\displaystyle
@@ -338,12 +325,8 @@ top portions of my proof.  All assumptions are properly discharged.
 
 \bigskip
 
-\bigskip
-
 and in the other, we are seeking to prove $(q \implies p)$
 $\Rightarrow$ $(\lnot p \implies \lnot q)$:
-
-\bigskip
 
 \noindent
 $\displaystyle
@@ -388,12 +371,8 @@ discharged and scopes are appropriate.
 
 \bigskip
 
-\bigskip
-
 We then combine these two proofs with the $\Leftrightarrow$-intro
 rule, using the results from above:
-
-\bigskip
 
 \noindent
 $\displaystyle
@@ -414,8 +393,6 @@ $
 
 In one direction, we are seeking to prove $(p \implies r)$ and $(q
 \implies r)$ $\Rightarrow$ $(p \lor q \implies r)$:
-
-\bigskip
 
 \noindent
 $\displaystyle
@@ -476,12 +453,8 @@ the top-down and bottom-up process. All assumptions are properly discharged.
 
 \bigskip
 
-\bigskip
-
 In the other direction, we are seeking to prove $(p \lor q \implies
 r)$ $\Rightarrow$ $((p \implies r) \land (q \implies r))$:
-
-\bigskip
 
 \noindent
 $\displaystyle
@@ -540,12 +513,8 @@ proof. All assumptions are properly discharged.
 
 \bigskip
 
-\bigskip
-
 We then combine these two proofs with the $\Leftrightarrow$-intro
 rule, using the results from above:
-
-\bigskip
 
 \noindent
 $\displaystyle
@@ -577,8 +546,6 @@ sequence from a non-empty sequence of sequences; minSeq yields the
 shortest sequence from a non-empty sequence of sequences; and
 maxDiff, which fulfills the specification for Question 4.
 
-\bigskip
-
 \begin{gendef}[X]
   maxSeq: \seq_1 (\seq X) \fun \seq X \\
   minSeq: \seq_1 (\seq X) \fun \seq X \\
@@ -608,8 +575,6 @@ return a natural number as defined in the specification. This
 solution passes fuzz validation.
 
 \bigskip
-
-\bigskip
 \noindent
 \textbf{Question 5}
 
@@ -619,15 +584,11 @@ solution passes fuzz validation.
 
 The relational composition operator is associative:
 
-\bigskip
-
 \hspace*{1em} $(R \circ S) \circ T = R \circ (S \circ T)$
 
 \bigskip
 
 if $R \in W$ $\rel$ X, $S \in X$ $\rel$ Y, and $T \in Y$ $\rel$ Z.
-
-\bigskip
 
 \bigskip
 
@@ -639,32 +600,29 @@ involved. Each such repositioning or regrouping will be justified.
 
 \bigskip
 
-\bigskip
-
 Given a relation $R \in X$ $\rel$ Y and a second relation $S \in Y$
 $\rel$ Z, and two elements $x \in X$ and $z \in Z$, x $\mapsto$ $z
 \in R$ $\circ$ S $\Leftrightarrow$ $\exists y : Y @ x \mapsto y \in R
 \land y \mapsto z \in S$ \citep[page 107]{simpson-notes}.
 
-\bigskip
-
+\noindent
 \[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & w \mapsto z \in (R \circ S) \circ T \\
-    &\Leftrightarrow \exists y : Y @ w \mapsto y \in (R \circ S)
-    \land y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
-    &\Leftrightarrow \exists y : Y @ (\exists x : X @ w \mapsto x \in
+  \begin{array}{l@{\hspace{2em}}l}
+    w \mapsto z \in (R \circ S) \circ T \\
+    \Leftrightarrow \exists y : Y @ w \mapsto y \in (R \circ S) \land
+    y \mapsto z \in T & [\mbox{definition of $\circ$}] \\
+    \Leftrightarrow \exists y : Y @ (\exists x : X @ w \mapsto x \in
     R \land x \mapsto y \in S) \land y \mapsto z \in T &
     [\mbox{definition of $\circ$}] \\
-    &\Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in
-    R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is
+    \Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in R
+    \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is
     $\lnot$ free $\in$ y $\mapsto$ z $\in$ T}] \\
-    &\Leftrightarrow \exists x : X @ w \mapsto x \in R \land (\exists
+    \Leftrightarrow \exists x : X @ w \mapsto x \in R \land (\exists
     y : Y @ x \mapsto y \in S \land y \mapsto z \in T) & [\mbox{y is
     $\lnot$ free $\in$ w $\mapsto$ x $\in$ R}] \\
-    &\Leftrightarrow \exists x : X @ w \mapsto x \in R \land x
-    \mapsto z \in (S \circ T) & [\mbox{definition of $\circ$}] \\
-    &\Leftrightarrow w \mapsto z \in R \circ (S \circ T)
+    \Leftrightarrow \exists x : X @ w \mapsto x \in R \land x \mapsto
+    z \in (S \circ T) & [\mbox{definition of $\circ$}] \\
+    \Leftrightarrow w \mapsto z \in R \circ (S \circ T)
   \end{array}
 \]
 
@@ -684,8 +642,6 @@ composition to R $\circ$ (S $\circ$ T).
 
 \bigskip
 
-\bigskip
-
 I worked on this proof both top-down and bottom-up.  After doing the
 obvious equivalence substitutions, I was left with step 3 and 4 to
 work out. In working out step 3, I could see from step 6 that I
@@ -700,8 +656,6 @@ one can reposition quantifiers or predicates provided there is no
 inpact to the truthity, but this seems logical and sound provided x
 is not $free \in P$ for the affected P.
 
-\bigskip
-
 \newpage
 
 \bigskip
@@ -713,8 +667,6 @@ is not $free \in P$ for the affected P.
 \bigskip
 
 Lecture 4 - Sets, Types, and Definitions
-
-\bigskip
 
 (a)
 \par
@@ -883,8 +835,6 @@ snd(episode\_info(s, e_2))))$
 The following are given as abbreviations to enable fuzz validation,
 which passes for each expression.
 
-\bigskip
-
 \begin{zed}
   EightA == \{ s : \dom show\_episodes | \# (show\_episodes(s)) \geq 100 \}
 \end{zed}
@@ -893,8 +843,6 @@ which passes for each expression.
 
 Shows with at least 100 episodes.  We use the cardinality operator on
 F EpisodeId after ensuring s is in the domain of show\_episodes.
-
-\bigskip
 
 \begin{zed}
   EightB == \{ p : PeopleId | \exists s_1, s_2 : \dom show\_info @
@@ -905,8 +853,6 @@ F EpisodeId after ensuring s is in the domain of show\_episodes.
 
 The set of PeopleId, which appear in 2 or more shows.  We make sure
 two such shows are distinct and we validate each $PeopleId \in F$ PeopleId.
-
-\bigskip
 
 \begin{axdef}
   first\_episode\_timestamp : ShowId \pfun Timestamp
@@ -933,8 +879,6 @@ captured in the mu expression, which returns the single matching value.
 
 \bigskip
 
-\bigskip
-
 For the second operation, we define a partial function
 first\_episode\_timestamp that yields the Timestamp for $EpisodeId =
 1$ for $s : ShowId$.  We are guaranteed that $EpisodeId = 1$ exists
@@ -942,8 +886,6 @@ by constraint 7(b). In addition, calling this function with the s
 from the mu expression is valid because the constraint defined in
 7(e) guarantees that the set of EpisodeId in the domain of show\_info
 and in the first element of the domain of episode\_info are identical.
-
-\bigskip
 
 \bigskip
 \noindent
@@ -1054,17 +996,16 @@ case occurs when p = $\langle \rangle$. Therefore, we must first
 prove length(played($\langle \rangle$)) + length(unplayed($\langle
 \rangle$)) = length($\langle \rangle$)
 
-\bigskip
-
+\noindent
 \[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & length(played(\langle \rangle)) + length(unplayed(\langle \rangle)) \\
-    &\Leftrightarrow length(\langle \rangle) + length(\langle
-    \rangle) & [\mbox{played($\langle \rangle$)=$\langle \rangle$
-    $\land$ unplayed($\langle \rangle$)=$\langle \rangle$}] \\
-    &\Leftrightarrow 0 + 0 & [\mbox{length($\langle \rangle$)=0}] \\
-    &\Leftrightarrow 0 & [\mbox{0 + 0=0}] \\
-    &\Leftrightarrow length(\langle \rangle) & [\mbox{length($\langle
+  \begin{array}{l@{\hspace{2em}}l}
+    length(played(\langle \rangle)) + length(unplayed(\langle \rangle)) \\
+    \Leftrightarrow length(\langle \rangle) + length(\langle \rangle)
+    & [\mbox{played($\langle \rangle$)=$\langle \rangle$ $\land$
+    unplayed($\langle \rangle$)=$\langle \rangle$}] \\
+    \Leftrightarrow 0 + 0 & [\mbox{length($\langle \rangle$)=0}] \\
+    \Leftrightarrow 0 & [\mbox{0 + 0=0}] \\
+    \Leftrightarrow length(\langle \rangle) & [\mbox{length($\langle
     \rangle$)=0}]
   \end{array}
 \]
@@ -1076,13 +1017,9 @@ length() base cases to justify our rewrites.
 
 \bigskip
 
-\bigskip
-
 A playlist element is of type ((dom status) cross N).  We now seek to
 prove the inductive hypothesis, which follows the form of induction
 for sequences and which is an implication \citep[page 157]{simpson-notes}.
-
-\bigskip
 
 \noindent
 $\forall t : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
@@ -1103,34 +1040,31 @@ inductive hypothesis length(played(t)) + length(unplayed(t)) = length(t).
 
 \bigskip
 
-\bigskip
-
 Case 1: The playlist element is played, which is represented by
 fst(status fst(ple)) = Played, which says take the status of the ple
 and inspect the first element of the status tuple and determine
 whether $PlayedOrNot = Played$.
 
-\bigskip
-
+\noindent
 \[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & length(played(\langle ple \rangle \cat t)) +
+  \begin{array}{l@{\hspace{2em}}l}
+    length(played(\langle ple \rangle \cat t)) +
     length(unplayed(\langle ple \rangle \cat t)) \\
-    &\Leftrightarrow length(\langle ple \rangle \cat played(t)) +
+    \Leftrightarrow length(\langle ple \rangle \cat played(t)) +
     length(unplayed(\langle ple \rangle \cat t)) &
     [\mbox{played($\langle  ple  \rangle$ $\cat$ pl)=$\langle  ple
     \rangle$ $\cat$(played(pl))}] \\
-    &\Leftrightarrow length(\langle ple \rangle \cat played(t)) +
+    \Leftrightarrow length(\langle ple \rangle \cat played(t)) +
     length(unplayed(t)) & [\mbox{unplayed($\langle  ple  \rangle$
     $\cat$ pl)=unplayed(pl)}] \\
-    &\Leftrightarrow snd(ple) + length(played(t)) +
+    \Leftrightarrow snd(ple) + length(played(t)) +
     length(unplayed(t)) & [\mbox{length($\langle  ple  \rangle$
     $\cat$ pl)=snd(ple)+ length(pl)}] \\
-    &\Leftrightarrow snd(ple) + (length(played(t)) +
+    \Leftrightarrow snd(ple) + (length(played(t)) +
     length(unplayed(t))) & [\mbox{associativity of addition}] \\
-    &\Leftrightarrow snd(ple) + length(t) & [\mbox{length(played(p))+
+    \Leftrightarrow snd(ple) + length(t) & [\mbox{length(played(p))+
     length(unplayed(p))=length(p)}] \\
-    &\Leftrightarrow length(\langle ple \rangle \cat t) &
+    \Leftrightarrow length(\langle ple \rangle \cat t) &
     [\mbox{length($\langle  ple  \rangle$ $\cat$ pl)=snd(ple)+ length(pl)}]
   \end{array}
 \]
@@ -1147,36 +1081,33 @@ arrive at our final form.
 
 \bigskip
 
-\bigskip
-
 Case 2: The playlist element is not played, which is represented by
 fst(status fst(ple)) = NotP, which says take the status of the ple
 and inspect the first element of the status tuple and determine
 whether $PlayedOrNot = NotP$.
 
-\bigskip
-
+\noindent
 \[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & length(played(\langle ple \rangle \cat t)) +
+  \begin{array}{l@{\hspace{2em}}l}
+    length(played(\langle ple \rangle \cat t)) +
     length(unplayed(\langle ple \rangle \cat t)) \\
-    &\Leftrightarrow length(played(\langle ple \rangle \cat t)) +
+    \Leftrightarrow length(played(\langle ple \rangle \cat t)) +
     length(\langle ple \rangle \cat unplayed(t)) &
     [\mbox{unplayed($\langle  ple  \rangle$ $\cat$ pl)=$\langle  ple
     \rangle$ $\cat$(unplayed(pl))}] \\
-    &\Leftrightarrow length(played(t)) + length(\langle ple \rangle
+    \Leftrightarrow length(played(t)) + length(\langle ple \rangle
     \cat unplayed(t)) & [\mbox{played($\langle  ple  \rangle$ $\cat$
     pl)=played(pl)}] \\
-    &\Leftrightarrow length(played(t)) + snd(ple) +
+    \Leftrightarrow length(played(t)) + snd(ple) +
     length(unplayed(t)) & [\mbox{length($\langle  ple  \rangle$
     $\cat$ pl)=snd(ple)+ length(pl)}] \\
-    &\Leftrightarrow snd(ple) + length(played(t)) +
+    \Leftrightarrow snd(ple) + length(played(t)) +
     length(unplayed(t)) & [\mbox{commutativity of addition}] \\
-    &\Leftrightarrow snd(ple) + (length(played(t)) +
+    \Leftrightarrow snd(ple) + (length(played(t)) +
     length(unplayed(t))) & [\mbox{associativity of addition}] \\
-    &\Leftrightarrow snd(ple) + length(t) & [\mbox{length(played(p))+
+    \Leftrightarrow snd(ple) + length(t) & [\mbox{length(played(p))+
     length(unplayed(p))=length(p)}] \\
-    &\Leftrightarrow length(\langle ple \rangle \cat t) &
+    \Leftrightarrow length(\langle ple \rangle \cat t) &
     [\mbox{length($\langle  ple  \rangle$ $\cat$ pl)=snd(ple)+ length(pl)}]
   \end{array}
 \]
@@ -1194,13 +1125,9 @@ again to arrive at our final form.
 
 \bigskip
 
-\bigskip
-
 Since the base case is proven and both inductive cases result in the
 same outcome, we can use the implication introduction rule
 [$\Rightarrow$ intro] to unify our cases and conclude:
-
-\bigskip
 
 \noindent
 $\displaystyle
@@ -1222,8 +1149,6 @@ $
 First, we can create an abbreviation for the elements of our list to
 make our expressions less cumbersome.
 
-\bigskip
-
 \begin{zed}
   ListElement == (ShowId \cross EpisodeId) \cross (\nat \cross
   PlayedOrNot \cross SavedOrNot)
@@ -1232,8 +1157,6 @@ make our expressions less cumbersome.
 \bigskip
 
 We restate our List free type definition using the abbreviation as
-
-\bigskip
 
 \begin{zed}List ::= nil | join \ldata ListElement \cross List \rdata
 \end{zed}
@@ -1244,8 +1167,6 @@ For example, such a List could include (join((1, 2), (3600, NotP,
 Saved), (join((1, 1), (3600, Played, Saved)), nil))) which is of the
 form (join(e, join(e, nil))).
 
-\bigskip
-
 (a)
 \par
 \vspace{11pt}
@@ -1254,8 +1175,6 @@ form (join(e, join(e, nil))).
 We define the induction principle for this List for the proposition
 Q, building upon the List of natural numbers example found in section
 13.3 of the course notes \citep[page 162]{simpson-notes}.
-
-\bigskip
 
 \noindent
 $\displaystyle
@@ -1277,8 +1196,6 @@ Fuzz does not support Z tuple projection such as e.2. Therefore, we
 define generic access functions for each element of any triple, which
 we will use with ListElement, together with the previously specified
 fst() and snd() for tuples.
-
-\bigskip
 
 \begin{gendef}[A, B, C]
   fstOfTriple: A \cross B \cross C \fun A
@@ -1302,8 +1219,6 @@ fst() and snd() for tuples.
 
 Next, we specify our recursive functions
 
-\bigskip
-
 \begin{axdef}
   length\_L : List \fun \nat
   \where
@@ -1317,8 +1232,6 @@ Next, we specify our recursive functions
 The length of a List is the recursive sum of seconds : N, found in
 the first position of the triple found in the second element of the
 tuple of each ListElement.
-
-\bigskip
 
 \begin{axdef}
   unplayed\_L : List \fun List
@@ -1337,8 +1250,6 @@ includes or excludes each ListElement based on the PlayedOrNot free
 type value of NotP found in the second position of the triple found
 in the second element of the tuple of each ListElement.
 
-\bigskip
-
 \begin{axdef}
   played\_L : List \fun List
   \where
@@ -1356,8 +1267,6 @@ includes or excludes each ListElement based on the PlayedOrNot free
 type value of Played found in the second position of the triple found
 in the second element of the tuple of each ListElement.
 
-\bigskip
-
 \medskip
 
 (c)
@@ -1366,8 +1275,6 @@ in the second element of the tuple of each ListElement.
 \bigskip
 
 Prove
-
-\bigskip
 
 \noindent
 $\forall l : List @ length\_L(played\_L(l)) +
@@ -1378,16 +1285,15 @@ length\_L(unplayed\_L(l)) = length\_L(l)$
 To use proof by induction, we need to prove the base case and the
 inductive case. The base case occurs when the List is nil.
 
-\bigskip
-
+\noindent
 \[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & length\_L(played\_L(nil)) + length\_L(unplayed\_L(nil)) \\
-    &\Leftrightarrow length\_L(nil) + length\_L(nil) &
+  \begin{array}{l@{\hspace{2em}}l}
+    length\_L(played\_L(nil)) + length\_L(unplayed\_L(nil)) \\
+    \Leftrightarrow length\_L(nil) + length\_L(nil) &
     [\mbox{(un)played\_L(nil)=nil}] \\
-    &\Leftrightarrow 0 + 0 & [\mbox{length\_L(nil)=0}] \\
-    &\Leftrightarrow 0 & [\mbox{arithmetic}] \\
-    &\Leftrightarrow length\_L(nil) & [\mbox{length\_L(nil)=0}]
+    \Leftrightarrow 0 + 0 & [\mbox{length\_L(nil)=0}] \\
+    \Leftrightarrow 0 & [\mbox{arithmetic}] \\
+    \Leftrightarrow length\_L(nil) & [\mbox{length\_L(nil)=0}]
   \end{array}
 \]
 
@@ -1396,8 +1302,6 @@ inductive case. The base case occurs when the List is nil.
 In the above, we use each of the definitions of played\_L(nil),
 unplayed\_L(nil), and length\_L(nil) to prove our base case.  Now we
 have to move to our inductive case
-
-\bigskip
 
 \noindent
 $length\_L(played(l)) + length\_L(unplayed(l)) = length\_L(l) \implies \\
@@ -1413,31 +1317,27 @@ PlayedOrNot, which can only have one of two states that map directly
 to these two outcomes.  Therefore, we have two cases, one where e's
 PlayedOrNot value is Played and another where the value is NotP.
 
-\bigskip
-
 \newpage
 
 \bigskip
 
 Case 1: e's $PlayedOrNot = Played$
 
-\bigskip
-
+\noindent
 \[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & length\_L(played(join(e, l))) + length\_L(unplayed(join(e, l))) \\
-    &\Leftrightarrow length\_L(played(join(e, l))) +
-    length\_L(unplayed(l)) & [\mbox{def . of unplayed\_L(join(e,l))}] \\
-    &\Leftrightarrow length\_L(join(e, played(l))) +
-    length\_L(unplayed(l)) & [\mbox{def . of unplayed\_L(join(e,l))}] \\
-    &\Leftrightarrow fstOfTriple(snd(e)) + length\_L(played(l)) +
-    length\_L(unplayed(l)) & [\mbox{def . of length\_L(join(e,l))}] \\
-    &\Leftrightarrow fstOfTriple(snd(e)) + (length\_L(played(l)) +
+  \begin{array}{l@{\hspace{2em}}l}
+    length\_L(played(join(e, l))) + length\_L(unplayed(join(e, l))) \\
+    \Leftrightarrow length\_L(played(join(e, l))) +
+    length\_L(unplayed(l)) & [\mbox{def of unplayed\_L(join(e,l))}] \\
+    \Leftrightarrow length\_L(join(e, played(l))) +
+    length\_L(unplayed(l)) & [\mbox{def of played\_L(join(e,l))}] \\
+    \Leftrightarrow fstOfTriple(snd(e)) + length\_L(played(l)) +
+    length\_L(unplayed(l)) & [\mbox{def of length\_L(join(e,l))}] \\
+    \Leftrightarrow fstOfTriple(snd(e)) + (length\_L(played(l)) +
     length\_L(unplayed(l))) & [\mbox{associativity of addition}] \\
-    &\Leftrightarrow fstOfTriple(snd(e)) + length\_L(l) &
+    \Leftrightarrow fstOfTriple(snd(e)) + length\_L(l) &
     [\mbox{inductive hypothesis}] \\
-    &\Leftrightarrow length\_L(join(e, l)) & [\mbox{def . of
-    length\_L(join(e,l))}]
+    \Leftrightarrow length\_L(join(e, l)) & [\mbox{def of length\_L(join(e,l))}]
   \end{array}
 \]
 
@@ -1445,23 +1345,23 @@ Case 1: e's $PlayedOrNot = Played$
 
 Case 2: e's $PlayedOrNot = NotP$
 
-\bigskip
-
+\noindent
 \[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & length\_L(played(join(e, l))) + length\_L(unplayed(join(e, l))) \\
-    &\Leftrightarrow length\_L(played(join(e, l))) +
-    length\_L(unplayed(l)) & [\mbox{def . of unplayed\_L(join(e,l))}] \\
-    &\Leftrightarrow length\_L(join(e, played(l))) +
-    length\_L(unplayed(l)) & [\mbox{def . of unplayed\_L(join(e,l))}] \\
-    &\Leftrightarrow fstOfTriple(snd(e)) + length\_L(played(l)) +
-    length\_L(unplayed(l)) & [\mbox{def . of length\_L(join(e,l))}] \\
-    &\Leftrightarrow fstOfTriple(snd(e)) + (length\_L(played(l)) +
+  \begin{array}{l@{\hspace{2em}}l}
+    length\_L(played(join(e, l))) + length\_L(unplayed(join(e, l))) \\
+    \Leftrightarrow length\_L(played(l)) + length\_L(unplayed(join(e,
+    l))) & [\mbox{def of played\_L(join(e,l))}] \\
+    \Leftrightarrow length\_L(played(l)) + length\_L(join(e,
+    unplayed(l))) & [\mbox{def of unplayed\_L(join(e,l))}] \\
+    \Leftrightarrow length\_L(played(l)) + fstOfTriple(snd(e)) +
+    length\_L(unplayed(l)) & [\mbox{def of length\_L(join(e,l))}] \\
+    \Leftrightarrow fstOfTriple(snd(e)) + length\_L(played(l)) +
+    length\_L(unplayed(l)) & [\mbox{commutativity of addition}] \\
+    \Leftrightarrow fstOfTriple(snd(e)) + (length\_L(played(l)) +
     length\_L(unplayed(l))) & [\mbox{associativity of addition}] \\
-    &\Leftrightarrow fstOfTriple(snd(e)) + length\_L(l) &
+    \Leftrightarrow fstOfTriple(snd(e)) + length\_L(l) &
     [\mbox{inductive hypothesis}] \\
-    &\Leftrightarrow length\_L(join(e, l)) & [\mbox{def . of
-    length\_L(join(e,l))}]
+    \Leftrightarrow length\_L(join(e, l)) & [\mbox{def of length\_L(join(e,l))}]
   \end{array}
 \]
 
@@ -1470,12 +1370,35 @@ Case 2: e's $PlayedOrNot = NotP$
 Having shown both cases result in the same outcome, we can unify our
 cases and conclude:
 
+\noindent
+$\displaystyle
+\infer{\forall l : List @ length\_L(played(join(e, l))) +
+length\_L(unplayed(join(e, l))) = length\_L(join(e, l))}{
+  \forall l : List @ length\_L(played(l)) + length\_L(unplayed(l)) =
+  length\_L(l)
+}
+$
+
 \bigskip
 
+Since the base case is proven and both inductive cases result in the
+same outcome, we can use the implication introduction rule
+[$\Rightarrow$ intro] to unify our cases and conclude:
+
 \noindent
-$length\_L(played(l)) + length\_L(unplayed(l)) = length\_L(l) \implies \\
-\quad length\_L(played(join(e, l))) + length\_L(unplayed(join(e, l)))
-= length\_L(join(e, l))$
+$\displaystyle
+\infer{\forall l : List @ L(l)}{
+  L(nil)
+  &
+  \forall l : List @ L(played(l)) + L(unplayed(l)) = L(l) \implies
+  L(played(join(e, l))) + L(unplayed(join(e, l))) = L(join(e, l))
+}
+$
+
+\bigskip
+
+by which we have proven $\forall l : List @ length\_L(played\_L(l)) +
+length\_L(unplayed\_L(l)) = length\_L(l)$
 
 \newpage
 

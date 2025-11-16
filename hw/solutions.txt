@@ -1,5 +1,9 @@
 === Software Engineering Mathematics ===
+
 TEXT: October 2025
+TEXT: Dr. Andrew Simpson
+TEXT: University of Oxford
+TEXT: Software Engineering Progamme
 
 TEXT: Answers use the order of precedence ([not], [and], [or], [=>], [<=>]) [cite simpson25a Slide 20].
 
@@ -561,29 +565,39 @@ TEXT: Case 1: e's PlayedOrNot = Played
 
 EQUIV:
 length_L(played(join(e, l))) + length_L(unplayed(join(e, l)))
-length_L(played(join(e, l))) + length_L(unplayed(l))                [def. of unplayed_L(join(e, l))]
-length_L(join(e, played(l))) + length_L(unplayed(l))                [def. of unplayed_L(join(e, l))]
-fstOfTriple(snd(e)) + length_L(played(l)) + length_L(unplayed(l))   [def. of length_L(join(e, l))]
+length_L(played(join(e, l))) + length_L(unplayed(l))                [def of unplayed_L(join(e, l))]
+length_L(join(e, played(l))) + length_L(unplayed(l))                [def of played_L(join(e, l))]
+fstOfTriple(snd(e)) + length_L(played(l)) + length_L(unplayed(l))   [def of length_L(join(e, l))]
 fstOfTriple(snd(e)) + (length_L(played(l)) + length_L(unplayed(l))) [associativity of addition]
 fstOfTriple(snd(e)) + length_L(l)                                   [inductive hypothesis]
-length_L(join(e, l))                                                [def. of length_L(join(e, l))]
+length_L(join(e, l))                                                [def of length_L(join(e, l))]
 
 TEXT: Case 2: e's PlayedOrNot = NotP
 
 EQUIV:
 length_L(played(join(e, l))) + length_L(unplayed(join(e, l)))
-length_L(played(join(e, l))) + length_L(unplayed(l))                [def. of unplayed_L(join(e, l))]
-length_L(join(e, played(l))) + length_L(unplayed(l))                [def. of unplayed_L(join(e, l))]
-fstOfTriple(snd(e)) + length_L(played(l)) + length_L(unplayed(l))   [def. of length_L(join(e, l))]
+length_L(played(l)) + length_L(unplayed(join(e, l)))                [def of played_L(join(e, l))]
+length_L(played(l)) + length_L(join(e, unplayed(l)))                [def of unplayed_L(join(e, l))]
+length_L(played(l)) + fstOfTriple(snd(e)) + length_L(unplayed(l))   [def of length_L(join(e, l))]
+fstOfTriple(snd(e)) + length_L(played(l)) + length_L(unplayed(l))   [commutativity of addition]
 fstOfTriple(snd(e)) + (length_L(played(l)) + length_L(unplayed(l))) [associativity of addition]
 fstOfTriple(snd(e)) + length_L(l)                                   [inductive hypothesis]
-length_L(join(e, l))                                                [def. of length_L(join(e, l))]
+length_L(join(e, l))                                                [def of length_L(join(e, l))]
 
 TEXT: Having shown both cases result in the same outcome, we can unify our cases and conclude:
 
-length_L(played(l)) + length_L(unplayed(l)) = length_L(l) => \
-  length_L(played(join(e, l))) + length_L(unplayed(join(e, l))) = length_L(join(e, l))
+PROOF:
+forall l : List | length_L(played(join(e, l))) + length_L(unplayed(join(e, l))) = length_L(join(e, l))
+  forall l : List | length_L(played(l)) + length_L(unplayed(l)) = length_L(l)
 
+TEXT: Since the base case is proven and both inductive cases result in the same outcome, we can use the implication introduction rule [=> intro] to unify our cases and conclude:
+
+PROOF:
+forall l : List | L(l)
+  :: L(nil)
+  :: forall l : List | L(played(l)) + L(unplayed(l)) = L(l) => L(played(join(e, l))) + L(unplayed(join(e, l))) = L(join(e, l))
+
+TEXT: by which we have proven forall l : List | length_L(played_L(l)) + length_L(unplayed_L(l)) = length_L(l)
 
 PAGEBREAK:
 
