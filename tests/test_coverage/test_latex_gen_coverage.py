@@ -308,8 +308,8 @@ x = 1
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
 
-    assert "\\textbf{Solution 5}" in latex
-    assert "\\bigskip" in latex
+    assert "\\section*{Solution 5}" in latex
+    # TOC is no longer automatically generated - requires CONTENTS: directive
 
 
 def test_latex_gen_section() -> None:
@@ -337,8 +337,8 @@ def test_latex_gen_part_label() -> None:
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
 
-    assert "(a)" in latex
-    assert "\\medskip" in latex
+    assert "\\subsection*{(a)}" in latex
+    assert "First part" in latex
 
 
 def test_latex_gen_given_types() -> None:

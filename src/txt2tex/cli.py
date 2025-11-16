@@ -33,6 +33,11 @@ def main() -> int:
         action="store_true",
         help="Use fuzz package instead of zed-* packages",
     )
+    parser.add_argument(
+        "--toc-parts",
+        action="store_true",
+        help="Include parts (a, b, c) in table of contents",
+    )
 
     args = parser.parse_args()
 
@@ -51,7 +56,7 @@ def main() -> int:
         parser_obj = Parser(tokens)
         ast = parser_obj.parse()
 
-        generator = LaTeXGenerator(use_fuzz=args.fuzz)
+        generator = LaTeXGenerator(use_fuzz=args.fuzz, toc_parts=args.toc_parts)
         latex = generator.generate_document(ast)
     except Exception as e:
         print(f"Error processing input: {e}", file=sys.stderr)

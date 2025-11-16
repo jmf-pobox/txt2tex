@@ -1,0 +1,19 @@
+TITLE: Bibliography Example
+AUTHOR: Example Author
+DATE: 2025
+
+BIBLIOGRAPHY: references.bib
+BIBLIOGRAPHY_STYLE: plainnat
+
+=== Introduction ===
+
+This example demonstrates bibliography file support in txt2tex.
+
+TEXT: The formal methods community has produced many influential works on Z notation. The foundational work by [cite spivey92] introduced the Z notation, while [cite woodcock96] provides a comprehensive guide to using Z in practice. More recent work by [cite simpson25a] covers modern applications.
+
+TEXT: This example uses a separate .bib file for bibliography management. The build process automatically runs BibTeX to process citations.
+
+** Solution 1 **
+
+TEXT: When citing multiple sources, the bibliography is automatically generated from the .bib file. For example, [cite spivey92] and [cite woodcock96] are both included in the references.
+

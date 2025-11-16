@@ -86,6 +86,12 @@ Sequences, bags, and sequence operations.
 - `pattern_matching.txt` - Pattern matching with sequences in recursive definitions
 - `bags.txt` - Bag types and bag literals ([[x]], [[a,b,c]])
 
+### 10_bibliography
+Bibliography file support and citation management.
+
+- `bibliography_example.txt` - Example using separate .bib file for bibliography
+- `references.bib` - Sample bibliography file in BibTeX format
+
 ### infrastructure/
 LaTeX support files (not examples):
 - `fuzz.sty` - Z notation typesetting system

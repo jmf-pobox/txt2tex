@@ -113,11 +113,33 @@ LATEX: \mycustomcommand{arg1}{arg2}
 
 **Bibliography Setup (Harvard Style):**
 
-txt2tex automatically includes the `natbib` package for author-year citations. Use LATEX: blocks to define your bibliography:
+txt2tex automatically includes the `natbib` package for author-year citations. You can manage bibliographies in two ways:
+
+**Option 1: Bibliography File (Recommended)**
+
+Use a separate `.bib` file with document-level directives:
 
 ```
-=== Bibliography ===
+BIBLIOGRAPHY: references.bib
+BIBLIOGRAPHY_STYLE: plainnat
+```
 
+The build process will automatically run BibTeX to process citations. The bibliography file should be in the same directory as your `.txt` file.
+
+**Available styles** (compatible with natbib):
+- `plainnat` - Author-year citations (default, similar to Harvard style)
+- `abbrvnat` - Abbreviated author names
+- `unsrtnat` - Unsorted, order of citation
+- `alpha` - Alphanumeric labels
+
+Note: The `harvard` style is not a standard BibTeX style. Use `plainnat` for author-year citations similar to Harvard style.
+
+**Option 2: Manual LATEX Blocks**
+
+Use LATEX: blocks to define your bibliography manually:
+
+```
+LATEX: \setlength{\leftskip}{0pt}
 LATEX: \begin{thebibliography}{Simpson, n.d.}
 LATEX:
 LATEX: \bibitem[Simpson, 2025a]{simpson25a} Simpson, A. (2025a). \textit{Introduction and propositions}. Lecture 01.
@@ -128,6 +150,8 @@ LATEX: \end{thebibliography}
 ```
 
 The `\bibitem[Author, Year]{key}` format creates Harvard-style citations. Use `[cite key]` in TEXT: blocks to reference them (see TEXT: section above).
+
+**Note**: If `BIBLIOGRAPHY:` is specified, the bibliography file approach takes precedence. LATEX blocks will still work for other purposes.
 
 ### PAGEBREAK: - Insert Page Break
 
