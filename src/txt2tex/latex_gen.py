@@ -12,6 +12,7 @@ from txt2tex.ast_nodes import (
     BinaryOp,
     CaseAnalysis,
     Conditional,
+    Contents,
     Document,
     DocumentItem,
     EquivChain,
@@ -31,6 +32,7 @@ from txt2tex.ast_nodes import (
     PageBreak,
     Paragraph,
     Part,
+    PartsFormat,
     ProofNode,
     ProofTree,
     PureParagraph,
@@ -216,10 +218,14 @@ class LaTeXGenerator:
     # Implication and equivalence are right-associative
     RIGHT_ASSOCIATIVE: ClassVar[set[str]] = {"=>", "<=>"}
 
-    def __init__(self, use_fuzz: bool = False) -> None:
-        """Initialize generator with package choice."""
+    def __init__(self, use_fuzz: bool = False, toc_parts: bool = False) -> None:
+        """Initialize generator with package choice and TOC options."""
         self.use_fuzz = use_fuzz
+        self.toc_parts = toc_parts
+        self.parts_format: str = "subsection"  # Document-level parts format
         self._in_equiv_block = False  # Track context for line break formatting
+        self._first_part_in_solution = False  # Track if we're generating first part
+        self._in_inline_part = False  # Track if we're inside an inline part
 
     def generate_document(self, ast: Document | Expr) -> str:
         """Generate complete LaTeX document with preamble and postamble."""
@@ -243,15 +249,61 @@ class LaTeXGenerator:
         # These packages work with both fuzz and zed-cm
         lines.append(r"\usepackage{zed-maths}")  # Mathematical operators
         lines.append(r"\usepackage{zed-proof}")  # Proof tree macros (\infer)
+        # Load hyperref last to avoid conflicts with other packages
+        # Enables clickable links in TOC, sections, citations, etc.
+        lines.append(
+            r"\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}"
+        )
+
+        # Title metadata (if present)
+        if isinstance(ast, Document) and ast.title_metadata:
+            meta = ast.title_metadata
+            if meta.title:
+                lines.append(r"\title{" + meta.title + "}")
+            if meta.author:
+                # Include subtitle and institution in author if present
+                author_parts = [meta.author]
+                if meta.subtitle:
+                    author_parts.append(r"\thanks{" + meta.subtitle + "}")
+                if meta.institution:
+                    author_parts.append(r"\thanks{" + meta.institution + "}")
+                lines.append(r"\author{" + " ".join(author_parts) + "}")
+            if meta.date:
+                lines.append(r"\date{" + meta.date + "}")
+
         lines.append(r"\begin{document}")
         lines.append("")
 
+        # Generate title page if metadata present
+        if isinstance(ast, Document) and ast.title_metadata:
+            lines.append(r"\maketitle")
+            lines.append("")
+
         # Content - handle both Document and single Expr
         if isinstance(ast, Document):
+            # Store document-level parts format
+            self.parts_format = ast.parts_format
             # Multi-line document: generate each item
             for item in ast.items:
                 item_lines = self.generate_document_item(item)
                 lines.extend(item_lines)
+
+            # Generate bibliography if bibliography file is specified
+            if ast.bibliography_metadata and ast.bibliography_metadata.file:
+                # Reset indentation before bibliography
+                lines.append(r"\setlength{\leftskip}{0pt}")
+                lines.append("")
+                # Generate bibliography style (default to "plainnat" if not specified)
+                # plainnat works with natbib package and provides author-year citations
+                style = ast.bibliography_metadata.style or "plainnat"
+                lines.append(r"\bibliographystyle{" + style + "}")
+                lines.append("")
+                # Generate bibliography command (remove .bib extension if present)
+                bib_file = ast.bibliography_metadata.file
+                if bib_file.endswith(".bib"):
+                    bib_file = bib_file[:-4]
+                lines.append(r"\bibliography{" + bib_file + "}")
+                lines.append("")
         else:
             # Single expression (Phase 0 backward compatibility)
             latex_expr = self.generate_expr(ast)
@@ -279,6 +331,11 @@ class LaTeXGenerator:
             return self._generate_latex_block(item)
         if isinstance(item, PageBreak):
             return self._generate_pagebreak(item)
+        if isinstance(item, Contents):
+            return self._generate_contents(item)
+        if isinstance(item, PartsFormat):
+            # PartsFormat directive - already applied at document level, skip
+            return []
         if isinstance(item, TruthTable):
             return self._generate_truth_table(item)
         if isinstance(item, EquivChain):
@@ -1284,88 +1341,178 @@ class LaTeXGenerator:
         return lines
 
     def _generate_solution(self, node: Solution) -> list[str]:
-        """Generate LaTeX for solution."""
+        """Generate LaTeX for solution as unnumbered section."""
         lines: list[str] = []
-        lines.append(r"\bigskip")
-        lines.append(r"\noindent")
-        lines.append(r"\textbf{" + node.number + "}")
-        lines.append("")
-        lines.append(r"\medskip")  # Add vertical space before content
+        lines.append(r"\section*{" + node.number + "}")
+        lines.append(r"\addcontentsline{toc}{section}{" + node.number + "}")
         lines.append("")
 
+        # Track first part in solution for indentation
+        self._first_part_in_solution = True
         for item in node.items:
             item_lines = self.generate_document_item(item)
             lines.extend(item_lines)
+        self._first_part_in_solution = False
 
         return lines
 
     def _generate_part(self, node: Part) -> list[str]:
-        """Generate LaTeX for part label.
+        r"""Generate LaTeX for part label.
 
-        - Single Paragraph: inline with hanging indent
-        - Single Expr: inline math
-        - Starts with Expr + more content: inline Expr, then continue below
-        - Multiple items or structural elements: traditional multi-line format
+        If parts_format is "subsection": generates \subsection*{(a)} heading
+        If parts_format is "inline": generates (a) followed by content inline
         """
         lines: list[str] = []
+        part_label = "(" + node.label + ")"
 
-        # Check if part contains single paragraph (from TEXT: parsing)
-        if len(node.items) == 1 and isinstance(node.items[0], Paragraph):
-            # Hanging indent format for prose paragraphs
-            paragraph = node.items[0]
-            # Remove the leading \bigskip from paragraph generation
-            para_lines = self._generate_paragraph(paragraph)
-            # Filter out \bigskip and empty lines at start
-            while para_lines and (para_lines[0] == r"\bigskip" or para_lines[0] == ""):
-                para_lines.pop(0)
-            # Use noindent and hangindent for proper alignment
-            lines.append(r"\noindent")
-            lines.append(r"\hangindent=2em")  # Indent continuation lines
-            if para_lines:
-                lines.append(f"({node.label}) {para_lines[0]}")
-                lines.extend(para_lines[1:])
+        if self.parts_format == "inline":
+            # Inline formatting: (a) content
+            # All parts indented consistently using \noindent\hspace*{\parindent}
+            # \noindent prevents LaTeX auto-indent, \hspace*{\parindent} adds our indent
+            indent_prefix = r"\noindent\hspace*{\parindent}"
+            # Add vertical spacing before parts that are not the first
+            if not self._first_part_in_solution:
+                lines.append(r"\medskip")
+                lines.append("")
+            # Reset flag after first part
+            if self._first_part_in_solution:
+                self._first_part_in_solution = False
+
+            if len(node.items) == 1:
+                # Single item - render inline
+                item = node.items[0]
+                if isinstance(item, Paragraph):
+                    # Single paragraph: (a) text
+                    # Process the text to convert operators and handle inline math
+                    processed_text = self._process_paragraph_text(item.text)
+                    lines.append(indent_prefix + part_label + " " + processed_text)
+                    lines.append("")
+                elif isinstance(item, Expr):
+                    # Single expression: (a) $expr$
+                    expr_latex = self.generate_expr(item)
+                    lines.append(indent_prefix + part_label + " $" + expr_latex + "$")
+                    lines.append("")
+                elif isinstance(item, TruthTable):
+                    # Truth table: (a) on its own line, then centered table
+                    lines.append(indent_prefix + part_label)
+                    lines.append("")
+                    # Set \leftskip for content after label
+                    # Add extra space so content starts after the closing ) of label
+                    lines.append(
+                        r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
+                    )
+                    self._in_inline_part = True
+                    item_lines = self.generate_document_item(item)
+                    lines.extend(item_lines)
+                    self._in_inline_part = False
+                    # Reset \leftskip after part content
+                    lines.append(r"\setlength{\leftskip}{0pt}")
+                elif isinstance(item, ProofTree):
+                    # Proof tree: (a) on its own line, then proof on new line
+                    lines.append(indent_prefix + part_label)
+                    lines.append("")
+                    item_lines = self.generate_document_item(item)
+                    lines.extend(item_lines)
+                else:
+                    # Other single item types - render inline with space
+                    item_lines = self.generate_document_item(item)
+                    if item_lines:
+                        # Remove leading bigskip/medskip from first item if present
+                        first_line = item_lines[0]
+                        if first_line.startswith("\\bigskip") or first_line.startswith(
+                            "\\medskip"
+                        ):
+                            item_lines = item_lines[1:]
+                            first_line = item_lines[0] if item_lines else ""
+                        # Remove \noindent from first line (we're indenting the part)
+                        if first_line.startswith("\\noindent"):
+                            # Remove \noindent and leading space
+                            first_line = first_line[9:].lstrip()
+                        lines.append(indent_prefix + part_label + " " + first_line)
+                        lines.extend(item_lines[1:])
             else:
-                lines.append(f"({node.label})")
-            lines.append("")
-            lines.append(r"\medskip")
-        elif len(node.items) == 1 and isinstance(node.items[0], Expr):
-            # Single expression: inline math (like Solution 1)
-            expr = node.items[0]
-            expr_latex = self.generate_expr(expr)
-            lines.append(r"\noindent")
-            lines.append(r"\hangindent=2em")  # Indent continuation lines
-            lines.append(f"({node.label}) ${expr_latex}$")
-            lines.append("")
-            lines.append(r"\medskip")
-        elif len(node.items) >= 2 and isinstance(node.items[0], Expr):
-            # Starts with expression followed by more content
-            # Render first expression inline, then rest below
-            expr = node.items[0]
-            expr_latex = self.generate_expr(expr)
-            lines.append(r"\noindent")
-            lines.append(r"\hangindent=2em")  # Indent continuation lines
-            lines.append(f"({node.label}) ${expr_latex}$")
-            lines.append("")
-
-            # Render remaining items
-            for item in node.items[1:]:
-                item_lines = self.generate_document_item(item)
-                lines.extend(item_lines)
-
-            lines.append(r"\medskip")
-            lines.append("")
+                # Multiple items: (a) first item inline, then remaining
+                if node.items:
+                    first_item = node.items[0]
+                    if isinstance(first_item, Paragraph):
+                        # Process the text to convert operators and handle inline math
+                        processed_text = self._process_paragraph_text(first_item.text)
+                        lines.append(
+                            indent_prefix + part_label + " " + processed_text
+                        )
+                    elif isinstance(first_item, Expr):
+                        expr_latex = self.generate_expr(first_item)
+                        lines.append(
+                            indent_prefix + part_label + " $" + expr_latex + "$"
+                        )
+                    elif isinstance(first_item, TruthTable):
+                        # Truth table: (a) on its own line, then centered table
+                        lines.append(indent_prefix + part_label)
+                        lines.append("")
+                        # Set \leftskip for content after label
+                        # Add extra space so content starts after the closing ) of label
+                        lines.append(
+                            r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
+                        )
+                        self._in_inline_part = True
+                        item_lines = self.generate_document_item(first_item)
+                        lines.extend(item_lines)
+                        self._in_inline_part = False
+                        # Note: \leftskip will be reset after all items are processed
+                    elif isinstance(first_item, ProofTree):
+                        # Proof tree: (a) on its own line, then proof on new line
+                        lines.append(indent_prefix + part_label)
+                        lines.append("")
+                        item_lines = self.generate_document_item(first_item)
+                        lines.extend(item_lines)
+                    else:
+                        item_lines = self.generate_document_item(first_item)
+                        if item_lines:
+                            first_line = item_lines[0]
+                            if first_line.startswith(
+                                "\\bigskip"
+                            ) or first_line.startswith("\\medskip"):
+                                item_lines = item_lines[1:]
+                                first_line = item_lines[0] if item_lines else ""
+                            # Remove \noindent (we're indenting the part)
+                            if first_line.startswith("\\noindent"):
+                                # Remove \noindent and leading space
+                                first_line = first_line[9:].lstrip()
+                            lines.append(indent_prefix + part_label + " " + first_line)
+                            lines.extend(item_lines[1:])
+                    lines.append("")
+                    # Remaining items - use \leftskip to create indented container
+                    # This allows paragraphs to justify properly while maintaining
+                    # indentation. Add extra space so paragraphs start after the
+                    # closing ) of the part label
+                    lines.append(
+                        r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
+                    )
+                    self._in_inline_part = True
+                    for item in node.items[1:]:
+                        item_lines = self.generate_document_item(item)
+                        lines.extend(item_lines)
+                    self._in_inline_part = False
+                    # Reset \leftskip after part content
+                    lines.append(r"\setlength{\leftskip}{0pt}")
         else:
-            # Traditional format: label on separate line
-            lines.append(f"({node.label})")
-            lines.append(r"\par")  # End paragraph cleanly
-            lines.append(r"\vspace{11pt}")  # Explicit spacing for all content types
+            # Subsection formatting (default)
+            # Add vertical spacing before parts that are not the first
+            if not self._first_part_in_solution:
+                lines.append(r"\medskip")
+                lines.append("")
+            # Reset flag after first part
+            if self._first_part_in_solution:
+                self._first_part_in_solution = False
+            lines.append(r"\subsection*{" + part_label + "}")
+            # Add to table of contents with hyperlink (if enabled)
+            if self.toc_parts:
+                lines.append(r"\addcontentsline{toc}{subsection}{" + part_label + "}")
+            lines.append("")
 
             for item in node.items:
                 item_lines = self.generate_document_item(item)
                 lines.extend(item_lines)
-
-            lines.append(r"\medskip")
-            lines.append("")
 
         return lines
 
@@ -1488,20 +1635,16 @@ class LaTeXGenerator:
 
         return result
 
-    def _generate_paragraph(self, node: Paragraph) -> list[str]:
-        """Generate LaTeX for plain text paragraph.
+    def _process_paragraph_text(self, text: str) -> str:
+        """Process paragraph text: convert operators, handle inline math, etc.
 
-        Converts symbolic operators like <=> and => to LaTeX math symbols.
-        Supports inline math expressions like { x : N | x > 0 }.
-        Does NOT convert words like 'and', 'or', 'not' - these are English prose.
+        This is a helper method that processes paragraph text without adding
+        spacing or formatting commands. Used both in _generate_paragraph()
+        and when rendering paragraphs inline with part labels.
         """
-        lines: list[str] = []
-        lines.append(r"\bigskip")  # Leading vertical space (larger than medskip)
-        lines.append("")
-
         # Convert sequence literals FIRST to protect <x> patterns
         # Must happen before _process_inline_math() which can break up < and >
-        text = self._convert_sequence_literals(node.text)
+        text = self._convert_sequence_literals(text)
 
         # Process inline math expressions (includes formula detection)
         text = self._process_inline_math(text)
@@ -1596,8 +1739,32 @@ class LaTeXGenerator:
         # Prevents LaTeX errors when identifiers like length_L appear in prose
         text = self._escape_underscores_outside_math(text)
 
-        lines.append(text)
+        return text
+
+    def _generate_paragraph(self, node: Paragraph) -> list[str]:
+        """Generate LaTeX for plain text paragraph.
+
+        Converts symbolic operators like <=> and => to LaTeX math symbols.
+        Supports inline math expressions like { x : N | x > 0 }.
+        Does NOT convert words like 'and', 'or', 'not' - these are English prose.
+        Paragraphs are justified with no first-line indentation.
+        If inside an inline part, respects the part's indentation.
+        """
+        lines: list[str] = []
+        lines.append(r"\bigskip")  # Leading vertical space (larger than medskip)
         lines.append("")
+
+        # Process the paragraph text
+        text = self._process_paragraph_text(node.text)
+
+        # Prevent first-line indentation for all paragraphs
+        # Paragraphs inside parts will be indented via \leftskip set at part level
+        # \noindent prevents LaTeX's automatic first-line indentation
+        # \leftskip handles the overall indentation of the paragraph block
+        # Both work together: \noindent prevents extra indent,
+        # \leftskip provides base indent
+        lines.append(r"\noindent " + text)
+        lines.append("")  # Blank line ends paragraph for proper justification
         return lines
 
     def _generate_pure_paragraph(self, node: PureParagraph) -> list[str]:
@@ -1640,6 +1807,24 @@ class LaTeXGenerator:
         PAGEBREAK: inserts a page break in PDF output.
         """
         return [r"\newpage", ""]
+
+    def _generate_contents(self, node: Contents) -> list[str]:
+        """Generate LaTeX for table of contents.
+
+        CONTENTS: generates \tableofcontents (sections only, depth 1)
+        CONTENTS: full generates \tableofcontents with depth 2 (sections + subsections)
+        CONTENTS: 2 also generates \tableofcontents with depth 2
+        """
+        lines: list[str] = []
+        # Determine depth: empty = 1 (sections only)
+        # "full" or "2" = 2 (sections + subsections)
+        if node.depth.lower() in ("full", "2"):
+            lines.append(r"\setcounter{tocdepth}{2}")
+        else:
+            lines.append(r"\setcounter{tocdepth}{1}")
+        lines.append(r"\tableofcontents")
+        lines.append("")
+        return lines
 
     def _convert_comparison_operators(self, text: str) -> str:
         """Convert bare comparison operators to math mode, avoiding nested math.
@@ -2451,8 +2636,11 @@ class LaTeXGenerator:
         return result
 
     def _generate_truth_table(self, node: TruthTable) -> list[str]:
-        """Generate LaTeX for truth table."""
+        """Generate LaTeX for truth table (centered)."""
         lines: list[str] = []
+
+        # Center the table
+        lines.append(r"\begin{center}")
 
         # Start table environment with vertical bars between columns (not at edges)
         # Spacing is controlled by part labels
@@ -2487,6 +2675,7 @@ class LaTeXGenerator:
             lines.append(" & ".join(row_parts) + r" \\")
 
         lines.append(r"\end{tabular}")
+        lines.append(r"\end{center}")
         lines.append("")
 
         return lines
@@ -2595,16 +2784,19 @@ class LaTeXGenerator:
     def _generate_equiv_chain(self, node: EquivChain) -> list[str]:
         r"""Generate LaTeX for equivalence chain using array environment.
 
-        Uses standard LaTeX array{lll} instead of amsmath align* to avoid
+        Uses standard LaTeX array instead of amsmath align* to avoid
         package dependency. Wraps array in display math \[...\] for proper
-        spacing without confusing fuzz type checker.
+        spacing without confusing fuzz type checker. Centers the entire block
+        and right-aligns justifications.
         """
         lines: list[str] = []
 
-        lines.append(r"\noindent")  # Flush left alignment (matches TRUTH TABLE)
-        lines.append(r"\[")
-        # Use l@{\hspace{2em}}l (no leading empty column) for flush left
-        lines.append(r"\begin{array}{l@{\hspace{2em}}l}")
+        # Center the entire equivalence chain
+        # The center environment will center the display math block
+        lines.append(r"\begin{center}")
+        lines.append(r"$\displaystyle")
+        # Use l@{\hspace{2em}}r: left-aligned expressions, right-aligned justifications
+        lines.append(r"\begin{array}{l@{\hspace{2em}}r}")
 
         # Set context for line break formatting
         self._in_equiv_block = True
@@ -2631,8 +2823,8 @@ class LaTeXGenerator:
         # Reset context
         self._in_equiv_block = False
 
-        lines.append(r"\end{array}")
-        lines.append(r"\]")
+        lines.append(r"\end{array}$")
+        lines.append(r"\end{center}")
         lines.append("")
 
         return lines
@@ -2895,13 +3087,17 @@ class LaTeXGenerator:
         """Generate LaTeX for proof tree using \\infer macros from zed-proof.sty."""
         lines: list[str] = []
 
-        # Generate proof tree in display math without centering
-        # Use negative hspace to shift left and compensate for centering
+        # Start PROOF block on a new line relative to part label
+        lines.append("")
+
+        # Center the proof tree
+        lines.append(r"\begin{center}")
+        # Generate proof tree in display math
         proof_latex = self._generate_proof_node_infer(node.conclusion)
-        lines.append(r"\noindent")
         lines.append(r"$\displaystyle")
         lines.append(proof_latex)
         lines.append(r"$")
+        lines.append(r"\end{center}")
         lines.append("")
 
         return lines

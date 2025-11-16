@@ -461,6 +461,25 @@ Expr = (
 
 
 @dataclass(frozen=True)
+class TitleMetadata(ASTNode):
+    """Document title metadata (title, author, date, etc.)."""
+
+    title: str | None = None
+    subtitle: str | None = None
+    author: str | None = None
+    date: str | None = None
+    institution: str | None = None
+
+
+@dataclass(frozen=True)
+class BibliographyMetadata(ASTNode):
+    """Bibliography file and style metadata for document."""
+
+    file: str | None = None
+    style: str | None = None
+
+
+@dataclass(frozen=True)
 class Section(ASTNode):
     """Section with title and content."""
 
@@ -710,6 +729,27 @@ class PageBreak(ASTNode):
 
 
 @dataclass(frozen=True)
+class Contents(ASTNode):
+    """Table of contents directive.
+
+    Generates \tableofcontents with optional depth control.
+    depth: "full" or "2" for sections + subsections, empty for sections only.
+    """
+
+    depth: str = ""  # Empty = sections only, "full" or "2" = sections + subsections
+
+
+@dataclass(frozen=True)
+class PartsFormat(ASTNode):
+    """Parts formatting style directive.
+
+    Controls how parts are rendered: "inline" or "subsection".
+    """
+
+    style: str = "subsection"  # "inline" or "subsection"
+
+
+@dataclass(frozen=True)
 class Zed(ASTNode):
     """Zed block for standalone predicates and declarations.
 
@@ -735,6 +775,8 @@ DocumentItem = (
     | PureParagraph
     | LatexBlock
     | PageBreak
+    | Contents
+    | PartsFormat
     | TruthTable
     | EquivChain
     | GivenType
@@ -753,3 +795,6 @@ class Document(ASTNode):
     """Document containing multiple expressions or blocks."""
 
     items: list[DocumentItem]
+    title_metadata: TitleMetadata | None = None
+    parts_format: str = "subsection"  # "inline" or "subsection"
+    bibliography_metadata: BibliographyMetadata | None = None

@@ -271,7 +271,8 @@ class TestLaTeXGenerator:
         # Should use \infer macro, not itemize
         assert r"\infer" in latex
         assert r"\begin{itemize}" not in latex
-        assert r"\noindent" in latex  # Left-aligned, not centered
+        assert r"\begin{center}" in latex  # Centered
+        assert r"\end{center}" in latex
         # Expressions are in math mode within the \infer macro
         assert "p" in latex
         assert "q" in latex
@@ -376,7 +377,8 @@ p and q => q [=> intro from 1]
         assert r"\infer" in doc
         assert r"\begin{itemize}" not in doc
         assert r"p \land q \Rightarrow q" in doc
-        assert r"\noindent" in doc  # Left-aligned, not centered
+        assert r"\begin{center}" in doc  # Centered
+        assert r"\end{center}" in doc
 
     def test_sibling_premises_integration(self) -> None:
         """Test complete pipeline with sibling premises."""

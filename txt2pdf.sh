@@ -119,13 +119,21 @@ echo "  → LaTeX dependencies copied locally"
 CURRENT_STEP=$((CURRENT_STEP + 1))
 echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Compiling PDF..."
 
+# Check if bibliography file is specified (look for \bibliography{ command)
+# If found, enable BibTeX; otherwise disable it (for inline bibliographies)
+BIBTEX_FLAG="-bibtex-"
+if grep -q "\\\\bibliography{" "$TEX_FILE" 2>/dev/null; then
+    BIBTEX_FLAG=""
+    echo "  → Bibliography file detected, enabling BibTeX"
+fi
+
 # Use latexmk to handle multiple passes automatically
 # It runs pdflatex as many times as needed until citations/references resolve
 # Use -g to force at least one extra pass (needed for natbib citations)
-# Use -bibtex- to disable bibtex (for inline bibliographies using thebibliography environment)
+# Conditionally enable/disable bibtex based on whether bibliography file is present
 # No TEXINPUTS/MFINPUTS needed - files are local
 set +e  # Temporarily disable exit on error
-cd "$INPUT_DIR" && latexmk -pdf -g -bibtex- -interaction=nonstopmode -file-line-error "${INPUT_BASE}.tex" > "${INPUT_BASE}.latexmk.log" 2>&1
+cd "$INPUT_DIR" && latexmk -pdf -g $BIBTEX_FLAG -interaction=nonstopmode -file-line-error "${INPUT_BASE}.tex" > "${INPUT_BASE}.latexmk.log" 2>&1
 LATEXMK_EXIT=$?
 
 if [ ! -f "${INPUT_BASE}.pdf" ]; then
