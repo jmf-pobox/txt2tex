@@ -260,9 +260,12 @@ class LaTeXGenerator:
             meta = ast.title_metadata
             if meta.title:
                 lines.append(r"\title{" + meta.title + "}")
-            if meta.author:
-                # Include subtitle and institution in author if present
-                author_parts = [meta.author]
+            # Generate author field with optional subtitle/institution footnotes
+            # Even without author name, generate \author{} if they're present
+            if meta.author or meta.subtitle or meta.institution:
+                author_parts = []
+                if meta.author:
+                    author_parts.append(meta.author)
                 if meta.subtitle:
                     author_parts.append(r"\thanks{" + meta.subtitle + "}")
                 if meta.institution:
@@ -357,10 +360,86 @@ class LaTeXGenerator:
         if isinstance(item, ProofTree):
             return self._generate_proof_tree(item)
 
-        # Item is an Expr - render as left-aligned paragraph with inline math
-        # Don't center expressions - use noindent paragraph instead
+        # Item is an Expr - render as paragraph with math
+        # Check if expression contains line breaks
         latex_expr = self.generate_expr(item)
+
+        if self._has_line_breaks(item):
+            # Multi-line expression: use display math with array
+            # Similar to EQUIV blocks but without center and alignment
+            lines: list[str] = []
+            lines.append(r"\noindent")
+            lines.append(r"$\displaystyle")
+            lines.append(r"\begin{array}{l}")  # Left-aligned single column
+            lines.append(latex_expr)
+            lines.append(r"\end{array}$")
+            lines.append("")
+            return lines
+        # Single-line expression: use inline math (original behavior)
         return [r"\noindent", f"${latex_expr}$", "", ""]
+
+    def _has_line_breaks(self, expr: Expr) -> bool:
+        """Recursively check if expression contains any line breaks.
+
+        Args:
+            expr: The expression to check
+
+        Returns:
+            True if expr or any sub-expression has line breaks
+        """
+        if isinstance(expr, BinaryOp):
+            if expr.line_break_after:
+                return True
+            return self._has_line_breaks(expr.left) or self._has_line_breaks(expr.right)
+        if isinstance(expr, UnaryOp):
+            return self._has_line_breaks(expr.operand)
+        if isinstance(expr, Quantifier):
+            if expr.line_break_after_pipe:
+                return True
+            if expr.domain and self._has_line_breaks(expr.domain):
+                return True
+            return self._has_line_breaks(expr.body)
+        if isinstance(expr, Lambda):
+            return self._has_line_breaks(expr.body)
+        if isinstance(expr, Subscript):
+            return self._has_line_breaks(expr.base) or self._has_line_breaks(expr.index)
+        if isinstance(expr, Superscript):
+            return self._has_line_breaks(expr.base) or self._has_line_breaks(
+                expr.exponent
+            )
+        if isinstance(expr, SetComprehension):
+            # Check all parts of set comprehension
+            if expr.domain and self._has_line_breaks(expr.domain):
+                return True
+            if expr.predicate and self._has_line_breaks(expr.predicate):
+                return True
+            return bool(expr.expression and self._has_line_breaks(expr.expression))
+        if isinstance(expr, SetLiteral):
+            return any(self._has_line_breaks(elem) for elem in expr.elements)
+        if isinstance(expr, FunctionApp):
+            if self._has_line_breaks(expr.function):
+                return True
+            return any(self._has_line_breaks(arg) for arg in expr.args)
+        if isinstance(expr, Tuple):
+            return any(self._has_line_breaks(elem) for elem in expr.elements)
+        if isinstance(expr, RelationalImage):
+            return self._has_line_breaks(expr.relation) or self._has_line_breaks(
+                expr.set
+            )
+        if isinstance(expr, GenericInstantiation):
+            if self._has_line_breaks(expr.base):
+                return True
+            return any(self._has_line_breaks(param) for param in expr.type_params)
+        if isinstance(expr, SequenceLiteral):
+            return any(self._has_line_breaks(elem) for elem in expr.elements)
+        if isinstance(expr, Conditional):
+            return (
+                self._has_line_breaks(expr.condition)
+                or self._has_line_breaks(expr.then_expr)
+                or self._has_line_breaks(expr.else_expr)
+            )
+        # Base cases: Identifier, Number, etc. - no line breaks
+        return False
 
     def generate_expr(self, expr: Expr, parent: Expr | None = None) -> str:
         """Generate LaTeX for expression (without wrapping in math mode).
@@ -1398,9 +1477,7 @@ class LaTeXGenerator:
                     lines.append("")
                     # Set \leftskip for content after label
                     # Add extra space so content starts after the closing ) of label
-                    lines.append(
-                        r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
-                    )
+                    lines.append(r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}")
                     self._in_inline_part = True
                     item_lines = self.generate_document_item(item)
                     lines.extend(item_lines)
@@ -1437,9 +1514,7 @@ class LaTeXGenerator:
                     if isinstance(first_item, Paragraph):
                         # Process the text to convert operators and handle inline math
                         processed_text = self._process_paragraph_text(first_item.text)
-                        lines.append(
-                            indent_prefix + part_label + " " + processed_text
-                        )
+                        lines.append(indent_prefix + part_label + " " + processed_text)
                     elif isinstance(first_item, Expr):
                         expr_latex = self.generate_expr(first_item)
                         lines.append(
@@ -1485,9 +1560,7 @@ class LaTeXGenerator:
                     # This allows paragraphs to justify properly while maintaining
                     # indentation. Add extra space so paragraphs start after the
                     # closing ) of the part label
-                    lines.append(
-                        r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
-                    )
+                    lines.append(r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}")
                     self._in_inline_part = True
                     for item in node.items[1:]:
                         item_lines = self.generate_document_item(item)
