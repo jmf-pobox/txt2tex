@@ -1598,8 +1598,6 @@ class LaTeXGenerator:
 
         lines.append(text)
         lines.append("")
-        lines.append(r"\bigskip")  # Trailing vertical space
-        lines.append("")
         return lines
 
     def _generate_pure_paragraph(self, node: PureParagraph) -> list[str]:
@@ -2603,9 +2601,10 @@ class LaTeXGenerator:
         """
         lines: list[str] = []
 
+        lines.append(r"\noindent")  # Flush left alignment (matches TRUTH TABLE)
         lines.append(r"\[")
-        # Use ll@{\hspace{2em}}l to add extra space before justification column
-        lines.append(r"\begin{array}{ll@{\hspace{2em}}l}")
+        # Use l@{\hspace{2em}}l (no leading empty column) for flush left
+        lines.append(r"\begin{array}{l@{\hspace{2em}}l}")
 
         # Set context for line break formatting
         self._in_equiv_block = True
@@ -2614,9 +2613,9 @@ class LaTeXGenerator:
         for i, step in enumerate(node.steps):
             expr_latex = self.generate_expr(step.expression)
 
-            # All lines start with & for consistent left alignment
-            # First step: & expression; subsequent: &\Leftrightarrow expression
-            line = r"& " + expr_latex if i == 0 else r"&\Leftrightarrow " + expr_latex
+            # No leading & - start directly with expression for flush left
+            # First step: expression; subsequent: \Leftrightarrow expression
+            line = expr_latex if i == 0 else r"\Leftrightarrow " + expr_latex
 
             # Add justification if present (flush right)
             if step.justification:
