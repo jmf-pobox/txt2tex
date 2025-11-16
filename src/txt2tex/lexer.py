@@ -727,6 +727,86 @@ class Lexer:
 
             return Token(TokenType.LATEX, text_content, start_line, start_column)
 
+        # Check for title metadata keywords: TITLE:, AUTHOR:, DATE:, etc.
+        title_keywords = {
+            "TITLE": TokenType.TITLE,
+            "SUBTITLE": TokenType.SUBTITLE,
+            "AUTHOR": TokenType.AUTHOR,
+            "DATE": TokenType.DATE,
+            "INSTITUTION": TokenType.INSTITUTION,
+        }
+        if value in title_keywords and self._current_char() == ":":
+            token_type = title_keywords[value]
+            self._advance()  # Consume ':'
+
+            # Skip any whitespace after the colon
+            while not self._at_end() and self._current_char() in " \t":
+                self._advance()
+
+            # Capture the rest of the line as raw text (don't tokenize)
+            text_start = self.pos
+            while not self._at_end() and self._current_char() != "\n":
+                self._advance()
+
+            # Extract the raw text content
+            text_content = self.text[text_start : self.pos]
+
+            return Token(token_type, text_content, start_line, start_column)
+
+        # Check for CONTENTS: keyword (table of contents)
+        if value == "CONTENTS" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+            # Skip whitespace after colon
+            while not self._at_end() and self._current_char() in " \t":
+                self._advance()
+            # Capture optional depth parameter (e.g., "full" or "2")
+            depth_start = self.pos
+            while not self._at_end() and self._current_char() not in "\n":
+                self._advance()
+            depth_value = self.text[depth_start : self.pos].strip()
+            return Token(TokenType.CONTENTS, depth_value, start_line, start_column)
+
+        # Check for PARTS: keyword (parts formatting style)
+        if value == "PARTS" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+            # Skip whitespace after colon
+            while not self._at_end() and self._current_char() in " \t":
+                self._advance()
+            # Capture style value (e.g., "inline" or "subsection")
+            style_start = self.pos
+            while not self._at_end() and self._current_char() not in "\n":
+                self._advance()
+            style_value = self.text[style_start : self.pos].strip()
+            return Token(TokenType.PARTS, style_value, start_line, start_column)
+
+        # Check for BIBLIOGRAPHY: keyword (bibliography file)
+        if value == "BIBLIOGRAPHY" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+            # Skip whitespace after colon
+            while not self._at_end() and self._current_char() in " \t":
+                self._advance()
+            # Capture filename (e.g., "references.bib")
+            file_start = self.pos
+            while not self._at_end() and self._current_char() not in "\n":
+                self._advance()
+            file_value = self.text[file_start : self.pos].strip()
+            return Token(TokenType.BIBLIOGRAPHY, file_value, start_line, start_column)
+
+        # Check for BIBLIOGRAPHY_STYLE: keyword (bibliography style)
+        if value == "BIBLIOGRAPHY_STYLE" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+            # Skip whitespace after colon
+            while not self._at_end() and self._current_char() in " \t":
+                self._advance()
+            # Capture style name (e.g., "harvard", "plainnat")
+            style_start = self.pos
+            while not self._at_end() and self._current_char() not in "\n":
+                self._advance()
+            style_value = self.text[style_start : self.pos].strip()
+            return Token(
+                TokenType.BIBLIOGRAPHY_STYLE, style_value, start_line, start_column
+            )
+
         # Check for PAGEBREAK: keyword
         if value == "PAGEBREAK" and self._current_char() == ":":
             self._advance()  # Consume ':'

@@ -9,9 +9,11 @@ from txt2tex.ast_nodes import (
     Abbreviation,
     AxDef,
     BagLiteral,
+    BibliographyMetadata,
     BinaryOp,
     CaseAnalysis,
     Conditional,
+    Contents,
     Declaration,
     Document,
     DocumentItem,
@@ -34,6 +36,7 @@ from txt2tex.ast_nodes import (
     PageBreak,
     Paragraph,
     Part,
+    PartsFormat,
     ProofNode,
     ProofTree,
     PureParagraph,
@@ -48,6 +51,7 @@ from txt2tex.ast_nodes import (
     Solution,
     Subscript,
     Superscript,
+    TitleMetadata,
     TruthTable,
     Tuple,
     TupleProjection,
@@ -156,9 +160,22 @@ class Parser:
 
         # Empty input
         if self._at_end():
-            return Document(items=[], line=1, column=1)
+            return Document(
+                items=[],
+                title_metadata=None,
+                parts_format="subsection",
+                bibliography_metadata=None,
+                line=1,
+                column=1,
+            )
 
         first_line = self._current().line
+
+        # Parse title metadata, bibliography metadata, and parts format
+        # at document start (if present)
+        title_metadata = self._parse_title_metadata()
+        bibliography_metadata = self._parse_bibliography_metadata()
+        parts_format = self._parse_parts_format()
 
         # Check if we start with a structural element (Phase 1 + Phase 4)
         if self._is_structural_token():
@@ -167,7 +184,14 @@ class Parser:
             while not self._at_end():
                 items.append(self._parse_document_item())
                 self._skip_newlines()
-            return Document(items=items, line=first_line, column=1)
+            return Document(
+                items=items,
+                title_metadata=title_metadata,
+                parts_format=parts_format,
+                bibliography_metadata=bibliography_metadata,
+                line=first_line,
+                column=1,
+            )
 
         # Check for abbreviation or free type (Phase 4)
         # Look ahead to see if this is "identifier ::=" or "identifier =="
@@ -184,9 +208,23 @@ class Parser:
                     while not self._at_end():
                         items_with_free.append(self._parse_document_item())
                         self._skip_newlines()
-                    return Document(items=items_with_free, line=first_line, column=1)
+                    return Document(
+                        items=items_with_free,
+                        title_metadata=None,
+                        parts_format=parts_format,
+                        bibliography_metadata=None,
+                        line=first_line,
+                        column=1,
+                    )
                 # Single free type
-                return Document(items=[first_free_type], line=first_line, column=1)
+                return Document(
+                    items=[first_free_type],
+                    title_metadata=None,
+                    parts_format=parts_format,
+                    bibliography_metadata=None,
+                    line=first_line,
+                    column=1,
+                )
             # Bug #3: Check for abbreviation with or without postfix operator
             # Cases: "R ==", "R+ ==", "R* ==", "R~ =="
             is_abbrev = next_token.type == TokenType.ABBREV
@@ -208,9 +246,23 @@ class Parser:
                     while not self._at_end():
                         items_with_abbrev.append(self._parse_document_item())
                         self._skip_newlines()
-                    return Document(items=items_with_abbrev, line=first_line, column=1)
+                    return Document(
+                        items=items_with_abbrev,
+                        title_metadata=None,
+                        parts_format=parts_format,
+                        bibliography_metadata=None,
+                        line=first_line,
+                        column=1,
+                    )
                 # Single abbreviation
-                return Document(items=[first_abbrev], line=first_line, column=1)
+                return Document(
+                    items=[first_abbrev],
+                    title_metadata=None,
+                    parts_format=parts_format,
+                    bibliography_metadata=None,
+                    line=first_line,
+                    column=1,
+                )
 
         # Check for abbreviation with generic parameters (Phase 9)
         # [X, Y] Name == expression
@@ -237,9 +289,23 @@ class Parser:
                 while not self._at_end():
                     items_with_generic.append(self._parse_document_item())
                     self._skip_newlines()
-                return Document(items=items_with_generic, line=first_line, column=1)
+                return Document(
+                    items=items_with_generic,
+                    title_metadata=None,
+                    parts_format=parts_format,
+                    bibliography_metadata=None,
+                    line=first_line,
+                    column=1,
+                )
             # Single abbreviation with generic parameters
-            return Document(items=[first_generic_abbrev], line=first_line, column=1)
+            return Document(
+                items=[first_generic_abbrev],
+                title_metadata=None,
+                parts_format=parts_format,
+                bibliography_metadata=None,
+                line=first_line,
+                column=1,
+            )
 
         # Try to parse as expression
         first_item = self._parse_expr()
@@ -253,7 +319,14 @@ class Parser:
                 items_list.append(self._parse_document_item())
                 self._skip_newlines()
 
-            return Document(items=items_list, line=first_line, column=1)
+            return Document(
+                items=items_list,
+                title_metadata=None,
+                parts_format=parts_format,
+                bibliography_metadata=None,
+                line=first_line,
+                column=1,
+            )
 
         # Single expression (Phase 0 backward compatibility)
         if not self._at_end():
@@ -262,6 +335,60 @@ class Parser:
                 self._current(),
             )
         return first_item
+
+    def _parse_title_metadata(self) -> TitleMetadata | None:
+        """Parse title metadata at document start (TITLE:, AUTHOR:, etc.).
+
+        This method consumes tokens, so it should only be called once at the
+        start of document parsing.
+        """
+        title: str | None = None
+        subtitle: str | None = None
+        author: str | None = None
+        date: str | None = None
+        institution: str | None = None
+
+        # Parse title metadata lines (must be at start of document)
+        while not self._at_end():
+            if self._match(TokenType.TITLE):
+                token = self._advance()  # Consume TITLE token (value contains text)
+                title = token.value.strip()
+                self._skip_newlines()
+            elif self._match(TokenType.SUBTITLE):
+                token = self._advance()  # Consume SUBTITLE token
+                subtitle = token.value.strip()
+                self._skip_newlines()
+            elif self._match(TokenType.AUTHOR):
+                token = self._advance()  # Consume AUTHOR token
+                author = token.value.strip()
+                self._skip_newlines()
+            elif self._match(TokenType.DATE):
+                token = self._advance()  # Consume DATE token
+                date = token.value.strip()
+                self._skip_newlines()
+            elif self._match(TokenType.INSTITUTION):
+                token = self._advance()  # Consume INSTITUTION token
+                institution = token.value.strip()
+                self._skip_newlines()
+            elif self._match(TokenType.PARTS):
+                # PARTS directive - stop here, will be parsed by _parse_parts_format()
+                break
+            else:
+                # Not a title metadata line, stop parsing
+                break
+
+        # Return metadata if any field was set, otherwise None
+        if title or subtitle or author or date or institution:
+            return TitleMetadata(
+                title=title,
+                subtitle=subtitle,
+                author=author,
+                date=date,
+                institution=institution,
+                line=1,
+                column=1,
+            )
+        return None
 
     def _is_structural_token(self) -> bool:
         """Check if current token is a structural element."""
@@ -274,6 +401,8 @@ class Parser:
             TokenType.PURETEXT,
             TokenType.LATEX,
             TokenType.PAGEBREAK,
+            TokenType.CONTENTS,
+            TokenType.PARTS,
             TokenType.EQUIV,
             TokenType.GIVEN,
             TokenType.AXDEF,
@@ -359,6 +488,84 @@ class Parser:
 
         return PageBreak(line=pagebreak_token.line, column=pagebreak_token.column)
 
+    def _parse_contents(self) -> Contents:
+        """Parse table of contents directive from CONTENTS token.
+
+        CONTENTS: generates table of contents (sections only)
+        CONTENTS: full generates table of contents (sections + subsections)
+        CONTENTS: 2 also generates table of contents (sections + subsections)
+        """
+        contents_token = self._advance()  # Consume CONTENTS token
+        if contents_token.type != TokenType.CONTENTS:
+            raise ParserError("Expected CONTENTS token", contents_token)
+
+        depth = contents_token.value.strip()  # "full", "2", or empty
+        return Contents(
+            depth=depth, line=contents_token.line, column=contents_token.column
+        )
+
+    def _parse_bibliography_metadata(self) -> BibliographyMetadata:
+        """Parse bibliography metadata directives.
+
+        Parses BIBLIOGRAPHY: and BIBLIOGRAPHY_STYLE: directives.
+        Returns BibliographyMetadata with file and style, or None values
+        if not present.
+        """
+        file: str | None = None
+        style: str | None = None
+
+        # Parse BIBLIOGRAPHY: and BIBLIOGRAPHY_STYLE: tokens
+        while not self._at_end():
+            if self._match(TokenType.BIBLIOGRAPHY):
+                token = self._advance()
+                file = token.value.strip()
+                self._skip_newlines()
+            elif self._match(TokenType.BIBLIOGRAPHY_STYLE):
+                token = self._advance()
+                style = token.value.strip()
+                self._skip_newlines()
+            elif self._match(
+                TokenType.TITLE,
+                TokenType.SUBTITLE,
+                TokenType.AUTHOR,
+                TokenType.DATE,
+                TokenType.INSTITUTION,
+                TokenType.PARTS,
+                TokenType.CONTENTS,
+            ):
+                # Other metadata directives - stop here, let them be parsed separately
+                break
+            else:
+                # Not a metadata directive - stop parsing metadata
+                break
+
+        return BibliographyMetadata(
+            file=file if file else None,
+            style=style if style else None,
+            line=self._current().line if not self._at_end() else 1,
+            column=self._current().column if not self._at_end() else 1,
+        )
+
+    def _parse_parts_format(self) -> str:
+        """Parse parts formatting style from PARTS token.
+
+        PARTS: inline generates inline parts formatting
+        PARTS: subsection generates subsection parts formatting (default)
+        Returns the style string or "subsection" if not found.
+        """
+        if self._match(TokenType.PARTS):
+            parts_token = self._advance()  # Consume PARTS token
+            style = parts_token.value.strip().lower()
+            # Validate style
+            if style not in ("inline", "subsection"):
+                raise ParserError(
+                    f"Invalid parts format: {style}. Must be 'inline' or 'subsection'",
+                    parts_token,
+                )
+            self._skip_newlines()  # Skip newlines after PARTS directive
+            return style
+        return "subsection"  # Default
+
     def _parse_document_item(self) -> DocumentItem:
         """Parse a document item (expression or structural element)."""
         if self._match(TokenType.SECTION_MARKER):
@@ -391,6 +598,17 @@ class Parser:
             return self._parse_latex_block()
         if self._match(TokenType.PAGEBREAK):
             return self._parse_pagebreak()
+        if self._match(TokenType.CONTENTS):
+            return self._parse_contents()
+        if self._match(TokenType.PARTS):
+            # PARTS directive parsed at document start, but can appear in content
+            # Parse it but it will be ignored (document-level setting already applied)
+            parts_token = self._advance()
+            return PartsFormat(
+                style=parts_token.value.strip().lower(),
+                line=parts_token.line,
+                column=parts_token.column,
+            )
 
         # Check for abbreviation (identifier == expr) or free type (identifier ::= ...)
         # Bug #3: Also check for compound identifiers like "R+ =="

@@ -1,15 +1,20 @@
-=== Software Engineering Mathematics ===
+TITLE: Software Engineering Mathematics
+SUBTITLE: Software Engineering Programme
+AUTHOR: Dr. Andrew Simpson
+DATE: October 2025
+INSTITUTION: University of Oxford
 
-TEXT: October 2025
-TEXT: Dr. Andrew Simpson
-TEXT: University of Oxford
-TEXT: Software Engineering Progamme
+PARTS: inline
+
+PAGEBREAK:
+
+CONTENTS:
+
+PAGEBREAK:
 
 TEXT: Answers use the order of precedence ([not], [and], [or], [=>], [<=>]) [cite simpson25a Slide 20].
 
 ** Question 1 **
-
-TEXT: Lecture 1 - Propositions
 
 (a) TRUTH TABLE:                                                                            
 p | not p | (not p => p) | p => (not p => p)
@@ -44,8 +49,6 @@ TEXT: The statements ((p => r) and (q => r)), ((p or q) => r) are equivalent and
 PAGEBREAK:
 
 ** Question 2 **
-
-TEXT: Lecture 1 - Propositions
 
 (a) EQUIV:
 p => (not p => p) 
@@ -97,7 +100,7 @@ TEXT: For this proof we are seeking to prove that p => (not p => p), which we kn
 
 (b) 
 
-TEXT: This proof involves equivalence or bi-implication, which requires us to show p => q and q => p given this is the definition of p <=> q.
+TEXT: This proof involves equivalence or bi-implication.
 
 TEXT: In one direction, we are seeking to prove (not p => not q) => (q => p):
 
@@ -140,7 +143,7 @@ PROOF:
 
 (c)
 
-TEXT: In one direction, we are seeking to prove (p => r) and (q => r) => (p or q => r):
+TEXT: In one direction, we are seeking to prove (p => r) and (q => r) => (p or q => r)
 
 PROOF:
   ((p => r) and (q => r)) => ((p or q) => r) [=> intro from 1]
@@ -601,8 +604,7 @@ TEXT: by which we have proven forall l : List | length_L(played_L(l)) + length_L
 
 PAGEBREAK:
 
-=== Bibliography ===
-
+LATEX: \setlength{\leftskip}{0pt}
 LATEX: \begin{thebibliography}{Simpson, n.d.}
 LATEX:
 LATEX: \bibitem[Simpson, n.d.]{simpson-notes} Simpson, A. (n.d.). \textit{From Discrete Mathematics to State-Based Models, SEM version}. University of Oxford Department of Computer Science. Unpublished course notes.

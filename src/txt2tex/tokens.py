@@ -141,6 +141,16 @@ class TokenType(Enum):
     PURETEXT = auto()  # PURETEXT: (raw text, no processing)
     LATEX = auto()  # LATEX: (raw LaTeX passthrough, no escaping)
     PAGEBREAK = auto()  # PAGEBREAK: (insert page break)
+    CONTENTS = auto()  # CONTENTS: (table of contents)
+    PARTS = auto()  # PARTS: (parts formatting style)
+    BIBLIOGRAPHY = auto()  # BIBLIOGRAPHY: (bibliography file)
+    BIBLIOGRAPHY_STYLE = auto()  # BIBLIOGRAPHY_STYLE: (bibliography style)
+    # Title metadata
+    TITLE = auto()  # TITLE: (document title)
+    SUBTITLE = auto()  # SUBTITLE: (document subtitle)
+    AUTHOR = auto()  # AUTHOR: (document author)
+    DATE = auto()  # DATE: (document date)
+    INSTITUTION = auto()  # INSTITUTION: (institution name)
 
     # Environments (Phase 2)
     EQUIV = auto()  # EQUIV:

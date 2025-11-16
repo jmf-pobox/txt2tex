@@ -193,8 +193,8 @@ end
     assert output_file.exists()
 
     latex = output_file.read_text()
-    assert "\\section" in latex
-    assert "\\textbf{Solution 1}" in latex
+    assert "\\section*{Solution 1}" in latex
+    # TOC is no longer automatically generated - requires CONTENTS: directive
 
 
 def test_cli_empty_input_file(tmp_path: Path) -> None:
