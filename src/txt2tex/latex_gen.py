@@ -1484,10 +1484,23 @@ class LaTeXGenerator:
                     lines.append(indent_prefix + part_label + " " + processed_text)
                     lines.append("")
                 elif isinstance(item, Expr):
-                    # Single expression: (a) $expr$
-                    expr_latex = self.generate_expr(item)
-                    lines.append(indent_prefix + part_label + " $" + expr_latex + "$")
-                    lines.append("")
+                    if self._has_line_breaks(item):
+                        # Expression with line breaks: (a) on its own line
+                        lines.append(indent_prefix + part_label)
+                        lines.append("")
+                        # Set \leftskip for content after label
+                        lines.append(r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}")
+                        self._in_inline_part = True
+                        item_lines = self.generate_document_item(item)
+                        lines.extend(item_lines)
+                        self._in_inline_part = False
+                        # Reset \leftskip after part content
+                        lines.append(r"\setlength{\leftskip}{0pt}")
+                    else:
+                        # Single-line expression: (a) $expr$
+                        expr_latex = self.generate_expr(item)
+                        lines.append(indent_prefix + part_label + " $" + expr_latex + "$")
+                        lines.append("")
                 elif isinstance(item, TruthTable):
                     # Truth table: (a) on its own line, then centered table
                     lines.append(indent_prefix + part_label)
@@ -1507,18 +1520,6 @@ class LaTeXGenerator:
                     lines.append("")
                     item_lines = self.generate_document_item(item)
                     lines.extend(item_lines)
-                elif isinstance(item, Expr) and self._has_line_breaks(item):
-                    # Expression with line breaks: (a) on its own line, then expression
-                    lines.append(indent_prefix + part_label)
-                    lines.append("")
-                    # Set \leftskip for content after label
-                    lines.append(r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}")
-                    self._in_inline_part = True
-                    item_lines = self.generate_document_item(item)
-                    lines.extend(item_lines)
-                    self._in_inline_part = False
-                    # Reset \leftskip after part content
-                    lines.append(r"\setlength{\leftskip}{0pt}")
                 else:
                     # Other single item types - render inline with space
                     item_lines = self.generate_document_item(item)
