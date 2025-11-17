@@ -1546,9 +1546,18 @@ class LaTeXGenerator:
                 if node.items:
                     first_item = node.items[0]
                     if isinstance(first_item, Paragraph):
-                        # Process the text to convert operators and handle inline math
-                        processed_text = self._process_paragraph_text(first_item.text)
-                        lines.append(indent_prefix + part_label + " " + processed_text)
+                        # Paragraph: (a) on separate line to avoid line-wrap issues
+                        lines.append(indent_prefix + part_label)
+                        lines.append("")
+                        # Set \leftskip for this paragraph (stays set for remaining)
+                        lines.append(
+                            r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
+                        )
+                        self._in_inline_part = True
+                        item_lines = self.generate_document_item(first_item)
+                        lines.extend(item_lines)
+                        self._in_inline_part = False
+                        # Note: \leftskip stays set for remaining items
                     elif isinstance(first_item, Expr):
                         if self._has_line_breaks(first_item):
                             # Expression with line breaks: (a) on its own line
