@@ -1830,8 +1830,6 @@ class LaTeXGenerator:
         If inside an inline part, respects the part's indentation.
         """
         lines: list[str] = []
-        lines.append(r"\bigskip")  # Leading vertical space (larger than medskip)
-        lines.append("")
 
         # Process the paragraph text
         text = self._process_paragraph_text(node.text)
