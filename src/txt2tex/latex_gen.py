@@ -2720,11 +2720,11 @@ class LaTeXGenerator:
 
         # Calculate available width and setup positioning
         if self._in_inline_part:
-            # Inside part with leftskip: skip centering, align with leftskip
+            # Inside part with leftskip: skip centering, align naturally
             lines.append(r"\savedleftskip=\leftskip")
             max_width = r"\dimexpr\textwidth-\savedleftskip\relax"
-            # Position at leftskip margin (no center environment)
-            lines.append(r"\noindent\hspace*{\savedleftskip}")
+            # Just prevent extra indentation - leftskip handles positioning
+            lines.append(r"\noindent")
         else:
             # Normal context: use centering
             max_width = r"\textwidth"
@@ -2888,11 +2888,11 @@ class LaTeXGenerator:
 
         # Calculate available width and setup positioning
         if self._in_inline_part:
-            # Inside part with leftskip: skip centering, align with leftskip
+            # Inside part with leftskip: skip centering, align naturally
             lines.append(r"\savedleftskip=\leftskip")
             max_width = r"\dimexpr\textwidth-\savedleftskip\relax"
-            # Position at leftskip margin (no center environment)
-            lines.append(r"\noindent\hspace*{\savedleftskip}")
+            # Just prevent extra indentation - leftskip handles positioning
+            lines.append(r"\noindent")
         else:
             # Normal context: use centering
             max_width = r"\textwidth"
@@ -3203,11 +3203,11 @@ class LaTeXGenerator:
 
         # Calculate available width and setup positioning
         if self._in_inline_part:
-            # Inside part with leftskip: skip centering, align with leftskip
+            # Inside part with leftskip: skip centering, align naturally
             lines.append(r"\savedleftskip=\leftskip")
             max_width = r"\dimexpr\textwidth-\savedleftskip\relax"
-            # Position at leftskip margin (no center environment)
-            lines.append(r"\noindent\hspace*{\savedleftskip}")
+            # Just prevent extra indentation - leftskip handles positioning
+            lines.append(r"\noindent")
         else:
             # Normal context: use centering
             max_width = r"\textwidth"
