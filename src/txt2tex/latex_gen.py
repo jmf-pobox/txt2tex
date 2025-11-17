@@ -1844,6 +1844,9 @@ class LaTeXGenerator:
         # \leftskip provides base indent
         lines.append(r"\noindent " + text)
         lines.append("")  # Blank line ends paragraph for proper justification
+        # Add trailing space after paragraph for separation from following elements
+        lines.append(r"\bigskip")
+        lines.append("")
         return lines
 
     def _generate_pure_paragraph(self, node: PureParagraph) -> list[str]:
@@ -1875,9 +1878,12 @@ class LaTeXGenerator:
         The LaTeX is passed directly through to the output.
         """
         lines: list[str] = []
-        lines.append("")  # Blank line before
+        lines.append(r"\bigskip")  # Spacing before
+        lines.append("")
         lines.append(node.latex)  # Raw LaTeX, no processing
-        lines.append("")  # Blank line after
+        lines.append("")
+        lines.append(r"\bigskip")  # Spacing after
+        lines.append("")
         return lines
 
     def _generate_pagebreak(self, node: PageBreak) -> list[str]:
@@ -2718,9 +2724,6 @@ class LaTeXGenerator:
         """Generate LaTeX for truth table (centered, with auto-scaling if needed)."""
         lines: list[str] = []
 
-        # Add spacing before element for visual separation
-        lines.append(r"\medskip")
-
         # Calculate available width and setup positioning
         if self._in_inline_part:
             # Inside part with leftskip: skip centering, align naturally
@@ -2774,8 +2777,6 @@ class LaTeXGenerator:
         # Close center environment (only if we opened it)
         if not self._in_inline_part:
             lines.append(r"\end{center}")
-        # Add spacing after element for visual separation
-        lines.append(r"\medskip")
 
         return lines
 
@@ -2890,9 +2891,6 @@ class LaTeXGenerator:
         """
         lines: list[str] = []
 
-        # Add spacing before element for visual separation
-        lines.append(r"\medskip")
-
         # Calculate available width and setup positioning
         if self._in_inline_part:
             # Inside part with leftskip: skip centering, align naturally
@@ -2943,8 +2941,6 @@ class LaTeXGenerator:
         # Close center environment (only if we opened it)
         if not self._in_inline_part:
             lines.append(r"\end{center}")
-        # Add spacing after element for visual separation
-        lines.append(r"\medskip")
 
         return lines
 
@@ -3206,9 +3202,6 @@ class LaTeXGenerator:
         """Generate LaTeX for proof tree (auto-scales if needed)."""
         lines: list[str] = []
 
-        # Add spacing before element for visual separation
-        lines.append(r"\medskip")
-
         # Calculate available width and setup positioning
         if self._in_inline_part:
             # Inside part with leftskip: skip centering, align naturally
@@ -3234,8 +3227,6 @@ class LaTeXGenerator:
         # Close center environment (only if we opened it)
         if not self._in_inline_part:
             lines.append(r"\end{center}")
-        # Add spacing after element for visual separation
-        lines.append(r"\medskip")
 
         return lines
 
