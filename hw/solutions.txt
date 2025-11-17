@@ -4,6 +4,9 @@ SUBTITLE: Software Engineering Programme
 DATE: October 2025
 INSTITUTION: University of Oxford
 
+BIBLIOGRAPHY: sem.bib
+BIBLIOGRAPHY_STYLE: plainnat
+
 PARTS: inline
 
 PAGEBREAK:
@@ -615,30 +618,3 @@ TEXT: we have proven forall l : List | length_L(played_L(l)) + length_L(unplayed
 PAGEBREAK:
 
 LATEX: \setlength{\leftskip}{0pt}
-LATEX: \begin{thebibliography}{Simpson, n.d.}
-LATEX:
-LATEX: \bibitem[Simpson, n.d.]{simpson-notes} Simpson, A. (n.d.). \textit{From Discrete Mathematics to State-Based Models, SEM version}. University of Oxford Department of Computer Science. Unpublished course notes.
-LATEX:
-LATEX: \bibitem[Simpson, 2002]{simpson02} Simpson, A.C. (2002). \textit{Discrete Mathematics by Example}. London: McGraw-Hill.
-LATEX:
-LATEX: \bibitem[Simpson, 2025a]{simpson25a} Simpson, A. (2025a). \textit{Introduction and propositions}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 01.
-LATEX:
-LATEX: \bibitem[Simpson, 2025b]{simpson25b} Simpson, A. (2025b). \textit{Predicate logic and equality}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 02.
-LATEX:
-LATEX: \bibitem[Simpson, 2025c]{simpson25c} Simpson, A. (2025c). \textit{Deductive proofs}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 03.
-LATEX:
-LATEX: \bibitem[Simpson, 2025d]{simpson25d} Simpson, A. (2025d). \textit{Sets, types and definitions}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 04.
-LATEX:
-LATEX: \bibitem[Simpson, 2025e]{simpson25e} Simpson, A. (2025e). \textit{Relations}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 05.
-LATEX:
-LATEX: \bibitem[Simpson, 2025f]{simpson25f} Simpson, A. (2025f). \textit{Functions and sequences}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 06.
-LATEX:
-LATEX: \bibitem[Simpson, 2025g]{simpson25g} Simpson, A. (2025g). \textit{Free types and induction}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 07.
-LATEX:
-LATEX: \bibitem[Simpson, 2025h]{simpson25h} Simpson, A. (2025g). \textit{Proof rules}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 03.
-LATEX:
-LATEX: \bibitem[Spivey, 1992]{spivey92} Spivey, J.M. (1992). \textit{The Z Notation: A Reference Manual}. Upper Saddle River, NJ: Prentice Hall.
-LATEX:
-LATEX: \bibitem[Woodcock and Davies, 1996]{woodcock96} Woodcock, J. and Davies, J. (1996). \textit{Using Z: Specification, Refinement and Proof}. Upper Saddle River, NJ: Prentice Hall.
-LATEX:
-LATEX: \end{thebibliography}
