@@ -1142,11 +1142,14 @@ class LaTeXGenerator:
                 # Per fuzz manual p.23: prefix generic symbols are operator symbols,
                 # LaTeX inserts thin space automatically
                 func_latex = special_functions[func_name]
-                arg_latex = self.generate_expr(node.args[0])
-                # Add parentheses if arg needs them for correct precedence
-                # FunctionApp: seq1 (seq X)
-                # BinaryOp: iseq (X cross Y), seq (X union Y)
-                if isinstance(node.args[0], (FunctionApp, BinaryOp)):
+                arg = node.args[0]
+                arg_latex = self.generate_expr(arg)
+                # Add parentheses for nested applications
+                # Critical for fuzz: P (P Z) → \power (\power Z) not \power \power Z
+                # FunctionApp: P (P Z), seq (seq X)
+                # BinaryOp: seq (X cross Y), P (A union B)
+                # GenericInstantiation: seq (P[X])
+                if isinstance(arg, (FunctionApp, BinaryOp, GenericInstantiation)):
                     arg_latex = f"({arg_latex})"
                 return f"{func_latex} {arg_latex}"
 
@@ -3109,6 +3112,27 @@ class LaTeXGenerator:
                     Identifier(line=0, column=0, name=decl.variable)
                 )
                 type_latex = self.generate_expr(decl.type_expr)
+                # Post-process: add parentheses for nested special functions
+                # Critical for fuzz: P (P Z) must be \power (\power Z)
+                # not \power \power Z which causes validation errors
+                special_ops = [
+                    r"\power \power",
+                    r"\power \finset",
+                    r"\finset \power",
+                    r"\seq \seq",
+                    r"\iseq \iseq",
+                    r"\bag \bag",
+                ]
+                for pattern in special_ops:
+                    if pattern in type_latex:
+                        # Find second operator and wrap from there
+                        parts = type_latex.split(pattern, 1)
+                        if len(parts) == 2:
+                            second_part = pattern.split()[-1] + " " + parts[1]
+                            type_latex = (
+                                parts[0] + pattern.split()[0] + f" ({second_part})"
+                            )
+                            break
 
                 # Add line break after each declaration except the last
                 if i < len(node.declarations) - 1:
@@ -3153,6 +3177,27 @@ class LaTeXGenerator:
                     Identifier(line=0, column=0, name=decl.variable)
                 )
                 type_latex = self.generate_expr(decl.type_expr)
+                # Post-process: add parentheses for nested special functions
+                # Critical for fuzz: P (P Z) must be \power (\power Z)
+                # not \power \power Z which causes validation errors
+                special_ops = [
+                    r"\power \power",
+                    r"\power \finset",
+                    r"\finset \power",
+                    r"\seq \seq",
+                    r"\iseq \iseq",
+                    r"\bag \bag",
+                ]
+                for pattern in special_ops:
+                    if pattern in type_latex:
+                        # Find second operator and wrap from there
+                        parts = type_latex.split(pattern, 1)
+                        if len(parts) == 2:
+                            second_part = pattern.split()[-1] + " " + parts[1]
+                            type_latex = (
+                                parts[0] + pattern.split()[0] + f" ({second_part})"
+                            )
+                            break
 
                 # Add line break after each declaration except the last
                 if i < len(node.declarations) - 1:
@@ -3229,6 +3274,27 @@ class LaTeXGenerator:
                     Identifier(line=0, column=0, name=decl.variable)
                 )
                 type_latex = self.generate_expr(decl.type_expr)
+                # Post-process: add parentheses for nested special functions
+                # Critical for fuzz: P (P Z) must be \power (\power Z)
+                # not \power \power Z which causes validation errors
+                special_ops = [
+                    r"\power \power",
+                    r"\power \finset",
+                    r"\finset \power",
+                    r"\seq \seq",
+                    r"\iseq \iseq",
+                    r"\bag \bag",
+                ]
+                for pattern in special_ops:
+                    if pattern in type_latex:
+                        # Find second operator and wrap from there
+                        parts = type_latex.split(pattern, 1)
+                        if len(parts) == 2:
+                            second_part = pattern.split()[-1] + " " + parts[1]
+                            type_latex = (
+                                parts[0] + pattern.split()[0] + f" ({second_part})"
+                            )
+                            break
 
                 # Add line break after each declaration except the last
                 if i < len(node.declarations) - 1:
