@@ -372,13 +372,24 @@ class LaTeXGenerator:
 
         if self._has_line_breaks(item):
             # Multi-line expression: use display math with array
-            # Similar to EQUIV blocks but without center and alignment
+            # Respect inline part context for proper positioning
             lines: list[str] = []
-            lines.append(r"\noindent")
+
+            if self._in_inline_part:
+                # Inside part with leftskip: position naturally with leftskip
+                lines.append(r"\savedleftskip=\leftskip")
+                lines.append(r"\noindent")
+            else:
+                # Normal context: just prevent paragraph indentation
+                lines.append(r"\noindent")
+
             lines.append(r"$\displaystyle")
             lines.append(r"\begin{array}{l}")  # Left-aligned single column
             lines.append(latex_expr)
             lines.append(r"\end{array}$")
+            lines.append("")
+            # Add trailing spacing for separation from following content
+            lines.append(r"\bigskip")
             lines.append("")
             return lines
         # Single-line expression: use inline math (original behavior)
@@ -1496,6 +1507,18 @@ class LaTeXGenerator:
                     lines.append("")
                     item_lines = self.generate_document_item(item)
                     lines.extend(item_lines)
+                elif isinstance(item, Expr) and self._has_line_breaks(item):
+                    # Expression with line breaks: (a) on its own line, then expression
+                    lines.append(indent_prefix + part_label)
+                    lines.append("")
+                    # Set \leftskip for content after label
+                    lines.append(r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}")
+                    self._in_inline_part = True
+                    item_lines = self.generate_document_item(item)
+                    lines.extend(item_lines)
+                    self._in_inline_part = False
+                    # Reset \leftskip after part content
+                    lines.append(r"\setlength{\leftskip}{0pt}")
                 else:
                     # Other single item types - render inline with space
                     item_lines = self.generate_document_item(item)
@@ -1522,10 +1545,25 @@ class LaTeXGenerator:
                         processed_text = self._process_paragraph_text(first_item.text)
                         lines.append(indent_prefix + part_label + " " + processed_text)
                     elif isinstance(first_item, Expr):
-                        expr_latex = self.generate_expr(first_item)
-                        lines.append(
-                            indent_prefix + part_label + " $" + expr_latex + "$"
-                        )
+                        if self._has_line_breaks(first_item):
+                            # Expression with line breaks: (a) on its own line
+                            lines.append(indent_prefix + part_label)
+                            lines.append("")
+                            # Set \leftskip for content after label
+                            lines.append(
+                                r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
+                            )
+                            self._in_inline_part = True
+                            item_lines = self.generate_document_item(first_item)
+                            lines.extend(item_lines)
+                            self._in_inline_part = False
+                            # Note: \leftskip will be reset after all items are processed
+                        else:
+                            # Single-line expression: render inline
+                            expr_latex = self.generate_expr(first_item)
+                            lines.append(
+                                indent_prefix + part_label + " $" + expr_latex + "$"
+                            )
                     elif isinstance(first_item, TruthTable):
                         # Truth table: (a) on its own line, then centered table
                         lines.append(indent_prefix + part_label)
