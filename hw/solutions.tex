@@ -23,13 +23,16 @@
 
 \newpage
 
-\noindent Answers use the order of precedence ($\lnot$, $\land$,
-$\lor$, $\Rightarrow$, $\Leftrightarrow$) \citep[Slide 20]{simpson25a}.
-
-\bigskip
-
 \section*{Question 1}
 \addcontentsline{toc}{section}{Question 1}
+
+\noindent A tautology is a statement that is true for every valuation
+of the propositional variables it contains. A contradiction is a
+statement that is false for each such valuation. A contingency is a
+statement that is neither a tautology nor a contradiction.
+\citep[Page 13]{simpson-notes}.
+
+\bigskip
 
 \noindent\hspace*{\parindent}(a)
 
@@ -104,7 +107,9 @@ illustrated by the final column of truth values.
   \begin{tabular}{c|c|c|c|c|c|c|c|c}
     $p$ & $q$ & $r$ & $( p \Rightarrow r )$ & $( q \Rightarrow r )$ &
     $( ( p \Rightarrow r ) \land ( q \Rightarrow r ) )$ & $( p \lor q
-    )$ & $( ( p \lor q ) \Rightarrow r )$ & $\mathbf{\Leftrightarrow}$ \\
+    )$ & $( ( p \lor q ) \Rightarrow r )$ & $\mathbf{( ( p
+      \Rightarrow r ) \land ( q \Rightarrow r ) ) \Leftrightarrow ( ( p
+    \lor q ) \Rightarrow r )}$ \\
     \hline
     \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textit{t} &
     \textit{t} & \textit{t} & \textit{t} & \textbf{t} \\
@@ -137,8 +142,6 @@ illustrated by the final column of truth values.
 
 \bigskip
 
-\newpage
-
 \setlength{\leftskip}{0pt}
 \section*{Question 2}
 \addcontentsline{toc}{section}{Question 2}
@@ -151,7 +154,8 @@ illustrated by the final column of truth values.
       p \implies (\lnot p \implies p) \\
       \Leftrightarrow p \implies (\lnot \lnot p \lor p) &
       [\mbox{$\Rightarrow$ disjunction}] \\
-      \Leftrightarrow p \implies (p \lor p) & [\mbox{$\lnot$ $\lnot$}] \\
+      \Leftrightarrow p \implies (p \lor p) & [\mbox{negation is an
+      involution}] \\
       \Leftrightarrow p \implies p & [\mbox{idempotence of p}] \\
       \Leftrightarrow true & [\mbox{tautology}]
     \end{array}$%
@@ -162,13 +166,17 @@ illustrated by the final column of truth values.
 \bigskip
 
 \setlength{\leftskip}{\dimexpr\parindent+2em\relax}
-\noindent In this equivalence proof, we show that $p \implies (\lnot
-p \implies p)$ by using implication disjunction to replace the
-implication with a logical or, the definition of double negation to
-simplify, the application of the idempotence rule to simplify, and
-the fact that $p \implies p$ is a tautology.
+\noindent In this equivalence, we prove that $p \implies (\lnot p
+\implies p)$ by starting with implication disjunction to replace the
+implication with a logical or \citep[page 17]{simpson-notes}. Next,
+we use the definition of double negation \citep[Slide 25]{simpson25a}
+and the application of the idempotence rule to simplify \citep[Slide
+26]{simpson25a}. We trivially conclude with the fact that $p \implies
+p$ is a tautology.
 
 \bigskip
+
+\newpage
 
 \setlength{\leftskip}{0pt}
 \medskip
@@ -178,11 +186,11 @@ the fact that $p \implies p$ is a tautology.
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \begin{array}{l@{\hspace{2em}}r}
-      (\lnot p \implies \lnot q) \\
-      \Leftrightarrow (\lnot \lnot p \lor \lnot q) &
+      \lnot p \implies \lnot q \\
+      \Leftrightarrow \lnot \lnot p \lor \lnot q &
       [\mbox{$\Rightarrow$ disjunction}] \\
-      \Leftrightarrow (p \lor \lnot q) & [\mbox{$\lnot$ $\lnot$}] \\
-      \Leftrightarrow (\lnot q \lor p) & [\mbox{commutativity of $\lor$}] \\
+      \Leftrightarrow p \lor \lnot q & [\mbox{negation is an involution}] \\
+      \Leftrightarrow \lnot q \lor p & [\mbox{commutativity of $\lor$}] \\
       \Leftrightarrow q \implies p & [\mbox{$\Rightarrow$ disjunction}]
     \end{array}$%
   }
@@ -196,8 +204,8 @@ the fact that $p \implies p$ is a tautology.
 \lnot q) \iff q \implies p$ by using implication disjunction to
 replace implication with logical or, the definition of double
 negation to simplify, the commutivity property of logical or to
-change the order of the elements, and the implication disjunction
-rule to reintroduce implication.
+change the order of the elements \citep[Slide 27]{simpson25a}, and
+the implication disjunction rule to reintroduce implication.
 
 \bigskip
 
@@ -209,8 +217,8 @@ rule to reintroduce implication.
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \begin{array}{l@{\hspace{2em}}r}
-      ((p \implies r) \land (q \implies r)) \\
-      \Leftrightarrow ((\lnot p \lor r) \land (\lnot q \lor r)) &
+      (p \implies r) \land (q \implies r) \\
+      \Leftrightarrow (\lnot p \lor r) \land (\lnot q \lor r) &
       [\mbox{$\Rightarrow$ disjunction}] \\
       \Leftrightarrow (r \lor \lnot p) \land (r \lor \lnot q) &
       [\mbox{commutativity of $\lor$}] \\
@@ -218,7 +226,7 @@ rule to reintroduce implication.
       [\mbox{distributivity 2}] \\
       \Leftrightarrow (\lnot p \land \lnot q) \lor r &
       [\mbox{commutativity of $\lor$}] \\
-      \Leftrightarrow \lnot (p \lor q) \lor r & [\mbox{De Morgan}] \\
+      \Leftrightarrow \lnot (p \lor q) \lor r & [\mbox{De Morgan 1}] \\
       \Leftrightarrow p \lor q \implies r & [\mbox{$\Rightarrow$ disjunction}]
     \end{array}$%
   }
@@ -232,22 +240,18 @@ rule to reintroduce implication.
 \land (q \implies r))$ $\Leftrightarrow$ $(p \lor q)$ $\Rightarrow$ r
 by using the implication disjunction rule to replace implication with
 logical or, the commutativity of or rule to change the order of the
-elements, the distributivity 2 rule to extract r, and the commutivity
-of logical or to change the order of the elements, De Morgan to
-extract negation for $(\lnot p \land \lnot q)$, and the implication
-disjunction rule to reintroduce implication.
+elements \citep[Slide 27]{simpson25a}, the distributivity 2 rule to
+extract r \citep[Slide 29]{simpson25a}, and the commutivity of
+logical or to change the order of the elements, De Morgan's Law to
+extract negation for $(\lnot p \land \lnot q)$ \citep[Slide
+28]{simpson25a}, and the implication disjunction rule to reintroduce
+implication.
 
 \bigskip
-
-\newpage
 
 \setlength{\leftskip}{0pt}
 \section*{Question 3}
 \addcontentsline{toc}{section}{Question 3}
-
-\noindent Lecture 3 - Deductive Proofs
-
-\bigskip
 
 \noindent\hspace*{\parindent}(a)
 
@@ -258,10 +262,10 @@ disjunction rule to reintroduce implication.
       \ulcorner p \urcorner^{[1]}
       &
       \infer[\Rightarrow\textrm{-intro}^{[2]}]{\lnot p \implies
-      p}{\ulcorner p \urcorner^{[1]} &
-        \infer[false\textrm{-elim}^{[3]}]{\lnot
-        p}{\infer[\mathrm{false} - \mathrm{intro}]{false}{\ulcorner
-      \lnot p \urcorner^{[2]} & \ulcorner p \urcorner^{[3]}}}}
+      p}{\ulcorner \lnot p \urcorner^{[2]} &
+        \infer[false\textrm{-elim}^{[3]}]{p}{\infer[\mathrm{false} -
+          \mathrm{intro}]{false}{\ulcorner p \urcorner^{[1]} & \ulcorner
+      \lnot p \urcorner^{[3]}}}}
     }
     $%
   }
@@ -273,21 +277,26 @@ disjunction rule to reintroduce implication.
 \setlength{\leftskip}{\dimexpr\parindent+2em\relax}
 \noindent For this proof we are seeking to prove that p $\Rightarrow$
 $(\lnot p \implies p)$, which we know holds given the truth table in
-1(a). Working mechanically from the bottom, I started by applying the
-implication introduction rule with assumption [1] to gain our
-conclusion, implication introduction rule with assumption [2] to gain
-$(\lnot p \implies p)$.  This statement requires that I have both p
-and $\lnot p$ as premisses, which is a bit odd and implied I needed
-to use false in the proof.  Since I had p as assumption [1], I knew I
-wanted $\lnot p$ as the output of the false rules.  It took some
-experimentation, but eventually I realized I needed three assumptions
-not two and it was obvious that I wanted to preserve $\lnot p$ as
-assumption [2], which meant I needed p as assumption [3] and that
-assumption [3] would be discharged by the false-elim rule.  In the
-final proof, all assumptions are discharged properly. The key insight
-was to have p as an assumption twice at different scopes.
+1(a). Working mechanically from the bottom, we start by applying the
+implication introduction rule to identify and discharge assumption
+[1] to gain our conclusion \citep[Slide 3]{simpson25h} and again we
+use the implication introduction rule to identify and discharge
+assumption [2] to gain $(\lnot p \implies p)$.  We note that this
+statement requires that we have both p and $\lnot p$ as premisses,
+which implies we need to use false in the proof. With some
+experimentation, we realize we need three assumptions and we
+introduce a third assumption [3]. We first use false-intro followed
+by false-elim1 to discharge assumption [3] \citep[Slide
+6]{simpson25h}. In the final proof, all assumptions are discharged
+properly. We note that this proof bears some similarities with the
+rules of negation proof in the course notes section 4.8 \citep[Pages
+41-46]{simpson-notes} which has multiple degrees of negation of p as
+assumptions. The key is to have $\lnot p$ as an assumption twice at
+different scopes.
 
 \bigskip
+
+\newpage
 
 \setlength{\leftskip}{0pt}
 \medskip
@@ -392,21 +401,26 @@ $\Rightarrow$ $(\lnot p \implies \lnot q)$:
 implication rule to $q \implies p$ as assumption [1] to gain the
 conclusion.  I need $(\lnot p \implies \lnot q)$, which shows me to
 use the implication rule again with $\lnot p$ as assumption [2].
-From there, the question is how to get $\lnot q$.  Now working from
-the top, given assumption [1] has q, it makes sense to use the
-implication elimation rule with q as assumption [3]. This gives me p,
-when what I want is $\lnot q$.  I see that if I introduce $\lnot p$
-as assumption [3] that I can negate q via the false-intro and
-false-elim rules and successfully discharge assumption [3]. This
-gives me $\lnot q$, which is what I need to connect to the top tree
-to the bottom of the proof. This proof came more quickly because $q
-\implies p$ as assumption [1] gave clear direction for the top
-portion. All assumptions are discharged and scopes are appropriate.
+From there, the question is how to get $\lnot q$.
+
+\bigskip
+
+\noindent Now working from the top, given assumption [1] has q, it
+makes sense to use the implication elimation rule with q as
+assumption [3]. This gives me p, when what I want is $\lnot q$.  I
+see that if I introduce $\lnot p$ as assumption [3] that I can negate
+q via the false-intro and false-elim rules and successfully discharge
+assumption [3]. This gives me $\lnot q$, which is what I need to
+connect to the top tree to the bottom of the proof. This proof came
+more quickly because $q \implies p$ as assumption [1] gave clear
+direction for the top portion. All assumptions are discharged and
+scopes are appropriate.
 
 \bigskip
 
 \noindent We then combine these two proofs with the
-$\Leftrightarrow$-intro rule, using the results from above:
+$\Leftrightarrow$-intro rule \citep[Slide 4]{simpson25h}, using the
+results from above to conclude our proof.
 
 \bigskip
 
@@ -424,14 +438,16 @@ $\Leftrightarrow$-intro rule, using the results from above:
 }
 \bigskip
 
+\newpage
+
 \setlength{\leftskip}{0pt}
 \medskip
 
 \noindent\hspace*{\parindent}(c)
 
 \setlength{\leftskip}{\dimexpr\parindent+2em\relax}
-\noindent In one direction, we are seeking to prove $(p \implies r)
-\land (q \implies r) \implies (p \lor q \implies r)$
+\noindent In one direction, we are seeking to prove $((p \implies r)
+\land (q \implies r))$ $\Rightarrow$ $((p \lor q) \implies r)$
 
 \bigskip
 
@@ -480,28 +496,35 @@ assumption [1] and applying the implication introduction rule to
 arrive at our conclusion and discharge assumption [1]. From there, I
 can see that I need $(p \lor q)$ and r as inputs to the implication
 introduction rule.  I take $(p \lor q)$ as assumption [2] and
-discharge this assumption via this rule.  That leaves me with r as
-the result of my bottom up process.  As I have already made
-assumptions $((p \implies r) \land (q \implies r))$ [1] and $(p \lor
-q)$ [2] and they are related, I start by working with both top-down.
-I begin with $(p \lor q)$ [2] and create cases for p and q working
-towards or elimination.  The p and q sub-branches are marked with [2]
-as the assumption as these are just the cases for $(p \lor q)$ [2]
-\citep[slide 41]{simpson25c}. First, I apply and elimination in each
-case to get $(p \implies r)$, $(q \implies r)$ with p, q respectively
-in the sub-branches.  From there, I apply implication elimination to
-arrive at r in both cases.  This enables me to use the or elimation
-together with $(p \lor q)$ [2] to simplify to r.  At this stage, I do
-not discharge assumption [2], as this is deferred until the next
-step. I use implication introduction together with $(p \lor q)$ [2]
-and r from the or elimination to discharge assumption [2], which
-connects the top-down and bottom-up process. All assumptions are
-properly discharged.
+discharge this assumption via the implication introduction rule.
+That leaves me with r as the result of my bottom up process.
 
 \bigskip
 
-\noindent In the other direction, we are seeking to prove $(p \lor q
-\implies r)$ $\Rightarrow$ $((p \implies r) \land (q \implies r))$:
+\noindent As I have already made assumptions $((p \implies r) \land
+(q \implies r))$ [1] and $(p \lor q)$ [2] and they are related, I
+start by working with both top-down. I begin with $(p \lor q)$ [2]
+and create cases for p and q working towards or elimination.  The p
+and q sub-branches are marked with [2] as the assumption as these are
+just the cases for $(p \lor q)$ [2] \citep[slide 41]{simpson25c}.
+Next, I apply and elimination in each case to get $(p \implies r)$,
+$(q \implies r)$ with the appropriate p or q cases in the
+sub-branches.  From there, I apply implication elimination to arrive
+at r in both cases.  This enables me to use the or elimination
+together with $(p \lor q)$ [2] to simplify to r.
+
+\bigskip
+
+\noindent At this stage, I do not discharge assumption [2], as this
+is deferred until the next step. I use implication introduction
+together with $(p \lor q)$ [2] and r from the or elimination to
+discharge assumption [2], which connects the top-down and bottom-up
+process. All assumptions are properly discharged.
+
+\bigskip
+
+\noindent In the other direction, we are seeking to prove $((p \lor
+q) \implies r)$ $\Rightarrow$ $((p \implies r) \land (q \implies r))$:
 
 \bigskip
 
@@ -544,28 +567,29 @@ properly discharged.
 \bigskip
 
 \noindent Working mechanically from the bottom, we start by taking
-$(p \lor q \implies r)$ as assumption [1] and applying the
+$((p \lor q) \implies r)$ as assumption [1] and applying the
 implication introduction rule to discharge assumption [1].  This
-leaves us with $(p \implies r)$ and $(q \implies r)$, which is
+leaves us with $((p \implies r) \land (q \implies r))$, which is
 derived from $p \implies r$, $q \implies r$ and the application of
 the and introduction rule. Fairly clearly, we need two sub-branches
-to be developed top-down. Since we have $(p \lor q \implies r)$ and
+to be developed top-down. Since we have $((p \lor q) \implies r)$ and
 we want $p \implies r$ and $q \implies r$, I start with p [2] and q
 [3] to start the top-down sub-trees.  I struggled here until I
 recalled that I could use the or intro rule to satisfy $(p \lor q)$.
 I also had to recall that this does not generate additional
 assumptions to discharge \citep[slide 38]{simpson25c}. From here, it
 was not difficult to use implication elimation to arrive at r in both
-sub-trees and to apply p [2] and q [3] in each tree respectively with
-the implication introduction rule to discharge those assumptions.
-This gave me $p \implies r$, $q \implies r$ and I used the and
+sub-trees and to apply p [2] and q [3] in each tree with the
+implication introduction rule to discharge those assumptions.  This
+gave me $p \implies r$, $q \implies r$ and I used the and
 introduction rule to connect the top and bottom portions of the
 proof. All assumptions are properly discharged.
 
 \bigskip
 
 \noindent We then combine these two proofs with the
-$\Leftrightarrow$-intro rule, using the results from above:
+$\Leftrightarrow$-intro rule, using the results from above to
+conclude our proof:
 
 \bigskip
 
@@ -587,7 +611,7 @@ $\Leftrightarrow$-intro rule, using the results from above:
 \section*{Question 4}
 \addcontentsline{toc}{section}{Question 4}
 
-\noindent We are defining a generic function that will tell us the
+\noindent We are defining a generic function that will return the
 difference in length between the longest and shorest sequences from
 an input type that is a non-empty sequences of sequences. The input
 could be $\langle  \langle x, y, z \rangle, \langle \rangle  \rangle$
@@ -614,16 +638,17 @@ and maxDiff, which fulfills the specification for Question 4.
 
 \noindent For maxSeq and minSeq, a mu function is defined that
 selects a single element meeting the specification based on comparing
-each sequence s with every sequence t. First, the range operator
+every sequence s with every sequence t. First, the range operator
 moves us from a sequence of sequences with ss values such as $\langle
 1  \mapsto  \langle x, y, z \rangle, 2  \mapsto  \langle \rangle
 \rangle$ to sequences s, t with values like $\langle x, y, z
 \rangle$, $\langle \rangle$ to enable seq operators. maxSeq and
-minSeq use the length operators and maxDiff uses the length operators
-with subtraction. For maxDiff, $maxSeq \geq minDiff$ is a valid
-pre-condition by virtue of maxSeq and minSeq and therefore the
-subtraction is guaranteed to return a natural number as defined in
-the specification. This solution passes fuzz validation.
+minSeq use the  operators and maxDiff uses the length operators with
+subtraction \citep[Page 40]{simpson25f}. For maxDiff, $maxSeq \geq
+minDiff$ is a valid pre-condition by virtue of maxSeq and minSeq and
+therefore the subtraction is guaranteed to return a natural number as
+defined in the specification, making maxSeq() a total function
+\citep[Page 119]{simpson-notes}. This solution passes fuzz validation.
 
 \bigskip
 
@@ -643,7 +668,7 @@ the specification. This solution passes fuzz validation.
 \noindent In this equivalence proof, we show that composition is
 associative using the definition of relational composition and by
 repositioning quantifiers and predicates where we are permitted to do
-so, which is only when there is no impact to the truthity of the
+so, which is only when there is no impact to the truth value of the
 predicates involved. Each such repositioning or regrouping will be justified.
 
 \bigskip
@@ -683,13 +708,13 @@ $\mapsto$ $z \in R$ $\circ$ S $\Leftrightarrow$ $\exists y : Y @ x
 outer composition of (R $\circ$ S) $\circ$ T. In step 2, we apply our
 equivalence to the inner composition (R $\circ$ S).  In step 3, we
 include the predicate y $\mapsto$ $z \in T$ in the scope of x : X. We
-can do this because this does not affect the truthity of y $\mapsto$
-$z \in T$ as x is not free in this predicate. In step 4, we
+can do this because this does not affect the truth values of y
+$\mapsto$ $z \in T$ as x is not free in this predicate. In step 4, we
 reposition the exists y : Y quantifier to be after the w $\mapsto$ $x
-\in R$ predicate without affecting its truthity because y is not free
-in w $\mapsto$ $x \in R$.  In step 5, we apply the equivalence for
-composition to S $\circ$ T.  In step 6, we apply the equivalence for
-composition to R $\circ$ (S $\circ$ T).
+\in R$ predicate without affecting its truth values because y is not
+free in w $\mapsto$ $x \in R$.  In step 5, we apply the equivalence
+for composition to S $\circ$ T.  In step 6, we apply the equivalence
+for composition to R $\circ$ (S $\circ$ T).
 
 \bigskip
 
@@ -701,20 +726,23 @@ see that y : Y needed to be repositioned to setup step 6.  The
 reasoning about both of these steps was not obvious at first, but I
 realized that these moves had no impact on the truth values of the
 affected predicates.  This led me to think about free and bound
-variables and what rules might apply in various cases.  I was not
-able to find a specific justification in the materials that maps to
-the idea that one can reposition quantifiers or predicates provided
-there is no inpact to the truthity, but this seems logical and sound
-provided x is not $free \in P$ for the affected P.
+variables and what rules might apply in various cases \citep[Pages
+54-55]{simpson-notes}.  I was not able to find a specific
+justification in the materials that maps to the idea that one can
+reposition quantifiers or predicates provided there is no inpact to
+the truth values, but this seems logical and sound provided x is not
+$free \in P$ for the affected P. I note the parallels with the logic
+for substition operations \citep[Pages 56-57]{simpson-notes}.
 
 \bigskip
-
-\newpage
 
 \section*{Question 6}
 \addcontentsline{toc}{section}{Question 6}
 
-\noindent Lecture 4 - Sets, Types, and Definitions
+\noindent The following set comprehensions are presented using Z
+axiomatic definitions to enable direct fuzz validation of the LaTeX.
+Further, exponents are written long-hand as fuzz does not  support
+exponentation.
 
 \bigskip
 
@@ -759,10 +787,10 @@ provided x is not $free \in P$ for the affected P.
 
 \noindent\hspace*{\parindent}(e)
 \begin{axdef}
-  SquareOrCubeIntegers : \power \num
+  SetsOfSquareOrCubeIntegers : \power (\power  \num)
   \where
-  SquareOrCubeIntegers = \{ z, z_0 : \num | z = z_0 * z_0 \lor z =
-  z_0 * z_0 * z_0 @ z \}
+  SetsOfSquareOrCubeIntegers = \power \{ z, z_0 : \num | z = z_0 *
+  z_0 \lor z = z_0 * z_0 * z_0 @ z \}
 \end{axdef}
 
 \bigskip
@@ -1545,6 +1573,10 @@ rule [$\Rightarrow$ intro] to unify our cases and conclude:
   \textit{Free types and induction}. Lecture slides for Software
   Engineering Mathematics. University of Oxford Department of
   Computer Science. Lecture 07.
+
+  \bibitem[Simpson, 2025h]{simpson25h} Simpson, A. (2025g).
+  \textit{Proof rules}. Lecture slides for Software Engineering
+  Mathematics. University of Oxford Department of Computer Science. Lecture 03.
 
   \bibitem[Spivey, 1992]{spivey92} Spivey, J.M. (1992). \textit{The Z
   Notation: A Reference Manual}. Upper Saddle River, NJ: Prentice Hall.

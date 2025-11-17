@@ -12,9 +12,9 @@ CONTENTS:
 
 PAGEBREAK:
 
-TEXT: Answers use the order of precedence ([not], [and], [or], [=>], [<=>]) [cite simpson25a Slide 20].
-
 ** Question 1 **
+
+TEXT: A tautology is a statement that is true for every valuation of the propositional variables it contains. A contradiction is a statement that is false for each such valuation. A contingency is a statement that is neither a tautology nor a contradiction. [cite simpson-notes Page 13].
 
 (a) TRUTH TABLE:                                                                            
 p | not p | (not p => p) | p => (not p => p)
@@ -22,7 +22,6 @@ T | F | T | T
 F | T | F | T
 
 TEXT: p => (not p => p) is a tautology as it is true for every interpretation of p as illustrated by the final column of truth values.
-
 
 (b) TRUTH TABLE:                                                                            
 p | q | (q => p) | not p | not q | (not p => not q) | (not p => not q) <=> (q => p)
@@ -34,7 +33,7 @@ f | f | t | t | t | t | t
 TEXT: The statements (not p =>  not q), (q => p) are equivalent and (not p =>  not q) <=> (q => p) is a tautology as it is true for every interpretation of p, q as illustrated by the final column of truth values.
 
 (c) TRUTH TABLE:
-p | q | r | (p => r) | (q => r) | ((p =>r) and (q => r)) | (p or q) | ((p or q) => r) | <=>
+p | q | r | (p => r) | (q => r) | ((p =>r) and (q => r)) | (p or q) | ((p or q) => r) | ((p => r) and (q => r)) <=> ((p or q) => r)
 t | t | t | t | t | t | t | t | t
 t | t | f | f | f | f | t | f | t
 t | f | t | t | t | t | t | t | t
@@ -46,57 +45,55 @@ f | f | f | t | t | t | f | t | t
 
 TEXT: The statements ((p => r) and (q => r)), ((p or q) => r) are equivalent and ((p => r) and (q => r)) <=> ((p or q) => r) is a tautology as it is true for every interpretation of p, q, r as illustrated by the final column of truth values.
 
-PAGEBREAK:
-
 ** Question 2 **
 
 (a) EQUIV:
 p => (not p => p) 
 p => (not not p or p) [=> disjunction]
-p => (p or p) [not not]
+p => (p or p) [negation is an involution]
 p => p [idempotence of p]
 true [tautology]
 
-TEXT: In this equivalence proof, we show that p => (not p => p) by using implication disjunction to replace the implication with a logical or, the definition of double negation to simplify, the application of the idempotence rule to simplify, and the fact that p => p is a tautology. 
-
-(b) EQUIV:
-(not p => not q)
-(not not p or not q) [=> disjunction]
-(p or not q) [not not]
-(not q or p) [commutativity of or]
-q => p [=> disjunction]
-
-TEXT: In this equivalance proof, we show that (not p => not q) <=> q => p by using implication disjunction to replace implication with logical or, the definition of double negation to simplify, the commutivity property of logical or to change the order of the elements, and the implication disjunction rule to reintroduce implication.
-
-(c) EQUIV:
-((p => r) and (q => r))
-((not p or r) and (not q or r)) [=> disjunction]
-(r or not p) and (r or not q) [commutativity of or]
-r or (not p and not q) [distributivity 2]
-(not p and not q) or r [commutativity of or]
-not (p or q) or r [De Morgan]
-p or q => r [=> disjunction]
-
-TEXT: In this equivalence proof, we show that ((p => r) and (q => r)) <=> (p or q) => r by using the implication disjunction rule to replace implication with logical or, the commutativity of or rule to change the order of the elements, the distributivity 2 rule to extract r, and the commutivity of logical or to change the order of the elements, De Morgan to extract negation for (not p and not q), and the implication disjunction rule to reintroduce implication.
+TEXT: In this equivalence, we prove that p => (not p => p) by starting with implication disjunction to replace the implication with a logical or [cite simpson-notes page 17]. Next, we use the definition of double negation [cite simpson25a Slide 25] and the application of the idempotence rule to simplify [cite simpson25a Slide 26]. We trivially conclude with the fact that p => p is a tautology. 
 
 PAGEBREAK:
 
-** Question 3 **
+(b) EQUIV:
+not p => not q
+not not p or not q [=> disjunction]
+p or not q [negation is an involution]
+not q or p [commutativity of or]
+q => p [=> disjunction]
 
-TEXT: Lecture 3 - Deductive Proofs
+TEXT: In this equivalance proof, we show that (not p => not q) <=> q => p by using implication disjunction to replace implication with logical or, the definition of double negation to simplify, the commutivity property of logical or to change the order of the elements [cite simpson25a Slide 27], and the implication disjunction rule to reintroduce implication.
+
+(c) EQUIV:
+(p => r) and (q => r)
+(not p or r) and (not q or r) [=> disjunction]
+(r or not p) and (r or not q) [commutativity of or]
+r or (not p and not q) [distributivity 2]
+(not p and not q) or r [commutativity of or]
+not (p or q) or r [De Morgan 1]
+p or q => r [=> disjunction]
+
+TEXT: In this equivalence proof, we show that ((p => r) and (q => r)) <=> (p or q) => r by using the implication disjunction rule to replace implication with logical or, the commutativity of or rule to change the order of the elements [cite simpson25a Slide 27], the distributivity 2 rule to extract r [cite simpson25a Slide 29], and the commutivity of logical or to change the order of the elements, De Morgan's Law to extract negation for (not p and not q) [cite simpson25a Slide 28], and the implication disjunction rule to reintroduce implication.
+
+** Question 3 **
 
 (a) PROOF: 
   p => (not p => p) [=> intro from 1]
     p [from 1]
     [1] p [assumption]
         not p => p [=> intro from 2]
-          p [from 1]
-          not p [false elim from 3]
+          [2] not p [assumption]
+          p [false elim from 3]
             false [false-intro]
-              [2] not p [assumption]
-              [3] p [assumption]
+              [1] p [assumption]
+              [3] not p [assumption]
 
-TEXT: For this proof we are seeking to prove that p => (not p => p), which we know holds given the truth table in 1(a). Working mechanically from the bottom, I started by applying the implication introduction rule with assumption [1] to gain our conclusion, implication introduction rule with assumption [2] to gain (not p => p).  This statement requires that I have both p and not p as premisses, which is a bit odd and implied I needed to use false in the proof.  Since I had p as assumption [1], I knew I wanted not p as the output of the false rules.  It took some experimentation, but eventually I realized I needed three assumptions not two and it was obvious that I wanted to preserve not p as assumption [2], which meant I needed p as assumption [3] and that assumption [3] would be discharged by the false-elim rule.  In the final proof, all assumptions are discharged properly. The key insight was to have p as an assumption twice at different scopes.
+TEXT: For this proof we are seeking to prove that p => (not p => p), which we know holds given the truth table in 1(a). Working mechanically from the bottom, we start by applying the implication introduction rule to identify and discharge assumption [1] to gain our conclusion [cite simpson25h Slide 3] and again we use the implication introduction rule to identify and discharge assumption [2] to gain (not p => p).  We note that this statement requires that we have both p and not p as premisses, which implies we need to use false in the proof. With some experimentation, we realize we need three assumptions and we introduce a third assumption [3]. We first use false-intro followed by false-elim1 to discharge assumption [3] [cite simpson25h Slide 6]. In the final proof, all assumptions are discharged properly. We note that this proof bears some similarities with the rules of negation proof in the course notes section 4.8 [cite simpson-notes Pages 41-46] which has multiple degrees of negation of p as assumptions. The key is to have not p as an assumption twice at different scopes. 
+
+PAGEBREAK:
 
 (b) 
 
@@ -132,18 +129,22 @@ PROOF:
             [3] q [assumption]
           :: not p [from 2]
 
-TEXT: Working mechanically from the bottom, I apply the implication rule to q => p as assumption [1] to gain the conclusion.  I need (not p => not q), which shows me to use the implication rule again with (not p) as assumption [2].  From there, the question is how to get not q.  Now working from the top, given assumption [1] has q, it makes sense to use the implication elimation rule with q as assumption [3]. This gives me p, when what I want is not q.  I see that if I introduce not p as assumption [3] that I can negate q via the false-intro and false-elim rules and successfully discharge assumption [3]. This gives me not q, which is what I need to connect to the top tree to the bottom of the proof. This proof came more quickly because q => p as assumption [1] gave clear direction for the top portion. All assumptions are discharged and scopes are appropriate.
+TEXT: Working mechanically from the bottom, I apply the implication rule to q => p as assumption [1] to gain the conclusion.  I need (not p => not q), which shows me to use the implication rule again with (not p) as assumption [2].  From there, the question is how to get not q.  
 
-TEXT: We then combine these two proofs with the <=>-intro rule, using the results from above:
+TEXT: Now working from the top, given assumption [1] has q, it makes sense to use the implication elimation rule with q as assumption [3]. This gives me p, when what I want is not q.  I see that if I introduce not p as assumption [3] that I can negate q via the false-intro and false-elim rules and successfully discharge assumption [3]. This gives me not q, which is what I need to connect to the top tree to the bottom of the proof. This proof came more quickly because q => p as assumption [1] gave clear direction for the top portion. All assumptions are discharged and scopes are appropriate.
+
+TEXT: We then combine these two proofs with the <=>-intro rule [cite simpson25h Slide 4], using the results from above to conclude our proof.
 
 PROOF:
   (not p => not q) <=> (q => p) [<=> intro]
     :: (not p => not q) => (q => p)
     :: (q => p) => (not p => not q)
 
+PAGEBREAK:
+
 (c)
 
-TEXT: In one direction, we are seeking to prove (p => r) and (q => r) => (p or q => r)
+TEXT: In one direction, we are seeking to prove ((p => r) and (q => r)) => ((p or q) => r)
 
 PROOF:
   ((p => r) and (q => r)) => ((p or q) => r) [=> intro from 1]
@@ -163,9 +164,13 @@ PROOF:
             :: (q => r) [and elim 2]
               (p => r) and (q => r) [from 1]
   
-TEXT: In this proof, I start by working from the bottom mechanically, taking (p => r) and (q => r) as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need (p or q) and r as inputs to the implication introduction rule.  I take (p or q) as assumption [2] and discharge this assumption via this rule.  That leaves me with r as the result of my bottom up process.  As I have already made assumptions ((p => r) and (q => r)) [1] and (p or q) [2] and they are related, I start by working with both top-down. I begin with (p or q) [2] and create cases for p and q working towards or elimination.  The p and q sub-branches are marked with [2] as the assumption as these are just the cases for (p or q) [2] [cite simpson25c slide 41]. First, I apply and elimination in each case to get (p => r), (q => r) with p, q respectively in the sub-branches.  From there, I apply implication elimination to arrive at r in both cases.  This enables me to use the or elimation together with (p or q) [2] to simplify to r.  At this stage, I do not discharge assumption [2], as this is deferred until the next step. I use implication introduction together with (p or q) [2] and r from the or elimination to discharge assumption [2], which connects the top-down and bottom-up process. All assumptions are properly discharged.  
+TEXT: In this proof, I start by working from the bottom mechanically, taking (p => r) and (q => r) as assumption [1] and applying the implication introduction rule to arrive at our conclusion and discharge assumption [1]. From there, I can see that I need (p or q) and r as inputs to the implication introduction rule.  I take (p or q) as assumption [2] and discharge this assumption via the implication introduction rule.  That leaves me with r as the result of my bottom up process.  
 
-TEXT: In the other direction, we are seeking to prove (p or q => r) => ((p => r) and (q => r)):
+TEXT: As I have already made assumptions ((p => r) and (q => r)) [1] and (p or q) [2] and they are related, I start by working with both top-down. I begin with (p or q) [2] and create cases for p and q working towards or elimination.  The p and q sub-branches are marked with [2] as the assumption as these are just the cases for (p or q) [2] [cite simpson25c slide 41]. Next, I apply and elimination in each case to get (p => r), (q => r) with the appropriate p or q cases in the sub-branches.  From there, I apply implication elimination to arrive at r in both cases.  This enables me to use the or elimination together with (p or q) [2] to simplify to r.  
+
+TEXT: At this stage, I do not discharge assumption [2], as this is deferred until the next step. I use implication introduction together with (p or q) [2] and r from the or elimination to discharge assumption [2], which connects the top-down and bottom-up process. All assumptions are properly discharged.  
+
+TEXT: In the other direction, we are seeking to prove ((p or q) => r) => ((p => r) and (q => r)):
 
 PROOF:
 ((p or q) => r) => ((p => r) and (q => r))  [=> intro from 1]
@@ -184,9 +189,9 @@ PROOF:
         :: p or q [or intro2]
           [3] q [assumption]
 
-TEXT: Working mechanically from the bottom, we start by taking (p or q => r) as assumption [1] and applying the implication introduction rule to discharge assumption [1].  This leaves us with (p => r) and (q => r), which is derived from p => r, q => r and the application of the and introduction rule. Fairly clearly, we need two sub-branches to be developed top-down. Since we have (p or q => r) and we want p => r and q => r, I start with p [2] and q [3] to start the top-down sub-trees.  I struggled here until I recalled that I could use the or intro rule to satisfy (p or q).  I also had to recall that this does not generate additional assumptions to discharge [cite simpson25c slide 38]. From here, it was not difficult to use implication elimation to arrive at r in both sub-trees and to apply p [2] and q [3] in each tree respectively with the implication introduction rule to discharge those assumptions.  This gave me p => r, q => r and I used the and introduction rule to connect the top and bottom portions of the proof. All assumptions are properly discharged.  
+TEXT: Working mechanically from the bottom, we start by taking ((p or q) => r) as assumption [1] and applying the implication introduction rule to discharge assumption [1].  This leaves us with ((p => r) and (q => r)), which is derived from p => r, q => r and the application of the and introduction rule. Fairly clearly, we need two sub-branches to be developed top-down. Since we have ((p or q) => r) and we want p => r and q => r, I start with p [2] and q [3] to start the top-down sub-trees.  I struggled here until I recalled that I could use the or intro rule to satisfy (p or q).  I also had to recall that this does not generate additional assumptions to discharge [cite simpson25c slide 38]. From here, it was not difficult to use implication elimation to arrive at r in both sub-trees and to apply p [2] and q [3] in each tree with the implication introduction rule to discharge those assumptions.  This gave me p => r, q => r and I used the and introduction rule to connect the top and bottom portions of the proof. All assumptions are properly discharged.
 
-TEXT: We then combine these two proofs with the <=>-intro rule, using the results from above:
+TEXT: We then combine these two proofs with the <=>-intro rule, using the results from above to conclude our proof:
 
 PROOF:
   ((p => r) and (q => r)) <=> ((p or q) => r) [<=> intro]
@@ -195,7 +200,7 @@ PROOF:
 
 ** Question 4 **
 
-TEXT: We are defining a generic function that will tell us the difference in length between the longest and shorest sequences from an input type that is a non-empty sequences of sequences. The input could be < <x, y, z>, <> > yielding 3 as output or < <x> > yielding 0, for example. I specify three generic functions: maxSeq yields the longest sequence from a non-empty sequence of sequences; minSeq yields the shortest sequence from a non-empty sequence of sequences; and maxDiff, which fulfills the specification for Question 4.
+TEXT: We are defining a generic function that will return the difference in length between the longest and shorest sequences from an input type that is a non-empty sequences of sequences. The input could be < <x, y, z>, <> > yielding 3 as output or < <x> > yielding 0, for example. I specify three generic functions: maxSeq yields the longest sequence from a non-empty sequence of sequences; minSeq yields the shortest sequence from a non-empty sequence of sequences; and maxDiff, which fulfills the specification for Question 4.
 
 gendef [X]
   maxSeq : seq1 seq X -> seq X ; minSeq : seq1 seq X -> seq X; maxDiff : seq1 seq X -> N
@@ -205,7 +210,7 @@ where
   forall ss : seq1 seq X | maxDiff(ss) = ((# maxSeq(ss)) - (# minSeq(ss)))
 end
 
-TEXT: For maxSeq and minSeq, a mu function is defined that selects a single element meeting the specification based on comparing each sequence s with every sequence t. First, the range operator moves us from a sequence of sequences with ss values such as < 1 |-> <x, y, z>, 2 |-> <> > to sequences s, t with values like <x, y, z>, <> to enable seq operators. maxSeq and minSeq use the length operators and maxDiff uses the length operators with subtraction. For maxDiff, maxSeq >= minDiff is a valid pre-condition by virtue of maxSeq and minSeq and therefore the subtraction is guaranteed to return a natural number as defined in the specification. This solution passes fuzz validation.
+TEXT: For maxSeq and minSeq, a mu function is defined that selects a single element meeting the specification based on comparing every sequence s with every sequence t. First, the range operator moves us from a sequence of sequences with ss values such as < 1 |-> <x, y, z>, 2 |-> <> > to sequences s, t with values like <x, y, z>, <> to enable seq operators. maxSeq and minSeq use the  operators and maxDiff uses the length operators with subtraction [cite simpson25f Page 40]. For maxDiff, maxSeq >= minDiff is a valid pre-condition by virtue of maxSeq and minSeq and therefore the subtraction is guaranteed to return a natural number as defined in the specification, making maxSeq() a total function [cite simpson-notes Page 119]. This solution passes fuzz validation.
 
 ** Question 5 **
 
@@ -215,7 +220,7 @@ LATEX: \hspace*{1em} $(R \circ S) \circ T = R \circ (S \circ T)$
 
 TEXT: if R in W <-> X, S in X <-> Y, and T in Y <-> Z.
 
-TEXT: In this equivalence proof, we show that composition is associative using the definition of relational composition and by repositioning quantifiers and predicates where we are permitted to do so, which is only when there is no impact to the truthity of the predicates involved. Each such repositioning or regrouping will be justified. 
+TEXT: In this equivalence proof, we show that composition is associative using the definition of relational composition and by repositioning quantifiers and predicates where we are permitted to do so, which is only when there is no impact to the truth value of the predicates involved. Each such repositioning or regrouping will be justified. 
 
 TEXT: Given a relation R in X <-> Y and a second relation S in Y <-> Z, and two elements x in X and z in Z, x |-> z in R o9 S <=> (exists y : Y | x |-> y in R and y |-> z in S) [cite simpson-notes page 107].
 
@@ -228,15 +233,13 @@ w |-> z in (R o9 S) o9 T
 (exists x : X | w |-> x in R and x |-> z in (S o9 T))                                       [definition of o9]
 w |-> z in R o9 (S o9 T)
 
-TEXT: In step 1, we apply the composition equivalence to the outer composition of (R o9 S) o9 T. In step 2, we apply our equivalence to the inner composition (R o9 S).  In step 3, we include the predicate y |-> z in T in the scope of x : X. We can do this because this does not affect the truthity of y |-> z in T as x is not free in this predicate. In step 4, we reposition the exists y : Y quantifier to be after the w |-> x in R predicate without affecting its truthity because y is not free in w |-> x in R.  In step 5, we apply the equivalence for composition to S o9 T.  In step 6, we apply the equivalence for composition to R o9 (S o9 T).
+TEXT: In step 1, we apply the composition equivalence to the outer composition of (R o9 S) o9 T. In step 2, we apply our equivalence to the inner composition (R o9 S).  In step 3, we include the predicate y |-> z in T in the scope of x : X. We can do this because this does not affect the truth values of y |-> z in T as x is not free in this predicate. In step 4, we reposition the exists y : Y quantifier to be after the w |-> x in R predicate without affecting its truth values because y is not free in w |-> x in R.  In step 5, we apply the equivalence for composition to S o9 T.  In step 6, we apply the equivalence for composition to R o9 (S o9 T).
 
-TEXT: I worked on this proof both top-down and bottom-up.  After doing the obvious equivalence substitutions, I was left with step 3 and 4 to work out. In working out step 3, I could see from step 6 that I wanted S o9 T together.  In working out step 4, I could see that y : Y needed to be repositioned to setup step 6.  The reasoning about both of these steps was not obvious at first, but I realized that these moves had no impact on the truth values of the affected predicates.  This led me to think about free and bound variables and what rules might apply in various cases.  I was not able to find a specific justification in the materials that maps to the idea that one can reposition quantifiers or predicates provided there is no inpact to the truthity, but this seems logical and sound provided x is not free in P for the affected P.
-
-PAGEBREAK:
+TEXT: I worked on this proof both top-down and bottom-up.  After doing the obvious equivalence substitutions, I was left with step 3 and 4 to work out. In working out step 3, I could see from step 6 that I wanted S o9 T together.  In working out step 4, I could see that y : Y needed to be repositioned to setup step 6.  The reasoning about both of these steps was not obvious at first, but I realized that these moves had no impact on the truth values of the affected predicates.  This led me to think about free and bound variables and what rules might apply in various cases [cite simpson-notes Pages 54-55].  I was not able to find a specific justification in the materials that maps to the idea that one can reposition quantifiers or predicates provided there is no inpact to the truth values, but this seems logical and sound provided x is not free in P for the affected P. I note the parallels with the logic for substition operations [cite simpson-notes Pages 56-57].
 
 ** Question 6 **
 
-TEXT: Lecture 4 - Sets, Types, and Definitions
+TEXT: The following set comprehensions are presented using Z axiomatic definitions to enable direct fuzz validation of the LaTeX.  Further, exponents are written long-hand as fuzz does not  support exponentation.
 
 (a)
 axdef
@@ -268,9 +271,9 @@ end
 
 (e)
 axdef
-  SquareOrCubeIntegers : P (Z)
+  SetsOfSquareOrCubeIntegers : P (P (Z))
 where
-  SquareOrCubeIntegers = { z, z_0 : Z | z = z_0 * z_0 or z = z_0 * z_0 * z_0 . z}
+  SetsOfSquareOrCubeIntegers = P { z, z_0 : Z | z = z_0 * z_0 or z = z_0 * z_0 * z_0 . z}
 end
 
 PAGEBREAK:
@@ -483,7 +486,9 @@ TEXT: First, we can create an abbreviation for the elements of our list to make 
 
 ListElement == (ShowId cross EpisodeId) cross (N cross PlayedOrNot cross SavedOrNot)
 
+
 TEXT: We restate our List free type definition using the abbreviation as
+
 
 List ::= nil | join <<ListElement cross List>>
 
@@ -547,10 +552,11 @@ end
 
 TEXT: The played list of any given list is a new list, which recursively includes or excludes each ListElement based on the PlayedOrNot free type value of Played found in the second position of the triple found in the second element of the tuple of each ListElement. 
 
-(c) TEXT: Prove 
+(c) TEXT: To use proof by induction, we need to prove the base case and the inductive case. 
+
 forall l : List | length_L(played_L(l)) + length_L(unplayed_L(l)) = length_L(l)
 
-TEXT: To use proof by induction, we need to prove the base case and the inductive case. The base case occurs when the List is nil.
+TEXT: The base case occurs when the List is nil.
 
 EQUIV:
 length_L(played_L(nil)) + length_L(unplayed_L(nil))
@@ -604,7 +610,7 @@ forall l : List | L(l)
   :: L(nil)
   :: forall l : List | L(played(l)) + L(unplayed(l)) = L(l) => L(played(join(e, l))) + L(unplayed(join(e, l))) = L(join(e, l))
 
-TEXT: by which we have proven forall l : List | length_L(played_L(l)) + length_L(unplayed_L(l)) = length_L(l)
+TEXT: we have proven forall l : List | length_L(played_L(l)) + length_L(unplayed_L(l)) = length_L(l)
 
 PAGEBREAK:
 
@@ -628,6 +634,8 @@ LATEX:
 LATEX: \bibitem[Simpson, 2025f]{simpson25f} Simpson, A. (2025f). \textit{Functions and sequences}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 06.
 LATEX:
 LATEX: \bibitem[Simpson, 2025g]{simpson25g} Simpson, A. (2025g). \textit{Free types and induction}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 07.
+LATEX:
+LATEX: \bibitem[Simpson, 2025h]{simpson25h} Simpson, A. (2025g). \textit{Proof rules}. Lecture slides for Software Engineering Mathematics. University of Oxford Department of Computer Science. Lecture 03.
 LATEX:
 LATEX: \bibitem[Spivey, 1992]{spivey92} Spivey, J.M. (1992). \textit{The Z Notation: A Reference Manual}. Upper Saddle River, NJ: Prentice Hall.
 LATEX:
