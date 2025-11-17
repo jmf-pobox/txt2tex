@@ -234,7 +234,7 @@ class LaTeXGenerator:
         # Preamble
         # Use fleqn option to left-align all equations (no centering)
         # a4paper for A4 page size, 10pt font (matches instructor's format)
-        lines.append(r"\documentclass[a4paper,10pt,fleqn]{article}")
+        lines.append(r"\documentclass[a4paper,11pt,fleqn]{article}")
         # Standard 1 inch margins on all sides
         lines.append(r"\usepackage[margin=1in]{geometry}")
         # Load amssymb for \mathbb{N} and \mathbb{Z} blackboard bold
@@ -1538,13 +1538,20 @@ class LaTeXGenerator:
                         lines.append(indent_prefix + part_label + " " + first_line)
                         lines.extend(item_lines[1:])
             else:
-                # Multiple items: (a) first item inline, then remaining
+                # Multiple items: (a) first item on separate line, then remaining
                 if node.items:
                     first_item = node.items[0]
                     if isinstance(first_item, Paragraph):
-                        # Process the text to convert operators and handle inline math
-                        processed_text = self._process_paragraph_text(first_item.text)
-                        lines.append(indent_prefix + part_label + " " + processed_text)
+                        # Paragraph: (a) on separate line to avoid line-wrap issues
+                        lines.append(indent_prefix + part_label)
+                        lines.append("")
+                        # Set \leftskip for this paragraph (will stay set for remaining items)
+                        lines.append(r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}")
+                        self._in_inline_part = True
+                        item_lines = self.generate_document_item(first_item)
+                        lines.extend(item_lines)
+                        self._in_inline_part = False
+                        # Note: \leftskip stays set for remaining items
                     elif isinstance(first_item, Expr):
                         if self._has_line_breaks(first_item):
                             # Expression with line breaks: (a) on its own line
