@@ -129,12 +129,21 @@ fi
 
 # Use latexmk to handle multiple passes automatically
 # It runs pdflatex as many times as needed until citations/references resolve
-# Use -g to force at least one extra pass (needed for natbib citations)
+# Use -gg to force at least two extra passes (needed for natbib citations)
+# With BibTeX: pdflatex -> bibtex -> pdflatex -> pdflatex (4 runs minimum)
+# For complex documents with many citations, run latexmk twice to ensure convergence
 # Conditionally enable/disable bibtex based on whether bibliography file is present
 # No TEXINPUTS/MFINPUTS needed - files are local
 set +e  # Temporarily disable exit on error
-cd "$INPUT_DIR" && latexmk -pdf -g $BIBTEX_FLAG -interaction=nonstopmode -file-line-error "${INPUT_BASE}.tex" > "${INPUT_BASE}.latexmk.log" 2>&1
+cd "$INPUT_DIR" && latexmk -pdf -gg $BIBTEX_FLAG -interaction=nonstopmode -file-line-error "${INPUT_BASE}.tex" > "${INPUT_BASE}.latexmk.log" 2>&1
 LATEXMK_EXIT=$?
+
+# If bibliography detected, run latexmk one more time to resolve all citations
+# This ensures 4+ pdflatex passes for complex documents
+if [ "$BIBTEX_FLAG" = "" ]; then
+    cd "$INPUT_DIR" && latexmk -pdf -g $BIBTEX_FLAG -interaction=nonstopmode -file-line-error "${INPUT_BASE}.tex" >> "${INPUT_BASE}.latexmk.log" 2>&1
+    LATEXMK_EXIT=$?
+fi
 
 if [ ! -f "${INPUT_BASE}.pdf" ]; then
     echo "Error: PDF compilation failed (exit code: $LATEXMK_EXIT)" >&2
