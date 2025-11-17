@@ -1876,8 +1876,6 @@ class LaTeXGenerator:
         The LaTeX is passed directly through to the output.
         """
         lines: list[str] = []
-        lines.append(r"\bigskip")  # Spacing before
-        lines.append("")
         lines.append(node.latex)  # Raw LaTeX, no processing
         lines.append("")
         lines.append(r"\bigskip")  # Spacing after
@@ -2775,6 +2773,9 @@ class LaTeXGenerator:
         # Close center environment (only if we opened it)
         if not self._in_inline_part:
             lines.append(r"\end{center}")
+        # Add trailing spacing for separation from following content
+        lines.append(r"\bigskip")
+        lines.append("")
 
         return lines
 
@@ -2939,6 +2940,9 @@ class LaTeXGenerator:
         # Close center environment (only if we opened it)
         if not self._in_inline_part:
             lines.append(r"\end{center}")
+        # Add trailing spacing for separation from following content
+        lines.append(r"\bigskip")
+        lines.append("")
 
         return lines
 
@@ -3225,6 +3229,9 @@ class LaTeXGenerator:
         # Close center environment (only if we opened it)
         if not self._in_inline_part:
             lines.append(r"\end{center}")
+        # Add trailing spacing for separation from following content
+        lines.append(r"\bigskip")
+        lines.append("")
 
         return lines
 
