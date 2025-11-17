@@ -2718,6 +2718,9 @@ class LaTeXGenerator:
         """Generate LaTeX for truth table (centered, with auto-scaling if needed)."""
         lines: list[str] = []
 
+        # Add spacing before element for visual separation
+        lines.append(r"\medskip")
+
         # Calculate available width and setup positioning
         if self._in_inline_part:
             # Inside part with leftskip: skip centering, align naturally
@@ -2771,7 +2774,8 @@ class LaTeXGenerator:
         # Close center environment (only if we opened it)
         if not self._in_inline_part:
             lines.append(r"\end{center}")
-        lines.append("")
+        # Add spacing after element for visual separation
+        lines.append(r"\medskip")
 
         return lines
 
@@ -2886,6 +2890,9 @@ class LaTeXGenerator:
         """
         lines: list[str] = []
 
+        # Add spacing before element for visual separation
+        lines.append(r"\medskip")
+
         # Calculate available width and setup positioning
         if self._in_inline_part:
             # Inside part with leftskip: skip centering, align naturally
@@ -2936,7 +2943,8 @@ class LaTeXGenerator:
         # Close center environment (only if we opened it)
         if not self._in_inline_part:
             lines.append(r"\end{center}")
-        lines.append("")
+        # Add spacing after element for visual separation
+        lines.append(r"\medskip")
 
         return lines
 
@@ -3198,8 +3206,8 @@ class LaTeXGenerator:
         """Generate LaTeX for proof tree (auto-scales if needed)."""
         lines: list[str] = []
 
-        # Start PROOF block on a new line relative to part label
-        lines.append("")
+        # Add spacing before element for visual separation
+        lines.append(r"\medskip")
 
         # Calculate available width and setup positioning
         if self._in_inline_part:
@@ -3226,7 +3234,8 @@ class LaTeXGenerator:
         # Close center environment (only if we opened it)
         if not self._in_inline_part:
             lines.append(r"\end{center}")
-        lines.append("")
+        # Add spacing after element for visual separation
+        lines.append(r"\medskip")
 
         return lines
 
