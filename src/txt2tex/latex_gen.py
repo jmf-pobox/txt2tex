@@ -257,6 +257,10 @@ class LaTeXGenerator:
             r"\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}"
         )
 
+        # Declare dimension register for saving \leftskip before \begin{center}
+        # The center environment resets \leftskip, but we need it for width calc
+        lines.append(r"\newdimen\savedleftskip")
+
         # Title metadata (if present)
         if isinstance(ast, Document) and ast.title_metadata:
             meta = ast.title_metadata
@@ -2714,14 +2718,16 @@ class LaTeXGenerator:
         """Generate LaTeX for truth table (centered, with auto-scaling if needed)."""
         lines: list[str] = []
 
-        # Center the table
-        lines.append(r"\begin{center}")
-
+        # Save \leftskip before \begin{center} resets it
         # Calculate available width (account for \leftskip if in inline part)
         if self._in_inline_part:
-            max_width = r"\dimexpr\textwidth-\leftskip\relax"
+            lines.append(r"\savedleftskip=\leftskip")
+            max_width = r"\dimexpr\textwidth-\savedleftskip\relax"
         else:
             max_width = r"\textwidth"
+
+        # Center the table
+        lines.append(r"\begin{center}")
 
         # Wrap table in adjustbox to scale if wider than available width
         lines.append(r"\adjustbox{max width=" + max_width + r"}{%")
@@ -2877,15 +2883,17 @@ class LaTeXGenerator:
         """
         lines: list[str] = []
 
+        # Save \leftskip before \begin{center} resets it
+        # Calculate available width (account for \leftskip if in inline part)
+        if self._in_inline_part:
+            lines.append(r"\savedleftskip=\leftskip")
+            max_width = r"\dimexpr\textwidth-\savedleftskip\relax"
+        else:
+            max_width = r"\textwidth"
+
         # Center the entire equivalence chain
         # The center environment will center the display math block
         lines.append(r"\begin{center}")
-
-        # Calculate available width (account for \leftskip if in inline part)
-        if self._in_inline_part:
-            max_width = r"\dimexpr\textwidth-\leftskip\relax"
-        else:
-            max_width = r"\textwidth"
 
         # Wrap in adjustbox to scale if wider than available width
         lines.append(r"\adjustbox{max width=" + max_width + r"}{%")
@@ -3188,14 +3196,16 @@ class LaTeXGenerator:
         # Start PROOF block on a new line relative to part label
         lines.append("")
 
-        # Center the proof tree
-        lines.append(r"\begin{center}")
-
+        # Save \leftskip before \begin{center} resets it
         # Calculate available width (account for \leftskip if in inline part)
         if self._in_inline_part:
-            max_width = r"\dimexpr\textwidth-\leftskip\relax"
+            lines.append(r"\savedleftskip=\leftskip")
+            max_width = r"\dimexpr\textwidth-\savedleftskip\relax"
         else:
             max_width = r"\textwidth"
+
+        # Center the proof tree
+        lines.append(r"\begin{center}")
 
         # Wrap in adjustbox to scale if wider than available width
         lines.append(r"\adjustbox{max width=" + max_width + r"}{%")
