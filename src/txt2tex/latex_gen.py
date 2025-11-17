@@ -2718,16 +2718,17 @@ class LaTeXGenerator:
         """Generate LaTeX for truth table (centered, with auto-scaling if needed)."""
         lines: list[str] = []
 
-        # Save \leftskip before \begin{center} resets it
-        # Calculate available width (account for \leftskip if in inline part)
+        # Calculate available width and setup positioning
         if self._in_inline_part:
+            # Inside part with leftskip: skip centering, align with leftskip
             lines.append(r"\savedleftskip=\leftskip")
             max_width = r"\dimexpr\textwidth-\savedleftskip\relax"
+            # Position at leftskip margin (no center environment)
+            lines.append(r"\noindent\hspace*{\savedleftskip}")
         else:
+            # Normal context: use centering
             max_width = r"\textwidth"
-
-        # Center the table
-        lines.append(r"\begin{center}")
+            lines.append(r"\begin{center}")
 
         # Wrap table in adjustbox to scale if wider than available width
         lines.append(r"\adjustbox{max width=" + max_width + r"}{%")
@@ -2767,7 +2768,9 @@ class LaTeXGenerator:
         lines.append(r"\end{tabular}%")
         # Close adjustbox wrapper
         lines.append(r"}")
-        lines.append(r"\end{center}")
+        # Close center environment (only if we opened it)
+        if not self._in_inline_part:
+            lines.append(r"\end{center}")
         lines.append("")
 
         return lines
@@ -2883,17 +2886,17 @@ class LaTeXGenerator:
         """
         lines: list[str] = []
 
-        # Save \leftskip before \begin{center} resets it
-        # Calculate available width (account for \leftskip if in inline part)
+        # Calculate available width and setup positioning
         if self._in_inline_part:
+            # Inside part with leftskip: skip centering, align with leftskip
             lines.append(r"\savedleftskip=\leftskip")
             max_width = r"\dimexpr\textwidth-\savedleftskip\relax"
+            # Position at leftskip margin (no center environment)
+            lines.append(r"\noindent\hspace*{\savedleftskip}")
         else:
+            # Normal context: use centering
             max_width = r"\textwidth"
-
-        # Center the entire equivalence chain
-        # The center environment will center the display math block
-        lines.append(r"\begin{center}")
+            lines.append(r"\begin{center}")
 
         # Wrap in adjustbox to scale if wider than available width
         lines.append(r"\adjustbox{max width=" + max_width + r"}{%")
@@ -2930,7 +2933,9 @@ class LaTeXGenerator:
         lines.append(r"\end{array}$%")
         # Close adjustbox wrapper
         lines.append(r"}")
-        lines.append(r"\end{center}")
+        # Close center environment (only if we opened it)
+        if not self._in_inline_part:
+            lines.append(r"\end{center}")
         lines.append("")
 
         return lines
@@ -3196,16 +3201,17 @@ class LaTeXGenerator:
         # Start PROOF block on a new line relative to part label
         lines.append("")
 
-        # Save \leftskip before \begin{center} resets it
-        # Calculate available width (account for \leftskip if in inline part)
+        # Calculate available width and setup positioning
         if self._in_inline_part:
+            # Inside part with leftskip: skip centering, align with leftskip
             lines.append(r"\savedleftskip=\leftskip")
             max_width = r"\dimexpr\textwidth-\savedleftskip\relax"
+            # Position at leftskip margin (no center environment)
+            lines.append(r"\noindent\hspace*{\savedleftskip}")
         else:
+            # Normal context: use centering
             max_width = r"\textwidth"
-
-        # Center the proof tree
-        lines.append(r"\begin{center}")
+            lines.append(r"\begin{center}")
 
         # Wrap in adjustbox to scale if wider than available width
         lines.append(r"\adjustbox{max width=" + max_width + r"}{%")
@@ -3217,7 +3223,9 @@ class LaTeXGenerator:
         lines.append(r"$%")
         # Close adjustbox wrapper
         lines.append(r"}")
-        lines.append(r"\end{center}")
+        # Close center environment (only if we opened it)
+        if not self._in_inline_part:
+            lines.append(r"\end{center}")
         lines.append("")
 
         return lines
