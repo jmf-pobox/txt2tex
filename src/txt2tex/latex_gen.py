@@ -234,7 +234,7 @@ class LaTeXGenerator:
         # Preamble
         # Use fleqn option to left-align all equations (no centering)
         # a4paper for A4 page size, 10pt font (matches instructor's format)
-        lines.append(r"\documentclass[a4paper,11pt,fleqn]{article}")
+        lines.append(r"\documentclass[a4paper,10pt,fleqn]{article}")
         # Standard 1 inch margins on all sides
         lines.append(r"\usepackage[margin=1in]{geometry}")
         # Load amssymb for \mathbb{N} and \mathbb{Z} blackboard bold
@@ -1489,7 +1489,9 @@ class LaTeXGenerator:
                         lines.append(indent_prefix + part_label)
                         lines.append("")
                         # Set \leftskip for content after label
-                        lines.append(r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}")
+                        lines.append(
+                            r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
+                        )
                         self._in_inline_part = True
                         item_lines = self.generate_document_item(item)
                         lines.extend(item_lines)
@@ -1499,7 +1501,9 @@ class LaTeXGenerator:
                     else:
                         # Single-line expression: (a) $expr$
                         expr_latex = self.generate_expr(item)
-                        lines.append(indent_prefix + part_label + " $" + expr_latex + "$")
+                        lines.append(
+                            indent_prefix + part_label + " $" + expr_latex + "$"
+                        )
                         lines.append("")
                 elif isinstance(item, TruthTable):
                     # Truth table: (a) on its own line, then centered table
@@ -1538,20 +1542,13 @@ class LaTeXGenerator:
                         lines.append(indent_prefix + part_label + " " + first_line)
                         lines.extend(item_lines[1:])
             else:
-                # Multiple items: (a) first item on separate line, then remaining
+                # Multiple items: (a) first item inline, then remaining
                 if node.items:
                     first_item = node.items[0]
                     if isinstance(first_item, Paragraph):
-                        # Paragraph: (a) on separate line to avoid line-wrap issues
-                        lines.append(indent_prefix + part_label)
-                        lines.append("")
-                        # Set \leftskip for this paragraph (will stay set for remaining items)
-                        lines.append(r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}")
-                        self._in_inline_part = True
-                        item_lines = self.generate_document_item(first_item)
-                        lines.extend(item_lines)
-                        self._in_inline_part = False
-                        # Note: \leftskip stays set for remaining items
+                        # Process the text to convert operators and handle inline math
+                        processed_text = self._process_paragraph_text(first_item.text)
+                        lines.append(indent_prefix + part_label + " " + processed_text)
                     elif isinstance(first_item, Expr):
                         if self._has_line_breaks(first_item):
                             # Expression with line breaks: (a) on its own line
@@ -1565,7 +1562,7 @@ class LaTeXGenerator:
                             item_lines = self.generate_document_item(first_item)
                             lines.extend(item_lines)
                             self._in_inline_part = False
-                            # Note: \leftskip will be reset after all items are processed
+                            # Note: \leftskip reset after processing all items
                         else:
                             # Single-line expression: render inline
                             expr_latex = self.generate_expr(first_item)
@@ -1926,8 +1923,6 @@ class LaTeXGenerator:
         """
         lines: list[str] = []
         lines.append(node.latex)  # Raw LaTeX, no processing
-        lines.append("")
-        lines.append(r"\bigskip")  # Spacing after
         lines.append("")
         return lines
 
