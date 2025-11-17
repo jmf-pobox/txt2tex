@@ -742,7 +742,7 @@ for substition operations \citep[Pages 56-57]{simpson-notes}.
 \noindent The following set comprehensions are presented using Z
 axiomatic definitions to enable direct fuzz validation of the LaTeX.
 Further, exponents are written long-hand as fuzz does not  support
-exponentation.
+exponentiation.
 
 \bigskip
 
@@ -802,6 +802,14 @@ exponentation.
 \section*{Question 7}
 \addcontentsline{toc}{section}{Question 7}
 
+\noindent We are designing a prototype for a new podcast platform and
+player.  We are given some initial types and abbreviations.  We also
+define two generic functions fst() and snd() to provide our fuzz
+compatible and validated solution capabilities equal to tuple
+projection, which is not supported in fuzz.
+
+\bigskip
+
 \begin{zed}[ShowId, PeopleId]
 \end{zed}
 
@@ -849,14 +857,37 @@ exponentation.
   snd(episode\_info(s, e_2))))
 \end{axdef}
 
+\noindent The above Z is validated using fuzz. Each part is briefly
+explained below:
+
+\bigskip
+
 \noindent\hspace*{\parindent}(a) $shows \subseteq \dom show\_episodes
 \land \dom show\_episodes \subseteq shows$
 
+\bigskip
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
+\noindent If and only if translates to the sets are equal. The same
+ShowId exist in both.
+
+\bigskip
+
+\setlength{\leftskip}{0pt}
 \medskip
 
 \noindent\hspace*{\parindent}(b) $\forall es : \ran show\_episodes @
 \exists n : \nat @ es = 1 \upto n$
 
+\bigskip
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
+\noindent Each finite set of EpisodeId includes an uninterrupted
+range from 1 to n.
+
+\bigskip
+
+\setlength{\leftskip}{0pt}
 \medskip
 
 \noindent\hspace*{\parindent}(c)
@@ -867,10 +898,19 @@ exponentation.
 $\displaystyle
 \begin{array}{l}
   \forall s : \dom show\_episodes @ \forall e : show\_episodes(s) @ \\
-  \quad (s, e) \in \dom episode\_info \iff s \in \dom show\_episodes
+  \quad e \in show\_episode(s) \iff (s, e) \in \dom episode\_info
 \end{array}$
 
 \bigskip
+
+\bigskip
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
+\noindent If and only if implies the condition is a bi-implication.
+
+\bigskip
+
+\newpage
 
 \setlength{\leftskip}{0pt}
 \medskip
@@ -878,6 +918,15 @@ $\displaystyle
 \noindent\hspace*{\parindent}(d) $shows \subseteq \dom show\_info
 \land \dom show\_info \subseteq shows$
 
+\bigskip
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
+\noindent If and only if translates to the sets are equal. The same
+ShowId exist in both.
+
+\bigskip
+
+\setlength{\leftskip}{0pt}
 \medskip
 
 \noindent\hspace*{\parindent}(e)
@@ -891,6 +940,15 @@ $\displaystyle
   \quad (s, e) \in \dom episode\_info \land \\
   \quad (p \in fst(episode\_info(s, e)) \iff p \in show\_info(s))
 \end{array}$
+
+\bigskip
+
+\bigskip
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
+\noindent The specification "exactly when" translates to if and only
+if and fst(episode\_info(s, e)) gives us access to a finite set of
+PeopleId as does show\_info(s) .
 
 \bigskip
 
@@ -917,7 +975,11 @@ $\displaystyle
 \bigskip
 
 \setlength{\leftskip}{\dimexpr\parindent+2em\relax}
-\newpage
+\noindent We specify how the Timestamp for different episodes of the
+same show must compare to fulfill the specification by using
+snd(episode\_info(s, e)) to access the Timestamp.
+
+\bigskip
 
 \setlength{\leftskip}{0pt}
 \section*{Question 8}
@@ -928,26 +990,41 @@ validation, which passes for each expression.
 
 \bigskip
 
+\noindent\hspace*{\parindent}(a)
 \begin{zed}
   EightA == \{ s : \dom show\_episodes | \# (show\_episodes(s)) \geq 100 \}
 \end{zed}
 
+\bigskip
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
 \noindent Shows with at least 100 episodes.  We use the cardinality
 operator on F EpisodeId after ensuring s is in the domain of show\_episodes.
 
 \bigskip
 
+\setlength{\leftskip}{0pt}
+\medskip
+
+\noindent\hspace*{\parindent}(b)
 \begin{zed}
   EightB == \{ p : PeopleId | \exists s_1, s_2 : \dom show\_info @
   s_1 \neq s_2 \land p \in show\_info(s_1) \land p \in show\_info(s_2) \}
 \end{zed}
 
+\bigskip
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
 \noindent The set of PeopleId, which appear in 2 or more shows.  We
 make sure two such shows are distinct and we validate each $PeopleId
 \in F$ PeopleId.
 
 \bigskip
 
+\setlength{\leftskip}{0pt}
+\medskip
+
+\noindent\hspace*{\parindent}(c)
 \begin{axdef}
   first\_episode\_timestamp : ShowId \pfun Timestamp
   \where
@@ -955,6 +1032,9 @@ make sure two such shows are distinct and we validate each $PeopleId
   first\_episode\_timestamp(s) = snd(episode\_info(s, 1))
 \end{axdef}
 
+\bigskip
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
 \begin{zed}
   EightC == first\_episode\_timestamp((\mu s : \dom show\_info | \\
       \quad \forall t : \dom show\_info @ s \neq t \land \\
@@ -981,6 +1061,7 @@ and in the first element of the domain of episode\_info are identical.
 
 \bigskip
 
+\setlength{\leftskip}{0pt}
 \section*{Question 9}
 \addcontentsline{toc}{section}{Question 9}
 
@@ -1005,8 +1086,6 @@ and in the first element of the domain of episode\_info are identical.
   \quad (s, e) \in \ran my\_episodes \implies ((s, e) \in \dom status \land \\
   \quad (s, e) \in \dom status \implies (s, e) \in \ran my\_episodes)
 \end{axdef}
-
-\newpage
 
 \section*{Question 10}
 \addcontentsline{toc}{section}{Question 10}
@@ -1227,8 +1306,6 @@ rule [$\Rightarrow$ intro] to unify our cases and conclude:
   }
 \end{center}
 \bigskip
-
-\newpage
 
 \section*{Question 12}
 \addcontentsline{toc}{section}{Question 12}
@@ -1504,7 +1581,8 @@ unify our cases and conclude:
 
 \noindent Since the base case is proven and both inductive cases
 result in the same outcome, we can use the implication introduction
-rule [$\Rightarrow$ intro] to unify our cases and conclude:
+rule [$\Rightarrow$ intro] to unify our cases (n.b. Length\_L is
+abbreviated L below to spare the reader further font scaling) and conclude:
 
 \bigskip
 
@@ -1528,8 +1606,6 @@ rule [$\Rightarrow$ intro] to unify our cases and conclude:
 \bigskip
 
 \newpage
-
-\setlength{\leftskip}{0pt}
 
 \setlength{\leftskip}{0pt}
 \setlength{\leftskip}{0pt}

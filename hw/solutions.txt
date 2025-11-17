@@ -242,7 +242,7 @@ TEXT: I worked on this proof both top-down and bottom-up.  After doing the obvio
 
 ** Question 6 **
 
-TEXT: The following set comprehensions are presented using Z axiomatic definitions to enable direct fuzz validation of the LaTeX.  Further, exponents are written long-hand as fuzz does not  support exponentation.
+TEXT: The following set comprehensions are presented using Z axiomatic definitions to enable direct fuzz validation of the LaTeX.  Further, exponents are written long-hand as fuzz does not  support exponentiation.
 
 (a)
 axdef
@@ -283,6 +283,8 @@ PAGEBREAK:
 
 ** Question 7 **
 
+TEXT: We are designing a prototype for a new podcast platform and player.  We are given some initial types and abbreviations.  We also define two generic functions fst() and snd() to provide our fuzz compatible and validated solution capabilities equal to tuple projection, which is not supported in fuzz. 
+
 given ShowId, PeopleId
 EpisodeId == N1
 Timestamp == N
@@ -318,31 +320,46 @@ where
     (e_1 < e_2) => (snd(episode_info(s, e_1)) <= (snd(episode_info(s, e_2)))))
 end
 
+TEXT: The above Z is validated using fuzz. Each part is briefly explained below:
+
 (a) shows subset dom (show_episodes) and dom (show_episodes) subset shows
+TEXT: If and only if translates to the sets are equal. The same ShowId exist in both.
+
 (b) forall es : ran show_episodes | (exists n : N | es = 1..n)
+TEXT: Each finite set of EpisodeId includes an uninterrupted range from 1 to n. 
+
 (c) forall s : dom show_episodes | forall e : show_episodes s | \
-  (s, e) in dom episode_info <=> s in dom show_episodes
+    e in show_episode(s) <=> (s, e) in dom episode_info 
+TEXT: If and only if implies the condition is a bi-implication.
+
+PAGEBREAK:
+
 (d) shows subset dom (show_info) and dom (show_info) subset shows
+TEXT: If and only if translates to the sets are equal. The same ShowId exist in both.
+
 (e) forall s : ShowId | forall p : PeopleId | (exists e : EpisodeId | \
     (s, e) in dom episode_info and \
     (p in fst(episode_info(s, e)) <=> p in show_info s))
+TEXT: The specification "exactly when" translates to if and only if and fst(episode_info(s, e)) gives us access to a finite set of PeopleId as does show_info(s) .
+
 (f) forall s : ShowId | forall t_1, t_2 : Timestamp | (forall e_1, e_2 : EpisodeId | \
     ((s, e_1) in dom episode_info and (s, e_2) in dom episode_info) | \
     (e_1 < e_2) => (snd(episode_info(s, e_1)) <= (snd(episode_info(s, e_2)))))
-
-PAGEBREAK:
+TEXT: We specify how the Timestamp for different episodes of the same show must compare to fulfill the specification by using snd(episode_info(s, e)) to access the Timestamp.
 
 ** Question 8 **
 
 TEXT: The following are given as abbreviations to enable fuzz validation, which passes for each expression.
 
-EightA == {s : dom show_episodes | #(show_episodes(s)) >= 100}
+(a) EightA == {s : dom show_episodes | #(show_episodes(s)) >= 100}
 
 TEXT: Shows with at least 100 episodes.  We use the cardinality operator on F EpisodeId after ensuring s is in the domain of show_episodes.
 
-EightB == {p : PeopleId | exists s_1, s_2 : dom show_info | s_1 != s_2 and p in show_info s_1 and p in show_info s_2}
+(b) EightB == {p : PeopleId | exists s_1, s_2 : dom show_info | s_1 != s_2 and p in show_info s_1 and p in show_info s_2}
 
 TEXT: The set of PeopleId, which appear in 2 or more shows.  We make sure two such shows are distinct and we validate each PeopleId in F PeopleId.
+
+(c)
 
 axdef
   first_episode_timestamp : ShowId +-> Timestamp
@@ -377,8 +394,6 @@ e in show_episodes s
     (s, e) in ran my_episodes => (s, e) in dom status and \
     (s, e) in dom status => (s, e) in ran my_episodes
 end
-
-PAGEBREAK:
 
 ** Question 10 **
 
@@ -480,18 +495,13 @@ PROOF:
 forall p : PossiblePlaylist | length(p)
   forall p : PossiblePlaylist | length(played(p)) + length(unplayed(p))
 
-
-PAGEBREAK:
-
 **Question 12**
 
 TEXT: First, we can create an abbreviation for the elements of our list to make our expressions less cumbersome.
 
 ListElement == (ShowId cross EpisodeId) cross (N cross PlayedOrNot cross SavedOrNot)
 
-
 TEXT: We restate our List free type definition using the abbreviation as
-
 
 List ::= nil | join <<ListElement cross List>>
 
@@ -606,7 +616,7 @@ PROOF:
 forall l : List | length_L(played(join(e, l))) + length_L(unplayed(join(e, l))) = length_L(join(e, l))
   forall l : List | length_L(played(l)) + length_L(unplayed(l)) = length_L(l)
 
-TEXT: Since the base case is proven and both inductive cases result in the same outcome, we can use the implication introduction rule [=> intro] to unify our cases and conclude:
+TEXT: Since the base case is proven and both inductive cases result in the same outcome, we can use the implication introduction rule [=> intro] to unify our cases (n.b. Length_L is abbreviated L below to spare the reader further font scaling) and conclude:
 
 PROOF:
 forall l : List | L(l)
@@ -616,5 +626,3 @@ forall l : List | L(l)
 TEXT: we have proven forall l : List | length_L(played_L(l)) + length_L(unplayed_L(l)) = length_L(l)
 
 PAGEBREAK:
-
-LATEX: \setlength{\leftskip}{0pt}
