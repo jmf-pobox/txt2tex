@@ -1601,6 +1601,9 @@ class LaTeXGenerator:
                             lines.append(indent_prefix + part_label + " " + first_line)
                             lines.extend(item_lines[1:])
                     lines.append("")
+                    # Add spacing before remaining items for visual separation
+                    lines.append(r"\bigskip")
+                    lines.append("")
                     # Remaining items - use \leftskip to create indented container
                     # This allows paragraphs to justify properly while maintaining
                     # indentation. Add extra space so paragraphs start after the
