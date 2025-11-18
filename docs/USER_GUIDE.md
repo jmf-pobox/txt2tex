@@ -338,6 +338,20 @@ exists1 x : N | x * x = 4 . x > 0
 ```
 Generates: $\exists_1 x : \mathbb{N} \mid x \times x = 4 \bullet x > 0$
 
+**Note on bullet separator limitations:**
+
+In rare cases where the bullet separator is followed by an identifier and then `=`, the parser may treat it as a field projection rather than a bullet separator. In these cases, use implication (`=>`) instead:
+
+```
+// Use implication for this pattern:
+forall i, j : dom f | f i = f j => i = j
+
+// Instead of bullet (ambiguous with projection):
+forall i, j : dom f | f i = f j . i = j
+```
+
+The bullet separator works correctly when followed by set operators (`in`, `notin`, `subset`), logical operators (`and`, `or`, `=>`), or comparisons (`<`, `>`, `<=`, `>=`, `!=`).
+
 #### Definite Description (μ)
 
 The mu operator (μ) denotes "the unique value satisfying a predicate":

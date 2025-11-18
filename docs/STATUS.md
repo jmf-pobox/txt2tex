@@ -584,6 +584,7 @@
   - Tests complex constraints from GitHub issue example
 - Test count: 1145 tests (all passing)
 - All quality gates pass: type, lint, format, test
+- **Known limitation**: When bullet followed by `identifier =`, parser treats as projection for backward compatibility. Use `=>` for patterns like `f i = f j => i = j` instead of bullet.
 - Resolves GitHub issue #8
 
 ### ✅ Fuzz Mode: Context-Aware Equivalence Operator
