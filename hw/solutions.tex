@@ -848,8 +848,7 @@ projection, which is not supported in fuzz \citep{spivey1993fuzz}.
   shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows \\
   \forall s : shows @ \forall e : EpisodeId @ \forall p : PeopleId @
   p \in fst(episode\_info(s, e)) \iff p \in show\_info(s) \\
-  \forall s : shows @ \forall t_1, t_2 : Timestamp @ \forall e_1, e_2
-  : EpisodeId @ \\
+  \forall s : shows @ \forall e_1, e_2 : EpisodeId @ \\
   \quad (((s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom
     episode\_info) \implies \\
     \quad ((e_1 < e_2) \implies (snd(episode\_info(s, e_1)) \leq
@@ -951,8 +950,7 @@ finite set of PeopleId as does show\_info(s) .
 \noindent
 $\displaystyle
 \begin{array}{l}
-  \forall s : shows @ \forall t_1, t_2 : Timestamp @ \forall e_1, e_2
-  : EpisodeId @ \\
+  \forall s : shows @ \forall e_1, e_2 : EpisodeId @ \\
   \quad (((s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom
     episode\_info) \implies \\
     \quad ((e_1 < e_2) \implies (snd(episode\_info(s, e_1)) \leq
@@ -1024,9 +1022,9 @@ make sure two such shows are distinct.
 
 \setlength{\leftskip}{\dimexpr\parindent+2em\relax}
 \begin{zed}
-  EightC == first\_episode\_timestamp((\mu s : \dom show\_info | \\
-      \quad \forall t : \dom show\_info @ s \neq t \land \\
-  \quad \# (show\_info(s)) > \# (show\_info(t))))
+  EightC == first\_episode\_timestamp(\mu s : \dom show\_info | \\
+    \quad \forall t : \dom show\_info @ s \neq t \land \\
+  \quad \# (show\_info(s)) > \# (show\_info(t)))
 \end{zed}
 
 \noindent We are given that there is exactly one show with the most

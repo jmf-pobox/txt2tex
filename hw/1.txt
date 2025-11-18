@@ -1,4 +1,0 @@
-
-  forall sid : ShowId; eid : EpisodeId | sid |-> eid in dom episode_info | true
-  { p : dom episode_info . p.EpisodeId }
-
