@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
-**Last Updated:** 2025-11-01
-**Current Phase:** Phase 39 (Strict Subset Operator) ✓ COMPLETE
+**Last Updated:** 2025-11-18
+**Current Phase:** Phase 40 (Bullet Separator for Quantifiers) ✓ COMPLETE
 
 ---
 
@@ -25,6 +25,7 @@
 - Phase 21: Fixed schema predicate separators, added subseteq operator (7→4 fuzz errors)
 - Phase 22: Removed false blockers, completed Solutions 39, 48-52 (+6 solutions)
 - **Phase 31**: Fixed Bug #3 (compound identifiers), completed Solution 31, achieved 100% (52/52) ✅
+- **Phase 40**: Added bullet separator for forall/exists/exists1 quantifiers (GitHub #8) ✅
 
 ---
 
@@ -56,13 +57,14 @@
 - ✓ Subscript/Superscript: `x_i`, `x^2`
 
 ### Quantifiers
-- ✓ Universal: `forall x : N | P`
-- ✓ Existential: `exists x : N | P`
-- ✓ Unique existence: `exists1 x : N | P`
+- ✓ Universal: `forall x : N | P`, `forall x : N | constraint . body` (Phase 40)
+- ✓ Existential: `exists x : N | P`, `exists x : N | constraint . body` (Phase 40)
+- ✓ Unique existence: `exists1 x : N | P`, `exists1 x : N | constraint . body` (Phase 40)
 - ✓ Definite description: `mu x : N | P`, `mu x : N | P . E`
 - ✓ Lambda: `lambda x : N . E`
 - ✓ Multiple variables: `forall x, y : N | P`
 - ✓ Semicolon-separated bindings: `forall x : T; y : U | P`
+- ✓ Bullet separator for all quantifiers (Phase 40, GitHub #8)
 
 ### Sets
 - ✓ Operators: `in`, `notin`, `subset`, `subseteq`, `union`, `intersect`, `\`
@@ -556,6 +558,33 @@
 - Test count: 1133 tests (1125 + 8 new psubset tests, all passing)
 - All quality gates pass: type, lint, format, test
 - Example file: [examples/03_sets/strict_subset.txt](examples/03_sets/strict_subset.txt) ✓
+
+### ✅ Phase 40: Bullet Separator for Quantifiers (GitHub #8)
+- Extended bullet separator (`.`) to forall/exists/exists1 quantifiers
+- Previously only supported for mu quantifier: `mu x : N | P . E`
+- Now supported for all quantifiers:
+  - `forall x : N | constraint . body` → `\forall x : \mathbb{N} \mid constraint \bullet body`
+  - `exists x : N | constraint . body` → `\exists x : \mathbb{N} \mid constraint \bullet body`
+  - `exists1 x : N | constraint . body` → `\exists_1 x : \mathbb{N} \mid constraint \bullet body`
+- Semantic distinction:
+  - For mu: expression is term/value to select
+  - For forall/exists/exists1: expression is body predicate after constraint filter
+  - Equivalence: `forall x : N | P . Q` ≡ `forall x : N | (P => Q)`
+- Parser changes:
+  - Removed mu-only restriction from bullet separator check
+  - Enhanced tuple projection disambiguation in comprehension bodies
+  - Preserves named field projection (`e.field`) vs bullet separator (complex expr `.` identifier)
+- LaTeX generator: Extended `\mid`/`\bullet` separator logic to all quantifiers
+- AST nodes: Updated Quantifier docstrings with semantic clarification
+- Updated USER_GUIDE.md with bullet separator examples for all quantifiers
+- Created comprehensive test suite: 8 new tests in TestPhase40BulletSeparator
+  - Tests forall/exists/exists1 with bullet separator
+  - Tests nested quantifiers with bullet
+  - Tests backward compatibility (quantifiers without bullet still work)
+  - Tests complex constraints from GitHub issue example
+- Test count: 1145 tests (all passing)
+- All quality gates pass: type, lint, format, test
+- Resolves GitHub issue #8
 
 ### ✅ Fuzz Mode: Context-Aware Equivalence Operator
 - Fixed `<=>` operator to render context-sensitively in fuzz mode
