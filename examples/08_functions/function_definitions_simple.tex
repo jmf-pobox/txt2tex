@@ -1,30 +1,26 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Simple Function Definitions}
 
-\bigskip
-
-This file demonstrates basic function $definitions \in Z$ notation
-that work well with fuzz type checking.
+\noindent This file demonstrates basic function $definitions \in Z$
+notation that work well with fuzz type checking.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 1 : Simple Total Functions}
+\section*{Example 1 : Simple Total Functions}
+\addcontentsline{toc}{section}{Example 1 : Simple Total Functions}
 
-\medskip
-
-\bigskip
-
-Total functions are defined over their entire domain.
+\noindent Total functions are defined over their entire domain.
 
 \bigskip
 
@@ -46,39 +42,29 @@ Total functions are defined over their entire domain.
   \forall n : \nat @ double(n) = 2 * n
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 2 : Partial Functions}
+\section*{Example 2 : Partial Functions}
+\addcontentsline{toc}{section}{Example 2 : Partial Functions}
 
-\medskip
-
-\bigskip
-
-Partial functions are not defined over their entire domain.
+\noindent Partial functions are not defined over their entire domain.
 
 \bigskip
 
 \begin{axdef}
   predecessor : \nat \pfun \nat
   \where
-  \forall n : \nat @ n > 0 \implies predecessor(n) = n - 1
+  \forall n : \nat | n > 0 @ predecessor(n) = n - 1
 \end{axdef}
 
-\bigskip
-
-predecessor is partial on natural numbers since 0 has no $predecessor \in N$.
-
-\bigskip
-
-\bigskip
-\noindent
-\textbf{Example 3 : Generic Functions}
-
-\medskip
+\noindent predecessor is partial on natural numbers since 0 has no
+$predecessor \in N$. The bullet separator filters to positive numbers
+(where predecessor is defined), then specifies the function value.
 
 \bigskip
 
-Generic functions work with any type parameter.
+\section*{Example 3 : Generic Functions}
+\addcontentsline{toc}{section}{Example 3 : Generic Functions}
+
+\noindent Generic functions work with any type parameter.
 
 \bigskip
 
@@ -100,11 +86,8 @@ Generic functions work with any type parameter.
   \forall x : X @ \forall y : Y @ snd(x, y) = y
 \end{gendef}
 
-\bigskip
-\noindent
-\textbf{Example 4 : Functions with Given Types}
-
-\medskip
+\section*{Example 4 : Functions with Given Types}
+\addcontentsline{toc}{section}{Example 4 : Functions with Given Types}
 
 \begin{zed}[Person, Department]
 \end{zed}
@@ -113,17 +96,12 @@ Generic functions work with any type parameter.
   assignment : Person \pfun Department
 \end{axdef}
 
-\bigskip
-
-assignment is a partial function from Person to Department.
+\noindent assignment is a partial function from Person to Department.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 5 : Functions on Numbers}
-
-\medskip
+\section*{Example 5 : Functions on Numbers}
+\addcontentsline{toc}{section}{Example 5 : Functions on Numbers}
 
 \begin{axdef}
   triple : \nat \fun \nat
@@ -137,11 +115,8 @@ assignment is a partial function from Person to Department.
   \forall n : \num @ addOne(n) = n + 1
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 6 : Function with Given Types}
-
-\medskip
+\section*{Example 6 : Function with Given Types}
+\addcontentsline{toc}{section}{Example 6 : Function with Given Types}
 
 \begin{zed}[Student, Grade]
 \end{zed}
@@ -150,17 +125,12 @@ assignment is a partial function from Person to Department.
   grades : Student \pfun Grade
 \end{axdef}
 
-\bigskip
-
-grades maps students to their grades.
+\noindent grades maps students to their grades.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 7 : Function Composition Example}
-
-\medskip
+\section*{Example 7 : Function Composition Example}
+\addcontentsline{toc}{section}{Example 7 : Function Composition Example}
 
 \begin{axdef}
   f : \nat \fun \nat \\
@@ -172,18 +142,13 @@ grades maps students to their grades.
   h = f \circ g
 \end{axdef}
 
-\bigskip
-
-f doubles its input, g adds one to its input. h is their forward
-$composition : h(n) $= f(g(n)) = 2 * (n + 1).
+\noindent f doubles its input, g adds one to its input. h is their
+forward $composition : h(n) $= f(g(n)) = 2 * (n + 1).
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 8 : Modulo Function}
-
-\medskip
+\section*{Example 8 : Modulo Function}
+\addcontentsline{toc}{section}{Example 8 : Modulo Function}
 
 \begin{axdef}
   modulo3 : \nat \fun \nat
@@ -191,10 +156,8 @@ $composition : h(n) $= f(g(n)) = 2 * (n + 1).
   \forall n : \nat @ modulo3(n) = n \mod 3
 \end{axdef}
 
-\bigskip
-
-For comprehensive function examples including recursive functions,
-higher-order functions, and advanced patterns, see
+\noindent For comprehensive function examples including recursive
+functions, higher-order functions, and advanced patterns, see
 examples/09\_sequences/pattern\_matching.txt.
 
 \bigskip

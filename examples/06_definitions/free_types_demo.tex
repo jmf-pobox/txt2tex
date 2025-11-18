@@ -1,131 +1,89 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 17 Demo : Semicolon - Separated Bindings}
 
-\bigskip
-\noindent
-\textbf{Example 1 : Two bindings}
+\section*{Example 1 : Two bindings}
+\addcontentsline{toc}{section}{Example 1 : Two bindings}
 
-\medskip
-
-\bigskip
-
-Simple case with two binding groups:
+\noindent Simple case with two binding groups:
 
 \bigskip
 
-\bigskip
-
-$\forall x : \nat @ \forall y : \nat @ x + y > 0$
+\noindent $\forall x : \nat @ \forall y : \nat @ x + y > 0$
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 2 : Three bindings}
+\section*{Example 2 : Three bindings}
+\addcontentsline{toc}{section}{Example 2 : Three bindings}
 
-\medskip
-
-\bigskip
-
-Three levels of nesting:
+\noindent Three levels of nesting:
 
 \bigskip
 
-\bigskip
-
-$\forall x : T @ \forall y : U @ \forall z : V @ x = y$
+\noindent $\forall x : T @ \forall y : U @ \forall z : V @ x = y$
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 3 : Mixed comma and semicolon}
+\section*{Example 3 : Mixed comma and semicolon}
+\addcontentsline{toc}{section}{Example 3 : Mixed comma and semicolon}
 
-\medskip
-
-\bigskip
-
-First quantifier has multiple variables with shared domain:
+\noindent First quantifier has multiple variables with shared domain:
 
 \bigskip
 
-\bigskip
-
-$\forall x, y : \nat @ \forall z : \nat @ x + y = z$
+\noindent $\forall x, y : \nat @ \forall z : \nat @ x + y = z$
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 4 : Real - world example from Solution 41}
+\section*{Example 4 : Real - world example from Solution 41}
+\addcontentsline{toc}{section}{Example 4 : Real - world example from
+Solution 41}
 
-\medskip
-
-\bigskip
-
-$\forall r : \ran records @ \forall i1, i2 : \dom r @ i1$/= $i2 \implies true$
+\noindent $\forall r : \ran records @ \forall i1, i2 : \dom r @ i1
+\neq i2$. true
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 5 : Conditional with semicolon bindings}
+\section*{Example 5 : Conditional with semicolon bindings}
+\addcontentsline{toc}{section}{Example 5 : Conditional with semicolon bindings}
 
-\medskip
-
-\bigskip
-
-Combining Phase 16 and Phase 17:
+\noindent Combining Phase 16 and Phase 17:
 
 \bigskip
 
-\bigskip
-
-$\forall x : \nat @ \forall y : \nat @ \IF x > y \THEN x \ELSE y$
+\noindent $\forall x : \nat @ \forall y : \nat @ \IF x > y \THEN x \ELSE y$
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 6 : Nested mu operator}
+\section*{Example 6 : Nested mu operator}
+\addcontentsline{toc}{section}{Example 6 : Nested mu operator}
 
-\medskip
-
-\bigskip
-
-Definite description with multiple bindings:
+\noindent Definite description with multiple bindings:
 
 \bigskip
 
-\bigskip
-
-($(\mu p : \ran hd | (\mu q : \ran hd | p \neq q))$$\mid$ p.2 $>$ q.2)
+\noindent ($(\mu p : \ran hd | (\mu q : \ran hd | p \neq q))$$\mid$ p.2 $>$ q.2)
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 7 : With exists quantifier}
+\section*{Example 7 : With exists quantifier}
+\addcontentsline{toc}{section}{Example 7 : With exists quantifier}
 
-\medskip
-
-\bigskip
-
-Multiple bindings with exists:
+\noindent Multiple bindings with exists:
 
 \bigskip
 
-\bigskip
-
-$\exists x : \nat @ \exists y : \nat @ x > y \land y > 0$
+\noindent $\exists x : \nat @ \exists y : \nat @ x > y \land y > 0$
 
 \bigskip
 
