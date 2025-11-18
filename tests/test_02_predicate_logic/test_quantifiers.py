@@ -603,3 +603,176 @@ class TestIntegration:
             latex
             == r"\exists x, y \colon \mathbb{N} \bullet x > 0 \land y > 0 \land x > y"
         )
+
+
+class TestPhase31BulletSeparator:
+    """Tests for Phase 40: Bullet separator (GitHub issue #8)."""
+
+    def test_forall_with_bullet_simple(self) -> None:
+        """Test forall with bullet separator: forall x : N | x > 0 . x < 10."""
+        text = "(forall x : N | x > 0 . x < 10)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "forall"
+        assert ast.variables == ["x"]
+        assert isinstance(ast.domain, Identifier)
+        assert ast.domain.name == "N"
+        # Body is the constraint (before bullet)
+        assert isinstance(ast.body, BinaryOp)
+        assert ast.body.operator == ">"
+        # Expression is the body (after bullet)
+        assert isinstance(ast.expression, BinaryOp)
+        assert ast.expression.operator == "<"
+
+        # Test LaTeX generation
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        assert latex == r"\forall x \colon \mathbb{N} \mid x > 0 \bullet x < 10"
+
+    def test_exists_with_bullet(self) -> None:
+        """Test exists with bullet separator: exists y : Z | y < 0 . y > -10."""
+        text = "(exists y : Z | y < 0 . y > -10)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "exists"
+        assert ast.variables == ["y"]
+        assert ast.expression is not None  # Has expression part after bullet
+
+        # Test LaTeX generation
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        assert latex == r"\exists y \colon \mathbb{Z} \mid y < 0 \bullet y > -10"
+
+    def test_exists1_with_bullet(self) -> None:
+        """Test exists1 with bullet separator: exists1 x : N | x * x = 4 . x > 0."""
+        text = "(exists1 x : N | x * x = 4 . x > 0)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "exists1"
+        assert ast.variables == ["x"]
+        assert ast.expression is not None
+
+        # Test LaTeX generation
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        expected = r"\exists_1 x \colon \mathbb{N} \mid x * x = 4 \bullet x > 0"
+        assert latex == expected
+
+    def test_forall_multi_variable_with_bullet(self) -> None:
+        """Test forall with multiple variables and bullet separator."""
+        text = "(forall x, y : N | x > 0 and y > 0 . x + y > 0)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "forall"
+        assert ast.variables == ["x", "y"]
+        assert ast.expression is not None
+
+        # Test LaTeX generation
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        expected = (
+            r"\forall x, y \colon \mathbb{N} \mid x > 0 \land y > 0 "
+            r"\bullet x + y > 0"
+        )
+        assert latex == expected
+
+    def test_nested_quantifiers_with_bullet(self) -> None:
+        """Test nested quantifiers where inner quantifier has bullet separator."""
+        text = "(forall x : N | exists y : N | y > 0 . x + y > 0)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "forall"
+        # Body should be an exists quantifier with bullet
+        assert isinstance(ast.body, Quantifier)
+        assert ast.body.quantifier == "exists"
+        assert ast.body.expression is not None  # Inner exists has bullet
+
+        # Test LaTeX generation
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        expected = (
+            r"\forall x \colon \mathbb{N} \bullet \exists y \colon \mathbb{N} "
+            r"\mid y > 0 \bullet x + y > 0"
+        )
+        assert latex == expected
+
+    def test_forall_without_bullet_still_works(self) -> None:
+        """Test backward compatibility: forall without bullet still works."""
+        text = "forall x : N | x > 0"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "forall"
+        assert ast.expression is None  # No bullet separator
+
+        # Test LaTeX generation - should use single bullet
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        assert latex == r"\forall x \colon \mathbb{N} \bullet x > 0"
+
+    def test_mu_with_bullet_still_works(self) -> None:
+        """Test backward compatibility: mu with bullet still works."""
+        text = "(mu x : N | x > 0 . x * x)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "mu"
+        assert ast.expression is not None
+
+        # Test LaTeX generation
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        assert latex == r"\mu x \colon \mathbb{N} \mid x > 0 \bullet x * x"
+
+    def test_complex_constraint_with_bullet(self) -> None:
+        """Test complex constraint expression with bullet separator.
+
+        Based on GitHub issue #8 example.
+        """
+        text = (
+            "(forall e_1, e_2 : EpisodeId | "
+            "(e_1 in S and e_2 in S) . (e_1 < e_2 => f(e_1) <= f(e_2)))"
+        )
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "forall"
+        assert ast.variables == ["e_1", "e_2"]
+        assert ast.expression is not None
+
+        # Constraint: (e_1 in S and e_2 in S)
+        assert isinstance(ast.body, BinaryOp)
+        assert ast.body.operator == "and"
+
+        # Body: (e_1 < e_2 => f(e_1) <= f(e_2))
+        assert isinstance(ast.expression, BinaryOp)
+        assert ast.expression.operator == "=>"

@@ -69,22 +69,32 @@ class Quantifier(ASTNode):
     Phase 7 enhancement: Supports mu-operator (definite description).
     Phase 11.5 enhancement: Supports mu with expression part (mu x : X | P . E).
     Phase 28 enhancement: Supports tuple patterns for destructuring.
+    Phase 40 enhancement: Bullet separator for all quantifiers (GitHub issue #8).
+
     Examples:
     - forall x : N | pred  -> variables=["x"], domain=N, body=pred
+    - forall x : N | constraint . body -> body=constraint, expression=body
     - forall x, y : N | pred -> variables=["x", "y"], domain=N, body=pred
-    - forall (x, y) : T | pred -> variables=["x", "y"], tuple_pattern, body=pred
-    - exists1 x : N | pred -> quantifier="exists1", variables=["x"], body=pred
-    - mu x : N | pred -> quantifier="mu", variables=["x"], body=pred, expression=None
+    - forall (x, y) : T | pred -> variables=["x", "y"], tuple_pattern
+    - exists x : N | constraint . body -> body=constraint, expression=body
+    - exists1 x : N | pred -> quantifier="exists1", variables=["x"]
+    - mu x : N | pred -> quantifier="mu", body=pred, expression=None
     - mu x : N | pred . expr -> quantifier="mu", body=pred, expression=expr
+
+    Note on expression field semantics:
+    - For mu: expression is the term/value to select
+      (e.g., f(x) in mu x : N | P . f(x))
+    - For forall/exists/exists1: expression is body predicate after constraint
+      (e.g., forall x : N | x > 0 . x < 10 has body="x > 0", expr="x < 10")
     """
 
     quantifier: str  # "forall", "exists", "exists1", or "mu"
     variables: list[str]  # One or more variables (e.g., ["x", "y"])
     domain: Expr | None  # Optional domain shared by all variables (e.g., N, Z)
-    body: Expr  # Predicate/body expression
-    expression: Expr | None = None  # Optional expression part (mu only)
-    line_break_after_pipe: bool = False  # True if \ continuation after | (Phase 27)
-    tuple_pattern: Expr | None = None  # Tuple pattern for destructuring (Phase 28)
+    body: Expr  # Constraint (before bullet) or full body (without bullet)
+    expression: Expr | None = None  # Body after bullet (all quantifiers)
+    line_break_after_pipe: bool = False  # True if \ continuation after |
+    tuple_pattern: Expr | None = None  # Tuple pattern for destructuring
 
 
 @dataclass(frozen=True)
