@@ -862,6 +862,7 @@ class LaTeXGenerator:
         Phase 7 enhancement: Supports mu-operator (definite description).
         Phase 11.5 enhancement: Supports mu with expression part (mu x : X | P . E).
         Phase 28 enhancement: Supports tuple patterns for destructuring.
+        Phase 40 enhancement: Bullet separator for all quantifiers (GitHub issue #8).
 
         Args:
             node: The quantifier node to generate
@@ -869,8 +870,12 @@ class LaTeXGenerator:
 
         Examples:
         - forall x : N | pred -> \\forall x \\colon N \\bullet pred
+        - forall x : N | constraint . body ->
+          \\forall x \\colon N \\mid constraint \\bullet body
         - forall x, y : N | pred -> \\forall x, y \\colon N \\bullet pred
         - forall (x, y) : T | pred -> \\forall (x, y) \\colon T \\bullet pred
+        - exists x : N | constraint . body ->
+          \\exists x \\colon N \\mid constraint \\bullet body
         - exists1 x : N | pred -> \\exists_1 x \\colon N \\bullet pred
         - mu x : N | pred -> \\mu x \\colon N \\bullet pred
         - mu x : N | pred . expr -> \\mu x \\colon N \\mid pred \\bullet expr
@@ -921,8 +926,9 @@ class LaTeXGenerator:
             # Wrap ENTIRE mu expression in parentheses
             return f"({' '.join(mu_parts)})"
 
-        # Phase 11.5: Check if mu has expression part (non-fuzz or other quantifiers)
-        if node.quantifier == "mu" and node.expression:
+        # Phase 11.5/31: Check if quantifier has expression part (bullet separator)
+        # Phase 40: Extended to all quantifiers (GitHub issue #8)
+        if node.expression:
             # Use | or \mid for predicate separator
             pipe_sep = "|" if self.use_fuzz else r"\mid"
             body_latex = self.generate_expr(node.body, parent=node)

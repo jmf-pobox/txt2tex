@@ -1576,9 +1576,10 @@ class Parser:
                     column=constraint.column,
                 )
 
-            # Phase 11.5: Check for optional expression part (mu only)
+            # Phase 11.5/31: Check for bullet separator (expression/body part)
+            # Phase 40: Extended to all quantifiers (GitHub issue #8)
             expression: Expr | None = None
-            if quant_token.value == "mu" and self._match(TokenType.PERIOD):
+            if self._match(TokenType.PERIOD):
                 self._advance()  # Consume '.'
                 expression = self._parse_iff()  # Parse the expression part
         finally:
@@ -1653,12 +1654,13 @@ class Parser:
         # Set flag: we're in quantifier body where . can be separator (for mu)
         self._in_comprehension_body = True
         try:
-            # Parse body
+            # Parse body (constraint part if bullet separator follows)
             body = self._parse_iff()
 
-            # Check for mu expression part
+            # Check for bullet separator (expression/body part)
+            # Phase 40: Extended to all quantifiers (GitHub issue #8)
             expression: Expr | None = None
-            if quantifier == "mu" and self._match(TokenType.PERIOD):
+            if self._match(TokenType.PERIOD):
                 self._advance()  # Consume '.'
                 expression = self._parse_iff()
         finally:
@@ -2345,7 +2347,7 @@ class Parser:
                         break
 
                     # Check if we're in a comprehension/quantifier body where
-                    # period could be expression separator
+                    # period could be expression separator (Phase 40)
                     # If so, check what follows the identifier
                     token_after_id = self._peek_ahead(2)
 
@@ -2357,6 +2359,20 @@ class Parser:
                         and token_after_id.type == TokenType.RBRACE
                     ):
                         # Likely expression separator, not projection
+                        break
+
+                    # Phase 40: In quantifier bodies, avoid parsing .identifier as
+                    # projection when base is a complex expression (not simple id)
+                    # Distinguishes bullet separator (x > 0 . y) from (e.field)
+                    next_token = self._peek_ahead(1)
+                    if (
+                        self._in_comprehension_body
+                        and next_token.type == TokenType.IDENTIFIER
+                        and not next_token.value.isdigit()
+                        and not isinstance(base, Identifier)
+                    ):
+                        # Period after complex expression + non-numeric identifier
+                        # Likely bullet separator, not projection
                         break
 
                     # Only parse if followed by safe token

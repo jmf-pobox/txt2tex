@@ -301,6 +301,17 @@ forall x : N | x > 0
 ```
 Generates: $\forall x : \mathbb{N} \bullet x > 0$
 
+**With bullet separator (Phase 40):**
+```
+forall x : N | x > 0 . x < 10
+```
+Generates: $\forall x : \mathbb{N} \mid x > 0 \bullet x < 10$
+
+The bullet separator (`.`) separates the constraint (filtering condition) from the body (conclusion). This is equivalent to:
+```
+forall x : N | (x > 0 => x < 10)
+```
+
 #### Existential Quantification (∃)
 
 ```
@@ -308,12 +319,24 @@ exists y : Z | y < 0
 ```
 Generates: $\exists y : \mathbb{Z} \bullet y < 0$
 
+**With bullet separator (Phase 40):**
+```
+exists y : Z | y < 0 . y > -10
+```
+Generates: $\exists y : \mathbb{Z} \mid y < 0 \bullet y > -10$
+
 #### Unique Existential Quantification (∃₁)
 
 ```
 exists1 x : N | x * x = 4
 ```
 Generates: $\exists_1 x : \mathbb{N} \bullet x \times x = 4$
+
+**With bullet separator (Phase 40):**
+```
+exists1 x : N | x * x = 4 . x > 0
+```
+Generates: $\exists_1 x : \mathbb{N} \mid x \times x = 4 \bullet x > 0$
 
 #### Definite Description (μ)
 
