@@ -1,0 +1,3 @@
+=== IN before bullet, IN after, different variable ===
+
+(forall x : N | x in S . y in T)

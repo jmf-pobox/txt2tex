@@ -1,0 +1,3 @@
+=== IN before bullet, comparison after ===
+
+(forall x : N | x in S . y < 10)

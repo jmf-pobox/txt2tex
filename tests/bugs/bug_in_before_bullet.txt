@@ -1,0 +1,13 @@
+=== Test: IN operator before bullet ===
+
+** Test 1: Comparison before bullet **
+
+(forall x : N | x > 0 . x < 10)
+
+** Test 2: IN before bullet **
+
+(forall x : N | x in S . x < 10)
+
+** Test 3: IN before bullet, notin after **
+
+(forall x : N | x in S . x notin T)

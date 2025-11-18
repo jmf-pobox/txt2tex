@@ -1,0 +1,17 @@
+=== Test NOTIN operator ===
+
+** Test 1: Simple notin **
+
+x notin S
+
+** Test 2: Parenthesized notin **
+
+(x notin S)
+
+** Test 3: Notin in quantifier body (no bullet) **
+
+(forall x : N | x notin S)
+
+** Test 4: Notin after bullet **
+
+(forall x : N | x > 0 . x notin S)

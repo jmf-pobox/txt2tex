@@ -1,0 +1,3 @@
+=== Minimal IN test ===
+
+(y in T)

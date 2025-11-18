@@ -1,126 +1,133 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 7 : Equality and Special Operators}
 
+\section*{Test 1 : Mu Operator}
+\addcontentsline{toc}{section}{Test 1 : Mu Operator}
+
+\subsection*{(a)}
+
+\noindent
+$(\mu x : \nat | x^2 = 4 \land x > 0)$
+
+\medskip
+
+\subsection*{(b)}
+
+\noindent
+$(\mu x | x > 0 \land x < 10)$
+
+\section*{Test 2 : Not Equal Operator}
+\addcontentsline{toc}{section}{Test 2 : Not Equal Operator}
+
+\subsection*{(a)}
+
+\noindent
+$x \neq 0$
+
+\medskip
+
+\subsection*{(b)}
+
+\noindent
+$x \neq 0 \land y \neq 0$
+
+\medskip
+
+\subsection*{(c)}
+
+\noindent
+$x \neq y \lor y \neq z$
+
+\section*{Test 3 : Not In Operator}
+\addcontentsline{toc}{section}{Test 3 : Not In Operator}
+
+\subsection*{(a)}
+
+\noindent
+$x \notin S$
+
+\medskip
+
+\subsection*{(b)}
+
+\noindent
+$x \in A \land x \notin B$
+
+\medskip
+
+\subsection*{(c)}
+
+\noindent
+$x \notin S \iff \lnot (x \in S)$
+
+\section*{Test 4 : One Point Rule}
+\addcontentsline{toc}{section}{Test 4 : One Point Rule}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \exists y : \nat @ y = 0 \land x \neq y \\
+      \Leftrightarrow 0 \in \nat \land x \neq 0 \\
+      \Leftrightarrow x \neq 0
+    \end{array}$%
+  }
+\end{center}
 \bigskip
+
+\section*{Test 5 : Complex Reasoning}
+\addcontentsline{toc}{section}{Test 5 : Complex Reasoning}
+
+\subsection*{(a)}
+
 \noindent
-\textbf{Test 1 : Mu Operator}
+$(\mu x : \nat | x^2 = 9 \land x \neq 3)$
 
 \medskip
 
-\noindent
-\hangindent=2em
-(a) $(\mu x : \nat | x^2 = 4 \land x > 0)$
+\subsection*{(b)}
 
-\medskip
 \noindent
-\hangindent=2em
-(b) $(\mu x | x > 0 \land x < 10)$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Test 2 : Not Equal Operator}
+$\forall x : \nat @ \exists y : \nat @ x \neq y$
 
 \medskip
 
-\noindent
-\hangindent=2em
-(a) $x \neq 0$
+\subsection*{(c)}
 
-\medskip
 \noindent
-\hangindent=2em
-(b) $x \neq 0 \land y \neq 0$
+$\forall x : \nat | x \in S @ x \notin T$
 
-\medskip
-\noindent
-\hangindent=2em
-(c) $x \neq y \lor y \neq z$
+\section*{Test 6 : Mixed Operators}
+\addcontentsline{toc}{section}{Test 6 : Mixed Operators}
 
-\medskip
-\bigskip
+\subsection*{(a)}
+
 \noindent
-\textbf{Test 3 : Not In Operator}
+$x = y \lor x \neq y$
 
 \medskip
 
-\noindent
-\hangindent=2em
-(a) $x \notin S$
+\subsection*{(b)}
 
-\medskip
 \noindent
-\hangindent=2em
-(b) $x \in A \land x \notin B$
-
-\medskip
-\noindent
-\hangindent=2em
-(c) $x \notin S \iff \lnot (x \in S)$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Test 4 : One Point Rule}
+$x \in A \lor x \notin A$
 
 \medskip
 
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & \exists y : \nat @ y = 0 \land x \neq y \\
-    &\Leftrightarrow 0 \in \nat \land x \neq 0 \\
-    &\Leftrightarrow x \neq 0
-  \end{array}
-\]
-
-\bigskip
-\noindent
-\textbf{Test 5 : Complex Reasoning}
-
-\medskip
+\subsection*{(c)}
 
 \noindent
-\hangindent=2em
-(a) $(\mu x : \nat | x^2 = 9 \land x \neq 3)$
+$(\mu x : \nat | x \in S \land x \neq 0 \land x^2 < 10)$
 
-\medskip
-\noindent
-\hangindent=2em
-(b) $\forall x : \nat @ \exists y : \nat @ x \neq y$
-
-\medskip
-\noindent
-\hangindent=2em
-(c) $\forall x : \nat @ x \in S \implies x \notin T$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Test 6 : Mixed Operators}
-
-\medskip
-
-\noindent
-\hangindent=2em
-(a) $x = y \lor x \neq y$
-
-\medskip
-\noindent
-\hangindent=2em
-(b) $x \in A \lor x \notin A$
-
-\medskip
-\noindent
-\hangindent=2em
-(c) $(\mu x : \nat | x \in S \land x \neq 0 \land x^2 < 10)$
-
-\medskip
 \end{document}
