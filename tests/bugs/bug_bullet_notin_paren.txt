@@ -1,0 +1,3 @@
+=== Bug: Bullet Separator with NOTIN - Parenthesized ===
+
+(forall x : N | x in S . x notin T)

@@ -1581,6 +1581,8 @@ class Parser:
             expression: Expr | None = None
             if self._match(TokenType.PERIOD):
                 self._advance()  # Consume '.'
+                # Expression after bullet is not part of comprehension body
+                self._in_comprehension_body = False
                 expression = self._parse_iff()  # Parse the expression part
         finally:
             self._in_comprehension_body = False
@@ -1662,6 +1664,8 @@ class Parser:
             expression: Expr | None = None
             if self._match(TokenType.PERIOD):
                 self._advance()  # Consume '.'
+                # Expression after bullet is not part of comprehension body
+                self._in_comprehension_body = False
                 expression = self._parse_iff()
         finally:
             self._in_comprehension_body = False
@@ -2362,18 +2366,36 @@ class Parser:
                         break
 
                     # Phase 40: In quantifier bodies, avoid parsing .identifier as
-                    # projection when base is a complex expression (not simple id)
-                    # Distinguishes bullet separator (x > 0 . y) from (e.field)
+                    # projection when it's actually a bullet separator
+                    # Heuristic: Check what follows the identifier
                     next_token = self._peek_ahead(1)
                     if (
                         self._in_comprehension_body
                         and next_token.type == TokenType.IDENTIFIER
                         and not next_token.value.isdigit()
-                        and not isinstance(base, Identifier)
                     ):
-                        # Period after complex expression + non-numeric identifier
-                        # Likely bullet separator, not projection
-                        break
+                        token_after_id = self._peek_ahead(2)
+
+                        # Strong bullet separator indicators:
+                        # - Set/logical operators starting new predicates
+                        # - Base is complex expression (not simple id)
+                        is_bullet_indicator = token_after_id.type in (
+                            TokenType.IN,
+                            TokenType.NOTIN,
+                            TokenType.SUBSET,
+                            TokenType.PSUBSET,
+                            TokenType.AND,
+                            TokenType.OR,
+                            TokenType.IMPLIES,
+                            TokenType.IFF,
+                        )
+
+                        if is_bullet_indicator or not isinstance(base, Identifier):
+                            # Likely bullet separator - break
+                            break
+
+                        # For other cases (like EQUALS), rely on safe_followers
+                        # Allows "e.field = value" while catching most bullets
 
                     # Only parse if followed by safe token
                     # (not ambiguous with separator)

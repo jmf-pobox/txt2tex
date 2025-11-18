@@ -1,0 +1,3 @@
+=== SUBSET before bullet, SUBSET after ===
+
+(forall S : P N | S subset T . S subset U)

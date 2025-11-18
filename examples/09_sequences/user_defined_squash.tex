@@ -1,41 +1,35 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{User - Defined Squash Function}
 
-\bigskip
-
-The squash operator appears in the Z notation glossary but is not
-built into the fuzz type-checker. However, we can define it ourselves
-as a user-defined function using an axiomatic specification.
+\noindent The squash operator appears in the Z notation glossary but
+is not built into the fuzz type-checker. However, we can define it
+ourselves as a user-defined function using an axiomatic specification.
 
 \bigskip
 
-\bigskip
-
-Squash takes a partial function from N1 (positive naturals) to some
-type X and compacts it into a sequence by removing gaps in the
-domain. For example, $\{1 \mapsto a, 3 \mapsto b, 7 \mapsto c\}$
+\noindent Squash takes a partial function from N1 (positive naturals)
+to some type X and compacts it into a sequence by removing gaps in
+the domain. For example, $\{1 \mapsto a, 3 \mapsto b, 7 \mapsto c\}$
 becomes $\langle a, b, c \rangle$.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 1 : Axiomatic Definition of Squash}
+\section*{Example 1 : Axiomatic Definition of Squash}
+\addcontentsline{toc}{section}{Example 1 : Axiomatic Definition of Squash}
 
-\medskip
-
-\bigskip
-
-We define squash axiomatically by specifying its key properties using
-only fuzz-compatible notation.
+\noindent We define squash axiomatically by specifying its key
+properties using only fuzz-compatible notation.
 
 \bigskip
 
@@ -46,27 +40,20 @@ only fuzz-compatible notation.
   (squashFunc(f)) = \# (\ran f)
 \end{gendef}
 
-\bigskip
-
-This axiomatically defines squashFunc (a user-defined version of
-squash) with two key properties that hold for all partial functions f
-from N1 to X: (1) squashFunc preserves the $range : ran (squashFunc
-f) $= ran f, and (2) the resulting sequence length equals the range
-cardinality: # (squashFunc f) = # (ran f). These properties
+\noindent This axiomatically defines squashFunc (a user-defined
+version of squash) with two key properties that hold for all partial
+functions f from N1 to X: (1) squashFunc preserves the $range : ran
+(squashFunc f) $= ran f, and (2) the resulting sequence length equals
+the range cardinality: # (squashFunc f) = # (ran f). These properties
 characterize squashFunc as compacting partial functions by removing
 domain gaps while preserving all elements and their relative order.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 2 : Using Squash on a Simple Function}
+\section*{Example 2 : Using Squash on a Simple Function}
+\addcontentsline{toc}{section}{Example 2 : Using Squash on a Simple Function}
 
-\medskip
-
-\bigskip
-
-Demonstrate squash on a sparse partial function.
+\noindent Demonstrate squash on a sparse partial function.
 
 \bigskip
 
@@ -77,18 +64,13 @@ Demonstrate squash on a sparse partial function.
   f1 = \{1 \mapsto 10, 3 \mapsto 30, 5 \mapsto 50\} \land s1 = squashFunc(f1)
 \end{axdef}
 
-\bigskip
-
-The result s1 is $\langle 10, 30, 50 \rangle$, containing exactly the
-range elements in the order of their original indices.
+\noindent The result s1 is $\langle 10, 30, 50 \rangle$, containing
+exactly the range elements in the order of their original indices.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 3 : Squash with Letters}
-
-\medskip
+\section*{Example 3 : Squash with Letters}
+\addcontentsline{toc}{section}{Example 3 : Squash with Letters}
 
 \begin{zed}[Letter]
 \end{zed}
@@ -105,18 +87,13 @@ range elements in the order of their original indices.
   s2 = squashFunc(f2)
 \end{axdef}
 
-\bigskip
-
-The result s2 is $\langle a, b, c, d \rangle$. The gaps at positions
-1, 3, 5, 6, 8 are removed.
+\noindent The result s2 is $\langle a, b, c, d \rangle$. The gaps at
+positions 1, 3, 5, 6, 8 are removed.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 4 : Empty Function}
-
-\medskip
+\section*{Example 4 : Empty Function}
+\addcontentsline{toc}{section}{Example 4 : Empty Function}
 
 \begin{axdef}
   f3 : \nat_1 \pfun \nat \\
@@ -125,17 +102,13 @@ The result s2 is $\langle a, b, c, d \rangle$. The gaps at positions
   f3 = \{\} \land s3 = squashFunc(f3)
 \end{axdef}
 
-\bigskip
-
-Squashing an empty function yields an empty $sequence : s3 $= $\langle \rangle$.
-
-\bigskip
+\noindent Squashing an empty function yields an empty $sequence : s3
+$= $\langle \rangle$.
 
 \bigskip
-\noindent
-\textbf{Example 5 : Continuous Function ( No Gaps )}
 
-\medskip
+\section*{Example 5 : Continuous Function ( No Gaps )}
+\addcontentsline{toc}{section}{Example 5 : Continuous Function ( No Gaps )}
 
 \begin{axdef}
   f4 : \nat_1 \pfun \nat \\
@@ -144,23 +117,17 @@ Squashing an empty function yields an empty $sequence : s3 $= $\langle \rangle$.
   f4 = \{1 \mapsto 100, 2 \mapsto 200, 3 \mapsto 300\} \land s4 = squashFunc(f4)
 \end{axdef}
 
-\bigskip
-
-When the function has no gaps (dom $f4 = 1$..3), squashFunc simply
-converts it to a $sequence : s4 $= $\langle 100, 200, 300 \rangle$.
+\noindent When the function has no gaps (dom $f4 = 1$..3), squashFunc
+simply converts it to a $sequence : s4 $= $\langle 100, 200, 300 \rangle$.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 6 : Relationship Between Function and Sequence}
+\section*{Example 6 : Relationship Between Function and Sequence}
+\addcontentsline{toc}{section}{Example 6 : Relationship Between
+Function and Sequence}
 
-\medskip
-
-\bigskip
-
-For any partial function f with a continuous domain starting at 1,
-squashFunc is the identity.
+\noindent For any partial function f with a continuous domain
+starting at 1, squashFunc is the identity.
 
 \bigskip
 
@@ -172,22 +139,16 @@ squashFunc is the identity.
   s\_continuous\_N = squashFunc(continuous\_N)
 \end{axdef}
 
-\bigskip
-
-In this case, continuous\_N is already a sequence, and squashFunc
-$continuous\_N = continuous\_N$ as a sequence.
+\noindent In this case, continuous\_N is already a sequence, and
+squashFunc $continuous\_N = continuous\_N$ as a sequence.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 7 : Squash Preserves Injectivity}
+\section*{Example 7 : Squash Preserves Injectivity}
+\addcontentsline{toc}{section}{Example 7 : Squash Preserves Injectivity}
 
-\medskip
-
-\bigskip
-
-If the input function is injective, the output sequence has no duplicates.
+\noindent If the input function is injective, the output sequence has
+no duplicates.
 
 \bigskip
 
@@ -195,22 +156,17 @@ If the input function is injective, the output sequence has no duplicates.
   inj\_func : \nat_1 \pfun \nat \\
   inj\_seq : \seq \nat
   \where
-  (\forall i, j : \dom inj\_func @ inj\_func(i) = inj\_func(j)
-  \implies i = j) \land inj\_seq = squashFunc(inj\_func)
+  (\forall i, j : \dom inj\_func | inj\_func(i) = inj\_func(j) @ i =
+  j) \land inj\_seq = squashFunc(inj\_func)
 \end{axdef}
 
-\bigskip
-
-Since inj\_func is injective (one-to-one), inj\_seq contains no
-duplicate elements.
+\noindent Since inj\_func is injective (one-to-one), inj\_seq
+contains no duplicate elements.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 8 : Practical Use Case - Video Database}
-
-\medskip
+\section*{Example 8 : Practical Use Case - Video Database}
+\addcontentsline{toc}{section}{Example 8 : Practical Use Case - Video Database}
 
 \begin{zed}[VideoID, Title]
 \end{zed}
@@ -222,10 +178,9 @@ duplicate elements.
   compact\_catalog = squashFunc(sparse\_catalog)
 \end{axdef}
 
-\bigskip
-
-A sparse catalog with gaps (deleted entries) can be compacted into a
-continuous sequence while preserving the order of remaining entries.
+\noindent A sparse catalog with gaps (deleted entries) can be
+compacted into a continuous sequence while preserving the order of
+remaining entries.
 
 \bigskip
 

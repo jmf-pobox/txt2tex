@@ -1,0 +1,9 @@
+=== Bug: Bullet Separator with NOTIN Operator ===
+
+** Test Case 1: Standalone quantifier with bullet and notin **
+
+forall x : N | x in S . x notin T
+
+** Test Case 2: Same with parentheses **
+
+(forall x : N | x in S . x notin T)
