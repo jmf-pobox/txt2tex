@@ -313,9 +313,9 @@ where
     e in show_episodes(s) <=> (s, e) in dom episode_info 
   shows subset dom (show_info) and dom (show_info) subset shows
   forall s : shows | forall e : EpisodeId | forall p : PeopleId | p in fst(episode_info(s, e)) <=> p in show_info s
-  forall s : ShowId | forall t_1, t_2 : Timestamp | (forall e_1, e_2 : EpisodeId | \
-    ((s, e_1) in dom episode_info and (s, e_2) in dom episode_info) | \
-    (e_1 < e_2) => (snd(episode_info(s, e_1)) <= (snd(episode_info(s, e_2)))))
+  forall s : shows | (forall t_1, t_2 : Timestamp | (forall e_1, e_2 : EpisodeId | \
+    (((s, e_1) in dom episode_info and (s, e_2) in dom episode_info) => \
+    ((e_1 < e_2) => (snd(episode_info(s, e_1)) <= (snd(episode_info(s, e_2))))))))
 end
 
 TEXT: The above Z is validated using fuzz. Each part is briefly explained below:
@@ -339,9 +339,10 @@ TEXT: If and only if translates to the sets are equal. The same ShowId exist in 
 
 TEXT: The specification "exactly when" translates to bi-implication and fst(episode_info(s, e)) gives us access to a finite set of PeopleId as does show_info(s) .
 
-(f) forall s : ShowId | forall t_1, t_2 : Timestamp | (forall e_1, e_2 : EpisodeId | \
-    ((s, e_1) in dom episode_info and (s, e_2) in dom episode_info) | \
-    (e_1 < e_2) => (snd(episode_info(s, e_1)) <= (snd(episode_info(s, e_2)))))
+(f) forall s : shows | (forall t_1, t_2 : Timestamp | (forall e_1, e_2 : EpisodeId | \
+      (((s, e_1) in dom episode_info and (s, e_2) in dom episode_info) => \
+      ((e_1 < e_2) => (snd(episode_info(s, e_1)) <= (snd(episode_info(s, e_2))))))))
+
 TEXT: We specify how the Timestamp for different episodes of the same show must compare to fulfill the specification by using snd(episode_info(s, e)) to access the Timestamp.
 
 ** Question 8 **
@@ -361,7 +362,7 @@ TEXT: The set of PeopleId, which appear in 2 or more shows.  We make sure two su
 axdef
   first_episode_timestamp : ShowId +-> Timestamp
 where
-  forall s : ShowId | (s, 1) in dom episode_info | first_episode_timestamp(s) = snd(episode_info(s, 1))
+  forall s : shows | (s, 1) in dom episode_info => first_episode_timestamp(s) = snd(episode_info(s, 1))
 end
 
 EightC == first_episode_timestamp(mu s : dom show_info | \
