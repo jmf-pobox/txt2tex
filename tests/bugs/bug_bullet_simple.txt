@@ -1,0 +1,13 @@
+=== Bug: Bullet Separator - Simple Cases ===
+
+** Test 1: Simple comparison **
+
+(forall x : N | x > 0 . x < 10)
+
+** Test 2: With notin **
+
+(forall x : N | x in S . x notin T)
+
+** Test 3: With implication (control) **
+
+(forall x : N | x in S => x notin T)

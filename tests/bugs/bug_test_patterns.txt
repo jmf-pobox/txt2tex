@@ -1,0 +1,17 @@
+=== Test exact patterns ===
+
+** Pattern 1: Works - comparison before bullet, notin after **
+
+(forall x : N | x > 0 . x notin S)
+
+** Pattern 2: Test - IN before bullet, comparison after **
+
+(forall x : N | x in S . y < 10)
+
+** Pattern 3: Test - IN before bullet, IN after (same variable) **
+
+(forall x : N | x in S . x in T)
+
+** Pattern 4: Test - IN before bullet, IN after (different variable) **
+
+(forall x : N | x in S . y in T)

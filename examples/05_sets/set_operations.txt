@@ -57,7 +57,7 @@ forall x : N | exists y : N | x != y
 
 (c)
 
-forall x : N | x in S => x notin T
+(forall x : N | x in S . x notin T)
 
 ** Test 6: Mixed Operators **
 
