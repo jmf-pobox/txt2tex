@@ -742,7 +742,7 @@ for substition operations \citep[Pages 56-57]{simpson-notes}.
 \noindent The following set comprehensions are presented using Z
 axiomatic definitions to enable direct fuzz validation of the LaTeX.
 Further, exponents are written long-hand as fuzz does not  support
-exponentiation.
+exponentiation \citep{spivey1993fuzz}.
 
 \bigskip
 
@@ -806,7 +806,7 @@ exponentiation.
 player.  We are given some initial types and abbreviations.  We also
 define two generic functions fst() and snd() to provide our fuzz
 compatible and validated solution capabilities equal to tuple
-projection, which is not supported in fuzz.
+projection, which is not supported in fuzz \citep{spivey1993fuzz}.
 
 \bigskip
 
@@ -844,11 +844,10 @@ projection, which is not supported in fuzz.
   \subseteq shows \\
   \forall es : \ran show\_episodes @ \exists n : \nat @ es = 1 \upto n \\
   \forall s : \dom show\_episodes @ \forall e : show\_episodes(s) @ \\
-  \quad (s, e) \in \dom episode\_info \iff s \in \dom show\_episodes \\
+  \quad e \in show\_episodes(s) \iff (s, e) \in \dom episode\_info \\
   shows \subseteq \dom show\_info \land \dom show\_info \subseteq shows \\
-  \forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ \\
-  \quad (s, e) \in \dom episode\_info \land \\
-  \quad (p \in fst(episode\_info(s, e)) \iff p \in show\_info(s)) \\
+  \forall s : shows @ \forall e : EpisodeId @ \forall p : PeopleId @
+  p \in fst(episode\_info(s, e)) \iff p \in show\_info(s) \\
   \forall s : ShowId @ \forall t_1, t_2 : Timestamp @ \forall e_1,
   e_2 : EpisodeId @ \\
   \quad ((s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom
@@ -869,7 +868,7 @@ explained below:
 
 \setlength{\leftskip}{\dimexpr\parindent+2em\relax}
 \noindent If and only if translates to the sets are equal. The same
-ShowId exist in both.
+ShowId exist in both sets.
 
 \bigskip
 
@@ -898,7 +897,7 @@ range from 1 to n.
 $\displaystyle
 \begin{array}{l}
   \forall s : \dom show\_episodes @ \forall e : show\_episodes(s) @ \\
-  \quad e \in show\_episode(s) \iff (s, e) \in \dom episode\_info
+  \quad e \in show\_episodes(s) \iff (s, e) \in \dom episode\_info
 \end{array}$
 
 \bigskip
@@ -922,33 +921,23 @@ $\displaystyle
 
 \setlength{\leftskip}{\dimexpr\parindent+2em\relax}
 \noindent If and only if translates to the sets are equal. The same
-ShowId exist in both.
+ShowId exist in both sets.
 
 \bigskip
 
 \setlength{\leftskip}{0pt}
 \medskip
 
-\noindent\hspace*{\parindent}(e)
-
-\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
-\savedleftskip=\leftskip
-\noindent
-$\displaystyle
-\begin{array}{l}
-  \forall s : ShowId @ \forall p : PeopleId @ \exists e : EpisodeId @ \\
-  \quad (s, e) \in \dom episode\_info \land \\
-  \quad (p \in fst(episode\_info(s, e)) \iff p \in show\_info(s))
-\end{array}$
-
-\bigskip
+\noindent\hspace*{\parindent}(e) $\forall s : shows @ \forall e :
+EpisodeId @ \forall p : PeopleId @ p \in fst(episode\_info(s, e))
+\iff p \in show\_info(s)$
 
 \bigskip
 
 \setlength{\leftskip}{\dimexpr\parindent+2em\relax}
-\noindent The specification "exactly when" translates to if and only
-if and fst(episode\_info(s, e)) gives us access to a finite set of
-PeopleId as does show\_info(s) .
+\noindent The specification "exactly when" translates to
+bi-implication and fst(episode\_info(s, e)) gives us access to a
+finite set of PeopleId as does show\_info(s) .
 
 \bigskip
 
@@ -985,8 +974,8 @@ snd(episode\_info(s, e)) to access the Timestamp.
 \section*{Question 8}
 \addcontentsline{toc}{section}{Question 8}
 
-\noindent The following are given as abbreviations to enable fuzz
-validation, which passes for each expression.
+\noindent The following solutions are expressed as abbreviations to
+enable fuzz validation, which passes for each expression.
 
 \bigskip
 
@@ -1016,8 +1005,7 @@ operator on F EpisodeId after ensuring s is in the domain of show\_episodes.
 
 \setlength{\leftskip}{\dimexpr\parindent+2em\relax}
 \noindent The set of PeopleId, which appear in 2 or more shows.  We
-make sure two such shows are distinct and we validate each $PeopleId
-\in F$ PeopleId.
+make sure two such shows are distinct.
 
 \bigskip
 
@@ -1053,17 +1041,28 @@ captured in the mu expression, which returns the single matching value.
 
 \noindent For the second operation, we define a partial function
 first\_episode\_timestamp that yields the Timestamp for $EpisodeId =
-1$ for $s : ShowId$.  We are guaranteed that $EpisodeId = 1$ exists
-by constraint 7(b). In addition, calling this function with the s
-from the mu expression is valid because the constraint defined in
-7(e) guarantees that the set of EpisodeId in the domain of show\_info
-and in the first element of the domain of episode\_info are identical.
+1$ for $s : ShowId$.  We are given there is exactly one episode
+associated with the most people. Therefore, we know that we will call
+first\_episode\_timestamp with a ShowId that has at least one episode
+and we are guaranteed that $EpisodeId = 1$ exists by constraint 7(b).
+In addition, calling this function with the s from the mu expression
+is valid because the constraint defined in 7(e) guarantees that the
+set of EpisodeId in the domain of show\_info and in the first element
+of the domain of episode\_info are identical. Therefore, calling this
+partial function is guaranteed to be valid with the mu expression as its input.
 
 \bigskip
 
 \setlength{\leftskip}{0pt}
 \section*{Question 9}
 \addcontentsline{toc}{section}{Question 9}
+
+\noindent We are now modeling an individual podcast player from the
+point of view of a user.  N.B. The free types PlayedOrNot and
+SavedOrNot have been adjusted to avoid ambiguity with propositions P
+and S. The following specification has been validated with fuzz.
+
+\bigskip
 
 \begin{zed}PlayedOrNot ::= Played | NotP
 \end{zed}
@@ -1078,15 +1077,101 @@ and in the first element of the domain of episode\_info are identical.
   \where
   my\_shows \subseteq shows \\
   \forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran
-  my\_episodes \land \\
+  my\_episodes \implies \\
   \quad e \in show\_episodes(s) \\
-  \forall s : ShowId @ \forall e : EpisodeId @ s \in my\_shows \land \\
-  \quad (s, e) \in \ran my\_episodes \\
+  \forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran
+  my\_episodes \implies \\
+  \quad s \in my\_shows \\
   \forall s : ShowId @ \forall e : EpisodeId @ \\
-  \quad (s, e) \in \ran my\_episodes \implies ((s, e) \in \dom status \land \\
-  \quad (s, e) \in \dom status \implies (s, e) \in \ran my\_episodes)
+  \quad (s, e) \in \ran my\_episodes \iff (s, e) \in \dom status
 \end{axdef}
 
+\noindent\hspace*{\parindent}(a) $my\_shows \subseteq shows$
+
+\bigskip
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
+\noindent The elements of the finite set of ShowId on this device
+must be elements of shows
+
+\bigskip
+
+\setlength{\leftskip}{0pt}
+\medskip
+
+\noindent\hspace*{\parindent}(b)
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
+\savedleftskip=\leftskip
+\noindent
+$\displaystyle
+\begin{array}{l}
+  \forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran
+  my\_episodes \implies \\
+  \quad e \in show\_episodes(s)
+\end{array}$
+
+\bigskip
+
+\bigskip
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
+\noindent We use the ran operator to access the (s, e) in the
+injective seq my\_episodes to specifiy each pair just be a valid
+mapping in show\_episodes
+
+\bigskip
+
+\setlength{\leftskip}{0pt}
+\medskip
+
+\noindent\hspace*{\parindent}(c)
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
+\savedleftskip=\leftskip
+\noindent
+$\displaystyle
+\begin{array}{l}
+  \forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran
+  my\_episodes \implies \\
+  \quad s \in my\_shows
+\end{array}$
+
+\bigskip
+
+\bigskip
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
+\noindent We use the ran operator to access the (s, e) in the
+injective seq my\_episodes to specifify each ShowId must be in my\_shows
+
+\bigskip
+
+\setlength{\leftskip}{0pt}
+\medskip
+
+\noindent\hspace*{\parindent}(d)
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
+\savedleftskip=\leftskip
+\noindent
+$\displaystyle
+\begin{array}{l}
+  \forall s : ShowId @ \forall e : EpisodeId @ \\
+  \quad (s, e) \in \ran my\_episodes \iff (s, e) \in \dom status
+\end{array}$
+
+\bigskip
+
+\bigskip
+
+\setlength{\leftskip}{\dimexpr\parindent+2em\relax}
+\noindent Every (s, e) pair in the ran my\_episodes has a status and
+every (s, e) in status must be in ran my\_episodes
+
+\bigskip
+
+\setlength{\leftskip}{0pt}
 \section*{Question 10}
 \addcontentsline{toc}{section}{Question 10}
 

@@ -242,7 +242,7 @@ TEXT: I worked on this proof both top-down and bottom-up.  After doing the obvio
 
 ** Question 6 **
 
-TEXT: The following set comprehensions are presented using Z axiomatic definitions to enable direct fuzz validation of the LaTeX.  Further, exponents are written long-hand as fuzz does not  support exponentiation.
+TEXT: The following set comprehensions are presented using Z axiomatic definitions to enable direct fuzz validation of the LaTeX.  Further, exponents are written long-hand as fuzz does not  support exponentiation [cite spivey1993fuzz].
 
 (a)
 axdef
@@ -283,7 +283,7 @@ PAGEBREAK:
 
 ** Question 7 **
 
-TEXT: We are designing a prototype for a new podcast platform and player.  We are given some initial types and abbreviations.  We also define two generic functions fst() and snd() to provide our fuzz compatible and validated solution capabilities equal to tuple projection, which is not supported in fuzz. 
+TEXT: We are designing a prototype for a new podcast platform and player.  We are given some initial types and abbreviations.  We also define two generic functions fst() and snd() to provide our fuzz compatible and validated solution capabilities equal to tuple projection, which is not supported in fuzz [cite spivey1993fuzz]. 
 
 given ShowId, PeopleId
 EpisodeId == N1
@@ -310,11 +310,9 @@ where
   shows subset dom (show_episodes) and dom (show_episodes) subset shows
   forall es : ran show_episodes | (exists n : N | es = 1..n)
   forall s : dom show_episodes | forall e : show_episodes s | \
-    (s, e) in dom episode_info <=> s in dom show_episodes
+    e in show_episodes(s) <=> (s, e) in dom episode_info 
   shows subset dom (show_info) and dom (show_info) subset shows
-  forall s : ShowId | forall p : PeopleId | (exists e : EpisodeId | \
-    (s, e) in dom episode_info and \
-    (p in fst(episode_info(s, e)) <=> p in show_info s))
+  forall s : shows | forall e : EpisodeId | forall p : PeopleId | p in fst(episode_info(s, e)) <=> p in show_info s
   forall s : ShowId | forall t_1, t_2 : Timestamp | (forall e_1, e_2 : EpisodeId | \
     ((s, e_1) in dom episode_info and (s, e_2) in dom episode_info) | \
     (e_1 < e_2) => (snd(episode_info(s, e_1)) <= (snd(episode_info(s, e_2)))))
@@ -323,24 +321,23 @@ end
 TEXT: The above Z is validated using fuzz. Each part is briefly explained below:
 
 (a) shows subset dom (show_episodes) and dom (show_episodes) subset shows
-TEXT: If and only if translates to the sets are equal. The same ShowId exist in both.
+TEXT: If and only if translates to the sets are equal. The same ShowId exist in both sets.
 
 (b) forall es : ran show_episodes | (exists n : N | es = 1..n)
 TEXT: Each finite set of EpisodeId includes an uninterrupted range from 1 to n. 
 
 (c) forall s : dom show_episodes | forall e : show_episodes s | \
-    e in show_episode(s) <=> (s, e) in dom episode_info 
+    e in show_episodes(s) <=> (s, e) in dom episode_info 
 TEXT: If and only if implies the condition is a bi-implication.
 
 PAGEBREAK:
 
 (d) shows subset dom (show_info) and dom (show_info) subset shows
-TEXT: If and only if translates to the sets are equal. The same ShowId exist in both.
+TEXT: If and only if translates to the sets are equal. The same ShowId exist in both sets.
 
-(e) forall s : ShowId | forall p : PeopleId | (exists e : EpisodeId | \
-    (s, e) in dom episode_info and \
-    (p in fst(episode_info(s, e)) <=> p in show_info s))
-TEXT: The specification "exactly when" translates to if and only if and fst(episode_info(s, e)) gives us access to a finite set of PeopleId as does show_info(s) .
+(e) forall s : shows | forall e : EpisodeId | forall p : PeopleId | p in fst(episode_info(s, e)) <=> p in show_info s
+
+TEXT: The specification "exactly when" translates to bi-implication and fst(episode_info(s, e)) gives us access to a finite set of PeopleId as does show_info(s) .
 
 (f) forall s : ShowId | forall t_1, t_2 : Timestamp | (forall e_1, e_2 : EpisodeId | \
     ((s, e_1) in dom episode_info and (s, e_2) in dom episode_info) | \
@@ -349,7 +346,7 @@ TEXT: We specify how the Timestamp for different episodes of the same show must 
 
 ** Question 8 **
 
-TEXT: The following are given as abbreviations to enable fuzz validation, which passes for each expression.
+TEXT: The following solutions are expressed as abbreviations to enable fuzz validation, which passes for each expression.
 
 (a) EightA == {s : dom show_episodes | #(show_episodes(s)) >= 100}
 
@@ -357,7 +354,7 @@ TEXT: Shows with at least 100 episodes.  We use the cardinality operator on F Ep
 
 (b) EightB == {p : PeopleId | exists s_1, s_2 : dom show_info | s_1 != s_2 and p in show_info s_1 and p in show_info s_2}
 
-TEXT: The set of PeopleId, which appear in 2 or more shows.  We make sure two such shows are distinct and we validate each PeopleId in F PeopleId.
+TEXT: The set of PeopleId, which appear in 2 or more shows.  We make sure two such shows are distinct.
 
 (c)
 
@@ -373,9 +370,11 @@ EightC == first_episode_timestamp(mu s : dom show_info | \
 
 TEXT: We are given that there is exactly one show with the most people and we want the timestamp for the first episode of that show. This involves two operations, finding the show with the most people and finding the timestamp for the first episode of that show.  For the first operation, we compare the cardinality of the F PeopleId for every pair s, t : ShowId in the domain of show\_info. This is captured in the mu expression, which returns the single matching value.
 
-TEXT: For the second operation, we define a partial function first\_episode\_timestamp that yields the Timestamp for EpisodeId = 1 for s : ShowId.  We are guaranteed that EpisodeId = 1 exists by constraint 7(b). In addition, calling this function with the s from the mu expression is valid because the constraint defined in 7(e) guarantees that the set of EpisodeId in the domain of show\_info and in the first element of the domain of episode\_info are identical.
+TEXT: For the second operation, we define a partial function first\_episode\_timestamp that yields the Timestamp for EpisodeId = 1 for s : ShowId.  We are given there is exactly one episode associated with the most people. Therefore, we know that we will call first\_episode\_timestamp with a ShowId that has at least one episode and we are guaranteed that EpisodeId = 1 exists by constraint 7(b). In addition, calling this function with the s from the mu expression is valid because the constraint defined in 7(e) guarantees that the set of EpisodeId in the domain of show\_info and in the first element of the domain of episode\_info are identical. Therefore, calling this partial function is guaranteed to be valid with the mu expression as its input.
 
 ** Question 9**
+
+TEXT: We are now modeling an individual podcast player from the point of view of a user.  N.B. The free types PlayedOrNot and SavedOrNot have been adjusted to avoid ambiguity with propositions P and S. The following specification has been validated with fuzz. 
 
 PlayedOrNot ::= Played | NotP
 SavedOrNot ::= Saved | NotS
@@ -386,14 +385,28 @@ axdef
   status : ShowId cross EpisodeId +-> (PlayedOrNot cross SavedOrNot)
 where
   my_shows subset shows
-  forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes and \
-e in show_episodes s
-  forall s : ShowId | forall e : EpisodeId | s in my_shows and \
-    (s, e) in ran my_episodes
+  forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes => \
+    e in show_episodes s
+  forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes => \
+    s in my_shows
   forall s : ShowId | forall e : EpisodeId | \
-    (s, e) in ran my_episodes => (s, e) in dom status and \
-    (s, e) in dom status => (s, e) in ran my_episodes
+    (s, e) in ran my_episodes <=> (s, e) in dom status
 end
+
+(a) my_shows subset shows
+TEXT: The elements of the finite set of ShowId on this device must be elements of shows
+
+(b) forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes => \
+      e in show_episodes s
+TEXT: We use the ran operator to access the (s, e) in the injective seq my\_episodes to specifiy each pair just be a valid mapping in show_episodes
+
+(c)   forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes => \
+      s in my_shows
+TEXT: We use the ran operator to access the (s, e) in the injective seq my\_episodes to specifify each ShowId must be in my\_shows
+
+(d)   forall s : ShowId | forall e : EpisodeId | \
+        (s, e) in ran my_episodes <=> (s, e) in dom status
+TEXT: Every (s, e) pair in the ran my\_episodes has a status and every (s, e) in status must be in ran my\_episodes
 
 ** Question 10 **
 
