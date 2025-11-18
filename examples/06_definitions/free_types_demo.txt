@@ -20,7 +20,7 @@ TEXT: forall x, y : N; z : N | x + y = z
 
 ** Example 4: Real-world example from Solution 41 **
 
-TEXT: forall r : ran records; i1, i2 : dom r | i1 /= i2 => true
+TEXT: forall r : ran records; i1, i2 : dom r | i1 /= i2 . true
 
 ** Example 5: Conditional with semicolon bindings **
 
