@@ -36,7 +36,7 @@ axdef
   finitePartialFunc : X 77-> Y
   totalBij : X >->> Y
 where
-  dom totalFunc = X and dom totalBij = X and (forall x1, x2 : X | totalBij(x1) = totalBij(x2) => x1 = x2) and ran totalBij = Y
+  dom totalFunc = X and dom totalBij = X and (forall x1, x2 : X | totalBij(x1) = totalBij(x2) . x1 = x2) and ran totalBij = Y
 end
 
 ** Example 3: Finite Functions in Practice **

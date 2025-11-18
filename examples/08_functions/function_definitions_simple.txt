@@ -31,10 +31,10 @@ TEXT: Partial functions are not defined over their entire domain.
 axdef
   predecessor : N +-> N
 where
-  forall n : N | n > 0 => predecessor(n) = n - 1
+  forall n : N | n > 0 . predecessor(n) = n - 1
 end
 
-TEXT: predecessor is partial on natural numbers since 0 has no predecessor in N.
+TEXT: predecessor is partial on natural numbers since 0 has no predecessor in N. The bullet separator filters to positive numbers (where predecessor is defined), then specifies the function value.
 
 ** Example 3: Generic Functions **
 
