@@ -958,6 +958,11 @@ class Parser:
         - if s = <> then 0 else head s
         - if x > 0 then 1 else if x < 0 then -1 else 0 (nested)
 
+        Multi-line support (Phase 28):
+        - if (exists1 i : songs | forall j : songs | i /= j | P(i) > P(j))
+          then (mu i : songs | forall j : songs | i /= j | P(i) > P(j))
+          else nullSong
+
         The condition is parsed with _parse_iff() (no quantifiers/lambdas/conditionals),
         but the then/else branches use _parse_expr() to allow nested conditionals.
         """
@@ -966,18 +971,30 @@ class Parser:
         # Parse condition (up to 'then') - no quantifiers/lambdas/conditionals
         condition = self._parse_iff()
 
+        # Skip newlines before 'then' (multi-line support)
+        self._skip_newlines()
+
         # Expect 'then'
         if not self._match(TokenType.THEN):
             raise ParserError("Expected 'then' after if condition", self._current())
         self._advance()  # Consume 'then'
 
+        # Skip newlines after 'then' (multi-line support)
+        self._skip_newlines()
+
         # Parse then branch - allow nested conditionals
         then_expr = self._parse_expr()
+
+        # Skip newlines before 'else' (multi-line support)
+        self._skip_newlines()
 
         # Expect 'else'
         if not self._match(TokenType.ELSE):
             raise ParserError("Expected 'else' after then expression", self._current())
         self._advance()  # Consume 'else'
+
+        # Skip newlines after 'else' (multi-line support)
+        self._skip_newlines()
 
         # Parse else branch - allow nested conditionals
         else_expr = self._parse_expr()
@@ -991,7 +1008,11 @@ class Parser:
         )
 
     def _parse_iff(self) -> Expr:
-        """Parse iff operation (<=>), lowest precedence."""
+        """Parse iff operation (<=>), lowest precedence.
+
+        Phase 28: Multi-line support - allows natural line breaks without
+        continuation marker.
+        """
         left = self._parse_implies()
 
         while self._match(TokenType.IFF):
@@ -1005,6 +1026,8 @@ class Parser:
                 if self._match(TokenType.NEWLINE):
                     self._advance()
                 self._skip_newlines()
+            # Phase 28: Always skip newlines before right operand (multi-line support)
+            self._skip_newlines()
             right = self._parse_implies()
             left = BinaryOp(
                 operator=op_token.value,
@@ -1022,6 +1045,9 @@ class Parser:
 
         Right side can be a quantifier to support patterns like:
         exists d : Dog | gentle(d) => forall t : Trainer | groomed(d, t)
+
+        Phase 28: Multi-line support - allows natural line breaks without
+        continuation marker.
         """
         left = self._parse_or()
 
@@ -1036,6 +1062,8 @@ class Parser:
                 if self._match(TokenType.NEWLINE):
                     self._advance()
                 self._skip_newlines()
+            # Phase 28: Always skip newlines before right operand (multi-line support)
+            self._skip_newlines()
             # Use _parse_expr() to allow quantifiers on RHS
             right = self._parse_expr()
             left = BinaryOp(
@@ -1050,7 +1078,11 @@ class Parser:
         return left
 
     def _parse_or(self) -> Expr:
-        """Parse or operation."""
+        """Parse or operation.
+
+        Phase 28: Multi-line support - allows natural line breaks without
+        continuation marker.
+        """
         left = self._parse_and()
 
         while self._match(TokenType.OR):
@@ -1064,6 +1096,8 @@ class Parser:
                 if self._match(TokenType.NEWLINE):
                     self._advance()
                 self._skip_newlines()
+            # Phase 28: Always skip newlines before right operand (multi-line support)
+            self._skip_newlines()
             right = self._parse_and()
             left = BinaryOp(
                 operator=op_token.value,
@@ -1077,7 +1111,12 @@ class Parser:
         return left
 
     def _parse_and(self) -> Expr:
-        """Parse and operation."""
+        """Parse and operation.
+
+        Phase 21c: Allow quantifiers after 'and'.
+        Phase 28: Multi-line support - allows natural line breaks without
+        continuation marker.
+        """
         left = self._parse_comparison()
 
         while self._match(TokenType.AND):
@@ -1091,6 +1130,8 @@ class Parser:
                 if self._match(TokenType.NEWLINE):
                     self._advance()
                 self._skip_newlines()
+            # Phase 28: Always skip newlines before right operand (multi-line support)
+            self._skip_newlines()
             # Phase 21c: Allow quantifiers after 'and'
             # Check if next token is a quantifier keyword
             if self._match(
