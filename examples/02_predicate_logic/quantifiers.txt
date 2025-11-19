@@ -1,3 +1,23 @@
+// ============================================================================
+// Example: Z Notation Basics - Types, Definitions, and Schemas
+// ============================================================================
+// Demonstrates:
+//   - Given types (basic type declarations)
+//   - Free types (algebraic data types with constructors)
+//   - Abbreviations (simple definitions)
+//   - Axiomatic definitions (axdef) with constraints
+//   - Schema definitions with state and invariants
+//
+// Features:
+//   - `given` for basic types
+//   - `::=` for free type constructors
+//   - `==` for abbreviations
+//   - `axdef` blocks with where clauses
+//   - `schema` blocks with declarations and predicates
+//
+// See: docs/USER_GUIDE.md - Sections "Definitions", "Schema Notation"
+// ============================================================================
+
 === Phase 4: Z Notation Basics ===
 
 ** Example 1: Given Types **

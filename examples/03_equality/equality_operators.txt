@@ -1,3 +1,22 @@
+// ============================================================================
+// Example: Equality and Inequality Operators
+// ============================================================================
+// Demonstrates:
+//   - Equality operator (=)
+//   - Inequality operator (!=)
+//   - Equality in quantified predicates
+//   - Equality in set comprehension
+//   - Equality with complex expressions
+//
+// Features:
+//   - Basic comparison: x = y, x != y
+//   - Reflexivity: x = x
+//   - Commutativity in expressions
+//   - TEXT: blocks for inline explanations
+//
+// See: docs/USER_GUIDE.md - Section "Equality"
+// ============================================================================
+
 === Equality Operators ===
 
 ** Example 1: Basic Equality **

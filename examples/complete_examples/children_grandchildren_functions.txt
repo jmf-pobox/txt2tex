@@ -1,0 +1,285 @@
+// ============================================================================
+// Complete Example: Children and Grandchildren Functions
+// ============================================================================
+// Course: Formal Methods
+// Topic: Functions - Higher-Order Operations and Composition
+// Difficulty: Intermediate
+//
+// This example demonstrates:
+//   - Functions from types to power sets (X -> P Y)
+//   - Relation image operator ((| ... |))
+//   - Set comprehension with function application
+//   - Relation composition for derived functions
+//   - Cardinality operator (#) on sets
+//
+// Learning Goals:
+//   1. Define functions that return sets as values
+//   2. Use relation image to apply relations to sets of elements
+//   3. Compose relations to derive new functions
+//   4. Count elements in derived sets using cardinality
+//   5. Connect relation operations to function definitions
+//
+// Design Decisions:
+//   - Functions return sets (P Person) rather than sequences
+//   - Use relation image (|) for elegant set construction
+//   - Leverage existing parentOf relation from previous example
+//   - Demonstrate two approaches: set comprehension and relation operations
+//   - Show how composition simplifies complex queries
+//
+// Domain Model:
+//   Building on the family relationships example, we define:
+//     - children: Person -> P Person
+//       Returns the set of all children for a given person
+//     - number_of_grandchildren: Person -> N
+//       Returns the count of grandchildren for a given person
+//
+// Mathematical Context:
+//   The relation image operator (R(| A |)) applies relation R to set A:
+//     R(| A |) = {y | exists x : A | x |-> y in R}
+//
+//   This is more elegant than explicit set comprehension:
+//     {y : Y | exists x : A | x |-> y in R}
+//
+// Comparison of Approaches:
+//   We show two equivalent ways to define each function:
+//   1. Using relation image (idiomatic, concise)
+//   2. Using set comprehension (explicit, pedagogical)
+//
+// See: docs/USER_GUIDE.md - Section "Functions"
+//      examples/08_functions/ - Function examples
+//      examples/07_relations/ - Relation image
+//      TUTORIAL_07.md - Functions tutorial
+// ============================================================================
+
+=== Children and Grandchildren Functions ===
+
+** Problem Statement **
+
+TEXT: Given a parentOf relation, define functions to:
+TEXT:   (a) Return the set of all children for a person
+TEXT:   (b) Count the number of grandchildren for a person
+
+** Prerequisites **
+
+TEXT: This example builds on the family relationships model. We assume:
+
+given Person
+
+axdef
+  parentOf : Person <-> Person
+end
+
+TEXT: Recall that parentOf represents direct parent-child relationships.
+TEXT: If (p, c) in parentOf, then p is a parent of c.
+
+** Solution (a): Children Function **
+
+TEXT: We want a function that maps each person to their set of children.
+TEXT:
+TEXT: Type signature: children : Person -> P Person
+TEXT:
+TEXT: For each person p, children(p) is the set of all people c where p is a parent of c.
+
+axdef
+  children : Person -> P Person
+where
+  children = {p : Person . p |-> parentOf(| {p} |)}
+end
+
+TEXT: Let's break down this definition:
+TEXT:
+TEXT: Step 1: Set comprehension structure
+TEXT:   {p : Person . p |-> ...}
+TEXT:   This creates a function (set of maplets) from Person to P Person.
+TEXT:
+TEXT: Step 2: Relation image
+TEXT:   parentOf(| {p} |)
+TEXT:   This applies the parentOf relation to the singleton set {p}.
+TEXT:
+TEXT:   Recall: R(| A |) = {y | exists x : A | x |-> y in R}
+TEXT:
+TEXT:   So: parentOf(| {p} |) = {c | p |-> c in parentOf}
+TEXT:       = the set of all children of p
+TEXT:
+TEXT: Step 3: Complete maplet
+TEXT:   p |-> parentOf(| {p} |)
+TEXT:   Maps person p to their set of children.
+TEXT:
+TEXT: Alternative equivalent definition using explicit set comprehension:
+TEXT:
+TEXT:   children = {p : Person . p |-> {c : Person | p |-> c in parentOf}}
+TEXT:
+TEXT: The relation image version is more concise and idiomatic in Z notation.
+
+** Understanding Relation Image **
+
+TEXT: The relation image operator (| ... |) is a powerful tool:
+TEXT:
+TEXT: Examples:
+TEXT:   - parentOf(| {Alice} |) = set of Alice's children
+TEXT:   - parentOf(| {Alice, Bob} |) = set of children of Alice or Bob
+TEXT:   - parentOf(| emptyset |) = emptyset
+TEXT:
+TEXT: Key properties:
+TEXT:   1. R(| A union B |) = R(| A |) union R(| B |)
+TEXT:   2. R(| emptyset |) = emptyset
+TEXT:   3. R(| A |) subseteq ran R
+TEXT:
+TEXT: Intuition: Given a relation R and a set of starting points A,
+TEXT: the image R(| A |) is the set of all endpoints reachable from A via R.
+
+** Solution (b): Number of Grandchildren Function **
+
+TEXT: We want a function that counts grandchildren for each person.
+TEXT:
+TEXT: Type signature: number_of_grandchildren : Person -> N
+TEXT:
+TEXT: Grandchildren are children of children, which we can express via composition.
+
+axdef
+  number_of_grandchildren : Person -> N
+where
+  number_of_grandchildren = {p : Person . p |-> # (parentOf o9 parentOf)(| {p} |)}
+end
+
+TEXT: Let's break down this definition:
+TEXT:
+TEXT: Step 1: Relation composition
+TEXT:   parentOf o9 parentOf
+TEXT:   This composes parentOf with itself:
+TEXT:     If (p, c) in parentOf and (c, g) in parentOf,
+TEXT:     then (p, g) in (parentOf o9 parentOf)
+TEXT:   Meaning: p is a grandparent of g.
+TEXT:
+TEXT: Step 2: Relation image
+TEXT:   (parentOf o9 parentOf)(| {p} |)
+TEXT:   Apply the grandparent relation to {p}.
+TEXT:   Result: the set of all grandchildren of p.
+TEXT:
+TEXT: Step 3: Cardinality
+TEXT:   # (parentOf o9 parentOf)(| {p} |)
+TEXT:   Count the number of grandchildren.
+TEXT:
+TEXT: Step 4: Complete maplet
+TEXT:   p |-> # (parentOf o9 parentOf)(| {p} |)
+TEXT:   Maps person p to their grandchild count.
+
+** Alternative Approaches **
+
+TEXT: We can express the same functions using different styles:
+
+TEXT: **Approach 1: Relation image (shown above)**
+TEXT:   + Most concise
+TEXT:   + Idiomatic Z notation
+TEXT:   + Leverages relation algebra
+TEXT:   - Requires understanding of (| |) operator
+
+TEXT: **Approach 2: Explicit set comprehension**
+
+axdef
+  children_alt : Person -> P Person
+where
+  forall p : Person | children_alt(p) = {c : Person | p |-> c in parentOf}
+end
+
+axdef
+  number_of_grandchildren_alt : Person -> N
+where
+  forall p : Person |
+    number_of_grandchildren_alt(p) = # {g : Person | exists c : Person | p |-> c in parentOf and c |-> g in parentOf}
+end
+
+TEXT: **Approach 3: Using previously defined functions**
+
+axdef
+  grandchildren : Person -> P Person
+where
+  forall p : Person |
+    grandchildren(p) = bigcup {c : children(p) . children(c)}
+end
+
+axdef
+  number_of_grandchildren_v3 : Person -> N
+where
+  forall p : Person | number_of_grandchildren_v3(p) = # grandchildren(p)
+end
+
+TEXT: All three approaches are mathematically equivalent. Choose based on:
+TEXT:   - Readability for your audience
+TEXT:   - Consistency with surrounding specifications
+TEXT:   - Performance considerations (if using a model checker)
+
+** Usage Examples **
+
+TEXT: Given a specific family structure:
+
+TEXT: Suppose:
+TEXT:   - Alice has children: Bob, Carol
+TEXT:   - Bob has children: Dave, Eve
+TEXT:   - Carol has children: Frank
+TEXT:
+TEXT: Then:
+TEXT:   children(Alice) = {Bob, Carol}
+TEXT:   children(Bob) = {Dave, Eve}
+TEXT:   children(Carol) = {Frank}
+TEXT:   number_of_grandchildren(Alice) = 3 (Dave, Eve, Frank)
+TEXT:   number_of_grandchildren(Bob) = 0
+TEXT:   number_of_grandchildren(Carol) = 0
+
+** Design Patterns **
+
+TEXT: This example illustrates several key patterns:
+TEXT:
+TEXT: 1. **Functions returning sets**: Use P X for set-valued functions
+TEXT:    - Common in modeling relationships with variable cardinality
+TEXT:    - children: Person -> P Person (a person may have 0+ children)
+TEXT:
+TEXT: 2. **Relation image for set operations**: Use (| ... |) instead of comprehensions
+TEXT:    - More concise: R(| {x} |) vs {y | x |-> y in R}
+TEXT:    - More compositional: easy to combine with other operators
+TEXT:
+TEXT: 3. **Composition for multi-step relationships**: Use o9 instead of nested quantifiers
+TEXT:    - Grandchildren: parentOf o9 parentOf
+TEXT:    - Great-grandchildren: parentOf o9 parentOf o9 parentOf
+TEXT:    - General ancestors: parentOf+
+TEXT:
+TEXT: 4. **Cardinality for counting**: Use # to convert sets to numbers
+TEXT:    - Essential for quantitative properties
+TEXT:    - number_of_grandchildren uses # on the grandchild set
+TEXT:
+TEXT: 5. **Progressive abstraction**: Build complex functions from simpler ones
+TEXT:    - Define children first
+TEXT:    - Use children to define grandchildren
+TEXT:    - Use grandchildren to define counting function
+
+** Specification Completeness **
+
+TEXT: Complete axiomatic definitions with all functions:
+
+axdef
+  parentOf : Person <-> Person
+  children : Person -> P Person
+  grandchildren : Person -> P Person
+  number_of_grandchildren : Person -> N
+where
+  children = {p : Person . p |-> parentOf(| {p} |)}
+  grandchildren = {p : Person . p |-> (parentOf o9 parentOf)(| {p} |)}
+  number_of_grandchildren = {p : Person . p |-> # grandchildren(p)}
+end
+
+** Exercise for the Reader **
+
+TEXT: 1. Define a function descendants : Person -> P Person
+TEXT:    that returns all descendants (children, grandchildren, etc.)
+TEXT:    Hint: use transitive closure (+)
+TEXT:
+TEXT: 2. Define a function oldest_child : Person +-> Person
+TEXT:    that returns the oldest child of a person (partial function)
+TEXT:    Hint: you'll need an age function
+TEXT:
+TEXT: 3. Prove that: # grandchildren(p) = sum {# children(c) | c in children(p)}
+TEXT:    (The number of grandchildren equals the sum of each child's children)
+TEXT:
+TEXT: 4. What constraints should parentOf satisfy to ensure:
+TEXT:    - No cycles (no one is their own ancestor)
+TEXT:    - Consistent cardinality (if p in children(x), then x in parentOf(| {p} |))

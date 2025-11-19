@@ -1,3 +1,20 @@
+// ============================================================================
+// Example: Strict (Proper) Subset Operator
+// ============================================================================
+// Demonstrates:
+//   - Strict/proper subset operator (psubset, ⊂)
+//   - Distinction between subset (⊆) and psubset (⊂)
+//   - Proper subset requires inequality
+//   - Examples comparing subset and psubset
+//
+// Features:
+//   - A subset B: A ⊆ B (includes equality)
+//   - A psubset B: A ⊂ B (excludes equality)
+//   - psubset means A subset B AND A != B
+//
+// See: docs/USER_GUIDE.md - Section "Sets and Types" > "Set Relations"
+// ============================================================================
+
 === Phase 39: Strict Subset Operator ===
 
 TEXT: The strict subset operator (psubset, ⊂) represents proper subset relationships, where A is a subset of B AND A is not equal to B.

@@ -1,3 +1,22 @@
+// ============================================================================
+// Example: Lambda Expressions
+// ============================================================================
+// Demonstrates:
+//   - Lambda expression syntax for anonymous functions
+//   - Single-variable lambdas (lambda x : T . expr)
+//   - Multi-variable lambdas (lambda x, y : T . expr)
+//   - Nested lambda expressions
+//   - Lambdas with quantifiers in body
+//
+// Features:
+//   - lambda x : N . x^2 [simple lambda]
+//   - lambda x, y : N . expr [multi-variable]
+//   - lambda x : X . lambda y : Y . expr [nested]
+//   - lambda x : X . forall y : Y | expr [with quantifier]
+//
+// See: docs/USER_GUIDE.md - Section "Functions" > "Lambda Expressions"
+// ============================================================================
+
 === Phase 11d: Lambda Expressions ===
 
 TEXT: Lambda expressions provide a concise way to define anonymous functions.

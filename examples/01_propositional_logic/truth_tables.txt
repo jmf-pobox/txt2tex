@@ -1,3 +1,25 @@
+// ============================================================================
+// Example: Equivalence Chains with Justifications
+// ============================================================================
+// Demonstrates:
+//   - EQUIV: blocks for step-by-step equational reasoning
+//   - Justifications in square brackets [reason]
+//   - Common logical laws (commutative, De Morgan, distributive)
+//   - Definition-based transformations
+//
+// Features:
+//   - Each step shows equivalence (<=>)
+//   - Justifications rendered flush-right
+//   - Multiple transformations in sequence
+//   - Optional justifications (can be omitted)
+//
+// Common justifications:
+//   - [commutative], [De Morgan], [distributive]
+//   - [definition], [parentheses], [idempotent]
+//
+// See: docs/USER_GUIDE.md - Section "Propositional Logic" > "Equivalence Chains"
+// ============================================================================
+
 === Equivalence Chains ===
 
 ** Solution 1 **

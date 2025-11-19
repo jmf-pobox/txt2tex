@@ -1,3 +1,21 @@
+// ============================================================================
+// Reference: Solutions 48-50 (Assignment Practice)
+// ============================================================================
+// Description:
+//   - Solutions for assignment practice problems
+//   - Music streaming service specification
+//   - Playlists, users, songs relationships
+//   - Set operations and constraints
+//
+// Topics:
+//   - Solution 48: Playlist and user data structures
+//   - Solution 49: User preferences (loved/hated songs)
+//   - Solution 50: Set operations and abbreviations
+//   - F (finite set), F1 (non-empty finite set)
+//
+// See: docs/USER_GUIDE.md - Sections "Axiomatic Definitions", "Sets", "Functions"
+// ============================================================================
+
 === Supplementary material: assignment practice ===
 
 ** Solution 48 **

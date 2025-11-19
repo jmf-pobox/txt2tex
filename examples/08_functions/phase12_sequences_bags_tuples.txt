@@ -1,3 +1,25 @@
+// ============================================================================
+// Example: Sequences, Bags, and Tuple Projection
+// ============================================================================
+// Demonstrates:
+//   - Sequence literal notation (angle brackets)
+//   - Sequence operators (head, tail, last, front, rev)
+//   - Sequence concatenation (⌢)
+//   - Tuple projection operators (.1, .2, etc.)
+//   - Bag literals (double brackets)
+//   - Sequences in quantifiers and set comprehensions
+//
+// Features:
+//   - ⟨⟩, ⟨a⟩, ⟨1, 2, 3⟩ [sequence literals]
+//   - head s, tail s, last s, front s, rev s [sequence operators]
+//   - s1 ⌢ s2 [concatenation]
+//   - x.1, x.2, (a, b, c).1 [tuple projection]
+//   - [[x]], [[1, 2, 3]] [bag literals]
+//   - seq[N] [sequence type]
+//
+// See: docs/USER_GUIDE.md - Sections "Sequences", "Tuples", "Bags"
+// ============================================================================
+
 === Phase 12: Sequences, Bags, and Tuple Projection ===
 
 ** Example 1: Sequence Literals **

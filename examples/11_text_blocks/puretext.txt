@@ -1,0 +1,71 @@
+// ============================================================================
+// Example: PURETEXT Blocks (Verbatim Text)
+// ============================================================================
+// Demonstrates:
+//   - PURETEXT directive for verbatim text output
+//   - No smart quote conversion
+//   - No mathematical notation processing
+//   - Preserves literal characters
+//
+// Features:
+//   - PURETEXT: verbatim paragraph
+//   - Quotes remain as typed: " and '
+//   - Special characters preserved literally
+//   - Useful for code snippets or literal examples
+//
+// See: docs/USER_GUIDE.md - Section "Text Blocks" > "PURETEXT Directive"
+// ============================================================================
+
+=== PURETEXT Block Examples ===
+
+** Example 1: Basic PURETEXT **
+
+PURETEXT: This is a verbatim text block. Unlike TEXT blocks, PURETEXT does not apply smart quote conversion or other typographical transformations.
+
+PURETEXT: The characters " and ' remain exactly as typed, without conversion to opening and closing quotes.
+
+** Example 2: Preserving Special Characters **
+
+PURETEXT: In PURETEXT blocks, special characters like & % $ # _ { } are preserved literally without requiring LaTeX escaping.
+
+PURETEXT: Mathematical notation like x^2 or f(n) is also treated as literal text, not as mathematical expressions.
+
+** Example 3: Code Snippets **
+
+PURETEXT: When documenting code or command-line syntax, use PURETEXT to preserve exact formatting:
+
+PURETEXT: $ hatch run convert examples/hello_world.txt
+
+PURETEXT: The above command compiles the example to PDF.
+
+** Example 4: Literal Z Notation Syntax **
+
+PURETEXT: To show Z notation syntax without rendering it as formal notation, use PURETEXT:
+
+PURETEXT: forall x : N | x > 0
+
+PURETEXT: This appears as literal text rather than being typeset as a quantified predicate.
+
+** Example 5: Comparison TEXT vs PURETEXT **
+
+TEXT: This block uses smart quotes: "Hello world" becomes properly formatted.
+
+PURETEXT: This block preserves quotes: "Hello world" stays exactly as typed.
+
+TEXT: Mathematical notation x^2 is rendered as a superscript.
+
+PURETEXT: Mathematical notation x^2 appears as literal text.
+
+** Example 6: File Paths and URLs **
+
+PURETEXT: File paths like /Users/name/Documents/file.txt are preserved exactly.
+
+PURETEXT: URLs like https://example.com/path?query=value&other=123 remain unmodified.
+
+** Example 7: Mixed Usage **
+
+TEXT: You can freely mix TEXT and PURETEXT blocks. Use TEXT for normal prose with smart typography.
+
+PURETEXT: Use PURETEXT when you need exact character-for-character reproduction.
+
+TEXT: This combination gives you flexibility: elegant typography when you want it, literal text when you need it.

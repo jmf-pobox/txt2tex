@@ -26,7 +26,10 @@
       "Bash(exiftool:*)",
       "Bash(gh issue:*)",
       "Bash(python:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(for dir in /Users/jfreeman/Coding/fuzz/txt2tex/sem/examples/*/)",
+      "Bash(done)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,3 +1,19 @@
+// ============================================================================
+// Example: Basic Propositional Logic Operators
+// ============================================================================
+// Demonstrates:
+//   - Basic logical operators: and, or, not, =>, <=>
+//   - Truth table formatting
+//   - Simple propositions and equivalences
+//
+// Features:
+//   - TRUTH TABLE: block for truth tables
+//   - Operator precedence examples
+//   - Equivalence operator (<=>)
+//
+// See: docs/USER_GUIDE.md - Section "Propositional Logic"
+// ============================================================================
+
 === Propositional Logic ===
 
 ** Solution 1 **

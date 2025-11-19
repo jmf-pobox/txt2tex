@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Mu Operator (μ) - Definite Description
+// ============================================================================
+// Demonstrates:
+//   - Mu operator (μ) - "the unique value that..."
+//   - Relationship between exists1 and mu
+//   - Well-defined vs undefined mu expressions
+//   - Using mu in equality expressions
+//
+// Features:
+//   - Syntax: mu x : N | predicate
+//   - Requires exactly one value to satisfy predicate
+//   - exists1 ensures mu is well-defined
+//   - Undefined when 0 or multiple values satisfy predicate
+//
+// See: docs/USER_GUIDE.md - Section "Equality" > "Mu Operator"
+// ============================================================================
+
 === Mu Operator (μ) ===
 
 ** Example 1: Basic Mu Expression **

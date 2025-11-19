@@ -1,3 +1,21 @@
+// ============================================================================
+// Reference: Solutions 44-47 (Free Types and Induction)
+// ============================================================================
+// Description:
+//   - Solutions demonstrating free type definitions
+//   - Structural induction proofs on sequences
+//   - Equational reasoning with sequence operations
+//   - Tree data type examples
+//
+// Topics:
+//   - Free type: Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩
+//   - Induction on sequences
+//   - Reverse operation properties
+//   - Equational reasoning steps
+//
+// See: docs/USER_GUIDE.md - Sections "Free Types", "Sequences", "Proofs"
+// ============================================================================
+
 === Free types and induction ===
 
 given N

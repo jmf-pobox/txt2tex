@@ -1,3 +1,21 @@
+// ============================================================================
+// Reference: Solutions 37-39 Fragment (Phase 12 Features)
+// ============================================================================
+// Description:
+//   - Test fragment for Solutions 37, 38, 39
+//   - Phase 12 features: sequences, tuples, bags
+//   - Sequence literals and operations
+//   - Tuple projection
+//   - Bag operations
+//
+// Topics:
+//   - Solution 37: Sequence notation and operations
+//   - Solution 38: Tuple projection with trains
+//   - Solution 39: Bag operations (collections of coins)
+//
+// See: docs/USER_GUIDE.md - Sections "Sequences", "Tuples", "Bags"
+// ============================================================================
+
 === Testing Solutions 37, 38, 39 (Phase 12 Features) ===
 
 ** Solution 37 **

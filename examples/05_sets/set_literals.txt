@@ -1,3 +1,22 @@
+// ============================================================================
+// Example: Set Literals with Maplets
+// ============================================================================
+// Demonstrates:
+//   - Set literals with maplet notation (|->)
+//   - Relation enumeration using maplets
+//   - Function enumeration
+//   - Mixed sets (values and maplets)
+//   - Nested sets
+//
+// Features:
+//   - {2 |-> 4, 3 |-> 3} [relation]
+//   - {1 |-> a, 2 |-> b} [function]
+//   - {} [empty set]
+//   - Maplets with tuples: {(0, 0) |-> 1}
+//
+// See: docs/USER_GUIDE.md - Sections "Sets and Types", "Relations"
+// ============================================================================
+
 === Phase 11.7: Set Literals with Maplets ===
 
 ** Test Cases **

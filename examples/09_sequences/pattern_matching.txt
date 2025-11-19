@@ -1,3 +1,22 @@
+// ============================================================================
+// Example: Pattern Matching with Sequences
+// ============================================================================
+// Demonstrates:
+//   - Pattern matching on empty sequences
+//   - Cons pattern (<x> ^ s) for decomposition
+//   - Recursive functions using pattern matching
+//   - Base case and recursive case definitions
+//   - Conditional expressions in pattern matching
+//
+// Features:
+//   - f(<>) = 0 [empty sequence base case]
+//   - f(<x> ^ s) = expr [cons pattern]
+//   - Recursive definitions (total, cumulative_total)
+//   - if-then-else in pattern matching
+//
+// See: docs/USER_GUIDE.md - Section "Sequences" > "Pattern Matching"
+// ============================================================================
+
 === Pattern Matching with Sequences ===
 
 ** Example 1: Empty Sequence Pattern **

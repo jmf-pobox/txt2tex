@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Simple Proof Tree Patterns
+// ============================================================================
+// Demonstrates:
+//   - Basic implication introduction
+//   - Sibling premises with :: notation
+//   - Case analysis (or-elimination)
+//   - Common inference patterns
+//
+// Features:
+//   - and elim 1, and elim 2
+//   - => intro, => elim
+//   - or elim with case analysis
+//   - and intro
+//
+// See: docs/PROOF_SYNTAX.md, docs/USER_GUIDE.md - Section "Proof Trees"
+// ============================================================================
+
 === Phase 5: Proof Trees ===
 
 ** Example 1: Simple Implication **

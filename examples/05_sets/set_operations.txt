@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Equality and Special Operators
+// ============================================================================
+// Demonstrates:
+//   - Mu operator (μ) for unique values
+//   - Not equal operator (!=)
+//   - Not in operator (notin)
+//   - Combining operators in predicates
+//
+// Features:
+//   - mu x : N | predicate
+//   - x != y
+//   - x notin S
+//   - Complex compound predicates
+//
+// See: docs/USER_GUIDE.md - Sections "Equality", "Sets and Types"
+// ============================================================================
+
 === Phase 7: Equality and Special Operators ===
 
 ** Test 1: Mu Operator **

@@ -1,0 +1,146 @@
+// ============================================================================
+// Example: PAGEBREAK Directive
+// ============================================================================
+// Demonstrates:
+//   - PAGEBREAK directive for forcing page breaks
+//   - Document structure control
+//   - Multi-page document organization
+//   - Section separation
+//
+// Features:
+//   - PAGEBREAK [inserts page break]
+//   - Useful for submission formatting
+//   - Separate solutions or sections
+//   - Control document flow
+//
+// See: docs/USER_GUIDE.md - Section "Text Blocks" > "PAGEBREAK Directive"
+// ============================================================================
+
+=== PAGEBREAK Examples ===
+
+** Example 1: Basic Page Break **
+
+TEXT: This content appears on the first page.
+
+PAGEBREAK
+
+TEXT: This content appears on the next page. The PAGEBREAK directive forces a page break at that point in the document.
+
+** Example 2: Separating Solutions **
+
+TEXT: When preparing solutions for submission, you may want each solution on a separate page.
+
+** Solution 1 **
+
+TEXT: First solution content here.
+
+forall x : N | x >= 0
+
+TEXT: Explanation of solution 1.
+
+PAGEBREAK
+
+** Solution 2 **
+
+TEXT: Second solution content here.
+
+exists y : N | y > 10
+
+TEXT: Explanation of solution 2.
+
+PAGEBREAK
+
+** Solution 3 **
+
+TEXT: Third solution content here.
+
+** Example 3: Section Separation **
+
+=== Section 1: Propositional Logic ===
+
+TEXT: Content for section 1 covering propositional logic operators and truth tables.
+
+p and q => p
+
+TEXT: More content for section 1.
+
+PAGEBREAK
+
+=== Section 2: Predicate Logic ===
+
+TEXT: Content for section 2 covering quantifiers and predicates.
+
+forall x : N | exists y : N | x + y = 10
+
+TEXT: More content for section 2.
+
+** Example 4: Long Proofs **
+
+TEXT: For lengthy proofs, you might want to start each major proof on a new page:
+
+** Theorem 1 **
+
+PROOF:
+  p => q [premise]
+  p [premise]
+  q [=> elim]
+
+TEXT: End of proof for Theorem 1.
+
+PAGEBREAK
+
+** Theorem 2 **
+
+PROOF:
+  p or q [premise]
+  not q [premise]
+  p [or elim]
+
+TEXT: End of proof for Theorem 2.
+
+** Example 5: Strategic Page Breaks **
+
+TEXT: Use PAGEBREAK strategically to improve document readability. Don't overuse it—let LaTeX handle most page breaking automatically.
+
+TEXT: Good uses of PAGEBREAK include:
+TEXT: - Starting new major sections
+TEXT: - Separating independent solutions
+TEXT: - Ensuring related content stays together
+
+** Example 6: Avoiding Orphans **
+
+TEXT: When you have a section title or definition that would appear at the bottom of a page with its content on the next page, you might insert a PAGEBREAK before the section.
+
+PAGEBREAK
+
+=== Important Definition ===
+
+axdef
+  critical : N -> N
+where
+  forall n : N | critical(n) = n * n
+end
+
+TEXT: This ensures the definition stays with its title.
+
+** Example 7: Submission Formatting **
+
+TEXT: For coursework submissions, instructors may require one solution per page:
+
+** Problem 1 **
+
+TEXT: Solution to problem 1 goes here.
+
+PAGEBREAK
+
+** Problem 2 **
+
+TEXT: Solution to problem 2 goes here.
+
+PAGEBREAK
+
+** Problem 3 **
+
+TEXT: Solution to problem 3 goes here.
+
+TEXT: This format makes it easy for instructors to review and grade individual problems.

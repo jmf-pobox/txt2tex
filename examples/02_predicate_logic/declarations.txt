@@ -1,3 +1,20 @@
+// ============================================================================
+// Example: Generic (Polymorphic) Type Parameters
+// ============================================================================
+// Demonstrates:
+//   - Generic abbreviations with [X], [X, Y] syntax
+//   - Generic definitions (gendef) with type parameters
+//   - Generic schemas with type parameters
+//   - Mixing generic and non-generic definitions
+//
+// Features:
+//   - Type parameters enable polymorphic definitions
+//   - Works with abbreviations, gendef, and schemas
+//   - TEXT: blocks for inline explanations
+//
+// See: docs/USER_GUIDE.md - Section "Definitions" > "Generic Definitions"
+// ============================================================================
+
 === Phase 9: Generic Parameters ===
 
 TEXT: This example demonstrates Z notation definitions with generic (polymorphic) type parameters.

@@ -90,6 +90,14 @@ class Lexer:
             self._advance()
             return None  # Skip whitespace
 
+        # Line comments: // ... (skip to end of line)
+        if char == "/" and self._peek_char() == "/":
+            # Skip the entire line including the newline
+            while not self._at_end() and self._current_char() != "\n":
+                self._advance()
+            # Don't consume the newline - let normal newline handling do it
+            return None
+
         # Newline (significant in Phase 1 for multi-line documents)
         if char == "\n":
             self._advance()

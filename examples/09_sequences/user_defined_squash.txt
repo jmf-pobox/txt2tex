@@ -1,3 +1,23 @@
+// ============================================================================
+// Example: User-Defined Squash Function
+// ============================================================================
+// Demonstrates:
+//   - Axiomatic definition of squash using gendef
+//   - Compacting sparse partial functions into sequences
+//   - Squash properties (range preservation, length calculation)
+//   - Examples with various function types
+//   - Relationship between continuous functions and sequences
+//   - Preserving injectivity
+//
+// Features:
+//   - gendef [X] squashFunc : (N1 +-> X) -> seq X
+//   - ran (squashFunc f) = ran f [range preservation]
+//   - # (squashFunc f) = # (ran f) [length property]
+//   - Removes gaps in domain
+//
+// See: docs/USER_GUIDE.md - Sections "Sequences", "Generic Definitions"
+// ============================================================================
+
 === User-Defined Squash Function ===
 
 TEXT: The squash operator appears in the Z notation glossary but is not built into the fuzz type-checker. However, we can define it ourselves as a user-defined function using an axiomatic specification.

@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Bags (Multisets)
+// ============================================================================
+// Demonstrates:
+//   - Bag type notation
+//   - Bag literal syntax with double brackets
+//   - Difference between bags and sets (multiplicity)
+//   - Use cases for bags in specifications
+//
+// Features:
+//   - bag N, bag Z [bag types]
+//   - [[x]], [[a, b, c]] [bag literals]
+//   - [[1, 2, 2, 3, 3, 3]] [bags with duplicates]
+//   - Bags preserve multiplicity unlike sets
+//
+// See: docs/USER_GUIDE.md - Section "Bags"
+// ============================================================================
+
 === Bags (Multisets) ===
 
 ** Example 1: Bag Type **

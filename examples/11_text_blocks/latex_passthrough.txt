@@ -1,0 +1,112 @@
+// ============================================================================
+// Example: LATEX Passthrough Blocks
+// ============================================================================
+// Demonstrates:
+//   - LATEX directive for custom LaTeX code
+//   - Direct LaTeX commands in output
+//   - Custom formatting and packages
+//   - Advanced typography control
+//
+// Features:
+//   - LATEX: raw LaTeX code block
+//   - Full LaTeX command support
+//   - Custom environments and macros
+//   - Escape hatch for advanced features
+//
+// See: docs/USER_GUIDE.md - Section "Text Blocks" > "LATEX Directive"
+// ============================================================================
+
+=== LATEX Passthrough Examples ===
+
+** Example 1: Basic LaTeX Commands **
+
+TEXT: You can insert custom LaTeX commands using the LATEX directive:
+
+LATEX: \noindent This paragraph has no indentation.
+
+TEXT: The LATEX block passes its content directly to the LaTeX output.
+
+** Example 2: Custom Spacing **
+
+TEXT: Control vertical spacing with LaTeX commands:
+
+LATEX: \vspace{1cm}
+
+TEXT: The above adds 1cm of vertical space.
+
+LATEX: \vspace{0.5cm}
+
+TEXT: You can add as much or as little space as needed.
+
+** Example 3: Custom Formatting **
+
+TEXT: Apply special formatting to text:
+
+LATEX: \begin{center}
+LATEX: \textbf{\Large This text is centered, bold, and large}
+LATEX: \end{center}
+
+TEXT: The LATEX blocks allow full control over typography.
+
+** Example 4: Boxes and Frames **
+
+TEXT: Create boxed text with LaTeX environments:
+
+LATEX: \begin{center}
+LATEX: \fbox{\parbox{0.8\textwidth}{
+LATEX: This text appears in a framed box. You can use this to highlight important definitions or theorems.
+LATEX: }}
+LATEX: \end{center}
+
+** Example 5: Custom Lists **
+
+TEXT: Create specialized list formats:
+
+LATEX: \begin{description}
+LATEX: \item[Precondition:] The input must be a natural number
+LATEX: \item[Postcondition:] The output is the square of the input
+LATEX: \item[Invariant:] The result is always non-negative
+LATEX: \end{description}
+
+** Example 6: Theorems and Definitions **
+
+TEXT: If you've loaded theorem packages, you can use them:
+
+LATEX: \begin{quotation}
+LATEX: \textbf{Theorem 1.} For all natural numbers $n$, we have $n \geq 0$.
+LATEX: \end{quotation}
+
+TEXT: The LATEX directive lets you use any LaTeX environment or command.
+
+** Example 7: Page Layout Control **
+
+TEXT: Control page layout with LaTeX commands:
+
+LATEX: \clearpage
+
+TEXT: The clearpage command forces a page break and flushes all pending floats.
+
+** Example 8: Mixed Z Notation and LaTeX **
+
+TEXT: You can combine Z notation with custom LaTeX formatting:
+
+axdef
+  example : N
+where
+  example = 42
+end
+
+LATEX: \medskip
+LATEX: \noindent\textit{Note:} The above defines a constant with value 42.
+
+TEXT: This demonstrates the flexibility of mixing txt2tex notation with raw LaTeX.
+
+** Example 9: Custom Macros **
+
+TEXT: If you define custom LaTeX macros in your preamble, you can use them:
+
+LATEX: % Assuming you've defined \newcommand{\spec}[1]{\textsc{#1}}
+LATEX: % You could write:
+LATEX: % \spec{Specification} is shown in small caps.
+
+TEXT: The LATEX directive is your escape hatch for any LaTeX feature not directly supported by txt2tex.

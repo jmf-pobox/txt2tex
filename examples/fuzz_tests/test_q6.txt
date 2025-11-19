@@ -1,3 +1,20 @@
+// ============================================================================
+// Test: Set Comprehension with Bullet Separator
+// ============================================================================
+// Demonstrates:
+//   - Set comprehension with constraint and term
+//   - Bullet separator (.) in set comprehensions
+//   - Defining mathematical sets axiomatically
+//   - Power set type (P Z)
+//
+// Features:
+//   - { z : Z | constraint . term } [set comprehension]
+//   - Bullet separator distinguishes constraint from term
+//   - P Z [power set of integers]
+//
+// See: docs/USER_GUIDE.md - Section "Set Comprehensions"
+// ============================================================================
+
 === Test ===
 
 ** Question 6 **

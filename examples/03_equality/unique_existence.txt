@@ -1,3 +1,22 @@
+// ============================================================================
+// Example: Unique Existence (∃₁)
+// ============================================================================
+// Demonstrates:
+//   - Unique existence quantifier (exists1)
+//   - "There exists exactly one value that..."
+//   - Unique existence with compound predicates
+//   - Relationship with one-point rule
+//   - Using exists1 to ensure mu is well-defined
+//
+// Features:
+//   - Syntax: exists1 x : N | predicate
+//   - Asserts exactly one value satisfies predicate
+//   - Combines uniqueness and existence
+//   - Often used as precondition for mu operator
+//
+// See: docs/USER_GUIDE.md - Section "Equality" > "Unique Existence"
+// ============================================================================
+
 === Unique Existence ===
 
 ** Example 1: Unique Quantifier (exists1) **

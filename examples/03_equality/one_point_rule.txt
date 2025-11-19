@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: One-Point Rule Applications
+// ============================================================================
+// Demonstrates:
+//   - One-point rule for eliminating quantifiers
+//   - Simplifying exists with equality constraints
+//   - One-point rule with set membership
+//   - One-point rule with disjunction
+//
+// Features:
+//   - Eliminates quantifiers when variable constrained by equality
+//   - Form: exists x : T | x = e and P(x) <=> e in T and P(e)
+//   - Works with forall and exists
+//   - EQUIV: blocks show step-by-step simplification
+//
+// See: docs/USER_GUIDE.md - Section "Equality"
+// ============================================================================
+
 === One-Point Rule Applications ===
 
 ** Example 1: Simple One-Point Rule **
