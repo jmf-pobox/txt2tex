@@ -1,0 +1,184 @@
+// ============================================================================
+// Example: Mu Operator with Expressions
+// ============================================================================
+// Demonstrates:
+//   - Mu operator with bullet separator
+//   - Computing expressions after finding unique value
+//   - Difference between mu x : T | P and mu x : T | P . E
+//   - Practical examples of mu with transformations
+//
+// Features:
+//   - mu x : T | constraint [returns the unique x]
+//   - mu x : T | constraint . expr [returns expr evaluated at that x]
+//   - Bullet separator for post-processing
+//
+// See: docs/USER_GUIDE.md - Section "Mu Operator"
+//      examples/03_equality/mu_operator.txt for basic mu examples
+// ============================================================================
+
+=== Mu Operator with Expressions ===
+
+** Example 1: Basic Mu (Returns the Value) **
+
+TEXT: The basic mu operator finds and returns the unique value:
+
+mu x : N | x * x = 16
+
+TEXT: This evaluates to 4 (the unique natural number whose square is 16).
+
+** Example 2: Mu with Expression (Returns Transformed Value) **
+
+TEXT: Adding a bullet and expression transforms the result:
+
+mu x : N | x * x = 16 . x + 1
+
+TEXT: This finds x = 4, then evaluates x + 1, giving 5.
+
+** Example 3: Finding and Doubling **
+
+mu n : N | n > 10 and n < 12 . 2 * n
+
+TEXT: Finds n = 11 (unique n between 10 and 12), then returns 2 * 11 = 22.
+
+** Example 4: Square Root and Square Again **
+
+mu x : N | x * x = 25 . x * x * x
+
+TEXT: Finds x = 5, then returns 5³ = 125.
+
+** Example 5: String Indexing Example **
+
+given String, Char
+
+axdef
+  charAt : String cross N -> Char
+  findChar : String cross Char -> N
+where
+  forall s : String; c : Char |
+    findChar(s, c) = mu i : N | charAt(s, i) = c
+end
+
+TEXT: findChar returns the index of the first (unique) occurrence of character c.
+
+** Example 6: With Transformation **
+
+axdef
+  findAndAdvance : String cross Char -> N
+where
+  forall s : String; c : Char |
+    findAndAdvance(s, c) = mu i : N | charAt(s, i) = c . i + 1
+end
+
+TEXT: Finds the index, then returns the next index.
+
+** Example 7: Mathematical Example - Inverse Function **
+
+axdef
+  inverse : (N -> N) cross N -> N
+where
+  forall f : N -> N; y : N |
+    inverse(f, y) = mu x : N | f(x) = y
+end
+
+TEXT: For an injective function f, inverse(f, y) finds the unique x such that f(x) = y.
+
+** Example 8: With Computation **
+
+axdef
+  inverseSquared : (N -> N) cross N -> N
+where
+  forall f : N -> N; y : N |
+    inverseSquared(f, y) = mu x : N | f(x) = y . x * x
+end
+
+TEXT: Finds the inverse, then squares it.
+
+** Example 9: Practical - Finding Configuration Values **
+
+given ConfigKey, ConfigValue
+
+axdef
+  configs : ConfigKey +-> ConfigValue
+  getConfigInt : ConfigKey -> N
+  parseValue : ConfigValue -> N
+where
+  forall k : ConfigKey |
+    k in dom configs =>
+    getConfigInt(k) = mu v : N | parseValue(configs(k)) = v
+end
+
+TEXT: Finds the unique N value by parsing a configuration value.
+
+** Example 10: With Default Processing **
+
+axdef
+  getConfigWithDefault : ConfigKey cross N -> N
+where
+  forall k : ConfigKey; default : N |
+    k in dom configs =>
+    getConfigWithDefault(k, default) = mu v : N | parseValue(configs(k)) = v . v
+  forall k : ConfigKey; default : N |
+    k notin dom configs =>
+    getConfigWithDefault(k, default) = default
+end
+
+TEXT: Uses mu to parse the value when key exists, otherwise returns default.
+
+** Example 11: Comparison - With and Without Bullet **
+
+TEXT: Without bullet (returns the value itself):
+
+axdef
+  findRoot : N
+where
+  findRoot = mu x : N | x * x = 49
+end
+
+TEXT: findRoot = 7
+
+TEXT: With bullet (returns a transformed value):
+
+axdef
+  findRootPlusOne : N
+where
+  findRootPlusOne = mu x : N | x * x = 49 . x + 1
+end
+
+TEXT: findRootPlusOne = 8
+
+** Example 12: Complex Expression **
+
+mu x : N | x > 5 and x < 7 . (x * x) + (x + 1)
+
+TEXT: Finds x = 6, then evaluates (6 * 6) + (6 + 1) = 36 + 7 = 43.
+
+** Example 13: Nested Mu Expressions **
+
+mu x : N | x * x = 16 . mu y : N | y * y = (x + 5) . y + x
+
+TEXT: Finds x = 4, then finds y where y² = (4 + 5) = 9, so y = 3, then returns 3 + 4 = 7.
+
+** Example 14: Error Conditions **
+
+TEXT: The mu operator requires the constraint to have exactly one solution. If there are zero solutions or multiple solutions, mu is undefined (evaluation error).
+
+TEXT: Zero solutions:
+TEXT: mu x : N | x * x = -1 (no natural number has negative square)
+
+TEXT: Multiple solutions:
+TEXT: mu x : N | x < 5 (0, 1, 2, 3, 4 all satisfy this)
+
+TEXT: For mu to be well-defined, the constraint must uniquely identify exactly one value.
+
+** Example 15: Design Pattern **
+
+TEXT: The pattern "mu x : T | uniqueness_constraint . expression" is useful when:
+TEXT: 1. You need to find a unique value satisfying a constraint
+TEXT: 2. You want to transform or compute something based on that value
+TEXT: 3. The transformation is more than just returning the value itself
+
+TEXT: Common use cases:
+TEXT: - Database lookups with post-processing
+TEXT: - Finding and transforming configuration values
+TEXT: - Inverse functions with additional computation
+TEXT: - Unique element selection with modification

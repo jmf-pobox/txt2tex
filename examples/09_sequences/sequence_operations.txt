@@ -1,3 +1,23 @@
+// ============================================================================
+// Example: Sequence Operations
+// ============================================================================
+// Demonstrates:
+//   - Sequence length/cardinality (#)
+//   - Head and tail operations
+//   - Last and front operations
+//   - Reverse operation (rev)
+//   - Domain and range of sequences
+//
+// Features:
+//   - # s [sequence length]
+//   - head s, tail s [decomposition]
+//   - last s, front s [end operations]
+//   - rev s [reverse]
+//   - dom s, ran s [domain and range]
+//
+// See: docs/USER_GUIDE.md - Section "Sequences" > "Operations"
+// ============================================================================
+
 === Sequence Operations ===
 
 ** Example 1: Sequence Length **

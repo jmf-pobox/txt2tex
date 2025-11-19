@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Function Type Arrow Notation
+// ============================================================================
+// Demonstrates:
+//   - All function type arrow syntaxes
+//   - Total, partial, injective, surjective, bijective functions
+//   - Standalone function type expressions
+//
+// Features:
+//   - -> [total], +-> [partial]
+//   - >-> [total injection], >+> [partial injection]
+//   - -->> [total surjection], +->> [partial surjection]
+//   - >->> [total bijection], >7-> [partial bijection]
+//   - 77-> [finite partial function]
+//
+// See: docs/USER_GUIDE.md - Section "Functions" > "Function Types"
+// ============================================================================
+
 === Phase 11c Function Type Arrows ===
 
 TEXT:

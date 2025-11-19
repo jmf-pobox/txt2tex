@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Simple Function Definitions (Fuzz-Compatible)
+// ============================================================================
+// Demonstrates:
+//   - Basic total function definitions
+//   - Partial function definitions
+//   - Function definitions that pass fuzz type checking
+//   - Using axdef with forall constraints
+//
+// Features:
+//   - Total functions: f : N -> N
+//   - Partial functions: f : N +-> N
+//   - Definition with forall
+//   - Examples: square, successor, double, predecessor
+//
+// See: docs/USER_GUIDE.md - Section "Functions"
+// ============================================================================
+
 === Simple Function Definitions ===
 
 TEXT: This file demonstrates basic function definitions in Z notation that work well with fuzz type checking.

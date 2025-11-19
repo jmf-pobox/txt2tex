@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Finite Partial Functions (77->)
+// ============================================================================
+// Demonstrates:
+//   - Finite partial function type (77->)
+//   - Functions with bounded finite domains
+//   - Use case: modeling limited capacity resources
+//   - Comparison with other function types
+//
+// Features:
+//   - X 77-> Y [finite partial function]
+//   - Partial: not all inputs mapped
+//   - Finite: domain has finite cardinality
+//   - Functional: each input maps to at most one output
+//
+// See: docs/USER_GUIDE.md - Section "Functions" > "Function Types"
+// ============================================================================
+
 === Phase 34: Finite Partial Functions ===
 
 TEXT: Finite partial functions are partial functions with a finite domain. The operator 77-> denotes a finite partial function, meaning the function may not be defined everywhere, and its domain must be finite.

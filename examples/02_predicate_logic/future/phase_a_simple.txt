@@ -1,3 +1,20 @@
+// ============================================================================
+// Example: Phase A Test - Pattern Matching with Sequences
+// ============================================================================
+// Demonstrates:
+//   - Pattern matching on sequences (future feature)
+//   - Cons pattern with tuple projection
+//   - Conditional filtering in recursive definitions
+//
+// Features:
+//   - f(<>) = base_case [empty pattern]
+//   - f(<x> ^ s) = expr [cons pattern]
+//   - x.3 [tuple projection]
+//   - if-then-else expressions
+//
+// See: docs/USER_GUIDE.md - Sections "Sequences", "Pattern Matching"
+// ============================================================================
+
 ** Test Phase A **
 
 Simple test of pattern matching with sequences:

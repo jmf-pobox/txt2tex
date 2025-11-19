@@ -1,3 +1,22 @@
+// ============================================================================
+// Example: Relational Image R(| S |)
+// ============================================================================
+// Demonstrates:
+//   - Relational image operator (| ... |)
+//   - R(| S |) gives image of set S under relation R
+//   - Image with set literals
+//   - Image with composition
+//   - Image with inverse
+//
+// Features:
+//   - R(| S |) [basic image]
+//   - R(| {1, 2, 3} |) [with set literal]
+//   - (R o9 S)(| A |) [with composition]
+//   - R~(| S |) [with inverse]
+//
+// See: docs/USER_GUIDE.md - Section "Relations" > "Relational Image"
+// ============================================================================
+
 ** Phase 11.8: Relational Image **
 
 TEXT: The relational image R(| S |) gives the image of set S under relation R.

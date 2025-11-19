@@ -1,0 +1,248 @@
+// ============================================================================
+// Example: Conditional Expressions (if-then-else)
+// ============================================================================
+// Demonstrates:
+//   - if-then-else expression syntax
+//   - Conditional expressions in function definitions
+//   - Nested conditionals
+//   - Conditional expressions in pattern matching
+//   - Boolean guard patterns
+//
+// Features:
+//   - if condition then expr1 else expr2
+//   - Nested if-then-else
+//   - Conditionals in axdef/gendef
+//   - Pattern matching with conditions
+//
+// See: docs/USER_GUIDE.md - Section "Advanced Features" > "Conditional Expressions"
+// ============================================================================
+
+=== Conditional Expressions ===
+
+** Example 1: Basic If-Then-Else **
+
+TEXT: The if-then-else expression evaluates to one of two values based on a condition:
+
+if x > 0 then 1 else -1
+
+TEXT: If x is positive, this evaluates to 1; otherwise, it evaluates to -1.
+
+** Example 2: Absolute Value Function **
+
+axdef
+  abs : Z -> N
+where
+  forall x : Z | abs(x) = if x >= 0 then x else -x
+end
+
+TEXT: The absolute value function uses if-then-else to handle positive and negative cases.
+
+** Example 3: Maximum Function **
+
+axdef
+  max : N cross N -> N
+where
+  forall a, b : N | max(a, b) = if a >= b then a else b
+end
+
+TEXT: Returns the larger of two numbers.
+
+** Example 4: Sign Function **
+
+axdef
+  sign : Z -> {-1, 0, 1}
+where
+  forall x : Z |
+    sign(x) = if x > 0 then 1
+              else if x = 0 then 0
+              else -1
+end
+
+TEXT: Nested if-then-else for three-way branching.
+
+** Example 5: Conditional in Set Comprehension **
+
+{ x : N | x < 10 . if x mod 2 = 0 then x else x + 1 }
+
+TEXT: For each x less than 10, select x if it's even, otherwise select x + 1.
+
+** Example 6: Pattern Matching with Conditionals **
+
+axdef
+  filterPositives : seq Z -> seq Z
+where
+  filterPositives(⟨⟩) = ⟨⟩
+  forall x : Z; s : seq Z |
+    filterPositives(⟨x⟩ ⌢ s) = if x > 0 then ⟨x⟩ ⌢ filterPositives(s) else filterPositives(s)
+end
+
+TEXT: Filters a sequence to include only positive elements using conditional expressions.
+
+** Example 7: Conditional Function Application **
+
+axdef
+  applyIf : (N -> N) cross N cross B -> N
+where
+  forall f : N -> N; x : N; cond : B |
+    applyIf(f, x, cond) = if cond = true then f(x) else x
+end
+
+TEXT: Applies a function conditionally based on a boolean.
+
+** Example 8: Grade Assignment **
+
+given Grade
+
+Grade ::= A | B | C | D | F
+
+axdef
+  scoreToGrade : N -> Grade
+where
+  forall score : N |
+    scoreToGrade(score) = if score >= 90 then A
+                          else if score >= 80 then B
+                          else if score >= 70 then C
+                          else if score >= 60 then D
+                          else F
+end
+
+TEXT: Multi-way branching using nested if-then-else.
+
+** Example 9: Safe Division **
+
+axdef
+  safeDiv : Z cross Z -> Z
+where
+  forall x, y : Z |
+    safeDiv(x, y) = if y /= 0 then x / y else 0
+end
+
+TEXT: Returns quotient if divisor is non-zero, otherwise returns 0.
+
+** Example 10: Piecewise Function **
+
+axdef
+  piecewise : Z -> Z
+where
+  forall x : Z |
+    piecewise(x) = if x < -5 then 0
+                   else if x < 0 then x + 5
+                   else if x < 5 then x
+                   else if x < 10 then x - 5
+                   else 0
+end
+
+TEXT: A piecewise-defined function with multiple ranges.
+
+** Example 11: Conditional in Lambda **
+
+lambda x : N . if x > 100 then 100 else x
+
+TEXT: Lambda function that caps values at 100.
+
+** Example 12: Boolean Expression Conditional **
+
+axdef
+  both_or_neither : B cross B -> B
+where
+  forall p, q : B |
+    both_or_neither(p, q) = if p = true then q else not q
+end
+
+TEXT: Returns true if both p and q are true, or both are false.
+
+** Example 13: Conditional Set Selection **
+
+axdef
+  selectSet : B -> P N
+  evenSet : P N
+  oddSet : P N
+where
+  evenSet = {n : N | n mod 2 = 0}
+  oddSet = {n : N | n mod 2 = 1}
+  forall flag : B |
+    selectSet(flag) = if flag = true then evenSet else oddSet
+end
+
+TEXT: Returns different sets based on a boolean flag.
+
+** Example 14: Nested Conditional in Quantifier **
+
+forall x : N | (if x > 5 then x > 0 else true)
+
+TEXT: The conditional can appear within quantified predicates.
+
+** Example 15: Practical Example - Tax Calculation **
+
+axdef
+  taxRate : N -> N
+  calculateTax : N -> N
+where
+  forall income : N |
+    taxRate(income) = if income < 20000 then 10
+                      else if income < 50000 then 15
+                      else if income < 100000 then 20
+                      else 25
+
+  forall income : N |
+    calculateTax(income) = (income * taxRate(income)) / 100
+end
+
+TEXT: Progressive tax rates with multi-level conditional.
+
+** Example 16: Conditional with Complex Expression **
+
+axdef
+  complexFunc : N -> N
+where
+  forall n : N |
+    complexFunc(n) = if n mod 3 = 0 then n * n
+                     else if n mod 3 = 1 then n + 10
+                     else n * 2
+end
+
+TEXT: Different computations based on remainder.
+
+** Example 17: Guard Conditions in Recursion **
+
+axdef
+  factorial : N -> N
+where
+  factorial(0) = 1
+  forall n : N |
+    factorial(n) = if n > 0 then n * factorial(n - 1) else 1
+end
+
+TEXT: Conditional ensures factorial only recurses for positive n.
+
+** Example 18: Ternary-Style Expression **
+
+TEXT: Z notation's if-then-else is similar to C's ternary operator (? :):
+
+TEXT: C: x > 0 ? 1 : -1
+TEXT: Z: if x > 0 then 1 else -1
+
+TEXT: Both evaluate to one of two values based on a condition.
+
+** Example 19: Short-Circuit Evaluation Note **
+
+TEXT: In Z notation, if-then-else expressions should be evaluated lazily: only the selected branch should be evaluated. This matters when branches have side effects or may be undefined:
+
+axdef
+  safeAccess : (N +-> N) cross N -> N
+where
+  forall f : N +-> N; key : N |
+    safeAccess(f, key) = if key in dom f then f(key) else 0
+end
+
+TEXT: If key is not in domain, f(key) would be undefined. The conditional ensures we only evaluate f(key) when it's safe.
+
+** Example 20: Best Practices **
+
+TEXT: When using if-then-else:
+TEXT: 1. Keep branches simple and readable
+TEXT: 2. For many cases, consider using free types with pattern matching
+TEXT: 3. Nest carefully—deep nesting hurts readability
+TEXT: 4. Document complex conditions
+TEXT: 5. Ensure both branches have the same type
+TEXT: 6. Consider using helper predicates for complex conditions

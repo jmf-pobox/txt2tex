@@ -1,3 +1,20 @@
+// ============================================================================
+// Example: Finite Set Types (F and F1)
+// ============================================================================
+// Demonstrates:
+//   - F X (all finite subsets of X)
+//   - F1 X (all non-empty finite subsets of X)
+//   - Combining finite sets with function types
+//   - Axiomatic definitions with finite set types
+//
+// Features:
+//   - F SongId [finite subsets]
+//   - F1 UserId [non-empty finite subsets]
+//   - Used with partial functions (+->)
+//
+// See: docs/USER_GUIDE.md - Section "Sets and Types" > "Power Set"
+// ============================================================================
+
 === Phase 19 Demo: Finite Set Types ===
 
 ** Example 1: F (finite sets) **

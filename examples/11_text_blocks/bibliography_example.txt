@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Bibliography and Citations
+// ============================================================================
+// Demonstrates:
+//   - BIBLIOGRAPHY directive for .bib file inclusion
+//   - BIBLIOGRAPHY_STYLE directive for citation styles
+//   - Citation syntax [cite key]
+//   - BibTeX integration
+//   - Multiple citations in text
+//
+// Features:
+//   - BIBLIOGRAPHY: references.bib
+//   - BIBLIOGRAPHY_STYLE: plainnat
+//   - [cite spivey92] [citation syntax]
+//
+// See: docs/USER_GUIDE.md - Section "Text Blocks" > "Bibliography"
+// ============================================================================
+
 TITLE: Bibliography Example
 AUTHOR: Example Author
 DATE: 2025

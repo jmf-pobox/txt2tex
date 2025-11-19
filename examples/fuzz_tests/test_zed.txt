@@ -1,3 +1,21 @@
+// ============================================================================
+// Test: Zed Block Features
+// ============================================================================
+// Demonstrates:
+//   - Simple abbreviations
+//   - Quantifiers (forall, exists) in axiomatic definitions
+//   - Nested quantifiers
+//   - Basic Z notation in fuzz
+//
+// Features:
+//   - SimpleConst == 42 [abbreviation]
+//   - forall x : N | predicate [universal quantification]
+//   - exists n : N | predicate [existential quantification]
+//   - Nested quantifiers in axioms
+//
+// See: docs/USER_GUIDE.md - Sections "Abbreviations", "Quantifiers", "Axiomatic Definitions"
+// ============================================================================
+
 === Zed Block Test ===
 
 ** Test 1: Simple Abbreviation **

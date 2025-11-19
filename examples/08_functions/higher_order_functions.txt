@@ -1,0 +1,339 @@
+// ============================================================================
+// Example: Higher-Order Functions
+// ============================================================================
+// Demonstrates:
+//   - Functions that take functions as arguments
+//   - Functions that return functions
+//   - Map, filter, fold operations
+//   - Function combinators
+//   - Currying and partial application
+//
+// Features:
+//   - map : (X -> Y) cross seq X -> seq Y
+//   - filter : (X -> B) cross seq X -> seq X
+//   - fold : (Y cross X -> Y) cross Y cross seq X -> Y
+//   - compose : (B -> C) cross (A -> B) -> (A -> C)
+//
+// See: docs/USER_GUIDE.md - Section "Functions" > "Higher-Order Functions"
+// ============================================================================
+
+=== Higher-Order Functions ===
+
+** Example 1: Map Function **
+
+TEXT: Map applies a function to each element of a sequence:
+
+gendef [X, Y]
+  map : (X -> Y) cross seq X -> seq Y
+where
+  forall f : X -> Y | map(f, ⟨⟩) = ⟨⟩
+  forall f : X -> Y; x : X; s : seq X |
+    map(f, ⟨x⟩ ⌢ s) = ⟨f(x)⟩ ⌢ map(f, s)
+end
+
+TEXT: map takes a function and applies it to every element.
+
+** Example 2: Using Map **
+
+axdef
+  square : N -> N
+  numbers : seq N
+  squares : seq N
+where
+  forall n : N | square(n) = n * n
+  numbers = ⟨1, 2, 3, 4, 5⟩
+  squares = map(square, numbers)
+end
+
+TEXT: squares = ⟨1, 4, 9, 16, 25⟩
+
+** Example 3: Filter Function **
+
+TEXT: Filter keeps only elements that satisfy a predicate:
+
+gendef [X]
+  filter : (X -> B) cross seq X -> seq X
+where
+  forall p : X -> B | filter(p, ⟨⟩) = ⟨⟩
+  forall p : X -> B; x : X; s : seq X |
+    filter(p, ⟨x⟩ ⌢ s) =
+      if p(x) = true then ⟨x⟩ ⌢ filter(p, s) else filter(p, s)
+end
+
+TEXT: filter takes a predicate function and a sequence, returns elements where predicate is true.
+
+** Example 4: Using Filter **
+
+axdef
+  isEven : N -> B
+  allNums : seq N
+  evenNums : seq N
+where
+  forall n : N | isEven(n) = (n mod 2 = 0)
+  allNums = ⟨1, 2, 3, 4, 5, 6⟩
+  evenNums = filter(isEven, allNums)
+end
+
+TEXT: evenNums = ⟨2, 4, 6⟩
+
+** Example 5: Fold (Reduce) Function **
+
+TEXT: Fold reduces a sequence to a single value using a binary operation:
+
+gendef [X, Y]
+  foldl : (Y cross X -> Y) cross Y cross seq X -> Y
+where
+  forall f : Y cross X -> Y; acc : Y | foldl(f, acc, ⟨⟩) = acc
+  forall f : Y cross X -> Y; acc : Y; x : X; s : seq X |
+    foldl(f, acc, ⟨x⟩ ⌢ s) = foldl(f, f(acc, x), s)
+end
+
+TEXT: foldl takes a combining function, an initial accumulator, and a sequence.
+
+** Example 6: Using Fold to Sum **
+
+axdef
+  add : N cross N -> N
+  nums : seq N
+  total : N
+where
+  forall a, b : N | add(a, b) = a + b
+  nums = ⟨1, 2, 3, 4, 5⟩
+  total = foldl(add, 0, nums)
+end
+
+TEXT: total = 15 (sum of 1+2+3+4+5)
+
+** Example 7: Compose as Higher-Order Function **
+
+TEXT: Compose takes two functions and returns their composition:
+
+gendef [A, B, C]
+  compose : (B -> C) cross (A -> B) -> (A -> C)
+where
+  forall g : B -> C; f : A -> B; x : A |
+    compose(g, f)(x) = g(f(x))
+end
+
+TEXT: compose is a higher-order function that produces a new function.
+
+** Example 8: Function Application **
+
+TEXT: Apply function: applies a function to a value:
+
+gendef [X, Y]
+  apply : (X -> Y) cross X -> Y
+where
+  forall f : X -> Y; x : X | apply(f, x) = f(x)
+end
+
+TEXT: Useful for uniform function application syntax.
+
+** Example 9: Partial Application (Currying) **
+
+TEXT: Create a function that fixes one argument:
+
+gendef [X, Y, Z]
+  curry : (X cross Y -> Z) -> (X -> (Y -> Z))
+where
+  forall f : X cross Y -> Z; x : X; y : Y |
+    curry(f)(x)(y) = f(x, y)
+end
+
+TEXT: curry transforms a two-argument function into a chain of one-argument functions.
+
+** Example 10: Uncurry **
+
+TEXT: Convert back from curried to uncurried form:
+
+gendef [X, Y, Z]
+  uncurry : (X -> (Y -> Z)) -> (X cross Y -> Z)
+where
+  forall f : X -> (Y -> Z); x : X; y : Y |
+    uncurry(f)(x, y) = f(x)(y)
+end
+
+TEXT: uncurry is the inverse of curry.
+
+** Example 11: Function Composition Operator **
+
+TEXT: Define composition as a higher-order operator:
+
+gendef [A, B, C]
+  composeFunc : (B -> C) cross (A -> B) -> (A -> C)
+where
+  forall g : B -> C; f : A -> B |
+    composeFunc(g, f) = g o9 f
+end
+
+TEXT: Returns the composed function.
+
+** Example 12: Predicate Combinators **
+
+TEXT: Combine predicates using logical operations:
+
+gendef [X]
+  andPred : (X -> B) cross (X -> B) -> (X -> B)
+  orPred : (X -> B) cross (X -> B) -> (X -> B)
+  notPred : (X -> B) -> (X -> B)
+where
+  forall p, q : X -> B; x : X |
+    andPred(p, q)(x) = (p(x) and q(x))
+  forall p, q : X -> B; x : X |
+    orPred(p, q)(x) = (p(x) or q(x))
+  forall p : X -> B; x : X |
+    notPred(p)(x) = not p(x)
+end
+
+TEXT: Create new predicates by combining existing ones.
+
+** Example 13: Map with Lambda **
+
+TEXT: Map with anonymous function:
+
+axdef
+  doubledNumbers : seq N
+where
+  doubledNumbers = map(lambda n : N . 2 * n, ⟨1, 2, 3⟩)
+end
+
+TEXT: Result: ⟨2, 4, 6⟩
+
+** Example 14: Twice Function **
+
+TEXT: Apply a function twice:
+
+gendef [X]
+  twice : (X -> X) -> (X -> X)
+where
+  forall f : X -> X; x : X |
+    twice(f)(x) = f(f(x))
+end
+
+TEXT: twice(f) returns a function that applies f two times.
+
+** Example 15: Using Twice **
+
+axdef
+  increment : N -> N
+  addTwo : N -> N
+where
+  forall n : N | increment(n) = n + 1
+  addTwo = twice(increment)
+end
+
+TEXT: addTwo(n) = increment(increment(n)) = n + 2
+
+** Example 16: Function Memoization (Conceptual) **
+
+TEXT: Higher-order function to memoize results:
+
+gendef [X, Y]
+  memoize : (X -> Y) -> (X +-> Y)
+where
+  forall f : X -> Y |
+    dom memoize(f) subseteq X and
+    forall x : X | x in dom memoize(f) => memoize(f)(x) = f(x)
+end
+
+TEXT: Conceptually caches function results.
+
+** Example 17: Practical Example - Data Transformation Pipeline **
+
+gendef [X, Y, Z]
+  pipeline : (X -> Y) cross (Y -> Z) cross seq X -> seq Z
+where
+  forall f : X -> Y; g : Y -> Z; s : seq X |
+    pipeline(f, g, s) = map(g, map(f, s))
+end
+
+TEXT: Apply two transformations in sequence.
+
+** Example 18: For-All Checker **
+
+gendef [X]
+  forAllSeq : (X -> B) cross seq X -> B
+where
+  forall p : X -> B | forAllSeq(p, ⟨⟩) = true
+  forall p : X -> B; x : X; s : seq X |
+    forAllSeq(p, ⟨x⟩ ⌢ s) = (p(x) and forAllSeq(p, s))
+end
+
+TEXT: Check if predicate holds for all elements.
+
+** Example 19: Exists Checker **
+
+gendef [X]
+  existsSeq : (X -> B) cross seq X -> B
+where
+  forall p : X -> B | existsSeq(p, ⟨⟩) = false
+  forall p : X -> B; x : X; s : seq X |
+    existsSeq(p, ⟨x⟩ ⌢ s) = (p(x) or existsSeq(p, s))
+end
+
+TEXT: Check if predicate holds for at least one element.
+
+** Example 20: Zip With Function **
+
+TEXT: Combine two sequences with a binary function:
+
+gendef [X, Y, Z]
+  zipWith : (X cross Y -> Z) cross seq X cross seq Y -> seq Z
+where
+  forall f : X cross Y -> Z | zipWith(f, ⟨⟩, ⟨⟩) = ⟨⟩
+  forall f : X cross Y -> Z; x : X; y : Y; xs : seq X; ys : seq Y |
+    zipWith(f, ⟨x⟩ ⌢ xs, ⟨y⟩ ⌢ ys) = ⟨f(x, y)⟩ ⌢ zipWith(f, xs, ys)
+  forall f : X cross Y -> Z; xs : seq X | zipWith(f, xs, ⟨⟩) = ⟨⟩
+  forall f : X cross Y -> Z; ys : seq Y | zipWith(f, ⟨⟩, ys) = ⟨⟩
+end
+
+TEXT: Combines corresponding elements with a function.
+
+** Example 21: Function Iteration **
+
+gendef [X]
+  iterate : (X -> X) cross N cross X -> seq X
+where
+  forall f : X -> X; x : X | iterate(f, 0, x) = ⟨x⟩
+  forall f : X -> X; n : N; x : X |
+    n > 0 => iterate(f, n, x) = ⟨x⟩ ⌢ iterate(f, n - 1, f(x))
+end
+
+TEXT: Generate sequence by repeatedly applying a function: x, f(x), f(f(x)), ...
+
+** Example 22: Constant Function Generator **
+
+gendef [X, Y]
+  constant : Y -> (X -> Y)
+where
+  forall y : Y; x : X | constant(y)(x) = y
+end
+
+TEXT: constant(y) returns a function that always returns y, ignoring its argument.
+
+** Example 23: Function Equality (Extensional) **
+
+TEXT: Two functions are equal if they produce the same output for all inputs:
+
+gendef [X, Y]
+  funcEqual : (X -> Y) cross (X -> Y) -> B
+where
+  forall f, g : X -> Y |
+    funcEqual(f, g) = (forall x : X | f(x) = g(x))
+end
+
+TEXT: Extensional equality for functions.
+
+** Example 24: Best Practices **
+
+TEXT: When using higher-order functions:
+TEXT: 1. Document what function parameters should do
+TEXT: 2. Use descriptive names for function arguments (predicate, transformer, reducer)
+TEXT: 3. Prefer standard higher-order functions (map, filter, fold) for readability
+TEXT: 4. Break complex higher-order functions into smaller, named pieces
+TEXT: 5. Test higher-order functions with multiple function arguments
+TEXT: 6. Type-check that function types match (domains and ranges align)
+TEXT: 7. Use lambdas for simple inline functions
+TEXT: 8. Name and reuse complex functions passed as arguments
+
+TEXT: Higher-order functions enable powerful abstractions, but clarity is essential—ensure your specifications remain readable and maintainable.

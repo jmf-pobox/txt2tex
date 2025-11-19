@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Phase A Test - Verify Phase 14-16 Features
+// ============================================================================
+// Demonstrates:
+//   - ASCII sequence brackets with pattern matching
+//   - Conditional expressions (if-then-else)
+//   - Multi-word identifiers with underscores
+//   - Combined feature usage
+//
+// Features:
+//   - viewed(<x> ^ s) [pattern matching]
+//   - if cond then expr else expr [conditionals]
+//   - cumulative_total [multi-word identifiers]
+//   - x.2, x.3 [tuple projection]
+//
+// See: docs/USER_GUIDE.md - Sections "Sequences", "Conditionals", "Identifiers"
+// ============================================================================
+
 ** Test: Phase A - Verify Phase 14-16 Features **
 
 (a) Test ASCII sequence brackets and pattern matching:

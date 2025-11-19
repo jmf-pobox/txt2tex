@@ -1,0 +1,161 @@
+// ============================================================================
+// Example: Combined Text Directives
+// ============================================================================
+// Demonstrates:
+//   - Using TEXT, PURETEXT, LATEX together
+//   - Choosing the right directive for each purpose
+//   - Document structure with mixed content
+//   - Best practices for text block usage
+//
+// Features:
+//   - TEXT for prose with smart typography
+//   - PURETEXT for literal/verbatim text
+//   - LATEX for custom formatting
+//   - PAGEBREAK for structure
+//
+// See: docs/USER_GUIDE.md - Section "Text Blocks"
+// ============================================================================
+
+=== Combined Text Directives ===
+
+** Example 1: Documentation Style **
+
+TEXT: This example demonstrates how to combine different text directives effectively. Use TEXT for normal explanatory prose with proper typography.
+
+PURETEXT: Use PURETEXT when showing literal syntax or code examples:
+PURETEXT: hatch run convert examples/hello_world.txt
+
+TEXT: And use LATEX when you need specific LaTeX formatting not available otherwise.
+
+** Example 2: Tutorial Format **
+
+TEXT: Let's explore the natural numbers. In Z notation, we write N for the set of natural numbers: {0, 1, 2, 3, ...}.
+
+axdef
+  first_five : P N
+where
+  first_five = {0, 1, 2, 3, 4}
+end
+
+LATEX: \medskip
+
+TEXT: The above defines a set containing the first five natural numbers. Note how TEXT blocks provide context before and after formal definitions.
+
+** Example 3: Showing Syntax vs Using Syntax **
+
+TEXT: To demonstrate the difference between showing syntax and using it, consider quantifiers.
+
+TEXT: When we want to use a quantifier in our specification:
+
+forall x : N | x >= 0
+
+TEXT: But when we want to show the syntax literally for teaching purposes:
+
+PURETEXT: forall x : T | predicate
+
+TEXT: The PURETEXT block shows the syntax pattern without actually creating a formal quantified expression.
+
+** Example 4: Code Examples with Explanations **
+
+TEXT: The txt2tex tool supports several commands. Here are the most common:
+
+PURETEXT: # Convert to LaTeX only
+PURETEXT: hatch run cli examples/file.txt
+PURETEXT:
+PURETEXT: # Convert to PDF (full pipeline)
+PURETEXT: hatch run convert examples/file.txt
+
+TEXT: The first command generates only the LaTeX file, while the second runs the complete pipeline including PDF generation.
+
+LATEX: \medskip\noindent\textit{Tip:} Always use the convert command for final output.
+
+** Example 5: Mathematical Explanation **
+
+TEXT: Consider the function f(n) = n^2. We can define this formally in Z notation:
+
+axdef
+  square : N -> N
+where
+  forall n : N | square(n) = n * n
+end
+
+TEXT: This states that square is a total function from natural numbers to natural numbers.
+
+LATEX: \begin{center}
+LATEX: \begin{tabular}{c|c}
+LATEX: $n$ & $f(n)$ \\ \hline
+LATEX: 0 & 0 \\
+LATEX: 1 & 1 \\
+LATEX: 2 & 4 \\
+LATEX: 3 & 9 \\
+LATEX: 4 & 16
+LATEX: \end{tabular}
+LATEX: \end{center}
+
+TEXT: The table above shows the first few values of the square function.
+
+** Example 6: Syntax Reference **
+
+TEXT: Here's a quick reference for text directives:
+
+LATEX: \begin{description}
+LATEX: \item[TEXT:] Normal prose with smart quotes and inline math
+LATEX: \item[PURETEXT:] Verbatim text without processing
+LATEX: \item[LATEX:] Raw LaTeX commands
+LATEX: \item[PAGEBREAK:] Force a page break
+LATEX: \end{description}
+
+PURETEXT: Example usage:
+PURETEXT: TEXT: This is a paragraph.
+PURETEXT: PURETEXT: This is verbatim.
+PURETEXT: LATEX: \textbf{Bold text}
+PURETEXT: PAGEBREAK
+
+** Example 7: Best Practices **
+
+TEXT: When writing specifications, follow these guidelines:
+
+TEXT: 1. Use TEXT for all explanatory prose—it provides the best typography
+
+TEXT: 2. Use PURETEXT sparingly, only when you need to show literal syntax or preserve special characters
+
+TEXT: 3. Use LATEX as an escape hatch for formatting not supported by txt2tex
+
+TEXT: 4. Use PAGEBREAK only when you need explicit control over page breaks
+
+LATEX: \vspace{1cm}
+
+TEXT: By following these practices, your documents will be both readable and maintainable.
+
+** Example 8: Real-World Document Structure **
+
+TEXT: A typical specification document might look like this:
+
+=== Section 1: Introduction ===
+
+TEXT: Prose introduction explaining the problem domain.
+
+=== Section 2: Data Types ===
+
+given User, Document, Permission
+
+TEXT: The system has three basic types: users, documents, and permissions.
+
+=== Section 3: State Schema ===
+
+schema FileSystem
+  docs : User +-> P Document
+  perms : Document +-> P Permission
+where
+  dom docs subseteq ran perms
+end
+
+TEXT: The state schema defines the relationships between users, documents, and permissions.
+
+PAGEBREAK
+
+=== Section 4: Operations ===
+
+TEXT: Now we define the operations on the file system...
+
+TEXT: This structure—sections with TEXT introductions, formal definitions, and strategic page breaks—creates clear, professional specifications.

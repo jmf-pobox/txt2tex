@@ -1,0 +1,351 @@
+// ============================================================================
+// Example: Generic Type Instantiation
+// ============================================================================
+// Demonstrates:
+//   - Type parameter application syntax
+//   - Instantiating polymorphic types
+//   - seq[T], P[T], emptyset[T] notation
+//   - Complex type parameters
+//   - Nested instantiation
+//
+// Features:
+//   - emptyset[N] [empty set of naturals]
+//   - seq[X] [sequence type instantiation]
+//   - P[N cross N] [power set of pairs]
+//   - Nested: P[seq[N]]
+//
+// See: docs/USER_GUIDE.md - Section "Advanced Features" > "Generic Type Instantiation"
+// ============================================================================
+
+=== Generic Type Instantiation ===
+
+** Example 1: Basic Type Instantiation **
+
+TEXT: Apply type parameters to polymorphic types using square brackets:
+
+seq[N]
+
+P[X]
+
+emptyset[Z]
+
+TEXT: These instantiate generic types for specific type arguments.
+
+** Example 2: Empty Set Instantiation **
+
+axdef
+  emptyNats : P N
+  emptyInts : P Z
+where
+  emptyNats = emptyset[N]
+  emptyInts = emptyset[Z]
+end
+
+TEXT: emptyset is generic; emptyset[N] is the empty set of naturals.
+
+** Example 3: Sequence Type Instantiation **
+
+axdef
+  numbers : seq[N]
+  integers : seq[Z]
+where
+  numbers = ⟨1, 2, 3⟩
+  integers = ⟨-1, 0, 1⟩
+end
+
+TEXT: seq[N] is the type of sequences of natural numbers.
+
+** Example 4: Power Set Instantiation **
+
+axdef
+  subsetsOfN : P(P N)
+  example : P(P N)
+where
+  example = {{1, 2}, {3}, emptyset[N]}
+end
+
+TEXT: P(P N) is the power set of the power set of naturals (sets of sets).
+
+** Example 5: Complex Type Parameters **
+
+axdef
+  pairsSeq : seq[N cross N]
+  pairsSet : P[N cross N]
+where
+  pairsSeq = ⟨(1, 2), (3, 4)⟩
+  pairsSet = {(1, 2), (3, 4)}
+end
+
+TEXT: Type parameters can be complex types like N cross N.
+
+** Example 6: Nested Instantiation **
+
+axdef
+  seqOfSets : seq[P N]
+  setOfSeqs : P[seq[N]]
+where
+  seqOfSets = ⟨{1, 2}, {3, 4, 5}⟩
+  setOfSeqs = {⟨1, 2⟩, ⟨3, 4⟩}
+end
+
+TEXT: seq[P N] is a sequence of sets. P[seq[N]] is a set of sequences.
+
+** Example 7: Generic Function Instantiation **
+
+gendef [X]
+  identity : X -> X
+where
+  forall x : X | identity(x) = x
+end
+
+axdef
+  id_nat : N -> N
+  id_int : Z -> Z
+where
+  id_nat = identity[N]
+  id_int = identity[Z]
+end
+
+TEXT: identity[N] instantiates the generic identity function for natural numbers.
+
+** Example 8: Multiple Type Parameters **
+
+gendef [X, Y]
+  pairType : X cross Y
+end
+
+axdef
+  natIntPair : N cross Z
+  intNatPair : Z cross N
+where
+  natIntPair = pairType[N, Z]
+  intNatPair = pairType[Z, N]
+end
+
+TEXT: Instantiate with multiple type arguments.
+
+** Example 9: Bag Instantiation **
+
+axdef
+  natBag : bag[N]
+  intBag : bag[Z]
+where
+  natBag = [[1, 1, 2, 3]]
+  intBag = [[-1, 0, 1]]
+end
+
+TEXT: bag[N] is the type of bags (multisets) of natural numbers.
+
+** Example 10: Generic Relation Types **
+
+axdef
+  natRelation : N <-> N
+  mixedRelation : N <-> Z
+where
+  natRelation = {1 |-> 2, 2 |-> 4}
+  mixedRelation = {1 |-> -1, 2 |-> -2}
+end
+
+TEXT: Relations between different types.
+
+** Example 11: Sequence of Pairs **
+
+axdef
+  coordSeq : seq[N cross N]
+where
+  coordSeq = ⟨(0, 0), (1, 1), (2, 4), (3, 9)⟩
+end
+
+TEXT: A sequence where each element is a pair (coordinate).
+
+** Example 12: Set of Functions **
+
+axdef
+  funcSet : P[N -> N]
+where
+  funcSet = {square, double, successor}
+end
+
+axdef
+  square, double, successor : N -> N
+where
+  forall n : N | square(n) = n * n
+  forall n : N | double(n) = 2 * n
+  forall n : N | successor(n) = n + 1
+end
+
+TEXT: A set containing three functions.
+
+** Example 13: Practical Example - Generic Container **
+
+gendef [T]
+  schema Container_T
+    elements : seq[T]
+    capacity : N
+  where
+    # elements <= capacity
+  end
+end
+
+axdef
+  intContainer : Container_N
+  stringContainer : Container_[seq Char]
+where
+  intContainer.elements = ⟨1, 2, 3⟩
+  intContainer.capacity = 100
+  stringContainer.elements = ⟨⟨'h', 'i'⟩⟩
+  stringContainer.capacity = 50
+end
+
+TEXT: Instantiate generic schema for different element types.
+
+** Example 14: Option Type Instantiation **
+
+gendef [X]
+  Option_X ::= none_X | some_X⟨X⟩
+end
+
+axdef
+  maybeInt : Option_N
+  maybeChar : Option_Char
+where
+  maybeInt = some_N(42)
+  maybeChar = none_Char
+end
+
+TEXT: Option type instantiated for different types.
+
+** Example 15: List of Lists **
+
+axdef
+  matrix : seq[seq[N]]
+where
+  matrix = ⟨⟨1, 2, 3⟩, ⟨4, 5, 6⟩, ⟨7, 8, 9⟩⟩
+end
+
+TEXT: Nested sequences represent a 3x3 matrix.
+
+** Example 16: Homogeneous Collections **
+
+TEXT: Type instantiation ensures homogeneity:
+
+axdef
+  validSeq : seq[N]
+where
+  validSeq = ⟨1, 2, 3⟩
+end
+
+TEXT: INVALID: seq[N] cannot contain non-naturals
+TEXT: invalidSeq = ⟨1, -1, 2⟩  -- would be type error if -1 not in N
+
+** Example 17: Generic Queue **
+
+gendef [T]
+  schema Queue_T
+    items : seq[T]
+  where
+    # items >= 0
+  end
+
+  enqueue_T : Queue_T cross T -> Queue_T
+  dequeue_T : Queue_T -> Queue_T
+  front_T : Queue_T -> T
+where
+  forall q : Queue_T; x : T |
+    enqueue_T(q, x).items = q.items ⌢ ⟨x⟩
+
+  forall q : Queue_T |
+    # (q.items) > 0 =>
+    dequeue_T(q).items = tail(q.items)
+
+  forall q : Queue_T |
+    # (q.items) > 0 =>
+    front_T(q) = head(q.items)
+end
+
+TEXT: Generic queue instantiated for any type T.
+
+** Example 18: Type Synonyms with Instantiation **
+
+axdef
+  IntSet == P[Z]
+  NatSeq == seq[N]
+  Coordinate == N cross N
+  Path == seq[Coordinate]
+where
+  true
+end
+
+TEXT: Type abbreviations using instantiation.
+
+** Example 19: Higher-Order Types **
+
+axdef
+  transformers : P[N -> N]
+  sequences : P[seq[N]]
+where
+  transformers = {square, double}
+  sequences = {⟨1, 2⟩, ⟨3, 4⟩}
+end
+
+TEXT: Sets of functions and sequences.
+
+** Example 20: Instantiation in Quantifiers **
+
+forall s : seq[N] | # s >= 0
+
+exists p : N cross N | p.1 = p.2
+
+TEXT: Quantifying over instantiated generic types.
+
+** Example 21: Partial Function Types **
+
+axdef
+  lookup : N +-> seq[Char]
+  mapping : N <-> N
+where
+  lookup = {1 |-> ⟨'a', 'b'⟩, 2 |-> ⟨'c', 'd'⟩}
+  mapping = {1 |-> 2, 2 |-> 4, 3 |-> 6}
+end
+
+TEXT: Partial functions with instantiated types.
+
+** Example 22: Best Practices **
+
+TEXT: When using generic instantiation:
+TEXT: 1. Be explicit about type parameters for clarity
+TEXT: 2. Use consistent naming (seq[T], not mixed seq T and T seq)
+TEXT: 3. Document what type parameters represent
+TEXT: 4. Instantiate at the right abstraction level
+TEXT: 5. Prefer generic definitions over duplicate specific definitions
+TEXT: 6. Type-check that instantiations make sense
+
+** Example 23: Common Patterns **
+
+TEXT: Common instantiation patterns:
+TEXT: - seq[T] for sequences of T
+TEXT: - P[T] for sets of T
+TEXT: - T +-> U for partial functions
+TEXT: - T <-> U for relations
+TEXT: - bag[T] for multisets of T
+TEXT: - T cross U for pairs
+TEXT: - T -> U for total functions
+
+** Example 24: Type Safety **
+
+TEXT: Generic instantiation provides type safety:
+
+axdef
+  safe : seq[N]
+where
+  safe = ⟨1, 2, 3⟩
+end
+
+TEXT: Type checker ensures all elements match the instantiated type.
+
+TEXT: COMPILE ERROR examples:
+TEXT: - seq[N] = ⟨1, 2, 'a'⟩ -- 'a' is not a natural
+TEXT: - P[N] = {1, 2, -1} -- -1 might not be in N depending on N definition
+TEXT: - bag[Z] = [[1, "hello"]] -- "hello" is not an integer
+
+TEXT: The type system catches these errors at compile/check time.

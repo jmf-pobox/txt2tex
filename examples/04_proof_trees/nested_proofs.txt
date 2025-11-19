@@ -1,3 +1,22 @@
+// ============================================================================
+// Example: Proof Tree Nesting Depths
+// ============================================================================
+// Demonstrates:
+//   - Proof trees with increasing nesting depths
+//   - Implication introduction (=> intro) at multiple levels
+//   - Assumption management across nested scopes
+//   - Proper indentation for nested proofs
+//
+// Features:
+//   - PROOF: blocks with nested structure
+//   - Depth 1-4 nesting examples
+//   - Assumption labeling [1], [2], [3], [4]
+//   - Discharge references [=> intro from N]
+//
+// See: docs/PROOF_SYNTAX.md - Indentation and nesting rules
+//      docs/USER_GUIDE.md - Section "Proof Trees"
+// ============================================================================
+
 === Proof Tree Nesting Depth Test ===
 
 ** Test 1: Simple (depth 1) **

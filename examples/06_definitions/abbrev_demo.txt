@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Partial Function Type Operators
+// ============================================================================
+// Demonstrates:
+//   - Partial injection operator (-|>, >+>)
+//   - Partial function operator (+->)
+//   - Function type declarations in axdef
+//   - Domain specification
+//
+// Features:
+//   - f : N -|> N [partial injection]
+//   - g : N +-> N [partial function]
+//   - dom(f) specification
+//   - Function value definitions
+//
+// See: docs/USER_GUIDE.md - Section "Functions" > "Function Types"
+// ============================================================================
+
 === Phase 18 Demo: Partial Function Operators ===
 
 ** Example 1: Partial injection operator **
