@@ -1,0 +1,13 @@
+=== Test Issue #7: Semicolon Separator ===
+
+** Test 1: Basic semicolon separator **
+
+(forall x : N; y : M | x > 0 and y > 0)
+
+** Test 2: Mixed comma and semicolon **
+
+(forall x, y : N; z : M | x + y > z)
+
+** Test 3: Multiple semicolons **
+
+(forall s : ShowId; t_1, t_2 : Timestamp; e_1, e_2 : EpisodeId | s = s)
