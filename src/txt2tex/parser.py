@@ -1018,6 +1018,7 @@ class Parser:
         while self._match(TokenType.IFF):
             op_token = self._advance()
             # Phase 27: Check for continuation marker (\ at end of line)
+            # Phase 28: Also detect natural newlines for WYSIWYG output
             has_continuation = False
             if self._match(TokenType.CONTINUATION):
                 self._advance()  # consume \
@@ -1026,8 +1027,13 @@ class Parser:
                 if self._match(TokenType.NEWLINE):
                     self._advance()
                 self._skip_newlines()
-            # Phase 28: Always skip newlines before right operand (multi-line support)
-            self._skip_newlines()
+            elif self._match(TokenType.NEWLINE):
+                # Natural line break without \ marker (WYSIWYG)
+                has_continuation = True
+                self._skip_newlines()
+            else:
+                # No line break, but still skip newlines for flexibility
+                self._skip_newlines()
             right = self._parse_implies()
             left = BinaryOp(
                 operator=op_token.value,
@@ -1054,6 +1060,7 @@ class Parser:
         while self._match(TokenType.IMPLIES):
             op_token = self._advance()
             # Phase 27: Check for continuation marker (\ at end of line)
+            # Phase 28: Also detect natural newlines for WYSIWYG output
             has_continuation = False
             if self._match(TokenType.CONTINUATION):
                 self._advance()  # consume \
@@ -1062,8 +1069,13 @@ class Parser:
                 if self._match(TokenType.NEWLINE):
                     self._advance()
                 self._skip_newlines()
-            # Phase 28: Always skip newlines before right operand (multi-line support)
-            self._skip_newlines()
+            elif self._match(TokenType.NEWLINE):
+                # Natural line break without \ marker (WYSIWYG)
+                has_continuation = True
+                self._skip_newlines()
+            else:
+                # No line break, but still skip newlines for flexibility
+                self._skip_newlines()
             # Use _parse_expr() to allow quantifiers on RHS
             right = self._parse_expr()
             left = BinaryOp(
@@ -1088,6 +1100,7 @@ class Parser:
         while self._match(TokenType.OR):
             op_token = self._advance()
             # Phase 27: Check for continuation marker (\ at end of line)
+            # Phase 28: Also detect natural newlines for WYSIWYG output
             has_continuation = False
             if self._match(TokenType.CONTINUATION):
                 self._advance()  # consume \
@@ -1096,8 +1109,13 @@ class Parser:
                 if self._match(TokenType.NEWLINE):
                     self._advance()
                 self._skip_newlines()
-            # Phase 28: Always skip newlines before right operand (multi-line support)
-            self._skip_newlines()
+            elif self._match(TokenType.NEWLINE):
+                # Natural line break without \ marker (WYSIWYG)
+                has_continuation = True
+                self._skip_newlines()
+            else:
+                # No line break, but still skip newlines for flexibility
+                self._skip_newlines()
             right = self._parse_and()
             left = BinaryOp(
                 operator=op_token.value,
@@ -1122,6 +1140,7 @@ class Parser:
         while self._match(TokenType.AND):
             op_token = self._advance()
             # Phase 27: Check for continuation marker (\ at end of line)
+            # Phase 28: Also detect natural newlines for WYSIWYG output
             has_continuation = False
             if self._match(TokenType.CONTINUATION):
                 self._advance()  # consume \
@@ -1130,8 +1149,13 @@ class Parser:
                 if self._match(TokenType.NEWLINE):
                     self._advance()
                 self._skip_newlines()
-            # Phase 28: Always skip newlines before right operand (multi-line support)
-            self._skip_newlines()
+            elif self._match(TokenType.NEWLINE):
+                # Natural line break without \ marker (WYSIWYG)
+                has_continuation = True
+                self._skip_newlines()
+            else:
+                # No line break, but still skip newlines for flexibility
+                self._skip_newlines()
             # Phase 21c: Allow quantifiers after 'and'
             # Check if next token is a quantifier keyword
             if self._match(
@@ -1568,6 +1592,7 @@ class Parser:
         self._advance()  # Consume '|'
 
         # Phase 27: Check for continuation marker (\ at end of line)
+        # Phase 28: Also detect natural newlines for WYSIWYG output
         has_continuation = False
         if self._match(TokenType.CONTINUATION):
             self._advance()  # consume \
@@ -1575,9 +1600,14 @@ class Parser:
             # Skip newline and any leading whitespace on next line
             if self._match(TokenType.NEWLINE):
                 self._advance()
-
-        # Phase 21: Allow newlines after | (multi-line quantifiers)
-        self._skip_newlines()
+            self._skip_newlines()
+        elif self._match(TokenType.NEWLINE):
+            # Natural line break without \ marker (WYSIWYG)
+            has_continuation = True
+            self._skip_newlines()
+        else:
+            # Phase 21: Allow newlines after | (multi-line quantifiers)
+            self._skip_newlines()
 
         # Set flag: we're in quantifier body where . can be separator (for mu)
         self._in_comprehension_body = True
