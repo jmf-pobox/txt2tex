@@ -1,3 +1,20 @@
+// ============================================================================
+// Reference: Solutions 51-52 (Advanced Features)
+// ============================================================================
+// Description:
+//   - Advanced solutions requiring pattern matching
+//   - Conditional logic in sequence operations
+//   - Cardinality and set comprehension
+//   - Future Phase 18 features (pattern matching in axdef)
+//
+// Topics:
+//   - Solution 51: Playlist counting with set comprehension
+//   - Solution 52: Pattern matching with conditionals (blocked)
+//   - premiumPlays filtering example
+//
+// See: docs/USER_GUIDE.md - Sections "Pattern Matching", "Sequences"
+// ============================================================================
+
 === Supplementary: Advanced ===
 
 ** Solution 51 **

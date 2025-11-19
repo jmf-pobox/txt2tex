@@ -1,3 +1,23 @@
+// ============================================================================
+// Example: Sequence Basics
+// ============================================================================
+// Demonstrates:
+//   - Sequence type notation
+//   - Injective sequence type (iseq)
+//   - Sequence literal syntax (Unicode and ASCII)
+//   - Empty sequences and singleton sequences
+//   - Sequences in expressions
+//
+// Features:
+//   - seq N, seq Z [sequence types]
+//   - iseq N [injective sequences]
+//   - ⟨⟩, ⟨a⟩, ⟨a, b, c⟩ [Unicode literals]
+//   - <>, <a>, <a, b, c> [ASCII literals]
+//   - # s [sequence cardinality]
+//
+// See: docs/USER_GUIDE.md - Section "Sequences" > "Basics"
+// ============================================================================
+
 === Sequence Basics ===
 
 ** Example 1: Sequence Types **

@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Set Comprehension
+// ============================================================================
+// Demonstrates:
+//   - Set comprehension by predicate: { x : T | predicate }
+//   - Set comprehension by expression: { x : T | predicate . expression }
+//   - Multi-variable comprehension
+//   - Set comprehension without explicit domain
+//
+// Features:
+//   - Basic form: { x : N | x > 0 }
+//   - Expression form: { x : N | x > 0 . x^2 }
+//   - Multi-variable: { x, y : N | x = y }
+//   - No domain: { x | x in A }
+//
+// See: docs/USER_GUIDE.md - Section "Sets and Types" > "Set Comprehension"
+// ============================================================================
+
 === Phase 8: Set Comprehension ===
 
 ** Example 1: Set by Predicate **

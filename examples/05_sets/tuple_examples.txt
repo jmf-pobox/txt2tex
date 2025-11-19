@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Tuple Expressions
+// ============================================================================
+// Demonstrates:
+//   - Tuple construction (ordered pairs, triples, etc.)
+//   - Tuples in set comprehension
+//   - Tuples in Cartesian products
+//   - Nested tuples
+//
+// Features:
+//   - (a, b) [ordered pair]
+//   - (x, y, z) [triple]
+//   - { n : N | predicate . (n, n^2) } [tuple expression]
+//   - (a, b) in A cross B [membership]
+//
+// See: docs/USER_GUIDE.md - Section "Sets and Types" > "Cartesian Product"
+// ============================================================================
+
 === Phase 11.6: Tuple Expressions ===
 
 ** Test Cases **

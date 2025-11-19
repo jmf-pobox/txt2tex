@@ -1,0 +1,395 @@
+// ============================================================================
+// Complete Example: TV Programme Schedule Modeling
+// ============================================================================
+// Course: Formal Methods
+// Topic: Schemas, Sequences, Pattern Matching, Recursive Functions
+// Difficulty: Advanced
+//
+// This example demonstrates:
+//   - Schema definitions with multiple fields
+//   - Sequences of structured data (seq Schema)
+//   - Pattern matching on sequences (<x> ^ s)
+//   - Recursive function definitions
+//   - Conditional expressions (if-then-else)
+//   - Set comprehension over sequence ranges
+//   - Mu operator for finding unique maxima
+//   - Constraints on data structures
+//
+// Learning Goals:
+//   1. Model real-world data using schemas
+//   2. Write recursive functions with pattern matching
+//   3. Process sequences functionally (map, filter, fold patterns)
+//   4. Express complex constraints and queries
+//   5. Integrate multiple Z notation features
+//
+// Design Decisions:
+//   - Use schema instead of tuple for better field access
+//   - All functions are pure (no side effects)
+//   - Recursive definitions follow structural induction pattern
+//   - Constraints ensure data validity
+//   - Demonstrate both functional and declarative styles
+//
+// Domain Model:
+//   A digital video recorder (DVR) stores a sequence of TV programmes.
+//   Each programme has:
+//     - title: unique identifier
+//     - length: duration in seconds
+//     - viewed: whether it has been watched
+//
+//   Constraints:
+//     - Total storage: 12000 seconds (200 minutes)
+//     - Maximum programme length: 360 seconds (6 minutes)
+//     - No programme can be negative length
+//
+// Design Patterns:
+//   - Base case + inductive case for recursive functions
+//   - Sequence filtering via if-then-else in recursion
+//   - Accumulation via recursive addition
+//   - Finding unique maxima with mu operator
+//
+// Real-World Application:
+//   This models a simplified DVR system. Real systems would add:
+//     - Recording operations (add, delete, edit)
+//     - State schemas for DVR state changes
+//     - Error handling for storage overflow
+//     - Priority scheduling for recording conflicts
+//
+// See: docs/USER_GUIDE.md - Sections "Schemas" and "Sequences"
+//      examples/09_sequences/ - Sequence operations
+//      examples/10_schemas/ - Schema definitions
+//      TUTORIAL_08.md - Sequences tutorial
+//      TUTORIAL_09.md - Schemas tutorial
+// ============================================================================
+
+=== TV Programme Schedule Modeling ===
+
+** Problem Statement **
+
+TEXT: Model a digital video recorder (DVR) system that stores a sequence of
+TEXT: TV programmes. Define functions to:
+TEXT:   (a) Specify storage constraints
+TEXT:   (b) Find titles of long programmes
+TEXT:   (c) Filter viewed programmes
+TEXT:   (d) Calculate total storage used
+TEXT:   (e) Find the longest programme
+TEXT:   (f) Calculate storage by title
+TEXT:   (g) Remove the longest viewed programme
+TEXT:   (h) Sort programmes by length
+
+** Domain Setup **
+
+TEXT: We define given types for programme attributes and a schema for programmes:
+
+given Title, Length, Viewed
+
+schema Programme
+  title: Title
+  length: Length
+  viewed: Viewed
+end
+
+TEXT: Design rationale:
+TEXT:   - Title is a given type (could be String in implementation)
+TEXT:   - Length is a given type (represents natural numbers in seconds)
+TEXT:   - Viewed is a given type (represents yes/no, could be boolean)
+TEXT:   - Schema provides named field access: p.title, p.length, p.viewed
+TEXT:   - More maintainable than tuples: (Title cross Length cross Viewed)
+
+** Solution (a): Storage Constraints **
+
+TEXT: Define a valid DVR hard drive with capacity and programme constraints:
+
+axdef
+  hd : seq(Programme)
+where
+  cumulativeTotal(hd) <= 12000
+  forall p : ran hd | p.length <= 360
+end
+
+TEXT: Constraint analysis:
+TEXT:
+TEXT: 1. cumulativeTotal(hd) <= 12000
+TEXT:    Total storage used must not exceed 12000 seconds (200 minutes)
+TEXT:    Uses cumulativeTotal function defined in part (d)
+TEXT:
+TEXT: 2. forall p : ran hd | p.length <= 360
+TEXT:    Each programme must be at most 360 seconds (6 minutes)
+TEXT:    Prevents recording movies or long shows
+TEXT:
+TEXT: Why these constraints?
+TEXT:   - Storage limit reflects hardware capacity
+TEXT:   - Length limit reflects intended use (short-form content)
+TEXT:   - Enforced at specification level, not runtime
+TEXT:
+TEXT: Note: This definition uses forward reference to cumulativeTotal.
+TEXT: In a complete specification, define cumulativeTotal first.
+
+** Solution (b): Finding Long Programme Titles **
+
+TEXT: Find titles of all programmes longer than 120 seconds (2 minutes):
+TEXT:
+TEXT:   {p : ran hd | p.length > 120 . p.title}
+
+TEXT: Breakdown:
+TEXT:
+TEXT: Step 1: ran hd
+TEXT:   The range of sequence hd is the set of all programmes in the sequence.
+TEXT:   If hd = <prog1, prog2, prog3>, then ran hd = {prog1, prog2, prog3}
+TEXT:
+TEXT: Step 2: p : ran hd | p.length > 120
+TEXT:   Filter programmes where length exceeds 120 seconds.
+TEXT:   This is the declaration and constraint part.
+TEXT:
+TEXT: Step 3: . p.title
+TEXT:   For each matching programme, extract just the title.
+TEXT:   This is the term (selector) part.
+TEXT:
+TEXT: Result type: P Title (set of titles)
+TEXT:
+TEXT: Example: If hd contains:
+TEXT:   - Programme("News", 180, yes)
+TEXT:   - Programme("Ads", 60, yes)
+TEXT:   - Programme("Drama", 300, no)
+TEXT: Then result = {"News", "Drama"}
+
+** Solution (c): Filtering Viewed Programmes **
+
+TEXT: Extract the subsequence of programmes that have been viewed:
+
+axdef
+  viewedProgrammes : seq(Programme) -> seq(Programme)
+where
+  viewedProgrammes(<>) = <>
+  forall x : Programme; s : seq(Programme) |
+    viewedProgrammes(<x> ^ s) = if x.viewed = yes then <x> ^ viewedProgrammes(s) else viewedProgrammes(s)
+end
+
+TEXT: Recursive structure:
+TEXT:
+TEXT: Base case: viewedProgrammes(<>) = <>
+TEXT:   Empty sequence has no viewed programmes.
+TEXT:
+TEXT: Inductive case: viewedProgrammes(<x> ^ s)
+TEXT:   Given: sequence with first element x and remaining elements s
+TEXT:   If x.viewed = yes: include x in result, recurse on s
+TEXT:   If x.viewed /= yes: skip x, recurse on s
+TEXT:
+TEXT: Pattern matching notation:
+TEXT:   <x> ^ s means "a sequence with head x and tail s"
+TEXT:   This is similar to x :: xs in Haskell or x:xs in ML
+TEXT:
+TEXT: Operational semantics:
+TEXT:   viewedProgrammes(<p1, p2, p3, p4>)
+TEXT:   = if p1.viewed = yes then <p1> ^ viewedProgrammes(<p2, p3, p4>) else viewedProgrammes(<p2, p3, p4>)
+TEXT:   ...continues recursively until base case
+TEXT:
+TEXT: This is a filter operation: keeps elements satisfying a predicate.
+
+** Solution (d): Cumulative Total Storage **
+
+TEXT: Calculate total storage used by summing all programme lengths:
+
+axdef
+  cumulativeTotal : seq(Programme) -> N
+where
+  cumulativeTotal(<>) = 0
+  forall x : Programme; s : seq(Programme) |
+    cumulativeTotal(<x> ^ s) = x.length + cumulativeTotal(s)
+end
+
+TEXT: Recursive structure:
+TEXT:
+TEXT: Base case: cumulativeTotal(<>) = 0
+TEXT:   Empty sequence has zero total length.
+TEXT:
+TEXT: Inductive case: cumulativeTotal(<x> ^ s) = x.length + cumulativeTotal(s)
+TEXT:   Add the first programme's length to the total of the rest.
+TEXT:
+TEXT: This is a fold (reduce) operation: combines elements with + operator.
+TEXT:
+TEXT: Correctness by structural induction:
+TEXT:   Prove: cumulativeTotal(s) = sum of all lengths in s
+TEXT:
+TEXT:   Base: cumulativeTotal(<>) = 0 = sum of lengths in <> ✓
+TEXT:
+TEXT:   Step: Assume cumulativeTotal(s) = sum of lengths in s
+TEXT:         Then cumulativeTotal(<x> ^ s)
+TEXT:            = x.length + cumulativeTotal(s)        [definition]
+TEXT:            = x.length + sum of lengths in s       [IH]
+TEXT:            = sum of lengths in (<x> ^ s)          ✓
+
+** Solution (e): Finding the Longest Programme **
+
+TEXT: Find the title of the unique longest programme:
+
+(mu p : ran hd | forall q : ran hd | p /= q | p.length > q.length | p.title)
+
+TEXT: Mu operator semantics:
+TEXT:   (mu x : S | constraint | term)
+TEXT:   Finds the unique x in S satisfying constraint, then evaluates term.
+TEXT:
+TEXT: Breakdown:
+TEXT:
+TEXT: Step 1: p : ran hd
+TEXT:   Candidate programmes from the DVR
+TEXT:
+TEXT: Step 2: forall q : ran hd | p /= q | p.length > q.length
+TEXT:   p's length strictly exceeds all other programmes' lengths
+TEXT:   This ensures p is the unique maximum
+TEXT:
+TEXT: Step 3: | p.title
+TEXT:   Extract p's title as the result
+TEXT:
+TEXT: Uniqueness assumption:
+TEXT:   This assumes exactly one programme has maximum length.
+TEXT:   If multiple programmes have the same maximum length, mu is undefined.
+TEXT:
+TEXT: Defensive alternative:
+TEXT:   To handle ties, could return a set of titles:
+TEXT:   {p : ran hd | forall q : ran hd | p.length >= q.length . p.title}
+
+** Solution (f): Storage Totals by Title **
+
+TEXT: (Note: Original solution was complex. This is a simplified version.)
+TEXT:
+TEXT: Calculate total storage used by each title across all programmes:
+
+TEXT: axdef
+TEXT:   totalsByTitle : seq(Programme) -> (Title +-> Length)
+TEXT: where
+TEXT:   forall s : seq(Programme) |
+TEXT:     totalsByTitle(s) = {t : Title | (exists p : ran s | p.title = t) .
+TEXT:       t |-> cumulativeTotal(s filter {t})}
+TEXT: end
+
+TEXT: (Note: This simplified version assumes a filter operation on sequences.
+TEXT:  The original problem requires complex nested comprehensions that may
+TEXT:  need implementation-specific handling.)
+
+** Solution (g): Remove Longest Viewed Programme **
+
+TEXT: Remove the longest viewed programme from the sequence:
+
+axdef
+  removeTheLongestViewed : seq(Programme) -> seq(Programme)
+where
+  forall s : seq(Programme) |
+    removeTheLongestViewed(s) = s filter {x : ran s | x /= longestViewed(s)}
+end
+
+TEXT: Where longestViewed is defined as:
+
+axdef
+  longestViewed : seq(Programme) +-> Programme
+where
+  forall s : seq(Programme) | longestViewed(s) = (mu p : ran s | p.viewed = yes and forall q : ran s | p /= q and q.viewed = yes | p.length > q.length)
+end
+
+TEXT: Two-step process:
+TEXT:
+TEXT: 1. longestViewed(s) finds the unique longest viewed programme
+TEXT:    - Only considers viewed programmes (p.viewed = yes)
+TEXT:    - Finds unique maximum by length
+TEXT:    - Partial function (+->): undefined if no viewed programmes
+TEXT:
+TEXT: 2. removeTheLongestViewed(s) filters it out
+TEXT:    - Uses sequence filter to remove the identified programme
+TEXT:    - Keeps all programmes except longestViewed(s)
+TEXT:
+TEXT: Assumptions:
+TEXT:   - At least one viewed programme exists
+TEXT:   - One viewed programme has unique maximum length
+TEXT:   - Otherwise longestViewed(s) is undefined (mu fails)
+
+** Solution (h): Sort by Length **
+
+TEXT: Sort programmes in descending order by length:
+
+axdef
+  sortByLength : seq(Programme) -> seq(Programme)
+where
+  forall x : seq(Programme) |
+    items(sortByLength(x)) = items(x) and
+    (forall i, j : dom(sortByLength(x)) | i < j =>
+      (sortByLength(x)(i)).length >= (sortByLength(x)(j)).length)
+end
+
+TEXT: Specification approach (not implementation):
+TEXT:
+TEXT: Property 1: items(sortByLength(x)) = items(x)
+TEXT:   The sorted sequence contains exactly the same programmes.
+TEXT:   items(s) converts sequence s to a bag (multiset).
+TEXT:   This ensures no programmes are added, removed, or duplicated.
+TEXT:
+TEXT: Property 2: Descending length order
+TEXT:   forall i, j : dom(sortByLength(x)) | i < j => length[i] >= length[j]
+TEXT:   For all positions i before j, programme at i has length >= programme at j.
+TEXT:
+TEXT: This is a declarative specification: defines what, not how.
+TEXT: Implementation could use quicksort, mergesort, etc.
+
+** Complete System Invariants **
+
+TEXT: For a real DVR system, we'd want additional invariants:
+
+axdef
+  DVRInvariants : seq(Programme) -> B
+where
+  forall s : seq(Programme) |
+    DVRInvariants(s) <=>
+      (cumulativeTotal(s) <= 12000) and
+      (forall p : ran s | p.length > 0 and p.length <= 360) and
+      (forall i : dom s | s(i).title /= s(i).title => i = i)
+end
+
+TEXT: Additional invariants to consider:
+TEXT:   1. No duplicate titles (each programme uniquely identified)
+TEXT:   2. Positive lengths (p.length > 0)
+TEXT:   3. Valid viewed status (viewed in {yes, no})
+TEXT:   4. Sequence order preserved during operations
+TEXT:   5. Storage never exceeds capacity after operations
+
+** Design Patterns Summary **
+
+TEXT: This example demonstrates several design patterns:
+TEXT:
+TEXT: 1. **Recursive sequence processing**
+TEXT:    - Base case for empty sequence
+TEXT:    - Inductive case for <x> ^ s
+TEXT:    - Common pattern: filter, map, fold
+TEXT:
+TEXT: 2. **Schema-based data modeling**
+TEXT:    - Named fields for clarity
+TEXT:    - Type safety via schema constraints
+TEXT:    - Better than tuples for complex data
+TEXT:
+TEXT: 3. **Declarative specifications**
+TEXT:    - Specify properties, not algorithms
+TEXT:    - sortByLength defines what sorted means
+TEXT:    - Implementation flexibility
+TEXT:
+TEXT: 4. **Mu operator for unique selection**
+TEXT:    - Finding unique maxima/minima
+TEXT:    - Requires uniqueness assumption
+TEXT:    - Alternative: return set for ties
+TEXT:
+TEXT: 5. **Constraints as preconditions**
+TEXT:    - DVR storage capacity
+TEXT:    - Programme length limits
+TEXT:    - Enforced at type/specification level
+
+** Exercise for the Reader **
+
+TEXT: 1. Define a function to add a new programme to the DVR:
+TEXT:    addProgramme : seq(Programme) cross Programme +-> seq(Programme)
+TEXT:    Include precondition: total storage won't exceed limit
+TEXT:
+TEXT: 2. Define a function to delete all viewed programmes:
+TEXT:    deleteViewed : seq(Programme) -> seq(Programme)
+TEXT:
+TEXT: 3. Prove that: cumulativeTotal(s ^ t) = cumulativeTotal(s) + cumulativeTotal(t)
+TEXT:    (Concatenation property)
+TEXT:
+TEXT: 4. Extend the model with recording times (Date, Time) and define:
+TEXT:    - Function to find programmes recorded on a specific date
+TEXT:    - Function to find recording conflicts (overlapping times)

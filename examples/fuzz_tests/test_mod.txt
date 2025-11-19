@@ -1,3 +1,19 @@
+// ============================================================================
+// Test: Modulus Operator
+// ============================================================================
+// Demonstrates:
+//   - Modulus operator (mod)
+//   - Remainder calculations
+//   - Modulus in expressions
+//
+// Features:
+//   - x mod 5 [basic modulus]
+//   - 7 mod 3 [literal modulus]
+//   - (x + y) mod n [compound expressions]
+//
+// See: docs/USER_GUIDE.md - Section "Arithmetic Operators"
+// ============================================================================
+
 === Test Mod ===
 
 TEXT: The modulus operator gives the remainder: x mod 5 = 2 and 7 mod 3 = 1.

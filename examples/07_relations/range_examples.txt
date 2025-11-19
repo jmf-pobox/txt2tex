@@ -1,3 +1,22 @@
+// ============================================================================
+// Example: Range Operator (..)
+// ============================================================================
+// Demonstrates:
+//   - Range operator for numeric intervals
+//   - 1..10 represents {1, 2, 3, ..., 10}
+//   - Range in set comprehension
+//   - Range with identifiers
+//   - Range in schema declarations
+//
+// Features:
+//   - Simple range: 1..10
+//   - With identifiers: 1993..current
+//   - In comprehension: { x : 1..20 | predicate }
+//   - Set operations on ranges
+//
+// See: docs/USER_GUIDE.md - Section "Functions" > "Range Operator"
+// ============================================================================
+
 === Testing Range Operator ===
 
 ** Test 1: Simple Numeric Range **

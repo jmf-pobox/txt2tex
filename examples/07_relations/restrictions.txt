@@ -1,3 +1,22 @@
+// ============================================================================
+// Example: Function Application
+// ============================================================================
+// Demonstrates:
+//   - Basic function definitions with axdef
+//   - Function application syntax f(x)
+//   - Functions with single argument
+//   - Functions with multiple arguments (tuples)
+//   - Defining function behavior with forall
+//
+// Features:
+//   - square(n) = n * n
+//   - add(a, b) = a + b
+//   - Function types: N -> N, N cross N -> N
+//   - Explicit parentheses required: f(x), not f x
+//
+// See: docs/USER_GUIDE.md - Section "Functions" > "Function Application"
+// ============================================================================
+
 === Function Application Examples ===
 
 given Item, Dog, Person, X

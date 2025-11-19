@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Predicate Logic Quantifiers
+// ============================================================================
+// Demonstrates:
+//   - Universal quantification (forall)
+//   - Existential quantification (exists)
+//   - Unique existence (exists1)
+//   - Multi-variable quantifiers
+//
+// Features:
+//   - forall x : N | predicate
+//   - exists y : N | predicate
+//   - exists1 z : N | predicate
+//   - Multi-variable: forall x, y : N | predicate
+//
+// See: docs/USER_GUIDE.md - Section "Predicate Logic"
+// ============================================================================
+
 === Predicate Logic Phase 6 Tests ===
 
 ** Test 1: Simple Quantifiers **

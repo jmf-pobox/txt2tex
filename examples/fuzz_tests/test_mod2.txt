@@ -1,3 +1,19 @@
+// ============================================================================
+// Test: Modulus in Axiomatic Definitions
+// ============================================================================
+// Demonstrates:
+//   - Using mod operator in axdef
+//   - Defining functions with modulus
+//   - Type-correct modulus usage for fuzz
+//
+// Features:
+//   - axdef with mod
+//   - remainder(x, y) = x mod y
+//   - N cross N -> N [function type]
+//
+// See: docs/USER_GUIDE.md - Sections "Axiomatic Definitions", "Arithmetic Operators"
+// ============================================================================
+
 === Test Mod Proper ===
 
 axdef

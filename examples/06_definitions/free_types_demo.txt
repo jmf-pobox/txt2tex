@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Semicolon-Separated Bindings in Quantifiers
+// ============================================================================
+// Demonstrates:
+//   - Multiple typed declarations with semicolon separator
+//   - forall x : T; y : U | predicate
+//   - Mixing comma and semicolon separators
+//   - Real-world complex examples
+//
+// Features:
+//   - Semicolon separates different type declarations
+//   - Comma separates variables with same type
+//   - forall x : N; y : N | predicate
+//   - forall x, y : N; z : M | predicate
+//
+// See: docs/USER_GUIDE.md - Section "Predicate Logic" > "Multi-Variable Quantifiers"
+// ============================================================================
+
 === Phase 17 Demo: Semicolon-Separated Bindings ===
 
 ** Example 1: Two bindings **

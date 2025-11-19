@@ -1,0 +1,184 @@
+// ============================================================================
+// Example: Proof by Contradiction
+// ============================================================================
+// Demonstrates:
+//   - Proof by contradiction technique
+//   - Assuming the negation and deriving falsehood
+//   - not elimination (absurdity)
+//   - Classical reasoning patterns
+//
+// Features:
+//   - PROOF: with contradiction structure
+//   - [not intro] rule application
+//   - Deriving false from contradictory premises
+//   - Classical logic proofs
+//
+// See: docs/PROOF_SYNTAX.md - Proof tree rules
+//      docs/USER_GUIDE.md - Section "Proof Trees"
+// ============================================================================
+
+=== Proof by Contradiction Examples ===
+
+** Example 1: Basic Contradiction **
+
+TEXT: To prove P, assume not P and derive a contradiction (false).
+
+PROOF:
+  not P [assumption 1]
+  ...
+  Q [from not P]
+  not Q [known fact]
+  false [contradiction]
+  P [not intro from 1]
+
+TEXT: Once we derive false, we can conclude anything—here we conclude P by discharging assumption 1.
+
+** Example 2: Simple Example - Proving p **
+
+TEXT: Prove: (p and not p) => q
+
+PROOF:
+  p and not p [premise]
+  p [and elim left]
+  not p [and elim right]
+  false [contradiction]
+  q [false elim]
+
+TEXT: From a contradiction, we can derive anything (ex falso quodlibet).
+
+** Example 3: Proving not (p and not p) **
+
+TEXT: Prove that p and not p is always false.
+
+PROOF:
+  p and not p [assumption 1]
+  p [and elim left]
+  not p [and elim right]
+  false [contradiction]
+  not (p and not p) [not intro from 1]
+
+TEXT: This proves the law of non-contradiction.
+
+** Example 4: Indirect Proof **
+
+TEXT: Prove: (not p => false) => p
+
+PROOF:
+  not p => false [premise]
+  not p [assumption 1]
+  false [=> elim]
+  p [false elim]
+  not not p [not intro from 1]
+
+TEXT: This is the pattern for indirect proof: if assuming not p leads to false, then p must hold (in classical logic).
+
+** Example 5: Modus Tollens via Contradiction **
+
+TEXT: Prove: (p => q) and not q => not p
+
+PROOF:
+  p => q [premise]
+  not q [premise]
+  p [assumption 1]
+  q [=> elim]
+  false [contradiction with not q]
+  not p [not intro from 1]
+
+TEXT: Classic modus tollens pattern using contradiction.
+
+** Example 6: Disjunction from Contradiction **
+
+TEXT: Prove: not p => (p => q)
+
+PROOF:
+  not p [premise]
+  p [assumption 1]
+  false [contradiction]
+  q [false elim]
+  p => q [=> intro from 1]
+
+TEXT: From not p, we can prove p => q for any q.
+
+** Example 7: Double Negation Elimination **
+
+TEXT: Prove: not not p => p (requires classical logic)
+
+PROOF:
+  not not p [premise]
+  not p [assumption 1]
+  false [contradiction]
+  p [false elim]
+  not not not p [not intro from 1]
+
+TEXT: In classical logic, not not p implies p. This requires excluded middle or equivalent axiom.
+
+** Example 8: Reductio ad Absurdum **
+
+TEXT: Prove: (not p => (q and not q)) => p
+
+PROOF:
+  not p => (q and not q) [premise]
+  not p [assumption 1]
+  q and not q [=> elim]
+  q [and elim left]
+  not q [and elim right]
+  false [contradiction]
+  p [false elim]
+  not not p [not intro from 1]
+  p [double negation elim]
+
+TEXT: Reductio ad absurdum: if assuming not p leads to absurdity, then p holds.
+
+** Example 9: Contradiction with Universal Quantifier **
+
+TEXT: Prove: (forall x | P(x)) and (exists x | not P(x)) is contradictory.
+
+PROOF:
+  forall x | P(x) [premise]
+  exists x | not P(x) [premise]
+  not P(a) [exists elim, fresh a]
+  P(a) [forall elim]
+  false [contradiction]
+
+TEXT: If something holds for all x, it cannot fail for some x.
+
+** Example 10: Proving Uniqueness by Contradiction **
+
+TEXT: Prove: if f is injective, then f(x) = f(y) => x = y.
+
+PROOF:
+  f is injective [premise]
+  f(x) = f(y) [premise]
+  x /= y [assumption 1]
+  f(x) /= f(y) [injective property]
+  false [contradiction with f(x) = f(y)]
+  not (x /= y) [not intro from 1]
+  x = y [double negation]
+
+TEXT: Uses contradiction to prove equality.
+
+** Example 11: Case Analysis Leading to Contradiction **
+
+TEXT: Prove: p or q, not p, not q => false
+
+PROOF:
+  p or q [premise]
+  not p [premise]
+  not q [premise]
+  CASE p:
+    false [contradiction with not p]
+  CASE q:
+    false [contradiction with not q]
+  false [or elim]
+
+TEXT: Both cases lead to contradiction, so the premises are inconsistent.
+
+** Example 12: Best Practices for Contradiction Proofs **
+
+TEXT: When using proof by contradiction:
+TEXT: 1. Clearly mark the assumption you're contradicting with [assumption N]
+TEXT: 2. Show explicitly where false is derived
+TEXT: 3. Use [not intro from N] to discharge the assumption
+TEXT: 4. Document the contradiction (what conflicts with what)
+TEXT: 5. In natural deduction, false elim lets you conclude anything
+TEXT: 6. Remember: contradiction is a classical technique (not constructive)

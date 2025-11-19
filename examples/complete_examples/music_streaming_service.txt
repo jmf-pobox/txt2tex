@@ -1,0 +1,453 @@
+// ============================================================================
+// Complete Example: Music Streaming Service Specification
+// ============================================================================
+// Course: Formal Methods
+// Topic: Complete System Modeling (Multi-Part Specification)
+// Difficulty: Advanced
+//
+// This example demonstrates:
+//   - Large-scale system modeling with multiple interrelated types
+//   - Complex axiomatic definitions with multiple constraints
+//   - Partial functions with domain restrictions
+//   - Set operations (union, intersection, subseteq)
+//   - Higher-order cardinality constraints
+//   - Conditional expressions in function definitions
+//   - Sequence operations with pattern matching
+//   - Mu operator for finding unique maxima
+//   - Comprehensive invariant specifications
+//
+// Learning Goals:
+//   1. Model a complete real-world system with multiple entities
+//   2. Express complex business rules as formal constraints
+//   3. Define derived quantities (popularity scores)
+//   4. Handle edge cases and undefined scenarios
+//   5. Write defensive specifications with proper preconditions
+//   6. Structure large specifications for maintainability
+//
+// System Overview:
+//   A music streaming service manages:
+//     - Songs: catalog of available music
+//     - Users: people who use the service
+//     - Playlists: user-created collections of songs
+//     - Preferences: users' loved/hated songs
+//     - Plays: sequence of listening events
+//
+// Design Decisions:
+//   - Use finite sets (F) for songs and users (bounded collections)
+//   - Use partial functions (+->  for playlists and preferences (not all users have them)
+//   - Use non-empty sets (F1) for playlist subscribers (at least owner)
+//   - Separate love/hate to prevent inconsistency
+//   - Define popularity as combination of loves, hates, and playlist appearances
+//   - Use sequence for play history (order matters)
+//
+// Real-World Requirements:
+//   1. Songs exist in a finite catalog
+//   2. Users can create playlists containing catalog songs
+//   3. Every playlist has an owner who is also a subscriber
+//   4. Users can love or hate songs (but not both for same song)
+//   5. Popularity considers multiple signals (loves, playlists, hates)
+//   6. Play history tracks chronological listening
+//   7. Different user tiers (premium, standard) get different treatment
+//
+// Specification Structure:
+//   - Given types (basic entities)
+//   - Core data structures (songs, users, playlists)
+//   - Integrity constraints (consistency rules)
+//   - Preference system (loved/hated songs)
+//   - Derived queries (set comprehensions)
+//   - Popularity metrics (computed values)
+//   - Play history (sequence operations)
+//
+// See: docs/USER_GUIDE.md - All sections
+//      examples/ - All example directories
+//      TUTORIAL_*.md - All tutorials
+// ============================================================================
+
+=== Music Streaming Service ===
+
+** System Overview **
+
+TEXT: This specification models a music streaming service similar to Spotify
+TEXT: or Apple Music. The system manages songs, users, playlists, preferences,
+TEXT: and listening history.
+
+** Part 1: Core Data Model **
+
+TEXT: Define the basic types and data structures:
+
+given SongId, UserId, PlaylistId, Playlist
+
+axdef
+  songs : F SongId
+  users : F UserId
+  playlists : PlaylistId +-> Playlist
+  playlistOwner : PlaylistId +-> UserId
+  playlistSubscribers : PlaylistId +-> F1 UserId
+where
+  forall i : dom(playlists) | ran(playlists(i)) subseteq songs
+  dom(playlistOwner) subseteq dom(playlists)
+  ran(playlistOwner) subseteq users
+  dom(playlistSubscribers) subseteq dom(playlists)
+  forall i : dom(playlistSubscribers) | playlistSubscribers(i) subseteq users
+  forall i : dom(playlists) | playlistOwner(i) in playlistSubscribers(i)
+end
+
+TEXT: Type analysis:
+TEXT:
+TEXT: Given types:
+TEXT:   - SongId: unique identifier for songs
+TEXT:   - UserId: unique identifier for users
+TEXT:   - PlaylistId: unique identifier for playlists
+TEXT:   - Playlist: sequence of songs (seq SongId in implementation)
+TEXT:
+TEXT: Global variables:
+TEXT:   - songs : F SongId
+TEXT:     Finite set of all songs in the catalog.
+TEXT:     F means finite (not infinite).
+TEXT:
+TEXT:   - users : F UserId
+TEXT:     Finite set of all registered users.
+TEXT:
+TEXT:   - playlists : PlaylistId +-> Playlist
+TEXT:     Partial function from playlist IDs to playlists.
+TEXT:     Partial (+->): not every PlaylistId has a playlist.
+TEXT:     This allows playlist creation/deletion.
+TEXT:
+TEXT:   - playlistOwner : PlaylistId +-> UserId
+TEXT:     Maps each playlist to its owner.
+TEXT:     Partial: only defined playlists have owners.
+TEXT:
+TEXT:   - playlistSubscribers : PlaylistId +-> F1 UserId
+TEXT:     Maps each playlist to its subscribers (non-empty set).
+TEXT:     F1 means non-empty finite set (at least one subscriber).
+
+TEXT: Integrity constraints:
+TEXT:
+TEXT: 1. forall i : dom(playlists) | ran(playlists(i)) subseteq songs
+TEXT:    Every song in every playlist must be in the catalog.
+TEXT:    Prevents adding non-existent songs to playlists.
+TEXT:
+TEXT: 2. dom(playlistOwner) subseteq dom(playlists)
+TEXT:    Owners only exist for playlists that exist.
+TEXT:
+TEXT: 3. ran(playlistOwner) subseteq users
+TEXT:    All owners must be registered users.
+TEXT:
+TEXT: 4. dom(playlistSubscribers) subseteq dom(playlists)
+TEXT:    Subscribers only exist for playlists that exist.
+TEXT:
+TEXT: 5. forall i : dom(playlistSubscribers) | playlistSubscribers(i) subseteq users
+TEXT:    All subscribers must be registered users.
+TEXT:
+TEXT: 6. forall i : dom(playlists) | playlistOwner(i) in playlistSubscribers(i)
+TEXT:    The owner of a playlist is always a subscriber to it.
+TEXT:    This ensures non-empty subscriber sets and owner access.
+
+** Part 2: User Preferences **
+
+TEXT: Model users' song preferences (loved and hated songs):
+
+axdef
+  hated : UserId +-> F SongId
+  loved : UserId +-> F SongId
+where
+  dom(hated) subseteq users
+  forall i : dom(hated) | hated(i) subseteq songs
+  dom(loved) subseteq users
+  forall i : dom(loved) | loved(i) subseteq songs
+  forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
+end
+
+TEXT: Type analysis:
+TEXT:
+TEXT:   - hated : UserId +-> F SongId
+TEXT:     Maps users to finite sets of hated songs.
+TEXT:     Partial: not all users hate songs.
+TEXT:
+TEXT:   - loved : UserId +-> F SongId
+TEXT:     Maps users to finite sets of loved songs.
+TEXT:     Partial: not all users love songs.
+
+TEXT: Constraints:
+TEXT:
+TEXT: 1. dom(hated) subseteq users
+TEXT:    Only registered users can hate songs.
+TEXT:
+TEXT: 2. forall i : dom(hated) | hated(i) subseteq songs
+TEXT:    Can only hate songs that exist in catalog.
+TEXT:
+TEXT: 3. dom(loved) subseteq users
+TEXT:    Only registered users can love songs.
+TEXT:
+TEXT: 4. forall i : dom(loved) | loved(i) subseteq songs
+TEXT:    Can only love songs that exist in catalog.
+TEXT:
+TEXT: 5. forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
+TEXT:    **Critical consistency constraint**: A user cannot love and hate the same song.
+TEXT:    For every user who has expressed preferences, their loved and hated sets are disjoint.
+
+TEXT: Design rationale:
+TEXT:   - Separate love/hate ensures no contradictory preferences
+TEXT:   - Partial functions allow users without preferences
+TEXT:   - Finite sets (F) bound memory usage
+TEXT:   - All preferences must reference catalog songs
+
+** Part 3: Derived Queries **
+
+TEXT: Define queries using set comprehension:
+
+TEXT: (a) Find users not subscribed to any playlist:
+
+A == users \ bigcup(ran(playlistSubscribers))
+
+TEXT: Breakdown:
+TEXT:   - ran(playlistSubscribers): all subscriber sets for all playlists
+TEXT:   - bigcup(...): union of all these sets = all users subscribed to anything
+TEXT:   - users \ (...): users not in the subscribed set
+TEXT:
+TEXT: Intuition: Users who never subscribed to any playlist.
+
+TEXT: (b) Find playlists with 100+ subscribers:
+
+B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
+
+TEXT: Breakdown:
+TEXT:   - p : dom(playlistSubscribers): iterate over all playlists with subscribers
+TEXT:   - # (playlistSubscribers(p)): count subscribers for playlist p
+TEXT:   - >= 100: filter for popular playlists
+TEXT:
+TEXT: Result type: P PlaylistId (set of popular playlist IDs)
+
+TEXT: (c) Find user who loves the most songs:
+
+C == (mu u : dom(loved) | forall v : dom(loved) | u /= v | # (loved(u)) > # (loved(v)))
+
+TEXT: Mu operator usage:
+TEXT:   - u : dom(loved): candidate users (those who love songs)
+TEXT:   - forall v : dom(loved) | u /= v: for all other users who love songs
+TEXT:   - # (loved(u)) > # (loved(v)): u loves strictly more songs than v
+TEXT:   - Result: the unique user with maximum loved songs
+TEXT:
+TEXT: Assumption: One user has a unique maximum (ties make mu undefined)
+
+TEXT: (d) Find most loved song in catalog:
+
+D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved(u)} > # {u : UserId | t in loved(u)})
+
+TEXT: Breakdown:
+TEXT:   - s : songs: candidate songs
+TEXT:   - # {u : UserId | s in loved(u)}: count users who love song s
+TEXT:   - forall t: for all other songs t
+TEXT:   - > # {u : UserId | t in loved(u)}: s has more lovers than t
+TEXT:   - Result: the unique most loved song
+TEXT:
+TEXT: Complexity: For each song, counts how many users love it, then finds unique max.
+
+** Part 4: Popularity Metrics **
+
+TEXT: Define computed popularity scores:
+
+TEXT: (a) Define love-hate score and playlist count:
+
+axdef
+  loveHateScore : SongId +-> N
+where
+  forall i : songs | loveHateScore(i) = if # {u : UserId | i in loved(u)} >= # {u : UserId | i in hated(u)} then # {u : UserId | i in loved(u)} - # {u : UserId | i in hated(u)} else 0
+end
+
+TEXT: Logic:
+TEXT:   - Count users who love song i
+TEXT:   - Count users who hate song i
+TEXT:   - If loves >= hates: score = loves - hates (net positive sentiment)
+TEXT:   - If loves < hates: score = 0 (cap at zero, don't go negative)
+TEXT:
+TEXT: Design choice: Non-negative scores simplify ranking.
+
+axdef
+  playlistCount : SongId +-> N
+where
+  forall i : songs |
+    playlistCount(i) = # {p : dom(playlists) | i in ran(playlists(p))}
+end
+
+TEXT: Logic:
+TEXT:   - For song i, count playlists containing it
+TEXT:   - Iterate over all playlists: dom(playlist)
+TEXT:   - Check if i appears in playlist p: i in ran(playlist(p))
+TEXT:   - Count matching playlists: #
+
+axdef
+  length : SongId +-> N
+  popularity : SongId +-> N
+where
+  dom(length) subseteq songs
+  dom(popularity) subseteq songs
+  forall i : songs |
+    popularity(i) = loveHateScore(i) + playlistCount(i)
+end
+
+TEXT: Popularity formula:
+TEXT:   popularity(song) = (loves - hates, capped at 0) + (number of playlists)
+TEXT:
+TEXT: Rationale:
+TEXT:   - Loves increase popularity
+TEXT:   - Hates decrease popularity (but don't go negative)
+TEXT:   - Playlist appearances indicate organic interest
+TEXT:   - Could extend with play counts, shares, etc.
+
+TEXT: (b) Find most popular song:
+
+axdef
+  mostPopular : SongId
+where
+  mostPopular = if (exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j))
+                then (mu i : songs | forall j : songs | i /= j | popularity(i) > popularity(j))
+                else nullSong
+end
+
+TEXT: Defensive programming:
+TEXT:   - exists1: check exactly one song has unique maximum popularity
+TEXT:   - If unique max exists: use mu to find it
+TEXT:   - If no unique max (tie): return nullSong (error value)
+TEXT:
+TEXT: This prevents undefined behavior when multiple songs tie for most popular.
+
+TEXT: (c) Find playlists containing the most popular song:
+
+playlistsContainingMostPopularSong == {i : dom(playlists) | mostPopular in ran(playlists(i))}
+
+TEXT: Logic:
+TEXT:   - Iterate over all playlists: i : dom(playlists)
+TEXT:   - Check if mostPopular song appears: mostPopular in ran(playlists(i))
+TEXT:   - Collect matching playlist IDs
+TEXT:
+TEXT: Result: set of playlist IDs featuring the most popular song.
+
+** Part 5: Play History **
+
+TEXT: Model chronological play events with sequences:
+
+given Play, Status
+
+TEXT: Assume Play is a schema: schema Play { songId: SongId, userId: UserId, timestamp: Time }
+TEXT: Assume Status is a free type: Status ::= premium | standard
+
+TEXT: Define functions to filter and analyze play history:
+
+TEXT: (a) Extract plays by premium users:
+
+axdef
+  premiumPlays : seq(Play) -> seq(Play)
+where
+  premiumPlays(<>) = <>
+  forall x : Play; s : seq(Play) |
+    premiumPlays(<x> ^ s) = if userStatus(x.2) = premium
+                            then <x> ^ premiumPlays(s)
+                            else premiumPlays(s)
+end
+
+TEXT: Recursive pattern matching:
+TEXT:   - Base case: empty sequence yields empty sequence
+TEXT:   - Inductive case: if first play x is by premium user, include it; else skip
+TEXT:   - x.2 accesses the userId field (assuming Play is a tuple or schema)
+TEXT:   - userStatus is assumed to be a function: UserId -> Status
+
+TEXT: (b) Extract plays by standard users:
+
+axdef
+  standardPlays : seq(Play) -> seq(Play)
+where
+  standardPlays(<>) = <>
+  forall x : Play; s : seq(Play) |
+    standardPlays(<x> ^ s) = if userStatus(x.2) = standard
+                             then <x> ^ standardPlays(s)
+                             else standardPlays(s)
+end
+
+TEXT: Similar to premiumPlays, but filters for standard users.
+
+TEXT: (c) Calculate cumulative listening time:
+
+axdef
+  cumulativeLength : seq(Play) -> N
+where
+  cumulativeLength(<>) = 0
+  forall x : Play; s : seq(Play) |
+    cumulativeLength(<x> ^ s) = length(x.1) + cumulativeLength(s)
+end
+
+TEXT: Fold (reduce) pattern:
+TEXT:   - Base case: empty sequence has zero length
+TEXT:   - Inductive case: add first play's length to rest's total
+TEXT:   - x.1 accesses the songId field
+TEXT:   - length(songId) returns song duration (from earlier definition)
+TEXT:
+TEXT: Usage: Total listening time for a user or for entire service.
+
+** System Invariants Summary **
+
+TEXT: Complete system must satisfy:
+TEXT:
+TEXT: 1. Catalog constraints:
+TEXT:    - Songs and users are finite sets
+TEXT:    - All referenced songs exist in catalog
+TEXT:    - All referenced users exist in user set
+TEXT:
+TEXT: 2. Playlist constraints:
+TEXT:    - Every playlist has exactly one owner
+TEXT:    - Owner is always a subscriber
+TEXT:    - Subscribers are non-empty (F1)
+TEXT:
+TEXT: 3. Preference constraints:
+TEXT:    - Cannot love and hate the same song
+TEXT:    - Preferences reference catalog songs
+TEXT:    - Only registered users have preferences
+TEXT:
+TEXT: 4. Derived data consistency:
+TEXT:    - Popularity reflects current loves/hates/playlists
+TEXT:    - Play history maintains chronological order
+TEXT:    - Metrics recomputed when data changes
+
+** Extensions and Exercises **
+
+TEXT: 1. Add schema for Play events:
+TEXT:    schema Play { songId: SongId, userId: UserId, timestamp: Time }
+TEXT:    Include constraints like timestamp monotonicity.
+TEXT:
+TEXT: 2. Define operations (state changes):
+TEXT:    - addSong: add new song to catalog
+TEXT:    - createPlaylist: user creates new playlist
+TEXT:    - subscribeTo: user subscribes to playlist
+TEXT:    - recordPlay: add play event to history
+TEXT:
+TEXT: 3. Define additional queries:
+TEXT:    - Most played song by premium users
+TEXT:    - Users who love all songs in a playlist
+TEXT:    - Playlists with no plays in last 30 days
+TEXT:
+TEXT: 4. Add recommendation system:
+TEXT:    - suggestSongs: UserId -> P SongId
+TEXT:    - Based on loved songs, playlist subscriptions, play history
+TEXT:
+TEXT: 5. Model collaborative features:
+TEXT:    - Shared playlists (multiple owners)
+TEXT:    - Following relationships between users
+TEXT:    - Social graph for recommendations
+
+** Design Patterns Demonstrated **
+
+TEXT: This specification showcases:
+TEXT:
+TEXT: 1. **Multi-entity modeling**: songs, users, playlists, plays work together
+TEXT: 2. **Integrity constraints**: prevent inconsistent states
+TEXT: 3. **Partial functions**: not all relationships are total
+TEXT: 4. **Defensive specifications**: handle edge cases (ties, empty sets)
+TEXT: 5. **Derived data**: popularity computed from multiple signals
+TEXT: 6. **Sequence operations**: filter, fold over play history
+TEXT: 7. **Set comprehensions**: powerful query language
+TEXT: 8. **Mu operator**: finding unique extrema
+TEXT: 9. **Progressive refinement**: start simple, add complexity
+TEXT: 10. **Real-world requirements**: models actual business rules
+
+TEXT: This is the most comprehensive example in this tutorial series,
+TEXT: combining nearly every Z notation feature into a cohesive system.

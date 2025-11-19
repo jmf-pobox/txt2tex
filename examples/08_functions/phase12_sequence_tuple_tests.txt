@@ -1,3 +1,22 @@
+// ============================================================================
+// Example: Phase 12 Feature Tests (Sequences, Tuples, Bags)
+// ============================================================================
+// Demonstrates:
+//   - Sequence literal notation with angle brackets
+//   - Tuple projection operators (.1, .2)
+//   - Bag literal notation with double brackets
+//   - Combined sequence operations (head, tail, concatenation)
+//
+// Features:
+//   - ⟨a⟩, ⟨a, b⟩ [sequence literals]
+//   - x.1, x.2 [tuple projection]
+//   - [[a]], [[a, b, c]] [bag literals]
+//   - head s, tail s [sequence operations]
+//   - s1 ⌢ s2 [sequence concatenation]
+//
+// See: docs/USER_GUIDE.md - Sections "Sequences", "Tuples", "Bags"
+// ============================================================================
+
 === Phase 12 Feature Tests ===
 
 ** Test 1: Sequence Literals from Solution 37 **

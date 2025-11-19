@@ -1,0 +1,247 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Distributivity of AND over OR}
+
+\section*{Problem Statement}
+\addcontentsline{toc}{section}{Problem Statement}
+
+\noindent Prove that conjunction (and) distributes over disjunction (or):
+
+\bigskip
+
+\noindent $(p \land (q \lor r))$ $\Leftrightarrow$ $((p \land q) \lor
+(p \land r))$
+
+\bigskip
+
+\noindent This requires proving both directions:
+
+\bigskip
+
+\noindent 1. Forward direction: $(p \land (q \lor r))$ $\Rightarrow$
+$((p \land q) \lor (p \land r))$
+
+\bigskip
+
+\noindent 2. Backward direction: $((p \land q) \lor (p \land r))$
+$\Rightarrow$ $(p \land (q \lor r))$
+
+\bigskip
+
+\section*{Solution : Forward Direction}
+\addcontentsline{toc}{section}{Solution : Forward Direction}
+
+\noindent First, we prove the forward implication. Starting from p
+and $(q \lor r)$,
+
+\bigskip
+
+\noindent we extract p and $(q \lor r)$ separately, then case-analyze
+on $(q \lor r)$.
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land (q \lor r))
+    \implies ((p \land q) \lor (p \land r))}{
+      \ulcorner p \land (q \lor r) \urcorner^{[1]}
+      &
+      \infer[\lor\textrm{-elim}^{[2]}]{(p \land q) \lor (p \land r)}{
+        \ulcorner q \lor r \urcorner^{[1]}
+        &
+        \raiseproof{10ex}{\infer[\lor \mathrm{intro}]{(p \land q)
+          \lor (p \land r)}{\infer[\land \mathrm{intro}]{p \land q}{
+              \infer[\land\textrm{-elim}^{[1]}]{p}{}
+              &
+              \infer[\mathrm{case} \mathrm{assumption}]{q}{}
+        }}}
+        &
+        \hskip 6em \raiseproof{26ex}{\infer[\lor \mathrm{intro}]{(p
+          \land q) \lor (p \land r)}{\infer[\land \mathrm{intro}]{p \land r}{
+              \infer[\land\textrm{-elim}^{[1]}]{p}{}
+              &
+              \infer[\mathrm{case} \mathrm{assumption}]{r}{}
+        }}}
+      }
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Key insight: We extract p once, then use it in both cases
+after splitting on $(q \lor r)$.
+
+\bigskip
+
+\section*{Solution : Backward Direction}
+\addcontentsline{toc}{section}{Solution : Backward Direction}
+
+\noindent For the backward direction, we start with $(p \land q)$ or
+$(p \land r)$ and
+
+\bigskip
+
+\noindent case-analyze on the outer disjunction. In each case, we extract p and
+
+\bigskip
+
+\noindent one of q or r, then rebuild p and $(q \lor r)$.
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[3]}]{((p \land q) \lor (p
+    \land r)) \implies (p \land (q \lor r))}{
+      \ulcorner (p \land q) \lor (p \land r) \urcorner^{[3]}
+      &
+      \infer[\lor\textrm{-elim}^{[4]}]{p \land (q \lor r)}{
+        \ulcorner case1 \lor case2 \urcorner^{[3]}
+        &
+        \raiseproof{8ex}{\infer[\land \mathrm{intro}]{p \land (q \lor
+          r)}{\infer[\land \mathrm{elim}]{p}{} & \infer[\lor
+        \mathrm{intro}]{q \lor r}{}}}
+        &
+        \hskip 6em \raiseproof{22ex}{\infer[\land \mathrm{intro}]{p
+          \land (q \lor r)}{\infer[\land \mathrm{elim}]{p}{} &
+        \infer[\lor \mathrm{intro}]{q \lor r}{}}}
+      }
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Key insight: Both cases yield the same conclusion p and $(q
+\lor r)$, since
+
+\bigskip
+
+\noindent we can inject q or r into $(q \lor r)$ using or introduction.
+
+\bigskip
+
+\section*{Combining Both Directions}
+\addcontentsline{toc}{section}{Combining Both Directions}
+
+\noindent Having proven both directions:
+
+\bigskip
+
+\noindent - $(p \land (q \lor r))$ $\Rightarrow$ $((p \land q) \lor
+(p \land r))$
+
+\bigskip
+
+\noindent - $((p \land q) \lor (p \land r))$ $\Rightarrow$ $(p \land
+(q \lor r))$
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent We can combine them $using \iff introduction$ to conclude:
+
+\bigskip
+
+\noindent $(p \land (q \lor r))$ $\Leftrightarrow$ $((p \land q) \lor
+(p \land r))$
+
+\bigskip
+
+\section*{Reflection}
+\addcontentsline{toc}{section}{Reflection}
+
+\noindent This proof demonstrates several important techniques:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 1. **Bidirectional proof structure**: Equivalences require
+proving both directions
+
+\bigskip
+
+\noindent 2. **Case analysis**: Essential for handling disjunctions (or)
+
+\bigskip
+
+\noindent 3. **Assumption management**: Clear labeling prevents confusion
+
+\bigskip
+
+\noindent 4. **Proof symmetry**: Both directions use similar patterns
+but different orders
+
+\bigskip
+
+\noindent 5. **Combining inference rules**: Multiple rules work
+together naturally
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent The distributive law is fundamental in logic and appears
+frequently in:
+
+\bigskip
+
+\noindent - Simplifying logical expressions
+
+\bigskip
+
+\noindent - Converting to disjunctive normal form (DNF)
+
+\bigskip
+
+\noindent - Optimizing boolean circuits
+
+\bigskip
+
+\noindent - Reasoning about program correctness
+
+\bigskip
+
+\section*{Exercise for the Reader}
+\addcontentsline{toc}{section}{Exercise for the Reader}
+
+\noindent Try proving the dual distributive law:
+
+\bigskip
+
+\noindent p or $(q \land r)$ $\Leftrightarrow$ $(p \lor q)$ and $(p \lor r)$
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent This proof will use similar techniques but with the roles
+of and/or reversed.
+
+\bigskip
+
+\end{document}

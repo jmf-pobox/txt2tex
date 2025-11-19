@@ -1,3 +1,20 @@
+// ============================================================================
+// Reference: Solution 40 Fragment Test
+// ============================================================================
+// Description:
+//   - Test fragment for Solution 40 features
+//   - Anonymous schema definitions
+//   - Generic type instantiation with sequences (seq[T])
+//   - Tuple projection operations
+//
+// Topics:
+//   - Anonymous schema syntax
+//   - seq[N], seq[Title cross Length cross Viewed]
+//   - Tuple projection p.1, p.2
+//
+// See: docs/USER_GUIDE.md - Sections "Schemas", "Sequences", "Tuples"
+// ============================================================================
+
 === Testing Solution 40 Features ===
 
 ** Test 1: Anonymous Schema **

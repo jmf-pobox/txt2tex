@@ -1,0 +1,674 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Children and Grandchildren Functions}
+
+\section*{Problem Statement}
+\addcontentsline{toc}{section}{Problem Statement}
+
+\noindent Given a parentOf relation, define functions to:
+
+\bigskip
+
+\subsection*{(a)}
+
+\noindent Return the set of all children for a person
+
+\bigskip
+
+\medskip
+
+\subsection*{(b)}
+
+\noindent Count the number of grandchildren for a person
+
+\bigskip
+
+\section*{Prerequisites}
+\addcontentsline{toc}{section}{Prerequisites}
+
+\noindent This example builds on the family relationships model. We assume:
+
+\bigskip
+
+\begin{zed}[Person]
+\end{zed}
+
+\begin{axdef}
+  parentOf : Person \rel Person
+\end{axdef}
+
+\noindent Recall that parentOf represents direct parent-child relationships.
+
+\bigskip
+
+\noindent If (p, c) in parentOf, then p is a parent of c.
+
+\bigskip
+
+\section*{Solution ( a ) : Children Function}
+\addcontentsline{toc}{section}{Solution ( a ) : Children Function}
+
+\noindent We want a function that maps each person to their set of children.
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Type $signature : children $: $Person \fun \power$ Person
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent For each person p, children(p) is the set of all people c
+where p is a parent of c.
+
+\bigskip
+
+\begin{axdef}
+  children : Person \fun \power Person
+  \where
+  children = \{ p : Person @ p \mapsto (parentOf \limg \{p\} \rimg) \}
+\end{axdef}
+
+\noindent Let's break down this definition:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Step 1: Set comprehension structure
+
+\bigskip
+
+\noindent {$p : Person $. p $\mapsto$ ...}
+
+\bigskip
+
+\noindent This creates a function (set of maplets) from Person to P Person.
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Step 2: Relation image
+
+\bigskip
+
+\noindent parentOf(| $\{p\}$ |)
+
+\bigskip
+
+\noindent This applies the parentOf relation to the singleton set $\{p\}$.
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Recall: R(| A |) = $\{ y | \exists x : A @ x \mapsto y \in R \}$
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent $So : parentOf(| $$\{p\}$ |) = $\{ c | p \mapsto c \in parentOf \}$
+
+\bigskip
+
+\noindent = the set of all children of p
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Step 3: Complete maplet
+
+\bigskip
+
+\noindent p $\mapsto$ parentOf(| $\{p\}$ |)
+
+\bigskip
+
+\noindent Maps person p to their set of children.
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Alternative equivalent definition using explicit set comprehension:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent children = $\{ p : Person @ p \mapsto \{ c : Person | p
+\mapsto c \in parentOf \} \}$
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent The relation image version is more concise and $idiomatic
+\in Z$ notation.
+
+\bigskip
+
+\section*{Understanding Relation Image}
+\addcontentsline{toc}{section}{Understanding Relation Image}
+
+\noindent The relation image operator (| ... |) is a powerful tool:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Examples:
+
+\bigskip
+
+\noindent - parentOf(| $\{Alice\}$ |) = set of Alice's children
+
+\bigskip
+
+\noindent - parentOf(| $\{Alice, Bob\}$ |) = set of children of Alice or Bob
+
+\bigskip
+
+\noindent - parentOf(| $\emptyset$ |) = $\emptyset$
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Key properties:
+
+\bigskip
+
+\noindent 1. R(| A union B |) = R(| A |) union R(| B |)
+
+\bigskip
+
+\noindent 2. R(| $\emptyset$ |) = $\emptyset$
+
+\bigskip
+
+\noindent 3. R(| A |) subseteq ran R
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Intuition: Given a relation R and a set of starting points A,
+
+\bigskip
+
+\noindent the image R(| A |) is the set of all endpoints reachable from A via R.
+
+\bigskip
+
+\section*{Solution ( b ) : Number of Grandchildren Function}
+\addcontentsline{toc}{section}{Solution ( b ) : Number of
+Grandchildren Function}
+
+\noindent We want a function that counts grandchildren for each person.
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Type $signature : number_of_grandchildren $: $Person \fun \nat$
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Grandchildren are children of children, which we can
+express via composition.
+
+\bigskip
+
+\begin{axdef}
+  number\_of\_grandchildren : Person \fun \nat
+  \where
+  number\_of\_grandchildren = \{ p : Person @ p \mapsto \# ((parentOf
+  \circ parentOf) \limg \{p\} \rimg) \}
+\end{axdef}
+
+\noindent Let's break down this definition:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Step 1: Relation composition
+
+\bigskip
+
+\noindent parentOf $\circ$ parentOf
+
+\bigskip
+
+\noindent This composes parentOf with itself:
+
+\bigskip
+
+\noindent If (p, c) in parentOf and (c, g) in parentOf,
+
+\bigskip
+
+\noindent then (p, g) in (parentOf $\circ$ parentOf)
+
+\bigskip
+
+\noindent Meaning: p is a grandparent of g.
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Step 2: Relation image
+
+\bigskip
+
+\noindent (parentOf $\circ$ parentOf)(| $\{p\}$ |)
+
+\bigskip
+
+\noindent Apply the grandparent relation to $\{p\}$.
+
+\bigskip
+
+\noindent Result: the set of all grandchildren of p.
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Step 3: Cardinality
+
+\bigskip
+
+\noindent # (parentOf $\circ$ parentOf)(| $\{p\}$ |)
+
+\bigskip
+
+\noindent Count the number of grandchildren.
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Step 4: Complete maplet
+
+\bigskip
+
+\noindent p $\mapsto$ # (parentOf $\circ$ parentOf)(| $\{p\}$ |)
+
+\bigskip
+
+\noindent Maps person p to their grandchild count.
+
+\bigskip
+
+\section*{Alternative Approaches}
+\addcontentsline{toc}{section}{Alternative Approaches}
+
+\noindent We can express the same functions using different styles:
+
+\bigskip
+
+\noindent **Approach 1: Relation image (shown above)**
+
+\bigskip
+
+\noindent + Most concise
+
+\bigskip
+
+\noindent + Idiomatic Z notation
+
+\bigskip
+
+\noindent + Leverages relation algebra
+
+\bigskip
+
+\noindent - Requires understanding of (| |) operator
+
+\bigskip
+
+\noindent **Approach 2: Explicit set comprehension**
+
+\bigskip
+
+\begin{axdef}
+  children\_alt : Person \fun \power Person
+  \where
+  \forall p : Person @ children\_alt(p) = \{ c : Person | p \mapsto c
+  \in parentOf \}
+\end{axdef}
+
+\begin{axdef}
+  number\_of\_grandchildren\_alt : Person \fun \nat
+  \where
+  \forall p : Person @ number\_of\_grandchildren\_alt(p) = \# \{ g :
+    Person | \exists c : Person @ p \mapsto c \in parentOf \land c
+  \mapsto g \in parentOf \}
+\end{axdef}
+
+\noindent **Approach 3: Using previously defined functions**
+
+\bigskip
+
+\begin{axdef}
+  grandchildren : Person \fun \power Person
+  \where
+  \forall p : Person @ grandchildren(p) = \bigcup \{ c : children(p)
+  @ children(c) \}
+\end{axdef}
+
+\begin{axdef}
+  number\_of\_grandchildren\_v3 : Person \fun \nat
+  \where
+  \forall p : Person @ number\_of\_grandchildren\_v3(p) = \# (grandchildren(p))
+\end{axdef}
+
+\noindent All three approaches are mathematically equivalent. Choose based on:
+
+\bigskip
+
+\noindent - Readability for your audience
+
+\bigskip
+
+\noindent - Consistency with surrounding specifications
+
+\bigskip
+
+\noindent - Performance considerations (if using a model checker)
+
+\bigskip
+
+\section*{Usage Examples}
+\addcontentsline{toc}{section}{Usage Examples}
+
+\noindent Given a specific family structure:
+
+\bigskip
+
+\noindent Suppose:
+
+\bigskip
+
+\noindent - Alice has $children : Bob, Carol$
+
+\bigskip
+
+\noindent - Bob has $children : Dave, Eve$
+
+\bigskip
+
+\noindent - Carol has $children : Frank$
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Then:
+
+\bigskip
+
+\noindent children(Alice) = $\{Bob, Carol\}$
+
+\bigskip
+
+\noindent children(Bob) = $\{Dave, Eve\}$
+
+\bigskip
+
+\noindent children(Carol) = $\{Frank\}$
+
+\bigskip
+
+\noindent number\_of\_grandchildren(Alice) = 3 (Dave, Eve, Frank)
+
+\bigskip
+
+\noindent number\_of\_grandchildren(Bob) = 0
+
+\bigskip
+
+\noindent number\_of\_grandchildren(Carol) = 0
+
+\bigskip
+
+\section*{Design Patterns}
+\addcontentsline{toc}{section}{Design Patterns}
+
+\noindent This example illustrates several key patterns:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 1. **Functions returning sets**: Use P X for set-valued functions
+
+\bigskip
+
+\noindent - Common in modeling relationships with variable cardinality
+
+\bigskip
+
+\noindent - children: $Person \fun \power$ Person (a person may have
+0+ children)
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 2. **Relation image for set operations**: Use (| ... |)
+instead of comprehensions
+
+\bigskip
+
+\noindent - More $concise : R(| $$\{x\}$ |) vs $\{ y | x \mapsto y \in R \}$
+
+\bigskip
+
+\noindent - More compositional: easy to combine with other operators
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 3. **Composition for multi-step relationships**: Use
+$\circ$ instead of nested quantifiers
+
+\bigskip
+
+\noindent - $Grandchildren : parentOf  \circ  parentOf$
+
+\bigskip
+
+\noindent - Great-$grandchildren : parentOf  \circ  parentOf  \circ  parentOf$
+
+\bigskip
+
+\noindent - General $ancestors : parentOf+$
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 4. **Cardinality for counting**: Use # to convert sets to numbers
+
+\bigskip
+
+\noindent - Essential for quantitative properties
+
+\bigskip
+
+\noindent - number\_of\_grandchildren uses # on the grandchild set
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 5. **Progressive abstraction**: Build complex functions
+from simpler ones
+
+\bigskip
+
+\noindent - Define children first
+
+\bigskip
+
+\noindent - Use children to define grandchildren
+
+\bigskip
+
+\noindent - Use grandchildren to define counting function
+
+\bigskip
+
+\section*{Specification Completeness}
+\addcontentsline{toc}{section}{Specification Completeness}
+
+\noindent Complete axiomatic definitions with all functions:
+
+\bigskip
+
+\begin{axdef}
+  parentOf : Person \rel Person \\
+  children : Person \fun \power Person \\
+  grandchildren : Person \fun \power Person \\
+  number\_of\_grandchildren : Person \fun \nat
+  \where
+  children = \{ p : Person @ p \mapsto (parentOf \limg \{p\} \rimg) \} \\
+  grandchildren = \{ p : Person @ p \mapsto ((parentOf \circ
+  parentOf) \limg \{p\} \rimg) \} \\
+  number\_of\_grandchildren = \{ p : Person @ p \mapsto \# (grandchildren(p)) \}
+\end{axdef}
+
+\section*{Exercise for the Reader}
+\addcontentsline{toc}{section}{Exercise for the Reader}
+
+\noindent 1. Define a function $descendants : Person  \fun  P Person$
+
+\bigskip
+
+\noindent that returns all descendants (children, grandchildren, etc.)
+
+\bigskip
+
+\noindent $Hint : use transitive closure (+)$
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 2. Define a function $oldest\_child : Person  \pfun  Person$
+
+\bigskip
+
+\noindent that returns the oldest child of a person (partial function)
+
+\bigskip
+
+\noindent $Hint : you$'ll need an age function
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 3. Prove that: # grandchildren(p) = sum {# children(c)
+$\mid$ c in children(p)}
+
+\bigskip
+
+\noindent (The number of grandchildren equals the sum of each child's children)
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 4. What constraints should parentOf satisfy to ensure:
+
+\bigskip
+
+\noindent - No cycles (no one is their own ancestor)
+
+\bigskip
+
+\noindent - Consistent cardinality (if p in children(x), then x in
+parentOf(| $\{p\}$ |))
+
+\bigskip
+
+\end{document}

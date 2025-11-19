@@ -1,0 +1,251 @@
+// ============================================================================
+// Complete Example: Family Relationships with Relations
+// ============================================================================
+// Course: Formal Methods
+// Topic: Relations - Composition, Inverse, Transitive Closure
+// Difficulty: Intermediate
+//
+// This example demonstrates:
+//   - Defining relations between given types
+//   - Relation inverse (converse operator ~)
+//   - Relation composition (forward o9 and backward o)
+//   - Transitive closure (+)
+//   - Identity relation (id[X])
+//   - Relation subtraction (\)
+//   - Abbreviation definitions (==)
+//
+// Learning Goals:
+//   1. Model real-world relationships using formal relations
+//   2. Build complex relations from simple primitive relations
+//   3. Understand relation composition semantics
+//   4. Apply transitive closure for recursive relationships
+//   5. Use relation algebra to express family concepts
+//
+// Design Decisions:
+//   - Start with one primitive relation (childOf) as the foundation
+//   - Derive all other relations from this primitive
+//   - Use relation operators instead of explicit set comprehensions
+//   - Demonstrate multiple equivalent notations (operators vs comprehensions)
+//   - Show idiomatic Z notation patterns
+//
+// Domain Model:
+//   We model family relationships starting from a single primitive:
+//     childOf : Person <-> Person
+//
+//   From this, we derive:
+//     - parentOf (inverse of childOf)
+//     - siblingOf (share a parent, but not yourself)
+//     - cousinOf (parents are siblings)
+//     - ancestorOf (transitive closure of parentOf)
+//
+// Mathematical Relationships:
+//   - parentOf is the converse (inverse) of childOf
+//   - siblingOf is symmetric: if A is sibling of B, then B is sibling of A
+//   - cousinOf is also symmetric
+//   - ancestorOf is transitive: if A is ancestor of B and B is ancestor of C,
+//     then A is ancestor of C
+//
+// Notation Notes:
+//   - R~ denotes the inverse (converse) of relation R
+//   - R o9 S denotes forward composition (apply R first, then S)
+//   - R+ denotes transitive closure (one or more applications)
+//   - R* denotes reflexive-transitive closure (zero or more applications)
+//   - id[X] denotes the identity relation on type X
+//
+// Alternative Definitions:
+//   For each abbreviation, we show multiple equivalent ways to express
+//   the same concept, demonstrating flexibility of Z notation.
+//
+// See: docs/USER_GUIDE.md - Section "Relations"
+//      examples/07_relations/ - Basic relation operations
+//      TUTORIAL_06.md - Relations tutorial
+// ============================================================================
+
+=== Family Relationships ===
+
+** Problem Statement **
+
+TEXT: Given a primitive relation childOf between people, define derived relations
+TEXT: for parentOf, siblingOf, cousinOf, and ancestorOf using relation operators.
+
+** Domain Setup **
+
+TEXT: We work with a given type Person and one primitive relation:
+
+given Person
+
+axdef
+  childOf : Person <-> Person
+end
+
+TEXT: The childOf relation represents direct parent-child relationships.
+TEXT: If (x, y) in childOf, then x is a child of y.
+TEXT:
+TEXT: From this single primitive, we can derive all other family relationships.
+
+** Solution (a): Parent Relationship **
+
+TEXT: A parent is simply the inverse (converse) of a child:
+
+parentOf == childOf~
+
+TEXT: Alternative equivalent definitions:
+TEXT:
+TEXT:   Method 1 (using relation inverse):
+TEXT:     parentOf == childOf~
+TEXT:
+TEXT:   Method 2 (using set comprehension):
+TEXT:     parentOf == {x, y : Person | x |-> y in childOf . y |-> x}
+TEXT:
+TEXT:   Method 3 (using axiomatic definition):
+TEXT:     axdef
+TEXT:       parentOf : Person <-> Person
+TEXT:     where
+TEXT:       parentOf = childOf~
+TEXT:     end
+TEXT:
+TEXT: All three methods are mathematically equivalent. The first is most idiomatic
+TEXT: in Z notation and clearly expresses the "inverse of childOf" concept.
+TEXT:
+TEXT: Properties of parentOf:
+TEXT:   - If (x, y) in parentOf, then x is a parent of y
+TEXT:   - dom(parentOf) = set of all people who are parents
+TEXT:   - ran(parentOf) = set of all people who have parents
+
+** Solution (b): Sibling Relationship **
+
+TEXT: Siblings are people who share at least one parent, excluding yourself:
+
+siblingOf == (childOf o9 parentOf) \ id[Person]
+
+TEXT: Let's break this down step by step:
+TEXT:
+TEXT: Step 1: childOf o9 parentOf
+TEXT:   This composition connects two people who share a common parent.
+TEXT:   If (x, p) in childOf and (p, y) in parentOf, then (x, y) is in the composition.
+TEXT:   This includes the case where x = y (you share parents with yourself).
+TEXT:
+TEXT: Step 2: id[Person]
+TEXT:   The identity relation contains all pairs (x, x).
+TEXT:   This represents the "share parents with yourself" case.
+TEXT:
+TEXT: Step 3: (childOf o9 parentOf) \ id[Person]
+TEXT:   Subtract the identity relation to remove self-loops.
+TEXT:   Result: all pairs of people who share parents, excluding yourself.
+TEXT:
+TEXT: Alternative equivalent definition using set comprehension:
+TEXT:   siblingOf == {x, y : Person | x /= y and
+TEXT:                 (exists p : Person | x |-> p in childOf and
+TEXT:                                       p |-> y in parentOf)}
+TEXT:
+TEXT: Properties of siblingOf:
+TEXT:   - siblingOf is symmetric: if x is sibling of y, then y is sibling of x
+TEXT:   - siblingOf is irreflexive: no one is their own sibling
+TEXT:   - This definition includes half-siblings (share one parent)
+
+** Solution (c): Cousin Relationship **
+
+TEXT: Cousins are people whose parents are siblings:
+
+cousinOf == childOf o9 siblingOf o9 parentOf
+
+TEXT: Let's trace the composition chain:
+TEXT:
+TEXT: Step 1: childOf
+TEXT:   Start with person x and their parent p1: (x, p1) in childOf
+TEXT:
+TEXT: Step 2: siblingOf
+TEXT:   Find p1's sibling p2: (p1, p2) in siblingOf
+TEXT:
+TEXT: Step 3: parentOf
+TEXT:   Find p2's children y: (p2, y) in parentOf
+TEXT:
+TEXT: Result: (x, y) in cousinOf means x and y are cousins
+TEXT:   (their parents p1 and p2 are siblings)
+TEXT:
+TEXT: Expanded reasoning:
+TEXT:   - (x, p1) in childOf: x is a child of p1
+TEXT:   - (p1, p2) in siblingOf: p1 and p2 are siblings
+TEXT:   - (p2, y) in parentOf: p2 is a parent of y
+TEXT:   - Therefore: x and y are cousins (first cousins)
+TEXT:
+TEXT: Properties of cousinOf:
+TEXT:   - cousinOf is symmetric
+TEXT:   - This definition captures first cousins only
+TEXT:   - For second cousins, you would need (childOf o9 siblingOf o9 parentOf)+
+
+** Solution (d): Ancestor Relationship **
+
+TEXT: An ancestor is a parent, or a parent of a parent, recursively:
+
+ancestorOf == parentOf+
+
+TEXT: The transitive closure operator (+) computes:
+TEXT:   R+ = R union (R o9 R) union (R o9 R o9 R) union ...
+TEXT:
+TEXT: For parentOf+:
+TEXT:   - Includes direct parents (parentOf)
+TEXT:   - Includes grandparents (parentOf o9 parentOf)
+TEXT:   - Includes great-grandparents (parentOf o9 parentOf o9 parentOf)
+TEXT:   - And so on, for all ancestor generations
+TEXT:
+TEXT: Alternative recursive definition:
+TEXT:   ancestorOf is the smallest relation such that:
+TEXT:     1. parentOf subseteq ancestorOf
+TEXT:     2. ancestorOf o9 parentOf subseteq ancestorOf
+TEXT:
+TEXT: Properties of ancestorOf:
+TEXT:   - ancestorOf is transitive: if x ancestor of y and y ancestor of z,
+TEXT:     then x ancestor of z
+TEXT:   - ancestorOf is irreflexive (assuming no cyclic families)
+TEXT:   - dom(ancestorOf) = people who have descendants
+TEXT:   - ran(ancestorOf) = people who have ancestors
+
+** Summary of Definitions **
+
+TEXT: Complete specification:
+
+parentOf == childOf~
+siblingOf == (childOf o9 parentOf) \ id[Person]
+cousinOf == childOf o9 siblingOf o9 parentOf
+ancestorOf == parentOf+
+
+TEXT: Additional derived relations you might define:
+TEXT:
+TEXT:   grandparentOf == parentOf o9 parentOf
+TEXT:   auntOrUncleOf == siblingOf o9 parentOf
+TEXT:   nieceOrNephewOf == (auntOrUncleOf)~
+TEXT:   descendantOf == ancestorOf~
+
+** Design Patterns **
+
+TEXT: This example illustrates several key patterns in formal specification:
+TEXT:
+TEXT: 1. **Primitive vs derived**: Start with minimal primitives, derive everything else
+TEXT:    - Only childOf is primitive (could be parentOf instead)
+TEXT:    - All other relations are derived using operators
+TEXT:
+TEXT: 2. **Relation algebra**: Use operators instead of explicit set comprehensions
+TEXT:    - Inverse (~) for bidirectional relationships
+TEXT:    - Composition (o9) for multi-step connections
+TEXT:    - Transitive closure (+) for recursive relationships
+TEXT:
+TEXT: 3. **Identity removal**: Use (R \ id[X]) to make relations irreflexive
+TEXT:    - Essential for siblingOf (you're not your own sibling)
+TEXT:    - Common pattern in many specifications
+TEXT:
+TEXT: 4. **Operator chaining**: Compose multiple operators for complex relationships
+TEXT:    - cousinOf chains three relations together
+TEXT:    - Order matters: childOf o9 siblingOf o9 parentOf
+TEXT:
+TEXT: 5. **Semantic clarity**: Names should match domain concepts exactly
+TEXT:    - parentOf, not "inverse_childOf"
+TEXT:    - ancestorOf, not "transitive_parentOf"
+
+** Exercise for the Reader **
+
+TEXT: 1. Define descendantOf using existing relations
+TEXT: 2. Define grandchildOf two ways: using composition and using descendantOf
+TEXT: 3. Prove that siblingOf is symmetric using relation algebra
+TEXT: 4. What properties must childOf satisfy for this model to be realistic?
+TEXT:    (Hint: consider cycles, reflexivity, domain constraints)

@@ -1,3 +1,22 @@
+// ============================================================================
+// Example: Sequence Concatenation
+// ============================================================================
+// Demonstrates:
+//   - Sequence concatenation operator (^)
+//   - Concatenation with sequence literals and variables
+//   - Cons pattern for building sequences
+//   - Associativity of concatenation
+//
+// Features:
+//   - <a> ^ <b> [simple concatenation]
+//   - <x> ^ s [cons with variable]
+//   - s ^ t [variable concatenation]
+//   - <> ^ t [empty sequence identity]
+//   - (s ^ t) ^ u [associative]
+//
+// See: docs/USER_GUIDE.md - Section "Sequences" > "Concatenation"
+// ============================================================================
+
 === Sequence Concatenation ===
 
 ** Example 1: Simple Concatenation (ASCII) **

@@ -1,3 +1,21 @@
+// ============================================================================
+// Example: Complex Formulas Combining Multiple Features
+// ============================================================================
+// Demonstrates:
+//   - Quantifiers (forall, exists) with operators
+//   - Subscripts and superscripts in formulas
+//   - Comparison operators (<, >, <=, >=)
+//   - Set operators (in, subset, union, intersect)
+//   - EQUIV: blocks for equivalence chains
+//
+// Features:
+//   - Combining propositional logic with quantifiers
+//   - Mathematical notation in propositions
+//   - Truth tables integrated with complex formulas
+//
+// See: docs/USER_GUIDE.md - Sections "Propositional Logic", "Predicate Logic"
+// ============================================================================
+
 === Phase 3: Quantifiers and Mathematical Notation ===
 
 ** Example 1: Quantifiers **

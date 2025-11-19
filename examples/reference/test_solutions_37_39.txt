@@ -1,3 +1,19 @@
+// ============================================================================
+// Reference: Solutions 37-39 Test (ASCII Sequences)
+// ============================================================================
+// Description:
+//   - Test file for Solutions 37-39 using ASCII sequence notation
+//   - Demonstrates ASCII angle brackets <> instead of Unicode ⟨⟩
+//   - Sequence operations, maplets, sets
+//
+// Topics:
+//   - Solution 37: ASCII sequence notation
+//   - Maplet notation for relations
+//   - Set literals and operations
+//
+// See: docs/USER_GUIDE.md - Sections "Sequences", "Relations"
+// ============================================================================
+
 === Sequences ===
 
 ** Solution 37 **

@@ -1,0 +1,242 @@
+// ============================================================================
+// Example: Generic Definitions (Advanced)
+// ============================================================================
+// Demonstrates:
+//   - Complex generic patterns
+//   - Multiple type parameters
+//   - Generic schemas
+//   - Higher-order generic functions
+//   - Nested generic types
+//
+// Features:
+//   - gendef with 2-3 type parameters
+//   - Generic schemas and state
+//   - Function types as parameters
+//   - Generic data structures
+//
+// See: docs/USER_GUIDE.md - Section "Generic Definitions" > "Advanced Patterns"
+// ============================================================================
+
+=== Advanced Generic Definitions ===
+
+** Example 1: Generic Three-Way Product **
+
+TEXT: Generic function for three-component tuples:
+
+gendef [X, Y, Z]
+  triple : X cross Y cross Z -> X cross Y cross Z
+  getFirst : X cross Y cross Z -> X
+  getSecond : X cross Y cross Z -> Y
+  getThird : X cross Y cross Z -> Z
+where
+  forall x : X; y : Y; z : Z |
+    triple(x, y, z) = (x, y, z) and
+    getFirst(x, y, z) = x and
+    getSecond(x, y, z) = y and
+    getThird(x, y, z) = z
+end
+
+TEXT: Projection functions for triples.
+
+** Example 2: Generic Map Function **
+
+TEXT: Map a function over a sequence:
+
+gendef [X, Y]
+  map : (X -> Y) cross seq X -> seq Y
+where
+  forall f : X -> Y | map(f, ⟨⟩) = ⟨⟩
+  forall f : X -> Y; x : X; s : seq X |
+    map(f, ⟨x⟩ ⌢ s) = ⟨f(x)⟩ ⌢ map(f, s)
+end
+
+TEXT: This applies function f to each element of the sequence.
+
+** Example 3: Generic Filter Function **
+
+TEXT: Filter a sequence based on a predicate:
+
+gendef [X]
+  filter : (X -> B) cross seq X -> seq X
+where
+  forall p : X -> B | filter(p, ⟨⟩) = ⟨⟩
+  forall p : X -> B; x : X; s : seq X |
+    filter(p, ⟨x⟩ ⌢ s) =
+      if p(x) = true then ⟨x⟩ ⌢ filter(p, s) else filter(p, s)
+end
+
+TEXT: Keeps only elements where the predicate returns true.
+
+** Example 4: Generic Fold (Reduce) **
+
+TEXT: Fold a binary operation over a sequence:
+
+gendef [X, Y]
+  foldl : (Y cross X -> Y) cross Y cross seq X -> Y
+where
+  forall f : Y cross X -> Y; acc : Y | foldl(f, acc, ⟨⟩) = acc
+  forall f : Y cross X -> Y; acc : Y; x : X; s : seq X |
+    foldl(f, acc, ⟨x⟩ ⌢ s) = foldl(f, f(acc, x), s)
+end
+
+TEXT: Left fold with accumulator.
+
+** Example 5: Generic Binary Tree **
+
+TEXT: Define a generic binary tree structure:
+
+gendef [X]
+  Tree_X ::= leaf | node⟨X × Tree_X × Tree_X⟩
+end
+
+TEXT: A tree is either a leaf or a node containing a value and two subtrees.
+
+** Example 6: Generic State Schema **
+
+TEXT: A generic container with capacity:
+
+gendef [X]
+  schema Container_X
+    contents : seq X
+    capacity : N
+  where
+    # contents <= capacity
+  end
+end
+
+TEXT: This schema is parameterized by the element type X.
+
+** Example 7: Generic Relation Operations **
+
+TEXT: Relational composition for any types:
+
+gendef [X, Y, Z]
+  compose : (X <-> Y) cross (Y <-> Z) -> (X <-> Z)
+where
+  forall R : X <-> Y; S : Y <-> Z |
+    compose(R, S) = R o9 S
+end
+
+TEXT: Composes two relations.
+
+** Example 8: Generic Option Type with Operations **
+
+gendef [X]
+  Option_X ::= none | some⟨X⟩
+  isSome : Option_X -> B
+  isNone : Option_X -> B
+  getValue : Option_X -> X
+where
+  isSome(none) = false
+  forall x : X | isSome(some(x)) = true
+  isNone(none) = true
+  forall x : X | isNone(some(x)) = false
+  forall x : X | getValue(some(x)) = x
+end
+
+TEXT: Optional values with accessor functions.
+
+** Example 9: Generic Stack Schema **
+
+gendef [X]
+  schema Stack_X
+    items : seq X
+    maxSize : N
+  where
+    # items <= maxSize
+  end
+
+  push_X : Stack_X cross X -> Stack_X
+  pop_X : Stack_X -> Stack_X
+  top_X : Stack_X -> X
+where
+  forall s : Stack_X; x : X |
+    # (s.items) < s.maxSize =>
+    push_X(s, x).items = s.items ⌢ ⟨x⟩ and
+    push_X(s, x).maxSize = s.maxSize
+
+  forall s : Stack_X |
+    # (s.items) > 0 =>
+    pop_X(s).items = front(s.items) and
+    pop_X(s).maxSize = s.maxSize
+
+  forall s : Stack_X |
+    # (s.items) > 0 =>
+    top_X(s) = last(s.items)
+end
+
+TEXT: Generic stack with push, pop, and top operations.
+
+** Example 10: Generic Pair with Constraints **
+
+gendef [X, Y]
+  schema OrderedPair_XY
+    first : X
+    second : Y
+  where
+    first in X and second in Y
+  end
+end
+
+TEXT: A constrained pair type.
+
+** Example 11: Generic Equality **
+
+TEXT: Generic equality testing:
+
+gendef [X]
+  equals : X cross X -> B
+where
+  forall x, y : X |
+    (equals(x, y) = true <=> x = y) and
+    (equals(x, y) = false <=> x /= y)
+end
+
+TEXT: Explicit equality function.
+
+** Example 12: Generic Zip Function **
+
+TEXT: Combine two sequences into a sequence of pairs:
+
+gendef [X, Y]
+  zip : seq X cross seq Y -> seq(X cross Y)
+where
+  zip(⟨⟩, ⟨⟩) = ⟨⟩
+  forall x : X; y : Y; xs : seq X; ys : seq Y |
+    zip(⟨x⟩ ⌢ xs, ⟨y⟩ ⌢ ys) = ⟨(x, y)⟩ ⌢ zip(xs, ys)
+  forall xs : seq X | zip(xs, ⟨⟩) = ⟨⟩
+  forall ys : seq Y | zip(⟨⟩, ys) = ⟨⟩
+end
+
+TEXT: Pairs up corresponding elements from two sequences.
+
+** Example 13: Practical Example - Generic Database Table **
+
+gendef [Key, Value]
+  schema Table_KV
+    entries : Key +-> Value
+    size : N
+  where
+    size = # (dom entries)
+  end
+
+  lookup_KV : Table_KV cross Key -> Option_Value
+  insert_KV : Table_KV cross Key cross Value -> Table_KV
+  delete_KV : Table_KV cross Key -> Table_KV
+where
+  forall t : Table_KV; k : Key |
+    k in dom (t.entries) =>
+    lookup_KV(t, k) = some((t.entries)(k))
+
+  forall t : Table_KV; k : Key |
+    k notin dom (t.entries) =>
+    lookup_KV(t, k) = none
+
+  forall t : Table_KV; k : Key; v : Value |
+    insert_KV(t, k, v).entries = (t.entries) ++ {k |-> v}
+
+  forall t : Table_KV; k : Key |
+    delete_KV(t, k).entries = {k} <-| (t.entries)
+end
+
+TEXT: A generic key-value table with lookup, insert, and delete operations. This demonstrates how generic definitions enable reusable, type-safe data structures.

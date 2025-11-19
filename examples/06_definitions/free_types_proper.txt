@@ -1,3 +1,20 @@
+// ============================================================================
+// Example: Semicolon Bindings in Axdef and Functions
+// ============================================================================
+// Demonstrates:
+//   - Semicolon bindings in axdef where clauses
+//   - Recursive functions on sequences with semicolons
+//   - forall x : T; y : U syntax in constraints
+//   - Pattern matching with semicolon bindings
+//
+// Features:
+//   - forall x : N; y : N | predicate
+//   - Recursive sequence functions
+//   - Pattern matching: (<>) and (<x> ^ s)
+//
+// See: docs/USER_GUIDE.md - Sections "Definitions", "Sequences"
+// ============================================================================
+
 === Phase 17: Proper Examples (not TEXT blocks) ===
 
 ** Example: Semicolon bindings in axdef **

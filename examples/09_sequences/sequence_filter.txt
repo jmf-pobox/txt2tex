@@ -1,3 +1,23 @@
+// ============================================================================
+// Example: Sequence Filter Operator
+// ============================================================================
+// Demonstrates:
+//   - Sequence filter operator (filter / ↾)
+//   - Filtering sequences to include only elements from a set
+//   - Comparison with range restriction (|>)
+//   - Multiple filters applied sequentially
+//   - Empty filter results
+//   - Bag union operator (bag_union / ⊎)
+//
+// Features:
+//   - s filter A [ASCII notation]
+//   - s ↾ A [Unicode notation]
+//   - Preserves order while filtering
+//   - b1 bag_union b2 [bag union with multiplicity]
+//
+// See: docs/USER_GUIDE.md - Sections "Sequences" > "Filter", "Bags"
+// ============================================================================
+
 === Phase 35: Sequence Filter Operator ===
 
 TEXT: The sequence filter operator restricts a sequence to elements from a specified set. It removes elements not in the filter set while preserving order.

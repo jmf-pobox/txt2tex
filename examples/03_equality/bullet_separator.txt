@@ -1,0 +1,138 @@
+// ============================================================================
+// Example: Bullet Separator (.)
+// ============================================================================
+// Demonstrates:
+//   - Bullet separator in set comprehensions
+//   - Bullet separator in mu expressions
+//   - Bullet separator in quantifiers (partial support)
+//   - Separating constraints from terms
+//
+// Features:
+//   - { x : T | constraint . term } [set comprehension]
+//   - mu x : T | constraint . expr [mu with bullet]
+//   - forall x : T | constraint . body [proposed for quantifiers]
+//   - Distinguishes filter from selector
+//
+// See: docs/USER_GUIDE.md - Sections "Set Comprehensions", "Mu Operator", "Quantifiers"
+//      docs/STATUS.md - Known limitations with bullet in quantifiers
+// ============================================================================
+
+=== Bullet Separator Examples ===
+
+** Example 1: Set Comprehension with Bullet **
+
+TEXT: The bullet separator distinguishes the constraint (filter) from the term (selector):
+
+{ x : N | x > 0 . x * x }
+
+TEXT: This reads: "the set of x squared, for all x in N where x is positive". The constraint x > 0 filters the domain, and x * x is the value selected.
+
+** Example 2: Set Comprehension Without Bullet **
+
+TEXT: Without the bullet, the set contains the values that satisfy the predicate:
+
+{ x : N | x > 0 and x < 10 }
+
+TEXT: This is the set {1, 2, 3, 4, 5, 6, 7, 8, 9}. No transformation is applied.
+
+** Example 3: Comparing With and Without Bullet **
+
+TEXT: With bullet (maps/transforms values):
+
+{ n : N | n < 5 . n * n }
+
+TEXT: Result: {0, 1, 4, 9, 16} (squares of 0, 1, 2, 3, 4)
+
+TEXT: Without bullet (filters values):
+
+{ n : N | n < 5 }
+
+TEXT: Result: {0, 1, 2, 3, 4} (the values themselves)
+
+** Example 4: Complex Set Comprehension **
+
+{ x : Z | x mod 2 = 0 and x >= -10 and x <= 10 . x / 2 }
+
+TEXT: This gives the set {-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5} by taking even integers from -10 to 10 and dividing by 2.
+
+** Example 5: Mu Operator with Bullet **
+
+TEXT: The mu operator finds the unique value satisfying a condition:
+
+mu x : N | x > 5 and x < 7 . x
+
+TEXT: This evaluates to 6, the unique natural number strictly between 5 and 7. The bullet separates the uniqueness constraint from the selected expression.
+
+** Example 6: Mu with Complex Expression **
+
+mu n : N | n * n = 16 . n + 1
+
+TEXT: This finds the unique n where n squared equals 16 (which is n = 4), then evaluates n + 1, giving 5.
+
+** Example 7: Nested Expressions **
+
+{ x : N | x < 3 . { y : N | y < x . (x, y) } }
+
+TEXT: This creates a set of sets of tuples. For each x < 3, we create the set of pairs (x, y) where y < x.
+
+** Example 8: Quantifiers with Bullet (Limited Support) **
+
+TEXT: Standard Z notation supports bullet in quantifiers to separate constraints from body:
+
+TEXT: PROPOSED: forall x : N | x > 0 . x >= 0
+
+TEXT: This would read: "for all positive x, x is non-negative". The constraint x > 0 restricts the quantification domain.
+
+TEXT: NOTE: Full bullet support in forall/exists quantifiers is not yet implemented (see STATUS.md). Currently use implication instead:
+
+forall x : N | x > 0 => x >= 0
+
+** Example 9: Partial Functions with Bullet **
+
+TEXT: In pattern matching and function definitions:
+
+axdef
+  predecessor : N +-> N
+where
+  forall n : N | n > 0 . predecessor(n) = n - 1
+end
+
+TEXT: The bullet indicates predecessor is only defined when the constraint n > 0 holds.
+
+** Example 10: Practical Example - Data Filtering **
+
+given Employee, Salary
+
+axdef
+  salaries : Employee -> Salary
+  high_earners : P Employee
+  high_salaries : P Salary
+where
+  high_earners = { e : Employee | salaries(e) > 100000 }
+  high_salaries = { e : Employee | salaries(e) > 100000 . salaries(e) }
+end
+
+TEXT: high_earners is the set of employees earning over 100K (the employees themselves). high_salaries is the set of salary values over 100K (the transformed values).
+
+** Example 11: Mathematical Sets **
+
+TEXT: The set of perfect squares less than 100:
+
+{ n : N | n < 10 . n * n }
+
+TEXT: Result: {0, 1, 4, 9, 16, 25, 36, 49, 64, 81}
+
+TEXT: The set of even numbers:
+
+{ n : N | n mod 2 = 0 }
+
+TEXT: Result: {0, 2, 4, 6, 8, ...} (infinite set, no bullet needed)
+
+** Example 12: Design Pattern **
+
+TEXT: The bullet separator follows a consistent pattern across Z notation:
+
+TEXT: Before bullet: constraint (declaration and filter)
+TEXT: After bullet: term (what to compute or select)
+
+TEXT: This separation makes specifications clearer by explicitly distinguishing the domain restriction from the value computation.

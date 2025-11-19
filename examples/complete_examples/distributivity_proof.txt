@@ -1,0 +1,142 @@
+// ============================================================================
+// Complete Example: Distributivity of AND over OR (Bidirectional Proof)
+// ============================================================================
+// Course: Formal Methods
+// Topic: Propositional Logic - Deductive Proofs
+// Difficulty: Intermediate
+//
+// This example demonstrates:
+//   - Bidirectional equivalence proofs (<=> intro)
+//   - Natural deduction with multiple inference rules
+//   - Case analysis (or elimination) with nested cases
+//   - Structural proof organization
+//   - => introduction and elimination
+//   - and introduction and elimination
+//   - or introduction and elimination
+//
+// Learning Goals:
+//   1. Understand how to prove logical equivalences in both directions
+//   2. Master case analysis for disjunction (or)
+//   3. Learn to structure complex proofs with clear assumptions
+//   4. Practice combining multiple inference rules
+//   5. Develop intuition for distributive laws
+//
+// Design Decisions:
+//   - Proof is split into two directions (=> and <=) for clarity
+//   - Each direction uses different proof techniques:
+//     * Forward direction: case analysis on the disjunction
+//     * Backward direction: case analysis on the outer disjunction
+//   - Assumptions are labeled [1], [2], [3] to track dependencies
+//   - Indentation shows proof structure and subproofs
+//   - Each step explicitly names the inference rule used
+//
+// Mathematical Context:
+//   The distributive law states that conjunction distributes over disjunction:
+//     p and (q or r) ≡ (p and q) or (p and r)
+//
+//   This is analogous to multiplication distributing over addition in algebra:
+//     a × (b + c) = (a × b) + (a × c)
+//
+//   Both directions must be proven to establish equivalence.
+//
+// Proof Strategy:
+//   Forward (=>): Assume p and (q or r), extract p and (q or r) separately,
+//                 case analyze on (q or r), combine p with each case.
+//
+//   Backward (<=): Assume (p and q) or (p and r), case analyze on outer or,
+//                  extract components and reassemble.
+//
+// See: docs/PROOF_SYNTAX.md - Natural deduction rules
+//      examples/04_proof_trees/ - Basic proof patterns
+//      TUTORIAL_04.md - Proof trees tutorial
+// ============================================================================
+
+=== Distributivity of AND over OR ===
+
+** Problem Statement **
+
+TEXT: Prove that conjunction (and) distributes over disjunction (or):
+
+TEXT: (p and (q or r)) <=> ((p and q) or (p and r))
+
+TEXT: This requires proving both directions:
+TEXT:   1. Forward direction: (p and (q or r)) => ((p and q) or (p and r))
+TEXT:   2. Backward direction: ((p and q) or (p and r)) => (p and (q or r))
+
+** Solution: Forward Direction **
+
+TEXT: First, we prove the forward implication. Starting from p and (q or r),
+TEXT: we extract p and (q or r) separately, then case-analyze on (q or r).
+
+PROOF:
+  (p and (q or r)) => ((p and q) or (p and r)) [=> intro from 1]
+    [1] p and (q or r) [assumption]
+    :: (p and q) or (p and r) [or elim from 2]
+      [2] q or r [from 1]
+      case q:
+        :: p and q [and intro]
+          :: p [and elim from 1]
+          :: q [case assumption]
+        :: (p and q) or (p and r) [or intro]
+      case r:
+        :: p and r [and intro]
+          :: p [and elim from 1]
+          :: r [case assumption]
+        :: (p and q) or (p and r) [or intro]
+
+TEXT: Key insight: We extract p once, then use it in both cases after splitting on (q or r).
+
+** Solution: Backward Direction **
+
+TEXT: For the backward direction, we start with (p and q) or (p and r) and
+TEXT: case-analyze on the outer disjunction. In each case, we extract p and
+TEXT: one of q or r, then rebuild p and (q or r).
+
+PROOF:
+  ((p and q) or (p and r)) => (p and (q or r)) [=> intro from 3]
+    [3] (p and q) or (p and r) [assumption]
+    :: p and (q or r) [or elim from 4]
+      [4] case1 or case2 [from 3]
+      case p and q:
+        :: p [and elim]
+        :: q or r [or intro]
+        :: p and (q or r) [and intro]
+      case p and r:
+        :: p [and elim]
+        :: q or r [or intro]
+        :: p and (q or r) [and intro]
+
+TEXT: Key insight: Both cases yield the same conclusion p and (q or r), since
+TEXT: we can inject q or r into (q or r) using or introduction.
+
+** Combining Both Directions **
+
+TEXT: Having proven both directions:
+TEXT:   - (p and (q or r)) => ((p and q) or (p and r))
+TEXT:   - ((p and q) or (p and r)) => (p and (q or r))
+TEXT:
+TEXT: We can combine them using <=> introduction to conclude:
+TEXT:   (p and (q or r)) <=> ((p and q) or (p and r))
+
+** Reflection **
+
+TEXT: This proof demonstrates several important techniques:
+TEXT:
+TEXT: 1. **Bidirectional proof structure**: Equivalences require proving both directions
+TEXT: 2. **Case analysis**: Essential for handling disjunctions (or)
+TEXT: 3. **Assumption management**: Clear labeling prevents confusion
+TEXT: 4. **Proof symmetry**: Both directions use similar patterns but different orders
+TEXT: 5. **Combining inference rules**: Multiple rules work together naturally
+TEXT:
+TEXT: The distributive law is fundamental in logic and appears frequently in:
+TEXT:   - Simplifying logical expressions
+TEXT:   - Converting to disjunctive normal form (DNF)
+TEXT:   - Optimizing boolean circuits
+TEXT:   - Reasoning about program correctness
+
+** Exercise for the Reader **
+
+TEXT: Try proving the dual distributive law:
+TEXT:   p or (q and r) <=> (p or q) and (p or r)
+TEXT:
+TEXT: This proof will use similar techniques but with the roles of and/or reversed.

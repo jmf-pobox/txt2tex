@@ -1,3 +1,20 @@
+// ============================================================================
+// Test: Nested Superscripts (Exponentiation)
+// ============================================================================
+// Demonstrates:
+//   - Nested superscript notation
+//   - Exponentiation (^)
+//   - Parenthesization for nested powers
+//   - Set comprehension with complex expressions
+//
+// Features:
+//   - z^2 [basic exponentiation]
+//   - (z^2)^3 [nested exponents]
+//   - Set comprehension with bullet separator
+//
+// See: docs/USER_GUIDE.md - Sections "Arithmetic Operators", "Set Comprehensions"
+// ============================================================================
+
 === Test Nested Superscript ===
 
 { z : Z | z mod 2 = 0 . (z^2)^3 }

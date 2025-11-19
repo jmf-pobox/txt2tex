@@ -1,0 +1,635 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Family Relationships}
+
+\section*{Problem Statement}
+\addcontentsline{toc}{section}{Problem Statement}
+
+\noindent Given a primitive relation childOf between people, define
+derived relations
+
+\bigskip
+
+\noindent for parentOf, siblingOf, cousinOf, and ancestorOf using
+relation operators.
+
+\bigskip
+
+\section*{Domain Setup}
+\addcontentsline{toc}{section}{Domain Setup}
+
+\noindent We work with a given type Person and one primitive relation:
+
+\bigskip
+
+\begin{zed}[Person]
+\end{zed}
+
+\begin{axdef}
+  childOf : Person \rel Person
+\end{axdef}
+
+\noindent The childOf relation represents direct parent-child relationships.
+
+\bigskip
+
+\noindent If (x, y) in childOf, then x is a child of y.
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent From this single primitive, we can derive all other family
+relationships.
+
+\bigskip
+
+\section*{Solution ( a ) : Parent Relationship}
+\addcontentsline{toc}{section}{Solution ( a ) : Parent Relationship}
+
+\noindent A parent is simply the inverse (converse) of a child:
+
+\bigskip
+
+\begin{zed}
+  parentOf == childOf^{-1}
+\end{zed}
+
+\noindent Alternative equivalent definitions:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Method 1 (using relation inverse):
+
+\bigskip
+
+\noindent parentOf == childOf~
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Method 2 (using set comprehension):
+
+\bigskip
+
+\noindent parentOf == $\{ x, y : Person | x \mapsto y \in childOf @ y
+\mapsto x \}$
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Method 3 (using axiomatic definition):
+
+\bigskip
+
+\noindent axdef
+
+\bigskip
+
+\noindent $parentOf : Person  \rel  Person$
+
+\bigskip
+
+\noindent where
+
+\bigskip
+
+\noindent $parentOf = childOf$~
+
+\bigskip
+
+\noindent end
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent All three methods are mathematically equivalent. The first
+is most idiomatic
+
+\bigskip
+
+\noindent in Z notation and clearly expresses the "inverse of childOf" concept.
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Properties of parentOf:
+
+\bigskip
+
+\noindent - If (x, y) in parentOf, then x is a parent of y
+
+\bigskip
+
+\noindent - dom(parentOf) = set of all people who are parents
+
+\bigskip
+
+\noindent - ran(parentOf) = set of all people who have parents
+
+\bigskip
+
+\section*{Solution ( b ) : Sibling Relationship}
+\addcontentsline{toc}{section}{Solution ( b ) : Sibling Relationship}
+
+\noindent Siblings are people who share at least one parent, excluding yourself:
+
+\bigskip
+
+\begin{zed}
+  siblingOf == (childOf \circ parentOf) \setminus \id[Person]
+\end{zed}
+
+\noindent Let's break this down step by step:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Step 1: childOf $\circ$ parentOf
+
+\bigskip
+
+\noindent This composition connects two people who share a common parent.
+
+\bigskip
+
+\noindent If (x, p) in childOf and (p, y) in parentOf, then (x, y) is
+in the composition.
+
+\bigskip
+
+\noindent This includes the case where $x = y$ (you share parents
+with yourself).
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Step 2: id[Person]
+
+\bigskip
+
+\noindent The identity relation contains all pairs (x, x).
+
+\bigskip
+
+\noindent This represents the "share parents with yourself" case.
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Step 3: (childOf $\circ$ parentOf) \ id[Person]
+
+\bigskip
+
+\noindent Subtract the identity relation to remove self-loops.
+
+\bigskip
+
+\noindent Result: all pairs of people who share parents, excluding yourself.
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Alternative equivalent definition using set comprehension:
+
+\bigskip
+
+\noindent siblingOf == {x, $y : Person | x $/= y and
+
+  \bigskip
+
+  \noindent ($\exists p : Person @ x \mapsto p$in childOf and
+
+    \bigskip
+
+\noindent p $\mapsto$ y in parentOf)}
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Properties of siblingOf:
+
+\bigskip
+
+\noindent - siblingOf is symmetric: if x is sibling of y, then y is sibling of x
+
+\bigskip
+
+\noindent - siblingOf is irreflexive: no one is their own sibling
+
+\bigskip
+
+\noindent - This definition includes half-siblings (share one parent)
+
+\bigskip
+
+\section*{Solution ( c ) : Cousin Relationship}
+\addcontentsline{toc}{section}{Solution ( c ) : Cousin Relationship}
+
+\noindent Cousins are people whose parents are siblings:
+
+\bigskip
+
+\begin{zed}
+  cousinOf == childOf \circ siblingOf \circ parentOf
+\end{zed}
+
+\noindent Let's trace the composition chain:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Step 1: childOf
+
+\bigskip
+
+\noindent Start with person x and their parent p1: (x, p1) in childOf
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Step 2: siblingOf
+
+\bigskip
+
+\noindent Find p1's sibling p2: (p1, p2) in siblingOf
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Step 3: parentOf
+
+\bigskip
+
+\noindent Find p2's children y: (p2, y) in parentOf
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Result: (x, y) in cousinOf means x and y are cousins
+
+\bigskip
+
+\noindent (their parents p1 and p2 are siblings)
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Expanded reasoning:
+
+\bigskip
+
+\noindent - (x, p1) in childOf: x is a child of p1
+
+\bigskip
+
+\noindent - (p1, p2) in siblingOf: p1 and p2 are siblings
+
+\bigskip
+
+\noindent - (p2, y) in parentOf: p2 is a parent of y
+
+\bigskip
+
+\noindent - Therefore: x and y are cousins (first cousins)
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Properties of cousinOf:
+
+\bigskip
+
+\noindent - cousinOf is symmetric
+
+\bigskip
+
+\noindent - This definition captures first cousins only
+
+\bigskip
+
+\noindent - For second cousins, you would need (childOf $\circ$
+siblingOf $\circ$ parentOf)+
+
+\bigskip
+
+\section*{Solution ( d ) : Ancestor Relationship}
+\addcontentsline{toc}{section}{Solution ( d ) : Ancestor Relationship}
+
+\noindent An ancestor is a parent, or a parent of a parent, recursively:
+
+\bigskip
+
+\begin{zed}
+  ancestorOf == parentOf \plus
+\end{zed}
+
+\noindent The transitive closure operator (+) computes:
+
+\bigskip
+
+\noindent R+ = R union (R $\circ$ R) union (R $\circ$ R $\circ$ R) union ...
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent For parentOf+:
+
+\bigskip
+
+\noindent - Includes direct parents (parentOf)
+
+\bigskip
+
+\noindent - Includes grandparents (parentOf $\circ$ parentOf)
+
+\bigskip
+
+\noindent - Includes great-grandparents (parentOf $\circ$ parentOf
+$\circ$ parentOf)
+
+\bigskip
+
+\noindent - And so on, for all ancestor generations
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Alternative recursive definition:
+
+\bigskip
+
+\noindent ancestorOf is the smallest relation such that:
+
+\bigskip
+
+\noindent 1. parentOf subseteq ancestorOf
+
+\bigskip
+
+\noindent 2. ancestorOf $\circ$ parentOf subseteq ancestorOf
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Properties of ancestorOf:
+
+\bigskip
+
+\noindent - ancestorOf is transitive: if x ancestor of y and y ancestor of z,
+
+\bigskip
+
+\noindent then x ancestor of z
+
+\bigskip
+
+\noindent - ancestorOf is irreflexive (assuming no cyclic families)
+
+\bigskip
+
+\noindent - dom(ancestorOf) = people who have descendants
+
+\bigskip
+
+\noindent - ran(ancestorOf) = people who have ancestors
+
+\bigskip
+
+\section*{Summary of Definitions}
+\addcontentsline{toc}{section}{Summary of Definitions}
+
+\noindent Complete specification:
+
+\bigskip
+
+\begin{zed}
+  parentOf == childOf^{-1}
+\end{zed}
+
+\begin{zed}
+  siblingOf == (childOf \circ parentOf) \setminus \id[Person]
+\end{zed}
+
+\begin{zed}
+  cousinOf == childOf \circ siblingOf \circ parentOf
+\end{zed}
+
+\begin{zed}
+  ancestorOf == parentOf \plus
+\end{zed}
+
+\noindent Additional derived relations you might define:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent grandparentOf == parentOf $\circ$ parentOf
+
+\bigskip
+
+\noindent auntOrUncleOf == siblingOf $\circ$ parentOf
+
+\bigskip
+
+\noindent nieceOrNephewOf == (auntOrUncleOf)~
+
+\bigskip
+
+\noindent descendantOf == ancestorOf~
+
+\bigskip
+
+\section*{Design Patterns}
+\addcontentsline{toc}{section}{Design Patterns}
+
+\noindent This example illustrates several key patterns in formal specification:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 1. **Primitive vs derived**: Start with minimal primitives,
+derive everything else
+
+\bigskip
+
+\noindent - Only childOf is primitive (could be parentOf instead)
+
+\bigskip
+
+\noindent - All other relations are derived using operators
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 2. **Relation algebra**: Use operators instead of explicit
+set comprehensions
+
+\bigskip
+
+\noindent - Inverse (~) for bidirectional relationships
+
+\bigskip
+
+\noindent - Composition ($\circ$) for multi-step connections
+
+\bigskip
+
+\noindent - Transitive closure (+) for recursive relationships
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 3. **Identity removal**: Use (R \ id[X]) to make relations irreflexive
+
+\bigskip
+
+\noindent - Essential for siblingOf $you're(\lnot (your(own)(sibling)))$
+
+\bigskip
+
+\noindent - Common pattern in many specifications
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 4. **Operator chaining**: Compose multiple operators for
+complex relationships
+
+\bigskip
+
+\noindent - cousinOf chains three relations together
+
+\bigskip
+
+\noindent - Order $matters : childOf  \circ  siblingOf  \circ  parentOf$
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 5. **Semantic clarity**: Names should match domain concepts exactly
+
+\bigskip
+
+\noindent - parentOf, not "inverse\_childOf"
+
+\bigskip
+
+\noindent - ancestorOf, not "transitive\_parentOf"
+
+\bigskip
+
+\section*{Exercise for the Reader}
+\addcontentsline{toc}{section}{Exercise for the Reader}
+
+\noindent 1. Define descendantOf using existing relations
+
+\bigskip
+
+\noindent 2. Define grandchildOf two $ways : using composition and
+using descendantOf$
+
+\bigskip
+
+\noindent 3. Prove that siblingOf is symmetric using relation algebra
+
+\bigskip
+
+\noindent 4. What properties must childOf satisfy for this model to
+be realistic?
+
+\bigskip
+
+\noindent ($Hint : consider cycles, reflexivity, domain constraints)$
+
+\bigskip
+
+\end{document}

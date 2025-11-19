@@ -1,3 +1,24 @@
+// ============================================================================
+// Example: Function Type Declarations
+// ============================================================================
+// Demonstrates:
+//   - Total function types (->)
+//   - Partial function types (+->)
+//   - Injection types (>->, >+>)
+//   - Surjection types (-->>)
+//   - Bijection types (>->>)
+//
+// Features:
+//   - X -> Y [total function]
+//   - X +-> Y [partial function]
+//   - X >-> Y [total injection]
+//   - X >+> Y [partial injection]
+//   - X -->> Y [total surjection]
+//   - X >->> Y [total bijection]
+//
+// See: docs/USER_GUIDE.md - Section "Functions" > "Function Types"
+// ============================================================================
+
 === Phase 11a: Function Types ===
 
 given X, Y, Z

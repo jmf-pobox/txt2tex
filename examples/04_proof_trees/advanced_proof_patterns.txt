@@ -1,0 +1,328 @@
+// ============================================================================
+// Example: Advanced Proof Patterns
+// ============================================================================
+// Demonstrates:
+//   - Complex proof strategies
+//   - Proof by cases with multiple branches
+//   - Proof by induction
+//   - Constructive vs classical proofs
+//   - Advanced natural deduction patterns
+//
+// Features:
+//   - Multi-level case analysis
+//   - Structural induction
+//   - Existential instantiation patterns
+//   - Lemma application
+//   - Proof composition
+//
+// See: docs/PROOF_SYNTAX.md
+//      examples/04_proof_trees/ - Basic proofs
+// ============================================================================
+
+=== Advanced Proof Patterns ===
+
+** Example 1: Proof by Cases (Three-Way Split) **
+
+TEXT: Prove: For all integers n, n < 0 or n = 0 or n > 0
+
+PROOF:
+  n : Z [given]
+  n < 0 or n = 0 or n > 0 [trichotomy of integers, axiom]
+
+TEXT: This uses the trichotomy property as an axiom. To prove something about all integers, we can case-analyze on these three possibilities.
+
+** Example 2: Multi-Level Case Analysis **
+
+TEXT: Prove: (p or q) and (r or s) => (p and r) or (p and s) or (q and r) or (q and s)
+
+PROOF:
+  (p or q) and (r or s) [premise]
+  p or q [and elim left]
+  r or s [and elim right]
+  CASE p:
+    CASE r:
+      p and r [and intro]
+      (p and r) or (p and s) or (q and r) or (q and s) [or intro]
+    CASE s:
+      p and s [and intro]
+      (p and r) or (p and s) or (q and r) or (q and s) [or intro]
+    (p and r) or (p and s) or (q and r) or (q and s) [or elim on r or s]
+  CASE q:
+    CASE r:
+      q and r [and intro]
+      (p and r) or (p and s) or (q and r) or (q and s) [or intro]
+    CASE s:
+      q and s [and intro]
+      (p and r) or (p and s) or (q and r) or (q and s) [or intro]
+    (p and r) or (p and s) or (q and r) or (q and s) [or elim on r or s]
+  (p and r) or (p and s) or (q and r) or (q and s) [or elim on p or q]
+
+TEXT: Nested case analysis on two disjunctions, exploring all four combinations.
+
+** Example 3: Proof by Mathematical Induction (Base and Step) **
+
+TEXT: Prove: For all n ∈ ℕ, sum(1 to n) = n(n+1)/2
+
+TEXT: Base case (n = 0):
+
+PROOF:
+  sum(1 to 0) = 0 [definition]
+  0(0+1)/2 = 0 [arithmetic]
+  sum(1 to 0) = 0(0+1)/2 [equality]
+
+TEXT: Inductive step (assume for n, prove for n+1):
+
+PROOF:
+  sum(1 to n) = n(n+1)/2 [inductive hypothesis]
+  sum(1 to n+1) = sum(1 to n) + (n+1) [definition]
+  sum(1 to n+1) = n(n+1)/2 + (n+1) [substitution]
+  sum(1 to n+1) = (n(n+1) + 2(n+1))/2 [algebra]
+  sum(1 to n+1) = (n+1)(n+2)/2 [factoring]
+  sum(1 to n+1) = (n+1)((n+1)+1)/2 [simplification]
+
+TEXT: By induction, the formula holds for all natural numbers.
+
+** Example 4: Structural Induction on Lists **
+
+TEXT: Prove: For all sequences s, reverse(reverse(s)) = s
+
+TEXT: Base case (empty sequence):
+
+PROOF:
+  reverse(<>) = <> [definition]
+  reverse(reverse(<>)) = reverse(<>) [substitution]
+  reverse(reverse(<>)) = <> [definition]
+
+TEXT: Inductive step (assume for s, prove for <x> ^ s):
+
+PROOF:
+  reverse(reverse(s)) = s [inductive hypothesis]
+  reverse(<x> ^ s) = reverse(s) ^ <x> [definition]
+  reverse(reverse(<x> ^ s)) = reverse(reverse(s) ^ <x>) [substitution]
+  reverse(reverse(s) ^ <x>) = reverse(<x>) ^ reverse(reverse(s)) [definition]
+  reverse(<x>) ^ reverse(reverse(s)) = <x> ^ reverse(reverse(s)) [definition]
+  <x> ^ reverse(reverse(s)) = <x> ^ s [inductive hypothesis]
+
+TEXT: By structural induction, reverse(reverse(s)) = s for all sequences.
+
+** Example 5: Constructive Existence Proof **
+
+TEXT: Prove: There exists an even number greater than 10
+
+PROOF:
+  12 : N [given]
+  12 = 2 * 6 [arithmetic]
+  12 mod 2 = 0 [definition of even]
+  12 > 10 [arithmetic]
+  12 is even and 12 > 10 [and intro]
+  exists n : N | n is even and n > 10 [exists intro with n = 12]
+
+TEXT: Constructive proof: we exhibit a specific witness (12).
+
+** Example 6: Non-Constructive Existence Proof **
+
+TEXT: Prove: There exist irrational numbers a and b such that a^b is rational
+
+PROOF:
+  sqrt(2) is irrational [known lemma]
+  CASE sqrt(2)^sqrt(2) is rational:
+    a = sqrt(2), b = sqrt(2) [witness]
+    a^b is rational [by case assumption]
+    exists a, b irrational | a^b rational [exists intro]
+  CASE sqrt(2)^sqrt(2) is irrational:
+    a = sqrt(2)^sqrt(2), b = sqrt(2) [witness]
+    a^b = (sqrt(2)^sqrt(2))^sqrt(2) [substitution]
+    a^b = sqrt(2)^(sqrt(2) * sqrt(2)) [exponent law]
+    a^b = sqrt(2)^2 [arithmetic]
+    a^b = 2 [simplification]
+    2 is rational [known]
+    exists a, b irrational | a^b rational [exists intro]
+  exists a, b irrational | a^b rational [or elim]
+
+TEXT: Non-constructive: we don't know which case is true, but both lead to the conclusion.
+
+** Example 7: Proof by Strong Induction **
+
+TEXT: Prove: Every natural number n ≥ 2 has a prime factorization
+
+TEXT: Base case (n = 2):
+
+PROOF:
+  2 is prime [definition]
+  2 has prime factorization {2} [trivial]
+
+TEXT: Inductive step (assume for all k < n, prove for n):
+
+PROOF:
+  n >= 2 [given]
+  n is prime or n is composite [dichotomy]
+  CASE n is prime:
+    n has prime factorization {n} [trivial]
+  CASE n is composite:
+    exists a, b | 2 <= a < n and 2 <= b < n and n = a * b [definition of composite]
+    a has prime factorization P_a [strong IH, a < n]
+    b has prime factorization P_b [strong IH, b < n]
+    n = a * b has prime factorization P_a union P_b [multiplication]
+  n has prime factorization [or elim]
+
+TEXT: Strong induction: we assume the property for all smaller values, not just n-1.
+
+** Example 8: Proof Using Lemmas **
+
+TEXT: Lemma 1: If n is even, then n^2 is even
+
+PROOF:
+  n is even [assumption]
+  exists k : N | n = 2 * k [definition of even]
+  n^2 = (2 * k)^2 [substitution]
+  n^2 = 4 * k^2 [algebra]
+  n^2 = 2 * (2 * k^2) [factoring]
+  exists m : N | n^2 = 2 * m [exists intro with m = 2*k^2]
+  n^2 is even [definition of even]
+
+TEXT: Main theorem: If n^2 is odd, then n is odd
+
+PROOF:
+  n^2 is odd [premise]
+  n is even or n is odd [dichotomy]
+  CASE n is even:
+    n^2 is even [Lemma 1]
+    n^2 is odd and n^2 is even [contradiction]
+    false [contradiction]
+  CASE n is odd:
+    n is odd [identity]
+  n is odd [or elim]
+
+TEXT: Proof by contrapositive using lemma.
+
+** Example 9: Proof by Minimal Counterexample **
+
+TEXT: Prove: All natural numbers n ≥ 1 satisfy P(n)
+
+PROOF:
+  Assume not (forall n >= 1 | P(n)) [assumption for contradiction]
+  exists n >= 1 | not P(n) [negation of forall]
+  Let m be the smallest such n [well-ordering principle]
+  m >= 1 and not P(m) [by choice of m]
+  CASE m = 1:
+    P(1) [base case proved separately]
+    not P(m) and P(m) [contradiction]
+    false
+  CASE m > 1:
+    forall k | 1 <= k < m => P(k) [minimality of m]
+    P(m-1) [since 1 <= m-1 < m]
+    P(m) [by inductive step from P(m-1)]
+    not P(m) and P(m) [contradiction]
+    false
+  false [or elim]
+  forall n >= 1 | P(n) [contradiction discharged]
+
+TEXT: Minimal counterexample combines well-ordering with contradiction.
+
+** Example 10: Proof by Invariant **
+
+TEXT: Prove: A loop maintains invariant I
+
+TEXT: Initialization:
+
+PROOF:
+  Initial state satisfies I [verification]
+
+TEXT: Preservation:
+
+PROOF:
+  I holds before iteration [assumption]
+  Loop body executes [given]
+  I holds after iteration [verification]
+
+TEXT: Termination:
+
+PROOF:
+  Loop terminates [termination proof]
+  I holds at termination [by preservation]
+  I and termination condition => desired property [logic]
+  Desired property holds [modus ponens]
+
+** Example 11: Proof by Diagonalization **
+
+TEXT: Prove: The set of real numbers is uncountable
+
+PROOF:
+  Assume real numbers are countable [assumption for contradiction]
+  exists enumeration f : N -> R [definition of countable]
+  Construct r : R by diagonal method [construction]
+  forall n : N | r /= f(n) [by construction, differs at nth digit]
+  r not in range of f [previous line]
+  r is real but r not in range of f [contradiction with enumeration]
+  false [contradiction]
+  Real numbers are uncountable [contradiction discharged]
+
+TEXT: Cantor's diagonal argument (outline).
+
+** Example 12: Constructive Proof Pattern **
+
+TEXT: To constructively prove: exists x | P(x)
+
+TEXT: Strategy:
+TEXT: 1. Explicitly construct a witness w
+TEXT: 2. Verify P(w) holds
+TEXT: 3. Conclude exists x | P(x) with x = w
+
+TEXT: Example: Prove exists n : N | n > 100 and n is even
+
+PROOF:
+  Let n = 102 [construction]
+  102 > 100 [arithmetic]
+  102 = 2 * 51 [arithmetic]
+  102 is even [definition]
+  exists n : N | n > 100 and n is even [exists intro with n = 102]
+
+** Example 13: Proof Composition **
+
+TEXT: Combine multiple proof techniques:
+
+TEXT: Theorem: Property P holds for all cases
+
+TEXT: Overall strategy: Case analysis + Induction + Contradiction
+
+PROOF:
+  CASE 1 (base case):
+    P(base) [direct proof]
+  CASE 2 (inductive case):
+    CASE 2a (subcase a):
+      Assume not P [assumption for contradiction]
+      Derive contradiction [proof]
+      P [contradiction discharged]
+    CASE 2b (subcase b):
+      Assume P(n) [inductive hypothesis]
+      P(n+1) [inductive step]
+    P for this case [or elim]
+  P holds [or elim over main cases]
+
+** Example 14: Best Practices for Complex Proofs **
+
+TEXT: Guidelines for writing advanced proofs:
+
+TEXT: 1. State strategy at the beginning
+TEXT: 2. Label cases clearly
+TEXT: 3. Discharge assumptions promptly
+TEXT: 4. Reference lemmas explicitly
+TEXT: 5. Show key algebraic steps
+TEXT: 6. Justify non-obvious steps
+TEXT: 7. Use proof by cases when structure suggests it
+TEXT: 8. Use induction for recursive definitions
+TEXT: 9. Use contradiction for negative conclusions
+TEXT: 10. Verify base cases thoroughly
+
+** Example 15: Proof Documentation **
+
+TEXT: Document complex proofs:
+
+TEXT: - **Goal**: State what you're proving
+TEXT: - **Strategy**: Explain the proof approach
+TEXT: - **Lemmas needed**: List dependencies
+TEXT: - **Key insights**: Highlight non-obvious steps
+TEXT: - **Pitfalls**: Note where proof could go wrong
+TEXT: - **Generalization**: Explain how proof extends
+
+TEXT: Well-documented proofs are maintainable and reusable.

@@ -1,3 +1,22 @@
+// ============================================================================
+// Example: Generic Type Instantiation
+// ============================================================================
+// Demonstrates:
+//   - Applying type parameters to polymorphic types
+//   - emptyset[T], seq[T], P[T] syntax
+//   - Complex type parameters (N cross N, P X)
+//   - Nested type instantiation
+//
+// Features:
+//   - emptyset[N] [empty set of naturals]
+//   - seq[N] [sequences of naturals]
+//   - P[X] [power set]
+//   - Complex: emptyset[N cross N], seq[N cross N]
+//   - Nested: P[P X]
+//
+// See: docs/USER_GUIDE.md - Section "Additional Features" > "Generic Type Instantiation"
+// ============================================================================
+
 === Phase 11.9: Generic Type Instantiation ===
 
 ** Example 1: Basic Generic Instantiation **

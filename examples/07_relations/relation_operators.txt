@@ -1,3 +1,25 @@
+// ============================================================================
+// Example: Relation Operators
+// ============================================================================
+// Demonstrates:
+//   - Relation type (<->)
+//   - Maplet constructor (|->)
+//   - Domain restriction (<|)
+//   - Range restriction (|>)
+//   - Relational composition (comp, o9)
+//   - Relation functions (dom, ran)
+//
+// Features:
+//   - R <-> S [relation type]
+//   - x |-> y [maplet]
+//   - S <| R [domain restriction]
+//   - R |> T [range restriction]
+//   - R o9 S, R comp S [composition]
+//   - dom R, ran R
+//
+// See: docs/USER_GUIDE.md - Section "Relations"
+// ============================================================================
+
 === Phase 10a: Relation Operators ===
 
 ** Example 1: Relation Type **

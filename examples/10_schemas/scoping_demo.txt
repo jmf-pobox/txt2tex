@@ -1,0 +1,264 @@
+// ============================================================================
+// Example: Scoping Rules in Z Notation
+// ============================================================================
+// Demonstrates:
+//   - Variable scoping in quantifiers
+//   - Schema component scoping
+//   - Name shadowing and conflicts
+//   - Nested scope resolution
+//   - Global vs local names
+//
+// Features:
+//   - Quantifier introduces local scope
+//   - Schema declarations have schema scope
+//   - Inner scopes shadow outer scopes
+//   - Set comprehension scoping
+//
+// See: docs/USER_GUIDE.md - Section "Schemas" > "Scoping Rules"
+// ============================================================================
+
+=== Scoping Rules Examples ===
+
+** Example 1: Quantifier Scope **
+
+TEXT: Variables introduced in quantifiers are local to that quantifier:
+
+forall x : N | x > 0
+
+TEXT: Here x is only in scope within the quantifier. Outside the quantifier, x is not defined.
+
+** Example 2: Nested Quantifiers **
+
+forall x : N | exists y : N | x + y = 10
+
+TEXT: x is in scope for the entire outer quantifier, including the inner quantifier. y is only in scope within the exists quantifier.
+
+** Example 3: Shadowing in Nested Quantifiers **
+
+forall x : N | x > 0 => (exists x : N | x < 10)
+
+TEXT: The inner x shadows the outer x. Within the exists quantifier, x refers to the inner binding. This is allowed but can be confusing.
+
+** Example 4: Set Comprehension Scope **
+
+{ x : N | x > 0 and x < 10 }
+
+TEXT: x is in scope only within the set comprehension. The constraint x > 0 and x < 10 uses the same x.
+
+** Example 5: Bullet Separator Scope **
+
+{ x : N | x < 5 . x * x }
+
+TEXT: x is in scope both before and after the bullet. The constraint x < 5 and the term x * x refer to the same x.
+
+** Example 6: Schema Component Scope **
+
+schema Counter
+  count : N
+  limit : N
+where
+  count <= limit
+end
+
+TEXT: Within the schema, count and limit are in scope in the where clause. Outside the schema, they must be accessed via schema references.
+
+** Example 7: Schema Reference **
+
+axdef
+  c : Counter
+where
+  c.count = 5
+  c.limit = 10
+end
+
+TEXT: When referencing schema components from outside, use dot notation: c.count and c.limit.
+
+** Example 8: Multiple Schemas - No Name Conflict **
+
+schema Account
+  balance : N
+where
+  balance >= 0
+end
+
+schema Transaction
+  balance : N
+where
+  balance >= 0
+end
+
+TEXT: Both schemas have a component named balance. This is allowed because they are in different schema scopes.
+
+** Example 9: Schema Inclusion Scope **
+
+schema User
+  id : N
+  name : seq Char
+end
+
+schema LoggedInUser
+  User
+  sessionToken : N
+where
+  sessionToken > 0
+end
+
+TEXT: LoggedInUser includes User, bringing id and name into LoggedInUser's scope. The where clause can reference id, name, and sessionToken.
+
+** Example 10: Global vs Local Names **
+
+given GlobalType
+
+axdef
+  globalVar : N
+where
+  globalVar = 42
+end
+
+schema LocalScope
+  x : N
+where
+  x = globalVar + 1
+end
+
+TEXT: globalVar is in the global scope, accessible from within schemas. x is local to LocalScope.
+
+** Example 11: Quantifier with Global Names **
+
+axdef
+  maximum : N
+where
+  maximum = 100
+end
+
+schema Bounded
+  value : N
+where
+  forall x : N | x <= maximum => value <= x
+end
+
+TEXT: The quantifier introduces local x, but maximum refers to the global axdef constant.
+
+** Example 12: Name Capture Avoidance **
+
+TEXT: Be careful with name shadowing in complex expressions:
+
+axdef
+  x : N
+  result : N
+where
+  x = 10
+  result = (forall x : N | x > 0 => x >= 0)
+end
+
+TEXT: The global x = 10, but the quantifier's x is independent. The forall quantifier's x shadows the global x within its scope.
+
+** Example 13: Lambda Scope **
+
+lambda x : N . x * x
+
+TEXT: x is in scope only within the lambda body (x * x). The lambda introduces its own scope for the parameter.
+
+** Example 14: Nested Lambdas **
+
+lambda x : N . lambda y : N . x + y
+
+TEXT: x is in scope in both the outer lambda body and the inner lambda body. y is only in scope in the inner lambda body.
+
+** Example 15: Mu Operator Scope **
+
+mu x : N | x * x = 25
+
+TEXT: x is in scope only within the mu expression (the constraint and any expression after a bullet).
+
+** Example 16: Set Comprehension with Multiple Variables **
+
+{ x, y : N | x < y and y < 10 . (x, y) }
+
+TEXT: Both x and y are in scope throughout the set comprehension, including the constraint and the term.
+
+** Example 17: Schema Quantification **
+
+schema Database
+  records : P N
+end
+
+exists Database | # records > 100
+
+TEXT: This quantifies over schema Database. The components of Database (records) are in scope within the predicate.
+
+** Example 18: Scope Hygiene Best Practices **
+
+TEXT: To avoid confusion:
+TEXT: 1. Don't shadow names unnecessarily—use different variable names
+TEXT: 2. Keep quantifier nesting shallow when possible
+TEXT: 3. Use descriptive names that make scope obvious
+TEXT: 4. Avoid reusing schema component names in nested contexts
+TEXT: 5. Document intentional shadowing with comments
+
+** Example 19: Good Style (Distinct Names) **
+
+forall x : N | x > 0 => (exists y : N | y < x and y > 0)
+
+TEXT: Uses distinct names x and y—clear and unambiguous.
+
+** Example 20: Poor Style (Shadowing) **
+
+forall x : N | x > 0 => (exists x : N | x < 10)
+
+TEXT: Inner x shadows outer x—confusing and error-prone. Avoid this pattern.
+
+** Example 21: Scoping in Definitions **
+
+axdef
+  square : N -> N
+  n : N
+where
+  forall n : N | square(n) = n * n
+  n = 5
+end
+
+TEXT: The quantifier's n is local to the quantifier. The global n = 5 is separate. The forall's n shadows the global n within the quantifier scope.
+
+TEXT: This is legal but confusing. Better to use different names:
+
+axdef
+  square : N -> N
+  testValue : N
+where
+  forall x : N | square(x) = x * x
+  testValue = 5
+end
+
+TEXT: Now there's no shadowing—much clearer!
+
+** Example 22: Schema Composition Scope **
+
+schema StateA
+  x : N
+end
+
+schema StateB
+  y : N
+end
+
+schema Combined
+  StateA
+  StateB
+where
+  x + y > 0
+end
+
+TEXT: Combined includes both x (from StateA) and y (from StateB) in its scope. The where clause can reference both.
+
+** Example 23: Free Type Scope **
+
+Color ::= red | green | blue
+
+schema ColoredItem
+  color : Color
+where
+  color in {red, blue}
+end
+
+TEXT: The free type constructors (red, green, blue) are in global scope, accessible within schemas and definitions.

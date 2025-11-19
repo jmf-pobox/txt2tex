@@ -1,3 +1,23 @@
+// ============================================================================
+// Reference: Compiled Course Solutions
+// ============================================================================
+// Description:
+//   - Complete collection of course solutions
+//   - Covers propositional logic, predicate logic, sets, relations, functions
+//   - Truth tables, equivalences, proofs
+//   - Z notation specifications
+//   - Reference implementation for txt2tex features
+//
+// Topics:
+//   - Propositional logic (Solutions 1-3)
+//   - Truth tables and equivalences
+//   - Predicate logic with quantifiers
+//   - Set theory and operations
+//   - Z notation definitions
+//
+// See: docs/USER_GUIDE.md for syntax reference
+// ============================================================================
+
 === Propositional logic ===
 
 ** Solution 1 **
