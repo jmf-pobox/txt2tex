@@ -1,6 +1,6 @@
 # txt2tex Implementation Status
 
-**Last Updated:** 2025-11-18
+**Last Updated:** 2025-11-19
 **Current Phase:** Phase 40 (Bullet Separator for Quantifiers) ✓ COMPLETE
 
 ---
@@ -16,16 +16,15 @@
 
 **Current Coverage:** 100% (52/52 solutions)
 - All 52 solutions fully working
-- Bug #3 resolved in Phase 31
+- Note: Bug #3 (compound identifiers) remains open but doesn't block solution coverage
 
-**Previous Coverage:** ~98% (51/52 solutions - Phase 30)
 **Recent Improvements:**
 - Phase 19: Added space-separated application, completed Solutions 44-47
 - Phase 20: Added semicolon-separated declarations for gendef/axdef/schema
 - Phase 21: Fixed schema predicate separators, added subseteq operator (7→4 fuzz errors)
 - Phase 22: Removed false blockers, completed Solutions 39, 48-52 (+6 solutions)
-- **Phase 31**: Fixed Bug #3 (compound identifiers), completed Solution 31, achieved 100% (52/52) ✅
 - **Phase 40**: Added bullet separator for forall/exists/exists1 quantifiers (GitHub #8) ✅
+- **2025-11-19**: Closed GitHub issues #6, #7, #8 (3 resolved)
 
 ---
 
@@ -450,24 +449,19 @@
 - User verification: Long homework predicates now fit within margins
 - Test count: 1013 tests (all passing)
 
-### ✅ Phase 31: Compound Identifiers (Bug #3 Fix)
-- Fixed Bug #3: Parser now recognizes compound identifiers with postfix operators
-- Added `_parse_compound_identifier_name()` helper method to combine identifier + postfix operator
-- Modified parser lookahead to detect patterns like `R+ ==`, `S* ==`, `R~ ==`
-- Updated abbreviation and schema name parsing to use compound identifier parsing
-- Updated LaTeX generator to render compound names correctly:
-  - `R+` → `R^+` (transitive closure)
-  - `R*` → `R^*` (reflexive-transitive closure)
-  - `R~` → `R^{-1}` (relational inverse)
-- Context-aware: Same operator has different meaning in different contexts:
-  - `R+ == expr` → R+ is the abbreviation name (compound identifier)
+### ⏸️ Phase 31: Compound Identifiers (Bug #3 - NOT IMPLEMENTED)
+**Status**: Documented but not implemented - GitHub issue #3 remains open
+
+**Planned Implementation:**
+- Parser to recognize compound identifiers with postfix operators (R+, R*, R~)
+- Context-aware parsing to distinguish:
+  - `R+ == expr` → R+ is abbreviation name (compound identifier)
   - `S == R+` → R+ is transitive closure operator applied to R
-- Created comprehensive test suite: 18 new tests in test_compound_identifiers.py
-  - Covers: lexer behavior, parser behavior, LaTeX generation, integration, edge cases
-- Completed Solution 31 (Relations) - the last remaining solution
-- **Achievement**: 100% solution coverage (52/52) ✅
-- Test count: 1078 tests (all passing)
-- All quality gates pass: type, lint, format, test
+- LaTeX rendering: `R+` → `R^+`, `R*` → `R^*`, `R~` → `R^{-1}`
+
+**Workaround**: Solution 31 works by avoiding compound identifier names
+
+**Note**: This section was incorrectly marked as complete in earlier documentation
 
 ### ✅ Phase 32: Distributed Intersection Operator
 - Implemented `bigcap` distributed intersection operator (Phase 2 from original plan)
@@ -740,22 +734,23 @@ Following the conventions used in the fuzz package test suite:
 
 **Test Cases**: All bugs have minimal reproducible test cases in `tests/bugs/`
 
-### Active Bugs (4 confirmed)
+### Active Bugs (3 open)
 
 | Priority | Issue | Component | Test Case | Blocks |
 |----------|-------|-----------|-----------|--------|
 | HIGH | [#1](https://github.com/jmf-pobox/txt2tex/issues/1): Parser fails on prose with periods | parser | [bug1_prose_period.txt](tests/bugs/bug1_prose_period.txt) | Homework, natural writing |
 | MEDIUM | [#2](https://github.com/jmf-pobox/txt2tex/issues/2): Multiple pipes in TEXT blocks | latex-gen | [bug2_multiple_pipes.txt](tests/bugs/bug2_multiple_pipes.txt) | Solution 40(g) |
-| MEDIUM | [#4](https://github.com/jmf-pobox/txt2tex/issues/4): Comma after parenthesized math not detected | latex-gen | [bug4_comma_after_parens.txt](tests/bugs/bug4_comma_after_parens.txt) | Homework prose |
-| MEDIUM-HIGH | [#5](https://github.com/jmf-pobox/txt2tex/issues/5): Logical operators (or, and) not converted | latex-gen | [bug5_or_operator.txt](tests/bugs/bug5_or_operator.txt) | Homework 1(c) |
+| MEDIUM | [#3](https://github.com/jmf-pobox/txt2tex/issues/3): Cannot use identifiers like R+, R* | lexer | [bug3_compound_id.txt](tests/bugs/bug3_compound_id.txt) | Solution 31 |
 
-### Recently Resolved (3 fixed)
+### Recently Resolved (5 closed)
 
 | Issue | Status | Fixed In |
 |-------|--------|----------|
-| [#3](https://github.com/jmf-pobox/txt2tex/issues/3): Compound identifiers with operators (R+, R*, R~) | ✅ RESOLVED | Phase 31 (Bug #3 fix) |
-| Nested quantifiers in mu expressions | ✅ RESOLVED | Phase 19 |
-| emptyset keyword not converted | ✅ RESOLVED | Recent update |
+| [#8](https://github.com/jmf-pobox/txt2tex/issues/8): Bullet separator for quantifiers | ✅ CLOSED | Phase 40 (2025-11-19) |
+| [#7](https://github.com/jmf-pobox/txt2tex/issues/7): Semicolon separator for quantifiers | ✅ CLOSED | Already in Phase 17 |
+| [#6](https://github.com/jmf-pobox/txt2tex/issues/6): Bibliography syntax | ✅ CLOSED | Bibliography file support |
+| [#4](https://github.com/jmf-pobox/txt2tex/issues/4): Comma after parenthesized math | ✅ CLOSED | Fixed |
+| [#5](https://github.com/jmf-pobox/txt2tex/issues/5): Logical operators not converted | ✅ CLOSED | Fixed |
 
 ### Bug Reporting
 
