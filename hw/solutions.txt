@@ -309,12 +309,12 @@ axdef
 where
   shows subset dom (show_episodes) and dom (show_episodes) subset shows
   forall es : ran show_episodes | (exists n : N | es = 1..n)
-  forall s : dom show_episodes | forall e : show_episodes s | \
+  forall s : dom show_episodes | forall e : show_episodes s |
     e in show_episodes(s) <=> (s, e) in dom episode_info 
   shows subset dom (show_info) and dom (show_info) subset shows
   forall s : shows | forall e : EpisodeId | forall p : PeopleId | p in fst(episode_info(s, e)) <=> p in show_info s
-  forall s : shows | (forall e_1, e_2 : EpisodeId | \
-    (((s, e_1) in dom episode_info and (s, e_2) in dom episode_info) => \
+  forall s : shows | (forall e_1, e_2 : EpisodeId |
+    (((s, e_1) in dom episode_info and (s, e_2) in dom episode_info) =>
     ((e_1 < e_2) => (snd(episode_info(s, e_1)) <= (snd(episode_info(s, e_2)))))))
 end
 
@@ -326,7 +326,7 @@ TEXT: If and only if translates to the sets are equal. The same ShowId exist in 
 (b) forall es : ran show_episodes | (exists n : N | es = 1..n)
 TEXT: Each finite set of EpisodeId includes an uninterrupted range from 1 to n. 
 
-(c) forall s : dom show_episodes | forall e : show_episodes s | \
+(c) forall s : dom show_episodes | forall e : show_episodes s |
     e in show_episodes(s) <=> (s, e) in dom episode_info 
 TEXT: If and only if implies the condition is a bi-implication.
 
@@ -339,8 +339,8 @@ TEXT: If and only if translates to the sets are equal. The same ShowId exist in 
 
 TEXT: The specification "exactly when" translates to bi-implication and fst(episode_info(s, e)) gives us access to a finite set of PeopleId as does show_info(s) .
 
-(f) forall s : shows | (forall e_1, e_2 : EpisodeId | \
-      (((s, e_1) in dom episode_info and (s, e_2) in dom episode_info) => \
+(f) forall s : shows | (forall e_1, e_2 : EpisodeId |
+      (((s, e_1) in dom episode_info and (s, e_2) in dom episode_info) =>
       ((e_1 < e_2) => (snd(episode_info(s, e_1)) <= (snd(episode_info(s, e_2)))))))
 
 TEXT: We specify how the Timestamp for different episodes of the same show must compare to fulfill the specification by using snd(episode_info(s, e)) to access the Timestamp.
@@ -365,8 +365,8 @@ where
   forall s : shows | (s, 1) in dom episode_info => first_episode_timestamp(s) = snd(episode_info(s, 1))
 end
 
-EightC == first_episode_timestamp(mu s : dom show_info | \
-  forall t : dom show_info | s != t and \
+EightC == first_episode_timestamp(mu s : dom show_info |
+  forall t : dom show_info | s != t and
   #(show_info s) > #(show_info t))
 
 TEXT: We are given that there is exactly one show with the most people and we want the timestamp for the first episode of that show. This involves two operations, finding the show with the most people and finding the timestamp for the first episode of that show.  For the first operation, we compare the cardinality of the F PeopleId for every pair s, t : ShowId in the domain of show\_info. This is captured in the mu expression, which returns the single matching value.
@@ -386,26 +386,26 @@ axdef
   status : ShowId cross EpisodeId +-> (PlayedOrNot cross SavedOrNot)
 where
   my_shows subset shows
-  forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes => \
+  forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes =>
     e in show_episodes s
-  forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes => \
+  forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes =>
     s in my_shows
-  forall s : ShowId | forall e : EpisodeId | \
+  forall s : ShowId | forall e : EpisodeId |
     (s, e) in ran my_episodes <=> (s, e) in dom status
 end
 
 (a) my_shows subset shows
 TEXT: The elements of the finite set of ShowId on this device must be elements of shows
 
-(b) forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes => \
+(b) forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes =>
       e in show_episodes s
 TEXT: We use the ran operator to access the (s, e) in the injective seq my\_episodes to specifiy each pair just be a valid mapping in show_episodes
 
-(c)   forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes => \
+(c)   forall s : ShowId | forall e : EpisodeId | (s, e) in ran my_episodes =>
       s in my_shows
 TEXT: We use the ran operator to access the (s, e) in the injective seq my\_episodes to specifify each ShowId must be in my\_shows
 
-(d)   forall s : ShowId | forall e : EpisodeId | \
+(d)   forall s : ShowId | forall e : EpisodeId |
         (s, e) in ran my_episodes <=> (s, e) in dom status
 TEXT: Every (s, e) pair in the ran my\_episodes has a status and every (s, e) in status must be in ran my\_episodes
 
@@ -424,8 +424,8 @@ end
 axdef
   length : PossiblePlaylist -> N
 where
-  length(<>) = 0 and \
-    forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) | \
+  length(<>) = 0 and
+    forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) |
       length(<ple> ^ pl) = snd(ple) + length(pl))
 end
 
@@ -434,9 +434,9 @@ end
 axdef
   unplayed : PossiblePlaylist -> PossiblePlaylist
 where
-  unplayed(<>) = <> and \
-    forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) | \
-      (fst(status(fst(ple))) = Played) => (unplayed(<ple> ^ pl) = unplayed(pl)) and \
+  unplayed(<>) = <> and
+    forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) |
+      (fst(status(fst(ple))) = Played) => (unplayed(<ple> ^ pl) = unplayed(pl)) and
       (fst(status(fst(ple))) = NotP) => (unplayed(<ple> ^ pl) = <ple> ^ (unplayed(pl))))
 end
 
@@ -445,9 +445,9 @@ end
 axdef
   played : PossiblePlaylist -> PossiblePlaylist
 where
-  played(<>) = <> and \
-    forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) | \
-      (fst(status(fst(ple))) = NotP) => (played(<ple> ^ pl) = played(pl)) and \
+  played(<>) = <> and
+    forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) |
+      (fst(status(fst(ple))) = NotP) => (played(<ple> ^ pl) = played(pl)) and
       (fst(status(fst(ple))) = Played) => (played(<ple> ^ pl) = <ple> ^ (played(pl))))
 end
 
@@ -468,8 +468,8 @@ TEXT: A playlist element is of type ((dom status) cross N).  We now seek to prov
 
 zed
 
-forall t : PossiblePlaylist | (forall ple : ((dom status) cross N) | \
-  length(played(t)) + length(unplayed(t)) = length(t) => \
+forall t : PossiblePlaylist | (forall ple : ((dom status) cross N) |
+  length(played(t)) + length(unplayed(t)) = length(t) =>
   length(played(<ple> ^ t)) + length(unplayed(<ple> ^ t)) = length(<ple> ^ t))
 
 end
@@ -594,7 +594,7 @@ length_L(nil)                             [length_L(nil) = 0]
 
 TEXT: In the above, we use each of the definitions of played_L(nil), unplayed_L(nil), and length_L(nil) to prove our base case.  Now we have to move to our inductive case 
 
-length_L(played(l)) + length_L(unplayed(l)) = length_L(l) => \
+length_L(played(l)) + length_L(unplayed(l)) = length_L(l) =>
   length_L(played(join(e, l))) + length_L(unplayed(join(e, l))) = length_L(join(e, l))
 
 TEXT: To establish this implication is true, we must prove it all cases. For this statement, e : ListElement is included in played_L's output or unplayed_L's output based on the value of its free type PlayedOrNot, which can only have one of two states that map directly to these two outcomes.  Therefore, we have two cases, one where e's PlayedOrNot value is Played and another where the value is NotP.
