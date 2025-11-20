@@ -64,6 +64,9 @@ from txt2tex.tokens import Token, TokenType
 class ParserError(Exception):
     """Raised when parser encounters invalid syntax."""
 
+    # Instance variable type annotations
+    token: Token
+
     def __init__(self, message: str, token: Token) -> None:
         """Initialize parser error with token position."""
         super().__init__(f"Line {token.line}, column {token.column}: {message}")
@@ -133,6 +136,14 @@ class Parser:
                  -->> (total surjection), +->> (partial surjection),
                  >->> (bijection)
     """
+
+    # Instance variable type annotations
+    tokens: list[Token]
+    pos: int
+    last_token_end_column: int
+    last_token_line: int
+    _parsing_schema_text: bool
+    _in_comprehension_body: bool
 
     def __init__(self, tokens: list[Token]) -> None:
         """Initialize parser with token list."""
@@ -680,6 +691,32 @@ class Parser:
         """Skip all consecutive newline tokens."""
         while self._match(TokenType.NEWLINE) and not self._at_end():
             self._advance()
+
+    def _is_keyword_usable_as_identifier(self) -> bool:
+        """Check if current token is a keyword that can be used as an identifier.
+
+        Z notation keywords (id, dom, ran, etc.) are context-sensitive.
+        In declaration contexts (schema/axdef/gendef), they can be variable names.
+        In expression contexts, they remain operators/functions.
+
+        Returns:
+            True if current token is a keyword usable as identifier in declarations
+        """
+        return self._current().type in (
+            TokenType.ID,  # id (identity relation)
+            TokenType.DOM,  # dom (domain)
+            TokenType.RAN,  # ran (range)
+            TokenType.INV,  # inv (inverse)
+            TokenType.COMP,  # comp (composition)
+            TokenType.HEAD,  # head (sequence)
+            TokenType.TAIL,  # tail (sequence)
+            TokenType.LAST,  # last (sequence)
+            TokenType.FRONT,  # front (sequence)
+            TokenType.REV,  # rev (reverse)
+            TokenType.MOD,  # mod (modulo)
+            TokenType.BIGCUP,  # bigcup (distributed union)
+            TokenType.BIGCAP,  # bigcap (distributed intersection)
+        )
 
     def _smart_join_justification(self, parts: list[str]) -> str:
         """Join justification tokens intelligently.
@@ -3175,7 +3212,8 @@ class Parser:
                 continue
 
             # Parse declaration: var : Type
-            if self._match(TokenType.IDENTIFIER):
+            # Allow keywords as variable names in declarations (e.g., id, dom, ran)
+            if self._match(TokenType.IDENTIFIER) or self._is_keyword_usable_as_identifier():
                 var_token = self._current()
                 var_name = var_token.value
                 self._advance()
@@ -3262,7 +3300,8 @@ class Parser:
                 continue
 
             # Parse declaration: var : Type
-            if self._match(TokenType.IDENTIFIER):
+            # Allow keywords as variable names in declarations (e.g., id, dom, ran)
+            if self._match(TokenType.IDENTIFIER) or self._is_keyword_usable_as_identifier():
                 var_token = self._current()
                 var_name = var_token.value
                 self._advance()
@@ -3386,7 +3425,8 @@ class Parser:
                 continue
 
             # Parse declaration: var : Type
-            if self._match(TokenType.IDENTIFIER):
+            # Allow keywords as variable names in declarations (e.g., id, dom, ran)
+            if self._match(TokenType.IDENTIFIER) or self._is_keyword_usable_as_identifier():
                 var_token = self._current()
                 var_name = var_token.value
                 self._advance()
