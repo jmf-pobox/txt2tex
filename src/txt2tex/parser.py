@@ -3213,7 +3213,10 @@ class Parser:
 
             # Parse declaration: var : Type
             # Allow keywords as variable names in declarations (e.g., id, dom, ran)
-            if self._match(TokenType.IDENTIFIER) or self._is_keyword_usable_as_identifier():
+            if (
+                self._match(TokenType.IDENTIFIER)
+                or self._is_keyword_usable_as_identifier()
+            ):
                 var_token = self._current()
                 var_name = var_token.value
                 self._advance()
@@ -3301,7 +3304,10 @@ class Parser:
 
             # Parse declaration: var : Type
             # Allow keywords as variable names in declarations (e.g., id, dom, ran)
-            if self._match(TokenType.IDENTIFIER) or self._is_keyword_usable_as_identifier():
+            if (
+                self._match(TokenType.IDENTIFIER)
+                or self._is_keyword_usable_as_identifier()
+            ):
                 var_token = self._current()
                 var_name = var_token.value
                 self._advance()
@@ -3426,7 +3432,10 @@ class Parser:
 
             # Parse declaration: var : Type
             # Allow keywords as variable names in declarations (e.g., id, dom, ran)
-            if self._match(TokenType.IDENTIFIER) or self._is_keyword_usable_as_identifier():
+            if (
+                self._match(TokenType.IDENTIFIER)
+                or self._is_keyword_usable_as_identifier()
+            ):
                 var_token = self._current()
                 var_name = var_token.value
                 self._advance()
