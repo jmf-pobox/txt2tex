@@ -1,23 +1,21 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Sequence Concatenation}
 
-\bigskip
-\noindent
-\textbf{Example 1 : Simple Concatenation ( ASCII )}
+\section*{Example 1 : Simple Concatenation ( ASCII )}
+\addcontentsline{toc}{section}{Example 1 : Simple Concatenation ( ASCII )}
 
-\medskip
-
-\bigskip
-
-The caret operator after a sequence means concatenation:
+\noindent The caret operator after a sequence means concatenation:
 
 \bigskip
 
@@ -30,15 +28,10 @@ $\langle 1, 2 \rangle \cat \langle 3, 4 \rangle$
 \noindent
 $\langle x \rangle \cat \langle \rangle$
 
-\bigskip
-\noindent
-\textbf{Example 2 : Concatenation with Variables}
+\section*{Example 2 : Concatenation with Variables}
+\addcontentsline{toc}{section}{Example 2 : Concatenation with Variables}
 
-\medskip
-
-\bigskip
-
-Concatenation with sequence variables:
+\noindent Concatenation with sequence variables:
 
 \bigskip
 
@@ -51,15 +44,10 @@ $s \cat t$
 \noindent
 $\langle \rangle \cat t$
 
-\bigskip
-\noindent
-\textbf{Example 3 : Cons Pattern}
+\section*{Example 3 : Cons Pattern}
+\addcontentsline{toc}{section}{Example 3 : Cons Pattern}
 
-\medskip
-
-\bigskip
-
-The cons pattern builds sequences incrementally:
+\noindent The cons pattern builds sequences incrementally:
 
 \bigskip
 
@@ -73,15 +61,10 @@ $\langle x \rangle \cat \langle y \rangle \cat \langle z \rangle$
 $\langle 1 \rangle \cat \langle 2 \rangle \cat \langle 3 \rangle \cat
 \langle \rangle$
 
-\bigskip
-\noindent
-\textbf{Example 4 : Nested Concatenation}
+\section*{Example 4 : Nested Concatenation}
+\addcontentsline{toc}{section}{Example 4 : Nested Concatenation}
 
-\medskip
-
-\bigskip
-
-Concatenation is associative:
+\noindent Concatenation is associative:
 
 \bigskip
 

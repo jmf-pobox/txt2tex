@@ -1,0 +1,393 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Scoping Rules Examples}
+
+\begin{zed}[Char]
+\end{zed}
+
+\section*{Example 1 : Quantifier Scope}
+\addcontentsline{toc}{section}{Example 1 : Quantifier Scope}
+
+\noindent Variables introduced in quantifiers are local to that quantifier:
+
+\bigskip
+
+\noindent
+$\forall x : \nat @ x > 0$
+
+\noindent Here x is only in scope within the quantifier. Outside the
+quantifier, x is not defined.
+
+\bigskip
+
+\section*{Example 2 : Nested Quantifiers}
+\addcontentsline{toc}{section}{Example 2 : Nested Quantifiers}
+
+\noindent
+$\forall x : \nat @ \exists y : \nat @ x + y = 10$
+
+\noindent x is in scope for the entire outer quantifier, including
+the inner quantifier. y is only in scope within the exists quantifier.
+
+\bigskip
+
+\section*{Example 3 : Shadowing in Nested Quantifiers}
+\addcontentsline{toc}{section}{Example 3 : Shadowing in Nested Quantifiers}
+
+\noindent
+$\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
+
+\noindent The inner x shadows the outer x. Within the exists
+quantifier, x refers to the inner binding. This is allowed but can be confusing.
+
+\bigskip
+
+\section*{Example 4 : Set Comprehension Scope}
+\addcontentsline{toc}{section}{Example 4 : Set Comprehension Scope}
+
+\noindent
+$\{ x : \nat | x > 0 \land x < 10 \}$
+
+\noindent x is in scope only within the set comprehension. The
+constraint $x > 0$ and $x < 10$ uses the same x.
+
+\bigskip
+
+\section*{Example 5 : Bullet Separator Scope}
+\addcontentsline{toc}{section}{Example 5 : Bullet Separator Scope}
+
+\noindent
+$\{ x : \nat | x < 5 @ x * x \}$
+
+\noindent x is in scope both before and after the bullet. The
+constraint $x < 5$ and the term x * x refer to the same x.
+
+\bigskip
+
+\section*{Example 6 : Schema Component Scope}
+\addcontentsline{toc}{section}{Example 6 : Schema Component Scope}
+
+\begin{schema}{Counter}
+  count : \nat \\
+  limit : \nat
+  \where
+  count \leq limit
+\end{schema}
+
+\noindent Within the schema, count and limit are in scope in the
+where clause. Outside the schema, they must be accessed via schema references.
+
+\bigskip
+
+\section*{Example 7 : Schema Reference}
+\addcontentsline{toc}{section}{Example 7 : Schema Reference}
+
+\begin{axdef}
+  c : Counter
+  \where
+  c.count = 5 \\
+  c.limit = 10
+\end{axdef}
+
+\noindent When referencing schema components from outside, use dot
+notation: c.count and c.limit.
+
+\bigskip
+
+\section*{Example 8 : Multiple Schemas - No Name Conflict}
+\addcontentsline{toc}{section}{Example 8 : Multiple Schemas - No Name Conflict}
+
+\begin{schema}{Account}
+  balance : \nat
+  \where
+  balance \geq 0
+\end{schema}
+
+\begin{schema}{Transaction}
+  balance : \nat
+  \where
+  balance \geq 0
+\end{schema}
+
+\noindent Both schemas have a component named balance. This is
+allowed because they are in different schema scopes.
+
+\bigskip
+
+\section*{Example 9 : Schema Inclusion Scope}
+\addcontentsline{toc}{section}{Example 9 : Schema Inclusion Scope}
+
+\begin{schema}{User}
+  userId : \nat \\
+  name : \seq Char
+\end{schema}
+
+\begin{schema}{LoggedInUser}
+  userId : \nat \\
+  userName : \seq Char \\
+  sessionToken : \nat
+  \where
+  sessionToken > 0
+\end{schema}
+
+\noindent LoggedInUser has its own copies of userId and name fields
+$(as(userId) \land userName)$, plus sessionToken. In full Z notation,
+schema inclusion would allow referencing User directly, but here we
+show explicit declarations.
+
+\bigskip
+
+\section*{Example 10 : Global vs Local Names}
+\addcontentsline{toc}{section}{Example 10 : Global vs Local Names}
+
+\begin{zed}[GlobalType]
+\end{zed}
+
+\begin{axdef}
+  globalVar : \nat
+  \where
+  globalVar = 42
+\end{axdef}
+
+\begin{schema}{LocalScope}
+  x : \nat
+  \where
+  x = globalVar + 1
+\end{schema}
+
+\noindent globalVar is in the global scope, accessible from within
+schemas. x is local to LocalScope.
+
+\bigskip
+
+\section*{Example 11 : Quantifier with Global Names}
+\addcontentsline{toc}{section}{Example 11 : Quantifier with Global Names}
+
+\begin{axdef}
+  maximum : \nat
+  \where
+  maximum = 100
+\end{axdef}
+
+\begin{schema}{Bounded}
+  value : \nat
+  \where
+  \forall x : \nat @ x \leq maximum \implies value \leq x
+\end{schema}
+
+\noindent The quantifier introduces local x, but maximum refers to
+the global axdef constant.
+
+\bigskip
+
+\section*{Example 12 : Name Capture Avoidance}
+\addcontentsline{toc}{section}{Example 12 : Name Capture Avoidance}
+
+\noindent Be careful with name shadowing in complex expressions:
+
+\bigskip
+
+\begin{axdef}
+  x : \nat
+  \where
+  x = 10 \\
+  \forall x : \nat @ x > 0 \implies x \geq 0
+\end{axdef}
+
+\noindent The global $x = 10$, but the quantifier in the where clause
+uses a local x that shadows the global x within its scope.
+
+\bigskip
+
+\section*{Example 13 : Lambda Scope}
+\addcontentsline{toc}{section}{Example 13 : Lambda Scope}
+
+\noindent
+$\lambda x : \nat @ x * x$
+
+\noindent x is in scope only within the lambda body (x * x). The
+lambda introduces its own scope for the parameter.
+
+\bigskip
+
+\section*{Example 14 : Nested Lambdas}
+\addcontentsline{toc}{section}{Example 14 : Nested Lambdas}
+
+\noindent
+$\lambda x : \nat @ \lambda y : \nat @ x + y$
+
+\noindent x is in scope in both the outer lambda body and the inner
+lambda body. y is only in scope in the inner lambda body.
+
+\bigskip
+
+\section*{Example 15 : Mu Operator Scope}
+\addcontentsline{toc}{section}{Example 15 : Mu Operator Scope}
+
+\noindent
+$(\mu x : \nat | x * x = 25)$
+
+\noindent x is in scope only within the mu expression (the constraint
+and any expression after a bullet).
+
+\bigskip
+
+\section*{Example 16 : Set Comprehension with Multiple Variables}
+\addcontentsline{toc}{section}{Example 16 : Set Comprehension with
+Multiple Variables}
+
+\noindent
+$\{ x, y : \nat | x < y \land y < 10 @ (x, y) \}$
+
+\noindent Both x and y are in scope throughout the set comprehension,
+including the constraint and the term.
+
+\bigskip
+
+\section*{Example 17 : Schema Quantification}
+\addcontentsline{toc}{section}{Example 17 : Schema Quantification}
+
+\begin{schema}{Database}
+  records : \power \nat
+\end{schema}
+
+\noindent
+$\exists Database @ \# records > 100$
+
+\noindent This quantifies over schema Database. The components of
+Database (records) are in scope within the predicate.
+
+\bigskip
+
+\section*{Example 18 : Scope Hygiene Best Practices}
+\addcontentsline{toc}{section}{Example 18 : Scope Hygiene Best Practices}
+
+\noindent To avoid confusion:
+
+\bigskip
+
+\noindent 1. Don't shadow names unnecessarily—use different variable names
+
+\bigskip
+
+\noindent 2. Keep quantifier nesting shallow when possible
+
+\bigskip
+
+\noindent 3. Use descriptive names that make scope obvious
+
+\bigskip
+
+\noindent 4. Avoid reusing schema component names in nested contexts
+
+\bigskip
+
+\noindent 5. Document intentional shadowing with comments
+
+\bigskip
+
+\section*{Example 19 : Good Style ( Distinct Names )}
+\addcontentsline{toc}{section}{Example 19 : Good Style ( Distinct Names )}
+
+\noindent
+$\forall x : \nat @ x > 0 \implies (\exists y : \nat @ y < x \land y > 0)$
+
+\noindent Uses distinct names x and y—clear and unambiguous.
+
+\bigskip
+
+\section*{Example 20 : Poor Style ( Shadowing )}
+\addcontentsline{toc}{section}{Example 20 : Poor Style ( Shadowing )}
+
+\noindent
+$\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
+
+\noindent Inner x shadows outer x—confusing and error-prone. Avoid this pattern.
+
+\bigskip
+
+\section*{Example 21 : Scoping in Definitions}
+\addcontentsline{toc}{section}{Example 21 : Scoping in Definitions}
+
+\noindent Poor style example (not valid due to name shadowing):
+
+\bigskip
+
+\noindent If we had: axdef with square : $\nat \fun \nat$ and $n : N,
+where $\forall$ n $: N shadows the global n.
+
+\bigskip
+
+\noindent The quantifier's n would be local to the quantifier, and
+the global $n = 5$ would be separate.
+
+\bigskip
+
+\noindent This is legal but confusing. Better to use different names:
+
+\bigskip
+
+\begin{axdef}
+  square : \nat \fun \nat \\
+  testValue : \nat
+  \where
+  \forall x : \nat @ square(x) = x * x \\
+  testValue = 5
+\end{axdef}
+
+\noindent Now there's no shadowing—much clearer!
+
+\bigskip
+
+\section*{Example 22 : Schema Composition Scope}
+\addcontentsline{toc}{section}{Example 22 : Schema Composition Scope}
+
+\begin{schema}{StateA}
+  x : \nat
+\end{schema}
+
+\begin{schema}{StateB}
+  y : \nat
+\end{schema}
+
+\begin{schema}{Combined}
+  x : \nat \\
+  y : \nat
+  \where
+  x + y > 0
+\end{schema}
+
+\noindent Combined has fields x and y. In full Z notation, schema
+inclusion (StateA; StateB) would automatically bring in these fields
+from other schemas, but here we show explicit declarations.
+
+\bigskip
+
+\section*{Example 23 : Free Type Scope}
+\addcontentsline{toc}{section}{Example 23 : Free Type Scope}
+
+\begin{zed}Color ::= red | green | blue
+\end{zed}
+
+\begin{schema}{ColoredItem}
+  color : Color
+  \where
+  color \in \{red, blue\}
+\end{schema}
+
+\noindent The free type constructors (red, green, blue) are in global
+scope, accessible within schemas and definitions.
+
+\bigskip
+
+\end{document}

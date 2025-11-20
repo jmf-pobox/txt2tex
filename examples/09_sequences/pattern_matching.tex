@@ -1,23 +1,21 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Pattern Matching with Sequences}
 
-\bigskip
-\noindent
-\textbf{Example 1 : Empty Sequence Pattern}
+\section*{Example 1 : Empty Sequence Pattern}
+\addcontentsline{toc}{section}{Example 1 : Empty Sequence Pattern}
 
-\medskip
-
-\bigskip
-
-Pattern matching on the empty sequence:
+\noindent Pattern matching on the empty sequence:
 
 \bigskip
 
@@ -27,15 +25,10 @@ Pattern matching on the empty sequence:
   f(\langle \rangle) = 0
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 2 : Cons Pattern ( Head and Tail )}
+\section*{Example 2 : Cons Pattern ( Head and Tail )}
+\addcontentsline{toc}{section}{Example 2 : Cons Pattern ( Head and Tail )}
 
-\medskip
-
-\bigskip
-
-Decomposing a sequence into head and tail:
+\noindent Decomposing a sequence into head and tail:
 
 \bigskip
 
@@ -46,15 +39,10 @@ Decomposing a sequence into head and tail:
   \forall x : \nat @ \forall s : \seq \nat @ g(\langle x \rangle \cat s) = x
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 3 : Recursive Sum}
+\section*{Example 3 : Recursive Sum}
+\addcontentsline{toc}{section}{Example 3 : Recursive Sum}
 
-\medskip
-
-\bigskip
-
-Computing the sum of elements using pattern matching:
+\noindent Computing the sum of elements using pattern matching:
 
 \bigskip
 
@@ -66,15 +54,10 @@ Computing the sum of elements using pattern matching:
   \cat s) = x + total(s)
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 4 : Cumulative Total}
+\section*{Example 4 : Cumulative Total}
+\addcontentsline{toc}{section}{Example 4 : Cumulative Total}
 
-\medskip
-
-\bigskip
-
-A more descriptive example from the solutions:
+\noindent A more descriptive example from the solutions:
 
 \bigskip
 
@@ -86,15 +69,10 @@ A more descriptive example from the solutions:
   cumulative\_total(\langle x \rangle \cat s) = x + cumulative\_total(s)
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 5 : Filter Pattern}
+\section*{Example 5 : Filter Pattern}
+\addcontentsline{toc}{section}{Example 5 : Filter Pattern}
 
-\medskip
-
-\bigskip
-
-Filtering sequences based on a condition:
+\noindent Filtering sequences based on a condition:
 
 \bigskip
 

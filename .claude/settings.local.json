@@ -29,7 +29,13 @@
       "Bash(git log:*)",
       "Bash(for dir in /Users/jfreeman/Coding/fuzz/txt2tex/sem/examples/*/)",
       "Bash(done)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(/tmp/music_test.tex)",
+      "Bash(for file in examples/complete_examples/*.txt)",
+      "Bash(/tmp/test.tex)",
+      "Bash(make 01_propositional_logic:*)",
+      "Bash(make 10_schemas:*)",
+      "Bash(make:*)"
     ],
     "deny": [],
     "ask": []
