@@ -1,0 +1,24 @@
+{
+  "include": [
+    "src",
+    "tests"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "**/node_modules",
+    ".venv",
+    "build",
+    "dist"
+  ],
+  "typeCheckingMode": "strict",
+  "reportUnknownMemberType": "information",
+  "reportUnknownVariableType": "information",
+  "reportMissingTypeStubs": "none",
+  "pythonVersion": "3.10",
+  "pythonPlatform": "Darwin",
+  "strict": [
+    "src/txt2tex"
+  ],
+  "venvPath": ".",
+  "venv": ".venv"
+}
