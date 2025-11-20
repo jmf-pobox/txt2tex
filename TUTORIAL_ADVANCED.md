@@ -33,7 +33,7 @@ else if x = 0 then 0
 else -1
 ```
 
-**See:** `examples/12_advanced/if_then_else.txt`
+**Note:** See `examples/12_advanced/future/if_then_else.txt` (requires division operator `/` which is not yet implemented)
 
 ## Subscripts and Superscripts
 
@@ -53,7 +53,7 @@ n^3 = n * n * n
 x_i^2           ((x sub i) squared)
 ```
 
-**See:** `examples/12_advanced/subscripts_superscripts.txt`
+**Note:** Basic subscripts and superscripts work as shown above. The comprehensive example at `examples/12_advanced/future/subscripts_superscripts.txt` requires prime notation (`x'`) which is not yet implemented.
 
 ## Generic Type Instantiation
 
@@ -71,7 +71,7 @@ seq[N cross N]      (sequence of pairs)
 P[seq[N]]           (set of sequences)
 ```
 
-**See:** `examples/12_advanced/generic_instantiation.txt`
+**Note:** See `examples/12_advanced/future/generic_instantiation.txt` (requires prime notation `x'` which is not yet implemented)
 
 ## Text Blocks
 
