@@ -230,7 +230,7 @@ class LaTeXGenerator:
         """Initialize generator with package choice and TOC options."""
         self.use_fuzz = use_fuzz
         self.toc_parts = toc_parts
-        self.parts_format: str = "subsection"  # Document-level parts format
+        self.parts_format = "subsection"  # Document-level parts format
         self._in_equiv_block = False  # Track context for line break formatting
         self._first_part_in_solution = False  # Track if we're generating first part
         self._in_inline_part = False  # Track if we're inside an inline part
@@ -515,7 +515,7 @@ class LaTeXGenerator:
             return self._generate_conditional(expr, parent)
         if isinstance(expr, GuardedCases):
             return self._generate_guarded_cases(expr, parent)
-        if isinstance(expr, GuardedBranch):
+        if isinstance(expr, GuardedBranch):  # pyright: ignore[reportUnnecessaryIsInstance]
             return self._generate_guarded_branch(expr, parent)
 
         raise TypeError(f"Unknown expression type: {type(expr)}")
@@ -3499,8 +3499,8 @@ class LaTeXGenerator:
                 if current_group:
                     child_groups.append(current_group)
                     current_group = []
-            elif isinstance(child, ProofNode):
-                # Regular proof node
+            else:
+                # child is ProofNode (only other type in union)
                 child_latex = self._generate_proof_node_infer(child)
 
                 if child.is_sibling and current_group:
@@ -3876,7 +3876,8 @@ class LaTeXGenerator:
                     for child in last_step.children:
                         if isinstance(child, ProofNode):
                             all_premises.append(self._generate_proof_node_infer(child))
-                        elif isinstance(child, CaseAnalysis):
+                        else:
+                            # child is CaseAnalysis (only other type in union)
                             all_premises.append(self._generate_case_analysis(child))
 
                 premises_str = " & ".join(all_premises) if all_premises else ""
