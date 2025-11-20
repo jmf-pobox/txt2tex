@@ -37,8 +37,26 @@ if [ -n "$TEX_FILE" ]; then
 fi
 echo ""
 
+# Check if pdftotext is installed
+if ! command -v pdftotext &> /dev/null; then
+    echo -e "${RED}ERROR: pdftotext command not found${NC}"
+    echo "Please install poppler-utils: brew install poppler"
+    exit 1
+fi
+
 # Extract text from PDF
-PDF_TEXT=$(pdftotext "$PDF_FILE" -)
+if ! PDF_TEXT=$(pdftotext "$PDF_FILE" - 2>&1); then
+    echo -e "${RED}ERROR: Failed to extract text from PDF${NC}"
+    echo "pdftotext output: $PDF_TEXT"
+    exit 1
+fi
+
+# Verify PDF text extraction succeeded
+if [ -z "$PDF_TEXT" ]; then
+    echo -e "${RED}ERROR: PDF text extraction produced empty output${NC}"
+    echo "The PDF may be corrupted or contain only images"
+    exit 1
+fi
 
 # 1. Check for garbled characters in PDF
 echo "=== 1. Garbled Characters in PDF ==="
@@ -51,9 +69,9 @@ if [ "${GARBLED_COUNT:-0}" -gt 0 ]; then
     # Show which solutions have garbled characters
     echo ""
     echo "Solutions with garbled characters:"
-    echo "$PDF_TEXT" | grep -n "Solution [0-9]" | while read -r line; do
+    echo "$PDF_TEXT" | grep -n "Solution [0-9]\+" | while read -r line; do
         line_num=$(echo "$line" | cut -d: -f1)
-        solution=$(echo "$line" | sed 's/.*Solution \([0-9]*\).*/\1/')
+        solution=$(echo "$line" | sed 's/.*Solution \([0-9]\+\).*/\1/')
         # Check if garbled chars appear within next 50 lines
         garbled_in_solution=$(echo "$PDF_TEXT" | tail -n +$line_num | head -n 50 | grep -o "[¿¡—]" | wc -l | tr -d ' ')
         if [ "$garbled_in_solution" -gt 0 ]; then
@@ -169,7 +187,7 @@ if [ -n "$TEX_FILE" ]; then
     TEX_OPERATOR_COUNT=0
 
     # Check for plain "and" (should be \land)
-    TEX_AND_TEXT=$(grep -n -E "[^\\[:alpha:]]and[^[:alpha:]]" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\land" | grep -v "\\\\begin" | grep -v "\\\\end" || true)
+    TEX_AND_TEXT=$(grep -n -E "\band\b" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\land" | grep -v "\\\\begin" | grep -v "\\\\end" || true)
     TEX_AND_COUNT=$(echo "$TEX_AND_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
     if [ "${TEX_AND_COUNT:-0}" -gt 0 ]; then
         echo -e "${RED}FAIL: Found $TEX_AND_COUNT instances of plain 'and' (should be \\land)${NC}"
@@ -178,7 +196,7 @@ if [ -n "$TEX_FILE" ]; then
     fi
 
     # Check for plain "or" (should be \lor)
-    TEX_OR_TEXT=$(grep -n -E "[^\\[:alpha:]]or[^[:alpha:]]" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\lor" | grep -v "\\\\begin" | grep -v "\\\\end" || true)
+    TEX_OR_TEXT=$(grep -n -E "\bor\b" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\lor" | grep -v "\\\\begin" | grep -v "\\\\end" || true)
     TEX_OR_COUNT=$(echo "$TEX_OR_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
     if [ "${TEX_OR_COUNT:-0}" -gt 0 ]; then
         echo -e "${RED}FAIL: Found $TEX_OR_COUNT instances of plain 'or' (should be \\lor)${NC}"
@@ -187,7 +205,7 @@ if [ -n "$TEX_FILE" ]; then
     fi
 
     # Check for plain "not" (should be \lnot)
-    TEX_NOT_TEXT=$(grep -n -E "[^\\[:alpha:]]not[^[:alpha:]]" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\lnot" | grep -v "\\\\begin" | grep -v "\\\\end" | grep -v "\\\\notin" || true)
+    TEX_NOT_TEXT=$(grep -n -E "\bnot\b" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\lnot" | grep -v "\\\\begin" | grep -v "\\\\end" | grep -v "\\\\notin" || true)
     TEX_NOT_COUNT=$(echo "$TEX_NOT_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
     if [ "${TEX_NOT_COUNT:-0}" -gt 0 ]; then
         echo -e "${RED}FAIL: Found $TEX_NOT_COUNT instances of plain 'not' (should be \\lnot)${NC}"
@@ -196,7 +214,7 @@ if [ -n "$TEX_FILE" ]; then
     fi
 
     # Check for plain "exists" (should be \exists)
-    TEX_EXISTS_TEXT=$(grep -n -E "[^\\[:alpha:]]exists[^[:alnum:]]" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\exists" | grep -v "exists1" || true)
+    TEX_EXISTS_TEXT=$(grep -n -E "\bexists\b" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\exists" | grep -v "exists1" || true)
     TEX_EXISTS_COUNT=$(echo "$TEX_EXISTS_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
     if [ "${TEX_EXISTS_COUNT:-0}" -gt 0 ]; then
         echo -e "${RED}FAIL: Found $TEX_EXISTS_COUNT instances of plain 'exists' (should be \\exists)${NC}"
@@ -205,7 +223,7 @@ if [ -n "$TEX_FILE" ]; then
     fi
 
     # Check for plain "exists1" (should be \exists_1)
-    TEX_EXISTS1_TEXT=$(grep -n -E "[^\\[:alpha:]]exists1[^[:alpha:]]" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\exists_1" || true)
+    TEX_EXISTS1_TEXT=$(grep -n -E "\bexists1\b" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\exists_1" || true)
     TEX_EXISTS1_COUNT=$(echo "$TEX_EXISTS1_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
     if [ "${TEX_EXISTS1_COUNT:-0}" -gt 0 ]; then
         echo -e "${RED}FAIL: Found $TEX_EXISTS1_COUNT instances of plain 'exists1' (should be \\exists_1)${NC}"
@@ -214,7 +232,7 @@ if [ -n "$TEX_FILE" ]; then
     fi
 
     # Check for plain "mu" (should be \mu)
-    TEX_MU_TEXT=$(grep -n -E "[^\\[:alpha:]]mu[^[:alpha:]]" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\mu" | grep -v "lambda" || true)
+    TEX_MU_TEXT=$(grep -n -E "\bmu\b" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\mu" | grep -v "lambda" || true)
     TEX_MU_COUNT=$(echo "$TEX_MU_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
     if [ "${TEX_MU_COUNT:-0}" -gt 0 ]; then
         echo -e "${RED}FAIL: Found $TEX_MU_COUNT instances of plain 'mu' (should be \\mu)${NC}"

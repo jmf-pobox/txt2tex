@@ -11,6 +11,10 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Create unique temporary file and ensure cleanup on exit
+TEMP_FILE=$(mktemp /tmp/qa_check_output.XXXXXX)
+trap "rm -f $TEMP_FILE" EXIT
+
 echo "=========================================="
 echo "txt2tex QA Check - All PDFs"
 echo "=========================================="
@@ -38,7 +42,7 @@ for PDF in $PDFS; do
     echo -e "${BLUE}Checking: $PDF${NC}"
     
     # Run qa_check.sh but capture output and exit code
-    if ./qa_check.sh "$PDF" > /tmp/qa_check_output.txt 2>&1; then
+    if ./qa_check.sh "$PDF" > "$TEMP_FILE" 2>&1; then
         echo -e "${GREEN}✓ PASS: $PDF${NC}"
         TOTAL_PASSED=$((TOTAL_PASSED + 1))
     else
@@ -49,13 +53,10 @@ for PDF in $PDFS; do
         
         # Show summary of issues (last few lines of output)
         echo "  Issues found:"
-        tail -n 10 /tmp/qa_check_output.txt | grep -E "Found|garbled|forall|emptyset" | head -5 | sed 's/^/    /' || true
+        tail -n 10 "$TEMP_FILE" | grep -E "Found|garbled|forall|emptyset" | head -5 | sed 's/^/    /' || true
     fi
     echo ""
 done
-
-# Cleanup
-rm -f /tmp/qa_check_output.txt
 
 # Final summary
 echo "=========================================="
