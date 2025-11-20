@@ -277,7 +277,7 @@ class LaTeXGenerator:
             # Generate author field with optional subtitle/institution footnotes
             # Even without author name, generate \author{} if they're present
             if meta.author or meta.subtitle or meta.institution:
-                author_parts = []
+                author_parts: list[str] = []
                 if meta.author:
                     author_parts.append(meta.author)
                 if meta.subtitle:
@@ -1669,7 +1669,7 @@ class LaTeXGenerator:
 
     def _replace_outside_math(self, text: str, pattern: str, replacement: str) -> str:
         """Replace pattern with LaTeX command only when NOT inside $...$ math mode."""
-        result = []
+        result: list[str] = []
         in_math = False
         i = 0
 
@@ -1697,7 +1697,7 @@ class LaTeXGenerator:
         underscores in text mode. Also skip underscores in citation keys like
         \citep{author_name_2025}.
         """
-        result = []
+        result: list[str] = []
         in_math = False
         in_citation = False
         i = 0
@@ -1983,7 +1983,7 @@ class LaTeXGenerator:
         Handles: >=, <=, >, <, | (pipe)
         Only converts when NOT inside existing $...$ math mode.
         """
-        result = []
+        result: list[str] = []
         i = 0
         in_math = False  # Track if we're inside $...$ math mode
 
@@ -2826,7 +2826,7 @@ class LaTeXGenerator:
 
         # Generate data rows (lowercase t/f in italic, last column in bold non-italic)
         for row in node.rows:
-            row_parts = []
+            row_parts: list[str] = []
             for i, val in enumerate(row):
                 # Lowercase t/f for truth values
                 cell = val.lower() if val in ("T", "F") else val
@@ -3527,7 +3527,7 @@ class LaTeXGenerator:
         # If we have case analysis, apply raiseproof for vertical layout
         if case_children:
             # Identify disjunction siblings (for or-elim)
-            disjunction_premises = []
+            disjunction_premises: list[str] = []
             for group in child_groups:
                 for premise in group:
                     # Check if this is a disjunction (contains \lor)
@@ -3535,7 +3535,7 @@ class LaTeXGenerator:
                         disjunction_premises.append(premise)
 
             # Generate raised cases with staggered heights
-            raised_cases = []
+            raised_cases: list[str] = []
             for case_position, (_idx, case) in enumerate(case_children):
                 case_latex = self._generate_case_analysis(case)
                 depth = self._calculate_tree_depth(case)
@@ -3734,7 +3734,7 @@ class LaTeXGenerator:
                         if has_case_analysis:
                             # Only include disjunction siblings as top-level
                             # premises for or-elim
-                            disjunction_siblings = []
+                            disjunction_siblings: list[str] = []
                             for i, sib_child in enumerate(sibling_group):
                                 if (
                                     isinstance(sib_child, ProofNode)
@@ -3746,10 +3746,10 @@ class LaTeXGenerator:
                             # Apply \raiseproof to case branches for vertical
                             # layout. STAGGERED STRATEGY: Different cases get
                             # different heights + horizontal spacing
-                            raised_cases = []
+                            raised_cases: list[str] = []
 
                             # Collect all case indices first
-                            case_indices = []
+                            case_indices: list[int] = []
                             for idx, grandchild in enumerate(child.children):
                                 if isinstance(grandchild, CaseAnalysis):
                                     case_indices.append(idx)
