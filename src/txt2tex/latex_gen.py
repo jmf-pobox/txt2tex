@@ -218,6 +218,14 @@ class LaTeXGenerator:
     # Implication and equivalence are right-associative
     RIGHT_ASSOCIATIVE: ClassVar[set[str]] = {"=>", "<=>"}
 
+    # Instance variable type annotations
+    use_fuzz: bool
+    toc_parts: bool
+    parts_format: str
+    _in_equiv_block: bool
+    _first_part_in_solution: bool
+    _in_inline_part: bool
+
     def __init__(self, use_fuzz: bool = False, toc_parts: bool = False) -> None:
         """Initialize generator with package choice and TOC options."""
         self.use_fuzz = use_fuzz

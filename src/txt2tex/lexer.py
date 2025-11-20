@@ -8,6 +8,10 @@ from txt2tex.tokens import Token, TokenType
 class LexerError(Exception):
     """Raised when lexer encounters invalid input."""
 
+    # Instance variable type annotations
+    line: int
+    column: int
+
     def __init__(self, message: str, line: int, column: int) -> None:
         """Initialize lexer error with position."""
         super().__init__(f"Line {line}, column {column}: {message}")
@@ -25,6 +29,13 @@ class Lexer:
     extended operators (Phase 10b: <<|, |>>, o9, ~, +, *, inv, id),
     and function types (Phase 11a: ->, +->, >->, >+>, -->>, +->>, >->>).
     """
+
+    # Instance variable type annotations
+    text: str
+    pos: int
+    line: int
+    column: int
+    _in_solution_marker: bool
 
     def __init__(self, text: str) -> None:
         """Initialize lexer with input text."""
