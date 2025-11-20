@@ -18,6 +18,7 @@ dependencies = []
 dev = [
     "ruff>=0.13.0",
     "mypy>=1.18.1",
+    "pyright>=1.1.0",
     "pytest>=8.4.2",
 ]
 
@@ -28,6 +29,7 @@ packages = ["src/txt2tex"]
 dependencies = [
     "ruff>=0.13.0",
     "mypy>=1.18.1",
+    "pyright>=1.1.0",
     "pytest>=8.4.2",
     "pytest-cov>=4.0.0",
 ]
@@ -46,8 +48,12 @@ format = "ruff format ."
 format-check = "ruff format --check ."
 type = "mypy src/txt2tex tests"
 type-quick = "mypy"
+type-pyright = "pyright"
+type-pyright-stats = "pyright --stats"
+type-all = ["type", "type-pyright"]
 check = ["lint", "type", "test"]
 check-cov = ["lint", "type", "test-cov"]
+check-all = ["lint", "type", "type-pyright", "test"]
 # CLI wrapper - use for generating LaTeX
 cli = "PYTHONPATH=src python -m txt2tex.cli {args}"
 # Full pipeline - use for txt -> tex -> pdf
