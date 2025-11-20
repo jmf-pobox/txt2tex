@@ -20,5 +20,14 @@
     "src/txt2tex"
   ],
   "venvPath": ".",
-  "venv": ".venv"
+  "venv": ".venv",
+  "executionEnvironments": [
+    {
+      "root": "tests",
+      "reportPrivateUsage": "none"
+    },
+    {
+      "root": "src"
+    }
+  ]
 }
