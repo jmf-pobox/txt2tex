@@ -19,6 +19,8 @@
 
 === Scoping Rules Examples ===
 
+given Char
+
 ** Example 1: Quantifier Scope **
 
 TEXT: Variables introduced in quantifiers are local to that quantifier:
@@ -92,18 +94,19 @@ TEXT: Both schemas have a component named balance. This is allowed because they 
 ** Example 9: Schema Inclusion Scope **
 
 schema User
-  id : N
-  name : seq Char
+  userId : N
+  name : seq(Char)
 end
 
 schema LoggedInUser
-  User
+  userId : N
+  userName : seq(Char)
   sessionToken : N
 where
   sessionToken > 0
 end
 
-TEXT: LoggedInUser includes User, bringing id and name into LoggedInUser's scope. The where clause can reference id, name, and sessionToken.
+TEXT: LoggedInUser has its own copies of userId and name fields (as userId and userName), plus sessionToken. In full Z notation, schema inclusion would allow referencing User directly, but here we show explicit declarations.
 
 ** Example 10: Global vs Local Names **
 
@@ -145,13 +148,12 @@ TEXT: Be careful with name shadowing in complex expressions:
 
 axdef
   x : N
-  result : N
 where
   x = 10
-  result = (forall x : N | x > 0 => x >= 0)
+  forall x : N | x > 0 => x >= 0
 end
 
-TEXT: The global x = 10, but the quantifier's x is independent. The forall quantifier's x shadows the global x within its scope.
+TEXT: The global x = 10, but the quantifier in the where clause uses a local x that shadows the global x within its scope.
 
 ** Example 13: Lambda Scope **
 
@@ -210,16 +212,9 @@ TEXT: Inner x shadows outer x—confusing and error-prone. Avoid this pattern.
 
 ** Example 21: Scoping in Definitions **
 
-axdef
-  square : N -> N
-  n : N
-where
-  forall n : N | square(n) = n * n
-  n = 5
-end
-
-TEXT: The quantifier's n is local to the quantifier. The global n = 5 is separate. The forall's n shadows the global n within the quantifier scope.
-
+TEXT: Poor style example (not valid due to name shadowing):
+TEXT: If we had: axdef with square : N -> N and n : N, where forall n : N shadows the global n.
+TEXT: The quantifier's n would be local to the quantifier, and the global n = 5 would be separate.
 TEXT: This is legal but confusing. Better to use different names:
 
 axdef
@@ -243,13 +238,13 @@ schema StateB
 end
 
 schema Combined
-  StateA
-  StateB
+  x : N
+  y : N
 where
   x + y > 0
 end
 
-TEXT: Combined includes both x (from StateA) and y (from StateB) in its scope. The where clause can reference both.
+TEXT: Combined has fields x and y. In full Z notation, schema inclusion (StateA; StateB) would automatically bring in these fields from other schemas, but here we show explicit declarations.
 
 ** Example 23: Free Type Scope **
 
