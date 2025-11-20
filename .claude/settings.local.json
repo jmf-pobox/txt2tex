@@ -38,7 +38,12 @@
       "Bash(make:*)",
       "Bash(./qa_check.sh:*)",
       "Bash(./qa_check_all.sh:*)",
-      "Bash(bash:*)"
+      "Bash(bash:*)",
+      "Bash(test -f qa_check.sh:*)",
+      "Bash(git checkout:*)",
+      "Bash(qa_check.sh:*)",
+      "Bash(chmod:*)",
+      "Bash(qa_check_all.sh:*)"
     ],
     "deny": [],
     "ask": []

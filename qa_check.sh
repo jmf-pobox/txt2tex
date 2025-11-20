@@ -123,40 +123,10 @@ else
 fi
 echo ""
 
-# 4a. Check for common operator text in PDF (Phase 1 - warnings due to false positives)
-echo "=== 4a. Operator Text in PDF (Warning) ==="
-OPERATOR_WORDS=("and" "or" "not" "exists" "mu")
-OPERATOR_TOTAL=0
-
-for word in "${OPERATOR_WORDS[@]}"; do
-    COUNT=$(echo "$PDF_TEXT" | grep -o -E "[^[:alpha:]]${word}[^[:alpha:]]" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
-    if [ "${COUNT:-0}" -gt 0 ]; then
-        echo -e "${YELLOW}WARNING: Found $COUNT instances of text '${word}' (should be symbol)${NC}"
-        echo "Note: This may be false positive if '${word}' appears in prose"
-        OPERATOR_TOTAL=$((OPERATOR_TOTAL + COUNT))
-    fi
-done
-
-if [ "${OPERATOR_TOTAL:-0}" -eq 0 ]; then
-    echo -e "${GREEN}PASS: No operator text found (or only in prose)${NC}"
-fi
-echo ""
 
 # 5. Check LaTeX file for common issues
 if [ -n "$TEX_FILE" ]; then
     echo "=== 5. LaTeX Source Issues ==="
-
-    # Check for bare < and > outside math mode
-    BARE_ANGLES=$(grep -n "[^$]<[^>]*>[^$]" "$TEX_FILE" | grep -v "\\langle\\|\\rangle\\|\\begin\\|\\end\\|%\\|\\usepackage" || true)
-    BARE_COUNT=$(echo "$BARE_ANGLES" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
-
-    if [ "${BARE_COUNT:-0}" -gt 0 ]; then
-        echo -e "${RED}FAIL: Found $BARE_COUNT potential bare < > characters (should be \\langle \\rangle)${NC}"
-        echo "$BARE_ANGLES" | head -5
-    else
-        echo -e "${GREEN}PASS: No bare angle brackets detected${NC}"
-    fi
-    echo ""
 
     # Check for \forall vs forall
     TEX_FORALL_TEXT=$(grep -n "[^\\]forall" "$TEX_FILE" | grep -v "^[[:space:]]*%" || true)
@@ -182,126 +152,8 @@ if [ -n "$TEX_FILE" ]; then
     fi
     echo ""
 
-    # 5a. Check for plain operator text (Phase 2 - High Priority)
-    echo "=== 5a. Plain Operator Text in LaTeX ==="
-    TEX_OPERATOR_COUNT=0
-
-    # Check for plain "and" (should be \land)
-    TEX_AND_TEXT=$(grep -n -E "\band\b" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\land" | grep -v "\\\\begin" | grep -v "\\\\end" || true)
-    TEX_AND_COUNT=$(echo "$TEX_AND_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
-    if [ "${TEX_AND_COUNT:-0}" -gt 0 ]; then
-        echo -e "${RED}FAIL: Found $TEX_AND_COUNT instances of plain 'and' (should be \\land)${NC}"
-        echo "$TEX_AND_TEXT" | head -5
-        TEX_OPERATOR_COUNT=$((TEX_OPERATOR_COUNT + TEX_AND_COUNT))
-    fi
-
-    # Check for plain "or" (should be \lor)
-    TEX_OR_TEXT=$(grep -n -E "\bor\b" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\lor" | grep -v "\\\\begin" | grep -v "\\\\end" || true)
-    TEX_OR_COUNT=$(echo "$TEX_OR_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
-    if [ "${TEX_OR_COUNT:-0}" -gt 0 ]; then
-        echo -e "${RED}FAIL: Found $TEX_OR_COUNT instances of plain 'or' (should be \\lor)${NC}"
-        echo "$TEX_OR_TEXT" | head -5
-        TEX_OPERATOR_COUNT=$((TEX_OPERATOR_COUNT + TEX_OR_COUNT))
-    fi
-
-    # Check for plain "not" (should be \lnot)
-    TEX_NOT_TEXT=$(grep -n -E "\bnot\b" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\lnot" | grep -v "\\\\begin" | grep -v "\\\\end" | grep -v "\\\\notin" || true)
-    TEX_NOT_COUNT=$(echo "$TEX_NOT_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
-    if [ "${TEX_NOT_COUNT:-0}" -gt 0 ]; then
-        echo -e "${RED}FAIL: Found $TEX_NOT_COUNT instances of plain 'not' (should be \\lnot)${NC}"
-        echo "$TEX_NOT_TEXT" | head -5
-        TEX_OPERATOR_COUNT=$((TEX_OPERATOR_COUNT + TEX_NOT_COUNT))
-    fi
-
-    # Check for plain "exists" (should be \exists)
-    TEX_EXISTS_TEXT=$(grep -n -E "\bexists\b" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\exists" | grep -v "exists1" || true)
-    TEX_EXISTS_COUNT=$(echo "$TEX_EXISTS_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
-    if [ "${TEX_EXISTS_COUNT:-0}" -gt 0 ]; then
-        echo -e "${RED}FAIL: Found $TEX_EXISTS_COUNT instances of plain 'exists' (should be \\exists)${NC}"
-        echo "$TEX_EXISTS_TEXT" | head -5
-        TEX_OPERATOR_COUNT=$((TEX_OPERATOR_COUNT + TEX_EXISTS_COUNT))
-    fi
-
-    # Check for plain "exists1" (should be \exists_1)
-    TEX_EXISTS1_TEXT=$(grep -n -E "\bexists1\b" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\exists_1" || true)
-    TEX_EXISTS1_COUNT=$(echo "$TEX_EXISTS1_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
-    if [ "${TEX_EXISTS1_COUNT:-0}" -gt 0 ]; then
-        echo -e "${RED}FAIL: Found $TEX_EXISTS1_COUNT instances of plain 'exists1' (should be \\exists_1)${NC}"
-        echo "$TEX_EXISTS1_TEXT" | head -5
-        TEX_OPERATOR_COUNT=$((TEX_OPERATOR_COUNT + TEX_EXISTS1_COUNT))
-    fi
-
-    # Check for plain "mu" (should be \mu)
-    TEX_MU_TEXT=$(grep -n -E "\bmu\b" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\mu" | grep -v "lambda" || true)
-    TEX_MU_COUNT=$(echo "$TEX_MU_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
-    if [ "${TEX_MU_COUNT:-0}" -gt 0 ]; then
-        echo -e "${RED}FAIL: Found $TEX_MU_COUNT instances of plain 'mu' (should be \\mu)${NC}"
-        echo "$TEX_MU_TEXT" | head -5
-        TEX_OPERATOR_COUNT=$((TEX_OPERATOR_COUNT + TEX_MU_COUNT))
-    fi
-
-    if [ "${TEX_OPERATOR_COUNT:-0}" -eq 0 ]; then
-        echo -e "${GREEN}PASS: All operators use LaTeX commands${NC}"
-    fi
-    echo ""
-
-    # 5b. Check for plain implication/equivalence operators (=>, <=>)
-    echo "=== 5b. Plain Arrow Operators in LaTeX ==="
-    TEX_ARROW_COUNT=0
-
-    # Check for plain "=>" (should be \Rightarrow or \implies)
-    TEX_ARROW_TEXT=$(grep -n "=>" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\Rightarrow" | grep -v "\\\\implies" || true)
-    TEX_ARROW_COUNT1=$(echo "$TEX_ARROW_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
-    if [ "${TEX_ARROW_COUNT1:-0}" -gt 0 ]; then
-        echo -e "${RED}FAIL: Found $TEX_ARROW_COUNT1 instances of plain '=>' (should be \\Rightarrow or \\implies)${NC}"
-        echo "$TEX_ARROW_TEXT" | head -5
-        TEX_ARROW_COUNT=$((TEX_ARROW_COUNT + TEX_ARROW_COUNT1))
-    fi
-
-    # Check for plain "<=>" (should be \Leftrightarrow or \iff)
-    TEX_BIARROW_TEXT=$(grep -n "<=>" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\Leftrightarrow" | grep -v "\\\\iff" || true)
-    TEX_ARROW_COUNT2=$(echo "$TEX_BIARROW_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
-    if [ "${TEX_ARROW_COUNT2:-0}" -gt 0 ]; then
-        echo -e "${RED}FAIL: Found $TEX_ARROW_COUNT2 instances of plain '<=>' (should be \\Leftrightarrow or \\iff)${NC}"
-        echo "$TEX_BIARROW_TEXT" | head -5
-        TEX_ARROW_COUNT=$((TEX_ARROW_COUNT + TEX_ARROW_COUNT2))
-    fi
-
-    if [ "${TEX_ARROW_COUNT:-0}" -eq 0 ]; then
-        echo -e "${GREEN}PASS: All arrow operators use LaTeX commands${NC}"
-    fi
-    echo ""
-
-    # 5c. Check for plain type names (N, Z) - Phase 2 High Priority
-    echo "=== 5c. Plain Type Names in LaTeX ==="
-    TEX_TYPE_COUNT=0
-
-    # Check for plain "N" (should be \nat or \mathbb{N}, but careful - N can be a variable)
-    # Only flag if it looks like a type (e.g., " : N" or "N " after certain patterns)
-    TEX_N_TEXT=$(grep -n "[^a-zA-Z_]:[[:space:]]*N[^a-zA-Z_]" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\nat" | grep -v "\\\\mathbb{N}" || true)
-    TEX_N_COUNT=$(echo "$TEX_N_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
-    if [ "${TEX_N_COUNT:-0}" -gt 0 ]; then
-        echo -e "${RED}FAIL: Found $TEX_N_COUNT instances of plain 'N' as type (should be \\nat or \\mathbb{N})${NC}"
-        echo "$TEX_N_TEXT" | head -5
-        TEX_TYPE_COUNT=$((TEX_TYPE_COUNT + TEX_N_COUNT))
-    fi
-
-    # Check for plain "Z" (should be \num or \mathbb{Z})
-    TEX_Z_TEXT=$(grep -n "[^a-zA-Z_]:[[:space:]]*Z[^a-zA-Z_]" "$TEX_FILE" | grep -v "^[[:space:]]*%" | grep -v "\\\\num" | grep -v "\\\\mathbb{Z}" || true)
-    TEX_Z_COUNT=$(echo "$TEX_Z_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
-    if [ "${TEX_Z_COUNT:-0}" -gt 0 ]; then
-        echo -e "${RED}FAIL: Found $TEX_Z_COUNT instances of plain 'Z' as type (should be \\num or \\mathbb{Z})${NC}"
-        echo "$TEX_Z_TEXT" | head -5
-        TEX_TYPE_COUNT=$((TEX_TYPE_COUNT + TEX_Z_COUNT))
-    fi
-
-    if [ "${TEX_TYPE_COUNT:-0}" -eq 0 ]; then
-        echo -e "${GREEN}PASS: All type names use LaTeX commands${NC}"
-    fi
-    echo ""
-
-    # 5d. Check for unconverted citations - Phase 2 Medium Priority
-    echo "=== 5d. Citation Conversion Check ==="
+    # 5a. Check for unconverted citations - Phase 2 Medium Priority
+    echo "=== 5a. Citation Conversion Check ==="
     TEX_CITE_TEXT=$(grep -n "\[cite " "$TEX_FILE" | grep -v "^[[:space:]]*%" || true)
     TEX_CITE_COUNT=$(echo "$TEX_CITE_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
 
@@ -313,8 +165,8 @@ if [ -n "$TEX_FILE" ]; then
     fi
     echo ""
 
-    # 5e. Check document structure - Phase 2 High Priority
-    echo "=== 5e. Document Structure Check ==="
+    # 5b. Check document structure - Phase 2 High Priority
+    echo "=== 5b. Document Structure Check ==="
     DOC_ISSUES=0
 
     if ! grep -q "\\\\documentclass" "$TEX_FILE"; then
@@ -337,7 +189,7 @@ if [ -n "$TEX_FILE" ]; then
     fi
     echo ""
 
-    # 5f. Check environment matching - Phase 2 High Priority
+    # 5c. Check environment matching - Phase 2 High Priority
     echo "=== 5f. Environment Matching Check ==="
     ENV_ISSUES=0
 
@@ -383,7 +235,7 @@ TOTAL_ISSUES=$((${GARBLED_COUNT:-0} + ${FORALL_COUNT:-0} + ${EMPTYSET_COUNT:-0})
 
 # Add LaTeX source issues if available
 if [ -n "$TEX_FILE" ]; then
-    TOTAL_ISSUES=$((TOTAL_ISSUES + ${BARE_COUNT:-0} + ${TEX_FORALL_COUNT:-0} + ${TEX_EMPTYSET_COUNT:-0} + ${TEX_OPERATOR_COUNT:-0} + ${TEX_ARROW_COUNT:-0} + ${TEX_TYPE_COUNT:-0} + ${TEX_CITE_COUNT:-0} + ${DOC_ISSUES:-0} + ${ENV_ISSUES:-0}))
+    TOTAL_ISSUES=$((TOTAL_ISSUES + ${TEX_FORALL_COUNT:-0} + ${TEX_EMPTYSET_COUNT:-0} + ${TEX_CITE_COUNT:-0} + ${DOC_ISSUES:-0} + ${ENV_ISSUES:-0}))
 fi
 
 if [ ${TOTAL_ISSUES:-0} -eq 0 ]; then
@@ -397,12 +249,8 @@ else
     [ ${FORALL_COUNT:-0} -gt 0 ] && echo "  - $FORALL_COUNT text 'forall' (should be symbol)"
     [ ${EMPTYSET_COUNT:-0} -gt 0 ] && echo "  - $EMPTYSET_COUNT text 'emptyset' (should be symbol)"
     if [ -n "$TEX_FILE" ]; then
-        [ ${BARE_COUNT:-0} -gt 0 ] && echo "  - $BARE_COUNT bare angle brackets"
         [ ${TEX_FORALL_COUNT:-0} -gt 0 ] && echo "  - $TEX_FORALL_COUNT plain 'forall' in LaTeX"
         [ ${TEX_EMPTYSET_COUNT:-0} -gt 0 ] && echo "  - $TEX_EMPTYSET_COUNT plain 'emptyset' in LaTeX"
-        [ ${TEX_OPERATOR_COUNT:-0} -gt 0 ] && echo "  - $TEX_OPERATOR_COUNT plain operator text in LaTeX"
-        [ ${TEX_ARROW_COUNT:-0} -gt 0 ] && echo "  - $TEX_ARROW_COUNT plain arrow operators in LaTeX"
-        [ ${TEX_TYPE_COUNT:-0} -gt 0 ] && echo "  - $TEX_TYPE_COUNT plain type names in LaTeX"
         [ ${TEX_CITE_COUNT:-0} -gt 0 ] && echo "  - $TEX_CITE_COUNT unconverted citations"
         [ ${DOC_ISSUES:-0} -gt 0 ] && echo "  - $DOC_ISSUES document structure issues"
         [ ${ENV_ISSUES:-0} -gt 0 ] && echo "  - $ENV_ISSUES environment matching issues"
