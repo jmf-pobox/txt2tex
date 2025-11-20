@@ -1,6 +1,6 @@
 # txt2tex Implementation Status
 
-**Last Updated:** 2025-11-19
+**Last Updated:** 2025-11-20
 **Current Phase:** Phase 40 (Bullet Separator for Quantifiers) ✓ COMPLETE
 
 ---
@@ -449,6 +449,27 @@
 - User verification: Long homework predicates now fit within margins
 - Test count: 1013 tests (all passing)
 
+### ✅ Phase 28: Multi-line Expression Support with WYSIWYG Line Breaks
+- Implemented natural line break support for all binary operators and quantifiers
+- Parser accepts expressions split across lines without explicit continuation markers
+- **WYSIWYG feature**: Natural newlines in input control line breaks in PDF output
+- Modified parser to detect newlines after operators and set `line_break_after` flag
+- Supported in binary operators: `<=>`, `=>`, `or`, `and`
+- Supported in quantifiers: newlines after `|` separator set `line_break_after_pipe` flag
+- Backward compatible: explicit `\` continuation markers still supported
+- Example natural formatting:
+  ```
+  forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) |
+    length(<ple> ^ pl) = snd(ple) + length(pl))
+  ```
+- LaTeX generator respects natural line breaks same as explicit `\` markers
+- Enables cleaner source: no explicit formatting hints needed
+- Use case: Write expressions as they appear in output, true WYSIWYG editing
+- Applied to hw/solutions.txt: removed 25 `\` markers, identical PDF output
+- Created comprehensive tests in test_line_breaks/ directory
+- Test count: 1145 tests (all passing)
+- User verification: Natural formatting matches PDF output exactly
+
 ### ⏸️ Phase 31: Compound Identifiers (Bug #3 - NOT IMPLEMENTED)
 **Status**: Documented but not implemented - GitHub issue #3 remains open
 
@@ -786,11 +807,14 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 17. ✓ Phase 24: Whitespace-Sensitive ^ Operator (concat vs exponent disambiguation)
 18. ✓ Phase 25: Justification Operator Conversion (relation/function operators in justifications)
 19. ✓ Phase 26: TEXT Block Operator Support (all operators in prose)
-20. ✓ Phase 34: Finite Partial Function Operator (`77->`)
-21. ✓ Phase 35: Sequence Filter & Bag Union (`filter`, `bag_union`)
-22. ✓ Phase 39: Strict Subset Operator (`psubset`)
+20. ✓ Phase 27: Line Continuation with Backslash (explicit `\` markers)
+21. ✓ Phase 28: Multi-line Expression Support with WYSIWYG Line Breaks (natural formatting)
+22. ✓ Phase 34: Finite Partial Function Operator (`77->`)
+23. ✓ Phase 35: Sequence Filter & Bag Union (`filter`, `bag_union`)
+24. ✓ Phase 39: Strict Subset Operator (`psubset`)
+25. ✓ Phase 40: Bullet Separator for Quantifiers (GitHub #8)
 
-**Current:** 96.2% (50/52) - Phase 39 Complete
+**Current:** 100% (52/52) - Phase 40 Complete
 
 ### Next Steps
 
@@ -803,7 +827,7 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 1125 passing (as of Phase 39, November 2025)
+- **Total Tests:** 1145 passing (as of Phase 40, November 2025)
 
 **Component Coverage:**
 - parser.py: 86.17%

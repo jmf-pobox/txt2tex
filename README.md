@@ -89,6 +89,22 @@ f(x) + g(y)
 
 txt2tex converts these to properly typeset LaTeX automatically.
 
+### WYSIWYG Line Breaks
+
+**What You See Is What You Get** - Natural line breaks in your input control line breaks in PDF output:
+
+```
+axdef
+  length : PossiblePlaylist -> N
+where
+  length(<>) = 0 and
+    forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) |
+      length(<ple> ^ pl) = snd(ple) + length(pl))
+end
+```
+
+Write multi-line expressions exactly as they should appear in the final PDF. No explicit formatting markers needed - natural breaks work automatically.
+
 ### Z Notation
 
 Full support for Z notation structures:
@@ -288,10 +304,11 @@ A few edge cases require workarounds:
 ## Project Status
 
 **Current Implementation:**
-- ✅ **98% solution coverage** (51 of 52 homework solutions working)
-- ✅ **1013 tests** - Comprehensive test suite
+- ✅ **100% solution coverage** (52 of 52 homework solutions working)
+- ✅ **1145 tests** - Comprehensive test suite
 - ✅ **Full Z notation** - Schemas, relations, functions, sequences
 - ✅ **Proof trees** - Natural deduction with justifications
+- ✅ **WYSIWYG line breaks** - Natural formatting controls PDF output
 - ✅ **fuzz integration** - Optional type checking
 
 **For detailed status, see [docs/STATUS.md](docs/STATUS.md)**
@@ -331,4 +348,4 @@ MIT
 
 ---
 
-**Last Updated:** 2025-10-27
+**Last Updated:** 2025-11-20
