@@ -122,7 +122,7 @@ zed
 end
 ```
 
-**See:** `examples/10_schemas/zed_blocks.txt`
+**Note:** The zed block syntax shown above is aspirational. Currently txt2tex's `zed` blocks only wrap single expressions, not nested definitions with `where` clauses. See `examples/10_schemas/future/zed_blocks.txt` for the full example (requires parser enhancements).
 
 ## Scoping
 
