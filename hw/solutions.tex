@@ -1022,9 +1022,9 @@ make sure two such shows are distinct.
 
 \setlength{\leftskip}{\dimexpr\parindent+2em\relax}
 \begin{zed}
-  EightC == first\_episode\_timestamp(\mu s : \dom show\_info | \\
-    \quad \forall t : \dom show\_info @ s \neq t \land \\
-  \quad \# (show\_info(s)) > \# (show\_info(t)))
+  EightC == first\_episode\_timestamp((\mu s : \dom show\_info | \\
+      \quad \forall t : \dom show\_info @ s \neq t \land \\
+  \quad \# (show\_info(s)) > \# (show\_info(t))))
 \end{zed}
 
 \noindent We are given that there is exactly one show with the most

@@ -51,9 +51,8 @@ type-quick = "mypy"
 type-pyright = "pyright"
 type-pyright-stats = "pyright --stats"
 type-all = ["type", "type-pyright"]
-check = ["lint", "type", "test"]
-check-cov = ["lint", "type", "test-cov"]
-check-all = ["lint", "type", "type-pyright", "test"]
+check = ["lint", "type", "type-pyright", "test"]
+check-cov = ["lint", "type", "type-pyright", "test-cov"]
 # CLI wrapper - use for generating LaTeX
 cli = "PYTHONPATH=src python -m txt2tex.cli {args}"
 # Full pipeline - use for txt -> tex -> pdf

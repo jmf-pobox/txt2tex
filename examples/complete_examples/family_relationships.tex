@@ -3,7 +3,7 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
-\usepackage{fuzz}
+\usepackage{zed-cm}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
@@ -15,13 +15,11 @@
 \section*{Problem Statement}
 \addcontentsline{toc}{section}{Problem Statement}
 
-\noindent Given a primitive relation childOf between people, define
-derived relations
+\noindent Given a primitive relation childOf between people, define derived relations
 
 \bigskip
 
-\noindent for parentOf, siblingOf, cousinOf, and ancestorOf using
-relation operators.
+\noindent for parentOf, siblingOf, cousinOf, and ancestorOf using relation operators.
 
 \bigskip
 
@@ -32,11 +30,10 @@ relation operators.
 
 \bigskip
 
-\begin{zed}[Person]
-\end{zed}
+\begin{zed}[Person]\end{zed}
 
 \begin{axdef}
-  childOf : Person \rel Person
+childOf : Person \rel Person
 \end{axdef}
 
 \noindent The childOf relation represents direct parent-child relationships.
@@ -47,12 +44,11 @@ relation operators.
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
-\noindent From this single primitive, we can derive all other family
-relationships.
+\noindent From this single primitive, we can derive all other family relationships.
 
 \bigskip
 
@@ -64,14 +60,14 @@ relationships.
 \bigskip
 
 \begin{zed}
-  parentOf == childOf^{-1}
+parentOf == childOf^{-1}
 \end{zed}
 
 \noindent Alternative equivalent definitions:
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -83,7 +79,7 @@ relationships.
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -91,12 +87,11 @@ relationships.
 
 \bigskip
 
-\noindent parentOf == $\{ x, y : Person | x \mapsto y \in childOf @ y
-\mapsto x \}$
+\noindent parentOf == $\{ x, y \colon Person \mid x \mapsto y \in childOf \bullet y \mapsto x \}$
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -124,12 +119,11 @@ relationships.
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
-\noindent All three methods are mathematically equivalent. The first
-is most idiomatic
+\noindent All three methods are mathematically equivalent. The first is most idiomatic
 
 \bigskip
 
@@ -137,7 +131,7 @@ is most idiomatic
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -165,14 +159,14 @@ is most idiomatic
 \bigskip
 
 \begin{zed}
-  siblingOf == (childOf \circ parentOf) \setminus \id[Person]
+siblingOf == (childOf \circ parentOf) \setminus \id[Person]
 \end{zed}
 
 \noindent Let's break this down step by step:
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -184,17 +178,15 @@ is most idiomatic
 
 \bigskip
 
-\noindent If (x, p) in childOf and (p, y) in parentOf, then (x, y) is
-in the composition.
+\noindent If (x, p) in childOf and (p, y) in parentOf, then (x, y) is in the composition.
 
 \bigskip
 
-\noindent This includes the case where $x = y$ (you share parents
-with yourself).
+\noindent This includes the case where $x = y$ (you share parents with yourself).
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -210,7 +202,7 @@ with yourself).
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -226,7 +218,7 @@ with yourself).
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -236,17 +228,17 @@ with yourself).
 
 \noindent siblingOf == {x, $y : Person | x $/= y and
 
-  \bigskip
+\bigskip
 
-  \noindent ($\exists p : Person @ x \mapsto p$in childOf and
+\noindent ($\exists p \colon Person \bullet x \mapsto p$in childOf and
 
-    \bigskip
+\bigskip
 
 \noindent p $\mapsto$ y in parentOf)}
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -274,14 +266,14 @@ with yourself).
 \bigskip
 
 \begin{zed}
-  cousinOf == childOf \circ siblingOf \circ parentOf
+cousinOf == childOf \circ siblingOf \circ parentOf
 \end{zed}
 
 \noindent Let's trace the composition chain:
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -293,7 +285,7 @@ with yourself).
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -305,7 +297,7 @@ with yourself).
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -317,7 +309,7 @@ with yourself).
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -329,7 +321,7 @@ with yourself).
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -353,7 +345,7 @@ with yourself).
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -369,8 +361,7 @@ with yourself).
 
 \bigskip
 
-\noindent - For second cousins, you would need (childOf $\circ$
-siblingOf $\circ$ parentOf)+
+\noindent - For second cousins, you would need (childOf $\circ$ siblingOf $\circ$ parentOf)+
 
 \bigskip
 
@@ -382,7 +373,7 @@ siblingOf $\circ$ parentOf)+
 \bigskip
 
 \begin{zed}
-  ancestorOf == parentOf \plus
+ancestorOf == parentOf^{+}
 \end{zed}
 
 \noindent The transitive closure operator (+) computes:
@@ -393,7 +384,7 @@ siblingOf $\circ$ parentOf)+
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -409,8 +400,7 @@ siblingOf $\circ$ parentOf)+
 
 \bigskip
 
-\noindent - Includes great-grandparents (parentOf $\circ$ parentOf
-$\circ$ parentOf)
+\noindent - Includes great-grandparents (parentOf $\circ$ parentOf $\circ$ parentOf)
 
 \bigskip
 
@@ -418,7 +408,7 @@ $\circ$ parentOf)
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -438,7 +428,7 @@ $\circ$ parentOf)
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -474,26 +464,26 @@ $\circ$ parentOf)
 \bigskip
 
 \begin{zed}
-  parentOf == childOf^{-1}
+parentOf == childOf^{-1}
 \end{zed}
 
 \begin{zed}
-  siblingOf == (childOf \circ parentOf) \setminus \id[Person]
+siblingOf == (childOf \circ parentOf) \setminus \id[Person]
 \end{zed}
 
 \begin{zed}
-  cousinOf == childOf \circ siblingOf \circ parentOf
+cousinOf == childOf \circ siblingOf \circ parentOf
 \end{zed}
 
 \begin{zed}
-  ancestorOf == parentOf \plus
+ancestorOf == parentOf^{+}
 \end{zed}
 
 \noindent Additional derived relations you might define:
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -520,12 +510,11 @@ $\circ$ parentOf)
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
-\noindent 1. **Primitive vs derived**: Start with minimal primitives,
-derive everything else
+\noindent 1. **Primitive vs derived**: Start with minimal primitives, derive everything else
 
 \bigskip
 
@@ -537,12 +526,11 @@ derive everything else
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
-\noindent 2. **Relation algebra**: Use operators instead of explicit
-set comprehensions
+\noindent 2. **Relation algebra**: Use operators instead of explicit set comprehensions
 
 \bigskip
 
@@ -558,7 +546,7 @@ set comprehensions
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -566,7 +554,7 @@ set comprehensions
 
 \bigskip
 
-\noindent - Essential for siblingOf $you're(\lnot (your(own)(sibling)))$
+\noindent - Essential for siblingOf $you're(\lnot your(own)(sibling))$
 
 \bigskip
 
@@ -574,12 +562,11 @@ set comprehensions
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
-\noindent 4. **Operator chaining**: Compose multiple operators for
-complex relationships
+\noindent 4. **Operator chaining**: Compose multiple operators for complex relationships
 
 \bigskip
 
@@ -591,7 +578,7 @@ complex relationships
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
@@ -614,8 +601,7 @@ complex relationships
 
 \bigskip
 
-\noindent 2. Define grandchildOf two $ways : using composition and
-using descendantOf$
+\noindent 2. Define grandchildOf two $ways : using composition and using descendantOf$
 
 \bigskip
 
@@ -623,8 +609,7 @@ using descendantOf$
 
 \bigskip
 
-\noindent 4. What properties must childOf satisfy for this model to
-be realistic?
+\noindent 4. What properties must childOf satisfy for this model to be realistic?
 
 \bigskip
 

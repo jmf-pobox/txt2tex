@@ -156,8 +156,8 @@ no duplicates.
   inj\_func : \nat_1 \pfun \nat \\
   inj\_seq : \seq \nat
   \where
-  (\forall i, j : \dom inj\_func | inj\_func(i) = inj\_func(j) @ i =
-  j) \land inj\_seq = squashFunc(inj\_func)
+  (\forall i, j : \dom inj\_func @ inj\_func(i) = inj\_func(j)
+  \implies i = j) \land inj\_seq = squashFunc(inj\_func)
 \end{axdef}
 
 \noindent Since inj\_func is injective (one-to-one), inj\_seq

@@ -1,133 +1,144 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 3 : Quantifiers and Mathematical Notation}
 
+\section*{Example 1 : Quantifiers}
+\addcontentsline{toc}{section}{Example 1 : Quantifiers}
+
+\subsection*{(a)}
+
+\noindent
+$\forall x : \nat @ x \geq 0$
+
+\medskip
+
+\subsection*{(b)}
+
+\noindent
+$\exists y : \nat @ y = 0$
+
+\medskip
+
+\subsection*{(c)}
+
+\noindent
+$\forall n : \nat @ n \geq 0 \land n < 100$
+
+\section*{Example 2 : Subscripts and Superscripts}
+\addcontentsline{toc}{section}{Example 2 : Subscripts and Superscripts}
+
+\subsection*{(a)}
+
+\noindent
+$x^2$
+
+\medskip
+
+\subsection*{(b)}
+
+\noindent
+$a_1$
+
+\medskip
+
+\subsection*{(c)}
+
+\noindent
+$x\_i^2$
+
+\section*{Example 3 : Comparison Operators}
+\addcontentsline{toc}{section}{Example 3 : Comparison Operators}
+
+\subsection*{(a)}
+
+\noindent
+$x < 10$
+
+\medskip
+
+\subsection*{(b)}
+
+\noindent
+$x \geq 0 \land x \leq 100$
+
+\medskip
+
+\subsection*{(c)}
+
+\noindent
+$y > 5 \lor y = 0$
+
+\section*{Example 4 : Set Operators}
+\addcontentsline{toc}{section}{Example 4 : Set Operators}
+
+\subsection*{(a)}
+
+\noindent
+$x \in \nat$
+
+\medskip
+
+\subsection*{(b)}
+
+\noindent
+$A \subseteq B$
+
+\medskip
+
+\subsection*{(c)}
+
+\noindent
+$A \cup B \cap C$
+
+\section*{Example 5 : Complex Expressions}
+\addcontentsline{toc}{section}{Example 5 : Complex Expressions}
+
+\subsection*{(a)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \forall x : \nat @ x \in \nat \land x \geq 0 \\
+      \Leftrightarrow \forall x : \nat @ x \geq 0
+    \end{array}$%
+  }
+\end{center}
 \bigskip
-\noindent
-\textbf{Example 1 : Quantifiers}
 
 \medskip
 
+\subsection*{(b)}
+
 \noindent
-\hangindent=2em
-(a) $\forall x : \nat @ x \geq 0$
+$\forall i : \nat @ a\_i > 0 \implies a\_i^2 > 0$
 
 \medskip
-\noindent
-\hangindent=2em
-(b) $\exists y : \nat @ y = 0$
 
-\medskip
-\noindent
-\hangindent=2em
-(c) $\forall n : \nat @ n \geq 0 \land n < 100$
+\subsection*{(c)}
 
-\medskip
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    \begin{tabular}{c|c|c}
+      $p$ & $q$ & $\mathbf{p \Rightarrow q}$ \\
+      \hline
+      \textit{t} & \textit{t} & \textbf{t} \\
+      \textit{t} & \textit{f} & \textbf{f} \\
+      \textit{f} & \textit{t} & \textbf{t} \\
+      \textit{f} & \textit{f} & \textbf{t} \\
+    \end{tabular}%
+  }
+\end{center}
 \bigskip
-\noindent
-\textbf{Example 2 : Subscripts and Superscripts}
-
-\medskip
-
-\noindent
-\hangindent=2em
-(a) $x^2$
-
-\medskip
-\noindent
-\hangindent=2em
-(b) $a_1$
-
-\medskip
-\noindent
-\hangindent=2em
-(c) $x\_i^2$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Example 3 : Comparison Operators}
-
-\medskip
-
-\noindent
-\hangindent=2em
-(a) $x < 10$
-
-\medskip
-\noindent
-\hangindent=2em
-(b) $x \geq 0 \land x \leq 100$
-
-\medskip
-\noindent
-\hangindent=2em
-(c) $y > 5 \lor y = 0$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Example 4 : Set Operators}
-
-\medskip
-
-\noindent
-\hangindent=2em
-(a) $x \in \nat$
-
-\medskip
-\noindent
-\hangindent=2em
-(b) $A \subseteq B$
-
-\medskip
-\noindent
-\hangindent=2em
-(c) $A \cup B \cap C$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Example 5 : Complex Expressions}
-
-\medskip
-
-(a)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & \forall x : \nat @ x \in \nat \land x \geq 0 \\
-    &\Leftrightarrow \forall x : \nat @ x \geq 0
-  \end{array}
-\]
-
-\medskip
-
-\noindent
-\hangindent=2em
-(b) $\forall i : \nat @ a\_i > 0 \implies a\_i^2 > 0$
-
-\medskip
-(c)
-\par
-\vspace{11pt}
-\begin{tabular}{c|c|c}
-  $p$ & $q$ & $\mathbf{p \Rightarrow q}$ \\
-  \hline
-  \textit{t} & \textit{t} & \textbf{t} \\
-  \textit{t} & \textit{f} & \textbf{f} \\
-  \textit{f} & \textit{t} & \textbf{t} \\
-  \textit{f} & \textit{f} & \textbf{t} \\
-\end{tabular}
-
-\medskip
 
 \end{document}

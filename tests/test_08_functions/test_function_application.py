@@ -53,7 +53,7 @@ class TestPhase11bParsing:
         assert len(ast.args) == 3
         assert all(isinstance(arg, Identifier) for arg in ast.args)
         # Type narrowing: after isinstance check, we know all args are Identifiers
-        names = []
+        names: list[str] = []
         for arg in ast.args:
             assert isinstance(arg, Identifier)
             names.append(arg.name)
