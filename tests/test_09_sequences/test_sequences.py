@@ -68,7 +68,7 @@ class TestSequenceLiteralParsing:
         assert isinstance(ast, SequenceLiteral)
         assert len(ast.elements) == 3
         assert all(isinstance(elem, Identifier) for elem in ast.elements)
-        names = []
+        names: list[str] = []
         for elem in ast.elements:
             assert isinstance(elem, Identifier)
             names.append(elem.name)
@@ -129,7 +129,7 @@ class TestBagLiteralParsing:
         ast = parse_expr("[[a, b, c]]")
         assert isinstance(ast, BagLiteral)
         assert len(ast.elements) == 3
-        names = []
+        names: list[str] = []
         for elem in ast.elements:
             assert isinstance(elem, Identifier)
             names.append(elem.name)

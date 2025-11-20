@@ -1,72 +1,81 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Propositional Logic}
 
+\section*{Solution 1}
+\addcontentsline{toc}{section}{Solution 1}
+
+\subsection*{(a)}
+
+\noindent
+$p \land q \implies p$
+
+\medskip
+
+\subsection*{(b)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    \begin{tabular}{c|c|c}
+      $p$ & $q$ & $\mathbf{p \Rightarrow q}$ \\
+      \hline
+      \textit{t} & \textit{t} & \textbf{t} \\
+      \textit{t} & \textit{f} & \textbf{f} \\
+      \textit{f} & \textit{t} & \textbf{t} \\
+      \textit{f} & \textit{f} & \textbf{t} \\
+    \end{tabular}%
+  }
+\end{center}
 \bigskip
-\noindent
-\textbf{Solution 1}
 
 \medskip
 
-\noindent
-\hangindent=2em
-(a) $p \land q \implies p$
-
-\medskip
-(b)
-\par
-\vspace{11pt}
-\begin{tabular}{c|c|c}
-  $p$ & $q$ & $\mathbf{p \Rightarrow q}$ \\
-  \hline
-  \textit{t} & \textit{t} & \textbf{t} \\
-  \textit{t} & \textit{f} & \textbf{f} \\
-  \textit{f} & \textit{t} & \textbf{t} \\
-  \textit{f} & \textit{f} & \textbf{t} \\
-\end{tabular}
-
-\medskip
+\subsection*{(c)}
 
 \noindent
-\hangindent=2em
-(c) $\lnot (p \land q) \iff \lnot p \lor \lnot q$
+$\lnot (p \land q) \iff \lnot p \lor \lnot q$
+
+\section*{Solution 2}
+\addcontentsline{toc}{section}{Solution 2}
+
+\subsection*{(a)}
+
+\noindent
+$(p \lor q) \land r \iff (p \land r) \lor (q \land r)$
 
 \medskip
+
+\subsection*{(b)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    \begin{tabular}{c|c|c}
+      $p$ & $q$ & $\mathbf{p \Leftrightarrow q}$ \\
+      \hline
+      \textit{t} & \textit{t} & \textbf{t} \\
+      \textit{t} & \textit{f} & \textbf{f} \\
+      \textit{f} & \textit{t} & \textbf{f} \\
+      \textit{f} & \textit{f} & \textbf{t} \\
+    \end{tabular}%
+  }
+\end{center}
 \bigskip
-\noindent
-\textbf{Solution 2}
 
 \medskip
 
-\noindent
-\hangindent=2em
-(a) $(p \lor q) \land r \iff (p \land r) \lor (q \land r)$
-
-\medskip
-(b)
-\par
-\vspace{11pt}
-\begin{tabular}{c|c|c}
-  $p$ & $q$ & $\mathbf{p \Leftrightarrow q}$ \\
-  \hline
-  \textit{t} & \textit{t} & \textbf{t} \\
-  \textit{t} & \textit{f} & \textbf{f} \\
-  \textit{f} & \textit{t} & \textbf{f} \\
-  \textit{f} & \textit{f} & \textbf{t} \\
-\end{tabular}
-
-\medskip
+\subsection*{(c)}
 
 \noindent
-\hangindent=2em
-(c) $p \implies (q \implies r)$
+$p \implies (q \implies r)$
 
-\medskip
 \end{document}

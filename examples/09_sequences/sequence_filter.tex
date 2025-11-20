@@ -1,43 +1,35 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 35 : Sequence Filter Operator}
 
-\bigskip
-
-The sequence$ \filter $operator restricts a sequence to elements from
-a specified set. It removes elements not in the$ \filter $set while
-preserving order.
+\noindent The sequence$ \filter $operator restricts a sequence to
+elements from a specified set. It removes elements not in the$
+\filter $set while preserving order.
 
 \bigskip
 
-\bigskip
-
-ASCII notation: s$ \filter $A
+\noindent ASCII notation: s$ \filter $A
 
 \bigskip
 
-\bigskip
-
-Unicode $alternative : s $$\filter$ A (U+21BE)
+\noindent Unicode $alternative : s $$\filter$ A (U+21BE)
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 1 : Basic Filter Operation}
+\section*{Example 1 : Basic Filter Operation}
+\addcontentsline{toc}{section}{Example 1 : Basic Filter Operation}
 
-\medskip
-
-\bigskip
-
-Filter a sequence to only include elements from a set.
+\noindent Filter a sequence to only include elements from a set.
 
 \bigskip
 
@@ -50,18 +42,13 @@ Filter a sequence to only include elements from a set.
   \land filtered1 = (s1 \filter evens1)
 \end{axdef}
 
-\bigskip
-
-The filtered sequence is $\langle 2, 4, 6 \rangle$, keeping only
-elements that are in evens and preserving their original order.
+\noindent The filtered sequence is $\langle 2, 4, 6 \rangle$, keeping
+only elements that are in evens and preserving their original order.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 2 : Filter with Set Comprehension}
-
-\medskip
+\section*{Example 2 : Filter with Set Comprehension}
+\addcontentsline{toc}{section}{Example 2 : Filter with Set Comprehension}
 
 \begin{zed}[Title2, Length2]
 \end{zed}
@@ -75,34 +62,24 @@ elements that are in evens and preserving their original order.
   all\_titles \filter long\_titles
 \end{axdef}
 
-\bigskip
-
-This filters a sequence of titles to include only titles with length
-greater than 120 minutes.
+\noindent This filters a sequence of titles to include only titles
+with length greater than 120 minutes.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 3 : Comparison with Range Restriction}
+\section*{Example 3 : Comparison with Range Restriction}
+\addcontentsline{toc}{section}{Example 3 : Comparison with Range Restriction}
 
-\medskip
-
-\bigskip
-
-Sequence$ \filter $(filter) is different from range restriction ($\rres$):
+\noindent Sequence$ \filter $(filter) is different from range
+restriction ($\rres$):
 
 \bigskip
 
-\bigskip
-
-- filter: operates on sequences, preserves order
+\noindent - filter: operates on sequences, preserves order
 
 \bigskip
 
-\bigskip
-
-- $\rres$: operates on relations, restricts range
+\noindent - $\rres$: operates on relations, restricts range
 
 \bigskip
 
@@ -118,24 +95,17 @@ Sequence$ \filter $(filter) is different from range restriction ($\rres$):
   filtered\_seq3 = s3 \filter A3 \land restricted\_rel3 = R3 \rres \{10, 20\}
 \end{axdef}
 
-\bigskip
-
-filtered\_seq is $\langle 2, 3, 4 \rangle$ (sequence $elements \in A$)
+\noindent filtered\_seq is $\langle 2, 3, 4 \rangle$ (sequence $elements \in A$)
 
 \bigskip
 
-\bigskip
-
-restricted\_rel is $\{1 \mapsto 10, 2 \mapsto 20\}$ (relation pairs
-with range in $\{10, 20\}$)
+\noindent restricted\_rel is $\{1 \mapsto 10, 2 \mapsto 20\}$
+(relation pairs with range in $\{10, 20\}$)
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 4 : Practical Example - Video Database}
-
-\medskip
+\section*{Example 4 : Practical Example - Video Database}
+\addcontentsline{toc}{section}{Example 4 : Practical Example - Video Database}
 
 \begin{zed}[Title4, Length4]
 \end{zed}
@@ -150,19 +120,14 @@ with range in $\{10, 20\}$)
   family\_friendly4 = \{G4, PG4\}
 \end{axdef}
 
-\bigskip
-
-The family\_friendly set contains ratings G and PG. A$ \filter $could
-be applied to the catalog sequence to only include entries with
-ratings in this set.
+\noindent The family\_friendly set contains ratings G and PG. A$
+\filter $could be applied to the catalog sequence to only include
+entries with ratings in this set.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 5 : Multiple Filters}
-
-\medskip
+\section*{Example 5 : Multiple Filters}
+\addcontentsline{toc}{section}{Example 5 : Multiple Filters}
 
 \begin{axdef}
   s5 : \seq \nat \\
@@ -175,19 +140,14 @@ ratings in this set.
   \land result5 = (s5 \filter evens5) \filter large5
 \end{axdef}
 
-\bigskip
-
-Multiple filters can be applied sequentially. First$ \filter $to
-evens gives $\langle 2, 4, 6, 8, 10 \rangle$, then$ \filter $to large
-gives $\langle 6, 8, 10 \rangle$.
+\noindent Multiple filters can be applied sequentially. First$
+\filter $to evens gives $\langle 2, 4, 6, 8, 10 \rangle$, then$
+\filter $to large gives $\langle 6, 8, 10 \rangle$.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 6 : Empty Filter}
-
-\medskip
+\section*{Example 6 : Empty Filter}
+\addcontentsline{toc}{section}{Example 6 : Empty Filter}
 
 \begin{axdef}
   s6 : \seq \nat \\
@@ -201,39 +161,28 @@ gives $\langle 6, 8, 10 \rangle$.
   empty\_set6 \land result6b = s6 \filter disjoint\_set6
 \end{axdef}
 
-\bigskip
-
-Filtering by an empty set or disjoint set results in an empty sequence.
-
-\bigskip
+\noindent Filtering by an empty set or disjoint set results in an
+empty sequence.
 
 \bigskip
 
-result1 = $\langle \rangle$ and result2 = $\langle \rangle$
+\noindent result1 = $\langle \rangle$ and result2 = $\langle \rangle$
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 7 : Bag Union ( Related Phase 35 Feature )}
+\section*{Example 7 : Bag Union ( Related Phase 35 Feature )}
+\addcontentsline{toc}{section}{Example 7 : Bag Union ( Related Phase
+35 Feature )}
 
-\medskip
-
-\bigskip
-
-Phase 35 also includes the bag union operator.
+\noindent Phase 35 also includes the bag union operator.
 
 \bigskip
 
-\bigskip
-
-ASCII $notation : b1  \uplus  b2$
+\noindent ASCII $notation : b1  \uplus  b2$
 
 \bigskip
 
-\bigskip
-
-Unicode $alternative : b1 $$\uplus$ b2 (U+228E)
+\noindent Unicode $alternative : b1 $$\uplus$ b2 (U+228E)
 
 \bigskip
 
@@ -246,17 +195,14 @@ Unicode $alternative : b1 $$\uplus$ b2 (U+228E)
   combined = b1 \uplus b2
 \end{axdef}
 
-\bigskip
-
-Bag union adds $multiplicities : combined $= [[1, 1, 2, 2, 3, 3, 3, 4]]
-
-\bigskip
+\noindent Bag union adds $multiplicities : combined $= [[1, 1, 2, 2,
+3, 3, 3, 4]]
 
 \bigskip
 
-Element 1 appears 2 times (2 from b1), element 2 appears 2 times (1
-from each), element 3 appears 3 times (1 from b1, 2 from b2), element
-4 appears 1 time (1 from b2).
+\noindent Element 1 appears 2 times (2 from b1), element 2 appears 2
+times (1 from each), element 3 appears 3 times (1 from b1, 2 from
+b2), element 4 appears 1 time (1 from b2).
 
 \bigskip
 

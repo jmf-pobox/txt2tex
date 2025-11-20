@@ -1,0 +1,1001 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{zed-cm}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{TV Programme Schedule Modeling}
+
+\section*{Problem Statement}
+\addcontentsline{toc}{section}{Problem Statement}
+
+\noindent Model a digital video recorder (DVR) system that stores a sequence of
+
+\bigskip
+
+\noindent TV programmes. Define functions to:
+
+\bigskip
+
+\subsection*{(a)}
+
+\noindent Specify storage constraints
+
+\bigskip
+
+\medskip
+
+\subsection*{(b)}
+
+\noindent Find titles of long programmes
+
+\bigskip
+
+\medskip
+
+\subsection*{(c)}
+
+\noindent Filter viewed programmes
+
+\bigskip
+
+\medskip
+
+\subsection*{(d)}
+
+\noindent Calculate total storage used
+
+\bigskip
+
+\medskip
+
+\subsection*{(e)}
+
+\noindent Find the longest programme
+
+\bigskip
+
+\medskip
+
+\subsection*{(f)}
+
+\noindent Calculate storage by title
+
+\bigskip
+
+\medskip
+
+\subsection*{(g)}
+
+\noindent Remove the longest viewed programme
+
+\bigskip
+
+\medskip
+
+\subsection*{(h)}
+
+\noindent Sort programmes by length
+
+\bigskip
+
+\section*{Domain Setup}
+\addcontentsline{toc}{section}{Domain Setup}
+
+\noindent We define given types for programme attributes and a schema for programmes:
+
+\bigskip
+
+\begin{zed}[Title, Length, Viewed]\end{zed}
+
+\begin{schema}{Programme}
+title : Title \\
+length : Length \\
+viewed : Viewed
+\end{schema}
+
+\noindent Design rationale:
+
+\bigskip
+
+\noindent - Title is a given type (could be String in implementation)
+
+\bigskip
+
+\noindent - Length is a given type (represents natural numbers in seconds)
+
+\bigskip
+
+\noindent - Viewed is a given type (represents yes/no, could be boolean)
+
+\bigskip
+
+\noindent - Schema provides named field access: p.title, p.length, p.viewed
+
+\bigskip
+
+\noindent - More maintainable than tuples: (Title cross Length cross Viewed)
+
+\bigskip
+
+\section*{Solution ( a ) : Storage Constraints}
+\addcontentsline{toc}{section}{Solution ( a ) : Storage Constraints}
+
+\noindent Define a valid DVR hard drive with capacity and programme constraints:
+
+\bigskip
+
+\begin{axdef}
+hd : \seq Programme
+\where
+cumulativeTotal(hd) \leq 12000 \\
+\forall p \colon \ran hd \bullet p.length \leq 360
+\end{axdef}
+
+\noindent Constraint analysis:
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent 1. cumulativeTotal(hd) $\leq$ 12000
+
+\bigskip
+
+\noindent Total storage used must not exceed 12000 seconds (200 minutes)
+
+\bigskip
+
+\noindent Uses cumulativeTotal function defined in part (d)
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent 2. $\forall p \colon \ran hd \bullet p.length \leq 360$
+
+\bigskip
+
+\noindent Each programme must be at most 360 seconds (6 minutes)
+
+\bigskip
+
+\noindent Prevents recording movies or long shows
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Why these constraints?
+
+\bigskip
+
+\noindent - Storage limit reflects hardware capacity
+
+\bigskip
+
+\noindent - Length limit reflects intended use (short-form content)
+
+\bigskip
+
+\noindent - Enforced at specification level, not runtime
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Note: This definition uses forward reference to cumulativeTotal.
+
+\bigskip
+
+\noindent In a complete specification, define cumulativeTotal first.
+
+\bigskip
+
+\section*{Solution ( b ) : Finding Long Programme Titles}
+\addcontentsline{toc}{section}{Solution ( b ) : Finding Long Programme Titles}
+
+\noindent Find titles of all programmes longer than 120 seconds (2 minutes):
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent {$p : ran hd | p$.$length > 120$ . p.title}
+
+\bigskip
+
+\noindent Breakdown:
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Step 1: ran hd
+
+\bigskip
+
+\noindent The range of sequence hd is the set of all programmes in the sequence.
+
+\bigskip
+
+\noindent If hd = $\langle prog1, prog2, prog3 \rangle$, then ran hd = $\{prog1, prog2, prog3\}$
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Step 2: $p : ran hd | p$.$length > 120$
+
+\bigskip
+
+\noindent Filter programmes where length exceeds 120 seconds.
+
+\bigskip
+
+\noindent This is the declaration and constraint part.
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Step 3: . p.title
+
+\bigskip
+
+\noindent For each matching programme, extract just the title.
+
+\bigskip
+
+\noindent This is the term (selector) part.
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Result type: P Title (set of titles)
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent $Example : If hd contains$:
+
+\bigskip
+
+\noindent - Programme("News", 180, yes)
+
+\bigskip
+
+\noindent - Programme("Ads", 60, yes)
+
+\bigskip
+
+\noindent - Programme("Drama", 300, no)
+
+\bigskip
+
+\noindent Then result = {"News", "Drama"}
+
+\bigskip
+
+\section*{Solution ( c ) : Filtering Viewed Programmes}
+\addcontentsline{toc}{section}{Solution ( c ) : Filtering Viewed Programmes}
+
+\noindent Extract the subsequence of programmes that have been viewed:
+
+\bigskip
+
+\begin{axdef}
+viewedProgrammes : \seq Programme \fun \seq Programme
+\where
+viewedProgrammes(\langle \rangle) = \langle \rangle \\
+\forall x \colon Programme \bullet \forall s \colon \seq Programme \bullet viewedProgrammes(\langle x \rangle \cat s) = (\mbox{if } x.viewed = yes \mbox{ then } \langle x \rangle \cat viewedProgrammes(s) \mbox{ else } viewedProgrammes(s))
+\end{axdef}
+
+\noindent Recursive structure:
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Base $case : viewedProgrammes($$\langle \rangle$) = $\langle \rangle$
+
+\bigskip
+
+\noindent Empty sequence has no viewed programmes.
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Inductive $case : viewedProgrammes($$\langle x \rangle$ ^ s)
+
+\bigskip
+
+\noindent Given: sequence with first element x and remaining elements s
+
+\bigskip
+
+\noindent If x.$viewed = yes$: include x in result, recurse on s
+
+\bigskip
+
+\noindent If x.viewed /= yes: skip x, recurse on s
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Pattern matching notation:
+
+\bigskip
+
+\noindent $\langle x \rangle$ ^ s means "a sequence with head x and tail s"
+
+\bigskip
+
+\noindent This is similar to x :: $xs \in Haskell$ or x:$xs \in ML$
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Operational semantics:
+
+\bigskip
+
+\noindent viewedProgrammes($\langle p1, p2, p3, p4 \rangle$)
+
+\bigskip
+
+\noindent = if p1.$viewed = yes$ then $\langle p1 \rangle$ ^ viewedProgrammes($\langle p2, p3, p4 \rangle$) else viewedProgrammes($\langle p2, p3, p4 \rangle$)
+
+\bigskip
+
+\noindent ...continues recursively until base case
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent This is a$ \filter $operation: keeps elements satisfying a predicate.
+
+\bigskip
+
+\section*{Solution ( d ) : Cumulative Total Storage}
+\addcontentsline{toc}{section}{Solution ( d ) : Cumulative Total Storage}
+
+\noindent Calculate total storage used by summing all programme lengths:
+
+\bigskip
+
+\begin{axdef}
+cumulativeTotal : \seq Programme \fun \mathbb{N}
+\where
+cumulativeTotal(\langle \rangle) = 0 \\
+\forall x \colon Programme \bullet \forall s \colon \seq Programme \bullet cumulativeTotal(\langle x \rangle \cat s) = x.length + cumulativeTotal(s)
+\end{axdef}
+
+\noindent Recursive structure:
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Base $case : cumulativeTotal($$\langle \rangle$) = 0
+
+\bigskip
+
+\noindent Empty sequence has zero total length.
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Inductive $case : cumulativeTotal($$\langle x \rangle$ ^ s) = x.length + cumulativeTotal(s)
+
+\bigskip
+
+\noindent Add the first programme's length to the total of the rest.
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent This is a fold (reduce) operation: combines elements with + operator.
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Correctness by structural induction:
+
+\bigskip
+
+\noindent $Prove : cumulativeTotal(s) $= sum of all lengths in s
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent $Base : cumulativeTotal($$\langle \rangle$) = 0 = sum of lengths in $\langle \rangle$ ✓
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent $Step : Assume cumulativeTotal(s) $= sum of lengths in s
+
+\bigskip
+
+\noindent Then cumulativeTotal($\langle x \rangle$ ^ s)
+
+\bigskip
+
+\noindent = x.length + cumulativeTotal(s)        [definition]
+
+\bigskip
+
+\noindent = x.length + sum of lengths in s       [IH]
+
+\bigskip
+
+\noindent = sum of lengths in ($\langle x \rangle$ ^ s)          ✓
+
+\bigskip
+
+\section*{Solution ( e ) : Finding the Longest Programme}
+\addcontentsline{toc}{section}{Solution ( e ) : Finding the Longest Programme}
+
+\noindent Find the title of the unique longest programme:
+
+\bigskip
+
+\noindent
+$\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.length > q \bullet length) \land p.title$
+
+
+\noindent Mu operator semantics:
+
+\bigskip
+
+\noindent ($\mu x \colon S \bullet constraint \land term$)
+
+\bigskip
+
+\noindent Finds the unique $x \in S$ satisfying constraint, then evaluates term.
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Breakdown:
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Step 1: $p : ran hd$
+
+\bigskip
+
+\noindent Candidate programmes from the DVR
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Step 2: $\forall q \colon \ran hd \bullet p \neq q \land p.length > q.length$
+
+\bigskip
+
+\noindent p's length strictly exceeds all other programmes' lengths
+
+\bigskip
+
+\noindent This ensures p is the unique maximum
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Step 3: $\mid$ p.title
+
+\bigskip
+
+\noindent Extract p's title as the result
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Uniqueness assumption:
+
+\bigskip
+
+\noindent This assumes exactly one programme has maximum length.
+
+\bigskip
+
+\noindent If multiple programmes have the same maximum length, mu is undefined.
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Defensive alternative:
+
+\bigskip
+
+\noindent To handle ties, could return a set of titles:
+
+\bigskip
+
+\noindent $\{ p \colon \ran hd \mid \forall q \colon \ran hd \mid p.length \geq q.length \bullet p.title \}$
+
+\bigskip
+
+\section*{Solution ( f ) : Storage Totals by Title}
+\addcontentsline{toc}{section}{Solution ( f ) : Storage Totals by Title}
+
+\noindent (Note: Original solution was complex. This is a simplified version.)
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Calculate total storage used by each title across all programmes:
+
+\bigskip
+
+\noindent axdef
+
+\bigskip
+
+\noindent $totalsByTitle : seq(Programme)  \fun  (Title  \pfun  Length)$
+
+\bigskip
+
+\noindent where
+
+\bigskip
+
+\noindent $\forall$ $s : seq(Programme) |$
+
+\bigskip
+
+\noindent totalsByTitle(s) = {$t : Title | ($$\exists p \colon \ran s \bullet p.title = t$) .
+
+\bigskip
+
+\noindent t $\mapsto$ cumulativeTotal(s$ \filter $$\{t\}$)}
+
+\bigskip
+
+\noindent end
+
+\bigskip
+
+\noindent (Note: This simplified version assumes a$ \filter $operation on sequences.
+
+\bigskip
+
+\noindent The original problem requires complex nested comprehensions that may
+
+\bigskip
+
+\noindent need implementation-specific handling.)
+
+\bigskip
+
+\section*{Solution ( g ) : Remove Longest Viewed Programme}
+\addcontentsline{toc}{section}{Solution ( g ) : Remove Longest Viewed Programme}
+
+\noindent Remove the longest viewed programme from the sequence:
+
+\bigskip
+
+\begin{axdef}
+removeTheLongestViewed : \seq Programme \fun \seq Programme
+\where
+\forall s \colon \seq Programme \bullet removeTheLongestViewed(s) = s \filter \{ x \colon \ran s \mid x \neq longestViewed(s) \}
+\end{axdef}
+
+\noindent Where longestViewed is defined as:
+
+\bigskip
+
+\begin{axdef}
+longestViewed : \seq Programme \pfun Programme
+\where
+\forall s \colon \seq Programme \bullet longestViewed(s) = (\mu p \colon \ran s \bullet p.viewed = yes \land (\forall q \colon \ran s \bullet p \neq q \land q.viewed = yes \land p.length > q.length))
+\end{axdef}
+
+\noindent Two-step process:
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent 1. longestViewed(s) finds the unique longest viewed programme
+
+\bigskip
+
+\noindent - Only considers viewed programmes (p.$viewed = yes$)
+
+\bigskip
+
+\noindent - Finds unique maximum by length
+
+\bigskip
+
+\noindent - Partial function ($\pfun$): undefined if no viewed programmes
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent 2. removeTheLongestViewed(s) filters it out
+
+\bigskip
+
+\noindent - Uses sequence$ \filter $to remove the identified programme
+
+\bigskip
+
+\noindent - Keeps all programmes except longestViewed(s)
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Assumptions:
+
+\bigskip
+
+\noindent - At least one viewed programme exists
+
+\bigskip
+
+\noindent - One viewed programme has unique maximum length
+
+\bigskip
+
+\noindent - Otherwise longestViewed(s) is undefined (mu fails)
+
+\bigskip
+
+\section*{Solution ( h ) : Sort by Length}
+\addcontentsline{toc}{section}{Solution ( h ) : Sort by Length}
+
+\noindent Sort programmes in descending order by length:
+
+\bigskip
+
+\begin{axdef}
+sortByLength : \seq Programme \fun \seq Programme
+\where
+\forall x \colon \seq Programme \bullet items(sortByLength(x)) = items(x) \land (\forall i, j \colon \dom sortByLength(x) \mid i < j \Rightarrow sortByLength(x)(i) \bullet length \geq sortByLength(x)(j).length)
+\end{axdef}
+
+\noindent Specification approach $\lnot implementation$:
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Property 1: items(sortByLength(x)) = items(x)
+
+\bigskip
+
+\noindent The sorted sequence contains exactly the same programmes.
+
+\bigskip
+
+\noindent items(s) converts sequence s to a bag (multiset).
+
+\bigskip
+
+\noindent This ensures no programmes are added, removed, or duplicated.
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent Property 2: Descending length order
+
+\bigskip
+
+\noindent $\forall i, j \colon \dom sortByLength(x) \bullet i$$\langle j \Rightarrow length[i] \rangle$= length[j]
+
+\bigskip
+
+\noindent For all positions i before j, programme at i has $length \geq programme$ at j.
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent This is a declarative $specification : defines what, not how$.
+
+\bigskip
+
+\noindent Implementation could use quicksort, mergesort, etc.
+
+\bigskip
+
+\section*{Complete System Invariants}
+\addcontentsline{toc}{section}{Complete System Invariants}
+
+\noindent For a real DVR system, we'd want additional invariants:
+
+\bigskip
+
+\begin{axdef}
+DVRInvariants : \seq Programme \fun B
+\where
+\forall s \colon \seq Programme \bullet DVRInvariants(s) \Leftrightarrow (cumulativeTotal(s) \leq 12000) \land (\forall p \colon \ran s \bullet p.length > 0 \land p.length \leq 360) \land (\forall i \colon \dom s \mid s(i) \bullet title \neq s(i).title \Rightarrow i = i)
+\end{axdef}
+
+\noindent Additional invariants to consider:
+
+\bigskip
+
+\noindent 1. No duplicate titles (each programme uniquely identified)
+
+\bigskip
+
+\noindent 2. Positive lengths (p.$length > 0$)
+
+\bigskip
+
+\noindent 3. Valid viewed status (viewed in $\{yes, no\}$)
+
+\bigskip
+
+\noindent 4. Sequence order preserved during operations
+
+\bigskip
+
+\noindent 5. Storage never exceeds capacity after operations
+
+\bigskip
+
+\section*{Design Patterns Summary}
+\addcontentsline{toc}{section}{Design Patterns Summary}
+
+\noindent This example demonstrates several design patterns:
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent 1. **Recursive sequence processing**
+
+\bigskip
+
+\noindent - Base case for empty sequence
+
+\bigskip
+
+\noindent - Inductive case for $\langle x \rangle$ ^ s
+
+\bigskip
+
+\noindent - Common $pattern :  \filter , map, fold$
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent 2. **Schema-based data modeling**
+
+\bigskip
+
+\noindent - Named fields for clarity
+
+\bigskip
+
+\noindent - Type safety via schema constraints
+
+\bigskip
+
+\noindent - Better than tuples for complex data
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent 3. **Declarative specifications**
+
+\bigskip
+
+\noindent - Specify properties, not algorithms
+
+\bigskip
+
+\noindent - sortByLength defines what sorted means
+
+\bigskip
+
+\noindent - Implementation flexibility
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent 4. **Mu operator for unique selection**
+
+\bigskip
+
+\noindent - Finding unique maxima/minima
+
+\bigskip
+
+\noindent - Requires uniqueness assumption
+
+\bigskip
+
+\noindent - Alternative: return set for ties
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent 5. **Constraints as preconditions**
+
+\bigskip
+
+\noindent - DVR storage capacity
+
+\bigskip
+
+\noindent - Programme length limits
+
+\bigskip
+
+\noindent - Enforced at type/specification level
+
+\bigskip
+
+\section*{Exercise for the Reader}
+\addcontentsline{toc}{section}{Exercise for the Reader}
+
+\noindent 1. Define a function to add a new programme to the DVR:
+
+\bigskip
+
+\noindent $addProgramme : seq(Programme) cross Programme  \pfun  seq(Programme)$
+
+\bigskip
+
+\noindent Include $precondition : total storage won$'t exceed limit
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent 2. Define a function to delete all viewed programmes:
+
+\bigskip
+
+\noindent $deleteViewed : seq(Programme)  \fun  seq(Programme)$
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent 3. Prove $that : cumulativeTotal(s $^ t) = cumulativeTotal(s) + cumulativeTotal(t)
+
+\bigskip
+
+\noindent (Concatenation property)
+
+\bigskip
+
+\noindent 
+
+\bigskip
+
+\noindent 4. Extend the model with recording times (Date, Time) and define:
+
+\bigskip
+
+\noindent - Function to find programmes recorded on a specific date
+
+\bigskip
+
+\noindent - Function to find recording conflicts (overlapping times)
+
+\bigskip
+
+\end{document}

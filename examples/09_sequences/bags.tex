@@ -1,23 +1,21 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Bags ( Multisets )}
 
-\bigskip
-\noindent
-\textbf{Example 1 : Bag Type}
+\section*{Example 1 : Bag Type}
+\addcontentsline{toc}{section}{Example 1 : Bag Type}
 
-\medskip
-
-\bigskip
-
-Bags are unordered collections that allow duplicates:
+\noindent Bags are unordered collections that allow duplicates:
 
 \bigskip
 
@@ -27,15 +25,10 @@ $\bag \nat$
 \noindent
 $\bag \num$
 
-\bigskip
-\noindent
-\textbf{Example 2 : Bag Literals}
+\section*{Example 2 : Bag Literals}
+\addcontentsline{toc}{section}{Example 2 : Bag Literals}
 
-\medskip
-
-\bigskip
-
-Bags are written with double square brackets:
+\noindent Bags are written with double square brackets:
 
 \bigskip
 
@@ -48,39 +41,26 @@ $\lbag a, b, c \rbag$
 \noindent
 $\lbag 1, 2, 2, 3, 3, 3 \rbag$
 
-\bigskip
-\noindent
-\textbf{Example 3 : Bags vs Sets}
+\section*{Example 3 : Bags vs Sets}
+\addcontentsline{toc}{section}{Example 3 : Bags vs Sets}
 
-\medskip
-
-\bigskip
-
-Unlike sets, bags preserve multiplicity:
+\noindent Unlike sets, bags preserve multiplicity:
 
 \bigskip
 
-\bigskip
-
-The bag [[1, 2, 2, 3]] is different from the set $\{1, 2, 3\}$
+\noindent The bag [[1, 2, 2, 3]] is different from the set $\{1, 2, 3\}$
 
 \bigskip
 
-\bigskip
-
-The bag [[a, a, a]] contains three copies of a
+\noindent The bag [[a, a, a]] contains three copies of a
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 4 : Bags in Specifications}
+\section*{Example 4 : Bags in Specifications}
+\addcontentsline{toc}{section}{Example 4 : Bags in Specifications}
 
-\medskip
-
-\bigskip
-
-Bags can model collections where order doesn't matter but quantity does:
+\noindent Bags can model collections where order doesn't matter but
+quantity does:
 
 \bigskip
 
