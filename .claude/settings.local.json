@@ -35,7 +35,10 @@
       "Bash(/tmp/test.tex)",
       "Bash(make 01_propositional_logic:*)",
       "Bash(make 10_schemas:*)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "Bash(./qa_check.sh:*)",
+      "Bash(./qa_check_all.sh:*)",
+      "Bash(bash:*)"
     ],
     "deny": [],
     "ask": []
