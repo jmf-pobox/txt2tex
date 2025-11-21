@@ -115,8 +115,18 @@ TEXT:   - ran(parentOf) = set of all people who have parents
 ** Solution (b): Sibling Relationship **
 
 TEXT: Siblings are people who share at least one parent, excluding yourself:
+TEXT: First, we define the identity relation for Person:
 
-siblingOf == (childOf o9 parentOf) \ id[Person]
+axdef
+  id_Person : Person <-> Person
+where
+  id_Person = {x : Person . x |-> x}
+end
+
+TEXT: The identity relation id_Person contains all pairs (x, x) for every person x.
+TEXT: Now we can define siblingOf:
+
+siblingOf == (childOf o9 parentOf) \ id_Person
 
 TEXT: Let's break this down step by step:
 TEXT:
@@ -125,11 +135,11 @@ TEXT:   This composition connects two people who share a common parent.
 TEXT:   If (x, p) in childOf and (p, y) in parentOf, then (x, y) is in the composition.
 TEXT:   This includes the case where x = y (you share parents with yourself).
 TEXT:
-TEXT: Step 2: id[Person]
+TEXT: Step 2: id_Person
 TEXT:   The identity relation contains all pairs (x, x).
 TEXT:   This represents the "share parents with yourself" case.
 TEXT:
-TEXT: Step 3: (childOf o9 parentOf) \ id[Person]
+TEXT: Step 3: (childOf o9 parentOf) \ id_Person
 TEXT:   Subtract the identity relation to remove self-loops.
 TEXT:   Result: all pairs of people who share parents, excluding yourself.
 TEXT:
@@ -204,12 +214,12 @@ TEXT:   - ran(ancestorOf) = people who have ancestors
 ** Summary of Definitions **
 
 TEXT: Complete specification:
-
-parentOf == childOf~
-siblingOf == (childOf o9 parentOf) \ id[Person]
-cousinOf == childOf o9 siblingOf o9 parentOf
-ancestorOf == parentOf+
-
+TEXT:
+TEXT:   parentOf == childOf~
+TEXT:   siblingOf == (childOf o9 parentOf) \ id_Person
+TEXT:   cousinOf == childOf o9 siblingOf o9 parentOf
+TEXT:   ancestorOf == parentOf+
+TEXT:
 TEXT: Additional derived relations you might define:
 TEXT:
 TEXT:   grandparentOf == parentOf o9 parentOf

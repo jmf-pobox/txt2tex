@@ -254,18 +254,26 @@ TEXT:    - Use grandchildren to define counting function
 
 ** Specification Completeness **
 
-TEXT: Complete axiomatic definitions with all functions:
-
-axdef
-  parentOf : Person <-> Person
-  children : Person -> P Person
-  grandchildren : Person -> P Person
-  number_of_grandchildren : Person -> N
-where
-  children = {p : Person . p |-> parentOf(| {p} |)}
-  grandchildren = {p : Person . p |-> (parentOf o9 parentOf)(| {p} |)}
-  number_of_grandchildren = {p : Person . p |-> # grandchildren(p)}
-end
+TEXT: Summary of all definitions declared above:
+TEXT:
+TEXT: 1. **parentOf** : Person <-> Person
+TEXT:    Base relation representing direct parent-child relationships
+TEXT:
+TEXT: 2. **children** : Person -> P Person
+TEXT:    Function mapping each person to their set of children
+TEXT:    Definition: children = {p : Person . p |-> parentOf(| {p} |)}
+TEXT:
+TEXT: 3. **grandchildren** : Person -> P Person
+TEXT:    Function mapping each person to their set of grandchildren
+TEXT:    Definition: grandchildren = {p : Person . p |-> (parentOf o9 parentOf)(| {p} |)}
+TEXT:
+TEXT: 4. **number_of_grandchildren** : Person -> N
+TEXT:    Function counting grandchildren for each person
+TEXT:    Definition: number_of_grandchildren = {p : Person . p |-> # grandchildren(p)}
+TEXT:
+TEXT: These definitions form a progressive hierarchy: parentOf is the base relation,
+TEXT: children builds on it, grandchildren uses composition of parentOf, and
+TEXT: number_of_grandchildren applies cardinality to the grandchildren set.
 
 ** Exercise for the Reader **
 
