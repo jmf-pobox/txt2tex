@@ -80,24 +80,38 @@ TEXT:   (h) Sort programmes by length
 
 TEXT: We define given types for programme attributes and a schema for programmes:
 
-given Title, Length, Viewed
+given Title
+
+YesNo ::= yes | no
 
 schema Programme
   title: Title
-  length: Length
-  viewed: Viewed
+  length: N
+  viewed: YesNo
 end
 
 TEXT: Design rationale:
 TEXT:   - Title is a given type (could be String in implementation)
-TEXT:   - Length is a given type (represents natural numbers in seconds)
-TEXT:   - Viewed is a given type (represents yes/no, could be boolean)
+TEXT:   - length is N (natural numbers representing seconds)
+TEXT:   - YesNo is a free type with two constructors: yes and no
 TEXT:   - Schema provides named field access: p.title, p.length, p.viewed
-TEXT:   - More maintainable than tuples: (Title cross Length cross Viewed)
+TEXT:   - More maintainable than tuples: (Title cross N cross YesNo)
 
 ** Solution (a): Storage Constraints **
 
 TEXT: Define a valid DVR hard drive with capacity and programme constraints:
+TEXT:
+TEXT: First, we need the cumulativeTotal function (defined in part d):
+
+axdef
+  cumulativeTotal : seq(Programme) -> N
+where
+  cumulativeTotal(<>) = 0
+  forall x : Programme; s : seq(Programme) |
+    cumulativeTotal(<x> ^ s) = x.length + cumulativeTotal(s)
+end
+
+TEXT: Now we can define the DVR with constraints:
 
 axdef
   hd : seq(Programme)
@@ -110,7 +124,6 @@ TEXT: Constraint analysis:
 TEXT:
 TEXT: 1. cumulativeTotal(hd) <= 12000
 TEXT:    Total storage used must not exceed 12000 seconds (200 minutes)
-TEXT:    Uses cumulativeTotal function defined in part (d)
 TEXT:
 TEXT: 2. forall p : ran hd | p.length <= 360
 TEXT:    Each programme must be at most 360 seconds (6 minutes)
@@ -120,9 +133,6 @@ TEXT: Why these constraints?
 TEXT:   - Storage limit reflects hardware capacity
 TEXT:   - Length limit reflects intended use (short-form content)
 TEXT:   - Enforced at specification level, not runtime
-TEXT:
-TEXT: Note: This definition uses forward reference to cumulativeTotal.
-TEXT: In a complete specification, define cumulativeTotal first.
 
 ** Solution (b): Finding Long Programme Titles **
 
@@ -187,16 +197,14 @@ TEXT: This is a filter operation: keeps elements satisfying a predicate.
 
 ** Solution (d): Cumulative Total Storage **
 
-TEXT: Calculate total storage used by summing all programme lengths:
-
-axdef
-  cumulativeTotal : seq(Programme) -> N
-where
-  cumulativeTotal(<>) = 0
-  forall x : Programme; s : seq(Programme) |
-    cumulativeTotal(<x> ^ s) = x.length + cumulativeTotal(s)
-end
-
+TEXT: Calculate total storage used by summing all programme lengths.
+TEXT: We already defined this function in part (a):
+TEXT:
+TEXT:   cumulativeTotal : seq(Programme) -> N
+TEXT:   cumulativeTotal(<>) = 0
+TEXT:   forall x : Programme; s : seq(Programme) |
+TEXT:     cumulativeTotal(<x> ^ s) = x.length + cumulativeTotal(s)
+TEXT:
 TEXT: Recursive structure:
 TEXT:
 TEXT: Base case: cumulativeTotal(<>) = 0
@@ -268,21 +276,22 @@ TEXT:  need implementation-specific handling.)
 
 ** Solution (g): Remove Longest Viewed Programme **
 
-TEXT: Remove the longest viewed programme from the sequence:
+TEXT: Remove the longest viewed programme from the sequence.
+TEXT: First, we need a function to find the longest viewed programme:
+
+axdef
+  longestViewed : seq(Programme) +-> Programme
+where
+  forall s : seq(Programme) | longestViewed(s) = (mu p : ran s | p.viewed = yes and forall q : ran s | p /= q and q.viewed = yes | p.length > q.length)
+end
+
+TEXT: Now we can define the removal function:
 
 axdef
   removeTheLongestViewed : seq(Programme) -> seq(Programme)
 where
   forall s : seq(Programme) |
     removeTheLongestViewed(s) = s filter {x : ran s | x /= longestViewed(s)}
-end
-
-TEXT: Where longestViewed is defined as:
-
-axdef
-  longestViewed : seq(Programme) +-> Programme
-where
-  forall s : seq(Programme) | longestViewed(s) = (mu p : ran s | p.viewed = yes and forall q : ran s | p /= q and q.viewed = yes | p.length > q.length)
 end
 
 TEXT: Two-step process:
@@ -303,17 +312,20 @@ TEXT:   - Otherwise longestViewed(s) is undefined (mu fails)
 
 ** Solution (h): Sort by Length **
 
-TEXT: Sort programmes in descending order by length:
-
-axdef
-  sortByLength : seq(Programme) -> seq(Programme)
-where
-  forall x : seq(Programme) |
-    items(sortByLength(x)) = items(x) and
-    (forall i, j : dom(sortByLength(x)) | i < j =>
-      (sortByLength(x)(i)).length >= (sortByLength(x)(j)).length)
-end
-
+TEXT: Sort programmes in descending order by length.
+TEXT:
+TEXT: Declarative specification (defines properties, not algorithm):
+TEXT:
+TEXT:   sortByLength : seq(Programme) -> seq(Programme)
+TEXT:
+TEXT:   Properties:
+TEXT:     1. items(sortByLength(x)) = items(x)
+TEXT:        The sorted sequence contains exactly the same programmes
+TEXT:
+TEXT:     2. forall i, j : dom(sortByLength(x)) | i < j =>
+TEXT:          sortByLength(x)(i).length >= sortByLength(x)(j).length
+TEXT:        For all positions i before j, programme at i has length >= programme at j
+TEXT:
 TEXT: Specification approach (not implementation):
 TEXT:
 TEXT: Property 1: items(sortByLength(x)) = items(x)
@@ -331,17 +343,12 @@ TEXT: Implementation could use quicksort, mergesort, etc.
 ** Complete System Invariants **
 
 TEXT: For a real DVR system, we'd want additional invariants:
-
-axdef
-  DVRInvariants : seq(Programme) -> B
-where
-  forall s : seq(Programme) |
-    DVRInvariants(s) <=>
-      (cumulativeTotal(s) <= 12000) and
-      (forall p : ran s | p.length > 0 and p.length <= 360) and
-      (forall i : dom s | s(i).title /= s(i).title => i = i)
-end
-
+TEXT:
+TEXT:   DVRInvariants(s) means:
+TEXT:     (cumulativeTotal(s) <= 12000) and
+TEXT:     (forall p : ran s | p.length > 0 and p.length <= 360) and
+TEXT:     (all titles are distinct in the sequence)
+TEXT:
 TEXT: Additional invariants to consider:
 TEXT:   1. No duplicate titles (each programme uniquely identified)
 TEXT:   2. Positive lengths (p.length > 0)
