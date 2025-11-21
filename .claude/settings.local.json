@@ -44,7 +44,8 @@
       "Bash(qa_check.sh:*)",
       "Bash(chmod:*)",
       "Bash(qa_check_all.sh:*)",
-      "Bash(TEXINPUTS=.::/Users/jfreeman/Coding/fuzz/txt2tex/sem/latex//: pdflatex:*)"
+      "Bash(TEXINPUTS=.::/Users/jfreeman/Coding/fuzz/txt2tex/sem/latex//: pdflatex:*)",
+      "Bash(latexmk:*)"
     ],
     "deny": [],
     "ask": []

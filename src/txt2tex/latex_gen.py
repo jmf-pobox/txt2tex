@@ -2634,9 +2634,19 @@ class LaTeXGenerator:
         # Pattern 2.5: Type declarations (identifier : type_expression)
         # Match patterns like "large_coins : Collection -> N"
         # This must come before Pattern 3 to catch the identifier before the colon
-        type_decl_pattern = (
-            r"\b([a-zA-Z_]\w*)\s*:\s*([a-zA-Z_][\w\s\*\(\)\[\]<>,\+\->|]+)"
+        # Stop at commas, periods, or common prose words
+        # Use negative lookahead to prevent matching prose words
+        prose_pattern = (
+            r"(?:where|and|or|but|if|then|else|shadows|gives|returns|which|that|"
+            r"is|are|was|were|be|been|have|has|had|the|a|an|this)"
         )
+        # Pattern: identifier : type_expr
+        # Type expr stops at prose words using negative lookahead
+        neg_lookahead = r"(?!" + prose_pattern + r"\b)"
+        type_word = r"[a-zA-Z_][^\s,]*"
+        type_continuation = r"(?:\s+" + neg_lookahead + type_word + r")*"
+        type_expr_part = r"(" + type_word + type_continuation + r")"
+        type_decl_pattern = r"\b([a-zA-Z_]\w*)\s*:\s*" + type_expr_part
 
         matches = list(re.finditer(type_decl_pattern, result))
         for match in reversed(matches):
