@@ -43,7 +43,8 @@
       "Bash(git checkout:*)",
       "Bash(qa_check.sh:*)",
       "Bash(chmod:*)",
-      "Bash(qa_check_all.sh:*)"
+      "Bash(qa_check_all.sh:*)",
+      "Bash(TEXINPUTS=.::/Users/jfreeman/Coding/fuzz/txt2tex/sem/latex//: pdflatex:*)"
     ],
     "deny": [],
     "ask": []
