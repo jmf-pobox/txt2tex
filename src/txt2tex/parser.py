@@ -716,6 +716,7 @@ class Parser:
             TokenType.MOD,  # mod (modulo)
             TokenType.BIGCUP,  # bigcup (distributed union)
             TokenType.BIGCAP,  # bigcap (distributed intersection)
+            TokenType.FILTER,  # filter (sequence filter)
         )
 
     def _smart_join_justification(self, parts: list[str]) -> str:
@@ -1583,13 +1584,14 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Phase 21/22: Use _parse_union to allow union/intersect in domain
+            # Parse type expression: union, cross, function & relation types
             # Allows: forall x : A union B | P
-            # TODO Phase 23: Support relation types (A <-> B) in quantifier domains
+            # Allows: forall f : X -> Y | P (function type)
+            # Allows: forall R : X <-> Y | P (relation type)
             # Set flag to prevent .identifier from being parsed as projection
             self._parsing_schema_text = True
             try:
-                domain = self._parse_union()
+                domain = self._parse_function_type()
             finally:
                 self._parsing_schema_text = False
 
@@ -1733,8 +1735,8 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Phase 21/22: Use _parse_union to match main quantifier parser
-            domain = self._parse_union()
+            # Parse type expression to match main quantifier parser
+            domain = self._parse_function_type()
 
         # Check for another semicolon (more bindings)
         if self._match(TokenType.SEMICOLON):
@@ -1954,13 +1956,14 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Phase 21/22: Use _parse_union to allow union/intersect in domain
+            # Parse type expression: union, cross, function & relation types
             # Allows: forall x : A union B | P
-            # TODO Phase 23: Support relation types (A <-> B) in quantifier domains
+            # Allows: forall f : X -> Y | P (function type)
+            # Allows: forall R : X <-> Y | P (relation type)
             # Set flag to prevent .identifier from being parsed as projection
             self._parsing_schema_text = True
             try:
-                domain = self._parse_union()
+                domain = self._parse_function_type()
             finally:
                 self._parsing_schema_text = False
 
@@ -2171,14 +2174,15 @@ class Parser:
         )
 
     def _parse_function_type(self) -> Expr:
-        """Parse function type operators (Phase 11c, enhanced Phase 18).
+        """Parse function and relation type operators (Phase 11c, Phase 18).
 
-        Function types: ->, +->, >->, >+>, -|>, -->>, +->>, >->>
+        Function/relation types: ->, +->, >->, >+>, -|>, -->>, +->>, >->>, <->
         Right-associative: A -> B -> C parses as A -> (B -> C)
+        Also used in quantifier domains: forall f : X -> Y | P
         """
         left = self._parse_relation()
 
-        # Check for function type arrow (right-associative)
+        # Check for function/relation type operators (right-associative)
         if self._match(
             TokenType.TFUN,  # ->
             TokenType.PFUN,  # +->
@@ -2189,6 +2193,7 @@ class Parser:
             TokenType.PSURJ,  # +->>
             TokenType.BIJECTION,  # >->>
             TokenType.FINFUN,  # 77-> (Phase 34)
+            TokenType.RELATION,  # <-> (relation type)
         ):
             arrow_token = self._advance()
             # Right-associative: recursively parse the right side as function type
@@ -2814,8 +2819,13 @@ class Parser:
         # Note: Function application expr(...) is now handled in _parse_postfix()
         # Note: Generic instantiation Type[X] is handled in _parse_postfix()
         # Note: Relational image R(| S |) is handled in _parse_postfix()
-        # Phase 22: Allow keywords to be used as function names (union, intersect)
-        if self._match(TokenType.IDENTIFIER, TokenType.UNION, TokenType.INTERSECT):
+        # Phase 22: Allow keywords as function names (union, intersect, filter)
+        if self._match(
+            TokenType.IDENTIFIER,
+            TokenType.UNION,
+            TokenType.INTERSECT,
+            TokenType.FILTER,
+        ):
             name_token = self._advance()
             return Identifier(
                 name=name_token.value, line=name_token.line, column=name_token.column

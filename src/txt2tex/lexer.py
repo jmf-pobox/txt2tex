@@ -585,7 +585,8 @@ class Lexer:
             # Safety limit to prevent infinite loops
             max_iterations = 10000
             iterations = 0
-            # Bug fix: empty string is "in" any string in Python, so we must check for it explicitly
+            # Bug fix: empty string is "in" any string in Python,
+            # so we must check for it explicitly
             ch = self._peek_char(peek_pos)
             while ch and ch in " \t":
                 peek_pos += 1
@@ -602,25 +603,25 @@ class Lexer:
                     )
                     print(f"Text length: {len(self.text)}")
                     print(f"Context (-20/+20): {context}")
-                    print(f"Current char: {repr(char)}")
+                    print(f"Current char: {char!r}")
                     print(f"Peek pos: {peek_pos}")
-                    print(f"Next 50 chars: {repr(self.text[self.pos:self.pos+50])}")
+                    print(f"Next 50 chars: {self.text[self.pos:self.pos+50]!r}")
                     print(
                         f"Char at peek pos: "
-                        f"{repr(self._peek_char(peek_pos))}"
+                        f"{self._peek_char(peek_pos)!r}"
                     )
                     # Show first 20 peek values
                     print("First 20 _peek_char values:")
                     for i in range(1, 21):
                         ch = self._peek_char(i)
-                        print(f"  _peek_char({i}) = {repr(ch)}")
+                        print(f"  _peek_char({i}) = {ch!r}")
                     print(
                         f"Full text (first 200 chars): "
-                        f"{repr(self.text[:200])}"
+                        f"{self.text[:200]!r}"
                     )
                     print(
                         f"Full text (last 200 chars): "
-                        f"{repr(self.text[-200:])}"
+                        f"{self.text[-200:]!r}"
                     )
                     raise RuntimeError(
                         f"Lexer infinite loop at position {self.pos}, "
