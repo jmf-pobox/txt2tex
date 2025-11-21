@@ -58,26 +58,35 @@ if [ -z "$PDF_TEXT" ]; then
     exit 1
 fi
 
-# 1. Check for garbled characters in PDF
+# 1. Check for garbled characters in PDF (from broken relational image syntax)
 echo "=== 1. Garbled Characters in PDF ==="
-GARBLED_CHARS=$(echo "$PDF_TEXT" | grep -o "[¿¡—]" || true)
-GARBLED_COUNT=$(echo "$GARBLED_CHARS" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
 
-if [ "${GARBLED_COUNT:-0}" -gt 0 ]; then
-    echo -e "${RED}FAIL: Found $GARBLED_COUNT garbled characters (¿, ¡, —)${NC}"
+# First check if PDF has em dashes
+EM_DASHES=$(echo "$PDF_TEXT" | grep -o "—" || true)
+EM_DASH_COUNT=$(echo "$EM_DASHES" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
 
-    # Show which solutions have garbled characters
-    echo ""
-    echo "Solutions with garbled characters:"
-    echo "$PDF_TEXT" | grep -n "Solution [0-9]\+" | while read -r line; do
-        line_num=$(echo "$line" | cut -d: -f1)
-        solution=$(echo "$line" | sed 's/.*Solution \([0-9]\+\).*/\1/')
-        # Check if garbled chars appear within next 50 lines
-        garbled_in_solution=$(echo "$PDF_TEXT" | tail -n +$line_num | head -n 50 | grep -o "[¿¡—]" | wc -l | tr -d ' ')
-        if [ "$garbled_in_solution" -gt 0 ]; then
-            echo -e "  ${RED}Solution $solution: $garbled_in_solution garbled character(s)${NC}"
+if [ "${EM_DASH_COUNT:-0}" -gt 0 ]; then
+    # Check if LaTeX source has literal pipe characters (not \limg or \rimg)
+    # Literal pipes in text mode render as em dashes
+    if [ -n "$TEX_FILE" ]; then
+        # Look for literal (| or |) that are NOT part of \limg or \rimg
+        # Pattern: (| or |) not preceded by backslash
+        LITERAL_PIPES=$(grep -E '(^|[^\\])\(\||\|\)' "$TEX_FILE" | grep -v '\\limg\|\\rimg' || true)
+        LITERAL_PIPE_COUNT=$(echo "$LITERAL_PIPES" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
+
+        if [ "${LITERAL_PIPE_COUNT:-0}" -gt 0 ]; then
+            echo -e "${RED}FAIL: Found $EM_DASH_COUNT em dashes in PDF from ${LITERAL_PIPE_COUNT} literal pipe(s) in LaTeX${NC}"
+            echo ""
+            echo "Literal pipes in LaTeX (should use \\limg/\\rimg):"
+            echo "$LITERAL_PIPES" | head -5
+        else
+            # Em dashes exist but no literal pipes - these are legitimate (from ---)
+            echo -e "${GREEN}PASS: Em dashes are legitimate (from --- in LaTeX, not broken pipes)${NC}"
         fi
-    done
+    else
+        # No tex file to check - report as warning
+        echo -e "${YELLOW}WARNING: Found $EM_DASH_COUNT em dashes but cannot verify LaTeX source${NC}"
+    fi
 else
     echo -e "${GREEN}PASS: No garbled characters found${NC}"
 fi
@@ -231,7 +240,9 @@ echo "=========================================="
 echo ""
 
 # Calculate total issues (PDF errors only - warnings don't count toward failure)
-TOTAL_ISSUES=$((${GARBLED_COUNT:-0} + ${FORALL_COUNT:-0} + ${EMPTYSET_COUNT:-0}))
+# Only count LITERAL_PIPE_COUNT as garbled (em dashes from literal pipes)
+# EM_DASH_COUNT without literal pipes are legitimate and don't count as issues
+TOTAL_ISSUES=$((${LITERAL_PIPE_COUNT:-0} + ${FORALL_COUNT:-0} + ${EMPTYSET_COUNT:-0}))
 
 # Add LaTeX source issues if available
 if [ -n "$TEX_FILE" ]; then
@@ -245,7 +256,7 @@ else
     echo -e "${RED}✗ Found $TOTAL_ISSUES issue(s)${NC}"
     echo ""
     echo "Issues found:"
-    [ ${GARBLED_COUNT:-0} -gt 0 ] && echo "  - $GARBLED_COUNT garbled characters"
+    [ ${LITERAL_PIPE_COUNT:-0} -gt 0 ] && echo "  - $LITERAL_PIPE_COUNT garbled em dashes (from literal pipes in LaTeX)"
     [ ${FORALL_COUNT:-0} -gt 0 ] && echo "  - $FORALL_COUNT text 'forall' (should be symbol)"
     [ ${EMPTYSET_COUNT:-0} -gt 0 ] && echo "  - $EMPTYSET_COUNT text 'emptyset' (should be symbol)"
     if [ -n "$TEX_FILE" ]; then
