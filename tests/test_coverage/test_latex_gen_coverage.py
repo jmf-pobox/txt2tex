@@ -641,8 +641,10 @@ def test_latex_gen_generic_instantiation() -> None:
     gen = LaTeXGenerator()
     latex = gen.generate_expr(result)
 
+    # seq[N] renders as \seq \mathbb{N} (no brackets for special types)
     assert "seq" in latex
-    assert "[" in latex
+    assert "\\mathbb{N}" in latex
+    assert latex == "\\seq \\mathbb{N}"
 
 
 def test_latex_gen_range() -> None:

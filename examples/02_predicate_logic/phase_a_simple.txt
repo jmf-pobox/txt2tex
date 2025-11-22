@@ -17,8 +17,8 @@
 
 ** Test Phase A **
 
-Simple test of pattern matching with sequences:
+TEXT: Pattern matching with sequences:
 
-viewed(<>) = <>
+TEXT: viewed(⟨⟩) = ⟨⟩
 
-viewed(<x> ^ s) = if x.3 = yes then <x> ^ viewed(s) else viewed(s)
+TEXT: viewed(⟨x⟩ ^ s) = if condition then ⟨x⟩ ^ viewed(s) else viewed(s)

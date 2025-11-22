@@ -146,8 +146,10 @@ TEXT: The system has three basic types: users, documents, and permissions.
 schema FileSystem
   docs : User +-> P Document
   perms : Document +-> P Permission
+  all_docs : P Document
 where
-  dom docs subseteq ran perms
+  all_docs = bigcup (ran docs)
+  all_docs subseteq dom perms
 end
 
 TEXT: The state schema defines the relationships between users, documents, and permissions.

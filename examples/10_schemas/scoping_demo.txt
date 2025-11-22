@@ -192,7 +192,7 @@ TEXT: This quantifies over schema Database. The components of Database (records)
 ** Example 18: Scope Hygiene Best Practices **
 
 TEXT: To avoid confusion:
-TEXT: 1. Don't shadow names unnecessarily—use different variable names
+TEXT: 1. Don't shadow names unnecessarily---use different variable names
 TEXT: 2. Keep quantifier nesting shallow when possible
 TEXT: 3. Use descriptive names that make scope obvious
 TEXT: 4. Avoid reusing schema component names in nested contexts
@@ -202,13 +202,13 @@ TEXT: 5. Document intentional shadowing with comments
 
 forall x : N | x > 0 => (exists y : N | y < x and y > 0)
 
-TEXT: Uses distinct names x and y—clear and unambiguous.
+TEXT: Uses distinct names x and y---clear and unambiguous.
 
 ** Example 20: Poor Style (Shadowing) **
 
 forall x : N | x > 0 => (exists x : N | x < 10)
 
-TEXT: Inner x shadows outer x—confusing and error-prone. Avoid this pattern.
+TEXT: Inner x shadows outer x---confusing and error-prone. Avoid this pattern.
 
 ** Example 21: Scoping in Definitions **
 
@@ -225,7 +225,7 @@ where
   testValue = 5
 end
 
-TEXT: Now there's no shadowing—much clearer!
+TEXT: Now there's no shadowing---much clearer!
 
 ** Example 22: Schema Composition Scope **
 

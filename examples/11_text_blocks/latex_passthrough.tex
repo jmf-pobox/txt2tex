@@ -1,0 +1,170 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{LATEX Passthrough Examples}
+
+\section*{Example 1 : Basic LaTeX Commands}
+\addcontentsline{toc}{section}{Example 1 : Basic LaTeX Commands}
+
+\noindent You can insert custom LaTeX commands using the LATEX directive:
+
+\bigskip
+
+\noindent This paragraph has no indentation.
+
+\noindent The LATEX block passes its content directly to the LaTeX output.
+
+\bigskip
+
+\section*{Example 2 : Custom Spacing}
+\addcontentsline{toc}{section}{Example 2 : Custom Spacing}
+
+\noindent Control vertical spacing with LaTeX commands:
+
+\bigskip
+
+\vspace{1cm}
+
+\noindent The above adds 1cm of vertical space.
+
+\bigskip
+
+\vspace{0.5cm}
+
+\noindent You can add as much or as little space as needed.
+
+\bigskip
+
+\section*{Example 3 : Custom Formatting}
+\addcontentsline{toc}{section}{Example 3 : Custom Formatting}
+
+\noindent Apply special formatting to text:
+
+\bigskip
+
+\begin{center}
+
+  \textbf{\Large This text is centered, bold, and large}
+
+\end{center}
+
+\noindent The LATEX blocks allow full control over typography.
+
+\bigskip
+
+\section*{Example 4 : Boxes and Frames}
+\addcontentsline{toc}{section}{Example 4 : Boxes and Frames}
+
+\noindent Create boxed text with LaTeX environments:
+
+\bigskip
+
+\begin{center}
+
+  \fbox{\parbox{0.8\textwidth}{
+
+      This text appears in a framed box. You can use this to
+      highlight important definitions or theorems.
+
+  }}
+
+\end{center}
+
+\section*{Example 5 : Custom Lists}
+\addcontentsline{toc}{section}{Example 5 : Custom Lists}
+
+\noindent Create specialized list formats:
+
+\bigskip
+
+\begin{description}
+
+  \item[Precondition:] The input must be a natural number
+
+  \item[Postcondition:] The output is the square of the input
+
+  \item[Invariant:] The result is always non-negative
+
+\end{description}
+
+\section*{Example 6 : Theorems and Definitions}
+\addcontentsline{toc}{section}{Example 6 : Theorems and Definitions}
+
+\noindent If you've loaded theorem packages, you can use them:
+
+\bigskip
+
+\begin{quotation}
+
+  \textbf{Theorem 1.} For all natural numbers $n$, we have $n \geq 0$.
+
+\end{quotation}
+
+\noindent The LATEX directive lets you use any LaTeX environment or command.
+
+\bigskip
+
+\section*{Example 7 : Page Layout Control}
+\addcontentsline{toc}{section}{Example 7 : Page Layout Control}
+
+\noindent Control page layout with LaTeX commands:
+
+\bigskip
+
+\clearpage
+
+\noindent The clearpage command forces a page break and flushes all
+pending floats.
+
+\bigskip
+
+\section*{Example 8 : Mixed Z Notation and LaTeX}
+\addcontentsline{toc}{section}{Example 8 : Mixed Z Notation and LaTeX}
+
+\noindent You can combine Z notation with custom LaTeX formatting:
+
+\bigskip
+
+\begin{axdef}
+  example : \nat
+  \where
+  example = 42
+\end{axdef}
+
+\medskip
+
+\noindent\textit{Note:} The above defines a constant with value 42.
+
+\noindent This demonstrates the flexibility of mixing txt2tex
+notation with raw LaTeX.
+
+\bigskip
+
+\section*{Example 9 : Custom Macros}
+\addcontentsline{toc}{section}{Example 9 : Custom Macros}
+
+\noindent If you define custom LaTeX macros in your preamble, you can use them:
+
+\bigskip
+
+% Assuming you've defined \newcommand{\spec}[1]{\textsc{#1}}
+
+% You could write:
+
+% \spec{Specification} is shown in small caps.
+
+\noindent The LATEX directive is your escape hatch for any LaTeX
+feature not directly supported by txt2tex.
+
+\bigskip
+
+\end{document}

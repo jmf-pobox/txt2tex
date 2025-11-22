@@ -1,0 +1,414 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Function Composition}
+
+\begin{zed}[Person, Char, B, Record, ValidatedRecord, ProcessedRecord, Output]
+\end{zed}
+
+\section*{Example 1 : Basic Forward Composition}
+\addcontentsline{toc}{section}{Example 1 : Basic Forward Composition}
+
+\noindent Forward composition applies f first, then g:
+
+\bigskip
+
+\begin{axdef}
+  f : \nat \fun \nat \\
+  g : \nat \fun \nat \\
+  h : \nat \fun \nat
+  \where
+  \forall n : \nat @ f(n) = n + 1 \\
+  \forall n : \nat @ g(n) = n * 2 \\
+  h = f \circ g
+\end{axdef}
+
+\noindent h(n) = g(f(n)) = g(n + 1) = (n + 1) * 2 = 2n + 2
+
+\bigskip
+
+\section*{Example 2 : Backward Composition}
+\addcontentsline{toc}{section}{Example 2 : Backward Composition}
+
+\noindent Backward composition applies the second function first (using comp):
+
+\bigskip
+
+\begin{axdef}
+  f2 : \nat \fun \nat \\
+  g2 : \nat \fun \nat \\
+  h2 : \nat \fun \nat
+  \where
+  \forall n : \nat @ f2(n) = n + 1 \\
+  \forall n : \nat @ g2(n) = n * 2 \\
+  h2 = f2 \comp g2
+\end{axdef}
+
+\noindent h2(n) = f2(g2(n)) = f2(n * 2) = (n * 2) + 1 = 2n + 1
+
+\bigskip
+
+\section*{Example 3 : Comparison - Forward vs Backward}
+\addcontentsline{toc}{section}{Example 3 : Comparison - Forward vs Backward}
+
+\noindent Forward composition f $\circ$ g:
+
+\bigskip
+
+\noindent Input → f → g → Output
+
+\bigskip
+
+\noindent (f $\circ$ g)(x) = g(f(x))
+
+\bigskip
+
+\noindent Backward composition f o g:
+
+\bigskip
+
+\noindent Input → g → f → Output
+
+\bigskip
+
+\noindent (f o g)(x) = f(g(x))
+
+\bigskip
+
+\noindent Notice the $reversal :  \circ  applies left-to-right$, o
+applies right-to-left.
+
+\bigskip
+
+\section*{Example 4 : Three - Function Composition}
+\addcontentsline{toc}{section}{Example 4 : Three - Function Composition}
+
+\begin{axdef}
+  addOne : \nat \fun \nat \\
+  double : \nat \fun \nat \\
+  square : \nat \fun \nat \\
+  pipeline : \nat \fun \nat
+  \where
+  \forall n : \nat @ addOne(n) = n + 1 \\
+  \forall n : \nat @ double(n) = 2 * n \\
+  \forall n : \nat @ square(n) = n * n \\
+  pipeline = addOne \circ double \circ square
+\end{axdef}
+
+\noindent pipeline(n) = square(double(addOne(n))) = square(double(n +
+1)) = square(2(n + 1)) = (2(n + 1))^2
+
+\bigskip
+
+\section*{Example 5 : Identity Composition Laws}
+\addcontentsline{toc}{section}{Example 5 : Identity Composition Laws}
+
+\begin{axdef}
+  identity : \nat \fun \nat \\
+  anyFunc : \nat \fun \nat \\
+  leftId : \nat \fun \nat \\
+  rightId : \nat \fun \nat
+  \where
+  \forall n : \nat @ identity(n) = n \\
+  \forall n : \nat @ anyFunc(n) = n * n \\
+  leftId = identity \circ anyFunc \\
+  rightId = anyFunc \circ identity
+\end{axdef}
+
+\noindent $leftId = anyFunc$ (identity is left identity for $\circ$)
+
+\bigskip
+
+\noindent $rightId = anyFunc$ (identity is right identity for $\circ$)
+
+\bigskip
+
+\section*{Example 6 : Associativity}
+\addcontentsline{toc}{section}{Example 6 : Associativity}
+
+\noindent Composition is associative:
+
+\bigskip
+
+\noindent (f $\circ$ g) $\circ$ $h = f$ $\circ$ (g $\circ$ h)
+
+\bigskip
+
+\noindent You can group compositions in any order—the result is the same.
+
+\bigskip
+
+\begin{axdef}
+  f3 : \nat \fun \nat \\
+  g3 : \nat \fun \nat \\
+  h3 : \nat \fun \nat \\
+  comp1 : \nat \fun \nat \\
+  comp2 : \nat \fun \nat
+  \where
+  \forall n : \nat @ f3(n) = n + 1 \\
+  \forall n : \nat @ g3(n) = n * 2 \\
+  \forall n : \nat @ h3(n) = n * n \\
+  comp1 = (f3 \circ g3) \circ h3 \\
+  comp2 = f3 \circ (g3 \circ h3)
+\end{axdef}
+
+\noindent $comp1 = comp2$ for all inputs.
+
+\bigskip
+
+\section*{Example 7 : Composition with Partial Functions}
+\addcontentsline{toc}{section}{Example 7 : Composition with Partial Functions}
+
+\begin{axdef}
+  safeSqrt : \nat \pfun \nat \\
+  addTen : \nat \fun \nat \\
+  composed : \nat \pfun \nat
+  \where
+  \forall n : \nat @ n * n = n \implies safeSqrt(n) = n \\
+  \forall n : \nat @ addTen(n) = n + 10 \\
+  composed = safeSqrt \circ addTen
+\end{axdef}
+
+\noindent composed is only defined where safeSqrt is defined, then
+adds 10 to the result.
+
+\bigskip
+
+\section*{Example 8 : Relation Composition}
+\addcontentsline{toc}{section}{Example 8 : Relation Composition}
+
+\noindent Composition works for relations too:
+
+\bigskip
+
+\begin{axdef}
+  parent : Person \rel Person \\
+  grandparent : Person \rel Person
+  \where
+  grandparent = parent \circ parent
+\end{axdef}
+
+\noindent grandparent relates a person to their grandparents via two
+parent links.
+
+\bigskip
+
+\section*{Example 9 : Function Pipeline Example}
+\addcontentsline{toc}{section}{Example 9 : Function Pipeline Example}
+
+\begin{axdef}
+  toLowerCase : \seq Char \fun \seq Char \\
+  trim : \seq Char \fun \seq Char \\
+  reverse : \seq Char \fun \seq Char \\
+  process : \seq Char \fun \seq Char
+  \where
+  process = toLowerCase \circ trim \circ reverse
+\end{axdef}
+
+\noindent Process a string by converting to lowercase, trimming
+whitespace, then reversing.
+
+\bigskip
+
+\section*{Example 10 : Mathematical Functions}
+\addcontentsline{toc}{section}{Example 10 : Mathematical Functions}
+
+\begin{axdef}
+  squareFunc : \nat \fun \nat \\
+  tripleFunc : \nat \fun \nat \\
+  combined : \nat \fun \nat
+  \where
+  \forall n : \nat @ squareFunc(n) = n * n \\
+  \forall n : \nat @ tripleFunc(n) = 3 * n \\
+  combined = squareFunc \circ tripleFunc
+\end{axdef}
+
+\noindent Combined applies squareFunc first, then triples the result.
+
+\bigskip
+
+\section*{Example 11 : Inverse via Composition}
+\addcontentsline{toc}{section}{Example 11 : Inverse via Composition}
+
+\begin{axdef}
+  encrypt : \seq Char \fun \seq Char \\
+  decrypt : \seq Char \fun \seq Char \\
+  identity\_check : \seq Char \fun \seq Char
+  \where
+  identity\_check = encrypt \circ decrypt
+\end{axdef}
+
+\noindent If encrypt and decrypt are inverses, then identity\_check
+should be the identity function.
+
+\bigskip
+
+\section*{Example 12 : Partial Composition}
+\addcontentsline{toc}{section}{Example 12 : Partial Composition}
+
+\noindent When composing f : $A \fun B$ and $g : C$ $\fun$ D, we need
+ran f subseteq dom g.
+
+\bigskip
+
+\begin{axdef}
+  f4 : \nat \pfun \nat \\
+  g4 : \nat \pfun \nat \\
+  h4 : \nat \pfun \nat
+  \where
+  f4 = \{1 \mapsto 10, 2 \mapsto 20\} \\
+  g4 = \{10 \mapsto 100, 20 \mapsto 200\} \\
+  h4 = f4 \circ g4
+\end{axdef}
+
+\noindent h4 = $\{1 \mapsto 100, 2 \mapsto 200\}$. Composition is
+defined where ranges align.
+
+\bigskip
+
+\section*{Example 13 : Monoid Structure}
+\addcontentsline{toc}{section}{Example 13 : Monoid Structure}
+
+\noindent Functions from $A \fun A$ with composition form a monoid:
+
+\bigskip
+
+\noindent 1. Composition is associative: (f $\circ$ g) $\circ$ $h =
+f$ $\circ$ (g $\circ$ h)
+
+\bigskip
+
+\noindent 2. Identity $element : id(x)$ = x, id $\circ$ $f = f = f$ $\circ$ id
+
+\bigskip
+
+\noindent 3. Closure: composing $A \fun A$ functions gives another $A
+\fun A$ function
+
+\bigskip
+
+\section*{Example 14 : Practical Example - Data Processing Pipeline}
+\addcontentsline{toc}{section}{Example 14 : Practical Example - Data
+Processing Pipeline}
+
+\noindent In practice, you might compose functions to create data
+processing $pipelines : validate  \circ  process  \circ  format. Each
+stage transforms data through$ a series of operations. The notation f
+$\circ$ g $\circ$ h means "apply f, then g, then h" which creates a
+pipeline from input to output.
+
+\bigskip
+
+\section*{Example 15 : Composition Operator Precedence}
+\addcontentsline{toc}{section}{Example 15 : Composition Operator Precedence}
+
+\noindent Composition operators bind tighter than logical operators:
+
+\bigskip
+
+\noindent f $\circ$ $g = h$ means (f $\circ$ g) = h, $\lnot f$ $\circ$ ($g = h$)
+
+\bigskip
+
+\noindent Use parentheses to clarify: (f $\circ$ g) or f $\circ$ (g $\circ$ h)
+
+\bigskip
+
+\section*{Example 16 : Self - Composition}
+\addcontentsline{toc}{section}{Example 16 : Self - Composition}
+
+\begin{axdef}
+  doubleIt : \nat \fun \nat \\
+  quadrupleIt : \nat \fun \nat
+  \where
+  \forall n : \nat @ doubleIt(n) = 2 * n \\
+  quadrupleIt = doubleIt \circ doubleIt
+\end{axdef}
+
+\noindent quadrupleIt(n) = doubleIt(doubleIt(n)) = 2 * (2 * n) = 4n
+
+\bigskip
+
+\section*{Example 17 : Iterated Composition}
+\addcontentsline{toc}{section}{Example 17 : Iterated Composition}
+
+\begin{axdef}
+  increment : \nat \fun \nat \\
+  addFive : \nat \fun \nat
+  \where
+  \forall n : \nat @ increment(n) = n + 1 \\
+  addFive = increment \circ increment \circ increment \circ increment
+  \circ increment
+\end{axdef}
+
+\noindent Composing increment 5 times gives addFive.
+
+\bigskip
+
+\section*{Example 18 : Functional Programming Style}
+\addcontentsline{toc}{section}{Example 18 : Functional Programming Style}
+
+\noindent Composition enables a functional programming style:
+
+\bigskip
+
+\noindent Instead $of : result$ = h(g(f(x)))
+
+\bigskip
+
+\noindent $Use : pipeline$ = f $\circ$ g $\circ$ h; $result = pipeline$(x)
+
+\bigskip
+
+\noindent This separates pipeline definition from application,
+improving modularity.
+
+\bigskip
+
+\section*{Example 19 : Best Practices}
+\addcontentsline{toc}{section}{Example 19 : Best Practices}
+
+\noindent When using composition:
+
+\bigskip
+
+\noindent 1. Choose forward ($\circ$) or backward (o) consistently in
+your codebase
+
+\bigskip
+
+\noindent 2. Document the data flow direction
+
+\bigskip
+
+\noindent 3. Break complex pipelines into named intermediate steps
+
+\bigskip
+
+\noindent 4. Type-check that domains and ranges align
+
+\bigskip
+
+\noindent 5. Use composition to create reusable pipelines
+
+\bigskip
+
+\noindent 6. Test individual functions before composing them
+
+\bigskip
+
+\noindent 7. $Remember :  \circ  reads left-to-right$ (natural for
+pipelines), o reads right-to-left (traditional math notation)
+
+\bigskip
+
+\end{document}

@@ -716,6 +716,7 @@ class Parser:
             TokenType.MOD,  # mod (modulo)
             TokenType.BIGCUP,  # bigcup (distributed union)
             TokenType.BIGCAP,  # bigcap (distributed intersection)
+            TokenType.FILTER,  # filter (sequence filter)
         )
 
     def _smart_join_justification(self, parts: list[str]) -> str:
@@ -1583,13 +1584,14 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Phase 21/22: Use _parse_union to allow union/intersect in domain
+            # Parse type expression: union, cross, function & relation types
             # Allows: forall x : A union B | P
-            # TODO Phase 23: Support relation types (A <-> B) in quantifier domains
+            # Allows: forall f : X -> Y | P (function type)
+            # Allows: forall R : X <-> Y | P (relation type)
             # Set flag to prevent .identifier from being parsed as projection
             self._parsing_schema_text = True
             try:
-                domain = self._parse_union()
+                domain = self._parse_function_type()
             finally:
                 self._parsing_schema_text = False
 
@@ -1733,8 +1735,8 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Phase 21/22: Use _parse_union to match main quantifier parser
-            domain = self._parse_union()
+            # Parse type expression to match main quantifier parser
+            domain = self._parse_function_type()
 
         # Check for another semicolon (more bindings)
         if self._match(TokenType.SEMICOLON):
@@ -1954,13 +1956,14 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Phase 21/22: Use _parse_union to allow union/intersect in domain
+            # Parse type expression: union, cross, function & relation types
             # Allows: forall x : A union B | P
-            # TODO Phase 23: Support relation types (A <-> B) in quantifier domains
+            # Allows: forall f : X -> Y | P (function type)
+            # Allows: forall R : X <-> Y | P (relation type)
             # Set flag to prevent .identifier from being parsed as projection
             self._parsing_schema_text = True
             try:
-                domain = self._parse_union()
+                domain = self._parse_function_type()
             finally:
                 self._parsing_schema_text = False
 
@@ -2171,14 +2174,15 @@ class Parser:
         )
 
     def _parse_function_type(self) -> Expr:
-        """Parse function type operators (Phase 11c, enhanced Phase 18).
+        """Parse function and relation type operators (Phase 11c, Phase 18).
 
-        Function types: ->, +->, >->, >+>, -|>, -->>, +->>, >->>
+        Function/relation types: ->, +->, >->, >+>, -|>, -->>, +->>, >->>, <->
         Right-associative: A -> B -> C parses as A -> (B -> C)
+        Also used in quantifier domains: forall f : X -> Y | P
         """
         left = self._parse_relation()
 
-        # Check for function type arrow (right-associative)
+        # Check for function/relation type operators (right-associative)
         if self._match(
             TokenType.TFUN,  # ->
             TokenType.PFUN,  # +->
@@ -2189,6 +2193,7 @@ class Parser:
             TokenType.PSURJ,  # +->>
             TokenType.BIJECTION,  # >->>
             TokenType.FINFUN,  # 77-> (Phase 34)
+            TokenType.RELATION,  # <-> (relation type)
         ):
             arrow_token = self._advance()
             # Right-associative: recursively parse the right side as function type
@@ -2814,8 +2819,13 @@ class Parser:
         # Note: Function application expr(...) is now handled in _parse_postfix()
         # Note: Generic instantiation Type[X] is handled in _parse_postfix()
         # Note: Relational image R(| S |) is handled in _parse_postfix()
-        # Phase 22: Allow keywords to be used as function names (union, intersect)
-        if self._match(TokenType.IDENTIFIER, TokenType.UNION, TokenType.INTERSECT):
+        # Phase 22: Allow keywords as function names (union, intersect, filter)
+        if self._match(
+            TokenType.IDENTIFIER,
+            TokenType.UNION,
+            TokenType.INTERSECT,
+            TokenType.FILTER,
+        ):
             name_token = self._advance()
             return Identifier(
                 name=name_token.value, line=name_token.line, column=name_token.column
@@ -3495,15 +3505,72 @@ class Parser:
         )
 
     def _parse_proof_tree(self) -> ProofTree:
-        """Parse proof tree with Path C syntax (conclusion with supporting proof)."""
+        """Parse proof tree with Path C syntax (conclusion with supporting proof).
+
+        Phase 3: Support top-level CASE analysis where proof starts with cases.
+        """
         start_token = self._advance()  # Consume 'PROOF:'
         self._skip_newlines()
 
         if self._at_end() or self._is_structural_token():
             raise ParserError("Expected proof node after PROOF:", self._current())
 
-        # Parse the conclusion node (first top-level node)
-        conclusion = self._parse_proof_node(base_indent=0, parent_indent=None)
+        # Check if first item is a case keyword (top-level case analysis)
+        if self._match(TokenType.IDENTIFIER) and self._current().value == "case":
+            # Parse all top-level cases
+            cases: list[CaseAnalysis] = []
+
+            while (
+                not self._at_end()
+                and not self._is_structural_token()
+                and self._match(TokenType.IDENTIFIER)
+                and self._current().value == "case"
+            ):
+                case_analysis = self._parse_case_analysis(
+                    base_indent=0, parent_indent=None
+                )
+                cases.append(case_analysis)
+                self._skip_newlines()
+
+            # Check if there's a final conclusion after the cases
+            final_conclusion_expr: Expr | None = None
+            final_justification: str | None = None
+
+            if not self._at_end() and not self._is_structural_token():
+                # Parse potential final conclusion (e.g., "q [or elim]")
+                final_conclusion_node = self._parse_proof_node(
+                    base_indent=0, parent_indent=None
+                )
+                final_conclusion_expr = final_conclusion_node.expression
+                final_justification = final_conclusion_node.justification
+
+            # Create synthetic conclusion node to wrap the cases
+            # Use the final conclusion if present, otherwise placeholder
+            if final_conclusion_expr is None:
+                final_conclusion_expr = Identifier(
+                    name="[case_analysis]",
+                    line=start_token.line,
+                    column=start_token.column,
+                )
+                final_justification = "case analysis"
+
+            # Type hint for children: explicitly cast to expected union type
+            children_list: list[ProofNode | CaseAnalysis] = list(cases)
+
+            conclusion = ProofNode(
+                expression=final_conclusion_expr,
+                justification=final_justification,
+                label=None,
+                is_assumption=False,
+                is_sibling=False,
+                children=children_list,
+                indent_level=0,
+                line=start_token.line,
+                column=start_token.column,
+            )
+        else:
+            # Standard proof: parse the conclusion node
+            conclusion = self._parse_proof_node(base_indent=0, parent_indent=None)
 
         return ProofTree(
             conclusion=conclusion, line=start_token.line, column=start_token.column
@@ -3549,8 +3616,18 @@ class Parser:
             is_sibling = True
             self._advance()  # Consume '::'
 
-        # Parse the expression
-        expr = self._parse_expr()
+        # Check for ellipsis ... (Phase 2.2) - steps omitted in proof
+        if self._match(TokenType.ELLIPSIS):
+            ellipsis_token = self._advance()
+            # Create a text node representing omitted steps
+            expr: Expr = Identifier(
+                name="...",
+                line=ellipsis_token.line,
+                column=ellipsis_token.column,
+            )
+        else:
+            # Parse the expression
+            expr = self._parse_expr()
 
         # Check for justification [rule name]
         justification: str | None = None
@@ -3617,9 +3694,12 @@ class Parser:
         )
 
     def _parse_case_analysis(
-        self, base_indent: int, parent_indent: int
+        self, base_indent: int, parent_indent: int | None
     ) -> CaseAnalysis:
-        """Parse case analysis: case name: followed by proof steps."""
+        """Parse case analysis: case name: followed by proof steps.
+
+        Phase 3: parent_indent can be None for top-level cases.
+        """
         if not self._match(TokenType.IDENTIFIER) or self._current().value != "case":
             raise ParserError("Expected 'case' keyword", self._current())
 

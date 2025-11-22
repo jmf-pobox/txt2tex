@@ -1,0 +1,296 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Zed Block Examples}
+
+\section*{Example 1 : Basic Variable Declarations}
+\addcontentsline{toc}{section}{Example 1 : Basic Variable Declarations}
+
+\noindent Use axdef for variable declarations with types:
+
+\bigskip
+
+\begin{zed}[Person, Department]
+\end{zed}
+
+\begin{axdef}
+  assignment : Person \pfun Department \\
+  employees : \finset Person \\
+  departments : \finset Department
+\end{axdef}
+
+\noindent This groups related variable declarations in a single block
+(given types must be declared outside).
+
+\bigskip
+
+\section*{Example 2 : Abbreviations}
+\addcontentsline{toc}{section}{Example 2 : Abbreviations}
+
+\begin{zed}
+  N\_PLUS == \{ n : \nat | n > 0 \}
+\end{zed}
+
+\begin{zed}
+  N\_EVEN == \{ n : \nat | n \mod 2 = 0 \}
+\end{zed}
+
+\begin{zed}
+  N\_ODD == \{ n : \nat | n \mod 2 = 1 \}
+\end{zed}
+
+\noindent Abbreviations can be defined standalone (zed blocks for
+abbreviations may not be fully supported yet).
+
+\bigskip
+
+\section*{Example 3 : Type Parameters}
+\addcontentsline{toc}{section}{Example 3 : Type Parameters}
+
+\begin{zed}[Company]
+\end{zed}
+
+\noindent Declare given types using the given keyword.
+
+\bigskip
+
+\section*{Example 4 : Predicates in Zed Block}
+\addcontentsline{toc}{section}{Example 4 : Predicates in Zed Block}
+
+\begin{axdef}
+  x : \nat \\
+  y : \nat
+  \where
+  x > 0 \\
+  y > 0 \\
+  x + y < 100
+\end{axdef}
+
+\noindent Multiple predicates can constrain variables defined in axdef.
+
+\bigskip
+
+\section*{Example 5 : Free Type Definitions}
+\addcontentsline{toc}{section}{Example 5 : Free Type Definitions}
+
+\begin{zed}Color ::= red | green | blue
+\end{zed}
+
+\begin{zed}Size ::= small | medium | large
+\end{zed}
+
+\begin{schema}{Product}
+  color : Color \\
+  size : Size \\
+  price : \nat
+  \where
+  price > 0
+\end{schema}
+
+\noindent Free types are defined standalone, then used in schemas.
+
+\bigskip
+
+\section*{Example 6 : Multiple Schemas}
+\addcontentsline{toc}{section}{Example 6 : Multiple Schemas}
+
+\begin{zed}[Account, Balance]
+\end{zed}
+
+\begin{schema}{BankAccount}
+  accountNumber : \nat \\
+  balance : \num
+  \where
+  balance \geq 0
+\end{schema}
+
+\begin{schema}{Transaction}
+  from : BankAccount \\
+  to : BankAccount \\
+  amount : \nat
+  \where
+  amount > 0 \\
+  from.balance \geq amount
+\end{schema}
+
+\noindent Multiple schemas can be defined separately, each with their
+own constraints.
+
+\bigskip
+
+\section*{Example 7 : Schema with External Variables}
+\addcontentsline{toc}{section}{Example 7 : Schema with External Variables}
+
+\begin{zed}[Student, Course]
+\end{zed}
+
+\begin{axdef}
+  enrolled : Student \rel Course \\
+  maxCourses : \nat \\
+  maxStudents : \nat
+  \where
+  maxCourses = 7 \\
+  maxStudents = 500
+\end{axdef}
+
+\begin{schema}{Enrollment}
+  students : \finset Student \\
+  courses : \finset Course
+  \where
+  students = \dom enrolled \\
+  courses = \ran enrolled \\
+  \# students \leq maxStudents \\
+  \# courses \leq maxCourses
+\end{schema}
+
+\noindent Schemas can reference variables defined in axdef blocks.
+
+\bigskip
+
+\section*{Example 8 : Nested Schemas}
+\addcontentsline{toc}{section}{Example 8 : Nested Schemas}
+
+\begin{zed}[Char]
+\end{zed}
+
+\begin{schema}{Address}
+  street : \seq Char \\
+  city : \seq Char \\
+  zipCode : \nat
+  \where
+  zipCode \geq 10000 \land zipCode \leq 99999
+\end{schema}
+
+\begin{schema}{PersonData}
+  name : \seq Char \\
+  address : Address \\
+  age : \nat
+  \where
+  age \geq 0 \land age \leq 150
+\end{schema}
+
+\begin{axdef}
+  population : \finset PersonData
+\end{axdef}
+
+\noindent Schema Address is used within schema PersonData. Variables
+using schemas go in axdef.
+
+\bigskip
+
+\section*{Example 9 : Constants and Functions}
+\addcontentsline{toc}{section}{Example 9 : Constants and Functions}
+
+\begin{zed}
+  PI == 3
+\end{zed}
+
+\begin{zed}
+  E == 2
+\end{zed}
+
+\begin{axdef}
+  circumference : \nat \fun \nat \\
+  area : \nat \fun \nat
+  \where
+  \forall r : \nat @ circumference(r) = 2 * PI * r \\
+  \forall r : \nat @ area(r) = PI * r * r
+\end{axdef}
+
+\noindent Mathematical constants defined as abbreviations, functions in axdef.
+
+\bigskip
+
+\section*{Example 10 : Permission System Example}
+\addcontentsline{toc}{section}{Example 10 : Permission System Example}
+
+\begin{zed}[UserID, DocumentID]
+\end{zed}
+
+\begin{zed}PermissionType ::= read | write | admin
+\end{zed}
+
+\begin{schema}{User}
+  userId : UserID \\
+  documents : \power DocumentID \\
+  permissions : DocumentID \pfun PermissionType
+  \where
+  \dom permissions \subseteq documents
+\end{schema}
+
+\begin{schema}{System}
+  users : UserID \pfun User \\
+  allDocuments : \finset DocumentID
+  \where
+  allDocuments = \bigcup \{ u : \ran users @ u.documents \}
+\end{schema}
+
+\begin{axdef}
+  users : UserID \pfun User
+\end{axdef}
+
+\noindent A permission system specification using free types and schemas.
+
+\bigskip
+
+\section*{Example 11 : Best Practices}
+\addcontentsline{toc}{section}{Example 11 : Best Practices}
+
+\noindent Use zed blocks for:
+
+\bigskip
+
+\noindent 1. Type parameter declarations [X, Y]
+
+\bigskip
+
+\noindent 2. Abbreviations (N\_PLUS, N\_EVEN, etc.)
+
+\bigskip
+
+\noindent 3. Simple predicates without variable declarations
+
+\bigskip
+
+\noindent Use axdef for:
+
+\bigskip
+
+\noindent 1. Variable declarations with types
+
+\bigskip
+
+\noindent 2. Constraints on those variables
+
+\bigskip
+
+\noindent 3. Function definitions
+
+\bigskip
+
+\noindent Use schema for:
+
+\bigskip
+
+\noindent 1. State spaces with declarations
+
+\bigskip
+
+\noindent 2. Operations on state
+
+\bigskip
+
+\noindent 3. Reusable component specifications
+
+\bigskip
+
+\end{document}

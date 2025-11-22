@@ -1,0 +1,64 @@
+name: PR Status Comment
+
+on:
+  workflow_run:
+    workflows: ["Quality Gates"]
+    types: [completed]
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.event == 'pull_request'
+
+    steps:
+    - name: Get PR number
+      id: pr
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: pullRequests } = await github.rest.pulls.list({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`
+          });
+
+          if (pullRequests.length > 0) {
+            return pullRequests[0].number;
+          }
+          return null;
+
+    - name: Post status comment
+      if: steps.pr.outputs.result != 'null'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const prNumber = ${{ steps.pr.outputs.result }};
+          const conclusion = context.payload.workflow_run.conclusion;
+          const runUrl = context.payload.workflow_run.html_url;
+          const headSha = context.payload.workflow_run.head_sha.substring(0, 7);
+
+          const statusEmoji = conclusion === 'success' ? '✅' : '❌';
+          const statusText = conclusion === 'success' ? 'All quality checks passed' : 'Quality checks failed';
+
+          const comment = `## ${statusEmoji} Quality Gates Status
+
+          **Commit:** \`${headSha}\`
+          **Status:** ${statusText}
+
+          ${conclusion === 'success'
+            ? '- ✅ Linting (Ruff)\n- ✅ Type checking (MyPy strict)\n- ✅ Formatting\n- ✅ Tests with coverage'
+            : 'One or more checks failed. Please review the workflow output.'}
+
+          [View workflow run](${runUrl})`;
+
+          github.rest.issues.createComment({
+            issue_number: prNumber,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });

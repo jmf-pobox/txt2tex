@@ -1,29 +1,26 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Zed Block Test}
 
-\bigskip
-\noindent
-\textbf{Test 1 : Simple Abbreviation}
-
-\medskip
+\section*{Test 1 : Simple Abbreviation}
+\addcontentsline{toc}{section}{Test 1 : Simple Abbreviation}
 
 \begin{zed}
   SimpleConst == 42
 \end{zed}
 
-\bigskip
-\noindent
-\textbf{Test 2 : Forall in Axiom}
-
-\medskip
+\section*{Test 2 : Forall in Axiom}
+\addcontentsline{toc}{section}{Test 2 : Forall in Axiom}
 
 \begin{axdef}
   constraint : \nat
@@ -32,11 +29,8 @@
   \forall x : \nat @ x \geq 0
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Test 3 : Exists in Axiom}
-
-\medskip
+\section*{Test 3 : Exists in Axiom}
+\addcontentsline{toc}{section}{Test 3 : Exists in Axiom}
 
 \begin{axdef}
   hasRoot : \nat
@@ -45,11 +39,8 @@
   \exists n : \nat @ n * n = hasRoot
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Test 4 : Nested Quantifiers in Axiom}
-
-\medskip
+\section*{Test 4 : Nested Quantifiers in Axiom}
+\addcontentsline{toc}{section}{Test 4 : Nested Quantifiers in Axiom}
 
 \begin{axdef}
   sumTen : \nat

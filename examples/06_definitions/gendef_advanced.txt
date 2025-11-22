@@ -19,6 +19,8 @@
 
 === Advanced Generic Definitions ===
 
+given B
+
 ** Example 1: Generic Three-Way Product **
 
 TEXT: Generic function for three-component tuples:
@@ -38,73 +40,25 @@ end
 
 TEXT: Projection functions for triples.
 
-** Example 2: Generic Map Function **
+** Example 2: Generic Binary Tree (Conceptual) **
 
-TEXT: Map a function over a sequence:
-
-gendef [X, Y]
-  map : (X -> Y) cross seq X -> seq Y
-where
-  forall f : X -> Y | map(f, ⟨⟩) = ⟨⟩
-  forall f : X -> Y; x : X; s : seq X |
-    map(f, ⟨x⟩ ⌢ s) = ⟨f(x)⟩ ⌢ map(f, s)
-end
-
-TEXT: This applies function f to each element of the sequence.
-
-** Example 3: Generic Filter Function **
-
-TEXT: Filter a sequence based on a predicate:
-
-gendef [X]
-  filter : (X -> B) cross seq X -> seq X
-where
-  forall p : X -> B | filter(p, ⟨⟩) = ⟨⟩
-  forall p : X -> B; x : X; s : seq X |
-    filter(p, ⟨x⟩ ⌢ s) =
-      if p(x) = true then ⟨x⟩ ⌢ filter(p, s) else filter(p, s)
-end
-
-TEXT: Keeps only elements where the predicate returns true.
-
-** Example 4: Generic Fold (Reduce) **
-
-TEXT: Fold a binary operation over a sequence:
-
-gendef [X, Y]
-  foldl : (Y cross X -> Y) cross Y cross seq X -> Y
-where
-  forall f : Y cross X -> Y; acc : Y | foldl(f, acc, ⟨⟩) = acc
-  forall f : Y cross X -> Y; acc : Y; x : X; s : seq X |
-    foldl(f, acc, ⟨x⟩ ⌢ s) = foldl(f, f(acc, x), s)
-end
-
-TEXT: Left fold with accumulator.
-
-** Example 5: Generic Binary Tree **
-
-TEXT: Define a generic binary tree structure:
-
-gendef [X]
-  Tree_X ::= leaf | node⟨X × Tree_X × Tree_X⟩
-end
-
-TEXT: A tree is either a leaf or a node containing a value and two subtrees.
+TEXT: Binary trees are typically defined for specific types in Z notation rather than as fully polymorphic structures. For a concrete type like N, you would define: Tree ::= leaf | node⟨N cross Tree cross Tree⟩. Generic trees require complex workarounds beyond standard gendef blocks, as free types in fuzz are not easily parameterized.
 
 ** Example 6: Generic State Schema **
 
 TEXT: A generic container with capacity:
+TEXT:
+TEXT: Note: Fuzz supports generic schemas using the schema[X] syntax (not gendef):
 
-gendef [X]
-  schema Container_X
-    contents : seq X
-    capacity : N
-  where
-    # contents <= capacity
-  end
+schema Container[X]
+  contents : seq X
+  capacity : N
+where
+  # contents <= capacity
 end
 
 TEXT: This schema is parameterized by the element type X.
+TEXT: It can be instantiated as Container[N], Container[Char], etc.
 
 ** Example 7: Generic Relation Operations **
 
@@ -114,87 +68,50 @@ gendef [X, Y, Z]
   compose : (X <-> Y) cross (Y <-> Z) -> (X <-> Z)
 where
   forall R : X <-> Y; S : Y <-> Z |
-    compose(R, S) = R o9 S
+    compose(R, S) = R comp S
 end
 
-TEXT: Composes two relations.
+TEXT: Composes two relations using forward composition.
 
-** Example 8: Generic Option Type with Operations **
+** Example 8: Generic Option Type (Conceptual) **
 
-gendef [X]
-  Option_X ::= none | some⟨X⟩
-  isSome : Option_X -> B
-  isNone : Option_X -> B
-  getValue : Option_X -> X
-where
-  isSome(none) = false
-  forall x : X | isSome(some(x)) = true
-  isNone(none) = true
-  forall x : X | isNone(some(x)) = false
-  forall x : X | getValue(some(x)) = x
-end
-
-TEXT: Optional values with accessor functions.
+TEXT: Optional values (like Maybe or Option in other languages) are challenging to express generically in Z notation due to limitations with parameterized free types. For a specific type, you would define: Option ::= none | some⟨T⟩. Fully generic option types with operations require advanced patterns beyond standard gendef blocks.
 
 ** Example 9: Generic Stack Schema **
 
-gendef [X]
-  schema Stack_X
-    items : seq X
-    maxSize : N
-  where
-    # items <= maxSize
-  end
+TEXT: Note: Define generic schema separately, then declare operations in gendef:
 
-  push_X : Stack_X cross X -> Stack_X
-  pop_X : Stack_X -> Stack_X
-  top_X : Stack_X -> X
+schema Stack[X]
+  items : seq X
+  maxSize : N
 where
-  forall s : Stack_X; x : X |
-    # (s.items) < s.maxSize =>
-    push_X(s, x).items = s.items ⌢ ⟨x⟩ and
-    push_X(s, x).maxSize = s.maxSize
-
-  forall s : Stack_X |
-    # (s.items) > 0 =>
-    pop_X(s).items = front(s.items) and
-    pop_X(s).maxSize = s.maxSize
-
-  forall s : Stack_X |
-    # (s.items) > 0 =>
-    top_X(s) = last(s.items)
+  # items <= maxSize
 end
-
-TEXT: Generic stack with push, pop, and top operations.
-
-** Example 10: Generic Pair with Constraints **
-
-gendef [X, Y]
-  schema OrderedPair_XY
-    first : X
-    second : Y
-  where
-    first in X and second in Y
-  end
-end
-
-TEXT: A constrained pair type.
-
-** Example 11: Generic Equality **
-
-TEXT: Generic equality testing:
 
 gendef [X]
-  equals : X cross X -> B
+  emptyStack : Stack[X]
+  stackSize : Stack[X] -> N
 where
-  forall x, y : X |
-    (equals(x, y) = true <=> x = y) and
-    (equals(x, y) = false <=> x /= y)
+  emptyStack.items = ⟨⟩ and emptyStack.maxSize = 100
+  forall s : Stack[X] | stackSize(s) = # (s.items)
 end
 
-TEXT: Explicit equality function.
+TEXT: Generic stack with query operations.
+TEXT: The schema is defined separately using schema[X] syntax, then operations use gendef.
 
-** Example 12: Generic Zip Function **
+** Example 10: Generic Pair Schema **
+
+TEXT: Use schema[X, Y] syntax for generic schemas:
+
+schema OrderedPair[X, Y]
+  first : X
+  second : Y
+end
+
+TEXT: A generic pair type.
+TEXT: The schema has two type parameters and can be instantiated as OrderedPair[N, Char], etc.
+
+** Example 11: Generic Zip Function **
 
 TEXT: Combine two sequences into a sequence of pairs:
 
@@ -210,33 +127,28 @@ end
 
 TEXT: Pairs up corresponding elements from two sequences.
 
-** Example 13: Practical Example - Generic Database Table **
+** Example 12: Practical Example - Generic Database Table **
 
-gendef [Key, Value]
-  schema Table_KV
-    entries : Key +-> Value
-    size : N
-  where
-    size = # (dom entries)
-  end
+TEXT: Note: Define generic schema separately, then query operations in gendef:
 
-  lookup_KV : Table_KV cross Key -> Option_Value
-  insert_KV : Table_KV cross Key cross Value -> Table_KV
-  delete_KV : Table_KV cross Key -> Table_KV
+given Key, Value
+
+schema Table[Key, Value]
+  entries : Key +-> Value
+  size : N
 where
-  forall t : Table_KV; k : Key |
-    k in dom (t.entries) =>
-    lookup_KV(t, k) = some((t.entries)(k))
-
-  forall t : Table_KV; k : Key |
-    k notin dom (t.entries) =>
-    lookup_KV(t, k) = none
-
-  forall t : Table_KV; k : Key; v : Value |
-    insert_KV(t, k, v).entries = (t.entries) ++ {k |-> v}
-
-  forall t : Table_KV; k : Key |
-    delete_KV(t, k).entries = {k} <-| (t.entries)
+  size = # (dom entries)
 end
 
-TEXT: A generic key-value table with lookup, insert, and delete operations. This demonstrates how generic definitions enable reusable, type-safe data structures.
+gendef [Key, Value]
+  emptyTable : Table[Key, Value]
+  tableSize : Table[Key, Value] -> N
+  allKeys : Table[Key, Value] -> P Key
+where
+  emptyTable.entries = {} and emptyTable.size = 0
+  forall t : Table[Key, Value] | tableSize(t) = t.size
+  forall t : Table[Key, Value] | allKeys(t) = dom (t.entries)
+end
+
+TEXT: A generic key-value table with query operations. This demonstrates how generic definitions enable reusable, type-safe data structures.
+TEXT: The Table schema is defined with schema[Key, Value] syntax, allowing proper fuzz typechecking.

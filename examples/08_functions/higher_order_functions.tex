@@ -1,0 +1,191 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Higher - Order Functions}
+
+\section*{Example 1 : Apply Function}
+\addcontentsline{toc}{section}{Example 1 : Apply Function}
+
+\noindent A simple higher-order function that applies a function to a value:
+
+\bigskip
+
+\begin{gendef}[X, Y]
+  apply: (X \fun Y) \fun (X \fun Y)
+  \where
+  \forall f : X \fun Y @ \forall x : X @ apply(f)(x) = f(x)
+\end{gendef}
+
+\noindent apply takes a function and a value, returns the result.
+
+\bigskip
+
+\section*{Example 2 : Using Apply}
+\addcontentsline{toc}{section}{Example 2 : Using Apply}
+
+\begin{axdef}
+  square : \nat \fun \nat \\
+  result : \nat
+  \where
+  \forall n : \nat @ square(n) = n * n \\
+  result = apply(square)(5)
+\end{axdef}
+
+\noindent $result = 25$
+
+\bigskip
+
+\section*{Example 3 : Compose Function}
+\addcontentsline{toc}{section}{Example 3 : Compose Function}
+
+\noindent Function composition as a higher-order operation:
+
+\bigskip
+
+\begin{gendef}[A, B, C]
+  compose: (B \fun C) \cross (A \fun B) \fun (A \fun C)
+  \where
+  \forall f : B \fun C @ \forall g : A \fun B @ \forall x : A @
+  compose(f, g)(x) = f(g(x))
+\end{gendef}
+
+\noindent compose takes two functions and returns their composition.
+
+\bigskip
+
+\section*{Example 4 : Using Compose}
+\addcontentsline{toc}{section}{Example 4 : Using Compose}
+
+\begin{axdef}
+  addOne : \nat \fun \nat \\
+  double : \nat \fun \nat \\
+  addOneAndDouble : \nat \fun \nat
+  \where
+  \forall n : \nat @ addOne(n) = n + 1 \\
+  \forall n : \nat @ double(n) = 2 * n \\
+  addOneAndDouble = compose(double, addOne)
+\end{axdef}
+
+\noindent addOneAndDouble(5) = double(addOne(5)) = double(6) = 12
+
+\bigskip
+
+\section*{Example 5 : Twice Function}
+\addcontentsline{toc}{section}{Example 5 : Twice Function}
+
+\noindent A function that applies another function twice:
+
+\bigskip
+
+\begin{gendef}[X]
+  twice: (X \fun X) \fun (X \fun X)
+  \where
+  \forall f : X \fun X @ \forall x : X @ twice(f)(x) = f(f(x))
+\end{gendef}
+
+\noindent twice takes a function and returns a function that applies it twice.
+
+\bigskip
+
+\section*{Example 6 : Using Twice}
+\addcontentsline{toc}{section}{Example 6 : Using Twice}
+
+\begin{axdef}
+  increment : \nat \fun \nat \\
+  addTwo : \nat \fun \nat
+  \where
+  \forall n : \nat @ increment(n) = n + 1 \\
+  addTwo = twice(increment)
+\end{axdef}
+
+\noindent addTwo(5) = increment(increment(5)) = 7
+
+\bigskip
+
+\section*{Example 7 : Constant Function}
+\addcontentsline{toc}{section}{Example 7 : Constant Function}
+
+\noindent A higher-order function that returns a constant function:
+
+\bigskip
+
+\begin{gendef}[X, Y]
+  constant: Y \fun (X \fun Y)
+  \where
+  \forall y : Y @ \forall x : X @ constant(y)(x) = y
+\end{gendef}
+
+\noindent constant takes a value and returns a function that always
+returns that value.
+
+\bigskip
+
+\section*{Example 8 : Using Lambda with Higher - Order Functions}
+\addcontentsline{toc}{section}{Example 8 : Using Lambda with Higher -
+Order Functions}
+
+\begin{axdef}
+  resultLambda : \nat
+  \where
+  resultLambda = apply(\lambda x : \nat @ x * x)(7)
+\end{axdef}
+
+\noindent $resultLambda = 49$
+
+\bigskip
+
+\section*{Example 9 : Flip Function}
+\addcontentsline{toc}{section}{Example 9 : Flip Function}
+
+\noindent A function that flips the arguments of a binary function:
+
+\bigskip
+
+\begin{gendef}[X, Y, Z]
+  flip: (X \cross Y \fun \num) \fun (Y \cross X \fun \num)
+  \where
+  \forall f : X \cross Y \fun \num @ \forall x : X @ \forall y : Y @
+  flip(f)(y, x) = f(x, y)
+\end{gendef}
+
+\noindent flip swaps the order of arguments to a function.
+
+\bigskip
+
+\section*{Example 10 : Best Practices}
+\addcontentsline{toc}{section}{Example 10 : Best Practices}
+
+\noindent When using higher-order functions:
+
+\bigskip
+
+\noindent 1. Use type parameters to make functions generic
+
+\bigskip
+
+\noindent 2. Keep function signatures clear and simple
+
+\bigskip
+
+\noindent 3. Compose small functions to build complex behavior
+
+\bigskip
+
+\noindent 4. Use lambda expressions for inline function definitions
+
+\bigskip
+
+\noindent 5. Higher-order functions enable functional programming patterns
+
+\bigskip
+
+\end{document}

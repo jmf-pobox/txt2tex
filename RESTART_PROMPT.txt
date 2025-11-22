@@ -1,0 +1,1 @@
+Read NEXT_SESSION.md and fix all 15 remaining files so that `cd examples && touch **/*.txt && make` succeeds with zero errors. Do NOT move any files to future/. Fix them properly.

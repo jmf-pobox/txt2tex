@@ -1,0 +1,465 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Law of Excluded Middle Examples}
+
+\section*{Example 1 : Statement of LEM}
+\addcontentsline{toc}{section}{Example 1 : Statement of LEM}
+
+\noindent The law of excluded middle states: for any proposition p,
+either p is true or $\lnot p$ is true.
+
+\bigskip
+
+\noindent
+$p \lor \lnot p$
+
+\noindent This is an axiom of classical logic but not of constructive logic.
+
+\bigskip
+
+\section*{Example 2 : Proof by Cases Using LEM}
+\addcontentsline{toc}{section}{Example 2 : Proof by Cases Using LEM}
+
+\noindent Prove: $(p \implies q) \implies ((\lnot p \implies q) \implies q)$
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\lor \mathrm{elim}]{q}{
+      \infer[\mathrm{assumption}]{\lnot p \implies q}{\infer[LEM]{p
+        \lor \lnot p}{\ulcorner p \implies q \urcorner^{[1]}} &
+        \infer[\Rightarrow \mathrm{elim} with p\Rightarrow q]{q}{} &
+        \infer[\Rightarrow \mathrm{elim} with \lnot p\Rightarrow
+        q]{q}{} & \infer[\lor \mathrm{elim}]{q}{\ulcorner p \implies q
+      \urcorner^{[1]}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent By LEM, we can case-analyze on p or $\lnot p$. In both
+cases we derive q.
+
+\bigskip
+
+\section*{Example 3 : Double Negation Elimination Using LEM}
+\addcontentsline{toc}{section}{Example 3 : Double Negation
+Elimination Using LEM}
+
+\noindent $Prove : not$ $\lnot p \implies p$
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\lor \mathrm{elim}]{p}{
+      \infer[\lor \mathrm{elim}]{p}{\infer[\mathrm{false}
+        \mathrm{elim}]{p}{\infer[\mathrm{contradiction} with \lnot
+      \lnot p]{false}{}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent LEM enables double negation elimination in classical logic.
+
+\bigskip
+
+\section*{Example 4 : De Morgan's Law Using LEM}
+\addcontentsline{toc}{section}{Example 4 : De Morgan's Law Using LEM}
+
+\noindent $Prove : not$ $(p \land q)$ $\Rightarrow$ $(\lnot p \lor \lnot q)$
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\lor \mathrm{elim}]{\lnot p \lor \lnot q}{
+      \infer[\lor \mathrm{elim}]{\lnot p \lor \lnot q}{\infer[\lor
+      \mathrm{intro} left]{\lnot p \lor \lnot q}{\infer[identity]{\lnot p}{}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent This proof requires LEM to case-analyze on both p and q.
+
+\bigskip
+
+\section*{Example 5 : Decidability}
+\addcontentsline{toc}{section}{Example 5 : Decidability}
+
+\noindent A proposition is decidable if we can prove p or $\lnot p$.
+In logical notation, we would $write : decidable(p) means$ $(p \lor \lnot p)$.
+
+\bigskip
+
+\noindent LEM states that all propositions are decidable in classical logic.
+
+\bigskip
+
+\section*{Example 6 : Proof by Contradiction via LEM}
+\addcontentsline{toc}{section}{Example 6 : Proof by Contradiction via LEM}
+
+\noindent Prove: $(\lnot p \implies false) \implies p$
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\lor \mathrm{elim}]{p}{
+      \infer[\lor \mathrm{elim}]{p}{\infer[\mathrm{false}
+      \mathrm{elim}]{p}{\infer[\Rightarrow \mathrm{elim}]{false}{}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent This shows that proof by contradiction follows from LEM.
+
+\bigskip
+
+\section*{Example 7 : Material Implication}
+\addcontentsline{toc}{section}{Example 7 : Material Implication}
+
+\noindent Prove: $(p \implies q) \iff (\lnot p \lor q)$
+
+\bigskip
+
+\noindent Left-to-right $(p \implies (q \implies \lnot p \lor q))$:
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\lor \mathrm{elim}]{\lnot p \lor q}{
+      \infer[\lor \mathrm{elim}]{\lnot p \lor q}{\infer[\lor
+      \mathrm{intro} left]{\lnot p \lor q}{}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Right-to-left $(\lnot p \lor q \implies (p \implies q))$:
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies q}{
+      \infer[\mathrm{assumption}]{p}{\infer[\mathrm{false}
+        \mathrm{elim}]{q}{\infer[\mathrm{contradiction}]{false}{}} &
+        \infer[identity]{q}{} & \infer[\lor \mathrm{elim}]{q}{\ulcorner
+      \lnot p \lor q \urcorner^{[1]}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Material implication equivalence uses LEM in the forward direction.
+
+\bigskip
+
+\section*{Example 8 : Pierce's Law}
+\addcontentsline{toc}{section}{Example 8 : Pierce's Law}
+
+\noindent Prove: $((p \implies q) \implies p)$ $\Rightarrow$ p
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\lor \mathrm{elim}]{p}{
+      \infer[\lor \mathrm{elim}]{p}{\infer[\Rightarrow \mathrm{elim}
+          with
+        \mathrm{premise}]{p}{\infer[\Rightarrow\textrm{-intro}^{[2]}]{p
+          \implies q}{\infer[\mathrm{false}
+            \mathrm{elim}]{q}{\infer[\mathrm{contradiction}]{false}{\ulcorner
+      p \urcorner^{[2]}}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Pierce's law is equivalent to LEM in classical logic.
+
+\bigskip
+
+\section*{Example 9 : Tertium Non Datur}
+\addcontentsline{toc}{section}{Example 9 : Tertium Non Datur}
+
+\noindent Tertium non datur (Latin: "no third possibility") is
+another name for LEM.
+
+\bigskip
+
+\noindent For any proposition p, there is no third option besides p
+and $\lnot p$.
+
+\bigskip
+
+\noindent
+$\forall p @ p \lor \lnot p$
+
+\noindent This principle distinguishes classical from intuitionistic logic.
+
+\bigskip
+
+\section*{Example 10 : Constructive vs Classical}
+\addcontentsline{toc}{section}{Example 10 : Constructive vs Classical}
+
+\noindent In constructive (intuitionistic) logic, LEM is not provable
+as a general principle.
+
+\bigskip
+
+\noindent Constructive: To prove p or $\lnot p$, you must either:
+
+\bigskip
+
+\noindent - Construct a proof of p, or
+
+\bigskip
+
+\noindent - Construct a proof of $\lnot p$ (a proof that p leads to
+contradiction)
+
+\bigskip
+
+\noindent $Classical : LEM$ is an axiom—every proposition is assumed
+decidable without construction.
+
+\bigskip
+
+\section*{Example 11 : Example Where LEM Is Not Needed}
+\addcontentsline{toc}{section}{Example 11 : Example Where LEM Is Not Needed}
+
+\noindent Some propositions are constructively decidable:
+
+\bigskip
+
+\noindent
+$\forall n : \nat @ (n = 0) \lor \lnot (n = 0)$
+
+\noindent We can decide this by checking if n equals 0.
+
+\bigskip
+
+\noindent But general propositions may not be decidable constructively:
+
+\bigskip
+
+\noindent
+$\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
+
+\section*{Example 12 : Proof Strategy with LEM}
+\addcontentsline{toc}{section}{Example 12 : Proof Strategy with LEM}
+
+\noindent Common proof strategy using LEM:
+
+\bigskip
+
+\noindent To prove Q:
+
+\bigskip
+
+\noindent 1. Invoke p or $\lnot p$ for some relevant p
+
+\bigskip
+
+\noindent 2. [case] p prove Q assuming p
+
+\bigskip
+
+\noindent 3. [case] $\lnot p$ prove Q assuming $\lnot p$
+
+\bigskip
+
+\noindent 4. Conclude Q by or elim
+
+\bigskip
+
+\noindent This technique is called "proof by cases" or "case analysis."
+
+\bigskip
+
+\section*{Example 13 : LEM and Indirect Proof}
+\addcontentsline{toc}{section}{Example 13 : LEM and Indirect Proof}
+
+\noindent Indirect proof pattern using LEM:
+
+\bigskip
+
+\noindent To prove p:
+
+\bigskip
+
+\noindent 1. Assume $\lnot p$ [assumption 1]
+
+\bigskip
+
+\noindent 2. Derive false
+
+\bigskip
+
+\noindent 3. Conclude not $\lnot p$ [not intro from 1]
+
+\bigskip
+
+\noindent 4. Apply $LEM : p$ or $\lnot p$
+
+\bigskip
+
+\noindent 5. [case] p p
+
+\bigskip
+
+\noindent 6. [case] $\lnot p$ contradicts not $\lnot p$, derive p by false elim
+
+\bigskip
+
+\noindent 7. Conclude p [or elim]
+
+\bigskip
+
+\noindent LEM enables the final step (double negation elimination).
+
+\bigskip
+
+\section*{Example 14 : Drinker Paradox}
+\addcontentsline{toc}{section}{Example 14 : Drinker Paradox}
+
+\noindent $Prove : There exists$ a person x such that if x drinks,
+then everyone drinks.
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\lor \mathrm{elim}]{\exists x @ x(drinks) \implies
+    (\forall y @ y(drinks))}{
+      \infer[\lor \mathrm{elim}]{\exists x @ x(drinks) \implies
+      (\forall y @ y(drinks))}{\infer[exists \mathrm{intro} with
+        x=a]{\exists x @ x(drinks) \implies (\forall y @
+        y(drinks))}{\infer[\Rightarrow \mathrm{intro},trivially
+          true]{a(drinks) \implies (\forall y @
+          y(drinks))}{\infer[\mathrm{from} p]{\forall y @
+            y(drinks)}{\infer[\mathrm{from}
+              p]{a(drinks)}{\infer{Pick(any)(person)}{
+                  a
+        }}}}} & \infer[exists \mathrm{intro} with x=b]{\exists x @
+          x(drinks) \implies (\forall y @
+        y(drinks))}{\infer[\Rightarrow\textrm{-intro}^{[2]}]{b(drinks)
+            \implies (\forall y @
+          y(drinks))}{\infer[\mathrm{assumption}]{b(drinks)}{\infer[exists
+              \mathrm{elim}]{\lnot (b(drinks))}{\infer[negation of
+      forall]{\exists b @ \lnot (b(drinks))}{}}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent This classical proof uses LEM crucially.
+
+\bigskip
+
+\section*{Example 15 : When to Use LEM}
+\addcontentsline{toc}{section}{Example 15 : When to Use LEM}
+
+\noindent Use LEM when:
+
+\bigskip
+
+\noindent 1. You need to prove something by case analysis on an
+arbitrary proposition
+
+\bigskip
+
+\noindent 2. You're working in classical logic $\lnot constructive$
+
+\bigskip
+
+\noindent 3. You need double negation elimination
+
+\bigskip
+
+\noindent 4. Your proof strategy requires considering both p and $\lnot p$
+
+\bigskip
+
+\noindent Avoid LEM when:
+
+\bigskip
+
+\noindent 1. Working in constructive/intuitionistic logic
+
+\bigskip
+
+\noindent 2. The proposition has a decidable, constructive proof
+
+\bigskip
+
+\noindent 3. You want algorithms that compute witnesses (constructive proofs)
+
+\bigskip
+
+\section*{Example 16 : Relationship to Other Principles}
+\addcontentsline{toc}{section}{Example 16 : Relationship to Other Principles}
+
+\noindent In classical logic, these are equivalent:
+
+\bigskip
+
+\noindent - Law of excluded $middle : p$ or $\lnot p$
+
+\bigskip
+
+\noindent - Double negation $elimination : not$ $\lnot p \implies p$
+
+\bigskip
+
+\noindent - Pierce's law: $((p \implies q) \implies p)$ $\Rightarrow$ p
+
+\bigskip
+
+\noindent - Reductio ad absurdum: $(\lnot p \implies false) \implies p$
+
+\bigskip
+
+\noindent Accepting any one of these principles gives you classical logic.
+
+\bigskip
+
+\noindent In intuitionistic logic, none of these hold in general—you
+must construct proofs explicitly.
+
+\bigskip
+
+\end{document}

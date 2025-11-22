@@ -687,6 +687,91 @@ Generic definitions are used for:
 - Generic constants that work across types
 - Type-parameterized operations
 
+### Generic Constructs - Fuzz Compatibility
+
+**Important**: The fuzz typechecker has limitations on what can appear inside `gendef` blocks. Use these workarounds for full fuzz compatibility:
+
+#### Workaround 1: Generic Free Types
+
+**Problem**: Free type definitions (`::=`) are NOT supported inside `gendef` blocks.
+
+**Incorrect** (will not compile):
+```
+gendef [X]
+  Tree_X ::= leaf | node⟨X × Tree_X × Tree_X⟩
+end
+```
+
+**Correct workaround**: Define the free type separately with `given`, then define operations in `gendef`:
+```
+given X
+
+Tree_X ::= leaf_X | node_X⟨X cross Tree_X cross Tree_X⟩
+
+gendef [X]
+  makeLeaf_X : Tree_X
+  makeNode_X : X cross Tree_X cross Tree_X -> Tree_X
+  treeDepth_X : Tree_X -> N
+where
+  makeLeaf_X = leaf_X
+  forall x : X; left, right : Tree_X |
+    makeNode_X(x, left, right) = node_X(x, left, right)
+end
+```
+
+#### Workaround 2: Generic Schemas
+
+**Problem**: Schema definitions are NOT supported inside `gendef` blocks.
+
+**Incorrect** (will not compile):
+```
+gendef [X]
+  schema Container_X
+    contents : seq X
+    capacity : N
+  where
+    # contents <= capacity
+  end
+end
+```
+
+**Correct workaround**: Use `schema[X]` syntax (standard Z notation):
+```
+schema Container[X]
+  contents : seq X
+  capacity : N
+where
+  # contents <= capacity
+end
+```
+
+You can then define operations on the generic schema using `gendef`:
+```
+gendef [X]
+  emptyContainer : Container[X]
+  addToContainer : Container[X] cross X -> Container[X]
+where
+  emptyContainer.contents = ⟨⟩ and emptyContainer.capacity = 100
+end
+```
+
+#### Key Principles for Fuzz Compatibility
+
+1. **`gendef` blocks can contain**:
+   - Type declarations (`name : type`)
+   - Schema references (to previously defined schemas)
+   - Predicates in `where` clause
+
+2. **`gendef` blocks CANNOT contain**:
+   - Free type definitions (`::=`)
+   - Schema definitions (`schema Name ... end`)
+
+3. **Generic schemas**: Use `schema Name[X, Y]` syntax (not `gendef`)
+
+4. **Generic free types**: Define separately with `given`, then operations with `gendef`
+
+See `examples/06_definitions/gendef_advanced.txt` for complete working examples.
+
 ---
 
 ## Relations
@@ -1640,10 +1725,9 @@ Examples:
 
 ```
 PROOF:
-  p and q => p [=> intro from 1]
-    [1] p and q [assumption]
-    :: p [and elim 1]
-      :: p and q [from 1]
+p and q => p [=> intro from 1]
+  [1] p and q [assumption]
+      p [and elim 1]
 ```
 
 ### Example: Case Analysis
@@ -1651,42 +1735,40 @@ PROOF:
 **Simple case analysis:**
 ```
 PROOF:
-  p or q => r [=> intro from 1]
-    [1] p or q [assumption]
-    :: r [or elim]
-      :: p or q [from 1]
-      case p:
-        :: r [from 2]
-          [2] p [assumption]
-      case q:
-        :: r [from 3]
-          [3] q [assumption]
+p or q => r [=> intro from 1]
+  [1] p or q [assumption]
+      r [or elim]
+        case p:
+          r [from assumption p]
+        case q:
+          r [from assumption q]
 ```
 
-**Case analysis with multiple sibling steps:**
+**Case analysis with sibling premises:**
 ```
 PROOF:
-  ((p => r) and (q => r)) => ((p or q) => r) [=> intro from 1]
-    [1] (p => r) and (q => r) [assumption]
-    :: (p or q) => r [=> intro from 2]
-      [2] p or q [assumption]
-      :: r [or elim from 3]
-        case p:
-          :: p => r [and elim 1]
-            :: (p => r) and (q => r) [from 1]
-          :: r [=> elim]
-            [3] p [assumption]
+p and (q or r) => (p and q) or (p and r) [=> intro from 1]
+  [1] p and (q or r) [assumption]
+      p [and elim 1]
+      q or r [and elim 2]
+      (p and q) or (p and r) [or elim]
         case q:
-          :: q => r [and elim 2]
-            :: (p => r) and (q => r) [from 1]
-          :: r [=> elim]
-            [3] q [assumption]
+          :: p [from above]
+          :: q [from case]
+          p and q [and intro]
+          (p and q) or (p and r) [or intro 1]
+        case r:
+          :: p [from above]
+          :: r [from case]
+          p and r [and intro]
+          (p and q) or (p and r) [or intro 2]
 ```
 
-**Important**: When a case has multiple sibling steps (marked with `::`) leading to the conclusion:
-- The LAST sibling step automatically includes earlier siblings as its premises
-- Do NOT write `:: result [from above]` - this creates duplication
-- The earlier derivations are automatically available to the final step
+**Important**: When working with case analysis:
+- Use `[from above]` to reference facts established before the case split
+- The `::` sibling markers indicate multiple facts that together support the next step
+- Each case should derive the same conclusion through different reasoning paths
+- Facts proven before case analysis remain available within all cases
 
 ---
 

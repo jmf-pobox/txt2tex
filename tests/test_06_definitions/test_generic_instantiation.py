@@ -189,7 +189,7 @@ class TestGenericInstantiationLatex:
         assert latex == r"Type[\mathbb{N} \cross \mathbb{N}]"
 
     def test_seq_generic_latex(self) -> None:
-        """Test LaTeX for seq[N] -> seq[\\mathbb{N}]."""
+        """Test LaTeX for seq[N] -> \\seq \\mathbb{N} (no brackets)."""
         lexer = Lexer("seq[N]")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -198,9 +198,11 @@ class TestGenericInstantiationLatex:
         generator = LaTeXGenerator()
         latex = generator.generate_expr(ast)
 
+        # seq[N] with single param renders as \seq \mathbb{N} (no brackets)
         assert "seq" in latex
         assert "N" in latex
-        assert "[" in latex
+        assert "[" not in latex  # No brackets for special Z notation types
+        assert latex == "\\seq \\mathbb{N}"
 
     def test_nested_generic_latex(self) -> None:
         """Test LaTeX for nested: Type[List[N]] -> Type[List[\\mathbb{N}]]."""

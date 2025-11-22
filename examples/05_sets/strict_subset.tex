@@ -1,45 +1,37 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 39 : Strict Subset Operator}
 
-\bigskip
-
-The strict subset operator (psubset, ⊂) represents proper subset
-relationships, where A is a subset of B AND A is not equal to B.
+\noindent The strict subset operator (psubset, ⊂) represents proper
+subset relationships, where A is a subset of B AND A is not equal to B.
 
 \bigskip
 
-\bigskip
-
-Distinction from subset (⊆):
+\noindent Distinction from subset (⊆):
 
 \bigskip
 
-\bigskip
-
-- A subset B means: every element of A $is \in B$ (may be equal)
+\noindent - A subset B means: every element of A $is \in B$ (may be equal)
 
 \bigskip
 
-\bigskip
-
-- A psubset B means: every element of A $is \in B$ AND $A \neq B$
-(strict inequality)
+\noindent - A psubset B means: every element of A $is \in B$ AND $A
+\neq B$ (strict inequality)
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 1 : Basic Strict Subset}
-
-\medskip
+\section*{Example 1 : Basic Strict Subset}
+\addcontentsline{toc}{section}{Example 1 : Basic Strict Subset}
 
 \begin{axdef}
   A : \power \nat \\
@@ -48,18 +40,13 @@ Distinction from subset (⊆):
   A = \{1, 2, 3\} \land B = \{1, 2, 3, 4, 5\} \land A \subset B
 \end{axdef}
 
-\bigskip
-
-Here A psubset B holds because all elements of A $are \in B$, and A
-contains fewer elements than B.
+\noindent Here A psubset B holds because all elements of A $are \in
+B$, and A contains fewer elements than B.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 2 : Comparing subset and psubset}
-
-\medskip
+\section*{Example 2 : Comparing subset and psubset}
+\addcontentsline{toc}{section}{Example 2 : Comparing subset and psubset}
 
 \begin{axdef}
   X : \power \nat \\
@@ -70,29 +57,21 @@ contains fewer elements than B.
   \subset Y \land X \subseteq W
 \end{axdef}
 
-\bigskip
-
-X psubset Y is true (X is strictly $contained \in Y$)
+\noindent X psubset Y is true (X is strictly $contained \in Y$)
 
 \bigskip
 
-\bigskip
-
-X subset W is true (X is a subset of W, including the case where $X = W$)
-
-\bigskip
+\noindent X subset W is true (X is a subset of W, including the case
+where $X = W$)
 
 \bigskip
 
-X psubset W would be FALSE (they are equal sets)
+\noindent X psubset W would be FALSE (they are equal sets)
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 3 : Empty Set}
-
-\medskip
+\section*{Example 3 : Empty Set}
+\addcontentsline{toc}{section}{Example 3 : Empty Set}
 
 \begin{axdef}
   emptySet : \power \nat \\
@@ -101,21 +80,14 @@ X psubset W would be FALSE (they are equal sets)
   emptySet = \{\} \land anySet = \{1, 2, 3\} \land emptySet \subset anySet
 \end{axdef}
 
-\bigskip
-
-The empty set is a strict subset of any non-empty set.
+\noindent The empty set is a strict subset of any non-empty set.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 4 : Transitive Property}
+\section*{Example 4 : Transitive Property}
+\addcontentsline{toc}{section}{Example 4 : Transitive Property}
 
-\medskip
-
-\bigskip
-
-If A psubset B and B psubset C, then A psubset C.
+\noindent If A psubset B and B psubset C, then A psubset C.
 
 \bigskip
 
@@ -128,11 +100,8 @@ If A psubset B and B psubset C, then A psubset C.
   \subset B1 \land B1 \subset C1 \land A1 \subset C1
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 5 : Set Hierarchy}
-
-\medskip
+\section*{Example 5 : Set Hierarchy}
+\addcontentsline{toc}{section}{Example 5 : Set Hierarchy}
 
 \begin{zed}[Person]
 \end{zed}
@@ -145,10 +114,8 @@ If A psubset B and B psubset C, then A psubset C.
   phds \subset grads \land grads \subset students
 \end{axdef}
 
-\bigskip
-
-PhD students are a strict subset of graduate students, which are a
-strict subset of all students.
+\noindent PhD students are a strict subset of graduate students,
+which are a strict subset of all students.
 
 \bigskip
 

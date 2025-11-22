@@ -1,0 +1,85 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Composition Pipelines}
+
+\section*{Example 1 : Simple Three - Stage Pipeline}
+\addcontentsline{toc}{section}{Example 1 : Simple Three - Stage Pipeline}
+
+\noindent A three-stage numeric processing pipeline.
+
+\bigskip
+
+\begin{axdef}
+  addOne : \nat \fun \nat \\
+  double : \nat \fun \nat \\
+  square : \nat \fun \nat \\
+  pipeline : \nat \fun \nat
+  \where
+  \forall n : \nat @ addOne(n) = n + 1 \\
+  \forall n : \nat @ double(n) = 2 * n \\
+  \forall n : \nat @ square(n) = n * n \\
+  pipeline = square \comp double \comp addOne
+\end{axdef}
+
+\noindent pipeline(3) = square(double(addOne(3))) = square(double(4))
+= square(8) = 64
+
+\bigskip
+
+\section*{Example 2 : String Pipeline}
+\addcontentsline{toc}{section}{Example 2 : String Pipeline}
+
+\begin{zed}[Char]
+\end{zed}
+
+\begin{axdef}
+  str1 : \seq Char \fun \seq Char \\
+  str2 : \seq Char \fun \seq Char \\
+  str3 : \seq Char \fun \seq Char \\
+  stringPipeline : \seq Char \fun \seq Char
+  \where
+  stringPipeline = str3 \comp str2 \comp str1
+\end{axdef}
+
+\noindent Demonstrates composition of string-processing functions.
+
+\bigskip
+
+\section*{Example 3 : Best Practices}
+\addcontentsline{toc}{section}{Example 3 : Best Practices}
+
+\noindent When building pipelines:
+
+\bigskip
+
+\noindent 1. Break complex operations into simple stages
+
+\bigskip
+
+\noindent 2. Each stage should have a single responsibility
+
+\bigskip
+
+\noindent 3. Test individual functions before composing
+
+\bigskip
+
+\noindent 4. Use meaningful names for pipeline stages
+
+\bigskip
+
+\noindent 5. Document the flow direction (comp applies right-to-left)
+
+\bigskip
+
+\end{document}

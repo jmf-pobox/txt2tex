@@ -1,32 +1,34 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 11 . 6 : Tuple Expressions}
 
-\bigskip
-\noindent
-\textbf{Test Cases}
+\section*{Test Cases}
+\addcontentsline{toc}{section}{Test Cases}
 
-\medskip
+\subsection*{(a)}
 
 \noindent
-\hangindent=2em
-(a) $Simple(tuple)$
+$Simple(tuple)$
 
 \noindent
 $(1, 2)$
 
 \medskip
 
+\subsection*{(b)}
+
 \noindent
-\hangindent=2em
-(b) $Tuple$
+$Tuple$
 
 \noindent
 $with(identifiers)$
@@ -36,9 +38,10 @@ $(x, y, z)$
 
 \medskip
 
+\subsection*{(c)}
+
 \noindent
-\hangindent=2em
-(c) $Set(comprehension)$
+$Set(comprehension)$
 
 \noindent
 $with(tuple)(expression)$
@@ -48,22 +51,22 @@ $\{ n : \nat | n \leq 4 @ (n, n^2) \}$
 
 \medskip
 
+\subsection*{(d)}
+
 \noindent
-\hangindent=2em
-(d) $Tuple \in set(membership)$
+$Tuple \in set(membership)$
 
 \noindent
 $(a, b) \in A \cross B$
 
 \medskip
 
+\subsection*{(e)}
+
 \noindent
-\hangindent=2em
-(e) $Nested(tuples)$
+$Nested(tuples)$
 
 \noindent
 $((a, b), (c, d))$
-
-\medskip
 
 \end{document}

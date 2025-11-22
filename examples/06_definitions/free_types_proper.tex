@@ -1,19 +1,19 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 17 : Proper Examples ( not TEXT blocks )}
 
-\bigskip
-\noindent
-\textbf{Example : Semicolon bindings in axdef}
-
-\medskip
+\section*{Example : Semicolon bindings in axdef}
+\addcontentsline{toc}{section}{Example : Semicolon bindings in axdef}
 
 \begin{axdef}
   dummy : \nat
@@ -22,11 +22,8 @@
   \forall x : \nat @ \forall y : \nat @ x + y > 0
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example : Function on sequences}
-
-\medskip
+\section*{Example : Function on sequences}
+\addcontentsline{toc}{section}{Example : Function on sequences}
 
 \begin{zed}[Entry]
 \end{zed}
@@ -39,11 +36,8 @@
   \rangle \cat s) = 1 + seqlen(s)
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example : Nested quantifier}
-
-\medskip
+\section*{Example : Nested quantifier}
+\addcontentsline{toc}{section}{Example : Nested quantifier}
 
 \begin{zed}[Person]
 \end{zed}

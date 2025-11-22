@@ -1,17 +1,17 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
-\bigskip
-\noindent
-\textbf{Test Pattern Matching}
-
-\medskip
+\section*{Test Pattern Matching}
+\addcontentsline{toc}{section}{Test Pattern Matching}
 
 \begin{zed}[Entry]
 \end{zed}
@@ -24,10 +24,8 @@
   \rangle \cat s) = \langle x \rangle \cat filterSeq(s)
 \end{axdef}
 
-\bigskip
-
-This demonstrates pattern matching on sequences with base case
-($\langle \rangle$) and recursive case ($\langle x \rangle$ ^ s).
+\noindent This demonstrates pattern matching on sequences with base
+case ($\langle \rangle$) and recursive case ($\langle x \rangle$ ^ s).
 
 \bigskip
 

@@ -1,10 +1,13 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 11 a : Function Types}
@@ -12,9 +15,7 @@
 \begin{zed}[X, Y, Z]
 \end{zed}
 
-\bigskip
-
-Total functions (every element in domain has a mapping):
+\noindent Total functions (every element in domain has a mapping):
 
 \bigskip
 
@@ -23,9 +24,7 @@ Total functions (every element in domain has a mapping):
   totalF2 : \nat \fun \nat
 \end{axdef}
 
-\bigskip
-
-Partial functions (some elements may not have a mapping):
+\noindent Partial functions (some elements may not have a mapping):
 
 \bigskip
 
@@ -33,9 +32,7 @@ Partial functions (some elements may not have a mapping):
   partialF : X \pfun Y
 \end{axdef}
 
-\bigskip
-
-Injections (one-to-one mappings):
+\noindent Injections (one-to-one mappings):
 
 \bigskip
 
@@ -44,9 +41,7 @@ Injections (one-to-one mappings):
   injPartial : X \pinj Y
 \end{axdef}
 
-\bigskip
-
-Surjections (onto mappings):
+\noindent Surjections (onto mappings):
 
 \bigskip
 
@@ -55,9 +50,7 @@ Surjections (onto mappings):
   surjPartial : X \psurj Y
 \end{axdef}
 
-\bigskip
-
-Bijections $(one - to - one \land onto)$:
+\noindent Bijections $(one - to - one \land onto)$:
 
 \bigskip
 
@@ -65,9 +58,7 @@ Bijections $(one - to - one \land onto)$:
   bijection : X \bij Y
 \end{axdef}
 
-\bigskip
-
-Mixed operators $(relations \land function(types)(work)(together))$:
+\noindent Mixed operators $(relations \land function(types)(work)(together))$:
 
 \bigskip
 

@@ -1,0 +1,28 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Test Phase A}
+\addcontentsline{toc}{section}{Test Phase A}
+
+\noindent Pattern matching with sequences:
+
+\bigskip
+
+\noindent viewed(⟨⟩) = ⟨⟩
+
+\bigskip
+
+\noindent viewed(⟨x⟩ ^ s) = if condition then ⟨x⟩ ^ viewed(s) else viewed(s)
+
+\bigskip
+
+\end{document}

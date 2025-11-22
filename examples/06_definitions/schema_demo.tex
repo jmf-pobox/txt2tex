@@ -1,19 +1,19 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Schema Examples}
 
-\bigskip
-\noindent
-\textbf{Example 1 : Simple Schema}
-
-\medskip
+\section*{Example 1 : Simple Schema}
+\addcontentsline{toc}{section}{Example 1 : Simple Schema}
 
 \begin{schema}{Counter}
   count : \nat
@@ -21,22 +21,16 @@
   count \geq 0
 \end{schema}
 
-\bigskip
-\noindent
-\textbf{Example 2 : Schema with Multiple Fields}
-
-\medskip
+\section*{Example 2 : Schema with Multiple Fields}
+\addcontentsline{toc}{section}{Example 2 : Schema with Multiple Fields}
 
 \begin{schema}{Point}
   x : \num \\
   y : \num
 \end{schema}
 
-\bigskip
-\noindent
-\textbf{Example 3 : Schema with Constraints}
-
-\medskip
+\section*{Example 3 : Schema with Constraints}
+\addcontentsline{toc}{section}{Example 3 : Schema with Constraints}
 
 \begin{schema}{BoundedPoint}
   x : \nat \\
@@ -46,11 +40,8 @@
   y \leq 100
 \end{schema}
 
-\bigskip
-\noindent
-\textbf{Example 4 : Schema with Given Types}
-
-\medskip
+\section*{Example 4 : Schema with Given Types}
+\addcontentsline{toc}{section}{Example 4 : Schema with Given Types}
 
 \begin{zed}[Person]
 \end{zed}

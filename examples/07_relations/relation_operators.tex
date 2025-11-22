@@ -1,28 +1,25 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 10 a : Relation Operators}
 
-\bigskip
-\noindent
-\textbf{Example 1 : Relation Type}
-
-\medskip
+\section*{Example 1 : Relation Type}
+\addcontentsline{toc}{section}{Example 1 : Relation Type}
 
 \noindent
 $R \rel S$
 
-\bigskip
-\noindent
-\textbf{Example 2 : Maplet Constructor}
-
-\medskip
+\section*{Example 2 : Maplet Constructor}
+\addcontentsline{toc}{section}{Example 2 : Maplet Constructor}
 
 \noindent
 $x \mapsto y$
@@ -30,29 +27,20 @@ $x \mapsto y$
 \noindent
 $1 \mapsto 2$
 
-\bigskip
-\noindent
-\textbf{Example 3 : Domain Restriction}
-
-\medskip
+\section*{Example 3 : Domain Restriction}
+\addcontentsline{toc}{section}{Example 3 : Domain Restriction}
 
 \noindent
 $S \dres R$
 
-\bigskip
-\noindent
-\textbf{Example 4 : Range Restriction}
-
-\medskip
+\section*{Example 4 : Range Restriction}
+\addcontentsline{toc}{section}{Example 4 : Range Restriction}
 
 \noindent
 $R \rres T$
 
-\bigskip
-\noindent
-\textbf{Example 5 : Relational Composition}
-
-\medskip
+\section*{Example 5 : Relational Composition}
+\addcontentsline{toc}{section}{Example 5 : Relational Composition}
 
 \noindent
 $R \comp S$
@@ -60,11 +48,8 @@ $R \comp S$
 \noindent
 $R \circ S$
 
-\bigskip
-\noindent
-\textbf{Example 6 : Relation Functions}
-
-\medskip
+\section*{Example 6 : Relation Functions}
+\addcontentsline{toc}{section}{Example 6 : Relation Functions}
 
 \noindent
 $\dom R$
@@ -72,11 +57,8 @@ $\dom R$
 \noindent
 $\ran R$
 
-\bigskip
-\noindent
-\textbf{Example 7 : Complex Expressions}
-
-\medskip
+\section*{Example 7 : Complex Expressions}
+\addcontentsline{toc}{section}{Example 7 : Complex Expressions}
 
 \noindent
 $\dom (S \dres R)$
@@ -87,11 +69,8 @@ $\ran (R \rres T)$
 \noindent
 $(A \dres R) \comp (R \rres B)$
 
-\bigskip
-\noindent
-\textbf{Example 8 : Chained Relations}
-
-\medskip
+\section*{Example 8 : Chained Relations}
+\addcontentsline{toc}{section}{Example 8 : Chained Relations}
 
 \noindent
 $R \circ S \circ T$
@@ -99,11 +78,8 @@ $R \circ S \circ T$
 \noindent
 $A \dres R \rres B$
 
-\bigskip
-\noindent
-\textbf{Example 9 : Relations with Set Operations}
-
-\medskip
+\section*{Example 9 : Relations with Set Operations}
+\addcontentsline{toc}{section}{Example 9 : Relations with Set Operations}
 
 \noindent
 $(x \mapsto y) \in R$

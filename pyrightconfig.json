@@ -19,8 +19,6 @@
   "strict": [
     "src/txt2tex"
   ],
-  "venvPath": ".",
-  "venv": ".venv",
   "executionEnvironments": [
     {
       "root": "tests",

@@ -1,0 +1,292 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Mu Operator with Expressions}
+
+\section*{Example 1 : Basic Mu ( Returns the Value )}
+\addcontentsline{toc}{section}{Example 1 : Basic Mu ( Returns the Value )}
+
+\noindent The basic mu operator finds and returns the unique value:
+
+\bigskip
+
+\noindent
+$(\mu x : \nat | x * x = 16)$
+
+\noindent This evaluates to 4 (the unique natural number whose square is 16).
+
+\bigskip
+
+\section*{Example 2 : Mu with Expression ( Returns Transformed Value )}
+\addcontentsline{toc}{section}{Example 2 : Mu with Expression (
+Returns Transformed Value )}
+
+\noindent Adding a bullet and expression transforms the result:
+
+\bigskip
+
+\noindent
+$(\mu x : \nat | x * x = 16 @ x + 1)$
+
+\noindent This finds $x = 4$, then evaluates x + 1, giving 5.
+
+\bigskip
+
+\section*{Example 3 : Finding and Doubling}
+\addcontentsline{toc}{section}{Example 3 : Finding and Doubling}
+
+\noindent
+$(\mu n : \nat | n > 10 \land n < 12.2 * n)$
+
+\noindent Finds $n = 11$ $(unique(n)(between)(10) \land 12)$, then
+returns 2 * 11 = 22.
+
+\bigskip
+
+\section*{Example 4 : Square Root and Square Again}
+\addcontentsline{toc}{section}{Example 4 : Square Root and Square Again}
+
+\noindent
+$(\mu x : \nat | x * x = 25 @ x * x * x)$
+
+\noindent Finds $x = 5$, then returns 5³ = 125.
+
+\bigskip
+
+\section*{Example 5 : String Indexing Example}
+\addcontentsline{toc}{section}{Example 5 : String Indexing Example}
+
+\begin{zed}[String, Char]
+\end{zed}
+
+\begin{axdef}
+  charAt : String \cross \nat \fun Char \\
+  findChar : String \cross Char \fun \nat
+  \where
+  \forall s : String @ \forall c : Char @ findChar(s, c) = (\mu i :
+  \nat | charAt(s, i) = c)
+\end{axdef}
+
+\noindent findChar returns the index of the first (unique) occurrence
+of character c.
+
+\bigskip
+
+\section*{Example 6 : With Transformation}
+\addcontentsline{toc}{section}{Example 6 : With Transformation}
+
+\begin{axdef}
+  findAndAdvance : String \cross Char \fun \nat
+  \where
+  \forall s : String @ \forall c : Char @ findAndAdvance(s, c) = (\mu
+  i : \nat | charAt(s, i) = c) + 1
+\end{axdef}
+
+\noindent Finds the index, then returns the next index.
+
+\bigskip
+
+\section*{Example 7 : Mathematical Example - Inverse Function}
+\addcontentsline{toc}{section}{Example 7 : Mathematical Example -
+Inverse Function}
+
+\begin{axdef}
+  inverse : (\nat \fun \nat) \cross \nat \fun \nat
+  \where
+  \forall f : \nat \fun \nat @ \forall y : \nat @ inverse(f, y) =
+  (\mu x : \nat | f(x) = y)
+\end{axdef}
+
+\noindent For an injective function f, inverse(f, y) finds the unique
+x such that f(x) = y.
+
+\bigskip
+
+\section*{Example 8 : With Computation}
+\addcontentsline{toc}{section}{Example 8 : With Computation}
+
+\begin{axdef}
+  inverseSquared : (\nat \fun \nat) \cross \nat \fun \nat
+  \where
+  \forall f : \nat \fun \nat @ \forall y : \nat @ inverseSquared(f,
+  y) = (\mu x : \nat | f(x) = y @ x * x)
+\end{axdef}
+
+\noindent Finds the inverse, then squares it.
+
+\bigskip
+
+\section*{Example 9 : Practical - Finding Configuration Values}
+\addcontentsline{toc}{section}{Example 9 : Practical - Finding
+Configuration Values}
+
+\begin{zed}[ConfigKey, ConfigValue]
+\end{zed}
+
+\begin{axdef}
+  configs : ConfigKey \pfun ConfigValue \\
+  getConfigInt : ConfigKey \fun \nat \\
+  parseValue : ConfigValue \fun \nat
+  \where
+  \forall k : ConfigKey @ \\
+  \quad k \in \dom configs \implies \\
+  \quad getConfigInt(k) = (\mu v : \nat | parseValue(configs(k)) = v)
+\end{axdef}
+
+\noindent Finds the unique N value by parsing a configuration value.
+
+\bigskip
+
+\section*{Example 10 : With Default Processing}
+\addcontentsline{toc}{section}{Example 10 : With Default Processing}
+
+\begin{axdef}
+  getConfigWithDefault : ConfigKey \cross \nat \fun \nat
+  \where
+  \forall k : ConfigKey @ \forall default : \nat @ k \in \dom configs
+  \implies \\
+  \quad getConfigWithDefault(k, default) = (\mu v : \nat |
+  parseValue(configs(k)) = v) \\
+  \forall k : ConfigKey @ \forall default : \nat @ k \notin \dom
+  configs \implies \\
+  \quad getConfigWithDefault(k, default) = default
+\end{axdef}
+
+\noindent Uses mu to parse the value when key exists, otherwise returns default.
+
+\bigskip
+
+\section*{Example 11 : Comparison - With and Without Bullet}
+\addcontentsline{toc}{section}{Example 11 : Comparison - With and
+Without Bullet}
+
+\noindent Without bullet (returns the value itself):
+
+\bigskip
+
+\begin{axdef}
+  findRoot : \nat
+  \where
+  findRoot = (\mu x : \nat | x * x = 49)
+\end{axdef}
+
+\noindent $findRoot = 7$
+
+\bigskip
+
+\noindent With bullet (returns a transformed value):
+
+\bigskip
+
+\begin{axdef}
+  findRootPlusOne : \nat
+  \where
+  findRootPlusOne = (\mu x : \nat | x * x = 49 @ x + 1)
+\end{axdef}
+
+\noindent $findRootPlusOne = 8$
+
+\bigskip
+
+\section*{Example 12 : Complex Expression}
+\addcontentsline{toc}{section}{Example 12 : Complex Expression}
+
+\noindent
+$(\mu x : \nat | x > 5 \land x < 7 @ (x * x) + (x + 1))$
+
+\noindent Finds $x = 6$, then evaluates (6 * 6) + (6 + 1) = 36 + 7 = 43.
+
+\bigskip
+
+\section*{Example 13 : Nested Mu Expressions}
+\addcontentsline{toc}{section}{Example 13 : Nested Mu Expressions}
+
+\noindent
+$(\mu x : \nat | x * x = 16 @ (\mu y : \nat | y * y = (x + 5) @ y + x))$
+
+\noindent Finds $x = 4$, then finds y where y² = (4 + 5) = 9, so $y =
+3$, then returns 3 + 4 = 7.
+
+\bigskip
+
+\section*{Example 14 : Error Conditions}
+\addcontentsline{toc}{section}{Example 14 : Error Conditions}
+
+\noindent The mu operator requires the constraint to have exactly one
+solution. If there are zero solutions or multiple solutions, mu is
+undefined (evaluation error).
+
+\bigskip
+
+\noindent Zero solutions:
+
+\bigskip
+
+\noindent $(\mu x : \nat | x * x =
+-(1(no(natural)(number)(has)(negative)(square))))$
+
+\bigskip
+
+\noindent Multiple solutions:
+
+\bigskip
+
+\noindent $(\mu x : \nat | x < 5)$(0, 1, 2, 3, 4 all satisfy this)
+
+\bigskip
+
+\noindent For mu to be well-defined, the constraint must uniquely
+identify exactly one value.
+
+\bigskip
+
+\section*{Example 15 : Design Pattern}
+\addcontentsline{toc}{section}{Example 15 : Design Pattern}
+
+\noindent The pattern "$(\mu x : T | uniqueness\_constraint)$.
+expression" is useful when:
+
+\bigskip
+
+\noindent 1. You need to find a unique value satisfying a constraint
+
+\bigskip
+
+\noindent 2. You want to transform or compute something based on that value
+
+\bigskip
+
+\noindent 3. The transformation is more than just returning the value itself
+
+\bigskip
+
+\noindent Common use cases:
+
+\bigskip
+
+\noindent - Database lookups with post-processing
+
+\bigskip
+
+\noindent - Finding and transforming configuration values
+
+\bigskip
+
+\noindent - Inverse functions with additional computation
+
+\bigskip
+
+\noindent - Unique element selection with modification
+
+\bigskip
+
+\end{document}

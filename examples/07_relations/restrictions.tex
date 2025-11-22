@@ -1,10 +1,13 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Function Application Examples}
@@ -12,17 +15,13 @@
 \begin{zed}[Item, Dog, Person, X]
 \end{zed}
 
-\bigskip
-
-This file demonstrates function $application \in Z$ notation definitions.
-
-\bigskip
+\noindent This file demonstrates function $application \in Z$
+notation definitions.
 
 \bigskip
-\noindent
-\textbf{Example 1 : Basic function definitions}
 
-\medskip
+\section*{Example 1 : Basic function definitions}
+\addcontentsline{toc}{section}{Example 1 : Basic function definitions}
 
 \begin{axdef}
   square : \nat \fun \nat \\
@@ -32,11 +31,8 @@ This file demonstrates function $application \in Z$ notation definitions.
   \forall n : \nat @ double(n) = 2 * n
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 2 : Functions with multiple arguments}
-
-\medskip
+\section*{Example 2 : Functions with multiple arguments}
+\addcontentsline{toc}{section}{Example 2 : Functions with multiple arguments}
 
 \begin{axdef}
   add : \nat \cross \nat \fun \nat \\
@@ -47,21 +43,15 @@ This file demonstrates function $application \in Z$ notation definitions.
   \land maximum(a, b) \geq a \land maximum(a, b) \geq b
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 3 : Generic functions}
-
-\medskip
+\section*{Example 3 : Generic functions}
+\addcontentsline{toc}{section}{Example 3 : Generic functions}
 
 \begin{gendef}[X]
   collection: \seq X
 \end{gendef}
 
-\bigskip
-\noindent
-\textbf{Example 4 : Function application in quantifiers}
-
-\medskip
+\section*{Example 4 : Function application in quantifiers}
+\addcontentsline{toc}{section}{Example 4 : Function application in quantifiers}
 
 \begin{axdef}
   posFunc : \nat \fun \nat
@@ -69,11 +59,8 @@ This file demonstrates function $application \in Z$ notation definitions.
   \forall x : \nat @ posFunc(x) > 0 \implies posFunc(x) > 0
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 5 : Schema with function type}
-
-\medskip
+\section*{Example 5 : Schema with function type}
+\addcontentsline{toc}{section}{Example 5 : Schema with function type}
 
 \begin{schema}{Heights}
   height : Person \fun \nat
@@ -81,11 +68,8 @@ This file demonstrates function $application \in Z$ notation definitions.
   \forall p : Person @ height(p) > 0 \land height(p) < 300
 \end{schema}
 
-\bigskip
-\noindent
-\textbf{Example 6 : Nested function application}
-
-\medskip
+\section*{Example 6 : Nested function application}
+\addcontentsline{toc}{section}{Example 6 : Nested function application}
 
 \begin{axdef}
   func1 : \nat \fun \nat \\

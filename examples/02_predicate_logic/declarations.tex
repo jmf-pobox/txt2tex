@@ -1,24 +1,23 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 9 : Generic Parameters}
 
-\bigskip
-
-This example demonstrates Z notation definitions with generic
-(polymorphic) type parameters.
+\noindent This example demonstrates Z notation definitions with
+generic (polymorphic) type parameters.
 
 \bigskip
 
-\bigskip
-
-Basic generic abbreviation for a Pair type:
+\noindent Basic generic abbreviation for a Pair type:
 
 \bigskip
 
@@ -26,9 +25,7 @@ Basic generic abbreviation for a Pair type:
   Pair[X] == X \cross X
 \end{zed}
 
-\bigskip
-
-Generic abbreviation with two type parameters:
+\noindent Generic abbreviation with two type parameters:
 
 \bigskip
 
@@ -36,9 +33,7 @@ Generic abbreviation with two type parameters:
   Product[X, Y] == X \cross Y
 \end{zed}
 
-\bigskip
-
-Generic axiomatic definition with constraints:
+\noindent Generic axiomatic definition with constraints:
 
 \bigskip
 
@@ -48,9 +43,7 @@ Generic axiomatic definition with constraints:
   identity = identity
 \end{gendef}
 
-\bigskip
-
-Generic schema for a collection:
+\noindent Generic schema for a collection:
 
 \bigskip
 
@@ -61,9 +54,7 @@ Generic schema for a collection:
   count = \# items
 \end{schema}
 
-\bigskip
-
-Generic schema with multiple parameters:
+\noindent Generic schema with multiple parameters:
 
 \bigskip
 
@@ -72,9 +63,7 @@ Generic schema with multiple parameters:
   second : Y
 \end{schema}
 
-\bigskip
-
-Non-generic definitions still work as before:
+\noindent Non-generic definitions still work as before:
 
 \bigskip
 

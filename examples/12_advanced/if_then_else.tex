@@ -1,0 +1,269 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Conditional Expressions}
+
+\section*{Example 1 : Basic If - Then - Else}
+\addcontentsline{toc}{section}{Example 1 : Basic If - Then - Else}
+
+\noindent The if-then-else expression evaluates to one of two values
+based on a condition:
+
+\bigskip
+
+\noindent
+$\IF x > 0 \THEN 1 \ELSE -1$
+
+\noindent If x is positive, this evaluates to 1; otherwise, it evaluates to -1.
+
+\bigskip
+
+\section*{Example 2 : Absolute Value Function}
+\addcontentsline{toc}{section}{Example 2 : Absolute Value Function}
+
+\begin{axdef}
+  abs : \num \fun \nat
+  \where
+  \forall x : \num @ abs(x) = \IF x \geq 0 \THEN x \ELSE -x
+\end{axdef}
+
+\noindent The absolute value function uses if-then-else to handle
+positive and negative cases.
+
+\bigskip
+
+\section*{Example 3 : Maximum Function}
+\addcontentsline{toc}{section}{Example 3 : Maximum Function}
+
+\begin{axdef}
+  maximum : \nat \cross \nat \fun \nat
+  \where
+  \forall a, b : \nat @ maximum(a, b) = \IF a \geq b \THEN a \ELSE b
+\end{axdef}
+
+\noindent Returns the larger of two numbers.
+
+\bigskip
+
+\section*{Example 4 : Sign Function}
+\addcontentsline{toc}{section}{Example 4 : Sign Function}
+
+\begin{axdef}
+  sign : \num \fun \{-1, 0, 1\}
+  \where
+  \forall x : \num @ \\
+  \quad sign(x) = \IF x > 0 \THEN 1 \ELSE \IF x = 0 \THEN 0 \ELSE -1
+\end{axdef}
+
+\noindent Nested if-then-else for three-way branching.
+
+\bigskip
+
+\section*{Example 5 : Conditional in Set Comprehension}
+\addcontentsline{toc}{section}{Example 5 : Conditional in Set Comprehension}
+
+\noindent
+$\{ x : \nat | x < 10 @ \IF x \mod 2 = 0 \THEN x \ELSE x + 1 \}$
+
+\noindent For each x less than 10, select x if it's even, otherwise
+select x + 1.
+
+\bigskip
+
+\section*{Example 6 : Pattern Matching with Conditionals}
+\addcontentsline{toc}{section}{Example 6 : Pattern Matching with Conditionals}
+
+\begin{axdef}
+  filterPositives : \seq \num \fun \seq \num
+  \where
+  filterPositives(\langle \rangle) = \langle \rangle \\
+  \forall x : \num @ \forall s : \seq \num @ filterPositives(\langle
+  x \rangle \cat s) = \IF x > 0 \THEN \langle x \rangle \cat
+  filterPositives(s) \ELSE filterPositives(s)
+\end{axdef}
+
+\noindent Filters a sequence to include only positive elements using
+conditional expressions.
+
+\bigskip
+
+\section*{Example 7 : Grade Assignment}
+\addcontentsline{toc}{section}{Example 7 : Grade Assignment}
+
+\begin{zed}Grade ::= GradeA | GradeB | GradeC | GradeD | GradeF
+\end{zed}
+
+\begin{axdef}
+  scoreToGrade : \nat \fun Grade
+  \where
+  \forall score : \nat @ \\
+  \quad scoreToGrade(score) = \IF score \geq 90 \THEN GradeA \ELSE
+  \IF score \geq 80 \THEN GradeB \ELSE \IF score \geq 70 \THEN GradeC
+  \ELSE \IF score \geq 60 \THEN GradeD \ELSE GradeF
+\end{axdef}
+
+\noindent Multi-way branching using nested if-then-else.
+
+\bigskip
+
+\section*{Example 8 : Piecewise Function}
+\addcontentsline{toc}{section}{Example 8 : Piecewise Function}
+
+\begin{axdef}
+  piecewise : \num \fun \num
+  \where
+  \forall x : \num @ \\
+  \quad piecewise(x) = \IF x < -5 \THEN 0 \ELSE \IF x < 0 \THEN x + 5
+  \ELSE \IF x < 5 \THEN x \ELSE \IF x < 10 \THEN x - 5 \ELSE 0
+\end{axdef}
+
+\noindent A piecewise-defined function with multiple ranges.
+
+\bigskip
+
+\section*{Example 9 : Conditional in Lambda}
+\addcontentsline{toc}{section}{Example 9 : Conditional in Lambda}
+
+\noindent
+$\lambda x : \nat @ \IF x > 100 \THEN 100 \ELSE x$
+
+\noindent Lambda function that caps values at 100.
+
+\bigskip
+
+\section*{Example 10 : Conditional Set Selection}
+\addcontentsline{toc}{section}{Example 10 : Conditional Set Selection}
+
+\begin{axdef}
+  evenSet : \power \nat \\
+  oddSet : \power \nat
+  \where
+  evenSet = \{ n : \nat | n \mod 2 = 0 \} \\
+  oddSet = \{ n : \nat | n \mod 2 = 1 \}
+\end{axdef}
+
+\noindent Define sets that can be selected conditionally in expressions.
+
+\bigskip
+
+\section*{Example 11 : Practical Example - Tax Rate Selection}
+\addcontentsline{toc}{section}{Example 11 : Practical Example - Tax
+Rate Selection}
+
+\begin{axdef}
+  taxRate : \nat \fun \nat
+  \where
+  \forall income : \nat @ \\
+  \quad taxRate(income) = \IF income < 20000 \THEN 10 \ELSE \IF
+  income < 50000 \THEN 15 \ELSE \IF income < 100000 \THEN 20 \ELSE 25
+\end{axdef}
+
+\noindent Progressive tax rates with multi-level conditional.
+
+\bigskip
+
+\section*{Example 12 : Conditional with Complex Expression}
+\addcontentsline{toc}{section}{Example 12 : Conditional with Complex Expression}
+
+\begin{axdef}
+  complexFunc : \nat \fun \nat
+  \where
+  \forall n : \nat @ \\
+  \quad complexFunc(n) = \IF n \mod 3 = 0 \THEN n * n \ELSE \IF n
+  \mod 3 = 1 \THEN n + 10 \ELSE n * 2
+\end{axdef}
+
+\noindent Different computations based on remainder.
+
+\bigskip
+
+\section*{Example 13 : Guard Conditions in Recursion}
+\addcontentsline{toc}{section}{Example 13 : Guard Conditions in Recursion}
+
+\begin{axdef}
+  factorial : \nat \fun \nat
+  \where
+  factorial(0) = 1 \\
+  \forall n : \nat @ \\
+  \quad factorial(n) = \IF n > 0 \THEN n * factorial(n - 1) \ELSE 1
+\end{axdef}
+
+\noindent Conditional ensures factorial only recurses for positive n.
+
+\bigskip
+
+\section*{Example 14 : Ternary - Style Expression}
+\addcontentsline{toc}{section}{Example 14 : Ternary - Style Expression}
+
+\noindent Z notation's if-then-else is similar to C's ternary operator (? :):
+
+\bigskip
+
+\noindent $C : x$ $>$ 0 ? 1 : -1
+
+\bigskip
+
+\noindent $\num : if x$ $>$ 0 then 1 else -1
+
+\bigskip
+
+\noindent Both evaluate to one of two values based on a condition.
+
+\bigskip
+
+\section*{Example 15 : Short - Circuit Evaluation Note}
+\addcontentsline{toc}{section}{Example 15 : Short - Circuit Evaluation Note}
+
+\noindent In Z notation, if-then-else expressions should be evaluated
+$lazily : only$ the selected branch should be evaluated. This matters
+when branches have side effects or may be undefined.
+
+\bigskip
+
+\noindent If a key is not in a function's domain, accessing it would
+be undefined. A conditional ensures we only evaluate the function
+application when it's safe.
+
+\bigskip
+
+\section*{Example 16 : Best Practices}
+\addcontentsline{toc}{section}{Example 16 : Best Practices}
+
+\noindent When using if-then-else:
+
+\bigskip
+
+\noindent 1. Keep branches simple and readable
+
+\bigskip
+
+\noindent 2. For many cases, consider using free types with pattern matching
+
+\bigskip
+
+\noindent 3. Nest carefully—deep nesting hurts readability
+
+\bigskip
+
+\noindent 4. Document complex conditions
+
+\bigskip
+
+\noindent 5. Ensure both branches have the same type
+
+\bigskip
+
+\noindent 6. Consider using helper predicates for complex conditions
+
+\bigskip
+
+\end{document}
