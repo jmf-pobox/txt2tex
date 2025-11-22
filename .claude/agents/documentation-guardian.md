@@ -18,21 +18,27 @@ You oversee three categories of documentation:
 - **CLAUDE.md** - Project context, workflow commands, coding standards, session management
 - **README.md** - Project overview and getting started guide
 - **docs/DESIGN.md** - Architecture, design decisions, operator precedence, AST structure
-- **docs/USER_GUIDE.md** - User-facing syntax reference for whiteboard notation
-- **docs/STATUS.md** - Implementation status, phase tracking, test counts, recent changes
 
-**Specialized Documentation:**
-- **docs/PROOF_SYNTAX.md** - Proof tree syntax and formatting rules
-- **docs/FUZZ_VS_STD_LATEX.md** - Critical fuzz vs standard LaTeX differences
-- **docs/FUZZ_FEATURE_GAPS.md** - Missing Z notation features and implementation roadmap
-- **docs/QA_PLAN.md** - Quality assurance checklist and testing procedures
-- **docs/QA_CHECKS.md** - Specific quality check procedures
-- **docs/NAMING_STANDARDS.md** - Variable and function naming conventions
-- **docs/RESERVED_WORDS.md** - Reserved keywords in the parser
+**User Guides (docs/guides/):**
+- **docs/guides/USER_GUIDE.md** - User-facing syntax reference for whiteboard notation
+- **docs/guides/PROOF_SYNTAX.md** - Proof tree syntax and formatting rules
+- **docs/guides/FUZZ_VS_STD_LATEX.md** - Critical fuzz vs standard LaTeX differences
+- **docs/guides/FUZZ_FEATURE_GAPS.md** - Missing Z notation features and implementation roadmap
 
-**Development Documentation:**
-- **docs/IDE_SETUP.md** - IDE configuration and development environment
-- **docs/CODE_REVIEW.md** - Code review guidelines
+**Tutorials (docs/tutorials/):**
+- **docs/tutorials/README.md** - Tutorial index and learning path
+- **docs/tutorials/00_getting_started.md** through **10_advanced.md** - Step-by-step learning materials
+
+**Development Documentation (docs/development/):**
+- **docs/development/STATUS.md** - Implementation status, phase tracking, test counts, recent changes
+- **docs/development/QA_PLAN.md** - Quality assurance checklist and testing procedures
+- **docs/development/QA_CHECKS.md** - Specific quality check procedures
+- **docs/development/NAMING_STANDARDS.md** - Variable and function naming conventions
+- **docs/development/RESERVED_WORDS.md** - Reserved keywords in the parser
+- **docs/development/IDE_SETUP.md** - IDE configuration and development environment
+- **docs/development/CODE_REVIEW.md** - Code review guidelines
+
+**Test and Example Documentation:**
 - **tests/README.md** - Test organization and conventions
 - **tests/bugs/README.md** - Bug test case documentation
 - **examples/README.md** - Example files and usage

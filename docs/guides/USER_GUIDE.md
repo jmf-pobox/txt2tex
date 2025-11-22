@@ -1888,8 +1888,36 @@ Container[seq[N]]            →  Container[seq[N]]
 ## Getting Help
 
 For more information:
-- See `README.md` for installation and setup
-- See `DESIGN.md` for architecture details
-- Check `examples/` directory for working examples
+- See [../../README.md](../../README.md) for installation and setup
+- See [../DESIGN.md](../DESIGN.md) for architecture details
+- Check `examples/` directory for working examples (48 examples organized by topic)
 - Review phase-specific test files in `tests/` for syntax examples
+
+---
+
+## See Also
+
+### Learning Resources
+- **[Tutorial Index](../tutorials/README.md)** - Step-by-step learning path
+- **[Getting Started](../tutorials/00_getting_started.md)** - Your first txt2tex document
+- **[Propositional Logic Tutorial](../tutorials/01_propositional_logic.md)** - Truth tables and proofs
+- **[Predicate Logic Tutorial](../tutorials/02_predicate_logic.md)** - Quantifiers and domains
+- **[Sets and Types Tutorial](../tutorials/03_sets_and_types.md)** - Set operations and Z types
+- **[Proof Trees Tutorial](../tutorials/04_proof_trees.md)** - Natural deduction proofs
+- **[Z Definitions Tutorial](../tutorials/05_z_definitions.md)** - Schemas and axdefs
+- **[Relations Tutorial](../tutorials/06_relations.md)** - Maplets and relational operators
+- **[Functions Tutorial](../tutorials/07_functions.md)** - Lambda expressions and function types
+- **[Sequences Tutorial](../tutorials/08_sequences.md)** - Sequence notation and operations
+- **[Schemas Tutorial](../tutorials/09_schemas.md)** - Schema notation and operations
+- **[Advanced Topics](../tutorials/10_advanced.md)** - Generic definitions and more
+
+### Reference Documentation
+- **[Proof Syntax Guide](PROOF_SYNTAX.md)** - Detailed proof tree formatting rules
+- **[Fuzz vs Standard LaTeX](FUZZ_VS_STD_LATEX.md)** - Understanding fuzz typechecker quirks
+- **[Feature Gaps](FUZZ_FEATURE_GAPS.md)** - Known limitations and workarounds
+
+### Development Resources
+- **[Implementation Status](../development/STATUS.md)** - Current features and roadmap
+- **[IDE Setup](../development/IDE_SETUP.md)** - VSCode/Cursor configuration
+- **[QA Plan](../development/QA_PLAN.md)** - Testing and validation procedures
 

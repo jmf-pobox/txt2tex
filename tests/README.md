@@ -259,7 +259,7 @@ This test suite was reorganized in October 2025 from a phase-based system (test_
 
 ## References
 
-- [docs/USER_GUIDE.md](../docs/USER_GUIDE.md) - Syntax guide for features tested here
+- [docs/guides/USER_GUIDE.md](../docs/guides/USER_GUIDE.md) - Syntax guide for features tested here
 - [docs/DESIGN.md](../docs/DESIGN.md) - Architecture behind the tested code
-- [docs/STATUS.md](../docs/STATUS.md) - Current implementation status and coverage
+- [docs/development/STATUS.md](../docs/development/STATUS.md) - Current implementation status and coverage
 - [glossary.pdf](../examples/reference/glossary.pdf) - Course symbol reference
