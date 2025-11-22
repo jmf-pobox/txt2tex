@@ -88,3 +88,5 @@ htmlcov/
 
 # ruff
 .ruff_cache/
+# Homework solutions - private
+hw/
