@@ -1,10 +1,13 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Recursive Function Examples}
@@ -12,17 +15,12 @@
 \begin{zed}[Entry]
 \end{zed}
 
-\bigskip
-
-This file demonstrates recursive functions on sequences.
+\noindent This file demonstrates recursive functions on sequences.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 1 : Simple recursive function}
-
-\medskip
+\section*{Example 1 : Simple recursive function}
+\addcontentsline{toc}{section}{Example 1 : Simple recursive function}
 
 \begin{axdef}
   length : \seq Entry \fun \nat
@@ -32,11 +30,8 @@ This file demonstrates recursive functions on sequences.
   \rangle \cat s) = 1 + length(s)
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 2 : Identity function on sequences}
-
-\medskip
+\section*{Example 2 : Identity function on sequences}
+\addcontentsline{toc}{section}{Example 2 : Identity function on sequences}
 
 \begin{axdef}
   identity : \seq Entry \fun \seq Entry
@@ -46,11 +41,8 @@ This file demonstrates recursive functions on sequences.
   \rangle \cat s) = \langle x \rangle \cat identity(s)
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 3 : Sequence doubling}
-
-\medskip
+\section*{Example 3 : Sequence doubling}
+\addcontentsline{toc}{section}{Example 3 : Sequence doubling}
 
 \begin{axdef}
   duplicate : \seq \nat \fun \seq \nat
@@ -60,10 +52,8 @@ This file demonstrates recursive functions on sequences.
   \rangle \cat s) = \langle n, n \rangle \cat duplicate(s)
 \end{axdef}
 
-\bigskip
-
-These examples show pattern matching on sequences with base cases and
-recursive cases.
+\noindent These examples show pattern matching on sequences with base
+cases and recursive cases.
 
 \bigskip
 

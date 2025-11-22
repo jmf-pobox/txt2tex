@@ -1,59 +1,64 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 11 . 7 : Set Literals with Maplets}
 
-\bigskip
-\noindent
-\textbf{Test Cases}
+\section*{Test Cases}
+\addcontentsline{toc}{section}{Test Cases}
 
-\medskip
+\subsection*{(a)}
 
 \noindent
-\hangindent=2em
-(a) $Simple(relation)$
+$Simple(relation)$
 
 \noindent
 $\{2 \mapsto 4, 3 \mapsto 3, 3 \mapsto 4, 4 \mapsto 2\}$
 
 \medskip
 
+\subsection*{(b)}
+
 \noindent
-\hangindent=2em
-(b) $Function(enumeration)$
+$Function(enumeration)$
 
 \noindent
 $\{1 \mapsto a, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
 
 \medskip
 
+\subsection*{(c)}
+
 \noindent
-\hangindent=2em
-(c) $Mixed(set)$
+$Mixed(set)$
 
 \noindent
 $\{1, 2 \mapsto 3, 4\}$
 
 \medskip
 
+\subsection*{(d)}
+
 \noindent
-\hangindent=2em
-(d) $Empty(set)$
+$Empty(set)$
 
 \noindent
 $\{\}$
 
 \medskip
 
+\subsection*{(e)}
+
 \noindent
-\hangindent=2em
-(e) $Nested(sets)$
+$Nested(sets)$
 
 \noindent
 $with(maplets)$
@@ -63,16 +68,15 @@ $\{\{1 \mapsto 2\}, \{3 \mapsto 4\}\}$
 
 \medskip
 
+\subsection*{(f)}
+
 \noindent
-\hangindent=2em
-(f) $Maplets$
+$Maplets$
 
 \noindent
 $with(tuples)$
 
 \noindent
 $\{(0, 0) \mapsto 1, (0, 1) \mapsto 2, (1, 0) \mapsto 3\}$
-
-\medskip
 
 \end{document}

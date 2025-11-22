@@ -1,26 +1,27 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 11 d : Lambda Expressions}
 
+\noindent Lambda expressions provide a concise way to define
+anonymous functions.
+
 \bigskip
 
-Lambda expressions provide a concise way to define anonymous functions.
+\medskip
 
-\bigskip
+\subsection*{(a)}
 
-(a)
-\par
-\vspace{11pt}
-\bigskip
-
-Simple lambda expression
+\noindent Simple lambda expression
 
 \bigskip
 
@@ -29,12 +30,9 @@ $\lambda x : \nat @ x^2$
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(b)}
 
-Multi-variable lambda
+\noindent Multi-variable lambda
 
 \bigskip
 
@@ -43,12 +41,9 @@ $\lambda x, y : \nat @ x \land y$
 
 \medskip
 
-(c)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(c)}
 
-Lambda with comparison
+\noindent Lambda with comparison
 
 \bigskip
 
@@ -57,12 +52,9 @@ $\lambda x : \nat @ x > 0$
 
 \medskip
 
-(d)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(d)}
 
-Nested lambda expression
+\noindent Nested lambda expression
 
 \bigskip
 
@@ -71,18 +63,13 @@ $\lambda x : X @ \lambda y : Y @ x \land y$
 
 \medskip
 
-(e)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(e)}
 
-Lambda with quantifier in body
+\noindent Lambda with quantifier in body
 
 \bigskip
 
 \noindent
 $\lambda x : X @ \forall y : Y @ x \lor y$
-
-\medskip
 
 \end{document}

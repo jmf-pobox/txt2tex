@@ -1,116 +1,134 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Equivalence Chains}
 
+\section*{Solution 1}
+\addcontentsline{toc}{section}{Solution 1}
+
+\subsection*{(a)}
+
+\noindent
+$Commutative(property)$
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      p \land q \\
+      \Leftrightarrow q \land p & [\mbox{commutative}]
+    \end{array}$%
+  }
+\end{center}
 \bigskip
-\noindent
-\textbf{Solution 1}
 
 \medskip
 
-\noindent
-\hangindent=2em
-(a) $Commutative(property)$
-
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & p \land q \\
-    &\Leftrightarrow q \land p & [\mbox{commutative}]
-  \end{array}
-\]
-
-\medskip
+\subsection*{(b)}
 
 \noindent
-\hangindent=2em
-(b) $De(Morgan)(law)$
+$De(Morgan)(law)$
 
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & \lnot (p \land q) \\
-    &\Leftrightarrow \lnot p \lor \lnot q & [\mbox{De Morgan}] \\
-    &\Leftrightarrow \lnot p \lor \lnot q & [\mbox{parentheses}]
-  \end{array}
-\]
-
-\medskip
-
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \lnot (p \land q) \\
+      \Leftrightarrow \lnot p \lor \lnot q & [\mbox{De Morgan}] \\
+      \Leftrightarrow \lnot p \lor \lnot q & [\mbox{parentheses}]
+    \end{array}$%
+  }
+\end{center}
 \bigskip
-\noindent
-\textbf{Solution 2}
 
-\medskip
+\section*{Solution 2}
+\addcontentsline{toc}{section}{Solution 2}
+
+\subsection*{(a)}
 
 \noindent
-\hangindent=2em
-(a) $Definition$
+$Definition$
 
 \noindent
 $of(implication)$
 
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & p \implies q \\
-    &\Leftrightarrow \lnot p \lor q & [\mbox{definition}]
-  \end{array}
-\]
-
-\medskip
-
-\noindent
-\hangindent=2em
-(b) $Multiple(equivalence)(steps)$
-
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & (p \land q) \lor (p \land r) \\
-    &\Leftrightarrow p \land (q \lor r) & [\mbox{distributive}] \\
-    &\Leftrightarrow (q \lor r) \land p & [\mbox{commutative}] \\
-    &\Leftrightarrow p \land (r \lor q) & [\mbox{commutative}]
-  \end{array}
-\]
-
-\medskip
-
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      p \implies q \\
+      \Leftrightarrow \lnot p \lor q & [\mbox{definition}]
+    \end{array}$%
+  }
+\end{center}
 \bigskip
-\noindent
-\textbf{Solution 3}
 
 \medskip
 
-\noindent
-\hangindent=2em
-(a) $Equivalence(chain)(without)(justifications)$
+\subsection*{(b)}
 
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & p \lor p \\
-    &\Leftrightarrow p
-  \end{array}
-\]
+\noindent
+$Multiple(equivalence)(steps)$
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      (p \land q) \lor (p \land r) \\
+      \Leftrightarrow p \land (q \lor r) & [\mbox{distributive}] \\
+      \Leftrightarrow (q \lor r) \land p & [\mbox{commutative}] \\
+      \Leftrightarrow p \land (r \lor q) & [\mbox{commutative}]
+    \end{array}$%
+  }
+\end{center}
+\bigskip
+
+\section*{Solution 3}
+\addcontentsline{toc}{section}{Solution 3}
+
+\subsection*{(a)}
+
+\noindent
+$Equivalence(chain)(without)(justifications)$
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      p \lor p \\
+      \Leftrightarrow p
+    \end{array}$%
+  }
+\end{center}
+\bigskip
 
 \medskip
 
+\subsection*{(b)}
+
 \noindent
-\hangindent=2em
-(b) $Mixed(justifications)$
+$Mixed(justifications)$
 
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & p \Leftrightarrow q \\
-    &\Leftrightarrow (p \implies q) \land (q \implies p) &
-    [\mbox{definition}] \\
-    &\Leftrightarrow (\lnot p \lor q) \land (\lnot q \lor p)
-  \end{array}
-\]
-
-\medskip
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      p \Leftrightarrow q \\
+      \Leftrightarrow (p \implies q) \land (q \implies p) &
+      [\mbox{definition}] \\
+      \Leftrightarrow (\lnot p \lor q) \land (\lnot q \lor p)
+    \end{array}$%
+  }
+\end{center}
+\bigskip
 
 \end{document}

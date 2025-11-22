@@ -42,8 +42,8 @@ properties using only fuzz-compatible notation.
 
 \noindent This axiomatically defines squashFunc (a user-defined
 version of squash) with two key properties that hold for all partial
-functions f from N1 to X: (1) squashFunc preserves the $range : ran
-(squashFunc f) $= ran f, and (2) the resulting sequence length equals
+functions f from N1 to X: (1) squashFunc preserves the $range : ran$
+(squashFunc f) = ran f, and (2) the resulting sequence length equals
 the range cardinality: # (squashFunc f) = # (ran f). These properties
 characterize squashFunc as compacting partial functions by removing
 domain gaps while preserving all elements and their relative order.
@@ -102,8 +102,8 @@ positions 1, 3, 5, 6, 8 are removed.
   f3 = \{\} \land s3 = squashFunc(f3)
 \end{axdef}
 
-\noindent Squashing an empty function yields an empty $sequence : s3
-$= $\langle \rangle$.
+\noindent Squashing an empty function yields an empty $sequence : s3$
+= $\langle \rangle$.
 
 \bigskip
 
@@ -118,7 +118,7 @@ $= $\langle \rangle$.
 \end{axdef}
 
 \noindent When the function has no gaps (dom $f4 = 1$..3), squashFunc
-simply converts it to a $sequence : s4 $= $\langle 100, 200, 300 \rangle$.
+simply converts it to a $sequence : s4$ = $\langle 100, 200, 300 \rangle$.
 
 \bigskip
 

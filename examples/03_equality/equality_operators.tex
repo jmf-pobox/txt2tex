@@ -1,23 +1,21 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Equality Operators}
 
-\bigskip
-\noindent
-\textbf{Example 1 : Basic Equality}
+\section*{Example 1 : Basic Equality}
+\addcontentsline{toc}{section}{Example 1 : Basic Equality}
 
-\medskip
-
-\bigskip
-
-The equality operator compares values:
+\noindent The equality operator compares values:
 
 \bigskip
 
@@ -27,15 +25,10 @@ $x = y$
 \noindent
 $x \neq y$
 
-\bigskip
-\noindent
-\textbf{Example 2 : Equality in Predicates}
+\section*{Example 2 : Equality in Predicates}
+\addcontentsline{toc}{section}{Example 2 : Equality in Predicates}
 
-\medskip
-
-\bigskip
-
-Equality is commonly used in quantified predicates:
+\noindent Equality is commonly used in quantified predicates:
 
 \bigskip
 
@@ -45,15 +38,10 @@ $\forall x : \nat @ x = x$
 \noindent
 $\exists y : \num @ y = 0$
 
-\bigskip
-\noindent
-\textbf{Example 3 : Equality in Set Comprehension}
+\section*{Example 3 : Equality in Set Comprehension}
+\addcontentsline{toc}{section}{Example 3 : Equality in Set Comprehension}
 
-\medskip
-
-\bigskip
-
-Using equality to define sets:
+\noindent Using equality to define sets:
 
 \bigskip
 
@@ -63,15 +51,10 @@ $\{ z : \num | z = 10 \}$
 \noindent
 $\{ n : \nat | n = n \}$
 
-\bigskip
-\noindent
-\textbf{Example 4 : Equality with Expressions}
+\section*{Example 4 : Equality with Expressions}
+\addcontentsline{toc}{section}{Example 4 : Equality with Expressions}
 
-\medskip
-
-\bigskip
-
-Equality can compare complex expressions:
+\noindent Equality can compare complex expressions:
 
 \bigskip
 

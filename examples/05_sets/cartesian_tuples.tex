@@ -1,26 +1,23 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 8 : Set Comprehension}
 
-\bigskip
-\noindent
-\textbf{Example 1 : Set by Predicate}
+\section*{Example 1 : Set by Predicate}
+\addcontentsline{toc}{section}{Example 1 : Set by Predicate}
 
-\medskip
+\subsection*{(a)}
 
-(a)
-\par
-\vspace{11pt}
-\bigskip
-
-Basic set comprehension with domain
+\noindent Basic set comprehension with domain
 
 \bigskip
 
@@ -29,12 +26,9 @@ $\{ x : \nat | x > 0 \}$
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(b)}
 
-Multi variable set
+\noindent Multi variable set
 
 \bigskip
 
@@ -43,32 +37,21 @@ $\{ x, y : \nat | x = y \}$
 
 \medskip
 
-(c)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(c)}
 
-Set without domain
+\noindent Set without domain
 
 \bigskip
 
 \noindent
 $\{ x | x \in A \}$
 
-\medskip
+\section*{Example 2 : Set by Expression}
+\addcontentsline{toc}{section}{Example 2 : Set by Expression}
 
-\bigskip
-\noindent
-\textbf{Example 2 : Set by Expression}
+\subsection*{(a)}
 
-\medskip
-
-(a)
-\par
-\vspace{11pt}
-\bigskip
-
-Set comprehension with expression part
+\noindent Set comprehension with expression part
 
 \bigskip
 
@@ -77,32 +60,21 @@ $\{ x : \nat | x > 0 @ x^2 \}$
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(b)}
 
-Combining set comprehension with quantifier
+\noindent Combining set comprehension with quantifier
 
 \bigskip
 
 \noindent
 $\forall x : \nat @ x \in \{ y : \nat | y > 0 \}$
 
-\medskip
+\section*{Example 3 : Complex Examples}
+\addcontentsline{toc}{section}{Example 3 : Complex Examples}
 
-\bigskip
-\noindent
-\textbf{Example 3 : Complex Examples}
+\subsection*{(a)}
 
-\medskip
-
-(a)
-\par
-\vspace{11pt}
-\bigskip
-
-Set comprehension in equivalence
+\noindent Set comprehension in equivalence
 
 \bigskip
 
@@ -111,18 +83,13 @@ $\{ x : \nat | x > 0 \} = \{ y : \nat | y > 0 \}$
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(b)}
 
-Set comprehension with multiple conditions
+\noindent Set comprehension with multiple conditions
 
 \bigskip
 
 \noindent
 $\{ x : \nat | x > 0 \land x \leq 10 \}$
-
-\medskip
 
 \end{document}

@@ -3,7 +3,7 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
-\usepackage{zed-cm}
+\usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
@@ -19,7 +19,8 @@
 
 \bigskip
 
-\noindent $(p \land (q \lor r))$ $\Leftrightarrow$ $((p \land q) \lor (p \land r))$
+\noindent $(p \land (q \lor r))$ $\Leftrightarrow$ $((p \land q) \lor
+(p \land r))$
 
 \bigskip
 
@@ -27,60 +28,69 @@
 
 \bigskip
 
-\noindent 1. Forward direction: $(p \land (q \lor r))$ $\Rightarrow$ $((p \land q) \lor (p \land r))$
+\noindent 1. Forward direction: $(p \land (q \lor r))$ $\Rightarrow$
+$((p \land q) \lor (p \land r))$
 
 \bigskip
 
-\noindent 2. Backward direction: $((p \land q) \lor (p \land r))$ $\Rightarrow$ $(p \land (q \lor r))$
+\noindent 2. Backward direction: $((p \land q) \lor (p \land r))$
+$\Rightarrow$ $(p \land (q \lor r))$
 
 \bigskip
 
 \section*{Solution : Forward Direction}
 \addcontentsline{toc}{section}{Solution : Forward Direction}
 
-\noindent First, we prove the forward implication. Starting from p and $(q \lor r)$,
+\noindent First, we prove the forward implication. Starting from p
+and $(q \lor r)$,
 
 \bigskip
 
-\noindent we extract p and $(q \lor r)$ separately, then case-analyze on $(q \lor r)$.
+\noindent we extract p and $(q \lor r)$ separately, then case-analyze
+on $(q \lor r)$.
 
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land (q \lor r)) \Rightarrow ((p \land q) \lor (p \land r))}{
-  \ulcorner p \land (q \lor r) \urcorner^{[1]}
-&
-\infer[\lor\textrm{-elim}^{[2]}]{(p \land q) \lor (p \land r)}{
-  \ulcorner q \lor r \urcorner^{[1]}
-&
-\raiseproof{10ex}{\infer[\lor \mathrm{intro}]{(p \land q) \lor (p \land r)}{\infer[\land \mathrm{intro}]{p \land q}{
-  \infer[\land\textrm{-elim}^{[1]}]{p}{}
-&
-\infer[\mathrm{case} \mathrm{assumption}]{q}{}
-}}}
-&
-\hskip 6em \raiseproof{26ex}{\infer[\lor \mathrm{intro}]{(p \land q) \lor (p \land r)}{\infer[\land \mathrm{intro}]{p \land r}{
-  \infer[\land\textrm{-elim}^{[1]}]{p}{}
-&
-\infer[\mathrm{case} \mathrm{assumption}]{r}{}
-}}}
-}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land (q \lor r))
+    \implies ((p \land q) \lor (p \land r))}{
+      \ulcorner p \land (q \lor r) \urcorner^{[1]}
+      &
+      \infer[\lor\textrm{-elim}^{[2]}]{(p \land q) \lor (p \land r)}{
+        \ulcorner q \lor r \urcorner^{[1]}
+        &
+        \raiseproof{10ex}{\infer[\lor \mathrm{intro}]{(p \land q)
+          \lor (p \land r)}{\infer[\land \mathrm{intro}]{p \land q}{
+              \infer[\land\textrm{-elim}^{[1]}]{p}{}
+              &
+              \infer[\mathrm{case} \mathrm{assumption}]{q}{}
+        }}}
+        &
+        \hskip 6em \raiseproof{26ex}{\infer[\lor \mathrm{intro}]{(p
+          \land q) \lor (p \land r)}{\infer[\land \mathrm{intro}]{p \land r}{
+              \infer[\land\textrm{-elim}^{[1]}]{p}{}
+              &
+              \infer[\mathrm{case} \mathrm{assumption}]{r}{}
+        }}}
+      }
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
-\noindent Key insight: We extract p once, then use it in both cases after splitting on $(q \lor r)$.
+\noindent Key $insight : We extract p once$, then use it in both
+cases after splitting on $(q \lor r)$.
 
 \bigskip
 
 \section*{Solution : Backward Direction}
 \addcontentsline{toc}{section}{Solution : Backward Direction}
 
-\noindent For the backward direction, we start with $(p \land q)$ or $(p \land r)$ and
+\noindent For the backward direction, we start with $(p \land q)$ or
+$(p \land r)$ and
 
 \bigskip
 
@@ -93,25 +103,31 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[3]}]{((p \land q) \lor (p \land r)) \Rightarrow (p \land (q \lor r))}{
-  \ulcorner (p \land q) \lor (p \land r) \urcorner^{[3]}
-&
-\infer[\lor\textrm{-elim}^{[4]}]{p \land (q \lor r)}{
-  \ulcorner case1 \lor case2 \urcorner^{[3]}
-&
-\raiseproof{8ex}{\infer[\land \mathrm{intro}]{p \land (q \lor r)}{\infer[\land \mathrm{elim}]{p}{} & \infer[\lor \mathrm{intro}]{q \lor r}{}}}
-&
-\hskip 6em \raiseproof{22ex}{\infer[\land \mathrm{intro}]{p \land (q \lor r)}{\infer[\land \mathrm{elim}]{p}{} & \infer[\lor \mathrm{intro}]{q \lor r}{}}}
-}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[3]}]{((p \land q) \lor (p
+    \land r)) \implies (p \land (q \lor r))}{
+      \ulcorner (p \land q) \lor (p \land r) \urcorner^{[3]}
+      &
+      \infer[\lor\textrm{-elim}^{[4]}]{p \land (q \lor r)}{
+        \ulcorner case1 \lor case2 \urcorner^{[3]}
+        &
+        \raiseproof{8ex}{\infer[\land \mathrm{intro}]{p \land (q \lor
+          r)}{\infer[\land \mathrm{elim}]{p}{} & \infer[\lor
+        \mathrm{intro}]{q \lor r}{}}}
+        &
+        \hskip 6em \raiseproof{22ex}{\infer[\land \mathrm{intro}]{p
+          \land (q \lor r)}{\infer[\land \mathrm{elim}]{p}{} &
+        \infer[\lor \mathrm{intro}]{q \lor r}{}}}
+      }
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
-\noindent Key insight: Both cases yield the same conclusion p and $(q \lor r)$, since
+\noindent Key $insight : Both cases yield$ the same conclusion p and
+$(q \lor r)$, since
 
 \bigskip
 
@@ -126,23 +142,26 @@ $%
 
 \bigskip
 
-\noindent - $(p \land (q \lor r))$ $\Rightarrow$ $((p \land q) \lor (p \land r))$
+\noindent - $(p \land (q \lor r))$ $\Rightarrow$ $((p \land q) \lor
+(p \land r))$
 
 \bigskip
 
-\noindent - $((p \land q) \lor (p \land r))$ $\Rightarrow$ $(p \land (q \lor r))$
+\noindent - $((p \land q) \lor (p \land r))$ $\Rightarrow$ $(p \land
+(q \lor r))$
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent We can combine them $using \Leftrightarrow introduction$ to conclude:
+\noindent We can combine them $using \iff introduction$ to conclude:
 
 \bigskip
 
-\noindent $(p \land (q \lor r))$ $\Leftrightarrow$ $((p \land q) \lor (p \land r))$
+\noindent $(p \land (q \lor r))$ $\Leftrightarrow$ $((p \land q) \lor
+(p \land r))$
 
 \bigskip
 
@@ -153,11 +172,12 @@ $%
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 1. **Bidirectional proof structure**: Equivalences require proving both directions
+\noindent 1. **Bidirectional proof structure**: Equivalences require
+proving both directions
 
 \bigskip
 
@@ -169,19 +189,22 @@ $%
 
 \bigskip
 
-\noindent 4. **Proof symmetry**: Both directions use similar patterns but different orders
+\noindent 4. **Proof symmetry**: Both directions use similar patterns
+but different orders
 
 \bigskip
 
-\noindent 5. **Combining inference rules**: Multiple rules work together naturally
+\noindent 5. **Combining inference rules**: Multiple rules work
+together naturally
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent The distributive law is fundamental in logic and appears frequently in:
+\noindent The distributive law is fundamental in logic and appears
+frequently in:
 
 \bigskip
 
@@ -212,11 +235,12 @@ $%
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent This proof will use similar techniques but with the roles of and/or reversed.
+\noindent This proof will use similar techniques but with the roles
+of and/or reversed.
 
 \bigskip
 

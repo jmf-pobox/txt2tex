@@ -1,29 +1,26 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Test}
 
-\bigskip
-\noindent
-\textbf{Question 6}
+\section*{Question 6}
+\addcontentsline{toc}{section}{Question 6}
 
-\medskip
+\subsection*{(a)}
 
-(a)
-\par
-\vspace{11pt}
 \begin{axdef}
   Squares : \power \num
   \where
   Squares = \{ z : \num | z > 0 @ z * z \}
 \end{axdef}
-
-\medskip
 
 \end{document}

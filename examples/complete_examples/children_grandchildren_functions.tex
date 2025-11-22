@@ -66,7 +66,7 @@
 
 \bigskip
 
-\noindent Type $signature : children $: $Person \fun \power$ Person
+\noindent Type $signature : children$ : $Person \fun \power$ Person
 
 \bigskip
 
@@ -97,7 +97,7 @@ where p is a parent of c.
 
 \bigskip
 
-\noindent {$p : Person $. p $\mapsto$ ...}
+\noindent {$p : Person$ . p $\mapsto$ ...}
 
 \bigskip
 
@@ -238,7 +238,7 @@ $(R \limg B \rimg)$
 
 \bigskip
 
-\noindent Intuition: Given a relation R and a set of starting points A,
+\noindent $Intuition : Given$ a relation R and a set of starting points A,
 
 \bigskip
 
@@ -259,7 +259,7 @@ Grandchildren Function}
 
 \bigskip
 
-\noindent Type $signature : number_of_grandchildren $: $Person \fun \nat$
+\noindent Type $signature : number_of_grandchildren$ : $Person \fun \nat$
 
 \bigskip
 
@@ -307,7 +307,7 @@ express via composition.
 
 \bigskip
 
-\noindent Meaning: p is a grandparent of g.
+\noindent $Meaning : p$ is a grandparent of g.
 
 \bigskip
 
@@ -454,11 +454,11 @@ express via composition.
 
 \bigskip
 
-\noindent - Alice has $children : Bob, Carol$
+\noindent - Alice has $children : Bob$, Carol
 
 \bigskip
 
-\noindent - Bob has $children : Dave, Eve$
+\noindent - Bob has $children : Dave$, Eve
 
 \bigskip
 
@@ -517,8 +517,7 @@ express via composition.
 
 \bigskip
 
-\noindent - children: $Person \fun \power$ Person (a person may have
-0+ children)
+\noindent - $children : Person$ $\fun$ P Person (a person may have 0+ children)
 
 \bigskip
 
@@ -601,34 +600,7 @@ from simpler ones
 \section*{Specification Completeness}
 \addcontentsline{toc}{section}{Specification Completeness}
 
-\noindent Complete axiomatic definitions with all functions:
-
-\bigskip
-
-\begin{axdef}
-  parentOf : Person \rel Person \\
-  children : Person \fun \power Person \\
-  grandchildren : Person \fun \power Person \\
-  number\_of\_grandchildren : Person \fun \nat
-  \where
-  children = \{ p : Person @ p \mapsto (parentOf \limg \{p\} \rimg) \} \\
-  grandchildren = \{ p : Person @ p \mapsto ((parentOf \circ
-  parentOf) \limg \{p\} \rimg) \} \\
-  number\_of\_grandchildren = \{ p : Person @ p \mapsto \# (grandchildren(p)) \}
-\end{axdef}
-
-\section*{Exercise for the Reader}
-\addcontentsline{toc}{section}{Exercise for the Reader}
-
-\noindent 1. Define a function $descendants : Person  \fun  P Person$
-
-\bigskip
-
-\noindent that returns all descendants (children, grandchildren, etc.)
-
-\bigskip
-
-\noindent $Hint : use transitive closure (+)$
+\noindent Summary of all definitions declared above:
 
 \bigskip
 
@@ -636,7 +608,103 @@ from simpler ones
 
 \bigskip
 
-\noindent 2. Define a function $oldest\_child : Person  \pfun  Person$
+\noindent 1. **parentOf** : Person $\rel$ Person
+
+\bigskip
+
+\noindent Base relation representing direct parent-child relationships
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 2. **children** : $Person \fun \power$ Person
+
+\bigskip
+
+\noindent Function mapping each person to their set of children
+
+\bigskip
+
+\noindent $Definition : children$ = {$p : Person$ . p $\mapsto$
+$(parentOf \limg \{p\} \rimg)$}
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 3. **grandchildren** : $Person \fun \power$ Person
+
+\bigskip
+
+\noindent Function mapping each person to their set of grandchildren
+
+\bigskip
+
+\noindent $Definition : grandchildren$ = {$p : Person$ . p $\mapsto$
+$((parentOf \circ parentOf) \limg \{p\} \rimg)$}
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 4. **number\_of\_grandchildren** : $Person \fun \nat$
+
+\bigskip
+
+\noindent Function counting grandchildren for each person
+
+\bigskip
+
+\noindent $Definition : number_of_grandchildren$ = $\{ p : Person @ p
+\mapsto \# (grandchildren(p)) \}$
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent These definitions form a progressive $hierarchy : parentOf$
+is the base relation,
+
+\bigskip
+
+\noindent children builds on it, grandchildren uses composition of parentOf, and
+
+\bigskip
+
+\noindent number\_of\_grandchildren applies cardinality to the
+grandchildren set.
+
+\bigskip
+
+\section*{Exercise for the Reader}
+\addcontentsline{toc}{section}{Exercise for the Reader}
+
+\noindent 1. Define a function $descendants : Person$ $\fun$ P Person
+
+\bigskip
+
+\noindent that returns all descendants (children, grandchildren, etc.)
+
+\bigskip
+
+\noindent $Hint : use transitive closure$ (+)
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 2. Define a function $oldest\_child : Person$ $\pfun$ Person
 
 \bigskip
 
@@ -644,7 +712,7 @@ from simpler ones
 
 \bigskip
 
-\noindent $Hint : you$'ll need an age function
+\noindent $Hint : you'll need$ an age function
 
 \bigskip
 

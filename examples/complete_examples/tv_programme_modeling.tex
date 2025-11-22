@@ -3,7 +3,7 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
-\usepackage{zed-cm}
+\usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
@@ -88,16 +88,21 @@
 \section*{Domain Setup}
 \addcontentsline{toc}{section}{Domain Setup}
 
-\noindent We define given types for programme attributes and a schema for programmes:
+\noindent We define given types for programme attributes and a schema
+for programmes:
 
 \bigskip
 
-\begin{zed}[Title, Length, Viewed]\end{zed}
+\begin{zed}[Title]
+\end{zed}
+
+\begin{zed}YesNo ::= yes | no
+\end{zed}
 
 \begin{schema}{Programme}
-title : Title \\
-length : Length \\
-viewed : Viewed
+  title : Title \\
+  length : \nat \\
+  viewed : YesNo
 \end{schema}
 
 \noindent Design rationale:
@@ -108,19 +113,19 @@ viewed : Viewed
 
 \bigskip
 
-\noindent - Length is a given type (represents natural numbers in seconds)
+\noindent - length is N (natural numbers representing seconds)
 
 \bigskip
 
-\noindent - Viewed is a given type (represents yes/no, could be boolean)
+\noindent - YesNo is a free type with two $constructors : yes$ and no
 
 \bigskip
 
-\noindent - Schema provides named field access: p.title, p.length, p.viewed
+\noindent - Schema provides named field $access : p.title$, p.length, p.viewed
 
 \bigskip
 
-\noindent - More maintainable than tuples: (Title cross Length cross Viewed)
+\noindent - More maintainable than tuples: (Title cross N cross YesNo)
 
 \bigskip
 
@@ -131,18 +136,38 @@ viewed : Viewed
 
 \bigskip
 
+\noindent
+
+\bigskip
+
+\noindent First, we need the cumulativeTotal function (defined in part d):
+
+\bigskip
+
 \begin{axdef}
-hd : \seq Programme
-\where
-cumulativeTotal(hd) \leq 12000 \\
-\forall p \colon \ran hd \bullet p.length \leq 360
+  cumulativeTotal : \seq Programme \fun \nat
+  \where
+  cumulativeTotal(\langle \rangle) = 0 \\
+  \forall x : Programme @ \forall s : \seq Programme @
+  cumulativeTotal(\langle x \rangle \cat s) = x.length + cumulativeTotal(s)
+\end{axdef}
+
+\noindent Now we can define the DVR with constraints:
+
+\bigskip
+
+\begin{axdef}
+  hd : \seq Programme
+  \where
+  cumulativeTotal(hd) \leq 12000 \\
+  \forall p : \ran hd @ p.length \leq 360
 \end{axdef}
 
 \noindent Constraint analysis:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -154,15 +179,11 @@ cumulativeTotal(hd) \leq 12000 \\
 
 \bigskip
 
-\noindent Uses cumulativeTotal function defined in part (d)
+\noindent
 
 \bigskip
 
-\noindent 
-
-\bigskip
-
-\noindent 2. $\forall p \colon \ran hd \bullet p.length \leq 360$
+\noindent 2. $\forall p : \ran hd @ p.length \leq 360$
 
 \bigskip
 
@@ -174,7 +195,7 @@ cumulativeTotal(hd) \leq 12000 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -194,18 +215,6 @@ cumulativeTotal(hd) \leq 12000 \\
 
 \bigskip
 
-\noindent 
-
-\bigskip
-
-\noindent Note: This definition uses forward reference to cumulativeTotal.
-
-\bigskip
-
-\noindent In a complete specification, define cumulativeTotal first.
-
-\bigskip
-
 \section*{Solution ( b ) : Finding Long Programme Titles}
 \addcontentsline{toc}{section}{Solution ( b ) : Finding Long Programme Titles}
 
@@ -213,11 +222,11 @@ cumulativeTotal(hd) \leq 12000 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent {$p : ran hd | p$.$length > 120$ . p.title}
+\noindent {$p : ran hd$ $\mid$ p.$length > 120$ . p.title}
 
 \bigskip
 
@@ -225,7 +234,7 @@ cumulativeTotal(hd) \leq 12000 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -237,15 +246,16 @@ cumulativeTotal(hd) \leq 12000 \\
 
 \bigskip
 
-\noindent If hd = $\langle prog1, prog2, prog3 \rangle$, then ran hd = $\{prog1, prog2, prog3\}$
+\noindent If hd = $\langle prog1, prog2, prog3 \rangle$, then ran hd
+= $\{prog1, prog2, prog3\}$
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Step 2: $p : ran hd | p$.$length > 120$
+\noindent Step 2: $p : ran hd$ $\mid$ p.$length > 120$
 
 \bigskip
 
@@ -257,7 +267,7 @@ cumulativeTotal(hd) \leq 12000 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -273,19 +283,19 @@ cumulativeTotal(hd) \leq 12000 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Result type: P Title (set of titles)
+\noindent Result $type : P Title$ (set of titles)
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent $Example : If hd contains$:
+\noindent $Example : If hd contains:$
 
 \bigskip
 
@@ -313,21 +323,23 @@ cumulativeTotal(hd) \leq 12000 \\
 \bigskip
 
 \begin{axdef}
-viewedProgrammes : \seq Programme \fun \seq Programme
-\where
-viewedProgrammes(\langle \rangle) = \langle \rangle \\
-\forall x \colon Programme \bullet \forall s \colon \seq Programme \bullet viewedProgrammes(\langle x \rangle \cat s) = (\mbox{if } x.viewed = yes \mbox{ then } \langle x \rangle \cat viewedProgrammes(s) \mbox{ else } viewedProgrammes(s))
+  viewedProgrammes : \seq Programme \fun \seq Programme
+  \where
+  viewedProgrammes(\langle \rangle) = \langle \rangle \\
+  \forall x : Programme @ \forall s : \seq Programme @
+  viewedProgrammes(\langle x \rangle \cat s) = \IF x.viewed = yes
+  \THEN \langle x \rangle \cat viewedProgrammes(s) \ELSE viewedProgrammes(s)
 \end{axdef}
 
 \noindent Recursive structure:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Base $case : viewedProgrammes($$\langle \rangle$) = $\langle \rangle$
+\noindent Base $case : viewedProgrammes($\langle$ \rangle$) = $\langle \rangle$
 
 \bigskip
 
@@ -335,11 +347,11 @@ viewedProgrammes(\langle \rangle) = \langle \rangle \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Inductive $case : viewedProgrammes($$\langle x \rangle$ ^ s)
+\noindent Inductive $case : viewedProgrammes($\langle x$ \rangle$ ^ s)
 
 \bigskip
 
@@ -351,11 +363,11 @@ viewedProgrammes(\langle \rangle) = \langle \rangle \\
 
 \bigskip
 
-\noindent If x.viewed /= yes: skip x, recurse on s
+\noindent If x.viewed /= $yes : skip x$, recurse on s
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -371,7 +383,7 @@ viewedProgrammes(\langle \rangle) = \langle \rangle \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -383,7 +395,9 @@ viewedProgrammes(\langle \rangle) = \langle \rangle \\
 
 \bigskip
 
-\noindent = if p1.$viewed = yes$ then $\langle p1 \rangle$ ^ viewedProgrammes($\langle p2, p3, p4 \rangle$) else viewedProgrammes($\langle p2, p3, p4 \rangle$)
+\noindent = if p1.$viewed = yes$ then $\langle p1 \rangle$ ^
+viewedProgrammes($\langle p2, p3, p4 \rangle$) else
+viewedProgrammes($\langle p2, p3, p4 \rangle$)
 
 \bigskip
 
@@ -391,37 +405,60 @@ viewedProgrammes(\langle \rangle) = \langle \rangle \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent This is a$ \filter $operation: keeps elements satisfying a predicate.
+\noindent This is a$ \filter $$operation : keeps elements satisfying$
+a predicate.
 
 \bigskip
 
 \section*{Solution ( d ) : Cumulative Total Storage}
 \addcontentsline{toc}{section}{Solution ( d ) : Cumulative Total Storage}
 
-\noindent Calculate total storage used by summing all programme lengths:
+\noindent Calculate total storage used by summing all programme lengths.
 
 \bigskip
 
-\begin{axdef}
-cumulativeTotal : \seq Programme \fun \mathbb{N}
-\where
-cumulativeTotal(\langle \rangle) = 0 \\
-\forall x \colon Programme \bullet \forall s \colon \seq Programme \bullet cumulativeTotal(\langle x \rangle \cat s) = x.length + cumulativeTotal(s)
-\end{axdef}
+\noindent We already defined this function in part (a):
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent $cumulativeTotal : seq(Programme)$ $\fun$ N
+
+\bigskip
+
+\noindent cumulativeTotal($\langle \rangle$) = 0
+
+\bigskip
+
+\noindent $\forall$ $x : Programme; s$ : seq(Programme) $\mid$
+
+\bigskip
+
+\noindent cumulativeTotal($\langle x \rangle$ ^ s) = x.length +
+cumulativeTotal(s)
+
+\bigskip
+
+\noindent
+
+\bigskip
 
 \noindent Recursive structure:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Base $case : cumulativeTotal($$\langle \rangle$) = 0
+\noindent Base $case : cumulativeTotal($\langle$ \rangle$) = 0
 
 \bigskip
 
@@ -429,11 +466,12 @@ cumulativeTotal(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Inductive $case : cumulativeTotal($$\langle x \rangle$ ^ s) = x.length + cumulativeTotal(s)
+\noindent Inductive $case : cumulativeTotal($\langle x$ \rangle$ ^ s)
+= x.length + cumulativeTotal(s)
 
 \bigskip
 
@@ -441,7 +479,7 @@ cumulativeTotal(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -449,7 +487,7 @@ cumulativeTotal(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -457,23 +495,24 @@ cumulativeTotal(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent $Prove : cumulativeTotal(s) $= sum of all lengths in s
+\noindent $Prove : cumulativeTotal(s)$ = sum of all lengths in s
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent $Base : cumulativeTotal($$\langle \rangle$) = 0 = sum of lengths in $\langle \rangle$ ✓
+\noindent $Base : cumulativeTotal($\langle$ \rangle$) = 0 = sum of
+lengths in $\langle \rangle$ ✓
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent $Step : Assume cumulativeTotal(s) $= sum of lengths in s
+\noindent $Step : Assume cumulativeTotal(s)$ = sum of lengths in s
 
 \bigskip
 
@@ -501,14 +540,14 @@ cumulativeTotal(\langle \rangle) = 0 \\
 \bigskip
 
 \noindent
-$\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.length > q \bullet length) \land p.title$
-
+$(\mu p : \ran hd | (\forall q : \ran hd | p \neq q \land p.length >
+q @ length) \land p.title)$
 
 \noindent Mu operator semantics:
 
 \bigskip
 
-\noindent ($\mu x \colon S \bullet constraint \land term$)
+\noindent ($(\mu x : S | constraint \land term)$)
 
 \bigskip
 
@@ -516,7 +555,7 @@ $\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.le
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -524,7 +563,7 @@ $\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.le
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -536,11 +575,11 @@ $\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.le
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Step 2: $\forall q \colon \ran hd \bullet p \neq q \land p.length > q.length$
+\noindent Step 2: $\forall q : \ran hd @ p \neq q \land p.length > q.length$
 
 \bigskip
 
@@ -552,7 +591,7 @@ $\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.le
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -564,7 +603,7 @@ $\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.le
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -580,7 +619,7 @@ $\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.le
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -592,7 +631,8 @@ $\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.le
 
 \bigskip
 
-\noindent $\{ p \colon \ran hd \mid \forall q \colon \ran hd \mid p.length \geq q.length \bullet p.title \}$
+\noindent $\{ p : \ran hd | \forall q : \ran hd | p.length \geq
+q.length @ p.title \}$
 
 \bigskip
 
@@ -603,7 +643,7 @@ $\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.le
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -615,7 +655,7 @@ $\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.le
 
 \bigskip
 
-\noindent $totalsByTitle : seq(Programme)  \fun  (Title  \pfun  Length)$
+\noindent $totalsByTitle : seq(Programme)$ $\fun$ ($Title \pfun Length$)
 
 \bigskip
 
@@ -623,13 +663,14 @@ $\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.le
 
 \bigskip
 
-\noindent $\forall$ $s : seq(Programme) |$
+\noindent $\forall$ $s : seq(Programme)$ $\mid$
 
 \bigskip
 
-\noindent totalsByTitle(s) = {$t : Title | ($$\exists p \colon \ran s \bullet p.title = t$) .
+\noindent totalsByTitle(s) = {$t : Title$ $\mid$ ($\exists p : \ran s
+  @ p.title = t$) .
 
-\bigskip
+  \bigskip
 
 \noindent t $\mapsto$ cumulativeTotal(s$ \filter $$\{t\}$)}
 
@@ -639,13 +680,14 @@ $\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.le
 
 \bigskip
 
-\noindent (Note: This simplified version assumes a$ \filter $operation on sequences.
+\noindent (Note: This simplified version assumes a$ \filter
+  $operation on sequences.
 
-\bigskip
+  \bigskip
 
-\noindent The original problem requires complex nested comprehensions that may
+  \noindent The original problem requires complex nested comprehensions that may
 
-\bigskip
+  \bigskip
 
 \noindent need implementation-specific handling.)
 
@@ -654,31 +696,39 @@ $\mu p \colon \ran hd \bullet (\forall q \colon \ran hd \mid p \neq q \land p.le
 \section*{Solution ( g ) : Remove Longest Viewed Programme}
 \addcontentsline{toc}{section}{Solution ( g ) : Remove Longest Viewed Programme}
 
-\noindent Remove the longest viewed programme from the sequence:
+\noindent Remove the longest viewed programme from the sequence.
+
+\bigskip
+
+\noindent First, we need a function to find the longest viewed programme:
 
 \bigskip
 
 \begin{axdef}
-removeTheLongestViewed : \seq Programme \fun \seq Programme
-\where
-\forall s \colon \seq Programme \bullet removeTheLongestViewed(s) = s \filter \{ x \colon \ran s \mid x \neq longestViewed(s) \}
+  longestViewed : \seq Programme \pfun Programme
+  \where
+  \forall s : \seq Programme @ longestViewed(s) = (\mu p : \ran s |
+    p.viewed = yes \land (\forall q : \ran s @ p \neq q \land q.viewed
+  = yes \land p.length > q.length))
 \end{axdef}
 
-\noindent Where longestViewed is defined as:
+\noindent Now we can define the removal function:
 
 \bigskip
 
 \begin{axdef}
-longestViewed : \seq Programme \pfun Programme
-\where
-\forall s \colon \seq Programme \bullet longestViewed(s) = (\mu p \colon \ran s \bullet p.viewed = yes \land (\forall q \colon \ran s \bullet p \neq q \land q.viewed = yes \land p.length > q.length))
+  removeTheLongestViewed : \seq Programme \fun \seq Programme
+  \where
+  \forall s : \seq Programme @ \\
+  \quad removeTheLongestViewed(s) = s \filter \{ x : \ran s | x \neq
+  longestViewed(s) \}
 \end{axdef}
 
 \noindent Two-step process:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -698,7 +748,7 @@ longestViewed : \seq Programme \pfun Programme
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -714,7 +764,7 @@ longestViewed : \seq Programme \pfun Programme
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -737,21 +787,68 @@ longestViewed : \seq Programme \pfun Programme
 \section*{Solution ( h ) : Sort by Length}
 \addcontentsline{toc}{section}{Solution ( h ) : Sort by Length}
 
-\noindent Sort programmes in descending order by length:
+\noindent Sort programmes in descending order by length.
 
 \bigskip
 
-\begin{axdef}
-sortByLength : \seq Programme \fun \seq Programme
-\where
-\forall x \colon \seq Programme \bullet items(sortByLength(x)) = items(x) \land (\forall i, j \colon \dom sortByLength(x) \mid i < j \Rightarrow sortByLength(x)(i) \bullet length \geq sortByLength(x)(j).length)
-\end{axdef}
+\noindent
+
+\bigskip
+
+\noindent Declarative specification $(defines(properties), \lnot algorithm)$:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent $sortByLength : seq(Programme)$ $\fun$ seq(Programme)
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent Properties:
+
+\bigskip
+
+\noindent 1. items(sortByLength(x)) = items(x)
+
+\bigskip
+
+\noindent The sorted sequence contains exactly the same programmes
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 2. $\forall i, j : \dom (sortByLength(x)) @ i < j$$\Rightarrow$
+
+\bigskip
+
+\noindent sortByLength(x)(i).$length \geq sortByLength$(x)(j).length
+
+\bigskip
+
+\noindent For all positions i before j, programme at i has $length
+\geq programme$ at j
+
+\bigskip
+
+\noindent
+
+\bigskip
 
 \noindent Specification approach $\lnot implementation$:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -771,7 +868,7 @@ sortByLength : \seq Programme \fun \seq Programme
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -779,19 +876,21 @@ sortByLength : \seq Programme \fun \seq Programme
 
 \bigskip
 
-\noindent $\forall i, j \colon \dom sortByLength(x) \bullet i$$\langle j \Rightarrow length[i] \rangle$= length[j]
+\noindent $\forall i, j : \dom (sortByLength(x)) @ i$$\langle j
+\implies length[i] \rangle$= length[j]
 
 \bigskip
 
-\noindent For all positions i before j, programme at i has $length \geq programme$ at j.
+\noindent For all positions i before j, programme at i has $length
+\geq programme$ at j.
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent This is a declarative $specification : defines what, not how$.
+\noindent This is a declarative $specification : defines what$, not how.
 
 \bigskip
 
@@ -806,11 +905,29 @@ sortByLength : \seq Programme \fun \seq Programme
 
 \bigskip
 
-\begin{axdef}
-DVRInvariants : \seq Programme \fun B
-\where
-\forall s \colon \seq Programme \bullet DVRInvariants(s) \Leftrightarrow (cumulativeTotal(s) \leq 12000) \land (\forall p \colon \ran s \bullet p.length > 0 \land p.length \leq 360) \land (\forall i \colon \dom s \mid s(i) \bullet title \neq s(i).title \Rightarrow i = i)
-\end{axdef}
+\noindent
+
+\bigskip
+
+\noindent DVRInvariants(s) means:
+
+\bigskip
+
+\noindent (cumulativeTotal(s) $\leq$ 12000) and
+
+\bigskip
+
+\noindent $\forall p : \ran s @ p.length > 0 \land p.length \leq 360$ and
+
+\bigskip
+
+\noindent (all titles are distinct in the sequence)
+
+\bigskip
+
+\noindent
+
+\bigskip
 
 \noindent Additional invariants to consider:
 
@@ -843,7 +960,7 @@ DVRInvariants : \seq Programme \fun B
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -859,11 +976,11 @@ DVRInvariants : \seq Programme \fun B
 
 \bigskip
 
-\noindent - Common $pattern :  \filter , map, fold$
+\noindent - Common $pattern :  \filter $, map, fold
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -883,7 +1000,7 @@ DVRInvariants : \seq Programme \fun B
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -903,7 +1020,7 @@ DVRInvariants : \seq Programme \fun B
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -923,7 +1040,7 @@ DVRInvariants : \seq Programme \fun B
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -950,15 +1067,15 @@ DVRInvariants : \seq Programme \fun B
 
 \bigskip
 
-\noindent $addProgramme : seq(Programme) cross Programme  \pfun  seq(Programme)$
+\noindent $addProgramme : seq(Programme) cross Programme$ $\pfun$ seq(Programme)
 
 \bigskip
 
-\noindent Include $precondition : total storage won$'t exceed limit
+\noindent Include $precondition : total storage won't exceed limit$
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -966,15 +1083,16 @@ DVRInvariants : \seq Programme \fun B
 
 \bigskip
 
-\noindent $deleteViewed : seq(Programme)  \fun  seq(Programme)$
+\noindent $deleteViewed : seq(Programme)$ $\fun$ seq(Programme)
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 3. Prove $that : cumulativeTotal(s $^ t) = cumulativeTotal(s) + cumulativeTotal(t)
+\noindent 3. Prove $that : cumulativeTotal(s$ ^ t) =
+cumulativeTotal(s) + cumulativeTotal(t)
 
 \bigskip
 
@@ -982,7 +1100,7 @@ DVRInvariants : \seq Programme \fun B
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
