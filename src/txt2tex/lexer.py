@@ -45,6 +45,52 @@ class Lexer:
         self.column = 1
         self._in_solution_marker = False  # Track if inside ** ... **
 
+    def _raise_infinite_loop_error(
+        self,
+        context_msg: str,
+        peek_pos: int | None = None,
+        current_char: str | None = None,
+    ) -> None:
+        """
+        Raise RuntimeError with diagnostic information about infinite loop.
+
+        Args:
+            context_msg: Description of where the loop occurred
+            peek_pos: Optional peek position for detailed diagnostics
+            current_char: Optional current character for diagnostics
+        """
+        context_start = max(0, self.pos - 20)
+        context_end = min(len(self.text), self.pos + 20)
+        context = repr(self.text[context_start:context_end])
+
+        error_msg = (
+            f"ERROR: Infinite loop detected in lexer at position {self.pos}, "
+            f"line {self.line}, column {self.column}: {context_msg}"
+        )
+        print(error_msg)
+        print(f"Text length: {len(self.text)}")
+        print(f"Context (-20/+20): {context}")
+
+        # Optional detailed diagnostics
+        if current_char is not None:
+            print(f"Current char: {current_char!r}")
+        if peek_pos is not None:
+            print(f"Peek pos: {peek_pos}")
+            print(f"Next 50 chars: {self.text[self.pos : self.pos + 50]!r}")
+            print(f"Char at peek pos: {self._peek_char(peek_pos)!r}")
+            print("First 20 _peek_char values:")
+            for i in range(1, 21):
+                ch = self._peek_char(i)
+                print(f"  _peek_char({i}) = {ch!r}")
+
+        print(f"Full text (first 200 chars): {self.text[:200]!r}")
+        print(f"Full text (last 200 chars): {self.text[-200:]!r}")
+
+        raise RuntimeError(
+            f"Lexer infinite loop at position {self.pos}, "
+            f"line {self.line}, column {self.column}: {context_msg}"
+        )
+
     def tokenize(self) -> list[Token]:
         """Tokenize entire input and return list of tokens."""
         tokens: list[Token] = []
@@ -634,31 +680,10 @@ class Lexer:
                 ch = self._peek_char(peek_pos)
                 iterations += 1
                 if iterations >= max_iterations:
-                    # Log diagnostic info
-                    context_start = max(0, self.pos - 20)
-                    context_end = min(len(self.text), self.pos + 20)
-                    context = repr(self.text[context_start:context_end])
-                    print(
-                        f"ERROR: Infinite loop detected in lexer at position "
-                        f"{self.pos}, line {self.line}, column {self.column}"
-                    )
-                    print(f"Text length: {len(self.text)}")
-                    print(f"Context (-20/+20): {context}")
-                    print(f"Current char: {char!r}")
-                    print(f"Peek pos: {peek_pos}")
-                    print(f"Next 50 chars: {self.text[self.pos : self.pos + 50]!r}")
-                    print(f"Char at peek pos: {self._peek_char(peek_pos)!r}")
-                    # Show first 20 peek values
-                    print("First 20 _peek_char values:")
-                    for i in range(1, 21):
-                        ch = self._peek_char(i)
-                        print(f"  _peek_char({i}) = {ch!r}")
-                    print(f"Full text (first 200 chars): {self.text[:200]!r}")
-                    print(f"Full text (last 200 chars): {self.text[-200:]!r}")
-                    raise RuntimeError(
-                        f"Lexer infinite loop at position {self.pos}, "
-                        f"line {self.line}, column {self.column}. "
-                        f"Text length: {len(self.text)}, peek_pos: {peek_pos}"
+                    self._raise_infinite_loop_error(
+                        "skipping whitespace after backslash",
+                        peek_pos=peek_pos,
+                        current_char=char,
                     )
 
             # If followed by newline, it's a continuation marker
@@ -671,19 +696,8 @@ class Lexer:
                     self._advance()
                     iterations += 1
                     if iterations >= max_iterations:
-                        context_start = max(0, self.pos - 20)
-                        context_end = min(len(self.text), self.pos + 20)
-                        context = repr(self.text[context_start:context_end])
-                        print(
-                            f"ERROR: Infinite loop detected in lexer at "
-                            f"position {self.pos}, line {self.line}, "
-                            f"column {self.column}"
-                        )
-                        print(f"Context: {context}")
-                        raise RuntimeError(
-                            f"Lexer infinite loop at position {self.pos}, "
-                            f"line {self.line}, column {self.column}. "
-                            f"Context: {context}"
+                        self._raise_infinite_loop_error(
+                            "consuming trailing whitespace after backslash-newline"
                         )
                 # Don't consume newline - let it be a separate token
                 return Token(TokenType.CONTINUATION, "\\", start_line, start_column)

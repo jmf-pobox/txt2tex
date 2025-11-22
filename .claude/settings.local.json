@@ -67,7 +67,8 @@
       "Bash(fgrep:*)",
       "Bash(git stash:*)",
       "Bash(gh pr create:*)",
-      "Bash(gh pr view:*)"
+      "Bash(gh pr view:*)",
+      "Bash(gh api:*)"
     ],
     "deny": [],
     "ask": []

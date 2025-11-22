@@ -300,13 +300,15 @@ TEXT: (b) Find most popular song:
 axdef
   mostPopular : SongId
 where
+  // Predicate duplicated intentionally: exists1 is precondition, mu is selection
   exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j)
   mostPopular = (mu i : songs | forall j : songs | i /= j | popularity(i) > popularity(j))
 end
 
 TEXT: Constraint:
 TEXT:   - exists1: ensures exactly one song has unique maximum popularity
-TEXT:   - mostPopular is that unique song with maximum popularity
+TEXT:   - mostPopular is that unique song with maximum popularity (mu selects it)
+TEXT:   - Predicate is duplicated: exists1 proves uniqueness, mu performs selection
 TEXT:   - If multiple songs tie for maximum, the constraint is not satisfied
 TEXT:
 TEXT: This specification assumes there is always a unique most popular song.
