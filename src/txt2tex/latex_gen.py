@@ -702,6 +702,17 @@ class LaTeXGenerator:
         ):
             operand = f"({operand})"
 
+        # bigcup/bigcap need parentheses around function-like operands
+        # E.g., bigcup (ran docs) must generate \bigcup (\ran docs)
+        # Otherwise fuzz parses \bigcup \ran docs as (\bigcup \ran) docs
+        if (
+            self.use_fuzz
+            and node.operator in {"bigcup", "bigcap"}
+            and isinstance(node.operand, UnaryOp)
+            and node.operand.operator in function_like_ops
+        ):
+            operand = f"({operand})"
+
         # Phase 10b: Check if this is a postfix operator (rendered as superscript)
         if node.operator in {"~", "+", "*"}:
             # Fuzz uses special commands for closure operators
@@ -743,6 +754,11 @@ class LaTeXGenerator:
         # In fuzz mode, _quantifier_needs_parens handles this separately
         # In non-fuzz mode, we handle it here
         if isinstance(child, (Quantifier, Lambda)) and not self.use_fuzz:
+            return True
+
+        # FunctionType needs parentheses when used as operand in cross/other ops
+        # E.g., (X -> Y) cross Z, not X -> Y cross Z which would be X -> (Y cross Z)
+        if isinstance(child, FunctionType):
             return True
 
         # Only binary ops need precedence checking
@@ -1277,24 +1293,52 @@ class LaTeXGenerator:
 
         Examples:
         - ∅[N] -> \\emptyset[N] or special empty set notation
-        - seq[N] -> \\seq[N]
-        - P[X] -> \\power[X]
+        - seq[N] -> \\seq N (special handling for single param)
+        - P[X] -> \\power X (special handling for single param)
         - Type[A, B] -> Type[A, B]
         - ∅[N cross N] -> \\emptyset[N \\cross N]
 
-        Strategy: Check if base is a special Z notation identifier, use special
-        rendering if so, otherwise use standard bracket notation.
+        Strategy: Check if base is a special Z notation identifier with single
+        type parameter, use LaTeX command notation. Otherwise use bracket notation.
         """
-        base_latex = self.generate_expr(node.base)
+        # Special Z notation types with LaTeX commands
+        special_types = {
+            "seq": r"\seq",
+            "seq1": r"\seq_1",
+            "iseq": r"\iseq",
+            "bag": r"\bag",
+            "P": r"\power",
+            "F": r"\finset",
+        }
 
-        # Generate comma-separated type parameters
+        # Check if base is a simple identifier with special handling
+        if isinstance(node.base, Identifier):
+            base_name = node.base.name
+            if base_name in special_types and len(node.type_params) == 1:
+                # Generic instantiation with single param: \seq N (no brackets)
+                # Per fuzz manual: prefix generic symbols are operator symbols
+                type_latex = special_types[base_name]
+                param = node.type_params[0]
+                param_latex = self.generate_expr(param)
+                # Add parentheses for complex param expressions
+                if isinstance(
+                    param,
+                    (
+                        FunctionApp,
+                        BinaryOp,
+                        GenericInstantiation,
+                        UnaryOp,
+                        FunctionType,
+                    ),
+                ):
+                    param_latex = f"({param_latex})"
+                return f"{type_latex} {param_latex}"
+
+        # Standard generic instantiation: Type[A, B, ...]
+        base_latex = self.generate_expr(node.base)
         type_params_latex = ", ".join(
             self.generate_expr(param) for param in node.type_params
         )
-
-        # Special Z notation types that might have custom rendering
-        # For now, use standard bracket notation for all types
-        # Future enhancement: Could use special notation like \emptyset~N
         return f"{base_latex}[{type_params_latex}]"
 
     def _generate_range(self, node: Range, parent: Expr | None = None) -> str:
@@ -3494,7 +3538,28 @@ class LaTeXGenerator:
         Generate \\infer macro for a proof node (bottom-up natural deduction).
 
         Returns LaTeX string for this node and its supporting premises.
+
+        Phase 3: Handle synthetic top-level case analysis nodes.
         """
+        # Check for synthetic top-level case analysis node (Phase 3)
+        # These are created when proof starts with CASE statements
+        if (
+            isinstance(node.expression, Identifier)
+            and node.expression.name == "[case_analysis]"
+            and node.justification == "case analysis"
+        ):
+            # Don't render the synthetic node itself, just its case children
+            case_latexes = []
+            for child in node.children:
+                if isinstance(child, CaseAnalysis):
+                    # Use existing case analysis generation method
+                    case_latexes.append(self._generate_case_analysis(child))
+                elif isinstance(child, ProofNode):
+                    case_latexes.append(self._generate_proof_node_infer(child))
+
+            # Join cases side-by-side with &
+            return " & ".join(case_latexes) if case_latexes else ""
+
         # If this is an assumption node, it should appear as a boxed premise
         if node.is_assumption:
             # The assumption itself is a premise (leaf)
