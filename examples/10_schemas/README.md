@@ -77,7 +77,7 @@ Browse the `.txt` files to see:
 
 ## See Also
 
-- **docs/USER_GUIDE.md** - Section "Schema Notation"
-- **docs/TUTORIAL_ADVANCED.md** - Advanced schema patterns
+- **docs/guides/USER_GUIDE.md** - Section "Schema Notation"
+- **docs/tutorials/10_advanced.md** - Advanced schema patterns
 - **Previous**: 09_sequences/
 - **Next**: 11_text_blocks/

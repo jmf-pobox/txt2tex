@@ -30,4 +30,4 @@ hatch run convert 00_getting_started/hello_world.txt
 
 After completing these examples, proceed to:
 - **01_propositional_logic/** - Learn about logical operators
-- **docs/TUTORIAL_01.md** - Lecture 1 tutorial
+- **docs/tutorials/01_propositional_logic.md** - Lecture 1 tutorial

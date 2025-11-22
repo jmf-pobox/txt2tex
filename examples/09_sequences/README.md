@@ -62,7 +62,7 @@ Browse the `.txt` files to see:
 
 ## See Also
 
-- **docs/USER_GUIDE.md** - Section "Sequences"
-- **docs/TUTORIAL_09.md** - Detailed tutorial for Lecture 9
+- **docs/guides/USER_GUIDE.md** - Section "Sequences"
+- **docs/tutorials/09_schemas.md** - Detailed tutorial for Lecture 9
 - **Previous**: 08_functions/
 - **Next**: 10_schemas/

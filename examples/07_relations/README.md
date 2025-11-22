@@ -49,7 +49,7 @@ Browse the `.txt` files to see:
 
 ## See Also
 
-- **docs/USER_GUIDE.md** - Section "Relations"
-- **docs/TUTORIAL_07.md** - Detailed tutorial for Lecture 7
+- **docs/guides/USER_GUIDE.md** - Section "Relations"
+- **docs/tutorials/07_functions.md** - Detailed tutorial for Lecture 7
 - **Previous**: 06_definitions/
 - **Next**: 08_functions/

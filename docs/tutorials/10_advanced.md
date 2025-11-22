@@ -241,7 +241,7 @@ You've learned:
 
 **Next Steps:**
 - Study complete examples in `complete_examples/`
-- Consult [USER_GUIDE.md](docs/USER_GUIDE.md) for comprehensive reference
+- Consult [USER_GUIDE.md](docs/guides/USER_GUIDE.md) for comprehensive reference
 - Practice with course problems
 
 ---

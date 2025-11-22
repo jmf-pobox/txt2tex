@@ -53,7 +53,7 @@ Browse the `.txt` files to see:
 
 ## See Also
 
-- **docs/USER_GUIDE.md** - Section "Functions"
-- **docs/TUTORIAL_08.md** - Detailed tutorial for Lecture 8
+- **docs/guides/USER_GUIDE.md** - Section "Functions"
+- **docs/tutorials/08_sequences.md** - Detailed tutorial for Lecture 8
 - **Previous**: 07_relations/
 - **Next**: 09_sequences/

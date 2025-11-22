@@ -175,7 +175,7 @@ You've learned:
 - ✅ Sequence filter
 - ✅ Bags (multisets)
 
-**Next Tutorial:** [Tutorial 9: Schemas and Composition](TUTORIAL_09.md)
+**Next Tutorial:** [Tutorial 9: Schemas and Composition](docs/tutorials/09_schemas.md)
 
 ---
 

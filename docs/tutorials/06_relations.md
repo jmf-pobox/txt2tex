@@ -144,7 +144,7 @@ You've learned:
 - ✅ Inverse (~)
 - ✅ Relational image
 
-**Next Tutorial:** [Tutorial 7: Functions](TUTORIAL_07.md)
+**Next Tutorial:** [Tutorial 7: Functions](docs/tutorials/07_functions.md)
 
 ---
 

@@ -30,6 +30,6 @@ Browse the `.txt` files in this directory to see:
 
 ## See Also
 
-- **docs/USER_GUIDE.md** - Section "Propositional Logic"
-- **docs/TUTORIAL_01.md** - Detailed tutorial for Lecture 1
+- **docs/guides/USER_GUIDE.md** - Section "Propositional Logic"
+- **docs/tutorials/01_propositional_logic.md** - Detailed tutorial for Lecture 1
 - **Next**: 02_predicate_logic/

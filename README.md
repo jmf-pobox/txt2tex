@@ -185,7 +185,7 @@ hatch run cli input.txt --latex-only -o output.tex
 
 ## Complete Syntax Reference
 
-For detailed syntax documentation, see **[docs/USER_GUIDE.md](docs/USER_GUIDE.md)**.
+For detailed syntax documentation, see **[docs/guides/USER_GUIDE.md](docs/guides/USER_GUIDE.md)**.
 
 The guide covers:
 - Document structure (sections, solutions, parts)
@@ -273,7 +273,7 @@ Run `hatch run convert` at least once - it copies dependencies locally. If using
 ### Parse Errors
 
 txt2tex provides clear error messages with line numbers. Common issues:
-- Unsupported syntax → See [docs/USER_GUIDE.md](docs/USER_GUIDE.md) for supported features
+- Unsupported syntax → See [docs/guides/USER_GUIDE.md](docs/guides/USER_GUIDE.md) for supported features
 - Missing quantifier separator → Use `forall x : N | predicate` (note the `|`)
 
 ### Fuzz Type Errors
@@ -317,7 +317,7 @@ A few edge cases require workarounds:
 
 ## Documentation
 
-- **[docs/USER_GUIDE.md](docs/USER_GUIDE.md)** - Complete syntax reference
+- **[docs/guides/USER_GUIDE.md](docs/guides/USER_GUIDE.md)** - Complete syntax reference
 - **[docs/STATUS.md](docs/STATUS.md)** - Implementation status and roadmap
 - **[docs/FUZZ_VS_STD_LATEX.md](docs/FUZZ_VS_STD_LATEX.md)** - Fuzz compatibility guide
 - **[docs/FUZZ_FEATURE_GAPS.md](docs/FUZZ_FEATURE_GAPS.md)** - Missing features

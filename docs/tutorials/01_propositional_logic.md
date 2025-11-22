@@ -424,8 +424,8 @@ hatch run convert my_logic.txt
 - `examples/01_propositional_logic/complex_formulas.txt` - Equivalence proofs
 
 **Reference:**
-- [USER_GUIDE.md](docs/USER_GUIDE.md) - Section "Propositional Logic"
-- [PROOF_SYNTAX.md](docs/PROOF_SYNTAX.md) - EQUIV block syntax
+- [USER_GUIDE.md](docs/guides/USER_GUIDE.md) - Section "Propositional Logic"
+- [PROOF_SYNTAX.md](docs/guides/PROOF_SYNTAX.md) - EQUIV block syntax
 
 ## Summary
 
@@ -436,7 +436,7 @@ You've learned:
 - ✅ Tautologies and contradictions
 - ✅ EQUIV blocks for proving equivalences
 
-**Next Tutorial:** [Tutorial 2: Predicate Logic](TUTORIAL_02.md)
+**Next Tutorial:** [Tutorial 2: Predicate Logic](docs/tutorials/02_predicate_logic.md)
 
 Learn about quantifiers, predicates, and reasoning about sets of objects.
 

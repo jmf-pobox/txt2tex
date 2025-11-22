@@ -12,7 +12,7 @@ This tutorial series teaches you how to write formal specifications using txt2te
 
 ## Getting Started
 
-- **[Tutorial 0: Getting Started](TUTORIAL_00.md)** - Installation, first document, basic workflow
+- **[Tutorial 0: Getting Started](docs/tutorials/00_getting_started.md)** - Installation, first document, basic workflow
 
 Start here if you're new to txt2tex. Learn how to install the tools, write your first document, and compile to PDF.
 
@@ -21,14 +21,14 @@ Start here if you're new to txt2tex. Learn how to install the tools, write your 
 These tutorials follow a structured curriculum covering fundamental concepts progressively:
 
 ### Lecture 1: Propositional Logic
-- **[Tutorial 1: Propositional Logic](TUTORIAL_01.md)**
+- **[Tutorial 1: Propositional Logic](docs/tutorials/01_propositional_logic.md)**
   - Boolean operators (and, or, not, =>, <=>)
   - Truth tables and equivalences
   - Tautologies and logical laws
   - **Examples:** `01_propositional_logic/`
 
 ### Lecture 2: Predicate Logic
-- **[Tutorial 2: Predicate Logic](TUTORIAL_02.md)**
+- **[Tutorial 2: Predicate Logic](docs/tutorials/02_predicate_logic.md)**
   - Predicates and declarations
   - Universal quantifier (forall)
   - Existential quantifier (exists)
@@ -36,7 +36,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - **Examples:** `02_predicate_logic/`, `03_equality/`
 
 ### Lecture 3: Set Theory
-- **[Tutorial 3: Sets and Types](TUTORIAL_03.md)**
+- **[Tutorial 3: Sets and Types](docs/tutorials/03_sets_and_types.md)**
   - Set notation and literals
   - Set operations (union, intersect, difference)
   - Power sets and Cartesian products
@@ -44,7 +44,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - **Examples:** `05_sets/`
 
 ### Lecture 4: Deductive Proofs
-- **[Tutorial 4: Proof Trees](TUTORIAL_04.md)**
+- **[Tutorial 4: Proof Trees](docs/tutorials/04_proof_trees.md)**
   - Natural deduction rules
   - Proof tree syntax (PROOF:, EQUIV:)
   - Introduction and elimination rules
@@ -52,7 +52,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - **Examples:** `04_proof_trees/`
 
 ### Lecture 5: Z Notation Basics
-- **[Tutorial 5: Z Notation Definitions](TUTORIAL_05.md)**
+- **[Tutorial 5: Z Notation Definitions](docs/tutorials/05_z_definitions.md)**
   - given types
   - Free type definitions
   - Abbreviations (==)
@@ -61,7 +61,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - **Examples:** `06_definitions/`
 
 ### Lecture 6: Relations
-- **[Tutorial 6: Relations](TUTORIAL_06.md)**
+- **[Tutorial 6: Relations](docs/tutorials/06_relations.md)**
   - Binary relations (↔ or <->)
   - Maplets (|->)
   - Domain and range
@@ -70,7 +70,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - **Examples:** `07_relations/`
 
 ### Lecture 7: Functions
-- **[Tutorial 7: Functions](TUTORIAL_07.md)**
+- **[Tutorial 7: Functions](docs/tutorials/07_functions.md)**
   - Function types (→, +→, ⇸, ⤖, ↣, ⤀, ↠, ⤖)
   - Total and partial functions
   - Function application
@@ -79,7 +79,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - **Examples:** `08_functions/`
 
 ### Lecture 8: Sequences and Bags
-- **[Tutorial 8: Sequences](TUTORIAL_08.md)**
+- **[Tutorial 8: Sequences](docs/tutorials/08_sequences.md)**
   - Sequence notation (⟨⟩, <> )
   - Sequence operations (head, tail, concatenation)
   - Pattern matching with sequences
@@ -87,7 +87,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - **Examples:** `09_sequences/`
 
 ### Lecture 9: Advanced Z Notation
-- **[Tutorial 9: Schemas and Composition](TUTORIAL_09.md)**
+- **[Tutorial 9: Schemas and Composition](docs/tutorials/09_schemas.md)**
   - Schema notation
   - Schema composition and operations
   - State schemas and operations
@@ -97,7 +97,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ## Advanced Topics
 
-- **[Tutorial: Advanced Features](TUTORIAL_ADVANCED.md)**
+- **[Tutorial: Advanced Features](docs/tutorials/10_advanced.md)**
   - Conditional expressions (if-then-else)
   - Subscripts and superscripts
   - Generic type instantiation
@@ -117,10 +117,10 @@ After completing the tutorials, explore complete formal specifications in `compl
 
 ## Reference Materials
 
-- **[USER_GUIDE.md](docs/USER_GUIDE.md)** - Complete syntax reference
-- **[PROOF_SYNTAX.md](docs/PROOF_SYNTAX.md)** - Proof tree formatting rules
+- **[USER_GUIDE.md](docs/guides/USER_GUIDE.md)** - Complete syntax reference
+- **[PROOF_SYNTAX.md](docs/guides/PROOF_SYNTAX.md)** - Proof tree formatting rules
 - **[DESIGN.md](docs/DESIGN.md)** - Architecture and design decisions
-- **[STATUS.md](docs/STATUS.md)** - Current implementation status
+- **[STATUS.md](docs/development/STATUS.md)** - Current implementation status
 
 ## How to Use This Tutorial
 
@@ -192,4 +192,4 @@ These tutorials and examples are part of the txt2tex project. See the main proje
 
 ---
 
-**Next Step:** Start with [Tutorial 0: Getting Started](TUTORIAL_00.md) or jump to a specific topic using the links above.
+**Next Step:** Start with [Tutorial 0: Getting Started](docs/tutorials/00_getting_started.md) or jump to a specific topic using the links above.
