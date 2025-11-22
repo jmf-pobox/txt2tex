@@ -94,13 +94,14 @@ echo ""
 
 # 2. Check for "forall" text instead of symbol
 echo "=== 2. Text 'forall' instead of Symbol ==="
-FORALL_TEXT=$(echo "$PDF_TEXT" | grep -o "forall" || true)
+# Exclude PURETEXT teaching syntax (has em dash: "forall x : T — predicate")
+FORALL_TEXT=$(echo "$PDF_TEXT" | grep "forall" | grep -v " — " | grep -o "forall" || true)
 FORALL_COUNT=$(echo "$FORALL_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
 
 if [ "${FORALL_COUNT:-0}" -gt 0 ]; then
     echo -e "${RED}FAIL: Found $FORALL_COUNT instances of text 'forall' (should be ∀ symbol)${NC}"
-    # Show context
-    echo "$PDF_TEXT" | grep -n "forall" | head -5
+    # Show context (excluding PURETEXT teaching syntax with em dash)
+    echo "$PDF_TEXT" | grep "forall" | grep -v " — " | grep -n "forall" | head -5
 else
     echo -e "${GREEN}PASS: No text 'forall' found (using symbol ∀)${NC}"
 fi
@@ -108,12 +109,14 @@ echo ""
 
 # 3. Check for "emptyset" text instead of symbol
 echo "=== 3. Text 'emptyset' instead of Symbol ==="
-EMPTYSET_TEXT=$(echo "$PDF_TEXT" | grep -o "emptyset" || true)
+# Exclude PURETEXT teaching syntax (has em dash: "emptyset — literal")
+EMPTYSET_TEXT=$(echo "$PDF_TEXT" | grep "emptyset" | grep -v " — " | grep -o "emptyset" || true)
 EMPTYSET_COUNT=$(echo "$EMPTYSET_TEXT" | grep -c . 2>/dev/null | tr -d '\n' || echo "0")
 
 if [ "${EMPTYSET_COUNT:-0}" -gt 0 ]; then
     echo -e "${RED}FAIL: Found $EMPTYSET_COUNT instances of text 'emptyset' (should be ∅ symbol)${NC}"
-    echo "$PDF_TEXT" | grep -n "emptyset" | head -5
+    # Show context (excluding PURETEXT teaching syntax with em dash)
+    echo "$PDF_TEXT" | grep "emptyset" | grep -v " — " | grep -n "emptyset" | head -5
 else
     echo -e "${GREEN}PASS: No text 'emptyset' found (using symbol ∅)${NC}"
 fi
