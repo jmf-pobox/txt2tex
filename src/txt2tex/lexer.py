@@ -629,7 +629,7 @@ class Lexer:
             # Bug fix: empty string is "in" any string in Python,
             # so we must check for it explicitly
             ch = self._peek_char(peek_pos)
-            while ch and ch in " \t":
+            while ch != "" and ch in " \t":
                 peek_pos += 1
                 ch = self._peek_char(peek_pos)
                 iterations += 1

@@ -3549,12 +3549,13 @@ class LaTeXGenerator:
             and node.justification == "case analysis"
         ):
             # Don't render the synthetic node itself, just its case children
-            case_latexes = []
+            case_latexes: list[str] = []
             for child in node.children:
                 if isinstance(child, CaseAnalysis):
                     # Use existing case analysis generation method
                     case_latexes.append(self._generate_case_analysis(child))
-                elif isinstance(child, ProofNode):
+                else:
+                    # Must be ProofNode
                     case_latexes.append(self._generate_proof_node_infer(child))
 
             # Join cases side-by-side with &
