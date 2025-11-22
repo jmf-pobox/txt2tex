@@ -260,7 +260,7 @@ The project includes pre-configured settings:
 - `.vscode/settings.json` - LaTeX Workshop configuration
 - `.latexmkrc` - Build settings for natbib citations
 
-**See [docs/IDE_SETUP.md](docs/IDE_SETUP.md) for complete setup instructions.**
+**See [docs/development/IDE_SETUP.md](docs/development/IDE_SETUP.md) for complete setup instructions.**
 
 ---
 
@@ -283,7 +283,7 @@ Fuzz catches genuine specification errors. Check:
 - Type mismatches
 - Invalid operator usage
 
-**See [docs/FUZZ_VS_STD_LATEX.md](docs/FUZZ_VS_STD_LATEX.md) for fuzz-specific requirements.**
+**See [docs/guides/FUZZ_VS_STD_LATEX.md](docs/guides/FUZZ_VS_STD_LATEX.md) for fuzz-specific requirements.**
 
 ---
 
@@ -311,16 +311,30 @@ A few edge cases require workarounds:
 - ✅ **WYSIWYG line breaks** - Natural formatting controls PDF output
 - ✅ **fuzz integration** - Optional type checking
 
-**For detailed status, see [docs/STATUS.md](docs/STATUS.md)**
+**For detailed status, see [docs/development/STATUS.md](docs/development/STATUS.md)**
 
 ---
 
 ## Documentation
 
+### User Guides
 - **[docs/guides/USER_GUIDE.md](docs/guides/USER_GUIDE.md)** - Complete syntax reference
-- **[docs/STATUS.md](docs/STATUS.md)** - Implementation status and roadmap
-- **[docs/FUZZ_VS_STD_LATEX.md](docs/FUZZ_VS_STD_LATEX.md)** - Fuzz compatibility guide
-- **[docs/FUZZ_FEATURE_GAPS.md](docs/FUZZ_FEATURE_GAPS.md)** - Missing features
+- **[docs/guides/FUZZ_VS_STD_LATEX.md](docs/guides/FUZZ_VS_STD_LATEX.md)** - Fuzz compatibility guide
+- **[docs/guides/FUZZ_FEATURE_GAPS.md](docs/guides/FUZZ_FEATURE_GAPS.md)** - Missing features
+- **[docs/guides/PROOF_SYNTAX.md](docs/guides/PROOF_SYNTAX.md)** - Proof tree notation
+
+### Tutorials
+- **[docs/tutorials/README.md](docs/tutorials/README.md)** - Tutorial index and learning path
+- **[docs/tutorials/00_getting_started.md](docs/tutorials/00_getting_started.md)** - First steps
+- **[docs/tutorials/01_propositional_logic.md](docs/tutorials/01_propositional_logic.md)** - Logic basics
+- **[docs/tutorials/02_predicate_logic.md](docs/tutorials/02_predicate_logic.md)** - Quantifiers and predicates
+- Plus 7 more tutorials covering sets, proof trees, relations, functions, sequences, schemas, and advanced topics
+
+### Development Documentation
+- **[docs/development/STATUS.md](docs/development/STATUS.md)** - Implementation status and roadmap
+- **[docs/development/IDE_SETUP.md](docs/development/IDE_SETUP.md)** - IDE configuration
+- **[docs/development/QA_PLAN.md](docs/development/QA_PLAN.md)** - Quality assurance procedures
+- **[docs/DESIGN.md](docs/DESIGN.md)** - Architecture and design decisions
 
 ---
 
