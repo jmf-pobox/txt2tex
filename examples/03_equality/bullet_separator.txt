@@ -51,7 +51,7 @@ TEXT: Result: {0, 1, 2, 3, 4} (the values themselves)
 
 ** Example 4: Complex Set Comprehension **
 
-{ x : Z | x mod 2 = 0 and x >= -10 and x <= 10 . x / 2 }
+{ x : Z | x mod 2 = 0 and x >= -10 and x <= 10 . x div 2 }
 
 TEXT: This gives the set {-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5} by taking even integers from -10 to 10 and dividing by 2.
 
@@ -101,12 +101,12 @@ TEXT: The bullet indicates predecessor is only defined when the constraint n > 0
 
 ** Example 10: Practical Example - Data Filtering **
 
-given Employee, Salary
+given Employee
 
 axdef
-  salaries : Employee -> Salary
+  salaries : Employee -> N
   high_earners : P Employee
-  high_salaries : P Salary
+  high_salaries : P N
 where
   high_earners = { e : Employee | salaries(e) > 100000 }
   high_salaries = { e : Employee | salaries(e) > 100000 . salaries(e) }

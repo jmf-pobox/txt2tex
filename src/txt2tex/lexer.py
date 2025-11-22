@@ -148,19 +148,53 @@ class Lexer:
             self._in_solution_marker = not self._in_solution_marker
             return Token(TokenType.SOLUTION_MARKER, "**", start_line, start_column)
 
-        # Part label: (a), (b), (c), etc. - restrict to a-j for homework parts
+        # Part label: (a), (b), ..., (j), (aa), (ab), etc.
         # Phase 11b: Only match at start of line to avoid function app conflict
-        next_char = self._peek_char()
-        if (
-            char == "("
-            and "a" <= next_char <= "j"
-            and self._peek_char(2) == ")"
-            and start_column == 1
-        ):
-            self._advance()  # consume '('
-            label = self._advance()  # consume letter
-            self._advance()  # consume ')'
-            return Token(TokenType.PART_LABEL, f"({label})", start_line, start_column)
+        # Phase 2.1: Extended to support multi-letter labels (aa), (ab), ...
+        # Single letters restricted to (a)-(j) to avoid conflict with vars like (x), (s)
+        # Multi-letter (2+) allowed for extended numbering: (aa), (ab), (ba), (bb), ...
+        # Must be followed by whitespace/newline (structural) not operators (expression)
+        if char == "(" and start_column == 1:
+            # Peek ahead to check for part label pattern
+            lookahead_pos = 1
+            label_chars = ""
+
+            # Collect consecutive lowercase letters
+            while True:
+                peek_char = self._peek_char(lookahead_pos)
+                if peek_char.islower():
+                    label_chars += peek_char
+                    lookahead_pos += 1
+                else:
+                    break
+
+            # Check if we have valid part label:
+            # - Single letter (a)-(j), OR
+            # - Multi-letter (2+): (aa), (ab), (abc), etc.
+            # Must be followed by ')' and then whitespace/newline
+            if label_chars and self._peek_char(lookahead_pos) == ")":
+                is_valid_label = False
+                if len(label_chars) == 1 and "a" <= label_chars[0] <= "j":
+                    is_valid_label = True  # (a)-(j)
+                elif len(label_chars) >= 2:
+                    is_valid_label = True  # (aa), (ab), etc.
+
+                if is_valid_label:
+                    char_after = self._peek_char(lookahead_pos + 1)
+                    # Part labels are structural - must be followed by space/tab/newline
+                    # NOT EOF - that would match (x) in parse_expr("(x)")
+                    if char_after in (" ", "\t", "\n"):
+                        self._advance()  # consume '('
+                        # Consume all label characters
+                        for _ in label_chars:
+                            self._advance()
+                        self._advance()  # consume ')'
+                        return Token(
+                            TokenType.PART_LABEL,
+                            f"({label_chars})",
+                            start_line,
+                            start_column,
+                        )
 
         # Relational image operators (Phase 11.5): (| and |)
         # Check before simple parentheses
@@ -233,6 +267,13 @@ class Lexer:
         if char == ",":
             self._advance()
             return Token(TokenType.COMMA, ",", start_line, start_column)
+
+        # Ellipsis ... (Phase 2.2) - check before range operator
+        if char == "." and self._peek_char() == "." and self._peek_char(2) == ".":
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.ELLIPSIS, "...", start_line, start_column)
 
         # Range operator .. (Phase 13) - check before period alone
         if char == "." and self._peek_char() == ".":
@@ -605,24 +646,15 @@ class Lexer:
                     print(f"Context (-20/+20): {context}")
                     print(f"Current char: {char!r}")
                     print(f"Peek pos: {peek_pos}")
-                    print(f"Next 50 chars: {self.text[self.pos:self.pos+50]!r}")
-                    print(
-                        f"Char at peek pos: "
-                        f"{self._peek_char(peek_pos)!r}"
-                    )
+                    print(f"Next 50 chars: {self.text[self.pos : self.pos + 50]!r}")
+                    print(f"Char at peek pos: {self._peek_char(peek_pos)!r}")
                     # Show first 20 peek values
                     print("First 20 _peek_char values:")
                     for i in range(1, 21):
                         ch = self._peek_char(i)
                         print(f"  _peek_char({i}) = {ch!r}")
-                    print(
-                        f"Full text (first 200 chars): "
-                        f"{self.text[:200]!r}"
-                    )
-                    print(
-                        f"Full text (last 200 chars): "
-                        f"{self.text[-200:]!r}"
-                    )
+                    print(f"Full text (first 200 chars): {self.text[:200]!r}")
+                    print(f"Full text (last 200 chars): {self.text[-200:]!r}")
                     raise RuntimeError(
                         f"Lexer infinite loop at position {self.pos}, "
                         f"line {self.line}, column {self.column}. "

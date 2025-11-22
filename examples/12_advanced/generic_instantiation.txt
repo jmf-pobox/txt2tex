@@ -161,59 +161,44 @@ TEXT: A sequence where each element is a pair (coordinate).
 ** Example 12: Set of Functions **
 
 axdef
-  funcSet : P[N -> N]
-where
-  funcSet = {square, double, successor}
-end
-
-axdef
-  square, double, successor : N -> N
+  square : N -> N
+  double : N -> N
+  successor : N -> N
 where
   forall n : N | square(n) = n * n
   forall n : N | double(n) = 2 * n
   forall n : N | successor(n) = n + 1
 end
 
+axdef
+  funcSet : P[N -> N]
+where
+  funcSet = {square, double, successor}
+end
+
 TEXT: A set containing three functions.
 
-** Example 13: Practical Example - Generic Container **
+** Example 13: Practical Example - Generic Pair **
 
 gendef [T]
-  schema Container_T
-    elements : seq[T]
-    capacity : N
-  where
-    # elements <= capacity
-  end
-end
-
-axdef
-  intContainer : Container_N
-  stringContainer : Container_[seq Char]
+  makePair : T cross T -> T cross T
 where
-  intContainer.elements = ⟨1, 2, 3⟩
-  intContainer.capacity = 100
-  stringContainer.elements = ⟨⟨'h', 'i'⟩⟩
-  stringContainer.capacity = 50
+  forall x, y : T | makePair(x, y) = (x, y)
 end
 
-TEXT: Instantiate generic schema for different element types.
+TEXT: Generic pair function that works with any type T.
 
-** Example 14: Option Type Instantiation **
+** Example 14: Generic Pair Extraction **
 
 gendef [X]
-  Option_X ::= none_X | some_X⟨X⟩
-end
-
-axdef
-  maybeInt : Option_N
-  maybeChar : Option_Char
+  fst : X cross X -> X
+  snd : X cross X -> X
 where
-  maybeInt = some_N(42)
-  maybeChar = none_Char
+  forall x, y : X | fst(x, y) = x
+  forall x, y : X | snd(x, y) = y
 end
 
-TEXT: Option type instantiated for different types.
+TEXT: Generic first and second functions that work with any type X.
 
 ** Example 15: List of Lists **
 
@@ -241,42 +226,25 @@ TEXT: invalidSeq = ⟨1, -1, 2⟩  -- would be type error if -1 not in N
 ** Example 17: Generic Queue **
 
 gendef [T]
-  schema Queue_T
-    items : seq[T]
-  where
-    # items >= 0
-  end
-
-  enqueue_T : Queue_T cross T -> Queue_T
-  dequeue_T : Queue_T -> Queue_T
-  front_T : Queue_T -> T
+  wrap : T -> seq[T]
+  unwrap : seq[T] -> T
 where
-  forall q : Queue_T; x : T |
-    enqueue_T(q, x).items = q.items ⌢ ⟨x⟩
-
-  forall q : Queue_T |
-    # (q.items) > 0 =>
-    dequeue_T(q).items = tail(q.items)
-
-  forall q : Queue_T |
-    # (q.items) > 0 =>
-    front_T(q) = head(q.items)
+  forall x : T | wrap(x) = ⟨x⟩
+  forall s : seq[T] | # s > 0 => unwrap(s) = s(1)
 end
 
-TEXT: Generic queue instantiated for any type T.
+TEXT: Generic wrap/unwrap functions for working with sequences.
 
 ** Example 18: Type Synonyms with Instantiation **
 
-axdef
-  IntSet == P[Z]
-  NatSeq == seq[N]
-  Coordinate == N cross N
-  Path == seq[Coordinate]
-where
-  true
-end
+TEXT: Type abbreviations can use instantiated types:
 
-TEXT: Type abbreviations using instantiation.
+TEXT: IntSet == P Z (set of integers)
+TEXT: NatSeq == seq N (sequence of naturals)
+TEXT: Coordinate == N cross N (pair of naturals)
+TEXT: Path == seq Coordinate (sequence of coordinates)
+
+TEXT: These provide readable names for complex instantiated types.
 
 ** Example 19: Higher-Order Types **
 
@@ -301,10 +269,10 @@ TEXT: Quantifying over instantiated generic types.
 ** Example 21: Partial Function Types **
 
 axdef
-  lookup : N +-> seq[Char]
+  lookup : N +-> seq[N]
   mapping : N <-> N
 where
-  lookup = {1 |-> ⟨'a', 'b'⟩, 2 |-> ⟨'c', 'd'⟩}
+  lookup = {1 |-> ⟨10, 20⟩, 2 |-> ⟨30, 40⟩}
   mapping = {1 |-> 2, 2 |-> 4, 3 |-> 6}
 end
 

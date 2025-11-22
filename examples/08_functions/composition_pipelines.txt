@@ -1,305 +1,54 @@
 // ============================================================================
-// Example: Complex Composition Pipelines
+// Example: Composition Pipelines
 // ============================================================================
 // Demonstrates:
 //   - Multi-stage data processing pipelines
-//   - Composing 5+ functions
-//   - Real-world pipeline patterns
-//   - Debugging composed functions
-//   - Pipeline optimization
-//
-// Features:
-//   - Long composition chains
-//   - Type transformations through pipeline
-//   - Error handling in pipelines
-//   - Practical data processing examples
+//   - Composing multiple functions
 //
 // See: docs/USER_GUIDE.md - Section "Functions" > "Composition"
 //      examples/08_functions/function_composition.txt - Basic composition
 // ============================================================================
 
-=== Complex Composition Pipelines ===
+=== Composition Pipelines ===
 
-** Example 1: Data Validation Pipeline **
+** Example 1: Simple Three-Stage Pipeline **
 
-TEXT: A multi-stage validation and transformation pipeline for user input data.
-
-given RawData, ValidatedData, NormalizedData, EnrichedData, FinalOutput
+TEXT: A three-stage numeric processing pipeline.
 
 axdef
-  validate : RawData +-> ValidatedData
-  normalize : ValidatedData -> NormalizedData
-  enrich : NormalizedData -> EnrichedData
-  format : EnrichedData -> FinalOutput
-  sanitize : FinalOutput -> FinalOutput
-  pipeline : RawData +-> FinalOutput
+  addOne : N -> N
+  double : N -> N
+  square : N -> N
+  pipeline : N -> N
 where
-  pipeline = validate o9 normalize o9 enrich o9 format o9 sanitize
+  forall n : N | addOne(n) = n + 1
+  forall n : N | double(n) = 2 * n
+  forall n : N | square(n) = n * n
+  pipeline = square comp double comp addOne
 end
 
-TEXT: This five-stage pipeline:
-TEXT: 1. validate - Check input validity (partial function)
-TEXT: 2. normalize - Standardize format
-TEXT: 3. enrich - Add derived information
-TEXT: 4. format - Convert to output format
-TEXT: 5. sanitize - Remove sensitive data
+TEXT: pipeline(3) = square(double(addOne(3))) = square(double(4)) = square(8) = 64
 
-** Example 2: String Processing Pipeline **
+** Example 2: String Pipeline **
+
+given Char
 
 axdef
-  toLowerCase : seq Char -> seq Char
-  trim : seq Char -> seq Char
-  removeSpecialChars : seq Char -> seq Char
-  dedup : seq Char -> seq Char
-  reverse : seq Char -> seq Char
+  str1 : seq Char -> seq Char
+  str2 : seq Char -> seq Char
+  str3 : seq Char -> seq Char
   stringPipeline : seq Char -> seq Char
 where
-  stringPipeline = toLowerCase o9 trim o9 removeSpecialChars o9 dedup o9 reverse
+  stringPipeline = str3 comp str2 comp str1
 end
 
-TEXT: Process a string through five transformations in sequence.
+TEXT: Demonstrates composition of string-processing functions.
 
-** Example 3: Numerical Computation Pipeline **
+** Example 3: Best Practices **
 
-axdef
-  parse : seq Char +-> Z
-  abs : Z -> N
-  sqrt : N +-> N
-  increment : N -> N
-  toString : N -> seq Char
-  numPipeline : seq Char +-> seq Char
-where
-  forall s : seq Char | s in dom parse =>
-    numPipeline(s) = toString(increment(sqrt(abs(parse(s)))))
-end
-
-TEXT: Parse string → absolute value → square root → increment → convert back to string.
-
-** Example 4: Sequence Transformation Pipeline **
-
-gendef [X, Y, Z, W]
-  map1 : (X -> Y) -> (seq X -> seq Y)
-  map2 : (Y -> Z) -> (seq Y -> seq Z)
-  map3 : (Z -> W) -> (seq Z -> seq W)
-  composeMaps : (X -> Y) cross (Y -> Z) cross (Z -> W) -> (seq X -> seq W)
-where
-  forall f : X -> Y; g : Y -> Z; h : Z -> W |
-    composeMaps(f, g, h) = map1(f) o9 map2(g) o9 map3(h)
-end
-
-TEXT: Compose three map operations into a single sequence transformation.
-
-** Example 5: State Machine Pipeline **
-
-Status ::= raw | validated | processed | approved | archived
-
-axdef
-  validateState : Status +-> Status
-  processState : Status +-> Status
-  approveState : Status +-> Status
-  archiveState : Status +-> Status
-  statePipeline : Status +-> Status
-where
-  dom validateState = {raw}
-  ran validateState = {validated}
-  dom processState = {validated}
-  ran processState = {processed}
-  dom approveState = {processed}
-  ran approveState = {approved}
-  dom archiveState = {approved}
-  ran archiveState = {archived}
-  statePipeline = validateState o9 processState o9 approveState o9 archiveState
-end
-
-TEXT: Each stage is only defined for specific input states, creating a strict state machine.
-
-** Example 6: Error Propagation in Pipelines **
-
-gendef [X, Y, Z]
-  Result_X ::= ok_X⟨X⟩ | error_X⟨seq Char⟩
-
-  safeCompose : (X +-> Y) cross (Y +-> Z) -> (X +-> Z)
-where
-  forall f : X +-> Y; g : Y +-> Z; x : X |
-    (x in dom f and f(x) in dom g) =>
-    safeCompose(f, g)(x) = g(f(x))
-end
-
-TEXT: Safe composition ensures intermediate results are in domain before proceeding.
-
-** Example 7: Conditional Pipeline Branches **
-
-axdef
-  route : N -> {1, 2, 3}
-  process1 : N -> N
-  process2 : N -> N
-  process3 : N -> N
-  conditionalPipeline : N -> N
-where
-  forall n : N | route(n) = if n < 10 then 1 else if n < 100 then 2 else 3
-  forall n : N | process1(n) = n * 2
-  forall n : N | process2(n) = n + 10
-  forall n : N | process3(n) = n * n
-  forall n : N |
-    conditionalPipeline(n) =
-      if route(n) = 1 then process1(n)
-      else if route(n) = 2 then process2(n)
-      else process3(n)
-end
-
-TEXT: Route data through different processing stages based on conditions.
-
-** Example 8: Pipeline with Feedback Loop **
-
-axdef
-  transform : N -> N
-  check : N -> B
-  iterate : N -> N
-where
-  forall n : N | transform(n) = (n * 2) + 1
-  forall n : N | check(n) = (n < 1000)
-  forall n : N |
-    iterate(n) = if check(n) then iterate(transform(n)) else n
-end
-
-TEXT: Apply transformation repeatedly until condition is met (feedback loop).
-
-** Example 9: Parallel Pipeline Branches **
-
-gendef [X, Y, Z]
-  fork : X -> (Y cross Z)
-  process_Y : Y -> Y
-  process_Z : Z -> Z
-  join : Y cross Z -> X
-  parallelPipeline : X -> X
-where
-  forall x : X |
-    parallelPipeline(x) =
-      join(process_Y(fork(x).1), process_Z(fork(x).2))
-end
-
-TEXT: Fork data into parallel branches, process independently, then join results.
-
-** Example 10: Database Query Pipeline **
-
-given Query, ParsedQuery, OptimizedQuery, ExecutionPlan, Results
-
-axdef
-  parseSQL : Query +-> ParsedQuery
-  optimize : ParsedQuery -> OptimizedQuery
-  plan : OptimizedQuery -> ExecutionPlan
-  execute : ExecutionPlan +-> Results
-  queryPipeline : Query +-> Results
-where
-  queryPipeline = parseSQL o9 optimize o9 plan o9 execute
-end
-
-TEXT: SQL query processing: parse → optimize → plan → execute.
-
-** Example 11: Machine Learning Pipeline **
-
-given RawFeatures, ScaledFeatures, SelectedFeatures, ModelInput, Prediction
-
-axdef
-  scale : RawFeatures -> ScaledFeatures
-  selectFeatures : ScaledFeatures -> SelectedFeatures
-  encode : SelectedFeatures -> ModelInput
-  predict : ModelInput -> Prediction
-  mlPipeline : RawFeatures -> Prediction
-where
-  mlPipeline = scale o9 selectFeatures o9 encode o9 predict
-end
-
-TEXT: ML inference pipeline: scale → feature selection → encoding → prediction.
-
-** Example 12: Debugging Composed Pipelines **
-
-TEXT: To debug a complex pipeline, decompose it into stages:
-
-axdef
-  stage1 : N -> N
-  stage2 : N -> N
-  stage3 : N -> N
-  full : N -> N
-  intermediate1 : N -> N
-  intermediate2 : N -> N
-where
-  forall n : N | stage1(n) = n + 1
-  forall n : N | stage2(n) = n * 2
-  forall n : N | stage3(n) = n * n
-  full = stage1 o9 stage2 o9 stage3
-  intermediate1 = stage1
-  intermediate2 = stage1 o9 stage2
-end
-
-TEXT: Test intermediate1, intermediate2, then full to isolate issues.
-
-** Example 13: Pipeline Performance Optimization **
-
-TEXT: Optimize by:
-TEXT: 1. Combining consecutive maps: map(f) o9 map(g) = map(f o9 g)
-TEXT: 2. Reordering filters: filter early to reduce data volume
-TEXT: 3. Caching expensive operations
-TEXT: 4. Parallelizing independent stages
-
-gendef [X]
-  filter_fast : (X -> B) -> (seq X -> seq X)
-  filter_slow : (X -> B) -> (seq X -> seq X)
-  map_expensive : (X -> X) -> (seq X -> seq X)
-  optimized : (X -> B) cross (X -> X) -> (seq X -> seq X)
-where
-  forall p : X -> B; f : X -> X |
-    optimized(p, f) = filter_fast(p) o9 map_expensive(f)
-end
-
-TEXT: Filter early (cheap operation) before expensive mapping.
-
-** Example 14: Real-World Example - HTTP Request Pipeline **
-
-given Request, ParsedRequest, AuthRequest, ValidRequest, Response
-
-axdef
-  parseHTTP : Request +-> ParsedRequest
-  authenticate : ParsedRequest +-> AuthRequest
-  validate : AuthRequest +-> ValidRequest
-  processRequest : ValidRequest -> Response
-  httpPipeline : Request +-> Response
-where
-  httpPipeline = parseHTTP o9 authenticate o9 validate o9 processRequest
-end
-
-TEXT: HTTP server pipeline with authentication and validation stages.
-
-** Example 15: Composition Associativity in Practice **
-
-TEXT: Composition is associative, so grouping doesn't matter:
-
-axdef
-  f, g, h, k : N -> N
-  grouped_left : N -> N
-  grouped_right : N -> N
-where
-  forall n : N | f(n) = n + 1
-  forall n : N | g(n) = n * 2
-  forall n : N | h(n) = n * n
-  forall n : N | k(n) = n - 1
-  grouped_left = ((f o9 g) o9 h) o9 k
-  grouped_right = f o9 (g o9 (h o9 k))
-end
-
-TEXT: Both groupings produce identical results, but may have different performance characteristics.
-
-** Example 16: Best Practices for Complex Pipelines **
-
-TEXT: Guidelines for building maintainable pipelines:
-
-TEXT: 1. Name intermediate stages clearly
-TEXT: 2. Document what each stage does
-TEXT: 3. Type-check that domains and ranges align
-TEXT: 4. Test each stage independently
-TEXT: 5. Use composition for sequential operations
-TEXT: 6. Consider performance implications
-TEXT: 7. Handle errors at appropriate stages
-TEXT: 8. Keep stages focused (single responsibility)
-TEXT: 9. Make pipelines observable (logging/monitoring)
-TEXT: 10. Version pipeline definitions for reproducibility
+TEXT: When building pipelines:
+TEXT: 1. Break complex operations into simple stages
+TEXT: 2. Each stage should have a single responsibility
+TEXT: 3. Test individual functions before composing
+TEXT: 4. Use meaningful names for pipeline stages
+TEXT: 5. Document the flow direction (comp applies right-to-left)

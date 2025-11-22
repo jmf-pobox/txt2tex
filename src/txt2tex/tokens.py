@@ -170,10 +170,11 @@ class TokenType(Enum):
     ELSE = auto()  # else
     OTHERWISE = auto()  # otherwise
 
-    # Proof trees (Phase 5)
+    # Proof trees (Phase 5, enhanced Phase 2.2)
     PROOF = auto()  # PROOF:
     DOUBLE_COLON = auto()  # :: (sibling marker in Path C)
     INDENT = auto()  # Indentation level (significant whitespace)
+    ELLIPSIS = auto()  # ... (steps omitted in proof)
 
     # Whitespace and structure
     WHITESPACE = auto()

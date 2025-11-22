@@ -79,15 +79,51 @@ case q:
 - Each case should derive the same conclusion through different paths
 
 ### 7. Justifications
-Common patterns:
+
+Justifications are free-form text enclosed in brackets `[...]`. Any text is accepted, but the following are standard natural deduction rules:
+
+**Basic rules:**
 - `[assumption]` - marks assumptions
-- `[and elim]` - and elimination
-- `[and intro]` - and introduction
-- `[or elim]` - or elimination
-- `[or intro]` - or introduction
-- `[=> intro from 1]` - implication introduction, discharging assumption [1]
-- `[=> elim]` - implication elimination (modus ponens)
 - `[premise]` - given fact
+
+**Conjunction (and):**
+- `[and elim]`, `[and elim left]`, `[and elim right]`, `[and elim 1]`, `[and elim 2]` - and elimination
+- `[and intro]` - and introduction
+
+**Disjunction (or):**
+- `[or elim]` - or elimination (case analysis)
+- `[or intro]`, `[or intro left]`, `[or intro right]`, `[or intro 1]`, `[or intro 2]` - or introduction
+
+**Implication (=>):**
+- `[=> intro from N]` - implication introduction, discharging assumption [N]
+- `[=> elim]` - implication elimination (modus ponens)
+
+**Negation (not):**
+- `[not intro from N]` - negation introduction (proof by contradiction), discharging assumption [N]
+- `[not elim]` - negation elimination
+
+**Absurdity (false):**
+- `[false elim]` - ex falso quodlibet (from false, derive anything)
+- `[contradiction]`, `[contradiction with X]` - deriving false from contradictory statements
+
+**Classical logic:**
+- `[LEM]` - Law of Excluded Middle (p or not p axiom)
+- `[double negation elim]` - classical rule: not not p implies p
+
+**Derived rules:**
+- `[identity]` - trivial identity step (p proves p)
+- `[negation intro from N]` - alternative form of not intro
+
+**Informal annotations:**
+- `[from above]` - reference to earlier step in proof
+- `[from case]` - reference to case hypothesis
+- `[from X]` - reference to specific statement or premise X
+- `[derived]` - derived result
+- `[known fact]` - external or previously established fact
+- `[definition]` - by definition
+- `[arithmetic]`, `[algebra]`, `[simplification]`, `[factoring]` - mathematical reasoning steps
+
+**Note**: The parser accepts any text within brackets as a justification. The above list represents commonly used patterns in natural deduction and mathematical proofs.
 
 ## Complete Examples
 
