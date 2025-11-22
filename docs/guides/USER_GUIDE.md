@@ -63,6 +63,11 @@ TEXT: We know that forall x : N | x >= 0 is true.
 - Operators converted: `=>` → $\Rightarrow$, `<=>` → $\Leftrightarrow$
 - Formulas automatically detected: `{ x : N | x > 0 }` → $\{ x : \mathbb{N} \mid x > 0 \}$
 - Sequence literals converted: `<a, b, c>` → $\langle a, b, c \rangle$
+- **Keywords automatically converted** to symbols:
+  - `forall` → ∀ ($\forall$)
+  - `exists` → ∃ ($\exists$)
+  - `exists1` → ∃₁ ($\exists_1$)
+  - `emptyset` → ∅ ($\emptyset$)
 - Citations supported: `[cite key]` → (Author, Year) in Harvard style
 
 **Citations in TEXT blocks:**
@@ -94,6 +99,7 @@ PURETEXT: Author's name, "quoted text", and more.
 - Escapes LaTeX special characters: `&`, `%`, `$`, `#`, `_`, `{`, `}`, `~`, `^`, `\`
 - NO formula detection
 - NO operator conversion
+- NO keyword conversion (preserves literal `forall`, `exists`, `emptyset` for teaching)
 - Preserves punctuation like quotes, commas, parentheses
 
 ### LATEX: - Raw LaTeX Passthrough
