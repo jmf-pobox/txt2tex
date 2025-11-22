@@ -1,0 +1,313 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Combined Text Directives}
+
+\section*{Example 1 : Documentation Style}
+\addcontentsline{toc}{section}{Example 1 : Documentation Style}
+
+\noindent This example demonstrates how to combine different text
+directives effectively. Use TEXT for normal explanatory prose with
+proper typography.
+
+\bigskip
+
+\bigskip
+
+Use PURETEXT when showing literal syntax or code examples:
+
+\bigskip
+
+\bigskip
+
+hatch run convert examples/hello\_world.txt
+
+\bigskip
+
+\noindent And use LATEX when you need specific LaTeX formatting not
+available otherwise.
+
+\bigskip
+
+\section*{Example 2 : Tutorial Format}
+\addcontentsline{toc}{section}{Example 2 : Tutorial Format}
+
+\noindent Let's explore the natural numbers. In Z notation, we write
+N for the set of natural numbers: {0, 1, 2, 3, ...}.
+
+\bigskip
+
+\begin{axdef}
+  first\_five : \power \nat
+  \where
+  first\_five = \{0, 1, 2, 3, 4\}
+\end{axdef}
+
+\medskip
+
+\noindent The above defines a set containing the first five natural
+numbers. Note how TEXT blocks provide context before and after formal
+definitions.
+
+\bigskip
+
+\section*{Example 3 : Showing Syntax vs Using Syntax}
+\addcontentsline{toc}{section}{Example 3 : Showing Syntax vs Using Syntax}
+
+\noindent To demonstrate the difference between showing syntax and
+using it, consider quantifiers.
+
+\bigskip
+
+\noindent When we want to use a quantifier in our specification:
+
+\bigskip
+
+\noindent
+$\forall x : \nat @ x \geq 0$
+
+\noindent But when we want to show the syntax literally for teaching purposes:
+
+\bigskip
+
+\bigskip
+
+forall x : T | predicate
+
+\bigskip
+
+\noindent The PURETEXT block shows the syntax pattern without
+actually creating a formal quantified expression.
+
+\bigskip
+
+\section*{Example 4 : Code Examples with Explanations}
+\addcontentsline{toc}{section}{Example 4 : Code Examples with Explanations}
+
+\noindent The txt2tex tool supports several commands. Here are the most common:
+
+\bigskip
+
+\bigskip
+
+\# Convert to LaTeX only
+
+\bigskip
+
+\bigskip
+
+hatch run cli examples/file.txt
+
+\bigskip
+
+\bigskip
+
+\bigskip
+
+\bigskip
+
+\# Convert to PDF (full pipeline)
+
+\bigskip
+
+\bigskip
+
+hatch run convert examples/file.txt
+
+\bigskip
+
+\noindent The first command generates only the LaTeX file, while the
+second runs the complete pipeline including PDF generation.
+
+\bigskip
+
+\medskip\noindent\textit{Tip:} Always use the convert command for final output.
+
+\section*{Example 5 : Mathematical Explanation}
+\addcontentsline{toc}{section}{Example 5 : Mathematical Explanation}
+
+\noindent Consider the function f(n) = $n^2$. We can define this
+$formally \in Z$ notation:
+
+\bigskip
+
+\begin{axdef}
+  square : \nat \fun \nat
+  \where
+  \forall n : \nat @ square(n) = n * n
+\end{axdef}
+
+\noindent This states that square is a total function from natural
+numbers to natural numbers.
+
+\bigskip
+
+\begin{center}
+
+  \begin{tabular}{c|c}
+
+    $n$ & $f(n)$ \\ \hline
+
+    0 & 0 \\
+
+    1 & 1 \\
+
+    2 & 4 \\
+
+    3 & 9 \\
+
+    4 & 16
+
+  \end{tabular}
+
+\end{center}
+
+\noindent The table above shows the first few values of the square function.
+
+\bigskip
+
+\section*{Example 6 : Syntax Reference}
+\addcontentsline{toc}{section}{Example 6 : Syntax Reference}
+
+\noindent Here's a quick reference for text directives:
+
+\bigskip
+
+\begin{description}
+
+  \item[TEXT:] Normal prose with smart quotes and inline math
+
+  \item[PURETEXT:] Verbatim text without processing
+
+  \item[LATEX:] Raw LaTeX commands
+
+  \item[PAGEBREAK:] Force a page break
+
+\end{description}
+
+\bigskip
+
+Example usage:
+
+\bigskip
+
+\bigskip
+
+TEXT: This is a paragraph.
+
+\bigskip
+
+\bigskip
+
+PURETEXT: This is verbatim.
+
+\bigskip
+
+\bigskip
+
+LATEX: \textbackslash\{\}textbf\{Bold text\}
+
+\bigskip
+
+\bigskip
+
+PAGEBREAK
+
+\bigskip
+
+\section*{Example 7 : Best Practices}
+\addcontentsline{toc}{section}{Example 7 : Best Practices}
+
+\noindent When writing specifications, follow these guidelines:
+
+\bigskip
+
+\noindent 1. Use TEXT for all explanatory prose—it provides the best typography
+
+\bigskip
+
+\noindent 2. Use PURETEXT sparingly, only when you need to show
+literal syntax or preserve special characters
+
+\bigskip
+
+\noindent 3. Use LATEX as an escape hatch for formatting not
+supported by txt2tex
+
+\bigskip
+
+\noindent 4. Use PAGEBREAK only when you need explicit control over page breaks
+
+\bigskip
+
+\vspace{1cm}
+
+\noindent By following these practices, your documents will be both
+readable and maintainable.
+
+\bigskip
+
+\section*{Example 8 : Real - World Document Structure}
+\addcontentsline{toc}{section}{Example 8 : Real - World Document Structure}
+
+\noindent A typical specification document might look like this:
+
+\bigskip
+
+\section*{Section 1 : Introduction}
+
+\noindent Prose introduction explaining the problem domain.
+
+\bigskip
+
+\section*{Section 2 : Data Types}
+
+\begin{zed}[User, Document, Permission]
+\end{zed}
+
+\noindent The system has three basic $types : users$, documents, and
+permissions.
+
+\bigskip
+
+\section*{Section 3 : State Schema}
+
+\begin{schema}{FileSystem}
+  docs : User \pfun \power Document \\
+  perms : Document \pfun \power Permission \\
+  all\_docs : \power Document
+  \where
+  all\_docs = \bigcup (\ran docs) \\
+  all\_docs \subseteq \dom perms
+\end{schema}
+
+\noindent The state schema defines the relationships between users,
+documents, and permissions.
+
+\bigskip
+
+\noindent
+$PAGEBREAK$
+
+\section*{Section 4 : Operations}
+
+\noindent Now we define the operations on the file system...
+
+\bigskip
+
+\noindent This structure—sections with TEXT introductions, formal
+definitions, and strategic page breaks—creates clear, professional
+specifications.
+
+\bigskip
+
+\end{document}

@@ -134,30 +134,32 @@ PROOF:
 
 ```
 PROOF:
+p => (q => p) [=> intro from 1]
   [1] p [assumption]
-      [2] q [assumption]
-          p [from 1]
       q => p [=> intro from 2]
-  p => (q => p) [=> intro from 1]
+        [2] q [assumption]
+            p [from 1]
 ```
 
 **See:** `examples/04_proof_trees/nested_proofs.txt`
 
 ## Indentation Rules
 
-- Top-level premises: no indentation
-- Nested assumption: indent 2 spaces
-- Conclusions within assumption: same indentation
-- Discharge: outdent to parent level
+- Top-level conclusion: no indentation
+- Assumptions with labels: indent 2 spaces per nesting level
+- Statements within assumption scope: indent 2 more spaces
+- Each nested assumption adds another indentation level
 
 **Example:**
 ```
 PROOF:
-  p [assumption 1]
-    q [assumption 2]
-    r [from q]
-  q => r [=> intro from 2]
-  p => (q => r) [=> intro from 1]
+p => (q => (r => s)) [=> intro from 1]
+  [1] p [assumption]
+      q => (r => s) [=> intro from 2]
+        [2] q [assumption]
+            r => s [=> intro from 3]
+              [3] r [assumption]
+                  s [axiom]
 ```
 
 **See:** `docs/PROOF_SYNTAX.md`
@@ -172,31 +174,33 @@ PROOF:
 TEXT: Prove (p and q) => p
 
 PROOF:
-  p and q [premise]
-  p [and elim left]
+p and q => p [=> intro from 1]
+  [1] p and q [assumption]
+      p [and elim 1]
 
-** Example 2: Transitivity of Implication **
+** Example 2: Modus Ponens **
 
-TEXT: Prove (p => q) and (q => r) => (p => r)
+TEXT: Prove p and (p => q) => (p and q)
 
 PROOF:
-  p => q [premise]
-  q => r [premise]
-  p [assumption 1]
-  q [=> elim with p => q]
-  r [=> elim with q => r]
-  p => r [=> intro from 1]
+p and (p => q) => (p and q) [=> intro from 1]
+  [1] p and (p => q) [assumption]
+      :: p [and elim 1]
+      :: p => q [and elim 2]
+      q [=> elim]
+      p and q [and intro]
 
 ** Example 3: Proof by Contradiction **
 
 TEXT: Prove (p and not p) => q
 
 PROOF:
-  p and not p [premise]
-  p [and elim left]
-  not p [and elim right]
-  false [contradiction]
-  q [false elim]
+(p and not p) => q [=> intro from 1]
+  [1] p and not p [assumption]
+      p [and elim 1]
+      not p [and elim 2]
+      false [contradiction]
+      q [false elim]
 ```
 
 **See:** `examples/04_proof_trees/simple_proofs.txt`, `examples/04_proof_trees/contradiction.txt`

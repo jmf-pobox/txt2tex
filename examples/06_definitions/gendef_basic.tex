@@ -1,0 +1,224 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Basic Generic Definitions}
+
+\section*{Example 1 : Generic Identity Function}
+\addcontentsline{toc}{section}{Example 1 : Generic Identity Function}
+
+\noindent The identity function works for any type:
+
+\bigskip
+
+\begin{gendef}[X]
+  identity: X \fun X
+  \where
+  \forall x : X @ identity(x) = x
+\end{gendef}
+
+\noindent This defines identity polymorphically. It can be used with
+any type: identity applied to a natural number returns that number,
+identity applied to a set returns that set, etc.
+
+\bigskip
+
+\section*{Example 2 : Generic Constant}
+\addcontentsline{toc}{section}{Example 2 : Generic Constant}
+
+\noindent A generic empty set:
+
+\bigskip
+
+\begin{gendef}[X]
+  empty: \power X
+  \where
+  empty = \{\}
+\end{gendef}
+
+\noindent The empty set can be instantiated for any type X.
+
+\bigskip
+
+\section*{Example 3 : Generic Pair Functions}
+\addcontentsline{toc}{section}{Example 3 : Generic Pair Functions}
+
+\noindent Extract the first element of a pair:
+
+\bigskip
+
+\begin{gendef}[X, Y]
+  fst: X \cross Y \fun X
+  \where
+  \forall x : X @ \forall y : Y @ fst(x, y) = x
+\end{gendef}
+
+\noindent Extract the second element:
+
+\bigskip
+
+\begin{gendef}[X, Y]
+  snd: X \cross Y \fun Y
+  \where
+  \forall x : X @ \forall y : Y @ snd(x, y) = y
+\end{gendef}
+
+\noindent These work for pairs of any types.
+
+\bigskip
+
+\section*{Example 4 : Generic Singleton Set}
+\addcontentsline{toc}{section}{Example 4 : Generic Singleton Set}
+
+\noindent Create a set containing a single element:
+
+\bigskip
+
+\begin{gendef}[X]
+  singleton: X \fun \power X
+  \where
+  \forall x : X @ singleton(x) = \{x\}
+\end{gendef}
+
+\noindent Given any value, singleton produces a set containing just that value.
+
+\bigskip
+
+\section*{Example 5 : Generic Sequence Operations}
+\addcontentsline{toc}{section}{Example 5 : Generic Sequence Operations}
+
+\noindent The head of a sequence (generic version):
+
+\bigskip
+
+\begin{gendef}[X]
+  headOf: \seq X \fun X
+  \where
+  \forall s : \seq X | \# s > 0 @ headOf(s) = s(1)
+\end{gendef}
+
+\noindent This is defined only for non-empty sequences.
+
+\bigskip
+
+\section*{Example 6 : Generic Set Membership ( Conceptual )}
+\addcontentsline{toc}{section}{Example 6 : Generic Set Membership (
+Conceptual )}
+
+\noindent Set membership can be tested using the built-in 'in'
+$operator \in Z$ notation. In other contexts, you might define a
+membership test function, but Z notation provides this as a primitive
+predicate: $x \in S$ is true exactly when x is an element of S.
+
+\bigskip
+
+\section*{Example 7 : Generic Optional Type ( Conceptual )}
+\addcontentsline{toc}{section}{Example 7 : Generic Optional Type ( Conceptual )}
+
+\noindent Optional values can be modeled with free $types \in Z$
+notation. For a specific type, you would $define : Option$ ::= none
+$\mid$ some⟨T⟩. Generic optional types require more complex setup
+beyond basic gendef blocks, as free $types \in Z$ are typically
+defined for specific types rather than being polymorphic.
+
+\bigskip
+
+\section*{Example 8 : Generic Swap Function}
+\addcontentsline{toc}{section}{Example 8 : Generic Swap Function}
+
+\noindent Swap the components of a pair:
+
+\bigskip
+
+\begin{gendef}[X, Y]
+  swap: X \cross Y \fun Y \cross X
+  \where
+  \forall x : X @ \forall y : Y @ swap(x, y) = (y, x)
+\end{gendef}
+
+\noindent Converts (x, y) to (y, x).
+
+\bigskip
+
+\section*{Example 9 : Generic Cardinality}
+\addcontentsline{toc}{section}{Example 9 : Generic Cardinality}
+
+\noindent Size of a set (for finite sets):
+
+\bigskip
+
+\begin{gendef}[X]
+  size: \power X \fun \nat
+  \where
+  \forall S : \power X @ size(S) = \# S
+\end{gendef}
+
+\noindent Returns the number of elements in a finite set.
+
+\bigskip
+
+\section*{Example 10 : Generic List Construction}
+\addcontentsline{toc}{section}{Example 10 : Generic List Construction}
+
+\noindent Construct a singleton sequence:
+
+\bigskip
+
+\begin{gendef}[X]
+  single: X \fun \seq X
+  \where
+  \forall x : X @ single(x) = \langle x \rangle
+\end{gendef}
+
+\noindent Wraps a value in a single-element sequence.
+
+\bigskip
+
+\section*{Example 11 : Using Generic Definitions}
+\addcontentsline{toc}{section}{Example 11 : Using Generic Definitions}
+
+\noindent Once defined, generic functions can be instantiated for
+specific types:
+
+\bigskip
+
+\begin{axdef}
+  id\_nat : \nat \fun \nat \\
+  id\_set : \power \nat \fun \power \nat
+  \where
+  id\_nat = identity[\nat] \\
+  id\_set = identity[\power \nat]
+\end{axdef}
+
+\noindent Here identity[N] is the identity function instantiated for
+natural numbers, and identity[P N] is instantiated for sets of natural numbers.
+
+\bigskip
+
+\section*{Example 12 : Generic Constants}
+\addcontentsline{toc}{section}{Example 12 : Generic Constants}
+
+\noindent Define a generic empty sequence:
+
+\bigskip
+
+\begin{gendef}[X]
+  emptySeq: \seq X
+  \where
+  emptySeq = \langle \rangle
+\end{gendef}
+
+\noindent This can be instantiated as emptySeq[N] for an empty
+sequence of naturals, emptySeq[Person] for an empty sequence of persons, etc.
+
+\bigskip
+
+\end{document}

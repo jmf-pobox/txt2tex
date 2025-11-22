@@ -27,11 +27,18 @@ PROOF:
 Marks the beginning of a proof tree.
 
 ### 2. Conclusion (Top Level)
-The first non-indented line after `PROOF:` is the final conclusion:
+The conclusion is the top-level statement of the proof. It may appear:
+- At the beginning (most common): Shows what we're proving, with the proof deriving it
+- At the end: Some proofs build up to the conclusion as the final step
+
 ```
 PROOF:
 p and q => q [=> intro from 1]
+  [1] p and q [assumption]
+      q [and elim]
 ```
+
+In this example, `p and q => q` is the conclusion we're proving.
 
 ### 3. Assumptions with Labels
 Assumptions are marked with `[number]` and the keyword `[assumption]`:
@@ -72,11 +79,11 @@ case q:
     [3] q [assumption]
 ```
 
-**Key pattern for cases with multiple sibling steps:**
-- When a case has multiple `::` siblings that build up to a conclusion
-- The LAST sibling step automatically wraps earlier siblings as its premises
-- Do NOT add explicit "from above" references - they create duplication
-- Each case should derive the same conclusion through different paths
+**Key pattern for cases with "from above":**
+- Use `[from above]` to reference facts established before the case analysis
+- The `::` marker indicates sibling premises that together support a step
+- Each case should derive the same conclusion through different reasoning paths
+- Facts derived before the case split remain available within all cases
 
 ### 7. Justifications
 
@@ -169,30 +176,30 @@ p and (p => q) => (p and q) [=> intro from 1]
 PROOF:
 p and (q or r) => (p and q) or (p and r) [=> intro from 1]
   [1] p and (q or r) [assumption]
-      :: p [and elim]
-        :: p and (q or r) [from 1]
-      :: q or r [and elim]
-        :: p and (q or r) [from 1]
-      :: (p and q) or (p and r) [or elim]
+      p [and elim 1]
+      q or r [and elim 2]
+      (p and q) or (p and r) [or elim]
         case q:
-          :: q [case assumption]
-          :: p and q [and intro]
-          :: (p and q) or (p and r) [or intro]
+          :: p [from above]
+          :: q [from case]
+          p and q [and intro]
+          (p and q) or (p and r) [or intro 1]
         case r:
-          :: r [case assumption]
-          :: p and r [and intro]
-          :: (p and q) or (p and r) [or intro]
+          :: p [from above]
+          :: r [from case]
+          p and r [and intro]
+          (p and q) or (p and r) [or intro 2]
 ```
 
 **Explanation**:
 - Assume `p and (q or r)` as [1]
-- Extract `p` and `q or r` as siblings
-- For case analysis on `q or r`:
-  - **Case q**: Use case assumption `q`, build `p and q`, then introduce to disjunction
-  - **Case r**: Use case assumption `r`, build `p and r`, then introduce to disjunction
-- Both cases yield the same result
+- Extract `p` and `q or r` from the assumption
+- Perform case analysis on `q or r`:
+  - **Case q**: Use `p` from above and case assumption `q`, build `p and q`, then introduce to disjunction
+  - **Case r**: Use `p` from above and case assumption `r`, build `p and r`, then introduce to disjunction
+- Both cases derive the same conclusion
 
-**Important note on case structure**: When a case has multiple sibling steps (marked with `::`) that derive the case conclusion, the LAST step automatically includes earlier steps as premises. You do NOT need to explicitly reference "from above" - the earlier sibling derivations are automatically available to the final step in the case.
+**Important note on case structure**: Within each case, use `[from above]` to reference facts established before the case analysis began. The `::` sibling markers indicate multiple facts that together support the next inference step.
 
 ### Example 4: Modus Tollens
 **Goal**: Prove `(p => q) and not q => not p`
@@ -243,6 +250,28 @@ class ProofStep:
 class CaseAnalysis:
     cases: list[tuple[str, list[ProofStep]]]  # ("q", steps), ("rcl", steps)
 ```
+
+## Parser Limitations
+
+### Critical: Spacing After Identifiers Before Brackets
+
+**IMPORTANT**: The parser requires a space between an identifier and an opening bracket `[` to avoid ambiguity with subscript notation.
+
+**Incorrect (will fail):**
+```
+p and q[and elim]  // Parser reads this as p with subscript "and q[and"
+```
+
+**Correct:**
+```
+p and q [and elim]  // Space before [ makes it clear this is a justification
+```
+
+This limitation affects:
+- Proof justifications: Always write `expression [justification]` with a space
+- Any context where brackets follow an identifier
+
+**Workaround**: Add at least one space before the `[` bracket when it's meant to be a justification or label, not a subscript operator.
 
 ## LaTeX Generation Strategy
 

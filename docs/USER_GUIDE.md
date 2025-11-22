@@ -1725,10 +1725,9 @@ Examples:
 
 ```
 PROOF:
-  p and q => p [=> intro from 1]
-    [1] p and q [assumption]
-    :: p [and elim 1]
-      :: p and q [from 1]
+p and q => p [=> intro from 1]
+  [1] p and q [assumption]
+      p [and elim 1]
 ```
 
 ### Example: Case Analysis
@@ -1736,42 +1735,40 @@ PROOF:
 **Simple case analysis:**
 ```
 PROOF:
-  p or q => r [=> intro from 1]
-    [1] p or q [assumption]
-    :: r [or elim]
-      :: p or q [from 1]
-      case p:
-        :: r [from 2]
-          [2] p [assumption]
-      case q:
-        :: r [from 3]
-          [3] q [assumption]
+p or q => r [=> intro from 1]
+  [1] p or q [assumption]
+      r [or elim]
+        case p:
+          r [from assumption p]
+        case q:
+          r [from assumption q]
 ```
 
-**Case analysis with multiple sibling steps:**
+**Case analysis with sibling premises:**
 ```
 PROOF:
-  ((p => r) and (q => r)) => ((p or q) => r) [=> intro from 1]
-    [1] (p => r) and (q => r) [assumption]
-    :: (p or q) => r [=> intro from 2]
-      [2] p or q [assumption]
-      :: r [or elim from 3]
-        case p:
-          :: p => r [and elim 1]
-            :: (p => r) and (q => r) [from 1]
-          :: r [=> elim]
-            [3] p [assumption]
+p and (q or r) => (p and q) or (p and r) [=> intro from 1]
+  [1] p and (q or r) [assumption]
+      p [and elim 1]
+      q or r [and elim 2]
+      (p and q) or (p and r) [or elim]
         case q:
-          :: q => r [and elim 2]
-            :: (p => r) and (q => r) [from 1]
-          :: r [=> elim]
-            [3] q [assumption]
+          :: p [from above]
+          :: q [from case]
+          p and q [and intro]
+          (p and q) or (p and r) [or intro 1]
+        case r:
+          :: p [from above]
+          :: r [from case]
+          p and r [and intro]
+          (p and q) or (p and r) [or intro 2]
 ```
 
-**Important**: When a case has multiple sibling steps (marked with `::`) leading to the conclusion:
-- The LAST sibling step automatically includes earlier siblings as its premises
-- Do NOT write `:: result [from above]` - this creates duplication
-- The earlier derivations are automatically available to the final step
+**Important**: When working with case analysis:
+- Use `[from above]` to reference facts established before the case split
+- The `::` sibling markers indicate multiple facts that together support the next step
+- Each case should derive the same conclusion through different reasoning paths
+- Facts proven before case analysis remain available within all cases
 
 ---
 

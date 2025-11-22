@@ -1,0 +1,81 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Test : Phase A - Verify Phase 14 - 16 Features}
+\addcontentsline{toc}{section}{Test : Phase A - Verify Phase 14 - 16 Features}
+
+\subsection*{(a)}
+
+\noindent Test ASCII sequence brackets and pattern matching:
+
+\bigskip
+
+\begin{zed}[Entry, Status]
+\end{zed}
+
+\begin{axdef}
+  viewed : \seq Entry \fun \seq Entry \\
+  yes : Status
+  \where
+  viewed(\langle \rangle) = \langle \rangle
+\end{axdef}
+
+\medskip
+
+\subsection*{(b)}
+
+\noindent Test conditional expressions:
+
+\bigskip
+
+\begin{axdef}
+  abs : \num \fun \nat
+  \where
+  \forall x : \num @ abs(x) = \IF x \geq 0 \THEN x \ELSE -x
+\end{axdef}
+
+\medskip
+
+\subsection*{(c)}
+
+\noindent Test multi-word identifiers with underscore:
+
+\bigskip
+
+\begin{axdef}
+  cumulative\_total : \seq \nat \fun \nat
+  \where
+  cumulative\_total(\langle \rangle) = 0 \\
+  \forall x : \nat @ \forall s : \seq \nat @
+  cumulative\_total(\langle x \rangle \cat s) = x + cumulative\_total(s)
+\end{axdef}
+
+\medskip
+
+\subsection*{(d)}
+
+\noindent Test all three features combined:
+
+\bigskip
+
+\begin{zed}[Play, User, UserStatus]
+\end{zed}
+
+\begin{axdef}
+  premium\_plays : \seq Play \fun \seq Play \\
+  user\_status : User \fun UserStatus \\
+  premium : UserStatus
+  \where
+  premium\_plays(\langle \rangle) = \langle \rangle
+\end{axdef}
+
+\end{document}

@@ -1,0 +1,470 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Generic Type Instantiation}
+
+\section*{Example 1 : Basic Type Instantiation}
+\addcontentsline{toc}{section}{Example 1 : Basic Type Instantiation}
+
+\noindent Apply type parameters to polymorphic types using square brackets:
+
+\bigskip
+
+\noindent
+$\seq \nat$
+
+\noindent
+$\power X$
+
+\noindent
+$\emptyset[\num]$
+
+\noindent These instantiate generic types for specific type arguments.
+
+\bigskip
+
+\section*{Example 2 : Empty Set Instantiation}
+\addcontentsline{toc}{section}{Example 2 : Empty Set Instantiation}
+
+\begin{axdef}
+  emptyNats : \power \nat \\
+  emptyInts : \power \num
+  \where
+  emptyNats = \emptyset[\nat] \\
+  emptyInts = \emptyset[\num]
+\end{axdef}
+
+\noindent $\emptyset$ is generic; $\emptyset$[N] is the empty set of naturals.
+
+\bigskip
+
+\section*{Example 3 : Sequence Type Instantiation}
+\addcontentsline{toc}{section}{Example 3 : Sequence Type Instantiation}
+
+\begin{axdef}
+  numbers : \seq \nat \\
+  integers : \seq \num
+  \where
+  numbers = \langle 1, 2, 3 \rangle \\
+  integers = \langle -1, 0, 1 \rangle
+\end{axdef}
+
+\noindent seq[N] is the type of sequences of natural numbers.
+
+\bigskip
+
+\section*{Example 4 : Power Set Instantiation}
+\addcontentsline{toc}{section}{Example 4 : Power Set Instantiation}
+
+\begin{axdef}
+  subsetsOfN : \power (\power  \nat) \\
+  example : \power (\power  \nat)
+  \where
+  example = \{\{1, 2\}, \{3\}, \emptyset[\nat]\}
+\end{axdef}
+
+\noindent P(P N) is the power set of the power set of naturals (sets of sets).
+
+\bigskip
+
+\section*{Example 5 : Complex Type Parameters}
+\addcontentsline{toc}{section}{Example 5 : Complex Type Parameters}
+
+\begin{axdef}
+  pairsSeq : \seq (\nat \cross \nat) \\
+  pairsSet : \power (\nat \cross \nat)
+  \where
+  pairsSeq = \langle (1, 2), (3, 4) \rangle \\
+  pairsSet = \{(1, 2), (3, 4)\}
+\end{axdef}
+
+\noindent Type parameters can be complex types like N cross N.
+
+\bigskip
+
+\section*{Example 6 : Nested Instantiation}
+\addcontentsline{toc}{section}{Example 6 : Nested Instantiation}
+
+\begin{axdef}
+  seqOfSets : \seq (\power \nat) \\
+  setOfSeqs : \power (\seq \nat)
+  \where
+  seqOfSets = \langle \{1, 2\}, \{3, 4, 5\} \rangle \\
+  setOfSeqs = \{\langle 1, 2 \rangle, \langle 3, 4 \rangle\}
+\end{axdef}
+
+\noindent seq[P N] is a sequence of sets. P[seq[N]] is a set of sequences.
+
+\bigskip
+
+\section*{Example 7 : Generic Function Instantiation}
+\addcontentsline{toc}{section}{Example 7 : Generic Function Instantiation}
+
+\begin{gendef}[X]
+  identity: X \fun X
+  \where
+  \forall x : X @ identity(x) = x
+\end{gendef}
+
+\begin{axdef}
+  id\_nat : \nat \fun \nat \\
+  id\_int : \num \fun \num
+  \where
+  id\_nat = identity[\nat] \\
+  id\_int = identity[\num]
+\end{axdef}
+
+\noindent identity[N] instantiates the generic identity function for
+natural numbers.
+
+\bigskip
+
+\section*{Example 8 : Multiple Type Parameters}
+\addcontentsline{toc}{section}{Example 8 : Multiple Type Parameters}
+
+\begin{gendef}[X, Y]
+  pairType: X \cross Y
+\end{gendef}
+
+\begin{axdef}
+  natIntPair : \nat \cross \num \\
+  intNatPair : \num \cross \nat
+  \where
+  natIntPair = pairType[\nat, \num] \\
+  intNatPair = pairType[\num, \nat]
+\end{axdef}
+
+\noindent Instantiate with multiple type arguments.
+
+\bigskip
+
+\section*{Example 9 : Bag Instantiation}
+\addcontentsline{toc}{section}{Example 9 : Bag Instantiation}
+
+\begin{axdef}
+  natBag : \bag \nat \\
+  intBag : \bag \num
+  \where
+  natBag = \lbag 1, 1, 2, 3 \rbag \\
+  intBag = \lbag -1, 0, 1 \rbag
+\end{axdef}
+
+\noindent bag[N] is the type of bags (multisets) of natural numbers.
+
+\bigskip
+
+\section*{Example 10 : Generic Relation Types}
+\addcontentsline{toc}{section}{Example 10 : Generic Relation Types}
+
+\begin{axdef}
+  natRelation : \nat \rel \nat \\
+  mixedRelation : \nat \rel \num
+  \where
+  natRelation = \{1 \mapsto 2, 2 \mapsto 4\} \\
+  mixedRelation = \{1 \mapsto -1, 2 \mapsto -2\}
+\end{axdef}
+
+\noindent Relations between different types.
+
+\bigskip
+
+\section*{Example 11 : Sequence of Pairs}
+\addcontentsline{toc}{section}{Example 11 : Sequence of Pairs}
+
+\begin{axdef}
+  coordSeq : \seq (\nat \cross \nat)
+  \where
+  coordSeq = \langle (0, 0), (1, 1), (2, 4), (3, 9) \rangle
+\end{axdef}
+
+\noindent A sequence where each element is a pair (coordinate).
+
+\bigskip
+
+\section*{Example 12 : Set of Functions}
+\addcontentsline{toc}{section}{Example 12 : Set of Functions}
+
+\begin{axdef}
+  square : \nat \fun \nat \\
+  double : \nat \fun \nat \\
+  successor : \nat \fun \nat
+  \where
+  \forall n : \nat @ square(n) = n * n \\
+  \forall n : \nat @ double(n) = 2 * n \\
+  \forall n : \nat @ successor(n) = n + 1
+\end{axdef}
+
+\begin{axdef}
+  funcSet : \power (\nat \fun \nat)
+  \where
+  funcSet = \{square, double, successor\}
+\end{axdef}
+
+\noindent A set containing three functions.
+
+\bigskip
+
+\section*{Example 13 : Practical Example - Generic Pair}
+\addcontentsline{toc}{section}{Example 13 : Practical Example - Generic Pair}
+
+\begin{gendef}[T]
+  makePair: T \cross T \fun T \cross T
+  \where
+  \forall x, y : T @ makePair(x, y) = (x, y)
+\end{gendef}
+
+\noindent Generic pair function that works with any type T.
+
+\bigskip
+
+\section*{Example 14 : Generic Pair Extraction}
+\addcontentsline{toc}{section}{Example 14 : Generic Pair Extraction}
+
+\begin{gendef}[X]
+  fst: X \cross X \fun X \\
+  snd: X \cross X \fun X
+  \where
+  \forall x, y : X @ fst(x, y) = x \\
+  \forall x, y : X @ snd(x, y) = y
+\end{gendef}
+
+\noindent Generic first and second functions that work with any type X.
+
+\bigskip
+
+\section*{Example 15 : List of Lists}
+\addcontentsline{toc}{section}{Example 15 : List of Lists}
+
+\begin{axdef}
+  matrix : \seq (\seq \nat)
+  \where
+  matrix = \langle \langle 1, 2, 3 \rangle, \langle 4, 5, 6 \rangle,
+  \langle 7, 8, 9 \rangle \rangle
+\end{axdef}
+
+\noindent Nested sequences represent a 3x3 matrix.
+
+\bigskip
+
+\section*{Example 16 : Homogeneous Collections}
+\addcontentsline{toc}{section}{Example 16 : Homogeneous Collections}
+
+\noindent Type instantiation ensures homogeneity:
+
+\bigskip
+
+\begin{axdef}
+  validSeq : \seq \nat
+  \where
+  validSeq = \langle 1, 2, 3 \rangle
+\end{axdef}
+
+\noindent $INVALID : seq[N] cannot contain non-naturals$
+
+\bigskip
+
+\noindent invalidSeq = ⟨1, -1, 2⟩  -- would be type error $if -1 \notin N$
+
+\bigskip
+
+\section*{Example 17 : Generic Queue}
+\addcontentsline{toc}{section}{Example 17 : Generic Queue}
+
+\begin{gendef}[T]
+  wrap: T \fun \seq T \\
+  unwrap: \seq T \fun T
+  \where
+  \forall x : T @ wrap(x) = \langle x \rangle \\
+  \forall s : \seq T @ \# s > 0 \implies unwrap(s) = s(1)
+\end{gendef}
+
+\noindent Generic wrap/unwrap functions for working with sequences.
+
+\bigskip
+
+\section*{Example 18 : Type Synonyms with Instantiation}
+\addcontentsline{toc}{section}{Example 18 : Type Synonyms with Instantiation}
+
+\noindent Type abbreviations can use instantiated types:
+
+\bigskip
+
+\noindent IntSet == P Z (set of integers)
+
+\bigskip
+
+\noindent NatSeq == seq N (sequence of naturals)
+
+\bigskip
+
+\noindent Coordinate == N cross N (pair of naturals)
+
+\bigskip
+
+\noindent Path == seq Coordinate (sequence of coordinates)
+
+\bigskip
+
+\noindent These provide readable names for complex instantiated types.
+
+\bigskip
+
+\section*{Example 19 : Higher - Order Types}
+\addcontentsline{toc}{section}{Example 19 : Higher - Order Types}
+
+\begin{axdef}
+  transformers : \power (\nat \fun \nat) \\
+  sequences : \power (\seq \nat)
+  \where
+  transformers = \{square, double\} \\
+  sequences = \{\langle 1, 2 \rangle, \langle 3, 4 \rangle\}
+\end{axdef}
+
+\noindent Sets of functions and sequences.
+
+\bigskip
+
+\section*{Example 20 : Instantiation in Quantifiers}
+\addcontentsline{toc}{section}{Example 20 : Instantiation in Quantifiers}
+
+\noindent
+$\forall s : \seq \nat @ \# s \geq 0$
+
+\noindent
+$\exists p : \nat \cross \nat @ p.1 = p.2$
+
+\noindent Quantifying over instantiated generic types.
+
+\bigskip
+
+\section*{Example 21 : Partial Function Types}
+\addcontentsline{toc}{section}{Example 21 : Partial Function Types}
+
+\begin{axdef}
+  lookup : \nat \pfun \seq \nat \\
+  mapping : \nat \rel \nat
+  \where
+  lookup = \{1 \mapsto \langle 10, 20 \rangle, 2 \mapsto \langle 30,
+  40 \rangle\} \\
+  mapping = \{1 \mapsto 2, 2 \mapsto 4, 3 \mapsto 6\}
+\end{axdef}
+
+\noindent Partial functions with instantiated types.
+
+\bigskip
+
+\section*{Example 22 : Best Practices}
+\addcontentsline{toc}{section}{Example 22 : Best Practices}
+
+\noindent When using generic instantiation:
+
+\bigskip
+
+\noindent 1. Be explicit about type parameters for clarity
+
+\bigskip
+
+\noindent 2. Use consistent naming $(\seq T, \lnot (mixed(seq)(T))
+\land T(seq))$
+
+\bigskip
+
+\noindent 3. Document what type parameters represent
+
+\bigskip
+
+\noindent 4. Instantiate at the right abstraction level
+
+\bigskip
+
+\noindent 5. Prefer generic definitions over duplicate specific definitions
+
+\bigskip
+
+\noindent 6. Type-check that instantiations make sense
+
+\bigskip
+
+\section*{Example 23 : Common Patterns}
+\addcontentsline{toc}{section}{Example 23 : Common Patterns}
+
+\noindent Common instantiation patterns:
+
+\bigskip
+
+\noindent - seq[T] for sequences of T
+
+\bigskip
+
+\noindent - P[T] for sets of T
+
+\bigskip
+
+\noindent - $T \pfun U$ for partial functions
+
+\bigskip
+
+\noindent - T $\rel$ U for relations
+
+\bigskip
+
+\noindent - bag[T] for multisets of T
+
+\bigskip
+
+\noindent - T cross U for pairs
+
+\bigskip
+
+\noindent - $T \fun U$ for total functions
+
+\bigskip
+
+\section*{Example 24 : Type Safety}
+\addcontentsline{toc}{section}{Example 24 : Type Safety}
+
+\noindent Generic instantiation provides type safety:
+
+\bigskip
+
+\begin{axdef}
+  safe : \seq \nat
+  \where
+  safe = \langle 1, 2, 3 \rangle
+\end{axdef}
+
+\noindent Type checker ensures all elements match the instantiated type.
+
+\bigskip
+
+\noindent COMPILE ERROR examples:
+
+\bigskip
+
+\noindent - seq[N] = ⟨1, 2, 'a'⟩ -- 'a' is $\lnot a$ natural
+
+\bigskip
+
+\noindent - P[N] = $\{1, 2, -1\}$ -- -1 might not $be \in N$
+depending on N definition
+
+\bigskip
+
+\noindent - bag[Z] = [[1, "hello"]] -- "hello" is not an integer
+
+\bigskip
+
+\noindent The type system catches these errors at compile/check time.
+
+\bigskip
+
+\end{document}
