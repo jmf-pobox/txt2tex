@@ -126,7 +126,7 @@ PROOF:
 
 ```
 PROOF:
-  p [assumption 1]
+  [1] p [assumption]
   p => p [=> intro from 1]
 ```
 
@@ -134,10 +134,10 @@ PROOF:
 
 ```
 PROOF:
-  p [assumption 1]
-    q [assumption 2]
-    p [from 1]
-    q => p [=> intro from 2]
+  [1] p [assumption]
+      [2] q [assumption]
+          p [from 1]
+      q => p [=> intro from 2]
   p => (q => p) [=> intro from 1]
 ```
 
