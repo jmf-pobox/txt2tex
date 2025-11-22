@@ -32,14 +32,15 @@ TEXT: This is an axiom of classical logic but not of constructive logic.
 TEXT: Prove: (p => q) => ((not p => q) => q)
 
 PROOF:
-  p => q [premise]
-  not p => q [premise]
-  p or not p [LEM]
-  CASE p:
-    q [=> elim with p => q]
-  CASE not p:
-    q [=> elim with not p => q]
-  q [or elim]
+q [or elim]
+  [1] p => q [assumption]
+      [2] not p => q [assumption]
+          p or not p [LEM]
+          case p:
+            q [=> elim with p => q]
+          case not p:
+            q [=> elim with not p => q]
+          q [or elim]
 
 TEXT: By LEM, we can case-analyze on p or not p. In both cases we derive q.
 
@@ -48,14 +49,15 @@ TEXT: By LEM, we can case-analyze on p or not p. In both cases we derive q.
 TEXT: Prove: not not p => p
 
 PROOF:
-  not not p [premise]
-  p or not p [LEM]
-  CASE p:
-    p [identity]
-  CASE not p:
-    false [contradiction with not not p]
-    p [false elim]
-  p [or elim]
+p [or elim]
+  [1] not not p [assumption]
+      p or not p [LEM]
+      case p:
+        p [identity]
+      case not p:
+        false [contradiction with not not p]
+        p [false elim]
+      p [or elim]
 
 TEXT: LEM enables double negation elimination in classical logic.
 
@@ -64,30 +66,29 @@ TEXT: LEM enables double negation elimination in classical logic.
 TEXT: Prove: not (p and q) => (not p or not q)
 
 PROOF:
-  not (p and q) [premise]
-  p or not p [LEM]
-  CASE p:
-    q or not q [LEM]
-    CASE q:
-      p and q [and intro]
-      false [contradiction with premise]
-      not p or not q [false elim]
-    CASE not q:
-      not q [identity]
-      not p or not q [or intro right]
-    not p or not q [or elim]
-  CASE not p:
-    not p [identity]
-    not p or not q [or intro left]
-  not p or not q [or elim]
+not p or not q [or elim]
+  [1] not (p and q) [assumption]
+      p or not p [LEM]
+      case p:
+        q or not q [LEM]
+        case q:
+          p and q [and intro]
+          false [contradiction with premise]
+          not p or not q [false elim]
+        case not q:
+          not q [identity]
+          not p or not q [or intro right]
+        not p or not q [or elim]
+      case not p:
+        not p [identity]
+        not p or not q [or intro left]
+      not p or not q [or elim]
 
 TEXT: This proof requires LEM to case-analyze on both p and q.
 
 ** Example 5: Decidability **
 
-TEXT: A proposition is decidable if we can prove p or not p:
-
-decidable(p) == p or not p
+TEXT: A proposition is decidable if we can prove p or not p. In logical notation, we would write: decidable(p) means (p or not p).
 
 TEXT: LEM states that all propositions are decidable in classical logic.
 
@@ -96,14 +97,15 @@ TEXT: LEM states that all propositions are decidable in classical logic.
 TEXT: Prove: (not p => false) => p
 
 PROOF:
-  not p => false [premise]
-  p or not p [LEM]
-  CASE p:
-    p [identity]
-  CASE not p:
-    false [=> elim]
-    p [false elim]
-  p [or elim]
+p [or elim]
+  [1] not p => false [assumption]
+      p or not p [LEM]
+      case p:
+        p [identity]
+      case not p:
+        false [=> elim]
+        p [false elim]
+      p [or elim]
 
 TEXT: This shows that proof by contradiction follows from LEM.
 
@@ -114,27 +116,28 @@ TEXT: Prove: (p => q) <=> (not p or q)
 TEXT: Left-to-right (p => q => not p or q):
 
 PROOF:
-  p => q [premise]
-  p or not p [LEM]
-  CASE p:
-    q [=> elim]
-    not p or q [or intro right]
-  CASE not p:
-    not p or q [or intro left]
-  not p or q [or elim]
+not p or q [or elim]
+  [1] p => q [assumption]
+      p or not p [LEM]
+      case p:
+        q [=> elim]
+        not p or q [or intro right]
+      case not p:
+        not p or q [or intro left]
+      not p or q [or elim]
 
 TEXT: Right-to-left (not p or q => p => q):
 
 PROOF:
-  not p or q [premise]
-  p [assumption 1]
-  CASE not p:
-    false [contradiction]
-    q [false elim]
-  CASE q:
-    q [identity]
-  q [or elim]
-  p => q [=> intro from 1]
+p => q [=> intro from 1]
+  [1] not p or q [assumption]
+      [2] p [assumption]
+          case not p:
+            false [contradiction]
+            q [false elim]
+          case q:
+            q [identity]
+          q [or elim]
 
 TEXT: Material implication equivalence uses LEM in the forward direction.
 
@@ -143,17 +146,18 @@ TEXT: Material implication equivalence uses LEM in the forward direction.
 TEXT: Prove: ((p => q) => p) => p
 
 PROOF:
-  (p => q) => p [premise]
-  p or not p [LEM]
-  CASE p:
-    p [identity]
-  CASE not p:
-    p [assumption 1]
-    false [contradiction]
-    q [false elim]
-    p => q [=> intro from 1]
-    p [=> elim with premise]
-  p [or elim]
+p [or elim]
+  [1] (p => q) => p [assumption]
+      p or not p [LEM]
+      case p:
+        p [identity]
+      case not p:
+        [2] p [assumption]
+            false [contradiction]
+            q [false elim]
+        p => q [=> intro from 2]
+        p [=> elim with premise]
+      p [or elim]
 
 TEXT: Pierce's law is equivalent to LEM in classical logic.
 
@@ -195,8 +199,8 @@ TEXT: Common proof strategy using LEM:
 
 TEXT: To prove Q:
 TEXT: 1. Invoke p or not p for some relevant p
-TEXT: 2. CASE p: prove Q assuming p
-TEXT: 3. CASE not p: prove Q assuming not p
+TEXT: 2. [case] p prove Q assuming p
+TEXT: 3. [case] not p prove Q assuming not p
 TEXT: 4. Conclude Q by or elim
 
 TEXT: This technique is called "proof by cases" or "case analysis."
@@ -210,8 +214,8 @@ TEXT: 1. Assume not p [assumption 1]
 TEXT: 2. Derive false
 TEXT: 3. Conclude not not p [not intro from 1]
 TEXT: 4. Apply LEM: p or not p
-TEXT: 5. CASE p: p
-TEXT: 6. CASE not p: contradicts not not p, derive p by false elim
+TEXT: 5. [case] p p
+TEXT: 6. [case] not p contradicts not not p, derive p by false elim
 TEXT: 7. Conclude p [or elim]
 
 TEXT: LEM enables the final step (double negation elimination).
@@ -221,22 +225,23 @@ TEXT: LEM enables the final step (double negation elimination).
 TEXT: Prove: There exists a person x such that if x drinks, then everyone drinks.
 
 PROOF:
-  p or not p [LEM] where p = "everyone drinks"
-  CASE p (everyone drinks):
-    Pick any person a
-    a drinks [from p]
-    forall y | y drinks [from p]
-    a drinks => (forall y | y drinks) [=> intro, trivially true]
-    exists x | x drinks => (forall y | y drinks) [exists intro with x = a]
-  CASE not p (not everyone drinks):
-    exists person b | not (b drinks) [negation of forall]
-    not (b drinks) [exists elim]
-    b drinks [assumption 1]
-    false [contradiction]
-    forall y | y drinks [false elim]
-    b drinks => (forall y | y drinks) [=> intro from 1]
-    exists x | x drinks => (forall y | y drinks) [exists intro with x = b]
-  exists x | x drinks => (forall y | y drinks) [or elim]
+exists x | x drinks => (forall y | y drinks) [or elim]
+  [1] p or not p [assumption]
+      case p:
+        Pick any person a
+        a drinks [from p]
+        forall y | y drinks [from p]
+        a drinks => (forall y | y drinks) [=> intro, trivially true]
+        exists x | x drinks => (forall y | y drinks) [exists intro with x = a]
+      case not p:
+        exists b | not (b drinks) [negation of forall]
+        not (b drinks) [exists elim]
+        [2] b drinks [assumption]
+            false [contradiction]
+            forall y | y drinks [false elim]
+        b drinks => (forall y | y drinks) [=> intro from 2]
+        exists x | x drinks => (forall y | y drinks) [exists intro with x = b]
+      exists x | x drinks => (forall y | y drinks) [or elim]
 
 TEXT: This classical proof uses LEM crucially.
 

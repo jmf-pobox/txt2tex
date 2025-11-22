@@ -1,55 +1,43 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Testing Range Operator}
 
-\bigskip
-\noindent
-\textbf{Test 1 : Simple Numeric Range}
-
-\medskip
+\section*{Test 1 : Simple Numeric Range}
+\addcontentsline{toc}{section}{Test 1 : Simple Numeric Range}
 
 \noindent
 $1 \upto 10$
 
-\bigskip
-\noindent
-\textbf{Test 2 : Range with Identifiers}
-
-\medskip
+\section*{Test 2 : Range with Identifiers}
+\addcontentsline{toc}{section}{Test 2 : Range with Identifiers}
 
 \noindent
 $1993 \upto current$
 
-\bigskip
-\noindent
-\textbf{Test 3 : Range in Set Comprehension}
-
-\medskip
+\section*{Test 3 : Range in Set Comprehension}
+\addcontentsline{toc}{section}{Test 3 : Range in Set Comprehension}
 
 \noindent
 $\{ x : 1 \upto 20 | x \mod 2 = 0 \}$
 
-\bigskip
-\noindent
-\textbf{Test 4 : Range with Expressions}
-
-\medskip
+\section*{Test 4 : Range with Expressions}
+\addcontentsline{toc}{section}{Test 4 : Range with Expressions}
 
 \noindent
 $a + 1 \upto b + 2$
 
-\bigskip
-\noindent
-\textbf{Test 5 : Range in Schema}
-
-\medskip
+\section*{Test 5 : Range in Schema}
+\addcontentsline{toc}{section}{Test 5 : Range in Schema}
 
 \begin{schema}{ValidYear}
   year : 1900 \upto 2100
@@ -57,29 +45,20 @@ $a + 1 \upto b + 2$
   year \geq 1900
 \end{schema}
 
-\bigskip
-\noindent
-\textbf{Test 6 : Union of Ranges}
-
-\medskip
+\section*{Test 6 : Union of Ranges}
+\addcontentsline{toc}{section}{Test 6 : Union of Ranges}
 
 \noindent
 $1 \upto 5 \cup 10 \upto 15$
 
-\bigskip
-\noindent
-\textbf{Test 7 : Range with Tuple Projections}
-
-\medskip
+\section*{Test 7 : Range with Tuple Projections}
+\addcontentsline{toc}{section}{Test 7 : Range with Tuple Projections}
 
 \noindent
 $p.1 \upto p.2$
 
-\bigskip
-\noindent
-\textbf{Test 8 : Complex Set Comprehension}
-
-\medskip
+\section*{Test 8 : Complex Set Comprehension}
+\addcontentsline{toc}{section}{Test 8 : Complex Set Comprehension}
 
 \noindent
 $\{ x : 1 \upto 10 | x > 3 @ x^2 \}$

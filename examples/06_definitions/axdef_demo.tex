@@ -1,23 +1,21 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 19 Demo : Finite Set Types}
 
-\bigskip
-\noindent
-\textbf{Example 1 : F ( finite sets )}
+\section*{Example 1 : F ( finite sets )}
+\addcontentsline{toc}{section}{Example 1 : F ( finite sets )}
 
-\medskip
-
-\bigskip
-
-F X denotes all finite subsets of X:
+\noindent F X denotes all finite subsets of X:
 
 \bigskip
 
@@ -29,15 +27,10 @@ F X denotes all finite subsets of X:
   users : \finset UserId
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 2 : F1 ( non - empty finite sets )}
+\section*{Example 2 : F1 ( non - empty finite sets )}
+\addcontentsline{toc}{section}{Example 2 : F1 ( non - empty finite sets )}
 
-\medskip
-
-\bigskip
-
-F1 X denotes all non-empty finite subsets of X:
+\noindent F1 X denotes all non-empty finite subsets of X:
 
 \bigskip
 
@@ -45,15 +38,10 @@ F1 X denotes all non-empty finite subsets of X:
   activeUsers : \finset_1 UserId
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Example 3 : Combined with function types}
+\section*{Example 3 : Combined with function types}
+\addcontentsline{toc}{section}{Example 3 : Combined with function types}
 
-\medskip
-
-\bigskip
-
-Using F and F1 with partial functions:
+\noindent Using F and F1 with partial functions:
 
 \bigskip
 

@@ -1,0 +1,232 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Bullet Separator Examples}
+
+\section*{Example 1 : Set Comprehension with Bullet}
+\addcontentsline{toc}{section}{Example 1 : Set Comprehension with Bullet}
+
+\noindent The bullet separator distinguishes the constraint (filter)
+from the term (selector):
+
+\bigskip
+
+\noindent
+$\{ x : \nat | x > 0 @ x * x \}$
+
+\noindent This reads: "the set of x squared, for all $x \in N$ where
+x is positive". The constraint $x > 0$ filters the domain, and x * x
+is the value selected.
+
+\bigskip
+
+\section*{Example 2 : Set Comprehension Without Bullet}
+\addcontentsline{toc}{section}{Example 2 : Set Comprehension Without Bullet}
+
+\noindent Without the bullet, the set contains the values that
+satisfy the predicate:
+
+\bigskip
+
+\noindent
+$\{ x : \nat | x > 0 \land x < 10 \}$
+
+\noindent This is the set $\{1, 2, 3, 4, 5, 6, 7, 8, 9\}$. No
+transformation is applied.
+
+\bigskip
+
+\section*{Example 3 : Comparing With and Without Bullet}
+\addcontentsline{toc}{section}{Example 3 : Comparing With and Without Bullet}
+
+\noindent With bullet (maps/transforms values):
+
+\bigskip
+
+\noindent
+$\{ n : \nat | n < 5 @ n * n \}$
+
+\noindent Result: $\{0, 1, 4, 9, 16\}$ (squares of 0, 1, 2, 3, 4)
+
+\bigskip
+
+\noindent Without bullet (filters values):
+
+\bigskip
+
+\noindent
+$\{ n : \nat | n < 5 \}$
+
+\noindent Result: $\{0, 1, 2, 3, 4\}$ (the values themselves)
+
+\bigskip
+
+\section*{Example 4 : Complex Set Comprehension}
+\addcontentsline{toc}{section}{Example 4 : Complex Set Comprehension}
+
+\noindent
+$\{ x : \num | x \mod 2 = 0 \land x \geq -10 \land x \leq 10 @ x(div)(2) \}$
+
+\noindent This gives the set $\{-5, -4, -3, -2, -1, 0, 1, 2, 3, 4,
+5\}$ by taking even integers from -10 to 10 and dividing by 2.
+
+\bigskip
+
+\section*{Example 5 : Mu Operator with Bullet}
+\addcontentsline{toc}{section}{Example 5 : Mu Operator with Bullet}
+
+\noindent The mu operator finds the unique value satisfying a condition:
+
+\bigskip
+
+\noindent
+$(\mu x : \nat | x > 5 \land x < 7 @ x)$
+
+\noindent This evaluates to 6, the unique natural number strictly
+between 5 and 7. The bullet separates the uniqueness constraint from
+the selected expression.
+
+\bigskip
+
+\section*{Example 6 : Mu with Complex Expression}
+\addcontentsline{toc}{section}{Example 6 : Mu with Complex Expression}
+
+\noindent
+$(\mu n : \nat | n * n = 16 @ n + 1)$
+
+\noindent This finds the unique n where n squared equals 16 (which is
+$n = 4$), then evaluates n + 1, giving 5.
+
+\bigskip
+
+\section*{Example 7 : Nested Expressions}
+\addcontentsline{toc}{section}{Example 7 : Nested Expressions}
+
+\noindent
+$\{ x : \nat | x < 3 @ \{ y : \nat | y < x @ (x, y) \} \}$
+
+\noindent This creates a set of sets of tuples. For each $x < 3$, we
+create the set of pairs (x, y) where $y < x$.
+
+\bigskip
+
+\section*{Example 8 : Quantifiers with Bullet ( Limited Support )}
+\addcontentsline{toc}{section}{Example 8 : Quantifiers with Bullet (
+Limited Support )}
+
+\noindent Standard Z notation supports bullet in quantifiers to
+separate constraints from body:
+
+\bigskip
+
+\noindent PROPOSED: $\forall x : \nat @ x > 0$. $x \geq 0$
+
+\bigskip
+
+\noindent This would read: "for all positive x, x is non-negative".
+The constraint $x > 0$ restricts the quantification domain.
+
+\bigskip
+
+\noindent NOTE: Full bullet support in $\forall$/exists quantifiers
+is not yet implemented (see STATUS.md). Currently use implication instead:
+
+\bigskip
+
+\noindent
+$\forall x : \nat @ x > 0 \implies x \geq 0$
+
+\section*{Example 9 : Partial Functions with Bullet}
+\addcontentsline{toc}{section}{Example 9 : Partial Functions with Bullet}
+
+\noindent In pattern matching and function definitions:
+
+\bigskip
+
+\begin{axdef}
+  predecessor : \nat \pfun \nat
+  \where
+  \forall n : \nat | n > 0 @ predecessor(n) = n - 1
+\end{axdef}
+
+\noindent The bullet indicates predecessor is only defined when the
+constraint $n > 0$ holds.
+
+\bigskip
+
+\section*{Example 10 : Practical Example - Data Filtering}
+\addcontentsline{toc}{section}{Example 10 : Practical Example - Data Filtering}
+
+\begin{zed}[Employee]
+\end{zed}
+
+\begin{axdef}
+  salaries : Employee \fun \nat \\
+  high\_earners : \power Employee \\
+  high\_salaries : \power \nat
+  \where
+  high\_earners = \{ e : Employee | salaries(e) > 100000 \} \\
+  high\_salaries = \{ e : Employee | salaries(e) > 100000 @ salaries(e) \}
+\end{axdef}
+
+\noindent high\_earners is the set of employees earning over 100K
+(the employees themselves). high\_salaries is the set of salary
+values over 100K (the transformed values).
+
+\bigskip
+
+\section*{Example 11 : Mathematical Sets}
+\addcontentsline{toc}{section}{Example 11 : Mathematical Sets}
+
+\noindent The set of perfect squares less than 100:
+
+\bigskip
+
+\noindent
+$\{ n : \nat | n < 10 @ n * n \}$
+
+\noindent Result: $\{0, 1, 4, 9, 16, 25, 36, 49, 64, 81\}$
+
+\bigskip
+
+\noindent The set of even numbers:
+
+\bigskip
+
+\noindent
+$\{ n : \nat | n \mod 2 = 0 \}$
+
+\noindent Result: {0, 2, 4, 6, 8, ...} (infinite set, no bullet needed)
+
+\bigskip
+
+\section*{Example 12 : Design Pattern}
+\addcontentsline{toc}{section}{Example 12 : Design Pattern}
+
+\noindent The bullet separator follows a consistent pattern across Z notation:
+
+\bigskip
+
+\noindent Before $bullet : constraint$ $(declaration \land filter)$
+
+\bigskip
+
+\noindent After $bullet : term$ (what to compute or select)
+
+\bigskip
+
+\noindent This separation makes specifications clearer by explicitly
+distinguishing the domain restriction from the value computation.
+
+\bigskip
+
+\end{document}

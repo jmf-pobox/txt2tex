@@ -100,7 +100,7 @@ where clause. Outside the schema, they must be accessed via schema references.
 \end{axdef}
 
 \noindent When referencing schema components from outside, use dot
-notation: c.count and c.limit.
+$notation : c.count$ and c.limit.
 
 \bigskip
 
@@ -312,7 +312,8 @@ $\forall x : \nat @ x > 0 \implies (\exists y : \nat @ y < x \land y > 0)$
 \noindent
 $\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
 
-\noindent Inner x shadows outer x---confusing and error-prone. Avoid this pattern.
+\noindent Inner x shadows outer x---confusing and error-prone. Avoid
+this pattern.
 
 \bigskip
 
@@ -323,8 +324,8 @@ $\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
 
 \bigskip
 
-\noindent If we had: axdef with square : $\nat \fun \nat$ and $n : N,
-where $\forall$ n $: N shadows the global n.
+\noindent If we had: axdef with square : $\nat \fun \nat$ and $n :
+N$, where $\forall$ $n : N$ shadows the global n.
 
 \bigskip
 

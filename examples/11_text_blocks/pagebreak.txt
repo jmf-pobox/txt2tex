@@ -81,9 +81,11 @@ TEXT: For lengthy proofs, you might want to start each major proof on a new page
 ** Theorem 1 **
 
 PROOF:
-  p => q [premise]
-  p [premise]
-  q [=> elim]
+(p and (p => q)) => q [=> intro from 1]
+  [1] p and (p => q) [assumption]
+      :: p [and elim 1]
+      :: p => q [and elim 2]
+      q [=> elim]
 
 TEXT: End of proof for Theorem 1.
 
@@ -92,9 +94,11 @@ PAGEBREAK
 ** Theorem 2 **
 
 PROOF:
-  p or q [premise]
-  not q [premise]
-  p [or elim]
+(p or q) and (not q) => p [=> intro from 1]
+  [1] (p or q) and (not q) [assumption]
+      p or q [and elim 1]
+      not q [and elim 2]
+      p [or elim]
 
 TEXT: End of proof for Theorem 2.
 

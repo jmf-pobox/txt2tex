@@ -1,0 +1,339 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Proof by Contradiction Examples}
+
+\section*{Example 1 : Basic Contradiction}
+\addcontentsline{toc}{section}{Example 1 : Basic Contradiction}
+
+\noindent To prove p, assume $\lnot p$ and derive a contradiction (false).
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \land (q \land
+    \lnot q)) \implies p}{
+      \infer[\mathrm{false}
+      \mathrm{elim}]{p}{\infer[\mathrm{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot
+          q}{\infer[\land\textrm{-elim-1}]{q}{\infer[\land\textrm{-elim-2}]{q
+              \land \lnot q}{\ulcorner \lnot p \land (q \land \lnot q)
+      \urcorner^{[1]}}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Once we derive false, we can conclude anything—here we
+conclude p by discharging assumption 1.
+
+\bigskip
+
+\section*{Example 2 : Simple Example - Proving q}
+\addcontentsline{toc}{section}{Example 2 : Simple Example - Proving q}
+
+\noindent Prove: $(p \land \lnot p)$ $\Rightarrow$ q
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land \lnot p) \implies q}{
+      \infer[\mathrm{false}
+      \mathrm{elim}]{q}{\infer[\mathrm{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot
+          p}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p \land \lnot p
+      \urcorner^{[1]}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent From a contradiction, we can derive anything (ex falso quodlibet).
+
+\bigskip
+
+\section*{Example 3 : Law of Non - Contradiction}
+\addcontentsline{toc}{section}{Example 3 : Law of Non - Contradiction}
+
+\noindent Prove that p and $\lnot p$ leads to a contradiction.
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \land \lnot p \implies false}{
+      \infer[\mathrm{contradiction}]{false}{\ulcorner p \land \lnot p
+      \urcorner^{[1]}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent This proves the law of non-contradiction - no proposition
+can be both true and false.
+
+\bigskip
+
+\section*{Example 4 : Indirect Proof}
+\addcontentsline{toc}{section}{Example 4 : Indirect Proof}
+
+\noindent Prove: $(\lnot p \implies false) \implies \lnot \lnot p$
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \implies false)
+    \implies \lnot \lnot p}{
+      \infer[\lnot\textrm{-intro}^{[2]}]{\lnot \lnot
+      p}{\infer[\mathrm{assumption}]{\lnot p}{\infer[\Rightarrow
+      \mathrm{elim}]{false}{}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent This is the pattern for indirect proof: if assuming $\lnot
+p$ leads to false, then not $\lnot p$ holds.
+
+\bigskip
+
+\section*{Example 5 : Modus Tollens via Contradiction}
+\addcontentsline{toc}{section}{Example 5 : Modus Tollens via Contradiction}
+
+\noindent Prove: $(p \implies q) \land \lnot q \implies \lnot p$
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \implies q) \land
+    \lnot q) \implies \lnot p}{
+      \infer[\lnot\textrm{-intro}^{[2]}]{\lnot
+      p}{\infer[\mathrm{assumption}]{p}{\infer[\Rightarrow
+      \mathrm{elim}]{q}{} & \infer[\mathrm{contradiction}]{false}{}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Classic modus tollens pattern using contradiction.
+
+\bigskip
+
+\section*{Example 6 : Disjunction from Contradiction}
+\addcontentsline{toc}{section}{Example 6 : Disjunction from Contradiction}
+
+\noindent Prove: $\lnot p \implies (p \implies q)$
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{\lnot p \implies (p \implies q)}{
+      \infer[\Rightarrow\textrm{-intro}^{[2]}]{(p \implies
+      q)}{\infer[\mathrm{false}
+        \mathrm{elim}]{q}{\infer[\mathrm{contradiction}]{false}{\ulcorner
+      p \urcorner^{[2]}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent From $\lnot p$, we can prove $p \implies q$ for any q.
+
+\bigskip
+
+\section*{Example 7 : Double Negation Elimination}
+\addcontentsline{toc}{section}{Example 7 : Double Negation Elimination}
+
+\noindent $Prove : not$ $\lnot p \implies p(requires(classical)(logic))$
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{\lnot \lnot p \implies
+    \lnot \lnot \lnot p}{
+      \infer[\lnot\textrm{-intro}^{[2]}]{\lnot \lnot \lnot
+      p}{\infer[\mathrm{false}
+        \mathrm{elim}]{p}{\infer[\mathrm{contradiction}]{false}{\ulcorner
+      \lnot p \urcorner^{[2]}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent In classical logic, not $\lnot p$ implies p. This requires
+excluded middle or equivalent axiom.
+
+\bigskip
+
+\section*{Example 8 : Reductio ad Absurdum}
+\addcontentsline{toc}{section}{Example 8 : Reductio ad Absurdum}
+
+\noindent Prove: $(\lnot p \implies (q \land \lnot q)) \implies p$
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \implies (q
+    \land \lnot q)) \implies \lnot \lnot p}{
+      \infer[\lnot\textrm{-intro}^{[2]}]{\lnot \lnot
+      p}{\infer[\mathrm{false}
+        \mathrm{elim}]{p}{\infer[\mathrm{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot
+            q}{\infer[\land\textrm{-elim-1}]{q}{\infer[\Rightarrow
+      \mathrm{elim}]{q \land \lnot q}{\ulcorner \lnot p \urcorner^{[2]}}}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Reductio ad absurdum: if assuming $\lnot p$ leads to
+absurdity, then p holds.
+
+\bigskip
+
+\section*{Example 9 : Contradiction with Universal Quantifier}
+\addcontentsline{toc}{section}{Example 9 : Contradiction with
+Universal Quantifier}
+
+\noindent Prove: ($\forall x @ \power x$) and $\exists x @ \lnot
+\power x$ is contradictory.
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{((\forall x @ \power x)
+    \land (\exists x @ \lnot \power x)) \implies false}{
+      \infer[\mathrm{contradiction}]{false}{\infer[forall
+        \mathrm{elim}]{\power a}{\infer[exists \mathrm{elim},fresh
+          a]{\lnot \power a}{\infer[\land\textrm{-elim-2}]{\exists x @
+            \lnot \power x}{\infer[\land\textrm{-elim-1}]{\forall x @
+              \power x}{\ulcorner (\forall x @ \power x) \land (\exists x @
+      \lnot \power x) \urcorner^{[1]}}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent If something holds for all x, it cannot fail for some x.
+
+\bigskip
+
+\section*{Example 10 : Proving Uniqueness by Contradiction}
+\addcontentsline{toc}{section}{Example 10 : Proving Uniqueness by Contradiction}
+
+\noindent $Prove : if f$ is injective, then f(x) = f(y) $\Rightarrow$ $x = y$.
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(injective(f) \land f(x)
+    = f(y)) \implies x = y}{
+      \infer[\lnot\textrm{-intro}^{[2]}]{x =
+      y}{\infer[\mathrm{contradiction} with
+        f(x)=f(y)]{false}{\infer[injective property]{f(x) \neq
+      f(y)}{\ulcorner x \neq y \urcorner^{[2]}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Uses contradiction to prove equality.
+
+\bigskip
+
+\section*{Example 11 : Case Analysis Leading to Contradiction}
+\addcontentsline{toc}{section}{Example 11 : Case Analysis Leading to
+Contradiction}
+
+\noindent $Prove : p$ or q, $\lnot p$, $\lnot q \implies false$
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \land \lnot
+    p \land \lnot q) \implies false}{
+      \infer[\lor \mathrm{elim} \mathrm{from} p \lor
+      q]{false}{\infer[\mathrm{contradiction} with \lnot p]{false}{}
+      & \infer[\mathrm{contradiction} with \lnot q]{false}{}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Both cases lead to contradiction, so the premises are inconsistent.
+
+\bigskip
+
+\section*{Example 12 : Best Practices for Contradiction Proofs}
+\addcontentsline{toc}{section}{Example 12 : Best Practices for
+Contradiction Proofs}
+
+\noindent When using proof by contradiction:
+
+\bigskip
+
+\noindent 1. Clearly mark the assumption you're contradicting with
+[assumption N]
+
+\bigskip
+
+\noindent 2. Show explicitly where false is derived
+
+\bigskip
+
+\noindent 3. Use [not intro from N] to discharge the assumption
+
+\bigskip
+
+\noindent 4. Document the contradiction (what conflicts with what)
+
+\bigskip
+
+\noindent 5. In natural deduction, false elim lets you conclude anything
+
+\bigskip
+
+\noindent 6. $Remember : contradiction$ is a classical technique
+$\lnot constructive$
+
+\bigskip
+
+\end{document}

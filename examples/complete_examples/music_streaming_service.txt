@@ -75,16 +75,16 @@ TEXT: and listening history.
 
 TEXT: Define the basic types and data structures:
 
-given SongId, UserId, PlaylistId, Playlist
+given SongId, UserId, PlaylistId
 
 axdef
   songs : F SongId
   users : F UserId
-  playlists : PlaylistId +-> Playlist
+  playlists : PlaylistId +-> seq SongId
   playlistOwner : PlaylistId +-> UserId
   playlistSubscribers : PlaylistId +-> F1 UserId
 where
-  forall i : dom(playlists) | ran(playlists(i)) subseteq songs
+  forall i : dom(playlists) | ran(playlists i) subseteq songs
   dom(playlistOwner) subseteq dom(playlists)
   ran(playlistOwner) subseteq users
   dom(playlistSubscribers) subseteq dom(playlists)
@@ -123,7 +123,7 @@ TEXT:     F1 means non-empty finite set (at least one subscriber).
 
 TEXT: Integrity constraints:
 TEXT:
-TEXT: 1. forall i : dom(playlists) | ran(playlists(i)) subseteq songs
+TEXT: 1. forall i : dom(playlists) | ran(playlists i) subseteq songs
 TEXT:    Every song in every playlist must be in the catalog.
 TEXT:    Prevents adding non-existent songs to playlists.
 TEXT:
@@ -198,10 +198,10 @@ TEXT: Define queries using set comprehension:
 
 TEXT: (a) Find users not subscribed to any playlist:
 
-A == users \ bigcup(ran(playlistSubscribers))
+A == users \ bigcup {p : dom(playlistSubscribers) . playlistSubscribers(p)}
 
 TEXT: Breakdown:
-TEXT:   - ran(playlistSubscribers): all subscriber sets for all playlists
+TEXT:   - {playlistSubscribers(p) | p : dom(playlistSubscribers)}: collect all subscriber sets
 TEXT:   - bigcup(...): union of all these sets = all users subscribed to anything
 TEXT:   - users \ (...): users not in the subscribed set
 TEXT:
@@ -252,7 +252,7 @@ TEXT: (a) Define love-hate score and playlist count:
 axdef
   loveHateScore : SongId +-> N
 where
-  forall i : songs | loveHateScore(i) = if # {u : UserId | i in loved(u)} >= # {u : UserId | i in hated(u)} then # {u : UserId | i in loved(u)} - # {u : UserId | i in hated(u)} else 0
+  forall i : songs | loveHateScore(i) = if (# {u : UserId | i in loved(u)}) >= (# {u : UserId | i in hated(u)}) then (# {u : UserId | i in loved(u)}) - (# {u : UserId | i in hated(u)}) else 0
 end
 
 TEXT: Logic:
@@ -267,7 +267,7 @@ axdef
   playlistCount : SongId +-> N
 where
   forall i : songs |
-    playlistCount(i) = # {p : dom(playlists) | i in ran(playlists(p))}
+    playlistCount(i) = # {p : dom(playlists) | i in ran(playlists p)}
 end
 
 TEXT: Logic:
@@ -300,25 +300,26 @@ TEXT: (b) Find most popular song:
 axdef
   mostPopular : SongId
 where
-  mostPopular = if (exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j))
-                then (mu i : songs | forall j : songs | i /= j | popularity(i) > popularity(j))
-                else nullSong
+  // Predicate duplicated intentionally: exists1 is precondition, mu is selection
+  exists1 i : songs | forall j : songs | i /= j | popularity(i) > popularity(j)
+  mostPopular = (mu i : songs | forall j : songs | i /= j | popularity(i) > popularity(j))
 end
 
-TEXT: Defensive programming:
-TEXT:   - exists1: check exactly one song has unique maximum popularity
-TEXT:   - If unique max exists: use mu to find it
-TEXT:   - If no unique max (tie): return nullSong (error value)
+TEXT: Constraint:
+TEXT:   - exists1: ensures exactly one song has unique maximum popularity
+TEXT:   - mostPopular is that unique song with maximum popularity (mu selects it)
+TEXT:   - Predicate is duplicated: exists1 proves uniqueness, mu performs selection
+TEXT:   - If multiple songs tie for maximum, the constraint is not satisfied
 TEXT:
-TEXT: This prevents undefined behavior when multiple songs tie for most popular.
+TEXT: This specification assumes there is always a unique most popular song.
 
 TEXT: (c) Find playlists containing the most popular song:
 
-playlistsContainingMostPopularSong == {i : dom(playlists) | mostPopular in ran(playlists(i))}
+playlistsContainingMostPopularSong == {i : dom(playlists) | mostPopular in ran(playlists i)}
 
 TEXT: Logic:
 TEXT:   - Iterate over all playlists: i : dom(playlists)
-TEXT:   - Check if mostPopular song appears: mostPopular in ran(playlists(i))
+TEXT:   - Check if mostPopular song appears: mostPopular in ran(playlists i)
 TEXT:   - Collect matching playlist IDs
 TEXT:
 TEXT: Result: set of playlist IDs featuring the most popular song.
@@ -327,24 +328,29 @@ TEXT: Result: set of playlist IDs featuring the most popular song.
 
 TEXT: Model chronological play events with sequences:
 
-given Play, Status
+given Play
 
-TEXT: Assume Play is a schema: schema Play { songId: SongId, userId: UserId, timestamp: Time }
-TEXT: Assume Status is a free type: Status ::= premium | standard
+Status ::= premium | standard
+
+schema PlayEvent
+  songId: SongId
+  userId: UserId
+end
+
+axdef
+  userStatus : UserId +-> Status
+end
 
 TEXT: Define functions to filter and analyze play history:
 
 TEXT: (a) Extract plays by premium users:
-
-axdef
-  premiumPlays : seq(Play) -> seq(Play)
-where
-  premiumPlays(<>) = <>
-  forall x : Play; s : seq(Play) |
-    premiumPlays(<x> ^ s) = if userStatus(x.2) = premium
-                            then <x> ^ premiumPlays(s)
-                            else premiumPlays(s)
-end
+TEXT:
+TEXT:   premiumPlays : seq(PlayEvent) -> seq(PlayEvent)
+TEXT:   premiumPlays(<>) = <>
+TEXT:   forall x : PlayEvent; s : seq(PlayEvent) |
+TEXT:     premiumPlays(<x> ^ s) = if userStatus(x.userId) = premium
+TEXT:                             then <x> ^ premiumPlays(s)
+TEXT:                             else premiumPlays(s)
 
 TEXT: Recursive pattern matching:
 TEXT:   - Base case: empty sequence yields empty sequence
@@ -353,34 +359,28 @@ TEXT:   - x.2 accesses the userId field (assuming Play is a tuple or schema)
 TEXT:   - userStatus is assumed to be a function: UserId -> Status
 
 TEXT: (b) Extract plays by standard users:
-
-axdef
-  standardPlays : seq(Play) -> seq(Play)
-where
-  standardPlays(<>) = <>
-  forall x : Play; s : seq(Play) |
-    standardPlays(<x> ^ s) = if userStatus(x.2) = standard
-                             then <x> ^ standardPlays(s)
-                             else standardPlays(s)
-end
-
+TEXT:
+TEXT:   standardPlays : seq(PlayEvent) -> seq(PlayEvent)
+TEXT:   standardPlays(<>) = <>
+TEXT:   forall x : PlayEvent; s : seq(PlayEvent) |
+TEXT:     standardPlays(<x> ^ s) = if userStatus(x.userId) = standard
+TEXT:                              then <x> ^ standardPlays(s)
+TEXT:                              else standardPlays(s)
+TEXT:
 TEXT: Similar to premiumPlays, but filters for standard users.
 
 TEXT: (c) Calculate cumulative listening time:
-
-axdef
-  cumulativeLength : seq(Play) -> N
-where
-  cumulativeLength(<>) = 0
-  forall x : Play; s : seq(Play) |
-    cumulativeLength(<x> ^ s) = length(x.1) + cumulativeLength(s)
-end
-
+TEXT:
+TEXT:   cumulativeLength : seq(Play) -> N
+TEXT:   cumulativeLength(<>) = 0
+TEXT:   forall x : Play; s : seq(Play) |
+TEXT:     cumulativeLength(<x> ^ s) = songLength(x.songId) + cumulativeLength(s)
+TEXT:
 TEXT: Fold (reduce) pattern:
 TEXT:   - Base case: empty sequence has zero length
-TEXT:   - Inductive case: add first play's length to rest's total
-TEXT:   - x.1 accesses the songId field
-TEXT:   - length(songId) returns song duration (from earlier definition)
+TEXT:   - Inductive case: add first play's song length to rest's total
+TEXT:   - x.songId accesses the songId field (if Play were a schema)
+TEXT:   - songLength(songId) would return song duration from the catalog
 TEXT:
 TEXT: Usage: Total listening time for a user or for entire service.
 

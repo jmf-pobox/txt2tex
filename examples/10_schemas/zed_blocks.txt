@@ -1,0 +1,206 @@
+// ============================================================================
+// Example: Zed Blocks (zed...end)
+// ============================================================================
+// Demonstrates:
+//   - zed...end block syntax
+//   - Predicates in zed blocks
+//   - Abbreviations in zed blocks
+//   - Type parameter declarations
+//
+// Features:
+//   - zed ... end [block containing predicates/abbreviations]
+//   - Can contain: predicates, abbreviations, type parameters [X, Y]
+//   - For variable declarations use axdef
+//
+// See: docs/USER_GUIDE.md - Section "Schemas" > "Zed Blocks"
+// ============================================================================
+
+=== Zed Block Examples ===
+
+** Example 1: Basic Variable Declarations **
+
+TEXT: Use axdef for variable declarations with types:
+
+given Person, Department
+
+axdef
+  assignment : Person +-> Department
+  employees : F Person
+  departments : F Department
+end
+
+TEXT: This groups related variable declarations in a single block (given types must be declared outside).
+
+** Example 2: Abbreviations **
+
+N_PLUS == {n : N | n > 0}
+N_EVEN == {n : N | n mod 2 = 0}
+N_ODD == {n : N | n mod 2 = 1}
+
+TEXT: Abbreviations can be defined standalone (zed blocks for abbreviations may not be fully supported yet).
+
+** Example 3: Type Parameters **
+
+given Company
+
+TEXT: Declare given types using the given keyword.
+
+** Example 4: Predicates in Zed Block **
+
+axdef
+  x : N
+  y : N
+where
+  x > 0
+  y > 0
+  x + y < 100
+end
+
+TEXT: Multiple predicates can constrain variables defined in axdef.
+
+** Example 5: Free Type Definitions **
+
+Color ::= red | green | blue
+Size ::= small | medium | large
+
+schema Product
+  color : Color
+  size : Size
+  price : N
+where
+  price > 0
+end
+
+TEXT: Free types are defined standalone, then used in schemas.
+
+** Example 6: Multiple Schemas **
+
+given Account, Balance
+
+schema BankAccount
+  accountNumber : N
+  balance : Z
+where
+  balance >= 0
+end
+
+schema Transaction
+  from : BankAccount
+  to : BankAccount
+  amount : N
+where
+  amount > 0
+  from.balance >= amount
+end
+
+TEXT: Multiple schemas can be defined separately, each with their own constraints.
+
+** Example 7: Schema with External Variables **
+
+given Student, Course
+
+axdef
+  enrolled : Student <-> Course
+  maxCourses : N
+  maxStudents : N
+where
+  maxCourses = 7
+  maxStudents = 500
+end
+
+schema Enrollment
+  students : F Student
+  courses : F Course
+where
+  students = dom enrolled
+  courses = ran enrolled
+  # students <= maxStudents
+  # courses <= maxCourses
+end
+
+TEXT: Schemas can reference variables defined in axdef blocks.
+
+** Example 8: Nested Schemas **
+
+given Char
+
+schema Address
+  street : seq Char
+  city : seq Char
+  zipCode : N
+where
+  zipCode >= 10000 and zipCode <= 99999
+end
+
+schema PersonData
+  name : seq Char
+  address : Address
+  age : N
+where
+  age >= 0 and age <= 150
+end
+
+axdef
+  population : F PersonData
+end
+
+TEXT: Schema Address is used within schema PersonData. Variables using schemas go in axdef.
+
+** Example 9: Constants and Functions **
+
+PI == 3
+E == 2
+
+axdef
+  circumference : N -> N
+  area : N -> N
+where
+  forall r : N | circumference(r) = 2 * PI * r
+  forall r : N | area(r) = PI * r * r
+end
+
+TEXT: Mathematical constants defined as abbreviations, functions in axdef.
+
+** Example 10: Permission System Example **
+
+given UserID, DocumentID
+
+PermissionType ::= read | write | admin
+
+schema User
+  userId : UserID
+  documents : P DocumentID
+  permissions : DocumentID +-> PermissionType
+where
+  dom permissions subseteq documents
+end
+
+schema System
+  users : UserID +-> User
+  allDocuments : F DocumentID
+where
+  allDocuments = bigcup {u : ran users . u.documents}
+end
+
+axdef
+  users : UserID +-> User
+end
+
+TEXT: A permission system specification using free types and schemas.
+
+** Example 11: Best Practices **
+
+TEXT: Use zed blocks for:
+TEXT: 1. Type parameter declarations [X, Y]
+TEXT: 2. Abbreviations (N_PLUS, N_EVEN, etc.)
+TEXT: 3. Simple predicates without variable declarations
+
+TEXT: Use axdef for:
+TEXT: 1. Variable declarations with types
+TEXT: 2. Constraints on those variables
+TEXT: 3. Function definitions
+
+TEXT: Use schema for:
+TEXT: 1. State spaces with declarations
+TEXT: 2. Operations on state
+TEXT: 3. Reusable component specifications

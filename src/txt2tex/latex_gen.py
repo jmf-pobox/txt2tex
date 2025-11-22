@@ -702,6 +702,17 @@ class LaTeXGenerator:
         ):
             operand = f"({operand})"
 
+        # bigcup/bigcap need parentheses around function-like operands
+        # E.g., bigcup (ran docs) must generate \bigcup (\ran docs)
+        # Otherwise fuzz parses \bigcup \ran docs as (\bigcup \ran) docs
+        if (
+            self.use_fuzz
+            and node.operator in {"bigcup", "bigcap"}
+            and isinstance(node.operand, UnaryOp)
+            and node.operand.operator in function_like_ops
+        ):
+            operand = f"({operand})"
+
         # Phase 10b: Check if this is a postfix operator (rendered as superscript)
         if node.operator in {"~", "+", "*"}:
             # Fuzz uses special commands for closure operators
@@ -743,6 +754,11 @@ class LaTeXGenerator:
         # In fuzz mode, _quantifier_needs_parens handles this separately
         # In non-fuzz mode, we handle it here
         if isinstance(child, (Quantifier, Lambda)) and not self.use_fuzz:
+            return True
+
+        # FunctionType needs parentheses when used as operand in cross/other ops
+        # E.g., (X -> Y) cross Z, not X -> Y cross Z which would be X -> (Y cross Z)
+        if isinstance(child, FunctionType):
             return True
 
         # Only binary ops need precedence checking
@@ -1277,24 +1293,52 @@ class LaTeXGenerator:
 
         Examples:
         - ∅[N] -> \\emptyset[N] or special empty set notation
-        - seq[N] -> \\seq[N]
-        - P[X] -> \\power[X]
+        - seq[N] -> \\seq N (special handling for single param)
+        - P[X] -> \\power X (special handling for single param)
         - Type[A, B] -> Type[A, B]
         - ∅[N cross N] -> \\emptyset[N \\cross N]
 
-        Strategy: Check if base is a special Z notation identifier, use special
-        rendering if so, otherwise use standard bracket notation.
+        Strategy: Check if base is a special Z notation identifier with single
+        type parameter, use LaTeX command notation. Otherwise use bracket notation.
         """
-        base_latex = self.generate_expr(node.base)
+        # Special Z notation types with LaTeX commands
+        special_types = {
+            "seq": r"\seq",
+            "seq1": r"\seq_1",
+            "iseq": r"\iseq",
+            "bag": r"\bag",
+            "P": r"\power",
+            "F": r"\finset",
+        }
 
-        # Generate comma-separated type parameters
+        # Check if base is a simple identifier with special handling
+        if isinstance(node.base, Identifier):
+            base_name = node.base.name
+            if base_name in special_types and len(node.type_params) == 1:
+                # Generic instantiation with single param: \seq N (no brackets)
+                # Per fuzz manual: prefix generic symbols are operator symbols
+                type_latex = special_types[base_name]
+                param = node.type_params[0]
+                param_latex = self.generate_expr(param)
+                # Add parentheses for complex param expressions
+                if isinstance(
+                    param,
+                    (
+                        FunctionApp,
+                        BinaryOp,
+                        GenericInstantiation,
+                        UnaryOp,
+                        FunctionType,
+                    ),
+                ):
+                    param_latex = f"({param_latex})"
+                return f"{type_latex} {param_latex}"
+
+        # Standard generic instantiation: Type[A, B, ...]
+        base_latex = self.generate_expr(node.base)
         type_params_latex = ", ".join(
             self.generate_expr(param) for param in node.type_params
         )
-
-        # Special Z notation types that might have custom rendering
-        # For now, use standard bracket notation for all types
-        # Future enhancement: Could use special notation like \emptyset~N
         return f"{base_latex}[{type_params_latex}]"
 
     def _generate_range(self, node: Range, parent: Expr | None = None) -> str:
@@ -2432,6 +2476,74 @@ class LaTeXGenerator:
             # Wrap in math mode: x^2 → $x^{2}$
             result = result[:start_pos] + f"${expr}$" + result[end_pos:]
 
+        # Pattern 0.5: Relational image R(| S |) and standalone (| ... |)
+        # MUST come BEFORE Pattern 1 to avoid partial math mode wrapping
+        # Strategy: Match these patterns:
+        # 1. identifier(| ... |) - simple relation like R(| S |)
+        # 2. (expr)(| ... |) - composition like (R o9 S)(| A |)
+        # 3. standalone (| ... |) - describing the notation in prose
+        # For case 2, match the full parenthesized expression
+        # For case 3, match just (| ... |) without a preceding identifier
+        relimg_pattern = r"(?:(\([^)]+\)|[a-zA-Z_]\w*)\s*)?\(\|[^$]*?\|\)"
+
+        matches = list(re.finditer(relimg_pattern, result))
+        for match in reversed(matches):
+            start_pos = match.start()
+            end_pos = match.end()
+
+            # Check if already in math mode
+            before = result[:start_pos]
+            dollars_before = before.count("$")
+            if dollars_before % 2 == 1:
+                continue  # Already in math mode
+
+            math_text = match.group(0)
+
+            # Skip if identifier is a common prose word
+            first_token = math_text.split("(|")[0].strip()
+            if first_token.lower() in {
+                "the",
+                "a",
+                "an",
+                "this",
+                "that",
+                "image",
+                "relation",
+                "set",
+                "function",
+                "gives",
+                "returns",
+                "where",
+                "when",
+                "which",
+            }:
+                continue
+
+            # Special case: standalone (| ... |) with ellipsis for describing notation
+            if "(| ... |)" in math_text or "(| |)" in math_text:
+                # Replace with LaTeX notation
+                math_latex = math_text.replace(
+                    "(| ... |)", r"$\limg \ldots \rimg$"
+                ).replace("(| |)", r"$\limg \rimg$")
+                result = result[:start_pos] + math_latex + result[end_pos:]
+                continue
+
+            # Try to parse as expression
+            try:
+                lexer = Lexer(math_text)
+                tokens = lexer.tokenize()
+                parser = Parser(tokens)
+                ast = parser.parse()
+
+                # Check if we got a valid expression
+                if isinstance(ast, Expr):
+                    # Generate LaTeX
+                    math_latex = self.generate_expr(ast)
+                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
+            except Exception:
+                # Parsing failed, leave as-is
+                pass
+
         # Pattern 1: Set expressions { ... }
         # Find balanced braces (handles nested braces)
         brace_matches = self._find_balanced_braces(result)
@@ -2566,9 +2678,19 @@ class LaTeXGenerator:
         # Pattern 2.5: Type declarations (identifier : type_expression)
         # Match patterns like "large_coins : Collection -> N"
         # This must come before Pattern 3 to catch the identifier before the colon
-        type_decl_pattern = (
-            r"\b([a-zA-Z_]\w*)\s*:\s*([a-zA-Z_][\w\s\*\(\)\[\]<>,\+\->|]+)"
+        # Stop at commas, periods, or common prose words
+        # Use negative lookahead to prevent matching prose words
+        prose_pattern = (
+            r"(?:where|and|or|but|if|then|else|shadows|gives|returns|which|that|"
+            r"is|are|was|were|be|been|have|has|had|the|a|an|this)"
         )
+        # Pattern: identifier : type_expr
+        # Type expr stops at prose words using negative lookahead
+        neg_lookahead = r"(?!" + prose_pattern + r"\b)"
+        type_word = r"[a-zA-Z_][^\s,]*"
+        type_continuation = r"(?:\s+" + neg_lookahead + type_word + r")*"
+        type_expr_part = r"(" + type_word + type_continuation + r")"
+        type_decl_pattern = r"\b([a-zA-Z_]\w*)\s*:\s*" + type_expr_part
 
         matches = list(re.finditer(type_decl_pattern, result))
         for match in reversed(matches):
@@ -3416,7 +3538,29 @@ class LaTeXGenerator:
         Generate \\infer macro for a proof node (bottom-up natural deduction).
 
         Returns LaTeX string for this node and its supporting premises.
+
+        Phase 3: Handle synthetic top-level case analysis nodes.
         """
+        # Check for synthetic top-level case analysis node (Phase 3)
+        # These are created when proof starts with CASE statements
+        if (
+            isinstance(node.expression, Identifier)
+            and node.expression.name == "[case_analysis]"
+            and node.justification == "case analysis"
+        ):
+            # Don't render the synthetic node itself, just its case children
+            case_latexes: list[str] = []
+            for child in node.children:
+                if isinstance(child, CaseAnalysis):
+                    # Use existing case analysis generation method
+                    case_latexes.append(self._generate_case_analysis(child))
+                else:
+                    # Must be ProofNode
+                    case_latexes.append(self._generate_proof_node_infer(child))
+
+            # Join cases side-by-side with &
+            return " & ".join(case_latexes) if case_latexes else ""
+
         # If this is an assumption node, it should appear as a boxed premise
         if node.is_assumption:
             # The assumption itself is a premise (leaf)

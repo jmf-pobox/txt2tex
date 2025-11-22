@@ -1,26 +1,23 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Phase 12 : Sequences , Bags , and Tuple Projection}
 
-\bigskip
-\noindent
-\textbf{Example 1 : Sequence Literals}
+\section*{Example 1 : Sequence Literals}
+\addcontentsline{toc}{section}{Example 1 : Sequence Literals}
 
-\medskip
+\subsection*{(a)}
 
-(a)
-\par
-\vspace{11pt}
-\bigskip
-
-Empty sequence
+\noindent Empty sequence
 
 \bigskip
 
@@ -29,12 +26,9 @@ $\langle \rangle$
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(b)}
 
-Single element
+\noindent Single element
 
 \bigskip
 
@@ -43,12 +37,9 @@ $\langle a \rangle$
 
 \medskip
 
-(c)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(c)}
 
-Multiple elements
+\noindent Multiple elements
 
 \bigskip
 
@@ -57,187 +48,185 @@ $\langle 1, 2, 3, 4, 5 \rangle$
 
 \medskip
 
-(d)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(d)}
 
-Sequence of identifiers
+\noindent Sequence of identifiers
 
 \bigskip
 
 \noindent
 $\langle x, y, z \rangle$
 
-\medskip
+\section*{Example 2 : Sequence Operators}
+\addcontentsline{toc}{section}{Example 2 : Sequence Operators}
 
-\bigskip
-\noindent
-\textbf{Example 2 : Sequence Operators}
-
-\medskip
+\subsection*{(a)}
 
 \noindent
-\hangindent=2em
-(a) $\head \langle 1, 2, 3 \rangle$
+$\head \langle 1, 2, 3 \rangle$
 
 \medskip
-\noindent
-\hangindent=2em
-(b) $\tail \langle 1, 2, 3 \rangle$
 
-\medskip
-\noindent
-\hangindent=2em
-(c) $\last \langle 1, 2, 3 \rangle$
-
-\medskip
-\noindent
-\hangindent=2em
-(d) $\front \langle 1, 2, 3 \rangle$
-
-\medskip
-\noindent
-\hangindent=2em
-(e) $\rev \langle 1, 2, 3 \rangle$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Example 3 : Sequence Concatenation}
-
-\medskip
+\subsection*{(b)}
 
 \noindent
-\hangindent=2em
-(a) $\langle 1, 2 \rangle \cat \langle 3, 4 \rangle$
+$\tail \langle 1, 2, 3 \rangle$
 
 \medskip
-\noindent
-\hangindent=2em
-(b) $s \cat t \cat u$
 
-\medskip
-\noindent
-\hangindent=2em
-(c) $\langle a \rangle \cat \langle b, c \rangle \cat \langle d \rangle$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Example 4 : Tuple Projection}
-
-\medskip
+\subsection*{(c)}
 
 \noindent
-\hangindent=2em
-(a) $x.1$
+$\last \langle 1, 2, 3 \rangle$
 
 \medskip
-\noindent
-\hangindent=2em
-(b) $x.2$
 
-\medskip
-\noindent
-\hangindent=2em
-(c) $(a, b, c).1$
-
-\medskip
-\noindent
-\hangindent=2em
-(d) $(a, b, c).2$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Example 5 : Bag Literals}
-
-\medskip
+\subsection*{(d)}
 
 \noindent
-\hangindent=2em
-(a) $\lbag x \rbag$
+$\front \langle 1, 2, 3 \rangle$
 
 \medskip
+
+\subsection*{(e)}
+
 \noindent
-\hangindent=2em
-(b) $\lbag 1, 2, 3 \rbag$
+$\rev \langle 1, 2, 3 \rangle$
 
-\medskip
+\section*{Example 3 : Sequence Concatenation}
+\addcontentsline{toc}{section}{Example 3 : Sequence Concatenation}
+
+\subsection*{(a)}
+
 \noindent
-\hangindent=2em
-(c) $\lbag a, b, c \rbag$
+$\langle 1, 2 \rangle \cat \langle 3, 4 \rangle$
 
 \medskip
-(d)
-\par
-\vspace{11pt}
-\bigskip
 
-Bags with duplicates
+\subsection*{(b)}
+
+\noindent
+$s \cat t \cat u$
+
+\medskip
+
+\subsection*{(c)}
+
+\noindent
+$\langle a \rangle \cat \langle b, c \rangle \cat \langle d \rangle$
+
+\section*{Example 4 : Tuple Projection}
+\addcontentsline{toc}{section}{Example 4 : Tuple Projection}
+
+\subsection*{(a)}
+
+\noindent
+$x.1$
+
+\medskip
+
+\subsection*{(b)}
+
+\noindent
+$x.2$
+
+\medskip
+
+\subsection*{(c)}
+
+\noindent
+$(a, b, c).1$
+
+\medskip
+
+\subsection*{(d)}
+
+\noindent
+$(a, b, c).2$
+
+\section*{Example 5 : Bag Literals}
+\addcontentsline{toc}{section}{Example 5 : Bag Literals}
+
+\subsection*{(a)}
+
+\noindent
+$\lbag x \rbag$
+
+\medskip
+
+\subsection*{(b)}
+
+\noindent
+$\lbag 1, 2, 3 \rbag$
+
+\medskip
+
+\subsection*{(c)}
+
+\noindent
+$\lbag a, b, c \rbag$
+
+\medskip
+
+\subsection*{(d)}
+
+\noindent Bags with duplicates
 
 \bigskip
 
 \noindent
 $\lbag 1, 2, 2, 3, 3, 3 \rbag$
 
-\medskip
+\section*{Example 6 : Sequences in Expressions}
+\addcontentsline{toc}{section}{Example 6 : Sequences in Expressions}
 
-\bigskip
-\noindent
-\textbf{Example 6 : Sequences in Expressions}
-
-\medskip
+\subsection*{(a)}
 
 \noindent
-\hangindent=2em
-(a) $x \in \langle 1, 2, 3 \rangle$
+$x \in \langle 1, 2, 3 \rangle$
 
 \medskip
-\noindent
-\hangindent=2em
-(b) $\head s = a$
 
-\medskip
-\noindent
-\hangindent=2em
-(c) $\tail \langle 1, 2, 3 \rangle = \langle 2, 3 \rangle$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Example 7 : Complex Expressions}
-
-\medskip
+\subsection*{(b)}
 
 \noindent
-\hangindent=2em
-(a) $\forall i : \nat @ i \in \langle 1, 2, 3 \rangle \implies i > 0$
+$\head s = a$
 
 \medskip
+
+\subsection*{(c)}
+
 \noindent
-\hangindent=2em
-(b) $\exists s : seq[\nat] @ \head s = 1$
+$\tail \langle 1, 2, 3 \rangle = \langle 2, 3 \rangle$
 
-\medskip
+\section*{Example 7 : Complex Expressions}
+\addcontentsline{toc}{section}{Example 7 : Complex Expressions}
+
+\subsection*{(a)}
+
 \noindent
-\hangindent=2em
-(c) $\{ x : \nat | x > 0 @ \langle x, x^2 \rangle \}$
+$\forall i : \nat @ i \in \langle 1, 2, 3 \rangle \implies i > 0$
 
 \medskip
-\bigskip
+
+\subsection*{(b)}
+
 \noindent
-\textbf{Example 8 : Real Examples}
+$\exists s : \seq \nat @ \head s = 1$
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(c)}
 
-From Solution 37
+\noindent
+$\{ x : \nat | x > 0 @ \langle x, x^2 \rangle \}$
+
+\section*{Example 8 : Real Examples}
+\addcontentsline{toc}{section}{Example 8 : Real Examples}
+
+\subsection*{(a)}
+
+\noindent From Solution 37
 
 \bigskip
 
@@ -246,12 +235,9 @@ $\langle a \rangle$
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(b)}
 
-Tuple projection from Solution 38
+\noindent Tuple projection from Solution 38
 
 \bigskip
 
@@ -260,18 +246,13 @@ $trains(x).2$
 
 \medskip
 
-(c)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(c)}
 
-Bags from Solution 39
+\noindent Bags from Solution 39
 
 \bigskip
 
 \noindent
 $\lbag d \rbag$
-
-\medskip
 
 \end{document}

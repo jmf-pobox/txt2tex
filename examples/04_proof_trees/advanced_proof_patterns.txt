@@ -26,7 +26,6 @@
 TEXT: Prove: For all integers n, n < 0 or n = 0 or n > 0
 
 PROOF:
-  n : Z [given]
   n < 0 or n = 0 or n > 0 [trichotomy of integers, axiom]
 
 TEXT: This uses the trichotomy property as an axiom. To prove something about all integers, we can case-analyze on these three possibilities.
@@ -36,26 +35,27 @@ TEXT: This uses the trichotomy property as an axiom. To prove something about al
 TEXT: Prove: (p or q) and (r or s) => (p and r) or (p and s) or (q and r) or (q and s)
 
 PROOF:
-  (p or q) and (r or s) [premise]
-  p or q [and elim left]
-  r or s [and elim right]
-  CASE p:
-    CASE r:
-      p and r [and intro]
-      (p and r) or (p and s) or (q and r) or (q and s) [or intro]
-    CASE s:
-      p and s [and intro]
-      (p and r) or (p and s) or (q and r) or (q and s) [or intro]
-    (p and r) or (p and s) or (q and r) or (q and s) [or elim on r or s]
-  CASE q:
-    CASE r:
-      q and r [and intro]
-      (p and r) or (p and s) or (q and r) or (q and s) [or intro]
-    CASE s:
-      q and s [and intro]
-      (p and r) or (p and s) or (q and r) or (q and s) [or intro]
-    (p and r) or (p and s) or (q and r) or (q and s) [or elim on r or s]
-  (p and r) or (p and s) or (q and r) or (q and s) [or elim on p or q]
+((p or q) and (r or s)) => (p and r) or (p and s) or (q and r) or (q and s) [=> intro from 1]
+  [1] (p or q) and (r or s) [assumption]
+      p or q [and elim 1]
+      r or s [and elim 2]
+      (p and r) or (p and s) or (q and r) or (q and s) [or elim on p or q]
+        case p:
+          (p and r) or (p and s) or (q and r) or (q and s) [or elim on r or s]
+            case r:
+              p and r [and intro]
+              (p and r) or (p and s) or (q and r) or (q and s) [or intro]
+            case s:
+              p and s [and intro]
+              (p and r) or (p and s) or (q and r) or (q and s) [or intro]
+        case q:
+          (p and r) or (p and s) or (q and r) or (q and s) [or elim on r or s]
+            case r:
+              q and r [and intro]
+              (p and r) or (p and s) or (q and r) or (q and s) [or intro]
+            case s:
+              q and s [and intro]
+              (p and r) or (p and s) or (q and r) or (q and s) [or intro]
 
 TEXT: Nested case analysis on two disjunctions, exploring all four combinations.
 
@@ -66,19 +66,21 @@ TEXT: Prove: For all n ∈ ℕ, sum(1 to n) = n(n+1)/2
 TEXT: Base case (n = 0):
 
 PROOF:
-  sum(1 to 0) = 0 [definition]
-  0(0+1)/2 = 0 [arithmetic]
-  sum(1 to 0) = 0(0+1)/2 [equality]
+true => (sum_to(0) = 0 * (0+1) div 2) [=> intro from 1]
+  [1] true [assumption]
+      sum_to(0) = 0 [definition]
+      0 * (0+1) div 2 = 0 [arithmetic]
+      sum_to(0) = 0 * (0+1) div 2 [equality]
 
 TEXT: Inductive step (assume for n, prove for n+1):
 
 PROOF:
-  sum(1 to n) = n(n+1)/2 [inductive hypothesis]
-  sum(1 to n+1) = sum(1 to n) + (n+1) [definition]
-  sum(1 to n+1) = n(n+1)/2 + (n+1) [substitution]
-  sum(1 to n+1) = (n(n+1) + 2(n+1))/2 [algebra]
-  sum(1 to n+1) = (n+1)(n+2)/2 [factoring]
-  sum(1 to n+1) = (n+1)((n+1)+1)/2 [simplification]
+(sum_to(n) = n * (n+1) div 2) => (sum_to(n+1) = (n+1) * (n+2) div 2) [=> intro from 1]
+  [1] sum_to(n) = n * (n+1) div 2 [assumption]
+      sum_to(n+1) = sum_to(n) + (n+1) [definition]
+      sum_to(n+1) = n * (n+1) div 2 + (n+1) [substitution]
+      sum_to(n+1) = (n * (n+1) + 2 * (n+1)) div 2 [algebra]
+      sum_to(n+1) = (n+1) * (n+2) div 2 [factoring]
 
 TEXT: By induction, the formula holds for all natural numbers.
 
@@ -89,19 +91,21 @@ TEXT: Prove: For all sequences s, reverse(reverse(s)) = s
 TEXT: Base case (empty sequence):
 
 PROOF:
-  reverse(<>) = <> [definition]
-  reverse(reverse(<>)) = reverse(<>) [substitution]
-  reverse(reverse(<>)) = <> [definition]
+true => (reverse(reverse(emptyseq)) = emptyseq) [=> intro from 1]
+  [1] true [assumption]
+      reverse(emptyseq) = emptyseq [definition]
+      reverse(reverse(emptyseq)) = reverse(emptyseq) [substitution]
+      reverse(reverse(emptyseq)) = emptyseq [definition]
 
-TEXT: Inductive step (assume for s, prove for <x> ^ s):
+TEXT: Inductive step (assume for s, prove for cons(x, s)):
 
 PROOF:
-  reverse(reverse(s)) = s [inductive hypothesis]
-  reverse(<x> ^ s) = reverse(s) ^ <x> [definition]
-  reverse(reverse(<x> ^ s)) = reverse(reverse(s) ^ <x>) [substitution]
-  reverse(reverse(s) ^ <x>) = reverse(<x>) ^ reverse(reverse(s)) [definition]
-  reverse(<x>) ^ reverse(reverse(s)) = <x> ^ reverse(reverse(s)) [definition]
-  <x> ^ reverse(reverse(s)) = <x> ^ s [inductive hypothesis]
+(reverse(reverse(s)) = s) => (reverse(reverse(cons(x, s))) = cons(x, s)) [=> intro from 1]
+  [1] reverse(reverse(s)) = s [assumption]
+      reverse(cons(x, s)) = append(reverse(s), x) [definition]
+      reverse(reverse(cons(x, s))) = reverse(append(reverse(s), x)) [substitution]
+      reverse(append(reverse(s), x)) = cons(x, reverse(reverse(s))) [definition]
+      cons(x, reverse(reverse(s))) = cons(x, s) [inductive hypothesis]
 
 TEXT: By structural induction, reverse(reverse(s)) = s for all sequences.
 
@@ -110,12 +114,13 @@ TEXT: By structural induction, reverse(reverse(s)) = s for all sequences.
 TEXT: Prove: There exists an even number greater than 10
 
 PROOF:
-  12 : N [given]
-  12 = 2 * 6 [arithmetic]
-  12 mod 2 = 0 [definition of even]
-  12 > 10 [arithmetic]
-  12 is even and 12 > 10 [and intro]
-  exists n : N | n is even and n > 10 [exists intro with n = 12]
+true => (exists n : N | even(n) and n > 10) [=> intro from 1]
+  [1] true [assumption]
+      12 = 2 * 6 [arithmetic]
+      even(12) [definition of even, 12 = 2 * 6]
+      12 > 10 [arithmetic]
+      even(12) and 12 > 10 [and intro]
+      exists n : N | even(n) and n > 10 [exists intro with n = 12]
 
 TEXT: Constructive proof: we exhibit a specific witness (12).
 
@@ -124,20 +129,20 @@ TEXT: Constructive proof: we exhibit a specific witness (12).
 TEXT: Prove: There exist irrational numbers a and b such that a^b is rational
 
 PROOF:
-  sqrt(2) is irrational [known lemma]
-  CASE sqrt(2)^sqrt(2) is rational:
-    a = sqrt(2), b = sqrt(2) [witness]
-    a^b is rational [by case assumption]
-    exists a, b irrational | a^b rational [exists intro]
-  CASE sqrt(2)^sqrt(2) is irrational:
-    a = sqrt(2)^sqrt(2), b = sqrt(2) [witness]
-    a^b = (sqrt(2)^sqrt(2))^sqrt(2) [substitution]
-    a^b = sqrt(2)^(sqrt(2) * sqrt(2)) [exponent law]
-    a^b = sqrt(2)^2 [arithmetic]
-    a^b = 2 [simplification]
-    2 is rational [known]
-    exists a, b irrational | a^b rational [exists intro]
-  exists a, b irrational | a^b rational [or elim]
+irrational(sqrt(2)) => (exists a, b | irrational(a) and irrational(b) and rational(power(a, b))) [=> intro from 1]
+  [1] irrational(sqrt(2)) [assumption]
+      rational(power(sqrt(2), sqrt(2))) or irrational(power(sqrt(2), sqrt(2))) [LEM]
+      exists a, b | irrational(a) and irrational(b) and rational(power(a, b)) [or elim]
+        case rational(power(sqrt(2), sqrt(2))):
+          irrational(sqrt(2)) and irrational(sqrt(2)) and rational(power(sqrt(2), sqrt(2))) [and intro]
+          exists a, b | irrational(a) and irrational(b) and rational(power(a, b)) [exists intro with a = b = sqrt(2)]
+        case irrational(power(sqrt(2), sqrt(2))):
+          power(power(sqrt(2), sqrt(2)), sqrt(2)) = power(sqrt(2), sqrt(2) * sqrt(2)) [exponent law]
+          power(sqrt(2), sqrt(2) * sqrt(2)) = power(sqrt(2), 2) [arithmetic]
+          power(sqrt(2), 2) = 2 [simplification]
+          rational(2) [known]
+          irrational(power(sqrt(2), sqrt(2))) and irrational(sqrt(2)) and rational(power(power(sqrt(2), sqrt(2)), sqrt(2))) [and intro]
+          exists a, b | irrational(a) and irrational(b) and rational(power(a, b)) [exists intro]
 
 TEXT: Non-constructive: we don't know which case is true, but both lead to the conclusion.
 
@@ -148,22 +153,26 @@ TEXT: Prove: Every natural number n ≥ 2 has a prime factorization
 TEXT: Base case (n = 2):
 
 PROOF:
-  2 is prime [definition]
-  2 has prime factorization {2} [trivial]
+true => prime_factorization(2) [=> intro from 1]
+  [1] true [assumption]
+      prime(2) [definition]
+      prime_factorization(2) [trivial, singleton factorization]
 
 TEXT: Inductive step (assume for all k < n, prove for n):
 
 PROOF:
-  n >= 2 [given]
-  n is prime or n is composite [dichotomy]
-  CASE n is prime:
-    n has prime factorization {n} [trivial]
-  CASE n is composite:
-    exists a, b | 2 <= a < n and 2 <= b < n and n = a * b [definition of composite]
-    a has prime factorization P_a [strong IH, a < n]
-    b has prime factorization P_b [strong IH, b < n]
-    n = a * b has prime factorization P_a union P_b [multiplication]
-  n has prime factorization [or elim]
+(n >= 2) => prime_factorization(n) [=> intro from 1]
+  [1] n >= 2 [assumption]
+      prime(n) or composite(n) [dichotomy]
+      prime_factorization(n) [or elim]
+        case prime(n):
+          prime_factorization(n) [trivial, singleton factorization]
+        case composite(n):
+          exists a, b | 2 <= a and a < n and 2 <= b and b < n and n = a * b [definition of composite]
+          prime_factorization(a) [strong IH, a < n]
+          prime_factorization(b) [strong IH, b < n]
+          prime_factorization(a * b) [multiplication of factorizations]
+          prime_factorization(n) [n = a * b]
 
 TEXT: Strong induction: we assume the property for all smaller values, not just n-1.
 
@@ -172,26 +181,29 @@ TEXT: Strong induction: we assume the property for all smaller values, not just 
 TEXT: Lemma 1: If n is even, then n^2 is even
 
 PROOF:
-  n is even [assumption]
-  exists k : N | n = 2 * k [definition of even]
-  n^2 = (2 * k)^2 [substitution]
-  n^2 = 4 * k^2 [algebra]
-  n^2 = 2 * (2 * k^2) [factoring]
-  exists m : N | n^2 = 2 * m [exists intro with m = 2*k^2]
-  n^2 is even [definition of even]
+even(n) => even(power(n, 2)) [=> intro from 1]
+  [1] even(n) [assumption]
+      exists k | n = 2 * k [definition of even]
+      power(n, 2) = power(2 * k, 2) [substitution]
+      power(2 * k, 2) = 4 * power(k, 2) [algebra]
+      4 * power(k, 2) = 2 * (2 * power(k, 2)) [factoring]
+      exists m | power(n, 2) = 2 * m [exists intro with m = 2 * power(k, 2)]
+      even(power(n, 2)) [definition of even]
 
 TEXT: Main theorem: If n^2 is odd, then n is odd
 
 PROOF:
-  n^2 is odd [premise]
-  n is even or n is odd [dichotomy]
-  CASE n is even:
-    n^2 is even [Lemma 1]
-    n^2 is odd and n^2 is even [contradiction]
-    false [contradiction]
-  CASE n is odd:
-    n is odd [identity]
-  n is odd [or elim]
+odd(power(n, 2)) => odd(n) [=> intro from 1]
+  [1] odd(power(n, 2)) [assumption]
+      even(n) or odd(n) [dichotomy]
+      odd(n) [or elim]
+        case even(n):
+          even(power(n, 2)) [Lemma 1]
+          odd(power(n, 2)) and even(power(n, 2)) [contradiction]
+          false [contradiction]
+          odd(n) [false elim]
+        case odd(n):
+          odd(n) [identity]
 
 TEXT: Proof by contrapositive using lemma.
 
@@ -200,22 +212,24 @@ TEXT: Proof by contrapositive using lemma.
 TEXT: Prove: All natural numbers n ≥ 1 satisfy P(n)
 
 PROOF:
-  Assume not (forall n >= 1 | P(n)) [assumption for contradiction]
-  exists n >= 1 | not P(n) [negation of forall]
-  Let m be the smallest such n [well-ordering principle]
-  m >= 1 and not P(m) [by choice of m]
-  CASE m = 1:
-    P(1) [base case proved separately]
-    not P(m) and P(m) [contradiction]
-    false
-  CASE m > 1:
-    forall k | 1 <= k < m => P(k) [minimality of m]
-    P(m-1) [since 1 <= m-1 < m]
-    P(m) [by inductive step from P(m-1)]
-    not P(m) and P(m) [contradiction]
-    false
-  false [or elim]
-  forall n >= 1 | P(n) [contradiction discharged]
+true => (forall n | n >= 1 => P(n)) [=> intro from 1]
+  [1] true [assumption]
+      (forall n | n >= 1 => P(n)) [not intro from 2]
+        [2] not (forall n | n >= 1 => P(n)) [assumption]
+            exists n | n >= 1 and not P(n) [negation of forall]
+            smallest_counterexample(m) [well-ordering principle]
+            m >= 1 and not P(m) [by choice of m]
+            false [or elim]
+              case m = 1:
+                P(1) [base case proved separately]
+                not P(m) and P(1) [contradiction]
+                false [contradiction]
+              case m > 1:
+                forall k | k >= 1 and k < m => P(k) [minimality of m]
+                P(m - 1) [since m - 1 >= 1 and m - 1 < m]
+                P(m) [by inductive step from P(m - 1)]
+                not P(m) and P(m) [contradiction]
+                false [contradiction]
 
 TEXT: Minimal counterexample combines well-ordering with contradiction.
 
@@ -226,36 +240,43 @@ TEXT: Prove: A loop maintains invariant I
 TEXT: Initialization:
 
 PROOF:
-  Initial state satisfies I [verification]
+initial_state => invariant(initial_state) [=> intro from 1]
+  [1] initial_state [assumption]
+      invariant(initial_state) [verification]
 
 TEXT: Preservation:
 
 PROOF:
-  I holds before iteration [assumption]
-  Loop body executes [given]
-  I holds after iteration [verification]
+(invariant(before_state) and executes_loop_body) => invariant(after_state) [=> intro from 1]
+  [1] invariant(before_state) and executes_loop_body [assumption]
+      invariant(before_state) [and elim 1]
+      executes_loop_body [and elim 2]
+      invariant(after_state) [verification]
 
 TEXT: Termination:
 
 PROOF:
-  Loop terminates [termination proof]
-  I holds at termination [by preservation]
-  I and termination condition => desired property [logic]
-  Desired property holds [modus ponens]
+loop_terminates => desired_property [=> intro from 1]
+  [1] loop_terminates [assumption]
+      invariant(termination_state) [by preservation]
+      invariant(termination_state) and termination_condition [and intro]
+      desired_property [logic]
 
 ** Example 11: Proof by Diagonalization **
 
 TEXT: Prove: The set of real numbers is uncountable
 
 PROOF:
-  Assume real numbers are countable [assumption for contradiction]
-  exists enumeration f : N -> R [definition of countable]
-  Construct r : R by diagonal method [construction]
-  forall n : N | r /= f(n) [by construction, differs at nth digit]
-  r not in range of f [previous line]
-  r is real but r not in range of f [contradiction with enumeration]
-  false [contradiction]
-  Real numbers are uncountable [contradiction discharged]
+true => uncountable(reals) [=> intro from 1]
+  [1] true [assumption]
+      uncountable(reals) [not intro from 2]
+        [2] countable(reals) [assumption]
+            exists f | enumeration(f, reals) [definition of countable]
+            diagonal_construction(r) [diagonal method]
+            forall n | r /= apply(f, n) [by construction, differs at nth digit]
+            not_in_range(r, f) [previous line]
+            not_in_range(r, f) and enumeration(f, reals) [contradiction]
+            false [contradiction]
 
 TEXT: Cantor's diagonal argument (outline).
 
@@ -271,11 +292,14 @@ TEXT: 3. Conclude exists x | P(x) with x = w
 TEXT: Example: Prove exists n : N | n > 100 and n is even
 
 PROOF:
-  Let n = 102 [construction]
-  102 > 100 [arithmetic]
-  102 = 2 * 51 [arithmetic]
-  102 is even [definition]
-  exists n : N | n > 100 and n is even [exists intro with n = 102]
+true => (exists n | n > 100 and even(n)) [=> intro from 1]
+  [1] true [assumption]
+      witness_construction(102) [construction]
+      102 > 100 [arithmetic]
+      102 = 2 * 51 [arithmetic]
+      even(102) [definition]
+      102 > 100 and even(102) [and intro]
+      exists n | n > 100 and even(n) [exists intro with n = 102]
 
 ** Example 13: Proof Composition **
 
@@ -286,18 +310,22 @@ TEXT: Theorem: Property P holds for all cases
 TEXT: Overall strategy: Case analysis + Induction + Contradiction
 
 PROOF:
-  CASE 1 (base case):
-    P(base) [direct proof]
-  CASE 2 (inductive case):
-    CASE 2a (subcase a):
-      Assume not P [assumption for contradiction]
-      Derive contradiction [proof]
-      P [contradiction discharged]
-    CASE 2b (subcase b):
-      Assume P(n) [inductive hypothesis]
-      P(n+1) [inductive step]
-    P for this case [or elim]
-  P holds [or elim over main cases]
+true => (forall n | P(n)) [=> intro from 1]
+  [1] true [assumption]
+      forall n | P(n) [or elim over cases]
+        case base:
+          P(base) [direct proof]
+        case inductive:
+          P(n) [or elim over subcases]
+            case subcase_a:
+              P(n) [not intro from 2]
+                [2] not P(n) [assumption]
+                    contradiction_derived [proof steps]
+                    false [contradiction]
+            case subcase_b:
+              P(n) [=> intro from 3]
+                [3] P(n - 1) [assumption]
+                    P(n) [inductive step]
 
 ** Example 14: Best Practices for Complex Proofs **
 

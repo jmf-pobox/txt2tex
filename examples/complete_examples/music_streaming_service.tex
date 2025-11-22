@@ -3,7 +3,7 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
-\usepackage{zed-cm}
+\usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
@@ -19,7 +19,8 @@
 
 \bigskip
 
-\noindent or Apple Music. The system manages songs, users, playlists, preferences,
+\noindent or Apple Music. The system manages songs, users, playlists,
+preferences,
 
 \bigskip
 
@@ -34,28 +35,30 @@
 
 \bigskip
 
-\begin{zed}[SongId, UserId, PlaylistId, Playlist]\end{zed}
+\begin{zed}[SongId, UserId, PlaylistId]
+\end{zed}
 
 \begin{axdef}
-songs : \finset SongId \\
-users : \finset UserId \\
-playlists : PlaylistId \pfun Playlist \\
-playlistOwner : PlaylistId \pfun UserId \\
-playlistSubscribers : PlaylistId \pfun \finset_1 UserId
-\where
-\forall i \colon \dom playlists \bullet \ran playlists(i) \subseteq songs \\
-\dom playlistOwner \subseteq \dom playlists \\
-\ran playlistOwner \subseteq users \\
-\dom playlistSubscribers \subseteq \dom playlists \\
-\forall i \colon \dom playlistSubscribers \bullet playlistSubscribers(i) \subseteq users \\
-\forall i \colon \dom playlists \bullet playlistOwner(i) \in playlistSubscribers(i)
+  songs : \finset SongId \\
+  users : \finset UserId \\
+  playlists : PlaylistId \pfun \seq SongId \\
+  playlistOwner : PlaylistId \pfun UserId \\
+  playlistSubscribers : PlaylistId \pfun \finset_1 UserId
+  \where
+  \forall i : \dom playlists @ \ran (playlists(i)) \subseteq songs \\
+  \dom playlistOwner \subseteq \dom playlists \\
+  \ran playlistOwner \subseteq users \\
+  \dom playlistSubscribers \subseteq \dom playlists \\
+  \forall i : \dom playlistSubscribers @ playlistSubscribers(i)
+  \subseteq users \\
+  \forall i : \dom playlists @ playlistOwner(i) \in playlistSubscribers(i)
 \end{axdef}
 
 \noindent Type analysis:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -79,7 +82,7 @@ playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -99,7 +102,7 @@ playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -111,11 +114,11 @@ playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent - $playlists : PlaylistId  \pfun  Playlist$
+\noindent - $playlists : PlaylistId$ $\pfun$ Playlist
 
 \bigskip
 
@@ -131,11 +134,11 @@ playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent - $playlistOwner : PlaylistId  \pfun  UserId$
+\noindent - $playlistOwner : PlaylistId$ $\pfun$ UserId
 
 \bigskip
 
@@ -143,15 +146,15 @@ playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 
 \bigskip
 
-\noindent Partial: only defined playlists have owners.
+\noindent $Partial : only defined playlists$ have owners.
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent - $playlistSubscribers : PlaylistId  \pfun  F1 UserId$
+\noindent - $playlistSubscribers : PlaylistId$ $\pfun$ F1 UserId
 
 \bigskip
 
@@ -167,11 +170,11 @@ playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 1. $\forall i \colon \dom playlists \bullet \ran playlists(i) \subseteq songs$
+\noindent 1. $\forall i : \dom playlists @ \ran (playlists(i)) \subseteq songs$
 
 \bigskip
 
@@ -183,7 +186,7 @@ playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -195,7 +198,7 @@ playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -207,7 +210,7 @@ playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -219,11 +222,12 @@ playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 5. $\forall i \colon \dom playlistSubscribers \bullet playlistSubscribers(i) \subseteq users$
+\noindent 5. $\forall i : \dom playlistSubscribers @
+playlistSubscribers(i) \subseteq users$
 
 \bigskip
 
@@ -231,11 +235,12 @@ playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 6. $\forall i \colon \dom playlists \bullet playlistOwner(i)$in playlistSubscribers(i)
+\noindent 6. $\forall i : \dom playlists @ playlistOwner(i)$in
+playlistSubscribers(i)
 
 \bigskip
 
@@ -255,25 +260,25 @@ playlistSubscribers : PlaylistId \pfun \finset_1 UserId
 \bigskip
 
 \begin{axdef}
-hated : UserId \pfun \finset SongId \\
-loved : UserId \pfun \finset SongId
-\where
-\dom hated \subseteq users \\
-\forall i \colon \dom hated \bullet hated(i) \subseteq songs \\
-\dom loved \subseteq users \\
-\forall i \colon \dom loved \bullet loved(i) \subseteq songs \\
-\forall i \colon \dom hated \cup \dom loved \bullet hated(i) \cap loved(i) = \emptyset
+  hated : UserId \pfun \finset SongId \\
+  loved : UserId \pfun \finset SongId
+  \where
+  \dom hated \subseteq users \\
+  \forall i : \dom hated @ hated(i) \subseteq songs \\
+  \dom loved \subseteq users \\
+  \forall i : \dom loved @ loved(i) \subseteq songs \\
+  \forall i : \dom hated \cup \dom loved @ hated(i) \cap loved(i) = \emptyset
 \end{axdef}
 
 \noindent Type analysis:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent - $hated : UserId  \pfun  F SongId$
+\noindent - $hated : UserId$ $\pfun$ F SongId
 
 \bigskip
 
@@ -281,15 +286,15 @@ loved : UserId \pfun \finset SongId
 
 \bigskip
 
-\noindent $Partial : not all users hate songs$.
+\noindent $Partial : not all users hate songs.$
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent - $loved : UserId  \pfun  F SongId$
+\noindent - $loved : UserId$ $\pfun$ F SongId
 
 \bigskip
 
@@ -297,7 +302,7 @@ loved : UserId \pfun \finset SongId
 
 \bigskip
 
-\noindent $Partial : not all users love songs$.
+\noindent $Partial : not all users love songs.$
 
 \bigskip
 
@@ -305,7 +310,7 @@ loved : UserId \pfun \finset SongId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -317,11 +322,11 @@ loved : UserId \pfun \finset SongId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 2. $\forall i \colon \dom hated \bullet hated(i) \subseteq songs$
+\noindent 2. $\forall i : \dom hated @ hated(i) \subseteq songs$
 
 \bigskip
 
@@ -329,7 +334,7 @@ loved : UserId \pfun \finset SongId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -341,11 +346,11 @@ loved : UserId \pfun \finset SongId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 4. $\forall i \colon \dom loved \bullet loved(i) \subseteq songs$
+\noindent 4. $\forall i : \dom loved @ loved(i) \subseteq songs$
 
 \bigskip
 
@@ -353,19 +358,22 @@ loved : UserId \pfun \finset SongId
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 5. $\forall i \colon \dom hated \cup \dom loved \bullet hated(i) \cap loved(i) = \emptyset$
+\noindent 5. $\forall i : \dom hated \cup \dom loved @ hated(i) \cap
+loved(i) = \emptyset$
 
 \bigskip
 
-\noindent **Critical consistency constraint**: A user cannot love and hate the same song.
+\noindent **Critical consistency constraint**: A user cannot love and
+hate the same song.
 
 \bigskip
 
-\noindent For every user who has expressed preferences, their loved and hated sets are disjoint.
+\noindent For every user who has expressed preferences, their loved
+and hated sets are disjoint.
 
 \bigskip
 
@@ -403,18 +411,21 @@ loved : UserId \pfun \finset SongId
 \bigskip
 
 \begin{zed}
-A == users \setminus \bigcup \ran playlistSubscribers
+  A == users \setminus \bigcup \{ p : \dom playlistSubscribers @
+  playlistSubscribers(p) \}
 \end{zed}
 
 \noindent Breakdown:
 
 \bigskip
 
-\noindent - ran(playlistSubscribers): all subscriber sets for all playlists
+\noindent - {playlistSubscribers(p) $\mid$ $p :
+dom(playlistSubscribers)}: collect all subscriber sets$
 
 \bigskip
 
-\noindent - bigcup(...): union of all these $sets = all$ users subscribed to anything
+\noindent - bigcup(...): union of all these $sets = all$ users
+subscribed to anything
 
 \bigskip
 
@@ -422,7 +433,7 @@ A == users \setminus \bigcup \ran playlistSubscribers
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -439,14 +450,15 @@ A == users \setminus \bigcup \ran playlistSubscribers
 \bigskip
 
 \begin{zed}
-B == \{ p \colon \dom playlistSubscribers \mid \# playlistSubscribers(p) \geq 100 \}
+  B == \{ p : \dom playlistSubscribers | \# (playlistSubscribers(p)) \geq 100 \}
 \end{zed}
 
 \noindent Breakdown:
 
 \bigskip
 
-\noindent - $p : dom(playlistSubscribers)$: iterate over all playlists with subscribers
+\noindent - p : dom(playlistSubscribers): iterate over all playlists
+with subscribers
 
 \bigskip
 
@@ -458,11 +470,11 @@ B == \{ p \colon \dom playlistSubscribers \mid \# playlistSubscribers(p) \geq 10
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Result type: P PlaylistId (set of popular playlist IDs)
+\noindent Result $type : P PlaylistId$ (set of popular playlist IDs)
 
 \bigskip
 
@@ -475,18 +487,20 @@ B == \{ p \colon \dom playlistSubscribers \mid \# playlistSubscribers(p) \geq 10
 \bigskip
 
 \begin{zed}
-C == \mu u \colon \dom loved \bullet \forall v \colon \dom loved \bullet u \neq v \land \# loved(u) > \# loved(v)
+  C == (\mu u : \dom loved | \forall v : \dom loved @ u \neq v \land
+  \# (loved(u)) > \# (loved(v)))
 \end{zed}
 
 \noindent Mu operator usage:
 
 \bigskip
 
-\noindent - $u : dom(loved)$: candidate users (those who love songs)
+\noindent - $u : dom(loved): candidate users$ (those who love songs)
 
 \bigskip
 
-\noindent - $\forall v \colon \dom loved \bullet u \neq v$: for all other users who love songs
+\noindent - $\forall v : \dom loved @ u \neq v$: for all other users
+who love songs
 
 \bigskip
 
@@ -498,11 +512,11 @@ C == \mu u \colon \dom loved \bullet \forall v \colon \dom loved \bullet u \neq 
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Assumption: One user has a unique maximum (ties make mu undefined)
+\noindent $Assumption : One user$ has a unique maximum (ties make mu undefined)
 
 \bigskip
 
@@ -515,18 +529,19 @@ C == \mu u \colon \dom loved \bullet \forall v \colon \dom loved \bullet u \neq 
 \bigskip
 
 \begin{zed}
-D == \mu s \colon songs \bullet \forall t \colon songs \bullet s \neq t \land \# \{ u \colon UserId \mid s \in loved(u) \} > \# \{ u \colon UserId \mid t \in loved(u) \}
+  D == (\mu s : songs | \forall t : songs @ s \neq t \land \# \{ u :
+  UserId | s \in loved(u) \} > \# \{ u : UserId | t \in loved(u) \})
 \end{zed}
 
 \noindent Breakdown:
 
 \bigskip
 
-\noindent - $s : songs$: candidate songs
+\noindent - $s : songs: candidate songs$
 
 \bigskip
 
-\noindent - # $\{ u \colon UserId \mid s \in loved(u) \}$: count users who love song s
+\noindent - # $\{ u : UserId | s \in loved(u) \}$: count users who love song s
 
 \bigskip
 
@@ -534,7 +549,7 @@ D == \mu s \colon songs \bullet \forall t \colon songs \bullet s \neq t \land \#
 
 \bigskip
 
-\noindent - $>$ # $\{ u \colon UserId \mid t \in loved(u) \}$: s has more lovers than t
+\noindent - $>$ # $\{ u : UserId | t \in loved(u) \}$: s has more lovers than t
 
 \bigskip
 
@@ -542,11 +557,12 @@ D == \mu s \colon songs \bullet \forall t \colon songs \bullet s \neq t \land \#
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Complexity: For each song, counts how many users love it, then finds unique max.
+\noindent Complexity: For each song, counts how many users love it,
+then finds unique max.
 
 \bigskip
 
@@ -564,9 +580,11 @@ D == \mu s \colon songs \bullet \forall t \colon songs \bullet s \neq t \land \#
 \bigskip
 
 \begin{axdef}
-loveHateScore : SongId \pfun \mathbb{N}
-\where
-\forall i \colon songs \bullet loveHateScore(i) = (\mbox{if } \# \{ u \colon UserId \mid i \in loved(u) \} \geq \# \{ u \colon UserId \mid i \in hated(u) \} \mbox{ then } \# (\{ u \colon UserId \mid i \in loved(u) \} - \# \{ u \colon UserId \mid i \in hated(u) \}) \mbox{ else } 0)
+  loveHateScore : SongId \pfun \nat
+  \where
+  \forall i : songs @ loveHateScore(i) = \IF \# \{ u : UserId | i \in
+  loved(u) \} \geq \# \{ u : UserId | i \in hated(u) \} \THEN \# \{ u
+  : UserId | i \in loved(u) \} - \# \{ u : UserId | i \in hated(u) \} \ELSE 0
 \end{axdef}
 
 \noindent Logic:
@@ -581,26 +599,29 @@ loveHateScore : SongId \pfun \mathbb{N}
 
 \bigskip
 
-\noindent - If loves $\geq$ $hates : score $= loves - hates (net positive sentiment)
+\noindent - If loves $\geq$ $hates : score$ = loves - hates (net
+positive sentiment)
 
 \bigskip
 
-\noindent - If loves $<$ $hates : score $= 0 (cap at zero, don't go negative)
+\noindent - If loves $<$ $hates : score$ = 0 (cap at zero, don't go negative)
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Design $choice : Non-negative scores simplify ranking$.
+\noindent Design $choice : Non-negative scores simplify ranking.$
 
 \bigskip
 
 \begin{axdef}
-playlistCount : SongId \pfun \mathbb{N}
-\where
-\forall i \colon songs \bullet playlistCount(i) = \# \{ p \colon \dom playlists \mid i \in \ran playlists(p) \}
+  playlistCount : SongId \pfun \nat
+  \where
+  \forall i : songs @ \\
+  \quad playlistCount(i) = \# \{ p : \dom playlists | i \in \ran
+  (playlists(p)) \}
 \end{axdef}
 
 \noindent Logic:
@@ -624,23 +645,25 @@ playlistCount : SongId \pfun \mathbb{N}
 \bigskip
 
 \begin{axdef}
-length : SongId \pfun \mathbb{N} \\
-popularity : SongId \pfun \mathbb{N}
-\where
-\dom length \subseteq songs \\
-\dom popularity \subseteq songs \\
-\forall i \colon songs \bullet popularity(i) = loveHateScore(i) + playlistCount(i)
+  length : SongId \pfun \nat \\
+  popularity : SongId \pfun \nat
+  \where
+  \dom length \subseteq songs \\
+  \dom popularity \subseteq songs \\
+  \forall i : songs @ \\
+  \quad popularity(i) = loveHateScore(i) + playlistCount(i)
 \end{axdef}
 
 \noindent Popularity formula:
 
 \bigskip
 
-\noindent popularity(song) = (loves - hates, capped at 0) + (number of playlists)
+\noindent popularity(song) = (loves - hates, capped at 0) + (number
+of playlists)
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -673,32 +696,42 @@ popularity : SongId \pfun \mathbb{N}
 \bigskip
 
 \begin{axdef}
-mostPopular : SongId
-\where
-mostPopular = (\mbox{if } \exists_1 i \colon songs \bullet \forall j \colon songs \bullet i \neq j \land popularity(i) > popularity(j) \mbox{ then } \mu i \colon songs \bullet \forall j \colon songs \bullet i \neq j \land popularity(i) > popularity(j) \mbox{ else } nullSong)
+  mostPopular : SongId
+  \where
+  \exists_1 i : songs @ \forall j : songs @ i \neq j \land
+  popularity(i) > popularity(j) \\
+  mostPopular = (\mu i : songs | \forall j : songs @ i \neq j \land
+  popularity(i) > popularity(j))
 \end{axdef}
 
-\noindent Defensive programming:
+\noindent Constraint:
 
 \bigskip
 
-\noindent - $\exists_1$: check exactly one song has unique maximum popularity
+\noindent - $$\exists\_1$ : ensures exactly one song$ has unique
+maximum popularity
 
 \bigskip
 
-\noindent - If unique max exists: use mu to find it
+\noindent - mostPopular is that unique song with maximum popularity
+(mu selects it)
 
 \bigskip
 
-\noindent - If no unique max (tie): return nullSong (error value)
+\noindent - Predicate is $duplicated : $\exists\_1$ proves
+uniqueness$, mu performs selection
 
 \bigskip
 
-\noindent 
+\noindent - If multiple songs tie for maximum, the constraint is not satisfied
 
 \bigskip
 
-\noindent This prevents undefined behavior when multiple songs tie for most popular.
+\noindent
+
+\bigskip
+
+\noindent This specification assumes there is always a unique most popular song.
 
 \bigskip
 
@@ -711,18 +744,19 @@ mostPopular = (\mbox{if } \exists_1 i \colon songs \bullet \forall j \colon song
 \bigskip
 
 \begin{zed}
-playlistsContainingMostPopularSong == \{ i \colon \dom playlists \mid mostPopular \in \ran playlists(i) \}
+  playlistsContainingMostPopularSong == \{ i : \dom playlists |
+  mostPopular \in \ran (playlists(i)) \}
 \end{zed}
 
 \noindent Logic:
 
 \bigskip
 
-\noindent - Iterate over all $playlists : i $: dom(playlists)
+\noindent - Iterate over all $playlists : i$ : dom(playlists)
 
 \bigskip
 
-\noindent - Check if mostPopular song appears: mostPopular in ran(playlists(i))
+\noindent - Check if mostPopular song appears: mostPopular in ran(playlists i)
 
 \bigskip
 
@@ -730,7 +764,7 @@ playlistsContainingMostPopularSong == \{ i \colon \dom playlists \mid mostPopula
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -745,15 +779,20 @@ playlistsContainingMostPopularSong == \{ i \colon \dom playlists \mid mostPopula
 
 \bigskip
 
-\begin{zed}[Play, Status]\end{zed}
+\begin{zed}[Play]
+\end{zed}
 
-\noindent Assume Play is a $schema : schema Play ${ $songId : SongId, userId$: UserId, $timestamp : Time $}
+\begin{zed}Status ::= premium | standard
+\end{zed}
 
-\bigskip
+\begin{schema}{PlayEvent}
+  songId : SongId \\
+  userId : UserId
+\end{schema}
 
-\noindent Assume Status is a free $type : Status $::= premium $\mid$ standard
-
-\bigskip
+\begin{axdef}
+  userStatus : UserId \pfun Status
+\end{axdef}
 
 \noindent Define functions to$ \filter $and analyze play history:
 
@@ -765,12 +804,34 @@ playlistsContainingMostPopularSong == \{ i \colon \dom playlists \mid mostPopula
 
 \bigskip
 
-\begin{axdef}
-premiumPlays : \seq Play \fun \seq Play
-\where
-premiumPlays(\langle \rangle) = \langle \rangle \\
-\forall x \colon Play \bullet \forall s \colon \seq Play \bullet premiumPlays(\langle x \rangle \cat s) = (\mbox{if } userStatus(x.2) = premium \mbox{ then } \langle x \rangle \cat premiumPlays(s) \mbox{ else } premiumPlays(s))
-\end{axdef}
+\noindent
+
+\bigskip
+
+\noindent $premiumPlays : seq(PlayEvent)$ $\fun$ seq(PlayEvent)
+
+\bigskip
+
+\noindent premiumPlays($\langle \rangle$) = $\langle \rangle$
+
+\bigskip
+
+\noindent $\forall$ $x : PlayEvent; s$ : seq(PlayEvent) $\mid$
+
+\bigskip
+
+\noindent premiumPlays($\langle x \rangle$ ^ s) = if
+userStatus(x.userId) = premium
+
+\bigskip
+
+\noindent then $\langle x \rangle$ ^ premiumPlays(s)
+
+\bigskip
+
+\noindent else premiumPlays(s)
+
+\bigskip
 
 \noindent Recursive pattern matching:
 
@@ -780,7 +841,8 @@ premiumPlays(\langle \rangle) = \langle \rangle \\
 
 \bigskip
 
-\noindent - Inductive case: if first play x is by premium user, include it; else skip
+\noindent - Inductive $case : if first play x$ is by premium user,
+include it; else skip
 
 \bigskip
 
@@ -788,7 +850,7 @@ premiumPlays(\langle \rangle) = \langle \rangle \\
 
 \bigskip
 
-\noindent - userStatus is assumed to be a $function : UserId  \fun  Status$
+\noindent - userStatus is assumed to be a $function : UserId$ $\fun$ Status
 
 \bigskip
 
@@ -800,12 +862,38 @@ premiumPlays(\langle \rangle) = \langle \rangle \\
 
 \bigskip
 
-\begin{axdef}
-standardPlays : \seq Play \fun \seq Play
-\where
-standardPlays(\langle \rangle) = \langle \rangle \\
-\forall x \colon Play \bullet \forall s \colon \seq Play \bullet standardPlays(\langle x \rangle \cat s) = (\mbox{if } userStatus(x.2) = standard \mbox{ then } \langle x \rangle \cat standardPlays(s) \mbox{ else } standardPlays(s))
-\end{axdef}
+\noindent
+
+\bigskip
+
+\noindent $standardPlays : seq(PlayEvent)$ $\fun$ seq(PlayEvent)
+
+\bigskip
+
+\noindent standardPlays($\langle \rangle$) = $\langle \rangle$
+
+\bigskip
+
+\noindent $\forall$ $x : PlayEvent; s$ : seq(PlayEvent) $\mid$
+
+\bigskip
+
+\noindent standardPlays($\langle x \rangle$ ^ s) = if
+userStatus(x.userId) = standard
+
+\bigskip
+
+\noindent then $\langle x \rangle$ ^ standardPlays(s)
+
+\bigskip
+
+\noindent else standardPlays(s)
+
+\bigskip
+
+\noindent
+
+\bigskip
 
 \noindent Similar to premiumPlays, but filters for standard users.
 
@@ -819,34 +907,52 @@ standardPlays(\langle \rangle) = \langle \rangle \\
 
 \bigskip
 
-\begin{axdef}
-cumulativeLength : \seq Play \fun \mathbb{N}
-\where
-cumulativeLength(\langle \rangle) = 0 \\
-\forall x \colon Play \bullet \forall s \colon \seq Play \bullet cumulativeLength(\langle x \rangle \cat s) = length(x.1) + cumulativeLength(s)
-\end{axdef}
+\noindent
+
+\bigskip
+
+\noindent $cumulativeLength : seq(Play)$ $\fun$ N
+
+\bigskip
+
+\noindent cumulativeLength($\langle \rangle$) = 0
+
+\bigskip
+
+\noindent $\forall$ $x : Play; s$ : seq(Play) $\mid$
+
+\bigskip
+
+\noindent cumulativeLength($\langle x \rangle$ ^ s) =
+songLength(x.songId) + cumulativeLength(s)
+
+\bigskip
+
+\noindent
+
+\bigskip
 
 \noindent Fold (reduce) pattern:
 
 \bigskip
 
-\noindent - Base case: empty sequence has zero length
+\noindent - Base $case : empty sequence$ has zero length
 
 \bigskip
 
-\noindent - Inductive $case : add first play$'s length to rest's total
+\noindent - Inductive case: add first play's song length to rest's total
 
 \bigskip
 
-\noindent - x.1 accesses the songId field
+\noindent - x.songId accesses the songId field (if Play were a schema)
 
 \bigskip
 
-\noindent - length(songId) returns song duration (from earlier definition)
+\noindent - songLength(songId) would return song duration from the catalog
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -861,7 +967,7 @@ cumulativeLength(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -881,7 +987,7 @@ cumulativeLength(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -901,7 +1007,7 @@ cumulativeLength(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -921,7 +1027,7 @@ cumulativeLength(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -948,7 +1054,8 @@ cumulativeLength(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent schema Play { $songId : SongId, userId$: UserId, $timestamp : Time $}
+\noindent schema Play { $songId : SongId$, $userId : UserId$,
+$timestamp : Time$ }
 
 \bigskip
 
@@ -956,7 +1063,7 @@ cumulativeLength(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -980,7 +1087,7 @@ cumulativeLength(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -1000,7 +1107,7 @@ cumulativeLength(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -1008,7 +1115,7 @@ cumulativeLength(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent - $suggestSongs : UserId  \fun  P SongId$
+\noindent - $suggestSongs : UserId$ $\fun$ P SongId
 
 \bigskip
 
@@ -1016,7 +1123,7 @@ cumulativeLength(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -1043,11 +1150,12 @@ cumulativeLength(\langle \rangle) = 0 \\
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 1. **Multi-entity modeling**: songs, users, playlists, plays work together
+\noindent 1. **Multi-entity modeling**: songs, users, playlists,
+plays work together
 
 \bigskip
 

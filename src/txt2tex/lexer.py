@@ -45,6 +45,52 @@ class Lexer:
         self.column = 1
         self._in_solution_marker = False  # Track if inside ** ... **
 
+    def _raise_infinite_loop_error(
+        self,
+        context_msg: str,
+        peek_pos: int | None = None,
+        current_char: str | None = None,
+    ) -> None:
+        """
+        Raise RuntimeError with diagnostic information about infinite loop.
+
+        Args:
+            context_msg: Description of where the loop occurred
+            peek_pos: Optional peek position for detailed diagnostics
+            current_char: Optional current character for diagnostics
+        """
+        context_start = max(0, self.pos - 20)
+        context_end = min(len(self.text), self.pos + 20)
+        context = repr(self.text[context_start:context_end])
+
+        error_msg = (
+            f"ERROR: Infinite loop detected in lexer at position {self.pos}, "
+            f"line {self.line}, column {self.column}: {context_msg}"
+        )
+        print(error_msg)
+        print(f"Text length: {len(self.text)}")
+        print(f"Context (-20/+20): {context}")
+
+        # Optional detailed diagnostics
+        if current_char is not None:
+            print(f"Current char: {current_char!r}")
+        if peek_pos is not None:
+            print(f"Peek pos: {peek_pos}")
+            print(f"Next 50 chars: {self.text[self.pos : self.pos + 50]!r}")
+            print(f"Char at peek pos: {self._peek_char(peek_pos)!r}")
+            print("First 20 _peek_char values:")
+            for i in range(1, 21):
+                ch = self._peek_char(i)
+                print(f"  _peek_char({i}) = {ch!r}")
+
+        print(f"Full text (first 200 chars): {self.text[:200]!r}")
+        print(f"Full text (last 200 chars): {self.text[-200:]!r}")
+
+        raise RuntimeError(
+            f"Lexer infinite loop at position {self.pos}, "
+            f"line {self.line}, column {self.column}: {context_msg}"
+        )
+
     def tokenize(self) -> list[Token]:
         """Tokenize entire input and return list of tokens."""
         tokens: list[Token] = []
@@ -148,19 +194,53 @@ class Lexer:
             self._in_solution_marker = not self._in_solution_marker
             return Token(TokenType.SOLUTION_MARKER, "**", start_line, start_column)
 
-        # Part label: (a), (b), (c), etc. - restrict to a-j for homework parts
+        # Part label: (a), (b), ..., (j), (aa), (ab), etc.
         # Phase 11b: Only match at start of line to avoid function app conflict
-        next_char = self._peek_char()
-        if (
-            char == "("
-            and "a" <= next_char <= "j"
-            and self._peek_char(2) == ")"
-            and start_column == 1
-        ):
-            self._advance()  # consume '('
-            label = self._advance()  # consume letter
-            self._advance()  # consume ')'
-            return Token(TokenType.PART_LABEL, f"({label})", start_line, start_column)
+        # Phase 2.1: Extended to support multi-letter labels (aa), (ab), ...
+        # Single letters restricted to (a)-(j) to avoid conflict with vars like (x), (s)
+        # Multi-letter (2+) allowed for extended numbering: (aa), (ab), (ba), (bb), ...
+        # Must be followed by whitespace/newline (structural) not operators (expression)
+        if char == "(" and start_column == 1:
+            # Peek ahead to check for part label pattern
+            lookahead_pos = 1
+            label_chars = ""
+
+            # Collect consecutive lowercase letters
+            while True:
+                peek_char = self._peek_char(lookahead_pos)
+                if peek_char.islower():
+                    label_chars += peek_char
+                    lookahead_pos += 1
+                else:
+                    break
+
+            # Check if we have valid part label:
+            # - Single letter (a)-(j), OR
+            # - Multi-letter (2+): (aa), (ab), (abc), etc.
+            # Must be followed by ')' and then whitespace/newline
+            if label_chars and self._peek_char(lookahead_pos) == ")":
+                is_valid_label = False
+                if len(label_chars) == 1 and "a" <= label_chars[0] <= "j":
+                    is_valid_label = True  # (a)-(j)
+                elif len(label_chars) >= 2:
+                    is_valid_label = True  # (aa), (ab), etc.
+
+                if is_valid_label:
+                    char_after = self._peek_char(lookahead_pos + 1)
+                    # Part labels are structural - must be followed by space/tab/newline
+                    # NOT EOF - that would match (x) in parse_expr("(x)")
+                    if char_after in (" ", "\t", "\n"):
+                        self._advance()  # consume '('
+                        # Consume all label characters
+                        for _ in label_chars:
+                            self._advance()
+                        self._advance()  # consume ')'
+                        return Token(
+                            TokenType.PART_LABEL,
+                            f"({label_chars})",
+                            start_line,
+                            start_column,
+                        )
 
         # Relational image operators (Phase 11.5): (| and |)
         # Check before simple parentheses
@@ -233,6 +313,13 @@ class Lexer:
         if char == ",":
             self._advance()
             return Token(TokenType.COMMA, ",", start_line, start_column)
+
+        # Ellipsis ... (Phase 2.2) - check before range operator
+        if char == "." and self._peek_char() == "." and self._peek_char(2) == ".":
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.ELLIPSIS, "...", start_line, start_column)
 
         # Range operator .. (Phase 13) - check before period alone
         if char == "." and self._peek_char() == ".":
@@ -582,15 +669,36 @@ class Lexer:
             # Look ahead for newline (continuation marker)
             peek_pos = 1
             # Skip optional whitespace after backslash
-            while self._peek_char(peek_pos) in " \t":
+            # Safety limit to prevent infinite loops
+            max_iterations = 10000
+            iterations = 0
+            # Bug fix: empty string is "in" any string in Python,
+            # so we must check for it explicitly
+            ch = self._peek_char(peek_pos)
+            while ch != "" and ch in " \t":
                 peek_pos += 1
+                ch = self._peek_char(peek_pos)
+                iterations += 1
+                if iterations >= max_iterations:
+                    self._raise_infinite_loop_error(
+                        "skipping whitespace after backslash",
+                        peek_pos=peek_pos,
+                        current_char=char,
+                    )
 
             # If followed by newline, it's a continuation marker
             if self._peek_char(peek_pos) == "\n":
                 self._advance()  # consume \
                 # Consume optional trailing whitespace
+                # Safety limit to prevent infinite loops
+                iterations = 0
                 while self._current_char() in " \t":
                     self._advance()
+                    iterations += 1
+                    if iterations >= max_iterations:
+                        self._raise_infinite_loop_error(
+                            "consuming trailing whitespace after backslash-newline"
+                        )
                 # Don't consume newline - let it be a separate token
                 return Token(TokenType.CONTINUATION, "\\", start_line, start_column)
 

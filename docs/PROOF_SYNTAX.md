@@ -27,11 +27,18 @@ PROOF:
 Marks the beginning of a proof tree.
 
 ### 2. Conclusion (Top Level)
-The first non-indented line after `PROOF:` is the final conclusion:
+The conclusion is the top-level statement of the proof. It may appear:
+- At the beginning (most common): Shows what we're proving, with the proof deriving it
+- At the end: Some proofs build up to the conclusion as the final step
+
 ```
 PROOF:
 p and q => q [=> intro from 1]
+  [1] p and q [assumption]
+      q [and elim]
 ```
+
+In this example, `p and q => q` is the conclusion we're proving.
 
 ### 3. Assumptions with Labels
 Assumptions are marked with `[number]` and the keyword `[assumption]`:
@@ -72,22 +79,58 @@ case q:
     [3] q [assumption]
 ```
 
-**Key pattern for cases with multiple sibling steps:**
-- When a case has multiple `::` siblings that build up to a conclusion
-- The LAST sibling step automatically wraps earlier siblings as its premises
-- Do NOT add explicit "from above" references - they create duplication
-- Each case should derive the same conclusion through different paths
+**Key pattern for cases with "from above":**
+- Use `[from above]` to reference facts established before the case analysis
+- The `::` marker indicates sibling premises that together support a step
+- Each case should derive the same conclusion through different reasoning paths
+- Facts derived before the case split remain available within all cases
 
 ### 7. Justifications
-Common patterns:
+
+Justifications are free-form text enclosed in brackets `[...]`. Any text is accepted, but the following are standard natural deduction rules:
+
+**Basic rules:**
 - `[assumption]` - marks assumptions
-- `[and elim]` - and elimination
-- `[and intro]` - and introduction
-- `[or elim]` - or elimination
-- `[or intro]` - or introduction
-- `[=> intro from 1]` - implication introduction, discharging assumption [1]
-- `[=> elim]` - implication elimination (modus ponens)
 - `[premise]` - given fact
+
+**Conjunction (and):**
+- `[and elim]`, `[and elim left]`, `[and elim right]`, `[and elim 1]`, `[and elim 2]` - and elimination
+- `[and intro]` - and introduction
+
+**Disjunction (or):**
+- `[or elim]` - or elimination (case analysis)
+- `[or intro]`, `[or intro left]`, `[or intro right]`, `[or intro 1]`, `[or intro 2]` - or introduction
+
+**Implication (=>):**
+- `[=> intro from N]` - implication introduction, discharging assumption [N]
+- `[=> elim]` - implication elimination (modus ponens)
+
+**Negation (not):**
+- `[not intro from N]` - negation introduction (proof by contradiction), discharging assumption [N]
+- `[not elim]` - negation elimination
+
+**Absurdity (false):**
+- `[false elim]` - ex falso quodlibet (from false, derive anything)
+- `[contradiction]`, `[contradiction with X]` - deriving false from contradictory statements
+
+**Classical logic:**
+- `[LEM]` - Law of Excluded Middle (p or not p axiom)
+- `[double negation elim]` - classical rule: not not p implies p
+
+**Derived rules:**
+- `[identity]` - trivial identity step (p proves p)
+- `[negation intro from N]` - alternative form of not intro
+
+**Informal annotations:**
+- `[from above]` - reference to earlier step in proof
+- `[from case]` - reference to case hypothesis
+- `[from X]` - reference to specific statement or premise X
+- `[derived]` - derived result
+- `[known fact]` - external or previously established fact
+- `[definition]` - by definition
+- `[arithmetic]`, `[algebra]`, `[simplification]`, `[factoring]` - mathematical reasoning steps
+
+**Note**: The parser accepts any text within brackets as a justification. The above list represents commonly used patterns in natural deduction and mathematical proofs.
 
 ## Complete Examples
 
@@ -133,30 +176,30 @@ p and (p => q) => (p and q) [=> intro from 1]
 PROOF:
 p and (q or r) => (p and q) or (p and r) [=> intro from 1]
   [1] p and (q or r) [assumption]
-      :: p [and elim]
-        :: p and (q or r) [from 1]
-      :: q or r [and elim]
-        :: p and (q or r) [from 1]
-      :: (p and q) or (p and r) [or elim]
+      p [and elim 1]
+      q or r [and elim 2]
+      (p and q) or (p and r) [or elim]
         case q:
-          :: q [case assumption]
-          :: p and q [and intro]
-          :: (p and q) or (p and r) [or intro]
+          :: p [from above]
+          :: q [from case]
+          p and q [and intro]
+          (p and q) or (p and r) [or intro 1]
         case r:
-          :: r [case assumption]
-          :: p and r [and intro]
-          :: (p and q) or (p and r) [or intro]
+          :: p [from above]
+          :: r [from case]
+          p and r [and intro]
+          (p and q) or (p and r) [or intro 2]
 ```
 
 **Explanation**:
 - Assume `p and (q or r)` as [1]
-- Extract `p` and `q or r` as siblings
-- For case analysis on `q or r`:
-  - **Case q**: Use case assumption `q`, build `p and q`, then introduce to disjunction
-  - **Case r**: Use case assumption `r`, build `p and r`, then introduce to disjunction
-- Both cases yield the same result
+- Extract `p` and `q or r` from the assumption
+- Perform case analysis on `q or r`:
+  - **Case q**: Use `p` from above and case assumption `q`, build `p and q`, then introduce to disjunction
+  - **Case r**: Use `p` from above and case assumption `r`, build `p and r`, then introduce to disjunction
+- Both cases derive the same conclusion
 
-**Important note on case structure**: When a case has multiple sibling steps (marked with `::`) that derive the case conclusion, the LAST step automatically includes earlier steps as premises. You do NOT need to explicitly reference "from above" - the earlier sibling derivations are automatically available to the final step in the case.
+**Important note on case structure**: Within each case, use `[from above]` to reference facts established before the case analysis began. The `::` sibling markers indicate multiple facts that together support the next inference step.
 
 ### Example 4: Modus Tollens
 **Goal**: Prove `(p => q) and not q => not p`
@@ -207,6 +250,28 @@ class ProofStep:
 class CaseAnalysis:
     cases: list[tuple[str, list[ProofStep]]]  # ("q", steps), ("rcl", steps)
 ```
+
+## Parser Limitations
+
+### Critical: Spacing After Identifiers Before Brackets
+
+**IMPORTANT**: The parser requires a space between an identifier and an opening bracket `[` to avoid ambiguity with subscript notation.
+
+**Incorrect (will fail):**
+```
+p and q[and elim]  // Parser reads this as p with subscript "and q[and"
+```
+
+**Correct:**
+```
+p and q [and elim]  // Space before [ makes it clear this is a justification
+```
+
+This limitation affects:
+- Proof justifications: Always write `expression [justification]` with a space
+- Any context where brackets follow an identifier
+
+**Workaround**: Add at least one space before the `[` bracket when it's meant to be a justification or label, not a subscript operator.
 
 ## LaTeX Generation Strategy
 

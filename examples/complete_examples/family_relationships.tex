@@ -3,7 +3,7 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
-\usepackage{zed-cm}
+\usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
@@ -15,11 +15,13 @@
 \section*{Problem Statement}
 \addcontentsline{toc}{section}{Problem Statement}
 
-\noindent Given a primitive relation childOf between people, define derived relations
+\noindent Given a primitive relation childOf between people, define
+derived relations
 
 \bigskip
 
-\noindent for parentOf, siblingOf, cousinOf, and ancestorOf using relation operators.
+\noindent for parentOf, siblingOf, cousinOf, and ancestorOf using
+relation operators.
 
 \bigskip
 
@@ -30,10 +32,11 @@
 
 \bigskip
 
-\begin{zed}[Person]\end{zed}
+\begin{zed}[Person]
+\end{zed}
 
 \begin{axdef}
-childOf : Person \rel Person
+  childOf : Person \rel Person
 \end{axdef}
 
 \noindent The childOf relation represents direct parent-child relationships.
@@ -44,11 +47,12 @@ childOf : Person \rel Person
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent From this single primitive, we can derive all other family relationships.
+\noindent From this single primitive, we can derive all other family
+relationships.
 
 \bigskip
 
@@ -60,14 +64,14 @@ childOf : Person \rel Person
 \bigskip
 
 \begin{zed}
-parentOf == childOf^{-1}
+  parentOf == childOf^{-1}
 \end{zed}
 
 \noindent Alternative equivalent definitions:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -79,7 +83,7 @@ parentOf == childOf^{-1}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -87,11 +91,12 @@ parentOf == childOf^{-1}
 
 \bigskip
 
-\noindent parentOf == $\{ x, y \colon Person \mid x \mapsto y \in childOf \bullet y \mapsto x \}$
+\noindent parentOf == $\{ x, y : Person | x \mapsto y \in childOf @ y
+\mapsto x \}$
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -103,7 +108,7 @@ parentOf == childOf^{-1}
 
 \bigskip
 
-\noindent $parentOf : Person  \rel  Person$
+\noindent $parentOf : Person$ $\rel$ Person
 
 \bigskip
 
@@ -119,11 +124,12 @@ parentOf == childOf^{-1}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent All three methods are mathematically equivalent. The first is most idiomatic
+\noindent All three methods are mathematically equivalent. The first
+is most idiomatic
 
 \bigskip
 
@@ -131,7 +137,7 @@ parentOf == childOf^{-1}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -158,15 +164,39 @@ parentOf == childOf^{-1}
 
 \bigskip
 
+\noindent First, we define the identity relation for Person:
+
+\bigskip
+
+\begin{axdef}
+  id\_Person : Person \rel Person
+  \where
+  id\_Person = \{ x : Person @ x \mapsto x \}
+\end{axdef}
+
+\noindent The identity relation id\_Person contains all pairs (x, x)
+for every person x.
+
+\bigskip
+
+\noindent We use this to remove self-loops when defining siblingOf (a
+person is not their own sibling).
+
+\bigskip
+
+\noindent Now we can define siblingOf:
+
+\bigskip
+
 \begin{zed}
-siblingOf == (childOf \circ parentOf) \setminus \id[Person]
+  siblingOf == (childOf \circ parentOf) \setminus id\_Person
 \end{zed}
 
 \noindent Let's break this down step by step:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -178,19 +208,21 @@ siblingOf == (childOf \circ parentOf) \setminus \id[Person]
 
 \bigskip
 
-\noindent If (x, p) in childOf and (p, y) in parentOf, then (x, y) is in the composition.
+\noindent If (x, p) in childOf and (p, y) in parentOf, then (x, y) is
+in the composition.
 
 \bigskip
 
-\noindent This includes the case where $x = y$ (you share parents with yourself).
+\noindent This includes the case where $x = y$ (you share parents
+with yourself).
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Step 2: id[Person]
+\noindent Step 2: id\_Person
 
 \bigskip
 
@@ -202,11 +234,11 @@ siblingOf == (childOf \circ parentOf) \setminus \id[Person]
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Step 3: (childOf $\circ$ parentOf) \ id[Person]
+\noindent Step 3: (childOf $\circ$ parentOf) \ id\_Person
 
 \bigskip
 
@@ -218,7 +250,7 @@ siblingOf == (childOf \circ parentOf) \setminus \id[Person]
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -226,19 +258,19 @@ siblingOf == (childOf \circ parentOf) \setminus \id[Person]
 
 \bigskip
 
-\noindent siblingOf == {x, $y : Person | x $/= y and
+\noindent siblingOf == {x, $y : Person$ $\mid$ x /= y and
 
-\bigskip
+  \bigskip
 
-\noindent ($\exists p \colon Person \bullet x \mapsto p$in childOf and
+  \noindent ($\exists p : Person @ x \mapsto p$in childOf and
 
-\bigskip
+    \bigskip
 
 \noindent p $\mapsto$ y in parentOf)}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -246,11 +278,12 @@ siblingOf == (childOf \circ parentOf) \setminus \id[Person]
 
 \bigskip
 
-\noindent - siblingOf is symmetric: if x is sibling of y, then y is sibling of x
+\noindent - siblingOf is $symmetric : if x$ is sibling of y, then y
+is sibling of x
 
 \bigskip
 
-\noindent - siblingOf is irreflexive: no one is their own sibling
+\noindent - siblingOf is $irreflexive : no one$ is their own sibling
 
 \bigskip
 
@@ -266,14 +299,14 @@ siblingOf == (childOf \circ parentOf) \setminus \id[Person]
 \bigskip
 
 \begin{zed}
-cousinOf == childOf \circ siblingOf \circ parentOf
+  cousinOf == childOf \circ siblingOf \circ parentOf
 \end{zed}
 
 \noindent Let's trace the composition chain:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -285,7 +318,7 @@ cousinOf == childOf \circ siblingOf \circ parentOf
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -297,7 +330,7 @@ cousinOf == childOf \circ siblingOf \circ parentOf
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -309,7 +342,7 @@ cousinOf == childOf \circ siblingOf \circ parentOf
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -321,7 +354,7 @@ cousinOf == childOf \circ siblingOf \circ parentOf
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -329,15 +362,15 @@ cousinOf == childOf \circ siblingOf \circ parentOf
 
 \bigskip
 
-\noindent - (x, p1) in childOf: x is a child of p1
+\noindent - (x, p1) in $childOf : x$ is a child of p1
 
 \bigskip
 
-\noindent - (p1, p2) in siblingOf: p1 and p2 are siblings
+\noindent - (p1, p2) in $siblingOf : p1$ and p2 are siblings
 
 \bigskip
 
-\noindent - (p2, y) in parentOf: p2 is a parent of y
+\noindent - (p2, y) in $parentOf : p2$ is a parent of y
 
 \bigskip
 
@@ -345,7 +378,7 @@ cousinOf == childOf \circ siblingOf \circ parentOf
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -361,7 +394,8 @@ cousinOf == childOf \circ siblingOf \circ parentOf
 
 \bigskip
 
-\noindent - For second cousins, you would need (childOf $\circ$ siblingOf $\circ$ parentOf)+
+\noindent - For second cousins, you would need (childOf $\circ$
+siblingOf $\circ$ parentOf)+
 
 \bigskip
 
@@ -373,7 +407,7 @@ cousinOf == childOf \circ siblingOf \circ parentOf
 \bigskip
 
 \begin{zed}
-ancestorOf == parentOf^{+}
+  ancestorOf == parentOf \plus
 \end{zed}
 
 \noindent The transitive closure operator (+) computes:
@@ -384,7 +418,7 @@ ancestorOf == parentOf^{+}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -400,7 +434,8 @@ ancestorOf == parentOf^{+}
 
 \bigskip
 
-\noindent - Includes great-grandparents (parentOf $\circ$ parentOf $\circ$ parentOf)
+\noindent - Includes great-grandparents (parentOf $\circ$ parentOf
+$\circ$ parentOf)
 
 \bigskip
 
@@ -408,7 +443,7 @@ ancestorOf == parentOf^{+}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -428,7 +463,7 @@ ancestorOf == parentOf^{+}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -463,27 +498,35 @@ ancestorOf == parentOf^{+}
 
 \bigskip
 
-\begin{zed}
-parentOf == childOf^{-1}
-\end{zed}
+\noindent
 
-\begin{zed}
-siblingOf == (childOf \circ parentOf) \setminus \id[Person]
-\end{zed}
+\bigskip
 
-\begin{zed}
-cousinOf == childOf \circ siblingOf \circ parentOf
-\end{zed}
+\noindent parentOf == childOf~
 
-\begin{zed}
-ancestorOf == parentOf^{+}
-\end{zed}
+\bigskip
+
+\noindent siblingOf == (childOf $\circ$ parentOf) \ id\_Person
+
+\bigskip
+
+\noindent cousinOf == childOf $\circ$ siblingOf $\circ$ parentOf
+
+\bigskip
+
+\noindent ancestorOf == parentOf+
+
+\bigskip
+
+\noindent
+
+\bigskip
 
 \noindent Additional derived relations you might define:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -510,11 +553,12 @@ ancestorOf == parentOf^{+}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 1. **Primitive vs derived**: Start with minimal primitives, derive everything else
+\noindent 1. **Primitive vs derived**: Start with minimal primitives,
+derive everything else
 
 \bigskip
 
@@ -526,11 +570,12 @@ ancestorOf == parentOf^{+}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 2. **Relation algebra**: Use operators instead of explicit set comprehensions
+\noindent 2. **Relation algebra**: Use operators instead of explicit
+set comprehensions
 
 \bigskip
 
@@ -546,7 +591,7 @@ ancestorOf == parentOf^{+}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -554,7 +599,7 @@ ancestorOf == parentOf^{+}
 
 \bigskip
 
-\noindent - Essential for siblingOf $you're(\lnot your(own)(sibling))$
+\noindent - Essential for siblingOf $you're(\lnot (your(own)(sibling)))$
 
 \bigskip
 
@@ -562,11 +607,12 @@ ancestorOf == parentOf^{+}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 4. **Operator chaining**: Compose multiple operators for complex relationships
+\noindent 4. **Operator chaining**: Compose multiple operators for
+complex relationships
 
 \bigskip
 
@@ -578,7 +624,7 @@ ancestorOf == parentOf^{+}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -601,7 +647,8 @@ ancestorOf == parentOf^{+}
 
 \bigskip
 
-\noindent 2. Define grandchildOf two $ways : using composition and using descendantOf$
+\noindent 2. Define grandchildOf two $ways : using composition$ and
+using descendantOf
 
 \bigskip
 
@@ -609,11 +656,12 @@ ancestorOf == parentOf^{+}
 
 \bigskip
 
-\noindent 4. What properties must childOf satisfy for this model to be realistic?
+\noindent 4. What properties must childOf satisfy for this model to
+be realistic?
 
 \bigskip
 
-\noindent ($Hint : consider cycles, reflexivity, domain constraints)$
+\noindent ($Hint : consider cycles$, reflexivity, domain constraints)
 
 \bigskip
 

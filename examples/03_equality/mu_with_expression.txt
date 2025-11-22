@@ -66,7 +66,7 @@ axdef
   findAndAdvance : String cross Char -> N
 where
   forall s : String; c : Char |
-    findAndAdvance(s, c) = mu i : N | charAt(s, i) = c . i + 1
+    findAndAdvance(s, c) = (mu i : N | charAt(s, i) = c) + 1
 end
 
 TEXT: Finds the index, then returns the next index.
@@ -116,7 +116,7 @@ axdef
 where
   forall k : ConfigKey; default : N |
     k in dom configs =>
-    getConfigWithDefault(k, default) = mu v : N | parseValue(configs(k)) = v . v
+    getConfigWithDefault(k, default) = mu v : N | parseValue(configs(k)) = v
   forall k : ConfigKey; default : N |
     k notin dom configs =>
     getConfigWithDefault(k, default) = default

@@ -1,0 +1,642 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Advanced Proof Patterns}
+
+\section*{Example 1 : Proof by Cases ( Three - Way Split )}
+\addcontentsline{toc}{section}{Example 1 : Proof by Cases ( Three - Way Split )}
+
+\noindent Prove: For all integers n, n $\langle 0 \lor n = 0 \lor n \rangle$ 0
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[trichotomy of integers,axiom]{n < 0 \lor n = 0 \lor n > 0}{}
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent This uses the trichotomy property as an axiom. To prove
+something about all integers, we can case-analyze on these three possibilities.
+
+\bigskip
+
+\section*{Example 2 : Multi - Level Case Analysis}
+\addcontentsline{toc}{section}{Example 2 : Multi - Level Case Analysis}
+
+\noindent Prove: $(p \lor q)$ and $(r \lor s)$ $\Rightarrow$ $(p
+\land r)$ or $(p \land s)$ or $(q \land r)$ or $(q \land s)$
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \land (r
+      \lor s)) \implies (p \land r) \lor (p \land s) \lor (q \land r)
+    \lor (q \land s)}{
+      \infer[\lor \mathrm{elim} on p \lor q]{(p \land r) \lor (p
+      \land s) \lor (q \land r) \lor (q \land s)}{\infer[\lor
+        \mathrm{elim} on r \lor s]{(p \land r) \lor (p \land s) \lor
+        (q \land r) \lor (q \land s)}{
+          \raiseproof{10ex}{\infer[\lor \mathrm{intro}]{(p \land r)
+              \lor (p \land s) \lor (q \land r) \lor (q \land
+          s)}{\infer[\land \mathrm{intro}]{p \land r}{}}}
+          &
+          \hskip 6em \raiseproof{26ex}{\infer[\lor \mathrm{intro}]{(p
+              \land r) \lor (p \land s) \lor (q \land r) \lor (q \land
+          s)}{\infer[\land \mathrm{intro}]{p \land s}{}}}
+        } & \infer[\lor \mathrm{elim} on r \lor s]{(p \land r) \lor
+        (p \land s) \lor (q \land r) \lor (q \land s)}{
+          \raiseproof{10ex}{\infer[\lor \mathrm{intro}]{(p \land r)
+              \lor (p \land s) \lor (q \land r) \lor (q \land
+          s)}{\infer[\land \mathrm{intro}]{q \land r}{}}}
+          &
+          \hskip 6em \raiseproof{26ex}{\infer[\lor \mathrm{intro}]{(p
+              \land r) \lor (p \land s) \lor (q \land r) \lor (q \land
+          s)}{\infer[\land \mathrm{intro}]{q \land s}{}}}
+      }}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Nested case analysis on two disjunctions, exploring all
+four combinations.
+
+\bigskip
+
+\section*{Example 3 : Proof by Mathematical Induction ( Base and Step )}
+\addcontentsline{toc}{section}{Example 3 : Proof by Mathematical
+Induction ( Base and Step )}
+
+\noindent Prove: For all n ∈ ℕ, sum(1 to n) = n(n+1)/2
+
+\bigskip
+
+\noindent Base case ($n = 0$):
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies
+    (sum\_{to}(0) = 0 * ((0 + 1))(div)(2))}{
+      \infer[equality]{sum\_{to}(0) = 0 * ((0 +
+      1))(div)(2)}{\infer[arithmetic]{0 * ((0 + 1))(div)(2) =
+      0}{\infer[definition]{sum\_{to}(0) = 0}{\ulcorner true \urcorner^{[1]}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Inductive step (assume for n, prove for n+1):
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(sum\_{to}(n) = n * ((n
+    + 1))(div)(2)) \implies (sum\_{to}(n + 1) = (n + 1) * ((n + 2))(div)(2))}{
+      \infer[factoring]{sum\_{to}(n + 1) = (n + 1) * ((n +
+      2))(div)(2)}{\infer[algebra]{sum\_{to}(n + 1) = ((n * (n + 1) +
+        2 * (n + 1)))(div)(2)}{\infer[substitution]{sum\_{to}(n + 1) =
+          n * ((n + 1))(div)(2) + (n + 1)}{\infer[definition]{sum\_{to}(n
+            + 1) = sum\_{to}(n) + (n + 1)}{\ulcorner sum\_{to}(n) = n * ((n
+      + 1))(div)(2) \urcorner^{[1]}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent By induction, the formula holds for all natural numbers.
+
+\bigskip
+
+\section*{Example 4 : Structural Induction on Lists}
+\addcontentsline{toc}{section}{Example 4 : Structural Induction on Lists}
+
+\noindent Prove: For all sequences s, reverse(reverse(s)) = s
+
+\bigskip
+
+\noindent Base case (empty sequence):
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies
+    (reverse(reverse(emptyseq)) = emptyseq)}{
+      \infer[definition]{reverse(reverse(emptyseq)) =
+      emptyseq}{\infer[substitution]{reverse(reverse(emptyseq)) =
+        reverse(emptyseq)}{\infer[definition]{reverse(emptyseq) =
+      emptyseq}{\ulcorner true \urcorner^{[1]}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Inductive step (assume for s, prove for cons(x, s)):
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(reverse(reverse(s)) =
+    s) \implies (reverse(reverse(cons(x, s))) = cons(x, s))}{
+      \infer[inductive hypothesis]{cons(x, reverse(reverse(s))) =
+      cons(x, s)}{\infer[definition]{reverse(append(reverse(s), x)) =
+          cons(x,
+        reverse(reverse(s)))}{\infer[substitution]{reverse(reverse(cons(x,
+            s))) = reverse(append(reverse(s),
+          x))}{\infer[definition]{reverse(cons(x, s)) =
+            append(reverse(s), x)}{\ulcorner reverse(reverse(s)) = s
+      \urcorner^{[1]}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent By structural induction, reverse(reverse(s)) = s for all sequences.
+
+\bigskip
+
+\section*{Example 5 : Constructive Existence Proof}
+\addcontentsline{toc}{section}{Example 5 : Constructive Existence Proof}
+
+\noindent $Prove : There exists$ an even number greater than 10
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\exists n
+    : \nat @ even(n) \land n > 10)}{
+      \infer[exists \mathrm{intro} with n=12]{\exists n : \nat @
+      even(n) \land n > 10}{\infer[\land \mathrm{intro}]{even(12)
+        \land 12 > 10}{\infer[arithmetic]{12 > 10}{\infer[definition of
+            even,12=2 * 6]{even(12)}{\infer[arithmetic]{12 = 2 *
+      6}{\ulcorner true \urcorner^{[1]}}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Constructive $proof : we exhibit$ a specific witness (12).
+
+\bigskip
+
+\section*{Example 6 : Non - Constructive Existence Proof}
+\addcontentsline{toc}{section}{Example 6 : Non - Constructive Existence Proof}
+
+\noindent $Prove : There exist irrational numbers$ a and b such that
+$a^b$ is rational
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{irrational(sqrt(2))
+      \implies (\exists a, b @ irrational(a) \land irrational(b) \land
+    rational(power(a, b)))}{
+      \infer[\lor \mathrm{elim}]{\exists a, b @ irrational(a) \land
+      irrational(b) \land rational(power(a, b))}{\infer[exists
+        \mathrm{intro} with a=b=sqrt(2)]{\exists a, b @ irrational(a)
+        \land irrational(b) \land rational(power(a, b))}{\infer[\land
+          \mathrm{intro}]{irrational(sqrt(2)) \land irrational(sqrt(2))
+        \land rational(power(sqrt(2), sqrt(2)))}{}} & \infer[exists
+        \mathrm{intro}]{\exists a, b @ irrational(a) \land
+        irrational(b) \land rational(power(a, b))}{\infer[\land
+          \mathrm{intro}]{irrational(power(sqrt(2), sqrt(2))) \land
+            irrational(sqrt(2)) \land rational(power(power(sqrt(2),
+                sqrt(2)),
+          sqrt(2)))}{\infer[known]{rational(2)}{\infer[simplification]{power(sqrt(2),
+              2) = 2}{\infer[arithmetic]{power(sqrt(2), sqrt(2) * sqrt(2)) =
+                power(sqrt(2), 2)}{\infer[exponent law]{power(power(sqrt(2),
+      sqrt(2)), sqrt(2)) = power(sqrt(2), sqrt(2) * sqrt(2))}{}}}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Non-$constructive : we don't know$ which case is true, but
+both lead to the conclusion.
+
+\bigskip
+
+\section*{Example 7 : Proof by Strong Induction}
+\addcontentsline{toc}{section}{Example 7 : Proof by Strong Induction}
+
+\noindent $Prove : Every natural number n$ ≥ 2 has a prime factorization
+
+\bigskip
+
+\noindent Base case ($n = 2$):
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies
+    prime\_factorization(2)}{
+      \infer[trivial,singleton
+      factorization]{prime\_factorization(2)}{\infer[definition]{prime(2)}{\ulcorner
+      true \urcorner^{[1]}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Inductive step (assume for all $k < n$, prove for n):
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(n \geq 2) \implies
+    prime\_factorization(n)}{
+      \infer[\lor
+      \mathrm{elim}]{prime\_factorization(n)}{\infer[trivial,singleton
+        factorization]{prime\_factorization(n)}{} & \infer[n=a *
+        b]{prime\_factorization(n)}{\infer[multiplication of
+          factorizations]{prime\_factorization(a * b)}{\infer[strong IH,b
+            < n]{prime\_factorization(b)}{\infer[strong IH,a <
+              n]{prime\_factorization(a)}{\infer[definition of
+                composite]{\exists a, b @ 2 \leq a \land a < n \land 2 \leq b
+      \land b < n \land n = a * b}{}}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Strong $induction : we assume$ the property for all smaller
+values, not just n-1.
+
+\bigskip
+
+\section*{Example 8 : Proof Using Lemmas}
+\addcontentsline{toc}{section}{Example 8 : Proof Using Lemmas}
+
+\noindent Lemma 1: If n is even, then $n^2$ is even
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{even(n) \implies
+    even(power(n, 2))}{
+      \infer[definition of even]{even(power(n, 2))}{\infer[exists
+        \mathrm{intro} with m=2 * power(k,2)]{\exists m @ power(n, 2) =
+        2 * m}{\infer[factoring]{4 * power(k, 2) = 2 * (2 * power(k,
+          2))}{\infer[algebra]{power(2 * k, 2) = 4 * power(k,
+            2)}{\infer[substitution]{power(n, 2) = power(2 * k,
+              2)}{\infer[definition of even]{\exists k @ n = 2 * k}{\ulcorner
+      even(n) \urcorner^{[1]}}}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Main $theorem : If$ $n^2$ is odd, then n is odd
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{odd(power(n, 2)) \implies odd(n)}{
+      \infer[\lor \mathrm{elim}]{odd(n)}{\infer[\mathrm{false}
+        \mathrm{elim}]{odd(n)}{\infer[\mathrm{contradiction}]{false}{\infer[\mathrm{contradiction}]{odd(power(n,
+            2)) \land even(power(n, 2))}{\infer[Lemma 1]{even(power(n,
+      2))}{}}}} & \infer[identity]{odd(n)}{}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Proof by contrapositive using lemma.
+
+\bigskip
+
+\section*{Example 9 : Proof by Minimal Counterexample}
+\addcontentsline{toc}{section}{Example 9 : Proof by Minimal Counterexample}
+
+\noindent $Prove : All natural numbers n$ ≥ 1 satisfy P(n)
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\forall n
+    @ n \geq 1 \implies \power n)}{
+      \infer[\lnot\textrm{-intro}^{[2]}]{\forall n @ n \geq 1
+      \implies \power n}{\infer[\lor
+        \mathrm{elim}]{false}{\infer[\mathrm{contradiction}]{false}{\infer[\mathrm{contradiction}]{\lnot
+            \power m \land \power 1}{\infer[base \mathrm{case} proved
+          separately]{\power 1}{}}} &
+          \infer[\mathrm{contradiction}]{false}{\infer[\mathrm{contradiction}]{\lnot
+            \power m \land \power m}{\infer[by inductive step \mathrm{from}
+              P(m - 1)]{\power m}{\infer[since m - 1 >=1 \land m - 1 <
+                m]{\power (m - 1)}{\infer[minimality of m]{\forall k @ k \geq 1
+      \land k < m \implies \power k}{}}}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Minimal counterexample combines well-ordering with contradiction.
+
+\bigskip
+
+\section*{Example 10 : Proof by Invariant}
+\addcontentsline{toc}{section}{Example 10 : Proof by Invariant}
+
+\noindent Prove: A loop maintains invariant I
+
+\bigskip
+
+\noindent Initialization:
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{initial\_state \implies
+    invariant(initial\_state)}{
+      \infer[verification]{invariant(initial\_state)}{\ulcorner
+      initial\_state \urcorner^{[1]}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Preservation:
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(invariant(before\_state)
+    \land executes\_loop\_body) \implies invariant(after\_state)}{
+      \infer[verification]{invariant(after\_state)}{\infer[\land\textrm{-elim-2}]{executes\_loop\_body}{\infer[\land\textrm{-elim-1}]{invariant(before\_state)}{\ulcorner
+      invariant(before\_state) \land executes\_loop\_body \urcorner^{[1]}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Termination:
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{loop\_terminates
+    \implies desired\_property}{
+      \infer[logic]{desired\_property}{\infer[\land
+        \mathrm{intro}]{invariant(termination\_state) \land
+        termination\_condition}{\infer[by
+          preservation]{invariant(termination\_state)}{\ulcorner
+      loop\_terminates \urcorner^{[1]}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\section*{Example 11 : Proof by Diagonalization}
+\addcontentsline{toc}{section}{Example 11 : Proof by Diagonalization}
+
+\noindent Prove: The set of real numbers is uncountable
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies uncountable(reals)}{
+      \infer[\lnot\textrm{-intro}^{[2]}]{uncountable(reals)}{\infer[\mathrm{contradiction}]{false}{\infer[\mathrm{contradiction}]{not\_in\_range(r,
+          f) \land enumeration(f, reals)}{\infer[previous
+            line]{not\_in\_range(r, f)}{\infer[by construction,differs at
+              nth digit]{\forall n @ r \neq apply(f, n)}{\infer[diagonal
+                method]{diagonal\_construction(r)}{\infer[definition of
+                  countable]{\exists f @ enumeration(f, reals)}{\ulcorner
+      countable(reals) \urcorner^{[2]}}}}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent Cantor's diagonal argument (outline).
+
+\bigskip
+
+\section*{Example 12 : Constructive Proof Pattern}
+\addcontentsline{toc}{section}{Example 12 : Constructive Proof Pattern}
+
+\noindent To constructively prove: $\exists x @ \power x$
+
+\bigskip
+
+\noindent Strategy:
+
+\bigskip
+
+\noindent 1. Explicitly construct a witness w
+
+\bigskip
+
+\noindent 2. Verify P(w) holds
+
+\bigskip
+
+\noindent 3. Conclude $\exists x @ \power x$with $x = w$
+
+\bigskip
+
+\noindent $Example : Prove$ $\exists n : \nat @ n > 100 \land n$is even
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\exists n
+    @ n > 100 \land even(n))}{
+      \infer[exists \mathrm{intro} with n=102]{\exists n @ n > 100
+      \land even(n)}{\infer[\land \mathrm{intro}]{102 > 100 \land
+        even(102)}{\infer[definition]{even(102)}{\infer[arithmetic]{102
+            = 2 * 51}{\infer[arithmetic]{102 >
+              100}{\infer[construction]{witness\_construction(102)}{\ulcorner
+      true \urcorner^{[1]}}}}}}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\section*{Example 13 : Proof Composition}
+\addcontentsline{toc}{section}{Example 13 : Proof Composition}
+
+\noindent Combine multiple proof techniques:
+
+\bigskip
+
+\noindent Theorem: Property P holds for all cases
+
+\bigskip
+
+\noindent Overall $strategy : Case analysis$ + Induction + Contradiction
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\forall n
+    @ \power n)}{
+      \infer[\lor \mathrm{elim} over cases]{\forall n @ \power
+      n}{\infer[direct proof]{\power base}{} & \infer[\lor
+        \mathrm{elim} over subcases]{\power n}{
+          \raiseproof{12ex}{\infer[\lnot\textrm{-intro}^{[2]}]{\power n}{
+              \infer[\mathrm{contradiction}]{false}{\infer[proof
+                steps]{contradiction\_derived}{\ulcorner \lnot \power n
+              \urcorner^{[2]}}}
+          }}
+          &
+          \hskip 6em
+          \raiseproof{30ex}{\infer[\Rightarrow\textrm{-intro}^{[3]}]{\power n}{
+              \infer[inductive step]{\power n}{\ulcorner \power (n -
+              1) \urcorner^{[3]}}
+          }}
+      }}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\section*{Example 14 : Best Practices for Complex Proofs}
+\addcontentsline{toc}{section}{Example 14 : Best Practices for Complex Proofs}
+
+\noindent Guidelines for writing advanced proofs:
+
+\bigskip
+
+\noindent 1. State strategy at the beginning
+
+\bigskip
+
+\noindent 2. Label cases clearly
+
+\bigskip
+
+\noindent 3. Discharge assumptions promptly
+
+\bigskip
+
+\noindent 4. Reference lemmas explicitly
+
+\bigskip
+
+\noindent 5. Show key algebraic steps
+
+\bigskip
+
+\noindent 6. Justify non-obvious steps
+
+\bigskip
+
+\noindent 7. Use proof by cases when structure suggests it
+
+\bigskip
+
+\noindent 8. Use induction for recursive definitions
+
+\bigskip
+
+\noindent 9. Use contradiction for negative conclusions
+
+\bigskip
+
+\noindent 10. Verify base cases thoroughly
+
+\bigskip
+
+\section*{Example 15 : Proof Documentation}
+\addcontentsline{toc}{section}{Example 15 : Proof Documentation}
+
+\noindent Document complex proofs:
+
+\bigskip
+
+\noindent - **Goal**: State what you're proving
+
+\bigskip
+
+\noindent - **Strategy**: Explain the proof approach
+
+\bigskip
+
+\noindent - **Lemmas needed**: List dependencies
+
+\bigskip
+
+\noindent - **Key insights**: Highlight non-obvious steps
+
+\bigskip
+
+\noindent - **Pitfalls**: Note where proof could go wrong
+
+\bigskip
+
+\noindent - **Generalization**: Explain how proof extends
+
+\bigskip
+
+\noindent Well-documented proofs are maintainable and reusable.
+
+\bigskip
+
+\end{document}

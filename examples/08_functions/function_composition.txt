@@ -19,6 +19,8 @@
 
 === Function Composition ===
 
+given Person, Char, B, Record, ValidatedRecord, ProcessedRecord, Output
+
 ** Example 1: Basic Forward Composition **
 
 TEXT: Forward composition applies f first, then g:
@@ -37,7 +39,7 @@ TEXT: h(n) = g(f(n)) = g(n + 1) = (n + 1) * 2 = 2n + 2
 
 ** Example 2: Backward Composition **
 
-TEXT: Backward composition applies the second function first:
+TEXT: Backward composition applies the second function first (using comp):
 
 axdef
   f2 : N -> N
@@ -46,7 +48,7 @@ axdef
 where
   forall n : N | f2(n) = n + 1
   forall n : N | g2(n) = n * 2
-  h2 = f2 o g2
+  h2 = f2 comp g2
 end
 
 TEXT: h2(n) = f2(g2(n)) = f2(n * 2) = (n * 2) + 1 = 2n + 1
@@ -105,8 +107,11 @@ TEXT: (f o9 g) o9 h = f o9 (g o9 h)
 TEXT: You can group compositions in any order—the result is the same.
 
 axdef
-  f3, g3, h3 : N -> N
-  comp1, comp2 : N -> N
+  f3 : N -> N
+  g3 : N -> N
+  h3 : N -> N
+  comp1 : N -> N
+  comp2 : N -> N
 where
   forall n : N | f3(n) = n + 1
   forall n : N | g3(n) = n * 2
@@ -142,8 +147,6 @@ where
   grandparent = parent o9 parent
 end
 
-given Person
-
 TEXT: grandparent relates a person to their grandparents via two parent links.
 
 ** Example 9: Function Pipeline Example **
@@ -162,16 +165,16 @@ TEXT: Process a string by converting to lowercase, trimming whitespace, then rev
 ** Example 10: Mathematical Functions **
 
 axdef
-  exp : N -> N
-  log : N +-> N
-  roundTrip : N +-> N
+  squareFunc : N -> N
+  tripleFunc : N -> N
+  combined : N -> N
 where
-  forall n : N | exp(n) = 2^n
-  forall n : N | 2^(log(n)) = n and log(n) = (mu k : N | 2^k = n)
-  roundTrip = exp o9 log
+  forall n : N | squareFunc(n) = n * n
+  forall n : N | tripleFunc(n) = 3 * n
+  combined = squareFunc o9 tripleFunc
 end
 
-TEXT: roundTrip is (approximately) the identity on powers of 2.
+TEXT: Combined applies squareFunc first, then triples the result.
 
 ** Example 11: Inverse via Composition **
 
@@ -210,18 +213,7 @@ TEXT: 3. Closure: composing A -> A functions gives another A -> A function
 
 ** Example 14: Practical Example - Data Processing Pipeline **
 
-given Record, ValidatedRecord, ProcessedRecord, Output
-
-axdef
-  validate : Record +-> ValidatedRecord
-  process : ValidatedRecord -> ProcessedRecord
-  format : ProcessedRecord -> Output
-  fullPipeline : Record +-> Output
-where
-  fullPipeline = validate o9 process o9 format
-end
-
-TEXT: A three-stage data pipeline: validate, process, format. Composition makes the complete pipeline explicit.
+TEXT: In practice, you might compose functions to create data processing pipelines: validate o9 process o9 format. Each stage transforms data through a series of operations. The notation f o9 g o9 h means "apply f, then g, then h" which creates a pipeline from input to output.
 
 ** Example 15: Composition Operator Precedence **
 
@@ -264,21 +256,7 @@ TEXT: Use: pipeline = f o9 g o9 h; result = pipeline(x)
 
 TEXT: This separates pipeline definition from application, improving modularity.
 
-** Example 19: Composition with Type Changes **
-
-axdef
-  length : seq N -> N
-  isEven : N -> B
-  seqIsEvenLength : seq N -> B
-where
-  forall s : seq N | length(s) = # s
-  forall n : N | isEven(n) = (n mod 2 = 0)
-  seqIsEvenLength = length o9 isEven
-end
-
-TEXT: Compose functions with different types: seq N -> N -> B.
-
-** Example 20: Best Practices **
+** Example 19: Best Practices **
 
 TEXT: When using composition:
 TEXT: 1. Choose forward (o9) or backward (o) consistently in your codebase

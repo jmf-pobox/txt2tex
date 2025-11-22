@@ -40,9 +40,9 @@ TEXT: The absolute value function uses if-then-else to handle positive and negat
 ** Example 3: Maximum Function **
 
 axdef
-  max : N cross N -> N
+  maximum : N cross N -> N
 where
-  forall a, b : N | max(a, b) = if a >= b then a else b
+  forall a, b : N | maximum(a, b) = if a >= b then a else b
 end
 
 TEXT: Returns the larger of two numbers.
@@ -78,48 +78,24 @@ end
 
 TEXT: Filters a sequence to include only positive elements using conditional expressions.
 
-** Example 7: Conditional Function Application **
+** Example 7: Grade Assignment **
 
-axdef
-  applyIf : (N -> N) cross N cross B -> N
-where
-  forall f : N -> N; x : N; cond : B |
-    applyIf(f, x, cond) = if cond = true then f(x) else x
-end
-
-TEXT: Applies a function conditionally based on a boolean.
-
-** Example 8: Grade Assignment **
-
-given Grade
-
-Grade ::= A | B | C | D | F
+Grade ::= GradeA | GradeB | GradeC | GradeD | GradeF
 
 axdef
   scoreToGrade : N -> Grade
 where
   forall score : N |
-    scoreToGrade(score) = if score >= 90 then A
-                          else if score >= 80 then B
-                          else if score >= 70 then C
-                          else if score >= 60 then D
-                          else F
+    scoreToGrade(score) = if score >= 90 then GradeA
+                          else if score >= 80 then GradeB
+                          else if score >= 70 then GradeC
+                          else if score >= 60 then GradeD
+                          else GradeF
 end
 
 TEXT: Multi-way branching using nested if-then-else.
 
-** Example 9: Safe Division **
-
-axdef
-  safeDiv : Z cross Z -> Z
-where
-  forall x, y : Z |
-    safeDiv(x, y) = if y /= 0 then x / y else 0
-end
-
-TEXT: Returns quotient if divisor is non-zero, otherwise returns 0.
-
-** Example 10: Piecewise Function **
+** Example 8: Piecewise Function **
 
 axdef
   piecewise : Z -> Z
@@ -134,63 +110,39 @@ end
 
 TEXT: A piecewise-defined function with multiple ranges.
 
-** Example 11: Conditional in Lambda **
+** Example 9: Conditional in Lambda **
 
 lambda x : N . if x > 100 then 100 else x
 
 TEXT: Lambda function that caps values at 100.
 
-** Example 12: Boolean Expression Conditional **
+** Example 10: Conditional Set Selection **
 
 axdef
-  both_or_neither : B cross B -> B
-where
-  forall p, q : B |
-    both_or_neither(p, q) = if p = true then q else not q
-end
-
-TEXT: Returns true if both p and q are true, or both are false.
-
-** Example 13: Conditional Set Selection **
-
-axdef
-  selectSet : B -> P N
   evenSet : P N
   oddSet : P N
 where
   evenSet = {n : N | n mod 2 = 0}
   oddSet = {n : N | n mod 2 = 1}
-  forall flag : B |
-    selectSet(flag) = if flag = true then evenSet else oddSet
 end
 
-TEXT: Returns different sets based on a boolean flag.
+TEXT: Define sets that can be selected conditionally in expressions.
 
-** Example 14: Nested Conditional in Quantifier **
-
-forall x : N | (if x > 5 then x > 0 else true)
-
-TEXT: The conditional can appear within quantified predicates.
-
-** Example 15: Practical Example - Tax Calculation **
+** Example 11: Practical Example - Tax Rate Selection **
 
 axdef
   taxRate : N -> N
-  calculateTax : N -> N
 where
   forall income : N |
     taxRate(income) = if income < 20000 then 10
                       else if income < 50000 then 15
                       else if income < 100000 then 20
                       else 25
-
-  forall income : N |
-    calculateTax(income) = (income * taxRate(income)) / 100
 end
 
 TEXT: Progressive tax rates with multi-level conditional.
 
-** Example 16: Conditional with Complex Expression **
+** Example 12: Conditional with Complex Expression **
 
 axdef
   complexFunc : N -> N
@@ -203,7 +155,7 @@ end
 
 TEXT: Different computations based on remainder.
 
-** Example 17: Guard Conditions in Recursion **
+** Example 13: Guard Conditions in Recursion **
 
 axdef
   factorial : N -> N
@@ -215,7 +167,7 @@ end
 
 TEXT: Conditional ensures factorial only recurses for positive n.
 
-** Example 18: Ternary-Style Expression **
+** Example 14: Ternary-Style Expression **
 
 TEXT: Z notation's if-then-else is similar to C's ternary operator (? :):
 
@@ -224,20 +176,13 @@ TEXT: Z: if x > 0 then 1 else -1
 
 TEXT: Both evaluate to one of two values based on a condition.
 
-** Example 19: Short-Circuit Evaluation Note **
+** Example 15: Short-Circuit Evaluation Note **
 
-TEXT: In Z notation, if-then-else expressions should be evaluated lazily: only the selected branch should be evaluated. This matters when branches have side effects or may be undefined:
+TEXT: In Z notation, if-then-else expressions should be evaluated lazily: only the selected branch should be evaluated. This matters when branches have side effects or may be undefined.
 
-axdef
-  safeAccess : (N +-> N) cross N -> N
-where
-  forall f : N +-> N; key : N |
-    safeAccess(f, key) = if key in dom f then f(key) else 0
-end
+TEXT: If a key is not in a function's domain, accessing it would be undefined. A conditional ensures we only evaluate the function application when it's safe.
 
-TEXT: If key is not in domain, f(key) would be undefined. The conditional ensures we only evaluate f(key) when it's safe.
-
-** Example 20: Best Practices **
+** Example 16: Best Practices **
 
 TEXT: When using if-then-else:
 TEXT: 1. Keep branches simple and readable

@@ -1,84 +1,63 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
-\bigskip
-\noindent
-\textbf{Phase 11 . 8 : Relational Image}
+\section*{Phase 11 . 8 : Relational Image}
+\addcontentsline{toc}{section}{Phase 11 . 8 : Relational Image}
 
-\medskip
-
-\bigskip
-
-The relational image R(| S |) gives the image of set S under relation R.
+\noindent The relational image $(R \limg S \rimg)$ gives the image of
+set S under relation R.
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Example 1 : Simple relational image}
-
-\medskip
+\section*{Example 1 : Simple relational image}
+\addcontentsline{toc}{section}{Example 1 : Simple relational image}
 
 \noindent
 $(R \limg S \rimg)$
 
-\bigskip
-\noindent
-\textbf{Example 2 : Relational image with set literal}
-
-\medskip
+\section*{Example 2 : Relational image with set literal}
+\addcontentsline{toc}{section}{Example 2 : Relational image with set literal}
 
 \noindent
 $(R \limg \{1, 2, 3\} \rimg)$
 
-\bigskip
-\noindent
-\textbf{Example 3 : Relational image with singleton set}
-
-\medskip
+\section*{Example 3 : Relational image with singleton set}
+\addcontentsline{toc}{section}{Example 3 : Relational image with singleton set}
 
 \noindent
 $(parentOf \limg \{john\} \rimg)$
 
-\bigskip
-\noindent
-\textbf{Example 4 : Relational image with composition}
-
-\medskip
+\section*{Example 4 : Relational image with composition}
+\addcontentsline{toc}{section}{Example 4 : Relational image with composition}
 
 \noindent
 $((R \circ S) \limg A \rimg)$
 
-\bigskip
-\noindent
-\textbf{Example 5 : Relational image with inverse}
-
-\medskip
+\section*{Example 5 : Relational image with inverse}
+\addcontentsline{toc}{section}{Example 5 : Relational image with inverse}
 
 \noindent
 $(R^{-1} \limg S \rimg)$
 
-\bigskip
-\noindent
-\textbf{Example 6 : Set comprehension with relational image (
+\section*{Example 6 : Set comprehension with relational image (
 Solution 35 pattern )}
-
-\medskip
+\addcontentsline{toc}{section}{Example 6 : Set comprehension with
+relational image ( Solution 35 pattern )}
 
 \noindent
 $\{ p : Person | p \in \dom parentOf @ (p, (parentOf \limg \{p\} \rimg)) \}$
 
-\bigskip
-\noindent
-\textbf{Example 7 : Chained relational images}
-
-\medskip
+\section*{Example 7 : Chained relational images}
+\addcontentsline{toc}{section}{Example 7 : Chained relational images}
 
 \noindent
 $((R \limg S \rimg) \limg T \rimg)$

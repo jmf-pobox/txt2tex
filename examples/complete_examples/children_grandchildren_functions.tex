@@ -3,7 +3,7 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
-\usepackage{zed-cm}
+\usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
@@ -40,10 +40,11 @@
 
 \bigskip
 
-\begin{zed}[Person]\end{zed}
+\begin{zed}[Person]
+\end{zed}
 
 \begin{axdef}
-parentOf : Person \rel Person
+  parentOf : Person \rel Person
 \end{axdef}
 
 \noindent Recall that parentOf represents direct parent-child relationships.
@@ -61,33 +62,34 @@ parentOf : Person \rel Person
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Type $signature : children $: $Person \fun \power$ Person
+\noindent Type $signature : children$ : $Person \fun \power$ Person
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent For each person p, children(p) is the set of all people c where p is a parent of c.
+\noindent For each person p, children(p) is the set of all people c
+where p is a parent of c.
 
 \bigskip
 
 \begin{axdef}
-children : Person \fun \power Person
-\where
-children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
+  children : Person \fun \power Person
+  \where
+  children = \{ p : Person @ p \mapsto (parentOf \limg \{p\} \rimg) \}
 \end{axdef}
 
 \noindent Let's break down this definition:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -95,7 +97,7 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent {$p : Person $. p $\mapsto$ ...}
+\noindent {$p : Person$ . p $\mapsto$ ...}
 
 \bigskip
 
@@ -103,7 +105,7 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -111,7 +113,7 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent parentOf(| $\{p\}$ |)
+\noindent $(parentOf \limg \{p\} \rimg)$
 
 \bigskip
 
@@ -119,19 +121,21 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Recall: R(| A |) = $\{ y \mid \exists x \colon A \bullet x \mapsto y \in R \}$
+\noindent Recall: $(R \limg A \rimg)$ = $\{ y | \exists x : A @ x
+\mapsto y \in R \}$
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent $So : parentOf(| $$\{p\}$ |) = $\{ c \mid p \mapsto c \in parentOf \}$
+\noindent So: $(parentOf \limg \{p\} \rimg)$ = $\{ c | p \mapsto c
+\in parentOf \}$
 
 \bigskip
 
@@ -139,7 +143,7 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -147,7 +151,7 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent p $\mapsto$ parentOf(| $\{p\}$ |)
+\noindent p $\mapsto$ $(parentOf \limg \{p\} \rimg)$
 
 \bigskip
 
@@ -155,7 +159,7 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -163,30 +167,32 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent children = $\{ p \colon Person \bullet p \mapsto \{ c \colon Person \mid p \mapsto c \in parentOf \} \}$
+\noindent children = $\{ p : Person @ p \mapsto \{ c : Person | p
+\mapsto c \in parentOf \} \}$
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent The relation image version is more concise and $idiomatic \in Z$ notation.
+\noindent The relation image version is more concise and $idiomatic
+\in Z$ notation.
 
 \bigskip
 
 \section*{Understanding Relation Image}
 \addcontentsline{toc}{section}{Understanding Relation Image}
 
-\noindent The relation image operator (| ... |) is a powerful tool:
+\noindent The relation image operator $\limg \ldots \rimg$ is a powerful tool:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -194,19 +200,20 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent - parentOf(| $\{Alice\}$ |) = set of Alice's children
+\noindent - $(parentOf \limg \{Alice\} \rimg)$ = set of Alice's children
 
 \bigskip
 
-\noindent - parentOf(| $\{Alice, Bob\}$ |) = set of children of Alice or Bob
+\noindent - $(parentOf \limg \{Alice, Bob\} \rimg)$ = set of children
+of Alice or Bob
 
 \bigskip
 
-\noindent - parentOf(| $\emptyset$ |) = $\emptyset$
+\noindent - $(parentOf \limg \emptyset \rimg)$ = $\emptyset$
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -214,64 +221,69 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent 1. R(| A union B |) = R(| A |) union R(| B |)
+\noindent 1. $(R \limg A \cup B \rimg)$ = $(R \limg A \rimg)$ union
+$(R \limg B \rimg)$
 
 \bigskip
 
-\noindent 2. R(| $\emptyset$ |) = $\emptyset$
+\noindent 2. $(R \limg \emptyset \rimg)$ = $\emptyset$
 
 \bigskip
 
-\noindent 3. R(| A |) subseteq ran R
+\noindent 3. $(R \limg A \rimg)$ subseteq ran R
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Intuition: Given a relation R and a set of starting points A,
+\noindent $Intuition : Given$ a relation R and a set of starting points A,
 
 \bigskip
 
-\noindent the image R(| A |) is the set of all endpoints reachable from A via R.
+\noindent the image $(R \limg A \rimg)$ is the set of all endpoints
+reachable from A via R.
 
 \bigskip
 
 \section*{Solution ( b ) : Number of Grandchildren Function}
-\addcontentsline{toc}{section}{Solution ( b ) : Number of Grandchildren Function}
+\addcontentsline{toc}{section}{Solution ( b ) : Number of
+Grandchildren Function}
 
 \noindent We want a function that counts grandchildren for each person.
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Type $signature : number_of_grandchildren $: $Person \fun \mathbb{N}$
+\noindent Type $signature : number_of_grandchildren$ : $Person \fun \nat$
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent Grandchildren are children of children, which we can express via composition.
+\noindent Grandchildren are children of children, which we can
+express via composition.
 
 \bigskip
 
 \begin{axdef}
-\mathit{number\_of\_grandchildren} : Person \fun \mathbb{N}
-\where
-\mathit{number\_of\_grandchildren} = \{ p \colon Person \bullet p \mapsto \# ((parentOf \circ parentOf) \limg \{p\} \rimg) \}
+  number\_of\_grandchildren : Person \fun \nat
+  \where
+  number\_of\_grandchildren = \{ p : Person @ p \mapsto \# ((parentOf
+  \circ parentOf) \limg \{p\} \rimg) \}
 \end{axdef}
 
 \noindent Let's break down this definition:
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -295,11 +307,11 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent Meaning: p is a grandparent of g.
+\noindent $Meaning : p$ is a grandparent of g.
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -307,7 +319,7 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent (parentOf $\circ$ parentOf)(| $\{p\}$ |)
+\noindent $((parentOf \circ parentOf) \limg \{p\} \rimg)$
 
 \bigskip
 
@@ -319,7 +331,7 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -327,7 +339,7 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent # (parentOf $\circ$ parentOf)(| $\{p\}$ |)
+\noindent # $((parentOf \circ parentOf) \limg \{p\} \rimg)$
 
 \bigskip
 
@@ -335,7 +347,7 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -343,7 +355,7 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent p $\mapsto$ # (parentOf $\circ$ parentOf)(| $\{p\}$ |)
+\noindent p $\mapsto$ # $((parentOf \circ parentOf) \limg \{p\} \rimg)$
 
 \bigskip
 
@@ -374,7 +386,7 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 
 \bigskip
 
-\noindent - Requires understanding of (| |) operator
+\noindent - Requires understanding of $\limg \rimg$ operator
 
 \bigskip
 
@@ -383,15 +395,19 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 \bigskip
 
 \begin{axdef}
-\mathit{children\_alt} : Person \fun \power Person
-\where
-\forall p \colon Person \bullet \mathit{children\_alt}(p) = \{ c \colon Person \mid p \mapsto c \in parentOf \}
+  children\_alt : Person \fun \power Person
+  \where
+  \forall p : Person @ children\_alt(p) = \{ c : Person | p \mapsto c
+  \in parentOf \}
 \end{axdef}
 
 \begin{axdef}
-\mathit{number\_of\_grandchildren\_alt} : Person \fun \mathbb{N}
-\where
-\forall p \colon Person \bullet \mathit{number\_of\_grandchildren\_alt}(p) = \# \{ g \colon Person \mid \exists c \colon Person \bullet p \mapsto c \in parentOf \land c \mapsto g \in parentOf \}
+  number\_of\_grandchildren\_alt : Person \fun \nat
+  \where
+  \forall p : Person @ \\
+  \quad number\_of\_grandchildren\_alt(p) = \# \{ g : Person |
+    \exists c : Person @ p \mapsto c \in parentOf \land c \mapsto g \in
+  parentOf \}
 \end{axdef}
 
 \noindent **Approach 3: Using previously defined functions**
@@ -399,15 +415,16 @@ children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \}
 \bigskip
 
 \begin{axdef}
-grandchildren : Person \fun \power Person
-\where
-\forall p \colon Person \bullet grandchildren(p) = \bigcup \{ c \colon children(p) \bullet children(c) \}
+  grandchildren : Person \fun \power Person
+  \where
+  \forall p : Person @ \\
+  \quad grandchildren(p) = \bigcup \{ c : children(p) @ children(c) \}
 \end{axdef}
 
 \begin{axdef}
-\mathit{number\_of\_grandchildren\_v3} : Person \fun \mathbb{N}
-\where
-\forall p \colon Person \bullet \mathit{number\_of\_grandchildren\_v3}(p) = \# grandchildren(p)
+  number\_of\_grandchildren\_v3 : Person \fun \nat
+  \where
+  \forall p : Person @ number\_of\_grandchildren\_v3(p) = \# (grandchildren(p))
 \end{axdef}
 
 \noindent All three approaches are mathematically equivalent. Choose based on:
@@ -437,11 +454,11 @@ grandchildren : Person \fun \power Person
 
 \bigskip
 
-\noindent - Alice has $children : Bob, Carol$
+\noindent - Alice has $children : Bob$, Carol
 
 \bigskip
 
-\noindent - Bob has $children : Dave, Eve$
+\noindent - Bob has $children : Dave$, Eve
 
 \bigskip
 
@@ -449,7 +466,7 @@ grandchildren : Person \fun \power Person
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -488,7 +505,7 @@ grandchildren : Person \fun \power Person
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -500,19 +517,21 @@ grandchildren : Person \fun \power Person
 
 \bigskip
 
-\noindent - children: $Person \fun \power$ Person (a person may have 0+ children)
+\noindent - $children : Person$ $\fun$ P Person (a person may have 0+ children)
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 2. **Relation image for set operations**: Use (| ... |) instead of comprehensions
+\noindent 2. **Relation image for set operations**: Use $\limg \ldots
+\rimg$ instead of comprehensions
 
 \bigskip
 
-\noindent - More $concise : R(| $$\{x\}$ |) vs $\{ y \mid x \mapsto y \in R \}$
+\noindent - More concise: $(R \limg \{x\} \rimg)$ vs $\{ y | x
+\mapsto y \in R \}$
 
 \bigskip
 
@@ -520,11 +539,12 @@ grandchildren : Person \fun \power Person
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 3. **Composition for multi-step relationships**: Use $\circ$ instead of nested quantifiers
+\noindent 3. **Composition for multi-step relationships**: Use
+$\circ$ instead of nested quantifiers
 
 \bigskip
 
@@ -540,7 +560,7 @@ grandchildren : Person \fun \power Person
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -556,11 +576,12 @@ grandchildren : Person \fun \power Person
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 5. **Progressive abstraction**: Build complex functions from simpler ones
+\noindent 5. **Progressive abstraction**: Build complex functions
+from simpler ones
 
 \bigskip
 
@@ -579,25 +600,95 @@ grandchildren : Person \fun \power Person
 \section*{Specification Completeness}
 \addcontentsline{toc}{section}{Specification Completeness}
 
-\noindent Complete axiomatic definitions with all functions:
+\noindent Summary of all definitions declared above:
 
 \bigskip
 
-\begin{axdef}
-parentOf : Person \rel Person \\
-children : Person \fun \power Person \\
-grandchildren : Person \fun \power Person \\
-\mathit{number\_of\_grandchildren} : Person \fun \mathbb{N}
-\where
-children = \{ p \colon Person \bullet p \mapsto (parentOf \limg \{p\} \rimg) \} \\
-grandchildren = \{ p \colon Person \bullet p \mapsto ((parentOf \circ parentOf) \limg \{p\} \rimg) \} \\
-\mathit{number\_of\_grandchildren} = \{ p \colon Person \bullet p \mapsto \# grandchildren(p) \}
-\end{axdef}
+\noindent
+
+\bigskip
+
+\noindent 1. **parentOf** : Person $\rel$ Person
+
+\bigskip
+
+\noindent Base relation representing direct parent-child relationships
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 2. **children** : $Person \fun \power$ Person
+
+\bigskip
+
+\noindent Function mapping each person to their set of children
+
+\bigskip
+
+\noindent $Definition : children$ = {$p : Person$ . p $\mapsto$
+$(parentOf \limg \{p\} \rimg)$}
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 3. **grandchildren** : $Person \fun \power$ Person
+
+\bigskip
+
+\noindent Function mapping each person to their set of grandchildren
+
+\bigskip
+
+\noindent $Definition : grandchildren$ = {$p : Person$ . p $\mapsto$
+$((parentOf \circ parentOf) \limg \{p\} \rimg)$}
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent 4. **number\_of\_grandchildren** : $Person \fun \nat$
+
+\bigskip
+
+\noindent Function counting grandchildren for each person
+
+\bigskip
+
+\noindent $Definition : number_of_grandchildren$ = $\{ p : Person @ p
+\mapsto \# (grandchildren(p)) \}$
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent These definitions form a progressive $hierarchy : parentOf$
+is the base relation,
+
+\bigskip
+
+\noindent children builds on it, grandchildren uses composition of parentOf, and
+
+\bigskip
+
+\noindent number\_of\_grandchildren applies cardinality to the
+grandchildren set.
+
+\bigskip
 
 \section*{Exercise for the Reader}
 \addcontentsline{toc}{section}{Exercise for the Reader}
 
-\noindent 1. Define a function $descendants : Person  \fun  P Person$
+\noindent 1. Define a function $descendants : Person$ $\fun$ P Person
 
 \bigskip
 
@@ -605,15 +696,15 @@ grandchildren = \{ p \colon Person \bullet p \mapsto ((parentOf \circ parentOf) 
 
 \bigskip
 
-\noindent $Hint : use transitive closure (+)$
+\noindent $Hint : use transitive closure$ (+)
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 2. Define a function $\mathit{oldest\_child} : Person  \pfun  Person$
+\noindent 2. Define a function $oldest\_child : Person$ $\pfun$ Person
 
 \bigskip
 
@@ -621,15 +712,16 @@ grandchildren = \{ p \colon Person \bullet p \mapsto ((parentOf \circ parentOf) 
 
 \bigskip
 
-\noindent $Hint : you$'ll need an age function
+\noindent $Hint : you'll need$ an age function
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
-\noindent 3. Prove that: # grandchildren(p) = sum {# children(c) $\mid$ c in children(p)}
+\noindent 3. Prove that: # grandchildren(p) = sum {# children(c)
+$\mid$ c in children(p)}
 
 \bigskip
 
@@ -637,7 +729,7 @@ grandchildren = \{ p \colon Person \bullet p \mapsto ((parentOf \circ parentOf) 
 
 \bigskip
 
-\noindent 
+\noindent
 
 \bigskip
 
@@ -649,7 +741,8 @@ grandchildren = \{ p \colon Person \bullet p \mapsto ((parentOf \circ parentOf) 
 
 \bigskip
 
-\noindent - Consistent cardinality (if p in children(x), then x in parentOf(| $\{p\}$ |))
+\noindent - Consistent cardinality (if p in children(x), then x in
+$(parentOf \limg \{p\} \rimg)$)
 
 \bigskip
 

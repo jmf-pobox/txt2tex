@@ -1,24 +1,22 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Unique Existence}
 
-\bigskip
-\noindent
-\textbf{Example 1 : Unique Quantifier ( exists1 )}
+\section*{Example 1 : Unique Quantifier ( exists1 )}
+\addcontentsline{toc}{section}{Example 1 : Unique Quantifier ( exists1 )}
 
-\medskip
-
-\bigskip
-
-The unique existence quantifier asserts there is exactly one value
-satisfying the predicate:
+\noindent The unique existence quantifier asserts there is exactly
+one value satisfying the predicate:
 
 \bigskip
 
@@ -28,15 +26,10 @@ $\exists_1 x : \nat @ x = 5$
 \noindent
 $\exists_1 n : \nat @ \forall m : \nat @ n \leq m$
 
-\bigskip
-\noindent
-\textbf{Example 2 : Multiple Conditions}
+\section*{Example 2 : Multiple Conditions}
+\addcontentsline{toc}{section}{Example 2 : Multiple Conditions}
 
-\medskip
-
-\bigskip
-
-Unique existence with compound predicates:
+\noindent Unique existence with compound predicates:
 
 \bigskip
 
@@ -46,37 +39,32 @@ $\exists_1 y : \nat @ y \in \{0, 1\} \land y \neq 1$
 \noindent
 $\exists_1 z : \num @ z^2 = 4 \land z > 0$
 
-\bigskip
-\noindent
-\textbf{Example 3 : One - Point Rule}
+\section*{Example 3 : One - Point Rule}
+\addcontentsline{toc}{section}{Example 3 : One - Point Rule}
 
-\medskip
-
-\bigskip
-
-When a unique value is specified by equality, we can apply the one-point rule:
+\noindent When a unique value is specified by equality, we can apply
+the one-point rule:
 
 \bigskip
 
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & \exists y : \nat @ y \in \{0, 1\} \land y \neq 1 \land x \neq y \\
-    &\Leftrightarrow \exists y : \nat @ y = 0 \land x \neq y &
-    [\mbox{arithmetic}] \\
-    &\Leftrightarrow 0 \in \nat \land x \neq 0 & [\mbox{one - point rule}] \\
-    &\Leftrightarrow x \neq 0
-  \end{array}
-\]
-
-\bigskip
-\noindent
-\textbf{Example 4 : Unique in Domain}
-
-\medskip
-
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \exists y : \nat @ y \in \{0, 1\} \land y \neq 1 \land x \neq y \\
+      \Leftrightarrow \exists y : \nat @ y = 0 \land x \neq y &
+      [\mbox{arithmetic}] \\
+      \Leftrightarrow 0 \in \nat \land x \neq 0 & [\mbox{one - point rule}] \\
+      \Leftrightarrow x \neq 0
+    \end{array}$%
+  }
+\end{center}
 \bigskip
 
-Testing uniqueness within a specific domain:
+\section*{Example 4 : Unique in Domain}
+\addcontentsline{toc}{section}{Example 4 : Unique in Domain}
+
+\noindent Testing uniqueness within a specific domain:
 
 \bigskip
 
