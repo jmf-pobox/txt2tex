@@ -1900,6 +1900,7 @@ class LaTeXGenerator:
         # Order matters: exists1+ must come before exists1 to avoid partial match
         text = re.sub(r"(?<!\\)exists1\+", r"$\\exists$", text)  # exists1+ → ∃
         text = re.sub(r"(?<!\\)\bexists1\b", r"$\\exists_1$", text)  # exists1 → ∃₁
+        text = re.sub(r"(?<!\\)\bexists\b", r"$\\exists$", text)  # exists → ∃
         text = re.sub(r"(?<!\\)\bemptyset\b", r"$\\emptyset$", text)  # emptyset → ∅
         text = re.sub(r"(?<!\\)\bforall\b", r"$\\forall$", text)  # forall → ∀
 
@@ -3061,6 +3062,14 @@ class LaTeXGenerator:
         result = re.sub(r"\binv\b", r"$\\inv$", result)
         result = re.sub(r"\bid\b", r"$\\id$", result)
 
+        # Convert Z notation keywords to symbols (QA fixes)
+        # Order matters: exists1+ before exists1 to avoid partial match
+        result = re.sub(r"(?<!\\)exists1\+", r"$\\exists$", result)  # exists1+ → ∃
+        result = re.sub(r"(?<!\\)\bexists1\b", r"$\\exists_1$", result)  # exists1 → ∃₁
+        result = re.sub(r"(?<!\\)\bexists\b", r"$\\exists$", result)  # exists → ∃
+        result = re.sub(r"(?<!\\)\bemptyset\b", r"$\\emptyset$", result)  # emptyset → ∅
+        result = re.sub(r"(?<!\\)\bforall\b", r"$\\forall$", result)  # forall → ∀
+
         # Escape underscores in identifiers for prose rendering (not subscripts)
         # Must happen AFTER all operator replacements to avoid interfering
         # Pattern: word characters around underscore, not already in math mode
@@ -4114,6 +4123,14 @@ class LaTeXGenerator:
             op_latex = re.sub(r"\binv\b", r"\\inv", op_latex)
             op_latex = re.sub(r"\bid\b", r"\\id", op_latex)
 
+            # Z notation keywords (QA fixes - matches _escape_justification)
+            # Order matters: exists1+ before exists1 to avoid partial match
+            op_latex = re.sub(r"exists1\+", r"\\exists", op_latex)  # exists1+ → ∃
+            op_latex = re.sub(r"\bexists1\b", r"\\exists_1", op_latex)  # exists1 → ∃₁
+            op_latex = re.sub(r"\bexists\b", r"\\exists", op_latex)  # exists → ∃
+            op_latex = re.sub(r"\bemptyset\b", r"\\emptyset", op_latex)  # emptyset → ∅
+            op_latex = re.sub(r"\bforall\b", r"\\forall", op_latex)  # forall → ∀
+
             # Format as: operator-rule^{[label]}
             # Use \textrm instead of \mbox to work correctly in math mode contexts
             return f"{op_latex}\\textrm{{-{rule_name}}}^{{[{label_num}]}}"
@@ -4170,6 +4187,14 @@ class LaTeXGenerator:
             op_latex = re.sub(r"\binv\b", r"\\inv", op_latex)
             op_latex = re.sub(r"\bid\b", r"\\id", op_latex)
 
+            # Z notation keywords (QA fixes - matches _escape_justification)
+            # Order matters: exists1+ before exists1 to avoid partial match
+            op_latex = re.sub(r"exists1\+", r"\\exists", op_latex)  # exists1+ → ∃
+            op_latex = re.sub(r"\bexists1\b", r"\\exists_1", op_latex)  # exists1 → ∃₁
+            op_latex = re.sub(r"\bexists\b", r"\\exists", op_latex)  # exists → ∃
+            op_latex = re.sub(r"\bemptyset\b", r"\\emptyset", op_latex)  # emptyset → ∅
+            op_latex = re.sub(r"\bforall\b", r"\\forall", op_latex)  # forall → ∀
+
             # Format as: operator-rule-number (just regular text, no subscript)
             # Use \textrm instead of \mbox to work correctly in math mode contexts
             return f"{op_latex}\\textrm{{-{rule_name}-{subscript_num}}}"
@@ -4215,6 +4240,14 @@ class LaTeXGenerator:
         result = re.sub(r"\bcomp\b", r"\\comp", result)
         result = re.sub(r"\binv\b", r"\\inv", result)
         result = re.sub(r"\bid\b", r"\\id", result)
+
+        # Z notation keywords (QA fixes - matches _escape_justification)
+        # Order matters: exists1+ before exists1 to avoid partial match
+        result = re.sub(r"exists1\+", r"\\exists", result)  # exists1+ → ∃
+        result = re.sub(r"\bexists1\b", r"\\exists_1", result)  # exists1 → ∃₁
+        result = re.sub(r"\bexists\b", r"\\exists", result)  # exists → ∃
+        result = re.sub(r"\bemptyset\b", r"\\emptyset", result)  # emptyset → ∅
+        result = re.sub(r"\bforall\b", r"\\forall", result)  # forall → ∀
 
         # Already in math mode - don't need extra wrapping
         # Just use \mathrm{} for text parts to get roman font
