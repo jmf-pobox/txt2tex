@@ -77,6 +77,6 @@ Browse the `.txt` files to see:
 
 ## See Also
 
-- **docs/USER_GUIDE.md** - Section "Text Blocks"
+- **docs/guides/USER_GUIDE.md** - Section "Text Blocks"
 - **Previous**: 10_schemas/
 - **Next**: 12_advanced/

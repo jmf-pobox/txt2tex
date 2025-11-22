@@ -314,9 +314,9 @@ your_document.log      # LaTeX compilation log
 ### Getting Help
 
 - **Examples:** `examples/` directory has 60+ example files
-- **User Guide:** `docs/USER_GUIDE.md` - complete syntax reference
+- **User Guide:** `docs/guides/USER_GUIDE.md` - complete syntax reference
 - **README:** Each example directory has a README
-- **Status:** `docs/STATUS.md` - implementation status and known issues
+- **Status:** `docs/development/STATUS.md` - implementation status and known issues
 
 ## Troubleshooting
 
@@ -351,10 +351,10 @@ You've learned:
 - ✅ The compilation workflow
 - ✅ Common patterns and mistakes
 
-**Next Tutorial:** [Tutorial 1: Propositional Logic](TUTORIAL_01.md)
+**Next Tutorial:** [Tutorial 1: Propositional Logic](docs/tutorials/01_propositional_logic.md)
 
 Learn about boolean operators, truth tables, and logical equivalences.
 
 ---
 
-**Questions?** Consult the [User Guide](docs/USER_GUIDE.md) or explore the [examples directory](examples/).
+**Questions?** Consult the [User Guide](docs/guides/USER_GUIDE.md) or explore the [examples directory](examples/).

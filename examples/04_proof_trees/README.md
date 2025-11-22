@@ -46,8 +46,8 @@ Browse the `.txt` files to see:
 
 ## See Also
 
-- **docs/PROOF_SYNTAX.md** - Complete proof tree syntax reference
-- **docs/USER_GUIDE.md** - Section "Proof Trees"
-- **docs/TUTORIAL_04.md** - Detailed tutorial for Lecture 4
+- **docs/guides/PROOF_SYNTAX.md** - Complete proof tree syntax reference
+- **docs/guides/USER_GUIDE.md** - Section "Proof Trees"
+- **docs/tutorials/04_proof_trees.md** - Detailed tutorial for Lecture 4
 - **Previous**: 03_equality/
 - **Next**: 05_sets/

@@ -6,7 +6,7 @@ Learn natural deduction, proof tree syntax, and how to write formal proofs.
 
 **Prerequisites:** Tutorials 1-3  
 **Examples:** `examples/04_proof_trees/`  
-**Reference:** `docs/PROOF_SYNTAX.md`
+**Reference:** `docs/guides/PROOF_SYNTAX.md`
 
 ---
 
@@ -162,7 +162,7 @@ p => (q => (r => s)) [=> intro from 1]
                   s [axiom]
 ```
 
-**See:** `docs/PROOF_SYNTAX.md`
+**See:** `docs/guides/PROOF_SYNTAX.md`
 
 ## Complete Example
 
@@ -214,7 +214,7 @@ You've learned:
 - ✅ Proper indentation
 - ✅ Proof by contradiction
 
-**Next Tutorial:** [Tutorial 5: Z Notation Definitions](TUTORIAL_05.md)
+**Next Tutorial:** [Tutorial 5: Z Notation Definitions](docs/tutorials/05_z_definitions.md)
 
 ---
 

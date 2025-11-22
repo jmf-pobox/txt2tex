@@ -183,7 +183,7 @@ You've learned:
 - ✅ Zed blocks for grouping definitions
 - ✅ Scoping rules
 
-**Next:** [Tutorial: Advanced Features](TUTORIAL_ADVANCED.md) or explore `complete_examples/`
+**Next:** [Tutorial: Advanced Features](docs/tutorials/10_advanced.md) or explore `complete_examples/`
 
 ---
 

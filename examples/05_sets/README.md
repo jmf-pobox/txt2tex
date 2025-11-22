@@ -40,7 +40,7 @@ Browse the `.txt` files to see:
 
 ## See Also
 
-- **docs/USER_GUIDE.md** - Section "Sets and Types"
-- **docs/TUTORIAL_05.md** - Detailed tutorial for Lecture 5
+- **docs/guides/USER_GUIDE.md** - Section "Sets and Types"
+- **docs/tutorials/05_z_definitions.md** - Detailed tutorial for Lecture 5
 - **Previous**: 04_proof_trees/
 - **Next**: 06_definitions/

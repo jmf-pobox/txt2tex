@@ -62,7 +62,7 @@ Browse the `.txt` files to see:
 
 ## See Also
 
-- **docs/USER_GUIDE.md** - Section "Definitions"
-- **docs/TUTORIAL_06.md** - Detailed tutorial for Lecture 6
+- **docs/guides/USER_GUIDE.md** - Section "Definitions"
+- **docs/tutorials/06_relations.md** - Detailed tutorial for Lecture 6
 - **Previous**: 05_sets/
 - **Next**: 07_relations/

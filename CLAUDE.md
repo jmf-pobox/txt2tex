@@ -29,13 +29,13 @@ This is `txt2tex` - a tool to convert whiteboard-style mathematical notation to 
 Essential reading for understanding the project:
 
 - **[CLAUDE.md](CLAUDE.md)** (this file) - Project context, workflow commands, coding standards, session management
-- **[docs/STATUS.md](docs/STATUS.md)** - Current implementation status, phase tracking, test counts, recent changes
+- **[docs/development/STATUS.md](docs/development/STATUS.md)** - Current implementation status, phase tracking, test counts, recent changes
 - **[docs/DESIGN.md](docs/DESIGN.md)** - Architecture, design decisions, operator precedence, AST structure
-- **[docs/USER_GUIDE.md](docs/USER_GUIDE.md)** - User-facing syntax guide, whiteboard notation reference
-- **[docs/PROOF_SYNTAX.md](docs/PROOF_SYNTAX.md)** - Proof tree syntax and formatting rules
-- **[docs/QA_PLAN.md](docs/QA_PLAN.md)** - Quality assurance checklist, testing procedures
-- **[docs/FUZZ_VS_STD_LATEX.md](docs/FUZZ_VS_STD_LATEX.md)** - Fuzz vs standard LaTeX differences (critical for understanding fuzz quirks)
-- **[docs/FUZZ_FEATURE_GAPS.md](docs/FUZZ_FEATURE_GAPS.md)** - Missing Z notation features, implementation roadmap
+- **[docs/guides/USER_GUIDE.md](docs/guides/USER_GUIDE.md)** - User-facing syntax guide, whiteboard notation reference
+- **[docs/guides/PROOF_SYNTAX.md](docs/guides/PROOF_SYNTAX.md)** - Proof tree syntax and formatting rules
+- **[docs/development/QA_PLAN.md](docs/development/QA_PLAN.md)** - Quality assurance checklist, testing procedures
+- **[docs/guides/FUZZ_VS_STD_LATEX.md](docs/guides/FUZZ_VS_STD_LATEX.md)** - Fuzz vs standard LaTeX differences (critical for understanding fuzz quirks)
+- **[docs/guides/FUZZ_FEATURE_GAPS.md](docs/guides/FUZZ_FEATURE_GAPS.md)** - Missing Z notation features, implementation roadmap
 
 **Note**: Always check FUZZ_VS_STD_LATEX.md when debugging LaTeX/PDF rendering issues - fuzz has different requirements than standard LaTeX.
 

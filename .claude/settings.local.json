@@ -68,7 +68,8 @@
       "Bash(git stash:*)",
       "Bash(gh pr create:*)",
       "Bash(gh pr view:*)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Bash(git mv:*)"
     ],
     "deny": [],
     "ask": []

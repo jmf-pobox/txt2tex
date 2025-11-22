@@ -35,7 +35,7 @@ Browse the `.txt` files to see:
 
 ## See Also
 
-- **docs/USER_GUIDE.md** - Section "Equality"
-- **docs/TUTORIAL_03.md** - Detailed tutorial for Lecture 3
+- **docs/guides/USER_GUIDE.md** - Section "Equality"
+- **docs/tutorials/03_sets_and_types.md** - Detailed tutorial for Lecture 3
 - **Previous**: 02_predicate_logic/
 - **Next**: 04_proof_trees/

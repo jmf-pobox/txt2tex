@@ -53,7 +53,7 @@ hatch run convert complete_examples/example_name.txt
 
 ## See Also
 
-- **docs/TUTORIAL_ADVANCED.md** - Advanced patterns and techniques
+- **docs/tutorials/10_advanced.md** - Advanced patterns and techniques
 - **All lecture directories** (01-09) - Feature-specific examples
-- **docs/USER_GUIDE.md** - Complete syntax reference
+- **docs/guides/USER_GUIDE.md** - Complete syntax reference
 - **Previous**: 12_advanced/
