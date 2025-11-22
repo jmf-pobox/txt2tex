@@ -90,3 +90,4 @@ htmlcov/
 .ruff_cache/
 # Homework solutions - private
 hw/
+examples/fuzz_tests/test_q6.txt
