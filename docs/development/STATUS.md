@@ -598,20 +598,21 @@ Following the conventions used in the fuzz package test suite:
 
 **Test Cases**: All bugs have minimal reproducible test cases in `tests/bugs/`
 
-### Active Bugs (5 confirmed)
+### Active Bugs (4 confirmed)
 
 | Priority | Issue | Component | Test Case | Blocks |
 |----------|-------|-----------|-----------|--------|
 | HIGH | [#1](https://github.com/jmf-pobox/txt2tex/issues/1): Parser fails on prose with periods | parser | [bug1_prose_period.txt](tests/bugs/bug1_prose_period.txt) | Homework, natural writing |
 | MEDIUM | [#2](https://github.com/jmf-pobox/txt2tex/issues/2): Multiple pipes in TEXT blocks | latex-gen | [bug2_multiple_pipes.txt](tests/bugs/bug2_multiple_pipes.txt) | Solution 40(g) |
 | MEDIUM | [#3](https://github.com/jmf-pobox/txt2tex/issues/3): Compound identifiers with operators | lexer | [bug3_compound_id.txt](tests/bugs/bug3_compound_id.txt) | Solution 31 |
-| MEDIUM | [#4](https://github.com/jmf-pobox/txt2tex/issues/4): Comma after parenthesized math not detected | latex-gen | [bug4_comma_after_parens.txt](tests/bugs/bug4_comma_after_parens.txt) | Homework prose |
-| MEDIUM-HIGH | [#5](https://github.com/jmf-pobox/txt2tex/issues/5): Logical operators (or, and) not converted | latex-gen | [bug5_or_operator.txt](tests/bugs/bug5_or_operator.txt) | Homework 1(c) |
+| MEDIUM | [#13](https://github.com/jmf-pobox/txt2tex/issues/13): Field projection on function application | parser | None | Advanced schema operations |
 
-### Recently Resolved (2 fixed)
+### Recently Resolved (4 fixed)
 
 | Issue | Status | Fixed In |
 |-------|--------|----------|
+| [#4](https://github.com/jmf-pobox/txt2tex/issues/4): Comma after parenthesized math | ✅ RESOLVED | Commit 7f6a932 (Pattern -0.5) |
+| [#5](https://github.com/jmf-pobox/txt2tex/issues/5): Logical operators in TEXT blocks | ✅ RESOLVED | Commit b709351 (Pattern -0.5) |
 | Nested quantifiers in mu expressions | ✅ RESOLVED | Phase 19 |
 | emptyset keyword not converted | ✅ RESOLVED | Recent update |
 
