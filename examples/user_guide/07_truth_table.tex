@@ -1,0 +1,27 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    \begin{tabular}{c|c|c}
+      $p$ & $q$ & $\mathbf{p \Rightarrow q}$ \\
+      \hline
+      \textit{t} & \textit{t} & \textbf{t} \\
+      \textit{t} & \textit{f} & \textbf{f} \\
+      \textit{f} & \textit{t} & \textbf{t} \\
+      \textit{f} & \textit{f} & \textbf{t} \\
+    \end{tabular}%
+  }
+\end{center}
+\bigskip
+
+\end{document}

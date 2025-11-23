@@ -354,7 +354,7 @@ $\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
 \section*{Example 14 : Drinker Paradox}
 \addcontentsline{toc}{section}{Example 14 : Drinker Paradox}
 
-\noindent $Prove : There exists$ a person x such that if x drinks,
+\noindent $Prove : There $\exists$$ a person x such that if x drinks,
 then everyone drinks.
 
 \bigskip
@@ -365,7 +365,7 @@ then everyone drinks.
     \infer[\lor \mathrm{elim}]{\exists x @ x(drinks) \implies
     (\forall y @ y(drinks))}{
       \infer[\lor \mathrm{elim}]{\exists x @ x(drinks) \implies
-      (\forall y @ y(drinks))}{\infer[exists \mathrm{intro} with
+      (\forall y @ y(drinks))}{\infer[\exists \mathrm{intro} with
         x=a]{\exists x @ x(drinks) \implies (\forall y @
         y(drinks))}{\infer[\Rightarrow \mathrm{intro},trivially
           true]{a(drinks) \implies (\forall y @
@@ -373,13 +373,13 @@ then everyone drinks.
             y(drinks)}{\infer[\mathrm{from}
               p]{a(drinks)}{\infer{Pick(any)(person)}{
                   a
-        }}}}} & \infer[exists \mathrm{intro} with x=b]{\exists x @
+        }}}}} & \infer[\exists \mathrm{intro} with x=b]{\exists x @
           x(drinks) \implies (\forall y @
         y(drinks))}{\infer[\Rightarrow\textrm{-intro}^{[2]}]{b(drinks)
             \implies (\forall y @
-          y(drinks))}{\infer[\mathrm{assumption}]{b(drinks)}{\infer[exists
+          y(drinks))}{\infer[\mathrm{assumption}]{b(drinks)}{\infer[\exists
               \mathrm{elim}]{\lnot (b(drinks))}{\infer[negation of
-      forall]{\exists b @ \lnot (b(drinks))}{}}}}}}
+      \forall]{\exists b @ \lnot (b(drinks))}{}}}}}}
     }
     $%
   }

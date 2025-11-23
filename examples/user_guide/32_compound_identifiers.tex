@@ -1,0 +1,29 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{zed}
+  Rplus == \{ a, b : \nat | b > a \}
+\end{zed}
+
+\begin{zed}
+  Rstar == Rplus \cup \id \nat
+\end{zed}
+
+\begin{schema}{S1}
+  x : \nat
+\end{schema}
+
+\begin{zed}
+  rel1plus == \{ x, y : \nat | x < y \}
+\end{zed}
+
+\end{document}

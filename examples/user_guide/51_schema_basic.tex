@@ -1,0 +1,37 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{schema}{State}
+  count : \nat
+  \where
+  count \geq 0
+\end{schema}
+
+\begin{schema}{Stack}[X]
+  items : \seq X
+  \where
+  \# items \leq 100
+\end{schema}
+
+\begin{schema}{Relation}[X, Y]
+  domain : \power X \\
+  range : \power Y
+\end{schema}
+
+\begin{schema}{Point}
+  x : \nat \\
+  y : \nat
+  \where
+  x > 0 \land y > 0
+\end{schema}
+
+\end{document}

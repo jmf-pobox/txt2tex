@@ -1,0 +1,28 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{axdef}
+  cumulative\_total : \nat \\
+  not\_yet\_viewed : \nat \\
+  employee\_count : \nat
+  \where
+  cumulative\_total = 0 \land \\
+  \quad not\_yet\_viewed = 0 \land \\
+  \quad employee\_count = 0
+\end{axdef}
+
+\noindent Simple subscript a\_i renders differently from multi-word
+cumulative\_total.
+
+\bigskip
+
+\end{document}

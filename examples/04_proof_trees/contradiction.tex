@@ -234,8 +234,8 @@ Universal Quantifier}
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{((\forall x @ \power x)
     \land (\exists x @ \lnot \power x)) \implies false}{
-      \infer[\mathrm{contradiction}]{false}{\infer[forall
-        \mathrm{elim}]{\power a}{\infer[exists \mathrm{elim},fresh
+      \infer[\mathrm{contradiction}]{false}{\infer[\forall
+        \mathrm{elim}]{\power a}{\infer[\exists \mathrm{elim},fresh
           a]{\lnot \power a}{\infer[\land\textrm{-elim-2}]{\exists x @
             \lnot \power x}{\infer[\land\textrm{-elim-1}]{\forall x @
               \power x}{\ulcorner (\forall x @ \power x) \land (\exists x @
