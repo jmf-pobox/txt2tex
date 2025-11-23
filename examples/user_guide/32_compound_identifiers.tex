@@ -1,0 +1,33 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{zed}
+  R^+ == \{ a, b : \nat | b > a \}
+\end{zed}
+
+\begin{zed}
+  R^* == R \plus \cup \id[\nat]
+\end{zed}
+
+\begin{zed}
+  R^{\sim} == \inv R
+\end{zed}
+
+\begin{schema}{S^+}
+  x : \nat
+\end{schema}
+
+\begin{zed}
+  rel_1^+ == \{ x, y : \nat | x < y \}
+\end{zed}
+
+\end{document}

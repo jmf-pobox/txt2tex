@@ -1,0 +1,27 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{gendef}[X, Y]
+  fst: X \cross Y \fun X \\
+  snd: X \cross Y \fun Y
+  \where
+  \forall x : X @ \forall y : Y @ fst(x, y) = x \land snd(x, y) = y
+\end{gendef}
+
+\begin{gendef}[X, Y]
+  fst: X \cross Y \fun X \\
+  snd: X \cross Y \fun Y
+  \where
+  \forall x : X @ \forall y : Y @ fst(x, y) = x \land snd(x, y) = y
+\end{gendef}
+
+\end{document}

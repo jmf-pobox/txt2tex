@@ -1,0 +1,31 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{zed}[ShowId, EpisodeId]
+\end{zed}
+
+\begin{axdef}
+  shows : \finset ShowId \\
+  show\_episodes : ShowId \pfun \finset EpisodeId
+  \where
+  shows \subseteq \dom show\_episodes
+\end{axdef}
+
+\noindent Later in document we can reference show\_episodes globally:
+
+\bigskip
+
+\begin{zed}
+  Answer == \{ s : \dom show\_episodes | \# (show\_episodes(s)) > 5 \}
+\end{zed}
+
+\end{document}
