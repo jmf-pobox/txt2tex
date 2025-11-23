@@ -160,6 +160,7 @@ class TokenType(Enum):
     AXDEF = auto()  # axdef
     SCHEMA = auto()  # schema
     GENDEF = auto()  # gendef (generic definition)
+    ABBREV_BLOCK = auto()  # abbrev (block syntax for abbreviations)
     ZED = auto()  # zed (unboxed paragraph block)
     WHERE = auto()  # where
     END = auto()  # end

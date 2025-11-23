@@ -1208,6 +1208,8 @@ class Lexer:
             return Token(TokenType.SCHEMA, value, start_line, start_column)
         if value == "gendef":
             return Token(TokenType.GENDEF, value, start_line, start_column)
+        if value == "abbrev":
+            return Token(TokenType.ABBREV_BLOCK, value, start_line, start_column)
         if value == "zed":
             return Token(TokenType.ZED, value, start_line, start_column)
         if value == "where":
