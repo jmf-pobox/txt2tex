@@ -1,0 +1,16 @@
+// Example: Generic Definitions - Multiple Declarations
+// Demonstrates multiple declaration formats in gendef
+// From USER_GUIDE.md - Definitions section
+
+gendef [X, Y]
+  fst : X cross Y -> X
+  snd : X cross Y -> Y
+where
+  forall x : X; y : Y | fst(x, y) = x and snd(x, y) = y
+end
+
+gendef [X, Y]
+  fst : X cross Y -> X; snd : X cross Y -> Y
+where
+  forall x : X; y : Y | fst(x, y) = x and snd(x, y) = y
+end

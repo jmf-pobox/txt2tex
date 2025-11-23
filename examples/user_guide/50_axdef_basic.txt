@@ -1,0 +1,21 @@
+// Example: Axiomatic Definitions
+// Demonstrates basic axdef with constraints
+// From USER_GUIDE.md - Schema Notation section
+
+axdef
+  population : N
+where
+  population > 0
+end
+
+axdef [T]
+  identity : T
+where
+  identity = identity
+end
+
+axdef
+  x : N; y : N
+where
+  x > y
+end

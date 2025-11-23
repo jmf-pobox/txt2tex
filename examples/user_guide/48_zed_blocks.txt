@@ -1,0 +1,23 @@
+// Example: Zed Blocks - Unboxed Paragraphs
+// Demonstrates zed blocks for predicates and abbreviations
+// From USER_GUIDE.md - Schema Notation section
+
+zed
+  x > 0
+end
+
+zed
+  forall x : N | x >= 0
+end
+
+given NAME, December
+
+zed
+  exists n : NAME | birthday(n) in December
+end
+
+Evens == { n : N | n mod 2 = 0 }
+
+zed
+  forall x : S | exists y : T | x in y
+end
