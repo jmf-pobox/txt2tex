@@ -791,174 +791,50 @@ uniqueness$, mu performs selection
 \end{schema}
 
 \begin{axdef}
-  userStatus : UserId \pfun Status
+  userStatus : UserId \pfun Status \\
+  songLength : SongId \pfun \nat
 \end{axdef}
 
-\noindent Define functions to$ \filter $and analyze play history:
-
-\bigskip
+\section*{Part 5 : Play History Analysis}
+\addcontentsline{toc}{section}{Part 5 : Play History Analysis}
 
 \subsection*{(a)}
 
-\noindent Extract plays by premium users:
-
-\bigskip
-
-\noindent
-
-\bigskip
-
-\noindent $premiumPlays : seq(PlayEvent)$ $\fun$ seq(PlayEvent)
-
-\bigskip
-
-\noindent premiumPlays($\langle \rangle$) = $\langle \rangle$
-
-\bigskip
-
-\noindent $\forall$ $x : PlayEvent; s$ : seq(PlayEvent) $\mid$
-
-\bigskip
-
-\noindent premiumPlays($\langle x \rangle$ ^ s) = if
-userStatus(x.userId) = premium
-
-\bigskip
-
-\noindent then $\langle x \rangle$ ^ premiumPlays(s)
-
-\bigskip
-
-\noindent else premiumPlays(s)
-
-\bigskip
-
-\noindent Recursive pattern matching:
-
-\bigskip
-
-\noindent - Base $case : empty sequence yields empty sequence$
-
-\bigskip
-
-\noindent - Inductive $case : if first play x$ is by premium user,
-include it; else skip
-
-\bigskip
-
-\noindent - x.2 accesses the userId field (assuming Play is a tuple or schema)
-
-\bigskip
-
-\noindent - userStatus is assumed to be a $function : UserId$ $\fun$ Status
-
-\bigskip
+\begin{axdef}
+  premiumPlays : \seq PlayEvent \fun \seq PlayEvent
+  \where
+  premiumPlays(\langle \rangle) = \langle \rangle \\
+  \forall x : PlayEvent @ \forall s : \seq PlayEvent @
+  premiumPlays(\langle x \rangle \cat s) = \IF userStatus(x.userId) =
+  premium \THEN \langle x \rangle \cat premiumPlays(s) \ELSE premiumPlays(s)
+\end{axdef}
 
 \medskip
 
 \subsection*{(b)}
 
-\noindent Extract plays by standard users:
-
-\bigskip
-
-\noindent
-
-\bigskip
-
-\noindent $standardPlays : seq(PlayEvent)$ $\fun$ seq(PlayEvent)
-
-\bigskip
-
-\noindent standardPlays($\langle \rangle$) = $\langle \rangle$
-
-\bigskip
-
-\noindent $\forall$ $x : PlayEvent; s$ : seq(PlayEvent) $\mid$
-
-\bigskip
-
-\noindent standardPlays($\langle x \rangle$ ^ s) = if
-userStatus(x.userId) = standard
-
-\bigskip
-
-\noindent then $\langle x \rangle$ ^ standardPlays(s)
-
-\bigskip
-
-\noindent else standardPlays(s)
-
-\bigskip
-
-\noindent
-
-\bigskip
-
-\noindent Similar to premiumPlays, but filters for standard users.
-
-\bigskip
+\begin{axdef}
+  standardPlays : \seq PlayEvent \fun \seq PlayEvent
+  \where
+  standardPlays(\langle \rangle) = \langle \rangle \\
+  \forall x : PlayEvent @ \forall s : \seq PlayEvent @
+  standardPlays(\langle x \rangle \cat s) = \IF userStatus(x.userId)
+  = standard \THEN \langle x \rangle \cat standardPlays(s) \ELSE
+  standardPlays(s)
+\end{axdef}
 
 \medskip
 
 \subsection*{(c)}
 
-\noindent Calculate cumulative listening time:
-
-\bigskip
-
-\noindent
-
-\bigskip
-
-\noindent $cumulativeLength : seq(Play)$ $\fun$ N
-
-\bigskip
-
-\noindent cumulativeLength($\langle \rangle$) = 0
-
-\bigskip
-
-\noindent $\forall$ $x : Play; s$ : seq(Play) $\mid$
-
-\bigskip
-
-\noindent cumulativeLength($\langle x \rangle$ ^ s) =
-songLength(x.songId) + cumulativeLength(s)
-
-\bigskip
-
-\noindent
-
-\bigskip
-
-\noindent Fold (reduce) pattern:
-
-\bigskip
-
-\noindent - Base $case : empty sequence$ has zero length
-
-\bigskip
-
-\noindent - Inductive case: add first play's song length to rest's total
-
-\bigskip
-
-\noindent - x.songId accesses the songId field (if Play were a schema)
-
-\bigskip
-
-\noindent - songLength(songId) would return song duration from the catalog
-
-\bigskip
-
-\noindent
-
-\bigskip
-
-\noindent Usage: Total listening time for a user or for entire service.
-
-\bigskip
+\begin{axdef}
+  cumulativeLength : \seq PlayEvent \fun \nat
+  \where
+  cumulativeLength(\langle \rangle) = 0 \\
+  \forall x : PlayEvent @ \forall s : \seq PlayEvent @
+  cumulativeLength(\langle x \rangle \cat s) = songLength(x.songId) +
+  cumulativeLength(s)
+\end{axdef}
 
 \section*{System Invariants Summary}
 \addcontentsline{toc}{section}{System Invariants Summary}

@@ -339,50 +339,34 @@ end
 
 axdef
   userStatus : UserId +-> Status
+  songLength : SongId +-> N
 end
 
-TEXT: Define functions to filter and analyze play history:
+** Part 5: Play History Analysis **
 
-TEXT: (a) Extract plays by premium users:
-TEXT:
-TEXT:   premiumPlays : seq(PlayEvent) -> seq(PlayEvent)
-TEXT:   premiumPlays(<>) = <>
-TEXT:   forall x : PlayEvent; s : seq(PlayEvent) |
-TEXT:     premiumPlays(<x> ^ s) = if userStatus(x.userId) = premium
-TEXT:                             then <x> ^ premiumPlays(s)
-TEXT:                             else premiumPlays(s)
+(a) axdef
+  premiumPlays : seq(PlayEvent) -> seq(PlayEvent)
+where
+  premiumPlays(<>) = <>
+  forall x : PlayEvent; s : seq(PlayEvent) |
+    premiumPlays(<x> ^ s) = if userStatus(x.userId) = premium then <x> ^ premiumPlays(s) else premiumPlays(s)
+end
 
-TEXT: Recursive pattern matching:
-TEXT:   - Base case: empty sequence yields empty sequence
-TEXT:   - Inductive case: if first play x is by premium user, include it; else skip
-TEXT:   - x.2 accesses the userId field (assuming Play is a tuple or schema)
-TEXT:   - userStatus is assumed to be a function: UserId -> Status
+(b) axdef
+  standardPlays : seq(PlayEvent) -> seq(PlayEvent)
+where
+  standardPlays(<>) = <>
+  forall x : PlayEvent; s : seq(PlayEvent) |
+    standardPlays(<x> ^ s) = if userStatus(x.userId) = standard then <x> ^ standardPlays(s) else standardPlays(s)
+end
 
-TEXT: (b) Extract plays by standard users:
-TEXT:
-TEXT:   standardPlays : seq(PlayEvent) -> seq(PlayEvent)
-TEXT:   standardPlays(<>) = <>
-TEXT:   forall x : PlayEvent; s : seq(PlayEvent) |
-TEXT:     standardPlays(<x> ^ s) = if userStatus(x.userId) = standard
-TEXT:                              then <x> ^ standardPlays(s)
-TEXT:                              else standardPlays(s)
-TEXT:
-TEXT: Similar to premiumPlays, but filters for standard users.
-
-TEXT: (c) Calculate cumulative listening time:
-TEXT:
-TEXT:   cumulativeLength : seq(Play) -> N
-TEXT:   cumulativeLength(<>) = 0
-TEXT:   forall x : Play; s : seq(Play) |
-TEXT:     cumulativeLength(<x> ^ s) = songLength(x.songId) + cumulativeLength(s)
-TEXT:
-TEXT: Fold (reduce) pattern:
-TEXT:   - Base case: empty sequence has zero length
-TEXT:   - Inductive case: add first play's song length to rest's total
-TEXT:   - x.songId accesses the songId field (if Play were a schema)
-TEXT:   - songLength(songId) would return song duration from the catalog
-TEXT:
-TEXT: Usage: Total listening time for a user or for entire service.
+(c) axdef
+  cumulativeLength : seq(PlayEvent) -> N
+where
+  cumulativeLength(<>) = 0
+  forall x : PlayEvent; s : seq(PlayEvent) |
+    cumulativeLength(<x> ^ s) = songLength(x.songId) + cumulativeLength(s)
+end
 
 ** System Invariants Summary **
 
