@@ -2,7 +2,10 @@
 // Demonstrates basic free type definitions
 // From USER_GUIDE.md - Definitions section
 
-IntTree ::= leaf | node<N cross IntTree cross IntTree>
+zed
+  IntTree ::= leaf | node<N cross IntTree cross IntTree>
+end
+
 
 axdef
   emptyTree : IntTree

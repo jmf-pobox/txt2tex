@@ -2,8 +2,17 @@
 // Demonstrates type abbreviations with and without generic parameters
 // From USER_GUIDE.md - Definitions section
 
-Pairs == N cross N
+zed
+  Pairs == N cross N
+end
 
-[X] Pair == X
 
-[X, Y] Product == X cross Y
+zed
+  [X] Pair == X
+end
+
+
+zed
+  [X, Y] Product == X cross Y
+end
+

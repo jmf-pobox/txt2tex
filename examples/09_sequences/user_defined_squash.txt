@@ -51,7 +51,10 @@ TEXT: The result s1 is <10, 30, 50>, containing exactly the range elements in th
 
 ** Example 3: Squash with Letters **
 
-given Letter
+zed
+  given Letter
+end
+
 
 axdef
   a : Letter
@@ -116,7 +119,10 @@ TEXT: Since inj_func is injective (one-to-one), inj_seq contains no duplicate el
 
 ** Example 8: Practical Use Case - Video Database **
 
-given VideoID, Title
+zed
+  given VideoID, Title
+end
+
 
 axdef
   sparse_catalog : N1 +-> (VideoID cross Title)

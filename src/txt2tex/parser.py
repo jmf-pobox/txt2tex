@@ -596,8 +596,6 @@ class Parser:
             return self._parse_axdef()
         if self._match(TokenType.GENDEF):
             return self._parse_gendef()
-        if self._match(TokenType.ABBREV_BLOCK):
-            return self._parse_abbrev_block()
         if self._match(TokenType.ZED):
             return self._parse_zed()
         if self._match(TokenType.SCHEMA):
@@ -2991,7 +2989,8 @@ class Parser:
         names: list[str] = []
 
         # Parse comma-separated list of type names
-        while not self._at_end() and not self._match(TokenType.NEWLINE):
+        # Stop at NEWLINE, END (for zed blocks), or EOF
+        while not self._at_end() and not self._match(TokenType.NEWLINE, TokenType.END):
             if self._match(TokenType.COMMA):
                 self._advance()  # Skip comma
                 continue
@@ -3032,7 +3031,8 @@ class Parser:
         branches: list[FreeBranch] = []
 
         # Parse pipe-separated list of branches
-        while not self._at_end() and not self._match(TokenType.NEWLINE):
+        # Stop at NEWLINE, END (for zed blocks), or EOF
+        while not self._at_end() and not self._match(TokenType.NEWLINE, TokenType.END):
             # Accept IDENTIFIER or keywords that could be branch names (P, F, etc.)
             if (
                 self._match(TokenType.IDENTIFIER)
@@ -3088,7 +3088,9 @@ class Parser:
             # Check for pipe separator
             if self._match(TokenType.PIPE):
                 self._advance()
-            elif not self._match(TokenType.NEWLINE) and not self._at_end():
+            elif (
+                not self._match(TokenType.NEWLINE, TokenType.END) and not self._at_end()
+            ):
                 # Unexpected token - raise error to prevent infinite loop
                 current = self._current()
                 if current.type == TokenType.EQUALS:
@@ -3385,84 +3387,106 @@ class Parser:
             column=start_token.column,
         )
 
-    def _parse_abbrev_block(self) -> Zed:
-        """Parse abbreviation block.
+    def _parse_zed(self) -> Zed:
+        """Parse zed block for Z notation constructs.
 
-        Abbreviation blocks contain one or more abbreviations.
-        Syntax: abbrev <abbreviations> end
+        Zed blocks contain unboxed Z notation paragraphs (\\begin{zed}...\\end{zed}).
+        Syntax: zed <content> end
 
-        Each abbreviation: identifier == expression
+        The content can be:
+        - Given types: given A, B, C
+        - Free types: Type ::= branch1 | branch2
+        - Abbreviations: Name == expression
+        - Predicates: forall x : N | x >= 0
 
-        Returns a Zed block containing a Document with the abbreviations.
+        Multiple constructs can appear in one zed block (mixed content).
+        Single predicates are parsed as expressions (backward compatible).
         """
-        start_token = self._advance()  # Consume 'abbrev'
+        start_token = self._advance()  # Consume 'zed'
         self._skip_newlines()
 
         items: list[DocumentItem] = []
 
-        # Parse abbreviations until 'end'
+        # Parse multiple statements until 'end'
         while not self._at_end() and not self._match(TokenType.END):
             if self._match(TokenType.NEWLINE):
                 self._advance()
                 continue
 
-            # Parse abbreviation: identifier == expression
-            if self._match(TokenType.IDENTIFIER):
+            # Check for given types
+            if self._match(TokenType.GIVEN):
+                items.append(self._parse_given_type())
+                self._skip_newlines()
+                continue
+
+            # Check for abbreviations with generic parameters [X] Name == ...
+            if self._match(TokenType.LBRACKET):
                 items.append(self._parse_abbreviation())
                 self._skip_newlines()
-            else:
-                break
+                continue
 
-        # Expect 'end'
-        if not self._match(TokenType.END):
-            raise ParserError(
-                "Expected 'end' to close abbrev block", self._current()
-            )
-        self._advance()  # Consume 'end'
+            # Check for free types or abbreviations (both start with IDENTIFIER)
+            if self._match(TokenType.IDENTIFIER):
+                # Save position to potentially backtrack
+                saved_pos = self.pos
 
-        # Wrap abbreviations in a Document, then in a Zed block
-        doc = Document(
-            items=items,
-            line=start_token.line,
-            column=start_token.column,
-        )
+                # Try to parse as compound identifier (handles R, R+, R*, R~, etc.)
+                try:
+                    _ = self._parse_compound_identifier_name()
 
-        return Zed(
-            content=doc,  # type: ignore[arg-type]
-            line=start_token.line,
-            column=start_token.column,
-        )
+                    # Check what follows the identifier
+                    if self._match(TokenType.FREE_TYPE):
+                        # It's a free type, backtrack and parse properly
+                        self.pos = saved_pos
+                        items.append(self._parse_free_type())
+                    elif self._match(TokenType.ABBREV):
+                        # It's an abbreviation, backtrack and parse properly
+                        self.pos = saved_pos
+                        items.append(self._parse_abbreviation())
+                    else:
+                        # Not a recognized Z notation construct, backtrack and
+                        # parse as expression
+                        self.pos = saved_pos
+                        items.append(self._parse_expr())
+                except Exception:
+                    # Failed to parse compound identifier, backtrack and
+                    # parse as expression
+                    self.pos = saved_pos
+                    items.append(self._parse_expr())
 
-    def _parse_zed(self) -> Zed:
-        """Parse zed block for standalone predicates.
+                self._skip_newlines()
+                continue
 
-        Zed blocks contain unboxed Z notation paragraphs.
-        Syntax: zed <content> end
-
-        The content can be:
-        - Standalone predicates (quantified or not)
-        - Basic type declarations
-        - Abbreviations
-        - Free type definitions
-        """
-        start_token = self._advance()  # Consume 'zed'
-        self._skip_newlines()
-
-        # Parse the content as a single expression
-        # This handles predicates, quantifiers, etc.
-        content = self._parse_expr()
-        self._skip_newlines()
+            # Otherwise, parse as expression (predicate)
+            items.append(self._parse_expr())
+            self._skip_newlines()
+            break  # Single expression mode (backward compatible)
 
         # Expect 'end'
         if not self._match(TokenType.END):
             raise ParserError("Expected 'end' to close zed block", self._current())
         self._advance()  # Consume 'end'
 
-        return Zed(
-            content=content,
-            line=start_token.line,
-            column=start_token.column,
-        )
+        # If single item and it's an expression, return Zed(content=expr)
+        # for backward compatibility. Otherwise, wrap in Document
+        if len(items) == 1 and isinstance(items[0], Expr):
+            return Zed(
+                content=items[0],
+                line=start_token.line,
+                column=start_token.column,
+            )
+        else:
+            # Multiple items or non-expression items - wrap in Document
+            doc = Document(
+                items=items,
+                line=start_token.line,
+                column=start_token.column,
+            )
+            return Zed(
+                content=doc,  # type: ignore[arg-type]
+                line=start_token.line,
+                column=start_token.column,
+            )
 
     def _parse_schema(self) -> Schema:
         """Parse schema definition block.

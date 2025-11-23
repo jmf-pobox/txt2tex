@@ -596,15 +596,63 @@ Generates: `\begin{zed}[Person, Company]\end{zed}`
 
 ### Abbreviations
 
+Abbreviations define shorthand names for types or expressions. They must be wrapped in `zed...end` blocks:
+
+**Basic abbreviations:**
 ```
-Pairs == N cross N      →  Pairs == ℕ × ℕ
+zed
+  Pairs == N cross N
+end
+
+zed
+  Triples == N cross N cross N
+end
 ```
+
+Generates: `\begin{zed} Pairs == ℕ × ℕ \end{zed}` and `\begin{zed} Triples == ℕ × ℕ × ℕ \end{zed}`
 
 **With generic parameters:**
 ```
-[X] Pair == X           →  [X] Pair == X
-[X, Y] Product == X cross Y  →  [X, Y] Product == X × Y
+zed
+  [X] Pair == X cross X
+end
+
+zed
+  [X, Y] Product == X cross Y
+end
 ```
+
+**Compound identifiers** (names with operator suffixes like `R+`, `R*`):
+```
+zed
+  R+ == { a, b : N | b > a }
+end
+
+zed
+  R* == { a, b : N | b >= a }
+end
+```
+
+This generates:
+```latex
+\begin{zed}
+  R^+ == \{ a, b : \mathbb{N} \mid b > a \}
+\end{zed}
+\begin{zed}
+  R^* == \{ a, b : \mathbb{N} \mid b \geq a \}
+\end{zed}
+```
+
+**Mixed content** (zed blocks can contain multiple constructs):
+```
+zed
+  given Entry
+  Status ::= active | inactive
+  DefaultStatus == active
+end
+```
+
+This generates a single `\begin{zed}...\end{zed}` block containing the given type, free type, and abbreviation.
 
 ### Free Types
 
@@ -1333,13 +1381,15 @@ The bag union operator combines two bags, preserving multiplicities (unlike set 
 
 ### Zed Blocks (Unboxed Paragraphs)
 
-Zed blocks provide a way to write standalone Z notation content without the visual boxing of axdef/schema blocks.
+Zed blocks provide a way to write Z notation content without the visual boxing of axdef/schema blocks. They correspond directly to fuzz's `\begin{zed}...\end{zed}` environment.
 
 **What can go in zed blocks:**
 - ✅ **Predicates**: `forall x : N | x >= 0`
-- ✅ **Type declarations**: `[NAME, DATE]`
-- ❌ **NOT abbreviations** (yet): Use standalone `Evens == { n : N | n mod 2 = 0 }` outside zed blocks
-- ❌ **NOT bare expressions**: Cannot use standalone `{ x : N | x > 0 }` or `x + y`
+- ✅ **Given types**: `given A, B, C`
+- ✅ **Free types**: `Status ::= active | inactive`
+- ✅ **Abbreviations**: `MaxSize == 100` or `[X] Pair == X cross X`
+- ✅ **Mixed content**: Multiple constructs in one block
+- ❌ **NOT bare expressions**: Cannot use standalone `{ x : N | x > 0 }` or `x + y` alone
 
 **Simple predicate:**
 ```
@@ -1361,12 +1411,49 @@ zed
 end
 ```
 
-**Abbreviations (standalone, not in zed blocks yet):**
+**Given types:**
 ```
-Evens == { n : N | n mod 2 = 0 }
+zed
+  given Person, Company
+end
 ```
 
-**Note**: Abbreviations in zed blocks are not yet supported. Define abbreviations as standalone statements.
+**Free types:**
+```
+zed
+  Status ::= active | inactive | pending
+end
+```
+
+**Abbreviations:**
+```
+zed
+  Evens == { n : N | n mod 2 = 0 }
+end
+```
+
+**Abbreviations with generic parameters:**
+```
+zed
+  [X] Pair == X cross X
+end
+```
+
+**Compound identifier abbreviations:**
+```
+zed
+  R+ == { a, b : N | b > a }
+end
+```
+
+**Mixed content (multiple constructs in one block):**
+```
+zed
+  given Entry
+  Status ::= active | inactive
+  DefaultStatus == active
+end
+```
 
 **Complex predicates:**
 ```
@@ -1385,19 +1472,22 @@ Generates:
 **Key differences from axdef/schema:**
 - No visual box in PDF output
 - No separate declaration and where sections
-- Content must be a predicate or abbreviation (not a bare expression)
-- Typically used for global constraints or simple definitions
+- Can contain given types, free types, abbreviations, and predicates
+- Supports mixed content (multiple construct types in one block)
+- Typically used for global type definitions, abbreviations, and constraints
 
 ### Container Comparison: What Goes Where
 
 | Content Type | zed | axdef | schema | Standalone |
 |--------------|-----|-------|--------|------------|
 | **Predicates** | ✅ `forall x : N \| x >= 0` | ✅ In `where` clause | ✅ In `where` clause | ✅ Direct |
-| **Abbreviations** | ❌ Not yet | ❌ Use top-level | ❌ Use top-level | ✅ Direct |
-| **Type declarations** | ✅ `[NAME, DATE]` | ❌ Use `given` | ❌ Use `given` | ✅ `given` |
+| **Abbreviations** | ✅ `MaxSize == 100` | ❌ Use zed | ❌ Use zed | ❌ Use zed |
+| **Given types** | ✅ `given A, B` | ❌ Use zed | ❌ Use zed | ✅ `given` (legacy) |
+| **Free types** | ✅ `Status ::= active` | ❌ Use zed | ❌ Use zed | ✅ Direct (legacy) |
+| **Type declarations** | ✅ Via `given` | ❌ Use zed | ❌ Use zed | ✅ `given` |
 | **Variable declarations** | ❌ | ✅ Before `where` | ✅ Before `where` | ❌ |
 | **Bare expressions** | ❌ | ❌ | ❌ | ✅ Direct |
-| **Set comprehensions** | ❌ Alone ✅ In abbrev | ✅ In `where` clause | ✅ In `where` clause | ✅ Direct |
+| **Set comprehensions** | ✅ In abbrev | ✅ In `where` clause | ✅ In `where` clause | ✅ Direct |
 | **Visual box in PDF** | ❌ No box | ✅ Boxed | ✅ Boxed | ❌ No box |
 
 **Examples:**

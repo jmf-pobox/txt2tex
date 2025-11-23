@@ -19,7 +19,10 @@
 
 === Advanced Generic Definitions ===
 
-given B
+zed
+  given B
+end
+
 
 ** Example 1: Generic Three-Way Product **
 
@@ -131,7 +134,10 @@ TEXT: Pairs up corresponding elements from two sequences.
 
 TEXT: Note: Define generic schema separately, then query operations in gendef:
 
-given Key, Value
+zed
+  given Key, Value
+end
+
 
 schema Table[Key, Value]
   entries : Key +-> Value

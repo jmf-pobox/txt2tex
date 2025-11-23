@@ -2,6 +2,6 @@
 
 TEXT: The abbreviation below should define R+ as a relation, but fails because the lexer tokenizes it as "R" followed by "+".
 
-abbrev
+zed
   R+ == {a, b : N | b > a}
 end

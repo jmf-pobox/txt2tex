@@ -19,7 +19,8 @@
 
 \bigskip
 
-\begin{zed}[Person, Department]
+\begin{zed}
+  [Person, Department]
 \end{zed}
 
 \begin{axdef}
@@ -38,13 +39,7 @@
 
 \begin{zed}
   N\_PLUS == \{ n : \nat | n > 0 \}
-\end{zed}
-
-\begin{zed}
   N\_EVEN == \{ n : \nat | n \mod 2 = 0 \}
-\end{zed}
-
-\begin{zed}
   N\_ODD == \{ n : \nat | n \mod 2 = 1 \}
 \end{zed}
 
@@ -56,7 +51,8 @@ abbreviations may not be fully supported yet).
 \section*{Example 3 : Type Parameters}
 \addcontentsline{toc}{section}{Example 3 : Type Parameters}
 
-\begin{zed}[Company]
+\begin{zed}
+  [Company]
 \end{zed}
 
 \noindent Declare given types using the given keyword.
@@ -82,10 +78,9 @@ abbreviations may not be fully supported yet).
 \section*{Example 5 : Free Type Definitions}
 \addcontentsline{toc}{section}{Example 5 : Free Type Definitions}
 
-\begin{zed}Color ::= red | green | blue
-\end{zed}
-
-\begin{zed}Size ::= small | medium | large
+\begin{zed}
+  Color ::= red | green | blue
+  Size ::= small | medium | large
 \end{zed}
 
 \begin{schema}{Product}
@@ -103,7 +98,8 @@ abbreviations may not be fully supported yet).
 \section*{Example 6 : Multiple Schemas}
 \addcontentsline{toc}{section}{Example 6 : Multiple Schemas}
 
-\begin{zed}[Account, Balance]
+\begin{zed}
+  [Account, Balance]
 \end{zed}
 
 \begin{schema}{BankAccount}
@@ -130,7 +126,8 @@ own constraints.
 \section*{Example 7 : Schema with External Variables}
 \addcontentsline{toc}{section}{Example 7 : Schema with External Variables}
 
-\begin{zed}[Student, Course]
+\begin{zed}
+  [Student, Course]
 \end{zed}
 
 \begin{axdef}
@@ -159,7 +156,8 @@ own constraints.
 \section*{Example 8 : Nested Schemas}
 \addcontentsline{toc}{section}{Example 8 : Nested Schemas}
 
-\begin{zed}[Char]
+\begin{zed}
+  [Char]
 \end{zed}
 
 \begin{schema}{Address}
@@ -192,9 +190,6 @@ using schemas go in axdef.
 
 \begin{zed}
   PI == 3
-\end{zed}
-
-\begin{zed}
   E == 2
 \end{zed}
 
@@ -213,10 +208,9 @@ using schemas go in axdef.
 \section*{Example 10 : Permission System Example}
 \addcontentsline{toc}{section}{Example 10 : Permission System Example}
 
-\begin{zed}[UserID, DocumentID]
-\end{zed}
-
-\begin{zed}PermissionType ::= read | write | admin
+\begin{zed}
+  [UserID, DocumentID]
+  PermissionType ::= read | write | admin
 \end{zed}
 
 \begin{schema}{User}

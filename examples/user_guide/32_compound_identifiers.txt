@@ -2,9 +2,15 @@
 // Demonstrates identifiers with numbers and letters
 // From USER_GUIDE.md - Relations section
 
-Rplus == {a, b : N | b > a}
+zed
+  Rplus == {a, b : N | b > a}
+end
 
-Rstar == Rplus union id N
+
+zed
+  Rstar == Rplus union id N
+end
+
 
 schema S1
   x : N

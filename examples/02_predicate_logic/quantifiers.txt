@@ -22,19 +22,26 @@
 
 ** Example 1: Given Types **
 
-given Person Company
+zed
+  given Person Company
+end
 
 ** Example 2: Free Types **
 
-Status ::= active | inactive | suspended
-
-Answer ::= yes | no
+zed
+  Status ::= active | inactive | suspended
+  Answer ::= yes | no
+end
 
 ** Example 3: Abbreviations **
 
-MaxCapacity == 100
+zed
+  MaxCapacity == 100
+end
 
-DefaultSize == 10
+zed
+  DefaultSize == 10
+end
 
 ** Example 4: Axiomatic Definitions **
 

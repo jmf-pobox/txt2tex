@@ -21,11 +21,15 @@ TEXT: This example demonstrates Z notation definitions with generic (polymorphic
 
 TEXT: Basic generic abbreviation for a Pair type:
 
-[X] Pair == X cross X
+zed
+  [X] Pair == X cross X
+end
 
 TEXT: Generic abbreviation with two type parameters:
 
-[X, Y] Product == X cross Y
+zed
+  [X, Y] Product == X cross Y
+end
 
 TEXT: Generic axiomatic definition with constraints:
 
@@ -53,7 +57,9 @@ end
 
 TEXT: Non-generic definitions still work as before:
 
-Naturals == N
+zed
+  Naturals == N
+end
 
 axdef
   zero : N

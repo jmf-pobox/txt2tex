@@ -2,7 +2,10 @@
 // Demonstrates axdef blocks with global identifiers
 // From USER_GUIDE.md - Schema Notation section
 
-given ShowId, EpisodeId
+zed
+  given ShowId, EpisodeId
+end
+
 
 axdef
   shows : F ShowId
@@ -13,4 +16,7 @@ end
 
 TEXT: Later in document we can reference show_episodes globally:
 
-Answer == {s : dom show_episodes | # (show_episodes(s)) > 5}
+zed
+  Answer == {s : dom show_episodes | # (show_episodes(s)) > 5}
+end
+

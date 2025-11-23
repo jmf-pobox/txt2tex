@@ -78,7 +78,10 @@ end
 
 ** Example 4: Functions with Given Types **
 
-given Person, Department
+zed
+  given Person, Department
+end
+
 
 axdef
   assignment : Person +-> Department
@@ -102,7 +105,10 @@ end
 
 ** Example 6: Function with Given Types **
 
-given Student, Grade
+zed
+  given Student, Grade
+end
+
 
 axdef
   grades : Student +-> Grade

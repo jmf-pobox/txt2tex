@@ -19,7 +19,10 @@
 
 === Function Composition ===
 
-given Person, Char, B, Record, ValidatedRecord, ProcessedRecord, Output
+zed
+  given Person, Char, B, Record, ValidatedRecord, ProcessedRecord, Output
+end
+
 
 ** Example 1: Basic Forward Composition **
 

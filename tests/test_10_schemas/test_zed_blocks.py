@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 from txt2tex.ast_nodes import (
+    Abbreviation,
     BinaryOp,
     Document,
+    FreeType,
+    GivenType,
     Identifier,
     Quantifier,
     Zed,
@@ -259,4 +262,214 @@ zed y < 10 end""")
         latex = generator.generate_document(ast)
         assert r"\begin{zed}" in latex
         assert "S" in latex
+        assert r"\end{zed}" in latex
+
+
+class TestZedBlockMixedContent:
+    """Tests for zed blocks with mixed content (given, freetype, abbrev)."""
+
+    def test_given_type_in_zed(self) -> None:
+        """Test zed block with given type."""
+        lexer = Lexer("zed given A, B end")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Document)
+        zed_block = ast.items[0]
+        assert isinstance(zed_block, Zed)
+        assert isinstance(zed_block.content, Document)
+        given = zed_block.content.items[0]
+        assert isinstance(given, GivenType)
+        assert given.names == ["A", "B"]
+
+    def test_free_type_in_zed(self) -> None:
+        """Test zed block with free type."""
+        lexer = Lexer("zed Status ::= active | inactive end")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Document)
+        zed_block = ast.items[0]
+        assert isinstance(zed_block, Zed)
+        assert isinstance(zed_block.content, Document)
+        freetype = zed_block.content.items[0]
+        assert isinstance(freetype, FreeType)
+        assert freetype.name == "Status"
+        assert len(freetype.branches) == 2
+
+    def test_abbreviation_in_zed(self) -> None:
+        """Test zed block with abbreviation."""
+        lexer = Lexer("zed MaxSize == 100 end")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Document)
+        zed_block = ast.items[0]
+        assert isinstance(zed_block, Zed)
+        assert isinstance(zed_block.content, Document)
+        abbrev = zed_block.content.items[0]
+        assert isinstance(abbrev, Abbreviation)
+        assert abbrev.name == "MaxSize"
+
+    def test_abbreviation_with_generic_params(self) -> None:
+        """Test zed block with generic abbreviation."""
+        lexer = Lexer("zed [X] Pair == X cross X end")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Document)
+        zed_block = ast.items[0]
+        assert isinstance(zed_block, Zed)
+        assert isinstance(zed_block.content, Document)
+        abbrev = zed_block.content.items[0]
+        assert isinstance(abbrev, Abbreviation)
+        assert abbrev.name == "Pair"
+        assert abbrev.generic_params == ["X"]
+
+    def test_compound_identifier_abbreviation(self) -> None:
+        """Test zed block with compound identifier abbreviation (R+, R*, etc)."""
+        lexer = Lexer("zed R+ == {a, b : N | b > a} end")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Document)
+        zed_block = ast.items[0]
+        assert isinstance(zed_block, Zed)
+        assert isinstance(zed_block.content, Document)
+        abbrev = zed_block.content.items[0]
+        assert isinstance(abbrev, Abbreviation)
+        assert abbrev.name == "R+"
+
+    def test_mixed_given_and_freetype(self) -> None:
+        """Test zed block with both given type and free type."""
+        lexer = Lexer("""zed
+  given A, B
+  Status ::= active | inactive
+end""")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Document)
+        zed_block = ast.items[0]
+        assert isinstance(zed_block, Zed)
+        assert isinstance(zed_block.content, Document)
+        assert len(zed_block.content.items) == 2
+        assert isinstance(zed_block.content.items[0], GivenType)
+        assert isinstance(zed_block.content.items[1], FreeType)
+
+    def test_mixed_freetype_and_abbreviation(self) -> None:
+        """Test zed block with free type and abbreviation."""
+        lexer = Lexer("""zed
+  Status ::= active | inactive
+  DefaultStatus == active
+end""")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Document)
+        zed_block = ast.items[0]
+        assert isinstance(zed_block, Zed)
+        assert isinstance(zed_block.content, Document)
+        assert len(zed_block.content.items) == 2
+        assert isinstance(zed_block.content.items[0], FreeType)
+        assert isinstance(zed_block.content.items[1], Abbreviation)
+
+    def test_all_three_constructs(self) -> None:
+        """Test zed block with given, free type, and abbreviation."""
+        lexer = Lexer("""zed
+  given Entry
+  Status ::= active | inactive
+  DefaultStatus == active
+end""")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Document)
+        zed_block = ast.items[0]
+        assert isinstance(zed_block, Zed)
+        assert isinstance(zed_block.content, Document)
+        assert len(zed_block.content.items) == 3
+        assert isinstance(zed_block.content.items[0], GivenType)
+        assert isinstance(zed_block.content.items[1], FreeType)
+        assert isinstance(zed_block.content.items[2], Abbreviation)
+
+    def test_given_type_latex(self) -> None:
+        """Test LaTeX generation for given type in zed block."""
+        lexer = Lexer("zed given A, B end")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=False)
+        latex = generator.generate_document(ast)
+        assert r"\begin{zed}" in latex
+        assert "[A, B]" in latex
+        assert r"\end{zed}" in latex
+
+    def test_free_type_latex(self) -> None:
+        """Test LaTeX generation for free type in zed block."""
+        lexer = Lexer("zed Status ::= active | inactive end")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=False)
+        latex = generator.generate_document(ast)
+        assert r"\begin{zed}" in latex
+        assert "Status ::=" in latex
+        assert "active | inactive" in latex
+        assert r"\end{zed}" in latex
+
+    def test_abbreviation_latex(self) -> None:
+        """Test LaTeX generation for abbreviation in zed block."""
+        lexer = Lexer("zed MaxSize == 100 end")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=False)
+        latex = generator.generate_document(ast)
+        assert r"\begin{zed}" in latex
+        assert "MaxSize ==" in latex
+        assert "100" in latex
+        assert r"\end{zed}" in latex
+
+    def test_generic_abbreviation_latex(self) -> None:
+        """Test LaTeX generation for generic abbreviation."""
+        lexer = Lexer("zed [X] Pair == X cross X end")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=False)
+        latex = generator.generate_document(ast)
+        assert r"\begin{zed}" in latex
+        assert "Pair[X] ==" in latex
+        assert r"\cross" in latex
+        assert r"\end{zed}" in latex
+
+    def test_compound_identifier_latex(self) -> None:
+        """Test LaTeX generation for compound identifier abbreviation."""
+        lexer = Lexer("zed R+ == {a, b : N | b > a} end")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=False)
+        latex = generator.generate_document(ast)
+        assert r"\begin{zed}" in latex
+        assert "R^+ ==" in latex
+        assert r"\end{zed}" in latex
+
+    def test_mixed_content_latex(self) -> None:
+        """Test LaTeX generation for mixed content zed block."""
+        lexer = Lexer("""zed
+  given Entry
+  Status ::= active | inactive
+  DefaultStatus == active
+end""")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=False)
+        latex = generator.generate_document(ast)
+        assert r"\begin{zed}" in latex
+        assert "[Entry]" in latex
+        assert "Status ::=" in latex
+        assert "DefaultStatus ==" in latex
         assert r"\end{zed}" in latex

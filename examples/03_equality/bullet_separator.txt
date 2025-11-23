@@ -101,7 +101,9 @@ TEXT: The bullet indicates predecessor is only defined when the constraint n > 0
 
 ** Example 10: Practical Example - Data Filtering **
 
-given Employee
+zed
+  given Employee
+end
 
 axdef
   salaries : Employee -> N

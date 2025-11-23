@@ -20,7 +20,9 @@
 
 TEXT: (a) Test ASCII sequence brackets and pattern matching:
 
-given Entry, Status
+zed
+  given Entry, Status
+end
 
 axdef
   viewed : seq Entry -> seq Entry
@@ -49,7 +51,9 @@ end
 
 TEXT: (d) Test all three features combined:
 
-given Play, User, UserStatus
+zed
+  given Play, User, UserStatus
+end
 
 axdef
   premium_plays : seq(Play) -> seq(Play)

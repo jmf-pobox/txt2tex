@@ -2,7 +2,10 @@
 // Demonstrates bag literals and bag union
 // From USER_GUIDE.md - Sequences section
 
-given T
+zed
+  given T
+end
+
 
 axdef
   a : T; b : T; c : T; x : T; y : T

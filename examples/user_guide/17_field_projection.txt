@@ -2,9 +2,15 @@
 // Demonstrates schema field access
 // From USER_GUIDE.md - Sets and Types section
 
-given Course
+zed
+  given Course
+end
 
-Year == N
+
+zed
+  Year == N
+end
+
 
 schema Entry
   year: Year

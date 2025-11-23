@@ -4,6 +4,12 @@
 
 Status ::= active | inactive | pending
 
-Tree ::= stalk | leaf<N> | branch<Tree cross Tree>
+zed
+  Tree ::= stalk | leaf<N> | branch<Tree cross Tree>
+end
 
-List ::= nil | cons<N cross List>
+
+zed
+  List ::= nil | cons<N cross List>
+end
+

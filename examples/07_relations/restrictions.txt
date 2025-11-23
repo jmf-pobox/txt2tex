@@ -19,7 +19,10 @@
 
 === Function Application Examples ===
 
-given Item, Dog, Person, X
+zed
+  given Item, Dog, Person, X
+end
+
 
 TEXT: This file demonstrates function application in Z notation definitions.
 

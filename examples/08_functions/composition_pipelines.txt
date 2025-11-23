@@ -31,7 +31,10 @@ TEXT: pipeline(3) = square(double(addOne(3))) = square(double(4)) = square(8) = 
 
 ** Example 2: String Pipeline **
 
-given Char
+zed
+  given Char
+end
+
 
 axdef
   str1 : seq Char -> seq Char
