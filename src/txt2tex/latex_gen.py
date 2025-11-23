@@ -3375,7 +3375,8 @@ class LaTeXGenerator:
         without the visual box styling of axdef/schema.
 
         Special case: If content is a Document (from abbrev...end blocks),
-        generate each item separately within the zed block.
+        generate each abbreviation directly within the zed block without
+        nested zed environments.
         """
         lines: list[str] = []
 
@@ -3384,10 +3385,22 @@ class LaTeXGenerator:
         # Handle Document content (from abbrev blocks)
         if isinstance(node.content, Document):
             for item in node.content.items:
-                item_lines = self.generate_document_item(item)
-                for line in item_lines:
-                    if line.strip():  # Skip empty lines
-                        lines.append(f"  {line}")
+                # Generate abbreviations directly without nested zed blocks
+                if isinstance(item, Abbreviation):
+                    expr_latex = self.generate_expr(item.expression)
+                    name_latex = self._generate_identifier(
+                        Identifier(line=0, column=0, name=item.name)
+                    )
+                    if item.generic_params:
+                        params_str = ", ".join(item.generic_params)
+                        lines.append(f"  {name_latex}[{params_str}] == {expr_latex}")
+                    else:
+                        lines.append(f"  {name_latex} == {expr_latex}")
+                else:
+                    # For non-abbreviation items, treat as expression
+                    if isinstance(item, Expr):
+                        content_latex = self.generate_expr(item)
+                        lines.append(f"  {content_latex}")
         else:
             # Normal single expression
             content_latex = self.generate_expr(node.content)
