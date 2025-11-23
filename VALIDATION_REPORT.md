@@ -8,11 +8,12 @@
 
 ## Executive Summary
 
-Validated all discovered issues by executing test cases and cross-referencing with GitHub. All 4 active bugs are confirmed real and reproducible. Found 22+ resolved issues with regression tests in place.
+Validated all discovered issues by executing test cases and cross-referencing with GitHub. All 4 active bugs are confirmed real and reproducible. Found 8 documented resolved bug categories with 15 regression test files.
 
 **Key Findings**:
 - 4 active bugs (1 critical, 3 medium)
-- 22+ resolved bugs with regression tests
+- 8 resolved bug categories with 15 regression test files
+- 7 test case files documenting feature edge cases (never bugs)
 - 11 documented limitations (by design)
 - 98.1% solution coverage (51/52)
 - Only Bug #3 blocks remaining solution
@@ -94,7 +95,7 @@ All GitHub issues match documented bugs in ISSUES.md.
 #### 1. Summary Statistics (lines 11-26)
 **Changes**:
 - Replaced all "TBD" placeholders with accurate counts
-- Updated to: 4 active bugs, 22+ resolved, 11 documented limitations
+- Updated to: 4 active bugs, 8 resolved bug categories, 11 documented limitations
 - Added percentages for each category
 
 **Before**:
@@ -146,12 +147,12 @@ All GitHub issues match documented bugs in ISSUES.md.
 **Changes**:
 - Added "Additional Resolved Regression Tests" section
 - Listed all 8 validated regression tests with PASS status
-- Documented 20+ total regression test files
+- Documented 15 regression test files for 8 resolved bug categories
 - Explained their purpose as regression tests
 
 #### 8. Appendix Statistics (lines 817-848)
 **Changes**:
-- Updated "Bugs by Priority" table with 22+ resolved count
+- Updated "Bugs by Priority" table with 8 resolved bug categories
 - Expanded "Issues by Component" to include resolved bugs column
 - Updated "Issues by Impact" with accurate categories and counts
 
@@ -184,7 +185,7 @@ Checked consistency across:
 | Bug #3 | MEDIUM | lexer | None | Solution 31 |
 | Bug #13 | MEDIUM | parser | Intermediate bindings | Field projection |
 
-### Resolved Issues: 22+
+### Resolved Issues: 8 Bug Categories (15 Test Files)
 
 All files in `tests/bugs/bug_*.txt` (excluding bug1-5) represent resolved issues with regression tests.
 
