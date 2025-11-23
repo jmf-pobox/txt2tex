@@ -1,0 +1,7 @@
+// Example: Transitive Closures
+// Demonstrates transitive and reflexive-transitive closure
+// From USER_GUIDE.md - Relations section
+
+R+
+
+R*

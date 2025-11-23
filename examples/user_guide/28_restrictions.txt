@@ -1,0 +1,11 @@
+// Example: Domain and Range Restrictions
+// Demonstrates restriction and corestriction operators
+// From USER_GUIDE.md - Relations section
+
+S <| R
+
+R |> T
+
+S <<| R
+
+R |>> T

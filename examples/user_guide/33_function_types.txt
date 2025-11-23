@@ -1,0 +1,18 @@
+// Example: Function Types
+// Demonstrates all function type operators
+// From USER_GUIDE.md - Functions section
+
+given X, Y, Year, Table
+
+axdef
+  f1 : X +-> Y
+  f2 : X -> Y
+  f3 : X >+> Y
+  f4 : X -|> Y
+  f5 : X >-> Y
+  f6 : X +->> Y
+  f7 : X -->> Y
+  f8 : X >->> Y
+  f9 : X >7-> Y
+  f10 : Year 77-> Table
+end

@@ -1,0 +1,7 @@
+// Example: Smart Text with Formula Detection
+// Demonstrates TEXT: blocks with automatic formula detection
+// From USER_GUIDE.md - Text Blocks section
+
+TEXT: This is a plain text paragraph with => and <=> symbols.
+TEXT: The set { x : N | x > 0 } contains positive integers.
+TEXT: We know that forall x : N | x >= 0 is true.

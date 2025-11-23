@@ -1,0 +1,15 @@
+// Example: Equivalence Chains with Justifications
+// Demonstrates EQUIV: blocks with free-form justifications
+// From USER_GUIDE.md - Propositional Logic section
+
+EQUIV:
+p and q
+<=> q and p [commutative]
+<=> q and p [idempotent]
+
+EQUIV:
+not (p and q)
+<=> (not p) or (not q) [De Morgan]
+<=> (not p) or (not q) [idempotence]
+<=> (not p) or (not q) or (not r) [associativity]
+<=> true [excluded middle]

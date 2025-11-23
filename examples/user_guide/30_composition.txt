@@ -1,0 +1,16 @@
+// Example: Relational Composition
+// Demonstrates composition vs nested application
+// From USER_GUIDE.md - Relations section
+
+given A, B, C
+
+axdef
+  successor : N -> N
+  square : N -> N
+where
+  forall n : N | successor(n) = n + 1 and square(n) = n * n
+end
+
+squareSuccessor == square o9 successor
+
+result == square(successor(5))

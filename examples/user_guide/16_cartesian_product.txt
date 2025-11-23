@@ -1,0 +1,15 @@
+// Example: Cartesian Products and Tuples
+// Demonstrates cross products and ordered pairs
+// From USER_GUIDE.md - Sets and Types section
+
+A cross B
+
+(x, y)
+
+(a, b, c)
+
+p.1
+
+p.2
+
+p.3

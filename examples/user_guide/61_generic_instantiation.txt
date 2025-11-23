@@ -1,0 +1,19 @@
+// Example: Generic Type Instantiation
+// Demonstrates applying type parameters to polymorphic types
+// From USER_GUIDE.md - Additional Features section
+
+emptyset[N]
+
+seq[N]
+
+P[X]
+
+Type[A, B]
+
+emptyset[N cross N]
+
+seq[N cross N]
+
+Type[List[N]]
+
+Container[seq[N]]

@@ -1,0 +1,15 @@
+// Example: Named Field Projection
+// Demonstrates schema field access
+// From USER_GUIDE.md - Sets and Types section
+
+schema Entry
+  year: Year
+  course: Course
+  code: N
+end
+
+axdef
+  e : Entry
+where
+  e.year = 2025 and e.code = 479
+end

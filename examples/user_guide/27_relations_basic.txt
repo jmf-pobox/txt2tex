@@ -1,0 +1,11 @@
+// Example: Relations - Basic Operators
+// Demonstrates maplets, relation type, domain and range
+// From USER_GUIDE.md - Relations section
+
+x |-> y
+
+X <-> Y
+
+dom R
+
+ran R

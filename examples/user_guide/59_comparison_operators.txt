@@ -1,0 +1,11 @@
+// Example: Comparison Operators
+// Demonstrates comparison operators
+// From USER_GUIDE.md - Additional Features section
+
+x < y
+
+x > y
+
+x <= y
+
+x >= y

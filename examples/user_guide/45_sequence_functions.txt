@@ -1,0 +1,15 @@
+// Example: Sequence Functions
+// Demonstrates head, tail, last, front, rev
+// From USER_GUIDE.md - Sequences section
+
+given X
+
+axdef
+  s : seq X
+where
+  head s = head s and
+  tail s = tail s and
+  last s = last s and
+  front s = front s and
+  rev s = rev s
+end

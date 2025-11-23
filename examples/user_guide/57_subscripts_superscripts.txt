@@ -1,0 +1,13 @@
+// Example: Subscripts and Superscripts
+// Demonstrates subscript and superscript syntax
+// From USER_GUIDE.md - Additional Features section
+
+x_i
+
+x^2
+
+2^n
+
+a_{n}
+
+x^{2n}

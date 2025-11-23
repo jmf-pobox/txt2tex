@@ -1,0 +1,13 @@
+// Example: Arithmetic Operators
+// Demonstrates arithmetic operations
+// From USER_GUIDE.md - Additional Features section
+
+x + y
+
+x - y
+
+-x
+
+x * y
+
+x mod n

@@ -1,0 +1,17 @@
+// Example: Generic Schemas
+// Demonstrates schema[X] syntax for fuzz compatibility
+// From USER_GUIDE.md - Definitions section
+
+schema Container[X]
+  contents : seq X
+  capacity : N
+where
+  # contents <= capacity
+end
+
+gendef [X]
+  emptyContainer : Container[X]
+  addToContainer : Container[X] cross X -> Container[X]
+where
+  emptyContainer.contents = <> and emptyContainer.capacity = 100
+end

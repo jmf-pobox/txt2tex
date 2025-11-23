@@ -1,0 +1,13 @@
+// Example: Set Comprehension
+// Demonstrates various forms of set comprehension
+// From USER_GUIDE.md - Sets and Types section
+
+{ x : N | x > 0 }
+
+{ x : N | x > 0 . x^2 }
+
+{ x, y : N | x = y }
+
+{ x | x in A }
+
+{1 |-> a, 2 |-> b, 3 |-> c}

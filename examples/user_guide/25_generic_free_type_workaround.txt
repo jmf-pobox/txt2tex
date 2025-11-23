@@ -1,0 +1,17 @@
+// Example: Generic Free Types - Fuzz Workaround
+// Demonstrates the correct way to define generic free types for fuzz compatibility
+// From USER_GUIDE.md - Definitions section
+
+given X
+
+Tree_X ::= leaf_X | node_X<X cross Tree_X cross Tree_X>
+
+gendef [X]
+  makeLeaf_X : Tree_X
+  makeNode_X : X cross Tree_X cross Tree_X -> Tree_X
+  treeDepth_X : Tree_X -> N
+where
+  makeLeaf_X = leaf_X
+  forall x : X; left, right : Tree_X |
+    makeNode_X(x, left, right) = node_X(x, left, right)
+end

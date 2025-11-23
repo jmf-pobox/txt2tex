@@ -1,0 +1,15 @@
+// Example: Multi-Word Identifiers
+// Demonstrates underscore usage in identifiers
+// From USER_GUIDE.md - Additional Features section
+
+axdef
+  cumulative_total : N
+  not_yet_viewed : N
+  employee_count : N
+where
+  cumulative_total = 0 and
+  not_yet_viewed = 0 and
+  employee_count = 0
+end
+
+TEXT: Simple subscript a_i renders differently from multi-word cumulative_total.

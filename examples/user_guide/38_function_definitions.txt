@@ -1,0 +1,27 @@
+// Example: Function Definitions
+// Demonstrates total, partial, and generic function definitions
+// From USER_GUIDE.md - Functions section
+
+axdef
+  square : N -> N
+where
+  forall n : N | square(n) = n * n
+end
+
+axdef
+  predecessor : N +-> N
+where
+  forall n : N | n > 0 => predecessor(n) = n - 1
+end
+
+gendef [X]
+  identity : X -> X
+where
+  forall x : X | identity(x) = x
+end
+
+gendef [X, Y]
+  first : X cross Y -> X
+where
+  forall x : X; y : Y | first(x, y) = x
+end

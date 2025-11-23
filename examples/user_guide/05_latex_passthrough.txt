@@ -1,0 +1,7 @@
+// Example: LaTeX Passthrough
+// Demonstrates LATEX: blocks for raw LaTeX commands
+// From USER_GUIDE.md - Text Blocks section
+
+LATEX: \begin{center}\textit{Custom formatting}\end{center}
+LATEX: \vspace{1cm}
+LATEX: \mycustomcommand{arg1}{arg2}

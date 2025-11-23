@@ -1,0 +1,7 @@
+// Example: Nested Quantifiers
+// Demonstrates nested quantification with proper parenthesization
+// From USER_GUIDE.md - Predicate Logic section
+
+forall x : N | exists y : N | x = y
+
+forall x : N | x > 0 and (forall y : N | y > x)

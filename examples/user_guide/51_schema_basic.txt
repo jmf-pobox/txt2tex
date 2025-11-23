@@ -1,0 +1,26 @@
+// Example: Schemas - State Spaces
+// Demonstrates basic schema definitions
+// From USER_GUIDE.md - Schema Notation section
+
+schema State
+  count : N
+where
+  count >= 0
+end
+
+schema Stack[X]
+  items : seq X
+where
+  # items <= 100
+end
+
+schema Relation[X, Y]
+  domain : P X
+  range : P Y
+end
+
+schema Point
+  x : N; y : N
+where
+  x > 0 and y > 0
+end

@@ -1,0 +1,11 @@
+// Example: Pattern Matching with Sequences
+// Demonstrates pattern matching in recursive function definitions
+// From USER_GUIDE.md - Sequences section
+
+axdef
+  cumulative_total : seq N -> N
+where
+  cumulative_total(<>) = 0 and
+  forall x : N; s : seq N |
+    cumulative_total(<x> ^ s) = x + cumulative_total(s)
+end

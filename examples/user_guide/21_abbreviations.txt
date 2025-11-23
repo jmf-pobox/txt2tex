@@ -1,0 +1,9 @@
+// Example: Abbreviations
+// Demonstrates type abbreviations with and without generic parameters
+// From USER_GUIDE.md - Definitions section
+
+Pairs == N cross N
+
+[X] Pair == X
+
+[X, Y] Product == X cross Y

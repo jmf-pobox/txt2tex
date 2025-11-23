@@ -1,0 +1,7 @@
+// Example: Multi-Variable Quantifiers
+// Demonstrates comma-separated variables in quantifiers
+// From USER_GUIDE.md - Predicate Logic section
+
+forall x, y : N | x = y
+
+exists a, b, c : Z | a = b
