@@ -1214,14 +1214,14 @@ The `^` operator has dual meaning based on whitespace:
 | `... ^ ...` (with space) | Concatenation | `\cat` | `<x> ^ <y>` |
 | `...^...` (no space) | Exponentiation | `^{...}` | `x^2` |
 
-**Concatenation examples (MUST have space before `^`):**
+**Concatenation examples (MUST have space before `^` and be on same line):**
 ```
 <a> ^ <b>        →  ⟨a⟩ ⌢ ⟨b⟩      [sequence literals]
 s ^ t            →  s ⌢ t           [sequence variables]
 f(x) ^ <y>       →  f(x) ⌢ ⟨y⟩     [function result]
-<x>              →  ⟨x⟩ ⌢ ⟨y⟩      [line break counts as space]
- ^ <y>
 ```
+
+**Note**: Multi-line concatenation (splitting across lines) is not currently supported.
 
 **Exponentiation examples (NO space before `^`):**
 ```
@@ -1310,9 +1310,11 @@ bag(X)           →  bag X       [set of all bags of type X]
 
 **Bag literals:**
 ```
-[[x]]            →  ⟦x⟧         [bag]
-[[a, b, c]]      →  ⟦a, b, c⟧
+b1 == [[x]]            →  b₁ = ⟦x⟧         [bag in abbreviation]
+b2 == [[a, b, c]]      →  b₂ = ⟦a, b, c⟧
 ```
+
+**Note**: Bag literals must appear in an abbreviation or expression context, not as standalone statements.
 
 **Bag union:**
 ```
@@ -1335,8 +1337,8 @@ Zed blocks provide a way to write standalone Z notation content without the visu
 
 **What can go in zed blocks:**
 - ✅ **Predicates**: `forall x : N | x >= 0`
-- ✅ **Abbreviations**: `Evens == { n : N | n mod 2 = 0 }`
 - ✅ **Type declarations**: `[NAME, DATE]`
+- ❌ **NOT abbreviations** (yet): Use standalone `Evens == { n : N | n mod 2 = 0 }` outside zed blocks
 - ❌ **NOT bare expressions**: Cannot use standalone `{ x : N | x > 0 }` or `x + y`
 
 **Simple predicate:**
@@ -1359,12 +1361,12 @@ zed
 end
 ```
 
-**Abbreviations (assignment):**
+**Abbreviations (standalone, not in zed blocks yet):**
 ```
-zed
-  Evens == { n : N | n mod 2 = 0 }
-end
+Evens == { n : N | n mod 2 = 0 }
 ```
+
+**Note**: Abbreviations in zed blocks are not yet supported. Define abbreviations as standalone statements.
 
 **Complex predicates:**
 ```
@@ -1391,7 +1393,7 @@ Generates:
 | Content Type | zed | axdef | schema | Standalone |
 |--------------|-----|-------|--------|------------|
 | **Predicates** | ✅ `forall x : N \| x >= 0` | ✅ In `where` clause | ✅ In `where` clause | ✅ Direct |
-| **Abbreviations** | ✅ `Evens == {...}` | ❌ Use top-level | ❌ Use top-level | ✅ Direct |
+| **Abbreviations** | ❌ Not yet | ❌ Use top-level | ❌ Use top-level | ✅ Direct |
 | **Type declarations** | ✅ `[NAME, DATE]` | ❌ Use `given` | ❌ Use `given` | ✅ `given` |
 | **Variable declarations** | ❌ | ✅ Before `where` | ✅ Before `where` | ❌ |
 | **Bare expressions** | ❌ | ❌ | ❌ | ✅ Direct |
