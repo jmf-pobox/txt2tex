@@ -4083,7 +4083,7 @@ class LaTeXGenerator:
 
             # Convert operator to LaTeX (no $ delimiters - already in math mode)
             # CRITICAL: Process by length (longest first) to avoid partial matches
-            op_latex = operator_part
+            op_latex: str = operator_part
 
             # 5-character operators
             op_latex = op_latex.replace("77->", r"\ffun")
