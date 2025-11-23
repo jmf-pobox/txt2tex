@@ -322,24 +322,32 @@ forall i : N; p : Programme | p = f(i) and p.length > 0
 
 ### Additional Resolved Regression Tests
 
-**Status**: All regression tests in `tests/bugs/bug_*.txt` pass as of 2025-11-23.
+**Status**: All regression tests in `tests/bugs/regression_*.txt` pass as of 2025-11-23.
 
-The following bug test files (not numbered 1-5) all compile successfully to PDF, indicating they are resolved issues kept as regression tests:
+The following test files all compile successfully to PDF, representing resolved issues kept as regression tests:
 
-- `bug_bullet_simple.txt` - Bullet separator in simple quantifiers (PASS)
-- `bug_in_in_same.txt` - Double `in` operators with same variable (PASS)
-- `bug_caret_in_justification.txt` - Concatenation operator in EQUIV justifications (PASS)
-- `bug_spaces_in_justification.txt` - Spaces in EQUIV justifications (PASS)
-- `bug_word_justification.txt` - Word-based justifications (PASS)
-- `bug_bag_in_free_type.txt` - Bag types in free type definitions (PASS)
-- `bug_empty_sequence_justification.txt` - Empty sequence in justifications (PASS)
-- `bug_bullet_notin_paren.txt` - Bullet with notin in parentheses (PASS)
-- `bug_bullet_notin.txt` - Bullet with notin operator (PASS)
-- `bug_in_before_bullet.txt` - In operator before bullet separator (PASS)
-- `bug_in_comparison.txt` - In operator in comparisons (PASS)
-- `bug_in_in_different.txt` - Double in operators with different variables (PASS)
-- `bug_in_notin_combo.txt` - Combination of in and notin (PASS)
-- And more... (20+ total regression test files)
+**IN Operator Disambiguation (8 files)**:
+- `regression_in_operator_basic.txt` - Basic `in` operator parsing (PASS)
+- `regression_in_operator_simple.txt` - Simple membership `y in T` (PASS)
+- `regression_in_operator_with_comparison.txt` - `in` with comparisons (PASS)
+- `regression_in_operator_multiple_same.txt` - Multiple `in` operators, same precedence (PASS)
+- `regression_in_operator_multiple_nested.txt` - Multiple `in` operators, different levels (PASS)
+- `regression_in_operator_before_bullet.txt` - `in` before bullet separator (PASS)
+- `regression_in_notin_operators_combined.txt` - Combined `in` and `notin` (PASS)
+- `regression_in_operator_patterns.txt` - Various `in` patterns (PASS)
+
+**Bullet Separator (3 files)**:
+- `regression_bullet_separator_basic.txt` - Basic bullet separator (PASS)
+- `regression_bullet_separator_with_notin.txt` - Bullet with `notin` (PASS)
+- `regression_bullet_separator_notin_paren.txt` - Bullet with parenthesized `notin` (PASS)
+
+**TEXT Block Operators (2 files)**:
+- `regression_text_comma_after_parens.txt` - Commas after parenthesized math (PASS)
+- `regression_text_logical_operators.txt` - Logical operators `or`/`and` (PASS)
+
+**Set Operators (2 files)**:
+- `regression_subset_operator.txt` - `subset` operator parsing (PASS)
+- `regression_notin_operator.txt` - `notin` operator parsing (PASS)
 
 These represent previously problematic syntax patterns that now work correctly. They serve as regression tests to prevent re-introduction of these bugs.
 
@@ -355,7 +363,7 @@ These represent previously problematic syntax patterns that now work correctly. 
 
 **Description**: Commas after parenthesized math expressions in TEXT blocks were not detected as part of inline math.
 
-**Test Case**: `tests/bugs/bug4_comma_after_parens.txt`
+**Test Case**: `tests/bugs/regression_text_comma_after_parens.txt`
 
 **Input**:
 ```txt
@@ -387,7 +395,7 @@ TEXT: The contrapositive pairs are (not p => not q), (q => p).
 
 **Description**: Logical operators (`or`, `and`) in parenthesized expressions were not converted to LaTeX symbols in TEXT blocks.
 
-**Test Case**: `tests/bugs/bug5_or_operator.txt`
+**Test Case**: `tests/bugs/regression_text_logical_operators.txt`
 
 **Input**:
 ```txt

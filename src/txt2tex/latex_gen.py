@@ -544,7 +544,8 @@ class LaTeXGenerator:
             return special_keywords[name]
 
         # Handle compound identifiers with postfix closure operators (R+, R*, R~, Rr)
-        # Appears in abbreviation and schema names (partial support, GitHub #3 still open)
+        # Appears in abbreviation and schema names
+        # (partial support, GitHub #3 still open)
         if name.endswith("+"):
             base = name[:-1]
             # Render as R^+ (transitive closure)

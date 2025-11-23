@@ -145,20 +145,22 @@ Examine all files in `tests/bugs/` directory.
 - `bug1_prose_period.txt` - Parser fails on prose with periods
 - `bug2_multiple_pipes.txt` - TEXT blocks with multiple pipes
 - `bug3_compound_id.txt` - Compound identifiers with operator suffixes
-- `bug4_comma_after_parens.txt` - Comma detection (RESOLVED)
-- `bug5_or_operator.txt` - Logical operators (RESOLVED)
+- `regression_text_comma_after_parens.txt` (formerly bug4) - Comma detection (RESOLVED)
+- `regression_text_logical_operators.txt` (formerly bug5) - Logical operators (RESOLVED)
 
-**Additional bug test files found**:
-- `bug_bag_in_free_type.txt`
-- `bug_bullet_*.txt` (3 files)
-- `bug_caret_in_justification.txt`
-- `bug_empty_sequence_justification.txt`
-- `bug_in_*.txt` (multiple files)
-- `bug_nonempty_sequence_justification.txt`
-- `bug_notin_simple.txt`
-- `bug_spaces_in_justification.txt`
-- `bug_word_justification.txt`
-- `test_issue7_semicolon.txt`
+**Additional test files found** (15 regression tests + 7 feature tests):
+
+*Regression Tests (resolved bugs)*:
+- `regression_in_operator_*.txt` (8 files) - IN operator disambiguation
+- `regression_bullet_separator_*.txt` (3 files) - Bullet separator parsing
+- `regression_subset_operator.txt` - SUBSET operator
+- `regression_notin_operator.txt` - NOTIN operator
+- `regression_text_*.txt` (2 files) - TEXT block operators
+
+*Feature Tests (never bugs)*:
+- `feature_justification_*.txt` (5 files) - Justification formatting edge cases
+- `feature_semicolon_separator.txt` (formerly test_issue7_semicolon.txt) - Semicolon separator
+- `feature_bag_syntax_in_free_types.txt` - Bag notation in free types
 
 **Command to execute**:
 ```bash
