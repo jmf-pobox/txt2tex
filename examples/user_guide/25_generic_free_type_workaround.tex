@@ -1,0 +1,25 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{zed}IntTree ::= leaf | node \ldata \nat \cross IntTree \cross
+  IntTree \rdata
+\end{zed}
+
+\begin{axdef}
+  emptyTree : IntTree \\
+  treeDepth : IntTree \fun \nat
+  \where
+  emptyTree = leaf \\
+  treeDepth(leaf) = 0
+\end{axdef}
+
+\end{document}

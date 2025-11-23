@@ -1,0 +1,29 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{zed}[X, Y]
+\end{zed}
+
+\begin{axdef}
+  f : X \fun Y \\
+  g : Y \fun Y \\
+  h : X \fun X \\
+  x : X \\
+  y : Y
+  \where
+  f(x) = y \\
+  g(y) = y \\
+  h(x) = x \\
+  f(h(x)) = y
+\end{axdef}
+
+\end{document}

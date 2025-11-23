@@ -186,7 +186,7 @@ Induction ( Base and Step )}
 \section*{Example 5 : Constructive Existence Proof}
 \addcontentsline{toc}{section}{Example 5 : Constructive Existence Proof}
 
-\noindent $Prove : There exists$ an even number greater than 10
+\noindent $Prove : There $\exists$$ an even number greater than 10
 
 \bigskip
 
@@ -195,7 +195,7 @@ Induction ( Base and Step )}
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\exists n
     : \nat @ even(n) \land n > 10)}{
-      \infer[exists \mathrm{intro} with n=12]{\exists n : \nat @
+      \infer[\exists \mathrm{intro} with n=12]{\exists n : \nat @
       even(n) \land n > 10}{\infer[\land \mathrm{intro}]{even(12)
         \land 12 > 10}{\infer[arithmetic]{12 > 10}{\infer[definition of
             even,12=2 * 6]{even(12)}{\infer[arithmetic]{12 = 2 *
@@ -225,11 +225,11 @@ $a^b$ is rational
       \implies (\exists a, b @ irrational(a) \land irrational(b) \land
     rational(power(a, b)))}{
       \infer[\lor \mathrm{elim}]{\exists a, b @ irrational(a) \land
-      irrational(b) \land rational(power(a, b))}{\infer[exists
+      irrational(b) \land rational(power(a, b))}{\infer[\exists
         \mathrm{intro} with a=b=sqrt(2)]{\exists a, b @ irrational(a)
         \land irrational(b) \land rational(power(a, b))}{\infer[\land
           \mathrm{intro}]{irrational(sqrt(2)) \land irrational(sqrt(2))
-        \land rational(power(sqrt(2), sqrt(2)))}{}} & \infer[exists
+        \land rational(power(sqrt(2), sqrt(2)))}{}} & \infer[\exists
         \mathrm{intro}]{\exists a, b @ irrational(a) \land
         irrational(b) \land rational(power(a, b))}{\infer[\land
           \mathrm{intro}]{irrational(power(sqrt(2), sqrt(2))) \land
@@ -316,7 +316,7 @@ values, not just n-1.
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{even(n) \implies
     even(power(n, 2))}{
-      \infer[definition of even]{even(power(n, 2))}{\infer[exists
+      \infer[definition of even]{even(power(n, 2))}{\infer[\exists
         \mathrm{intro} with m=2 * power(k,2)]{\exists m @ power(n, 2) =
         2 * m}{\infer[factoring]{4 * power(k, 2) = 2 * (2 * power(k,
           2))}{\infer[algebra]{power(2 * k, 2) = 4 * power(k,
@@ -504,7 +504,7 @@ values, not just n-1.
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\exists n
     @ n > 100 \land even(n))}{
-      \infer[exists \mathrm{intro} with n=102]{\exists n @ n > 100
+      \infer[\exists \mathrm{intro} with n=102]{\exists n @ n > 100
       \land even(n)}{\infer[\land \mathrm{intro}]{102 > 100 \land
         even(102)}{\infer[definition]{even(102)}{\infer[arithmetic]{102
             = 2 * 51}{\infer[arithmetic]{102 >

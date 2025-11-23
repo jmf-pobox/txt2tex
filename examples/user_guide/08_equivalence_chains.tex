@@ -1,0 +1,40 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      p \land q \\
+      \Leftrightarrow q \land p & [\mbox{commutative}] \\
+      \Leftrightarrow q \land p & [\mbox{idempotent}]
+    \end{array}$%
+  }
+\end{center}
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \lnot (p \land q) \\
+      \Leftrightarrow \lnot p \lor \lnot q & [\mbox{De Morgan}] \\
+      \Leftrightarrow \lnot p \lor \lnot q & [\mbox{idempotence}] \\
+      \Leftrightarrow \lnot p \lor \lnot q \lor \lnot r &
+      [\mbox{associativity}] \\
+      \Leftrightarrow true & [\mbox{excluded middle}]
+    \end{array}$%
+  }
+\end{center}
+\bigskip
+
+\end{document}

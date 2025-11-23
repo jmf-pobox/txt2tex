@@ -1,0 +1,36 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{axdef}
+  x : \nat
+  \where
+  x > 0
+\end{axdef}
+
+\begin{zed}
+  \forall x : \nat @ x \geq 0
+\end{zed}
+
+\begin{zed}
+  Evens == \{ n : \nat | n \mod 2 = 0 \}
+\end{zed}
+
+\begin{zed}[NAME]
+\end{zed}
+
+\begin{axdef}
+  birthdays : \power NAME
+  \where
+  \exists n : NAME @ n \in birthdays
+\end{axdef}
+
+\end{document}

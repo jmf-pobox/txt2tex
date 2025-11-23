@@ -37,7 +37,7 @@ quantifier, x is not defined.
 $\forall x : \nat @ \exists y : \nat @ x + y = 10$
 
 \noindent x is in scope for the entire outer quantifier, including
-the inner quantifier. y is only in scope within the exists quantifier.
+the inner quantifier. y is only in scope within the $\exists$ quantifier.
 
 \bigskip
 
@@ -47,7 +47,7 @@ the inner quantifier. y is only in scope within the exists quantifier.
 \noindent
 $\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
 
-\noindent The inner x shadows the outer x. Within the exists
+\noindent The inner x shadows the outer x. Within the $\exists$
 quantifier, x refers to the inner binding. This is allowed but can be confusing.
 
 \bigskip
