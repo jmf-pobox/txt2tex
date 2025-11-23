@@ -1,0 +1,25 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{schema}{Entry}
+  year : Year \\
+  course : Course \\
+  code : \nat
+\end{schema}
+
+\begin{axdef}
+  e : Entry
+  \where
+  e.year = 2025 \land e.code = 479
+\end{axdef}
+
+\end{document}

@@ -1,0 +1,26 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \lor q \implies r}{
+      \infer[\lor \mathrm{elim}]{r}{\infer[\mathrm{from}
+        \mathrm{assumption} p]{r}{} & \infer[\mathrm{from}
+      \mathrm{assumption} q]{r}{}}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\end{document}

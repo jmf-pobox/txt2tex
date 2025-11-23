@@ -1,0 +1,26 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{zed}[X]
+\end{zed}
+
+\begin{axdef}
+  s : \seq X
+  \where
+  \head s = \head s \land \\
+  \quad \tail s = \tail s \land \\
+  \quad \last s = \last s \land \\
+  \quad \front s = \front s \land \\
+  \quad \rev s = \rev s
+\end{axdef}
+
+\end{document}

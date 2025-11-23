@@ -1,0 +1,25 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{zed}
+  b1 == \lbag a, b, c \rbag
+\end{zed}
+
+\begin{zed}
+  b2 == \lbag x, x, y \rbag
+\end{zed}
+
+\begin{zed}
+  b3 == b1 \uplus b2
+\end{zed}
+
+\end{document}

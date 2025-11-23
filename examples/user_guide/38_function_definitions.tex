@@ -1,0 +1,37 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{axdef}
+  square : \nat \fun \nat
+  \where
+  \forall n : \nat @ square(n) = n * n
+\end{axdef}
+
+\begin{axdef}
+  predecessor : \nat \pfun \nat
+  \where
+  \forall n : \nat @ n > 0 \implies predecessor(n) = n - 1
+\end{axdef}
+
+\begin{gendef}[X]
+  identity: X \fun X
+  \where
+  \forall x : X @ identity(x) = x
+\end{gendef}
+
+\begin{gendef}[X, Y]
+  first: X \cross Y \fun X
+  \where
+  \forall x : X @ \forall y : Y @ first(x, y) = x
+\end{gendef}
+
+\end{document}

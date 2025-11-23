@@ -1,0 +1,20 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\begin{gendef}[X, Y, Z]
+  compose: (Y \fun \num) \cross (X \fun Y) \fun (X \fun \num)
+  \where
+  \forall f : Y \fun \num @ \forall g : X \fun Y @ \forall x : X @
+  compose(f, g)(x) = f(g(x))
+\end{gendef}
+
+\end{document}
