@@ -2,24 +2,17 @@
 // Demonstrates various forms of function application
 // From USER_GUIDE.md - Functions section
 
-given X, Y, A, Entry, Person
+given X, Y
 
 axdef
   f : X -> Y
   g : Y -> Y
-  h : Y -> Y
-  R : X <-> Y
-  S : Y <-> Y
+  h : X -> X
+  x : X
+  y : Y
 where
-  f(x) = x
-  g(x, y, z) = x
-  seq(Entry) = {}
-  P(Person) = {}
-  f(g(h(x))) = x
+  f(x) = y
+  g(y) = y
+  h(x) = x
+  f(h(x)) = y
 end
-
-(f ++ g)(x)
-
-<a, b, c>(2)
-
-(R o9 S)(| A |)

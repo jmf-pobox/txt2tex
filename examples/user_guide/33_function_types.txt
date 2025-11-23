@@ -1,8 +1,8 @@
 // Example: Function Types
-// Demonstrates all function type operators
+// Demonstrates function type operators
 // From USER_GUIDE.md - Functions section
 
-given X, Y, Year, Table
+given X, Y
 
 axdef
   f1 : X +-> Y
@@ -13,6 +13,6 @@ axdef
   f6 : X +->> Y
   f7 : X -->> Y
   f8 : X >->> Y
-  f9 : X >7-> Y
-  f10 : Year 77-> Table
 end
+
+// Note: Finite function arrows (>7->, 77->) are not supported by fuzz

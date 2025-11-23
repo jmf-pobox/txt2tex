@@ -2,15 +2,13 @@
 // Demonstrates multiple declaration formats in gendef
 // From USER_GUIDE.md - Definitions section
 
+// Note: Two equivalent syntaxes exist:
+// 1. Each declaration on a separate line (shown below)
+// 2. Multiple declarations on one line separated by semicolon
+
 gendef [X, Y]
   fst : X cross Y -> X
   snd : X cross Y -> Y
-where
-  forall x : X; y : Y | fst(x, y) = x and snd(x, y) = y
-end
-
-gendef [X, Y]
-  fst : X cross Y -> X; snd : X cross Y -> Y
 where
   forall x : X; y : Y | fst(x, y) = x and snd(x, y) = y
 end

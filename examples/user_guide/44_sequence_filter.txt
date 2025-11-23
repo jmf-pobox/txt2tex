@@ -2,14 +2,13 @@
 // Demonstrates filter operator for sequences
 // From USER_GUIDE.md - Sequences section
 
-given Entry, viewed
-
 schema Entry
   viewed : N
 end
 
 axdef
   records : seq Entry
+  yes : N
 where
   records filter {x : Entry | x.viewed = yes} = <>
 end

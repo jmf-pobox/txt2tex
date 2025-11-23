@@ -2,6 +2,12 @@
 // Demonstrates bag literals and bag union
 // From USER_GUIDE.md - Sequences section
 
+given T
+
+axdef
+  a : T; b : T; c : T; x : T; y : T
+end
+
 b1 == [[a, b, c]]
 
 b2 == [[x, x, y]]

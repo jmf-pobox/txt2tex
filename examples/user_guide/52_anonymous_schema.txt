@@ -1,8 +1,11 @@
-// Example: Anonymous Schemas
-// Demonstrates schemas without names for inline use
+// Example: Schema Definitions
+// Demonstrates basic schema syntax
 // From USER_GUIDE.md - Schema Notation section
 
-schema
+// Note: Anonymous schemas (schema without name) are not supported by fuzz
+// All schemas must have names
+
+schema Point
   x : N
   y : N
 where

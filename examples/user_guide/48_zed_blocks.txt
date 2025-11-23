@@ -2,7 +2,9 @@
 // Demonstrates zed blocks for predicates and abbreviations
 // From USER_GUIDE.md - Schema Notation section
 
-zed
+axdef
+  x : N
+where
   x > 0
 end
 
@@ -10,14 +12,12 @@ zed
   forall x : N | x >= 0
 end
 
-given NAME, December
-
-zed
-  exists n : NAME | birthday(n) in December
-end
-
 Evens == { n : N | n mod 2 = 0 }
 
-zed
-  forall x : S | exists y : T | x in y
+given NAME
+
+axdef
+  birthdays : P NAME
+where
+  exists n : NAME | n in birthdays
 end
