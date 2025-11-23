@@ -1545,62 +1545,31 @@ trains | snd(trains(x)) = q \}$)
 \section*{Solution 39}
 \addcontentsline{toc}{section}{Solution 39}
 
-\noindent Assuming Collection is defined as a bag (multiset) of
-$coins : Collection$ == $Coin \fun \nat$
+\begin{zed}[Coin]
+\end{zed}
 
-\bigskip
-
-\noindent And large is a specific coin denomination.
-
-\bigskip
+\begin{axdef}
+  large : Coin
+\end{axdef}
 
 \subsection*{(a)}
 
-\noindent axdef
-
-\bigskip
-
-\noindent largeCoins : ($Coin \fun \nat$) $\fun$ N
-
-\bigskip
-
-\noindent where
-
-\bigskip
-
-\noindent $\forall c : Coin \fun \nat @ \forall large : Coin @
-largeCoins(c) = c(large)$
-
-\bigskip
-
-\noindent end
-
-\bigskip
+\begin{axdef}
+  largeCoins : (Coin \fun \nat) \fun \nat
+  \where
+  \forall c : Coin \fun \nat @ largeCoins(c) = c(large)
+\end{axdef}
 
 \medskip
 
 \subsection*{(b)}
 
-\noindent axdef
-
-\bigskip
-
-\noindent addCoin : ($Coin \fun \nat$) cross Coin $\fun$ ($Coin \fun \nat$)
-
-\bigskip
-
-\noindent where
-
-\bigskip
-
-\noindent $\forall c : Coin \fun \nat @ \forall d : Coin @ addCoin(c,
-d) = c \cup \lbag d \rbag$
-
-\bigskip
-
-\noindent end
-
-\bigskip
+\begin{axdef}
+  addCoin : (Coin \fun \nat) \cross Coin \fun (Coin \fun \nat)
+  \where
+  \forall c : Coin \fun \nat @ \forall d : Coin @ addCoin(c, d) = c
+  \cup \{d \mapsto 1\}
+\end{axdef}
 
 \section*{Modelling}
 
@@ -1905,21 +1874,6 @@ $v(\{ y : Year | y \in \dom records @ y \mapsto \{ l : Lecturer | \#
 \section*{Solution 43}
 \addcontentsline{toc}{section}{Solution 43}
 
-\noindent Note: Assuming given types Cinema, Film, Date, Booking and
-a bookings relation.
-
-\bigskip
-
-\noindent The problem statement $defines : bookings$ : (Cinema cross
-Film) $\pfun$ seq Booking
-
-\bigskip
-
-\noindent where Booking is a triple of (bookingRef, startDay, endDay)
-: (N cross N cross N)
-
-\bigskip
-
 \begin{zed}[Cinema, Film, Date]
 \end{zed}
 
@@ -1929,44 +1883,39 @@ Film) $\pfun$ seq Booking
   endDay : \nat
 \end{schema}
 
-\noindent Assuming: bookings : (Cinema cross Film) $\pfun$ seq Booking
-
-\bigskip
+\begin{axdef}
+  bookings : (Cinema \cross Film) \pfun \seq Booking \\
+  maxDay : Cinema \fun \nat \\
+  Banbury : Cinema
+\end{axdef}
 
 \subsection*{(a)}
 
-\medskip
+\noindent
+$i$
 
-\subsection*{(i)}
-
-\noindent $\forall$ $i : dom bookings$ $\mid$ $\forall x, y :
-bookings(i) @ x \neq y$$\mid$ (x.startDay..x.endDay) intersect
-(y.startDay..y.endDay) = $\emptyset$
-
-\bigskip
+\noindent
+$\forall i : \dom bookings @ \forall x : Booking @ \forall y :
+Booking @ x \in \ran (bookings(i)) \land y \in \ran (bookings(i))
+\land x \neq y \implies x.startDay \upto x.endDay \cap y.startDay
+\upto y.endDay = \emptyset$
 
 \medskip
 
 \subsection*{(ii)}
 
-\noindent $\forall$ $i : dom bookings$ $\mid$ $\forall$ $x :
-bookings(i)$ $\mid$ $\{x.startDay, x.endDay\}$ subseteq 1..max(fst(i))
-
-\bigskip
-
-\noindent (Note: Assuming max is a function on Cinema that returns
-the maximum day number)
-
-\bigskip
+\noindent
+$\forall i : \dom bookings @ \forall x : Booking @ x \in \ran
+(bookings(i)) \implies x.startDay \in 1 \upto maxDay(fst(i)) \land
+x.endDay \in 1 \upto maxDay(fst(i))$
 
 \medskip
 
 \subsection*{(iii)}
 
-\noindent $\forall$ $i : dom bookings$ $\mid$ $\forall b :
-bookings(i) @ b.startDay \leq b.endDay$
-
-\bigskip
+\noindent
+$\forall i : \dom bookings @ \forall b : Booking @ b \in \ran
+(bookings(i)) \implies b.startDay \leq b.endDay$
 
 \medskip
 
@@ -1980,48 +1929,31 @@ bookings(i) @ b.startDay \leq b.endDay$
 
 \subsection*{(b)}
 
-\noindent Assuming $Banbury : Cinema$ and bookings is defined
-
-\bigskip
-
-\medskip
-
-\subsection*{(i)}
-
-\noindent $\{ i : \dom bookings | fst(i) = Banbury.snd(i) \}$
-
-\bigskip
+\noindent
+$i(\{ i : \dom bookings | fst(i) = Banbury.snd(i) \})$
 
 \medskip
 
 \subsection*{(ii)}
 
-\noindent $\{ i : \dom bookings | fst(i) = Banbury \land (\$\exists
-$b : bookings(i)$ @ 50$\in b @ startDay \upto b.endDay) \}$
-
-\bigskip
+\noindent
+$\{ i : \dom bookings | fst(i) = Banbury \land (\exists b : Booking @
+b \in \ran (bookings(i)) \land 50 \in b.startDay \upto b.endDay) \}$
 
 \medskip
 
 \subsection*{(iii)}
 
-\noindent Assuming Room is Cinema, returning unique cinema/film pairs:
-
-\bigskip
-
-\noindent {$c : Cinema; f$ : Film $\mid$ $\exists i : \dom bookings @
-fst(i) = c \land snd(i) = f$. (c, f)}
-
-\bigskip
+\noindent
+$\{ i : \dom bookings @ (fst(i), snd(i)) \}$
 
 \medskip
 
 \subsection*{(iv)}
 
-\noindent $\{ c : Cinema | \exists i : \dom bookings @ fst(i) = c
-\land \# (bookings(i)) \geq 10 \}$
-
-\bigskip
+\noindent
+$\{ c : Cinema | \exists i : \dom bookings | fst(i) = c \land \#
+(bookings(i)) \geq 10 @ c \}$
 
 \section*{Free types and induction}
 
@@ -2356,35 +2288,52 @@ with recursive functions)
 \section*{Solution 52}
 \addcontentsline{toc}{section}{Solution 52}
 
-\noindent Assuming Play == SongId cross UserId
+\begin{zed}UserStatus ::= premium | standard
+\end{zed}
 
-\bigskip
-
-\noindent And $functions : userStatus$ : UserId $\fun$ $\{premium,
-standard\}$, $fst : X cross Y$ $\fun$ X, $snd : X cross Y$ $\fun$ Y
-
-\bigskip
+\begin{axdef}
+  userStatus : UserId \fun UserStatus \\
+  fst : (SongId \cross UserId) \fun SongId \\
+  snd : (SongId \cross UserId) \fun UserId
+\end{axdef}
 
 \subsection*{(a)}
 
-\noindent premiumPlays filters plays to only premium users
-
-\bigskip
+\begin{axdef}
+  premiumPlays : \seq (SongId \cross UserId) \fun \seq (SongId \cross UserId)
+  \where
+  premiumPlays(\langle \rangle) = \langle \rangle \\
+  \forall p : SongId \cross UserId @ \forall ps : \seq (SongId \cross
+  UserId) @ premiumPlays(\langle p \rangle \cat ps) = \IF
+  userStatus(snd(p)) = premium \THEN \langle p \rangle \cat
+  premiumPlays(ps) \ELSE premiumPlays(ps)
+\end{axdef}
 
 \medskip
 
 \subsection*{(b)}
 
-\noindent standardPlays filters plays to only standard users
-
-\bigskip
+\begin{axdef}
+  standardPlays : \seq (SongId \cross UserId) \fun \seq (SongId \cross UserId)
+  \where
+  standardPlays(\langle \rangle) = \langle \rangle \\
+  \forall p : SongId \cross UserId @ \forall ps : \seq (SongId \cross
+  UserId) @ standardPlays(\langle p \rangle \cat ps) = \IF
+  userStatus(snd(p)) = standard \THEN \langle p \rangle \cat
+  standardPlays(ps) \ELSE standardPlays(ps)
+\end{axdef}
 
 \medskip
 
 \subsection*{(c)}
 
-\noindent cumulativeLength sums the lengths of all songs played
-
-\bigskip
+\begin{axdef}
+  cumulativeLength : \seq (SongId \cross UserId) \fun \nat
+  \where
+  cumulativeLength(\langle \rangle) = 0 \\
+  \forall p : SongId \cross UserId @ \forall ps : \seq (SongId \cross
+  UserId) @ cumulativeLength(\langle p \rangle \cat ps) =
+  length(fst(p)) + cumulativeLength(ps)
+\end{axdef}
 
 \end{document}

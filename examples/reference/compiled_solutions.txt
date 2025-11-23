@@ -611,21 +611,23 @@ end
 
 ** Solution 39 **
 
-TEXT: Assuming Collection is defined as a bag (multiset) of coins: Collection == Coin -> N
+given Coin
 
-TEXT: And large is a specific coin denomination.
+axdef
+  large : Coin
+end
 
-TEXT: (a) axdef
-TEXT:   largeCoins : (Coin -> N) -> N
-TEXT: where
-TEXT:   forall c : (Coin -> N); large : Coin | largeCoins(c) = c(large)
-TEXT: end
+(a) axdef
+  largeCoins : (Coin -> N) -> N
+where
+  forall c : (Coin -> N) | largeCoins(c) = c(large)
+end
 
-TEXT: (b) axdef
-TEXT:   addCoin : (Coin -> N) cross Coin -> (Coin -> N)
-TEXT: where
-TEXT:   forall c : (Coin -> N); d : Coin | addCoin(c, d) = c union [[d]]
-TEXT: end
+(b) axdef
+  addCoin : (Coin -> N) cross Coin -> (Coin -> N)
+where
+  forall c : (Coin -> N); d : Coin | addCoin(c, d) = c union {d |-> 1}
+end
 
 === Modelling ===
 
@@ -780,10 +782,6 @@ end
 
 ** Solution 43 **
 
-TEXT: Note: Assuming given types Cinema, Film, Date, Booking and a bookings relation.
-TEXT: The problem statement defines: bookings : (Cinema cross Film) +-> seq Booking
-TEXT: where Booking is a triple of (bookingRef, startDay, endDay) : (N cross N cross N)
-
 given Cinema, Film, Date
 
 schema Booking
@@ -792,29 +790,27 @@ schema Booking
   endDay: N
 end
 
-TEXT: Assuming: bookings : (Cinema cross Film) +-> seq Booking
+axdef
+  bookings : (Cinema cross Film) +-> seq Booking
+  maxDay : Cinema -> N
+  Banbury : Cinema
+end
 
-(a) TEXT: (i) forall i : dom bookings | forall x, y : bookings(i) | x /= y | (x.startDay..x.endDay) intersect (y.startDay..y.endDay) = emptyset
+(a) (i) forall i : dom bookings; x : Booking; y : Booking | x in ran (bookings(i)) and y in ran (bookings(i)) and x /= y => ((x.startDay)..(x.endDay)) intersect ((y.startDay)..(y.endDay)) = emptyset
 
-TEXT: (ii) forall i : dom bookings | forall x : bookings(i) | {x.startDay, x.endDay} subseteq 1..max(fst(i))
+(ii) forall i : dom bookings; x : Booking | x in ran (bookings(i)) => (x.startDay) in (1..(maxDay(fst(i)))) and (x.endDay) in (1..(maxDay(fst(i))))
 
-TEXT: (Note: Assuming max is a function on Cinema that returns the maximum day number)
+(iii) forall i : dom bookings; b : Booking | b in ran (bookings(i)) => b.startDay <= b.endDay
 
-TEXT: (iii) forall i : dom bookings | forall b : bookings(i) | b.startDay <= b.endDay
+(iv) TEXT: This is enforced by the constraint for part (i).
 
-TEXT: (iv) This is enforced by the constraint for part (i).
+(b) (i) {i : dom bookings | fst(i) = Banbury . snd(i)}
 
-(b) TEXT: Assuming Banbury : Cinema and bookings is defined
+(ii) {i : dom bookings | fst(i) = Banbury and exists b : Booking | b in ran (bookings(i)) and 50 in ((b.startDay)..(b.endDay))}
 
-TEXT: (i) {i : dom bookings | fst(i) = Banbury . snd(i)}
+(iii) {i : dom bookings . (fst(i), snd(i))}
 
-TEXT: (ii) {i : dom bookings | fst(i) = Banbury and exists b : bookings(i) | 50 in b.startDay..b.endDay}
-
-TEXT: (iii) Assuming Room is Cinema, returning unique cinema/film pairs:
-
-TEXT: {c : Cinema; f : Film | exists i : dom bookings | fst(i) = c and snd(i) = f . (c, f)}
-
-TEXT: (iv) {c : Cinema | exists i : dom bookings | fst(i) = c | # (bookings(i)) >= 10}
+(iv) {c : Cinema | exists i : dom bookings | fst(i) = c and # (bookings(i)) >= 10 . c}
 
 === Free types and induction ===
 
@@ -964,10 +960,34 @@ end
 
 ** Solution 52 **
 
-TEXT: Assuming Play == SongId cross UserId
+UserStatus ::= premium | standard
 
-TEXT: And functions: userStatus : UserId -> {premium, standard}, fst : X cross Y -> X, snd : X cross Y -> Y
+axdef
+  userStatus : UserId -> UserStatus
+  fst : (SongId cross UserId) -> SongId
+  snd : (SongId cross UserId) -> UserId
+end
 
-TEXT: (a) premiumPlays filters plays to only premium users
-TEXT: (b) standardPlays filters plays to only standard users
-TEXT: (c) cumulativeLength sums the lengths of all songs played
+(a) axdef
+  premiumPlays : seq(SongId cross UserId) -> seq(SongId cross UserId)
+where
+  premiumPlays(<>) = <>
+  forall p : SongId cross UserId; ps : seq(SongId cross UserId) |
+    premiumPlays(<p> ^ ps) = if userStatus(snd(p)) = premium then <p> ^ premiumPlays(ps) else premiumPlays(ps)
+end
+
+(b) axdef
+  standardPlays : seq(SongId cross UserId) -> seq(SongId cross UserId)
+where
+  standardPlays(<>) = <>
+  forall p : SongId cross UserId; ps : seq(SongId cross UserId) |
+    standardPlays(<p> ^ ps) = if userStatus(snd(p)) = standard then <p> ^ standardPlays(ps) else standardPlays(ps)
+end
+
+(c) axdef
+  cumulativeLength : seq(SongId cross UserId) -> N
+where
+  cumulativeLength(<>) = 0
+  forall p : SongId cross UserId; ps : seq(SongId cross UserId) |
+    cumulativeLength(<p> ^ ps) = length(fst(p)) + cumulativeLength(ps)
+end
