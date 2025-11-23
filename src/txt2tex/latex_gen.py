@@ -3373,12 +3373,26 @@ class LaTeXGenerator:
 
         Zed blocks contain standalone predicates, types, or other expressions
         without the visual box styling of axdef/schema.
+
+        Special case: If content is a Document (from abbrev...end blocks),
+        generate each item separately within the zed block.
         """
         lines: list[str] = []
 
         lines.append(r"\begin{zed}")
-        content_latex = self.generate_expr(node.content)
-        lines.append(f"  {content_latex}")
+
+        # Handle Document content (from abbrev blocks)
+        if isinstance(node.content, Document):
+            for item in node.content.items:
+                item_lines = self.generate_document_item(item)
+                for line in item_lines:
+                    if line.strip():  # Skip empty lines
+                        lines.append(f"  {line}")
+        else:
+            # Normal single expression
+            content_latex = self.generate_expr(node.content)
+            lines.append(f"  {content_latex}")
+
         lines.append(r"\end{zed}")
         lines.append("")
 

@@ -596,6 +596,8 @@ class Parser:
             return self._parse_axdef()
         if self._match(TokenType.GENDEF):
             return self._parse_gendef()
+        if self._match(TokenType.ABBREV_BLOCK):
+            return self._parse_abbrev_block()
         if self._match(TokenType.ZED):
             return self._parse_zed()
         if self._match(TokenType.SCHEMA):
@@ -3379,6 +3381,54 @@ class Parser:
             generic_params=generic_params,
             declarations=declarations,
             predicates=predicates,
+            line=start_token.line,
+            column=start_token.column,
+        )
+
+    def _parse_abbrev_block(self) -> Zed:
+        """Parse abbreviation block.
+
+        Abbreviation blocks contain one or more abbreviations.
+        Syntax: abbrev <abbreviations> end
+
+        Each abbreviation: identifier == expression
+
+        Returns a Zed block containing a Document with the abbreviations.
+        """
+        start_token = self._advance()  # Consume 'abbrev'
+        self._skip_newlines()
+
+        items: list[DocumentItem] = []
+
+        # Parse abbreviations until 'end'
+        while not self._at_end() and not self._match(TokenType.END):
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+                continue
+
+            # Parse abbreviation: identifier == expression
+            if self._match(TokenType.IDENTIFIER):
+                items.append(self._parse_abbreviation())
+                self._skip_newlines()
+            else:
+                break
+
+        # Expect 'end'
+        if not self._match(TokenType.END):
+            raise ParserError(
+                "Expected 'end' to close abbrev block", self._current()
+            )
+        self._advance()  # Consume 'end'
+
+        # Wrap abbreviations in a Document, then in a Zed block
+        doc = Document(
+            items=items,
+            line=start_token.line,
+            column=start_token.column,
+        )
+
+        return Zed(
+            content=doc,  # type: ignore[arg-type]
             line=start_token.line,
             column=start_token.column,
         )
