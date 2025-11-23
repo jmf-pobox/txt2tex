@@ -8,7 +8,14 @@
       "Bash(comm:*)",
       "Bash(git ls-tree:*)",
       "Bash(for f in user_guide/25_generic_free_type_workaround user_guide/32_compound_identifiers user_guide/33_function_types user_guide/45_sequence_functions user_guide/50_axdef_basic user_guide/52_anonymous_schema)",
-      "Bash(do echo \"=== Testing $f ===\")"
+      "Bash(do echo \"=== Testing $f ===\")",
+      "Bash(git describe:*)",
+      "WebFetch(domain:)",
+      "Bash(hatch run convert:*)",
+      "Bash(fuzz test_id_generic_raw.tex:*)",
+      "Bash(fuzz:*)",
+      "Bash(hatch run:*)",
+      "Bash(gh issue close:*)"
     ],
     "deny": [],
     "ask": []
