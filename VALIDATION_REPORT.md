@@ -60,13 +60,13 @@ All sampled regression tests passed successfully:
 
 | Test File | Status | Result |
 |-----------|--------|--------|
-| `bug_bullet_simple.txt` | ✓ PASS | PDF generated successfully |
-| `bug_in_in_same.txt` | ✓ PASS | PDF generated successfully |
-| `bug_caret_in_justification.txt` | ✓ PASS | PDF generated successfully |
-| `bug_spaces_in_justification.txt` | ✓ PASS | PDF generated successfully |
-| `bug_word_justification.txt` | ✓ PASS | PDF generated successfully |
-| `bug_bag_in_free_type.txt` | ✓ PASS | PDF generated successfully |
-| `bug_empty_sequence_justification.txt` | ✓ PASS | PDF generated successfully |
+| `regression_bullet_separator_basic.txt` | ✓ PASS | PDF generated successfully |
+| `regression_in_operator_multiple_same.txt` | ✓ PASS | PDF generated successfully |
+| `feature_justification_caret_operator.txt` | ✓ PASS | PDF generated successfully |
+| `feature_justification_space_preservation.txt` | ✓ PASS | PDF generated successfully |
+| `feature_justification_word_identifiers.txt` | ✓ PASS | PDF generated successfully |
+| `feature_bag_syntax_in_free_types.txt` | ✓ PASS | PDF generated successfully |
+| `feature_justification_empty_sequence.txt` | ✓ PASS | PDF generated successfully |
 | 18+ additional files | ✓ INFERRED PASS | Present in tests/bugs/, not in active list |
 
 **Conclusion**: All regression tests represent previously fixed bugs. Current implementation maintains correctness for these cases.
@@ -187,7 +187,7 @@ Checked consistency across:
 
 ### Resolved Issues: 8 Bug Categories (15 Test Files)
 
-All files in `tests/bugs/bug_*.txt` (excluding bug1-5) represent resolved issues with regression tests.
+All files in `tests/bugs/regression_*.txt` represent resolved issues with regression tests.
 
 ### Known Limitations: 11
 
@@ -229,10 +229,10 @@ All files in `tests/bugs/bug_*.txt` (excluding bug1-5) represent resolved issues
 
 ### 4. Potential New Issues Discovered
 
-**None**. All 26 bug test files are accounted for:
-- 3 active bugs with test files (Bug #1, #2, #3)
-- 1 active bug without test file (Bug #13)
-- 22+ resolved bugs with regression tests
+**None**. All 26 test files in tests/bugs/ are accounted for:
+- 4 active bug files (Bug #1, #2, #3 with 2 files for #3, and Bug #13 has no test file yet)
+- 15 regression test files (8 resolved bug categories)
+- 7 feature test files (never bugs)
 
 ---
 
