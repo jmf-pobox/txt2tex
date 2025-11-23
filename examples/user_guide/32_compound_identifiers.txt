@@ -1,15 +1,16 @@
-// Example: Compound Identifiers with Postfix Operators
-// Demonstrates using +, *, ~ in identifier names
+// Example: Multi-Word Identifiers
+// Demonstrates identifiers with numbers and letters
 // From USER_GUIDE.md - Relations section
 
-R+ == {a, b : N | b > a}
+Rplus == {a, b : N | b > a}
 
-R* == R+ union id[N]
+Rstar == Rplus union id N
 
-R~ == inv R
-
-schema S+
+schema S1
   x : N
 end
 
-rel_1+ == {x, y : N | x < y}
+rel1plus == {x, y : N | x < y}
+
+// Note: Postfix operator symbols (+, *, ~) cannot be used as part of
+// identifier names in fuzz. Use descriptive names like "plus" instead

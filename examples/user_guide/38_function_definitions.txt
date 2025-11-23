@@ -21,7 +21,7 @@ where
 end
 
 gendef [X, Y]
-  first : X cross Y -> X
+  proj1 : X cross Y -> X
 where
-  forall x : X; y : Y | first(x, y) = x
+  forall x : X; y : Y | proj1(x, y) = x
 end

@@ -1,15 +1,15 @@
-// Example: Sequence Functions
-// Demonstrates head, tail, last, front, rev
+// Example: Sequence Types
+// Demonstrates sequence type declarations
 // From USER_GUIDE.md - Sequences section
 
 given X
 
 axdef
   s : seq X
+  t : seq X
 where
-  head s = head s and
-  tail s = tail s and
-  last s = last s and
-  front s = front s and
-  rev s = rev s
+  s ^ t = s ^ t
 end
+
+// Note: Sequence functions (head, tail, last, front, rev) are not
+// included in the fuzz standard library and must be defined if needed

@@ -8,14 +8,11 @@ where
   population > 0
 end
 
-axdef [T]
-  identity : T
-where
-  identity = identity
-end
-
 axdef
   x : N; y : N
 where
   x > y
 end
+
+// Note: Generic axdef (axdef [T]) is not supported by fuzz
+// Use gendef for generic definitions instead
