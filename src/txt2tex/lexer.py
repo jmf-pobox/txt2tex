@@ -994,6 +994,14 @@ class Lexer:
             "Hence",
             "Thus",
             "Therefore",
+            "Show",
+            "Prove",
+            "Verify",
+            "Check",
+            "Using",
+            "Calculate",
+            "Find",
+            "Determine",
             # Phase 24: Common contractions
             "Let's",
             "It's",
@@ -1026,7 +1034,20 @@ class Lexer:
 
         # Prose detection at column 1 OR after whitespace (for prose after part labels)
         # BUT NOT inside solution markers (** ... **) to avoid consuming closing **
+        # AND NOT in section headers (lines containing ===)
         if value in prose_starters and not self._in_solution_marker:
+            # Check if the rest of the line contains "===" (section header)
+            temp_pos = self.pos
+            while temp_pos < len(self.text) and self.text[temp_pos] != "\n":
+                if (
+                    temp_pos + 2 < len(self.text)
+                    and self.text[temp_pos : temp_pos + 3] == "==="
+                ):
+                    # This is a section header, not prose
+                    # Return as regular identifier
+                    return Token(TokenType.IDENTIFIER, value, start_line, start_column)
+                temp_pos += 1
+
             # Looks like prose, capture whole line
             text_start = start_pos
 
