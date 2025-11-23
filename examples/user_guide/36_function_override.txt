@@ -1,0 +1,14 @@
+// Example: Function Override
+// Demonstrates override operator
+// From USER_GUIDE.md - Functions section
+
+given X, Y
+
+axdef
+  f : X -> Y
+  g : X -> Y
+  h : X -> Y
+where
+  f ++ g = g
+  f ++ g ++ h = h
+end

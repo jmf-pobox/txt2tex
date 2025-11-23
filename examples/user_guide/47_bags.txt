@@ -1,0 +1,9 @@
+// Example: Bags
+// Demonstrates bag literals and bag union
+// From USER_GUIDE.md - Sequences section
+
+b1 == [[a, b, c]]
+
+b2 == [[x, x, y]]
+
+b3 == b1 bag_union b2

@@ -1,0 +1,8 @@
+// Example: Simple Proof Tree
+// Demonstrates basic proof structure with assumption
+// From USER_GUIDE.md - Proof Trees section
+
+PROOF:
+p and q => p [=> intro from 1]
+  [1] p and q [assumption]
+      p [and elim 1]

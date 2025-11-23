@@ -1,0 +1,12 @@
+// Example: Manual Bibliography with LATEX blocks
+// Demonstrates manual bibliography formatting in Harvard style
+// From USER_GUIDE.md - Text Blocks section
+
+LATEX: \setlength{\leftskip}{0pt}
+LATEX: \begin{thebibliography}{Simpson, n.d.}
+LATEX:
+LATEX: \bibitem[Simpson, 2025a]{simpson25a} Simpson, A. (2025a). \textit{Introduction and propositions}. Lecture 01.
+LATEX:
+LATEX: \bibitem[Woodcock and Davies, 1996]{woodcock96} Woodcock, J. and Davies, J. (1996). \textit{Using Z}. Prentice Hall.
+LATEX:
+LATEX: \end{thebibliography}

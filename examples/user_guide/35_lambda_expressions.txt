@@ -1,0 +1,13 @@
+// Example: Lambda Expressions
+// Demonstrates lambda syntax with single and multiple variables
+// From USER_GUIDE.md - Functions section
+
+lambda x : N . x^2
+
+lambda f : X -> Y . f(x)
+
+lambda x, y : N . x + y
+
+lambda a, b, c : Z . a
+
+lambda x : X . lambda y : Y . (x, y)

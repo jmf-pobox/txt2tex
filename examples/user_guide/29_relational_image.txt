@@ -1,0 +1,11 @@
+// Example: Relational Image
+// Demonstrates relational image operator
+// From USER_GUIDE.md - Relations section
+
+R(| S |)
+
+parentOf(| {john} |)
+
+R(| {1, 2, 3} |)
+
+(R o9 S)(| A |)

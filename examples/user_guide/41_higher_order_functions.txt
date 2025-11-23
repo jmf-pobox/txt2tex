@@ -1,0 +1,10 @@
+// Example: Higher-Order Functions
+// Demonstrates functions that take functions as arguments
+// From USER_GUIDE.md - Functions section
+
+gendef [X, Y, Z]
+  compose : (Y -> Z) cross (X -> Y) -> (X -> Z)
+where
+  forall f : Y -> Z; g : X -> Y; x : X |
+    compose(f, g)(x) = f(g(x))
+end

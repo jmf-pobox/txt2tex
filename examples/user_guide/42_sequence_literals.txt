@@ -1,0 +1,9 @@
+// Example: Sequence Literals
+// Demonstrates empty sequences and sequence literals
+// From USER_GUIDE.md - Sequences section
+
+<>
+
+<a>
+
+<a, b, c>

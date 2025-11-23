@@ -1,0 +1,21 @@
+// Example: Set Notation Basics
+// Demonstrates set literals, membership, and relations
+// From USER_GUIDE.md - Sets and Types section
+
+{1, 2, 3}
+
+{}
+
+x in A
+
+x notin B
+
+A subset B
+
+A psubset B
+
+A union B
+
+A intersect C
+
+A \ B

@@ -1,0 +1,9 @@
+// Example: Quantifiers with Bullet Separator
+// Demonstrates constraint | body . conclusion syntax
+// From USER_GUIDE.md - Predicate Logic section
+
+forall x : N | x > 0 . x < 10
+
+exists y : Z | y < 0 . y > -10
+
+exists1 x : N | x * x = 4 . x > 0

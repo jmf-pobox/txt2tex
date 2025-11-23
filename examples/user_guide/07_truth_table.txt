@@ -1,0 +1,10 @@
+// Example: Truth Tables
+// Demonstrates TRUTH TABLE: syntax for propositional logic
+// From USER_GUIDE.md - Propositional Logic section
+
+TRUTH TABLE:
+p | q | p => q
+T | T | T
+T | F | F
+F | T | T
+F | F | T

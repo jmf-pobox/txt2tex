@@ -1,0 +1,7 @@
+// Example: Range Operator
+// Demonstrates 'up to' range operator
+// From USER_GUIDE.md - Functions section
+
+1..10
+
+1993..current

@@ -1,0 +1,15 @@
+// Example: Generic Definitions - Basic
+// Demonstrates basic gendef with single and multiple type parameters
+// From USER_GUIDE.md - Definitions section
+
+gendef [X, Y]
+  fst : X cross Y -> X
+where
+  forall x : X; y : Y | fst(x, y) = x
+end
+
+gendef [X]
+  identity : X -> X
+where
+  forall x : X | identity(x) = x
+end

@@ -1,0 +1,17 @@
+// Example: Power Sets and Cardinality
+// Demonstrates power set, finite set, and cardinality
+// From USER_GUIDE.md - Sets and Types section
+
+P S
+
+P1 S
+
+F S
+
+P (A cross B)
+
+P (Z cross Z)
+
+// S
+
+// {1, 2, 3}

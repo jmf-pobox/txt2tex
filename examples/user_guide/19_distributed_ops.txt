@@ -1,0 +1,7 @@
+// Example: Distributed Union and Intersection
+// Demonstrates bigcup and bigcap operators
+// From USER_GUIDE.md - Sets and Types section
+
+bigcup S
+
+bigcap S

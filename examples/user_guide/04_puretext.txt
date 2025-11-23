@@ -1,0 +1,6 @@
+// Example: PURETEXT blocks for raw text
+// Demonstrates PURETEXT: with LaTeX escaping but no formula detection
+// From USER_GUIDE.md - Text Blocks section
+
+PURETEXT: Simpson, A. (2025) "Lecture notes" & references.
+PURETEXT: Author's name, "quoted text", and more.

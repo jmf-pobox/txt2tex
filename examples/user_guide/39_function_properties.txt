@@ -1,0 +1,19 @@
+// Example: Function Properties - Injective and Surjective
+// Demonstrates injective and surjective function definitions
+// From USER_GUIDE.md - Functions section
+
+given StudentId, Student
+
+axdef
+  studentRecord : StudentId >-> Student
+where
+  forall id1, id2 : StudentId |
+    id1 != id2 => studentRecord(id1) != studentRecord(id2)
+end
+
+axdef
+  modulo3 : N -->> {0, 1, 2}
+where
+  forall n : N | modulo3(n) = n mod 3 and
+  forall r : {0, 1, 2} | exists n : N | modulo3(n) = r
+end

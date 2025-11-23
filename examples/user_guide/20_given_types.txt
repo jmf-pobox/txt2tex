@@ -1,0 +1,5 @@
+// Example: Given Types (Basic Type Definition)
+// Demonstrates given type declarations
+// From USER_GUIDE.md - Definitions section
+
+given Person, Company

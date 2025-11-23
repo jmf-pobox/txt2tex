@@ -1,0 +1,10 @@
+// Example: Recursive Function on Sequences
+// Demonstrates recursive function using pattern matching
+// From USER_GUIDE.md - Functions section
+
+gendef [X]
+  length : seq X -> N
+where
+  length(<>) = 0 and
+  forall x : X; s : seq X | length(<x> ^ s) = 1 + length(s)
+end

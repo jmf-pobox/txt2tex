@@ -1,0 +1,9 @@
+// Example: Free Types
+// Demonstrates simple and recursive free type definitions
+// From USER_GUIDE.md - Definitions section
+
+Status ::= active | inactive | pending
+
+Tree ::= stalk | leaf<N> | branch<Tree cross Tree>
+
+List ::= nil | cons<N cross List>
