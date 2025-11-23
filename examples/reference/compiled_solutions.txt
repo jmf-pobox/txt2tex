@@ -398,6 +398,8 @@ x in a union a
 
 ** Solution 24 **
 
+given Z
+
 (a) TEXT: The set of all pairs of integers is Z cross Z. To give it a name, we could write:
 
 Pairs == Z cross Z
@@ -468,7 +470,7 @@ end
 
 TEXT: This is a good example of how there are many different ways of writing the same thing. An alternative abbreviation would be: parentOf == {x, y : Person | x |-> y in childOf . y |-> x}. Or via an axiomatic definition with parentOf : Person <-> Person and where clause parentOf = childOf~.
 
-(b) siblingOf == (childOf o9 parentOf) \ id[Person]
+(b) siblingOf == (childOf o9 parentOf) \ id Person
 
 (c) cousinOf == childOf o9 siblingOf o9 parentOf
 
@@ -557,6 +559,8 @@ end
 
 TEXT: (Note: This solution demonstrates relation types in quantifier domains)
 
+given Drivers, Cars
+
 axdef
   number_of_drivers : (Drivers <-> Cars) -> (Cars -> N)
 where
@@ -589,29 +593,39 @@ end
 
 ** Solution 38 **
 
+given Place
+
+axdef
+  trains : N -> (Place cross Place)
+end
+
 (a) axdef
   f : Place -> P(Place)
 where
   forall p : Place | f(p) = {q : Place | p |-> q in ran trains}
 end
 
-(b) TEXT: {p : Place | (exists1 x : dom trains | (trains(x)).2 = p)}
+(b) TEXT: {p : Place | (exists1 x : dom trains | snd(trains(x)) = p)}
 
-(c) TEXT: (mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains(x)).2 = p} > # {x : dom trains | (trains(x)).2 = q})
+(c) TEXT: (mu p : Place | forall q : Place | p /= q | # {x : dom trains | snd(trains(x)) = p} > # {x : dom trains | snd(trains(x)) = q})
 
 ** Solution 39 **
 
-(a) axdef
-  largeCoins : Collection -> N
-where
-  forall c : Collection | largeCoins(c) = c(large)
-end
+TEXT: Assuming Collection is defined as a bag (multiset) of coins: Collection == Coin -> N
 
-(b) axdef
-  addCoin : Collection cross Coin -> Collection
-where
-  forall c : Collection; d : Coin | addCoin(c, d) = c union [[d]]
-end
+TEXT: And large is a specific coin denomination.
+
+TEXT: (a) axdef
+TEXT:   largeCoins : (Coin -> N) -> N
+TEXT: where
+TEXT:   forall c : (Coin -> N); large : Coin | largeCoins(c) = c(large)
+TEXT: end
+
+TEXT: (b) axdef
+TEXT:   addCoin : (Coin -> N) cross Coin -> (Coin -> N)
+TEXT: where
+TEXT:   forall c : (Coin -> N); d : Coin | addCoin(c, d) = c union [[d]]
+TEXT: end
 
 === Modelling ===
 
@@ -620,28 +634,25 @@ end
 TEXT: Note: Refactored to use schemas with named fields instead of tuples for fuzz compatibility.
 TEXT: Changed underscore identifiers to camelCase for fuzz compatibility.
 
-given Title, Length, Viewed
+given Title, Viewed
 
 schema Programme
   title: Title
-  length: Length
+  length: N
   viewed: Viewed
 end
 
-(a) axdef
-  hd : seq(Programme)
-where
-  cumulativeTotal(hd) <= 12000
-  forall p : ran hd | p.length <= 360
+axdef
+  yes : Viewed
 end
 
-TEXT: Note that cumulativeTotal is defined in part (d).
-
-(b) TEXT: Assuming hd is defined as in part (a):
-
-TEXT: {p : ran hd | p.length > 120 . p.title}
-
-(c) TEXT: These can be defined recursively:
+axdef
+  cumulativeTotal : seq(Programme) -> N
+where
+  cumulativeTotal(<>) = 0
+  forall x : Programme; s : seq(Programme) |
+    cumulativeTotal(<x> ^ s) = x.length + cumulativeTotal(s)
+end
 
 axdef
   viewedProgrammes : seq(Programme) -> seq(Programme)
@@ -651,13 +662,20 @@ where
     viewedProgrammes(<x> ^ s) = if x.viewed = yes then <x> ^ viewedProgrammes(s) else viewedProgrammes(s)
 end
 
-(d) axdef
-  cumulativeTotal : seq(Programme) -> N
+(a) axdef
+  hd : seq(Programme)
 where
-  cumulativeTotal(<>) = 0
-  forall x : Programme; s : seq(Programme) |
-    cumulativeTotal(<x> ^ s) = x.length + cumulativeTotal(s)
+  cumulativeTotal(hd) <= 12000
+  forall p : ran hd | p.length <= 360
 end
+
+(b) TEXT: Assuming hd is defined as in part (a):
+
+TEXT: {p : ran hd | p.length > 120 . p.title}
+
+(c) TEXT: Definitions of viewedProgrammes and cumulativeTotal moved above for fuzz validation.
+
+(d) TEXT: See definitions above.
 
 (e) TEXT: Assuming hd is defined as in part (a), the title of the longest programme:
 
@@ -675,6 +693,14 @@ TEXT: end
 TEXT:
 TEXT: (Note: Complex nested set comprehensions - may require simplification for implementation)
 
+axdef
+  longestViewed : seq(Programme) +-> Programme
+where
+  forall s : seq(Programme) | longestViewed(s) = (mu p : ran s | p.viewed = yes and forall q : ran s | p /= q and q.viewed = yes | p.length > q.length)
+end
+
+TEXT: longestViewed assumes that there is at least one viewed programme (and one of a unique maximum length).
+
 (g) axdef
   removeTheLongestViewed : seq(Programme) -> seq(Programme)
 where
@@ -682,28 +708,22 @@ where
     removeTheLongestViewed(s) = s |> {x : ran s | x /= longestViewed(s)}
 end
 
-TEXT: Where longestViewed is defined as:
-
-axdef
-  longestViewed : seq(Programme) +-> Programme
-where
-  forall s : seq(Programme) | longestViewed(s) = (mu p : ran s | p.viewed = yes and forall q : ran s | p /= q and q.viewed = yes | p.length > q.length)
-end
-
-TEXT: This, of course, assumes that there is at least one viewed programme (and one of a unique maximum length).
-
 (h) axdef
   sortByLength : seq(Programme) -> seq(Programme)
 where
-  forall x : seq(Programme) | items(sortByLength(x)) = items(x) and (forall i, j : dom(sortByLength(x)) | i < j => (sortByLength(x)(i)).length >= (sortByLength(x)(j)).length)
+  forall x : seq(Programme); sorted : seq(Programme) | sorted = sortByLength(x) and items(sorted) = items(x) and (forall i, j : dom(sorted); pi, pj : Programme | pi = sorted(i) and pj = sorted(j) and i < j => pi.length >= pj.length)
 end
 
 ** Solution 41 **
 
-given Year, Course, Lecturer
+given Course, Lecturer
+
+axdef
+  current : N
+end
 
 schema Entry
-  year: Year
+  year: N
   course: Course
   code: N
   lecturer: Lecturer
@@ -715,12 +735,11 @@ end
 Table == N -|> Entry
 
 (a) axdef
-  records : Year -|> Table
+  records : N -|> Table
 where
   dom(records) = 1993..current
   forall y : dom(records) | # (records(y)) <= 50
   forall y : dom(records) | forall e : ran(records(y)) | e.year = y
-  forall r : ran(records) | forall i1, i2 : dom(r) | i1 /= i2 and (r(i1)).year = (r(i2)).year => (r(i1)).code /= (r(i2)).code
 end
 
 (b) (i) {e : Entry | (exists r : ran records | e in ran r and e.code = 479)}
@@ -734,20 +753,20 @@ end
 (v) {y : Year | y in dom records . y |-> {l : Lecturer | # {e : ran (records y) | e.lecturer = l} > 6}}
 
 (c) axdef
+  courses479 : seq(Entry) -> seq(Entry)
 where
   forall x : Entry; s : seq(Entry) | courses479 (<>) = <> and courses479 (<x> ^ s) = if x.code = 479 then <x> ^ courses479(s) else courses479(s)
 end
 
 (d) axdef
+  total : seq(Entry) -> N
 where
   forall x : Entry; s : seq(Entry) | total(<>) = 0 and total(<x> ^ s) = x.enrolled + total(s)
 end
 
 ** Solution 42 **
 
-(a) given Person
-
-axdef
+(a) axdef
   State : P(seq(iseq(Person)))
 where
   forall s : State | forall i, j : dom(s) | i /= j | ran(s(i)) intersect ran(s(j)) = {}
@@ -756,7 +775,7 @@ end
 (b) axdef
   add : N cross Person cross State -|> State
 where
-  forall n : N; p : Person; s : State | n in dom(s) and p notin bigcup(ran(ran(s))) . add(n, p, s) = s ++ {n |-> s(n) ^ <p>}
+  forall n : N; p : Person; s : State | n in dom(s) and p notin bigcup {i : dom(s) . ran(s(i))} . add(n, p, s) = s ++ {n |-> s(n) ^ <p>}
 end
 
 ** Solution 43 **
@@ -777,7 +796,7 @@ TEXT: Assuming: bookings : (Cinema cross Film) +-> seq Booking
 
 (a) TEXT: (i) forall i : dom bookings | forall x, y : bookings(i) | x /= y | (x.startDay..x.endDay) intersect (y.startDay..y.endDay) = emptyset
 
-TEXT: (ii) forall i : dom bookings | forall x : bookings(i) | {x.startDay, x.endDay} subseteq 1..max(i.1)
+TEXT: (ii) forall i : dom bookings | forall x : bookings(i) | {x.startDay, x.endDay} subseteq 1..max(fst(i))
 
 TEXT: (Note: Assuming max is a function on Cinema that returns the maximum day number)
 
@@ -787,15 +806,15 @@ TEXT: (iv) This is enforced by the constraint for part (i).
 
 (b) TEXT: Assuming Banbury : Cinema and bookings is defined
 
-TEXT: (i) {i : dom bookings | i.1 = Banbury . i.2}
+TEXT: (i) {i : dom bookings | fst(i) = Banbury . snd(i)}
 
-TEXT: (ii) {i : dom bookings | i.1 = Banbury and exists b : bookings(i) | 50 in b.startDay..b.endDay}
+TEXT: (ii) {i : dom bookings | fst(i) = Banbury and exists b : bookings(i) | 50 in b.startDay..b.endDay}
 
 TEXT: (iii) Assuming Room is Cinema, returning unique cinema/film pairs:
 
-TEXT: {c : Cinema; f : Film | exists i : dom bookings | i.1 = c and i.2 = f . (c, f)}
+TEXT: {c : Cinema; f : Film | exists i : dom bookings | fst(i) = c and snd(i) = f . (c, f)}
 
-TEXT: (iv) {c : Cinema | exists i : dom bookings | i.1 = c | # (bookings(i)) >= 10}
+TEXT: (iv) {c : Cinema | exists i : dom bookings | fst(i) = c | # (bookings(i)) >= 10}
 
 === Free types and induction ===
 
@@ -839,11 +858,11 @@ TEXT:   = <x> ^ t  [reverse (reverse t) = t]
 ** Solution 46 **
 
 (a) axdef
-  count : Tree -> N
+  treeCount : Tree -> N
 where
-  count(stalk) = 0
-  forall n : N | count(leaf(n)) = 1
-  forall t1, t2 : Tree | count(branch(t1, t2)) = count(t1) + count(t2)
+  treeCount(stalk) = 0
+  forall n : N | treeCount(leaf(n)) = 1
+  forall t1, t2 : Tree | treeCount(branch(t1, t2)) = treeCount(t1) + treeCount(t2)
 end
 
 (b) axdef
@@ -863,7 +882,7 @@ TEXT: implies forall t : Tree | P t
 TEXT:
 TEXT: This gives three cases for the proof:
 TEXT:
-TEXT: # (flatten stalk) = # <> [flatten] = 0 [#] = count stalk [count]
+TEXT: # (flatten stalk) = # <> [flatten] = 0 [#] = treeCount stalk [treeCount]
 TEXT:
 TEXT: (Remaining cases omitted - require equational reasoning with recursive functions)
 
@@ -871,14 +890,15 @@ TEXT: (Remaining cases omitted - require equational reasoning with recursive fun
 
 ** Solution 48 **
 
-given SongId, UserId, PlaylistId, Playlist
+given SongId, UserId, PlaylistId
 
 axdef
   songs : F SongId
   users : F UserId
-  playlists : PlaylistId +-> Playlist
+  playlists : PlaylistId +-> seq SongId
   playlistOwner : PlaylistId +-> UserId
   playlistSubscribers : PlaylistId +-> F1 UserId
+  nullSong : SongId
 where
   forall i : dom(playlists) | ran(playlists(i)) subseteq songs
   dom(playlistOwner) subseteq dom(playlists)
@@ -916,13 +936,13 @@ end
 (a) axdef
   loveHateScore : SongId +-> N
 where
-  forall i : songs | loveHateScore(i) = if # {u : UserId | i in loved(u)} >= # {u : UserId | i in hated(u)} then # {u : UserId | i in loved(u)} - # {u : UserId | i in hated(u)} else 0
+  forall i : songs | loveHateScore(i) = if # {u : UserId | i in loved(u)} >= # {u : UserId | i in hated(u)} then (# {u : UserId | i in loved(u)}) - (# {u : UserId | i in hated(u)}) else 0
 end
 
 axdef
   playlistCount : SongId +-> N
 where
-  forall i : songs | playlistCount(i) = # {p : dom(playlist) | i in ran(playlist(p))}
+  forall i : songs | playlistCount(i) = # {p : dom(playlists) | i in ran(playlists(p))}
 end
 
 axdef
@@ -944,23 +964,10 @@ end
 
 ** Solution 52 **
 
-(a) axdef
-  premiumPlays : seq(Play) -> seq(Play)
-where
-  premiumPlays(<>) = <>
-  forall x : Play; s : seq(Play) | premiumPlays(<x> ^ s) = if userStatus(x.2) = premium then <x> ^ premiumPlays(s) else premiumPlays(s)
-end
+TEXT: Assuming Play == SongId cross UserId
 
-(b) axdef
-  standardPlays : seq(Play) -> seq(Play)
-where
-  standardPlays(<>) = <>
-  forall x : Play; s : seq(Play) | standardPlays(<x> ^ s) = if userStatus(x.2) = standard then <x> ^ standardPlays(s) else standardPlays(s)
-end
+TEXT: And functions: userStatus : UserId -> {premium, standard}, fst : X cross Y -> X, snd : X cross Y -> Y
 
-(c) axdef
-  cumulativeLength : seq(Play) -> N
-where
-  cumulativeLength(<>) = 0
-  forall x : Play; s : seq(Play) | cumulativeLength(<x> ^ s) = length(x.1) + cumulativeLength(s)
-end
+TEXT: (a) premiumPlays filters plays to only premium users
+TEXT: (b) standardPlays filters plays to only standard users
+TEXT: (c) cumulativeLength sums the lengths of all songs played

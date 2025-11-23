@@ -19,17 +19,17 @@ PDF_FILES := $(TXT_FILES:.txt=.pdf)
 
 # Subdirectory targets
 SUBDIRS := 01_propositional_logic 02_predicate_logic 03_equality 04_proof_trees \
-           05_sets 06_definitions 07_relations 08_functions 09_sequences fuzz_tests
+           05_sets 06_definitions 07_relations 08_functions 09_sequences fuzz_tests 
 
 # Set default goal to build all PDFs
 .DEFAULT_GOAL := all
 
-# Reference directory (special - continues despite fuzz validation errors)
-# Note: All directories use fuzz validation, but reference allows known errors (tuple projections, etc.)
+# Reference directory (with fuzz validation)
+# Note: Semantic errors (undeclared identifiers, type mismatches) are expected
 .PHONY: reference
 reference:
-	@echo "Building reference/compiled_solutions.pdf with fuzz validation..."
-	@cd .. && hatch run convert examples/reference/compiled_solutions.txt --fuzz || true
+	@echo "Building reference/compiled_solutions.pdf (with fuzz validation)..."
+	@cd .. && hatch run convert examples/reference/compiled_solutions.txt --fuzz
 	@if [ -f reference/compiled_solutions.pdf ]; then \
 		echo "✓ Successfully built reference/compiled_solutions.pdf"; \
 	else \
@@ -57,7 +57,7 @@ $(SUBDIRS):
 	done
 
 # Convenient short aliases
-.PHONY: 01 02 03 04 05 06 07 08 09
+.PHONY: 01 02 03 04 05 06 07 08 09 fuzz ref
 01: 01_propositional_logic
 02: 02_predicate_logic
 03: 03_equality
@@ -67,6 +67,8 @@ $(SUBDIRS):
 07: 07_relations
 08: 08_functions
 09: 09_sequences
+fuzz: fuzz_tests
+ref: reference
 
 # Clean auxiliary files in all subdirectories
 .PHONY: clean
@@ -100,6 +102,8 @@ list:
 	@echo "  07_relations           - Build examples in 07_relations/"
 	@echo "  08_functions           - Build examples in 08_functions/"
 	@echo "  09_sequences           - Build examples in 09_sequences/"
+	@echo "  fuzz_tests / fuzz      - Build examples in fuzz_tests/"
+	@echo "  reference / ref        - Build reference/compiled_solutions.pdf"
 	@echo "  clean                  - Remove auxiliary files"
 	@echo "  distclean              - Remove all generated files"
 	@echo "  list                   - Show this help"

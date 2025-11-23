@@ -1,1008 +1,1013 @@
 \documentclass[a4paper,10pt,fleqn]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
 \begin{document}
 
 \section*{Propositional logic}
 
-\bigskip
-\noindent
-\textbf{Solution 1}
+\section*{Solution 1}
+\addcontentsline{toc}{section}{Solution 1}
 
-\medskip
-
-\noindent
-\hangindent=2em
-(a) $false(as(true \implies false) \iff false)$
-
-\medskip
-\noindent
-\hangindent=2em
-(b) $true(as(false \implies false) \iff true)$
-
-\medskip
-\noindent
-\hangindent=2em
-(c) $true(as(false \implies true) \iff true)$
-
-\medskip
-\noindent
-\hangindent=2em
-(d) $true(as(false \implies false) \iff true)$
-
-\bigskip
-
-(Assuming that pigs can't fly . . . )
-
-\bigskip
-
-\medskip
-
-\bigskip
-\noindent
-\textbf{Solution 2}
-
-\medskip
-
-(a)
-\par
-\vspace{11pt}
-\begin{tabular}{c|c|c|c}
-  $p$ & $q$ & $p \land q$ & $\mathbf{( p \land q ) \Rightarrow p}$ \\
-  \hline
-  \textit{t} & \textit{t} & \textit{t} & \textbf{t} \\
-  \textit{t} & \textit{f} & \textit{f} & \textbf{t} \\
-  \textit{f} & \textit{t} & \textit{f} & \textbf{t} \\
-  \textit{f} & \textit{f} & \textit{f} & \textbf{t} \\
-\end{tabular}
-
-\medskip
-
-(b)
-\par
-\vspace{11pt}
-\begin{tabular}{c|c|c|c|c|c}
-  $p$ & $q$ & $p \land q$ & $\lnot p$ & $\lnot p \Rightarrow ( p
-  \land q )$ & $\mathbf{( \lnot p \Rightarrow ( p \land q ) )
-  \Leftrightarrow p}$ \\
-  \hline
-  \textit{t} & \textit{t} & \textit{t} & \textit{f} & \textit{t} & \textbf{t} \\
-  \textit{t} & \textit{f} & \textit{f} & \textit{f} & \textit{t} & \textbf{t} \\
-  \textit{f} & \textit{t} & \textit{f} & \textit{t} & \textit{f} & \textbf{t} \\
-  \textit{f} & \textit{f} & \textit{f} & \textit{t} & \textit{f} & \textbf{t} \\
-\end{tabular}
-
-\medskip
-
-(c)
-\par
-\vspace{11pt}
-\begin{tabular}{c|c|c|c|c}
-  $p$ & $q$ & $p \Rightarrow q$ & $p \land ( p \Rightarrow q )$ &
-  $\mathbf{( p \land ( p \Rightarrow q ) ) \Rightarrow q}$ \\
-  \hline
-  \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textbf{t} \\
-  \textit{t} & \textit{f} & \textit{f} & \textit{f} & \textbf{t} \\
-  \textit{f} & \textit{t} & \textit{t} & \textit{f} & \textbf{t} \\
-  \textit{f} & \textit{f} & \textit{t} & \textit{f} & \textbf{t} \\
-\end{tabular}
-
-\medskip
-
-\bigskip
-\noindent
-\textbf{Solution 3}
-
-\medskip
-
-(a)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & p \implies \lnot p \\
-    &\Leftrightarrow \lnot p \lor \lnot p & [\mbox{$\Rightarrow$}] \\
-    &\Leftrightarrow \lnot p & [\mbox{idempotence}]
-  \end{array}
-\]
-
-\medskip
-
-(b)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & \lnot p \implies p \\
-    &\Leftrightarrow \lnot \lnot p \lor p & [\mbox{$\Rightarrow$}] \\
-    &\Leftrightarrow p \lor p & [\mbox{$\lnot$ $\lnot$}] \\
-    &\Leftrightarrow p & [\mbox{idempotence}]
-  \end{array}
-\]
-
-\medskip
-
-(c)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & p \implies (q \implies r) \\
-    &\Leftrightarrow \lnot p \lor (q \implies r) & [\mbox{$\Rightarrow$}] \\
-    &\Leftrightarrow \lnot p \lor (\lnot q \lor r) & [\mbox{$\Rightarrow$}] \\
-    &\Leftrightarrow (\lnot p \lor \lnot q) \lor r & [\mbox{associativity}] \\
-    &\Leftrightarrow \lnot (p \land q) \lor r & [\mbox{De Morgan}] \\
-    &\Leftrightarrow (p \land q) \implies r & [\mbox{$\Rightarrow$}]
-  \end{array}
-\]
-
-\medskip
-
-(d)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & q \implies (p \implies r) \\
-    &\Leftrightarrow \lnot q \lor (p \implies r) & [\mbox{$\Rightarrow$}] \\
-    &\Leftrightarrow \lnot q \lor (\lnot p \lor r) & [\mbox{$\Rightarrow$}] \\
-    &\Leftrightarrow \lnot p \lor (\lnot q \lor r) &
-    [\mbox{associativity $\land$ commutativity}] \\
-    &\Leftrightarrow \lnot p \lor (q \implies r) & [\mbox{$\Rightarrow$}] \\
-    &\Leftrightarrow p \implies (q \implies r) & [\mbox{$\Rightarrow$}]
-  \end{array}
-\]
-
-\medskip
-
-(e)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & ((p \land q) \Leftrightarrow p) \\
-    &\Leftrightarrow ((p \land q) \implies p) \land (p \implies (p
-    \land q)) & [\mbox{$\Leftrightarrow$}] \\
-    &\Leftrightarrow (\lnot (p \land q) \lor p) \land (\lnot p \lor
-    (p \land q)) & [\mbox{$\Rightarrow$}] \\
-    &\Leftrightarrow ((\lnot p \lor \lnot q) \lor p) \land (\lnot p
-    \lor (p \land q)) & [\mbox{De Morgan}] \\
-    &\Leftrightarrow (\lnot q \lor (\lnot p \lor p)) \land (\lnot p
-    \lor (p \land q)) & [\mbox{associativity $\land$ comm .}] \\
-    &\Leftrightarrow (\lnot q \lor true) \land (\lnot p \lor (p \land
-    q)) & [\mbox{excluded middle}] \\
-    &\Leftrightarrow true \land (\lnot p \lor (p \land q)) &
-    [\mbox{$\lor$ $\land$ true}] \\
-    &\Leftrightarrow \lnot p \lor (p \land q) & [\mbox{$\land$ $\land$ true}] \\
-    &\Leftrightarrow (\lnot p \lor p) \land (\lnot p \lor q) &
-    [\mbox{distribution}] \\
-    &\Leftrightarrow true \land (\lnot p \lor q) & [\mbox{excluded middle}] \\
-    &\Leftrightarrow \lnot p \lor q & [\mbox{$\land$ $\land$ true}] \\
-    &\Leftrightarrow p \implies q & [\mbox{$\Rightarrow$}]
-  \end{array}
-\]
-
-\medskip
-
-(f)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & ((p \lor q) \Leftrightarrow p) \\
-    &\Leftrightarrow ((p \lor q) \implies p) \land (p \implies (p
-    \lor q)) & [\mbox{$\Leftrightarrow$}] \\
-    &\Leftrightarrow (\lnot (p \lor q) \lor p) \land (\lnot p \lor (p
-    \lor q)) & [\mbox{$\Rightarrow$}] \\
-    &\Leftrightarrow ((\lnot p \land \lnot q) \lor p) \land (\lnot p
-    \lor (p \lor q)) & [\mbox{De Morgan}] \\
-    &\Leftrightarrow ((\lnot p \lor p) \land (\lnot q \lor p)) \land
-    (\lnot p \lor (p \lor q)) & [\mbox{distribution}] \\
-    &\Leftrightarrow (true \land (\lnot q \lor p)) \land (\lnot p
-    \lor (p \lor q)) & [\mbox{excluded middle}] \\
-    &\Leftrightarrow (\lnot q \lor p) \land (\lnot p \lor (p \lor q))
-    & [\mbox{$\land$ $\land$ true}] \\
-    &\Leftrightarrow (\lnot q \lor p) \land ((\lnot p \lor p) \lor q)
-    & [\mbox{associativity}] \\
-    &\Leftrightarrow (\lnot q \lor p) \land (true \lor q) &
-    [\mbox{excluded middle}] \\
-    &\Leftrightarrow (\lnot q \lor p) \land true & [\mbox{$\lor$
-    $\land$ true}] \\
-    &\Leftrightarrow (\lnot q \lor p) & [\mbox{$\land$ $\land$ true}] \\
-    &\Leftrightarrow q \implies p & [\mbox{$\Rightarrow$}]
-  \end{array}
-\]
-
-\medskip
-
-\bigskip
-\noindent
-\textbf{Solution 4}
-
-\medskip
+\subsection*{(a)}
 
 \noindent
-\hangindent=2em
-(a) $(p \lor q)$ $\Leftrightarrow$ $((\lnot p \lor \lnot q) \land q)$
-is $\lnot a$ tautology. You might illustrate this via a truth table
-or via a chain of equivalences, showing that the proposition is not
-equivalent to true. Alternatively, you might try and find a
-combination of values for which the proposition is false. (In this
-case, the proposition is false when p and q are both true.)
+$false(as(true \implies false) \iff false)$
+
+\medskip
+
+\subsection*{(b)}
+
+\noindent
+$true(as(false \implies false) \iff true)$
+
+\medskip
+
+\subsection*{(c)}
+
+\noindent
+$true(as(false \implies true) \iff true)$
+
+\medskip
+
+\subsection*{(d)}
+
+\noindent
+$true(as(false \implies false) \iff true)$
+
+\noindent (Assuming that pigs can't fly . . . )
 
 \bigskip
 
+\section*{Solution 2}
+\addcontentsline{toc}{section}{Solution 2}
+
+\subsection*{(a)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    \begin{tabular}{c|c|c|c}
+      $p$ & $q$ & $p \land q$ & $\mathbf{( p \land q ) \Rightarrow p}$ \\
+      \hline
+      \textit{t} & \textit{t} & \textit{t} & \textbf{t} \\
+      \textit{t} & \textit{f} & \textit{f} & \textbf{t} \\
+      \textit{f} & \textit{t} & \textit{f} & \textbf{t} \\
+      \textit{f} & \textit{f} & \textit{f} & \textbf{t} \\
+    \end{tabular}%
+  }
+\end{center}
+\bigskip
+
 \medskip
-\noindent
-\hangindent=2em
-(b) $(p \lor q)$ $\Leftrightarrow$ $((\lnot p \land \lnot q) \lor q)$
-is $\lnot a$ tautology. In this case, the proposition is false when p
-is true and q is false.
+
+\subsection*{(b)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    \begin{tabular}{c|c|c|c|c|c}
+      $p$ & $q$ & $p \land q$ & $\lnot p$ & $\lnot p \Rightarrow ( p
+      \land q )$ & $\mathbf{( \lnot p \Rightarrow ( p \land q ) )
+      \Leftrightarrow p}$ \\
+      \hline
+      \textit{t} & \textit{t} & \textit{t} & \textit{f} & \textit{t}
+      & \textbf{t} \\
+      \textit{t} & \textit{f} & \textit{f} & \textit{f} & \textit{t}
+      & \textbf{t} \\
+      \textit{f} & \textit{t} & \textit{f} & \textit{t} & \textit{f}
+      & \textbf{t} \\
+      \textit{f} & \textit{f} & \textit{f} & \textit{t} & \textit{f}
+      & \textbf{t} \\
+    \end{tabular}%
+  }
+\end{center}
+\bigskip
+
+\medskip
+
+\subsection*{(c)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    \begin{tabular}{c|c|c|c|c}
+      $p$ & $q$ & $p \Rightarrow q$ & $p \land ( p \Rightarrow q )$ &
+      $\mathbf{( p \land ( p \Rightarrow q ) ) \Rightarrow q}$ \\
+      \hline
+      \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textbf{t} \\
+      \textit{t} & \textit{f} & \textit{f} & \textit{f} & \textbf{t} \\
+      \textit{f} & \textit{t} & \textit{t} & \textit{f} & \textbf{t} \\
+      \textit{f} & \textit{f} & \textit{t} & \textit{f} & \textbf{t} \\
+    \end{tabular}%
+  }
+\end{center}
+\bigskip
+
+\section*{Solution 3}
+\addcontentsline{toc}{section}{Solution 3}
+
+\subsection*{(a)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      p \implies \lnot p \\
+      \Leftrightarrow \lnot p \lor \lnot p & [\mbox{$\Rightarrow$}] \\
+      \Leftrightarrow \lnot p & [\mbox{idempotence}]
+    \end{array}$%
+  }
+\end{center}
+\bigskip
+
+\medskip
+
+\subsection*{(b)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \lnot p \implies p \\
+      \Leftrightarrow \lnot \lnot p \lor p & [\mbox{$\Rightarrow$}] \\
+      \Leftrightarrow p \lor p & [\mbox{$\lnot$ $\lnot$}] \\
+      \Leftrightarrow p & [\mbox{idempotence}]
+    \end{array}$%
+  }
+\end{center}
+\bigskip
+
+\medskip
+
+\subsection*{(c)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      p \implies (q \implies r) \\
+      \Leftrightarrow \lnot p \lor (q \implies r) & [\mbox{$\Rightarrow$}] \\
+      \Leftrightarrow \lnot p \lor (\lnot q \lor r) & [\mbox{$\Rightarrow$}] \\
+      \Leftrightarrow (\lnot p \lor \lnot q) \lor r & [\mbox{associativity}] \\
+      \Leftrightarrow \lnot (p \land q) \lor r & [\mbox{De Morgan}] \\
+      \Leftrightarrow (p \land q) \implies r & [\mbox{$\Rightarrow$}]
+    \end{array}$%
+  }
+\end{center}
+\bigskip
+
+\medskip
+
+\subsection*{(d)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      q \implies (p \implies r) \\
+      \Leftrightarrow \lnot q \lor (p \implies r) & [\mbox{$\Rightarrow$}] \\
+      \Leftrightarrow \lnot q \lor (\lnot p \lor r) & [\mbox{$\Rightarrow$}] \\
+      \Leftrightarrow \lnot p \lor (\lnot q \lor r) &
+      [\mbox{associativity $\land$ commutativity}] \\
+      \Leftrightarrow \lnot p \lor (q \implies r) & [\mbox{$\Rightarrow$}] \\
+      \Leftrightarrow p \implies (q \implies r) & [\mbox{$\Rightarrow$}]
+    \end{array}$%
+  }
+\end{center}
+\bigskip
+
+\medskip
+
+\subsection*{(e)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      ((p \land q) \Leftrightarrow p) \\
+      \Leftrightarrow ((p \land q) \implies p) \land (p \implies (p
+      \land q)) & [\mbox{$\langle = \rangle$}] \\
+      \Leftrightarrow (\lnot (p \land q) \lor p) \land (\lnot p \lor
+      (p \land q)) & [\mbox{$\Rightarrow$}] \\
+      \Leftrightarrow ((\lnot p \lor \lnot q) \lor p) \land (\lnot p
+      \lor (p \land q)) & [\mbox{De Morgan}] \\
+      \Leftrightarrow (\lnot q \lor (\lnot p \lor p)) \land (\lnot p
+      \lor (p \land q)) & [\mbox{associativity $\land$ comm .}] \\
+      \Leftrightarrow (\lnot q \lor true) \land (\lnot p \lor (p
+      \land q)) & [\mbox{excluded middle}] \\
+      \Leftrightarrow true \land (\lnot p \lor (p \land q)) &
+      [\mbox{$\lor$ $\land$ true}] \\
+      \Leftrightarrow \lnot p \lor (p \land q) & [\mbox{$\land$
+      $\land$ true}] \\
+      \Leftrightarrow (\lnot p \lor p) \land (\lnot p \lor q) &
+      [\mbox{distribution}] \\
+      \Leftrightarrow true \land (\lnot p \lor q) & [\mbox{excluded middle}] \\
+      \Leftrightarrow \lnot p \lor q & [\mbox{$\land$ $\land$ true}] \\
+      \Leftrightarrow p \implies q & [\mbox{$\Rightarrow$}]
+    \end{array}$%
+  }
+\end{center}
+\bigskip
+
+\medskip
+
+\subsection*{(f)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      ((p \lor q) \Leftrightarrow p) \\
+      \Leftrightarrow ((p \lor q) \implies p) \land (p \implies (p
+      \lor q)) & [\mbox{$\langle = \rangle$}] \\
+      \Leftrightarrow (\lnot (p \lor q) \lor p) \land (\lnot p \lor
+      (p \lor q)) & [\mbox{$\Rightarrow$}] \\
+      \Leftrightarrow ((\lnot p \land \lnot q) \lor p) \land (\lnot p
+      \lor (p \lor q)) & [\mbox{De Morgan}] \\
+      \Leftrightarrow ((\lnot p \lor p) \land (\lnot q \lor p)) \land
+      (\lnot p \lor (p \lor q)) & [\mbox{distribution}] \\
+      \Leftrightarrow (true \land (\lnot q \lor p)) \land (\lnot p
+      \lor (p \lor q)) & [\mbox{excluded middle}] \\
+      \Leftrightarrow (\lnot q \lor p) \land (\lnot p \lor (p \lor
+      q)) & [\mbox{$\land$ $\land$ true}] \\
+      \Leftrightarrow (\lnot q \lor p) \land ((\lnot p \lor p) \lor
+      q) & [\mbox{associativity}] \\
+      \Leftrightarrow (\lnot q \lor p) \land (true \lor q) &
+      [\mbox{excluded middle}] \\
+      \Leftrightarrow (\lnot q \lor p) \land true & [\mbox{$\lor$
+      $\land$ true}] \\
+      \Leftrightarrow (\lnot q \lor p) & [\mbox{$\land$ $\land$ true}] \\
+      \Leftrightarrow q \implies p & [\mbox{$\Rightarrow$}]
+    \end{array}$%
+  }
+\end{center}
+\bigskip
+
+\section*{Solution 4}
+\addcontentsline{toc}{section}{Solution 4}
+
+\subsection*{(a)}
+
+\noindent $(p \lor q)$ $\Leftrightarrow$ $((\lnot p \lor \lnot q)
+\land q)$ is $\lnot a$ tautology. You might illustrate this via a
+truth table or via a chain of equivalences, showing that the
+proposition is not equivalent to true. Alternatively, you might try
+and find a combination of values for which the proposition is false.
+(In this case, the proposition is false when p and q are both true.)
 
 \bigskip
 
 \medskip
+
+\subsection*{(b)}
+
+\noindent $(p \lor q)$ $\Leftrightarrow$ $((\lnot p \land \lnot q)
+\lor q)$ is $\lnot a$ tautology. In this case, the proposition is
+false when p is true and q is false.
+
 \bigskip
+
+\section*{Solution 5}
+\addcontentsline{toc}{section}{Solution 5}
+
+\subsection*{(a)}
+
 \noindent
-\textbf{Solution 5}
+$\exists d : Dog @ gentle(d) \land well\_trained(d)$
 
 \medskip
 
-\noindent
-\hangindent=2em
-(a) $\exists d : Dog @ gentle(d) \land well\_trained(d)$
+\subsection*{(b)}
 
-\medskip
 \noindent
-\hangindent=2em
-(b) $\forall d : Dog @ neat(d) \land well\_trained(d) \implies attractive(d)$
-
-\medskip
-\noindent
-\hangindent=2em
-(c) $\exists d : Dog @ gentle(d) \implies (\forall t : Trainer @ groomed(d, t))$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Solution 6}
+$\forall d : Dog @ neat(d) \land well\_trained(d) \implies attractive(d)$
 
 \medskip
 
+\subsection*{(c)}
+
 \noindent
-\hangindent=2em
-(a) This is a true proposition: whatever the value of x, the
+$\exists d : Dog @ gentle(d) \implies (\forall t : Trainer @ groomed(d, t))$
+
+\section*{Solution 6}
+\addcontentsline{toc}{section}{Solution 6}
+
+\subsection*{(a)}
+
+\noindent This is a true proposition: whatever the value of x, the
 expression $x^2$ - x + 1 denotes a natural number. If we choose y to
 be this natural number, we will find that p is true.
 
 \bigskip
 
 \medskip
-\noindent
-\hangindent=2em
-(b) This is a false proposition. We cannot choose a large enough
-value for y such that p will hold for any value of x.
+
+\subsection*{(b)}
+
+\noindent This is a false proposition. We cannot choose a large
+enough value for y such that p will hold for any value of x.
 
 \bigskip
 
 \medskip
-\noindent
-\hangindent=2em
-(c) This is a false proposition. It is an implication whose
+
+\subsection*{(c)}
+
+\noindent This is a false proposition. It is an implication whose
 antecedent part is true and whose consequent part is false.
 
 \bigskip
 
 \medskip
-\noindent
-\hangindent=2em
-(d) This is a true proposition. It is an implication whose antecedent
-part is false and whose consequent part is true.
+
+\subsection*{(d)}
+
+\noindent This is a true proposition. It is an implication whose
+antecedent part is false and whose consequent part is true.
+
+\bigskip
+
+\section*{Solution 7}
+\addcontentsline{toc}{section}{Solution 7}
+
+\subsection*{(a)}
+
+\noindent We must define a predicate p that is false for at least one
+value of x, and is true for at least one other value. A suitable
+solution would be $p \iff x > 1$.
 
 \bigskip
 
 \medskip
-\bigskip
-\noindent
-\textbf{Solution 7}
 
-\medskip
+\subsection*{(b)}
 
-\noindent
-\hangindent=2em
-(a) We must define a predicate p that is false for at least one value
-of x, and is true for at least one other value. A suitable solution
-would be $p \iff x > 1$.
+\noindent With the above choice of p, we require only that q is
+sometimes false when p is true (for else the universal quantification
+would hold). A suitable solution would be $q \iff x > 3$.
 
 \bigskip
 
-\medskip
-\noindent
-\hangindent=2em
-(b) With the above choice of p, we require only that q is sometimes
-false when p is true (for else the universal quantification would
-hold). A suitable solution would be $q \iff x > 3$.
+\section*{Solution 8}
+\addcontentsline{toc}{section}{Solution 8}
 
-\bigskip
-
-\medskip
-\bigskip
-\noindent
-\textbf{Solution 8}
-
-\medskip
+\subsection*{(a)}
 
 \noindent
-\hangindent=2em
-(a) $\forall x : \nat @ x \geq z$
+$\forall x : \nat @ x \geq z$
 
 \medskip
+
+\subsection*{(b)}
+
 \noindent
-\hangindent=2em
-(b) $\forall z : \nat @ z \geq x + y$
+$\forall z : \nat @ z \geq x + y$
 
 \medskip
+
+\subsection*{(c)}
+
 \noindent
-\hangindent=2em
-(c) $x + 3 > 0 \land (\forall z : \nat @ z \geq x + 3)$
+$x + 3 > 0 \land (\forall z : \nat @ z \geq x + 3)$
 
-\medskip
 \section*{Equality}
 
-\bigskip
-\noindent
-\textbf{Solution 9}
+\section*{Solution 9}
+\addcontentsline{toc}{section}{Solution 9}
 
-\medskip
+\subsection*{(a)}
 
-(a)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & \exists y : \nat @ y \in \{0, 1\} \land y \neq 1 \land x \neq y \\
-    &\Leftrightarrow \exists y : \nat @ y = 0 \land x \neq y &
-    [\mbox{arithmetic}] \\
-    &\Leftrightarrow 0 \in \nat \land x \neq 0 & [\mbox{one - point rule}] \\
-    &\Leftrightarrow x \neq 0
-  \end{array}
-\]
-
-\medskip
-
-(b)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & \exists x, y : \nat @ x + y = 4 \land x < y \\
-    &\Leftrightarrow \exists x, y : \nat @ y = 4 - x \land x < y \\
-    &\Leftrightarrow \exists x : \nat @ 4 - x \in \nat \land x < 4 - x \\
-    &\Leftrightarrow true
-  \end{array}
-\]
-
-\bigskip
-
-The final equivalence holds because $0 \in N$, $4 - 0 \in N$, and 0 $<$ 4.
-
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \exists y : \nat @ y \in \{0, 1\} \land y \neq 1 \land x \neq y \\
+      \Leftrightarrow \exists y : \nat @ y = 0 \land x \neq y &
+      [\mbox{arithmetic}] \\
+      \Leftrightarrow 0 \in \nat \land x \neq 0 & [\mbox{one - point rule}] \\
+      \Leftrightarrow x \neq 0
+    \end{array}$%
+  }
+\end{center}
 \bigskip
 
 \medskip
 
-(c)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & \forall x : \nat @ \exists y : \nat @ x = y + 1 \\
-    &\Leftrightarrow \forall x : \nat @ \exists y : \nat @ y = x - 1 \\
-    &\Leftrightarrow \forall x : \nat @ x - 1 \in \nat
-  \end{array}
-\]
+\subsection*{(b)}
 
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \exists x, y : \nat @ x + y = 4 \land x < y \\
+      \Leftrightarrow \exists x, y : \nat @ y = 4 - x \land x < y \\
+      \Leftrightarrow \exists x : \nat @ 4 - x \in \nat \land x < 4 - x \\
+      \Leftrightarrow true
+    \end{array}$%
+  }
+\end{center}
 \bigskip
 
-The final equivalence holds because $0 \in N$ and yet $0 - 1 \notin
-N$. We may assume that the subtraction operator is defined for all integers.
+\noindent The final equivalence holds because $0 \in N$, $4 - 0 \in
+N$, and 0 $<$ 4.
 
 \bigskip
 
 \medskip
 
-(d)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & \exists x : \nat @ (x = 1 \land x > y) \lor (x = 2 \land x > z) \\
-    &\Leftrightarrow (\exists x : \nat @ x = 1 \land x > y) \lor
-    (\exists x : \nat @ x = 2 \land x > z) \\
-    &\Leftrightarrow (1 \in \nat \land 1 > y) \lor (\exists x : \nat
-    @ x = 2 \land x > z) \\
-    &\Leftrightarrow (1 \in \nat \land 1 > y) \lor (2 \in \nat \land 2 > z) \\
-    &\Leftrightarrow 1 > y \lor 2 > z
-  \end{array}
-\]
+\subsection*{(c)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \forall x : \nat @ \exists y : \nat @ x = y + 1 \\
+      \Leftrightarrow \forall x : \nat @ \exists y : \nat @ y = x - 1 \\
+      \Leftrightarrow \forall x : \nat @ x - 1 \in \nat
+    \end{array}$%
+  }
+\end{center}
+\bigskip
+
+\noindent The final equivalence holds because $0 \in N$ and yet $0 -
+1 \notin N$. We may assume that the subtraction operator is defined
+for all integers.
+
+\bigskip
 
 \medskip
 
+\subsection*{(d)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \exists x : \nat @ (x = 1 \land x > y) \lor (x = 2 \land x > z) \\
+      \Leftrightarrow (\exists x : \nat @ x = 1 \land x > y) \lor
+      (\exists x : \nat @ x = 2 \land x > z) \\
+      \Leftrightarrow (1 \in \nat \land 1 > y) \lor (\exists x : \nat
+      @ x = 2 \land x > z) \\
+      \Leftrightarrow (1 \in \nat \land 1 > y) \lor (2 \in \nat \land 2 > z) \\
+      \Leftrightarrow 1 > y \lor 2 > z
+    \end{array}$%
+  }
+\end{center}
 \bigskip
-\noindent
-\textbf{Solution 10}
 
-\medskip
+\section*{Solution 10}
+\addcontentsline{toc}{section}{Solution 10}
 
-\bigskip
-
-As discussed, the quantifier $\exists_1$ can help give rise to a
-'test' or 'precondition' to ensure that an application of mu will work.
+\noindent As discussed, the quantifier $\exists_1$ can help give rise
+to a 'test' or 'precondition' to ensure that an application of mu will work.
 
 \bigskip
 
-\bigskip
-
-So, as a simple example, as the proposition
+\noindent So, as a simple example, as the proposition
 
 \bigskip
 
 \noindent
 $\exists_1 n : \nat @ \forall m : \nat @ n \leq m$
 
-\bigskip
-
-is equivalent to true, we can be certain that the statement
+\noindent is equivalent to true, we can be certain that the statement
 
 \bigskip
 
 \noindent
 $(\mu n : \nat | \forall m : \nat @ n \leq m)$
 
-\bigskip
-
-will return a result (which happens to be 0).
+\noindent will return a result (which happens to be 0).
 
 \bigskip
 
-\bigskip
-\noindent
-\textbf{Solution 11}
+\section*{Solution 11}
+\addcontentsline{toc}{section}{Solution 11}
 
-\medskip
+\subsection*{(a)}
 
 \noindent
-\hangindent=2em
-(a) $(\mu a : \nat | a = a) = 0$
+$(\mu a : \nat | a = a) = 0$
 
-\bigskip
-
-is a provable statement, since 0 is the only natural number with the
-specified property.
+\noindent is a provable statement, since 0 is the only natural number
+with the specified property.
 
 \bigskip
 
 \medskip
 
+\subsection*{(b)}
+
 \noindent
-\hangindent=2em
-(b) $(\mu b : \nat | b = b) = 1$
+$(\mu b : \nat | b = b) = 1$
 
-\bigskip
-
-is not provable. The specified property is true of both 0 and 1, and
-thus the value of the mu-expression is undefined.
+\noindent is not provable. The specified property is true of both 0
+and 1, and thus the value of the mu-expression is undefined.
 
 \bigskip
 
 \medskip
 
-\noindent
-\hangindent=2em
-(c) $(\mu c : \nat | c > c) = (\mu c : \nat | c > c)$
-
-\bigskip
-
-is a provable statement. Neither expression is properly defined, but
-we may conclude that they are equal; there is little else that we can
-prove about them.
-
-\bigskip
-
-\medskip
+\subsection*{(c)}
 
 \noindent
-\hangindent=2em
-(d) $(\mu d : \nat | d = d) = 1$
+$(\mu c : \nat | c > c) = (\mu c : \nat | c > c)$
 
-\bigskip
-
-is $\lnot a$ provable statement. We cannot confirm that 1 is the only
-natural number with the specified property; we do not know what value
-is taken by undefined operations.
+\noindent is a provable statement. Neither expression is properly
+defined, but we may conclude that they are equal; there is little
+else that we can prove about them.
 
 \bigskip
 
 \medskip
 
-\bigskip
-\noindent
-\textbf{Solution 12}
-
-\medskip
+\subsection*{(d)}
 
 \noindent
-\hangindent=2em
-(a) $(\mu m : Mountain | \forall n : Mountain @ height(n) \leq
-height(m).height(m))$
+$(\mu d : \nat | d = d) = 1$
 
-\medskip
-\noindent
-\hangindent=2em
-(b) $(\mu c : Chapter | \exists_1 d : Chapter @ length(d) >
-length(c).length(c))$
-
-\medskip
-\noindent
-\hangindent=2em
-(c) Assuming the existence of a suitable function, max: ($(\mu n :
-\nat | n = max)$($\{ m : \nat | 8 * m < 100.8 * m \}$) . 100 - n)
+\noindent is $\lnot a$ provable statement. We cannot confirm that 1
+is the only natural number with the specified property; we do not
+know what value is taken by undefined operations.
 
 \bigskip
 
+\section*{Solution 12}
+\addcontentsline{toc}{section}{Solution 12}
+
+\subsection*{(a)}
+
+\noindent
+$(\mu m : Mountain | \forall n : Mountain @ height(n) \leq height(m).height(m))$
+
 \medskip
+
+\subsection*{(b)}
+
+\noindent
+$(\mu c : Chapter | \exists_1 d : Chapter @ length(d) > length(c).length(c))$
+
+\medskip
+
+\subsection*{(c)}
+
+\noindent Assuming the existence of a suitable function, max: ($(\mu
+n : \nat | n = max)$($\{ m : \nat | 8 * m < 100.8 * m \}$) . 100 - n)
+
+\bigskip
+
 \section*{Deductive proofs}
 
-\bigskip
-\noindent
-\textbf{Solution 13}
+\section*{Solution 13}
+\addcontentsline{toc}{section}{Solution 13}
 
-\medskip
-
-\noindent
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land (p \implies q))
-\implies (p \land q)}{
-  \ulcorner p \land (p \implies q) \urcorner^{[1]}
-  &
-  \infer[\land \mathrm{intro}]{p \land q}{
-    \infer[\land\textrm{-elim}^{[1]}]{p}{
-      \infer[\mathrm{from} above]{p \land (p \implies q)}{}
-    }
-    &
-    \infer[\Rightarrow \mathrm{elim}]{q}{
-      \infer[\land\textrm{-elim}^{[1]}]{p \implies q}{
-        \infer[\mathrm{from} above]{p \land (p \implies q)}{}
-      }
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land (p \implies q))
+    \implies (p \land q)}{
+      \ulcorner p \land (p \implies q) \urcorner^{[1]}
       &
-      \infer[\land\textrm{-elim}^{[1]}]{p}{
-        \infer[\mathrm{from} above]{p \land (p \implies q)}{}
-      }
-    }
-  }
-}
-$
-
-\bigskip
-\noindent
-\textbf{Solution 14}
-
-\medskip
-
-\bigskip
-
-In one direction:
-
-\bigskip
-
-\noindent
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \land q) \iff p)
-\implies (p \implies q)}{
-  \ulcorner (p \land q) \iff p \urcorner^{[1]}
-  &
-  \infer[\Rightarrow\textrm{-intro}^{[2]}]{p \implies q}{
-    \ulcorner p \urcorner^{[2]}
-    &
-    \infer[\land\textrm{-elim}^{[3]}]{q}{
-      \infer[\Rightarrow \mathrm{elim} \mathrm{from} 1 \land 2]{p \land q}{
-        \infer[derived]{p \land q}{}
-      }
-    }
-  }
-}
-$
-
-\bigskip
-
-and the other:
-
-\bigskip
-
-\noindent
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \implies q) \implies ((p
-\land q) \iff p)}{
-  \ulcorner p \implies q \urcorner^{[1]}
-  &
-  \infer[\Leftrightarrow \mathrm{intro}]{(p \land q) \iff p}{
-    \infer[\Rightarrow\textrm{-intro}^{[2]}]{(p \land q) \implies p}{
-      \ulcorner p \land q \urcorner^{[2]}
-      &
-      \infer[\land\textrm{-elim}^{[2]}]{p}{}
-    }
-    &
-    \infer[\Rightarrow\textrm{-intro}^{[3]}]{p \implies (p \land q)}{
-      \ulcorner p \urcorner^{[3]}
-      &
-      \infer[\land \mathrm{intro} \mathrm{from} 1 \land 3]{p \land q}{}
-    }
-  }
-}
-$
-
-\bigskip
-
-We can then combine these two proofs $with \iff intro$.
-
-\bigskip
-
-\bigskip
-\noindent
-\textbf{Solution 15}
-
-\medskip
-
-\noindent
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \implies q) \land \lnot
-q) \implies \lnot p}{
-  \ulcorner (p \implies q) \land \lnot q \urcorner^{[1]}
-  &
-  \infer[false\textrm{-elim}^{[2]}]{\lnot p}{
-    \ulcorner p \urcorner^{[2]}
-    &
-    \infer[\mathrm{false} \mathrm{intro}]{false}{
-      \infer[\Rightarrow \mathrm{elim}]{q}{
-        \infer[\land\textrm{-elim}^{[1]}]{p \implies q}{}
+      \infer[\land \mathrm{intro}]{p \land q}{
+        \infer[\land\textrm{-elim}^{[1]}]{p}{
+          \infer[\mathrm{from} above]{p \land (p \implies q)}{}
+        }
         &
-        \ulcorner p \urcorner^{[2]}
+        \infer[\Rightarrow \mathrm{elim}]{q}{
+          \infer[\land\textrm{-elim}^{[1]}]{p \implies q}{
+            \infer[\mathrm{from} above]{p \land (p \implies q)}{}
+          }
+          &
+          \infer[\land\textrm{-elim}^{[1]}]{p}{
+            \infer[\mathrm{from} above]{p \land (p \implies q)}{}
+          }
+        }
       }
-      &
-      \infer[\land\textrm{-elim}^{[1]}]{\lnot q}{}
     }
+    $%
   }
-}
-$
-
-\bigskip
-\noindent
-\textbf{Solution 16}
-
-\medskip
-
+\end{center}
 \bigskip
 
-In one direction:
+\section*{Solution 14}
+\addcontentsline{toc}{section}{Solution 14}
+
+\noindent In one direction:
 
 \bigskip
 
-\noindent
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land (q \lor r))
-\implies ((p \land q) \lor (p \land r))}{
-  \ulcorner p \land (q \lor r) \urcorner^{[1]}
-  &
-  \infer[\lor\textrm{-elim}^{[2]}]{(p \land q) \lor (p \land r)}{
-    \ulcorner q \lor r \urcorner^{[1]}
-    &
-    \raiseproof{10ex}{\infer[\lor \mathrm{intro}]{(p \land q) \lor (p
-      \land r)}{\infer[\land \mathrm{intro}]{p \land q}{
-          \infer[\land\textrm{-elim}^{[1]}]{p}{}
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \land q) \iff p)
+    \implies (p \implies q)}{
+      \ulcorner (p \land q) \iff p \urcorner^{[1]}
+      &
+      \infer[\Rightarrow\textrm{-intro}^{[2]}]{p \implies q}{
+        \ulcorner p \urcorner^{[2]}
+        &
+        \infer[\land\textrm{-elim}^{[3]}]{q}{
+          \infer[\Rightarrow \mathrm{elim} \mathrm{from} 1 \land 2]{p \land q}{
+            \infer[derived]{p \land q}{}
+          }
+        }
+      }
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent and the other:
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \implies q) \implies
+    ((p \land q) \iff p)}{
+      \ulcorner p \implies q \urcorner^{[1]}
+      &
+      \infer[\Leftrightarrow \mathrm{intro}]{(p \land q) \iff p}{
+        \infer[\Rightarrow\textrm{-intro}^{[2]}]{(p \land q) \implies p}{
+          \ulcorner p \land q \urcorner^{[2]}
           &
-          \infer[\mathrm{case} \mathrm{assumption}]{q}{}
-    }}}
-    &
-    \hskip 6em \raiseproof{26ex}{\infer[\lor \mathrm{intro}]{(p \land
-      q) \lor (p \land r)}{\infer[\land \mathrm{intro}]{p \land r}{
-          \infer[\land\textrm{-elim}^{[1]}]{p}{}
+          \infer[\land\textrm{-elim}^{[2]}]{p}{}
+        }
+        &
+        \infer[\Rightarrow\textrm{-intro}^{[3]}]{p \implies (p \land q)}{
+          \ulcorner p \urcorner^{[3]}
           &
-          \infer[\mathrm{case} \mathrm{assumption}]{r}{}
-    }}}
+          \infer[\land \mathrm{intro} \mathrm{from} 1 \land 3]{p \land q}{}
+        }
+      }
+    }
+    $%
   }
-}
-$
+\end{center}
+\bigskip
+
+\noindent We can then combine these two proofs $with \iff intro$.
 
 \bigskip
 
-In the other:
+\section*{Solution 15}
+\addcontentsline{toc}{section}{Solution 15}
 
-\bigskip
-
-\noindent
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[3]}]{((p \land q) \lor (p \land
-r)) \implies (p \land (q \lor r))}{
-  \ulcorner (p \land q) \lor (p \land r) \urcorner^{[3]}
-  &
-  \infer[\lor\textrm{-elim}^{[4]}]{p \land (q \lor r)}{
-    \ulcorner case1 \lor case2 \urcorner^{[3]}
-    &
-    \raiseproof{8ex}{\infer[\land \mathrm{intro}]{p \land (q \lor
-      r)}{\infer[\land \mathrm{elim}]{p}{} & \infer[\lor
-    \mathrm{intro}]{q \lor r}{}}}
-    &
-    \hskip 6em \raiseproof{22ex}{\infer[\land \mathrm{intro}]{p \land
-      (q \lor r)}{\infer[\land \mathrm{elim}]{p}{} & \infer[\lor
-    \mathrm{intro}]{q \lor r}{}}}
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \implies q) \land
+    \lnot q) \implies \lnot p}{
+      \ulcorner (p \implies q) \land \lnot q \urcorner^{[1]}
+      &
+      \infer[false\textrm{-elim}^{[2]}]{\lnot p}{
+        \ulcorner p \urcorner^{[2]}
+        &
+        \infer[\mathrm{false} \mathrm{intro}]{false}{
+          \infer[\Rightarrow \mathrm{elim}]{q}{
+            \infer[\land\textrm{-elim}^{[1]}]{p \implies q}{}
+            &
+            \ulcorner p \urcorner^{[2]}
+          }
+          &
+          \infer[\land\textrm{-elim}^{[1]}]{\lnot q}{}
+        }
+      }
+    }
+    $%
   }
-}
-$
-
-\bigskip
-\noindent
-\textbf{Solution 17}
-
-\medskip
-
+\end{center}
 \bigskip
 
-In one direction:
+\section*{Solution 16}
+\addcontentsline{toc}{section}{Solution 16}
+
+\noindent In one direction:
 
 \bigskip
 
-\noindent
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[3]}]{(p \lor (q \land r))
-\implies ((p \lor q) \land (p \lor r))}{
-  \ulcorner p \lor (q \land r) \urcorner^{[3]}
-  &
-  \infer[\lor \mathrm{elim} \land \land \mathrm{intro}]{(p \lor q)
-  \land (p \lor r)}{}
-}
-$
-
-\bigskip
-
-and the other:
-
-\bigskip
-
-\noindent
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \land (p \lor
-r)) \implies (p \lor (q \land r))}{
-  \ulcorner (p \lor q) \land (p \lor r) \urcorner^{[1]}
-  &
-  \infer[\lor \mathrm{elim} \mathrm{from} 2 \land 3]{p \lor (q \land r)}{}
-}
-$
-
-\bigskip
-\noindent
-\textbf{Solution 18}
-
-\medskip
-
-\bigskip
-
-In one direction:
-
-\bigskip
-
-\noindent
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \implies q) \implies
-(\lnot p \lor q)}{
-  \ulcorner p \implies q \urcorner^{[1]}
-  &
-  \infer[\lor \mathrm{elim} \mathrm{from} \mathrm{excluded}
-  \mathrm{middle}]{\lnot p \lor q}{}
-}
-$
-
-\bigskip
-
-and the other:
-
-\bigskip
-
-\noindent
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[3]}]{(\lnot p \lor q) \implies (p
-\implies q)}{
-  \ulcorner \lnot p \lor q \urcorner^{[3]}
-  &
-  \infer[\Rightarrow\textrm{-intro}^{[4]}]{p \implies q}{
-    \ulcorner p \urcorner^{[4]}
-    &
-    \infer[\lor elim \land false\textrm{-elim}^{[3]}]{q}{}
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land (q \lor r))
+    \implies ((p \land q) \lor (p \land r))}{
+      \ulcorner p \land (q \lor r) \urcorner^{[1]}
+      &
+      \infer[\lor\textrm{-elim}^{[2]}]{(p \land q) \lor (p \land r)}{
+        \ulcorner q \lor r \urcorner^{[1]}
+        &
+        \raiseproof{10ex}{\infer[\lor \mathrm{intro}]{(p \land q)
+          \lor (p \land r)}{\infer[\land \mathrm{intro}]{p \land q}{
+              \infer[\land\textrm{-elim}^{[1]}]{p}{}
+              &
+              \infer[\mathrm{case} \mathrm{assumption}]{q}{}
+        }}}
+        &
+        \hskip 6em \raiseproof{26ex}{\infer[\lor \mathrm{intro}]{(p
+          \land q) \lor (p \land r)}{\infer[\land \mathrm{intro}]{p \land r}{
+              \infer[\land\textrm{-elim}^{[1]}]{p}{}
+              &
+              \infer[\mathrm{case} \mathrm{assumption}]{r}{}
+        }}}
+      }
+    }
+    $%
   }
-}
-$
+\end{center}
+\bigskip
+
+\noindent In the other:
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[3]}]{((p \land q) \lor (p
+    \land r)) \implies (p \land (q \lor r))}{
+      \ulcorner (p \land q) \lor (p \land r) \urcorner^{[3]}
+      &
+      \infer[\lor\textrm{-elim}^{[4]}]{p \land (q \lor r)}{
+        \ulcorner case1 \lor case2 \urcorner^{[3]}
+        &
+        \raiseproof{8ex}{\infer[\land \mathrm{intro}]{p \land (q \lor
+          r)}{\infer[\land \mathrm{elim}]{p}{} & \infer[\lor
+        \mathrm{intro}]{q \lor r}{}}}
+        &
+        \hskip 6em \raiseproof{22ex}{\infer[\land \mathrm{intro}]{p
+          \land (q \lor r)}{\infer[\land \mathrm{elim}]{p}{} &
+        \infer[\lor \mathrm{intro}]{q \lor r}{}}}
+      }
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\section*{Solution 17}
+\addcontentsline{toc}{section}{Solution 17}
+
+\noindent In one direction:
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[3]}]{(p \lor (q \land r))
+    \implies ((p \lor q) \land (p \lor r))}{
+      \ulcorner p \lor (q \land r) \urcorner^{[3]}
+      &
+      \infer[\lor \mathrm{elim} \land \land \mathrm{intro}]{(p \lor
+      q) \land (p \lor r)}{}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent and the other:
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \land (p
+    \lor r)) \implies (p \lor (q \land r))}{
+      \ulcorner (p \lor q) \land (p \lor r) \urcorner^{[1]}
+      &
+      \infer[\lor \mathrm{elim} \mathrm{from} 2 \land 3]{p \lor (q \land r)}{}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\section*{Solution 18}
+\addcontentsline{toc}{section}{Solution 18}
+
+\noindent In one direction:
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \implies q) \implies
+    (\lnot p \lor q)}{
+      \ulcorner p \implies q \urcorner^{[1]}
+      &
+      \infer[\lor \mathrm{elim} \mathrm{from} \mathrm{excluded}
+      \mathrm{middle}]{\lnot p \lor q}{}
+    }
+    $%
+  }
+\end{center}
+\bigskip
+
+\noindent and the other:
+
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[3]}]{(\lnot p \lor q)
+    \implies (p \implies q)}{
+      \ulcorner \lnot p \lor q \urcorner^{[3]}
+      &
+      \infer[\Rightarrow\textrm{-intro}^{[4]}]{p \implies q}{
+        \ulcorner p \urcorner^{[4]}
+        &
+        \infer[\lor elim \land false\textrm{-elim}^{[3]}]{q}{}
+      }
+    }
+    $%
+  }
+\end{center}
+\bigskip
 
 \section*{Sets and types}
 
-\bigskip
-\noindent
-\textbf{Solution 19}
+\section*{Solution 19}
+\addcontentsline{toc}{section}{Solution 19}
 
-\medskip
+\subsection*{(a)}
 
-\noindent
-\hangindent=2em
-(a) 1 in $\{4, 3, 2, 1\}$ is true.
-
-\bigskip
-
-\medskip
-\noindent
-\hangindent=2em
-(b) $\{1\}$ in $\{1, 2, 3, 4\}$ is undefined.
-
-\bigskip
-
-\medskip
-\noindent
-\hangindent=2em
-(c) $\{1\}$ in $\{\{1\}, \{2\}, \{3\}, \{4\}\}$ is true.
-
-\bigskip
-
-\medskip
-\noindent
-\hangindent=2em
-(d) The empty set in $\{1, 2, 3, 4\}$ is undefined.
-
-\bigskip
-
-\medskip
-\bigskip
-\noindent
-\textbf{Solution 20}
-
-\medskip
-
-\noindent
-\hangindent=2em
-(a) $\{1\} \cross \{2, 3\}$
-
-\bigskip
-
-is the set $\{(1, 2), (1, 3)\}$
+\noindent 1 in $\{4, 3, 2, 1\}$ is true.
 
 \bigskip
 
 \medskip
 
-\noindent
-\hangindent=2em
-(b) The empty set cross $\{2, 3\}$ is the empty set
+\subsection*{(b)}
 
-\bigskip
-
-\medskip
-\noindent
-\hangindent=2em
-(c) $\power \emptyset \cross \{1\}$
-
-\bigskip
-
-is the set $\{(\emptyset, 1)\}$
+\noindent $\{1\}$ in $\{1, 2, 3, 4\}$ is undefined.
 
 \bigskip
 
 \medskip
 
-\noindent
-\hangindent=2em
-(d) $\{(1, 2)\}$ cross $\{3, 4\}$ is the set $\{((1, 2), 3), ((1, 2), 4)\}$
+\subsection*{(c)}
+
+\noindent $\{1\}$ in $\{\{1\}, \{2\}, \{3\}, \{4\}\}$ is true.
 
 \bigskip
 
 \medskip
+
+\subsection*{(d)}
+
+\noindent The empty set in $\{1, 2, 3, 4\}$ is undefined.
+
 \bigskip
+
+\section*{Solution 20}
+\addcontentsline{toc}{section}{Solution 20}
+
+\subsection*{(a)}
+
 \noindent
-\textbf{Solution 21}
+$\{1\} \cross \{2, 3\}$
+
+\noindent is the set $\{(1, 2), (1, 3)\}$
+
+\bigskip
 
 \medskip
 
+\subsection*{(b)}
+
+\noindent The empty set cross $\{2, 3\}$ is the empty set
+
 \bigskip
 
-There are various ways of describing these sets via set
+\medskip
+
+\subsection*{(c)}
+
+\noindent
+$\power \emptyset \cross \{1\}$
+
+\noindent is the set $\{(\emptyset, 1)\}$
+
+\bigskip
+
+\medskip
+
+\subsection*{(d)}
+
+\noindent $\{(1, 2)\}$ cross $\{3, 4\}$ is the set $\{((1, 2), 3),
+((1, 2), 4)\}$
+
+\bigskip
+
+\section*{Solution 21}
+\addcontentsline{toc}{section}{Solution 21}
+
+\noindent There are various ways of describing these sets via set
 comprehensions. Examples are given below.
 
 \bigskip
 
-\noindent
-\hangindent=2em
-(a) $\{ z : \num | 0 \leq z \land z \leq 100 \}$
-
-\medskip
-\noindent
-\hangindent=2em
-(b) $\{ z : \num | z = 10 \}$
-
-\medskip
-\noindent
-\hangindent=2em
-(c) $\{ z : \num | z \mod 2 = 0 \lor z \mod 3 = 0 \lor z \mod 5 = 0 \}$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Solution 22}
-
-\medskip
+\subsection*{(a)}
 
 \noindent
-\hangindent=2em
-(a) $\{ n : \nat | n \leq 4 @ n^2 \}$
+$\{ z : \num | 0 \leq z \land z \leq 100 \}$
 
 \medskip
+
+\subsection*{(b)}
+
 \noindent
-\hangindent=2em
-(b) $\{ n : \nat | n \leq 4 @ (n, n^2) \}$
+$\{ z : \num | z = 10 \}$
 
 \medskip
+
+\subsection*{(c)}
+
 \noindent
-\hangindent=2em
-(c) $\{ n : \power \{0, 1\} \}$
+$\{ z : \num | z \mod 2 = 0 \lor z \mod 3 = 0 \lor z \mod 5 = 0 \}$
 
-\medskip
+\section*{Solution 22}
+\addcontentsline{toc}{section}{Solution 22}
+
+\subsection*{(a)}
+
 \noindent
-\hangindent=2em
-(d) $\{ n : \power \{0, 1\} | true @ (n, \# n) \}$
+$\{ n : \nat | n \leq 4 @ n^2 \}$
 
 \medskip
-\bigskip
+
+\subsection*{(b)}
+
 \noindent
-\textbf{Solution 23}
+$\{ n : \nat | n \leq 4 @ (n, n^2) \}$
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & x \in a \cap a \\
-    &\Leftrightarrow x \in a \land x \in a \\
-    &\Leftrightarrow x \in a
-  \end{array}
-\]
+\subsection*{(c)}
 
-\medskip
-
-(b)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & x \in a \cup a \\
-    &\Leftrightarrow x \in a \lor x \in a \\
-    &\Leftrightarrow x \in a
-  \end{array}
-\]
-
-\medskip
-
-\bigskip
 \noindent
-\textbf{Solution 24}
+$\{ n : \power \{0, 1\} \}$
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
+\subsection*{(d)}
+
+\noindent
+$\{ n : \power \{0, 1\} | true @ (n, \# n) \}$
+
+\section*{Solution 23}
+\addcontentsline{toc}{section}{Solution 23}
+
+\subsection*{(a)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      x \in a \cap a \\
+      \Leftrightarrow x \in a \land x \in a \\
+      \Leftrightarrow x \in a
+    \end{array}$%
+  }
+\end{center}
 \bigskip
 
-The set of all pairs of integers is Z cross Z. To give it a name, we
-could write:
+\medskip
+
+\subsection*{(b)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      x \in a \cup a \\
+      \Leftrightarrow x \in a \lor x \in a \\
+      \Leftrightarrow x \in a
+    \end{array}$%
+  }
+\end{center}
+\bigskip
+
+\section*{Solution 24}
+\addcontentsline{toc}{section}{Solution 24}
+
+\begin{zed}[Z]
+\end{zed}
+
+\subsection*{(a)}
+
+\noindent The set of all pairs of integers is Z cross Z. To give it a
+name, we could write:
 
 \bigskip
 
@@ -1012,13 +1017,10 @@ could write:
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(b)}
 
-The set of all integer pairs in which each element is strictly
-greater than zero could be defined by:
+\noindent The set of all integer pairs in which each element is
+strictly greater than zero could be defined by:
 
 \bigskip
 
@@ -1028,13 +1030,10 @@ greater than zero could be defined by:
 
 \medskip
 
-(c)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(c)}
 
-It is intuitive to use a singular noun for the name of a basic type;
-we define the set of all people by writing:
+\noindent It is intuitive to use a singular noun for the name of a
+basic type; we define the set of all people by writing:
 
 \bigskip
 
@@ -1043,12 +1042,9 @@ we define the set of all people by writing:
 
 \medskip
 
-(d)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(d)}
 
-The set of all couples could be defined by:
+\noindent The set of all couples could be defined by:
 
 \bigskip
 
@@ -1056,58 +1052,45 @@ The set of all couples could be defined by:
   Couples == \{ s : \power Person | \# s = 2 \}
 \end{zed}
 
-\medskip
+\section*{Solution 25}
+\addcontentsline{toc}{section}{Solution 25}
 
-\bigskip
-\noindent
-\textbf{Solution 25}
-
-\medskip
+\subsection*{(a)}
 
 \noindent
-\hangindent=2em
-(a) $\emptyset[\nat] \in \emptyset[\power \nat]$
+$\emptyset[\nat] \in \emptyset[\power \nat]$
 
 \medskip
+
+\subsection*{(b)}
+
 \noindent
-\hangindent=2em
-(b) $\emptyset[\nat \cross \nat] \subseteq (\emptyset[\nat] \cross
-\emptyset[\nat])$
+$\emptyset[\nat \cross \nat] \subseteq (\emptyset[\nat] \cross \emptyset[\nat])$
 
 \medskip
+
+\subsection*{(c)}
+
 \noindent
-\hangindent=2em
-(c) $(\emptyset[\nat] \cross \{\emptyset[\nat]\}) \subseteq
+$(\emptyset[\nat] \cross \{\emptyset[\nat]\}) \subseteq
 \emptyset[\nat \cross \power \nat]$
 
-\medskip
-\bigskip
-\noindent
-\textbf{Solution 26}
+\section*{Solution 26}
+\addcontentsline{toc}{section}{Solution 26}
 
-\medskip
-
-\bigskip
-
-We may define notin using our built-in operator (notin is already
-implemented as a binary operator mapping to \notin)
+\noindent We may define notin using our built-in operator (notin is
+already implemented as a binary operator mapping to \notin)
 
 \bigskip
 
 \section*{Relations}
 
-\bigskip
-\noindent
-\textbf{Solution 27}
+\section*{Solution 27}
+\addcontentsline{toc}{section}{Solution 27}
 
-\medskip
+\subsection*{(a)}
 
-(a)
-\par
-\vspace{11pt}
-\bigskip
-
-The power set of $\{(0, 0), (0, 1), (1, 0), (1, 1)\}$ is:
+\noindent The power set of $\{(0, 0), (0, 1), (1, 0), (1, 1)\}$ is:
 
 \bigskip
 
@@ -1120,219 +1103,207 @@ $\{\emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 0)\}, \{(1, 1)\}, \{(1,
 
 \medskip
 
-\noindent
-\hangindent=2em
-(b) $\{\emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(0, 0), (0, 1)\}\}$
+\subsection*{(b)}
 
-\medskip
 \noindent
-\hangindent=2em
-(c) $\{\emptyset\}$
-
-\medskip
-\noindent
-\hangindent=2em
-(d) $\{\emptyset\}$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Solution 28}
+$\{\emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(0, 0), (0, 1)\}\}$
 
 \medskip
 
-\noindent
-\hangindent=2em
-(a) $\dom R = \{0, 1, 2\}$
+\subsection*{(c)}
 
-\medskip
 \noindent
-\hangindent=2em
-(b) $\ran R = \{1, 2, 3\}$
-
-\medskip
-\noindent
-\hangindent=2em
-(c) $\{1, 2\} \dres R = \{1 \mapsto 2, 1 \mapsto 3, 2 \mapsto 3\}$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Solution 29}
+$\{\emptyset\}$
 
 \medskip
 
+\subsection*{(d)}
+
 \noindent
-\hangindent=2em
-(a) $\{2 \mapsto 4, 3 \mapsto 3, 3 \mapsto 4, 4 \mapsto 2\}$
+$\{\emptyset\}$
+
+\section*{Solution 28}
+\addcontentsline{toc}{section}{Solution 28}
+
+\subsection*{(a)}
+
+\noindent
+$\dom R = \{0, 1, 2\}$
 
 \medskip
+
+\subsection*{(b)}
+
 \noindent
-\hangindent=2em
-(b) $\{1 \mapsto 3, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 1\}$
+$\ran R = \{1, 2, 3\}$
 
 \medskip
+
+\subsection*{(c)}
+
 \noindent
-\hangindent=2em
-(c) $\{1 \mapsto 1, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto
-3, 4 \mapsto 4\}$
+$\{1, 2\} \dres R = \{1 \mapsto 2, 1 \mapsto 3, 2 \mapsto 3\}$
+
+\section*{Solution 29}
+\addcontentsline{toc}{section}{Solution 29}
+
+\subsection*{(a)}
+
+\noindent
+$\{2 \mapsto 4, 3 \mapsto 3, 3 \mapsto 4, 4 \mapsto 2\}$
 
 \medskip
+
+\subsection*{(b)}
+
 \noindent
-\hangindent=2em
-(d) $\{1 \mapsto 4, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto
-3, 4 \mapsto 1\}$
+$\{1 \mapsto 3, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 1\}$
 
 \medskip
-\bigskip
+
+\subsection*{(c)}
+
 \noindent
-\textbf{Solution 30}
+$\{1 \mapsto 1, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4
+\mapsto 4\}$
 
 \medskip
+
+\subsection*{(d)}
+
+\noindent
+$\{1 \mapsto 4, 2 \mapsto 2, 2 \mapsto 3, 3 \mapsto 2, 3 \mapsto 3, 4
+\mapsto 1\}$
+
+\section*{Solution 30}
+\addcontentsline{toc}{section}{Solution 30}
 
 \begin{axdef}
   childOf : Person \rel Person
 \end{axdef}
 
-(a)
-\par
-\vspace{11pt}
+\subsection*{(a)}
+
 \begin{zed}
   parentOf == childOf^{-1}
 \end{zed}
 
-\bigskip
-
-This is a good example of how there are many different ways of
-writing the same thing. An alternative abbreviation would $be :
-parentOf $== $\{ x, y : Person | x \mapsto y \in childOf @ y \mapsto
-x \}$. Or via an axiomatic definition with $parentOf : Person  \rel
-Person and where clause parentOf $= childOf~.
+\noindent This is a good example of how there are many different ways
+of writing the same thing. An alternative abbreviation would $be :
+parentOf$ == $\{ x, y : Person | x \mapsto y \in childOf @ y \mapsto
+x \}$. Or via an axiomatic definition with $parentOf : Person$ $\rel$
+Person and where clause $parentOf = childOf$~.
 
 \bigskip
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
+\subsection*{(b)}
+
 \begin{zed}
-  siblingOf == (childOf \circ parentOf) \setminus \id[Person]
+  siblingOf == (childOf \circ parentOf) \setminus \id Person
 \end{zed}
 
 \medskip
 
-(c)
-\par
-\vspace{11pt}
+\subsection*{(c)}
+
 \begin{zed}
   cousinOf == childOf \circ siblingOf \circ parentOf
 \end{zed}
 
 \medskip
 
-(d)
-\par
-\vspace{11pt}
+\subsection*{(d)}
+
 \begin{zed}
   ancestorOf == parentOf \plus
 \end{zed}
 
-\medskip
+\section*{Solution 31}
+\addcontentsline{toc}{section}{Solution 31}
 
-\bigskip
-\noindent
-\textbf{Solution 31}
-
-\medskip
+\noindent (Requires compound identifiers with operators - R+, R*)
 
 \bigskip
 
-(Requires compound identifiers with operators - R+, R*)
+\subsection*{(a)}
 
-\bigskip
-
-(a)
-\par
-\vspace{11pt}
 \begin{zed}
   R == \{ a, b : \nat | b = a \lor b = a \}
 \end{zed}
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
+\subsection*{(b)}
+
 \begin{zed}
   S == \{ a, b : \nat | b = a \lor b = a \}
 \end{zed}
 
 \medskip
 
-\noindent
-\hangindent=2em
-(c) R+ == $\{ a, b : \nat | b > a \}$
+\subsection*{(c)}
+
+\noindent R+ == $\{ a, b : \nat | b > a \}$
 
 \bigskip
 
 \medskip
-\noindent
-\hangindent=2em
-(d) R* == $\{ a, b : \nat | b \geq a \}$
+
+\subsection*{(d)}
+
+\noindent R* == $\{ a, b : \nat | b \geq a \}$
 
 \bigskip
 
-\medskip
+\section*{Solution 32}
+\addcontentsline{toc}{section}{Solution 32}
+
+\subsection*{(a)}
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      x \mapsto y \in A \dres (B \dres R) \\
+      \Leftrightarrow x \in A \land x \mapsto y \in (B \dres R) \\
+      \Leftrightarrow x \in A \land x \in B \land x \mapsto y \in R \\
+      \Leftrightarrow x \in A \cap B \land x \mapsto y \in R \\
+      \Leftrightarrow x \mapsto y \in (A \cap B) \dres R
+    \end{array}$%
+  }
+\end{center}
 \bigskip
-\noindent
-\textbf{Solution 32}
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & x \mapsto y \in A \dres (B \dres R) \\
-    &\Leftrightarrow x \in A \land x \mapsto y \in (B \dres R) \\
-    &\Leftrightarrow x \in A \land x \in B \land x \mapsto y \in R \\
-    &\Leftrightarrow x \in A \cap B \land x \mapsto y \in R \\
-    &\Leftrightarrow x \mapsto y \in (A \cap B) \dres R
-  \end{array}
-\]
+\subsection*{(b)}
 
-\medskip
-
-(b)
-\par
-\vspace{11pt}
-\[
-  \begin{array}{ll@{\hspace{2em}}l}
-    & x \mapsto y \in (R \cup S) \rres C \\
-    &\Leftrightarrow x \mapsto y \in (R \cup S) \land y \in C \\
-    &\Leftrightarrow (x \mapsto y \in R \lor x \mapsto y \in S) \land y \in C \\
-    &\Leftrightarrow (x \mapsto y \in R \land y \in C) \lor (x
-    \mapsto y \in S \land y \in C) \\
-    &\Leftrightarrow x \mapsto y \in R \rres C \lor x \mapsto y \in S \rres C \\
-    &\Leftrightarrow x \mapsto y \in (R \rres C) \cup (S \rres C)
-  \end{array}
-\]
-
-\medskip
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      x \mapsto y \in (R \cup S) \rres C \\
+      \Leftrightarrow x \mapsto y \in (R \cup S) \land y \in C \\
+      \Leftrightarrow (x \mapsto y \in R \lor x \mapsto y \in S)
+      \land y \in C \\
+      \Leftrightarrow (x \mapsto y \in R \land y \in C) \lor (x
+      \mapsto y \in S \land y \in C) \\
+      \Leftrightarrow x \mapsto y \in R \rres C \lor x \mapsto y \in
+      S \rres C \\
+      \Leftrightarrow x \mapsto y \in (R \rres C) \cup (S \rres C)
+    \end{array}$%
+  }
+\end{center}
+\bigskip
 
 \section*{Functions}
 
-\bigskip
-\noindent
-\textbf{Solution 33}
+\section*{Solution 33}
+\addcontentsline{toc}{section}{Solution 33}
 
-\medskip
-
-\bigskip
-
-The set of 9 functions:
+\noindent The set of 9 functions:
 
 \bigskip
 
@@ -1340,12 +1311,9 @@ The set of 9 functions:
 $\{\emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 1)\}, \{(1, 0)\}, \{(0,
 0), (1, 1)\}, \{(0, 1), (1, 1)\}, \{(1, 0), (0, 0)\}, \{(0, 1), (1, 0)\}\}$
 
-(a)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(a)}
 
-The set of total functions:
+\noindent The set of total functions:
 
 \bigskip
 
@@ -1355,12 +1323,9 @@ $\{\{(0, 0), (1, 1)\}, \{(0, 1), (1, 1)\}, \{(1, 0), (0, 0)\}, \{(0,
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(b)}
 
-The set of functions which are neither injective nor surjective:
+\noindent The set of functions which are neither injective nor surjective:
 
 \bigskip
 
@@ -1369,12 +1334,9 @@ $\{\{(0, 1), (1, 1)\}, \{(0, 0), (1, 0)\}\}$
 
 \medskip
 
-(c)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(c)}
 
-The set of functions which are injective but not surjective:
+\noindent The set of functions which are injective but not surjective:
 
 \bigskip
 
@@ -1383,63 +1345,58 @@ $\{\emptyset, \{(0, 0)\}, \{(0, 1)\}, \{(1, 0)\}, \{(1, 1)\}\}$
 
 \medskip
 
-\noindent
-\hangindent=2em
-(d) There are no functions (of this type) which are surjective but
-not injective.
+\subsection*{(d)}
+
+\noindent There are no functions (of this type) which are surjective
+but not injective.
 
 \bigskip
 
 \medskip
-(e)
-\par
-\vspace{11pt}
-\bigskip
 
-The set of bijective functions:
+\subsection*{(e)}
+
+\noindent The set of bijective functions:
 
 \bigskip
 
 \noindent
 $\{\{(0, 0), (1, 1)\}, \{(0, 1), (1, 0)\}\}$
 
-\medskip
+\section*{Solution 34}
+\addcontentsline{toc}{section}{Solution 34}
 
-\bigskip
-\noindent
-\textbf{Solution 34}
-
-\medskip
+\subsection*{(a)}
 
 \noindent
-\hangindent=2em
-(a) $\{1 \mapsto a, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
+$\{1 \mapsto a, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
 
 \medskip
+
+\subsection*{(b)}
+
 \noindent
-\hangindent=2em
-(b) $\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}$
+$\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}$
 
 \medskip
+
+\subsection*{(c)}
+
 \noindent
-\hangindent=2em
-(c) $\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
+$\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
 
 \medskip
+
+\subsection*{(d)}
+
 \noindent
-\hangindent=2em
-(d) $\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
+$\{1 \mapsto c, 2 \mapsto b, 3 \mapsto c, 4 \mapsto b\}$
 
-\medskip
-\bigskip
-\noindent
-\textbf{Solution 35}
+\section*{Solution 35}
+\addcontentsline{toc}{section}{Solution 35}
 
-\medskip
+\subsection*{(a)}
 
-(a)
-\par
-\vspace{11pt}
 \begin{axdef}
   children : Person \fun \power Person
   \where
@@ -1448,9 +1405,8 @@ $\{\{(0, 0), (1, 1)\}, \{(0, 1), (1, 0)\}\}$
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
+\subsection*{(b)}
+
 \begin{axdef}
   number\_of\_grandchildren : Person \fun \nat
   \where
@@ -1458,19 +1414,16 @@ $\{\{(0, 0), (1, 1)\}, \{(0, 1), (1, 0)\}\}$
   \circ parentOf) \limg \{p\} \rimg) \}
 \end{axdef}
 
-\medskip
+\section*{Solution 36}
+\addcontentsline{toc}{section}{Solution 36}
+
+\noindent (Note: This solution demonstrates relation types in
+quantifier domains)
 
 \bigskip
-\noindent
-\textbf{Solution 36}
 
-\medskip
-
-\bigskip
-
-(Note: This solution demonstrates relation types in quantifier domains)
-
-\bigskip
+\begin{zed}[Drivers, Cars]
+\end{zed}
 
 \begin{axdef}
   number\_of\_drivers : (Drivers \rel Cars) \fun (Cars \fun \nat)
@@ -1481,72 +1434,90 @@ $\{\{(0, 0), (1, 1)\}, \{(0, 1), (1, 0)\}\}$
 
 \section*{Sequences}
 
-\bigskip
+\section*{Solution 37}
+\addcontentsline{toc}{section}{Solution 37}
+
+\subsection*{(a)}
+
 \noindent
-\textbf{Solution 37}
+$\langle a \rangle$
 
 \medskip
 
-\noindent
-\hangindent=2em
-(a) $\langle a \rangle$
+\subsection*{(b)}
 
-\medskip
 \noindent
-\hangindent=2em
-(b) $\{1 \mapsto a, 2 \mapsto b, 2 \mapsto a, 3 \mapsto c, 3 \mapsto
-b, 4 \mapsto d\}$
-
-\medskip
-\noindent
-\hangindent=2em
-(c) $\{2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}$
-
-\medskip
-\noindent
-\hangindent=2em
-(d) $\{1, 2, 3, 4\}$
-
-\medskip
-\noindent
-\hangindent=2em
-(e) $\{a, b\}$
-
-\medskip
-\noindent
-\hangindent=2em
-(f) $\{a \mapsto 1, b \mapsto 2, c \mapsto 3, d \mapsto 4\}$
-
-\medskip
-\noindent
-\hangindent=2em
-(g) $\langle a, b \rangle$
-
-\medskip
-\noindent
-\hangindent=2em
-(h) $\{3 \mapsto b\}$
-
-\medskip
-\noindent
-\hangindent=2em
-(i) $\{a\}$
-
-\medskip
-\noindent
-\hangindent=2em
-(j) $c$
-
-\medskip
-\bigskip
-\noindent
-\textbf{Solution 38}
+$\{1 \mapsto a, 2 \mapsto b, 2 \mapsto a, 3 \mapsto c, 3 \mapsto b, 4
+\mapsto d\}$
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
+\subsection*{(c)}
+
+\noindent
+$\{2 \mapsto b, 3 \mapsto c, 4 \mapsto d\}$
+
+\medskip
+
+\subsection*{(d)}
+
+\noindent
+$\{1, 2, 3, 4\}$
+
+\medskip
+
+\subsection*{(e)}
+
+\noindent
+$\{a, b\}$
+
+\medskip
+
+\subsection*{(f)}
+
+\noindent
+$\{a \mapsto 1, b \mapsto 2, c \mapsto 3, d \mapsto 4\}$
+
+\medskip
+
+\subsection*{(g)}
+
+\noindent
+$\langle a, b \rangle$
+
+\medskip
+
+\subsection*{(h)}
+
+\noindent
+$\{3 \mapsto b\}$
+
+\medskip
+
+\subsection*{(i)}
+
+\noindent
+$\{a\}$
+
+\medskip
+
+\subsection*{(j)}
+
+\noindent
+$c$
+
+\section*{Solution 38}
+\addcontentsline{toc}{section}{Solution 38}
+
+\begin{zed}[Place]
+\end{zed}
+
+\begin{axdef}
+  trains : \nat \fun (Place \cross Place)
+\end{axdef}
+
+\subsection*{(a)}
+
 \begin{axdef}
   f : Place \fun \power Place
   \where
@@ -1555,124 +1526,116 @@ b, 4 \mapsto d\}$
 
 \medskip
 
-\noindent
-\hangindent=2em
-(b) $\{ p : Place | \exists_1 x : \dom trains @ trains(x).2 = p \}$
+\subsection*{(b)}
+
+\noindent $\{ p : Place | \exists_1 x : \dom trains @ snd(trains(x)) = p \}$
 
 \bigskip
 
 \medskip
-\noindent
-\hangindent=2em
-(c) (mu $p : Place | $$\forall q : Place @ p \neq q$$\mid$ # $\{ x :
-  \dom trains | trains(x).2 = p \}$ $>$ # $\{ x : \dom trains |
-trains(x).2 = q \}$)
+
+\subsection*{(c)}
+
+\noindent (mu $p : Place$ $\mid$ $\forall q : Place @ p \neq q$$\mid$
+  # $\{ x : \dom trains | snd(trains(x)) = p \}$ $>$ # $\{ x : \dom
+trains | snd(trains(x)) = q \}$)
+
+\bigskip
+
+\section*{Solution 39}
+\addcontentsline{toc}{section}{Solution 39}
+
+\noindent Assuming Collection is defined as a bag (multiset) of
+$coins : Collection$ == $Coin \fun \nat$
+
+\bigskip
+
+\noindent And large is a specific coin denomination.
+
+\bigskip
+
+\subsection*{(a)}
+
+\noindent axdef
+
+\bigskip
+
+\noindent largeCoins : ($Coin \fun \nat$) $\fun$ N
+
+\bigskip
+
+\noindent where
+
+\bigskip
+
+\noindent $\forall c : Coin \fun \nat @ \forall large : Coin @
+largeCoins(c) = c(large)$
+
+\bigskip
+
+\noindent end
 
 \bigskip
 
 \medskip
+
+\subsection*{(b)}
+
+\noindent axdef
+
 \bigskip
-\noindent
-\textbf{Solution 39}
 
-\medskip
+\noindent addCoin : ($Coin \fun \nat$) cross Coin $\fun$ ($Coin \fun \nat$)
 
-(a)
-\par
-\vspace{11pt}
-\begin{axdef}
-  largeCoins : Collection \fun \nat
-  \where
-  \forall c : Collection @ largeCoins(c) = c(large)
-\end{axdef}
+\bigskip
 
-\medskip
+\noindent where
 
-(b)
-\par
-\vspace{11pt}
-\begin{axdef}
-  addCoin : Collection \cross Coin \fun Collection
-  \where
-  \forall c : Collection @ \forall d : Coin @ addCoin(c, d) = c \cup
-  \lbag d \rbag
-\end{axdef}
+\bigskip
 
-\medskip
+\noindent $\forall c : Coin \fun \nat @ \forall d : Coin @ addCoin(c,
+d) = c \cup \lbag d \rbag$
+
+\bigskip
+
+\noindent end
+
+\bigskip
 
 \section*{Modelling}
 
-\bigskip
-\noindent
-\textbf{Solution 40}
+\section*{Solution 40}
+\addcontentsline{toc}{section}{Solution 40}
 
-\medskip
-
-\bigskip
-
-Note: Refactored to use schemas with named fields instead of tuples
-for fuzz compatibility.
+\noindent Note: Refactored to use schemas with named fields instead
+of tuples for fuzz compatibility.
 
 \bigskip
 
-\bigskip
-
-Changed underscore identifiers to camelCase for fuzz compatibility.
+\noindent Changed underscore identifiers to camelCase for fuzz compatibility.
 
 \bigskip
 
-\begin{zed}[Title, Length, Viewed]
+\begin{zed}[Title, Viewed]
 \end{zed}
 
 \begin{schema}{Programme}
   title : Title \\
-  length : Length \\
+  length : \nat \\
   viewed : Viewed
 \end{schema}
 
-(a)
-\par
-\vspace{11pt}
 \begin{axdef}
-  hd : \seq Programme
-  \where
-  cumulativeTotal(hd) \leq 12000 \\
-  \forall p : \ran hd @ p.length \leq 360
+  yes : Viewed
 \end{axdef}
 
-\bigskip
-
-Note that cumulativeTotal is defined in part (d).
-
-\bigskip
-
-\medskip
-
-(b)
-\par
-\vspace{11pt}
-\bigskip
-
-Assuming hd is defined as in part (a):
-
-\bigskip
-
-\bigskip
-
-{$p : ran hd | p$.$length > 120$ . p.title}
-
-\bigskip
-
-\medskip
-
-(c)
-\par
-\vspace{11pt}
-\bigskip
-
-These can be defined recursively:
-
-\bigskip
+\begin{axdef}
+  cumulativeTotal : \seq Programme \fun \nat
+  \where
+  cumulativeTotal(\langle \rangle) = 0 \\
+  \forall x : Programme @ \forall s : \seq Programme @
+  cumulativeTotal(\langle x \rangle \cat s) = x.length + cumulativeTotal(s)
+\end{axdef}
 
 \begin{axdef}
   viewedProgrammes : \seq Programme \fun \seq Programme
@@ -1683,116 +1646,103 @@ These can be defined recursively:
   \THEN \langle x \rangle \cat viewedProgrammes(s) \ELSE viewedProgrammes(s)
 \end{axdef}
 
-\medskip
+\subsection*{(a)}
 
-(d)
-\par
-\vspace{11pt}
 \begin{axdef}
-  cumulativeTotal : \seq Programme \fun \nat
+  hd : \seq Programme
   \where
-  cumulativeTotal(\langle \rangle) = 0 \\
-  \forall x : Programme @ \forall s : \seq Programme @
-  cumulativeTotal(\langle x \rangle \cat s) = x.length + cumulativeTotal(s)
+  cumulativeTotal(hd) \leq 12000 \\
+  \forall p : \ran hd @ p.length \leq 360
 \end{axdef}
 
 \medskip
 
-(e)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(b)}
 
-Assuming hd is defined as in part (a), the title of the longest programme:
+\noindent Assuming hd is defined as in part (a):
 
 \bigskip
 
-\bigskip
-
-(mu $p : ran hd | $$\forall q : \ran hd @ p \neq q \land p.length >
-q.length$$\mid$ p.title)
-
-\bigskip
-
-\bigskip
-
-(This, of course, assumes that there is a unique element with this property.)
+\noindent {$p : ran hd$ $\mid$ p.$length > 120$ . p.title}
 
 \bigskip
 
 \medskip
 
-(f)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(c)}
 
-axdef
-
-\bigskip
-
-\bigskip
-
-$totalsByTitle : seq(Programme)  \fun  (Title  \pfun  Length)$
-
-\bigskip
-
-\bigskip
-
-where
-
-\bigskip
-
-\bigskip
-
-$\forall$ $s : seq(Programme) |$
-
-\bigskip
-
-\bigskip
-
-totalsByTitle(s) = {$t : Title | ($$\exists p : \ran s @ p.title = t$) .
-
-  \bigskip
-
-  \bigskip
-
-t $\mapsto$ cumulativeTotal(s $\rres$ {$l : Length$; $v : Viewed $. (t, l, v)})}
-
-\bigskip
-
-\bigskip
-
-end
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-(Note: Complex nested set comprehensions - may require simplification
-for implementation)
+\noindent Definitions of viewedProgrammes and cumulativeTotal moved
+above for fuzz validation.
 
 \bigskip
 
 \medskip
 
-(g)
-\par
-\vspace{11pt}
-\begin{axdef}
-  removeTheLongestViewed : \seq Programme \fun \seq Programme
-  \where
-  \forall s : \seq Programme @ removeTheLongestViewed(s) = s \rres \{
-  x : \ran s | x \neq longestViewed(s) \}
-\end{axdef}
+\subsection*{(d)}
+
+\noindent See definitions above.
 
 \bigskip
 
-Where longestViewed is defined as:
+\medskip
+
+\subsection*{(e)}
+
+\noindent Assuming hd is defined as in part (a), the title of the
+longest programme:
+
+\bigskip
+
+\noindent (mu $p : ran hd$ $\mid$ $\forall q : \ran hd @ p \neq q
+\land p.length > q.length$$\mid$ p.title)
+
+\bigskip
+
+\noindent (This, of course, assumes that there is a unique element
+with this property.)
+
+\bigskip
+
+\medskip
+
+\subsection*{(f)}
+
+\noindent axdef
+
+\bigskip
+
+\noindent $totalsByTitle : seq(Programme)$ $\fun$ ($Title \pfun Length$)
+
+\bigskip
+
+\noindent where
+
+\bigskip
+
+\noindent $\forall$ $s : seq(Programme)$ $\mid$
+
+\bigskip
+
+\noindent totalsByTitle(s) = {$t : Title$ $\mid$ ($\exists p : \ran s
+  @ p.title = t$) .
+
+  \bigskip
+
+  \noindent t $\mapsto$ cumulativeTotal(s $\rres$ {$l : Length; v$ :
+Viewed . (t, l, v)})}
+
+\bigskip
+
+\noindent end
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent (Note: Complex nested set comprehensions - may require
+simplification for implementation)
 
 \bigskip
 
@@ -1804,39 +1754,48 @@ Where longestViewed is defined as:
   = yes \land p.length > q.length))
 \end{axdef}
 
-\bigskip
-
-This, of course, assumes that there is at least one viewed programme
-(and one of a unique maximum length).
+\noindent longestViewed assumes that there is at least one viewed
+programme (and one of a unique maximum length).
 
 \bigskip
 
 \medskip
 
-(h)
-\par
-\vspace{11pt}
+\subsection*{(g)}
+
 \begin{axdef}
-  sortByLength : \seq Programme \fun \seq Programme
+  removeTheLongestViewed : \seq Programme \fun \seq Programme
   \where
-  \forall x : \seq Programme @ items(sortByLength(x)) = items(x)
-  \land (\forall i, j : \dom (sortByLength(x)) @ i < j \implies
-  sortByLength(x)(i).length \geq sortByLength(x)(j).length)
+  \forall s : \seq Programme @ \\
+  \quad removeTheLongestViewed(s) = s \rres \{ x : \ran s | x \neq
+  longestViewed(s) \}
 \end{axdef}
 
 \medskip
 
-\bigskip
-\noindent
-\textbf{Solution 41}
+\subsection*{(h)}
 
-\medskip
+\begin{axdef}
+  sortByLength : \seq Programme \fun \seq Programme
+  \where
+  \forall x : \seq Programme @ \forall sorted : \seq Programme @
+  sorted = sortByLength(x) \land items(sorted) = items(x) \land
+  (\forall i, j : \dom sorted @ \forall pi, pj : Programme @ pi =
+  sorted(i) \land pj = sorted(j) \land i < j \implies pi.length \geq pj.length)
+\end{axdef}
 
-\begin{zed}[Year, Course, Lecturer]
+\section*{Solution 41}
+\addcontentsline{toc}{section}{Solution 41}
+
+\begin{zed}[Course, Lecturer]
 \end{zed}
 
+\begin{axdef}
+  current : \nat
+\end{axdef}
+
 \begin{schema}{Entry}
-  year : Year \\
+  year : \nat \\
   course : Course \\
   code : \nat \\
   lecturer : Lecturer \\
@@ -1849,37 +1808,47 @@ This, of course, assumes that there is at least one viewed programme
   Table == \nat \pinj Entry
 \end{zed}
 
-(a)
-\par
-\vspace{11pt}
+\subsection*{(a)}
+
 \begin{axdef}
-  records : Year \pinj Table
+  records : \nat \pinj Table
   \where
   \dom records = 1993 \upto current \\
   \forall y : \dom records @ \# (records(y)) \leq 50 \\
-  \forall y : \dom records @ \forall e : \ran (records(y)) @ e.year = y \\
-  \forall r : \ran records @ \forall i1, i2 : \dom r @ i1 \neq i2
-  \land r(i1).year = r(i2).year \implies r(i1).code \neq r(i2).code
+  \forall y : \dom records @ \forall e : \ran (records(y)) @ e.year = y
 \end{axdef}
 
 \medskip
 
+\subsection*{(b)}
+
 \noindent
-\hangindent=2em
-(b) $i(\{ e : Entry | \exists r : \ran records @ e \in \ran r \land
+$i(\{ e : Entry | \exists r : \ran records @ e \in \ran r \land
 e.code = 479 \})$
 
-\noindent
-$ii(\{ e : Entry | \exists r : \ran records @ e \in \ran r \land
-e.completed > e.enrolled \})$
+\medskip
+
+\subsection*{(ii)}
 
 \noindent
-$iii(\{ e : Entry | \exists r : \ran records @ e \in \ran r \land
-e.grade \geq 70 \})$
+$\{ e : Entry | \exists r : \ran records @ e \in \ran r \land
+e.completed > e.enrolled \}$
+
+\medskip
+
+\subsection*{(iii)}
 
 \noindent
-$iv(\{ c : Course | \forall r : \ran records @ \forall e : \ran r @
-e.course = c \implies e.grade \geq 70 \})$
+$\{ e : Entry | \exists r : \ran records @ e \in \ran r \land e.grade
+\geq 70 \}$
+
+\medskip
+
+\subsection*{(iv)}
+
+\noindent
+$\{ c : Course | \forall r : \ran records @ \forall e : \ran r @
+e.course = c \implies e.grade \geq 70 \}$
 
 \noindent
 $v(\{ y : Year | y \in \dom records @ y \mapsto \{ l : Lecturer | \#
@@ -1887,10 +1856,10 @@ $v(\{ y : Year | y \in \dom records @ y \mapsto \{ l : Lecturer | \#
 
 \medskip
 
-(c)
-\par
-\vspace{11pt}
+\subsection*{(c)}
+
 \begin{axdef}
+  courses479 : \seq Entry \fun \seq Entry
   \where
   \forall x : Entry @ \forall s : \seq Entry @ courses479(\langle
   \rangle) = \langle \rangle \land courses479(\langle x \rangle \cat
@@ -1900,28 +1869,19 @@ $v(\{ y : Year | y \in \dom records @ y \mapsto \{ l : Lecturer | \#
 
 \medskip
 
-(d)
-\par
-\vspace{11pt}
+\subsection*{(d)}
+
 \begin{axdef}
+  total : \seq Entry \fun \nat
   \where
   \forall x : Entry @ \forall s : \seq Entry @ total(\langle \rangle)
   = 0 \land total(\langle x \rangle \cat s) = x.enrolled + total(s)
 \end{axdef}
 
-\medskip
+\section*{Solution 42}
+\addcontentsline{toc}{section}{Solution 42}
 
-\bigskip
-\noindent
-\textbf{Solution 42}
-
-\medskip
-
-(a)
-\par
-\vspace{11pt}
-\begin{zed}[Person]
-\end{zed}
+\subsection*{(a)}
 
 \begin{axdef}
   State : \power (\seq (\iseq Person))
@@ -1932,42 +1892,31 @@ $v(\{ y : Year | y \in \dom records @ y \mapsto \{ l : Lecturer | \#
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
+\subsection*{(b)}
+
 \begin{axdef}
-  add : (\nat \cross Person) \cross State \pinj State
+  add : \nat \cross Person \cross State \pinj State
   \where
-  \forall n : \nat @ \forall p : Person @ \forall s : State @ n \in
-  \dom s \land p \notin \bigcup \ran \ran s.add(n, p, s) = s \oplus
-  \{n \mapsto s(n) \cat \langle p \rangle\}
+  \forall n : \nat @ \forall p : Person @ \forall s : State | n \in
+  \dom s \land p \notin \bigcup \{ i : \dom s @ \ran (s(i)) \} @
+  add(n, p, s) = s \oplus \{n \mapsto s(n) \cat \langle p \rangle\}
 \end{axdef}
 
-\medskip
+\section*{Solution 43}
+\addcontentsline{toc}{section}{Solution 43}
 
-\bigskip
-\noindent
-\textbf{Solution 43}
-
-\medskip
-
-\bigskip
-
-Note: Assuming given types Cinema, Film, Date, Booking and a bookings relation.
+\noindent Note: Assuming given types Cinema, Film, Date, Booking and
+a bookings relation.
 
 \bigskip
 
-\bigskip
-
-The problem statement $defines : bookings $: (Cinema cross Film)
-$\pfun$ seq Booking
+\noindent The problem statement $defines : bookings$ : (Cinema cross
+Film) $\pfun$ seq Booking
 
 \bigskip
 
-\bigskip
-
-where Booking is a triple of (bookingRef, startDay, endDay) : (N
-cross N cross N)
+\noindent where Booking is a triple of (bookingRef, startDay, endDay)
+: (N cross N cross N)
 
 \bigskip
 
@@ -1980,102 +1929,99 @@ cross N cross N)
   endDay : \nat
 \end{schema}
 
-\bigskip
-
-Assuming: bookings : (Cinema cross Film) $\pfun$ seq Booking
+\noindent Assuming: bookings : (Cinema cross Film) $\pfun$ seq Booking
 
 \bigskip
 
-(a)
-\par
-\vspace{11pt}
-\noindent
-\hangindent=2em
-(i) $\forall$ $i : dom bookings | $$\forall x, y : bookings(i) @ x
-\neq y$$\mid$ (x.startDay..x.endDay) intersect (y.startDay..y.endDay)
-= $\emptyset$
+\subsection*{(a)}
+
+\medskip
+
+\subsection*{(i)}
+
+\noindent $\forall$ $i : dom bookings$ $\mid$ $\forall x, y :
+bookings(i) @ x \neq y$$\mid$ (x.startDay..x.endDay) intersect
+(y.startDay..y.endDay) = $\emptyset$
 
 \bigskip
 
 \medskip
-\noindent
-\hangindent=2em
-(ii) $\forall$ $i : dom bookings | $\forall$ x $: bookings(i) $\mid$
-$\{x.startDay, x.endDay\}$ subseteq 1..max(i.1)
+
+\subsection*{(ii)}
+
+\noindent $\forall$ $i : dom bookings$ $\mid$ $\forall$ $x :
+bookings(i)$ $\mid$ $\{x.startDay, x.endDay\}$ subseteq 1..max(fst(i))
+
+\bigskip
+
+\noindent (Note: Assuming max is a function on Cinema that returns
+the maximum day number)
 
 \bigskip
 
 \medskip
-\bigskip
 
-(Note: Assuming max is a function on Cinema that returns the maximum day number)
+\subsection*{(iii)}
 
-\bigskip
-
-\noindent
-\hangindent=2em
-(iii) $\forall$ $i : dom bookings | $$\forall b : bookings(i) @
-b.startDay \leq b.endDay$
+\noindent $\forall$ $i : dom bookings$ $\mid$ $\forall b :
+bookings(i) @ b.startDay \leq b.endDay$
 
 \bigskip
 
 \medskip
-\noindent
-\hangindent=2em
-(iv) This is enforced by the constraint for part (i).
+
+\subsection*{(iv)}
+
+\noindent This is enforced by the constraint for part (i).
 
 \bigskip
 
 \medskip
-\medskip
 
-(b)
-\par
-\vspace{11pt}
-\bigskip
+\subsection*{(b)}
 
-Assuming Banbury : Cinema and bookings is defined
-
-\bigskip
-
-\noindent
-\hangindent=2em
-(i) $\{ i : \dom bookings | i.1 = Banbury.i.2 \}$
+\noindent Assuming $Banbury : Cinema$ and bookings is defined
 
 \bigskip
 
 \medskip
-\noindent
-\hangindent=2em
-(ii) $\{ i : \dom bookings | i.1 = Banbury \land (\exists b :
-bookings(i) @ 50 \in b) @ startDay \upto b.endDay \}$
+
+\subsection*{(i)}
+
+\noindent $\{ i : \dom bookings | fst(i) = Banbury.snd(i) \}$
 
 \bigskip
 
 \medskip
-\noindent
-\hangindent=2em
-(iii) Assuming Room is Cinema, returning unique cinema/film pairs:
+
+\subsection*{(ii)}
+
+\noindent $\{ i : \dom bookings | fst(i) = Banbury \land (\$\exists
+$b : bookings(i)$ @ 50$\in b @ startDay \upto b.endDay) \}$
 
 \bigskip
 
 \medskip
+
+\subsection*{(iii)}
+
+\noindent Assuming Room is Cinema, returning unique cinema/film pairs:
+
 \bigskip
 
-{$c : Cinema$; $f : Film | $$\exists i : \dom bookings @ i.1 = c
-\land i.2 = f$. (c, f)}
-
-\bigskip
-
-\noindent
-\hangindent=2em
-(iv) $\{ c : Cinema | \exists i : \dom bookings @ i.1 = c \land \#
-(bookings(i)) \geq 10 \}$
+\noindent {$c : Cinema; f$ : Film $\mid$ $\exists i : \dom bookings @
+fst(i) = c \land snd(i) = f$. (c, f)}
 
 \bigskip
 
 \medskip
-\medskip
+
+\subsection*{(iv)}
+
+\noindent $\{ c : Cinema | \exists i : \dom bookings @ fst(i) = c
+\land \# (bookings(i)) \geq 10 \}$
+
+\bigskip
 
 \section*{Free types and induction}
 
@@ -2086,194 +2032,147 @@ bookings(i) @ 50 \in b) @ startDay \upto b.endDay \}$
   Tree \cross Tree \rdata
 \end{zed}
 
+\section*{Solution 44}
+\addcontentsline{toc}{section}{Solution 44}
+
+\noindent The two cases of the proof are established by equational
+reasoning: the first by
+
 \bigskip
+
 \noindent
-\textbf{Solution 44}
-
-\medskip
 
 \bigskip
 
-The two cases of the proof are established by equational reasoning: the first by
+\noindent reverse ($\langle \rangle$ ^ t) = reverse t [cat.1a] =
+(reverse t) ^ $\langle \rangle$ [cat.1b]
 
 \bigskip
 
-\bigskip
-
-\bigskip
-
-\bigskip
-
-reverse ($\langle \rangle$ ^ t) = reverse t [cat.1a] = (reverse t) ^
-$\langle \rangle$ [cat.1b]
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-where cat.1a is $\langle \rangle$ ^ $s = s$ and cat.1b is s ^
-$\langle \rangle$ = s
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-and the second by
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-reverse (($\langle x \rangle$ ^ u) ^ t) = reverse ($\langle x
-\rangle$ ^ (u ^ t)) [cat.2]
-
-\bigskip
-
-\bigskip
-
-= reverse (u ^ t) ^ $\langle x \rangle$    [reverse.2]
-
-\bigskip
-
-\bigskip
-
-= (reverse t ^ reverse u) ^ $\langle x \rangle$  [anti-distributive]
-
-\bigskip
-
-\bigskip
-
-= reverse t ^ (reverse u ^ $\langle x \rangle$)  [cat.2]
-
-\bigskip
-
-\bigskip
-
-= reverse t ^ reverse ($\langle x \rangle$ ^ u)  [reverse.2]
-
-\bigskip
-
-\bigskip
 \noindent
-\textbf{Solution 45}
-
-\medskip
 
 \bigskip
 
-The base case:
+\noindent where cat.1a is $\langle \rangle$ ^ $s = s$ and cat.1b is s
+^ $\langle \rangle$ = s
 
 \bigskip
 
-\bigskip
-
-\bigskip
-
-\bigskip
-
-reverse (reverse $\langle \rangle$) = reverse $\langle \rangle$
-[reverse.1] = $\langle \rangle$ [reverse.1]
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-The inductive step:
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-reverse (reverse ($\langle x \rangle$ ^ t))
-
-\bigskip
-
-\bigskip
-
-= reverse ((reverse t) ^ $\langle x \rangle$)  [reverse.2]
-
-\bigskip
-
-\bigskip
-
-= reverse ($\langle x \rangle$) ^ reverse (reverse t)  [anti-distributive]
-
-\bigskip
-
-\bigskip
-
-= reverse ($\langle x \rangle$ ^ $\langle \rangle$) ^ reverse
-(reverse t)  [cat.1]
-
-\bigskip
-
-\bigskip
-
-= ((reverse $\langle \rangle$) ^ $\langle x \rangle$) ^ reverse
-(reverse t)  [reverse.2]
-
-\bigskip
-
-\bigskip
-
-= ($\langle \rangle$ ^ $\langle x \rangle$) ^ reverse (reverse t)  [reverse.1]
-
-\bigskip
-
-\bigskip
-
-= $\langle x \rangle$ ^ reverse (reverse t)  [cat.1]
-
-\bigskip
-
-\bigskip
-
-= $\langle x \rangle$ ^ t  [reverse (reverse t) = t]
-
-\bigskip
-
-\bigskip
 \noindent
-\textbf{Solution 46}
 
-\medskip
+\bigskip
 
-(a)
-\par
-\vspace{11pt}
+\noindent and the second by
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent reverse (($\langle x \rangle$ ^ u) ^ t) = reverse ($\langle
+x \rangle$ ^ (u ^ t)) [cat.2]
+
+\bigskip
+
+\noindent = reverse (u ^ t) ^ $\langle x \rangle$    [reverse.2]
+
+\bigskip
+
+\noindent = (reverse t ^ reverse u) ^ $\langle x \rangle$  [anti-distributive]
+
+\bigskip
+
+\noindent = reverse t ^ (reverse u ^ $\langle x \rangle$)  [cat.2]
+
+\bigskip
+
+\noindent = reverse t ^ reverse ($\langle x \rangle$ ^ u)  [reverse.2]
+
+\bigskip
+
+\section*{Solution 45}
+\addcontentsline{toc}{section}{Solution 45}
+
+\noindent The base case:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent reverse (reverse $\langle \rangle$) = reverse $\langle
+\rangle$ [reverse.1] = $\langle \rangle$ [reverse.1]
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent The inductive step:
+
+\bigskip
+
+\noindent
+
+\bigskip
+
+\noindent reverse (reverse ($\langle x \rangle$ ^ t))
+
+\bigskip
+
+\noindent = reverse ((reverse t) ^ $\langle x \rangle$)  [reverse.2]
+
+\bigskip
+
+\noindent = reverse ($\langle x \rangle$) ^ reverse (reverse t)
+[anti-distributive]
+
+\bigskip
+
+\noindent = reverse ($\langle x \rangle$ ^ $\langle \rangle$) ^
+reverse (reverse t)  [cat.1]
+
+\bigskip
+
+\noindent = ((reverse $\langle \rangle$) ^ $\langle x \rangle$) ^
+reverse (reverse t)  [reverse.2]
+
+\bigskip
+
+\noindent = ($\langle \rangle$ ^ $\langle x \rangle$) ^ reverse
+(reverse t)  [reverse.1]
+
+\bigskip
+
+\noindent = $\langle x \rangle$ ^ reverse (reverse t)  [cat.1]
+
+\bigskip
+
+\noindent = $\langle x \rangle$ ^ t  [reverse (reverse t) = t]
+
+\bigskip
+
+\section*{Solution 46}
+\addcontentsline{toc}{section}{Solution 46}
+
+\subsection*{(a)}
+
 \begin{axdef}
-  count : Tree \fun \nat
+  treeCount : Tree \fun \nat
   \where
-  count(stalk) = 0 \\
-  \forall n : \nat @ count(leaf(n)) = 1 \\
-  \forall t1, t2 : Tree @ count(branch(t1, t2)) = count(t1) + count(t2)
+  treeCount(stalk) = 0 \\
+  \forall n : \nat @ treeCount(leaf(n)) = 1 \\
+  \forall t1, t2 : Tree @ treeCount(branch(t1, t2)) = treeCount(t1) +
+  treeCount(t2)
 \end{axdef}
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
+\subsection*{(b)}
+
 \begin{axdef}
   flatten : Tree \fun \seq \nat
   \where
@@ -2282,85 +2181,68 @@ reverse (reverse ($\langle x \rangle$ ^ t))
   \forall t1, t2 : Tree @ flatten(branch(t1, t2)) = flatten(t1) \cat flatten(t2)
 \end{axdef}
 
-\medskip
+\section*{Solution 47}
+\addcontentsline{toc}{section}{Solution 47}
+
+\noindent First, exhibit the induction principle for the free type:
 
 \bigskip
+
 \noindent
-\textbf{Solution 47}
-
-\medskip
 
 \bigskip
 
-First, exhibit the induction principle for the free type:
+\noindent P stalk and ($\forall n : \nat @ \power (leaf(n))$) and
+$\forall t1, t2 : Tree @ \power t1 \land \power t2 \implies \power
+(branch(t1, t2))$
 
 \bigskip
 
-\bigskip
+\noindent implies $\forall t : Tree @ \power t$
 
 \bigskip
 
-\bigskip
-
-P stalk and ($\forall n : \nat @ \power (leaf(n))$) and $\forall t1,
-t2 : Tree @ \power t1 \land \power t2 \implies \power (branch(t1, t2))$
+\noindent
 
 \bigskip
 
-\bigskip
-
-implies $\forall t : Tree @ \power t$
+\noindent This gives three cases for the proof:
 
 \bigskip
 
-\bigskip
+\noindent
 
 \bigskip
 
-\bigskip
-
-This gives three cases for the proof:
-
-\bigskip
+\noindent # (flatten stalk) = # $\langle \rangle$ [flatten] = 0 [#] =
+treeCount stalk [treeCount]
 
 \bigskip
 
-\bigskip
+\noindent
 
 \bigskip
 
-# (flatten stalk) = # $\langle \rangle$ [flatten] = 0 [#] = count stalk [count]
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-\bigskip
-
-(Remaining cases omitted - require equational reasoning with
-recursive functions)
+\noindent (Remaining cases omitted - require equational reasoning
+with recursive functions)
 
 \bigskip
 
 \section*{Supplementary material : assignment practice}
 
-\bigskip
-\noindent
-\textbf{Solution 48}
+\section*{Solution 48}
+\addcontentsline{toc}{section}{Solution 48}
 
-\medskip
-
-\begin{zed}[SongId, UserId, PlaylistId, Playlist]
+\begin{zed}[SongId, UserId, PlaylistId]
 \end{zed}
 
 \begin{axdef}
   songs : \finset SongId \\
   users : \finset UserId \\
-  playlists : PlaylistId \pfun Playlist \\
+  playlists : PlaylistId \pfun \seq SongId \\
   playlistOwner : PlaylistId \pfun UserId \\
-  playlistSubscribers : PlaylistId \pfun \finset_1 UserId
+  playlistSubscribers : PlaylistId \pfun \finset_1 UserId \\
+  nullSong : SongId
   \where
   \forall i : \dom playlists @ \ran (playlists(i)) \subseteq songs \\
   \dom playlistOwner \subseteq \dom playlists \\
@@ -2371,11 +2253,8 @@ recursive functions)
   \forall i : \dom playlists @ playlistOwner(i) \in playlistSubscribers(i)
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Solution 49}
-
-\medskip
+\section*{Solution 49}
+\addcontentsline{toc}{section}{Solution 49}
 
 \begin{axdef}
   hated : UserId \pfun \finset SongId \\
@@ -2388,33 +2267,27 @@ recursive functions)
   \forall i : \dom hated \cup \dom loved @ hated(i) \cap loved(i) = \emptyset
 \end{axdef}
 
-\bigskip
-\noindent
-\textbf{Solution 50}
+\section*{Solution 50}
+\addcontentsline{toc}{section}{Solution 50}
 
-\medskip
+\subsection*{(a)}
 
-(a)
-\par
-\vspace{11pt}
 \begin{zed}
-  A == users \setminus \bigcup \ran playlistSubscribers
+  A == users \setminus \bigcup (\ran playlistSubscribers)
 \end{zed}
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
+\subsection*{(b)}
+
 \begin{zed}
   B == \{ p : \dom playlistSubscribers | \# (playlistSubscribers(p)) \geq 100 \}
 \end{zed}
 
 \medskip
 
-(c)
-\par
-\vspace{11pt}
+\subsection*{(c)}
+
 \begin{zed}
   C == (\mu u : \dom loved | \forall v : \dom loved @ u \neq v \land
   \# (loved(u)) > \# (loved(v)))
@@ -2422,38 +2295,31 @@ recursive functions)
 
 \medskip
 
-(d)
-\par
-\vspace{11pt}
+\subsection*{(d)}
+
 \begin{zed}
   D == (\mu s : songs | \forall t : songs @ s \neq t \land \# \{ u :
   UserId | s \in loved(u) \} > \# \{ u : UserId | t \in loved(u) \})
 \end{zed}
 
-\medskip
+\section*{Solution 51}
+\addcontentsline{toc}{section}{Solution 51}
 
-\bigskip
-\noindent
-\textbf{Solution 51}
+\subsection*{(a)}
 
-\medskip
-
-(a)
-\par
-\vspace{11pt}
 \begin{axdef}
   loveHateScore : SongId \pfun \nat
   \where
   \forall i : songs @ loveHateScore(i) = \IF \# \{ u : UserId | i \in
-  loved(u) \} \geq \# \{ u : UserId | i \in hated(u) \} \THEN \# (\{
-  u : UserId | i \in loved(u) \} - \# \{ u : UserId | i \in hated(u) \}) \ELSE 0
+  loved(u) \} \geq \# \{ u : UserId | i \in hated(u) \} \THEN \# \{ u
+  : UserId | i \in loved(u) \} - \# \{ u : UserId | i \in hated(u) \} \ELSE 0
 \end{axdef}
 
 \begin{axdef}
   playlistCount : SongId \pfun \nat
   \where
-  \forall i : songs @ playlistCount(i) = \# \{ p : \dom playlist | i
-  \in \ran (playlist(p)) \}
+  \forall i : songs @ playlistCount(i) = \# \{ p : \dom playlists | i
+  \in \ran (playlists(p)) \}
 \end{axdef}
 
 \begin{axdef}
@@ -2467,9 +2333,8 @@ recursive functions)
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
+\subsection*{(b)}
+
 \begin{axdef}
   mostPopular : SongId
   \where
@@ -2481,61 +2346,45 @@ recursive functions)
 
 \medskip
 
-(c)
-\par
-\vspace{11pt}
+\subsection*{(c)}
+
 \begin{zed}
   playlistsContainingMostPopularSong == \{ i : \dom playlists |
   mostPopular \in \ran (playlists(i)) \}
 \end{zed}
 
-\medskip
+\section*{Solution 52}
+\addcontentsline{toc}{section}{Solution 52}
+
+\noindent Assuming Play == SongId cross UserId
 
 \bigskip
-\noindent
-\textbf{Solution 52}
+
+\noindent And $functions : userStatus$ : UserId $\fun$ $\{premium,
+standard\}$, $fst : X cross Y$ $\fun$ X, $snd : X cross Y$ $\fun$ Y
+
+\bigskip
+
+\subsection*{(a)}
+
+\noindent premiumPlays filters plays to only premium users
+
+\bigskip
 
 \medskip
 
-(a)
-\par
-\vspace{11pt}
-\begin{axdef}
-  premiumPlays : \seq Play \fun \seq Play
-  \where
-  premiumPlays(\langle \rangle) = \langle \rangle \\
-  \forall x : Play @ \forall s : \seq Play @ premiumPlays(\langle x
-  \rangle \cat s) = \IF userStatus(x.2) = premium \THEN \langle x
-  \rangle \cat premiumPlays(s) \ELSE premiumPlays(s)
-\end{axdef}
+\subsection*{(b)}
+
+\noindent standardPlays filters plays to only standard users
+
+\bigskip
 
 \medskip
 
-(b)
-\par
-\vspace{11pt}
-\begin{axdef}
-  standardPlays : \seq Play \fun \seq Play
-  \where
-  standardPlays(\langle \rangle) = \langle \rangle \\
-  \forall x : Play @ \forall s : \seq Play @ standardPlays(\langle x
-  \rangle \cat s) = \IF userStatus(x.2) = standard \THEN \langle x
-  \rangle \cat standardPlays(s) \ELSE standardPlays(s)
-\end{axdef}
+\subsection*{(c)}
 
-\medskip
+\noindent cumulativeLength sums the lengths of all songs played
 
-(c)
-\par
-\vspace{11pt}
-\begin{axdef}
-  cumulativeLength : \seq Play \fun \nat
-  \where
-  cumulativeLength(\langle \rangle) = 0 \\
-  \forall x : Play @ \forall s : \seq Play @ cumulativeLength(\langle
-  x \rangle \cat s) = length(x.1) + cumulativeLength(s)
-\end{axdef}
-
-\medskip
+\bigskip
 
 \end{document}
