@@ -15,7 +15,7 @@ make fuzz      # Build fuzz test cases
 
 ## Directory Structure
 
-### 01_propositional_logic (Lecture 1)
+### 01_propositional_logic (4 examples)
 Basic propositional logic operators and constructs.
 
 - `hello_world.txt` - Minimal example
@@ -23,22 +23,25 @@ Basic propositional logic operators and constructs.
 - `truth_tables.txt` - Truth table construction
 - `complex_formulas.txt` - Complex propositional formulas
 
-### 02_predicate_logic (Lecture 2)
+### 02_predicate_logic (4 examples)
 Predicate logic with quantifiers and declarations.
 
 - `quantifiers.txt` - Universal (forall) and existential (exists) quantification
+- `multi_variable_quantifiers.txt` - Multiple variables in quantifiers
 - `declarations.txt` - Type declarations and predicates
-- `future/` - Examples using syntax not yet implemented (seq(T), pattern matching)
+- `nested_quantifiers.txt` - Nested quantification examples
 
-### 03_equality (Lecture 3)
+### 03_equality (6 examples)
 Equality and unique quantification.
 
 - `equality_operators.txt` - Basic equality (=, !=) and equality in predicates
 - `unique_existence.txt` - Unique quantifier (exists1) and uniqueness conditions
 - `mu_operator.txt` - Mu operator (μ) for selecting unique values
+- `mu_with_expression.txt` - Mu with expression part
 - `one_point_rule.txt` - Applications of the one-point rule in quantifier elimination
+- `equality_proofs.txt` - Proofs using equality reasoning
 
-### 04_proof_trees (Lecture 4)
+### 04_proof_trees (8 examples)
 Natural deduction proof trees with inference rules.
 
 - `simple_proofs.txt` - Basic implication and elimination proofs
@@ -46,9 +49,11 @@ Natural deduction proof trees with inference rules.
 - `minimal_nesting.txt` - Minimal nested proof example
 - `contradiction.txt` - Proof by contradiction
 - `excluded_middle.txt` - Excluded middle proofs
+- `case_analysis.txt` - Or-elimination with case analysis
 - `advanced_proof_patterns.txt` - Advanced proof patterns
+- `implication_introduction.txt` - Implication introduction rule
 
-### 05_sets (Lecture 5)
+### 05_sets (7 examples)
 Set theory, types, and set operations.
 
 - `set_basics.txt` - Basic set notation {}, membership (in, notin)
@@ -56,65 +61,106 @@ Set theory, types, and set operations.
 - `cartesian_tuples.txt` - Cartesian products and ordered pairs
 - `set_literals.txt` - Set literal notation with maplets
 - `tuple_examples.txt` - Tuple construction and component selection
-- `union_domain.txt` - Distributed union and intersection
+- `set_comprehension.txt` - Set comprehension with predicates and expressions
+- `distributed_union.txt` - Distributed union (bigcup) operator
 
-### 06_definitions (Lecture 6)
+### 06_definitions (8 examples)
 Z notation definitions: basic types, free types, abbreviations.
 
-- `free_types_demo.txt` - Free type definitions (Type ::= branch1 | branch2)
-- `free_types_proper.txt` - Proper free type examples
-- `abbrev_demo.txt` - Abbreviation definitions (==)
-- `axdef_demo.txt` - Axiomatic definitions
-- `schema_demo.txt` - Schema definitions
+- `given_types.txt` - Given type declarations
+- `free_types_basic.txt` - Basic free type definitions (Type ::= branch1 | branch2)
+- `free_types_recursive.txt` - Recursive free types (trees, lists)
+- `free_types_generic.txt` - Generic free types
+- `abbreviations.txt` - Abbreviation definitions (==)
+- `axdef_basic.txt` - Axiomatic definitions
+- `schema_basic.txt` - Schema definitions
 - `anonymous_schema.txt` - Anonymous schema expressions
 
-### 07_relations (Lecture 7)
+### 07_relations (7 examples)
 Relations, domain, range, and relational operators.
 
-- `relation_operators.txt` - Relation types (X <-> Y), maplets (|->)
+- `relation_types.txt` - Relation types (X <-> Y), maplets (|->)
 - `domain_range.txt` - Domain (dom) and range (ran) operators
 - `restrictions.txt` - Domain restriction (<|), range restriction (|>)
-- `maplets.txt` - Maplet construction and usage
-- `relational_image.txt` - Relational image operator
-- `relational_composition.txt` - Composition (;, comp)
-- `range_examples.txt` - Range operation examples
+- `domain_range_subtraction.txt` - Domain subtraction (<<|), range subtraction (|>>)
+- `relational_image.txt` - Relational image operator (R(| S |))
+- `composition.txt` - Relational composition (o9, comp)
+- `closures.txt` - Transitive (+) and reflexive-transitive (*) closures
 
-### 08_functions (Lecture 8)
+### 08_functions (8 examples)
 Functions, lambda expressions, and function types.
 
-- `lambda_expressions.txt` - Lambda expressions (lambda x : T . body)
-- `function_types.txt` - Partial (7->), total (->), injections, surjections, bijections
-- `simple_functions.txt` - Basic function definitions
+- `lambda_basic.txt` - Basic lambda expressions (lambda x : T . body)
+- `lambda_multi_variable.txt` - Multi-variable lambdas
+- `function_types.txt` - Partial (+->), total (->), injections, surjections, bijections
+- `function_application.txt` - Function application f(x)
+- `space_separated_application.txt` - Space-separated application (f x y)
+- `override.txt` - Function override (++)
+- `generic_functions.txt` - Generic function definitions
+- `recursive_functions.txt` - Recursive function definitions with pattern matching
 
-### 09_sequences (Lecture 9)
+### 09_sequences (7 examples)
 Sequences, bags, and sequence operations.
 
-- `sequence_basics.txt` - Sequence types and literals (⟨⟩, <>, ⟨a,b,c⟩)
+- `sequence_literals.txt` - Sequence types and literals (⟨⟩, <>, ⟨a,b,c⟩)
 - `concatenation.txt` - Sequence concatenation (⌢, ^) and cons patterns
 - `sequence_operations.txt` - Length (#), head, tail, last, front, reverse
 - `pattern_matching.txt` - Pattern matching with sequences in recursive definitions
+- `sequence_comprehension.txt` - Sequence comprehension
 - `bags.txt` - Bag types and bag literals ([[x]], [[a,b,c]])
+- `ranges.txt` - Range operator (m..n)
 
-### complete_examples/
-Complete real-world specifications:
+### 10_schemas (2 examples)
+Schema definitions and schema expressions.
 
-- `tv_programme_modeling.txt` - TV programme modeling example
+- `scoping_demo.txt` - Schema scoping and variable visibility
+- `zed_blocks.txt` - Multiple Z notation block types
 
-### fuzz_tests/
-Test cases for fuzz validation and edge cases:
+### 11_text_blocks (6 examples)
+Text blocks with inline mathematics and LaTeX integration.
 
-- `test_field_projection_bug.txt` - Demonstrates parser bug with field projection on function applications (see issue #13)
-- `test_zed.txt` - Zed notation test
-- `test_mod.txt` - Modulo operator test
-- `test_mod2.txt` - Extended modulo tests
-- `test_nested_super.txt` - Nested schema tests
+- `text_smart.txt` - Smart inline math detection in TEXT blocks
+- `puretext.txt` - PURETEXT directive (no math conversion)
+- `latex_passthrough.txt` - LATEX directive for raw LaTeX
+- `combined_directives.txt` - Combining different text block types
+- `pagebreak.txt` - PAGEBREAK directive
+- `bibliography_example.txt` - Bibliography and citations
 
-### reference/
-Reference solutions from course materials:
+### 12_advanced (3 examples)
+Advanced features and edge cases.
+
+- `subscripts_superscripts.txt` - Complex subscripts and superscripts
+- `generic_instantiation.txt` - Generic type instantiation
+- `if_then_else.txt` - Conditional expressions
+
+### complete_examples/ (5 examples)
+Complete real-world specifications combining multiple features.
+
+- `tv_programme_modeling.txt` - TV programme modeling
+- `music_streaming_service.txt` - Music streaming service specification
+- `family_relationships.txt` - Family relationship modeling
+- `children_grandchildren_functions.txt` - Functions on family relationships
+- `distributivity_proof.txt` - Complete proof with multiple reasoning steps
+
+### fuzz_tests/ (4 examples)
+Test cases for fuzz validation and edge cases.
+
+- `test_field_projection_bug.txt` - Field projection on function applications
+- `test_zed.txt` - Zed notation edge cases
+- `test_mod.txt` - Modulo operator
+- `test_nested_super.txt` - Nested superscripts
+
+### reference/ (1 file)
+Reference solutions from course materials.
 
 - `compiled_solutions.txt` - Complete solution set (Solutions 1-52)
-- `compiled_solutions.tex/pdf` - Generated LaTeX and PDF output
-- **Status**: All solutions pass fuzz validation with zero errors
+- **Status**: 98.1% coverage (51/52 solutions working)
+
+### user_guide/ (61 examples)
+Examples extracted from USER_GUIDE.md documentation, organized by feature.
+
+- Comprehensive examples for every documented feature
+- Used for documentation validation and testing
 
 ## Build System
 
@@ -147,12 +193,13 @@ All builds include:
 
 ## Validation Status
 
-**All 141 examples build successfully with fuzz validation enabled.**
+**All 136 examples build successfully with fuzz validation enabled.**
 
-- ✅ Zero fuzz validation errors
-- ✅ All type declarations complete
-- ✅ All specifications semantically correct
-- ✅ Reference solutions fully validated
+Total count: 141 .txt files (136 examples + 5 complete_examples)
+
+- ✅ All examples compile to PDF
+- ✅ Comprehensive feature coverage
+- ✅ Reference solutions: 98.1% coverage (51/52 solutions working)
 
 ## Usage
 
@@ -202,7 +249,14 @@ See existing files for format details. Key elements:
 
 ## Known Issues
 
-- **Field Projection on Function Applications** (issue #13): Parser incorrectly handles `f(x).field` in quantifier bodies. Workaround: use intermediate bindings. See `fuzz_tests/test_field_projection_bug.txt` for test case.
+See [tests/bugs/README.md](../tests/bugs/README.md) for complete bug tracking with test cases.
+
+Active bugs:
+- **Bug #1**: Parser fails on prose with periods outside TEXT blocks
+- **Bug #2**: Multiple pipes in TEXT blocks close math mode prematurely
+- **Bug #3**: Compound identifiers with operator suffixes (R+, R*) - blocks Solution 31
+- **Bug #4**: Comma after parenthesized math not detected in prose
+- **Bug #5**: Logical operators (or, and) not converted in certain TEXT block contexts
 
 ## Quality Standards
 
