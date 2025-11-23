@@ -544,7 +544,7 @@ class LaTeXGenerator:
             return special_keywords[name]
 
         # Handle compound identifiers with postfix closure operators (R+, R*, R~, Rr)
-        # These appear in abbreviation and schema names from Bug #3 fix
+        # Appears in abbreviation and schema names (partial support, GitHub #3 still open)
         if name.endswith("+"):
             base = name[:-1]
             # Render as R^+ (transitive closure)
@@ -3206,13 +3206,13 @@ class LaTeXGenerator:
         Fuzz syntax requires generic parameters AFTER the name: Name[X, Y]
         not before: [X, Y]Name
 
-        Bug #3: Process abbreviation names through _generate_identifier() to handle
-        compound identifiers like R+, R*, R~ correctly.
+        Processes abbreviation names through _generate_identifier() for compound
+        identifiers like R+, R*, R~ (partial support, GitHub #3 still open).
         """
         lines: list[str] = []
         expr_latex = self.generate_expr(node.expression)
 
-        # Bug #3: Process name through _generate_identifier() for compound identifiers
+        # Process name through _generate_identifier() for compound identifiers
         name_latex = self._generate_identifier(
             Identifier(line=0, column=0, name=node.name)
         )
@@ -3390,13 +3390,13 @@ class LaTeXGenerator:
         Phase 13 enhancement: Supports anonymous schemas (name=None).
         Multiple declarations appear on separate lines with line breaks.
 
-        Bug #3: Process schema names through _generate_identifier() to handle
-        compound identifiers like S+, S*, S~ correctly.
+        Processes schema names through _generate_identifier() for compound
+        identifiers like S+, S*, S~ (partial support, GitHub #3 still open).
         """
         lines: list[str] = []
 
         # Determine schema name (empty string for anonymous)
-        # Bug #3: Process name through _generate_identifier() for compound identifiers
+        # Process name through _generate_identifier() for compound identifiers
         if node.name is not None:
             schema_name = self._generate_identifier(
                 Identifier(line=0, column=0, name=node.name)

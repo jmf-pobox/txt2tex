@@ -15,7 +15,21 @@
       "Bash(fuzz test_id_generic_raw.tex:*)",
       "Bash(fuzz:*)",
       "Bash(hatch run:*)",
-      "Bash(gh issue close:*)"
+      "Bash(gh issue close:*)",
+      "Bash(cat:*)",
+      "Bash(for dir in /Users/jfreeman/Coding/fuzz/txt2tex/sem/examples/*/)",
+      "Bash(done)",
+      "Bash(gh issue list:*)",
+      "Bash(for f in bug1_prose_period bug2_multiple_pipes bug3_compound_id bug4_comma_after_parens bug5_or_operator)",
+      "Bash(do echo \"=== $f ===\")",
+      "Bash(pdftotext:*)",
+      "Bash(gh issue view:*)",
+      "Bash(for f in tests/bugs/bug_*.txt tests/bugs/test_*.txt)",
+      "Bash(do if [ -f \"$f\" ])",
+      "Bash(then echo \"=== Testing $f ===\")",
+      "Bash(echo:*)",
+      "Bash(fi)",
+      "Bash(git mv:*)"
     ],
     "deny": [],
     "ask": []

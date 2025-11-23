@@ -206,7 +206,7 @@ class Parser:
 
         # Check for abbreviation or free type (Phase 4)
         # Look ahead to see if this is "identifier ::=" or "identifier =="
-        # Bug #3: Also check for compound identifiers like "R+ =="
+        # Note: Partial support for compound identifiers like "R+ ==" (GitHub #3 still open)
         if self._match(TokenType.IDENTIFIER):
             next_token = self._peek_ahead(1)
             if next_token.type == TokenType.FREE_TYPE:
@@ -236,8 +236,8 @@ class Parser:
                     line=first_line,
                     column=1,
                 )
-            # Bug #3: Check for abbreviation with or without postfix operator
-            # Cases: "R ==", "R+ ==", "R* ==", "R~ =="
+            # Check for abbreviation with or without postfix operator
+            # Cases: "R ==", "R+ ==", "R* ==", "R~ ==" (partial support, GitHub #3 open)
             is_abbrev = next_token.type == TokenType.ABBREV
             if not is_abbrev and next_token.type in (
                 TokenType.PLUS,
@@ -622,14 +622,14 @@ class Parser:
             )
 
         # Check for abbreviation (identifier == expr) or free type (identifier ::= ...)
-        # Bug #3: Also check for compound identifiers like "R+ =="
+        # Note: Partial support for compound identifiers like "R+ ==" (GitHub #3 still open)
         if self._match(TokenType.IDENTIFIER):
             # Look ahead to determine type
             next_token = self._peek_ahead(1)
             if next_token.type == TokenType.FREE_TYPE:
                 return self._parse_free_type()
-            # Bug #3: Check for abbreviation with or without postfix operator
-            # Cases: "R ==", "R+ ==", "R* ==", "R~ =="
+            # Check for abbreviation with or without postfix operator
+            # Cases: "R ==", "R+ ==", "R* ==", "R~ ==" (partial support, GitHub #3 open)
             is_abbrev = next_token.type == TokenType.ABBREV
             if not is_abbrev and next_token.type in (
                 TokenType.PLUS,
@@ -3426,7 +3426,7 @@ class Parser:
         start_token = self._advance()  # Consume 'schema'
 
         # Parse optional schema name
-        # Bug #3: May include postfix operator suffix like S+, S*, S~
+        # Note: May include postfix operator suffix like S+, S*, S~ (partial support, GitHub #3 open)
         name: str | None = None
         generic_params: list[str] | None = None
 
