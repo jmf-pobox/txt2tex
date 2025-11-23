@@ -2,7 +2,10 @@
 // Demonstrates function type operators
 // From USER_GUIDE.md - Functions section
 
-given X, Y
+zed
+  given X, Y
+end
+
 
 axdef
   f1 : X +-> Y

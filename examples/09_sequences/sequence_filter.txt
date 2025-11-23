@@ -41,7 +41,10 @@ TEXT: The filtered sequence is <2, 4, 6>, keeping only elements that are in even
 
 ** Example 2: Filter with Set Comprehension **
 
-given Title2, Length2
+zed
+  given Title2, Length2
+end
+
 
 axdef
   all_titles : seq Title2
@@ -74,9 +77,15 @@ TEXT: restricted_rel is {1 |-> 10, 2 |-> 20} (relation pairs with range in {10, 
 
 ** Example 4: Practical Example - Video Database **
 
-given Title4, Length4
+zed
+  given Title4, Length4
+end
 
-Rating4 ::= G4 | PG4 | PG13_4 | R4
+
+zed
+  Rating4 ::= G4 | PG4 | PG13_4 | R4
+end
+
 
 axdef
   catalog4 : seq (Title4 cross Length4 cross Rating4)

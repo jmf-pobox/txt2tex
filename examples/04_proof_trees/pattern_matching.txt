@@ -17,7 +17,10 @@
 
 ** Test Pattern Matching **
 
-given Entry
+zed
+  given Entry
+end
+
 
 axdef
   filterSeq : seq Entry -> seq Entry

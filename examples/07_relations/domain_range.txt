@@ -21,7 +21,10 @@
 
 === Phase 11a: Function Types ===
 
-given X, Y, Z
+zed
+  given X, Y, Z
+end
+
 
 TEXT: Total functions (every element in domain has a mapping):
 

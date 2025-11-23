@@ -13,16 +13,16 @@
 | Category | Count | Percentage |
 |----------|-------|------------|
 | **Critical Bugs** | 1 | 5% |
-| **Medium Bugs** | 3 | 14% |
+| **Medium Bugs** | 2 | 9% |
 | **Low Priority Bugs** | 0 | 0% |
-| **Known Limitations** | 4 | 19% |
-| **Fuzz Limitations** | 4 | 19% |
+| **Known Limitations** | 4 | 18% |
+| **Fuzz Limitations** | 4 | 18% |
 | **Design Decisions** | 3 | 14% |
-| **Resolved Issues** | 8 | 38% |
-| **TOTAL** | 21 | 100% |
+| **Resolved Issues** | 9 | 41% |
+| **TOTAL** | 22 | 100% |
 
-**Active Issues**: 4 (3 with workarounds, 1 no workaround)
-**Resolved Issues**: 8 (fixed, with regression tests - see tests/bugs/README.md)
+**Active Issues**: 3 (all with workarounds)
+**Resolved Issues**: 9 (fixed, with regression tests - see tests/bugs/README.md)
 **Documented Limitations**: 11 (8 intentional, 3 design decisions)
 
 ---
@@ -196,14 +196,15 @@ The second pipe `| p.2 > q.2` appears as text after a closing math delimiter.
 
 ---
 
-### Bug #3: Compound Identifiers with Operator Suffixes
+### Bug #3: Compound Identifiers with Operator Suffixes (RESOLVED ✓)
 
-**Priority**: MEDIUM
-**Component**: lexer
-**Status**: ACTIVE
+**Priority**: MEDIUM (when active)
+**Component**: parser/lexer
+**Status**: RESOLVED
 **GitHub**: [#3](https://github.com/jmf-pobox/txt2tex/issues/3)
+**Fixed In**: Commits 4a2a77a, af14357, 07c1e8b (2025-11-23)
 
-**Description**: Cannot use identifiers that end with operator symbols like `+` or `*`. Lexer tokenizes as identifier followed by operator.
+**Description**: Previously could not use identifiers with operator suffixes in `abbrev...end` blocks. Fixed by implementing block syntax.
 
 **Test Case**: `tests/bugs/bug3_compound_id.txt`
 
@@ -216,36 +217,40 @@ abbrev
 end
 ```
 
-**Expected Behavior**: Should define `R+` as an abbreviation.
+**Expected Behavior**: Should define `R+` as an abbreviation and render as R⁺.
 
-**Actual Behavior** (verified 2025-11-23):
+**Previous Behavior** (before fix):
 ```
 Error: Line 7, column 1: Expected identifier, number, '(', '{', '⟨', or lambda, got END
 ```
-(lexer tokenizes as R followed by +)
 
-**Workaround**: None available.
+**Current Behavior** (after fix):
+- Parses successfully
+- Generates PDF with R⁺ (R with superscript plus)
+- Test files `bug3_compound_id.txt` and `bug3_test_simple.txt` both work
 
-**Impact**:
-- **Blocks Solution 31** (only solution not working - 51/52 = 98.1%)
-- Prevents standard mathematical notation like R+ (transitive closure)
-- Affects anyone using relation notation
+**Solution Implemented**:
+Added `abbrev...end` block syntax support:
+- New `ABBREV_BLOCK` token in lexer
+- Parser wraps abbreviations in `Zed(Document(...))` structure
+- LaTeX generator handles Document content without nested zed blocks
+- Compound identifiers (R+, R*, R~) rendered correctly as superscripts
+
+**Impact Before Fix**:
+- Blocked Solution 31 (caused 51/52 = 98.1% coverage)
+- Prevented standard mathematical notation like R+ (transitive closure)
+
+**Impact After Fix**:
+- ✅ Solution 31 now possible (100% solution coverage achievable)
+- ✅ Both inline (`R+ == expr`) and block syntax work
+- ✅ All 1174 tests pass
 
 **Validation Status**:
-- [x] Issue verified (reproduced 2025-11-23, parser fails)
-- [x] Test case created
-- [x] GitHub issue exists
+- [x] Issue resolved (verified 2025-11-23)
+- [x] Test cases pass
+- [x] GitHub issue ready to close
 - [x] Documented in STATUS.md
-- [x] Blocks Solution 31
-- [x] Regression test in place
-
-**Root Cause**: Lexer tokenizes greedily - identifier stops at operator character. No lookahead for compound identifier patterns.
-
-**Possible Solutions**:
-1. Context-aware lexing: Allow `+`/`*` after identifier in abbrev/declaration context
-2. Quoted identifiers: `"R+"` syntax
-3. Escape syntax: `R\+` or similar
-4. Reserved compound identifiers: Hardcode `R+`, `R*` as special tokens
+- [x] Regression tests in place
 
 ---
 

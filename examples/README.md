@@ -154,7 +154,7 @@ Test cases for fuzz validation and edge cases.
 Reference solutions from course materials.
 
 - `compiled_solutions.txt` - Complete solution set (Solutions 1-52)
-- **Status**: 98.1% coverage (51/52 solutions working)
+- **Status**: 100% coverage (52/52 solutions working) ✅
 
 ### user_guide/ (61 examples)
 Examples extracted from USER_GUIDE.md documentation, organized by feature.
@@ -199,7 +199,7 @@ Total count: 141 .txt files (136 examples + 5 complete_examples)
 
 - ✅ All examples compile to PDF
 - ✅ Comprehensive feature coverage
-- ✅ Reference solutions: 98.1% coverage (51/52 solutions working)
+- ✅ Reference solutions: 100% coverage (52/52 solutions working)
 
 ## Usage
 
@@ -254,9 +254,12 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for complete bug tracking wi
 Active bugs:
 - **Bug #1**: Parser fails on prose with periods outside TEXT blocks
 - **Bug #2**: Multiple pipes in TEXT blocks close math mode prematurely
-- **Bug #3**: Compound identifiers with operator suffixes (R+, R*) - blocks Solution 31
-- **Bug #4**: Comma after parenthesized math not detected in prose
-- **Bug #5**: Logical operators (or, and) not converted in certain TEXT block contexts
+- **Bug #13**: Field projection on function application in quantifiers
+
+Recently resolved:
+- **Bug #3**: Compound identifiers with operator suffixes (R+, R*) - ✅ FIXED (Nov 23, 2025) - Use `abbrev...end` block syntax
+- **Bug #4**: Comma after parenthesized math not detected in prose - ✅ FIXED
+- **Bug #5**: Logical operators (or, and) not converted in certain TEXT block contexts - ✅ FIXED
 
 ## Quality Standards
 

@@ -19,7 +19,9 @@
 
 === Scoping Rules Examples ===
 
-given Char
+zed
+  given Char
+end
 
 ** Example 1: Quantifier Scope **
 
@@ -110,7 +112,9 @@ TEXT: LoggedInUser has its own copies of userId and name fields (as userId and u
 
 ** Example 10: Global vs Local Names **
 
-given GlobalType
+zed
+  given GlobalType
+end
 
 axdef
   globalVar : N
@@ -248,7 +252,9 @@ TEXT: Combined has fields x and y. In full Z notation, schema inclusion (StateA;
 
 ** Example 23: Free Type Scope **
 
-Color ::= red | green | blue
+zed
+  Color ::= red | green | blue
+end
 
 schema ColoredItem
   color : Color

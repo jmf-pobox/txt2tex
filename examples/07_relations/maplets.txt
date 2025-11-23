@@ -65,7 +65,10 @@ A -> B -> C
 
 X -> (Y -> Z)
 
-given A, B
+zed
+  given A, B
+end
+
 
 axdef
   square : N -> N

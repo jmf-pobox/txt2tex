@@ -18,7 +18,10 @@
 
 === Recursive Function Examples ===
 
-given Entry
+zed
+  given Entry
+end
+
 
 TEXT: This file demonstrates recursive functions on sequences.
 

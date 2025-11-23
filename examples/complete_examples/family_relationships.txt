@@ -72,7 +72,10 @@ TEXT: for parentOf, siblingOf, cousinOf, and ancestorOf using relation operators
 
 TEXT: We work with a given type Person and one primitive relation:
 
-given Person
+zed
+  given Person
+end
+
 
 axdef
   childOf : Person <-> Person

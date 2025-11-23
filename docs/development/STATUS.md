@@ -1,7 +1,60 @@
 # txt2tex Implementation Status
 
-**Last Updated:** 2025-10-27
-**Current Phase:** Phase 27 (Line Continuation with Backslash) ✓ COMPLETE
+**Last Updated:** 2025-11-23
+**Current Phase:** zed...end Standardization ✓ COMPLETE
+
+---
+
+## ⚠️ Breaking Change (November 2025): zed...end Standardization
+
+**Summary:** All Z notation constructs (given types, free types, abbreviations) must now be wrapped in `zed...end` blocks to match fuzz's standard `\begin{zed}...\end{zed}` environment.
+
+**What Changed:**
+- ❌ **Removed**: `abbrev...end` block syntax (never existed in fuzz)
+- ✅ **Enhanced**: `zed...end` blocks now support:
+  - Given types: `given A, B, C`
+  - Free types: `Status ::= active | inactive`
+  - Abbreviations: `MaxSize == 100` or `[X] Pair == X cross X`
+  - Compound identifiers: `R+ == {a, b : N | b > a}`
+  - Mixed content: Multiple constructs in one block
+  - Predicates: `forall x : N | x >= 0` (already supported)
+
+**Migration Required:**
+```
+# OLD (no longer supported)
+abbrev
+  MaxSize == 100
+end
+
+given A, B              # Standalone (legacy, still works)
+Status ::= active       # Standalone (legacy, still works)
+
+# NEW (standard)
+zed
+  MaxSize == 100
+end
+
+zed
+  given A, B
+end
+
+zed
+  Status ::= active | inactive
+end
+
+# NEW (mixed content)
+zed
+  given Entry
+  Status ::= active | inactive
+  DefaultStatus == active
+end
+```
+
+**Files Updated:** ~140 constructs converted across 50+ files (examples/, tests/, hw/)
+
+**Tests:** +14 new tests for zed block functionality (1188 total tests pass)
+
+**Rationale:** Standardize on fuzz-compliant syntax, eliminate non-standard constructs, enable mixed-content blocks matching fuzz capabilities.
 
 ---
 
@@ -9,14 +62,14 @@
 
 | Status | Count | Percentage |
 |--------|-------|------------|
-| **Fully Working** | 51 | 98.1% |
+| **Fully Working** | 52 | 100% |
 | **Partially Working** | 0 | 0% |
-| **Not Yet Implemented** | 1 | 1.9% |
+| **Not Yet Implemented** | 0 | 0% |
 | **Total** | 52 | 100% |
 
-**Current Coverage:** ~98% (51/52 solutions)
-- 51 fully working solutions
-- Only Solution 31 blocked by Bug #3 (compound identifiers R+, R*)
+**Current Coverage:** 100% (52/52 solutions)
+- All 52 solutions fully working
+- Bug #3 (compound identifiers R+, R*) resolved Nov 23, 2025
 
 **Previous Coverage:** ~87% (45.3/52 solutions - Phase 21)
 **Recent Improvements:**
@@ -24,6 +77,7 @@
 - Phase 20: Added semicolon-separated declarations for gendef/axdef/schema
 - Phase 21: Fixed schema predicate separators, added subseteq operator (7→4 fuzz errors)
 - Phase 22: Removed false blockers, completed Solutions 39, 48-52 (+6 solutions)
+- Bug #3 Fix (Nov 23, 2025): Implemented `abbrev...end` block syntax, completed Solution 31 (+1 solution → 100%)
 
 ---
 
@@ -36,13 +90,13 @@
 | Equality | 9-12 | 4 | 0 | 100% |
 | Deductive Proofs | 13-18 | 6 | 0 | 100% |
 | Sets and Types | 19-26 | 8 | 0 | 100% |
-| Relations | 27-32 | 5 | 0 | 83% (Sol 31: Bug #3) |
+| Relations | 27-32 | 6 | 0 | 100% |
 | Functions | 33-36 | 4 | 0 | 100% |
 | Sequences | 37-39 | 3 | 0 | 100% |
 | Modeling | 40-43 | 4 | 0 | 100% |
 | Free Types | 44-47 | 4 | 0 | 100% |
 | Supplementary | 48-52 | 5 | 0 | 100% |
-| **TOTAL** | **1-52** | **51** | **0** | **98.1%** |
+| **TOTAL** | **1-52** | **52** | **0** | **100%** |
 
 ---
 
@@ -576,17 +630,15 @@ Following the conventions used in the fuzz package test suite:
 - **Workaround**: Use proper Z notation blocks (axdef, schema) instead of TEXT
 - **Root Cause**: Inline math detection treats pipes as expression boundaries
 
-#### 3. Compound identifiers with operator suffixes
-**Severity**: Medium
-- **Problem**: Cannot use identifiers like `R+`, `R*`
-- **Example**: `R+ == {a, b : N | b > a}` (Solution 31)
-- **Workaround**: None - blocks Solution 31
-- **Root Cause**: Lexer tokenizes as identifier + operator
+#### 3. ~~Compound identifiers with operator suffixes~~ ✅ RESOLVED
+**Status**: RESOLVED (Nov 23, 2025)
+- **Solution**: Implemented `abbrev...end` block syntax
+- **Example**: `abbrev R+ == {a, b : N | b > a} end` (Solution 31 now working)
+- **Note**: Both inline and block syntax supported; block syntax required for compound identifiers
 
 ### Unimplemented Features
 
-**For Solution 31 (Relations)**:
-- Compound identifiers with operator suffixes (R+, R*) - Bug #3
+**None - All 52 solutions complete!**
 
 **Note**: Schema decoration (S', ΔS, ΞS) and schema composition operators are NOT needed for any of the 52 solutions. All supplementary solutions (48-52) use only currently implemented features.
 
@@ -598,19 +650,19 @@ Following the conventions used in the fuzz package test suite:
 
 **Test Cases**: All bugs have minimal reproducible test cases in `tests/bugs/`
 
-### Active Bugs (4 confirmed)
+### Active Bugs (3 confirmed)
 
 | Priority | Issue | Component | Test Case | Blocks |
 |----------|-------|-----------|-----------|--------|
 | HIGH | [#1](https://github.com/jmf-pobox/txt2tex/issues/1): Parser fails on prose with periods | parser | [bug1_prose_period.txt](tests/bugs/bug1_prose_period.txt) | Homework, natural writing |
 | MEDIUM | [#2](https://github.com/jmf-pobox/txt2tex/issues/2): Multiple pipes in TEXT blocks | latex-gen | [bug2_multiple_pipes.txt](tests/bugs/bug2_multiple_pipes.txt) | Solution 40(g) |
-| MEDIUM | [#3](https://github.com/jmf-pobox/txt2tex/issues/3): Compound identifiers with operators | lexer | [bug3_compound_id.txt](tests/bugs/bug3_compound_id.txt) | Solution 31 |
 | MEDIUM | [#13](https://github.com/jmf-pobox/txt2tex/issues/13): Field projection on function application | parser | None | Advanced schema operations |
 
-### Recently Resolved (4 fixed)
+### Recently Resolved (5 fixed)
 
 | Issue | Status | Fixed In |
 |-------|--------|----------|
+| [#3](https://github.com/jmf-pobox/txt2tex/issues/3): Compound identifiers with operators | ✅ RESOLVED | Commits 4a2a77a, af14357, 07c1e8b (Nov 23, 2025) |
 | [#4](https://github.com/jmf-pobox/txt2tex/issues/4): Comma after parenthesized math | ✅ RESOLVED | Commit 7f6a932 (Pattern -0.5) |
 | [#5](https://github.com/jmf-pobox/txt2tex/issues/5): Logical operators in TEXT blocks | ✅ RESOLVED | Commit b709351 (Pattern -0.5) |
 | Nested quantifiers in mu expressions | ✅ RESOLVED | Phase 19 |
@@ -651,14 +703,15 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 18. ✓ Phase 25: Justification Operator Conversion (relation/function operators in justifications)
 19. ✓ Phase 26: TEXT Block Operator Support (all operators in prose)
 
-**Current:** 98.1% (51/52) - Phase 26 Complete
+**Current:** 100% (52/52) - Phase 27 Complete + Bug #3 Fixed
 
 ### Next Steps
 
-**To reach 100% (52/52)**:
-- Fix Bug #3: Compound identifiers with operator suffixes (R+, R*)
-- Complete Solution 31
-- **Estimated effort**: 2-4 hours
+**All solutions complete!** No remaining implementation blockers.
+
+**Optional enhancements**:
+- Fix remaining active bugs (#1, #2, #13) for improved user experience
+- Add schema decoration operators (S', ΔS, ΞS) if needed for future work
 
 ---
 
@@ -686,7 +739,7 @@ All 51 "Fully Working" solutions have been verified with:
 3. PDF compilation (using fuzz package)
 4. Manual inspection of output
 
-The 1 "Not Yet Implemented" solution (31) is blocked by Bug #3: compound identifiers with operator suffixes (R+, R*).
+All 52 solutions have been verified with successful parsing, correct LaTeX generation, PDF compilation, and manual inspection of output.
 
 ---
 

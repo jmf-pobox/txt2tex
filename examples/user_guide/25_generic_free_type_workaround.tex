@@ -10,8 +10,8 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\begin{zed}IntTree ::= leaf | node \ldata \nat \cross IntTree \cross
-  IntTree \rdata
+\begin{zed}
+  IntTree ::= leaf | node \ldata \nat \cross IntTree \cross IntTree \rdata
 \end{zed}
 
 \begin{axdef}

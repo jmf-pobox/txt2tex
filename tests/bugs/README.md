@@ -1,11 +1,11 @@
 # txt2tex Test Files: Bugs, Regressions, and Features
 
 This directory contains test files organized into three categories:
-1. **Active Bugs** (4 files) - Real bugs currently open on GitHub
-2. **Regression Tests** (15 files) - Previously fixed bugs, now serving as regression protection
+1. **Active Bugs** (3 files) - Real bugs currently open on GitHub
+2. **Regression Tests** (17 files) - Previously fixed bugs, now serving as regression protection
 3. **Feature Tests** (7 files) - Edge cases and features that were never bugs
 
-## Active Bugs (4 files)
+## Active Bugs (3 files)
 
 Real bugs that are currently open on GitHub and need fixing.
 
@@ -38,23 +38,6 @@ Real bugs that are currently open on GitHub and need fixing.
 - **Workaround**: Use proper Z notation blocks (axdef, schema) instead of TEXT
 - **Impact**: Solution 40(g) and similar complex expressions
 
-### Bug #3: Compound identifiers with operator suffixes fail
-- **Files**:
-  - [bug3_compound_id.txt](bug3_compound_id.txt) - Full test with TEXT description
-  - [bug3_test_simple.txt](bug3_test_simple.txt) - Minimal failing case
-- **Issue**: [#3](https://github.com/jmf-pobox/txt2tex/issues/3)
-- **Priority**: MEDIUM
-- **Status**: ACTIVE
-- **Test Command**:
-  ```bash
-  hatch run convert tests/bugs/bug3_compound_id.txt
-  hatch run convert tests/bugs/bug3_test_simple.txt  # Both fail
-  ```
-- **Expected**: Should define `R+` as an identifier
-- **Actual**: `Error: Line 4/5, column 6/1: Expected identifier...` (lexer tokenizes as R followed by +)
-- **Workaround**: None available
-- **Impact**: **Blocks Solution 31** (transitive closure R+) - only solution not working (51/52 = 98.1%)
-
 ### Bug #13: Field projection on function application in quantifiers
 - **File**: None yet (documented in GitHub issue)
 - **Issue**: [#13](https://github.com/jmf-pobox/txt2tex/issues/13)
@@ -66,7 +49,7 @@ Real bugs that are currently open on GitHub and need fixing.
 
 ---
 
-## Regression Tests (15 files)
+## Regression Tests (17 files)
 
 Previously fixed bugs that now serve as regression tests. All these files PASS (compile successfully).
 
@@ -123,6 +106,22 @@ Fixed parsing of subset and notin operators.
 - [regression_subset_operator.txt](regression_subset_operator.txt) - `subset` operator parsing
 - [regression_notin_operator.txt](regression_notin_operator.txt) - `notin` operator parsing
 
+### Block Syntax for Abbreviations (2 files) - Resolved Nov 23, 2025
+
+Fixed `abbrev...end` block syntax for Z notation abbreviations.
+
+- [bug3_compound_id.txt](bug3_compound_id.txt)
+  - **Issue**: [#3](https://github.com/jmf-pobox/txt2tex/issues/3) (RESOLVED)
+  - **Resolved**: Commits 4a2a77a, af14357, 07c1e8b (Nov 23, 2025)
+  - **Fix**: Implemented `abbrev...end` block syntax for abbreviations
+  - **Test**: Compound identifiers like `R+` now work in abbreviation blocks ✓
+  - **LaTeX**: Generates `\begin{zed}...\end{zed}` blocks properly
+
+- [bug3_test_simple.txt](bug3_test_simple.txt)
+  - **Issue**: [#3](https://github.com/jmf-pobox/txt2tex/issues/3) (RESOLVED)
+  - **Resolved**: Commits 4a2a77a, af14357, 07c1e8b (Nov 23, 2025)
+  - **Test**: Minimal test case for `R+ == { a, b : nat | b > a }` ✓
+
 ---
 
 ## Feature Tests (7 files)
@@ -165,12 +164,12 @@ Tests for advanced syntax features.
 
 | Category | Count | Status |
 |----------|-------|--------|
-| Active Bugs | 4 | Need fixing |
-| Regression Tests | 15 | All PASS |
+| Active Bugs | 3 | Need fixing |
+| Regression Tests | 17 | All PASS |
 | Feature Tests | 7 | All PASS |
-| **Total** | **26** | **22 PASS, 4 FAIL** |
+| **Total** | **27** | **24 PASS, 3 FAIL** |
 
-**Project Coverage**: 98.1% (51/52 solutions working) - only Bug #3 blocks remaining solution
+**Project Coverage**: 100% (52/52 solutions working) - all solutions complete!
 
 ---
 
@@ -243,5 +242,5 @@ Found a new bug? Follow this workflow:
 ---
 
 **Last Updated**: 2025-11-23
-**Active Bugs**: 4 (Issues #1, #2, #3, #13)
-**Test Coverage**: 22 regression + feature tests ensure stability
+**Active Bugs**: 3 (Issues #1, #2, #13)
+**Test Coverage**: 24 regression + feature tests ensure stability

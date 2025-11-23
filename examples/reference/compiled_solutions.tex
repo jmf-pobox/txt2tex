@@ -1001,7 +1001,8 @@ $\{ n : \power \{0, 1\} | true @ (n, \# n) \}$
 \section*{Solution 24}
 \addcontentsline{toc}{section}{Solution 24}
 
-\begin{zed}[Z]
+\begin{zed}
+  [Z]
 \end{zed}
 
 \subsection*{(a)}
@@ -1037,7 +1038,8 @@ basic type; we define the set of all people by writing:
 
 \bigskip
 
-\begin{zed}[Person]
+\begin{zed}
+  [Person]
 \end{zed}
 
 \medskip
@@ -1223,14 +1225,10 @@ Person and where clause $parentOf = childOf$~.
 \section*{Solution 31}
 \addcontentsline{toc}{section}{Solution 31}
 
-\noindent (Requires compound identifiers with operators - R+, R*)
-
-\bigskip
-
 \subsection*{(a)}
 
 \begin{zed}
-  R == \{ a, b : \nat | b = a \lor b = a \}
+  R == \{ a, b : \nat | b = a \lor b = a + 1 \}
 \end{zed}
 
 \medskip
@@ -1238,24 +1236,24 @@ Person and where clause $parentOf = childOf$~.
 \subsection*{(b)}
 
 \begin{zed}
-  S == \{ a, b : \nat | b = a \lor b = a \}
+  S == \{ a, b : \nat | b = a \lor b = a - 1 \}
 \end{zed}
 
 \medskip
 
 \subsection*{(c)}
 
-\noindent R+ == $\{ a, b : \nat | b > a \}$
-
-\bigskip
+\begin{zed}
+  R^+ == \{ a, b : \nat | b > a \}
+\end{zed}
 
 \medskip
 
 \subsection*{(d)}
 
-\noindent R* == $\{ a, b : \nat | b \geq a \}$
-
-\bigskip
+\begin{zed}
+  R^* == \{ a, b : \nat | b \geq a \}
+\end{zed}
 
 \section*{Solution 32}
 \addcontentsline{toc}{section}{Solution 32}
@@ -1422,7 +1420,8 @@ quantifier domains)
 
 \bigskip
 
-\begin{zed}[Drivers, Cars]
+\begin{zed}
+  [Drivers, Cars]
 \end{zed}
 
 \begin{axdef}
@@ -1509,7 +1508,8 @@ $c$
 \section*{Solution 38}
 \addcontentsline{toc}{section}{Solution 38}
 
-\begin{zed}[Place]
+\begin{zed}
+  [Place]
 \end{zed}
 
 \begin{axdef}
@@ -1545,7 +1545,8 @@ trains | snd(trains(x)) = q \}$)
 \section*{Solution 39}
 \addcontentsline{toc}{section}{Solution 39}
 
-\begin{zed}[Coin]
+\begin{zed}
+  [Coin]
 \end{zed}
 
 \begin{axdef}
@@ -1585,7 +1586,8 @@ of tuples for fuzz compatibility.
 
 \bigskip
 
-\begin{zed}[Title, Viewed]
+\begin{zed}
+  [Title, Viewed]
 \end{zed}
 
 \begin{schema}{Programme}
@@ -1756,7 +1758,8 @@ programme (and one of a unique maximum length).
 \section*{Solution 41}
 \addcontentsline{toc}{section}{Solution 41}
 
-\begin{zed}[Course, Lecturer]
+\begin{zed}
+  [Course, Lecturer]
 \end{zed}
 
 \begin{axdef}
@@ -1874,7 +1877,8 @@ $v(\{ y : Year | y \in \dom records @ y \mapsto \{ l : Lecturer | \#
 \section*{Solution 43}
 \addcontentsline{toc}{section}{Solution 43}
 
-\begin{zed}[Cinema, Film, Date]
+\begin{zed}
+  [Cinema, Film, Date]
 \end{zed}
 
 \begin{schema}{Booking}
@@ -1957,11 +1961,13 @@ $\{ c : Cinema | \exists i : \dom bookings | fst(i) = c \land \#
 
 \section*{Free types and induction}
 
-\begin{zed}[N]
+\begin{zed}
+  [N]
 \end{zed}
 
-\begin{zed}Tree ::= stalk | leaf \ldata \nat \rdata | branch \ldata
-  Tree \cross Tree \rdata
+\begin{zed}
+  Tree ::= stalk | leaf \ldata \nat \rdata | branch \ldata Tree
+  \cross Tree \rdata
 \end{zed}
 
 \section*{Solution 44}
@@ -2165,7 +2171,8 @@ with recursive functions)
 \section*{Solution 48}
 \addcontentsline{toc}{section}{Solution 48}
 
-\begin{zed}[SongId, UserId, PlaylistId]
+\begin{zed}
+  [SongId, UserId, PlaylistId]
 \end{zed}
 
 \begin{axdef}
@@ -2288,7 +2295,8 @@ with recursive functions)
 \section*{Solution 52}
 \addcontentsline{toc}{section}{Solution 52}
 
-\begin{zed}UserStatus ::= premium | standard
+\begin{zed}
+  UserStatus ::= premium | standard
 \end{zed}
 
 \begin{axdef}

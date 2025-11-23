@@ -3371,40 +3371,59 @@ class LaTeXGenerator:
     def _generate_zed(self, node: Zed) -> list[str]:
         """Generate LaTeX for zed block (unboxed paragraph).
 
-        Zed blocks contain standalone predicates, types, or other expressions
-        without the visual box styling of axdef/schema.
+        Zed blocks contain Z notation constructs:
+        - Given types: [A, B, C]
+        - Free types: Type ::= branch1 | branch2
+        - Abbreviations: Name == expression
+        - Predicates: forall x : N | P
 
-        Special case: If content is a Document (from abbrev...end blocks),
-        generate each abbreviation directly within the zed block without
-        nested zed environments.
+        Supports mixed content (multiple construct types in one block).
         """
         lines: list[str] = []
 
         lines.append(r"\begin{zed}")
 
-        # Handle Document content (from abbrev blocks)
+        # Handle Document content (multiple items in zed block)
         if isinstance(node.content, Document):
             for item in node.content.items:
-                # Generate abbreviations directly without nested zed blocks
-                if isinstance(item, Abbreviation):
+                # Generate given types: [A, B, C]
+                if isinstance(item, GivenType):
+                    names_str = ", ".join(item.names)
+                    lines.append(f"[{names_str}]")
+
+                # Generate free types: Type ::= branch1 | branch2
+                elif isinstance(item, FreeType):
+                    branch_strs: list[str] = []
+                    for branch in item.branches:
+                        if branch.parameters is None:
+                            branch_strs.append(branch.name)
+                        else:
+                            params_latex = self.generate_expr(branch.parameters)
+                            branch_str = f"{branch.name} \\ldata {params_latex} \\rdata"
+                            branch_strs.append(branch_str)
+                    branches_str = " | ".join(branch_strs)
+                    lines.append(f"{item.name} ::= {branches_str}")
+
+                # Generate abbreviations: Name == expression
+                elif isinstance(item, Abbreviation):
                     expr_latex = self.generate_expr(item.expression)
                     name_latex = self._generate_identifier(
                         Identifier(line=0, column=0, name=item.name)
                     )
                     if item.generic_params:
                         params_str = ", ".join(item.generic_params)
-                        lines.append(f"  {name_latex}[{params_str}] == {expr_latex}")
+                        lines.append(f"{name_latex}[{params_str}] == {expr_latex}")
                     else:
-                        lines.append(f"  {name_latex} == {expr_latex}")
-                else:
-                    # For non-abbreviation items, treat as expression
-                    if isinstance(item, Expr):
-                        content_latex = self.generate_expr(item)
-                        lines.append(f"  {content_latex}")
+                        lines.append(f"{name_latex} == {expr_latex}")
+
+                # Generate expressions/predicates
+                elif isinstance(item, Expr):
+                    content_latex = self.generate_expr(item)
+                    lines.append(f"{content_latex}")
         else:
-            # Normal single expression
+            # Single expression (backward compatible)
             content_latex = self.generate_expr(node.content)
-            lines.append(f"  {content_latex}")
+            lines.append(f"{content_latex}")
 
         lines.append(r"\end{zed}")
         lines.append("")

@@ -75,7 +75,10 @@ TEXT: and listening history.
 
 TEXT: Define the basic types and data structures:
 
-given SongId, UserId, PlaylistId
+zed
+  given SongId, UserId, PlaylistId
+end
+
 
 axdef
   songs : F SongId
@@ -198,7 +201,10 @@ TEXT: Define queries using set comprehension:
 
 TEXT: (a) Find users not subscribed to any playlist:
 
-A == users \ bigcup {p : dom(playlistSubscribers) . playlistSubscribers(p)}
+zed
+  A == users \ bigcup {p : dom(playlistSubscribers) . playlistSubscribers(p)}
+end
+
 
 TEXT: Breakdown:
 TEXT:   - {playlistSubscribers(p) | p : dom(playlistSubscribers)}: collect all subscriber sets
@@ -209,7 +215,10 @@ TEXT: Intuition: Users who never subscribed to any playlist.
 
 TEXT: (b) Find playlists with 100+ subscribers:
 
-B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
+zed
+  B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
+end
+
 
 TEXT: Breakdown:
 TEXT:   - p : dom(playlistSubscribers): iterate over all playlists with subscribers
@@ -220,7 +229,10 @@ TEXT: Result type: P PlaylistId (set of popular playlist IDs)
 
 TEXT: (c) Find user who loves the most songs:
 
-C == (mu u : dom(loved) | forall v : dom(loved) | u /= v | # (loved(u)) > # (loved(v)))
+zed
+  C == (mu u : dom(loved) | forall v : dom(loved) | u /= v | # (loved(u)) > # (loved(v)))
+end
+
 
 TEXT: Mu operator usage:
 TEXT:   - u : dom(loved): candidate users (those who love songs)
@@ -232,7 +244,10 @@ TEXT: Assumption: One user has a unique maximum (ties make mu undefined)
 
 TEXT: (d) Find most loved song in catalog:
 
-D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved(u)} > # {u : UserId | t in loved(u)})
+zed
+  D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved(u)} > # {u : UserId | t in loved(u)})
+end
+
 
 TEXT: Breakdown:
 TEXT:   - s : songs: candidate songs
@@ -328,9 +343,15 @@ TEXT: Result: set of playlist IDs featuring the most popular song.
 
 TEXT: Model chronological play events with sequences:
 
-given Play
+zed
+  given Play
+end
 
-Status ::= premium | standard
+
+zed
+  Status ::= premium | standard
+end
+
 
 schema PlayEvent
   songId: SongId

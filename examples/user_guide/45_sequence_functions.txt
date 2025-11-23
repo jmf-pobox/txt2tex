@@ -2,7 +2,10 @@
 // Demonstrates sequence type declarations
 // From USER_GUIDE.md - Sequences section
 
-given X
+zed
+  given X
+end
+
 
 axdef
   s : seq X

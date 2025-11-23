@@ -80,9 +80,15 @@ TEXT:   (h) Sort programmes by length
 
 TEXT: We define given types for programme attributes and a schema for programmes:
 
-given Title
+zed
+  given Title
+end
 
-YesNo ::= yes | no
+
+zed
+  YesNo ::= yes | no
+end
+
 
 schema Programme
   title: Title

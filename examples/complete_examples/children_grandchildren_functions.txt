@@ -63,7 +63,10 @@ TEXT:   (b) Count the number of grandchildren for a person
 
 TEXT: This example builds on the family relationships model. We assume:
 
-given Person
+zed
+  given Person
+end
+
 
 axdef
   parentOf : Person <-> Person

@@ -1,5 +1,5 @@
 === Bug 3 Test Simple ===
 
-abbrev
+zed
   R+ == {a, b : N | b > a}
 end

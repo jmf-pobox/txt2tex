@@ -28,7 +28,10 @@ end
 
 ** Example: Function on sequences **
 
-given Entry
+zed
+  given Entry
+end
+
 
 axdef
   seqlen : seq Entry -> N
@@ -39,7 +42,10 @@ end
 
 ** Example: Nested quantifier **
 
-given Person
+zed
+  given Person
+end
+
 
 axdef
   constraint : N

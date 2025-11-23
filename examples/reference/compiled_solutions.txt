@@ -398,23 +398,38 @@ x in a union a
 
 ** Solution 24 **
 
-given Z
+zed
+  given Z
+end
+
 
 (a) TEXT: The set of all pairs of integers is Z cross Z. To give it a name, we could write:
 
-Pairs == Z cross Z
+zed
+  Pairs == Z cross Z
+end
+
 
 (b) TEXT: The set of all integer pairs in which each element is strictly greater than zero could be defined by:
 
-StrictlyPositivePairs == { m, n : Z | m > 0 and n > 0 . (m, n) }
+zed
+  StrictlyPositivePairs == { m, n : Z | m > 0 and n > 0 . (m, n) }
+end
+
 
 (c) TEXT: It is intuitive to use a singular noun for the name of a basic type; we define the set of all people by writing:
 
-given Person
+zed
+  given Person
+end
+
 
 (d) TEXT: The set of all couples could be defined by:
 
-Couples == { s : P Person | # s = 2 }
+zed
+  Couples == { s : P Person | # s = 2 }
+end
+
 
 ** Solution 25 **
 
@@ -478,15 +493,25 @@ TEXT: This is a good example of how there are many different ways of writing the
 
 ** Solution 31 **
 
-TEXT: (Requires compound identifiers with operators - R+, R*)
+(a)
+zed
+  R == {a, b : N | b = a or b = a + 1}
+end
 
-(a) R == {a, b : N | b = a or b = a}
+(b)
+zed
+  S == {a, b : N | b = a or b = a - 1}
+end
 
-(b) S == {a, b : N | b = a or b = a}
+(c)
+zed
+  R+ == {a, b : N | b > a}
+end
 
-(c) TEXT: R+ == {a, b : N | b > a}
-
-(d) TEXT: R* == {a, b : N | b >= a}
+(d)
+zed
+  R* == {a, b : N | b >= a}
+end
 
 ** Solution 32 **
 
@@ -559,7 +584,10 @@ end
 
 TEXT: (Note: This solution demonstrates relation types in quantifier domains)
 
-given Drivers, Cars
+zed
+  given Drivers, Cars
+end
+
 
 axdef
   number_of_drivers : (Drivers <-> Cars) -> (Cars -> N)
@@ -593,7 +621,10 @@ end
 
 ** Solution 38 **
 
-given Place
+zed
+  given Place
+end
+
 
 axdef
   trains : N -> (Place cross Place)
@@ -611,7 +642,10 @@ end
 
 ** Solution 39 **
 
-given Coin
+zed
+  given Coin
+end
+
 
 axdef
   large : Coin
@@ -636,7 +670,10 @@ end
 TEXT: Note: Refactored to use schemas with named fields instead of tuples for fuzz compatibility.
 TEXT: Changed underscore identifiers to camelCase for fuzz compatibility.
 
-given Title, Viewed
+zed
+  given Title, Viewed
+end
+
 
 schema Programme
   title: Title
@@ -718,7 +755,10 @@ end
 
 ** Solution 41 **
 
-given Course, Lecturer
+zed
+  given Course, Lecturer
+end
+
 
 axdef
   current : N
@@ -734,7 +774,10 @@ schema Entry
   grade: N
 end
 
-Table == N -|> Entry
+zed
+  Table == N -|> Entry
+end
+
 
 (a) axdef
   records : N -|> Table
@@ -782,7 +825,10 @@ end
 
 ** Solution 43 **
 
-given Cinema, Film, Date
+zed
+  given Cinema, Film, Date
+end
+
 
 schema Booking
   ref: N
@@ -814,9 +860,15 @@ end
 
 === Free types and induction ===
 
-given N
+zed
+  given N
+end
 
-Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩
+
+zed
+  Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩
+end
+
 
 ** Solution 44 **
 
@@ -886,7 +938,10 @@ TEXT: (Remaining cases omitted - require equational reasoning with recursive fun
 
 ** Solution 48 **
 
-given SongId, UserId, PlaylistId
+zed
+  given SongId, UserId, PlaylistId
+end
+
 
 axdef
   songs : F SongId
@@ -921,11 +976,20 @@ end
 
 (a) A == users \ bigcup(ran(playlistSubscribers))
 
-(b) B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
+(b)
+zed
+  B == {p : dom(playlistSubscribers) | # (playlistSubscribers(p)) >= 100}
+end
 
-(c) C == (mu u : dom(loved) | forall v : dom(loved) | u /= v | # (loved(u)) > # (loved(v)))
+(c)
+zed
+  C == (mu u : dom(loved) | forall v : dom(loved) | u /= v | # (loved(u)) > # (loved(v)))
+end
 
-(d) D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved(u)} > # {u : UserId | t in loved(u)})
+(d)
+zed
+  D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved(u)} > # {u : UserId | t in loved(u)})
+end
 
 ** Solution 51 **
 
@@ -960,7 +1024,10 @@ end
 
 ** Solution 52 **
 
-UserStatus ::= premium | standard
+zed
+  UserStatus ::= premium | standard
+end
+
 
 axdef
   userStatus : UserId -> UserStatus

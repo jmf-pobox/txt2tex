@@ -2,7 +2,10 @@
 // Demonstrates composition vs nested application
 // From USER_GUIDE.md - Relations section
 
-given A, B, C
+zed
+  given A, B, C
+end
+
 
 axdef
   successor : N -> N

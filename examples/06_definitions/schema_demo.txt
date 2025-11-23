@@ -45,7 +45,10 @@ end
 
 ** Example 4: Schema with Given Types **
 
-given Person
+zed
+  given Person
+end
+
 
 schema PersonData
   name : Person

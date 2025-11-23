@@ -24,7 +24,10 @@ TEXT: Finite partial functions are partial functions with a finite domain. The o
 
 TEXT: A finite partial function from X to Y is a partial function whose domain is finite. This is useful when modeling resources with limited capacity or databases with a bounded number of entries.
 
-given Year, Table
+zed
+  given Year, Table
+end
+
 
 axdef
   records : Year 77-> Table
@@ -46,7 +49,10 @@ TEXT: - Partial function (+->): may not be defined for all inputs, domain may be
 TEXT: - Finite partial function (77->): partial function with finite domain
 TEXT: - Total bijection (>->>): defined everywhere, injective and surjective
 
-given X, Y
+zed
+  given X, Y
+end
+
 
 axdef
   totalFunc : X -> Y
@@ -61,7 +67,10 @@ end
 
 TEXT: Real-world example: A database table storing customer preferences.
 
-given CustomerID, Preference
+zed
+  given CustomerID, Preference
+end
+
 
 axdef
   preferences : CustomerID 77-> Preference
@@ -95,7 +104,10 @@ TEXT: The composition has a domain size bounded by the domain of f, since we can
 
 ** Example 5: Domain Restrictions and Finiteness **
 
-given Title, Length, ViewDate
+zed
+  given Title, Length, ViewDate
+end
+
 
 axdef
   viewed : Title 77-> ViewDate

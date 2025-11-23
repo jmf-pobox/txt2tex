@@ -21,7 +21,9 @@
 
 TEXT: Use axdef for variable declarations with types:
 
-given Person, Department
+zed
+  given Person, Department
+end
 
 axdef
   assignment : Person +-> Department
@@ -33,15 +35,19 @@ TEXT: This groups related variable declarations in a single block (given types m
 
 ** Example 2: Abbreviations **
 
-N_PLUS == {n : N | n > 0}
-N_EVEN == {n : N | n mod 2 = 0}
-N_ODD == {n : N | n mod 2 = 1}
+zed
+  N_PLUS == {n : N | n > 0}
+  N_EVEN == {n : N | n mod 2 = 0}
+  N_ODD == {n : N | n mod 2 = 1}
+end
 
 TEXT: Abbreviations can be defined standalone (zed blocks for abbreviations may not be fully supported yet).
 
 ** Example 3: Type Parameters **
 
-given Company
+zed
+  given Company
+end
 
 TEXT: Declare given types using the given keyword.
 
@@ -60,8 +66,10 @@ TEXT: Multiple predicates can constrain variables defined in axdef.
 
 ** Example 5: Free Type Definitions **
 
-Color ::= red | green | blue
-Size ::= small | medium | large
+zed
+  Color ::= red | green | blue
+  Size ::= small | medium | large
+end
 
 schema Product
   color : Color
@@ -75,7 +83,9 @@ TEXT: Free types are defined standalone, then used in schemas.
 
 ** Example 6: Multiple Schemas **
 
-given Account, Balance
+zed
+  given Account, Balance
+end
 
 schema BankAccount
   accountNumber : N
@@ -97,7 +107,9 @@ TEXT: Multiple schemas can be defined separately, each with their own constraint
 
 ** Example 7: Schema with External Variables **
 
-given Student, Course
+zed
+  given Student, Course
+end
 
 axdef
   enrolled : Student <-> Course
@@ -122,7 +134,9 @@ TEXT: Schemas can reference variables defined in axdef blocks.
 
 ** Example 8: Nested Schemas **
 
-given Char
+zed
+  given Char
+end
 
 schema Address
   street : seq Char
@@ -148,8 +162,10 @@ TEXT: Schema Address is used within schema PersonData. Variables using schemas g
 
 ** Example 9: Constants and Functions **
 
-PI == 3
-E == 2
+zed
+  PI == 3
+  E == 2
+end
 
 axdef
   circumference : N -> N
@@ -163,9 +179,10 @@ TEXT: Mathematical constants defined as abbreviations, functions in axdef.
 
 ** Example 10: Permission System Example **
 
-given UserID, DocumentID
-
-PermissionType ::= read | write | admin
+zed
+  given UserID, DocumentID
+  PermissionType ::= read | write | admin
+end
 
 schema User
   userId : UserID

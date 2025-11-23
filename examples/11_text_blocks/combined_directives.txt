@@ -137,7 +137,10 @@ TEXT: Prose introduction explaining the problem domain.
 
 === Section 2: Data Types ===
 
-given User, Document, Permission
+zed
+  given User, Document, Permission
+end
+
 
 TEXT: The system has three basic types: users, documents, and permissions.
 

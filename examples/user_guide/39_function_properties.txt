@@ -2,7 +2,10 @@
 // Demonstrates injective and surjective function definitions
 // From USER_GUIDE.md - Functions section
 
-given StudentId, Student
+zed
+  given StudentId, Student
+end
+
 
 axdef
   studentRecord : StudentId >-> Student

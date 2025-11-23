@@ -12,9 +12,15 @@ zed
   forall x : N | x >= 0
 end
 
-Evens == { n : N | n mod 2 = 0 }
+zed
+  Evens == { n : N | n mod 2 = 0 }
+end
 
-given NAME
+
+zed
+  given NAME
+end
+
 
 axdef
   birthdays : P NAME

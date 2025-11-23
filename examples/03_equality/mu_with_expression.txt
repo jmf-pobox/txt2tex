@@ -48,7 +48,9 @@ TEXT: Finds x = 5, then returns 5³ = 125.
 
 ** Example 5: String Indexing Example **
 
-given String, Char
+zed
+  given String, Char
+end
 
 axdef
   charAt : String cross N -> Char
@@ -95,7 +97,9 @@ TEXT: Finds the inverse, then squares it.
 
 ** Example 9: Practical - Finding Configuration Values **
 
-given ConfigKey, ConfigValue
+zed
+  given ConfigKey, ConfigValue
+end
 
 axdef
   configs : ConfigKey +-> ConfigValue

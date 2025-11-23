@@ -47,11 +47,20 @@ end
 
 TEXT: Using partial injection (-|>) with custom types:
 
-Year == N
+zed
+  Year == N
+end
 
-given Entry
 
-Table == seq(Entry)
+zed
+  given Entry
+end
+
+
+zed
+  Table == seq(Entry)
+end
+
 
 axdef
   records : Year -|> Table
