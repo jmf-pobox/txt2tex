@@ -32,6 +32,9 @@ dependencies = [
     "pyright>=1.1.0",
     "pytest>=8.4.2",
     "pytest-cov>=4.0.0",
+    # Complexity metrics
+    "radon>=6.0.1",
+    "xenon>=0.9.1",
 ]
 
 [tool.hatch.envs.default.scripts]
@@ -61,6 +64,14 @@ convert = "./txt2pdf.sh {args}"
 qa-check = "./qa_check.sh {args:examples/solutions.pdf}"
 # QA check - all PDFs in hw/ and examples/
 qa-check-all = "./qa_check_all.sh"
+# Complexity metrics
+complexity = "radon cc src/ -s -a"
+complexity-detailed = "radon cc src/ -s"
+complexity-json = "radon cc src/ -j"
+maintainability = "radon mi src/ -s"
+raw-metrics = "radon raw src/ -s"
+complexity-check = "xenon --max-absolute C --max-modules C --max-average B src/"
+complexity-monitor = ["complexity", "maintainability"]
 
 [tool.ruff]
 line-length = 88
@@ -143,3 +154,12 @@ precision = 2
 [tool.ruff.lint.isort]
 known-first-party = ["txt2tex"]
 combine-as-imports = true
+
+# Radon complexity thresholds
+# Cyclomatic Complexity grades: A=1-5, B=6-10, C=11-20, D=21-50, E=51-100, F=100+
+# Maintainability Index grades: A=20-100, B=10-19, C=0-9
+[tool.radon]
+exclude = "tests/*,*/__init__.py"
+# Set thresholds for failing
+cc_min = "B"  # Fail if any function has CC > 10
+mi_min = "B"  # Fail if any module has MI < 10
