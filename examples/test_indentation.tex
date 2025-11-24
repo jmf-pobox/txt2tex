@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -19,7 +19,7 @@
   policy : \power_1 RESOURCE \fun RESOURCE
   \where
   \forall S : \power_1 RESOURCE @ \\
-  \quad policy(S) \in S
+  \t1 policy(S) \in S
 \end{axdef}
 
 \section*{Example 2 : Quantifier with multiple lines}
@@ -29,8 +29,8 @@
   policy : \power_1 RESOURCE \fun RESOURCE
   \where
   \forall S : \power_1 RESOURCE @ \\
-  \quad policy(S) \in S \land \\
-  \quad S \subseteq RESOURCE
+  \t1 policy(S) \in S \land \\
+  \t1 S \subseteq RESOURCE
 \end{axdef}
 
 \section*{Example 3 : Nested quantifiers}
@@ -40,8 +40,8 @@
   relation : PERSON \rel PERSON
   \where
   \forall x : PERSON @ \\
-  \quad \exists y : PERSON @ \\
-  \quad (x, y) \in relation
+  \t1 \exists y : PERSON @ \\
+  \t2 (x, y) \in relation
 \end{axdef}
 
 \end{document}

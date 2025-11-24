@@ -44,7 +44,14 @@
       "Bash(make clean:*)",
       "Bash(make:*)",
       "Bash(for f in /Users/jfreeman/Coding/fuzz/txt2tex/sem/examples/02_predicate_logic/quantifiers.txt /Users/jfreeman/Coding/fuzz/txt2tex/sem/examples/03_equality/mu_with_expression.txt /Users/jfreeman/Coding/fuzz/txt2tex/sem/examples/03_equality/bullet_separator.txt)",
-      "Bash(do python3 /tmp/fix_nested_zed.py \"$f\")"
+      "Bash(do python3 /tmp/fix_nested_zed.py \"$f\")",
+      "Bash(TEXINPUTS=./:/Users/jfreeman/Coding/fuzz/txt2tex/sem/latex//: MFINPUTS=/Users/jfreeman/Coding/fuzz/txt2tex/sem/latex//: pdflatex:*)",
+      "Bash(TEXINPUTS=../latex//: MFINPUTS=../latex//: pdflatex:*)",
+      "Bash(/dev/null)",
+      "Bash(open:*)",
+      "Bash(TEXINPUTS=./latex//: MFINPUTS=./latex//: pdflatex:*)",
+      "Bash(/tmp/compile2.log)",
+      "Bash(/tmp/test1.log)"
     ],
     "deny": [],
     "ask": []

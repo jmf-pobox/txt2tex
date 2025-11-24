@@ -14,15 +14,15 @@
 - zed2e is a DOCUMENT: "The Z Notation: Reference Manual, Second Edition" by Mike Spivey
 - It specifies how Z notation should be written (syntax, conventions, commands)
 - Both fuzz.sty and zed-*.sty packages implement these standards
-- Commands like `\also`, `\quad` are defined in fuzz.sty and work correctly
-- NOTE: fuzz's `\t#` commands are for tabular/argue contexts, not general indentation
+- Commands like `\also`, `\t1`, `\t2` are defined in fuzz.sty and work correctly
 
 **This plan implements fuzz features, NOT a migration away from fuzz.**
 
 **Indentation Strategy**:
-- Use `\quad` for predicate indentation in axdef/schema/gendef contexts
+- Use `\t1`, `\t2`, `\t3`, etc. for depth-based indentation in predicates
+- `\t#` = horizontal skip of # × 2em (defined in fuzz.sty, zed-cm.sty, zed-lbr.sty)
 - Use `\also` for vertical spacing between predicate groups (blank line separator)
-- Fuzz's `\t1`, `\t2` are for argue environments and display math, not schemas
+- Depth tracking: increment when entering quantifier body, use for line breaks
 
 ---
 
