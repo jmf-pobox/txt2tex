@@ -237,6 +237,91 @@ class LaTeXGenerator:
         self._in_inline_part = False  # Track if we're inside an inline part
         self._quantifier_depth = 0  # Track nesting for \t1, \t2 indentation
 
+    def _generate_document_items_with_consolidation(
+        self, items: list[DocumentItem]
+    ) -> list[str]:
+        """Generate document items with zed environment consolidation.
+
+        Phase 1.4: Group consecutive GivenType, FreeType, and Abbreviation items
+        into a single zed environment with \\also between them.
+        """
+        lines: list[str] = []
+        i = 0
+        while i < len(items):
+            item = items[i]
+            # Check if this is a zed-generating item
+            if isinstance(item, (GivenType, FreeType, Abbreviation)):
+                # Collect consecutive zed items
+                zed_items: list[GivenType | FreeType | Abbreviation] = [item]
+                j = i + 1
+                while j < len(items) and isinstance(
+                    items[j], (GivenType, FreeType, Abbreviation)
+                ):
+                    zed_items.append(items[j])  # type: ignore
+                    j += 1
+
+                # Generate consolidated zed environment
+                if len(zed_items) == 1:
+                    # Single item: generate normally
+                    item_lines = self.generate_document_item(item)
+                    lines.extend(item_lines)
+                else:
+                    # Multiple consecutive items: consolidate
+                    lines.append(r"\begin{zed}")
+                    for idx, zed_item in enumerate(zed_items):
+                        if idx > 0:
+                            lines.append(r"\also")
+                        # Generate content without wrapping zed environment
+                        content = self._generate_zed_content(zed_item)
+                        lines.append(content)
+                    lines.append(r"\end{zed}")
+                    lines.append("")
+
+                # Skip processed items
+                i = j
+            else:
+                # Not a zed item: generate normally
+                item_lines = self.generate_document_item(item)
+                lines.extend(item_lines)
+                i += 1
+
+        return lines
+
+    def _generate_zed_content(self, item: GivenType | FreeType | Abbreviation) -> str:
+        """Generate the content of a zed item without the environment wrapper."""
+        if isinstance(item, GivenType):
+            names_str = ", ".join(item.names)
+            return f"[~ {names_str} ~]"
+        elif isinstance(item, FreeType):
+            # Generate branches
+            branch_strs: list[str] = []
+            for branch in item.branches:
+                if branch.parameters is None:
+                    branch_strs.append(branch.name)
+                else:
+                    if isinstance(branch.parameters, SequenceLiteral):
+                        if branch.parameters.elements:
+                            params_latex = self.generate_expr(
+                                branch.parameters.elements[0]
+                            )
+                        else:
+                            params_latex = ""
+                    else:
+                        params_latex = self.generate_expr(branch.parameters)
+                    branch_strs.append(f"{branch.name} \\ldata {params_latex} \\rdata")
+            branches_str = " | ".join(branch_strs)
+            return f"{item.name} ::= {branches_str}"
+        else:  # Abbreviation
+            expr_latex = self.generate_expr(item.expression)
+            name_latex = self._generate_identifier(
+                Identifier(line=0, column=0, name=item.name)
+            )
+            if item.generic_params:
+                params_str = ", ".join(item.generic_params)
+                return f"{name_latex}[{params_str}] == {expr_latex}"
+            else:
+                return f"{name_latex} == {expr_latex}"
+
     def generate_document(self, ast: Document | Expr) -> str:
         """Generate complete LaTeX document with preamble and postamble."""
         lines: list[str] = []
@@ -303,9 +388,8 @@ class LaTeXGenerator:
             # Store document-level parts format
             self.parts_format = ast.parts_format
             # Multi-line document: generate each item
-            for item in ast.items:
-                item_lines = self.generate_document_item(item)
-                lines.extend(item_lines)
+            # Phase 1.4: Consolidate consecutive zed environments
+            lines.extend(self._generate_document_items_with_consolidation(ast.items))
 
             # Generate bibliography if bibliography file is specified
             if ast.bibliography_metadata and ast.bibliography_metadata.file:
