@@ -2,27 +2,33 @@
 #
 # txt2pdf.sh - Convert whiteboard notation to PDF
 #
-# Usage: ./txt2pdf.sh input.txt [--fuzz]
+# Usage: ./txt2pdf.sh input.txt [--zed] [--typecheck]
 #
 
 set -e  # Exit on error (disabled for pdflatex step)
 
 # Check arguments
 if [ $# -lt 1 ]; then
-    echo "Usage: $0 input.txt [--fuzz]" >&2
+    echo "Usage: $0 input.txt [--zed] [--typecheck]" >&2
     echo "" >&2
     echo "Options:" >&2
-    echo "  --fuzz    Use fuzz package instead of zed-*" >&2
+    echo "  --zed         Use zed-* packages instead of fuzz (default: fuzz)" >&2
+    echo "  --typecheck   Run fuzz type checker before compilation" >&2
     exit 1
 fi
 
 INPUT="$1"
-FUZZ_FLAG=""
+ZED_FLAG=""
+TYPECHECK=""
 
-# Check for --fuzz flag
-if [ $# -ge 2 ] && [ "$2" = "--fuzz" ]; then
-    FUZZ_FLAG="--fuzz"
-fi
+# Parse flags
+for arg in "$@"; do
+    if [ "$arg" = "--zed" ]; then
+        ZED_FLAG="--zed"
+    elif [ "$arg" = "--typecheck" ]; then
+        TYPECHECK="1"
+    fi
+done
 
 # Validate input file exists
 if [ ! -f "$INPUT" ]; then
@@ -51,14 +57,14 @@ TOTAL_STEPS=3  # Generate, Copy deps, Compile
 if command -v tex-fmt > /dev/null 2>&1; then
     TOTAL_STEPS=$((TOTAL_STEPS + 1))
 fi
-if [ -n "$FUZZ_FLAG" ]; then
+if [ -n "$TYPECHECK" ]; then
     TOTAL_STEPS=$((TOTAL_STEPS + 1))
 fi
 
 # Step 1: Generate LaTeX
 CURRENT_STEP=1
 echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Generating LaTeX..."
-(cd "$SCRIPT_DIR" && PYTHONPATH="${SCRIPT_DIR}/src" python -m txt2tex.cli "$INPUT" -o "$TEX_FILE" --fuzz)
+(cd "$SCRIPT_DIR" && PYTHONPATH="${SCRIPT_DIR}/src" python -m txt2tex.cli "$INPUT" -o "$TEX_FILE" $ZED_FLAG)
 
 if [ ! -f "$TEX_FILE" ]; then
     echo "Error: LaTeX generation failed" >&2
@@ -75,15 +81,15 @@ if command -v tex-fmt > /dev/null 2>&1; then
     echo "  → Formatted: $TEX_FILE"
 fi
 
-# Step 3: Type check with fuzz (if --fuzz flag is set)
-if [ -n "$FUZZ_FLAG" ]; then
+# Step 3: Type check with fuzz (if --typecheck flag is set)
+if [ -n "$TYPECHECK" ]; then
     CURRENT_STEP=$((CURRENT_STEP + 1))
     echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Type checking with fuzz..."
 
     # Check if fuzz command exists
     if ! command -v fuzz > /dev/null 2>&1; then
         echo "Error: fuzz command not found in PATH" >&2
-        echo "The fuzz type checker is required when using --fuzz option" >&2
+        echo "The fuzz type checker is required when using --typecheck option" >&2
         exit 1
     fi
 

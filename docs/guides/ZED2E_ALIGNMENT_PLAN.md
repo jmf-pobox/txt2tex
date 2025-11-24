@@ -1,14 +1,40 @@
-# txt2tex Alignment Plan: Toward Z Notation Standards
+# txt2tex Alignment Plan: Toward Z Notation Standards (via fuzz)
+
+## CRITICAL CONTEXT
+
+**Primary Goal**: Implement fuzz features more completely to generate standards-compliant Z notation LaTeX.
+
+**Package Architecture**:
+- **fuzz** is the DEFAULT and ONLY supported package for validation
+- fuzz.sty provides Z notation typesetting AND typechecking/validation
+- The project uses fuzz.sty + zed-maths.sty + zed-proof.sty
+- Optional `--zed` flag swaps fuzz.sty for zed-cm.sty (no validation)
+
+**What "zed2e standards" means**:
+- zed2e is a DOCUMENT: "The Z Notation: Reference Manual, Second Edition" by Mike Spivey
+- It specifies how Z notation should be written (syntax, conventions, commands)
+- Both fuzz.sty and zed-*.sty packages implement these standards
+- Commands like `\also`, `\quad` are defined in fuzz.sty and work correctly
+- NOTE: fuzz's `\t#` commands are for tabular/argue contexts, not general indentation
+
+**This plan implements fuzz features, NOT a migration away from fuzz.**
+
+**Indentation Strategy**:
+- Use `\quad` for predicate indentation in axdef/schema/gendef contexts
+- Use `\also` for vertical spacing between predicate groups (blank line separator)
+- Fuzz's `\t1`, `\t2` are for argue environments and display math, not schemas
+
+---
 
 ## Design Principles
 
 ### Principle 1: **Whiteboard Fidelity with LaTeX Transparency**
 *"Make the simple things invisible, the complex things explicit."*
 
-**Philosophy**: Users write natural whiteboard notation, but the generated LaTeX should be recognizable and teachable. A student who learns txt2tex should be 70%+ prepared to write LaTeX with fuzz/zed2e directly.
+**Philosophy**: Users write natural whiteboard notation, but the generated LaTeX should be recognizable and teachable. A student who learns txt2tex should be 70%+ prepared to write LaTeX with fuzz directly.
 
 **Application**:
-- ✅ **Automatic smart defaults**: Add `\t1`, `\t2` for indentation when users break lines
+- ✅ **Automatic smart defaults**: Add `\quad` for indentation when users break lines
 - ✅ **Automatic line breaks**: Convert newlines to `\\` in appropriate contexts
 - ✅ **Automatic spacing**: Insert `~` in set comprehensions, function application
 - ❌ **Don't hide LaTeX structure**: Keep environment boundaries clear (`schema...end`, not implicit)
@@ -30,8 +56,8 @@ end
   policy : \power_1 RESOURCE \fun RESOURCE
 \where
   \forall S : \power_1 RESOURCE @ \\
-  \t1 policy(S) \in S \land \\
-  \t1 S \subseteq RESOURCE
+  \quad policy(S) \in S \land \\
+  \quad S \subseteq RESOURCE
 \end{axdef}
 ```
 

@@ -66,29 +66,8 @@ def test_cli_with_output_option(temp_input_file: Path, tmp_path: Path) -> None:
     assert "\\documentclass" in content
 
 
-def test_cli_with_fuzz_option(temp_input_file_with_schema: Path) -> None:
-    """Test CLI with --fuzz option (uses fuzz package instead of zed-*)."""
-    output_file = temp_input_file_with_schema.with_suffix(".tex")
-
-    with patch.object(
-        sys, "argv", ["txt2tex", str(temp_input_file_with_schema), "--fuzz"]
-    ):
-        result = main()
-
-    assert result == 0
-    assert output_file.exists()
-    content = output_file.read_text()
-
-    # With --fuzz, should use fuzz package
-    assert "\\usepackage{fuzz}" in content
-    assert "\\begin{schema}" in content
-
-    # Should NOT use zed-* packages
-    assert "zed-cm" not in content
-
-
-def test_cli_without_fuzz_option(temp_input_file_with_schema: Path) -> None:
-    """Test CLI without --fuzz option (uses zed-* packages)."""
+def test_cli_default_uses_fuzz(temp_input_file_with_schema: Path) -> None:
+    """Test CLI default (uses fuzz package)."""
     output_file = temp_input_file_with_schema.with_suffix(".tex")
 
     with patch.object(sys, "argv", ["txt2tex", str(temp_input_file_with_schema)]):
@@ -98,7 +77,28 @@ def test_cli_without_fuzz_option(temp_input_file_with_schema: Path) -> None:
     assert output_file.exists()
     content = output_file.read_text()
 
-    # Without --fuzz, should use zed-* packages
+    # Default should use fuzz package
+    assert "\\usepackage{fuzz}" in content
+    assert "\\begin{schema}" in content
+
+    # Should NOT use zed-cm
+    assert "zed-cm" not in content
+
+
+def test_cli_with_zed_option(temp_input_file_with_schema: Path) -> None:
+    """Test CLI with --zed option (uses zed-* packages instead of fuzz)."""
+    output_file = temp_input_file_with_schema.with_suffix(".tex")
+
+    with patch.object(
+        sys, "argv", ["txt2tex", str(temp_input_file_with_schema), "--zed"]
+    ):
+        result = main()
+
+    assert result == 0
+    assert output_file.exists()
+    content = output_file.read_text()
+
+    # With --zed, should use zed-* packages
     assert "\\usepackage{zed-cm}" in content
     assert "\\begin{schema}" in content
 

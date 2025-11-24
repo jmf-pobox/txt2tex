@@ -225,6 +225,7 @@ class LaTeXGenerator:
     _in_equiv_block: bool
     _first_part_in_solution: bool
     _in_inline_part: bool
+    _quantifier_depth: int
 
     def __init__(self, use_fuzz: bool = False, toc_parts: bool = False) -> None:
         """Initialize generator with package choice and TOC options."""
@@ -234,6 +235,7 @@ class LaTeXGenerator:
         self._in_equiv_block = False  # Track context for line break formatting
         self._first_part_in_solution = False  # Track if we're generating first part
         self._in_inline_part = False  # Track if we're inside an inline part
+        self._quantifier_depth = 0  # Track nesting for \t1, \t2 indentation
 
     def generate_document(self, ast: Document | Expr) -> str:
         """Generate complete LaTeX document with preamble and postamble."""
@@ -864,10 +866,11 @@ class LaTeXGenerator:
             # Multi-line expression: insert \\ and indent continuation
             # EQUIV blocks use array format and need & prefix for column alignment
             # Schemas and proofs use plain \\ without & prefix
+            indent = self._get_indentation()
             if self._in_equiv_block:
-                result = f"{left} {op_latex} \\\\\n& \\quad {right}"
+                result = f"{left} {op_latex} \\\\\n& {indent} {right}"
             else:
-                result = f"{left} {op_latex} \\\\\n\\quad {right}"
+                result = f"{left} {op_latex} \\\\\n{indent} {right}"
         else:
             # Single-line expression
             result = f"{left} {op_latex} {right}"
@@ -879,6 +882,18 @@ class LaTeXGenerator:
             result = f"({result})"
 
         return result
+
+    def _get_indentation(self) -> str:
+        """Get indentation command based on current quantifier depth.
+
+        Returns:
+            \\quad for standard indentation
+            (fuzz \\t commands are for tabular contexts only)
+        """
+        # Note: fuzz's \t command is for tabular alignment in
+        # argue/display math contexts. For predicates in axdef/schema/gendef,
+        # standard \quad indentation is correct
+        return r"\quad"
 
     def _generate_quantifier(self, node: Quantifier, parent: Expr | None = None) -> str:
         """Generate LaTeX for quantifier (forall, exists, exists1, mu).
@@ -932,12 +947,18 @@ class LaTeXGenerator:
                 domain_latex = self.generate_expr(node.domain, parent=node)
                 mu_parts.append(f": {domain_latex}")
             # Always use | for predicate separator in mu
+
+            # Increment depth for nested quantifiers
+            self._quantifier_depth += 1
+            # Get indentation at this depth (for line breaks)
+            indent = self._get_indentation()
             body_latex = self.generate_expr(node.body, parent=node)
+            self._quantifier_depth -= 1
 
             # Phase 27: Check for line break after pipe (|)
             if node.line_break_after_pipe:
                 # Note: Fuzz mu is parenthesized, doesn't use array format
-                mu_parts.append(f"| \\\\\n\\quad {body_latex}")
+                mu_parts.append(f"| \\\\\n{indent} {body_latex}")
             else:
                 mu_parts.append("|")
                 mu_parts.append(body_latex)
@@ -956,14 +977,20 @@ class LaTeXGenerator:
         if node.expression:
             # Use | or \mid for predicate separator
             pipe_sep = "|" if self.use_fuzz else r"\mid"
+
+            # Increment depth for nested quantifiers
+            self._quantifier_depth += 1
+            # Get indentation at this depth (for line breaks)
+            indent = self._get_indentation()
             body_latex = self.generate_expr(node.body, parent=node)
+            self._quantifier_depth -= 1
 
             # Phase 27: Check for line break after pipe (|)
             if node.line_break_after_pipe:
                 if self._in_equiv_block:
-                    parts.append(f"{pipe_sep} \\\\\n& \\quad {body_latex}")
+                    parts.append(f"{pipe_sep} \\\\\n& {indent} {body_latex}")
                 else:
-                    parts.append(f"{pipe_sep} \\\\\n\\quad {body_latex}")
+                    parts.append(f"{pipe_sep} \\\\\n{indent} {body_latex}")
             else:
                 parts.append(pipe_sep)
                 parts.append(body_latex)
@@ -977,7 +1004,13 @@ class LaTeXGenerator:
             # Standard quantifier: @ or bullet separator and body
             # Fuzz uses @ (at sign), LaTeX uses \bullet
             separator = "@" if self.use_fuzz else r"\bullet"
+
+            # Increment depth for nested quantifiers
+            self._quantifier_depth += 1
+            # Get indentation at this depth (for line breaks)
+            indent = self._get_indentation()
             body_latex = self.generate_expr(node.body, parent=node)
+            self._quantifier_depth -= 1
 
             # Phase 27: Check for line break after pipe (|)
             if node.line_break_after_pipe:
@@ -985,9 +1018,9 @@ class LaTeXGenerator:
                 # EQUIV blocks use array format and need & prefix
                 # Schemas and proofs use plain \\ without &
                 if self._in_equiv_block:
-                    parts.append(f"{separator} \\\\\n& \\quad {body_latex}")
+                    parts.append(f"{separator} \\\\\n& {indent} {body_latex}")
                 else:
-                    parts.append(f"{separator} \\\\\n\\quad {body_latex}")
+                    parts.append(f"{separator} \\\\\n{indent} {body_latex}")
             else:
                 # Single-line quantifier
                 parts.append(separator)
