@@ -3525,7 +3525,11 @@ class LaTeXGenerator:
 
         # Handle Document content (multiple items in zed block)
         if isinstance(node.content, Document):
-            for item in node.content.items:
+            for idx, item in enumerate(node.content.items):
+                # Add line break before all items except the first
+                if idx > 0:
+                    lines.append(r"\\")
+
                 # Generate given types: [A, B, C]
                 if isinstance(item, GivenType):
                     names_str = ", ".join(item.names)
