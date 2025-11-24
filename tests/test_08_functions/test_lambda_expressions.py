@@ -224,9 +224,10 @@ end"""
         assert len(doc.items) == 1
         axdef = doc.items[0]
         assert isinstance(axdef, AxDef)
-        assert len(axdef.predicates) == 2
+        assert len(axdef.predicates) == 1  # One group
+        assert len(axdef.predicates[0]) == 2  # Two predicates in that group
         # First predicate: f = lambda x : N . x + 1
-        pred1 = axdef.predicates[0]
+        pred1 = axdef.predicates[0][0]
         assert isinstance(pred1, BinaryOp)
         assert pred1.operator == "="
         assert isinstance(pred1.right, Lambda)
@@ -234,7 +235,7 @@ end"""
         assert isinstance(pred1.right.body, BinaryOp)
         assert pred1.right.body.operator == "+"
         # Second predicate: g = lambda y : N . y * 2
-        pred2 = axdef.predicates[1]
+        pred2 = axdef.predicates[0][1]
         assert isinstance(pred2, BinaryOp)
         assert pred2.operator == "="
         assert isinstance(pred2.right, Lambda)

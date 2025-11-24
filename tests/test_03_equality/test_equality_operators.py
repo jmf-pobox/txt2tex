@@ -188,7 +188,8 @@ end"""
         axdef = ast.items[0]
         assert isinstance(axdef, AxDef)
         assert len(axdef.declarations) == 2
-        assert len(axdef.predicates) == 2
+        assert len(axdef.predicates) == 1  # One group
+        assert len(axdef.predicates[0]) == 2  # Two predicates in that group
 
     def test_schema_basic(self) -> None:
         """Test parsing basic schema."""
@@ -303,13 +304,15 @@ class TestLaTeXGenerator:
                 )
             ],
             predicates=[
-                BinaryOp(
-                    operator=">",
-                    left=Identifier(name="x", line=4, column=1),
-                    right=Number(value="0", line=4, column=5),
-                    line=4,
-                    column=3,
-                )
+                [
+                    BinaryOp(
+                        operator=">",
+                        left=Identifier(name="x", line=4, column=1),
+                        right=Number(value="0", line=4, column=5),
+                        line=4,
+                        column=3,
+                    )
+                ]
             ],
             line=1,
             column=1,
@@ -358,13 +361,15 @@ class TestLaTeXGenerator:
                 )
             ],
             predicates=[
-                BinaryOp(
-                    operator=">=",
-                    left=Identifier(name="balance", line=4, column=1),
-                    right=Number(value="0", line=4, column=12),
-                    line=4,
-                    column=9,
-                )
+                [
+                    BinaryOp(
+                        operator=">=",
+                        left=Identifier(name="balance", line=4, column=1),
+                        right=Number(value="0", line=4, column=12),
+                        line=4,
+                        column=9,
+                    )
+                ]
             ],
             line=1,
             column=1,

@@ -611,6 +611,8 @@ class AxDef(ASTNode):
     """Axiomatic definition block.
 
     Phase 9 enhancement: Supports generic parameters [X, Y, ...].
+    ZED2E alignment: predicates grouped by blank lines for \also generation.
+
     Example:
     axdef [X]
       f : X -> X
@@ -620,7 +622,7 @@ class AxDef(ASTNode):
     """
 
     declarations: list[Declaration]
-    predicates: list[Expr]
+    predicates: list[list[Expr]]  # Groups of predicates (separated by blank lines)
     generic_params: list[str] | None = None  # Optional generic parameters
 
 
@@ -630,6 +632,7 @@ class GenDef(ASTNode):
 
     Generic definitions define polymorphic functions and constants.
     Generic parameters are required (not optional like in AxDef).
+    ZED2E alignment: predicates grouped by blank lines for \also generation.
 
     Example:
     gendef [X, Y]
@@ -641,7 +644,7 @@ class GenDef(ASTNode):
 
     generic_params: list[str]  # Required generic parameters
     declarations: list[Declaration]
-    predicates: list[Expr]
+    predicates: list[list[Expr]]  # Groups of predicates (separated by blank lines)
 
 
 @dataclass(frozen=True)
@@ -650,6 +653,8 @@ class Schema(ASTNode):
 
     Phase 9 enhancement: Supports generic parameters [X, Y, ...].
     Phase 13 enhancement: Supports anonymous schemas (name=None).
+    ZED2E alignment: predicates grouped by blank lines for \also generation.
+
     Examples:
     - schema GenericStack[X] ... end (named with generics)
     - schema State ... end (named)
@@ -658,7 +663,7 @@ class Schema(ASTNode):
 
     name: str | None  # Optional name (None for anonymous schemas)
     declarations: list[Declaration]
-    predicates: list[Expr]
+    predicates: list[list[Expr]]  # Groups of predicates (separated by blank lines)
     generic_params: list[str] | None = None  # Optional generic parameters
 
 
