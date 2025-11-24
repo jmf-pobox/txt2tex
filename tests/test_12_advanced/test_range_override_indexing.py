@@ -384,8 +384,9 @@ end"""
         assert isinstance(ast.items[0], Schema)
         schema = ast.items[0]
         # Check predicate contains override
-        assert len(schema.predicates) == 1
-        pred = schema.predicates[0]
+        assert len(schema.predicates) == 1  # One group
+        assert len(schema.predicates[0]) == 1  # One predicate
+        pred = schema.predicates[0][0]
         assert isinstance(pred, BinaryOp)
         assert pred.operator == "="
         # Left side should be override

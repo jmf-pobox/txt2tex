@@ -3286,17 +3286,25 @@ class LaTeXGenerator:
                 else:
                     lines.append(f"{var_latex} : {type_latex}")
 
-        # Generate where clause if predicates exist
-        if node.predicates:
+        # Generate where clause if predicate groups exist
+        if node.predicates and any(group for group in node.predicates):
             lines.append(r"\where")
-            for i, pred in enumerate(node.predicates):
-                # Top-level predicates: pass parent=None for smart parenthesization
-                pred_latex = self.generate_expr(pred, parent=None)
-                # Use \\ as separator (fuzz Sep: ; | \\ | \also)
-                if i < len(node.predicates) - 1:
-                    lines.append(f"{pred_latex} \\\\")
-                else:
-                    lines.append(pred_latex)
+
+            # Iterate through predicate groups (separated by blank lines)
+            for group_idx, group in enumerate(node.predicates):
+                # Generate predicates in current group
+                for pred_idx, pred in enumerate(group):
+                    # Top-level predicates: pass parent=None for smart parenthesization
+                    pred_latex = self.generate_expr(pred, parent=None)
+                    # Use \\ as separator within group
+                    if pred_idx < len(group) - 1:
+                        lines.append(f"{pred_latex} \\\\")
+                    else:
+                        lines.append(pred_latex)
+
+                # Add \also between groups (not after last group)
+                if group_idx < len(node.predicates) - 1:
+                    lines.append(r"\also")
 
         lines.append(r"\end{axdef}")
         lines.append("")
@@ -3351,17 +3359,25 @@ class LaTeXGenerator:
                 else:
                     lines.append(f"  {var_latex}: {type_latex}")
 
-        # Generate where clause if predicates exist
-        if node.predicates:
+        # Generate where clause if predicate groups exist
+        if node.predicates and any(group for group in node.predicates):
             lines.append(r"\where")
-            for i, pred in enumerate(node.predicates):
-                # Top-level predicates: pass parent=None for smart parenthesization
-                pred_latex = self.generate_expr(pred, parent=None)
-                # Fuzz requires \\ after each predicate except the last
-                if self.use_fuzz and i < len(node.predicates) - 1:
-                    lines.append(f"  {pred_latex} \\\\")
-                else:
-                    lines.append(f"  {pred_latex}")
+
+            # Iterate through predicate groups (separated by blank lines)
+            for group_idx, group in enumerate(node.predicates):
+                # Generate predicates in current group
+                for pred_idx, pred in enumerate(group):
+                    # Top-level predicates: pass parent=None for smart parenthesization
+                    pred_latex = self.generate_expr(pred, parent=None)
+                    # Fuzz requires \\ after each predicate except the last in group
+                    if self.use_fuzz and pred_idx < len(group) - 1:
+                        lines.append(f"  {pred_latex} \\\\")
+                    else:
+                        lines.append(f"  {pred_latex}")
+
+                # Add \also between groups (not after last group)
+                if group_idx < len(node.predicates) - 1:
+                    lines.append(r"\also")
 
         lines.append(r"\end{gendef}")
         lines.append("")
@@ -3494,17 +3510,25 @@ class LaTeXGenerator:
                 else:
                     lines.append(f"{var_latex} : {type_latex}")
 
-        # Generate where clause if predicates exist
-        if node.predicates:
+        # Generate where clause if predicate groups exist
+        if node.predicates and any(group for group in node.predicates):
             lines.append(r"\where")
-            for i, pred in enumerate(node.predicates):
-                # Top-level predicates: pass parent=None for smart parenthesization
-                pred_latex = self.generate_expr(pred, parent=None)
-                # Use \\ as separator (fuzz Sep: ; | \\ | \also)
-                if i < len(node.predicates) - 1:
-                    lines.append(f"{pred_latex} \\\\")
-                else:
-                    lines.append(pred_latex)
+
+            # Iterate through predicate groups (separated by blank lines)
+            for group_idx, group in enumerate(node.predicates):
+                # Generate predicates in current group
+                for pred_idx, pred in enumerate(group):
+                    # Top-level predicates: pass parent=None for smart parenthesization
+                    pred_latex = self.generate_expr(pred, parent=None)
+                    # Use \\ as separator within group
+                    if pred_idx < len(group) - 1:
+                        lines.append(f"{pred_latex} \\\\")
+                    else:
+                        lines.append(pred_latex)
+
+                # Add \also between groups (not after last group)
+                if group_idx < len(node.predicates) - 1:
+                    lines.append(r"\also")
 
         lines.append(r"\end{schema}")
         lines.append("")

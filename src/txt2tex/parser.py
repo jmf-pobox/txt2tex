@@ -694,6 +694,66 @@ class Parser:
         while self._match(TokenType.NEWLINE) and not self._at_end():
             self._advance()
 
+    def _has_blank_line(self) -> bool:
+        """Check if there are multiple consecutive newlines (blank line).
+
+        Returns:
+            True if there are 2+ consecutive NEWLINE tokens (indicating blank line)
+        """
+        if not self._match(TokenType.NEWLINE):
+            return False
+
+        # Count consecutive newlines
+        newline_count = 0
+        offset = 0
+        while (
+            self.pos + offset < len(self.tokens)
+            and self.tokens[self.pos + offset].type == TokenType.NEWLINE
+        ):
+            newline_count += 1
+            offset += 1
+
+        return newline_count >= 2
+
+    def _parse_predicate_groups(
+        self, end_tokens: tuple[TokenType, ...]
+    ) -> list[list[Expr]]:
+        """Parse predicates grouped by blank lines for \\also generation.
+
+        Args:
+            end_tokens: Token types that end the predicate section (e.g., END, WHERE)
+
+        Returns:
+            List of predicate groups, where each group is separated by blank lines
+        """
+        groups: list[list[Expr]] = []
+        current_group: list[Expr] = []
+
+        while not self._at_end() and not self._match(*end_tokens):
+            # Skip leading newlines before checking for predicates
+            if self._match(TokenType.NEWLINE):
+                # Check if this is a blank line (2+ consecutive newlines)
+                if self._has_blank_line():
+                    # Save current group if non-empty
+                    if current_group:
+                        groups.append(current_group)
+                        current_group = []
+                    # Skip all newlines (including the blank line)
+                    self._skip_newlines()
+                else:
+                    # Single newline - just skip it
+                    self._advance()
+                continue
+
+            # Parse predicate and add to current group
+            current_group.append(self._parse_expr())
+
+        # Add final group if non-empty
+        if current_group:
+            groups.append(current_group)
+
+        return groups  # Return [] if no predicates
+
     def _is_keyword_usable_as_identifier(self) -> bool:
         """Check if current token is a keyword that can be used as an identifier.
 
@@ -3225,7 +3285,6 @@ class Parser:
         self._skip_newlines()
 
         declarations: list[Declaration] = []
-        predicates: list[Expr] = []
 
         # Parse declarations until 'where' or 'end'
         while not self._at_end() and not self._match(TokenType.WHERE, TokenType.END):
@@ -3270,18 +3329,13 @@ class Parser:
                 break
 
         # Parse 'where' clause (optional)
+        predicate_groups: list[list[Expr]] = []  # Default: no groups
         if self._match(TokenType.WHERE):
             self._advance()  # Consume 'where'
             self._skip_newlines()
 
-            # Parse predicates until 'end'
-            while not self._at_end() and not self._match(TokenType.END):
-                if self._match(TokenType.NEWLINE):
-                    self._advance()
-                    continue
-
-                predicates.append(self._parse_expr())
-                self._skip_newlines()
+            # Parse predicates grouped by blank lines
+            predicate_groups = self._parse_predicate_groups((TokenType.END,))
 
         # Expect 'end'
         if not self._match(TokenType.END):
@@ -3290,7 +3344,7 @@ class Parser:
 
         return AxDef(
             declarations=declarations,
-            predicates=predicates,
+            predicates=predicate_groups,
             generic_params=generic_params,
             line=start_token.line,
             column=start_token.column,
@@ -3316,7 +3370,6 @@ class Parser:
         self._skip_newlines()
 
         declarations: list[Declaration] = []
-        predicates: list[Expr] = []
 
         # Parse declarations until 'where' or 'end'
         while not self._at_end() and not self._match(TokenType.WHERE, TokenType.END):
@@ -3361,18 +3414,13 @@ class Parser:
                 break
 
         # Parse 'where' clause (optional)
+        predicate_groups: list[list[Expr]] = []  # Default: no groups
         if self._match(TokenType.WHERE):
             self._advance()  # Consume 'where'
             self._skip_newlines()
 
-            # Parse predicates until 'end'
-            while not self._at_end() and not self._match(TokenType.END):
-                if self._match(TokenType.NEWLINE):
-                    self._advance()
-                    continue
-
-                predicates.append(self._parse_expr())
-                self._skip_newlines()
+            # Parse predicates grouped by blank lines
+            predicate_groups = self._parse_predicate_groups((TokenType.END,))
 
         # Expect 'end'
         if not self._match(TokenType.END):
@@ -3382,7 +3430,7 @@ class Parser:
         return GenDef(
             generic_params=generic_params,
             declarations=declarations,
-            predicates=predicates,
+            predicates=predicate_groups,
             line=start_token.line,
             column=start_token.column,
         )
@@ -3515,7 +3563,6 @@ class Parser:
         self._skip_newlines()
 
         declarations: list[Declaration] = []
-        predicates: list[Expr] = []
 
         # Parse declarations until 'where' or 'end'
         while not self._at_end() and not self._match(TokenType.WHERE, TokenType.END):
@@ -3560,18 +3607,13 @@ class Parser:
                 break
 
         # Parse 'where' clause (optional)
+        predicate_groups: list[list[Expr]] = []  # Default: no groups
         if self._match(TokenType.WHERE):
             self._advance()  # Consume 'where'
             self._skip_newlines()
 
-            # Parse predicates until 'end'
-            while not self._at_end() and not self._match(TokenType.END):
-                if self._match(TokenType.NEWLINE):
-                    self._advance()
-                    continue
-
-                predicates.append(self._parse_expr())
-                self._skip_newlines()
+            # Parse predicates grouped by blank lines
+            predicate_groups = self._parse_predicate_groups((TokenType.END,))
 
         # Expect 'end'
         if not self._match(TokenType.END):
@@ -3581,7 +3623,7 @@ class Parser:
         return Schema(
             name=name,
             declarations=declarations,
-            predicates=predicates,
+            predicates=predicate_groups,
             generic_params=generic_params,
             line=start_token.line,
             column=start_token.column,
