@@ -29,10 +29,10 @@ def test_nested_cross_in_seq_fuzz() -> None:
     generator = LaTeXGenerator(use_fuzz=True)
     latex = generator.generate_document(doc)
 
-    # Should preserve parentheses: \seq ((ShowId \cross EpisodeId) \cross N)
+    # Should preserve parentheses: \seq~((ShowId \cross EpisodeId) \cross N)
     assert (
-        r"\seq ((ShowId \cross EpisodeId) \cross" in latex
-        or r"\seq ((ShowId \cross EpisodeId) \cross \nat)" in latex
+        r"\seq~((ShowId \cross EpisodeId) \cross" in latex
+        or r"\seq~((ShowId \cross EpisodeId) \cross \nat)" in latex
     ), f"Expected parenthesized cross product, got: {latex}"
 
 
@@ -51,8 +51,8 @@ def test_nested_cross_in_seq_standard() -> None:
 
     # Should preserve parentheses
     assert (
-        r"\seq ((ShowId \cross EpisodeId) \cross" in latex
-        or r"\seq ((ShowId \cross EpisodeId) \cross \nat)" in latex
+        r"\seq~((ShowId \cross EpisodeId) \cross" in latex
+        or r"\seq~((ShowId \cross EpisodeId) \cross \nat)" in latex
     ), f"Expected parenthesized cross product, got: {latex}"
 
 

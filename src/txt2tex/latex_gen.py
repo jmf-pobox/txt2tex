@@ -1094,7 +1094,8 @@ class LaTeXGenerator:
         # Generate variables (comma-separated for multi-variable)
         variables_str = ", ".join(node.variables)
         # Both fuzz and LaTeX use \{ \} for set braces
-        parts = [r"\{", variables_str]
+        # Phase 1.3: Add ~ spacing hints after { and before }
+        parts = [r"\{~", variables_str]
 
         if node.domain:
             domain_latex = self.generate_expr(node.domain)
@@ -1127,7 +1128,8 @@ class LaTeXGenerator:
                 parts.append(expression_latex)
 
         # Close set
-        parts.append(r"\}")
+        # Phase 1.3: Add ~ spacing hint before closing brace
+        parts.append(r"~\}")
 
         return " ".join(parts)
 
@@ -1218,7 +1220,8 @@ class LaTeXGenerator:
                 # GenericInstantiation: seq (P[X])
                 if isinstance(arg, (FunctionApp, BinaryOp, GenericInstantiation)):
                     arg_latex = f"({arg_latex})"
-                return f"{func_latex} {arg_latex}"
+                # Phase 1.3: Add ~ spacing hint between function and argument
+                return f"{func_latex}~{arg_latex}"
 
             # Standard function application with identifier: f(x, y, z)
             # Process identifier through _generate_identifier for underscore handling
@@ -1240,11 +1243,12 @@ class LaTeXGenerator:
                 and node.function.args[0].name in special_functions
             ):
                 # Pattern: (special_fn1(special_fn2))(args)
-                # Generate: special_fn1 (special_fn2 args) with parens
+                # Generate: special_fn1~(special_fn2~args) with parens and tildes
                 outer_latex = special_functions[inner_func.name]
                 inner_latex = special_functions[node.function.args[0].name]
                 args_latex = " ".join(self.generate_expr(arg) for arg in node.args)
-                return f"{outer_latex} ({inner_latex} {args_latex})"
+                # Phase 1.3: Add ~ spacing hints
+                return f"{outer_latex}~({inner_latex}~{args_latex})"
 
         # General function application: expr(args)
         func_latex = self.generate_expr(node.function)
@@ -3188,8 +3192,9 @@ class LaTeXGenerator:
         """Generate LaTeX for given type declaration."""
         lines: list[str] = []
         # Generate as: given [A, B, C]
+        # Phase 1.3: Add ~ spacing hints after [ and before ]
         names_str = ", ".join(node.names)
-        lines.append(f"\\begin{{zed}}[{names_str}]\\end{{zed}}")
+        lines.append(f"\\begin{{zed}}[~ {names_str} ~]\\end{{zed}}")
         lines.append("")
         return lines
 

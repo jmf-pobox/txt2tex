@@ -30,7 +30,7 @@ class TestIseqCrossParentheses:
         assert ast.args[0].operator == "cross"
 
     def test_iseq_cross_latex(self) -> None:
-        """Test that iseq(X cross Y) generates \\iseq (X \\cross Y) with parens."""
+        """Test that iseq(X cross Y) generates \\iseq~(X \\cross Y) with parens."""
         text = "iseq(ShowId cross EpisodeId)"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -42,7 +42,7 @@ class TestIseqCrossParentheses:
         result = gen.generate_expr(ast)
 
         # Must have parentheses around cross for correct precedence
-        assert result == r"\iseq (ShowId \cross EpisodeId)"
+        assert result == r"\iseq~(ShowId \cross EpisodeId)"
 
     def test_seq_union_latex(self) -> None:
         """Test that seq(X union Y) also gets parentheses."""
@@ -57,7 +57,7 @@ class TestIseqCrossParentheses:
         result = gen.generate_expr(ast)
 
         # Must have parentheses around union
-        assert result == r"\seq (X \cup Y)"
+        assert result == r"\seq~(X \cup Y)"
 
     def test_seq_nested_no_extra_parens(self) -> None:
         """Test that seq1 (seq X) doesn't add double parentheses."""
@@ -72,7 +72,7 @@ class TestIseqCrossParentheses:
         result = gen.generate_expr(ast)
 
         # Only one set of parentheses needed
-        assert result == r"\seq_1 (\seq X)"
+        assert result == r"\seq_1~(\seq~X)"
 
     def test_iseq_identifier_no_parens(self) -> None:
         """Test that iseq(X) with simple identifier doesn't add unnecessary parens."""
@@ -87,4 +87,4 @@ class TestIseqCrossParentheses:
         result = gen.generate_expr(ast)
 
         # No parentheses needed for simple identifier
-        assert result == r"\iseq ShowId"
+        assert result == r"\iseq~ShowId"

@@ -34,7 +34,7 @@ TEXT: The set { x : N | x > 0 } contains positive integers.
         latex = gen.generate_document(ast)
 
         # Check that set comprehension is wrapped in $...$
-        assert r"$\{ x \colon \mathbb{N} \mid x > 0 \}$" in latex
+        assert r"$\{~ x \colon \mathbb{N} \mid x > 0 ~\}$" in latex
         assert "contains positive integers" in latex
 
     def test_inline_quantifier(self) -> None:
@@ -75,8 +75,8 @@ TEXT: Both { x : N | x > 0 } and { y : N | y < 10 } are sets.
         latex = gen.generate_document(ast)
 
         # Check both set comprehensions are converted
-        assert r"$\{ x \colon \mathbb{N} \mid x > 0 \}$" in latex
-        assert r"$\{ y \colon \mathbb{N} \mid y < 10 \}$" in latex
+        assert r"$\{~ x \colon \mathbb{N} \mid x > 0 ~\}$" in latex
+        assert r"$\{~ y \colon \mathbb{N} \mid y < 10 ~\}$" in latex
         assert "Both" in latex
         assert "and" in latex
         assert "are sets" in latex
@@ -124,7 +124,7 @@ TEXT: The set { x : N | x > 0 } is non-empty.
         latex = gen.generate_document(ast)
 
         # Check that set comprehension is converted
-        assert r"$\{ x \colon \mathbb{N} \mid x > 0 \}$" in latex
+        assert r"$\{~ x \colon \mathbb{N} \mid x > 0 ~\}$" in latex
         assert "is non-empty" in latex
 
     def test_symbolic_operators_with_inline_math(self) -> None:
@@ -143,7 +143,7 @@ TEXT: We have { x : N | x > 0 } => x != 0 for all members.
         latex = gen.generate_document(ast)
 
         # Check both conversions
-        assert r"$\{ x \colon \mathbb{N} \mid x > 0 \}$" in latex
+        assert r"$\{~ x \colon \mathbb{N} \mid x > 0 ~\}$" in latex
         assert r"$\Rightarrow$" in latex
         assert "for all members" in latex
 
