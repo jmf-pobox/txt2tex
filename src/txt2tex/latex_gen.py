@@ -1631,9 +1631,8 @@ class LaTeXGenerator:
 
         # Track first part in solution for indentation
         self._first_part_in_solution = True
-        for item in node.items:
-            item_lines = self.generate_document_item(item)
-            lines.extend(item_lines)
+        # Use consolidation logic for items within solution
+        lines.extend(self._generate_document_items_with_consolidation(node.items))
         self._first_part_in_solution = False
 
         return lines
