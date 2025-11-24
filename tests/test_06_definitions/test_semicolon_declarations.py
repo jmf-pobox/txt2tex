@@ -400,5 +400,5 @@ end"""
         latex = gen.generate_document(ast)
         # Three declarations on separate lines with line breaks
         assert "f: X \\fun Y \\\\" in latex
-        assert "g: \\seq X \\fun \\seq Y \\\\" in latex
+        assert "g: \\seq~X \\fun \\seq~Y \\\\" in latex
         assert "h: \\power X \\fun \\power Y" in latex

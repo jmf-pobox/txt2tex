@@ -670,29 +670,29 @@ class TestNonEmptySequences:
     """Test seq1 (non-empty sequences) support."""
 
     def test_seq1_simple(self):
-        """Test seq1 X → \\seq_1 X."""
+        """Test seq1 X → \\seq_1~X."""
         text = "seq1 X"
         ast = parse_expr(text)
         assert isinstance(ast, FunctionApp)
         assert isinstance(ast.function, Identifier)
         assert ast.function.name == "seq1"
         latex = generate_latex(text)
-        assert latex == r"\seq_1 X"
+        assert latex == r"\seq_1~X"
 
     def test_seq_seq(self):
-        """Test seq seq N → \\seq (\\seq \\mathbb{N}) (sequence of sequences)."""
+        """Test seq seq N → \\seq~(\\seq~\\mathbb{N}) (sequence of sequences)."""
         text = "seq seq N"
         latex = generate_latex(text)
-        assert latex == r"\seq (\seq \mathbb{N})"
+        assert latex == r"\seq~(\seq~\mathbb{N})"
 
     def test_seq1_seq(self):
-        """Test seq1 seq X → \\seq_1 (\\seq X) (non-empty sequences)."""
+        """Test seq1 seq X → \\seq_1~(\\seq~X) (non-empty sequences)."""
         text = "seq1 seq X"
         latex = generate_latex(text)
-        assert latex == r"\seq_1 (\seq X)"
+        assert latex == r"\seq_1~(\seq~X)"
 
     def test_seq1_with_nat(self):
-        """Test seq1 N → \\seq_1 \\nat (with fuzz) or \\seq_1 \\mathbb{N} (LaTeX)."""
+        """Test seq1 N → \\seq_1~\\nat (with fuzz) or \\seq_1~\\mathbb{N} (LaTeX)."""
         text = "seq1 N"
         ast = parse_expr(text)
         assert not isinstance(ast, Document)
@@ -700,18 +700,18 @@ class TestNonEmptySequences:
         # Test with fuzz mode
         generator_fuzz = LaTeXGenerator(use_fuzz=True)
         latex_fuzz = generator_fuzz.generate_expr(ast)
-        assert latex_fuzz == r"\seq_1 \nat"
+        assert latex_fuzz == r"\seq_1~\nat"
 
         # Test with LaTeX mode
         generator_latex = LaTeXGenerator(use_fuzz=False)
         latex_regular = generator_latex.generate_expr(ast)
-        assert latex_regular == r"\seq_1 \mathbb{N}"
+        assert latex_regular == r"\seq_1~\mathbb{N}"
 
     def test_seq1_in_function_type(self):
-        """Test seq1 X -> Y → \\seq_1 X \\fun Y."""
+        """Test seq1 X -> Y → \\seq_1~X \\fun Y."""
         text = "seq1 X -> Y"
         latex = generate_latex(text)
-        assert latex == r"\seq_1 X \fun Y"
+        assert latex == r"\seq_1~X \fun Y"
 
     def test_seq1_in_declaration(self):
         """Test axdef with seq1 X."""
@@ -724,4 +724,4 @@ end"""
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=True)
         latex = generator.generate_document(ast)
-        assert r"\seq_1 \nat" in latex
+        assert r"\seq_1~\nat" in latex
