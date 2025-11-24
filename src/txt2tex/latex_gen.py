@@ -254,6 +254,11 @@ class LaTeXGenerator:
         lines.append(r"\usepackage{adjustbox}")
         # Load natbib for author-year citations (Harvard style)
         lines.append(r"\usepackage{natbib}")
+        # Load hyperref BEFORE fuzz to avoid conflict with fuzz's \t command
+        # hyperref redefines \t, but fuzz needs to override it for indentation
+        lines.append(
+            r"\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}"
+        )
         if self.use_fuzz:
             lines.append(r"\usepackage{fuzz}")  # Replaces zed-cm (fonts/styling)
         else:
@@ -261,11 +266,6 @@ class LaTeXGenerator:
         # These packages work with both fuzz and zed-cm
         lines.append(r"\usepackage{zed-maths}")  # Mathematical operators
         lines.append(r"\usepackage{zed-proof}")  # Proof tree macros (\infer)
-        # Load hyperref last to avoid conflicts with other packages
-        # Enables clickable links in TOC, sections, citations, etc.
-        lines.append(
-            r"\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}"
-        )
 
         # Declare dimension register for saving \leftskip before \begin{center}
         # The center environment resets \leftskip, but we need it for width calc
@@ -887,13 +887,13 @@ class LaTeXGenerator:
         """Get indentation command based on current quantifier depth.
 
         Returns:
-            \\quad for standard indentation
-            (fuzz \\t commands are for tabular contexts only)
+            \\t1, \\t2, etc. for nested indentation, or \\quad for depth 0
         """
-        # Note: fuzz's \t command is for tabular alignment in
-        # argue/display math contexts. For predicates in axdef/schema/gendef,
-        # standard \quad indentation is correct
-        return r"\quad"
+        # Use depth-based \t commands for nested quantifiers
+        # \t1 = 1 * 2em, \t2 = 2 * 2em, etc.
+        if self._quantifier_depth == 0:
+            return r"\quad"  # Fallback for non-quantifier contexts
+        return f"\\t{self._quantifier_depth}"
 
     def _generate_quantifier(self, node: Quantifier, parent: Expr | None = None) -> str:
         """Generate LaTeX for quantifier (forall, exists, exists1, mu).
@@ -958,6 +958,7 @@ class LaTeXGenerator:
             # Phase 27: Check for line break after pipe (|)
             if node.line_break_after_pipe:
                 # Note: Fuzz mu is parenthesized, doesn't use array format
+                # LaTeX source: \\ at end of line, then newline, then \t command
                 mu_parts.append(f"| \\\\\n{indent} {body_latex}")
             else:
                 mu_parts.append("|")
@@ -987,6 +988,7 @@ class LaTeXGenerator:
 
             # Phase 27: Check for line break after pipe (|)
             if node.line_break_after_pipe:
+                # LaTeX source: \\ at end of line, then newline, then \t command
                 if self._in_equiv_block:
                     parts.append(f"{pipe_sep} \\\\\n& {indent} {body_latex}")
                 else:
@@ -1015,6 +1017,7 @@ class LaTeXGenerator:
             # Phase 27: Check for line break after pipe (|)
             if node.line_break_after_pipe:
                 # Multi-line quantifier: insert \\ and indent body
+                # LaTeX source: \\ at end of line, then newline, then \t command
                 # EQUIV blocks use array format and need & prefix
                 # Schemas and proofs use plain \\ without &
                 if self._in_equiv_block:
