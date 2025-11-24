@@ -29,9 +29,9 @@ def main() -> int:
         help="Output LaTeX file (default: input with .tex extension)",
     )
     parser.add_argument(
-        "--fuzz",
+        "--zed",
         action="store_true",
-        help="Use fuzz package instead of zed-* packages",
+        help="Use zed-* packages instead of fuzz package (fuzz is default)",
     )
     parser.add_argument(
         "--toc-parts",
@@ -56,7 +56,7 @@ def main() -> int:
         parser_obj = Parser(tokens)
         ast = parser_obj.parse()
 
-        generator = LaTeXGenerator(use_fuzz=args.fuzz, toc_parts=args.toc_parts)
+        generator = LaTeXGenerator(use_fuzz=not args.zed, toc_parts=args.toc_parts)
         latex = generator.generate_document(ast)
     except Exception as e:
         print(f"Error processing input: {e}", file=sys.stderr)

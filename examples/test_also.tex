@@ -1,0 +1,52 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Testing \ also Generation}
+
+\section*{Example 1 : Axdef with blank lines}
+\addcontentsline{toc}{section}{Example 1 : Axdef with blank lines}
+
+\begin{axdef}
+  x : \nat \\
+  y : \nat
+  \where
+  x > 0
+  \also
+  y > x
+  \also
+  x + y < 100
+\end{axdef}
+
+\section*{Example 2 : Axdef without blank lines}
+\addcontentsline{toc}{section}{Example 2 : Axdef without blank lines}
+
+\begin{axdef}
+  a : \nat \\
+  b : \nat
+  \where
+  a \geq 0 \\
+  b \geq 0
+\end{axdef}
+
+\section*{Example 3 : Schema with blank lines}
+\addcontentsline{toc}{section}{Example 3 : Schema with blank lines}
+
+\begin{schema}{Counter}
+  count : \nat \\
+  max : \nat
+  \where
+  count \geq 0
+  \also
+  count \leq max
+\end{schema}
+
+\end{document}

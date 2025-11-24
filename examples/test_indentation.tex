@@ -1,0 +1,47 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Testing Indentation}
+
+\section*{Example 1 : Simple quantifier}
+\addcontentsline{toc}{section}{Example 1 : Simple quantifier}
+
+\begin{axdef}
+  policy : \power_1 RESOURCE \fun RESOURCE
+  \where
+  \forall S : \power_1 RESOURCE @ \\
+  \quad policy(S) \in S
+\end{axdef}
+
+\section*{Example 2 : Quantifier with multiple lines}
+\addcontentsline{toc}{section}{Example 2 : Quantifier with multiple lines}
+
+\begin{axdef}
+  policy : \power_1 RESOURCE \fun RESOURCE
+  \where
+  \forall S : \power_1 RESOURCE @ \\
+  \quad policy(S) \in S \land \\
+  \quad S \subseteq RESOURCE
+\end{axdef}
+
+\section*{Example 3 : Nested quantifiers}
+\addcontentsline{toc}{section}{Example 3 : Nested quantifiers}
+
+\begin{axdef}
+  relation : PERSON \rel PERSON
+  \where
+  \forall x : PERSON @ \\
+  \quad \exists y : PERSON @ \\
+  \quad (x, y) \in relation
+\end{axdef}
+
+\end{document}
