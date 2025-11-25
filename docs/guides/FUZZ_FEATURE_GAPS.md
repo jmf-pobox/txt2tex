@@ -56,7 +56,8 @@
 - ✅ Generic instantiation: `seq[N]`, `P[X]`
 - ✅ Range expressions: `1..10`, `m..n`
 - ✅ Relational image: `R(| S |)`
-- ✅ Subscript/superscript: `x_i`, `x^2`
+- ✅ Subscript: `x_i`
+- ⚠️ Superscript: `R^n` (relation iteration ONLY - NOT arithmetic like `x^2`)
 
 **Predicate Constructs:**
 - ✅ Quantifiers: `forall`, `exists`, `exists1`
@@ -181,7 +182,7 @@ Based on fuzz manual Section 7 (Syntax Summary, pages 54-59) and ZRM Second Edit
 | Sequence functions | `\head`, `\tail`, `\rev`, etc. | ✅ | parser.py:1188 | Phase 12 |
 | Tuple | `(Expression, ..., Expression)` | ✅ | parser.py:1615 | 2+ elements |
 | Tuple projection | `Expression . Var-Name` | ✅ | parser.py:1570 | Named fields only |
-| Subscript | `Expression \bsup Expression \esup` | ✅ | parser.py:1655 | Superscript/subscript |
+| Iteration/Exponentiation | `Expression \bsup Expression \esup` | ✅ | latex_gen.py:1255 | All `^` generates `\bsup...\esup` |
 | Generic instantiation | `Type[Params]` | ✅ | parser.py:1389 | Phase 11.9 |
 | Relational image | `Rel(| Set |)` | ✅ | parser.py:1225 | Phase 11.8 |
 | Range | `m..n` | ✅ | parser.py:1295 | Phase 13 |

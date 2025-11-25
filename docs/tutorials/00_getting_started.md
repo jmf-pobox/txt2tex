@@ -101,8 +101,10 @@ TEXT: This is a paragraph of explanation.
 
 Features:
 - Smart quote conversion ("quotes" becomes "quotes")
-- Inline math notation (x^2 renders properly)
+- Inline math operators (and, or, =>, etc.)
 - Proper paragraph spacing
+
+**Note:** Arithmetic exponentiation (x^2) is not supported by fuzz. For relation iteration use R^n.
 
 ### Mathematical Notation
 

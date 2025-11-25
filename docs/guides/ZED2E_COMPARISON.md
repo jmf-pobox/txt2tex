@@ -638,7 +638,7 @@ end
 
 **Example:**
 ```
-{ x : N | x > 0 . x^2 }
+{ x : N | x > 0 . x * x }
 ```
 
 **Current Output:**

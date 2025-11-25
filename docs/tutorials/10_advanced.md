@@ -42,18 +42,19 @@ else -1
 x_1, x_2, x_i
 ```
 
-**Superscripts (exponents):** Use caret (^)
+**Superscripts (relation iteration only):** Use caret (^)
 ```
-x^2 = x * x
-n^3 = n * n * n
-```
-
-**Combined:**
-```
-x_i^2           ((x sub i) squared)
+R^2   # Relation composed with itself (R o9 R)
+R^n   # N-fold relation composition
 ```
 
-**Note:** Basic subscripts and superscripts work as shown above. The comprehensive example at `examples/12_advanced/future/subscripts_superscripts.txt` requires prime notation (`x'`) which is not yet implemented.
+**Note:** Arithmetic exponentiation (x^2, n^3) is NOT supported by fuzz. Use manual multiplication:
+```
+x * x        # For x squared
+n * n * n    # For n cubed
+```
+
+**Note:** Combining subscripts with arithmetic exponentiation is not supported (e.g., `x_i^2` would fail fuzz validation). Use manual multiplication for the squared part.
 
 ## Generic Type Instantiation
 
@@ -80,8 +81,10 @@ P[seq[N]]           (set of sequences)
 Normal prose with smart typography:
 
 ```
-TEXT: This is explanatory text with "smart quotes" and inline math like x^2.
+TEXT: This is explanatory text with "smart quotes" and inline math like (x * x).
 ```
+
+**Note:** Arithmetic exponentiation (x^2) is not supported in TEXT blocks - use multiplication instead.
 
 ### PURETEXT Directive
 
