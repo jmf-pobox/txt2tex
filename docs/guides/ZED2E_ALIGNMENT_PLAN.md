@@ -233,7 +233,7 @@ From zed2e.pdf analysis, here are ALL reserved words, commands, and environments
 | `\where` | ✅ Implemented | - | Separator in schema/axdef |
 | `\also` | ✅ Implemented | - | Vertical spacing between predicates (Phase 1, Nov 2025) |
 | `\t1`, `\t2`, ... `\tn` | ✅ Implemented | - | Indentation hints (Phase 1, Nov 2025) |
-| `~` | ❌ Missing | ⭐⭐⭐ Medium | Spacing hint (thin space) |
+| `~` | ✅ Implemented | - | Spacing hint (thin space) - in set comprehensions, function application, given types |
 | `\\` | ✅ Implemented | - | Line breaks (automatic, Phase 1, Nov 2025) |
 | `\derive` | ❌ Missing | ⭐ Low | Horizontal line in inference rules |
 | `\shows` | ❌ Missing | ⭐ Low | Turnstile in inference rules |
@@ -708,13 +708,16 @@ max_line_length = 80      # Smart line breaking threshold
 
 ---
 
-### Week 2: Phase 1.3-1.4 (Non-Breaking) ⚠️ PARTIAL
-- [ ] Implement `~` spacing hints - NOT DONE
+### Week 2: Phase 1.3-1.4 (Non-Breaking) ✅ COMPLETE
+- [x] Implement `~` spacing hints (implemented in latex_gen.py lines 1185-1220, 1311-1339, 3282-3284)
+  - Set comprehensions: `{~ x : N | x > 0 ~}`
+  - Function application: `\seq~N`, `\power~X`
+  - Given types: `[~ X, Y ~]`
 - [x] Consolidate consecutive `zed` environments (commit a240d6f)
-- [x] Add regression tests for formatting features
+- [x] Add regression tests for formatting features (13 tests in test_inline_math.py, 5 tests in test_iseq_cross_parentheses.py)
 - [x] Update USER_GUIDE.md with output examples
 
-**Deliverable**: "Textbook quality" LaTeX generation ⚠️ (mostly done, `~` spacing missing)
+**Deliverable**: "Textbook quality" LaTeX generation ✅ COMPLETE
 
 ---
 
