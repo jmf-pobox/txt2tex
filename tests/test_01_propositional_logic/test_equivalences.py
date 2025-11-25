@@ -202,18 +202,15 @@ class TestPhase2LaTeXGeneration:
             column=1,
         )
 
-        lines = gen._generate_equiv_chain(equiv)
+        lines = gen._generate_argue_chain(equiv)
         latex = "\n".join(lines)
 
-        assert r"\begin{center}" in latex
-        assert r"$\displaystyle" in latex
-        assert r"\begin{array}{l@{\hspace{2em}}r}" in latex
-        assert r"\end{array}$" in latex
-        assert r"\end{center}" in latex
+        assert r"\begin{argue}" in latex
+        assert r"\end{argue}" in latex
         assert r"p \land q" in latex
         assert r"\Leftrightarrow q \land p" in latex
-        # Check that first line has \\ but last doesn't (before \end{array})
-        assert r"p \land q \\" in latex
+        # Check that first line has \\ but last doesn't (before \end{argue})
+        assert r"p \land q & \\" in latex
         assert not latex.strip().endswith(r"\\")
 
     def test_generate_equiv_chain_with_justifications(self) -> None:
@@ -250,16 +247,13 @@ class TestPhase2LaTeXGeneration:
             column=1,
         )
 
-        lines = gen._generate_equiv_chain(equiv)
+        lines = gen._generate_argue_chain(equiv)
         latex = "\n".join(lines)
 
-        assert r"\begin{center}" in latex
-        assert r"$\displaystyle" in latex
-        assert r"\begin{array}{l@{\hspace{2em}}r}" in latex
-        assert r"\end{array}$" in latex
-        assert r"\end{center}" in latex
+        assert r"\begin{argue}" in latex
+        assert r"\end{argue}" in latex
         assert r"p \land q" in latex
-        assert r"\Leftrightarrow q \land p & [\mbox{commutative}]" in latex
+        assert r"\Leftrightarrow q \land p & \mbox{commutative}" in latex
 
     def test_generate_document_with_equiv_chain(self) -> None:
         """Test complete document generation with equivalence chain."""
@@ -288,14 +282,11 @@ class TestPhase2LaTeXGeneration:
 
         assert r"\documentclass[a4paper,10pt,fleqn]{article}" in latex
         assert r"\usepackage{zed-cm}" in latex
-        assert r"\usepackage{amssymb}" in latex  # amsmath removed - using array
-        assert r"\begin{center}" in latex
-        assert r"$\displaystyle" in latex
-        assert r"\begin{array}{l@{\hspace{2em}}r}" in latex
-        assert r"p \\" in latex
-        assert r"\Leftrightarrow q & [\mbox{assumption}]" in latex
-        assert r"\end{array}$" in latex
-        assert r"\end{center}" in latex
+        assert r"\usepackage{amssymb}" in latex  # amsmath removed - using argue
+        assert r"\begin{argue}" in latex
+        assert r"p & \\" in latex
+        assert r"\Leftrightarrow q & \mbox{assumption}" in latex
+        assert r"\end{argue}" in latex
         assert r"\end{document}" in latex
 
 
@@ -324,13 +315,10 @@ q and p [commutative]"""
         assert isinstance(ast, Document)
         assert len(ast.items) == 1
         assert isinstance(ast.items[0], EquivChain)
-        assert r"\begin{center}" in latex
-        assert r"$\displaystyle" in latex
-        assert r"\begin{array}{l@{\hspace{2em}}r}" in latex
+        assert r"\begin{argue}" in latex
         assert r"p \land q" in latex
-        assert r"\Leftrightarrow q \land p & [\mbox{commutative}]" in latex
-        assert r"\end{array}$" in latex
-        assert r"\end{center}" in latex
+        assert r"\Leftrightarrow q \land p & \mbox{commutative}" in latex
+        assert r"\end{argue}" in latex
 
     def test_end_to_end_complex_equiv(self) -> None:
         """Test complete pipeline with complex equivalence chain."""
@@ -353,16 +341,13 @@ not p or not q [parentheses]"""
         assert len(equiv.steps) == 3
 
         # Check LaTeX output
-        assert r"\begin{center}" in latex
-        assert r"$\displaystyle" in latex
-        assert r"\begin{array}{l@{\hspace{2em}}r}" in latex
+        assert r"\begin{argue}" in latex
         assert r"\lnot" in latex
         assert r"\land" in latex
         assert r"\lor" in latex
-        assert r"[\mbox{De Morgan}]" in latex
-        assert r"[\mbox{parentheses}]" in latex
-        assert r"\end{array}$" in latex
-        assert r"\end{center}" in latex
+        assert r"\mbox{De Morgan}" in latex
+        assert r"\mbox{parentheses}" in latex
+        assert r"\end{argue}" in latex
 
     def test_equiv_chain_mixed_with_expressions(self) -> None:
         """Test equivalence chain mixed with regular expressions."""
@@ -397,9 +382,6 @@ q or p [commutative]
 
         # Should have both left-aligned expressions and centered array in display math
         assert r"p \land q" in latex
-        assert r"\begin{center}" in latex
-        assert r"$\displaystyle" in latex
-        assert r"\begin{array}{l@{\hspace{2em}}r}" in latex
+        assert r"\begin{argue}" in latex
         assert r"\lnot p" in latex
-        assert r"\end{array}$" in latex
-        assert r"\end{center}" in latex
+        assert r"\end{argue}" in latex

@@ -7,6 +7,7 @@ from typing import ClassVar
 
 from txt2tex.ast_nodes import (
     Abbreviation,
+    ArgueChain,
     AxDef,
     BagLiteral,
     BinaryOp,
@@ -15,7 +16,6 @@ from txt2tex.ast_nodes import (
     Contents,
     Document,
     DocumentItem,
-    EquivChain,
     Expr,
     FreeType,
     FunctionApp,
@@ -443,8 +443,8 @@ class LaTeXGenerator:
             return []
         if isinstance(item, TruthTable):
             return self._generate_truth_table(item)
-        if isinstance(item, EquivChain):
-            return self._generate_equiv_chain(item)
+        if isinstance(item, ArgueChain):
+            return self._generate_argue_chain(item)
         if isinstance(item, GivenType):
             return self._generate_given_type(item)
         if isinstance(item, FreeType):
@@ -3205,34 +3205,18 @@ class LaTeXGenerator:
 
         return result
 
-    def _generate_equiv_chain(self, node: EquivChain) -> list[str]:
-        r"""Generate LaTeX for equivalence chain using array environment.
+    def _generate_argue_chain(self, node: ArgueChain) -> list[str]:
+        r"""Generate LaTeX for argue chain using fuzz's argue environment.
 
-        Uses standard LaTeX array instead of amsmath align* to avoid
-        package dependency. Wraps array in display math \[...\] for proper
-        spacing without confusing fuzz type checker. Centers the entire block
-        and right-aligns justifications. Auto-scales if wider than page.
+        Both EQUIV: and ARGUE: keywords generate this output (EQUIV is alias).
+        Uses fuzz's argue environment which provides automatic line width handling
+        via \halign to\linewidth and better page breaking via \interdisplaylinepenalty.
+        No adjustbox wrapper needed - argue handles margins natively.
         """
         lines: list[str] = []
 
-        # Calculate available width and setup positioning
-        if self._in_inline_part:
-            # Inside part with leftskip: skip centering, align naturally
-            lines.append(r"\savedleftskip=\leftskip")
-            max_width = r"\dimexpr\textwidth-\savedleftskip\relax"
-            # Just prevent extra indentation - leftskip handles positioning
-            lines.append(r"\noindent")
-        else:
-            # Normal context: use centering
-            max_width = r"\textwidth"
-            lines.append(r"\begin{center}")
-
-        # Wrap in adjustbox to scale if wider than available width
-        lines.append(r"\adjustbox{max width=" + max_width + r"}{%")
-
-        lines.append(r"$\displaystyle")
-        # Use l@{\hspace{2em}}r: left-aligned expressions, right-aligned justifications
-        lines.append(r"\begin{array}{l@{\hspace{2em}}r}")
+        # argue environment handles margins automatically - no adjustbox needed
+        lines.append(r"\begin{argue}")
 
         # Set context for line break formatting
         self._in_equiv_block = True
@@ -3241,14 +3225,16 @@ class LaTeXGenerator:
         for i, step in enumerate(node.steps):
             expr_latex = self.generate_expr(step.expression)
 
-            # No leading & - start directly with expression for flush left
             # First step: expression; subsequent: \Leftrightarrow expression
-            line = expr_latex if i == 0 else r"\Leftrightarrow " + expr_latex
+            line = "  " + (expr_latex if i == 0 else r"\Leftrightarrow " + expr_latex)
 
-            # Add justification if present (flush right)
+            # Column separator
+            line += " &"
+
+            # Add justification if present, or empty column
             if step.justification:
                 escaped_just = self._escape_justification(step.justification)
-                line += r" & [\mbox{" + escaped_just + "}]"
+                line += r" \mbox{" + escaped_just + "}"
 
             # Add line break except for last line
             if i < len(node.steps) - 1:
@@ -3259,14 +3245,7 @@ class LaTeXGenerator:
         # Reset context
         self._in_equiv_block = False
 
-        lines.append(r"\end{array}$%")
-        # Close adjustbox wrapper
-        lines.append(r"}")
-        # Close center environment (only if we opened it)
-        if not self._in_inline_part:
-            lines.append(r"\end{center}")
-        # Add trailing spacing for separation from following content
-        lines.append(r"\bigskip")
+        lines.append(r"\end{argue}")
         lines.append("")
 
         return lines
@@ -3344,8 +3323,8 @@ class LaTeXGenerator:
                 branch_lines = self._generate_syntax_definition_branches(definition)
 
                 # Determine if we need \\ at the end of this definition
-                is_last_in_group = (def_idx == len(group) - 1)
-                is_last_group = (group_idx == len(node.groups) - 1)
+                is_last_in_group = def_idx == len(group) - 1
+                is_last_group = group_idx == len(node.groups) - 1
                 needs_line_break = not (is_last_in_group and is_last_group)
 
                 # First line: TypeName & ::= & branches
@@ -3357,7 +3336,7 @@ class LaTeXGenerator:
 
                 # Continuation lines: & | & branches
                 for cont_idx, continuation in enumerate(branch_lines[1:]):
-                    is_last_continuation = (cont_idx == len(branch_lines) - 2)
+                    is_last_continuation = cont_idx == len(branch_lines) - 2
                     if needs_line_break and is_last_continuation:
                         continuation += " \\\\"
                     lines.append(continuation)
