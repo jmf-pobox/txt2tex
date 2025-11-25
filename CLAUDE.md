@@ -387,3 +387,4 @@ If starting fresh from `/Users/jfreeman/Coding/fuzz/txt2tex/sem/`:
 - there are no pre-existing issues that should be used to justify anything
 - success is defined as 100%. Do not ask to settle for lower standards of success.
 - you should always find the root cause, which you can do it if you are patient and tenacious
+- The user makes the decisions, you need to ask before making up rationales and decisions.
