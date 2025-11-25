@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -207,10 +207,10 @@ parent links.
 \addcontentsline{toc}{section}{Example 9 : Function Pipeline Example}
 
 \begin{axdef}
-  toLowerCase : \seq Char \fun \seq Char \\
-  trim : \seq Char \fun \seq Char \\
-  reverse : \seq Char \fun \seq Char \\
-  process : \seq Char \fun \seq Char
+  toLowerCase : \seq~Char \fun \seq~Char \\
+  trim : \seq~Char \fun \seq~Char \\
+  reverse : \seq~Char \fun \seq~Char \\
+  process : \seq~Char \fun \seq~Char
   \where
   process = toLowerCase \circ trim \circ reverse
 \end{axdef}
@@ -241,9 +241,9 @@ whitespace, then reversing.
 \addcontentsline{toc}{section}{Example 11 : Inverse via Composition}
 
 \begin{axdef}
-  encrypt : \seq Char \fun \seq Char \\
-  decrypt : \seq Char \fun \seq Char \\
-  identity\_check : \seq Char \fun \seq Char
+  encrypt : \seq~Char \fun \seq~Char \\
+  decrypt : \seq~Char \fun \seq~Char \\
+  identity\_check : \seq~Char \fun \seq~Char
   \where
   identity\_check = encrypt \circ decrypt
 \end{axdef}

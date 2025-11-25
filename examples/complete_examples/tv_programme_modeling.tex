@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -147,10 +147,10 @@ for programmes:
 \bigskip
 
 \begin{axdef}
-  cumulativeTotal : \seq Programme \fun \nat
+  cumulativeTotal : \seq~Programme \fun \nat
   \where
   cumulativeTotal(\langle \rangle) = 0 \\
-  \forall x : Programme @ \forall s : \seq Programme @
+  \forall x : Programme @ \forall s : \seq~Programme @
   cumulativeTotal(\langle x \rangle \cat s) = x.length + cumulativeTotal(s)
 \end{axdef}
 
@@ -159,7 +159,7 @@ for programmes:
 \bigskip
 
 \begin{axdef}
-  hd : \seq Programme
+  hd : \seq~Programme
   \where
   cumulativeTotal(hd) \leq 12000 \\
   \forall p : \ran hd @ p.length \leq 360
@@ -325,10 +325,10 @@ for programmes:
 \bigskip
 
 \begin{axdef}
-  viewedProgrammes : \seq Programme \fun \seq Programme
+  viewedProgrammes : \seq~Programme \fun \seq~Programme
   \where
   viewedProgrammes(\langle \rangle) = \langle \rangle \\
-  \forall x : Programme @ \forall s : \seq Programme @
+  \forall x : Programme @ \forall s : \seq~Programme @
   viewedProgrammes(\langle x \rangle \cat s) = \IF x.viewed = yes
   \THEN \langle x \rangle \cat viewedProgrammes(s) \ELSE viewedProgrammes(s)
 \end{axdef}
@@ -633,8 +633,8 @@ q @ length) \land p.title)$
 
 \bigskip
 
-\noindent $\{ p : \ran hd | \forall q : \ran hd | p.length \geq
-q.length @ p.title \}$
+\noindent $\{~ p : \ran hd | \forall q : \ran hd | p.length \geq
+q.length @ p.title ~\}$
 
 \bigskip
 
@@ -707,9 +707,9 @@ q.length @ p.title \}$
 \bigskip
 
 \begin{axdef}
-  longestViewed : \seq Programme \pfun Programme
+  longestViewed : \seq~Programme \pfun Programme
   \where
-  \forall s : \seq Programme @ longestViewed(s) = (\mu p : \ran s |
+  \forall s : \seq~Programme @ longestViewed(s) = (\mu p : \ran s |
     p.viewed = yes \land (\forall q : \ran s @ p \neq q \land q.viewed
   = yes \land p.length > q.length))
 \end{axdef}
@@ -719,11 +719,11 @@ q.length @ p.title \}$
 \bigskip
 
 \begin{axdef}
-  removeTheLongestViewed : \seq Programme \fun \seq Programme
+  removeTheLongestViewed : \seq~Programme \fun \seq~Programme
   \where
-  \forall s : \seq Programme @ \\
-  \quad removeTheLongestViewed(s) = s \filter \{ x : \ran s | x \neq
-  longestViewed(s) \}
+  \forall s : \seq~Programme @ \\
+  \t1 removeTheLongestViewed(s) = s \filter \{~ x : \ran s | x \neq
+  longestViewed(s) ~\}
 \end{axdef}
 
 \noindent Two-step process:

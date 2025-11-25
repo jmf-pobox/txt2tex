@@ -586,6 +586,49 @@ class FreeType(ASTNode):
 
 
 @dataclass(frozen=True)
+class SyntaxDefinition(ASTNode):
+    """Single free type definition within syntax environment.
+
+    Represents: TypeName ::= branch1 | branch2 | ...
+    Can span multiple lines with continuation branches.
+
+    Example:
+    - EXP ::= const<N> | binop<OP cross EXP cross EXP>
+      -> name="EXP", branches=[FreeBranch("const", N), ...]
+    """
+
+    name: str  # Type name (e.g., "EXP", "OP")
+    branches: list[FreeBranch]  # List of constructor branches
+
+
+@dataclass(frozen=True)
+class SyntaxBlock(ASTNode):
+    """Syntax environment for aligned free type definitions.
+
+    Generates \\begin{syntax}...\\end{syntax} with column alignment.
+    Groups of definitions separated by blank lines generate \\also.
+
+    Example:
+      syntax
+        OP ::= plus | minus
+
+        EXP ::= const<N>
+             |  binop<OP cross EXP>
+      end
+
+    Generated LaTeX:
+      \\begin{syntax}
+      OP & ::= & plus | minus
+      \\also
+      EXP & ::= & const \\ldata \\nat \\rdata \\\\
+      & | & binop \\ldata OP \\cross EXP \\rdata
+      \\end{syntax}
+    """
+
+    groups: list[list[SyntaxDefinition]]  # Groups separated by blank lines
+
+
+@dataclass(frozen=True)
 class Abbreviation(ASTNode):
     """Abbreviation definition (name == expression).
 
@@ -796,6 +839,7 @@ DocumentItem = (
     | EquivChain
     | GivenType
     | FreeType
+    | SyntaxBlock
     | Abbreviation
     | AxDef
     | GenDef

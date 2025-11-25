@@ -3,18 +3,18 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
 \begin{gendef}[X]
-  length: \seq X \fun \nat
+  length: \seq~X \fun \nat
   \where
   length(\langle \rangle) = 0 \land \\
-  \quad (\forall x : X @ \forall s : \seq X @ length(\langle x
+  \quad (\forall x : X @ \forall s : \seq~X @ length(\langle x
   \rangle \cat s) = 1 + length(s))
 \end{gendef}
 

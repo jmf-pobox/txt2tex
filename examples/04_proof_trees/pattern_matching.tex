@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -18,10 +18,10 @@
 \end{zed}
 
 \begin{axdef}
-  filterSeq : \seq Entry \fun \seq Entry
+  filterSeq : \seq~Entry \fun \seq~Entry
   \where
   filterSeq(\langle \rangle) = \langle \rangle \\
-  \forall x : Entry @ \forall s : \seq Entry @ filterSeq(\langle x
+  \forall x : Entry @ \forall s : \seq~Entry @ filterSeq(\langle x
   \rangle \cat s) = \langle x \rangle \cat filterSeq(s)
 \end{axdef}
 

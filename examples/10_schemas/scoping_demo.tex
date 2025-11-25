@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -57,7 +57,7 @@ quantifier, x refers to the inner binding. This is allowed but can be confusing.
 \addcontentsline{toc}{section}{Example 4 : Set Comprehension Scope}
 
 \noindent
-$\{ x : \nat | x > 0 \land x < 10 \}$
+$\{~ x : \nat | x > 0 \land x < 10 ~\}$
 
 \noindent x is in scope only within the set comprehension. The
 constraint $x > 0$ and $x < 10$ uses the same x.
@@ -68,7 +68,7 @@ constraint $x > 0$ and $x < 10$ uses the same x.
 \addcontentsline{toc}{section}{Example 5 : Bullet Separator Scope}
 
 \noindent
-$\{ x : \nat | x < 5 @ x * x \}$
+$\{~ x : \nat | x < 5 @ x * x ~\}$
 
 \noindent x is in scope both before and after the bullet. The
 constraint $x < 5$ and the term x * x refer to the same x.
@@ -130,12 +130,12 @@ allowed because they are in different schema scopes.
 
 \begin{schema}{User}
   userId : \nat \\
-  name : \seq Char
+  name : \seq~Char
 \end{schema}
 
 \begin{schema}{LoggedInUser}
   userId : \nat \\
-  userName : \seq Char \\
+  userName : \seq~Char \\
   sessionToken : \nat
   \where
   sessionToken > 0
@@ -249,7 +249,7 @@ and any expression after a bullet).
 Multiple Variables}
 
 \noindent
-$\{ x, y : \nat | x < y \land y < 10 @ (x, y) \}$
+$\{~ x, y : \nat | x < y \land y < 10 @ (x, y) ~\}$
 
 \noindent Both x and y are in scope throughout the set comprehension,
 including the constraint and the term.

@@ -3,15 +3,15 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
 \begin{zed}
-  Rplus == \{ a, b : \nat | b > a \}
+  Rplus == \{~ a, b : \nat | b > a ~\}
 \end{zed}
 
 \begin{zed}
@@ -23,7 +23,7 @@
 \end{schema}
 
 \begin{zed}
-  rel1plus == \{ x, y : \nat | x < y \}
+  rel1plus == \{~ x, y : \nat | x < y ~\}
 \end{zed}
 
 \end{document}

@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -24,7 +24,7 @@
 \end{zed}
 
 \begin{axdef}
-  viewed : \seq Entry \fun \seq Entry \\
+  viewed : \seq~Entry \fun \seq~Entry \\
   yes : Status
   \where
   viewed(\langle \rangle) = \langle \rangle
@@ -53,10 +53,10 @@
 \bigskip
 
 \begin{axdef}
-  cumulative\_total : \seq \nat \fun \nat
+  cumulative\_total : \seq~\nat \fun \nat
   \where
   cumulative\_total(\langle \rangle) = 0 \\
-  \forall x : \nat @ \forall s : \seq \nat @
+  \forall x : \nat @ \forall s : \seq~\nat @
   cumulative\_total(\langle x \rangle \cat s) = x + cumulative\_total(s)
 \end{axdef}
 
@@ -73,7 +73,7 @@
 \end{zed}
 
 \begin{axdef}
-  premium\_plays : \seq Play \fun \seq Play \\
+  premium\_plays : \seq~Play \fun \seq~Play \\
   user\_status : User \fun UserStatus \\
   premium : UserStatus
   \where

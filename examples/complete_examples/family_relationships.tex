@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -92,8 +92,8 @@ relationships.
 
 \bigskip
 
-\noindent parentOf == $\{ x, y : Person | x \mapsto y \in childOf @ y
-\mapsto x \}$
+\noindent parentOf == $\{~ x, y : Person | x \mapsto y \in childOf @
+y \mapsto x ~\}$
 
 \bigskip
 
@@ -172,7 +172,7 @@ is most idiomatic
 \begin{axdef}
   id\_Person : Person \rel Person
   \where
-  id\_Person = \{ x : Person @ x \mapsto x \}
+  id\_Person = \{~ x : Person @ x \mapsto x ~\}
 \end{axdef}
 
 \noindent The identity relation id\_Person contains all pairs (x, x)

@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -61,7 +61,7 @@ positive and negative cases.
   sign : \num \fun \{-1, 0, 1\}
   \where
   \forall x : \num @ \\
-  \quad sign(x) = \IF x > 0 \THEN 1 \ELSE \IF x = 0 \THEN 0 \ELSE -1
+  \t1 sign(x) = \IF x > 0 \THEN 1 \ELSE \IF x = 0 \THEN 0 \ELSE -1
 \end{axdef}
 
 \noindent Nested if-then-else for three-way branching.
@@ -72,7 +72,7 @@ positive and negative cases.
 \addcontentsline{toc}{section}{Example 5 : Conditional in Set Comprehension}
 
 \noindent
-$\{ x : \nat | x < 10 @ \IF x \mod 2 = 0 \THEN x \ELSE x + 1 \}$
+$\{~ x : \nat | x < 10 @ \IF x \mod 2 = 0 \THEN x \ELSE x + 1 ~\}$
 
 \noindent For each x less than 10, select x if it's even, otherwise
 select x + 1.
@@ -83,10 +83,10 @@ select x + 1.
 \addcontentsline{toc}{section}{Example 6 : Pattern Matching with Conditionals}
 
 \begin{axdef}
-  filterPositives : \seq \num \fun \seq \num
+  filterPositives : \seq~\num \fun \seq~\num
   \where
   filterPositives(\langle \rangle) = \langle \rangle \\
-  \forall x : \num @ \forall s : \seq \num @ filterPositives(\langle
+  \forall x : \num @ \forall s : \seq~\num @ filterPositives(\langle
   x \rangle \cat s) = \IF x > 0 \THEN \langle x \rangle \cat
   filterPositives(s) \ELSE filterPositives(s)
 \end{axdef}
@@ -106,8 +106,8 @@ conditional expressions.
   scoreToGrade : \nat \fun Grade
   \where
   \forall score : \nat @ \\
-  \quad scoreToGrade(score) = \IF score \geq 90 \THEN GradeA \ELSE
-  \IF score \geq 80 \THEN GradeB \ELSE \IF score \geq 70 \THEN GradeC
+  \t1 scoreToGrade(score) = \IF score \geq 90 \THEN GradeA \ELSE \IF
+  score \geq 80 \THEN GradeB \ELSE \IF score \geq 70 \THEN GradeC
   \ELSE \IF score \geq 60 \THEN GradeD \ELSE GradeF
 \end{axdef}
 
@@ -122,7 +122,7 @@ conditional expressions.
   piecewise : \num \fun \num
   \where
   \forall x : \num @ \\
-  \quad piecewise(x) = \IF x < -5 \THEN 0 \ELSE \IF x < 0 \THEN x + 5
+  \t1 piecewise(x) = \IF x < -5 \THEN 0 \ELSE \IF x < 0 \THEN x + 5
   \ELSE \IF x < 5 \THEN x \ELSE \IF x < 10 \THEN x - 5 \ELSE 0
 \end{axdef}
 
@@ -147,8 +147,8 @@ $\lambda x : \nat @ \IF x > 100 \THEN 100 \ELSE x$
   evenSet : \power \nat \\
   oddSet : \power \nat
   \where
-  evenSet = \{ n : \nat | n \mod 2 = 0 \} \\
-  oddSet = \{ n : \nat | n \mod 2 = 1 \}
+  evenSet = \{~ n : \nat | n \mod 2 = 0 ~\} \\
+  oddSet = \{~ n : \nat | n \mod 2 = 1 ~\}
 \end{axdef}
 
 \noindent Define sets that can be selected conditionally in expressions.
@@ -163,8 +163,8 @@ Rate Selection}
   taxRate : \nat \fun \nat
   \where
   \forall income : \nat @ \\
-  \quad taxRate(income) = \IF income < 20000 \THEN 10 \ELSE \IF
-  income < 50000 \THEN 15 \ELSE \IF income < 100000 \THEN 20 \ELSE 25
+  \t1 taxRate(income) = \IF income < 20000 \THEN 10 \ELSE \IF income
+  < 50000 \THEN 15 \ELSE \IF income < 100000 \THEN 20 \ELSE 25
 \end{axdef}
 
 \noindent Progressive tax rates with multi-level conditional.
@@ -178,8 +178,8 @@ Rate Selection}
   complexFunc : \nat \fun \nat
   \where
   \forall n : \nat @ \\
-  \quad complexFunc(n) = \IF n \mod 3 = 0 \THEN n * n \ELSE \IF n
-  \mod 3 = 1 \THEN n + 10 \ELSE n * 2
+  \t1 complexFunc(n) = \IF n \mod 3 = 0 \THEN n * n \ELSE \IF n \mod
+  3 = 1 \THEN n + 10 \ELSE n * 2
 \end{axdef}
 
 \noindent Different computations based on remainder.
@@ -194,7 +194,7 @@ Rate Selection}
   \where
   factorial(0) = 1 \\
   \forall n : \nat @ \\
-  \quad factorial(n) = \IF n > 0 \THEN n * factorial(n - 1) \ELSE 1
+  \t1 factorial(n) = \IF n > 0 \THEN n * factorial(n - 1) \ELSE 1
 \end{axdef}
 
 \noindent Conditional ensures factorial only recurses for positive n.

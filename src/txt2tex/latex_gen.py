@@ -47,6 +47,8 @@ from txt2tex.ast_nodes import (
     Solution,
     Subscript,
     Superscript,
+    SyntaxBlock,
+    SyntaxDefinition,
     TruthTable,
     Tuple,
     TupleProjection,
@@ -447,6 +449,8 @@ class LaTeXGenerator:
             return self._generate_given_type(item)
         if isinstance(item, FreeType):
             return self._generate_free_type(item)
+        if isinstance(item, SyntaxBlock):
+            return self._generate_syntax_block(item)
         if isinstance(item, Abbreviation):
             return self._generate_abbreviation(item)
         if isinstance(item, AxDef):
@@ -3319,6 +3323,84 @@ class LaTeXGenerator:
         lines.append(f"\\begin{{zed}}{node.name} ::= {branches_str}\\end{{zed}}")
         lines.append("")
         return lines
+
+    def _generate_syntax_block(self, node: SyntaxBlock) -> list[str]:
+        """Generate LaTeX for syntax environment (aligned free type definitions).
+
+        Generates column-aligned LaTeX with & separators:
+        \\begin{syntax}
+        TypeName & ::= & branch1 | branch2
+        \\also
+        AnotherType & ::= & branch1 \\\\
+        & | & branch2
+        \\end{syntax}
+        """
+        lines: list[str] = []
+        lines.append("\\begin{syntax}")
+
+        for group_idx, group in enumerate(node.groups):
+            # Add \also between groups (but not before first group)
+            if group_idx > 0:
+                lines.append("\\also")
+
+            for def_idx, definition in enumerate(group):
+                # Generate branches for this definition
+                branch_lines = self._generate_syntax_definition_branches(definition)
+
+                # Determine if we need \\ at the end of this definition
+                is_last_in_group = (def_idx == len(group) - 1)
+                is_last_group = (group_idx == len(node.groups) - 1)
+                needs_line_break = not (is_last_in_group and is_last_group)
+
+                # First line: TypeName & ::= & branches
+                first_line = branch_lines[0]
+                if needs_line_break and len(branch_lines) == 1:
+                    # Only one line and not the last: add \\
+                    first_line += " \\\\"
+                lines.append(first_line)
+
+                # Continuation lines: & | & branches
+                for cont_idx, continuation in enumerate(branch_lines[1:]):
+                    is_last_continuation = (cont_idx == len(branch_lines) - 2)
+                    if needs_line_break and is_last_continuation:
+                        continuation += " \\\\"
+                    lines.append(continuation)
+
+        lines.append("\\end{syntax}")
+        lines.append("")
+        return lines
+
+    def _generate_syntax_definition_branches(
+        self, definition: SyntaxDefinition
+    ) -> list[str]:
+        """Generate branch lines for a single type definition in syntax block.
+
+        Returns list of lines:
+        - First line: "TypeName & ::= & branch1 | branch2 | ..."
+        - Continuation lines (if any): "& | & branch3 | branch4 | ..."
+        """
+        # Generate LaTeX for each branch
+        branch_strs: list[str] = []
+        for branch in definition.branches:
+            if branch.parameters is None:
+                branch_strs.append(branch.name)
+            else:
+                # Generate parameter expression
+                if isinstance(branch.parameters, SequenceLiteral):
+                    if branch.parameters.elements:
+                        params_latex = self.generate_expr(branch.parameters.elements[0])
+                    else:
+                        params_latex = ""
+                else:
+                    params_latex = self.generate_expr(branch.parameters)
+                branch_strs.append(f"{branch.name} \\ldata {params_latex} \\rdata")
+
+        # For now, put all branches on one line
+        # Future enhancement: could split long lines across multiple rows
+        branches_str = " | ".join(branch_strs)
+        first_line = f"{definition.name} & ::= & {branches_str}"
+
+        return [first_line]
 
     def _generate_abbreviation(self, node: Abbreviation) -> list[str]:
         r"""Generate LaTeX for abbreviation definition.

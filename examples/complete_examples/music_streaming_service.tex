@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -42,7 +42,7 @@ preferences,
 \begin{axdef}
   songs : \finset SongId \\
   users : \finset UserId \\
-  playlists : PlaylistId \pfun \seq SongId \\
+  playlists : PlaylistId \pfun \seq~SongId \\
   playlistOwner : PlaylistId \pfun UserId \\
   playlistSubscribers : PlaylistId \pfun \finset_1 UserId
   \where
@@ -412,8 +412,8 @@ and hated sets are disjoint.
 \bigskip
 
 \begin{zed}
-  A == users \setminus \bigcup \{ p : \dom playlistSubscribers @
-  playlistSubscribers(p) \}
+  A == users \setminus \bigcup \{~ p : \dom playlistSubscribers @
+  playlistSubscribers(p) ~\}
 \end{zed}
 
 \noindent Breakdown:
@@ -451,7 +451,8 @@ subscribed to anything
 \bigskip
 
 \begin{zed}
-  B == \{ p : \dom playlistSubscribers | \# (playlistSubscribers(p)) \geq 100 \}
+  B == \{~ p : \dom playlistSubscribers | \# (playlistSubscribers(p))
+  \geq 100 ~\}
 \end{zed}
 
 \noindent Breakdown:
@@ -530,8 +531,8 @@ who love songs
 \bigskip
 
 \begin{zed}
-  D == (\mu s : songs | \forall t : songs @ s \neq t \land \# \{ u :
-  UserId | s \in loved(u) \} > \# \{ u : UserId | t \in loved(u) \})
+  D == (\mu s : songs | \forall t : songs @ s \neq t \land \# \{~ u :
+  UserId | s \in loved(u) ~\} > \# \{~ u : UserId | t \in loved(u) ~\})
 \end{zed}
 
 \noindent Breakdown:
@@ -542,7 +543,7 @@ who love songs
 
 \bigskip
 
-\noindent - # $\{ u : UserId | s \in loved(u) \}$: count users who love song s
+\noindent - # $\{~ u : UserId | s \in loved(u) ~\}$: count users who love song s
 
 \bigskip
 
@@ -550,7 +551,8 @@ who love songs
 
 \bigskip
 
-\noindent - $>$ # $\{ u : UserId | t \in loved(u) \}$: s has more lovers than t
+\noindent - $>$ # $\{~ u : UserId | t \in loved(u) ~\}$: s has more
+lovers than t
 
 \bigskip
 
@@ -583,9 +585,10 @@ then finds unique max.
 \begin{axdef}
   loveHateScore : SongId \pfun \nat
   \where
-  \forall i : songs @ loveHateScore(i) = \IF \# \{ u : UserId | i \in
-  loved(u) \} \geq \# \{ u : UserId | i \in hated(u) \} \THEN \# \{ u
-  : UserId | i \in loved(u) \} - \# \{ u : UserId | i \in hated(u) \} \ELSE 0
+  \forall i : songs @ loveHateScore(i) = \IF \# \{~ u : UserId | i
+  \in loved(u) ~\} \geq \# \{~ u : UserId | i \in hated(u) ~\} \THEN
+  \# \{~ u : UserId | i \in loved(u) ~\} - \# \{~ u : UserId | i \in
+  hated(u) ~\} \ELSE 0
 \end{axdef}
 
 \noindent Logic:
@@ -621,8 +624,8 @@ positive sentiment)
   playlistCount : SongId \pfun \nat
   \where
   \forall i : songs @ \\
-  \quad playlistCount(i) = \# \{ p : \dom playlists | i \in \ran
-  (playlists(p)) \}
+  \t1 playlistCount(i) = \# \{~ p : \dom playlists | i \in \ran
+  (playlists(p)) ~\}
 \end{axdef}
 
 \noindent Logic:
@@ -652,7 +655,7 @@ positive sentiment)
   \dom length \subseteq songs \\
   \dom popularity \subseteq songs \\
   \forall i : songs @ \\
-  \quad popularity(i) = loveHateScore(i) + playlistCount(i)
+  \t1 popularity(i) = loveHateScore(i) + playlistCount(i)
 \end{axdef}
 
 \noindent Popularity formula:
@@ -745,8 +748,8 @@ uniqueness$, mu performs selection
 \bigskip
 
 \begin{zed}
-  playlistsContainingMostPopularSong == \{ i : \dom playlists |
-  mostPopular \in \ran (playlists(i)) \}
+  playlistsContainingMostPopularSong == \{~ i : \dom playlists |
+  mostPopular \in \ran (playlists(i)) ~\}
 \end{zed}
 
 \noindent Logic:
@@ -804,10 +807,10 @@ uniqueness$, mu performs selection
 \subsection*{(a)}
 
 \begin{axdef}
-  premiumPlays : \seq PlayEvent \fun \seq PlayEvent
+  premiumPlays : \seq~PlayEvent \fun \seq~PlayEvent
   \where
   premiumPlays(\langle \rangle) = \langle \rangle \\
-  \forall x : PlayEvent @ \forall s : \seq PlayEvent @
+  \forall x : PlayEvent @ \forall s : \seq~PlayEvent @
   premiumPlays(\langle x \rangle \cat s) = \IF userStatus(x.userId) =
   premium \THEN \langle x \rangle \cat premiumPlays(s) \ELSE premiumPlays(s)
 \end{axdef}
@@ -817,10 +820,10 @@ uniqueness$, mu performs selection
 \subsection*{(b)}
 
 \begin{axdef}
-  standardPlays : \seq PlayEvent \fun \seq PlayEvent
+  standardPlays : \seq~PlayEvent \fun \seq~PlayEvent
   \where
   standardPlays(\langle \rangle) = \langle \rangle \\
-  \forall x : PlayEvent @ \forall s : \seq PlayEvent @
+  \forall x : PlayEvent @ \forall s : \seq~PlayEvent @
   standardPlays(\langle x \rangle \cat s) = \IF userStatus(x.userId)
   = standard \THEN \langle x \rangle \cat standardPlays(s) \ELSE
   standardPlays(s)
@@ -831,10 +834,10 @@ uniqueness$, mu performs selection
 \subsection*{(c)}
 
 \begin{axdef}
-  cumulativeLength : \seq PlayEvent \fun \nat
+  cumulativeLength : \seq~PlayEvent \fun \nat
   \where
   cumulativeLength(\langle \rangle) = 0 \\
-  \forall x : PlayEvent @ \forall s : \seq PlayEvent @
+  \forall x : PlayEvent @ \forall s : \seq~PlayEvent @
   cumulativeLength(\langle x \rangle \cat s) = songLength(x.songId) +
   cumulativeLength(s)
 \end{axdef}

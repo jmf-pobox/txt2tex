@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -30,10 +30,10 @@
 \end{zed}
 
 \begin{axdef}
-  seqlen : \seq Entry \fun \nat
+  seqlen : \seq~Entry \fun \nat
   \where
   seqlen(\langle \rangle) = 0 \\
-  \forall x : Entry @ \forall s : \seq Entry @ seqlen(\langle x
+  \forall x : Entry @ \forall s : \seq~Entry @ seqlen(\langle x
   \rangle \cat s) = 1 + seqlen(s)
 \end{axdef}
 

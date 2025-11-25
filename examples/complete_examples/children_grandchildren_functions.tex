@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -83,7 +83,7 @@ where p is a parent of c.
 \begin{axdef}
   children : Person \fun \power Person
   \where
-  children = \{ p : Person @ p \mapsto (parentOf \limg \{p\} \rimg) \}
+  children = \{~ p : Person @ p \mapsto (parentOf \limg \{p\} \rimg) ~\}
 \end{axdef}
 
 \noindent Let's break down this definition:
@@ -126,8 +126,8 @@ where p is a parent of c.
 
 \bigskip
 
-\noindent Recall: $(R \limg A \rimg)$ = $\{ y | \exists x : A @ x
-\mapsto y \in R \}$
+\noindent Recall: $(R \limg A \rimg)$ = $\{~ y | \exists x : A @ x
+\mapsto y \in R ~\}$
 
 \bigskip
 
@@ -135,8 +135,8 @@ where p is a parent of c.
 
 \bigskip
 
-\noindent So: $(parentOf \limg \{p\} \rimg)$ = $\{ c | p \mapsto c
-\in parentOf \}$
+\noindent So: $(parentOf \limg \{p\} \rimg)$ = $\{~ c | p \mapsto c
+\in parentOf ~\}$
 
 \bigskip
 
@@ -172,8 +172,8 @@ where p is a parent of c.
 
 \bigskip
 
-\noindent children = $\{ p : Person @ p \mapsto \{ c : Person | p
-\mapsto c \in parentOf \} \}$
+\noindent children = $\{~ p : Person @ p \mapsto \{~ c : Person | p
+\mapsto c \in parentOf ~\} ~\}$
 
 \bigskip
 
@@ -276,8 +276,8 @@ express via composition.
 \begin{axdef}
   number\_of\_grandchildren : Person \fun \nat
   \where
-  number\_of\_grandchildren = \{ p : Person @ p \mapsto \# ((parentOf
-  \circ parentOf) \limg \{p\} \rimg) \}
+  number\_of\_grandchildren = \{~ p : Person @ p \mapsto \#
+  ((parentOf \circ parentOf) \limg \{p\} \rimg) ~\}
 \end{axdef}
 
 \noindent Let's break down this definition:
@@ -398,17 +398,16 @@ express via composition.
 \begin{axdef}
   children\_alt : Person \fun \power Person
   \where
-  \forall p : Person @ children\_alt(p) = \{ c : Person | p \mapsto c
-  \in parentOf \}
+  \forall p : Person @ children\_alt(p) = \{~ c : Person | p \mapsto
+  c \in parentOf ~\}
 \end{axdef}
 
 \begin{axdef}
   number\_of\_grandchildren\_alt : Person \fun \nat
   \where
   \forall p : Person @ \\
-  \quad number\_of\_grandchildren\_alt(p) = \# \{ g : Person |
-    \exists c : Person @ p \mapsto c \in parentOf \land c \mapsto g \in
-  parentOf \}
+  \t1 number\_of\_grandchildren\_alt(p) = \# \{~ g : Person | \exists
+  c : Person @ p \mapsto c \in parentOf \land c \mapsto g \in parentOf ~\}
 \end{axdef}
 
 \noindent **Approach 3: Using previously defined functions**
@@ -419,7 +418,7 @@ express via composition.
   grandchildren : Person \fun \power Person
   \where
   \forall p : Person @ \\
-  \quad grandchildren(p) = \bigcup \{ c : children(p) @ children(c) \}
+  \t1 grandchildren(p) = \bigcup \{~ c : children(p) @ children(c) ~\}
 \end{axdef}
 
 \begin{axdef}
@@ -531,8 +530,8 @@ express via composition.
 
 \bigskip
 
-\noindent - More concise: $(R \limg \{x\} \rimg)$ vs $\{ y | x
-\mapsto y \in R \}$
+\noindent - More concise: $(R \limg \{x\} \rimg)$ vs $\{~ y | x
+\mapsto y \in R ~\}$
 
 \bigskip
 
@@ -663,8 +662,8 @@ $((parentOf \circ parentOf) \limg \{p\} \rimg)$}
 
 \bigskip
 
-\noindent $Definition : number_of_grandchildren$ = $\{ p : Person @ p
-\mapsto \# (grandchildren(p)) \}$
+\noindent $Definition : number_of_grandchildren$ = $\{~ p : Person @
+p \mapsto \# (grandchildren(p)) ~\}$
 
 \bigskip
 

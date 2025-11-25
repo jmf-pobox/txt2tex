@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -14,7 +14,7 @@
 \addcontentsline{toc}{section}{Test Real Nested Quantifier}
 
 \noindent
-$(\mu p : Place | \forall q : Place @ p \neq q \land \# \{ x : \dom
-trains | trains(x).2 = p \} > \# \{ x : \dom trains | trains(x).2 = q \})$
+$(\mu p : Place | \forall q : Place @ p \neq q \land \# \{~ x : \dom
+trains | trains(x).2 = p ~\} > \# \{~ x : \dom trains | trains(x).2 = q ~\})$
 
 \end{document}

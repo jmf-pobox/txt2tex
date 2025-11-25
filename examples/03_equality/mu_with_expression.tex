@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -65,7 +65,8 @@ $(\mu x : \nat | x * x = 25 @ x * x * x)$
 \section*{Example 5 : String Indexing Example}
 \addcontentsline{toc}{section}{Example 5 : String Indexing Example}
 
-\begin{zed}[String, Char]
+\begin{zed}
+  [String, Char]
 \end{zed}
 
 \begin{axdef}
@@ -129,7 +130,8 @@ x such that f(x) = y.
 \addcontentsline{toc}{section}{Example 9 : Practical - Finding
 Configuration Values}
 
-\begin{zed}[ConfigKey, ConfigValue]
+\begin{zed}
+  [ConfigKey, ConfigValue]
 \end{zed}
 
 \begin{axdef}
@@ -138,8 +140,8 @@ Configuration Values}
   parseValue : ConfigValue \fun \nat
   \where
   \forall k : ConfigKey @ \\
-  \quad k \in \dom configs \implies \\
-  \quad getConfigInt(k) = (\mu v : \nat | parseValue(configs(k)) = v)
+  \t1 k \in \dom configs \implies \\
+  \t1 getConfigInt(k) = (\mu v : \nat | parseValue(configs(k)) = v)
 \end{axdef}
 
 \noindent Finds the unique N value by parsing a configuration value.
@@ -154,11 +156,11 @@ Configuration Values}
   \where
   \forall k : ConfigKey @ \forall default : \nat @ k \in \dom configs
   \implies \\
-  \quad getConfigWithDefault(k, default) = (\mu v : \nat |
+  \t2 getConfigWithDefault(k, default) = (\mu v : \nat |
   parseValue(configs(k)) = v) \\
   \forall k : ConfigKey @ \forall default : \nat @ k \notin \dom
   configs \implies \\
-  \quad getConfigWithDefault(k, default) = default
+  \t2 getConfigWithDefault(k, default) = default
 \end{axdef}
 
 \noindent Uses mu to parse the value when key $\exists$, otherwise

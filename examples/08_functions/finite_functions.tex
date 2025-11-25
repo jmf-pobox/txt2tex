@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -167,7 +167,7 @@ f, since we can only compose where f's range intersects g's domain.
   recent\_viewed : Title \ffun ViewDate \\
   recentSet : \power Title
   \where
-  recentSet = \{ t : Title | t \in \dom viewed \} \land
+  recentSet = \{~ t : Title | t \in \dom viewed ~\} \land
   recent\_viewed = recentSet \dres viewed \land \# (\dom
   recent\_viewed) \leq \# (\dom viewed)
 \end{axdef}

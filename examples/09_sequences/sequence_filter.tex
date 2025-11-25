@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -34,9 +34,9 @@ elements from a specified set. It removes elements not in the$
 \bigskip
 
 \begin{axdef}
-  s1 : \seq \nat \\
+  s1 : \seq~\nat \\
   evens1 : \power \nat \\
-  filtered1 : \seq \nat
+  filtered1 : \seq~\nat
   \where
   s1 = \langle 1, 2, 3, 4, 5, 6 \rangle \land evens1 = \{2, 4, 6, 8\}
   \land filtered1 = (s1 \filter evens1)
@@ -55,11 +55,11 @@ only elements that are in evens and preserving their original order.
 \end{zed}
 
 \begin{axdef}
-  all\_titles : \seq Title2 \\
+  all\_titles : \seq~Title2 \\
   long\_titles : \power Title2 \\
-  filtered\_titles : \seq Title2
+  filtered\_titles : \seq~Title2
   \where
-  long\_titles = \{ t : Title2 | true \} \land filtered\_titles =
+  long\_titles = \{~ t : Title2 | true ~\} \land filtered\_titles =
   all\_titles \filter long\_titles
 \end{axdef}
 
@@ -85,10 +85,10 @@ restriction ($\rres$):
 \bigskip
 
 \begin{axdef}
-  s3 : \seq \nat \\
+  s3 : \seq~\nat \\
   R3 : \nat \rel \nat \\
   A3 : \power \nat \\
-  filtered\_seq3 : \seq \nat \\
+  filtered\_seq3 : \seq~\nat \\
   restricted\_rel3 : \nat \rel \nat
   \where
   s3 = \langle 1, 2, 3, 4, 5 \rangle \land R3 = \{1 \mapsto 10, 2
@@ -117,7 +117,7 @@ restriction ($\rres$):
 \end{zed}
 
 \begin{axdef}
-  catalog4 : \seq (Title4 \cross Length4 \cross Rating4) \\
+  catalog4 : \seq~(Title4 \cross Length4 \cross Rating4) \\
   family\_friendly4 : \power Rating4
   \where
   family\_friendly4 = \{G4, PG4\}
@@ -133,10 +133,10 @@ entries with ratings in this set.
 \addcontentsline{toc}{section}{Example 5 : Multiple Filters}
 
 \begin{axdef}
-  s5 : \seq \nat \\
+  s5 : \seq~\nat \\
   evens5 : \power \nat \\
   large5 : \power \nat \\
-  result5 : \seq \nat
+  result5 : \seq~\nat
   \where
   s5 = \langle 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 \rangle \land evens5 =
   \{2, 4, 6, 8, 10, 12\} \land large5 = \{5, 6, 7, 8, 9, 10, 11\}
@@ -153,11 +153,11 @@ entries with ratings in this set.
 \addcontentsline{toc}{section}{Example 6 : Empty Filter}
 
 \begin{axdef}
-  s6 : \seq \nat \\
+  s6 : \seq~\nat \\
   empty\_set6 : \power \nat \\
   disjoint\_set6 : \power \nat \\
-  result6a : \seq \nat \\
-  result6b : \seq \nat
+  result6a : \seq~\nat \\
+  result6b : \seq~\nat
   \where
   s6 = \langle 1, 2, 3 \rangle \land empty\_set6 = \{\} \land
   disjoint\_set6 = \{10, 20, 30\} \land result6a = s6 \filter
@@ -190,9 +190,9 @@ empty sequence.
 \bigskip
 
 \begin{axdef}
-  b1 : \bag \nat \\
-  b2 : \bag \nat \\
-  combined : \bag \nat
+  b1 : \bag~\nat \\
+  b2 : \bag~\nat \\
+  combined : \bag~\nat
   \where
   b1 = \lbag 1, 1, 2, 3 \rbag \land b2 = \lbag 2, 3, 3, 4 \rbag \land
   combined = b1 \uplus b2

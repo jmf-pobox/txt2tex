@@ -161,6 +161,7 @@ class TokenType(Enum):
     SCHEMA = auto()  # schema
     GENDEF = auto()  # gendef (generic definition)
     ZED = auto()  # zed (unboxed paragraph block)
+    SYNTAX = auto()  # syntax (aligned free type definitions)
     WHERE = auto()  # where
     END = auto()  # end
 

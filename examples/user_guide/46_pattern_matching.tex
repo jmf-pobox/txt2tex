@@ -3,18 +3,18 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
 \begin{axdef}
-  cumulative\_total : \seq \nat \fun \nat
+  cumulative\_total : \seq~\nat \fun \nat
   \where
   cumulative\_total(\langle \rangle) = 0 \land \\
-  \quad (\forall x : \nat @ \forall s : \seq \nat @
+  \quad (\forall x : \nat @ \forall s : \seq~\nat @
   cumulative\_total(\langle x \rangle \cat s) = x + cumulative\_total(s))
 \end{axdef}
 
