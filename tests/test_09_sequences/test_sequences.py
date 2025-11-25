@@ -570,7 +570,7 @@ class TestASCIIConcatenation:
         # This should be superscript, not concatenation
         # For single-character exponents, LaTeX doesn't need braces
         result = generate_latex("x^2")
-        assert result == "x^2"  # or x^{2}, both are correct LaTeX
+        assert result == r"x \bsup 2 \esup"  # or x^{2}, both are correct LaTeX
 
     def test_concatenation_chain(self):
         """Test <a> ^ <b> ^ <c>."""

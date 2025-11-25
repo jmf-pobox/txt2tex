@@ -1252,18 +1252,14 @@ class LaTeXGenerator:
     def _generate_superscript(
         self, node: Superscript, parent: Expr | None = None
     ) -> str:
-        """Generate LaTeX for superscript (x^2, 2^n, (z^2)^3)."""
+        """Generate LaTeX for superscript using \\bsup...\\esup (fuzz-compatible)."""
         base = self.generate_expr(node.base)
         exponent = self.generate_expr(node.exponent)
 
-        # Wrap base in braces if it contains a superscript (for nesting)
-        if isinstance(node.base, Superscript):
-            base = f"{{{base}}}"
-
-        # Wrap exponent in braces if it's more than one character
-        if len(exponent) > 1:
-            return f"{base}^{{{exponent}}}"
-        return f"{base}^{exponent}"
+        # Use \bsup...\esup for fuzz compatibility
+        # Standard ^{n} doesn't work in fuzz mode
+        # This syntax works in both fuzz and zed modes
+        return f"{base} \\bsup {exponent} \\esup"
 
     def _generate_function_app(
         self, node: FunctionApp, parent: Expr | None = None

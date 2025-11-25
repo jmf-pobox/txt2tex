@@ -127,7 +127,7 @@ class TestPhase11dLaTeX:
     def test_lambda_with_nat_latex(self):
         """Test lambda x : N . x^2 → \\lambda x : \\mathbb{N} \\bullet x^2."""
         result = generate_latex("lambda x : N . x^2")
-        assert result == r"\lambda x : \mathbb{N} \bullet x^2"
+        assert result == r"\lambda x : \mathbb{N} \bullet x \bsup 2 \esup"
 
     def test_lambda_multi_variable_latex(self):
         """Test lambda x, y : N . x and y."""

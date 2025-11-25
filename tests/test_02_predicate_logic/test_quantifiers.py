@@ -257,7 +257,7 @@ class TestLaTeXGenerator:
             column=2,
         )
         latex = gen.generate_expr(ast)
-        assert latex == "x^2"
+        assert latex == r"x \bsup 2 \esup"
 
     def test_superscript_multichar(self) -> None:
         """Test generating superscript with multi-character exponent."""
@@ -269,7 +269,7 @@ class TestLaTeXGenerator:
             column=2,
         )
         latex = gen.generate_expr(ast)
-        assert latex == "x^{ab}"
+        assert latex == r"x \bsup ab \esup"
 
     def test_subscript(self) -> None:
         """Test generating subscript."""
@@ -487,7 +487,7 @@ class TestIntegration:
         assert isinstance(ast, Superscript)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert latex == "x^2"
+        assert latex == r"x \bsup 2 \esup"
 
     def test_simple_subscript(self) -> None:
         """Test complete pipeline for subscript (Phase 15)."""

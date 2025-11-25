@@ -230,7 +230,7 @@ class TestIntegration:
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert r"\mu x \colon \mathbb{N} \bullet" in latex
-        assert r"x^2 = 4" in latex
+        assert r"x \bsup 2 \esup = 4" in latex
         assert r"\land" in latex
         assert "x > 0" in latex
 
