@@ -39,7 +39,7 @@ TEXT: Parameters are rendered with \ldata and \rdata delimiters in LaTeX.
 
 ** Example 3: Multiple Definitions with Grouping **
 
-TEXT: Blank lines between definitions create visual groups using \also:
+TEXT: Blank lines between definitions create visual groups using \textbackslash also:
 
 syntax
   Status ::= active | inactive | pending
