@@ -790,10 +790,12 @@ class Lexer:
             self.line = saved_line
             self.column = saved_column
 
-        # Check for EQUIV: keyword
-        if value == "EQUIV" and self._current_char() == ":":
+        # Check for ARGUE: or EQUIV: keywords (both map to ARGUE token)
+        # EQUIV is backwards-compatible alias for ARGUE
+        if (value == "ARGUE" or value == "EQUIV") and self._current_char() == ":":
             self._advance()  # Consume ':'
-            return Token(TokenType.EQUIV, "EQUIV:", start_line, start_column)
+            keyword = f"{value}:"
+            return Token(TokenType.ARGUE, keyword, start_line, start_column)
 
         # Check for PROOF: keyword
         if value == "PROOF" and self._current_char() == ":":
