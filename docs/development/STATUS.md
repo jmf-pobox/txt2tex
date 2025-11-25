@@ -1,7 +1,7 @@
 # txt2tex Implementation Status
 
-**Last Updated:** 2025-11-23
-**Current Phase:** zed...end Standardization ✓ COMPLETE
+**Last Updated:** 2025-11-25
+**Current Phase:** Syntax Environment ✓ COMPLETE
 
 ---
 
@@ -52,7 +52,7 @@ end
 
 **Files Updated:** ~140 constructs converted across 50+ files (examples/, tests/, hw/)
 
-**Tests:** +14 new tests for zed block functionality (1188 total tests pass)
+**Tests:** +14 new tests for zed block functionality (1199 total tests pass)
 
 **Rationale:** Standardize on fuzz-compliant syntax, eliminate non-standard constructs, enable mixed-content blocks matching fuzz capabilities.
 
@@ -167,6 +167,7 @@ end
 - ✓ Given types: `given A, B`
 - ✓ Free types: `Type ::= branch1 | branch2`
 - ✓ Recursive free types: `Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩`
+- ✓ Syntax environment: `syntax ... end` (column-aligned free type definitions)
 - ✓ Abbreviations: `Name == expr`, `[X] Name == expr`
 - ✓ Axiomatic definitions: `axdef ... where ... end`
 - ✓ Generic definitions: `gendef [X] ... where ... end`
@@ -509,6 +510,39 @@ end
 - Consistent with existing `=>` handling which uses `\implies` in fuzz mode
 - All 999 tests pass
 
+### ✅ Phase 28: Syntax Environment (November 2025)
+- Implemented column-aligned free type definitions from ZED2E standard
+- Added `syntax...end` block for BNF-style grammar definitions
+- **AST**: Added `SyntaxBlock` and `SyntaxDefinition` nodes
+- **Lexer**: Added `SYNTAX` token type and keyword recognition
+- **Parser**: Implemented blank line detection for group separation with `\also`
+- **LaTeX Generator**: 3-column alignment with `&` separators: `TypeName & ::= & branches`
+- **Features**:
+  - Single-line definitions: `OP ::= plus | minus | times`
+  - Parameterized constructors: `Tree ::= leaf<N> | branch<Tree cross Tree>`
+  - Blank line grouping: Multiple definitions separated by `\also`
+  - Multi-line definitions with continuation pipes
+- **Example**:
+  ```
+  syntax
+    Status ::= active | inactive | pending
+
+    Response ::= ok | error<N> | timeout
+  end
+  ```
+  Generates:
+  ```latex
+  \begin{syntax}
+  Status & ::= & active | inactive | pending \\
+  \also
+  Response & ::= & ok | error \ldata \nat \rdata | timeout
+  \end{syntax}
+  ```
+- **Examples**: `examples/06_definitions/syntax_demo.txt` with comprehensive demonstrations
+- **Documentation**: Added "Syntax Environment" section to USER_GUIDE.md
+- **Test count**: 1199 tests (all passing)
+- **Files updated**: hw/solutions.txt Question 9 converted to use syntax environment
+
 ---
 
 ## Syntax Requirements & Limitations
@@ -702,8 +736,10 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 17. ✓ Phase 24: Whitespace-Sensitive ^ Operator (concat vs exponent disambiguation)
 18. ✓ Phase 25: Justification Operator Conversion (relation/function operators in justifications)
 19. ✓ Phase 26: TEXT Block Operator Support (all operators in prose)
+20. ✓ Phase 27: Line Continuation with Backslash
+21. ✓ Phase 28: Syntax Environment (column-aligned free type definitions)
 
-**Current:** 100% (52/52) - Phase 27 Complete + Bug #3 Fixed
+**Current:** 100% (52/52) - Phase 28 Complete
 
 ### Next Steps
 
@@ -717,7 +753,7 @@ See [tests/bugs/README.md](tests/bugs/README.md) for details.
 
 ## Test Coverage
 
-- **Total Tests:** 973 passing (as of Phase 26, October 2025)
+- **Total Tests:** 1199 passing (as of Phase 28, November 2025)
 - **Component Coverage:**
   - parser.py: 88.91%
   - latex_gen.py: 80.61%
