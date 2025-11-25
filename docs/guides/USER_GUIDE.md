@@ -543,9 +543,9 @@ Generates: $\{ x : \mathbb{N} \mid x > 0 \}$
 
 **Set by expression:**
 ```
-{ x : N | x > 0 . x^2 }
+{ x : N | x > 0 . x * x }
 ```
-Generates: $\{ x : \mathbb{N} \mid x > 0 \bullet x^2 \}$
+Generates: $\{ x : \mathbb{N} \mid x > 0 \bullet x \times x \}$
 
 The bullet (`•`) separates the predicate from the expression.
 
@@ -1096,7 +1096,7 @@ Any expression can be applied as a function:
 
 **Basic lambdas:**
 ```
-lambda x : N . x^2
+lambda x : N . x * x
 lambda f : X -> Y . f(x)
 ```
 
@@ -1315,7 +1315,7 @@ The `^` operator has dual meaning based on whitespace:
 | Pattern | Meaning | LaTeX | Example |
 |---------|---------|-------|---------|
 | `... ^ ...` (with space) | Concatenation | `\cat` | `<x> ^ <y>` |
-| `...^...` (no space) | Exponentiation | `^{...}` | `x^2` |
+| `...^...` (no space) | Relation iteration | `\bsup...\esup` | `R^2` |
 
 **Concatenation examples (MUST have space before `^` and be on same line):**
 ```
@@ -1326,13 +1326,20 @@ f(x) ^ <y>       →  f(x) ⌢ ⟨y⟩     [function result]
 
 **Note**: Multi-line concatenation (splitting across lines) is not currently supported.
 
-**Exponentiation examples (NO space before `^`):**
+**Relation iteration examples (NO space before `^`):**
 ```
-x^2              →  x²
-4^2              →  4²
-n^k              →  nᵏ
-(x+1)^2          →  (x+1)²
+R^2              →  R²          [relation composed with itself]
+R^n              →  Rⁿ          [n-fold relation composition]
 ```
+
+**Important limitation:** The `^` operator (without space) generates `\bsup...\esup` which fuzz interprets as the `iter` operator. This **only works for relations**, not arithmetic:
+
+✅ **Works:** `R^n` where R is a relation (type: `X <-> Y`)
+❌ **Does NOT work:** `x^2`, `2^n` where x or 2 are numbers (fuzz type error)
+
+**For arithmetic exponentiation, use:**
+- Manual multiplication: `x * x` for x², `x * x * x` for x³
+- Define a pow function (see examples/06_definitions/pow_function.txt)
 
 **Common mistake:**
 ```
@@ -1947,13 +1954,28 @@ max(x, y) = if x > y then x else y
 
 ### Subscripts and Superscripts
 
+**Subscripts:**
 ```
-x_i              →  xᵢ
-x^2              →  x²
-2^n              →  2ⁿ
+x_i              →  xᵢ          [subscript]
 a_{n}            →  aₙ          [braces group multi-char subscripts]
-x^{2n}           →  x²ⁿ         [braces group multi-char superscripts]
 ```
+
+**Superscripts (relation iteration only):**
+```
+R^n              →  Rⁿ          [n-fold relation composition]
+R^{n+1}          →  Rⁿ⁺¹        [braces group multi-char superscripts]
+```
+
+**CRITICAL LIMITATION**: The `^` operator generates `\bsup ... \esup` LaTeX commands which fuzz interprets as the `iter` operator (relation iteration). This **ONLY works for relations**, not arithmetic:
+
+✅ **Supported:** `R^n` where R has type `X <-> Y` (relation)
+❌ **NOT supported:** `x^2`, `2^n`, `n^k` where the base is a number (causes fuzz type error)
+
+**For arithmetic exponentiation:**
+- Use manual multiplication: `x * x` for x², `x * x * x` for x³
+- Define a `pow` function (see examples/06_definitions/pow_function.txt)
+
+**Why this limitation exists:** Fuzz's `\bsup...\esup` command is specifically for the `iter` operator, which applies a relation to itself n times. It expects a relation type, not a number type. See the Z Reference Manual section on `iter` for details.
 
 ### Multi-Word Identifiers
 
@@ -2020,7 +2042,7 @@ Container[seq[N]]            →  Container[seq[N]]
 
 - **Sequence closing:** `<x>` (no space before `>`) vs `x > y` (space before `>`)
 - **Generic instantiation:** `Type[X]` (no space before `[`) vs `p [just]` (space before `[`)
-- **Caret operator:** `s ^ t` (space before `^`) is concatenation, `x^2` (no space) is exponentiation
+- **Caret operator:** `s ^ t` (space before `^`) is concatenation, `R^n` (no space) is relation iteration
 
 ### Parentheses Requirements
 

@@ -283,7 +283,7 @@ From zed2e.pdf analysis, here are ALL reserved words, commands, and environments
 - `\#`, `\upto`, `\uplus` ✅ Implemented
 - `\ldata`, `\rdata` ✅ Implemented (free type constructors)
 - `\lbag`, `\rbag` ✅ Implemented (bag brackets)
-- `\bsup`, `\esup` ❌ Missing (iteration notation, e.g., R^n)
+- `\bsup`, `\esup` ✅ Implemented (iteration notation, e.g., R^n → generates `\bsup n \esup`)
 - `\inbag`, `\partition`, `\disjoint` ⚠️ Check status
 
 #### Style Parameters (configurable)
@@ -762,7 +762,7 @@ max_line_length = 80      # Smart line breaking threshold
 - [ ] Add formatting configuration options (.txt2tex.toml)
 - [ ] Create example config files for different styles
 - [ ] Consider schema calculus operators (`\hide`, `\project`, `\pre`) if requested
-- [ ] Add `\bsup`/`\esup` iteration notation
+- [x] Add `\bsup`/`\esup` iteration notation (all `^` generates `\bsup ... \esup` for fuzz compatibility)
 - [ ] Tag release: `v2.0.0` (stable)
 
 **Deliverable**: Production-ready Z notation alignment

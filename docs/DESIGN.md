@@ -220,12 +220,14 @@ consistent, and matches mathematical convention (e.g., `4^2` vs `s ^ t`).
 **Examples**:
 ```
 <x> ^ <y>     → CAT token (space before ^) → \langle x \rangle \cat \langle y \rangle
-x^2           → CARET token (no space) → x^{2}
+R^2           → CARET token (no space) → R \bsup 2 \esup (relation iteration)
 s ^ t         → CAT token (space before ^) → s \cat t
-n^k           → CARET token (no space) → n^{k}
+R^n           → CARET token (no space) → R \bsup n \esup (relation iteration)
 f(x) ^ <y>    → CAT token (space before ^) → f(x) \cat \langle y \rangle
 <x>^<y>       → ERROR: "Sequence concatenation requires space: use '> ^ <' not '>^<'"
 ```
+
+**Important:** CARET without space generates `\bsup...\esup` which fuzz interprets as `iter` (relation iteration). This ONLY works for relations, NOT arithmetic (x^2 causes fuzz type error).
 
 **Error Handling**: The `>^<` pattern is explicitly detected and produces a clear
 error message directing users to add space. This prevents a common mistake when
@@ -789,10 +791,10 @@ Clear, actionable error messages with context:
 
 ```
 Error on line 42, column 15:
-  (a) This is true: forall x in N, x^2 >= 0
+  (a) This is true: forall x in N, x * x >= 0
                           ^
 Expected '|' or '.' after domain specification
-Did you mean: forall x : N | x^2 >= 0
+Did you mean: forall x : N | x * x >= 0
 ```
 
 ## Testing Strategy
@@ -1009,13 +1011,13 @@ p and q
 **Add**:
 - `forall x : Domain | predicate` syntax
 - `exists` quantifier
-- Superscripts: `x^2`, `2^n`
+- Superscripts: `R^n` (relation iteration - NOT arithmetic exponentiation)
 - Subscripts: `a_1`, `x_i`
 - Set operators: `in`, `subset`, `union`, `intersect`
 
 **Use Case**:
 ```
-forall x : N | x^2 >= 0
+forall x : N | x * x >= 0
 exists n : N | n > 10
 ```
 
@@ -1108,7 +1110,7 @@ PROOF:
 - **Proofs**: Natural deduction with all major inference rules (=>-intro, =>-elim, and-intro, and-elim, or-intro, or-elim, false-intro, false-elim)
 - **Proof Features**: Nested assumptions, discharge notation, case analysis (or-elim), boxed assumption notation
 - **Quantifiers**: forall, exists, exists1, mu-operator with multi-variable support
-- **Subscripts/Superscripts**: `x_i`, `x^2`, `2^n`
+- **Subscripts/Superscripts**: `x_i` (subscripts), `R^n` (relation iteration - NOT arithmetic exponentiation)
 - **Set Operations**: in, notin, subset, subseteq, union, intersect, cross (×), setminus (\), P (power set), P1, # (cardinality), bigcup (distributed union)
 - **Set Comprehension**: `{ x : X | predicate }`, `{ x : X | predicate . expression }`, multi-variable, optional domain
 - **Set Literals**: Including maplets `{1 |-> a, 2 |-> b, 3 |-> c}`
@@ -1175,14 +1177,14 @@ PROOF:
 
 **Input Format**:
 ```
-forall x : N | x^2 >= 0
+forall x : N | x * x >= 0
 exists d : Dog | gentle(d) and well_trained(d)
 forall x, y : N | x + y = 4 and x < y
 ```
 
 **LaTeX Output**:
 ```latex
-$\forall x : \nat \bullet x^{2} \geq 0$
+$\forall x : \nat \bullet x \times x \geq 0$
 $\exists d : Dog \bullet gentle(d) \land well\_trained(d)$
 $\forall x, y : \nat \bullet x + y = 4 \land x < y$
 ```
@@ -1500,7 +1502,7 @@ $\forall x : seq[N] \bullet \# x > 0$
 **Key Features**:
 - Lookahead for `<`: recognizes `<>`, `<x>`, `<(expr)>`, `<<nested>>`
 - Whitespace check for `>`: `<x>` (no space) vs `x > y` (space before `>`)
-- Lookback for `^`: `<x> ^ s` (concatenation) vs `x^2` (superscript)
+- Lookback for `^`: `<x> ^ s` (concatenation) vs `R^n` (relation iteration)
 
 **Input Format**:
 ```
@@ -2148,7 +2150,7 @@ Clear, actionable error messages more important than partial output in v1.
 ```
 ** Solution 1 **
 
-(a) forall x : N | x^2 >= 0
+(a) forall x : N | x * x >= 0
 
 TRUTH TABLE:
 p | q | p => q

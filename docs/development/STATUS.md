@@ -106,7 +106,7 @@ end
 - ✓ Boolean operators: `and`, `or`, `not`, `=>`, `<=>`
 - ✓ Comparison: `<`, `>`, `<=`, `>=`, `=`, `!=`
 - ✓ Arithmetic: `+`, `*`, `mod`, `-` (subtraction/negation)
-- ✓ Subscript/Superscript: `x_i`, `x^2`
+- ✓ Subscript/Superscript: `x_i`, `R^n` (relation iteration only, NOT arithmetic)
 
 ### Quantifiers
 - ✓ Universal: `forall x : N | P`
@@ -211,7 +211,7 @@ end
 ### ✅ Phase 3: Mathematical Notation
 - Quantifiers: `forall`, `exists`
 - Subscripts: `x_i`, `a_{n}`
-- Superscripts: `x^2`, `2^{10}`
+- Superscripts: `R^n` (relation iteration only - NOT arithmetic like `x^2`)
 - Set operators: `in`, `notin`, `subset`, `union`, `intersect`
 - Comparison: `<`, `>`, `<=`, `>=`, `=`, `!=`
 
@@ -295,7 +295,7 @@ end
 - Integration with relation operators
 
 ### ✅ Phase 11d: Lambda Expressions
-- Basic lambdas: `lambda x : N . x^2`
+- Basic lambdas: `lambda x : N . x * x`
 - Multi-variable: `lambda x, y : N . x + y`
 - Nested lambdas
 - Complex domain types

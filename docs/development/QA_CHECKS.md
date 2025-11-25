@@ -106,10 +106,11 @@ make && ./qa_check.sh examples/solutions.pdf
 ### Root Causes
 
 #### 1. Solution 6(a) - Runon Text
-**Source**: `TEXT: x^2 - x + 1 denotes a natural number`
-**Problem**: Superscript `^2` eating space after `1`
+**Source**: `TEXT: (x * x) - x + 1 denotes a natural number`
+**Note**: Arithmetic exponentiation (x^2) is not supported by fuzz - use manual multiplication instead
+**Problem**: Space handling after numeric expressions in TEXT blocks
 **Result**: "1denotesanaturalnumber"
-**Fix needed**: Improve superscript space handling in TEXT blocks
+**Fix needed**: Improve space handling in TEXT blocks
 
 #### 2. Solution 19 - Missing Set Braces
 **Source**: `TEXT: 1 in {4, 3, 2, 1} is true.`
