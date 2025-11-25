@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -44,10 +44,10 @@
 \end{zed}
 
 \begin{axdef}
-  str1 : \seq Char \fun \seq Char \\
-  str2 : \seq Char \fun \seq Char \\
-  str3 : \seq Char \fun \seq Char \\
-  stringPipeline : \seq Char \fun \seq Char
+  str1 : \seq~Char \fun \seq~Char \\
+  str2 : \seq~Char \fun \seq~Char \\
+  str3 : \seq~Char \fun \seq~Char \\
+  stringPipeline : \seq~Char \fun \seq~Char
   \where
   stringPipeline = str3 \comp str2 \comp str1
 \end{axdef}

@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -28,7 +28,7 @@ $1993 \upto current$
 \addcontentsline{toc}{section}{Test 3 : Range in Set Comprehension}
 
 \noindent
-$\{ x : 1 \upto 20 | x \mod 2 = 0 \}$
+$\{~ x : 1 \upto 20 | x \mod 2 = 0 ~\}$
 
 \section*{Test 4 : Range with Expressions}
 \addcontentsline{toc}{section}{Test 4 : Range with Expressions}
@@ -61,6 +61,6 @@ $p.1 \upto p.2$
 \addcontentsline{toc}{section}{Test 8 : Complex Set Comprehension}
 
 \noindent
-$\{ x : 1 \upto 10 | x > 3 @ x^2 \}$
+$\{~ x : 1 \upto 10 | x > 3 @ x^2 ~\}$
 
 \end{document}

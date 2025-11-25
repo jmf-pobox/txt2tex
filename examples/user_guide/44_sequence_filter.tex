@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -15,10 +15,10 @@
 \end{schema}
 
 \begin{axdef}
-  records : \seq Entry \\
+  records : \seq~Entry \\
   yes : \nat
   \where
-  records \filter \{ x : Entry | x.viewed = yes \} = \langle \rangle
+  records \filter \{~ x : Entry | x.viewed = yes ~\} = \langle \rangle
 \end{axdef}
 
 \end{document}

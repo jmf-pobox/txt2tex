@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -38,9 +38,11 @@
 \addcontentsline{toc}{section}{Example 2 : Abbreviations}
 
 \begin{zed}
-  N\_PLUS == \{ n : \nat | n > 0 \}
-  N\_EVEN == \{ n : \nat | n \mod 2 = 0 \}
-  N\_ODD == \{ n : \nat | n \mod 2 = 1 \}
+  N\_PLUS == \{~ n : \nat | n > 0 ~\}
+  \\
+  N\_EVEN == \{~ n : \nat | n \mod 2 = 0 ~\}
+  \\
+  N\_ODD == \{~ n : \nat | n \mod 2 = 1 ~\}
 \end{zed}
 
 \noindent Abbreviations can be defined standalone (zed blocks for
@@ -80,6 +82,7 @@ abbreviations may not be fully supported yet).
 
 \begin{zed}
   Color ::= red | green | blue
+  \\
   Size ::= small | medium | large
 \end{zed}
 
@@ -161,15 +164,15 @@ own constraints.
 \end{zed}
 
 \begin{schema}{Address}
-  street : \seq Char \\
-  city : \seq Char \\
+  street : \seq~Char \\
+  city : \seq~Char \\
   zipCode : \nat
   \where
   zipCode \geq 10000 \land zipCode \leq 99999
 \end{schema}
 
 \begin{schema}{PersonData}
-  name : \seq Char \\
+  name : \seq~Char \\
   address : Address \\
   age : \nat
   \where
@@ -190,6 +193,7 @@ using schemas go in axdef.
 
 \begin{zed}
   PI == 3
+  \\
   E == 2
 \end{zed}
 
@@ -210,6 +214,7 @@ using schemas go in axdef.
 
 \begin{zed}
   [UserID, DocumentID]
+  \\
   PermissionType ::= read | write | admin
 \end{zed}
 
@@ -225,7 +230,7 @@ using schemas go in axdef.
   users : UserID \pfun User \\
   allDocuments : \finset DocumentID
   \where
-  allDocuments = \bigcup \{ u : \ran users @ u.documents \}
+  allDocuments = \bigcup \{~ u : \ran users @ u.documents ~\}
 \end{schema}
 
 \begin{axdef}

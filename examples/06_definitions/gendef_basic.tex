@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -100,9 +100,9 @@ identity applied to a set returns that set, etc.
 \bigskip
 
 \begin{gendef}[X]
-  headOf: \seq X \fun X
+  headOf: \seq~X \fun X
   \where
-  \forall s : \seq X | \# s > 0 @ headOf(s) = s(1)
+  \forall s : \seq~X | \# s > 0 @ headOf(s) = s(1)
 \end{gendef}
 
 \noindent This is defined only for non-empty sequences.
@@ -173,7 +173,7 @@ defined for specific types rather than being polymorphic.
 \bigskip
 
 \begin{gendef}[X]
-  single: X \fun \seq X
+  single: X \fun \seq~X
   \where
   \forall x : X @ single(x) = \langle x \rangle
 \end{gendef}
@@ -211,7 +211,7 @@ natural numbers, and identity[P N] is instantiated for sets of natural numbers.
 \bigskip
 
 \begin{gendef}[X]
-  emptySeq: \seq X
+  emptySeq: \seq~X
   \where
   emptySeq = \langle \rangle
 \end{gendef}

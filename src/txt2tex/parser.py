@@ -51,6 +51,8 @@ from txt2tex.ast_nodes import (
     Solution,
     Subscript,
     Superscript,
+    SyntaxBlock,
+    SyntaxDefinition,
     TitleMetadata,
     TruthTable,
     Tuple,
@@ -421,6 +423,7 @@ class Parser:
             TokenType.GENDEF,
             TokenType.ZED,
             TokenType.SCHEMA,
+            TokenType.SYNTAX,
             TokenType.PROOF,
         )
 
@@ -600,6 +603,8 @@ class Parser:
             return self._parse_zed()
         if self._match(TokenType.SCHEMA):
             return self._parse_schema()
+        if self._match(TokenType.SYNTAX):
+            return self._parse_syntax_block()
         if self._match(TokenType.PROOF):
             return self._parse_proof_tree()
         if self._match(TokenType.TEXT):
@@ -3176,6 +3181,227 @@ class Parser:
             branches=branches,
             line=name_token.line,
             column=name_token.column,
+        )
+
+    def _parse_syntax_block(self) -> SyntaxBlock:
+        """Parse syntax environment for aligned free type definitions.
+
+        Syntax:
+          syntax
+            TypeName ::= branch1 | branch2
+
+            AnotherType ::= branch1<Param>
+                         |  branch2<Param1 cross Param2>
+          end
+
+        Generates column-aligned LaTeX with \also between groups.
+        """
+        start_token = self._advance()  # Consume 'syntax'
+        self._skip_newlines()
+
+        # Parse groups of definitions separated by blank lines
+        groups: list[list[SyntaxDefinition]] = []
+        current_group: list[SyntaxDefinition] = []
+
+        while not self._at_end() and not self._match(TokenType.END):
+            # Check for blank line (group separator)
+            if self._match(TokenType.NEWLINE):
+                # Count consecutive newlines
+                newline_count = 0
+                while self._match(TokenType.NEWLINE):
+                    newline_count += 1
+                    self._advance()
+
+                # Blank line (2+ newlines) separates groups
+                if newline_count >= 2 and current_group:
+                    groups.append(current_group)
+                    current_group = []
+
+                # Skip any remaining newlines
+                self._skip_newlines()
+
+                if self._match(TokenType.END):
+                    break
+
+            # Parse a single free type definition
+            if not self._match(TokenType.IDENTIFIER):
+                if not self._match(TokenType.END):
+                    current_type = self._current().type.name
+                    raise ParserError(
+                        f"Expected type name in syntax block, got {current_type}",
+                        self._current(),
+                    )
+                break
+
+            # Parse: TypeName ::= branches
+            type_name_token = self._current()
+            type_name = type_name_token.value
+            self._advance()
+
+            if not self._match(TokenType.FREE_TYPE):
+                raise ParserError(
+                    "Expected '::=' after type name in syntax block",
+                    self._current(),
+                )
+            self._advance()  # Consume '::='
+
+            # Parse branches (same logic as _parse_free_type)
+            branches: list[FreeBranch] = []
+
+            # Parse initial set of branches on the same line
+            while not self._at_end():
+                if self._match(TokenType.NEWLINE, TokenType.END):
+                    break
+                # Parse branch name
+                if not self._match(TokenType.IDENTIFIER):
+                    if self._match(TokenType.PIPE):
+                        # Skip leading pipe if present
+                        self._advance()
+                        continue
+                    break
+
+                branch_token = self._current()
+                branch_name = branch_token.value
+                self._advance()
+
+                # Check for constructor parameters: <...>
+                parameters: Expr | None = None
+                if self._match(TokenType.LANGLE):
+                    langle_token = self._current()
+                    self._advance()  # Consume '<'
+
+                    if self._match(TokenType.RANGLE):
+                        # Empty parameters
+                        parameters = SequenceLiteral(
+                            elements=[],
+                            line=langle_token.line,
+                            column=langle_token.column,
+                        )
+                        self._advance()  # Consume '>'
+                    else:
+                        # Parse parameter type expression
+                        parameters = self._parse_cross()
+
+                        if not self._match(TokenType.RANGLE):
+                            raise ParserError(
+                                "Expected '>' after constructor parameters",
+                                self._current(),
+                            )
+                        self._advance()  # Consume '>'
+
+                # Create FreeBranch
+                branches.append(
+                    FreeBranch(
+                        name=branch_name,
+                        parameters=parameters,
+                        line=branch_token.line,
+                        column=branch_token.column,
+                    )
+                )
+
+                # Check for pipe separator
+                if self._match(TokenType.PIPE):
+                    self._advance()
+
+            # Check for continuation lines (starting with |)
+            while not self._at_end() and not self._match(TokenType.END):
+                # Skip single newline
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+
+                # Check if next line starts with |
+                if not self._match(TokenType.PIPE):
+                    break
+
+                self._advance()  # Consume continuation '|'
+
+                # Parse branches on this continuation line
+                while not self._at_end():
+                    if self._match(TokenType.NEWLINE, TokenType.END):
+                        break
+
+                    if not self._match(TokenType.IDENTIFIER):
+                        if self._match(TokenType.PIPE):
+                            self._advance()
+                            continue
+                        break
+
+                    branch_token = self._current()
+                    branch_name = branch_token.value
+                    self._advance()
+
+                    # Parse parameters
+                    parameters = None
+                    if self._match(TokenType.LANGLE):
+                        langle_token = self._current()
+                        self._advance()
+
+                        if self._match(TokenType.RANGLE):
+                            parameters = SequenceLiteral(
+                                elements=[],
+                                line=langle_token.line,
+                                column=langle_token.column,
+                            )
+                            self._advance()
+                        else:
+                            parameters = self._parse_cross()
+                            if not self._match(TokenType.RANGLE):
+                                raise ParserError(
+                                    "Expected '>' after constructor parameters",
+                                    self._current(),
+                                )
+                            self._advance()
+
+                    branches.append(
+                        FreeBranch(
+                            name=branch_name,
+                            parameters=parameters,
+                            line=branch_token.line,
+                            column=branch_token.column,
+                        )
+                    )
+
+                    if self._match(TokenType.PIPE):
+                        self._advance()
+
+            if not branches:
+                raise ParserError(
+                    f"Expected at least one branch for type {type_name}",
+                    type_name_token,
+                )
+
+            # Create SyntaxDefinition
+            current_group.append(
+                SyntaxDefinition(
+                    name=type_name,
+                    branches=branches,
+                    line=type_name_token.line,
+                    column=type_name_token.column,
+                )
+            )
+
+            # Skip trailing newline after definition
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+
+        # Add final group if not empty
+        if current_group:
+            groups.append(current_group)
+
+        # Expect 'end'
+        if not self._match(TokenType.END):
+            raise ParserError("Expected 'end' to close syntax block", self._current())
+        self._advance()  # Consume 'end'
+
+        if not groups:
+            raise ParserError(
+                "Expected at least one type definition in syntax block", start_token
+            )
+
+        return SyntaxBlock(
+            groups=groups,
+            line=start_token.line,
+            column=start_token.column,
         )
 
     def _parse_generic_params(self) -> list[str] | None:

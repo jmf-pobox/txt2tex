@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -31,9 +31,9 @@
   \where
   \forall x : X @ \forall y : Y @ \forall z : \num @ triple(x, y, z)
   = (x, y, z) \land \\
-  \quad getFirst(x, y, z) = x \land \\
-  \quad getSecond(x, y, z) = y \land \\
-  \quad getThird(x, y, z) = z
+  \t3 getFirst(x, y, z) = x \land \\
+  \t3 getSecond(x, y, z) = y \land \\
+  \t3 getThird(x, y, z) = z
 \end{gendef}
 
 \noindent Projection functions for triples.
@@ -69,7 +69,7 @@ syntax (not gendef):
 \bigskip
 
 \begin{schema}{Container}[X]
-  contents : \seq X \\
+  contents : \seq~X \\
   capacity : \nat
   \where
   \# contents \leq capacity
@@ -121,7 +121,7 @@ operations in gendef:
 \bigskip
 
 \begin{schema}{Stack}[X]
-  items : \seq X \\
+  items : \seq~X \\
   maxSize : \nat
   \where
   \# items \leq maxSize
@@ -173,14 +173,14 @@ as OrderedPair[N, Char], etc.
 \bigskip
 
 \begin{gendef}[X, Y]
-  zip: \seq X \cross \seq Y \fun \seq (X \cross Y)
+  zip: \seq~X \cross \seq~Y \fun \seq~(X \cross Y)
   \where
   zip(\langle \rangle, \langle \rangle) = \langle \rangle \\
-  \forall x : X @ \forall y : Y @ \forall xs : \seq X @ \forall ys :
-  \seq Y @ zip(\langle x \rangle \cat xs, \langle y \rangle \cat ys)
+  \forall x : X @ \forall y : Y @ \forall xs : \seq~X @ \forall ys :
+  \seq~Y @ zip(\langle x \rangle \cat xs, \langle y \rangle \cat ys)
   = \langle (x, y) \rangle \cat zip(xs, ys) \\
-  \forall xs : \seq X @ zip(xs, \langle \rangle) = \langle \rangle \\
-  \forall ys : \seq Y @ zip(\langle \rangle, ys) = \langle \rangle
+  \forall xs : \seq~X @ zip(xs, \langle \rangle) = \langle \rangle \\
+  \forall ys : \seq~Y @ zip(\langle \rangle, ys) = \langle \rangle
 \end{gendef}
 
 \noindent Pairs up corresponding elements from two sequences.

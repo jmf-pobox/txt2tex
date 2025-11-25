@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -34,7 +34,7 @@ properties using only fuzz-compatible notation.
 \bigskip
 
 \begin{gendef}[X]
-  squashFunc: (\nat_1 \pfun X) \fun \seq X
+  squashFunc: (\nat_1 \pfun X) \fun \seq~X
   \where
   \forall f : \nat_1 \pfun X @ \ran (squashFunc(f)) = \ran f \land \#
   (squashFunc(f)) = \# (\ran f)
@@ -59,7 +59,7 @@ domain gaps while preserving all elements and their relative order.
 
 \begin{axdef}
   f1 : \nat_1 \pfun \nat \\
-  s1 : \seq \nat
+  s1 : \seq~\nat
   \where
   f1 = \{1 \mapsto 10, 3 \mapsto 30, 5 \mapsto 50\} \land s1 = squashFunc(f1)
 \end{axdef}
@@ -82,7 +82,7 @@ exactly the range elements in the order of their original indices.
   c : Letter \\
   d : Letter \\
   f2 : \nat_1 \pfun Letter \\
-  s2 : \seq Letter
+  s2 : \seq~Letter
   \where
   f2 = \{2 \mapsto a, 4 \mapsto b, 7 \mapsto c, 9 \mapsto d\} \land
   s2 = squashFunc(f2)
@@ -98,7 +98,7 @@ positions 1, 3, 5, 6, 8 are removed.
 
 \begin{axdef}
   f3 : \nat_1 \pfun \nat \\
-  s3 : \seq \nat
+  s3 : \seq~\nat
   \where
   f3 = \{\} \land s3 = squashFunc(f3)
 \end{axdef}
@@ -113,7 +113,7 @@ positions 1, 3, 5, 6, 8 are removed.
 
 \begin{axdef}
   f4 : \nat_1 \pfun \nat \\
-  s4 : \seq \nat
+  s4 : \seq~\nat
   \where
   f4 = \{1 \mapsto 100, 2 \mapsto 200, 3 \mapsto 300\} \land s4 = squashFunc(f4)
 \end{axdef}
@@ -134,7 +134,7 @@ starting at 1, squashFunc is the identity.
 
 \begin{axdef}
   continuous\_N : \nat_1 \pfun \nat \\
-  s\_continuous\_N : \seq \nat
+  s\_continuous\_N : \seq~\nat
   \where
   \dom continuous\_N = 1 \upto \# (\ran continuous\_N) \land
   s\_continuous\_N = squashFunc(continuous\_N)
@@ -155,7 +155,7 @@ no duplicates.
 
 \begin{axdef}
   inj\_func : \nat_1 \pfun \nat \\
-  inj\_seq : \seq \nat
+  inj\_seq : \seq~\nat
   \where
   (\forall i, j : \dom inj\_func @ inj\_func(i) = inj\_func(j)
   \implies i = j) \land inj\_seq = squashFunc(inj\_func)
@@ -175,7 +175,7 @@ contains no duplicate elements.
 
 \begin{axdef}
   sparse\_catalog : \nat_1 \pfun (VideoID \cross Title) \\
-  compact\_catalog : \seq (VideoID \cross Title)
+  compact\_catalog : \seq~(VideoID \cross Title)
   \where
   compact\_catalog = squashFunc(sparse\_catalog)
 \end{axdef}

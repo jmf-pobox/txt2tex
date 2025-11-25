@@ -3,10 +3,10 @@
 \usepackage{amssymb}
 \usepackage{adjustbox}
 \usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \newdimen\savedleftskip
 \begin{document}
 
@@ -26,7 +26,7 @@
 \bigskip
 
 \begin{zed}
-  Answer == \{ s : \dom show\_episodes | \# (show\_episodes(s)) > 5 \}
+  Answer == \{~ s : \dom show\_episodes | \# (show\_episodes(s)) > 5 ~\}
 \end{zed}
 
 \end{document}
