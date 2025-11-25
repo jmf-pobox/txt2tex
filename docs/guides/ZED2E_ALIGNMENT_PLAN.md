@@ -743,31 +743,7 @@ max_line_length = 80      # Smart line breaking threshold
 
 ---
 
-### Week 5-6: Phase 3 - Advanced Features (Part 1) ⏭️ SKIPPED
-**Goal**: Inline LaTeX passthrough (`\\`, `\t1`-`\t9`, `~` in user input)
-
-**Decision (Nov 25, 2025)**: Skipped due to complexity vs. value analysis
-
-**Rationale**:
-- **Auto-generation works well**: Phase 1 already provides automatic `\\`, `\t1`-`\t9`, and `~` spacing
-- **LATEX: blocks provide escape hatch**: Users needing manual control can use `LATEX:` directive
-- **Risk too high**: Lexer conflicts with `\` (SETMINUS) and `~` (postfix inverse) create maintenance burden
-- **Use cases covered**: Beginners get auto-formatting, experts get `LATEX:` blocks
-
-**Alternative approach**: Users can write:
-```
-LATEX: forall S : P1 RESOURCE @ \\
-LATEX: \t3 policy(S) in S \land \\
-LATEX: \t3 S \subseteq RESOURCE
-```
-
-This provides full manual control without lexer complexity.
-
-**Deliverable**: N/A - Phase skipped
-
----
-
-### Week 7-8: Phase 3 - Advanced Features (Part 2) ✅ COMPLETE
+### Week 5-6: Phase 3 - Advanced Features (Part 1) ✅ COMPLETE
 - [x] Implement `syntax` environment (commits d02166f, 0269c1a, 83bec4d, 586758a)
   - Lexer: Add `SYNTAX` token
   - Parser: Add `syntax...end` block with blank line grouping
@@ -781,7 +757,7 @@ This provides full manual control without lexer complexity.
 
 ---
 
-### Week 9-10: Phase 3 - Advanced Features (Part 3)
+### Week 7-8: Phase 3 - Advanced Features (Part 2)
 - [ ] Implement smart line breaking
 - [ ] Add formatting configuration options (.txt2tex.toml)
 - [ ] Create example config files for different styles
