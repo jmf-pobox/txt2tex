@@ -1,0 +1,109 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Syntax Environment Examples}
+
+\section*{Example 1 : Simple Enumeration}
+\addcontentsline{toc}{section}{Example 1 : Simple Enumeration}
+
+\noindent For simple free types with several branches, syntax provides
+
+\bigskip
+
+\noindent column-aligned layout:
+
+\bigskip
+
+\begin{syntax}
+OP & ::= & plus | minus | times | divide
+\end{syntax}
+
+\noindent This generates aligned columns with the ::= separator clearly visible.
+
+\bigskip
+
+\section*{Example 2 : Parameterized Constructors}
+\addcontentsline{toc}{section}{Example 2 : Parameterized Constructors}
+
+\noindent Constructors can have type parameters using angle brackets:
+
+\bigskip
+
+\begin{syntax}
+Tree & ::= & leaf \ldata \nat \rdata | branch \ldata Tree \cross Tree \rdata
+\end{syntax}
+
+\noindent Parameters are rendered with \ldata and \rdata $delimiters \in LaTeX$.
+
+\bigskip
+
+\section*{Example 3 : Multiple Definitions with Grouping}
+\addcontentsline{toc}{section}{Example 3 : Multiple Definitions with Grouping}
+
+\noindent Blank lines between definitions create visual groups using \also:
+
+\bigskip
+
+\begin{syntax}
+Status & ::= & active | inactive | pending \\
+Response & ::= & ok | error \ldata \nat \rdata | timeout
+\end{syntax}
+
+\noindent The blank line causes \also to be generated, creating vertical
+
+\bigskip
+
+\noindent separation between the two type definitions.
+
+\bigskip
+
+\section*{Example 4 : Complex BNF - Style Definitions}
+\addcontentsline{toc}{section}{Example 4 : Complex BNF - Style Definitions}
+
+\noindent Syntax environment is ideal for BNF-style grammar definitions:
+
+\bigskip
+
+\begin{syntax}
+Expr & ::= & const \ldata \nat \rdata | var \ldata NAME \rdata | binop \ldata OP \cross Expr \cross Expr \rdata \\
+Stmt & ::= & assign \ldata NAME \cross Expr \rdata | seq \ldata Stmt \cross Stmt \rdata | skip
+\end{syntax}
+
+\noindent This creates a professionally formatted grammar specification.
+
+\bigskip
+
+\section*{Comparison : Syntax vs Zed Blocks}
+\addcontentsline{toc}{section}{Comparison : Syntax vs Zed Blocks}
+
+\noindent Standard zed blocks work for simple types:
+
+\bigskip
+
+\begin{zed}
+Color ::= red | green | blue
+\end{zed}
+
+\noindent But syntax environment provides better alignment for complex types:
+
+\bigskip
+
+\begin{syntax}
+Color & ::= & red | green | blue \\
+Shape & ::= & circle \ldata \nat \rdata | rectangle \ldata \nat \cross \nat \rdata | polygon \ldata \seq~\nat \rdata
+\end{syntax}
+
+\noindent The column alignment makes the structure more readable.
+
+\bigskip
+
+\end{document}
