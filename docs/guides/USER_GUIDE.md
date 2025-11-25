@@ -672,6 +672,61 @@ Both Unicode `⟨⟩` and ASCII `<>` angle brackets are supported:
 Tree ::= stalk | leaf<N> | branch<Tree × Tree>
 ```
 
+### Syntax Environment
+
+For complex free type definitions with multiple types, the `syntax` environment provides column-aligned layout similar to BNF grammars:
+
+**Basic syntax block:**
+```
+syntax
+  OP ::= plus | minus | times | divide
+end
+```
+
+Generates:
+```latex
+\begin{syntax}
+OP & ::= & plus | minus | times | divide
+\end{syntax}
+```
+
+**Multiple definitions with grouping:**
+
+Blank lines between definitions create visual groups using `\also`:
+
+```
+syntax
+  Status ::= active | inactive | pending
+
+  Response ::= ok | error<N> | timeout
+end
+```
+
+Generates:
+```latex
+\begin{syntax}
+Status & ::= & active | inactive | pending \\
+\also
+Response & ::= & ok | error \ldata \nat \rdata | timeout
+\end{syntax}
+```
+
+**Parameterized constructors:**
+```
+syntax
+  Tree ::= leaf<N> | branch<Tree cross Tree>
+
+  Expr ::= const<N> | var<NAME> | binop<OP cross Expr cross Expr>
+end
+```
+
+**When to use syntax vs zed blocks:**
+
+- Use `syntax` for: Multiple related types, BNF-style grammars, complex type hierarchies
+- Use `zed` for: Single simple types, types mixed with other definitions
+
+**Examples:** See `examples/06_definitions/syntax_demo.txt`
+
 ### Generic Definitions
 
 Generic definitions (gendef) define polymorphic functions and constants with type parameters:
