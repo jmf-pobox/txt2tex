@@ -207,7 +207,7 @@ class TestTupleInSetComprehension:
         assert r"\mid" in latex
         assert r"\bullet" in latex
         # Single-character exponents don't get braces
-        assert "(n, n^2)" in latex
+        assert r"(n, n \bsup 2 \esup)" in latex
 
     def test_set_comprehension_multi_var_tuple(self) -> None:
         """Test set comprehension with multiple vars and tuple expression."""

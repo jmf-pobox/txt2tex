@@ -151,7 +151,7 @@ class TestPhase8LaTeXGeneration:
         assert r"\bullet" in latex  # Has expression part
         assert "x" in latex
         assert "N" in latex
-        assert "^" in latex
+        assert r"\bsup" in latex
         assert "2" in latex
 
     def test_generate_multi_variable_set(self) -> None:
@@ -285,7 +285,7 @@ class TestPhase8Integration:
         latex = gen.generate_expr(ast)
 
         assert r"\bullet" in latex
-        assert "^" in latex
+        assert r"\bsup" in latex
 
     def test_end_to_end_multi_variable(self) -> None:
         """Test complete pipeline for multi-variable set."""

@@ -611,7 +611,7 @@ def test_latex_gen_superscript() -> None:
     gen = LaTeXGenerator()
     latex = gen.generate_expr(result)
 
-    assert "^" in latex or "^{" in latex
+    assert r"\bsup" in latex
 
 
 def test_latex_gen_relational_image() -> None:

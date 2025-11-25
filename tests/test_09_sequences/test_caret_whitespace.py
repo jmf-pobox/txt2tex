@@ -117,7 +117,7 @@ class TestExponentiationNoSpace:
         assert isinstance(ast, Superscript)
 
         latex = generate_latex("x^2")
-        assert "x^" in latex
+        assert r"x \bsup" in latex
         assert "cat" not in latex.lower()
 
     def test_number_exponent(self):
@@ -126,7 +126,7 @@ class TestExponentiationNoSpace:
         assert isinstance(ast, Superscript)
 
         latex = generate_latex("4^2")
-        assert "4^" in latex
+        assert r"4 \bsup" in latex
 
     def test_nested_exponent(self):
         """(x^3)^2 → nested superscript."""
@@ -136,7 +136,7 @@ class TestExponentiationNoSpace:
 
         latex = generate_latex("(x^3)^2")
         # Nested superscripts should wrap base
-        assert "^" in latex
+        assert r"\bsup" in latex
         assert "cat" not in latex.lower()
 
     def test_identifier_exponent(self):
@@ -145,7 +145,7 @@ class TestExponentiationNoSpace:
         assert isinstance(ast, Superscript)
 
         latex = generate_latex("n^k")
-        assert "n^k" in latex or "n^{k}" in latex
+        assert r"n \bsup k \esup" in latex
 
     def test_function_result_exponent(self):
         """f(x)^2 → exponentiation."""
@@ -153,7 +153,7 @@ class TestExponentiationNoSpace:
         assert isinstance(ast, Superscript)
 
         latex = generate_latex("f(x)^2")
-        assert "f(x)^" in latex
+        assert r"f(x) \bsup" in latex
 
     def test_multi_char_exponent(self):
         """x^{2n} works with braces."""
@@ -224,7 +224,7 @@ class TestMixedUsage:
         latex = generate_latex(text)
         # Should have both \cat and ^
         assert r"\cat" in latex
-        assert "n^" in latex
+        assert r"n \bsup" in latex
 
 
 class TestIntegration:
@@ -251,7 +251,7 @@ end"""
         assert latex.count(r"\cat") == 2
 
         # Should NOT have superscripts
-        assert "^{" not in latex
+        assert r"\esup" not in latex  # No exponentiation, only concatenation
 
         # Verify specific pattern
         expected = (
@@ -302,7 +302,7 @@ end"""
         assert r"s \cat t" in latex
 
         # Second and third ^ (powers) no space → superscripts
-        assert "f(s)^2" in latex and "f(t)^2" in latex
+        assert r"f(s) \bsup 2 \esup" in latex and r"f(t) \bsup 2 \esup" in latex
 
 
 class TestEdgeCases:
