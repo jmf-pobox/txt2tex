@@ -97,8 +97,9 @@ The LaTeX structure is transparent - someone reading our generated LaTeX learns 
 **Application**:
 - ✅ **Level 1 (Beginner)**: Write `and`, `or`, let system handle spacing and breaks
 - ✅ **Level 2 (Intermediate)**: Use blank lines for `\also` grouping in where clauses
-- ✅ **Level 3 (Expert)**: Use `LATEX:` blocks for direct control
-- ✅ **Level 4 (Expert+)**: Mix txt2tex with hand-written LaTeX
+- ✅ **Level 3 (Advanced)**: Use inline LaTeX commands (`\\`, `\t1`, `~`) for fine control
+- ✅ **Level 4 (Expert)**: Use `LATEX:` blocks for direct control
+- ✅ **Level 5 (Expert+)**: Mix txt2tex with hand-written LaTeX
 
 **Examples**:
 
