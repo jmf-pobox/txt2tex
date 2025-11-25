@@ -718,26 +718,42 @@ max_line_length = 80      # Smart line breaking threshold
 
 ---
 
-### Week 3-4: Phase 2 - Keyword Migration ❌ FAILED & ABANDONED
-**Attempted migration of `and`→`land`, `or`→`lor`, `not`→`lnot`**
+### Week 3-4: Phase 2 - Keyword Migration ⚠️ ATTEMPTED, FAILED, WILL RETRY
+**Goal**: Migrate `and`→`land`, `or`→`lor`, `not`→`lnot` to align with Z notation LaTeX commands
 
-**Why it failed:**
-- Cannot reliably distinguish English words ("and", "or", "not") from Z notation context using regex
-- Attempted regex-based approach fundamentally flawed
-- Would require LLM-based context analysis to work properly
-- Breaking change with insufficient benefit
+**What didn't work:**
+- **Approach**: Regex-based detection to distinguish English vs mathematical context
+- **Failure mode**: Cannot reliably identify when "and"/"or"/"not" are English prose vs logical operators
+  - Example failure: "The system checks policies and resources" (English prose)
+  - Example failure: "The predicate x > 0 and y > 0 holds" (mathematical operator in prose)
+- **Root cause**: Regex pattern matching insufficient for semantic context analysis
 
-**Decision**: Phase 2 abandoned. Keep `and`, `or`, `not` as current syntax.
+**Next attempt strategy:**
+- Use LLM-based context analysis to distinguish English from mathematical usage
+- Process TEXT blocks with semantic understanding of mathematical expressions
+- Maintain high accuracy to avoid breaking English prose
 
-**Alternative implemented** (commit 709390b):
-- Convert Z notation keywords in TEXT blocks/justifications (forall, exists, emptyset)
-- Keep logical operators as English keywords (more intuitive for beginners)
+**Status**: Will retry with improved approach
+
+**Related work completed** (commit 709390b):
+- Successfully implemented keyword conversion for quantifiers in TEXT blocks (forall, exists, emptyset)
+- This proves TEXT block processing is feasible
 
 ---
 
-### Week 5-6: Phase 3 - Advanced Features (Part 1)
-- [ ] Implement inline LaTeX passthrough (`\\`, `\t1`-`\t9`, `~`)
+### Week 5-6: Phase 3 - Advanced Features (Part 1) ❌ NOT STARTED
+**Goal**: Implement inline LaTeX passthrough (`\\`, `\t1`-`\t9`, `~`)
+
+**Current status verified** (Nov 25, 2025):
+- Tested inline `\t1`, `\t2` commands → Parser error (SETMINUS token conflict)
+- Tested inline `\\` commands → Parser error (SETMINUS token conflict)
+- Tested `~` spacing hints → Not tested yet
+- **Conclusion**: Inline LaTeX passthrough is NOT currently working
+
+**Implementation needed:**
 - [ ] Add lexer support for LaTeX commands in txt2tex input
+- [ ] Disambiguate `\t` (LaTeX tab) from `\` (set minus) + `t` (identifier)
+- [ ] Disambiguate `\\` (LaTeX line break) from `\` (set minus) + `\` (set minus)
 - [ ] Update parser to pass through LaTeX formatting commands
 - [ ] Add tests for Level 3 (inline LaTeX control)
 - [ ] Update USER_GUIDE.md with Level 3 examples
