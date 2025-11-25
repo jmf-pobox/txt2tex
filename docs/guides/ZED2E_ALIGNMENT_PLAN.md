@@ -95,11 +95,10 @@ The LaTeX structure is transparent - someone reading our generated LaTeX learns 
 **Philosophy**: Common patterns get smart defaults. Advanced users can override with explicit LaTeX hints. Never force complexity on beginners, never hide power from experts.
 
 **Application**:
-- ✅ **Level 1 (Beginner)**: Write `land`, `lor`, let system handle spacing and breaks
-- ✅ **Level 2 (Intermediate)**: Add explicit line breaks, indentation hints in input
-- ✅ **Level 3 (Advanced)**: Use inline LaTeX commands (`\\`, `\t3`, `~`) for fine control
-- ✅ **Level 4 (Expert)**: Use `LATEX:` blocks for direct control
-- ✅ **Level 5 (Expert+)**: Mix txt2tex with hand-written LaTeX
+- ✅ **Level 1 (Beginner)**: Write `and`, `or`, let system handle spacing and breaks
+- ✅ **Level 2 (Intermediate)**: Use blank lines for `\also` grouping in where clauses
+- ✅ **Level 3 (Expert)**: Use `LATEX:` blocks for direct control
+- ✅ **Level 4 (Expert+)**: Mix txt2tex with hand-written LaTeX
 
 **Examples**:
 
@@ -744,24 +743,27 @@ max_line_length = 80      # Smart line breaking threshold
 
 ---
 
-### Week 5-6: Phase 3 - Advanced Features (Part 1) ❌ NOT STARTED
-**Goal**: Implement inline LaTeX passthrough (`\\`, `\t1`-`\t9`, `~`)
+### Week 5-6: Phase 3 - Advanced Features (Part 1) ⏭️ SKIPPED
+**Goal**: Inline LaTeX passthrough (`\\`, `\t1`-`\t9`, `~` in user input)
 
-**Current status verified** (Nov 25, 2025):
-- Tested inline `\t1`, `\t2` commands → Parser error (SETMINUS token conflict)
-- Tested inline `\\` commands → Parser error (SETMINUS token conflict)
-- Tested `~` spacing hints → Not tested yet
-- **Conclusion**: Inline LaTeX passthrough is NOT currently working
+**Decision (Nov 25, 2025)**: Skipped due to complexity vs. value analysis
 
-**Implementation needed:**
-- [ ] Add lexer support for LaTeX commands in txt2tex input
-- [ ] Disambiguate `\t` (LaTeX tab) from `\` (set minus) + `t` (identifier)
-- [ ] Disambiguate `\\` (LaTeX line break) from `\` (set minus) + `\` (set minus)
-- [ ] Update parser to pass through LaTeX formatting commands
-- [ ] Add tests for Level 3 (inline LaTeX control)
-- [ ] Update USER_GUIDE.md with Level 3 examples
+**Rationale**:
+- **Auto-generation works well**: Phase 1 already provides automatic `\\`, `\t1`-`\t9`, and `~` spacing
+- **LATEX: blocks provide escape hatch**: Users needing manual control can use `LATEX:` directive
+- **Risk too high**: Lexer conflicts with `\` (SETMINUS) and `~` (postfix inverse) create maintenance burden
+- **Use cases covered**: Beginners get auto-formatting, experts get `LATEX:` blocks
 
-**Deliverable**: Users can write `\\` and `\t3` directly in input for fine control
+**Alternative approach**: Users can write:
+```
+LATEX: forall S : P1 RESOURCE @ \\
+LATEX: \t3 policy(S) in S \land \\
+LATEX: \t3 S \subseteq RESOURCE
+```
+
+This provides full manual control without lexer complexity.
+
+**Deliverable**: N/A - Phase skipped
 
 ---
 
