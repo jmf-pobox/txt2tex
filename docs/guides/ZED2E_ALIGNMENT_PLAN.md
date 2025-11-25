@@ -222,7 +222,7 @@ From zed2e.pdf analysis, here are ALL reserved words, commands, and environments
 | `gendef` | ✅ Implemented | - | Generic definitions |
 | `zed` | ✅ Implemented | - | Unboxed paragraphs |
 | `schema*` | ❌ Missing | ⭐⭐ Medium | Anonymous schema boxes |
-| `syntax` | ❌ Missing | ⭐⭐⭐⭐ High | Large free type definitions with alignment |
+| `syntax` | ✅ Implemented | - | Large free type definitions with alignment (Phase 28, Nov 2025) |
 | `argue` | ❌ Missing | ⭐⭐ Medium | Multi-line equational reasoning |
 | `infrule` | ❌ Missing | ⭐ Low | Inference rules (proof trees alternative) |
 
@@ -231,10 +231,10 @@ From zed2e.pdf analysis, here are ALL reserved words, commands, and environments
 | Command | Status | Priority | Notes |
 |---------|--------|----------|-------|
 | `\where` | ✅ Implemented | - | Separator in schema/axdef |
-| `\also` | ❌ Missing | ⭐⭐⭐⭐⭐ Critical | Vertical spacing between predicates |
-| `\t1`, `\t2`, ... `\tn` | ❌ Missing | ⭐⭐⭐⭐ High | Indentation hints |
+| `\also` | ✅ Implemented | - | Vertical spacing between predicates (Phase 1, Nov 2025) |
+| `\t1`, `\t2`, ... `\tn` | ✅ Implemented | - | Indentation hints (Phase 1, Nov 2025) |
 | `~` | ❌ Missing | ⭐⭐⭐ Medium | Spacing hint (thin space) |
-| `\\` | ⚠️ Partial | ⭐⭐⭐⭐ High | Line breaks (need passthrough support) |
+| `\\` | ✅ Implemented | - | Line breaks (automatic, Phase 1, Nov 2025) |
 | `\derive` | ❌ Missing | ⭐ Low | Horizontal line in inference rules |
 | `\shows` | ❌ Missing | ⭐ Low | Turnstile in inference rules |
 
@@ -697,48 +697,41 @@ max_line_length = 80      # Smart line breaking threshold
 
 ## Migration Roadmap
 
-### Week 1: Phase 1.1-1.2 (Non-Breaking)
-- [ ] Implement automatic line breaking with `\\`
-- [ ] Implement automatic indentation with `\t1`, `\t2`
-- [ ] Add `\also` support for blank lines in `where` clauses
-- [ ] Update tests to expect enhanced output
-- [ ] Run full test suite - ensure 100% pass rate
+### Week 1: Phase 1.1-1.2 (Non-Breaking) ✅ COMPLETE
+- [x] Implement automatic line breaking with `\\` (commit 2b1c8f2, ece9f9a)
+- [x] Implement automatic indentation with `\t1`, `\t2` (commit 2b1c8f2)
+- [x] Add `\also` support for blank lines in `where` clauses (commit ece9f9a)
+- [x] Update tests to expect enhanced output
+- [x] Run full test suite - ensure 100% pass rate (1199 tests passing)
 
-**Deliverable**: Enhanced LaTeX output, no input syntax changes
-
----
-
-### Week 2: Phase 1.3-1.4 (Non-Breaking)
-- [ ] Implement `~` spacing hints
-- [ ] Consolidate consecutive `zed` environments
-- [ ] Add regression tests for formatting features
-- [ ] Update USER_GUIDE.md with output examples
-
-**Deliverable**: "Textbook quality" LaTeX generation
+**Deliverable**: Enhanced LaTeX output, no input syntax changes ✅
 
 ---
 
-### Week 3: Phase 2.1 - Keyword Migration Prep
-- [ ] Add deprecation warnings for `and`, `or`, `not`
-- [ ] Accept both old and new syntax
-- [ ] Create and test migration script
-- [ ] Run migration script on `tests/`
-- [ ] Manual review of migrated tests
-- [ ] Update test expectations
+### Week 2: Phase 1.3-1.4 (Non-Breaking) ⚠️ PARTIAL
+- [ ] Implement `~` spacing hints - NOT DONE
+- [x] Consolidate consecutive `zed` environments (commit a240d6f)
+- [x] Add regression tests for formatting features
+- [x] Update USER_GUIDE.md with output examples
 
-**Deliverable**: Tests migrated to `land`/`lor`/`lnot`
+**Deliverable**: "Textbook quality" LaTeX generation ⚠️ (mostly done, `~` spacing missing)
 
 ---
 
-### Week 4: Phase 2.1-2.2 - Complete Migration
-- [ ] Migrate `examples/` directory
-- [ ] Migrate all documentation (USER_GUIDE.md, tutorials)
-- [ ] Update CLAUDE.md, DESIGN.md
-- [ ] Implement context-aware detection for TEXT: blocks
-- [ ] Remove deprecated keyword support
-- [ ] Tag release: `v2.0.0-beta` (breaking changes)
+### Week 3-4: Phase 2 - Keyword Migration ❌ FAILED & ABANDONED
+**Attempted migration of `and`→`land`, `or`→`lor`, `not`→`lnot`**
 
-**Deliverable**: Full migration to Z notation keywords
+**Why it failed:**
+- Cannot reliably distinguish English words ("and", "or", "not") from Z notation context using regex
+- Attempted regex-based approach fundamentally flawed
+- Would require LLM-based context analysis to work properly
+- Breaking change with insufficient benefit
+
+**Decision**: Phase 2 abandoned. Keep `and`, `or`, `not` as current syntax.
+
+**Alternative implemented** (commit 709390b):
+- Convert Z notation keywords in TEXT blocks/justifications (forall, exists, emptyset)
+- Keep logical operators as English keywords (more intuitive for beginners)
 
 ---
 
@@ -753,17 +746,17 @@ max_line_length = 80      # Smart line breaking threshold
 
 ---
 
-### Week 7-8: Phase 3 - Advanced Features (Part 2)
-- [ ] Implement `syntax` environment
+### Week 7-8: Phase 3 - Advanced Features (Part 2) ✅ COMPLETE
+- [x] Implement `syntax` environment (commits d02166f, 0269c1a, 83bec4d, 586758a)
   - Lexer: Add `SYNTAX` token
-  - Parser: Add `syntax...end` block with `&` column separators
-  - AST: Add `SyntaxBlock` node type
-  - LaTeX gen: Generate `\begin{syntax}...\end{syntax}`
-- [ ] Add tests for `syntax` environment
-- [ ] Add `syntax` examples to `examples/06_definitions/`
-- [ ] Update USER_GUIDE.md with `syntax` documentation
+  - Parser: Add `syntax...end` block with blank line grouping
+  - AST: Add `SyntaxBlock` and `SyntaxDefinition` node types
+  - LaTeX gen: Generate `\begin{syntax}...\end{syntax}` with `&` column alignment
+- [x] Add tests for `syntax` environment (all 1199 tests passing)
+- [x] Add `syntax` examples to `examples/06_definitions/syntax_demo.txt`
+- [x] Update USER_GUIDE.md with `syntax` documentation
 
-**Deliverable**: Full support for aligned free type definitions
+**Deliverable**: Full support for aligned free type definitions ✅ (Phase 28, November 2025)
 
 ---
 
