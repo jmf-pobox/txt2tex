@@ -7,6 +7,8 @@ import re
 
 from txt2tex.ast_nodes import (
     Abbreviation,
+    ArgueChain,
+    ArgueStep,
     AxDef,
     BagLiteral,
     BibliographyMetadata,
@@ -17,8 +19,6 @@ from txt2tex.ast_nodes import (
     Declaration,
     Document,
     DocumentItem,
-    EquivChain,
-    EquivStep,
     Expr,
     FreeBranch,
     FreeType,
@@ -417,7 +417,7 @@ class Parser:
             TokenType.PAGEBREAK,
             TokenType.CONTENTS,
             TokenType.PARTS,
-            TokenType.EQUIV,
+            TokenType.ARGUE,  # Both EQUIV: and ARGUE: map to this token
             TokenType.GIVEN,
             TokenType.AXDEF,
             TokenType.GENDEF,
@@ -591,8 +591,8 @@ class Parser:
             return self._parse_part()
         if self._match(TokenType.TRUTH_TABLE):
             return self._parse_truth_table()
-        if self._match(TokenType.EQUIV):
-            return self._parse_equiv_chain()
+        if self._match(TokenType.ARGUE):  # Handles both EQUIV: and ARGUE: keywords
+            return self._parse_argue_chain()
         if self._match(TokenType.GIVEN):
             return self._parse_given_type()
         if self._match(TokenType.AXDEF):
@@ -981,12 +981,16 @@ class Parser:
             column=start_token.column,
         )
 
-    def _parse_equiv_chain(self) -> EquivChain:
-        """Parse equivalence chain: EQUIV: followed by steps."""
-        start_token = self._advance()  # Consume 'EQUIV:'
+    def _parse_argue_chain(self) -> ArgueChain:
+        """Parse argue chain: ARGUE: or EQUIV: followed by reasoning steps.
+
+        Both EQUIV: and ARGUE: keywords are supported (backwards-compatible).
+        Generates argue environment for better page breaking.
+        """
+        start_token = self._advance()  # Consume 'ARGUE:' or 'EQUIV:'
         self._skip_newlines()
 
-        steps: list[EquivStep] = []
+        steps: list[ArgueStep] = []
 
         # Parse steps until we hit another structural element or end
         while not self._at_end() and not self._is_structural_token():
@@ -1022,7 +1026,7 @@ class Parser:
 
             # Create step
             steps.append(
-                EquivStep(
+                ArgueStep(
                     expression=expr,
                     justification=justification,
                     line=expr.line,
@@ -1034,10 +1038,10 @@ class Parser:
 
         if not steps:
             raise ParserError(
-                "Expected at least one step in EQUIV chain", self._current()
+                "Expected at least one step in ARGUE chain", self._current()
             )
 
-        return EquivChain(steps=steps, line=start_token.line, column=start_token.column)
+        return ArgueChain(steps=steps, line=start_token.line, column=start_token.column)
 
     def _parse_expr(self) -> Expr:
         """Parse expression (entry point)."""
