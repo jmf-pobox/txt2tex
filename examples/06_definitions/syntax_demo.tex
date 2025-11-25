@@ -24,7 +24,7 @@
 \bigskip
 
 \begin{syntax}
-OP & ::= & plus | minus | times | divide
+  OP & ::= & plus | minus | times | divide
 \end{syntax}
 
 \noindent This generates aligned columns with the ::= separator clearly visible.
@@ -39,7 +39,7 @@ OP & ::= & plus | minus | times | divide
 \bigskip
 
 \begin{syntax}
-Tree & ::= & leaf \ldata \nat \rdata | branch \ldata Tree \cross Tree \rdata
+  Tree & ::= & leaf \ldata \nat \rdata | branch \ldata Tree \cross Tree \rdata
 \end{syntax}
 
 \noindent Parameters are rendered with \ldata and \rdata $delimiters \in LaTeX$.
@@ -54,8 +54,8 @@ Tree & ::= & leaf \ldata \nat \rdata | branch \ldata Tree \cross Tree \rdata
 \bigskip
 
 \begin{syntax}
-Status & ::= & active | inactive | pending \\
-Response & ::= & ok | error \ldata \nat \rdata | timeout
+  Status & ::= & active | inactive | pending \\
+  Response & ::= & ok | error \ldata \nat \rdata | timeout
 \end{syntax}
 
 \noindent The blank line causes \also to be generated, creating vertical
@@ -74,8 +74,10 @@ Response & ::= & ok | error \ldata \nat \rdata | timeout
 \bigskip
 
 \begin{syntax}
-Expr & ::= & const \ldata \nat \rdata | var \ldata NAME \rdata | binop \ldata OP \cross Expr \cross Expr \rdata \\
-Stmt & ::= & assign \ldata NAME \cross Expr \rdata | seq \ldata Stmt \cross Stmt \rdata | skip
+  Expr & ::= & const \ldata \nat \rdata | var \ldata NAME \rdata |
+  binop \ldata OP \cross Expr \cross Expr \rdata \\
+  Stmt & ::= & assign \ldata NAME \cross Expr \rdata | seq \ldata
+  Stmt \cross Stmt \rdata | skip
 \end{syntax}
 
 \noindent This creates a professionally formatted grammar specification.
@@ -90,7 +92,7 @@ Stmt & ::= & assign \ldata NAME \cross Expr \rdata | seq \ldata Stmt \cross Stmt
 \bigskip
 
 \begin{zed}
-Color ::= red | green | blue
+  Color ::= red | green | blue
 \end{zed}
 
 \noindent But syntax environment provides better alignment for complex types:
@@ -98,8 +100,9 @@ Color ::= red | green | blue
 \bigskip
 
 \begin{syntax}
-Color & ::= & red | green | blue \\
-Shape & ::= & circle \ldata \nat \rdata | rectangle \ldata \nat \cross \nat \rdata | polygon \ldata \seq~\nat \rdata
+  Color & ::= & red | green | blue \\
+  Shape & ::= & circle \ldata \nat \rdata | rectangle \ldata \nat
+  \cross \nat \rdata | polygon \ldata \seq~\nat \rdata
 \end{syntax}
 
 \noindent The column alignment makes the structure more readable.
