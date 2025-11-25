@@ -298,7 +298,7 @@ From zed2e.pdf analysis, here are ALL reserved words, commands, and environments
 
 ### Critical Missing Features
 
-#### 1. `syntax` Environment (HIGH PRIORITY)
+#### 1. `syntax` Environment ✅ **COMPLETED**
 
 **Purpose**: Large free type definitions with alignment (like `eqnarray`)
 
@@ -320,13 +320,7 @@ EXP ::=  const⟨N⟩
      |   binop⟨OP × EXP × EXP⟩
 ```
 
-**Why we need it**:
-- Free types in `zed` blocks don't align nicely for complex definitions
-- The `&` separators create columns (like `eqnarray`)
-- Industry standard for BNF-style syntax definitions
-- Appears in Spivey's "The Z Notation" textbook
-
-**txt2tex syntax** (proposed):
+**txt2tex syntax**:
 ```
 syntax
   OP ::= plus | minus | times | divide
@@ -336,7 +330,11 @@ syntax
 end
 ```
 
-**Implementation**: Phase 3, estimated 6-8 hours
+**Status**: ✅ **Fully implemented and documented**
+- Implementation: Complete with proper `&` separator and `\also` support
+- Documentation: USER_GUIDE.md lines 676-728
+- Examples: examples/06_definitions/syntax_demo.txt
+- Tests: Covered in free type tests
 
 ---
 
