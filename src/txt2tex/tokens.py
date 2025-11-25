@@ -153,7 +153,7 @@ class TokenType(Enum):
     INSTITUTION = auto()  # INSTITUTION: (institution name)
 
     # Environments (Phase 2)
-    EQUIV = auto()  # EQUIV:
+    ARGUE = auto()  # ARGUE: or EQUIV: (both map to argue environment)
 
     # Z notation keywords (Phase 4)
     GIVEN = auto()  # given
