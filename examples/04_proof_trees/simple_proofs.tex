@@ -34,8 +34,8 @@
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \land (p \implies q)
     \implies (p \land q)}{
-      \infer[\land \mathrm{intro}]{p \land q}{\infer[\Rightarrow
-        \mathrm{elim}]{q}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p
+      \infer[\land \mbox{intro}]{p \land q}{\infer[\Rightarrow
+        \mbox{elim}]{q}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p
           \land (p \implies q) \urcorner^{[1]}} &
           \infer[\land\textrm{-elim-2}]{p \implies q}{\ulcorner p \land
       (p \implies q) \urcorner^{[1]}}}}
@@ -53,13 +53,13 @@
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \land (q \lor r)
     \implies (p \land q) \lor (p \land r)}{
-      \infer[\lor \mathrm{elim}]{(p \land q) \lor (p \land
+      \infer[\lor \mbox{elim}]{(p \land q) \lor (p \land
       r)}{\infer[\lor\textrm{-intro-1}]{(p \land q) \lor (p \land
-        r)}{\infer[\land \mathrm{intro}]{p \land q}{\infer[\mathrm{from
-        case}]{q}{\infer[\mathrm{from above}]{p}{}}}} &
+        r)}{\infer[\land \mbox{intro}]{p \land q}{\infer[\mbox{from
+        case}]{q}{\infer[\mbox{from above}]{p}{}}}} &
         \infer[\lor\textrm{-intro-2}]{(p \land q) \lor (p \land
-        r)}{\infer[\land \mathrm{intro}]{p \land r}{\infer[\mathrm{from
-      case}]{r}{\infer[\mathrm{from above}]{p}{}}}}}
+        r)}{\infer[\land \mbox{intro}]{p \land r}{\infer[\mbox{from
+      case}]{r}{\infer[\mbox{from above}]{p}{}}}}}
     }
     $%
   }
@@ -79,8 +79,8 @@
         \implies q) \land \lnot q \urcorner^{[1]}} &
         \infer[\land\textrm{-elim-2}]{\lnot q}{\ulcorner (p \implies q)
         \land \lnot q \urcorner^{[1]}} &
-        \infer[\mathrm{contradiction}]{false}{\infer[\Rightarrow
-      \mathrm{elim}]{q}{\ulcorner p \urcorner^{[2]}}}}
+        \infer[\mbox{contradiction}]{false}{\infer[\Rightarrow
+      \mbox{elim}]{q}{\ulcorner p \urcorner^{[2]}}}}
     }
     $%
   }
@@ -96,11 +96,11 @@ Disjunction}
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \implies q) \implies
     (\lnot p \lor q)}{
-      \infer[\mathrm{excluded middle}]{p \lor \lnot p}{\ulcorner p
+      \infer[\mbox{excluded middle}]{p \lor \lnot p}{\ulcorner p
       \implies q \urcorner^{[1]}} &
       \infer[\lor\textrm{-elim}^{[2]}]{\lnot p \lor
       q}{\infer[\lor\textrm{-intro-2}]{\lnot p \lor
-        q}{\infer[\Rightarrow \mathrm{elim}]{q}{\ulcorner p
+        q}{\infer[\Rightarrow \mbox{elim}]{q}{\ulcorner p
         \urcorner^{[2]}}} & \infer[\lor\textrm{-intro-1}]{\lnot p \lor
       q}{\ulcorner \lnot p \urcorner^{[2]}}}
     }

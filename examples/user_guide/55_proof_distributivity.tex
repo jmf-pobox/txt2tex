@@ -15,14 +15,13 @@
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \land (q \lor r)
     \implies (p \land q) \lor (p \land r)}{
-      \infer[\lor \mathrm{elim}]{(p \land q) \lor (p \land
+      \infer[\lor \mbox{elim}]{(p \land q) \lor (p \land
       r)}{\infer[\lor\textrm{-intro-1}]{(p \land q) \lor (p \land
-        r)}{\infer[\land \mathrm{intro}]{p \land
-          q}{\infer[\mathrm{from} \mathrm{case}]{q}{\infer[\mathrm{from}
-        above]{p}{}}}} & \infer[\lor\textrm{-intro-2}]{(p \land q) \lor
-        (p \land r)}{\infer[\land \mathrm{intro}]{p \land
-          r}{\infer[\mathrm{from} \mathrm{case}]{r}{\infer[\mathrm{from}
-      above]{p}{}}}}}
+        r)}{\infer[\land \mbox{intro}]{p \land q}{\infer[\mbox{from
+        case}]{q}{\infer[\mbox{from above}]{p}{}}}} &
+        \infer[\lor\textrm{-intro-2}]{(p \land q) \lor (p \land
+        r)}{\infer[\land \mbox{intro}]{p \land r}{\infer[\mbox{from
+      case}]{r}{\infer[\mbox{from above}]{p}{}}}}}
     }
     $%
   }

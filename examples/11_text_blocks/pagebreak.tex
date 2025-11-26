@@ -126,7 +126,7 @@ proof on a new page:
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land (p \implies q))
     \implies q}{
       \infer[\Rightarrow
-      \mathrm{elim}]{q}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p
+      \mbox{elim}]{q}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p
         \land (p \implies q) \urcorner^{[1]}} &
         \infer[\land\textrm{-elim-2}]{p \implies q}{\ulcorner p \land
       (p \implies q) \urcorner^{[1]}}}
@@ -151,8 +151,7 @@ $PAGEBREAK$
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \lor q) \land \lnot q
     \implies p}{
-      \infer[\lor
-      \mathrm{elim}]{p}{\infer[\land\textrm{-elim-2}]{\lnot
+      \infer[\lor \mbox{elim}]{p}{\infer[\land\textrm{-elim-2}]{\lnot
         q}{\infer[\land\textrm{-elim-1}]{p \lor q}{\ulcorner (p \lor q)
       \land \lnot q \urcorner^{[1]}}}}
     }
