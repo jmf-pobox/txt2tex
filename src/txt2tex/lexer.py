@@ -1097,8 +1097,11 @@ class Lexer:
                     # Z keywords that shouldn't trigger prose mode
                     z_keywords = {
                         "and",
+                        "land",  # Alternative spelling for and
                         "or",
+                        "lor",  # Alternative spelling for or
                         "not",
+                        "lnot",  # Alternative spelling for not
                         "union",
                         "intersect",
                         "in",
@@ -1200,10 +1203,10 @@ class Lexer:
             return Token(TokenType.LAMBDA, value, start_line, start_column)
 
         # Check for set operators (Phase 3, enhanced in Phase 7, Phase 11.5)
-        # Only accept "elem" for set membership (not "in" - see migration)
+        # Accept both "in" and "elem" for set membership
         if value == "notin":
             return Token(TokenType.NOTIN, value, start_line, start_column)
-        if value == "elem":
+        if value == "in" or value == "elem":
             return Token(TokenType.IN, value, start_line, start_column)
         if value == "subset" or value == "subseteq":
             return Token(TokenType.SUBSET, value, start_line, start_column)
