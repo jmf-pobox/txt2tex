@@ -58,7 +58,7 @@ TEXT: ASCII angle brackets are also supported:
 
 TEXT: Sequences can appear in various contexts:
 
-s in seq N
+s elem seq N
 
 # <>
 

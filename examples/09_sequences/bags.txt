@@ -48,6 +48,6 @@ TEXT: The bag [[a, a, a]] contains three copies of a
 
 TEXT: Bags can model collections where order doesn't matter but quantity does:
 
-coins in bag Coin
+coins elem bag Coin
 
-items in bag Item
+items elem bag Item
