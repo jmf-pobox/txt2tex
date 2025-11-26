@@ -26,6 +26,7 @@ Perfect for:
 - **Python 3.10+**
 - **LaTeX distribution** (TeX Live recommended)
 - **hatch** (for running commands)
+- **[fuzz](https://github.com/jmf-pobox/fuzz)** (optional but recommended for type checking)
 
 ```bash
 # Install hatch if needed
@@ -175,22 +176,22 @@ lnot (p land q)
 ### Basic Conversion
 
 ```bash
-# Convert txt to PDF
+# Convert txt to PDF (uses fuzz package by default)
 hatch run convert input.txt
 
 # Or use the shell script
 ./txt2pdf.sh input.txt
 ```
 
-### With Type Checking (fuzz)
+Fuzz is enabled by default, providing type checking that catches errors, undefined variables, and specification issues before you submit.
 
-Validate your Z notation with Mike Spivey's fuzz type checker:
+### Without fuzz (zed-* packages)
+
+If you prefer standard LaTeX packages without fuzz type checking:
 
 ```bash
-hatch run convert input.txt --fuzz
+hatch run convert input.txt --zed
 ```
-
-Fuzz catches type errors, undefined variables, and other specification issues before you submit.
 
 ### LaTeX Only (No PDF)
 
@@ -246,23 +247,23 @@ hatch run convert examples/01_propositional_logic/hello_world.txt
 
 ## LaTeX Output Options
 
-### Default: zed-* Packages
+### Default: fuzz Package
+
+The standard for Z notation with built-in type checking:
+- Custom Oxford fonts
+- Type validation during compilation
+- Compatible with fuzz-based toolchains
+
+**Note:** Fuzz doesn't support identifiers with underscores (use camelCase instead).
+
+### Optional: zed-* Packages
 
 Works on any LaTeX installation, no custom fonts needed:
 - Computer Modern fonts
 - Excellent proof tree support
 - Industry-standard Z notation rendering
 
-### Optional: fuzz Package
-
-Historical standard for Z notation with built-in type checking:
-- Custom Oxford fonts
-- Type validation during compilation
-- Compatible with fuzz-based toolchains
-
-Use `--fuzz` flag: `hatch run convert input.txt --fuzz`
-
-**Note:** Fuzz doesn't support identifiers with underscores (use camelCase instead).
+Use `--zed` flag: `hatch run convert input.txt --zed`
 
 ---
 
@@ -347,7 +348,14 @@ A few edge cases require workarounds:
 - **[docs/tutorials/00_getting_started.md](docs/tutorials/00_getting_started.md)** - First steps
 - **[docs/tutorials/01_propositional_logic.md](docs/tutorials/01_propositional_logic.md)** - Logic basics
 - **[docs/tutorials/02_predicate_logic.md](docs/tutorials/02_predicate_logic.md)** - Quantifiers and predicates
-- Plus 7 more tutorials covering sets, proof trees, relations, functions, sequences, schemas, and advanced topics
+- **[docs/tutorials/03_sets_and_types.md](docs/tutorials/03_sets_and_types.md)** - Sets and types
+- **[docs/tutorials/04_proof_trees.md](docs/tutorials/04_proof_trees.md)** - Proof trees
+- **[docs/tutorials/05_z_definitions.md](docs/tutorials/05_z_definitions.md)** - Z definitions
+- **[docs/tutorials/06_relations.md](docs/tutorials/06_relations.md)** - Relations
+- **[docs/tutorials/07_functions.md](docs/tutorials/07_functions.md)** - Functions
+- **[docs/tutorials/08_sequences.md](docs/tutorials/08_sequences.md)** - Sequences
+- **[docs/tutorials/09_schemas.md](docs/tutorials/09_schemas.md)** - Schemas
+- **[docs/tutorials/10_advanced.md](docs/tutorials/10_advanced.md)** - Advanced topics
 
 ### Development Documentation
 - **[docs/development/STATUS.md](docs/development/STATUS.md)** - Implementation status and roadmap
@@ -376,7 +384,7 @@ MIT
 
 ## Credits
 
-- **Mike Spivey** - fuzz package for Z notation type checking
+- **Mike Spivey** - [fuzz](https://github.com/jmf-pobox/fuzz) package for Z notation type checking
 - **Jim Davies** - zed-* packages for Z notation typesetting
 
 ---
