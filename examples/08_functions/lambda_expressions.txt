@@ -29,7 +29,7 @@ lambda x : N . x^2
 (b)
 TEXT: Multi-variable lambda
 
-lambda x, y : N . x and y
+lambda x, y : N . x land y
 
 (c)
 TEXT: Lambda with comparison
@@ -39,9 +39,9 @@ lambda x : N . x > 0
 (d)
 TEXT: Nested lambda expression
 
-lambda x : X . lambda y : Y . x and y
+lambda x : X . lambda y : Y . x land y
 
 (e)
 TEXT: Lambda with quantifier in body
 
-lambda x : X . forall y : Y | x or y
+lambda x : X . forall y : Y | x lor y
