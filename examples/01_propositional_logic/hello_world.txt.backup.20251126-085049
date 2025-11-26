@@ -1,0 +1,19 @@
+// ============================================================================
+// Example: Hello World - Your First txt2tex Formula
+// ============================================================================
+// Demonstrates:
+//   - The simplest possible txt2tex formula
+//   - Basic propositional logic operators (and, =>)
+//   - How txt2tex converts whiteboard notation to LaTeX
+//
+// Features:
+//   - Conjunction (and → ∧)
+//   - Implication (=> → ⇒)
+//
+// To compile:
+//   hatch run convert 01_propositional_logic/hello_world.txt
+//
+// See: docs/USER_GUIDE.md - Section "Propositional Logic"
+// ============================================================================
+
+p and q => r

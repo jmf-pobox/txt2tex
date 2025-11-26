@@ -8,15 +8,15 @@ end
 
 
 axdef
-  shows : F ShowId
-  show_episodes : ShowId +-> F EpisodeId
+  podcasts : F ShowId
+  podcast_episodes : ShowId +-> F EpisodeId
 where
-  shows subset dom show_episodes
+  podcasts subset dom podcast_episodes
 end
 
-TEXT: Later in document we can reference show_episodes globally:
+TEXT: Later in document we can reference podcast_episodes globally:
 
 zed
-  Answer == {s : dom show_episodes | # (show_episodes(s)) > 5}
+  Answer == {s : dom podcast_episodes | # (podcast_episodes(s)) > 5}
 end
 

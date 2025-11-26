@@ -2091,6 +2091,69 @@ Users are familiar with `<=> q and p [commutative]`
 
 Clear, actionable error messages more important than partial output in v1.
 
+### 6. ARGUE/EQUIV blocks: array vs argue environment ✅ RESOLVED
+
+**Decision**: Use standard LaTeX `array` environment, NOT fuzz's `argue` environment
+
+**Problem investigated**:
+- Fuzz provides an `argue` environment specifically for equivalence chains with justifications
+- Initial assumption was to use it for ARGUE/EQUIV blocks
+- However, argue has fundamental limitations that make it unsuitable
+
+**Root cause analysis**:
+
+The fuzz `argue` environment uses this definition:
+```tex
+\def\argue{\@zed \interzedlinepenalty=\interdisplaylinepenalty
+  \openup\@jot \halign to\linewidth\bgroup
+    \strut$\@zlign##$\hfil \tabskip=0pt plus1fil
+    &\hbox to0pt{\hss[\@zlign##\unskip]}\tabskip=0pt\cr
+    \noalign{\vskip-\@jot}}
+```
+
+Key issues:
+1. **Zero-width box for justifications**: `\hbox to0pt{\hss[...]}` places justifications in zero-width boxes
+2. **No column spacing**: No mechanism for minimum spacing between expression and justification columns
+3. **Result**: When both expressions and justifications are long, they overlap with no whitespace
+4. **Cannot be scaled**: The raw `\halign` construct is incompatible with `adjustbox` (requires LR mode, but `\halign` expects display math mode)
+
+**Attempted fixes**:
+- Created `argue-fixed.sty` that replaces `\hbox to0pt{\hss[...]}` with `\hspace{2em}[...]`
+- This fixed the spacing issue (2em guaranteed between columns)
+- But scaling with `adjustbox{max width=\textwidth}` still fails due to `\halign` mode incompatibility
+- Tried `\resizebox + minipage` wrapper but requires guessing content width (no conditional scaling)
+
+**Array solution**:
+```latex
+\adjustbox{max width=\textwidth}{%
+  $\displaystyle
+  \begin{array}{l@{\hspace{2em}}r}
+    expression & [justification] \\
+    \Leftrightarrow expression & [justification]
+  \end{array}$%
+}
+```
+
+Advantages:
+- `@{\hspace{2em}}` provides guaranteed 2em spacing between columns
+- `adjustbox` works perfectly (conditional scaling only when needed)
+- Standard LaTeX - no dependency on modified fuzz packages
+- All 1199 tests pass
+
+**Where adjustbox is critical**:
+
+We use `adjustbox{max width=...}` in three places where content width is unpredictable:
+
+1. **Truth tables** (line 3058 in latex_gen.py): Multi-column truth tables with complex headers
+2. **ARGUE/EQUIV blocks** (line 3236): Long expressions AND long justifications
+3. **Proof trees** (line 3809): Wide inference rules with multiple premises
+
+In all cases, `adjustbox` provides **conditional scaling** - it measures natural content width and only scales down if needed to fit page margins. This maintains readability while preventing overflow.
+
+The argue environment's use of raw `\halign` makes this impossible - it cannot be measured or wrapped in adjustbox. This was the deciding factor for using array instead.
+
+**Conclusion**: The array-based approach is the correct solution. The argue environment, while designed for equivalence chains, has fundamental architectural limitations that prevent proper overflow handling in modern LaTeX documents.
+
 ## Future Enhancements
 
 1. **LSP (Language Server Protocol)**

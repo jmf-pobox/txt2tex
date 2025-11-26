@@ -127,3 +127,23 @@ class TestNamedFieldProjection:
 
         # Should be identical (works in both modes)
         assert latex_std == latex_fuzz
+
+    def test_field_projection_on_function_app_in_quantifier(self) -> None:
+        """Regression test for GitHub issue #13.
+
+        Field projection on function applications like f(i).length was
+        incorrectly parsed as bullet separator (f(i) @ length) when inside
+        quantifier bodies.
+        """
+        # Test the specific case from the bug report
+        result = parse_expr("forall i : N | f(i).length > 0")
+
+        # The body should contain f(i).length, not f(i) @ length
+        assert not isinstance(result, Document)
+        gen = LaTeXGenerator(use_fuzz=True)
+        latex = gen.generate_expr(result)
+
+        # Should have proper field projection
+        assert "f(i).length" in latex
+        # Should NOT have bullet separator where field projection should be
+        assert "f(i) @" not in latex

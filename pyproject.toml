@@ -35,6 +35,8 @@ dependencies = [
     # Complexity metrics
     "radon>=6.0.1",
     "xenon>=0.9.1",
+    # Migration script
+    "anthropic>=0.40.0",
 ]
 
 [tool.hatch.envs.default.scripts]

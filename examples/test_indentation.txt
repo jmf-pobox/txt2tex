@@ -15,7 +15,7 @@ axdef
   policy : P1 RESOURCE -> RESOURCE
 where
   forall S : P1 RESOURCE |
-    policy(S) in S and
+    policy(S) in S land
     S subset RESOURCE
 end
 

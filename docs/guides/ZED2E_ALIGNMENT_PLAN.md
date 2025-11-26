@@ -221,10 +221,10 @@ From zed2e.pdf analysis, here are ALL reserved words, commands, and environments
 | `axdef` | ✅ Implemented | - | Axiomatic definitions |
 | `gendef` | ✅ Implemented | - | Generic definitions |
 | `zed` | ✅ Implemented | - | Unboxed paragraphs |
-| `schema*` | ❌ Missing | ⭐⭐ Medium | Anonymous schema boxes |
+| `schema*` | ✅ Implemented | - | Anonymous schema boxes (supported as unnamed schema blocks) |
 | `syntax` | ✅ Implemented | - | Large free type definitions with alignment (Phase 28, Nov 2025) |
-| `argue` | ❌ Missing | ⭐⭐ Medium | Multi-line equational reasoning |
-| `infrule` | ❌ Missing | ⭐ Low | Inference rules (proof trees alternative) |
+| `argue` | ✅ NOT USING | - | Multi-line equational reasoning - **RESOLVED: Using array instead** (see DESIGN.md §6) |
+| `infrule` | ✅ Implemented | - | Inference rules (Phase Nov 2025) |
 
 #### Special Commands (must support all)
 
@@ -235,8 +235,8 @@ From zed2e.pdf analysis, here are ALL reserved words, commands, and environments
 | `\t1`, `\t2`, ... `\tn` | ✅ Implemented | - | Indentation hints (Phase 1, Nov 2025) |
 | `~` | ✅ Implemented | - | Spacing hint (thin space) - in set comprehensions, function application, given types |
 | `\\` | ✅ Implemented | - | Line breaks (automatic, Phase 1, Nov 2025) |
-| `\derive` | ❌ Missing | ⭐ Low | Horizontal line in inference rules |
-| `\shows` | ❌ Missing | ⭐ Low | Turnstile in inference rules |
+| `\derive` | ✅ Implemented | - | Horizontal line in inference rules (Phase 42, Nov 2025) |
+| `\shows` | ✅ Implemented | - | Turnstile in inference rules (Phase 42, Nov 2025) |
 
 #### Z Language Keywords (zed2e LaTeX commands)
 
@@ -370,50 +370,116 @@ end
 
 ---
 
-#### 3. `argue` Environment (MEDIUM PRIORITY)
+#### 3. `argue` Environment ✅ **RESOLVED - NOT USING**
 
 **Purpose**: Multi-line equational reasoning with justifications
 
-**zed2e Example**:
+**Investigation** (November 2025):
+- Investigated using fuzz's `argue` environment for ARGUE/EQUIV blocks
+- **Root cause discovered**: `argue` uses `\hbox to0pt` (zero-width boxes) for justifications, causing overlap when both expressions and justifications are wide
+- **Scaling problem**: The `\halign` construct is incompatible with `adjustbox` (requires LR mode, `\halign` expects display math mode)
+- **Attempted fix**: Created `argue-fixed.sty` with `\hspace{2em}` spacing, but still couldn't scale with adjustbox
+
+**Decision**: ✅ **Use standard LaTeX `array` environment instead**
+
+**Implementation**:
 ```latex
-\begin{argue}
-S \dres (T \dres R) \\
-\t1 = \id S \comp \id T \comp R \\
-\t1 = \id (S \cap T) \comp R & law about $\id$ \\
-\t1 = (S \cap T) \dres R.
-\end{argue}
+\adjustbox{max width=\textwidth}{%
+  $\displaystyle
+  \begin{array}{l@{\hspace{2em}}r}
+    expression & [justification] \\
+    \Leftrightarrow expression & [justification]
+  \end{array}$%
+}
 ```
 
-**Why we need it**:
-- Alternative to `EQUIV:` blocks
-- Better for long left-hand sides
-- Optional justifications in second column (with `&`)
+**Advantages**:
+- ✅ Guaranteed 2em spacing between columns (`@{\hspace{2em}}`)
+- ✅ Works with `adjustbox` for conditional scaling
+- ✅ Standard LaTeX - no modified packages needed
+- ✅ All 1199 tests pass
 
-**txt2tex equivalent**: Our `EQUIV:` blocks already handle this use case
-
-**Decision**: ⚠️ Low priority - our `EQUIV:` syntax is simpler and covers the same use case
+**Documentation**: See DESIGN.md §6 for complete analysis and rationale
 
 ---
 
-#### 4. `infrule` Environment (LOW PRIORITY)
+#### 4. `infrule` Environment ✅ **IMPLEMENTED**
 
 **Purpose**: Inference rules for natural deduction
 
-**zed2e Example**:
+**Status**: Fully implemented (November 2025)
+
+**txt2tex syntax**:
+```
+INFRULE:
+premise1 [label1]
+premise2 [label2]
+---
+conclusion [label]
+```
+
+**Generated LaTeX**:
 ```latex
 \begin{infrule}
-\Gamma \shows P
-\derive[x \notin freevars(\Gamma)]
-\Gamma \shows \forall x @ P
+  premise1 & label1 \\
+  premise2 & label2
+\derive
+  conclusion & label
 \end{infrule}
 ```
 
-**Why we might skip it**:
-- Our `PROOF:` trees use different formatting
-- Inference rules are less common than proof trees
-- zed-specific display style (not standard in textbooks)
+**Features**:
+- Two-column format (expression & label)
+- `---` separator generates `\derive` (horizontal line)
+- Optional labels in brackets
+- Works with adjustbox for wide rules
 
-**Decision**: ⚠️ Low priority - our proof tree syntax is better for pedagogical use
+**Tests**: 8 passing tests in test_infrule.py
+**Documentation**: USER_GUIDE.md (INFRULE section)
+
+---
+
+## Current Implementation Status (November 2025)
+
+### Summary: 7 of 8 Environments Implemented
+
+| Environment | Status | Notes |
+|-------------|--------|-------|
+| `schema` | ✅ Complete | Named and anonymous schemas |
+| `axdef` | ✅ Complete | Axiomatic definitions |
+| `gendef` | ✅ Complete | Generic definitions |
+| `zed` | ✅ Complete | Unboxed paragraphs, consolidation with `\also` |
+| `syntax` | ✅ Complete | Large free type definitions with alignment |
+| `infrule` | ✅ Complete | Inference rules |
+| `argue` | ✅ Resolved | Using `array` instead (see DESIGN.md §6) |
+| `schema*` | ✅ Complete | Anonymous schema boxes (unnamed schemas) |
+
+**Result**: All 8 environments either implemented or resolved with better alternatives.
+
+### Phase Completion
+
+| Phase | Status | Deliverables |
+|-------|--------|--------------|
+| Phase 1 (Weeks 1-2) | ✅ Complete | Auto line breaking, `\also`, `\t` indentation |
+| Phase 2 (Keywords) | ⚠️ Deferred | `and`→`land` migration (needs LLM-based approach) |
+| Phase 3 Part 1 (Weeks 5-6) | ✅ Complete | `~` spacing hints, zed consolidation |
+| Phase 3 Part 2 (Weeks 7-8) | ✅ Complete | `syntax` environment, `\bsup`/`\esup` |
+| Phase 3 Part 3 | 🔄 Partial | Smart line breaking (pending), config system (pending) |
+
+### Remaining Work
+
+**High Priority**:
+- None - all critical features implemented
+
+**Medium Priority**:
+- Schema calculus operators (`\hide`, `\project`, `\pre`) - only if requested
+- Configuration system (`.txt2tex.toml`) - nice to have
+- Smart auto line breaking - nice to have
+
+**Low Priority / Deferred**:
+- Keyword migration (`and`→`land`) - needs better approach
+
+**Status**: Project is **feature-complete** for all homework solutions (100% coverage, 1199 tests passing)
 
 ---
 

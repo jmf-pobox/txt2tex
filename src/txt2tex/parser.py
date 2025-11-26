@@ -30,6 +30,7 @@ from txt2tex.ast_nodes import (
     GuardedBranch,
     GuardedCases,
     Identifier,
+    InfruleBlock,
     Lambda,
     LatexBlock,
     Number,
@@ -418,6 +419,7 @@ class Parser:
             TokenType.CONTENTS,
             TokenType.PARTS,
             TokenType.ARGUE,  # Both EQUIV: and ARGUE: map to this token
+            TokenType.INFRULE,
             TokenType.GIVEN,
             TokenType.AXDEF,
             TokenType.GENDEF,
@@ -593,6 +595,8 @@ class Parser:
             return self._parse_truth_table()
         if self._match(TokenType.ARGUE):  # Handles both EQUIV: and ARGUE: keywords
             return self._parse_argue_chain()
+        if self._match(TokenType.INFRULE):
+            return self._parse_infrule_block()
         if self._match(TokenType.GIVEN):
             return self._parse_given_type()
         if self._match(TokenType.AXDEF):
@@ -809,7 +813,7 @@ class Parser:
         result = re.sub(r"\s*\(\s*", "(", result)  # Remove space before/after (
         result = re.sub(r"\s*\)\s*", ")", result)  # Remove space before/after )
         result = re.sub(r"\s*=\s*", "=", result)  # Remove space around =
-        result = re.sub(r"\s*,\s*", ",", result)  # Remove space around ,
+        result = re.sub(r"\s*,", ",", result)  # Remove space BEFORE comma only
 
         # DO NOT touch < or > as they appear in many operators (=>, ->>, etc.)
         # Sequences like <ple> will have internal spacing, but that's acceptable
@@ -1042,6 +1046,106 @@ class Parser:
             )
 
         return ArgueChain(steps=steps, line=start_token.line, column=start_token.column)
+
+    def _parse_infrule_block(self) -> InfruleBlock:
+        """Parse INFRULE: block with premises, ---, and conclusion.
+
+        Format:
+          INFRULE:
+          premise1 [label1]
+          premise2 [label2]
+          ---
+          conclusion [label]
+        """
+        start_token = self._advance()  # Consume 'INFRULE:'
+        self._skip_newlines()
+
+        premises: list[tuple[Expr, str | None]] = []
+
+        # Parse premises until we hit ---
+        while not self._at_end() and not self._match(TokenType.DERIVE):
+            # Check if we hit another structural token (error)
+            if self._is_structural_token():
+                raise ParserError(
+                    "Expected '---' separator in INFRULE block", self._current()
+                )
+
+            # Parse premise expression
+            expr = self._parse_expr()
+            self._skip_newlines()
+
+            # Check for optional label [text]
+            label: str | None = None
+            if self._match(TokenType.LBRACKET):
+                self._advance()  # Consume '['
+
+                # Collect label text (all tokens until ']')
+                label_parts: list[str] = []
+                while not self._match(TokenType.RBRACKET) and not self._at_end():
+                    if self._match(TokenType.NEWLINE):
+                        break  # Label on one line
+                    label_parts.append(self._current().value)
+                    self._advance()
+
+                if not self._match(TokenType.RBRACKET):
+                    raise ParserError("Expected closing ']' for label", self._current())
+
+                self._advance()  # Consume ']'
+                label = self._smart_join_justification(label_parts)
+
+            premises.append((expr, label))
+            self._skip_newlines()
+
+        # Check for --- separator
+        if not self._match(TokenType.DERIVE):
+            raise ParserError(
+                "Expected '---' separator in INFRULE block", self._current()
+            )
+
+        self._advance()  # Consume '---'
+        self._skip_newlines()
+
+        # Parse conclusion expression
+        if self._at_end() or self._is_structural_token():
+            raise ParserError(
+                "Expected conclusion after '---' in INFRULE block", self._current()
+            )
+
+        conclusion_expr = self._parse_expr()
+        self._skip_newlines()
+
+        # Check for optional label [text]
+        conclusion_label: str | None = None
+        if self._match(TokenType.LBRACKET):
+            self._advance()  # Consume '['
+
+            # Collect label text
+            conclusion_label_parts: list[str] = []
+            while not self._match(TokenType.RBRACKET) and not self._at_end():
+                if self._match(TokenType.NEWLINE):
+                    break
+                conclusion_label_parts.append(self._current().value)
+                self._advance()
+
+            if not self._match(TokenType.RBRACKET):
+                raise ParserError(
+                    "Expected closing ']' for conclusion label", self._current()
+                )
+
+            self._advance()  # Consume ']'
+            conclusion_label = self._smart_join_justification(conclusion_label_parts)
+
+        if not premises:
+            raise ParserError(
+                "Expected at least one premise in INFRULE block", self._current()
+            )
+
+        return InfruleBlock(
+            premises=premises,
+            conclusion=(conclusion_expr, conclusion_label),
+            line=start_token.line,
+            column=start_token.column,
+        )
 
     def _parse_expr(self) -> Expr:
         """Parse expression (entry point)."""
@@ -2126,6 +2230,7 @@ class Parser:
             TokenType.GREATER_EQUAL,
             TokenType.EQUALS,
             TokenType.NOT_EQUAL,
+            TokenType.SHOWS,
         ):
             # Found comparison operator, consume it
             op_token = self._advance()
@@ -2580,7 +2685,16 @@ class Parser:
                             TokenType.IFF,
                         )
 
-                        if is_bullet_indicator or not isinstance(base, Identifier):
+                        # Allow field projection on safe base types that can have fields
+                        # (GitHub issue #13: FunctionApp and TupleProjection are safe)
+                        safe_projection_bases = (
+                            Identifier,
+                            FunctionApp,
+                            TupleProjection,
+                        )
+                        if is_bullet_indicator or not isinstance(
+                            base, safe_projection_bases
+                        ):
                             # Likely bullet separator - break
                             break
 

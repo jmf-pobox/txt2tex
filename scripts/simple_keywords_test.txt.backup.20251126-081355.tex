@@ -1,0 +1,63 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Keyword Migration Test}
+
+\section*{Formula 1}
+\addcontentsline{toc}{section}{Formula 1}
+
+\noindent
+$p \land q \implies p$
+
+\section*{Formula 2}
+\addcontentsline{toc}{section}{Formula 2}
+
+\noindent
+$p \lor q \implies \lnot (\lnot p \land \lnot q)$
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    \begin{tabular}{c|c|c|c|c}
+      $p$ & $q$ & $p \land q$ & $p \lor q$ & $\mathbf{\lnot p}$ \\
+      \hline
+      \textit{t} & \textit{t} & \textit{t} & \textit{t} & \textbf{f} \\
+      \textit{t} & \textit{f} & \textit{f} & \textit{t} & \textbf{f} \\
+      \textit{f} & \textit{t} & \textit{f} & \textit{t} & \textbf{t} \\
+      \textit{f} & \textit{f} & \textit{f} & \textit{f} & \textbf{t} \\
+    \end{tabular}%
+  }
+\end{center}
+\bigskip
+
+\begin{center}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      p \land (q \lor r) \\
+      \Leftrightarrow (p \land q) \lor (p \land r)
+    \end{array}$%
+  }
+\end{center}
+\bigskip
+
+\noindent This is English prose with and, or, not that should be kept.
+
+\bigskip
+
+\begin{axdef}
+  x : ZZ \\
+  y : ZZ
+  \where
+  x > 0 \land y > 0
+\end{axdef}
+
+\end{document}

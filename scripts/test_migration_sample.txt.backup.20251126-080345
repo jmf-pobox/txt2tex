@@ -1,0 +1,35 @@
+// Test file for keyword migration
+// Contains both mathematical expressions and English prose
+
+TEXT: This is a simple example and demonstration of the migration tool.
+TEXT: The system should not replace English words in prose text.
+
+// Mathematical expression - should be migrated
+p and q => p
+
+TRUTH TABLE:
+p | q | p and q | p or q | not p
+T | T | T       | T      | F
+T | F | F       | T      | F
+F | T | F       | T      | T
+F | F | F       | F      | T
+
+EQUIV:
+p and (q or r)
+<=> (p and q) or (p and r) [distributivity]
+<=> not (not p or (not q and not r)) [De Morgan]
+
+TEXT: The formula p or q is a disjunction, and the formula not p is a negation.
+TEXT: Both formulas are important concepts in propositional logic.
+
+axdef
+  validPassword : P String
+where
+  forall pw : String |
+    pw in validPassword <=>
+      # pw >= 8 and
+      (exists d : 0..9 | intToString(d) in pw) and
+      not (pw = "password" or pw = "12345678")
+end
+
+TEXT: Note that the password must be strong and secure, not weak or common.

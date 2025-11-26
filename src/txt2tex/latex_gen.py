@@ -26,6 +26,7 @@ from txt2tex.ast_nodes import (
     GuardedBranch,
     GuardedCases,
     Identifier,
+    InfruleBlock,
     Lambda,
     LatexBlock,
     Number,
@@ -74,7 +75,9 @@ class LaTeXGenerator:
     BINARY_OPS: ClassVar[dict[str, str]] = {
         # Propositional logic
         "and": r"\land",
+        "land": r"\land",  # LaTeX-style alternative to "and"
         "or": r"\lor",
+        "lor": r"\lor",  # LaTeX-style alternative to "or"
         "=>": r"\Rightarrow",
         "<=>": r"\Leftrightarrow",
         # Comparison operators (Phase 3, enhanced in Phase 7)
@@ -85,8 +88,11 @@ class LaTeXGenerator:
         "=": r"=",
         "!=": r"\neq",
         "/=": r"\neq",  # Z notation slash negation (Phase 16+)
+        # Sequent judgment
+        "shows": r"\shows",  # Turnstile (⊢)
         # Set operators (Phase 3, enhanced in Phase 7, Phase 11.5)
         "in": r"\in",
+        "elem": r"\in",  # LaTeX-style alternative to "in"
         "notin": r"\notin",
         "/in": r"\notin",  # Z notation slash negation (Phase 16+)
         "subset": r"\subseteq",
@@ -136,6 +142,7 @@ class LaTeXGenerator:
 
     UNARY_OPS: ClassVar[dict[str, str]] = {
         "not": r"\lnot",
+        "lnot": r"\lnot",  # LaTeX-style alternative to "not"
         "-": r"-",  # Unary negation (Phase 16)
         "#": r"\#",  # Cardinality (Phase 8)
         # Relation functions (Phase 10a)
@@ -445,6 +452,8 @@ class LaTeXGenerator:
             return self._generate_truth_table(item)
         if isinstance(item, ArgueChain):
             return self._generate_argue_chain(item)
+        if isinstance(item, InfruleBlock):
+            return self._generate_infrule_block(item)
         if isinstance(item, GivenType):
             return self._generate_given_type(item)
         if isinstance(item, FreeType):
@@ -2548,11 +2557,15 @@ class LaTeXGenerator:
             paren_text = result[start_pos:end_pos]
 
             # Only process if it contains logical operators or keywords
-            # Look for: or, and, not, =>, <=>
+            # Look for: or, and, not, lor, land, lnot, elem, =>, <=>
             has_logic = bool(
                 re.search(r"\bor\b", paren_text)
                 or re.search(r"\band\b", paren_text)
                 or re.search(r"\bnot\b", paren_text)
+                or re.search(r"\blor\b", paren_text)
+                or re.search(r"\bland\b", paren_text)
+                or re.search(r"\blnot\b", paren_text)
+                or re.search(r"\belem\b", paren_text)
                 or "=>" in paren_text
                 or "<=>" in paren_text
             )
@@ -2573,6 +2586,32 @@ class LaTeXGenerator:
             except Exception:
                 # Parsing failed, leave as-is (might be prose)
                 pass
+
+        # Pattern -0.3: Standalone logical keywords (lor, land, lnot, elem)
+        # These should ALWAYS render as symbols, never as literal text
+        # Match whole words only (use word boundaries)
+        standalone_keywords = {
+            r"\blor\b": "$\\lor$",
+            r"\bland\b": "$\\land$",
+            r"\blnot\b": "$\\lnot$",
+            r"\belem\b": "$\\in$",
+        }
+
+        for pattern, replacement in standalone_keywords.items():
+            # Find all matches and replace from right to left (to preserve positions)
+            matches = list(re.finditer(pattern, result))
+            for match in reversed(matches):
+                start_pos = match.start()
+                end_pos = match.end()
+
+                # Check if already in math mode
+                before = result[:start_pos]
+                dollars_before = before.count("$")
+                if dollars_before % 2 == 1:
+                    continue  # Already in math mode
+
+                # Replace with math mode wrapped keyword
+                result = result[:start_pos] + replacement + result[end_pos:]
 
         # Pattern 0: Standalone superscripts (MUST come before other patterns)
         # Match: identifier/number followed by ^ and exponent
@@ -2817,6 +2856,40 @@ class LaTeXGenerator:
         type_expr_part = r"(" + type_word + type_continuation + r")"
         type_decl_pattern = r"\b([a-zA-Z_]\w*)\s*:\s*" + type_expr_part
 
+        # Words that appear BEFORE colons in prose (not type declarations)
+        # These are section/label words that introduce explanatory text
+        prose_intro_words = {
+            "proof",
+            "theorem",
+            "induction",
+            "example",
+            "note",
+            "strategy",
+            "hint",
+            "warning",
+            "remark",
+            "observation",
+            "claim",
+            "lemma",
+            "corollary",
+            "definition",
+            "assumption",
+            "goal",
+            "objective",
+            "result",
+            "conclusion",
+            "summary",
+            "overview",
+            "introduction",
+            "background",
+            "context",
+            "constructive",
+            "non",
+            "strong",
+            "main",
+            "base",
+        }
+
         matches = list(re.finditer(type_decl_pattern, result))
         for match in reversed(matches):
             start_pos = match.start()
@@ -2827,6 +2900,13 @@ class LaTeXGenerator:
             dollars_before = before.count("$")
             if dollars_before % 2 == 1:
                 continue  # Already in math mode
+
+            # Extract the identifier (word before colon)
+            identifier = match.group(1).lower()
+
+            # Skip if identifier is a prose intro word (like "proof:", "theorem:")
+            if identifier in prose_intro_words:
+                continue
 
             # Extract the matched expression
             expr = match.group(0)
@@ -3206,17 +3286,33 @@ class LaTeXGenerator:
         return result
 
     def _generate_argue_chain(self, node: ArgueChain) -> list[str]:
-        r"""Generate LaTeX for argue chain using fuzz's argue environment.
+        r"""Generate LaTeX for equivalence chain using array environment.
 
         Both EQUIV: and ARGUE: keywords generate this output (EQUIV is alias).
-        Uses fuzz's argue environment which provides automatic line width handling
-        via \halign to\linewidth and better page breaking via \interdisplaylinepenalty.
-        No adjustbox wrapper needed - argue handles margins natively.
+        Uses standard LaTeX array instead of argue environment for better control.
+        Wraps array in display math \[...\] for proper spacing. Centers the block
+        and right-aligns justifications. Auto-scales if wider than page.
         """
         lines: list[str] = []
 
-        # argue environment handles margins automatically - no adjustbox needed
-        lines.append(r"\begin{argue}")
+        # Calculate available width and setup positioning
+        if self._in_inline_part:
+            # Inside part with leftskip: skip centering, align naturally
+            lines.append(r"\savedleftskip=\leftskip")
+            max_width = r"\dimexpr\textwidth-\savedleftskip\relax"
+            # Just prevent extra indentation - leftskip handles positioning
+            lines.append(r"\noindent")
+        else:
+            # Normal context: use centering
+            max_width = r"\textwidth"
+            lines.append(r"\begin{center}")
+
+        # Wrap in adjustbox to scale if wider than available width
+        lines.append(r"\adjustbox{max width=" + max_width + r"}{%")
+
+        lines.append(r"$\displaystyle")
+        # Use l@{\hspace{2em}}r: left-aligned expressions, right-aligned justifications
+        lines.append(r"\begin{array}{l@{\hspace{2em}}r}")
 
         # Set context for line break formatting
         self._in_equiv_block = True
@@ -3225,16 +3321,14 @@ class LaTeXGenerator:
         for i, step in enumerate(node.steps):
             expr_latex = self.generate_expr(step.expression)
 
+            # No leading & - start directly with expression for flush left
             # First step: expression; subsequent: \Leftrightarrow expression
-            line = "  " + (expr_latex if i == 0 else r"\Leftrightarrow " + expr_latex)
+            line = expr_latex if i == 0 else r"\Leftrightarrow " + expr_latex
 
-            # Column separator
-            line += " &"
-
-            # Add justification if present, or empty column
+            # Add justification if present (flush right)
             if step.justification:
                 escaped_just = self._escape_justification(step.justification)
-                line += r" \mbox{" + escaped_just + "}"
+                line += r" & [\mbox{" + escaped_just + "}]"
 
             # Add line break except for last line
             if i < len(node.steps) - 1:
@@ -3245,7 +3339,57 @@ class LaTeXGenerator:
         # Reset context
         self._in_equiv_block = False
 
-        lines.append(r"\end{argue}")
+        lines.append(r"\end{array}$%")
+        # Close adjustbox wrapper
+        lines.append(r"}")
+        # Close center environment (only if we opened it)
+        if not self._in_inline_part:
+            lines.append(r"\end{center}")
+        # Add trailing spacing for separation from following content
+        lines.append(r"\bigskip")
+        lines.append("")
+
+        return lines
+
+    def _generate_infrule_block(self, node: InfruleBlock) -> list[str]:
+        r"""Generate LaTeX for infrule block.
+
+        Uses fuzz's infrule environment with premises, \derive separator,
+        and conclusion. Two-column format: expression & label.
+        """
+        lines: list[str] = []
+
+        lines.append(r"\begin{infrule}")
+
+        # Generate premises
+        for premise_expr, label in node.premises:
+            expr_latex = self.generate_expr(premise_expr)
+            line = "  " + expr_latex + " &"
+
+            # Add label if present
+            if label:
+                escaped_label = self._escape_justification(label)
+                line += r" \mbox{" + escaped_label + "}"
+
+            line += r" \\"
+            lines.append(line)
+
+        # Add \derive separator
+        lines.append(r"  \derive \\")
+
+        # Generate conclusion
+        conclusion_expr, conclusion_label = node.conclusion
+        conclusion_latex = self.generate_expr(conclusion_expr)
+        line = "  " + conclusion_latex + " &"
+
+        # Add label if present
+        if conclusion_label:
+            escaped_label = self._escape_justification(conclusion_label)
+            line += r" \mbox{" + escaped_label + "}"
+
+        lines.append(line)
+
+        lines.append(r"\end{infrule}")
         lines.append("")
 
         return lines
@@ -4368,10 +4512,13 @@ class LaTeXGenerator:
             op_latex = op_latex.replace("++", r"\oplus")
             op_latex = op_latex.replace("o9", r"\circ")
 
-            # Word-based operators
-            op_latex = re.sub(r"\band\b", r"\\land", op_latex)
-            op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)
-            op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)
+            # Word-based operators (both English and L-prefixed forms)
+            op_latex = re.sub(r"\bland\b", r"\\land", op_latex)  # land → \land
+            op_latex = re.sub(r"\blor\b", r"\\lor", op_latex)  # lor → \lor
+            op_latex = re.sub(r"\blnot\b", r"\\lnot", op_latex)  # lnot → \lnot
+            op_latex = re.sub(r"\band\b", r"\\land", op_latex)  # and → \land
+            op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)  # or → \lor
+            op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)  # not → \lnot
             op_latex = re.sub(r"\bin\b", r"\\in", op_latex)  # Set membership
             op_latex = re.sub(r"\bdom\b", r"\\dom", op_latex)
             op_latex = re.sub(r"\bran\b", r"\\ran", op_latex)
@@ -4432,10 +4579,13 @@ class LaTeXGenerator:
             op_latex = op_latex.replace("++", r"\oplus")
             op_latex = op_latex.replace("o9", r"\circ")
 
-            # Word-based operators
-            op_latex = re.sub(r"\band\b", r"\\land", op_latex)
-            op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)
-            op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)
+            # Word-based operators (both English and L-prefixed forms)
+            op_latex = re.sub(r"\bland\b", r"\\land", op_latex)  # land → \land
+            op_latex = re.sub(r"\blor\b", r"\\lor", op_latex)  # lor → \lor
+            op_latex = re.sub(r"\blnot\b", r"\\lnot", op_latex)  # lnot → \lnot
+            op_latex = re.sub(r"\band\b", r"\\land", op_latex)  # and → \land
+            op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)  # or → \lor
+            op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)  # not → \lnot
             op_latex = re.sub(r"\bin\b", r"\\in", op_latex)  # Set membership
             op_latex = re.sub(r"\bdom\b", r"\\dom", op_latex)
             op_latex = re.sub(r"\bran\b", r"\\ran", op_latex)
@@ -4486,10 +4636,13 @@ class LaTeXGenerator:
         result = result.replace("++", r"\oplus")
         result = result.replace("o9", r"\circ")
 
-        # Word-based operators
-        result = re.sub(r"\band\b", r"\\land", result)
-        result = re.sub(r"\bor\b", r"\\lor", result)
-        result = re.sub(r"\bnot\b", r"\\lnot", result)
+        # Word-based operators (both English and L-prefixed forms)
+        result = re.sub(r"\bland\b", r"\\land", result)  # land → \land
+        result = re.sub(r"\blor\b", r"\\lor", result)  # lor → \lor
+        result = re.sub(r"\blnot\b", r"\\lnot", result)  # lnot → \lnot
+        result = re.sub(r"\band\b", r"\\land", result)  # and → \land
+        result = re.sub(r"\bor\b", r"\\lor", result)  # or → \lor
+        result = re.sub(r"\bnot\b", r"\\lnot", result)  # not → \lnot
         result = re.sub(r"\bin\b", r"\\in", result)  # Set membership
         result = re.sub(r"\bdom\b", r"\\dom", result)
         result = re.sub(r"\bran\b", r"\\ran", result)
@@ -4505,9 +4658,57 @@ class LaTeXGenerator:
         result = re.sub(r"\bemptyset\b", r"\\emptyset", result)  # emptyset → ∅
         result = re.sub(r"\bforall\b", r"\\forall", result)  # forall → ∀
 
-        # Already in math mode - don't need extra wrapping
-        # Just use \mathrm{} for text parts to get roman font
-        for word in [
+        # Wrap ALL remaining text sequences in \mathrm{} for proper spacing
+        # In math mode, spaces between letters are ignored, so we must wrap
+        # text phrases to preserve word spacing.
+        #
+        # Strategy: Find sequences of words (letters/digits/underscores + spaces)
+        # that aren't LaTeX commands (not preceded by \) and wrap them.
+        # This handles phrases like "inductive hypothesis", "strong IH", etc.
+        result = self._wrap_text_in_mathrm(result)
+
+        return result
+
+    def _wrap_text_in_mathrm(self, text: str) -> str:
+        """Wrap non-operator text sequences in \\mathrm{} for proper math mode spacing.
+
+        In math mode, spaces between bare letters are ignored. This function
+        identifies text segments (between operators/symbols) and wraps them
+        in \\mathrm{} to preserve word spacing.
+
+        Examples:
+        - "inductive hypothesis" → "\\mathrm{inductive hypothesis}"
+        - "\\land intro" → "\\land \\mathrm{intro}"
+        - "strong IH, a < n" → "\\mathrm{strong IH}, a < n"
+        """
+        # Pattern: Match sequences of words (with spaces between them)
+        # that are NOT LaTeX commands (not preceded by \)
+        # A "text segment" is: word (optional: space + word)*
+        # where word = [a-zA-Z_][a-zA-Z0-9_]*
+        #
+        # We need to be careful not to match:
+        # - LaTeX commands like \land, \mathrm{}, etc.
+        # - Single letters that are math variables (like a, b, n)
+        # - Numbers that are math
+        #
+        # Strategy: Find word sequences of 2+ words OR single words that are
+        # clearly text (not single letters, not LaTeX commands)
+
+        # First, handle multi-word sequences (these are definitely text)
+        # Pattern: word + (space + word)+  (2 or more words with spaces)
+        # Use lookbehind to exclude matches inside LaTeX commands like \lor
+        # (?<![a-zA-Z\\]) ensures we don't start inside a command or word
+        word = r"[a-zA-Z_][a-zA-Z0-9_]*"
+        multi_word_pattern = rf"(?<![a-zA-Z\\])({word}(?:\s+{word})+)"
+
+        def wrap_multi(m: re.Match[str]) -> str:
+            return f"\\mathrm{{{m.group(1)}}}"
+
+        text = re.sub(multi_word_pattern, wrap_multi, text)
+
+        # Then handle known single-word text that should be wrapped
+        # (rule names, common justification words)
+        text_words = [
             "elim",
             "intro",
             "assumption",
@@ -4518,8 +4719,63 @@ class LaTeXGenerator:
             "middle",
             "excluded",
             "false",
-        ]:
-            # Replace text words with \mathrm{} for roman font in math mode
-            result = re.sub(rf"\b{word}\b", rf"\\mathrm{{{word}}}", result)
+            "definition",
+            "substitution",
+            "arithmetic",
+            "algebra",
+            "factoring",
+            "equality",
+            "trivial",
+            "singleton",
+            "factorization",
+            "construction",
+            "verification",
+            "dichotomy",
+            "known",
+            "identity",
+            "simplification",
+            "logic",
+            "previous",
+            "line",
+            "proof",
+            "steps",
+            "separately",
+            "proved",
+            "inductive",
+            "step",
+            "minimality",
+            "well",
+            "ordering",
+            "principle",
+            "choice",
+            "axiom",
+            "lemma",
+            "direct",
+            "negation",
+            "trichotomy",
+            "integers",
+            "multiplication",
+            "factorizations",
+            "composite",
+            "hypothesis",
+            "diagonal",
+            "method",
+            "differs",
+            "digit",
+            "countable",
+            "enumeration",
+            "preservation",
+            "terminates",
+            "termination",
+            "condition",
+            "invariant",
+            "exponent",
+            "law",
+        ]
 
-        return result
+        for word in text_words:
+            # Only wrap if not already in \mathrm{} and not a LaTeX command
+            pattern = rf"(?<!\\)(?<!\{{)\b{word}\b(?!\}})"
+            text = re.sub(pattern, rf"\\mathrm{{{word}}}", text)
+
+        return text

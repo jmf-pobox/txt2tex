@@ -269,6 +269,38 @@ From conversation:
 - Typechecking with fuzz is a core feature, not optional
 - Output must be submission-quality
 
+### Recent Investigations (November 2025)
+
+#### ARGUE Environment Investigation (RESOLVED)
+
+**Question**: Should we use fuzz's `\begin{argue}` environment for ARGUE/EQUIV blocks?
+
+**Investigation** (November 25, 2025):
+- Systematically tested fuzz's `argue` environment for equational reasoning blocks
+- Created test files to stress-test spacing and overflow scenarios
+- Root cause analysis: `argue` uses `\hbox to0pt` (zero-width boxes) for justifications
+- **Problem 1**: No minimum column spacing - expressions and justifications overlap when both are wide
+- **Problem 2**: Cannot use `adjustbox` for conditional scaling - `\halign` incompatible with LR mode
+
+**Attempted Fixes**:
+- Created `argue-fixed.sty` with `\hspace{2em}` spacing - fixed spacing but not scaling
+- Tried `\resizebox + minipage` - requires guessing content width, no conditional scaling
+
+**Decision**: ✅ **Stick with array-based implementation**
+- Uses standard LaTeX `\begin{array}{l@{\hspace{2em}}r}`
+- Guaranteed 2em column spacing
+- Works perfectly with `adjustbox{max width=\textwidth}` for conditional scaling
+- All 1199 tests passing
+
+**Documentation**: Complete analysis in DESIGN.md §6
+
+**Key Insight**: The `adjustbox` package is critical for handling unpredictable content width in:
+1. Truth tables (multi-column with complex headers)
+2. ARGUE/EQUIV blocks (long expressions AND long justifications)
+3. Proof trees (wide inference rules with multiple premises)
+
+The argue environment's use of raw `\halign` makes conditional scaling impossible, which was the deciding factor.
+
 ## Debugging Tips
 
 ### Common LaTeX Errors

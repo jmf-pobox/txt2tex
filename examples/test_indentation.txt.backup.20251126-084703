@@ -1,0 +1,30 @@
+=== Testing Indentation ===
+
+** Example 1: Simple quantifier **
+
+axdef
+  policy : P1 RESOURCE -> RESOURCE
+where
+  forall S : P1 RESOURCE |
+    policy(S) in S
+end
+
+** Example 2: Quantifier with multiple lines **
+
+axdef
+  policy : P1 RESOURCE -> RESOURCE
+where
+  forall S : P1 RESOURCE |
+    policy(S) in S and
+    S subset RESOURCE
+end
+
+** Example 3: Nested quantifiers **
+
+axdef
+  relation : PERSON <-> PERSON
+where
+  forall x : PERSON |
+    exists y : PERSON |
+      (x, y) in relation
+end

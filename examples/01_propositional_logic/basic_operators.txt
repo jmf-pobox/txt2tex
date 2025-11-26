@@ -18,7 +18,7 @@
 
 ** Solution 1 **
 
-(a) p and q => p
+(a) p land q => p
 
 (b) TRUTH TABLE:
 p | q | p => q
@@ -27,11 +27,11 @@ T | F | F
 F | T | T
 F | F | T
 
-(c) not (p and q) <=> (not p) or (not q)
+(c) lnot (p land q) <=> (lnot p) lor (lnot q)
 
 ** Solution 2 **
 
-(a) (p or q) and r <=> (p and r) or (q and r)
+(a) (p lor q) land r <=> (p land r) lor (q land r)
 
 (b) TRUTH TABLE:
 p | q | p <=> q

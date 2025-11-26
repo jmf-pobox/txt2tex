@@ -1,0 +1,193 @@
+// ============================================================================
+// Example: Proof by Contradiction
+// ============================================================================
+// Demonstrates:
+//   - Proof by contradiction technique
+//   - Assuming the negation and deriving falsehood
+//   - not elimination (absurdity)
+//   - Classical reasoning patterns
+//
+// Features:
+//   - PROOF: with contradiction structure
+//   - [not intro] rule application
+//   - Deriving false from contradictory premises
+//   - Classical logic proofs
+//
+// See: docs/PROOF_SYNTAX.md - Proof tree rules
+//      docs/USER_GUIDE.md - Section "Proof Trees"
+// ============================================================================
+
+=== Proof by Contradiction Examples ===
+
+** Example 1: Basic Contradiction **
+
+TEXT: To prove p, assume not p and derive a contradiction (false).
+
+PROOF:
+(not p and (q and not q)) => p [=> intro from 1]
+  [1] not p and (q and not q) [assumption]
+      q and not q [and elim 2]
+      q [and elim 1]
+      not q [and elim 2]
+      false [contradiction]
+      p [false elim]
+
+TEXT: Once we derive false, we can conclude anything—here we conclude p by discharging assumption 1.
+
+** Example 2: Simple Example - Proving q **
+
+TEXT: Prove: (p and not p) => q
+
+PROOF:
+(p and not p) => q [=> intro from 1]
+  [1] p and not p [assumption]
+      p [and elim 1]
+      not p [and elim 2]
+      false [contradiction]
+      q [false elim]
+
+TEXT: From a contradiction, we can derive anything (ex falso quodlibet).
+
+** Example 3: Law of Non-Contradiction **
+
+TEXT: Prove that p and not p leads to a contradiction.
+
+PROOF:
+p and not p => false [=> intro from 1]
+  [1] p and not p [assumption]
+      false [contradiction]
+
+TEXT: This proves the law of non-contradiction - no proposition can be both true and false.
+
+** Example 4: Indirect Proof **
+
+TEXT: Prove: (not p => false) => not not p
+
+PROOF:
+(not p => false) => not not p [=> intro from 1]
+  [1] not p => false [assumption]
+      [2] not p [assumption]
+          false [=> elim]
+      not not p [not intro from 2]
+
+TEXT: This is the pattern for indirect proof: if assuming not p leads to false, then not not p holds.
+
+** Example 5: Modus Tollens via Contradiction **
+
+TEXT: Prove: (p => q) and not q => not p
+
+PROOF:
+((p => q) and not q) => not p [=> intro from 1]
+  [1] (p => q) and not q [assumption]
+      p => q [and elim 1]
+      not q [and elim 2]
+      [2] p [assumption]
+          q [=> elim]
+          false [contradiction]
+      not p [not intro from 2]
+
+TEXT: Classic modus tollens pattern using contradiction.
+
+** Example 6: Disjunction from Contradiction **
+
+TEXT: Prove: not p => (p => q)
+
+PROOF:
+not p => (p => q) [=> intro from 1]
+  [1] not p [assumption]
+      (p => q) [=> intro from 2]
+        [2] p [assumption]
+            false [contradiction]
+            q [false elim]
+
+TEXT: From not p, we can prove p => q for any q.
+
+** Example 7: Double Negation Elimination **
+
+TEXT: Prove: not not p => p (requires classical logic)
+
+PROOF:
+not not p => not not not p [=> intro from 1]
+  [1] not not p [assumption]
+      not not not p [not intro from 2]
+        [2] not p [assumption]
+            false [contradiction]
+            p [false elim]
+
+TEXT: In classical logic, not not p implies p. This requires excluded middle or equivalent axiom.
+
+** Example 8: Reductio ad Absurdum **
+
+TEXT: Prove: (not p => (q and not q)) => p
+
+PROOF:
+(not p => (q and not q)) => not not p [=> intro from 1]
+  [1] not p => (q and not q) [assumption]
+      not not p [not intro from 2]
+        [2] not p [assumption]
+            q and not q [=> elim]
+            q [and elim 1]
+            not q [and elim 2]
+            false [contradiction]
+            p [false elim]
+
+TEXT: Reductio ad absurdum: if assuming not p leads to absurdity, then p holds.
+
+** Example 9: Contradiction with Universal Quantifier **
+
+TEXT: Prove: (forall x | P(x)) and (exists x | not P(x)) is contradictory.
+
+PROOF:
+((forall x | P(x)) and (exists x | not P(x))) => false [=> intro from 1]
+  [1] (forall x | P(x)) and (exists x | not P(x)) [assumption]
+      forall x | P(x) [and elim 1]
+      exists x | not P(x) [and elim 2]
+      not P(a) [exists elim, fresh a]
+      P(a) [forall elim]
+      false [contradiction]
+
+TEXT: If something holds for all x, it cannot fail for some x.
+
+** Example 10: Proving Uniqueness by Contradiction **
+
+TEXT: Prove: if f is injective, then f(x) = f(y) => x = y.
+
+PROOF:
+(injective(f) and f(x) = f(y)) => x = y [=> intro from 1]
+  [1] injective(f) and f(x) = f(y) [assumption]
+      injective(f) [and elim 1]
+      f(x) = f(y) [and elim 2]
+      x = y [not intro from 2]
+        [2] x /= y [assumption]
+            f(x) /= f(y) [injective property]
+            false [contradiction with f(x) = f(y)]
+
+TEXT: Uses contradiction to prove equality.
+
+** Example 11: Case Analysis Leading to Contradiction **
+
+TEXT: Prove: p or q, not p, not q => false
+
+PROOF:
+((p or q) and not p and not q) => false [=> intro from 1]
+  [1] (p or q) and not p and not q [assumption]
+      p or q [and elim 1]
+      not p [and elim 2]
+      not q [and elim 3]
+      false [or elim from p or q]
+        case p:
+          false [contradiction with not p]
+        case q:
+          false [contradiction with not q]
+
+TEXT: Both cases lead to contradiction, so the premises are inconsistent.
+
+** Example 12: Best Practices for Contradiction Proofs **
+
+TEXT: When using proof by contradiction:
+TEXT: 1. Clearly mark the assumption you're contradicting with [assumption N]
+TEXT: 2. Show explicitly where false is derived
+TEXT: 3. Use [not intro from N] to discharge the assumption
+TEXT: 4. Document the contradiction (what conflicts with what)
+TEXT: 5. In natural deduction, false elim lets you conclude anything
+TEXT: 6. Remember: contradiction is a classical technique (not constructive)

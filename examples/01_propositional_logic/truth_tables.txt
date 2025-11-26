@@ -27,15 +27,15 @@
 (a) Commutative property
 
 EQUIV:
-p and q
-q and p [commutative]
+p land q
+q land p [commutative]
 
 (b) De Morgan law
 
 EQUIV:
-not (p and q)
-(not p) or (not q) [De Morgan]
-not p or not q [parentheses]
+lnot (p land q)
+(lnot p) lor (lnot q) [De Morgan]
+lnot p lor lnot q [parentheses]
 
 ** Solution 2 **
 
@@ -43,27 +43,27 @@ not p or not q [parentheses]
 
 EQUIV:
 p => q
-not p or q [definition]
+lnot p lor q [definition]
 
 (b) Multiple equivalence steps
 
 EQUIV:
-(p and q) or (p and r)
-p and (q or r) [distributive]
-(q or r) and p [commutative]
-p and (r or q) [commutative]
+(p land q) lor (p land r)
+p land (q lor r) [distributive]
+(q lor r) land p [commutative]
+p land (r lor q) [commutative]
 
 ** Solution 3 **
 
 (a) Equivalence chain without justifications
 
 EQUIV:
-p or p
+p lor p
 p
 
 (b) Mixed justifications
 
 EQUIV:
 p <=> q
-(p => q) and (q => p) [definition]
-(not p or q) and (not q or p)
+(p => q) land (q => p) [definition]
+(lnot p lor q) land (lnot q lor p)

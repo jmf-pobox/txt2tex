@@ -1,6 +1,6 @@
 # Reserved Words and Operator Mappings
 
-**Last Updated:** 2025-11-01
+**Last Updated:** 2025-11-26
 **Purpose:** Complete reference of all ASCII keywords/operators and their Unicode/LaTeX mappings
 
 ---
@@ -161,6 +161,16 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 
 ---
 
+## Inference Rule Operators
+
+| ASCII Keyword | Unicode Alternative | LaTeX Output | Description | Phase |
+|--------------|---------------------|--------------|-------------|-------|
+| `shows` | ⊢ (U+22A2) | `\vdash` | Sequent judgment (turnstile) | Phase 42 |
+
+**Note:** Used in INFRULE blocks for natural deduction inference rules. Cannot be used as a variable name.
+
+---
+
 ## Special Operators
 
 | ASCII Keyword | Unicode Alternative | LaTeX Output | Description | Phase |
@@ -229,7 +239,7 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 
 ## Reserved Words Summary
 
-**Total Reserved Keywords:** 90+
+**Total Reserved Keywords:** 91+
 
 **Categories:**
 - Logical operators: 8
@@ -240,6 +250,7 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 - Bag operators: 2
 - Arithmetic: 6
 - Comparison: 6
+- Inference rule operators: 1
 - Special operators: 5
 - Type keywords: 3
 - Structural: 8
@@ -284,10 +295,12 @@ Do NOT use reserved words as identifiers:
 ❌ BAD:  given = 5           (reserved word)
 ❌ BAD:  subset = {1, 2}     (reserved word)
 ❌ BAD:  union = A union B   (reserved word)
+❌ BAD:  shows : F ShowId    (reserved word - use "podcasts" or similar)
 
 ✅ GOOD: givenSet = 5
 ✅ GOOD: mySubset = {1, 2}
 ✅ GOOD: unionSet = A union B
+✅ GOOD: podcasts : F ShowId
 ```
 
 ### Case Sensitivity
