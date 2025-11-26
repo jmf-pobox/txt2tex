@@ -2,7 +2,7 @@
 
 Fuzz distinguishes between:
 - Flat 3-tuples: A x B x C (without nested parens)
-- Nested pairs: (A x B) x C or ((A x B) x C) with explicit parens
+- Nested pairs: (A x B) x C lor ((A x B) x C) with explicit parens
 
 This test verifies that txt2tex does NOT add automatic parentheses
 to cross products, preserving fuzz's 3-tuple semantics.
@@ -25,57 +25,40 @@ def test_explicit_parens_create_nested_pairs() -> None:
         "ListElement == (ShowId cross EpisodeId) cross "
         "(N cross PlayedOrNot cross SavedOrNot)"
     )
-
     lexer = Lexer(txt)
     tokens = list(lexer.tokenize())
     parser = Parser(tokens)
     ast = parser.parse()
-
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
-
-    # Extract the abbreviation line
-    # Abbreviations are on a single line, not wrapped in \\
     for line in latex.split("\n"):
         if "ListElement ==" in line:
             abbrev_latex = line.strip()
             break
     else:
-        raise AssertionError("Could not find ListElement abbreviation in LaTeX")
-
+        raise AssertionError("Could lnot find ListElement abbreviation elem LaTeX")
     print(f"Generated LaTeX: {abbrev_latex}")
-
-    # The right side should stay flat: (\mathbb{N} \cross PlayedOrNot \cross SavedOrNot)
-    # NOT nested: ((\mathbb{N} \cross PlayedOrNot) \cross SavedOrNot)
-    # Fuzz needs flat 3-tuples for (a, b, c) tuple syntax
-
-    assert r"(\mathbb{N} \cross PlayedOrNot \cross SavedOrNot)" in abbrev_latex, (
+    assert "(\\mathbb{N} \\cross PlayedOrNot \\cross SavedOrNot)" in abbrev_latex, (
         f"Expected flat 3-tuple (N x PlayedOrNot x SavedOrNot), got: {abbrev_latex}"
     )
 
 
 def test_three_way_cross_without_explicit_parens() -> None:
     """Test that A cross B cross C without parens generates left-associated pairs."""
-    txt = """MyType == A cross B cross C"""
-
+    txt = "MyType == A cross B cross C"
     lexer = Lexer(txt)
     tokens = list(lexer.tokenize())
     parser = Parser(tokens)
     ast = parser.parse()
-
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
-
     for line in latex.split("\n"):
         if "MyType ==" in line:
             abbrev_latex = line.strip()
             break
     else:
-        raise AssertionError("Could not find MyType abbreviation")
+        raise AssertionError("Could lnot find MyType abbreviation")
     print(f"Generated LaTeX (no explicit parens): {abbrev_latex}")
-
-    # Without explicit parens, output should stay flat for fuzz 3-tuple semantics
-    # NOT: (A \cross B) \cross C (nested pairs)
     assert "A \\cross B \\cross C" in abbrev_latex, (
         f"Expected flat 3-tuple A x B x C, got: {abbrev_latex}"
     )
@@ -83,34 +66,20 @@ def test_three_way_cross_without_explicit_parens() -> None:
 
 def test_explicit_parens_in_function_signature() -> None:
     """Test function signature with explicit parentheses around cross product."""
-    txt = """axdef
-  f : (N cross A cross B) -> C
-where
-  true
-end"""
-
+    txt = "axdef\n  f : (N cross A cross B) -> C\nwhere\n  true\nend"
     lexer = Lexer(txt)
     tokens = list(lexer.tokenize())
     parser = Parser(tokens)
     ast = parser.parse()
-
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
-
     print(f"Generated function signature LaTeX:\n{latex}")
-
-    # The domain (N cross A cross B) should stay flat as 3-tuple
-    # to match fuzz's tuple semantics
-    match = re.search(r"f : (.+?) \\fun", latex, re.DOTALL)
-    assert match, "Could not find function signature"
-
+    match = re.search("f : (.+?) \\\\fun", latex, re.DOTALL)
+    assert match, "Could lnot find function signature"
     domain_latex = match.group(1).strip()
     print(f"Domain: {domain_latex}")
-
-    # Should stay flat: (\mathbb{N} \cross A \cross B)
-    # NOT nested: ((\mathbb{N} \cross A) \cross B)
     assert "\\mathbb{N} \\cross A \\cross B" in domain_latex, (
-        f"Expected flat 3-tuple in domain, got: {domain_latex}"
+        f"Expected flat 3-tuple elem domain, got: {domain_latex}"
     )
 
 

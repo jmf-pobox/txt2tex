@@ -45,7 +45,7 @@ TEXT: The inner x shadows the outer x. Within the exists quantifier, x refers to
 
 ** Example 4: Set Comprehension Scope **
 
-{ x : N | x > 0 and x < 10 }
+{ x : N | x > 0 land x < 10 }
 
 TEXT: x is in scope only within the set comprehension. The constraint x > 0 and x < 10 uses the same x.
 
@@ -179,7 +179,7 @@ TEXT: x is in scope only within the mu expression (the constraint and any expres
 
 ** Example 16: Set Comprehension with Multiple Variables **
 
-{ x, y : N | x < y and y < 10 . (x, y) }
+{ x, y : N | x < y land y < 10 . (x, y) }
 
 TEXT: Both x and y are in scope throughout the set comprehension, including the constraint and the term.
 
@@ -204,7 +204,7 @@ TEXT: 5. Document intentional shadowing with comments
 
 ** Example 19: Good Style (Distinct Names) **
 
-forall x : N | x > 0 => (exists y : N | y < x and y > 0)
+forall x : N | x > 0 => (exists y : N | y < x land y > 0)
 
 TEXT: Uses distinct names x and y---clear and unambiguous.
 

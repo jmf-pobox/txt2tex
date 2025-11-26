@@ -143,4 +143,134 @@ Low priority:
 - Small commits (1–5 files, <100 LOC ideally), clear messages
 - Add temporary forwarding shims and remove when stable
 
+### Coding Standards Assessment
+
+This section catalogs shortcuts and deviations from project quality standards.
+
+#### Linter and Type Checker Suppression Comments
+
+**Current State**: 7 suppression comments found in production code.
+
+| File | Line | Suppression | Justification Status |
+|------|------|-------------|---------------------|
+| `latex_gen.py` | 101 | `# noqa: RUF001` | Unicode × character - **legitimate** |
+| `latex_gen.py` | 218 | `# noqa: RUF001` | Unicode × character - **legitimate** |
+| `latex_gen.py` | 266 | `# type: ignore` | List append typing - **needs fix** |
+| `lexer.py` | 670 | `# noqa: RUF001` | Unicode × character - **legitimate** |
+| `lexer.py` | 672 | `# noqa: RUF001` | Unicode × character - **legitimate** |
+| `parser.py` | 3890 | `# type: ignore[arg-type]` | Type mismatch - **needs fix** |
+| `tokens.py` | 33 | `# noqa: RUF003` | Unicode × in comment - **legitimate** |
+
+**Analysis**:
+- 5 of 7 suppressions are for Unicode characters (`×` for Cartesian product) which RUF001/RUF003 flags as ambiguous. These are **legitimate** since the codebase explicitly handles both ASCII `cross` and Unicode `×` as equivalent inputs.
+- 2 suppressions are `# type: ignore` comments that mask type system failures. These indicate incomplete type annotations or design issues that should be fixed rather than suppressed.
+
+**Recommendations**:
+1. Fix the 2 `# type: ignore` comments by refining types or restructuring code
+2. Consider adding a project-level `noqa` for RUF001/RUF003 on the specific Unicode characters rather than inline suppressions, or document in code why Unicode is intentional
+
+#### Broad Exception Handling Anti-Patterns
+
+**Current State**: 13 occurrences of `except Exception` across 3 files.
+
+| File | Count | Pattern | Risk Level |
+|------|-------|---------|------------|
+| `latex_gen.py` | 10 | Catch-all for parse fallbacks | **High** |
+| `cli.py` | 3 | Catch-all for file/processing errors | **Medium** |
+| `parser.py` | 1 | Catch-all in compound identifier parsing | **High** |
+
+**Specific Violations**:
+
+1. **Silent failures with bare `pass`** (4 occurrences in `latex_gen.py`):
+   ```python
+   except Exception:
+       # Parsing failed, leave as-is
+       pass
+   ```
+   This pattern:
+   - Hides defects that would surface as incorrect output
+   - Makes debugging extremely difficult
+   - Violates fail-fast principles
+
+2. **Overly broad catches in CLI** (`cli.py` lines 47, 61, 70):
+   ```python
+   except Exception as e:
+       print(f"Error reading input file: {e}", file=sys.stderr)
+       return 1
+   ```
+   This catches `KeyboardInterrupt`, `SystemExit`, memory errors, and actual bugs indiscriminately.
+
+3. **Control flow via exceptions** (`parser.py` line 3855):
+   Uses `except Exception` to detect failed parsing attempts - this is exception-driven control flow, an anti-pattern.
+
+**Recommendations**:
+1. Replace all `except Exception` with specific exception types:
+   - CLI: `FileNotFoundError`, `PermissionError`, `IsADirectoryError`, `UnicodeDecodeError`
+   - Parser/Generator: `LexerError`, `ParserError`, `ValueError`, `IndexError`
+2. Eliminate bare `pass` statements in exception handlers - at minimum log the failure
+3. Consider redesigning parser backtracking to use return values rather than exceptions
+
+#### PEP Compliance
+
+**Strengths**:
+- PEP 8 naming conventions consistently followed (snake_case functions, PascalCase classes)
+- PEP 257 module docstrings present in all 6 source files
+- PEP 484 type hints comprehensive; mypy strict mode enabled
+- PEP 585 generic syntax (`list[str]` not `List[str]`)
+- `from __future__ import annotations` used consistently
+
+**Gaps**:
+- PEP 257 docstring style inconsistent (some Google-style, some minimal)
+- Missing `Args`, `Returns`, `Raises` sections in many docstrings
+- No `Examples` sections in any docstrings
+
+**Observation**: The ruff configuration (`pyproject.toml`) enables 11 rule categories but notably omits:
+- `D` (pydocstyle) - would enforce docstring standards
+- `ANN` (flake8-annotations) - would catch missing type annotations
+- `PTH` (flake8-use-pathlib) - would enforce pathlib over os.path
+
+**Recommendations**:
+1. Enable `D` rules in ruff to enforce consistent docstrings
+2. Add Args/Returns/Raises to all public methods
+3. Consider enabling `ANN` rules for stricter annotation enforcement
+
+#### Comment Quality
+
+**Issues Identified**:
+
+1. **Phase references without context** (dozens of occurrences):
+   ```python
+   # Phase 27: Added line_break_after to support multi-line expressions.
+   ```
+   These comments reference internal development phases but don't explain what the code does or link to documentation.
+
+2. **No TODO/FIXME/HACK markers**: Only 1 found (`# Bug fix:` in lexer.py line 682). This is good - indicates no acknowledged technical debt markers.
+
+3. **Inline comments on suppression lines lack detail**:
+   ```python
+   zed_items.append(items[j])  # type: ignore
+   ```
+   Should explain *why* the type ignore is needed and what the correct fix would be.
+
+**Recommendations**:
+1. Replace "Phase X" comments with descriptive comments or links to DESIGN.md sections
+2. When using `# type: ignore` or `# noqa`, add a comment explaining the root cause and potential fix
+
+#### Summary: Coding Standards Violations
+
+| Category | Count | Severity |
+|----------|-------|----------|
+| Type ignore suppressions needing fix | 2 | High |
+| Broad `except Exception` handlers | 13 | High |
+| Silent `except: pass` patterns | 4 | Critical |
+| Legitimate Unicode noqa comments | 5 | None (acceptable) |
+| Missing docstring sections | Many | Medium |
+| Phase-only comments | Dozens | Low |
+
+**Priority Actions**:
+1. **Critical**: Eliminate 4 silent `except: pass` patterns
+2. **High**: Replace 13 `except Exception` with specific exceptions
+3. **High**: Fix 2 `# type: ignore` suppressions
+4. **Medium**: Enable pydocstyle (`D`) rules in ruff
+5. **Low**: Replace Phase references with descriptive comments
 

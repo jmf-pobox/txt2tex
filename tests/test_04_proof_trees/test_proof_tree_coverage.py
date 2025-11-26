@@ -1,4 +1,4 @@
-"""Tests for proof tree coverage - targeting lines 1576-1673 in latex_gen.py.
+"""Tests for proof tree coverage - targeting lines 1576-1673 elem latex_gen.py.
 
 This file focuses on testing the complex case analysis code that handles:
 - Or-elimination with case branches
@@ -9,12 +9,7 @@ This file focuses on testing the complex case analysis code that handles:
 
 from __future__ import annotations
 
-from txt2tex.ast_nodes import (
-    CaseAnalysis,
-    Document,
-    Identifier,
-    ProofNode,
-)
+from txt2tex.ast_nodes import CaseAnalysis, Document, Identifier, ProofNode
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
@@ -57,39 +52,33 @@ class TestCaseAnalysisWithSiblings:
         Tests the logic that filters siblings to only include disjunctions
         as top-level premises when case analysis is present.
         """
-        text = """PROOF:
-(p and (q or r)) => ((p and q) or (p and r)) [=> intro from 1]
-  [1] p and (q or r) [assumption]
-  :: (p and q) or (p and r) [or elim from 2]
-    [2] q or r [from 1]
-    case q:
-      :: p and q [and intro]
-        :: p [and elim from 1]
-        :: q [case assumption]
-      :: (p and q) or (p and r) [or intro]
-    case r:
-      :: p and r [and intro]
-        :: p [and elim from 1]
-        :: r [case assumption]
-      :: (p and q) or (p and r) [or intro]"""
-
+        text = (
+            "PROOF:\n"
+            "(p land (q lor r)) => ((p land q) lor (p land r)) [=> intro from 1]\n"
+            "  [1] p land (q lor r) [assumption]\n"
+            "  :: (p land q) lor (p land r) [lor elim from 2]\n"
+            "    [2] q lor r [from 1]\n"
+            "    case q:\n"
+            "      :: p land q [land intro]\n"
+            "        :: p [land elim from 1]\n"
+            "        :: q [case assumption]\n"
+            "      :: (p land q) lor (p land r) [lor intro]\n"
+            "    case r:\n"
+            "      :: p land r [land intro]\n"
+            "        :: p [land elim from 1]\n"
+            "        :: r [case assumption]\n"
+            "      :: (p land q) lor (p land r) [lor intro]"
+        )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, Document)
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-
-        # Should generate inference rules
-        assert r"\infer" in latex
-
-        # Should contain case analysis elements
+        assert "\\infer" in latex
         assert "q" in latex
         assert "r" in latex
-
-        # Should use & for horizontal layout
         assert "&" in latex
 
     def test_case_analysis_multiple_cases_staggered(self) -> None:
@@ -99,35 +88,24 @@ class TestCaseAnalysisWithSiblings:
         - First case: 6 + depth*2
         - Subsequent cases: 18 + depth*4 with \\hskip 6em
         """
-        text = """PROOF:
-result [or elim]
-  case p:
-    result [from p]
-  case q:
-    result [from q]
-  case r:
-    result [from r]"""
-
+        text = (
+            "PROOF:\nresult [or elim]\n  case p:\n    result [from p]\n"
+            "  case q:\n    result [from q]\n  case r:\n    result [from r]"
+        )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-
-        # Should generate raised proof structures
-        # The staggered strategy uses \raiseproof for vertical spacing
-        assert r"\infer" in latex
-        assert r"\raiseproof" in latex
-
-        # Multiple cases should generate staggered layout with hskip
-        assert r"\hskip" in latex
-        assert latex.count(r"\raiseproof") >= 2  # Multiple raised cases
+        assert "\\infer" in latex
+        assert "\\raiseproof" in latex
+        assert "\\hskip" in latex
+        assert latex.count("\\raiseproof") >= 2
 
 
 class TestNestedCaseAnalysis:
-    """Test nested grandchildren in case analysis (lines 1581-1592)."""
+    """Test nested grandchildren elem case analysis (lines 1581-1592)."""
 
     def test_nested_case_analysis_grandchildren(self) -> None:
         """Test case analysis as grandchildren (lines 1582-1586).
@@ -135,25 +113,17 @@ class TestNestedCaseAnalysis:
         Tests the code that checks if grandchild is CaseAnalysis and
         sets has_case_analysis flag.
         """
-        # Parse a real proof with nested structure
-        text = """PROOF:
-conclusion [rule]
-  premise [from 1]
-    case p:
-      result [case p]
-    case q:
-      result [case q]"""
-
+        text = (
+            "PROOF:\nconclusion [rule]\n  premise [from 1]\n    case p:\n"
+            "      result [case p]\n    case q:\n      result [case q]"
+        )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-
-        # Should handle nested case analysis
-        assert r"\infer" in latex
+        assert "\\infer" in latex
         assert "conclusion" in latex
 
     def test_sequential_child_with_children(self) -> None:
@@ -162,49 +132,36 @@ conclusion [rule]
         Tests the code path where a sequential child has its own children,
         requiring recursive subtree generation.
         """
-        text = """PROOF:
-top [rule1]
-  [1] assumption1 [assumption]
-  middle [rule2]
-    bottom1 [from 1]
-    bottom2 [from 1]"""
-
+        text = (
+            "PROOF:\ntop [rule1]\n  [1] assumption1 [assumption]\n  middle [rule2]\n"
+            "    bottom1 [from 1]\n    bottom2 [from 1]"
+        )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-
-        # Should generate nested inference rules
-        assert r"\infer" in latex
-        assert latex.count(r"\infer") >= 2  # Multiple nested inferences
+        assert "\\infer" in latex
+        assert latex.count("\\infer") >= 2
 
 
 class TestProofTreeEdgeCases:
-    """Test edge cases in proof tree generation."""
+    """Test edge cases elem proof tree generation."""
 
     def test_case_analysis_no_siblings(self) -> None:
         """Test case analysis without siblings (lines 1662-1665).
 
         Tests the else branch where only child_premises_parts exist.
         """
-        text = """PROOF:
-result [or elim]
-  case p:
-    result [from p]"""
-
+        text = "PROOF:\nresult [or elim]\n  case p:\n    result [from p]"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-
-        # Should generate basic case structure
-        assert r"\infer" in latex
+        assert "\\infer" in latex
         assert "result" in latex
 
     def test_child_with_justification(self) -> None:
@@ -212,21 +169,17 @@ result [or elim]
 
         Tests the branch where child has a justification label.
         """
-        text = """PROOF:
-conclusion [rule]
-  premise [specific justification]
-    subpremise [another rule]"""
-
+        text = (
+            "PROOF:\nconclusion [rule]\n  premise [specific justification]\n"
+            "    subpremise [another rule]"
+        )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-
-        # Should include justification labels
-        assert r"\infer[" in latex  # Justification in brackets
+        assert "\\infer[" in latex
         assert "rule" in latex or "specific" in latex
 
     def test_empty_current_premises(self) -> None:
@@ -235,20 +188,14 @@ conclusion [rule]
         Tests the case where neither sibling_latex_parts nor
         child_premises_parts exist.
         """
-        text = """PROOF:
-conclusion [rule]
-  [1] assumption [assumption]"""
-
+        text = "PROOF:\nconclusion [rule]\n  [1] assumption [assumption]"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-
-        # Should use assumption as premise
-        assert r"\infer" in latex
+        assert "\\infer" in latex
         assert "assumption" in latex
 
     def test_sequential_with_case_analysis_children(self) -> None:
@@ -265,25 +212,17 @@ conclusion [rule]
         - Staggered height calculations
         - Nested case processing
         """
-        text = """PROOF:
-conclusion [rule]
-  [1] assumption [assumption]
-    sibling1 [from 1]
-    sequential_node [sequential_rule]
-      case p:
-        result_p [from p]
-      case q:
-        result_q [from q]"""
-
+        text = (
+            "PROOF:\nconclusion [rule]\n  [1] assumption [assumption]\n"
+            "    sibling1 [from 1]\n    sequential_node [sequential_rule]\n"
+            "      case p:\n        result_p [from p]\n"
+            "      case q:\n        result_q [from q]"
+        )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-
-        # Should generate complex nested structure
-        assert r"\infer" in latex
-        # Complex proof should have multiple elements
-        assert latex.count(r"\infer") >= 2
+        assert "\\infer" in latex
+        assert latex.count("\\infer") >= 2

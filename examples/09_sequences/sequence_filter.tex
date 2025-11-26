@@ -38,8 +38,8 @@ elements from a specified set. It removes elements not in the$
   evens1 : \power \nat \\
   filtered1 : \seq~\nat
   \where
-  (s1 = \langle 1, 2, 3, 4, 5, 6 \rangle) \land (evens1 = \{2, 4, 6,
-  8\}) \land (filtered1 = (s1 \filter evens1))
+  s1 = \langle 1, 2, 3, 4, 5, 6 \rangle \land evens1 = \{2, 4, 6, 8\}
+  \land filtered1 = (s1 \filter evens1)
 \end{axdef}
 
 \noindent The filtered sequence is $\langle 2, 4, 6 \rangle$, keeping
@@ -59,8 +59,8 @@ only elements that are in evens and preserving their original order.
   long\_titles : \power Title2 \\
   filtered\_titles : \seq~Title2
   \where
-  (long\_titles = \{~ t : Title2 | true ~\}) \land (filtered\_titles
-  = all\_titles \filter long\_titles)
+  long\_titles = \{~ t : Title2 | true ~\} \land filtered\_titles =
+  all\_titles \filter long\_titles
 \end{axdef}
 
 \noindent This filters a sequence of titles to include only titles
@@ -91,10 +91,9 @@ restriction ($\rres$):
   filtered\_seq3 : \seq~\nat \\
   restricted\_rel3 : \nat \rel \nat
   \where
-  (s3 = \langle 1, 2, 3, 4, 5 \rangle) \land (R3 = \{1 \mapsto 10, 2
-  \mapsto 20, 3 \mapsto 30\}) \land (A3 = \{2, 3, 4\}) \land
-  (filtered\_seq3 = s3 \filter A3) \land (restricted\_rel3 = R3 \rres
-  \{10, 20\})
+  s3 = \langle 1, 2, 3, 4, 5 \rangle \land R3 = \{1 \mapsto 10, 2
+  \mapsto 20, 3 \mapsto 30\} \land A3 = \{2, 3, 4\} \land
+  filtered\_seq3 = s3 \filter A3 \land restricted\_rel3 = R3 \rres \{10, 20\}
 \end{axdef}
 
 \noindent filtered\_seq is $\langle 2, 3, 4 \rangle$ (sequence elements in A)
@@ -139,9 +138,9 @@ entries with ratings in this set.
   large5 : \power \nat \\
   result5 : \seq~\nat
   \where
-  (s5 = \langle 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 \rangle \land evens5 =
-  \{2, 4, 6, 8, 10, 12\}) \land (large5 = \{5, 6, 7, 8, 9, 10, 11\})
-  \land (result5 = (s5 \filter evens5) \filter large5)
+  s5 = \langle 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 \rangle \land evens5 =
+  \{2, 4, 6, 8, 10, 12\} \land large5 = \{5, 6, 7, 8, 9, 10, 11\}
+  \land result5 = (s5 \filter evens5) \filter large5
 \end{axdef}
 
 \noindent Multiple filters can be applied sequentially. First$
@@ -160,9 +159,9 @@ entries with ratings in this set.
   result6a : \seq~\nat \\
   result6b : \seq~\nat
   \where
-  (s6 = \langle 1, 2, 3 \rangle) \land (empty\_set6 = \{\}) \land
-  (disjoint\_set6 = \{10, 20, 30\}) \land (result6a = s6 \filter
-  empty\_set6) \land (result6b = s6 \filter disjoint\_set6)
+  s6 = \langle 1, 2, 3 \rangle \land empty\_set6 = \{\} \land
+  disjoint\_set6 = \{10, 20, 30\} \land result6a = s6 \filter
+  empty\_set6 \land result6b = s6 \filter disjoint\_set6
 \end{axdef}
 
 \noindent Filtering by an empty set or disjoint set results in an
@@ -195,8 +194,8 @@ empty sequence.
   b2 : \bag~\nat \\
   combined : \bag~\nat
   \where
-  (b1 = \lbag 1, 1, 2, 3 \rbag) \land (b2 = \lbag 2, 3, 3, 4 \rbag)
-  \land (combined = b1 \uplus b2)
+  b1 = \lbag 1, 1, 2, 3 \rbag \land b2 = \lbag 2, 3, 3, 4 \rbag \land
+  combined = b1 \uplus b2
 \end{axdef}
 
 \noindent Bag union adds $multiplicities : combined$ = [[1, 1, 2, 2,

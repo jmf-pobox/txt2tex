@@ -2,13 +2,7 @@
 
 from __future__ import annotations
 
-from txt2tex.ast_nodes import (
-    BinaryOp,
-    Document,
-    FreeBranch,
-    FreeType,
-    Identifier,
-)
+from txt2tex.ast_nodes import BinaryOp, Document, FreeBranch, FreeType, Identifier
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
@@ -49,8 +43,8 @@ class TestRecursiveFreeTypeParsing:
         assert branch.parameters.name == "N"
 
     def test_multi_parameter_constructor(self) -> None:
-        """Test constructor with multiple parameters: branch⟨Tree × Tree⟩."""  # noqa: RUF002
-        lexer = Lexer("Tree ::= branch⟨Tree × Tree⟩")  # noqa: RUF001
+        """Test constructor with multiple parameters: branch⟨Tree × Tree⟩."""
+        lexer = Lexer("Tree ::= branch⟨Tree × Tree⟩")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
@@ -63,15 +57,15 @@ class TestRecursiveFreeTypeParsing:
         assert branch.name == "branch"
         assert branch.parameters is not None
         assert isinstance(branch.parameters, BinaryOp)
-        assert branch.parameters.operator == "×"  # noqa: RUF001
+        assert branch.parameters.operator == "×"
         assert isinstance(branch.parameters.left, Identifier)
         assert branch.parameters.left.name == "Tree"
         assert isinstance(branch.parameters.right, Identifier)
         assert branch.parameters.right.name == "Tree"
 
     def test_mixed_branches(self) -> None:
-        """Test free type with mix of simple and parameterized branches."""
-        lexer = Lexer("Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩")  # noqa: RUF001
+        """Test free type with mix of simple land parameterized branches."""
+        lexer = Lexer("Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
@@ -80,16 +74,10 @@ class TestRecursiveFreeTypeParsing:
         assert isinstance(free_type, FreeType)
         assert free_type.name == "Tree"
         assert len(free_type.branches) == 3
-
-        # stalk - simple branch
         assert free_type.branches[0].name == "stalk"
         assert free_type.branches[0].parameters is None
-
-        # leaf⟨N⟩ - single parameter
         assert free_type.branches[1].name == "leaf"
         assert isinstance(free_type.branches[1].parameters, Identifier)
-
-        # branch⟨Tree × Tree⟩ - multiple parameters  # noqa: RUF003
         assert free_type.branches[2].name == "branch"
         assert isinstance(free_type.branches[2].parameters, BinaryOp)
 
@@ -111,7 +99,7 @@ class TestRecursiveFreeTypeParsing:
 
     def test_complex_parameter_type(self) -> None:
         """Test constructor with complex parameter type."""
-        lexer = Lexer("List ::= cons⟨N × seq(N)⟩")  # noqa: RUF001
+        lexer = Lexer("List ::= cons⟨N × seq(N)⟩")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
@@ -140,8 +128,8 @@ class TestRecursiveFreeTypeLaTeX:
         latex_lines = gen.generate_document_item(ast)
         latex = "".join(latex_lines)
         assert "Status ::= active" in latex
-        assert r"\begin{zed}" in latex
-        assert r"\end{zed}" in latex
+        assert "\\begin{zed}" in latex
+        assert "\\end{zed}" in latex
 
     def test_single_parameter_latex(self) -> None:
         """Test LaTeX generation for single parameter constructor."""
@@ -162,8 +150,8 @@ class TestRecursiveFreeTypeLaTeX:
         latex_lines = gen.generate_document_item(ast)
         latex = "".join(latex_lines)
         assert "Tree ::= leaf" in latex
-        assert r"\ldata" in latex
-        assert r"\rdata" in latex
+        assert "\\ldata" in latex
+        assert "\\rdata" in latex
         assert "N" in latex
 
     def test_multi_parameter_latex(self) -> None:
@@ -185,12 +173,12 @@ class TestRecursiveFreeTypeLaTeX:
         latex_lines = gen.generate_document_item(ast)
         latex = "".join(latex_lines)
         assert "Tree ::= branch" in latex
-        assert r"\ldata" in latex
-        assert r"\rdata" in latex
-        assert r"\cross" in latex
+        assert "\\ldata" in latex
+        assert "\\rdata" in latex
+        assert "\\cross" in latex
 
     def test_mixed_branches_latex(self) -> None:
-        """Test LaTeX generation for mixed simple and parameterized branches."""
+        """Test LaTeX generation for mixed simple land parameterized branches."""
         gen = LaTeXGenerator()
         ast = FreeType(
             name="Tree",
@@ -222,8 +210,8 @@ class TestRecursiveFreeTypeLaTeX:
         latex = "".join(latex_lines)
         assert "Tree ::= stalk | leaf" in latex
         assert "| branch" in latex
-        assert r"\ldata" in latex
-        assert r"\rdata" in latex
+        assert "\\ldata" in latex
+        assert "\\rdata" in latex
 
 
 class TestRecursiveFreeTypeIntegration:
@@ -231,57 +219,51 @@ class TestRecursiveFreeTypeIntegration:
 
     def test_complete_tree_definition(self) -> None:
         """Test complete Tree free type definition with LaTeX generation."""
-        text = "Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩"  # noqa: RUF001
+        text = "Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-
-        # Check document structure
-        assert r"\documentclass[a4paper,10pt,fleqn]{article}" in doc
-        assert r"\begin{document}" in doc
-        assert r"\end{document}" in doc
-
-        # Check free type definition
+        assert "\\documentclass[a4paper,10pt,fleqn]{article}" in doc
+        assert "\\begin{document}" in doc
+        assert "\\end{document}" in doc
         assert "Tree ::= stalk | leaf" in doc
-        assert r"\ldata" in doc
-        assert r"\rdata" in doc
-        assert r"\cross" in doc
+        assert "\\ldata" in doc
+        assert "\\rdata" in doc
+        assert "\\cross" in doc
 
     def test_complete_list_definition(self) -> None:
-        """Test List free type with nil and cons constructors."""
-        text = "List ::= nil | cons⟨N × List⟩"  # noqa: RUF001
+        """Test List free type with nil land cons constructors."""
+        text = "List ::= nil | cons⟨N × List⟩"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-
         assert "List ::= nil | cons" in doc
-        assert r"\ldata" in doc
-        assert r"\cross" in doc
+        assert "\\ldata" in doc
+        assert "\\cross" in doc
 
     def test_ascii_brackets_integration(self) -> None:
-        """Test ASCII angle brackets in full pipeline."""
-        text = "Tree ::= leaf<N> | branch<Tree × Tree>"  # noqa: RUF001
+        """Test ASCII angle brackets elem full pipeline."""
+        text = "Tree ::= leaf<N> | branch<Tree × Tree>"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-
         assert "Tree ::= leaf" in doc
-        assert r"\ldata" in doc
-        assert r"\rdata" in doc
+        assert "\\ldata" in doc
+        assert "\\rdata" in doc
         assert "| branch" in doc
 
 
 class TestRecursiveFreeTypeEdgeCases:
-    """Tests for edge cases and error handling."""
+    """Tests for edge cases land error handling."""
 
     def test_no_branches_error(self) -> None:
         """Test that empty branches list raises an error."""
@@ -310,7 +292,6 @@ class TestRecursiveFreeTypeEdgeCases:
         lexer = Lexer("Tree ::= leaf⟨⟩")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
-        # This should parse - empty sequence literal as parameter
         ast = parser.parse()
         assert isinstance(ast, Document)
 
@@ -327,10 +308,8 @@ class TestBackwardCompatibility:
         ast = parser.parse()
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-
         assert "Status ::= active | inactive | suspended" in doc
-        # Should not have \ldata or \rdata for simple branches
-        assert r"\ldata" not in doc
+        assert "\\ldata" not in doc
 
     def test_phase4_examples_unchanged(self) -> None:
         """Test that Phase 4 example outputs remain the same."""
@@ -341,6 +320,5 @@ class TestBackwardCompatibility:
         ast = parser.parse()
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-
         assert "Answer ::= yes | no" in doc
-        assert r"\ldata" not in doc
+        assert "\\ldata" not in doc

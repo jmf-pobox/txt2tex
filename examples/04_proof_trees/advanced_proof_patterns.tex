@@ -15,15 +15,15 @@
 \section*{Example 1 : Proof by Cases ( Three - Way Split )}
 \addcontentsline{toc}{section}{Example 1 : Proof by Cases ( Three - Way Split )}
 
-\noindent Prove: For all integers n, n $\langle 0 \lor n = 0 \lor n \rangle$ 0
+\noindent Prove: For all integers n, n $\langle 0(or)(n) = 0(or)(n) \rangle$ 0
 
 \bigskip
 
 \begin{center}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
-    \infer[\mbox{trichotomy of integers}, \mbox{axiom}]{(n < 0) \lor
-    (n = 0) \lor n > 0}{}
+    \infer[\mbox{trichotomy of integers}, \mbox{axiom}]{n < 0 \lor n
+    = 0 \lor n > 0}{}
     $%
   }
 \end{center}
@@ -50,8 +50,7 @@ something about all integers, we can case-analyze on these three possibilities.
     \lor (q \land s)}{
       \infer[\lor \mbox{elim on p} \lor q]{(p \land r) \lor (p \land
       s) \lor (q \land r) \lor (q \land s)}{\infer[\lor \mbox{elim on
-        r} \lor s]{(p \land r) \lor (p \land s) \lor (q \land r) \lor
-        (q \land s)}{
+        r} \lor s]{((p \land r))(or(p \land s))(or(q \land r))(or(q \land s))}{
           \raiseproof{10ex}{\infer[\lor \mbox{intro}]{(p \land r)
               \lor (p \land s) \lor (q \land r) \lor (q \land
           s)}{\infer[\land \mbox{intro}]{p \land r}{}}}
@@ -59,8 +58,8 @@ something about all integers, we can case-analyze on these three possibilities.
           \hskip 6em \raiseproof{26ex}{\infer[\lor \mbox{intro}]{(p
               \land r) \lor (p \land s) \lor (q \land r) \lor (q \land
           s)}{\infer[\land \mbox{intro}]{p \land s}{}}}
-        } & \infer[\lor \mbox{elim on r} \lor s]{(p \land r) \lor (p
-        \land s) \lor (q \land r) \lor (q \land s)}{
+        } & \infer[\lor \mbox{elim on r} \lor s]{((p \land r))(or(p
+        \land s))(or(q \land r))(or(q \land s))}{
           \raiseproof{10ex}{\infer[\lor \mbox{intro}]{(p \land r)
               \lor (p \land s) \lor (q \land r) \lor (q \land
           s)}{\infer[\land \mbox{intro}]{q \land r}{}}}
@@ -200,10 +199,10 @@ Induction ( Base and Step )}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\exists n
-    : \nat @ even(n) \land (n > 10))}{
+    : \nat @ even(n) \land n > 10)}{
       \infer[\exists \mbox{intro with n}=12]{\exists n : \nat @
-      even(n) \land (n > 10)}{\infer[\land \mbox{intro}]{even(12)
-        \land (12 > 10)}{\infer[\mbox{arithmetic}]{12 >
+      even(n) \land n > 10}{\infer[\land \mbox{intro}]{even(12) \land
+        12 > 10}{\infer[\mbox{arithmetic}]{12 >
           10}{\infer[\mbox{definition of even}, 12=2 *
             6]{even(12)}{\infer[\mbox{arithmetic}]{12 = 2 * 6}{\ulcorner
       true \urcorner^{[1]}}}}}}
@@ -302,8 +301,8 @@ both lead to the conclusion.
           b)}{\infer[\mbox{strong IH}, b <
             n]{prime\_factorization(b)}{\infer[\mbox{strong IH}, a <
               n]{prime\_factorization(a)}{\infer[\mbox{definition of
-                composite}]{\exists a, b @ (2 \leq a) \land (a < n) \land (2
-      \leq b) \land (b < n) \land (n = a * b)}{}}}}}}
+                composite}]{\exists a, b @ 2 \leq a \land a < n \land 2 \leq b
+      \land b < n \land n = a * b}{}}}}}}
     }
     $%
   }
@@ -384,8 +383,8 @@ values, not just n-1.
             \power m \land \power m}{\infer[\mbox{by \mbox{inductive}
               \mbox{step} \mbox{from} P}(m - 1)]{\power m}{\infer[\mbox{since
                 m} - 1 >=1 \land m - 1 < m]{\power (m -
-                1)}{\infer[\mbox{minimality of m}]{\forall k @ (k \geq 1) \land
-      (k < m) \implies \power k}{}}}}}}}
+                1)}{\infer[\mbox{minimality of m}]{\forall k @ k \geq 1 \land k
+      < m \implies \power k}{}}}}}}}
     }
     $%
   }
@@ -517,9 +516,9 @@ values, not just n-1.
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\exists n
-    @ (n > 100) \land even(n))}{
-      \infer[\exists \mbox{intro with n}=102]{\exists n @ (n > 100)
-      \land even(n)}{\infer[\land \mbox{intro}]{(102 > 100) \land
+    @ n > 100 \land even(n))}{
+      \infer[\exists \mbox{intro with n}=102]{\exists n @ n > 100
+      \land even(n)}{\infer[\land \mbox{intro}]{102 > 100 \land
         even(102)}{\infer[\mbox{definition}]{even(102)}{\infer[\mbox{arithmetic}]{102
             = 2 * 51}{\infer[\mbox{arithmetic}]{102 >
               100}{\infer[\mbox{construction}]{witness\_construction(102)}{\ulcorner

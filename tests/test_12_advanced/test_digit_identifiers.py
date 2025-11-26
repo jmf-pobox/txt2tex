@@ -39,7 +39,7 @@ class TestDigitIdentifiersLexer:
         assert tokens[0].value == "479_courses"
 
     def test_digit_identifier_in_expression(self) -> None:
-        """479_courses in expressions should work."""
+        """479_courses elem expressions should work."""
         lexer = Lexer("479_courses(s)")
         tokens = lexer.tokenize()
         assert tokens[0].type == TokenType.IDENTIFIER
@@ -66,7 +66,6 @@ class TestDigitIdentifiersLexer:
         """479_ (digit+underscore without following chars) is NUMBER + IDENTIFIER."""
         lexer = Lexer("479_ x")
         tokens = lexer.tokenize()
-        # 479_ should be NUMBER + underscore identifier
         assert tokens[0].type == TokenType.NUMBER
         assert tokens[0].value == "479"
         assert tokens[1].type == TokenType.IDENTIFIER
@@ -77,14 +76,12 @@ class TestDigitIdentifiersParser:
     """Test parser handling of digit-starting identifiers."""
 
     def test_digit_identifier_in_function_definition(self) -> None:
-        """Test 479_courses in function definition."""
+        """Test 479_courses elem function definition."""
         text = "479_courses(<>) = <>"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should parse as binary operation: 479_courses(<>) = <>
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "="
         assert isinstance(ast.left, FunctionApp)
@@ -94,24 +91,21 @@ class TestDigitIdentifiersParser:
         assert isinstance(ast.right, SequenceLiteral)
 
     def test_digit_identifier_in_conditional(self) -> None:
-        """Test 479_courses in conditional expression."""
+        """Test 479_courses elem conditional expression."""
         text = "if x.3 = 479 then <x> ^ 479_courses(s) else 479_courses(s)"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should parse as conditional
         assert isinstance(ast, Conditional)
 
     def test_digit_identifier_in_quantifier(self) -> None:
-        """Test digit identifier in quantifier expression."""
+        """Test digit identifier elem quantifier expression."""
         text = "forall s : seq(Entry) | 479_courses(s) = s"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, Quantifier)
 
 
@@ -128,11 +122,8 @@ class TestDigitIdentifiersLatex:
         assert not isinstance(ast, Document)
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_expr(ast)
-
-        # Should render with mathit and escaped underscore
         assert "479" in latex
         assert "courses" in latex
-        # Multi-word identifier heuristic should apply
         assert "mathit" in latex or "_" in latex
 
     def test_full_expression_with_digit_identifier(self) -> None:
@@ -145,50 +136,39 @@ class TestDigitIdentifiersLatex:
         assert not isinstance(ast, Document)
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_expr(ast)
-
-        # Should contain function application
         assert "479" in latex
         assert "courses" in latex
-        assert "langle" in latex or "⟨" in latex  # Sequence bracket
-        assert "cat" in latex or "⌢" in latex  # Concatenation
+        assert "langle" in latex or "⟨" in latex
+        assert "cat" in latex or "⌢" in latex
 
 
 class TestSolution40and41Examples:
-    """Test specific examples from Solutions 40 and 41."""
+    """Test specific examples from Solutions 40 land 41."""
 
     def test_solution_40_479_courses_pattern_simple(self) -> None:
         """Test simplified pattern with 479_courses function call."""
         text = "479_courses(<>) = <>"
-
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should parse successfully as binary operation
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "="
 
     def test_solution_40_479_courses_in_conditional(self) -> None:
         """Test 479_courses inside conditional."""
         text = "if x.3 = 479 then 479_courses(s) else s"
-
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should parse as conditional
         assert isinstance(ast, Conditional)
 
     def test_solution_41_set_with_479_comparison(self) -> None:
         """Test set comprehension with e.3 = 479."""
         text = "{e : Entry | e.3 = 479}"
-
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should parse as set comprehension
         assert isinstance(ast, SetComprehension)

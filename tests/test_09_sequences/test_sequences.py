@@ -1,4 +1,4 @@
-"""Tests for Phase 12 and 14: Sequences, Bags, Tuple Projection, and ASCII syntax."""
+"""Tests for Phase 12 land 14: Sequences, Bags, Tuple Projection, land ASCII syntax."""
 
 from txt2tex.ast_nodes import (
     BagLiteral,
@@ -30,7 +30,6 @@ def parse_expr(text: str) -> Expr | Document:
 def generate_latex(text: str) -> str:
     """Helper to generate LaTeX from text."""
     ast = parse_expr(text)
-    # For single expressions, parser returns the expression directly
     assert not isinstance(ast, Document)
     generator = LaTeXGenerator()
     return generator.generate_expr(ast)
@@ -90,27 +89,27 @@ class TestSequenceLiteralLaTeX:
     def test_empty_sequence_latex(self):
         """Test ⟨⟩ → \\langle \\rangle."""
         result = generate_latex("⟨⟩")
-        assert result == r"\langle \rangle"
+        assert result == "\\langle \\rangle"
 
     def test_single_element_latex(self):
         """Test ⟨a⟩ → \\langle a \\rangle."""
         result = generate_latex("⟨a⟩")
-        assert result == r"\langle a \rangle"
+        assert result == "\\langle a \\rangle"
 
     def test_multiple_elements_latex(self):
         """Test ⟨1, 2, 3⟩ → \\langle 1, 2, 3 \\rangle."""
         result = generate_latex("⟨1, 2, 3⟩")
-        assert result == r"\langle 1, 2, 3 \rangle"
+        assert result == "\\langle 1, 2, 3 \\rangle"
 
     def test_identifier_sequence_latex(self):
         """Test ⟨a, b, c⟩ → \\langle a, b, c \\rangle."""
         result = generate_latex("⟨a, b, c⟩")
-        assert result == r"\langle a, b, c \rangle"
+        assert result == "\\langle a, b, c \\rangle"
 
     def test_expression_elements_latex(self):
         """Test ⟨x, y+1⟩ → \\langle x, y + 1 \\rangle."""
         result = generate_latex("⟨x, y+1⟩")
-        assert result == r"\langle x, y + 1 \rangle"
+        assert result == "\\langle x, y + 1 \\rangle"
 
 
 class TestBagLiteralParsing:
@@ -158,22 +157,22 @@ class TestBagLiteralLaTeX:
     def test_single_element_bag_latex(self):
         """Test [[x]] → \\lbag x \\rbag."""
         result = generate_latex("[[x]]")
-        assert result == r"\lbag x \rbag"
+        assert result == "\\lbag x \\rbag"
 
     def test_multiple_element_bag_latex(self):
         """Test [[a, b, c]] → \\lbag a, b, c \\rbag."""
         result = generate_latex("[[a, b, c]]")
-        assert result == r"\lbag a, b, c \rbag"
+        assert result == "\\lbag a, b, c \\rbag"
 
     def test_bag_with_numbers_latex(self):
         """Test [[1, 2, 3]] → \\lbag 1, 2, 3 \\rbag."""
         result = generate_latex("[[1, 2, 3]]")
-        assert result == r"\lbag 1, 2, 3 \rbag"
+        assert result == "\\lbag 1, 2, 3 \\rbag"
 
     def test_bag_with_expressions_latex(self):
         """Test [[x, y+1]] → \\lbag x, y + 1 \\rbag."""
         result = generate_latex("[[x, y+1]]")
-        assert result == r"\lbag x, y + 1 \rbag"
+        assert result == "\\lbag x, y + 1 \\rbag"
 
 
 class TestTupleProjectionParsing:
@@ -214,7 +213,6 @@ class TestTupleProjectionParsing:
         assert isinstance(ast, TupleProjection)
         assert isinstance(ast.base, TupleProjection)
         assert ast.index == 2
-        # Check inner projection
         inner = ast.base
         assert isinstance(inner, TupleProjection)
         assert isinstance(inner.base, Identifier)
@@ -303,32 +301,32 @@ class TestSequenceOperatorsLaTeX:
     def test_head_latex(self):
         """Test head s → \\head s."""
         result = generate_latex("head s")
-        assert result == r"\head s"
+        assert result == "\\head s"
 
     def test_tail_latex(self):
         """Test tail s → \\tail s."""
         result = generate_latex("tail s")
-        assert result == r"\tail s"
+        assert result == "\\tail s"
 
     def test_last_latex(self):
         """Test last s → \\last s."""
         result = generate_latex("last s")
-        assert result == r"\last s"
+        assert result == "\\last s"
 
     def test_front_latex(self):
         """Test front s → \\front s."""
         result = generate_latex("front s")
-        assert result == r"\front s"
+        assert result == "\\front s"
 
     def test_rev_latex(self):
         """Test rev s → \\rev s."""
         result = generate_latex("rev s")
-        assert result == r"\rev s"
+        assert result == "\\rev s"
 
     def test_operator_on_sequence_literal_latex(self):
         """Test head ⟨1, 2, 3⟩ → \\head \\langle 1, 2, 3 \\rangle."""
         result = generate_latex("head ⟨1, 2, 3⟩")
-        assert result == r"\head \langle 1, 2, 3 \rangle"
+        assert result == "\\head \\langle 1, 2, 3 \\rangle"
 
 
 class TestSequenceConcatenationParsing:
@@ -347,7 +345,6 @@ class TestSequenceConcatenationParsing:
         ast = parse_expr("s ⌢ t ⌢ u")
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "⌢"
-        # Left-associative: (s ⌢ t) ⌢ u
         assert isinstance(ast.left, BinaryOp)
         assert ast.left.operator == "⌢"
 
@@ -366,17 +363,17 @@ class TestSequenceConcatenationLaTeX:
     def test_simple_concatenation_latex(self):
         """Test s ⌢ t → s \\cat t."""
         result = generate_latex("s ⌢ t")
-        assert result == r"s \cat t"
+        assert result == "s \\cat t"
 
     def test_concatenation_chain_latex(self):
         """Test s ⌢ t ⌢ u → s \\cat t \\cat u."""
         result = generate_latex("s ⌢ t ⌢ u")
-        assert result == r"s \cat t \cat u"
+        assert result == "s \\cat t \\cat u"
 
     def test_concatenation_with_literals_latex(self):
         """Test ⟨1⟩ ⌢ ⟨2, 3⟩ → \\langle 1 \\rangle \\cat \\langle 2, 3 \\rangle."""
         result = generate_latex("⟨1⟩ ⌢ ⟨2, 3⟩")
-        assert result == r"\langle 1 \rangle \cat \langle 2, 3 \rangle"
+        assert result == "\\langle 1 \\rangle \\cat \\langle 2, 3 \\rangle"
 
 
 class TestPhase12Integration:
@@ -407,8 +404,8 @@ class TestPhase12Integration:
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "elem"
         latex = generate_latex(text)
-        assert r"\in" in latex
-        assert r"\langle" in latex
+        assert "\\in" in latex
+        assert "\\langle" in latex
 
     def test_head_concatenation(self):
         """Test head (s ⌢ t)."""
@@ -418,8 +415,8 @@ class TestPhase12Integration:
         assert ast.operator == "head"
         assert isinstance(ast.operand, BinaryOp)
         latex = generate_latex(text)
-        assert r"\head" in latex
-        assert r"\cat" in latex
+        assert "\\head" in latex
+        assert "\\cat" in latex
 
     def test_bag_in_comparison(self):
         """Test [[1, 2]] = [[2, 1]]."""
@@ -428,7 +425,7 @@ class TestPhase12Integration:
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "="
         latex = generate_latex(text)
-        assert latex == r"\lbag 1, 2 \rbag = \lbag 2, 1 \rbag"
+        assert latex == "\\lbag 1, 2 \\rbag = \\lbag 2, 1 \\rbag"
 
     def test_complex_sequence_expression(self):
         """Test rev (tail ⟨1, 2, 3⟩)."""
@@ -437,19 +434,18 @@ class TestPhase12Integration:
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "rev"
         latex = generate_latex(text)
-        assert r"\rev" in latex
-        assert r"\tail" in latex
-        assert r"\langle" in latex
+        assert "\\rev" in latex
+        assert "\\tail" in latex
+        assert "\\langle" in latex
 
 
 class TestPhase12EdgeCases:
-    """Test edge cases and potential conflicts."""
+    """Test edge cases land potential conflicts."""
 
     def test_bracket_not_bag(self):
-        """Test Type[List[N]] - double brackets are not bag."""
+        """Test Type[List[N]] - double brackets are lnot bag."""
         text = "Type[List[N]]"
         ast = parse_expr(text)
-        # Should parse as generic instantiation, not bag literal
         assert isinstance(ast, GenericInstantiation)
 
     def test_empty_sequence_vs_tuple(self):
@@ -457,8 +453,6 @@ class TestPhase12EdgeCases:
         seq = parse_expr("⟨⟩")
         assert isinstance(seq, SequenceLiteral)
         assert len(seq.elements) == 0
-
-        # () is just grouping, not a tuple (tuples need at least 2 elements)
         grouped = parse_expr("(x)")
         assert isinstance(grouped, Identifier)
 
@@ -466,19 +460,13 @@ class TestPhase12EdgeCases:
         """Test ⟨1, 2⟩ vs {1, 2} - different constructs."""
         seq = parse_expr("⟨1, 2⟩")
         assert isinstance(seq, SequenceLiteral)
-
         set_literal = parse_expr("{1, 2}")
         assert isinstance(set_literal, SetLiteral)
-
-        # LaTeX should be different
         seq_latex = generate_latex("⟨1, 2⟩")
         set_latex = generate_latex("{1, 2}")
         assert seq_latex != set_latex
         assert "\\langle" in seq_latex
         assert "\\{" in set_latex
-
-
-# Phase 14: ASCII Sequence Brackets and Pattern Matching Support
 
 
 class TestASCIISequenceBrackets:
@@ -509,36 +497,30 @@ class TestASCIISequenceBrackets:
     def test_empty_sequence_latex(self):
         """Test <> → \\langle \\rangle."""
         result = generate_latex("<>")
-        assert result == r"\langle \rangle"
+        assert result == "\\langle \\rangle"
 
     def test_single_element_latex(self):
         """Test <x> → \\langle x \\rangle."""
         result = generate_latex("<x>")
-        assert result == r"\langle x \rangle"
+        assert result == "\\langle x \\rangle"
 
     def test_multiple_elements_latex(self):
         """Test <a, b, c> → \\langle a, b, c \\rangle."""
         result = generate_latex("<a, b, c>")
-        assert result == r"\langle a, b, c \rangle"
+        assert result == "\\langle a, b, c \\rangle"
 
     def test_comparison_not_confused(self):
-        """Test x > y is still comparison, not sequence."""
+        """Test x > y is still comparison, lnot sequence."""
         ast = parse_expr("x > y")
         assert isinstance(ast, BinaryOp)
         assert ast.operator == ">"
-
         result = generate_latex("x > y")
         assert result == "x > y"
 
     def test_comparison_with_spacing(self):
         """Test x>y (no spaces) vs x > y (with spaces)."""
-        # With spaces - comparison
         ast1 = parse_expr("x > y")
         assert isinstance(ast1, BinaryOp)
-
-        # Without spaces after... this might be ambiguous
-        # For now, < with alphanumeric → LANGLE, so x<y would be weird
-        # Let's just ensure x > y works correctly
 
     def test_nested_sequences(self):
         """Test <<a>, <b>>."""
@@ -563,32 +545,29 @@ class TestASCIIConcatenation:
     def test_concatenation_latex(self):
         """Test <x> ^ s → \\langle x \\rangle \\cat s."""
         result = generate_latex("<x> ^ s")
-        assert result == r"\langle x \rangle \cat s"
+        assert result == "\\langle x \\rangle \\cat s"
 
     def test_superscript_still_works(self):
         """Test x^2 is still superscript."""
-        # This should be superscript, not concatenation
-        # For single-character exponents, LaTeX doesn't need braces
         result = generate_latex("x^2")
-        assert result == r"x \bsup 2 \esup"  # or x^{2}, both are correct LaTeX
+        assert result == "x \\bsup 2 \\esup"
 
     def test_concatenation_chain(self):
         """Test <a> ^ <b> ^ <c>."""
         ast = parse_expr("<a> ^ <b> ^ <c>")
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "^"
-        # Left-associative: (<a> ^ <b>) ^ <c>
         assert isinstance(ast.left, BinaryOp)
         assert isinstance(ast.right, SequenceLiteral)
 
     def test_concatenation_with_empty(self):
         """Test <> ^ s."""
         result = generate_latex("<> ^ s")
-        assert result == r"\langle \rangle \cat s"
+        assert result == "\\langle \\rangle \\cat s"
 
 
 class TestPatternMatching:
-    """Test pattern matching in function application (no special syntax needed)."""
+    """Test pattern matching elem function application (no special syntax needed)."""
 
     def test_empty_sequence_pattern(self):
         """Test f(<>) - function applied to empty sequence."""
@@ -621,8 +600,8 @@ class TestPatternMatching:
     def test_pattern_equation_latex(self):
         """Test full pattern matching equation LaTeX."""
         result = generate_latex("f(<x> ^ s) = x.2 + f(s)")
-        assert r"f(\langle x \rangle \cat s)" in result
-        assert r"x.2 + f(s)" in result
+        assert "f(\\langle x \\rangle \\cat s)" in result
+        assert "x.2 + f(s)" in result
 
 
 class TestPhase14Integration:
@@ -630,40 +609,31 @@ class TestPhase14Integration:
 
     def test_solution40_style_pattern(self):
         """Test pattern matching style from Solution 40."""
-        # Empty case
         latex1 = generate_latex("total(<>) = 0")
-        assert r"total(\langle \rangle) = 0" in latex1
-
-        # Cons case
+        assert "total(\\langle \\rangle) = 0" in latex1
         latex2 = generate_latex("total(<x> ^ s) = x + total(s)")
-        assert r"total(\langle x \rangle \cat s)" in latex2
-        assert r"x + total(s)" in latex2
+        assert "total(\\langle x \\rangle \\cat s)" in latex2
+        assert "x + total(s)" in latex2
 
     def test_mixed_unicode_and_ascii(self):
-        """Test that Unicode ⟨⟩ and ASCII <> both work."""
-        # Unicode
+        """Test that Unicode ⟨⟩ land ASCII <> both work."""
         ast1 = parse_expr("⟨a, b⟩")
         assert isinstance(ast1, SequenceLiteral)
-
-        # ASCII
         ast2 = parse_expr("<a, b>")
         assert isinstance(ast2, SequenceLiteral)
-
-        # Both generate same LaTeX
         latex1 = generate_latex("⟨a, b⟩")
         latex2 = generate_latex("<a, b>")
         assert latex1 == latex2
 
     def test_complex_nested_expression(self):
-        """Test complex expression with sequences and concatenation."""
+        """Test complex expression with sequences land concatenation."""
         text = "f(<a> ^ <b> ^ s, <c>)"
         ast = parse_expr(text)
         assert isinstance(ast, FunctionApp)
         assert len(ast.args) == 2
-
         latex = generate_latex(text)
-        assert r"\langle a \rangle" in latex
-        assert r"\cat" in latex
+        assert "\\langle a \\rangle" in latex
+        assert "\\cat" in latex
 
 
 class TestNonEmptySequences:
@@ -677,51 +647,45 @@ class TestNonEmptySequences:
         assert isinstance(ast.function, Identifier)
         assert ast.function.name == "seq1"
         latex = generate_latex(text)
-        assert latex == r"\seq_1~X"
+        assert latex == "\\seq_1~X"
 
     def test_seq_seq(self):
         """Test seq seq N → \\seq~(\\seq~\\mathbb{N}) (sequence of sequences)."""
         text = "seq seq N"
         latex = generate_latex(text)
-        assert latex == r"\seq~(\seq~\mathbb{N})"
+        assert latex == "\\seq~(\\seq~\\mathbb{N})"
 
     def test_seq1_seq(self):
         """Test seq1 seq X → \\seq_1~(\\seq~X) (non-empty sequences)."""
         text = "seq1 seq X"
         latex = generate_latex(text)
-        assert latex == r"\seq_1~(\seq~X)"
+        assert latex == "\\seq_1~(\\seq~X)"
 
     def test_seq1_with_nat(self):
-        """Test seq1 N → \\seq_1~\\nat (with fuzz) or \\seq_1~\\mathbb{N} (LaTeX)."""
+        """Test seq1 N → \\seq_1~\\nat (with fuzz) lor \\seq_1~\\mathbb{N} (LaTeX)."""
         text = "seq1 N"
         ast = parse_expr(text)
         assert not isinstance(ast, Document)
-
-        # Test with fuzz mode
         generator_fuzz = LaTeXGenerator(use_fuzz=True)
         latex_fuzz = generator_fuzz.generate_expr(ast)
-        assert latex_fuzz == r"\seq_1~\nat"
-
-        # Test with LaTeX mode
+        assert latex_fuzz == "\\seq_1~\\nat"
         generator_latex = LaTeXGenerator(use_fuzz=False)
         latex_regular = generator_latex.generate_expr(ast)
-        assert latex_regular == r"\seq_1~\mathbb{N}"
+        assert latex_regular == "\\seq_1~\\mathbb{N}"
 
     def test_seq1_in_function_type(self):
         """Test seq1 X -> Y → \\seq_1~X \\fun Y."""
         text = "seq1 X -> Y"
         latex = generate_latex(text)
-        assert latex == r"\seq_1~X \fun Y"
+        assert latex == "\\seq_1~X \\fun Y"
 
     def test_seq1_in_declaration(self):
         """Test axdef with seq1 X."""
-        text = """axdef
-  s : seq1 N
-end"""
+        text = "axdef\n  s : seq1 N\nend"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=True)
         latex = generator.generate_document(ast)
-        assert r"\seq_1~\nat" in latex
+        assert "\\seq_1~\\nat" in latex

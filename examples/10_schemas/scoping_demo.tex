@@ -142,7 +142,7 @@ allowed because they are in different schema scopes.
 \end{schema}
 
 \noindent LoggedInUser has its own copies of userId and name fields
-$(as(userId) \land userName)$, plus sessionToken. In full Z notation,
+(as userId and userName), plus sessionToken. In full Z notation,
 schema inclusion would allow referencing User directly, but here we
 show explicit declarations.
 
@@ -386,7 +386,7 @@ from other schemas, but here we show explicit declarations.
 \begin{schema}{ColoredItem}
   color : Color
   \where
-  color \in \{red, blue\}
+  color(in)(\{red, blue\})
 \end{schema}
 
 \noindent The free type constructors (red, green, blue) are in global

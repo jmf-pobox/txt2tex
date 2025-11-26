@@ -47,8 +47,8 @@ $(\mu x : \nat | x * x = 16 @ x + 1)$
 \noindent
 $(\mu n : \nat | n > 10 \land n < 12.2 * n)$
 
-\noindent Finds $n = 11$ $(unique(n)(between)(10) \land 12)$, then
-returns 2 * $11 = 22$.
+\noindent Finds $n = 11$ (unique n between 10 and 12), then returns 2
+* $11 = 22$.
 
 \bigskip
 
@@ -140,7 +140,7 @@ Configuration Values}
   parseValue : ConfigValue \fun \nat
   \where
   \forall k : ConfigKey @ \\
-  \t1 k \in \dom configs \implies \\
+  \t1 k(in)(\dom configs) \implies \\
   \t1 getConfigInt(k) = (\mu v : \nat | parseValue(configs(k)) = v)
 \end{axdef}
 
@@ -154,8 +154,8 @@ Configuration Values}
 \begin{axdef}
   getConfigWithDefault : ConfigKey \cross \nat \fun \nat
   \where
-  \forall k : ConfigKey @ \forall default : \nat @ k \in \dom configs
-  \implies \\
+  \forall k : ConfigKey @ \forall default : \nat @ k(in)(\dom
+  configs) \implies \\
   \t2 getConfigWithDefault(k, default) = (\mu v : \nat |
   parseValue(configs(k)) = v) \\
   \forall k : ConfigKey @ \forall default : \nat @ k \notin \dom

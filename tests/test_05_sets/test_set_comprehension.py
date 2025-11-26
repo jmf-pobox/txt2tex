@@ -21,14 +21,13 @@ class TestPhase8Parsing:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, SetComprehension)
         assert ast.variables == ["x"]
         assert isinstance(ast.domain, Identifier)
         assert ast.domain.name == "N"
         assert isinstance(ast.predicate, BinaryOp)
         assert ast.predicate.operator == ">"
-        assert ast.expression is None  # No expression part
+        assert ast.expression is None
 
     def test_set_by_expression(self) -> None:
         """Test parsing set with expression: { x : N | x > 0 . x^2 }."""
@@ -36,7 +35,6 @@ class TestPhase8Parsing:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, SetComprehension)
         assert ast.variables == ["x"]
         assert isinstance(ast.domain, Identifier)
@@ -52,7 +50,6 @@ class TestPhase8Parsing:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, SetComprehension)
         assert ast.variables == ["x", "y"]
         assert isinstance(ast.domain, Identifier)
@@ -66,7 +63,6 @@ class TestPhase8Parsing:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, SetComprehension)
         assert ast.variables == ["x"]
         assert ast.domain is None
@@ -79,7 +75,6 @@ class TestPhase8Parsing:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, Document)
         assert len(ast.items) == 2
         assert isinstance(ast.items[0], SetComprehension)
@@ -106,14 +101,12 @@ class TestPhase8LaTeXGeneration:
             line=1,
             column=1,
         )
-
         latex = gen.generate_expr(set_comp)
-
-        assert r"\{" in latex
-        assert r"\}" in latex
-        assert r"\colon" in latex
-        assert r"\mid" in latex
-        assert r"\bullet" not in latex  # No expression part
+        assert "\\{" in latex
+        assert "\\}" in latex
+        assert "\\colon" in latex
+        assert "\\mid" in latex
+        assert "\\bullet" not in latex
         assert "x" in latex
         assert "N" in latex
         assert ">" in latex
@@ -141,17 +134,15 @@ class TestPhase8LaTeXGeneration:
             line=1,
             column=1,
         )
-
         latex = gen.generate_expr(set_comp)
-
-        assert r"\{" in latex
-        assert r"\}" in latex
-        assert r"\colon" in latex
-        assert r"\mid" in latex
-        assert r"\bullet" in latex  # Has expression part
+        assert "\\{" in latex
+        assert "\\}" in latex
+        assert "\\colon" in latex
+        assert "\\mid" in latex
+        assert "\\bullet" in latex
         assert "x" in latex
         assert "N" in latex
-        assert r"\bsup" in latex
+        assert "\\bsup" in latex
         assert "2" in latex
 
     def test_generate_multi_variable_set(self) -> None:
@@ -171,14 +162,12 @@ class TestPhase8LaTeXGeneration:
             line=1,
             column=1,
         )
-
         latex = gen.generate_expr(set_comp)
-
-        assert r"\{" in latex
-        assert r"\}" in latex
-        assert r"\colon" in latex
-        assert r"\mid" in latex
-        assert "x, y" in latex or "x , y" in latex  # May have spacing
+        assert "\\{" in latex
+        assert "\\}" in latex
+        assert "\\colon" in latex
+        assert "\\mid" in latex
+        assert "x, y" in latex or "x , y" in latex
         assert "N" in latex
         assert "=" in latex
 
@@ -199,14 +188,12 @@ class TestPhase8LaTeXGeneration:
             line=1,
             column=1,
         )
-
         latex = gen.generate_expr(set_comp)
-
-        assert r"\{" in latex
-        assert r"\}" in latex
-        assert r"\colon" not in latex  # No domain
-        assert r"\mid" in latex
-        assert r"\in" in latex
+        assert "\\{" in latex
+        assert "\\}" in latex
+        assert "\\colon" not in latex
+        assert "\\mid" in latex
+        assert "\\in" in latex
         assert "x" in latex
         assert "A" in latex
 
@@ -228,19 +215,17 @@ class TestPhase8LaTeXGeneration:
                     expression=None,
                     line=1,
                     column=1,
-                ),
+                )
             ],
             line=1,
             column=1,
         )
-
         latex = gen.generate_document(doc)
-
-        assert r"\documentclass[a4paper,10pt,fleqn]{article}" in latex
-        assert r"\begin{document}" in latex
-        assert r"\{" in latex
-        assert r"\}" in latex
-        assert r"\end{document}" in latex
+        assert "\\documentclass[a4paper,10pt,fleqn]{article}" in latex
+        assert "\\begin{document}" in latex
+        assert "\\{" in latex
+        assert "\\}" in latex
+        assert "\\end{document}" in latex
 
 
 class TestPhase8Integration:
@@ -249,65 +234,45 @@ class TestPhase8Integration:
     def test_end_to_end_simple_set(self) -> None:
         """Test complete pipeline from text to LaTeX for simple set."""
         text = "{ x : N | x > 0 }"
-
-        # Lex
         lexer = Lexer(text)
         tokens = lexer.tokenize()
-
-        # Parse
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Generate
         gen = LaTeXGenerator()
-        # ast is SetComprehension here, not Document
         assert isinstance(ast, SetComprehension)
         latex = gen.generate_expr(ast)
-
-        # Verify
-        assert r"\{" in latex
-        assert r"\mid" in latex
-        assert r"\}" in latex
+        assert "\\{" in latex
+        assert "\\mid" in latex
+        assert "\\}" in latex
 
     def test_end_to_end_set_by_expression(self) -> None:
         """Test complete pipeline for set by expression."""
         text = "{ x : N | x > 0 . x^2 }"
-
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, SetComprehension)
         assert ast.expression is not None
-
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert r"\bullet" in latex
-        assert r"\bsup" in latex
+        assert "\\bullet" in latex
+        assert "\\bsup" in latex
 
     def test_end_to_end_multi_variable(self) -> None:
         """Test complete pipeline for multi-variable set."""
-        text = "{ x, y, z : N | x = y and y = z }"
-
+        text = "{ x, y, z : N | x = y land y = z }"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, SetComprehension)
         assert ast.variables == ["x", "y", "z"]
-
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
         assert "x" in latex
         assert "y" in latex
         assert "z" in latex
-
-
-# Set comprehension with period separator tests
 
 
 def test_set_comp_with_period_separator() -> None:
@@ -317,8 +282,6 @@ def test_set_comp_with_period_separator() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
-    # Should parse as: {p : Person . p |-> f(p)} with predicate=None
     assert isinstance(result, SetComprehension)
     assert result.variables == ["p"]
     assert result.predicate is None
@@ -326,16 +289,13 @@ def test_set_comp_with_period_separator() -> None:
 
 
 def test_set_comp_period_vs_pipe() -> None:
-    """Test difference between period and pipe separator."""
-    # Period: no predicate
+    """Test difference between period land pipe separator."""
     text1 = "{x : N . x * 2}"
     lexer1 = Lexer(text1)
     result1 = Parser(lexer1.tokenize()).parse()
     assert isinstance(result1, SetComprehension)
     assert result1.predicate is None
     assert result1.expression is not None
-
-    # Pipe: has predicate
     text2 = "{x : N | x > 0 . x * 2}"
     lexer2 = Lexer(text2)
     result2 = Parser(lexer2.tokenize()).parse()
@@ -345,30 +305,28 @@ def test_set_comp_period_vs_pipe() -> None:
 
 
 class TestUnaryOperatorsInSetComprehensions:
-    """Test unary operators (# , not, -) in set comprehension contexts."""
+    """Test unary operators (# , lnot, -) elem set comprehension contexts."""
 
     def test_hash_in_predicate(self) -> None:
-        """Test # operator in set comprehension predicate."""
+        """Test # operator elem set comprehension predicate."""
         text = "{i : 1 .. 5 | # s(i) > 0}"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         assert isinstance(ast, SetComprehension)
-        # Verify it parsed successfully
 
     def test_hash_in_expression(self) -> None:
-        """Test # operator in set comprehension expression part."""
+        """Test # operator elem set comprehension expression part."""
         text = "{i : 1 .. 5 . # s(i)}"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         assert isinstance(ast, SetComprehension)
-        # Verify it parsed successfully
 
     def test_nested_set_with_hash(self) -> None:
-        """Test nested set comprehensions with # in predicate."""
+        """Test nested set comprehensions with # elem predicate."""
         text = "{i : 1 .. n | # {j : 1 .. i | j > 0} > 0}"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -377,7 +335,7 @@ class TestUnaryOperatorsInSetComprehensions:
         assert isinstance(ast, SetComprehension)
 
     def test_hash_with_function_application(self) -> None:
-        """Test # applied to function application in predicate."""
+        """Test # applied to function application elem predicate."""
         text = "{i : 1 .. # s | # s(i) = i}"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -386,8 +344,8 @@ class TestUnaryOperatorsInSetComprehensions:
         assert isinstance(ast, SetComprehension)
 
     def test_not_in_predicate(self) -> None:
-        """Test not operator in set comprehension predicate."""
-        text = "{x : N | not x > 0}"
+        """Test lnot operator elem set comprehension predicate."""
+        text = "{x : N | lnot x > 0}"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -395,7 +353,7 @@ class TestUnaryOperatorsInSetComprehensions:
         assert isinstance(ast, SetComprehension)
 
     def test_minus_in_predicate(self) -> None:
-        """Test unary minus in set comprehension predicate."""
+        """Test unary minus elem set comprehension predicate."""
         text = "{x : N | -x > 0}"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -404,7 +362,7 @@ class TestUnaryOperatorsInSetComprehensions:
         assert isinstance(ast, SetComprehension)
 
     def test_latex_generation_hash_predicate(self) -> None:
-        """Test LaTeX generation for # in predicate."""
+        """Test LaTeX generation for # elem predicate."""
         text = "{i : 1 .. n | # s(i) > 0}"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -413,5 +371,5 @@ class TestUnaryOperatorsInSetComprehensions:
         assert not isinstance(ast, Document)
         generator = LaTeXGenerator()
         latex = generator.generate_expr(ast)
-        assert r"\#" in latex
+        assert "\\#" in latex
         assert "s(i)" in latex

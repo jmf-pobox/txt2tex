@@ -23,7 +23,7 @@ class TestBsupEsupGeneration:
         )
         gen = LaTeXGenerator(use_fuzz=True)
         result = gen._generate_superscript(node, parent=None)
-        assert result == r"x \bsup 2 \esup"
+        assert result == "x \\bsup 2 \\esup"
 
     def test_simple_variable_exponent(self) -> None:
         """Test 2^n generates 2 \\bsup n \\esup."""
@@ -35,7 +35,7 @@ class TestBsupEsupGeneration:
         )
         gen = LaTeXGenerator(use_fuzz=True)
         result = gen._generate_superscript(node, parent=None)
-        assert result == r"2 \bsup n \esup"
+        assert result == "2 \\bsup n \\esup"
 
     def test_relation_iteration(self) -> None:
         """Test R^n generates R \\bsup n \\esup (relation iteration)."""
@@ -47,7 +47,7 @@ class TestBsupEsupGeneration:
         )
         gen = LaTeXGenerator(use_fuzz=True)
         result = gen._generate_superscript(node, parent=None)
-        assert result == r"R \bsup n \esup"
+        assert result == "R \\bsup n \\esup"
 
     def test_zed_mode_also_uses_bsup(self) -> None:
         """Test that zed mode (--zed flag) also uses \\bsup...\\esup."""
@@ -57,16 +57,16 @@ class TestBsupEsupGeneration:
             line=1,
             column=1,
         )
-        gen = LaTeXGenerator(use_fuzz=False)  # zed mode
+        gen = LaTeXGenerator(use_fuzz=False)
         result = gen._generate_superscript(node, parent=None)
-        assert result == r"R \bsup n \esup"
+        assert result == "R \\bsup n \\esup"
 
 
 class TestBsupEsupIntegration:
     """Integration tests for exponentiation through full pipeline."""
 
     def test_simple_exponent_full_pipeline(self) -> None:
-        """Test x^2 through lexer, parser, and generator."""
+        """Test x^2 through lexer, parser, land generator."""
         text = "x^2"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -74,7 +74,7 @@ class TestBsupEsupIntegration:
         ast = parser.parse()
         gen = LaTeXGenerator(use_fuzz=True)
         result = gen.generate_expr(cast("Expr", ast))
-        assert result == r"x \bsup 2 \esup"
+        assert result == "x \\bsup 2 \\esup"
 
     def test_power_of_ten(self) -> None:
         """Test 10^6 through full pipeline."""
@@ -85,7 +85,7 @@ class TestBsupEsupIntegration:
         ast = parser.parse()
         gen = LaTeXGenerator(use_fuzz=True)
         result = gen.generate_expr(cast("Expr", ast))
-        assert result == r"10 \bsup 6 \esup"
+        assert result == "10 \\bsup 6 \\esup"
 
     def test_complex_exponent(self) -> None:
         """Test R^(n+1) generates R \\bsup (n + 1) \\esup."""
@@ -96,7 +96,7 @@ class TestBsupEsupIntegration:
         ast = parser.parse()
         gen = LaTeXGenerator(use_fuzz=True)
         result = gen.generate_expr(cast("Expr", ast))
-        assert result == r"R \bsup (n + 1) \esup"
+        assert result == "R \\bsup (n + 1) \\esup"
 
     def test_nested_exponentiation(self) -> None:
         """Test (x^2)^3 generates nested \\bsup."""
@@ -107,10 +107,9 @@ class TestBsupEsupIntegration:
         ast = parser.parse()
         gen = LaTeXGenerator(use_fuzz=True)
         result = gen.generate_expr(cast("Expr", ast))
-        # Should generate: (x \bsup 2 \esup) \bsup 3 \esup
-        assert r"\bsup" in result
-        assert r"\esup" in result
-        assert result.count(r"\bsup") == 2  # Two levels of exponentiation
+        assert "\\bsup" in result
+        assert "\\esup" in result
+        assert result.count("\\bsup") == 2
 
     def test_exponent_with_closure_operator(self) -> None:
         """Test R+^n (transitive closure then iteration)."""
@@ -121,6 +120,5 @@ class TestBsupEsupIntegration:
         ast = parser.parse()
         gen = LaTeXGenerator(use_fuzz=True)
         result = gen.generate_expr(cast("Expr", ast))
-        # R+ becomes R^{+}, then ^n adds \bsup n \esup
-        assert r"\bsup" in result
-        assert r"\esup" in result
+        assert "\\bsup" in result
+        assert "\\esup" in result

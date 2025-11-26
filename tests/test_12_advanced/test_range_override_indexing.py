@@ -16,21 +16,15 @@ from txt2tex.parser import Parser
 
 
 class TestAnonymousSchemas:
-    """Test anonymous schema parsing and LaTeX generation."""
+    """Test anonymous schema parsing land LaTeX generation."""
 
     def test_anonymous_schema_basic(self) -> None:
         """Test basic anonymous schema."""
-        txt = """schema
-  x : N
-where
-  x > 0
-end"""
+        txt = "schema\n  x : N\nwhere\n  x > 0\nend"
         lexer = Lexer(txt)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Check AST structure
         assert isinstance(ast, Document)
         assert isinstance(ast.items[0], Schema)
         schema = ast.items[0]
@@ -40,26 +34,19 @@ end"""
 
     def test_anonymous_schema_latex(self) -> None:
         """Test LaTeX generation for anonymous schema."""
-        txt = """schema
-  x : N
-where
-  x > 0
-end"""
+        txt = "schema\n  x : N\nwhere\n  x > 0\nend"
         lexer = Lexer(txt)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-
-        # Should have empty schema name
-        assert r"\begin{schema}{}" in latex
-        assert r"\end{schema}" in latex
+        assert "\\begin{schema}{}" in latex
+        assert "\\end{schema}" in latex
 
 
 class TestRangeOperator:
-    """Test range operator (..) parsing and LaTeX generation."""
+    """Test range operator (..) parsing land LaTeX generation."""
 
     def test_range_simple_numbers(self) -> None:
         """Test simple numeric range: 1..10."""
@@ -68,8 +55,6 @@ class TestRangeOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Check AST structure
         assert isinstance(ast, Range)
         assert isinstance(ast.start, Number)
         assert ast.start.value == "1"
@@ -83,8 +68,6 @@ class TestRangeOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Check AST structure
         assert isinstance(ast, Range)
         assert isinstance(ast.start, Number)
         assert ast.start.value == "1993"
@@ -98,8 +81,6 @@ class TestRangeOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Check AST structure
         assert isinstance(ast, Range)
         assert isinstance(ast.start, TupleProjection)
         assert ast.start.index == 2
@@ -113,13 +94,9 @@ class TestRangeOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Check AST structure
         assert isinstance(ast, Range)
-        # Start should be BinaryOp (1 + 2)
         assert isinstance(ast.start, BinaryOp)
         assert ast.start.operator == "+"
-        # End should be BinaryOp (3 + 4)
         assert isinstance(ast.end, BinaryOp)
         assert ast.end.operator == "+"
 
@@ -130,13 +107,10 @@ class TestRangeOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, Range)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        # Should use \upto command
-        assert latex == r"1 \upto 10"
+        assert latex == "1 \\upto 10"
 
     def test_range_latex_identifiers(self) -> None:
         """Test LaTeX generation for range with identifiers."""
@@ -145,12 +119,10 @@ class TestRangeOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, Range)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"1993 \upto current"
+        assert latex == "1993 \\upto current"
 
     def test_range_latex_complex(self) -> None:
         """Test LaTeX generation for complex range expressions."""
@@ -159,12 +131,10 @@ class TestRangeOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, Range)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"x.2 \upto x.3"
+        assert latex == "x.2 \\upto x.3"
 
     def test_range_in_set_comprehension(self) -> None:
         """Test range operator inside set comprehension."""
@@ -173,8 +143,6 @@ class TestRangeOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Check AST structure
         assert isinstance(ast, SetComprehension)
         assert isinstance(ast.domain, Range)
         assert isinstance(ast.domain.start, Number)
@@ -183,35 +151,26 @@ class TestRangeOperator:
         assert ast.domain.end.value == "10"
 
     def test_range_in_set_comprehension_latex(self) -> None:
-        """Test LaTeX for range in set comprehension."""
+        """Test LaTeX for range elem set comprehension."""
         txt = "{ x : 1..10 | x > 5 }"
         lexer = Lexer(txt)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, SetComprehension)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        # Should have \upto in the domain
-        assert r"1 \upto 10" in latex
-        assert r"\{" in latex
-        assert r"\}" in latex
+        assert "1 \\upto 10" in latex
+        assert "\\{" in latex
+        assert "\\}" in latex
 
     def test_range_in_schema(self) -> None:
-        """Test range operator in schema declarations."""
-        txt = """schema
-  year : 1993..current
-where
-  year >= 1993
-end"""
+        """Test range operator elem schema declarations."""
+        txt = "schema\n  year : 1993..current\nwhere\n  year >= 1993\nend"
         lexer = Lexer(txt)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Check AST structure
         assert isinstance(ast, Document)
         assert isinstance(ast.items[0], Schema)
         schema = ast.items[0]
@@ -222,15 +181,12 @@ end"""
 
     def test_range_not_confused_with_period(self) -> None:
         """Test that range (..) is distinct from single period (.)."""
-        # Single period should be tuple projection
         txt1 = "x.1"
         lexer1 = Lexer(txt1)
         tokens1 = lexer1.tokenize()
         parser1 = Parser(tokens1)
         ast1 = parser1.parse()
         assert isinstance(ast1, TupleProjection)
-
-        # Double period should be range
         txt2 = "1..10"
         lexer2 = Lexer(txt2)
         tokens2 = lexer2.tokenize()
@@ -240,15 +196,12 @@ end"""
 
     def test_range_with_whitespace(self) -> None:
         """Test range with various whitespace."""
-        # No whitespace
         txt1 = "1..10"
         lexer1 = Lexer(txt1)
         tokens1 = lexer1.tokenize()
         parser1 = Parser(tokens1)
         ast1 = parser1.parse()
         assert isinstance(ast1, Range)
-
-        # With whitespace
         txt2 = "1 .. 10"
         lexer2 = Lexer(txt2)
         tokens2 = lexer2.tokenize()
@@ -258,7 +211,7 @@ end"""
 
 
 class TestOverrideOperator:
-    """Test override operator (++) parsing and LaTeX generation."""
+    """Test override operator (++) parsing land LaTeX generation."""
 
     def test_override_basic(self) -> None:
         """Test basic override: f ++ g."""
@@ -267,8 +220,6 @@ class TestOverrideOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Check AST structure
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "++"
         assert isinstance(ast.left, Identifier)
@@ -283,13 +234,10 @@ class TestOverrideOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        # Should use \\oplus command
-        assert latex == r"f \oplus g"
+        assert latex == "f \\oplus g"
 
     def test_override_chained(self) -> None:
         """Test chained override: f ++ g ++ h."""
@@ -298,14 +246,10 @@ class TestOverrideOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Check AST structure - should be left-associative
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "++"
-        # Left side should be (f ++ g)
         assert isinstance(ast.left, BinaryOp)
         assert ast.left.operator == "++"
-        # Right side should be h
         assert isinstance(ast.right, Identifier)
         assert ast.right.name == "h"
 
@@ -316,12 +260,10 @@ class TestOverrideOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"f \oplus g \oplus h"
+        assert latex == "f \\oplus g \\oplus h"
 
     def test_override_with_set_literals(self) -> None:
         """Test override with set literals: {1 |-> a} ++ {2 |-> b}."""
@@ -330,8 +272,6 @@ class TestOverrideOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Check AST structure
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "++"
 
@@ -342,8 +282,6 @@ class TestOverrideOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should parse as (A union B) ++ C (left-associative)
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "++"
         assert isinstance(ast.left, BinaryOp)
@@ -356,64 +294,45 @@ class TestOverrideOperator:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should parse as (A intersect B) ++ (C intersect D)
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "++"
-        # Both sides should be intersections
         assert isinstance(ast.left, BinaryOp)
         assert ast.left.operator == "intersect"
         assert isinstance(ast.right, BinaryOp)
         assert ast.right.operator == "intersect"
 
     def test_override_in_schema_declaration(self) -> None:
-        """Test override in schema type declarations."""
-        txt = """schema
-  f : A -> B
-  g : A -> B
-where
-  f ++ g = h
-end"""
+        """Test override elem schema type declarations."""
+        txt = "schema\n  f : A -> B\n  g : A -> B\nwhere\n  f ++ g = h\nend"
         lexer = Lexer(txt)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Check AST structure
         assert isinstance(ast, Document)
         assert isinstance(ast.items[0], Schema)
         schema = ast.items[0]
-        # Check predicate contains override
-        assert len(schema.predicates) == 1  # One group
-        assert len(schema.predicates[0]) == 1  # One predicate
+        assert len(schema.predicates) == 1
+        assert len(schema.predicates[0]) == 1
         pred = schema.predicates[0][0]
         assert isinstance(pred, BinaryOp)
         assert pred.operator == "="
-        # Left side should be override
         assert isinstance(pred.left, BinaryOp)
         assert pred.left.operator == "++"
 
     def test_override_in_axdef(self) -> None:
-        """Test override in axdef predicate."""
-        txt = """axdef
-  f : A -> B
-  g : A -> B
-where
-  dom (f ++ g) = dom f union dom g
-end"""
+        """Test override elem axdef predicate."""
+        txt = (
+            "axdef\n  f : A -> B\n  g : A -> B\n"
+            "where\n  dom (f ++ g) = dom f union dom g\nend"
+        )
         lexer = Lexer(txt)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Check AST structure
         assert isinstance(ast, Document)
-        # Should contain override in predicate
-        # (detailed structure checking omitted for brevity)
 
     def test_override_not_confused_with_plus(self) -> None:
         """Test that ++ is distinct from single + operator."""
-        # Single plus should be addition
         txt1 = "a + b"
         lexer1 = Lexer(txt1)
         tokens1 = lexer1.tokenize()
@@ -421,8 +340,6 @@ end"""
         ast1 = parser1.parse()
         assert isinstance(ast1, BinaryOp)
         assert ast1.operator == "+"
-
-        # Double plus should be override
         txt2 = "a ++ b"
         lexer2 = Lexer(txt2)
         tokens2 = lexer2.tokenize()
@@ -438,8 +355,6 @@ end"""
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should still parse as left-associative
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "++"
 
@@ -450,12 +365,8 @@ end"""
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        # Should contain \\oplus
-        assert r"\oplus" in latex
-        # Should contain maplet arrows
-        assert r"\mapsto" in latex
+        assert "\\oplus" in latex
+        assert "\\mapsto" in latex

@@ -20,7 +20,6 @@ def test_simple_tuple_pattern_forall():
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     quant = parser.parse()
     assert isinstance(quant, Quantifier)
     assert quant.quantifier == "forall"
@@ -39,7 +38,6 @@ def test_tuple_pattern_with_three_variables():
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     quant = parser.parse()
     assert isinstance(quant, Quantifier)
     assert quant.quantifier == "exists"
@@ -55,14 +53,10 @@ def test_tuple_pattern_latex_generation():
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     doc = parser.parse()
-
     generator = LaTeXGenerator(use_fuzz=False)
     latex = generator.generate_document(doc)
-
-    # Should contain tuple pattern in output
-    assert r"\forall (s, e)" in latex or r"\forall (s, e)" in latex
-    # Should contain domain
-    assert r"\ran" in latex
+    assert "\\forall (s, e)" in latex or "\\forall (s, e)" in latex
+    assert "\\ran" in latex
     assert "my_episodes" in latex or "my\\_episodes" in latex
 
 
@@ -72,7 +66,6 @@ def test_tuple_pattern_with_complex_domain():
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     quant = parser.parse()
     assert isinstance(quant, Quantifier)
     assert quant.variables == ["x", "y"]
@@ -85,7 +78,6 @@ def test_tuple_pattern_exists1():
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     quant = parser.parse()
     assert isinstance(quant, Quantifier)
     assert quant.quantifier == "exists1"
@@ -99,8 +91,6 @@ def test_empty_tuple_pattern_error():
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
-    # Empty parens trigger parse error (can't parse expression after LPAREN)
     with pytest.raises(ParserError):
         parser.parse()
 
@@ -111,10 +101,8 @@ def test_nested_tuple_pattern_error():
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     with pytest.raises(
-        ParserError,
-        match="Tuple pattern in quantifier must contain only identifiers",
+        ParserError, match="Tuple pattern in quantifier must contain only identifiers"
     ):
         parser.parse()
 
@@ -125,10 +113,8 @@ def test_tuple_pattern_with_non_identifier_error():
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     with pytest.raises(
-        ParserError,
-        match="Tuple pattern in quantifier must contain only identifiers",
+        ParserError, match="Tuple pattern in quantifier must contain only identifiers"
     ):
         parser.parse()
 
@@ -139,11 +125,10 @@ def test_regular_quantifier_still_works():
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     quant = parser.parse()
     assert isinstance(quant, Quantifier)
     assert quant.variables == ["x"]
-    assert quant.tuple_pattern is None  # No tuple pattern
+    assert quant.tuple_pattern is None
 
 
 def test_multi_variable_quantifier_still_works():
@@ -152,27 +137,23 @@ def test_multi_variable_quantifier_still_works():
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     quant = parser.parse()
     assert isinstance(quant, Quantifier)
     assert quant.variables == ["x", "y"]
-    assert quant.tuple_pattern is None  # No tuple pattern
+    assert quant.tuple_pattern is None
 
 
 def test_tuple_pattern_in_nested_quantifier():
-    """Test tuple pattern in nested quantifier body."""
+    """Test tuple pattern elem nested quantifier body."""
     text = "forall (x, y) : A | exists z : B | x > z"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     outer_quant = parser.parse()
     assert isinstance(outer_quant, Quantifier)
     assert outer_quant.quantifier == "forall"
     assert outer_quant.variables == ["x", "y"]
     assert outer_quant.tuple_pattern is not None
-
-    # Check nested quantifier
     inner_quant = outer_quant.body
     assert isinstance(inner_quant, Quantifier)
     assert inner_quant.quantifier == "exists"
@@ -185,7 +166,6 @@ def test_tuple_pattern_with_constrained_quantifier():
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     quant = parser.parse()
     assert isinstance(quant, Quantifier)
     assert quant.variables == ["x", "y"]
@@ -199,12 +179,10 @@ def test_tuple_pattern_latex_with_colon():
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     doc = parser.parse()
-
     generator = LaTeXGenerator(use_fuzz=False)
     latex = generator.generate_document(doc)
-
-    assert r"\colon" in latex
-    assert r"(a, b)" in latex
+    assert "\\colon" in latex
+    assert "(a, b)" in latex
 
 
 def test_tuple_pattern_latex_fuzz_mode():
@@ -214,13 +192,10 @@ def test_tuple_pattern_latex_fuzz_mode():
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     doc = parser.parse()
-
     generator = LaTeXGenerator(use_fuzz=True)
     latex = generator.generate_document(doc)
-
-    # Fuzz uses : not \colon
     assert ": T" in latex or ":\\," in latex
-    assert r"(a, b)" in latex
+    assert "(a, b)" in latex
 
 
 def test_realistic_example_from_homework():
@@ -229,17 +204,12 @@ def test_realistic_example_from_homework():
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     quant = parser.parse()
     assert isinstance(quant, Quantifier)
     assert quant.quantifier == "forall"
     assert quant.variables == ["s", "e"]
     assert quant.tuple_pattern is not None
-
-    # Generate LaTeX and verify it's valid
     generator = LaTeXGenerator(use_fuzz=False)
     latex = generator.generate_expr(quant)
-
-    # Should contain the tuple pattern and domain
     assert "(s, e)" in latex
-    assert "ran" in latex or r"\ran" in latex
+    assert "ran" in latex or "\\ran" in latex

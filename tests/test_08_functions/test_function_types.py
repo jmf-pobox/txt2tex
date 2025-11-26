@@ -20,14 +20,13 @@ from txt2tex.tokens import TokenType
 
 
 class TestPhase11aLexer:
-    """Test Phase 11a function type operators in lexer."""
+    """Test Phase 11a function type operators elem lexer."""
 
     def test_tfun_tokenization(self) -> None:
         """Test -> (total function) tokenizes correctly."""
         lexer = Lexer("X -> Y")
         tokens = lexer.tokenize()
-
-        assert len(tokens) == 4  # X, ->, Y, EOF
+        assert len(tokens) == 4
         assert tokens[0].type == TokenType.IDENTIFIER
         assert tokens[0].value == "X"
         assert tokens[1].type == TokenType.TFUN
@@ -39,7 +38,6 @@ class TestPhase11aLexer:
         """Test +-> (partial function) tokenizes correctly."""
         lexer = Lexer("X +-> Y")
         tokens = lexer.tokenize()
-
         assert len(tokens) == 4
         assert tokens[1].type == TokenType.PFUN
         assert tokens[1].value == "+->"
@@ -48,7 +46,6 @@ class TestPhase11aLexer:
         """Test >-> (total injection) tokenizes correctly."""
         lexer = Lexer("X >-> Y")
         tokens = lexer.tokenize()
-
         assert len(tokens) == 4
         assert tokens[1].type == TokenType.TINJ
         assert tokens[1].value == ">->"
@@ -57,7 +54,6 @@ class TestPhase11aLexer:
         """Test >+> (partial injection) tokenizes correctly."""
         lexer = Lexer("X >+> Y")
         tokens = lexer.tokenize()
-
         assert len(tokens) == 4
         assert tokens[1].type == TokenType.PINJ
         assert tokens[1].value == ">+>"
@@ -66,7 +62,6 @@ class TestPhase11aLexer:
         """Test -->> (total surjection) tokenizes correctly."""
         lexer = Lexer("X -->> Y")
         tokens = lexer.tokenize()
-
         assert len(tokens) == 4
         assert tokens[1].type == TokenType.TSURJ
         assert tokens[1].value == "-->>"
@@ -75,7 +70,6 @@ class TestPhase11aLexer:
         """Test +->> (partial surjection) tokenizes correctly."""
         lexer = Lexer("X +->> Y")
         tokens = lexer.tokenize()
-
         assert len(tokens) == 4
         assert tokens[1].type == TokenType.PSURJ
         assert tokens[1].value == "+->>"
@@ -84,37 +78,28 @@ class TestPhase11aLexer:
         """Test >->> (bijection) tokenizes correctly."""
         lexer = Lexer("X >->> Y")
         tokens = lexer.tokenize()
-
         assert len(tokens) == 4
         assert tokens[1].type == TokenType.BIJECTION
         assert tokens[1].value == ">->>"
 
     def test_longest_match_first(self) -> None:
         """Test longest-match-first prevents conflicts."""
-        # >->> should be recognized as BIJECTION, not >-> followed by >
         lexer = Lexer("X >->> Y")
         tokens = lexer.tokenize()
-
         assert tokens[1].type == TokenType.BIJECTION
         assert tokens[1].value == ">->>"
-
-        # +->> should be recognized as PSURJ, not +-> followed by >
         lexer2 = Lexer("A +->> B")
         tokens2 = lexer2.tokenize()
-
         assert tokens2[1].type == TokenType.PSURJ
         assert tokens2[1].value == "+->>"
-
-        # -->> should be recognized as TSURJ, not -> preceded by -
-        lexer3 = Lexer(r"M -->> \mathbb{N}")
+        lexer3 = Lexer("M -->> \\mathbb{N}")
         tokens3 = lexer3.tokenize()
-
         assert tokens3[1].type == TokenType.TSURJ
         assert tokens3[1].value == "-->>"
 
 
 class TestPhase11aParser:
-    """Test Phase 11a function type operators in parser."""
+    """Test Phase 11a function type operators elem parser."""
 
     def test_tfun_parsing(self) -> None:
         """Test -> (total function) parses to FunctionType."""
@@ -122,7 +107,6 @@ class TestPhase11aParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, FunctionType)
         assert ast.arrow == "->"
         assert isinstance(ast.domain, Identifier)
@@ -136,7 +120,6 @@ class TestPhase11aParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, FunctionType)
         assert ast.arrow == "+->"
 
@@ -146,7 +129,6 @@ class TestPhase11aParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, FunctionType)
         assert ast.arrow == ">->"
 
@@ -156,7 +138,6 @@ class TestPhase11aParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, FunctionType)
         assert ast.arrow == ">+>"
 
@@ -166,7 +147,6 @@ class TestPhase11aParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, FunctionType)
         assert ast.arrow == "-->>"
 
@@ -176,7 +156,6 @@ class TestPhase11aParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, FunctionType)
         assert ast.arrow == "+->>"
 
@@ -186,7 +165,6 @@ class TestPhase11aParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, FunctionType)
         assert ast.arrow == ">->>"
 
@@ -196,8 +174,6 @@ class TestPhase11aParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should parse as X -> (Y -> Z) (right-associative)
         assert isinstance(ast, FunctionType)
         assert ast.arrow == "->"
         assert isinstance(ast.domain, Identifier)
@@ -211,13 +187,10 @@ class TestPhase11aParser:
 
     def test_precedence_with_relations(self) -> None:
         """Test function types have same precedence as relations."""
-        # X <-> Y should work alongside X -> Y at same precedence level
         lexer = Lexer("X -> Y <-> Z")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Both at precedence 6, but -> is right-assoc: X -> (Y <-> Z)
         assert isinstance(ast, FunctionType)
         assert ast.arrow == "->"
         assert isinstance(ast.domain, Identifier)
@@ -235,12 +208,10 @@ class TestPhase11aLaTeXGeneration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, FunctionType)  # Type narrowing for mypy
-
+        assert isinstance(ast, FunctionType)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"X \fun Y"
+        assert latex == "X \\fun Y"
 
     def test_pfun_latex(self) -> None:
         """Test +-> generates \\pfun."""
@@ -249,11 +220,9 @@ class TestPhase11aLaTeXGeneration:
         parser = Parser(tokens)
         ast = parser.parse()
         assert isinstance(ast, FunctionType)
-
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"X \pfun Y"
+        assert latex == "X \\pfun Y"
 
     def test_tinj_latex(self) -> None:
         """Test >-> generates \\inj."""
@@ -262,11 +231,9 @@ class TestPhase11aLaTeXGeneration:
         parser = Parser(tokens)
         ast = parser.parse()
         assert isinstance(ast, FunctionType)
-
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"X \inj Y"
+        assert latex == "X \\inj Y"
 
     def test_pinj_latex(self) -> None:
         """Test >+> generates \\pinj."""
@@ -275,11 +242,9 @@ class TestPhase11aLaTeXGeneration:
         parser = Parser(tokens)
         ast = parser.parse()
         assert isinstance(ast, FunctionType)
-
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"X \pinj Y"
+        assert latex == "X \\pinj Y"
 
     def test_tsurj_latex(self) -> None:
         """Test -->> generates \\surj."""
@@ -288,11 +253,9 @@ class TestPhase11aLaTeXGeneration:
         parser = Parser(tokens)
         ast = parser.parse()
         assert isinstance(ast, FunctionType)
-
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"X \surj Y"
+        assert latex == "X \\surj Y"
 
     def test_psurj_latex(self) -> None:
         """Test +->> generates \\psurj."""
@@ -301,11 +264,9 @@ class TestPhase11aLaTeXGeneration:
         parser = Parser(tokens)
         ast = parser.parse()
         assert isinstance(ast, FunctionType)
-
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"X \psurj Y"
+        assert latex == "X \\psurj Y"
 
     def test_bijection_latex(self) -> None:
         """Test >->> generates \\bij."""
@@ -314,11 +275,9 @@ class TestPhase11aLaTeXGeneration:
         parser = Parser(tokens)
         ast = parser.parse()
         assert isinstance(ast, FunctionType)
-
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"X \bij Y"
+        assert latex == "X \\bij Y"
 
     def test_nested_function_types_latex(self) -> None:
         """Test nested function types generate correct parentheses."""
@@ -327,12 +286,9 @@ class TestPhase11aLaTeXGeneration:
         parser = Parser(tokens)
         ast = parser.parse()
         assert isinstance(ast, FunctionType)
-
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        # Parentheses should be preserved from input parsing
-        assert r"\fun" in latex
+        assert "\\fun" in latex
 
 
 class TestPhase11aIntegration:
@@ -345,14 +301,11 @@ class TestPhase11aIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, FunctionType)
         assert ast.arrow == "->"
-
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"X \fun Y"
+        assert latex == "X \\fun Y"
 
     def test_end_to_end_pfun(self) -> None:
         """Test complete pipeline for partial function."""
@@ -361,12 +314,10 @@ class TestPhase11aIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, FunctionType)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"A \pfun B"
+        assert latex == "A \\pfun B"
 
     def test_end_to_end_tinj(self) -> None:
         """Test complete pipeline for total injection."""
@@ -375,12 +326,10 @@ class TestPhase11aIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, FunctionType)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"X \inj Y"
+        assert latex == "X \\inj Y"
 
     def test_end_to_end_bijection(self) -> None:
         """Test complete pipeline for bijection."""
@@ -389,12 +338,10 @@ class TestPhase11aIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, FunctionType)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        assert latex == r"Domain \bij Codomain"
+        assert latex == "Domain \\bij Codomain"
 
     def test_complex_function_type(self) -> None:
         """Test complex function type from homework."""
@@ -403,47 +350,37 @@ class TestPhase11aIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "<->"
-
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        # Should generate: X \rel Y
-        assert r"\rel" in latex
+        assert "\\rel" in latex
 
     def test_generic_function_declaration(self) -> None:
-        """Test function type in generic context (for homework)."""
+        """Test function type elem generic context (for homework)."""
         text = "(X -> Y) -> Z"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, FunctionType)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        # Should have function types with proper nesting
-        assert latex.count(r"\fun") == 2  # Two -> operators
+        assert latex.count("\\fun") == 2
 
     def test_multiple_function_types(self) -> None:
-        """Test multiple different function types in one expression."""
+        """Test multiple different function types elem one expression."""
         text = "X -> Y +-> Z >-> W"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        assert isinstance(ast, FunctionType)  # Type narrowing
+        assert isinstance(ast, FunctionType)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        # Should have all three function type operators
-        assert r"\fun" in latex
-        assert r"\pfun" in latex
-        assert r"\inj" in latex
+        assert "\\fun" in latex
+        assert "\\pfun" in latex
+        assert "\\inj" in latex
 
     def test_function_type_with_set_ops(self) -> None:
         """Test function types work correctly with set operators."""
@@ -452,12 +389,9 @@ class TestPhase11aIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        assert isinstance(ast, FunctionType)  # Type narrowing
+        assert isinstance(ast, FunctionType)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        # Should parse correctly as function type
-        assert r"\fun" in latex
+        assert "\\fun" in latex
         assert "X" in latex
         assert "Y" in latex

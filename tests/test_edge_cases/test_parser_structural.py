@@ -23,52 +23,33 @@ from txt2tex.parser import Parser
 
 def test_solution_with_parts() -> None:
     """Test solution containing part labels."""
-    text = """** Solution 1 **
-
-(a) x > 0
-
-(b) y > 0
-"""
+    text = "** Solution 1 **\n\n(a) x > 0\n\n(b) y > 0\n"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, Document)
-    # Should have solution with parts inside
     assert isinstance(result.items[0], Solution)
 
 
 def test_multiple_solutions() -> None:
-    """Test multiple solutions in sequence."""
-    text = """** Solution 1 **
-
-x = 1
-
-** Solution 2 **
-
-y = 2
-"""
+    """Test multiple solutions elem sequence."""
+    text = "** Solution 1 **\n\nx = 1\n\n** Solution 2 **\n\ny = 2\n"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, Document)
     assert len(result.items) >= 2
 
 
 def test_section_with_content() -> None:
     """Test section containing other items."""
-    text = """=== Chapter 1 ===
-
-x = 1
-"""
+    text = "=== Chapter 1 ===\n\nx = 1\n"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, Document)
     assert isinstance(result.items[0], Section)
 
@@ -76,27 +57,18 @@ x = 1
 def test_section_with_prose_starter_words() -> None:
     """Test section headers with words that trigger prose detection.
 
-    Regression test for bug where prose-starter words in section headers
+    Regression test for bug where prose-starter words elem section headers
     (like "First", "Show", "Using") were incorrectly treated as prose,
     consuming the rest of the line including the closing ===.
     """
-    # Test the exact example from README
-    text = """=== My First Proof ===
-
-** Solution 1 **
-
-x = 1
-"""
+    text = "=== My First Proof ===\n\n** Solution 1 **\n\nx = 1\n"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, Document)
     assert isinstance(result.items[0], Section)
     assert result.items[0].title == "My First Proof"
-
-    # Test other prose-starter words
     test_cases = [
         "=== First Steps ===",
         "=== Show Your Work ===",
@@ -106,17 +78,14 @@ x = 1
         "=== Given These Assumptions ===",
         "=== Consider the Following ===",
     ]
-
     for section_header in test_cases:
         text = f"{section_header}\n\nx = 1\n"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         result = parser.parse()
-
         assert isinstance(result, Document)
         assert isinstance(result.items[0], Section)
-        # Verify title was extracted correctly (strip === markers)
         expected_title = section_header.strip("= ")
         assert result.items[0].title == expected_title
 
@@ -128,7 +97,6 @@ def test_given_types_multiple() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, Document)
     assert isinstance(result.items[0], GivenType)
     assert len(result.items[0].names) == 3
@@ -141,7 +109,6 @@ def test_free_type_three_branches() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, Document)
     assert isinstance(result.items[0], FreeType)
     assert len(result.items[0].branches) == 3
@@ -154,24 +121,17 @@ def test_abbreviation_simple() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, Document)
     assert isinstance(result.items[0], Abbreviation)
 
 
 def test_axdef_with_where() -> None:
     """Test axdef with where clause."""
-    text = """axdef
-  count : N
-where
-  count > 0
-end
-"""
+    text = "axdef\n  count : N\nwhere\n  count > 0\nend\n"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, Document)
     assert isinstance(result.items[0], AxDef)
     assert len(result.items[0].predicates) > 0
@@ -179,17 +139,11 @@ end
 
 def test_schema_with_where() -> None:
     """Test schema with where clause."""
-    text = """schema State
-  x : N
-where
-  x >= 0
-end
-"""
+    text = "schema State\n  x : N\nwhere\n  x >= 0\nend\n"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, Document)
     assert isinstance(result.items[0], Schema)
     assert len(result.items[0].predicates) > 0
@@ -202,7 +156,6 @@ def test_part_standalone() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, Document)
     assert isinstance(result.items[0], Part)
     assert result.items[0].label == "a"
@@ -210,13 +163,11 @@ def test_part_standalone() -> None:
 
 def test_complex_quantifier() -> None:
     """Test quantifier with complex predicate."""
-    text = "forall x : N | x > 0 and x < 100 or x = 0"
+    text = "forall x : N | x > 0 land x < 100 lor x = 0"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
-    # Should parse without error
     assert result is not None
 
 
@@ -227,8 +178,6 @@ def test_nested_set_operations() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
-    # Should parse without error
     assert result is not None
 
 
@@ -242,32 +191,26 @@ def test_function_composition() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
-    # Should parse without error
     assert result is not None
 
 
 def test_relational_operators() -> None:
     """Test various relational operators."""
-    text = "x <= y and y >= z and a != b"
+    text = "x <= y land y >= z land a != b"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
-    # Should parse without error
     assert result is not None
 
 
 def test_schema_operations() -> None:
     """Test schema composition."""
-    text = "State and OtherState"
+    text = "State land OtherState"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
-    # Should parse without error
     assert result is not None
 
 
@@ -278,6 +221,4 @@ def test_hiding_operator() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
-    # Should parse without error
     assert result is not None

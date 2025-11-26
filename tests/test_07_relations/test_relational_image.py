@@ -2,13 +2,7 @@
 
 from __future__ import annotations
 
-from txt2tex.ast_nodes import (
-    BinaryOp,
-    Identifier,
-    RelationalImage,
-    SetLiteral,
-    UnaryOp,
-)
+from txt2tex.ast_nodes import BinaryOp, Identifier, RelationalImage, SetLiteral, UnaryOp
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
@@ -55,7 +49,6 @@ class TestRelationalImageParser:
         tokens = Lexer("(R o9 S)(| A |)").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, RelationalImage)
-        # The relation should be a binary operation (composition)
         assert isinstance(ast.relation, BinaryOp)
         assert ast.relation.operator == "o9"
         assert isinstance(ast.set, Identifier)
@@ -66,7 +59,6 @@ class TestRelationalImageParser:
         tokens = Lexer("R~(| S |)").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, RelationalImage)
-        # The relation should be a unary operation (inverse)
         assert isinstance(ast.relation, UnaryOp)
         assert ast.relation.operator == "~"
         assert isinstance(ast.relation.operand, Identifier)
@@ -76,7 +68,6 @@ class TestRelationalImageParser:
 
     def test_solution_35_example(self) -> None:
         """Test Solution 35 example pattern."""
-        # From Solution 35: parentOf(| {p} |)
         tokens = Lexer("parentOf(| {p} |)").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, RelationalImage)
@@ -90,7 +81,6 @@ class TestRelationalImageParser:
         tokens = Lexer("R(| S |)(| T |)").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, RelationalImage)
-        # The relation should be another relational image
         assert isinstance(ast.relation, RelationalImage)
         assert isinstance(ast.relation.relation, Identifier)
         assert ast.relation.relation.name == "R"
@@ -108,12 +98,11 @@ class TestRelationalImageLatex:
         assert isinstance(ast, RelationalImage)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"\limg" in latex
-        assert r"\rimg" in latex
+        assert "\\limg" in latex
+        assert "\\rimg" in latex
         assert "R" in latex
         assert "S" in latex
-        # Should be: (R \limg S \rimg) - fuzz requires spaces and wrapping parens
-        assert latex == r"(R \limg S \rimg)"
+        assert latex == "(R \\limg S \\rimg)"
 
     def test_relational_image_with_set_literal_latex(self) -> None:
         """Test LaTeX generation for R(| {1, 2} |)."""
@@ -122,12 +111,11 @@ class TestRelationalImageLatex:
         assert isinstance(ast, RelationalImage)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"\limg" in latex
-        assert r"\rimg" in latex
-        assert r"\{" in latex
-        assert r"\}" in latex
-        # Should be: (R \limg \{1, 2\} \rimg) - fuzz requires spaces and wrapping parens
-        assert latex == r"(R \limg \{1, 2\} \rimg)"
+        assert "\\limg" in latex
+        assert "\\rimg" in latex
+        assert "\\{" in latex
+        assert "\\}" in latex
+        assert latex == "(R \\limg \\{1, 2\\} \\rimg)"
 
     def test_relational_image_with_composition_latex(self) -> None:
         """Test LaTeX generation for (R o9 S)(| A |)."""
@@ -136,11 +124,9 @@ class TestRelationalImageLatex:
         assert isinstance(ast, RelationalImage)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"\circ" in latex  # o9 -> \circ
-        assert r"\limg" in latex
-        assert r"\rimg" in latex
-        # The parentheses from source are lost during parsing (normal behavior)
-        # LaTeX output: R \circ S(\limg A \rimg) is mathematically correct
+        assert "\\circ" in latex
+        assert "\\limg" in latex
+        assert "\\rimg" in latex
         assert "R" in latex
         assert "S" in latex
         assert "A" in latex
@@ -153,12 +139,10 @@ class TestRelationalImageLatex:
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert "parentOf" in latex
-        assert r"\limg" in latex
-        assert r"\rimg" in latex
+        assert "\\limg" in latex
+        assert "\\rimg" in latex
         assert "john" in latex
-        # Should be: (parentOf \limg \{john\} \rimg)
-        # fuzz requires spaces and wrapping parens
-        assert latex == r"(parentOf \limg \{john\} \rimg)"
+        assert latex == "(parentOf \\limg \\{john\\} \\rimg)"
 
     def test_relational_image_with_inverse_latex(self) -> None:
         """Test LaTeX generation for R~(| S |)."""
@@ -167,11 +151,10 @@ class TestRelationalImageLatex:
         assert isinstance(ast, RelationalImage)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert "R^{-1}" in latex  # ~ -> ^{-1}
-        assert r"\limg" in latex
-        assert r"\rimg" in latex
-        # Should be: (R^{-1} \limg S \rimg) - fuzz requires spaces and wrapping parens
-        assert latex == r"(R^{-1} \limg S \rimg)"
+        assert "R^{-1}" in latex
+        assert "\\limg" in latex
+        assert "\\rimg" in latex
+        assert latex == "(R^{-1} \\limg S \\rimg)"
 
 
 class TestRelationalImageEdgeCases:
@@ -194,10 +177,9 @@ class TestRelationalImageEdgeCases:
         assert ast.relation.operator == "<|"
 
     def test_relational_image_preserves_line_column(self) -> None:
-        """Test that relational image preserves line and column info."""
+        """Test that relational image preserves line land column info."""
         tokens = Lexer("R(| S |)").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, RelationalImage)
-        # The LIMG token should be at the start
         assert ast.line == 1
         assert ast.column >= 1

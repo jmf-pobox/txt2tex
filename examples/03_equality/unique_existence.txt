@@ -31,18 +31,18 @@ exists1 n : N | forall m : N | n <= m
 
 TEXT: Unique existence with compound predicates:
 
-exists1 y : N | y in {0, 1} and y != 1
+exists1 y : N | y in {0, 1} land y != 1
 
-exists1 z : Z | z^2 = 4 and z > 0
+exists1 z : Z | z^2 = 4 land z > 0
 
 ** Example 3: One-Point Rule **
 
 TEXT: When a unique value is specified by equality, we can apply the one-point rule:
 
 EQUIV:
-exists y : N | y in {0, 1} and y != 1 and x != y
-<=> exists y : N | y = 0 and x != y [arithmetic]
-<=> 0 in N and x != 0 [one-point rule]
+exists y : N | y in {0, 1} land y != 1 land x != y
+<=> exists y : N | y = 0 land x != y [arithmetic]
+<=> 0 in N land x != 0 [one-point rule]
 <=> x != 0
 
 ** Example 4: Unique in Domain **

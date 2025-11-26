@@ -36,7 +36,7 @@ TEXT: This finds x = 4, then evaluates x + 1, giving 5.
 
 ** Example 3: Finding and Doubling **
 
-mu n : N | n > 10 and n < 12 . 2 * n
+mu n : N | n > 10 land n < 12 . 2 * n
 
 TEXT: Finds n = 11 (unique n between 10 and 12), then returns 2 * 11 = 22.
 
@@ -152,7 +152,7 @@ TEXT: findRootPlusOne = 8
 
 ** Example 12: Complex Expression **
 
-mu x : N | x > 5 and x < 7 . (x * x) + (x + 1)
+mu x : N | x > 5 land x < 7 . (x * x) + (x + 1)
 
 TEXT: Finds x = 6, then evaluates (6 * 6) + (6 + 1) = 36 + 7 = 43.
 

@@ -68,7 +68,6 @@ class TestSequenceFilterParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        # Should parse as (s ↾ A) ↾ B (left-associative)
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "↾"
         assert isinstance(ast.left, BinaryOp)
@@ -113,12 +112,12 @@ class TestSequenceFilterLaTeX:
             column=3,
         )
         latex = gen.generate_expr(ast)
-        assert r"\filter" in latex
+        assert "\\filter" in latex
         assert "s" in latex
         assert "A" in latex
 
     def test_filter_in_document(self) -> None:
-        """Test filter in complete document."""
+        """Test filter elem complete document."""
         text = "s ↾ A"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -127,9 +126,9 @@ class TestSequenceFilterLaTeX:
         assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-        assert r"\filter" in doc
-        assert r"\documentclass" in doc
-        assert r"\end{document}" in doc
+        assert "\\filter" in doc
+        assert "\\documentclass" in doc
+        assert "\\end{document}" in doc
 
     def test_filter_latex_generation_ascii(self) -> None:
         """Test generating LaTeX for filter operator (ASCII keyword)."""
@@ -142,12 +141,12 @@ class TestSequenceFilterLaTeX:
             column=3,
         )
         latex = gen.generate_expr(ast)
-        assert r"\filter" in latex
+        assert "\\filter" in latex
         assert "s" in latex
         assert "A" in latex
 
     def test_filter_in_document_ascii(self) -> None:
-        """Test filter in complete document (ASCII keyword)."""
+        """Test filter elem complete document (ASCII keyword)."""
         text = "s filter A"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -156,9 +155,9 @@ class TestSequenceFilterLaTeX:
         assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-        assert r"\filter" in doc
-        assert r"\documentclass" in doc
-        assert r"\end{document}" in doc
+        assert "\\filter" in doc
+        assert "\\documentclass" in doc
+        assert "\\end{document}" in doc
 
 
 class TestSequenceFilterIntegration:
@@ -175,42 +174,36 @@ class TestSequenceFilterIntegration:
         assert ast.operator == "↾"
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"s \filter A" in latex
+        assert "s \\filter A" in latex
 
     def test_filter_vs_range_restriction(self) -> None:
-        """Test that ↾ (filter) and |> (range restriction) are distinct."""
+        """Test that ↾ (filter) land |> (range restriction) are distinct."""
         text_filter = "s ↾ A"
         text_rres = "R |> S"
-
         lexer_filter = Lexer(text_filter)
         tokens_filter = lexer_filter.tokenize()
         assert tokens_filter[1].type == TokenType.FILTER
-
         lexer_rres = Lexer(text_rres)
         tokens_rres = lexer_rres.tokenize()
         assert tokens_rres[1].type == TokenType.RRES
-
         parser_filter = Parser(tokens_filter)
         ast_filter = parser_filter.parse()
         assert isinstance(ast_filter, BinaryOp)
         assert ast_filter.operator == "↾"
-
         parser_rres = Parser(tokens_rres)
         ast_rres = parser_rres.parse()
         assert isinstance(ast_rres, BinaryOp)
         assert ast_rres.operator == "|>"
-
         gen = LaTeXGenerator()
         latex_filter = gen.generate_expr(ast_filter)
         latex_rres = gen.generate_expr(ast_rres)
-        assert r"\filter" in latex_filter
-        assert r"\rres" in latex_rres
-        assert r"\filter" not in latex_rres
-        assert r"\rres" not in latex_filter
+        assert "\\filter" in latex_filter
+        assert "\\rres" in latex_rres
+        assert "\\filter" not in latex_rres
+        assert "\\rres" not in latex_filter
 
     def test_filter_real_usage(self) -> None:
         """Test realistic usage from Solutions 40, 41."""
-        # From Solution 40: s ↾ {t : Title; l : Length • (t, l, no)}
         text = "s ↾ {t : Title | true}"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -220,7 +213,7 @@ class TestSequenceFilterIntegration:
         assert ast.operator == "↾"
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"\filter" in latex
+        assert "\\filter" in latex
 
     def test_filter_left_associative(self) -> None:
         """Test left-associativity of filter operator."""
@@ -229,8 +222,6 @@ class TestSequenceFilterIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should parse as (s ↾ A) ↾ B (left-associative)
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "↾"
         assert isinstance(ast.left, BinaryOp)
@@ -253,11 +244,10 @@ class TestSequenceFilterIntegration:
         assert ast.operator == "filter"
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"s \filter A" in latex
+        assert "s \\filter A" in latex
 
     def test_filter_real_usage_ascii(self) -> None:
         """Test realistic usage with ASCII keyword."""
-        # From Solution 40: s filter {t : Title | true}
         text = "s filter {t : Title | true}"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -267,4 +257,4 @@ class TestSequenceFilterIntegration:
         assert ast.operator == "filter"
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"\filter" in latex
+        assert "\\filter" in latex

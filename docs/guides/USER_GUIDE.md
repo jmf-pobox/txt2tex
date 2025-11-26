@@ -176,29 +176,29 @@ Generates: `\newpage` to start a new page in the PDF.
 ### Basic Operators
 
 ```
-not p  (or: lnot p)    →  ¬p          (negation)
-p and q  (or: p land q)  →  p ∧ q       (conjunction)
-p or q  (or: p lor q)   →  p ∨ q       (disjunction)
+lnot p           →  ¬p          (negation)
+p land q         →  p ∧ q       (conjunction)
+p lor q          →  p ∨ q       (disjunction)
 p => q           →  p ⇒ q       (implication)
 p <=> q          →  p ⇔ q       (equivalence)
 ```
 
-**Note:** Both English-style (`and`, `or`, `not`) and LaTeX-style (`land`, `lor`, `lnot`) keywords are supported. Use whichever form you prefer - they produce identical output.
+**Important:** Use LaTeX-style keywords `land`, `lor`, `lnot` for logical operators. English-style `and`, `or`, `not` are NOT supported in Z notation expressions.
 
 ### Precedence (highest to lowest)
 
-1. `not` / `lnot` (unary)
-2. `and` / `land`
-3. `or` / `lor`
-4. `=>`
-5. `<=>` (lowest)
+1. `lnot` (unary negation)
+2. `land` (conjunction)
+3. `lor` (disjunction)
+4. `=>` (implication)
+5. `<=>` (equivalence, lowest)
 
 ### Examples
 
 ```
-not p and q      →  (¬p) ∧ q
-p and q => r     →  (p ∧ q) ⇒ r
-p => q => r      →  p ⇒ (q ⇒ r)    [right-associative]
+lnot p land q      →  (¬p) ∧ q
+p land q => r      →  (p ∧ q) ⇒ r
+p => q => r        →  p ⇒ (q ⇒ r)    [right-associative]
 ```
 
 ### Truth Tables
@@ -218,9 +218,9 @@ Generates a centered LaTeX tabular environment with proper formatting.
 
 ```
 EQUIV:
-p and q
-<=> q and p [commutative]
-<=> q and p [idempotent]
+p land q
+<=> q land p [commutative]
+<=> q land p [idempotent]
 ```
 
 Generates `align*` environment with justifications flush-right.
@@ -231,10 +231,10 @@ Justifications are **free-form text** in square brackets after each step. You ca
 
 ```
 EQUIV:
-not (p and q)
-<=> (not p) or (not q) [De Morgan]
-<=> (not p) or (not q) [idempotence]
-<=> (not p) or (not q) or (not r) [associativity]
+lnot (p land q)
+<=> (lnot p) lor (lnot q) [De Morgan]
+<=> (lnot p) lor (lnot q) [idempotence]
+<=> (lnot p) lor (lnot q) lor (lnot r) [associativity]
 <=> true [excluded middle]
 ```
 
@@ -252,9 +252,9 @@ not (p and q)
 **Operator conversion:** Mathematical operators in justifications are automatically converted to LaTeX:
 
 **Logical operators:**
-- `and` / `land` → $\land$
-- `or` / `lor` → $\lor$
-- `not` / `lnot` → $\lnot$
+- `land` → $\land$
+- `lor` → $\lor$
+- `lnot` → $\lnot$
 - `=>` → $\Rightarrow$ (or `\implies` in fuzz mode)
 - `<=>` → $\Leftrightarrow$ (always, even in fuzz mode for EQUIV blocks)
 
@@ -284,13 +284,13 @@ not (p and q)
 
 Example with logical operators:
 ```
-<=> p or (not p and q) [and and true]
+<=> p lor (lnot p land q) [land land true]
 ```
-Renders as: $\Leftrightarrow p \lor (\lnot p \land q)$ with justification $[\land$ and true]
+Renders as: $\Leftrightarrow p \lor (\lnot p \land q)$ with justification [$\land$ $\land$ true]
 
 Example with relation operators:
 ```
-<=> (exists y : Y | w |-> y in (R o9 S) and y |-> z in T) [definition of o9]
+<=> (exists y : Y | w |-> y in (R o9 S) land y |-> z in T) [definition of o9]
 ```
 Renders as: $\Leftrightarrow \exists y : Y \bullet w \mapsto y \in (R \circ S) \land y \mapsto z \in T$ with justification [definition of $\circ$]
 
@@ -358,14 +358,14 @@ forall i, j : dom f | f i = f j => i = j
 forall i, j : dom f | f i = f j . i = j
 ```
 
-The bullet separator works correctly when followed by set operators (`in`, `notin`, `subset`), logical operators (`and`, `or`, `=>`), or comparisons (`<`, `>`, `<=`, `>=`, `!=`).
+The bullet separator works correctly when followed by set operators (`in`, `notin`, `subset`), logical operators (`land`, `lor`, `=>`), or comparisons (`<`, `>`, `<=`, `>=`, `!=`).
 
 #### Definite Description (μ)
 
 The mu operator (μ) denotes "the unique value satisfying a predicate":
 
 ```
-mu x : N | x * x = 4 and x > 0
+mu x : N | x * x = 4 land x > 0
 ```
 
 Generates (in fuzz mode): $(\mu x : \mathbb{N} \mid x \times x = 4 \land x > 0)$
@@ -396,10 +396,10 @@ Comma-separated variables share the same domain.
 forall x : N | exists y : N | x = y
 ```
 
-**Important:** Nested quantifiers in `and`/`or` expressions must be parenthesized:
+**Important:** Nested quantifiers in `land`/`lor` expressions must be parenthesized:
 ```
-✅ Correct:   forall x : N | x > 0 and (forall y : N | y > x)
-❌ Incorrect: forall x : N | x > 0 and forall y : N | y > x
+✅ Correct:   forall x : N | x > 0 land (forall y : N | y > x)
+❌ Incorrect: forall x : N | x > 0 land forall y : N | y > x
 ```
 
 ### Declaration and Binding
@@ -528,7 +528,7 @@ end
 axdef
   e : Entry
 where
-  e.year = 2025 and e.code = 479
+  e.year = 2025 land e.code = 479
 end
 ```
 
@@ -770,7 +770,7 @@ gendef [X, Y]
   fst : X cross Y -> X
   snd : X cross Y -> Y
 where
-  forall x : X; y : Y | fst(x, y) = x and snd(x, y) = y
+  forall x : X; y : Y | fst(x, y) = x land snd(x, y) = y
 end
 ```
 
@@ -779,7 +779,7 @@ end
 gendef [X, Y]
   fst : X cross Y -> X; snd : X cross Y -> Y
 where
-  forall x : X; y : Y | fst(x, y) = x and snd(x, y) = y
+  forall x : X; y : Y | fst(x, y) = x land snd(x, y) = y
 end
 ```
 
@@ -864,7 +864,7 @@ gendef [X]
   emptyContainer : Container[X]
   addToContainer : Container[X] cross X -> Container[X]
 where
-  emptyContainer.contents = ⟨⟩ and emptyContainer.capacity = 100
+  emptyContainer.contents = ⟨⟩ land emptyContainer.capacity = 100
 end
 ```
 
@@ -1723,7 +1723,7 @@ end
 schema Point
   x : N; y : N
 where
-  x > 0 and y > 0
+  x > 0 land y > 0
 end
 ```
 
@@ -1733,7 +1733,7 @@ Generates:
   x : \mathbb{N} \\
   y : \mathbb{N}
 \where
-  x > 0 \land y > 0
+  x > 0 land y > 0
 \end{schema}
 ```
 
@@ -1824,9 +1824,9 @@ Free-form text, wrapped in `\text{}` for proper spacing
 Mathematical operators in justifications are automatically converted to LaTeX symbols:
 
 **Logical operators:**
-- `and` → $\land$
-- `or` → $\lor$
-- `not` → $\lnot$
+- `land` → $\land$
+- `lor` → $\lor$
+- `lnot` → $\lnot$
 - `=>` → $\Rightarrow$ (or `\implies` in fuzz mode)
 - `<=>` → $\Leftrightarrow$ (or `\iff` in fuzz mode)
 
@@ -1847,30 +1847,30 @@ Mathematical operators in justifications are automatically converted to LaTeX sy
 
 Examples:
 - `[=> intro from 1]` → $\Rightarrow$-intro$^{[1]}$
-- `[and elim 1]` → $\land$-elim-1
-- `[or elim from 2]` → $\lor$-elim (from 2)
+- `[land elim 1]` → $\land$-elim-1
+- `[lor elim from 2]` → $\lor$-elim (from 2)
 - `[definition of o9]` → [definition of $\circ$]
 - `[definition of |->]` → [definition of $\mapsto$]
 
 ### Supported Rules
 
 **Conjunction:**
-- `[and intro]` - introduction
-- `[and elim 1]` - left elimination
-- `[and elim 2]` - right elimination
-- `[and intro from 1 and 3]` - introduction with references
+- `[land intro]` - introduction
+- `[land elim 1]` - left elimination
+- `[land elim 2]` - right elimination
+- `[land intro from 1 land 3]` - introduction with references
 
 **Disjunction:**
-- `[or intro 1]` - left introduction
-- `[or intro 2]` - right introduction
-- `[or elim]` - elimination (case analysis)
-- `[or elim from 2 and 3]` - elimination with references
+- `[lor intro 1]` - left introduction
+- `[lor intro 2]` - right introduction
+- `[lor elim]` - elimination (case analysis)
+- `[lor elim from 2 land 3]` - elimination with references
 
 **Implication:**
 - `[=> intro]` - introduction (discharge assumption)
 - `[=> intro from 1]` - introduction discharging assumption 1
 - `[=> elim]` - modus ponens
-- `[=> elim from 1 and 2]` - modus ponens with references
+- `[=> elim from 1 land 2]` - modus ponens with references
 
 **Falsehood:**
 - `[false intro]` - contradiction
@@ -1889,9 +1889,9 @@ Examples:
 
 ```
 PROOF:
-p and q => p [=> intro from 1]
-  [1] p and q [assumption]
-      p [and elim 1]
+p land q => p [=> intro from 1]
+  [1] p land q [assumption]
+      p [land elim 1]
 ```
 
 ### Example: Case Analysis
@@ -1899,9 +1899,9 @@ p and q => p [=> intro from 1]
 **Simple case analysis:**
 ```
 PROOF:
-p or q => r [=> intro from 1]
-  [1] p or q [assumption]
-      r [or elim]
+p lor q => r [=> intro from 1]
+  [1] p lor q [assumption]
+      r [lor elim]
         case p:
           r [from assumption p]
         case q:
@@ -1911,21 +1911,21 @@ p or q => r [=> intro from 1]
 **Case analysis with sibling premises:**
 ```
 PROOF:
-p and (q or r) => (p and q) or (p and r) [=> intro from 1]
-  [1] p and (q or r) [assumption]
-      p [and elim 1]
-      q or r [and elim 2]
-      (p and q) or (p and r) [or elim]
+p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
+  [1] p land (q lor r) [assumption]
+      p [land elim 1]
+      q lor r [land elim 2]
+      (p land q) lor (p land r) [lor elim]
         case q:
           :: p [from above]
           :: q [from case]
-          p and q [and intro]
-          (p and q) or (p and r) [or intro 1]
+          p land q [land intro]
+          (p land q) lor (p land r) [lor intro 1]
         case r:
           :: p [from above]
           :: r [from case]
-          p and r [and intro]
-          (p and q) or (p and r) [or intro 2]
+          p land r [land intro]
+          (p land q) lor (p land r) [lor intro 2]
 ```
 
 **Important**: When working with case analysis:
@@ -2052,7 +2052,7 @@ Container[seq[N]]            →  Container[seq[N]]
 
 - **Function application:** `f(x)` not `f x`
 - **Type application:** `seq(N)` not `seq N`
-- **Nested quantifiers in and/or:** `p and (forall x : N | P)`
+- **Nested quantifiers in land/lor:** `p land (forall x : N | P)`
 
 ### Common Pitfalls
 

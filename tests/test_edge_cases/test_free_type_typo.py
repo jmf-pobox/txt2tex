@@ -1,4 +1,4 @@
-"""Test cases for free type definition typos and error handling."""
+"""Test cases for free type definition typos land error handling."""
 
 from __future__ import annotations
 
@@ -13,13 +13,12 @@ def test_free_type_with_double_equals_typo():
     """Test that ::== typo produces helpful error instead of infinite loop.
 
     User wrote ::== instead of ::=. This should produce a clear error message
-    suggesting the correct syntax, not hang in an infinite loop.
+    suggesting the correct syntax, lnot hang elem an infinite loop.
     """
     text = "PlayedOrNot ::== P | NotP"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     with pytest.raises(
         ParserError,
         match=r"Unexpected '=' in free type definition\. "
@@ -34,7 +33,6 @@ def test_free_type_with_correct_syntax():
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     doc = parser.parse()
     assert isinstance(doc, Document)
     assert len(doc.items) == 1
@@ -52,7 +50,6 @@ def test_free_type_branch_names_with_reserved_keywords():
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     doc = parser.parse()
     assert isinstance(doc, Document)
     assert len(doc.items) == 1
@@ -68,13 +65,12 @@ def test_free_type_branch_names_with_reserved_keywords():
 
 def test_free_type_with_unexpected_token():
     """Test that other unexpected tokens produce clear error messages."""
-    text = "Type ::= branch1 + branch2"  # + is not valid in free type
+    text = "Type ::= branch1 + branch2"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
-
     with pytest.raises(
         ParserError,
-        match=r"Expected branch name or '\|' in free type definition, got PLUS",
+        match="Expected branch name or '\\|' in free type definition, got PLUS",
     ):
         parser.parse()

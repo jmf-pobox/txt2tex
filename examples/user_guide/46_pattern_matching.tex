@@ -13,9 +13,9 @@
 \begin{axdef}
   cumulative\_total : \seq~\nat \fun \nat
   \where
-  cumulative\_total(\langle \rangle) = 0 \land \\
-  \quad (\forall x : \nat @ \forall s : \seq~\nat @
-  cumulative\_total(\langle x \rangle \cat s) = x + cumulative\_total(s))
+  cumulative\_total(\langle \rangle) = 0(and) \\
+  \forall x : \nat @ \forall s : \seq~\nat @
+  cumulative\_total(\langle x \rangle \cat s) = x + cumulative\_total(s)
 \end{axdef}
 
 \end{document}

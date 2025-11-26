@@ -16,7 +16,7 @@
 \addcontentsline{toc}{section}{Example 1 : Statement of LEM}
 
 \noindent The law of excluded middle states: for any proposition p,
-either p is true or $\lnot$ p is true.
+either p is true or $\lnot p$ is true.
 
 \bigskip
 
@@ -49,7 +49,7 @@ $p \lor \lnot p$
 \end{center}
 \bigskip
 
-\noindent By LEM, we can case-analyze on p $\lor$ $\lnot$ p. In both
+\noindent By LEM, we can case-analyze on p $\lor$ $\lnot p$. In both
 cases we derive q.
 
 \bigskip
@@ -58,7 +58,7 @@ cases we derive q.
 \addcontentsline{toc}{section}{Example 3 : Double Negation
 Elimination Using LEM}
 
-\noindent Prove: $\lnot$ l$\lnot p \implies p$
+\noindent Prove: $\lnot$ $\lnot p \implies p$
 
 \bigskip
 
@@ -89,7 +89,7 @@ Elimination Using LEM}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \infer[\lor \mbox{elim}]{\lnot p \lor \lnot q}{
-      \infer[\lor \mbox{elim}]{\lnot p \lor \lnot q}{\infer[\lor
+      \infer[\lor \mbox{elim}]{\lnot (p(or)(\lnot q))}{\infer[\lor
         \mbox{intro left}]{\lnot p \lor \lnot
       q}{\infer[\mbox{identity}]{\lnot p}{}}}
     }
@@ -105,8 +105,8 @@ Elimination Using LEM}
 \section*{Example 5 : Decidability}
 \addcontentsline{toc}{section}{Example 5 : Decidability}
 
-\noindent A proposition is decidable if we can prove p or $\lnot p$.
-In logical notation, we would $write : decidable(p) means$ $(p \lor \lnot p)$.
+\noindent A proposition is decidable if we can prove p or not p. In
+logical notation, we would $write : decidable(p) means$ $p(or)(\lnot p)$.
 
 \bigskip
 
@@ -117,7 +117,7 @@ In logical notation, we would $write : decidable(p) means$ $(p \lor \lnot p)$.
 \section*{Example 6 : Proof by Contradiction via LEM}
 \addcontentsline{toc}{section}{Example 6 : Proof by Contradiction via LEM}
 
-\noindent Prove: $(\lnot p \implies false)$ $\Rightarrow$ p
+\noindent Prove: $(\lnot p \implies false) \implies p$
 
 \bigskip
 
@@ -152,7 +152,7 @@ In logical notation, we would $write : decidable(p) means$ $(p \lor \lnot p)$.
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \infer[\lor \mbox{elim}]{\lnot p \lor q}{
-      \infer[\lor \mbox{elim}]{\lnot p \lor q}{\infer[\lor
+      \infer[\lor \mbox{elim}]{\lnot (p(or)(q))}{\infer[\lor
       \mbox{intro left}]{\lnot p \lor q}{}}
     }
     $%
@@ -217,7 +217,7 @@ another name for LEM.
 \bigskip
 
 \noindent For any proposition p, there is no third option besides p
-and $\lnot$ p.
+and $\lnot p$.
 
 \bigskip
 
@@ -236,7 +236,7 @@ as a general principle.
 
 \bigskip
 
-\noindent Constructive: To prove p or $\lnot p$, you must either:
+\noindent Constructive: To prove p or not p, you must either:
 
 \bigskip
 
@@ -244,8 +244,7 @@ as a general principle.
 
 \bigskip
 
-\noindent - Construct a proof of $\lnot p$ (a proof that p leads to
-contradiction)
+\noindent - Construct a proof of not p (a proof that p leads to contradiction)
 
 \bigskip
 
@@ -273,7 +272,7 @@ $\forall n : \nat @ (n = 0) \lor \lnot (n = 0)$
 \bigskip
 
 \noindent
-$\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
+$\forall p @ p \lor \lnot (p - -(requires(LEM)(in)(general)(case)))$
 
 \section*{Example 12 : Proof Strategy with LEM}
 \addcontentsline{toc}{section}{Example 12 : Proof Strategy with LEM}
@@ -286,7 +285,7 @@ $\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
 
 \bigskip
 
-\noindent 1. Invoke p or $\lnot$ p for some relevant p
+\noindent 1. Invoke p or $\lnot p$ for some relevant p
 
 \bigskip
 
@@ -294,7 +293,7 @@ $\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
 
 \bigskip
 
-\noindent 3. [case] $\lnot$ p prove Q assuming $\lnot$ p
+\noindent 3. [case] $\lnot p$ prove Q assuming $\lnot p$
 
 \bigskip
 
@@ -317,7 +316,7 @@ $\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
 
 \bigskip
 
-\noindent 1. Assume $\lnot p$ [assumption 1]
+\noindent 1. Assume not p [assumption 1]
 
 \bigskip
 
@@ -325,11 +324,11 @@ $\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
 
 \bigskip
 
-\noindent 3. Conclude $\lnot$ $\lnot$ p [$\lnot$ intro from 1]
+\noindent 3. Conclude $\lnot$ $\lnot p$ [$\lnot$ intro from 1]
 
 \bigskip
 
-\noindent 4. Apply $LEM : p$ $\lor$ $\lnot$ p
+\noindent 4. Apply $LEM : p$ $\lor$ $\lnot p$
 
 \bigskip
 
@@ -337,7 +336,7 @@ $\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
 
 \bigskip
 
-\noindent 6. [case] $\lnot$ p contradicts $\lnot$ $\lnot$ p, derive p
+\noindent 6. [case] $\lnot p$ contradicts $\lnot$ $\lnot p$, derive p
 by false elim
 
 \bigskip
@@ -401,7 +400,7 @@ arbitrary proposition
 
 \bigskip
 
-\noindent 2. You're working in classical logic $\lnot constructive$
+\noindent 2. You're working in classical logic (not constructive)
 
 \bigskip
 
@@ -409,7 +408,7 @@ arbitrary proposition
 
 \bigskip
 
-\noindent 4. Your proof strategy requires considering both p $\land$ $\lnot$ p
+\noindent 4. Your proof strategy requires considering both p $\land$ $\lnot p$
 
 \bigskip
 
@@ -436,11 +435,11 @@ arbitrary proposition
 
 \bigskip
 
-\noindent - Law of excluded $middle : p$ $\lor$ $\lnot$ p
+\noindent - Law of excluded $middle : p$ $\lor$ $\lnot p$
 
 \bigskip
 
-\noindent - Double negation elimination: $\lnot$ l$\lnot p \implies p$
+\noindent - Double negation elimination: $\lnot$ $\lnot p \implies p$
 
 \bigskip
 
@@ -448,7 +447,7 @@ arbitrary proposition
 
 \bigskip
 
-\noindent - Reductio ad absurdum: $(\lnot p \implies false)$ $\Rightarrow$ p
+\noindent - Reductio ad absurdum: $(\lnot p \implies false) \implies p$
 
 \bigskip
 

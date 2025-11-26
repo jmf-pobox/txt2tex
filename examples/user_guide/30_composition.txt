@@ -11,7 +11,7 @@ axdef
   successor : N -> N
   square : N -> N
 where
-  forall n : N | successor(n) = n + 1 and square(n) = n * n
+  forall n : N | successor(n) = n + 1 land square(n) = n * n
 end
 
 squareSuccessor == square o9 successor

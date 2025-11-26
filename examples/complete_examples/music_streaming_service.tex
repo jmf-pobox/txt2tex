@@ -52,7 +52,7 @@ preferences,
   \dom playlistSubscribers \subseteq \dom playlists \\
   \forall i : \dom playlistSubscribers @ playlistSubscribers(i)
   \subseteq users \\
-  \forall i : \dom playlists @ playlistOwner(i) \in playlistSubscribers(i)
+  \forall i : \dom playlists @ playlistOwner(i)(in)(playlistSubscribers(i))
 \end{axdef}
 
 \noindent Type analysis:
@@ -99,7 +99,7 @@ preferences,
 
 \bigskip
 
-\noindent F means finite $\lnot infinite$.
+\noindent F means finite (not infinite).
 
 \bigskip
 
@@ -256,7 +256,7 @@ playlistSubscribers(i)
 \section*{Part 2 : User Preferences}
 \addcontentsline{toc}{section}{Part 2 : User Preferences}
 
-\noindent Model users' song preferences $(loved \land hated(songs))$:
+\noindent Model users' song preferences (loved and hated songs):
 
 \bigskip
 
@@ -532,7 +532,7 @@ who love songs
 
 \begin{zed}
   D == (\mu s : songs | \forall t : songs @ s \neq t \land \# \{~ u :
-  UserId | s \in loved(u) ~\} > \# \{~ u : UserId | t \in loved(u) ~\})
+  UserId | s(in)(loved(u)) ~\} > \# \{~ u : UserId | t(in)(loved(u)) ~\})
 \end{zed}
 
 \noindent Breakdown:
@@ -543,7 +543,8 @@ who love songs
 
 \bigskip
 
-\noindent - # $\{~ u : UserId | s \in loved(u) ~\}$: count users who love song s
+\noindent - # $\{~ u : UserId | s(in)(loved(u)) ~\}$: count users who
+love song s
 
 \bigskip
 
@@ -551,7 +552,7 @@ who love songs
 
 \bigskip
 
-\noindent - $>$ # $\{~ u : UserId | t \in loved(u) ~\}$: s has more
+\noindent - $>$ # $\{~ u : UserId | t(in)(loved(u)) ~\}$: s has more
 lovers than t
 
 \bigskip
@@ -585,10 +586,10 @@ then finds unique max.
 \begin{axdef}
   loveHateScore : SongId \pfun \nat
   \where
-  \forall i : songs @ loveHateScore(i) = \IF \# \{~ u : UserId | i
-  \in loved(u) ~\} \geq \# \{~ u : UserId | i \in hated(u) ~\} \THEN
-  \# \{~ u : UserId | i \in loved(u) ~\} - \# \{~ u : UserId | i \in
-  hated(u) ~\} \ELSE 0
+  \forall i : songs @ loveHateScore(i) = \IF \# \{~ u : UserId |
+  i(in)(loved(u)) ~\} \geq \# \{~ u : UserId | i(in)(hated(u)) ~\}
+  \THEN \# \{~ u : UserId | i(in)(loved(u)) ~\} - \# \{~ u : UserId |
+  i(in)(hated(u)) ~\} \ELSE 0
 \end{axdef}
 
 \noindent Logic:
@@ -624,8 +625,8 @@ positive sentiment)
   playlistCount : SongId \pfun \nat
   \where
   \forall i : songs @ \\
-  \t1 playlistCount(i) = \# \{~ p : \dom playlists | i \in \ran
-  (playlists(p)) ~\}
+  \t1 playlistCount(i) = \# \{~ p : \dom playlists | i(in)(\ran
+  (playlists(p))) ~\}
 \end{axdef}
 
 \noindent Logic:
@@ -749,7 +750,7 @@ uniqueness$, mu performs selection
 
 \begin{zed}
   playlistsContainingMostPopularSong == \{~ i : \dom playlists |
-  mostPopular \in \ran (playlists(i)) ~\}
+  mostPopular(in)(\ran (playlists(i))) ~\}
 \end{zed}
 
 \noindent Logic:

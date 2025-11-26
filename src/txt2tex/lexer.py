@@ -1096,15 +1096,12 @@ class Lexer:
 
                     # Z keywords that shouldn't trigger prose mode
                     z_keywords = {
-                        "and",
-                        "land",  # Alternative spelling for and
-                        "or",
-                        "lor",  # Alternative spelling for or
-                        "not",
-                        "lnot",  # Alternative spelling for not
+                        "land",
+                        "lor",
+                        "lnot",
                         "union",
                         "intersect",
-                        "in",
+                        "elem",
                         "notin",
                         "subset",
                         "subseteq",
@@ -1182,12 +1179,12 @@ class Lexer:
                 return Token(TokenType.TEXT, text_content, start_line, start_column)
 
         # Check for keywords (propositional logic)
-        # Support both English (and/or/not) and LaTeX-style (land/lor/lnot)
-        if value in ("and", "land"):
+        # Only LaTeX-style keywords supported: land, lor, lnot
+        if value == "land":
             return Token(TokenType.AND, value, start_line, start_column)
-        if value in ("or", "lor"):
+        if value == "lor":
             return Token(TokenType.OR, value, start_line, start_column)
-        if value in ("not", "lnot"):
+        if value == "lnot":
             return Token(TokenType.NOT, value, start_line, start_column)
 
         # Check for quantifiers (Phase 3, enhanced in Phase 6-7)
@@ -1203,10 +1200,10 @@ class Lexer:
             return Token(TokenType.LAMBDA, value, start_line, start_column)
 
         # Check for set operators (Phase 3, enhanced in Phase 7, Phase 11.5)
-        # Accept both "in" and "elem" for set membership
+        # Only "elem" supported for set membership
         if value == "notin":
             return Token(TokenType.NOTIN, value, start_line, start_column)
-        if value == "in" or value == "elem":
+        if value == "elem":
             return Token(TokenType.IN, value, start_line, start_column)
         if value == "subset" or value == "subseteq":
             return Token(TokenType.SUBSET, value, start_line, start_column)

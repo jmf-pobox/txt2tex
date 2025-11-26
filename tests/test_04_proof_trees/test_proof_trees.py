@@ -37,28 +37,20 @@ class TestParser:
     """Tests for Phase 5 parser features."""
 
     def test_simple_proof_tree(self) -> None:
-        """Test parsing simple proof tree with conclusion and one premise."""
-        text = """PROOF:
-p
-  q"""
+        """Test parsing simple proof tree with conclusion land one premise."""
+        text = "PROOF:\np\n  q"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Document with one ProofTree item
         assert isinstance(ast, Document)
         assert len(ast.items) == 1
         proof_tree = ast.items[0]
         assert isinstance(proof_tree, ProofTree)
-
-        # Check conclusion
         conclusion = proof_tree.conclusion
         assert isinstance(conclusion, ProofNode)
         assert isinstance(conclusion.expression, Identifier)
         assert conclusion.expression.name == "p"
-
-        # Check premise
         assert len(conclusion.children) == 1
         premise = conclusion.children[0]
         assert isinstance(premise, ProofNode)
@@ -67,14 +59,11 @@ p
 
     def test_proof_tree_with_justification(self) -> None:
         """Test parsing proof tree with justifications."""
-        text = """PROOF:
-p [conclusion]
-  q [premise]"""
+        text = "PROOF:\np [conclusion]\n  q [premise]"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, Document)
         proof_tree = ast.items[0]
         assert isinstance(proof_tree, ProofTree)
@@ -85,26 +74,20 @@ p [conclusion]
 
     def test_assumption_label(self) -> None:
         """Test parsing assumption labels [1], [2], etc."""
-        text = """PROOF:
-p => q [=> intro from 1]
-  [1] p [assumption]
-      q [from p]"""
+        text = (
+            "PROOF:\np => q [=> intro from 1]\n  [1] p [assumption]\n      q [from p]"
+        )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, Document)
         proof_tree = ast.items[0]
         assert isinstance(proof_tree, ProofTree)
-
-        # Check conclusion
         conclusion = proof_tree.conclusion
         assert conclusion.justification == "=> intro from 1"
         assert conclusion.label is None
         assert not conclusion.is_assumption
-
-        # Check assumption
         assert len(conclusion.children) == 1
         assumption = conclusion.children[0]
         assert isinstance(assumption, ProofNode)
@@ -114,31 +97,21 @@ p => q [=> intro from 1]
 
     def test_sibling_premises(self) -> None:
         """Test parsing sibling premises with :: marker."""
-        text = """PROOF:
-p and q [and intro]
-  :: p [premise]
-  :: q [premise]"""
+        text = "PROOF:\np land q [land intro]\n  :: p [premise]\n  :: q [premise]"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, Document)
         proof_tree = ast.items[0]
         assert isinstance(proof_tree, ProofTree)
         conclusion = proof_tree.conclusion
-
-        # Check that we have two children
         assert len(conclusion.children) == 2
-
-        # Check first sibling
         first = conclusion.children[0]
         assert isinstance(first, ProofNode)
         assert first.is_sibling
         assert isinstance(first.expression, Identifier)
         assert first.expression.name == "p"
-
-        # Check second sibling
         second = conclusion.children[1]
         assert isinstance(second, ProofNode)
         assert second.is_sibling
@@ -147,26 +120,19 @@ p and q [and intro]
 
     def test_case_analysis(self) -> None:
         """Test parsing case analysis."""
-        text = """PROOF:
-p or q => r [or elim]
-  case p:
-    r [from p]
-  case q:
-    r [from q]"""
+        text = (
+            "PROOF:\np lor q => r [lor elim]\n  case p:\n    r [from p]\n"
+            "  case q:\n    r [from q]"
+        )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, Document)
         proof_tree = ast.items[0]
         assert isinstance(proof_tree, ProofTree)
         conclusion = proof_tree.conclusion
-
-        # Check that we have two case branches
         assert len(conclusion.children) == 2
-
-        # Check first case
         case1 = conclusion.children[0]
         assert isinstance(case1, CaseAnalysis)
         assert case1.case_name == "p"
@@ -174,8 +140,6 @@ p or q => r [or elim]
         step1 = case1.steps[0]
         assert isinstance(step1.expression, Identifier)
         assert step1.expression.name == "r"
-
-        # Check second case
         case2 = conclusion.children[1]
         assert isinstance(case2, CaseAnalysis)
         assert case2.case_name == "q"
@@ -183,28 +147,20 @@ p or q => r [or elim]
 
     def test_nested_structure(self) -> None:
         """Test parsing nested proof structure."""
-        text = """PROOF:
-p
-  q
-    r"""
+        text = "PROOF:\np\n  q\n    r"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, Document)
         proof_tree = ast.items[0]
         assert isinstance(proof_tree, ProofTree)
         conclusion = proof_tree.conclusion
-
-        # p has child q
         assert len(conclusion.children) == 1
         q_node = conclusion.children[0]
         assert isinstance(q_node, ProofNode)
         assert isinstance(q_node.expression, Identifier)
         assert q_node.expression.name == "q"
-
-        # q has child r
         assert len(q_node.children) == 1
         r_node = q_node.children[0]
         assert isinstance(r_node, ProofNode)
@@ -213,21 +169,18 @@ p
 
     def test_complex_expression(self) -> None:
         """Test parsing proof tree with complex expressions."""
-        text = """PROOF:
-p and q => q [=> intro from 1]
-  [1] p and q [assumption]
-      q [and elim]"""
+        text = (
+            "PROOF:\np land q => q [=> intro from 1]\n"
+            "  [1] p land q [assumption]\n      q [land elim]"
+        )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, Document)
         proof_tree = ast.items[0]
         assert isinstance(proof_tree, ProofTree)
         conclusion = proof_tree.conclusion
-
-        # Check conclusion expression is binary op
         assert isinstance(conclusion.expression, BinaryOp)
         assert conclusion.expression.operator == "=>"
 
@@ -256,7 +209,7 @@ class TestLaTeXGenerator:
                         indent_level=2,
                         line=3,
                         column=3,
-                    ),
+                    )
                 ],
                 indent_level=0,
                 line=2,
@@ -267,13 +220,10 @@ class TestLaTeXGenerator:
         )
         latex_lines = gen.generate_document_item(ast)
         latex = "\n".join(latex_lines)
-
-        # Should use \infer macro, not itemize
-        assert r"\infer" in latex
-        assert r"\begin{itemize}" not in latex
-        assert r"\begin{center}" in latex  # Centered
-        assert r"\end{center}" in latex
-        # Expressions are in math mode within the \infer macro
+        assert "\\infer" in latex
+        assert "\\begin{itemize}" not in latex
+        assert "\\begin{center}" in latex
+        assert "\\end{center}" in latex
         assert "p" in latex
         assert "q" in latex
 
@@ -297,9 +247,7 @@ class TestLaTeXGenerator:
         )
         latex_lines = gen.generate_document_item(ast)
         latex = "\n".join(latex_lines)
-
-        # Should include justification in \infer label
-        assert r"\infer[" in latex
+        assert "\\infer[" in latex
         assert "elim" in latex
 
     def test_sibling_premises(self) -> None:
@@ -308,13 +256,13 @@ class TestLaTeXGenerator:
         ast = ProofTree(
             conclusion=ProofNode(
                 expression=BinaryOp(
-                    operator="and",
+                    operator="land",
                     left=Identifier(name="p", line=2, column=1),
                     right=Identifier(name="q", line=2, column=7),
                     line=2,
                     column=3,
                 ),
-                justification="and intro",
+                justification="land intro",
                 label=None,
                 is_assumption=False,
                 is_sibling=False,
@@ -351,10 +299,8 @@ class TestLaTeXGenerator:
         )
         latex_lines = gen.generate_document_item(ast)
         latex = "\n".join(latex_lines)
-
-        # Should use & to separate sibling premises (on its own line)
         assert "\n&\n" in latex
-        assert r"\infer" in latex
+        assert "\\infer" in latex
 
 
 class TestIntegration:
@@ -362,59 +308,50 @@ class TestIntegration:
 
     def test_simple_implication(self) -> None:
         """Test complete pipeline for simple implication proof."""
-        text = """PROOF:
-p and q => q [=> intro from 1]
-  [1] p and q [assumption]
-      q [and elim]"""
+        text = (
+            "PROOF:\np land q => q [=> intro from 1]\n"
+            "  [1] p land q [assumption]\n      q [land elim]"
+        )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-
-        # Should use \infer macros
-        assert r"\infer" in doc
-        assert r"\begin{itemize}" not in doc
-        assert r"p \land q \Rightarrow q" in doc
-        assert r"\begin{center}" in doc  # Centered
-        assert r"\end{center}" in doc
+        assert "\\infer" in doc
+        assert "\\begin{itemize}" not in doc
+        assert "p \\land q \\Rightarrow q" in doc
+        assert "\\begin{center}" in doc
+        assert "\\end{center}" in doc
 
     def test_sibling_premises_integration(self) -> None:
         """Test complete pipeline with sibling premises."""
-        text = """PROOF:
-p and (p => q) => (p and q) [=> intro from 1]
-  [1] p and (p => q) [assumption]
-      :: p [and elim]
-      :: p => q [and elim]
-      q [=> elim]
-      p and q [and intro]"""
+        text = (
+            "PROOF:\np land (p => q) => (p land q) [=> intro from 1]\n"
+            "  [1] p land (p => q) [assumption]\n      :: p [land elim]\n"
+            "      :: p => q [land elim]\n      q [=> elim]\n"
+            "      p land q [land intro]"
+        )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-
-        # Should use & for sibling premises
         assert " & " in doc
-        assert r"\infer" in doc
+        assert "\\infer" in doc
 
     def test_case_analysis_integration(self) -> None:
         """Test complete pipeline with case analysis."""
-        text = """PROOF:
-p or q => r [or elim]
-  case p:
-    r [from p]
-  case q:
-    r [from q]"""
+        text = (
+            "PROOF:\np lor q => r [lor elim]\n  case p:\n    r [from p]\n"
+            "  case q:\n    r [from q]"
+        )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-
-        # Should generate inference tree with r in display math
-        assert r"\infer" in doc
-        assert "r" in doc  # r appears directly in display math mode
+        assert "\\infer" in doc
+        assert "r" in doc

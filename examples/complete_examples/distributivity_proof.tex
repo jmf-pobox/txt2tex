@@ -19,8 +19,7 @@
 
 \bigskip
 
-\noindent $(p \land (q \lor r))$ $\Leftrightarrow$ $((p \land q) \lor
-(p \land r))$
+\noindent (p and (q or r)) $\Leftrightarrow$ ((p and q) or (p and r))
 
 \bigskip
 
@@ -28,48 +27,48 @@
 
 \bigskip
 
-\noindent 1. Forward direction: $(p \land (q \lor r))$ $\Rightarrow$
-$((p \land q) \lor (p \land r))$
+\noindent 1. Forward direction: (p and (q or r)) $\Rightarrow$ ((p
+and q) or (p and r))
 
 \bigskip
 
-\noindent 2. Backward direction: $((p \land q) \lor (p \land r))$
-$\Rightarrow$ $(p \land (q \lor r))$
+\noindent 2. Backward direction: ((p and q) or (p and r))
+$\Rightarrow$ (p and (q or r))
 
 \bigskip
 
 \section*{Solution : Forward Direction}
 \addcontentsline{toc}{section}{Solution : Forward Direction}
 
-\noindent First, we prove the forward implication. Starting from p
-and $(q \lor r)$,
+\noindent First, we prove the forward implication. Starting from p and (q or r),
 
 \bigskip
 
-\noindent we extract p and $(q \lor r)$ separately, then case-analyze
-on $(q \lor r)$.
+\noindent we extract p and (q or r) separately, then case-analyze on (q or r).
 
 \bigskip
 
 \begin{center}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land (q \lor r))
-    \implies ((p \land q) \lor (p \land r))}{
-      \ulcorner p \land (q \lor r) \urcorner^{[1]}
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and(q(or)(r)))
+    \implies p(and)(q)(or(p(and)(r)))}{
+      \ulcorner p(and(q(or)(r))) \urcorner^{[1]}
       &
-      \infer[\lor\textrm{-elim}^{[2]}]{(p \land q) \lor (p \land r)}{
-        \ulcorner q \lor r \urcorner^{[1]}
+      \infer[\lor\textrm{-elim}^{[2]}]{p(and)(q)(or(p(and)(r)))}{
+        \ulcorner q(or)(r) \urcorner^{[1]}
         &
-        \raiseproof{10ex}{\infer[\lor \mbox{intro}]{(p \land q) \lor
-          (p \land r)}{\infer[\land \mbox{intro}]{p \land q}{
+        \raiseproof{10ex}{\infer[\lor
+          \mbox{intro}]{p(and)(q)(or(p(and)(r)))}{\infer[\land
+            \mbox{intro}]{p(and)(q)}{
               \infer[\land\textrm{-elim}^{[1]}]{p}{}
               &
               \infer[\mbox{case assumption}]{q}{}
         }}}
         &
-        \hskip 6em \raiseproof{26ex}{\infer[\lor \mbox{intro}]{(p
-          \land q) \lor (p \land r)}{\infer[\land \mbox{intro}]{p \land r}{
+        \hskip 6em \raiseproof{26ex}{\infer[\lor
+          \mbox{intro}]{p(and)(q)(or(p(and)(r)))}{\infer[\land
+            \mbox{intro}]{p(and)(r)}{
               \infer[\land\textrm{-elim}^{[1]}]{p}{}
               &
               \infer[\mbox{case assumption}]{r}{}
@@ -82,15 +81,14 @@ on $(q \lor r)$.
 \bigskip
 
 \noindent Key $insight : We extract p once$, then use it in both
-cases after splitting on $(q \lor r)$.
+cases after splitting on (q or r).
 
 \bigskip
 
 \section*{Solution : Backward Direction}
 \addcontentsline{toc}{section}{Solution : Backward Direction}
 
-\noindent For the backward direction, we start with $(p \land q)$ or
-$(p \land r)$ and
+\noindent For the backward direction, we start with (p and q) or (p and r) and
 
 \bigskip
 
@@ -98,27 +96,27 @@ $(p \land r)$ and
 
 \bigskip
 
-\noindent one of q or r, then rebuild p and $(q \lor r)$.
+\noindent one of q or r, then rebuild p and (q or r).
 
 \bigskip
 
 \begin{center}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[3]}]{((p \land q) \lor (p
-    \land r)) \implies (p \land (q \lor r))}{
-      \ulcorner (p \land q) \lor (p \land r) \urcorner^{[3]}
+    \infer[\Rightarrow\textrm{-intro}^{[3]}]{p(and)(q)(or(p(and)(r)))
+    \implies p(and(q(or)(r)))}{
+      \ulcorner p(and)(q)(or(p(and)(r))) \urcorner^{[3]}
       &
-      \infer[\lor\textrm{-elim}^{[4]}]{p \land (q \lor r)}{
-        \ulcorner case1 \lor case2 \urcorner^{[3]}
+      \infer[\lor\textrm{-elim}^{[4]}]{p(and(q(or)(r)))}{
+        \ulcorner case1(or)(case2) \urcorner^{[3]}
         &
-        \raiseproof{8ex}{\infer[\land \mbox{intro}]{p \land (q \lor
-          r)}{\infer[\land \mbox{elim}]{p}{} & \infer[\lor
-        \mbox{intro}]{q \lor r}{}}}
+        \raiseproof{8ex}{\infer[\land
+          \mbox{intro}]{p(and(q(or)(r)))}{\infer[\land
+        \mbox{elim}]{p}{} & \infer[\lor \mbox{intro}]{q(or)(r)}{}}}
         &
-        \hskip 6em \raiseproof{22ex}{\infer[\land \mbox{intro}]{p
-          \land (q \lor r)}{\infer[\land \mbox{elim}]{p}{} &
-        \infer[\lor \mbox{intro}]{q \lor r}{}}}
+        \hskip 6em \raiseproof{22ex}{\infer[\land
+          \mbox{intro}]{p(and(q(or)(r)))}{\infer[\land
+        \mbox{elim}]{p}{} & \infer[\lor \mbox{intro}]{q(or)(r)}{}}}
       }
     }
     $%
@@ -127,11 +125,11 @@ $(p \land r)$ and
 \bigskip
 
 \noindent Key $insight : Both cases yield$ the same conclusion p and
-$(q \lor r)$, since
+(q or r), since
 
 \bigskip
 
-\noindent we can inject q or r into $(q \lor r)$ using or introduction.
+\noindent we can inject q or r into (q or r) using or introduction.
 
 \bigskip
 
@@ -142,13 +140,11 @@ $(q \lor r)$, since
 
 \bigskip
 
-\noindent - $(p \land (q \lor r))$ $\Rightarrow$ $((p \land q) \lor
-(p \land r))$
+\noindent - (p and (q or r)) $\Rightarrow$ ((p and q) or (p and r))
 
 \bigskip
 
-\noindent - $((p \land q) \lor (p \land r))$ $\Rightarrow$ $(p \land
-(q \lor r))$
+\noindent - ((p and q) or (p and r)) $\Rightarrow$ (p and (q or r))
 
 \bigskip
 
@@ -160,8 +156,7 @@ $(q \lor r)$, since
 
 \bigskip
 
-\noindent $(p \land (q \lor r))$ $\Leftrightarrow$ $((p \land q) \lor
-(p \land r))$
+\noindent (p and (q or r)) $\Leftrightarrow$ ((p and q) or (p and r))
 
 \bigskip
 
@@ -231,7 +226,7 @@ frequently in:
 
 \bigskip
 
-\noindent p or $(q \land r)$ $\Leftrightarrow$ $(p \lor q)$ and $(p \lor r)$
+\noindent p or (q and r) $\Leftrightarrow$ (p or q) and (p or r)
 
 \bigskip
 

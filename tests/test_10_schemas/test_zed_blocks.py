@@ -58,7 +58,7 @@ class TestZedBlockParsing:
 
     def test_exists1_quantifier(self) -> None:
         """Test zed block with exists1 (unique existence) quantifier."""
-        lexer = Lexer("zed exists1 x : N | x * x = 4 and x > 0 end")
+        lexer = Lexer("zed exists1 x : N | x * x = 4 land x > 0 end")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
@@ -77,13 +77,12 @@ class TestZedBlockParsing:
         assert isinstance(ast, Document)
         zed_block = ast.items[0]
         assert isinstance(zed_block, Zed)
-        # The content is the parenthesized mu expression
         assert isinstance(zed_block.content, Quantifier)
         assert zed_block.content.quantifier == "mu"
 
     def test_complex_predicate(self) -> None:
         """Test zed block with complex predicate combining operators."""
-        lexer = Lexer("zed x in S and y notin T => x <> y end")
+        lexer = Lexer("zed x elem S land y notin T => x <> y end")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
@@ -104,16 +103,12 @@ class TestZedBlockParsing:
         assert isinstance(zed_block, Zed)
         assert isinstance(zed_block.content, Quantifier)
         assert zed_block.content.quantifier == "forall"
-        # The body should be another quantifier
         assert isinstance(zed_block.content.body, Quantifier)
         assert zed_block.content.body.quantifier == "exists"
 
     def test_multiline_zed_block(self) -> None:
         """Test zed block with content on multiple lines."""
-        lexer = Lexer("""zed
-forall x : N |
-  x >= 0
-end""")
+        lexer = Lexer("zed\nforall x : N |\n  x >= 0\nend")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
@@ -158,8 +153,8 @@ class TestZedBlockLaTeXGeneration:
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
-        assert r"\end{zed}" in latex
+        assert "\\begin{zed}" in latex
+        assert "\\end{zed}" in latex
         assert "x > 0" in latex
 
     def test_forall_quantifier_latex(self) -> None:
@@ -170,9 +165,9 @@ class TestZedBlockLaTeXGeneration:
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
-        assert r"\forall" in latex
-        assert r"\end{zed}" in latex
+        assert "\\begin{zed}" in latex
+        assert "\\forall" in latex
+        assert "\\end{zed}" in latex
 
     def test_exists_quantifier_latex(self) -> None:
         """Test LaTeX generation for exists quantifier."""
@@ -182,9 +177,9 @@ class TestZedBlockLaTeXGeneration:
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
-        assert r"\exists" in latex
-        assert r"\end{zed}" in latex
+        assert "\\begin{zed}" in latex
+        assert "\\exists" in latex
+        assert "\\end{zed}" in latex
 
     def test_mu_expression_latex(self) -> None:
         """Test LaTeX generation for mu expression."""
@@ -194,22 +189,22 @@ class TestZedBlockLaTeXGeneration:
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
-        assert r"\mu" in latex
-        assert r"\end{zed}" in latex
+        assert "\\begin{zed}" in latex
+        assert "\\mu" in latex
+        assert "\\end{zed}" in latex
 
     def test_complex_predicate_latex(self) -> None:
         """Test LaTeX generation for complex predicate."""
-        lexer = Lexer("zed x elem S and y notin T => x <> y end")
+        lexer = Lexer("zed x elem S land y notin T => x <> y end")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
-        assert r"\in" in latex
-        assert r"\Rightarrow" in latex
-        assert r"\end{zed}" in latex
+        assert "\\begin{zed}" in latex
+        assert "\\in" in latex
+        assert "\\Rightarrow" in latex
+        assert "\\end{zed}" in latex
 
     def test_fuzz_mode_latex(self) -> None:
         """Test LaTeX generation with fuzz mode enabled."""
@@ -219,25 +214,21 @@ class TestZedBlockLaTeXGeneration:
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=True)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
-        assert r"\forall" in latex
-        # In fuzz mode, N should be \nat
-        assert r"\nat" in latex
-        assert r"\end{zed}" in latex
+        assert "\\begin{zed}" in latex
+        assert "\\forall" in latex
+        assert "\\nat" in latex
+        assert "\\end{zed}" in latex
 
     def test_multiple_zed_blocks(self) -> None:
-        """Test LaTeX generation for multiple zed blocks in document."""
-        lexer = Lexer("""zed x > 0 end
-
-zed y < 10 end""")
+        """Test LaTeX generation for multiple zed blocks elem document."""
+        lexer = Lexer("zed x > 0 end\n\nzed y < 10 end")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        # Should have two zed environments
-        assert latex.count(r"\begin{zed}") == 2
-        assert latex.count(r"\end{zed}") == 2
+        assert latex.count("\\begin{zed}") == 2
+        assert latex.count("\\end{zed}") == 2
 
     def test_nested_quantifiers_latex(self) -> None:
         """Test LaTeX generation for nested quantifiers."""
@@ -247,22 +238,22 @@ zed y < 10 end""")
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
-        assert r"\forall" in latex
-        assert r"\exists" in latex
-        assert r"\end{zed}" in latex
+        assert "\\begin{zed}" in latex
+        assert "\\forall" in latex
+        assert "\\exists" in latex
+        assert "\\end{zed}" in latex
 
     def test_identifier_latex(self) -> None:
-        """Test LaTeX generation for identifier in zed block."""
+        """Test LaTeX generation for identifier elem zed block."""
         lexer = Lexer("zed S end")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
+        assert "\\begin{zed}" in latex
         assert "S" in latex
-        assert r"\end{zed}" in latex
+        assert "\\end{zed}" in latex
 
 
 class TestZedBlockMixedContent:
@@ -341,11 +332,8 @@ class TestZedBlockMixedContent:
         assert abbrev.name == "R+"
 
     def test_mixed_given_and_freetype(self) -> None:
-        """Test zed block with both given type and free type."""
-        lexer = Lexer("""zed
-  given A, B
-  Status ::= active | inactive
-end""")
+        """Test zed block with both given type land free type."""
+        lexer = Lexer("zed\n  given A, B\n  Status ::= active | inactive\nend")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
@@ -358,11 +346,10 @@ end""")
         assert isinstance(zed_block.content.items[1], FreeType)
 
     def test_mixed_freetype_and_abbreviation(self) -> None:
-        """Test zed block with free type and abbreviation."""
-        lexer = Lexer("""zed
-  Status ::= active | inactive
-  DefaultStatus == active
-end""")
+        """Test zed block with free type land abbreviation."""
+        lexer = Lexer(
+            "zed\n  Status ::= active | inactive\n  DefaultStatus == active\nend"
+        )
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
@@ -375,12 +362,12 @@ end""")
         assert isinstance(zed_block.content.items[1], Abbreviation)
 
     def test_all_three_constructs(self) -> None:
-        """Test zed block with given, free type, and abbreviation."""
-        lexer = Lexer("""zed
-  given Entry
-  Status ::= active | inactive
-  DefaultStatus == active
-end""")
+        """Test zed block with given, free type, land abbreviation."""
+        text = (
+            "zed\n  given Entry\n  Status ::= active | inactive\n"
+            "  DefaultStatus == active\nend"
+        )
+        lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
@@ -394,42 +381,42 @@ end""")
         assert isinstance(zed_block.content.items[2], Abbreviation)
 
     def test_given_type_latex(self) -> None:
-        """Test LaTeX generation for given type in zed block."""
+        """Test LaTeX generation for given type elem zed block."""
         lexer = Lexer("zed given A, B end")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
+        assert "\\begin{zed}" in latex
         assert "[A, B]" in latex
-        assert r"\end{zed}" in latex
+        assert "\\end{zed}" in latex
 
     def test_free_type_latex(self) -> None:
-        """Test LaTeX generation for free type in zed block."""
+        """Test LaTeX generation for free type elem zed block."""
         lexer = Lexer("zed Status ::= active | inactive end")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
+        assert "\\begin{zed}" in latex
         assert "Status ::=" in latex
         assert "active | inactive" in latex
-        assert r"\end{zed}" in latex
+        assert "\\end{zed}" in latex
 
     def test_abbreviation_latex(self) -> None:
-        """Test LaTeX generation for abbreviation in zed block."""
+        """Test LaTeX generation for abbreviation elem zed block."""
         lexer = Lexer("zed MaxSize == 100 end")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
+        assert "\\begin{zed}" in latex
         assert "MaxSize ==" in latex
         assert "100" in latex
-        assert r"\end{zed}" in latex
+        assert "\\end{zed}" in latex
 
     def test_generic_abbreviation_latex(self) -> None:
         """Test LaTeX generation for generic abbreviation."""
@@ -439,10 +426,10 @@ end""")
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
+        assert "\\begin{zed}" in latex
         assert "Pair[X] ==" in latex
-        assert r"\cross" in latex
-        assert r"\end{zed}" in latex
+        assert "\\cross" in latex
+        assert "\\end{zed}" in latex
 
     def test_compound_identifier_latex(self) -> None:
         """Test LaTeX generation for compound identifier abbreviation."""
@@ -452,24 +439,24 @@ end""")
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
+        assert "\\begin{zed}" in latex
         assert "R^+ ==" in latex
-        assert r"\end{zed}" in latex
+        assert "\\end{zed}" in latex
 
     def test_mixed_content_latex(self) -> None:
         """Test LaTeX generation for mixed content zed block."""
-        lexer = Lexer("""zed
-  given Entry
-  Status ::= active | inactive
-  DefaultStatus == active
-end""")
+        text = (
+            "zed\n  given Entry\n  Status ::= active | inactive\n"
+            "  DefaultStatus == active\nend"
+        )
+        lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=False)
         latex = generator.generate_document(ast)
-        assert r"\begin{zed}" in latex
+        assert "\\begin{zed}" in latex
         assert "[Entry]" in latex
         assert "Status ::=" in latex
         assert "DefaultStatus ==" in latex
-        assert r"\end{zed}" in latex
+        assert "\\end{zed}" in latex

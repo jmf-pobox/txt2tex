@@ -73,11 +73,9 @@ class LaTeXGenerator:
 
     # Operator mappings
     BINARY_OPS: ClassVar[dict[str, str]] = {
-        # Propositional logic
-        "and": r"\land",
-        "land": r"\land",  # LaTeX-style alternative to "and"
-        "or": r"\lor",
-        "lor": r"\lor",  # LaTeX-style alternative to "or"
+        # Propositional logic - Only LaTeX-style keywords
+        "land": r"\land",
+        "lor": r"\lor",
         "=>": r"\Rightarrow",
         "<=>": r"\Leftrightarrow",
         # Comparison operators (Phase 3, enhanced in Phase 7)
@@ -91,8 +89,7 @@ class LaTeXGenerator:
         # Sequent judgment
         "shows": r"\shows",  # Turnstile (⊢)
         # Set operators (Phase 3, enhanced in Phase 7, Phase 11.5)
-        "in": r"\in",  # Set membership
-        "elem": r"\in",  # Alternative spelling for "in"
+        "elem": r"\in",  # Set membership
         "notin": r"\notin",
         "/in": r"\notin",  # Z notation slash negation (Phase 16+)
         "subset": r"\subseteq",
@@ -141,8 +138,7 @@ class LaTeXGenerator:
     }
 
     UNARY_OPS: ClassVar[dict[str, str]] = {
-        "not": r"\lnot",
-        "lnot": r"\lnot",  # LaTeX-style alternative to "not"
+        "lnot": r"\lnot",  # Only LaTeX-style keyword
         "-": r"-",  # Unary negation (Phase 16)
         "#": r"\#",  # Cardinality (Phase 8)
         # Relation functions (Phase 10a)
@@ -179,11 +175,12 @@ class LaTeXGenerator:
     }
 
     # Operator precedence (lower number = lower precedence)
+    # Only LaTeX-style keywords supported: land, lor
     PRECEDENCE: ClassVar[dict[str, int]] = {
         "<=>": 1,  # Lowest precedence
         "=>": 2,
-        "or": 3,
-        "and": 4,
+        "lor": 3,
+        "land": 4,
         # Comparison operators
         "<": 5,
         ">": 5,
@@ -2037,13 +2034,9 @@ class LaTeXGenerator:
         text = re.sub(r"(?<!\\)\bemptyset\b", r"$\\emptyset$", text)  # emptyset → ∅
         text = re.sub(r"(?<!\\)\bforall\b", r"$\\forall$", text)  # forall → ∀
 
-        # Convert "not <variable>" to logical not symbol
-        # Only when "not" is followed by a single identifier (variable name)
-        # Examples: "not p", "not q", but NOT "not a tautology", "not every"
-        # Pattern: \bnot\s+([a-zA-Z]\b) - "not" followed by single letter
-        text = re.sub(r"\bnot\s+([a-zA-Z])\b", r"$\\lnot \1$", text)  # not p → ¬p
-
-        # Convert "not elem" and "elem" for set membership
+        # Convert "elem" and "not elem" for set membership
+        # NOTE: "not elem" is English prose, not "notin" keyword
+        # NOTE: Pattern for "not elem" must come before "elem" to avoid partial match
         # Pattern: expression followed by "not elem"/"elem" + capitalized set name
         # Matches: identifier/number, optionally with operators (-, +, *, /)
         # Examples: "0 elem N", "4 - 0 elem N", "x - 1 not elem N"
@@ -2505,13 +2498,14 @@ class LaTeXGenerator:
         for pattern, replacement in markup_operators.items():
             result = re.sub(pattern, replacement, result)
 
-        # Pattern -1: Logical formulas with =>, <=>, not, and, or (MUST come FIRST)
-        # Detect expressions like "p => (not p => p)" or "(not p => not q) <=> (q => p)"
-        # Look for patterns starting with identifier/paren/not and containing => or <=>
+        # Pattern -1: Logical formulas with =>, <=>, lnot, land, lor (MUST come FIRST)
+        # Detect expressions like "p => (lnot p => p)" or "(lnot p => lnot q) <=> ..."
+        # Look for patterns starting with identifier/paren/lnot, containing => or <=>
         # Stop at sentence boundaries (is, as, are, etc.) or punctuation
         # NOTE: Include common prose verbs that follow mathematical statements
+        # NOTE: Only LaTeX-style keywords (lnot, land, lor), not English
         formula_pattern = (
-            r"(\()?(?:not\s+)?([a-zA-Z]\w*)\s*(=>|<=>)\s*[^.!?]*?"
+            r"(\()?(?:lnot\s+)?([a-zA-Z]\w*)\s*(=>|<=>)\s*[^.!?]*?"
             r"(?=\s+(?:is|as|are|for|to|be|a|an|the|in|on|at|by|with|"
             r"holds|means|implies|shows|proves|states|says|gives|follows|"
             r"so|then|therefore|hence|thus|because|since|when|where|which|that)\b|[.!?]|$)"
@@ -2545,9 +2539,10 @@ class LaTeXGenerator:
                 pass
 
         # Pattern -0.5: Parenthesized logical expressions
-        # Detect expressions like "(p or q)", "(p and q)", "((p => r) and (q => r))"
-        # Also handles "(not p => not q)" which Pattern -1 misses due to greedy matching
+        # Detect expressions like "(p lor q)", "(p land q)", "((p => r) land ...)"
+        # Also handles "(lnot p => lnot q)" which Pattern -1 misses
         # Use balanced parenthesis matching to handle nested expressions
+        # NOTE: Only LaTeX-style keywords (lnot, land, lor), not English
         paren_matches = self._find_balanced_parens(result)
 
         for start_pos, end_pos in reversed(paren_matches):
@@ -2560,12 +2555,9 @@ class LaTeXGenerator:
             paren_text = result[start_pos:end_pos]
 
             # Only process if it contains logical operators or keywords
-            # Look for: or, and, not, lor, land, lnot, elem, =>, <=>
+            # Look for: lor, land, lnot, elem, =>, <=>
             has_logic = bool(
-                re.search(r"\bor\b", paren_text)
-                or re.search(r"\band\b", paren_text)
-                or re.search(r"\bnot\b", paren_text)
-                or re.search(r"\blor\b", paren_text)
+                re.search(r"\blor\b", paren_text)
                 or re.search(r"\bland\b", paren_text)
                 or re.search(r"\blnot\b", paren_text)
                 or re.search(r"\belem\b", paren_text)
@@ -2593,10 +2585,29 @@ class LaTeXGenerator:
         # Pattern -0.3: Standalone logical keywords (lor, land, lnot, elem)
         # These should ALWAYS render as symbols, never as literal text
         # Match whole words only (use word boundaries)
+        # Special case: lnot followed by single variable (lnot p) → $\lnot p$
+
+        # First, handle "lnot <variable>" as a unit
+        lnot_var_pattern = r"\blnot\s+([a-zA-Z])\b"
+        matches = list(re.finditer(lnot_var_pattern, result))
+        for match in reversed(matches):
+            start_pos = match.start()
+            end_pos = match.end()
+
+            # Check if already in math mode
+            before = result[:start_pos]
+            dollars_before = before.count("$")
+            if dollars_before % 2 == 1:
+                continue  # Already in math mode
+
+            var_name = match.group(1)
+            result = result[:start_pos] + f"$\\lnot {var_name}$" + result[end_pos:]
+
+        # Then handle other standalone keywords
         standalone_keywords = {
             r"\blor\b": "$\\lor$",
             r"\bland\b": "$\\land$",
-            r"\blnot\b": "$\\lnot$",
+            r"\blnot\b": "$\\lnot$",  # Only matches lnot NOT followed by variable
             r"\belem\b": "$\\in$",
         }
 
@@ -3072,12 +3083,17 @@ class LaTeXGenerator:
         # Pattern: identifier/number, followed by (operator identifier/number)+
         # This matches chains like "p <=> x > 1" and "x = 5.5"
         full_pattern = (
-            r"\b" + operand + r"\s*"  # First identifier/number
+            r"\b"
+            + operand
+            + r"\s*"  # First identifier/number
             + math_op_pattern  # Operator
-            + r"\s*" + operand  # Second operand
+            + r"\s*"
+            + operand  # Second operand
             + r"(?:\s*"
             + math_op_pattern
-            + r"\s*" + operand + r")*"  # More ops
+            + r"\s*"
+            + operand
+            + r")*"  # More ops
         )
 
         matches = list(re.finditer(full_pattern, result))
@@ -3189,11 +3205,11 @@ class LaTeXGenerator:
         # Order matters: replace longer operators first
         result = text.replace("<=>", r"\Leftrightarrow")
         result = result.replace("=>", r"\Rightarrow")
-        # Support both English (and/or/not) and LaTeX-style (land/lor/lnot)
-        result = re.sub(r"\b(and|land)\b", r"\\land", result)
-        result = re.sub(r"\b(or|lor)\b", r"\\lor", result)
-        result = re.sub(r"\b(not|lnot)\b", r"\\lnot", result)
-        result = re.sub(r"\b(in|elem)\b", r"\\in", result)
+        # Only LaTeX-style keywords supported: land, lor, lnot, elem
+        result = re.sub(r"\bland\b", r"\\land", result)
+        result = re.sub(r"\blor\b", r"\\lor", result)
+        result = re.sub(r"\blnot\b", r"\\lnot", result)
+        result = re.sub(r"\belem\b", r"\\in", result)
         return result
 
     def _escape_latex(self, text: str) -> str:

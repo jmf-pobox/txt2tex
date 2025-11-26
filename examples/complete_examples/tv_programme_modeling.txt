@@ -288,7 +288,7 @@ TEXT: First, we need a function to find the longest viewed programme:
 axdef
   longestViewed : seq(Programme) +-> Programme
 where
-  forall s : seq(Programme) | longestViewed(s) = (mu p : ran s | p.viewed = yes and forall q : ran s | p /= q and q.viewed = yes | p.length > q.length)
+  forall s : seq(Programme) | longestViewed(s) = (mu p : ran s | p.viewed = yes land forall q : ran s | p /= q land q.viewed = yes | p.length > q.length)
 end
 
 TEXT: Now we can define the removal function:

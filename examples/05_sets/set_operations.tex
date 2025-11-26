@@ -18,14 +18,14 @@
 \subsection*{(a)}
 
 \noindent
-$(\mu x : \nat | (x \bsup 2 \esup = 4) \land (x > 0))$
+$(\mu x : \nat | x \bsup 2 \esup = 4 \land x > 0)$
 
 \medskip
 
 \subsection*{(b)}
 
 \noindent
-$(\mu x | (x > 0) \land (x < 10))$
+$(\mu x | x > 0 \land x < 10)$
 
 \section*{Test 2 : Not Equal Operator}
 \addcontentsline{toc}{section}{Test 2 : Not Equal Operator}
@@ -40,14 +40,14 @@ $x \neq 0$
 \subsection*{(b)}
 
 \noindent
-$(x \neq 0) \land (y \neq 0)$
+$x \neq 0 \land y \neq 0$
 
 \medskip
 
 \subsection*{(c)}
 
 \noindent
-$(x \neq y) \lor (y \neq z)$
+$x \neq y \lor y \neq z$
 
 \section*{Test 3 : Not In Operator}
 \addcontentsline{toc}{section}{Test 3 : Not In Operator}
@@ -62,7 +62,7 @@ $x \notin S$
 \subsection*{(b)}
 
 \noindent
-$(x \in A) \land (x \notin B)$
+$x \in A \land x \notin B$
 
 \medskip
 
@@ -78,8 +78,8 @@ $x \notin S \iff \lnot (x \in S)$
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \begin{array}{l@{\hspace{2em}}r}
-      \exists y : \nat @ (y = 0) \land (x \neq y) \\
-      \Leftrightarrow (0 \in \nat) \land (x \neq 0) \\
+      \exists y : \nat @ y = 0 \land x \neq y \\
+      \Leftrightarrow 0 \in \nat \land x \neq 0 \\
       \Leftrightarrow x \neq 0
     \end{array}$%
   }
@@ -92,7 +92,7 @@ $x \notin S \iff \lnot (x \in S)$
 \subsection*{(a)}
 
 \noindent
-$(\mu x : \nat | (x \bsup 2 \esup = 9) \land (x \neq 3))$
+$(\mu x : \nat | x \bsup 2 \esup = 9 \land x \neq 3)$
 
 \medskip
 
@@ -114,20 +114,20 @@ $\forall x : \nat | x \in S @ x \notin T$
 \subsection*{(a)}
 
 \noindent
-$(x = y) \lor (x \neq y)$
+$x = y \lor x \neq y$
 
 \medskip
 
 \subsection*{(b)}
 
 \noindent
-$(x \in A) \lor (x \notin A)$
+$x \in A \lor x \notin A$
 
 \medskip
 
 \subsection*{(c)}
 
 \noindent
-$(\mu x : \nat | (x \in S) \land (x \neq 0) \land (x \bsup 2 \esup < 10))$
+$(\mu x : \nat | x \in S \land x \neq 0 \land x \bsup 2 \esup < 10)$
 
 \end{document}

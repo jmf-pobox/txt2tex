@@ -14,9 +14,9 @@
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \begin{array}{l@{\hspace{2em}}r}
-      p \land q \\
-      \Leftrightarrow q \land p & [\mbox{commutative}] \\
-      \Leftrightarrow q \land p & [\mbox{idempotent}]
+      p(and)(q) \\
+      \Leftrightarrow q(and)(p) & [\mbox{commutative}] \\
+      \Leftrightarrow q(and)(p) & [\mbox{idempotent}]
     \end{array}$%
   }
 \end{center}
@@ -26,11 +26,10 @@
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \begin{array}{l@{\hspace{2em}}r}
-      \lnot (p \land q) \\
-      \Leftrightarrow \lnot p \lor \lnot q & [\mbox{De Morgan}] \\
-      \Leftrightarrow \lnot p \lor \lnot q & [\mbox{idempotence}] \\
-      \Leftrightarrow \lnot p \lor \lnot q \lor \lnot r &
-      [\mbox{associativity}] \\
+      not(p(and)(q)) \\
+      \Leftrightarrow not(p)(or(not(q))) & [\mbox{De Morgan}] \\
+      \Leftrightarrow not(p)(or(not(q))) & [\mbox{idempotence}] \\
+      \Leftrightarrow not(p)(or(not(q)))(or(not(r))) & [\mbox{associativity}] \\
       \Leftrightarrow true & [\mbox{excluded middle}]
     \end{array}$%
   }

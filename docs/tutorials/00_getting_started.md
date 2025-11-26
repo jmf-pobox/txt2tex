@@ -7,7 +7,7 @@ Welcome to txt2tex! This tutorial will get you up and running with your first fo
 txt2tex is a tool that converts whiteboard-style mathematical notation into beautiful LaTeX documents. It allows you to write formal specifications naturally, as you would on a whiteboard, and automatically generates typeset PDF output.
 
 **Key features:**
-- Write math notation naturally (forall, =>, and, or, etc.)
+- Write math notation naturally (forall, =>, land, lor, etc.)
 - Automatic conversion to LaTeX
 - Type checking with fuzz (optional but recommended)
 - PDF generation in one command
@@ -47,9 +47,9 @@ Create a new file called `my_first_spec.txt`:
 
 ** Example 1: Simple Implication **
 
-TEXT: If p and q are both true, then p is true.
+TEXT: If p land q are both true, then p is true.
 
-(p and q) => p
+(p land q) => p
 ```
 
 ### Step 2: Compile to PDF
@@ -101,7 +101,7 @@ TEXT: This is a paragraph of explanation.
 
 Features:
 - Smart quote conversion ("quotes" becomes "quotes")
-- Inline math operators (and, or, =>, etc.)
+- Inline math operators (land, lor, =>, etc.)
 - Proper paragraph spacing
 
 **Note:** Arithmetic exponentiation (x^2) is not supported by fuzz. For relation iteration use R^n.
@@ -111,9 +111,9 @@ Features:
 **Propositional operators:**
 
 ```
-p and q          →  p ∧ q
-p or q           →  p ∨ q
-not p            →  ¬p
+p land q         →  p ∧ q
+p lor q          →  p ∨ q
+lnot p           →  ¬p
 p => q           →  p ⇒ q
 p <=> q          →  p ⇔ q
 ```
@@ -155,11 +155,11 @@ Edit your txt file and recompile until you're satisfied.
 ```
 ** Problem 1 **
 
-TEXT: Prove that p and q implies p.
+TEXT: Prove that p land q implies p.
 
 PROOF:
-  p and q [premise]
-  p [and elim left]
+  p land q [premise]
+  p [land elim left]
 ```
 
 ### Pattern 2: Definition with Examples
@@ -173,16 +173,16 @@ where
   forall n : N | square(n) = n * n
 end
 
-TEXT: For example, square(3) = 9 and square(5) = 25.
+TEXT: For example, square(3) = 9 land square(5) = 25.
 ```
 
 ### Pattern 3: Truth Table
 
 ```
-** Truth Table for And **
+** Truth Table for Land **
 
 TRUTH TABLE:
-p | q | p and q
+p | q | p land q
 T | T | T
 T | F | F
 F | T | F
@@ -200,14 +200,14 @@ TEXT: This document demonstrates basic propositional logic operators.
 
 ** Example 1: Conjunction **
 
-TEXT: The conjunction operator 'and' is true only when both operands are true.
+TEXT: The conjunction operator 'land' is true only when both operands are true.
 
-p and q
+p land q
 
 TEXT: Truth table:
 
 TRUTH TABLE:
-p | q | p and q
+p | q | p land q
 T | T | T
 T | F | F
 F | T | F
@@ -218,12 +218,12 @@ F | F | F
 TEXT: Implication p => q means "if p then q".
 
 PROOF:
-  p and (p => q) [premise]
-  p [and elim left]
-  p => q [and elim right]
+  p land (p => q) [premise]
+  p [land elim left]
+  p => q [land elim right]
   q [=> elim]
 
-TEXT: This proof shows modus ponens: from p and p => q, we conclude q.
+TEXT: This proof shows modus ponens: from p land p => q, we conclude q.
 ```
 
 Save this as `basics.txt` and compile:

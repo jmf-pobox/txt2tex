@@ -91,8 +91,8 @@ and surjective
   finitePartialFunc : X \ffun Y \\
   totalBij : X \bij Y
   \where
-  (\dom totalFunc = X) \land (\dom totalBij = X) \land (\forall x1,
-  x2 : X | totalBij(x1) = totalBij(x2) @ x1 = x2) \land (\ran totalBij = Y)
+  \dom totalFunc = X \land \dom totalBij = X \land (\forall x1, x2 :
+  X | totalBij(x1) = totalBij(x2) @ x1 = x2) \land \ran totalBij = Y
 \end{axdef}
 
 \section*{Example 3 : Finite Functions in Practice}
@@ -135,8 +135,8 @@ and surjective
   f : \nat \ffun \nat \\
   g : \nat \ffun \nat
   \where
-  (f = \{1 \mapsto 10, 2 \mapsto 20, 3 \mapsto 30\}) \land (g = \{10
-  \mapsto 100, 20 \mapsto 200\}) \land (\# (\dom f) = 3) \land (\# (\dom g) = 2)
+  f = \{1 \mapsto 10, 2 \mapsto 20, 3 \mapsto 30\} \land g = \{10
+  \mapsto 100, 20 \mapsto 200\} \land \# (\dom f) = 3 \land \# (\dom g) = 2
 \end{axdef}
 
 \noindent We can compose finite functions, but the result may not be
@@ -147,7 +147,7 @@ finite unless proven.
 \begin{axdef}
   f\_composed : \nat \ffun \nat
   \where
-  (f\_composed = g \circ f) \land (\# (\dom f\_composed) \leq \# (\dom f))
+  f\_composed = g \circ f \land \# (\dom f\_composed) \leq \# (\dom f)
 \end{axdef}
 
 \noindent The composition has a domain size bounded by the domain of
@@ -167,9 +167,9 @@ f, since we can only compose where f's range intersects g's domain.
   recent\_viewed : Title \ffun ViewDate \\
   recentSet : \power Title
   \where
-  (recentSet = \{~ t : Title | t \in \dom viewed ~\}) \land
-  (recent\_viewed = recentSet \dres viewed) \land (\# (\dom
-  recent\_viewed) \leq \# (\dom viewed))
+  recentSet = \{~ t : Title | t \in \dom viewed ~\} \land
+  recent\_viewed = recentSet \dres viewed \land \# (\dom
+  recent\_viewed) \leq \# (\dom viewed)
 \end{axdef}
 
 \noindent Restricting a finite partial function preserves finiteness.

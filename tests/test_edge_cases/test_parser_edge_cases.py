@@ -15,7 +15,7 @@ from txt2tex.parser import Parser, ParserError
 
 def test_incomplete_solution_marker() -> None:
     """Test error when solution marker is not closed."""
-    text = "** Solution 1"  # Missing closing **
+    text = "** Solution 1"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -25,7 +25,7 @@ def test_incomplete_solution_marker() -> None:
 
 def test_missing_quantifier_pipe() -> None:
     """Test error when quantifier is missing pipe separator."""
-    text = "forall x : N  x > 0"  # Missing |
+    text = "forall x : N  x > 0"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -35,7 +35,7 @@ def test_missing_quantifier_pipe() -> None:
 
 def test_missing_set_comprehension_pipe() -> None:
     """Test error when set comprehension is missing pipe or period."""
-    text = "{x : N  x > 0}"  # Missing | or .
+    text = "{x : N  x > 0}"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -48,7 +48,7 @@ def test_missing_set_comprehension_pipe() -> None:
 
 def test_missing_set_comprehension_closing_brace() -> None:
     """Test error when set comprehension is not closed."""
-    text = "{x : N | x > 0"  # Missing }
+    text = "{x : N | x > 0"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -63,8 +63,6 @@ def test_set_comprehension_no_domain() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
-    # Result is SetComprehension directly (single expression)
     assert isinstance(result, SetComprehension)
     assert result.domain is None
 
@@ -76,7 +74,6 @@ def test_set_comprehension_with_expression_part() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, SetComprehension)
     assert result.expression is not None
 
@@ -88,7 +85,6 @@ def test_set_comprehension_multiple_variables() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, SetComprehension)
     assert len(result.variables) == 2
     assert result.variables == ["x", "y"]
@@ -101,7 +97,6 @@ def test_quantifier_no_domain() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, Quantifier)
     assert result.domain is None
 
@@ -113,7 +108,6 @@ def test_mu_with_expression() -> None:
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     result = parser.parse()
-
     assert isinstance(result, Quantifier)
     assert result.quantifier == "mu"
     assert result.expression is not None
@@ -121,7 +115,7 @@ def test_mu_with_expression() -> None:
 
 def test_truth_table_invalid_first_token() -> None:
     """Test truth table with invalid starting token."""
-    text = "TRUTH TABLE:\n123 | 456"  # Numbers not identifiers
+    text = "TRUTH TABLE:\n123 | 456"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -131,7 +125,7 @@ def test_truth_table_invalid_first_token() -> None:
 
 def test_truth_table_no_headers() -> None:
     """Test truth table with no headers."""
-    text = "TRUTH TABLE:\n"  # Empty table
+    text = "TRUTH TABLE:\n"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
