@@ -182,4 +182,3 @@ class TestParserSmartJoinJustification:
         result = parser._smart_join_justification(parts)
         # Should compact parentheses
         assert "length(x)" in result
-
