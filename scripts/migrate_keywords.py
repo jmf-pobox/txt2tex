@@ -37,6 +37,7 @@ KEYWORD_MAP = {
     "and": "land",
     "or": "lor",
     "not": "lnot",
+    "in": "elem",
 }
 
 
@@ -119,13 +120,14 @@ Question: Is this occurrence mathematical notation (should become "{replacement}
 or English prose (should stay "{keyword}")?
 
 Context clues for mathematical usage:
-- In formulas: p and q, x or y, not p
+- In formulas: p and q, x or y, not p, x in S
 - In schemas/axdef/gendef blocks
-- Near math operators: =>, <=>, forall, exists, in, subset
+- Near math operators: =>, <=>, forall, exists, subset
 - In TRUTH TABLE: column headers
 - In EQUIV: blocks (equivalence reasoning)
 - In PROOF: blocks (proof trees)
 - In quantified predicates: forall x | ...
+- For "in": set membership (x in S, n in N)
 
 Context clues for English prose:
 - In TEXT: blocks (natural language)
@@ -133,6 +135,7 @@ Context clues for English prose:
 - In justification labels [...] with prose
 - Surrounded by articles (a, an, the)
 - In explanatory sentences
+- For "in": English preposition (in LaTeX, in sequent calculus, in natural deduction)
 
 Respond with ONLY valid JSON (no markdown, no extra text):
 {{"is_math": true, "confidence": 0.95, "reasoning": "Appears in formula 'p and q'"}}
@@ -154,9 +157,7 @@ JSON response:"""
             if content.startswith("```"):
                 # Extract JSON from code block
                 lines = content.split("\n")
-                json_lines = [
-                    line for line in lines if not line.startswith("```")
-                ]
+                json_lines = [line for line in lines if not line.startswith("```")]
                 content = "\n".join(json_lines).strip()
 
             result = json.loads(content)
@@ -283,9 +284,7 @@ JSON response:"""
             line_number = i + 1
             current_line = line.rstrip("\n")
             prev_line = lines[i - 1].rstrip("\n") if i > 0 else None
-            next_line = (
-                lines[i + 1].rstrip("\n") if i < len(lines) - 1 else None
-            )
+            next_line = lines[i + 1].rstrip("\n") if i < len(lines) - 1 else None
 
             analysis = self.analyze_line(
                 line_number, current_line, prev_line, next_line
@@ -294,9 +293,7 @@ JSON response:"""
 
         return results
 
-    def apply_migration(
-        self, file_path: Path, analyses: list[LineAnalysis]
-    ) -> None:
+    def apply_migration(self, file_path: Path, analyses: list[LineAnalysis]) -> None:
         """Apply migration to file with backup.
 
         Args:
@@ -331,9 +328,7 @@ JSON response:"""
 def print_analysis_report(analyses: list[LineAnalysis]) -> None:
     """Print detailed analysis report."""
     total_lines = len(analyses)
-    lines_with_changes = sum(
-        1 for a in analyses if a.modified_line is not None
-    )
+    lines_with_changes = sum(1 for a in analyses if a.modified_line is not None)
     total_occurrences = sum(len(a.occurrences) for a in analyses)
     replacements = sum(
         sum(1 for occ in a.occurrences if occ.should_replace) for a in analyses
@@ -381,9 +376,7 @@ def main() -> int:
         action="store_true",
         help="Show changes without applying",
     )
-    parser.add_argument(
-        "--apply", action="store_true", help="Apply changes to file"
-    )
+    parser.add_argument("--apply", action="store_true", help="Apply changes to file")
     parser.add_argument(
         "--threshold",
         type=float,
