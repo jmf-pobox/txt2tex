@@ -35,6 +35,25 @@ pip install hatch
 hatch run cli --help
 ```
 
+### Syntax at a Glance
+
+txt2tex uses intuitive keywords that mirror mathematical notation:
+
+| You Write | You Get | Meaning |
+|-----------|---------|---------|
+| `forall x : N \| P(x)` | ∀x : ℕ • P(x) | Universal quantifier |
+| `exists y : Z \| Q(y)` | ∃y : ℤ • Q(y) | Existential quantifier |
+| `p land q` | p ∧ q | Logical AND |
+| `p lor q` | p ∨ q | Logical OR |
+| `lnot p` | ¬p | Logical NOT |
+| `p => q` | p ⇒ q | Implication |
+| `x elem S` | x ∈ S | Set membership |
+| `A union B` | A ∪ B | Set union |
+
+**Note:** Use `land`, `lor`, `lnot` for logical operators (LaTeX-style keywords).
+
+For complete syntax reference, see **[docs/guides/USER_GUIDE.md](docs/guides/USER_GUIDE.md)**.
+
 ### Your First Document
 
 Create a file `example.txt`:
@@ -44,10 +63,10 @@ Create a file `example.txt`:
 
 ** Solution 1 **
 
-(a) Show that p and q implies p:
+(a) Show that p land q implies p:
 
 TRUTH TABLE:
-p | q | p and q => p
+p | q | p land q => p
 T | T | T
 T | F | T
 F | T | T
@@ -56,8 +75,8 @@ F | F | T
 (b) Using natural deduction:
 
 PROOF:
-  p and q
-    p [and-elim1]
+  p land q
+    p [land-elim1]
 ```
 
 Convert to PDF:
@@ -81,7 +100,7 @@ forall x : N | x >= 0
 exists y : Z | y < 0
 { x : N | x mod 2 = 0 }
 lambda x : N . x^2
-p and q => r
+p land q => r
 A union B
 R o9 S
 f(x) + g(y)
@@ -97,7 +116,7 @@ txt2tex converts these to properly typeset LaTeX automatically.
 axdef
   length : PossiblePlaylist -> N
 where
-  length(<>) = 0 and
+  length(<>) = 0 land
     forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) |
       length(<ple> ^ pl) = snd(ple) + length(pl))
 end
@@ -145,8 +164,8 @@ T | T | T
 T | F | F
 
 EQUIV:
-not (p and q)
-<=> not p or not q [De Morgan]
+lnot (p land q)
+<=> lnot p lor lnot q [De Morgan]
 ```
 
 ---
@@ -305,7 +324,7 @@ A few edge cases require workarounds:
 
 **Current Implementation:**
 - ✅ **100% solution coverage** (52 of 52 homework solutions working)
-- ✅ **1145 tests** - Comprehensive test suite
+- ✅ **1244 tests** - Comprehensive test suite
 - ✅ **Full Z notation** - Schemas, relations, functions, sequences
 - ✅ **Proof trees** - Natural deduction with justifications
 - ✅ **WYSIWYG line breaks** - Natural formatting controls PDF output
@@ -362,4 +381,4 @@ MIT
 
 ---
 
-**Last Updated:** 2025-11-20
+**Last Updated:** 2025-11-26
