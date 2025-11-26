@@ -2685,6 +2685,17 @@ class Parser:
                             TokenType.IFF,
                         )
 
+                        # Special case: When base is FunctionApp and followed by
+                        # .identifier = , this is almost always a bullet separator
+                        # Example: f(x) = g(y) . x = y (the . is bullet, not projection)
+                        # This pattern is common in quantifier bodies like:
+                        # forall x : X | f(x) = g(x) . h(x) = k(x)
+                        if (
+                            isinstance(base, FunctionApp)
+                            and token_after_id.type == TokenType.EQUALS
+                        ):
+                            is_bullet_indicator = True
+
                         # Allow field projection on safe base types that can have fields
                         # (GitHub issue #13: FunctionApp and TupleProjection are safe)
                         safe_projection_bases = (
@@ -2698,7 +2709,8 @@ class Parser:
                             # Likely bullet separator - break
                             break
 
-                        # For other cases (like EQUALS), rely on safe_followers
+                        # For other cases (like EQUALS on non-FunctionApp),
+                        # rely on safe_followers.
                         # Allows "e.field = value" while catching most bullets
 
                     # Only parse if followed by safe token
