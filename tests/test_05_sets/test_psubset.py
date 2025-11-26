@@ -41,17 +41,15 @@ class TestPSubsetParser:
         assert ast.right.name == "B"
 
     def test_psubset_vs_subset(self) -> None:
-        """Test that psubset and subset are distinct operators."""
+        """Test that psubset land subset are distinct operators."""
         lexer_psubset = Lexer("A psubset B")
         tokens_psubset = lexer_psubset.tokenize()
         parser_psubset = Parser(tokens_psubset)
         ast_psubset = parser_psubset.parse()
-
         lexer_subset = Lexer("A subset B")
         tokens_subset = lexer_subset.tokenize()
         parser_subset = Parser(tokens_subset)
         ast_subset = parser_subset.parse()
-
         assert isinstance(ast_psubset, BinaryOp)
         assert isinstance(ast_subset, BinaryOp)
         assert ast_psubset.operator == "psubset"
@@ -72,14 +70,13 @@ class TestPSubsetLaTeX:
             column=3,
         )
         latex = gen.generate_expr(ast)
-        assert r"\subset" in latex
+        assert "\\subset" in latex
         assert "A" in latex
         assert "B" in latex
 
     def test_psubset_vs_subset_latex(self) -> None:
-        """Test that psubset and subset generate different LaTeX."""
+        """Test that psubset land subset generate different LaTeX."""
         gen = LaTeXGenerator()
-
         ast_psubset = BinaryOp(
             operator="psubset",
             left=Identifier(name="A", line=1, column=1),
@@ -88,7 +85,6 @@ class TestPSubsetLaTeX:
             column=3,
         )
         latex_psubset = gen.generate_expr(ast_psubset)
-
         ast_subset = BinaryOp(
             operator="subset",
             left=Identifier(name="A", line=1, column=1),
@@ -97,18 +93,13 @@ class TestPSubsetLaTeX:
             column=3,
         )
         latex_subset = gen.generate_expr(ast_subset)
-
-        # psubset → \subset (strict subset)
-        assert r"\subset" in latex_psubset
-        assert r"\subseteq" not in latex_psubset
-
-        # subset → \subseteq (subset or equal)
-        assert r"\subseteq" in latex_subset
-        # Note: \subset is substring of \subseteq, check exact match
-        assert latex_subset == r"A \subseteq B"
+        assert "\\subset" in latex_psubset
+        assert "\\subseteq" not in latex_psubset
+        assert "\\subseteq" in latex_subset
+        assert latex_subset == "A \\subseteq B"
 
     def test_psubset_in_document(self) -> None:
-        """Test psubset in complete document."""
+        """Test psubset elem complete document."""
         text = "A psubset B"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -117,9 +108,9 @@ class TestPSubsetLaTeX:
         assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-        assert r"\subset" in doc
-        assert r"\documentclass" in doc
-        assert r"\end{document}" in doc
+        assert "\\subset" in doc
+        assert "\\documentclass" in doc
+        assert "\\end{document}" in doc
 
 
 class TestPSubsetIntegration:
@@ -136,19 +127,15 @@ class TestPSubsetIntegration:
         assert ast.operator == "psubset"
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"A \subset B" in latex
+        assert "A \\subset B" in latex
 
     def test_psubset_precedence(self) -> None:
         """Test psubset has correct precedence with other set operators."""
-        # psubset and subset have precedence 7
-        # union has precedence 8
-        # So: A psubset B union C should parse as A psubset (B union C)
         text = "A psubset B union C"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "psubset"
         assert isinstance(ast.right, BinaryOp)

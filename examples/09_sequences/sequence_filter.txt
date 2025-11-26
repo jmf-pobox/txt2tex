@@ -104,7 +104,7 @@ axdef
   large5 : P N
   result5 : seq N
 where
-  s5 = <1, 2, 3, 4, 5, 6, 7, 8, 9, 10> and evens5 = {2, 4, 6, 8, 10, 12} land large5 = {5, 6, 7, 8, 9, 10, 11} land result5 = (s5 filter evens5) filter large5
+  s5 = <1, 2, 3, 4, 5, 6, 7, 8, 9, 10> land evens5 = {2, 4, 6, 8, 10, 12} land large5 = {5, 6, 7, 8, 9, 10, 11} land result5 = (s5 filter evens5) filter large5
 end
 
 TEXT: Multiple filters can be applied sequentially. First filter to evens gives <2, 4, 6, 8, 10>, then filter to large gives <6, 8, 10>.

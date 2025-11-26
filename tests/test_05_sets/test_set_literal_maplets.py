@@ -2,13 +2,7 @@
 
 from __future__ import annotations
 
-from txt2tex.ast_nodes import (
-    BinaryOp,
-    Identifier,
-    Number,
-    SetLiteral,
-    Tuple,
-)
+from txt2tex.ast_nodes import BinaryOp, Identifier, Number, SetLiteral, Tuple
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
@@ -37,7 +31,6 @@ class TestSetLiteralMapletParser:
         ast = Parser(tokens).parse()
         assert isinstance(ast, SetLiteral)
         assert len(ast.elements) == 3
-        # Check all elements are maplets
         for elem in ast.elements:
             assert isinstance(elem, BinaryOp)
             assert elem.operator == "|->"
@@ -48,12 +41,11 @@ class TestSetLiteralMapletParser:
         ast = Parser(tokens).parse()
         assert isinstance(ast, SetLiteral)
         assert len(ast.elements) == 2
-        # First maplet should have BinaryOp on both sides
         first = ast.elements[0]
         assert isinstance(first, BinaryOp)
         assert first.operator == "|->"
-        assert isinstance(first.left, BinaryOp)  # x + 1
-        assert isinstance(first.right, BinaryOp)  # y * 2
+        assert isinstance(first.left, BinaryOp)
+        assert isinstance(first.right, BinaryOp)
 
     def test_solution_29a_example(self) -> None:
         """Test Solution 29(a) example."""
@@ -70,7 +62,7 @@ class TestSetLiteralMapletParser:
         assert len(ast.elements) == 4
 
     def test_mixed_maplets_and_values(self) -> None:
-        """Test set literal mixing maplets and regular values."""
+        """Test set literal mixing maplets land regular values."""
         tokens = Lexer("{1, 2 |-> 3, 4}").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, SetLiteral)
@@ -91,9 +83,9 @@ class TestSetLiteralMapletLatex:
         assert isinstance(ast, SetLiteral)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"\{" in latex
-        assert r"\}" in latex
-        assert r"\mapsto" in latex
+        assert "\\{" in latex
+        assert "\\}" in latex
+        assert "\\mapsto" in latex
         assert "1" in latex
         assert "a" in latex
 
@@ -104,10 +96,8 @@ class TestSetLiteralMapletLatex:
         assert isinstance(ast, SetLiteral)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        # Should have commas separating elements
         assert latex.count(",") == 2
-        # Should have three mapsto operators
-        assert latex.count(r"\mapsto") == 3
+        assert latex.count("\\mapsto") == 3
 
     def test_solution_29a_latex(self) -> None:
         """Test LaTeX generation for Solution 29(a)."""
@@ -116,10 +106,9 @@ class TestSetLiteralMapletLatex:
         assert isinstance(ast, SetLiteral)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        # Verify structure
-        assert r"\{" in latex
-        assert r"\}" in latex
-        assert latex.count(r"\mapsto") == 4
+        assert "\\{" in latex
+        assert "\\}" in latex
+        assert latex.count("\\mapsto") == 4
 
     def test_solution_34a_latex(self) -> None:
         """Test LaTeX generation for Solution 34(a)."""
@@ -128,9 +117,9 @@ class TestSetLiteralMapletLatex:
         assert isinstance(ast, SetLiteral)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"\{" in latex
-        assert r"\}" in latex
-        assert latex.count(r"\mapsto") == 4
+        assert "\\{" in latex
+        assert "\\}" in latex
+        assert latex.count("\\mapsto") == 4
 
     def test_empty_set_latex(self) -> None:
         """Test LaTeX generation for empty set."""
@@ -139,7 +128,7 @@ class TestSetLiteralMapletLatex:
         assert isinstance(ast, SetLiteral)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert latex == r"\{\}"
+        assert latex == "\\{\\}"
 
 
 class TestSetLiteralEdgeCases:
@@ -151,7 +140,6 @@ class TestSetLiteralEdgeCases:
         ast = Parser(tokens).parse()
         assert isinstance(ast, SetLiteral)
         assert len(ast.elements) == 2
-        # Both elements should be SetLiteral nodes
         assert isinstance(ast.elements[0], SetLiteral)
         assert isinstance(ast.elements[1], SetLiteral)
 
@@ -164,6 +152,5 @@ class TestSetLiteralEdgeCases:
         elem = ast.elements[0]
         assert isinstance(elem, BinaryOp)
         assert elem.operator == "|->"
-        # Both sides should be tuples
         assert isinstance(elem.left, Tuple)
         assert isinstance(elem.right, Tuple)

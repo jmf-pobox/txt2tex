@@ -1,0 +1,133 @@
+// ============================================================================
+// Example: Higher-Order Functions
+// ============================================================================
+// Demonstrates:
+//   - Functions that take functions as arguments
+//   - Function composition
+//   - Function application
+//
+// Features:
+//   - apply : (X -> Y) cross X -> Y
+//   - compose : (B -> C) cross (A -> B) -> (A -> C)
+//
+// See: docs/USER_GUIDE.md - Section "Functions" > "Higher-Order Functions"
+// ============================================================================
+
+=== Higher-Order Functions ===
+
+** Example 1: Apply Function **
+
+TEXT: A simple higher-order function that applies a function to a value:
+
+gendef [X, Y]
+  apply : (X -> Y) -> X -> Y
+where
+  forall f : X -> Y; x : X | apply(f)(x) = f(x)
+end
+
+TEXT: apply takes a function and a value, returns the result.
+
+** Example 2: Using Apply **
+
+axdef
+  square : N -> N
+  result : N
+where
+  forall n : N | square(n) = n * n
+  result = apply(square)(5)
+end
+
+TEXT: result = 25
+
+** Example 3: Compose Function **
+
+TEXT: Function composition as a higher-order operation:
+
+gendef [A, B, C]
+  compose : (B -> C) cross (A -> B) -> (A -> C)
+where
+  forall f : B -> C; g : A -> B; x : A | compose(f, g)(x) = f(g(x))
+end
+
+TEXT: compose takes two functions and returns their composition.
+
+** Example 4: Using Compose **
+
+axdef
+  addOne : N -> N
+  double : N -> N
+  addOneAndDouble : N -> N
+where
+  forall n : N | addOne(n) = n + 1
+  forall n : N | double(n) = 2 * n
+  addOneAndDouble = compose(double, addOne)
+end
+
+TEXT: addOneAndDouble(5) = double(addOne(5)) = double(6) = 12
+
+** Example 5: Twice Function **
+
+TEXT: A function that applies another function twice:
+
+gendef [X]
+  twice : (X -> X) -> (X -> X)
+where
+  forall f : X -> X; x : X | twice(f)(x) = f(f(x))
+end
+
+TEXT: twice takes a function and returns a function that applies it twice.
+
+** Example 6: Using Twice **
+
+axdef
+  increment : N -> N
+  addTwo : N -> N
+where
+  forall n : N | increment(n) = n + 1
+  addTwo = twice(increment)
+end
+
+TEXT: addTwo(5) = increment(increment(5)) = 7
+
+** Example 7: Constant Function **
+
+TEXT: A higher-order function that returns a constant function:
+
+gendef [X, Y]
+  constant : Y -> (X -> Y)
+where
+  forall y : Y; x : X | constant(y)(x) = y
+end
+
+TEXT: constant takes a value and returns a function that always returns that value.
+
+** Example 8: Using Lambda with Higher-Order Functions **
+
+axdef
+  resultLambda : N
+where
+  resultLambda = apply(lambda x : N . x * x)(7)
+end
+
+TEXT: resultLambda = 49
+
+** Example 9: Flip Function **
+
+TEXT: A function that flips the arguments of a binary function:
+
+gendef [X, Y, Z]
+  flip : (X cross Y -> Z) -> (Y cross X -> Z)
+where
+  forall f : X cross Y -> Z; x : X; y : Y | flip(f)(y, x) = f(x, y)
+end
+
+TEXT: flip swaps the order of arguments to a function.
+
+** Example 10: Best Practices **
+
+TEXT: When using higher-order functions:
+TEXT: 1. Use type parameters to make functions generic
+TEXT: 2. Keep function signatures clear and simple
+TEXT: 3. Compose small functions to build complex behavior
+TEXT: 4. Use lambda expressions for inline function definitions
+TEXT: 5. Higher-order functions enable functional programming patterns

@@ -16,43 +16,31 @@ class TestPhase10bLexer:
         """Test lexing domain subtraction operator <<|."""
         lexer = Lexer("S <<| R")
         tokens = lexer.tokenize()
-        types = [t.type for t in tokens[:-1]]  # Exclude EOF
-        assert types == [
-            TokenType.IDENTIFIER,
-            TokenType.NDRES,
-            TokenType.IDENTIFIER,
-        ]
+        types = [t.type for t in tokens[:-1]]
+        assert types == [TokenType.IDENTIFIER, TokenType.NDRES, TokenType.IDENTIFIER]
         assert tokens[1].value == "<<|"
 
     def test_range_subtraction_operator(self) -> None:
         """Test lexing range subtraction operator |>>."""
         lexer = Lexer("R |>> S")
         tokens = lexer.tokenize()
-        types = [t.type for t in tokens[:-1]]  # Exclude EOF
-        assert types == [
-            TokenType.IDENTIFIER,
-            TokenType.NRRES,
-            TokenType.IDENTIFIER,
-        ]
+        types = [t.type for t in tokens[:-1]]
+        assert types == [TokenType.IDENTIFIER, TokenType.NRRES, TokenType.IDENTIFIER]
         assert tokens[1].value == "|>>"
 
     def test_composition_operator(self) -> None:
         """Test lexing composition operator o9."""
         lexer = Lexer("R o9 S")
         tokens = lexer.tokenize()
-        types = [t.type for t in tokens[:-1]]  # Exclude EOF
-        assert types == [
-            TokenType.IDENTIFIER,
-            TokenType.CIRC,
-            TokenType.IDENTIFIER,
-        ]
+        types = [t.type for t in tokens[:-1]]
+        assert types == [TokenType.IDENTIFIER, TokenType.CIRC, TokenType.IDENTIFIER]
         assert tokens[1].value == "o9"
 
     def test_inv_keyword(self) -> None:
         """Test lexing inv keyword."""
         lexer = Lexer("inv R")
         tokens = lexer.tokenize()
-        types = [t.type for t in tokens[:-1]]  # Exclude EOF
+        types = [t.type for t in tokens[:-1]]
         assert types == [TokenType.INV, TokenType.IDENTIFIER]
         assert tokens[0].value == "inv"
 
@@ -60,7 +48,7 @@ class TestPhase10bLexer:
         """Test lexing id keyword."""
         lexer = Lexer("id X")
         tokens = lexer.tokenize()
-        types = [t.type for t in tokens[:-1]]  # Exclude EOF
+        types = [t.type for t in tokens[:-1]]
         assert types == [TokenType.ID, TokenType.IDENTIFIER]
         assert tokens[0].value == "id"
 
@@ -68,7 +56,7 @@ class TestPhase10bLexer:
         """Test lexing tilde postfix operator ~."""
         lexer = Lexer("R~")
         tokens = lexer.tokenize()
-        types = [t.type for t in tokens[:-1]]  # Exclude EOF
+        types = [t.type for t in tokens[:-1]]
         assert types == [TokenType.IDENTIFIER, TokenType.TILDE]
         assert tokens[1].value == "~"
 
@@ -76,7 +64,7 @@ class TestPhase10bLexer:
         """Test lexing plus postfix operator +."""
         lexer = Lexer("R+")
         tokens = lexer.tokenize()
-        types = [t.type for t in tokens[:-1]]  # Exclude EOF
+        types = [t.type for t in tokens[:-1]]
         assert types == [TokenType.IDENTIFIER, TokenType.PLUS]
         assert tokens[1].value == "+"
 
@@ -84,31 +72,20 @@ class TestPhase10bLexer:
         """Test lexing star postfix operator *."""
         lexer = Lexer("R*")
         tokens = lexer.tokenize()
-        types = [t.type for t in tokens[:-1]]  # Exclude EOF
+        types = [t.type for t in tokens[:-1]]
         assert types == [TokenType.IDENTIFIER, TokenType.STAR]
         assert tokens[1].value == "*"
 
     def test_operator_precedence_no_conflict(self) -> None:
         """Test that 3-char operators don't conflict with 2-char operators."""
-        # <<| should be parsed as NDRES, not LESS_THAN followed by DRES
         lexer = Lexer("a <<| b")
         tokens = lexer.tokenize()
         types = [t.type for t in tokens[:-1]]
-        assert types == [
-            TokenType.IDENTIFIER,
-            TokenType.NDRES,
-            TokenType.IDENTIFIER,
-        ]
-
-        # |>> should be parsed as NRRES, not RRES followed by GREATER_THAN
+        assert types == [TokenType.IDENTIFIER, TokenType.NDRES, TokenType.IDENTIFIER]
         lexer = Lexer("a |>> b")
         tokens = lexer.tokenize()
         types = [t.type for t in tokens[:-1]]
-        assert types == [
-            TokenType.IDENTIFIER,
-            TokenType.NRRES,
-            TokenType.IDENTIFIER,
-        ]
+        assert types == [TokenType.IDENTIFIER, TokenType.NRRES, TokenType.IDENTIFIER]
 
 
 class TestPhase10bParser:
@@ -120,7 +97,6 @@ class TestPhase10bParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "<<|"
         assert isinstance(ast.left, Identifier)
@@ -134,7 +110,6 @@ class TestPhase10bParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "|>>"
         assert isinstance(ast.left, Identifier)
@@ -148,7 +123,6 @@ class TestPhase10bParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "o9"
         assert isinstance(ast.left, Identifier)
@@ -162,7 +136,6 @@ class TestPhase10bParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "inv"
         assert isinstance(ast.operand, Identifier)
@@ -174,7 +147,6 @@ class TestPhase10bParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "id"
         assert isinstance(ast.operand, Identifier)
@@ -186,7 +158,6 @@ class TestPhase10bParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "~"
         assert isinstance(ast.operand, Identifier)
@@ -198,7 +169,6 @@ class TestPhase10bParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "+"
         assert isinstance(ast.operand, Identifier)
@@ -210,7 +180,6 @@ class TestPhase10bParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "*"
         assert isinstance(ast.operand, Identifier)
@@ -222,8 +191,6 @@ class TestPhase10bParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should parse as: (R~)+
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "+"
         assert isinstance(ast.operand, UnaryOp)
@@ -235,8 +202,6 @@ class TestPhase10bParser:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should parse as: (R o9 S) o9 T (left-associative)
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "o9"
         assert isinstance(ast.left, BinaryOp)
@@ -257,7 +222,7 @@ class TestPhase10bLaTeXGeneration:
             column=3,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"S \ndres R"
+        assert latex == "S \\ndres R"
 
     def test_generate_range_subtraction(self) -> None:
         """Test generating LaTeX for range subtraction."""
@@ -270,7 +235,7 @@ class TestPhase10bLaTeXGeneration:
             column=3,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"R \nrres S"
+        assert latex == "R \\nrres S"
 
     def test_generate_composition_operator(self) -> None:
         """Test generating LaTeX for composition operator."""
@@ -283,7 +248,7 @@ class TestPhase10bLaTeXGeneration:
             column=3,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"R \circ S"
+        assert latex == "R \\circ S"
 
     def test_generate_inv_function(self) -> None:
         """Test generating LaTeX for inv function."""
@@ -295,7 +260,7 @@ class TestPhase10bLaTeXGeneration:
             column=1,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"\inv R"
+        assert latex == "\\inv R"
 
     def test_generate_id_function(self) -> None:
         """Test generating LaTeX for id function."""
@@ -307,7 +272,7 @@ class TestPhase10bLaTeXGeneration:
             column=1,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"\id X"
+        assert latex == "\\id X"
 
     def test_generate_tilde_postfix(self) -> None:
         """Test generating LaTeX for tilde postfix operator."""
@@ -319,7 +284,7 @@ class TestPhase10bLaTeXGeneration:
             column=2,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"R^{-1}"
+        assert latex == "R^{-1}"
 
     def test_generate_plus_postfix(self) -> None:
         """Test generating LaTeX for plus postfix operator."""
@@ -331,7 +296,7 @@ class TestPhase10bLaTeXGeneration:
             column=2,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"R^{+}"
+        assert latex == "R^{+}"
 
     def test_generate_star_postfix(self) -> None:
         """Test generating LaTeX for star postfix operator."""
@@ -343,7 +308,7 @@ class TestPhase10bLaTeXGeneration:
             column=2,
         )
         latex = gen.generate_expr(ast)
-        assert latex == r"R^{*}"
+        assert latex == "R^{*}"
 
 
 class TestPhase10bIntegration:
@@ -356,13 +321,12 @@ class TestPhase10bIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Expr)  # Type narrowing for mypy
+        assert isinstance(ast, Expr)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "<<|"
-        assert latex == r"S \ndres R"
+        assert latex == "S \\ndres R"
 
     def test_end_to_end_range_subtraction(self) -> None:
         """Test complete pipeline for range subtraction."""
@@ -371,13 +335,12 @@ class TestPhase10bIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Expr)  # Type narrowing for mypy
+        assert isinstance(ast, Expr)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "|>>"
-        assert latex == r"R \nrres S"
+        assert latex == "R \\nrres S"
 
     def test_end_to_end_composition(self) -> None:
         """Test complete pipeline for composition operator."""
@@ -386,13 +349,12 @@ class TestPhase10bIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Expr)  # Type narrowing for mypy
+        assert isinstance(ast, Expr)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "o9"
-        assert latex == r"R \circ S"
+        assert latex == "R \\circ S"
 
     def test_end_to_end_inv_function(self) -> None:
         """Test complete pipeline for inv function."""
@@ -401,13 +363,12 @@ class TestPhase10bIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Expr)  # Type narrowing for mypy
+        assert isinstance(ast, Expr)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "inv"
-        assert latex == r"\inv R"
+        assert latex == "\\inv R"
 
     def test_end_to_end_id_function(self) -> None:
         """Test complete pipeline for id function."""
@@ -416,13 +377,12 @@ class TestPhase10bIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Expr)  # Type narrowing for mypy
+        assert isinstance(ast, Expr)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "id"
-        assert latex == r"\id X"
+        assert latex == "\\id X"
 
     def test_end_to_end_tilde_postfix(self) -> None:
         """Test complete pipeline for tilde postfix operator."""
@@ -431,13 +391,12 @@ class TestPhase10bIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Expr)  # Type narrowing for mypy
+        assert isinstance(ast, Expr)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "~"
-        assert latex == r"R^{-1}"
+        assert latex == "R^{-1}"
 
     def test_end_to_end_plus_postfix(self) -> None:
         """Test complete pipeline for plus postfix operator."""
@@ -446,13 +405,12 @@ class TestPhase10bIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Expr)  # Type narrowing for mypy
+        assert isinstance(ast, Expr)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "+"
-        assert latex == r"R^{+}"
+        assert latex == "R^{+}"
 
     def test_end_to_end_star_postfix(self) -> None:
         """Test complete pipeline for star postfix operator."""
@@ -461,13 +419,12 @@ class TestPhase10bIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Expr)  # Type narrowing for mypy
+        assert isinstance(ast, Expr)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "*"
-        assert latex == r"R^{*}"
+        assert latex == "R^{*}"
 
     def test_complex_extended_relation_expression(self) -> None:
         """Test complex expression with multiple extended operators."""
@@ -476,13 +433,12 @@ class TestPhase10bIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Expr)  # Type narrowing for mypy
+        assert isinstance(ast, Expr)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "inv"
-        assert latex == r"\inv (S \ndres R^{-1})"
+        assert latex == "\\inv (S \\ndres R^{-1})"
 
     def test_transitive_closure_of_composition(self) -> None:
         """Test transitive closure applied to composition."""
@@ -491,29 +447,26 @@ class TestPhase10bIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Expr)  # Type narrowing for mypy
+        assert isinstance(ast, Expr)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "+"
         assert isinstance(ast.operand, BinaryOp)
-        assert latex == r"(R \circ S)^{+}"
+        assert latex == "(R \\circ S)^{+}"
 
     def test_mixed_phase10a_and_10b_operators(self) -> None:
-        """Test mixing Phase 10a and 10b operators."""
+        """Test mixing Phase 10a land 10b operators."""
         text = "(S <| R)~"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        assert isinstance(ast, Expr)  # Type narrowing for mypy
+        assert isinstance(ast, Expr)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-
-        # Domain restriction followed by inverse
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "~"
         assert isinstance(ast.operand, BinaryOp)
         assert ast.operand.operator == "<|"
-        assert latex == r"(S \dres R)^{-1}"
+        assert latex == "(S \\dres R)^{-1}"

@@ -15,7 +15,7 @@
 \section*{Example 1 : Basic Contradiction}
 \addcontentsline{toc}{section}{Example 1 : Basic Contradiction}
 
-\noindent To prove p, assume $\lnot p$ and derive a contradiction (false).
+\noindent To prove p, assume not p and derive a contradiction (false).
 
 \bigskip
 
@@ -68,7 +68,7 @@ conclude p by discharging assumption 1.
 \section*{Example 3 : Law of Non - Contradiction}
 \addcontentsline{toc}{section}{Example 3 : Law of Non - Contradiction}
 
-\noindent Prove that p $\land$ $\lnot$ p leads to a contradiction.
+\noindent Prove that p $\land$ $\lnot p$ leads to a contradiction.
 
 \bigskip
 
@@ -92,7 +92,7 @@ can be both true and false.
 \section*{Example 4 : Indirect Proof}
 \addcontentsline{toc}{section}{Example 4 : Indirect Proof}
 
-\noindent Prove: $(\lnot p \implies false)$ $\Rightarrow$ $\lnot$ $\lnot$ p
+\noindent Prove: $(\lnot p \implies false) \implies \lnot \lnot p$
 
 \bigskip
 
@@ -110,8 +110,8 @@ can be both true and false.
 \end{center}
 \bigskip
 
-\noindent This is the pattern for indirect proof: if assuming $\lnot$
-p leads to false, then $\lnot$ $\lnot p$ holds.
+\noindent This is the pattern for indirect proof: if assuming $\lnot
+p$ leads to false, then $\lnot$ not p holds.
 
 \bigskip
 
@@ -143,7 +143,7 @@ p leads to false, then $\lnot$ $\lnot p$ holds.
 \section*{Example 6 : Disjunction from Contradiction}
 \addcontentsline{toc}{section}{Example 6 : Disjunction from Contradiction}
 
-\noindent Prove: l$\lnot p \implies (p \implies q)$
+\noindent Prove: $\lnot p \implies (p \implies q)$
 
 \bigskip
 
@@ -161,14 +161,14 @@ p leads to false, then $\lnot$ $\lnot p$ holds.
 \end{center}
 \bigskip
 
-\noindent From $\lnot$ p, we can prove $p \implies q$ for any q.
+\noindent From $\lnot p$, we can prove $p \implies q$ for any q.
 
 \bigskip
 
 \section*{Example 7 : Double Negation Elimination}
 \addcontentsline{toc}{section}{Example 7 : Double Negation Elimination}
 
-\noindent Prove: $\lnot$ l$\lnot p \implies p(requires(classical)(logic))$
+\noindent Prove: $\lnot$ $\lnot p \implies p(requires(classical)(logic))$
 
 \bigskip
 
@@ -187,7 +187,7 @@ p leads to false, then $\lnot$ $\lnot p$ holds.
 \end{center}
 \bigskip
 
-\noindent In classical logic, not $\lnot$ p implies p. This requires
+\noindent In classical logic, not $\lnot p$ implies p. This requires
 excluded middle or equivalent axiom.
 
 \bigskip
@@ -195,7 +195,7 @@ excluded middle or equivalent axiom.
 \section*{Example 8 : Reductio ad Absurdum}
 \addcontentsline{toc}{section}{Example 8 : Reductio ad Absurdum}
 
-\noindent Prove: $(\lnot p \implies (q \land \lnot q))$ $\Rightarrow$ p
+\noindent Prove: $(\lnot p \implies (q \land \lnot q)) \implies p$
 
 \bigskip
 
@@ -215,8 +215,8 @@ excluded middle or equivalent axiom.
 \end{center}
 \bigskip
 
-\noindent Reductio ad absurdum: if assuming $\lnot p$ leads to
-absurdity, then p holds.
+\noindent Reductio ad absurdum: if assuming not p leads to absurdity,
+then p holds.
 
 \bigskip
 
@@ -260,8 +260,8 @@ Universal Quantifier}
 \begin{center}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(injective(f) \land
-    (f(x) = f(y))) \implies x = y}{
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(injective(f) \land f(x)
+    = f(y)) \implies x = y}{
       \infer[\lnot\textrm{-intro}^{[2]}]{x =
       y}{\infer[\mbox{contradiction with
         f}(x)=f(y)]{false}{\infer[\mbox{injective property}]{f(x) \neq
@@ -280,7 +280,7 @@ Universal Quantifier}
 \addcontentsline{toc}{section}{Example 11 : Case Analysis Leading to
 Contradiction}
 
-\noindent Prove: p $\lor$ q, $\lnot$ p, l$\lnot q \implies false$
+\noindent Prove: p $\lor$ q, $\lnot p$, $\lnot q \implies false$
 
 \bigskip
 
@@ -331,8 +331,8 @@ Contradiction Proofs}
 
 \bigskip
 
-\noindent 6. $Remember : contradiction$ is a classical technique
-$\lnot constructive$
+\noindent 6. $Remember : contradiction$ is a classical technique (not
+constructive)
 
 \bigskip
 

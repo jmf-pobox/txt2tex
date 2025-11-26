@@ -63,7 +63,6 @@ class TestFiniteFunctionParser:
         ast = parser.parse()
         assert isinstance(ast, FunctionType)
         assert ast.arrow == "77->"
-        # Right-associative: X 77-> (Y 77-> Z)
         assert isinstance(ast.range, FunctionType)
         assert ast.range.arrow == "77->"
 
@@ -82,12 +81,12 @@ class TestFiniteFunctionLaTeX:
             column=3,
         )
         latex = gen.generate_expr(ast)
-        assert r"\ffun" in latex
+        assert "\\ffun" in latex
         assert "X" in latex
         assert "Y" in latex
 
     def test_finite_function_in_document(self) -> None:
-        """Test finite function in complete document."""
+        """Test finite function elem complete document."""
         text = "X 77-> Y"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -96,9 +95,9 @@ class TestFiniteFunctionLaTeX:
         assert isinstance(ast, FunctionType)
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-        assert r"\ffun" in doc
-        assert r"\documentclass" in doc
-        assert r"\end{document}" in doc
+        assert "\\ffun" in doc
+        assert "\\documentclass" in doc
+        assert "\\end{document}" in doc
 
 
 class TestFiniteFunctionIntegration:
@@ -115,38 +114,33 @@ class TestFiniteFunctionIntegration:
         assert ast.arrow == "77->"
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"X \ffun Y" in latex
+        assert "X \\ffun Y" in latex
 
     def test_finite_function_vs_partial_function(self) -> None:
-        """Test that 77-> and +-> are distinct operators."""
+        """Test that 77-> land +-> are distinct operators."""
         text_ffun = "X 77-> Y"
         text_pfun = "X +-> Y"
-
         lexer_ffun = Lexer(text_ffun)
         tokens_ffun = lexer_ffun.tokenize()
         assert tokens_ffun[1].type == TokenType.FINFUN
-
         lexer_pfun = Lexer(text_pfun)
         tokens_pfun = lexer_pfun.tokenize()
         assert tokens_pfun[1].type == TokenType.PFUN
-
         parser_ffun = Parser(tokens_ffun)
         ast_ffun = parser_ffun.parse()
         assert isinstance(ast_ffun, FunctionType)
         assert ast_ffun.arrow == "77->"
-
         parser_pfun = Parser(tokens_pfun)
         ast_pfun = parser_pfun.parse()
         assert isinstance(ast_pfun, FunctionType)
         assert ast_pfun.arrow == "+->"
-
         gen = LaTeXGenerator()
         latex_ffun = gen.generate_expr(ast_ffun)
         latex_pfun = gen.generate_expr(ast_pfun)
-        assert r"\ffun" in latex_ffun
-        assert r"\pfun" in latex_pfun
-        assert r"\ffun" not in latex_pfun
-        assert r"\pfun" not in latex_ffun
+        assert "\\ffun" in latex_ffun
+        assert "\\pfun" in latex_pfun
+        assert "\\ffun" not in latex_pfun
+        assert "\\pfun" not in latex_ffun
 
     def test_finite_function_nested_right(self) -> None:
         """Test right-associativity of finite functions."""
@@ -155,8 +149,6 @@ class TestFiniteFunctionIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should parse as X 77-> (Y 77-> Z)
         assert isinstance(ast, FunctionType)
         assert ast.arrow == "77->"
         assert isinstance(ast.domain, Identifier)
@@ -173,5 +165,4 @@ class TestFiniteFunctionIntegration:
         text = "records : Year 77-> Table"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
-        # Should tokenize: records, :, Year, 77->, Table
         assert any(t.type == TokenType.FINFUN for t in tokens)

@@ -79,7 +79,7 @@ class TestBagUnionLaTeX:
             column=4,
         )
         latex = gen.generate_expr(ast)
-        assert r"\uplus" in latex
+        assert "\\uplus" in latex
         assert "b1" in latex
         assert "b2" in latex
 
@@ -94,12 +94,12 @@ class TestBagUnionLaTeX:
             column=4,
         )
         latex = gen.generate_expr(ast)
-        assert r"\uplus" in latex
+        assert "\\uplus" in latex
         assert "b1" in latex
         assert "b2" in latex
 
     def test_bag_union_in_document_unicode(self) -> None:
-        """Test bag union in complete document (Unicode)."""
+        """Test bag union elem complete document (Unicode)."""
         text = "b1 ⊎ b2"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -108,12 +108,12 @@ class TestBagUnionLaTeX:
         assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-        assert r"\uplus" in doc
-        assert r"\documentclass" in doc
-        assert r"\end{document}" in doc
+        assert "\\uplus" in doc
+        assert "\\documentclass" in doc
+        assert "\\end{document}" in doc
 
     def test_bag_union_in_document_ascii(self) -> None:
-        """Test bag union in complete document (ASCII keyword)."""
+        """Test bag union elem complete document (ASCII keyword)."""
         text = "b1 bag_union b2"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -122,9 +122,9 @@ class TestBagUnionLaTeX:
         assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-        assert r"\uplus" in doc
-        assert r"\documentclass" in doc
-        assert r"\end{document}" in doc
+        assert "\\uplus" in doc
+        assert "\\documentclass" in doc
+        assert "\\end{document}" in doc
 
 
 class TestBagUnionIntegration:
@@ -141,7 +141,7 @@ class TestBagUnionIntegration:
         assert ast.operator == "⊎"
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"b1 \uplus b2" in latex
+        assert "b1 \\uplus b2" in latex
 
     def test_bag_union_pipeline_ascii(self) -> None:
         """Test complete pipeline for bag_union operator (ASCII keyword)."""
@@ -154,7 +154,7 @@ class TestBagUnionIntegration:
         assert ast.operator == "bag_union"
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"b1 \uplus b2" in latex
+        assert "b1 \\uplus b2" in latex
 
     def test_bag_union_left_associative(self) -> None:
         """Test left-associativity of bag union operator."""
@@ -163,8 +163,6 @@ class TestBagUnionIntegration:
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-
-        # Should parse as (b1 bag_union b2) bag_union b3 (left-associative)
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "bag_union"
         assert isinstance(ast.left, BinaryOp)

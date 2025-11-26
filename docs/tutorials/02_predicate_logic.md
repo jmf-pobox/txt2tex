@@ -94,7 +94,7 @@ Evaluates to 5 (the unique natural number whose square is 25).
 
 **With expression:**
 ```
-mu x : N | x > 5 and x < 7 . x + 1
+mu x : N | x > 5 land x < 7 . x + 1
 ```
 
 Finds x = 6, then evaluates x + 1 = 7.
@@ -108,7 +108,7 @@ Simplify quantifiers when the variable is constrained to a single value.
 **Rule:**
 ```
 forall x : T | x = a => P(x)  ≡  P(a)
-exists x : T | x = a and P(x)  ≡  P(a)
+exists x : T | x = a land P(x)  ≡  P(a)
 ```
 
 **Example:**
@@ -140,14 +140,14 @@ exists y | forall x | P(x, y)
 
 **Distribution:**
 ```
-forall x | P(x) and Q(x)  ≡  (forall x | P(x)) and (forall x | Q(x))
-exists x | P(x) or Q(x)   ≡  (exists x | P(x)) or (exists x | Q(x))
+forall x | P(x) land Q(x)  ≡  (forall x | P(x)) land (forall x | Q(x))
+exists x | P(x) lor Q(x)   ≡  (exists x | P(x)) lor (exists x | Q(x))
 ```
 
 **Negation:**
 ```
-not (forall x | P(x))  ≡  exists x | not P(x)
-not (exists x | P(x))  ≡  forall x | not P(x)
+lnot (forall x | P(x))  ≡  exists x | lnot P(x)
+lnot (exists x | P(x))  ≡  forall x | lnot P(x)
 ```
 
 **Vacuous quantification:**
@@ -181,9 +181,9 @@ forall x : N | exists y : N | y > x
 
 ** Example 4: Mu Operator **
 
-TEXT: Find the unique natural number between 5 and 7.
+TEXT: Find the unique natural number between 5 land 7.
 
-mu x : N | x > 5 and x < 7
+mu x : N | x > 5 land x < 7
 
 TEXT: This evaluates to 6.
 ```

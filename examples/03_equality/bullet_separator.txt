@@ -31,7 +31,7 @@ TEXT: This reads: "the set of x squared, for all x in N where x is positive". Th
 
 TEXT: Without the bullet, the set contains the values that satisfy the predicate:
 
-{ x : N | x > 0 and x < 10 }
+{ x : N | x > 0 land x < 10 }
 
 TEXT: This is the set {1, 2, 3, 4, 5, 6, 7, 8, 9}. No transformation is applied.
 
@@ -51,7 +51,7 @@ TEXT: Result: {0, 1, 2, 3, 4} (the values themselves)
 
 ** Example 4: Complex Set Comprehension **
 
-{ x : Z | x mod 2 = 0 and x >= -10 and x <= 10 . x div 2 }
+{ x : Z | x mod 2 = 0 land x >= -10 land x <= 10 . x div 2 }
 
 TEXT: This gives the set {-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5} by taking even integers from -10 to 10 and dividing by 2.
 
@@ -59,7 +59,7 @@ TEXT: This gives the set {-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5} by taking even i
 
 TEXT: The mu operator finds the unique value satisfying a condition:
 
-mu x : N | x > 5 and x < 7 . x
+mu x : N | x > 5 land x < 7 . x
 
 TEXT: This evaluates to 6, the unique natural number strictly between 5 and 7. The bullet separates the uniqueness constraint from the selected expression.
 

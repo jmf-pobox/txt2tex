@@ -22,5 +22,5 @@ end
 schema Point
   x : N; y : N
 where
-  x > 0 and y > 0
+  x > 0 land y > 0
 end

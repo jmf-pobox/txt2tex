@@ -13,5 +13,5 @@ gendef [X]
   emptyContainer : Container[X]
   addToContainer : Container[X] cross X -> Container[X]
 where
-  emptyContainer.contents = <> and emptyContainer.capacity = 100
+  emptyContainer.contents = <> land emptyContainer.capacity = 100
 end

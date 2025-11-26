@@ -19,7 +19,7 @@
   policy : \power_1 RESOURCE \fun RESOURCE
   \where
   \forall S : \power_1 RESOURCE @ \\
-  \t1 policy(S) \in S
+  \t1 policy(S)(in)(S)
 \end{axdef}
 
 \section*{Example 2 : Quantifier with multiple lines}
@@ -29,8 +29,8 @@
   policy : \power_1 RESOURCE \fun RESOURCE
   \where
   \forall S : \power_1 RESOURCE @ \\
-  \t1 policy(S) \in S \land \\
-  \t1 (S \subseteq RESOURCE)
+  \t1 policy(S)(in)(S) \land \\
+  \t1 S \subseteq RESOURCE
 \end{axdef}
 
 \section*{Example 3 : Nested quantifiers}
@@ -41,7 +41,7 @@
   \where
   \forall x : PERSON @ \\
   \t1 \exists y : PERSON @ \\
-  \t2 (x, y) \in relation
+  \t2 (x, y)(in)(relation)
 \end{axdef}
 
 \end{document}

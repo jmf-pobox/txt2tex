@@ -25,7 +25,6 @@ def parse_expr(text: str) -> Expr | Document:
 def generate_latex(text: str) -> str:
     """Helper to generate LaTeX from text."""
     ast = parse_expr(text)
-    # For single expressions, parser returns the expression directly
     assert not isinstance(ast, Document)
     generator = LaTeXGenerator()
     return generator.generate_expr(ast)
@@ -52,7 +51,6 @@ class TestPhase11bParsing:
         assert ast.function.name == "g"
         assert len(ast.args) == 3
         assert all(isinstance(arg, Identifier) for arg in ast.args)
-        # Type narrowing: after isinstance check, we know all args are Identifiers
         names: list[str] = []
         for arg in ast.args:
             assert isinstance(arg, Identifier)
@@ -66,13 +64,11 @@ class TestPhase11bParsing:
         assert isinstance(ast.function, Identifier)
         assert ast.function.name == "f"
         assert len(ast.args) == 1
-
         inner = ast.args[0]
         assert isinstance(inner, FunctionApp)
         assert isinstance(inner.function, Identifier)
         assert inner.function.name == "g"
         assert len(inner.args) == 1
-
         innermost = inner.args[0]
         assert isinstance(innermost, FunctionApp)
         assert isinstance(innermost.function, Identifier)
@@ -99,36 +95,36 @@ class TestPhase11bParsing:
         assert ast.args[0].value == "5"
 
     def test_expression_argument(self):
-        """Test f(x and y)."""
-        ast = parse_expr("f(x and y)")
+        """Test f(x land y)."""
+        ast = parse_expr("f(x land y)")
         assert isinstance(ast, FunctionApp)
         assert isinstance(ast.function, Identifier)
         assert ast.function.name == "f"
         assert len(ast.args) == 1
         assert isinstance(ast.args[0], BinaryOp)
-        assert ast.args[0].operator == "and"
+        assert ast.args[0].operator == "land"
 
     def test_multiple_expression_arguments(self):
-        """Test g(x and y, p or q)."""
-        ast = parse_expr("g(x and y, p or q)")
+        """Test g(x land y, p lor q)."""
+        ast = parse_expr("g(x land y, p lor q)")
         assert isinstance(ast, FunctionApp)
         assert isinstance(ast.function, Identifier)
         assert ast.function.name == "g"
         assert len(ast.args) == 2
         assert isinstance(ast.args[0], BinaryOp)
-        assert ast.args[0].operator == "and"
+        assert ast.args[0].operator == "land"
         assert isinstance(ast.args[1], BinaryOp)
-        assert ast.args[1].operator == "or"
+        assert ast.args[1].operator == "lor"
 
 
 class TestPhase11bInExpressions:
-    """Test function application in larger expressions."""
+    """Test function application elem larger expressions."""
 
     def test_in_binary_expression(self):
-        """Test f(x) and g(y)."""
-        ast = parse_expr("f(x) and g(y)")
+        """Test f(x) land g(y)."""
+        ast = parse_expr("f(x) land g(y)")
         assert isinstance(ast, BinaryOp)
-        assert ast.operator == "and"
+        assert ast.operator == "land"
         assert isinstance(ast.left, FunctionApp)
         assert isinstance(ast.right, FunctionApp)
 
@@ -191,14 +187,14 @@ class TestPhase11bLaTeX:
         assert result == "f()"
 
     def test_in_expression_latex(self):
-        """Test f(x) and g(y) → f(x) \\land g(y)."""
-        result = generate_latex("f(x) and g(y)")
-        assert result == r"f(x) \land g(y)"
+        """Test f(x) land g(y) → f(x) \\land g(y)."""
+        result = generate_latex("f(x) land g(y)")
+        assert result == "f(x) \\land g(y)"
 
     def test_in_quantifier_latex(self):
         """Test forall x : N | f(x) > 0 → \\forall x : \\mathbb{N} \\bullet f(x) > 0."""
         result = generate_latex("forall x : N | f(x) > 0")
-        assert result == r"\forall x \colon \mathbb{N} \bullet f(x) > 0"
+        assert result == "\\forall x \\colon \\mathbb{N} \\bullet f(x) > 0"
 
 
 class TestPhase11bSpecialFunctions:
@@ -207,22 +203,22 @@ class TestPhase11bSpecialFunctions:
     def test_seq_function(self):
         """Test seq(N) → \\seq~\\mathbb{N} (space, no tilde per fuzz manual)."""
         result = generate_latex("seq(N)")
-        assert result == r"\seq~\mathbb{N}"
+        assert result == "\\seq~\\mathbb{N}"
 
     def test_iseq_function(self):
         """Test iseq(N) → \\iseq~\\mathbb{N} (space, no tilde per fuzz manual)."""
         result = generate_latex("iseq(N)")
-        assert result == r"\iseq~\mathbb{N}"
+        assert result == "\\iseq~\\mathbb{N}"
 
     def test_bag_function(self):
         """Test bag(X) → \\bag~X (space, no tilde per fuzz manual)."""
         result = generate_latex("bag(X)")
-        assert result == r"\bag~X"
+        assert result == "\\bag~X"
 
     def test_power_set(self):
         """Test P(X) → \\power X (space, no tilde per fuzz manual)."""
         result = generate_latex("P(X)")
-        assert result == r"\power X"
+        assert result == "\\power X"
 
     def test_special_function_multiple_args(self):
         """Test seq(N, N) → seq(N, N) (not special form)."""
@@ -232,21 +228,18 @@ class TestPhase11bSpecialFunctions:
     def test_seq_in_expression(self):
         """Test x elem seq(N) (space, no tilde per fuzz manual)."""
         result = generate_latex("x elem seq(N)")
-        assert result == r"x \in \seq~\mathbb{N}"
+        assert result == "x \\in \\seq~\\mathbb{N}"
 
 
 class TestPhase11bEdgeCases:
-    """Test edge cases and complex scenarios."""
+    """Test edge cases land complex scenarios."""
 
     def test_parentheses_grouping_vs_application(self):
         """Test (x + y) vs f(x + y)."""
-        # Grouping parentheses
-        ast1 = parse_expr("(x and y)")
+        ast1 = parse_expr("(x land y)")
         assert isinstance(ast1, BinaryOp)
-        assert ast1.operator == "and"
-
-        # Function application
-        ast2 = parse_expr("f(x and y)")
+        assert ast1.operator == "land"
+        ast2 = parse_expr("f(x land y)")
         assert isinstance(ast2, FunctionApp)
         assert isinstance(ast2.function, Identifier)
         assert ast2.function.name == "f"
@@ -255,14 +248,13 @@ class TestPhase11bEdgeCases:
     def test_underscore_in_name(self):
         """Test well_trained(d) - underscore is subscript operator.
 
-        Note: Current lexer treats _ as subscript operator, not part of identifier.
+        Note: Current lexer treats _ as subscript operator, lnot part of identifier.
         So 'well_trained' is parsed as 'well' followed by subscript 'trained'.
         This is a known limitation - identifiers with underscores need workaround
-        or lexer enhancement.
+        lor lexer enhancement.
 
         For now, skip this test as it documents expected limitation.
         """
-        # Skip - documented limitation
         pass
 
     def test_application_with_numbers(self):
@@ -277,9 +269,6 @@ class TestPhase11bEdgeCases:
 
     def test_nested_special_functions(self):
         """Test seq(seq(N))."""
-        # Inner seq(N) is special, outer seq(...) is not (wrong arg count)
-        # Actually, the inner generates \\seq~\mathbb{N} which is then passed to outer
-        # Need to check what actually happens
         ast = parse_expr("seq(seq(N))")
         assert isinstance(ast, FunctionApp)
         assert isinstance(ast.function, Identifier)
@@ -299,23 +288,19 @@ class TestPhase11bSolution5:
         assert len(ast.args) == 1
         assert isinstance(ast.args[0], Identifier)
         assert ast.args[0].name == "d"
-
         latex = generate_latex("gentle(d)")
         assert latex == "gentle(d)"
 
     def test_solution_5a(self):
-        """Test exists d : Dog | gentle(d) and well_trained(d)."""
-        # Note: well_trained has underscore which may cause issues
-        # For now, test without underscore
-        text = "exists d : Dog | gentle(d) and neat(d)"
+        """Test exists d : Dog | gentle(d) land well_trained(d)."""
+        text = "exists d : Dog | gentle(d) land neat(d)"
         ast = parse_expr(text)
         assert isinstance(ast, Quantifier)
         assert ast.quantifier == "exists"
         assert isinstance(ast.body, BinaryOp)
-        assert ast.body.operator == "and"
+        assert ast.body.operator == "land"
         assert isinstance(ast.body.left, FunctionApp)
         assert isinstance(ast.body.right, FunctionApp)
-
         latex = generate_latex(text)
         assert "gentle(d)" in latex
         assert "neat(d)" in latex
@@ -328,9 +313,8 @@ class TestPhase11bSolution5:
         assert ast.operator == "=>"
         assert isinstance(ast.left, FunctionApp)
         assert isinstance(ast.right, FunctionApp)
-
         latex = generate_latex(text)
-        assert latex == r"neat(d) \Rightarrow attractive(d)"
+        assert latex == "neat(d) \\Rightarrow attractive(d)"
 
 
 class TestPhase11bIntegration:
@@ -338,17 +322,11 @@ class TestPhase11bIntegration:
 
     def test_axiom_with_function_application(self):
         """Test axdef with function application."""
-        text = """axdef
-  f : X -> Y
-where
-  forall x : X | f(x) in Y
-end"""
+        text = "axdef\n  f : X -> Y\nwhere\n  forall x : X | f(x) elem Y\nend"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         doc = parser.parse()
-
-        # Should parse without errors
         assert doc is not None
 
     def test_complex_predicate(self):
@@ -356,7 +334,6 @@ end"""
         text = "forall x : N | f(g(x)) > h(x, y)"
         ast = parse_expr(text)
         assert isinstance(ast, Quantifier)
-
         latex = generate_latex(text)
         assert "f(g(x))" in latex
         assert "h(x, y)" in latex

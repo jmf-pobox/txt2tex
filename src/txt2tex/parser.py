@@ -1835,7 +1835,7 @@ class Parser:
 
             # Phase 21b: Check for second pipe (constrained quantifier)
             # Syntax: forall x : T | constraint | body
-            # Semantics: forall x : T | constraint and body
+            # Semantics: forall x : T | constraint land body
             if self._match(TokenType.PIPE):
                 self._advance()  # Consume second '|'
 
@@ -1853,7 +1853,7 @@ class Parser:
                 actual_body = self._parse_expr()
                 # Combine constraint and body with AND
                 body = BinaryOp(
-                    operator="and",
+                    operator="land",
                     left=constraint,
                     right=actual_body,
                     line_break_after=constraint_continuation,

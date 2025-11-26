@@ -142,7 +142,7 @@ p.2                    (second element)
 
 ** Example 2: Set Comprehension **
 
-{ x : N | x < 10 and x mod 2 = 0 }
+{ x : N | x < 10 land x mod 2 = 0 }
 
 TEXT: This is the set {0, 2, 4, 6, 8}.
 

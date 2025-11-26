@@ -34,35 +34,35 @@ This proves q from premises p and p => q using modus ponens (=> elim).
 
 ## Inference Rules
 
-### Conjunction (and)
+### Conjunction (land)
 
 **And Introduction:**
 ```
 P    Q
-──────── [and intro]
-P and Q
+──────── [land intro]
+P land Q
 ```
 
 **And Elimination:**
 ```
-P and Q              P and Q
-─────── [and elim left]    ───────  [and elim right]
+P land Q              P land Q
+─────── [land elim left]    ───────  [land elim right]
    P                    Q
 ```
 
-### Disjunction (or)
+### Disjunction (lor)
 
 **Or Introduction:**
 ```
   P                    Q
-───────── [or intro left]    ───────── [or intro right]
-P or Q                P or Q
+───────── [lor intro left]    ───────── [lor intro right]
+P lor Q                P lor Q
 ```
 
 **Or Elimination (case analysis):**
 ```
-P or Q    P => R    Q => R
-──────────────────────────── [or elim]
+P lor Q    P => R    Q => R
+──────────────────────────── [lor elim]
            R
 ```
 
@@ -84,20 +84,20 @@ P    P => Q
      Q
 ```
 
-### Negation (not)
+### Negation (lnot)
 
 **Not Introduction:**
 ```
   [P]
    ⋮
  false
-───────  [not intro]
- not P
+───────  [lnot intro]
+ lnot P
 ```
 
 **Not Elimination:**
 ```
-P    not P
+P    lnot P
 ────────── [contradiction]
   false
 ```
@@ -117,9 +117,9 @@ PROOF:
 
 ```
 PROOF:
-  p and q [premise]
-  p [and elim left]
-  q [and elim right]
+  p land q [premise]
+  p [land elim left]
+  q [land elim right]
 ```
 
 ### Example 3: Implication Introduction
@@ -171,34 +171,34 @@ p => (q => (r => s)) [=> intro from 1]
 
 ** Example 1: Simple Implication **
 
-TEXT: Prove (p and q) => p
+TEXT: Prove (p land q) => p
 
 PROOF:
-p and q => p [=> intro from 1]
-  [1] p and q [assumption]
-      p [and elim 1]
+p land q => p [=> intro from 1]
+  [1] p land q [assumption]
+      p [land elim 1]
 
 ** Example 2: Modus Ponens **
 
-TEXT: Prove p and (p => q) => (p and q)
+TEXT: Prove p land (p => q) => (p land q)
 
 PROOF:
-p and (p => q) => (p and q) [=> intro from 1]
-  [1] p and (p => q) [assumption]
-      :: p [and elim 1]
-      :: p => q [and elim 2]
+p land (p => q) => (p land q) [=> intro from 1]
+  [1] p land (p => q) [assumption]
+      :: p [land elim 1]
+      :: p => q [land elim 2]
       q [=> elim]
-      p and q [and intro]
+      p land q [land intro]
 
 ** Example 3: Proof by Contradiction **
 
-TEXT: Prove (p and not p) => q
+TEXT: Prove (p land lnot p) => q
 
 PROOF:
-(p and not p) => q [=> intro from 1]
-  [1] p and not p [assumption]
-      p [and elim 1]
-      not p [and elim 2]
+(p land lnot p) => q [=> intro from 1]
+  [1] p land lnot p [assumption]
+      p [land elim 1]
+      lnot p [land elim 2]
       false [contradiction]
       q [false elim]
 ```

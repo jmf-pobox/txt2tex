@@ -1,0 +1,60 @@
+// ============================================================================
+// Example: Sequence Concatenation
+// ============================================================================
+// Demonstrates:
+//   - Sequence concatenation operator (^)
+//   - Concatenation with sequence literals and variables
+//   - Cons pattern for building sequences
+//   - Associativity of concatenation
+//
+// Features:
+//   - <a> ^ <b> [simple concatenation]
+//   - <x> ^ s [cons with variable]
+//   - s ^ t [variable concatenation]
+//   - <> ^ t [empty sequence identity]
+//   - (s ^ t) ^ u [associative]
+//
+// See: docs/USER_GUIDE.md - Section "Sequences" > "Concatenation"
+// ============================================================================
+
+=== Sequence Concatenation ===
+
+** Example 1: Simple Concatenation (ASCII) **
+
+TEXT: The caret operator after a sequence means concatenation:
+
+<a> ^ <b>
+
+<1, 2> ^ <3, 4>
+
+<x> ^ <>
+
+** Example 2: Concatenation with Variables **
+
+TEXT: Concatenation with sequence variables:
+
+<x> ^ s
+
+s ^ t
+
+<> ^ t
+
+** Example 3: Cons Pattern **
+
+TEXT: The cons pattern builds sequences incrementally:
+
+<x> ^ <>
+
+<x> ^ <y> ^ <z>
+
+<1> ^ <2> ^ <3> ^ <>
+
+** Example 4: Nested Concatenation **
+
+TEXT: Concatenation is associative:
+
+(<a> ^ <b>) ^ <c>
+
+<a> ^ (<b> ^ <c>)
+
+(s ^ t) ^ u

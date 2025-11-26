@@ -143,7 +143,7 @@ schema Address
   city : seq Char
   zipCode : N
 where
-  zipCode >= 10000 and zipCode <= 99999
+  zipCode >= 10000 land zipCode <= 99999
 end
 
 schema PersonData
@@ -151,7 +151,7 @@ schema PersonData
   address : Address
   age : N
 where
-  age >= 0 and age <= 150
+  age >= 0 land age <= 150
 end
 
 axdef

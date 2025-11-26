@@ -4,13 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from txt2tex.ast_nodes import (
-    BinaryOp,
-    Identifier,
-    Number,
-    SetComprehension,
-    Tuple,
-)
+from txt2tex.ast_nodes import BinaryOp, Identifier, Number, SetComprehension, Tuple
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser, ParserError
@@ -89,10 +83,9 @@ class TestTupleParser:
         assert len(ast.elements) == 3
 
     def test_parenthesized_expression_not_tuple(self) -> None:
-        """Test that (x) is parsed as expression, not tuple."""
+        """Test that (x) is parsed as expression, lnot tuple."""
         tokens = Lexer("(x)").tokenize()
         ast = Parser(tokens).parse()
-        # Should be Identifier, not Tuple
         assert not isinstance(ast, Tuple)
         assert isinstance(ast, Identifier)
         assert ast.name == "x"
@@ -183,13 +176,12 @@ class TestTupleLatexGeneration:
 
 
 class TestTupleInSetComprehension:
-    """Test tuples in set comprehension bodies."""
+    """Test tuples elem set comprehension bodies."""
 
     def test_set_comprehension_with_tuple_body(self) -> None:
-        """Test parsing set comprehension with tuple in body."""
+        """Test parsing set comprehension with tuple elem body."""
         tokens = Lexer("{ n : N | n <= 4 . (n, n^2) }").tokenize()
         ast = Parser(tokens).parse()
-        # Should parse as SetComprehension
         assert isinstance(ast, SetComprehension)
         assert ast.expression is not None
         assert isinstance(ast.expression, Tuple)
@@ -202,16 +194,14 @@ class TestTupleInSetComprehension:
         assert isinstance(ast, SetComprehension)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        # Should render as set comprehension with tuple in expression part
-        assert r"\{" in latex
-        assert r"\mid" in latex
-        assert r"\bullet" in latex
-        # Single-character exponents don't get braces
-        assert r"(n, n \bsup 2 \esup)" in latex
+        assert "\\{" in latex
+        assert "\\mid" in latex
+        assert "\\bullet" in latex
+        assert "(n, n \\bsup 2 \\esup)" in latex
 
     def test_set_comprehension_multi_var_tuple(self) -> None:
-        """Test set comprehension with multiple vars and tuple expression."""
-        tokens = Lexer("{ x, y : N | x > 0 and y > 0 . (x, y) }").tokenize()
+        """Test set comprehension with multiple vars land tuple expression."""
+        tokens = Lexer("{ x, y : N | x > 0 land y > 0 . (x, y) }").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, SetComprehension)
         assert ast.expression is not None
@@ -219,10 +209,10 @@ class TestTupleInSetComprehension:
 
 
 class TestCartesianProductTuples:
-    """Test tuples in Cartesian product contexts."""
+    """Test tuples elem Cartesian product contexts."""
 
     def test_tuple_in_set_membership(self) -> None:
-        """Test parsing tuple in set membership expression."""
+        """Test parsing tuple elem set membership expression."""
         tokens = Lexer("(a, b) elem A cross B").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, BinaryOp)
@@ -237,8 +227,8 @@ class TestCartesianProductTuples:
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
         assert "(a, b)" in latex
-        assert r"\in" in latex
-        assert r"\cross" in latex
+        assert "\\in" in latex
+        assert "\\cross" in latex
 
 
 class TestTupleEdgeCases:
@@ -254,7 +244,6 @@ class TestTupleEdgeCases:
         """Test that (x) without comma is not a tuple."""
         tokens = Lexer("(x)").tokenize()
         ast = Parser(tokens).parse()
-        # Should be Identifier, not Tuple
         assert not isinstance(ast, Tuple)
         assert isinstance(ast, Identifier)
 

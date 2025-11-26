@@ -29,11 +29,11 @@
   getSecond: X \cross Y \cross \num \fun Y \\
   getThird: X \cross Y \cross \num \fun \num
   \where
-  \forall x : X @ \forall y : Y @ \forall z : \num @ (triple(x, y, z)
-  = (x, y, z)) \land \\
-  \t3 (getFirst(x, y, z) = x) \land \\
-  \t3 (getSecond(x, y, z) = y) \land \\
-  \t3 (getThird(x, y, z) = z)
+  \forall x : X @ \forall y : Y @ \forall z : \num @ triple(x, y, z)
+  = (x, y, z) \land \\
+  \t3 getFirst(x, y, z) = x \land \\
+  \t3 getSecond(x, y, z) = y \land \\
+  \t3 getThird(x, y, z) = z
 \end{gendef}
 
 \noindent Projection functions for triples.
@@ -102,12 +102,11 @@ syntax (not gendef):
 \section*{Example 8 : Generic Option Type ( Conceptual )}
 \addcontentsline{toc}{section}{Example 8 : Generic Option Type ( Conceptual )}
 
-\noindent Optional values $(like(Maybe) \lor Option \in
-other(languages))$ are challenging to express generically in Z
-notation due to limitations with parameterized free types. For a
-specific type, you would $define : Option$ ::= none $\mid$ some⟨T⟩.
-Fully generic option types with operations require advanced patterns
-beyond standard gendef blocks.
+\noindent Optional values (like Maybe or Option in other languages)
+are challenging to express generically in Z notation due to
+limitations with parameterized free types. For a specific type, you
+would $define : Option$ ::= none $\mid$ some⟨T⟩. Fully generic option
+types with operations require advanced patterns beyond standard gendef blocks.
 
 \bigskip
 
@@ -130,7 +129,7 @@ operations in gendef:
   emptyStack: Stack[X] \\
   stackSize: Stack[X] \fun \nat
   \where
-  (emptyStack.items = \langle \rangle) \land (emptyStack.maxSize = 100) \\
+  emptyStack.items = \langle \rangle \land emptyStack.maxSize = 100 \\
   \forall s : Stack[X] @ stackSize(s) = \# s.items
 \end{gendef}
 
@@ -211,7 +210,7 @@ operations in gendef:
   tableSize: Table[Key, Value] \fun \nat \\
   allKeys: Table[Key, Value] \fun \power Key
   \where
-  (emptyTable.entries = \{\}) \land (emptyTable.size = 0) \\
+  emptyTable.entries = \{\} \land emptyTable.size = 0 \\
   \forall t : Table[Key, Value] @ tableSize(t) = t.size \\
   \forall t : Table[Key, Value] @ allKeys(t) = \dom t.entries
 \end{gendef}

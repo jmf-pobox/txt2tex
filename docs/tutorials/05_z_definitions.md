@@ -127,7 +127,7 @@ gendef [X, Y]
   fst : X cross Y -> X
   snd : X cross Y -> Y
 where
-  forall x : X; y : Y | fst(x, y) = x and snd(x, y) = y
+  forall x : X; y : Y | fst(x, y) = x land snd(x, y) = y
 end
 ```
 

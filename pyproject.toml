@@ -101,6 +101,10 @@ ignore = [
     "TC003",  # Move standard lib import into TYPE_CHECKING - unnecessary overhead
 ]
 
+[tool.ruff.lint.per-file-ignores]
+# Allow ambiguous Unicode characters in tests - intentional Z notation (× is cross product)
+"tests/test_06_definitions/test_free_types.py" = ["RUF001", "RUF002"]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"

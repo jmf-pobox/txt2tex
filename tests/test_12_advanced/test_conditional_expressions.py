@@ -70,7 +70,6 @@ class TestConditionalParsing:
         """Test if x > 0 then if x > 10 then 10 else x else 0."""
         ast = parse_expr("if x > 0 then if x > 10 then 10 else x else 0")
         assert isinstance(ast, Conditional)
-        # Then branch is another conditional
         assert isinstance(ast.then_expr, Conditional)
         assert isinstance(ast.else_expr, Number)
 
@@ -78,7 +77,6 @@ class TestConditionalParsing:
         """Test if x > 0 then 1 else if x < 0 then -1 else 0."""
         ast = parse_expr("if x > 0 then 1 else if x < 0 then -1 else 0")
         assert isinstance(ast, Conditional)
-        # Else branch is another conditional
         assert isinstance(ast.else_expr, Conditional)
         assert isinstance(ast.then_expr, Number)
 
@@ -96,50 +94,47 @@ class TestConditionalLaTeX:
     def test_simple_conditional_latex(self):
         """Test if x > 0 then x else -x → LaTeX."""
         result = generate_latex("if x > 0 then x else -x")
-        assert r"\mbox{if }" in result
-        assert r"\mbox{ then }" in result
-        assert r"\mbox{ else }" in result
+        assert "\\mbox{if }" in result
+        assert "\\mbox{ then }" in result
+        assert "\\mbox{ else }" in result
         assert "x > 0" in result
-        assert r"\lnot" in result or "-x" in result
+        assert "\\lnot" in result or "-x" in result
 
     def test_conditional_empty_sequence_latex(self):
         """Test if s = <> then 0 else head s → LaTeX."""
         result = generate_latex("if s = <> then 0 else head s")
-        assert r"\mbox{if }" in result
-        assert r"s = \langle \rangle" in result
-        assert r"\mbox{ then } 0" in result
-        assert r"\head" in result
+        assert "\\mbox{if }" in result
+        assert "s = \\langle \\rangle" in result
+        assert "\\mbox{ then } 0" in result
+        assert "\\head" in result
 
     def test_conditional_with_arithmetic_latex(self):
         """Test if x > 0 then x * 2 else x - 1 → LaTeX."""
         result = generate_latex("if x > 0 then x * 2 else x - 1")
-        assert r"\mbox{if }" in result
+        assert "\\mbox{if }" in result
         assert "x > 0" in result
-        assert "x * 2" in result or r"x \cdot 2" in result
+        assert "x * 2" in result or "x \\cdot 2" in result
         assert "x - 1" in result
 
     def test_nested_conditional_latex(self):
         """Test nested conditional generates valid LaTeX."""
         result = generate_latex("if x > 0 then if x > 10 then 10 else x else 0")
-        # Should have two sets of if/then/else
-        assert result.count(r"\mbox{if }") == 2
-        assert result.count(r"\mbox{ then }") == 2
-        assert result.count(r"\mbox{ else }") == 2
+        assert result.count("\\mbox{if }") == 2
+        assert result.count("\\mbox{ then }") == 2
+        assert result.count("\\mbox{ else }") == 2
 
     def test_conditional_parenthesized(self):
-        """Test that conditionals are wrapped in parentheses."""
+        """Test that conditionals are wrapped elem parentheses."""
         result = generate_latex("if x > 0 then x else -x")
-        # The conditional should be wrapped in parentheses
-        assert result.startswith(r"(\mbox{if }")
+        assert result.startswith("(\\mbox{if }")
         assert result.endswith(")")
 
 
 class TestConditionalPrecedence:
-    """Test conditional expression precedence and associativity."""
+    """Test conditional expression precedence land associativity."""
 
     def test_conditional_binds_loosely(self):
         """Test that conditionals have low precedence."""
-        # if x > 0 then 1 else 0 should parse the condition as (x > 0)
         ast = parse_expr("if x > 0 then 1 else 0")
         assert isinstance(ast, Conditional)
         assert isinstance(ast.condition, BinaryOp)
@@ -153,11 +148,11 @@ class TestConditionalPrecedence:
         assert isinstance(ast.right, Conditional)
 
     def test_conditional_with_logical_ops(self):
-        """Test if x and y then 1 else 0."""
-        ast = parse_expr("if x and y then 1 else 0")
+        """Test if x land y then 1 else 0."""
+        ast = parse_expr("if x land y then 1 else 0")
         assert isinstance(ast, Conditional)
         assert isinstance(ast.condition, BinaryOp)
-        assert ast.condition.operator == "and"
+        assert ast.condition.operator == "land"
 
 
 class TestPhase16Integration:
@@ -167,27 +162,26 @@ class TestPhase16Integration:
         """Test abs(x) = if x > 0 then x else -x."""
         latex = generate_latex("abs(x) = if x > 0 then x else -x")
         assert "abs(x) =" in latex
-        assert r"\mbox{if }" in latex
+        assert "\\mbox{if }" in latex
 
     def test_conditional_in_sequence_pattern(self):
-        """Test conditional in recursive sequence function."""
+        """Test conditional elem recursive sequence function."""
         text = "f(s) = if s = <> then 0 else head s + f(tail s)"
         ast = parse_expr(text)
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "="
         assert isinstance(ast.right, Conditional)
-
         latex = generate_latex(text)
-        assert r"\mbox{if }" in latex
-        assert r"s = \langle \rangle" in latex
-        assert r"\head" in latex
-        assert r"\tail" in latex
+        assert "\\mbox{if }" in latex
+        assert "s = \\langle \\rangle" in latex
+        assert "\\head" in latex
+        assert "\\tail" in latex
 
     def test_max_function(self):
         """Test max(x, y) = if x > y then x else y."""
         latex = generate_latex("max(x, y) = if x > y then x else y")
         assert "max(x, y)" in latex
-        assert r"\mbox{if }" in latex
+        assert "\\mbox{if }" in latex
         assert "x > y" in latex
 
     def test_sign_function(self):
@@ -197,15 +191,12 @@ class TestPhase16Integration:
         assert isinstance(ast, BinaryOp)
         assert isinstance(ast.right, Conditional)
         assert isinstance(ast.right.else_expr, Conditional)
-
         latex = generate_latex(text)
-        # Two nested conditionals
-        assert latex.count(r"\mbox{if }") == 2
+        assert latex.count("\\mbox{if }") == 2
 
     def test_conditional_in_set_comprehension(self):
         """Test { x : N | pred . if x > 0 then x else 0 }."""
         text = "{ x : N | x < 10 . if x > 0 then x else 0 }"
-        # Should parse correctly - conditional in expression part
         latex = generate_latex(text)
-        assert r"\{" in latex
-        assert r"\mbox{if }" in latex
+        assert "\\{" in latex
+        assert "\\mbox{if }" in latex

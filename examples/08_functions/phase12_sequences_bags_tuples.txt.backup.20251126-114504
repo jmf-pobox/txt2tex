@@ -1,0 +1,171 @@
+// ============================================================================
+// Example: Sequences, Bags, and Tuple Projection
+// ============================================================================
+// Demonstrates:
+//   - Sequence literal notation (angle brackets)
+//   - Sequence operators (head, tail, last, front, rev)
+//   - Sequence concatenation (⌢)
+//   - Tuple projection operators (.1, .2, etc.)
+//   - Bag literals (double brackets)
+//   - Sequences in quantifiers and set comprehensions
+//
+// Features:
+//   - ⟨⟩, ⟨a⟩, ⟨1, 2, 3⟩ [sequence literals]
+//   - head s, tail s, last s, front s, rev s [sequence operators]
+//   - s1 ⌢ s2 [concatenation]
+//   - x.1, x.2, (a, b, c).1 [tuple projection]
+//   - [[x]], [[1, 2, 3]] [bag literals]
+//   - seq[N] [sequence type]
+//
+// See: docs/USER_GUIDE.md - Sections "Sequences", "Tuples", "Bags"
+// ============================================================================
+
+=== Phase 12: Sequences, Bags, and Tuple Projection ===
+
+** Example 1: Sequence Literals **
+
+(a)
+
+TEXT: Empty sequence
+
+⟨⟩
+
+(b)
+
+TEXT: Single element
+
+⟨a⟩
+
+(c)
+
+TEXT: Multiple elements
+
+⟨1, 2, 3, 4, 5⟩
+
+(d)
+
+TEXT: Sequence of identifiers
+
+⟨x, y, z⟩
+
+** Example 2: Sequence Operators **
+
+(a)
+
+head ⟨1, 2, 3⟩
+
+(b)
+
+tail ⟨1, 2, 3⟩
+
+(c)
+
+last ⟨1, 2, 3⟩
+
+(d)
+
+front ⟨1, 2, 3⟩
+
+(e)
+
+rev ⟨1, 2, 3⟩
+
+** Example 3: Sequence Concatenation **
+
+(a)
+
+⟨1, 2⟩ ⌢ ⟨3, 4⟩
+
+(b)
+
+s ⌢ t ⌢ u
+
+(c)
+
+⟨a⟩ ⌢ ⟨b, c⟩ ⌢ ⟨d⟩
+
+** Example 4: Tuple Projection **
+
+(a)
+
+x.1
+
+(b)
+
+x.2
+
+(c)
+
+(a, b, c).1
+
+(d)
+
+(a, b, c).2
+
+** Example 5: Bag Literals **
+
+(a)
+
+[[x]]
+
+(b)
+
+[[1, 2, 3]]
+
+(c)
+
+[[a, b, c]]
+
+(d)
+
+TEXT: Bags with duplicates
+
+[[1, 2, 2, 3, 3, 3]]
+
+** Example 6: Sequences in Expressions **
+
+(a)
+
+x in ⟨1, 2, 3⟩
+
+(b)
+
+head s = a
+
+(c)
+
+tail ⟨1, 2, 3⟩ = ⟨2, 3⟩
+
+** Example 7: Complex Expressions **
+
+(a)
+
+forall i : N | i in ⟨1, 2, 3⟩ => i > 0
+
+(b)
+
+exists s : seq[N] | head s = 1
+
+(c)
+
+{ x : N | x > 0 . ⟨x, x^2⟩ }
+
+** Example 8: Real Examples **
+
+(a)
+
+TEXT: From Solution 37
+
+⟨a⟩
+
+(b)
+
+TEXT: Tuple projection from Solution 38
+
+(trains(x)).2
+
+(c)
+
+TEXT: Bags from Solution 39
+
+[[d]]

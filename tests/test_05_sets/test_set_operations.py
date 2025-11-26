@@ -1,13 +1,8 @@
-"""Tests for Phase 7: Equality and Special Operators."""
+"""Tests for Phase 7: Equality land Special Operators."""
 
 from __future__ import annotations
 
-from txt2tex.ast_nodes import (
-    BinaryOp,
-    Identifier,
-    Number,
-    Quantifier,
-)
+from txt2tex.ast_nodes import BinaryOp, Identifier, Number, Quantifier
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
@@ -113,23 +108,23 @@ class TestParser:
 
     def test_complex_mu_expression(self) -> None:
         """Test parsing mu with complex body."""
-        lexer = Lexer("mu x : N | x^2 = 4 and x > 0")
+        lexer = Lexer("mu x : N | x^2 = 4 land x > 0")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         assert isinstance(ast, Quantifier)
         assert ast.quantifier == "mu"
         assert isinstance(ast.body, BinaryOp)
-        assert ast.body.operator == "and"
+        assert ast.body.operator == "land"
 
     def test_inequality_chain(self) -> None:
-        """Test parsing expression with != in compound statement."""
-        lexer = Lexer("x != y and y != z")
+        """Test parsing expression with != elem compound statement."""
+        lexer = Lexer("x != y land y != z")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         assert isinstance(ast, BinaryOp)
-        assert ast.operator == "and"
+        assert ast.operator == "land"
         assert isinstance(ast.left, BinaryOp)
         assert ast.left.operator == "!="
         assert isinstance(ast.right, BinaryOp)
@@ -157,9 +152,9 @@ class TestLaTeXGenerator:
             column=1,
         )
         latex = gen.generate_expr(ast)
-        assert r"\mu" in latex
-        assert r"\colon" in latex
-        assert r"\bullet" in latex
+        assert "\\mu" in latex
+        assert "\\colon" in latex
+        assert "\\bullet" in latex
         assert "N" in latex
         assert "x > 0" in latex
 
@@ -174,7 +169,7 @@ class TestLaTeXGenerator:
             column=3,
         )
         latex = gen.generate_expr(ast)
-        assert r"\neq" in latex
+        assert "\\neq" in latex
         assert "x" in latex
         assert "0" in latex
 
@@ -189,7 +184,7 @@ class TestLaTeXGenerator:
             column=3,
         )
         latex = gen.generate_expr(ast)
-        assert r"\notin" in latex
+        assert "\\notin" in latex
         assert "x" in latex
         assert "S" in latex
 
@@ -211,9 +206,9 @@ class TestLaTeXGenerator:
             column=1,
         )
         latex = gen.generate_expr(ast)
-        assert r"\mu" in latex
-        assert r"\bullet" in latex
-        assert r"\colon" not in latex  # No domain specified
+        assert "\\mu" in latex
+        assert "\\bullet" in latex
+        assert "\\colon" not in latex
 
 
 class TestIntegration:
@@ -221,7 +216,7 @@ class TestIntegration:
 
     def test_mu_operator_pipeline(self) -> None:
         """Test complete pipeline for mu operator."""
-        text = "mu x : N | x^2 = 4 and x > 0"
+        text = "mu x : N | x^2 = 4 land x > 0"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -229,9 +224,9 @@ class TestIntegration:
         assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"\mu x \colon \mathbb{N} \bullet" in latex
-        assert r"x \bsup 2 \esup = 4" in latex
-        assert r"\land" in latex
+        assert "\\mu x \\colon \\mathbb{N} \\bullet" in latex
+        assert "x \\bsup 2 \\esup = 4" in latex
+        assert "\\land" in latex
         assert "x > 0" in latex
 
     def test_not_equal_pipeline(self) -> None:
@@ -244,7 +239,7 @@ class TestIntegration:
         assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"x \neq 0" in latex
+        assert "x \\neq 0" in latex
 
     def test_notin_pipeline(self) -> None:
         """Test complete pipeline for notin operator."""
@@ -256,11 +251,11 @@ class TestIntegration:
         assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"x \notin S" in latex
+        assert "x \\notin S" in latex
 
     def test_complex_equality_reasoning(self) -> None:
         """Test one-point rule style reasoning with equality."""
-        text = "exists y : N | y = 0 and x != y"
+        text = "exists y : N | y = 0 land x != y"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -268,10 +263,10 @@ class TestIntegration:
         assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert r"\exists y \colon \mathbb{N} \bullet" in latex
+        assert "\\exists y \\colon \\mathbb{N} \\bullet" in latex
         assert "y = 0" in latex
-        assert r"\land" in latex
-        assert r"x \neq y" in latex
+        assert "\\land" in latex
+        assert "x \\neq y" in latex
 
     def test_document_with_phase7_features(self) -> None:
         """Test document generation with Phase 7 features."""
@@ -283,14 +278,14 @@ class TestIntegration:
         assert isinstance(ast, Quantifier)
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-        assert r"\documentclass[a4paper,10pt,fleqn]{article}" in doc
-        assert r"\usepackage{zed-cm}" in doc
-        assert r"\mu x \colon \mathbb{N} \bullet x > 0" in doc
-        assert r"\end{document}" in doc
+        assert "\\documentclass[a4paper,10pt,fleqn]{article}" in doc
+        assert "\\usepackage{zed-cm}" in doc
+        assert "\\mu x \\colon \\mathbb{N} \\bullet x > 0" in doc
+        assert "\\end{document}" in doc
 
     def test_membership_in_document(self) -> None:
-        """Test membership operators in complete document."""
-        text = "x elem S and y notin T"
+        """Test membership operators elem complete document."""
+        text = "x elem S land y notin T"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -298,5 +293,5 @@ class TestIntegration:
         assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-        assert r"x \in S" in doc
-        assert r"y \notin T" in doc
+        assert "x \\in S" in doc
+        assert "y \\notin T" in doc
