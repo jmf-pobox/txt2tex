@@ -55,12 +55,11 @@
     \implies (p \land q) \lor (p \land r)}{
       \infer[\lor \mathrm{elim}]{(p \land q) \lor (p \land
       r)}{\infer[\lor\textrm{-intro-1}]{(p \land q) \lor (p \land
-        r)}{\infer[\land \mathrm{intro}]{p \land
-          q}{\infer[\mathrm{from} \mathrm{case}]{q}{\infer[\mathrm{from}
-        above]{p}{}}}} & \infer[\lor\textrm{-intro-2}]{(p \land q) \lor
-        (p \land r)}{\infer[\land \mathrm{intro}]{p \land
-          r}{\infer[\mathrm{from} \mathrm{case}]{r}{\infer[\mathrm{from}
-      above]{p}{}}}}}
+        r)}{\infer[\land \mathrm{intro}]{p \land q}{\infer[\mathrm{from
+        case}]{q}{\infer[\mathrm{from above}]{p}{}}}} &
+        \infer[\lor\textrm{-intro-2}]{(p \land q) \lor (p \land
+        r)}{\infer[\land \mathrm{intro}]{p \land r}{\infer[\mathrm{from
+      case}]{r}{\infer[\mathrm{from above}]{p}{}}}}}
     }
     $%
   }
@@ -97,8 +96,8 @@ Disjunction}
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \implies q) \implies
     (\lnot p \lor q)}{
-      \infer[\mathrm{excluded} \mathrm{middle}]{p \lor \lnot
-      p}{\ulcorner p \implies q \urcorner^{[1]}} &
+      \infer[\mathrm{excluded middle}]{p \lor \lnot p}{\ulcorner p
+      \implies q \urcorner^{[1]}} &
       \infer[\lor\textrm{-elim}^{[2]}]{\lnot p \lor
       q}{\infer[\lor\textrm{-intro-2}]{\lnot p \lor
         q}{\infer[\Rightarrow \mathrm{elim}]{q}{\ulcorner p

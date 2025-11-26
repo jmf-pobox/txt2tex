@@ -4670,16 +4670,19 @@ class LaTeXGenerator:
         return result
 
     def _wrap_text_in_mathrm(self, text: str) -> str:
-        """Wrap non-operator text sequences in \\mathrm{} for proper math mode spacing.
+        """Wrap non-operator text sequences in \\mbox{} for proper math mode spacing.
 
         In math mode, spaces between bare letters are ignored. This function
         identifies text segments (between operators/symbols) and wraps them
-        in \\mathrm{} to preserve word spacing.
+        in \\mbox{} to preserve word spacing.
+
+        Note: We use \\mbox{} instead of \\mathrm{} because \\mbox{} preserves
+        spaces between words, while \\mathrm{} ignores them in math mode.
 
         Examples:
-        - "inductive hypothesis" → "\\mathrm{inductive hypothesis}"
-        - "\\land intro" → "\\land \\mathrm{intro}"
-        - "strong IH, a < n" → "\\mathrm{strong IH}, a < n"
+        - "inductive hypothesis" → "\\mbox{inductive hypothesis}"
+        - "\\land intro" → "\\land \\mbox{intro}"
+        - "strong IH, a < n" → "\\mbox{strong IH}, a < n"
         """
         # Pattern: Match sequences of words (with spaces between them)
         # that are NOT LaTeX commands (not preceded by \)
@@ -4687,7 +4690,7 @@ class LaTeXGenerator:
         # where word = [a-zA-Z_][a-zA-Z0-9_]*
         #
         # We need to be careful not to match:
-        # - LaTeX commands like \land, \mathrm{}, etc.
+        # - LaTeX commands like \land, \mbox{}, etc.
         # - Single letters that are math variables (like a, b, n)
         # - Numbers that are math
         #
@@ -4702,7 +4705,7 @@ class LaTeXGenerator:
         multi_word_pattern = rf"(?<![a-zA-Z\\])({word}(?:\s+{word})+)"
 
         def wrap_multi(m: re.Match[str]) -> str:
-            return f"\\mathrm{{{m.group(1)}}}"
+            return f"\\mbox{{{m.group(1)}}}"
 
         text = re.sub(multi_word_pattern, wrap_multi, text)
 
@@ -4774,8 +4777,8 @@ class LaTeXGenerator:
         ]
 
         for word in text_words:
-            # Only wrap if not already in \mathrm{} and not a LaTeX command
+            # Only wrap if not already in \mbox{} and not a LaTeX command
             pattern = rf"(?<!\\)(?<!\{{)\b{word}\b(?!\}})"
-            text = re.sub(pattern, rf"\\mathrm{{{word}}}", text)
+            text = re.sub(pattern, rf"\\mbox{{{word}}}", text)
 
         return text
