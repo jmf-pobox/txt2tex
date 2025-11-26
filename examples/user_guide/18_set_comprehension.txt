@@ -8,6 +8,6 @@
 
 { x, y : N | x = y }
 
-{ x | x in A }
+{ x | x elem A }
 
 {1 |-> a, 2 |-> b, 3 |-> c}
