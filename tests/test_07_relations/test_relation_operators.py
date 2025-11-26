@@ -532,7 +532,7 @@ class TestPhase10aIntegration:
 
     def test_relation_with_set_operations(self) -> None:
         """Test relation operators have lower precedence than set operations."""
-        text = r"(x |-> y) in R"
+        text = r"(x |-> y) elem R"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -543,5 +543,5 @@ class TestPhase10aIntegration:
 
         # Relations bind looser than set operations, so need explicit parens
         assert isinstance(ast, BinaryOp)
-        assert ast.operator == "in"
+        assert ast.operator == "elem"
         assert latex == r"(x \mapsto y) \in R"

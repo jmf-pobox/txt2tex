@@ -68,7 +68,7 @@ def test_tuple_pattern_latex_generation():
 
 def test_tuple_pattern_with_complex_domain():
     """Test tuple pattern with complex domain expression."""
-    text = "forall (x, y) : A cross B | x in A"
+    text = "forall (x, y) : A cross B | x elem A"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)

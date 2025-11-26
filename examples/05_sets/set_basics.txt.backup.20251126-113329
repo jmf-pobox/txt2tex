@@ -40,11 +40,11 @@ forall x, y : N | x > y
 
 (b)
 
-exists a, b : N | a > 0 land b > 0
+exists a, b : N | a > 0 and b > 0
 
 (c)
 
-forall m, n, p : N | m >= n land n >= p
+forall m, n, p : N | m >= n and n >= p
 
 ** Test 3: Nested Quantifiers **
 

@@ -43,7 +43,7 @@ R~(| S |)
 
 ** Example 6: Set comprehension with relational image (Solution 35 pattern) **
 
-{ p : Person | p elem dom parentOf . (p, parentOf(| {p} |)) }
+{ p : Person | p in dom parentOf . (p, parentOf(| {p} |)) }
 
 ** Example 7: Chained relational images **
 

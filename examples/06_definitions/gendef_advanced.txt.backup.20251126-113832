@@ -35,9 +35,9 @@ gendef [X, Y, Z]
   getThird : X cross Y cross Z -> Z
 where
   forall x : X; y : Y; z : Z |
-    triple(x, y, z) = (x, y, z) land
-    getFirst(x, y, z) = x land
-    getSecond(x, y, z) = y land
+    triple(x, y, z) = (x, y, z) and
+    getFirst(x, y, z) = x and
+    getSecond(x, y, z) = y and
     getThird(x, y, z) = z
 end
 
@@ -95,7 +95,7 @@ gendef [X]
   emptyStack : Stack[X]
   stackSize : Stack[X] -> N
 where
-  emptyStack.items = ⟨⟩ land emptyStack.maxSize = 100
+  emptyStack.items = ⟨⟩ and emptyStack.maxSize = 100
   forall s : Stack[X] | stackSize(s) = # (s.items)
 end
 
@@ -151,7 +151,7 @@ gendef [Key, Value]
   tableSize : Table[Key, Value] -> N
   allKeys : Table[Key, Value] -> P Key
 where
-  emptyTable.entries = {} land emptyTable.size = 0
+  emptyTable.entries = {} and emptyTable.size = 0
   forall t : Table[Key, Value] | tableSize(t) = t.size
   forall t : Table[Key, Value] | allKeys(t) = dom (t.entries)
 end

@@ -1,0 +1,45 @@
+// ============================================================================
+// Example: Named Schema Definitions
+// ============================================================================
+// Demonstrates:
+//   - Basic named schema structure
+//   - Schema with single field and constraint
+//   - Schema with power set (P)
+//   - Schema with multiple fields
+//   - Predicates in where clause
+//
+// Features:
+//   - schema Name ... end
+//   - Type declarations
+//   - where clause with constraints
+//   - Multiple field declarations
+//
+// See: docs/USER_GUIDE.md - Section "Schema Notation"
+// ============================================================================
+
+=== Testing Named Schemas ===
+
+** Test 1: Simple Schema **
+
+schema State
+  count : N
+where
+  count >= 0
+end
+
+** Test 2: Schema with Set **
+
+schema Items
+  items : P(N)
+where
+  # items <= 100
+end
+
+** Test 3: Schema with Multiple Fields **
+
+schema Coordinates
+  x : N
+  y : N
+where
+  x + y < 100
+end

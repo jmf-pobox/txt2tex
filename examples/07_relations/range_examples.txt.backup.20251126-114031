@@ -1,0 +1,48 @@
+// ============================================================================
+// Example: Range Operator (..)
+// ============================================================================
+// Demonstrates:
+//   - Range operator for numeric intervals
+//   - 1..10 represents {1, 2, 3, ..., 10}
+//   - Range in set comprehension
+//   - Range with identifiers
+//   - Range in schema declarations
+//
+// Features:
+//   - Simple range: 1..10
+//   - With identifiers: 1993..current
+//   - In comprehension: { x : 1..20 | predicate }
+//   - Set operations on ranges
+//
+// See: docs/USER_GUIDE.md - Section "Functions" > "Range Operator"
+// ============================================================================
+
+=== Testing Range Operator ===
+
+** Test 1: Simple Numeric Range **
+1..10
+
+** Test 2: Range with Identifiers **
+1993..current
+
+** Test 3: Range in Set Comprehension **
+{ x : 1..20 | x mod 2 = 0 }
+
+** Test 4: Range with Expressions **
+a + 1..b + 2
+
+** Test 5: Range in Schema **
+schema ValidYear
+  year : 1900..2100
+where
+  year >= 1900
+end
+
+** Test 6: Union of Ranges **
+1..5 union 10..15
+
+** Test 7: Range with Tuple Projections **
+p.1..p.2
+
+** Test 8: Complex Set Comprehension **
+{ x : 1..10 | x > 3 . x^2 }

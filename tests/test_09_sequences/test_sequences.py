@@ -401,11 +401,11 @@ class TestPhase12Integration:
         assert latex == "x.1 = y.1"
 
     def test_sequence_in_expression(self):
-        """Test x in ⟨1, 2, 3⟩."""
-        text = "x in ⟨1, 2, 3⟩"
+        """Test x elem ⟨1, 2, 3⟩."""
+        text = "x elem ⟨1, 2, 3⟩"
         ast = parse_expr(text)
         assert isinstance(ast, BinaryOp)
-        assert ast.operator == "in"
+        assert ast.operator == "elem"
         latex = generate_latex(text)
         assert r"\in" in latex
         assert r"\langle" in latex

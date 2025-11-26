@@ -11,7 +11,7 @@
 //   - (a, b) [ordered pair]
 //   - (x, y, z) [triple]
 //   - { n : N | predicate . (n, n^2) } [tuple expression]
-//   - (a, b) elem A cross B [membership]
+//   - (a, b) in A cross B [membership]
 //
 // See: docs/USER_GUIDE.md - Section "Sets and Types" > "Cartesian Product"
 // ============================================================================
@@ -29,8 +29,8 @@
 (c) Set comprehension with tuple expression
 { n : N | n <= 4 . (n, n^2) }
 
-(d) Tuple elem set membership
-(a, b) elem A cross B
+(d) Tuple in set membership
+(a, b) in A cross B
 
 (e) Nested tuples
 ((a, b), (c, d))

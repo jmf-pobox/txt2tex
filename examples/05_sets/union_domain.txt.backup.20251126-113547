@@ -1,0 +1,29 @@
+// ============================================================================
+// Example: Union in Quantifier Domain
+// ============================================================================
+// Demonstrates:
+//   - Set union in quantifier domains
+//   - Domain of partial functions
+//   - Set intersection in predicates
+//   - Complex domain expressions
+//
+// Features:
+//   - forall i : dom(hated) union dom(loved) | predicate
+//   - Function domains with dom()
+//   - Set operations in declarations
+//
+// See: docs/USER_GUIDE.md - Sections "Predicate Logic", "Functions"
+// ============================================================================
+
+=== Test: Union in Quantifier Domain ===
+
+given UserId, SongId
+
+axdef
+  users : F UserId
+  songs : F SongId
+  hated : UserId +-> F SongId
+  loved : UserId +-> F SongId
+where
+  forall i : dom(hated) union dom(loved) | hated(i) intersect loved(i) = emptyset
+end

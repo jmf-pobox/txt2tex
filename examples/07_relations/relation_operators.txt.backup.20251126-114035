@@ -68,7 +68,7 @@ A <| R |> B
 
 ** Example 9: Relations with Set Operations **
 
-(x |-> y) elem R
+(x |-> y) in R
 
 dom R subset S
 

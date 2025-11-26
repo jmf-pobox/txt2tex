@@ -38,11 +38,11 @@ class TestBigcapParser:
 
     def test_parse_bigcap_in_expression(self) -> None:
         """Test parsing bigcap in compound expression."""
-        lexer = Lexer("bigcap S in T")
+        lexer = Lexer("bigcap S elem T")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
-        # Should parse as (bigcap S) in T
+        # Should parse as (bigcap S) elem T
         assert ast.__class__.__name__ == "BinaryOp"
 
 

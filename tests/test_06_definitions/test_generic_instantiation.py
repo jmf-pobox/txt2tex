@@ -221,14 +221,14 @@ class TestGenericInstantiationEdgeCases:
     """Test edge cases for generic instantiation."""
 
     def test_generic_in_expression(self) -> None:
-        """Test generic within larger expression: x in Type[N]."""
-        lexer = Lexer("x in Type[N]")
+        """Test generic within larger expression: x elem Type[N]."""
+        lexer = Lexer("x elem Type[N]")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         result = parser.parse()
 
         assert isinstance(result, BinaryOp)
-        assert result.operator == "in"
+        assert result.operator == "elem"
         assert isinstance(result.left, Identifier)
         right = result.right
         assert isinstance(right, GenericInstantiation)

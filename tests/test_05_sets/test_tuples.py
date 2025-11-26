@@ -223,15 +223,15 @@ class TestCartesianProductTuples:
 
     def test_tuple_in_set_membership(self) -> None:
         """Test parsing tuple in set membership expression."""
-        tokens = Lexer("(a, b) in A cross B").tokenize()
+        tokens = Lexer("(a, b) elem A cross B").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, BinaryOp)
-        assert ast.operator == "in"
+        assert ast.operator == "elem"
         assert isinstance(ast.left, Tuple)
 
     def test_tuple_membership_latex(self) -> None:
         """Test LaTeX generation for tuple membership."""
-        tokens = Lexer("(a, b) in A cross B").tokenize()
+        tokens = Lexer("(a, b) elem A cross B").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, BinaryOp)
         gen = LaTeXGenerator()

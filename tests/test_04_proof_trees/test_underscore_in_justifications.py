@@ -39,7 +39,7 @@ length_L(nil) = 0
         """Test multiple identifiers with underscores in same justification."""
         text = """EQUIV:
 played_L(nil) = nil
-unplayed_L(nil) = nil [played_L(nil) = nil and unplayed_L(nil) = nil]"""
+unplayed_L(nil) = nil [played_L(nil) = nil land unplayed_L(nil) = nil]"""
 
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -52,14 +52,14 @@ unplayed_L(nil) = nil [played_L(nil) = nil and unplayed_L(nil) = nil]"""
         assert r"played\_L" in latex
         assert r"unplayed\_L" in latex
 
-        # The 'and' operator should also be converted
+        # The 'land' operator should also be converted
         assert r"$\land$" in latex
 
     def test_underscore_with_operators_in_justification(self) -> None:
         """Test underscore identifiers mixed with operators in justification."""
         text = """EQUIV:
-x in S
-y in S [x_i in S => y_i in S]"""
+x elem S
+y elem S [x_i elem S => y_i elem S]"""
 
         lexer = Lexer(text)
         tokens = lexer.tokenize()

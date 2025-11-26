@@ -91,8 +91,7 @@ class LaTeXGenerator:
         # Sequent judgment
         "shows": r"\shows",  # Turnstile (⊢)
         # Set operators (Phase 3, enhanced in Phase 7, Phase 11.5)
-        "in": r"\in",
-        "elem": r"\in",  # LaTeX-style alternative to "in"
+        "elem": r"\in",  # Set membership (replaces "in" after migration)
         "notin": r"\notin",
         "/in": r"\notin",  # Z notation slash negation (Phase 16+)
         "subset": r"\subseteq",
@@ -211,7 +210,7 @@ class LaTeXGenerator:
         ">->>": 6,
         "77->": 6,  # Finite partial function (Phase 34)
         # Set operators - highest precedence
-        "in": 7,
+        "elem": 7,  # Set membership (replaces "in" after migration)
         "notin": 7,
         "subset": 7,
         "subseteq": 7,  # Alternative notation for subset
@@ -2043,21 +2042,21 @@ class LaTeXGenerator:
         # Pattern: \bnot\s+([a-zA-Z]\b) - "not" followed by single letter
         text = re.sub(r"\bnot\s+([a-zA-Z])\b", r"$\\lnot \1$", text)  # not p → ¬p
 
-        # Convert "not in" and "in" for set membership (e.g., "0 in N", "x not in S")
-        # Pattern: simple expression followed by "not in"/"in" + capitalized set name
+        # Convert "not elem" and "elem" for set membership
+        # Pattern: expression followed by "not elem"/"elem" + capitalized set name
         # Matches: identifier/number, optionally with operators (-, +, *, /)
-        # Examples: "0 in N", "4 - 0 in N", "x - 1 not in N"
-        # Only convert when set name starts with capital to avoid "in" in English prose
+        # Examples: "0 elem N", "4 - 0 elem N", "x - 1 not elem N"
+        # NOTE: "not in" and "in" are no longer converted after migration to elem
         text = re.sub(
-            r"\b(\w+(?:\s*[\+\-\*/]\s*\w+)*)\s+not\s+in\s+([A-Z]\w*)\b",
+            r"\b(\w+(?:\s*[\+\-\*/]\s*\w+)*)\s+not\s+elem\s+([A-Z]\w*)\b",
             r"$\1 \\notin \2$",
             text,
-        )  # x - 1 not in N → $x - 1 \notin N$
+        )  # x - 1 not elem N → $x - 1 \notin N$
         text = re.sub(
-            r"\b(\w+(?:\s*[\+\-\*/]\s*\w+)*)\s+in\s+([A-Z]\w*)\b",
+            r"\b(\w+(?:\s*[\+\-\*/]\s*\w+)*)\s+elem\s+([A-Z]\w*)\b",
             r"$\1 \\in \2$",
             text,
-        )  # 4 - 0 in N → $4 - 0 \in N$
+        )  # 4 - 0 elem N → $4 - 0 \in N$
 
         # Convert bare comparison operators (garbled character fix - final pass)
         # Catches cases not handled by _process_inline_math() (complex expressions)
@@ -2509,9 +2508,12 @@ class LaTeXGenerator:
         # Detect expressions like "p => (not p => p)" or "(not p => not q) <=> (q => p)"
         # Look for patterns starting with identifier/paren/not and containing => or <=>
         # Stop at sentence boundaries (is, as, are, etc.) or punctuation
+        # NOTE: Include common prose verbs that follow mathematical statements
         formula_pattern = (
             r"(\()?(?:not\s+)?([a-zA-Z]\w*)\s*(=>|<=>)\s*[^.!?]*?"
-            r"(?=\s+(?:is|as|are|for|to|be|a|an|the|in|on|at|by|with)\b|[.!?]|$)"
+            r"(?=\s+(?:is|as|are|for|to|be|a|an|the|in|on|at|by|with|"
+            r"holds|means|implies|shows|proves|states|says|gives|follows|"
+            r"so|then|therefore|hence|thus|because|since|when|where|which|that)\b|[.!?]|$)"
         )
 
         matches = list(re.finditer(formula_pattern, result))
@@ -3062,15 +3064,19 @@ class LaTeXGenerator:
 
         # All operators that need math mode (already defined above for Pattern 2.75)
 
+        # Operand pattern: identifier OR decimal number
+        # This ensures "5.5" stays together as a decimal, not split at the period
+        operand = r"(?:[a-zA-Z_]\w*|\d+(?:\.\d+)?)"
+
         # Pattern: identifier/number, followed by (operator identifier/number)+
-        # This matches chains like "p <=> x > 1"
+        # This matches chains like "p <=> x > 1" and "x = 5.5"
         full_pattern = (
-            r"\b([a-zA-Z_]\w*)\s*"  # First identifier
+            r"\b" + operand + r"\s*"  # First identifier/number
             + math_op_pattern  # Operator
-            + r"\s*([a-zA-Z_0-9]\w*)"  # Second operand
+            + r"\s*" + operand  # Second operand
             + r"(?:\s*"
             + math_op_pattern
-            + r"\s*([a-zA-Z_0-9]\w*))*"  # More ops
+            + r"\s*" + operand + r")*"  # More ops
         )
 
         matches = list(re.finditer(full_pattern, result))
@@ -3256,10 +3262,11 @@ class LaTeXGenerator:
         result = result.replace("^", r"$\cat$")  # Sequence concatenation
 
         # Word-based operators (use word boundaries to avoid partial matches)
-        result = re.sub(r"\band\b", r"$\\land$", result)
-        result = re.sub(r"\bor\b", r"$\\lor$", result)
-        result = re.sub(r"\bnot\b", r"$\\lnot$", result)
-        result = re.sub(r"\bin\b", r"$\\in$", result)  # Set membership
+        # After migration: only LaTeX-style keywords are converted (not English)
+        result = re.sub(r"\bland\b", r"$\\land$", result)
+        result = re.sub(r"\blor\b", r"$\\lor$", result)
+        result = re.sub(r"\blnot\b", r"$\\lnot$", result)
+        result = re.sub(r"\belem\b", r"$\\in$", result)  # Set membership
         result = re.sub(r"\bdom\b", r"$\\dom$", result)
         result = re.sub(r"\bran\b", r"$\\ran$", result)
         result = re.sub(r"\bcomp\b", r"$\\comp$", result)

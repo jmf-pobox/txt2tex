@@ -61,8 +61,8 @@ class TestPhase8Parsing:
         assert ast.predicate.operator == "="
 
     def test_set_without_domain(self) -> None:
-        """Test parsing set without domain: { x | x in A }."""
-        lexer = Lexer("{ x | x in A }")
+        """Test parsing set without domain: { x | x elem A }."""
+        lexer = Lexer("{ x | x elem A }")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
@@ -71,7 +71,7 @@ class TestPhase8Parsing:
         assert ast.variables == ["x"]
         assert ast.domain is None
         assert isinstance(ast.predicate, BinaryOp)
-        assert ast.predicate.operator == "in"
+        assert ast.predicate.operator == "elem"
 
     def test_set_in_document(self) -> None:
         """Test set comprehension within a document."""
@@ -183,13 +183,13 @@ class TestPhase8LaTeXGeneration:
         assert "=" in latex
 
     def test_generate_set_without_domain(self) -> None:
-        """Test LaTeX generation for { x | x in A }."""
+        """Test LaTeX generation for { x | x elem A }."""
         gen = LaTeXGenerator()
         set_comp = SetComprehension(
             variables=["x"],
             domain=None,
             predicate=BinaryOp(
-                operator="in",
+                operator="elem",
                 left=Identifier(name="x", line=1, column=7),
                 right=Identifier(name="A", line=1, column=12),
                 line=1,

@@ -56,4 +56,4 @@ TEXT: (mu p : ran hd; q : ran hd | p /= q | p.2 > q.2)
 
 TEXT: Multiple bindings with exists:
 
-TEXT: exists x : N; y : N | x > y land y > 0
+TEXT: exists x : N; y : N | x > y and y > 0

@@ -38,7 +38,7 @@ y |-> x [definition of |->]"""
         """Test the actual homework bug: [x is not free in y |-> z]."""
         text = """EQUIV:
 x |-> y
-y |-> x [x is not free in y |-> z]"""
+y |-> x [x is lnot free elem y |-> z]"""
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -50,7 +50,7 @@ y |-> x [x is not free in y |-> z]"""
         assert r"y $\mapsto$ z" in latex
         # Should NOT have the bug pattern |$\fun$
         assert r"|$\fun$" not in latex
-        # Verify full justification (with "in" converted to \in)
+        # Verify full justification (with "elem" converted to \in and "lnot" to \lnot)
         assert r"\mbox{x is $\lnot$ free $\in$ y $\mapsto$ z}" in latex
 
     def test_domain_corestriction_not_split(self) -> None:
@@ -105,8 +105,8 @@ y in S [definition of -|>]"""
     def test_multiple_overlapping_operators(self) -> None:
         """Test multiple operators with substring relationships in one justification."""
         text = """EQUIV:
-x in S
-y in T [definition of -> and +->]"""
+x elem S
+y elem T [definition of -> land +->]"""
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -140,8 +140,8 @@ w |-> z in S [x is not free in y |-> z]"""
     def test_relation_composition_with_maplet(self) -> None:
         """Test that o9 and |-> both work in same justification."""
         text = """EQUIV:
-w |-> z in R o9 S
-w |-> z in S o9 R [definition of |-> and o9]"""
+w |-> z elem R o9 S
+w |-> z elem S o9 R [definition of |-> land o9]"""
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)

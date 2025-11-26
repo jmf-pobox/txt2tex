@@ -40,12 +40,12 @@ class TestLexer:
         assert tokens[1].value == "notin"
 
     def test_in_keyword(self) -> None:
-        """Test that 'in' is still recognized (not broken by notin)."""
-        lexer = Lexer("x in S")
+        """Test that 'elem' is recognized as set membership."""
+        lexer = Lexer("x elem S")
         tokens = lexer.tokenize()
         assert tokens[0].type.name == "IDENTIFIER"
         assert tokens[1].type.name == "IN"
-        assert tokens[1].value == "in"
+        assert tokens[1].value == "elem"
 
 
 class TestParser:
@@ -103,13 +103,13 @@ class TestParser:
         assert ast.right.name == "S"
 
     def test_in_membership(self) -> None:
-        """Test that 'in' still works correctly."""
-        lexer = Lexer("x in S")
+        """Test that 'elem' works correctly for set membership."""
+        lexer = Lexer("x elem S")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         assert isinstance(ast, BinaryOp)
-        assert ast.operator == "in"
+        assert ast.operator == "elem"
 
     def test_complex_mu_expression(self) -> None:
         """Test parsing mu with complex body."""
@@ -290,7 +290,7 @@ class TestIntegration:
 
     def test_membership_in_document(self) -> None:
         """Test membership operators in complete document."""
-        text = "x in S and y notin T"
+        text = "x elem S and y notin T"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)

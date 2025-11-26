@@ -1,0 +1,55 @@
+// ============================================================================
+// Example: Finite Set Types (F and F1)
+// ============================================================================
+// Demonstrates:
+//   - F X (all finite subsets of X)
+//   - F1 X (all non-empty finite subsets of X)
+//   - Combining finite sets with function types
+//   - Axiomatic definitions with finite set types
+//
+// Features:
+//   - F SongId [finite subsets]
+//   - F1 UserId [non-empty finite subsets]
+//   - Used with partial functions (+->)
+//
+// See: docs/USER_GUIDE.md - Section "Sets and Types" > "Power Set"
+// ============================================================================
+
+=== Phase 19 Demo: Finite Set Types ===
+
+** Example 1: F (finite sets) **
+
+TEXT: F X denotes all finite subsets of X:
+
+zed
+  given SongId, UserId
+end
+
+
+axdef
+  songs : F SongId
+  users : F UserId
+end
+
+** Example 2: F1 (non-empty finite sets) **
+
+TEXT: F1 X denotes all non-empty finite subsets of X:
+
+axdef
+  activeUsers : F1 UserId
+end
+
+** Example 3: Combined with function types **
+
+TEXT: Using F and F1 with partial functions:
+
+zed
+  given PlaylistId, Playlist
+end
+
+
+axdef
+  playlists : PlaylistId +-> Playlist
+  playlistOwner : PlaylistId +-> UserId
+  playlistSubscribers : PlaylistId +-> F1 UserId
+end

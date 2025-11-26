@@ -20,8 +20,8 @@
 TEXT: The strict subset operator (psubset, ⊂) represents proper subset relationships, where A is a subset of B AND A is not equal to B.
 
 TEXT: Distinction from subset (⊆):
-TEXT: - A subset B means: every element of A is elem B (may be equal)
-TEXT: - A psubset B means: every element of A is elem B AND A != B (strict inequality)
+TEXT: - A subset B means: every element of A is in B (may be equal)
+TEXT: - A psubset B means: every element of A is in B AND A != B (strict inequality)
 
 ** Example 1: Basic Strict Subset **
 
@@ -29,7 +29,7 @@ axdef
   A : P N
   B : P N
 where
-  A = {1, 2, 3} land B = {1, 2, 3, 4, 5} land A psubset B
+  A = {1, 2, 3} and B = {1, 2, 3, 4, 5} and A psubset B
 end
 
 TEXT: Here A psubset B holds because all elements of A are in B, and A contains fewer elements than B.
@@ -41,7 +41,7 @@ axdef
   Y : P N
   W : P N
 where
-  X = {1, 2} land Y = {1, 2, 3} land W = {1, 2} land X psubset Y land X subset W
+  X = {1, 2} and Y = {1, 2, 3} and W = {1, 2} and X psubset Y and X subset W
 end
 
 TEXT: X psubset Y is true (X is strictly contained in Y)
@@ -54,21 +54,21 @@ axdef
   emptySet : P N
   anySet : P N
 where
-  emptySet = {} land anySet = {1, 2, 3} land emptySet psubset anySet
+  emptySet = {} and anySet = {1, 2, 3} and emptySet psubset anySet
 end
 
 TEXT: The empty set is a strict subset of any non-empty set.
 
 ** Example 4: Transitive Property **
 
-TEXT: If A psubset B land B psubset C, then A psubset C.
+TEXT: If A psubset B and B psubset C, then A psubset C.
 
 axdef
   A1 : P N
   B1 : P N
   C1 : P N
 where
-  A1 = {1} land B1 = {1, 2} land C1 = {1, 2, 3} land A1 psubset B1 land B1 psubset C1 land A1 psubset C1
+  A1 = {1} and B1 = {1, 2} and C1 = {1, 2, 3} and A1 psubset B1 and B1 psubset C1 and A1 psubset C1
 end
 
 ** Example 5: Set Hierarchy **
@@ -80,7 +80,7 @@ axdef
   grads : P Person
   phds : P Person
 where
-  phds psubset grads land grads psubset students
+  phds psubset grads and grads psubset students
 end
 
 TEXT: PhD students are a strict subset of graduate students, which are a strict subset of all students.

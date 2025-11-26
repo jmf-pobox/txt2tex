@@ -54,7 +54,7 @@ class TestLexer:
 
     def test_set_operators(self) -> None:
         """Test lexing set operators."""
-        lexer = Lexer("x in A subset B union C intersect D")
+        lexer = Lexer("x elem A subset B union C intersect D")
         tokens = lexer.tokenize()
         types = [t.type.name for t in tokens[:-1][1::2]]  # Exclude EOF
         assert types == ["IN", "SUBSET", "UNION", "INTERSECT"]
@@ -142,13 +142,13 @@ class TestParser:
         assert ast.operator == ">="
 
     def test_set_operator_in(self) -> None:
-        """Test parsing 'in' operator."""
-        lexer = Lexer("x in N")
+        """Test parsing 'elem' operator."""
+        lexer = Lexer("x elem N")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         assert isinstance(ast, BinaryOp)
-        assert ast.operator == "in"
+        assert ast.operator == "elem"
 
     def test_set_operator_union(self) -> None:
         """Test parsing 'union' operator."""
@@ -322,10 +322,10 @@ class TestLaTeXGenerator:
         assert latex == r"x \leq 10"
 
     def test_set_operator_in(self) -> None:
-        """Test generating 'in' operator."""
+        """Test generating 'elem' operator."""
         gen = LaTeXGenerator()
         ast = BinaryOp(
-            operator="in",
+            operator="elem",
             left=Identifier(name="x", line=1, column=1),
             right=Identifier(name="N", line=1, column=6),
             line=1,
@@ -517,7 +517,7 @@ class TestIntegration:
 
     def test_set_membership(self) -> None:
         """Test complete pipeline for set membership."""
-        text = "x in N and x > 0"
+        text = "x elem N and x > 0"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -757,7 +757,7 @@ class TestPhase31BulletSeparator:
         """
         text = (
             "(forall e_1, e_2 : EpisodeId | "
-            "(e_1 in S and e_2 in S) . (e_1 < e_2 => f(e_1) <= f(e_2)))"
+            "(e_1 elem S and e_2 elem S) . (e_1 < e_2 => f(e_1) <= f(e_2)))"
         )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -769,7 +769,7 @@ class TestPhase31BulletSeparator:
         assert ast.variables == ["e_1", "e_2"]
         assert ast.expression is not None
 
-        # Constraint: (e_1 in S and e_2 in S)
+        # Constraint: (e_1 elem S and e_2 elem S)
         assert isinstance(ast.body, BinaryOp)
         assert ast.body.operator == "and"
 
