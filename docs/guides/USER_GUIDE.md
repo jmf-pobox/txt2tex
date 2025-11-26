@@ -176,18 +176,20 @@ Generates: `\newpage` to start a new page in the PDF.
 ### Basic Operators
 
 ```
-not p            →  ¬p          (negation)
-p and q          →  p ∧ q       (conjunction)
-p or q           →  p ∨ q       (disjunction)
+not p  (or: lnot p)    →  ¬p          (negation)
+p and q  (or: p land q)  →  p ∧ q       (conjunction)
+p or q  (or: p lor q)   →  p ∨ q       (disjunction)
 p => q           →  p ⇒ q       (implication)
 p <=> q          →  p ⇔ q       (equivalence)
 ```
 
+**Note:** Both English-style (`and`, `or`, `not`) and LaTeX-style (`land`, `lor`, `lnot`) keywords are supported. Use whichever form you prefer - they produce identical output.
+
 ### Precedence (highest to lowest)
 
-1. `not` (unary)
-2. `and`
-3. `or`
+1. `not` / `lnot` (unary)
+2. `and` / `land`
+3. `or` / `lor`
 4. `=>`
 5. `<=>` (lowest)
 
@@ -250,9 +252,9 @@ not (p and q)
 **Operator conversion:** Mathematical operators in justifications are automatically converted to LaTeX:
 
 **Logical operators:**
-- `and` → $\land$
-- `or` → $\lor$
-- `not` → $\lnot$
+- `and` / `land` → $\land$
+- `or` / `lor` → $\lor$
+- `not` / `lnot` → $\lnot$
 - `=>` → $\Rightarrow$ (or `\implies` in fuzz mode)
 - `<=>` → $\Leftrightarrow$ (always, even in fuzz mode for EQUIV blocks)
 
@@ -456,9 +458,11 @@ Generates: $\mu x : \mathbb{N} \bullet x > 0$
 ### Set Membership
 
 ```
-x in A           →  x ∈ A       ['is an element of']
-x notin B        →  x ∉ B       ['not an element of']
+x in A  (or: x elem A)   →  x ∈ A       ['is an element of']
+x notin B                →  x ∉ B       ['not an element of']
 ```
+
+**Note:** Both `in` and `elem` are supported for set membership - use whichever form you prefer.
 
 ### Set Relations
 
