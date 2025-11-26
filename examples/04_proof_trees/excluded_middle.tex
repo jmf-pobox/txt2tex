@@ -16,7 +16,7 @@
 \addcontentsline{toc}{section}{Example 1 : Statement of LEM}
 
 \noindent The law of excluded middle states: for any proposition p,
-either p is true or $\lnot p$ is true.
+either p is true or $\lnot$ p is true.
 
 \bigskip
 
@@ -40,8 +40,8 @@ $p \lor \lnot p$
     \infer[\lor \mathrm{elim}]{q}{
       \infer[\mathrm{assumption}]{\lnot p \implies q}{\infer[LEM]{p
         \lor \lnot p}{\ulcorner p \implies q \urcorner^{[1]}} &
-        \infer[\Rightarrow \mathrm{elim} with p\Rightarrow q]{q}{} &
-        \infer[\Rightarrow \mathrm{elim} with \lnot p\Rightarrow
+        \infer[\Rightarrow \mathrm{elim with p}\Rightarrow q]{q}{} &
+        \infer[\Rightarrow \mathrm{elim with} \lnot p\Rightarrow
         q]{q}{} & \infer[\lor \mathrm{elim}]{q}{\ulcorner p \implies q
       \urcorner^{[1]}}}
     }
@@ -50,7 +50,7 @@ $p \lor \lnot p$
 \end{center}
 \bigskip
 
-\noindent By LEM, we can case-analyze on p or $\lnot p$. In both
+\noindent By LEM, we can case-analyze on p $\lor$ $\lnot$ p. In both
 cases we derive q.
 
 \bigskip
@@ -59,7 +59,7 @@ cases we derive q.
 \addcontentsline{toc}{section}{Example 3 : Double Negation
 Elimination Using LEM}
 
-\noindent Prove: not $\lnot p \implies p$
+\noindent Prove: $\lnot$ l$\lnot p \implies p$
 
 \bigskip
 
@@ -67,9 +67,8 @@ Elimination Using LEM}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \infer[\lor \mathrm{elim}]{p}{
-      \infer[\lor \mathrm{elim}]{p}{\infer[\mathrm{false}
-        \mathrm{elim}]{p}{\infer[\mathrm{contradiction} with \lnot
-      \lnot p]{false}{}}}
+      \infer[\lor \mathrm{elim}]{p}{\infer[\mathrm{false
+      elim}]{p}{\infer[\mathrm{contradiction with} \lnot \lnot p]{false}{}}}
     }
     $%
   }
@@ -83,7 +82,7 @@ Elimination Using LEM}
 \section*{Example 4 : De Morgan's Law Using LEM}
 \addcontentsline{toc}{section}{Example 4 : De Morgan's Law Using LEM}
 
-\noindent Prove: not $(p \land q)$ $\Rightarrow$ $(\lnot p \lor \lnot q)$
+\noindent Prove: $\lnot$ $(p \land q)$ $\Rightarrow$ $(\lnot p \lor \lnot q)$
 
 \bigskip
 
@@ -92,7 +91,8 @@ Elimination Using LEM}
     $\displaystyle
     \infer[\lor \mathrm{elim}]{\lnot p \lor \lnot q}{
       \infer[\lor \mathrm{elim}]{\lnot p \lor \lnot q}{\infer[\lor
-      \mathrm{intro} left]{\lnot p \lor \lnot q}{\infer[identity]{\lnot p}{}}}
+        \mathrm{intro left}]{\lnot p \lor \lnot
+      q}{\infer[\mathrm{identity}]{\lnot p}{}}}
     }
     $%
   }
@@ -118,7 +118,7 @@ In logical notation, we would $write : decidable(p) means$ $(p \lor \lnot p)$.
 \section*{Example 6 : Proof by Contradiction via LEM}
 \addcontentsline{toc}{section}{Example 6 : Proof by Contradiction via LEM}
 
-\noindent Prove: $(\lnot p \implies false) \implies p$
+\noindent Prove: $(\lnot p \implies false)$ $\Rightarrow$ p
 
 \bigskip
 
@@ -126,8 +126,8 @@ In logical notation, we would $write : decidable(p) means$ $(p \lor \lnot p)$.
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \infer[\lor \mathrm{elim}]{p}{
-      \infer[\lor \mathrm{elim}]{p}{\infer[\mathrm{false}
-      \mathrm{elim}]{p}{\infer[\Rightarrow \mathrm{elim}]{false}{}}}
+      \infer[\lor \mathrm{elim}]{p}{\infer[\mathrm{false
+      elim}]{p}{\infer[\Rightarrow \mathrm{elim}]{false}{}}}
     }
     $%
   }
@@ -154,7 +154,7 @@ In logical notation, we would $write : decidable(p) means$ $(p \lor \lnot p)$.
     $\displaystyle
     \infer[\lor \mathrm{elim}]{\lnot p \lor q}{
       \infer[\lor \mathrm{elim}]{\lnot p \lor q}{\infer[\lor
-      \mathrm{intro} left]{\lnot p \lor q}{}}
+      \mathrm{intro left}]{\lnot p \lor q}{}}
     }
     $%
   }
@@ -169,10 +169,10 @@ In logical notation, we would $write : decidable(p) means$ $(p \lor \lnot p)$.
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies q}{
-      \infer[\mathrm{assumption}]{p}{\infer[\mathrm{false}
-        \mathrm{elim}]{q}{\infer[\mathrm{contradiction}]{false}{}} &
-        \infer[identity]{q}{} & \infer[\lor \mathrm{elim}]{q}{\ulcorner
-      \lnot p \lor q \urcorner^{[1]}}}
+      \infer[\mathrm{assumption}]{p}{\infer[\mathrm{false
+        elim}]{q}{\infer[\mathrm{contradiction}]{false}{}} &
+        \infer[\mathrm{identity}]{q}{} & \infer[\lor
+      \mathrm{elim}]{q}{\ulcorner \lnot p \lor q \urcorner^{[1]}}}
     }
     $%
   }
@@ -194,12 +194,11 @@ In logical notation, we would $write : decidable(p) means$ $(p \lor \lnot p)$.
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \infer[\lor \mathrm{elim}]{p}{
-      \infer[\lor \mathrm{elim}]{p}{\infer[\Rightarrow \mathrm{elim}
-          with
-        \mathrm{premise}]{p}{\infer[\Rightarrow\textrm{-intro}^{[2]}]{p
-          \implies q}{\infer[\mathrm{false}
-            \mathrm{elim}]{q}{\infer[\mathrm{contradiction}]{false}{\ulcorner
-      p \urcorner^{[2]}}}}}}
+      \infer[\lor \mathrm{elim}]{p}{\infer[\Rightarrow \mathrm{elim
+        with premise}]{p}{\infer[\Rightarrow\textrm{-intro}^{[2]}]{p
+          \implies q}{\infer[\mathrm{false
+            elim}]{q}{\infer[\mathrm{contradiction}]{false}{\ulcorner p
+      \urcorner^{[2]}}}}}}
     }
     $%
   }
@@ -219,7 +218,7 @@ another name for LEM.
 \bigskip
 
 \noindent For any proposition p, there is no third option besides p
-and $\lnot p$.
+and $\lnot$ p.
 
 \bigskip
 
@@ -275,7 +274,7 @@ $\forall n : \nat @ (n = 0) \lor \lnot (n = 0)$
 \bigskip
 
 \noindent
-$\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
+$\forall p @ p \lor (\lnot (p - -(requires(LEM))) \in general(case))$
 
 \section*{Example 12 : Proof Strategy with LEM}
 \addcontentsline{toc}{section}{Example 12 : Proof Strategy with LEM}
@@ -288,7 +287,7 @@ $\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
 
 \bigskip
 
-\noindent 1. Invoke p or $\lnot p$ for some relevant p
+\noindent 1. Invoke p or $\lnot$ p for some relevant p
 
 \bigskip
 
@@ -296,7 +295,7 @@ $\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
 
 \bigskip
 
-\noindent 3. [case] $\lnot p$ prove Q assuming $\lnot p$
+\noindent 3. [case] $\lnot$ p prove Q assuming $\lnot$ p
 
 \bigskip
 
@@ -327,11 +326,11 @@ $\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
 
 \bigskip
 
-\noindent 3. Conclude not $\lnot p$ [not intro from 1]
+\noindent 3. Conclude $\lnot$ $\lnot$ p [$\lnot$ intro from 1]
 
 \bigskip
 
-\noindent 4. Apply $LEM : p$ or $\lnot p$
+\noindent 4. Apply $LEM : p$ $\lor$ $\lnot$ p
 
 \bigskip
 
@@ -339,7 +338,8 @@ $\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
 
 \bigskip
 
-\noindent 6. [case] $\lnot p$ contradicts not $\lnot p$, derive p by false elim
+\noindent 6. [case] $\lnot$ p contradicts $\lnot$ $\lnot$ p, derive p
+by false elim
 
 \bigskip
 
@@ -365,20 +365,20 @@ then everyone drinks.
     \infer[\lor \mathrm{elim}]{\exists x @ x(drinks) \implies
     (\forall y @ y(drinks))}{
       \infer[\lor \mathrm{elim}]{\exists x @ x(drinks) \implies
-      (\forall y @ y(drinks))}{\infer[\exists \mathrm{intro} with
-        x=a]{\exists x @ x(drinks) \implies (\forall y @
-        y(drinks))}{\infer[\Rightarrow \mathrm{intro},trivially
-          true]{a(drinks) \implies (\forall y @
-          y(drinks))}{\infer[\mathrm{from} p]{\forall y @
-            y(drinks)}{\infer[\mathrm{from}
-              p]{a(drinks)}{\infer{Pick(any)(person)}{
+      (\forall y @ y(drinks))}{\infer[\exists \mathrm{intro with
+        x}=a]{\exists x @ x(drinks) \implies (\forall y @
+        y(drinks))}{\infer[\Rightarrow \mathrm{intro},
+          \mathrm{trivially true}]{a(drinks) \implies (\forall y @
+          y(drinks))}{\infer[\mathrm{from p}]{\forall y @
+            y(drinks)}{\infer[\mathrm{from
+              p}]{a(drinks)}{\infer{Pick(any)(person)}{
                   a
-        }}}}} & \infer[\exists \mathrm{intro} with x=b]{\exists x @
+        }}}}} & \infer[\exists \mathrm{intro with x}=b]{\exists x @
           x(drinks) \implies (\forall y @
         y(drinks))}{\infer[\Rightarrow\textrm{-intro}^{[2]}]{b(drinks)
             \implies (\forall y @
           y(drinks))}{\infer[\mathrm{assumption}]{b(drinks)}{\infer[\exists
-              \mathrm{elim}]{\lnot (b(drinks))}{\infer[negation of
+              \mathrm{elim}]{\lnot (b(drinks))}{\infer[\mathrm{negation of}
       \forall]{\exists b @ \lnot (b(drinks))}{}}}}}}
     }
     $%
@@ -410,7 +410,7 @@ arbitrary proposition
 
 \bigskip
 
-\noindent 4. Your proof strategy requires considering both p and $\lnot p$
+\noindent 4. Your proof strategy requires considering both p $\land$ $\lnot$ p
 
 \bigskip
 
@@ -437,11 +437,11 @@ arbitrary proposition
 
 \bigskip
 
-\noindent - Law of excluded $middle : p$ or $\lnot p$
+\noindent - Law of excluded $middle : p$ $\lor$ $\lnot$ p
 
 \bigskip
 
-\noindent - Double negation $elimination : not$ $\lnot p \implies p$
+\noindent - Double negation elimination: $\lnot$ l$\lnot p \implies p$
 
 \bigskip
 
@@ -449,7 +449,7 @@ arbitrary proposition
 
 \bigskip
 
-\noindent - Reductio ad absurdum: $(\lnot p \implies false) \implies p$
+\noindent - Reductio ad absurdum: $(\lnot p \implies false)$ $\Rightarrow$ p
 
 \bigskip
 

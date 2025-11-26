@@ -64,9 +64,9 @@ result [inductive hypothesis]
         # Either as \mathrm{inductive hypothesis} or with proper spacing
         assert "inductive" in latex
         assert "hypothesis" in latex
-        # Should NOT have words run together without \mathrm wrapping
-        # Check that mathrm is used for text
-        assert r"\mathrm" in latex
+        # Should NOT have words run together without \mbox wrapping
+        # Check that mbox is used for text (preserves spaces in math mode)
+        assert r"\mbox" in latex
 
     def test_definition_of_even_spacing(self) -> None:
         """Test: [definition of even] should preserve all spaces."""
@@ -77,8 +77,8 @@ even(n) [definition of even]
         # Multi-word phrase should be wrapped
         assert "definition" in latex
         assert "even" in latex
-        # Verify \mathrm wrapping for text preservation
-        assert r"\mathrm" in latex
+        # Verify \mbox wrapping for text preservation (preserves spaces)
+        assert r"\mbox" in latex
 
     def test_exists_intro_with_witness(self) -> None:
         """Test: [exists intro with n = 12] preserves spacing."""
@@ -141,8 +141,8 @@ result [lor elim on p lor q]
         latex = generate_latex(input_text)
         # Should have \lor for the operator
         assert r"\lor" in latex
-        # Should have \mathrm{elim} for text
-        assert r"\mathrm" in latex
+        # Should have \mbox{elim} for text (preserves spaces)
+        assert r"\mbox" in latex
 
     def test_land_intro_formatting(self) -> None:
         """Test: [land intro] formats correctly."""
@@ -152,8 +152,8 @@ p land q [land intro]
         latex = generate_latex(input_text)
         # Should have \land for the operator
         assert r"\land" in latex
-        # Should have \mathrm for intro
-        assert r"\mathrm" in latex
+        # Should have \mbox for intro (preserves spaces)
+        assert r"\mbox" in latex
 
 
 class TestParserSmartJoinJustification:

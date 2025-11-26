@@ -24,8 +24,8 @@
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \land (q \land
     \lnot q)) \implies p}{
-      \infer[\mathrm{false}
-      \mathrm{elim}]{p}{\infer[\mathrm{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot
+      \infer[\mathrm{false
+      elim}]{p}{\infer[\mathrm{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot
           q}{\infer[\land\textrm{-elim-1}]{q}{\infer[\land\textrm{-elim-2}]{q
               \land \lnot q}{\ulcorner \lnot p \land (q \land \lnot q)
       \urcorner^{[1]}}}}}}
@@ -51,8 +51,8 @@ conclude p by discharging assumption 1.
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land \lnot p) \implies q}{
-      \infer[\mathrm{false}
-      \mathrm{elim}]{q}{\infer[\mathrm{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot
+      \infer[\mathrm{false
+      elim}]{q}{\infer[\mathrm{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot
           p}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p \land \lnot p
       \urcorner^{[1]}}}}}
     }
@@ -68,7 +68,7 @@ conclude p by discharging assumption 1.
 \section*{Example 3 : Law of Non - Contradiction}
 \addcontentsline{toc}{section}{Example 3 : Law of Non - Contradiction}
 
-\noindent Prove that p and $\lnot p$ leads to a contradiction.
+\noindent Prove that p $\land$ $\lnot$ p leads to a contradiction.
 
 \bigskip
 
@@ -92,7 +92,7 @@ can be both true and false.
 \section*{Example 4 : Indirect Proof}
 \addcontentsline{toc}{section}{Example 4 : Indirect Proof}
 
-\noindent Prove: $(\lnot p \implies false) \implies \lnot \lnot p$
+\noindent Prove: $(\lnot p \implies false)$ $\Rightarrow$ $\lnot$ $\lnot$ p
 
 \bigskip
 
@@ -110,8 +110,8 @@ can be both true and false.
 \end{center}
 \bigskip
 
-\noindent This is the pattern for indirect proof: if assuming $\lnot
-p$ leads to false, then not $\lnot p$ holds.
+\noindent This is the pattern for indirect proof: if assuming $\lnot$
+p leads to false, then $\lnot$ $\lnot p$ holds.
 
 \bigskip
 
@@ -143,7 +143,7 @@ p$ leads to false, then not $\lnot p$ holds.
 \section*{Example 6 : Disjunction from Contradiction}
 \addcontentsline{toc}{section}{Example 6 : Disjunction from Contradiction}
 
-\noindent Prove: $\lnot p \implies (p \implies q)$
+\noindent Prove: l$\lnot p \implies (p \implies q)$
 
 \bigskip
 
@@ -152,23 +152,23 @@ p$ leads to false, then not $\lnot p$ holds.
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{\lnot p \implies (p \implies q)}{
       \infer[\Rightarrow\textrm{-intro}^{[2]}]{(p \implies
-      q)}{\infer[\mathrm{false}
-        \mathrm{elim}]{q}{\infer[\mathrm{contradiction}]{false}{\ulcorner
-      p \urcorner^{[2]}}}}
+      q)}{\infer[\mathrm{false
+        elim}]{q}{\infer[\mathrm{contradiction}]{false}{\ulcorner p
+      \urcorner^{[2]}}}}
     }
     $%
   }
 \end{center}
 \bigskip
 
-\noindent From $\lnot p$, we can prove $p \implies q$ for any q.
+\noindent From $\lnot$ p, we can prove $p \implies q$ for any q.
 
 \bigskip
 
 \section*{Example 7 : Double Negation Elimination}
 \addcontentsline{toc}{section}{Example 7 : Double Negation Elimination}
 
-\noindent Prove: not $\lnot p \implies p(requires(classical)(logic))$
+\noindent Prove: $\lnot$ l$\lnot p \implies p(requires(classical)(logic))$
 
 \bigskip
 
@@ -178,16 +178,16 @@ p$ leads to false, then not $\lnot p$ holds.
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{\lnot \lnot p \implies
     \lnot \lnot \lnot p}{
       \infer[\lnot\textrm{-intro}^{[2]}]{\lnot \lnot \lnot
-      p}{\infer[\mathrm{false}
-        \mathrm{elim}]{p}{\infer[\mathrm{contradiction}]{false}{\ulcorner
-      \lnot p \urcorner^{[2]}}}}
+      p}{\infer[\mathrm{false
+        elim}]{p}{\infer[\mathrm{contradiction}]{false}{\ulcorner \lnot
+      p \urcorner^{[2]}}}}
     }
     $%
   }
 \end{center}
 \bigskip
 
-\noindent In classical logic, not $\lnot p$ implies p. This requires
+\noindent In classical logic, not $\lnot$ p implies p. This requires
 excluded middle or equivalent axiom.
 
 \bigskip
@@ -195,7 +195,7 @@ excluded middle or equivalent axiom.
 \section*{Example 8 : Reductio ad Absurdum}
 \addcontentsline{toc}{section}{Example 8 : Reductio ad Absurdum}
 
-\noindent Prove: $(\lnot p \implies (q \land \lnot q)) \implies p$
+\noindent Prove: $(\lnot p \implies (q \land \lnot q))$ $\Rightarrow$ p
 
 \bigskip
 
@@ -205,8 +205,8 @@ excluded middle or equivalent axiom.
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \implies (q
     \land \lnot q)) \implies \lnot \lnot p}{
       \infer[\lnot\textrm{-intro}^{[2]}]{\lnot \lnot
-      p}{\infer[\mathrm{false}
-        \mathrm{elim}]{p}{\infer[\mathrm{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot
+      p}{\infer[\mathrm{false
+        elim}]{p}{\infer[\mathrm{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot
             q}{\infer[\land\textrm{-elim-1}]{q}{\infer[\Rightarrow
       \mathrm{elim}]{q \land \lnot q}{\ulcorner \lnot p \urcorner^{[2]}}}}}}}
     }
@@ -224,7 +224,7 @@ absurdity, then p holds.
 \addcontentsline{toc}{section}{Example 9 : Contradiction with
 Universal Quantifier}
 
-\noindent Prove: ($\forall x @ \power x$) and $\exists x @ \lnot
+\noindent Prove: ($\forall x @ \power x$) $\land$ $\exists x @ \lnot
 \power x$ is contradictory.
 
 \bigskip
@@ -235,11 +235,12 @@ Universal Quantifier}
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{((\forall x @ \power x)
     \land (\exists x @ \lnot \power x)) \implies false}{
       \infer[\mathrm{contradiction}]{false}{\infer[\forall
-        \mathrm{elim}]{\power a}{\infer[\exists \mathrm{elim},fresh
-          a]{\lnot \power a}{\infer[\land\textrm{-elim-2}]{\exists x @
-            \lnot \power x}{\infer[\land\textrm{-elim-1}]{\forall x @
-              \power x}{\ulcorner (\forall x @ \power x) \land (\exists x @
-      \lnot \power x) \urcorner^{[1]}}}}}}
+        \mathrm{elim}]{\power a}{\infer[\exists \mathrm{elim},
+          \mathrm{fresh a}]{\lnot \power
+          a}{\infer[\land\textrm{-elim-2}]{\exists x @ \lnot \power
+            x}{\infer[\land\textrm{-elim-1}]{\forall x @ \power
+              x}{\ulcorner (\forall x @ \power x) \land (\exists x @ \lnot
+      \power x) \urcorner^{[1]}}}}}}
     }
     $%
   }
@@ -260,12 +261,12 @@ Universal Quantifier}
 \begin{center}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(injective(f) \land f(x)
-    = f(y)) \implies x = y}{
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(injective(f) \land
+    (f(x) = f(y))) \implies x = y}{
       \infer[\lnot\textrm{-intro}^{[2]}]{x =
-      y}{\infer[\mathrm{contradiction} with
-        f(x)=f(y)]{false}{\infer[injective property]{f(x) \neq
-      f(y)}{\ulcorner x \neq y \urcorner^{[2]}}}}
+      y}{\infer[\mathrm{contradiction with
+        f}(x)=f(y)]{false}{\infer[\mathrm{injective property}]{f(x)
+      \neq f(y)}{\ulcorner x \neq y \urcorner^{[2]}}}}
     }
     $%
   }
@@ -280,7 +281,7 @@ Universal Quantifier}
 \addcontentsline{toc}{section}{Example 11 : Case Analysis Leading to
 Contradiction}
 
-\noindent Prove: p or q, $\lnot p$, $\lnot q \implies false$
+\noindent Prove: p $\lor$ q, $\lnot$ p, l$\lnot q \implies false$
 
 \bigskip
 
@@ -289,9 +290,9 @@ Contradiction}
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \land \lnot
     p \land \lnot q) \implies false}{
-      \infer[\lor \mathrm{elim} \mathrm{from} p \lor
-      q]{false}{\infer[\mathrm{contradiction} with \lnot p]{false}{}
-      & \infer[\mathrm{contradiction} with \lnot q]{false}{}}
+      \infer[\lor \mathrm{elim \mathrm{from} p} \lor
+      q]{false}{\infer[\mathrm{contradiction with} \lnot p]{false}{}
+      & \infer[\mathrm{contradiction with} \lnot q]{false}{}}
     }
     $%
   }
