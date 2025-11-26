@@ -126,7 +126,7 @@ TEXT: Bags with duplicates
 
 (a)
 
-x in ⟨1, 2, 3⟩
+x elem ⟨1, 2, 3⟩
 
 (b)
 
@@ -140,7 +140,7 @@ tail ⟨1, 2, 3⟩ = ⟨2, 3⟩
 
 (a)
 
-forall i : N | i in ⟨1, 2, 3⟩ => i > 0
+forall i : N | i elem ⟨1, 2, 3⟩ => i > 0
 
 (b)
 
