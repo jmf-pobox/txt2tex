@@ -16,8 +16,7 @@
   [Item, Dog, Person, X]
 \end{zed}
 
-\noindent This file demonstrates function $application \in Z$
-notation definitions.
+\noindent This file demonstrates function application in Z notation definitions.
 
 \bigskip
 
@@ -40,8 +39,8 @@ notation definitions.
   maximum : \nat \cross \nat \fun \nat
   \where
   \forall a, b : \nat @ add(a, b) = a + b \\
-  \forall a, b : \nat @ (maximum(a, b) = a \lor maximum(a, b) = b)
-  \land maximum(a, b) \geq a \land maximum(a, b) \geq b
+  \forall a, b : \nat @ ((maximum(a, b) = a) \lor (maximum(a, b) =
+  b)) \land (maximum(a, b) \geq a) \land (maximum(a, b) \geq b)
 \end{axdef}
 
 \section*{Example 3 : Generic functions}
@@ -66,7 +65,7 @@ notation definitions.
 \begin{schema}{Heights}
   height : Person \fun \nat
   \where
-  \forall p : Person @ height(p) > 0 \land height(p) < 300
+  \forall p : Person @ (height(p) > 0) \land (height(p) < 300)
 \end{schema}
 
 \section*{Example 6 : Nested function application}

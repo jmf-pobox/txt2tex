@@ -61,18 +61,18 @@ on $(q \lor r)$.
       \infer[\lor\textrm{-elim}^{[2]}]{(p \land q) \lor (p \land r)}{
         \ulcorner q \lor r \urcorner^{[1]}
         &
-        \raiseproof{10ex}{\infer[\lor \mathrm{intro}]{(p \land q)
-          \lor (p \land r)}{\infer[\land \mathrm{intro}]{p \land q}{
+        \raiseproof{10ex}{\infer[\lor \mbox{intro}]{(p \land q) \lor
+          (p \land r)}{\infer[\land \mbox{intro}]{p \land q}{
               \infer[\land\textrm{-elim}^{[1]}]{p}{}
               &
-              \infer[\mathrm{case} \mathrm{assumption}]{q}{}
+              \infer[\mbox{case assumption}]{q}{}
         }}}
         &
-        \hskip 6em \raiseproof{26ex}{\infer[\lor \mathrm{intro}]{(p
-          \land q) \lor (p \land r)}{\infer[\land \mathrm{intro}]{p \land r}{
+        \hskip 6em \raiseproof{26ex}{\infer[\lor \mbox{intro}]{(p
+          \land q) \lor (p \land r)}{\infer[\land \mbox{intro}]{p \land r}{
               \infer[\land\textrm{-elim}^{[1]}]{p}{}
               &
-              \infer[\mathrm{case} \mathrm{assumption}]{r}{}
+              \infer[\mbox{case assumption}]{r}{}
         }}}
       }
     }
@@ -112,13 +112,13 @@ $(p \land r)$ and
       \infer[\lor\textrm{-elim}^{[4]}]{p \land (q \lor r)}{
         \ulcorner case1 \lor case2 \urcorner^{[3]}
         &
-        \raiseproof{8ex}{\infer[\land \mathrm{intro}]{p \land (q \lor
-          r)}{\infer[\land \mathrm{elim}]{p}{} & \infer[\lor
-        \mathrm{intro}]{q \lor r}{}}}
+        \raiseproof{8ex}{\infer[\land \mbox{intro}]{p \land (q \lor
+          r)}{\infer[\land \mbox{elim}]{p}{} & \infer[\lor
+        \mbox{intro}]{q \lor r}{}}}
         &
-        \hskip 6em \raiseproof{22ex}{\infer[\land \mathrm{intro}]{p
-          \land (q \lor r)}{\infer[\land \mathrm{elim}]{p}{} &
-        \infer[\lor \mathrm{intro}]{q \lor r}{}}}
+        \hskip 6em \raiseproof{22ex}{\infer[\land \mbox{intro}]{p
+          \land (q \lor r)}{\infer[\land \mbox{elim}]{p}{} &
+        \infer[\lor \mbox{intro}]{q \lor r}{}}}
       }
     }
     $%

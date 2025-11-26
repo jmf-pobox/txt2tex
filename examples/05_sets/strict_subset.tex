@@ -21,11 +21,11 @@ subset relationships, where A is a subset of B AND A is not equal to B.
 
 \bigskip
 
-\noindent - A subset B means: every element of A $is \in B$ (may be equal)
+\noindent - A subset B means: every element of A is $\in$ B (may be equal)
 
 \bigskip
 
-\noindent - A psubset B means: every element of A $is \in B$ AND $A
+\noindent - A psubset B means: every element of A is $\in$ B AND $A
 \neq B$ (strict inequality)
 
 \bigskip
@@ -37,11 +37,11 @@ subset relationships, where A is a subset of B AND A is not equal to B.
   A : \power \nat \\
   B : \power \nat
   \where
-  A = \{1, 2, 3\} \land B = \{1, 2, 3, 4, 5\} \land A \subset B
+  (A = \{1, 2, 3\}) \land (B = \{1, 2, 3, 4, 5\}) \land (A \subset B)
 \end{axdef}
 
-\noindent Here A psubset B holds because all elements of A $are \in
-B$, and A contains fewer elements than B.
+\noindent Here A psubset B holds because all elements of A are in B,
+and A contains fewer elements than B.
 
 \bigskip
 
@@ -53,11 +53,11 @@ B$, and A contains fewer elements than B.
   Y : \power \nat \\
   W : \power \nat
   \where
-  X = \{1, 2\} \land Y = \{1, 2, 3\} \land W = \{1, 2\} \land X
-  \subset Y \land X \subseteq W
+  (X = \{1, 2\}) \land (Y = \{1, 2, 3\}) \land (W = \{1, 2\}) \land
+  (X \subset Y) \land (X \subseteq W)
 \end{axdef}
 
-\noindent X psubset Y is true (X is strictly $contained \in Y$)
+\noindent X psubset Y is true (X is strictly contained in Y)
 
 \bigskip
 
@@ -77,7 +77,7 @@ where $X = W$)
   emptySet : \power \nat \\
   anySet : \power \nat
   \where
-  emptySet = \{\} \land anySet = \{1, 2, 3\} \land emptySet \subset anySet
+  (emptySet = \{\}) \land (anySet = \{1, 2, 3\}) \land (emptySet \subset anySet)
 \end{axdef}
 
 \noindent The empty set is a strict subset of any non-empty set.
@@ -87,7 +87,7 @@ where $X = W$)
 \section*{Example 4 : Transitive Property}
 \addcontentsline{toc}{section}{Example 4 : Transitive Property}
 
-\noindent If A psubset B and B psubset C, then A psubset C.
+\noindent If A psubset B $\land$ B psubset C, then A psubset C.
 
 \bigskip
 
@@ -96,8 +96,8 @@ where $X = W$)
   B1 : \power \nat \\
   C1 : \power \nat
   \where
-  A1 = \{1\} \land B1 = \{1, 2\} \land C1 = \{1, 2, 3\} \land A1
-  \subset B1 \land B1 \subset C1 \land A1 \subset C1
+  (A1 = \{1\}) \land (B1 = \{1, 2\}) \land (C1 = \{1, 2, 3\}) \land
+  (A1 \subset B1) \land (B1 \subset C1) \land (A1 \subset C1)
 \end{axdef}
 
 \section*{Example 5 : Set Hierarchy}
@@ -111,7 +111,7 @@ where $X = W$)
   grads : \power Person \\
   phds : \power Person
   \where
-  phds \subset grads \land grads \subset students
+  (phds \subset grads) \land (grads \subset students)
 \end{axdef}
 
 \noindent PhD students are a strict subset of graduate students,

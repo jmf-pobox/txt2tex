@@ -181,8 +181,8 @@ where p is a parent of c.
 
 \bigskip
 
-\noindent The relation image version is more concise and $idiomatic
-\in Z$ notation.
+\noindent The relation image version is more concise and idiomatic in
+Z notation.
 
 \bigskip
 
@@ -418,7 +418,7 @@ express via composition.
   grandchildren : Person \fun \power Person
   \where
   \forall p : Person @ \\
-  \t1 grandchildren(p) = \bigcup \{~ c : children(p) @ children(c) ~\}
+  \t1 grandchildren(p) = \bigcup \{~ c : children(p).children(c) ~\}
 \end{axdef}
 
 \begin{axdef}
@@ -628,7 +628,7 @@ from simpler ones
 
 \bigskip
 
-\noindent $Definition : children$ = {$p : Person$ . p $\mapsto$
+\noindent Definition: children = {$p : Person$ . p $\mapsto$
 $(parentOf \limg \{p\} \rimg)$}
 
 \bigskip
@@ -645,7 +645,7 @@ $(parentOf \limg \{p\} \rimg)$}
 
 \bigskip
 
-\noindent $Definition : grandchildren$ = {$p : Person$ . p $\mapsto$
+\noindent Definition: grandchildren = {$p : Person$ . p $\mapsto$
 $((parentOf \circ parentOf) \limg \{p\} \rimg)$}
 
 \bigskip
@@ -662,8 +662,8 @@ $((parentOf \circ parentOf) \limg \{p\} \rimg)$}
 
 \bigskip
 
-\noindent $Definition : number_of_grandchildren$ = $\{~ p : Person @
-p \mapsto \# (grandchildren(p)) ~\}$
+\noindent Definition: number\_of\_grandchildren = $\{~ p : Person @ p
+\mapsto \# (grandchildren(p)) ~\}$
 
 \bigskip
 
@@ -696,7 +696,7 @@ grandchildren set.
 
 \bigskip
 
-\noindent $Hint : use transitive closure$ (+)
+\noindent Hint: use transitive closure (+)
 
 \bigskip
 
@@ -712,7 +712,7 @@ grandchildren set.
 
 \bigskip
 
-\noindent $Hint : you'll need$ an age function
+\noindent Hint: you'll need an age function
 
 \bigskip
 

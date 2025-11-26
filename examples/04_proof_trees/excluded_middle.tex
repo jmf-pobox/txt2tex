@@ -37,13 +37,12 @@ $p \lor \lnot p$
 \begin{center}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
-    \infer[\lor \mathrm{elim}]{q}{
-      \infer[\mathrm{assumption}]{\lnot p \implies q}{\infer[LEM]{p
+    \infer[\lor \mbox{elim}]{q}{
+      \infer[\mbox{assumption}]{\lnot p \implies q}{\infer[LEM]{p
         \lor \lnot p}{\ulcorner p \implies q \urcorner^{[1]}} &
-        \infer[\Rightarrow \mathrm{elim with p}\Rightarrow q]{q}{} &
-        \infer[\Rightarrow \mathrm{elim with} \lnot p\Rightarrow
-        q]{q}{} & \infer[\lor \mathrm{elim}]{q}{\ulcorner p \implies q
-      \urcorner^{[1]}}}
+        \infer[\Rightarrow \mbox{elim with p}\Rightarrow q]{q}{} &
+        \infer[\Rightarrow \mbox{elim with} \lnot p\Rightarrow q]{q}{}
+      & \infer[\lor \mbox{elim}]{q}{\ulcorner p \implies q \urcorner^{[1]}}}
     }
     $%
   }
@@ -66,9 +65,9 @@ Elimination Using LEM}
 \begin{center}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
-    \infer[\lor \mathrm{elim}]{p}{
-      \infer[\lor \mathrm{elim}]{p}{\infer[\mathrm{false
-      elim}]{p}{\infer[\mathrm{contradiction with} \lnot \lnot p]{false}{}}}
+    \infer[\lor \mbox{elim}]{p}{
+      \infer[\lor \mbox{elim}]{p}{\infer[\mbox{false
+      elim}]{p}{\infer[\mbox{contradiction with} \lnot \lnot p]{false}{}}}
     }
     $%
   }
@@ -89,10 +88,10 @@ Elimination Using LEM}
 \begin{center}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
-    \infer[\lor \mathrm{elim}]{\lnot p \lor \lnot q}{
-      \infer[\lor \mathrm{elim}]{\lnot p \lor \lnot q}{\infer[\lor
-        \mathrm{intro left}]{\lnot p \lor \lnot
-      q}{\infer[\mathrm{identity}]{\lnot p}{}}}
+    \infer[\lor \mbox{elim}]{\lnot p \lor \lnot q}{
+      \infer[\lor \mbox{elim}]{\lnot p \lor \lnot q}{\infer[\lor
+        \mbox{intro left}]{\lnot p \lor \lnot
+      q}{\infer[\mbox{identity}]{\lnot p}{}}}
     }
     $%
   }
@@ -125,9 +124,9 @@ In logical notation, we would $write : decidable(p) means$ $(p \lor \lnot p)$.
 \begin{center}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
-    \infer[\lor \mathrm{elim}]{p}{
-      \infer[\lor \mathrm{elim}]{p}{\infer[\mathrm{false
-      elim}]{p}{\infer[\Rightarrow \mathrm{elim}]{false}{}}}
+    \infer[\lor \mbox{elim}]{p}{
+      \infer[\lor \mbox{elim}]{p}{\infer[\mbox{false
+      elim}]{p}{\infer[\Rightarrow \mbox{elim}]{false}{}}}
     }
     $%
   }
@@ -152,9 +151,9 @@ In logical notation, we would $write : decidable(p) means$ $(p \lor \lnot p)$.
 \begin{center}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
-    \infer[\lor \mathrm{elim}]{\lnot p \lor q}{
-      \infer[\lor \mathrm{elim}]{\lnot p \lor q}{\infer[\lor
-      \mathrm{intro left}]{\lnot p \lor q}{}}
+    \infer[\lor \mbox{elim}]{\lnot p \lor q}{
+      \infer[\lor \mbox{elim}]{\lnot p \lor q}{\infer[\lor
+      \mbox{intro left}]{\lnot p \lor q}{}}
     }
     $%
   }
@@ -169,10 +168,10 @@ In logical notation, we would $write : decidable(p) means$ $(p \lor \lnot p)$.
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies q}{
-      \infer[\mathrm{assumption}]{p}{\infer[\mathrm{false
-        elim}]{q}{\infer[\mathrm{contradiction}]{false}{}} &
-        \infer[\mathrm{identity}]{q}{} & \infer[\lor
-      \mathrm{elim}]{q}{\ulcorner \lnot p \lor q \urcorner^{[1]}}}
+      \infer[\mbox{assumption}]{p}{\infer[\mbox{false
+        elim}]{q}{\infer[\mbox{contradiction}]{false}{}} &
+        \infer[\mbox{identity}]{q}{} & \infer[\lor
+      \mbox{elim}]{q}{\ulcorner \lnot p \lor q \urcorner^{[1]}}}
     }
     $%
   }
@@ -193,11 +192,11 @@ In logical notation, we would $write : decidable(p) means$ $(p \lor \lnot p)$.
 \begin{center}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
-    \infer[\lor \mathrm{elim}]{p}{
-      \infer[\lor \mathrm{elim}]{p}{\infer[\Rightarrow \mathrm{elim
-        with premise}]{p}{\infer[\Rightarrow\textrm{-intro}^{[2]}]{p
-          \implies q}{\infer[\mathrm{false
-            elim}]{q}{\infer[\mathrm{contradiction}]{false}{\ulcorner p
+    \infer[\lor \mbox{elim}]{p}{
+      \infer[\lor \mbox{elim}]{p}{\infer[\Rightarrow \mbox{elim with
+        premise}]{p}{\infer[\Rightarrow\textrm{-intro}^{[2]}]{p
+          \implies q}{\infer[\mbox{false
+            elim}]{q}{\infer[\mbox{contradiction}]{false}{\ulcorner p
       \urcorner^{[2]}}}}}}
     }
     $%
@@ -274,7 +273,7 @@ $\forall n : \nat @ (n = 0) \lor \lnot (n = 0)$
 \bigskip
 
 \noindent
-$\forall p @ p \lor (\lnot (p - -(requires(LEM))) \in general(case))$
+$\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
 
 \section*{Example 12 : Proof Strategy with LEM}
 \addcontentsline{toc}{section}{Example 12 : Proof Strategy with LEM}
@@ -362,23 +361,23 @@ then everyone drinks.
 \begin{center}
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
-    \infer[\lor \mathrm{elim}]{\exists x @ x(drinks) \implies
-    (\forall y @ y(drinks))}{
-      \infer[\lor \mathrm{elim}]{\exists x @ x(drinks) \implies
-      (\forall y @ y(drinks))}{\infer[\exists \mathrm{intro with
+    \infer[\lor \mbox{elim}]{\exists x @ x(drinks) \implies (\forall
+    y @ y(drinks))}{
+      \infer[\lor \mbox{elim}]{\exists x @ x(drinks) \implies
+      (\forall y @ y(drinks))}{\infer[\exists \mbox{intro with
         x}=a]{\exists x @ x(drinks) \implies (\forall y @
-        y(drinks))}{\infer[\Rightarrow \mathrm{intro},
-          \mathrm{trivially true}]{a(drinks) \implies (\forall y @
-          y(drinks))}{\infer[\mathrm{from p}]{\forall y @
-            y(drinks)}{\infer[\mathrm{from
+        y(drinks))}{\infer[\Rightarrow \mbox{intro}, \mbox{trivially
+          true}]{a(drinks) \implies (\forall y @
+          y(drinks))}{\infer[\mbox{from p}]{\forall y @
+            y(drinks)}{\infer[\mbox{from
               p}]{a(drinks)}{\infer{Pick(any)(person)}{
                   a
-        }}}}} & \infer[\exists \mathrm{intro with x}=b]{\exists x @
+        }}}}} & \infer[\exists \mbox{intro with x}=b]{\exists x @
           x(drinks) \implies (\forall y @
         y(drinks))}{\infer[\Rightarrow\textrm{-intro}^{[2]}]{b(drinks)
             \implies (\forall y @
-          y(drinks))}{\infer[\mathrm{assumption}]{b(drinks)}{\infer[\exists
-              \mathrm{elim}]{\lnot (b(drinks))}{\infer[\mathrm{negation of}
+          y(drinks))}{\infer[\mbox{assumption}]{b(drinks)}{\infer[\exists
+              \mbox{elim}]{\lnot (b(drinks))}{\infer[\mbox{negation of}
       \forall]{\exists b @ \lnot (b(drinks))}{}}}}}}
     }
     $%

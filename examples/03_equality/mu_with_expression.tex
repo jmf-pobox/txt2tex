@@ -48,7 +48,7 @@ $(\mu x : \nat | x * x = 16 @ x + 1)$
 $(\mu n : \nat | n > 10 \land n < 12.2 * n)$
 
 \noindent Finds $n = 11$ $(unique(n)(between)(10) \land 12)$, then
-returns 2 * 11 = 22.
+returns 2 * $11 = 22$.
 
 \bigskip
 
@@ -206,7 +206,7 @@ Without Bullet}
 \noindent
 $(\mu x : \nat | x > 5 \land x < 7 @ (x * x) + (x + 1))$
 
-\noindent Finds $x = 6$, then evaluates (6 * 6) + (6 + 1) = 36 + 7 = 43.
+\noindent Finds $x = 6$, then evaluates (6 * 6) + (6 + 1) = 36 + $7 = 43$.
 
 \bigskip
 
@@ -217,7 +217,7 @@ $(\mu x : \nat | x > 5 \land x < 7 @ (x * x) + (x + 1))$
 $(\mu x : \nat | x * x = 16 @ (\mu y : \nat | y * y = (x + 5) @ y + x))$
 
 \noindent Finds $x = 4$, then finds y where y² = (4 + 5) = 9, so $y =
-3$, then returns 3 + 4 = 7.
+3$, then returns 3 + $4 = 7$.
 
 \bigskip
 
