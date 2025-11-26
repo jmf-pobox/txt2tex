@@ -2,13 +2,13 @@
 // Example: Law of Excluded Middle (LEM)
 // ============================================================================
 // Demonstrates:
-//   - Law of excluded middle: p or not p
+//   - Law of excluded middle: p or lnot p
 //   - Classical reasoning with LEM
-//   - Case analysis on p or not p
+//   - Case analysis on p lor lnot p
 //   - Relationship to double negation elimination
 //
 // Features:
-//   - p or not p [LEM axiom]
+//   - p lor lnot p [LEM axiom]
 //   - Case analysis on disjunctions
 //   - Classical vs constructive logic
 //   - Proof by cases using LEM
@@ -21,40 +21,40 @@
 
 ** Example 1: Statement of LEM **
 
-TEXT: The law of excluded middle states: for any proposition p, either p is true or not p is true.
+TEXT: The law of excluded middle states: for any proposition p, either p is true or lnot p is true.
 
-p or not p
+p lor lnot p
 
 TEXT: This is an axiom of classical logic but not of constructive logic.
 
 ** Example 2: Proof by Cases Using LEM **
 
-TEXT: Prove: (p => q) => ((not p => q) => q)
+TEXT: Prove: (p => q) => ((lnot p => q) => q)
 
 PROOF:
-q [or elim]
+q [lor elim]
   [1] p => q [assumption]
-      [2] not p => q [assumption]
-          p or not p [LEM]
+      [2] lnot p => q [assumption]
+          p lor lnot p [LEM]
           case p:
             q [=> elim with p => q]
-          case not p:
-            q [=> elim with not p => q]
+          case lnot p:
+            q [=> elim with lnot p => q]
           q [or elim]
 
-TEXT: By LEM, we can case-analyze on p or not p. In both cases we derive q.
+TEXT: By LEM, we can case-analyze on p lor lnot p. In both cases we derive q.
 
 ** Example 3: Double Negation Elimination Using LEM **
 
-TEXT: Prove: not not p => p
+TEXT: Prove: lnot lnot p => p
 
 PROOF:
 p [or elim]
-  [1] not not p [assumption]
-      p or not p [LEM]
+  [1] lnot lnot p [assumption]
+      p lor lnot p [LEM]
       case p:
         p [identity]
-      case not p:
+      case lnot p:
         false [contradiction with not not p]
         p [false elim]
       p [or elim]
@@ -63,46 +63,46 @@ TEXT: LEM enables double negation elimination in classical logic.
 
 ** Example 4: De Morgan's Law Using LEM **
 
-TEXT: Prove: not (p and q) => (not p or not q)
+TEXT: Prove: lnot (p land q) => (lnot p lor lnot q)
 
 PROOF:
-not p or not q [or elim]
-  [1] not (p and q) [assumption]
-      p or not p [LEM]
+lnot p lor lnot q [or elim]
+  [1] lnot (p land q) [assumption]
+      p lor lnot p [LEM]
       case p:
-        q or not q [LEM]
+        q lor lnot q [LEM]
         case q:
-          p and q [and intro]
+          p land q [land intro]
           false [contradiction with premise]
-          not p or not q [false elim]
+          lnot p lor lnot q [false elim]
         case not q:
-          not q [identity]
-          not p or not q [or intro right]
-        not p or not q [or elim]
+          lnot q [identity]
+          lnot p lor lnot q [lor intro right]
+        lnot p or lnot q [or elim]
       case not p:
-        not p [identity]
-        not p or not q [or intro left]
-      not p or not q [or elim]
+        lnot p [identity]
+        lnot p lor lnot q [lor intro left]
+      lnot p or lnot q [or elim]
 
 TEXT: This proof requires LEM to case-analyze on both p and q.
 
 ** Example 5: Decidability **
 
-TEXT: A proposition is decidable if we can prove p or not p. In logical notation, we would write: decidable(p) means (p or not p).
+TEXT: A proposition is decidable if we can prove p or not p. In logical notation, we would write: decidable(p) means (p or lnot p).
 
 TEXT: LEM states that all propositions are decidable in classical logic.
 
 ** Example 6: Proof by Contradiction via LEM **
 
-TEXT: Prove: (not p => false) => p
+TEXT: Prove: (lnot p => false) => p
 
 PROOF:
 p [or elim]
-  [1] not p => false [assumption]
-      p or not p [LEM]
+  [1] lnot p => false [assumption]
+      p lor lnot p [LEM]
       case p:
         p [identity]
-      case not p:
+      case lnot p:
         false [=> elim]
         p [false elim]
       p [or elim]
@@ -111,33 +111,33 @@ TEXT: This shows that proof by contradiction follows from LEM.
 
 ** Example 7: Material Implication **
 
-TEXT: Prove: (p => q) <=> (not p or q)
+TEXT: Prove: (p => q) <=> (lnot p lor q)
 
-TEXT: Left-to-right (p => q => not p or q):
+TEXT: Left-to-right (p => q => lnot p lor q):
 
 PROOF:
-not p or q [or elim]
+lnot p lor q [lor elim]
   [1] p => q [assumption]
-      p or not p [LEM]
+      p lor lnot p [LEM]
       case p:
         q [=> elim]
-        not p or q [or intro right]
-      case not p:
-        not p or q [or intro left]
-      not p or q [or elim]
+        lnot p lor q [lor intro right]
+      case lnot p:
+        lnot p lor q [or intro left]
+      lnot p or q [or elim]
 
-TEXT: Right-to-left (not p or q => p => q):
+TEXT: Right-to-left (lnot p lor q => p => q):
 
 PROOF:
 p => q [=> intro from 1]
-  [1] not p or q [assumption]
+  [1] lnot p lor q [assumption]
       [2] p [assumption]
-          case not p:
+          case lnot p:
             false [contradiction]
             q [false elim]
           case q:
             q [identity]
-          q [or elim]
+          q [lor elim]
 
 TEXT: Material implication equivalence uses LEM in the forward direction.
 
@@ -148,10 +148,10 @@ TEXT: Prove: ((p => q) => p) => p
 PROOF:
 p [or elim]
   [1] (p => q) => p [assumption]
-      p or not p [LEM]
+      p lor lnot p [LEM]
       case p:
         p [identity]
-      case not p:
+      case lnot p:
         [2] p [assumption]
             false [contradiction]
             q [false elim]
@@ -165,9 +165,9 @@ TEXT: Pierce's law is equivalent to LEM in classical logic.
 
 TEXT: Tertium non datur (Latin: "no third possibility") is another name for LEM.
 
-TEXT: For any proposition p, there is no third option besides p and not p.
+TEXT: For any proposition p, there is no third option besides p and lnot p.
 
-forall p | p or not p
+forall p | p lor lnot p
 
 TEXT: This principle distinguishes classical from intuitionistic logic.
 
@@ -185,22 +185,22 @@ TEXT: Classical: LEM is an axiom—every proposition is assumed decidable withou
 
 TEXT: Some propositions are constructively decidable:
 
-forall n : N | (n = 0) or not (n = 0)
+forall n : N | (n = 0) lor lnot (n = 0)
 
 TEXT: We can decide this by checking if n equals 0.
 
 TEXT: But general propositions may not be decidable constructively:
 
-forall p | p or not p  -- requires LEM in general case
+forall p | p lor lnot p  -- requires LEM in general case
 
 ** Example 12: Proof Strategy with LEM **
 
 TEXT: Common proof strategy using LEM:
 
 TEXT: To prove Q:
-TEXT: 1. Invoke p or not p for some relevant p
+TEXT: 1. Invoke p or lnot p for some relevant p
 TEXT: 2. [case] p prove Q assuming p
-TEXT: 3. [case] not p prove Q assuming not p
+TEXT: 3. [case] lnot p prove Q assuming lnot p
 TEXT: 4. Conclude Q by or elim
 
 TEXT: This technique is called "proof by cases" or "case analysis."
@@ -212,10 +212,10 @@ TEXT: Indirect proof pattern using LEM:
 TEXT: To prove p:
 TEXT: 1. Assume not p [assumption 1]
 TEXT: 2. Derive false
-TEXT: 3. Conclude not not p [not intro from 1]
-TEXT: 4. Apply LEM: p or not p
+TEXT: 3. Conclude lnot lnot p [lnot intro from 1]
+TEXT: 4. Apply LEM: p lor lnot p
 TEXT: 5. [case] p p
-TEXT: 6. [case] not p contradicts not not p, derive p by false elim
+TEXT: 6. [case] lnot p contradicts lnot lnot p, derive p by false elim
 TEXT: 7. Conclude p [or elim]
 
 TEXT: LEM enables the final step (double negation elimination).
@@ -226,16 +226,16 @@ TEXT: Prove: There exists a person x such that if x drinks, then everyone drinks
 
 PROOF:
 exists x | x drinks => (forall y | y drinks) [or elim]
-  [1] p or not p [assumption]
+  [1] p lor lnot p [assumption]
       case p:
         Pick any person a
         a drinks [from p]
         forall y | y drinks [from p]
         a drinks => (forall y | y drinks) [=> intro, trivially true]
         exists x | x drinks => (forall y | y drinks) [exists intro with x = a]
-      case not p:
-        exists b | not (b drinks) [negation of forall]
-        not (b drinks) [exists elim]
+      case lnot p:
+        exists b | lnot (b drinks) [negation of forall]
+        lnot (b drinks) [exists elim]
         [2] b drinks [assumption]
             false [contradiction]
             forall y | y drinks [false elim]
@@ -251,7 +251,7 @@ TEXT: Use LEM when:
 TEXT: 1. You need to prove something by case analysis on an arbitrary proposition
 TEXT: 2. You're working in classical logic (not constructive)
 TEXT: 3. You need double negation elimination
-TEXT: 4. Your proof strategy requires considering both p and not p
+TEXT: 4. Your proof strategy requires considering both p land lnot p
 
 TEXT: Avoid LEM when:
 TEXT: 1. Working in constructive/intuitionistic logic
@@ -261,10 +261,10 @@ TEXT: 3. You want algorithms that compute witnesses (constructive proofs)
 ** Example 16: Relationship to Other Principles **
 
 TEXT: In classical logic, these are equivalent:
-TEXT: - Law of excluded middle: p or not p
-TEXT: - Double negation elimination: not not p => p
+TEXT: - Law of excluded middle: p lor lnot p
+TEXT: - Double negation elimination: lnot lnot p => p
 TEXT: - Pierce's law: ((p => q) => p) => p
-TEXT: - Reductio ad absurdum: (not p => false) => p
+TEXT: - Reductio ad absurdum: (lnot p => false) => p
 
 TEXT: Accepting any one of these principles gives you classical logic.
 

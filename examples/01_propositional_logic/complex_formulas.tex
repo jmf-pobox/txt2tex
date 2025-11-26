@@ -32,7 +32,7 @@ $\exists y : \nat @ y = 0$
 \subsection*{(c)}
 
 \noindent
-$\forall n : \nat @ n \geq 0 \land n < 100$
+$\forall n : \nat @ (n \geq 0) \land (n < 100)$
 
 \section*{Example 2 : Subscripts and Superscripts}
 \addcontentsline{toc}{section}{Example 2 : Subscripts and Superscripts}
@@ -40,7 +40,7 @@ $\forall n : \nat @ n \geq 0 \land n < 100$
 \subsection*{(a)}
 
 \noindent
-$x^2$
+$x \bsup 2 \esup$
 
 \medskip
 
@@ -54,7 +54,7 @@ $a_1$
 \subsection*{(c)}
 
 \noindent
-$x\_i^2$
+$x\_i \bsup 2 \esup$
 
 \section*{Example 3 : Comparison Operators}
 \addcontentsline{toc}{section}{Example 3 : Comparison Operators}
@@ -69,14 +69,14 @@ $x < 10$
 \subsection*{(b)}
 
 \noindent
-$x \geq 0 \land x \leq 100$
+$(x \geq 0) \land (x \leq 100)$
 
 \medskip
 
 \subsection*{(c)}
 
 \noindent
-$y > 5 \lor y = 0$
+$(y > 5) \lor (y = 0)$
 
 \section*{Example 4 : Set Operators}
 \addcontentsline{toc}{section}{Example 4 : Set Operators}
@@ -109,7 +109,7 @@ $A \cup B \cap C$
   \adjustbox{max width=\textwidth}{%
     $\displaystyle
     \begin{array}{l@{\hspace{2em}}r}
-      \forall x : \nat @ x \in \nat \land x \geq 0 \\
+      \forall x : \nat @ (x \in \nat) \land (x \geq 0) \\
       \Leftrightarrow \forall x : \nat @ x \geq 0
     \end{array}$%
   }
@@ -121,7 +121,7 @@ $A \cup B \cap C$
 \subsection*{(b)}
 
 \noindent
-$\forall i : \nat @ a\_i > 0 \implies a\_i^2 > 0$
+$\forall i : \nat @ a\_i > 0 \implies a\_i \bsup 2 \esup > 0$
 
 \medskip
 

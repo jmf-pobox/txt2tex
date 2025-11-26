@@ -50,6 +50,7 @@ class TokenType(Enum):
     STAR = auto()  # * (reflexive-transitive closure postfix / arithmetic)
     LIMG = auto()  # (| (relational image left)
     RIMG = auto()  # |) (relational image right)
+    SHOWS = auto()  # shows (sequent judgment operator ⊢)
 
     # Relation functions (Phase 10)
     DOM = auto()  # dom (domain of relation)
@@ -127,6 +128,7 @@ class TokenType(Enum):
     PIPE = auto()  # | for quantifiers and table columns
     COMMA = auto()  # , for multi-variable quantifiers (forall x, y : N)
     PERIOD = auto()  # . for sentences in paragraphs
+    DERIVE = auto()  # --- (horizontal line separator in INFRULE)
 
     # Identifiers and literals
     IDENTIFIER = auto()
@@ -154,6 +156,7 @@ class TokenType(Enum):
 
     # Environments (Phase 2)
     ARGUE = auto()  # ARGUE: or EQUIV: (both map to argue environment)
+    INFRULE = auto()  # INFRULE: (inference rule with horizontal line)
 
     # Z notation keywords (Phase 4)
     GIVEN = auto()  # given

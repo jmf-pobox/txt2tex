@@ -1,0 +1,13 @@
+=== Bug 13 Test: Field Projection on Function Application ===
+
+given Programme
+
+schema Programme
+  length : N
+end
+
+axdef
+  f : N -> Programme
+where
+  forall i : N | f(i).length > 0
+end

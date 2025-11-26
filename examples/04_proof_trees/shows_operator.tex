@@ -1,0 +1,69 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\noindent The "shows" operator represents sequent judgment, written
+as ⊢ (turnstile).
+
+\bigskip
+
+\noindent In sequent calculus, Γ ⊢ Δ means "from context Γ, we can derive Δ".
+
+\bigskip
+
+\noindent Simple sequent judgment:
+
+\bigskip
+
+\noindent
+$Gamma \shows Delta$
+
+\noindent More concrete example with specific propositions:
+
+\bigskip
+
+\noindent
+$(\power \land Q) \shows \power$
+
+\noindent Sequent with multiple context items (using sets):
+
+\bigskip
+
+\noindent
+$\{\power, \power \implies Q\} \shows Q$
+
+\noindent We can use shows in inference rules to represent natural deduction:
+
+\bigskip
+
+\begin{infrule}
+  Gamma \shows \power & \\
+  Gamma \shows (\power \implies Q) & \\
+  \derive \\
+  Gamma \shows Q & \mbox{modus ponens $\in$ sequent form}
+\end{infrule}
+
+\noindent Combining shows with inference rules for natural deduction style:
+
+\bigskip
+
+\begin{infrule}
+  Gamma \shows A & \\
+  Gamma \shows B & \\
+  \derive \\
+  Gamma \shows (A \land B) & \mbox{conjunction introduction}
+\end{infrule}
+
+\noindent The shows operator renders as \$shows \in LaTeX$, which displays as ⊢.
+
+\bigskip
+
+\end{document}

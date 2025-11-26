@@ -62,8 +62,8 @@ PROOF:
 ** Test 5: Horizontal siblings (depth 2) **
 
 PROOF:
-  (p and q) => r [=> intro from 1]
-    [1] p and q [assumption]
-    :: r [and elim]
+  (p land q) => r [=> intro from 1]
+    [1] p land q [assumption]
+    :: r [land elim]
       :: p [from 1]
       :: q [from 1]

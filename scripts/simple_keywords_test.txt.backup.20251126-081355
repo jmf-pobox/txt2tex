@@ -1,0 +1,29 @@
+=== Keyword Migration Test ===
+
+// Simple logical formulas with and/or/not
+
+** Formula 1 **
+p and q => p
+
+** Formula 2 **
+p or q => not (not p and not q)
+
+TRUTH TABLE:
+p | q | p and q | p or q | not p
+T | T | T       | T      | F
+T | F | F       | T      | F
+F | T | F       | T      | T
+F | F | F       | F      | T
+
+EQUIV:
+p and (q or r)
+<=> (p and q) or (p and r)
+
+TEXT: This is English prose with and, or, not that should be kept.
+
+axdef
+  x : ZZ
+  y : ZZ
+where
+  x > 0 and y > 0
+end

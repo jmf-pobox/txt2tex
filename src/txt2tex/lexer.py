@@ -613,6 +613,13 @@ class Lexer:
                 text_content = self.text[text_start : self.pos]
                 return Token(TokenType.TEXT, text_content, start_line, start_column)
 
+        # Check for --- (derive separator in INFRULE)
+        if char == "-" and self._peek_char() == "-" and self._peek_char(2) == "-":
+            self._advance()
+            self._advance()
+            self._advance()
+            return Token(TokenType.DERIVE, "---", start_line, start_column)
+
         # Standalone minus (subtraction/negation)
         if char == "-":
             self._advance()
@@ -796,6 +803,11 @@ class Lexer:
             self._advance()  # Consume ':'
             keyword = f"{value}:"
             return Token(TokenType.ARGUE, keyword, start_line, start_column)
+
+        # Check for INFRULE: keyword
+        if value == "INFRULE" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+            return Token(TokenType.INFRULE, "INFRULE:", start_line, start_column)
 
         # Check for PROOF: keyword
         if value == "PROOF" and self._current_char() == ":":
@@ -1100,6 +1112,7 @@ class Lexer:
                         "inv",
                         "id",
                         "comp",
+                        "shows",
                         "forall",
                         "exists",
                         "exists1",
@@ -1166,11 +1179,12 @@ class Lexer:
                 return Token(TokenType.TEXT, text_content, start_line, start_column)
 
         # Check for keywords (propositional logic)
-        if value == "and":
+        # Support both English (and/or/not) and LaTeX-style (land/lor/lnot)
+        if value in ("and", "land"):
             return Token(TokenType.AND, value, start_line, start_column)
-        if value == "or":
+        if value in ("or", "lor"):
             return Token(TokenType.OR, value, start_line, start_column)
-        if value == "not":
+        if value in ("not", "lnot"):
             return Token(TokenType.NOT, value, start_line, start_column)
 
         # Check for quantifiers (Phase 3, enhanced in Phase 6-7)
@@ -1186,9 +1200,10 @@ class Lexer:
             return Token(TokenType.LAMBDA, value, start_line, start_column)
 
         # Check for set operators (Phase 3, enhanced in Phase 7, Phase 11.5)
+        # Support both English (in) and LaTeX-style (elem)
         if value == "notin":
             return Token(TokenType.NOTIN, value, start_line, start_column)
-        if value == "in":
+        if value in ("in", "elem"):
             return Token(TokenType.IN, value, start_line, start_column)
         if value == "subset" or value == "subseteq":
             return Token(TokenType.SUBSET, value, start_line, start_column)
@@ -1243,6 +1258,10 @@ class Lexer:
             return Token(TokenType.INV, value, start_line, start_column)
         if value == "id":
             return Token(TokenType.ID, value, start_line, start_column)
+
+        # Check for sequent judgment operator (shows)
+        if value == "shows":
+            return Token(TokenType.SHOWS, value, start_line, start_column)
 
         # Check for arithmetic operators (modulo)
         if value == "mod":

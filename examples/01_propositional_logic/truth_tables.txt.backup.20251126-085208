@@ -1,0 +1,69 @@
+// ============================================================================
+// Example: Equivalence Chains with Justifications
+// ============================================================================
+// Demonstrates:
+//   - EQUIV: blocks for step-by-step equational reasoning
+//   - Justifications in square brackets [reason]
+//   - Common logical laws (commutative, De Morgan, distributive)
+//   - Definition-based transformations
+//
+// Features:
+//   - Each step shows equivalence (<=>)
+//   - Justifications rendered flush-right
+//   - Multiple transformations in sequence
+//   - Optional justifications (can be omitted)
+//
+// Common justifications:
+//   - [commutative], [De Morgan], [distributive]
+//   - [definition], [parentheses], [idempotent]
+//
+// See: docs/USER_GUIDE.md - Section "Propositional Logic" > "Equivalence Chains"
+// ============================================================================
+
+=== Equivalence Chains ===
+
+** Solution 1 **
+
+(a) Commutative property
+
+EQUIV:
+p and q
+q and p [commutative]
+
+(b) De Morgan law
+
+EQUIV:
+not (p and q)
+(not p) or (not q) [De Morgan]
+not p or not q [parentheses]
+
+** Solution 2 **
+
+(a) Definition of implication
+
+EQUIV:
+p => q
+not p or q [definition]
+
+(b) Multiple equivalence steps
+
+EQUIV:
+(p and q) or (p and r)
+p and (q or r) [distributive]
+(q or r) and p [commutative]
+p and (r or q) [commutative]
+
+** Solution 3 **
+
+(a) Equivalence chain without justifications
+
+EQUIV:
+p or p
+p
+
+(b) Mixed justifications
+
+EQUIV:
+p <=> q
+(p => q) and (q => p) [definition]
+(not p or q) and (not q or p)

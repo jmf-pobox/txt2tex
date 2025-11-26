@@ -1,0 +1,27 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Bug 13 Test : Field Projection on Function Application}
+
+\begin{zed}[~ Programme ~]\end{zed}
+
+\begin{schema}{Programme}
+length : \nat
+\end{schema}
+
+\begin{axdef}
+f : \nat \fun Programme
+\where
+\forall i : \nat @ f(i).length > 0
+\end{axdef}
+
+\end{document}

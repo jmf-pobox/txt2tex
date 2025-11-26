@@ -1,0 +1,74 @@
+// ============================================================================
+// Example: Generic (Polymorphic) Type Parameters
+// ============================================================================
+// Demonstrates:
+//   - Generic abbreviations with [X], [X, Y] syntax
+//   - Generic definitions (gendef) with type parameters
+//   - Generic schemas with type parameters
+//   - Mixing generic and non-generic definitions
+//
+// Features:
+//   - Type parameters enable polymorphic definitions
+//   - Works with abbreviations, gendef, and schemas
+//   - TEXT: blocks for inline explanations
+//
+// See: docs/USER_GUIDE.md - Section "Definitions" > "Generic Definitions"
+// ============================================================================
+
+=== Phase 9: Generic Parameters ===
+
+TEXT: This example demonstrates Z notation definitions with generic (polymorphic) type parameters.
+
+TEXT: Basic generic abbreviation for a Pair type:
+
+zed
+  [X] Pair == X cross X
+end
+
+TEXT: Generic abbreviation with two type parameters:
+
+zed
+  [X, Y] Product == X cross Y
+end
+
+TEXT: Generic axiomatic definition with constraints:
+
+gendef [T]
+  identity : T
+where
+  identity = identity
+end
+
+TEXT: Generic schema for a collection:
+
+schema Collection[X]
+  items : seq X
+  count : N
+where
+  count = # items
+end
+
+TEXT: Generic schema with multiple parameters:
+
+schema Tuple[X, Y]
+  first : X
+  second : Y
+end
+
+TEXT: Non-generic definitions still work as before:
+
+zed
+  Naturals == N
+end
+
+axdef
+  zero : N
+where
+  zero = 0
+end
+
+schema Counter
+  value : N
+where
+  value >= 0
+end

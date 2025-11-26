@@ -16,4 +16,4 @@
 // See: docs/USER_GUIDE.md - Section "Propositional Logic"
 // ============================================================================
 
-p and q => r
+p land q => r

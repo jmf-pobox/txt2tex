@@ -26,36 +26,36 @@
 TEXT: Prove: For all integers n, n < 0 or n = 0 or n > 0
 
 PROOF:
-  n < 0 or n = 0 or n > 0 [trichotomy of integers, axiom]
+  n < 0 lor n = 0 or n > 0 [trichotomy of integers, axiom]
 
 TEXT: This uses the trichotomy property as an axiom. To prove something about all integers, we can case-analyze on these three possibilities.
 
 ** Example 2: Multi-Level Case Analysis **
 
-TEXT: Prove: (p or q) and (r or s) => (p and r) or (p and s) or (q and r) or (q and s)
+TEXT: Prove: (p lor q) land (r lor s) => (p land r) lor (p land s) lor (q land r) lor (q land s)
 
 PROOF:
-((p or q) and (r or s)) => (p and r) or (p and s) or (q and r) or (q and s) [=> intro from 1]
-  [1] (p or q) and (r or s) [assumption]
-      p or q [and elim 1]
-      r or s [and elim 2]
-      (p and r) or (p and s) or (q and r) or (q and s) [or elim on p or q]
+((p lor q) land (r lor s)) => (p land r) lor (p land s) lor (q land r) lor (q land s) [=> intro from 1]
+  [1] (p lor q) land (r lor s) [assumption]
+      p lor q [and elim 1]
+      r lor s [land elim 2]
+      (p land r) lor (p land s) lor (q land r) lor (q land s) [lor elim on p lor q]
         case p:
-          (p and r) or (p and s) or (q and r) or (q and s) [or elim on r or s]
+          (p land r) or (p land s) or (q land r) or (q land s) [or elim on r or s]
             case r:
-              p and r [and intro]
-              (p and r) or (p and s) or (q and r) or (q and s) [or intro]
+              p land r [land intro]
+              (p land r) lor (p land s) lor (q land r) lor (q land s) [lor intro]
             case s:
-              p and s [and intro]
-              (p and r) or (p and s) or (q and r) or (q and s) [or intro]
+              p land s [land intro]
+              (p land r) lor (p land s) lor (q land r) lor (q land s) [lor intro]
         case q:
-          (p and r) or (p and s) or (q and r) or (q and s) [or elim on r or s]
+          (p land r) or (p land s) or (q land r) or (q land s) [or elim on r or s]
             case r:
-              q and r [and intro]
-              (p and r) or (p and s) or (q and r) or (q and s) [or intro]
+              q land r [land intro]
+              (p land r) lor (p land s) lor (q land r) lor (q land s) [lor intro]
             case s:
-              q and s [and intro]
-              (p and r) or (p and s) or (q and r) or (q and s) [or intro]
+              q land s [land intro]
+              (p land r) lor (p land s) lor (q land r) lor (q land s) [lor intro]
 
 TEXT: Nested case analysis on two disjunctions, exploring all four combinations.
 
@@ -114,13 +114,13 @@ TEXT: By structural induction, reverse(reverse(s)) = s for all sequences.
 TEXT: Prove: There exists an even number greater than 10
 
 PROOF:
-true => (exists n : N | even(n) and n > 10) [=> intro from 1]
+true => (exists n : N | even(n) land n > 10) [=> intro from 1]
   [1] true [assumption]
       12 = 2 * 6 [arithmetic]
       even(12) [definition of even, 12 = 2 * 6]
       12 > 10 [arithmetic]
-      even(12) and 12 > 10 [and intro]
-      exists n : N | even(n) and n > 10 [exists intro with n = 12]
+      even(12) land 12 > 10 [land intro]
+      exists n : N | even(n) land n > 10 [exists intro with n = 12]
 
 TEXT: Constructive proof: we exhibit a specific witness (12).
 
@@ -129,20 +129,20 @@ TEXT: Constructive proof: we exhibit a specific witness (12).
 TEXT: Prove: There exist irrational numbers a and b such that a^b is rational
 
 PROOF:
-irrational(sqrt(2)) => (exists a, b | irrational(a) and irrational(b) and rational(power(a, b))) [=> intro from 1]
+irrational(sqrt(2)) => (exists a, b | irrational(a) land irrational(b) land rational(power(a, b))) [=> intro from 1]
   [1] irrational(sqrt(2)) [assumption]
-      rational(power(sqrt(2), sqrt(2))) or irrational(power(sqrt(2), sqrt(2))) [LEM]
-      exists a, b | irrational(a) and irrational(b) and rational(power(a, b)) [or elim]
+      rational(power(sqrt(2), sqrt(2))) lor irrational(power(sqrt(2), sqrt(2))) [LEM]
+      exists a, b | irrational(a) land irrational(b) land rational(power(a, b)) [lor elim]
         case rational(power(sqrt(2), sqrt(2))):
-          irrational(sqrt(2)) and irrational(sqrt(2)) and rational(power(sqrt(2), sqrt(2))) [and intro]
-          exists a, b | irrational(a) and irrational(b) and rational(power(a, b)) [exists intro with a = b = sqrt(2)]
+          irrational(sqrt(2)) land irrational(sqrt(2)) land rational(power(sqrt(2), sqrt(2))) [land intro]
+          exists a, b | irrational(a) land irrational(b) land rational(power(a, b)) [exists intro with a = b = sqrt(2)]
         case irrational(power(sqrt(2), sqrt(2))):
           power(power(sqrt(2), sqrt(2)), sqrt(2)) = power(sqrt(2), sqrt(2) * sqrt(2)) [exponent law]
           power(sqrt(2), sqrt(2) * sqrt(2)) = power(sqrt(2), 2) [arithmetic]
           power(sqrt(2), 2) = 2 [simplification]
           rational(2) [known]
-          irrational(power(sqrt(2), sqrt(2))) and irrational(sqrt(2)) and rational(power(power(sqrt(2), sqrt(2)), sqrt(2))) [and intro]
-          exists a, b | irrational(a) and irrational(b) and rational(power(a, b)) [exists intro]
+          irrational(power(sqrt(2), sqrt(2))) land irrational(sqrt(2)) land rational(power(power(sqrt(2), sqrt(2)), sqrt(2))) [land intro]
+          exists a, b | irrational(a) land irrational(b) land rational(power(a, b)) [exists intro]
 
 TEXT: Non-constructive: we don't know which case is true, but both lead to the conclusion.
 
@@ -163,12 +163,12 @@ TEXT: Inductive step (assume for all k < n, prove for n):
 PROOF:
 (n >= 2) => prime_factorization(n) [=> intro from 1]
   [1] n >= 2 [assumption]
-      prime(n) or composite(n) [dichotomy]
+      prime(n) lor composite(n) [dichotomy]
       prime_factorization(n) [or elim]
         case prime(n):
           prime_factorization(n) [trivial, singleton factorization]
         case composite(n):
-          exists a, b | 2 <= a and a < n and 2 <= b and b < n and n = a * b [definition of composite]
+          exists a, b | 2 <= a land a < n land 2 <= b land b < n land n = a * b [definition of composite]
           prime_factorization(a) [strong IH, a < n]
           prime_factorization(b) [strong IH, b < n]
           prime_factorization(a * b) [multiplication of factorizations]
@@ -195,11 +195,11 @@ TEXT: Main theorem: If n^2 is odd, then n is odd
 PROOF:
 odd(power(n, 2)) => odd(n) [=> intro from 1]
   [1] odd(power(n, 2)) [assumption]
-      even(n) or odd(n) [dichotomy]
+      even(n) lor odd(n) [dichotomy]
       odd(n) [or elim]
         case even(n):
           even(power(n, 2)) [Lemma 1]
-          odd(power(n, 2)) and even(power(n, 2)) [contradiction]
+          odd(power(n, 2)) land even(power(n, 2)) [contradiction]
           false [contradiction]
           odd(n) [false elim]
         case odd(n):
@@ -214,21 +214,21 @@ TEXT: Prove: All natural numbers n ≥ 1 satisfy P(n)
 PROOF:
 true => (forall n | n >= 1 => P(n)) [=> intro from 1]
   [1] true [assumption]
-      (forall n | n >= 1 => P(n)) [not intro from 2]
-        [2] not (forall n | n >= 1 => P(n)) [assumption]
-            exists n | n >= 1 and not P(n) [negation of forall]
+      (forall n | n >= 1 => P(n)) [lnot intro from 2]
+        [2] lnot (forall n | n >= 1 => P(n)) [assumption]
+            exists n | n >= 1 land lnot P(n) [negation of forall]
             smallest_counterexample(m) [well-ordering principle]
-            m >= 1 and not P(m) [by choice of m]
+            m >= 1 land lnot P(m) [by choice of m]
             false [or elim]
               case m = 1:
                 P(1) [base case proved separately]
-                not P(m) and P(1) [contradiction]
+                lnot P(m) land P(1) [contradiction]
                 false [contradiction]
               case m > 1:
-                forall k | k >= 1 and k < m => P(k) [minimality of m]
+                forall k | k >= 1 land k < m => P(k) [minimality of m]
                 P(m - 1) [since m - 1 >= 1 and m - 1 < m]
                 P(m) [by inductive step from P(m - 1)]
-                not P(m) and P(m) [contradiction]
+                lnot P(m) land P(m) [contradiction]
                 false [contradiction]
 
 TEXT: Minimal counterexample combines well-ordering with contradiction.
@@ -247,10 +247,10 @@ initial_state => invariant(initial_state) [=> intro from 1]
 TEXT: Preservation:
 
 PROOF:
-(invariant(before_state) and executes_loop_body) => invariant(after_state) [=> intro from 1]
-  [1] invariant(before_state) and executes_loop_body [assumption]
-      invariant(before_state) [and elim 1]
-      executes_loop_body [and elim 2]
+(invariant(before_state) land executes_loop_body) => invariant(after_state) [=> intro from 1]
+  [1] invariant(before_state) land executes_loop_body [assumption]
+      invariant(before_state) [land elim 1]
+      executes_loop_body [land elim 2]
       invariant(after_state) [verification]
 
 TEXT: Termination:
@@ -259,7 +259,7 @@ PROOF:
 loop_terminates => desired_property [=> intro from 1]
   [1] loop_terminates [assumption]
       invariant(termination_state) [by preservation]
-      invariant(termination_state) and termination_condition [and intro]
+      invariant(termination_state) land termination_condition [land intro]
       desired_property [logic]
 
 ** Example 11: Proof by Diagonalization **
@@ -275,7 +275,7 @@ true => uncountable(reals) [=> intro from 1]
             diagonal_construction(r) [diagonal method]
             forall n | r /= apply(f, n) [by construction, differs at nth digit]
             not_in_range(r, f) [previous line]
-            not_in_range(r, f) and enumeration(f, reals) [contradiction]
+            not_in_range(r, f) land enumeration(f, reals) [contradiction]
             false [contradiction]
 
 TEXT: Cantor's diagonal argument (outline).
@@ -289,17 +289,17 @@ TEXT: 1. Explicitly construct a witness w
 TEXT: 2. Verify P(w) holds
 TEXT: 3. Conclude exists x | P(x) with x = w
 
-TEXT: Example: Prove exists n : N | n > 100 and n is even
+TEXT: Example: Prove exists n : N | n > 100 land n is even
 
 PROOF:
-true => (exists n | n > 100 and even(n)) [=> intro from 1]
+true => (exists n | n > 100 land even(n)) [=> intro from 1]
   [1] true [assumption]
       witness_construction(102) [construction]
       102 > 100 [arithmetic]
       102 = 2 * 51 [arithmetic]
       even(102) [definition]
-      102 > 100 and even(102) [and intro]
-      exists n | n > 100 and even(n) [exists intro with n = 102]
+      102 > 100 land even(102) [land intro]
+      exists n | n > 100 land even(n) [exists intro with n = 102]
 
 ** Example 13: Proof Composition **
 
@@ -312,14 +312,14 @@ TEXT: Overall strategy: Case analysis + Induction + Contradiction
 PROOF:
 true => (forall n | P(n)) [=> intro from 1]
   [1] true [assumption]
-      forall n | P(n) [or elim over cases]
+      forall n | P(n) [lor elim over cases]
         case base:
           P(base) [direct proof]
         case inductive:
-          P(n) [or elim over subcases]
+          P(n) [lor elim over subcases]
             case subcase_a:
-              P(n) [not intro from 2]
-                [2] not P(n) [assumption]
+              P(n) [lnot intro from 2]
+                [2] lnot P(n) [assumption]
                     contradiction_derived [proof steps]
                     false [contradiction]
             case subcase_b:
