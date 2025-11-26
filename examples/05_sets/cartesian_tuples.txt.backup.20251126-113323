@@ -11,7 +11,7 @@
 //   - Basic form: { x : N | x > 0 }
 //   - Expression form: { x : N | x > 0 . x^2 }
 //   - Multi-variable: { x, y : N | x = y }
-//   - No domain: { x | x elem A }
+//   - No domain: { x | x in A }
 //
 // See: docs/USER_GUIDE.md - Section "Sets and Types" > "Set Comprehension"
 // ============================================================================
@@ -33,7 +33,7 @@ TEXT: Multi variable set
 (c)
 TEXT: Set without domain
 
-{ x | x elem A }
+{ x | x in A }
 
 
 ** Example 2: Set by Expression **
@@ -46,7 +46,7 @@ TEXT: Set comprehension with expression part
 (b)
 TEXT: Combining set comprehension with quantifier
 
-forall x : N | x elem { y : N | y > 0 }
+forall x : N | x in { y : N | y > 0 }
 
 
 ** Example 3: Complex Examples **
@@ -59,4 +59,4 @@ TEXT: Set comprehension in equivalence
 (b)
 TEXT: Set comprehension with multiple conditions
 
-{ x : N | x > 0 land x <= 10 }
+{ x : N | x > 0 and x <= 10 }

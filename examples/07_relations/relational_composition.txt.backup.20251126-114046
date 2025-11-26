@@ -77,7 +77,7 @@ Type[N][M]
 
 (a)
 
-x elem Type[N]
+x in Type[N]
 
 (b)
 

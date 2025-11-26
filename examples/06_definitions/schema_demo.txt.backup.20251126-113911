@@ -1,0 +1,59 @@
+// ============================================================================
+// Example: Basic Schema Patterns
+// ============================================================================
+// Demonstrates:
+//   - Simple schema with single field
+//   - Schema with multiple fields
+//   - Schema with constraints in where clause
+//   - Schema without where clause
+//
+// Features:
+//   - schema Name ... end
+//   - Field declarations with types
+//   - where clause with predicates
+//   - Multiple constraints
+//
+// See: docs/USER_GUIDE.md - Section "Schema Notation"
+// ============================================================================
+
+=== Schema Examples ===
+
+** Example 1: Simple Schema **
+
+schema Counter
+  count : N
+where
+  count >= 0
+end
+
+** Example 2: Schema with Multiple Fields **
+
+schema Point
+  x : Z
+  y : Z
+end
+
+** Example 3: Schema with Constraints **
+
+schema BoundedPoint
+  x : N
+  y : N
+where
+  x <= 100
+  y <= 100
+end
+
+** Example 4: Schema with Given Types **
+
+zed
+  given Person
+end
+
+
+schema PersonData
+  name : Person
+  age : N
+where
+  age >= 0
+  age <= 150
+end

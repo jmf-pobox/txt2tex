@@ -4,7 +4,7 @@
 // Demonstrates:
 //   - Mu operator (μ) for unique values
 //   - Not equal operator (!=)
-//   - Not elem operator (notin)
+//   - Not in operator (notin)
 //   - Combining operators in predicates
 //
 // Features:
@@ -22,11 +22,11 @@
 
 (a)
 
-mu x : N | x^2 = 4 land x > 0
+mu x : N | x^2 = 4 and x > 0
 
 (b)
 
-mu x | x > 0 land x < 10
+mu x | x > 0 and x < 10
 
 ** Test 2: Not Equal Operator **
 
@@ -36,11 +36,11 @@ x != 0
 
 (b)
 
-x != 0 land y != 0
+x != 0 and y != 0
 
 (c)
 
-x != y lor y != z
+x != y or y != z
 
 ** Test 3: Not In Operator **
 
@@ -50,24 +50,24 @@ x notin S
 
 (b)
 
-x elem A land x notin B
+x in A and x notin B
 
 (c)
 
-x notin S <=> lnot (x elem S)
+x notin S <=> not (x in S)
 
 ** Test 4: One Point Rule **
 
 EQUIV:
-exists y : N | y = 0 land x != y
-<=> 0 elem N land x != 0
+exists y : N | y = 0 and x != y
+<=> 0 in N and x != 0
 <=> x != 0
 
 ** Test 5: Complex Reasoning **
 
 (a)
 
-mu x : N | x^2 = 9 land x != 3
+mu x : N | x^2 = 9 and x != 3
 
 (b)
 
@@ -75,18 +75,18 @@ forall x : N | exists y : N | x != y
 
 (c)
 
-(forall x : N | x elem S . x notin T)
+(forall x : N | x in S . x notin T)
 
 ** Test 6: Mixed Operators **
 
 (a)
 
-x = y lor x != y
+x = y or x != y
 
 (b)
 
-x elem A lor x notin A
+x in A or x notin A
 
 (c)
 
-mu x : N | x elem S land x != 0 land x^2 < 10
+mu x : N | x in S and x != 0 and x^2 < 10

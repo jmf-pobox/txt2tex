@@ -43,7 +43,7 @@ axdef
   maximum : N cross N -> N
 where
   forall a, b : N | add(a, b) = a + b
-  forall a, b : N | (maximum(a, b) = a lor maximum(a, b) = b) land maximum(a, b) >= a land maximum(a, b) >= b
+  forall a, b : N | (maximum(a, b) = a or maximum(a, b) = b) and maximum(a, b) >= a and maximum(a, b) >= b
 end
 
 ** Example 3: Generic functions **
@@ -65,7 +65,7 @@ end
 schema Heights
   height : Person -> N
 where
-  forall p : Person | height(p) > 0 land height(p) < 300
+  forall p : Person | height(p) > 0 and height(p) < 300
 end
 
 ** Example 6: Nested function application **

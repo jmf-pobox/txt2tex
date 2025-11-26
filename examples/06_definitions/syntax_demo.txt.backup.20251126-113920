@@ -1,0 +1,81 @@
+// ============================================================================
+// Example: Syntax Environment for Aligned Free Type Definitions
+// ============================================================================
+// Demonstrates the syntax environment for column-aligned free types
+// From ZED2E_ALIGNMENT_PLAN.md - Syntax environment
+//
+// Features:
+//   - Column-aligned layout with & separators
+//   - Single-line and multi-line definitions
+//   - Blank line grouping with \also
+//   - Parameterized constructors with angle brackets
+//
+// See: docs/guides/USER_GUIDE.md - Section "Definitions > Syntax Environment"
+//      docs/guides/ZED2E_ALIGNMENT_PLAN.md - Syntax environment specification
+// ============================================================================
+
+=== Syntax Environment Examples ===
+
+** Example 1: Simple Enumeration **
+
+TEXT: For simple free types with several branches, syntax provides
+TEXT: column-aligned layout:
+
+syntax
+  OP ::= plus | minus | times | divide
+end
+
+TEXT: This generates aligned columns with the ::= separator clearly visible.
+
+** Example 2: Parameterized Constructors **
+
+TEXT: Constructors can have type parameters using angle brackets:
+
+syntax
+  Tree ::= leaf<N> | branch<Tree cross Tree>
+end
+
+TEXT: Parameters are rendered with \ldata and \rdata delimiters in LaTeX.
+
+** Example 3: Multiple Definitions with Grouping **
+
+TEXT: Blank lines between definitions create visual groups using \textbackslash also:
+
+syntax
+  Status ::= active | inactive | pending
+
+  Response ::= ok | error<N> | timeout
+end
+
+TEXT: The blank line causes \also to be generated, creating vertical
+TEXT: separation between the two type definitions.
+
+** Example 4: Complex BNF-Style Definitions **
+
+TEXT: Syntax environment is ideal for BNF-style grammar definitions:
+
+syntax
+  Expr ::= const<N> | var<NAME> | binop<OP cross Expr cross Expr>
+
+  Stmt ::= assign<NAME cross Expr> | seq<Stmt cross Stmt> | skip
+end
+
+TEXT: This creates a professionally formatted grammar specification.
+
+** Comparison: Syntax vs Zed Blocks **
+
+TEXT: Standard zed blocks work for simple types:
+
+zed
+  Color ::= red | green | blue
+end
+
+TEXT: But syntax environment provides better alignment for complex types:
+
+syntax
+  Color ::= red | green | blue
+
+  Shape ::= circle<N> | rectangle<N cross N> | polygon<seq N>
+end
+
+TEXT: The column alignment makes the structure more readable.

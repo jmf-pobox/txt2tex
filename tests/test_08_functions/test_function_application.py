@@ -230,8 +230,8 @@ class TestPhase11bSpecialFunctions:
         assert result == "seq(\\mathbb{N}, \\mathbb{N})"
 
     def test_seq_in_expression(self):
-        """Test x in seq(N) (space, no tilde per fuzz manual)."""
-        result = generate_latex("x in seq(N)")
+        """Test x elem seq(N) (space, no tilde per fuzz manual)."""
+        result = generate_latex("x elem seq(N)")
         assert result == r"x \in \seq~\mathbb{N}"
 
 

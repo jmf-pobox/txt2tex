@@ -1,0 +1,57 @@
+// ============================================================================
+// Example: Composition Pipelines
+// ============================================================================
+// Demonstrates:
+//   - Multi-stage data processing pipelines
+//   - Composing multiple functions
+//
+// See: docs/USER_GUIDE.md - Section "Functions" > "Composition"
+//      examples/08_functions/function_composition.txt - Basic composition
+// ============================================================================
+
+=== Composition Pipelines ===
+
+** Example 1: Simple Three-Stage Pipeline **
+
+TEXT: A three-stage numeric processing pipeline.
+
+axdef
+  addOne : N -> N
+  double : N -> N
+  square : N -> N
+  pipeline : N -> N
+where
+  forall n : N | addOne(n) = n + 1
+  forall n : N | double(n) = 2 * n
+  forall n : N | square(n) = n * n
+  pipeline = square comp double comp addOne
+end
+
+TEXT: pipeline(3) = square(double(addOne(3))) = square(double(4)) = square(8) = 64
+
+** Example 2: String Pipeline **
+
+zed
+  given Char
+end
+
+
+axdef
+  str1 : seq Char -> seq Char
+  str2 : seq Char -> seq Char
+  str3 : seq Char -> seq Char
+  stringPipeline : seq Char -> seq Char
+where
+  stringPipeline = str3 comp str2 comp str1
+end
+
+TEXT: Demonstrates composition of string-processing functions.
+
+** Example 3: Best Practices **
+
+TEXT: When building pipelines:
+TEXT: 1. Break complex operations into simple stages
+TEXT: 2. Each stage should have a single responsibility
+TEXT: 3. Test individual functions before composing
+TEXT: 4. Use meaningful names for pipeline stages
+TEXT: 5. Document the flow direction (comp applies right-to-left)

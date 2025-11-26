@@ -136,7 +136,7 @@ end""")
 
     def test_set_membership(self) -> None:
         """Test zed block with set membership predicate."""
-        lexer = Lexer("zed x in {1, 2, 3} end")
+        lexer = Lexer("zed x elem {1, 2, 3} end")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
@@ -144,7 +144,7 @@ end""")
         zed_block = ast.items[0]
         assert isinstance(zed_block, Zed)
         assert isinstance(zed_block.content, BinaryOp)
-        assert zed_block.content.operator == "in"
+        assert zed_block.content.operator == "elem"
 
 
 class TestZedBlockLaTeXGeneration:
@@ -200,7 +200,7 @@ class TestZedBlockLaTeXGeneration:
 
     def test_complex_predicate_latex(self) -> None:
         """Test LaTeX generation for complex predicate."""
-        lexer = Lexer("zed x in S and y notin T => x <> y end")
+        lexer = Lexer("zed x elem S and y notin T => x <> y end")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()

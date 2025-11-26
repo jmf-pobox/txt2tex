@@ -1,0 +1,79 @@
+// ============================================================================
+// Example: Partial Function Type Operators
+// ============================================================================
+// Demonstrates:
+//   - Partial injection operator (-|>, >+>)
+//   - Partial function operator (+->)
+//   - Function type declarations in axdef
+//   - Domain specification
+//
+// Features:
+//   - f : N -|> N [partial injection]
+//   - g : N +-> N [partial function]
+//   - dom(f) specification
+//   - Function value definitions
+//
+// See: docs/USER_GUIDE.md - Section "Functions" > "Function Types"
+// ============================================================================
+
+=== Phase 18 Demo: Partial Function Operators ===
+
+** Example 1: Partial injection operator **
+
+TEXT: Basic function type with partial injection (-|>) operator:
+
+axdef
+  f : N -|> N
+where
+  dom(f) = {1, 2, 3}
+  f(1) = 10
+  f(2) = 20
+  f(3) = 30
+end
+
+** Example 2: Partial function operator **
+
+TEXT: Basic function type with partial function (+->) operator:
+
+axdef
+  g : N +-> N
+where
+  dom(g) = {1, 2}
+  g(1) = 100
+  g(2) = 200
+end
+
+** Example 3: Complex types with partial injection **
+
+TEXT: Using partial injection (-|>) with custom types:
+
+zed
+  Year == N
+end
+
+
+zed
+  given Entry
+end
+
+
+zed
+  Table == seq(Entry)
+end
+
+
+axdef
+  records : Year -|> Table
+where
+  dom(records) = {1993, 1994, 1995}
+end
+
+** Example 4: Mixed function type operators **
+
+TEXT: Different function type operators:
+
+axdef
+  total : N -> N
+  partial : N +-> N
+  injection : N -|> N
+end

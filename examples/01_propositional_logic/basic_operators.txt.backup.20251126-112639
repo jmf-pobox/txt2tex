@@ -1,0 +1,43 @@
+// ============================================================================
+// Example: Basic Propositional Logic Operators
+// ============================================================================
+// Demonstrates:
+//   - Basic logical operators: and, or, not, =>, <=>
+//   - Truth table formatting
+//   - Simple propositions and equivalences
+//
+// Features:
+//   - TRUTH TABLE: block for truth tables
+//   - Operator precedence examples
+//   - Equivalence operator (<=>)
+//
+// See: docs/USER_GUIDE.md - Section "Propositional Logic"
+// ============================================================================
+
+=== Propositional Logic ===
+
+** Solution 1 **
+
+(a) p land q => p
+
+(b) TRUTH TABLE:
+p | q | p => q
+T | T | T
+T | F | F
+F | T | T
+F | F | T
+
+(c) lnot (p land q) <=> (lnot p) lor (lnot q)
+
+** Solution 2 **
+
+(a) (p lor q) land r <=> (p land r) lor (q land r)
+
+(b) TRUTH TABLE:
+p | q | p <=> q
+T | T | T
+T | F | F
+F | T | F
+F | F | T
+
+(c) p => q => r

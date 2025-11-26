@@ -1200,10 +1200,10 @@ class Lexer:
             return Token(TokenType.LAMBDA, value, start_line, start_column)
 
         # Check for set operators (Phase 3, enhanced in Phase 7, Phase 11.5)
-        # Support both English (in) and LaTeX-style (elem)
+        # Only accept "elem" for set membership (not "in" - see migration)
         if value == "notin":
             return Token(TokenType.NOTIN, value, start_line, start_column)
-        if value in ("in", "elem"):
+        if value == "elem":
             return Token(TokenType.IN, value, start_line, start_column)
         if value == "subset" or value == "subseteq":
             return Token(TokenType.SUBSET, value, start_line, start_column)
