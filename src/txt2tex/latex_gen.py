@@ -91,7 +91,8 @@ class LaTeXGenerator:
         # Sequent judgment
         "shows": r"\shows",  # Turnstile (⊢)
         # Set operators (Phase 3, enhanced in Phase 7, Phase 11.5)
-        "elem": r"\in",  # Set membership (replaces "in" after migration)
+        "in": r"\in",  # Set membership
+        "elem": r"\in",  # Alternative spelling for "in"
         "notin": r"\notin",
         "/in": r"\notin",  # Z notation slash negation (Phase 16+)
         "subset": r"\subseteq",
@@ -3188,9 +3189,11 @@ class LaTeXGenerator:
         # Order matters: replace longer operators first
         result = text.replace("<=>", r"\Leftrightarrow")
         result = result.replace("=>", r"\Rightarrow")
-        result = re.sub(r"\band\b", r"\\land", result)
-        result = re.sub(r"\bor\b", r"\\lor", result)
-        result = re.sub(r"\bnot\b", r"\\lnot", result)
+        # Support both English (and/or/not) and LaTeX-style (land/lor/lnot)
+        result = re.sub(r"\b(and|land)\b", r"\\land", result)
+        result = re.sub(r"\b(or|lor)\b", r"\\lor", result)
+        result = re.sub(r"\b(not|lnot)\b", r"\\lnot", result)
+        result = re.sub(r"\b(in|elem)\b", r"\\in", result)
         return result
 
     def _escape_latex(self, text: str) -> str:
