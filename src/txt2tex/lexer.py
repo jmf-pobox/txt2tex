@@ -1143,41 +1143,6 @@ class Lexer:
                             TokenType.TEXT, text_content, start_line, start_column
                         )
 
-        # Check for lowercase keywords at start of line that might be prose
-        # Examples: "where cat.1a is", "and the second by"
-        if start_column == 1 and value in ("where", "and"):
-            # Peek ahead to see if this line looks like prose
-            temp_pos = self.pos
-            line_rest = ""
-            while temp_pos < len(self.text) and self.text[temp_pos] != "\n":
-                line_rest += self.text[temp_pos]
-                temp_pos += 1
-
-            # If line contains prose indicators, treat whole line as TEXT
-            # Check for both " word " (middle of line) and " word" (end of line)
-            full_line = value + line_rest
-            prose_indicators = [
-                " is ",
-                " is",
-                " by ",
-                " by",
-                " are ",
-                " are",
-                " was ",
-                " was",
-                " were ",
-                " were",
-            ]
-            if any(indicator in full_line for indicator in prose_indicators):
-                # This is prose, not Z notation
-                text_start = start_pos
-
-                while not self._at_end() and self._current_char() != "\n":
-                    self._advance()
-
-                text_content = self.text[text_start : self.pos]
-                return Token(TokenType.TEXT, text_content, start_line, start_column)
-
         # Check for keywords (propositional logic)
         # Only LaTeX-style keywords supported: land, lor, lnot
         if value == "land":
