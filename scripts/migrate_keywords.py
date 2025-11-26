@@ -278,7 +278,12 @@ JSON response:"""
         with open(file_path, encoding="utf-8") as f:
             lines = f.readlines()
 
+        total_lines = len(lines)
+        print(f"\nAnalyzing {total_lines} lines...")
+        print("(Progress updates every 50 lines or when keywords found)\n")
+
         results: list[LineAnalysis] = []
+        keywords_found = 0
 
         for i, line in enumerate(lines):
             line_number = i + 1
@@ -286,10 +291,32 @@ JSON response:"""
             prev_line = lines[i - 1].rstrip("\n") if i > 0 else None
             next_line = lines[i + 1].rstrip("\n") if i < len(lines) - 1 else None
 
+            # Progress reporting every 50 lines
+            if line_number % 50 == 0:
+                pct = (line_number / total_lines) * 100
+                print(
+                    f"Progress: {line_number}/{total_lines} lines ({pct:.0f}%), "
+                    f"{keywords_found} keywords analyzed"
+                )
+
             analysis = self.analyze_line(
                 line_number, current_line, prev_line, next_line
             )
+
+            # Report when keywords found
+            if analysis.occurrences:
+                keywords_found += len(analysis.occurrences)
+                keyword_str = ", ".join(
+                    f'"{o.keyword}"@{o.position}' for o in analysis.occurrences
+                )
+                print(f"  Line {line_number}: Found {keyword_str}")
+
             results.append(analysis)
+
+        print(
+            f"\nAnalysis complete: {total_lines} lines, "
+            f"{keywords_found} total keywords\n"
+        )
 
         return results
 
