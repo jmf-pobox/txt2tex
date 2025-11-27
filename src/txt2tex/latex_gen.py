@@ -291,6 +291,17 @@ class LaTeXGenerator:
         op_superscript = {"+": "^{+}", "*": "^{*}", "~": "^{-1}"}
         return f"{operand}{op_superscript[operator]}"
 
+    def _format_multiword_identifier(self, name: str) -> str:
+        """Format a multi-word identifier with underscores.
+
+        For fuzz: just escape underscores (name\\_with\\_underscores)
+        For standard LaTeX: escape and wrap in \\mathit{...}
+        """
+        escaped = name.replace("_", r"\_")
+        if self.use_fuzz:
+            return escaped
+        return rf"\mathit{{{escaped}}}"
+
     def _generate_document_items_with_consolidation(
         self, items: list[DocumentItem]
     ) -> list[str]:
@@ -683,12 +694,7 @@ class LaTeXGenerator:
 
         # Multiple underscores → multi-word identifier
         if len(parts) > 2:
-            escaped = name.replace("_", r"\_")
-            # Fuzz: escape but no mathit wrapper
-            if self.use_fuzz:
-                return escaped
-            # Standard LaTeX: escape and wrap in mathit
-            return rf"\mathit{{{escaped}}}"
+            return self._format_multiword_identifier(name)
 
         # Single underscore: prioritize suffix length for subscript detection
         if len(parts) == 2:
@@ -717,16 +723,10 @@ class LaTeXGenerator:
                 return f"{prefix}_{{{suffix}}}"
             # Priority 3: Long suffix → multi-word identifier (e.g., cumulative_total)
             else:  # len(suffix) >= 3
-                escaped = name.replace("_", r"\_")
-                # Fuzz: escape but no mathit wrapper
-                if self.use_fuzz:
-                    return escaped
-                # Standard LaTeX: escape and wrap in mathit
-                return rf"\mathit{{{escaped}}}"
+                return self._format_multiword_identifier(name)
 
-        # Fallback: escape and use mathit
-        escaped = name.replace("_", r"\_")
-        return rf"\mathit{{{escaped}}}"
+        # Fallback: multi-word identifier
+        return self._format_multiword_identifier(name)
 
     @generate_expr.register(Number)
     def _generate_number(self, node: Number, parent: Expr | None = None) -> str:
