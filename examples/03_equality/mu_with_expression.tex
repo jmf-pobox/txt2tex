@@ -140,8 +140,9 @@ Configuration Values}
   parseValue : ConfigValue \fun \nat
   \where
   \forall k : ConfigKey @ \\
-  \t1 k(in)(\dom configs) \implies \\
-  \t1 getConfigInt(k) = (\mu v : \nat | parseValue(configs(k)) = v)
+  \t1 k \\
+  in(\dom configs) \implies \\
+  \quad getConfigInt(k) = (\mu v : \nat | parseValue(configs(k)) = v)
 \end{axdef}
 
 \noindent Finds the unique N value by parsing a configuration value.
@@ -154,9 +155,9 @@ Configuration Values}
 \begin{axdef}
   getConfigWithDefault : ConfigKey \cross \nat \fun \nat
   \where
-  \forall k : ConfigKey @ \forall default : \nat @ k(in)(\dom
-  configs) \implies \\
-  \t2 getConfigWithDefault(k, default) = (\mu v : \nat |
+  \forall k : ConfigKey @ \forall default : \nat @ k \\
+  in(\dom configs) \implies \\
+  \quad getConfigWithDefault(k, default) = (\mu v : \nat |
   parseValue(configs(k)) = v) \\
   \forall k : ConfigKey @ \forall default : \nat @ k \notin \dom
   configs \implies \\
@@ -234,8 +235,7 @@ undefined (evaluation error).
 
 \bigskip
 
-\noindent $(\mu x : \nat | x * x =
--(1(no(natural)(number)(has)(negative)(square))))$
+\noindent $(\mu x : \nat | x * x = -1)$(no natural number has negative square)
 
 \bigskip
 

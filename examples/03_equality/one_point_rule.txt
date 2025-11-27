@@ -42,13 +42,13 @@ TEXT: The final equivalence holds because 0 in N, 4 - 0 in N, and 0 < 4.
 EQUIV:
 exists x : N | (x = 1 land x > y) lor (x = 2 land x > z)
 <=> (exists x : N | x = 1 land x > y) lor (exists x : N | x = 2 land x > z)
-<=> (1 in N land 1 > y) lor (exists x : N | x = 2 land x > z)
-<=> (1 in N land 1 > y) lor (2 in N land 2 > z)
+<=> (1 elem N land 1 > y) lor (exists x : N | x = 2 land x > z)
+<=> (1 elem N land 1 > y) lor (2 elem N land 2 > z)
 <=> 1 > y lor 2 > z
 
 ** Example 4: One-Point with Expression Part **
 
 EQUIV:
 exists y : N | y = x + 1 land y > 0
-<=> x + 1 in N land x + 1 > 0 [one-point rule]
+<=> x + 1 elem N land x + 1 > 0 [one-point rule]
 <=> x + 1 > 0
