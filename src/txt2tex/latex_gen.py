@@ -270,6 +270,27 @@ class LaTeXGenerator:
             return type_map_fuzz[name] if self.use_fuzz else type_map_std[name]
         return None
 
+    def _get_closure_operator_latex(self, operator: str, operand: str) -> str:
+        """Return LaTeX for closure/inverse operators (+, *, ~).
+
+        Args:
+            operator: One of '+', '*', '~'
+            operand: The operand LaTeX string
+
+        Returns:
+            Formatted LaTeX with appropriate operator for fuzz/standard mode.
+        """
+        if self.use_fuzz:
+            if operator == "+":
+                return rf"{operand} \plus"
+            if operator == "*":
+                return rf"{operand} \star"
+            # ~ inverse uses ^{\sim} in fuzz mode
+            return rf"{operand}^{{\sim}}"
+        # Standard LaTeX: superscript notation
+        op_superscript = {"+": "^{+}", "*": "^{*}", "~": "^{-1}"}
+        return f"{operand}{op_superscript[operator]}"
+
     def _generate_document_items_with_consolidation(
         self, items: list[DocumentItem]
     ) -> list[str]:
