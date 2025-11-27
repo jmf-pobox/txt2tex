@@ -73,6 +73,20 @@ KEYWORD_ALIASES: dict[str, TokenType] = {
     "subseteq": TokenType.SUBSET,
 }
 
+# Single-character tokens that don't require lookahead.
+# These can be dispatched directly without peek checks.
+# Note: Characters like (, [, {, |, ., :, +, -, *, = require lookahead
+# for multi-character operators, so they stay as if-statements.
+SINGLE_CHAR_TOKENS: dict[str, TokenType] = {
+    ")": TokenType.RPAREN,
+    "]": TokenType.RBRACKET,
+    "}": TokenType.RBRACE,
+    ",": TokenType.COMMA,
+    ";": TokenType.SEMICOLON,
+    "#": TokenType.HASH,
+    "~": TokenType.TILDE,
+}
+
 
 class LexerError(Exception):
     """Raised when lexer encounters invalid input."""
@@ -229,6 +243,12 @@ class Lexer:
             self._advance()
             return Token(TokenType.NEWLINE, "\n", start_line, start_column)
 
+        # Single-character token dispatch (no lookahead needed)
+        # This replaces individual if-statements for ), ], }, ,, ;, #, ~
+        if char in SINGLE_CHAR_TOKENS:
+            self._advance()
+            return Token(SINGLE_CHAR_TOKENS[char], char, start_line, start_column)
+
         # Section marker: ===
         if char == "=" and self._peek_char() == "=" and self._peek_char(2) == "=":
             self._advance()
@@ -323,10 +343,6 @@ class Lexer:
             self._advance()
             return Token(TokenType.LPAREN, "(", start_line, start_column)
 
-        if char == ")":
-            self._advance()
-            return Token(TokenType.RPAREN, ")", start_line, start_column)
-
         # Brackets (for justifications in Phase 2)
         # Note: Bag literals [[...]] are handled at parser level, not lexer level
         # to avoid conflicts with nested brackets like Type[List[N]]
@@ -334,18 +350,10 @@ class Lexer:
             self._advance()
             return Token(TokenType.LBRACKET, "[", start_line, start_column)
 
-        if char == "]":
-            self._advance()
-            return Token(TokenType.RBRACKET, "]", start_line, start_column)
-
         # Braces (for grouping subscripts/superscripts in Phase 3)
         if char == "{":
             self._advance()
             return Token(TokenType.LBRACE, "{", start_line, start_column)
-
-        if char == "}":
-            self._advance()
-            return Token(TokenType.RBRACE, "}", start_line, start_column)
 
         # Maplet operator: |-> (Phase 10a) - check before | alone
         if char == "|" and self._peek_char() == "-" and self._peek_char(2) == ">":
@@ -377,11 +385,6 @@ class Lexer:
         if char == "|":
             self._advance()
             return Token(TokenType.PIPE, "|", start_line, start_column)
-
-        # Comma (for multi-variable quantifiers in Phase 6)
-        if char == ",":
-            self._advance()
-            return Token(TokenType.COMMA, ",", start_line, start_column)
 
         # Ellipsis ... (Phase 2.2) - check before range operator
         if char == "." and self._peek_char() == "." and self._peek_char(2) == ".":
@@ -418,11 +421,6 @@ class Lexer:
         if char == ":":
             self._advance()
             return Token(TokenType.COLON, ":", start_line, start_column)
-
-        # Semicolon (for relational composition in Phase 10a)
-        if char == ";":
-            self._advance()
-            return Token(TokenType.SEMICOLON, ";", start_line, start_column)
 
         # Comparison operators (Phase 3)
         # Check <= and >= before < and >
@@ -589,16 +587,6 @@ class Lexer:
             # No space → exponentiation
             self._advance()
             return Token(TokenType.CARET, "^", start_line, start_column)
-
-        # Cardinality operator (Phase 8)
-        if char == "#":
-            self._advance()
-            return Token(TokenType.HASH, "#", start_line, start_column)
-
-        # Postfix relation operators (Phase 10b)
-        if char == "~":
-            self._advance()
-            return Token(TokenType.TILDE, "~", start_line, start_column)
 
         # Function type operators starting with + (Phase 11a)
         # Check 4-character first: +->>

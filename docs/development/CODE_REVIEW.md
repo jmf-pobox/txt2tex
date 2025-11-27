@@ -102,7 +102,7 @@ Run `hatch run complexity` to get current metrics. Average complexity: C (19.8).
 
 | Method | CC | File:Line | Reduction Strategy |
 |--------|----|-----------|--------------------|
-| `Lexer._scan_token` | 172 | lexer.py:138 | Extract token-type handlers into separate methods; use dispatch table keyed by first character |
+| `Lexer._scan_token` | 166 | lexer.py:221 | ~~Extract simple tokens~~ (done); extract multi-char operator groups by first character |
 | `Lexer._scan_identifier` | 97 | lexer.py:812 | ~~Extract keyword lookup~~ (done); extract multi-word/colon keywords; extract prose detection |
 | `LaTeXGenerator._process_inline_math` | 69 | latex_gen.py:2470 | Extract pattern-matching phases into separate methods (sequences, operators, brackets); chain transformations |
 | `Parser._parse_postfix` | 41 | parser.py:2468 | Extract each postfix operator (function app, projection, indexing) into dedicated `_parse_*_postfix` methods |
@@ -133,7 +133,7 @@ Run `hatch run complexity` to get current metrics. Average complexity: C (19.8).
 
 #### Refactoring Priority
 
-1. **Lexer methods** (CC 172, 97): Highest impact - these dwarf all others. Use dispatch tables and extract character-class handlers.
+1. **Lexer methods** (CC 166, 97): Highest impact - Phase 1 & 2 done; continue with multi-char operators and prose detection.
 2. **`_process_inline_math`** (CC 69): Complex text transformation. Decompose into pipeline stages.
 3. **`_parse_postfix`** (CC 41): Operator-specific handlers reduce branching.
 4. **Proof/syntax methods** (CC 31-37): Extract formatting helpers.
@@ -165,6 +165,27 @@ This section tracks phased complexity reduction work.
 - Extract prose detection logic into separate method
 - Extract A/An article handling
 
+#### Phase 2: Single-Char Token Dispatch (Complete)
+
+**Branch**: `refactor/lexer-token-dispatch`
+**Date**: 2025-11-27
+**Status**: ✅ Complete
+
+**Changes**:
+- Added `SINGLE_CHAR_TOKENS` dictionary (7 tokens: `)`, `]`, `}`, `,`, `;`, `#`, `~`)
+- Replaced 7 individual if-statements with single dictionary lookup in `_scan_token`
+
+**Results**:
+| Method | Before | After | Reduction |
+|--------|--------|-------|-----------|
+| `Lexer._scan_token` | F (172) | F (166) | -6 |
+| Average complexity | 19.1 | 19.0 | -0.1 |
+
+**Remaining work for `_scan_token`** (CC 166):
+- Many characters require lookahead for multi-char operators (not easily dispatchable)
+- Context-sensitive tokens (`<`, `>`, `^`) need special handling
+- Consider grouping multi-char operator handlers by first character
+
 ### Complex Nested Conditionals
 
 Location: Tuple/field projection parsing and ambiguity handling in `parser.py` has deep nesting and multiple early breaks.
@@ -195,7 +216,7 @@ Recommendation:
 ### Recommendations Summary (Prioritized)
 
 High priority:
-1. **Reduce lexer complexity** (CC 172, 143): Extract token handlers into dispatch tables; split `_scan_identifier` into keyword lookup + character classification helpers
+1. **Reduce lexer complexity** (CC 166, 97): ~~Extract keyword lookup~~ (done); ~~extract simple tokens~~ (done); continue extracting multi-char operators and prose detection
 2. **Reduce `_process_inline_math` complexity** (CC 69): Decompose into pipeline stages for different transformation patterns
 3. Split large files into cohesive modules with re-export shims; no behavior changes
 4. Replace isinstance dispatch with singledispatch/registry; reuse existing generators
