@@ -259,6 +259,17 @@ class LaTeXGenerator:
         """Return mid separator: | for fuzz, \\mid for standard LaTeX."""
         return "|" if self.use_fuzz else r"\mid"
 
+    def _get_type_latex(self, name: str) -> str | None:
+        """Return LaTeX for mathematical type names (N, Z, N1).
+
+        Returns None if name is not a known type name.
+        """
+        type_map_fuzz = {"Z": r"\num", "N": r"\nat", "N1": r"\nat_1"}
+        type_map_std = {"Z": r"\mathbb{Z}", "N": r"\mathbb{N}", "N1": r"\mathbb{N}_1"}
+        if name in type_map_fuzz:
+            return type_map_fuzz[name] if self.use_fuzz else type_map_std[name]
+        return None
+
     def _generate_document_items_with_consolidation(
         self, items: list[DocumentItem]
     ) -> list[str]:
@@ -639,16 +650,9 @@ class LaTeXGenerator:
         # Mathematical type names: use blackboard bold (or fuzz built-in types)
         # N = naturals, Z = integers, N1 = positive integers (≥ 1)
         # Only convert N and Z, not Q/R/C which are commonly used as variables
-        if name == "Z":
-            # Fuzz uses \num for integers, LaTeX uses \mathbb{Z}
-            return r"\num" if self.use_fuzz else r"\mathbb{Z}"
-        if name == "N":
-            # Fuzz uses \nat for naturals, LaTeX uses \mathbb{N}
-            return r"\nat" if self.use_fuzz else r"\mathbb{N}"
-        if name == "N1":
-            # N1 = positive integers {1, 2, 3, ...}
-            # Render with subscript like exists1 → \exists_1
-            return r"\nat_1" if self.use_fuzz else r"\mathbb{N}_1"
+        type_latex = self._get_type_latex(name)
+        if type_latex is not None:
+            return type_latex
 
         # No underscore: return as-is
         if "_" not in name:

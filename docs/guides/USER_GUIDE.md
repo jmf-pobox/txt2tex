@@ -458,11 +458,11 @@ Generates: $\mu x : \mathbb{N} \bullet x > 0$
 ### Set Membership
 
 ```
-x in A  (or: x elem A)   →  x ∈ A       ['is an element of']
-x notin B                →  x ∉ B       ['not an element of']
+x elem A         →  x ∈ A       ['is an element of']
+x notin B        →  x ∉ B       ['not an element of']
 ```
 
-**Note:** Both `in` and `elem` are supported for set membership - use whichever form you prefer.
+**Note:** Use `elem` for set membership. The `in` keyword was deprecated in favor of `elem` to avoid ambiguity with English prose.
 
 ### Set Relations
 
