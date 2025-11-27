@@ -35,7 +35,7 @@ TEXT: Without the bullet, the set contains the values that satisfy the predicate
 
 TEXT: This is the set {1, 2, 3, 4, 5, 6, 7, 8, 9}. No transformation is applied.
 
-** Example 3: Comparing With and Without Bullet **
+** Example 3: Comparing With land Without Bullet **
 
 TEXT: With bullet (maps/transforms values):
 

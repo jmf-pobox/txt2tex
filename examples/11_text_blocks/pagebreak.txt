@@ -60,7 +60,7 @@ TEXT: Third solution content here.
 
 TEXT: Content for section 1 covering propositional logic operators and truth tables.
 
-p and q => p
+p land q => p
 
 TEXT: More content for section 1.
 
@@ -81,10 +81,10 @@ TEXT: For lengthy proofs, you might want to start each major proof on a new page
 ** Theorem 1 **
 
 PROOF:
-(p and (p => q)) => q [=> intro from 1]
-  [1] p and (p => q) [assumption]
-      :: p [and elim 1]
-      :: p => q [and elim 2]
+(p land (p => q)) => q [=> intro from 1]
+  [1] p land (p => q) [assumption]
+      :: p [land elim 1]
+      :: p => q [land elim 2]
       q [=> elim]
 
 TEXT: End of proof for Theorem 1.
@@ -94,11 +94,11 @@ PAGEBREAK
 ** Theorem 2 **
 
 PROOF:
-(p or q) and (not q) => p [=> intro from 1]
-  [1] (p or q) and (not q) [assumption]
-      p or q [and elim 1]
-      not q [and elim 2]
-      p [or elim]
+(p lor q) land (lnot q) => p [=> intro from 1]
+  [1] (p lor q) land (lnot q) [assumption]
+      p lor q [land elim 1]
+      lnot q [land elim 2]
+      p [lor elim]
 
 TEXT: End of proof for Theorem 2.
 

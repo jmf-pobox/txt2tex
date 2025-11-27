@@ -21,47 +21,47 @@
 ** Example 1: Simple Implication **
 
 PROOF:
-p and q => q [=> intro from 1]
-  [1] p and q [assumption]
-      q [and elim 2]
+p land q => q [=> intro from 1]
+  [1] p land q [assumption]
+      q [land elim 2]
 
 ** Example 2: With Sibling Premises **
 
 PROOF:
-p and (p => q) => (p and q) [=> intro from 1]
-  [1] p and (p => q) [assumption]
-      :: p [and elim 1]
-      :: p => q [and elim 2]
+p land (p => q) => (p land q) [=> intro from 1]
+  [1] p land (p => q) [assumption]
+      :: p [land elim 1]
+      :: p => q [land elim 2]
       q [=> elim]
-      p and q [and intro]
+      p land q [land intro]
 
 ** Example 3: Distribution with Cases **
 
 PROOF:
-p and (q or r) => (p and q) or (p and r) [=> intro from 1]
-  [1] p and (q or r) [assumption]
-      p [and elim 1]
-      q or r [and elim 2]
-      (p and q) or (p and r) [or elim]
+p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
+  [1] p land (q lor r) [assumption]
+      p [land elim 1]
+      q lor r [land elim 2]
+      (p land q) lor (p land r) [lor elim]
         case q:
           :: p [from above]
           :: q [from case]
-          p and q [and intro]
-          (p and q) or (p and r) [or intro 1]
+          p land q [land intro]
+          (p land q) lor (p land r) [lor intro 1]
         case r:
           :: p [from above]
           :: r [from case]
-          p and r [and intro]
-          (p and q) or (p and r) [or intro 2]
+          p land r [land intro]
+          (p land q) lor (p land r) [lor intro 2]
 
 ** Example 4: Modus Tollens **
 
 PROOF:
-(p => q) and not q => not p [=> intro from 1]
-  [1] (p => q) and not q [assumption]
-      :: p => q [and elim 1]
-      :: not q [and elim 2]
-      not p [negation intro from 2]
+(p => q) land lnot q => lnot p [=> intro from 1]
+  [1] (p => q) land lnot q [assumption]
+      :: p => q [land elim 1]
+      :: lnot q [land elim 2]
+      lnot p [negation intro from 2]
         [2] p [assumption]
             q [=> elim]
             false [contradiction]
@@ -69,14 +69,14 @@ PROOF:
 ** Example 5: Solution 18 Implication to Disjunction **
 
 PROOF:
-(p => q) => (not p or q) [=> intro from 1]
+(p => q) => (lnot p lor q) [=> intro from 1]
   [1] p => q [assumption]
-      :: p or not p [excluded middle]
-      :: not p or q [or elim from 2]
+      :: p lor lnot p [excluded middle]
+      :: lnot p lor q [lor elim from 2]
         case p:
           [2] p [assumption]
           q [=> elim]
-          not p or q [or intro 2]
-        case not p:
-          [2] not p [assumption]
-          not p or q [or intro 1]
+          lnot p lor q [lor intro 2]
+        case lnot p:
+          [2] lnot p [assumption]
+          lnot p lor q [lor intro 1]

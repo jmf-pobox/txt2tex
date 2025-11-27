@@ -27,8 +27,8 @@ PROOF:
 (lnot p land (q land lnot q)) => p [=> intro from 1]
   [1] lnot p land (q land lnot q) [assumption]
       q land lnot q [land elim 2]
-      q [and elim 1]
-      lnot q [and elim 2]
+      q [land elim 1]
+      lnot q [land elim 2]
       false [contradiction]
       p [false elim]
 
@@ -42,7 +42,7 @@ PROOF:
 (p land lnot p) => q [=> intro from 1]
   [1] p land lnot p [assumption]
       p [land elim 1]
-      lnot p [and elim 2]
+      lnot p [land elim 2]
       false [contradiction]
       q [false elim]
 
@@ -79,7 +79,7 @@ TEXT: Prove: (p => q) land lnot q => lnot p
 PROOF:
 ((p => q) land lnot q) => lnot p [=> intro from 1]
   [1] (p => q) land lnot q [assumption]
-      p => q [and elim 1]
+      p => q [land elim 1]
       lnot q [land elim 2]
       [2] p [assumption]
           q [=> elim]
@@ -108,7 +108,7 @@ TEXT: Prove: lnot lnot p => p (requires classical logic)
 
 PROOF:
 lnot lnot p => lnot lnot lnot p [=> intro from 1]
-  [1] not not p [assumption]
+  [1] lnot lnot p [assumption]
       lnot lnot lnot p [lnot intro from 2]
         [2] lnot p [assumption]
             false [contradiction]
@@ -140,7 +140,7 @@ TEXT: Prove: (forall x | P(x)) land (exists x | lnot P(x)) is contradictory.
 PROOF:
 ((forall x | P(x)) land (exists x | lnot P(x))) => false [=> intro from 1]
   [1] (forall x | P(x)) land (exists x | lnot P(x)) [assumption]
-      forall x | P(x) [and elim 1]
+      forall x | P(x) [land elim 1]
       exists x | lnot P(x) [land elim 2]
       lnot P(a) [exists elim, fresh a]
       P(a) [forall elim]
@@ -155,7 +155,7 @@ TEXT: Prove: if f is injective, then f(x) = f(y) => x = y.
 PROOF:
 (injective(f) land f(x) = f(y)) => x = y [=> intro from 1]
   [1] injective(f) land f(x) = f(y) [assumption]
-      injective(f) [and elim 1]
+      injective(f) [land elim 1]
       f(x) = f(y) [land elim 2]
       x = y [lnot intro from 2]
         [2] x /= y [assumption]
@@ -171,9 +171,9 @@ TEXT: Prove: p lor q, lnot p, lnot q => false
 PROOF:
 ((p lor q) land lnot p land lnot q) => false [=> intro from 1]
   [1] (p lor q) land lnot p land lnot q [assumption]
-      p lor q [and elim 1]
-      lnot p [and elim 2]
-      lnot q [and elim 3]
+      p lor q [land elim 1]
+      lnot p [land elim 2]
+      lnot q [land elim 3]
       false [lor elim from p lor q]
         case p:
           false [contradiction with lnot p]

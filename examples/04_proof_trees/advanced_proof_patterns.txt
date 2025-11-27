@@ -37,11 +37,11 @@ TEXT: Prove: (p lor q) land (r lor s) => (p land r) lor (p land s) lor (q land r
 PROOF:
 ((p lor q) land (r lor s)) => (p land r) lor (p land s) lor (q land r) lor (q land s) [=> intro from 1]
   [1] (p lor q) land (r lor s) [assumption]
-      p lor q [and elim 1]
+      p lor q [land elim 1]
       r lor s [land elim 2]
       (p land r) lor (p land s) lor (q land r) lor (q land s) [lor elim on p lor q]
         case p:
-          (p land r) or (p land s) or (q land r) or (q land s) [or elim on r or s]
+          (p land r) lor (p land s) lor (q land r) lor (q land s) [lor elim on r lor s]
             case r:
               p land r [land intro]
               (p land r) lor (p land s) lor (q land r) lor (q land s) [lor intro]
@@ -49,7 +49,7 @@ PROOF:
               p land s [land intro]
               (p land r) lor (p land s) lor (q land r) lor (q land s) [lor intro]
         case q:
-          (p land r) or (p land s) or (q land r) or (q land s) [or elim on r or s]
+          (p land r) lor (p land s) lor (q land r) lor (q land s) [lor elim on r lor s]
             case r:
               q land r [land intro]
               (p land r) lor (p land s) lor (q land r) lor (q land s) [lor intro]
@@ -59,7 +59,7 @@ PROOF:
 
 TEXT: Nested case analysis on two disjunctions, exploring all four combinations.
 
-** Example 3: Proof by Mathematical Induction (Base and Step) **
+** Example 3: Proof by Mathematical Induction (Base land Step) **
 
 TEXT: Prove: For all n ∈ ℕ, sum(1 to n) = n(n+1)/2
 
@@ -164,7 +164,7 @@ PROOF:
 (n >= 2) => prime_factorization(n) [=> intro from 1]
   [1] n >= 2 [assumption]
       prime(n) lor composite(n) [dichotomy]
-      prime_factorization(n) [or elim]
+      prime_factorization(n) [lor elim]
         case prime(n):
           prime_factorization(n) [trivial, singleton factorization]
         case composite(n):
@@ -196,7 +196,7 @@ PROOF:
 odd(power(n, 2)) => odd(n) [=> intro from 1]
   [1] odd(power(n, 2)) [assumption]
       even(n) lor odd(n) [dichotomy]
-      odd(n) [or elim]
+      odd(n) [lor elim]
         case even(n):
           even(power(n, 2)) [Lemma 1]
           odd(power(n, 2)) land even(power(n, 2)) [contradiction]
@@ -219,14 +219,14 @@ true => (forall n | n >= 1 => P(n)) [=> intro from 1]
             exists n | n >= 1 land lnot P(n) [negation of forall]
             smallest_counterexample(m) [well-ordering principle]
             m >= 1 land lnot P(m) [by choice of m]
-            false [or elim]
+            false [lor elim]
               case m = 1:
                 P(1) [base case proved separately]
                 lnot P(m) land P(1) [contradiction]
                 false [contradiction]
               case m > 1:
                 forall k | k >= 1 land k < m => P(k) [minimality of m]
-                P(m - 1) [since m - 1 >= 1 and m - 1 < m]
+                P(m - 1) [since m - 1 >= 1 land m - 1 < m]
                 P(m) [by inductive step from P(m - 1)]
                 lnot P(m) land P(m) [contradiction]
                 false [contradiction]
@@ -269,7 +269,7 @@ TEXT: Prove: The set of real numbers is uncountable
 PROOF:
 true => uncountable(reals) [=> intro from 1]
   [1] true [assumption]
-      uncountable(reals) [not intro from 2]
+      uncountable(reals) [lnot intro from 2]
         [2] countable(reals) [assumption]
             exists f | enumeration(f, reals) [definition of countable]
             diagonal_construction(r) [diagonal method]

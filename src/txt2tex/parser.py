@@ -1272,15 +1272,13 @@ class Parser:
     def _parse_or(self) -> Expr:
         """Parse or operation.
 
-        Phase 28: Multi-line support - allows natural line breaks without
-        continuation marker.
+        Supports multi-line expressions with natural line breaks.
         """
         left = self._parse_and()
 
         while self._match(TokenType.OR):
             op_token = self._advance()
-            # Phase 27: Check for continuation marker (\ at end of line)
-            # Phase 28: Also detect natural newlines for WYSIWYG output
+            # Detect line continuation (backslash or natural newline)
             has_continuation = False
             if self._match(TokenType.CONTINUATION):
                 self._advance()  # consume \
@@ -1311,16 +1309,14 @@ class Parser:
     def _parse_and(self) -> Expr:
         """Parse and operation.
 
-        Phase 21c: Allow quantifiers after 'and'.
-        Phase 28: Multi-line support - allows natural line breaks without
-        continuation marker.
+        Allows quantifiers after 'and' (e.g., p and forall x : T | q).
+        Supports multi-line expressions with natural line breaks.
         """
         left = self._parse_comparison()
 
         while self._match(TokenType.AND):
             op_token = self._advance()
-            # Phase 27: Check for continuation marker (\ at end of line)
-            # Phase 28: Also detect natural newlines for WYSIWYG output
+            # Detect line continuation (backslash or natural newline)
             has_continuation = False
             if self._match(TokenType.CONTINUATION):
                 self._advance()  # consume \
@@ -1358,8 +1354,7 @@ class Parser:
     def _parse_unary(self) -> Expr:
         """Parse unary operation (not, #, -).
 
-        Phase 8 enhancement: Added cardinality operator (#) as prefix unary.
-        Phase 16 enhancement: Added negation operator (-) as prefix unary.
+        Handles logical not, cardinality (#), and arithmetic negation (-).
         """
         if self._match(TokenType.NOT):
             op_token = self._advance()
@@ -1371,7 +1366,7 @@ class Parser:
                 column=op_token.column,
             )
 
-        # Cardinality operator (Phase 8)
+        # Cardinality operator (#)
         if self._match(TokenType.HASH):
             op_token = self._advance()
             operand = self._parse_unary()
@@ -1382,7 +1377,7 @@ class Parser:
                 column=op_token.column,
             )
 
-        # Unary negation (Phase 16)
+        # Unary negation (-)
         if self._match(TokenType.MINUS):
             op_token = self._advance()
             operand = self._parse_unary()
@@ -1399,7 +1394,7 @@ class Parser:
         """Parse additive operators (+ and - and ⌢).
 
         Arithmetic operators: + (addition), - (subtraction)
-        Sequence operator: ⌢ (concatenation) - Phase 12
+        Sequence operator: ⌢ (concatenation)
         Note: + can also be postfix (transitive closure R+), handled by lookahead
         """
         left = self._parse_multiplicative()
@@ -1428,7 +1423,7 @@ class Parser:
         return left
 
     def _parse_range(self) -> Expr:
-        """Parse range operator .. (Phase 13).
+        """Parse range operator (m..n).
 
         Creates integer ranges: m..n represents {m, m+1, m+2, ..., n}
         Range has lower precedence than addition, so 1+2..3+4 means (1+2)..(3+4)
@@ -1479,7 +1474,6 @@ class Parser:
         Used for lookahead to disambiguate postfix +/* from infix +/*.
         Checks the NEXT token, not the current one.
 
-        Phase 16 enhancement: Added IF (conditional) and MINUS (unary negation)
         """
         next_token = self._peek_ahead(1)
         return next_token.type in (
@@ -1560,8 +1554,8 @@ class Parser:
             TokenType.STAR,
             TokenType.MOD,
             TokenType.CAT,  # ⌢ concatenation
-            TokenType.FILTER,  # ↾ sequence filter (Phase 35)
-            TokenType.BAG_UNION,  # ⊎ bag union (Phase 35)
+            TokenType.FILTER,  # ↾ sequence filter
+            TokenType.BAG_UNION,  # ⊎ bag union
             TokenType.RANGE,  # ..
             TokenType.EQUALS,
             TokenType.NOT_EQUAL,
@@ -1572,7 +1566,7 @@ class Parser:
             TokenType.IN,
             TokenType.NOTIN,
             TokenType.SUBSET,
-            TokenType.PSUBSET,  # psubset (strict subset - Phase 39)
+            TokenType.PSUBSET,  # psubset (strict subset)
             TokenType.UNION,
             TokenType.INTERSECT,
             TokenType.SETMINUS,  # \ set difference
@@ -1594,7 +1588,7 @@ class Parser:
             TokenType.TSURJ,  # -->>
             TokenType.PSURJ,  # +->>
             TokenType.BIJECTION,  # >->>
-            TokenType.FINFUN,  # 77-> (Phase 34)
+            TokenType.FINFUN,  # 77-> (finite partial function)
             TokenType.IMPLIES,  # =>
             TokenType.IFF,  # <=>
         ):
@@ -1631,19 +1625,18 @@ class Parser:
     def _parse_quantifier(self) -> Expr:
         """Parse quantifier: (forall|exists|exists1|mu) var [, var]* : domain | body.
 
-        Phase 6 enhancement: Supports multiple variables with shared domain.
-        Phase 7 enhancement: Supports mu-operator (definite description).
-        Phase 11.5 enhancement: Supports mu with expression part (mu x : X | P . E).
-        Phase 17: Supports semicolon-separated bindings (x : T; y : U).
-        Phase 28: Supports tuple patterns for destructuring (forall (x, y) : T | P).
+        Supports:
+            - Multiple variables with shared domain: forall x, y : N | pred
+            - Tuple patterns for destructuring: forall (x, y) : T | pred
+            - Semicolon-separated bindings (nested): forall x : T; y : U | pred
+            - Mu-operator with expression: mu x : N | pred . expr
+
         Examples:
-        - forall x : N | pred
-        - forall x, y : N | pred
-        - forall (x, y) : T | pred (Phase 28: tuple pattern)
-        - forall x : T; y : U | pred (Phase 17: nested quantifiers)
-        - exists1 x : N | pred
-        - mu x : N | pred
-        - mu x : N | pred . expr (mu with expression body)
+            forall x : N | pred
+            forall x, y : N | pred
+            forall (x, y) : T | pred
+            exists1 x : N | pred
+            mu x : N | pred . expr
         """
         quant_token = self._advance()  # Consume 'forall', 'exists', 'exists1', or 'mu'
 
@@ -1950,11 +1943,11 @@ class Parser:
         )
 
     def _parse_set(self) -> Expr:
-        """Parse set literal or set comprehension (Phase 11.5).
+        """Parse set literal or set comprehension.
 
         Distinguishes between:
-        - Set literal: {1, 2, 3} or {a, b} - comma-separated elements
-        - Set comprehension: {x : X | pred} - has : and |
+            - Set literal: {1, 2, 3} or {a, b} - comma-separated elements
+            - Set comprehension: {x : X | pred} - has : and |
 
         Strategy: Look ahead for : or | to determine type.
         Multi-variable comprehensions like {x, y : N | ...} need special handling.
@@ -2141,8 +2134,8 @@ class Parser:
     def _parse_comparison(self) -> Expr:
         """Parse comparison operators (<, >, <=, >=, =, !=).
 
-        Phase 21d: Allow newlines before and after comparison operators.
-        Phase 23: Support guarded cases after = operator.
+        Allows newlines before and after comparison operators.
+        Supports guarded cases after = operator (pattern matching).
         """
         left = self._parse_function_type()
 
@@ -2185,7 +2178,7 @@ class Parser:
         return left
 
     def _try_parse_guarded_cases(self, first_expr: Expr) -> Expr:
-        """Try to parse guarded cases (Phase 23).
+        """Try to parse guarded cases for pattern matching.
 
         Checks if the current position is followed by:
           NEWLINE IF condition NEWLINE expr IF condition ...
@@ -2278,7 +2271,7 @@ class Parser:
         )
 
     def _parse_function_type(self) -> Expr:
-        """Parse function and relation type operators (Phase 11c, Phase 18).
+        """Parse function and relation type operators.
 
         Function/relation types: ->, +->, >->, >+>, -|>, -->>, +->>, >->>, <->
         Right-associative: A -> B -> C parses as A -> (B -> C)
@@ -2296,7 +2289,7 @@ class Parser:
             TokenType.TSURJ,  # -->>
             TokenType.PSURJ,  # +->>
             TokenType.BIJECTION,  # >->>
-            TokenType.FINFUN,  # 77-> (Phase 34)
+            TokenType.FINFUN,  # 77-> (finite partial function)
             TokenType.RELATION,  # <-> (relation type)
         ):
             arrow_token = self._advance()

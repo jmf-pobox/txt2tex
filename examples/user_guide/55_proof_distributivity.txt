@@ -3,18 +3,18 @@
 // From USER_GUIDE.md - Proof Trees section
 
 PROOF:
-p and (q or r) => (p and q) or (p and r) [=> intro from 1]
-  [1] p and (q or r) [assumption]
-      p [and elim 1]
-      q or r [and elim 2]
-      (p and q) or (p and r) [or elim]
+p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
+  [1] p land (q lor r) [assumption]
+      p [land elim 1]
+      q lor r [land elim 2]
+      (p land q) lor (p land r) [lor elim]
         case q:
           :: p [from above]
           :: q [from case]
-          p and q [and intro]
-          (p and q) or (p and r) [or intro 1]
+          p land q [land intro]
+          (p land q) lor (p land r) [lor intro 1]
         case r:
           :: p [from above]
           :: r [from case]
-          p and r [and intro]
-          (p and q) or (p and r) [or intro 2]
+          p land r [land intro]
+          (p land q) lor (p land r) [lor intro 2]

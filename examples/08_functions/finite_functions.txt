@@ -102,7 +102,7 @@ end
 
 TEXT: The composition has a domain size bounded by the domain of f, since we can only compose where f's range intersects g's domain.
 
-** Example 5: Domain Restrictions and Finiteness **
+** Example 5: Domain Restrictions land Finiteness **
 
 zed
   given Title, Length, ViewDate

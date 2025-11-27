@@ -30,7 +30,7 @@ TEXT: The cardinality operator gives the length of a sequence:
 
 # s
 
-** Example 2: Head and Tail **
+** Example 2: Head land Tail **
 
 TEXT: Basic sequence decomposition:
 
@@ -42,7 +42,7 @@ head s
 
 tail s
 
-** Example 3: Last and Front **
+** Example 3: Last land Front **
 
 TEXT: Operations on the end of sequences:
 
@@ -66,7 +66,7 @@ rev <a, b, c>
 
 rev (rev s)
 
-** Example 5: Domain and Range **
+** Example 5: Domain land Range **
 
 TEXT: Sequences are functions from indices to elements:
 

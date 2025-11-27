@@ -160,7 +160,7 @@ end
 
 TEXT: Schema Address is used within schema PersonData. Variables using schemas go in axdef.
 
-** Example 9: Constants and Functions **
+** Example 9: Constants land Functions **
 
 zed
   PI == 3

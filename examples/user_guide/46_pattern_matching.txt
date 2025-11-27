@@ -5,7 +5,7 @@
 axdef
   cumulative_total : seq N -> N
 where
-  cumulative_total(<>) = 0 and
+  cumulative_total(<>) = 0 land
   forall x : N; s : seq N |
     cumulative_total(<x> ^ s) = x + cumulative_total(s)
 end

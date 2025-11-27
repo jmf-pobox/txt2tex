@@ -34,7 +34,7 @@ end
 
 TEXT: Here A psubset B holds because all elements of A are in B, and A contains fewer elements than B.
 
-** Example 2: Comparing subset and psubset **
+** Example 2: Comparing subset land psubset **
 
 axdef
   X : P N
