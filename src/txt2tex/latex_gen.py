@@ -2988,59 +2988,9 @@ class LaTeXGenerator:
         """Stage 2.75: Detect function application followed by operator.
 
         Matches patterns like "f_name x <= 5".
-        """
-        return text  # Stub - will be implemented
-
-    def _process_simple_expressions(self, text: str) -> str:
-        """Stage 3: Detect simple inline math expressions.
-
-        Matches expressions with operators like x > 1, f +-> g.
-        """
-        return text  # Stub - will be implemented
-
-    def _process_inline_math(self, text: str) -> str:
-        """Process inline math expressions in text via pipeline stages.
-
-        Detects patterns like:
-        - Superscripts: x^2, a_i^2, 2^n (wrap in math mode)
-        - Set comprehensions: { x : N | x > 0 }
-        - Set comprehensions with nested braces: {p : P . p |-> {p}}
-        - Quantifiers: forall x : N | predicate
-
-        Parses them and converts to $...$ wrapped LaTeX.
-
-        Pipeline stages (order matters):
-        1. Manual markup: [operator] -> LaTeX symbols
-        2. Logical formulas: p => q, p <=> q
-        3. Parenthesized logic: (p lor q)
-        4. Standalone keywords: lor, land, lnot, elem
-        5. Superscripts: x^2
-        6. Relational image: R(| S |)
-        7. Set expressions: { ... }
-        8. Quantifiers: forall, exists, exists1, mu
-        9. Type declarations: x : T
-        10. Function application: f x > y
-        11. Simple expressions: x > 1
+        ONLY matches identifiers with underscores to avoid false positives.
         """
         result = text
-        result = self._process_manual_markup(result)
-        result = self._process_logical_formulas(result)
-        result = self._process_parenthesized_logic(result)
-        result = self._process_standalone_keywords(result)
-        result = self._process_superscripts(result)
-        result = self._process_relational_image(result)
-        result = self._process_set_expressions(result)
-        result = self._process_quantifiers(result)
-        result = self._process_type_declarations(result)
-        result = self._process_function_applications(result)
-        result = self._process_simple_expressions(result)
-
-        # --- Original implementation below (to be migrated to stages) ---
-
-        # Pattern 2.75: Function application followed by operator
-        # Match: func_name arg operator value (e.g., "cumulative_total hd <= 12000")
-        # ONLY matches identifiers with underscores to avoid false positives with prose
-        # This must come before Pattern 3 to catch function applications
         math_op_pattern = r"(77->|\+->|-\|>|<-\||->|>->|>->>|<=>|=>|>=|<=|!=|>|<|=)"
         func_app_pattern = (
             r"\b([a-zA-Z_]\w*_\w+)\s+"  # Function name (must contain underscore)
@@ -3098,11 +3048,18 @@ class LaTeXGenerator:
                     full_latex = f"{func_latex}({arg_latex}) {op_and_value_latex}"
                     result = result[:start_pos] + f"${full_latex}$" + result[end_pos:]
 
-        # Pattern 3: Simple inline math expressions (x > 1, f +-> g, etc.)
-        # Match expressions with math operators that need wrapping
-        # Strategy: Match sequences of identifiers/numbers connected by operators
+        return result
 
-        # All operators that need math mode (already defined above for Pattern 2.75)
+    def _process_simple_expressions(self, text: str) -> str:
+        """Stage 3: Detect simple inline math expressions.
+
+        Matches expressions with operators like x > 1, f +-> g.
+        Strategy: Match sequences of identifiers/numbers connected by operators.
+        """
+        result = text
+
+        # All operators that need math mode
+        math_op_pattern = r"(77->|\+->|-\|>|<-\||->|>->|>->>|<=>|=>|>=|<=|!=|>|<|=)"
 
         # Operand pattern: identifier OR decimal number
         # This ensures "5.5" stays together as a decimal, not split at the period
@@ -3160,6 +3117,45 @@ class LaTeXGenerator:
             except (LexerError, ParserError):
                 # Parsing failed - wrap expression as-is
                 result = result[:start_pos] + f"${expr}$" + result[end_pos:]
+
+        return result
+
+    def _process_inline_math(self, text: str) -> str:
+        """Process inline math expressions in text via pipeline stages.
+
+        Detects patterns like:
+        - Superscripts: x^2, a_i^2, 2^n (wrap in math mode)
+        - Set comprehensions: { x : N | x > 0 }
+        - Set comprehensions with nested braces: {p : P . p |-> {p}}
+        - Quantifiers: forall x : N | predicate
+
+        Parses them and converts to $...$ wrapped LaTeX.
+
+        Pipeline stages (order matters):
+        1. Manual markup: [operator] -> LaTeX symbols
+        2. Logical formulas: p => q, p <=> q
+        3. Parenthesized logic: (p lor q)
+        4. Standalone keywords: lor, land, lnot, elem
+        5. Superscripts: x^2
+        6. Relational image: R(| S |)
+        7. Set expressions: { ... }
+        8. Quantifiers: forall, exists, exists1, mu
+        9. Type declarations: x : T
+        10. Function application: f x > y
+        11. Simple expressions: x > 1
+        """
+        result = text
+        result = self._process_manual_markup(result)
+        result = self._process_logical_formulas(result)
+        result = self._process_parenthesized_logic(result)
+        result = self._process_standalone_keywords(result)
+        result = self._process_superscripts(result)
+        result = self._process_relational_image(result)
+        result = self._process_set_expressions(result)
+        result = self._process_quantifiers(result)
+        result = self._process_type_declarations(result)
+        result = self._process_function_applications(result)
+        result = self._process_simple_expressions(result)
 
         return result
 
