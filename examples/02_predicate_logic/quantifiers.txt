@@ -29,8 +29,8 @@ end
 ** Example 2: Free Types **
 
 zed
-  Status ::= active | inactive | suspended
-  Answer ::= yes | no
+  StatusQ ::= active | inactive | suspended
+  Answer ::= yesQ | no
 end
 
 ** Example 3: Abbreviations **

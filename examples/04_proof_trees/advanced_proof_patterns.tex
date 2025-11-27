@@ -43,11 +43,11 @@ $%
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \land (r \lor s)) \implies (p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{
-  \infer[\lor \mbox{elim on p} \lor q]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\lor \mbox{elim on r} \lor s]{((p \land r))(or(p \land s))(or(q \land r))(or(q \land s))}{
+  \infer[\lor \mbox{elim on p} \lor q]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\lor \mbox{elim on r} \lor s]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{
   \raiseproof{10ex}{\infer[\lor \mbox{intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land \mbox{intro}]{p \land r}{}}}
 &
 \hskip 6em \raiseproof{26ex}{\infer[\lor \mbox{intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land \mbox{intro}]{p \land s}{}}}
-} & \infer[\lor \mbox{elim on r} \lor s]{((p \land r))(or(p \land s))(or(q \land r))(or(q \land s))}{
+} & \infer[\lor \mbox{elim on r} \lor s]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{
   \raiseproof{10ex}{\infer[\lor \mbox{intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land \mbox{intro}]{q \land r}{}}}
 &
 \hskip 6em \raiseproof{26ex}{\infer[\lor \mbox{intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land \mbox{intro}]{q \land s}{}}}
@@ -62,8 +62,8 @@ $%
 
 \bigskip
 
-\section*{Example 3 : Proof by Mathematical Induction ( Base and Step )}
-\addcontentsline{toc}{section}{Example 3 : Proof by Mathematical Induction ( Base and Step )}
+\section*{Example 3 : Proof by Mathematical Induction ( Base land Step )}
+\addcontentsline{toc}{section}{Example 3 : Proof by Mathematical Induction ( Base land Step )}
 
 \noindent Prove: For all n ∈ ℕ, sum(1 to n) = n(n+1)/2
 

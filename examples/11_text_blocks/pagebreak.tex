@@ -89,7 +89,7 @@ $PAGEBREAK$
 \bigskip
 
 \noindent
-$p(and)(q) \implies p$
+$p \land q \implies p$
 
 
 \noindent More content for section 1.
@@ -127,8 +127,8 @@ $\forall x : \nat @ \exists y : \nat @ x + y = 10$
 \begin{center}
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and(p \implies q)) \implies q}{
-  \infer[\Rightarrow \mbox{elim}]{q}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p(and(p \implies q)) \urcorner^{[1]}} & \infer[\land\textrm{-elim-2}]{p \implies q}{\ulcorner p(and(p \implies q)) \urcorner^{[1]}}}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land (p \implies q)) \implies q}{
+  \infer[\Rightarrow \mbox{elim}]{q}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p \land (p \implies q) \urcorner^{[1]}} & \infer[\land\textrm{-elim-2}]{p \implies q}{\ulcorner p \land (p \implies q) \urcorner^{[1]}}}
 }
 $%
 }
@@ -149,8 +149,8 @@ $PAGEBREAK$
 \begin{center}
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{p(or)(q)(and(not(q))) \implies p}{
-  \infer[\lor \mbox{elim}]{p}{\infer[\land\textrm{-elim-2}]{not(q)}{\infer[\land\textrm{-elim-1}]{p(or)(q)}{\ulcorner p(or)(q)(and(not(q))) \urcorner^{[1]}}}}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \lor q) \land \lnot q \implies p}{
+  \infer[\lor \mbox{elim}]{p}{\infer[\land\textrm{-elim-2}]{\lnot q}{\infer[\land\textrm{-elim-1}]{p \lor q}{\ulcorner (p \lor q) \land \lnot q \urcorner^{[1]}}}}
 }
 $%
 }

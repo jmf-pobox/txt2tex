@@ -10,7 +10,7 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\section*{Phase 17 : Proper Examples ( not TEXT blocks )}
+\section*{Phase 17 : Proper Examples ( lnot TEXT blocks )}
 
 \section*{Example : Semicolon bindings elem axdef}
 \addcontentsline{toc}{section}{Example : Semicolon bindings elem axdef}
@@ -26,28 +26,28 @@ dummy = 0 \\
 \addcontentsline{toc}{section}{Example : Function on sequences}
 
 \begin{zed}
-[Entry]
+[EntryFTP]
 \end{zed}
 
 \begin{axdef}
-seqlen : \seq~Entry \fun \nat
+seqlen : \seq~EntryFTP \fun \nat
 \where
 seqlen(\langle \rangle) = 0 \\
-\forall x : Entry @ \forall s : \seq~Entry @ seqlen(\langle x \rangle \cat s) = 1 + seqlen(s)
+\forall x : EntryFTP @ \forall s : \seq~EntryFTP @ seqlen(\langle x \rangle \cat s) = 1 + seqlen(s)
 \end{axdef}
 
 \section*{Example : Nested quantifier}
 \addcontentsline{toc}{section}{Example : Nested quantifier}
 
 \begin{zed}
-[Person]
+[PersonFTP]
 \end{zed}
 
 \begin{axdef}
 constraint : \nat
 \where
 constraint = 1 \\
-\forall p : Person @ \forall n : \nat @ n > 0
+\forall p : PersonFTP @ \forall n : \nat @ n > 0
 \end{axdef}
 
 \end{document}

@@ -12,6 +12,10 @@
 
 \section*{Syntax Environment Examples}
 
+\begin{zed}
+[NAME]
+\end{zed}
+
 \section*{Example 1 : Simple Enumeration}
 \addcontentsline{toc}{section}{Example 1 : Simple Enumeration}
 
@@ -24,7 +28,7 @@
 \bigskip
 
 \begin{syntax}
-OP & ::= & plus | minus | times | divide
+OP1 & ::= & plus | minus | times | divide
 \end{syntax}
 
 \noindent This generates aligned columns with the ::= separator clearly visible.
@@ -54,7 +58,7 @@ Tree & ::= & leaf \ldata \nat \rdata | branch \ldata Tree \cross Tree \rdata
 \bigskip
 
 \begin{syntax}
-Status & ::= & active | inactive | pending \\
+Status2 & ::= & active2 | inactive2 | pending2 \\
 Response & ::= & ok | error \ldata \nat \rdata | timeout
 \end{syntax}
 
@@ -74,7 +78,7 @@ Response & ::= & ok | error \ldata \nat \rdata | timeout
 \bigskip
 
 \begin{syntax}
-Expr & ::= & const \ldata \nat \rdata | var \ldata NAME \rdata | binop \ldata OP \cross Expr \cross Expr \rdata \\
+Expr & ::= & const \ldata \nat \rdata | var \ldata NAME \rdata | binop \ldata OP1 \cross Expr \cross Expr \rdata \\
 Stmt & ::= & assign \ldata NAME \cross Expr \rdata | seq \ldata Stmt \cross Stmt \rdata | skip
 \end{syntax}
 
@@ -90,7 +94,7 @@ Stmt & ::= & assign \ldata NAME \cross Expr \rdata | seq \ldata Stmt \cross Stmt
 \bigskip
 
 \begin{zed}
-Color ::= red | green | blue
+Color1 ::= red1 | green1 | blue1
 \end{zed}
 
 \noindent But syntax environment provides better alignment for complex types:
@@ -98,7 +102,7 @@ Color ::= red | green | blue
 \bigskip
 
 \begin{syntax}
-Color & ::= & red | green | blue \\
+Color2 & ::= & red2 | green2 | blue2 \\
 Shape & ::= & circle \ldata \nat \rdata | rectangle \ldata \nat \cross \nat \rdata | polygon \ldata \seq~\nat \rdata
 \end{syntax}
 

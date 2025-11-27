@@ -31,7 +31,7 @@ N +-> N
 TEXT:
 Total injection
 
-A >-> B
+AMap >-> BMap
 
 TEXT:
 Partial injection
@@ -41,7 +41,7 @@ X >+> Y
 TEXT:
 Total surjection
 
-A -->> B
+AMap -->> BMap
 
 TEXT:
 Partial surjection
@@ -51,7 +51,7 @@ X +->> Y
 TEXT:
 Bijection
 
-A >->> B
+AMap >->> BMap
 
 TEXT:
 Higher order function type
@@ -61,17 +61,17 @@ Higher order function type
 TEXT:
 Right associative function types
 
-A -> B -> C
+AMap -> BMap -> C
 
 X -> (Y -> Z)
 
 zed
-  given A, B
+  given AMap, BMap
 end
 
 
 axdef
   square : N -> N
   pdiv : N +-> N
-  bmap : A >->> B
+  bmap : AMap >->> BMap
 end

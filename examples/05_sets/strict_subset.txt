@@ -73,12 +73,12 @@ end
 
 ** Example 5: Set Hierarchy **
 
-given Person
+given PersonSS
 
 axdef
-  students : P Person
-  grads : P Person
-  phds : P Person
+  students : P PersonSS
+  grads : P PersonSS
+  phds : P PersonSS
 where
   phds psubset grads land grads psubset students
 end

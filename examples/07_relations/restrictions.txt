@@ -9,7 +9,7 @@
 //   - Defining function behavior with forall
 //
 // Features:
-//   - square(n) = n * n
+//   - squareRes(n) = n * n
 //   - add(a, b) = a + b
 //   - Function types: N -> N, N cross N -> N
 //   - Explicit parentheses required: f(x), not f x
@@ -20,7 +20,7 @@
 === Function Application Examples ===
 
 zed
-  given Item, Dog, Person, X
+  given Item, Dog, PersonRes, XRes
 end
 
 
@@ -29,10 +29,10 @@ TEXT: This file demonstrates function application in Z notation definitions.
 ** Example 1: Basic function definitions **
 
 axdef
-  square : N -> N
+  squareRes : N -> N
   double : N -> N
 where
-  forall n : N | square(n) = n * n
+  forall n : N | squareRes(n) = n * n
   forall n : N | double(n) = 2 * n
 end
 
@@ -48,8 +48,8 @@ end
 
 ** Example 3: Generic functions **
 
-gendef [X]
-  collection : seq X
+gendef [XRes]
+  collection : seq XRes
 end
 
 ** Example 4: Function application elem quantifiers **
@@ -63,9 +63,9 @@ end
 ** Example 5: Schema with function type **
 
 schema Heights
-  height : Person -> N
+  height : PersonRes -> N
 where
-  forall p : Person | height(p) > 0 land height(p) < 300
+  forall p : PersonRes | height(p) > 0 land height(p) < 300
 end
 
 ** Example 6: Nested function application **

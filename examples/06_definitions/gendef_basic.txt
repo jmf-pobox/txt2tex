@@ -10,7 +10,7 @@
 //
 // Features:
 //   - gendef [X] ... end [generic definition]
-//   - Generic identity function
+//   - Generic identityGB function
 //   - Generic pairing functions
 //   - seq[T], P[T] type instantiation
 //
@@ -21,15 +21,15 @@
 
 ** Example 1: Generic Identity Function **
 
-TEXT: The identity function works for any type:
+TEXT: The identityGB function works for any type:
 
 gendef [X]
-  identity : X -> X
+  identityGB : X -> X
 where
-  forall x : X | identity(x) = x
+  forall x : X | identityGB(x) = x
 end
 
-TEXT: This defines identity polymorphically. It can be used with any type: identity applied to a natural number returns that number, identity applied to a set returns that set, etc.
+TEXT: This defines identityGB polymorphically. It can be used with any type: identityGB applied to a natural number returns that number, identityGB applied to a set returns that set, etc.
 
 ** Example 2: Generic Constant **
 
@@ -139,11 +139,11 @@ axdef
   id_nat : N -> N
   id_set : P N -> P N
 where
-  id_nat = identity[N]
-  id_set = identity[P N]
+  id_nat = identityGB[N]
+  id_set = identityGB[P N]
 end
 
-TEXT: Here identity[N] is the identity function instantiated for natural numbers, and identity[P N] is instantiated for sets of natural numbers.
+TEXT: Here identityGB[N] is the identityGB function instantiated for natural numbers, and identityGB[P N] is instantiated for sets of natural numbers.
 
 ** Example 12: Generic Constants **
 

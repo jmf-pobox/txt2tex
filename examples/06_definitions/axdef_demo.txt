@@ -8,8 +8,8 @@
 //   - Axiomatic definitions with finite set types
 //
 // Features:
-//   - F SongId [finite subsets]
-//   - F1 UserId [non-empty finite subsets]
+//   - F SongIdAD [finite subsets]
+//   - F1 UserIdAD [non-empty finite subsets]
 //   - Used with partial functions (+->)
 //
 // See: docs/USER_GUIDE.md - Section "Sets and Types" > "Power Set"
@@ -22,13 +22,13 @@
 TEXT: F X denotes all finite subsets of X:
 
 zed
-  given SongId, UserId
+  given SongIdAD, UserIdAD
 end
 
 
 axdef
-  songs : F SongId
-  users : F UserId
+  songsAD : F SongIdAD
+  usersAD : F UserIdAD
 end
 
 ** Example 2: F1 (non-empty finite sets) **
@@ -36,7 +36,7 @@ end
 TEXT: F1 X denotes all non-empty finite subsets of X:
 
 axdef
-  activeUsers : F1 UserId
+  activeUsers : F1 UserIdAD
 end
 
 ** Example 3: Combined with function types **
@@ -50,6 +50,6 @@ end
 
 axdef
   playlists : PlaylistId +-> Playlist
-  playlistOwner : PlaylistId +-> UserId
-  playlistSubscribers : PlaylistId +-> F1 UserId
+  playlistOwner : PlaylistId +-> UserIdAD
+  playlistSubscribers : PlaylistId +-> F1 UserIdAD
 end

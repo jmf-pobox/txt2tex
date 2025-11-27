@@ -13,7 +13,7 @@
 \section*{Advanced Generic Definitions}
 
 \begin{zed}
-[B]
+[BGA]
 \end{zed}
 
 \section*{Example 1 : Generic Three - Way Product}
@@ -170,8 +170,8 @@ second : Y
 
 \bigskip
 
-\section*{Example 12 : Practical Example - Generic Database Table}
-\addcontentsline{toc}{section}{Example 12 : Practical Example - Generic Database Table}
+\section*{Example 12 : Practical Example - Generic Database TableGA}
+\addcontentsline{toc}{section}{Example 12 : Practical Example - Generic Database TableGA}
 
 \noindent Note: Define generic schema separately, then query operations in gendef:
 
@@ -181,7 +181,7 @@ second : Y
 [Key, Value]
 \end{zed}
 
-\begin{schema}{Table}[Key, Value]
+\begin{schema}{TableGA}[Key, Value]
 entries : Key \pfun Value \\
 size : \nat
 \where
@@ -189,20 +189,20 @@ size = \# (\dom entries)
 \end{schema}
 
 \begin{gendef}[Key, Value]
-  emptyTable: Table[Key, Value] \\
-  tableSize: Table[Key, Value] \fun \nat \\
-  allKeys: Table[Key, Value] \fun \power Key
+  emptyTable: TableGA[Key, Value] \\
+  tableSize: TableGA[Key, Value] \fun \nat \\
+  allKeys: TableGA[Key, Value] \fun \power Key
 \where
   emptyTable.entries = \{\} \land emptyTable.size = 0 \\
-  \forall t : Table[Key, Value] @ tableSize(t) = t.size \\
-  \forall t : Table[Key, Value] @ allKeys(t) = \dom t.entries
+  \forall t : TableGA[Key, Value] @ tableSize(t) = t.size \\
+  \forall t : TableGA[Key, Value] @ allKeys(t) = \dom t.entries
 \end{gendef}
 
 \noindent A generic key-value table with query operations. This demonstrates how generic definitions enable reusable, type-safe data structures.
 
 \bigskip
 
-\noindent The Table schema is defined with schema[Key, Value] syntax, allowing proper fuzz typechecking.
+\noindent The TableGA schema is defined with schema[Key, Value] syntax, allowing proper fuzz typechecking.
 
 \bigskip
 

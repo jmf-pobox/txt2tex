@@ -13,7 +13,7 @@
 \section*{Phase 11 a : Function Types}
 
 \begin{zed}
-[X, Y, Z]
+[XDR, YDR, Z]
 \end{zed}
 
 \noindent Total functions (every element in domain has a mapping):
@@ -21,7 +21,7 @@
 \bigskip
 
 \begin{axdef}
-totalF1 : X \fun Y \\
+totalF1 : XDR \fun YDR \\
 totalF2 : \nat \fun \nat
 \end{axdef}
 
@@ -30,7 +30,7 @@ totalF2 : \nat \fun \nat
 \bigskip
 
 \begin{axdef}
-partialF : X \pfun Y
+partialF : XDR \pfun YDR
 \end{axdef}
 
 \noindent Injections (one-to-one mappings):
@@ -38,8 +38,8 @@ partialF : X \pfun Y
 \bigskip
 
 \begin{axdef}
-injTotal : X \inj Y \\
-injPartial : X \pinj Y
+injTotal : XDR \inj YDR \\
+injPartial : XDR \pinj YDR
 \end{axdef}
 
 \noindent Surjections (onto mappings):
@@ -47,8 +47,8 @@ injPartial : X \pinj Y
 \bigskip
 
 \begin{axdef}
-surjTotal : X \surj Y \\
-surjPartial : X \psurj Y
+surjTotal : XDR \surj YDR \\
+surjPartial : XDR \psurj YDR
 \end{axdef}
 
 \noindent Bijections (one-to-one and onto):
@@ -56,7 +56,7 @@ surjPartial : X \psurj Y
 \bigskip
 
 \begin{axdef}
-bijection : X \bij Y
+bijection : XDR \bij YDR
 \end{axdef}
 
 \noindent Mixed operators (relations and function types work together):
@@ -64,8 +64,8 @@ bijection : X \bij Y
 \bigskip
 
 \begin{axdef}
-relation : X \rel Y \\
-function : X \fun Y
+relationDR : XDR \rel YDR \\
+function : XDR \fun YDR
 \end{axdef}
 
 \end{document}

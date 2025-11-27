@@ -9,12 +9,12 @@
 //   - Bijection types (>->>)
 //
 // Features:
-//   - X -> Y [total function]
-//   - X +-> Y [partial function]
-//   - X >-> Y [total injection]
-//   - X >+> Y [partial injection]
-//   - X -->> Y [total surjection]
-//   - X >->> Y [total bijection]
+//   - XDR -> YDR [total function]
+//   - XDR +-> YDR [partial function]
+//   - XDR >-> YDR [total injection]
+//   - XDR >+> YDR [partial injection]
+//   - XDR -->> YDR [total surjection]
+//   - XDR >->> YDR [total bijection]
 //
 // See: docs/USER_GUIDE.md - Section "Functions" > "Function Types"
 // ============================================================================
@@ -22,46 +22,46 @@
 === Phase 11a: Function Types ===
 
 zed
-  given X, Y, Z
+  given XDR, YDR, Z
 end
 
 
 TEXT: Total functions (every element in domain has a mapping):
 
 axdef
-  totalF1 : X -> Y
+  totalF1 : XDR -> YDR
   totalF2 : N -> N
 end
 
 TEXT: Partial functions (some elements may not have a mapping):
 
 axdef
-  partialF : X +-> Y
+  partialF : XDR +-> YDR
 end
 
 TEXT: Injections (one-to-one mappings):
 
 axdef
-  injTotal : X >-> Y
-  injPartial : X >+> Y
+  injTotal : XDR >-> YDR
+  injPartial : XDR >+> YDR
 end
 
 TEXT: Surjections (onto mappings):
 
 axdef
-  surjTotal : X -->> Y
-  surjPartial : X +->> Y
+  surjTotal : XDR -->> YDR
+  surjPartial : XDR +->> YDR
 end
 
 TEXT: Bijections (one-to-one and onto):
 
 axdef
-  bijection : X >->> Y
+  bijection : XDR >->> YDR
 end
 
 TEXT: Mixed operators (relations and function types work together):
 
 axdef
-  relation : X <-> Y
-  function : X -> Y
+  relationDR : XDR <-> YDR
+  function : XDR -> YDR
 end

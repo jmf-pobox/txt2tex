@@ -13,7 +13,7 @@
 \section*{Recursive Function Examples}
 
 \begin{zed}
-[Entry]
+[EntryS40]
 \end{zed}
 
 \noindent This file demonstrates recursive functions on sequences.
@@ -24,20 +24,20 @@
 \addcontentsline{toc}{section}{Example 1 : Simple recursive function}
 
 \begin{axdef}
-length : \seq~Entry \fun \nat
+length : \seq~EntryS40 \fun \nat
 \where
 length(\langle \rangle) = 0 \\
-\forall x : Entry @ \forall s : \seq~Entry @ length(\langle x \rangle \cat s) = 1 + length(s)
+\forall x : EntryS40 @ \forall s : \seq~EntryS40 @ length(\langle x \rangle \cat s) = 1 + length(s)
 \end{axdef}
 
 \section*{Example 2 : Identity function on sequences}
 \addcontentsline{toc}{section}{Example 2 : Identity function on sequences}
 
 \begin{axdef}
-identity : \seq~Entry \fun \seq~Entry
+identityS40 : \seq~EntryS40 \fun \seq~EntryS40
 \where
-identity(\langle \rangle) = \langle \rangle \\
-\forall x : Entry @ \forall s : \seq~Entry @ identity(\langle x \rangle \cat s) = \langle x \rangle \cat identity(s)
+identityS40(\langle \rangle) = \langle \rangle \\
+\forall x : EntryS40 @ \forall s : \seq~EntryS40 @ identityS40(\langle x \rangle \cat s) = \langle x \rangle \cat identityS40(s)
 \end{axdef}
 
 \section*{Example 3 : Sequence doubling}

@@ -18,8 +18,8 @@
 \begin{center}
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and)(q) \implies q}{
-  \infer[\land\textrm{-elim-2}]{q}{\ulcorner p(and)(q) \urcorner^{[1]}}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \land q \implies q}{
+  \infer[\land\textrm{-elim-2}]{q}{\ulcorner p \land q \urcorner^{[1]}}
 }
 $%
 }
@@ -32,8 +32,8 @@ $%
 \begin{center}
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and(p \implies q)) \implies p(and)(q)}{
-  \infer[\land \mbox{intro}]{p(and)(q)}{\infer[\Rightarrow \mbox{elim}]{q}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p(and(p \implies q)) \urcorner^{[1]}} & \infer[\land\textrm{-elim-2}]{p \implies q}{\ulcorner p(and(p \implies q)) \urcorner^{[1]}}}}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \land (p \implies q) \implies (p \land q)}{
+  \infer[\land \mbox{intro}]{p \land q}{\infer[\Rightarrow \mbox{elim}]{q}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p \land (p \implies q) \urcorner^{[1]}} & \infer[\land\textrm{-elim-2}]{p \implies q}{\ulcorner p \land (p \implies q) \urcorner^{[1]}}}}
 }
 $%
 }
@@ -46,8 +46,8 @@ $%
 \begin{center}
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and(q(or)(r))) \implies p(and)(q)(or(p(and)(r)))}{
-  \infer[\lor \mbox{elim}]{p(and)(q)(or(p(and)(r)))}{\infer[\lor\textrm{-intro-1}]{p(and)(q)(or(p(and)(r)))}{\infer[\land \mbox{intro}]{p(and)(q)}{\infer[\mbox{from case}]{q}{\infer[\mbox{from above}]{p}{}}}} & \infer[\lor\textrm{-intro-2}]{p(and)(q)(or(p(and)(r)))}{\infer[\land \mbox{intro}]{p(and)(r)}{\infer[\mbox{from case}]{r}{\infer[\mbox{from above}]{p}{}}}}}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \land (q \lor r) \implies (p \land q) \lor (p \land r)}{
+  \infer[\lor \mbox{elim}]{(p \land q) \lor (p \land r)}{\infer[\lor\textrm{-intro-1}]{(p \land q) \lor (p \land r)}{\infer[\land \mbox{intro}]{p \land q}{\infer[\mbox{from case}]{q}{\infer[\mbox{from above}]{p}{}}}} & \infer[\lor\textrm{-intro-2}]{(p \land q) \lor (p \land r)}{\infer[\land \mbox{intro}]{p \land r}{\infer[\mbox{from case}]{r}{\infer[\mbox{from above}]{p}{}}}}}
 }
 $%
 }
@@ -60,8 +60,8 @@ $%
 \begin{center}
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \implies q))(and)(not)(q) \implies not(p)}{
-  \infer[negation\textrm{-intro}^{[2]}]{not(p)}{\infer[\land\textrm{-elim-1}]{p \implies q}{\ulcorner ((p \implies q))(and)(not)(q) \urcorner^{[1]}} & \infer[\land\textrm{-elim-2}]{not(q)}{\ulcorner ((p \implies q))(and)(not)(q) \urcorner^{[1]}} & \infer[\mbox{contradiction}]{false}{\infer[\Rightarrow \mbox{elim}]{q}{\ulcorner p \urcorner^{[2]}}}}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \implies q) \land \lnot q \implies \lnot p}{
+  \infer[negation\textrm{-intro}^{[2]}]{\lnot p}{\infer[\land\textrm{-elim-1}]{p \implies q}{\ulcorner (p \implies q) \land \lnot q \urcorner^{[1]}} & \infer[\land\textrm{-elim-2}]{\lnot q}{\ulcorner (p \implies q) \land \lnot q \urcorner^{[1]}} & \infer[\mbox{contradiction}]{false}{\infer[\Rightarrow \mbox{elim}]{q}{\ulcorner p \urcorner^{[2]}}}}
 }
 $%
 }
@@ -74,8 +74,8 @@ $%
 \begin{center}
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \implies q) \implies not(p)(or)(q)}{
-  \infer[\mbox{excluded middle}]{p(or)(not)(p)}{\ulcorner p \implies q \urcorner^{[1]}} & \infer[\lor\textrm{-elim}^{[2]}]{not(p)(or)(q)}{\infer[\lor\textrm{-intro-2}]{not(p)(or)(q)}{\infer[\Rightarrow \mbox{elim}]{q}{\ulcorner p \urcorner^{[2]}}} & \infer[\lor\textrm{-intro-1}]{not(p)(or)(q)}{\ulcorner not(p) \urcorner^{[2]}}}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \implies q) \implies (\lnot p \lor q)}{
+  \infer[\mbox{excluded middle}]{p \lor \lnot p}{\ulcorner p \implies q \urcorner^{[1]}} & \infer[\lor\textrm{-elim}^{[2]}]{\lnot p \lor q}{\infer[\lor\textrm{-intro-2}]{\lnot p \lor q}{\infer[\Rightarrow \mbox{elim}]{q}{\ulcorner p \urcorner^{[2]}}} & \infer[\lor\textrm{-intro-1}]{\lnot p \lor q}{\ulcorner \lnot p \urcorner^{[2]}}}
 }
 $%
 }

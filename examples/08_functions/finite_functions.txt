@@ -25,12 +25,12 @@ TEXT: Finite partial functions are partial functions with a finite domain. The o
 TEXT: A finite partial function from X to Y is a partial function whose domain is finite. This is useful when modeling resources with limited capacity or databases with a bounded number of entries.
 
 zed
-  given Year, Table
+  given Year, TableFF
 end
 
 
 axdef
-  records : Year 77-> Table
+  records : Year 77-> TableFF
 where
   # (dom records) <= 1000
 end

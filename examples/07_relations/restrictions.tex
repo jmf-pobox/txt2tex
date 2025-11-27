@@ -13,7 +13,7 @@
 \section*{Function Application Examples}
 
 \begin{zed}
-[Item, Dog, Person, X]
+[Item, Dog, PersonRes, XRes]
 \end{zed}
 
 \noindent This file demonstrates function application in Z notation definitions.
@@ -24,10 +24,10 @@
 \addcontentsline{toc}{section}{Example 1 : Basic function definitions}
 
 \begin{axdef}
-square : \nat \fun \nat \\
+squareRes : \nat \fun \nat \\
 double : \nat \fun \nat
 \where
-\forall n : \nat @ square(n) = n * n \\
+\forall n : \nat @ squareRes(n) = n * n \\
 \forall n : \nat @ double(n) = 2 * n
 \end{axdef}
 
@@ -45,8 +45,8 @@ maximum : \nat \cross \nat \fun \nat
 \section*{Example 3 : Generic functions}
 \addcontentsline{toc}{section}{Example 3 : Generic functions}
 
-\begin{gendef}[X]
-  collection: \seq~X
+\begin{gendef}[XRes]
+  collection: \seq~XRes
 \end{gendef}
 
 \section*{Example 4 : Function application elem quantifiers}
@@ -62,9 +62,9 @@ posFunc : \nat \fun \nat
 \addcontentsline{toc}{section}{Example 5 : Schema with function type}
 
 \begin{schema}{Heights}
-height : Person \fun \nat
+height : PersonRes \fun \nat
 \where
-\forall p : Person @ height(p) > 0 \land height(p) < 300
+\forall p : PersonRes @ height(p) > 0 \land height(p) < 300
 \end{schema}
 
 \section*{Example 6 : Nested function application}

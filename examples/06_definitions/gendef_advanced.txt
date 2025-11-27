@@ -20,7 +20,7 @@
 === Advanced Generic Definitions ===
 
 zed
-  given B
+  given BGA
 end
 
 
@@ -130,7 +130,7 @@ end
 
 TEXT: Pairs up corresponding elements from two sequences.
 
-** Example 12: Practical Example - Generic Database Table **
+** Example 12: Practical Example - Generic Database TableGA **
 
 TEXT: Note: Define generic schema separately, then query operations in gendef:
 
@@ -139,7 +139,7 @@ zed
 end
 
 
-schema Table[Key, Value]
+schema TableGA[Key, Value]
   entries : Key +-> Value
   size : N
 where
@@ -147,14 +147,14 @@ where
 end
 
 gendef [Key, Value]
-  emptyTable : Table[Key, Value]
-  tableSize : Table[Key, Value] -> N
-  allKeys : Table[Key, Value] -> P Key
+  emptyTable : TableGA[Key, Value]
+  tableSize : TableGA[Key, Value] -> N
+  allKeys : TableGA[Key, Value] -> P Key
 where
   emptyTable.entries = {} land emptyTable.size = 0
-  forall t : Table[Key, Value] | tableSize(t) = t.size
-  forall t : Table[Key, Value] | allKeys(t) = dom (t.entries)
+  forall t : TableGA[Key, Value] | tableSize(t) = t.size
+  forall t : TableGA[Key, Value] | allKeys(t) = dom (t.entries)
 end
 
 TEXT: A generic key-value table with query operations. This demonstrates how generic definitions enable reusable, type-safe data structures.
-TEXT: The Table schema is defined with schema[Key, Value] syntax, allowing proper fuzz typechecking.
+TEXT: The TableGA schema is defined with schema[Key, Value] syntax, allowing proper fuzz typechecking.

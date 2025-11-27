@@ -15,17 +15,17 @@
 \section*{Example 1 : Generic Identity Function}
 \addcontentsline{toc}{section}{Example 1 : Generic Identity Function}
 
-\noindent The identity function works for any type:
+\noindent The identityGB function works for any type:
 
 \bigskip
 
 \begin{gendef}[X]
-  identity: X \fun X
+  identityGB: X \fun X
 \where
-  \forall x : X @ identity(x) = x
+  \forall x : X @ identityGB(x) = x
 \end{gendef}
 
-\noindent This defines identity polymorphically. It can be used with any type: identity applied to a natural number returns that number, identity applied to a set returns that set, etc.
+\noindent This defines identityGB polymorphically. It can be used with any type: identityGB applied to a natural number returns that number, identityGB applied to a set returns that set, etc.
 
 \bigskip
 
@@ -183,11 +183,11 @@
 id\_nat : \nat \fun \nat \\
 id\_set : \power \nat \fun \power \nat
 \where
-id\_nat = identity[\nat] \\
-id\_set = identity[\power \nat]
+id\_nat = identityGB[\nat] \\
+id\_set = identityGB[\power \nat]
 \end{axdef}
 
-\noindent Here identity[N] is the identity function instantiated for natural numbers, and identity[P N] is instantiated for sets of natural numbers.
+\noindent Here identityGB[N] is the identityGB function instantiated for natural numbers, and identityGB[P N] is instantiated for sets of natural numbers.
 
 \bigskip
 

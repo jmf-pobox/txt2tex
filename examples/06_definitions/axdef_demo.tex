@@ -20,12 +20,12 @@
 \bigskip
 
 \begin{zed}
-[SongId, UserId]
+[SongIdAD, UserIdAD]
 \end{zed}
 
 \begin{axdef}
-songs : \finset SongId \\
-users : \finset UserId
+songsAD : \finset SongIdAD \\
+usersAD : \finset UserIdAD
 \end{axdef}
 
 \section*{Example 2 : F1 ( non - empty finite sets )}
@@ -36,7 +36,7 @@ users : \finset UserId
 \bigskip
 
 \begin{axdef}
-activeUsers : \finset_1 UserId
+activeUsers : \finset_1 UserIdAD
 \end{axdef}
 
 \section*{Example 3 : Combined with function types}
@@ -52,8 +52,8 @@ activeUsers : \finset_1 UserId
 
 \begin{axdef}
 playlists : PlaylistId \pfun Playlist \\
-playlistOwner : PlaylistId \pfun UserId \\
-playlistSubscribers : PlaylistId \pfun \finset_1 UserId
+playlistOwner : PlaylistId \pfun UserIdAD \\
+playlistSubscribers : PlaylistId \pfun \finset_1 UserIdAD
 \end{axdef}
 
 \end{document}

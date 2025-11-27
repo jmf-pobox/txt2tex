@@ -12,24 +12,28 @@
 
 \section*{Testing Indentation}
 
+\begin{zed}
+[RESOURCE, PERSON]
+\end{zed}
+
 \section*{Example 1 : Simple quantifier}
 \addcontentsline{toc}{section}{Example 1 : Simple quantifier}
 
 \begin{axdef}
-policy : \power_1 RESOURCE \fun RESOURCE
+policy1 : \power_1 RESOURCE \fun RESOURCE
 \where
 \forall S : \power_1 RESOURCE @ \\
-\t1 policy(S) \in S
+\t1 policy1(S) \in S
 \end{axdef}
 
 \section*{Example 2 : Quantifier with multiple lines}
 \addcontentsline{toc}{section}{Example 2 : Quantifier with multiple lines}
 
 \begin{axdef}
-policy : \power_1 RESOURCE \fun RESOURCE
+policy2 : \power_1 RESOURCE \fun RESOURCE
 \where
 \forall S : \power_1 RESOURCE @ \\
-\t1 policy(S) \in S \land \\
+\t1 policy2(S) \in S \land \\
 \t1 S \subseteq RESOURCE
 \end{axdef}
 
