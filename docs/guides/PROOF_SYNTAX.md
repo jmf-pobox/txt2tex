@@ -33,24 +33,24 @@ The conclusion is the top-level statement of the proof. It may appear:
 
 ```
 PROOF:
-p and q => q [=> intro from 1]
-  [1] p and q [assumption]
-      q [and elim]
+p land q => q [=> intro from 1]
+  [1] p land q [assumption]
+      q [land elim]
 ```
 
-In this example, `p and q => q` is the conclusion we're proving.
+In this example, `p land q => q` is the conclusion we're proving.
 
 ### 3. Assumptions with Labels
 Assumptions are marked with `[number]` and the keyword `[assumption]`:
 ```
-[1] p and q [assumption]
+[1] p land q [assumption]
 ```
 - The `[1]` is a **label** used to reference this assumption later
 - Everything indented under this is "within the scope" of the assumption
 
 ### 4. Regular Proof Steps
 ```
-q [and elim]
+q [land elim]
 ```
 - Statement followed by justification in brackets
 - Indentation shows dependency
@@ -58,23 +58,23 @@ q [and elim]
 ### 5. Sibling Premises (`::`  marker)
 When multiple things need to be proven together (side-by-side in tree):
 ```
-:: p [and elim]
+:: p [land elim]
 :: q [from case]
-p and q [and intro]
+p land q [land intro]
 ```
 The `::` means "these are siblings that together support the next step"
 
 ### 6. Case Analysis
-For or-elimination and case splits:
+For lor-elimination and case splits:
 ```
 case p:
-  :: p => r [and elim 1]
-    :: (p => r) and (q => r) [from 1]
+  :: p => r [land elim 1]
+    :: (p => r) land (q => r) [from 1]
   :: r [=> elim]
     [3] p [assumption]
 case q:
-  :: q => r [and elim 2]
-    :: (p => r) and (q => r) [from 1]
+  :: q => r [land elim 2]
+    :: (p => r) land (q => r) [from 1]
   :: r [=> elim]
     [3] q [assumption]
 ```
@@ -93,33 +93,33 @@ Justifications are free-form text enclosed in brackets `[...]`. Any text is acce
 - `[assumption]` - marks assumptions
 - `[premise]` - given fact
 
-**Conjunction (and):**
-- `[and elim]`, `[and elim left]`, `[and elim right]`, `[and elim 1]`, `[and elim 2]` - and elimination
-- `[and intro]` - and introduction
+**Conjunction (land):**
+- `[land elim]`, `[land elim left]`, `[land elim right]`, `[land elim 1]`, `[land elim 2]` - land elimination
+- `[land intro]` - land introduction
 
-**Disjunction (or):**
-- `[or elim]` - or elimination (case analysis)
-- `[or intro]`, `[or intro left]`, `[or intro right]`, `[or intro 1]`, `[or intro 2]` - or introduction
+**Disjunction (lor):**
+- `[lor elim]` - lor elimination (case analysis)
+- `[lor intro]`, `[lor intro left]`, `[lor intro right]`, `[lor intro 1]`, `[lor intro 2]` - lor introduction
 
 **Implication (=>):**
 - `[=> intro from N]` - implication introduction, discharging assumption [N]
 - `[=> elim]` - implication elimination (modus ponens)
 
-**Negation (not):**
-- `[not intro from N]` - negation introduction (proof by contradiction), discharging assumption [N]
-- `[not elim]` - negation elimination
+**Negation (lnot):**
+- `[lnot intro from N]` - negation introduction (proof by contradiction), discharging assumption [N]
+- `[lnot elim]` - negation elimination
 
 **Absurdity (false):**
 - `[false elim]` - ex falso quodlibet (from false, derive anything)
 - `[contradiction]`, `[contradiction with X]` - deriving false from contradictory statements
 
 **Classical logic:**
-- `[LEM]` - Law of Excluded Middle (p or not p axiom)
-- `[double negation elim]` - classical rule: not not p implies p
+- `[LEM]` - Law of Excluded Middle (p lor lnot p axiom)
+- `[double negation elim]` - classical rule: lnot lnot p implies p
 
 **Derived rules:**
 - `[identity]` - trivial identity step (p proves p)
-- `[negation intro from N]` - alternative form of not intro
+- `[negation intro from N]` - alternative form of lnot intro
 
 **Informal annotations:**
 - `[from above]` - reference to earlier step in proof
@@ -135,93 +135,93 @@ Justifications are free-form text enclosed in brackets `[...]`. Any text is acce
 ## Complete Examples
 
 ### Example 1: Simple Implication
-**Goal**: Prove `p and q => q`
+**Goal**: Prove `p land q => q`
 
 ```
 PROOF:
-p and q => q [=> intro from 1]
-  [1] p and q [assumption]
-      q [and elim]
+p land q => q [=> intro from 1]
+  [1] p land q [assumption]
+      q [land elim]
 ```
 
 **Explanation**:
 1. To prove `A => B`, assume A and prove B
-2. We assume `p and q` (label it [1])
-3. From `p and q`, extract `q` using and-elimination
+2. We assume `p land q` (label it [1])
+3. From `p land q`, extract `q` using land-elimination
 4. This proves the implication, discharging assumption [1]
 
 ### Example 2: With Sibling Premises
-**Goal**: Prove `p and (p => q) => (p and q)`
+**Goal**: Prove `p land (p => q) => (p land q)`
 
 ```
 PROOF:
-p and (p => q) => (p and q) [=> intro from 1]
-  [1] p and (p => q) [assumption]
-      :: p [and elim]
-      :: p => q [and elim]
+p land (p => q) => (p land q) [=> intro from 1]
+  [1] p land (p => q) [assumption]
+      :: p [land elim]
+      :: p => q [land elim]
       q [=> elim]
-      p and q [and intro]
+      p land q [land intro]
 ```
 
 **Explanation**:
-- Assume `p and (p => q)` as [1]
+- Assume `p land (p => q)` as [1]
 - Extract both `p` and `p => q` (marked as siblings with `::`)
 - Apply modus ponens to get `q`
-- Combine `p` and `q` to get `p and q`
+- Combine `p` and `q` to get `p land q`
 
 ### Example 3: Distribution with Cases
-**Goal**: Prove `p and (q or r) => (p and q) or (p and r)`
+**Goal**: Prove `p land (q lor r) => (p land q) lor (p land r)`
 
 ```
 PROOF:
-p and (q or r) => (p and q) or (p and r) [=> intro from 1]
-  [1] p and (q or r) [assumption]
-      p [and elim 1]
-      q or r [and elim 2]
-      (p and q) or (p and r) [or elim]
+p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
+  [1] p land (q lor r) [assumption]
+      p [land elim 1]
+      q lor r [land elim 2]
+      (p land q) lor (p land r) [lor elim]
         case q:
           :: p [from above]
           :: q [from case]
-          p and q [and intro]
-          (p and q) or (p and r) [or intro 1]
+          p land q [land intro]
+          (p land q) lor (p land r) [lor intro 1]
         case r:
           :: p [from above]
           :: r [from case]
-          p and r [and intro]
-          (p and q) or (p and r) [or intro 2]
+          p land r [land intro]
+          (p land q) lor (p land r) [lor intro 2]
 ```
 
 **Explanation**:
-- Assume `p and (q or r)` as [1]
-- Extract `p` and `q or r` from the assumption
-- Perform case analysis on `q or r`:
-  - **Case q**: Use `p` from above and case assumption `q`, build `p and q`, then introduce to disjunction
-  - **Case r**: Use `p` from above and case assumption `r`, build `p and r`, then introduce to disjunction
+- Assume `p land (q lor r)` as [1]
+- Extract `p` and `q lor r` from the assumption
+- Perform case analysis on `q lor r`:
+  - **Case q**: Use `p` from above and case assumption `q`, build `p land q`, then introduce to disjunction
+  - **Case r**: Use `p` from above and case assumption `r`, build `p land r`, then introduce to disjunction
 - Both cases derive the same conclusion
 
 **Important note on case structure**: Within each case, use `[from above]` to reference facts established before the case analysis began. The `::` sibling markers indicate multiple facts that together support the next inference step.
 
 ### Example 4: Modus Tollens
-**Goal**: Prove `(p => q) and not q => not p`
+**Goal**: Prove `(p => q) land lnot q => lnot p`
 
 ```
 PROOF:
-(p => q) and not q => not p [=> intro from 1]
-  [1] (p => q) and not q [assumption]
-      p => q [and elim]
-      not q [and elim]
-      not p [negation intro from 2]
+(p => q) land lnot q => lnot p [=> intro from 1]
+  [1] (p => q) land lnot q [assumption]
+      p => q [land elim]
+      lnot q [land elim]
+      lnot p [negation intro from 2]
         [2] p [assumption]
             q [=> elim]
             false [contradiction]
 ```
 
 **Explanation**:
-- Assume `(p => q) and not q` as [1]
-- To prove `not p`, assume `p` (as [2]) and derive contradiction
+- Assume `(p => q) land lnot q` as [1]
+- To prove `lnot p`, assume `p` (as [2]) and derive contradiction
 - From `p` and `p => q`, get `q`
-- But we have `not q`, so contradiction
-- Therefore `not p`, discharging assumption [2]
+- But we have `lnot q`, so contradiction
+- Therefore `lnot p`, discharging assumption [2]
 
 ## Indentation Rules
 
@@ -259,12 +259,12 @@ class CaseAnalysis:
 
 **Incorrect (will fail):**
 ```
-p and q[and elim]  // Parser reads this as p with subscript "and q[and"
+p land q[land elim]  // Parser reads this as p with subscript "land q[land"
 ```
 
 **Correct:**
 ```
-p and q [and elim]  // Space before [ makes it clear this is a justification
+p land q [land elim]  // Space before [ makes it clear this is a justification
 ```
 
 This limitation affects:
@@ -292,4 +292,4 @@ For siblings (marked with `::`), generate side-by-side premises:
 }
 ```
 
-For cases, generate multiple inference branches combined with or-elimination.
+For cases, generate multiple inference branches combined with lor-elimination.

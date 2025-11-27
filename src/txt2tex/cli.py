@@ -39,6 +39,18 @@ def main() -> int:
         action="store_true",
         help="Include parts (a, b, c) in table of contents",
     )
+    parser.add_argument(
+        "--no-warn-overflow",
+        action="store_true",
+        help="Disable warnings for lines that may overflow page margins",
+    )
+    parser.add_argument(
+        "--overflow-threshold",
+        type=int,
+        default=None,
+        metavar="N",
+        help="LaTeX character threshold for overflow warnings (default: 100)",
+    )
 
     args = parser.parse_args()
 
@@ -67,7 +79,12 @@ def main() -> int:
         parser_obj = Parser(tokens)
         ast = parser_obj.parse()
 
-        generator = LaTeXGenerator(use_fuzz=not args.zed, toc_parts=args.toc_parts)
+        generator = LaTeXGenerator(
+            use_fuzz=not args.zed,
+            toc_parts=args.toc_parts,
+            warn_overflow=not args.no_warn_overflow,
+            overflow_threshold=args.overflow_threshold,
+        )
         latex = generator.generate_document(ast)
     except LexerError as e:
         formatted = formatter.format_error(e.message, e.line, e.column)
@@ -77,6 +94,9 @@ def main() -> int:
         formatted = formatter.format_error(e.message, e.token.line, e.token.column)
         print(formatted, file=sys.stderr)
         return 1
+
+    # Emit any overflow warnings
+    generator.emit_warnings()
 
     # Write output
     output_path = args.output or args.input.with_suffix(".tex")

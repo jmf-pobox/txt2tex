@@ -161,4 +161,3 @@ class TestIntegration:
             result = formatter.format_error(e.message, e.token.line, e.token.column)
             assert "Error:" in result
             assert "^" in result
-

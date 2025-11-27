@@ -11,20 +11,20 @@
 \begin{document}
 
 \begin{zed}
-[A, B, C]
+  [A, B, C]
 \end{zed}
 
 \begin{axdef}
-successor : \nat \fun \nat \\
-square : \nat \fun \nat
-\where
-\forall n : \nat @ successor(n) = n + 1 \land square(n) = n * n
+  successor : \nat \fun \nat \\
+  square : \nat \fun \nat
+  \where
+  \forall n : \nat @ successor(n) = n + 1 \land square(n) = n * n
 \end{axdef}
 
 \begin{zed}
-squareSuccessor == square \circ successor
-\also
-result == square(successor(5))
+  squareSuccessor == square \circ successor
+  \also
+  result == square(successor(5))
 \end{zed}
 
 \end{document}

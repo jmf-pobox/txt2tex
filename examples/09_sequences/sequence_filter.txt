@@ -69,7 +69,11 @@ axdef
   filtered_seq3 : seq N
   restricted_rel3 : N <-> N
 where
-  s3 = <1, 2, 3, 4, 5> land R3 = {1 |-> 10, 2 |-> 20, 3 |-> 30} land A3 = {2, 3, 4} land filtered_seq3 = s3 filter A3 land restricted_rel3 = R3 |> {10, 20}
+  s3 = <1, 2, 3, 4, 5> land \
+    R3 = {1 |-> 10, 2 |-> 20, 3 |-> 30} land \
+    A3 = {2, 3, 4} land \
+    filtered_seq3 = s3 filter A3 land \
+    restricted_rel3 = R3 |> {10, 20}
 end
 
 TEXT: filtered_seq is <2, 3, 4> (sequence elements in A)
@@ -104,7 +108,10 @@ axdef
   large5 : P N
   result5 : seq N
 where
-  s5 = <1, 2, 3, 4, 5, 6, 7, 8, 9, 10> land evens5 = {2, 4, 6, 8, 10, 12} land large5 = {5, 6, 7, 8, 9, 10, 11} land result5 = (s5 filter evens5) filter large5
+  s5 = <1, 2, 3, 4, 5, 6, 7, 8, 9, 10> land \
+    evens5 = {2, 4, 6, 8, 10, 12} land \
+    large5 = {5, 6, 7, 8, 9, 10, 11} land \
+    result5 = (s5 filter evens5) filter large5
 end
 
 TEXT: Multiple filters can be applied sequentially. First filter to evens gives <2, 4, 6, 8, 10>, then filter to large gives <6, 8, 10>.
@@ -118,7 +125,11 @@ axdef
   result6a : seq N
   result6b : seq N
 where
-  s6 = <1, 2, 3> land empty_set6 = {} land disjoint_set6 = {10, 20, 30} land result6a = s6 filter empty_set6 land result6b = s6 filter disjoint_set6
+  s6 = <1, 2, 3> land \
+    empty_set6 = {} land \
+    disjoint_set6 = {10, 20, 30} land \
+    result6a = s6 filter empty_set6 land \
+    result6b = s6 filter disjoint_set6
 end
 
 TEXT: Filtering by an empty set or disjoint set results in an empty sequence.

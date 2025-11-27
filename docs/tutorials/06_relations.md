@@ -128,8 +128,8 @@ axdef
   siblings : Person <-> Person
 where
   grandparentOf = parentOf o9 parentOf
-  forall p, q : Person | (p, q) in siblings <=>
-    (exists parent : Person | (p, parent) in parentOf and (q, parent) in parentOf and p /= q)
+  forall p, q : Person | (p, q) elem siblings <=>
+    (exists parent : Person | (p, parent) elem parentOf land (q, parent) elem parentOf land p /= q)
 end
 ```
 

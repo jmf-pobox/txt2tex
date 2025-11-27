@@ -10,14 +10,16 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\begin{zed}Status ::= active | inactive | pending\end{zed}
-
-\begin{zed}
-Tree ::= stalk | leaf \ldata \nat \rdata | branch \ldata Tree \cross Tree \rdata
+\begin{zed}Status ::= active | inactive | pending
 \end{zed}
 
 \begin{zed}
-List ::= nil | cons \ldata \nat \cross List \rdata
+  Tree ::= stalk | leaf \ldata \nat \rdata | branch \ldata Tree
+  \cross Tree \rdata
+\end{zed}
+
+\begin{zed}
+  List ::= nil | cons \ldata \nat \cross List \rdata
 \end{zed}
 
 \end{document}

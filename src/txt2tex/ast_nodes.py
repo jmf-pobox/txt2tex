@@ -392,12 +392,19 @@ class Conditional(ASTNode):
     - if x > 0 then x else -x -> condition=(x > 0), then_expr=x, else_expr=(-x)
     - if s = <> then 0 else 1 -> condition=(s = <>), then_expr=0, else_expr=1
 
+    Line breaks can be inserted using \\ at the end of a line:
+    - if x > 0 \\
+        then x \\
+        else -x
+
     LaTeX rendering: Uses cases environment or inline conditional notation
     """
 
     condition: Expr  # The conditional predicate
     then_expr: Expr  # Expression when condition is true
     else_expr: Expr  # Expression when condition is false
+    line_break_after_condition: bool = False  # Line break before 'then'
+    line_break_after_then: bool = False  # Line break before 'else'
 
 
 @dataclass(frozen=True)

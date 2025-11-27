@@ -1238,7 +1238,7 @@ end
 axdef
   modulo3 : N -->> {0, 1, 2}
 where
-  forall n : N | modulo3(n) = n mod 3 and
+  forall n : N | modulo3(n) = n mod 3 land
   forall r : {0, 1, 2} | exists n : N | modulo3(n) = r
 end
 ```
@@ -2037,6 +2037,62 @@ seq[N cross N]               →  seq[N × N]
 Type[List[N]]                →  Type[List[N]]
 Container[seq[N]]            →  Container[seq[N]]
 ```
+
+---
+
+## Overflow Warnings
+
+txt2tex automatically detects lines in Z notation blocks (axdef, schema, zed, gendef) that may overflow the page margin. These blocks use fuzz's internal `\halign` formatting which cannot be automatically scaled with `adjustbox`.
+
+### Warning Output
+
+When a line exceeds the threshold, you'll see a warning on stderr:
+
+```
+Warning: Line 270 may overflow page margin (~145 chars)
+  In: axdef where clause
+  Content: forall i : songs | loveHateScore(i) = if ...
+  Suggestion: Break long expressions using indentation continuation
+```
+
+### CLI Options
+
+- `--no-warn-overflow` - Disable overflow warnings
+- `--overflow-threshold N` - Set custom threshold (default: 100 LaTeX chars)
+
+### Fixing Overflow
+
+To fix overflowing lines, manually break long expressions using indentation:
+
+**Before (overflows):**
+```
+axdef
+  f : SongId +-> N
+where
+  forall i : songs | f(i) = if (# {u : UserId | i elem loved(u)}) >= (# {u : UserId | i elem hated(u)}) then (# {u : UserId | i elem loved(u)}) - (# {u : UserId | i elem hated(u)}) else 0
+end
+```
+
+**After (fits page):**
+```
+axdef
+  f : SongId +-> N
+where
+  forall i : songs |
+    f(i) = if (# {u : UserId | i elem loved(u)}) >= (# {u : UserId | i elem hated(u)})
+      then (# {u : UserId | i elem loved(u)}) - (# {u : UserId | i elem hated(u)})
+      else 0
+end
+```
+
+### Blocks That Support Auto-Scaling
+
+The following block types use `adjustbox` and automatically scale to fit the page:
+- `TRUTH TABLE:` blocks
+- `ARGUE:` and `EQUIV:` blocks
+- `PROOF:` blocks (proof trees)
+
+These do not need manual line breaking.
 
 ---
 

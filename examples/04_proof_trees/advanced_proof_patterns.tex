@@ -20,50 +20,69 @@
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\mbox{trichotomy of integers}, \mbox{axiom}]{n < 0 \lor n = 0 \lor n > 0}{}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\mbox{trichotomy of integers}, \mbox{axiom}]{n < 0 \lor n
+    = 0 \lor n > 0}{}
+    $%
+  }
 \end{center}
 \bigskip
 
-\noindent This uses the trichotomy property as an axiom. To prove something about all integers, we can case-analyze on these three possibilities.
+\noindent This uses the trichotomy property as an axiom. To prove
+something about all integers, we can case-analyze on these three possibilities.
 
 \bigskip
 
 \section*{Example 2 : Multi - Level Case Analysis}
 \addcontentsline{toc}{section}{Example 2 : Multi - Level Case Analysis}
 
-\noindent Prove: $(p \lor q)$ $\land$ $(r \lor s)$ $\Rightarrow$ $(p \land r)$ $\lor$ $(p \land s)$ $\lor$ $(q \land r)$ $\lor$ $(q \land s)$
+\noindent Prove: $(p \lor q)$ $\land$ $(r \lor s)$ $\Rightarrow$ $(p
+\land r)$ $\lor$ $(p \land s)$ $\lor$ $(q \land r)$ $\lor$ $(q \land s)$
 
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \land (r \lor s)) \implies (p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{
-  \infer[\lor \mbox{elim on p} \lor q]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\lor \mbox{elim on r} \lor s]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{
-  \raiseproof{10ex}{\infer[\lor \mbox{intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land \mbox{intro}]{p \land r}{}}}
-&
-\hskip 6em \raiseproof{26ex}{\infer[\lor \mbox{intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land \mbox{intro}]{p \land s}{}}}
-} & \infer[\lor \mbox{elim on r} \lor s]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{
-  \raiseproof{10ex}{\infer[\lor \mbox{intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land \mbox{intro}]{q \land r}{}}}
-&
-\hskip 6em \raiseproof{26ex}{\infer[\lor \mbox{intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land \mbox{intro}]{q \land s}{}}}
-}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \land (r
+      \lor s)) \implies (p \land r) \lor (p \land s) \lor (q \land r)
+    \lor (q \land s)}{
+      \infer[\lor \mbox{elim on p} \lor q]{(p \land r) \lor (p \land
+      s) \lor (q \land r) \lor (q \land s)}{\infer[\lor \mbox{elim on
+        r} \lor s]{(p \land r) \lor (p \land s) \lor (q \land r) \lor
+        (q \land s)}{
+          \raiseproof{10ex}{\infer[\lor \mbox{intro}]{(p \land r)
+              \lor (p \land s) \lor (q \land r) \lor (q \land
+          s)}{\infer[\land \mbox{intro}]{p \land r}{}}}
+          &
+          \hskip 6em \raiseproof{26ex}{\infer[\lor \mbox{intro}]{(p
+              \land r) \lor (p \land s) \lor (q \land r) \lor (q \land
+          s)}{\infer[\land \mbox{intro}]{p \land s}{}}}
+        } & \infer[\lor \mbox{elim on r} \lor s]{(p \land r) \lor (p
+        \land s) \lor (q \land r) \lor (q \land s)}{
+          \raiseproof{10ex}{\infer[\lor \mbox{intro}]{(p \land r)
+              \lor (p \land s) \lor (q \land r) \lor (q \land
+          s)}{\infer[\land \mbox{intro}]{q \land r}{}}}
+          &
+          \hskip 6em \raiseproof{26ex}{\infer[\lor \mbox{intro}]{(p
+              \land r) \lor (p \land s) \lor (q \land r) \lor (q \land
+          s)}{\infer[\land \mbox{intro}]{q \land s}{}}}
+      }}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
-\noindent Nested case analysis on two disjunctions, exploring all four combinations.
+\noindent Nested case analysis on two disjunctions, exploring all
+four combinations.
 
 \bigskip
 
 \section*{Example 3 : Proof by Mathematical Induction ( Base land Step )}
-\addcontentsline{toc}{section}{Example 3 : Proof by Mathematical Induction ( Base land Step )}
+\addcontentsline{toc}{section}{Example 3 : Proof by Mathematical
+Induction ( Base land Step )}
 
 \noindent Prove: For all n ∈ ℕ, sum(1 to n) = n(n+1)/2
 
@@ -74,13 +93,17 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (sum\_{to}(0) = 0 * ((0 + 1))(div)(2))}{
-  \infer[\mbox{equality}]{sum\_{to}(0) = 0 * ((0 + 1))(div)(2)}{\infer[\mbox{arithmetic}]{0 * ((0 + 1))(div)(2) = 0}{\infer[\mbox{definition}]{sum\_{to}(0) = 0}{\ulcorner true \urcorner^{[1]}}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies
+    (sum\_{to}(0) = 0 * ((0 + 1))(div)(2))}{
+      \infer[\mbox{equality}]{sum\_{to}(0) = 0 * ((0 +
+      1))(div)(2)}{\infer[\mbox{arithmetic}]{0 * ((0 + 1))(div)(2) =
+        0}{\infer[\mbox{definition}]{sum\_{to}(0) = 0}{\ulcorner true
+      \urcorner^{[1]}}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -89,13 +112,21 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(sum\_{to}(n) = n * ((n + 1))(div)(2)) \implies (sum\_{to}(n + 1) = (n + 1) * ((n + 2))(div)(2))}{
-  \infer[\mbox{factoring}]{sum\_{to}(n + 1) = (n + 1) * ((n + 2))(div)(2)}{\infer[\mbox{algebra}]{sum\_{to}(n + 1) = ((n * (n + 1) + 2 * (n + 1)))(div)(2)}{\infer[\mbox{substitution}]{sum\_{to}(n + 1) = n * ((n + 1))(div)(2) + (n + 1)}{\infer[\mbox{definition}]{sum\_{to}(n + 1) = sum\_{to}(n) + (n + 1)}{\ulcorner sum\_{to}(n) = n * ((n + 1))(div)(2) \urcorner^{[1]}}}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(sum\_{to}(n) = n * ((n
+    + 1))(div)(2)) \implies (sum\_{to}(n + 1) = (n + 1) * ((n + 2))(div)(2))}{
+      \infer[\mbox{factoring}]{sum\_{to}(n + 1) = (n + 1) * ((n +
+      2))(div)(2)}{\infer[\mbox{algebra}]{sum\_{to}(n + 1) = ((n * (n
+              + 1) + 2 * (n +
+        1)))(div)(2)}{\infer[\mbox{substitution}]{sum\_{to}(n + 1) = n
+            * ((n + 1))(div)(2) + (n +
+          1)}{\infer[\mbox{definition}]{sum\_{to}(n + 1) = sum\_{to}(n) +
+            (n + 1)}{\ulcorner sum\_{to}(n) = n * ((n + 1))(div)(2)
+      \urcorner^{[1]}}}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -115,13 +146,18 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (reverse(reverse(emptyseq)) = emptyseq)}{
-  \infer[\mbox{definition}]{reverse(reverse(emptyseq)) = emptyseq}{\infer[\mbox{substitution}]{reverse(reverse(emptyseq)) = reverse(emptyseq)}{\infer[\mbox{definition}]{reverse(emptyseq) = emptyseq}{\ulcorner true \urcorner^{[1]}}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies
+    (reverse(reverse(emptyseq)) = emptyseq)}{
+      \infer[\mbox{definition}]{reverse(reverse(emptyseq)) =
+      emptyseq}{\infer[\mbox{substitution}]{reverse(reverse(emptyseq))
+          =
+        reverse(emptyseq)}{\infer[\mbox{definition}]{reverse(emptyseq)
+      = emptyseq}{\ulcorner true \urcorner^{[1]}}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -130,13 +166,22 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(reverse(reverse(s)) = s) \implies (reverse(reverse(cons(x, s))) = cons(x, s))}{
-  \infer[\mbox{inductive hypothesis}]{cons(x, reverse(reverse(s))) = cons(x, s)}{\infer[\mbox{definition}]{reverse(append(reverse(s), x)) = cons(x, reverse(reverse(s)))}{\infer[\mbox{substitution}]{reverse(reverse(cons(x, s))) = reverse(append(reverse(s), x))}{\infer[\mbox{definition}]{reverse(cons(x, s)) = append(reverse(s), x)}{\ulcorner reverse(reverse(s)) = s \urcorner^{[1]}}}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(reverse(reverse(s)) =
+    s) \implies (reverse(reverse(cons(x, s))) = cons(x, s))}{
+      \infer[\mbox{inductive hypothesis}]{cons(x,
+        reverse(reverse(s))) = cons(x,
+      s)}{\infer[\mbox{definition}]{reverse(append(reverse(s), x)) =
+          cons(x,
+        reverse(reverse(s)))}{\infer[\mbox{substitution}]{reverse(reverse(cons(x,
+            s))) = reverse(append(reverse(s),
+          x))}{\infer[\mbox{definition}]{reverse(cons(x, s)) =
+            append(reverse(s), x)}{\ulcorner reverse(reverse(s)) = s
+      \urcorner^{[1]}}}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -152,13 +197,19 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\exists n : \nat @ even(n) \land n > 10)}{
-  \infer[\exists \mbox{intro with n}=12]{\exists n : \nat @ even(n) \land n > 10}{\infer[\land \mbox{intro}]{even(12) \land 12 > 10}{\infer[\mbox{arithmetic}]{12 > 10}{\infer[\mbox{definition of even}, 12=2 * 6]{even(12)}{\infer[\mbox{arithmetic}]{12 = 2 * 6}{\ulcorner true \urcorner^{[1]}}}}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\exists n
+    : \nat @ even(n) \land n > 10)}{
+      \infer[\exists \mbox{intro with n}=12]{\exists n : \nat @
+      even(n) \land n > 10}{\infer[\land \mbox{intro}]{even(12) \land
+        12 > 10}{\infer[\mbox{arithmetic}]{12 >
+          10}{\infer[\mbox{definition of even}, 12=2 *
+            6]{even(12)}{\infer[\mbox{arithmetic}]{12 = 2 * 6}{\ulcorner
+      true \urcorner^{[1]}}}}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -169,22 +220,42 @@ $%
 \section*{Example 6 : Non - Constructive Existence Proof}
 \addcontentsline{toc}{section}{Example 6 : Non - Constructive Existence Proof}
 
-\noindent Prove: There exist irrational numbers a and b such that $a^b$ is rational
+\noindent Prove: There exist irrational numbers a and b such that
+$a^b$ is rational
 
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{irrational(sqrt(2)) \implies (\exists a, b @ irrational(a) \land irrational(b) \land rational(power(a, b)))}{
-  \infer[\lor \mbox{elim}]{\exists a, b @ irrational(a) \land irrational(b) \land rational(power(a, b))}{\infer[\exists \mbox{intro with a}=b=sqrt(2)]{\exists a, b @ irrational(a) \land irrational(b) \land rational(power(a, b))}{\infer[\land \mbox{intro}]{irrational(sqrt(2)) \land irrational(sqrt(2)) \land rational(power(sqrt(2), sqrt(2)))}{}} & \infer[\exists \mbox{intro}]{\exists a, b @ irrational(a) \land irrational(b) \land rational(power(a, b))}{\infer[\land \mbox{intro}]{irrational(power(sqrt(2), sqrt(2))) \land irrational(sqrt(2)) \land rational(power(power(sqrt(2), sqrt(2)), sqrt(2)))}{\infer[\mbox{known}]{rational(2)}{\infer[\mbox{simplification}]{power(sqrt(2), 2) = 2}{\infer[\mbox{arithmetic}]{power(sqrt(2), sqrt(2) * sqrt(2)) = power(sqrt(2), 2)}{\infer[\mbox{exponent law}]{power(power(sqrt(2), sqrt(2)), sqrt(2)) = power(sqrt(2), sqrt(2) * sqrt(2))}{}}}}}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{irrational(sqrt(2))
+      \implies (\exists a, b @ irrational(a) \land irrational(b) \land
+    rational(power(a, b)))}{
+      \infer[\lor \mbox{elim}]{\exists a, b @ irrational(a) \land
+      irrational(b) \land rational(power(a, b))}{\infer[\exists
+        \mbox{intro with a}=b=sqrt(2)]{\exists a, b @ irrational(a)
+        \land irrational(b) \land rational(power(a, b))}{\infer[\land
+          \mbox{intro}]{irrational(sqrt(2)) \land irrational(sqrt(2))
+        \land rational(power(sqrt(2), sqrt(2)))}{}} & \infer[\exists
+        \mbox{intro}]{\exists a, b @ irrational(a) \land irrational(b)
+        \land rational(power(a, b))}{\infer[\land
+          \mbox{intro}]{irrational(power(sqrt(2), sqrt(2))) \land
+            irrational(sqrt(2)) \land rational(power(power(sqrt(2),
+                sqrt(2)),
+          sqrt(2)))}{\infer[\mbox{known}]{rational(2)}{\infer[\mbox{simplification}]{power(sqrt(2),
+              2) = 2}{\infer[\mbox{arithmetic}]{power(sqrt(2), sqrt(2) *
+                sqrt(2)) = power(sqrt(2), 2)}{\infer[\mbox{exponent
+                  law}]{power(power(sqrt(2), sqrt(2)), sqrt(2)) =
+                    power(sqrt(2),
+      sqrt(2) * sqrt(2))}{}}}}}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
-\noindent Non-constructive: we don't know which case is true, but both lead to the conclusion.
+\noindent Non-constructive: we don't know which case is true, but
+both lead to the conclusion.
 
 \bigskip
 
@@ -200,13 +271,16 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies prime\_factorization(2)}{
-  \infer[\mbox{trivial}, \mbox{singleton factorization}]{prime\_factorization(2)}{\infer[\mbox{definition}]{prime(2)}{\ulcorner true \urcorner^{[1]}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies
+    prime\_factorization(2)}{
+      \infer[\mbox{trivial}, \mbox{singleton
+      factorization}]{prime\_factorization(2)}{\infer[\mbox{definition}]{prime(2)}{\ulcorner
+      true \urcorner^{[1]}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -215,17 +289,29 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(n \geq 2) \implies prime\_factorization(n)}{
-  \infer[\lor \mbox{elim}]{prime\_factorization(n)}{\infer[\mbox{trivial}, \mbox{singleton factorization}]{prime\_factorization(n)}{} & \infer[n=a * b]{prime\_factorization(n)}{\infer[\mbox{multiplication of factorizations}]{prime\_factorization(a * b)}{\infer[\mbox{strong IH}, b < n]{prime\_factorization(b)}{\infer[\mbox{strong IH}, a < n]{prime\_factorization(a)}{\infer[\mbox{definition of composite}]{\exists a, b @ 2 \leq a \land a < n \land 2 \leq b \land b < n \land n = a * b}{}}}}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(n \geq 2) \implies
+    prime\_factorization(n)}{
+      \infer[\lor
+      \mbox{elim}]{prime\_factorization(n)}{\infer[\mbox{trivial},
+        \mbox{singleton factorization}]{prime\_factorization(n)}{} &
+        \infer[n=a *
+        b]{prime\_factorization(n)}{\infer[\mbox{multiplication of
+          factorizations}]{prime\_factorization(a *
+          b)}{\infer[\mbox{strong IH}, b <
+            n]{prime\_factorization(b)}{\infer[\mbox{strong IH}, a <
+              n]{prime\_factorization(a)}{\infer[\mbox{definition of
+                composite}]{\exists a, b @ 2 \leq a \land a < n \land 2 \leq b
+      \land b < n \land n = a * b}{}}}}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
-\noindent Strong induction: we assume the property for all smaller values, not just n-1.
+\noindent Strong induction: we assume the property for all smaller
+values, not just n-1.
 
 \bigskip
 
@@ -237,13 +323,21 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{even(n) \implies even(power(n, 2))}{
-  \infer[\mbox{definition of even}]{even(power(n, 2))}{\infer[\exists \mbox{intro with m}=2 * power(k, 2)]{\exists m @ power(n, 2) = 2 * m}{\infer[\mbox{factoring}]{4 * power(k, 2) = 2 * (2 * power(k, 2))}{\infer[\mbox{algebra}]{power(2 * k, 2) = 4 * power(k, 2)}{\infer[\mbox{substitution}]{power(n, 2) = power(2 * k, 2)}{\infer[\mbox{definition of even}]{\exists k @ n = 2 * k}{\ulcorner even(n) \urcorner^{[1]}}}}}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{even(n) \implies
+    even(power(n, 2))}{
+      \infer[\mbox{definition of even}]{even(power(n,
+      2))}{\infer[\exists \mbox{intro with m}=2 * power(k,
+        2)]{\exists m @ power(n, 2) = 2 * m}{\infer[\mbox{factoring}]{4
+            * power(k, 2) = 2 * (2 * power(k,
+          2))}{\infer[\mbox{algebra}]{power(2 * k, 2) = 4 * power(k,
+            2)}{\infer[\mbox{substitution}]{power(n, 2) = power(2 * k,
+              2)}{\infer[\mbox{definition of even}]{\exists k @ n = 2 *
+      k}{\ulcorner even(n) \urcorner^{[1]}}}}}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -252,13 +346,16 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{odd(power(n, 2)) \implies odd(n)}{
-  \infer[\lor \mbox{elim}]{odd(n)}{\infer[\mbox{false elim}]{odd(n)}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{odd(power(n, 2)) \land even(power(n, 2))}{\infer[Lemma 1]{even(power(n, 2))}{}}}} & \infer[\mbox{identity}]{odd(n)}{}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{odd(power(n, 2)) \implies odd(n)}{
+      \infer[\lor \mbox{elim}]{odd(n)}{\infer[\mbox{false
+        elim}]{odd(n)}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{odd(power(n,
+            2)) \land even(power(n, 2))}{\infer[Lemma 1]{even(power(n,
+      2))}{}}}} & \infer[\mbox{identity}]{odd(n)}{}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -274,13 +371,24 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\forall n @ n \geq 1 \implies \power n)}{
-  \infer[\lnot\textrm{-intro}^{[2]}]{\forall n @ n \geq 1 \implies \power n}{\infer[\lor \mbox{elim}]{false}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot \power m \land \power 1}{\infer[\mbox{base \mbox{case} \mbox{proved} separately}]{\power 1}{}}} & \infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot \power m \land \power m}{\infer[\mbox{by \mbox{inductive} \mbox{step} \mbox{from} P}(m - 1)]{\power m}{\infer[\mbox{since m} - 1 >=1 \land m - 1 < m]{\power (m - 1)}{\infer[\mbox{minimality of m}]{\forall k @ k \geq 1 \land k < m \implies \power k}{}}}}}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\forall n
+    @ n \geq 1 \implies \power n)}{
+      \infer[\lnot\textrm{-intro}^{[2]}]{\forall n @ n \geq 1
+      \implies \power n}{\infer[\lor
+        \mbox{elim}]{false}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot
+            \power m \land \power 1}{\infer[\mbox{base \mbox{case}
+          \mbox{proved} separately}]{\power 1}{}}} &
+          \infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot
+            \power m \land \power m}{\infer[\mbox{by \mbox{inductive}
+              \mbox{step} \mbox{from} P}(m - 1)]{\power m}{\infer[\mbox{since
+                m} - 1 >=1 \land m - 1 < m]{\power (m -
+                1)}{\infer[\mbox{minimality of m}]{\forall k @ k \geq 1 \land k
+      < m \implies \power k}{}}}}}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -300,13 +408,15 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{initial\_state \implies invariant(initial\_state)}{
-  \infer[\mbox{verification}]{invariant(initial\_state)}{\ulcorner initial\_state \urcorner^{[1]}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{initial\_state \implies
+    invariant(initial\_state)}{
+      \infer[\mbox{verification}]{invariant(initial\_state)}{\ulcorner
+      initial\_state \urcorner^{[1]}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -315,13 +425,15 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(invariant(before\_state) \land executes\_loop\_body) \implies invariant(after\_state)}{
-  \infer[\mbox{verification}]{invariant(after\_state)}{\infer[\land\textrm{-elim-2}]{executes\_loop\_body}{\infer[\land\textrm{-elim-1}]{invariant(before\_state)}{\ulcorner invariant(before\_state) \land executes\_loop\_body \urcorner^{[1]}}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(invariant(before\_state)
+    \land executes\_loop\_body) \implies invariant(after\_state)}{
+      \infer[\mbox{verification}]{invariant(after\_state)}{\infer[\land\textrm{-elim-2}]{executes\_loop\_body}{\infer[\land\textrm{-elim-1}]{invariant(before\_state)}{\ulcorner
+      invariant(before\_state) \land executes\_loop\_body \urcorner^{[1]}}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -330,13 +442,18 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{loop\_terminates \implies desired\_property}{
-  \infer[\mbox{logic}]{desired\_property}{\infer[\land \mbox{intro}]{invariant(termination\_state) \land termination\_condition}{\infer[\mbox{by preservation}]{invariant(termination\_state)}{\ulcorner loop\_terminates \urcorner^{[1]}}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{loop\_terminates
+    \implies desired\_property}{
+      \infer[\mbox{logic}]{desired\_property}{\infer[\land
+        \mbox{intro}]{invariant(termination\_state) \land
+        termination\_condition}{\infer[\mbox{by
+          preservation}]{invariant(termination\_state)}{\ulcorner
+      loop\_terminates \urcorner^{[1]}}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -348,13 +465,20 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies uncountable(reals)}{
-  \infer[\lnot\textrm{-intro}^{[2]}]{uncountable(reals)}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{not\_in\_range(r, f) \land enumeration(f, reals)}{\infer[\mbox{previous line}]{not\_in\_range(r, f)}{\infer[\mbox{by construction}, \mbox{differs at nth digit}]{\forall n @ r \neq apply(f, n)}{\infer[\mbox{diagonal method}]{diagonal\_construction(r)}{\infer[\mbox{definition of countable}]{\exists f @ enumeration(f, reals)}{\ulcorner countable(reals) \urcorner^{[2]}}}}}}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies uncountable(reals)}{
+      \infer[\lnot\textrm{-intro}^{[2]}]{uncountable(reals)}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{not\_in\_range(r,
+          f) \land enumeration(f, reals)}{\infer[\mbox{previous
+            line}]{not\_in\_range(r, f)}{\infer[\mbox{by construction},
+              \mbox{differs at nth digit}]{\forall n @ r \neq apply(f,
+              n)}{\infer[\mbox{diagonal
+                method}]{diagonal\_construction(r)}{\infer[\mbox{definition of
+                  countable}]{\exists f @ enumeration(f, reals)}{\ulcorner
+      countable(reals) \urcorner^{[2]}}}}}}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -390,13 +514,19 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\exists n @ n > 100 \land even(n))}{
-  \infer[\exists \mbox{intro with n}=102]{\exists n @ n > 100 \land even(n)}{\infer[\land \mbox{intro}]{102 > 100 \land even(102)}{\infer[\mbox{definition}]{even(102)}{\infer[\mbox{arithmetic}]{102 = 2 * 51}{\infer[\mbox{arithmetic}]{102 > 100}{\infer[\mbox{construction}]{witness\_construction(102)}{\ulcorner true \urcorner^{[1]}}}}}}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\exists n
+    @ n > 100 \land even(n))}{
+      \infer[\exists \mbox{intro with n}=102]{\exists n @ n > 100
+      \land even(n)}{\infer[\land \mbox{intro}]{102 > 100 \land
+        even(102)}{\infer[\mbox{definition}]{even(102)}{\infer[\mbox{arithmetic}]{102
+            = 2 * 51}{\infer[\mbox{arithmetic}]{102 >
+              100}{\infer[\mbox{construction}]{witness\_construction(102)}{\ulcorner
+      true \urcorner^{[1]}}}}}}}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 
@@ -416,21 +546,28 @@ $%
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\forall n @ \power n)}{
-  \infer[\lor \mbox{elim over cases}]{\forall n @ \power n}{\infer[\mbox{direct proof}]{\power base}{} & \infer[\lor \mbox{elim over subcases}]{\power n}{
-  \raiseproof{12ex}{\infer[\lnot\textrm{-intro}^{[2]}]{\power n}{
-  \infer[\mbox{contradiction}]{false}{\infer[\mbox{proof steps}]{contradiction\_derived}{\ulcorner \lnot \power n \urcorner^{[2]}}}
-}}
-&
-\hskip 6em \raiseproof{30ex}{\infer[\Rightarrow\textrm{-intro}^{[3]}]{\power n}{
-  \infer[\mbox{inductive step}]{\power n}{\ulcorner \power (n - 1) \urcorner^{[3]}}
-}}
-}}
-}
-$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\forall n
+    @ \power n)}{
+      \infer[\lor \mbox{elim over cases}]{\forall n @ \power
+      n}{\infer[\mbox{direct proof}]{\power base}{} & \infer[\lor
+        \mbox{elim over subcases}]{\power n}{
+          \raiseproof{12ex}{\infer[\lnot\textrm{-intro}^{[2]}]{\power n}{
+              \infer[\mbox{contradiction}]{false}{\infer[\mbox{proof
+                steps}]{contradiction\_derived}{\ulcorner \lnot \power
+              n \urcorner^{[2]}}}
+          }}
+          &
+          \hskip 6em
+          \raiseproof{30ex}{\infer[\Rightarrow\textrm{-intro}^{[3]}]{\power n}{
+              \infer[\mbox{inductive step}]{\power n}{\ulcorner
+              \power (n - 1) \urcorner^{[3]}}
+          }}
+      }}
+    }
+    $%
+  }
 \end{center}
 \bigskip
 

@@ -23,7 +23,7 @@ emptyset               (empty set)
 ### Set Membership
 
 ```
-x in S                 (x is a member of S)
+x elem S               (x is a member of S)
 x notin S              (x is not a member of S)
 ```
 

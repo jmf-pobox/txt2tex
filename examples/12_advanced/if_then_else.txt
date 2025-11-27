@@ -73,7 +73,10 @@ axdef
 where
   filterPositives(⟨⟩) = ⟨⟩
   forall x : Z; s : seq Z |
-    filterPositives(⟨x⟩ ⌢ s) = if x > 0 then ⟨x⟩ ⌢ filterPositives(s) else filterPositives(s)
+    filterPositives(⟨x⟩ ⌢ s) =
+      if x > 0 \
+        then ⟨x⟩ ⌢ filterPositives(s) \
+        else filterPositives(s)
 end
 
 TEXT: Filters a sequence to include only positive elements using conditional expressions.
@@ -86,11 +89,12 @@ axdef
   scoreToGrade : N -> Grade
 where
   forall score : N |
-    scoreToGrade(score) = if score >= 90 then GradeA
-                          else if score >= 80 then GradeB
-                          else if score >= 70 then GradeC
-                          else if score >= 60 then GradeD
-                          else GradeF
+    scoreToGrade(score) =
+      if score >= 90 then GradeA \
+      else if score >= 80 then GradeB \
+      else if score >= 70 then GradeC \
+      else if score >= 60 then GradeD \
+      else GradeF
 end
 
 TEXT: Multi-way branching using nested if-then-else.

@@ -1156,7 +1156,10 @@ class Parser:
             if s = <> then 0 else head s
             if x > 0 then 1 else if x < 0 then -1 else 0 (nested)
 
-        Supports multi-line conditionals with line breaks after if/then/else.
+        Supports explicit line breaks with \\ continuation marker:
+            if x > 0 \\
+              then x \\
+              else -x
 
         The condition is parsed with _parse_iff() (no quantifiers/lambdas/conditionals),
         but the then/else branches use _parse_expr() to allow nested conditionals.
@@ -1165,6 +1168,12 @@ class Parser:
 
         # Parse condition (up to 'then') - no quantifiers/lambdas/conditionals
         condition = self._parse_iff()
+
+        # Check for explicit line break after condition (before 'then')
+        line_break_after_condition = False
+        if self._match(TokenType.CONTINUATION):
+            self._advance()  # consume \\
+            line_break_after_condition = True
 
         # Skip newlines before 'then' (multi-line support)
         self._skip_newlines()
@@ -1179,6 +1188,12 @@ class Parser:
 
         # Parse then branch - allow nested conditionals
         then_expr = self._parse_expr()
+
+        # Check for explicit line break after then expression (before 'else')
+        line_break_after_then = False
+        if self._match(TokenType.CONTINUATION):
+            self._advance()  # consume \\
+            line_break_after_then = True
 
         # Skip newlines before 'else' (multi-line support)
         self._skip_newlines()
@@ -1198,6 +1213,8 @@ class Parser:
             condition=condition,
             then_expr=then_expr,
             else_expr=else_expr,
+            line_break_after_condition=line_break_after_condition,
+            line_break_after_then=line_break_after_then,
             line=if_token.line,
             column=if_token.column,
         )
@@ -1544,6 +1561,7 @@ class Parser:
             TokenType.NEWLINE,
             TokenType.SEMICOLON,
             TokenType.PIPE,
+            TokenType.CONTINUATION,  # Line break marker
         ):
             return False
 
@@ -2147,6 +2165,7 @@ class Parser:
 
         Allows newlines before and after comparison operators.
         Supports guarded cases after = operator (pattern matching).
+        Supports line continuation with \\ after = operator.
         """
         left = self._parse_function_type()
 
@@ -2166,8 +2185,20 @@ class Parser:
         ):
             # Found comparison operator, consume it
             op_token = self._advance()
-            # Allow newlines after comparison operator
-            self._skip_newlines()
+
+            # Detect line continuation (backslash after operator)
+            has_continuation = False
+            if self._match(TokenType.CONTINUATION):
+                self._advance()  # consume \
+                has_continuation = True
+                # Skip newline and any leading whitespace on next line
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
+            else:
+                # Allow newlines after comparison operator
+                self._skip_newlines()
+
             right = self._parse_function_type()
 
             # Check for guarded cases after = operator (pattern matching)
@@ -2179,6 +2210,7 @@ class Parser:
                 operator=op_token.value,
                 left=left,
                 right=right,
+                line_break_after=has_continuation,
                 line=op_token.line,
                 column=op_token.column,
             )
@@ -2555,15 +2587,11 @@ class Parser:
                     # Named field projection: .fieldname (new feature)
                     # Don't parse as projection if we're in schema text
                     # (lambda/set comp) where periods are separators, not operators
-                    # EXCEPT: If base is a function application, parse as projection
-                    # (f(x).field is field access, not a separator)
+                    # In set comprehensions like {c : children(p) . children(c)},
+                    # the . after children(p) is the body separator, not field access
                     if self._parsing_schema_text:
-                        if isinstance(base, FunctionApp):
-                            # Function application - parse as field projection
-                            pass  # Continue to parse as projection
-                        else:
-                            # Not a function application - leave unparsed (separator)
-                            break
+                        # In schema text, period is always separator, not projection
+                        break
 
                     # Don't allow field projections on number literals
                     # (only tuples/records have named fields)

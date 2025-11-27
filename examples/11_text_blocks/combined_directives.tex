@@ -15,7 +15,9 @@
 \section*{Example 1 : Documentation Style}
 \addcontentsline{toc}{section}{Example 1 : Documentation Style}
 
-\noindent This example demonstrates how to combine different text directives effectively. Use TEXT for normal explanatory prose with proper typography.
+\noindent This example demonstrates how to combine different text
+directives effectively. Use TEXT for normal explanatory prose with
+proper typography.
 
 \bigskip
 
@@ -31,33 +33,38 @@ hatch run convert examples/hello\_world.txt
 
 \bigskip
 
-\noindent And use LATEX when you need specific LaTeX formatting not available otherwise.
+\noindent And use LATEX when you need specific LaTeX formatting not
+available otherwise.
 
 \bigskip
 
 \section*{Example 2 : Tutorial Format}
 \addcontentsline{toc}{section}{Example 2 : Tutorial Format}
 
-\noindent Let's explore the natural numbers. In Z notation, we write N for the set of natural numbers: {0, 1, 2, 3, ...}.
+\noindent Let's explore the natural numbers. In Z notation, we write
+N for the set of natural numbers: {0, 1, 2, 3, ...}.
 
 \bigskip
 
 \begin{axdef}
-first\_five : \power \nat
-\where
-first\_five = \{0, 1, 2, 3, 4\}
+  first\_five : \power \nat
+  \where
+  first\_five = \{0, 1, 2, 3, 4\}
 \end{axdef}
 
 \medskip
 
-\noindent The above defines a set containing the first five natural numbers. Note how TEXT blocks provide context before and after formal definitions.
+\noindent The above defines a set containing the first five natural
+numbers. Note how TEXT blocks provide context before and after formal
+definitions.
 
 \bigskip
 
 \section*{Example 3 : Showing Syntax vs Using Syntax}
 \addcontentsline{toc}{section}{Example 3 : Showing Syntax vs Using Syntax}
 
-\noindent To demonstrate the difference between showing syntax and using it, consider quantifiers.
+\noindent To demonstrate the difference between showing syntax and
+using it, consider quantifiers.
 
 \bigskip
 
@@ -67,7 +74,6 @@ first\_five = \{0, 1, 2, 3, 4\}
 
 \noindent
 $\forall x : \nat @ x \geq 0$
-
 
 \noindent But when we want to show the syntax literally for teaching purposes:
 
@@ -79,7 +85,8 @@ forall x : T | predicate
 
 \bigskip
 
-\noindent The PURETEXT block shows the syntax pattern without actually creating a formal quantified expression.
+\noindent The PURETEXT block shows the syntax pattern without
+actually creating a formal quantified expression.
 
 \bigskip
 
@@ -104,8 +111,6 @@ hatch run cli examples/file.txt
 
 \bigskip
 
-
-
 \bigskip
 
 \bigskip
@@ -120,7 +125,8 @@ hatch run convert examples/file.txt
 
 \bigskip
 
-\noindent The first command generates only the LaTeX file, while the second runs the complete pipeline including PDF generation.
+\noindent The first command generates only the LaTeX file, while the
+second runs the complete pipeline including PDF generation.
 
 \bigskip
 
@@ -129,37 +135,39 @@ hatch run convert examples/file.txt
 \section*{Example 5 : Mathematical Explanation}
 \addcontentsline{toc}{section}{Example 5 : Mathematical Explanation}
 
-\noindent Consider the function f(n) = $n^2$. We can define this formally in Z notation:
+\noindent Consider the function f(n) = $n^2$. We can define this
+formally in Z notation:
 
 \bigskip
 
 \begin{axdef}
-square : \nat \fun \nat
-\where
-\forall n : \nat @ square(n) = n * n
+  square : \nat \fun \nat
+  \where
+  \forall n : \nat @ square(n) = n * n
 \end{axdef}
 
-\noindent This states that square is a total function from natural numbers to natural numbers.
+\noindent This states that square is a total function from natural
+numbers to natural numbers.
 
 \bigskip
 
 \begin{center}
 
-\begin{tabular}{c|c}
+  \begin{tabular}{c|c}
 
-$n$ & $f(n)$ \\ \hline
+    $n$ & $f(n)$ \\ \hline
 
-0 & 0 \\
+    0 & 0 \\
 
-1 & 1 \\
+    1 & 1 \\
 
-2 & 4 \\
+    2 & 4 \\
 
-3 & 9 \\
+    3 & 9 \\
 
-4 & 16
+    4 & 16
 
-\end{tabular}
+  \end{tabular}
 
 \end{center}
 
@@ -176,13 +184,13 @@ $n$ & $f(n)$ \\ \hline
 
 \begin{description}
 
-\item[TEXT:] Normal prose with smart quotes and inline math
+  \item[TEXT:] Normal prose with smart quotes and inline math
 
-\item[PURETEXT:] Verbatim text without processing
+  \item[PURETEXT:] Verbatim text without processing
 
-\item[LATEX:] Raw LaTeX commands
+  \item[LATEX:] Raw LaTeX commands
 
-\item[PAGEBREAK:] Force a page break
+  \item[PAGEBREAK:] Force a page break
 
 \end{description}
 
@@ -227,11 +235,13 @@ PAGEBREAK
 
 \bigskip
 
-\noindent 2. Use PURETEXT sparingly, only when you need to show literal syntax or preserve special characters
+\noindent 2. Use PURETEXT sparingly, only when you need to show
+literal syntax or preserve special characters
 
 \bigskip
 
-\noindent 3. Use LATEX as an escape hatch for formatting not supported by txt2tex
+\noindent 3. Use LATEX as an escape hatch for formatting not
+supported by txt2tex
 
 \bigskip
 
@@ -241,7 +251,8 @@ PAGEBREAK
 
 \vspace{1cm}
 
-\noindent By following these practices, your documents will be both readable and maintainable.
+\noindent By following these practices, your documents will be both
+readable and maintainable.
 
 \bigskip
 
@@ -261,31 +272,32 @@ PAGEBREAK
 \section*{Section 2 : Data Types}
 
 \begin{zed}
-[User, Document, Permission]
+  [User, Document, Permission]
 \end{zed}
 
-\noindent The system has three basic $types : users$, documents, and permissions.
+\noindent The system has three basic $types : users$, documents, and
+permissions.
 
 \bigskip
 
 \section*{Section 3 : State Schema}
 
 \begin{schema}{FileSystem}
-docs : User \pfun \power Document \\
-perms : Document \pfun \power Permission \\
-all\_docs : \power Document
-\where
-all\_docs = \bigcup (\ran docs) \\
-all\_docs \subseteq \dom perms
+  docs : User \pfun \power Document \\
+  perms : Document \pfun \power Permission \\
+  all\_docs : \power Document
+  \where
+  all\_docs = \bigcup (\ran docs) \\
+  all\_docs \subseteq \dom perms
 \end{schema}
 
-\noindent The state schema defines the relationships between users, documents, and permissions.
+\noindent The state schema defines the relationships between users,
+documents, and permissions.
 
 \bigskip
 
 \noindent
 $PAGEBREAK$
-
 
 \section*{Section 4 : Operations}
 
@@ -293,7 +305,9 @@ $PAGEBREAK$
 
 \bigskip
 
-\noindent This structure—sections with TEXT introductions, formal definitions, and strategic page breaks—creates clear, professional specifications.
+\noindent This structure—sections with TEXT introductions, formal
+definitions, and strategic page breaks—creates clear, professional
+specifications.
 
 \bigskip
 

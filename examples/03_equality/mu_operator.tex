@@ -22,15 +22,14 @@
 \noindent
 $(\mu x : \nat | x = 5)$
 
-
 \noindent
 $(\mu n : \nat | \forall m : \nat @ n \leq m)$
-
 
 \section*{Example 2 : Mu with Precondition}
 \addcontentsline{toc}{section}{Example 2 : Mu with Precondition}
 
-\noindent The $\exists_1$ quantifier provides a precondition to ensure mu is well-defined:
+\noindent The $\exists_1$ quantifier provides a precondition to
+ensure mu is well-defined:
 
 \bigskip
 
@@ -41,14 +40,12 @@ $(\mu n : \nat | \forall m : \nat @ n \leq m)$
 \noindent
 $\exists_1 n : \nat @ \forall m : \nat @ n \leq m$
 
-
 \noindent is equivalent to true, we can be certain that
 
 \bigskip
 
 \noindent
 $(\mu n : \nat | \forall m : \nat @ n \leq m)$
-
 
 \noindent will return a result (which is 0).
 
@@ -64,10 +61,8 @@ $(\mu n : \nat | \forall m : \nat @ n \leq m)$
 \noindent
 $(\mu a : \nat | a = a) = 0$
 
-
 \noindent
 $(\mu z : \num | z = 10) = 10$
-
 
 \section*{Example 4 : Undefined Mu Expressions}
 \addcontentsline{toc}{section}{Example 4 : Undefined Mu Expressions}
@@ -79,16 +74,16 @@ $(\mu z : \num | z = 10) = 10$
 \noindent
 $(\mu b : \nat | b = b)$
 
-
-\noindent This is undefined because the property holds for all natural numbers, not just one.
+\noindent This is undefined because the property holds for all
+natural numbers, not just one.
 
 \bigskip
 
 \noindent
 $(\mu c : \nat | c > c)$
 
-
-\noindent This is also undefined because no natural number satisfies this property.
+\noindent This is also undefined because no natural number satisfies
+this property.
 
 \bigskip
 

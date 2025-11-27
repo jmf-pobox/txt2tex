@@ -20,14 +20,14 @@
 \bigskip
 
 \begin{zed}
-[Entry, Status]
+  [Entry, Status]
 \end{zed}
 
 \begin{axdef}
-viewed : \seq~Entry \fun \seq~Entry \\
-yes : Status
-\where
-viewed(\langle \rangle) = \langle \rangle
+  viewed : \seq~Entry \fun \seq~Entry \\
+  yes : Status
+  \where
+  viewed(\langle \rangle) = \langle \rangle
 \end{axdef}
 
 \medskip
@@ -39,9 +39,9 @@ viewed(\langle \rangle) = \langle \rangle
 \bigskip
 
 \begin{axdef}
-abs : \num \fun \nat
-\where
-\forall x : \num @ abs(x) = \IF x \geq 0 \THEN x \ELSE -x
+  abs : \num \fun \nat
+  \where
+  \forall x : \num @ abs(x) = \IF x \geq 0 \THEN x \ELSE -x
 \end{axdef}
 
 \medskip
@@ -53,10 +53,11 @@ abs : \num \fun \nat
 \bigskip
 
 \begin{axdef}
-cumulative\_total : \seq~\nat \fun \nat
-\where
-cumulative\_total(\langle \rangle) = 0 \\
-\forall x : \nat @ \forall s : \seq~\nat @ cumulative\_total(\langle x \rangle \cat s) = x + cumulative\_total(s)
+  cumulative\_total : \seq~\nat \fun \nat
+  \where
+  cumulative\_total(\langle \rangle) = 0 \\
+  \forall x : \nat @ \forall s : \seq~\nat @
+  cumulative\_total(\langle x \rangle \cat s) = x + cumulative\_total(s)
 \end{axdef}
 
 \medskip
@@ -68,15 +69,15 @@ cumulative\_total(\langle \rangle) = 0 \\
 \bigskip
 
 \begin{zed}
-[Play, User, UserStatus]
+  [Play, User, UserStatus]
 \end{zed}
 
 \begin{axdef}
-premium\_plays : \seq~Play \fun \seq~Play \\
-user\_status : User \fun UserStatus \\
-premium : UserStatus
-\where
-premium\_plays(\langle \rangle) = \langle \rangle
+  premium\_plays : \seq~Play \fun \seq~Play \\
+  user\_status : User \fun UserStatus \\
+  premium : UserStatus
+  \where
+  premium\_plays(\langle \rangle) = \langle \rangle
 \end{axdef}
 
 \end{document}

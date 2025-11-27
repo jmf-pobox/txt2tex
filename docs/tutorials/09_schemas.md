@@ -85,12 +85,12 @@ Combine schemas using operators:
 
 **Conjunction:**
 ```
-SchemaA and SchemaB
+SchemaA land SchemaB
 ```
 
 **Disjunction:**
 ```
-SchemaA or SchemaB
+SchemaA lor SchemaB
 ```
 
 **Sequential composition:**

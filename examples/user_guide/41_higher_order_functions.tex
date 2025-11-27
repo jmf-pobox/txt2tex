@@ -12,8 +12,9 @@
 
 \begin{gendef}[X, Y, Z]
   compose: (Y \fun \num) \cross (X \fun Y) \fun (X \fun \num)
-\where
-  \forall f : Y \fun \num @ \forall g : X \fun Y @ \forall x : X @ compose(f, g)(x) = f(g(x))
+  \where
+  \forall f : Y \fun \num @ \forall g : X \fun Y @ \forall x : X @
+  compose(f, g)(x) = f(g(x))
 \end{gendef}
 
 \end{document}
