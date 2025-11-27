@@ -36,19 +36,25 @@ Recommendations:
 - Split `latex_gen.py` into a `latex_gen/` package (expressions, documents, operators, zed)
 - Keep public API stable via re-export stubs during transition
 
-### Type Dispatch vs isinstance Chains
+### Type Dispatch vs isinstance Chains ✅ FIXED
 
-Location: `latex_gen.py:generate_expr` uses a long chain of `isinstance` checks to route generation for node types.
+**Status:** `generate_expr` now uses `@singledispatchmethod` for type dispatch.
 
-Issues:
-- Hard to extend; violates Open/Closed Principle
-- No static exhaustiveness checks; runtime dispatch only
-- Encourages monolithic files as all cases collect centrally
+**Changes Made (2025-11-27):**
+- Converted `generate_expr` to use `@singledispatchmethod` from `functools`
+- Registered all 22 expression type handlers with `@generate_expr.register(TypeName)`
+- Standardized handler signatures to accept `parent: Expr | None = None` parameter
+- Base method raises `TypeError` with clear message for unknown types
 
-Recommendations:
-- Introduce `functools.singledispatch` or an internal registry for expression handlers
-- Register existing `_generate_*` methods per AST node type
-- Keep a strict fallback that raises a clear, actionable error
+**Benefits:**
+- Easier to extend: add new type support by adding a decorated method
+- Cleaner separation: each type's generation logic in its own method
+- Standard library pattern: no custom dispatch infrastructure needed
+
+**Implementation Notes:**
+- mypy has limited support for `singledispatchmethod` type checking
+- All handlers still defined in `latex_gen.py` for now (file splitting is a separate concern)
+- `generate_document_item` still uses isinstance chains (lower priority)
 
 ### Exception Handling ✅ FIXED
 
@@ -155,7 +161,7 @@ Run `hatch run complexity` to get current metrics. Average complexity: C (19.0).
 
 **Medium priority** - genuine design improvements:
 4. **`_process_inline_math`** (CC 69) - does multiple transformations in one pass; could be a pipeline
-5. **isinstance dispatch in `latex_gen.py`** - could use singledispatch for extensibility
+5. ~~**isinstance dispatch in `latex_gen.py`**~~ ✅ FIXED - `generate_expr` now uses `@singledispatchmethod`
 
 **Low priority / Skip**:
 - Lexer complexity (CC 166, 97) - domain-appropriate, leave as-is
@@ -240,14 +246,14 @@ Recommendation:
 
 ### Recommendations Summary (Prioritized)
 
-**High priority - Fix actual bugs:**
-1. **Eliminate 4 silent `except: pass` patterns** in `latex_gen.py` - these hide bugs
-2. **Replace 13 `except Exception` with specific exceptions** - catches KeyboardInterrupt, masks errors
-3. **Fix 2 `# type: ignore` suppressions** - type safety holes
+**High priority - Fix actual bugs:** ✅ ALL FIXED
+1. ~~**Eliminate 4 silent `except: pass` patterns**~~ - replaced with specific exceptions
+2. ~~**Replace 13 `except Exception` with specific exceptions**~~ - done
+3. ~~**Fix 2 `# type: ignore` suppressions**~~ - done
 
 **Medium priority - Design improvements:**
 4. **Decompose `_process_inline_math`** (CC 69) into pipeline stages - does multiple transformations
-5. **Replace isinstance dispatch with singledispatch** in `latex_gen.py` - improves extensibility
+5. ~~**Replace isinstance dispatch with singledispatch**~~ ✅ FIXED - `generate_expr` now uses `@singledispatchmethod`
 6. Centralize fuzz-mode decisions into helper methods
 
 **Low priority - Nice to have:**

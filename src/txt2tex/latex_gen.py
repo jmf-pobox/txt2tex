@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from functools import singledispatchmethod
 from typing import ClassVar
 
 from txt2tex.ast_nodes import (
@@ -566,61 +567,23 @@ class LaTeXGenerator:
         # Base cases: Identifier, Number, etc. - no line breaks
         return False
 
+    @singledispatchmethod
     def generate_expr(self, expr: Expr, parent: Expr | None = None) -> str:
         """Generate LaTeX for expression (without wrapping in math mode).
 
         Args:
             expr: The expression to generate LaTeX for
             parent: The parent expression context (None if top-level)
+
+        Raises:
+            TypeError: If expression type has no registered handler.
         """
-        if isinstance(expr, Identifier):
-            return self._generate_identifier(expr)
-        if isinstance(expr, Number):
-            return self._generate_number(expr)
-        if isinstance(expr, UnaryOp):
-            return self._generate_unary_op(expr, parent)
-        if isinstance(expr, BinaryOp):
-            return self._generate_binary_op(expr, parent)
-        if isinstance(expr, Quantifier):
-            return self._generate_quantifier(expr, parent)
-        if isinstance(expr, Lambda):
-            return self._generate_lambda(expr, parent)
-        if isinstance(expr, Subscript):
-            return self._generate_subscript(expr, parent)
-        if isinstance(expr, Superscript):
-            return self._generate_superscript(expr, parent)
-        if isinstance(expr, SetComprehension):
-            return self._generate_set_comprehension(expr, parent)
-        if isinstance(expr, SetLiteral):
-            return self._generate_set_literal(expr, parent)
-        if isinstance(expr, FunctionApp):
-            return self._generate_function_app(expr, parent)
-        if isinstance(expr, FunctionType):
-            return self._generate_function_type(expr, parent)
-        if isinstance(expr, Tuple):
-            return self._generate_tuple(expr, parent)
-        if isinstance(expr, RelationalImage):
-            return self._generate_relational_image(expr, parent)
-        if isinstance(expr, GenericInstantiation):
-            return self._generate_generic_instantiation(expr, parent)
-        if isinstance(expr, Range):
-            return self._generate_range(expr, parent)
-        if isinstance(expr, SequenceLiteral):
-            return self._generate_sequence_literal(expr, parent)
-        if isinstance(expr, TupleProjection):
-            return self._generate_tuple_projection(expr, parent)
-        if isinstance(expr, BagLiteral):
-            return self._generate_bag_literal(expr, parent)
-        if isinstance(expr, Conditional):
-            return self._generate_conditional(expr, parent)
-        if isinstance(expr, GuardedCases):
-            return self._generate_guarded_cases(expr, parent)
-        if isinstance(expr, GuardedBranch):  # pyright: ignore[reportUnnecessaryIsInstance]
-            return self._generate_guarded_branch(expr, parent)
+        raise TypeError(f"Unknown expression type: {type(expr).__name__}")
 
-        raise TypeError(f"Unknown expression type: {type(expr)}")
-
-    def _generate_identifier(self, node: Identifier) -> str:
+    @generate_expr.register(Identifier)
+    def _generate_identifier(
+        self, node: Identifier, parent: Expr | None = None
+    ) -> str:
         """Generate LaTeX for identifier (Phase 15: smart underscore handling).
 
         Handles three cases:
@@ -743,10 +706,12 @@ class LaTeXGenerator:
         escaped = name.replace("_", r"\_")
         return rf"\mathit{{{escaped}}}"
 
-    def _generate_number(self, node: Number) -> str:
+    @generate_expr.register(Number)
+    def _generate_number(self, node: Number, parent: Expr | None = None) -> str:
         """Generate LaTeX for number."""
         return node.value
 
+    @generate_expr.register(UnaryOp)
     def _generate_unary_op(self, node: UnaryOp, parent: Expr | None = None) -> str:
         """Generate LaTeX for unary operation.
 
@@ -930,6 +895,7 @@ class LaTeXGenerator:
         # Otherwise, nested in expression: needs parens
         return not isinstance(parent, (Quantifier, Lambda))
 
+    @generate_expr.register(BinaryOp)
     def _generate_binary_op(self, node: BinaryOp, parent: Expr | None = None) -> str:
         """Generate LaTeX for binary operation.
 
@@ -993,6 +959,7 @@ class LaTeXGenerator:
             return r"\quad"  # Fallback for non-quantifier contexts
         return f"\\t{self._quantifier_depth}"
 
+    @generate_expr.register(Quantifier)
     def _generate_quantifier(self, node: Quantifier, parent: Expr | None = None) -> str:
         """Generate LaTeX for quantifier (forall, exists, exists1, mu).
 
@@ -1136,6 +1103,7 @@ class LaTeXGenerator:
 
         return result
 
+    @generate_expr.register(Lambda)
     def _generate_lambda(self, node: Lambda, parent: Expr | None = None) -> str:
         """Generate LaTeX for lambda expression (Phase 11d).
 
@@ -1168,6 +1136,7 @@ class LaTeXGenerator:
 
         return result
 
+    @generate_expr.register(SetComprehension)
     def _generate_set_comprehension(
         self, node: SetComprehension, parent: Expr | None = None
     ) -> str:
@@ -1231,6 +1200,7 @@ class LaTeXGenerator:
 
         return " ".join(parts)
 
+    @generate_expr.register(SetLiteral)
     def _generate_set_literal(
         self, node: SetLiteral, parent: Expr | None = None
     ) -> str:
@@ -1249,6 +1219,7 @@ class LaTeXGenerator:
         elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
         return f"\\{{{elements_latex}\\}}"
 
+    @generate_expr.register(Subscript)
     def _generate_subscript(self, node: Subscript, parent: Expr | None = None) -> str:
         """Generate LaTeX for subscript (a_1, x_i)."""
         base = self.generate_expr(node.base)
@@ -1259,6 +1230,7 @@ class LaTeXGenerator:
             return f"{base}_{{{index}}}"
         return f"{base}_{index}"
 
+    @generate_expr.register(Superscript)
     def _generate_superscript(
         self, node: Superscript, parent: Expr | None = None
     ) -> str:
@@ -1271,6 +1243,7 @@ class LaTeXGenerator:
         # This syntax works in both fuzz and zed modes
         return f"{base} \\bsup {exponent} \\esup"
 
+    @generate_expr.register(FunctionApp)
     def _generate_function_app(
         self, node: FunctionApp, parent: Expr | None = None
     ) -> str:
@@ -1354,6 +1327,7 @@ class LaTeXGenerator:
         args_latex = ", ".join(self.generate_expr(arg) for arg in node.args)
         return f"{func_latex}({args_latex})"
 
+    @generate_expr.register(FunctionType)
     def _generate_function_type(
         self, node: FunctionType, parent: Expr | None = None
     ) -> str:
@@ -1385,6 +1359,7 @@ class LaTeXGenerator:
 
         return f"{domain_latex} {arrow_latex} {range_latex}"
 
+    @generate_expr.register(Tuple)
     def _generate_tuple(self, node: Tuple, parent: Expr | None = None) -> str:
         """Generate LaTeX for tuple expression (Phase 11.6).
 
@@ -1398,6 +1373,7 @@ class LaTeXGenerator:
         elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
         return f"({elements_latex})"
 
+    @generate_expr.register(RelationalImage)
     def _generate_relational_image(
         self, node: RelationalImage, parent: Expr | None = None
     ) -> str:
@@ -1418,6 +1394,7 @@ class LaTeXGenerator:
         set_latex = self.generate_expr(node.set)
         return f"({relation_latex} \\limg {set_latex} \\rimg)"
 
+    @generate_expr.register(GenericInstantiation)
     def _generate_generic_instantiation(
         self, node: GenericInstantiation, parent: Expr | None = None
     ) -> str:
@@ -1476,6 +1453,7 @@ class LaTeXGenerator:
         )
         return f"{base_latex}[{type_params_latex}]"
 
+    @generate_expr.register(Range)
     def _generate_range(self, node: Range, parent: Expr | None = None) -> str:
         """Generate LaTeX for range expression (Phase 13).
 
@@ -1492,6 +1470,7 @@ class LaTeXGenerator:
         end_latex = self.generate_expr(node.end)
         return f"{start_latex} \\upto {end_latex}"
 
+    @generate_expr.register(SequenceLiteral)
     def _generate_sequence_literal(
         self, node: SequenceLiteral, parent: Expr | None = None
     ) -> str:
@@ -1510,6 +1489,7 @@ class LaTeXGenerator:
         elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
         return f"\\langle {elements_latex} \\rangle"
 
+    @generate_expr.register(TupleProjection)
     def _generate_tuple_projection(
         self, node: TupleProjection, parent: Expr | None = None
     ) -> str:
@@ -1540,6 +1520,7 @@ class LaTeXGenerator:
         # Generate projection suffix (works for both int and str)
         return f"{base_latex}.{node.index}"
 
+    @generate_expr.register(BagLiteral)
     def _generate_bag_literal(
         self, node: BagLiteral, parent: Expr | None = None
     ) -> str:
@@ -1555,6 +1536,7 @@ class LaTeXGenerator:
         elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
         return f"\\lbag {elements_latex} \\rbag"
 
+    @generate_expr.register(Conditional)
     def _generate_conditional(
         self, node: Conditional, parent: Expr | None = None
     ) -> str:
@@ -1582,6 +1564,7 @@ class LaTeXGenerator:
             f"\\mbox{{ else }} {else_latex})"
         )
 
+    @generate_expr.register(GuardedCases)
     def _generate_guarded_cases(
         self, node: GuardedCases, parent: Expr | None = None
     ) -> str:
@@ -1609,6 +1592,7 @@ class LaTeXGenerator:
 
         return "\n".join(lines)
 
+    @generate_expr.register(GuardedBranch)
     def _generate_guarded_branch(
         self, node: GuardedBranch, parent: Expr | None = None
     ) -> str:
