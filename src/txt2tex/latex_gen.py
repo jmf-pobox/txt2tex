@@ -2620,23 +2620,136 @@ class LaTeXGenerator:
     def _process_superscripts(self, text: str) -> str:
         """Stage 0: Wrap standalone superscripts in math mode.
 
-        Matches patterns like x^2, a_i^2, 2^n.
+        Matches patterns like x^2, a_i^2, 2^n, x^{2n}.
+        Skips sequence concatenation (<x> ^ <y>).
         """
-        return text  # Stub - will be implemented
+        result = text
+        superscript_pattern = r"(\w+_?\w*)\^(\{[^}]+\}|\w+)"
+
+        matches = list(re.finditer(superscript_pattern, result))
+        for match in reversed(matches):
+            start_pos = match.start()
+            end_pos = match.end()
+
+            # Check if already in math mode
+            before = result[:start_pos]
+            dollars_before = before.count("$")
+            if dollars_before % 2 == 1:
+                continue  # Already in math mode
+
+            # Check if this looks like sequence concatenation (<x> ^ <y>)
+            # Look for closing > before the ^
+            context_before = result[max(0, start_pos - 10) : start_pos]
+            if ">" in context_before and context_before.rstrip().endswith(">"):
+                continue  # This is sequence concatenation, skip
+
+            expr = match.group(0)
+            # Wrap in math mode: x^2 -> $x^{2}$
+            result = result[:start_pos] + f"${expr}$" + result[end_pos:]
+
+        return result
 
     def _process_relational_image(self, text: str) -> str:
         """Stage 0.5: Detect relational image notation R(| S |).
 
-        Matches relation(| set |) patterns and wraps in math mode.
+        Matches patterns:
+        1. identifier(| ... |) - simple relation like R(| S |)
+        2. (expr)(| ... |) - composition like (R o9 S)(| A |)
+        3. standalone (| ... |) - describing the notation in prose
         """
-        return text  # Stub - will be implemented
+        result = text
+        relimg_pattern = r"(?:(\([^)]+\)|[a-zA-Z_]\w*)\s*)?\(\|[^$]*?\|\)"
+
+        matches = list(re.finditer(relimg_pattern, result))
+        for match in reversed(matches):
+            start_pos = match.start()
+            end_pos = match.end()
+
+            # Check if already in math mode
+            before = result[:start_pos]
+            dollars_before = before.count("$")
+            if dollars_before % 2 == 1:
+                continue  # Already in math mode
+
+            math_text = match.group(0)
+
+            # Skip if identifier is a common prose word
+            first_token = math_text.split("(|")[0].strip()
+            if first_token.lower() in {
+                "the",
+                "a",
+                "an",
+                "this",
+                "that",
+                "image",
+                "relation",
+                "set",
+                "function",
+                "gives",
+                "returns",
+                "where",
+                "when",
+                "which",
+            }:
+                continue
+
+            # Special case: standalone (| ... |) with ellipsis for describing notation
+            if "(| ... |)" in math_text or "(| |)" in math_text:
+                # Replace with LaTeX notation
+                math_latex = math_text.replace(
+                    "(| ... |)", r"$\limg \ldots \rimg$"
+                ).replace("(| |)", r"$\limg \rimg$")
+                result = result[:start_pos] + math_latex + result[end_pos:]
+                continue
+
+            # Try to parse as expression
+            try:
+                lexer = Lexer(math_text)
+                tokens = lexer.tokenize()
+                parser = Parser(tokens)
+                ast = parser.parse()
+
+                # Check if we got a valid expression
+                if isinstance(ast, Expr):
+                    # Generate LaTeX
+                    math_latex = self.generate_expr(ast)
+                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
+            except (LexerError, ParserError):
+                # Parsing failed - expression is not valid math, leave as prose
+                pass
+
+        return result
 
     def _process_set_expressions(self, text: str) -> str:
         """Stage 1: Detect set expressions { ... }.
 
         Matches balanced braces and parses as set comprehensions or literals.
+        Handles nested braces correctly.
         """
-        return text  # Stub - will be implemented
+        result = text
+        brace_matches = self._find_balanced_braces(result)
+
+        # Process matches in reverse order to preserve positions
+        for start_pos, end_pos in reversed(brace_matches):
+            math_text = result[start_pos:end_pos]
+            try:
+                # Try to parse as math expression
+                lexer = Lexer(math_text)
+                tokens = lexer.tokenize()
+                parser = Parser(tokens)
+                ast = parser.parse()
+
+                # Check if it's a set expression (comprehension or literal)
+                if isinstance(ast, (SetComprehension, SetLiteral)):
+                    # Generate LaTeX for the expression
+                    math_latex = self.generate_expr(ast)
+                    # Wrap in $...$
+                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
+            except (LexerError, ParserError):
+                # Parsing failed - expression is not valid math, leave as prose
+                pass
+
+        return result
 
     def _process_quantifiers(self, text: str) -> str:
         """Stage 2: Detect quantifier expressions.
@@ -2704,125 +2817,6 @@ class LaTeXGenerator:
         result = self._process_simple_expressions(result)
 
         # --- Original implementation below (to be migrated to stages) ---
-
-        # Pattern 0: Standalone superscripts (MUST come before other patterns)
-        # Match: identifier/number followed by ^ and exponent
-        # Examples: x^2, a_i^2, 2^n, x^{2n}
-        # Strategy: Match \w+^{?[\w]+}? but NOT if already in math mode
-        superscript_pattern = r"(\w+_?\w*)\^(\{[^}]+\}|\w+)"
-
-        matches = list(re.finditer(superscript_pattern, result))
-        for match in reversed(matches):
-            start_pos = match.start()
-            end_pos = match.end()
-
-            # Check if already in math mode
-            before = result[:start_pos]
-            dollars_before = before.count("$")
-            if dollars_before % 2 == 1:
-                continue  # Already in math mode
-
-            # Check if this looks like sequence concatenation (<x> ^ <y>)
-            # Look for closing > before the ^
-            context_before = result[max(0, start_pos - 10) : start_pos]
-            if ">" in context_before and context_before.rstrip().endswith(">"):
-                continue  # This is sequence concatenation, skip
-
-            expr = match.group(0)
-            # Wrap in math mode: x^2 → $x^{2}$
-            result = result[:start_pos] + f"${expr}$" + result[end_pos:]
-
-        # Pattern 0.5: Relational image R(| S |) and standalone (| ... |)
-        # MUST come BEFORE Pattern 1 to avoid partial math mode wrapping
-        # Strategy: Match these patterns:
-        # 1. identifier(| ... |) - simple relation like R(| S |)
-        # 2. (expr)(| ... |) - composition like (R o9 S)(| A |)
-        # 3. standalone (| ... |) - describing the notation in prose
-        # For case 2, match the full parenthesized expression
-        # For case 3, match just (| ... |) without a preceding identifier
-        relimg_pattern = r"(?:(\([^)]+\)|[a-zA-Z_]\w*)\s*)?\(\|[^$]*?\|\)"
-
-        matches = list(re.finditer(relimg_pattern, result))
-        for match in reversed(matches):
-            start_pos = match.start()
-            end_pos = match.end()
-
-            # Check if already in math mode
-            before = result[:start_pos]
-            dollars_before = before.count("$")
-            if dollars_before % 2 == 1:
-                continue  # Already in math mode
-
-            math_text = match.group(0)
-
-            # Skip if identifier is a common prose word
-            first_token = math_text.split("(|")[0].strip()
-            if first_token.lower() in {
-                "the",
-                "a",
-                "an",
-                "this",
-                "that",
-                "image",
-                "relation",
-                "set",
-                "function",
-                "gives",
-                "returns",
-                "where",
-                "when",
-                "which",
-            }:
-                continue
-
-            # Special case: standalone (| ... |) with ellipsis for describing notation
-            if "(| ... |)" in math_text or "(| |)" in math_text:
-                # Replace with LaTeX notation
-                math_latex = math_text.replace(
-                    "(| ... |)", r"$\limg \ldots \rimg$"
-                ).replace("(| |)", r"$\limg \rimg$")
-                result = result[:start_pos] + math_latex + result[end_pos:]
-                continue
-
-            # Try to parse as expression
-            try:
-                lexer = Lexer(math_text)
-                tokens = lexer.tokenize()
-                parser = Parser(tokens)
-                ast = parser.parse()
-
-                # Check if we got a valid expression
-                if isinstance(ast, Expr):
-                    # Generate LaTeX
-                    math_latex = self.generate_expr(ast)
-                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except (LexerError, ParserError):
-                # Parsing failed - expression is not valid math, leave as prose
-                pass
-
-        # Pattern 1: Set expressions { ... }
-        # Find balanced braces (handles nested braces)
-        brace_matches = self._find_balanced_braces(result)
-
-        # Process matches in reverse order to preserve positions
-        for start_pos, end_pos in reversed(brace_matches):
-            math_text = result[start_pos:end_pos]
-            try:
-                # Try to parse as math expression
-                lexer = Lexer(math_text)
-                tokens = lexer.tokenize()
-                parser = Parser(tokens)
-                ast = parser.parse()
-
-                # Check if it's a set expression (comprehension or literal)
-                if isinstance(ast, (SetComprehension, SetLiteral)):
-                    # Generate LaTeX for the expression
-                    math_latex = self.generate_expr(ast)
-                    # Wrap in $...$
-                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except (LexerError, ParserError):
-                # Parsing failed - expression is not valid math, leave as prose
-                pass
 
         # Pattern 2: Quantifiers (forall, exists, exists1, mu)
         # Strategy: Find keyword, then try parsing increasingly longer substrings
