@@ -12,9 +12,7 @@
 
 \section*{Phase 35 : Sequence Filter Operator}
 
-\noindent The sequence$ \filter $operator restricts a sequence to
-elements from a specified set. It removes elements not in the$
-\filter $set while preserving order.
+\noindent The sequence$ \filter $operator restricts a sequence to elements from a specified set. It removes elements not in the$ \filter $set while preserving order.
 
 \bigskip
 
@@ -34,16 +32,14 @@ elements from a specified set. It removes elements not in the$
 \bigskip
 
 \begin{axdef}
-  s1 : \seq~\nat \\
-  evens1 : \power \nat \\
-  filtered1 : \seq~\nat
-  \where
-  s1 = \langle 1, 2, 3, 4, 5, 6 \rangle \land evens1 = \{2, 4, 6, 8\}
-  \land filtered1 = (s1 \filter evens1)
+s1 : \seq~\nat \\
+evens1 : \power \nat \\
+filtered1 : \seq~\nat
+\where
+s1 = \langle 1, 2, 3, 4, 5, 6 \rangle \land evens1 = \{2, 4, 6, 8\} \land filtered1 = (s1 \filter evens1)
 \end{axdef}
 
-\noindent The filtered sequence is $\langle 2, 4, 6 \rangle$, keeping
-only elements that are in evens and preserving their original order.
+\noindent The filtered sequence is $\langle 2, 4, 6 \rangle$, keeping only elements that are in evens and preserving their original order.
 
 \bigskip
 
@@ -51,28 +47,25 @@ only elements that are in evens and preserving their original order.
 \addcontentsline{toc}{section}{Example 2 : Filter with Set Comprehension}
 
 \begin{zed}
-  [Title2, Length2]
+[Title2, Length2]
 \end{zed}
 
 \begin{axdef}
-  all\_titles : \seq~Title2 \\
-  long\_titles : \power Title2 \\
-  filtered\_titles : \seq~Title2
-  \where
-  long\_titles = \{~ t : Title2 | true ~\} \land filtered\_titles =
-  all\_titles \filter long\_titles
+all\_titles : \seq~Title2 \\
+long\_titles : \power Title2 \\
+filtered\_titles : \seq~Title2
+\where
+long\_titles = \{~ t : Title2 | true ~\} \land filtered\_titles = all\_titles \filter long\_titles
 \end{axdef}
 
-\noindent This filters a sequence of titles to include only titles
-with length greater than 120 minutes.
+\noindent This filters a sequence of titles to include only titles with length greater than 120 minutes.
 
 \bigskip
 
 \section*{Example 3 : Comparison with Range Restriction}
 \addcontentsline{toc}{section}{Example 3 : Comparison with Range Restriction}
 
-\noindent Sequence$ \filter $(filter) is different from range
-restriction ($\rres$):
+\noindent Sequence$ \filter $(filter) is different from range restriction ($\rres$):
 
 \bigskip
 
@@ -85,23 +78,20 @@ restriction ($\rres$):
 \bigskip
 
 \begin{axdef}
-  s3 : \seq~\nat \\
-  R3 : \nat \rel \nat \\
-  A3 : \power \nat \\
-  filtered\_seq3 : \seq~\nat \\
-  restricted\_rel3 : \nat \rel \nat
-  \where
-  s3 = \langle 1, 2, 3, 4, 5 \rangle \land R3 = \{1 \mapsto 10, 2
-  \mapsto 20, 3 \mapsto 30\} \land A3 = \{2, 3, 4\} \land
-  filtered\_seq3 = s3 \filter A3 \land restricted\_rel3 = R3 \rres \{10, 20\}
+s3 : \seq~\nat \\
+R3 : \nat \rel \nat \\
+A3 : \power \nat \\
+filtered\_seq3 : \seq~\nat \\
+restricted\_rel3 : \nat \rel \nat
+\where
+s3 = \langle 1, 2, 3, 4, 5 \rangle \land R3 = \{1 \mapsto 10, 2 \mapsto 20, 3 \mapsto 30\} \land A3 = \{2, 3, 4\} \land filtered\_seq3 = s3 \filter A3 \land restricted\_rel3 = R3 \rres \{10, 20\}
 \end{axdef}
 
 \noindent filtered\_seq is $\langle 2, 3, 4 \rangle$ (sequence elements in A)
 
 \bigskip
 
-\noindent restricted\_rel is $\{1 \mapsto 10, 2 \mapsto 20\}$
-(relation pairs with range in $\{10, 20\}$)
+\noindent restricted\_rel is $\{1 \mapsto 10, 2 \mapsto 20\}$ (relation pairs with range in $\{10, 20\}$)
 
 \bigskip
 
@@ -109,23 +99,21 @@ restriction ($\rres$):
 \addcontentsline{toc}{section}{Example 4 : Practical Example - Video Database}
 
 \begin{zed}
-  [Title4, Length4]
+[Title4, Length4]
 \end{zed}
 
 \begin{zed}
-  Rating4 ::= G4 | PG4 | PG13_4 | R4
+Rating4 ::= G4 | PG4 | PG13_4 | R4
 \end{zed}
 
 \begin{axdef}
-  catalog4 : \seq~(Title4 \cross Length4 \cross Rating4) \\
-  family\_friendly4 : \power Rating4
-  \where
-  family\_friendly4 = \{G4, PG4\}
+catalog4 : \seq~(Title4 \cross Length4 \cross Rating4) \\
+family\_friendly4 : \power Rating4
+\where
+family\_friendly4 = \{G4, PG4\}
 \end{axdef}
 
-\noindent The family\_friendly set contains ratings G and PG. A$
-\filter $could be applied to the catalog sequence to only include
-entries with ratings in this set.
+\noindent The family\_friendly set contains ratings G and PG. A$ \filter $could be applied to the catalog sequence to only include entries with ratings in this set.
 
 \bigskip
 
@@ -133,19 +121,15 @@ entries with ratings in this set.
 \addcontentsline{toc}{section}{Example 5 : Multiple Filters}
 
 \begin{axdef}
-  s5 : \seq~\nat \\
-  evens5 : \power \nat \\
-  large5 : \power \nat \\
-  result5 : \seq~\nat
-  \where
-  s5 = \langle 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 \rangle \land evens5 =
-  \{2, 4, 6, 8, 10, 12\} \land large5 = \{5, 6, 7, 8, 9, 10, 11\}
-  \land result5 = (s5 \filter evens5) \filter large5
+s5 : \seq~\nat \\
+evens5 : \power \nat \\
+large5 : \power \nat \\
+result5 : \seq~\nat
+\where
+s5 = \langle 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 \rangle \land evens5 = \{2, 4, 6, 8, 10, 12\} \land large5 = \{5, 6, 7, 8, 9, 10, 11\} \land result5 = (s5 \filter evens5) \filter large5
 \end{axdef}
 
-\noindent Multiple filters can be applied sequentially. First$
-\filter $to evens gives $\langle 2, 4, 6, 8, 10 \rangle$, then$
-\filter $to large gives $\langle 6, 8, 10 \rangle$.
+\noindent Multiple filters can be applied sequentially. First$ \filter $to evens gives $\langle 2, 4, 6, 8, 10 \rangle$, then$ \filter $to large gives $\langle 6, 8, 10 \rangle$.
 
 \bigskip
 
@@ -153,19 +137,16 @@ entries with ratings in this set.
 \addcontentsline{toc}{section}{Example 6 : Empty Filter}
 
 \begin{axdef}
-  s6 : \seq~\nat \\
-  empty\_set6 : \power \nat \\
-  disjoint\_set6 : \power \nat \\
-  result6a : \seq~\nat \\
-  result6b : \seq~\nat
-  \where
-  s6 = \langle 1, 2, 3 \rangle \land empty\_set6 = \{\} \land
-  disjoint\_set6 = \{10, 20, 30\} \land result6a = s6 \filter
-  empty\_set6 \land result6b = s6 \filter disjoint\_set6
+s6 : \seq~\nat \\
+empty\_set6 : \power \nat \\
+disjoint\_set6 : \power \nat \\
+result6a : \seq~\nat \\
+result6b : \seq~\nat
+\where
+s6 = \langle 1, 2, 3 \rangle \land empty\_set6 = \{\} \land disjoint\_set6 = \{10, 20, 30\} \land result6a = s6 \filter empty\_set6 \land result6b = s6 \filter disjoint\_set6
 \end{axdef}
 
-\noindent Filtering by an empty set or disjoint set results in an
-empty sequence.
+\noindent Filtering by an empty set or disjoint set results in an empty sequence.
 
 \bigskip
 
@@ -174,8 +155,7 @@ empty sequence.
 \bigskip
 
 \section*{Example 7 : Bag Union ( Related Phase 35 Feature )}
-\addcontentsline{toc}{section}{Example 7 : Bag Union ( Related Phase
-35 Feature )}
+\addcontentsline{toc}{section}{Example 7 : Bag Union ( Related Phase 35 Feature )}
 
 \noindent Phase 35 also includes the bag union operator.
 
@@ -190,22 +170,18 @@ empty sequence.
 \bigskip
 
 \begin{axdef}
-  b1 : \bag~\nat \\
-  b2 : \bag~\nat \\
-  combined : \bag~\nat
-  \where
-  b1 = \lbag 1, 1, 2, 3 \rbag \land b2 = \lbag 2, 3, 3, 4 \rbag \land
-  combined = b1 \uplus b2
+b1 : \bag~\nat \\
+b2 : \bag~\nat \\
+combined : \bag~\nat
+\where
+b1 = \lbag 1, 1, 2, 3 \rbag \land b2 = \lbag 2, 3, 3, 4 \rbag \land combined = b1 \uplus b2
 \end{axdef}
 
-\noindent Bag union adds $multiplicities : combined$ = [[1, 1, 2, 2,
-3, 3, 3, 4]]
+\noindent Bag union adds $multiplicities : combined$ = [[1, 1, 2, 2, 3, 3, 3, 4]]
 
 \bigskip
 
-\noindent Element 1 appears 2 times (2 from b1), element 2 appears 2
-times (1 from each), element 3 appears 3 times (1 from b1, 2 from
-b2), element 4 appears 1 time (1 from b2).
+\noindent Element 1 appears 2 times (2 from b1), element 2 appears 2 times (1 from each), element 3 appears 3 times (1 from b1, 2 from b2), element 4 appears 1 time (1 from b2).
 
 \bigskip
 

@@ -20,19 +20,18 @@
 \bigskip
 
 \begin{axdef}
-  addOne : \nat \fun \nat \\
-  double : \nat \fun \nat \\
-  square : \nat \fun \nat \\
-  pipeline : \nat \fun \nat
-  \where
-  \forall n : \nat @ addOne(n) = n + 1 \\
-  \forall n : \nat @ double(n) = 2 * n \\
-  \forall n : \nat @ square(n) = n * n \\
-  pipeline = square \comp double \comp addOne
+addOne : \nat \fun \nat \\
+double : \nat \fun \nat \\
+square : \nat \fun \nat \\
+pipeline : \nat \fun \nat
+\where
+\forall n : \nat @ addOne(n) = n + 1 \\
+\forall n : \nat @ double(n) = 2 * n \\
+\forall n : \nat @ square(n) = n * n \\
+pipeline = square \comp double \comp addOne
 \end{axdef}
 
-\noindent pipeline(3) = square(double(addOne(3))) = square(double(4))
-= square(8) = 64
+\noindent pipeline(3) = square(double(addOne(3))) = square(double(4)) = square(8) = 64
 
 \bigskip
 
@@ -40,16 +39,16 @@
 \addcontentsline{toc}{section}{Example 2 : String Pipeline}
 
 \begin{zed}
-  [Char]
+[Char]
 \end{zed}
 
 \begin{axdef}
-  str1 : \seq~Char \fun \seq~Char \\
-  str2 : \seq~Char \fun \seq~Char \\
-  str3 : \seq~Char \fun \seq~Char \\
-  stringPipeline : \seq~Char \fun \seq~Char
-  \where
-  stringPipeline = str3 \comp str2 \comp str1
+str1 : \seq~Char \fun \seq~Char \\
+str2 : \seq~Char \fun \seq~Char \\
+str3 : \seq~Char \fun \seq~Char \\
+stringPipeline : \seq~Char \fun \seq~Char
+\where
+stringPipeline = str3 \comp str2 \comp str1
 \end{axdef}
 
 \noindent Demonstrates composition of string-processing functions.

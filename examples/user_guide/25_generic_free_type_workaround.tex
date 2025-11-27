@@ -11,15 +11,15 @@
 \begin{document}
 
 \begin{zed}
-  IntTree ::= leaf | node \ldata \nat \cross IntTree \cross IntTree \rdata
+IntTree ::= leaf | node \ldata \nat \cross IntTree \cross IntTree \rdata
 \end{zed}
 
 \begin{axdef}
-  emptyTree : IntTree \\
-  treeDepth : IntTree \fun \nat
-  \where
-  emptyTree = leaf \\
-  treeDepth(leaf) = 0
+emptyTree : IntTree \\
+treeDepth : IntTree \fun \nat
+\where
+emptyTree = leaf \\
+treeDepth(leaf) = 0
 \end{axdef}
 
 \end{document}

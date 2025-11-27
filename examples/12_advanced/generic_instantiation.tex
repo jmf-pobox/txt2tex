@@ -22,11 +22,14 @@
 \noindent
 $\seq \nat$
 
+
 \noindent
 $\power X$
 
+
 \noindent
 $\emptyset[\num]$
+
 
 \noindent These instantiate generic types for specific type arguments.
 
@@ -36,11 +39,11 @@ $\emptyset[\num]$
 \addcontentsline{toc}{section}{Example 2 : Empty Set Instantiation}
 
 \begin{axdef}
-  emptyNats : \power \nat \\
-  emptyInts : \power \num
-  \where
-  emptyNats = \emptyset[\nat] \\
-  emptyInts = \emptyset[\num]
+emptyNats : \power \nat \\
+emptyInts : \power \num
+\where
+emptyNats = \emptyset[\nat] \\
+emptyInts = \emptyset[\num]
 \end{axdef}
 
 \noindent $\emptyset$ is generic; $\emptyset$[N] is the empty set of naturals.
@@ -51,11 +54,11 @@ $\emptyset[\num]$
 \addcontentsline{toc}{section}{Example 3 : Sequence Type Instantiation}
 
 \begin{axdef}
-  numbers : \seq \nat \\
-  integers : \seq \num
-  \where
-  numbers = \langle 1, 2, 3 \rangle \\
-  integers = \langle -1, 0, 1 \rangle
+numbers : \seq \nat \\
+integers : \seq \num
+\where
+numbers = \langle 1, 2, 3 \rangle \\
+integers = \langle -1, 0, 1 \rangle
 \end{axdef}
 
 \noindent seq[N] is the type of sequences of natural numbers.
@@ -66,10 +69,10 @@ $\emptyset[\num]$
 \addcontentsline{toc}{section}{Example 4 : Power Set Instantiation}
 
 \begin{axdef}
-  subsetsOfN : \power (\power  \nat) \\
-  example : \power (\power  \nat)
-  \where
-  example = \{\{1, 2\}, \{3\}, \emptyset[\nat]\}
+subsetsOfN : \power (\power  \nat) \\
+example : \power (\power  \nat)
+\where
+example = \{\{1, 2\}, \{3\}, \emptyset[\nat]\}
 \end{axdef}
 
 \noindent P(P N) is the power set of the power set of naturals (sets of sets).
@@ -80,11 +83,11 @@ $\emptyset[\num]$
 \addcontentsline{toc}{section}{Example 5 : Complex Type Parameters}
 
 \begin{axdef}
-  pairsSeq : \seq (\nat \cross \nat) \\
-  pairsSet : \power (\nat \cross \nat)
-  \where
-  pairsSeq = \langle (1, 2), (3, 4) \rangle \\
-  pairsSet = \{(1, 2), (3, 4)\}
+pairsSeq : \seq (\nat \cross \nat) \\
+pairsSet : \power (\nat \cross \nat)
+\where
+pairsSeq = \langle (1, 2), (3, 4) \rangle \\
+pairsSet = \{(1, 2), (3, 4)\}
 \end{axdef}
 
 \noindent Type parameters can be complex types like N cross N.
@@ -95,11 +98,11 @@ $\emptyset[\num]$
 \addcontentsline{toc}{section}{Example 6 : Nested Instantiation}
 
 \begin{axdef}
-  seqOfSets : \seq (\power \nat) \\
-  setOfSeqs : \power (\seq \nat)
-  \where
-  seqOfSets = \langle \{1, 2\}, \{3, 4, 5\} \rangle \\
-  setOfSeqs = \{\langle 1, 2 \rangle, \langle 3, 4 \rangle\}
+seqOfSets : \seq (\power \nat) \\
+setOfSeqs : \power (\seq \nat)
+\where
+seqOfSets = \langle \{1, 2\}, \{3, 4, 5\} \rangle \\
+setOfSeqs = \{\langle 1, 2 \rangle, \langle 3, 4 \rangle\}
 \end{axdef}
 
 \noindent seq[P N] is a sequence of sets. P[seq[N]] is a set of sequences.
@@ -111,20 +114,19 @@ $\emptyset[\num]$
 
 \begin{gendef}[X]
   identity: X \fun X
-  \where
+\where
   \forall x : X @ identity(x) = x
 \end{gendef}
 
 \begin{axdef}
-  id\_nat : \nat \fun \nat \\
-  id\_int : \num \fun \num
-  \where
-  id\_nat = identity[\nat] \\
-  id\_int = identity[\num]
+id\_nat : \nat \fun \nat \\
+id\_int : \num \fun \num
+\where
+id\_nat = identity[\nat] \\
+id\_int = identity[\num]
 \end{axdef}
 
-\noindent identity[N] instantiates the generic identity function for
-natural numbers.
+\noindent identity[N] instantiates the generic identity function for natural numbers.
 
 \bigskip
 
@@ -136,11 +138,11 @@ natural numbers.
 \end{gendef}
 
 \begin{axdef}
-  natIntPair : \nat \cross \num \\
-  intNatPair : \num \cross \nat
-  \where
-  natIntPair = pairType[\nat, \num] \\
-  intNatPair = pairType[\num, \nat]
+natIntPair : \nat \cross \num \\
+intNatPair : \num \cross \nat
+\where
+natIntPair = pairType[\nat, \num] \\
+intNatPair = pairType[\num, \nat]
 \end{axdef}
 
 \noindent Instantiate with multiple type arguments.
@@ -151,11 +153,11 @@ natural numbers.
 \addcontentsline{toc}{section}{Example 9 : Bag Instantiation}
 
 \begin{axdef}
-  natBag : \bag \nat \\
-  intBag : \bag \num
-  \where
-  natBag = \lbag 1, 1, 2, 3 \rbag \\
-  intBag = \lbag -1, 0, 1 \rbag
+natBag : \bag \nat \\
+intBag : \bag \num
+\where
+natBag = \lbag 1, 1, 2, 3 \rbag \\
+intBag = \lbag -1, 0, 1 \rbag
 \end{axdef}
 
 \noindent bag[N] is the type of bags (multisets) of natural numbers.
@@ -166,11 +168,11 @@ natural numbers.
 \addcontentsline{toc}{section}{Example 10 : Generic Relation Types}
 
 \begin{axdef}
-  natRelation : \nat \rel \nat \\
-  mixedRelation : \nat \rel \num
-  \where
-  natRelation = \{1 \mapsto 2, 2 \mapsto 4\} \\
-  mixedRelation = \{1 \mapsto -1, 2 \mapsto -2\}
+natRelation : \nat \rel \nat \\
+mixedRelation : \nat \rel \num
+\where
+natRelation = \{1 \mapsto 2, 2 \mapsto 4\} \\
+mixedRelation = \{1 \mapsto -1, 2 \mapsto -2\}
 \end{axdef}
 
 \noindent Relations between different types.
@@ -181,9 +183,9 @@ natural numbers.
 \addcontentsline{toc}{section}{Example 11 : Sequence of Pairs}
 
 \begin{axdef}
-  coordSeq : \seq (\nat \cross \nat)
-  \where
-  coordSeq = \langle (0, 0), (1, 1), (2, 4), (3, 9) \rangle
+coordSeq : \seq (\nat \cross \nat)
+\where
+coordSeq = \langle (0, 0), (1, 1), (2, 4), (3, 9) \rangle
 \end{axdef}
 
 \noindent A sequence where each element is a pair (coordinate).
@@ -194,19 +196,19 @@ natural numbers.
 \addcontentsline{toc}{section}{Example 12 : Set of Functions}
 
 \begin{axdef}
-  square : \nat \fun \nat \\
-  double : \nat \fun \nat \\
-  successor : \nat \fun \nat
-  \where
-  \forall n : \nat @ square(n) = n * n \\
-  \forall n : \nat @ double(n) = 2 * n \\
-  \forall n : \nat @ successor(n) = n + 1
+square : \nat \fun \nat \\
+double : \nat \fun \nat \\
+successor : \nat \fun \nat
+\where
+\forall n : \nat @ square(n) = n * n \\
+\forall n : \nat @ double(n) = 2 * n \\
+\forall n : \nat @ successor(n) = n + 1
 \end{axdef}
 
 \begin{axdef}
-  funcSet : \power (\nat \fun \nat)
-  \where
-  funcSet = \{square, double, successor\}
+funcSet : \power (\nat \fun \nat)
+\where
+funcSet = \{square, double, successor\}
 \end{axdef}
 
 \noindent A set containing three functions.
@@ -218,7 +220,7 @@ natural numbers.
 
 \begin{gendef}[T]
   makePair: T \cross T \fun T \cross T
-  \where
+\where
   \forall x, y : T @ makePair(x, y) = (x, y)
 \end{gendef}
 
@@ -232,7 +234,7 @@ natural numbers.
 \begin{gendef}[X]
   fst: X \cross X \fun X \\
   snd: X \cross X \fun X
-  \where
+\where
   \forall x, y : X @ fst(x, y) = x \\
   \forall x, y : X @ snd(x, y) = y
 \end{gendef}
@@ -245,10 +247,9 @@ natural numbers.
 \addcontentsline{toc}{section}{Example 15 : List of Lists}
 
 \begin{axdef}
-  matrix : \seq (\seq \nat)
-  \where
-  matrix = \langle \langle 1, 2, 3 \rangle, \langle 4, 5, 6 \rangle,
-  \langle 7, 8, 9 \rangle \rangle
+matrix : \seq (\seq \nat)
+\where
+matrix = \langle \langle 1, 2, 3 \rangle, \langle 4, 5, 6 \rangle, \langle 7, 8, 9 \rangle \rangle
 \end{axdef}
 
 \noindent Nested sequences represent a 3x3 matrix.
@@ -263,9 +264,9 @@ natural numbers.
 \bigskip
 
 \begin{axdef}
-  validSeq : \seq \nat
-  \where
-  validSeq = \langle 1, 2, 3 \rangle
+validSeq : \seq \nat
+\where
+validSeq = \langle 1, 2, 3 \rangle
 \end{axdef}
 
 \noindent $INVALID : seq[N] cannot contain non-naturals$
@@ -282,7 +283,7 @@ natural numbers.
 \begin{gendef}[T]
   wrap: T \fun \seq T \\
   unwrap: \seq T \fun T
-  \where
+\where
   \forall x : T @ wrap(x) = \langle x \rangle \\
   \forall s : \seq T @ \# s > 0 \implies unwrap(s) = s(1)
 \end{gendef}
@@ -322,25 +323,27 @@ natural numbers.
 \addcontentsline{toc}{section}{Example 19 : Higher - Order Types}
 
 \begin{axdef}
-  transformers : \power (\nat \fun \nat) \\
-  sequences : \power (\seq \nat)
-  \where
-  transformers = \{square, double\} \\
-  sequences = \{\langle 1, 2 \rangle, \langle 3, 4 \rangle\}
+transformers : \power (\nat \fun \nat) \\
+sequences : \power (\seq \nat)
+\where
+transformers = \{square, double\} \\
+sequences = \{\langle 1, 2 \rangle, \langle 3, 4 \rangle\}
 \end{axdef}
 
 \noindent Sets of functions and sequences.
 
 \bigskip
 
-\section*{Example 20 : Instantiation in Quantifiers}
-\addcontentsline{toc}{section}{Example 20 : Instantiation in Quantifiers}
+\section*{Example 20 : Instantiation elem Quantifiers}
+\addcontentsline{toc}{section}{Example 20 : Instantiation elem Quantifiers}
 
 \noindent
 $\forall s : \seq \nat @ \# s \geq 0$
 
+
 \noindent
 $\exists p : \nat \cross \nat @ p.1 = p.2$
+
 
 \noindent Quantifying over instantiated generic types.
 
@@ -350,12 +353,11 @@ $\exists p : \nat \cross \nat @ p.1 = p.2$
 \addcontentsline{toc}{section}{Example 21 : Partial Function Types}
 
 \begin{axdef}
-  lookup : \nat \pfun \seq \nat \\
-  mapping : \nat \rel \nat
-  \where
-  lookup = \{1 \mapsto \langle 10, 20 \rangle, 2 \mapsto \langle 30,
-  40 \rangle\} \\
-  mapping = \{1 \mapsto 2, 2 \mapsto 4, 3 \mapsto 6\}
+lookup : \nat \pfun \seq \nat \\
+mapping : \nat \rel \nat
+\where
+lookup = \{1 \mapsto \langle 10, 20 \rangle, 2 \mapsto \langle 30, 40 \rangle\} \\
+mapping = \{1 \mapsto 2, 2 \mapsto 4, 3 \mapsto 6\}
 \end{axdef}
 
 \noindent Partial functions with instantiated types.
@@ -436,9 +438,9 @@ $\exists p : \nat \cross \nat @ p.1 = p.2$
 \bigskip
 
 \begin{axdef}
-  safe : \seq \nat
-  \where
-  safe = \langle 1, 2, 3 \rangle
+safe : \seq \nat
+\where
+safe = \langle 1, 2, 3 \rangle
 \end{axdef}
 
 \noindent Type checker ensures all elements match the instantiated type.
@@ -453,8 +455,7 @@ $\exists p : \nat \cross \nat @ p.1 = p.2$
 
 \bigskip
 
-\noindent - P[N] = $\{1, 2, -1\}$ -- -1 might not be in N depending
-on N definition
+\noindent - P[N] = $\{1, 2, -1\}$ -- -1 might not be in N depending on N definition
 
 \bigskip
 

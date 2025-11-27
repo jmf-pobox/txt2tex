@@ -20,17 +20,16 @@
 \bigskip
 
 \begin{zed}
-  [Person, Department]
+[Person, Department]
 \end{zed}
 
 \begin{axdef}
-  assignment : Person \pfun Department \\
-  employees : \finset Person \\
-  departments : \finset Department
+assignment : Person \pfun Department \\
+employees : \finset Person \\
+departments : \finset Department
 \end{axdef}
 
-\noindent This groups related variable declarations in a single block
-(given types must be declared outside).
+\noindent This groups related variable declarations in a single block (given types must be declared outside).
 
 \bigskip
 
@@ -38,15 +37,14 @@
 \addcontentsline{toc}{section}{Example 2 : Abbreviations}
 
 \begin{zed}
-  N\_PLUS == \{~ n : \nat | n > 0 ~\}
-  \\
-  N\_EVEN == \{~ n : \nat | n \mod 2 = 0 ~\}
-  \\
-  N\_ODD == \{~ n : \nat | n \mod 2 = 1 ~\}
+N\_PLUS == \{~ n : \nat | n > 0 ~\}
+\\
+N\_EVEN == \{~ n : \nat | n \mod 2 = 0 ~\}
+\\
+N\_ODD == \{~ n : \nat | n \mod 2 = 1 ~\}
 \end{zed}
 
-\noindent Abbreviations can be defined standalone (zed blocks for
-abbreviations may not be fully supported yet).
+\noindent Abbreviations can be defined standalone (zed blocks for abbreviations may not be fully supported yet).
 
 \bigskip
 
@@ -54,23 +52,23 @@ abbreviations may not be fully supported yet).
 \addcontentsline{toc}{section}{Example 3 : Type Parameters}
 
 \begin{zed}
-  [Company]
+[Company]
 \end{zed}
 
 \noindent Declare given types using the given keyword.
 
 \bigskip
 
-\section*{Example 4 : Predicates in Zed Block}
-\addcontentsline{toc}{section}{Example 4 : Predicates in Zed Block}
+\section*{Example 4 : Predicates elem Zed Block}
+\addcontentsline{toc}{section}{Example 4 : Predicates elem Zed Block}
 
 \begin{axdef}
-  x : \nat \\
-  y : \nat
-  \where
-  x > 0 \\
-  y > 0 \\
-  x + y < 100
+x : \nat \\
+y : \nat
+\where
+x > 0 \\
+y > 0 \\
+x + y < 100
 \end{axdef}
 
 \noindent Multiple predicates can constrain variables defined in axdef.
@@ -81,17 +79,17 @@ abbreviations may not be fully supported yet).
 \addcontentsline{toc}{section}{Example 5 : Free Type Definitions}
 
 \begin{zed}
-  Color ::= red | green | blue
-  \\
-  Size ::= small | medium | large
+Color ::= red | green | blue
+\\
+Size ::= small | medium | large
 \end{zed}
 
 \begin{schema}{Product}
-  color : Color \\
-  size : Size \\
-  price : \nat
-  \where
-  price > 0
+color : Color \\
+size : Size \\
+price : \nat
+\where
+price > 0
 \end{schema}
 
 \noindent Free types are defined standalone, then used in schemas.
@@ -102,27 +100,26 @@ abbreviations may not be fully supported yet).
 \addcontentsline{toc}{section}{Example 6 : Multiple Schemas}
 
 \begin{zed}
-  [Account, Balance]
+[Account, Balance]
 \end{zed}
 
 \begin{schema}{BankAccount}
-  accountNumber : \nat \\
-  balance : \num
-  \where
-  balance \geq 0
+accountNumber : \nat \\
+balance : \num
+\where
+balance \geq 0
 \end{schema}
 
 \begin{schema}{Transaction}
-  from : BankAccount \\
-  to : BankAccount \\
-  amount : \nat
-  \where
-  amount > 0 \\
-  from.balance \geq amount
+from : BankAccount \\
+to : BankAccount \\
+amount : \nat
+\where
+amount > 0 \\
+from.balance \geq amount
 \end{schema}
 
-\noindent Multiple schemas can be defined separately, each with their
-own constraints.
+\noindent Multiple schemas can be defined separately, each with their own constraints.
 
 \bigskip
 
@@ -130,26 +127,26 @@ own constraints.
 \addcontentsline{toc}{section}{Example 7 : Schema with External Variables}
 
 \begin{zed}
-  [Student, Course]
+[Student, Course]
 \end{zed}
 
 \begin{axdef}
-  enrolled : Student \rel Course \\
-  maxCourses : \nat \\
-  maxStudents : \nat
-  \where
-  maxCourses = 7 \\
-  maxStudents = 500
+enrolled : Student \rel Course \\
+maxCourses : \nat \\
+maxStudents : \nat
+\where
+maxCourses = 7 \\
+maxStudents = 500
 \end{axdef}
 
 \begin{schema}{Enrollment}
-  students : \finset Student \\
-  courses : \finset Course
-  \where
-  students = \dom enrolled \\
-  courses = \ran enrolled \\
-  \# students \leq maxStudents \\
-  \# courses \leq maxCourses
+students : \finset Student \\
+courses : \finset Course
+\where
+students = \dom enrolled \\
+courses = \ran enrolled \\
+\# students \leq maxStudents \\
+\# courses \leq maxCourses
 \end{schema}
 
 \noindent Schemas can reference variables defined in axdef blocks.
@@ -160,31 +157,30 @@ own constraints.
 \addcontentsline{toc}{section}{Example 8 : Nested Schemas}
 
 \begin{zed}
-  [Char]
+[Char]
 \end{zed}
 
 \begin{schema}{Address}
-  street : \seq~Char \\
-  city : \seq~Char \\
-  zipCode : \nat
-  \where
-  zipCode \geq 10000 \land zipCode \leq 99999
+street : \seq~Char \\
+city : \seq~Char \\
+zipCode : \nat
+\where
+zipCode \geq 10000 \land zipCode \leq 99999
 \end{schema}
 
 \begin{schema}{PersonData}
-  name : \seq~Char \\
-  address : Address \\
-  age : \nat
-  \where
-  age \geq 0 \land age \leq 150
+name : \seq~Char \\
+address : Address \\
+age : \nat
+\where
+age \geq 0 \land age \leq 150
 \end{schema}
 
 \begin{axdef}
-  population : \finset PersonData
+population : \finset PersonData
 \end{axdef}
 
-\noindent Schema Address is used within schema PersonData. Variables
-using schemas go in axdef.
+\noindent Schema Address is used within schema PersonData. Variables using schemas go in axdef.
 
 \bigskip
 
@@ -192,17 +188,17 @@ using schemas go in axdef.
 \addcontentsline{toc}{section}{Example 9 : Constants and Functions}
 
 \begin{zed}
-  PI == 3
-  \\
-  E == 2
+PI == 3
+\\
+E == 2
 \end{zed}
 
 \begin{axdef}
-  circumference : \nat \fun \nat \\
-  area : \nat \fun \nat
-  \where
-  \forall r : \nat @ circumference(r) = 2 * PI * r \\
-  \forall r : \nat @ area(r) = PI * r * r
+circumference : \nat \fun \nat \\
+area : \nat \fun \nat
+\where
+\forall r : \nat @ circumference(r) = 2 * PI * r \\
+\forall r : \nat @ area(r) = PI * r * r
 \end{axdef}
 
 \noindent Mathematical constants defined as abbreviations, functions in axdef.
@@ -213,28 +209,28 @@ using schemas go in axdef.
 \addcontentsline{toc}{section}{Example 10 : Permission System Example}
 
 \begin{zed}
-  [UserID, DocumentID]
-  \\
-  PermissionType ::= read | write | admin
+[UserID, DocumentID]
+\\
+PermissionType ::= read | write | admin
 \end{zed}
 
 \begin{schema}{User}
-  userId : UserID \\
-  documents : \power DocumentID \\
-  permissions : DocumentID \pfun PermissionType
-  \where
-  \dom permissions \subseteq documents
+userId : UserID \\
+documents : \power DocumentID \\
+permissions : DocumentID \pfun PermissionType
+\where
+\dom permissions \subseteq documents
 \end{schema}
 
 \begin{schema}{System}
-  users : UserID \pfun User \\
-  allDocuments : \finset DocumentID
-  \where
-  allDocuments = \bigcup \{~ u : \ran users @ u.documents ~\}
+users : UserID \pfun User \\
+allDocuments : \finset DocumentID
+\where
+allDocuments = \bigcup \{~ u : \ran users @ u.documents ~\}
 \end{schema}
 
 \begin{axdef}
-  users : UserID \pfun User
+users : UserID \pfun User
 \end{axdef}
 
 \noindent A permission system specification using free types and schemas.

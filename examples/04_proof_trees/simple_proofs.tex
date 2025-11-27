@@ -16,13 +16,13 @@
 \addcontentsline{toc}{section}{Example 1 : Simple Implication}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and)(q) \implies q}{
-      \infer[\land\textrm{-elim-2}]{q}{\ulcorner p(and)(q) \urcorner^{[1]}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and)(q) \implies q}{
+  \infer[\land\textrm{-elim-2}]{q}{\ulcorner p(and)(q) \urcorner^{[1]}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -30,18 +30,13 @@
 \addcontentsline{toc}{section}{Example 2 : With Sibling Premises}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and(p \implies q))
-    \implies p(and)(q)}{
-      \infer[\land \mbox{intro}]{p(and)(q)}{\infer[\Rightarrow
-        \mbox{elim}]{q}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner
-          p(and(p \implies q)) \urcorner^{[1]}} &
-          \infer[\land\textrm{-elim-2}]{p \implies q}{\ulcorner p(and(p
-      \implies q)) \urcorner^{[1]}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and(p \implies q)) \implies p(and)(q)}{
+  \infer[\land \mbox{intro}]{p(and)(q)}{\infer[\Rightarrow \mbox{elim}]{q}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p(and(p \implies q)) \urcorner^{[1]}} & \infer[\land\textrm{-elim-2}]{p \implies q}{\ulcorner p(and(p \implies q)) \urcorner^{[1]}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -49,20 +44,13 @@
 \addcontentsline{toc}{section}{Example 3 : Distribution with Cases}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and(q(or)(r)))
-    \implies p(and)(q)(or(p(and)(r)))}{
-      \infer[\lor
-      \mbox{elim}]{p(and)(q)(or(p(and)(r)))}{\infer[\lor\textrm{-intro-1}]{p(and)(q)(or(p(and)(r)))}{\infer[\land
-          \mbox{intro}]{p(and)(q)}{\infer[\mbox{from
-        case}]{q}{\infer[\mbox{from above}]{p}{}}}} &
-        \infer[\lor\textrm{-intro-2}]{p(and)(q)(or(p(and)(r)))}{\infer[\land
-          \mbox{intro}]{p(and)(r)}{\infer[\mbox{from
-      case}]{r}{\infer[\mbox{from above}]{p}{}}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and(q(or)(r))) \implies p(and)(q)(or(p(and)(r)))}{
+  \infer[\lor \mbox{elim}]{p(and)(q)(or(p(and)(r)))}{\infer[\lor\textrm{-intro-1}]{p(and)(q)(or(p(and)(r)))}{\infer[\land \mbox{intro}]{p(and)(q)}{\infer[\mbox{from case}]{q}{\infer[\mbox{from above}]{p}{}}}} & \infer[\lor\textrm{-intro-2}]{p(and)(q)(or(p(and)(r)))}{\infer[\land \mbox{intro}]{p(and)(r)}{\infer[\mbox{from case}]{r}{\infer[\mbox{from above}]{p}{}}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -70,41 +58,27 @@
 \addcontentsline{toc}{section}{Example 4 : Modus Tollens}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \implies
-    q))(and)(not)(q) \implies not(p)}{
-      \infer[negation\textrm{-intro}^{[2]}]{not(p)}{\infer[\land\textrm{-elim-1}]{p
-        \implies q}{\ulcorner ((p \implies q))(and)(not)(q)
-        \urcorner^{[1]}} &
-        \infer[\land\textrm{-elim-2}]{not(q)}{\ulcorner ((p \implies
-        q))(and)(not)(q) \urcorner^{[1]}} &
-        \infer[\mbox{contradiction}]{false}{\infer[\Rightarrow
-      \mbox{elim}]{q}{\ulcorner p \urcorner^{[2]}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \implies q))(and)(not)(q) \implies not(p)}{
+  \infer[negation\textrm{-intro}^{[2]}]{not(p)}{\infer[\land\textrm{-elim-1}]{p \implies q}{\ulcorner ((p \implies q))(and)(not)(q) \urcorner^{[1]}} & \infer[\land\textrm{-elim-2}]{not(q)}{\ulcorner ((p \implies q))(and)(not)(q) \urcorner^{[1]}} & \infer[\mbox{contradiction}]{false}{\infer[\Rightarrow \mbox{elim}]{q}{\ulcorner p \urcorner^{[2]}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
 \section*{Example 5 : Solution 18 Implication to Disjunction}
-\addcontentsline{toc}{section}{Example 5 : Solution 18 Implication to
-Disjunction}
+\addcontentsline{toc}{section}{Example 5 : Solution 18 Implication to Disjunction}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \implies q) \implies
-    not(p)(or)(q)}{
-      \infer[\mbox{excluded middle}]{p(or)(not)(p)}{\ulcorner p
-      \implies q \urcorner^{[1]}} &
-      \infer[\lor\textrm{-elim}^{[2]}]{not(p)(or)(q)}{\infer[\lor\textrm{-intro-2}]{not(p)(or)(q)}{\infer[\Rightarrow
-        \mbox{elim}]{q}{\ulcorner p \urcorner^{[2]}}} &
-        \infer[\lor\textrm{-intro-1}]{not(p)(or)(q)}{\ulcorner not(p)
-      \urcorner^{[2]}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \implies q) \implies not(p)(or)(q)}{
+  \infer[\mbox{excluded middle}]{p(or)(not)(p)}{\ulcorner p \implies q \urcorner^{[1]}} & \infer[\lor\textrm{-elim}^{[2]}]{not(p)(or)(q)}{\infer[\lor\textrm{-intro-2}]{not(p)(or)(q)}{\infer[\Rightarrow \mbox{elim}]{q}{\ulcorner p \urcorner^{[2]}}} & \infer[\lor\textrm{-intro-1}]{not(p)(or)(q)}{\ulcorner not(p) \urcorner^{[2]}}}
+}
+$%
+}
 \end{center}
 \bigskip
 

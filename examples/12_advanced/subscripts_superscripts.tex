@@ -20,21 +20,19 @@
 \bigskip
 
 \noindent
-$x_1$
+$x_1 \in S$
 
-\noindent
-$in(S)$
 
 \noindent
 $x_2 = x_1 + 1$
+
 
 \noindent Common for indexed variables in sequences, arrays, or iterations.
 
 \bigskip
 
 \section*{Example 2 : Basic Superscripts ( Exponentiation )}
-\addcontentsline{toc}{section}{Example 2 : Basic Superscripts (
-Exponentiation )}
+\addcontentsline{toc}{section}{Example 2 : Basic Superscripts ( Exponentiation )}
 
 \noindent Superscripts denote exponentiation:
 
@@ -43,8 +41,10 @@ Exponentiation )}
 \noindent
 $x \bsup 2 \esup = x * x$
 
+
 \noindent
 $n \bsup 3 \esup = n * n * n$
+
 
 \noindent The caret symbol (^) creates superscripts for powers.
 
@@ -54,13 +54,13 @@ $n \bsup 3 \esup = n * n * n$
 \addcontentsline{toc}{section}{Example 3 : Multiple Subscripted Variables}
 
 \begin{axdef}
-  x_1 : \nat \\
-  x_2 : \nat \\
-  x_3 : \nat
-  \where
-  x_1 = 1 \\
-  x_2 = 2 \\
-  x_3 = 3
+x_1 : \nat \\
+x_2 : \nat \\
+x_3 : \nat
+\where
+x_1 = 1 \\
+x_2 = 2 \\
+x_3 = 3
 \end{axdef}
 
 \noindent Define multiple indexed variables.
@@ -75,10 +75,8 @@ $n \bsup 3 \esup = n * n * n$
 \bigskip
 
 \noindent
-$\forall i : 1 \upto n @ s\_i$
+$\forall i : 1 \upto n @ s\_i \in \nat$
 
-\noindent
-$in(\nat)$
 
 \noindent Here s\_i represents the i-th element of a conceptual sequence.
 
@@ -103,11 +101,12 @@ $in(\nat)$
 
 \bigskip
 
-\section*{Example 6 : Exponentiation in Expressions}
-\addcontentsline{toc}{section}{Example 6 : Exponentiation in Expressions}
+\section*{Example 6 : Exponentiation elem Expressions}
+\addcontentsline{toc}{section}{Example 6 : Exponentiation elem Expressions}
 
 \noindent
 $\{~ n : \nat | n < 10 @ n \bsup 2 \esup ~\}$
+
 
 \noindent Set of squares: $\{0, 1, 4, 9, 16, 25, 36, 49, 64, 81\}$
 
@@ -117,10 +116,10 @@ $\{~ n : \nat | n < 10 @ n \bsup 2 \esup ~\}$
 \addcontentsline{toc}{section}{Example 7 : Power Function}
 
 \begin{axdef}
-  power : \nat \cross \nat \fun \nat
-  \where
-  \forall x : \nat @ power(x, 0) = 1 \\
-  \forall x, n : \nat @ n > 0 \implies power(x, n) = x * power(x, n - 1)
+power : \nat \cross \nat \fun \nat
+\where
+\forall x : \nat @ power(x, 0) = 1 \\
+\forall x, n : \nat @ n > 0 \implies power(x, n) = x * power(x, n - 1)
 \end{axdef}
 
 \noindent Recursive definition of exponentiation. Equivalent to $x^n$.
@@ -137,6 +136,7 @@ $\{~ n : \nat | n < 10 @ n \bsup 2 \esup ~\}$
 \noindent
 $a_0 + a_1 * x + a_2 * x \bsup 2 \esup + a_3 * x \bsup 3 \esup$
 
+
 \noindent Standard polynomial notation.
 
 \bigskip
@@ -151,6 +151,7 @@ $a_0 + a_1 * x + a_2 * x \bsup 2 \esup + a_3 * x \bsup 3 \esup$
 \noindent
 $x\_i \bsup 2 \esup$
 
+
 \noindent Meaning: (x sub i) squared.
 
 \bigskip
@@ -161,6 +162,7 @@ $x\_i \bsup 2 \esup$
 
 \noindent
 $x \bsup 2 \esup(\_i)$
+
 
 \noindent Meaning: The i-th element of the sequence of squares.
 
@@ -176,12 +178,14 @@ $x \bsup 2 \esup(\_i)$
 \noindent
 $x \bsup 2 \esup \bsup 3 \esup = x \bsup 6 \esup$
 
+
 \noindent Or with explicit parentheses:
 
 \bigskip
 
 \noindent
 $n \bsup 2 \esup \bsup (n + 1) \esup$
+
 
 \section*{Example 11 : Cartesian Product Powers}
 \addcontentsline{toc}{section}{Example 11 : Cartesian Product Powers}
@@ -193,8 +197,10 @@ $n \bsup 2 \esup \bsup (n + 1) \esup$
 \noindent
 $S \bsup 2 \esup = S \cross S$
 
+
 \noindent
 $S \bsup 3 \esup = S \cross S \cross S$
+
 
 \noindent Set of n-tuples from S.
 
@@ -210,8 +216,10 @@ $S \bsup 3 \esup = S \cross S \cross S$
 \noindent
 $x_0 = initial(value)$
 
+
 \noindent
 $x\_(i + 1) = f(x\_i)$
+
 
 \noindent Defines a recurrence relation.
 
@@ -236,14 +244,13 @@ $x\_(i + 1) = f(x\_i)$
 \addcontentsline{toc}{section}{Example 14 : State Variable Subscripts}
 
 \begin{schema}{Counter}
-  count : \nat \\
-  countNext : \nat
-  \where
-  countNext = count + 1
+count : \nat \\
+countNext : \nat
+\where
+countNext = count + 1
 \end{schema}
 
-\noindent Next-state variables can use descriptive names like
-countNext instead of primed notation.
+\noindent Next-state variables can use descriptive names like countNext instead of primed notation.
 
 \bigskip
 
@@ -251,35 +258,34 @@ countNext instead of primed notation.
 \addcontentsline{toc}{section}{Example 15 : Indexed Family of Sets}
 
 \begin{axdef}
-  S_1 : \power \nat \\
-  S_2 : \power \nat \\
-  S_3 : \power \nat
-  \where
-  S_1 = \{1, 2, 3\} \\
-  S_2 = \{4, 5, 6\} \\
-  S_3 = \{7, 8, 9\}
+S_1 : \power \nat \\
+S_2 : \power \nat \\
+S_3 : \power \nat
+\where
+S_1 = \{1, 2, 3\} \\
+S_2 = \{4, 5, 6\} \\
+S_3 = \{7, 8, 9\}
 \end{axdef}
 
 \noindent Family of sets indexed by natural numbers.
 
 \bigskip
 
-\section*{Example 16 : Exponents in Constraints}
-\addcontentsline{toc}{section}{Example 16 : Exponents in Constraints}
+\section*{Example 16 : Exponents elem Constraints}
+\addcontentsline{toc}{section}{Example 16 : Exponents elem Constraints}
 
 \noindent
 $\forall n : \nat @ n \bsup 2 \esup \geq n$
 
-\noindent Constraint using $exponentiation : every natural number's
-square$ is at least itself.
+
+\noindent Constraint using $exponentiation : every natural number's square$ is at least itself.
 
 \bigskip
 
 \section*{Example 17 : Summation Notation ( Conceptual )}
 \addcontentsline{toc}{section}{Example 17 : Summation Notation ( Conceptual )}
 
-\noindent While txt2tex doesn't have built-in summation, subscripts
-help express it:
+\noindent While txt2tex doesn't have built-in summation, subscripts help express it:
 
 \bigskip
 
@@ -295,15 +301,14 @@ help express it:
 \addcontentsline{toc}{section}{Example 18 : Geometric Sequence}
 
 \begin{axdef}
-  r : \nat \\
-  a_0 : \nat
-  \where
-  r = 2 \\
-  a_0 = 1
+r : \nat \\
+a_0 : \nat
+\where
+r = 2 \\
+a_0 = 1
 \end{axdef}
 
-\noindent For a geometric sequence with first term a\_0 and ratio $r
-: a_0$, a\_0 * r, a\_0 * r * r, a\_0 * r * r * r, ...
+\noindent For a geometric sequence with first term a\_0 and ratio $r : a_0$, a\_0 * r, a\_0 * r * r, a\_0 * r * r * r, ...
 
 \bigskip
 
@@ -336,6 +341,7 @@ help express it:
 \noindent
 $x\_(i + 1) + x\_(i - 1) = 2 * x\_i$
 
+
 \noindent Recurrence relation with subscript expressions.
 
 \bigskip
@@ -349,6 +355,7 @@ $x\_(i + 1) + x\_(i - 1) = 2 * x\_i$
 
 \noindent
 $\power S(or)(2 \bsup S \esup)$
+
 
 \noindent Both denote the power set of S.
 
@@ -376,8 +383,7 @@ $\power S(or)(2 \bsup S \esup)$
 
 \bigskip
 
-\noindent 1. Use subscripts for indices, versions, or families (x\_1,
-x\_i, S\_k)
+\noindent 1. Use subscripts for indices, versions, or families (x\_1, x\_i, S\_k)
 
 \bigskip
 

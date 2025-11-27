@@ -13,7 +13,7 @@
 \section*{Scoping Rules Examples}
 
 \begin{zed}
-  [Char]
+[Char]
 \end{zed}
 
 \section*{Example 1 : Quantifier Scope}
@@ -26,8 +26,8 @@
 \noindent
 $\forall x : \nat @ x > 0$
 
-\noindent Here x is only in scope within the quantifier. Outside the
-quantifier, x is not defined.
+
+\noindent Here x is only in scope within the quantifier. Outside the quantifier, x is not defined.
 
 \bigskip
 
@@ -37,19 +37,19 @@ quantifier, x is not defined.
 \noindent
 $\forall x : \nat @ \exists y : \nat @ x + y = 10$
 
-\noindent x is in scope for the entire outer quantifier, including
-the inner quantifier. y is only in scope within the $\exists$ quantifier.
+
+\noindent x is in scope for the entire outer quantifier, including the inner quantifier. y is only in scope within the $\exists$ quantifier.
 
 \bigskip
 
-\section*{Example 3 : Shadowing in Nested Quantifiers}
-\addcontentsline{toc}{section}{Example 3 : Shadowing in Nested Quantifiers}
+\section*{Example 3 : Shadowing elem Nested Quantifiers}
+\addcontentsline{toc}{section}{Example 3 : Shadowing elem Nested Quantifiers}
 
 \noindent
 $\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
 
-\noindent The inner x shadows the outer x. Within the $\exists$
-quantifier, x refers to the inner binding. This is allowed but can be confusing.
+
+\noindent The inner x shadows the outer x. Within the $\exists$ quantifier, x refers to the inner binding. This is allowed but can be confusing.
 
 \bigskip
 
@@ -59,8 +59,8 @@ quantifier, x refers to the inner binding. This is allowed but can be confusing.
 \noindent
 $\{~ x : \nat | x > 0 \land x < 10 ~\}$
 
-\noindent x is in scope only within the set comprehension. The
-constraint $x > 0$ and $x < 10$ uses the same x.
+
+\noindent x is in scope only within the set comprehension. The constraint $x > 0$ and $x < 10$ uses the same x.
 
 \bigskip
 
@@ -70,8 +70,8 @@ constraint $x > 0$ and $x < 10$ uses the same x.
 \noindent
 $\{~ x : \nat | x < 5 @ x * x ~\}$
 
-\noindent x is in scope both before and after the bullet. The
-constraint $x < 5$ and the term x * x refer to the same x.
+
+\noindent x is in scope both before and after the bullet. The constraint $x < 5$ and the term x * x refer to the same x.
 
 \bigskip
 
@@ -79,14 +79,13 @@ constraint $x < 5$ and the term x * x refer to the same x.
 \addcontentsline{toc}{section}{Example 6 : Schema Component Scope}
 
 \begin{schema}{Counter}
-  count : \nat \\
-  limit : \nat
-  \where
-  count \leq limit
+count : \nat \\
+limit : \nat
+\where
+count \leq limit
 \end{schema}
 
-\noindent Within the schema, count and limit are in scope in the
-where clause. Outside the schema, they must be accessed via schema references.
+\noindent Within the schema, count and limit are in scope in the where clause. Outside the schema, they must be accessed via schema references.
 
 \bigskip
 
@@ -94,14 +93,13 @@ where clause. Outside the schema, they must be accessed via schema references.
 \addcontentsline{toc}{section}{Example 7 : Schema Reference}
 
 \begin{axdef}
-  c : Counter
-  \where
-  c.count = 5 \\
-  c.limit = 10
+c : Counter
+\where
+c.count = 5 \\
+c.limit = 10
 \end{axdef}
 
-\noindent When referencing schema components from outside, use dot
-$notation : c.count$ and c.limit.
+\noindent When referencing schema components from outside, use dot $notation : c.count$ and c.limit.
 
 \bigskip
 
@@ -109,19 +107,18 @@ $notation : c.count$ and c.limit.
 \addcontentsline{toc}{section}{Example 8 : Multiple Schemas - No Name Conflict}
 
 \begin{schema}{Account}
-  balance : \nat
-  \where
-  balance \geq 0
+balance : \nat
+\where
+balance \geq 0
 \end{schema}
 
 \begin{schema}{Transaction}
-  balance : \nat
-  \where
-  balance \geq 0
+balance : \nat
+\where
+balance \geq 0
 \end{schema}
 
-\noindent Both schemas have a component named balance. This is
-allowed because they are in different schema scopes.
+\noindent Both schemas have a component named balance. This is allowed because they are in different schema scopes.
 
 \bigskip
 
@@ -129,22 +126,19 @@ allowed because they are in different schema scopes.
 \addcontentsline{toc}{section}{Example 9 : Schema Inclusion Scope}
 
 \begin{schema}{User}
-  userId : \nat \\
-  name : \seq~Char
+userId : \nat \\
+name : \seq~Char
 \end{schema}
 
 \begin{schema}{LoggedInUser}
-  userId : \nat \\
-  userName : \seq~Char \\
-  sessionToken : \nat
-  \where
-  sessionToken > 0
+userId : \nat \\
+userName : \seq~Char \\
+sessionToken : \nat
+\where
+sessionToken > 0
 \end{schema}
 
-\noindent LoggedInUser has its own copies of userId and name fields
-(as userId and userName), plus sessionToken. In full Z notation,
-schema inclusion would allow referencing User directly, but here we
-show explicit declarations.
+\noindent LoggedInUser has its own copies of userId and name fields (as userId and userName), plus sessionToken. In full Z notation, schema inclusion would allow referencing User directly, but here we show explicit declarations.
 
 \bigskip
 
@@ -152,23 +146,22 @@ show explicit declarations.
 \addcontentsline{toc}{section}{Example 10 : Global vs Local Names}
 
 \begin{zed}
-  [GlobalType]
+[GlobalType]
 \end{zed}
 
 \begin{axdef}
-  globalVar : \nat
-  \where
-  globalVar = 42
+globalVar : \nat
+\where
+globalVar = 42
 \end{axdef}
 
 \begin{schema}{LocalScope}
-  x : \nat
-  \where
-  x = globalVar + 1
+x : \nat
+\where
+x = globalVar + 1
 \end{schema}
 
-\noindent globalVar is in the global scope, accessible from within
-schemas. x is local to LocalScope.
+\noindent globalVar is in the global scope, accessible from within schemas. x is local to LocalScope.
 
 \bigskip
 
@@ -176,19 +169,18 @@ schemas. x is local to LocalScope.
 \addcontentsline{toc}{section}{Example 11 : Quantifier with Global Names}
 
 \begin{axdef}
-  maximum : \nat
-  \where
-  maximum = 100
+maximum : \nat
+\where
+maximum = 100
 \end{axdef}
 
 \begin{schema}{Bounded}
-  value : \nat
-  \where
-  \forall x : \nat @ x \leq maximum \implies value \leq x
+value : \nat
+\where
+\forall x : \nat @ x \leq maximum \implies value \leq x
 \end{schema}
 
-\noindent The quantifier introduces local x, but maximum refers to
-the global axdef constant.
+\noindent The quantifier introduces local x, but maximum refers to the global axdef constant.
 
 \bigskip
 
@@ -200,14 +192,13 @@ the global axdef constant.
 \bigskip
 
 \begin{axdef}
-  x : \nat
-  \where
-  x = 10 \\
-  \forall x : \nat @ x > 0 \implies x \geq 0
+x : \nat
+\where
+x = 10 \\
+\forall x : \nat @ x > 0 \implies x \geq 0
 \end{axdef}
 
-\noindent The global $x = 10$, but the quantifier in the where clause
-uses a local x that shadows the global x within its scope.
+\noindent The global $x = 10$, but the quantifier in the where clause uses a local x that shadows the global x within its scope.
 
 \bigskip
 
@@ -217,8 +208,8 @@ uses a local x that shadows the global x within its scope.
 \noindent
 $\lambda x : \nat @ x * x$
 
-\noindent x is in scope only within the lambda body (x * x). The
-lambda introduces its own scope for the parameter.
+
+\noindent x is in scope only within the lambda body (x * x). The lambda introduces its own scope for the parameter.
 
 \bigskip
 
@@ -228,8 +219,8 @@ lambda introduces its own scope for the parameter.
 \noindent
 $\lambda x : \nat @ \lambda y : \nat @ x + y$
 
-\noindent x is in scope in both the outer lambda body and the inner
-lambda body. y is only in scope in the inner lambda body.
+
+\noindent x is in scope in both the outer lambda body and the inner lambda body. y is only in scope in the inner lambda body.
 
 \bigskip
 
@@ -239,20 +230,19 @@ lambda body. y is only in scope in the inner lambda body.
 \noindent
 $(\mu x : \nat | x * x = 25)$
 
-\noindent x is in scope only within the mu expression (the constraint
-and any expression after a bullet).
+
+\noindent x is in scope only within the mu expression (the constraint and any expression after a bullet).
 
 \bigskip
 
 \section*{Example 16 : Set Comprehension with Multiple Variables}
-\addcontentsline{toc}{section}{Example 16 : Set Comprehension with
-Multiple Variables}
+\addcontentsline{toc}{section}{Example 16 : Set Comprehension with Multiple Variables}
 
 \noindent
 $\{~ x, y : \nat | x < y \land y < 10 @ (x, y) ~\}$
 
-\noindent Both x and y are in scope throughout the set comprehension,
-including the constraint and the term.
+
+\noindent Both x and y are in scope throughout the set comprehension, including the constraint and the term.
 
 \bigskip
 
@@ -260,14 +250,14 @@ including the constraint and the term.
 \addcontentsline{toc}{section}{Example 17 : Schema Quantification}
 
 \begin{schema}{Database}
-  records : \power \nat
+records : \power \nat
 \end{schema}
 
 \noindent
 $\exists Database @ \# records > 100$
 
-\noindent This quantifies over schema Database. The components of
-Database (records) are in scope within the predicate.
+
+\noindent This quantifies over schema Database. The components of Database (records) are in scope within the predicate.
 
 \bigskip
 
@@ -304,6 +294,7 @@ Database (records) are in scope within the predicate.
 \noindent
 $\forall x : \nat @ x > 0 \implies (\exists y : \nat @ y < x \land y > 0)$
 
+
 \noindent Uses distinct names x and y---clear and unambiguous.
 
 \bigskip
@@ -314,25 +305,23 @@ $\forall x : \nat @ x > 0 \implies (\exists y : \nat @ y < x \land y > 0)$
 \noindent
 $\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
 
-\noindent Inner x shadows outer x---confusing and error-prone. Avoid
-this pattern.
+
+\noindent Inner x shadows outer x---confusing and error-prone. Avoid this pattern.
 
 \bigskip
 
-\section*{Example 21 : Scoping in Definitions}
-\addcontentsline{toc}{section}{Example 21 : Scoping in Definitions}
+\section*{Example 21 : Scoping elem Definitions}
+\addcontentsline{toc}{section}{Example 21 : Scoping elem Definitions}
 
 \noindent Poor style example (not valid due to name shadowing):
 
 \bigskip
 
-\noindent If we had: axdef with square : $\nat \fun \nat$ and $n :
-N$, where $\forall$ $n : N$ shadows the global n.
+\noindent If we had: axdef with square : $\nat \fun \nat$ and $n : N$, where $\forall$ $n : N$ shadows the global n.
 
 \bigskip
 
-\noindent The quantifier's n would be local to the quantifier, and
-the global $n = 5$ would be separate.
+\noindent The quantifier's n would be local to the quantifier, and the global $n = 5$ would be separate.
 
 \bigskip
 
@@ -341,11 +330,11 @@ the global $n = 5$ would be separate.
 \bigskip
 
 \begin{axdef}
-  square : \nat \fun \nat \\
-  testValue : \nat
-  \where
-  \forall x : \nat @ square(x) = x * x \\
-  testValue = 5
+square : \nat \fun \nat \\
+testValue : \nat
+\where
+\forall x : \nat @ square(x) = x * x \\
+testValue = 5
 \end{axdef}
 
 \noindent Now there's no shadowing---much clearer!
@@ -356,23 +345,21 @@ the global $n = 5$ would be separate.
 \addcontentsline{toc}{section}{Example 22 : Schema Composition Scope}
 
 \begin{schema}{StateA}
-  x : \nat
+x : \nat
 \end{schema}
 
 \begin{schema}{StateB}
-  y : \nat
+y : \nat
 \end{schema}
 
 \begin{schema}{Combined}
-  x : \nat \\
-  y : \nat
-  \where
-  x + y > 0
+x : \nat \\
+y : \nat
+\where
+x + y > 0
 \end{schema}
 
-\noindent Combined has fields x and y. In full Z notation, schema
-inclusion (StateA; StateB) would automatically bring in these fields
-from other schemas, but here we show explicit declarations.
+\noindent Combined has fields x and y. In full Z notation, schema inclusion (StateA; StateB) would automatically bring in these fields from other schemas, but here we show explicit declarations.
 
 \bigskip
 
@@ -380,18 +367,16 @@ from other schemas, but here we show explicit declarations.
 \addcontentsline{toc}{section}{Example 23 : Free Type Scope}
 
 \begin{zed}
-  Color ::= red | green | blue
+Color ::= red | green | blue
 \end{zed}
 
 \begin{schema}{ColoredItem}
-  color : Color
-  \where
-  color \\
-  in(\{red, blue\})
+color : Color
+\where
+color \in \{red, blue\}
 \end{schema}
 
-\noindent The free type constructors (red, green, blue) are in global
-scope, accessible within schemas and definitions.
+\noindent The free type constructors (red, green, blue) are in global scope, accessible within schemas and definitions.
 
 \bigskip
 

@@ -15,13 +15,13 @@
 \section*{Example 1 : Statement of LEM}
 \addcontentsline{toc}{section}{Example 1 : Statement of LEM}
 
-\noindent The law of excluded middle states: for any proposition p,
-either p is true or $\lnot p$ is true.
+\noindent The law of excluded middle states: for any proposition p, either p is true or $\lnot p$ is true.
 
 \bigskip
 
 \noindent
 $p \lor \lnot p$
+
 
 \noindent This is an axiom of classical logic but not of constructive logic.
 
@@ -35,42 +35,35 @@ $p \lor \lnot p$
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\lor \mbox{elim}]{q}{
-      \infer[\mbox{assumption}]{\lnot p \implies q}{\infer[LEM]{p
-        \lor \lnot p}{\ulcorner p \implies q \urcorner^{[1]}} &
-        \infer[\Rightarrow \mbox{elim with p}\Rightarrow q]{q}{} &
-        \infer[\Rightarrow \mbox{elim with} \lnot p\Rightarrow q]{q}{}
-      & \infer[\lor \mbox{elim}]{q}{\ulcorner p \implies q \urcorner^{[1]}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\lor \mbox{elim}]{q}{
+  \infer[\mbox{assumption}]{\lnot p \implies q}{\infer[LEM]{p \lor \lnot p}{\ulcorner p \implies q \urcorner^{[1]}} & \infer[\Rightarrow \mbox{elim with p}\Rightarrow q]{q}{} & \infer[\Rightarrow \mbox{elim with} \lnot p\Rightarrow q]{q}{} & \infer[\lor \mbox{elim}]{q}{\ulcorner p \implies q \urcorner^{[1]}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
-\noindent By LEM, we can case-analyze on p $\lor$ $\lnot p$. In both
-cases we derive q.
+\noindent By LEM, we can case-analyze on p $\lor$ $\lnot p$. In both cases we derive q.
 
 \bigskip
 
 \section*{Example 3 : Double Negation Elimination Using LEM}
-\addcontentsline{toc}{section}{Example 3 : Double Negation
-Elimination Using LEM}
+\addcontentsline{toc}{section}{Example 3 : Double Negation Elimination Using LEM}
 
 \noindent Prove: $\lnot$ $\lnot p \implies p$
 
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\lor \mbox{elim}]{p}{
-      \infer[\lor \mbox{elim}]{p}{\infer[\mbox{false
-      elim}]{p}{\infer[\mbox{contradiction with} \lnot \lnot p]{false}{}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\lor \mbox{elim}]{p}{
+  \infer[\lor \mbox{elim}]{p}{\infer[\mbox{false elim}]{p}{\infer[\mbox{contradiction with} \lnot \lnot p]{false}{}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -86,15 +79,13 @@ Elimination Using LEM}
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\lor \mbox{elim}]{\lnot p \lor \lnot q}{
-      \infer[\lor \mbox{elim}]{\lnot (p(or)(\lnot q))}{\infer[\lor
-        \mbox{intro left}]{\lnot p \lor \lnot
-      q}{\infer[\mbox{identity}]{\lnot p}{}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\lor \mbox{elim}]{\lnot p \lor \lnot q}{
+  \infer[\lor \mbox{elim}]{\lnot (p(or)(\lnot q))}{\infer[\lor \mbox{intro left}]{\lnot p \lor \lnot q}{\infer[\mbox{identity}]{\lnot p}{}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -105,8 +96,7 @@ Elimination Using LEM}
 \section*{Example 5 : Decidability}
 \addcontentsline{toc}{section}{Example 5 : Decidability}
 
-\noindent A proposition is decidable if we can prove p or not p. In
-logical notation, we would $write : decidable(p) means$ $p(or)(\lnot p)$.
+\noindent A proposition is decidable if we can prove p or not p. In logical notation, we would $write : decidable(p) means$ $p(or)(\lnot p)$.
 
 \bigskip
 
@@ -122,14 +112,13 @@ logical notation, we would $write : decidable(p) means$ $p(or)(\lnot p)$.
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\lor \mbox{elim}]{p}{
-      \infer[\lor \mbox{elim}]{p}{\infer[\mbox{false
-      elim}]{p}{\infer[\Rightarrow \mbox{elim}]{false}{}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\lor \mbox{elim}]{p}{
+  \infer[\lor \mbox{elim}]{p}{\infer[\mbox{false elim}]{p}{\infer[\Rightarrow \mbox{elim}]{false}{}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -149,14 +138,13 @@ logical notation, we would $write : decidable(p) means$ $p(or)(\lnot p)$.
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\lor \mbox{elim}]{\lnot p \lor q}{
-      \infer[\lor \mbox{elim}]{\lnot (p(or)(q))}{\infer[\lor
-      \mbox{intro left}]{\lnot p \lor q}{}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\lor \mbox{elim}]{\lnot p \lor q}{
+  \infer[\lor \mbox{elim}]{\lnot (p(or)(q))}{\infer[\lor \mbox{intro left}]{\lnot p \lor q}{}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -165,16 +153,13 @@ logical notation, we would $write : decidable(p) means$ $p(or)(\lnot p)$.
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies q}{
-      \infer[\mbox{assumption}]{p}{\infer[\mbox{false
-        elim}]{q}{\infer[\mbox{contradiction}]{false}{}} &
-        \infer[\mbox{identity}]{q}{} & \infer[\lor
-      \mbox{elim}]{q}{\ulcorner \lnot p \lor q \urcorner^{[1]}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies q}{
+  \infer[\mbox{assumption}]{p}{\infer[\mbox{false elim}]{q}{\infer[\mbox{contradiction}]{false}{}} & \infer[\mbox{identity}]{q}{} & \infer[\lor \mbox{elim}]{q}{\ulcorner \lnot p \lor q \urcorner^{[1]}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -190,17 +175,13 @@ logical notation, we would $write : decidable(p) means$ $p(or)(\lnot p)$.
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\lor \mbox{elim}]{p}{
-      \infer[\lor \mbox{elim}]{p}{\infer[\Rightarrow \mbox{elim with
-        premise}]{p}{\infer[\Rightarrow\textrm{-intro}^{[2]}]{p
-          \implies q}{\infer[\mbox{false
-            elim}]{q}{\infer[\mbox{contradiction}]{false}{\ulcorner p
-      \urcorner^{[2]}}}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\lor \mbox{elim}]{p}{
+  \infer[\lor \mbox{elim}]{p}{\infer[\Rightarrow \mbox{elim with premise}]{p}{\infer[\Rightarrow\textrm{-intro}^{[2]}]{p \implies q}{\infer[\mbox{false elim}]{q}{\infer[\mbox{contradiction}]{false}{\ulcorner p \urcorner^{[2]}}}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -211,18 +192,17 @@ logical notation, we would $write : decidable(p) means$ $p(or)(\lnot p)$.
 \section*{Example 9 : Tertium Non Datur}
 \addcontentsline{toc}{section}{Example 9 : Tertium Non Datur}
 
-\noindent Tertium non datur (Latin: "no third possibility") is
-another name for LEM.
+\noindent Tertium non datur (Latin: "no third possibility") is another name for LEM.
 
 \bigskip
 
-\noindent For any proposition p, there is no third option besides p
-and $\lnot p$.
+\noindent For any proposition p, there is no third option besides p and $\lnot p$.
 
 \bigskip
 
 \noindent
 $\forall p @ p \lor \lnot p$
+
 
 \noindent This principle distinguishes classical from intuitionistic logic.
 
@@ -231,8 +211,7 @@ $\forall p @ p \lor \lnot p$
 \section*{Example 10 : Constructive vs Classical}
 \addcontentsline{toc}{section}{Example 10 : Constructive vs Classical}
 
-\noindent In constructive (intuitionistic) logic, LEM is not provable
-as a general principle.
+\noindent In constructive (intuitionistic) logic, LEM is not provable as a general principle.
 
 \bigskip
 
@@ -248,8 +227,7 @@ as a general principle.
 
 \bigskip
 
-\noindent $Classical : LEM$ is an axiom—every proposition is assumed
-decidable without construction.
+\noindent $Classical : LEM$ is an axiom—every proposition is assumed decidable without construction.
 
 \bigskip
 
@@ -263,6 +241,7 @@ decidable without construction.
 \noindent
 $\forall n : \nat @ (n = 0) \lor \lnot (n = 0)$
 
+
 \noindent We can decide this by checking if n equals 0.
 
 \bigskip
@@ -272,10 +251,8 @@ $\forall n : \nat @ (n = 0) \lor \lnot (n = 0)$
 \bigskip
 
 \noindent
-$\forall p @ p \lor \lnot (p - -(requires(LEM)))$
+$\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
 
-\noindent
-$in(general)(case)$
 
 \section*{Example 12 : Proof Strategy with LEM}
 \addcontentsline{toc}{section}{Example 12 : Proof Strategy with LEM}
@@ -339,8 +316,7 @@ $in(general)(case)$
 
 \bigskip
 
-\noindent 6. [case] $\lnot p$ contradicts $\lnot$ $\lnot p$, derive p
-by false elim
+\noindent 6. [case] $\lnot p$ contradicts $\lnot$ $\lnot p$, derive p by false elim
 
 \bigskip
 
@@ -355,35 +331,20 @@ by false elim
 \section*{Example 14 : Drinker Paradox}
 \addcontentsline{toc}{section}{Example 14 : Drinker Paradox}
 
-\noindent Prove: There $\exists$ a person x such that if x drinks,
-then everyone drinks.
+\noindent Prove: There $\exists$ a person x such that if x drinks, then everyone drinks.
 
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\lor \mbox{elim}]{\exists x @ x(drinks) \implies (\forall
-    y @ y(drinks))}{
-      \infer[\lor \mbox{elim}]{\exists x @ x(drinks) \implies
-      (\forall y @ y(drinks))}{\infer[\exists \mbox{intro with
-        x}=a]{\exists x @ x(drinks) \implies (\forall y @
-        y(drinks))}{\infer[\Rightarrow \mbox{intro}, \mbox{trivially
-          true}]{a(drinks) \implies (\forall y @
-          y(drinks))}{\infer[\mbox{from p}]{\forall y @
-            y(drinks)}{\infer[\mbox{from
-              p}]{a(drinks)}{\infer{Pick(any)(person)}{
-                  a
-        }}}}} & \infer[\exists \mbox{intro with x}=b]{\exists x @
-          x(drinks) \implies (\forall y @
-        y(drinks))}{\infer[\Rightarrow\textrm{-intro}^{[2]}]{b(drinks)
-            \implies (\forall y @
-          y(drinks))}{\infer[\mbox{assumption}]{b(drinks)}{\infer[\exists
-              \mbox{elim}]{\lnot (b(drinks))}{\infer[\mbox{negation of}
-      \forall]{\exists b @ \lnot (b(drinks))}{}}}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\lor \mbox{elim}]{\exists x @ x(drinks) \implies (\forall y @ y(drinks))}{
+  \infer[\lor \mbox{elim}]{\exists x @ x(drinks) \implies (\forall y @ y(drinks))}{\infer[\exists \mbox{intro with x}=a]{\exists x @ x(drinks) \implies (\forall y @ y(drinks))}{\infer[\Rightarrow \mbox{intro}, \mbox{trivially true}]{a(drinks) \implies (\forall y @ y(drinks))}{\infer[\mbox{from p}]{\forall y @ y(drinks)}{\infer[\mbox{from p}]{a(drinks)}{\infer{Pick(any)(person)}{
+  a
+}}}}} & \infer[\exists \mbox{intro with x}=b]{\exists x @ x(drinks) \implies (\forall y @ y(drinks))}{\infer[\Rightarrow\textrm{-intro}^{[2]}]{b(drinks) \implies (\forall y @ y(drinks))}{\infer[\mbox{assumption}]{b(drinks)}{\infer[\exists \mbox{elim}]{\lnot (b(drinks))}{\infer[\mbox{negation of} \forall]{\exists b @ \lnot (b(drinks))}{}}}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -398,8 +359,7 @@ then everyone drinks.
 
 \bigskip
 
-\noindent 1. You need to prove something by case analysis on an
-arbitrary proposition
+\noindent 1. You need to prove something by case analysis on an arbitrary proposition
 
 \bigskip
 
@@ -458,8 +418,7 @@ arbitrary proposition
 
 \bigskip
 
-\noindent In intuitionistic logic, none of these hold in general—you
-must construct proofs explicitly.
+\noindent In intuitionistic logic, none of these hold in general—you must construct proofs explicitly.
 
 \bigskip
 

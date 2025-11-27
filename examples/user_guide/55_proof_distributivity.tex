@@ -11,20 +11,13 @@
 \begin{document}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and(q(or)(r)))
-    \implies p(and)(q)(or(p(and)(r)))}{
-      \infer[\lor
-      \mbox{elim}]{p(and)(q)(or(p(and)(r)))}{\infer[\lor\textrm{-intro-1}]{p(and)(q)(or(p(and)(r)))}{\infer[\land
-          \mbox{intro}]{p(and)(q)}{\infer[\mbox{from
-        case}]{q}{\infer[\mbox{from above}]{p}{}}}} &
-        \infer[\lor\textrm{-intro-2}]{p(and)(q)(or(p(and)(r)))}{\infer[\land
-          \mbox{intro}]{p(and)(r)}{\infer[\mbox{from
-      case}]{r}{\infer[\mbox{from above}]{p}{}}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and(q(or)(r))) \implies p(and)(q)(or(p(and)(r)))}{
+  \infer[\lor \mbox{elim}]{p(and)(q)(or(p(and)(r)))}{\infer[\lor\textrm{-intro-1}]{p(and)(q)(or(p(and)(r)))}{\infer[\land \mbox{intro}]{p(and)(q)}{\infer[\mbox{from case}]{q}{\infer[\mbox{from above}]{p}{}}}} & \infer[\lor\textrm{-intro-2}]{p(and)(q)(or(p(and)(r)))}{\infer[\land \mbox{intro}]{p(and)(r)}{\infer[\mbox{from case}]{r}{\infer[\mbox{from above}]{p}{}}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
