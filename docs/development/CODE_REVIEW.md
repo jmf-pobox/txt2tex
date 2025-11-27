@@ -2,15 +2,19 @@
 
 ### Executive Summary
 
-This review analyzes the `src/txt2tex` codebase for code quality issues beyond what automated tools (ruff, mypy) catch. The codebase demonstrates good type safety and follows many PEP 8 conventions, but has significant maintainability concerns due to file size, complex control flow, and architectural patterns.
+This review analyzes the `src/txt2tex` codebase for code quality issues beyond what automated tools (ruff, mypy) catch. The codebase demonstrates good type safety and follows many PEP 8 conventions.
 
 Key findings:
-- parser.py (4213 LOC), latex_gen.py (4770 LOC), and lexer.py (1282 LOC) are very large
-- **Extreme cyclomatic complexity**: lexer methods at CC 172 and 143; average CC is 19.8
-- Long isinstance chains instead of visitor/dispatch increase rigidity
-- Broad Exception handling hides defects and complicates debugging
-- Incomplete docstrings and Phase-only references reduce approachability
-- Duplicated fuzz-mode logic; magic strings scattered; tight coupling
+- **Correctness issues** (high priority):
+  - 4 silent `except Exception: pass` patterns hide bugs
+  - 2 `# type: ignore` comments mask type system failures
+  - 13 broad exception handlers catch `KeyboardInterrupt` and real bugs
+- **Design considerations** (medium priority):
+  - Long isinstance chains in `latex_gen.py` reduce extensibility
+  - Duplicated fuzz-mode logic across many sites
+- **Acceptable as-is**:
+  - Lexer/parser complexity is domain-appropriate (tokenizers and parsers are inherently branchy)
+  - Large file sizes reflect cohesive modules, not random sprawl
 
 ### File Size and Organization
 
@@ -96,57 +100,51 @@ Remaining work:
 
 ### Complexity Hotspots
 
-Run `hatch run complexity` to get current metrics. Average complexity: C (19.8).
+Run `hatch run complexity` to get current metrics. Average complexity: C (19.0).
 
-#### Critical (F grade, CC > 40)
+**Important context**: Cyclomatic complexity measures branches, not maintainability. Lexers and parsers are inherently branchy because they handle many token/grammar productions. A CC of 166 in a lexer doesn't mean "hard to maintain" - it means "handles many token types," which is expected.
 
-| Method | CC | File:Line | Reduction Strategy |
-|--------|----|-----------|--------------------|
-| `Lexer._scan_token` | 166 | lexer.py:221 | ~~Extract simple tokens~~ (done); extract multi-char operator groups by first character |
-| `Lexer._scan_identifier` | 97 | lexer.py:812 | ~~Extract keyword lookup~~ (done); extract multi-word/colon keywords; extract prose detection |
-| `LaTeXGenerator._process_inline_math` | 69 | latex_gen.py:2470 | Extract pattern-matching phases into separate methods (sequences, operators, brackets); chain transformations |
-| `Parser._parse_postfix` | 41 | parser.py:2468 | Extract each postfix operator (function app, projection, indexing) into dedicated `_parse_*_postfix` methods |
+#### Domain-Appropriate Complexity (Leave As-Is)
 
-#### Severe (E grade, CC 31-40)
+| Method | CC | Why It's Fine |
+|--------|-----|---------------|
+| `Lexer._scan_token` | 166 | Tokenizers are a linear process: read char → match pattern → emit token. One big if-chain is the standard pattern. |
+| `Lexer._scan_identifier` | 97 | Keyword matching inherently requires many cases. Phase 1 extracted duplicates; remaining complexity is domain-appropriate. |
+| `Parser._parse_postfix` | 41 | Each branch handles a different postfix operator. Matches the grammar structure. |
+| `Parser._parse_syntax_block` | 36 | Syntax block parsing has many valid forms. Complexity matches the grammar. |
 
-| Method | CC | File:Line | Reduction Strategy |
-|--------|----|-----------|--------------------|
-| `LaTeXGenerator._has_line_breaks` | 37 | latex_gen.py:503 | Use `singledispatch` or visitor pattern; one handler per AST node type |
-| `LaTeXGenerator._generate_proof_node_infer` | 37 | latex_gen.py:3931 | Extract premise formatting, conclusion formatting, and justification handling into helpers |
-| `Parser._parse_syntax_block` | 36 | parser.py:3288 | Extract priority/associativity parsing into dedicated methods |
-| `LaTeXGenerator._generate_part` | 31 | latex_gen.py:1647 | Extract subpart handling, list generation, and label formatting into helpers |
-| `Lexer` (class) | 31 | lexer.py:22 | N/A - class-level complexity from method count |
+#### Actually Worth Refactoring
 
-#### High (D grade, CC 21-30)
+| Method | CC | File:Line | Why It's Worth Fixing |
+|--------|----|-----------|-----------------------|
+| `LaTeXGenerator._process_inline_math` | 69 | latex_gen.py:2470 | Does multiple conceptually different transformations (sequences, operators, brackets) in one pass. Could be a pipeline. |
+| `LaTeXGenerator._has_line_breaks` | 37 | latex_gen.py:503 | isinstance chain could use singledispatch for extensibility. |
 
-| Method | CC | File:Line |
-|--------|----|-----------| 
-| `LaTeXGenerator._generate_complex_assumption_scope` | 29 | latex_gen.py:4189 |
-| `Parser._parse_document_item` | 27 | parser.py:587 |
-| `LaTeXGenerator._generate_identifier` | 25 | latex_gen.py:620 |
-| `LaTeXGenerator._convert_comparison_operators` | 25 | latex_gen.py:2152 |
-| `Parser._parse_proof_node` | 24 | parser.py:4032 |
-| `LaTeXGenerator.generate_document_item` | 24 | latex_gen.py:428 |
-| `LaTeXGenerator.generate_expr` | 23 | latex_gen.py:566 |
-| `Parser.parse` | 21 | parser.py:167 |
-| `LaTeXGenerator._generate_unary_op` | 21 | latex_gen.py:747 |
+#### Refactoring Priority (Revised)
 
-#### Refactoring Priority
+**High priority** - these are actual bugs or design issues:
+1. **Fix 4 silent `except: pass` patterns** - these hide bugs and make debugging impossible
+2. **Fix 13 broad exception handlers** - they catch `KeyboardInterrupt` and mask real errors
+3. **Fix 2 `# type: ignore` comments** - type safety holes
 
-1. **Lexer methods** (CC 166, 97): Highest impact - Phase 1 & 2 done; continue with multi-char operators and prose detection.
-2. **`_process_inline_math`** (CC 69): Complex text transformation. Decompose into pipeline stages.
-3. **`_parse_postfix`** (CC 41): Operator-specific handlers reduce branching.
-4. **Proof/syntax methods** (CC 31-37): Extract formatting helpers.
+**Medium priority** - genuine design improvements:
+4. **`_process_inline_math`** (CC 69) - does multiple transformations in one pass; could be a pipeline
+5. **isinstance dispatch in `latex_gen.py`** - could use singledispatch for extensibility
+
+**Low priority / Skip**:
+- Lexer complexity (CC 166, 97) - domain-appropriate, leave as-is
+- Parser complexity - matches grammar structure
+- File splitting - cohesive modules don't need splitting
 
 ### Complexity Reduction Progress
 
 This section tracks phased complexity reduction work.
 
-#### Phase 1: Lexer Keyword Lookup (Complete)
+#### Phase 1: Lexer Keyword Lookup (Complete - Keep)
 
 **Branch**: `refactor/lexer-keyword-lookup`
 **Date**: 2025-11-27
-**Status**: ✅ Complete
+**Status**: ✅ Complete - **Worth keeping**
 
 **Changes**:
 - Added `KEYWORD_TO_TOKEN` dictionary (40 keywords) and `KEYWORD_ALIASES` dictionary (2 aliases) to `lexer.py`
@@ -159,17 +157,13 @@ This section tracks phased complexity reduction work.
 | `Lexer` class | E (31) | D (27) | -4 |
 | Average complexity | 19.8 | 19.1 | -0.7 |
 
-**Remaining work for `_scan_identifier`** (CC 97):
-- Extract multi-word keyword handlers (TRUTH TABLE:)
-- Extract colon-terminated keyword handlers (TEXT:, LATEX:, TITLE:, etc.)
-- Extract prose detection logic into separate method
-- Extract A/An article handling
+**Retrospective**: This was **genuine simplification**, not just metric optimization. It eliminated 45 nearly identical if-statements (duplication). Adding a new keyword is now 1 line instead of 3-4. **Do not reverse.**
 
-#### Phase 2: Single-Char Token Dispatch (Complete)
+#### Phase 2: Single-Char Token Dispatch (Complete - Keep but Don't Continue)
 
 **Branch**: `refactor/lexer-token-dispatch`
 **Date**: 2025-11-27
-**Status**: ✅ Complete
+**Status**: ✅ Complete - **Marginal value, but not harmful**
 
 **Changes**:
 - Added `SINGLE_CHAR_TOKENS` dictionary (7 tokens: `)`, `]`, `}`, `,`, `;`, `#`, `~`)
@@ -181,10 +175,14 @@ This section tracks phased complexity reduction work.
 | `Lexer._scan_token` | F (172) | F (166) | -6 |
 | Average complexity | 19.1 | 19.0 | -0.1 |
 
-**Remaining work for `_scan_token`** (CC 166):
-- Many characters require lookahead for multi-char operators (not easily dispatchable)
-- Context-sensitive tokens (`<`, `>`, `^`) need special handling
-- Consider grouping multi-char operator handlers by first character
+**Retrospective**: The 6-point reduction was marginal. Most tokens in `_scan_token` require lookahead for multi-character operators, so they can't be dispatched simply. The change is consistent with Phase 1's pattern and doesn't hurt readability, so **keep it but don't continue** further lexer refactoring. The remaining CC 166 is domain-appropriate for a tokenizer.
+
+#### Lessons Learned
+
+1. **CC metrics are misleading for lexers/parsers** - high branch counts are inherent to the domain
+2. **Duplication elimination (Phase 1) was valuable** - 45 identical patterns → 1 dictionary
+3. **Extract-method refactoring (Phase 2+) has diminishing returns** - just shuffles complexity
+4. **Focus on actual bugs** - the `except Exception: pass` patterns are more important than CC scores
 
 ### Complex Nested Conditionals
 
@@ -215,22 +213,24 @@ Recommendation:
 
 ### Recommendations Summary (Prioritized)
 
-High priority:
-1. **Reduce lexer complexity** (CC 166, 97): ~~Extract keyword lookup~~ (done); ~~extract simple tokens~~ (done); continue extracting multi-char operators and prose detection
-2. **Reduce `_process_inline_math` complexity** (CC 69): Decompose into pipeline stages for different transformation patterns
-3. Split large files into cohesive modules with re-export shims; no behavior changes
-4. Replace isinstance dispatch with singledispatch/registry; reuse existing generators
-5. Replace broad exception handling with specific catches and improved messages
+**High priority - Fix actual bugs:**
+1. **Eliminate 4 silent `except: pass` patterns** in `latex_gen.py` - these hide bugs
+2. **Replace 13 `except Exception` with specific exceptions** - catches KeyboardInterrupt, masks errors
+3. **Fix 2 `# type: ignore` suppressions** - type safety holes
 
-Medium priority:
-6. Reduce parser/generator D-grade methods (CC 21-30) by extracting helpers
-7. Centralize fuzz-mode decisions into helpers/strategies
-8. Improve docstrings (Args/Returns/Raises) and link "Phase X" to docs
-9. Extract magic strings/keyword sets to constants
+**Medium priority - Design improvements:**
+4. **Decompose `_process_inline_math`** (CC 69) into pipeline stages - does multiple transformations
+5. **Replace isinstance dispatch with singledispatch** in `latex_gen.py` - improves extensibility
+6. Centralize fuzz-mode decisions into helper methods
 
-Low priority:
-10. Extract complex parser conditionals into named helpers
-11. Enhance error messages with "did you mean"/guidance where feasible
+**Low priority - Nice to have:**
+7. Improve docstrings (Args/Returns/Raises)
+8. Replace "Phase X" comments with descriptive comments
+
+**Do NOT prioritize:**
+- Lexer complexity reduction - CC 166/97 is domain-appropriate
+- Parser complexity reduction - matches grammar structure
+- File splitting - modules are already cohesive
 
 ### Refactoring Guardrails
 
