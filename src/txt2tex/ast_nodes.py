@@ -841,9 +841,12 @@ class Zed(ASTNode):
     - Free type definitions
 
     Generates: \\begin{zed}...\\end{zed}
+
+    Note: content can be an Expr (single expression) or Document (multiple items).
+    The parser creates Document when the zed block contains multiple declarations.
     """
 
-    content: Expr  # Can be a predicate, declaration, or other expression
+    content: Expr | Document  # Single expression or multiple items
 
 
 # Type alias for document items (expressions or structural elements)

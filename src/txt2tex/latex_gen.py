@@ -263,10 +263,11 @@ class LaTeXGenerator:
                 # Collect consecutive zed items
                 zed_items: list[GivenType | FreeType | Abbreviation] = [item]
                 j = i + 1
-                while j < len(items) and isinstance(
-                    items[j], (GivenType, FreeType, Abbreviation)
-                ):
-                    zed_items.append(items[j])  # type: ignore
+                while j < len(items):
+                    next_item = items[j]
+                    if not isinstance(next_item, (GivenType, FreeType, Abbreviation)):
+                        break
+                    zed_items.append(next_item)
                     j += 1
 
                 # Generate consolidated zed environment

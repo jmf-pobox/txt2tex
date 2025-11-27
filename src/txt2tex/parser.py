@@ -3859,7 +3859,7 @@ class Parser:
                 column=start_token.column,
             )
             return Zed(
-                content=doc,  # type: ignore[arg-type]
+                content=doc,
                 line=start_token.line,
                 column=start_token.column,
             )
