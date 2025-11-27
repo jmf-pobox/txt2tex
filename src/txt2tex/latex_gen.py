@@ -325,7 +325,7 @@ class LaTeXGenerator:
     def emit_warnings(self) -> None:
         """Emit all collected overflow warnings to stderr."""
         for warning in self._overflow_warnings:
-            print(warning, file=sys.stderr)
+            print(warning, file=sys.stderr)  # noqa: T201 - intentional user warning
 
     def get_warnings(self) -> list[str]:
         """Return collected overflow warnings (for testing)."""

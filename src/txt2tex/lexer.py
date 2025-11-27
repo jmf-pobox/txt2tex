@@ -146,33 +146,21 @@ class Lexer:
         context_end = min(len(self.text), self.pos + 20)
         context = repr(self.text[context_start:context_end])
 
-        error_msg = (
-            f"ERROR: Infinite loop detected in lexer at position {self.pos}, "
-            f"line {self.line}, column {self.column}: {context_msg}"
-        )
-        print(error_msg)
-        print(f"Text length: {len(self.text)}")
-        print(f"Context (-20/+20): {context}")
+        # Build detailed error message with all diagnostic info
+        details = [
+            f"Infinite loop detected in lexer at position {self.pos}, "
+            f"line {self.line}, column {self.column}: {context_msg}",
+            f"Text length: {len(self.text)}",
+            f"Context (-20/+20): {context}",
+        ]
 
-        # Optional detailed diagnostics
         if current_char is not None:
-            print(f"Current char: {current_char!r}")
+            details.append(f"Current char: {current_char!r}")
         if peek_pos is not None:
-            print(f"Peek pos: {peek_pos}")
-            print(f"Next 50 chars: {self.text[self.pos : self.pos + 50]!r}")
-            print(f"Char at peek pos: {self._peek_char(peek_pos)!r}")
-            print("First 20 _peek_char values:")
-            for i in range(1, 21):
-                ch = self._peek_char(i)
-                print(f"  _peek_char({i}) = {ch!r}")
+            details.append(f"Peek pos: {peek_pos}")
+            details.append(f"Next 50 chars: {self.text[self.pos : self.pos + 50]!r}")
 
-        print(f"Full text (first 200 chars): {self.text[:200]!r}")
-        print(f"Full text (last 200 chars): {self.text[-200:]!r}")
-
-        raise RuntimeError(
-            f"Lexer infinite loop at position {self.pos}, "
-            f"line {self.line}, column {self.column}: {context_msg}"
-        )
+        raise RuntimeError("\n".join(details))
 
     def tokenize(self) -> list[Token]:
         """Tokenize entire input and return list of tokens."""

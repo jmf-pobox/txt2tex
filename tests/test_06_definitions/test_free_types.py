@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import pytest
+
 from txt2tex.ast_nodes import BinaryOp, Document, FreeBranch, FreeType, Identifier
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
-from txt2tex.parser import Parser
+from txt2tex.parser import Parser, ParserError
 
 
 class TestRecursiveFreeTypeParsing:
@@ -270,22 +272,16 @@ class TestRecursiveFreeTypeEdgeCases:
         lexer = Lexer("Tree ::=")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
-        try:
+        with pytest.raises(ParserError, match="Expected at least one branch"):
             parser.parse()
-            raise AssertionError("Expected ParserError for empty branches")
-        except Exception as e:
-            assert "Expected at least one branch" in str(e)
 
     def test_unclosed_angle_bracket(self) -> None:
         """Test error handling for unclosed constructor parameters."""
         lexer = Lexer("Tree ::= leaf⟨N")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
-        try:
+        with pytest.raises(ParserError, match="Expected"):
             parser.parse()
-            raise AssertionError("Expected ParserError for unclosed angle bracket")
-        except Exception as e:
-            assert "Expected" in str(e)
 
     def test_empty_parameters(self) -> None:
         """Test constructor with empty parameter list."""
