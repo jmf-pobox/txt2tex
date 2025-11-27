@@ -302,6 +302,22 @@ class LaTeXGenerator:
             return escaped
         return rf"\mathit{{{escaped}}}"
 
+    def _map_binary_operator(self, operator: str, base_latex: str) -> str:
+        """Map binary operator to appropriate LaTeX for fuzz/standard mode.
+
+        Fuzz-specific mappings:
+        - => / implies → \\implies (instead of \\Rightarrow)
+        - <=> → \\iff (outside EQUIV blocks) or \\Leftrightarrow (in EQUIV)
+        """
+        if not self.use_fuzz:
+            return base_latex
+        if operator in ("=>", "implies"):
+            return r"\implies"
+        # In EQUIV blocks, use \Leftrightarrow; otherwise use \iff
+        if operator == "<=>" and not self._in_equiv_block:
+            return r"\iff"
+        return base_latex
+
     def _generate_document_items_with_consolidation(
         self, items: list[DocumentItem]
     ) -> list[str]:
@@ -920,15 +936,8 @@ class LaTeXGenerator:
         if op_latex is None:
             raise ValueError(f"Unknown binary operator: {node.operator}")
 
-        # Fuzz-specific operator mappings
-        if self.use_fuzz:
-            # Fuzz uses \implies instead of \Rightarrow for implication
-            if node.operator in ("=>", "implies"):
-                op_latex = r"\implies"
-            # Fuzz uses \iff for logical equivalence in predicates (schemas, etc.)
-            # but \Leftrightarrow for equivalence in EQUIV blocks
-            elif node.operator == "<=>" and not self._in_equiv_block:
-                op_latex = r"\iff"
+        # Apply fuzz-specific operator mappings
+        op_latex = self._map_binary_operator(node.operator, op_latex)
 
         # Pass this node as parent to children
         left = self.generate_expr(node.left, parent=node)
