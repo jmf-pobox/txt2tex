@@ -38,13 +38,20 @@ Recommendations:
 
 ### Type Dispatch vs isinstance Chains ✅ FIXED
 
-**Status:** `generate_expr` now uses `@singledispatchmethod` for type dispatch.
+**Status:** Both `generate_expr` and `generate_document_item` now use `@singledispatchmethod` for type dispatch.
 
 **Changes Made (2025-11-27):**
-- Converted `generate_expr` to use `@singledispatchmethod` from `functools`
-- Registered all 22 expression type handlers with `@generate_expr.register(TypeName)`
-- Standardized handler signatures to accept `parent: Expr | None = None` parameter
-- Base method raises `TypeError` with clear message for unknown types
+
+1. **`generate_expr`** - 22 expression type handlers:
+   - Converted to `@singledispatchmethod` with `TypeError` fallback for unknown types
+   - Registered all 22 Expr type handlers with `@generate_expr.register(TypeName)`
+   - Standardized handler signatures to accept `parent: Expr | None = None` parameter
+
+2. **`generate_document_item`** - 21 document item type handlers:
+   - Converted to `@singledispatchmethod` with Expr rendering as fallback
+   - Registered all 21 DocumentItem type handlers with `@generate_document_item.register(TypeName)`
+   - Added `_generate_parts_format` handler for `PartsFormat` type (returns empty list)
+   - Used `cast("Expr", item)` in fallback for type safety with mypy
 
 **Benefits:**
 - Easier to extend: add new type support by adding a decorated method
@@ -54,7 +61,6 @@ Recommendations:
 **Implementation Notes:**
 - mypy has limited support for `singledispatchmethod` type checking
 - All handlers still defined in `latex_gen.py` for now (file splitting is a separate concern)
-- `generate_document_item` still uses isinstance chains (lower priority)
 
 ### Exception Handling ✅ FIXED
 

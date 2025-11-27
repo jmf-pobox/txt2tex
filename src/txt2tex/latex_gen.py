@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from functools import singledispatchmethod
-from typing import ClassVar
+from typing import ClassVar, cast
 
 from txt2tex.ast_nodes import (
     Abbreviation,
@@ -429,57 +429,18 @@ class LaTeXGenerator:
 
         return "\n".join(lines)
 
+    @singledispatchmethod
     def generate_document_item(self, item: DocumentItem) -> list[str]:
-        """Generate LaTeX lines for a document item."""
-        if isinstance(item, Section):
-            return self._generate_section(item)
-        if isinstance(item, Solution):
-            return self._generate_solution(item)
-        if isinstance(item, Part):
-            return self._generate_part(item)
-        if isinstance(item, Paragraph):
-            return self._generate_paragraph(item)
-        if isinstance(item, PureParagraph):
-            return self._generate_pure_paragraph(item)
-        if isinstance(item, LatexBlock):
-            return self._generate_latex_block(item)
-        if isinstance(item, PageBreak):
-            return self._generate_pagebreak(item)
-        if isinstance(item, Contents):
-            return self._generate_contents(item)
-        if isinstance(item, PartsFormat):
-            # PartsFormat directive - already applied at document level, skip
-            return []
-        if isinstance(item, TruthTable):
-            return self._generate_truth_table(item)
-        if isinstance(item, ArgueChain):
-            return self._generate_argue_chain(item)
-        if isinstance(item, InfruleBlock):
-            return self._generate_infrule_block(item)
-        if isinstance(item, GivenType):
-            return self._generate_given_type(item)
-        if isinstance(item, FreeType):
-            return self._generate_free_type(item)
-        if isinstance(item, SyntaxBlock):
-            return self._generate_syntax_block(item)
-        if isinstance(item, Abbreviation):
-            return self._generate_abbreviation(item)
-        if isinstance(item, AxDef):
-            return self._generate_axdef(item)
-        if isinstance(item, GenDef):
-            return self._generate_gendef(item)
-        if isinstance(item, Zed):
-            return self._generate_zed(item)
-        if isinstance(item, Schema):
-            return self._generate_schema(item)
-        if isinstance(item, ProofTree):
-            return self._generate_proof_tree(item)
+        """Generate LaTeX lines for a document item.
 
-        # Item is an Expr - render as paragraph with math
-        # Check if expression contains line breaks
-        latex_expr = self.generate_expr(item)
+        Fallback: Item is an Expr - render as paragraph with math.
+        Specific document item types are handled by registered methods.
+        """
+        # Fallback only reached for Expr types (all document types are registered)
+        expr = cast("Expr", item)
+        latex_expr = self.generate_expr(expr)
 
-        if self._has_line_breaks(item):
+        if self._has_line_breaks(expr):
             # Multi-line expression: use display math with array
             # Respect inline part context for proper positioning
             lines: list[str] = []
@@ -1604,6 +1565,7 @@ class LaTeXGenerator:
         guard_latex = self.generate_expr(node.guard)
         return f"{expr_latex} \\mbox{{if }} {guard_latex}"
 
+    @generate_document_item.register(Section)
     def _generate_section(self, node: Section) -> list[str]:
         """Generate LaTeX for section."""
         lines: list[str] = []
@@ -1616,6 +1578,7 @@ class LaTeXGenerator:
 
         return lines
 
+    @generate_document_item.register(Solution)
     def _generate_solution(self, node: Solution) -> list[str]:
         """Generate LaTeX for solution as unnumbered section."""
         lines: list[str] = []
@@ -1631,6 +1594,7 @@ class LaTeXGenerator:
 
         return lines
 
+    @generate_document_item.register(Part)
     def _generate_part(self, node: Part) -> list[str]:
         r"""Generate LaTeX for part label.
 
@@ -2051,6 +2015,7 @@ class LaTeXGenerator:
 
         return text
 
+    @generate_document_item.register(Paragraph)
     def _generate_paragraph(self, node: Paragraph) -> list[str]:
         """Generate LaTeX for plain text paragraph.
 
@@ -2078,6 +2043,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
+    @generate_document_item.register(PureParagraph)
     def _generate_pure_paragraph(self, node: PureParagraph) -> list[str]:
         """Generate LaTeX for pure text paragraph with NO processing.
 
@@ -2100,6 +2066,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
+    @generate_document_item.register(LatexBlock)
     def _generate_latex_block(self, node: LatexBlock) -> list[str]:
         """Generate LaTeX for raw LaTeX passthrough block.
 
@@ -2111,6 +2078,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
+    @generate_document_item.register(PageBreak)
     def _generate_pagebreak(self, node: PageBreak) -> list[str]:
         """Generate LaTeX for page break.
 
@@ -2118,6 +2086,7 @@ class LaTeXGenerator:
         """
         return [r"\newpage", ""]
 
+    @generate_document_item.register(Contents)
     def _generate_contents(self, node: Contents) -> list[str]:
         """Generate LaTeX for table of contents.
 
@@ -2135,6 +2104,15 @@ class LaTeXGenerator:
         lines.append(r"\tableofcontents")
         lines.append("")
         return lines
+
+    @generate_document_item.register(PartsFormat)
+    def _generate_parts_format(self, node: PartsFormat) -> list[str]:
+        """Generate LaTeX for parts format directive.
+
+        PartsFormat directive is already applied at document level during parsing,
+        so we return empty list here (no LaTeX output needed).
+        """
+        return []
 
     def _convert_comparison_operators(self, text: str) -> str:
         """Convert bare comparison operators to math mode, avoiding nested math.
@@ -3075,6 +3053,7 @@ class LaTeXGenerator:
 
         return result
 
+    @generate_document_item.register(TruthTable)
     def _generate_truth_table(self, node: TruthTable) -> list[str]:
         """Generate LaTeX for truth table (centered, with auto-scaling if needed)."""
         lines: list[str] = []
@@ -3250,6 +3229,7 @@ class LaTeXGenerator:
 
         return result
 
+    @generate_document_item.register(ArgueChain)
     def _generate_argue_chain(self, node: ArgueChain) -> list[str]:
         r"""Generate LaTeX for equivalence chain using array environment.
 
@@ -3316,6 +3296,7 @@ class LaTeXGenerator:
 
         return lines
 
+    @generate_document_item.register(InfruleBlock)
     def _generate_infrule_block(self, node: InfruleBlock) -> list[str]:
         r"""Generate LaTeX for infrule block.
 
@@ -3359,6 +3340,7 @@ class LaTeXGenerator:
 
         return lines
 
+    @generate_document_item.register(GivenType)
     def _generate_given_type(self, node: GivenType) -> list[str]:
         """Generate LaTeX for given type declaration."""
         lines: list[str] = []
@@ -3369,6 +3351,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
+    @generate_document_item.register(FreeType)
     def _generate_free_type(self, node: FreeType) -> list[str]:
         """Generate LaTeX for free type definition (Phase 17: Recursive Free Types).
 
@@ -3408,6 +3391,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
+    @generate_document_item.register(SyntaxBlock)
     def _generate_syntax_block(self, node: SyntaxBlock) -> list[str]:
         """Generate LaTeX for syntax environment (aligned free type definitions).
 
@@ -3486,6 +3470,7 @@ class LaTeXGenerator:
 
         return [first_line]
 
+    @generate_document_item.register(Abbreviation)
     def _generate_abbreviation(self, node: Abbreviation) -> list[str]:
         r"""Generate LaTeX for abbreviation definition.
 
@@ -3525,6 +3510,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
+    @generate_document_item.register(AxDef)
     def _generate_axdef(self, node: AxDef) -> list[str]:
         """Generate LaTeX for axiomatic definition.
 
@@ -3601,6 +3587,7 @@ class LaTeXGenerator:
 
         return lines
 
+    @generate_document_item.register(GenDef)
     def _generate_gendef(self, node: GenDef) -> list[str]:
         """Generate LaTeX for generic definition.
 
@@ -3674,6 +3661,7 @@ class LaTeXGenerator:
 
         return lines
 
+    @generate_document_item.register(Zed)
     def _generate_zed(self, node: Zed) -> list[str]:
         """Generate LaTeX for zed block (unboxed paragraph).
 
@@ -3740,6 +3728,7 @@ class LaTeXGenerator:
 
         return lines
 
+    @generate_document_item.register(Schema)
     def _generate_schema(self, node: Schema) -> list[str]:
         """Generate LaTeX for schema definition.
 
@@ -3829,6 +3818,7 @@ class LaTeXGenerator:
 
         return lines
 
+    @generate_document_item.register(ProofTree)
     def _generate_proof_tree(self, node: ProofTree) -> list[str]:
         """Generate LaTeX for proof tree (auto-scales if needed)."""
         lines: list[str] = []
