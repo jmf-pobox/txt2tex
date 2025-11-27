@@ -330,7 +330,18 @@ class LaTeXGenerator:
                 return f"{name_latex} == {expr_latex}"
 
     def generate_document(self, ast: Document | Expr) -> str:
-        """Generate complete LaTeX document with preamble and postamble."""
+        """Generate complete LaTeX document with preamble and postamble.
+
+        Produces a full LaTeX document including documentclass, packages,
+        title/author metadata, bibliography, and document body.
+
+        Args:
+            ast: The AST root node, either a Document with structural elements
+                or a single Expr for backward compatibility.
+
+        Returns:
+            Complete LaTeX source code ready for compilation.
+        """
         lines: list[str] = []
 
         # Preamble
@@ -429,8 +440,16 @@ class LaTeXGenerator:
     def generate_document_item(self, item: DocumentItem) -> list[str]:
         """Generate LaTeX lines for a document item.
 
-        Fallback: Item is an Expr - render as paragraph with math.
-        Specific document item types are handled by registered methods.
+        Uses singledispatch to select the appropriate generator based on
+        the item type. This fallback handles bare Expr nodes that appear
+        as document items.
+
+        Args:
+            item: The document item node to generate. Can be Section,
+                Solution, TruthTable, EquivChain, Schema, AxDef, or Expr.
+
+        Returns:
+            List of LaTeX lines (without newline characters).
         """
         # Fallback only reached for Expr types (all document types are registered)
         expr = cast("Expr", item)
@@ -528,9 +547,17 @@ class LaTeXGenerator:
     def generate_expr(self, expr: Expr, parent: Expr | None = None) -> str:
         """Generate LaTeX for expression (without wrapping in math mode).
 
+        Uses singledispatch to select the appropriate generator based on
+        the expression type. Each registered handler generates LaTeX for
+        its specific node type, with precedence-aware parenthesization.
+
         Args:
-            expr: The expression to generate LaTeX for
-            parent: The parent expression context (None if top-level)
+            expr: The expression AST node to generate LaTeX for.
+            parent: The parent expression context for precedence handling
+                (None if top-level).
+
+        Returns:
+            LaTeX math-mode source code (caller wraps in $...$ or environments).
 
         Raises:
             TypeError: If expression type has no registered handler.
