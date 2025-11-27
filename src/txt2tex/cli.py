@@ -7,8 +7,8 @@ import sys
 from pathlib import Path
 
 from txt2tex.latex_gen import LaTeXGenerator
-from txt2tex.lexer import Lexer
-from txt2tex.parser import Parser
+from txt2tex.lexer import Lexer, LexerError
+from txt2tex.parser import Parser, ParserError
 
 
 def main() -> int:
@@ -44,8 +44,17 @@ def main() -> int:
     # Read input
     try:
         text = args.input.read_text()
-    except Exception as e:
-        print(f"Error reading input file: {e}", file=sys.stderr)
+    except FileNotFoundError:
+        print(f"Error: Input file not found: {args.input}", file=sys.stderr)
+        return 1
+    except PermissionError:
+        print(f"Error: Permission denied reading: {args.input}", file=sys.stderr)
+        return 1
+    except IsADirectoryError:
+        print(f"Error: Expected a file, got a directory: {args.input}", file=sys.stderr)
+        return 1
+    except UnicodeDecodeError as e:
+        print(f"Error: File encoding issue: {e}", file=sys.stderr)
         return 1
 
     # Process
@@ -58,7 +67,10 @@ def main() -> int:
 
         generator = LaTeXGenerator(use_fuzz=not args.zed, toc_parts=args.toc_parts)
         latex = generator.generate_document(ast)
-    except Exception as e:
+    except LexerError as e:
+        print(f"Error processing input: {e}", file=sys.stderr)
+        return 1
+    except ParserError as e:
         print(f"Error processing input: {e}", file=sys.stderr)
         return 1
 
@@ -67,7 +79,13 @@ def main() -> int:
     try:
         output_path.write_text(latex)
         print(f"Generated: {output_path}")
-    except Exception as e:
+    except PermissionError:
+        print(f"Error: Permission denied writing: {output_path}", file=sys.stderr)
+        return 1
+    except IsADirectoryError:
+        print(f"Error: Cannot write to directory: {output_path}", file=sys.stderr)
+        return 1
+    except OSError as e:
         print(f"Error writing output file: {e}", file=sys.stderr)
         return 1
 
