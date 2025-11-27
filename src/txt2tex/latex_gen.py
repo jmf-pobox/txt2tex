@@ -78,6 +78,7 @@ class LaTeXGenerator:
         "land": r"\land",
         "lor": r"\lor",
         "=>": r"\Rightarrow",
+        "implies": r"\Rightarrow",  # Internal operator for filter semantics
         "<=>": r"\Leftrightarrow",
         # Comparison operators (Phase 3, enhanced in Phase 7)
         "<": r"<",
@@ -180,6 +181,7 @@ class LaTeXGenerator:
     PRECEDENCE: ClassVar[dict[str, int]] = {
         "<=>": 1,  # Lowest precedence
         "=>": 2,
+        "implies": 2,  # Internal operator for filter semantics
         "lor": 3,
         "land": 4,
         # Comparison operators
@@ -939,7 +941,7 @@ class LaTeXGenerator:
         # Fuzz-specific operator mappings
         if self.use_fuzz:
             # Fuzz uses \implies instead of \Rightarrow for implication
-            if node.operator == "=>":
+            if node.operator in ("=>", "implies"):
                 op_latex = r"\implies"
             # Fuzz uses \iff for logical equivalence in predicates (schemas, etc.)
             # but \Leftrightarrow for equivalence in EQUIV blocks

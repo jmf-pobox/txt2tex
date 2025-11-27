@@ -1823,9 +1823,9 @@ class Parser:
 
                 constraint = body
                 actual_body = self._parse_expr()
-                # Combine constraint and body with AND
+                # Combine constraint and body with IMPLIES (filter semantics)
                 body = BinaryOp(
-                    operator="land",
+                    operator="implies",
                     left=constraint,
                     right=actual_body,
                     line_break_after=constraint_continuation,
