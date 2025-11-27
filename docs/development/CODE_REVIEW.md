@@ -18,11 +18,12 @@ Key findings:
 
 ### File Size and Organization
 
-Current state (11,508 lines total):
-- `parser.py` ≈ 4213 lines
+Current state (11,643 lines total):
+- `parser.py` ≈ 4215 lines
 - `latex_gen.py` ≈ 4770 lines
-- `lexer.py` ≈ 1282 lines
-- `ast_nodes.py` ≈ 889 lines
+- `lexer.py` ≈ 1225 lines
+- `ast_nodes.py` ≈ 893 lines
+- `errors.py` ≈ 135 lines
 - `constants.py` ≈ 71 lines
 
 Risks:
@@ -51,9 +52,30 @@ Recommendations:
 
 ### Exception Handling ✅ FIXED
 
-**Status:** All broad exception handlers replaced with specific types.
+**Status:** All broad exception handlers replaced with specific types. Context-aware error formatting added.
 
-Changes made:
+#### Error Formatting (NEW)
+
+Added `errors.py` with `ErrorFormatter` class providing gcc/rustc-style error output:
+
+```
+Error: Expected 'end' to close schema block
+
+4 |   x : N
+5 | axdef
+  | ^
+6 |   y : N
+
+Hint: Did you forget 'end' before starting a new block?
+```
+
+Features:
+- Shows 1 line of context before/after error
+- Caret (`^`) points to exact error column
+- Hints for 9 common syntax mistakes
+- `LexerError` and `ParserError` now store original message for formatting
+
+#### Exception Type Changes
 - `cli.py`: 3 handlers now catch specific file/parse exceptions
   - File read: `FileNotFoundError`, `PermissionError`, `IsADirectoryError`, `UnicodeDecodeError`
   - Processing: `LexerError`, `ParserError`
@@ -212,7 +234,8 @@ Recommendation:
 
 - Strong type annotations and frozen dataclass AST nodes (immutability)
 - Clear pipeline: lexer → parser → generator
-- Custom error types include position info (line/column)
+- **Context-aware error formatting** with source lines, carets, and hints (via `errors.py`)
+- Custom error types include position info (line/column) and original message
 - Naming is consistent and readable; code generally follows modern Python idioms
 
 ### Recommendations Summary (Prioritized)
