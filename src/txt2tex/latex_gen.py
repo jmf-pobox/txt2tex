@@ -2755,71 +2755,9 @@ class LaTeXGenerator:
         """Stage 2: Detect quantifier expressions.
 
         Matches forall, exists, exists1, mu with their predicates.
-        """
-        return text  # Stub - will be implemented
-
-    def _process_type_declarations(self, text: str) -> str:
-        """Stage 2.5: Detect type declarations (identifier : type).
-
-        Matches patterns like "x : N" or "f : A -> B".
-        """
-        return text  # Stub - will be implemented
-
-    def _process_function_applications(self, text: str) -> str:
-        """Stage 2.75: Detect function application followed by operator.
-
-        Matches patterns like "f_name x <= 5".
-        """
-        return text  # Stub - will be implemented
-
-    def _process_simple_expressions(self, text: str) -> str:
-        """Stage 3: Detect simple inline math expressions.
-
-        Matches expressions with operators like x > 1, f +-> g.
-        """
-        return text  # Stub - will be implemented
-
-    def _process_inline_math(self, text: str) -> str:
-        """Process inline math expressions in text via pipeline stages.
-
-        Detects patterns like:
-        - Superscripts: x^2, a_i^2, 2^n (wrap in math mode)
-        - Set comprehensions: { x : N | x > 0 }
-        - Set comprehensions with nested braces: {p : P . p |-> {p}}
-        - Quantifiers: forall x : N | predicate
-
-        Parses them and converts to $...$ wrapped LaTeX.
-
-        Pipeline stages (order matters):
-        1. Manual markup: [operator] -> LaTeX symbols
-        2. Logical formulas: p => q, p <=> q
-        3. Parenthesized logic: (p lor q)
-        4. Standalone keywords: lor, land, lnot, elem
-        5. Superscripts: x^2
-        6. Relational image: R(| S |)
-        7. Set expressions: { ... }
-        8. Quantifiers: forall, exists, exists1, mu
-        9. Type declarations: x : T
-        10. Function application: f x > y
-        11. Simple expressions: x > 1
+        Strategy: Find keyword, then try parsing increasingly longer substrings.
         """
         result = text
-        result = self._process_manual_markup(result)
-        result = self._process_logical_formulas(result)
-        result = self._process_parenthesized_logic(result)
-        result = self._process_standalone_keywords(result)
-        result = self._process_superscripts(result)
-        result = self._process_relational_image(result)
-        result = self._process_set_expressions(result)
-        result = self._process_quantifiers(result)
-        result = self._process_type_declarations(result)
-        result = self._process_function_applications(result)
-        result = self._process_simple_expressions(result)
-
-        # --- Original implementation below (to be migrated to stages) ---
-
-        # Pattern 2: Quantifiers (forall, exists, exists1, mu)
-        # Strategy: Find keyword, then try parsing increasingly longer substrings
         quant_keywords = ["forall", "exists", "exists1", "mu"]
         for keyword in quant_keywords:
             # Find all occurrences of quantifier keywords
@@ -2925,17 +2863,22 @@ class LaTeXGenerator:
                         # This substring doesn't parse - try shorter one
                         continue
 
-        # Pattern 2.5: Type declarations (identifier : type_expression)
-        # Match patterns like "large_coins : Collection -> N"
-        # This must come before Pattern 3 to catch the identifier before the colon
-        # Stop at commas, periods, or common prose words
-        # Use negative lookahead to prevent matching prose words
+        return result
+
+    def _process_type_declarations(self, text: str) -> str:
+        """Stage 2.5: Detect type declarations (identifier : type).
+
+        Matches patterns like "x : N" or "f : A -> B".
+        Stops at commas, periods, or common prose words.
+        """
+        result = text
+
+        # Build pattern: identifier : type_expr
+        # Type expr stops at prose words using negative lookahead
         prose_pattern = (
             r"(?:where|and|or|but|if|then|else|shadows|gives|returns|which|that|"
             r"is|are|was|were|be|been|have|has|had|the|a|an|this)"
         )
-        # Pattern: identifier : type_expr
-        # Type expr stops at prose words using negative lookahead
         neg_lookahead = r"(?!" + prose_pattern + r"\b)"
         type_word = r"[a-zA-Z_][^\s,]*"
         type_continuation = r"(?:\s+" + neg_lookahead + type_word + r")*"
@@ -2943,7 +2886,6 @@ class LaTeXGenerator:
         type_decl_pattern = r"\b([a-zA-Z_]\w*)\s*:\s*" + type_expr_part
 
         # Words that appear BEFORE colons in prose (not type declarations)
-        # These are section/label words that introduce explanatory text
         prose_intro_words = {
             "proof",
             "theorem",
@@ -3039,6 +2981,61 @@ class LaTeXGenerator:
                     result = (
                         result[:start_pos] + f"${expr_with_ops}$" + result[end_pos:]
                     )
+
+        return result
+
+    def _process_function_applications(self, text: str) -> str:
+        """Stage 2.75: Detect function application followed by operator.
+
+        Matches patterns like "f_name x <= 5".
+        """
+        return text  # Stub - will be implemented
+
+    def _process_simple_expressions(self, text: str) -> str:
+        """Stage 3: Detect simple inline math expressions.
+
+        Matches expressions with operators like x > 1, f +-> g.
+        """
+        return text  # Stub - will be implemented
+
+    def _process_inline_math(self, text: str) -> str:
+        """Process inline math expressions in text via pipeline stages.
+
+        Detects patterns like:
+        - Superscripts: x^2, a_i^2, 2^n (wrap in math mode)
+        - Set comprehensions: { x : N | x > 0 }
+        - Set comprehensions with nested braces: {p : P . p |-> {p}}
+        - Quantifiers: forall x : N | predicate
+
+        Parses them and converts to $...$ wrapped LaTeX.
+
+        Pipeline stages (order matters):
+        1. Manual markup: [operator] -> LaTeX symbols
+        2. Logical formulas: p => q, p <=> q
+        3. Parenthesized logic: (p lor q)
+        4. Standalone keywords: lor, land, lnot, elem
+        5. Superscripts: x^2
+        6. Relational image: R(| S |)
+        7. Set expressions: { ... }
+        8. Quantifiers: forall, exists, exists1, mu
+        9. Type declarations: x : T
+        10. Function application: f x > y
+        11. Simple expressions: x > 1
+        """
+        result = text
+        result = self._process_manual_markup(result)
+        result = self._process_logical_formulas(result)
+        result = self._process_parenthesized_logic(result)
+        result = self._process_standalone_keywords(result)
+        result = self._process_superscripts(result)
+        result = self._process_relational_image(result)
+        result = self._process_set_expressions(result)
+        result = self._process_quantifiers(result)
+        result = self._process_type_declarations(result)
+        result = self._process_function_applications(result)
+        result = self._process_simple_expressions(result)
+
+        # --- Original implementation below (to be migrated to stages) ---
 
         # Pattern 2.75: Function application followed by operator
         # Match: func_name arg operator value (e.g., "cumulative_total hd <= 12000")
