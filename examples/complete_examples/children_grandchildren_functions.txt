@@ -182,14 +182,14 @@ TEXT: **Approach 2: Explicit set comprehension**
 axdef
   children_alt : Person -> P Person
 where
-  forall p : Person | children_alt(p) = {c : Person | p |-> c in parentOf}
+  forall p : Person | children_alt(p) = {c : Person | p |-> c elem parentOf}
 end
 
 axdef
   number_of_grandchildren_alt : Person -> N
 where
   forall p : Person |
-    number_of_grandchildren_alt(p) = # {g : Person | exists c : Person | p |-> c in parentOf and c |-> g in parentOf}
+    number_of_grandchildren_alt(p) = # {g : Person | exists c : Person | p |-> c elem parentOf land c |-> g elem parentOf}
 end
 
 TEXT: **Approach 3: Using previously defined functions**

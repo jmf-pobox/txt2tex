@@ -126,8 +126,8 @@ where p is a parent of c.
 
 \bigskip
 
-\noindent Recall: $(R \limg A \rimg)$ = $\{~ y | \exists x : A @ x
-\mapsto y(in)(R) ~\}$
+\noindent Recall: $(R \limg A \rimg)$ = {y $\mid$ $\exists x : A @ x
+\mapsto y$in R}
 
 \bigskip
 
@@ -135,8 +135,8 @@ where p is a parent of c.
 
 \bigskip
 
-\noindent So: $(parentOf \limg \{p\} \rimg)$ = $\{~ c | p \mapsto
-c(in)(parentOf) ~\}$
+\noindent So: $(parentOf \limg \{p\} \rimg)$ = {c $\mid$ p $\mapsto$
+c in parentOf}
 
 \bigskip
 
@@ -172,8 +172,8 @@ c(in)(parentOf) ~\}$
 
 \bigskip
 
-\noindent children = $\{~ p : Person @ p \mapsto \{~ c : Person | p
-\mapsto c(in)(parentOf) ~\} ~\}$
+\noindent children = {$p : Person$ . p $\mapsto$ {$c : Person$ $\mid$
+p $\mapsto$ c in parentOf}}
 
 \bigskip
 
@@ -399,7 +399,7 @@ express via composition.
   children\_alt : Person \fun \power Person
   \where
   \forall p : Person @ children\_alt(p) = \{~ c : Person | p \mapsto
-  c(in)(parentOf) ~\}
+  c \in parentOf ~\}
 \end{axdef}
 
 \begin{axdef}
@@ -407,7 +407,7 @@ express via composition.
   \where
   \forall p : Person @ \\
   \t1 number\_of\_grandchildren\_alt(p) = \# \{~ g : Person | \exists
-  c : Person @ p \mapsto c(in)(parentOf)(and)(c) \mapsto g(in)(parentOf) ~\}
+  c : Person @ p \mapsto c \in parentOf \land c \mapsto g \in parentOf ~\}
 \end{axdef}
 
 \noindent **Approach 3: Using previously defined functions**
@@ -530,8 +530,8 @@ express via composition.
 
 \bigskip
 
-\noindent - More concise: $(R \limg \{x\} \rimg)$ vs $\{~ y | x
-\mapsto y(in)(R) ~\}$
+\noindent - More concise: $(R \limg \{x\} \rimg)$ vs {y $\mid$ x
+$\mapsto$ y in R}
 
 \bigskip
 

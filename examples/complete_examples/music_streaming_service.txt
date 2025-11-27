@@ -230,7 +230,7 @@ TEXT: Result type: P PlaylistId (set of popular playlist IDs)
 TEXT: (c) Find user who loves the most songs:
 
 zed
-  C == (mu u : dom(loved) | forall v : dom(loved) | u /= v | # (loved(u)) > # (loved(v)))
+  C == (mu u : dom(loved) | forall v : dom(loved) | (u /= v => # (loved(u)) > # (loved(v))))
 end
 
 
@@ -245,7 +245,7 @@ TEXT: Assumption: One user has a unique maximum (ties make mu undefined)
 TEXT: (d) Find most loved song in catalog:
 
 zed
-  D == (mu s : songs | forall t : songs | s /= t | # {u : UserId | s in loved(u)} > # {u : UserId | t in loved(u)})
+  D == (mu s : songs | forall t : songs | (s /= t => # {u : UserId | s elem loved(u)} > # {u : UserId | t elem loved(u)}))
 end
 
 
@@ -267,7 +267,7 @@ TEXT: (a) Define love-hate score and playlist count:
 axdef
   loveHateScore : SongId +-> N
 where
-  forall i : songs | loveHateScore(i) = if (# {u : UserId | i in loved(u)}) >= (# {u : UserId | i in hated(u)}) then (# {u : UserId | i in loved(u)}) - (# {u : UserId | i in hated(u)}) else 0
+  forall i : songs | loveHateScore(i) = if (# {u : UserId | i elem loved(u)}) >= (# {u : UserId | i elem hated(u)}) then (# {u : UserId | i elem loved(u)}) - (# {u : UserId | i elem hated(u)}) else 0
 end
 
 TEXT: Logic:
@@ -282,7 +282,7 @@ axdef
   playlistCount : SongId +-> N
 where
   forall i : songs |
-    playlistCount(i) = # {p : dom(playlists) | i in ran(playlists p)}
+    playlistCount(i) = # {p : dom(playlists) | i elem ran(playlists p)}
 end
 
 TEXT: Logic:
@@ -330,7 +330,7 @@ TEXT: This specification assumes there is always a unique most popular song.
 
 TEXT: (c) Find playlists containing the most popular song:
 
-playlistsContainingMostPopularSong == {i : dom(playlists) | mostPopular in ran(playlists i)}
+playlistsContainingMostPopularSong == {i : dom(playlists) | mostPopular elem ran(playlists i)}
 
 TEXT: Logic:
 TEXT:   - Iterate over all playlists: i : dom(playlists)
