@@ -135,8 +135,10 @@ and surjective
   f : \nat \ffun \nat \\
   g : \nat \ffun \nat
   \where
-  f = \{1 \mapsto 10, 2 \mapsto 20, 3 \mapsto 30\} \land g = \{10
-  \mapsto 100, 20 \mapsto 200\} \land \# (\dom f) = 3 \land \# (\dom g) = 2
+  f = \{1 \mapsto 10, 2 \mapsto 20, 3 \mapsto 30\} \land \\
+  \quad g = \{10 \mapsto 100, 20 \mapsto 200\} \land \\
+  \quad \# (\dom f) = 3 \land \\
+  \quad \# (\dom g) = 2
 \end{axdef}
 
 \noindent We can compose finite functions, but the result may not be
@@ -167,9 +169,9 @@ f, since we can only compose where f's range intersects g's domain.
   recent\_viewed : Title \ffun ViewDate \\
   recentSet : \power Title
   \where
-  recentSet = \{~ t : Title | t \in \dom viewed ~\} \land
-  recent\_viewed = recentSet \dres viewed \land \# (\dom
-  recent\_viewed) \leq \# (\dom viewed)
+  recentSet = \{~ t : Title | t \in \dom viewed ~\} \land \\
+  \quad recent\_viewed = recentSet \dres viewed \land \\
+  \quad \# (\dom recent\_viewed) \leq \# (\dom viewed)
 \end{axdef}
 
 \noindent Restricting a finite partial function preserves finiteness.

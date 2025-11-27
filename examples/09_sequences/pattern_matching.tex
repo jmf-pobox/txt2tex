@@ -81,8 +81,9 @@
   \where
   positives(\langle \rangle) = \langle \rangle \\
   \forall x : \num @ \forall s : \seq~\num @ positives(\langle x
-  \rangle \cat s) = \IF x > 0 \THEN \langle x \rangle \cat
-  positives(s) \ELSE positives(s)
+  \rangle \cat s) = \IF x > 0 \\
+  \t1 \THEN \langle x \rangle \cat positives(s) \\
+  \t1 \ELSE positives(s)
 \end{axdef}
 
 \end{document}

@@ -72,5 +72,8 @@ axdef
 where
   positives(<>) = <>
   forall x : Z; s : seq Z |
-    positives(<x> ^ s) = if x > 0 then <x> ^ positives(s) else positives(s)
+    positives(<x> ^ s) =
+      if x > 0 \
+        then <x> ^ positives(s) \
+        else positives(s)
 end

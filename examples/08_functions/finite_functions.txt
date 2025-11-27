@@ -89,7 +89,10 @@ axdef
   f : N 77-> N
   g : N 77-> N
 where
-  f = {1 |-> 10, 2 |-> 20, 3 |-> 30} land g = {10 |-> 100, 20 |-> 200} land # (dom f) = 3 land # (dom g) = 2
+  f = {1 |-> 10, 2 |-> 20, 3 |-> 30} land \
+    g = {10 |-> 100, 20 |-> 200} land \
+    # (dom f) = 3 land \
+    # (dom g) = 2
 end
 
 TEXT: We can compose finite functions, but the result may not be finite unless proven.
@@ -114,7 +117,9 @@ axdef
   recent_viewed : Title 77-> ViewDate
   recentSet : P Title
 where
-  recentSet = {t : Title | t elem dom viewed} land recent_viewed = recentSet <| viewed land # (dom recent_viewed) <= # (dom viewed)
+  recentSet = {t : Title | t elem dom viewed} land \
+    recent_viewed = recentSet <| viewed land \
+    # (dom recent_viewed) <= # (dom viewed)
 end
 
 TEXT: Restricting a finite partial function preserves finiteness. The recent_viewed function has a domain that is a subset of viewed's domain, so it remains finite.

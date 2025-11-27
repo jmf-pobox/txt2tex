@@ -87,8 +87,9 @@ select x + 1.
   \where
   filterPositives(\langle \rangle) = \langle \rangle \\
   \forall x : \num @ \forall s : \seq~\num @ filterPositives(\langle
-  x \rangle \cat s) = \IF x > 0 \THEN \langle x \rangle \cat
-  filterPositives(s) \ELSE filterPositives(s)
+  x \rangle \cat s) = \IF x > 0 \\
+  \t1 \THEN \langle x \rangle \cat filterPositives(s) \\
+  \t1 \ELSE filterPositives(s)
 \end{axdef}
 
 \noindent Filters a sequence to include only positive elements using
@@ -106,9 +107,11 @@ conditional expressions.
   scoreToGrade : \nat \fun Grade
   \where
   \forall score : \nat @ \\
-  \t1 scoreToGrade(score) = \IF score \geq 90 \THEN GradeA \ELSE \IF
-  score \geq 80 \THEN GradeB \ELSE \IF score \geq 70 \THEN GradeC
-  \ELSE \IF score \geq 60 \THEN GradeD \ELSE GradeF
+  \t1 scoreToGrade(score) = \IF score \geq 90 \THEN GradeA \\
+  \t1 \ELSE \IF score \geq 80 \THEN GradeB \\
+  \t1 \ELSE \IF score \geq 70 \THEN GradeC \\
+  \t1 \ELSE \IF score \geq 60 \THEN GradeD \\
+  \t1 \ELSE GradeF
 \end{axdef}
 
 \noindent Multi-way branching using nested if-then-else.
