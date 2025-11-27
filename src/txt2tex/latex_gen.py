@@ -2439,8 +2439,94 @@ class LaTeXGenerator:
         result = re.sub(pattern, replace_citation, text)
         return result
 
+    # -------------------------------------------------------------------------
+    # Inline Math Pipeline Stages
+    # -------------------------------------------------------------------------
+    # These methods form a pipeline that transforms prose text by detecting
+    # mathematical expressions and wrapping them in $...$ for LaTeX.
+    # Order matters: earlier stages must run before later ones.
+    # -------------------------------------------------------------------------
+
+    def _process_manual_markup(self, text: str) -> str:
+        """Stage -1.5: Convert bracketed operator markup to LaTeX symbols.
+
+        Converts explicit markup like [and], [or], [not] to LaTeX symbols.
+        Must run first before any expression parsing.
+        """
+        return text  # Stub - will be implemented
+
+    def _process_logical_formulas(self, text: str) -> str:
+        """Stage -1: Detect logical formulas with =>, <=>, lnot, land, lor.
+
+        Matches expressions like "p => (lnot p => p)" and wraps in math mode.
+        """
+        return text  # Stub - will be implemented
+
+    def _process_parenthesized_logic(self, text: str) -> str:
+        """Stage -0.5: Detect parenthesized logical expressions.
+
+        Matches balanced parentheses containing logical operators.
+        """
+        return text  # Stub - will be implemented
+
+    def _process_standalone_keywords(self, text: str) -> str:
+        """Stage -0.3: Convert standalone logical keywords to symbols.
+
+        Converts lor, land, lnot, elem to their LaTeX equivalents.
+        """
+        return text  # Stub - will be implemented
+
+    def _process_superscripts(self, text: str) -> str:
+        """Stage 0: Wrap standalone superscripts in math mode.
+
+        Matches patterns like x^2, a_i^2, 2^n.
+        """
+        return text  # Stub - will be implemented
+
+    def _process_relational_image(self, text: str) -> str:
+        """Stage 0.5: Detect relational image notation R(| S |).
+
+        Matches relation(| set |) patterns and wraps in math mode.
+        """
+        return text  # Stub - will be implemented
+
+    def _process_set_expressions(self, text: str) -> str:
+        """Stage 1: Detect set expressions { ... }.
+
+        Matches balanced braces and parses as set comprehensions or literals.
+        """
+        return text  # Stub - will be implemented
+
+    def _process_quantifiers(self, text: str) -> str:
+        """Stage 2: Detect quantifier expressions.
+
+        Matches forall, exists, exists1, mu with their predicates.
+        """
+        return text  # Stub - will be implemented
+
+    def _process_type_declarations(self, text: str) -> str:
+        """Stage 2.5: Detect type declarations (identifier : type).
+
+        Matches patterns like "x : N" or "f : A -> B".
+        """
+        return text  # Stub - will be implemented
+
+    def _process_function_applications(self, text: str) -> str:
+        """Stage 2.75: Detect function application followed by operator.
+
+        Matches patterns like "f_name x <= 5".
+        """
+        return text  # Stub - will be implemented
+
+    def _process_simple_expressions(self, text: str) -> str:
+        """Stage 3: Detect simple inline math expressions.
+
+        Matches expressions with operators like x > 1, f +-> g.
+        """
+        return text  # Stub - will be implemented
+
     def _process_inline_math(self, text: str) -> str:
-        """Process inline math expressions in text.
+        """Process inline math expressions in text via pipeline stages.
 
         Detects patterns like:
         - Superscripts: x^2, a_i^2, 2^n (wrap in math mode)
@@ -2449,8 +2535,34 @@ class LaTeXGenerator:
         - Quantifiers: forall x : N | predicate
 
         Parses them and converts to $...$ wrapped LaTeX.
+
+        Pipeline stages (order matters):
+        1. Manual markup: [operator] -> LaTeX symbols
+        2. Logical formulas: p => q, p <=> q
+        3. Parenthesized logic: (p lor q)
+        4. Standalone keywords: lor, land, lnot, elem
+        5. Superscripts: x^2
+        6. Relational image: R(| S |)
+        7. Set expressions: { ... }
+        8. Quantifiers: forall, exists, exists1, mu
+        9. Type declarations: x : T
+        10. Function application: f x > y
+        11. Simple expressions: x > 1
         """
         result = text
+        result = self._process_manual_markup(result)
+        result = self._process_logical_formulas(result)
+        result = self._process_parenthesized_logic(result)
+        result = self._process_standalone_keywords(result)
+        result = self._process_superscripts(result)
+        result = self._process_relational_image(result)
+        result = self._process_set_expressions(result)
+        result = self._process_quantifiers(result)
+        result = self._process_type_declarations(result)
+        result = self._process_function_applications(result)
+        result = self._process_simple_expressions(result)
+
+        # --- Original implementation below (to be migrated to stages) ---
 
         # Pattern -1.5: Manual operator markup [operator]
         # Convert bracketed operator keywords to symbols
