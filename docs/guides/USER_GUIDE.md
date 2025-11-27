@@ -2058,11 +2058,34 @@ Warning: Line 270 may overflow page margin (~145 chars)
 ### CLI Options
 
 - `--no-warn-overflow` - Disable overflow warnings
-- `--overflow-threshold N` - Set custom threshold (default: 100 LaTeX chars)
+- `--overflow-threshold N` - Set custom threshold (default: 140 LaTeX chars)
+
+### Line Break Syntax
+
+Use `\` (backslash) to explicitly break long lines. Line breaks are supported:
+
+**After logical operators:**
+```
+p land q => \
+  r lor s
+```
+
+**After `then` and before `else` in conditionals:**
+```
+if condition \
+  then result1 \
+  else result2
+```
+
+**After `=` in equations:**
+```
+longFunctionName(x, y, z) = \
+  complexExpression + moreTerms
+```
 
 ### Fixing Overflow
 
-To fix overflowing lines, manually break long expressions using indentation:
+To fix overflowing lines, use `\` to break at logical points:
 
 **Before (overflows):**
 ```
@@ -2079,8 +2102,8 @@ axdef
   f : SongId +-> N
 where
   forall i : songs |
-    f(i) = if (# {u : UserId | i elem loved(u)}) >= (# {u : UserId | i elem hated(u)})
-      then (# {u : UserId | i elem loved(u)}) - (# {u : UserId | i elem hated(u)})
+    f(i) = if (# {u : UserId | i elem loved(u)}) >= (# {u : UserId | i elem hated(u)}) \
+      then (# {u : UserId | i elem loved(u)}) - (# {u : UserId | i elem hated(u)}) \
       else 0
 end
 ```

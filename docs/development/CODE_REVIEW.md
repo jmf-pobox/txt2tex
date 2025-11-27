@@ -10,6 +10,8 @@ This review analyzes the `src/txt2tex` codebase for code quality issues beyond w
 - Documentation: Google-style docstrings on public methods, Phase comments replaced
 - `_process_inline_math` decomposed into 11 pipeline stages (see below)
 - Fuzz-mode logic centralized into helper methods (see below)
+- Overflow warning system for Z notation blocks (axdef, schema, zed, gendef)
+- Line break continuation syntax (`\`) for conditionals and after `=` operator
 
 **Acceptable as-is:**
 - Lexer/parser complexity is domain-appropriate (tokenizers and parsers are inherently branchy)
@@ -17,12 +19,13 @@ This review analyzes the `src/txt2tex` codebase for code quality issues beyond w
 
 ### File Size and Organization
 
-Current state (~12,000 lines total):
-- `parser.py` ≈ 4,200 lines
-- `latex_gen.py` ≈ 4,750 lines
-- `lexer.py` ≈ 1,200 lines
+Current state (~11,900 lines total):
+- `latex_gen.py` ≈ 5,060 lines
+- `parser.py` ≈ 4,180 lines
+- `lexer.py` ≈ 1,220 lines
 - `ast_nodes.py` ≈ 900 lines
 - `errors.py` ≈ 135 lines
+- `cli.py` ≈ 120 lines
 - `constants.py` ≈ 70 lines
 
 File splitting is **not recommended** - these are cohesive modules where the size reflects domain complexity, not poor organization.
@@ -42,6 +45,18 @@ The fuzz vs standard LaTeX differences are now centralized in helper methods (re
 | `_map_binary_operator(op, base)` | =>/<=> fuzz-specific mappings |
 
 Remaining `self.use_fuzz` usages are context-specific parentheses decisions and structural choices that don't benefit from further abstraction.
+
+### Overflow Warning Infrastructure
+
+The `LaTeXGenerator` includes an overflow detection system:
+
+| Method | Purpose |
+|--------|---------|
+| `_emit_warning()` | Format and collect warning messages |
+| `_check_overflow()` | Measure line lengths, trigger warnings |
+| `emit_warnings()` | Output collected warnings to stderr |
+
+CLI flags: `--no-warn-overflow`, `--overflow-threshold N` (default: 140)
 
 ### Complexity Notes
 
