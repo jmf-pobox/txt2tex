@@ -1755,11 +1755,11 @@ class Parser:
         # Set flag: we're in quantifier body where . can be separator (for mu)
         self._in_comprehension_body = True
         try:
-            # Parse body (may be followed by constraint pipe: forall x : T | constraint | body)
+            # Parse body (may be followed by constraint pipe)
             body = self._parse_expr()
 
-            # Check for second pipe (constrained quantifier: forall x : T | constraint | body)
-            # Semantics: forall x : T | constraint => body (filter semantics)
+            # Check for second pipe (constrained quantifier)
+            # forall x : T | constraint | body → constraint => body
             if self._match(TokenType.PIPE):
                 self._advance()  # Consume second '|'
 
@@ -1785,7 +1785,7 @@ class Parser:
                     column=constraint.column,
                 )
 
-            # Check for bullet separator (quantifier with expression: Q x : T | pred . expr)
+            # Check for bullet separator (Q x : T | pred . expr)
             expression: Expr | None = None
             if self._match(TokenType.PERIOD):
                 self._advance()  # Consume '.'
@@ -1867,7 +1867,7 @@ class Parser:
             # Parse body (constraint part if bullet separator follows)
             body = self._parse_iff()
 
-            # Check for bullet separator (quantifier with expression: Q x : T | pred . expr)
+            # Check for bullet separator (Q x : T | pred . expr)
             expression: Expr | None = None
             if self._match(TokenType.PERIOD):
                 self._advance()  # Consume '.'
@@ -2379,7 +2379,7 @@ class Parser:
         return left
 
     def _parse_cross(self) -> Expr:
-        """Parse Cartesian product operator (Phase 11.5)."""
+        """Parse Cartesian product operator (cross)."""
         left = self._parse_intersect()
 
         while self._match(TokenType.CROSS):
@@ -2396,7 +2396,7 @@ class Parser:
         return left
 
     def _parse_intersect(self) -> Expr:
-        """Parse intersect and set difference operators (Phase 11.5)."""
+        """Parse intersect and set difference operators."""
         left = self._parse_unary()
 
         while self._match(TokenType.INTERSECT, TokenType.SETMINUS):
@@ -2415,13 +2415,11 @@ class Parser:
     def _parse_postfix(self, allow_space_separated: bool = True) -> Expr:
         """Parse postfix operators and space-separated application.
 
-        Phase 3: ^ (superscript), _ (subscript) - take operands
-        Phase 10b: ~ (inverse), + (transitive closure),
-                   * (reflexive-transitive closure) - no operands
-        Phase 11.8: (| ... |) (relational image) - takes set argument
-        Phase 11.9: [ ... ] (generic instantiation) - takes type parameters
-        Phase 19: Space-separated function application (f x y)
-        Phase 36: rcl (reflexive closure) - no operands
+        Postfix operators:
+            ^ (superscript), _ (subscript) - take operands
+            ~ (inverse), + (transitive), * (reflexive-transitive) - no operands
+            (| ... |) (relational image) - takes set argument
+            [ ... ] (generic instantiation) - takes type parameters
 
         Disambiguation: + and * are postfix only if NOT followed by operand.
         If followed by operand, they're infix arithmetic operators.
@@ -2565,7 +2563,7 @@ class Parser:
                         break
 
                     # Check if we're in a comprehension/quantifier body where
-                    # period could be expression separator (Phase 40)
+                    # period could be expression separator in comprehension/quantifier
                     # If so, check what follows the identifier
                     token_after_id = self._peek_ahead(2)
 
@@ -2752,7 +2750,7 @@ class Parser:
                     column=op_token.column,
                 )
             else:
-                # Postfix operators: ~ (inverse), + (transitive), * (reflexive-transitive)
+                # Postfix: ~ (inverse), + (transitive), * (reflexive-transitive)
                 base = UnaryOp(
                     operator=op_token.value,
                     operand=base,
@@ -3008,10 +3006,7 @@ class Parser:
         return args
 
     def _parse_sequence_literal(self) -> Expr:
-        """Parse sequence literal: ⟨⟩, ⟨a⟩, ⟨a, b, c⟩.
-
-        Phase 12: Sequence literal support.
-        """
+        """Parse sequence literal: ⟨⟩, ⟨a⟩, ⟨a, b, c⟩."""
         langle_token = self._advance()  # Consume '⟨'
 
         elements: list[Expr] = []
@@ -3049,7 +3044,6 @@ class Parser:
     def _parse_bag_literal(self) -> Expr:
         """Parse bag literal: [[a]], [[a, b, c]].
 
-        Phase 12: Bag literal support.
         Bag literals use double brackets: [[...]]
         """
         # Consume first '['
@@ -3120,11 +3114,11 @@ class Parser:
     def _parse_free_type(self) -> FreeType:
         """Parse free type: Type ::= branch1 | branch2⟨N⟩ | branch3⟨Tree x Tree⟩.
 
-        Phase 17 enhancement: Supports recursive constructors with parameters.
+        Supports recursive constructors with parameters.
 
         Examples:
-        - Status ::= active | inactive (simple branches)
-        - Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree x Tree⟩ (with parameters)
+            Status ::= active | inactive (simple branches)
+            Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree x Tree⟩ (with parameters)
         """
         # Identifier already consumed in _parse_document_item, need to back up
         name_token = self._current()
@@ -3449,7 +3443,6 @@ class Parser:
     def _parse_generic_params(self) -> list[str] | None:
         """Parse optional generic parameters: [X, Y, Z].
 
-        Phase 9: Generic parameter support for Z notation definitions.
         Returns None if no generic parameters present.
         """
         if not self._match(TokenType.LBRACKET):
@@ -3512,7 +3505,7 @@ class Parser:
     def _parse_abbreviation(self) -> Abbreviation:
         """Parse abbreviation: [X] name == expression or name == expression.
 
-        Phase 9 enhancement: Supports optional generic parameters.
+        Supports optional generic parameters.
         """
         start_token = self._current()
 
@@ -3541,9 +3534,8 @@ class Parser:
     def _parse_axdef(self) -> AxDef:
         """Parse axiomatic definition block.
 
-        Phase 9 enhancement: Supports optional generic parameters.
         Syntax: axdef [X, Y] ... end
-        Supports semicolon-separated declarations: x : N; y : N
+        Supports optional generic parameters and semicolon-separated declarations.
         """
         start_token = self._advance()  # Consume 'axdef'
         self._skip_newlines()
@@ -3807,13 +3799,12 @@ class Parser:
     def _parse_schema(self) -> Schema:
         """Parse schema definition block.
 
-        Phase 9 enhancement: Supports optional generic parameters.
-        Phase 13 enhancement: Supports anonymous schemas (no name).
         Syntax:
-        - schema Name[X, Y] ... end (named with generics)
-        - schema Name ... end (named)
-        - schema ... end (anonymous)
-        Supports semicolon-separated declarations: x : N; y : N
+            schema Name[X, Y] ... end (named with generics)
+            schema Name ... end (named)
+            schema ... end (anonymous)
+
+        Supports optional generic parameters and semicolon-separated declarations.
         """
         start_token = self._advance()  # Consume 'schema'
 
@@ -3900,7 +3891,7 @@ class Parser:
     def _parse_proof_tree(self) -> ProofTree:
         """Parse proof tree with Path C syntax (conclusion with supporting proof).
 
-        Phase 3: Support top-level CASE analysis where proof starts with cases.
+        Supports top-level CASE analysis where proof starts with cases.
         """
         start_token = self._advance()  # Consume 'PROOF:'
         self._skip_newlines()
@@ -4009,7 +4000,7 @@ class Parser:
             is_sibling = True
             self._advance()  # Consume '::'
 
-        # Check for ellipsis ... (Phase 2.2) - steps omitted in proof
+        # Check for ellipsis ... (steps omitted in proof)
         if self._match(TokenType.ELLIPSIS):
             ellipsis_token = self._advance()
             # Create a text node representing omitted steps
@@ -4091,7 +4082,7 @@ class Parser:
     ) -> CaseAnalysis:
         """Parse case analysis: case name: followed by proof steps.
 
-        Phase 3: parent_indent can be None for top-level cases.
+        parent_indent can be None for top-level cases.
         """
         if not self._match(TokenType.IDENTIFIER) or self._current().value != "case":
             raise ParserError("Expected 'case' keyword", self._current())
