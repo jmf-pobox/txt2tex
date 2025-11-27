@@ -17,7 +17,7 @@
 
 === Phase 17: Proper Examples (not TEXT blocks) ===
 
-** Example: Semicolon bindings in axdef **
+** Example: Semicolon bindings elem axdef **
 
 axdef
   dummy : N

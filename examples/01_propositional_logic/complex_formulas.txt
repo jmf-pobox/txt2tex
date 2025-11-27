@@ -54,7 +54,7 @@ y > 5 lor y = 0
 ** Example 4: Set Operators **
 
 (a)
-x in N
+x elem N
 
 (b)
 A subset B
@@ -65,7 +65,7 @@ A union B intersect C
 ** Example 5: Complex Expressions **
 
 (a) EQUIV:
-forall x : N | x in N land x >= 0
+forall x : N | x elem N land x >= 0
 forall x : N | x >= 0
 
 (b)

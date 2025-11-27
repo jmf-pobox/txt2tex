@@ -258,7 +258,7 @@ end
 
 TEXT: Sets of functions and sequences.
 
-** Example 20: Instantiation in Quantifiers **
+** Example 20: Instantiation elem Quantifiers **
 
 forall s : seq[N] | # s >= 0
 

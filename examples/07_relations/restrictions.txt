@@ -52,7 +52,7 @@ gendef [X]
   collection : seq X
 end
 
-** Example 4: Function application in quantifiers **
+** Example 4: Function application elem quantifiers **
 
 axdef
   posFunc : N -> N

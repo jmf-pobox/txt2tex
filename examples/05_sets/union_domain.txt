@@ -15,7 +15,7 @@
 // See: docs/USER_GUIDE.md - Sections "Predicate Logic", "Functions"
 // ============================================================================
 
-=== Test: Union in Quantifier Domain ===
+=== Test: Union elem Quantifier Domain ===
 
 given UserId, SongId
 

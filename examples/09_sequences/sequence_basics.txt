@@ -54,7 +54,7 @@ TEXT: ASCII angle brackets are also supported:
 
 <1, 2, 3, 4>
 
-** Example 4: Sequences in Expressions **
+** Example 4: Sequences elem Expressions **
 
 TEXT: Sequences can appear in various contexts:
 

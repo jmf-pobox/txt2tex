@@ -122,7 +122,7 @@ TEXT: Bags with duplicates
 
 [[1, 2, 2, 3, 3, 3]]
 
-** Example 6: Sequences in Expressions **
+** Example 6: Sequences elem Expressions **
 
 (a)
 

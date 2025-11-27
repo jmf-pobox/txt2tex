@@ -63,7 +63,7 @@ where
   dom totalFunc = X land dom totalBij = X land (forall x1, x2 : X | totalBij(x1) = totalBij(x2) . x1 = x2) land ran totalBij = Y
 end
 
-** Example 3: Finite Functions in Practice **
+** Example 3: Finite Functions elem Practice **
 
 TEXT: Real-world example: A database table storing customer preferences.
 

@@ -60,7 +60,7 @@ end
 
 TEXT: Nested if-then-else for three-way branching.
 
-** Example 5: Conditional in Set Comprehension **
+** Example 5: Conditional elem Set Comprehension **
 
 { x : N | x < 10 . if x mod 2 = 0 then x else x + 1 }
 
@@ -110,7 +110,7 @@ end
 
 TEXT: A piecewise-defined function with multiple ranges.
 
-** Example 9: Conditional in Lambda **
+** Example 9: Conditional elem Lambda **
 
 lambda x : N . if x > 100 then 100 else x
 
@@ -155,7 +155,7 @@ end
 
 TEXT: Different computations based on remainder.
 
-** Example 13: Guard Conditions in Recursion **
+** Example 13: Guard Conditions elem Recursion **
 
 axdef
   factorial : N -> N

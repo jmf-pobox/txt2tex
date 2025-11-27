@@ -51,7 +51,7 @@ end
 
 TEXT: Declare given types using the given keyword.
 
-** Example 4: Predicates in Zed Block **
+** Example 4: Predicates elem Zed Block **
 
 axdef
   x : N

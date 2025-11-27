@@ -107,7 +107,7 @@ axdef
   parseValue : ConfigValue -> N
 where
   forall k : ConfigKey |
-    k in dom configs =>
+    k elem dom configs =>
     getConfigInt(k) = mu v : N | parseValue(configs(k)) = v
 end
 
@@ -119,7 +119,7 @@ axdef
   getConfigWithDefault : ConfigKey cross N -> N
 where
   forall k : ConfigKey; default : N |
-    k in dom configs =>
+    k elem dom configs =>
     getConfigWithDefault(k, default) = mu v : N | parseValue(configs(k)) = v
   forall k : ConfigKey; default : N |
     k notin dom configs =>

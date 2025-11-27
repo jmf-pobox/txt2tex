@@ -1499,23 +1499,23 @@ class Parser:
             TokenType.LBRACKET,
             TokenType.NOT,
             TokenType.HASH,
-            TokenType.MINUS,  # Phase 16: unary negation
+            TokenType.MINUS,  # Unary negation
             TokenType.POWER,
             TokenType.POWER1,
-            TokenType.FINSET,  # Phase 19: finite sets
-            TokenType.FINSET1,  # Phase 19: non-empty finite sets
+            TokenType.FINSET,  # F (finite sets)
+            TokenType.FINSET1,  # F1 (non-empty finite sets)
             TokenType.FORALL,
             TokenType.EXISTS,
             TokenType.EXISTS1,
             TokenType.MU,
             TokenType.LAMBDA,
-            TokenType.IF,  # Phase 16: conditional expressions
+            TokenType.IF,  # Conditional expressions (if/then/else)
         )
 
     def _should_parse_space_separated_arg(self) -> bool:
         """Check if we should parse next token as space-separated function argument.
 
-        Phase 19: Space-separated application (f x).
+        Space-separated application parses f x as function application.
         Returns True if next token could start an operand and we're not at
         a delimiter, separator, or infix operator.
         """
@@ -1652,11 +1652,11 @@ class Parser:
         - forall x : T; y : U | pred (Phase 17: nested quantifiers)
         - exists1 x : N | pred
         - mu x : N | pred
-        - mu x : N | pred . expr (Phase 11.5)
+        - mu x : N | pred . expr (mu with expression body)
         """
         quant_token = self._advance()  # Consume 'forall', 'exists', 'exists1', or 'mu'
 
-        # Phase 28: Parse variable pattern (simple identifiers or tuple pattern)
+        # Parse variable pattern: simple identifiers or tuple pattern like (x, y)
         tuple_pattern: Expr | None = None
         variables: list[str]
 
@@ -1717,8 +1717,7 @@ class Parser:
             finally:
                 self._parsing_schema_text = False
 
-        # Phase 17: Check for semicolon-separated bindings
-        # If we see SEMICOLON, we have more binding groups: x : T; y : U | body
+        # Check for semicolon-separated bindings (x : T; y : U | body)
         # Transform into nested quantifiers: Q x : T | Q y : U | body
         if self._match(TokenType.SEMICOLON):
             self._advance()  # Consume ';'
@@ -1752,8 +1751,7 @@ class Parser:
             raise ParserError("Expected '|' after quantifier binding", self._current())
         self._advance()  # Consume '|'
 
-        # Phase 27: Check for continuation marker (\ at end of line)
-        # Phase 28: Also detect natural newlines for WYSIWYG output
+        # Detect line continuation (backslash or natural newline)
         has_continuation = False
         if self._match(TokenType.CONTINUATION):
             self._advance()  # consume \
@@ -1767,26 +1765,21 @@ class Parser:
             has_continuation = True
             self._skip_newlines()
         else:
-            # Phase 21: Allow newlines after | (multi-line quantifiers)
+            # Allow newlines after | for multi-line quantifiers
             self._skip_newlines()
 
         # Set flag: we're in quantifier body where . can be separator (for mu)
         self._in_comprehension_body = True
         try:
-            # Parse body
-            # Phase 21: Use _parse_expr() to allow nested quantifiers
-            # Phase 21b: Check for constrained quantifier
-            # (forall x : T | constraint | body)
-            # Parse first expression (constraint or full body)
+            # Parse body (may be followed by constraint pipe: forall x : T | constraint | body)
             body = self._parse_expr()
 
-            # Phase 21b: Check for second pipe (constrained quantifier)
-            # Syntax: forall x : T | constraint | body
-            # Semantics: forall x : T | constraint land body
+            # Check for second pipe (constrained quantifier: forall x : T | constraint | body)
+            # Semantics: forall x : T | constraint => body (filter semantics)
             if self._match(TokenType.PIPE):
                 self._advance()  # Consume second '|'
 
-                # Phase 27: Check for continuation marker after second pipe
+                # Check for continuation marker after second pipe
                 constraint_continuation = False
                 if self._match(TokenType.CONTINUATION):
                     self._advance()  # consume \
@@ -1808,8 +1801,7 @@ class Parser:
                     column=constraint.column,
                 )
 
-            # Phase 11.5/31: Check for bullet separator (expression/body part)
-            # Phase 40: Extended to all quantifiers (GitHub issue #8)
+            # Check for bullet separator (quantifier with expression: Q x : T | pred . expr)
             expression: Expr | None = None
             if self._match(TokenType.PERIOD):
                 self._advance()  # Consume '.'
@@ -1836,7 +1828,7 @@ class Parser:
     ) -> Expr:
         """Parse continuation of semicolon-separated quantifier bindings.
 
-        Phase 17: Helper for parsing y : U | body or y : U; z : V | body
+        Helper for parsing y : U | body or y : U; z : V | body
         after we've already parsed x : T;
         """
         # Parse variable(s)
@@ -1882,7 +1874,7 @@ class Parser:
             raise ParserError("Expected '|' after quantifier binding", self._current())
         self._advance()  # Consume '|'
 
-        # Phase 21: Allow newlines after | (multi-line quantifiers)
+        # Allow newlines after | for multi-line quantifiers
         self._skip_newlines()
 
         # Set flag: we're in quantifier body where . can be separator (for mu)
@@ -1891,8 +1883,7 @@ class Parser:
             # Parse body (constraint part if bullet separator follows)
             body = self._parse_iff()
 
-            # Check for bullet separator (expression/body part)
-            # Phase 40: Extended to all quantifiers (GitHub issue #8)
+            # Check for bullet separator (quantifier with expression: Q x : T | pred . expr)
             expression: Expr | None = None
             if self._match(TokenType.PERIOD):
                 self._advance()  # Consume '.'
@@ -2089,7 +2080,7 @@ class Parser:
             finally:
                 self._parsing_schema_text = False
 
-        # Phase 22: Parse separator | or .
+        # Parse separator | or . for set comprehension
         # Syntax: {x : T | predicate . expr} or {x : T . expr} (no predicate)
         predicate: Expr | None
         expression: Expr | None
@@ -2165,7 +2156,7 @@ class Parser:
         """
         left = self._parse_function_type()
 
-        # Phase 21d: Peek ahead to see if there's a comparison operator
+        # Peek ahead to see if there's a comparison operator
         # We need to skip newlines to check, but restore position if no operator
         saved_pos = self.pos
         self._skip_newlines()
@@ -2181,11 +2172,11 @@ class Parser:
         ):
             # Found comparison operator, consume it
             op_token = self._advance()
-            # Phase 21d: Allow newlines after comparison operator
+            # Allow newlines after comparison operator
             self._skip_newlines()
             right = self._parse_function_type()
 
-            # Phase 23: Check for guarded cases after = operator
+            # Check for guarded cases after = operator (pattern matching)
             # Syntax: expr1 = expr2 \n if cond2 \n expr3 \n if cond3 ...
             if op_token.type == TokenType.EQUALS:
                 right = self._try_parse_guarded_cases(right)
@@ -2332,25 +2323,23 @@ class Parser:
         return left
 
     def _parse_relation(self) -> Expr:
-        """Parse relation operators (Phase 10a-b).
+        """Parse relation operators.
 
-        Phase 10a: <->, |->, <|, |>, comp, ;
-        Phase 10b: <<|, |>>, o9
+        Infix: <->, |->, <|, |>, <<|, |>>, o9/comp
         """
         left = self._parse_set_op()
 
-        # Phase 10a-b: Infix relation operators (left-associative)
+        # Infix relation operators (left-associative)
         # Note: SEMICOLON is NOT included here - it's used for declaration separators
         # Use 'o9' for relational composition instead
         while self._match(
-            # Relation operators (Phase 10)
             TokenType.RELATION,  # <->
             TokenType.MAPLET,  # |->
-            TokenType.DRES,  # <|
-            TokenType.RRES,  # |>
-            TokenType.NDRES,  # <<| (Phase 10b)
-            TokenType.NRRES,  # |>> (Phase 10b)
-            TokenType.CIRC,  # o9 (Phase 10b)
+            TokenType.DRES,  # <| (domain restriction)
+            TokenType.RRES,  # |> (range restriction)
+            TokenType.NDRES,  # <<| (domain subtraction)
+            TokenType.NRRES,  # |>> (range subtraction)
+            TokenType.CIRC,  # o9 (relational composition)
             TokenType.COMP,  # comp
         ):
             op_token = self._advance()
@@ -2385,7 +2374,7 @@ class Parser:
         return left
 
     def _parse_union(self) -> Expr:
-        """Parse union and override operators (Phase 13).
+        """Parse union and override operators.
 
         Union: union operator (set union)
         Override: ++ (function/sequence override)

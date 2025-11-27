@@ -27,7 +27,7 @@ x = y
 
 x != y
 
-** Example 2: Equality in Predicates **
+** Example 2: Equality elem Predicates **
 
 TEXT: Equality is commonly used in quantified predicates:
 
@@ -35,7 +35,7 @@ forall x : N | x = x
 
 exists y : Z | y = 0
 
-** Example 3: Equality in Set Comprehension **
+** Example 3: Equality elem Set Comprehension **
 
 TEXT: Using equality to define sets:
 

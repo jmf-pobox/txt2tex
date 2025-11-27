@@ -22,7 +22,7 @@
 
 SimpleConst == 42
 
-** Test 2: Forall in Axiom **
+** Test 2: Forall elem Axiom **
 
 axdef
   constraint : N
@@ -31,7 +31,7 @@ where
   forall x : N | x >= 0
 end
 
-** Test 3: Exists in Axiom **
+** Test 3: Exists elem Axiom **
 
 axdef
   hasRoot : N
@@ -40,7 +40,7 @@ where
   exists n : N | n * n = hasRoot
 end
 
-** Test 4: Nested Quantifiers in Axiom **
+** Test 4: Nested Quantifiers elem Axiom **
 
 axdef
   sumTen : N

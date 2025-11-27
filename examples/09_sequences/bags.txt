@@ -44,7 +44,7 @@ TEXT: The bag [[1, 2, 2, 3]] is different from the set {1, 2, 3}
 
 TEXT: The bag [[a, a, a]] contains three copies of a
 
-** Example 4: Bags in Specifications **
+** Example 4: Bags elem Specifications **
 
 TEXT: Bags can model collections where order doesn't matter but quantity does:
 
