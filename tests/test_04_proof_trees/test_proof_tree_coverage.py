@@ -19,6 +19,7 @@ def make_proof_node(
     expr: str,
     justification: str | None = None,
     label: int | None = None,
+    *,
     is_assumption: bool = False,
     is_sibling: bool = False,
     children: list[ProofNode | CaseAnalysis] | None = None,

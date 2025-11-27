@@ -2454,7 +2454,7 @@ class Parser:
 
         return left
 
-    def _parse_postfix(self, allow_space_separated: bool = True) -> Expr:
+    def _parse_postfix(self, *, allow_space_separated: bool = True) -> Expr:  # noqa: C901
         """Parse postfix operators and space-separated application.
 
         Postfix operators:
@@ -3256,7 +3256,7 @@ class Parser:
             column=name_token.column,
         )
 
-    def _parse_syntax_block(self) -> SyntaxBlock:
+    def _parse_syntax_block(self) -> SyntaxBlock:  # noqa: C901
         """Parse syntax environment for aligned free type definitions.
 
         Syntax:

@@ -105,6 +105,12 @@ select = [
     "RSE", # flake8-raise
     "ARG", # flake8-unused-arguments
     "RET", # flake8-return
+    # Group 4: Performance & Modern Python (assessing)
+    "PERF", # perflint
+    "PTH",  # flake8-use-pathlib
+    "ISC",  # flake8-implicit-str-concat
+    "FBT",  # flake8-boolean-trap
+    "C90",  # mccabe complexity
 ]
 extend-select = ["PLC0415"]
 
@@ -179,6 +185,9 @@ exclude_lines = [
 ]
 show_missing = true
 precision = 2
+
+[tool.ruff.lint.mccabe]
+max-complexity = 30
 
 [tool.ruff.lint.isort]
 known-first-party = ["txt2tex"]

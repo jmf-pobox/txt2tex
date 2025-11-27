@@ -244,6 +244,7 @@ class LaTeXGenerator:
 
     def __init__(
         self,
+        *,
         use_fuzz: bool = False,
         toc_parts: bool = False,
         warn_overflow: bool = True,
@@ -914,7 +915,9 @@ class LaTeXGenerator:
             return f"{op_latex}{operand}"
         return f"{op_latex} {operand}"
 
-    def _needs_parens(self, child: Expr, parent: BinaryOp, is_left_child: bool) -> bool:
+    def _needs_parens(
+        self, child: Expr, parent: BinaryOp, *, is_left_child: bool
+    ) -> bool:
         """Check if child expression needs parentheses in parent context.
 
         Args:
@@ -2322,7 +2325,7 @@ class LaTeXGenerator:
 
         return "".join(result)
 
-    def _convert_sequence_literals(self, text: str, wrap_math: bool = True) -> str:
+    def _convert_sequence_literals(self, text: str, *, wrap_math: bool = True) -> str:
         """Convert sequence literals <...> to math mode \\langle ... \\rangle.
 
         Handles patterns like:
@@ -4341,12 +4344,12 @@ class LaTeXGenerator:
         # If we have case analysis, apply raiseproof for vertical layout
         if case_children:
             # Identify disjunction siblings (for or-elim)
-            disjunction_premises: list[str] = []
-            for group in child_groups:
-                for premise in group:
-                    # Check if this is a disjunction (contains \lor)
-                    if r"\lor" in premise:
-                        disjunction_premises.append(premise)
+            disjunction_premises = [
+                premise
+                for group in child_groups
+                for premise in group
+                if r"\lor" in premise  # Check if this is a disjunction
+            ]
 
             # Generate raised cases with staggered heights
             raised_cases: list[str] = []

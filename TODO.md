@@ -142,14 +142,24 @@ Phased rollout of additional linting rules to tighten coding standards. Each gro
 
 ### Workflow
 
-- [ ] **Step 4.1**: Enable rules in `pyproject.toml`
-- [ ] **Step 4.2**: Run `hatch run lint` and count violations per rule
-- [ ] **Step 4.3**: Present violation counts to user
-- [ ] **Step 4.4**: User decides: keep all / keep some / disable
-- [ ] **Step 4.5**: Fix violations for kept rules OR add to ignore list
-- [ ] **Step 4.6**: Commit changes
+- [x] **Step 4.1**: Enable rules in `pyproject.toml`
+- [x] **Step 4.2**: Run `hatch run lint` and count violations per rule
+- [x] **Step 4.3**: Present violation counts to user
+- [x] **Step 4.4**: User decides: keep all / keep some / disable
+- [x] **Step 4.5**: Fix violations for kept rules OR add to ignore list
+- [x] **Step 4.6**: Commit changes
 
-### Status: NOT STARTED
+### Status: COMPLETE ✅
+
+### Results
+
+| Rule | Violations | Resolution |
+|------|------------|------------|
+| PERF | 1 | Keep, fixed (list comprehension) |
+| PTH | 0 | Keep (free win) |
+| ISC | 0 | Keep (free win) |
+| FBT | 15 | Keep, fixed (keyword-only booleans) |
+| C90 | 30 | Keep, max-complexity=30, noqa for 4 functions >30 |
 
 ---
 
@@ -219,7 +229,7 @@ If a rule causes too many issues:
 | 1 - Safety | ✅ Complete | S, BLE, T10, T20, A | None |
 | 2 - Dead Code | ✅ Complete | ARG, ERA, PIE, RET, RSE | None |
 | 3 - Type Safety | ✅ Complete | strict_equality, ignore-without-code, reportUnknown*: warning | None |
-| 4 - Performance | Not Started | - | - |
+| 4 - Performance | ✅ Complete | PERF, PTH, ISC, FBT, C90 (max=30) | None |
 | 5 - Testing | Not Started | - | - |
 
 ---

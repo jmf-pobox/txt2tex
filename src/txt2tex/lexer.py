@@ -206,7 +206,7 @@ class Lexer:
         """Create token at current position."""
         return Token(token_type, value, self.line, self.column - len(value))
 
-    def _scan_token(self) -> Token | None:
+    def _scan_token(self) -> Token | None:  # noqa: C901
         """Scan next token from input."""
         start_line = self.line
         start_column = self.column
@@ -784,7 +784,7 @@ class Lexer:
         # Unknown character
         raise LexerError(f"Unexpected character: {char!r}", self.line, self.column)
 
-    def _scan_identifier(self, start_line: int, start_column: int) -> Token:
+    def _scan_identifier(self, start_line: int, start_column: int) -> Token:  # noqa: C901
         """Scan identifier or keyword."""
         start_pos = self.pos
 
