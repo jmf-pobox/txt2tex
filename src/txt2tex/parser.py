@@ -127,7 +127,11 @@ class Parser:
     _in_comprehension_body: bool
 
     def __init__(self, tokens: list[Token]) -> None:
-        """Initialize parser with token list."""
+        """Initialize parser with token list.
+
+        Args:
+            tokens: List of tokens from Lexer to parse.
+        """
         self.tokens = tokens
         self.pos = 0
         # Track the end position of the last consumed token for whitespace detection
@@ -142,11 +146,18 @@ class Parser:
         self._in_comprehension_body = False
 
     def parse(self) -> Document | Expr:
-        """
-        Parse tokens and return AST.
+        """Parse tokens and return AST.
 
-        Returns Document for multi-line input or structural elements,
-        or single Expr for single expression (backward compatible).
+        Parses the entire token stream into an Abstract Syntax Tree.
+        Handles both document-level constructs (sections, solutions, Z blocks)
+        and expression-level parsing.
+
+        Returns:
+            Document: For multi-line input or structural elements.
+            Expr: For single expression input (backward compatible).
+
+        Raises:
+            ParserError: If the input contains syntax errors.
         """
         self._skip_newlines()
 
