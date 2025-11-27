@@ -138,7 +138,7 @@ end
 axdef
   manager : Person +-> Person
 where
-  forall p : Person | p in dom manager => manager(p) /= p
+  forall p : Person | p elem dom manager => manager(p) /= p
 end
 
 ** Example 3: Function Composition **

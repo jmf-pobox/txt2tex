@@ -22,7 +22,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ### Lecture 1: Propositional Logic
 - **[Tutorial 1: Propositional Logic](docs/tutorials/01_propositional_logic.md)**
-  - Boolean operators (and, or, not, =>, <=>)
+  - Boolean operators (land, lor, lnot, =>, <=>)
   - Truth tables and equivalences
   - Tautologies and logical laws
   - **Examples:** `01_propositional_logic/`

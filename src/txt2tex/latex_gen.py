@@ -232,9 +232,30 @@ class LaTeXGenerator:
     _first_part_in_solution: bool
     _in_inline_part: bool
     _quantifier_depth: int
+    _warn_overflow: bool
+    _overflow_threshold: int
+    _overflow_warnings: list[str]
 
-    def __init__(self, use_fuzz: bool = False, toc_parts: bool = False) -> None:
-        """Initialize generator with package choice and TOC options."""
+    # Default threshold for overflow warnings (LaTeX characters)
+    # ~100 LaTeX chars ≈ 80 rendered chars at 10pt with 1in margins
+    DEFAULT_OVERFLOW_THRESHOLD: ClassVar[int] = 100
+
+    def __init__(
+        self,
+        use_fuzz: bool = False,
+        toc_parts: bool = False,
+        warn_overflow: bool = True,
+        overflow_threshold: int | None = None,
+    ) -> None:
+        """Initialize generator with package choice and TOC options.
+
+        Args:
+            use_fuzz: Use fuzz package instead of zed-* packages.
+            toc_parts: Include parts (a, b, c) in table of contents.
+            warn_overflow: Emit warnings for lines that may overflow page margins.
+            overflow_threshold: LaTeX character threshold for overflow warnings.
+                Defaults to DEFAULT_OVERFLOW_THRESHOLD (~100 chars).
+        """
         self.use_fuzz = use_fuzz
         self.toc_parts = toc_parts
         self.parts_format = "subsection"  # Document-level parts format
@@ -242,6 +263,60 @@ class LaTeXGenerator:
         self._first_part_in_solution = False  # Track if we're generating first part
         self._in_inline_part = False  # Track if we're inside an inline part
         self._quantifier_depth = 0  # Track nesting for \t1, \t2 indentation
+        self._warn_overflow = warn_overflow
+        self._overflow_threshold = (
+            overflow_threshold
+            if overflow_threshold is not None
+            else self.DEFAULT_OVERFLOW_THRESHOLD
+        )
+        self._overflow_warnings = []  # Collected warnings to emit
+
+    # -------------------------------------------------------------------------
+    # Overflow warning helpers
+    # -------------------------------------------------------------------------
+
+    def _check_overflow(
+        self,
+        latex: str,
+        source_line: int,
+        context: str,
+        content_preview: str | None = None,
+    ) -> None:
+        """Check if generated LaTeX may overflow page margins.
+
+        Args:
+            latex: The generated LaTeX string to check.
+            source_line: Source file line number for the warning.
+            context: Description of where the overflow occurs (e.g., "axdef where clause").
+            content_preview: Optional preview of source content for the warning message.
+        """
+        if not self._warn_overflow:
+            return
+
+        # Measure LaTeX length (approximation of rendered width)
+        latex_len = len(latex)
+        if latex_len <= self._overflow_threshold:
+            return
+
+        # Build warning message
+        preview = content_preview or latex[:50] + "..." if len(latex) > 50 else latex
+        warning = (
+            f"Warning: Line {source_line} may overflow page margin "
+            f"(~{latex_len} chars)\n"
+            f"  In: {context}\n"
+            f"  Content: {preview}\n"
+            f"  Suggestion: Break long expressions using indentation continuation"
+        )
+        self._overflow_warnings.append(warning)
+
+    def emit_warnings(self) -> None:
+        """Emit all collected overflow warnings to stderr."""
+        for warning in self._overflow_warnings:
+            print(warning, file=sys.stderr)
+
+    def get_warnings(self) -> list[str]:
+        """Return collected overflow warnings (for testing)."""
+        return self._overflow_warnings.copy()
 
     # -------------------------------------------------------------------------
     # Fuzz/Standard LaTeX mode helpers
