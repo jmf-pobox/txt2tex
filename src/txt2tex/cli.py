@@ -6,6 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from txt2tex.errors import ErrorFormatter
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer, LexerError
 from txt2tex.parser import Parser, ParserError
@@ -58,6 +59,7 @@ def main() -> int:
         return 1
 
     # Process
+    formatter = ErrorFormatter(text)
     try:
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -68,10 +70,12 @@ def main() -> int:
         generator = LaTeXGenerator(use_fuzz=not args.zed, toc_parts=args.toc_parts)
         latex = generator.generate_document(ast)
     except LexerError as e:
-        print(f"Error processing input: {e}", file=sys.stderr)
+        formatted = formatter.format_error(e.message, e.line, e.column)
+        print(formatted, file=sys.stderr)
         return 1
     except ParserError as e:
-        print(f"Error processing input: {e}", file=sys.stderr)
+        formatted = formatter.format_error(e.message, e.token.line, e.token.column)
+        print(formatted, file=sys.stderr)
         return 1
 
     # Write output

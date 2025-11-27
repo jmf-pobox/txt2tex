@@ -69,11 +69,13 @@ class ParserError(Exception):
     """Raised when parser encounters invalid syntax."""
 
     # Instance variable type annotations
+    message: str
     token: Token
 
     def __init__(self, message: str, token: Token) -> None:
         """Initialize parser error with token position."""
         super().__init__(f"Line {token.line}, column {token.column}: {message}")
+        self.message = message
         self.token = token
 
 
