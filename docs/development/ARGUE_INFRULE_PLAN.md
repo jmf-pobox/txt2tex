@@ -114,8 +114,8 @@ This achieves zed2e alignment while preserving what works, adding complementary 
 **Current behavior**:
 ```txt
 EQUIV:
-  p and q
-  <=> q and p [commutative]
+  p land q
+  <=> q land p [commutative]
 ```
 Generates:
 ```latex
@@ -133,8 +133,8 @@ p \land q \\
 **New behavior** (both syntaxes work):
 ```txt
 EQUIV:                          ARGUE:
-  p and q                         p and q
-  <=> q and p [commutative]       <=> q and p [commutative]
+  p land q                         p land q
+  <=> q land p [commutative]       <=> q land p [commutative]
 ```
 Both generate:
 ```latex

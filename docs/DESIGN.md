@@ -454,15 +454,15 @@ When users write explicit parentheses like `(A and B) and C`, these are preserve
 
 **Examples**:
 ```
-(A and B) and C      → (A \land B) \land C   (left parens preserved)
-A and (B and C)      → A \land (B \land C)   (right parens preserved)
-A and B and C        → A \land B \land C     (no parens, left-associative)
-((A and B) and C)    → ((A \land B) \land C) (both levels preserved)
+(A land B) land C      → (A \land B) \land C   (left parens preserved)
+A land (B land C)      → A \land (B \land C)   (right parens preserved)
+A land B land C        → A \land B \land C     (no parens, left-associative)
+((A land B) land C)    → ((A \land B) \land C) (both levels preserved)
 ```
 
 **Rationale**: User-written parentheses indicate semantic intent beyond operator precedence. In formal specifications, explicit grouping conveys important meaning about logical structure. The parser must distinguish between:
-- **Precedence-required parens**: `(A or B) and C` (needed because `or` has lower precedence)
-- **Explicit clarity parens**: `(A and B) and C` (not needed by precedence, but preserves grouping)
+- **Precedence-required parens**: `(A lor B) land C` (needed because `lor` has lower precedence)
+- **Explicit clarity parens**: `(A land B) land C` (not needed by precedence, but preserves grouping)
 
 **Context Handling**:
 
@@ -1052,9 +1052,9 @@ F | F | T
 **Use Case**:
 ```
 EQUIV:
-p and q
-<=> q and p [commutative]
-<=> q and p [idempotent]
+p land q
+<=> q land p [commutative]
+<=> q land p [idempotent]
 ```
 
 **Deliverable**: Can process equivalence proofs
@@ -1129,9 +1129,9 @@ end
 **Use Case**:
 ```
 PROOF:
-  p and q
-    p [and-elim-1]
-    q [and-elim-2]
+  p land q
+    p [land-elim-1]
+    q [land-elim-2]
 ```
 
 **Deliverable**: Can process proof tree exercises
@@ -1237,8 +1237,8 @@ PROOF:
 **Input Format**:
 ```
 forall x : N | x * x >= 0
-exists d : Dog | gentle(d) and well_trained(d)
-forall x, y : N | x + y = 4 and x < y
+exists d : Dog | gentle(d) land well_trained(d)
+forall x, y : N | x + y = 4 land x < y
 ```
 
 **LaTeX Output**:
@@ -1269,9 +1269,9 @@ $\forall x, y : \nat \bullet x + y = 4 \land x < y$
 **Input Format**:
 ```
 EQUIV:
-exists y : N | y in {0, 1} and y != 1 and x != y
-<=> exists y : N | y = 0 and x != y [arithmetic]
-<=> 0 in N and x != 0 [one-point rule]
+exists y : N | y elem {0, 1} land y != 1 land x != y
+<=> exists y : N | y = 0 land x != y [arithmetic]
+<=> 0 elem N land x != 0 [one-point rule]
 <=> x != 0
 ```
 
@@ -1314,10 +1314,10 @@ exists y : N | y in {0, 1} and y != 1 and x != y
 {n : P {0, 1} . (n, # n)}
 
 EQUIV:
-x in a cap b
-<=> (x in a and x in b) [intersection]
-<=> (x in a) [idempotence of and]
-<=> x in a
+x elem a cap b
+<=> (x elem a land x elem b) [intersection]
+<=> (x elem a) [idempotence of land]
+<=> x elem a
 ```
 
 **LaTeX Output**:
@@ -1360,7 +1360,7 @@ Couples == { s : P Person | # s = 2 }
 axdef
   notin[X] : (X <-> P X)
 where
-  forall x : X; s : P X | x notin s <=> not (x in s)
+  forall x : X; s : P X | x notin s <=> lnot (x elem s)
 end
 ```
 
@@ -1417,11 +1417,11 @@ siblingOf == (childOf o9 parentOf) \ id[Person]
 ancestorOf == parentOf+
 
 EQUIV:
-x |-> y in A <| (B <| R)
-<=> x in A and x |-> y in (B <| R) [domain restriction]
-<=> x in A and x in B and x |-> y in R [domain restriction]
-<=> x in A cap B and x |-> y in R [intersection]
-<=> x |-> y in (A cap B) <| R [domain restriction]
+x |-> y elem A <| (B <| R)
+<=> x elem A land x |-> y elem (B <| R) [domain restriction]
+<=> x elem A land x elem B land x |-> y elem R [domain restriction]
+<=> x elem A cap B land x |-> y elem R [intersection]
+<=> x |-> y elem (A cap B) <| R [domain restriction]
 ```
 
 **LaTeX Output**:
@@ -1858,7 +1858,7 @@ front <a, b, c, d> = <a, b, c>
 ran <a, b, a, d> = {a, b, d}
 
 f : Place -> P Place
-forall p : Place | f p = {q : Place | p |-> q in ran trains}
+forall p : Place | f p = {q : Place | p |-> q elem ran trains}
 
 {p : Place | exists1 x : dom trains | (trains x).2 = p}
 ```

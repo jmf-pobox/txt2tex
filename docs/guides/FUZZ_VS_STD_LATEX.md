@@ -362,7 +362,7 @@ Fuzz mode generates:
 
 With expression part:
 ```
-mu n : N | n in S . f(n)
+mu n : N | n elem S . f(n)
 ```
 
 Generates:
