@@ -3824,7 +3824,7 @@ class Parser:
                         # parse as expression
                         self.pos = saved_pos
                         items.append(self._parse_expr())
-                except Exception:
+                except ParserError:
                     # Failed to parse compound identifier, backtrack and
                     # parse as expression
                     self.pos = saved_pos

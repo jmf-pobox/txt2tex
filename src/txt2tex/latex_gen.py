@@ -57,8 +57,8 @@ from txt2tex.ast_nodes import (
     Zed,
 )
 from txt2tex.constants import PROSE_WORDS
-from txt2tex.lexer import Lexer
-from txt2tex.parser import Parser
+from txt2tex.lexer import Lexer, LexerError
+from txt2tex.parser import Parser, ParserError
 
 
 class LaTeXGenerator:
@@ -2282,6 +2282,9 @@ class LaTeXGenerator:
 
                 # Try to parse the ORIGINAL content (not converted)
                 # The parser will handle nested sequences correctly
+                # Try to parse and generate LaTeX for sequence content
+                parsed_successfully = False
+                latex = ""  # Will be set by either branch
                 try:
                     lexer = Lexer(content)
                     tokens = lexer.tokenize()
@@ -2290,41 +2293,31 @@ class LaTeXGenerator:
 
                     # Generate LaTeX for the sequence content
                     # Note: parser.parse() returns Document | Expr
-                    if isinstance(ast, Document):
-                        # Not an expression, fall back to simple wrap
-                        raise ValueError("Expected expression, got document")
+                    if isinstance(ast, Expr):
+                        # Successfully parsed as expression
+                        if content.strip() == "":
+                            latex = r"\langle \rangle"
+                        else:
+                            latex_content = self.generate_expr(ast)
+                            latex = rf"\langle {latex_content} \rangle"
+                        parsed_successfully = True
+                except (LexerError, ParserError):
+                    # Parsing failed - will use fallback below
+                    pass
 
-                    # Wrap in \langle \rangle (we stripped outer brackets)
-                    if content.strip() == "":
-                        # Empty sequence
-                        latex = r"\langle \rangle"
-                    else:
-                        # Generate LaTeX from AST and wrap in sequence brackets
-                        latex_content = self.generate_expr(ast)
-                        latex = rf"\langle {latex_content} \rangle"
-
-                    # Wrap in math mode only on first iteration (outermost sequences)
-                    if wrap_math and iteration == 0:
-                        result = result[:start_pos] + f"${latex}$" + result[end_pos:]
-                    else:
-                        result = result[:start_pos] + latex + result[end_pos:]
-                except Exception:
-                    # Parsing failed (e.g., comma-separated expressions)
-                    # Convert operators; later iterations handle inner sequences
+                if not parsed_successfully:
+                    # Fallback: convert operators without full parsing
                     if not content.strip():
-                        # Empty sequence
                         latex = r"\langle \rangle"
                     else:
-                        # Convert operators without wrapping (wrap whole sequence)
                         content_with_ops = self._convert_operators_bare(content)
-                        # Inner sequences processed in next iteration
                         latex = rf"\langle {content_with_ops} \rangle"
 
-                    # Wrap in math mode only on first iteration (outermost sequences)
-                    if wrap_math and iteration == 0:
-                        result = result[:start_pos] + f"${latex}$" + result[end_pos:]
-                    else:
-                        result = result[:start_pos] + latex + result[end_pos:]
+                # Wrap in math mode only on first iteration (outermost sequences)
+                if wrap_math and iteration == 0:
+                    result = result[:start_pos] + f"${latex}$" + result[end_pos:]
+                else:
+                    result = result[:start_pos] + latex + result[end_pos:]
 
             iteration += 1
 
@@ -2537,8 +2530,8 @@ class LaTeXGenerator:
                 if isinstance(ast, Expr):
                     math_latex = self.generate_expr(ast)
                     result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except Exception:
-                # Parsing failed, leave as-is
+            except (LexerError, ParserError):
+                # Parsing failed - expression is not valid math, leave as prose
                 pass
 
         # Pattern -0.5: Parenthesized logical expressions
@@ -2581,8 +2574,8 @@ class LaTeXGenerator:
                 if isinstance(ast, Expr):
                     math_latex = self.generate_expr(ast)
                     result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except Exception:
-                # Parsing failed, leave as-is (might be prose)
+            except (LexerError, ParserError):
+                # Parsing failed - expression is not valid math, leave as prose
                 pass
 
         # Pattern -0.3: Standalone logical keywords (lor, land, lnot, elem)
@@ -2721,8 +2714,8 @@ class LaTeXGenerator:
                     # Generate LaTeX
                     math_latex = self.generate_expr(ast)
                     result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except Exception:
-                # Parsing failed, leave as-is
+            except (LexerError, ParserError):
+                # Parsing failed - expression is not valid math, leave as prose
                 pass
 
         # Pattern 1: Set expressions { ... }
@@ -2745,8 +2738,8 @@ class LaTeXGenerator:
                     math_latex = self.generate_expr(ast)
                     # Wrap in $...$
                     result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except Exception:
-                # If parsing fails, leave as-is (might be prose)
+            except (LexerError, ParserError):
+                # Parsing failed - expression is not valid math, leave as prose
                 pass
 
         # Pattern 2: Quantifiers (forall, exists, exists1, mu)
@@ -2852,8 +2845,8 @@ class LaTeXGenerator:
                                 + result[end_pos:]
                             )
                             break  # Move to next match
-                    except Exception:
-                        # Try shorter substring
+                    except (LexerError, ParserError):
+                        # This substring doesn't parse - try shorter one
                         continue
 
         # Pattern 2.5: Type declarations (identifier : type_expression)
@@ -2939,8 +2932,8 @@ class LaTeXGenerator:
                 if isinstance(ast, Expr):
                     math_latex = self.generate_expr(ast)
                     result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except Exception:
-                # If parsing fails, check if this looks like prose (not math)
+            except (LexerError, ParserError):
+                # Parsing failed - check if this looks like prose (not math)
                 # Common English words that appear in prose but not in math
                 expr_words = set(expr.lower().split())
                 if expr_words & PROSE_WORDS:
@@ -3006,8 +2999,8 @@ class LaTeXGenerator:
                 if isinstance(ast, Expr):
                     math_latex = self.generate_expr(ast)
                     result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except Exception:
-                # If parsing fails, manually process components
+            except (LexerError, ParserError):
+                # Parsing failed - manually process components
                 # Extract: func_name arg operator value
                 parts = expr.split()
                 if len(parts) >= 3:
@@ -3091,9 +3084,8 @@ class LaTeXGenerator:
                     math_latex = self.generate_expr(ast)
                     # Wrap in $...$
                     result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except Exception:
-                # If parsing fails, just wrap as-is
-                # Still need to convert operators
+            except (LexerError, ParserError):
+                # Parsing failed - wrap expression as-is
                 result = result[:start_pos] + f"${expr}$" + result[end_pos:]
 
         return result
