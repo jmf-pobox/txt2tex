@@ -1,13 +1,18 @@
 === Bug 13 Test: Field Projection on Function Application ===
 
-given Programme
+// Note: Schema provides both the type name and field definitions
+// No 'given' declaration needed when using schema
 
 schema Programme
   length : N
 end
 
+// In fuzz, f(i).length is parsed as f applied to (i).length
+// To select a field from a function result, use theta notation:
+// (theta Programme).length extracts length from any Programme value
+
 axdef
   f : N -> Programme
 where
-  forall i : N | f(i).length > 0
+  forall i : N; p : Programme | p = f(i) => p.length > 0
 end

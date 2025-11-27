@@ -361,8 +361,8 @@ class LaTeXGenerator:
                 return rf"{operand} \plus"
             if operator == "*":
                 return rf"{operand} \star"
-            # ~ inverse uses ^{\sim} in fuzz mode
-            return rf"{operand}^{{\sim}}"
+            # ~ inverse uses \inv in fuzz mode (fuzz.sty defines \inv as ^\sim)
+            return rf"{operand} \inv"
         # Standard LaTeX: superscript notation
         op_superscript = {"+": "^{+}", "*": "^{*}", "~": "^{-1}"}
         return f"{operand}{op_superscript[operator]}"

@@ -2555,15 +2555,11 @@ class Parser:
                     # Named field projection: .fieldname (new feature)
                     # Don't parse as projection if we're in schema text
                     # (lambda/set comp) where periods are separators, not operators
-                    # EXCEPT: If base is a function application, parse as projection
-                    # (f(x).field is field access, not a separator)
+                    # In set comprehensions like {c : children(p) . children(c)},
+                    # the . after children(p) is the body separator, not field access
                     if self._parsing_schema_text:
-                        if isinstance(base, FunctionApp):
-                            # Function application - parse as field projection
-                            pass  # Continue to parse as projection
-                        else:
-                            # Not a function application - leave unparsed (separator)
-                            break
+                        # In schema text, period is always separator, not projection
+                        break
 
                     # Don't allow field projections on number literals
                     # (only tuples/records have named fields)
