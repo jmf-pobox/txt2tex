@@ -302,7 +302,7 @@ class LaTeXGenerator:
         """Generate the content of a zed item without the environment wrapper."""
         if isinstance(item, GivenType):
             names_str = ", ".join(item.names)
-            return f"[~ {names_str} ~]"
+            return f"[{names_str}]"
         elif isinstance(item, FreeType):
             # Generate branches
             branch_strs: list[str] = []
@@ -3344,10 +3344,9 @@ class LaTeXGenerator:
     def _generate_given_type(self, node: GivenType) -> list[str]:
         """Generate LaTeX for given type declaration."""
         lines: list[str] = []
-        # Generate as: given [A, B, C]
-        # Phase 1.3: Add ~ spacing hints after [ and before ]
+        # Generate as: [A, B, C] in zed environment
         names_str = ", ".join(node.names)
-        lines.append(f"\\begin{{zed}}[~ {names_str} ~]\\end{{zed}}")
+        lines.append(f"\\begin{{zed}}[{names_str}]\\end{{zed}}")
         lines.append("")
         return lines
 

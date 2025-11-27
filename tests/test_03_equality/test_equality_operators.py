@@ -237,7 +237,7 @@ class TestLaTeXGenerator:
         ast = GivenType(names=["Person", "Company"], line=1, column=1)
         latex_lines = gen.generate_document_item(ast)
         latex = "".join(latex_lines)
-        assert r"\begin{zed}[~ Person, Company ~]\end{zed}" in latex
+        assert r"\begin{zed}[Person, Company]\end{zed}" in latex
 
     def test_free_type(self) -> None:
         """Test generating free type."""
@@ -394,7 +394,7 @@ class TestIntegration:
         ast = parser.parse()
         gen = LaTeXGenerator()
         doc = gen.generate_document(ast)
-        assert r"\begin{zed}[~ Person, Company ~]\end{zed}" in doc
+        assert r"\begin{zed}[Person, Company]\end{zed}" in doc
 
     def test_complete_free_type(self) -> None:
         """Test complete pipeline for free type."""

@@ -23,7 +23,7 @@ def test_consecutive_given_and_free_types():
     assert "\\also" in latex
     assert latex.count("\\begin{zed}") == 1
     assert latex.count("\\end{zed}") == 1
-    assert "[~ NAME, DATE ~]" in latex
+    assert "[NAME, DATE]" in latex
     assert "Status ::= active | inactive" in latex
 
 
@@ -38,7 +38,7 @@ def test_three_consecutive_zed_items():
     latex = gen.generate_document(ast)
     assert latex.count("\\begin{zed}") == 1
     assert latex.count("\\also") == 2
-    assert "[~ A, B ~]" in latex
+    assert "[A, B]" in latex
     assert "Status ::= ok | fail" in latex
     assert "Pair == A \\cross B" in latex
 
@@ -55,7 +55,7 @@ def test_single_zed_item_not_consolidated():
     assert latex.count("\\begin{zed}") == 1
     assert latex.count("\\end{zed}") == 1
     assert "\\also" not in latex
-    assert "[~ NAME ~]" in latex
+    assert "[NAME]" in latex
 
 
 def test_zed_items_separated_by_text():
@@ -108,6 +108,6 @@ def test_consolidation_preserves_content():
         column=1,
     )
     latex = gen.generate_document(doc)
-    assert "[~ X, Y ~]" in latex
+    assert "[X, Y]" in latex
     assert "Status ::= active | inactive" in latex
     assert "\\also" in latex

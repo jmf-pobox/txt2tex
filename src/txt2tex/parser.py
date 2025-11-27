@@ -80,32 +80,9 @@ class ParserError(Exception):
 
 
 class Parser:
-    """
-    Recursive descent parser for Phase 0-4 + Phase 10a-b + Phase 11a.
+    """Recursive descent parser for txt2tex whiteboard notation.
 
-    Phase 0 - Expression grammar (precedence from lowest to highest):
-        expr     ::= iff
-        iff      ::= implies ( '<=>' implies )*
-        implies  ::= or ( '=>' or )*
-        or       ::= and ( 'or' and )*
-        and      ::= unary ( 'and' unary )*
-        unary    ::= 'not' unary | primary
-        primary  ::= IDENTIFIER | '(' expr ')'
-
-    Phase 1 - Document structure:
-        document ::= document_item*
-        document_item ::= section | solution | part | truth_table | expr
-        section ::= '===' TEXT '===' document_item*
-        solution ::= '**' TEXT '**' document_item*
-        part ::= PART_LABEL document_item*
-        truth_table ::= 'TRUTH TABLE:' table_rows
-
-    Phase 2 - Equivalence chains:
-        equiv_chain ::= 'EQUIV:' equiv_step+
-        equiv_step ::= expr ('<=' '>')? justification?
-        justification ::= '[' TEXT ']'
-
-    Phase 3 - Quantifiers and mathematical notation (enhanced in Phase 6-7):
+    Expression grammar (precedence from lowest to highest):
         expr       ::= quantifier | iff
         quantifier ::= ('forall' | 'exists' | 'exists1' | 'mu')
                        var_list (':' atom)? '|' expr
@@ -115,32 +92,30 @@ class Parser:
         or         ::= and ( 'or' and )*
         and        ::= comparison ( 'and' comparison )*
         comparison ::= relation ( ('<' | '>' | '<=' | '>=' | '=' | '!=') relation )?
-        relation   ::= set_op ( ('<->' | '|->' | '<|' | '|>' | '<<|' |
-                                  '|>>' | 'o9' | 'comp' | ';' |
-                                  '->' | '+->' | '>->' | '>+>' |
-                                  '-->>' | '+->>' | '>->>') set_op )*
+        relation   ::= set_op ( relation_op set_op )*
         set_op     ::= union ( ('in' | 'notin' | 'subset') union )?
         union      ::= intersect ( 'union' intersect )*
         intersect  ::= unary ( 'intersect' unary )*
         unary      ::= 'not' unary | postfix
-        postfix    ::= atom ( '^' atom | '_' atom | '~' | '+' | '*' | 'r' )*
-        atom       ::= ('dom' | 'ran' | 'inv' | 'id') atom |
-                       IDENTIFIER | NUMBER | '(' expr ')'
+        postfix    ::= atom ( '^' atom | '_' atom | '~' | '+' | '*' )*
+        atom       ::= prefix_op atom | IDENTIFIER | NUMBER | '(' expr ')' |
+                       '{' set_comprehension '}' | '⟨' sequence '⟩' | '[[' bag ']]'
 
-    Phase 10a - Relation operators:
-        - Infix: <->, |->, <|, |>, comp, ;
-        - Prefix functions: dom, ran
+    Document structure:
+        document ::= document_item*
+        document_item ::= section | solution | part | truth_table | equiv_chain |
+                         z_definition | proof_tree | expr
 
-    Phase 10b - Extended relation operators:
-        - Infix: <<| (domain subtraction), |>> (range subtraction), o9 (composition)
-        - Prefix functions: inv (inverse), id (identity)
-        - Postfix: ~ (inverse), + (transitive closure), * (reflexive-transitive closure)
+    Relation operators:
+        - Infix: <-> (relation), |-> (maplet), <| (domain restriction),
+                 |> (range restriction), <<| (domain subtraction),
+                 |>> (range subtraction), o9/comp (composition)
+        - Prefix: dom, ran, inv, id
+        - Postfix: ~ (inverse), + (transitive closure), * (reflexive-transitive)
 
-    Phase 11a - Function type operators:
-        - Infix: -> (total function), +-> (partial function),
-                 >-> (total injection), >+> (partial injection),
-                 -->> (total surjection), +->> (partial surjection),
-                 >->> (bijection)
+    Function type operators:
+        - -> (total), +-> (partial), >-> (injection), >+> (partial injection),
+          -->> (surjection), +->> (partial surjection), >->> (bijection)
     """
 
     # Instance variable type annotations
@@ -194,7 +169,7 @@ class Parser:
         bibliography_metadata = self._parse_bibliography_metadata()
         parts_format = self._parse_parts_format()
 
-        # Check if we start with a structural element (Phase 1 + Phase 4)
+        # Check if we start with a structural element (section, solution, etc.)
         if self._is_structural_token():
             # Parse as document with structural elements
             items: list[DocumentItem] = []
@@ -210,8 +185,7 @@ class Parser:
                 column=1,
             )
 
-        # Check for abbreviation or free type (Phase 4)
-        # Look ahead to see if this is "identifier ::=" or "identifier =="
+        # Check for abbreviation (identifier ==) or free type (identifier ::=)
         # Note: Partial support for compound identifiers like "R+ =="
         # (GitHub #3 still open)
         if self._match(TokenType.IDENTIFIER):
@@ -1233,8 +1207,7 @@ class Parser:
 
         while self._match(TokenType.IFF):
             op_token = self._advance()
-            # Phase 27: Check for continuation marker (\ at end of line)
-            # Phase 28: Also detect natural newlines for WYSIWYG output
+            # Detect line continuation (backslash or natural newline)
             has_continuation = False
             if self._match(TokenType.CONTINUATION):
                 self._advance()  # consume \
@@ -1372,7 +1345,7 @@ class Parser:
             else:
                 # No line break, but still skip newlines for flexibility
                 self._skip_newlines()
-            # Phase 21c: Allow quantifiers after 'and'
+            # Quantifiers can appear after 'and' (e.g., p and forall x : T | q)
             # Check if next token is a quantifier keyword
             if self._match(
                 TokenType.FORALL, TokenType.EXISTS, TokenType.EXISTS1, TokenType.MU
