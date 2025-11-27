@@ -105,14 +105,12 @@ class LexerError(Exception):
 
 
 class Lexer:
-    """
-    Tokenizes input text for Phase 0-4 + Phase 10a-b + Phase 11a.
+    """Tokenizes input text for txt2tex.
 
     Supports propositional logic, document structure, equivalence chains,
     predicate logic with quantifiers and mathematical notation, Z notation,
-    relational operators (Phase 10a: <->, |->, <|, |>, comp, ;, dom, ran),
-    extended operators (Phase 10b: <<|, |>>, o9, ~, +, *, inv, id),
-    and function types (Phase 11a: ->, +->, >->, >+>, -->>, +->>, >->>).
+    relational operators (<->, |->, <|, |>, comp, ;, dom, ran, <<|, |>>, etc.),
+    and function types (->, +->, >->, >+>, -->>, +->>, >->>).
     """
 
     # Instance variable type annotations
@@ -240,7 +238,7 @@ class Lexer:
             # Don't consume the newline - let normal newline handling do it
             return None
 
-        # Newline (significant in Phase 1 for multi-line documents)
+        # Newline (significant for multi-line documents)
         if char == "\n":
             self._advance()
             return Token(TokenType.NEWLINE, "\n", start_line, start_column)
@@ -270,7 +268,7 @@ class Lexer:
             self._advance()
             return Token(TokenType.IFF, "<=>", start_line, start_column)
 
-        # Relation type operator: <-> (Phase 10)
+        # Relation type operator: <->
         if char == "<" and self._peek_char() == "-" and self._peek_char(2) == ">":
             self._advance()
             self._advance()
@@ -286,8 +284,7 @@ class Lexer:
             return Token(TokenType.SOLUTION_MARKER, "**", start_line, start_column)
 
         # Part label: (a), (b), ..., (j), (aa), (ab), etc.
-        # Phase 11b: Only match at start of line to avoid function app conflict
-        # Phase 2.1: Extended to support multi-letter labels (aa), (ab), ...
+        # Only match at start of line to avoid function app conflict
         # Single letters restricted to (a)-(j) to avoid conflict with vars like (x), (s)
         # Multi-letter (2+) allowed for extended numbering: (aa), (ab), (ba), (bb), ...
         # Must be followed by whitespace/newline (structural) not operators (expression)
@@ -333,7 +330,7 @@ class Lexer:
                             start_column,
                         )
 
-        # Relational image operators (Phase 11.5): (| and |)
+        # Relational image operators: (| and |)
         # Check before simple parentheses
         if char == "(" and self._peek_char() == "|":
             self._advance()
@@ -345,39 +342,39 @@ class Lexer:
             self._advance()
             return Token(TokenType.LPAREN, "(", start_line, start_column)
 
-        # Brackets (for justifications in Phase 2)
+        # Brackets (for justifications and generics)
         # Note: Bag literals [[...]] are handled at parser level, not lexer level
         # to avoid conflicts with nested brackets like Type[List[N]]
         if char == "[":
             self._advance()
             return Token(TokenType.LBRACKET, "[", start_line, start_column)
 
-        # Braces (for grouping subscripts/superscripts in Phase 3)
+        # Braces (for sets and grouping subscripts/superscripts)
         if char == "{":
             self._advance()
             return Token(TokenType.LBRACE, "{", start_line, start_column)
 
-        # Maplet operator: |-> (Phase 10a) - check before | alone
+        # Maplet operator: |-> - check before | alone
         if char == "|" and self._peek_char() == "-" and self._peek_char(2) == ">":
             self._advance()
             self._advance()
             self._advance()
             return Token(TokenType.MAPLET, "|->", start_line, start_column)
 
-        # Range subtraction operator: |>> (Phase 10b) - check before |> and | alone
+        # Range subtraction operator: |>> - check before |> and | alone
         if char == "|" and self._peek_char() == ">" and self._peek_char(2) == ">":
             self._advance()
             self._advance()
             self._advance()
             return Token(TokenType.NRRES, "|>>", start_line, start_column)
 
-        # Range restriction operator: |> (Phase 10a) - check before | alone
+        # Range restriction operator: |> - check before | alone
         if char == "|" and self._peek_char() == ">":
             self._advance()
             self._advance()
             return Token(TokenType.RRES, "|>", start_line, start_column)
 
-        # Relational image right bracket: |) (Phase 11.5) - check before | alone
+        # Relational image right bracket: |) - check before | alone
         if char == "|" and self._peek_char() == ")":
             self._advance()
             self._advance()
@@ -388,14 +385,14 @@ class Lexer:
             self._advance()
             return Token(TokenType.PIPE, "|", start_line, start_column)
 
-        # Ellipsis ... (Phase 2.2) - check before range operator
+        # Ellipsis ... - check before range operator
         if char == "." and self._peek_char() == "." and self._peek_char(2) == ".":
             self._advance()
             self._advance()
             self._advance()
             return Token(TokenType.ELLIPSIS, "...", start_line, start_column)
 
-        # Range operator .. (Phase 13) - check before period alone
+        # Range operator .. - check before period alone
         if char == "." and self._peek_char() == ".":
             self._advance()
             self._advance()
@@ -406,35 +403,35 @@ class Lexer:
             self._advance()
             return Token(TokenType.PERIOD, ".", start_line, start_column)
 
-        # Free type operator ::= (Phase 4) - check before :: and :
+        # Free type operator ::= - check before :: and :
         if char == ":" and self._peek_char() == ":" and self._peek_char(2) == "=":
             self._advance()
             self._advance()
             self._advance()
             return Token(TokenType.FREE_TYPE, "::=", start_line, start_column)
 
-        # Double colon :: (Phase 5 - sibling marker) - check before : alone
+        # Double colon :: (sibling marker in proofs) - check before : alone
         if char == ":" and self._peek_char() == ":":
             self._advance()
             self._advance()
             return Token(TokenType.DOUBLE_COLON, "::", start_line, start_column)
 
-        # Colon (for quantifiers in Phase 3)
+        # Colon (for quantifiers and declarations)
         if char == ":":
             self._advance()
             return Token(TokenType.COLON, ":", start_line, start_column)
 
-        # Comparison operators (Phase 3)
+        # Comparison operators
         # Check <= and >= before < and >
         # But watch out for <=> and <-> which are handled earlier
-        # Domain subtraction operator: <<| (Phase 10b) - check before <| and < alone
+        # Domain subtraction operator: <<| - check before <| and < alone
         if char == "<" and self._peek_char() == "<" and self._peek_char(2) == "|":
             self._advance()
             self._advance()
             self._advance()
             return Token(TokenType.NDRES, "<<|", start_line, start_column)
 
-        # Domain restriction operator: <| (Phase 10a) - check before < alone
+        # Domain restriction operator: <| - check before < alone
         if char == "<" and self._peek_char() == "|":
             self._advance()
             self._advance()
@@ -445,7 +442,7 @@ class Lexer:
             self._advance()
             return Token(TokenType.LESS_EQUAL, "<=", start_line, start_column)
 
-        # Phase 14: ASCII sequence brackets <> as alternative to Unicode ⟨⟩
+        # ASCII sequence brackets <> as alternative to Unicode ⟨⟩
         # Recognize < as LANGLE when followed by: >, identifier, digit, (, or <
         # This handles: <>, <x>, <1>, <(expr)>, <<nested>>
         if char == "<":
@@ -467,7 +464,7 @@ class Lexer:
             self._advance()
             return Token(TokenType.GREATER_EQUAL, ">=", start_line, start_column)
 
-        # Function type operators starting with > (Phase 11a)
+        # Function type operators starting with >
         # Check 4-character first: >->>
         if (
             char == ">"
@@ -494,7 +491,7 @@ class Lexer:
             self._advance()
             return Token(TokenType.TINJ, ">->", start_line, start_column)
 
-        # Phase 14: ASCII sequence brackets - recognize > as RANGLE
+        # ASCII sequence brackets - recognize > as RANGLE
         # Key distinction: <x> has NO space before >, but x > 0 HAS space
         # > is RANGLE if: no space before AND previous char is alphanumeric/</)/ ,
         # > is GREATER_THAN if: space before OR previous char is operator/etc
@@ -519,19 +516,19 @@ class Lexer:
             self._advance()
             return Token(TokenType.GREATER_THAN, ">", start_line, start_column)
 
-        # Not equal != (Phase 7) - check before other operators
+        # Not equal != - check before other operators
         if char == "!" and self._peek_char() == "=":
             self._advance()
             self._advance()
             return Token(TokenType.NOT_EQUAL, "!=", start_line, start_column)
 
-        # Not equal /= (Z notation slash negation - Phase 16+)
+        # Not equal /= (Z notation slash negation)
         if char == "/" and self._peek_char() == "=":
             self._advance()
             self._advance()
             return Token(TokenType.NOT_EQUAL, "/=", start_line, start_column)
 
-        # Not in /in (Z notation slash negation - Phase 16+)
+        # Not in /in (Z notation slash negation)
         # Check for /in followed by non-alphanumeric (not part of identifier)
         if (
             char == "/"
@@ -545,21 +542,21 @@ class Lexer:
             self._advance()
             return Token(TokenType.NOTIN, "/in", start_line, start_column)
 
-        # Abbreviation operator == (Phase 4) - check before = alone
+        # Abbreviation operator == - check before = alone
         # Already checked for === and => earlier
         if char == "=" and self._peek_char() == "=":
             self._advance()
             self._advance()
             return Token(TokenType.ABBREV, "==", start_line, start_column)
 
-        # Equals (Phase 3) - but not =>, ==, or === which are handled earlier
+        # Equals - but not =>, ==, or === which are handled earlier
         if char == "=":
             self._advance()
             return Token(TokenType.EQUALS, "=", start_line, start_column)
 
-        # Math operators (Phase 3, enhanced Phase 14, Phase 24)
+        # Math operators
         # Caret: ^ can mean superscript OR sequence concatenation
-        # Phase 24: Whitespace-sensitive disambiguation
+        # Whitespace-sensitive disambiguation:
         # - Space/tab/newline before ^ → concatenation (CAT)
         # - No space before ^ → exponentiation (CARET)
         # - Special case: >^< → error (missing required space)
@@ -590,7 +587,7 @@ class Lexer:
             self._advance()
             return Token(TokenType.CARET, "^", start_line, start_column)
 
-        # Function type operators starting with + (Phase 11a)
+        # Function type operators starting with +
         # Check 4-character first: +->>
         if (
             char == "+"
@@ -611,7 +608,7 @@ class Lexer:
             self._advance()
             return Token(TokenType.PFUN, "+->", start_line, start_column)
 
-        # Override operator: ++ (Phase 13)
+        # Override operator: ++
         if char == "+" and self._peek_char() == "+":
             self._advance()
             self._advance()
@@ -627,7 +624,7 @@ class Lexer:
             self._advance()
             return Token(TokenType.STAR, "*", start_line, start_column)
 
-        # Function type operators starting with - (Phase 11a)
+        # Function type operators starting with -
         # Check 4-character first: -->>
         if (
             char == "-"
@@ -641,7 +638,7 @@ class Lexer:
             self._advance()
             return Token(TokenType.TSURJ, "-->>", start_line, start_column)
 
-        # Check 3-character: -|> (Phase 18 - partial injection alternative)
+        # Check 3-character: -|> (partial injection alternative)
         if char == "-" and self._peek_char() == "|" and self._peek_char(2) == ">":
             self._advance()
             self._advance()
@@ -654,7 +651,7 @@ class Lexer:
             self._advance()
             return Token(TokenType.TFUN, "->", start_line, start_column)
 
-        # Phase 20: Visual separator lines (-----, ===== etc.)
+        # Visual separator lines (-----, ===== etc.)
         # If at start of line and followed by many more of the same character,
         # treat as TEXT
         if start_column == 1 and char == "-":
@@ -684,14 +681,14 @@ class Lexer:
             self._advance()
             return Token(TokenType.MINUS, "-", start_line, start_column)
 
-        # Identifiers and keywords (Phase 15: allow underscore in identifiers)
+        # Identifiers and keywords (allow underscore in identifiers)
         if char.isalpha() or char == "_":
             return self._scan_identifier(start_line, start_column)
 
-        # Numbers and digit-starting identifiers (Phase 18)
+        # Numbers and digit-starting identifiers
         # Digit-starting identifiers: 479_courses (digit followed by underscore+letter)
         # Pure numbers: 479 (digits only)
-        # Finite function operator: 77-> (Phase 34)
+        # Finite function operator: 77->
         if (
             char == "7"
             and self._peek_char() == "7"
@@ -725,12 +722,12 @@ class Lexer:
             # It's a plain number
             return self._scan_number(start_line, start_column)
 
-        # Unicode symbols (Phase 11.5)
+        # Unicode symbols
         if char == "×":  # noqa: RUF001
             self._advance()
             return Token(TokenType.CROSS, "×", start_line, start_column)  # noqa: RUF001
 
-        # Set difference operator OR line continuation (Phase 11.5, enhanced Phase 27)
+        # Set difference operator OR line continuation
         if char == "\\":
             # Look ahead for newline (continuation marker)
             peek_pos = 1
@@ -772,7 +769,7 @@ class Lexer:
             self._advance()
             return Token(TokenType.SETMINUS, "\\", start_line, start_column)
 
-        # Sequence literals (Phase 12) - Unicode angle brackets
+        # Sequence literals - Unicode angle brackets
         if char == "⟨":
             self._advance()
             return Token(TokenType.LANGLE, "⟨", start_line, start_column)
@@ -781,17 +778,17 @@ class Lexer:
             self._advance()
             return Token(TokenType.RANGLE, "⟩", start_line, start_column)
 
-        # Sequence concatenation (Phase 12)
+        # Sequence concatenation
         if char == "⌢":
             self._advance()
             return Token(TokenType.CAT, "⌢", start_line, start_column)
 
-        # Sequence filter (Phase 35)
+        # Sequence filter
         if char == "↾":
             self._advance()
             return Token(TokenType.FILTER, "↾", start_line, start_column)
 
-        # Bag union (Phase 12)
+        # Bag union
         if char == "⊎":
             self._advance()
             return Token(TokenType.BAG_UNION, "⊎", start_line, start_column)
@@ -803,14 +800,13 @@ class Lexer:
         """Scan identifier or keyword."""
         start_pos = self.pos
 
-        # Check for special o9 operator (Phase 10b) - composition
+        # Check for special o9 operator - composition
         if self._current_char() == "o" and self._peek_char() == "9":
             self._advance()  # consume 'o'
             self._advance()  # consume '9'
             return Token(TokenType.CIRC, "o9", start_line, start_column)
 
-        # Phase 15: Include underscore in identifiers
-        # Phase 24: Allow apostrophes in contractions (Let's, can't)
+        # Include underscore in identifiers and apostrophes in contractions
         # This allows multi-word identifiers like cumulative_total
         # Subscripts like a_i are now handled in LaTeX generation
         while not self._at_end():
@@ -1012,8 +1008,8 @@ class Lexer:
             self._advance()  # Consume ':'
             return Token(TokenType.PAGEBREAK, "PAGEBREAK:", start_line, start_column)
 
-        # Phase 20: Auto-detect prose paragraphs BEFORE keyword checks
-        # Phase 24: Also detect prose after part labels (any column)
+        # Auto-detect prose paragraphs BEFORE keyword checks
+        # Also detect prose after part labels (any column)
         # Check for capitalized prose starters
         # Exclude articles (A, An) that might be type names
         prose_starters = {
@@ -1075,7 +1071,7 @@ class Lexer:
             "Calculate",
             "Find",
             "Determine",
-            # Phase 24: Common contractions
+            # Common contractions
             "Let's",
             "It's",
             "That's",
