@@ -2,7 +2,7 @@
 
 **Purpose**: This document captures important differences between fuzz (Mike Spivey's Z notation typesetter) and standard LaTeX that affect txt2tex code generation.
 
-**Last Updated**: 2025-11-01
+**Last Updated**: 2025-11-27
 
 ---
 
@@ -42,7 +42,7 @@ if name == "Z":
     return r"\num" if self.use_fuzz else r"\mathbb{Z}"
 ```
 
-**Reference**: [latex_gen.py:368-373](../src/txt2tex/latex_gen.py:368-373)
+**Reference**: `latex_gen.py` - identifier generation
 
 ---
 
@@ -84,7 +84,7 @@ if self.use_fuzz:
 
 This matches the fuzz package conventions where predicates use logical connectives (`\implies`, `\iff`) while equational reasoning uses arrows (`\Rightarrow`, `\Leftrightarrow`).
 
-**Reference**: [latex_gen.py:571-579](../src/txt2tex/latex_gen.py:571-579)
+**Reference**: `latex_gen.py` - binary operator generation
 
 ---
 
@@ -105,7 +105,7 @@ if self.use_fuzz and isinstance(node.operand, FunctionApp):
     operand = f"({operand})"  # Generates: # (s(i))
 ```
 
-**Reference**: [latex_gen.py:510-514](../src/txt2tex/latex_gen.py:510-514)
+**Reference**: `latex_gen.py` - unary operator generation
 
 **Example**:
 ```
@@ -135,7 +135,7 @@ if self.use_fuzz and node.operator == "#" and isinstance(node.operand, UnaryOp):
         operand = f"({operand})"  # Generates: # (squash f)
 ```
 
-**Reference**: [latex_gen.py:519-542](../src/txt2tex/latex_gen.py:519-542)
+**Reference**: `latex_gen.py` - cardinality with function-like operators
 
 **Example**:
 ```
@@ -178,10 +178,7 @@ for i, decl in enumerate(node.declarations):
         lines.append(f"  {var_latex}: {type_latex}")      # Last one: no \\
 ```
 
-**Reference**:
-- [latex_gen.py:2086-2124](../src/txt2tex/latex_gen.py:2086-2124) - gendef
-- [latex_gen.py:2044-2084](../src/txt2tex/latex_gen.py:2044-2084) - axdef
-- [latex_gen.py:2126-2170](../src/txt2tex/latex_gen.py:2126-2170) - schema
+**Reference**: `latex_gen.py` - gendef, axdef, schema generation
 
 **PDF Result**:
 ```
@@ -205,7 +202,7 @@ g :X →X        ← on its own line
 - Semicolon is now **exclusively** used for declaration separators
 - Users must use `o9` or `comp` for relational composition
 
-**Reference**: [parser.py:1670-1683](../src/txt2tex/parser.py:1670-1683)
+**Reference**: `parser.py` - operator handling
 
 **Reason**: Ambiguity between:
 - `R ; S` (relational composition - now unsupported)
@@ -248,7 +245,7 @@ if (
     return f"{outer_latex} ({inner_latex} {args_latex})"
 ```
 
-**Reference**: [latex_gen.py:712-733](../src/txt2tex/latex_gen.py:712-733)
+**Reference**: `latex_gen.py` - nested function handling
 
 ---
 
@@ -310,7 +307,7 @@ No standard functions exist for 3-tuples, 4-tuples, or n-tuples.
 - Solution 41(a): Uses `e.1`, `(r(i1)).1`, `(r(i1)).3` → Wrapped in TEXT blocks
 - Solution 41(b): Uses `e.2`, `e.3`, `e.5`, `e.6`, `e.7` → Currently unwrapped (generates fuzz errors)
 
-**See also**: [FUZZ_FEATURE_GAPS.md](FUZZ_FEATURE_GAPS.md) for implementation status
+**See also**: [MISSING_FEATURES.md](MISSING_FEATURES.md) for missing features
 
 ---
 
@@ -328,7 +325,7 @@ No standard functions exist for 3-tuples, 4-tuples, or n-tuples.
 
 **txt2tex behavior**: Generates underscores in LaTeX, but fuzz type checking will fail
 
-**Reference**: [STATUS.md:359-367](../STATUS.md:359-367)
+**Note**: See [MISSING_FEATURES.md](MISSING_FEATURES.md) for known limitations
 
 ---
 
@@ -349,7 +346,7 @@ if node.quantifier == "mu" and self.use_fuzz:
     return f"({quant_latex} {vars} : {domain} | {body})"
 ```
 
-**Reference**: [latex_gen.py:535-554](../src/txt2tex/latex_gen.py:535-554)
+**Reference**: `latex_gen.py` - mu expression generation
 
 **Examples**:
 
@@ -387,11 +384,11 @@ Generates:
 
 When implementing new features, test both modes:
 ```bash
-# Standard LaTeX mode (default)
+# Fuzz mode (default - type checking enabled)
 hatch run convert file.txt
 
-# Fuzz mode (type checking enabled)
-hatch run convert file.txt --fuzz
+# zed-* packages mode (no fuzz type checking)
+hatch run convert file.txt --zed
 ```
 
 **Important**: Create minimal test cases in /tmp first before modifying production code.
@@ -486,7 +483,7 @@ def test_feature_fuzz_mode(self) -> None:
     # ... test fuzz-specific output ...
 ```
 
-**Example**: [test_semicolon_declarations.py:280-335](../tests/test_06_definitions/test_semicolon_declarations.py:280-335)
+**Example**: `tests/test_06_definitions/test_semicolon_declarations.py`
 
 ### Manual Fuzz Verification
 
@@ -509,12 +506,9 @@ pdftotext test.pdf -  # Check rendering
 
 ## References
 
-- **Fuzz Manual**: [docs/fuzz/part*.pdf](../docs/fuzz/) - Official fuzz documentation
-- **Fuzz Package**: `hw/fuzz.sty` - Local copy of fuzz.sty with font definitions
-- **Feature Gaps**: [FUZZ_FEATURE_GAPS.md](FUZZ_FEATURE_GAPS.md) - Features from manual not yet implemented
-- **txt2tex Implementation**:
-  - [latex_gen.py](../src/txt2tex/latex_gen.py) - LaTeX generation with fuzz support
-  - [parser.py](../src/txt2tex/parser.py) - Parser aware of fuzz limitations
+- **Fuzz Package**: Available at [github.com/jmf-pobox/fuzz](https://github.com/jmf-pobox/fuzz)
+- **Missing Features**: [MISSING_FEATURES.md](MISSING_FEATURES.md) - Features not yet implemented
+- **txt2tex Implementation**: `src/txt2tex/latex_gen.py` and `src/txt2tex/parser.py`
 
 ---
 
@@ -529,4 +523,4 @@ pdftotext test.pdf -  # Check rendering
 
 ### Known Limitations
 
-See [FUZZ_FEATURE_GAPS.md](FUZZ_FEATURE_GAPS.md) for complete list of fuzz features not yet supported by txt2tex.
+See [MISSING_FEATURES.md](MISSING_FEATURES.md) for complete list of fuzz features not yet supported by txt2tex.
