@@ -6,6 +6,7 @@ This review analyzes the `src/txt2tex` codebase for code quality issues beyond w
 
 Key findings:
 - parser.py (4213 LOC), latex_gen.py (4770 LOC), and lexer.py (1282 LOC) are very large
+- **Extreme cyclomatic complexity**: lexer methods at CC 172 and 143; average CC is 19.8
 - Long isinstance chains instead of visitor/dispatch increase rigidity
 - Broad Exception handling hides defects and complicates debugging
 - Incomplete docstrings and Phase-only references reduce approachability
@@ -93,6 +94,50 @@ Status: **Partially addressed** - `PROSE_WORDS` extracted. Operator maps remain 
 Remaining work:
 - Consider extracting operator maps from `latex_gen.py` to constants
 
+### Complexity Hotspots
+
+Run `hatch run complexity` to get current metrics. Average complexity: C (19.8).
+
+#### Critical (F grade, CC > 40)
+
+| Method | CC | File:Line | Reduction Strategy |
+|--------|----|-----------|--------------------|
+| `Lexer._scan_token` | 172 | lexer.py:138 | Extract token-type handlers into separate methods; use dispatch table keyed by first character |
+| `Lexer._scan_identifier` | 143 | lexer.py:743 | Extract keyword lookup into helper; split Unicode vs ASCII paths; use lookup table for reserved words |
+| `LaTeXGenerator._process_inline_math` | 69 | latex_gen.py:2470 | Extract pattern-matching phases into separate methods (sequences, operators, brackets); chain transformations |
+| `Parser._parse_postfix` | 41 | parser.py:2468 | Extract each postfix operator (function app, projection, indexing) into dedicated `_parse_*_postfix` methods |
+
+#### Severe (E grade, CC 31-40)
+
+| Method | CC | File:Line | Reduction Strategy |
+|--------|----|-----------|--------------------|
+| `LaTeXGenerator._has_line_breaks` | 37 | latex_gen.py:503 | Use `singledispatch` or visitor pattern; one handler per AST node type |
+| `LaTeXGenerator._generate_proof_node_infer` | 37 | latex_gen.py:3931 | Extract premise formatting, conclusion formatting, and justification handling into helpers |
+| `Parser._parse_syntax_block` | 36 | parser.py:3288 | Extract priority/associativity parsing into dedicated methods |
+| `LaTeXGenerator._generate_part` | 31 | latex_gen.py:1647 | Extract subpart handling, list generation, and label formatting into helpers |
+| `Lexer` (class) | 31 | lexer.py:22 | N/A - class-level complexity from method count |
+
+#### High (D grade, CC 21-30)
+
+| Method | CC | File:Line |
+|--------|----|-----------| 
+| `LaTeXGenerator._generate_complex_assumption_scope` | 29 | latex_gen.py:4189 |
+| `Parser._parse_document_item` | 27 | parser.py:587 |
+| `LaTeXGenerator._generate_identifier` | 25 | latex_gen.py:620 |
+| `LaTeXGenerator._convert_comparison_operators` | 25 | latex_gen.py:2152 |
+| `Parser._parse_proof_node` | 24 | parser.py:4032 |
+| `LaTeXGenerator.generate_document_item` | 24 | latex_gen.py:428 |
+| `LaTeXGenerator.generate_expr` | 23 | latex_gen.py:566 |
+| `Parser.parse` | 21 | parser.py:167 |
+| `LaTeXGenerator._generate_unary_op` | 21 | latex_gen.py:747 |
+
+#### Refactoring Priority
+
+1. **Lexer methods** (CC 172, 143): Highest impact - these dwarf all others. Use dispatch tables and extract character-class handlers.
+2. **`_process_inline_math`** (CC 69): Complex text transformation. Decompose into pipeline stages.
+3. **`_parse_postfix`** (CC 41): Operator-specific handlers reduce branching.
+4. **Proof/syntax methods** (CC 31-37): Extract formatting helpers.
+
 ### Complex Nested Conditionals
 
 Location: Tuple/field projection parsing and ambiguity handling in `parser.py` has deep nesting and multiple early breaks.
@@ -123,18 +168,21 @@ Recommendation:
 ### Recommendations Summary (Prioritized)
 
 High priority:
-1. Split large files into cohesive modules with re-export shims; no behavior changes
-2. Replace isinstance dispatch with singledispatch/registry; reuse existing generators
-3. Replace broad exception handling with specific catches and improved messages
+1. **Reduce lexer complexity** (CC 172, 143): Extract token handlers into dispatch tables; split `_scan_identifier` into keyword lookup + character classification helpers
+2. **Reduce `_process_inline_math` complexity** (CC 69): Decompose into pipeline stages for different transformation patterns
+3. Split large files into cohesive modules with re-export shims; no behavior changes
+4. Replace isinstance dispatch with singledispatch/registry; reuse existing generators
+5. Replace broad exception handling with specific catches and improved messages
 
 Medium priority:
-4. Centralize fuzz-mode decisions into helpers/strategies
-5. Improve docstrings (Args/Returns/Raises) and link “Phase X” to docs
-6. Extract magic strings/keyword sets to constants
+6. Reduce parser/generator D-grade methods (CC 21-30) by extracting helpers
+7. Centralize fuzz-mode decisions into helpers/strategies
+8. Improve docstrings (Args/Returns/Raises) and link "Phase X" to docs
+9. Extract magic strings/keyword sets to constants
 
 Low priority:
-7. Extract complex parser conditionals into named helpers
-8. Enhance error messages with “did you mean”/guidance where feasible
+10. Extract complex parser conditionals into named helpers
+11. Enhance error messages with "did you mean"/guidance where feasible
 
 ### Refactoring Guardrails
 
