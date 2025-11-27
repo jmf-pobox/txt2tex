@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import sys
 from functools import singledispatchmethod
 from typing import ClassVar, cast
 
@@ -287,8 +288,8 @@ class LaTeXGenerator:
         Args:
             latex: The generated LaTeX string to check.
             source_line: Source file line number for the warning.
-            context: Description of where the overflow occurs (e.g., "axdef where clause").
-            content_preview: Optional preview of source content for the warning message.
+            context: Description of where overflow occurs (e.g., "axdef where").
+            content_preview: Optional preview of source content for warning.
         """
         if not self._warn_overflow:
             return
@@ -715,9 +716,7 @@ class LaTeXGenerator:
         raise TypeError(f"Unknown expression type: {type(expr).__name__}")
 
     @generate_expr.register(Identifier)
-    def _generate_identifier(
-        self, node: Identifier, parent: Expr | None = None
-    ) -> str:
+    def _generate_identifier(self, node: Identifier, parent: Expr | None = None) -> str:
         """Generate LaTeX for identifier with smart underscore handling.
 
         Handles three cases:
@@ -3771,11 +3770,20 @@ class LaTeXGenerator:
                             )
                             break
 
+                # Build full declaration line for overflow check
+                decl_line = f"{var_latex} : {type_latex}"
+                self._check_overflow(
+                    decl_line,
+                    decl.type_expr.line,
+                    "axdef declaration",
+                    f"{decl.variable} : ...",
+                )
+
                 # Add line break after each declaration except the last
                 if i < len(node.declarations) - 1:
-                    lines.append(f"{var_latex} : {type_latex} \\\\")
+                    lines.append(f"{decl_line} \\\\")
                 else:
-                    lines.append(f"{var_latex} : {type_latex}")
+                    lines.append(decl_line)
 
         # Generate where clause if predicate groups exist
         if node.predicates and any(group for group in node.predicates):
@@ -3787,6 +3795,14 @@ class LaTeXGenerator:
                 for pred_idx, pred in enumerate(group):
                     # Top-level predicates: pass parent=None for smart parenthesization
                     pred_latex = self.generate_expr(pred, parent=None)
+
+                    # Check for overflow in where clause predicates
+                    self._check_overflow(
+                        pred_latex,
+                        pred.line,
+                        "axdef where clause",
+                    )
+
                     # Use \\ as separator within group
                     if pred_idx < len(group) - 1:
                         lines.append(f"{pred_latex} \\\\")
@@ -3845,11 +3861,20 @@ class LaTeXGenerator:
                             )
                             break
 
+                # Build full declaration line for overflow check
+                decl_line = f"  {var_latex}: {type_latex}"
+                self._check_overflow(
+                    decl_line,
+                    decl.type_expr.line,
+                    "gendef declaration",
+                    f"{decl.variable} : ...",
+                )
+
                 # Add line break after each declaration except the last
                 if i < len(node.declarations) - 1:
-                    lines.append(f"  {var_latex}: {type_latex} \\\\")
+                    lines.append(f"{decl_line} \\\\")
                 else:
-                    lines.append(f"  {var_latex}: {type_latex}")
+                    lines.append(decl_line)
 
         # Generate where clause if predicate groups exist
         if node.predicates and any(group for group in node.predicates):
@@ -3861,6 +3886,14 @@ class LaTeXGenerator:
                 for pred_idx, pred in enumerate(group):
                     # Top-level predicates: pass parent=None for smart parenthesization
                     pred_latex = self.generate_expr(pred, parent=None)
+
+                    # Check for overflow in where clause predicates
+                    self._check_overflow(
+                        pred_latex,
+                        pred.line,
+                        "gendef where clause",
+                    )
+
                     # Fuzz requires \\ after each predicate except the last in group
                     if self.use_fuzz and pred_idx < len(group) - 1:
                         lines.append(f"  {pred_latex} \\\\")
@@ -3903,7 +3936,13 @@ class LaTeXGenerator:
                 # Generate given types: [A, B, C]
                 if isinstance(item, GivenType):
                     names_str = ", ".join(item.names)
-                    lines.append(f"[{names_str}]")
+                    given_line = f"[{names_str}]"
+                    self._check_overflow(
+                        given_line,
+                        item.line,
+                        "zed given types",
+                    )
+                    lines.append(given_line)
 
                 # Generate free types: Type ::= branch1 | branch2
                 elif isinstance(item, FreeType):
@@ -3916,7 +3955,14 @@ class LaTeXGenerator:
                             branch_str = f"{branch.name} \\ldata {params_latex} \\rdata"
                             branch_strs.append(branch_str)
                     branches_str = " | ".join(branch_strs)
-                    lines.append(f"{item.name} ::= {branches_str}")
+                    free_type_line = f"{item.name} ::= {branches_str}"
+                    self._check_overflow(
+                        free_type_line,
+                        item.line,
+                        "zed free type",
+                        f"{item.name} ::= ...",
+                    )
+                    lines.append(free_type_line)
 
                 # Generate abbreviations: Name == expression
                 elif isinstance(item, Abbreviation):
@@ -3926,17 +3972,34 @@ class LaTeXGenerator:
                     )
                     if item.generic_params:
                         params_str = ", ".join(item.generic_params)
-                        lines.append(f"{name_latex}[{params_str}] == {expr_latex}")
+                        abbrev_line = f"{name_latex}[{params_str}] == {expr_latex}"
                     else:
-                        lines.append(f"{name_latex} == {expr_latex}")
+                        abbrev_line = f"{name_latex} == {expr_latex}"
+                    self._check_overflow(
+                        abbrev_line,
+                        item.line,
+                        "zed abbreviation",
+                        f"{item.name} == ...",
+                    )
+                    lines.append(abbrev_line)
 
                 # Generate expressions/predicates
                 elif isinstance(item, Expr):
                     content_latex = self.generate_expr(item)
+                    self._check_overflow(
+                        content_latex,
+                        item.line,
+                        "zed predicate",
+                    )
                     lines.append(f"{content_latex}")
         else:
             # Single expression (backward compatible)
             content_latex = self.generate_expr(node.content)
+            self._check_overflow(
+                content_latex,
+                node.content.line,
+                "zed predicate",
+            )
             lines.append(f"{content_latex}")
 
         lines.append(r"\end{zed}")
@@ -3964,6 +4027,9 @@ class LaTeXGenerator:
             )
         else:
             schema_name = ""
+
+        # Context for overflow warnings
+        schema_context = f"schema {schema_name}" if schema_name else "anonymous schema"
 
         # Add generic parameters if present
         if node.generic_params:
@@ -4002,11 +4068,20 @@ class LaTeXGenerator:
                             )
                             break
 
+                # Build full declaration line for overflow check
+                decl_line = f"{var_latex} : {type_latex}"
+                self._check_overflow(
+                    decl_line,
+                    decl.type_expr.line,
+                    f"{schema_context} declaration",
+                    f"{decl.variable} : ...",
+                )
+
                 # Add line break after each declaration except the last
                 if i < len(node.declarations) - 1:
-                    lines.append(f"{var_latex} : {type_latex} \\\\")
+                    lines.append(f"{decl_line} \\\\")
                 else:
-                    lines.append(f"{var_latex} : {type_latex}")
+                    lines.append(decl_line)
 
         # Generate where clause if predicate groups exist
         if node.predicates and any(group for group in node.predicates):
@@ -4018,6 +4093,14 @@ class LaTeXGenerator:
                 for pred_idx, pred in enumerate(group):
                     # Top-level predicates: pass parent=None for smart parenthesization
                     pred_latex = self.generate_expr(pred, parent=None)
+
+                    # Check for overflow in where clause predicates
+                    self._check_overflow(
+                        pred_latex,
+                        pred.line,
+                        f"{schema_context} where clause",
+                    )
+
                     # Use \\ as separator within group
                     if pred_idx < len(group) - 1:
                         lines.append(f"{pred_latex} \\\\")
