@@ -20,9 +20,9 @@
 \bigskip
 
 \begin{axdef}
-f : \seq~\nat \fun \nat
-\where
-f(\langle \rangle) = 0
+  f : \seq~\nat \fun \nat
+  \where
+  f(\langle \rangle) = 0
 \end{axdef}
 
 \section*{Example 2 : Cons Pattern ( Head land Tail )}
@@ -33,10 +33,10 @@ f(\langle \rangle) = 0
 \bigskip
 
 \begin{axdef}
-g : \seq~\nat \fun \nat
-\where
-g(\langle \rangle) = 0 \\
-\forall x : \nat @ \forall s : \seq~\nat @ g(\langle x \rangle \cat s) = x
+  g : \seq~\nat \fun \nat
+  \where
+  g(\langle \rangle) = 0 \\
+  \forall x : \nat @ \forall s : \seq~\nat @ g(\langle x \rangle \cat s) = x
 \end{axdef}
 
 \section*{Example 3 : Recursive Sum}
@@ -47,10 +47,11 @@ g(\langle \rangle) = 0 \\
 \bigskip
 
 \begin{axdef}
-total : \seq~\nat \fun \nat
-\where
-total(\langle \rangle) = 0 \\
-\forall x : \nat @ \forall s : \seq~\nat @ total(\langle x \rangle \cat s) = x + total(s)
+  total : \seq~\nat \fun \nat
+  \where
+  total(\langle \rangle) = 0 \\
+  \forall x : \nat @ \forall s : \seq~\nat @ total(\langle x \rangle
+  \cat s) = x + total(s)
 \end{axdef}
 
 \section*{Example 4 : Cumulative Total}
@@ -61,10 +62,11 @@ total(\langle \rangle) = 0 \\
 \bigskip
 
 \begin{axdef}
-cumulative\_total : \seq~\nat \fun \nat
-\where
-cumulative\_total(\langle \rangle) = 0 \\
-\forall x : \nat @ \forall s : \seq~\nat @ cumulative\_total(\langle x \rangle \cat s) = x + cumulative\_total(s)
+  cumulative\_total : \seq~\nat \fun \nat
+  \where
+  cumulative\_total(\langle \rangle) = 0 \\
+  \forall x : \nat @ \forall s : \seq~\nat @
+  cumulative\_total(\langle x \rangle \cat s) = x + cumulative\_total(s)
 \end{axdef}
 
 \section*{Example 5 : Filter Pattern}
@@ -75,10 +77,12 @@ cumulative\_total(\langle \rangle) = 0 \\
 \bigskip
 
 \begin{axdef}
-positives : \seq~\num \fun \seq~\num
-\where
-positives(\langle \rangle) = \langle \rangle \\
-\forall x : \num @ \forall s : \seq~\num @ positives(\langle x \rangle \cat s) = \IF x > 0 \THEN \langle x \rangle \cat positives(s) \ELSE positives(s)
+  positives : \seq~\num \fun \seq~\num
+  \where
+  positives(\langle \rangle) = \langle \rangle \\
+  \forall x : \num @ \forall s : \seq~\num @ positives(\langle x
+  \rangle \cat s) = \IF x > 0 \THEN \langle x \rangle \cat
+  positives(s) \ELSE positives(s)
 \end{axdef}
 
 \end{document}

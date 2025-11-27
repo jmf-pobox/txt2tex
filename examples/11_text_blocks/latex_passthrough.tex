@@ -53,7 +53,7 @@
 
 \begin{center}
 
-\textbf{\Large This text is centered, bold, and large}
+  \textbf{\Large This text is centered, bold, and large}
 
 \end{center}
 
@@ -70,11 +70,12 @@
 
 \begin{center}
 
-\fbox{\parbox{0.8\textwidth}{
+  \fbox{\parbox{0.8\textwidth}{
 
-This text appears in a framed box. You can use this to highlight important definitions or theorems.
+      This text appears in a framed box. You can use this to
+      highlight important definitions or theorems.
 
-}}
+  }}
 
 \end{center}
 
@@ -87,11 +88,11 @@ This text appears in a framed box. You can use this to highlight important defin
 
 \begin{description}
 
-\item[Precondition:] The input must be a natural number
+  \item[Precondition:] The input must be a natural number
 
-\item[Postcondition:] The output is the square of the input
+  \item[Postcondition:] The output is the square of the input
 
-\item[Invariant:] The result is always non-negative
+  \item[Invariant:] The result is always non-negative
 
 \end{description}
 
@@ -104,7 +105,7 @@ This text appears in a framed box. You can use this to highlight important defin
 
 \begin{quotation}
 
-\textbf{Theorem 1.} For all natural numbers $n$, we have $n \geq 0$.
+  \textbf{Theorem 1.} For all natural numbers $n$, we have $n \geq 0$.
 
 \end{quotation}
 
@@ -121,7 +122,8 @@ This text appears in a framed box. You can use this to highlight important defin
 
 \clearpage
 
-\noindent The clearpage command forces a page break and flushes all pending floats.
+\noindent The clearpage command forces a page break and flushes all
+pending floats.
 
 \bigskip
 
@@ -133,16 +135,17 @@ This text appears in a framed box. You can use this to highlight important defin
 \bigskip
 
 \begin{axdef}
-example : \nat
-\where
-example = 42
+  example : \nat
+  \where
+  example = 42
 \end{axdef}
 
 \medskip
 
 \noindent\textit{Note:} The above defines a constant with value 42.
 
-\noindent This demonstrates the flexibility of mixing txt2tex notation with raw LaTeX.
+\noindent This demonstrates the flexibility of mixing txt2tex
+notation with raw LaTeX.
 
 \bigskip
 
@@ -159,7 +162,8 @@ example = 42
 
 % \spec{Specification} is shown in small caps.
 
-\noindent The LATEX directive is your escape hatch for any LaTeX feature not directly supported by txt2tex.
+\noindent The LATEX directive is your escape hatch for any LaTeX
+feature not directly supported by txt2tex.
 
 \bigskip
 

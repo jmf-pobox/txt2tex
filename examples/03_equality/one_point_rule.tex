@@ -15,19 +15,20 @@
 \section*{Example 1 : Simple One - Point Rule}
 \addcontentsline{toc}{section}{Example 1 : Simple One - Point Rule}
 
-\noindent When a quantifier binds a variable that is constrained by equality, we can eliminate the quantifier:
+\noindent When a quantifier binds a variable that is constrained by
+equality, we can eliminate the quantifier:
 
 \bigskip
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\begin{array}{l@{\hspace{2em}}r}
-\exists y : \nat @ y = 5 \land x > y \\
-\Leftrightarrow 5 \in \nat \land x > 5 & [\mbox{one - point rule}] \\
-\Leftrightarrow x > 5
-\end{array}$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \exists y : \nat @ y = 5 \land x > y \\
+      \Leftrightarrow 5 \in \nat \land x > 5 & [\mbox{one - point rule}] \\
+      \Leftrightarrow x > 5
+    \end{array}$%
+  }
 \end{center}
 \bigskip
 
@@ -35,15 +36,15 @@ $\displaystyle
 \addcontentsline{toc}{section}{Example 2 : One - Point with Set Membership}
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\begin{array}{l@{\hspace{2em}}r}
-\exists x, y : \nat @ x + y = 4 \land x < y \\
-\Leftrightarrow \exists x, y : \nat @ y = 4 - x \land x < y \\
-\Leftrightarrow \exists x : \nat @ 4 - x \in \nat \land x < 4 - x \\
-\Leftrightarrow true
-\end{array}$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \exists x, y : \nat @ x + y = 4 \land x < y \\
+      \Leftrightarrow \exists x, y : \nat @ y = 4 - x \land x < y \\
+      \Leftrightarrow \exists x : \nat @ 4 - x \in \nat \land x < 4 - x \\
+      \Leftrightarrow true
+    \end{array}$%
+  }
 \end{center}
 \bigskip
 
@@ -55,16 +56,18 @@ $\displaystyle
 \addcontentsline{toc}{section}{Example 3 : One - Point with Disjunction}
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\begin{array}{l@{\hspace{2em}}r}
-\exists x : \nat @ (x = 1 \land x > y) \lor (x = 2 \land x > z) \\
-\Leftrightarrow (\exists x : \nat @ x = 1 \land x > y) \lor (\exists x : \nat @ x = 2 \land x > z) \\
-\Leftrightarrow (1 \in \nat \land 1 > y) \lor (\exists x : \nat @ x = 2 \land x > z) \\
-\Leftrightarrow (1 \in \nat \land 1 > y) \lor (2 \in \nat \land 2 > z) \\
-\Leftrightarrow 1 > y \lor 2 > z
-\end{array}$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \exists x : \nat @ (x = 1 \land x > y) \lor (x = 2 \land x > z) \\
+      \Leftrightarrow (\exists x : \nat @ x = 1 \land x > y) \lor
+      (\exists x : \nat @ x = 2 \land x > z) \\
+      \Leftrightarrow (1 \in \nat \land 1 > y) \lor (\exists x : \nat
+      @ x = 2 \land x > z) \\
+      \Leftrightarrow (1 \in \nat \land 1 > y) \lor (2 \in \nat \land 2 > z) \\
+      \Leftrightarrow 1 > y \lor 2 > z
+    \end{array}$%
+  }
 \end{center}
 \bigskip
 
@@ -72,14 +75,15 @@ $\displaystyle
 \addcontentsline{toc}{section}{Example 4 : One - Point with Expression Part}
 
 \begin{center}
-\adjustbox{max width=\textwidth}{%
-$\displaystyle
-\begin{array}{l@{\hspace{2em}}r}
-\exists y : \nat @ y = x + 1 \land y > 0 \\
-\Leftrightarrow x + 1 \in \nat \land x + 1 > 0 & [\mbox{one - point rule}] \\
-\Leftrightarrow x + 1 > 0
-\end{array}$%
-}
+  \adjustbox{max width=\textwidth}{%
+    $\displaystyle
+    \begin{array}{l@{\hspace{2em}}r}
+      \exists y : \nat @ y = x + 1 \land y > 0 \\
+      \Leftrightarrow x + 1 \in \nat \land x + 1 > 0 & [\mbox{one -
+      point rule}] \\
+      \Leftrightarrow x + 1 > 0
+    \end{array}$%
+  }
 \end{center}
 \bigskip
 

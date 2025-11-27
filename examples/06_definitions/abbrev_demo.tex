@@ -20,12 +20,12 @@
 \bigskip
 
 \begin{axdef}
-f : \nat \pinj \nat
-\where
-\dom f = \{1, 2, 3\} \\
-f(1) = 10 \\
-f(2) = 20 \\
-f(3) = 30
+  f : \nat \pinj \nat
+  \where
+  \dom f = \{1, 2, 3\} \\
+  f(1) = 10 \\
+  f(2) = 20 \\
+  f(3) = 30
 \end{axdef}
 
 \section*{Example 2 : Partial function operator}
@@ -36,11 +36,11 @@ f(3) = 30
 \bigskip
 
 \begin{axdef}
-g : \nat \pfun \nat
-\where
-\dom g = \{1, 2\} \\
-g(1) = 100 \\
-g(2) = 200
+  g : \nat \pfun \nat
+  \where
+  \dom g = \{1, 2\} \\
+  g(1) = 100 \\
+  g(2) = 200
 \end{axdef}
 
 \section*{Example 3 : Complex types with partial injection}
@@ -51,21 +51,21 @@ g(2) = 200
 \bigskip
 
 \begin{zed}
-Year == \nat
+  Year == \nat
 \end{zed}
 
 \begin{zed}
-[EntryAD]
+  [EntryAD]
 \end{zed}
 
 \begin{zed}
-TableAD == \seq~EntryAD
+  TableAD == \seq~EntryAD
 \end{zed}
 
 \begin{axdef}
-recordsAD : Year \pinj TableAD
-\where
-\dom recordsAD = \{1993, 1994, 1995\}
+  recordsAD : Year \pinj TableAD
+  \where
+  \dom recordsAD = \{1993, 1994, 1995\}
 \end{axdef}
 
 \section*{Example 4 : Mixed function type operators}
@@ -76,9 +76,9 @@ recordsAD : Year \pinj TableAD
 \bigskip
 
 \begin{axdef}
-total : \nat \fun \nat \\
-partial : \nat \pfun \nat \\
-injection : \nat \pinj \nat
+  total : \nat \fun \nat \\
+  partial : \nat \pfun \nat \\
+  injection : \nat \pinj \nat
 \end{axdef}
 
 \end{document}

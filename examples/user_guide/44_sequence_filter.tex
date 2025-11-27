@@ -11,14 +11,14 @@
 \begin{document}
 
 \begin{schema}{Entry}
-viewed : \nat
+  viewed : \nat
 \end{schema}
 
 \begin{axdef}
-records : \seq~Entry \\
-yes : \nat
-\where
-records \filter \{~ x : Entry | x.viewed = yes ~\} = \langle \rangle
+  records : \seq~Entry \\
+  yes : \nat
+  \where
+  records \filter \{~ x : Entry | x.viewed = yes ~\} = \langle \rangle
 \end{axdef}
 
 \end{document}

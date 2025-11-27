@@ -21,7 +21,7 @@
 
 \begin{gendef}[X, Y]
   apply: (X \fun Y) \fun (X \fun Y)
-\where
+  \where
   \forall f : X \fun Y @ \forall x : X @ apply(f)(x) = f(x)
 \end{gendef}
 
@@ -33,11 +33,11 @@
 \addcontentsline{toc}{section}{Example 2 : Using Apply}
 
 \begin{axdef}
-square : \nat \fun \nat \\
-result : \nat
-\where
-\forall n : \nat @ square(n) = n * n \\
-result = apply(square)(5)
+  square : \nat \fun \nat \\
+  result : \nat
+  \where
+  \forall n : \nat @ square(n) = n * n \\
+  result = apply(square)(5)
 \end{axdef}
 
 \noindent $result = 25$
@@ -53,8 +53,9 @@ result = apply(square)(5)
 
 \begin{gendef}[A, B, C]
   compose: (B \fun C) \cross (A \fun B) \fun (A \fun C)
-\where
-  \forall f : B \fun C @ \forall g : A \fun B @ \forall x : A @ compose(f, g)(x) = f(g(x))
+  \where
+  \forall f : B \fun C @ \forall g : A \fun B @ \forall x : A @
+  compose(f, g)(x) = f(g(x))
 \end{gendef}
 
 \noindent compose takes two functions and returns their composition.
@@ -65,13 +66,13 @@ result = apply(square)(5)
 \addcontentsline{toc}{section}{Example 4 : Using Compose}
 
 \begin{axdef}
-addOne : \nat \fun \nat \\
-double : \nat \fun \nat \\
-addOneAndDouble : \nat \fun \nat
-\where
-\forall n : \nat @ addOne(n) = n + 1 \\
-\forall n : \nat @ double(n) = 2 * n \\
-addOneAndDouble = compose(double, addOne)
+  addOne : \nat \fun \nat \\
+  double : \nat \fun \nat \\
+  addOneAndDouble : \nat \fun \nat
+  \where
+  \forall n : \nat @ addOne(n) = n + 1 \\
+  \forall n : \nat @ double(n) = 2 * n \\
+  addOneAndDouble = compose(double, addOne)
 \end{axdef}
 
 \noindent addOneAndDouble(5) = double(addOne(5)) = double(6) = 12
@@ -87,7 +88,7 @@ addOneAndDouble = compose(double, addOne)
 
 \begin{gendef}[X]
   twice: (X \fun X) \fun (X \fun X)
-\where
+  \where
   \forall f : X \fun X @ \forall x : X @ twice(f)(x) = f(f(x))
 \end{gendef}
 
@@ -99,11 +100,11 @@ addOneAndDouble = compose(double, addOne)
 \addcontentsline{toc}{section}{Example 6 : Using Twice}
 
 \begin{axdef}
-increment : \nat \fun \nat \\
-addTwo : \nat \fun \nat
-\where
-\forall n : \nat @ increment(n) = n + 1 \\
-addTwo = twice(increment)
+  increment : \nat \fun \nat \\
+  addTwo : \nat \fun \nat
+  \where
+  \forall n : \nat @ increment(n) = n + 1 \\
+  addTwo = twice(increment)
 \end{axdef}
 
 \noindent addTwo(5) = increment(increment(5)) = 7
@@ -119,21 +120,23 @@ addTwo = twice(increment)
 
 \begin{gendef}[X, Y]
   constant: Y \fun (X \fun Y)
-\where
+  \where
   \forall y : Y @ \forall x : X @ constant(y)(x) = y
 \end{gendef}
 
-\noindent constant takes a value and returns a function that always returns that value.
+\noindent constant takes a value and returns a function that always
+returns that value.
 
 \bigskip
 
 \section*{Example 8 : Using Lambda with Higher - Order Functions}
-\addcontentsline{toc}{section}{Example 8 : Using Lambda with Higher - Order Functions}
+\addcontentsline{toc}{section}{Example 8 : Using Lambda with Higher -
+Order Functions}
 
 \begin{axdef}
-resultLambda : \nat
-\where
-resultLambda = apply(\lambda x : \nat @ x * x)(7)
+  resultLambda : \nat
+  \where
+  resultLambda = apply(\lambda x : \nat @ x * x)(7)
 \end{axdef}
 
 \noindent $resultLambda = 49$
@@ -149,8 +152,9 @@ resultLambda = apply(\lambda x : \nat @ x * x)(7)
 
 \begin{gendef}[X, Y, Z]
   flip: (X \cross Y \fun \num) \fun (Y \cross X \fun \num)
-\where
-  \forall f : X \cross Y \fun \num @ \forall x : X @ \forall y : Y @ flip(f)(y, x) = f(x, y)
+  \where
+  \forall f : X \cross Y \fun \num @ \forall x : X @ \forall y : Y @
+  flip(f)(y, x) = f(x, y)
 \end{gendef}
 
 \noindent flip swaps the order of arguments to a function.

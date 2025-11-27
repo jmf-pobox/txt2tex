@@ -12,16 +12,14 @@
 
 \section*{Bug 13 Test : Field Projection on Function Application}
 
-\begin{zed}[Programme]\end{zed}
-
 \begin{schema}{Programme}
-length : \nat
+  length : \nat
 \end{schema}
 
 \begin{axdef}
-f : \nat \fun Programme
-\where
-\forall i : \nat @ f(i).length > 0
+  f : \nat \fun Programme
+  \where
+  \forall i : \nat @ \forall p : Programme @ p = f(i) \implies p.length > 0
 \end{axdef}
 
 \end{document}

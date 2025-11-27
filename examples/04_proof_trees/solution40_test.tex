@@ -13,7 +13,7 @@
 \section*{Recursive Function Examples}
 
 \begin{zed}
-[EntryS40]
+  [EntryS40]
 \end{zed}
 
 \noindent This file demonstrates recursive functions on sequences.
@@ -24,33 +24,37 @@
 \addcontentsline{toc}{section}{Example 1 : Simple recursive function}
 
 \begin{axdef}
-length : \seq~EntryS40 \fun \nat
-\where
-length(\langle \rangle) = 0 \\
-\forall x : EntryS40 @ \forall s : \seq~EntryS40 @ length(\langle x \rangle \cat s) = 1 + length(s)
+  length : \seq~EntryS40 \fun \nat
+  \where
+  length(\langle \rangle) = 0 \\
+  \forall x : EntryS40 @ \forall s : \seq~EntryS40 @ length(\langle x
+  \rangle \cat s) = 1 + length(s)
 \end{axdef}
 
 \section*{Example 2 : Identity function on sequences}
 \addcontentsline{toc}{section}{Example 2 : Identity function on sequences}
 
 \begin{axdef}
-identityS40 : \seq~EntryS40 \fun \seq~EntryS40
-\where
-identityS40(\langle \rangle) = \langle \rangle \\
-\forall x : EntryS40 @ \forall s : \seq~EntryS40 @ identityS40(\langle x \rangle \cat s) = \langle x \rangle \cat identityS40(s)
+  identityS40 : \seq~EntryS40 \fun \seq~EntryS40
+  \where
+  identityS40(\langle \rangle) = \langle \rangle \\
+  \forall x : EntryS40 @ \forall s : \seq~EntryS40 @
+  identityS40(\langle x \rangle \cat s) = \langle x \rangle \cat identityS40(s)
 \end{axdef}
 
 \section*{Example 3 : Sequence doubling}
 \addcontentsline{toc}{section}{Example 3 : Sequence doubling}
 
 \begin{axdef}
-duplicate : \seq~\nat \fun \seq~\nat
-\where
-duplicate(\langle \rangle) = \langle \rangle \\
-\forall n : \nat @ \forall s : \seq~\nat @ duplicate(\langle n \rangle \cat s) = \langle n, n \rangle \cat duplicate(s)
+  duplicate : \seq~\nat \fun \seq~\nat
+  \where
+  duplicate(\langle \rangle) = \langle \rangle \\
+  \forall n : \nat @ \forall s : \seq~\nat @ duplicate(\langle n
+  \rangle \cat s) = \langle n, n \rangle \cat duplicate(s)
 \end{axdef}
 
-\noindent These examples show pattern matching on sequences with base cases and recursive cases.
+\noindent These examples show pattern matching on sequences with base
+cases and recursive cases.
 
 \bigskip
 
