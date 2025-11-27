@@ -103,7 +103,7 @@ Run `hatch run complexity` to get current metrics. Average complexity: C (19.8).
 | Method | CC | File:Line | Reduction Strategy |
 |--------|----|-----------|--------------------|
 | `Lexer._scan_token` | 172 | lexer.py:138 | Extract token-type handlers into separate methods; use dispatch table keyed by first character |
-| `Lexer._scan_identifier` | 143 | lexer.py:743 | Extract keyword lookup into helper; split Unicode vs ASCII paths; use lookup table for reserved words |
+| `Lexer._scan_identifier` | 97 | lexer.py:812 | ~~Extract keyword lookup~~ (done); extract multi-word/colon keywords; extract prose detection |
 | `LaTeXGenerator._process_inline_math` | 69 | latex_gen.py:2470 | Extract pattern-matching phases into separate methods (sequences, operators, brackets); chain transformations |
 | `Parser._parse_postfix` | 41 | parser.py:2468 | Extract each postfix operator (function app, projection, indexing) into dedicated `_parse_*_postfix` methods |
 
@@ -133,10 +133,37 @@ Run `hatch run complexity` to get current metrics. Average complexity: C (19.8).
 
 #### Refactoring Priority
 
-1. **Lexer methods** (CC 172, 143): Highest impact - these dwarf all others. Use dispatch tables and extract character-class handlers.
+1. **Lexer methods** (CC 172, 97): Highest impact - these dwarf all others. Use dispatch tables and extract character-class handlers.
 2. **`_process_inline_math`** (CC 69): Complex text transformation. Decompose into pipeline stages.
 3. **`_parse_postfix`** (CC 41): Operator-specific handlers reduce branching.
 4. **Proof/syntax methods** (CC 31-37): Extract formatting helpers.
+
+### Complexity Reduction Progress
+
+This section tracks phased complexity reduction work.
+
+#### Phase 1: Lexer Keyword Lookup (Complete)
+
+**Branch**: `refactor/lexer-keyword-lookup`
+**Date**: 2025-11-27
+**Status**: ✅ Complete
+
+**Changes**:
+- Added `KEYWORD_TO_TOKEN` dictionary (40 keywords) and `KEYWORD_ALIASES` dictionary (2 aliases) to `lexer.py`
+- Replaced ~45 `if value == "keyword"` statements with single dictionary lookups
+
+**Results**:
+| Method | Before | After | Reduction |
+|--------|--------|-------|-----------|
+| `Lexer._scan_identifier` | F (143) | F (97) | -46 |
+| `Lexer` class | E (31) | D (27) | -4 |
+| Average complexity | 19.8 | 19.1 | -0.7 |
+
+**Remaining work for `_scan_identifier`** (CC 97):
+- Extract multi-word keyword handlers (TRUTH TABLE:)
+- Extract colon-terminated keyword handlers (TEXT:, LATEX:, TITLE:, etc.)
+- Extract prose detection logic into separate method
+- Extract A/An article handling
 
 ### Complex Nested Conditionals
 

@@ -4,6 +4,75 @@ from __future__ import annotations
 
 from txt2tex.tokens import Token, TokenType
 
+# Keyword to token type mapping for simple keywords.
+# This replaces ~40 individual if-statements in _scan_identifier,
+# reducing cyclomatic complexity significantly.
+KEYWORD_TO_TOKEN: dict[str, TokenType] = {
+    # Logical operators (LaTeX-style only)
+    "land": TokenType.AND,
+    "lor": TokenType.OR,
+    "lnot": TokenType.NOT,
+    # Quantifiers
+    "forall": TokenType.FORALL,
+    "exists1": TokenType.EXISTS1,
+    "exists": TokenType.EXISTS,
+    "mu": TokenType.MU,
+    "lambda": TokenType.LAMBDA,
+    # Set operators
+    "notin": TokenType.NOTIN,
+    "elem": TokenType.IN,
+    "psubset": TokenType.PSUBSET,
+    "union": TokenType.UNION,
+    "intersect": TokenType.INTERSECT,
+    "cross": TokenType.CROSS,
+    "bigcup": TokenType.BIGCUP,
+    "bigcap": TokenType.BIGCAP,
+    # Z notation keywords
+    "given": TokenType.GIVEN,
+    "axdef": TokenType.AXDEF,
+    "schema": TokenType.SCHEMA,
+    "gendef": TokenType.GENDEF,
+    "zed": TokenType.ZED,
+    "syntax": TokenType.SYNTAX,
+    "where": TokenType.WHERE,
+    "end": TokenType.END,
+    # Conditional expression keywords
+    "if": TokenType.IF,
+    "then": TokenType.THEN,
+    "else": TokenType.ELSE,
+    "otherwise": TokenType.OTHERWISE,
+    # Relation operators
+    "comp": TokenType.COMP,
+    "dom": TokenType.DOM,
+    "ran": TokenType.RAN,
+    "inv": TokenType.INV,
+    "id": TokenType.ID,
+    # Judgment operator
+    "shows": TokenType.SHOWS,
+    # Arithmetic
+    "mod": TokenType.MOD,
+    # Power set and finite set
+    "P1": TokenType.POWER1,
+    "P": TokenType.POWER,
+    "F1": TokenType.FINSET1,
+    "F": TokenType.FINSET,
+    # Sequence operators
+    "head": TokenType.HEAD,
+    "tail": TokenType.TAIL,
+    "last": TokenType.LAST,
+    "front": TokenType.FRONT,
+    "rev": TokenType.REV,
+    # Filter and bag operators
+    "filter": TokenType.FILTER,
+    "bag_union": TokenType.BAG_UNION,
+}
+
+# Keywords that map to the same token type (aliases)
+KEYWORD_ALIASES: dict[str, TokenType] = {
+    "subset": TokenType.SUBSET,
+    "subseteq": TokenType.SUBSET,
+}
+
 
 class LexerError(Exception):
     """Raised when lexer encounters invalid input."""
@@ -1143,131 +1212,14 @@ class Lexer:
                             TokenType.TEXT, text_content, start_line, start_column
                         )
 
-        # Check for keywords (propositional logic)
-        # Only LaTeX-style keywords supported: land, lor, lnot
-        if value == "land":
-            return Token(TokenType.AND, value, start_line, start_column)
-        if value == "lor":
-            return Token(TokenType.OR, value, start_line, start_column)
-        if value == "lnot":
-            return Token(TokenType.NOT, value, start_line, start_column)
+        # Check for keywords using lookup tables (replaces ~40 if-statements)
+        # This reduces cyclomatic complexity significantly
+        if value in KEYWORD_TO_TOKEN:
+            return Token(KEYWORD_TO_TOKEN[value], value, start_line, start_column)
 
-        # Check for quantifiers (Phase 3, enhanced in Phase 6-7)
-        if value == "forall":
-            return Token(TokenType.FORALL, value, start_line, start_column)
-        if value == "exists1":
-            return Token(TokenType.EXISTS1, value, start_line, start_column)
-        if value == "exists":
-            return Token(TokenType.EXISTS, value, start_line, start_column)
-        if value == "mu":
-            return Token(TokenType.MU, value, start_line, start_column)
-        if value == "lambda":
-            return Token(TokenType.LAMBDA, value, start_line, start_column)
-
-        # Check for set operators (Phase 3, enhanced in Phase 7, Phase 11.5)
-        # Only "elem" supported for set membership
-        if value == "notin":
-            return Token(TokenType.NOTIN, value, start_line, start_column)
-        if value == "elem":
-            return Token(TokenType.IN, value, start_line, start_column)
-        if value == "subset" or value == "subseteq":
-            return Token(TokenType.SUBSET, value, start_line, start_column)
-        # Check for strict/proper subset (Phase 39)
-        if value == "psubset":
-            return Token(TokenType.PSUBSET, value, start_line, start_column)
-        if value == "union":
-            return Token(TokenType.UNION, value, start_line, start_column)
-        if value == "intersect":
-            return Token(TokenType.INTERSECT, value, start_line, start_column)
-        if value == "cross":
-            return Token(TokenType.CROSS, value, start_line, start_column)
-
-        # Check for Z notation keywords (Phase 4)
-        if value == "given":
-            return Token(TokenType.GIVEN, value, start_line, start_column)
-        if value == "axdef":
-            return Token(TokenType.AXDEF, value, start_line, start_column)
-        if value == "schema":
-            return Token(TokenType.SCHEMA, value, start_line, start_column)
-        if value == "gendef":
-            return Token(TokenType.GENDEF, value, start_line, start_column)
-        if value == "zed":
-            return Token(TokenType.ZED, value, start_line, start_column)
-        if value == "syntax":
-            return Token(TokenType.SYNTAX, value, start_line, start_column)
-        if value == "where":
-            return Token(TokenType.WHERE, value, start_line, start_column)
-        if value == "end":
-            return Token(TokenType.END, value, start_line, start_column)
-
-        # Check for conditional expression keywords (Phase 16)
-        if value == "if":
-            return Token(TokenType.IF, value, start_line, start_column)
-        if value == "then":
-            return Token(TokenType.THEN, value, start_line, start_column)
-        if value == "else":
-            return Token(TokenType.ELSE, value, start_line, start_column)
-        if value == "otherwise":
-            return Token(TokenType.OTHERWISE, value, start_line, start_column)
-
-        # Check for relation functions (Phase 10a)
-        if value == "comp":
-            return Token(TokenType.COMP, value, start_line, start_column)
-        if value == "dom":
-            return Token(TokenType.DOM, value, start_line, start_column)
-        if value == "ran":
-            return Token(TokenType.RAN, value, start_line, start_column)
-
-        # Check for relation functions (Phase 10b)
-        if value == "inv":
-            return Token(TokenType.INV, value, start_line, start_column)
-        if value == "id":
-            return Token(TokenType.ID, value, start_line, start_column)
-
-        # Check for sequent judgment operator (shows)
-        if value == "shows":
-            return Token(TokenType.SHOWS, value, start_line, start_column)
-
-        # Check for arithmetic operators (modulo)
-        if value == "mod":
-            return Token(TokenType.MOD, value, start_line, start_column)
-
-        # Check for power set and finite set functions (Phase 11.5, enhanced Phase 19)
-        if value == "P1":
-            return Token(TokenType.POWER1, value, start_line, start_column)
-        if value == "P":
-            return Token(TokenType.POWER, value, start_line, start_column)
-        if value == "F1":
-            return Token(TokenType.FINSET1, value, start_line, start_column)
-        if value == "F":
-            return Token(TokenType.FINSET, value, start_line, start_column)
-
-        # Check for sequence operator keywords (Phase 12)
-        # Note: seq and seq1 are left as identifiers to support seq(X) and seq[X]
-        if value == "head":
-            return Token(TokenType.HEAD, value, start_line, start_column)
-        if value == "tail":
-            return Token(TokenType.TAIL, value, start_line, start_column)
-        if value == "last":
-            return Token(TokenType.LAST, value, start_line, start_column)
-        if value == "front":
-            return Token(TokenType.FRONT, value, start_line, start_column)
-        if value == "rev":
-            return Token(TokenType.REV, value, start_line, start_column)
-
-        # Check for set operators (Phase 20)
-        if value == "bigcup":
-            return Token(TokenType.BIGCUP, value, start_line, start_column)
-        if value == "bigcap":
-            return Token(TokenType.BIGCAP, value, start_line, start_column)
-
-        # Check for sequence filter operator (Phase 35 - ASCII alternative)
-        if value == "filter":
-            return Token(TokenType.FILTER, value, start_line, start_column)
-
-        # Check for bag union operator (Phase 35 - ASCII alternative)
-        if value == "bag_union":
-            return Token(TokenType.BAG_UNION, value, start_line, start_column)
+        # Check for keyword aliases (subset/subseteq both map to SUBSET)
+        if value in KEYWORD_ALIASES:
+            return Token(KEYWORD_ALIASES[value], value, start_line, start_column)
 
         # Regular identifier (includes seq, seq1)
         return Token(TokenType.IDENTIFIER, value, start_line, start_column)
