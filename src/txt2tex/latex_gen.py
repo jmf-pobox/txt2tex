@@ -243,6 +243,22 @@ class LaTeXGenerator:
         self._in_inline_part = False  # Track if we're inside an inline part
         self._quantifier_depth = 0  # Track nesting for \t1, \t2 indentation
 
+    # -------------------------------------------------------------------------
+    # Fuzz/Standard LaTeX mode helpers
+    # -------------------------------------------------------------------------
+
+    def _get_bullet_separator(self) -> str:
+        """Return bullet separator: @ for fuzz, \\bullet for standard LaTeX."""
+        return "@" if self.use_fuzz else r"\bullet"
+
+    def _get_colon_separator(self) -> str:
+        """Return colon separator: : for fuzz, \\colon for standard LaTeX."""
+        return ":" if self.use_fuzz else r"\colon"
+
+    def _get_mid_separator(self) -> str:
+        """Return mid separator: | for fuzz, \\mid for standard LaTeX."""
+        return "|" if self.use_fuzz else r"\mid"
+
     def _generate_document_items_with_consolidation(
         self, items: list[DocumentItem]
     ) -> list[str]:
@@ -976,8 +992,7 @@ class LaTeXGenerator:
 
         if node.domain:
             domain_latex = self.generate_expr(node.domain, parent=node)
-            # Fuzz uses : instead of \colon
-            parts.append(":" if self.use_fuzz else r"\colon")
+            parts.append(self._get_colon_separator())
             parts.append(domain_latex)
 
         # Special handling for mu operator in fuzz mode
@@ -1017,7 +1032,7 @@ class LaTeXGenerator:
         # Check if quantifier has expression part (bullet separator)
         if node.expression:
             # Use | or \mid for predicate separator
-            pipe_sep = "|" if self.use_fuzz else r"\mid"
+            pipe_sep = self._get_mid_separator()
 
             # Increment depth for nested quantifiers
             self._quantifier_depth += 1
@@ -1038,14 +1053,12 @@ class LaTeXGenerator:
                 parts.append(body_latex)
 
             # Add @ or bullet separator and expression
-            # Fuzz uses @ (at sign), LaTeX uses \bullet
-            parts.append("@" if self.use_fuzz else r"\bullet")
+            parts.append(self._get_bullet_separator())
             expr_latex = self.generate_expr(node.expression, parent=node)
             parts.append(expr_latex)
         else:
             # Standard quantifier: @ or bullet separator and body
-            # Fuzz uses @ (at sign), LaTeX uses \bullet
-            separator = "@" if self.use_fuzz else r"\bullet"
+            separator = self._get_bullet_separator()
 
             # Increment depth for nested quantifiers
             self._quantifier_depth += 1
@@ -1098,8 +1111,8 @@ class LaTeXGenerator:
         domain_latex = self.generate_expr(node.domain)
         parts.append(domain_latex)
 
-        # Add bullet/@ separator (fuzz uses @, standard LaTeX uses \bullet)
-        parts.append("@" if self.use_fuzz else r"\bullet")
+        # Add bullet/@ separator
+        parts.append(self._get_bullet_separator())
         body_latex = self.generate_expr(node.body)
         parts.append(body_latex)
 
@@ -1141,22 +1154,20 @@ class LaTeXGenerator:
 
         if node.domain:
             domain_latex = self.generate_expr(node.domain)
-            # Fuzz uses : instead of \colon
-            parts.append(":" if self.use_fuzz else r"\colon")
+            parts.append(self._get_colon_separator())
             parts.append(domain_latex)
 
         # Handle case with no predicate
         if node.predicate is None:
             # No predicate: { x : X . expr } -> use bullet/@ directly
             if node.expression:
-                # Fuzz uses @ (at sign) inside Z environments, LaTeX uses \bullet
-                parts.append("@" if self.use_fuzz else r"\bullet")
+                parts.append(self._get_bullet_separator())
                 expression_latex = self.generate_expr(node.expression)
                 parts.append(expression_latex)
             # else: {x : T} with no predicate or expression - just the binding
         else:
             # Has predicate: add mid/pipe separator
-            parts.append("|" if self.use_fuzz else r"\mid")
+            parts.append(self._get_mid_separator())
 
             # Generate predicate
             predicate_latex = self.generate_expr(node.predicate)
@@ -1164,8 +1175,7 @@ class LaTeXGenerator:
 
             # If expression is present, add bullet/@ and expression
             if node.expression:
-                # Fuzz uses @ (at sign) inside Z environments, LaTeX uses \bullet
-                parts.append("@" if self.use_fuzz else r"\bullet")
+                parts.append(self._get_bullet_separator())
                 expression_latex = self.generate_expr(node.expression)
                 parts.append(expression_latex)
 
