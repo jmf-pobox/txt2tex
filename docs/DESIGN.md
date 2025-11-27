@@ -12,6 +12,65 @@
 3. fuzz validation integration
 4. High-quality PDF generation
 
+## Design Principles
+
+These principles guide all design decisions in txt2tex, balancing accessibility for beginners with alignment to Z notation standards.
+
+### Principle 1: Whiteboard Fidelity with LaTeX Transparency
+
+*"Make the simple things invisible, the complex things explicit."*
+
+Users write natural whiteboard notation, but the generated LaTeX should be recognizable and teachable. A student who learns txt2tex should be 70%+ prepared to write LaTeX with fuzz directly.
+
+**Application**:
+- ✅ **Automatic smart defaults**: Add `\quad` for indentation when users break lines
+- ✅ **Automatic line breaks**: Convert newlines to `\\` in appropriate contexts
+- ✅ **Automatic spacing**: Insert `~` in set comprehensions, function application
+- ❌ **Don't hide LaTeX structure**: Keep environment boundaries clear (`schema...end`, not implicit)
+- ❌ **Don't invent new operators**: Use Z notation conventions or ASCII approximations
+
+### Principle 2: Align Notation with Z Standards
+
+*"When whiteboard notation matches formal notation, prefer formal notation."*
+
+Where Z notation has established conventions (like `\land`, `\lor`, `\forall`), our ASCII input mirrors these closely. This reduces cognitive load when students transition to reading research papers or formal specifications.
+
+**Application**:
+- ✅ **Use standard Z keywords**: `land`, `lor`, `lnot` (not `and`, `or`, `not`)
+- ✅ **Use standard Z symbols where ASCII-friendly**: `forall`, `exists`, `cross`, `subset`
+- ✅ **Preserve Z operator precedence**: Match zed2e exactly
+- ✅ **Use Z terminology**: "maplet" not "pair", "dom" not "domain"
+- ⚠️ **ASCII approximations only where necessary**: `|->` for `\mapsto`, `<->` for `\rel`
+
+**Rationale**: Students learning `land` and `lor` are learning the actual Z notation names. Reading `\land` in LaTeX or papers becomes immediate recognition.
+
+### Principle 3: Progressive Disclosure of Complexity
+
+*"Simple cases should be simple; complex cases should be explicit."*
+
+Common patterns get smart defaults. Advanced users can override with explicit LaTeX hints. Never force complexity on beginners, never hide power from experts.
+
+**Supported Levels**:
+
+| Level | User | Approach |
+|-------|------|----------|
+| **Level 1** (Beginner) | Write `land`, `lor`, let system handle spacing and breaks | Auto-formatting |
+| **Level 2** (Intermediate) | Use blank lines for `\also` grouping in where clauses | Structural control |
+| **Level 4** (Expert) | Use `LATEX:` blocks for direct control | Full LaTeX escape hatch |
+| **Level 5** (Expert+) | Mix txt2tex with hand-written LaTeX | Hybrid mode |
+
+**Note**: Level 3 (inline LaTeX commands like `\\`, `\t1`, `~`) is not currently supported. Users who need fine formatting control should use `LATEX:` blocks (Level 4).
+
+### Strategic Goals
+
+1. **Training Wheels for Z Notation**: A student proficient in txt2tex can read 80% of Z notation papers and write 60% of fuzz LaTeX without additional training.
+
+2. **Textbook-Quality LaTeX**: Generated LaTeX should be indistinguishable from examples in Spivey's "The Z Notation" or Woodcock & Davies' "Using Z".
+
+3. **Preserve Accessibility**: Keep the "whiteboard feel" - users shouldn't feel like they're writing code.
+
+---
+
 ## Requirements
 
 ### Functional Requirements
