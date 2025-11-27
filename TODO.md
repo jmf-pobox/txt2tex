@@ -104,16 +104,25 @@ Phased rollout of additional linting rules to tighten coding standards. Each gro
 
 ### Workflow
 
-- [ ] **Step 3.1**: Enable mypy additions
-- [ ] **Step 3.2**: Run `hatch run type` and count new errors
-- [ ] **Step 3.3**: Enable pyright tightening
-- [ ] **Step 3.4**: Run `hatch run type-pyright` and count new warnings
-- [ ] **Step 3.5**: Present all counts to user
-- [ ] **Step 3.6**: User decides: keep all / keep some / disable
-- [ ] **Step 3.7**: Fix violations for kept options OR revert
-- [ ] **Step 3.8**: Commit changes
+- [x] **Step 3.1**: Enable mypy additions
+- [x] **Step 3.2**: Run `hatch run type` and count new errors
+- [x] **Step 3.3**: Enable pyright tightening
+- [x] **Step 3.4**: Run `hatch run type-pyright` and count new warnings
+- [x] **Step 3.5**: Present all counts to user
+- [x] **Step 3.6**: User decides: keep all / keep some / disable
+- [x] **Step 3.7**: Fix violations for kept options OR revert
+- [x] **Step 3.8**: Commit changes
 
-### Status: NOT STARTED
+### Status: COMPLETE ✅
+
+### Results
+
+| Tool | Option | Violations | Resolution |
+|------|--------|------------|------------|
+| mypy | `strict_equality` | 0 | Keep (free win) |
+| mypy | `enable_error_code = ["ignore-without-code"]` | 0 | Keep (free win) |
+| pyright | `reportUnknownMemberType: "warning"` | 0 | Keep (free win) |
+| pyright | `reportUnknownVariableType: "warning"` | 0 | Keep (free win) |
 
 ---
 
@@ -209,7 +218,7 @@ If a rule causes too many issues:
 |-------|--------|------------|----------------|
 | 1 - Safety | ✅ Complete | S, BLE, T10, T20, A | None |
 | 2 - Dead Code | ✅ Complete | ARG, ERA, PIE, RET, RSE | None |
-| 3 - Type Safety | Not Started | - | - |
+| 3 - Type Safety | ✅ Complete | strict_equality, ignore-without-code, reportUnknown*: warning | None |
 | 4 - Performance | Not Started | - | - |
 | 5 - Testing | Not Started | - | - |
 
