@@ -461,7 +461,7 @@ conclusion [label]
 | Phase | Status | Deliverables |
 |-------|--------|--------------|
 | Phase 1 (Weeks 1-2) | ✅ Complete | Auto line breaking, `\also`, `\t` indentation |
-| Phase 2 (Keywords) | ⚠️ Deferred | `and`→`land` migration (needs LLM-based approach) |
+| Phase 2 (Keywords) | ✅ Complete | `and`→`land`, `or`→`lor`, `not`→`lnot`, `in`→`elem` migration + cleanup |
 | Phase 3 Part 1 (Weeks 5-6) | ✅ Complete | `~` spacing hints, zed consolidation |
 | Phase 3 Part 2 (Weeks 7-8) | ✅ Complete | `syntax` environment, `\bsup`/`\esup` |
 | Phase 3 Part 3 | 🔄 Partial | Smart line breaking (pending), config system (pending) |
@@ -476,10 +476,7 @@ conclusion [label]
 - Configuration system (`.txt2tex.toml`) - nice to have
 - Smart auto line breaking - nice to have
 
-**Low Priority / Deferred**:
-- Keyword migration (`and`→`land`) - needs better approach
-
-**Status**: Project is **feature-complete** for all homework solutions (100% coverage, 1199 tests passing)
+**Status**: Project is **feature-complete** for all homework solutions (100% coverage, 1244 tests passing)
 
 ---
 
@@ -785,26 +782,24 @@ max_line_length = 80      # Smart line breaking threshold
 
 ---
 
-### Week 3-4: Phase 2 - Keyword Migration ⚠️ ATTEMPTED, FAILED, WILL RETRY
-**Goal**: Migrate `and`→`land`, `or`→`lor`, `not`→`lnot` to align with Z notation LaTeX commands
+### Week 3-4: Phase 2 - Keyword Migration ✅ COMPLETE
+**Goal**: Migrate `and`→`land`, `or`→`lor`, `not`→`lnot`, `in`→`elem` to align with Z notation LaTeX commands
 
-**What didn't work:**
-- **Approach**: Regex-based detection to distinguish English vs mathematical context
-- **Failure mode**: Cannot reliably identify when "and"/"or"/"not" are English prose vs logical operators
-  - Example failure: "The system checks policies and resources" (English prose)
-  - Example failure: "The predicate x > 0 and y > 0 holds" (mathematical operator in prose)
-- **Root cause**: Regex pattern matching insufficient for semantic context analysis
+**Completed work:**
+- **Migration script**: Created `scripts/migrate_keywords.py` with context-aware detection
+- **All files migrated**: ~200 test files, ~60 example files, all documentation updated
+- **Approach**: Pattern-based detection of mathematical context vs prose
+- **Success**: All 1244 tests pass after migration
 
-**Next attempt strategy:**
-- Use LLM-based context analysis to distinguish English from mathematical usage
-- Process TEXT blocks with semantic understanding of mathematical expressions
-- Maintain high accuracy to avoid breaking English prose
+**Post-migration cleanup** (November 2025):
+- Removed 34 lines of where/and prose detection logic (lexer.py:1146-1179)
+- Consolidated duplicate prose word lists into shared `constants.py` (~50 lines saved)
+- Total complexity reduction: ~84 lines removed
 
-**Status**: Will retry with improved approach
-
-**Related work completed** (commit 709390b):
-- Successfully implemented keyword conversion for quantifiers in TEXT blocks (forall, exists, emptyset)
-- This proves TEXT block processing is feasible
+**Artifacts**:
+- Migration script: `scripts/migrate_keywords.py`
+- Documentation: Updated USER_GUIDE.md, DESIGN.md, CLAUDE.md
+- Analysis documents: `docs/development/KEYWORD_DEPRECATION_CLEANUP.md`
 
 ---
 
