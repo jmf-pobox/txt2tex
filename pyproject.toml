@@ -105,12 +105,16 @@ select = [
     "RSE", # flake8-raise
     "ARG", # flake8-unused-arguments
     "RET", # flake8-return
-    # Group 4: Performance & Modern Python (assessing)
+    # Group 4: Performance & Modern Python
     "PERF", # perflint
     "PTH",  # flake8-use-pathlib
     "ISC",  # flake8-implicit-str-concat
     "FBT",  # flake8-boolean-trap
     "C90",  # mccabe complexity
+    # Group 5: Testing & Advanced
+    "PT",   # flake8-pytest-style
+    "SLF",  # flake8-self
+    # TRY and PL deferred - see docs/development/CODE_REVIEW.md
 ]
 extend-select = ["PLC0415"]
 
@@ -122,8 +126,8 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 # Allow ambiguous Unicode characters in tests - intentional Z notation (× is cross product)
 "tests/test_06_definitions/test_free_types.py" = ["RUF001", "RUF002"]
-# Allow assert in tests (S101) and print statements for debug output (T20)
-"tests/*" = ["S101", "T20"]
+# Allow assert in tests (S101), print statements (T20), and private member access (SLF001)
+"tests/*" = ["S101", "T20", "SLF001"]
 # Allow print in CLI - intentional user output
 "src/txt2tex/cli.py" = ["T20"]
 # Allow unused parent arg in singledispatch visitor pattern

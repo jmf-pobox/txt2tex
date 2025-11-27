@@ -178,14 +178,23 @@ Phased rollout of additional linting rules to tighten coding standards. Each gro
 
 ### Workflow
 
-- [ ] **Step 5.1**: Enable rules in `pyproject.toml`
-- [ ] **Step 5.2**: Run `hatch run lint` and count violations per rule
-- [ ] **Step 5.3**: Present violation counts to user
-- [ ] **Step 5.4**: User decides: keep all / keep some / disable
-- [ ] **Step 5.5**: Fix violations for kept rules OR add to ignore list
-- [ ] **Step 5.6**: Commit changes
+- [x] **Step 5.1**: Enable rules in `pyproject.toml`
+- [x] **Step 5.2**: Run `hatch run lint` and count violations per rule
+- [x] **Step 5.3**: Present violation counts to user
+- [x] **Step 5.4**: User decides: keep all / keep some / disable
+- [x] **Step 5.5**: Fix violations for kept rules OR add to ignore list
+- [x] **Step 5.6**: Commit changes
 
-### Status: NOT STARTED
+### Status: COMPLETE ✅
+
+### Results
+
+| Rule | Violations | Resolution |
+|------|------------|------------|
+| PT | 8 | Keep, fixed (pytest style improvements) |
+| SLF | 54 | Keep, ignored in tests (private member access) |
+| TRY | 103 | Deferred (documented in CODE_REVIEW.md) |
+| PL | 211 | Deferred (documented in CODE_REVIEW.md), PLR5501 auto-fixed |
 
 ---
 
@@ -230,7 +239,7 @@ If a rule causes too many issues:
 | 2 - Dead Code | ✅ Complete | ARG, ERA, PIE, RET, RSE | None |
 | 3 - Type Safety | ✅ Complete | strict_equality, ignore-without-code, reportUnknown*: warning | None |
 | 4 - Performance | ✅ Complete | PERF, PTH, ISC, FBT, C90 (max=30) | None |
-| 5 - Testing | Not Started | - | - |
+| 5 - Testing | ✅ Complete | PT, SLF | TRY, PL (deferred) |
 
 ---
 

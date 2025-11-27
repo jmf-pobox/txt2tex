@@ -161,8 +161,8 @@ class TestErrorCases:
 
     def test_no_space_seq_concat_errors(self):
         """<x>^<y> → clear error."""
+        lexer = Lexer("<x>^<y>")
         with pytest.raises(LexerError) as exc_info:
-            lexer = Lexer("<x>^<y>")
             lexer.tokenize()
         error_msg = str(exc_info.value).lower()
         assert "space" in error_msg
@@ -170,14 +170,14 @@ class TestErrorCases:
 
     def test_no_space_in_middle_of_chain(self):
         """<a> ^ <b>^<c> → error at second ^."""
+        lexer = Lexer("<a> ^ <b>^<c>")
         with pytest.raises(LexerError):
-            lexer = Lexer("<a> ^ <b>^<c>")
             lexer.tokenize()
 
     def test_error_message_clear(self):
         """Verify error message is helpful."""
+        lexer = Lexer("<x>^<y>")
         with pytest.raises(LexerError) as exc_info:
-            lexer = Lexer("<x>^<y>")
             lexer.tokenize()
         assert ">^<" in str(exc_info.value) or "'>^<'" in str(exc_info.value)
 
@@ -256,7 +256,8 @@ class TestIntegration:
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
         assert "s \\cat t" in latex
-        assert "f(s) \\bsup 2 \\esup" in latex and "f(t) \\bsup 2 \\esup" in latex
+        assert "f(s) \\bsup 2 \\esup" in latex
+        assert "f(t) \\bsup 2 \\esup" in latex
 
 
 class TestEdgeCases:

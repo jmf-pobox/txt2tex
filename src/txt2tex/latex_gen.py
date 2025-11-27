@@ -1828,49 +1828,28 @@ class LaTeXGenerator:
                             first_line = first_line[9:].lstrip()
                         lines.append(indent_prefix + part_label + " " + first_line)
                         lines.extend(item_lines[1:])
-            else:
-                # Multiple items: (a) first item inline, then remaining
-                if node.items:
-                    first_item = node.items[0]
-                    if isinstance(first_item, Paragraph):
-                        # Paragraph: (a) on separate line to avoid line-wrap issues
-                        lines.append(indent_prefix + part_label)
-                        lines.append("")
-                        # Set \leftskip for this paragraph (stays set for remaining)
-                        lines.append(
-                            r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
-                        )
-                        self._in_inline_part = True
-                        item_lines = self.generate_document_item(first_item)
-                        lines.extend(item_lines)
-                        self._in_inline_part = False
-                        # Note: \leftskip stays set for remaining items
-                    elif isinstance(first_item, Expr):
-                        if self._has_line_breaks(first_item):
-                            # Expression with line breaks: (a) on its own line
-                            lines.append(indent_prefix + part_label)
-                            lines.append("")
-                            # Set \leftskip for content after label
-                            lines.append(
-                                r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
-                            )
-                            self._in_inline_part = True
-                            item_lines = self.generate_document_item(first_item)
-                            lines.extend(item_lines)
-                            self._in_inline_part = False
-                            # Note: \leftskip reset after processing all items
-                        else:
-                            # Single-line expression: render inline
-                            expr_latex = self.generate_expr(first_item)
-                            lines.append(
-                                indent_prefix + part_label + " $" + expr_latex + "$"
-                            )
-                    elif isinstance(first_item, TruthTable):
-                        # Truth table: (a) on its own line, then centered table
+            # Multiple items: (a) first item inline, then remaining
+            elif node.items:
+                first_item = node.items[0]
+                if isinstance(first_item, Paragraph):
+                    # Paragraph: (a) on separate line to avoid line-wrap issues
+                    lines.append(indent_prefix + part_label)
+                    lines.append("")
+                    # Set \leftskip for this paragraph (stays set for remaining)
+                    lines.append(
+                        r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
+                    )
+                    self._in_inline_part = True
+                    item_lines = self.generate_document_item(first_item)
+                    lines.extend(item_lines)
+                    self._in_inline_part = False
+                    # Note: \leftskip stays set for remaining items
+                elif isinstance(first_item, Expr):
+                    if self._has_line_breaks(first_item):
+                        # Expression with line breaks: (a) on its own line
                         lines.append(indent_prefix + part_label)
                         lines.append("")
                         # Set \leftskip for content after label
-                        # Add extra space so content starts after the closing ) of label
                         lines.append(
                             r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
                         )
@@ -1878,42 +1857,62 @@ class LaTeXGenerator:
                         item_lines = self.generate_document_item(first_item)
                         lines.extend(item_lines)
                         self._in_inline_part = False
-                        # Note: \leftskip will be reset after all items are processed
-                    elif isinstance(first_item, ProofTree):
-                        # Proof tree: (a) on its own line, then proof on new line
-                        lines.append(indent_prefix + part_label)
-                        lines.append("")
-                        item_lines = self.generate_document_item(first_item)
-                        lines.extend(item_lines)
+                        # Note: \leftskip reset after processing all items
                     else:
-                        item_lines = self.generate_document_item(first_item)
-                        if item_lines:
-                            first_line = item_lines[0]
-                            if first_line.startswith(("\\bigskip", "\\medskip")):
-                                item_lines = item_lines[1:]
-                                first_line = item_lines[0] if item_lines else ""
-                            # Remove \noindent (we're indenting the part)
-                            if first_line.startswith("\\noindent"):
-                                # Remove \noindent and leading space
-                                first_line = first_line[9:].lstrip()
-                            lines.append(indent_prefix + part_label + " " + first_line)
-                            lines.extend(item_lines[1:])
+                        # Single-line expression: render inline
+                        expr_latex = self.generate_expr(first_item)
+                        lines.append(
+                            indent_prefix + part_label + " $" + expr_latex + "$"
+                        )
+                elif isinstance(first_item, TruthTable):
+                    # Truth table: (a) on its own line, then centered table
+                    lines.append(indent_prefix + part_label)
                     lines.append("")
-                    # Add spacing before remaining items for visual separation
-                    lines.append(r"\bigskip")
-                    lines.append("")
-                    # Remaining items - use \leftskip to create indented container
-                    # This allows paragraphs to justify properly while maintaining
-                    # indentation. Add extra space so paragraphs start after the
-                    # closing ) of the part label
-                    lines.append(r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}")
+                    # Set \leftskip for content after label
+                    # Add extra space so content starts after the closing ) of label
+                    lines.append(
+                        r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
+                    )
                     self._in_inline_part = True
-                    for item in node.items[1:]:
-                        item_lines = self.generate_document_item(item)
-                        lines.extend(item_lines)
+                    item_lines = self.generate_document_item(first_item)
+                    lines.extend(item_lines)
                     self._in_inline_part = False
-                    # Reset \leftskip after part content
-                    lines.append(r"\setlength{\leftskip}{0pt}")
+                    # Note: \leftskip will be reset after all items are processed
+                elif isinstance(first_item, ProofTree):
+                    # Proof tree: (a) on its own line, then proof on new line
+                    lines.append(indent_prefix + part_label)
+                    lines.append("")
+                    item_lines = self.generate_document_item(first_item)
+                    lines.extend(item_lines)
+                else:
+                    item_lines = self.generate_document_item(first_item)
+                    if item_lines:
+                        first_line = item_lines[0]
+                        if first_line.startswith(("\\bigskip", "\\medskip")):
+                            item_lines = item_lines[1:]
+                            first_line = item_lines[0] if item_lines else ""
+                        # Remove \noindent (we're indenting the part)
+                        if first_line.startswith("\\noindent"):
+                            # Remove \noindent and leading space
+                            first_line = first_line[9:].lstrip()
+                        lines.append(indent_prefix + part_label + " " + first_line)
+                        lines.extend(item_lines[1:])
+                lines.append("")
+                # Add spacing before remaining items for visual separation
+                lines.append(r"\bigskip")
+                lines.append("")
+                # Remaining items - use \leftskip to create indented container
+                # This allows paragraphs to justify properly while maintaining
+                # indentation. Add extra space so paragraphs start after the
+                # closing ) of the part label
+                lines.append(r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}")
+                self._in_inline_part = True
+                for item in node.items[1:]:
+                    item_lines = self.generate_document_item(item)
+                    lines.extend(item_lines)
+                self._in_inline_part = False
+                # Reset \leftskip after part content
+                lines.append(r"\setlength{\leftskip}{0pt}")
         else:
             # Subsection formatting (default)
             # Add vertical spacing before parts that are not the first
@@ -4517,121 +4516,120 @@ class LaTeXGenerator:
         for child in sequential:
             if isinstance(child, CaseAnalysis):
                 child_latex = self._generate_case_analysis(child)
-            else:
-                # Generate the child
-                # If it has children, we need to process them recursively
-                if child.children:
-                    # This node has children - need to generate a full subtree
-                    # The subtree should use current_premises as its base
-                    expr_latex = self.generate_expr(child.expression)
+            # Generate the child
+            # If it has children, we need to process them recursively
+            elif child.children:
+                # This node has children - need to generate a full subtree
+                # The subtree should use current_premises as its base
+                expr_latex = self.generate_expr(child.expression)
 
-                    # Generate children
-                    child_premises_parts: list[str] = []
-                    has_case_analysis = False
-                    for grandchild in child.children:
-                        if isinstance(grandchild, CaseAnalysis):
-                            child_premises_parts.append(
-                                self._generate_case_analysis(grandchild)
-                            )
-                            has_case_analysis = True
-                        else:
-                            # Recurse to handle nested structure
-                            grandchild_latex = self._generate_proof_node_infer(
-                                grandchild
-                            )
-                            child_premises_parts.append(grandchild_latex)
-
-                    # Include siblings from parent scope as additional premises.
-                    # Special case: for or-elim with case analysis, only include
-                    # disjunction siblings. Other siblings (like extracted
-                    # conjuncts) are handled within case branches.
-                    if sibling_latex_parts and child_premises_parts:
-                        if has_case_analysis:
-                            # Only include disjunction siblings as top-level
-                            # premises for or-elim
-                            disjunction_siblings: list[str] = []
-                            for i, sib_child in enumerate(sibling_group):
-                                if (
-                                    isinstance(sib_child, ProofNode)
-                                    and isinstance(sib_child.expression, BinaryOp)
-                                    and sib_child.expression.operator == "or"
-                                ):
-                                    disjunction_siblings.append(sibling_latex_parts[i])
-
-                            # Apply \raiseproof to case branches for vertical
-                            # layout. STAGGERED STRATEGY: Different cases get
-                            # different heights + horizontal spacing
-                            raised_cases: list[str] = []
-
-                            # Collect all case indices first
-                            case_indices: list[int] = []
-                            for idx, grandchild in enumerate(child.children):
-                                if isinstance(grandchild, CaseAnalysis):
-                                    case_indices.append(idx)
-
-                            # Generate raised cases with staggered heights
-                            for case_position, idx in enumerate(case_indices):
-                                grandchild = child.children[idx]
-                                depth = self._calculate_tree_depth(grandchild)
-                                case_latex = child_premises_parts[idx]
-
-                                # STAGGERED HEIGHT FORMULA:
-                                # First case: 6-8ex (minimal)
-                                # Subsequent cases: 18-24ex (much taller to
-                                # avoid overlap)
-                                if case_position == 0:
-                                    # First case: minimal height
-                                    height = 6 + (
-                                        depth * 2
-                                    )  # Conservative for first case
-                                    raised = (
-                                        f"\\raiseproof{{{height}ex}}{{{case_latex}}}"
-                                    )
-                                else:
-                                    # Subsequent cases: taller + horizontal
-                                    # spacing
-                                    height = 18 + (
-                                        depth * 4
-                                    )  # Much taller for subsequent cases
-                                    raised = (
-                                        f"\\hskip 6em "
-                                        f"\\raiseproof{{{height}ex}}"
-                                        f"{{{case_latex}}}"
-                                    )
-
-                                raised_cases.append(raised)
-
-                            # Combine: disjunction siblings first, then raised
-                            # case branches
-                            all_premises = disjunction_siblings + raised_cases
-                            child_premises = " & ".join(all_premises)
-                        else:
-                            # Not case analysis - include all siblings
-                            all_premises = sibling_latex_parts + child_premises_parts
-                            child_premises = " & ".join(all_premises)
-                    elif child_premises_parts:
-                        child_premises = " & ".join(child_premises_parts)
-                    else:
-                        child_premises = current_premises
-
-                    if child.justification:
-                        just = self._format_justification_label(child.justification)
-                        child_latex = (
-                            f"\\infer[{just}]{{{expr_latex}}}{{{child_premises}}}"
+                # Generate children
+                child_premises_parts: list[str] = []
+                has_case_analysis = False
+                for grandchild in child.children:
+                    if isinstance(grandchild, CaseAnalysis):
+                        child_premises_parts.append(
+                            self._generate_case_analysis(grandchild)
                         )
+                        has_case_analysis = True
                     else:
-                        child_latex = f"\\infer{{{expr_latex}}}{{{child_premises}}}"
+                        # Recurse to handle nested structure
+                        grandchild_latex = self._generate_proof_node_infer(
+                            grandchild
+                        )
+                        child_premises_parts.append(grandchild_latex)
+
+                # Include siblings from parent scope as additional premises.
+                # Special case: for or-elim with case analysis, only include
+                # disjunction siblings. Other siblings (like extracted
+                # conjuncts) are handled within case branches.
+                if sibling_latex_parts and child_premises_parts:
+                    if has_case_analysis:
+                        # Only include disjunction siblings as top-level
+                        # premises for or-elim
+                        disjunction_siblings: list[str] = []
+                        for i, sib_child in enumerate(sibling_group):
+                            if (
+                                isinstance(sib_child, ProofNode)
+                                and isinstance(sib_child.expression, BinaryOp)
+                                and sib_child.expression.operator == "or"
+                            ):
+                                disjunction_siblings.append(sibling_latex_parts[i])
+
+                        # Apply \raiseproof to case branches for vertical
+                        # layout. STAGGERED STRATEGY: Different cases get
+                        # different heights + horizontal spacing
+                        raised_cases: list[str] = []
+
+                        # Collect all case indices first
+                        case_indices: list[int] = []
+                        for idx, grandchild in enumerate(child.children):
+                            if isinstance(grandchild, CaseAnalysis):
+                                case_indices.append(idx)
+
+                        # Generate raised cases with staggered heights
+                        for case_position, idx in enumerate(case_indices):
+                            grandchild = child.children[idx]
+                            depth = self._calculate_tree_depth(grandchild)
+                            case_latex = child_premises_parts[idx]
+
+                            # STAGGERED HEIGHT FORMULA:
+                            # First case: 6-8ex (minimal)
+                            # Subsequent cases: 18-24ex (much taller to
+                            # avoid overlap)
+                            if case_position == 0:
+                                # First case: minimal height
+                                height = 6 + (
+                                    depth * 2
+                                )  # Conservative for first case
+                                raised = (
+                                    f"\\raiseproof{{{height}ex}}{{{case_latex}}}"
+                                )
+                            else:
+                                # Subsequent cases: taller + horizontal
+                                # spacing
+                                height = 18 + (
+                                    depth * 4
+                                )  # Much taller for subsequent cases
+                                raised = (
+                                    f"\\hskip 6em "
+                                    f"\\raiseproof{{{height}ex}}"
+                                    f"{{{case_latex}}}"
+                                )
+
+                            raised_cases.append(raised)
+
+                        # Combine: disjunction siblings first, then raised
+                        # case branches
+                        all_premises = disjunction_siblings + raised_cases
+                        child_premises = " & ".join(all_premises)
+                    else:
+                        # Not case analysis - include all siblings
+                        all_premises = sibling_latex_parts + child_premises_parts
+                        child_premises = " & ".join(all_premises)
+                elif child_premises_parts:
+                    child_premises = " & ".join(child_premises_parts)
                 else:
-                    # No children - derive directly from current_premises
-                    expr_latex = self.generate_expr(child.expression)
+                    child_premises = current_premises
 
-                    if child.justification:
-                        just = self._format_justification_label(child.justification)
-                        child_latex = (
-                            f"\\infer[{just}]{{{expr_latex}}}{{{current_premises}}}"
-                        )
-                    else:
-                        child_latex = f"\\infer{{{expr_latex}}}{{{current_premises}}}"
+                if child.justification:
+                    just = self._format_justification_label(child.justification)
+                    child_latex = (
+                        f"\\infer[{just}]{{{expr_latex}}}{{{child_premises}}}"
+                    )
+                else:
+                    child_latex = f"\\infer{{{expr_latex}}}{{{child_premises}}}"
+            else:
+                # No children - derive directly from current_premises
+                expr_latex = self.generate_expr(child.expression)
+
+                if child.justification:
+                    just = self._format_justification_label(child.justification)
+                    child_latex = (
+                        f"\\infer[{just}]{{{expr_latex}}}{{{current_premises}}}"
+                    )
+                else:
+                    child_latex = f"\\infer{{{expr_latex}}}{{{current_premises}}}"
 
             # This becomes the new premise for next step
             current_premises = child_latex

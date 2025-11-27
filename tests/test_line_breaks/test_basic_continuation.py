@@ -122,8 +122,10 @@ def test_continuation_preserves_precedence():
     gen = LaTeXGenerator()
     latex1 = gen.generate_document(ast1)
     latex2 = gen.generate_document(ast2)
-    assert "\\lor" in latex1 and "\\lor" in latex2
-    assert "\\land" in latex1 and "\\land" in latex2
+    assert "\\lor" in latex1
+    assert "\\lor" in latex2
+    assert "\\land" in latex1
+    assert "\\land" in latex2
 
 
 def test_no_continuation_without_newline():

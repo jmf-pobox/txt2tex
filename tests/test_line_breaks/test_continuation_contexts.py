@@ -32,7 +32,8 @@ def test_continuation_in_multiple_schema_predicates():
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
     assert "\\\\" in latex
-    assert "x" in latex and "y" in latex
+    assert "x" in latex
+    assert "y" in latex
 
 
 def test_continuation_in_quantifier_body():

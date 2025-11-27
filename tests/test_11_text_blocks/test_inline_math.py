@@ -166,7 +166,8 @@ def test_equals_operator_inline() -> None:
     gen = LaTeXGenerator()
     latex_lines = gen._generate_paragraph(para)
     latex = "\n".join(latex_lines)
-    assert "x" in latex and "5" in latex
+    assert "x" in latex
+    assert "5" in latex
 
 
 def test_domain_restriction_inline() -> None:

@@ -117,6 +117,70 @@ def _process_inline_math(self, text: str) -> str:
 
 5 `# noqa: RUF001/RUF003` comments for Unicode `×` character handling - these are legitimate since the codebase explicitly supports both ASCII `cross` and Unicode `×` as equivalent inputs.
 
+### Deferred Linting Rules (TRY, PL)
+
+The following rules are documented for future consideration. They were assessed during the November 2025 linting standards review but deferred due to high violation counts relative to value.
+
+#### TRY (tryceratops) - Exception Handling
+
+| Rule | Violations | Description | Example |
+|------|------------|-------------|---------|
+| **TRY003** | 103 | Raise vanilla args | `raise ParserError(f"Expected {x}")` should use custom exception subclasses |
+
+**Why deferred**: Would require creating many custom exception subclasses (e.g., `ExpectedTokenError`, `UnexpectedCharError`) instead of using f-string messages with `ParserError`/`LexerError`. The current approach provides clear error messages without the overhead of many exception types.
+
+**Future consideration**: If exception handling becomes more complex (e.g., programmatic error recovery), custom exceptions would add value.
+
+#### PL (pylint) - Code Structure
+
+| Rule | Violations | Description | Typical Locations |
+|------|------------|-------------|-------------------|
+| **PLR2004** | 157 | Magic value comparison | `if len(suffix) == 2`, `if depth > 10` |
+| **PLR0912** | 25 | Too many branches | Parser dispatch methods, lexer token handling |
+| **PLR0915** | 13 | Too many statements | Complex generation methods |
+| **PLR0911** | 11 | Too many return statements | Multi-case dispatch methods |
+| **PLR0913** | 1 | Too many arguments | `make_proof_node()` test helper |
+| **PLR1714** | 1 | Repeated equality comparison | Could use `in` operator |
+| **PLW2901** | 1 | Redefined loop name | Loop variable reused |
+
+**PLR2004 (Magic Values)** - 157 violations
+
+These are comparisons like:
+```python
+if len(suffix) == 2:  # PLR2004: magic value 2
+if depth > 10:        # PLR2004: magic value 10
+```
+
+**Why deferred**: Many of these are domain-specific thresholds (indent levels, string lengths) where named constants would add verbosity without clarity. Some could benefit from constants (e.g., `MAX_NESTING_DEPTH`).
+
+**Future consideration**: Create a `constants.py` section for thresholds that appear multiple times or have semantic meaning.
+
+**PLR0912/PLR0915/PLR0911 (Structural Complexity)** - 49 violations
+
+These overlap significantly with C90 (mccabe complexity). Functions flagged include:
+- `_scan_token` - lexer main dispatch (inherently branchy)
+- `_parse_document_item` - parser main dispatch
+- `_generate_proof_node_infer` - complex proof tree rendering
+
+**Why deferred**: These functions are complex by design (dispatch over many token/node types). Splitting would fragment cohesive logic. Already addressed via C90 with max-complexity=30 and targeted noqa comments.
+
+**PLR1714 (Repeated Equality)** - 1 violation
+
+```python
+# Current:
+if x == "a" or x == "b" or x == "c":
+# Suggested:
+if x in ("a", "b", "c"):
+```
+
+**Future consideration**: Low-hanging fruit, easy fix.
+
+**PLW2901 (Redefined Loop Name)** - 1 violation
+
+A loop variable is reused in nested context. Generally safe but can be confusing.
+
+**Future consideration**: Easy fix, rename inner variable.
+
 ### Refactoring Guardrails
 
 When making changes:
