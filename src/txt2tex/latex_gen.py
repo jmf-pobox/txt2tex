@@ -653,13 +653,10 @@ class LaTeXGenerator:
             return f"{self._generate_identifier(base_id)}^*"
         elif name.endswith("~"):
             base = name[:-1]
-            # Render as R^{-1} (relational inverse) or R^{\sim} in fuzz
+            # Render as R^{-1} (standard) or R^{\sim} (fuzz)
             base_id = Identifier(line=0, column=0, name=base)
             base_latex = self._generate_identifier(base_id)
-            if not self.use_fuzz:
-                return f"{base_latex}^{{-1}}"
-            else:
-                return f"{base_latex}^{{\\sim}}"
+            return self._get_closure_operator_latex("~", base_latex)
 
         # Check if this is an operator/function from UNARY_OPS dictionary
         # This handles operators like id, inv, dom, ran when used as identifiers
@@ -805,13 +802,7 @@ class LaTeXGenerator:
 
         # Check if this is a postfix operator (rendered as superscript)
         if node.operator in {"~", "+", "*"}:
-            # Fuzz uses special commands for closure operators
-            if self.use_fuzz and node.operator == "+":
-                return rf"{operand} \plus"
-            if self.use_fuzz and node.operator == "*":
-                return rf"{operand} \star"
-            # Standard LaTeX or inverse: operand^{superscript}
-            return f"{operand}{op_latex}"
+            return self._get_closure_operator_latex(node.operator, operand)
         # Generic instantiation operators (P, P1, F, F1)
         # Per fuzz manual p.23: prefix generic symbols are operator symbols,
         # LaTeX inserts thin space automatically - NO TILDE needed
