@@ -238,9 +238,9 @@ class LaTeXGenerator:
     _overflow_warnings: list[str]
 
     # Default threshold for overflow warnings (LaTeX characters)
-    # ~135 LaTeX chars ≈ text width at 10pt with 1in margins in fuzz mode
-    # Empirically calibrated: 131 chars fits, 140 chars overflows
-    DEFAULT_OVERFLOW_THRESHOLD: ClassVar[int] = 135
+    # ~140 LaTeX chars ≈ text width at 10pt with 1in margins in fuzz mode
+    # Empirically calibrated: 136 chars fits, 150+ chars likely overflows
+    DEFAULT_OVERFLOW_THRESHOLD: ClassVar[int] = 140
 
     def __init__(
         self,

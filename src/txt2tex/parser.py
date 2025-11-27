@@ -2165,6 +2165,7 @@ class Parser:
 
         Allows newlines before and after comparison operators.
         Supports guarded cases after = operator (pattern matching).
+        Supports line continuation with \\ after = operator.
         """
         left = self._parse_function_type()
 
@@ -2184,8 +2185,20 @@ class Parser:
         ):
             # Found comparison operator, consume it
             op_token = self._advance()
-            # Allow newlines after comparison operator
-            self._skip_newlines()
+
+            # Detect line continuation (backslash after operator)
+            has_continuation = False
+            if self._match(TokenType.CONTINUATION):
+                self._advance()  # consume \
+                has_continuation = True
+                # Skip newline and any leading whitespace on next line
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
+            else:
+                # Allow newlines after comparison operator
+                self._skip_newlines()
+
             right = self._parse_function_type()
 
             # Check for guarded cases after = operator (pattern matching)
@@ -2197,6 +2210,7 @@ class Parser:
                 operator=op_token.value,
                 left=left,
                 right=right,
+                line_break_after=has_continuation,
                 line=op_token.line,
                 column=op_token.column,
             )
