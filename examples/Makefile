@@ -29,7 +29,7 @@ SUBDIRS := 01_propositional_logic 02_predicate_logic 03_equality 04_proof_trees 
 .PHONY: reference
 reference:
 	@echo "Building reference/compiled_solutions.pdf (with fuzz validation)..."
-	@cd .. && hatch run convert examples/reference/compiled_solutions.txt --fuzz
+	@cd .. && hatch run convert examples/reference/compiled_solutions.txt --typecheck
 	@if [ -f reference/compiled_solutions.pdf ]; then \
 		echo "✓ Successfully built reference/compiled_solutions.pdf"; \
 	else \
@@ -44,7 +44,7 @@ all: $(PDF_FILES)
 # Pattern rule: .txt -> .pdf (using hatch run convert with fuzz type checking)
 %.pdf: %.txt
 	@echo "Building $@..."
-	@cd .. && hatch run convert examples/$< --fuzz || (echo "Error building $@"; exit 1)
+	@cd .. && hatch run convert examples/$< --typecheck || (echo "Error building $@"; exit 1)
 
 # Subdirectory targets for convenience
 .PHONY: $(SUBDIRS)
@@ -52,7 +52,7 @@ $(SUBDIRS):
 	@echo "Building examples in $@..."
 	@for f in $@/*.txt; do \
 		if [ -f "$$f" ]; then \
-			cd .. && hatch run convert "examples/$$f" --fuzz || (echo "Error building $$f"; exit 1); \
+			cd .. && hatch run convert "examples/$$f" --typecheck || (echo "Error building $$f"; exit 1); \
 		fi; \
 	done
 
