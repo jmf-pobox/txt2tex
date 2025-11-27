@@ -243,6 +243,81 @@ class LaTeXGenerator:
         self._in_inline_part = False  # Track if we're inside an inline part
         self._quantifier_depth = 0  # Track nesting for \t1, \t2 indentation
 
+    # -------------------------------------------------------------------------
+    # Fuzz/Standard LaTeX mode helpers
+    # -------------------------------------------------------------------------
+
+    def _get_bullet_separator(self) -> str:
+        """Return bullet separator: @ for fuzz, \\bullet for standard LaTeX."""
+        return "@" if self.use_fuzz else r"\bullet"
+
+    def _get_colon_separator(self) -> str:
+        """Return colon separator: : for fuzz, \\colon for standard LaTeX."""
+        return ":" if self.use_fuzz else r"\colon"
+
+    def _get_mid_separator(self) -> str:
+        """Return mid separator: | for fuzz, \\mid for standard LaTeX."""
+        return "|" if self.use_fuzz else r"\mid"
+
+    def _get_type_latex(self, name: str) -> str | None:
+        """Return LaTeX for mathematical type names (N, Z, N1).
+
+        Returns None if name is not a known type name.
+        """
+        type_map_fuzz = {"Z": r"\num", "N": r"\nat", "N1": r"\nat_1"}
+        type_map_std = {"Z": r"\mathbb{Z}", "N": r"\mathbb{N}", "N1": r"\mathbb{N}_1"}
+        if name in type_map_fuzz:
+            return type_map_fuzz[name] if self.use_fuzz else type_map_std[name]
+        return None
+
+    def _get_closure_operator_latex(self, operator: str, operand: str) -> str:
+        """Return LaTeX for closure/inverse operators (+, *, ~).
+
+        Args:
+            operator: One of '+', '*', '~'
+            operand: The operand LaTeX string
+
+        Returns:
+            Formatted LaTeX with appropriate operator for fuzz/standard mode.
+        """
+        if self.use_fuzz:
+            if operator == "+":
+                return rf"{operand} \plus"
+            if operator == "*":
+                return rf"{operand} \star"
+            # ~ inverse uses ^{\sim} in fuzz mode
+            return rf"{operand}^{{\sim}}"
+        # Standard LaTeX: superscript notation
+        op_superscript = {"+": "^{+}", "*": "^{*}", "~": "^{-1}"}
+        return f"{operand}{op_superscript[operator]}"
+
+    def _format_multiword_identifier(self, name: str) -> str:
+        """Format a multi-word identifier with underscores.
+
+        For fuzz: just escape underscores (name\\_with\\_underscores)
+        For standard LaTeX: escape and wrap in \\mathit{...}
+        """
+        escaped = name.replace("_", r"\_")
+        if self.use_fuzz:
+            return escaped
+        return rf"\mathit{{{escaped}}}"
+
+    def _map_binary_operator(self, operator: str, base_latex: str) -> str:
+        """Map binary operator to appropriate LaTeX for fuzz/standard mode.
+
+        Fuzz-specific mappings:
+        - => / implies → \\implies (instead of \\Rightarrow)
+        - <=> → \\iff (outside EQUIV blocks) or \\Leftrightarrow (in EQUIV)
+        """
+        if not self.use_fuzz:
+            return base_latex
+        if operator in ("=>", "implies"):
+            return r"\implies"
+        # In EQUIV blocks, use \Leftrightarrow; otherwise use \iff
+        if operator == "<=>" and not self._in_equiv_block:
+            return r"\iff"
+        return base_latex
+
     def _generate_document_items_with_consolidation(
         self, items: list[DocumentItem]
     ) -> list[str]:
@@ -605,13 +680,10 @@ class LaTeXGenerator:
             return f"{self._generate_identifier(base_id)}^*"
         elif name.endswith("~"):
             base = name[:-1]
-            # Render as R^{-1} (relational inverse) or R^{\sim} in fuzz
+            # Render as R^{-1} (standard) or R^{\sim} (fuzz)
             base_id = Identifier(line=0, column=0, name=base)
             base_latex = self._generate_identifier(base_id)
-            if not self.use_fuzz:
-                return f"{base_latex}^{{-1}}"
-            else:
-                return f"{base_latex}^{{\\sim}}"
+            return self._get_closure_operator_latex("~", base_latex)
 
         # Check if this is an operator/function from UNARY_OPS dictionary
         # This handles operators like id, inv, dom, ran when used as identifiers
@@ -623,16 +695,9 @@ class LaTeXGenerator:
         # Mathematical type names: use blackboard bold (or fuzz built-in types)
         # N = naturals, Z = integers, N1 = positive integers (≥ 1)
         # Only convert N and Z, not Q/R/C which are commonly used as variables
-        if name == "Z":
-            # Fuzz uses \num for integers, LaTeX uses \mathbb{Z}
-            return r"\num" if self.use_fuzz else r"\mathbb{Z}"
-        if name == "N":
-            # Fuzz uses \nat for naturals, LaTeX uses \mathbb{N}
-            return r"\nat" if self.use_fuzz else r"\mathbb{N}"
-        if name == "N1":
-            # N1 = positive integers {1, 2, 3, ...}
-            # Render with subscript like exists1 → \exists_1
-            return r"\nat_1" if self.use_fuzz else r"\mathbb{N}_1"
+        type_latex = self._get_type_latex(name)
+        if type_latex is not None:
+            return type_latex
 
         # No underscore: return as-is
         if "_" not in name:
@@ -645,12 +710,7 @@ class LaTeXGenerator:
 
         # Multiple underscores → multi-word identifier
         if len(parts) > 2:
-            escaped = name.replace("_", r"\_")
-            # Fuzz: escape but no mathit wrapper
-            if self.use_fuzz:
-                return escaped
-            # Standard LaTeX: escape and wrap in mathit
-            return rf"\mathit{{{escaped}}}"
+            return self._format_multiword_identifier(name)
 
         # Single underscore: prioritize suffix length for subscript detection
         if len(parts) == 2:
@@ -679,16 +739,10 @@ class LaTeXGenerator:
                 return f"{prefix}_{{{suffix}}}"
             # Priority 3: Long suffix → multi-word identifier (e.g., cumulative_total)
             else:  # len(suffix) >= 3
-                escaped = name.replace("_", r"\_")
-                # Fuzz: escape but no mathit wrapper
-                if self.use_fuzz:
-                    return escaped
-                # Standard LaTeX: escape and wrap in mathit
-                return rf"\mathit{{{escaped}}}"
+                return self._format_multiword_identifier(name)
 
-        # Fallback: escape and use mathit
-        escaped = name.replace("_", r"\_")
-        return rf"\mathit{{{escaped}}}"
+        # Fallback: multi-word identifier
+        return self._format_multiword_identifier(name)
 
     @generate_expr.register(Number)
     def _generate_number(self, node: Number, parent: Expr | None = None) -> str:
@@ -764,13 +818,7 @@ class LaTeXGenerator:
 
         # Check if this is a postfix operator (rendered as superscript)
         if node.operator in {"~", "+", "*"}:
-            # Fuzz uses special commands for closure operators
-            if self.use_fuzz and node.operator == "+":
-                return rf"{operand} \plus"
-            if self.use_fuzz and node.operator == "*":
-                return rf"{operand} \star"
-            # Standard LaTeX or inverse: operand^{superscript}
-            return f"{operand}{op_latex}"
+            return self._get_closure_operator_latex(node.operator, operand)
         # Generic instantiation operators (P, P1, F, F1)
         # Per fuzz manual p.23: prefix generic symbols are operator symbols,
         # LaTeX inserts thin space automatically - NO TILDE needed
@@ -888,15 +936,8 @@ class LaTeXGenerator:
         if op_latex is None:
             raise ValueError(f"Unknown binary operator: {node.operator}")
 
-        # Fuzz-specific operator mappings
-        if self.use_fuzz:
-            # Fuzz uses \implies instead of \Rightarrow for implication
-            if node.operator in ("=>", "implies"):
-                op_latex = r"\implies"
-            # Fuzz uses \iff for logical equivalence in predicates (schemas, etc.)
-            # but \Leftrightarrow for equivalence in EQUIV blocks
-            elif node.operator == "<=>" and not self._in_equiv_block:
-                op_latex = r"\iff"
+        # Apply fuzz-specific operator mappings
+        op_latex = self._map_binary_operator(node.operator, op_latex)
 
         # Pass this node as parent to children
         left = self.generate_expr(node.left, parent=node)
@@ -976,8 +1017,7 @@ class LaTeXGenerator:
 
         if node.domain:
             domain_latex = self.generate_expr(node.domain, parent=node)
-            # Fuzz uses : instead of \colon
-            parts.append(":" if self.use_fuzz else r"\colon")
+            parts.append(self._get_colon_separator())
             parts.append(domain_latex)
 
         # Special handling for mu operator in fuzz mode
@@ -1017,7 +1057,7 @@ class LaTeXGenerator:
         # Check if quantifier has expression part (bullet separator)
         if node.expression:
             # Use | or \mid for predicate separator
-            pipe_sep = "|" if self.use_fuzz else r"\mid"
+            pipe_sep = self._get_mid_separator()
 
             # Increment depth for nested quantifiers
             self._quantifier_depth += 1
@@ -1038,14 +1078,12 @@ class LaTeXGenerator:
                 parts.append(body_latex)
 
             # Add @ or bullet separator and expression
-            # Fuzz uses @ (at sign), LaTeX uses \bullet
-            parts.append("@" if self.use_fuzz else r"\bullet")
+            parts.append(self._get_bullet_separator())
             expr_latex = self.generate_expr(node.expression, parent=node)
             parts.append(expr_latex)
         else:
             # Standard quantifier: @ or bullet separator and body
-            # Fuzz uses @ (at sign), LaTeX uses \bullet
-            separator = "@" if self.use_fuzz else r"\bullet"
+            separator = self._get_bullet_separator()
 
             # Increment depth for nested quantifiers
             self._quantifier_depth += 1
@@ -1098,8 +1136,8 @@ class LaTeXGenerator:
         domain_latex = self.generate_expr(node.domain)
         parts.append(domain_latex)
 
-        # Add bullet/@ separator (fuzz uses @, standard LaTeX uses \bullet)
-        parts.append("@" if self.use_fuzz else r"\bullet")
+        # Add bullet/@ separator
+        parts.append(self._get_bullet_separator())
         body_latex = self.generate_expr(node.body)
         parts.append(body_latex)
 
@@ -1141,22 +1179,20 @@ class LaTeXGenerator:
 
         if node.domain:
             domain_latex = self.generate_expr(node.domain)
-            # Fuzz uses : instead of \colon
-            parts.append(":" if self.use_fuzz else r"\colon")
+            parts.append(self._get_colon_separator())
             parts.append(domain_latex)
 
         # Handle case with no predicate
         if node.predicate is None:
             # No predicate: { x : X . expr } -> use bullet/@ directly
             if node.expression:
-                # Fuzz uses @ (at sign) inside Z environments, LaTeX uses \bullet
-                parts.append("@" if self.use_fuzz else r"\bullet")
+                parts.append(self._get_bullet_separator())
                 expression_latex = self.generate_expr(node.expression)
                 parts.append(expression_latex)
             # else: {x : T} with no predicate or expression - just the binding
         else:
             # Has predicate: add mid/pipe separator
-            parts.append("|" if self.use_fuzz else r"\mid")
+            parts.append(self._get_mid_separator())
 
             # Generate predicate
             predicate_latex = self.generate_expr(node.predicate)
@@ -1164,8 +1200,7 @@ class LaTeXGenerator:
 
             # If expression is present, add bullet/@ and expression
             if node.expression:
-                # Fuzz uses @ (at sign) inside Z environments, LaTeX uses \bullet
-                parts.append("@" if self.use_fuzz else r"\bullet")
+                parts.append(self._get_bullet_separator())
                 expression_latex = self.generate_expr(node.expression)
                 parts.append(expression_latex)
 

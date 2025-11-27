@@ -290,7 +290,7 @@ Renders as: $\Leftrightarrow p \lor (\lnot p \land q)$ with justification [$\lan
 
 Example with relation operators:
 ```
-<=> (exists y : Y | w |-> y in (R o9 S) land y |-> z in T) [definition of o9]
+<=> (exists y : Y | w |-> y elem (R o9 S) land y |-> z elem T) [definition of o9]
 ```
 Renders as: $\Leftrightarrow \exists y : Y \bullet w \mapsto y \in (R \circ S) \land y \mapsto z \in T$ with justification [definition of $\circ$]
 
@@ -358,7 +358,7 @@ forall i, j : dom f | f i = f j => i = j
 forall i, j : dom f | f i = f j . i = j
 ```
 
-The bullet separator works correctly when followed by set operators (`in`, `notin`, `subset`), logical operators (`land`, `lor`, `=>`), or comparisons (`<`, `>`, `<=`, `>=`, `!=`).
+The bullet separator works correctly when followed by set operators (`elem`, `notin`, `subset`), logical operators (`land`, `lor`, `=>`), or comparisons (`<`, `>`, `<=`, `>=`, `!=`).
 
 #### Definite Description (μ)
 
@@ -374,7 +374,7 @@ Generates (in fuzz mode): $(\mu x : \mathbb{N} \mid x \times x = 4 \land x > 0)$
 
 **With expression part** (selecting from a set):
 ```
-mu x : N | x in S . f(x)
+mu x : N | x elem S . f(x)
 ```
 
 Generates: `(\mu x : \mathbb{N} \mid x \in S @ f(x))`
@@ -458,11 +458,11 @@ Generates: $\mu x : \mathbb{N} \bullet x > 0$
 ### Set Membership
 
 ```
-x in A  (or: x elem A)   →  x ∈ A       ['is an element of']
-x notin B                →  x ∉ B       ['not an element of']
+x elem A         →  x ∈ A       ['is an element of']
+x notin B        →  x ∉ B       ['not an element of']
 ```
 
-**Note:** Both `in` and `elem` are supported for set membership - use whichever form you prefer.
+**Note:** Use `elem` for set membership. The `in` keyword was deprecated in favor of `elem` to avoid ambiguity with English prose.
 
 ### Set Relations
 
@@ -560,7 +560,7 @@ The bullet (`•`) separates the predicate from the expression.
 
 **Without domain:**
 ```
-{ x | x in A }
+{ x | x elem A }
 ```
 
 **With maplets:**
@@ -1473,7 +1473,7 @@ end
 
 ```
 zed
-  exists n : NAME | birthday(n) in December
+  exists n : NAME | birthday(n) elem December
 end
 ```
 
@@ -1524,7 +1524,7 @@ end
 **Complex predicates:**
 ```
 zed
-  forall x : S | exists y : T | x in y
+  forall x : S | exists y : T | x elem y
 end
 ```
 
