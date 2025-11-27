@@ -3693,9 +3693,10 @@ class LaTeXGenerator:
         # Handle Document content (multiple items in zed block)
         if isinstance(node.content, Document):
             for idx, item in enumerate(node.content.items):
-                # Add line break before all items except the first
+                # Add \also separator before all items except the first
+                # Note: fuzz requires \also between Z paragraphs, not \\
                 if idx > 0:
-                    lines.append(r"\\")
+                    lines.append(r"\also")
 
                 # Generate given types: [A, B, C]
                 if isinstance(item, GivenType):
