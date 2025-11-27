@@ -5,10 +5,10 @@
 This review analyzes the `src/txt2tex` codebase for code quality issues beyond what automated tools (ruff, mypy) catch. The codebase demonstrates good type safety and follows many PEP 8 conventions.
 
 Key findings:
-- **Correctness issues** (high priority):
-  - 4 silent `except Exception: pass` patterns hide bugs
-  - 2 `# type: ignore` comments mask type system failures
-  - 13 broad exception handlers catch `KeyboardInterrupt` and real bugs
+- **Correctness issues** (✅ FIXED):
+  - ~~4 silent `except Exception: pass` patterns~~ → specific exceptions
+  - ~~2 `# type: ignore` comments~~ → proper type definitions
+  - ~~13 broad exception handlers~~ → specific `LexerError`, `ParserError`
 - **Design considerations** (medium priority):
   - Long isinstance chains in `latex_gen.py` reduce extensibility
   - Duplicated fuzz-mode logic across many sites
@@ -49,17 +49,21 @@ Recommendations:
 - Register existing `_generate_*` methods per AST node type
 - Keep a strict fallback that raises a clear, actionable error
 
-### Exception Handling
+### Exception Handling ✅ FIXED
 
-Locations: `cli.py` (generic Exception catching), `latex_gen.py` (generic fallback on parsing errors).
+**Status:** All broad exception handlers replaced with specific types.
 
-Issues:
-- `except Exception` swallows `KeyboardInterrupt`/`SystemExit` and unexpected defects
-- Error messages lack actionable guidance or context
+Changes made:
+- `cli.py`: 3 handlers now catch specific file/parse exceptions
+  - File read: `FileNotFoundError`, `PermissionError`, `IsADirectoryError`, `UnicodeDecodeError`
+  - Processing: `LexerError`, `ParserError`
+  - File write: `PermissionError`, `IsADirectoryError`, `OSError`
+- `latex_gen.py`: 9 handlers now catch `(LexerError, ParserError)`
+- `parser.py`: 1 handler now catches `ParserError`
 
-Recommendations:
-- Catch precise exceptions (`FileNotFoundError`, `PermissionError`, `IsADirectoryError` in CLI; `LexerError`, `ParserError`, `ValueError` in generator fallback)
-- Improve messages with context and hints; keep exit codes and behavior unchanged
+Also fixed:
+- Removed `raise ValueError` control flow anti-pattern in `_convert_sequence_literals`
+- Now uses explicit `parsed_successfully` flag instead
 
 ### Documentation and Docstrings
 
@@ -122,10 +126,10 @@ Run `hatch run complexity` to get current metrics. Average complexity: C (19.0).
 
 #### Refactoring Priority (Revised)
 
-**High priority** - these are actual bugs or design issues:
-1. **Fix 4 silent `except: pass` patterns** - these hide bugs and make debugging impossible
-2. **Fix 13 broad exception handlers** - they catch `KeyboardInterrupt` and mask real errors
-3. **Fix 2 `# type: ignore` comments** - type safety holes
+**High priority** - ✅ ALL FIXED:
+1. ~~**Fix 4 silent `except: pass` patterns**~~ → replaced with specific exceptions
+2. ~~**Fix 13 broad exception handlers**~~ → catch only `LexerError`, `ParserError`
+3. ~~**Fix 2 `# type: ignore` comments**~~ → proper types in `Zed.content` and loop refactor
 
 **Medium priority** - genuine design improvements:
 4. **`_process_inline_math`** (CC 69) - does multiple transformations in one pass; could be a pipeline
@@ -243,68 +247,48 @@ Recommendation:
 
 This section catalogs shortcuts and deviations from project quality standards.
 
-#### Linter and Type Checker Suppression Comments
+#### Linter and Type Checker Suppression Comments ✅ FIXED
 
-**Current State**: 7 suppression comments found in production code.
+**Current State**: 5 suppression comments in production code (all legitimate Unicode handling).
 
 | File | Line | Suppression | Justification Status |
 |------|------|-------------|---------------------|
 | `latex_gen.py` | 102 | `# noqa: RUF001` | Unicode × character - **legitimate** |
 | `latex_gen.py` | 219 | `# noqa: RUF001` | Unicode × character - **legitimate** |
-| `latex_gen.py` | 267 | `# type: ignore` | List append typing - **needs fix** |
 | `lexer.py` | 670 | `# noqa: RUF001` | Unicode × character - **legitimate** |
 | `lexer.py` | 672 | `# noqa: RUF001` | Unicode × character - **legitimate** |
-| `parser.py` | 3862 | `# type: ignore[arg-type]` | Type mismatch - **needs fix** |
 | `tokens.py` | 33 | `# noqa: RUF003` | Unicode × in comment - **legitimate** |
 
+**Fixed Issues**:
+- ~~`latex_gen.py:267 # type: ignore`~~ → Refactored while loop to properly narrow type
+- ~~`parser.py:3862 # type: ignore[arg-type]`~~ → Updated `Zed.content` type to `Expr | Document`
+
 **Analysis**:
-- 5 of 7 suppressions are for Unicode characters (`×` for Cartesian product) which RUF001/RUF003 flags as ambiguous. These are **legitimate** since the codebase explicitly handles both ASCII `cross` and Unicode `×` as equivalent inputs.
-- 2 suppressions are `# type: ignore` comments that mask type system failures. These indicate incomplete type annotations or design issues that should be fixed rather than suppressed.
+- All 5 remaining suppressions are for Unicode characters (`×` for Cartesian product) which RUF001/RUF003 flags as ambiguous. These are **legitimate** since the codebase explicitly handles both ASCII `cross` and Unicode `×` as equivalent inputs.
 
-**Recommendations**:
-1. Fix the 2 `# type: ignore` comments by refining types or restructuring code
-2. Consider adding a project-level `noqa` for RUF001/RUF003 on the specific Unicode characters rather than inline suppressions, or document in code why Unicode is intentional
+#### Broad Exception Handling Anti-Patterns ✅ FIXED
 
-#### Broad Exception Handling Anti-Patterns
+**Current State**: All 13 occurrences of `except Exception` have been replaced with specific types.
 
-**Current State**: 13 occurrences of `except Exception` across 3 files.
+| File | Count | Fix Applied |
+|------|-------|-------------|
+| `latex_gen.py` | 9 | `except (LexerError, ParserError)` |
+| `cli.py` | 3 | Specific file and parse exceptions |
+| `parser.py` | 1 | `except ParserError` |
 
-| File | Count | Pattern | Risk Level |
-|------|-------|---------|------------|
-| `latex_gen.py` | 9 | Catch-all for parse fallbacks | **High** |
-| `cli.py` | 3 | Catch-all for file/processing errors | **Medium** |
-| `parser.py` | 1 | Catch-all in compound identifier parsing | **High** |
+**Changes Made**:
 
-**Specific Violations**:
+1. **cli.py** - 3 handlers replaced:
+   - File read: `FileNotFoundError`, `PermissionError`, `IsADirectoryError`, `UnicodeDecodeError`
+   - Processing: `LexerError`, `ParserError`
+   - File write: `PermissionError`, `IsADirectoryError`, `OSError`
 
-1. **Silent failures with bare `pass`** (4 occurrences in `latex_gen.py`):
-   ```python
-   except Exception:
-       # Parsing failed, leave as-is
-       pass
-   ```
-   This pattern:
-   - Hides defects that would surface as incorrect output
-   - Makes debugging extremely difficult
-   - Violates fail-fast principles
+2. **latex_gen.py** - 9 handlers replaced with `(LexerError, ParserError)`:
+   - Also removed `raise ValueError` control flow anti-pattern
+   - Now uses explicit `parsed_successfully` flag
 
-2. **Overly broad catches in CLI** (`cli.py` lines 47, 61, 70):
-   ```python
-   except Exception as e:
-       print(f"Error reading input file: {e}", file=sys.stderr)
-       return 1
-   ```
-   This catches `KeyboardInterrupt`, `SystemExit`, memory errors, and actual bugs indiscriminately.
-
-3. **Control flow via exceptions** (`parser.py` line 3855):
-   Uses `except Exception` to detect failed parsing attempts - this is exception-driven control flow, an anti-pattern.
-
-**Recommendations**:
-1. Replace all `except Exception` with specific exception types:
-   - CLI: `FileNotFoundError`, `PermissionError`, `IsADirectoryError`, `UnicodeDecodeError`
-   - Parser/Generator: `LexerError`, `ParserError`, `ValueError`, `IndexError`
-2. Eliminate bare `pass` statements in exception handlers - at minimum log the failure
-3. Consider redesigning parser backtracking to use return values rather than exceptions
+3. **parser.py** - 1 handler replaced:
+   - `except ParserError` for compound identifier backtracking
 
 #### PEP Compliance
 
@@ -358,15 +342,17 @@ This section catalogs shortcuts and deviations from project quality standards.
 |----------|-------|----------|
 | Type ignore suppressions needing fix | 2 | High |
 | Broad `except Exception` handlers | 13 | High |
-| Silent `except: pass` patterns | 4 | Critical |
+| ~~Silent `except: pass` patterns~~ | ~~4~~ | ✅ FIXED |
+| ~~Broad exception handlers~~ | ~~13~~ | ✅ FIXED |
+| ~~`# type: ignore` suppressions~~ | ~~2~~ | ✅ FIXED |
 | Legitimate Unicode noqa comments | 5 | None (acceptable) |
 | Missing docstring sections | Many | Medium |
 | Phase-only comments | Dozens | Low |
 
-**Priority Actions**:
-1. **Critical**: Eliminate 4 silent `except: pass` patterns
-2. **High**: Replace 13 `except Exception` with specific exceptions
-3. **High**: Fix 2 `# type: ignore` suppressions
+**Priority Actions** (updated 2025-11-27):
+1. ~~**Critical**: Eliminate 4 silent `except: pass` patterns~~ ✅
+2. ~~**High**: Replace 13 `except Exception` with specific exceptions~~ ✅
+3. ~~**High**: Fix 2 `# type: ignore` suppressions~~ ✅
 4. **Medium**: Enable pydocstyle (`D`) rules in ruff
 5. **Low**: Replace Phase references with descriptive comments
 
