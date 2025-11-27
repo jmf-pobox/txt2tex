@@ -40,7 +40,7 @@ q [lor elim]
             q [=> elim with p => q]
           case lnot p:
             q [=> elim with lnot p => q]
-          q [or elim]
+          q [lor elim]
 
 TEXT: By LEM, we can case-analyze on p lor lnot p. In both cases we derive q.
 
@@ -49,15 +49,15 @@ TEXT: By LEM, we can case-analyze on p lor lnot p. In both cases we derive q.
 TEXT: Prove: lnot lnot p => p
 
 PROOF:
-p [or elim]
+p [lor elim]
   [1] lnot lnot p [assumption]
       p lor lnot p [LEM]
       case p:
         p [identity]
       case lnot p:
-        false [contradiction with not not p]
+        false [contradiction with lnot lnot p]
         p [false elim]
-      p [or elim]
+      p [lor elim]
 
 TEXT: LEM enables double negation elimination in classical logic.
 
@@ -66,7 +66,7 @@ TEXT: LEM enables double negation elimination in classical logic.
 TEXT: Prove: lnot (p land q) => (lnot p lor lnot q)
 
 PROOF:
-lnot p lor lnot q [or elim]
+lnot p lor lnot q [lor elim]
   [1] lnot (p land q) [assumption]
       p lor lnot p [LEM]
       case p:
@@ -75,14 +75,14 @@ lnot p lor lnot q [or elim]
           p land q [land intro]
           false [contradiction with premise]
           lnot p lor lnot q [false elim]
-        case not q:
+        case lnot q:
           lnot q [identity]
           lnot p lor lnot q [lor intro right]
-        lnot p or lnot q [or elim]
-      case not p:
+        lnot p lor lnot q [lor elim]
+      case lnot p:
         lnot p [identity]
         lnot p lor lnot q [lor intro left]
-      lnot p or lnot q [or elim]
+      lnot p lor lnot q [lor elim]
 
 TEXT: This proof requires LEM to case-analyze on both p and q.
 
@@ -97,7 +97,7 @@ TEXT: LEM states that all propositions are decidable in classical logic.
 TEXT: Prove: (lnot p => false) => p
 
 PROOF:
-p [or elim]
+p [lor elim]
   [1] lnot p => false [assumption]
       p lor lnot p [LEM]
       case p:
@@ -105,7 +105,7 @@ p [or elim]
       case lnot p:
         false [=> elim]
         p [false elim]
-      p [or elim]
+      p [lor elim]
 
 TEXT: This shows that proof by contradiction follows from LEM.
 
@@ -123,8 +123,8 @@ lnot p lor q [lor elim]
         q [=> elim]
         lnot p lor q [lor intro right]
       case lnot p:
-        lnot p lor q [or intro left]
-      lnot p or q [or elim]
+        lnot p lor q [lor intro left]
+      lnot p lor q [lor elim]
 
 TEXT: Right-to-left (lnot p lor q => p => q):
 
@@ -146,7 +146,7 @@ TEXT: Material implication equivalence uses LEM in the forward direction.
 TEXT: Prove: ((p => q) => p) => p
 
 PROOF:
-p [or elim]
+p [lor elim]
   [1] (p => q) => p [assumption]
       p lor lnot p [LEM]
       case p:
@@ -157,7 +157,7 @@ p [or elim]
             q [false elim]
         p => q [=> intro from 2]
         p [=> elim with premise]
-      p [or elim]
+      p [lor elim]
 
 TEXT: Pierce's law is equivalent to LEM in classical logic.
 
@@ -191,7 +191,7 @@ TEXT: We can decide this by checking if n equals 0.
 
 TEXT: But general propositions may not be decidable constructively:
 
-forall p | p lor lnot p  -- requires LEM in general case
+forall p | p lor lnot p  -- requires LEM elem general case
 
 ** Example 12: Proof Strategy with LEM **
 
@@ -205,7 +205,7 @@ TEXT: 4. Conclude Q by or elim
 
 TEXT: This technique is called "proof by cases" or "case analysis."
 
-** Example 13: LEM and Indirect Proof **
+** Example 13: LEM land Indirect Proof **
 
 TEXT: Indirect proof pattern using LEM:
 
@@ -225,7 +225,7 @@ TEXT: LEM enables the final step (double negation elimination).
 TEXT: Prove: There exists a person x such that if x drinks, then everyone drinks.
 
 PROOF:
-exists x | x drinks => (forall y | y drinks) [or elim]
+exists x | x drinks => (forall y | y drinks) [lor elim]
   [1] p lor lnot p [assumption]
       case p:
         Pick any person a
@@ -241,7 +241,7 @@ exists x | x drinks => (forall y | y drinks) [or elim]
             forall y | y drinks [false elim]
         b drinks => (forall y | y drinks) [=> intro from 2]
         exists x | x drinks => (forall y | y drinks) [exists intro with x = b]
-      exists x | x drinks => (forall y | y drinks) [or elim]
+      exists x | x drinks => (forall y | y drinks) [lor elim]
 
 TEXT: This classical proof uses LEM crucially.
 

@@ -13,7 +13,7 @@
 \section*{Advanced Generic Definitions}
 
 \begin{zed}
-  [B]
+[BGA]
 \end{zed}
 
 \section*{Example 1 : Generic Three - Way Product}
@@ -28,12 +28,11 @@
   getFirst: X \cross Y \cross \num \fun X \\
   getSecond: X \cross Y \cross \num \fun Y \\
   getThird: X \cross Y \cross \num \fun \num
-  \where
-  \forall x : X @ \forall y : Y @ \forall z : \num @ triple(x, y, z)
-  = (x, y, z) \land \\
-  \t3 getFirst(x, y, z) = x \land \\
-  \t3 getSecond(x, y, z) = y \land \\
-  \t3 getThird(x, y, z) = z
+\where
+  \forall x : X @ \forall y : Y @ \forall z : \num @ triple(x, y, z) = (x, y, z) \land \\
+\t3 getFirst(x, y, z) = x \land \\
+\t3 getSecond(x, y, z) = y \land \\
+\t3 getThird(x, y, z) = z
 \end{gendef}
 
 \noindent Projection functions for triples.
@@ -43,11 +42,7 @@
 \section*{Example 2 : Generic Binary Tree ( Conceptual )}
 \addcontentsline{toc}{section}{Example 2 : Generic Binary Tree ( Conceptual )}
 
-\noindent Binary trees are typically defined for specific types in Z
-notation rather than as fully polymorphic structures. For a concrete
-type like N, you would $define : Tree$ ::= leaf $\mid$ node⟨N cross
-Tree cross Tree⟩. Generic trees require complex workarounds beyond
-standard gendef blocks, as free types in fuzz are not easily parameterized.
+\noindent Binary trees are typically defined for specific types in Z notation rather than as fully polymorphic structures. For a concrete type like N, you would $define : Tree$ ::= leaf $\mid$ node⟨N cross Tree cross Tree⟩. Generic trees require complex workarounds beyond standard gendef blocks, as free types in fuzz are not easily parameterized.
 
 \bigskip
 
@@ -58,20 +53,19 @@ standard gendef blocks, as free types in fuzz are not easily parameterized.
 
 \bigskip
 
-\noindent
+\noindent 
 
 \bigskip
 
-\noindent Note: Fuzz supports generic schemas using the schema[X]
-syntax (not gendef):
+\noindent Note: Fuzz supports generic schemas using the schema[X] syntax (not gendef):
 
 \bigskip
 
 \begin{schema}{Container}[X]
-  contents : \seq~X \\
-  capacity : \nat
-  \where
-  \# contents \leq capacity
+contents : \seq~X \\
+capacity : \nat
+\where
+\# contents \leq capacity
 \end{schema}
 
 \noindent This schema is parameterized by the element type X.
@@ -91,7 +85,7 @@ syntax (not gendef):
 
 \begin{gendef}[X, Y, Z]
   compose: (X \rel Y) \cross (Y \rel \num) \fun (X \rel \num)
-  \where
+\where
   \forall R : X \rel Y @ \forall S : Y \rel \num @ compose(R, S) = R \comp S
 \end{gendef}
 
@@ -102,33 +96,28 @@ syntax (not gendef):
 \section*{Example 8 : Generic Option Type ( Conceptual )}
 \addcontentsline{toc}{section}{Example 8 : Generic Option Type ( Conceptual )}
 
-\noindent Optional values (like Maybe or Option in other languages)
-are challenging to express generically in Z notation due to
-limitations with parameterized free types. For a specific type, you
-would $define : Option$ ::= none $\mid$ some⟨T⟩. Fully generic option
-types with operations require advanced patterns beyond standard gendef blocks.
+\noindent Optional values (like Maybe or Option in other languages) are challenging to express generically in Z notation due to limitations with parameterized free types. For a specific type, you would $define : Option$ ::= none $\mid$ some⟨T⟩. Fully generic option types with operations require advanced patterns beyond standard gendef blocks.
 
 \bigskip
 
 \section*{Example 9 : Generic Stack Schema}
 \addcontentsline{toc}{section}{Example 9 : Generic Stack Schema}
 
-\noindent Note: Define generic schema separately, then declare
-operations in gendef:
+\noindent Note: Define generic schema separately, then declare operations in gendef:
 
 \bigskip
 
 \begin{schema}{Stack}[X]
-  items : \seq~X \\
-  maxSize : \nat
-  \where
-  \# items \leq maxSize
+items : \seq~X \\
+maxSize : \nat
+\where
+\# items \leq maxSize
 \end{schema}
 
 \begin{gendef}[X]
   emptyStack: Stack[X] \\
   stackSize: Stack[X] \fun \nat
-  \where
+\where
   emptyStack.items = \langle \rangle \land emptyStack.maxSize = 100 \\
   \forall s : Stack[X] @ stackSize(s) = \# s.items
 \end{gendef}
@@ -137,8 +126,7 @@ operations in gendef:
 
 \bigskip
 
-\noindent The schema is defined separately using schema[X] syntax,
-then operations use gendef.
+\noindent The schema is defined separately using schema[X] syntax, then operations use gendef.
 
 \bigskip
 
@@ -150,16 +138,15 @@ then operations use gendef.
 \bigskip
 
 \begin{schema}{OrderedPair}[X, Y]
-  first : X \\
-  second : Y
+first : X \\
+second : Y
 \end{schema}
 
 \noindent A generic pair type.
 
 \bigskip
 
-\noindent The schema has two type parameters and can be instantiated
-as OrderedPair[N, Char], etc.
+\noindent The schema has two type parameters and can be instantiated as OrderedPair[N, Char], etc.
 
 \bigskip
 
@@ -172,11 +159,9 @@ as OrderedPair[N, Char], etc.
 
 \begin{gendef}[X, Y]
   zip: \seq~X \cross \seq~Y \fun \seq~(X \cross Y)
-  \where
+\where
   zip(\langle \rangle, \langle \rangle) = \langle \rangle \\
-  \forall x : X @ \forall y : Y @ \forall xs : \seq~X @ \forall ys :
-  \seq~Y @ zip(\langle x \rangle \cat xs, \langle y \rangle \cat ys)
-  = \langle (x, y) \rangle \cat zip(xs, ys) \\
+  \forall x : X @ \forall y : Y @ \forall xs : \seq~X @ \forall ys : \seq~Y @ zip(\langle x \rangle \cat xs, \langle y \rangle \cat ys) = \langle (x, y) \rangle \cat zip(xs, ys) \\
   \forall xs : \seq~X @ zip(xs, \langle \rangle) = \langle \rangle \\
   \forall ys : \seq~Y @ zip(\langle \rangle, ys) = \langle \rangle
 \end{gendef}
@@ -185,43 +170,39 @@ as OrderedPair[N, Char], etc.
 
 \bigskip
 
-\section*{Example 12 : Practical Example - Generic Database Table}
-\addcontentsline{toc}{section}{Example 12 : Practical Example -
-Generic Database Table}
+\section*{Example 12 : Practical Example - Generic Database TableGA}
+\addcontentsline{toc}{section}{Example 12 : Practical Example - Generic Database TableGA}
 
-\noindent Note: Define generic schema separately, then query
-operations in gendef:
+\noindent Note: Define generic schema separately, then query operations in gendef:
 
 \bigskip
 
 \begin{zed}
-  [Key, Value]
+[Key, Value]
 \end{zed}
 
-\begin{schema}{Table}[Key, Value]
-  entries : Key \pfun Value \\
-  size : \nat
-  \where
-  size = \# (\dom entries)
+\begin{schema}{TableGA}[Key, Value]
+entries : Key \pfun Value \\
+size : \nat
+\where
+size = \# (\dom entries)
 \end{schema}
 
 \begin{gendef}[Key, Value]
-  emptyTable: Table[Key, Value] \\
-  tableSize: Table[Key, Value] \fun \nat \\
-  allKeys: Table[Key, Value] \fun \power Key
-  \where
+  emptyTable: TableGA[Key, Value] \\
+  tableSize: TableGA[Key, Value] \fun \nat \\
+  allKeys: TableGA[Key, Value] \fun \power Key
+\where
   emptyTable.entries = \{\} \land emptyTable.size = 0 \\
-  \forall t : Table[Key, Value] @ tableSize(t) = t.size \\
-  \forall t : Table[Key, Value] @ allKeys(t) = \dom t.entries
+  \forall t : TableGA[Key, Value] @ tableSize(t) = t.size \\
+  \forall t : TableGA[Key, Value] @ allKeys(t) = \dom t.entries
 \end{gendef}
 
-\noindent A generic key-value table with query operations. This
-demonstrates how generic definitions enable reusable, type-safe data structures.
+\noindent A generic key-value table with query operations. This demonstrates how generic definitions enable reusable, type-safe data structures.
 
 \bigskip
 
-\noindent The Table schema is defined with schema[Key, Value] syntax,
-allowing proper fuzz typechecking.
+\noindent The TableGA schema is defined with schema[Key, Value] syntax, allowing proper fuzz typechecking.
 
 \bigskip
 

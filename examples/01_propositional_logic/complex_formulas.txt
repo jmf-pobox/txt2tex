@@ -16,7 +16,7 @@
 // See: docs/USER_GUIDE.md - Sections "Propositional Logic", "Predicate Logic"
 // ============================================================================
 
-=== Phase 3: Quantifiers and Mathematical Notation ===
+=== Phase 3: Quantifiers land Mathematical Notation ===
 
 ** Example 1: Quantifiers **
 
@@ -29,7 +29,7 @@ exists y : N | y = 0
 (c)
 forall n : N | n >= 0 land n < 100
 
-** Example 2: Subscripts and Superscripts **
+** Example 2: Subscripts land Superscripts **
 
 (a)
 x^2
@@ -54,7 +54,7 @@ y > 5 lor y = 0
 ** Example 4: Set Operators **
 
 (a)
-x in N
+x elem N
 
 (b)
 A subset B
@@ -65,7 +65,7 @@ A union B intersect C
 ** Example 5: Complex Expressions **
 
 (a) EQUIV:
-forall x : N | x in N land x >= 0
+forall x : N | x elem N land x >= 0
 forall x : N | x >= 0
 
 (b)

@@ -16,15 +16,15 @@
 \addcontentsline{toc}{section}{Test 1 : Simple ( depth 1 )}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies q}{
-      \ulcorner p \urcorner^{[1]}
-      &
-      \infer[\mbox{axiom}]{q}{}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies q}{
+  \ulcorner p \urcorner^{[1]}
+&
+\infer[\mbox{axiom}]{q}{}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -32,19 +32,19 @@
 \addcontentsline{toc}{section}{Test 2 : Moderate ( depth 2 )}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (q \implies r)}{
-      \ulcorner p \urcorner^{[1]}
-      &
-      \infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies r}{
-        \ulcorner q \urcorner^{[2]}
-        &
-        \infer[\mbox{axiom}]{r}{}
-      }
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (q \implies r)}{
+  \ulcorner p \urcorner^{[1]}
+&
+\infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies r}{
+  \ulcorner q \urcorner^{[2]}
+&
+\infer[\mbox{axiom}]{r}{}
+}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -52,24 +52,23 @@
 \addcontentsline{toc}{section}{Test 3 : Deep ( depth 3 )}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (q \implies
-    (r \implies s))}{
-      \ulcorner p \urcorner^{[1]}
-      &
-      \infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies (r \implies s)}{
-        \ulcorner q \urcorner^{[2]}
-        &
-        \infer[\Rightarrow\textrm{-intro}^{[3]}]{r \implies s}{
-          \ulcorner r \urcorner^{[3]}
-          &
-          \infer[\mbox{axiom}]{s}{}
-        }
-      }
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (q \implies (r \implies s))}{
+  \ulcorner p \urcorner^{[1]}
+&
+\infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies (r \implies s)}{
+  \ulcorner q \urcorner^{[2]}
+&
+\infer[\Rightarrow\textrm{-intro}^{[3]}]{r \implies s}{
+  \ulcorner r \urcorner^{[3]}
+&
+\infer[\mbox{axiom}]{s}{}
+}
+}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -77,29 +76,27 @@
 \addcontentsline{toc}{section}{Test 4 : Very Deep ( depth 4 )}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (q \implies
-    (r \implies (s \implies t)))}{
-      \ulcorner p \urcorner^{[1]}
-      &
-      \infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies (r \implies
-      (s \implies t))}{
-        \ulcorner q \urcorner^{[2]}
-        &
-        \infer[\Rightarrow\textrm{-intro}^{[3]}]{r \implies (s \implies t)}{
-          \ulcorner r \urcorner^{[3]}
-          &
-          \infer[\Rightarrow\textrm{-intro}^{[4]}]{s \implies t}{
-            \ulcorner s \urcorner^{[4]}
-            &
-            \infer[\mbox{axiom}]{t}{}
-          }
-        }
-      }
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \implies (q \implies (r \implies (s \implies t)))}{
+  \ulcorner p \urcorner^{[1]}
+&
+\infer[\Rightarrow\textrm{-intro}^{[2]}]{q \implies (r \implies (s \implies t))}{
+  \ulcorner q \urcorner^{[2]}
+&
+\infer[\Rightarrow\textrm{-intro}^{[3]}]{r \implies (s \implies t)}{
+  \ulcorner r \urcorner^{[3]}
+&
+\infer[\Rightarrow\textrm{-intro}^{[4]}]{s \implies t}{
+  \ulcorner s \urcorner^{[4]}
+&
+\infer[\mbox{axiom}]{t}{}
+}
+}
+}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -107,19 +104,19 @@
 \addcontentsline{toc}{section}{Test 5 : Horizontal siblings ( depth 2 )}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land q) \implies r}{
-      \ulcorner p \land q \urcorner^{[1]}
-      &
-      \infer[\land \mbox{elim}]{r}{
-        \ulcorner p \urcorner^{[1]}
-        &
-        \ulcorner q \urcorner^{[1]}
-      }
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land q) \implies r}{
+  \ulcorner p \land q \urcorner^{[1]}
+&
+\infer[\land \mbox{elim}]{r}{
+  \ulcorner p \urcorner^{[1]}
+&
+\ulcorner q \urcorner^{[1]}
+}
+}
+$%
+}
 \end{center}
 \bigskip
 

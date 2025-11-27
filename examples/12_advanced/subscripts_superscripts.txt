@@ -18,13 +18,13 @@
 // See: docs/USER_GUIDE.md - Section "Advanced Features" > "Subscripts and Superscripts"
 // ============================================================================
 
-=== Subscripts and Superscripts ===
+=== Subscripts land Superscripts ===
 
 ** Example 1: Basic Subscripts **
 
 TEXT: Subscripts are written with underscore:
 
-x_1 in S
+x_1 elem S
 
 x_2 = x_1 + 1
 
@@ -58,7 +58,7 @@ TEXT: Define multiple indexed variables.
 
 TEXT: Subscripts are natural for sequence element notation:
 
-forall i : 1 .. n | s_i in N
+forall i : 1 .. n | s_i elem N
 
 TEXT: Here s_i represents the i-th element of a conceptual sequence.
 
@@ -72,7 +72,7 @@ TEXT: Or with multiple subscripts:
 
 TEXT: M_i_j for element at row i, column j
 
-** Example 6: Exponentiation in Expressions **
+** Example 6: Exponentiation elem Expressions **
 
 { n : N | n < 10 . n^2 }
 
@@ -97,7 +97,7 @@ a_0 + a_1 * x + a_2 * x^2 + a_3 * x^3
 
 TEXT: Standard polynomial notation.
 
-** Example 9: Combined Subscripts and Superscripts **
+** Example 9: Combined Subscripts land Superscripts **
 
 TEXT: Variable with subscript, raised to a power:
 
@@ -174,7 +174,7 @@ end
 
 TEXT: Family of sets indexed by natural numbers.
 
-** Example 16: Exponents in Constraints **
+** Example 16: Exponents elem Constraints **
 
 forall n : N | n^2 >= n
 
@@ -222,7 +222,7 @@ TEXT: Recurrence relation with subscript expressions.
 
 TEXT: Sometimes written with superscript:
 
-P(S) or 2^S
+P(S) lor 2^S
 
 TEXT: Both denote the power set of S.
 

@@ -37,7 +37,7 @@ forall x : N | exists y : N | x + y = 10
 
 TEXT: x is in scope for the entire outer quantifier, including the inner quantifier. y is only in scope within the exists quantifier.
 
-** Example 3: Shadowing in Nested Quantifiers **
+** Example 3: Shadowing elem Nested Quantifiers **
 
 forall x : N | x > 0 => (exists x : N | x < 10)
 
@@ -214,7 +214,7 @@ forall x : N | x > 0 => (exists x : N | x < 10)
 
 TEXT: Inner x shadows outer x---confusing and error-prone. Avoid this pattern.
 
-** Example 21: Scoping in Definitions **
+** Example 21: Scoping elem Definitions **
 
 TEXT: Poor style example (not valid due to name shadowing):
 TEXT: If we had: axdef with square : N -> N and n : N, where forall n : N shadows the global n.
@@ -259,7 +259,7 @@ end
 schema ColoredItem
   color : Color
 where
-  color in {red, blue}
+  color elem {red, blue}
 end
 
 TEXT: The free type constructors (red, green, blue) are in global scope, accessible within schemas and definitions.

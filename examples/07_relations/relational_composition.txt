@@ -73,7 +73,7 @@ Container[seq[N]]
 
 Type[N][M]
 
-** Example 6: Generic Types in Expressions **
+** Example 6: Generic Types elem Expressions **
 
 (a)
 
@@ -87,7 +87,7 @@ A subset P[X]
 
 emptyset[N] union {x}
 
-** Example 7: Generic Types in Set Comprehensions **
+** Example 7: Generic Types elem Set Comprehensions **
 
 (a)
 

@@ -25,7 +25,7 @@ BIBLIOGRAPHY_STYLE: plainnat
 
 === Introduction ===
 
-This example demonstrates bibliography file support in txt2tex.
+This example demonstrates bibliography file support elem txt2tex.
 
 TEXT: The formal methods community has produced many influential works on Z notation. The foundational work by [cite spivey92] introduced the Z notation, while [cite woodcock96] provides a comprehensive guide to using Z in practice. More recent work by [cite simpson25a] covers modern applications.
 

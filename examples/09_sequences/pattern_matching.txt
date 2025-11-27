@@ -29,7 +29,7 @@ where
   f(<>) = 0
 end
 
-** Example 2: Cons Pattern (Head and Tail) **
+** Example 2: Cons Pattern (Head land Tail) **
 
 TEXT: Decomposing a sequence into head and tail:
 

@@ -23,7 +23,7 @@ INFRULE:
 Gamma shows P
 Gamma shows (P => Q)
 ---
-Gamma shows Q [modus ponens in sequent form]
+Gamma shows Q [modus ponens elem sequent form]
 
 TEXT: Combining shows with inference rules for natural deduction style:
 

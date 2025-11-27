@@ -6,7 +6,7 @@
 
 {}
 
-x in A
+x elem A
 
 x notin B
 

@@ -13,17 +13,15 @@ class ASTNode:
     column: int
 
 
-# Expression nodes (Phase 0)
+# Expression nodes
 
 
 @dataclass(frozen=True)
 class BinaryOp(ASTNode):
     """Binary operation node (and, or, =>, <=>).
 
-    Phase 27: Added line_break_after to support multi-line expressions.
     When line_break_after is True, LaTeX generator inserts \\\\ after the operator.
 
-    Phase 29: Added explicit_parens to preserve user-written parentheses.
     When explicit_parens is True, parentheses are always generated in LaTeX output,
     even if not required by precedence rules. This preserves semantic grouping and
     clarity from the source text.
@@ -58,18 +56,19 @@ class Number(ASTNode):
     value: str
 
 
-# Phase 3 expression nodes
+# Quantifier expression nodes
 
 
 @dataclass(frozen=True)
 class Quantifier(ASTNode):
     """Quantifier node (forall, exists, exists1, mu).
 
-    Phase 6 enhancement: Supports multiple variables with shared domain.
-    Phase 7 enhancement: Supports mu-operator (definite description).
-    Phase 11.5 enhancement: Supports mu with expression part (mu x : X | P . E).
-    Phase 28 enhancement: Supports tuple patterns for destructuring.
-    Phase 40 enhancement: Bullet separator for all quantifiers (GitHub issue #8).
+    Supports:
+        - Multiple variables with shared domain
+        - Mu-operator (definite description)
+        - Mu with expression part (mu x : X | P . E)
+        - Tuple patterns for destructuring
+        - Bullet separator for all quantifiers
 
     Examples:
     - forall x : N | pred  -> variables=["x"], domain=N, body=pred
@@ -115,12 +114,12 @@ class Superscript(ASTNode):
 
 @dataclass(frozen=True)
 class SetComprehension(ASTNode):
-    """Set comprehension node (Phase 8, enhanced Phase 22).
+    """Set comprehension node.
 
     Supports three forms:
-    - Set by predicate: { x : X | predicate } (expression=None)
-    - Set by expression with predicate: { x : X | predicate . expression }
-    - Set by expression only: { x : X . expression } (predicate=None, Phase 22)
+        - Set by predicate: { x : X | predicate } (expression=None)
+        - Set by expression with predicate: { x : X | predicate . expression }
+        - Set by expression only: { x : X . expression } (predicate=None)
 
     Examples:
     - { x : N | x > 0 } -> variables=["x"], domain=N, predicate=(x > 0),
@@ -133,13 +132,13 @@ class SetComprehension(ASTNode):
 
     variables: list[str]  # One or more variables (e.g., ["x"], ["x", "y"])
     domain: Expr | None  # Optional domain (e.g., N, Z, P X)
-    predicate: Expr | None  # The condition/predicate (Phase 22: can be None)
+    predicate: Expr | None  # The condition/predicate (can be None)
     expression: Expr | None  # Optional expression (if present, set by expression)
 
 
 @dataclass(frozen=True)
 class SetLiteral(ASTNode):
-    """Set literal node (Phase 11.5).
+    """Set literal node.
 
     Represents explicit set literals: {1, 2, 3}, {a, b, c}, {}
 
@@ -154,12 +153,12 @@ class SetLiteral(ASTNode):
 
 @dataclass(frozen=True)
 class FunctionApp(ASTNode):
-    """Function application node (Phase 11b, enhanced in Phase 13).
+    """Function application node.
 
     Represents function application: f(x), g(x, y, z), ⟨a, b, c⟩(2)
     Also used for sequence indexing and generic instantiation: seq(N), P(X)
 
-    Phase 13 enhancement: Supports applying any expression, not just identifiers.
+    Supports applying any expression, not just identifiers.
 
     Examples:
     - f(x) -> function=Identifier("f"), args=[Identifier("x")]
@@ -176,7 +175,7 @@ class FunctionApp(ASTNode):
 
 @dataclass(frozen=True)
 class FunctionType(ASTNode):
-    """Function type node (Phase 11c).
+    """Function type node.
 
     Represents function type arrows: X -> Y, X +-> Y, X >-> Y, etc.
 
@@ -202,7 +201,7 @@ class FunctionType(ASTNode):
 
 @dataclass(frozen=True)
 class Lambda(ASTNode):
-    """Lambda expression node (Phase 11d).
+    """Lambda expression node.
 
     Represents lambda expressions: lambda x : X . body
 
@@ -223,7 +222,7 @@ class Lambda(ASTNode):
 
 @dataclass(frozen=True)
 class Tuple(ASTNode):
-    """Tuple expression node (Phase 11.6).
+    """Tuple expression node.
 
     Represents tuple expressions: (a, b), (x, y, z)
 
@@ -246,7 +245,7 @@ class Tuple(ASTNode):
 
 @dataclass(frozen=True)
 class RelationalImage(ASTNode):
-    r"""Relational image node (Phase 11.8).
+    r"""Relational image node.
 
     Represents relational image: R(| S |)
 
@@ -268,7 +267,7 @@ class RelationalImage(ASTNode):
 
 @dataclass(frozen=True)
 class GenericInstantiation(ASTNode):
-    """Generic type instantiation node (Phase 11.9).
+    """Generic type instantiation node.
 
     Represents generic type instantiation: Type[A, B]
 
@@ -289,12 +288,12 @@ class GenericInstantiation(ASTNode):
     type_params: list[Expr]  # Type parameters (at least one)
 
 
-# Range node (Phase 13)
+# Range node
 
 
 @dataclass(frozen=True)
 class Range(ASTNode):
-    """Range expression node (Phase 13).
+    """Range expression node.
 
     Represents integer range expressions: m..n
 
@@ -312,12 +311,12 @@ class Range(ASTNode):
     end: Expr  # End of range (inclusive)
 
 
-# Sequence nodes (Phase 12)
+# Sequence nodes
 
 
 @dataclass(frozen=True)
 class SequenceLiteral(ASTNode):
-    """Sequence literal node (Phase 12).
+    """Sequence literal node.
 
     Represents sequence literals: ⟨⟩, ⟨a⟩, ⟨a, b, c⟩
 
@@ -337,7 +336,7 @@ class SequenceLiteral(ASTNode):
 
 @dataclass(frozen=True)
 class TupleProjection(ASTNode):
-    """Tuple projection node (Phase 12).
+    """Tuple projection node.
 
     Represents tuple component access: x.1, x.2, x.3, or schema field access: e.name
 
@@ -363,7 +362,7 @@ class TupleProjection(ASTNode):
 
 @dataclass(frozen=True)
 class BagLiteral(ASTNode):
-    """Bag literal node (Phase 12).
+    """Bag literal node.
 
     Represents bag (multiset) literals: [[x]], [[a, b, c]]
 
@@ -382,7 +381,7 @@ class BagLiteral(ASTNode):
 
 @dataclass(frozen=True)
 class Conditional(ASTNode):
-    """Conditional expression node (Phase 16).
+    """Conditional expression node.
 
     Represents conditional expressions: if condition then expr1 else expr2
 
@@ -403,7 +402,7 @@ class Conditional(ASTNode):
 
 @dataclass(frozen=True)
 class GuardedBranch(ASTNode):
-    """A single branch in a guarded cases expression (Phase 23).
+    """A single branch in a guarded cases expression.
 
     Represents: expression if guard
 
@@ -420,7 +419,7 @@ class GuardedBranch(ASTNode):
 
 @dataclass(frozen=True)
 class GuardedCases(ASTNode):
-    """Guarded cases expression (Phase 23).
+    """Guarded cases expression.
 
     Represents multiple conditional branches:
       expr1 if cond1
@@ -467,7 +466,7 @@ Expr = (
 )
 
 
-# Document structure nodes (Phase 1)
+# Document structure nodes
 
 
 @dataclass(frozen=True)
@@ -521,7 +520,7 @@ class TruthTable(ASTNode):
     rows: list[list[str]]
 
 
-# Equivalence chain nodes (Phase 2)
+# Equivalence chain nodes
 
 
 @dataclass(frozen=True)
@@ -562,7 +561,7 @@ class InfruleBlock(ASTNode):
     conclusion: tuple[Expr, str | None]  # (conclusion, label)
 
 
-# Z notation nodes (Phase 4)
+# Z notation nodes
 
 
 @dataclass(frozen=True)
@@ -574,7 +573,7 @@ class GivenType(ASTNode):
 
 @dataclass(frozen=True)
 class FreeBranch(ASTNode):
-    """A single branch in a free type definition (Phase 17: Recursive Free Types).
+    """A single branch in a free type definition.
 
     Represents constructor branches that may have parameters.
 
@@ -595,7 +594,7 @@ class FreeBranch(ASTNode):
 class FreeType(ASTNode):
     """Free type definition (Type ::= branch1 | branch2).
 
-    Phase 17 enhancement: Supports recursive constructors with parameters.
+    Supports recursive constructors with parameters.
 
     Examples:
     - Status ::= active | inactive (simple)
@@ -655,7 +654,7 @@ class SyntaxBlock(ASTNode):
 class Abbreviation(ASTNode):
     """Abbreviation definition (name == expression).
 
-    Phase 9 enhancement: Supports generic parameters [X, Y, ...].
+    Supports generic parameters [X, Y, ...].
     Example: [X] Pairs == X x X
     """
 
@@ -676,7 +675,7 @@ class Declaration(ASTNode):
 class AxDef(ASTNode):
     """Axiomatic definition block.
 
-    Phase 9 enhancement: Supports generic parameters [X, Y, ...].
+    Supports generic parameters [X, Y, ...].
     ZED2E alignment: predicates grouped by blank lines for \also generation.
 
     Example:
@@ -717,8 +716,7 @@ class GenDef(ASTNode):
 class Schema(ASTNode):
     """Schema definition block.
 
-    Phase 9 enhancement: Supports generic parameters [X, Y, ...].
-    Phase 13 enhancement: Supports anonymous schemas (name=None).
+    Supports generic parameters [X, Y, ...] and anonymous schemas (name=None).
     ZED2E alignment: predicates grouped by blank lines for \also generation.
 
     Examples:
@@ -733,7 +731,7 @@ class Schema(ASTNode):
     generic_params: list[str] | None = None  # Optional generic parameters
 
 
-# Proof tree nodes (Phase 5 - Path C)
+# Proof tree nodes
 
 
 @dataclass(frozen=True)
@@ -766,7 +764,7 @@ class ProofTree(ASTNode):
     conclusion: ProofNode  # The final conclusion at the top
 
 
-# Text paragraph node (Phase 0 - originally planned, now implementing)
+# Text paragraph node
 
 
 @dataclass(frozen=True)

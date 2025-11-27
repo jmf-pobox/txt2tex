@@ -3,13 +3,13 @@
 // From USER_GUIDE.md - Propositional Logic section
 
 EQUIV:
-p and q
-<=> q and p [commutative]
-<=> q and p [idempotent]
+p land q
+<=> q land p [commutative]
+<=> q land p [idempotent]
 
 EQUIV:
-not (p and q)
-<=> (not p) or (not q) [De Morgan]
-<=> (not p) or (not q) [idempotence]
-<=> (not p) or (not q) or (not r) [associativity]
+lnot (p land q)
+<=> (lnot p) lor (lnot q) [De Morgan]
+<=> (lnot p) lor (lnot q) [idempotence]
+<=> (lnot p) lor (lnot q) lor (lnot r) [associativity]
 <=> true [excluded middle]

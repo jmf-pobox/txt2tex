@@ -3,9 +3,9 @@
 // From USER_GUIDE.md - Proof Trees section
 
 PROOF:
-p or q => r [=> intro from 1]
-  [1] p or q [assumption]
-      r [or elim]
+p lor q => r [=> intro from 1]
+  [1] p lor q [assumption]
+      r [lor elim]
         case p:
           r [from assumption p]
         case q:

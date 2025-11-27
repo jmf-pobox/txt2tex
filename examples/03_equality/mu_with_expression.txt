@@ -34,13 +34,13 @@ mu x : N | x * x = 16 . x + 1
 
 TEXT: This finds x = 4, then evaluates x + 1, giving 5.
 
-** Example 3: Finding and Doubling **
+** Example 3: Finding land Doubling **
 
 mu n : N | n > 10 land n < 12 . 2 * n
 
 TEXT: Finds n = 11 (unique n between 10 and 12), then returns 2 * 11 = 22.
 
-** Example 4: Square Root and Square Again **
+** Example 4: Square Root land Square Again **
 
 mu x : N | x * x = 25 . x * x * x
 
@@ -107,7 +107,7 @@ axdef
   parseValue : ConfigValue -> N
 where
   forall k : ConfigKey |
-    k in dom configs =>
+    k elem dom configs =>
     getConfigInt(k) = mu v : N | parseValue(configs(k)) = v
 end
 
@@ -119,7 +119,7 @@ axdef
   getConfigWithDefault : ConfigKey cross N -> N
 where
   forall k : ConfigKey; default : N |
-    k in dom configs =>
+    k elem dom configs =>
     getConfigWithDefault(k, default) = mu v : N | parseValue(configs(k)) = v
   forall k : ConfigKey; default : N |
     k notin dom configs =>
@@ -128,7 +128,7 @@ end
 
 TEXT: Uses mu to parse the value when key exists, otherwise returns default.
 
-** Example 11: Comparison - With and Without Bullet **
+** Example 11: Comparison - With land Without Bullet **
 
 TEXT: Without bullet (returns the value itself):
 

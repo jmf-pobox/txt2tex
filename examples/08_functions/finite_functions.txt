@@ -25,12 +25,12 @@ TEXT: Finite partial functions are partial functions with a finite domain. The o
 TEXT: A finite partial function from X to Y is a partial function whose domain is finite. This is useful when modeling resources with limited capacity or databases with a bounded number of entries.
 
 zed
-  given Year, Table
+  given Year, TableFF
 end
 
 
 axdef
-  records : Year 77-> Table
+  records : Year 77-> TableFF
 where
   # (dom records) <= 1000
 end
@@ -63,7 +63,7 @@ where
   dom totalFunc = X land dom totalBij = X land (forall x1, x2 : X | totalBij(x1) = totalBij(x2) . x1 = x2) land ran totalBij = Y
 end
 
-** Example 3: Finite Functions in Practice **
+** Example 3: Finite Functions elem Practice **
 
 TEXT: Real-world example: A database table storing customer preferences.
 
@@ -102,7 +102,7 @@ end
 
 TEXT: The composition has a domain size bounded by the domain of f, since we can only compose where f's range intersects g's domain.
 
-** Example 5: Domain Restrictions and Finiteness **
+** Example 5: Domain Restrictions land Finiteness **
 
 zed
   given Title, Length, ViewDate

@@ -2,13 +2,13 @@
 // Demonstrates sections, solutions, and part labels
 // From USER_GUIDE.md - Document Structure section
 
-=== Introduction and Propositions ===
+=== Introduction land Propositions ===
 
 ** Solution 1 **
 
-(a) p and q
-(b) p or q
-(c) not p
+(a) p land q
+(b) p lor q
+(c) lnot p
 
 ** Solution 2 **
 

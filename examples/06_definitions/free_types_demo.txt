@@ -30,7 +30,7 @@ TEXT: Three levels of nesting:
 
 TEXT: forall x : T; y : U; z : V | x = y
 
-** Example 3: Mixed comma and semicolon **
+** Example 3: Mixed comma land semicolon **
 
 TEXT: First quantifier has multiple variables with shared domain:
 

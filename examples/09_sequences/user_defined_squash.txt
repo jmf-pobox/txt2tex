@@ -91,7 +91,7 @@ end
 
 TEXT: When the function has no gaps (dom f4 = 1..3), squashFunc simply converts it to a sequence: s4 = <100, 200, 300>.
 
-** Example 6: Relationship Between Function and Sequence **
+** Example 6: Relationship Between Function land Sequence **
 
 TEXT: For any partial function f with a continuous domain starting at 1, squashFunc is the identity.
 

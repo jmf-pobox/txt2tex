@@ -14,19 +14,17 @@
 \addcontentsline{toc}{section}{Test Pattern Matching}
 
 \begin{zed}
-  [Entry]
+[EntryPM]
 \end{zed}
 
 \begin{axdef}
-  filterSeq : \seq~Entry \fun \seq~Entry
-  \where
-  filterSeq(\langle \rangle) = \langle \rangle \\
-  \forall x : Entry @ \forall s : \seq~Entry @ filterSeq(\langle x
-  \rangle \cat s) = \langle x \rangle \cat filterSeq(s)
+filterSeq : \seq~EntryPM \fun \seq~EntryPM
+\where
+filterSeq(\langle \rangle) = \langle \rangle \\
+\forall x : EntryPM @ \forall s : \seq~EntryPM @ filterSeq(\langle x \rangle \cat s) = \langle x \rangle \cat filterSeq(s)
 \end{axdef}
 
-\noindent This demonstrates pattern matching on sequences with base
-case ($\langle \rangle$) and recursive case ($\langle x \rangle$ ^ s).
+\noindent This demonstrates pattern matching on sequences with base case ($\langle \rangle$) and recursive case ($\langle x \rangle$ ^ s).
 
 \bigskip
 

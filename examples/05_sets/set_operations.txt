@@ -16,7 +16,7 @@
 // See: docs/USER_GUIDE.md - Sections "Equality", "Sets and Types"
 // ============================================================================
 
-=== Phase 7: Equality and Special Operators ===
+=== Phase 7: Equality land Special Operators ===
 
 ** Test 1: Mu Operator **
 

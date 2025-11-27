@@ -10,7 +10,7 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\section*{Phase 3 : Quantifiers and Mathematical Notation}
+\section*{Phase 3 : Quantifiers land Mathematical Notation}
 
 \section*{Example 1 : Quantifiers}
 \addcontentsline{toc}{section}{Example 1 : Quantifiers}
@@ -20,12 +20,14 @@
 \noindent
 $\forall x : \nat @ x \geq 0$
 
+
 \medskip
 
 \subsection*{(b)}
 
 \noindent
 $\exists y : \nat @ y = 0$
+
 
 \medskip
 
@@ -34,13 +36,15 @@ $\exists y : \nat @ y = 0$
 \noindent
 $\forall n : \nat @ n \geq 0 \land n < 100$
 
-\section*{Example 2 : Subscripts and Superscripts}
-\addcontentsline{toc}{section}{Example 2 : Subscripts and Superscripts}
+
+\section*{Example 2 : Subscripts land Superscripts}
+\addcontentsline{toc}{section}{Example 2 : Subscripts land Superscripts}
 
 \subsection*{(a)}
 
 \noindent
 $x \bsup 2 \esup$
+
 
 \medskip
 
@@ -49,12 +53,14 @@ $x \bsup 2 \esup$
 \noindent
 $a_1$
 
+
 \medskip
 
 \subsection*{(c)}
 
 \noindent
 $x\_i \bsup 2 \esup$
+
 
 \section*{Example 3 : Comparison Operators}
 \addcontentsline{toc}{section}{Example 3 : Comparison Operators}
@@ -64,12 +70,14 @@ $x\_i \bsup 2 \esup$
 \noindent
 $x < 10$
 
+
 \medskip
 
 \subsection*{(b)}
 
 \noindent
 $x \geq 0 \land x \leq 100$
+
 
 \medskip
 
@@ -78,16 +86,15 @@ $x \geq 0 \land x \leq 100$
 \noindent
 $y > 5 \lor y = 0$
 
+
 \section*{Example 4 : Set Operators}
 \addcontentsline{toc}{section}{Example 4 : Set Operators}
 
 \subsection*{(a)}
 
 \noindent
-$x$
+$x \in \nat$
 
-\noindent
-$in(\nat)$
 
 \medskip
 
@@ -96,6 +103,7 @@ $in(\nat)$
 \noindent
 $A \subseteq B$
 
+
 \medskip
 
 \subsection*{(c)}
@@ -103,20 +111,20 @@ $A \subseteq B$
 \noindent
 $A \cup B \cap C$
 
+
 \section*{Example 5 : Complex Expressions}
 \addcontentsline{toc}{section}{Example 5 : Complex Expressions}
 
 \subsection*{(a)}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \begin{array}{l@{\hspace{2em}}r}
-      \forall x : \nat @ x \\
-      \Leftrightarrow in(\nat) \land x \geq 0 \\
-      \Leftrightarrow \forall x : \nat @ x \geq 0
-    \end{array}$%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\begin{array}{l@{\hspace{2em}}r}
+\forall x : \nat @ x \in \nat \land x \geq 0 \\
+\Leftrightarrow \forall x : \nat @ x \geq 0
+\end{array}$%
+}
 \end{center}
 \bigskip
 
@@ -127,21 +135,22 @@ $A \cup B \cap C$
 \noindent
 $\forall i : \nat @ a\_i > 0 \implies a\_i \bsup 2 \esup > 0$
 
+
 \medskip
 
 \subsection*{(c)}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    \begin{tabular}{c|c|c}
-      $p$ & $q$ & $\mathbf{p \Rightarrow q}$ \\
-      \hline
-      \textit{t} & \textit{t} & \textbf{t} \\
-      \textit{t} & \textit{f} & \textbf{f} \\
-      \textit{f} & \textit{t} & \textbf{t} \\
-      \textit{f} & \textit{f} & \textbf{t} \\
-    \end{tabular}%
-  }
+\adjustbox{max width=\textwidth}{%
+\begin{tabular}{c|c|c}
+$p$ & $q$ & $\mathbf{p \Rightarrow q}$ \\
+\hline
+\textit{t} & \textit{t} & \textbf{t} \\
+\textit{t} & \textit{f} & \textbf{f} \\
+\textit{f} & \textit{t} & \textbf{t} \\
+\textit{f} & \textit{f} & \textbf{t} \\
+\end{tabular}%
+}
 \end{center}
 \bigskip
 

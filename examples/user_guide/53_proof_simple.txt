@@ -3,6 +3,6 @@
 // From USER_GUIDE.md - Proof Trees section
 
 PROOF:
-p and q => p [=> intro from 1]
-  [1] p and q [assumption]
-      p [and elim 1]
+p land q => p [=> intro from 1]
+  [1] p land q [assumption]
+      p [land elim 1]

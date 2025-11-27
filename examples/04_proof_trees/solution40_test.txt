@@ -5,11 +5,11 @@
 //   - Recursive function definitions with pattern matching
 //   - Base case: empty sequence <>
 //   - Recursive case: <x> ^ s (head and tail)
-//   - Common sequence operations (length, identity, transformations)
+//   - Common sequence operations (length, identityS40, transformations)
 //
 // Features:
 //   - length function (counting elements)
-//   - identity function (copying sequence)
+//   - identityS40 function (copying sequence)
 //   - duplicate function (transforming elements)
 //   - Pattern matching enables inductive definitions
 //
@@ -19,7 +19,7 @@
 === Recursive Function Examples ===
 
 zed
-  given Entry
+  given EntryS40
 end
 
 
@@ -28,19 +28,19 @@ TEXT: This file demonstrates recursive functions on sequences.
 ** Example 1: Simple recursive function **
 
 axdef
-  length : seq Entry -> N
+  length : seq EntryS40 -> N
 where
   length(<>) = 0
-  forall x : Entry; s : seq Entry | length(<x> ^ s) = 1 + length(s)
+  forall x : EntryS40; s : seq EntryS40 | length(<x> ^ s) = 1 + length(s)
 end
 
 ** Example 2: Identity function on sequences **
 
 axdef
-  identity : seq Entry -> seq Entry
+  identityS40 : seq EntryS40 -> seq EntryS40
 where
-  identity(<>) = <>
-  forall x : Entry; s : seq Entry | identity(<x> ^ s) = <x> ^ identity(s)
+  identityS40(<>) = <>
+  forall x : EntryS40; s : seq EntryS40 | identityS40(<x> ^ s) = <x> ^ identityS40(s)
 end
 
 ** Example 3: Sequence doubling **

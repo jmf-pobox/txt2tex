@@ -1,21 +1,25 @@
 === Testing Indentation ===
 
+zed
+  given RESOURCE, PERSON
+end
+
 ** Example 1: Simple quantifier **
 
 axdef
-  policy : P1 RESOURCE -> RESOURCE
+  policy1 : P1 RESOURCE -> RESOURCE
 where
   forall S : P1 RESOURCE |
-    policy(S) in S
+    policy1(S) elem S
 end
 
 ** Example 2: Quantifier with multiple lines **
 
 axdef
-  policy : P1 RESOURCE -> RESOURCE
+  policy2 : P1 RESOURCE -> RESOURCE
 where
   forall S : P1 RESOURCE |
-    policy(S) in S land
+    policy2(S) elem S land
     S subset RESOURCE
 end
 
@@ -26,5 +30,5 @@ axdef
 where
   forall x : PERSON |
     exists y : PERSON |
-      (x, y) in relation
+      (x, y) elem relation
 end

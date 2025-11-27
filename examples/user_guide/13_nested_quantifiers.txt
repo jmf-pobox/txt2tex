@@ -4,4 +4,4 @@
 
 forall x : N | exists y : N | x = y
 
-forall x : N | x > 0 and (forall y : N | y > x)
+forall x : N | x > 0 land (forall y : N | y > x)

@@ -16,7 +16,7 @@ def test_unknown_expression_type() -> None:
         pass
 
     with pytest.raises(TypeError, match="Unknown expression type"):
-        gen.generate_expr(UnknownExpr())  # type: ignore[arg-type]
+        gen.generate_expr(UnknownExpr())
 
 
 def test_identifier_with_fuzz_flag() -> None:

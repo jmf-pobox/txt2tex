@@ -11,16 +11,16 @@
 \begin{document}
 
 \begin{schema}{Container}[X]
-  contents : \seq~X \\
-  capacity : \nat
-  \where
-  \# contents \leq capacity
+contents : \seq~X \\
+capacity : \nat
+\where
+\# contents \leq capacity
 \end{schema}
 
 \begin{gendef}[X]
   emptyContainer: Container[X] \\
   addToContainer: Container[X] \cross X \fun Container[X]
-  \where
+\where
   emptyContainer.contents = \langle \rangle \land emptyContainer.capacity = 100
 \end{gendef}
 

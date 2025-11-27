@@ -7,8 +7,8 @@ axdef
   not_yet_viewed : N
   employee_count : N
 where
-  cumulative_total = 0 and
-  not_yet_viewed = 0 and
+  cumulative_total = 0 land
+  not_yet_viewed = 0 land
   employee_count = 0
 end
 

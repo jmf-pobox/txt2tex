@@ -10,8 +10,7 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\noindent The "shows" operator represents sequent judgment, written
-as ⊢ (turnstile).
+\noindent The "shows" operator represents sequent judgment, written as ⊢ (turnstile).
 
 \bigskip
 
@@ -26,6 +25,7 @@ as ⊢ (turnstile).
 \noindent
 $Gamma \shows Delta$
 
+
 \noindent More concrete example with specific propositions:
 
 \bigskip
@@ -33,12 +33,14 @@ $Gamma \shows Delta$
 \noindent
 $(\power \land Q) \shows \power$
 
+
 \noindent Sequent with multiple context items (using sets):
 
 \bigskip
 
 \noindent
 $\{\power, \power \implies Q\} \shows Q$
+
 
 \noindent We can use shows in inference rules to represent natural deduction:
 
@@ -48,7 +50,7 @@ $\{\power, \power \implies Q\} \shows Q$
   Gamma \shows \power & \\
   Gamma \shows (\power \implies Q) & \\
   \derive \\
-  Gamma \shows Q & \mbox{modus ponens in sequent form}
+  Gamma \shows Q & \mbox{modus ponens $\in$ sequent form}
 \end{infrule}
 
 \noindent Combining shows with inference rules for natural deduction style:

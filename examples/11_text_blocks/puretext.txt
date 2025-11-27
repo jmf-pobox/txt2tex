@@ -56,7 +56,7 @@ TEXT: Mathematical notation x^2 is rendered as a superscript.
 
 PURETEXT: Mathematical notation x^2 appears as literal text.
 
-** Example 6: File Paths and URLs **
+** Example 6: File Paths land URLs **
 
 PURETEXT: File paths like /Users/name/Documents/file.txt are preserved exactly.
 

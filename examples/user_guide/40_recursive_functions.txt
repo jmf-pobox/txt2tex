@@ -5,6 +5,6 @@
 gendef [X]
   length : seq X -> N
 where
-  length(<>) = 0 and
+  length(<>) = 0 land
   forall x : X; s : seq X | length(<x> ^ s) = 1 + length(s)
 end

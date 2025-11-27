@@ -24,7 +24,7 @@ TEXT: When a quantifier binds a variable that is constrained by equality, we can
 
 EQUIV:
 exists y : N | y = 5 land x > y
-<=> 5 in N land x > 5 [one-point rule]
+<=> 5 elem N land x > 5 [one-point rule]
 <=> x > 5
 
 ** Example 2: One-Point with Set Membership **
@@ -32,7 +32,7 @@ exists y : N | y = 5 land x > y
 EQUIV:
 exists x, y : N | x + y = 4 land x < y
 <=> exists x, y : N | y = 4 - x land x < y
-<=> exists x : N | 4 - x in N land x < 4 - x
+<=> exists x : N | 4 - x elem N land x < 4 - x
 <=> true
 
 TEXT: The final equivalence holds because 0 in N, 4 - 0 in N, and 0 < 4.

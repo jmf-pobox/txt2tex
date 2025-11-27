@@ -10,7 +10,7 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\section*{Phase 7 : Equality and Special Operators}
+\section*{Phase 7 : Equality land Special Operators}
 
 \section*{Test 1 : Mu Operator}
 \addcontentsline{toc}{section}{Test 1 : Mu Operator}
@@ -20,12 +20,14 @@
 \noindent
 $(\mu x : \nat | x \bsup 2 \esup = 4 \land x > 0)$
 
+
 \medskip
 
 \subsection*{(b)}
 
 \noindent
 $(\mu x | x > 0 \land x < 10)$
+
 
 \section*{Test 2 : Not Equal Operator}
 \addcontentsline{toc}{section}{Test 2 : Not Equal Operator}
@@ -35,6 +37,7 @@ $(\mu x | x > 0 \land x < 10)$
 \noindent
 $x \neq 0$
 
+
 \medskip
 
 \subsection*{(b)}
@@ -42,12 +45,14 @@ $x \neq 0$
 \noindent
 $x \neq 0 \land y \neq 0$
 
+
 \medskip
 
 \subsection*{(c)}
 
 \noindent
 $x \neq y \lor y \neq z$
+
 
 \section*{Test 3 : Not In Operator}
 \addcontentsline{toc}{section}{Test 3 : Not In Operator}
@@ -57,12 +62,14 @@ $x \neq y \lor y \neq z$
 \noindent
 $x \notin S$
 
+
 \medskip
 
 \subsection*{(b)}
 
 \noindent
 $x \in A \land x \notin B$
+
 
 \medskip
 
@@ -71,18 +78,19 @@ $x \in A \land x \notin B$
 \noindent
 $x \notin S \iff \lnot (x \in S)$
 
+
 \section*{Test 4 : One Point Rule}
 \addcontentsline{toc}{section}{Test 4 : One Point Rule}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \begin{array}{l@{\hspace{2em}}r}
-      \exists y : \nat @ y = 0 \land x \neq y \\
-      \Leftrightarrow 0 \in \nat \land x \neq 0 \\
-      \Leftrightarrow x \neq 0
-    \end{array}$%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\begin{array}{l@{\hspace{2em}}r}
+\exists y : \nat @ y = 0 \land x \neq y \\
+\Leftrightarrow 0 \in \nat \land x \neq 0 \\
+\Leftrightarrow x \neq 0
+\end{array}$%
+}
 \end{center}
 \bigskip
 
@@ -94,6 +102,7 @@ $x \notin S \iff \lnot (x \in S)$
 \noindent
 $(\mu x : \nat | x \bsup 2 \esup = 9 \land x \neq 3)$
 
+
 \medskip
 
 \subsection*{(b)}
@@ -101,12 +110,14 @@ $(\mu x : \nat | x \bsup 2 \esup = 9 \land x \neq 3)$
 \noindent
 $\forall x : \nat @ \exists y : \nat @ x \neq y$
 
+
 \medskip
 
 \subsection*{(c)}
 
 \noindent
 $\forall x : \nat | x \in S @ x \notin T$
+
 
 \section*{Test 6 : Mixed Operators}
 \addcontentsline{toc}{section}{Test 6 : Mixed Operators}
@@ -116,6 +127,7 @@ $\forall x : \nat | x \in S @ x \notin T$
 \noindent
 $x = y \lor x \neq y$
 
+
 \medskip
 
 \subsection*{(b)}
@@ -123,11 +135,13 @@ $x = y \lor x \neq y$
 \noindent
 $x \in A \lor x \notin A$
 
+
 \medskip
 
 \subsection*{(c)}
 
 \noindent
 $(\mu x : \nat | x \in S \land x \neq 0 \land x \bsup 2 \esup < 10)$
+
 
 \end{document}

@@ -53,19 +53,19 @@ end
 
 
 zed
-  given Entry
+  given EntryAD
 end
 
 
 zed
-  Table == seq(Entry)
+  TableAD == seq(EntryAD)
 end
 
 
 axdef
-  records : Year -|> Table
+  recordsAD : Year -|> TableAD
 where
-  dom(records) = {1993, 1994, 1995}
+  dom(recordsAD) = {1993, 1994, 1995}
 end
 
 ** Example 4: Mixed function type operators **

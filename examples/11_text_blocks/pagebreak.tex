@@ -22,16 +22,15 @@
 \noindent
 $PAGEBREAK$
 
-\noindent This content appears on the next page. The PAGEBREAK
-directive forces a page break at that point in the document.
+
+\noindent This content appears on the next page. The PAGEBREAK directive forces a page break at that point in the document.
 
 \bigskip
 
 \section*{Example 2 : Separating Solutions}
 \addcontentsline{toc}{section}{Example 2 : Separating Solutions}
 
-\noindent When preparing solutions for submission, you may want each
-solution on a separate page.
+\noindent When preparing solutions for submission, you may want each solution on a separate page.
 
 \bigskip
 
@@ -45,12 +44,14 @@ solution on a separate page.
 \noindent
 $\forall x : \nat @ x \geq 0$
 
+
 \noindent Explanation of solution 1.
 
 \bigskip
 
 \noindent
 $PAGEBREAK$
+
 
 \section*{Solution 2}
 \addcontentsline{toc}{section}{Solution 2}
@@ -62,12 +63,14 @@ $PAGEBREAK$
 \noindent
 $\exists y : \nat @ y > 10$
 
+
 \noindent Explanation of solution 2.
 
 \bigskip
 
 \noindent
 $PAGEBREAK$
+
 
 \section*{Solution 3}
 \addcontentsline{toc}{section}{Solution 3}
@@ -81,13 +84,13 @@ $PAGEBREAK$
 
 \section*{Section 1 : Propositional Logic}
 
-\noindent Content for section 1 covering propositional logic
-operators and truth tables.
+\noindent Content for section 1 covering propositional logic operators and truth tables.
 
 \bigskip
 
 \noindent
-$p(and)(q) \implies p$
+$p \land q \implies p$
+
 
 \noindent More content for section 1.
 
@@ -95,6 +98,7 @@ $p(and)(q) \implies p$
 
 \noindent
 $PAGEBREAK$
+
 
 \section*{Section 2 : Predicate Logic}
 
@@ -105,6 +109,7 @@ $PAGEBREAK$
 \noindent
 $\forall x : \nat @ \exists y : \nat @ x + y = 10$
 
+
 \noindent More content for section 2.
 
 \bigskip
@@ -112,8 +117,7 @@ $\forall x : \nat @ \exists y : \nat @ x + y = 10$
 \section*{Example 4 : Long Proofs}
 \addcontentsline{toc}{section}{Example 4 : Long Proofs}
 
-\noindent For lengthy proofs, you might want to start each major
-proof on a new page:
+\noindent For lengthy proofs, you might want to start each major proof on a new page:
 
 \bigskip
 
@@ -121,17 +125,13 @@ proof on a new page:
 \addcontentsline{toc}{section}{Theorem 1}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p(and(p \implies q)) \implies q}{
-      \infer[\Rightarrow
-      \mbox{elim}]{q}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner
-        p(and(p \implies q)) \urcorner^{[1]}} &
-        \infer[\land\textrm{-elim-2}]{p \implies q}{\ulcorner p(and(p
-      \implies q)) \urcorner^{[1]}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land (p \implies q)) \implies q}{
+  \infer[\Rightarrow \mbox{elim}]{q}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p \land (p \implies q) \urcorner^{[1]}} & \infer[\land\textrm{-elim-2}]{p \implies q}{\ulcorner p \land (p \implies q) \urcorner^{[1]}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -142,19 +142,18 @@ proof on a new page:
 \noindent
 $PAGEBREAK$
 
+
 \section*{Theorem 2}
 \addcontentsline{toc}{section}{Theorem 2}
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p(or)(q)(and(not(q))) \implies p}{
-      \infer[\lor
-      \mbox{elim}]{p}{\infer[\land\textrm{-elim-2}]{not(q)}{\infer[\land\textrm{-elim-1}]{p(or)(q)}{\ulcorner
-      p(or)(q)(and(not(q))) \urcorner^{[1]}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \lor q) \land \lnot q \implies p}{
+  \infer[\lor \mbox{elim}]{p}{\infer[\land\textrm{-elim-2}]{\lnot q}{\infer[\land\textrm{-elim-1}]{p \lor q}{\ulcorner (p \lor q) \land \lnot q \urcorner^{[1]}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -165,8 +164,7 @@ $PAGEBREAK$
 \section*{Example 5 : Strategic Page Breaks}
 \addcontentsline{toc}{section}{Example 5 : Strategic Page Breaks}
 
-\noindent Use PAGEBREAK strategically to improve document
-readability. Don't overuse it—let LaTeX handle most page breaking automatically.
+\noindent Use PAGEBREAK strategically to improve document readability. Don't overuse it—let LaTeX handle most page breaking automatically.
 
 \bigskip
 
@@ -189,21 +187,20 @@ readability. Don't overuse it—let LaTeX handle most page breaking automaticall
 \section*{Example 6 : Avoiding Orphans}
 \addcontentsline{toc}{section}{Example 6 : Avoiding Orphans}
 
-\noindent When you have a section title or definition that would
-appear at the bottom of a page with its content on the next page, you
-might insert a PAGEBREAK before the section.
+\noindent When you have a section title or definition that would appear at the bottom of a page with its content on the next page, you might insert a PAGEBREAK before the section.
 
 \bigskip
 
 \noindent
 $PAGEBREAK$
 
+
 \section*{Important Definition}
 
 \begin{axdef}
-  critical : \nat \fun \nat
-  \where
-  \forall n : \nat @ critical(n) = n * n
+critical : \nat \fun \nat
+\where
+\forall n : \nat @ critical(n) = n * n
 \end{axdef}
 
 \noindent This ensures the definition stays with its title.
@@ -213,8 +210,7 @@ $PAGEBREAK$
 \section*{Example 7 : Submission Formatting}
 \addcontentsline{toc}{section}{Example 7 : Submission Formatting}
 
-\noindent For coursework submissions, instructors may require one
-solution per page:
+\noindent For coursework submissions, instructors may require one solution per page:
 
 \bigskip
 
@@ -228,6 +224,7 @@ solution per page:
 \noindent
 $PAGEBREAK$
 
+
 \section*{Problem 2}
 \addcontentsline{toc}{section}{Problem 2}
 
@@ -238,6 +235,7 @@ $PAGEBREAK$
 \noindent
 $PAGEBREAK$
 
+
 \section*{Problem 3}
 \addcontentsline{toc}{section}{Problem 3}
 
@@ -245,8 +243,7 @@ $PAGEBREAK$
 
 \bigskip
 
-\noindent This format makes it easy for instructors to review and
-grade individual problems.
+\noindent This format makes it easy for instructors to review and grade individual problems.
 
 \bigskip
 

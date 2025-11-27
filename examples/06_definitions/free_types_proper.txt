@@ -15,9 +15,9 @@
 // See: docs/USER_GUIDE.md - Sections "Definitions", "Sequences"
 // ============================================================================
 
-=== Phase 17: Proper Examples (not TEXT blocks) ===
+=== Phase 17: Proper Examples (lnot TEXT blocks) ===
 
-** Example: Semicolon bindings in axdef **
+** Example: Semicolon bindings elem axdef **
 
 axdef
   dummy : N
@@ -29,21 +29,21 @@ end
 ** Example: Function on sequences **
 
 zed
-  given Entry
+  given EntryFTP
 end
 
 
 axdef
-  seqlen : seq Entry -> N
+  seqlen : seq EntryFTP -> N
 where
   seqlen (<>) = 0
-  forall x : Entry; s : seq Entry | seqlen (<x> ^ s) = 1 + seqlen (s)
+  forall x : EntryFTP; s : seq EntryFTP | seqlen (<x> ^ s) = 1 + seqlen (s)
 end
 
 ** Example: Nested quantifier **
 
 zed
-  given Person
+  given PersonFTP
 end
 
 
@@ -51,5 +51,5 @@ axdef
   constraint : N
 where
   constraint = 1
-  forall p : Person; n : N | n > 0
+  forall p : PersonFTP; n : N | n > 0
 end

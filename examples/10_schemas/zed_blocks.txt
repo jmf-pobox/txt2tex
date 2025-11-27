@@ -51,7 +51,7 @@ end
 
 TEXT: Declare given types using the given keyword.
 
-** Example 4: Predicates in Zed Block **
+** Example 4: Predicates elem Zed Block **
 
 axdef
   x : N
@@ -84,19 +84,19 @@ TEXT: Free types are defined standalone, then used in schemas.
 ** Example 6: Multiple Schemas **
 
 zed
-  given Account, Balance
+  given AccountZB, BalanceZB
 end
 
-schema BankAccount
+schema BankAccountZB
   accountNumber : N
   balance : Z
 where
   balance >= 0
 end
 
-schema Transaction
-  from : BankAccount
-  to : BankAccount
+schema TransactionZB
+  from : BankAccountZB
+  to : BankAccountZB
   amount : N
 where
   amount > 0
@@ -160,7 +160,7 @@ end
 
 TEXT: Schema Address is used within schema PersonData. Variables using schemas go in axdef.
 
-** Example 9: Constants and Functions **
+** Example 9: Constants land Functions **
 
 zed
   PI == 3

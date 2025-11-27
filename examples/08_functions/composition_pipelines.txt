@@ -17,30 +17,30 @@ TEXT: A three-stage numeric processing pipeline.
 
 axdef
   addOne : N -> N
-  double : N -> N
-  square : N -> N
+  doubleCP : N -> N
+  squareCP : N -> N
   pipeline : N -> N
 where
   forall n : N | addOne(n) = n + 1
-  forall n : N | double(n) = 2 * n
-  forall n : N | square(n) = n * n
-  pipeline = square comp double comp addOne
+  forall n : N | doubleCP(n) = 2 * n
+  forall n : N | squareCP(n) = n * n
+  pipeline = squareCP comp doubleCP comp addOne
 end
 
-TEXT: pipeline(3) = square(double(addOne(3))) = square(double(4)) = square(8) = 64
+TEXT: pipeline(3) = squareCP(doubleCP(addOne(3))) = squareCP(doubleCP(4)) = squareCP(8) = 64
 
 ** Example 2: String Pipeline **
 
 zed
-  given Char
+  given CharCP
 end
 
 
 axdef
-  str1 : seq Char -> seq Char
-  str2 : seq Char -> seq Char
-  str3 : seq Char -> seq Char
-  stringPipeline : seq Char -> seq Char
+  str1 : seq CharCP -> seq CharCP
+  str2 : seq CharCP -> seq CharCP
+  str3 : seq CharCP -> seq CharCP
+  stringPipeline : seq CharCP -> seq CharCP
 where
   stringPipeline = str3 comp str2 comp str1
 end

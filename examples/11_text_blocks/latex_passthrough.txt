@@ -48,7 +48,7 @@ LATEX: \end{center}
 
 TEXT: The LATEX blocks allow full control over typography.
 
-** Example 4: Boxes and Frames **
+** Example 4: Boxes land Frames **
 
 TEXT: Create boxed text with LaTeX environments:
 
@@ -68,7 +68,7 @@ LATEX: \item[Postcondition:] The output is the square of the input
 LATEX: \item[Invariant:] The result is always non-negative
 LATEX: \end{description}
 
-** Example 6: Theorems and Definitions **
+** Example 6: Theorems land Definitions **
 
 TEXT: If you've loaded theorem packages, you can use them:
 
@@ -86,7 +86,7 @@ LATEX: \clearpage
 
 TEXT: The clearpage command forces a page break and flushes all pending floats.
 
-** Example 8: Mixed Z Notation and LaTeX **
+** Example 8: Mixed Z Notation land LaTeX **
 
 TEXT: You can combine Z notation with custom LaTeX formatting:
 

@@ -25,5 +25,5 @@ end
 axdef
   birthdays : P NAME
 where
-  exists n : NAME | n in birthdays
+  exists n : NAME | n elem birthdays
 end

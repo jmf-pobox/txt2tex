@@ -20,7 +20,7 @@
 // See: docs/USER_GUIDE.md - Sections "Sequences", "Tuples", "Bags"
 // ============================================================================
 
-=== Phase 12: Sequences, Bags, and Tuple Projection ===
+=== Phase 12: Sequences, Bags, land Tuple Projection ===
 
 ** Example 1: Sequence Literals **
 
@@ -122,7 +122,7 @@ TEXT: Bags with duplicates
 
 [[1, 2, 2, 3, 3, 3]]
 
-** Example 6: Sequences in Expressions **
+** Example 6: Sequences elem Expressions **
 
 (a)
 
