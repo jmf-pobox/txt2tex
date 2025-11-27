@@ -100,19 +100,19 @@ price > 0
 \addcontentsline{toc}{section}{Example 6 : Multiple Schemas}
 
 \begin{zed}
-[Account, Balance]
+[AccountZB, BalanceZB]
 \end{zed}
 
-\begin{schema}{BankAccount}
+\begin{schema}{BankAccountZB}
 accountNumber : \nat \\
 balance : \num
 \where
 balance \geq 0
 \end{schema}
 
-\begin{schema}{Transaction}
-from : BankAccount \\
-to : BankAccount \\
+\begin{schema}{TransactionZB}
+from : BankAccountZB \\
+to : BankAccountZB \\
 amount : \nat
 \where
 amount > 0 \\
