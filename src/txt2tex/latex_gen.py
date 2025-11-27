@@ -2452,29 +2452,170 @@ class LaTeXGenerator:
 
         Converts explicit markup like [and], [or], [not] to LaTeX symbols.
         Must run first before any expression parsing.
+
+        Example: "([not], [and], [or])" becomes "($\\lnot$, $\\land$, $\\lor$)"
         """
-        return text  # Stub - will be implemented
+        result = text
+        markup_operators = {
+            r"\[not\]": r"$\\lnot$",
+            r"\[and\]": r"$\\land$",
+            r"\[or\]": r"$\\lor$",
+            r"\[=>\]": r"$\\Rightarrow$",
+            r"\[<=>\]": r"$\\Leftrightarrow$",
+            r"\[forall\]": r"$\\forall$",
+            r"\[exists\]": r"$\\exists$",
+            r"\[exists1\]": r"$\\exists_1$",
+        }
+
+        for pattern, replacement in markup_operators.items():
+            result = re.sub(pattern, replacement, result)
+
+        return result
 
     def _process_logical_formulas(self, text: str) -> str:
         """Stage -1: Detect logical formulas with =>, <=>, lnot, land, lor.
 
         Matches expressions like "p => (lnot p => p)" and wraps in math mode.
+        Stops at sentence boundaries (is, as, are, etc.) or punctuation.
+        Only LaTeX-style keywords (lnot, land, lor), not English.
         """
-        return text  # Stub - will be implemented
+        result = text
+        formula_pattern = (
+            r"(\()?(?:lnot\s+)?([a-zA-Z]\w*)\s*(=>|<=>)\s*[^.!?]*?"
+            r"(?=\s+(?:is|as|are|for|to|be|a|an|the|in|on|at|by|with|"
+            r"holds|means|implies|shows|proves|states|says|gives|follows|"
+            r"so|then|therefore|hence|thus|because|since|when|where|which|that)\b|[.!?]|$)"
+        )
+
+        matches = list(re.finditer(formula_pattern, result))
+        for match in reversed(matches):
+            start_pos = match.start()
+            end_pos = match.end()
+
+            # Check if already in math mode
+            before = result[:start_pos]
+            dollars_before = before.count("$")
+            if dollars_before % 2 == 1:
+                continue
+
+            formula_text = result[start_pos:end_pos].strip()
+
+            # Try to parse as logical expression
+            try:
+                lexer = Lexer(formula_text)
+                tokens = lexer.tokenize()
+                parser = Parser(tokens)
+                ast = parser.parse()
+
+                if isinstance(ast, Expr):
+                    math_latex = self.generate_expr(ast)
+                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
+            except (LexerError, ParserError):
+                # Parsing failed - expression is not valid math, leave as prose
+                pass
+
+        return result
 
     def _process_parenthesized_logic(self, text: str) -> str:
         """Stage -0.5: Detect parenthesized logical expressions.
 
-        Matches balanced parentheses containing logical operators.
+        Matches balanced parentheses containing logical operators like
+        (p lor q), (p land q), ((p => r) land ...).
+        Also handles (lnot p => lnot q) which Pattern -1 misses.
+        Only LaTeX-style keywords (lnot, land, lor), not English.
         """
-        return text  # Stub - will be implemented
+        result = text
+        paren_matches = self._find_balanced_parens(result)
+
+        for start_pos, end_pos in reversed(paren_matches):
+            # Check if already in math mode
+            before = result[:start_pos]
+            dollars_before = before.count("$")
+            if dollars_before % 2 == 1:
+                continue
+
+            paren_text = result[start_pos:end_pos]
+
+            # Only process if it contains logical operators or keywords
+            # Look for: lor, land, lnot, elem, =>, <=>
+            has_logic = bool(
+                re.search(r"\blor\b", paren_text)
+                or re.search(r"\bland\b", paren_text)
+                or re.search(r"\blnot\b", paren_text)
+                or re.search(r"\belem\b", paren_text)
+                or "=>" in paren_text
+                or "<=>" in paren_text
+            )
+
+            if not has_logic:
+                continue
+
+            # Try to parse as logical expression
+            try:
+                lexer = Lexer(paren_text)
+                tokens = lexer.tokenize()
+                parser = Parser(tokens)
+                ast = parser.parse()
+
+                if isinstance(ast, Expr):
+                    math_latex = self.generate_expr(ast)
+                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
+            except (LexerError, ParserError):
+                # Parsing failed - expression is not valid math, leave as prose
+                pass
+
+        return result
 
     def _process_standalone_keywords(self, text: str) -> str:
         """Stage -0.3: Convert standalone logical keywords to symbols.
 
         Converts lor, land, lnot, elem to their LaTeX equivalents.
+        These should ALWAYS render as symbols, never as literal text.
+        Special case: lnot followed by single variable (lnot p) -> $\\lnot p$
         """
-        return text  # Stub - will be implemented
+        result = text
+
+        # First, handle "lnot <variable>" as a unit
+        lnot_var_pattern = r"\blnot\s+([a-zA-Z])\b"
+        matches = list(re.finditer(lnot_var_pattern, result))
+        for match in reversed(matches):
+            start_pos = match.start()
+            end_pos = match.end()
+
+            # Check if already in math mode
+            before = result[:start_pos]
+            dollars_before = before.count("$")
+            if dollars_before % 2 == 1:
+                continue  # Already in math mode
+
+            var_name = match.group(1)
+            result = result[:start_pos] + f"$\\lnot {var_name}$" + result[end_pos:]
+
+        # Then handle other standalone keywords
+        standalone_keywords = {
+            r"\blor\b": "$\\lor$",
+            r"\bland\b": "$\\land$",
+            r"\blnot\b": "$\\lnot$",  # Only matches lnot NOT followed by variable
+            r"\belem\b": "$\\in$",
+        }
+
+        for pattern, replacement in standalone_keywords.items():
+            # Find all matches and replace from right to left (to preserve positions)
+            matches = list(re.finditer(pattern, result))
+            for match in reversed(matches):
+                start_pos = match.start()
+                end_pos = match.end()
+
+                # Check if already in math mode
+                before = result[:start_pos]
+                dollars_before = before.count("$")
+                if dollars_before % 2 == 1:
+                    continue  # Already in math mode
+
+                # Replace with math mode wrapped keyword
+                result = result[:start_pos] + replacement + result[end_pos:]
+
+        return result
 
     def _process_superscripts(self, text: str) -> str:
         """Stage 0: Wrap standalone superscripts in math mode.
@@ -2563,154 +2704,6 @@ class LaTeXGenerator:
         result = self._process_simple_expressions(result)
 
         # --- Original implementation below (to be migrated to stages) ---
-
-        # Pattern -1.5: Manual operator markup [operator]
-        # Convert bracketed operator keywords to symbols
-        # Example: "([not], [and], [or])" becomes "(symbols)" in LaTeX
-        # Must come FIRST before any expression parsing
-        # This provides explicit markup when auto-detection doesn't work
-        markup_operators = {
-            r"\[not\]": r"$\\lnot$",
-            r"\[and\]": r"$\\land$",
-            r"\[or\]": r"$\\lor$",
-            r"\[=>\]": r"$\\Rightarrow$",
-            r"\[<=>\]": r"$\\Leftrightarrow$",
-            r"\[forall\]": r"$\\forall$",
-            r"\[exists\]": r"$\\exists$",
-            r"\[exists1\]": r"$\\exists_1$",
-        }
-
-        for pattern, replacement in markup_operators.items():
-            result = re.sub(pattern, replacement, result)
-
-        # Pattern -1: Logical formulas with =>, <=>, lnot, land, lor (MUST come FIRST)
-        # Detect expressions like "p => (lnot p => p)" or "(lnot p => lnot q) <=> ..."
-        # Look for patterns starting with identifier/paren/lnot, containing => or <=>
-        # Stop at sentence boundaries (is, as, are, etc.) or punctuation
-        # NOTE: Include common prose verbs that follow mathematical statements
-        # NOTE: Only LaTeX-style keywords (lnot, land, lor), not English
-        formula_pattern = (
-            r"(\()?(?:lnot\s+)?([a-zA-Z]\w*)\s*(=>|<=>)\s*[^.!?]*?"
-            r"(?=\s+(?:is|as|are|for|to|be|a|an|the|in|on|at|by|with|"
-            r"holds|means|implies|shows|proves|states|says|gives|follows|"
-            r"so|then|therefore|hence|thus|because|since|when|where|which|that)\b|[.!?]|$)"
-        )
-
-        matches = list(re.finditer(formula_pattern, result))
-        for match in reversed(matches):
-            start_pos = match.start()
-            end_pos = match.end()
-
-            # Check if already in math mode
-            before = result[:start_pos]
-            dollars_before = before.count("$")
-            if dollars_before % 2 == 1:
-                continue
-
-            formula_text = result[start_pos:end_pos].strip()
-
-            # Try to parse as logical expression
-            try:
-                lexer = Lexer(formula_text)
-                tokens = lexer.tokenize()
-                parser = Parser(tokens)
-                ast = parser.parse()
-
-                if isinstance(ast, Expr):
-                    math_latex = self.generate_expr(ast)
-                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except (LexerError, ParserError):
-                # Parsing failed - expression is not valid math, leave as prose
-                pass
-
-        # Pattern -0.5: Parenthesized logical expressions
-        # Detect expressions like "(p lor q)", "(p land q)", "((p => r) land ...)"
-        # Also handles "(lnot p => lnot q)" which Pattern -1 misses
-        # Use balanced parenthesis matching to handle nested expressions
-        # NOTE: Only LaTeX-style keywords (lnot, land, lor), not English
-        paren_matches = self._find_balanced_parens(result)
-
-        for start_pos, end_pos in reversed(paren_matches):
-            # Check if already in math mode
-            before = result[:start_pos]
-            dollars_before = before.count("$")
-            if dollars_before % 2 == 1:
-                continue
-
-            paren_text = result[start_pos:end_pos]
-
-            # Only process if it contains logical operators or keywords
-            # Look for: lor, land, lnot, elem, =>, <=>
-            has_logic = bool(
-                re.search(r"\blor\b", paren_text)
-                or re.search(r"\bland\b", paren_text)
-                or re.search(r"\blnot\b", paren_text)
-                or re.search(r"\belem\b", paren_text)
-                or "=>" in paren_text
-                or "<=>" in paren_text
-            )
-
-            if not has_logic:
-                continue
-
-            # Try to parse as logical expression
-            try:
-                lexer = Lexer(paren_text)
-                tokens = lexer.tokenize()
-                parser = Parser(tokens)
-                ast = parser.parse()
-
-                if isinstance(ast, Expr):
-                    math_latex = self.generate_expr(ast)
-                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except (LexerError, ParserError):
-                # Parsing failed - expression is not valid math, leave as prose
-                pass
-
-        # Pattern -0.3: Standalone logical keywords (lor, land, lnot, elem)
-        # These should ALWAYS render as symbols, never as literal text
-        # Match whole words only (use word boundaries)
-        # Special case: lnot followed by single variable (lnot p) → $\lnot p$
-
-        # First, handle "lnot <variable>" as a unit
-        lnot_var_pattern = r"\blnot\s+([a-zA-Z])\b"
-        matches = list(re.finditer(lnot_var_pattern, result))
-        for match in reversed(matches):
-            start_pos = match.start()
-            end_pos = match.end()
-
-            # Check if already in math mode
-            before = result[:start_pos]
-            dollars_before = before.count("$")
-            if dollars_before % 2 == 1:
-                continue  # Already in math mode
-
-            var_name = match.group(1)
-            result = result[:start_pos] + f"$\\lnot {var_name}$" + result[end_pos:]
-
-        # Then handle other standalone keywords
-        standalone_keywords = {
-            r"\blor\b": "$\\lor$",
-            r"\bland\b": "$\\land$",
-            r"\blnot\b": "$\\lnot$",  # Only matches lnot NOT followed by variable
-            r"\belem\b": "$\\in$",
-        }
-
-        for pattern, replacement in standalone_keywords.items():
-            # Find all matches and replace from right to left (to preserve positions)
-            matches = list(re.finditer(pattern, result))
-            for match in reversed(matches):
-                start_pos = match.start()
-                end_pos = match.end()
-
-                # Check if already in math mode
-                before = result[:start_pos]
-                dollars_before = before.count("$")
-                if dollars_before % 2 == 1:
-                    continue  # Already in math mode
-
-                # Replace with math mode wrapped keyword
-                result = result[:start_pos] + replacement + result[end_pos:]
 
         # Pattern 0: Standalone superscripts (MUST come before other patterns)
         # Match: identifier/number followed by ^ and exponent
