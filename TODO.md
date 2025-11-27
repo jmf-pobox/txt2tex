@@ -1,60 +1,46 @@
 # TODO: Centralize Fuzz-Mode Logic
 
+**Status: COMPLETE** ✅
+
 Refactoring to centralize `self.use_fuzz` branches into helper methods.
 
-## Overview
+## Summary
 
-31 `self.use_fuzz` branches scattered across `latex_gen.py` for:
-- Type names (N, Z, N1)
-- Separators (bullet, colon, mid)
-- Closure operators (+, *, ~)
-- Binary operators (=>, <=>)
-- Identifier formatting (mathit wrapping)
-- Parentheses decisions
-- Document structure
+Reduced `self.use_fuzz` usages from 31 to 20 by centralizing common patterns into 7 helper methods.
 
-## Plan
+## Completed Phases
 
-### Phase 1: Simple separator helpers
-- [ ] `_get_bullet_separator() -> str` - @ vs \bullet (5 usages)
-- [ ] `_get_colon_separator() -> str` - : vs \colon (2 usages)
-- [ ] `_get_mid_separator() -> str` - | vs \mid (2 usages)
+### Phase 1: Separator helpers ✅
+- `_get_bullet_separator()` - @ vs \bullet
+- `_get_colon_separator()` - : vs \colon
+- `_get_mid_separator()` - | vs \mid
 
-### Phase 2: Type name helper
-- [ ] `_get_type_latex(name: str) -> str` - N/Z/N1 mappings (3 usages)
+### Phase 2: Type name helper ✅
+- `_get_type_latex(name)` - N/Z/N1 mappings
 
-### Phase 3: Closure operator helper
-- [ ] `_get_closure_operator_latex(op: str) -> str` - +/*/~ (3 usages)
+### Phase 3: Closure operator helper ✅
+- `_get_closure_operator_latex(op, operand)` - +/*/~
 
-### Phase 4: Identifier formatting helper
-- [ ] `_format_multiword_identifier(escaped: str) -> str` - mathit wrapping (3 usages)
+### Phase 4: Identifier formatting helper ✅
+- `_format_multiword_identifier(name)` - mathit wrapping
 
-### Phase 5: Binary operator helper
-- [ ] `_map_binary_operator(op: str, base_latex: str) -> str` - =>/<=>/iff (1 block)
+### Phase 5: Binary operator helper ✅
+- `_map_binary_operator(op, base_latex)` - =>/<=>/iff
 
-### Phase 6: Update CODE_REVIEW.md
-- [ ] Document completed refactoring
-- [ ] Remove from "Remaining Refactoring Opportunities"
+### Phase 6: Documentation ✅
+- CODE_REVIEW.md updated
+- Ready for merge
 
-## Workflow
+## Remaining Usages (Acceptable)
 
-1. Create feature branch `refactor/centralize-fuzz-mode`
-2. For each phase:
-   - Add helper method
-   - Replace usages one at a time
-   - Run `hatch run check` after each change
-   - Commit when green
-3. Update CODE_REVIEW.md
-4. Merge to main, delete branch
+12 remaining usages are context-specific:
+- 8 in helper methods (the centralized logic)
+- Parentheses decisions for # operator precedence
+- Lambda/quantifier parenthesization
+- mu operator special handling
+- IF-THEN-ELSE formatting
+- Schema predicate line breaks
+- Document-level package selection
 
-## Status
-
-- [ ] Branch created
-- [ ] Phase 1 complete
-- [ ] Phase 2 complete
-- [ ] Phase 3 complete
-- [ ] Phase 4 complete
-- [ ] Phase 5 complete
-- [ ] Phase 6 complete
-- [ ] Merged to main
+These don't benefit from further abstraction.
 

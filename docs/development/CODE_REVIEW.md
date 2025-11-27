@@ -9,9 +9,7 @@ This review analyzes the `src/txt2tex` codebase for code quality issues beyond w
 - Type dispatch: `@singledispatchmethod` replaces isinstance chains
 - Documentation: Google-style docstrings on public methods, Phase comments replaced
 - `_process_inline_math` decomposed into 11 pipeline stages (see below)
-
-**Remaining considerations:**
-- Duplicated fuzz-mode logic could be centralized
+- Fuzz-mode logic centralized into helper methods (see below)
 
 **Acceptable as-is:**
 - Lexer/parser complexity is domain-appropriate (tokenizers and parsers are inherently branchy)
@@ -29,13 +27,21 @@ Current state (~12,000 lines total):
 
 File splitting is **not recommended** - these are cohesive modules where the size reflects domain complexity, not poor organization.
 
-### Remaining Refactoring Opportunities
+### Fuzz-Mode Helper Methods
 
-#### 1. Duplicated Fuzz-Mode Logic
+The fuzz vs standard LaTeX differences are now centralized in helper methods (reduced from 31 scattered usages to 20, with 8 in helpers):
 
-`self.use_fuzz` branches appear repeatedly (dozens of sites) for type names, operator choices, and parentheses formatting.
+| Helper | Purpose |
+|--------|---------|
+| `_get_bullet_separator()` | @ (fuzz) vs \\bullet (standard) |
+| `_get_colon_separator()` | : (fuzz) vs \\colon (standard) |
+| `_get_mid_separator()` | \| (fuzz) vs \\mid (standard) |
+| `_get_type_latex(name)` | N/Z/N1 → \\nat/\\num vs \\mathbb{} |
+| `_get_closure_operator_latex(op, operand)` | +/*/~ closure formatting |
+| `_format_multiword_identifier(name)` | Underscore escape ± \\mathit{} |
+| `_map_binary_operator(op, base)` | =>/<=> fuzz-specific mappings |
 
-Potential improvement: centralize in helper methods (e.g., `_get_type_latex`, `_map_operator`).
+Remaining `self.use_fuzz` usages are context-specific parentheses decisions and structural choices that don't benefit from further abstraction.
 
 ### Complexity Notes
 
