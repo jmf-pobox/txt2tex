@@ -61,14 +61,24 @@ Phased rollout of additional linting rules to tighten coding standards. Each gro
 
 ### Workflow
 
-- [ ] **Step 2.1**: Enable rules in `pyproject.toml`
-- [ ] **Step 2.2**: Run `hatch run lint` and count violations per rule
-- [ ] **Step 2.3**: Present violation counts to user
-- [ ] **Step 2.4**: User decides: keep all / keep some / disable
-- [ ] **Step 2.5**: Fix violations for kept rules OR add to ignore list
-- [ ] **Step 2.6**: Commit changes
+- [x] **Step 2.1**: Enable rules in `pyproject.toml`
+- [x] **Step 2.2**: Run `hatch run lint` and count violations per rule
+- [x] **Step 2.3**: Present violation counts to user
+- [x] **Step 2.4**: User decides: keep all / keep some / disable
+- [x] **Step 2.5**: Fix violations for kept rules OR add to ignore list
+- [x] **Step 2.6**: Commit changes
 
-### Status: NOT STARTED
+### Status: COMPLETE ✅
+
+### Results
+
+| Rule | Violations | Resolution |
+|------|------------|------------|
+| ARG | 25 | Keep, per-file ignore for latex_gen.py and parser.py (visitor pattern) |
+| ERA | 4 | Keep, noqa comments for documentation examples |
+| PIE | 4 | Keep, auto-fixed |
+| RET | 26 | Keep, auto-fixed (including unsafe RET504) |
+| RSE | 0 | Keep (free win) |
 
 ---
 
@@ -198,7 +208,7 @@ If a rule causes too many issues:
 | Group | Status | Rules Kept | Rules Disabled |
 |-------|--------|------------|----------------|
 | 1 - Safety | ✅ Complete | S, BLE, T10, T20, A | None |
-| 2 - Dead Code | Not Started | - | - |
+| 2 - Dead Code | ✅ Complete | ARG, ERA, PIE, RET, RSE | None |
 | 3 - Type Safety | Not Started | - | - |
 | 4 - Performance | Not Started | - | - |
 | 5 - Testing | Not Started | - | - |

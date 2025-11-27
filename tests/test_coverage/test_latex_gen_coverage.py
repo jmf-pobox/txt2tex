@@ -163,8 +163,8 @@ def test_latex_gen_use_fuzz_false() -> None:
 
 
 def test_latex_gen_case_analysis() -> None:
-    """Test LaTeX generation for CASE ANALYSIS (syntax lnot fully supported yet)."""
-    pass
+    """Test LaTeX generation for CASE ANALYSIS (syntax not fully supported yet)."""
+    # Intentionally empty - syntax not fully supported yet
 
 
 def test_latex_gen_proof_tree() -> None:

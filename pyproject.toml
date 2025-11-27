@@ -93,12 +93,18 @@ select = [
     "TCH", # flake8-type-checking
     "TID", # flake8-tidy-imports
     "RUF", # Ruff-specific rules
-    # Group 1: Safety & Bug Prevention (assessing)
+    # Group 1: Safety & Bug Prevention
     "S",   # flake8-bandit (security)
     "BLE", # flake8-blind-except
     "T10", # flake8-debugger
     "T20", # flake8-print
     "A",   # flake8-builtins
+    # Group 2: Dead Code & Quality
+    "ERA", # flake8-eradicate (commented code)
+    "PIE", # flake8-pie (misc improvements)
+    "RSE", # flake8-raise
+    "ARG", # flake8-unused-arguments
+    "RET", # flake8-return
 ]
 extend-select = ["PLC0415"]
 
@@ -114,6 +120,10 @@ ignore = [
 "tests/*" = ["S101", "T20"]
 # Allow print in CLI - intentional user output
 "src/txt2tex/cli.py" = ["T20"]
+# Allow unused parent arg in singledispatch visitor pattern
+"src/txt2tex/latex_gen.py" = ["ARG002"]
+# Allow unused parent_indent in proof tree parsing
+"src/txt2tex/parser.py" = ["ARG002"]
 
 [tool.ruff.format]
 quote-style = "double"

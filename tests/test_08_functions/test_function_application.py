@@ -251,11 +251,11 @@ class TestPhase11bEdgeCases:
         Note: Current lexer treats _ as subscript operator, lnot part of identifier.
         So 'well_trained' is parsed as 'well' followed by subscript 'trained'.
         This is a known limitation - identifiers with underscores need workaround
-        lor lexer enhancement.
+        or lexer enhancement.
 
         For now, skip this test as it documents expected limitation.
         """
-        pass
+        # Intentionally empty - documents known limitation
 
     def test_application_with_numbers(self):
         """Test f(1, 2, 3)."""

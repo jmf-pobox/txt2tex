@@ -462,7 +462,7 @@ class LaTeXGenerator:
         if isinstance(item, GivenType):
             names_str = ", ".join(item.names)
             return f"[{names_str}]"
-        elif isinstance(item, FreeType):
+        if isinstance(item, FreeType):
             # Generate branches
             branch_strs: list[str] = []
             for branch in item.branches:
@@ -481,16 +481,15 @@ class LaTeXGenerator:
                     branch_strs.append(f"{branch.name} \\ldata {params_latex} \\rdata")
             branches_str = " | ".join(branch_strs)
             return f"{item.name} ::= {branches_str}"
-        else:  # Abbreviation
-            expr_latex = self.generate_expr(item.expression)
-            name_latex = self._generate_identifier(
-                Identifier(line=0, column=0, name=item.name)
-            )
-            if item.generic_params:
-                params_str = ", ".join(item.generic_params)
-                return f"{name_latex}[{params_str}] == {expr_latex}"
-            else:
-                return f"{name_latex} == {expr_latex}"
+        # Abbreviation
+        expr_latex = self.generate_expr(item.expression)
+        name_latex = self._generate_identifier(
+            Identifier(line=0, column=0, name=item.name)
+        )
+        if item.generic_params:
+            params_str = ", ".join(item.generic_params)
+            return f"{name_latex}[{params_str}] == {expr_latex}"
+        return f"{name_latex} == {expr_latex}"
 
     def generate_document(self, ast: Document | Expr) -> str:
         """Generate complete LaTeX document with preamble and postamble.
@@ -759,12 +758,12 @@ class LaTeXGenerator:
             # Render as R^+ (transitive closure)
             base_id = Identifier(line=0, column=0, name=base)
             return f"{self._generate_identifier(base_id)}^+"
-        elif name.endswith("*"):
+        if name.endswith("*"):
             base = name[:-1]
             # Render as R^* (reflexive-transitive closure)
             base_id = Identifier(line=0, column=0, name=base)
             return f"{self._generate_identifier(base_id)}^*"
-        elif name.endswith("~"):
+        if name.endswith("~"):
             base = name[:-1]
             # Render as R^{-1} (standard) or R^{\sim} (fuzz)
             base_id = Identifier(line=0, column=0, name=base)
@@ -808,24 +807,22 @@ class LaTeXGenerator:
                     # Letter suffixes are identifier parts (escaped \_)
                     if suffix.isdigit():
                         return f"{prefix}_{suffix}"  # z_1 (decoration)
-                    else:
-                        return f"{prefix}\\_{suffix}"  # length\_L (identifier)
+                    return f"{prefix}\\_{suffix}"  # length\_L (identifier)
                 # Standard LaTeX: bare underscore for subscript
                 return f"{prefix}_{suffix}"
             # Priority 2: Two-char suffix → subscript with braces (e.g., x_10)
-            elif len(suffix) == 2:
+            if len(suffix) == 2:
                 if self.use_fuzz:
                     # Fuzz: all-numeric subscripts are decorations (bare _)
                     # Mixed/letter suffixes are identifier parts (escaped \_)
                     if suffix.isdigit():
                         return f"{prefix}_{{{suffix}}}"  # z_10 (decoration)
-                    else:
-                        return f"{prefix}\\_{{{suffix}}}"  # state\_AB (identifier)
+                    return f"{prefix}\\_{{{suffix}}}"  # state\_AB (identifier)
                 # Standard LaTeX: bare underscore
                 return f"{prefix}_{{{suffix}}}"
             # Priority 3: Long suffix → multi-word identifier (e.g., cumulative_total)
-            else:  # len(suffix) >= 3
-                return self._format_multiword_identifier(name)
+            # len(suffix) >= 3  # noqa: ERA001
+            return self._format_multiword_identifier(name)
 
         # Fallback: multi-word identifier
         return self._format_multiword_identifier(name)
@@ -859,7 +856,7 @@ class LaTeXGenerator:
 
         # Add parentheses for function application with fuzz mode
         # Fuzz has different precedence: # binds less tightly than application
-        # So # s(i) means (# s)(i), but we want # (s(i))
+        # So # s(i) means (# s)(i), but we want # (s(i))  # noqa: ERA001
         if self.use_fuzz and isinstance(node.operand, FunctionApp):
             operand = f"({operand})"
 
@@ -908,16 +905,14 @@ class LaTeXGenerator:
         # Generic instantiation operators (P, P1, F, F1)
         # Per fuzz manual p.23: prefix generic symbols are operator symbols,
         # LaTeX inserts thin space automatically - NO TILDE needed
-        elif node.operator in {"P", "P1", "F", "F1"}:
+        if node.operator in {"P", "P1", "F", "F1"}:
             # Generic instantiation: \power X or \finset X (no tilde)
             return f"{op_latex} {operand}"
-        else:
-            # Prefix: operator operand
-            # Special case: no space for unary minus
-            if node.operator == "-":
-                return f"{op_latex}{operand}"
-            else:
-                return f"{op_latex} {operand}"
+        # Prefix: operator operand
+        # Special case: no space for unary minus
+        if node.operator == "-":
+            return f"{op_latex}{operand}"
+        return f"{op_latex} {operand}"
 
     def _needs_parens(self, child: Expr, parent: BinaryOp, is_left_child: bool) -> bool:
         """Check if child expression needs parentheses in parent context.
@@ -1380,7 +1375,7 @@ class LaTeXGenerator:
                 # Critical for fuzz: P (P Z) → \power (\power Z) not \power \power Z
                 # FunctionApp: P (P Z), seq (seq X)
                 # BinaryOp: seq (X cross Y), P (A union B)
-                # GenericInstantiation: seq (P[X])
+                # GenericInstantiation: seq (P[X])  # noqa: ERA001
                 if isinstance(arg, (FunctionApp, BinaryOp, GenericInstantiation)):
                     arg_latex = f"({arg_latex})"
                 # Add ~ spacing hint between function and argument
@@ -1405,7 +1400,7 @@ class LaTeXGenerator:
                 and isinstance(node.function.args[0], Identifier)
                 and node.function.args[0].name in special_functions
             ):
-                # Pattern: (special_fn1(special_fn2))(args)
+                # Pattern: (special_fn1(special_fn2))(args)  # noqa: ERA001
                 # Generate: special_fn1~(special_fn2~args) with parens and tildes
                 outer_latex = special_functions[inner_func.name]
                 inner_latex = special_functions[node.function.args[0].name]
@@ -1821,9 +1816,7 @@ class LaTeXGenerator:
                     if item_lines:
                         # Remove leading bigskip/medskip from first item if present
                         first_line = item_lines[0]
-                        if first_line.startswith("\\bigskip") or first_line.startswith(
-                            "\\medskip"
-                        ):
+                        if first_line.startswith(("\\bigskip", "\\medskip")):
                             item_lines = item_lines[1:]
                             first_line = item_lines[0] if item_lines else ""
                         # Remove \noindent from first line (we're indenting the part)
@@ -1893,9 +1886,7 @@ class LaTeXGenerator:
                         item_lines = self.generate_document_item(first_item)
                         if item_lines:
                             first_line = item_lines[0]
-                            if first_line.startswith(
-                                "\\bigskip"
-                            ) or first_line.startswith("\\medskip"):
+                            if first_line.startswith(("\\bigskip", "\\medskip")):
                                 item_lines = item_lines[1:]
                                 first_line = item_lines[0] if item_lines else ""
                             # Remove \noindent (we're indenting the part)
@@ -2159,9 +2150,8 @@ class LaTeXGenerator:
 
         # Escape underscores outside math mode (final pass)
         # Prevents LaTeX errors when identifiers like length_L appear in prose
-        text = self._escape_underscores_outside_math(text)
+        return self._escape_underscores_outside_math(text)
 
-        return text
 
     @generate_document_item.register(Paragraph)
     def _generate_paragraph(self, node: Paragraph) -> list[str]:
@@ -2567,11 +2557,9 @@ class LaTeXGenerator:
                 # Strip leading/trailing whitespace from locator
                 locator = locator.strip()
                 return f"\\citep[{locator}]{{{key}}}"
-            else:
-                return f"\\citep{{{key}}}"
+            return f"\\citep{{{key}}}"
 
-        result = re.sub(pattern, replace_citation, text)
-        return result
+        return re.sub(pattern, replace_citation, text)
 
     # -------------------------------------------------------------------------
     # Inline Math Pipeline Stages
@@ -3289,9 +3277,8 @@ class LaTeXGenerator:
         result = self._process_quantifiers(result)
         result = self._process_type_declarations(result)
         result = self._process_function_applications(result)
-        result = self._process_simple_expressions(result)
+        return self._process_simple_expressions(result)
 
-        return result
 
     @generate_document_item.register(TruthTable)
     def _generate_truth_table(self, node: TruthTable) -> list[str]:
@@ -3367,8 +3354,7 @@ class LaTeXGenerator:
         result = re.sub(r"\bland\b", r"\\land", result)
         result = re.sub(r"\blor\b", r"\\lor", result)
         result = re.sub(r"\blnot\b", r"\\lnot", result)
-        result = re.sub(r"\belem\b", r"\\in", result)
-        return result
+        return re.sub(r"\belem\b", r"\\in", result)
 
     def _escape_latex(self, text: str) -> str:
         """Escape LaTeX special characters.
@@ -3387,8 +3373,7 @@ class LaTeXGenerator:
         result = result.replace("{", r"\{")
         result = result.replace("}", r"\}")
         result = result.replace("~", r"\textasciitilde{}")
-        result = result.replace("^", r"\textasciicircum{}")
-        return result
+        return result.replace("^", r"\textasciicircum{}")
 
     def _escape_justification(self, text: str) -> str:
         """Escape operators in justification text for LaTeX.
@@ -3463,11 +3448,10 @@ class LaTeXGenerator:
         # Pattern: word characters around underscore, not already in math mode
         # This handles cases like length_L, played_L in justification text
         # Escapes as length\_L (prose) not $length_L$ (subscript)
-        result = re.sub(
+        return re.sub(
             r"(?<!\$)(\w+_\w+)(?!\$)", lambda m: m.group(1).replace("_", r"\_"), result
         )
 
-        return result
 
     @generate_document_item.register(ArgueChain)
     def _generate_argue_chain(self, node: ArgueChain) -> list[str]:
@@ -4297,9 +4281,8 @@ class LaTeXGenerator:
                     premises = "\n  ".join(child_latexes)
                     boxed = f"\\ulcorner {expr_latex} \\urcorner^{{[{ref_label}]}}"
                     return f"\\infer{{{boxed}}}{{\n  {premises}\n}}"
-                else:
-                    # Leaf node - just return the boxed reference
-                    return f"\\ulcorner {expr_latex} \\urcorner^{{[{ref_label}]}}"
+                # Leaf node - just return the boxed reference
+                return f"\\ulcorner {expr_latex} \\urcorner^{{[{ref_label}]}}"
 
         # If no children, return expression (possibly with justification)
         if not node.children:
@@ -4405,9 +4388,8 @@ class LaTeXGenerator:
             # Escape LaTeX special characters in justification
             just = self._format_justification_label(node.justification)
             return f"\\infer[{just}]{{{expr_latex}}}{{\n  {premises}\n}}"
-        else:
-            # No justification - use plain \infer
-            return f"\\infer{{{expr_latex}}}{{\n  {premises}\n}}"
+        # No justification - use plain \infer
+        return f"\\infer{{{expr_latex}}}{{\n  {premises}\n}}"
 
     def _generate_inference_from_assumption(
         self, node: ProofNode, assumption_latex: str, assumption_label: int | None
@@ -4424,10 +4406,9 @@ class LaTeXGenerator:
 
         # Node has children - generate them recursively
         # Children should ultimately reference the assumption as their premise
-        child_latex = self._generate_proof_node_infer_with_assumption(
+        return self._generate_proof_node_infer_with_assumption(
             node, assumption_latex, assumption_label
         )
-        return child_latex
 
     def _generate_proof_node_infer_with_assumption(
         self, node: ProofNode, assumption_latex: str, assumption_label: int | None
@@ -4943,9 +4924,8 @@ class LaTeXGenerator:
         # Strategy: Find sequences of words (letters/digits/underscores + spaces)
         # that aren't LaTeX commands (not preceded by \) and wrap them.
         # This handles phrases like "inductive hypothesis", "strong IH", etc.
-        result = self._wrap_text_in_mathrm(result)
+        return self._wrap_text_in_mathrm(result)
 
-        return result
 
     def _wrap_text_in_mathrm(self, text: str) -> str:
         """Wrap non-operator text sequences in \\mbox{} for proper math mode spacing.

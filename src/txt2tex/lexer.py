@@ -1118,7 +1118,7 @@ class Lexer:
         # by common English word
         if start_column == 1 and value in ("A", "An"):
             # Peek ahead to check if this is an article or a type name
-            # Article: "A function is..." or "An element is..."
+            # Article: "A function is..." or "An element is..."  # noqa: ERA001
             # Type name: "A -> B" or "A union B" (union is Z keyword, not prose)
             temp_pos = self.pos
             # Skip whitespace

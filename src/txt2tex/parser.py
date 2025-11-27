@@ -799,13 +799,12 @@ class Parser:
         result = re.sub(r"\s*\(\s*", "(", result)  # Remove space before/after (
         result = re.sub(r"\s*\)\s*", ")", result)  # Remove space before/after )
         result = re.sub(r"\s*=\s*", "=", result)  # Remove space around =
-        result = re.sub(r"\s*,", ",", result)  # Remove space BEFORE comma only
+        return re.sub(r"\s*,", ",", result)  # Remove space BEFORE comma only
 
         # DO NOT touch < or > as they appear in many operators (=>, ->>, etc.)
         # Sequences like <ple> will have internal spacing, but that's acceptable
         # to avoid breaking operator conversion in _escape_justification
 
-        return result
 
     def _parse_section(self) -> Section:
         """Parse section: === Title ==="""
@@ -3239,12 +3238,11 @@ class Parser:
                         "Did you mean '::=' instead of '::=='?",
                         current,
                     )
-                else:
-                    raise ParserError(
-                        f"Expected branch name or '|' in free type definition, "
-                        f"got {current.type.name}",
-                        current,
-                    )
+                raise ParserError(
+                    f"Expected branch name or '|' in free type definition, "
+                    f"got {current.type.name}",
+                    current,
+                )
 
         if not branches:
             raise ParserError(
@@ -3822,18 +3820,17 @@ class Parser:
                 line=start_token.line,
                 column=start_token.column,
             )
-        else:
-            # Multiple items or non-expression items - wrap in Document
-            doc = Document(
-                items=items,
-                line=start_token.line,
-                column=start_token.column,
-            )
-            return Zed(
-                content=doc,
-                line=start_token.line,
-                column=start_token.column,
-            )
+        # Multiple items or non-expression items - wrap in Document
+        doc = Document(
+            items=items,
+            line=start_token.line,
+            column=start_token.column,
+        )
+        return Zed(
+            content=doc,
+            line=start_token.line,
+            column=start_token.column,
+        )
 
     def _parse_schema(self) -> Schema:
         """Parse schema definition block.
