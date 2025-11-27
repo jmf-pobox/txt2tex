@@ -294,16 +294,27 @@ class LaTeXGenerator:
         if not self._warn_overflow:
             return
 
-        # Measure LaTeX length (approximation of rendered width)
-        latex_len = len(latex)
-        if latex_len <= self._overflow_threshold:
+        # Split on LaTeX line breaks (\\) and check each line individually
+        # This respects user-inserted line breaks via \ continuation
+        lines = latex.split("\\\\")
+
+        # Find the longest line (strip leading whitespace like \t1)
+        max_line_len = 0
+        for line in lines:
+            # Strip common indentation markers
+            stripped = line.lstrip()
+            if stripped.startswith("\\t1 "):
+                stripped = stripped[4:]
+            max_line_len = max(max_line_len, len(stripped))
+
+        if max_line_len <= self._overflow_threshold:
             return
 
         # Build warning message
         preview = content_preview or latex[:50] + "..." if len(latex) > 50 else latex
         warning = (
             f"Warning: Line {source_line} may overflow page margin "
-            f"(~{latex_len} chars)\n"
+            f"(~{max_line_len} chars)\n"
             f"  In: {context}\n"
             f"  Content: {preview}\n"
             f"  Suggestion: Break long expressions using indentation continuation"
