@@ -5,7 +5,7 @@
 This review analyzes the `src/txt2tex` codebase for code quality issues beyond what automated tools (ruff, mypy) catch. The codebase demonstrates good type safety and follows many PEP 8 conventions, but has significant maintainability concerns due to file size, complex control flow, and architectural patterns.
 
 Key findings:
-- parser.py (3195 LOC), latex_gen.py (3395 LOC), and lexer.py (1033 LOC) are very large
+- parser.py (4213 LOC), latex_gen.py (4770 LOC), and lexer.py (1282 LOC) are very large
 - Long isinstance chains instead of visitor/dispatch increase rigidity
 - Broad Exception handling hides defects and complicates debugging
 - Incomplete docstrings and Phase-only references reduce approachability
@@ -13,11 +13,12 @@ Key findings:
 
 ### File Size and Organization
 
-Current state:
-- `parser.py` ≈ 3195 lines
-- `latex_gen.py` ≈ 3395 lines
-- `lexer.py` ≈ 1033 lines
-- `ast_nodes.py` ≈ 749 lines (reasonable)
+Current state (11,508 lines total):
+- `parser.py` ≈ 4213 lines
+- `latex_gen.py` ≈ 4770 lines
+- `lexer.py` ≈ 1282 lines
+- `ast_nodes.py` ≈ 889 lines
+- `constants.py` ≈ 71 lines
 
 Risks:
 - Cognitive load and navigation difficulty
@@ -85,13 +86,12 @@ Recommendations:
 
 ### Magic Strings and Scattered Constants
 
-Observation: Hardcoded keyword sets in lexer prose detection and other places; operator strings scattered.
+Observation: Hardcoded keyword sets previously scattered; `constants.py` now exists with `PROSE_WORDS`.
 
-Issues:
-- Multiple sources of truth; drift risks
+Status: **Partially addressed** - `PROSE_WORDS` extracted. Operator maps remain in `latex_gen.py`.
 
-Recommendations:
-- Extract constants (keyword sets, operator maps) to a single module (e.g., `constants.py`) or colocated sections in `tokens.py`
+Remaining work:
+- Consider extracting operator maps from `latex_gen.py` to constants
 
 ### Complex Nested Conditionals
 
@@ -153,12 +153,12 @@ This section catalogs shortcuts and deviations from project quality standards.
 
 | File | Line | Suppression | Justification Status |
 |------|------|-------------|---------------------|
-| `latex_gen.py` | 101 | `# noqa: RUF001` | Unicode × character - **legitimate** |
-| `latex_gen.py` | 218 | `# noqa: RUF001` | Unicode × character - **legitimate** |
-| `latex_gen.py` | 266 | `# type: ignore` | List append typing - **needs fix** |
+| `latex_gen.py` | 102 | `# noqa: RUF001` | Unicode × character - **legitimate** |
+| `latex_gen.py` | 219 | `# noqa: RUF001` | Unicode × character - **legitimate** |
+| `latex_gen.py` | 267 | `# type: ignore` | List append typing - **needs fix** |
 | `lexer.py` | 670 | `# noqa: RUF001` | Unicode × character - **legitimate** |
 | `lexer.py` | 672 | `# noqa: RUF001` | Unicode × character - **legitimate** |
-| `parser.py` | 3890 | `# type: ignore[arg-type]` | Type mismatch - **needs fix** |
+| `parser.py` | 3862 | `# type: ignore[arg-type]` | Type mismatch - **needs fix** |
 | `tokens.py` | 33 | `# noqa: RUF003` | Unicode × in comment - **legitimate** |
 
 **Analysis**:
@@ -175,7 +175,7 @@ This section catalogs shortcuts and deviations from project quality standards.
 
 | File | Count | Pattern | Risk Level |
 |------|-------|---------|------------|
-| `latex_gen.py` | 10 | Catch-all for parse fallbacks | **High** |
+| `latex_gen.py` | 9 | Catch-all for parse fallbacks | **High** |
 | `cli.py` | 3 | Catch-all for file/processing errors | **Medium** |
 | `parser.py` | 1 | Catch-all in compound identifier parsing | **High** |
 
