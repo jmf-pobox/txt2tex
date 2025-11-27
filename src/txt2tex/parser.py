@@ -61,6 +61,7 @@ from txt2tex.ast_nodes import (
     UnaryOp,
     Zed,
 )
+from txt2tex.constants import PROSE_WORDS
 from txt2tex.tokens import Token, TokenType
 
 
@@ -1551,40 +1552,11 @@ class Parser:
 
         # Reject common English prose words to avoid parsing text as math
         # This prevents "x >= 0 is true" from being parsed as function applications
-        if current.type == TokenType.IDENTIFIER:
-            prose_words = {
-                "is",
-                "are",
-                "be",
-                "was",
-                "were",
-                "true",
-                "false",
-                "the",
-                "a",
-                "an",
-                "to",
-                "of",
-                "for",
-                "with",
-                "as",
-                "by",
-                "from",
-                "that",
-                "this",
-                "these",
-                "those",
-                "it",
-                "its",
-                "they",
-                "them",
-                "syntax",
-                "valid",
-                "here",
-                "there",
-            }
-            if current.value.lower() in prose_words:
-                return False
+        if (
+            current.type == TokenType.IDENTIFIER
+            and current.value.lower() in PROSE_WORDS
+        ):
+            return False
 
         # Stop at delimiters
         if current.type in (

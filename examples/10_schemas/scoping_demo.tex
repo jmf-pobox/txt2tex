@@ -386,7 +386,8 @@ from other schemas, but here we show explicit declarations.
 \begin{schema}{ColoredItem}
   color : Color
   \where
-  color(in)(\{red, blue\})
+  color \\
+  in(\{red, blue\})
 \end{schema}
 
 \noindent The free type constructors (red, green, blue) are in global

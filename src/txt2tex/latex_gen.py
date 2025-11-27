@@ -56,6 +56,7 @@ from txt2tex.ast_nodes import (
     UnaryOp,
     Zed,
 )
+from txt2tex.constants import PROSE_WORDS
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
 
@@ -2939,49 +2940,8 @@ class LaTeXGenerator:
             except Exception:
                 # If parsing fails, check if this looks like prose (not math)
                 # Common English words that appear in prose but not in math
-                prose_words = {
-                    "the",
-                    "a",
-                    "an",
-                    "is",
-                    "are",
-                    "was",
-                    "were",
-                    "be",
-                    "been",
-                    "have",
-                    "has",
-                    "had",
-                    "do",
-                    "does",
-                    "did",
-                    "will",
-                    "would",
-                    "should",
-                    "could",
-                    "may",
-                    "might",
-                    "must",
-                    "can",
-                    "this",
-                    "that",
-                    "these",
-                    "those",
-                    "whatever",
-                    "whoever",
-                    "of",
-                    "for",
-                    "with",
-                    "as",
-                    "by",
-                    "from",
-                    "to",
-                    "in",
-                    "on",
-                    "at",
-                }
                 expr_words = set(expr.lower().split())
-                if expr_words & prose_words:
+                if expr_words & PROSE_WORDS:
                     # Contains prose words - skip this match
                     continue
 
