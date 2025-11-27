@@ -1630,6 +1630,11 @@ class LaTeXGenerator:
         - if x > 0 then x else -x
         - if s = <> then 0 else head s
 
+        Supports line breaks with \\\\ continuation:
+        - if x > 0 \\\\
+            then x \\\\
+            else -x
+
         Fuzz mode: \\IF condition \\THEN expr1 \\ELSE expr2
         Standard LaTeX: (\\mbox{if } ... \\mbox{ then } ... \\mbox{ else } ...)
         """
@@ -1637,14 +1642,22 @@ class LaTeXGenerator:
         then_latex = self.generate_expr(node.then_expr)
         else_latex = self.generate_expr(node.else_expr)
 
+        # Build line break markers
+        break_after_cond = " \\\\\n\\t1 " if node.line_break_after_condition else " "
+        break_after_then = " \\\\\n\\t1 " if node.line_break_after_then else " "
+
         # Fuzz uses \IF \THEN \ELSE keywords
         if self.use_fuzz:
-            return f"\\IF {condition_latex} \\THEN {then_latex} \\ELSE {else_latex}"
+            return (
+                f"\\IF {condition_latex}{break_after_cond}"
+                f"\\THEN {then_latex}{break_after_then}"
+                f"\\ELSE {else_latex}"
+            )
 
         # Standard LaTeX uses mbox keywords
         return (
-            f"(\\mbox{{if }} {condition_latex} "
-            f"\\mbox{{ then }} {then_latex} "
+            f"(\\mbox{{if }} {condition_latex}{break_after_cond}"
+            f"\\mbox{{ then }} {then_latex}{break_after_then}"
             f"\\mbox{{ else }} {else_latex})"
         )
 

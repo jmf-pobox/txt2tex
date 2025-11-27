@@ -1156,7 +1156,10 @@ class Parser:
             if s = <> then 0 else head s
             if x > 0 then 1 else if x < 0 then -1 else 0 (nested)
 
-        Supports multi-line conditionals with line breaks after if/then/else.
+        Supports explicit line breaks with \\ continuation marker:
+            if x > 0 \\
+              then x \\
+              else -x
 
         The condition is parsed with _parse_iff() (no quantifiers/lambdas/conditionals),
         but the then/else branches use _parse_expr() to allow nested conditionals.
@@ -1165,6 +1168,12 @@ class Parser:
 
         # Parse condition (up to 'then') - no quantifiers/lambdas/conditionals
         condition = self._parse_iff()
+
+        # Check for explicit line break after condition (before 'then')
+        line_break_after_condition = False
+        if self._match(TokenType.CONTINUATION):
+            self._advance()  # consume \\
+            line_break_after_condition = True
 
         # Skip newlines before 'then' (multi-line support)
         self._skip_newlines()
@@ -1179,6 +1188,12 @@ class Parser:
 
         # Parse then branch - allow nested conditionals
         then_expr = self._parse_expr()
+
+        # Check for explicit line break after then expression (before 'else')
+        line_break_after_then = False
+        if self._match(TokenType.CONTINUATION):
+            self._advance()  # consume \\
+            line_break_after_then = True
 
         # Skip newlines before 'else' (multi-line support)
         self._skip_newlines()
@@ -1198,6 +1213,8 @@ class Parser:
             condition=condition,
             then_expr=then_expr,
             else_expr=else_expr,
+            line_break_after_condition=line_break_after_condition,
+            line_break_after_then=line_break_after_then,
             line=if_token.line,
             column=if_token.column,
         )
@@ -1544,6 +1561,7 @@ class Parser:
             TokenType.NEWLINE,
             TokenType.SEMICOLON,
             TokenType.PIPE,
+            TokenType.CONTINUATION,  # Line break marker
         ):
             return False
 
