@@ -76,8 +76,24 @@ pdflatex -interaction=nonstopmode input.tex
 ```
 
 **Package options:**
-- **Default (fuzz)**: Provides Z notation type checking during compilation
-- **`--zed` flag**: Uses zed-* packages (no type checking, but simpler fonts)
+- **Default (fuzz)**: Uses fuzz.sty for Z notation rendering with Oxford fonts
+- **`--zed` flag**: Uses zed-* packages with Computer Modern fonts
+
+#### Optional: fuzz typechecker binary
+
+The bundled `fuzz.sty` handles LaTeX rendering. For **type checking** your Z specifications (catching undefined variables, type mismatches, etc.), you need the separate fuzz binary:
+
+```bash
+# Clone and build the fuzz typechecker
+git clone https://github.com/jmf-pobox/fuzz.git
+cd fuzz
+make
+
+# Run type checking on your .tex file
+./fuzz input.tex
+```
+
+Type checking is optional but recommended for catching specification errors before submission.
 
 ---
 
