@@ -139,7 +139,7 @@ def test_cli_with_complex_document(tmp_path: Path) -> None:
     input_file = tmp_path / "complex.txt"
     content = (
         "=== Section 1 ===\n\n** Solution 1 **\n\n(a) x = 1\n\n"
-        "given Person\n\naxdef\n  count : N\nwhere\n  count > 0\nend\n"
+        "given Person\n\naxdef\n  population : N\nwhere\n  population > 0\nend\n"
     )
     input_file.write_text(content)
     with patch.object(sys, "argv", ["txt2tex", str(input_file)]):

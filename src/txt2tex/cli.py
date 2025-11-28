@@ -19,6 +19,68 @@ def get_latex_dir() -> Path:
     return Path(__file__).parent / "latex"
 
 
+def copy_latex_files(work_dir: Path) -> list[Path]:
+    """Copy bundled .sty and .mf files to working directory.
+
+    Returns:
+        List of copied file paths (for cleanup)
+    """
+    latex_dir = get_latex_dir()
+    copied_files: list[Path] = []
+    for pattern in ("*.sty", "*.mf"):
+        for src_file in latex_dir.glob(pattern):
+            dest = work_dir / src_file.name
+            if not dest.exists():
+                shutil.copy(src_file, dest)
+                copied_files.append(dest)
+    return copied_files
+
+
+def typecheck_fuzz(tex_path: Path) -> bool:
+    """Run fuzz typechecker on a .tex file.
+
+    Args:
+        tex_path: Path to the .tex file
+
+    Returns:
+        True if typechecking passed, False otherwise
+    """
+    fuzz = shutil.which("fuzz")
+    if fuzz is None:
+        return True  # Skip if not available
+
+    work_dir = tex_path.parent
+
+    # Copy .sty files for fuzz
+    copied_files = copy_latex_files(work_dir)
+
+    try:
+        result = subprocess.run(  # noqa: S603
+            [fuzz, tex_path.name],
+            cwd=work_dir,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        if result.returncode != 0:
+            print("Type checking failed:", file=sys.stderr)
+            # Show fuzz output (it contains the errors)
+            if result.stdout:
+                print(result.stdout, file=sys.stderr)
+            if result.stderr:
+                print(result.stderr, file=sys.stderr)
+            return False
+
+        print("Type checking: passed")
+        return True
+
+    finally:
+        # Clean up copied files
+        for copied in copied_files:
+            copied.unlink(missing_ok=True)
+
+
 def compile_pdf(tex_path: Path, *, keep_aux: bool = False) -> bool:
     """Compile a .tex file to PDF using pdflatex.
 
@@ -29,7 +91,6 @@ def compile_pdf(tex_path: Path, *, keep_aux: bool = False) -> bool:
     Returns:
         True if compilation succeeded, False otherwise
     """
-    latex_dir = get_latex_dir()
     work_dir = tex_path.parent
 
     # Find pdflatex executable
@@ -38,13 +99,7 @@ def compile_pdf(tex_path: Path, *, keep_aux: bool = False) -> bool:
         return False
 
     # Copy bundled .sty and .mf files to working directory
-    copied_files: list[Path] = []
-    for pattern in ("*.sty", "*.mf"):
-        for src_file in latex_dir.glob(pattern):
-            dest = work_dir / src_file.name
-            if not dest.exists():
-                shutil.copy(src_file, dest)
-                copied_files.append(dest)
+    copied_files = copy_latex_files(work_dir)
 
     try:
         # Run pdflatex (executable path verified by shutil.which above)
@@ -209,23 +264,27 @@ def main() -> int:
         print(f"Error writing output file: {e}", file=sys.stderr)
         return 1
 
+    # Type check with fuzz (if available and using fuzz package)
+    if not args.zed:
+        if shutil.which("fuzz") is not None:
+            if not typecheck_fuzz(output_path):
+                return 1
+        else:
+            print(
+                "Note: fuzz typechecker not found. Skipping type checking.",
+                file=sys.stderr,
+            )
+            print(
+                "      Install from: https://github.com/jmf-pobox/fuzz",
+                file=sys.stderr,
+            )
+
     # Compile to PDF unless --tex-only
     if not args.tex_only:
         print(f"Compiling: {output_path.with_suffix('.pdf')}")
         if not compile_pdf(output_path, keep_aux=args.keep_aux):
             return 1
         print(f"Generated: {output_path.with_suffix('.pdf')}")
-
-    # Warn about fuzz typechecker if using fuzz package
-    if not args.zed and shutil.which("fuzz") is None:
-        print(
-            "Note: fuzz typechecker not found. Type checking is unavailable.",
-            file=sys.stderr,
-        )
-        print(
-            "      Install from: https://github.com/jmf-pobox/fuzz",
-            file=sys.stderr,
-        )
 
     return 0
 

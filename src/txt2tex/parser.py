@@ -805,7 +805,6 @@ class Parser:
         # Sequences like <ple> will have internal spacing, but that's acceptable
         # to avoid breaking operator conversion in _escape_justification
 
-
     def _parse_section(self) -> Section:
         """Parse section: === Title ==="""
         start_token = self._advance()  # Consume first '==='

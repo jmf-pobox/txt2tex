@@ -1836,9 +1836,7 @@ class LaTeXGenerator:
                     lines.append(indent_prefix + part_label)
                     lines.append("")
                     # Set \leftskip for this paragraph (stays set for remaining)
-                    lines.append(
-                        r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
-                    )
+                    lines.append(r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}")
                     self._in_inline_part = True
                     item_lines = self.generate_document_item(first_item)
                     lines.extend(item_lines)
@@ -1870,9 +1868,7 @@ class LaTeXGenerator:
                     lines.append("")
                     # Set \leftskip for content after label
                     # Add extra space so content starts after the closing ) of label
-                    lines.append(
-                        r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}"
-                    )
+                    lines.append(r"\setlength{\leftskip}{\dimexpr\parindent+2em\relax}")
                     self._in_inline_part = True
                     item_lines = self.generate_document_item(first_item)
                     lines.extend(item_lines)
@@ -2153,7 +2149,6 @@ class LaTeXGenerator:
         # Escape underscores outside math mode (final pass)
         # Prevents LaTeX errors when identifiers like length_L appear in prose
         return self._escape_underscores_outside_math(text)
-
 
     @generate_document_item.register(Paragraph)
     def _generate_paragraph(self, node: Paragraph) -> list[str]:
@@ -3281,7 +3276,6 @@ class LaTeXGenerator:
         result = self._process_function_applications(result)
         return self._process_simple_expressions(result)
 
-
     @generate_document_item.register(TruthTable)
     def _generate_truth_table(self, node: TruthTable) -> list[str]:
         """Generate LaTeX for truth table (centered, with auto-scaling if needed)."""
@@ -3453,7 +3447,6 @@ class LaTeXGenerator:
         return re.sub(
             r"(?<!\$)(\w+_\w+)(?!\$)", lambda m: m.group(1).replace("_", r"\_"), result
         )
-
 
     @generate_document_item.register(ArgueChain)
     def _generate_argue_chain(self, node: ArgueChain) -> list[str]:
@@ -4534,9 +4527,7 @@ class LaTeXGenerator:
                         has_case_analysis = True
                     else:
                         # Recurse to handle nested structure
-                        grandchild_latex = self._generate_proof_node_infer(
-                            grandchild
-                        )
+                        grandchild_latex = self._generate_proof_node_infer(grandchild)
                         child_premises_parts.append(grandchild_latex)
 
                 # Include siblings from parent scope as additional premises.
@@ -4579,12 +4570,8 @@ class LaTeXGenerator:
                             # avoid overlap)
                             if case_position == 0:
                                 # First case: minimal height
-                                height = 6 + (
-                                    depth * 2
-                                )  # Conservative for first case
-                                raised = (
-                                    f"\\raiseproof{{{height}ex}}{{{case_latex}}}"
-                                )
+                                height = 6 + (depth * 2)  # Conservative for first case
+                                raised = f"\\raiseproof{{{height}ex}}{{{case_latex}}}"
                             else:
                                 # Subsequent cases: taller + horizontal
                                 # spacing
@@ -4614,9 +4601,7 @@ class LaTeXGenerator:
 
                 if child.justification:
                     just = self._format_justification_label(child.justification)
-                    child_latex = (
-                        f"\\infer[{just}]{{{expr_latex}}}{{{child_premises}}}"
-                    )
+                    child_latex = f"\\infer[{just}]{{{expr_latex}}}{{{child_premises}}}"
                 else:
                     child_latex = f"\\infer{{{expr_latex}}}{{{child_premises}}}"
             else:
@@ -4926,7 +4911,6 @@ class LaTeXGenerator:
         # that aren't LaTeX commands (not preceded by \) and wrap them.
         # This handles phrases like "inductive hypothesis", "strong IH", etc.
         return self._wrap_text_in_mathrm(result)
-
 
     def _wrap_text_in_mathrm(self, text: str) -> str:
         """Wrap non-operator text sequences in \\mbox{} for proper math mode spacing.
