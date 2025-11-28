@@ -86,18 +86,10 @@ PROOF:
     p [land-elim1]
 ```
 
-Convert to LaTeX and PDF:
+Convert to PDF:
 
 ```bash
-# Generate LaTeX
-txt2tex example.txt -o example.tex
-
-# Find bundled LaTeX packages
-LATEX_DIR=$(python -c "import txt2tex; import os; print(os.path.dirname(txt2tex.__file__) + '/latex')")
-
-# Compile to PDF (copy .sty/.mf files or set TEXINPUTS)
-cp "$LATEX_DIR"/*.sty "$LATEX_DIR"/*.mf .
-pdflatex -interaction=nonstopmode example.tex
+txt2tex example.txt --pdf
 ```
 
 Open `example.pdf` to see your beautifully formatted output!
@@ -187,38 +179,29 @@ lnot (p land q)
 
 ## Usage
 
-### Generate LaTeX
+### Generate PDF
 
 ```bash
-# Generate LaTeX (uses fuzz package by default)
-txt2tex input.txt -o input.tex
+# Convert to PDF directly (uses fuzz package by default)
+txt2tex input.txt --pdf
 
-# Use zed-* packages instead
-txt2tex input.txt --zed -o input.tex
+# Use zed-* packages instead of fuzz
+txt2tex input.txt --zed --pdf
+
+# Keep auxiliary files (.aux, .log) for debugging
+txt2tex input.txt --pdf --keep-aux
 ```
 
-### Compile to PDF
-
-txt2tex bundles both fuzz.sty and zed-* packages. Make them available to pdflatex:
+### Generate LaTeX Only
 
 ```bash
-# Find bundled LaTeX packages
-LATEX_DIR=$(python -c "import txt2tex; import os; print(os.path.dirname(txt2tex.__file__) + '/latex')")
-
-# Option A: Copy to current directory
-cp "$LATEX_DIR"/*.sty "$LATEX_DIR"/*.mf .
-
-# Option B: Set environment variables
-export TEXINPUTS="$LATEX_DIR:$TEXINPUTS"
-export MFINPUTS="$LATEX_DIR:$MFINPUTS"
-
-# Compile
-pdflatex -interaction=nonstopmode input.tex
+# Generate LaTeX without compiling
+txt2tex input.txt -o output.tex
 ```
 
 ### Optional: Type Checking with fuzz
 
-The bundled fuzz.sty handles LaTeX rendering. For **type checking** (catching undefined variables, type errors), build the fuzz binary:
+The bundled fuzz.sty handles LaTeX rendering. For **type checking** (catching undefined variables, type errors), build the fuzz binary separately:
 
 ```bash
 git clone https://github.com/jmf-pobox/fuzz.git
