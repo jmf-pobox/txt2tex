@@ -116,8 +116,8 @@ echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Preparing LaTeX dependencies..."
 
 # Copy LaTeX packages and METAFONT sources to build directory
 # This makes the LaTeX self-contained and portable
-cp "${SCRIPT_DIR}/latex"/*.sty "$INPUT_DIR/" 2>/dev/null || true
-cp "${SCRIPT_DIR}/latex"/*.mf "$INPUT_DIR/" 2>/dev/null || true
+cp "${SCRIPT_DIR}/src/txt2tex/latex"/*.sty "$INPUT_DIR/" 2>/dev/null || true
+cp "${SCRIPT_DIR}/src/txt2tex/latex"/*.mf "$INPUT_DIR/" 2>/dev/null || true
 
 echo "  → LaTeX dependencies copied locally"
 

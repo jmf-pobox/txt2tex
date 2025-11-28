@@ -135,7 +135,7 @@ hatch run check-cov      # lint + type + test-cov
    - Main file: `fuzz.sty`
    - Fonts: `oxsz*.mf`, `zarrow.mf`, `zletter.mf`, `zsymbol.mf`
 
-2. **zed-* packages** (in `latex/` directory):
+2. **zed-* packages** (in `src/txt2tex/latex/` directory):
    - `zed-cm.sty` - Z notation in Computer Modern fonts
    - `zed-float.sty` - Floating Z notation environments
    - `zed-lbr.sty` - Line breaking rules for Z
