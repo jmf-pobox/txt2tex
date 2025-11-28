@@ -2,21 +2,29 @@
 
 ## 🚨 CRITICAL: Use Proper Workflow Commands
 
-**NEVER manually invoke pdflatex!** Always use:
+**Use the txt2tex CLI for conversions:**
 
 ```bash
-# Convert txt to PDF (THE CORRECT WAY)
-hatch run convert examples/file.txt
-# OR
-./txt2pdf.sh examples/file.txt
+# Convert txt to PDF (default behavior)
+txt2tex examples/file.txt
+
+# LaTeX only (no PDF compilation)
+txt2tex examples/file.txt --tex-only
+
+# Use zed-* packages instead of fuzz
+txt2tex examples/file.txt --zed
 ```
 
-The `txt2pdf.sh` script handles all the complexity:
-- Sets PYTHONPATH correctly
-- Generates LaTeX with txt2tex CLI
-- Sets TEXINPUTS and MFINPUTS for fuzz/zed-* packages
-- Compiles with pdflatex
-- Cleans up auxiliary files
+The CLI handles:
+- PDF generation with pdflatex (default)
+- Bundled .sty/.mf files copied automatically
+- Fuzz typechecking when fuzz binary is available
+- Cleanup of auxiliary files
+
+For advanced use (bibliography support, tex-fmt formatting):
+```bash
+./txt2pdf.sh examples/file.txt
+```
 
 ## Project Overview
 
@@ -98,12 +106,13 @@ hatch run test-cov       # 5. Coverage maintained
 
 ### Development Workflow
 ```bash
-# LaTeX generation only (txt → tex)
-hatch run cli <file>
+# Full pipeline (txt → tex → pdf) - DEFAULT
+txt2tex <file>
 
-# Full pipeline (txt → tex → pdf)
-hatch run convert <file>
-# OR directly:
+# LaTeX generation only (txt → tex)
+txt2tex <file> --tex-only
+
+# Advanced: bibliography support, tex-fmt formatting
 ./txt2pdf.sh <file>
 
 # Quality gates (run after every change)
@@ -124,7 +133,7 @@ hatch run check          # lint + type + test
 hatch run check-cov      # lint + type + test-cov
 ```
 
-**Important**: The `txt2pdf.sh` script handles TEXINPUTS/MFINPUTS automatically. Don't manually invoke pdflatex unless debugging LaTeX compilation issues.
+**Important**: The CLI copies bundled .sty/.mf files automatically. The `txt2pdf.sh` script adds latexmk for bibliography handling.
 
 ## Environment Setup
 
@@ -166,12 +175,14 @@ pdftotext examples/phase5.pdf -
 # (manual visual inspection)
 ```
 
-### LaTeX Environment Variables (handled by txt2pdf.sh)
+### LaTeX Package Handling
 
-- `TEXINPUTS=../tex//:` - Tells LaTeX to search `../tex/` for style files (fuzz)
-- `TEXINPUTS=./latex//:` - Also searches local latex/ directory for zed-* packages
-- `MFINPUTS=../tex//:` - Tells METAFONT to search `../tex/` for fonts
-- `-interaction=nonstopmode` - Don't stop on LaTeX errors (check .log file)
+The CLI automatically copies bundled .sty and .mf files to the working directory before compilation:
+- `fuzz.sty` - Z notation with Oxford fonts (default)
+- `zed-*.sty` - Z notation with Computer Modern fonts (--zed flag)
+- `*.mf` - METAFONT font definitions
+
+Files are cleaned up after successful compilation unless `--keep-aux` is used.
 
 ## Input Format (Whiteboard Notation)
 

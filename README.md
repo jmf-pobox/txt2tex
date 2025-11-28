@@ -199,23 +199,19 @@ txt2tex input.txt --keep-aux
 txt2tex input.txt --tex-only
 ```
 
-### Optional: Type Checking with fuzz
+### Automatic Type Checking
 
-The bundled fuzz.sty handles LaTeX rendering. For **type checking** (catching undefined variables, type errors), build the fuzz binary separately:
+When the fuzz binary is installed, txt2tex automatically runs type checking before PDF generation. This catches undefined variables, type mismatches, and specification errors.
+
+To install the fuzz typechecker:
 
 ```bash
 git clone https://github.com/jmf-pobox/fuzz.git
 cd fuzz && make
-./fuzz input.tex
+# Add to PATH or install system-wide
 ```
 
-### LaTeX Only (No PDF)
-
-Generate LaTeX without compiling:
-
-```bash
-hatch run cli input.txt --latex-only -o output.tex
-```
+If fuzz is not installed, you'll see a note but compilation continues.
 
 ---
 
@@ -256,7 +252,7 @@ cd examples && make
 cd examples && make 01_propositional_logic
 
 # Build a specific example
-hatch run convert examples/01_propositional_logic/hello_world.txt
+txt2tex examples/01_propositional_logic/hello_world.txt
 ```
 
 ---
@@ -279,7 +275,7 @@ Works on any LaTeX installation, no custom fonts needed:
 - Excellent proof tree support
 - Industry-standard Z notation rendering
 
-Use `--zed` flag: `hatch run convert input.txt --zed`
+Use `--zed` flag: `txt2tex input.txt --zed`
 
 ---
 
@@ -289,8 +285,8 @@ Use `--zed` flag: `hatch run convert input.txt --zed`
 
 1. Install **LaTeX Workshop** extension in VSCode/Cursor
 2. Edit your `.txt` files
-3. Run `hatch run convert myfile.txt` to generate `.tex`
-4. LaTeX Workshop auto-compiles and shows PDF preview
+3. Run `txt2tex myfile.txt` to generate PDF
+4. Or use `txt2tex myfile.txt --tex-only` for LaTeX Workshop live preview
 
 The project includes pre-configured settings:
 - `.vscode/settings.json` - LaTeX Workshop configuration
@@ -304,7 +300,7 @@ The project includes pre-configured settings:
 
 ### "File `zed-cm.sty' not found"
 
-Run `hatch run convert` at least once - it copies dependencies locally. If using LaTeX Workshop, reload the window after first build.
+Run `txt2tex` at least once - it copies dependencies locally. If using LaTeX Workshop, reload the window after first build.
 
 ### Parse Errors
 
