@@ -57,6 +57,37 @@ If fuzz is not installed, txt2tex will show a note but continue normally.
 
 ### Verify Installation
 
+Check that all dependencies are available:
+
+```bash
+txt2tex --check-env
+```
+
+Example output:
+
+```
+txt2tex environment check
+========================================
+✓ pdflatex: /usr/local/texlive/2025/bin/universal-darwin/pdflatex
+
+LaTeX packages:
+  ✓ adjustbox
+  ✓ natbib
+  ✓ geometry
+  ✓ amsfonts
+  ✓ hyperref
+
+Optional tools:
+  ✓ latexmk: /usr/local/texlive/2025/bin/universal-darwin/latexmk
+  ✓ bibtex: /usr/local/texlive/2025/bin/universal-darwin/bibtex
+  ○ fuzz: not found (for Z notation type checking)
+
+========================================
+Environment OK - ready for PDF generation
+```
+
+Or check available options:
+
 ```bash
 txt2tex --help
 ```

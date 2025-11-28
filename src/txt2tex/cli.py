@@ -6,6 +6,7 @@ import argparse
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 from txt2tex.errors import ErrorFormatter
@@ -260,6 +261,86 @@ def _show_latex_error(tex_path: Path) -> None:
         print("LaTeX compilation failed (check .log file)", file=sys.stderr)
 
 
+def _check_latex_package(pdflatex: str, package: str) -> bool:
+    """Check if a LaTeX package is available."""
+    test_doc = (
+        f"\\documentclass{{article}}\n"
+        f"\\usepackage{{{package}}}\n"
+        f"\\begin{{document}}\ntest\n\\end{{document}}\n"
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tex_file = Path(tmpdir) / "test.tex"
+        tex_file.write_text(test_doc)
+
+        result = subprocess.run(  # noqa: S603
+            [pdflatex, "-interaction=batchmode", "-halt-on-error", "test.tex"],
+            cwd=tmpdir,
+            capture_output=True,
+            check=False,
+        )
+        return result.returncode == 0
+
+
+def check_environment() -> int:
+    """Check for required and optional dependencies."""
+    print("txt2tex environment check")
+    print("=" * 40)
+
+    all_ok = True
+
+    # Check pdflatex (required for PDF)
+    pdflatex = shutil.which("pdflatex")
+    if pdflatex:
+        print(f"✓ pdflatex: {pdflatex}")
+    else:
+        print("✗ pdflatex: NOT FOUND (required for PDF generation)")
+        all_ok = False
+
+    # Check required LaTeX packages (only if pdflatex found)
+    if pdflatex:
+        required_packages = ["adjustbox", "natbib", "geometry", "amsfonts", "hyperref"]
+        print("\nLaTeX packages:")
+        for pkg in required_packages:
+            if _check_latex_package(pdflatex, pkg):
+                print(f"  ✓ {pkg}")
+            else:
+                print(f"  ✗ {pkg}: NOT FOUND")
+                all_ok = False
+
+    # Check latexmk (optional, but recommended)
+    print("\nOptional tools:")
+    latexmk = shutil.which("latexmk")
+    if latexmk:
+        print(f"  ✓ latexmk: {latexmk}")
+    else:
+        print("  ○ latexmk: not found (recommended for bibliography)")
+
+    # Check bibtex (optional)
+    bibtex = shutil.which("bibtex")
+    if bibtex:
+        print(f"  ✓ bibtex: {bibtex}")
+    else:
+        print("  ○ bibtex: not found (for bibliography)")
+
+    # Check fuzz (optional)
+    fuzz = shutil.which("fuzz")
+    if fuzz:
+        print(f"  ✓ fuzz: {fuzz}")
+    else:
+        print("  ○ fuzz: not found (for Z notation type checking)")
+
+    print("\n" + "=" * 40)
+    if all_ok:
+        print("Environment OK - ready for PDF generation")
+        return 0
+
+    print("Missing required dependencies - use --tex-only or install LaTeX")
+    print("On Ubuntu/Debian: sudo apt install texlive-latex-extra")
+    print("On macOS: Install MacTeX from https://www.tug.org/mactex/")
+    return 1
+
+
 def main() -> int:
     """Main entry point for txt2tex CLI."""
     parser = argparse.ArgumentParser(
@@ -269,6 +350,7 @@ def main() -> int:
     parser.add_argument(
         "input",
         type=Path,
+        nargs="?",
         help="Input text file with whiteboard notation",
     )
     parser.add_argument(
@@ -309,8 +391,21 @@ def main() -> int:
         action="store_true",
         help="Keep auxiliary files (.aux, .log, etc.) after PDF compilation",
     )
+    parser.add_argument(
+        "--check-env",
+        action="store_true",
+        help="Check for required dependencies (LaTeX, fuzz) and exit",
+    )
 
     args = parser.parse_args()
+
+    # Handle --check-env
+    if args.check_env:
+        return check_environment()
+
+    # Require input file for normal operation
+    if args.input is None:
+        parser.error("the following arguments are required: input")
 
     # Check for pdflatex early unless --tex-only
     if not args.tex_only and shutil.which("pdflatex") is None:
