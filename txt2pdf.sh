@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 #
-# txt2pdf.sh - Convert whiteboard notation to PDF
+# txt2pdf.sh - Convert whiteboard notation to PDF with advanced features
+#
+# This script wraps the txt2tex CLI and adds:
+# - latexmk for robust compilation (handles bibliographies, multiple passes)
+# - tex-fmt for LaTeX formatting (if available)
+# - fuzz type checking (if --typecheck specified)
+#
+# For simple conversions, use the CLI directly: txt2tex input.txt
 #
 # Usage: ./txt2pdf.sh input.txt [--zed] [--typecheck]
 #
 
-set -e  # Exit on error (disabled for pdflatex step)
+set -e
 
 # Check arguments
 if [ $# -lt 1 ]; then
@@ -14,6 +21,8 @@ if [ $# -lt 1 ]; then
     echo "Options:" >&2
     echo "  --zed         Use zed-* packages instead of fuzz (default: fuzz)" >&2
     echo "  --typecheck   Run fuzz type checker before compilation" >&2
+    echo "" >&2
+    echo "For simple conversions, use: txt2tex input.txt" >&2
     exit 1
 fi
 
@@ -23,11 +32,10 @@ TYPECHECK=""
 
 # Parse flags
 for arg in "$@"; do
-    if [ "$arg" = "--zed" ]; then
-        ZED_FLAG="--zed"
-    elif [ "$arg" = "--typecheck" ]; then
-        TYPECHECK="1"
-    fi
+    case "$arg" in
+        --zed) ZED_FLAG="--zed" ;;
+        --typecheck) TYPECHECK="1" ;;
+    esac
 done
 
 # Validate input file exists
@@ -36,134 +44,50 @@ if [ ! -f "$INPUT" ]; then
     exit 1
 fi
 
-# Get absolute path to script directory
+# Get absolute paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# Convert input to absolute path
 INPUT="$(cd "$(dirname "$INPUT")" && pwd)/$(basename "$INPUT")"
-
-# Derive output paths (same directory as input)
 INPUT_DIR="$(dirname "$INPUT")"
 INPUT_BASE="$(basename "$INPUT" .txt)"
 TEX_FILE="${INPUT_DIR}/${INPUT_BASE}.tex"
 PDF_FILE="${INPUT_DIR}/${INPUT_BASE}.pdf"
 
 echo "Converting: $INPUT"
-echo "Output: $PDF_FILE"
-echo ""
 
-# Calculate total steps for progress display
-TOTAL_STEPS=3  # Generate, Copy deps, Compile
+# Step 1: Generate LaTeX using CLI
+echo "Generating LaTeX..."
+(cd "$SCRIPT_DIR" && PYTHONPATH="${SCRIPT_DIR}/src" python -m txt2tex.cli "$INPUT" -o "$TEX_FILE" --tex-only $ZED_FLAG)
+
+# Step 2: Format with tex-fmt (if available)
 if command -v tex-fmt > /dev/null 2>&1; then
-    TOTAL_STEPS=$((TOTAL_STEPS + 1))
+    echo "Formatting LaTeX..."
+    cd "$INPUT_DIR" && tex-fmt "${INPUT_BASE}.tex" 2>&1 || true
 fi
+
+# Step 3: Type check with fuzz (if requested)
 if [ -n "$TYPECHECK" ]; then
-    TOTAL_STEPS=$((TOTAL_STEPS + 1))
-fi
-
-# Step 1: Generate LaTeX
-CURRENT_STEP=1
-echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Generating LaTeX..."
-(cd "$SCRIPT_DIR" && PYTHONPATH="${SCRIPT_DIR}/src" python -m txt2tex.cli "$INPUT" -o "$TEX_FILE" $ZED_FLAG)
-
-if [ ! -f "$TEX_FILE" ]; then
-    echo "Error: LaTeX generation failed" >&2
-    exit 1
-fi
-
-echo "  → Generated: $TEX_FILE"
-
-# Step 2: Format LaTeX with tex-fmt (if available)
-if command -v tex-fmt > /dev/null 2>&1; then
-    CURRENT_STEP=$((CURRENT_STEP + 1))
-    echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Formatting LaTeX..."
-    cd "$INPUT_DIR" && tex-fmt "${INPUT_BASE}.tex" 2>&1 || echo "  ⚠ Warning: tex-fmt formatting had issues (continuing anyway)"
-    echo "  → Formatted: $TEX_FILE"
-fi
-
-# Step 3: Type check with fuzz (if --typecheck flag is set)
-if [ -n "$TYPECHECK" ]; then
-    CURRENT_STEP=$((CURRENT_STEP + 1))
-    echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Type checking with fuzz..."
-
-    # Check if fuzz command exists
+    echo "Type checking with fuzz..."
     if ! command -v fuzz > /dev/null 2>&1; then
-        echo "Error: fuzz command not found in PATH" >&2
-        echo "The fuzz type checker is required when using --typecheck option" >&2
+        echo "Error: fuzz command not found" >&2
         exit 1
     fi
-
-    # Run fuzz type checker
-    # Use full type check (not just -s syntax check)
-    cd "$INPUT_DIR" && fuzz "${INPUT_BASE}.tex" > "${INPUT_BASE}.fuzz.log" 2>&1
-    FUZZ_EXIT=$?
-
-    if [ $FUZZ_EXIT -ne 0 ]; then
-        echo "Error: Fuzz type checking failed (exit code: $FUZZ_EXIT)" >&2
-        echo "Check the fuzz log: ${INPUT_BASE}.fuzz.log" >&2
-        echo "" >&2
-        echo "Fuzz output:" >&2
-        cat "${INPUT_BASE}.fuzz.log" >&2
-        exit 1
-    fi
-
-    echo "  → Type check passed"
+    cd "$INPUT_DIR" && fuzz "${INPUT_BASE}.tex" || exit 1
 fi
 
-# Step 4: Copy LaTeX dependencies locally
-CURRENT_STEP=$((CURRENT_STEP + 1))
-echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Preparing LaTeX dependencies..."
-
-# Copy LaTeX packages and METAFONT sources to build directory
-# This makes the LaTeX self-contained and portable
+# Step 4: Copy LaTeX dependencies
 cp "${SCRIPT_DIR}/src/txt2tex/latex"/*.sty "$INPUT_DIR/" 2>/dev/null || true
 cp "${SCRIPT_DIR}/src/txt2tex/latex"/*.mf "$INPUT_DIR/" 2>/dev/null || true
 
-echo "  → LaTeX dependencies copied locally"
-
-# Step 5: Compile to PDF
-CURRENT_STEP=$((CURRENT_STEP + 1))
-echo "Step ${CURRENT_STEP}/${TOTAL_STEPS}: Compiling PDF..."
-
-# Check if bibliography file is specified (look for \bibliography{ command)
-# If found, enable BibTeX; otherwise disable it (for inline bibliographies)
+# Step 5: Compile with latexmk (handles bibliographies automatically)
+echo "Compiling PDF..."
 BIBTEX_FLAG="-bibtex-"
 if grep -q "\\\\bibliography{" "$TEX_FILE" 2>/dev/null; then
     BIBTEX_FLAG=""
-    echo "  → Bibliography file detected, enabling BibTeX"
 fi
 
-# Use latexmk to handle multiple passes automatically
-# It runs pdflatex as many times as needed until citations/references resolve
-# Use -gg to force at least two extra passes (needed for natbib citations)
-# With BibTeX: pdflatex -> bibtex -> pdflatex -> pdflatex (4 runs minimum)
-# For complex documents with many citations, run latexmk twice to ensure convergence
-# Conditionally enable/disable bibtex based on whether bibliography file is present
-# No TEXINPUTS/MFINPUTS needed - files are local
-set +e  # Temporarily disable exit on error
-cd "$INPUT_DIR" && latexmk -pdf -gg $BIBTEX_FLAG -interaction=nonstopmode -file-line-error "${INPUT_BASE}.tex" > "${INPUT_BASE}.latexmk.log" 2>&1
-LATEXMK_EXIT=$?
+cd "$INPUT_DIR" && latexmk -pdf -gg $BIBTEX_FLAG -interaction=nonstopmode -quiet "${INPUT_BASE}.tex"
 
-# If bibliography detected, run latexmk one more time to resolve all citations
-# This ensures 4+ pdflatex passes for complex documents
-if [ "$BIBTEX_FLAG" = "" ]; then
-    cd "$INPUT_DIR" && latexmk -pdf -g $BIBTEX_FLAG -interaction=nonstopmode -file-line-error "${INPUT_BASE}.tex" >> "${INPUT_BASE}.latexmk.log" 2>&1
-    LATEXMK_EXIT=$?
-fi
-
-if [ ! -f "${INPUT_BASE}.pdf" ]; then
-    echo "Error: PDF compilation failed (exit code: $LATEXMK_EXIT)" >&2
-    echo "Check the LaTeX log: ${INPUT_BASE}.latexmk.log" >&2
-    set -e
-    exit 1
-fi
-
-set -e  # Re-enable exit on error
-
-echo "  → Generated: $PDF_FILE"
-
-# Clean up auxiliary files (latexmk creates several)
+# Clean up
 cd "$INPUT_DIR" && latexmk -c "${INPUT_BASE}.tex" > /dev/null 2>&1 || true
 
-echo ""
-echo "✓ Success: $PDF_FILE"
+echo "Generated: $PDF_FILE"
