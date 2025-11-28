@@ -32,7 +32,6 @@ Essential reading for understanding the project:
 - **[docs/DESIGN.md](docs/DESIGN.md)** - Architecture, design decisions, operator precedence, AST structure
 - **[docs/guides/USER_GUIDE.md](docs/guides/USER_GUIDE.md)** - User-facing syntax guide, whiteboard notation reference
 - **[docs/guides/PROOF_SYNTAX.md](docs/guides/PROOF_SYNTAX.md)** - Proof tree syntax and formatting rules
-- **[docs/development/QA_PLAN.md](docs/development/QA_PLAN.md)** - Quality assurance checklist, testing procedures
 - **[docs/guides/FUZZ_VS_STD_LATEX.md](docs/guides/FUZZ_VS_STD_LATEX.md)** - Fuzz vs standard LaTeX differences (critical for understanding fuzz quirks)
 - **[docs/guides/FUZZ_FEATURE_GAPS.md](docs/guides/FUZZ_FEATURE_GAPS.md)** - Missing Z notation features, implementation roadmap
 
@@ -132,7 +131,7 @@ hatch run check-cov      # lint + type + test-cov
 ### Critical Dependencies
 
 1. **fuzz**: Z notation typesetting system
-   - Location: `/Users/jfreeman/Coding/fuzz/txt2tex/tex/`
+   - Location: `../tex/` (relative to sem/)
    - Main file: `fuzz.sty`
    - Fonts: `oxsz*.mf`, `zarrow.mf`, `zletter.mf`, `zsymbol.mf`
 
@@ -346,7 +345,7 @@ When you encounter a bug:
 
 User mentioned: "I can exit our session and resume our session from the sem directory if that will make things easier."
 
-If starting fresh from `/Users/jfreeman/Coding/fuzz/txt2tex/sem/`:
+If starting fresh from the `sem/` directory:
 1. Remember fuzz is in `./latex/`
 2. Test files are in parent directory `./tests/`
 3. Use workflow commands at the top of this document
