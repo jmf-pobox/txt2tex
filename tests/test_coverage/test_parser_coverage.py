@@ -150,7 +150,7 @@ def test_relation_operations() -> None:
 
 def test_sequence_operations() -> None:
     """Test sequence operations."""
-    text = "head s = 1 land tail s = ⟨2, 3⟩"
+    text = "s ⌢ t = ⟨1, 2, 3⟩"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)

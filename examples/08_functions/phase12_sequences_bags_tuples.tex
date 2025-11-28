@@ -24,6 +24,7 @@
 \noindent
 $\langle \rangle$
 
+
 \medskip
 
 \subsection*{(b)}
@@ -34,6 +35,7 @@ $\langle \rangle$
 
 \noindent
 $\langle a \rangle$
+
 
 \medskip
 
@@ -46,6 +48,7 @@ $\langle a \rangle$
 \noindent
 $\langle 1, 2, 3, 4, 5 \rangle$
 
+
 \medskip
 
 \subsection*{(d)}
@@ -57,41 +60,47 @@ $\langle 1, 2, 3, 4, 5 \rangle$
 \noindent
 $\langle x, y, z \rangle$
 
+
 \section*{Example 2 : Sequence Operators}
 \addcontentsline{toc}{section}{Example 2 : Sequence Operators}
 
 \subsection*{(a)}
 
 \noindent
-$\head \langle 1, 2, 3 \rangle$
+$head(\langle 1, 2, 3 \rangle)$
+
 
 \medskip
 
 \subsection*{(b)}
 
 \noindent
-$\tail \langle 1, 2, 3 \rangle$
+$tail(\langle 1, 2, 3 \rangle)$
+
 
 \medskip
 
 \subsection*{(c)}
 
 \noindent
-$\last \langle 1, 2, 3 \rangle$
+$last(\langle 1, 2, 3 \rangle)$
+
 
 \medskip
 
 \subsection*{(d)}
 
 \noindent
-$\front \langle 1, 2, 3 \rangle$
+$front(\langle 1, 2, 3 \rangle)$
+
 
 \medskip
 
 \subsection*{(e)}
 
 \noindent
-$\rev \langle 1, 2, 3 \rangle$
+$rev(\langle 1, 2, 3 \rangle)$
+
 
 \section*{Example 3 : Sequence Concatenation}
 \addcontentsline{toc}{section}{Example 3 : Sequence Concatenation}
@@ -101,6 +110,7 @@ $\rev \langle 1, 2, 3 \rangle$
 \noindent
 $\langle 1, 2 \rangle \cat \langle 3, 4 \rangle$
 
+
 \medskip
 
 \subsection*{(b)}
@@ -108,12 +118,14 @@ $\langle 1, 2 \rangle \cat \langle 3, 4 \rangle$
 \noindent
 $s \cat t \cat u$
 
+
 \medskip
 
 \subsection*{(c)}
 
 \noindent
 $\langle a \rangle \cat \langle b, c \rangle \cat \langle d \rangle$
+
 
 \section*{Example 4 : Tuple Projection}
 \addcontentsline{toc}{section}{Example 4 : Tuple Projection}
@@ -123,12 +135,14 @@ $\langle a \rangle \cat \langle b, c \rangle \cat \langle d \rangle$
 \noindent
 $x.1$
 
+
 \medskip
 
 \subsection*{(b)}
 
 \noindent
 $x.2$
+
 
 \medskip
 
@@ -137,12 +151,14 @@ $x.2$
 \noindent
 $(a, b, c).1$
 
+
 \medskip
 
 \subsection*{(d)}
 
 \noindent
 $(a, b, c).2$
+
 
 \section*{Example 5 : Bag Literals}
 \addcontentsline{toc}{section}{Example 5 : Bag Literals}
@@ -152,6 +168,7 @@ $(a, b, c).2$
 \noindent
 $\lbag x \rbag$
 
+
 \medskip
 
 \subsection*{(b)}
@@ -159,12 +176,14 @@ $\lbag x \rbag$
 \noindent
 $\lbag 1, 2, 3 \rbag$
 
+
 \medskip
 
 \subsection*{(c)}
 
 \noindent
 $\lbag a, b, c \rbag$
+
 
 \medskip
 
@@ -177,6 +196,7 @@ $\lbag a, b, c \rbag$
 \noindent
 $\lbag 1, 2, 2, 3, 3, 3 \rbag$
 
+
 \section*{Example 6 : Sequences elem Expressions}
 \addcontentsline{toc}{section}{Example 6 : Sequences elem Expressions}
 
@@ -185,19 +205,22 @@ $\lbag 1, 2, 2, 3, 3, 3 \rbag$
 \noindent
 $x \in \langle 1, 2, 3 \rangle$
 
+
 \medskip
 
 \subsection*{(b)}
 
 \noindent
-$\head s = a$
+$head(s) = a$
+
 
 \medskip
 
 \subsection*{(c)}
 
 \noindent
-$\tail \langle 1, 2, 3 \rangle = \langle 2, 3 \rangle$
+$tail(\langle 1, 2, 3 \rangle) = \langle 2, 3 \rangle$
+
 
 \section*{Example 7 : Complex Expressions}
 \addcontentsline{toc}{section}{Example 7 : Complex Expressions}
@@ -207,12 +230,14 @@ $\tail \langle 1, 2, 3 \rangle = \langle 2, 3 \rangle$
 \noindent
 $\forall i : \nat @ i \in \langle 1, 2, 3 \rangle \implies i > 0$
 
+
 \medskip
 
 \subsection*{(b)}
 
 \noindent
-$\exists s : \seq \nat @ \head s = 1$
+$\exists s : \seq \nat @ head(s) = 1$
+
 
 \medskip
 
@@ -220,6 +245,7 @@ $\exists s : \seq \nat @ \head s = 1$
 
 \noindent
 $\{~ x : \nat | x > 0 @ \langle x, x \bsup 2 \esup \rangle ~\}$
+
 
 \section*{Example 8 : Real Examples}
 \addcontentsline{toc}{section}{Example 8 : Real Examples}
@@ -233,6 +259,7 @@ $\{~ x : \nat | x > 0 @ \langle x, x \bsup 2 \esup \rangle ~\}$
 \noindent
 $\langle a \rangle$
 
+
 \medskip
 
 \subsection*{(b)}
@@ -244,6 +271,7 @@ $\langle a \rangle$
 \noindent
 $trains(x).2$
 
+
 \medskip
 
 \subsection*{(c)}
@@ -254,5 +282,6 @@ $trains(x).2$
 
 \noindent
 $\lbag d \rbag$
+
 
 \end{document}

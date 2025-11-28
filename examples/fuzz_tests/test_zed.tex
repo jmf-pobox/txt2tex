@@ -16,37 +16,37 @@
 \addcontentsline{toc}{section}{Test 1 : Simple Abbreviation}
 
 \begin{zed}
-  SimpleConst == 42
+SimpleConst == 42
 \end{zed}
 
 \section*{Test 2 : Forall elem Axiom}
 \addcontentsline{toc}{section}{Test 2 : Forall elem Axiom}
 
 \begin{axdef}
-  constraint : \nat
-  \where
-  constraint = 0 \\
-  \forall x : \nat @ x \geq 0
+constraint : \nat
+\where
+constraint = 0 \\
+\forall x : \nat @ x \geq 0
 \end{axdef}
 
 \section*{Test 3 : Exists elem Axiom}
 \addcontentsline{toc}{section}{Test 3 : Exists elem Axiom}
 
 \begin{axdef}
-  hasRoot : \nat
-  \where
-  hasRoot = 4 \\
-  \exists n : \nat @ n * n = hasRoot
+hasRoot : \nat
+\where
+hasRoot = 4 \\
+\exists n : \nat @ n * n = hasRoot
 \end{axdef}
 
 \section*{Test 4 : Nested Quantifiers elem Axiom}
 \addcontentsline{toc}{section}{Test 4 : Nested Quantifiers elem Axiom}
 
 \begin{axdef}
-  sumTen : \nat
-  \where
-  sumTen = 10 \\
-  \forall x : \nat @ \exists y : \nat @ x + y = sumTen
+sumTen : \nat
+\where
+sumTen = 10 \\
+\forall x : \nat @ \exists y : \nat @ x + y = sumTen
 \end{axdef}
 
 \end{document}

@@ -20,23 +20,17 @@
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \land (q \land
-    \lnot q)) \implies p}{
-      \infer[\mbox{false
-      elim}]{p}{\infer[\mbox{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot
-          q}{\infer[\land\textrm{-elim-1}]{q}{\infer[\land\textrm{-elim-2}]{q
-              \land \lnot q}{\ulcorner \lnot p \land (q \land \lnot q)
-      \urcorner^{[1]}}}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \land (q \land \lnot q)) \implies p}{
+  \infer[\mbox{false elim}]{p}{\infer[\mbox{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot q}{\infer[\land\textrm{-elim-1}]{q}{\infer[\land\textrm{-elim-2}]{q \land \lnot q}{\ulcorner \lnot p \land (q \land \lnot q) \urcorner^{[1]}}}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
-\noindent Once we derive false, we can conclude anything—here we
-conclude p by discharging assumption 1.
+\noindent Once we derive false, we can conclude anything—here we conclude p by discharging assumption 1.
 
 \bigskip
 
@@ -48,16 +42,13 @@ conclude p by discharging assumption 1.
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land \lnot p) \implies q}{
-      \infer[\mbox{false
-      elim}]{q}{\infer[\mbox{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot
-          p}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p \land \lnot p
-      \urcorner^{[1]}}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(p \land \lnot p) \implies q}{
+  \infer[\mbox{false elim}]{q}{\infer[\mbox{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot p}{\infer[\land\textrm{-elim-1}]{p}{\ulcorner p \land \lnot p \urcorner^{[1]}}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -73,19 +64,17 @@ conclude p by discharging assumption 1.
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{p \land \lnot p \implies false}{
-      \infer[\mbox{contradiction}]{false}{\ulcorner p \land \lnot p
-      \urcorner^{[1]}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \land \lnot p \implies false}{
+  \infer[\mbox{contradiction}]{false}{\ulcorner p \land \lnot p \urcorner^{[1]}}
+}
+$%
+}
 \end{center}
 \bigskip
 
-\noindent This proves the law of non-contradiction - no proposition
-can be both true and false.
+\noindent This proves the law of non-contradiction - no proposition can be both true and false.
 
 \bigskip
 
@@ -97,21 +86,17 @@ can be both true and false.
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \implies false)
-    \implies \lnot \lnot p}{
-      \infer[\lnot\textrm{-intro}^{[2]}]{\lnot \lnot
-      p}{\infer[\mbox{assumption}]{\lnot p}{\infer[\Rightarrow
-      \mbox{elim}]{false}{}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \implies false) \implies \lnot \lnot p}{
+  \infer[\lnot\textrm{-intro}^{[2]}]{\lnot \lnot p}{\infer[\mbox{assumption}]{\lnot p}{\infer[\Rightarrow \mbox{elim}]{false}{}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
-\noindent This is the pattern for indirect proof: if assuming $\lnot
-p$ leads to false, then $\lnot$ not p holds.
+\noindent This is the pattern for indirect proof: if assuming $\lnot p$ leads to false, then $\lnot$ not p holds.
 
 \bigskip
 
@@ -123,16 +108,13 @@ p$ leads to false, then $\lnot$ not p holds.
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \implies q) \land
-    \lnot q) \implies \lnot p}{
-      \infer[\lnot\textrm{-intro}^{[2]}]{\lnot
-      p}{\infer[\mbox{assumption}]{p}{\infer[\Rightarrow
-      \mbox{elim}]{q}{} & \infer[\mbox{contradiction}]{false}{}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \implies q) \land \lnot q) \implies \lnot p}{
+  \infer[\lnot\textrm{-intro}^{[2]}]{\lnot p}{\infer[\mbox{assumption}]{p}{\infer[\Rightarrow \mbox{elim}]{q}{} & \infer[\mbox{contradiction}]{false}{}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -148,16 +130,13 @@ p$ leads to false, then $\lnot$ not p holds.
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{\lnot p \implies (p \implies q)}{
-      \infer[\Rightarrow\textrm{-intro}^{[2]}]{(p \implies
-      q)}{\infer[\mbox{false
-        elim}]{q}{\infer[\mbox{contradiction}]{false}{\ulcorner p
-      \urcorner^{[2]}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{\lnot p \implies (p \implies q)}{
+  \infer[\Rightarrow\textrm{-intro}^{[2]}]{(p \implies q)}{\infer[\mbox{false elim}]{q}{\infer[\mbox{contradiction}]{false}{\ulcorner p \urcorner^{[2]}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -173,22 +152,17 @@ p$ leads to false, then $\lnot$ not p holds.
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{\lnot \lnot p \implies
-    \lnot \lnot \lnot p}{
-      \infer[\lnot\textrm{-intro}^{[2]}]{\lnot \lnot \lnot
-      p}{\infer[\mbox{false
-        elim}]{p}{\infer[\mbox{contradiction}]{false}{\ulcorner \lnot p
-      \urcorner^{[2]}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{\lnot \lnot p \implies \lnot \lnot \lnot p}{
+  \infer[\lnot\textrm{-intro}^{[2]}]{\lnot \lnot \lnot p}{\infer[\mbox{false elim}]{p}{\infer[\mbox{contradiction}]{false}{\ulcorner \lnot p \urcorner^{[2]}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
-\noindent In classical logic, not $\lnot p$ implies p. This requires
-excluded middle or equivalent axiom.
+\noindent In classical logic, not $\lnot p$ implies p. This requires excluded middle or equivalent axiom.
 
 \bigskip
 
@@ -200,49 +174,35 @@ excluded middle or equivalent axiom.
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \implies (q
-    \land \lnot q)) \implies \lnot \lnot p}{
-      \infer[\lnot\textrm{-intro}^{[2]}]{\lnot \lnot
-      p}{\infer[\mbox{false
-        elim}]{p}{\infer[\mbox{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot
-            q}{\infer[\land\textrm{-elim-1}]{q}{\infer[\Rightarrow
-      \mbox{elim}]{q \land \lnot q}{\ulcorner \lnot p \urcorner^{[2]}}}}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(\lnot p \implies (q \land \lnot q)) \implies \lnot \lnot p}{
+  \infer[\lnot\textrm{-intro}^{[2]}]{\lnot \lnot p}{\infer[\mbox{false elim}]{p}{\infer[\mbox{contradiction}]{false}{\infer[\land\textrm{-elim-2}]{\lnot q}{\infer[\land\textrm{-elim-1}]{q}{\infer[\Rightarrow \mbox{elim}]{q \land \lnot q}{\ulcorner \lnot p \urcorner^{[2]}}}}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
-\noindent Reductio ad absurdum: if assuming not p leads to absurdity,
-then p holds.
+\noindent Reductio ad absurdum: if assuming not p leads to absurdity, then p holds.
 
 \bigskip
 
 \section*{Example 9 : Contradiction with Universal Quantifier}
-\addcontentsline{toc}{section}{Example 9 : Contradiction with
-Universal Quantifier}
+\addcontentsline{toc}{section}{Example 9 : Contradiction with Universal Quantifier}
 
-\noindent Prove: ($\forall x @ \power x$) $\land$ $\exists x @ \lnot
-\power x$ is contradictory.
+\noindent Prove: ($\forall x @ \power x$) $\land$ $\exists x @ \lnot \power x$ is contradictory.
 
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{((\forall x @ \power x)
-    \land (\exists x @ \lnot \power x)) \implies false}{
-      \infer[\mbox{contradiction}]{false}{\infer[\forall
-        \mbox{elim}]{\power a}{\infer[\exists \mbox{elim}, \mbox{fresh
-          a}]{\lnot \power a}{\infer[\land\textrm{-elim-2}]{\exists x @
-            \lnot \power x}{\infer[\land\textrm{-elim-1}]{\forall x @
-              \power x}{\ulcorner (\forall x @ \power x) \land (\exists x @
-      \lnot \power x) \urcorner^{[1]}}}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{((\forall x @ \power x) \land (\exists x @ \lnot \power x)) \implies false}{
+  \infer[\mbox{contradiction}]{false}{\infer[\forall \mbox{elim}]{\power a}{\infer[\exists \mbox{elim}, \mbox{fresh a}]{\lnot \power a}{\infer[\land\textrm{-elim-2}]{\exists x @ \lnot \power x}{\infer[\land\textrm{-elim-1}]{\forall x @ \power x}{\ulcorner (\forall x @ \power x) \land (\exists x @ \lnot \power x) \urcorner^{[1]}}}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -258,17 +218,13 @@ Universal Quantifier}
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{(injective(f) \land f(x)
-    = f(y)) \implies x = y}{
-      \infer[\lnot\textrm{-intro}^{[2]}]{x =
-      y}{\infer[\mbox{contradiction with
-        f}(x)=f(y)]{false}{\infer[\mbox{injective property}]{f(x) \neq
-      f(y)}{\ulcorner x \neq y \urcorner^{[2]}}}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(injective(f) \land f(x) = f(y)) \implies x = y}{
+  \infer[\lnot\textrm{-intro}^{[2]}]{x = y}{\infer[\mbox{contradiction with f}(x)=f(y)]{false}{\infer[\mbox{injective property}]{f(x) \neq f(y)}{\ulcorner x \neq y \urcorner^{[2]}}}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -277,24 +233,20 @@ Universal Quantifier}
 \bigskip
 
 \section*{Example 11 : Case Analysis Leading to Contradiction}
-\addcontentsline{toc}{section}{Example 11 : Case Analysis Leading to
-Contradiction}
+\addcontentsline{toc}{section}{Example 11 : Case Analysis Leading to Contradiction}
 
 \noindent Prove: p $\lor$ q, $\lnot p$, $\lnot q \implies false$
 
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \land \lnot
-    p \land \lnot q) \implies false}{
-      \infer[\lor \mbox{elim \mbox{from} p} \lor
-      q]{false}{\infer[\mbox{contradiction with} \lnot p]{false}{} &
-      \infer[\mbox{contradiction with} \lnot q]{false}{}}
-    }
-    $%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \land \lnot p \land \lnot q) \implies false}{
+  \infer[\lor \mbox{elim \mbox{from} p} \lor q]{false}{\infer[\mbox{contradiction with} \lnot p]{false}{} & \infer[\mbox{contradiction with} \lnot q]{false}{}}
+}
+$%
+}
 \end{center}
 \bigskip
 
@@ -303,15 +255,13 @@ Contradiction}
 \bigskip
 
 \section*{Example 12 : Best Practices for Contradiction Proofs}
-\addcontentsline{toc}{section}{Example 12 : Best Practices for
-Contradiction Proofs}
+\addcontentsline{toc}{section}{Example 12 : Best Practices for Contradiction Proofs}
 
 \noindent When using proof by contradiction:
 
 \bigskip
 
-\noindent 1. Clearly mark the assumption you're contradicting with
-[assumption N]
+\noindent 1. Clearly mark the assumption you're contradicting with [assumption N]
 
 \bigskip
 
@@ -331,8 +281,7 @@ Contradiction Proofs}
 
 \bigskip
 
-\noindent 6. $Remember : contradiction$ is a classical technique (not
-constructive)
+\noindent 6. $Remember : contradiction$ is a classical technique (not constructive)
 
 \bigskip
 

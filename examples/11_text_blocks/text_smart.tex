@@ -15,104 +15,83 @@
 \section*{Example 1 : Basic TEXT Blocks}
 \addcontentsline{toc}{section}{Example 1 : Basic TEXT Blocks}
 
-\noindent This is a simple prose paragraph. The TEXT directive allows
-you to write explanatory text that will be typeset as regular
-paragraphs in the output document.
+\noindent This is a simple prose paragraph. The TEXT directive allows you to write explanatory text that will be typeset as regular paragraphs in the output document.
 
 \bigskip
 
-\noindent You can have multiple TEXT blocks in sequence. Each TEXT
-block becomes a separate paragraph with proper spacing.
+\noindent You can have multiple TEXT blocks in sequence. Each TEXT block becomes a separate paragraph with proper spacing.
 
 \bigskip
 
 \section*{Example 2 : Smart Quotes}
 \addcontentsline{toc}{section}{Example 2 : Smart Quotes}
 
-\noindent The TEXT directive automatically converts straight quotes
-to "smart quotes" for proper typography. This includes both "double
-quotes" and 'single quotes'.
+\noindent The TEXT directive automatically converts straight quotes to "smart quotes" for proper typography. This includes both "double quotes" and 'single quotes'.
 
 \bigskip
 
-\noindent For example: "The quick brown fox" becomes properly
-formatted with opening and closing quotes.
+\noindent For example: "The quick brown fox" becomes properly formatted with opening and closing quotes.
 
 \bigskip
 
 \section*{Example 3 : Inline Mathematical Notation}
 \addcontentsline{toc}{section}{Example 3 : Inline Mathematical Notation}
 
-\noindent You can include inline mathematical expressions in TEXT
-blocks. For example, the function f(n) = $n^2$ computes the square of n.
+\noindent You can include inline mathematical expressions in TEXT blocks. For example, the function f(n) = $n^2$ computes the square of n.
 
 \bigskip
 
-\noindent More complex expressions work too: The formula for the sum
-of squares is sum($i = 1$ to n) of $i^2$ = n(n+1)(2n+1)/6.
+\noindent More complex expressions work too: The formula for the sum of squares is sum($i = 1$ to n) of $i^2$ = n(n+1)(2n+1)/6.
 
 \bigskip
 
 \section*{Example 4 : Mixed Content}
 \addcontentsline{toc}{section}{Example 4 : Mixed Content}
 
-\noindent Z notation provides powerful tools for formal
-specification. The $\forall$ quantifier allows us to express
-universal properties.
+\noindent Z notation provides powerful tools for formal specification. The $\forall$ quantifier allows us to express universal properties.
 
 \bigskip
 
 \noindent
 $\forall x : \nat @ x \geq 0$
 
-\noindent The above predicate states that all natural numbers are
-non-negative, which is true by definition of N.
+
+\noindent The above predicate states that all natural numbers are non-negative, which is true by definition of N.
 
 \bigskip
 
 \section*{Example 5 : Explaining Z Notation}
 \addcontentsline{toc}{section}{Example 5 : Explaining Z Notation}
 
-\noindent When defining a function like $square : N$ $\fun$ N, we're
-declaring a total function from natural numbers to natural numbers.
+\noindent When defining a function like $square : N$ $\fun$ N, we're declaring a total function from natural numbers to natural numbers.
 
 \bigskip
 
 \begin{axdef}
-  square : \nat \fun \nat
-  \where
-  \forall n : \nat @ square(n) = n * n
+square : \nat \fun \nat
+\where
+\forall n : \nat @ square(n) = n * n
 \end{axdef}
 
-\noindent The axdef block gives the signature and the constraint that
-defines the function's behavior.
+\noindent The axdef block gives the signature and the constraint that defines the function's behavior.
 
 \bigskip
 
 \section*{Example 6 : Long Explanations}
 \addcontentsline{toc}{section}{Example 6 : Long Explanations}
 
-\noindent The TEXT directive is particularly useful for providing
-detailed explanations of formal specifications. It allows you to
-write at length about the design decisions, invariants, and
-assumptions that underlie your formal models.
+\noindent The TEXT directive is particularly useful for providing detailed explanations of formal specifications. It allows you to write at length about the design decisions, invariants, and assumptions that underlie your formal models.
 
 \bigskip
 
-\noindent By interspersing TEXT blocks with formal notation, you
-create documents that are both mathematically precise and
-human-readable. This is essential for effective formal methods practice.
+\noindent By interspersing TEXT blocks with formal notation, you create documents that are both mathematically precise and human-readable. This is essential for effective formal methods practice.
 
 \bigskip
 
 \section*{Example 7 : Technical Writing}
 \addcontentsline{toc}{section}{Example 7 : Technical Writing}
 
-\noindent In practice, specifications should include both formal
-definitions and prose explanations. The formal notation provides
-precision and enables automated checking with tools like fuzz. The
-prose provides context and motivation that help readers understand
-the purpose and design of the specification.
+\noindent In practice, specifications should include both formal definitions and prose explanations. The formal notation provides precision and enables automated checking with tools like fuzz. The prose provides context and motivation that help readers understand the purpose and design of the specification.
 
 \bigskip
 

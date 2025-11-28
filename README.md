@@ -80,7 +80,7 @@ LaTeX packages:
 Optional tools:
   ✓ latexmk: /usr/local/texlive/2025/bin/universal-darwin/latexmk
   ✓ bibtex: /usr/local/texlive/2025/bin/universal-darwin/bibtex
-  ○ fuzz: not found (for Z notation type checking)
+  ✓ fuzz: /usr/local/bin/fuzz
 
 ========================================
 Environment OK - ready for PDF generation

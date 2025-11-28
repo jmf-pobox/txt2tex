@@ -13,8 +13,7 @@
 \section*{Phase 11 . 8 : Relational Image}
 \addcontentsline{toc}{section}{Phase 11 . 8 : Relational Image}
 
-\noindent The relational image $(R \limg S \rimg)$ gives the image of
-set S under relation R.
+\noindent The relational image $(R \limg S \rimg)$ gives the image of set S under relation R.
 
 \bigskip
 
@@ -24,11 +23,13 @@ set S under relation R.
 \noindent
 $(R \limg S \rimg)$
 
+
 \section*{Example 2 : Relational image with set literal}
 \addcontentsline{toc}{section}{Example 2 : Relational image with set literal}
 
 \noindent
 $(R \limg \{1, 2, 3\} \rimg)$
+
 
 \section*{Example 3 : Relational image with singleton set}
 \addcontentsline{toc}{section}{Example 3 : Relational image with singleton set}
@@ -36,11 +37,13 @@ $(R \limg \{1, 2, 3\} \rimg)$
 \noindent
 $(parentOf \limg \{john\} \rimg)$
 
+
 \section*{Example 4 : Relational image with composition}
 \addcontentsline{toc}{section}{Example 4 : Relational image with composition}
 
 \noindent
 $((R \circ S) \limg A \rimg)$
+
 
 \section*{Example 5 : Relational image with inverse}
 \addcontentsline{toc}{section}{Example 5 : Relational image with inverse}
@@ -48,18 +51,19 @@ $((R \circ S) \limg A \rimg)$
 \noindent
 $(R \inv \limg S \rimg)$
 
-\section*{Example 6 : Set comprehension with relational image (
-Solution 35 pattern )}
-\addcontentsline{toc}{section}{Example 6 : Set comprehension with
-relational image ( Solution 35 pattern )}
+
+\section*{Example 6 : Set comprehension with relational image ( Solution 35 pattern )}
+\addcontentsline{toc}{section}{Example 6 : Set comprehension with relational image ( Solution 35 pattern )}
 
 \noindent
 $\{~ p : Person | p \in \dom parentOf @ (p, (parentOf \limg \{p\} \rimg)) ~\}$
+
 
 \section*{Example 7 : Chained relational images}
 \addcontentsline{toc}{section}{Example 7 : Chained relational images}
 
 \noindent
 $((R \limg S \rimg) \limg T \rimg)$
+
 
 \end{document}

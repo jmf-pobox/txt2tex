@@ -13,7 +13,7 @@
 \section*{Function Application Examples}
 
 \begin{zed}
-  [Item, Dog, PersonRes, XRes]
+[Item, Dog, PersonRes, XRes]
 \end{zed}
 
 \noindent This file demonstrates function application in Z notation definitions.
@@ -24,23 +24,22 @@
 \addcontentsline{toc}{section}{Example 1 : Basic function definitions}
 
 \begin{axdef}
-  squareRes : \nat \fun \nat \\
-  double : \nat \fun \nat
-  \where
-  \forall n : \nat @ squareRes(n) = n * n \\
-  \forall n : \nat @ double(n) = 2 * n
+squareRes : \nat \fun \nat \\
+double : \nat \fun \nat
+\where
+\forall n : \nat @ squareRes(n) = n * n \\
+\forall n : \nat @ double(n) = 2 * n
 \end{axdef}
 
 \section*{Example 2 : Functions with multiple arguments}
 \addcontentsline{toc}{section}{Example 2 : Functions with multiple arguments}
 
 \begin{axdef}
-  add : \nat \cross \nat \fun \nat \\
-  maximum : \nat \cross \nat \fun \nat
-  \where
-  \forall a, b : \nat @ add(a, b) = a + b \\
-  \forall a, b : \nat @ (maximum(a, b) = a \lor maximum(a, b) = b)
-  \land maximum(a, b) \geq a \land maximum(a, b) \geq b
+add : \nat \cross \nat \fun \nat \\
+maximum : \nat \cross \nat \fun \nat
+\where
+\forall a, b : \nat @ add(a, b) = a + b \\
+\forall a, b : \nat @ (maximum(a, b) = a \lor maximum(a, b) = b) \land maximum(a, b) \geq a \land maximum(a, b) \geq b
 \end{axdef}
 
 \section*{Example 3 : Generic functions}
@@ -51,33 +50,32 @@
 \end{gendef}
 
 \section*{Example 4 : Function application elem quantifiers}
-\addcontentsline{toc}{section}{Example 4 : Function application elem
-quantifiers}
+\addcontentsline{toc}{section}{Example 4 : Function application elem quantifiers}
 
 \begin{axdef}
-  posFunc : \nat \fun \nat
-  \where
-  \forall x : \nat @ posFunc(x) > 0 \implies posFunc(x) > 0
+posFunc : \nat \fun \nat
+\where
+\forall x : \nat @ posFunc(x) > 0 \implies posFunc(x) > 0
 \end{axdef}
 
 \section*{Example 5 : Schema with function type}
 \addcontentsline{toc}{section}{Example 5 : Schema with function type}
 
 \begin{schema}{Heights}
-  height : PersonRes \fun \nat
-  \where
-  \forall p : PersonRes @ height(p) > 0 \land height(p) < 300
+height : PersonRes \fun \nat
+\where
+\forall p : PersonRes @ height(p) > 0 \land height(p) < 300
 \end{schema}
 
 \section*{Example 6 : Nested function application}
 \addcontentsline{toc}{section}{Example 6 : Nested function application}
 
 \begin{axdef}
-  func1 : \nat \fun \nat \\
-  func2 : \nat \fun \nat \\
-  func3 : \nat \fun \nat
-  \where
-  \forall x : \nat @ func1(func2(func3(x))) \geq 0
+func1 : \nat \fun \nat \\
+func2 : \nat \fun \nat \\
+func3 : \nat \fun \nat
+\where
+\forall x : \nat @ func1(func2(func3(x))) \geq 0
 \end{axdef}
 
 \end{document}

@@ -15,13 +15,13 @@
 \section*{Example 1 : Basic If - Then - Else}
 \addcontentsline{toc}{section}{Example 1 : Basic If - Then - Else}
 
-\noindent The if-then-else expression evaluates to one of two values
-based on a condition:
+\noindent The if-then-else expression evaluates to one of two values based on a condition:
 
 \bigskip
 
 \noindent
 $\IF x > 0 \THEN 1 \ELSE -1$
+
 
 \noindent If x is positive, this evaluates to 1; otherwise, it evaluates to -1.
 
@@ -31,13 +31,12 @@ $\IF x > 0 \THEN 1 \ELSE -1$
 \addcontentsline{toc}{section}{Example 2 : Absolute Value Function}
 
 \begin{axdef}
-  abs : \num \fun \nat
-  \where
-  \forall x : \num @ abs(x) = \IF x \geq 0 \THEN x \ELSE -x
+abs : \num \fun \nat
+\where
+\forall x : \num @ abs(x) = \IF x \geq 0 \THEN x \ELSE -x
 \end{axdef}
 
-\noindent The absolute value function uses if-then-else to handle
-positive and negative cases.
+\noindent The absolute value function uses if-then-else to handle positive and negative cases.
 
 \bigskip
 
@@ -45,9 +44,9 @@ positive and negative cases.
 \addcontentsline{toc}{section}{Example 3 : Maximum Function}
 
 \begin{axdef}
-  maximum : \nat \cross \nat \fun \nat
-  \where
-  \forall a, b : \nat @ maximum(a, b) = \IF a \geq b \THEN a \ELSE b
+maximum : \nat \cross \nat \fun \nat
+\where
+\forall a, b : \nat @ maximum(a, b) = \IF a \geq b \THEN a \ELSE b
 \end{axdef}
 
 \noindent Returns the larger of two numbers.
@@ -58,10 +57,10 @@ positive and negative cases.
 \addcontentsline{toc}{section}{Example 4 : Sign Function}
 
 \begin{axdef}
-  sign : \num \fun \{-1, 0, 1\}
-  \where
-  \forall x : \num @ \\
-  \t1 sign(x) = \IF x > 0 \THEN 1 \ELSE \IF x = 0 \THEN 0 \ELSE -1
+sign : \num \fun \{-1, 0, 1\}
+\where
+\forall x : \num @ \\
+\t1 sign(x) = \IF x > 0 \THEN 1 \ELSE \IF x = 0 \THEN 0 \ELSE -1
 \end{axdef}
 
 \noindent Nested if-then-else for three-way branching.
@@ -74,8 +73,8 @@ positive and negative cases.
 \noindent
 $\{~ x : \nat | x < 10 @ \IF x \mod 2 = 0 \THEN x \ELSE x + 1 ~\}$
 
-\noindent For each x less than 10, select x if it's even, otherwise
-select x + 1.
+
+\noindent For each x less than 10, select x if it's even, otherwise select x + 1.
 
 \bigskip
 
@@ -83,35 +82,32 @@ select x + 1.
 \addcontentsline{toc}{section}{Example 6 : Pattern Matching with Conditionals}
 
 \begin{axdef}
-  filterPositives : \seq~\num \fun \seq~\num
-  \where
-  filterPositives(\langle \rangle) = \langle \rangle \\
-  \forall x : \num @ \forall s : \seq~\num @ filterPositives(\langle
-  x \rangle \cat s) = \IF x > 0 \\
-  \t1 \THEN \langle x \rangle \cat filterPositives(s) \\
-  \t1 \ELSE filterPositives(s)
+filterPositives : \seq~\num \fun \seq~\num
+\where
+filterPositives(\langle \rangle) = \langle \rangle \\
+\forall x : \num @ \forall s : \seq~\num @ filterPositives(\langle x \rangle \cat s) = \IF x > 0 \\
+\t1 \THEN \langle x \rangle \cat filterPositives(s) \\
+\t1 \ELSE filterPositives(s)
 \end{axdef}
 
-\noindent Filters a sequence to include only positive elements using
-conditional expressions.
+\noindent Filters a sequence to include only positive elements using conditional expressions.
 
 \bigskip
 
 \section*{Example 7 : Grade Assignment}
 \addcontentsline{toc}{section}{Example 7 : Grade Assignment}
 
-\begin{zed}Grade ::= GradeA | GradeB | GradeC | GradeD | GradeF
-\end{zed}
+\begin{zed}Grade ::= GradeA | GradeB | GradeC | GradeD | GradeF\end{zed}
 
 \begin{axdef}
-  scoreToGrade : \nat \fun Grade
-  \where
-  \forall score : \nat @ \\
-  \t1 scoreToGrade(score) = \IF score \geq 90 \THEN GradeA \\
-  \t1 \ELSE \IF score \geq 80 \THEN GradeB \\
-  \t1 \ELSE \IF score \geq 70 \THEN GradeC \\
-  \t1 \ELSE \IF score \geq 60 \THEN GradeD \\
-  \t1 \ELSE GradeF
+scoreToGrade : \nat \fun Grade
+\where
+\forall score : \nat @ \\
+\t1 scoreToGrade(score) = \IF score \geq 90 \THEN GradeA \\
+\t1 \ELSE \IF score \geq 80 \THEN GradeB \\
+\t1 \ELSE \IF score \geq 70 \THEN GradeC \\
+\t1 \ELSE \IF score \geq 60 \THEN GradeD \\
+\t1 \ELSE GradeF
 \end{axdef}
 
 \noindent Multi-way branching using nested if-then-else.
@@ -122,11 +118,10 @@ conditional expressions.
 \addcontentsline{toc}{section}{Example 8 : Piecewise Function}
 
 \begin{axdef}
-  piecewise : \num \fun \num
-  \where
-  \forall x : \num @ \\
-  \t1 piecewise(x) = \IF x < -5 \THEN 0 \ELSE \IF x < 0 \THEN x + 5
-  \ELSE \IF x < 5 \THEN x \ELSE \IF x < 10 \THEN x - 5 \ELSE 0
+piecewise : \num \fun \num
+\where
+\forall x : \num @ \\
+\t1 piecewise(x) = \IF x < -5 \THEN 0 \ELSE \IF x < 0 \THEN x + 5 \ELSE \IF x < 5 \THEN x \ELSE \IF x < 10 \THEN x - 5 \ELSE 0
 \end{axdef}
 
 \noindent A piecewise-defined function with multiple ranges.
@@ -139,6 +134,7 @@ conditional expressions.
 \noindent
 $\lambda x : \nat @ \IF x > 100 \THEN 100 \ELSE x$
 
+
 \noindent Lambda function that caps values at 100.
 
 \bigskip
@@ -147,11 +143,11 @@ $\lambda x : \nat @ \IF x > 100 \THEN 100 \ELSE x$
 \addcontentsline{toc}{section}{Example 10 : Conditional Set Selection}
 
 \begin{axdef}
-  evenSet : \power \nat \\
-  oddSet : \power \nat
-  \where
-  evenSet = \{~ n : \nat | n \mod 2 = 0 ~\} \\
-  oddSet = \{~ n : \nat | n \mod 2 = 1 ~\}
+evenSet : \power \nat \\
+oddSet : \power \nat
+\where
+evenSet = \{~ n : \nat | n \mod 2 = 0 ~\} \\
+oddSet = \{~ n : \nat | n \mod 2 = 1 ~\}
 \end{axdef}
 
 \noindent Define sets that can be selected conditionally in expressions.
@@ -159,15 +155,13 @@ $\lambda x : \nat @ \IF x > 100 \THEN 100 \ELSE x$
 \bigskip
 
 \section*{Example 11 : Practical Example - Tax Rate Selection}
-\addcontentsline{toc}{section}{Example 11 : Practical Example - Tax
-Rate Selection}
+\addcontentsline{toc}{section}{Example 11 : Practical Example - Tax Rate Selection}
 
 \begin{axdef}
-  taxRate : \nat \fun \nat
-  \where
-  \forall income : \nat @ \\
-  \t1 taxRate(income) = \IF income < 20000 \THEN 10 \ELSE \IF income
-  < 50000 \THEN 15 \ELSE \IF income < 100000 \THEN 20 \ELSE 25
+taxRate : \nat \fun \nat
+\where
+\forall income : \nat @ \\
+\t1 taxRate(income) = \IF income < 20000 \THEN 10 \ELSE \IF income < 50000 \THEN 15 \ELSE \IF income < 100000 \THEN 20 \ELSE 25
 \end{axdef}
 
 \noindent Progressive tax rates with multi-level conditional.
@@ -178,11 +172,10 @@ Rate Selection}
 \addcontentsline{toc}{section}{Example 12 : Conditional with Complex Expression}
 
 \begin{axdef}
-  complexFunc : \nat \fun \nat
-  \where
-  \forall n : \nat @ \\
-  \t1 complexFunc(n) = \IF n \mod 3 = 0 \THEN n * n \ELSE \IF n \mod
-  3 = 1 \THEN n + 10 \ELSE n * 2
+complexFunc : \nat \fun \nat
+\where
+\forall n : \nat @ \\
+\t1 complexFunc(n) = \IF n \mod 3 = 0 \THEN n * n \ELSE \IF n \mod 3 = 1 \THEN n + 10 \ELSE n * 2
 \end{axdef}
 
 \noindent Different computations based on remainder.
@@ -193,11 +186,11 @@ Rate Selection}
 \addcontentsline{toc}{section}{Example 13 : Guard Conditions elem Recursion}
 
 \begin{axdef}
-  factorial : \nat \fun \nat
-  \where
-  factorial(0) = 1 \\
-  \forall n : \nat @ \\
-  \t1 factorial(n) = \IF n > 0 \THEN n * factorial(n - 1) \ELSE 1
+factorial : \nat \fun \nat
+\where
+factorial(0) = 1 \\
+\forall n : \nat @ \\
+\t1 factorial(n) = \IF n > 0 \THEN n * factorial(n - 1) \ELSE 1
 \end{axdef}
 
 \noindent Conditional ensures factorial only recurses for positive n.
@@ -226,15 +219,11 @@ Rate Selection}
 \section*{Example 15 : Short - Circuit Evaluation Note}
 \addcontentsline{toc}{section}{Example 15 : Short - Circuit Evaluation Note}
 
-\noindent In Z notation, if-then-else expressions should be evaluated
-$lazily : only$ the selected branch should be evaluated. This matters
-when branches have side effects or may be undefined.
+\noindent In Z notation, if-then-else expressions should be evaluated $lazily : only$ the selected branch should be evaluated. This matters when branches have side effects or may be undefined.
 
 \bigskip
 
-\noindent If a key is not in a function's domain, accessing it would
-be undefined. A conditional ensures we only evaluate the function
-application when it's safe.
+\noindent If a key is not in a function's domain, accessing it would be undefined. A conditional ensures we only evaluate the function application when it's safe.
 
 \bigskip
 

@@ -765,11 +765,6 @@ class Parser:
             TokenType.RAN,  # ran (range)
             TokenType.INV,  # inv (inverse)
             TokenType.COMP,  # comp (composition)
-            TokenType.HEAD,  # head (sequence)
-            TokenType.TAIL,  # tail (sequence)
-            TokenType.LAST,  # last (sequence)
-            TokenType.FRONT,  # front (sequence)
-            TokenType.REV,  # rev (reverse)
             TokenType.MOD,  # mod (modulo)
             TokenType.BIGCUP,  # bigcup (distributed union)
             TokenType.BIGCAP,  # bigcap (distributed intersection)
@@ -1640,11 +1635,6 @@ class Parser:
             TokenType.FINSET1,
             TokenType.BIGCUP,
             TokenType.BIGCAP,
-            TokenType.HEAD,
-            TokenType.TAIL,
-            TokenType.LAST,
-            TokenType.FRONT,
-            TokenType.REV,
             TokenType.LAMBDA,
             TokenType.IF,
         )
@@ -2887,11 +2877,6 @@ class Parser:
             TokenType.FINSET1,
             TokenType.BIGCUP,  # Distributed union
             TokenType.BIGCAP,  # Distributed intersection
-            TokenType.HEAD,
-            TokenType.TAIL,
-            TokenType.LAST,
-            TokenType.FRONT,
-            TokenType.REV,
         ):
             op_token = self._advance()
 
@@ -2929,11 +2914,6 @@ class Parser:
                 TokenType.FINSET1,
                 TokenType.BIGCUP,
                 TokenType.BIGCAP,
-                TokenType.HEAD,
-                TokenType.TAIL,
-                TokenType.LAST,
-                TokenType.FRONT,
-                TokenType.REV,
             ):
                 # Not followed by valid operand, treat as identifier
                 return Identifier(

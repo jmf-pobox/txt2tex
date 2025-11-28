@@ -191,7 +191,10 @@ def _has_latex_error(tex_path: Path) -> bool:
     log_file = tex_path.with_suffix(".log")
     if not log_file.exists():
         return False
-    log_content = log_file.read_text()
+    try:
+        log_content = log_file.read_text(errors="replace")
+    except OSError:
+        return False
     return any(line.startswith("!") for line in log_content.split("\n"))
 
 
@@ -252,7 +255,11 @@ def _show_latex_error(tex_path: Path) -> None:
     """Show relevant error from LaTeX log file."""
     log_file = tex_path.with_suffix(".log")
     if log_file.exists():
-        log_content = log_file.read_text()
+        try:
+            log_content = log_file.read_text(errors="replace")
+        except OSError:
+            print("LaTeX compilation failed (cannot read .log file)", file=sys.stderr)
+            return
         for line in log_content.split("\n"):
             if line.startswith("!"):
                 print(f"LaTeX error: {line}", file=sys.stderr)

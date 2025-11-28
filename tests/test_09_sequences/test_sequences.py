@@ -12,7 +12,6 @@ from txt2tex.ast_nodes import (
     SequenceLiteral,
     SetLiteral,
     TupleProjection,
-    UnaryOp,
 )
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
@@ -244,91 +243,6 @@ class TestTupleProjectionLaTeX:
         assert result == "x.1.2"
 
 
-class TestSequenceOperatorsParsing:
-    """Test parsing of sequence operators."""
-
-    def test_head_operator(self):
-        """Test head s."""
-        ast = parse_expr("head s")
-        assert isinstance(ast, UnaryOp)
-        assert ast.operator == "head"
-        assert isinstance(ast.operand, Identifier)
-        assert ast.operand.name == "s"
-
-    def test_tail_operator(self):
-        """Test tail s."""
-        ast = parse_expr("tail s")
-        assert isinstance(ast, UnaryOp)
-        assert ast.operator == "tail"
-
-    def test_last_operator(self):
-        """Test last s."""
-        ast = parse_expr("last s")
-        assert isinstance(ast, UnaryOp)
-        assert ast.operator == "last"
-
-    def test_front_operator(self):
-        """Test front s."""
-        ast = parse_expr("front s")
-        assert isinstance(ast, UnaryOp)
-        assert ast.operator == "front"
-
-    def test_rev_operator(self):
-        """Test rev s."""
-        ast = parse_expr("rev s")
-        assert isinstance(ast, UnaryOp)
-        assert ast.operator == "rev"
-
-    def test_operator_on_sequence_literal(self):
-        """Test head ⟨1, 2, 3⟩."""
-        ast = parse_expr("head ⟨1, 2, 3⟩")
-        assert isinstance(ast, UnaryOp)
-        assert ast.operator == "head"
-        assert isinstance(ast.operand, SequenceLiteral)
-
-    def test_nested_operators(self):
-        """Test tail (head s)."""
-        ast = parse_expr("tail (head s)")
-        assert isinstance(ast, UnaryOp)
-        assert ast.operator == "tail"
-        assert isinstance(ast.operand, UnaryOp)
-        assert ast.operand.operator == "head"
-
-
-class TestSequenceOperatorsLaTeX:
-    """Test LaTeX generation for sequence operators."""
-
-    def test_head_latex(self):
-        """Test head s → \\head s."""
-        result = generate_latex("head s")
-        assert result == "\\head s"
-
-    def test_tail_latex(self):
-        """Test tail s → \\tail s."""
-        result = generate_latex("tail s")
-        assert result == "\\tail s"
-
-    def test_last_latex(self):
-        """Test last s → \\last s."""
-        result = generate_latex("last s")
-        assert result == "\\last s"
-
-    def test_front_latex(self):
-        """Test front s → \\front s."""
-        result = generate_latex("front s")
-        assert result == "\\front s"
-
-    def test_rev_latex(self):
-        """Test rev s → \\rev s."""
-        result = generate_latex("rev s")
-        assert result == "\\rev s"
-
-    def test_operator_on_sequence_literal_latex(self):
-        """Test head ⟨1, 2, 3⟩ → \\head \\langle 1, 2, 3 \\rangle."""
-        result = generate_latex("head ⟨1, 2, 3⟩")
-        assert result == "\\head \\langle 1, 2, 3 \\rangle"
-
-
 class TestSequenceConcatenationParsing:
     """Test parsing of sequence concatenation."""
 
@@ -407,17 +321,6 @@ class TestPhase12Integration:
         assert "\\in" in latex
         assert "\\langle" in latex
 
-    def test_head_concatenation(self):
-        """Test head (s ⌢ t)."""
-        text = "head (s ⌢ t)"
-        ast = parse_expr(text)
-        assert isinstance(ast, UnaryOp)
-        assert ast.operator == "head"
-        assert isinstance(ast.operand, BinaryOp)
-        latex = generate_latex(text)
-        assert "\\head" in latex
-        assert "\\cat" in latex
-
     def test_bag_in_comparison(self):
         """Test [[1, 2]] = [[2, 1]]."""
         text = "[[1, 2]] = [[2, 1]]"
@@ -426,18 +329,6 @@ class TestPhase12Integration:
         assert ast.operator == "="
         latex = generate_latex(text)
         assert latex == "\\lbag 1, 2 \\rbag = \\lbag 2, 1 \\rbag"
-
-    def test_complex_sequence_expression(self):
-        """Test rev (tail ⟨1, 2, 3⟩)."""
-        text = "rev (tail ⟨1, 2, 3⟩)"
-        ast = parse_expr(text)
-        assert isinstance(ast, UnaryOp)
-        assert ast.operator == "rev"
-        latex = generate_latex(text)
-        assert "\\rev" in latex
-        assert "\\tail" in latex
-        assert "\\langle" in latex
-
 
 class TestPhase12EdgeCases:
     """Test edge cases land potential conflicts."""

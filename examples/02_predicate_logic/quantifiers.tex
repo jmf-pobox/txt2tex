@@ -16,57 +16,57 @@
 \addcontentsline{toc}{section}{Example 1 : Given Types}
 
 \begin{zed}
-  [Person, Company]
+[Person, Company]
 \end{zed}
 
 \section*{Example 2 : Free Types}
 \addcontentsline{toc}{section}{Example 2 : Free Types}
 
 \begin{zed}
-  StatusQ ::= active | inactive | suspended
-  \also
-  Answer ::= yesQ | no
+StatusQ ::= active | inactive | suspended
+\also
+Answer ::= yesQ | no
 \end{zed}
 
 \section*{Example 3 : Abbreviations}
 \addcontentsline{toc}{section}{Example 3 : Abbreviations}
 
 \begin{zed}
-  MaxCapacity == 100
+MaxCapacity == 100
 \end{zed}
 
 \begin{zed}
-  DefaultSize == 10
+DefaultSize == 10
 \end{zed}
 
 \section*{Example 4 : Axiomatic Definitions}
 \addcontentsline{toc}{section}{Example 4 : Axiomatic Definitions}
 
 \begin{axdef}
-  population : \nat \\
-  capacity : \nat
-  \where
-  population \leq capacity \\
-  capacity > 0
+population : \nat \\
+capacity : \nat
+\where
+population \leq capacity \\
+capacity > 0
 \end{axdef}
 
 \section*{Example 5 : Schema Definitions}
 \addcontentsline{toc}{section}{Example 5 : Schema Definitions}
 
 \begin{schema}{Library}
-  books : \nat \\
-  members : \nat
-  \where
-  books > 0 \\
-  members \geq 0
+books : \nat \\
+members : \nat
+\where
+books > 0 \\
+members \geq 0
 \end{schema}
 
 \begin{schema}{BankAccount}
-  balance : \nat \\
-  overdraft : \nat
-  \where
-  balance \geq 0 \\
-  overdraft \geq 0
+balance : \nat \\
+overdraft : \nat
+\where
+balance \geq 0 \\
+overdraft \geq 0
 \end{schema}
 
 \end{document}

@@ -3,22 +3,16 @@
 // ============================================================================
 // Demonstrates:
 //   - Subscript notation with underscore (_)
-//   - Superscript notation with caret (^)
+//   - Superscript notation with caret
 //   - Identifier subscripts (x_i, y_1)
 //   - Mathematical exponentiation (x^2, n^k)
-//   - Nested subscripts and superscripts
+//   - Using power function for nested exponents
 //   - Indexing conventions
-//
-// Features:
-//   - x_1, x_2, x_i [subscripted identifiers]
-//   - x^2, x^n [exponentiation/superscripts]
-//   - x_i^2, x^2_i [combined sub/superscripts]
-//   - Nested: (x^2)^3, x_(i+1)
 //
 // See: docs/USER_GUIDE.md - Section "Advanced Features" > "Subscripts and Superscripts"
 // ============================================================================
 
-=== Subscripts land Superscripts ===
+=== Subscripts and Superscripts ===
 
 ** Example 1: Basic Subscripts **
 
@@ -38,7 +32,7 @@ x^2 = x * x
 
 n^3 = n * n * n
 
-TEXT: The caret symbol (^) creates superscripts for powers.
+TEXT: The caret symbol creates superscripts for powers.
 
 ** Example 3: Multiple Subscripted Variables **
 
@@ -62,34 +56,32 @@ forall i : 1 .. n | s_i elem N
 
 TEXT: Here s_i represents the i-th element of a conceptual sequence.
 
-** Example 5: Matrix Notation **
-
-TEXT: Subscripts can indicate matrix positions:
-
-TEXT: M_(i,j) = row i, column j element
-
-TEXT: Or with multiple subscripts:
-
-TEXT: M_i_j for element at row i, column j
-
-** Example 6: Exponentiation elem Expressions **
+** Example 5: Exponentiation in Expressions **
 
 { n : N | n < 10 . n^2 }
 
-TEXT: Set of squares: {0, 1, 4, 9, 16, 25, 36, 49, 64, 81}
+TEXT: Set of squares.
 
-** Example 7: Power Function **
+** Example 6: Power Function for Nested Exponents **
+
+TEXT: For nested exponents like power of a power, define a power function:
 
 axdef
-  power : N cross N -> N
+  pow : N cross N -> N
 where
-  forall x : N | power(x, 0) = 1
-  forall x, n : N | n > 0 => power(x, n) = x * power(x, n - 1)
+  forall x : N | pow(x, 0) = 1
+  forall x, n : N | n > 0 => pow(x, n) = x * pow(x, n - 1)
 end
 
-TEXT: Recursive definition of exponentiation. Equivalent to x^n.
+TEXT: Then use it for nested exponentiation:
 
-** Example 8: Polynomials **
+pow(pow(x, 2), 3) = pow(x, 6)
+
+pow(pow(n, 2), n + 1)
+
+TEXT: This avoids LaTeX double superscript issues.
+
+** Example 7: Polynomials **
 
 TEXT: Subscripts for coefficients, superscripts for powers:
 
@@ -97,31 +89,15 @@ a_0 + a_1 * x + a_2 * x^2 + a_3 * x^3
 
 TEXT: Standard polynomial notation.
 
-** Example 9: Combined Subscripts land Superscripts **
+** Example 8: Combined Subscripts and Superscripts **
 
 TEXT: Variable with subscript, raised to a power:
 
 x_i^2
 
-TEXT: Meaning: (x sub i) squared.
+TEXT: Meaning: x sub i, squared.
 
-TEXT: Power of a variable with subscript:
-
-(x^2)_i
-
-TEXT: Meaning: The i-th element of the sequence of squares.
-
-** Example 10: Nested Superscripts **
-
-TEXT: Power of a power:
-
-(x^2)^3 = x^6
-
-TEXT: Or with explicit parentheses:
-
-(n^2)^(n+1)
-
-** Example 11: Cartesian Product Powers **
+** Example 9: Cartesian Product Powers **
 
 TEXT: Cartesian product repeated n times:
 
@@ -131,25 +107,17 @@ S^3 = S cross S cross S
 
 TEXT: Set of n-tuples from S.
 
-** Example 12: Iteration Subscripts **
+** Example 10: Iteration Subscripts **
 
 TEXT: Subscripts often denote iteration steps:
 
-x_0 = initial value
+x_0 = initial
 
 x_(i+1) = f(x_i)
 
 TEXT: Defines a recurrence relation.
 
-** Example 13: Prime Notation Alternative **
-
-TEXT: For derivatives or next-state, use primes or subscripts:
-
-TEXT: x' (prime) or x_next
-
-TEXT: txt2tex supports x' notation for primed identifiers in schemas.
-
-** Example 14: State Variable Subscripts **
+** Example 11: State Variable Subscripts **
 
 schema Counter
   count : N
@@ -160,7 +128,7 @@ end
 
 TEXT: Next-state variables can use descriptive names like countNext instead of primed notation.
 
-** Example 15: Indexed Family of Sets **
+** Example 12: Indexed Family of Sets **
 
 axdef
   S_1 : P N
@@ -174,51 +142,19 @@ end
 
 TEXT: Family of sets indexed by natural numbers.
 
-** Example 16: Exponents elem Constraints **
+** Example 13: Exponents in Constraints **
 
 forall n : N | n^2 >= n
 
 TEXT: Constraint using exponentiation: every natural number's square is at least itself.
 
-** Example 17: Summation Notation (Conceptual) **
-
-TEXT: While txt2tex doesn't have built-in summation, subscripts help express it:
-
-TEXT: sum_i = x_1 + x_2 + ... + x_n
-
-TEXT: Conceptually represents summing x_i for i from 1 to n.
-
-** Example 18: Geometric Sequence **
-
-axdef
-  r : N
-  a_0 : N
-where
-  r = 2
-  a_0 = 1
-end
-
-TEXT: For a geometric sequence with first term a_0 and ratio r: a_0, a_0 * r, a_0 * r * r, a_0 * r * r * r, ...
-
-** Example 19: Multiple Indices **
-
-TEXT: Double subscripts for 2D structures:
-
-TEXT: M_1_1, M_1_2, M_2_1, M_2_2
-
-TEXT: Or with tuple notation:
-
-TEXT: M_(1,1), M_(1,2), M_(2,1), M_(2,2)
-
-TEXT: Both styles represent matrix elements.
-
-** Example 20: Complex Subscript Expressions **
+** Example 14: Complex Subscript Expressions **
 
 x_(i+1) + x_(i-1) = 2 * x_i
 
 TEXT: Recurrence relation with subscript expressions.
 
-** Example 21: Power Set Notation **
+** Example 15: Power Set Notation **
 
 TEXT: Sometimes written with superscript:
 
@@ -226,40 +162,11 @@ P(S) lor 2^S
 
 TEXT: Both denote the power set of S.
 
-** Example 22: Factorial Approximation **
-
-TEXT: Superscripts in approximations:
-
-TEXT: n^n > n!
-
-TEXT: For n >= 1, n to the power n exceeds n factorial.
-
-** Example 23: Best Practices **
+** Example 16: Best Practices **
 
 TEXT: Guidelines for subscripts and superscripts:
-TEXT: 1. Use subscripts for indices, versions, or families (x_1, x_i, S_k)
-TEXT: 2. Use superscripts for exponents and powers (x^2, n^k, 2^n)
-TEXT: 3. Parenthesize complex expressions: (x+1)^2, not x+1^2
+TEXT: 1. Use subscripts for indices, versions, or families
+TEXT: 2. Use superscripts for exponents and powers
+TEXT: 3. For nested exponents, define a pow function
 TEXT: 4. Be consistent in indexing: start at 0 or 1, not mixed
-TEXT: 5. Document what subscripts mean (time steps, indices, identifiers)
-TEXT: 6. Avoid deeply nested subscripts—hurts readability
-
-** Example 24: Common Pitfalls **
-
-TEXT: Operator precedence matters:
-
-TEXT: x + y^2 means x + (y^2), not (x+y)^2
-
-TEXT: 2 * x^2 means 2 * (x^2), not (2*x)^2
-
-TEXT: Use parentheses when in doubt: (x + y)^2 is unambiguous.
-
-** Example 25: Typographical Rendering **
-
-TEXT: In LaTeX output:
-TEXT: - x_1 renders as x with subscript 1
-TEXT: - x^2 renders as x with superscript 2
-TEXT: - x_i^2 renders as x with subscript i and superscript 2
-TEXT: - (x^2)^3 renders with proper nesting
-
-TEXT: The txt2tex compiler handles the LaTeX generation automatically.
+TEXT: 5. Document what subscripts mean

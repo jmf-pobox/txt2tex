@@ -22,68 +22,61 @@
 \noindent
 $\# \langle \rangle$
 
+
 \noindent
 $\# \langle a, b, c \rangle$
+
 
 \noindent
 $\# s$
 
-\section*{Example 2 : Head land Tail}
-\addcontentsline{toc}{section}{Example 2 : Head land Tail}
 
-\noindent Basic sequence decomposition:
+\section*{Example 2 : Pattern Matching for Head and Tail}
+\addcontentsline{toc}{section}{Example 2 : Pattern Matching for Head and Tail}
+
+\noindent In Z, decomposing a sequence uses pattern matching with concatenation.
+
+\bigskip
+
+\noindent Given a non-empty sequence s, if we have x and t such that:
 
 \bigskip
 
 \noindent
-$\head \langle a, b, c \rangle$
+$\langle x \rangle \cat t = s$
 
-\noindent
-$\tail \langle a, b, c \rangle$
 
-\noindent
-$\head s$
-
-\noindent
-$\tail s$
-
-\section*{Example 3 : Last land Front}
-\addcontentsline{toc}{section}{Example 3 : Last land Front}
-
-\noindent Operations on the end of sequences:
+\noindent Then x is the first element (head) and t is the remaining sequence (tail).
 
 \bigskip
 
-\noindent
-$\last \langle a, b, c \rangle$
+\section*{Example 3 : User - Defined First and Rest Functions}
+\addcontentsline{toc}{section}{Example 3 : User - Defined First and Rest Functions}
 
-\noindent
-$\front \langle a, b, c \rangle$
-
-\noindent
-$\last s$
-
-\noindent
-$\front s$
-
-\section*{Example 4 : Reverse}
-\addcontentsline{toc}{section}{Example 4 : Reverse}
-
-\noindent Reversing a sequence:
+\noindent You can define explicit functions for sequence decomposition:
 
 \bigskip
 
-\noindent
-$\rev \langle \rangle$
+\begin{zed}[X]\end{zed}
 
-\noindent
-$\rev \langle a \rangle$
+\begin{axdef}
+fst : \seq_1~X \fun X \\
+rest : \seq_1~X \fun \seq~X
+\where
+\forall x : X @ \forall s : \seq~X @ fst(\langle x \rangle \cat s) = x \\
+\forall x : X @ \forall s : \seq~X @ rest(\langle x \rangle \cat s) = s
+\end{axdef}
 
-\noindent
-$\rev \langle a, b, c \rangle$
+\section*{Example 4 : User - Defined Last and Init Functions}
+\addcontentsline{toc}{section}{Example 4 : User - Defined Last and Init Functions}
 
-\noindent
-$\rev \rev s$
+\begin{axdef}
+lst : \seq_1~X \fun X \\
+init : \seq_1~X \fun \seq~X
+\where
+\forall x : X @ \forall s : \seq~X @ lst(s \cat \langle x \rangle) = x \\
+\forall x : X @ \forall s : \seq~X @ init(s \cat \langle x \rangle) = s
+\end{axdef}
 
 \section*{Example 5 : Domain land Range}
 \addcontentsline{toc}{section}{Example 5 : Domain land Range}
@@ -95,10 +88,61 @@ $\rev \rev s$
 \noindent
 $\dom \langle \rangle$
 
+
 \noindent
 $\dom \langle a, b, c, d \rangle$
 
+
 \noindent
 $\ran \langle a, b, c \rangle$
+
+
+\section*{Example 6 : Concatenation}
+\addcontentsline{toc}{section}{Example 6 : Concatenation}
+
+\noindent The concatenation operator joins sequences:
+
+\bigskip
+
+\noindent
+$s \cat t$
+
+
+\noindent
+$\langle 1, 2 \rangle \cat \langle 3, 4 \rangle$
+
+
+\noindent
+$\langle a \rangle \cat \langle b, c \rangle \cat \langle d \rangle$
+
+
+\section*{Example 7 : Using Pattern Matching}
+\addcontentsline{toc}{section}{Example 7 : Using Pattern Matching}
+
+\noindent Pattern matching extracts elements from sequences:
+
+\bigskip
+
+\noindent
+$\forall s : \seq_1~\nat @ \exists x : \nat @ \exists t : \seq~\nat @ s = \langle x \rangle \cat t$
+
+
+\noindent This asserts that every non-empty sequence can be decomposed.
+
+\bigskip
+
+\section*{Example 8 : Recursive Function Example}
+\addcontentsline{toc}{section}{Example 8 : Recursive Function Example}
+
+\noindent Define a sum function using pattern matching style:
+
+\bigskip
+
+\begin{axdef}
+sumSeq : \seq~\nat \fun \nat
+\where
+sumSeq(\langle \rangle) = 0 \\
+\forall x : \nat @ \forall s : \seq~\nat @ sumSeq(\langle x \rangle \cat s) = x + sumSeq(s)
+\end{axdef}
 
 \end{document}

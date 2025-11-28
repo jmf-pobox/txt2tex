@@ -3,17 +3,13 @@
 // ============================================================================
 // Demonstrates:
 //   - Sequence length/cardinality (#)
-//   - Head and tail operations
-//   - Last and front operations
-//   - Reverse operation (rev)
+//   - Pattern matching for head/tail decomposition
+//   - User-defined sequence functions
 //   - Domain and range of sequences
 //
-// Features:
-//   - # s [sequence length]
-//   - head s, tail s [decomposition]
-//   - last s, front s [end operations]
-//   - rev s [reverse]
-//   - dom s, ran s [domain and range]
+// Note: In Z notation, head/tail are expressed via pattern matching with
+// concatenation, not as built-in operators. This example shows how to
+// define and use sequence operations properly.
 //
 // See: docs/USER_GUIDE.md - Section "Sequences" > "Operations"
 // ============================================================================
@@ -30,41 +26,39 @@ TEXT: The cardinality operator gives the length of a sequence:
 
 # s
 
-** Example 2: Head land Tail **
+** Example 2: Pattern Matching for Head and Tail **
 
-TEXT: Basic sequence decomposition:
+TEXT: In Z, decomposing a sequence uses pattern matching with concatenation.
 
-head <a, b, c>
+TEXT: Given a non-empty sequence s, if we have x and t such that:
 
-tail <a, b, c>
+<x> ^ t = s
 
-head s
+TEXT: Then x is the first element (head) and t is the remaining sequence (tail).
 
-tail s
+** Example 3: User-Defined First and Rest Functions **
 
-** Example 3: Last land Front **
+TEXT: You can define explicit functions for sequence decomposition:
 
-TEXT: Operations on the end of sequences:
+given X
 
-last <a, b, c>
+axdef
+  fst : seq1 X -> X
+  rest : seq1 X -> seq X
+where
+  forall x : X; s : seq X | fst(<x> ^ s) = x
+  forall x : X; s : seq X | rest(<x> ^ s) = s
+end
 
-front <a, b, c>
+** Example 4: User-Defined Last and Init Functions **
 
-last s
-
-front s
-
-** Example 4: Reverse **
-
-TEXT: Reversing a sequence:
-
-rev <>
-
-rev <a>
-
-rev <a, b, c>
-
-rev (rev s)
+axdef
+  lst : seq1 X -> X
+  init : seq1 X -> seq X
+where
+  forall x : X; s : seq X | lst(s ^ <x>) = x
+  forall x : X; s : seq X | init(s ^ <x>) = s
+end
 
 ** Example 5: Domain land Range **
 
@@ -75,3 +69,32 @@ dom <>
 dom <a, b, c, d>
 
 ran <a, b, c>
+
+** Example 6: Concatenation **
+
+TEXT: The concatenation operator joins sequences:
+
+s ^ t
+
+<1, 2> ^ <3, 4>
+
+<a> ^ <b, c> ^ <d>
+
+** Example 7: Using Pattern Matching **
+
+TEXT: Pattern matching extracts elements from sequences:
+
+forall s : seq1 N | exists x : N; t : seq N | s = <x> ^ t
+
+TEXT: This asserts that every non-empty sequence can be decomposed.
+
+** Example 8: Recursive Function Example **
+
+TEXT: Define a sum function using pattern matching style:
+
+axdef
+  sumSeq : seq N -> N
+where
+  sumSeq(<>) = 0
+  forall x : N; s : seq N | sumSeq(<x> ^ s) = x + sumSeq(s)
+end

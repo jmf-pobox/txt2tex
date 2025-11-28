@@ -15,16 +15,17 @@
 \section*{Example 1 : Unique Quantifier ( exists1 )}
 \addcontentsline{toc}{section}{Example 1 : Unique Quantifier ( exists1 )}
 
-\noindent The unique existence quantifier asserts there is exactly
-one value satisfying the predicate:
+\noindent The unique existence quantifier asserts there is exactly one value satisfying the predicate:
 
 \bigskip
 
 \noindent
 $\exists_1 x : \nat @ x = 5$
 
+
 \noindent
 $\exists_1 n : \nat @ \forall m : \nat @ n \leq m$
+
 
 \section*{Example 2 : Multiple Conditions}
 \addcontentsline{toc}{section}{Example 2 : Multiple Conditions}
@@ -36,28 +37,28 @@ $\exists_1 n : \nat @ \forall m : \nat @ n \leq m$
 \noindent
 $\exists_1 y : \nat @ y \in \{0, 1\} \land y \neq 1$
 
+
 \noindent
 $\exists_1 z : \num @ z \bsup 2 \esup = 4 \land z > 0$
+
 
 \section*{Example 3 : One - Point Rule}
 \addcontentsline{toc}{section}{Example 3 : One - Point Rule}
 
-\noindent When a unique value is specified by equality, we can apply
-the one-point rule:
+\noindent When a unique value is specified by equality, we can apply the one-point rule:
 
 \bigskip
 
 \begin{center}
-  \adjustbox{max width=\textwidth}{%
-    $\displaystyle
-    \begin{array}{l@{\hspace{2em}}r}
-      \exists y : \nat @ y \in \{0, 1\} \land y \neq 1 \land x \neq y \\
-      \Leftrightarrow \exists y : \nat @ y = 0 \land x \neq y &
-      [\mbox{arithmetic}] \\
-      \Leftrightarrow 0 \in \nat \land x \neq 0 & [\mbox{one - point rule}] \\
-      \Leftrightarrow x \neq 0
-    \end{array}$%
-  }
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\begin{array}{l@{\hspace{2em}}r}
+\exists y : \nat @ y \in \{0, 1\} \land y \neq 1 \land x \neq y \\
+\Leftrightarrow \exists y : \nat @ y = 0 \land x \neq y & [\mbox{arithmetic}] \\
+\Leftrightarrow 0 \in \nat \land x \neq 0 & [\mbox{one - point rule}] \\
+\Leftrightarrow x \neq 0
+\end{array}$%
+}
 \end{center}
 \bigskip
 
@@ -71,7 +72,9 @@ the one-point rule:
 \noindent
 $\exists_1 p : \power \{0, 1\} @ \# p = 1$
 
+
 \noindent
 $\exists_1 x : \{1, 2, 3, 4\} @ x > 3$
+
 
 \end{document}

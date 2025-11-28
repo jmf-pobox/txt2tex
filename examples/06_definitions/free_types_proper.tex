@@ -16,39 +16,38 @@
 \addcontentsline{toc}{section}{Example : Semicolon bindings elem axdef}
 
 \begin{axdef}
-  dummy : \nat
-  \where
-  dummy = 0 \\
-  \forall x : \nat @ \forall y : \nat @ x + y > 0
+dummy : \nat
+\where
+dummy = 0 \\
+\forall x : \nat @ \forall y : \nat @ x + y > 0
 \end{axdef}
 
 \section*{Example : Function on sequences}
 \addcontentsline{toc}{section}{Example : Function on sequences}
 
 \begin{zed}
-  [EntryFTP]
+[EntryFTP]
 \end{zed}
 
 \begin{axdef}
-  seqlen : \seq~EntryFTP \fun \nat
-  \where
-  seqlen(\langle \rangle) = 0 \\
-  \forall x : EntryFTP @ \forall s : \seq~EntryFTP @ seqlen(\langle x
-  \rangle \cat s) = 1 + seqlen(s)
+seqlen : \seq~EntryFTP \fun \nat
+\where
+seqlen(\langle \rangle) = 0 \\
+\forall x : EntryFTP @ \forall s : \seq~EntryFTP @ seqlen(\langle x \rangle \cat s) = 1 + seqlen(s)
 \end{axdef}
 
 \section*{Example : Nested quantifier}
 \addcontentsline{toc}{section}{Example : Nested quantifier}
 
 \begin{zed}
-  [PersonFTP]
+[PersonFTP]
 \end{zed}
 
 \begin{axdef}
-  constraint : \nat
-  \where
-  constraint = 1 \\
-  \forall p : PersonFTP @ \forall n : \nat @ n > 0
+constraint : \nat
+\where
+constraint = 1 \\
+\forall p : PersonFTP @ \forall n : \nat @ n > 0
 \end{axdef}
 
 \end{document}

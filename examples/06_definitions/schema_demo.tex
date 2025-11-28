@@ -16,43 +16,43 @@
 \addcontentsline{toc}{section}{Example 1 : Simple Schema}
 
 \begin{schema}{CounterSD}
-  count : \nat
-  \where
-  count \geq 0
+count : \nat
+\where
+count \geq 0
 \end{schema}
 
 \section*{Example 2 : Schema with Multiple Fields}
 \addcontentsline{toc}{section}{Example 2 : Schema with Multiple Fields}
 
 \begin{schema}{Point}
-  x : \num \\
-  y : \num
+x : \num \\
+y : \num
 \end{schema}
 
 \section*{Example 3 : Schema with Constraints}
 \addcontentsline{toc}{section}{Example 3 : Schema with Constraints}
 
 \begin{schema}{BoundedPoint}
-  x : \nat \\
-  y : \nat
-  \where
-  x \leq 100 \\
-  y \leq 100
+x : \nat \\
+y : \nat
+\where
+x \leq 100 \\
+y \leq 100
 \end{schema}
 
 \section*{Example 4 : Schema with Given Types}
 \addcontentsline{toc}{section}{Example 4 : Schema with Given Types}
 
 \begin{zed}
-  [PersonSD]
+[PersonSD]
 \end{zed}
 
 \begin{schema}{PersonData}
-  name : PersonSD \\
-  age : \nat
-  \where
-  age \geq 0 \\
-  age \leq 150
+name : PersonSD \\
+age : \nat
+\where
+age \geq 0 \\
+age \leq 150
 \end{schema}
 
 \end{document}

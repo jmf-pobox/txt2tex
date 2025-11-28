@@ -10,7 +10,7 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\section*{Subscripts land Superscripts}
+\section*{Subscripts and Superscripts}
 
 \section*{Example 1 : Basic Subscripts}
 \addcontentsline{toc}{section}{Example 1 : Basic Subscripts}
@@ -22,16 +22,17 @@
 \noindent
 $x_1 \in S$
 
+
 \noindent
 $x_2 = x_1 + 1$
+
 
 \noindent Common for indexed variables in sequences, arrays, or iterations.
 
 \bigskip
 
 \section*{Example 2 : Basic Superscripts ( Exponentiation )}
-\addcontentsline{toc}{section}{Example 2 : Basic Superscripts (
-Exponentiation )}
+\addcontentsline{toc}{section}{Example 2 : Basic Superscripts ( Exponentiation )}
 
 \noindent Superscripts denote exponentiation:
 
@@ -40,10 +41,12 @@ Exponentiation )}
 \noindent
 $x \bsup 2 \esup = x * x$
 
+
 \noindent
 $n \bsup 3 \esup = n * n * n$
 
-\noindent The caret symbol (^) creates superscripts for powers.
+
+\noindent The caret symbol creates superscripts for powers.
 
 \bigskip
 
@@ -51,13 +54,13 @@ $n \bsup 3 \esup = n * n * n$
 \addcontentsline{toc}{section}{Example 3 : Multiple Subscripted Variables}
 
 \begin{axdef}
-  x_1 : \nat \\
-  x_2 : \nat \\
-  x_3 : \nat
-  \where
-  x_1 = 1 \\
-  x_2 = 2 \\
-  x_3 = 3
+x_1 : \nat \\
+x_2 : \nat \\
+x_3 : \nat
+\where
+x_1 = 1 \\
+x_2 = 2 \\
+x_3 = 3
 \end{axdef}
 
 \noindent Define multiple indexed variables.
@@ -74,55 +77,54 @@ $n \bsup 3 \esup = n * n * n$
 \noindent
 $\forall i : 1 \upto n @ s\_i \in \nat$
 
+
 \noindent Here s\_i represents the i-th element of a conceptual sequence.
 
 \bigskip
 
-\section*{Example 5 : Matrix Notation}
-\addcontentsline{toc}{section}{Example 5 : Matrix Notation}
-
-\noindent Subscripts can indicate matrix positions:
-
-\bigskip
-
-\noindent M\_(i,j) = row i, column j element
-
-\bigskip
-
-\noindent Or with multiple subscripts:
-
-\bigskip
-
-\noindent M\_i\_j for element at row i, column j
-
-\bigskip
-
-\section*{Example 6 : Exponentiation elem Expressions}
-\addcontentsline{toc}{section}{Example 6 : Exponentiation elem Expressions}
+\section*{Example 5 : Exponentiation in Expressions}
+\addcontentsline{toc}{section}{Example 5 : Exponentiation in Expressions}
 
 \noindent
 $\{~ n : \nat | n < 10 @ n \bsup 2 \esup ~\}$
 
-\noindent Set of squares: $\{0, 1, 4, 9, 16, 25, 36, 49, 64, 81\}$
+
+\noindent Set of squares.
 
 \bigskip
 
-\section*{Example 7 : Power Function}
-\addcontentsline{toc}{section}{Example 7 : Power Function}
+\section*{Example 6 : Power Function for Nested Exponents}
+\addcontentsline{toc}{section}{Example 6 : Power Function for Nested Exponents}
+
+\noindent For nested exponents like power of a power, define a power function:
+
+\bigskip
 
 \begin{axdef}
-  power : \nat \cross \nat \fun \nat
-  \where
-  \forall x : \nat @ power(x, 0) = 1 \\
-  \forall x, n : \nat @ n > 0 \implies power(x, n) = x * power(x, n - 1)
+pow : \nat \cross \nat \fun \nat
+\where
+\forall x : \nat @ pow(x, 0) = 1 \\
+\forall x, n : \nat @ n > 0 \implies pow(x, n) = x * pow(x, n - 1)
 \end{axdef}
 
-\noindent Recursive definition of exponentiation. Equivalent to $x^n$.
+\noindent Then use it for nested exponentiation:
 
 \bigskip
 
-\section*{Example 8 : Polynomials}
-\addcontentsline{toc}{section}{Example 8 : Polynomials}
+\noindent
+$pow(pow(x, 2), 3) = pow(x, 6)$
+
+
+\noindent
+$pow(pow(n, 2), n + 1)$
+
+
+\noindent This avoids LaTeX double superscript issues.
+
+\bigskip
+
+\section*{Example 7 : Polynomials}
+\addcontentsline{toc}{section}{Example 7 : Polynomials}
 
 \noindent Subscripts for coefficients, superscripts for powers:
 
@@ -131,13 +133,13 @@ $\{~ n : \nat | n < 10 @ n \bsup 2 \esup ~\}$
 \noindent
 $a_0 + a_1 * x + a_2 * x \bsup 2 \esup + a_3 * x \bsup 3 \esup$
 
+
 \noindent Standard polynomial notation.
 
 \bigskip
 
-\section*{Example 9 : Combined Subscripts land Superscripts}
-\addcontentsline{toc}{section}{Example 9 : Combined Subscripts land
-Superscripts}
+\section*{Example 8 : Combined Subscripts and Superscripts}
+\addcontentsline{toc}{section}{Example 8 : Combined Subscripts and Superscripts}
 
 \noindent Variable with subscript, raised to a power:
 
@@ -146,40 +148,13 @@ Superscripts}
 \noindent
 $x\_i \bsup 2 \esup$
 
-\noindent Meaning: (x sub i) squared.
+
+\noindent $Meaning : x sub i$, squared.
 
 \bigskip
 
-\noindent Power of a variable with subscript:
-
-\bigskip
-
-\noindent
-$x \bsup 2 \esup(\_i)$
-
-\noindent Meaning: The i-th element of the sequence of squares.
-
-\bigskip
-
-\section*{Example 10 : Nested Superscripts}
-\addcontentsline{toc}{section}{Example 10 : Nested Superscripts}
-
-\noindent Power of a power:
-
-\bigskip
-
-\noindent
-$x \bsup 2 \esup \bsup 3 \esup = x \bsup 6 \esup$
-
-\noindent Or with explicit parentheses:
-
-\bigskip
-
-\noindent
-$n \bsup 2 \esup \bsup (n + 1) \esup$
-
-\section*{Example 11 : Cartesian Product Powers}
-\addcontentsline{toc}{section}{Example 11 : Cartesian Product Powers}
+\section*{Example 9 : Cartesian Product Powers}
+\addcontentsline{toc}{section}{Example 9 : Cartesian Product Powers}
 
 \noindent Cartesian product repeated n times:
 
@@ -188,155 +163,89 @@ $n \bsup 2 \esup \bsup (n + 1) \esup$
 \noindent
 $S \bsup 2 \esup = S \cross S$
 
+
 \noindent
 $S \bsup 3 \esup = S \cross S \cross S$
+
 
 \noindent Set of n-tuples from S.
 
 \bigskip
 
-\section*{Example 12 : Iteration Subscripts}
-\addcontentsline{toc}{section}{Example 12 : Iteration Subscripts}
+\section*{Example 10 : Iteration Subscripts}
+\addcontentsline{toc}{section}{Example 10 : Iteration Subscripts}
 
 \noindent Subscripts often denote iteration steps:
 
 \bigskip
 
 \noindent
-$x_0 = initial(value)$
+$x_0 = initial$
+
 
 \noindent
 $x\_(i + 1) = f(x\_i)$
+
 
 \noindent Defines a recurrence relation.
 
 \bigskip
 
-\section*{Example 13 : Prime Notation Alternative}
-\addcontentsline{toc}{section}{Example 13 : Prime Notation Alternative}
-
-\noindent For derivatives or next-state, use primes or subscripts:
-
-\bigskip
-
-\noindent x' (prime) or x\_next
-
-\bigskip
-
-\noindent txt2tex supports x' notation for primed identifiers in schemas.
-
-\bigskip
-
-\section*{Example 14 : State Variable Subscripts}
-\addcontentsline{toc}{section}{Example 14 : State Variable Subscripts}
+\section*{Example 11 : State Variable Subscripts}
+\addcontentsline{toc}{section}{Example 11 : State Variable Subscripts}
 
 \begin{schema}{Counter}
-  count : \nat \\
-  countNext : \nat
-  \where
-  countNext = count + 1
+count : \nat \\
+countNext : \nat
+\where
+countNext = count + 1
 \end{schema}
 
-\noindent Next-state variables can use descriptive names like
-countNext instead of primed notation.
+\noindent Next-state variables can use descriptive names like countNext instead of primed notation.
 
 \bigskip
 
-\section*{Example 15 : Indexed Family of Sets}
-\addcontentsline{toc}{section}{Example 15 : Indexed Family of Sets}
+\section*{Example 12 : Indexed Family of Sets}
+\addcontentsline{toc}{section}{Example 12 : Indexed Family of Sets}
 
 \begin{axdef}
-  S_1 : \power \nat \\
-  S_2 : \power \nat \\
-  S_3 : \power \nat
-  \where
-  S_1 = \{1, 2, 3\} \\
-  S_2 = \{4, 5, 6\} \\
-  S_3 = \{7, 8, 9\}
+S_1 : \power \nat \\
+S_2 : \power \nat \\
+S_3 : \power \nat
+\where
+S_1 = \{1, 2, 3\} \\
+S_2 = \{4, 5, 6\} \\
+S_3 = \{7, 8, 9\}
 \end{axdef}
 
 \noindent Family of sets indexed by natural numbers.
 
 \bigskip
 
-\section*{Example 16 : Exponents elem Constraints}
-\addcontentsline{toc}{section}{Example 16 : Exponents elem Constraints}
+\section*{Example 13 : Exponents in Constraints}
+\addcontentsline{toc}{section}{Example 13 : Exponents in Constraints}
 
 \noindent
 $\forall n : \nat @ n \bsup 2 \esup \geq n$
 
-\noindent Constraint using $exponentiation : every natural number's
-square$ is at least itself.
+
+\noindent Constraint using $exponentiation : every natural number's square$ is at least itself.
 
 \bigskip
 
-\section*{Example 17 : Summation Notation ( Conceptual )}
-\addcontentsline{toc}{section}{Example 17 : Summation Notation ( Conceptual )}
-
-\noindent While txt2tex doesn't have built-in summation, subscripts
-help express it:
-
-\bigskip
-
-\noindent $sum\_i = x_1$ + x\_2 + ... + x\_n
-
-\bigskip
-
-\noindent Conceptually represents summing x\_i for i from 1 to n.
-
-\bigskip
-
-\section*{Example 18 : Geometric Sequence}
-\addcontentsline{toc}{section}{Example 18 : Geometric Sequence}
-
-\begin{axdef}
-  r : \nat \\
-  a_0 : \nat
-  \where
-  r = 2 \\
-  a_0 = 1
-\end{axdef}
-
-\noindent For a geometric sequence with first term a\_0 and ratio $r
-: a_0$, a\_0 * r, a\_0 * r * r, a\_0 * r * r * r, ...
-
-\bigskip
-
-\section*{Example 19 : Multiple Indices}
-\addcontentsline{toc}{section}{Example 19 : Multiple Indices}
-
-\noindent Double subscripts for 2D structures:
-
-\bigskip
-
-\noindent M\_1\_1, M\_1\_2, M\_2\_1, M\_2\_2
-
-\bigskip
-
-\noindent Or with tuple notation:
-
-\bigskip
-
-\noindent M\_(1,1), M\_(1,2), M\_(2,1), M\_(2,2)
-
-\bigskip
-
-\noindent Both styles represent matrix elements.
-
-\bigskip
-
-\section*{Example 20 : Complex Subscript Expressions}
-\addcontentsline{toc}{section}{Example 20 : Complex Subscript Expressions}
+\section*{Example 14 : Complex Subscript Expressions}
+\addcontentsline{toc}{section}{Example 14 : Complex Subscript Expressions}
 
 \noindent
 $x\_(i + 1) + x\_(i - 1) = 2 * x\_i$
+
 
 \noindent Recurrence relation with subscript expressions.
 
 \bigskip
 
-\section*{Example 21 : Power Set Notation}
-\addcontentsline{toc}{section}{Example 21 : Power Set Notation}
+\section*{Example 15 : Power Set Notation}
+\addcontentsline{toc}{section}{Example 15 : Power Set Notation}
 
 \noindent Sometimes written with superscript:
 
@@ -345,42 +254,27 @@ $x\_(i + 1) + x\_(i - 1) = 2 * x\_i$
 \noindent
 $\power S \lor 2 \bsup S \esup$
 
+
 \noindent Both denote the power set of S.
 
 \bigskip
 
-\section*{Example 22 : Factorial Approximation}
-\addcontentsline{toc}{section}{Example 22 : Factorial Approximation}
-
-\noindent Superscripts in approximations:
-
-\bigskip
-
-\noindent $n^n$ $>$ n!
-
-\bigskip
-
-\noindent For $n \geq 1$, n to the power n exceeds n factorial.
-
-\bigskip
-
-\section*{Example 23 : Best Practices}
-\addcontentsline{toc}{section}{Example 23 : Best Practices}
+\section*{Example 16 : Best Practices}
+\addcontentsline{toc}{section}{Example 16 : Best Practices}
 
 \noindent Guidelines for subscripts and superscripts:
 
 \bigskip
 
-\noindent 1. Use subscripts for indices, versions, or families (x\_1,
-x\_i, S\_k)
+\noindent 1. Use subscripts for indices, versions, or families
 
 \bigskip
 
-\noindent 2. Use superscripts for exponents and powers ($x^2$, $n^k$, $2^n$)
+\noindent 2. Use superscripts for exponents and powers
 
 \bigskip
 
-\noindent 3. Parenthesize complex expressions: (x+1)^2, not x+$1^2$
+\noindent 3. For nested exponents, define a pow function
 
 \bigskip
 
@@ -388,57 +282,7 @@ x\_i, S\_k)
 
 \bigskip
 
-\noindent 5. Document what subscripts mean (time steps, indices, identifiers)
-
-\bigskip
-
-\noindent 6. Avoid deeply nested subscripts—hurts readability
-
-\bigskip
-
-\section*{Example 24 : Common Pitfalls}
-\addcontentsline{toc}{section}{Example 24 : Common Pitfalls}
-
-\noindent Operator precedence matters:
-
-\bigskip
-
-\noindent x + $y^2$ means x + ($y^2$), not (x+y)^2
-
-\bigskip
-
-\noindent 2 * $x^2$ means 2 * ($x^2$), not (2*x)^2
-
-\bigskip
-
-\noindent Use parentheses when in doubt: (x + y)^2 is unambiguous.
-
-\bigskip
-
-\section*{Example 25 : Typographical Rendering}
-\addcontentsline{toc}{section}{Example 25 : Typographical Rendering}
-
-\noindent In LaTeX output:
-
-\bigskip
-
-\noindent - x\_1 renders as x with subscript 1
-
-\bigskip
-
-\noindent - $x^2$ renders as x with superscript 2
-
-\bigskip
-
-\noindent - $x_i^2$ renders as x with subscript i and superscript 2
-
-\bigskip
-
-\noindent - ($x^2$)^3 renders with proper nesting
-
-\bigskip
-
-\noindent The txt2tex compiler handles the LaTeX generation automatically.
+\noindent 5. Document what subscripts mean
 
 \bigskip
 

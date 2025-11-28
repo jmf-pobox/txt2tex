@@ -56,12 +56,6 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     "P": TokenType.POWER,
     "F1": TokenType.FINSET1,
     "F": TokenType.FINSET,
-    # Sequence operators
-    "head": TokenType.HEAD,
-    "tail": TokenType.TAIL,
-    "last": TokenType.LAST,
-    "front": TokenType.FRONT,
-    "rev": TokenType.REV,
     # Filter and bag operators
     "filter": TokenType.FILTER,
     "bag_union": TokenType.BAG_UNION,

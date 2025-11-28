@@ -18,11 +18,13 @@
 \noindent
 $1 \upto 10$
 
+
 \section*{Test 2 : Range with Identifiers}
 \addcontentsline{toc}{section}{Test 2 : Range with Identifiers}
 
 \noindent
 $1993 \upto current$
+
 
 \section*{Test 3 : Range elem Set Comprehension}
 \addcontentsline{toc}{section}{Test 3 : Range elem Set Comprehension}
@@ -30,19 +32,21 @@ $1993 \upto current$
 \noindent
 $\{~ x : 1 \upto 20 | x \mod 2 = 0 ~\}$
 
+
 \section*{Test 4 : Range with Expressions}
 \addcontentsline{toc}{section}{Test 4 : Range with Expressions}
 
 \noindent
 $a + 1 \upto b + 2$
 
+
 \section*{Test 5 : Range elem Schema}
 \addcontentsline{toc}{section}{Test 5 : Range elem Schema}
 
 \begin{schema}{ValidYear}
-  year : 1900 \upto 2100
-  \where
-  year \geq 1900
+year : 1900 \upto 2100
+\where
+year \geq 1900
 \end{schema}
 
 \section*{Test 6 : Union of Ranges}
@@ -51,16 +55,19 @@ $a + 1 \upto b + 2$
 \noindent
 $1 \upto 5 \cup 10 \upto 15$
 
+
 \section*{Test 7 : Range with Tuple Projections}
 \addcontentsline{toc}{section}{Test 7 : Range with Tuple Projections}
 
 \noindent
 $p.1 \upto p.2$
 
+
 \section*{Test 8 : Complex Set Comprehension}
 \addcontentsline{toc}{section}{Test 8 : Complex Set Comprehension}
 
 \noindent
 $\{~ x : 1 \upto 10 | x > 3 @ x \bsup 2 \esup ~\}$
+
 
 \end{document}

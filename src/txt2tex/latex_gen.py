@@ -154,12 +154,6 @@ class LaTeXGenerator:
         "F1": r"\finset_1",  # Non-empty finite set
         "bigcup": r"\bigcup",  # Distributed union
         "bigcap": r"\bigcap",  # Distributed intersection
-        # Sequence operators
-        "head": r"\head",  # First element
-        "tail": r"\tail",  # All but first
-        "last": r"\last",  # Last element
-        "front": r"\front",  # All but last
-        "rev": r"\rev",  # Reverse sequence
         # Postfix operators - special handling needed
         "~": r"^{-1}",  # Relational inverse (superscript -1)
         "+": r"^{+}",  # Transitive closure (superscript +)
@@ -869,11 +863,6 @@ class LaTeXGenerator:
             "ran",
             "inv",
             "id",
-            "head",
-            "tail",
-            "last",
-            "front",
-            "rev",
             "P",
             "P1",
             "F",
@@ -1715,7 +1704,8 @@ class LaTeXGenerator:
     def _generate_section(self, node: Section) -> list[str]:
         """Generate LaTeX for section."""
         lines: list[str] = []
-        lines.append(r"\section*{" + node.title + "}")
+        title = self._convert_unicode_symbols(node.title)
+        lines.append(r"\section*{" + title + "}")
         lines.append("")
 
         for item in node.items:
@@ -2049,6 +2039,49 @@ class LaTeXGenerator:
 
         return result
 
+    def _convert_unicode_symbols(self, text: str) -> str:
+        """Convert Unicode symbols to LaTeX equivalents.
+
+        Used for section titles and other contexts where Unicode may appear
+        but needs to be rendered as LaTeX math.
+        """
+        # Map of Unicode symbols to LaTeX (wrapped in $...$)
+        replacements = [
+            ("∈", r"$\in$"),
+            ("∉", r"$\notin$"),
+            ("⊂", r"$\subset$"),
+            ("⊆", r"$\subseteq$"),
+            ("⊃", r"$\supset$"),
+            ("⊇", r"$\supseteq$"),
+            ("∪", r"$\cup$"),  # noqa: RUF001
+            ("∩", r"$\cap$"),
+            ("∅", r"$\emptyset$"),
+            ("∀", r"$\forall$"),
+            ("∃", r"$\exists$"),
+            ("¬", r"$\lnot$"),
+            ("∧", r"$\land$"),
+            ("∨", r"$\lor$"),  # noqa: RUF001
+            ("⇒", r"$\Rightarrow$"),
+            ("⇔", r"$\Leftrightarrow$"),
+            ("⊢", r"$\vdash$"),
+            ("μ", r"$\mu$"),
+            ("λ", r"$\lambda$"),
+            ("×", r"$\cross$"),  # noqa: RUF001
+            ("ℕ", r"$\nat$"),  # noqa: RUF001
+            ("ℤ", r"$\num$"),  # noqa: RUF001
+            ("⌢", r"$\cat$"),
+            ("≤", r"$\leq$"),
+            ("≥", r"$\geq$"),
+            ("≠", r"$\neq$"),
+            ("→", r"$\rightarrow$"),
+            ("←", r"$\leftarrow$"),
+            ("↔", r"$\leftrightarrow$"),
+        ]
+        result = text
+        for symbol, latex in replacements:
+            result = result.replace(symbol, latex)
+        return result
+
     def _process_paragraph_text(self, text: str) -> str:
         """Process paragraph text: convert operators, handle inline math, etc.
 
@@ -2112,6 +2145,36 @@ class LaTeXGenerator:
         text = self._replace_outside_math(text, "⊎", r"\uplus")  # Bag union (Unicode)
         # Bag union (ASCII)
         text = self._replace_outside_math(text, " bag_union ", r" \uplus ")
+
+        # Additional Unicode symbols that need conversion in TEXT blocks
+        text = self._replace_outside_math(text, "∈", r"\in")  # Element of
+        text = self._replace_outside_math(text, "∉", r"\notin")  # Not element of
+        text = self._replace_outside_math(text, "⊂", r"\subset")  # Proper subset
+        text = self._replace_outside_math(text, "⊆", r"\subseteq")  # Subset or equal
+        text = self._replace_outside_math(text, "⊃", r"\supset")  # Proper superset
+        text = self._replace_outside_math(text, "⊇", r"\supseteq")  # Superset or equal
+        text = self._replace_outside_math(text, "∪", r"\cup")  # noqa: RUF001
+        text = self._replace_outside_math(text, "∩", r"\cap")  # Intersection
+        text = self._replace_outside_math(text, "∅", r"\emptyset")  # Empty set
+        text = self._replace_outside_math(text, "∀", r"\forall")  # For all
+        text = self._replace_outside_math(text, "∃", r"\exists")  # Exists
+        text = self._replace_outside_math(text, "¬", r"\lnot")  # Negation
+        text = self._replace_outside_math(text, "∧", r"\land")  # Logical and
+        text = self._replace_outside_math(text, "∨", r"\lor")  # noqa: RUF001
+        text = self._replace_outside_math(text, "⇒", r"\Rightarrow")  # Implies
+        text = self._replace_outside_math(text, "⇔", r"\Leftrightarrow")  # Iff
+        text = self._replace_outside_math(text, "⊢", r"\vdash")  # Turnstile
+        text = self._replace_outside_math(text, "μ", r"\mu")  # Mu
+        text = self._replace_outside_math(text, "λ", r"\lambda")  # Lambda
+        text = self._replace_outside_math(text, "×", r"\cross")  # noqa: RUF001
+        text = self._replace_outside_math(text, "ℕ", r"\nat")  # noqa: RUF001
+        text = self._replace_outside_math(text, "ℤ", r"\num")  # noqa: RUF001
+        text = self._replace_outside_math(text, "≤", r"\leq")
+        text = self._replace_outside_math(text, "≥", r"\geq")
+        text = self._replace_outside_math(text, "≠", r"\neq")
+        text = self._replace_outside_math(text, "→", r"\rightarrow")
+        text = self._replace_outside_math(text, "←", r"\leftarrow")
+        text = self._replace_outside_math(text, "↔", r"\leftrightarrow")
 
         # Convert keywords to symbols (QA fixes)
         # Negative lookbehind (?<!\\) ensures we don't match LaTeX commands like \forall

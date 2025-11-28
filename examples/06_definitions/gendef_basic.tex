@@ -21,13 +21,11 @@
 
 \begin{gendef}[X]
   identityGB: X \fun X
-  \where
+\where
   \forall x : X @ identityGB(x) = x
 \end{gendef}
 
-\noindent This defines identityGB polymorphically. It can be used
-with any type: identityGB applied to a natural number returns that
-number, identityGB applied to a set returns that set, etc.
+\noindent This defines identityGB polymorphically. It can be used with any type: identityGB applied to a natural number returns that number, identityGB applied to a set returns that set, etc.
 
 \bigskip
 
@@ -40,7 +38,7 @@ number, identityGB applied to a set returns that set, etc.
 
 \begin{gendef}[X]
   empty: \power X
-  \where
+\where
   empty = \{\}
 \end{gendef}
 
@@ -57,7 +55,7 @@ number, identityGB applied to a set returns that set, etc.
 
 \begin{gendef}[X, Y]
   fst: X \cross Y \fun X
-  \where
+\where
   \forall x : X @ \forall y : Y @ fst(x, y) = x
 \end{gendef}
 
@@ -67,7 +65,7 @@ number, identityGB applied to a set returns that set, etc.
 
 \begin{gendef}[X, Y]
   snd: X \cross Y \fun Y
-  \where
+\where
   \forall x : X @ \forall y : Y @ snd(x, y) = y
 \end{gendef}
 
@@ -84,7 +82,7 @@ number, identityGB applied to a set returns that set, etc.
 
 \begin{gendef}[X]
   singleton: X \fun \power X
-  \where
+\where
   \forall x : X @ singleton(x) = \{x\}
 \end{gendef}
 
@@ -101,7 +99,7 @@ number, identityGB applied to a set returns that set, etc.
 
 \begin{gendef}[X]
   headOf: \seq~X \fun X
-  \where
+\where
   \forall s : \seq~X | \# s > 0 @ headOf(s) = s(1)
 \end{gendef}
 
@@ -110,24 +108,16 @@ number, identityGB applied to a set returns that set, etc.
 \bigskip
 
 \section*{Example 6 : Generic Set Membership ( Conceptual )}
-\addcontentsline{toc}{section}{Example 6 : Generic Set Membership (
-Conceptual )}
+\addcontentsline{toc}{section}{Example 6 : Generic Set Membership ( Conceptual )}
 
-\noindent Set membership can be tested using the built-in 'in'
-operator in Z notation. In other contexts, you might define a
-membership test function, but Z notation provides this as a primitive
-predicate: x in S is true exactly when x is an element of S.
+\noindent Set membership can be tested using the built-in 'in' operator in Z notation. In other contexts, you might define a membership test function, but Z notation provides this as a primitive predicate: x in S is true exactly when x is an element of S.
 
 \bigskip
 
 \section*{Example 7 : Generic Optional Type ( Conceptual )}
 \addcontentsline{toc}{section}{Example 7 : Generic Optional Type ( Conceptual )}
 
-\noindent Optional values can be modeled with free types in Z
-notation. For a specific type, you would $define : Option$ ::= none
-$\mid$ some⟨T⟩. Generic optional types require more complex setup
-beyond basic gendef blocks, as free types in Z are typically defined
-for specific types rather than being polymorphic.
+\noindent Optional values can be modeled with free types in Z notation. For a specific type, you would $define : Option$ ::= none $\mid$ some⟨T⟩. Generic optional types require more complex setup beyond basic gendef blocks, as free types in Z are typically defined for specific types rather than being polymorphic.
 
 \bigskip
 
@@ -140,7 +130,7 @@ for specific types rather than being polymorphic.
 
 \begin{gendef}[X, Y]
   swap: X \cross Y \fun Y \cross X
-  \where
+\where
   \forall x : X @ \forall y : Y @ swap(x, y) = (y, x)
 \end{gendef}
 
@@ -157,7 +147,7 @@ for specific types rather than being polymorphic.
 
 \begin{gendef}[X]
   size: \power X \fun \nat
-  \where
+\where
   \forall S : \power X @ size(S) = \# S
 \end{gendef}
 
@@ -174,7 +164,7 @@ for specific types rather than being polymorphic.
 
 \begin{gendef}[X]
   single: X \fun \seq~X
-  \where
+\where
   \forall x : X @ single(x) = \langle x \rangle
 \end{gendef}
 
@@ -185,22 +175,19 @@ for specific types rather than being polymorphic.
 \section*{Example 11 : Using Generic Definitions}
 \addcontentsline{toc}{section}{Example 11 : Using Generic Definitions}
 
-\noindent Once defined, generic functions can be instantiated for
-specific types:
+\noindent Once defined, generic functions can be instantiated for specific types:
 
 \bigskip
 
 \begin{axdef}
-  id\_nat : \nat \fun \nat \\
-  id\_set : \power \nat \fun \power \nat
-  \where
-  id\_nat = identityGB[\nat] \\
-  id\_set = identityGB[\power \nat]
+id\_nat : \nat \fun \nat \\
+id\_set : \power \nat \fun \power \nat
+\where
+id\_nat = identityGB[\nat] \\
+id\_set = identityGB[\power \nat]
 \end{axdef}
 
-\noindent Here identityGB[N] is the identityGB function instantiated
-for natural numbers, and identityGB[P N] is instantiated for sets of
-natural numbers.
+\noindent Here identityGB[N] is the identityGB function instantiated for natural numbers, and identityGB[P N] is instantiated for sets of natural numbers.
 
 \bigskip
 
@@ -213,12 +200,11 @@ natural numbers.
 
 \begin{gendef}[X]
   emptySeq: \seq~X
-  \where
+\where
   emptySeq = \langle \rangle
 \end{gendef}
 
-\noindent This can be instantiated as emptySeq[N] for an empty
-sequence of naturals, emptySeq[Person] for an empty sequence of persons, etc.
+\noindent This can be instantiated as emptySeq[N] for an empty sequence of naturals, emptySeq[Person] for an empty sequence of persons, etc.
 
 \bigskip
 

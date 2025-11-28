@@ -12,12 +12,11 @@
 
 \section*{Phase 39 : Strict Subset Operator}
 
-\noindent The strict subset operator (psubset, ⊂) represents proper
-subset relationships, where A is a subset of B AND A is not equal to B.
+\noindent The strict subset operator (psubset, $\subset$) represents proper subset relationships, where A is a subset of B AND A is not equal to B.
 
 \bigskip
 
-\noindent Distinction from subset (⊆):
+\noindent Distinction from subset ($\subseteq$):
 
 \bigskip
 
@@ -25,8 +24,7 @@ subset relationships, where A is a subset of B AND A is not equal to B.
 
 \bigskip
 
-\noindent - A psubset B means: every element of A is $\in$ B AND $A
-\neq B$ (strict inequality)
+\noindent - A psubset B means: every element of A is $\in$ B AND $A \neq B$ (strict inequality)
 
 \bigskip
 
@@ -34,14 +32,13 @@ subset relationships, where A is a subset of B AND A is not equal to B.
 \addcontentsline{toc}{section}{Example 1 : Basic Strict Subset}
 
 \begin{axdef}
-  A : \power \nat \\
-  B : \power \nat
-  \where
-  A = \{1, 2, 3\} \land B = \{1, 2, 3, 4, 5\} \land A \subset B
+A : \power \nat \\
+B : \power \nat
+\where
+A = \{1, 2, 3\} \land B = \{1, 2, 3, 4, 5\} \land A \subset B
 \end{axdef}
 
-\noindent Here A psubset B holds because all elements of A are in B,
-and A contains fewer elements than B.
+\noindent Here A psubset B holds because all elements of A are in B, and A contains fewer elements than B.
 
 \bigskip
 
@@ -49,20 +46,18 @@ and A contains fewer elements than B.
 \addcontentsline{toc}{section}{Example 2 : Comparing subset land psubset}
 
 \begin{axdef}
-  X : \power \nat \\
-  Y : \power \nat \\
-  W : \power \nat
-  \where
-  X = \{1, 2\} \land Y = \{1, 2, 3\} \land W = \{1, 2\} \land X
-  \subset Y \land X \subseteq W
+X : \power \nat \\
+Y : \power \nat \\
+W : \power \nat
+\where
+X = \{1, 2\} \land Y = \{1, 2, 3\} \land W = \{1, 2\} \land X \subset Y \land X \subseteq W
 \end{axdef}
 
 \noindent X psubset Y is true (X is strictly contained in Y)
 
 \bigskip
 
-\noindent X subset W is true (X is a subset of W, including the case
-where $X = W$)
+\noindent X subset W is true (X is a subset of W, including the case where $X = W$)
 
 \bigskip
 
@@ -74,10 +69,10 @@ where $X = W$)
 \addcontentsline{toc}{section}{Example 3 : Empty Set}
 
 \begin{axdef}
-  emptySet : \power \nat \\
-  anySet : \power \nat
-  \where
-  emptySet = \{\} \land anySet = \{1, 2, 3\} \land emptySet \subset anySet
+emptySet : \power \nat \\
+anySet : \power \nat
+\where
+emptySet = \{\} \land anySet = \{1, 2, 3\} \land emptySet \subset anySet
 \end{axdef}
 
 \noindent The empty set is a strict subset of any non-empty set.
@@ -92,30 +87,27 @@ where $X = W$)
 \bigskip
 
 \begin{axdef}
-  A1 : \power \nat \\
-  B1 : \power \nat \\
-  C1 : \power \nat
-  \where
-  A1 = \{1\} \land B1 = \{1, 2\} \land C1 = \{1, 2, 3\} \land A1
-  \subset B1 \land B1 \subset C1 \land A1 \subset C1
+A1 : \power \nat \\
+B1 : \power \nat \\
+C1 : \power \nat
+\where
+A1 = \{1\} \land B1 = \{1, 2\} \land C1 = \{1, 2, 3\} \land A1 \subset B1 \land B1 \subset C1 \land A1 \subset C1
 \end{axdef}
 
 \section*{Example 5 : Set Hierarchy}
 \addcontentsline{toc}{section}{Example 5 : Set Hierarchy}
 
-\begin{zed}[PersonSS]
-\end{zed}
+\begin{zed}[PersonSS]\end{zed}
 
 \begin{axdef}
-  students : \power PersonSS \\
-  grads : \power PersonSS \\
-  phds : \power PersonSS
-  \where
-  phds \subset grads \land grads \subset students
+students : \power PersonSS \\
+grads : \power PersonSS \\
+phds : \power PersonSS
+\where
+phds \subset grads \land grads \subset students
 \end{axdef}
 
-\noindent PhD students are a strict subset of graduate students,
-which are a strict subset of all students.
+\noindent PhD students are a strict subset of graduate students, which are a strict subset of all students.
 
 \bigskip
 

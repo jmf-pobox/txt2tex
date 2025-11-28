@@ -101,12 +101,12 @@ class TestConditionalLaTeX:
         assert "\\lnot" in result or "-x" in result
 
     def test_conditional_empty_sequence_latex(self):
-        """Test if s = <> then 0 else head s → LaTeX."""
-        result = generate_latex("if s = <> then 0 else head s")
+        """Test if s = <> then 0 else 1 → LaTeX."""
+        result = generate_latex("if s = <> then 0 else 1")
         assert "\\mbox{if }" in result
         assert "s = \\langle \\rangle" in result
         assert "\\mbox{ then } 0" in result
-        assert "\\head" in result
+        assert "\\mbox{ else } 1" in result
 
     def test_conditional_with_arithmetic_latex(self):
         """Test if x > 0 then x * 2 else x - 1 → LaTeX."""
@@ -164,18 +164,17 @@ class TestPhase16Integration:
         assert "abs(x) =" in latex
         assert "\\mbox{if }" in latex
 
-    def test_conditional_in_sequence_pattern(self):
-        """Test conditional elem recursive sequence function."""
-        text = "f(s) = if s = <> then 0 else head s + f(tail s)"
+    def test_conditional_in_recursive_function(self):
+        """Test conditional in recursive function."""
+        text = "f(n) = if n = 0 then 1 else n * f(n - 1)"
         ast = parse_expr(text)
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "="
         assert isinstance(ast.right, Conditional)
         latex = generate_latex(text)
         assert "\\mbox{if }" in latex
-        assert "s = \\langle \\rangle" in latex
-        assert "\\head" in latex
-        assert "\\tail" in latex
+        assert "n = 0" in latex
+        assert "f(n - 1)" in latex
 
     def test_max_function(self):
         """Test max(x, y) = if x > y then x else y."""

@@ -10,12 +10,11 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\noindent The "shows" operator represents sequent judgment, written
-as ⊢ (turnstile).
+\noindent The "shows" operator represents sequent judgment (turnstile).
 
 \bigskip
 
-\noindent In sequent calculus, Γ ⊢ Δ means "from context Γ, we can derive Δ".
+\noindent In sequent calculus, "Gamma shows Delta" means "from context Gamma, we can derive Delta".
 
 \bigskip
 
@@ -26,6 +25,7 @@ as ⊢ (turnstile).
 \noindent
 $Gamma \shows Delta$
 
+
 \noindent More concrete example with specific propositions:
 
 \bigskip
@@ -33,12 +33,14 @@ $Gamma \shows Delta$
 \noindent
 $(\power \land Q) \shows \power$
 
+
 \noindent Sequent with multiple context items (using sets):
 
 \bigskip
 
 \noindent
 $\{\power, \power \implies Q\} \shows Q$
+
 
 \noindent We can use shows in inference rules to represent natural deduction:
 
@@ -62,7 +64,7 @@ $\{\power, \power \implies Q\} \shows Q$
   Gamma \shows (A \land B) & \mbox{conjunction introduction}
 \end{infrule}
 
-\noindent The shows operator renders as \shows in LaTeX, which displays as ⊢.
+\noindent The shows operator renders as the turnstile symbol in LaTeX.
 
 \bigskip
 

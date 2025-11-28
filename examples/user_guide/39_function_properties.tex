@@ -11,21 +11,21 @@
 \begin{document}
 
 \begin{zed}
-  [StudentId, Student]
+[StudentId, Student]
 \end{zed}
 
 \begin{axdef}
-  studentRecord : StudentId \inj Student
-  \where
-  \forall id1, id2 : StudentId @ \\
-  \t1 id1 \neq id2 \implies studentRecord(id1) \neq studentRecord(id2)
+studentRecord : StudentId \inj Student
+\where
+\forall id1, id2 : StudentId @ \\
+\t1 id1 \neq id2 \implies studentRecord(id1) \neq studentRecord(id2)
 \end{axdef}
 
 \begin{axdef}
-  modulo3 : \nat \surj \{0, 1, 2\}
-  \where
-  \forall n : \nat @ modulo3(n) = n \mod 3 \land \\
-  \t1 (\forall r : \{0, 1, 2\} @ \exists n : \nat @ modulo3(n) = r)
+modulo3 : \nat \surj \{0, 1, 2\}
+\where
+\forall n : \nat @ modulo3(n) = n \mod 3 \land \\
+\t1 (\forall r : \{0, 1, 2\} @ \exists n : \nat @ modulo3(n) = r)
 \end{axdef}
 
 \end{document}

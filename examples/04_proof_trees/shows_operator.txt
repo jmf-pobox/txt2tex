@@ -1,9 +1,9 @@
 // Example: shows operator (Sequent Judgment)
-// Demonstrates the turnstile operator (⊢) for sequent calculus
+// Demonstrates the turnstile operator for sequent calculus
 // From ZED2E_ALIGNMENT_PLAN.md - inference rules
 
-TEXT: The "shows" operator represents sequent judgment, written as ⊢ (turnstile).
-TEXT: In sequent calculus, Γ ⊢ Δ means "from context Γ, we can derive Δ".
+TEXT: The "shows" operator represents sequent judgment (turnstile).
+TEXT: In sequent calculus, "Gamma shows Delta" means "from context Gamma, we can derive Delta".
 
 TEXT: Simple sequent judgment:
 
@@ -33,4 +33,4 @@ Gamma shows B
 ---
 Gamma shows (A land B) [conjunction introduction]
 
-TEXT: The shows operator renders as \shows in LaTeX, which displays as ⊢.
+TEXT: The shows operator renders as the turnstile symbol in LaTeX.

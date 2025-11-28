@@ -28,10 +28,10 @@ SUBDIRS := 01_propositional_logic 02_predicate_logic 03_equality 04_proof_trees 
 .PHONY: all
 all: $(PDF_FILES)
 
-# Pattern rule: .txt -> .pdf (using hatch run convert with fuzz type checking)
+# Pattern rule: .txt -> .pdf (using txt2tex CLI via hatch)
 %.pdf: %.txt
 	@echo "Building $@..."
-	@cd .. && hatch run convert examples/$< --typecheck || (echo "Error building $@"; exit 1)
+	@cd .. && hatch run python3 -m txt2tex.cli examples/$< || (echo "Error building $@"; exit 1)
 
 # Subdirectory targets for convenience
 .PHONY: $(SUBDIRS)
@@ -39,7 +39,7 @@ $(SUBDIRS):
 	@echo "Building examples in $@..."
 	@for f in $@/*.txt; do \
 		if [ -f "$$f" ]; then \
-			cd .. && hatch run convert "examples/$$f" --typecheck || (echo "Error building $$f"; exit 1); \
+			cd .. && hatch run python3 -m txt2tex.cli "examples/$$f" || (echo "Error building $$f"; exit 1); \
 		fi; \
 	done
 

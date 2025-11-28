@@ -12,30 +12,25 @@
 
 \section*{Phase 34 : Finite Partial Functions}
 
-\noindent Finite partial functions are partial functions with a
-finite domain. The $operator \ffun denotes$ a finite partial
-function, meaning the function may not be defined everywhere, and its
-domain must be finite.
+\noindent Finite partial functions are partial functions with a finite domain. The $operator \ffun denotes$ a finite partial function, meaning the function may not be defined everywhere, and its domain must be finite.
 
 \bigskip
 
 \section*{Example 1 : Basic Finite Function Type}
 \addcontentsline{toc}{section}{Example 1 : Basic Finite Function Type}
 
-\noindent A finite partial function from X to Y is a partial function
-whose domain is finite. This is useful when modeling resources with
-limited capacity or databases with a bounded number of entries.
+\noindent A finite partial function from X to Y is a partial function whose domain is finite. This is useful when modeling resources with limited capacity or databases with a bounded number of entries.
 
 \bigskip
 
 \begin{zed}
-  [Year, TableFF]
+[Year, TableFF]
 \end{zed}
 
 \begin{axdef}
-  records : Year \ffun TableFF
-  \where
-  \# (\dom records) \leq 1000
+records : Year \ffun TableFF
+\where
+\# (\dom records) \leq 1000
 \end{axdef}
 
 \noindent The records relation is a finite partial function because:
@@ -61,38 +56,33 @@ limited capacity or databases with a bounded number of entries.
 
 \bigskip
 
-\noindent - Total function ($\fun$): defined for all inputs, domain
-is entire source set
+\noindent - Total function ($\fun$): defined for all inputs, domain is entire source set
 
 \bigskip
 
-\noindent - Partial function ($\pfun$): may not be defined for all
-inputs, domain may be infinite
+\noindent - Partial function ($\pfun$): may not be defined for all inputs, domain may be infinite
 
 \bigskip
 
-\noindent - Finite partial function ($\ffun$): partial function with
-finite domain
+\noindent - Finite partial function ($\ffun$): partial function with finite domain
 
 \bigskip
 
-\noindent - Total bijection ($\bij$): defined everywhere, injective
-and surjective
+\noindent - Total bijection ($\bij$): defined everywhere, injective and surjective
 
 \bigskip
 
 \begin{zed}
-  [X, Y]
+[X, Y]
 \end{zed}
 
 \begin{axdef}
-  totalFunc : X \fun Y \\
-  partialFunc : X \pfun Y \\
-  finitePartialFunc : X \ffun Y \\
-  totalBij : X \bij Y
-  \where
-  \dom totalFunc = X \land \dom totalBij = X \land (\forall x1, x2 :
-  X | totalBij(x1) = totalBij(x2) @ x1 = x2) \land \ran totalBij = Y
+totalFunc : X \fun Y \\
+partialFunc : X \pfun Y \\
+finitePartialFunc : X \ffun Y \\
+totalBij : X \bij Y
+\where
+\dom totalFunc = X \land \dom totalBij = X \land (\forall x1, x2 : X | totalBij(x1) = totalBij(x2) @ x1 = x2) \land \ran totalBij = Y
 \end{axdef}
 
 \section*{Example 3 : Finite Functions elem Practice}
@@ -103,13 +93,13 @@ and surjective
 \bigskip
 
 \begin{zed}
-  [CustomerID, Preference]
+[CustomerID, Preference]
 \end{zed}
 
 \begin{axdef}
-  preferences : CustomerID \ffun Preference
-  \where
-  \# (\dom preferences) \leq 10000
+preferences : CustomerID \ffun Preference
+\where
+\# (\dom preferences) \leq 10000
 \end{axdef}
 
 \noindent This models a preference database where:
@@ -132,28 +122,26 @@ and surjective
 \addcontentsline{toc}{section}{Example 4 : Operations on Finite Functions}
 
 \begin{axdef}
-  f : \nat \ffun \nat \\
-  g : \nat \ffun \nat
-  \where
-  f = \{1 \mapsto 10, 2 \mapsto 20, 3 \mapsto 30\} \land \\
-  \quad g = \{10 \mapsto 100, 20 \mapsto 200\} \land \\
-  \quad \# (\dom f) = 3 \land \\
-  \quad \# (\dom g) = 2
+f : \nat \ffun \nat \\
+g : \nat \ffun \nat
+\where
+f = \{1 \mapsto 10, 2 \mapsto 20, 3 \mapsto 30\} \land \\
+\quad g = \{10 \mapsto 100, 20 \mapsto 200\} \land \\
+\quad \# (\dom f) = 3 \land \\
+\quad \# (\dom g) = 2
 \end{axdef}
 
-\noindent We can compose finite functions, but the result may not be
-finite unless proven.
+\noindent We can compose finite functions, but the result may not be finite unless proven.
 
 \bigskip
 
 \begin{axdef}
-  f\_composed : \nat \ffun \nat
-  \where
-  f\_composed = g \circ f \land \# (\dom f\_composed) \leq \# (\dom f)
+f\_composed : \nat \ffun \nat
+\where
+f\_composed = g \circ f \land \# (\dom f\_composed) \leq \# (\dom f)
 \end{axdef}
 
-\noindent The composition has a domain size bounded by the domain of
-f, since we can only compose where f's range intersects g's domain.
+\noindent The composition has a domain size bounded by the domain of f, since we can only compose where f's range intersects g's domain.
 
 \bigskip
 
@@ -161,22 +149,20 @@ f, since we can only compose where f's range intersects g's domain.
 \addcontentsline{toc}{section}{Example 5 : Domain Restrictions land Finiteness}
 
 \begin{zed}
-  [Title, Length, ViewDate]
+[Title, Length, ViewDate]
 \end{zed}
 
 \begin{axdef}
-  viewed : Title \ffun ViewDate \\
-  recent\_viewed : Title \ffun ViewDate \\
-  recentSet : \power Title
-  \where
-  recentSet = \{~ t : Title | t \in \dom viewed ~\} \land \\
-  \quad recent\_viewed = recentSet \dres viewed \land \\
-  \quad \# (\dom recent\_viewed) \leq \# (\dom viewed)
+viewed : Title \ffun ViewDate \\
+recent\_viewed : Title \ffun ViewDate \\
+recentSet : \power Title
+\where
+recentSet = \{~ t : Title | t \in \dom viewed ~\} \land \\
+\quad recent\_viewed = recentSet \dres viewed \land \\
+\quad \# (\dom recent\_viewed) \leq \# (\dom viewed)
 \end{axdef}
 
-\noindent Restricting a finite partial function preserves finiteness.
-The recent\_viewed function has a domain that is a subset of viewed's
-domain, so it remains finite.
+\noindent Restricting a finite partial function preserves finiteness. The recent\_viewed function has a domain that is a subset of viewed's domain, so it remains finite.
 
 \bigskip
 
