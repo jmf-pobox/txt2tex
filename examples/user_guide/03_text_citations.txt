@@ -2,6 +2,9 @@
 // Demonstrates citation handling in smart text
 // From USER_GUIDE.md - Text Blocks section
 
+BIBLIOGRAPHY: references.bib
+BIBLIOGRAPHY_STYLE: plainnat
+
 TEXT: The proof technique follows [cite spivey92].
 TEXT: This is discussed in [cite spivey92 p. 42].
 TEXT: See the definition in [cite woodcock96 p. 15].
