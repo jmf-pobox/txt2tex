@@ -19,22 +19,28 @@ Perfect for:
 
 ---
 
-## Quick Start
+## Installation
 
-### Prerequisites
+### Install from PyPI
+
+```bash
+pip install txt2tex
+```
+
+### Prerequisites for PDF Generation
 
 - **Python 3.10+**
 - **LaTeX distribution** (TeX Live recommended)
-- **hatch** (for running commands)
-- **[fuzz](https://github.com/jmf-pobox/fuzz)** (optional but recommended for type checking)
+
+### Verify Installation
 
 ```bash
-# Install hatch if needed
-pip install hatch
-
-# Verify installation
-hatch run cli --help
+txt2tex --help
 ```
+
+---
+
+## Quick Start
 
 ### Syntax at a Glance
 
@@ -80,10 +86,18 @@ PROOF:
     p [land-elim1]
 ```
 
-Convert to PDF:
+Convert to LaTeX and PDF:
 
 ```bash
-hatch run convert example.txt
+# Generate LaTeX
+txt2tex example.txt -o example.tex
+
+# Find bundled LaTeX packages
+LATEX_DIR=$(python -c "import txt2tex; import os; print(os.path.dirname(txt2tex.__file__) + '/latex')")
+
+# Compile to PDF (copy .sty/.mf files or set TEXINPUTS)
+cp "$LATEX_DIR"/*.sty "$LATEX_DIR"/*.mf .
+pdflatex -interaction=nonstopmode example.tex
 ```
 
 Open `example.pdf` to see your beautifully formatted output!
@@ -173,24 +187,43 @@ lnot (p land q)
 
 ## Usage
 
-### Basic Conversion
+### Generate LaTeX
 
 ```bash
-# Convert txt to PDF (uses fuzz package by default)
-hatch run convert input.txt
+# Generate LaTeX (uses fuzz package by default)
+txt2tex input.txt -o input.tex
 
-# Or use the shell script
-./txt2pdf.sh input.txt
+# Use zed-* packages instead
+txt2tex input.txt --zed -o input.tex
 ```
 
-Fuzz is enabled by default, providing type checking that catches errors, undefined variables, and specification issues before you submit.
+### Compile to PDF
 
-### Without fuzz (zed-* packages)
-
-If you prefer standard LaTeX packages without fuzz type checking:
+txt2tex bundles both fuzz.sty and zed-* packages. Make them available to pdflatex:
 
 ```bash
-hatch run convert input.txt --zed
+# Find bundled LaTeX packages
+LATEX_DIR=$(python -c "import txt2tex; import os; print(os.path.dirname(txt2tex.__file__) + '/latex')")
+
+# Option A: Copy to current directory
+cp "$LATEX_DIR"/*.sty "$LATEX_DIR"/*.mf .
+
+# Option B: Set environment variables
+export TEXINPUTS="$LATEX_DIR:$TEXINPUTS"
+export MFINPUTS="$LATEX_DIR:$MFINPUTS"
+
+# Compile
+pdflatex -interaction=nonstopmode input.tex
+```
+
+### Optional: Type Checking with fuzz
+
+The bundled fuzz.sty handles LaTeX rendering. For **type checking** (catching undefined variables, type errors), build the fuzz binary:
+
+```bash
+git clone https://github.com/jmf-pobox/fuzz.git
+cd fuzz && make
+./fuzz input.tex
 ```
 
 ### LaTeX Only (No PDF)

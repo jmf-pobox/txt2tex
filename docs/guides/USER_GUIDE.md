@@ -22,78 +22,10 @@ A comprehensive guide to writing mathematical specifications in txt2tex whiteboa
 
 ## Installation
 
-### Install from PyPI
-
-```bash
-pip install txt2tex
-```
-
-### Using the CLI
-
-After installation, the `txt2tex` command is available:
-
-```bash
-# Convert a txt file to LaTeX
-txt2tex input.txt
-
-# Specify output file
-txt2tex input.txt -o output.tex
-
-# Use zed-* packages instead of fuzz (default)
-txt2tex input.txt --zed
-
-# Include parts (a, b, c) in table of contents
-txt2tex input.txt --toc-parts
-
-# Disable overflow warnings
-txt2tex input.txt --no-warn-overflow
-```
-
-### Full PDF Pipeline
-
-To convert txt2tex files to PDF, you need a LaTeX distribution (TeX Live recommended).
-
-#### Using the bundled LaTeX packages
-
-txt2tex bundles both fuzz and zed-* LaTeX packages. After generating LaTeX, you need to make these available to pdflatex:
-
-```bash
-# Generate LaTeX (fuzz is the default, use --zed for zed-* packages)
-txt2tex input.txt -o input.tex
-
-# Find where txt2tex installed its LaTeX files
-LATEX_DIR=$(python -c "import txt2tex; import os; print(os.path.dirname(txt2tex.__file__) + '/latex')")
-
-# Option A: Copy required files to current directory
-cp "$LATEX_DIR"/*.sty "$LATEX_DIR"/*.mf .
-
-# Option B: Or set TEXINPUTS to include the bundled files
-export TEXINPUTS="$LATEX_DIR:$TEXINPUTS"
-export MFINPUTS="$LATEX_DIR:$MFINPUTS"
-
-# Compile to PDF
-pdflatex -interaction=nonstopmode input.tex
-```
-
-**Package options:**
-- **Default (fuzz)**: Uses fuzz.sty for Z notation rendering with Oxford fonts
-- **`--zed` flag**: Uses zed-* packages with Computer Modern fonts
-
-#### Optional: fuzz typechecker binary
-
-The bundled `fuzz.sty` handles LaTeX rendering. For **type checking** your Z specifications (catching undefined variables, type mismatches, etc.), you need the separate fuzz binary:
-
-```bash
-# Clone and build the fuzz typechecker
-git clone https://github.com/jmf-pobox/fuzz.git
-cd fuzz
-make
-
-# Run type checking on your .tex file
-./fuzz input.tex
-```
-
-Type checking is optional but recommended for catching specification errors before submission.
+See [README.md](../../README.md) for installation instructions, including:
+- Installing via `pip install txt2tex`
+- Setting up LaTeX packages for PDF generation
+- Optional fuzz typechecker binary
 
 ---
 
