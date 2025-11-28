@@ -1,6 +1,6 @@
 # Reserved Words and Operator Mappings
 
-**Last Updated:** 2025-11-26
+**Last Updated:** 2025-11-28
 **Purpose:** Complete reference of all ASCII keywords/operators and their Unicode/LaTeX mappings
 
 ---
@@ -17,9 +17,9 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 
 | ASCII Keyword | Unicode Alternative | LaTeX Output | Description | Phase |
 |--------------|---------------------|--------------|-------------|-------|
-| `and` | ∧ (U+2227) | `\land` | Logical conjunction | 2 |
-| `or` | ∨ (U+2228) | `\lor` | Logical disjunction | 2 |
-| `not` | ¬ (U+00AC) | `\lnot` | Logical negation | 2 |
+| `land` | ∧ (U+2227) | `\land` | Logical conjunction | 2 |
+| `lor` | ∨ (U+2228) | `\lor` | Logical disjunction | 2 |
+| `lnot` | ¬ (U+00AC) | `\lnot` | Logical negation | 2 |
 | `=>` | → (U+2192) | `\implies` | Logical implication | 2 |
 | `<=>` | ↔ (U+2194) | `\iff` / `\Leftrightarrow` | Logical equivalence (context-dependent) | 2 |
 | `forall` | ∀ (U+2200) | `\forall` | Universal quantifier | 3 |
@@ -29,6 +29,7 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 **Notes:**
 - `<=>` renders as `\iff` in predicates (schemas, axioms, proofs)
 - `<=>` renders as `\Leftrightarrow` in EQUIV blocks (equational reasoning)
+- `and`, `or`, `not` are **deprecated** - use `land`, `lor`, `lnot` instead
 
 ---
 
@@ -36,7 +37,7 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 
 | ASCII Keyword | Unicode Alternative | LaTeX Output | Description | Phase |
 |--------------|---------------------|--------------|-------------|-------|
-| `in` | ∈ (U+2208) | `\in` | Set membership | 3 |
+| `elem` | ∈ (U+2208) | `\in` | Set membership | 3 |
 | `notin` | ∉ (U+2209) | `\notin` | Set non-membership | 3 |
 | `subset` | ⊆ (U+2286) | `\subseteq` | Subset (includes equality) | 3 |
 | `subseteq` | ⊆ (U+2286) | `\subseteq` | Subset (alternative keyword) | 3 |
@@ -45,6 +46,9 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 | `intersect` | ∩ (U+2229) | `\cap` | Set intersection | 3 |
 | `cross` | × (U+00D7) | `\cross` | Cartesian product | 11.5 |
 | `\` | ∖ (U+2216) | `\setminus` | Set difference | 11.5 |
+
+**Notes:**
+- `in` is **deprecated** - use `elem` instead (avoids ambiguity with English prose)
 
 ---
 
@@ -267,10 +271,10 @@ All reserved words are recognized by the lexer in `src/txt2tex/lexer.py`:
 - Longest-match principle applied (e.g., `+->` checked before `->`)
 
 ### Z Keywords Set
-Reserved words that prevent prose mode triggering (line 871-904 in lexer.py):
+Reserved words that prevent prose mode triggering (in lexer.py):
 ```python
 z_keywords = {
-    "and", "or", "not", "union", "intersect", "in", "notin",
+    "land", "lor", "lnot", "union", "intersect", "elem", "notin",
     "subset", "subseteq", "psubset", "cross", "dom", "ran", "inv", "id",
     "comp", "forall", "exists", "exists1", "mu", "lambda",
     "given", "axdef", "schema", "gendef", "zed",
