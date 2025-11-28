@@ -55,17 +55,26 @@ To convert txt2tex files to PDF, you need a LaTeX distribution (TeX Live recomme
 
 #### Option 1: Using zed-* packages (simplest)
 
-Use the `--zed` flag to generate LaTeX that uses standard zed-* packages (bundled with txt2tex):
+Use the `--zed` flag to generate LaTeX that uses the zed-* packages (bundled with txt2tex):
 
 ```bash
 # Generate LaTeX with zed-* packages
 txt2tex input.txt --zed -o input.tex
 
+# Find where txt2tex installed its LaTeX files
+LATEX_DIR=$(python -c "import txt2tex; import os; print(os.path.dirname(txt2tex.__file__) + '/latex')")
+
+# Copy required .sty files to current directory
+cp "$LATEX_DIR"/*.sty .
+
 # Compile to PDF
 pdflatex -interaction=nonstopmode input.tex
 ```
 
-This works with any standard TeX Live installation.
+Alternatively, set TEXINPUTS to include the bundled files:
+```bash
+TEXINPUTS="$LATEX_DIR:$TEXINPUTS" pdflatex -interaction=nonstopmode input.tex
+```
 
 #### Option 2: Using fuzz package (with type checking)
 
