@@ -10,8 +10,13 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Default to solutions.pdf if no argument
-PDF_FILE="${1:-examples/solutions.pdf}"
+# Require PDF file argument
+if [ -z "$1" ]; then
+    echo "Usage: ./qa_check.sh <pdf_file>"
+    echo "Example: ./qa_check.sh examples/01_propositional_logic/basic_operators.pdf"
+    exit 1
+fi
+PDF_FILE="$1"
 TEX_FILE="${PDF_FILE%.pdf}.tex"
 
 echo "=========================================="

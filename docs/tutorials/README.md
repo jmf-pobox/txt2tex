@@ -120,7 +120,7 @@ After completing the tutorials, explore complete formal specifications in `compl
 - **[USER_GUIDE.md](docs/guides/USER_GUIDE.md)** - Complete syntax reference
 - **[PROOF_SYNTAX.md](docs/guides/PROOF_SYNTAX.md)** - Proof tree formatting rules
 - **[DESIGN.md](docs/DESIGN.md)** - Architecture and design decisions
-- **[STATUS.md](docs/development/STATUS.md)** - Current implementation status
+- **[MISSING_FEATURES.md](../guides/MISSING_FEATURES.md)** - Features not yet implemented
 
 ## How to Use This Tutorial
 

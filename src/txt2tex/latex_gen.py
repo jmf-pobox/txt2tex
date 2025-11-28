@@ -509,7 +509,7 @@ class LaTeXGenerator:
 
         # Preamble
         # Use fleqn option to left-align all equations (no centering)
-        # a4paper for A4 page size, 10pt font (matches instructor's format)
+        # a4paper for A4 page size, 10pt font
         lines.append(r"\documentclass[a4paper,10pt,fleqn]{article}")
         # Standard 1 inch margins on all sides
         lines.append(r"\usepackage[margin=1in]{geometry}")

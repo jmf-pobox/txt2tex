@@ -331,7 +331,7 @@ A few edge cases require workarounds:
 - ✅ **WYSIWYG line breaks** - Natural formatting controls PDF output
 - ✅ **fuzz integration** - Optional type checking
 
-**For detailed status, see [docs/development/STATUS.md](docs/development/STATUS.md)**
+**For missing features, see [docs/guides/MISSING_FEATURES.md](docs/guides/MISSING_FEATURES.md)**
 
 ---
 
@@ -358,7 +358,6 @@ A few edge cases require workarounds:
 - **[docs/tutorials/10_advanced.md](docs/tutorials/10_advanced.md)** - Advanced topics
 
 ### Development Documentation
-- **[docs/development/STATUS.md](docs/development/STATUS.md)** - Implementation status
 - **[docs/development/IDE_SETUP.md](docs/development/IDE_SETUP.md)** - IDE configuration
 - **[docs/DESIGN.md](docs/DESIGN.md)** - Architecture and design decisions
 

@@ -325,4 +325,3 @@ Some operators use multiple characters:
 
 - [USER_GUIDE.md](USER_GUIDE.md) - User-facing syntax guide
 - [DESIGN.md](DESIGN.md) - Operator precedence and parsing details
-- [STATUS.md](STATUS.md) - Implementation status by phase

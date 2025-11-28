@@ -227,14 +227,12 @@ Found a new bug? Follow this workflow:
 
 4. **Update documentation**:
    - Add bug to this README
-   - Add bug to [STATUS.md](../../docs/development/STATUS.md) Bug Tracking table
    - Add bug to [ISSUES.md](../../ISSUES.md)
 
 ---
 
 ## References
 
-- **[STATUS.md](../../docs/development/STATUS.md)** - Implementation status with bug tracking table
 - **[ISSUES.md](../../ISSUES.md)** - Comprehensive issue tracking document
 - **[GitHub Issues](https://github.com/jmf-pobox/txt2tex/issues)** - Live bug tracking
 - **[FUZZ_FEATURE_GAPS.md](../../docs/guides/FUZZ_FEATURE_GAPS.md)** - Missing features vs bugs

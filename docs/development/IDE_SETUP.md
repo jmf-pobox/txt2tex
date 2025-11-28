@@ -75,22 +75,16 @@ When you save a `.tex` file, LaTeX Workshop automatically:
 
 #### 2. txt2pdf.sh Script
 ```bash
-./txt2pdf.sh hw/solutions.txt --fuzz
+./txt2pdf.sh examples/01_propositional_logic/basic_operators.txt
 ```
 
-Internally runs pdflatex twice (lines 113-124):
+Internally runs pdflatex twice:
 ```bash
-pdflatex -interaction=nonstopmode solutions.tex  # First pass
-pdflatex -interaction=nonstopmode solutions.tex  # Second pass
+pdflatex -interaction=nonstopmode basic_operators.tex  # First pass
+pdflatex -interaction=nonstopmode basic_operators.tex  # Second pass
 ```
 
 #### 3. Makefile
-```bash
-make -C hw solutions.pdf
-```
-
-Calls txt2pdf.sh, which handles double compilation.
-
 ```bash
 make -C examples all
 ```
@@ -99,7 +93,7 @@ Uses `hatch run convert`, which calls txt2pdf.sh.
 
 #### 4. Hatch Command
 ```bash
-hatch run convert hw/solutions.txt --fuzz
+hatch run convert examples/01_propositional_logic/basic_operators.txt
 ```
 
 Calls txt2pdf.sh internally.

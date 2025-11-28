@@ -24,19 +24,6 @@ SUBDIRS := 01_propositional_logic 02_predicate_logic 03_equality 04_proof_trees 
 # Set default goal to build all PDFs
 .DEFAULT_GOAL := all
 
-# Reference directory (with fuzz validation)
-# Note: Semantic errors (undeclared identifiers, type mismatches) are expected
-.PHONY: reference
-reference:
-	@echo "Building reference/compiled_solutions.pdf (with fuzz validation)..."
-	@cd .. && hatch run convert examples/reference/compiled_solutions.txt --typecheck
-	@if [ -f reference/compiled_solutions.pdf ]; then \
-		echo "✓ Successfully built reference/compiled_solutions.pdf"; \
-	else \
-		echo "✗ Failed to build reference/compiled_solutions.pdf"; \
-		exit 1; \
-	fi
-
 # Default target: build all PDFs
 .PHONY: all
 all: $(PDF_FILES)
@@ -57,7 +44,7 @@ $(SUBDIRS):
 	done
 
 # Convenient short aliases
-.PHONY: 01 02 03 04 05 06 07 08 09 fuzz ref
+.PHONY: 01 02 03 04 05 06 07 08 09 fuzz
 01: 01_propositional_logic
 02: 02_predicate_logic
 03: 03_equality
@@ -68,7 +55,6 @@ $(SUBDIRS):
 08: 08_functions
 09: 09_sequences
 fuzz: fuzz_tests
-ref: reference
 
 # Clean auxiliary files in all subdirectories
 .PHONY: clean
@@ -103,7 +89,6 @@ list:
 	@echo "  08_functions           - Build examples in 08_functions/"
 	@echo "  09_sequences           - Build examples in 09_sequences/"
 	@echo "  fuzz_tests / fuzz      - Build examples in fuzz_tests/"
-	@echo "  reference / ref        - Build reference/compiled_solutions.pdf"
 	@echo "  clean                  - Remove auxiliary files"
 	@echo "  distclean              - Remove all generated files"
 	@echo "  list                   - Show this help"

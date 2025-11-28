@@ -2175,7 +2175,7 @@ For more information:
 - **[Feature Gaps](FUZZ_FEATURE_GAPS.md)** - Known limitations and workarounds
 
 ### Development Resources
-- **[Implementation Status](../development/STATUS.md)** - Current features and roadmap
+- **[Missing Features](MISSING_FEATURES.md)** - Features not yet implemented
 - **[IDE Setup](../development/IDE_SETUP.md)** - VSCode/Cursor configuration
 - **[QA Plan](../development/QA_PLAN.md)** - Testing and validation procedures
 

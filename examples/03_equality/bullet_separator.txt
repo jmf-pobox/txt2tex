@@ -14,7 +14,7 @@
 //   - Distinguishes filter from selector
 //
 // See: docs/USER_GUIDE.md - Sections "Set Comprehensions", "Mu Operator", "Quantifiers"
-//      docs/STATUS.md - Known limitations with bullet in quantifiers
+//      Known limitation: bullet in quantifiers uses implication
 // ============================================================================
 
 === Bullet Separator Examples ===
@@ -83,7 +83,7 @@ TEXT: PROPOSED: forall x : N | x > 0 . x >= 0
 
 TEXT: This would read: "for all positive x, x is non-negative". The constraint x > 0 restricts the quantification domain.
 
-TEXT: NOTE: Full bullet support in forall/exists quantifiers is not yet implemented (see STATUS.md). Currently use implication instead:
+TEXT: NOTE: Full bullet support in forall/exists quantifiers is not yet implemented. Currently use implication instead:
 
 forall x : N | x > 0 => x >= 0
 

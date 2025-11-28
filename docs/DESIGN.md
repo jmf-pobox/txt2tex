@@ -875,7 +875,7 @@ Did you mean: forall x : N | x * x >= 0
    - Edge cases discovered during development
 
 4. **Golden Tests**
-   - Compare against reference output (solutions.pdf)
+   - Compare against expected output
    - Pixel-perfect or text-diff comparison
 
 ### Test Structure
@@ -1054,9 +1054,9 @@ txt2tex/
 ├── tests/
 │   ├── ... (as above)
 ├── examples/
-│   ├── simple.txt
-│   ├── truth_tables.txt
-│   └── solutions_complete.txt
+│   ├── 01_propositional_logic/
+│   ├── 02_predicate_logic/
+│   └── ...
 ├── docs/
 │   ├── CLAUDE.md
 │   ├── DESIGN.md

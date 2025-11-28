@@ -12,7 +12,6 @@
 **Pattern:** `TITLE_CASE_WITH_UNDERSCORES.md`
 
 **Examples:**
-- `STATUS.md` - Implementation status and roadmap
 - `DESIGN.md` - Architecture and design decisions  
 - `USER_GUIDE.md` - Syntax reference
 - `PROOF_SYNTAX.md` - Proof tree syntax reference
@@ -94,7 +93,6 @@
 
 ```
 docs/
-├── STATUS.md              # Core: Implementation status
 ├── DESIGN.md              # Core: Architecture
 ├── USER_GUIDE.md         # Core: Syntax reference
 ├── PROOF_SYNTAX.md      # Core: Proof syntax

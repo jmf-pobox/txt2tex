@@ -318,7 +318,7 @@ your_document.log      # LaTeX compilation log
 - **Examples:** `examples/` directory has 60+ example files
 - **User Guide:** `docs/guides/USER_GUIDE.md` - complete syntax reference
 - **README:** Each example directory has a README
-- **Status:** `docs/development/STATUS.md` - implementation status and known issues
+- **Missing Features:** `docs/guides/MISSING_FEATURES.md` - features not yet implemented
 
 ## Troubleshooting
 

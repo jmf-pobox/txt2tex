@@ -96,7 +96,7 @@ cli = "PYTHONPATH=src python -m txt2tex.cli {args}"
 # Full pipeline - use for txt -> tex -> pdf
 convert = "./txt2pdf.sh {args}"
 # QA check - single PDF
-qa-check = "./qa_check.sh {args:examples/solutions.pdf}"
+qa-check = "./qa_check.sh {args}"
 # QA check - all PDFs in hw/ and examples/
 qa-check-all = "./qa_check_all.sh"
 # Complexity metrics

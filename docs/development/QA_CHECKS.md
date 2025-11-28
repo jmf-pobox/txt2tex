@@ -77,7 +77,7 @@ GOOD: x² - x + 1 denotes a natural number
 
 ### Basic usage:
 ```bash
-./qa_check.sh examples/solutions.pdf
+./qa_check.sh examples/01_propositional_logic/basic_operators.pdf
 ```
 
 ### Check specific file:
@@ -88,11 +88,8 @@ GOOD: x² - x + 1 denotes a natural number
 ### Integrate into workflow:
 ```bash
 # After generating PDF
-hatch run convert examples/solutions.txt
-./qa_check.sh examples/solutions.pdf
-
-# Or in Makefile
-make && ./qa_check.sh examples/solutions.pdf
+hatch run convert examples/01_propositional_logic/basic_operators.txt
+./qa_check.sh examples/01_propositional_logic/basic_operators.pdf
 ```
 
 ## Current Issues Found
@@ -185,30 +182,27 @@ edit src/txt2tex/parser.py
 hatch run check
 
 # 3. Regenerate PDF
-hatch run convert examples/solutions.txt
+hatch run convert examples/01_propositional_logic/basic_operators.txt
 
 # 4. QA check (automated notation verification)
-./qa_check.sh examples/solutions.pdf
+./qa_check.sh examples/01_propositional_logic/basic_operators.pdf
 
 # 5. If issues found, investigate and fix
 # 6. Repeat
 ```
 
-### Solution Review Workflow
-
-When reviewing solutions per [QA_PLAN.md](QA_PLAN.md):
+### Document Review Workflow
 
 ```bash
 # Step 1: Generate PDF
-hatch run convert examples/solutions.txt
+hatch run convert examples/01_propositional_logic/basic_operators.txt
 
-# Step 2: Run automated checks (supports Check #2: Notation Correct)
-./qa_check.sh examples/solutions.pdf
+# Step 2: Run automated checks
+./qa_check.sh examples/01_propositional_logic/basic_operators.pdf
 
-# Step 3: Fix any automated issues found
+# Step 3: Fix any issues found
 
-# Step 4: Manual review (Check #1: Input Correct, Check #3: Formatting Correct)
-# Review each solution manually in QA_PLAN.md checklist
+# Step 4: Manual review for formatting
 ```
 
 ### Pre-Commit Checklist

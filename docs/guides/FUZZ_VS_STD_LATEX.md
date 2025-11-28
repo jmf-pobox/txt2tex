@@ -303,9 +303,7 @@ No standard functions exist for 3-tuples, 4-tuples, or n-tuples.
 2. Define custom projection functions for n-tuples
 3. Wrap numeric projections in TEXT blocks (renders as plain text, no type checking)
 
-**Examples in compiled_solutions.txt**:
-- Solution 41(a): Uses `e.1`, `(r(i1)).1`, `(r(i1)).3` → Wrapped in TEXT blocks
-- Solution 41(b): Uses `e.2`, `e.3`, `e.5`, `e.6`, `e.7` → Currently unwrapped (generates fuzz errors)
+**Example**: When using `e.1`, `(r(i1)).1`, `(r(i1)).3`, wrap in TEXT blocks to avoid fuzz type errors.
 
 **See also**: [MISSING_FEATURES.md](MISSING_FEATURES.md) for missing features
 
