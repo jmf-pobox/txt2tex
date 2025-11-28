@@ -4,15 +4,35 @@ build-backend = "hatchling.build"
 
 [project]
 name = "txt2tex"
-version = "0.1.0"
 description = "Convert whiteboard-style mathematical notation to high-quality LaTeX"
 readme = "README.md"
 requires-python = ">=3.10"
-license = "MIT"
+license = {text = "MIT"}
 authors = [
     { name = "JF", email = "jmf@pobox.com" },
 ]
 dependencies = []
+dynamic = ["version"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Text Processing :: Markup :: LaTeX",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/jmf-pobox/txt2tex"
+"Bug Tracker" = "https://github.com/jmf-pobox/txt2tex/issues"
+
+[project.scripts]
+txt2tex = "txt2tex.cli:main"
 
 [project.optional-dependencies]
 dev = [
@@ -24,6 +44,19 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/txt2tex"]
+
+[tool.hatch.build]
+exclude = [
+    ".gitignore",
+    "tests/",
+    "docs/",
+    "examples/",
+    "hw/",
+    "htmlcov/",
+]
+
+[tool.hatch.version]
+path = "src/txt2tex/__version__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -205,3 +238,20 @@ exclude = "tests/*,*/__init__.py"
 # Set thresholds for failing
 cc_min = "B"  # Fail if any function has CC > 10
 mi_min = "B"  # Fail if any module has MI < 10
+
+# Publishing environment for PyPI uploads
+[tool.hatch.envs.publish]
+dependencies = [
+    "build",
+    "twine",
+]
+
+[tool.hatch.envs.publish.scripts]
+build = "python -m build"
+upload = "twine upload dist/*"
+check = "twine check dist/*"
+test-publish = [
+    "python -m build",
+    "twine check dist/*",
+    "twine upload --repository testpypi dist/*"
+]
