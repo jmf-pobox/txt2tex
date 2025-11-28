@@ -30,7 +30,10 @@ pip install txt2tex
 ### Prerequisites for PDF Generation
 
 - **Python 3.10+**
-- **LaTeX distribution** (TeX Live recommended)
+- **LaTeX distribution** with common packages (TeX Live recommended)
+  - Requires: `adjustbox`, `natbib`, standard math packages
+  - On Ubuntu/Debian: `sudo apt install texlive-latex-extra`
+  - On macOS: MacTeX includes everything needed
 
 ### Verify Installation
 
