@@ -51,22 +51,38 @@ txt2tex input.txt --no-warn-overflow
 
 ### Full PDF Pipeline
 
-To convert txt2tex files to PDF, you need:
-1. A LaTeX distribution (TeX Live recommended)
-2. The [fuzz](https://github.com/jmf-pobox/fuzz) package for Z notation fonts and type checking
+To convert txt2tex files to PDF, you need a LaTeX distribution (TeX Live recommended).
+
+#### Option 1: Using zed-* packages (simplest)
+
+Use the `--zed` flag to generate LaTeX that uses standard zed-* packages (bundled with txt2tex):
 
 ```bash
-# Generate LaTeX
-txt2tex input.txt -o input.tex
+# Generate LaTeX with zed-* packages
+txt2tex input.txt --zed -o input.tex
 
-# Compile to PDF (requires LaTeX and fuzz package)
-# Use -interaction=nonstopmode to avoid hanging on errors
+# Compile to PDF
 pdflatex -interaction=nonstopmode input.tex
 ```
 
-**Note:** The fuzz package provides essential Z notation fonts (`oxsz*.mf`). Without it, compilation will fail with missing font errors. See the [fuzz repository](https://github.com/jmf-pobox/fuzz) for installation instructions.
+This works with any standard TeX Live installation.
 
-For development, the repository includes `txt2pdf.sh` which handles LaTeX paths and compilation automatically.
+#### Option 2: Using fuzz package (with type checking)
+
+By default, txt2tex generates LaTeX using the [fuzz](https://github.com/jmf-pobox/fuzz) package, which provides Z notation type checking. This requires installing fuzz separately:
+
+```bash
+# Clone fuzz repository
+git clone https://github.com/jmf-pobox/fuzz.git
+
+# Generate LaTeX (fuzz is the default)
+txt2tex input.txt -o input.tex
+
+# Compile with TEXINPUTS pointing to fuzz
+TEXINPUTS=./fuzz/: pdflatex -interaction=nonstopmode input.tex
+```
+
+The fuzz package enables type checking of your Z specifications during compilation, catching errors like undefined variables and type mismatches.
 
 ---
 
