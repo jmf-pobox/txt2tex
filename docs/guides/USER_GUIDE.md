@@ -4,18 +4,69 @@ A comprehensive guide to writing mathematical specifications in txt2tex whiteboa
 
 ## Table of Contents
 
-1. [Document Structure](#document-structure)
-2. [Text Blocks](#text-blocks)
-3. [Propositional Logic](#propositional-logic)
-4. [Predicate Logic](#predicate-logic)
-5. [Equality](#equality)
-6. [Sets and Types](#sets-and-types)
-7. [Definitions](#definitions)
-8. [Relations](#relations)
-9. [Functions](#functions)
-10. [Sequences](#sequences)
-11. [Schema Notation](#schema-notation)
-12. [Proof Trees](#proof-trees)
+1. [Installation](#installation)
+2. [Document Structure](#document-structure)
+3. [Text Blocks](#text-blocks)
+4. [Propositional Logic](#propositional-logic)
+5. [Predicate Logic](#predicate-logic)
+6. [Equality](#equality)
+7. [Sets and Types](#sets-and-types)
+8. [Definitions](#definitions)
+9. [Relations](#relations)
+10. [Functions](#functions)
+11. [Sequences](#sequences)
+12. [Schema Notation](#schema-notation)
+13. [Proof Trees](#proof-trees)
+
+---
+
+## Installation
+
+### Install from PyPI
+
+```bash
+pip install txt2tex
+```
+
+### Using the CLI
+
+After installation, the `txt2tex` command is available:
+
+```bash
+# Convert a txt file to LaTeX
+txt2tex input.txt
+
+# Specify output file
+txt2tex input.txt -o output.tex
+
+# Use zed-* packages instead of fuzz (default)
+txt2tex input.txt --zed
+
+# Include parts (a, b, c) in table of contents
+txt2tex input.txt --toc-parts
+
+# Disable overflow warnings
+txt2tex input.txt --no-warn-overflow
+```
+
+### Full PDF Pipeline
+
+To convert txt2tex files to PDF, you need:
+1. A LaTeX distribution (TeX Live recommended)
+2. The [fuzz](https://github.com/jmf-pobox/fuzz) package for Z notation fonts and type checking
+
+```bash
+# Generate LaTeX
+txt2tex input.txt -o input.tex
+
+# Compile to PDF (requires LaTeX and fuzz package)
+# Use -interaction=nonstopmode to avoid hanging on errors
+pdflatex -interaction=nonstopmode input.tex
+```
+
+**Note:** The fuzz package provides essential Z notation fonts (`oxsz*.mf`). Without it, compilation will fail with missing font errors. See the [fuzz repository](https://github.com/jmf-pobox/fuzz) for installation instructions.
+
+For development, the repository includes `txt2pdf.sh` which handles LaTeX paths and compilation automatically.
 
 ---
 
@@ -2177,5 +2228,4 @@ For more information:
 ### Development Resources
 - **[Missing Features](MISSING_FEATURES.md)** - Features not yet implemented
 - **[IDE Setup](../development/IDE_SETUP.md)** - VSCode/Cursor configuration
-- **[QA Plan](../development/QA_PLAN.md)** - Testing and validation procedures
 
