@@ -89,7 +89,7 @@ PROOF:
 Convert to PDF:
 
 ```bash
-txt2tex example.txt --pdf
+txt2tex example.txt
 ```
 
 Open `example.pdf` to see your beautifully formatted output!
@@ -179,24 +179,24 @@ lnot (p land q)
 
 ## Usage
 
-### Generate PDF
+### Generate PDF (default)
 
 ```bash
-# Convert to PDF directly (uses fuzz package by default)
-txt2tex input.txt --pdf
+# Convert to PDF (uses fuzz package by default)
+txt2tex input.txt
 
 # Use zed-* packages instead of fuzz
-txt2tex input.txt --zed --pdf
+txt2tex input.txt --zed
 
 # Keep auxiliary files (.aux, .log) for debugging
-txt2tex input.txt --pdf --keep-aux
+txt2tex input.txt --keep-aux
 ```
 
 ### Generate LaTeX Only
 
 ```bash
-# Generate LaTeX without compiling
-txt2tex input.txt -o output.tex
+# Generate LaTeX without compiling to PDF
+txt2tex input.txt --tex-only
 ```
 
 ### Optional: Type Checking with fuzz

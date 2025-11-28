@@ -129,9 +129,9 @@ def main() -> int:
         help="LaTeX character threshold for overflow warnings (default: 100)",
     )
     parser.add_argument(
-        "--pdf",
+        "--tex-only",
         action="store_true",
-        help="Compile to PDF using pdflatex (requires LaTeX installation)",
+        help="Generate LaTeX only, do not compile to PDF",
     )
     parser.add_argument(
         "--keep-aux",
@@ -140,6 +140,15 @@ def main() -> int:
     )
 
     args = parser.parse_args()
+
+    # Check for pdflatex early unless --tex-only
+    if not args.tex_only and shutil.which("pdflatex") is None:
+        print(
+            "Error: pdflatex not found. Install a LaTeX distribution "
+            "(e.g., TeX Live, MacTeX, MiKTeX), or use --tex-only.",
+            file=sys.stderr,
+        )
+        return 1
 
     # Read input
     try:
@@ -200,19 +209,23 @@ def main() -> int:
         print(f"Error writing output file: {e}", file=sys.stderr)
         return 1
 
-    # Compile to PDF if requested
-    if args.pdf:
-        if shutil.which("pdflatex") is None:
-            print(
-                "Error: pdflatex not found. Install a LaTeX distribution.",
-                file=sys.stderr,
-            )
-            return 1
-
+    # Compile to PDF unless --tex-only
+    if not args.tex_only:
         print(f"Compiling: {output_path.with_suffix('.pdf')}")
         if not compile_pdf(output_path, keep_aux=args.keep_aux):
             return 1
         print(f"Generated: {output_path.with_suffix('.pdf')}")
+
+    # Warn about fuzz typechecker if using fuzz package
+    if not args.zed and shutil.which("fuzz") is None:
+        print(
+            "Note: fuzz typechecker not found. Type checking is unavailable.",
+            file=sys.stderr,
+        )
+        print(
+            "      Install from: https://github.com/jmf-pobox/fuzz",
+            file=sys.stderr,
+        )
 
     return 0
 
