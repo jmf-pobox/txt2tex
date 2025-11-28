@@ -659,8 +659,8 @@ class LaTeXGenerator:
         Supports optional page/slide numbers.
         
         Examples:
-            "[cite simpson25a]" → "\\citep{simpson25a}"
-            "[cite simpson25a slide 20]" → "\\citep[slide 20]{simpson25a}"
+            "[cite spivey92]" → "\\citep{spivey92}"
+            "[cite spivey92 p. 42]" → "\\citep[p. 42]{spivey92}"
             "[cite spivey92 p. 42]" → "\\citep[p. 42]{spivey92}"
         """
         pattern = r"\[cite\s+([a-zA-Z0-9_-]+)(?:\s+([^\]]+))?\]"

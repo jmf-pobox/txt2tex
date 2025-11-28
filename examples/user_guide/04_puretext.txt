@@ -2,5 +2,5 @@
 // Demonstrates PURETEXT: with LaTeX escaping but no formula detection
 // From USER_GUIDE.md - Text Blocks section
 
-PURETEXT: Simpson, A. (2025) "Lecture notes" & references.
+PURETEXT: Spivey, J.M. (1992) "The Z Notation" & references.
 PURETEXT: Author's name, "quoted text", and more.

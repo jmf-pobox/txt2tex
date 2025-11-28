@@ -45,7 +45,7 @@ Same configuration for examples directory.
 
 **With natbib**, the first pdflatex pass produces warnings like:
 ```
-Package natbib Warning: Citation `simpson25a' on page 1 undefined.
+Package natbib Warning: Citation `spivey92' on page 1 undefined.
 Package natbib Warning: Citation(s) may have changed.
 (natbib)                Rerun to get citations correct.
 ```
@@ -53,13 +53,13 @@ Package natbib Warning: Citation(s) may have changed.
 These are **expected** and resolved automatically on the second pass.
 
 **First pass**:
-- Reads `\citep{simpson25a}` commands
+- Reads `\citep{spivey92}` commands
 - Writes citation info to `.aux` file
 - Shows warnings about undefined citations
 
 **Second pass**:
 - Reads `.aux` file with citation info
-- Replaces `\citep{simpson25a}` with `(Simpson, 2025a)`
+- Replaces `\citep{spivey92}` with `(Spivey, 1992)`
 - No warnings
 
 ### Build Methods
@@ -110,11 +110,11 @@ To verify citations are working:
 
 ```bash
 # Check PDF has correct citations (not [?] or undefined)
-pdftotext hw/solutions.pdf - | grep "Simpson"
+pdftotext output.pdf - | grep "Spivey"
 
 # Should show:
-# (Simpson, 2025a, Slide 20)
-# (Simpson, 2025c, slide 41)
+# (Spivey, 1992)
+# (Spivey, 1992, p. 42)
 # etc.
 ```
 
@@ -124,7 +124,7 @@ pdftotext hw/solutions.pdf - | grep "Simpson"
 
 **Symptom**:
 ```
-Package natbib: Citation `simpson25a' on page 1 undefined.
+Package natbib: Citation `spivey92' on page 1 undefined.
 Package natbib: Citation(s) may have changed. Rerun to get citations correct.
 ```
 

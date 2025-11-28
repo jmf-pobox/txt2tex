@@ -73,16 +73,16 @@ TEXT: We know that forall x : N | x >= 0 is true.
 **Citations in TEXT blocks:**
 
 ```
-TEXT: The proof technique follows [cite simpson25a].
-TEXT: This is discussed in [cite simpson25a slide 20].
-TEXT: See the definition in [cite spivey92 p. 42].
+TEXT: The proof technique follows [cite spivey92].
+TEXT: This is discussed in [cite spivey92 p. 42].
+TEXT: See the definition in [cite woodcock96 p. 15].
 TEXT: Multiple examples appear in [cite woodcock96 pp. 10-15].
 ```
 
 Renders as:
-- `[cite simpson25a]` → (Simpson, 2025a)
-- `[cite simpson25a slide 20]` → (Simpson, 2025a, slide 20)
+- `[cite spivey92]` → (Spivey, 1992)
 - `[cite spivey92 p. 42]` → (Spivey, 1992, p. 42)
+- `[cite woodcock96 p. 15]` → (Woodcock and Davies, 1996, p. 15)
 
 **Note**: Citation keys match those defined in your bibliography (see LATEX: blocks for bibliography setup). You can add any locator text (slide, p., pp., etc.) after the citation key.
 
@@ -91,7 +91,7 @@ Renders as:
 Use for bibliography entries or prose with punctuation that would confuse the lexer:
 
 ```
-PURETEXT: Simpson, A. (2025) "Lecture notes" & references.
+PURETEXT: Spivey, J.M. (1992) "The Z Notation" & references.
 PURETEXT: Author's name, "quoted text", and more.
 ```
 
@@ -146,9 +146,9 @@ For custom formatting or when you don't have a `.bib` file, use LATEX: blocks to
 
 ```
 LATEX: \setlength{\leftskip}{0pt}
-LATEX: \begin{thebibliography}{Simpson, n.d.}
+LATEX: \begin{thebibliography}{Woodcock, n.d.}
 LATEX:
-LATEX: \bibitem[Simpson, 2025a]{simpson25a} Simpson, A. (2025a). \textit{Introduction and propositions}. Lecture 01.
+LATEX: \bibitem[Spivey, 1992]{spivey92} Spivey, J.M. (1992). \textit{The Z Notation: A Reference Manual}. Prentice Hall.
 LATEX:
 LATEX: \bibitem[Woodcock and Davies, 1996]{woodcock96} Woodcock, J. and Davies, J. (1996). \textit{Using Z}. Prentice Hall.
 LATEX:

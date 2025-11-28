@@ -59,10 +59,10 @@ BIBLIOGRAPHY_STYLE: plainnat
 
 ### Citations in TEXT Blocks
 ```
-TEXT: The proof technique follows [cite simpson25a].
+TEXT: The proof technique follows [cite spivey92].
 TEXT: See [cite spivey92 p. 42] for details.
 ```
-Renders as: (Simpson, 2025a), (Spivey, 1992, p. 42)
+Renders as: (Spivey, 1992), (Spivey, 1992, p. 42)
 
 ### Manual Bibliography (Alternative)
 Use LATEX blocks with `\begin{thebibliography}` for custom formatting.

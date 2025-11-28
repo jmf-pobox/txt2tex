@@ -2539,8 +2539,8 @@ class LaTeXGenerator:
         Supports optional page/slide numbers.
 
         Examples:
-            "[cite simpson25a]" → "\\citep{simpson25a}"
-            "[cite simpson25a slide 20]" → "\\citep[slide 20]{simpson25a}"
+            "[cite spivey92]" → "\\citep{spivey92}"
+            "[cite spivey92 p. 42]" → "\\citep[p. 42]{spivey92}"
             "[cite spivey92 p. 42]" → "\\citep[p. 42]{spivey92}"
             "[cite woodcock96 pp. 10-15]" → "\\citep[pp. 10-15]{woodcock96}"
 
@@ -2549,7 +2549,7 @@ class LaTeXGenerator:
         """
         # Pattern: [cite key optional-locator]
         # Capture key (alphanumeric with hyphens/underscores) and optional locator text
-        # Example: [cite simpson25a slide 20] → \citep[slide 20]{simpson25a}
+        # Example: [cite spivey92 p. 42] → \citep[p. 42]{spivey92}
         pattern = r"\[cite\s+([a-zA-Z0-9_-]+)(?:\s+([^\]]+))?\]"
 
         def replace_citation(match: re.Match[str]) -> str:

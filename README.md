@@ -324,8 +324,8 @@ A few edge cases require workarounds:
 ## Project Status
 
 **Current Implementation:**
-- ✅ **100% solution coverage** (52 of 52 homework solutions working)
-- ✅ **1244 tests** - Comprehensive test suite
+- ✅ **Feature complete** for typical Z specifications
+- ✅ **1261 tests** - Comprehensive test suite
 - ✅ **Full Z notation** - Schemas, relations, functions, sequences
 - ✅ **Proof trees** - Natural deduction with justifications
 - ✅ **WYSIWYG line breaks** - Natural formatting controls PDF output
@@ -358,9 +358,8 @@ A few edge cases require workarounds:
 - **[docs/tutorials/10_advanced.md](docs/tutorials/10_advanced.md)** - Advanced topics
 
 ### Development Documentation
-- **[docs/development/STATUS.md](docs/development/STATUS.md)** - Implementation status and roadmap
+- **[docs/development/STATUS.md](docs/development/STATUS.md)** - Implementation status
 - **[docs/development/IDE_SETUP.md](docs/development/IDE_SETUP.md)** - IDE configuration
-- **[docs/development/QA_PLAN.md](docs/development/QA_PLAN.md)** - Quality assurance procedures
 - **[docs/DESIGN.md](docs/DESIGN.md)** - Architecture and design decisions
 
 ---
@@ -384,9 +383,18 @@ MIT
 
 ## Credits
 
+### Acknowledgements
+
+This tool was developed to support formal methods education. The notation and syntax are based on standard Z notation as described in:
+
+- J.M. Spivey, *The Z Notation: A Reference Manual* (2nd ed.)
+- J. Woodcock and J. Davies, *Using Z: Specification, Refinement, and Proof*
+
+### Software Dependencies
+
 - **Mike Spivey** - [fuzz](https://github.com/jmf-pobox/fuzz) package for Z notation type checking
 - **Jim Davies** - zed-* packages for Z notation typesetting
 
 ---
 
-**Last Updated:** 2025-11-26
+**Last Updated:** 2025-11-28

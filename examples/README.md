@@ -1,6 +1,6 @@
 # txt2tex Examples
 
-This directory contains example files organized by lecture topic from the course glossary. Each example demonstrates specific features of the txt2tex whiteboard-to-LaTeX conversion system.
+This directory contains example files demonstrating txt2tex features. Each example shows specific features of the whiteboard-to-LaTeX conversion system.
 
 ## Quick Start
 
@@ -9,7 +9,6 @@ Build all examples with fuzz validation:
 ```bash
 cd examples
 make           # Build all examples in parallel
-make reference # Build reference solutions
 make fuzz      # Build fuzz test cases
 ```
 
@@ -133,15 +132,6 @@ Advanced features and edge cases.
 - `generic_instantiation.txt` - Generic type instantiation
 - `if_then_else.txt` - Conditional expressions
 
-### complete_examples/ (5 examples)
-Complete real-world specifications combining multiple features.
-
-- `tv_programme_modeling.txt` - TV programme modeling
-- `music_streaming_service.txt` - Music streaming service specification
-- `family_relationships.txt` - Family relationship modeling
-- `children_grandchildren_functions.txt` - Functions on family relationships
-- `distributivity_proof.txt` - Complete proof with multiple reasoning steps
-
 ### fuzz_tests/ (4 examples)
 Test cases for fuzz validation and edge cases.
 
@@ -149,12 +139,6 @@ Test cases for fuzz validation and edge cases.
 - `test_zed.txt` - Zed notation edge cases
 - `test_mod.txt` - Modulo operator
 - `test_nested_super.txt` - Nested superscripts
-
-### reference/ (1 file)
-Reference solutions from course materials.
-
-- `compiled_solutions.txt` - Complete solution set (Solutions 1-52)
-- **Status**: 100% coverage (52/52 solutions working) ✅
 
 ### user_guide/ (61 examples)
 Examples extracted from USER_GUIDE.md documentation, organized by feature.
@@ -167,14 +151,13 @@ Examples extracted from USER_GUIDE.md documentation, organized by feature.
 The Makefile provides targets for building examples with full fuzz validation:
 
 ```bash
-# Build all examples (excluding reference/ and infrastructure/)
+# Build all examples
 make
 
 # Build specific directories
 make 01                      # Build 01_propositional_logic/
 make 02                      # Build 02_predicate_logic/
 make fuzz                    # Build fuzz_tests/
-make reference               # Build reference/compiled_solutions.pdf
 
 # Shortcuts
 make all                     # Build all examples
@@ -191,16 +174,6 @@ All builds include:
 3. **Type checking with fuzz** (validates Z notation)
 4. PDF compilation
 
-## Validation Status
-
-**All 136 examples build successfully with fuzz validation enabled.**
-
-Total count: 141 .txt files (136 examples + 5 complete_examples)
-
-- ✅ All examples compile to PDF
-- ✅ Comprehensive feature coverage
-- ✅ Reference solutions: 100% coverage (52/52 solutions working)
-
 ## Usage
 
 Convert any .txt file to PDF:
@@ -208,9 +181,6 @@ Convert any .txt file to PDF:
 ```bash
 # From sem/ directory
 hatch run convert examples/01_propositional_logic/basic_operators.txt
-
-# With fuzz validation (recommended)
-hatch run convert examples/01_propositional_logic/basic_operators.txt --fuzz
 
 # Or using the shell script
 ./txt2pdf.sh examples/01_propositional_logic/basic_operators.txt
@@ -227,10 +197,10 @@ hatch run convert examples/01_propositional_logic/basic_operators.txt --fuzz
 
 When adding new examples:
 
-1. Place in the appropriate lecture directory
+1. Place in the appropriate directory
 2. Use clear, descriptive filenames
 3. Include a header comment explaining the example's purpose
-4. Test conversion with `hatch run convert <file> --fuzz`
+4. Test conversion with `hatch run convert <file>`
 5. Ensure fuzz validation passes (zero errors)
 6. Update this README if adding a new category
 
@@ -250,16 +220,6 @@ See existing files for format details. Key elements:
 ## Known Issues
 
 See [tests/bugs/README.md](../tests/bugs/README.md) for complete bug tracking with test cases.
-
-Active bugs:
-- **Bug #1**: Parser fails on prose with periods outside TEXT blocks
-- **Bug #2**: Multiple pipes in TEXT blocks close math mode prematurely
-- **Bug #13**: Field projection on function application in quantifiers
-
-Recently resolved:
-- **Bug #3**: Compound identifiers with operator suffixes (R+, R*) - ✅ FIXED (Nov 23, 2025) - Use `abbrev...end` block syntax
-- **Bug #4**: Comma after parenthesized math not detected in prose - ✅ FIXED
-- **Bug #5**: Logical operators (or, and) not converted in certain TEXT block contexts - ✅ FIXED
 
 ## Quality Standards
 

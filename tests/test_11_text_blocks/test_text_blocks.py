@@ -233,7 +233,7 @@ def test_pagebreak_between_sections() -> None:
 
 def test_puretext_latex_generation() -> None:
     """Test LaTeX generation for PURETEXT."""
-    text = 'PURETEXT: Simpson, A. (2025) "Lecture notes" land more.'
+    text = 'PURETEXT: Spivey, J.M. (1992) "The Z Notation" land more.'
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -241,8 +241,8 @@ def test_puretext_latex_generation() -> None:
     generator = LaTeXGenerator()
     latex = generator.generate_document(doc)
     assert "\\bigskip" in latex
-    assert "Simpson" in latex
-    assert "2025" in latex
+    assert "Spivey" in latex
+    assert "1992" in latex
 
 
 def test_pagebreak_latex_generation() -> None:

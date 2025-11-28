@@ -2,7 +2,7 @@
 // Demonstrates citation handling in smart text
 // From USER_GUIDE.md - Text Blocks section
 
-TEXT: The proof technique follows [cite simpson25a].
-TEXT: This is discussed in [cite simpson25a slide 20].
-TEXT: See the definition in [cite spivey92 p. 42].
+TEXT: The proof technique follows [cite spivey92].
+TEXT: This is discussed in [cite spivey92 p. 42].
+TEXT: See the definition in [cite woodcock96 p. 15].
 TEXT: Multiple examples appear in [cite woodcock96 pp. 10-15].
