@@ -25,6 +25,11 @@ jobs:
     - name: Install Hatch
       run: pip install hatch
 
+    - name: Install TeX Live
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y texlive-latex-base texlive-fonts-recommended
+
     - name: Run Ruff linting
       run: hatch run lint
 
