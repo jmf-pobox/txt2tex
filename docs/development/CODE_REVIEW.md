@@ -4,7 +4,7 @@
 
 This review analyzes the `src/txt2tex` codebase for code quality issues beyond what automated tools (ruff, mypy) catch. The codebase demonstrates good type safety and follows PEP 8 conventions.
 
-**Completed improvements (2025-11-27):**
+**Completed improvements (2025-11-27/28):**
 - Exception handling: specific types replace broad `except Exception`
 - Type dispatch: `@singledispatchmethod` replaces isinstance chains
 - Documentation: Google-style docstrings on public methods, Phase comments replaced
@@ -12,6 +12,8 @@ This review analyzes the `src/txt2tex` codebase for code quality issues beyond w
 - Fuzz-mode logic centralized into helper methods (see below)
 - Overflow warning system for Z notation blocks (axdef, schema, zed, gendef)
 - Line break continuation syntax (`\`) for conditionals and after `=` operator
+- Linting standards tightened: ruff (S, BLE, A, ARG, ERA, PIE, RET, RSE, PERF, PTH, ISC, FBT, C90, PT, SLF)
+- Extracted `_parse_free_branch()` helper to reduce `_parse_syntax_block` complexity
 
 **Acceptable as-is:**
 - Lexer/parser complexity is domain-appropriate (tokenizers and parsers are inherently branchy)
@@ -19,9 +21,9 @@ This review analyzes the `src/txt2tex` codebase for code quality issues beyond w
 
 ### File Size and Organization
 
-Current state (~11,900 lines total):
-- `latex_gen.py` ≈ 5,060 lines
-- `parser.py` ≈ 4,180 lines
+Current state (~11,800 lines total):
+- `latex_gen.py` ≈ 5,044 lines
+- `parser.py` ≈ 4,124 lines (reduced by refactoring)
 - `lexer.py` ≈ 1,220 lines
 - `ast_nodes.py` ≈ 900 lines
 - `errors.py` ≈ 135 lines
@@ -60,14 +62,23 @@ CLI flags: `--no-warn-overflow`, `--overflow-threshold N` (default: 140)
 
 ### Complexity Notes
 
-Cyclomatic complexity measures branches, not maintainability. High CC in lexers/parsers is expected:
+Cyclomatic complexity measures branches, not maintainability. High CC in lexers/parsers is expected.
 
-| Method | CC | Status |
-|--------|-----|--------|
-| `Lexer._scan_token` | 166 | Domain-appropriate |
-| `Lexer._scan_identifier` | 97 | Domain-appropriate |
-| `Parser._parse_postfix` | 41 | Matches grammar |
-| `LaTeXGenerator._process_inline_math` | ~15 | Decomposed into pipeline (was 69) |
+**C90 Configuration:** `max-complexity = 30` with targeted `noqa: C901` for inherently complex functions.
+
+| Method | CC | Grade | Status |
+|--------|-----|-------|--------|
+| `Lexer._scan_token` | 166 | F | Domain-appropriate (token dispatch) |
+| `Lexer._scan_identifier` | 97 | F | Domain-appropriate (100+ keywords) |
+| `Parser._parse_postfix` | 40 | E | Grammar-driven operator dispatch |
+| `Parser._parse_syntax_block` | 30 | D | Refactored (was 36, extracted helper) |
+| `LaTeXGenerator._has_line_breaks` | 37 | E | AST visitor across node types |
+| `LaTeXGenerator._generate_proof_node_infer` | 37 | E | Natural deduction scenarios |
+| `LaTeXGenerator._process_inline_math` | ~15 | C | Decomposed into 11 stages (was 69) |
+
+**Refactoring applied (2025-11-28):**
+- Extracted `_parse_free_branch()` helper method (~60 lines × 3 → 1 shared helper)
+- Reduced `_parse_syntax_block` from E (36) to D (30), removed noqa comment
 
 ### Inline Math Pipeline Architecture
 
@@ -116,6 +127,29 @@ def _process_inline_math(self, text: str) -> str:
 ### Suppression Comments (All Legitimate)
 
 5 `# noqa: RUF001/RUF003` comments for Unicode `×` character handling - these are legitimate since the codebase explicitly supports both ASCII `cross` and Unicode `×` as equivalent inputs.
+
+### Enabled Linting Rules (2025-11-28)
+
+The following ruff rule sets were enabled after systematic review:
+
+| Rule Set | Description | Per-File Ignores |
+|----------|-------------|------------------|
+| S | flake8-bandit (security) | S101 in tests (assert is idiomatic) |
+| BLE | flake8-blind-except | None |
+| A | flake8-builtins | None |
+| ARG | flake8-unused-arguments | ARG002 in latex_gen.py, parser.py (visitor patterns) |
+| ERA | eradicate (commented code) | None (uses noqa for doc examples) |
+| PIE | flake8-pie | None |
+| RET | flake8-return | None |
+| RSE | flake8-raise | None |
+| PERF | perflint | None |
+| PTH | pathlib preference | None |
+| ISC | implicit string concat | None |
+| FBT | flake8-boolean-trap | None (API changed to keyword-only args) |
+| C90 | mccabe complexity | max-complexity=30, noqa on 4 functions |
+| PT | pytest style | None |
+| SLF | private member access | SLF001 in tests (testing internals) |
+| T20 | print detection | T20 in cli.py, tests |
 
 ### Deferred Linting Rules (TRY, PL)
 
