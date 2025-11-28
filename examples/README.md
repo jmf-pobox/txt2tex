@@ -179,7 +179,7 @@ All builds include:
 Convert any .txt file to PDF:
 
 ```bash
-# From sem/ directory
+# From project root
 hatch run convert examples/01_propositional_logic/basic_operators.txt
 
 # Or using the shell script

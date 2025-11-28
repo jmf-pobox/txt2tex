@@ -177,7 +177,7 @@ Tests for advanced syntax features.
 
 ### Test Active Bugs (expect FAIL)
 ```bash
-cd sem
+cd txt2tex
 for f in tests/bugs/bug*.txt; do
   echo "Testing: $f"
   hatch run convert "$f" 2>&1 | head -5

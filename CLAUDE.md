@@ -131,7 +131,7 @@ hatch run check-cov      # lint + type + test-cov
 ### Critical Dependencies
 
 1. **fuzz**: Z notation typesetting system
-   - Location: `../tex/` (relative to sem/)
+   - Location: `../tex/` (relative to project root)
    - Main file: `fuzz.sty`
    - Fonts: `oxsz*.mf`, `zarrow.mf`, `zletter.mf`, `zsymbol.mf`
 
@@ -343,9 +343,7 @@ When you encounter a bug:
 
 ## Session Management
 
-User mentioned: "I can exit our session and resume our session from the sem directory if that will make things easier."
-
-If starting fresh from the `sem/` directory:
+If starting fresh from the project root:
 1. Remember fuzz is in `./latex/`
 2. Test files are in parent directory `./tests/`
 3. Use workflow commands at the top of this document
