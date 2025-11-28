@@ -56,10 +56,10 @@ Common patterns get smart defaults. Advanced users can override with explicit La
 |-------|------|----------|
 | **Level 1** (Beginner) | Write `land`, `lor`, let system handle spacing and breaks | Auto-formatting |
 | **Level 2** (Intermediate) | Use blank lines for `\also` grouping in where clauses | Structural control |
-| **Level 4** (Expert) | Use `LATEX:` blocks for direct control | Full LaTeX escape hatch |
-| **Level 5** (Expert+) | Mix txt2tex with hand-written LaTeX | Hybrid mode |
+| **Level 3** (Expert) | Use `LATEX:` blocks for direct control | Full LaTeX escape hatch |
+| **Level 4** (Expert+) | Mix txt2tex with hand-written LaTeX | Hybrid mode |
 
-**Note**: Level 3 (inline LaTeX commands like `\\`, `\t1`, `~`) is not currently supported. Users who need fine formatting control should use `LATEX:` blocks (Level 4).
+**Future Enhancement**: Inline LaTeX hints (e.g., `\\`, `\t1`, `~`) within expressions are not currently supported. Users who need fine formatting control should use `LATEX:` blocks (Level 3).
 
 ### Strategic Goals
 
