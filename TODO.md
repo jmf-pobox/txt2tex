@@ -1,6 +1,6 @@
 # TODO: Linting Standards Tightening
 
-**Status: PLANNING**
+**Status: COMPLETE** ✅
 
 ## Overview
 
@@ -256,3 +256,25 @@ Reduced `self.use_fuzz` usages from 31 to 20 by centralizing common patterns int
 - Phase 4: Identifier formatting helper (`_format_multiword_identifier`)
 - Phase 5: Binary operator helper (`_map_binary_operator`)
 - Phase 6: Documentation updated
+
+---
+
+### Complexity Refactoring (COMPLETE) ✅
+
+Analyzed all methods with F/E complexity grades to identify genuine refactoring opportunities.
+
+**Refactored:**
+- `Parser._parse_syntax_block`: E (36) → D (30) by extracting `_parse_free_branch()` helper
+  - Deduplicated ~60 lines of branch parameter parsing code (3 occurrences)
+  - Removed `noqa: C901` comment
+
+**Inherent complexity (no refactoring beneficial):**
+| Method | Grade | Reason |
+|--------|-------|--------|
+| `Lexer._scan_token` | F (166) | Token type dispatch over many characters |
+| `Lexer._scan_identifier` | F (97) | 100+ keyword recognition |
+| `Parser._parse_postfix` | E (40) | Grammar-driven operator dispatch |
+| `LaTeXGenerator._has_line_breaks` | E (37) | AST visitor across node types |
+| `LaTeXGenerator._generate_proof_node_infer` | E (37) | Natural deduction scenarios |
+
+These methods have complexity matching their domain requirements. Splitting would fragment cohesive logic without reducing total complexity.
