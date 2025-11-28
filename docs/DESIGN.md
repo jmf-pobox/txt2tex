@@ -598,10 +598,10 @@ class LaTeXGenerator:
 
     def emit_preamble(self):
         self.output.append(r'\documentclass{article}')
-        if self.options.use_fuzz:
-            self.output.append(r'\usepackage{fuzz}')
+        if not self.options.use_zed:
+            self.output.append(r'\usepackage{fuzz}')  # Default
         else:
-            # Default: zed-* packages (instructor's preference)
+            # Alternative: zed-* packages (via --zed flag)
             self.output.append(r'\usepackage{zed-cm}')
             self.output.append(r'\usepackage{zed-maths}')
             if self.has_proof_trees:  # Detected during parsing
@@ -872,7 +872,6 @@ Did you mean: forall x : N | x * x >= 0
    - Source mapping
 
 3. **Regression Tests**
-   - All bugs fixed from txt2tex_v3.py
    - Edge cases discovered during development
 
 4. **Golden Tests**
@@ -881,1167 +880,138 @@ Did you mean: forall x : N | x * x >= 0
 
 ### Test Structure
 
+Tests are organized by feature area, mirroring the user guide topics:
+
 ```
 tests/
-├── lexer/
-│   ├── test_operators.py
-│   ├── test_structural.py
-│   └── test_unicode.py
-├── parser/
-│   ├── test_expressions.py
-│   ├── test_znotation.py
-│   ├── test_errors.py
-│   └── test_precedence.py
-├── semantic/
-│   ├── test_scope.py
-│   └── test_validation.py
-├── generator/
-│   ├── test_latex_output.py
-│   └── test_formatting.py
-├── integration/
-│   ├── test_pipeline.py
-│   └── test_errors.py
-├── golden/
-│   ├── inputs/
-│   │   ├── simple.txt
-│   │   ├── truth_tables.txt
-│   │   ├── proofs.txt
-│   │   └── znotation.txt
-│   └── expected/
-│       ├── simple.tex
-│       ├── truth_tables.tex
-│       ├── proofs.tex
-│       └── znotation.tex
-└── fixtures/
-    └── solutions_complete.txt  # From parent directory
+├── conftest.py                    # Shared fixtures
+├── README.md                      # Test documentation
+├── bugs/                          # Minimal reproducible test cases for bugs
+│   └── *.txt
+├── test_00_getting_started/       # Basic document structure
+├── test_01_propositional_logic/   # Truth tables, equivalences, operators
+├── test_02_predicate_logic/       # Quantifiers, nested quantifiers
+├── test_03_equality/              # Equality operators
+├── test_04_proof_trees/           # Natural deduction proofs
+├── test_05_sets/                  # Set operations, comprehensions, tuples
+├── test_06_definitions/           # Free types, generics, declarations
+├── test_07_relations/             # Relation operators, composition
+├── test_08_functions/             # Function types, lambda, application
+├── test_09_sequences/             # Sequence literals, concatenation, bags
+├── test_10_schemas/               # Schema definitions, zed blocks
+├── test_11_text_blocks/           # Prose, citations, inline math
+├── test_12_advanced/              # Conditionals, special identifiers
+├── test_cli.py                    # CLI interface tests
+├── test_coverage/                 # Additional coverage tests
+├── test_edge_cases/               # Error handling, edge cases
+├── test_error_formatting.py       # Error message formatting
+├── test_infrule.py                # Inference rule tests
+├── test_line_breaks/              # Line continuation handling
+└── test_zed2e/                    # zed2e compatibility tests
 ```
+
+Each feature directory contains:
+- `README.md` - Description of tests in this area
+- `test_*.py` - Test modules organized by sub-feature
 
 ## Configuration
 
-### Options
+### CLI Options
+
+The `txt2tex` command accepts the following arguments:
+
+```
+txt2tex INPUT [-o OUTPUT] [--zed] [--toc-parts] [--no-warn-overflow] [--overflow-threshold N]
+```
+
+| Option | Description |
+|--------|-------------|
+| `INPUT` | Input text file with whiteboard notation (required) |
+| `-o, --output` | Output LaTeX file (default: input with .tex extension) |
+| `--zed` | Use zed-* packages instead of fuzz package (fuzz is default) |
+| `--toc-parts` | Include parts (a, b, c) in table of contents |
+| `--no-warn-overflow` | Disable warnings for lines that may overflow page margins |
+| `--overflow-threshold N` | LaTeX character threshold for overflow warnings (default: 100) |
+
+### LaTeXGenerator Options
+
+The `LaTeXGenerator` class accepts these configuration options:
 
 ```python
-@dataclass
-class Options:
-    # Input
-    input_file: str
-
-    # Output
-    output_pdf: Optional[str]
-    output_latex: Optional[str]
-    keep_intermediate: bool = False
-
-    # LaTeX packages
-    use_fuzz: bool = False          # True=fuzz, False=zed-* packages (default)
-
-    # Validation
-    run_fuzz_validation: bool = True
-    strict_validation: bool = False  # Treat warnings as errors
-
-    # Formatting
-    latex_indent: int = 2
-    wrap_width: int = 80             # For generated LaTeX
-
-    # Debugging
-    debug_tokens: bool = False
-    debug_ast: bool = False
-    verbose: bool = False
+generator = LaTeXGenerator(
+    use_fuzz=True,           # True=fuzz package (default), False=zed-* packages
+    toc_parts=False,         # Include parts in table of contents
+    warn_overflow=True,      # Emit warnings for potential overflow
+    overflow_threshold=100,  # Character threshold for overflow detection
+)
 ```
 
-### Configuration File
 
-Optional `.txt2texrc` (YAML or JSON):
+## Supported Features
 
-```yaml
-# LaTeX package choice
-use_fuzz: false  # false = zed-* packages (default), true = fuzz
+txt2tex is feature-complete for typical Z specifications. See [MISSING_FEATURES.md](guides/MISSING_FEATURES.md) for advanced operators not yet implemented.
 
-# Validation
-run_fuzz_validation: true
-strict_validation: false
-
-# Operator aliases (both ASCII and Unicode accepted)
-operator_aliases:
-  implies: ["=>", "→", "⇒"]
-  iff: ["<=>", "↔", "⇔"]
-  and: ["and", "∧", "&"]
-  or: ["or", "∨", "|"]
-  not: ["not", "¬", "~"]
-
-# Formatting
-formatting:
-  latex_indent: 2
-  wrap_width: 80
-```
-
-## Implementation Plan
-
-### Phased End-to-End Approach
-
-Each phase delivers a working end-to-end system that is immediately useful for a subset of problems. This allows incremental development with regular user testing and feedback.
-
-### Phase 0: Minimal Viable Product (MVP)
-**Timeline**: 2-3 hours
-**Goal**: Convert simple propositional logic to LaTeX
-
-**Features**:
-- Basic operators: `and`, `or`, `not`, `=>`, `<=>`
-- Simple expressions: `p and q => r`
-- Prose paragraphs with inline math
-- Document structure (minimal preamble/postamble)
-
-**Components**:
-- Basic lexer (operators, identifiers, whitespace)
-- Expression parser (precedence: `<=>` < `=>` < `or` < `and` < `not`)
-- Simple LaTeX generator
-- CLI wrapper
-
-**Use Case**:
-```
-Input:  "The formula p and q => r is valid."
-Output: "The formula $p \land q \Rightarrow r$ is valid."
-```
-
-**Deliverable**: Can process simple logic statements
-**Test**: Convert a single paragraph with 3-5 expressions
-**Quality Gates**: All 5 commands pass (type, lint, format, test, test-cov)
-
----
-
-### Phase 1: Document Structure + Truth Tables
-**Timeline**: 2-3 hours
-**Goal**: Complete solutions with truth tables
-
-**Add**:
-- `=== Section ===` headers
-- `** Solution N **` markers
-- `(a)`, `(b)`, `(c)` part labels
-- `TRUTH TABLE:` environment
+### Document Structure
+- Section headers (`=== Title ===`)
+- Solution markers (`** Solution N **`)
+- Part labels (`(a)`, `(b)`, `(c)`)
+- Text paragraphs with `TEXT:` keyword
 - Proper spacing (`\bigskip`, `\medskip`)
 
-**Use Case**:
-```
-** Solution 1 **
-
-(a) Construct a truth table for p => q
-
-TRUTH TABLE:
-p | q | p => q
-T | T | T
-T | F | F
-F | T | T
-F | F | T
-```
-
-**Deliverable**: Can process complete homework solutions with truth tables
-**Test**: Convert solutions 1-3 from test file
-**Quality Gates**: All 5 commands pass
-
----
-
-### Phase 2: Equivalence Chains + Justifications
-**Timeline**: 1-2 hours
-**Goal**: Step-by-step proofs with justifications
-
-**Add**:
-- `EQUIV:` environment
-- Justifications in `[brackets]`
-- Multi-step equivalence chains
-- Operator handling in justifications
-
-**Use Case**:
-```
-EQUIV:
-p land q
-<=> q land p [commutative]
-<=> q land p [idempotent]
-```
-
-**Deliverable**: Can process equivalence proofs
-**Test**: Convert solutions with EQUIV blocks
-**Quality Gates**: All 5 commands pass
-
----
-
-### Phase 3: Quantifiers + Subscripts/Superscripts
-**Timeline**: 2-3 hours
-**Goal**: Predicate logic and mathematical notation
-
-**Add**:
-- `forall x : Domain | predicate` syntax
-- `exists` quantifier
-- Superscripts: `R^n` (relation iteration - NOT arithmetic exponentiation)
-- Subscripts: `a_1`, `x_i`
-- Set operators: `in`, `subset`, `union`, `intersect`
-
-**Use Case**:
-```
-forall x : N | x * x >= 0
-exists n : N | n > 10
-```
-
-**Deliverable**: Can process predicate logic problems
-**Test**: Convert solutions with quantified formulas
-**Quality Gates**: All 5 commands pass
-
----
-
-### Phase 4: Z Notation Basics
-**Timeline**: 3-4 hours
-**Goal**: Type definitions and schemas
-
-**Add**:
-- `given A, B` (given types)
-- `Type ::= branch1 | branch2` (free types)
-- `abbrev == expression` (abbreviations)
-- `axdef ... where ... end` blocks
-- `schema Name ... where ... end` blocks
-
-**Use Case**:
-```
-given Person, Company
-
-Employment ::= employed | unemployed
-
-axdef
-  population : N
-where
-  population > 0
-end
-```
-
-**Deliverable**: Can process Z notation exercises
-**Test**: Convert Z notation definitions
-**Quality Gates**: All 5 commands pass
-
----
-
-### Phase 5: Proof Trees (Advanced)
-**Timeline**: 4-5 hours
-**Goal**: Natural deduction proofs
-
-**Add**:
-- `PROOF:` environment
-- Indentation-based tree structure
-- Justifications/rule names
-- Optional: `\infer` syntax generation for zed-proof
-
-**Use Case**:
-```
-PROOF:
-  p land q
-    p [land-elim-1]
-    q [land-elim-2]
-```
-
-**Deliverable**: Can process proof tree exercises
-**Test**: Convert natural deduction proofs
-**Quality Gates**: All 5 commands pass
-
----
-
----
-
-### Phase 5b: Proof Tree Improvements ✅ COMPLETED
-**Timeline**: 2-3 hours
-**Goal**: Fix nested assumptions and improve proof tree rendering
-
-**Added**:
-- Boxed assumption notation: `⌜expr⌝[n]` for assumption references
-- Proper handling of "from N" references
-- Independent nested assumption rendering
-- Consistent spacing across all proof environments
-- Centered proof trees in display math mode
-
-**Deliverable**: Natural deduction proofs with correct assumption scope and discharge notation
-**Test**: Solutions 13-18 with complex nested assumptions
-**Quality Gates**: All 5 commands pass
-**Status**: ✅ Completed (tagged as phase5b)
-
----
-
-## Coverage Assessment (As of Phase 22)
-
-### Currently Supported ✅
-- **Propositional Logic**: Truth tables, equivalence chains, basic operators (and, or, not, =>, <=>)
-- **Document Structure**: Sections, solutions, part labels, proper spacing, explicit TEXT paragraphs
-- **Text Paragraphs**: Explicit `TEXT:` keyword captures raw line content with operator conversion
-- **Proofs**: Natural deduction with all major inference rules (=>-intro, =>-elim, and-intro, and-elim, or-intro, or-elim, false-intro, false-elim)
-- **Proof Features**: Nested assumptions, discharge notation, case analysis (or-elim), boxed assumption notation
-- **Quantifiers**: forall, exists, exists1, mu-operator with multi-variable support
-- **Subscripts/Superscripts**: `x_i` (subscripts), `R^n` (relation iteration - NOT arithmetic exponentiation)
-- **Set Operations**: in, notin, subset, subseteq, union, intersect, cross (×), setminus (\), P (power set), P1, # (cardinality), bigcup (distributed union)
-- **Set Comprehension**: `{ x : X | predicate }`, `{ x : X | predicate . expression }`, multi-variable, optional domain
-- **Set Literals**: Including maplets `{1 |-> a, 2 |-> b, 3 |-> c}`
-- **Tuple Expressions**: `(a, b, c)` in set comprehensions and expressions
-- **Equality**: =, != in predicates and equivalence chains
-- **Arithmetic**: +, *, mod, -, unary minus operators
-- **Relations**: Relation type (<->), maplet (|->), domain restriction (<|), range restriction (|>), domain/range subtraction (<<|, |>>), composition (comp, o9), inverse (~), transitive closure (+, *), dom, ran, inv, id, relational image (R(| S |))
-  - **Note**: Semicolon (;) is NOT used for composition - it's reserved for declaration separators
-- **Functions**: All function types (partial, total, injection, surjection, bijection), lambda expressions, function override (++)
-- **Generic Parameters**: Generic definitions with [X] prefix, generic type instantiation (Type[A, B], emptyset[N], seq[N], P[X])
-- **Z Notation**: Given types, free types (::=) with recursive constructors and parameters, abbreviations (==), axiomatic definitions (axdef), generic definitions (gendef), schemas (schema)
-  - **Semicolon-separated declarations**: Multiple declarations in gendef/axdef/schema can be separated by semicolons on one line or across multiple lines - both render as separate lines in PDF
-- **Sequences**: Sequence literals `<>`, `<a, b>`, concatenation `^`, ASCII bracket alternatives, pattern matching, bags
-- **Identifiers**: Multi-word identifiers with underscores (cumulative_total, not_yet_viewed), digit-starting identifiers (479_courses)
-- **Conditionals**: if/then/else expressions with proper nesting
-- **Named Field Projection**: Schema field access (e.name, record.status)
-
-### Coverage Statistics
-- **Solutions fully working**: 52 of 52 (100%) ✅
-- **Solutions 1-30**: All working (propositional logic, quantifiers, equality, proofs, sets, relations)
-- **Solution 31**: Working with `abbrev...end` block syntax (Bug #3 fixed Nov 23, 2025)
-- **Solutions 32-52**: All working (functions, sequences, modeling, free types, supplementary)
-- **Topics covered**: Complete coverage of all 52 reference solutions
-- **No blockers**: All features implemented
-
----
-
-## Remaining Implementation (Phases 6-14)
-
-### ⚡ Immediate Homework Needs
-
-**User's next homework requires:**
-1. **Set comprehensions** → Phase 8
-2. **Relational composition** → Phase 10
-3. **Generic functions** → Phase 9 + Phase 11 (partial)
-
-**Recommended implementation order for homework:**
-1. ✅ Phase 6 (Quantifiers) - foundation for set comprehensions
-2. ✅ Phase 8 (Sets) - **set comprehensions needed**
-3. ✅ Phase 9 (Z Definitions) - **generic syntax needed**
-4. ✅ Phase 10 (Relations) - **relational composition needed**
-5. ✅ Phase 11 (Functions, partial) - function types for generic functions
-
-**Estimated time to homework readiness**: 21-31 hours
-- Phase 6: 4-6h
-- Phase 8: 6-8h
-- Phase 9: 4-5h
-- Phase 10: 8-10h (can start earlier if needed)
-- Phase 11 (minimal): ~2-3h (just function signatures and type syntax)
-
----
-
-### Phase 6: Quantifiers with Complex Domains
-**Timeline**: 4-6 hours
-**Goal**: Predicate logic with typed quantification
-**Priority**: ⚡ CRITICAL (foundation for Phase 8, needed for Solutions 5-8)
-
-**Add**:
-- Quantifier syntax with domains: `forall x : Domain | predicate`
-- Multi-variable quantification: `forall x, y : N | predicate`
-- Nested quantifiers: `exists d : Dog | forall t : Trainer | predicate`
-- Bullet operator in quantified predicates: `forall x : N | x > 0`
-- Domain restrictions and type annotations
-
-**Input Format**:
-```
-forall x : N | x * x >= 0
-exists d : Dog | gentle(d) land well_trained(d)
-forall x, y : N | x + y = 4 land x < y
-```
-
-**LaTeX Output**:
-```latex
-$\forall x : \nat \bullet x \times x \geq 0$
-$\exists d : Dog \bullet gentle(d) \land well\_trained(d)$
-$\forall x, y : \nat \bullet x + y = 4 \land x < y$
-```
-
-**Test Coverage**: Solutions 5-8
-**Deliverable**: Can process predicate logic with typed quantification
-
----
-
-### Phase 7: Equality and Special Operators
-**Timeline**: 3-4 hours
-**Goal**: One-point rule, µ-operator, unique existence
-**Priority**: HIGH (needed for Solutions 9-12)
-
-**Add**:
-- Equality in equivalence chains: `x = y`, `x ≠ y`
-- One-point rule applications in EQUIV blocks
-- µ-operator (definite description): `(mu x : X | predicate)`
-- ∃₁ (unique existence): `exists1 x : X | predicate`
-- Set membership in predicates: `in`, `notin`
-- Arithmetic in predicates
-
-**Input Format**:
-```
-EQUIV:
-exists y : N | y elem {0, 1} land y != 1 land x != y
-<=> exists y : N | y = 0 land x != y [arithmetic]
-<=> 0 elem N land x != 0 [one-point rule]
-<=> x != 0
-```
-
-**LaTeX Output**:
-```latex
-\begin{align*}
-\exists y : \nat \bullet y \in \{0, 1\} \land y \neq 1 \land x \neq y \\
-&\Leftrightarrow \exists y : \nat \bullet y = 0 \land x \neq y && \text{[arithmetic]} \\
-&\Leftrightarrow 0 \in \nat \land x \neq 0 && \text{[one-point rule]} \\
-&\Leftrightarrow x \neq 0
-\end{align*}
-```
-
-**Test Coverage**: Solutions 9-12
-**Deliverable**: Can process equality reasoning and special quantifiers
-
----
-
-### Phase 8: Sets and Set Theory
-**Timeline**: 6-8 hours
-**Goal**: Set operations, comprehensions, and set theory proofs
-**Priority**: ⚡ CRITICAL (needed for upcoming homework + Solutions 19-23)
-
-**Add**:
-- Set membership: `in`, `notin`, `subset`, `subseteq`
-- Set operations: `cap` (∩), `cup` (∪), `setminus` (\)
-- Power sets: `P`, `P1` (non-empty power set)
-- Cartesian products: `x` (×)
-- Set comprehensions: `{ x : X | predicate }`, `{ x : X | predicate . expression }`
-- Cardinality: `#` (as prefix operator)
-- Empty set: `emptyset` or `{}`
-- Set literals: `{1, 2, 3}`
-
-**Input Format**:
-```
-1 in {4, 3, 2, 1}
-{1} x {2, 3} = {(1, 2), (1, 3)}
-{ z : Z | 0 <= z and z <= 100 }
-{n : N | n <= 4 . n^2}
-{n : P {0, 1} . (n, # n)}
-
-EQUIV:
-x elem a cap b
-<=> (x elem a land x elem b) [intersection]
-<=> (x elem a) [idempotence of land]
-<=> x elem a
-```
-
-**LaTeX Output**:
-```latex
-$1 \in \{4, 3, 2, 1\}$
-$\{1\} \times \{2, 3\} = \{(1, 2), (1, 3)\}$
-$\{ z : \mathbb{Z} \mid 0 \leq z \land z \leq 100 \}$
-$\{n : \nat \mid n \leq 4 \bullet n^{2}\}$
-$\{n : \mathbb{P} \{0, 1\} \bullet (n, \# n)\}$
-```
-
-**Test Coverage**: Solutions 19-23
-**Deliverable**: Can process set theory exercises and proofs
-
----
-
-### Phase 9: Z Notation Definitions (Complete)
-**Timeline**: 4-5 hours
-**Goal**: Full Z notation definition support
-**Priority**: ⚡ CRITICAL (needed for upcoming homework generic functions + Solutions 24-26)
-
-**Add**:
-- Given types (basic types): `[Person]`, `[Dog]`
-- Abbreviation definitions: `Name == Expression`
-- Axiomatic definitions with schema boxes (proper rendering)
-- Generic definitions: `[X]` with generic parameters
-- Type constraints in predicates
-- Schema boxes with proper formatting
-
-**Input Format**:
-```
-given Person, Company
-
-Pairs == Z x Z
-
-StrictlyPositivePairs == { m, n : Z | m > 0 and n > 0 . (m, n) }
-
-Couples == { s : P Person | # s = 2 }
-
-axdef
-  notin[X] : (X <-> P X)
-where
-  forall x : X; s : P X | x notin s <=> lnot (x elem s)
-end
-```
-
-**LaTeX Output**:
-```latex
-\begin{zed}
-[Person, Company]
-\end{zed}
-
-\begin{zed}
-Pairs == \mathbb{Z} \times \mathbb{Z}
-\end{zed}
-
-\begin{axdef}[X]
-\_ \not\in \_ : (X \rel \power X)
-\where
-\forall x : X; s : \power X \bullet
-  x \not\in s \iff \lnot (x \in s)
-\end{axdef}
-```
-
-**Test Coverage**: Solutions 24-26
-**Deliverable**: Can process Z notation definitions and axiomatic descriptions
-
----
-
-### Phase 10: Relations
-**Timeline**: 8-10 hours
-**Goal**: Relational operators and relation calculus
-**Priority**: ⚡ CRITICAL (needed for upcoming homework relational composition + Solutions 27-32)
-
-**Add**:
-- Relation type: `X <-> Y`
-- Maplet: `x |-> y`
-- Domain/range: `dom R`, `ran R`
-- Domain/range restriction: `A <| R`, `R |> B`
-- Domain/range subtraction: `A <<| R`, `R |>> B`
-- Relational composition: `R comp S` or `R o9 S`
-  - **Note**: `R ; S` is NOT supported - semicolon is reserved for declaration separators
-- Relational inverse: `R~` or `inv R`
-- Transitive closure: `R+`, `R*`
-- Identity relation: `id[X]`
+### Logic and Proofs
+- **Propositional**: Truth tables, equivalence chains, operators (`land`, `lor`, `lnot`, `=>`, `<=>`)
+- **Predicate**: `forall`, `exists`, `exists1`, mu-operator with multi-variable support
+- **Proofs**: Natural deduction with inference rules, nested assumptions, discharge notation, case analysis
+
+### Sets and Types
+- **Operations**: `in`, `notin`, `subset`, `subseteq`, `cup`, `cap`, `cross`, `setminus`, `P`, `P1`, `#`, `bigcup`
+- **Comprehension**: `{ x : X | predicate }`, `{ x : X | predicate . expression }`
+- **Literals**: Set literals, maplets (`{1 |-> a, 2 |-> b}`)
+- **Tuples**: `(a, b, c)` in expressions and comprehensions
+
+### Relations
+- Type syntax (`<->`), maplet (`|->`)
+- Domain/range: `dom`, `ran`, restriction (`<|`, `|>`), subtraction (`<<|`, `|>>`)
+- Composition (`comp`, `o9`), inverse (`~`), transitive closure (`+`, `*`)
 - Relational image: `R(| S |)`
+- Identity: `id[X]`
 
-**Input Format**:
-```
-dom R = {0, 1, 2}
-ran R = {1, 2, 3}
-{1, 2} <| R = {1 |-> 2, 1 |-> 3, 2 |-> 3}
-R |>> {1, 2} = {0 |-> 3, 1 |-> 3, 2 |-> 3}
+**Note**: Semicolon (`;`) is reserved for declaration separators, not composition.
 
-parentOf == childOf~
-siblingOf == (childOf o9 parentOf) \ id[Person]
-ancestorOf == parentOf+
-
-EQUIV:
-x |-> y elem A <| (B <| R)
-<=> x elem A land x |-> y elem (B <| R) [domain restriction]
-<=> x elem A land x elem B land x |-> y elem R [domain restriction]
-<=> x elem A cap B land x |-> y elem R [intersection]
-<=> x |-> y elem (A cap B) <| R [domain restriction]
-```
-
-**LaTeX Output**:
-```latex
-$\dom R = \{0, 1, 2\}$
-$\ran R = \{1, 2, 3\}$
-$\{1, 2\} \dres R = \{1 \mapsto 2, 1 \mapsto 3, 2 \mapsto 3\}$
-$R \nrres \{1, 2\} = \{0 \mapsto 3, 1 \mapsto 3, 2 \mapsto 3\}$
-
-$parentOf == childOf^{\sim}$
-$siblingOf == (childOf \comp parentOf) \setminus id[Person]$
-$ancestorOf == parentOf^{+}$
-```
-
-**Test Coverage**: Solutions 27-32
-**Deliverable**: Can process relation theory and relational calculus
-
----
-
-### Phase 11: Functions
-**Timeline**: 5-6 hours (2-3h minimal for homework)
-**Goal**: Function types and function operators
-**Priority**: ⚡ CRITICAL (partially needed for upcoming homework generic functions + Solutions 33-36)
-
-**Add**:
-- Partial functions: `X +-> Y`
-- Total functions: `X -> Y`
-- Partial injections: `X >+> Y`
-- Total injections: `X >-> Y`
-- Partial surjections: `X +->> Y`
-- Total surjections: `X -->> Y`
-- Bijections: `X >->> Y`
+### Functions
+- All function types: partial (`+->`), total (`->`), injections, surjections, bijections
+- Lambda expressions: `lambda x : X . expr`
 - Function application: `f x`, `f(x)`
-- Function override: `f oplus {x |-> y}`
-- Lambda expressions: `lambda x : X . expression`
-- Relational image: `R(| S |)`
+- Override: `f ++ {x |-> y}`
 
-**Input Format**:
-```
-children : Person -> P Person
-children = {p : Person . p |-> parentOf(| {p} |)}
-
-number_of_grandchildren : Person -> N
-number_of_grandchildren =
-  {p : Person . p |-> # (parentOf o9 parentOf)(| {p} |)}
-
-f : (Drivers <-> Cars) -> (Cars -> N)
-forall r : Drivers <-> Cars |
-  f(r) = {c : ran r . c |-> #{d : Drivers | d |-> c in r}}
-```
-
-**LaTeX Output**:
-```latex
-\begin{axdef}
-children : Person \fun \power Person \\
-children = \{p : Person \bullet p \mapsto parentOf(\limg \{p\} \rimg)\}
-\end{axdef}
-
-\begin{axdef}
-number\_of\_grandchildren : Person \fun \nat \\
-number\_of\_grandchildren = \\
-\t1 \{p : Person \bullet p \mapsto \# (parentOf \comp parentOf)(\limg \{p\} \rimg)\}
-\end{axdef}
-```
-
-**Test Coverage**: Solutions 33-36
-**Deliverable**: Can process function theory and function specifications
-
----
-
-### Phase 11.9: Generic Type Instantiation ✅ COMPLETED
-**Timeline**: 6-8 hours actual
-**Goal**: Generic type parameters for Z notation
-**Priority**: CRITICAL (needed for Solutions 25, 26)
-**Status**: ✅ Completed (69.2% coverage achieved - Solutions 1-36 fully working)
-
-**Added**:
-- Generic type instantiation: `Type[A, B]`, `emptyset[N]`, `seq[N]`, `P[X]`
-- Whitespace-sensitive parsing: distinguishes `Type[X]` from `p [justification]`
-- Token position tracking in parser for accurate whitespace detection
-- Support for nested generics: `Type[List[N]]`
-- Support for chained generics: `Type[N][M]`
-- Support for complex type parameters: `emptyset[N cross N]`
-- Generic types in quantifier/set comprehension domains: `forall x : P[N] | ...`
-
-**Input Format**:
-```
-emptyset[N]
-seq[N cross N]
-P[X]
-Type[A, B, C]
-Type[List[N]]
-Type[N][M]
-
-{ s : P[N] | s = emptyset[N] }
-forall x : seq[N] | # x > 0
-```
-
-**LaTeX Output**:
-```latex
-$emptyset[N]$
-$seq[N \cross N]$
-$P[X]$
-$Type[A, B, C]$
-$Type[List[N]]$
-$Type[N][M]$
-
-$\{ s : P[N] \mid s = emptyset[N] \}$
-$\forall x : seq[N] \bullet \# x > 0$
-```
-
-**Implementation Details**:
-- Added `GenericInstantiation` AST node with `base` and `type_params` fields
-- Parser tracks `last_token_end_column` and `last_token_line` to detect whitespace
-- Handles special case: `P[X]` where `P` is lexed as POWER token but treated as identifier for generics
-- Updated domain parsing in quantifiers and set comprehensions to use `_parse_postfix()` instead of `_parse_atom()`
-
-**Test Coverage**: Solutions 25, 26 + comprehensive test suite (16 tests in test_generic_instantiation.py)
-**Deliverable**: Can process generic type specifications in Z notation
-**Result**: Achieved 69.2% solution coverage (36/52 solutions fully working, Solutions 37-52 require additional features)
-
----
-
-### Phase 14: ASCII Sequence Brackets and Pattern Matching ✅ COMPLETED
-**Timeline**: 3-4 hours actual
-**Goal**: ASCII alternatives for sequence notation and pattern matching support
-**Priority**: CRITICAL (preparation for Phase 12, unblocks Solutions 40-43)
-**Status**: ✅ Completed (571 tests passing)
-
-**Added**:
-- ASCII sequence brackets: `<>` as alternative to Unicode `⟨⟩`
-- ASCII concatenation: `^` as alternative to Unicode `⌢`
-- Whitespace-based disambiguation for `<` and `>` operators
-- Context-sensitive `^` operator (concatenation after sequences, superscript elsewhere)
-- Pattern matching support for recursive functions on sequences
-
-**Key Features**:
-- Lookahead for `<`: recognizes `<>`, `<x>`, `<(expr)>`, `<<nested>>`
-- Whitespace check for `>`: `<x>` (no space) vs `x > y` (space before `>`)
-- Lookback for `^`: `<x> ^ s` (concatenation) vs `R^n` (relation iteration)
-
-**Input Format**:
-```
-<>                      # Empty sequence
-<a, b, c>              # Sequence literal
-<x> ^ s                # Concatenation
-f(<>)                  # Pattern matching - empty case
-f(<x> ^ s)             # Pattern matching - cons case
-total(<>) = 0          # Recursive function base case
-total(<x> ^ s) = x + total(s)  # Recursive function inductive case
-```
-
-**LaTeX Output**:
-```latex
-$\langle \rangle$
-$\langle a, b, c \rangle$
-$\langle x \rangle \cat s$
-$f(\langle \rangle)$
-$f(\langle x \rangle \cat s)$
-$total(\langle \rangle) = 0$
-$total(\langle x \rangle \cat s) = x + total(s)$
-```
-
-**Implementation Details**:
-- Lexer: Whitespace-sensitive recognition of `<`, `>`, and `^` tokens
-- Parser: Reuses `SequenceLiteral` AST node (from Phase 12)
-- LaTeX: Maps both Unicode and ASCII to same LaTeX commands
-- Disambiguation heuristics prevent conflicts with comparison operators
-
-**Test Coverage**: 21 tests in test_phase14.py covering:
-- ASCII sequence brackets (empty, single, multiple elements, nested)
-- ASCII concatenation (after sequences, chaining, with empty)
-- Pattern matching (empty pattern, cons pattern, equations)
-- Comparison operator disambiguation
-- Mixed Unicode/ASCII usage
-
-**Deliverable**: Can write sequences using ASCII or Unicode syntax
-**Unblocks**: Solutions 40-43 (pattern matching on sequences)
-
----
-
-### Phase 15: Underscore in Identifiers ✅ COMPLETED
-**Timeline**: 2-3 hours actual
-**Goal**: Support multi-word identifiers with underscores
-**Priority**: CRITICAL (needed for Solutions 40-52)
-**Status**: ✅ Completed (571 tests passing)
-
-**Problem**: Previously, `_` was a subscript operator, so `cumulative_total` tokenized as three separate tokens: `cumulative`, `_`, `total`. Solutions 40-52 use multi-word identifiers extensively.
-
-**Solution**: Include underscore in identifiers at lexer level, handle subscript rendering in LaTeX generation.
-
-**Added**:
-- Underscore now part of identifier characters in lexer
-- Removed UNDERSCORE token type
-- Smart underscore rendering in LaTeX generator
-
-**LaTeX Rendering Heuristics**:
-1. **No underscore**: `x` → `x`
-2. **Simple subscript** (single char after `_`): `a_i` → `a_i`, `x_0` → `x_0`
-3. **Multi-char subscript** (2-3 chars after `_`): `a_max` → `a_{max}`
-4. **Multi-word identifier** (long words or multiple `_`): `cumulative_total` → `\mathit{cumulative\_total}`
-
-**Heuristic**: If any part is > 3 chars or multiple underscores, treat as multi-word identifier and use `\mathit{}` with escaped underscores.
-
-**Input Format**:
-```
-x_i                    # Simple subscript
-a_max                  # Multi-char subscript
-cumulative_total       # Multi-word identifier
-not_yet_viewed         # Multi-word identifier (3 underscores)
-```
-
-**LaTeX Output**:
-```latex
-$x_i$
-$a_{max}$
-$\mathit{cumulative\_total}$
-$\mathit{not\_yet\_viewed}$
-```
-
-**Backward Compatibility**:
-- Solutions 1-39 still work (subscripts like `a_i`, `x_n`)
-- Simple subscripts render identically
-- Only affects multi-char suffixes and long identifiers
-
-**Implementation Details**:
-- Lexer: Changed `_scan_identifier()` to include underscore in character loop
-- Lexer: Removed underscore token generation
-- LaTeX: Added smart heuristic in `_generate_identifier()`
-- Updated 6 tests to reflect new behavior
-
-**Test Coverage**: Existing tests + verification tests
-- Simple subscripts: `a_i`, `x_0`
-- Multi-char subscripts: `a_max`
-- Multi-word identifiers: `cumulative_total`, `not_yet_viewed`
-- In equations: `cumulative_total = x + y`
-
-**Deliverable**: Can use multi-word identifiers in Z specifications
-**Unblocks**: Solutions 40-52 (all use multi-word identifiers)
-
----
-
-### Phase 16: Conditional Expressions (if/then/else) ✅ COMPLETED
-**Timeline**: 3-4 hours actual
-**Goal**: Support conditional expressions in mathematical notation
-**Priority**: CRITICAL (needed for Solutions 40-52)
-**Status**: ✅ Completed (590 tests passing)
-
-**Problem**: Conditional expressions (`if condition then expr1 else expr2`) are commonly used in recursive function definitions and specifications, especially for pattern matching on sequences and free types.
-
-**Solution**: Add conditional expression syntax with proper precedence and LaTeX rendering.
-
-**Added**:
-- Conditional expression tokens: IF, THEN, ELSE, OTHERWISE
-- Conditional AST node with condition, then_expr, else_expr fields
-- Conditional parsing at expression entry level (before iff) for low precedence
-- Nested conditional support in then/else branches
-- MINUS token for arithmetic subtraction/negation
-- Unary minus operator (Phase 16 dependency)
-
-**Precedence**: Conditionals bind very loosely (lower than iff), allowing arbitrary expressions in condition but allowing conditionals in then/else branches for nesting.
-
-**Parsing Strategy**:
-- Condition: parsed with `_parse_iff()` (no quantifiers/lambdas/conditionals)
-- Then/else branches: parsed with `_parse_expr()` (allows nested conditionals)
-- Conditionals can appear as operands in arithmetic expressions
-
-**Input Format**:
-```
-if x > 0 then x else -x
-if s = <> then 0 else head s
-if x > 0 then 1 else if x < 0 then -1 else 0  # Nested
-abs(x) = if x > 0 then x else -x
-max(x, y) = if x > y then x else y
-y + if x > 0 then 1 else 0  # As operand
-```
-
-**LaTeX Output**:
-```latex
-$(\text{if } x > 0 \text{ then } x \text{ else } -x)$
-$(\text{if } s = \langle \rangle \text{ then } 0 \text{ else } \head s)$
-$(\text{if } x > 0 \text{ then } 1 \text{ else } (\text{if } x < 0 \text{ then } -1 \text{ else } 0))$
-$abs(x) = (\text{if } x > 0 \text{ then } x \text{ else } -x)$
-$max(x, y) = (\text{if } x > y \text{ then } x \text{ else } y)$
-$y + (\text{if } x > 0 \text{ then } 1 \text{ else } 0)$
-```
-
-**MINUS Token Implementation**:
-- Added MINUS to TokenType enum
-- Lexer recognizes standalone `-` (separate from multi-char operators like `->`, `-->>`)
-- Parser handles MINUS as both unary prefix (negation) and binary infix (subtraction)
-- LaTeX generator maps `-` to `-` for both contexts (no space for unary)
-
-**Implementation Details**:
-- Lexer: Added IF/THEN/ELSE/OTHERWISE keyword recognition
-- Lexer: Added standalone minus token handling
-- Parser: Added `_parse_conditional()` method at expression entry point
-- Parser: Added MINUS to unary operators and additive operators
-- Parser: Added IF and MINUS to `_is_operand_start()` for lookahead
-- LaTeX: Inline rendering with `\text{}` keywords, wrapped in parentheses
-- LaTeX: Unary minus renders without space (`-x` not `- x`)
-
-**Test Coverage**: 19 tests in test_phase16.py covering:
-- Simple conditionals (if x > 0 then x else -x)
-- Conditionals with comparisons (if s = <> then 0 else 1)
-- Nested conditionals (in then branch, in else branch)
-- Conditionals in binary operations (y + if x > 0 then 1 else 0)
-- LaTeX generation with proper formatting
-- Precedence and associativity
-- Integration tests (abs, max, sign functions)
-
-**Example Use Cases**:
-```
-# Absolute value
-abs(x) = if x > 0 then x else -x
-
-# Maximum of two values
-max(x, y) = if x > y then x else y
-
-# Sign function (nested conditionals)
-sign(x) = if x > 0 then 1 else if x < 0 then -1 else 0
-
-# Recursive sequence function
-f(s) = if s = <> then 0 else head s + f(tail s)
-
-# Pattern matching alternative
-total(<>) = 0
-total(<x> ^ s) = x + total(s)
-# Equivalent to: total(seq) = if seq = <> then 0 else ...
-```
-
-**Deliverable**: Can express conditional logic in mathematical specifications
-**Unblocks**: Solutions 40-52 (conditional expressions in recursive functions)
-
----
-
-### Phase 17: Recursive Free Types with Constructor Parameters ✅ COMPLETED
-**Timeline**: 4-5 hours actual
-**Goal**: Support recursive free type definitions with parameterized constructors
-**Priority**: CRITICAL (needed for Solutions 44-47)
-**Status**: ✅ Completed (773 tests passing)
-
-**Problem**: Basic free types (Phase 4) only supported simple constructor names without parameters. Z notation requires recursive free types with parameterized constructors like `Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩`.
-
-**Solution**: Enhance free type syntax to support constructor parameters enclosed in angle brackets.
-
-**Added**:
-- FreeBranch AST node with name and optional parameters field
-- Modified FreeType to use `list[FreeBranch]` instead of `list[str]`
-- Parser support for angle bracket parameters `⟨Type⟩` or `<Type>`
-- LaTeX generation with `\ldata` and `\rdata` for parameterized constructors
-- Support for complex parameter types (cross products, function applications)
-- Backward compatibility with simple free types (Phase 4)
-
-**Input Format**:
-```
-given N
-
-Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩
-
-List ::= nil | cons⟨N × List⟩
-```
-
-**LaTeX Output**:
-```latex
-\begin{zed}[N]\end{zed}
-
-\begin{zed}Tree ::= stalk | leaf \ldata N \rdata | branch \ldata Tree \cross Tree \rdata\end{zed}
-
-\begin{zed}List ::= nil | cons \ldata N \cross List \rdata\end{zed}
-```
-
-**Implementation Details**:
-- **FreeBranch**: New dataclass with `name: str` and `parameters: Expr | None`
-- **FreeType**: Changed `branches: list[str]` to `branches: list[FreeBranch]`
-- **Parser**: Added `_parse_free_type()` enhancement to parse `⟨...⟩` parameters
-  - Uses `_parse_cross()` for parameter expressions (handles identifiers and cross products)
-  - Special case for empty parameters `⟨⟩` creates empty SequenceLiteral
-  - Supports both Unicode `⟨⟩` and ASCII `<>` angle brackets
-- **LaTeX**: Updated `_generate_free_type()` to render `\ldata` and `\rdata` for parameterized branches
-  - Added `"×": r"\cross"` to BINARY_OPS dictionary
-  - Added `"×": 8` to PRECEDENCE dictionary
-- **Token reuse**: Leveraged LANGLE/RANGLE tokens from Phase 12
-
-**Key Design Decisions**:
-1. **Parameter type**: `Expr | None` allows arbitrary type expressions (identifiers, cross products, function applications)
-2. **Parser method**: Use `_parse_cross()` instead of `_parse_comparison()` to correctly handle cross products without consuming too much
-3. **LaTeX wrapping**: Entire free type in `\begin{zed}...\end{zed}` environment
-4. **Backward compatibility**: Simple branches (no parameters) render without `\ldata`/`\rdata`
-
-**Test Coverage**: 18 tests in test_phase17_free_types.py covering:
-- Simple branches (no parameters)
-- Single parameter constructors (leaf⟨N⟩)
-- Multi-parameter constructors (branch⟨Tree × Tree⟩)
-- Mixed branches (combination of simple and parameterized)
-- ASCII angle brackets alternative (`<>`)
-- Complex parameter types (`cons⟨N × seq(N)⟩`)
-- LaTeX generation for all cases
-- End-to-end integration tests (Tree, List definitions)
-- Error handling (empty branches, unclosed brackets)
-- Backward compatibility with Phase 4 simple free types
-
-**Verified Against**:
-- Solutions 44-47 test file successfully generated PDF
-- Tree definition renders correctly: `Tree ::= stalk | leaf ⟨N⟩ | branch⟨Tree × Tree⟩`
-
-**Deliverable**: Can process recursive free type definitions with constructor parameters
-**Unblocks**: Solutions 44-47 (free types and structural induction)
-
----
-
-### Phase 12: Sequences
-**Timeline**: 6-8 hours
-**Goal**: Sequence types and sequence operators
-**Priority**: MEDIUM (needed for Solutions 37-39)
-
-**Add**:
-- Sequence types: `seq X`, `seq1 X` (non-empty), `iseq X` (injective)
+### Sequences and Bags
 - Sequence literals: `<>`, `<a, b, c>`
-- Concatenation: `s ^ t`
-- Head/tail/last/front: `head s`, `tail s`, `last s`, `front s`
-- Sequence filtering: `s |` A` (filter by set)
-- Reverse: `rev s`
-- Extraction: `s(i)` (element at position)
-- Distributed concatenation: `cat/s`
-- Squash: `squash R` (not implemented - not built into fuzz)
+- Concatenation: `^` (with space: `s ^ t`)
+- Operators: `head`, `tail`, `front`, `last`, `rev`, `#`
+- Sequence types: `seq`, `seq1`, `iseq`
+- Bag operations: `bag`, `uplus`
 
-**Input Format**:
-```
-<a>
-<a, b, c, d> ^ <a, b> = {1 |-> a, 2 |-> b, 3 |-> c, 4 |-> d, 5 |-> a, 6 |-> b}
-tail <a, b, c, d> = <b, c, d>
-front <a, b, c, d> = <a, b, c>
-ran <a, b, a, d> = {a, b, d}
+### Z Notation Definitions
+- Given types: `given A, B`
+- Free types: `Status ::= active | inactive` with parameterized constructors
+- Abbreviations: `Name == expression`
+- Axiomatic definitions: `axdef...where...end`
+- Generic definitions: `gendef [X]...where...end`
+- Schemas: `schema Name...where...end`
+- Generic instantiation: `Type[A, B]`, `emptyset[N]`
 
-f : Place -> P Place
-forall p : Place | f p = {q : Place | p |-> q elem ran trains}
-
-{p : Place | exists1 x : dom trains | (trains x).2 = p}
-```
-
-**LaTeX Output**:
-```latex
-$\langle a \rangle$
-$\langle a, b, c, d \rangle \cat \langle a, b \rangle = \{1 \mapsto a, 2 \mapsto b, \ldots\}$
-$\tail \langle a, b, c, d \rangle = \langle b, c, d \rangle$
-$\front \langle a, b, c, d \rangle = \langle a, b, c \rangle$
-$\ran \langle a, b, a, d \rangle = \{a, b, d\}$
-```
-
-**Test Coverage**: Solutions 37-39
-**Deliverable**: Can process sequence specifications and operations
-
----
-
-### Phase 13: Schemas and State Machines
-**Timeline**: 10-12 hours
-**Goal**: Z schemas, state, and operations
-**Priority**: MEDIUM-LOW (needed for Solutions 40-43)
-
-**Add**:
-- Schema boxes with declarations and predicates
-- Schema references and inclusion
-- Schema decoration: `S'`, `S?`, `S!`
-- Delta notation: `Delta S` (before/after state)
-- Xi notation: `Xi S` (no state change)
-- Schema composition: `S1 ; S2`, `S1 and S2`, `S1 or S2`
-- Schema projection: `S \ (x, y)`
-- Preconditions: `pre S`
-- Schema quantification
-
-**Input Format**:
-```
-schema State
-  hd : seq(Title x Length x Viewed)
-where
-  cumulative_total hd <= 12000
-  forall p : ran hd | p.2 <= 360
-end
-
-schema AddSong
-  Delta State
-  song? : SongId
-where
-  song? notin ran hd
-  hd' = hd ^ <song?>
-end
-```
-
-**LaTeX Output**:
-```latex
-\begin{schema}{State}
-hd : \seq(Title \cross Length \cross Viewed)
-\where
-cumulative\_total~hd \leq 12000 \\
-\forall p : \ran hd \bullet p.2 \leq 360
-\end{schema}
-
-\begin{schema}{AddSong}
-\Delta State \\
-song? : SongId
-\where
-song? \notin \ran hd \\
-hd' = hd \cat \langle song? \rangle
-\end{schema}
-```
-
-**Test Coverage**: Solutions 40-43
-**Deliverable**: Can process state-based specifications with schemas
-
----
-
-### Phase 14: Free Types and Induction
-**Timeline**: 8-10 hours
-**Goal**: Recursive types and inductive proofs
-**Priority**: LOW (needed for Solutions 44-47)
-
-**Add**:
-- Free type definitions: `Type ::= constructor1 | constructor2 << Type >>`
-- Recursive constructors with parameters
-- Pattern matching in function definitions
-- Inductive proof structure (base case + inductive step)
-- Recursive function definitions over free types
-- Proof by structural induction
-
-**Input Format**:
-```
-Tree ::= stalk | leaf << N >> | branch << Tree x Tree >>
-
-count : Tree -> N
-count stalk = 0
-forall n : N | count (leaf n) = 1
-forall t1, t2 : Tree | count (branch (t1, t2)) = count t1 + count t2
-
-PROOF (by induction on t : Tree):
-Base case (stalk):
-  # (flatten stalk)
-  = # <> [flatten]
-  = 0 [#]
-  = count stalk [count]
-
-Inductive step (branch):
-  # (flatten branch (t1, t2))
-  = # (flatten t1 ^ flatten t2) [flatten]
-  = # flatten t1 + # flatten t2 [# is distributive]
-  = count t1 + count t2 [induction hypothesis]
-  = count branch (t1, t2) [count]
-```
-
-**LaTeX Output**:
-```latex
-\begin{zed}
-Tree ::= stalk | leaf \ldata \nat \rdata | branch \ldata Tree \cross Tree \rdata
-\end{zed}
-
-\begin{axdef}
-count : Tree \fun \nat
-\also
-count~stalk = 0 \\
-\forall n : \nat \bullet count~(leaf~n) = 1 \\
-\forall t_{1}, t_{2} : Tree \bullet count~(branch~(t_{1}, t_{2})) = count~t_{1} + count~t_{2}
-\end{axdef}
-
-[Proof rendered with proper structure...]
-```
-
-**Test Coverage**: Solutions 44-47
-**Deliverable**: Can process recursive types and inductive proofs
-
----
-
-## Updated Timeline Summary
-
-### Completed (Phase 0-29) ✅
-- **Total time invested**: ~75-95 hours
-- **Coverage**: 98.1% of course material (51/52 solutions fully working)
-- **Status**: ✅ Phase 29 complete - explicit parentheses preservation
-- **Phases complete**: 0, 1, 2, 3, 4, 5, 5b, 6, 7, 8, 9, 10a, 10b, 11a, 11b, 11c, 11d, 11.5, 11.6, 11.7, 11.8, 11.9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 27, 29
-- **Test coverage**: 1188 tests passing
-
-### Status: 100% Complete ✅
-
-**Achievement (Nov 23, 2025 - Morning)**:
-- **Bug #3 Fixed**: Implemented `abbrev...end` block syntax for compound identifiers (R+, R*)
-- **Solution 31**: Now working with proper abbreviation block syntax
-- **Coverage**: 100% complete (52/52 solutions fully working)
-
-**Breaking Change (Nov 23, 2025 - Afternoon): zed...end Standardization**
-- **Removed**: `abbrev...end` syntax (never existed in fuzz - was our invention)
-- **Standardized**: All Z notation constructs now use `zed...end` blocks
-- **Enhanced**: `zed...end` blocks now support:
-  - Given types (`given A, B`)
-  - Free types (`Status ::= active | inactive`)
-  - Abbreviations (`MaxSize == 100`, `[X] Pair == X`, `R+ == ...`)
-  - Predicates (`forall x : N | x >= 0`)
-  - Mixed content (multiple construct types in one block)
-- **Migration**: ~140 constructs converted across 50+ files
-- **Tests**: +14 new tests (1188 total), all quality checks pass
-- **Rationale**: Align with fuzz's standard `\begin{zed}...\end{zed}` environment
-
-### Grand Total
-- **Final progress**: 100% complete (52/52 solutions fully working) ✅
-- **All topics covered**: Propositional logic, quantifiers, equality, proofs, sets, relations, functions, sequences, modeling, free types, supplementary
-- **Estimated total development time**: ~80 hours
-- **Milestone achieved**: Full feature coverage for all reference solutions
-
-### Advantages of Phased Approach
-1. ✅ **Early utility**: Phase 1 usable for truth table problems immediately
-2. ✅ **Risk reduction**: Each phase validates the architecture
-3. ✅ **Isolated testing**: Clear test scope per phase
-4. ✅ **Regular milestones**: Working software at each phase
-5. ✅ **User feedback**: Real usage drives next phase priorities
-6. ✅ **Easier debugging**: Smaller scope to diagnose issues
+### Expressions
+- Arithmetic: `+`, `-`, `*`, `mod`, unary minus
+- Conditionals: `if condition then expr else expr`
+- Subscripts/superscripts: `x_i`, `R^n` (relation iteration)
+- Named field projection: `record.field`
+- Multi-word identifiers: `cumulative_total`, `not_yet_viewed`
 
 ## Technology Choices
 
 ### Language
 
 **Python 3.10+**
-- Already used in txt2tex_v3.py
 - Good library support
 - Dataclasses for AST nodes
 - Type hints for maintainability
@@ -2102,28 +1072,27 @@ txt2tex/
 
 ### 1. Package Choice: fuzz vs zed-* ✅ RESOLVED
 
-**Decision**: Support both, default to **zed-***
+**Decision**: Support both, default to **fuzz**
 
-**Rationale**:
-- **zed-* advantages**:
-  - No custom fonts (uses Computer Modern + AMS)
-  - Works on any LaTeX installation immediately
-  - Instructor uses it (submission compatibility)
-  - Built-in proof tree support (`\infer`, `\assume`, `\discharge`)
-  - Modular design (load only what's needed)
+**Rationale**: Typechecking with fuzz is a core feature of txt2tex. The ability to validate Z specifications before PDF generation is a primary reason users convert to LaTeX.
 
-- **fuzz advantages**:
+- **fuzz advantages** (why it's the default):
+  - Typechecker integration - validates Z notation correctness
   - Historical standard for Z notation
   - Single package simplicity
-  - Already working in txt2tex_v3.py
-  - May have typechecker integration
+
+- **zed-* advantages** (available via `--zed` flag):
+  - No custom fonts (uses Computer Modern + AMS)
+  - Works on any LaTeX installation immediately
+  - Built-in proof tree support (`\infer`, `\assume`, `\discharge`)
+  - Modular design (load only what's needed)
 
 **Implementation**: Both packages use identical macro names (`\land`, `\forall`, `\begin{schema}`, etc.), so generated LaTeX is 99% compatible. Only difference is preamble and proof tree syntax.
 
 **Configuration**:
 ```python
-Options(use_fuzz=False)  # Default: zed-*
-Options(use_fuzz=True)   # Use fuzz package
+# Default: fuzz package (for typechecking)
+# Use --zed flag for zed-* packages
 ```
 
 ### 2. Proof tree syntax
@@ -2241,31 +1210,6 @@ The argue environment's use of raw `\halign` makes this impossible - it cannot b
    - Reverse conversion
    - Useful for editing existing documents
 
-## Success Criteria
-
-1. ✅ Convert solutions_complete.txt to PDF matching reference
-2. ✅ Pass fuzz validation without errors
-3. ✅ Handle all constructs from txt2tex_v3.py correctly
-4. ✅ Clear error messages for malformed input
-5. ✅ Fast enough for interactive use (<1s for typical document)
-6. ✅ Clean, maintainable codebase
-7. ✅ Comprehensive test coverage (>90%)
-8. ✅ User documentation with examples
-
-## Appendix: Comparison with txt2tex_v3.py
-
-| Feature | v3 (Regex) | v4 (Parser) |
-|---------|------------|-------------|
-| Operator detection | String replacement | Token-based |
-| Context awareness | None | Full context tracking |
-| Error messages | Generic | Line/column specific |
-| Extensibility | Hard (regex conflicts) | Easy (add tokens/rules) |
-| Correctness | Fragile | Robust |
-| Performance | Fast | Fast enough |
-| Code complexity | Growing | Structured |
-| Testing | Hard to test | Easy to unit test |
-| Maintainability | Low | High |
-
 ## Appendix: Example Conversion
 
 **Input (whiteboard.txt)**:
@@ -2332,11 +1276,10 @@ Document(
 )
 ```
 
-**Output LaTeX** (with default zed-* packages):
+**Output LaTeX** (with default fuzz package):
 ```latex
 \documentclass{article}
-\usepackage{zed-cm}
-\usepackage{zed-maths}
+\usepackage{fuzz}
 \usepackage{amsmath}
 \begin{document}
 
@@ -2361,4 +1304,4 @@ F & F & T \\
 \end{document}
 ```
 
-**Note**: Output with `use_fuzz=True` is identical except first three `\usepackage` lines become `\usepackage{fuzz}`.
+**Note**: With `--zed` flag, `\usepackage{fuzz}` becomes `\usepackage{zed-cm}` and `\usepackage{zed-maths}`.
