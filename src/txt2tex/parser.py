@@ -3149,6 +3149,55 @@ class Parser:
 
         return GivenType(names=names, line=start_token.line, column=start_token.column)
 
+    def _parse_free_branch(self, branch_token: Token) -> FreeBranch:
+        """Parse a single free type branch with optional parameters.
+
+        Assumes the branch name token has already been consumed. Parses
+        optional constructor parameters in angle brackets: <...> or ⟨...⟩
+
+        Args:
+            branch_token: The token containing the branch name
+
+        Returns:
+            FreeBranch with name and optional parameters
+        """
+        branch_name = branch_token.value
+
+        # Check for constructor parameters: ⟨...⟩ or <...>
+        parameters: Expr | None = None
+        if self._match(TokenType.LANGLE):
+            langle_token = self._current()
+            self._advance()  # Consume '⟨' or '<'
+
+            # Check for empty parameters: ⟨⟩
+            if self._match(TokenType.RANGLE):
+                # Empty parameters - create empty sequence literal
+                parameters = SequenceLiteral(
+                    elements=[],
+                    line=langle_token.line,
+                    column=langle_token.column,
+                )
+                self._advance()  # Consume '⟩' or '>'
+            else:
+                # Parse parameter type expression (can be cross product)
+                # Examples: ⟨N⟩, ⟨Tree⟩, ⟨Tree x Tree⟩
+                parameters = self._parse_cross()
+
+                # Expect closing angle bracket
+                if not self._match(TokenType.RANGLE):
+                    raise ParserError(
+                        "Expected '⟩' or '>' after constructor parameters",
+                        self._current(),
+                    )
+                self._advance()  # Consume '⟩' or '>'
+
+        return FreeBranch(
+            name=branch_name,
+            parameters=parameters,
+            line=branch_token.line,
+            column=branch_token.column,
+        )
+
     def _parse_free_type(self) -> FreeType:
         """Parse free type: Type ::= branch1 | branch2⟨N⟩ | branch3⟨Tree x Tree⟩.
 
@@ -3181,48 +3230,8 @@ class Parser:
                 or self._match(TokenType.FINSET1)
             ):
                 branch_token = self._current()
-                branch_name = branch_token.value
                 self._advance()
-
-                # Check for constructor parameters: ⟨...⟩
-                parameters: Expr | None = None
-                if self._match(TokenType.LANGLE):
-                    langle_token = self._current()
-                    self._advance()  # Consume '⟨'
-
-                    # Check for empty parameters: ⟨⟩
-                    if self._match(TokenType.RANGLE):
-                        # Empty parameters - create empty sequence literal
-                        parameters = SequenceLiteral(
-                            elements=[],
-                            line=langle_token.line,
-                            column=langle_token.column,
-                        )
-                        self._advance()  # Consume '⟩'
-                    else:
-                        # Parse parameter type expression (can be cross product)
-                        # Examples: ⟨N⟩, ⟨Tree⟩, ⟨Tree x Tree⟩
-                        # Use _parse_cross to parse identifiers and cross products
-                        # Stops at operators higher than cross (union, comparison)
-                        parameters = self._parse_cross()
-
-                        # Expect closing angle bracket
-                        if not self._match(TokenType.RANGLE):
-                            raise ParserError(
-                                "Expected '⟩' after constructor parameters",
-                                self._current(),
-                            )
-                        self._advance()  # Consume '⟩'
-
-                # Create FreeBranch
-                branches.append(
-                    FreeBranch(
-                        name=branch_name,
-                        parameters=parameters,
-                        line=branch_token.line,
-                        column=branch_token.column,
-                    )
-                )
+                branches.append(self._parse_free_branch(branch_token))
 
             # Check for pipe separator
             if self._match(TokenType.PIPE):
@@ -3256,7 +3265,7 @@ class Parser:
             column=name_token.column,
         )
 
-    def _parse_syntax_block(self) -> SyntaxBlock:  # noqa: C901
+    def _parse_syntax_block(self) -> SyntaxBlock:
         """Parse syntax environment for aligned free type definitions.
 
         Syntax:
@@ -3318,7 +3327,7 @@ class Parser:
                 )
             self._advance()  # Consume '::='
 
-            # Parse branches (same logic as _parse_free_type)
+            # Parse branches using shared helper
             branches: list[FreeBranch] = []
 
             # Parse initial set of branches on the same line
@@ -3334,43 +3343,8 @@ class Parser:
                     break
 
                 branch_token = self._current()
-                branch_name = branch_token.value
                 self._advance()
-
-                # Check for constructor parameters: <...>
-                parameters: Expr | None = None
-                if self._match(TokenType.LANGLE):
-                    langle_token = self._current()
-                    self._advance()  # Consume '<'
-
-                    if self._match(TokenType.RANGLE):
-                        # Empty parameters
-                        parameters = SequenceLiteral(
-                            elements=[],
-                            line=langle_token.line,
-                            column=langle_token.column,
-                        )
-                        self._advance()  # Consume '>'
-                    else:
-                        # Parse parameter type expression
-                        parameters = self._parse_cross()
-
-                        if not self._match(TokenType.RANGLE):
-                            raise ParserError(
-                                "Expected '>' after constructor parameters",
-                                self._current(),
-                            )
-                        self._advance()  # Consume '>'
-
-                # Create FreeBranch
-                branches.append(
-                    FreeBranch(
-                        name=branch_name,
-                        parameters=parameters,
-                        line=branch_token.line,
-                        column=branch_token.column,
-                    )
-                )
+                branches.append(self._parse_free_branch(branch_token))
 
                 # Check for pipe separator
                 if self._match(TokenType.PIPE):
@@ -3400,39 +3374,8 @@ class Parser:
                         break
 
                     branch_token = self._current()
-                    branch_name = branch_token.value
                     self._advance()
-
-                    # Parse parameters
-                    parameters = None
-                    if self._match(TokenType.LANGLE):
-                        langle_token = self._current()
-                        self._advance()
-
-                        if self._match(TokenType.RANGLE):
-                            parameters = SequenceLiteral(
-                                elements=[],
-                                line=langle_token.line,
-                                column=langle_token.column,
-                            )
-                            self._advance()
-                        else:
-                            parameters = self._parse_cross()
-                            if not self._match(TokenType.RANGLE):
-                                raise ParserError(
-                                    "Expected '>' after constructor parameters",
-                                    self._current(),
-                                )
-                            self._advance()
-
-                    branches.append(
-                        FreeBranch(
-                            name=branch_name,
-                            parameters=parameters,
-                            line=branch_token.line,
-                            column=branch_token.column,
-                        )
-                    )
+                    branches.append(self._parse_free_branch(branch_token))
 
                     if self._match(TokenType.PIPE):
                         self._advance()
