@@ -39,7 +39,7 @@ syntax
   Tree ::= leaf<N> | branch<Tree cross Tree>
 end
 
-TEXT: Parameters are rendered with \ldata and \rdata delimiters in LaTeX.
+TEXT: Parameters are rendered with special data delimiters in LaTeX.
 
 ** Example 3: Multiple Definitions with Grouping **
 
@@ -51,7 +51,7 @@ syntax
   Response ::= ok | error<N> | timeout
 end
 
-TEXT: The blank line causes \also to be generated, creating vertical
+TEXT: The blank line causes the also command to be generated, creating vertical
 TEXT: separation between the two type definitions.
 
 ** Example 4: Complex BNF-Style Definitions **

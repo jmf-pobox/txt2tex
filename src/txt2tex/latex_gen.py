@@ -1324,6 +1324,11 @@ class LaTeXGenerator:
         # Use \bsup...\esup for fuzz compatibility
         # Standard ^{n} doesn't work in fuzz mode
         # This syntax works in both fuzz and zed modes
+
+        # If base is itself a superscript, wrap in braces to avoid double superscript
+        if isinstance(node.base, Superscript):
+            base = f"{{{base}}}"
+
         return f"{base} \\bsup {exponent} \\esup"
 
     @generate_expr.register(FunctionApp)
@@ -2089,6 +2094,13 @@ class LaTeXGenerator:
         spacing or formatting commands. Used both in _generate_paragraph()
         and when rendering paragraphs inline with part labels.
         """
+        # Escape special LaTeX characters FIRST
+        # # is a macro parameter character
+        # ^ is a superscript character (only valid in math mode)
+        # Must escape before any other processing that might add LaTeX commands
+        text = text.replace("#", r"\#")
+        text = text.replace("^", r"\textasciicircum{}")
+
         # Convert sequence literals FIRST to protect <x> patterns
         # Must happen before _process_inline_math() which can break up < and >
         text = self._convert_sequence_literals(text)

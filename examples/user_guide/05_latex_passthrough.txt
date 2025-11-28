@@ -4,4 +4,4 @@
 
 LATEX: \begin{center}\textit{Custom formatting}\end{center}
 LATEX: \vspace{1cm}
-LATEX: \mycustomcommand{arg1}{arg2}
+LATEX: \textbf{Bold text via raw LaTeX}
