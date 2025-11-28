@@ -21,19 +21,39 @@ Perfect for:
 
 ## Installation
 
-### Install from PyPI
+### Step 1: Install txt2tex (Required)
 
 ```bash
 pip install txt2tex
 ```
 
-### Prerequisites for PDF Generation
+Requires **Python 3.10+**.
 
-- **Python 3.10+**
-- **LaTeX distribution** with common packages (TeX Live recommended)
-  - Requires: `adjustbox`, `natbib`, standard math packages
-  - On Ubuntu/Debian: `sudo apt install texlive-latex-extra`
-  - On macOS: MacTeX includes everything needed
+### Step 2: Install LaTeX (Required for PDF output)
+
+txt2tex generates PDF by default. You need a LaTeX distribution:
+
+| Platform | Install Command |
+|----------|-----------------|
+| **macOS** | Install [MacTeX](https://www.tug.org/mactex/) (includes everything) |
+| **Ubuntu/Debian** | `sudo apt install texlive-latex-extra latexmk` |
+| **Windows** | Install [MiKTeX](https://miktex.org/) or [TeX Live](https://www.tug.org/texlive/) |
+
+**Required packages:** `adjustbox`, `natbib`, `geometry`, `amsfonts`, `hyperref`
+
+If you only need LaTeX output (no PDF), use `txt2tex input.txt --tex-only` and skip this step.
+
+### Step 3: Install fuzz typechecker (Optional)
+
+The fuzz typechecker catches specification errors (undefined variables, type mismatches) before PDF generation. This is **optional but recommended** for Z notation work.
+
+```bash
+git clone https://github.com/jmf-pobox/fuzz.git
+cd fuzz && make
+sudo cp fuzz /usr/local/bin/   # Or add to PATH
+```
+
+If fuzz is not installed, txt2tex will show a note but continue normally.
 
 ### Verify Installation
 
@@ -204,17 +224,9 @@ txt2tex input.txt --tex-only
 
 ### Automatic Type Checking
 
-When the fuzz binary is installed, txt2tex automatically runs type checking before PDF generation. This catches undefined variables, type mismatches, and specification errors.
+When the fuzz binary is installed (see [Installation](#installation)), txt2tex automatically runs type checking before PDF generation. This catches undefined variables, type mismatches, and specification errors.
 
-To install the fuzz typechecker:
-
-```bash
-git clone https://github.com/jmf-pobox/fuzz.git
-cd fuzz && make
-# Add to PATH or install system-wide
-```
-
-If fuzz is not installed, you'll see a note but compilation continues.
+If fuzz is not installed, you'll see a note but compilation continues normally.
 
 ---
 
