@@ -2,7 +2,7 @@
 
 This directory contains test files organized into three categories:
 1. **Active Bugs** (1 file) - Real bugs currently open on GitHub
-2. **Broken Tests** (13 files) - Tests that fail but may represent stale test cases
+2. **Stale Tests** (13 files) - Tests using deprecated/incorrect syntax
 3. **Passing Tests** (12 files) - Regression and feature tests that pass
 
 ## Active Bugs (1 file)
@@ -25,44 +25,67 @@ Real bugs that are currently open on GitHub and need fixing.
 
 ---
 
-## Broken Tests (13 files)
+## Stale Tests (13 files)
 
-These tests fail. They may represent:
-- Bugs that were never actually fixed
-- Test cases that use unsupported syntax
-- Stale test cases that need updating
+These tests fail because they use **deprecated or incorrect syntax**, NOT because of bugs in txt2tex.
 
-### Failing "Regression" Tests (10 files)
+### Tests Using Deprecated `in` Keyword (10 files)
 
-These were documented as "resolved" but actually fail:
+**Problem**: Tests use `in` for set membership, but the correct keyword is `elem`.
 
-| File | Error |
-|------|-------|
-| regression_in_operator_basic.txt | Parser error |
-| regression_in_operator_with_comparison.txt | Parser error |
-| regression_in_operator_multiple_same.txt | Parser error |
-| regression_in_operator_multiple_nested.txt | Parser error |
-| regression_in_operator_before_bullet.txt | Parser error |
-| regression_in_notin_operators_combined.txt | Parser error |
-| regression_in_operator_patterns.txt | Parser error |
-| regression_bullet_separator_basic.txt | Parser error |
-| regression_bullet_separator_with_notin.txt | Parser error |
-| regression_bullet_separator_notin_paren.txt | Parser error |
+Per USER_GUIDE.md: *"Use `elem` for set membership. The `in` keyword was deprecated in favor of `elem` to avoid ambiguity with English prose."*
 
-### Failing Bug Files (2 files)
+| File | Issue | Fix |
+|------|-------|-----|
+| regression_in_operator_basic.txt | Uses `y in T` | Change to `y elem T` |
+| regression_in_operator_with_comparison.txt | Uses `x in S` | Change to `x elem S` |
+| regression_in_operator_multiple_same.txt | Uses `x in S` | Change to `x elem S` |
+| regression_in_operator_multiple_nested.txt | Uses `x in S` | Change to `x elem S` |
+| regression_in_operator_before_bullet.txt | Uses `x in S` | Change to `x elem S` |
+| regression_in_notin_operators_combined.txt | Uses `x in S` | Change to `x elem S` |
+| regression_in_operator_patterns.txt | Uses `x in S` | Change to `x elem S` |
+| regression_bullet_separator_basic.txt | Uses `x in S` | Change to `x elem S` |
+| regression_bullet_separator_with_notin.txt | Uses `x in S` | Change to `x elem S` |
+| regression_bullet_separator_notin_paren.txt | Uses `x in S` | Change to `x elem S` |
 
-These were documented as "resolved" for Issue #3 but fail:
+**Verification**: The bullet separator syntax (`.`) works correctly with `elem`:
+```bash
+echo "(forall x : N | x elem S . y < 10)" > /tmp/test.txt
+hatch run cli /tmp/test.txt --tex-only  # PASSES
+```
 
-| File | Status |
-|------|--------|
-| bug3_compound_id.txt | FAIL - abbrev block syntax not working |
-| bug3_test_simple.txt | FAIL - abbrev block syntax not working |
+### Tests Using Incorrect `and` Keyword (1 file)
 
-### Failing Feature Test (1 file)
+**Problem**: Test uses `and` for logical conjunction, but the correct keyword is `land`.
 
-| File | Status |
-|------|--------|
-| feature_semicolon_separator.txt | FAIL - semicolon separator syntax not working |
+Per USER_GUIDE.md: *"English-style `and`, `or`, `not` are NOT supported in Z notation expressions."*
+
+| File | Issue | Fix |
+|------|-------|-----|
+| feature_semicolon_separator.txt | Uses `x > 0 and y > 0` | Change to `x > 0 land y > 0` |
+
+**Verification**: Semicolon separator works correctly with `land`:
+```bash
+echo "forall x : N; y : M | x > 0 land y > 0" > /tmp/test.txt
+hatch run cli /tmp/test.txt --tex-only  # PASSES
+```
+
+### Tests Hitting Fuzz Limitations (2 files)
+
+**Problem**: txt2tex parsing and LaTeX generation work correctly, but fuzz type-checker cannot handle compound identifiers like `R+`.
+
+| File | Issue | Workaround |
+|------|-------|------------|
+| bug3_compound_id.txt | fuzz rejects `R^+` | Use `--zed` flag to skip fuzz |
+| bug3_test_simple.txt | fuzz rejects `R^+` | Use `--zed` flag to skip fuzz |
+
+**Verification**: Parsing and generation work, only fuzz fails:
+```bash
+hatch run cli tests/bugs/bug3_test_simple.txt --tex-only       # FAIL (fuzz error)
+hatch run cli tests/bugs/bug3_test_simple.txt --tex-only --zed # PASS
+```
+
+This is a **fuzz limitation**, not a txt2tex bug. The generated LaTeX is correct.
 
 ---
 
@@ -107,9 +130,17 @@ All justification formatting tests pass:
 | Category | Count | Status |
 |----------|-------|--------|
 | Active Bugs | 1 | Need fixing |
-| Broken Tests | 13 | Need investigation |
+| Stale Tests (bad syntax) | 13 | Delete or fix syntax |
 | Passing Tests | 12 | All PASS |
 | **Total** | **26** | **12 PASS, 14 FAIL** |
+
+---
+
+## Recommended Actions
+
+1. **Delete stale tests**: The 13 failing tests use deprecated syntax and don't test real functionality
+2. **Close Bug #2**: bug2_multiple_pipes.txt now passes
+3. **Close Bug #3**: bug3 files work correctly, only fail fuzz type-checking (not a txt2tex issue)
 
 ---
 
@@ -124,28 +155,15 @@ for f in tests/bugs/*.txt; do
 done
 ```
 
-### Test Active Bugs (expect FAIL)
-```bash
-hatch run cli tests/bugs/bug1_prose_period.txt --tex-only
-```
-
-### Test Passing Files (expect PASS)
-```bash
-for f in tests/bugs/regression_text_*.txt tests/bugs/feature_justification*.txt; do
-  echo -n "$(basename $f): "
-  hatch run cli "$f" --tex-only >/dev/null 2>&1 && echo "PASS" || echo "FAIL"
-done
-```
-
 ---
 
 ## References
 
+- **[USER_GUIDE.md](../../docs/guides/USER_GUIDE.md)** - Documented syntax
 - **[GitHub Issues](https://github.com/jmf-pobox/txt2tex/issues)** - Live bug tracking
-- **[FUZZ_FEATURE_GAPS.md](../../docs/guides/FUZZ_FEATURE_GAPS.md)** - Missing features vs bugs
 
 ---
 
 **Last Updated**: 2025-11-29
 **Active Bugs**: 1 (Issue #1)
-**Test Results**: 12 PASS, 14 FAIL
+**Test Results**: 12 PASS, 14 FAIL (13 due to bad syntax, 1 real bug)
