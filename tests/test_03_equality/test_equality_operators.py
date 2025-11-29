@@ -1,4 +1,4 @@
-"""Tests for Phase 4: Z Notation Basics."""
+"""Tests for Z notation basics (equality, given types, abbreviations)."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ from txt2tex.parser import Parser
 
 
 class TestLexer:
-    """Tests for Phase 4 lexer features."""
+    """Tests for Z notation lexer features."""
 
     def test_given_keyword(self) -> None:
         """Test lexing given keyword."""
@@ -73,7 +73,7 @@ class TestLexer:
 
 
 class TestParser:
-    """Tests for Phase 4 parser features."""
+    """Tests for Z notation parser features."""
 
     def test_given_type_single(self) -> None:
         """Test parsing given type with single name."""
@@ -229,7 +229,7 @@ end"""
 
 
 class TestLaTeXGenerator:
-    """Tests for Phase 4 LaTeX generator."""
+    """Tests for Z notation LaTeX generation."""
 
     def test_given_type(self) -> None:
         """Test generating given type."""
@@ -383,7 +383,7 @@ class TestLaTeXGenerator:
 
 
 class TestIntegration:
-    """End-to-end integration tests for Phase 4."""
+    """End-to-end integration tests for Z notation basics."""
 
     def test_complete_given_type(self) -> None:
         """Test complete pipeline for given type."""
