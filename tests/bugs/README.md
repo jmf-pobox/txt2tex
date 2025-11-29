@@ -1,11 +1,11 @@
 # txt2tex Test Files: Bugs, Regressions, and Features
 
 This directory contains test files organized into three categories:
-1. **Active Bugs** (3 files) - Real bugs currently open on GitHub
+1. **Active Bugs** (2 files) - Real bugs currently open on GitHub
 2. **Regression Tests** (17 files) - Previously fixed bugs, now serving as regression protection
 3. **Feature Tests** (7 files) - Edge cases and features that were never bugs
 
-## Active Bugs (3 files)
+## Active Bugs (2 files)
 
 Real bugs that are currently open on GitHub and need fixing.
 
@@ -38,20 +38,16 @@ Real bugs that are currently open on GitHub and need fixing.
 - **Workaround**: Use proper Z notation blocks (axdef, schema) instead of TEXT
 - **Impact**: Solution 40(g) and similar complex expressions
 
-### Bug #13: Field projection on function application in quantifiers
-- **File**: None yet (documented in GitHub issue)
-- **Issue**: [#13](https://github.com/jmf-pobox/txt2tex/issues/13)
-- **Priority**: MEDIUM
-- **Status**: ACTIVE
-- **Description**: Field projection like `f(i).field` incorrectly parsed as bullet separator in quantifier bodies
-- **Workaround**: Use intermediate binding with semicolon separator
-- **Impact**: Blocks field access on function return values
-
 ---
 
 ## Regression Tests (17 files)
 
 Previously fixed bugs that now serve as regression tests. All these files PASS (compile successfully).
+
+### Field Projection on Function Application - Resolved Nov 2025
+
+- **Issue**: [#13](https://github.com/jmf-pobox/txt2tex/issues/13) (CLOSED)
+- **Fix**: Field projection like `f(i).field` no longer incorrectly parsed as bullet separator in quantifier bodies
 
 ### IN Operator Disambiguation (8 files) - Resolved Nov 18, 2025
 
@@ -164,10 +160,10 @@ Tests for advanced syntax features.
 
 | Category | Count | Status |
 |----------|-------|--------|
-| Active Bugs | 3 | Need fixing |
+| Active Bugs | 2 | Need fixing |
 | Regression Tests | 17 | All PASS |
 | Feature Tests | 7 | All PASS |
-| **Total** | **27** | **24 PASS, 3 FAIL** |
+| **Total** | **26** | **24 PASS, 2 FAIL** |
 
 **Project Coverage**: 100% (52/52 solutions working) - all solutions complete!
 
@@ -239,6 +235,6 @@ Found a new bug? Follow this workflow:
 
 ---
 
-**Last Updated**: 2025-11-23
-**Active Bugs**: 3 (Issues #1, #2, #13)
+**Last Updated**: 2025-11-29
+**Active Bugs**: 2 (Issues #1, #2)
 **Test Coverage**: 24 regression + feature tests ensure stability
