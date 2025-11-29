@@ -1,4 +1,4 @@
-"""Tests for Phase 9: Z Notation Definitions with Generic Parameters."""
+"""Tests for Z notation definitions with generic parameters."""
 
 from txt2tex.ast_nodes import Abbreviation, AxDef, Document, Identifier, Schema
 from txt2tex.latex_gen import LaTeXGenerator
@@ -6,7 +6,7 @@ from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
 
 
-class TestPhase9Parsing:
+class TestGenericParameterParsing:
     """Test parsing Z notation definitions with generic parameters."""
 
     def test_abbreviation_without_generics(self) -> None:
@@ -164,7 +164,7 @@ end"""
         assert schema.generic_params == ["X", "Y"]
 
 
-class TestPhase9LaTeXGeneration:
+class TestGenericParameterLaTeX:
     """Test LaTeX generation for Z notation with generic parameters."""
 
     def test_generate_abbreviation_without_generics(self) -> None:
@@ -264,12 +264,12 @@ end"""
         assert r"\end{schema}" in latex
 
 
-class TestPhase9Integration:
-    """Integration tests for Phase 9."""
+class TestGenericParameterIntegration:
+    """Integration tests for generic parameters."""
 
     def test_full_document_with_generics(self) -> None:
         """Test complete document with all Z notation features."""
-        source = """=== Phase 9 Test ===
+        source = """=== Generic Parameters Test ===
 
 given A, B
 
@@ -292,7 +292,7 @@ end
         latex = gen.generate_document(ast)
 
         # Check all components are present
-        assert r"\section*{Phase 9 Test}" in latex
+        assert r"\section*{Generic Parameters Test}" in latex
         assert r"\begin{zed}[A, B]\end{zed}" in latex
         # Abbreviations now wrapped in zed environment for fuzz compatibility
         # Fuzz requires generics AFTER name: Pair[X] not [X]Pair

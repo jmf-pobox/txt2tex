@@ -1,4 +1,4 @@
-"""Tests for Phase 17: Recursive Free Types with Constructor Parameters."""
+"""Tests for recursive free types with constructor parameters."""
 
 from __future__ import annotations
 
@@ -296,7 +296,7 @@ class TestBackwardCompatibility:
     """Tests to ensure backward compatibility with simple free types."""
 
     def test_simple_free_types_still_work(self) -> None:
-        """Test that simple free types from Phase 4 still work."""
+        """Test that simple free types still work."""
         text = "Status ::= active | inactive | suspended"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -307,8 +307,8 @@ class TestBackwardCompatibility:
         assert "Status ::= active | inactive | suspended" in doc
         assert "\\ldata" not in doc
 
-    def test_phase4_examples_unchanged(self) -> None:
-        """Test that Phase 4 example outputs remain the same."""
+    def test_basic_examples_unchanged(self) -> None:
+        """Test that basic example outputs remain the same."""
         text = "Answer ::= yes | no"
         lexer = Lexer(text)
         tokens = lexer.tokenize()

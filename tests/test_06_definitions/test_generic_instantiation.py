@@ -1,4 +1,4 @@
-"""Tests for generic type instantiation (Phase 11.9)."""
+"""Tests for generic type instantiation."""
 
 from __future__ import annotations
 
@@ -250,8 +250,8 @@ class TestGenericInstantiationEdgeCases:
         assert param0.name == "A"
 
     def test_generic_vs_subscript(self) -> None:
-        """Test underscore vs brackets: a_1 is identifier, a[1] generic (Phase 15)."""
-        # Subscript (Phase 15: now just identifier with underscore)
+        """Test underscore vs brackets: a_1 is identifier, a[1] generic."""
+        # Subscript: underscore is now just part of identifier
         lexer = Lexer("a_1")
         tokens = lexer.tokenize()
         parser = Parser(tokens)

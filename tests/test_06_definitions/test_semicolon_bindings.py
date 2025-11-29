@@ -1,4 +1,4 @@
-"""Phase 17: Semicolon-separated bindings elem quantifiers land set comprehensions.
+"""Tests for semicolon-separated bindings in quantifiers and set comprehensions.
 
 Z notation allows multiple binding groups separated by semicolons:
 - forall x : T; y : U | P  means  forall x : T | forall y : U | P
@@ -27,7 +27,7 @@ def parse_expr(text: str) -> ASTNode:
 
 
 class TestSemicolonQuantifiers:
-    """Test semicolon-separated bindings elem quantifiers (Phase 17)."""
+    """Test semicolon-separated bindings in quantifiers."""
 
     def test_forall_two_bindings(self):
         """Test forall x : N; y : N | x + y > 0."""
