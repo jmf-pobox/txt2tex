@@ -176,10 +176,10 @@ class TokenType(Enum):
     FREE_TYPE = "::="
     ABBREV = "=="
 
-    # Operators (with context)
-    AND = "and"
-    OR = "or"
-    NOT = "not"
+    # Operators
+    AND = "land"
+    OR = "lor"
+    NOT = "lnot"
     IMPLIES = "=>"
     IFF = "<=>"
     FORALL = "forall"
@@ -210,7 +210,6 @@ class TokenType(Enum):
 
 **Key Features**:
 - **Whitespace significance**: Track indentation for proof trees
-- **Context awareness**: Same text ("or") can be operator or English word
 - **Line tracking**: Maintain line numbers for error messages
 - **Lookahead**: Support for multi-character operators (<=>)
 
@@ -385,14 +384,14 @@ class MathExpr(ASTNode):
 
 @dataclass
 class BinaryOp(MathExpr):
-    op: str              # "and", "or", "=>", etc.
+    op: str              # "land", "lor", "=>", etc.
     left: MathExpr
     right: MathExpr
     explicit_parens: bool = False  # Preserves user-written parentheses
 
 @dataclass
 class UnaryOp(MathExpr):
-    op: str              # "not"
+    op: str              # "lnot"
     operand: MathExpr
 
 @dataclass
@@ -512,25 +511,6 @@ class Parser:
         return left
 
     # ... more precedence levels
-```
-
-**Word Boundary Detection**:
-
-Critical for distinguishing "or" in "De Morgan" vs "p or q":
-
-```python
-def is_operator_context(self, token: Token) -> bool:
-    """Check if this token is in an operator context."""
-    # Look at surrounding tokens
-    prev = self.previous_token()
-    next = self.next_token()
-
-    # "or" is operator if preceded/followed by identifier, paren, or operator
-    if prev.type in [TokenType.IDENTIFIER, TokenType.RPAREN]:
-        if next.type in [TokenType.IDENTIFIER, TokenType.LPAREN]:
-            return True
-
-    return False
 ```
 
 ### 3. Semantic Analyzer
