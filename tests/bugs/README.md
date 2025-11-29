@@ -2,8 +2,8 @@
 
 This directory contains test files organized into three categories:
 1. **Active Bugs** (1 file) - Real bugs currently open on GitHub
-2. **Stale Tests** (13 files) - Tests using deprecated/incorrect syntax
-3. **Passing Tests** (12 files) - Regression and feature tests that pass
+2. **Fuzz Limitation Tests** (2 files) - Tests that pass txt2tex but fail fuzz type-checking
+3. **Passing Tests** (23 files) - Regression and feature tests that pass
 
 ## Active Bugs (1 file)
 
@@ -25,96 +25,67 @@ Real bugs that are currently open on GitHub and need fixing.
 
 ---
 
-## Stale Tests (13 files)
+## Fuzz Limitation Tests (2 files)
 
-These tests fail because they use **deprecated or incorrect syntax**, NOT because of bugs in txt2tex.
-
-### Tests Using Deprecated `in` Keyword (10 files)
-
-**Problem**: Tests use `in` for set membership, but the correct keyword is `elem`.
-
-Per USER_GUIDE.md: *"Use `elem` for set membership. The `in` keyword was deprecated in favor of `elem` to avoid ambiguity with English prose."*
-
-| File | Issue | Fix |
-|------|-------|-----|
-| regression_in_operator_basic.txt | Uses `y in T` | Change to `y elem T` |
-| regression_in_operator_with_comparison.txt | Uses `x in S` | Change to `x elem S` |
-| regression_in_operator_multiple_same.txt | Uses `x in S` | Change to `x elem S` |
-| regression_in_operator_multiple_nested.txt | Uses `x in S` | Change to `x elem S` |
-| regression_in_operator_before_bullet.txt | Uses `x in S` | Change to `x elem S` |
-| regression_in_notin_operators_combined.txt | Uses `x in S` | Change to `x elem S` |
-| regression_in_operator_patterns.txt | Uses `x in S` | Change to `x elem S` |
-| regression_bullet_separator_basic.txt | Uses `x in S` | Change to `x elem S` |
-| regression_bullet_separator_with_notin.txt | Uses `x in S` | Change to `x elem S` |
-| regression_bullet_separator_notin_paren.txt | Uses `x in S` | Change to `x elem S` |
-
-**Verification**: The bullet separator syntax (`.`) works correctly with `elem`:
-```bash
-echo "(forall x : N | x elem S . y < 10)" > /tmp/test.txt
-hatch run cli /tmp/test.txt --tex-only  # PASSES
-```
-
-### Tests Using Incorrect `and` Keyword (1 file)
-
-**Problem**: Test uses `and` for logical conjunction, but the correct keyword is `land`.
-
-Per USER_GUIDE.md: *"English-style `and`, `or`, `not` are NOT supported in Z notation expressions."*
-
-| File | Issue | Fix |
-|------|-------|-----|
-| feature_semicolon_separator.txt | Uses `x > 0 and y > 0` | Change to `x > 0 land y > 0` |
-
-**Verification**: Semicolon separator works correctly with `land`:
-```bash
-echo "forall x : N; y : M | x > 0 land y > 0" > /tmp/test.txt
-hatch run cli /tmp/test.txt --tex-only  # PASSES
-```
-
-### Tests Hitting Fuzz Limitations (2 files)
-
-**Problem**: txt2tex parsing and LaTeX generation work correctly, but fuzz type-checker cannot handle compound identifiers like `R+`.
+These tests pass txt2tex parsing and LaTeX generation, but fail fuzz type-checking due to fuzz limitations (not txt2tex bugs).
 
 | File | Issue | Workaround |
 |------|-------|------------|
-| bug3_compound_id.txt | fuzz rejects `R^+` | Use `--zed` flag to skip fuzz |
-| bug3_test_simple.txt | fuzz rejects `R^+` | Use `--zed` flag to skip fuzz |
+| bug3_compound_id.txt | fuzz rejects `R^+` compound identifier | Use `--zed` flag |
+| bug3_test_simple.txt | fuzz rejects `R^+` compound identifier | Use `--zed` flag |
 
-**Verification**: Parsing and generation work, only fuzz fails:
+**Verification**:
 ```bash
 hatch run cli tests/bugs/bug3_test_simple.txt --tex-only       # FAIL (fuzz error)
 hatch run cli tests/bugs/bug3_test_simple.txt --tex-only --zed # PASS
 ```
 
-This is a **fuzz limitation**, not a txt2tex bug. The generated LaTeX is correct.
-
 ---
 
-## Passing Tests (12 files)
+## Passing Tests (23 files)
 
 ### Resolved Bug (1 file)
 
 - **bug2_multiple_pipes.txt** - Issue [#2](https://github.com/jmf-pobox/txt2tex/issues/2) appears to be fixed
   - Multiple pipes in TEXT blocks now work correctly
 
+### elem Operator and Bullet Separator (11 files)
+
+These tests verify `elem` operator and bullet separator (`.`) functionality:
+
+| File | Tests |
+|------|-------|
+| regression_in_operator_basic.txt | Basic `y elem T` |
+| regression_in_operator_simple.txt | Simple membership |
+| regression_in_operator_with_comparison.txt | elem with bullet separator |
+| regression_in_operator_multiple_same.txt | Multiple elem, same variable |
+| regression_in_operator_multiple_nested.txt | Multiple elem, different variables |
+| regression_in_operator_before_bullet.txt | elem before bullet separator |
+| regression_in_notin_operators_combined.txt | Combined elem and notin |
+| regression_in_operator_patterns.txt | Various elem patterns |
+| regression_bullet_separator_basic.txt | Basic bullet separator |
+| regression_bullet_separator_with_notin.txt | Bullet with notin |
+| regression_bullet_separator_notin_paren.txt | Parenthesized bullet with notin |
+
 ### TEXT Block Operators (2 files) - Issues #4, #5
 
 - [regression_text_comma_after_parens.txt](regression_text_comma_after_parens.txt) ✓
   - **Issue**: [#4](https://github.com/jmf-pobox/txt2tex/issues/4) (CLOSED)
-  - **Test**: `(not p => not q), (q => p)` → `¬ p ⇒ ¬ q, q ⇒ p`
 
 - [regression_text_logical_operators.txt](regression_text_logical_operators.txt) ✓
   - **Issue**: [#5](https://github.com/jmf-pobox/txt2tex/issues/5) (CLOSED)
-  - **Test**: `(p or q)` → `p ∨ q`, `(p and q)` → `p ∧ q`
 
-### Set Operators (3 files)
+### Set Operators (2 files)
 
-- [regression_in_operator_simple.txt](regression_in_operator_simple.txt) ✓ - Simple `y in T`
-- [regression_subset_operator.txt](regression_subset_operator.txt) ✓ - `subset` operator
-- [regression_notin_operator.txt](regression_notin_operator.txt) ✓ - `notin` operator
+- [regression_subset_operator.txt](regression_subset_operator.txt) ✓
+- [regression_notin_operator.txt](regression_notin_operator.txt) ✓
+
+### Semicolon Separator (1 file)
+
+- [feature_semicolon_separator.txt](feature_semicolon_separator.txt) ✓
+  - **Related**: GitHub Issue [#7](https://github.com/jmf-pobox/txt2tex/issues/7) (CLOSED)
 
 ### Feature Tests - Justification Formatting (6 files)
-
-All justification formatting tests pass:
 
 - [feature_justification_caret_operator.txt](feature_justification_caret_operator.txt) ✓
 - [feature_justification_empty_sequence.txt](feature_justification_empty_sequence.txt) ✓
@@ -130,17 +101,9 @@ All justification formatting tests pass:
 | Category | Count | Status |
 |----------|-------|--------|
 | Active Bugs | 1 | Need fixing |
-| Stale Tests (bad syntax) | 13 | Delete or fix syntax |
-| Passing Tests | 12 | All PASS |
-| **Total** | **26** | **12 PASS, 14 FAIL** |
-
----
-
-## Recommended Actions
-
-1. **Delete stale tests**: The 13 failing tests use deprecated syntax and don't test real functionality
-2. **Close Bug #2**: bug2_multiple_pipes.txt now passes
-3. **Close Bug #3**: bug3 files work correctly, only fail fuzz type-checking (not a txt2tex issue)
+| Fuzz Limitations | 2 | Pass with --zed |
+| Passing Tests | 23 | All PASS |
+| **Total** | **26** | **23 PASS, 1 BUG, 2 FUZZ** |
 
 ---
 
@@ -150,6 +113,14 @@ All justification formatting tests pass:
 ```bash
 cd /path/to/txt2tex/sem
 for f in tests/bugs/*.txt; do
+  echo -n "$(basename $f): "
+  hatch run cli "$f" --tex-only >/dev/null 2>&1 && echo "PASS" || echo "FAIL"
+done
+```
+
+### Test Regression Files (expect PASS)
+```bash
+for f in tests/bugs/regression_*.txt tests/bugs/feature_*.txt; do
   echo -n "$(basename $f): "
   hatch run cli "$f" --tex-only >/dev/null 2>&1 && echo "PASS" || echo "FAIL"
 done
@@ -166,4 +137,4 @@ done
 
 **Last Updated**: 2025-11-29
 **Active Bugs**: 1 (Issue #1)
-**Test Results**: 12 PASS, 14 FAIL (13 due to bad syntax, 1 real bug)
+**Test Results**: 23 PASS, 1 BUG, 2 FUZZ limitation

@@ -1,16 +1,16 @@
-=== Test: IN and NOTIN combinations ===
+=== Test: elem and NOTIN combinations ===
 
-** Test 1: IN before bullet, IN after **
+** Test 1: elem before bullet, elem after **
 
-(forall x : N | x in S . y in T)
+(forall x : N | x elem S . y elem T)
 
-** Test 2: IN before bullet, NOTIN after **
+** Test 2: elem before bullet, NOTIN after **
 
-(forall x : N | x in S . y notin T)
+(forall x : N | x elem S . y notin T)
 
-** Test 3: NOTIN before bullet, IN after **
+** Test 3: NOTIN before bullet, elem after **
 
-(forall x : N | x notin S . y in T)
+(forall x : N | x notin S . y elem T)
 
 ** Test 4: NOTIN before bullet, NOTIN after **
 

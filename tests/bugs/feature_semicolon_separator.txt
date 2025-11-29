@@ -2,7 +2,7 @@
 
 ** Test 1: Basic semicolon separator **
 
-(forall x : N; y : M | x > 0 and y > 0)
+(forall x : N; y : M | x > 0 land y > 0)
 
 ** Test 2: Mixed comma and semicolon **
 

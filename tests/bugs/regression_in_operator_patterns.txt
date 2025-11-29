@@ -4,14 +4,14 @@
 
 (forall x : N | x > 0 . x notin S)
 
-** Pattern 2: Test - IN before bullet, comparison after **
+** Pattern 2: Test - elem before bullet, comparison after **
 
-(forall x : N | x in S . y < 10)
+(forall x : N | x elem S . y < 10)
 
-** Pattern 3: Test - IN before bullet, IN after (same variable) **
+** Pattern 3: Test - elem before bullet, elem after (same variable) **
 
-(forall x : N | x in S . x in T)
+(forall x : N | x elem S . x elem T)
 
-** Pattern 4: Test - IN before bullet, IN after (different variable) **
+** Pattern 4: Test - elem before bullet, elem after (different variable) **
 
-(forall x : N | x in S . y in T)
+(forall x : N | x elem S . y elem T)

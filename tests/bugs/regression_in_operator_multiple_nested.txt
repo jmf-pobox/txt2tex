@@ -1,3 +1,3 @@
 === IN before bullet, IN after, different variable ===
 
-(forall x : N | x in S . y in T)
+(forall x : N | x elem S . y elem T)

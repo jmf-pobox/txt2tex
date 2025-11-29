@@ -1,4 +1,4 @@
-=== Bug: Bullet Separator - Simple Cases ===
+=== Regression: Bullet Separator - Simple Cases ===
 
 ** Test 1: Simple comparison **
 
@@ -6,8 +6,8 @@
 
 ** Test 2: With notin **
 
-(forall x : N | x in S . x notin T)
+(forall x : N | x elem S . x notin T)
 
 ** Test 3: With implication (control) **
 
-(forall x : N | x in S => x notin T)
+(forall x : N | x elem S => x notin T)
