@@ -1,4 +1,4 @@
-"""Tests for set literals with maplets (Phase 11.7)."""
+"""Tests for set literals with maplets."""
 
 from __future__ import annotations
 

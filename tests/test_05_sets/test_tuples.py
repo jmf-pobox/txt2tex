@@ -1,4 +1,4 @@
-"""Tests for tuple expressions (Phase 11.6)."""
+"""Tests for tuple expressions."""
 
 from __future__ import annotations
 

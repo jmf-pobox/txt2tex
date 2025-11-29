@@ -1,4 +1,4 @@
-"""Tests for Phase 39: Strict Subset Operator (psubset)."""
+"""Tests for strict subset operator (psubset)."""
 
 from __future__ import annotations
 

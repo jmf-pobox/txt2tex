@@ -1,4 +1,4 @@
-"""Tests for Phase 32: Distributed Intersection Operator (bigcap)."""
+"""Tests for distributed intersection operator (bigcap)."""
 
 from __future__ import annotations
 

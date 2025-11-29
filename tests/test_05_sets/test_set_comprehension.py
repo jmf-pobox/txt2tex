@@ -1,4 +1,4 @@
-"""Tests for Phase 8: Set Comprehension."""
+"""Tests for set comprehension syntax and generation."""
 
 from txt2tex.ast_nodes import (
     BinaryOp,
@@ -12,7 +12,7 @@ from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
 
 
-class TestPhase8Parsing:
+class TestSetComprehensionParsing:
     """Test parsing of set comprehension syntax."""
 
     def test_simple_set_by_predicate(self) -> None:
@@ -81,7 +81,7 @@ class TestPhase8Parsing:
         assert isinstance(ast.items[1], SetComprehension)
 
 
-class TestPhase8LaTeXGeneration:
+class TestSetComprehensionLaTeX:
     """Test LaTeX generation for set comprehension."""
 
     def test_generate_simple_set_by_predicate(self) -> None:
@@ -228,8 +228,8 @@ class TestPhase8LaTeXGeneration:
         assert "\\end{document}" in latex
 
 
-class TestPhase8Integration:
-    """Integration tests for Phase 8."""
+class TestSetComprehensionIntegration:
+    """Integration tests for set comprehension."""
 
     def test_end_to_end_simple_set(self) -> None:
         """Test complete pipeline from text to LaTeX for simple set."""

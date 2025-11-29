@@ -1,4 +1,4 @@
-"""Tests for Phase 7: Equality land Special Operators."""
+"""Tests for set operations (equality, mu operator, membership)."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from txt2tex.parser import Parser
 
 
 class TestLexer:
-    """Tests for Phase 7 lexer features."""
+    """Tests for set operation lexer features."""
 
     def test_mu_keyword(self) -> None:
         """Test lexing mu keyword."""
@@ -44,7 +44,7 @@ class TestLexer:
 
 
 class TestParser:
-    """Tests for Phase 7 parser features."""
+    """Tests for set operation parser features."""
 
     def test_mu_operator(self) -> None:
         """Test parsing mu operator (definite description)."""
@@ -132,7 +132,7 @@ class TestParser:
 
 
 class TestLaTeXGenerator:
-    """Tests for Phase 7 LaTeX generator."""
+    """Tests for set operation LaTeX generation."""
 
     def test_mu_operator_generation(self) -> None:
         """Test generating LaTeX for mu operator."""
@@ -212,7 +212,7 @@ class TestLaTeXGenerator:
 
 
 class TestIntegration:
-    """End-to-end integration tests for Phase 7."""
+    """End-to-end integration tests for set operations."""
 
     def test_mu_operator_pipeline(self) -> None:
         """Test complete pipeline for mu operator."""
@@ -268,8 +268,8 @@ class TestIntegration:
         assert "\\land" in latex
         assert "x \\neq y" in latex
 
-    def test_document_with_phase7_features(self) -> None:
-        """Test document generation with Phase 7 features."""
+    def test_document_with_set_features(self) -> None:
+        """Test document generation with set operation features."""
         text = "mu x : N | x > 0"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
