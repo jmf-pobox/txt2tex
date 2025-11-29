@@ -57,9 +57,9 @@ If you only need LaTeX output (no PDF), use `txt2tex input.txt --tex-only` and s
 The fuzz typechecker catches specification errors (undefined variables, type mismatches) before PDF generation. This is **optional but recommended** for Z notation work.
 
 ```bash
-git clone https://github.com/jmf-pobox/fuzz.git
-cd fuzz && make
-sudo cp fuzz /usr/local/bin/   # Or add to PATH
+git clone https://github.com/Spivoxity/fuzz.git
+cd fuzz && ./configure && make
+sudo make install   # Or copy 'fuzz' binary to PATH
 ```
 
 If fuzz is not installed, txt2tex will show a note but continue normally.
@@ -504,7 +504,7 @@ This tool was developed to support formal methods education. The notation and sy
 
 ### Software Dependencies
 
-- **Mike Spivey** - [fuzz](https://github.com/jmf-pobox/fuzz) package for Z notation type checking
+- **Mike Spivey** - [fuzz](https://github.com/Spivoxity/fuzz) typechecker for Z notation
 - **Jim Davies** - zed-* packages for Z notation typesetting
 
 ### Z Notation Resources
