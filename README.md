@@ -511,7 +511,7 @@ This tool was developed to support formal methods education. The notation and sy
 
 Online references for learning Z notation:
 
-- **[The Z Notation: A Reference Manual](https://spivey.oriel.ox.ac.uk/mike/zrm/)** - J.M. Spivey's definitive reference (free PDF)
+- **The Z Notation: A Reference Manual** - J.M. Spivey, 2nd edition (Prentice Hall, 1992) - the definitive Z reference
 - **[The fuzz Manual](https://bitbucket-archive.softwareheritage.org/static/93/93ff4436-a8e5-4c1d-a3f1-774369ab2d00/attachments/fuzzman.pdf)** - Complete documentation for the fuzz type checker (PDF)
 - **[ISO Z Standard](https://www.iso.org/standard/21573.html)** - ISO/IEC 13568:2002 formal specification
 - **[Z Notation Wikipedia](https://en.wikipedia.org/wiki/Z_notation)** - Overview and history
