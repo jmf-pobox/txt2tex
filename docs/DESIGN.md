@@ -261,7 +261,7 @@ class Lexer:
         pass
 ```
 
-**Phase 24: Whitespace-Sensitive Operator Disambiguation**
+**Whitespace-Sensitive Operator Disambiguation**
 
 The lexer uses whitespace to disambiguate the `^` operator, which has dual meaning:
 
@@ -388,7 +388,7 @@ class BinaryOp(MathExpr):
     op: str              # "and", "or", "=>", etc.
     left: MathExpr
     right: MathExpr
-    explicit_parens: bool = False  # Phase 29: Preserves user-written parentheses
+    explicit_parens: bool = False  # Preserves user-written parentheses
 
 @dataclass
 class UnaryOp(MathExpr):
@@ -438,12 +438,12 @@ class Application(MathExpr):
 11. Atoms (identifiers, numbers, parenthesized expressions)
 ```
 
-**Note on `^` operator (Phase 24)**:
+**Note on `^` operator**:
 The `^` symbol has dual meaning based on whitespace (disambiguated at lexing):
 - **With space before**: CAT token → sequence concatenation (level 8, same as multiplication)
 - **No space before**: CARET token → exponentiation/superscript (level 9, higher precedence)
 
-**Phase 29: Explicit Parentheses Preservation**:
+**Explicit Parentheses Preservation**:
 
 When users write explicit parentheses like `(A and B) and C`, these are preserved in the LaTeX output even if not strictly required by precedence rules. This maintains semantic grouping clarity from the source text.
 
