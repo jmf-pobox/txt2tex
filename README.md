@@ -159,7 +159,7 @@ txt2tex uses intuitive keywords that mirror mathematical notation:
 
 **Note:** Use `land`, `lor`, `lnot` for logical operators (LaTeX-style keywords).
 
-For complete syntax reference, see **[docs/guides/USER_GUIDE.md](docs/guides/USER_GUIDE.md)**.
+For complete syntax reference, see **[docs/guides/USER_GUIDE.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/USER_GUIDE.md)**.
 
 ### Your First Document
 
@@ -309,7 +309,7 @@ If fuzz is not installed, you'll see a note but compilation continues normally.
 
 ## Complete Syntax Reference
 
-For detailed syntax documentation, see **[docs/guides/USER_GUIDE.md](docs/guides/USER_GUIDE.md)**.
+For detailed syntax documentation, see **[docs/guides/USER_GUIDE.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/USER_GUIDE.md)**.
 
 The guide covers:
 - Document structure (sections, solutions, parts)
@@ -393,7 +393,7 @@ The project includes pre-configured settings:
 - `.vscode/settings.json` - LaTeX Workshop configuration
 - `.latexmkrc` - Build settings for natbib citations
 
-**See [docs/development/IDE_SETUP.md](docs/development/IDE_SETUP.md) for complete setup instructions.**
+**See [docs/development/IDE_SETUP.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/development/IDE_SETUP.md) for complete setup instructions.**
 
 ---
 
@@ -437,7 +437,7 @@ Run `txt2tex` at least once - it copies dependencies locally. If using LaTeX Wor
 ### Parse Errors
 
 txt2tex provides clear error messages with line numbers. Common issues:
-- Unsupported syntax → See [docs/guides/USER_GUIDE.md](docs/guides/USER_GUIDE.md) for supported features
+- Unsupported syntax → See [docs/guides/USER_GUIDE.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/USER_GUIDE.md) for supported features
 - Missing quantifier separator → Use `forall x : N | predicate` (note the `|`)
 
 ### Fuzz Type Errors
@@ -447,7 +447,7 @@ Fuzz catches genuine specification errors. Check:
 - Type mismatches
 - Invalid operator usage
 
-**See [docs/guides/FUZZ_VS_STD_LATEX.md](docs/guides/FUZZ_VS_STD_LATEX.md) for fuzz-specific requirements.**
+**See [docs/guides/FUZZ_VS_STD_LATEX.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/FUZZ_VS_STD_LATEX.md) for fuzz-specific requirements.**
 
 ---
 
@@ -463,7 +463,7 @@ A few edge cases require workarounds:
 | Identifiers like `R+`, `R*` | Use `RPlus`, `RStar` instead |
 | Multiple pipes in TEXT blocks | Use `axdef`/`schema` for complex notation |
 
-**For details and test cases, see [tests/bugs/README.md](tests/bugs/README.md)**
+**For details and test cases, see [tests/bugs/README.md](https://github.com/jmf-pobox/txt2tex/blob/main/tests/bugs/README.md)**
 
 ---
 
@@ -477,35 +477,35 @@ A few edge cases require workarounds:
 - ✅ **WYSIWYG line breaks** - Natural formatting controls PDF output
 - ✅ **fuzz integration** - Optional type checking
 
-**For missing features, see [docs/guides/MISSING_FEATURES.md](docs/guides/MISSING_FEATURES.md)**
+**For missing features, see [docs/guides/MISSING_FEATURES.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/MISSING_FEATURES.md)**
 
 ---
 
 ## Documentation
 
 ### User Guides
-- **[docs/guides/USER_GUIDE.md](docs/guides/USER_GUIDE.md)** - Complete syntax reference
-- **[docs/guides/FUZZ_VS_STD_LATEX.md](docs/guides/FUZZ_VS_STD_LATEX.md)** - Fuzz compatibility guide
-- **[docs/guides/FUZZ_FEATURE_GAPS.md](docs/guides/FUZZ_FEATURE_GAPS.md)** - Missing features
-- **[docs/guides/PROOF_SYNTAX.md](docs/guides/PROOF_SYNTAX.md)** - Proof tree notation
+- **[docs/guides/USER_GUIDE.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/USER_GUIDE.md)** - Complete syntax reference
+- **[docs/guides/FUZZ_VS_STD_LATEX.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/FUZZ_VS_STD_LATEX.md)** - Fuzz compatibility guide
+- **[docs/guides/FUZZ_FEATURE_GAPS.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/FUZZ_FEATURE_GAPS.md)** - Missing features
+- **[docs/guides/PROOF_SYNTAX.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/PROOF_SYNTAX.md)** - Proof tree notation
 
 ### Tutorials
-- **[docs/tutorials/README.md](docs/tutorials/README.md)** - Tutorial index and learning path
-- **[docs/tutorials/00_getting_started.md](docs/tutorials/00_getting_started.md)** - First steps
-- **[docs/tutorials/01_propositional_logic.md](docs/tutorials/01_propositional_logic.md)** - Logic basics
-- **[docs/tutorials/02_predicate_logic.md](docs/tutorials/02_predicate_logic.md)** - Quantifiers and predicates
-- **[docs/tutorials/03_sets_and_types.md](docs/tutorials/03_sets_and_types.md)** - Sets and types
-- **[docs/tutorials/04_proof_trees.md](docs/tutorials/04_proof_trees.md)** - Proof trees
-- **[docs/tutorials/05_z_definitions.md](docs/tutorials/05_z_definitions.md)** - Z definitions
-- **[docs/tutorials/06_relations.md](docs/tutorials/06_relations.md)** - Relations
-- **[docs/tutorials/07_functions.md](docs/tutorials/07_functions.md)** - Functions
-- **[docs/tutorials/08_sequences.md](docs/tutorials/08_sequences.md)** - Sequences
-- **[docs/tutorials/09_schemas.md](docs/tutorials/09_schemas.md)** - Schemas
-- **[docs/tutorials/10_advanced.md](docs/tutorials/10_advanced.md)** - Advanced topics
+- **[docs/tutorials/README.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/README.md)** - Tutorial index and learning path
+- **[docs/tutorials/00_getting_started.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/00_getting_started.md)** - First steps
+- **[docs/tutorials/01_propositional_logic.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/01_propositional_logic.md)** - Logic basics
+- **[docs/tutorials/02_predicate_logic.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/02_predicate_logic.md)** - Quantifiers and predicates
+- **[docs/tutorials/03_sets_and_types.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/03_sets_and_types.md)** - Sets and types
+- **[docs/tutorials/04_proof_trees.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/04_proof_trees.md)** - Proof trees
+- **[docs/tutorials/05_z_definitions.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/05_z_definitions.md)** - Z definitions
+- **[docs/tutorials/06_relations.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/06_relations.md)** - Relations
+- **[docs/tutorials/07_functions.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/07_functions.md)** - Functions
+- **[docs/tutorials/08_sequences.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/08_sequences.md)** - Sequences
+- **[docs/tutorials/09_schemas.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/09_schemas.md)** - Schemas
+- **[docs/tutorials/10_advanced.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/10_advanced.md)** - Advanced topics
 
 ### Development Documentation
-- **[docs/development/IDE_SETUP.md](docs/development/IDE_SETUP.md)** - IDE configuration
-- **[docs/DESIGN.md](docs/DESIGN.md)** - Architecture and design decisions
+- **[docs/development/IDE_SETUP.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/development/IDE_SETUP.md)** - IDE configuration
+- **[docs/DESIGN.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/DESIGN.md)** - Architecture and design decisions
 
 ---
 
@@ -513,7 +513,7 @@ A few edge cases require workarounds:
 
 Contributions welcome! See [For Developers](#for-developers-git-clone) for setup instructions.
 
-1. Read [docs/DESIGN.md](docs/DESIGN.md) for architecture overview
+1. Read [docs/DESIGN.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/DESIGN.md) for architecture overview
 2. Follow quality gates: `hatch run check` (type, lint, format, test)
 3. Add tests for new features
 4. Update documentation
