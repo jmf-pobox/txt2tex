@@ -1,4 +1,4 @@
-"""Tests for Phase 10a: Relation operators - Critical subset."""
+"""Tests for relation operators (critical subset)."""
 
 from __future__ import annotations
 
@@ -9,8 +9,8 @@ from txt2tex.parser import Parser
 from txt2tex.tokens import TokenType
 
 
-class TestPhase10aLexer:
-    """Test lexer for Phase 10a relation operators."""
+class TestRelationOperatorLexer:
+    """Test lexer for relation operators."""
 
     def test_relation_operator(self) -> None:
         """Test lexing relation type operator <->."""
@@ -96,8 +96,8 @@ class TestPhase10aLexer:
         assert types == [TokenType.IDENTIFIER, TokenType.RRES, TokenType.IDENTIFIER]
 
 
-class TestPhase10aParser:
-    """Test parser for Phase 10a relation operators."""
+class TestRelationOperatorParser:
+    """Test parser for relation operators."""
 
     def test_parse_relation_operator(self) -> None:
         """Test parsing relation type operator <->."""
@@ -229,8 +229,8 @@ class TestPhase10aParser:
         assert ast.left.operator == "o9"
 
 
-class TestPhase10aLaTeXGeneration:
-    """Test LaTeX generation for Phase 10a relation operators."""
+class TestRelationOperatorLaTeX:
+    """Test LaTeX generation for relation operators."""
 
     def test_generate_relation_operator(self) -> None:
         """Test generating LaTeX for relation type operator."""
@@ -338,8 +338,8 @@ class TestPhase10aLaTeXGeneration:
         assert latex == "\\ran R"
 
 
-class TestPhase10aIntegration:
-    """Integration tests for Phase 10a."""
+class TestRelationOperatorIntegration:
+    """Integration tests for relation operators."""
 
     def test_end_to_end_relation_operator(self) -> None:
         """Test complete pipeline for relation type operator."""

@@ -1,4 +1,4 @@
-"""Tests for relational image (Phase 11.8)."""
+"""Tests for relational image operator."""
 
 from __future__ import annotations
 

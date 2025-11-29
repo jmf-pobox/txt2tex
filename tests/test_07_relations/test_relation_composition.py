@@ -1,4 +1,4 @@
-"""Tests for Phase 10b: Extended relation operators."""
+"""Tests for extended relation operators (composition, closures)."""
 
 from __future__ import annotations
 
@@ -9,8 +9,8 @@ from txt2tex.parser import Parser
 from txt2tex.tokens import TokenType
 
 
-class TestPhase10bLexer:
-    """Test lexer for Phase 10b extended relation operators."""
+class TestRelationCompositionLexer:
+    """Test lexer for extended relation operators."""
 
     def test_domain_subtraction_operator(self) -> None:
         """Test lexing domain subtraction operator <<|."""
@@ -88,8 +88,8 @@ class TestPhase10bLexer:
         assert types == [TokenType.IDENTIFIER, TokenType.NRRES, TokenType.IDENTIFIER]
 
 
-class TestPhase10bParser:
-    """Test parser for Phase 10b extended relation operators."""
+class TestRelationCompositionParser:
+    """Test parser for extended relation operators."""
 
     def test_parse_domain_subtraction(self) -> None:
         """Test parsing domain subtraction operator <<|."""
@@ -208,8 +208,8 @@ class TestPhase10bParser:
         assert ast.left.operator == "o9"
 
 
-class TestPhase10bLaTeXGeneration:
-    """Test LaTeX generation for Phase 10b extended relation operators."""
+class TestRelationCompositionLaTeX:
+    """Test LaTeX generation for extended relation operators."""
 
     def test_generate_domain_subtraction(self) -> None:
         """Test generating LaTeX for domain subtraction."""
@@ -311,8 +311,8 @@ class TestPhase10bLaTeXGeneration:
         assert latex == "R^{*}"
 
 
-class TestPhase10bIntegration:
-    """Integration tests for Phase 10b."""
+class TestRelationCompositionIntegration:
+    """Integration tests for extended relation operators."""
 
     def test_end_to_end_domain_subtraction(self) -> None:
         """Test complete pipeline for domain subtraction."""
@@ -455,8 +455,8 @@ class TestPhase10bIntegration:
         assert isinstance(ast.operand, BinaryOp)
         assert latex == "(R \\circ S)^{+}"
 
-    def test_mixed_phase10a_and_10b_operators(self) -> None:
-        """Test mixing Phase 10a land 10b operators."""
+    def test_mixed_basic_and_extended_operators(self) -> None:
+        """Test mixing basic and extended relation operators."""
         text = "(S <| R)~"
         lexer = Lexer(text)
         tokens = lexer.tokenize()

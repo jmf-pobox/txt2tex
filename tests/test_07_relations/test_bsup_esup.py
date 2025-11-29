@@ -1,4 +1,4 @@
-"""Tests for \\bsup...\\esup superscript generation (Phase: exponentiation support)."""
+"""Tests for \\bsup...\\esup superscript generation (exponentiation support)."""
 
 from __future__ import annotations
 
