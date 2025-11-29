@@ -507,6 +507,16 @@ This tool was developed to support formal methods education. The notation and sy
 - **Mike Spivey** - [fuzz](https://github.com/jmf-pobox/fuzz) package for Z notation type checking
 - **Jim Davies** - zed-* packages for Z notation typesetting
 
+### Z Notation Resources
+
+Online references for learning Z notation:
+
+- **[The Z Notation: A Reference Manual](https://spivey.oriel.ox.ac.uk/mike/zrm/)** - J.M. Spivey's definitive reference (free PDF)
+- **[The fuzz Manual](https://spivey.oriel.ox.ac.uk/mike/fuzz/)** - Documentation for the fuzz type checker
+- **[ISO Z Standard](https://www.iso.org/standard/21573.html)** - ISO/IEC 13568:2002 formal specification
+- **[Z Notation Wikipedia](https://en.wikipedia.org/wiki/Z_notation)** - Overview and history
+- **[Community Z Tools](https://czt.sourceforge.net/)** - Open source Z tools and resources
+
 ---
 
 **Last Updated:** 2025-11-29
