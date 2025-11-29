@@ -10,7 +10,7 @@ The project uses natbib for Harvard-style citations, which requires **two pdflat
 
 ### Configuration Files
 
-#### [.vscode/settings.json](../.vscode/settings.json)
+#### [.vscode/settings.json](../../.vscode/settings.json)
 
 **Default Recipe**: `fuzz -> pdflatex*2`
 - Runs fuzz type checker
@@ -30,14 +30,14 @@ The project uses natbib for Harvard-style citations, which requires **two pdflat
 }
 ```
 
-#### [hw/.latexmkrc](../hw/.latexmkrc)
+#### [hw/.latexmkrc](../../hw/.latexmkrc)
 
 Configures latexmk for natbib:
 - Sets `$max_repeat = 5` to ensure citations resolve
 - Adds current directory to TEXINPUTS/MFINPUTS
 - Uses `pdflatex -interaction=nonstopmode`
 
-#### [examples/infrastructure/.latexmkrc](../examples/infrastructure/.latexmkrc)
+#### [examples/infrastructure/.latexmkrc](../../examples/infrastructure/.latexmkrc)
 
 Same configuration for examples directory.
 
@@ -78,11 +78,12 @@ When you save a `.tex` file, LaTeX Workshop automatically:
 ./txt2pdf.sh examples/01_propositional_logic/basic_operators.txt
 ```
 
-Internally runs pdflatex twice:
+Uses latexmk for robust compilation:
 ```bash
-pdflatex -interaction=nonstopmode basic_operators.tex  # First pass
-pdflatex -interaction=nonstopmode basic_operators.tex  # Second pass
+latexmk -pdf -gg -interaction=nonstopmode -quiet basic_operators.tex
 ```
+
+latexmk automatically handles multiple passes and bibliography processing.
 
 #### 3. Makefile
 ```bash
@@ -145,12 +146,12 @@ Package natbib: Citation(s) may have changed. Rerun to get citations correct.
 
 1. **Development**: Use `fuzz -> pdflatex*2` recipe (default)
 2. **Quick iteration**: Temporarily switch to `pdflatex*2` recipe
-3. **Final build**: Always use `./txt2pdf.sh file.txt --fuzz` or Makefile
+3. **Final build**: Always use `./txt2pdf.sh file.txt --typecheck` or Makefile
 4. **Verify**: Check PDF output with `pdftotext` to confirm citations rendered
 
 ### References
 
-- **txt2pdf.sh**: [txt2pdf.sh:113-124](../txt2pdf.sh#L113-L124) - Double pdflatex pass
-- **LaTeX Workshop**: [.vscode/settings.json](../.vscode/settings.json) - IDE configuration
-- **Makefiles**: [hw/Makefile](../hw/Makefile), [examples/Makefile](../examples/Makefile)
-- **Citation syntax**: [USER_GUIDE.md:68-82](../USER_GUIDE.md#L68-L82)
+- **txt2pdf.sh**: [txt2pdf.sh](../../txt2pdf.sh) - latexmk-based compilation
+- **LaTeX Workshop**: [.vscode/settings.json](../../.vscode/settings.json) - IDE configuration
+- **Makefiles**: [hw/Makefile](../../hw/Makefile), [examples/Makefile](../../examples/Makefile)
+- **Citation syntax**: [USER_GUIDE.md](../guides/USER_GUIDE.md)
