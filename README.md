@@ -21,15 +21,24 @@ Perfect for:
 
 ## Installation
 
-### Step 1: Install txt2tex (Required)
+There are two ways to use txt2tex:
+
+- **End users**: Install via pip to use txt2tex on your own files
+- **Developers/learners**: Clone the repo to work with examples or contribute
+
+---
+
+### For End Users (pip install)
+
+#### Step 1: Install txt2tex
 
 ```bash
 pip install txt2tex
 ```
 
-Requires **Python 3.10+**.
+Requires **Python 3.10+**. This gives you the `txt2tex` command.
 
-### Step 2: Install LaTeX (Required for PDF output)
+#### Step 2: Install LaTeX (Required for PDF output)
 
 txt2tex generates PDF by default. You need a LaTeX distribution:
 
@@ -43,7 +52,7 @@ txt2tex generates PDF by default. You need a LaTeX distribution:
 
 If you only need LaTeX output (no PDF), use `txt2tex input.txt --tex-only` and skip this step.
 
-### Step 3: Install fuzz typechecker (Optional)
+#### Step 3: Install fuzz typechecker (Optional)
 
 The fuzz typechecker catches specification errors (undefined variables, type mismatches) before PDF generation. This is **optional but recommended** for Z notation work.
 
@@ -55,7 +64,7 @@ sudo cp fuzz /usr/local/bin/   # Or add to PATH
 
 If fuzz is not installed, txt2tex will show a note but continue normally.
 
-### Verify Installation
+#### Verify Installation
 
 Check that all dependencies are available:
 
@@ -86,11 +95,44 @@ Optional tools:
 Environment OK - ready for PDF generation
 ```
 
-Or check available options:
+---
+
+### For Developers (git clone)
+
+To work with examples, run tests, or contribute:
 
 ```bash
-txt2tex --help
+# Clone the repository
+git clone https://github.com/jmf-pobox/txt2tex.git
+cd txt2tex
+
+# Install hatch (Python project manager)
+pip install hatch
+
+# Run txt2tex via hatch (installs dependencies automatically)
+hatch run txt2tex examples/01_propositional_logic/hello_world.txt
+
+# Or enter a shell with txt2tex available
+hatch shell
+txt2tex examples/01_propositional_logic/hello_world.txt
 ```
+
+**Note:** After cloning, use `hatch run txt2tex` (not just `txt2tex`) to ensure the development version is used.
+
+#### Development Commands
+
+```bash
+# Run all quality checks (lint, type check, tests)
+hatch run check
+
+# Run tests only
+hatch run test
+
+# Build all examples
+cd examples && make
+```
+
+You'll also need LaTeX and optionally fuzz (see Steps 2-3 above)
 
 ---
 
@@ -277,29 +319,37 @@ The guide covers:
 
 ## Examples
 
-The `examples/` directory contains **48 working examples** organized by topic:
+The `examples/` directory contains **141 working examples** organized by topic. **To access examples, you need to clone the repository** (see [For Developers](#for-developers-git-clone) above).
 
-- **01_propositional_logic** (4 examples) - Truth tables, logical operators, propositional formulas
-- **02_predicate_logic** (2 examples) - Quantifiers, type declarations
-- **03_equality** (4 examples) - Equality operators, unique existence, mu operator, one-point rule
-- **04_proof_trees** (5 examples) - Natural deduction proofs, nested proofs, pattern matching
-- **05_sets** (6 examples) - Set operations, Cartesian products, tuples, set literals
-- **06_definitions** (6 examples) - Free types, abbreviations, axiomatic definitions, schemas
-- **07_relations** (7 examples) - Relation types, domain/range, restrictions, composition, relational image
-- **08_functions** (4 examples) - Lambda expressions, function types, function definitions
-- **09_sequences** (5 examples) - Sequence operations, concatenation, pattern matching, bags
-- **fuzz_tests** (5 examples) - Additional fuzz type checking examples
+- **01_propositional_logic** - Truth tables, logical operators, propositional formulas
+- **02_predicate_logic** - Quantifiers, type declarations
+- **03_equality** - Equality operators, unique existence, mu operator, one-point rule
+- **04_proof_trees** - Natural deduction proofs, nested proofs, pattern matching
+- **05_sets** - Set operations, Cartesian products, tuples, set literals
+- **06_definitions** - Free types, abbreviations, axiomatic definitions, schemas
+- **07_relations** - Relation types, domain/range, restrictions, composition, relational image
+- **08_functions** - Lambda expressions, function types, function definitions
+- **09_sequences** - Sequence operations, concatenation, pattern matching, bags
+- **10_schemas** - Schema definitions, scoping, zed blocks
+- **11_text_blocks** - TEXT, PURETEXT, citations, bibliography
+- **12_advanced** - Conditionals, subscripts, generic instantiation
+- **user_guide** - Examples from the user guide documentation
 
 ```bash
-# Build all examples
+# After cloning the repo:
+cd txt2tex
+
+# Build all examples (requires hatch)
 cd examples && make
 
 # Build examples in a specific directory
 cd examples && make 01_propositional_logic
 
 # Build a specific example
-txt2tex examples/01_propositional_logic/hello_world.txt
+hatch run txt2tex examples/01_propositional_logic/hello_world.txt
 ```
+
+All 141 examples pass fuzz typechecking and compile to PDF
 
 ---
 
@@ -423,7 +473,7 @@ A few edge cases require workarounds:
 
 ## Contributing
 
-Contributions welcome! Please:
+Contributions welcome! See [For Developers](#for-developers-git-clone) for setup instructions.
 
 1. Read [docs/DESIGN.md](docs/DESIGN.md) for architecture overview
 2. Follow quality gates: `hatch run check` (type, lint, format, test)
@@ -454,4 +504,4 @@ This tool was developed to support formal methods education. The notation and sy
 
 ---
 
-**Last Updated:** 2025-11-28
+**Last Updated:** 2025-11-29
