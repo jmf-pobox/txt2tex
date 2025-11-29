@@ -197,12 +197,12 @@ Files are cleaned up after successful compilation unless `--keep-aux` is used.
 (b) Another part
 
 TRUTH TABLE:                  → \begin{tabular}...\end{tabular}
-p | q | p and q
+p | q | p land q
 T | T | T
 
 EQUIV:                        → \begin{align*}...\end{align*}
-p and q
-<=> q and p [commutative]
+p land q
+<=> q land p [commutative]
 
 PROOF:                        → \begin{itemize} with indentation
   premise
@@ -212,16 +212,18 @@ PROOF:                        → \begin{itemize} with indentation
 ### Operators
 
 ```
-and    → \land
-or     → \lor
-not    → \lnot
-=>     → \Rightarrow
-<=>    → \Leftrightarrow
-forall → \forall
-exists → \exists
- | → \bullet (in quantified predicates)
-x^2    → $x^{2}$ (in prose)
+land   → \land              (logical AND)
+lor    → \lor               (logical OR)
+lnot   → \lnot              (logical NOT)
+=>     → \Rightarrow        (implication)
+<=>    → \Leftrightarrow    (equivalence)
+forall → \forall            (universal quantifier)
+exists → \exists            (existential quantifier)
+elem   → \in                (set membership)
+ |     → \bullet            (in quantified predicates)
 ```
+
+**Note:** Use `land`, `lor`, `lnot` (LaTeX-style). English `and`, `or`, `not` are NOT supported.
 
 ### Z Notation
 
