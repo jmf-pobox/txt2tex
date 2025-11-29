@@ -109,17 +109,18 @@ cd txt2tex
 # Install hatch (Python project manager)
 pip install hatch
 
-# Run txt2tex via hatch (installs dependencies automatically)
-hatch run txt2tex examples/01_propositional_logic/hello_world.txt
-
-# Or enter a shell with txt2tex available
+# Enter a development shell (installs dependencies automatically)
 hatch shell
+
+# Now txt2tex works directly
 txt2tex examples/01_propositional_logic/hello_world.txt
 ```
 
-**Note:** After cloning, use `hatch run txt2tex` (not just `txt2tex`) to ensure the development version is used.
+**Note:** Always run `hatch shell` first after cloning. This enters a virtual environment where `txt2tex` and all dev tools are available.
 
 #### Development Commands
+
+Inside `hatch shell`:
 
 ```bash
 # Run all quality checks (lint, type check, tests)
@@ -130,6 +131,9 @@ hatch run test
 
 # Build all examples
 cd examples && make
+
+# Convert a file
+txt2tex myfile.txt
 ```
 
 You'll also need LaTeX and optionally fuzz (see Steps 2-3 above)
@@ -336,17 +340,18 @@ The `examples/` directory contains **141 working examples** organized by topic. 
 - **user_guide** - Examples from the user guide documentation
 
 ```bash
-# After cloning the repo:
+# After cloning and entering hatch shell:
 cd txt2tex
+hatch shell
 
-# Build all examples (requires hatch)
+# Build all examples
 cd examples && make
 
 # Build examples in a specific directory
 cd examples && make 01_propositional_logic
 
 # Build a specific example
-hatch run txt2tex examples/01_propositional_logic/hello_world.txt
+txt2tex examples/01_propositional_logic/hello_world.txt
 ```
 
 All 141 examples pass fuzz typechecking and compile to PDF
