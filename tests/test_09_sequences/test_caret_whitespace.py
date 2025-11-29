@@ -1,4 +1,4 @@
-"""Tests for Phase 24: Whitespace-sensitive ^ operator.
+"""Tests for whitespace-sensitive ^ operator.
 
 Tests the disambiguation between concatenation (space before ^) and
 exponentiation (no space before ^).

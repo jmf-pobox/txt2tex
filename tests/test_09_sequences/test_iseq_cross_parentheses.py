@@ -1,4 +1,4 @@
-"""Test for Phase 12: Parentheses around cross elem iseq(X cross Y).
+"""Test for parentheses around cross in iseq(X cross Y).
 
 This is critical for fuzz compatibility - without parentheses,
 iseq ShowId cross EpisodeId parses as (iseq ShowId) cross EpisodeId,

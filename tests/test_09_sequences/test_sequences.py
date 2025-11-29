@@ -1,4 +1,4 @@
-"""Tests for Phase 12 land 14: Sequences, Bags, Tuple Projection, land ASCII syntax."""
+"""Tests for sequences, bags, tuple projection, and ASCII syntax."""
 
 from txt2tex.ast_nodes import (
     BagLiteral,
@@ -290,8 +290,8 @@ class TestSequenceConcatenationLaTeX:
         assert result == "\\langle 1 \\rangle \\cat \\langle 2, 3 \\rangle"
 
 
-class TestPhase12Integration:
-    """Integration tests combining Phase 12 features."""
+class TestSequenceIntegration:
+    """Integration tests combining sequence features."""
 
     def test_sequence_of_tuples(self):
         """Test ⟨(1, 2), (3, 4)⟩."""
@@ -330,7 +330,7 @@ class TestPhase12Integration:
         latex = generate_latex(text)
         assert latex == "\\lbag 1, 2 \\rbag = \\lbag 2, 1 \\rbag"
 
-class TestPhase12EdgeCases:
+class TestSequenceEdgeCases:
     """Test edge cases land potential conflicts."""
 
     def test_bracket_not_bag(self):
@@ -495,8 +495,8 @@ class TestPatternMatching:
         assert "x.2 + f(s)" in result
 
 
-class TestPhase14Integration:
-    """Integration tests for Phase 14."""
+class TestASCIISyntaxIntegration:
+    """Integration tests for ASCII sequence syntax."""
 
     def test_solution40_style_pattern(self):
         """Test pattern matching style from Solution 40."""

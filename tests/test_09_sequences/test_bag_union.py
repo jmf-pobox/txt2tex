@@ -1,4 +1,4 @@
-"""Tests for Phase 35: Bag Union Operator (⊎ / bag_union)."""
+"""Tests for bag union operator (⊎ / bag_union)."""
 
 from __future__ import annotations
 

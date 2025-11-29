@@ -1,4 +1,4 @@
-"""Tests for Phase 35: Sequence Filter Operator (↾)."""
+"""Tests for sequence filter operator (↾)."""
 
 from __future__ import annotations
 

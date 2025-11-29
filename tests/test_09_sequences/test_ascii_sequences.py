@@ -1,4 +1,4 @@
-"""Tests for Phase 14: ASCII Sequence Brackets land Pattern Matching Support."""
+"""Tests for ASCII sequence brackets and pattern matching support."""
 
 from txt2tex.ast_nodes import (
     BinaryOp,
@@ -164,8 +164,8 @@ class TestPatternMatching:
         assert "x.2 + f(s)" in result
 
 
-class TestPhase14Integration:
-    """Integration tests for Phase 14."""
+class TestASCIISequenceIntegration:
+    """Integration tests for ASCII sequences."""
 
     def test_solution40_style_pattern(self):
         """Test pattern matching style from Solution 40."""
