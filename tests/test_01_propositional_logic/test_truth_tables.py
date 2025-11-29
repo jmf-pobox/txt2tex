@@ -1,4 +1,4 @@
-"""Tests for Phase 1: Multi-line document support land truth tables."""
+"""Tests for multi-line documents and truth tables."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
 
 
-class TestPhase1Parsing:
+class TestTruthTableParsing:
     """Test parsing of multi-line documents."""
 
     def test_empty_document(self) -> None:
@@ -85,7 +85,7 @@ class TestPhase1Parsing:
         assert ast.items[3].operator == "<=>"
 
 
-class TestPhase1LaTeXGeneration:
+class TestTruthTableLaTeX:
     """Test LaTeX generation for multi-line documents."""
 
     def test_generate_single_expr_backward_compatible(self) -> None:
@@ -153,8 +153,8 @@ class TestPhase1LaTeXGeneration:
         assert "\\usepackage{zed-cm}" not in latex
 
 
-class TestPhase1Integration:
-    """Integration tests for Phase 1."""
+class TestTruthTableIntegration:
+    """Integration tests for truth tables."""
 
     def test_end_to_end_multiline(self) -> None:
         """Test complete pipeline from text to LaTeX for multi-line input."""
@@ -352,8 +352,8 @@ def test_truth_table_three_variables() -> None:
     assert table.rows[7] == ["F", "F", "F", "F"]
 
 
-def test_truth_table_phase19_f_token() -> None:
-    """Test that F token (from Phase 19 FINSET) works elem truth tables."""
+def test_truth_table_f_token() -> None:
+    """Test that F token (from FINSET) works in truth tables."""
     text = "\nTRUTH TABLE:\np | q\nF | F\nF | T\nT | F\nT | T\n"
     table = parse_truth_table(text)
     assert table.rows[0] == ["F", "F"]

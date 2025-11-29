@@ -1,4 +1,4 @@
-"""Tests for Phase 0: Simple propositional logic."""
+"""Tests for simple propositional logic operators."""
 
 from __future__ import annotations
 

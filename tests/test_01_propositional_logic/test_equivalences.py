@@ -1,4 +1,4 @@
-"""Tests for Phase 2: Equivalence chains with justifications."""
+"""Tests for equivalence chains with justifications."""
 
 from txt2tex.ast_nodes import (
     BinaryOp,
@@ -13,7 +13,7 @@ from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
 
 
-class TestPhase2Parsing:
+class TestEquivalenceParsing:
     """Test parsing of equivalence chains."""
 
     def test_simple_equiv_chain_no_justifications(self) -> None:
@@ -120,7 +120,7 @@ class TestPhase2Parsing:
         assert len(ast.items[1].steps) == 2
 
 
-class TestPhase2LaTeXGeneration:
+class TestEquivalenceLaTeX:
     """Test LaTeX generation for equivalence chains."""
 
     def test_generate_equiv_chain_no_justifications(self) -> None:
@@ -238,8 +238,8 @@ class TestPhase2LaTeXGeneration:
         assert "\\end{document}" in latex
 
 
-class TestPhase2Integration:
-    """Integration tests for Phase 2."""
+class TestEquivalenceIntegration:
+    """Integration tests for equivalence chains."""
 
     def test_end_to_end_equiv_chain(self) -> None:
         """Test complete pipeline from text to LaTeX for equivalence chain."""
