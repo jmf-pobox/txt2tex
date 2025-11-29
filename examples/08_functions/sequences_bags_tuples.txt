@@ -20,7 +20,7 @@
 // See: docs/USER_GUIDE.md - Sections "Sequences", "Tuples", "Bags"
 // ============================================================================
 
-=== Phase 12: Sequences, Bags, land Tuple Projection ===
+=== Sequences, Bags, and Tuple Projection ===
 
 ** Example 1: Sequence Literals **
 

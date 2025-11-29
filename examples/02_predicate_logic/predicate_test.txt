@@ -1,5 +1,5 @@
 // ============================================================================
-// Example: Phase A Test - Verify Phase 14-16 Features
+// Example: Predicate Logic Test - Verify Advanced Features
 // ============================================================================
 // Demonstrates:
 //   - ASCII sequence brackets with pattern matching
@@ -16,7 +16,7 @@
 // See: docs/USER_GUIDE.md - Sections "Sequences", "Conditionals", "Identifiers"
 // ============================================================================
 
-** Test: Phase A - Verify Phase 14-16 Features **
+** Test: Predicate Logic Advanced Features **
 
 TEXT: (a) Test ASCII sequence brackets and pattern matching:
 

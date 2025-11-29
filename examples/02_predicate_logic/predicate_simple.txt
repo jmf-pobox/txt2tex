@@ -1,5 +1,5 @@
 // ============================================================================
-// Example: Phase A Test - Pattern Matching with Sequences
+// Example: Pattern Matching with Sequences
 // ============================================================================
 // Demonstrates:
 //   - Pattern matching on sequences (future feature)
@@ -15,7 +15,7 @@
 // See: docs/USER_GUIDE.md - Sections "Sequences", "Pattern Matching"
 // ============================================================================
 
-** Test Phase A **
+** Pattern Matching Examples **
 
 TEXT: Pattern matching with sequences:
 

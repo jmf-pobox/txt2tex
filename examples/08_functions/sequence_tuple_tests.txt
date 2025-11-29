@@ -1,5 +1,5 @@
 // ============================================================================
-// Example: Phase 12 Feature Tests (Sequences, Tuples, Bags)
+// Example: Sequence and Tuple Feature Tests
 // ============================================================================
 // Demonstrates:
 //   - Sequence literal notation with angle brackets
@@ -17,7 +17,7 @@
 // See: docs/USER_GUIDE.md - Sections "Sequences", "Tuples", "Bags"
 // ============================================================================
 
-=== Phase 12 Feature Tests ===
+=== Sequence and Tuple Feature Tests ===
 
 ** Test 1: Sequence Literals from Solution 37 **
 

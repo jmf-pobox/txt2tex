@@ -416,10 +416,9 @@ Upload these files to your Overleaf project:
 | File | Purpose |
 |------|---------|
 | `input.tex` | Your generated LaTeX document |
-| `fuzz.sty` | Z notation package |
+| `fuzz.sty` | Z notation package (omit if using `--zed`) |
+| `zed-*.sty` | Z notation support packages (zed-cm, zed-float, zed-lbr, zed-maths, zed-proof) |
 | `*.mf` | METAFONT files (oxsz*.mf, zarrow.mf, zletter.mf, zsymbol.mf) |
-
-**Note:** If using `--zed` flag instead, upload the `zed-*.sty` files instead of fuzz.sty.
 
 ### Step 3: Compile in Overleaf
 
@@ -454,7 +453,7 @@ Fuzz catches genuine specification errors. Check:
 
 ## Known Limitations
 
-**⚠️ Always proofread your output.** txt2tex makes design choices about how to render complex mathematical expressions. The generated LaTeX may not match your preferred formatting in all cases. Review your final PDF carefully before submission.
+**⚠️ Always proofread your output.** txt2tex makes design choices about how to render complex mathematical expressions. The generated LaTeX may not match your preferred formatting in all cases. Review your final PDF carefully.
 
 A few edge cases require workarounds:
 
