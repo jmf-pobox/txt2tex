@@ -1,4 +1,4 @@
-"""Test Phase 13 features: anonymous schemas, range operator, sequence operations."""
+"""Tests for anonymous schemas, range operator, and sequence operations."""
 
 from txt2tex.ast_nodes import (
     BinaryOp,

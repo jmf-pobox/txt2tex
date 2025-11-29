@@ -1,4 +1,4 @@
-"""Tests for identifier underscore handling coverage (Phase 15)."""
+"""Tests for identifier underscore handling coverage."""
 
 from __future__ import annotations
 

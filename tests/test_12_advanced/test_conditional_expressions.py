@@ -1,4 +1,4 @@
-"""Tests for Phase 16: Conditional Expressions (if/then/else)."""
+"""Tests for conditional expressions (if/then/else)."""
 
 from txt2tex.ast_nodes import (
     BinaryOp,
@@ -155,8 +155,8 @@ class TestConditionalPrecedence:
         assert ast.condition.operator == "land"
 
 
-class TestPhase16Integration:
-    """Integration tests for Phase 16."""
+class TestConditionalExpressionIntegration:
+    """Integration tests for conditional expressions."""
 
     def test_absolute_value_function(self):
         """Test abs(x) = if x > 0 then x else -x."""

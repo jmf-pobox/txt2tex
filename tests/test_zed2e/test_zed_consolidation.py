@@ -1,6 +1,6 @@
-"""Tests for Phase 1.4: Zed environment consolidation.
+"""Tests for zed environment consolidation.
 
-This phase consolidates consecutive GivenType, FreeType, land Abbreviation items
+Consolidates consecutive GivenType, FreeType, and Abbreviation items
 into a single zed environment with \\also between them.
 """
 

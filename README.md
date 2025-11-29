@@ -397,6 +397,38 @@ The project includes pre-configured settings:
 
 ---
 
+## Overleaf Workflow
+
+If you prefer to edit LaTeX in [Overleaf](https://www.overleaf.com/), you can use txt2tex to generate the initial `.tex` file and then upload it for final editing:
+
+### Step 1: Generate LaTeX
+
+```bash
+txt2tex input.txt --tex-only
+```
+
+This creates `input.tex` and copies the required style files to your directory.
+
+### Step 2: Upload to Overleaf
+
+Upload these files to your Overleaf project:
+
+| File | Purpose |
+|------|---------|
+| `input.tex` | Your generated LaTeX document |
+| `fuzz.sty` | Z notation package |
+| `*.mf` | METAFONT files (oxsz*.mf, zarrow.mf, zletter.mf, zsymbol.mf) |
+
+**Note:** If using `--zed` flag instead, upload the `zed-*.sty` files instead of fuzz.sty.
+
+### Step 3: Compile in Overleaf
+
+Set the compiler to **pdfLaTeX** in Overleaf's settings. The document should compile with all Z notation symbols rendering correctly.
+
+This workflow lets you use txt2tex for the initial conversion, then make final adjustments directly in Overleaf's editor.
+
+---
+
 ## Troubleshooting
 
 ### "File `zed-cm.sty' not found"
@@ -421,6 +453,8 @@ Fuzz catches genuine specification errors. Check:
 ---
 
 ## Known Limitations
+
+**⚠️ Always proofread your output.** txt2tex makes design choices about how to render complex mathematical expressions. The generated LaTeX may not match your preferred formatting in all cases. Review your final PDF carefully before submission.
 
 A few edge cases require workarounds:
 

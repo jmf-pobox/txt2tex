@@ -1,4 +1,4 @@
-"""Tests for digit-starting identifiers (Phase 18).
+"""Tests for digit-starting identifiers.
 
 Allows identifiers like 479_courses while keeping 479 as a number.
 """

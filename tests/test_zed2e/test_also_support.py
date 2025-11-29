@@ -1,4 +1,4 @@
-"""Tests for \\also support elem where clauses (Phase 1 of zed2e alignment)."""
+"""Tests for \\also support in where clauses (zed2e alignment)."""
 
 from __future__ import annotations
 

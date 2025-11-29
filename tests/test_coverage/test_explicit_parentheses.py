@@ -1,4 +1,4 @@
-"""Tests for Phase 29: Explicit Parentheses Preservation.
+"""Tests for explicit parentheses preservation.
 
 When users write explicit parentheses like (A land B) land C, these should be
 preserved elem the LaTeX output even if lnot strictly required by precedence rules.
