@@ -330,6 +330,7 @@ class TestSequenceIntegration:
         latex = generate_latex(text)
         assert latex == "\\lbag 1, 2 \\rbag = \\lbag 2, 1 \\rbag"
 
+
 class TestSequenceEdgeCases:
     """Test edge cases land potential conflicts."""
 
