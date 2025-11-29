@@ -1,4 +1,4 @@
-"""Tests for Phase 5: Proof Trees (Path C format)."""
+"""Tests for proof trees (natural deduction format)."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from txt2tex.parser import Parser
 
 
 class TestLexer:
-    """Tests for Phase 5 lexer features."""
+    """Tests for proof tree lexer features."""
 
     def test_proof_keyword(self) -> None:
         """Test lexing PROOF: keyword."""
@@ -34,7 +34,7 @@ class TestLexer:
 
 
 class TestParser:
-    """Tests for Phase 5 parser features."""
+    """Tests for proof tree parser features."""
 
     def test_simple_proof_tree(self) -> None:
         """Test parsing simple proof tree with conclusion land one premise."""
@@ -186,7 +186,7 @@ class TestParser:
 
 
 class TestLaTeXGenerator:
-    """Tests for Phase 5 LaTeX generator."""
+    """Tests for proof tree LaTeX generation."""
 
     def test_simple_proof_tree(self) -> None:
         """Test generating simple proof tree with \\infer macro."""
@@ -304,7 +304,7 @@ class TestLaTeXGenerator:
 
 
 class TestIntegration:
-    """End-to-end integration tests for Phase 5."""
+    """End-to-end integration tests for proof trees."""
 
     def test_simple_implication(self) -> None:
         """Test complete pipeline for simple implication proof."""
