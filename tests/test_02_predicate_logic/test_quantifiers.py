@@ -1,4 +1,4 @@
-"""Tests for Phase 3: Quantifiers, subscripts, superscripts, land math."""
+"""Tests for quantifiers, subscripts, superscripts, and math operators."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from txt2tex.parser import Parser
 
 
 class TestLexer:
-    """Tests for Phase 3 lexer features."""
+    """Tests for quantifier lexer features."""
 
     def test_forall_keyword(self) -> None:
         """Test lexing forall keyword."""
@@ -58,7 +58,7 @@ class TestLexer:
         assert types == ["IN", "SUBSET", "UNION", "INTERSECT"]
 
     def test_caret_and_underscore(self) -> None:
-        """Test lexing caret (Phase 15: underscore now part of identifiers)."""
+        """Test lexing caret (underscore is now part of identifiers)."""
         lexer = Lexer("x^2 a_1")
         tokens = lexer.tokenize()
         assert tokens[1].type.name == "CARET"
@@ -76,7 +76,7 @@ class TestLexer:
 
 
 class TestParser:
-    """Tests for Phase 3 parser features."""
+    """Tests for quantifier parser features."""
 
     def test_number(self) -> None:
         """Test parsing number."""
@@ -100,7 +100,7 @@ class TestParser:
         assert ast.exponent.value == "2"
 
     def test_subscript(self) -> None:
-        """Test parsing subscript (Phase 15: underscore elem identifiers)."""
+        """Test parsing subscript (underscore in identifiers)."""
         lexer = Lexer("a_1")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -109,7 +109,7 @@ class TestParser:
         assert ast.name == "a_1"
 
     def test_multiple_postfix(self) -> None:
-        """Test parsing multiple postfix operators (Phase 15)."""
+        """Test parsing multiple postfix operators."""
         lexer = Lexer("x_i^2")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -189,7 +189,7 @@ class TestParser:
         assert ast.variables == ["y"]
 
     def test_quantifier_multi_variable(self) -> None:
-        """Test parsing forall with multiple variables (Phase 6)."""
+        """Test parsing forall with multiple variables."""
         lexer = Lexer("forall x, y : N | x > y")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -201,7 +201,7 @@ class TestParser:
         assert ast.domain.name == "N"
 
     def test_quantifier_exists1(self) -> None:
-        """Test parsing exists1 (unique existence, Phase 6)."""
+        """Test parsing exists1 (unique existence)."""
         lexer = Lexer("exists1 x : N | x = 0")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -211,7 +211,7 @@ class TestParser:
         assert ast.variables == ["x"]
 
     def test_quantifier_multi_variable_no_domain(self) -> None:
-        """Test parsing multi-variable quantifier without domain (Phase 6)."""
+        """Test parsing multi-variable quantifier without domain."""
         lexer = Lexer("exists x, y | x > y")
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -233,7 +233,7 @@ class TestParser:
 
 
 class TestLaTeXGenerator:
-    """Tests for Phase 3 LaTeX generator."""
+    """Tests for quantifier LaTeX generation."""
 
     def test_number(self) -> None:
         """Test generating number."""
@@ -429,7 +429,7 @@ class TestLaTeXGenerator:
         assert latex == "\\exists y \\colon \\mathbb{N} \\bullet y = 0"
 
     def test_quantifier_multi_variable(self) -> None:
-        """Test generating multi-variable forall (Phase 6)."""
+        """Test generating multi-variable forall."""
         gen = LaTeXGenerator()
         ast = Quantifier(
             quantifier="forall",
@@ -449,7 +449,7 @@ class TestLaTeXGenerator:
         assert latex == "\\forall x, y \\colon \\mathbb{N} \\bullet x > y"
 
     def test_quantifier_exists1(self) -> None:
-        """Test generating exists1 (Phase 6)."""
+        """Test generating exists1."""
         gen = LaTeXGenerator()
         ast = Quantifier(
             quantifier="exists1",
@@ -470,7 +470,7 @@ class TestLaTeXGenerator:
 
 
 class TestIntegration:
-    """End-to-end integration tests for Phase 3."""
+    """End-to-end integration tests for quantifiers."""
 
     def test_simple_superscript(self) -> None:
         """Test complete pipeline for superscript."""
@@ -485,7 +485,7 @@ class TestIntegration:
         assert latex == "x \\bsup 2 \\esup"
 
     def test_simple_subscript(self) -> None:
-        """Test complete pipeline for subscript (Phase 15)."""
+        """Test complete pipeline for subscript."""
         text = "a_1"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -548,7 +548,7 @@ class TestIntegration:
         )
 
     def test_subscript_with_identifier_index(self) -> None:
-        """Test subscript with identifier index (Phase 15)."""
+        """Test subscript with identifier index."""
         text = "x_i"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -561,7 +561,7 @@ class TestIntegration:
         assert latex == "x_i"
 
     def test_multi_variable_quantifier(self) -> None:
-        """Test complete pipeline for multi-variable quantifier (Phase 6)."""
+        """Test complete pipeline for multi-variable quantifier."""
         text = "forall x, y : N | x > y"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -573,7 +573,7 @@ class TestIntegration:
         assert latex == "\\forall x, y \\colon \\mathbb{N} \\bullet x > y"
 
     def test_exists1_quantifier(self) -> None:
-        """Test complete pipeline for exists1 quantifier (Phase 6)."""
+        """Test complete pipeline for exists1 quantifier."""
         text = "exists1 x : N | x = 0"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -585,7 +585,7 @@ class TestIntegration:
         assert latex == "\\exists_1 x \\colon \\mathbb{N} \\bullet x = 0"
 
     def test_complex_multi_variable_expression(self) -> None:
-        """Test complete pipeline for complex multi-variable expression (Phase 6)."""
+        """Test complete pipeline for complex multi-variable expression."""
         text = "exists x, y : N | x > 0 land y > 0 land x > y"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -599,8 +599,8 @@ class TestIntegration:
         )
 
 
-class TestPhase31BulletSeparator:
-    """Tests for Phase 40: Bullet separator (GitHub issue #8)."""
+class TestBulletSeparator:
+    """Tests for bullet separator (GitHub issue #8)."""
 
     def test_forall_with_bullet_simple(self) -> None:
         """Test forall with bullet separator: forall x : N | x > 0 . x < 10."""

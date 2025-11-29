@@ -1,4 +1,4 @@
-"""Tests for nested quantifiers (Phase 21: Fix parser bug)."""
+"""Tests for nested quantifiers."""
 
 from txt2tex.ast_nodes import BinaryOp, Quantifier
 from txt2tex.lexer import Lexer
@@ -47,7 +47,7 @@ def test_mu_with_nested_forall_complex_predicate() -> None:
 def test_constrained_quantifier() -> None:
     """Test constrained quantifier: forall x : T | constraint | body.
 
-    Phase 21b: Support for constrained quantifiers (filter semantics).
+    Support for constrained quantifiers (filter semantics).
     Syntax: forall x : T | constraint | body
     Semantics: forall x : T | constraint => body (implication, not conjunction)
     """

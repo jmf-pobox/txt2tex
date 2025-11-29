@@ -1,4 +1,4 @@
-"""Test cases for tuple patterns in quantifiers (Phase 28).
+"""Tests for tuple patterns in quantifiers.
 
 Tests the ability to destructure tuples in quantifier variable bindings.
 Examples: forall (x, y) : T | P
