@@ -1,4 +1,4 @@
-"""Tests for space-separated function application (Phase 19).
+"""Tests for space-separated function application.
 
 Allows function application without parentheses: f x instead of f(x).
 Syntax: f x y → (f x) y (left-associative)

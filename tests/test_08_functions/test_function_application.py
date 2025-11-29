@@ -1,4 +1,4 @@
-"""Tests for Phase 11b: Function Application."""
+"""Tests for function application."""
 
 from txt2tex.ast_nodes import (
     BinaryOp,
@@ -30,7 +30,7 @@ def generate_latex(text: str) -> str:
     return generator.generate_expr(ast)
 
 
-class TestPhase11bParsing:
+class TestFunctionApplicationParsing:
     """Test parsing of function application."""
 
     def test_single_argument(self):
@@ -117,7 +117,7 @@ class TestPhase11bParsing:
         assert ast.args[1].operator == "lor"
 
 
-class TestPhase11bInExpressions:
+class TestFunctionApplicationInExpressions:
     """Test function application elem larger expressions."""
 
     def test_in_binary_expression(self):
@@ -163,7 +163,7 @@ class TestPhase11bInExpressions:
         assert isinstance(ast.right, FunctionApp)
 
 
-class TestPhase11bLaTeX:
+class TestFunctionApplicationLaTeX:
     """Test LaTeX generation for function application."""
 
     def test_single_argument_latex(self):
@@ -197,7 +197,7 @@ class TestPhase11bLaTeX:
         assert result == "\\forall x \\colon \\mathbb{N} \\bullet f(x) > 0"
 
 
-class TestPhase11bSpecialFunctions:
+class TestSpecialFunctions:
     """Test special Z notation functions."""
 
     def test_seq_function(self):
@@ -231,7 +231,7 @@ class TestPhase11bSpecialFunctions:
         assert result == "x \\in \\seq~\\mathbb{N}"
 
 
-class TestPhase11bEdgeCases:
+class TestFunctionApplicationEdgeCases:
     """Test edge cases land complex scenarios."""
 
     def test_parentheses_grouping_vs_application(self):
@@ -276,7 +276,7 @@ class TestPhase11bEdgeCases:
         assert isinstance(ast.args[0], FunctionApp)
 
 
-class TestPhase11bSolution5:
+class TestSolution5Examples:
     """Test examples from Solution 5."""
 
     def test_gentle_dog(self):
@@ -317,7 +317,7 @@ class TestPhase11bSolution5:
         assert latex == "neat(d) \\Rightarrow attractive(d)"
 
 
-class TestPhase11bIntegration:
+class TestFunctionApplicationIntegration:
     """Integration tests with full documents."""
 
     def test_axiom_with_function_application(self):

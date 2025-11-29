@@ -1,6 +1,6 @@
-"""Tests for Phase 11a: Function Type Operators.
+"""Tests for function type operators.
 
-Phase 11a adds 7 function type operators for Z notation:
+Covers 7 function type operators for Z notation:
 - -> (total function)
 - +-> (partial function)
 - >-> (total injection)
@@ -19,8 +19,8 @@ from txt2tex.parser import Parser
 from txt2tex.tokens import TokenType
 
 
-class TestPhase11aLexer:
-    """Test Phase 11a function type operators elem lexer."""
+class TestFunctionTypeLexer:
+    """Test function type operators in lexer."""
 
     def test_tfun_tokenization(self) -> None:
         """Test -> (total function) tokenizes correctly."""
@@ -98,8 +98,8 @@ class TestPhase11aLexer:
         assert tokens3[1].value == "-->>"
 
 
-class TestPhase11aParser:
-    """Test Phase 11a function type operators elem parser."""
+class TestFunctionTypeParser:
+    """Test function type operators in parser."""
 
     def test_tfun_parsing(self) -> None:
         """Test -> (total function) parses to FunctionType."""
@@ -199,8 +199,8 @@ class TestPhase11aParser:
         assert ast.range.operator == "<->"
 
 
-class TestPhase11aLaTeXGeneration:
-    """Test Phase 11a LaTeX generation for function types."""
+class TestFunctionTypeLaTeX:
+    """Test LaTeX generation for function types."""
 
     def test_tfun_latex(self) -> None:
         """Test -> generates \\fun."""
@@ -291,8 +291,8 @@ class TestPhase11aLaTeXGeneration:
         assert "\\fun" in latex
 
 
-class TestPhase11aIntegration:
-    """Test Phase 11a end-to-end integration."""
+class TestFunctionTypeIntegration:
+    """Test function type end-to-end integration."""
 
     def test_end_to_end_tfun(self) -> None:
         """Test complete pipeline for total function."""

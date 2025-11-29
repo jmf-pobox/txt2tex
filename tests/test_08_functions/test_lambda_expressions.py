@@ -1,4 +1,4 @@
-"""Tests for Phase 11d: Lambda Expressions."""
+"""Tests for lambda expressions."""
 
 from txt2tex.ast_nodes import (
     AxDef,
@@ -30,7 +30,7 @@ def generate_latex(text: str) -> str:
     return generator.generate_expr(ast)
 
 
-class TestPhase11dParsing:
+class TestLambdaParsing:
     """Test parsing of lambda expressions."""
 
     def test_simple_lambda(self):
@@ -80,7 +80,7 @@ class TestPhase11dParsing:
         assert ast.body.operator == ">"
 
 
-class TestPhase11dInDeclarations:
+class TestLambdaInDeclarations:
     """Test lambda expressions elem declarations."""
 
     def test_lambda_in_axdef(self):
@@ -102,7 +102,7 @@ class TestPhase11dInDeclarations:
         assert isinstance(ast, Document)
 
 
-class TestPhase11dLaTeX:
+class TestLambdaLaTeX:
     """Test LaTeX generation for lambda expressions."""
 
     def test_simple_lambda_latex(self):
@@ -126,7 +126,7 @@ class TestPhase11dLaTeX:
         assert result == "\\lambda x : \\mathbb{N} \\bullet x > 0"
 
 
-class TestPhase11dComplexExpressions:
+class TestLambdaComplexExpressions:
     """Test complex lambda expressions."""
 
     def test_nested_lambda(self):
@@ -150,7 +150,7 @@ class TestPhase11dComplexExpressions:
         _ = parse_expr(text)
 
 
-class TestPhase11dEdgeCases:
+class TestLambdaEdgeCases:
     """Test edge cases land precedence."""
 
     def test_lambda_vs_function_application(self):
@@ -170,7 +170,7 @@ class TestPhase11dEdgeCases:
         _ = parse_expr(text)
 
 
-class TestPhase11dIntegration:
+class TestLambdaIntegration:
     """Integration tests with full documents."""
 
     def test_axdef_with_lambda(self):

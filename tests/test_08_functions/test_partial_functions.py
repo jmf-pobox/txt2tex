@@ -1,4 +1,4 @@
-"""Tests for Phase 11c: Function Types (Arrows)."""
+"""Tests for partial functions and function type arrows."""
 
 from txt2tex.ast_nodes import Document, Expr, FunctionType, Identifier
 from txt2tex.latex_gen import LaTeXGenerator
@@ -22,7 +22,7 @@ def generate_latex(text: str) -> str:
     return generator.generate_expr(ast)
 
 
-class TestPhase11cParsing:
+class TestPartialFunctionParsing:
     """Test parsing of function type arrows."""
 
     def test_total_function(self):
@@ -84,7 +84,7 @@ class TestPhase11cParsing:
         assert isinstance(ast.range, Identifier)
 
 
-class TestPhase11cInDeclarations:
+class TestPartialFunctionInDeclarations:
     """Test function types elem declarations."""
 
     def test_simple_function_declaration(self):
@@ -106,7 +106,7 @@ class TestPhase11cInDeclarations:
         assert isinstance(ast, Document)
 
 
-class TestPhase11cLaTeX:
+class TestPartialFunctionLaTeX:
     """Test LaTeX generation for function arrows."""
 
     def test_total_function_latex(self):
@@ -145,7 +145,7 @@ class TestPhase11cLaTeX:
         assert result == "X \\bij Y"
 
 
-class TestPhase11cComplexTypes:
+class TestPartialFunctionComplexTypes:
     """Test complex function type expressions."""
 
     def test_function_composition_type(self):
@@ -173,7 +173,7 @@ class TestPhase11cComplexTypes:
         assert isinstance(ast.range, FunctionType)
 
 
-class TestPhase11cEdgeCases:
+class TestPartialFunctionEdgeCases:
     """Test edge cases land precedence."""
 
     def test_arrow_vs_relation(self):
@@ -207,7 +207,7 @@ class TestPhase11cEdgeCases:
         assert ast.range.name == "C"
 
 
-class TestPhase11cIntegration:
+class TestPartialFunctionIntegration:
     """Integration tests with full documents."""
 
     def test_axdef_with_function_type(self):

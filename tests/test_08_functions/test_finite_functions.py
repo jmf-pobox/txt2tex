@@ -1,4 +1,4 @@
-"""Tests for Phase 34: Finite Partial Function Operator (77->)."""
+"""Tests for finite partial function operator (77->)."""
 
 from __future__ import annotations
 
