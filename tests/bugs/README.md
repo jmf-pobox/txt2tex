@@ -53,7 +53,7 @@ Real bugs that are currently open on GitHub and need fixing.
 
 Previously fixed bugs that now serve as regression tests. All these files PASS (compile successfully).
 
-### IN Operator Disambiguation (8 files) - Resolved Phase 18 (Nov 18, 2025)
+### IN Operator Disambiguation (8 files) - Resolved Nov 18, 2025
 
 Fixed issue where `in` operator was incorrectly parsed in various contexts.
 
@@ -73,7 +73,7 @@ for f in tests/bugs/regression_in_operator*.txt tests/bugs/regression_in_notin*.
 done
 ```
 
-### Bullet Separator (3 files) - Resolved Phase 18
+### Bullet Separator (3 files) - Resolved Nov 18, 2025
 
 Fixed bullet separator (`.` for constraint/body in quantifiers) parsing with `notin` operator.
 
@@ -99,7 +99,7 @@ Fixed operator conversion in TEXT blocks.
   - **Fix**: Logical operators `or`/`and` in TEXT blocks now correctly converted
   - **Test**: `(p or q)` → `p ∨ q`, `(p and q)` → `p ∧ q` ✓
 
-### Set Operators (2 files) - Resolved Phase 18
+### Set Operators (2 files) - Resolved Nov 18, 2025
 
 Fixed parsing of subset and notin operators.
 

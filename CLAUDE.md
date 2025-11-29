@@ -123,10 +123,10 @@ hatch run test           # Run ALL tests
 hatch run test-cov       # Run tests with coverage
 
 # Run specific tests (use hatch run test with path arguments)
-hatch run test tests/test_phase11d.py                           # Single file
-hatch run test tests/test_phase11d.py -v                        # Verbose output
-hatch run test tests/test_phase11d.py::TestPhase11dParsing     # Single test class
-hatch run test tests/test_phase11d.py::TestPhase11dParsing::test_simple_lambda -v  # Single test method
+hatch run test tests/test_08_functions/test_lambda_expressions.py                         # Single file
+hatch run test tests/test_08_functions/test_lambda_expressions.py -v                      # Verbose output
+hatch run test tests/test_08_functions/test_lambda_expressions.py::TestLambdaParsing     # Single test class
+hatch run test tests/test_08_functions/test_lambda_expressions.py::TestLambdaParsing::test_simple_lambda -v  # Single test method
 
 # Combined quality check
 hatch run check          # lint + type + test
@@ -166,10 +166,10 @@ The project supports both **fuzz** and **zed-*** packages for Z notation:
 
 ```bash
 # Generate and compile to PDF in one step
-./txt2pdf.sh examples/phase5.txt
+./txt2pdf.sh examples/04_proof_trees/simple_proofs.txt
 
 # Extract text from PDF for verification
-pdftotext examples/phase5.pdf -
+pdftotext examples/04_proof_trees/simple_proofs.pdf -
 
 # Verify output looks correct
 # (manual visual inspection)
