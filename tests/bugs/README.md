@@ -1,11 +1,11 @@
 # txt2tex Test Files: Bugs, Regressions, and Features
 
 This directory contains test files organized into three categories:
-1. **Active Bugs** (2 files) - Real bugs currently open on GitHub
-2. **Regression Tests** (17 files) - Previously fixed bugs, now serving as regression protection
-3. **Feature Tests** (7 files) - Edge cases and features that were never bugs
+1. **Active Bugs** (1 file) - Real bugs currently open on GitHub
+2. **Broken Tests** (13 files) - Tests that fail but may represent stale test cases
+3. **Passing Tests** (12 files) - Regression and feature tests that pass
 
-## Active Bugs (2 files)
+## Active Bugs (1 file)
 
 Real bugs that are currently open on GitHub and need fixing.
 
@@ -16,143 +16,89 @@ Real bugs that are currently open on GitHub and need fixing.
 - **Status**: ACTIVE
 - **Test Command**:
   ```bash
-  hatch run convert tests/bugs/bug1_prose_period.txt
+  hatch run cli tests/bugs/bug1_prose_period.txt --tex-only
   ```
 - **Expected**: Should parse and render correctly
-- **Actual**: `Error: Line 3, column 26: Expected identifier, number, '(', '{', '⟨', or lambda, got PERIOD`
+- **Actual**: `Error: Expected ')' after expression`
 - **Workaround**: Use TEXT blocks for prose with periods
 - **Impact**: Blocks natural writing style, especially for homework problems
 
-### Bug #2: TEXT blocks with multiple pipes close math mode prematurely
-- **File**: [bug2_multiple_pipes.txt](bug2_multiple_pipes.txt)
-- **Issue**: [#2](https://github.com/jmf-pobox/txt2tex/issues/2)
-- **Priority**: MEDIUM
-- **Status**: ACTIVE
-- **Test Command**:
-  ```bash
-  hatch run convert tests/bugs/bug2_multiple_pipes.txt
-  pdftotext tests/bugs/bug2_multiple_pipes.pdf -
-  ```
-- **Expected**: All pipes should be in math mode: `(µ p : ran hd • (∀ q : ran hd • p ≠ q • p.2 > q.2))`
-- **Actual**: Second pipe appears as text: `p ̸= q| p.2 > q.2` (pipe outside math mode)
-- **Workaround**: Use proper Z notation blocks (axdef, schema) instead of TEXT
-- **Impact**: Solution 40(g) and similar complex expressions
+---
+
+## Broken Tests (13 files)
+
+These tests fail. They may represent:
+- Bugs that were never actually fixed
+- Test cases that use unsupported syntax
+- Stale test cases that need updating
+
+### Failing "Regression" Tests (10 files)
+
+These were documented as "resolved" but actually fail:
+
+| File | Error |
+|------|-------|
+| regression_in_operator_basic.txt | Parser error |
+| regression_in_operator_with_comparison.txt | Parser error |
+| regression_in_operator_multiple_same.txt | Parser error |
+| regression_in_operator_multiple_nested.txt | Parser error |
+| regression_in_operator_before_bullet.txt | Parser error |
+| regression_in_notin_operators_combined.txt | Parser error |
+| regression_in_operator_patterns.txt | Parser error |
+| regression_bullet_separator_basic.txt | Parser error |
+| regression_bullet_separator_with_notin.txt | Parser error |
+| regression_bullet_separator_notin_paren.txt | Parser error |
+
+### Failing Bug Files (2 files)
+
+These were documented as "resolved" for Issue #3 but fail:
+
+| File | Status |
+|------|--------|
+| bug3_compound_id.txt | FAIL - abbrev block syntax not working |
+| bug3_test_simple.txt | FAIL - abbrev block syntax not working |
+
+### Failing Feature Test (1 file)
+
+| File | Status |
+|------|--------|
+| feature_semicolon_separator.txt | FAIL - semicolon separator syntax not working |
 
 ---
 
-## Regression Tests (17 files)
+## Passing Tests (12 files)
 
-Previously fixed bugs that now serve as regression tests. All these files PASS (compile successfully).
+### Resolved Bug (1 file)
 
-### Field Projection on Function Application - Resolved Nov 2025
+- **bug2_multiple_pipes.txt** - Issue [#2](https://github.com/jmf-pobox/txt2tex/issues/2) appears to be fixed
+  - Multiple pipes in TEXT blocks now work correctly
 
-- **Issue**: [#13](https://github.com/jmf-pobox/txt2tex/issues/13) (CLOSED)
-- **Fix**: Field projection like `f(i).field` no longer incorrectly parsed as bullet separator in quantifier bodies
+### TEXT Block Operators (2 files) - Issues #4, #5
 
-### IN Operator Disambiguation (8 files) - Resolved Nov 18, 2025
-
-Fixed issue where `in` operator was incorrectly parsed in various contexts.
-
-- [regression_in_operator_basic.txt](regression_in_operator_basic.txt) - Basic `in` operator parsing
-- [regression_in_operator_simple.txt](regression_in_operator_simple.txt) - Simple membership `y in T`
-- [regression_in_operator_with_comparison.txt](regression_in_operator_with_comparison.txt) - `in` with comparisons
-- [regression_in_operator_multiple_same.txt](regression_in_operator_multiple_same.txt) - Multiple `in` operators, same precedence
-- [regression_in_operator_multiple_nested.txt](regression_in_operator_multiple_nested.txt) - Multiple `in` operators, different levels
-- [regression_in_operator_before_bullet.txt](regression_in_operator_before_bullet.txt) - `in` before bullet separator
-- [regression_in_notin_operators_combined.txt](regression_in_notin_operators_combined.txt) - Combined `in` and `notin`
-- [regression_in_operator_patterns.txt](regression_in_operator_patterns.txt) - Various `in` patterns
-
-**Test Command**:
-```bash
-for f in tests/bugs/regression_in_operator*.txt tests/bugs/regression_in_notin*.txt; do
-  hatch run convert "$f"
-done
-```
-
-### Bullet Separator (3 files) - Resolved Nov 18, 2025
-
-Fixed bullet separator (`.` for constraint/body in quantifiers) parsing with `notin` operator.
-
-- [regression_bullet_separator_basic.txt](regression_bullet_separator_basic.txt) - Basic bullet separator
-- [regression_bullet_separator_with_notin.txt](regression_bullet_separator_with_notin.txt) - Bullet with `notin`
-- [regression_bullet_separator_notin_paren.txt](regression_bullet_separator_notin_paren.txt) - Bullet with parenthesized `notin`
-
-**Related**: GitHub Issue [#8](https://github.com/jmf-pobox/txt2tex/issues/8) (CLOSED)
-
-### TEXT Block Operators (2 files) - Resolved Issues #4, #5
-
-Fixed operator conversion in TEXT blocks.
-
-- [regression_text_comma_after_parens.txt](regression_text_comma_after_parens.txt)
+- [regression_text_comma_after_parens.txt](regression_text_comma_after_parens.txt) ✓
   - **Issue**: [#4](https://github.com/jmf-pobox/txt2tex/issues/4) (CLOSED)
-  - **Resolved**: Commit 7f6a932 (Pattern -0.5 with balanced parenthesis matching)
-  - **Fix**: Commas after parenthesized math now correctly included in math mode
-  - **Test**: `(not p => not q), (q => p)` → `¬ p ⇒ ¬ q, q ⇒ p` ✓
+  - **Test**: `(not p => not q), (q => p)` → `¬ p ⇒ ¬ q, q ⇒ p`
 
-- [regression_text_logical_operators.txt](regression_text_logical_operators.txt)
+- [regression_text_logical_operators.txt](regression_text_logical_operators.txt) ✓
   - **Issue**: [#5](https://github.com/jmf-pobox/txt2tex/issues/5) (CLOSED)
-  - **Resolved**: Commit b709351 (Pattern -0.5)
-  - **Fix**: Logical operators `or`/`and` in TEXT blocks now correctly converted
-  - **Test**: `(p or q)` → `p ∨ q`, `(p and q)` → `p ∧ q` ✓
+  - **Test**: `(p or q)` → `p ∨ q`, `(p and q)` → `p ∧ q`
 
-### Set Operators (2 files) - Resolved Nov 18, 2025
+### Set Operators (3 files)
 
-Fixed parsing of subset and notin operators.
+- [regression_in_operator_simple.txt](regression_in_operator_simple.txt) ✓ - Simple `y in T`
+- [regression_subset_operator.txt](regression_subset_operator.txt) ✓ - `subset` operator
+- [regression_notin_operator.txt](regression_notin_operator.txt) ✓ - `notin` operator
 
-- [regression_subset_operator.txt](regression_subset_operator.txt) - `subset` operator parsing
-- [regression_notin_operator.txt](regression_notin_operator.txt) - `notin` operator parsing
+### Feature Tests - Justification Formatting (6 files)
 
-### Block Syntax for Abbreviations (2 files) - Resolved Nov 23, 2025
+All justification formatting tests pass:
 
-Fixed `abbrev...end` block syntax for Z notation abbreviations.
-
-- [bug3_compound_id.txt](bug3_compound_id.txt)
-  - **Issue**: [#3](https://github.com/jmf-pobox/txt2tex/issues/3) (RESOLVED)
-  - **Resolved**: Commits 4a2a77a, af14357, 07c1e8b (Nov 23, 2025)
-  - **Fix**: Implemented `abbrev...end` block syntax for abbreviations
-  - **Test**: Compound identifiers like `R+` now work in abbreviation blocks ✓
-  - **LaTeX**: Generates `\begin{zed}...\end{zed}` blocks properly
-
-- [bug3_test_simple.txt](bug3_test_simple.txt)
-  - **Issue**: [#3](https://github.com/jmf-pobox/txt2tex/issues/3) (RESOLVED)
-  - **Resolved**: Commits 4a2a77a, af14357, 07c1e8b (Nov 23, 2025)
-  - **Test**: Minimal test case for `R+ == { a, b : nat | b > a }` ✓
-
----
-
-## Feature Tests (7 files)
-
-Tests for complex features and edge cases. These were **never bugs** - they document features that have always worked.
-
-### Justification Formatting (5 files)
-
-Edge case tests for operator formatting in EQUIV and PROOF justifications.
-
-- [feature_justification_caret_operator.txt](feature_justification_caret_operator.txt) - Caret (^) in justifications
-- [feature_justification_empty_sequence.txt](feature_justification_empty_sequence.txt) - Empty sequences in justifications
-- [feature_justification_nonempty_sequence.txt](feature_justification_nonempty_sequence.txt) - Non-empty sequences in justifications
-- [feature_justification_space_preservation.txt](feature_justification_space_preservation.txt) - Space preservation in justifications
-- [feature_justification_word_identifiers.txt](feature_justification_word_identifiers.txt) - Word identifiers in justifications
-
-**Test Command**:
-```bash
-for f in tests/bugs/feature_justification*.txt; do
-  hatch run convert "$f"
-done
-```
-
-### Advanced Syntax (2 files)
-
-Tests for advanced syntax features.
-
-- [feature_semicolon_separator.txt](feature_semicolon_separator.txt)
-  - **Feature**: Semicolon separator in quantifiers
-  - **Related**: GitHub Issue [#7](https://github.com/jmf-pobox/txt2tex/issues/7) (CLOSED - feature implemented)
-  - **Test**: `forall x : N; y : N | P` (semicolon separates multiple typed declarations)
-
-- [feature_bag_syntax_in_free_types.txt](feature_bag_syntax_in_free_types.txt)
-  - **Feature**: Bag notation `[[...]]` in free type definitions
-  - **Test**: Complex free types with bag syntax
+- [feature_justification_caret_operator.txt](feature_justification_caret_operator.txt) ✓
+- [feature_justification_empty_sequence.txt](feature_justification_empty_sequence.txt) ✓
+- [feature_justification_nonempty_sequence.txt](feature_justification_nonempty_sequence.txt) ✓
+- [feature_justification_space_preservation.txt](feature_justification_space_preservation.txt) ✓
+- [feature_justification_word_identifiers.txt](feature_justification_word_identifiers.txt) ✓
+- [feature_bag_syntax_in_free_types.txt](feature_bag_syntax_in_free_types.txt) ✓
 
 ---
 
@@ -160,81 +106,46 @@ Tests for advanced syntax features.
 
 | Category | Count | Status |
 |----------|-------|--------|
-| Active Bugs | 2 | Need fixing |
-| Regression Tests | 17 | All PASS |
-| Feature Tests | 7 | All PASS |
-| **Total** | **26** | **24 PASS, 2 FAIL** |
-
-**Project Coverage**: 100% (52/52 solutions working) - all solutions complete!
+| Active Bugs | 1 | Need fixing |
+| Broken Tests | 13 | Need investigation |
+| Passing Tests | 12 | All PASS |
+| **Total** | **26** | **12 PASS, 14 FAIL** |
 
 ---
 
 ## Testing All Files
 
+### Quick Status Check
+```bash
+cd /path/to/txt2tex/sem
+for f in tests/bugs/*.txt; do
+  echo -n "$(basename $f): "
+  hatch run cli "$f" --tex-only >/dev/null 2>&1 && echo "PASS" || echo "FAIL"
+done
+```
+
 ### Test Active Bugs (expect FAIL)
 ```bash
-cd txt2tex
-for f in tests/bugs/bug*.txt; do
-  echo "Testing: $f"
-  hatch run convert "$f" 2>&1 | head -5
-done
+hatch run cli tests/bugs/bug1_prose_period.txt --tex-only
 ```
 
-### Test Regression Files (expect PASS)
+### Test Passing Files (expect PASS)
 ```bash
-for f in tests/bugs/regression_*.txt; do
-  echo "Testing: $f"
-  hatch run convert "$f" >/dev/null 2>&1 && echo "  PASS" || echo "  FAIL"
+for f in tests/bugs/regression_text_*.txt tests/bugs/feature_justification*.txt; do
+  echo -n "$(basename $f): "
+  hatch run cli "$f" --tex-only >/dev/null 2>&1 && echo "PASS" || echo "FAIL"
 done
 ```
-
-### Test Feature Files (expect PASS)
-```bash
-for f in tests/bugs/feature_*.txt; do
-  echo "Testing: $f"
-  hatch run convert "$f" >/dev/null 2>&1 && echo "  PASS" || echo "  FAIL"
-done
-```
-
----
-
-## Bug Reporting Workflow
-
-Found a new bug? Follow this workflow:
-
-1. **Create minimal test case**:
-   ```bash
-   cat > tests/bugs/bugN_short_name.txt << 'EOF'
-   === Bug N Test: Description ===
-
-   [minimal failing example]
-   EOF
-   ```
-
-2. **Verify it fails**:
-   ```bash
-   hatch run convert tests/bugs/bugN_short_name.txt
-   ```
-
-3. **Create GitHub issue**:
-   - Use [bug report template](../../.github/ISSUE_TEMPLATE/bug_report.md)
-   - Include test case location and exact error/output
-   - See [.github/ISSUES_TO_CREATE.md](../../.github/ISSUES_TO_CREATE.md) for examples
-
-4. **Update documentation**:
-   - Add bug to this README
-   - Add bug to [ISSUES.md](../../ISSUES.md)
 
 ---
 
 ## References
 
-- **[ISSUES.md](../../ISSUES.md)** - Comprehensive issue tracking document
 - **[GitHub Issues](https://github.com/jmf-pobox/txt2tex/issues)** - Live bug tracking
 - **[FUZZ_FEATURE_GAPS.md](../../docs/guides/FUZZ_FEATURE_GAPS.md)** - Missing features vs bugs
 
 ---
 
 **Last Updated**: 2025-11-29
-**Active Bugs**: 2 (Issues #1, #2)
-**Test Coverage**: 24 regression + feature tests ensure stability
+**Active Bugs**: 1 (Issue #1)
+**Test Results**: 12 PASS, 14 FAIL
