@@ -2861,7 +2861,7 @@ class Parser:
         """Parse atom.
 
         Handles: identifier, number, parenthesized expression, set comprehension,
-        prefix functions (dom, ran, inv, id, P, P1, F, F1, head, tail, etc.),
+        prefix operators (dom, ran, inv, id, P, P1, F, F1, bigcup, bigcap),
         function application f(x), and lambda expressions.
         """
         # Prefix operators: relation functions, set functions, sequence operators

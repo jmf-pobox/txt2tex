@@ -117,15 +117,12 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 |--------------|---------------------|--------------|-------------|-------|
 | `<>` | ⟨⟩ (U+27E8/U+27E9) | `\langle \rangle` | Empty sequence | 12 |
 | `<...>` | ⟨...⟩ | `\langle ... \rangle` | Sequence literal | 12 |
-| `seq` | — | `\seq` | Sequence type | 12 |
-| `seq1` | — | `\seq_1` | Non-empty sequence type | 12 |
 | `^` | ⌢ (U+2322) | `\cat` | Sequence concatenation (space-sensitive) | 24 |
 | `filter` | ↾ (U+21BE) | `\filter` | Sequence filter | 35 |
-| `head` | — | `\head` | First element | 12 |
-| `tail` | — | `\tail` | All but first | 12 |
-| `last` | — | `\last` | Last element | 12 |
-| `front` | — | `\front` | All but last | 12 |
-| `rev` | — | `\rev` | Reverse | 12 |
+
+**Note:** The following are **NOT reserved words** and can be used as variable names:
+- `seq`, `seq1` - These are regular identifiers that get special LaTeX handling when used with parentheses like `seq(N)` → `\seq N`
+- `head`, `tail`, `last`, `front`, `rev` - These are regular identifiers with no special handling (output as-is)
 
 ---
 
@@ -134,8 +131,9 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 | ASCII Keyword | Unicode Alternative | LaTeX Output | Description | Phase |
 |--------------|---------------------|--------------|-------------|-------|
 | `[[...]]` | ⟦...⟧ (U+27E6/U+27E7) | `\lbag ... \rbag` | Bag literal | 12 |
-| `bag` | — | `\bag` | Bag type | 12 |
 | `bag_union` | ⊎ (U+228E) | `\uplus` | Bag union | 35 |
+
+**Note:** `bag` is **NOT a reserved word** - it is a regular identifier that gets special LaTeX handling when used with parentheses like `bag(N)` → `\bag N`
 
 ---
 
@@ -243,22 +241,25 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 
 ## Reserved Words Summary
 
-**Total Reserved Keywords:** 91+
+**Total Reserved Keywords:** ~75
 
 **Categories:**
 - Logical operators: 8
 - Set operators/functions: 14
 - Relation operators/functions: 20
 - Function types: 9
-- Sequence operators: 9
-- Bag operators: 2
+- Sequence operators: 2 (syntax only: `^`/`⌢`, `filter`/`↾`)
+- Bag operators: 1 (`bag_union`/`⊎`)
 - Arithmetic: 6
 - Comparison: 6
 - Inference rule operators: 1
 - Special operators: 5
 - Type keywords: 3
 - Structural: 8
-- Miscellaneous: 3
+
+**NOT Reserved (regular identifiers with special LaTeX handling):**
+- `seq`, `seq1`, `bag` - type constructors handled specially in `latex_gen.py`
+- `head`, `tail`, `last`, `front`, `rev` - sequence functions (no special handling)
 
 ---
 
@@ -310,10 +311,12 @@ Do NOT use reserved words as identifiers:
 ### Case Sensitivity
 All reserved words are lowercase. Capitalized versions are valid identifiers:
 ```
-✅ seq   - reserved (sequence type)
-✅ Seq   - valid identifier
-✅ SEQ   - valid identifier
+✅ land  - reserved (logical AND)
+✅ Land  - valid identifier
+✅ LAND  - valid identifier
 ```
+
+Note: `seq`, `seq1`, `bag`, `head`, `tail`, etc. are NOT reserved - they are regular identifiers.
 
 ### Multi-Character Operators
 Some operators use multiple characters:
