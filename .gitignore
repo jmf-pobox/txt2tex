@@ -92,4 +92,5 @@ htmlcov/
 hw/
 
 # Tutorial project
-rpntxt/
+rpn2tex/
+
