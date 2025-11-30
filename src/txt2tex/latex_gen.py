@@ -7,6 +7,7 @@ import sys
 from functools import singledispatchmethod
 from typing import ClassVar, cast
 
+from txt2tex.__version__ import __version__
 from txt2tex.ast_nodes import (
     Abbreviation,
     ArgueChain,
@@ -549,6 +550,17 @@ class LaTeXGenerator:
                 lines.append(r"\author{" + " ".join(author_parts) + "}")
             if meta.date:
                 lines.append(r"\date{" + meta.date + "}")
+
+            # PDF metadata via hyperref (already loaded above)
+            hypersetup_opts: list[str] = []
+            if meta.title:
+                hypersetup_opts.append(f"pdftitle={{{meta.title}}}")
+            if meta.author:
+                hypersetup_opts.append(f"pdfauthor={{{meta.author}}}")
+            if meta.subtitle:
+                hypersetup_opts.append(f"pdfsubject={{{meta.subtitle}}}")
+            hypersetup_opts.append(f"pdfcreator={{txt2tex v{__version__}}}")
+            lines.append(r"\hypersetup{" + ",".join(hypersetup_opts) + "}")
 
         lines.append(r"\begin{document}")
         lines.append("")
