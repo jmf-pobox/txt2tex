@@ -1,141 +1,89 @@
 # Documentation Naming Standards
 
-**Last Updated:** 2025-10-27  
+**Last Updated:** 2025-11-30  
 **Purpose:** Define consistent naming conventions for all documentation files
 
 ---
 
 ## Naming Conventions
 
-### Core Documentation (Primary User-Facing)
+### Core Documentation
 
-**Pattern:** `TITLE_CASE_WITH_UNDERSCORES.md`
+**Pattern:** `UPPERCASE_WITH_UNDERSCORES.md`
 
 **Examples:**
 - `DESIGN.md` - Architecture and design decisions  
 - `USER_GUIDE.md` - Syntax reference
 - `PROOF_SYNTAX.md` - Proof tree syntax reference
-- `QA_PLAN.md` - Quality assurance procedures
-- `QA_CHECKS.md` - QA checklist
+- `FUZZ_VS_STD_LATEX.md` - Fuzz vs standard LaTeX differences
 
 **Rationale:** Short, clear, easy to reference. Underscores work reliably across all systems.
 
 ---
 
-### Reference Documentation (Secondary)
+### Tutorials
 
-**Pattern:** `UPPERCASE_WITH_UNDERSCORES.md`
-
-**Examples:**
-- `FUZZ_FEATURE_GAPS.md` - Missing fuzz features
-- `FUZZ_VS_STD_LATEX.md` - Fuzz vs standard LaTeX differences
-- ~~`MISSING_TESTS.md`~~ - Archived (all tests complete, see `docs/archive/MISSING_TESTS.md`)
-- `IDE_SETUP.md` - IDE configuration guide
-
-**Rationale:** Uppercase indicates reference/supplementary documentation. Easily distinguishable from core docs.
-
----
-
-### Historical/Archived Documentation
-
-**Pattern:** `NAME_TYPE.md` in `docs/archive/`
+**Pattern:** `NN_lowercase_with_underscores.md`
 
 **Examples:**
-- `archive/VALIDATION_REPORT.md` - Historical validation reports
-- `archive/TEST_VALIDATION_REPORT.md` - Test validation reports
-- `archive/FEATURE_COMPARISON.md` - Comparison reports
-- `archive/DOCUMENTATION_REORGANIZATION_PLAN.md` - Completed planning docs
+- `00_getting_started.md`
+- `01_propositional_logic.md`
+- `02_predicate_logic.md`
 
-**Rationale:** Archive contains completed work, old plans, and historical records.
-
----
-
-## Naming Standards Status
-
-✅ **All naming standards implemented** (2025-10-27)
-
-- ✅ `USER-GUIDE.md` → `USER_GUIDE.md` (renamed for consistency)
-- ✅ All references updated across documentation
-- ✅ Consistent naming for all active documentation files
+**Rationale:** Numbered prefix ensures correct ordering. Lowercase for readability.
 
 ---
 
 ## Guidelines for New Documentation
 
 1. **No hyphens** in filenames - use underscores instead
-2. **Core docs** use Title_Case_With_Underscores
-3. **Reference docs** use UPPERCASE_WITH_UNDERSCORES
-4. **Reports/Plans** go to `archive/` when work is complete
-5. **Be descriptive** but concise (aim for 2-4 words)
-6. **Consistent abbreviations** - use same abbreviation across files (e.g., `QA`, `USER_GUIDE`)
+2. **Reference docs** use `UPPERCASE_WITH_UNDERSCORES.md`
+3. **Tutorials** use `NN_lowercase_with_underscores.md`
+4. **Be descriptive** but concise (aim for 2-4 words)
+5. **Consistent abbreviations** - use same abbreviation across files
 
 ---
 
-## Archive Policy
-
-**Move to `docs/archive/` when:**
-- Work is complete and no longer actively referenced
-- Report/documentation is historical record
-- Planning document for completed work
-- Superseded by newer version
-
-**Keep in `docs/` when:**
-- Actively referenced
-- Needed for ongoing work
-- User-facing documentation
-- Current reference material
-
----
-
-## File Organization Summary
-
-### Active Documentation (`docs/`)
+## Current File Organization
 
 ```
 docs/
-├── DESIGN.md              # Core: Architecture
-├── USER_GUIDE.md         # Core: Syntax reference
-├── PROOF_SYNTAX.md      # Core: Proof syntax
-├── QA_PLAN.md           # Core: QA procedures
-├── QA_CHECKS.md         # Core: QA checklist
-├── FUZZ_FEATURE_GAPS.md # Reference: Feature gaps
-├── FUZZ_VS_STD_LATEX.md # Reference: Fuzz differences
-└── IDE_SETUP.md         # Reference: IDE configuration
+├── DESIGN.md                    # Architecture and design decisions
+├── development/                 # Developer documentation
+│   ├── CODE_REVIEW.md
+│   ├── IDE_SETUP.md
+│   ├── NAMING_STANDARDS.md
+│   ├── RESERVED_WORDS.md
+│   └── TOOL-PyPI.md
+├── guides/                      # Reference guides
+│   ├── FUZZ_VS_STD_LATEX.md
+│   ├── MISSING_FEATURES.md
+│   ├── PROOF_SYNTAX.md
+│   └── USER_GUIDE.md
+└── tutorials/                   # Step-by-step tutorials
+    ├── 00_getting_started.md
+    ├── 01_propositional_logic.md
+    ├── 02_predicate_logic.md
+    ├── 03_sets_and_types.md
+    ├── 04_proof_trees.md
+    ├── 05_z_definitions.md
+    ├── 06_relations.md
+    ├── 07_functions.md
+    ├── 08_sequences.md
+    ├── 09_schemas.md
+    ├── 10_advanced.md
+    └── README.md
 ```
-
-### Archived Documentation (`docs/archive/`)
-
-```
-docs/archive/
-├── VALIDATION_REPORT.md
-├── TEST_VALIDATION_REPORT.md
-├── FEATURE_COMPARISON.md
-├── USER_GUIDE_TEST_MAPPING.md
-├── DOCUMENTATION_REORGANIZATION_PLAN.md
-└── [historical phase plans, etc.]
-```
-
----
-
-## References
-
-For historical records of the naming standardization work, see:
-- `docs/archive/NAMING_ANALYSIS.md` - Detailed analysis performed 2025-10-27 (historical record)
-- `docs/archive/NAMING_IMPLEMENTATION_SUMMARY.md` - Implementation summary and verification (historical record)
 
 ---
 
 ## Summary
 
-**Active Documentation:** 11 files in `docs/`  
-**Archived Documentation:** 15 files in `docs/archive/` (includes NAMING_ANALYSIS.md, NAMING_IMPLEMENTATION_SUMMARY.md)  
+**Total Documentation Files:** 18 files across 4 locations
 
-**Transitory files archived (2025-10-27):**
-- All validation reports moved to archive
-- All planning documents moved to archive
-- All one-time comparison/mapping documents moved to archive
-
-**Current naming status:**
-- ✅ Consistent naming for all active files (100%)
-- ✅ All naming standards implemented (2025-10-27)
-
+| Location | Count | Purpose |
+|----------|-------|---------|
+| `docs/` | 1 | Core architecture |
+| `docs/development/` | 5 | Developer guides |
+| `docs/guides/` | 4 | Reference documentation |
+| `docs/tutorials/` | 12 | Step-by-step tutorials |
