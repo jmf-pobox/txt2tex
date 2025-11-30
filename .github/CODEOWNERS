@@ -1,0 +1,22 @@
+# CODEOWNERS - Automatically request reviews from code owners
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repo
+* @jmf-pobox
+
+# Core source code
+/src/ @jmf-pobox
+
+# Tests
+/tests/ @jmf-pobox
+
+# Documentation
+/docs/ @jmf-pobox
+*.md @jmf-pobox
+
+# CI/CD and GitHub configuration
+/.github/ @jmf-pobox
+
+# Build configuration
+pyproject.toml @jmf-pobox
+
