@@ -243,7 +243,7 @@ You've learned:
 - ✅ Document structure and style
 
 **Next Steps:**
-- Study complete examples in `complete_examples/`
+- Study examples in `examples/` directories for integration patterns
 - Consult [USER_GUIDE.md](docs/guides/USER_GUIDE.md) for comprehensive reference
 - Practice with course problems
 

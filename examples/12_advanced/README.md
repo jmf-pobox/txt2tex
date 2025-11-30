@@ -76,4 +76,3 @@ Browse the `.txt` files to see:
 - **docs/guides/USER_GUIDE.md** - Section "Additional Features"
 - **docs/tutorials/10_advanced.md** - Comprehensive advanced guide
 - **Previous**: 11_text_blocks/
-- **Next**: complete_examples/

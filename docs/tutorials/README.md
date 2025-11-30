@@ -106,15 +106,6 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - Bibliography management
   - **Examples:** `11_text_blocks/`, `12_advanced/`
 
-## Complete Examples
-
-After completing the tutorials, explore complete formal specifications in `complete_examples/`:
-
-- Full problem specifications from coursework
-- Real-world modeling examples
-- Integration of multiple features
-- Design patterns and best practices
-
 ## Reference Materials
 
 - **[USER_GUIDE.md](docs/guides/USER_GUIDE.md)** - Complete syntax reference
@@ -130,7 +121,7 @@ After completing the tutorials, explore complete formal specifications in `compl
 2. Work through Tutorials 1-4 (logic and proofs)
 3. Continue with Tutorials 5-9 (Z notation)
 4. Explore advanced topics as needed
-5. Study complete examples for integration
+5. Study the examples directories for integration patterns
 
 ### For Experienced Formal Methods Users
 
@@ -143,7 +134,7 @@ After completing the tutorials, explore complete formal specifications in `compl
 
 1. Follow tutorials aligned with lecture schedule (Tutorials 1-9)
 2. Complete exercises in each example directory
-3. Use complete_examples/ for assignment reference
+3. Use `examples/` directories for assignment reference
 4. Refer to PROOF_SYNTAX.md for proof formatting
 
 ## Learning Tips
@@ -160,7 +151,7 @@ After completing the tutorials, explore complete formal specifications in `compl
 
 6. **Consult USER_GUIDE.md:** When you encounter unfamiliar syntax, check the user guide.
 
-7. **Study complete examples:** See how all features work together in real specifications.
+7. **Study advanced examples:** See how features work together in `examples/12_advanced/` and `examples/user_guide/`.
 
 ## Compilation Workflow
 
