@@ -47,7 +47,6 @@ ENV/
 *.blg
 *.dvi
 *.ps
-*.pdf
 *.600pk
 *.600gf
 *.fuzz.log
@@ -88,6 +87,9 @@ htmlcov/
 
 # ruff
 .ruff_cache/
-# Homework solutions - private
+
+# Homework - private
 hw/
-examples/fuzz_tests/test_q6.txt
+
+# Tutorial project
+rpntxt/
