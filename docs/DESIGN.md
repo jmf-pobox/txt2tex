@@ -1,4 +1,4 @@
-# txt2tex: Software Design Document
+`# txt2tex: Software Design Document
 
 ## Executive Summary
 
@@ -146,6 +146,8 @@ Input Text
 │ pdflatex        │ → PDF Output
 └─────────────────┘
 ```
+
+**Simplified Example**: For a minimal implementation of this pipeline, see [rpn2tex](https://github.com/jmf-pobox/rpn2tex) — a tutorial project that converts RPN expressions to LaTeX using the same architecture (lexer → parser → AST → generator) with only ~6 token types and 2 AST nodes instead of 100+.
 
 ## Component Design
 
