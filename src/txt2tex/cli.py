@@ -151,6 +151,7 @@ def _compile_with_latexmk(
         [
             latexmk,
             "-pdf",
+            "-gg",  # Force complete rebuild for consistent bibliography generation
             "-interaction=nonstopmode",
             *bibtex_flag,
             tex_path.name,
