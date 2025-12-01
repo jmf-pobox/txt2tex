@@ -1166,31 +1166,19 @@ The argue environment's use of raw `\halign` makes this impossible - it cannot b
 
 ## Future Enhancements
 
-1. **LSP (Language Server Protocol)**
-   - Live validation in text editor
-   - Autocomplete for operators
-   - Inline error messages
-
-2. **Incremental compilation**
-   - Cache parsed AST
-   - Only regenerate changed sections
-
-3. **Interactive mode**
-   - REPL for testing expressions
-   - Live preview
-
-4. **IDE Integration**
-   - VS Code extension
-   - Syntax highlighting
-
-5. **Export formats**
-   - Markdown with MathJax
+1. **Export formats**
    - HTML with KaTeX
    - Plain text (pretty-printed)
 
-6. **Import from LaTeX**
-   - Reverse conversion
-   - Useful for editing existing documents
+2. **LSP + IDE Integration**
+   - Language Server Protocol implementation
+   - VS Code extension (thin wrapper around LSP)
+   - Live validation, autocomplete, syntax highlighting
+
+3. **Handwritten image to LaTeX (OCR)**
+   - Convert whiteboard/paper photos to txt2tex input
+   - Recognize mathematical notation from handwriting
+   - Challenging but high-value for real whiteboard workflows
 
 ## Appendix: Example Conversion
 
