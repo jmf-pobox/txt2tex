@@ -182,6 +182,7 @@ def process_input(
         return True
 
     # Generate full document and compile to PDF
+    print("\nGenerating PDF...", end=" ", flush=True)
     full_doc = generate_preview_document(latex_fragment, use_fuzz=generator.use_fuzz)
 
     tex_path = temp_dir / "preview.tex"
@@ -194,12 +195,12 @@ def process_input(
     if compile_pdf(tex_path, keep_aux=False):
         pdf_path = tex_path.with_suffix(".pdf")
         if pdf_path.exists():
-            print(f"\n[PDF preview: {pdf_path}]")
+            print("done.")
             open_pdf(pdf_path)
             return True
-        print("PDF not generated", file=sys.stderr)
+        print("failed (PDF not generated).", file=sys.stderr)
         return False
-    print("PDF compilation failed", file=sys.stderr)
+    print("failed.", file=sys.stderr)
     return False
 
 
