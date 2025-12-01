@@ -29,6 +29,10 @@ hatch run check    # runs: lint, type, type-pyright, test (run locally first)
 hatch run format-check   # also run this to match CI requirements
 ```
 
+> **Note:**  
+> - `hatch run check` (run locally) does **not** include coverage reporting.  
+> - CI runs `hatch run test-cov` (tests with coverage) instead of just `test`, and does **not** run `type-pyright` explicitly.  
+> - To check coverage locally, you can run `hatch run test-cov`.
 ## Commit Messages
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
