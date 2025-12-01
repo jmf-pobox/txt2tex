@@ -155,8 +155,10 @@ ignore = [
 "tests/test_06_definitions/test_free_types.py" = ["RUF001", "RUF002"]
 # Allow assert in tests (S101), print statements (T20), and private member access (SLF001)
 "tests/*" = ["S101", "T20", "SLF001"]
-# Allow print in CLI - intentional user output
+# Allow print in CLI, REPL, and compile - intentional user output
 "src/txt2tex/cli.py" = ["T20"]
+"src/txt2tex/compile.py" = ["T20"]
+"src/txt2tex/repl.py" = ["T20"]
 # Allow unused parent arg in singledispatch visitor pattern
 "src/txt2tex/latex_gen.py" = ["ARG002"]
 # Allow unused parent_indent in proof tree parsing

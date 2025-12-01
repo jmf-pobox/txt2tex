@@ -487,6 +487,26 @@ class LaTeXGenerator:
             return f"{name_latex}[{params_str}] == {expr_latex}"
         return f"{name_latex} == {expr_latex}"
 
+    def generate_fragment(self, ast: Document) -> str:
+        """Generate LaTeX content without document wrapper.
+
+        Useful for interactive mode and previews where the content
+        will be wrapped in a minimal document separately.
+
+        Args:
+            ast: The Document AST to generate content for.
+
+        Returns:
+            LaTeX content (body only, no preamble/postamble).
+        """
+        # Store document-level parts format
+        self.parts_format = ast.parts_format
+
+        # Generate all document items
+        lines = self._generate_document_items_with_consolidation(ast.items)
+
+        return "\n".join(lines)
+
     def generate_document(self, ast: Document | Expr) -> str:
         """Generate complete LaTeX document with preamble and postamble.
 
