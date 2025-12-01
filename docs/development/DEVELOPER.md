@@ -26,7 +26,7 @@ CI runs on all PRs:
 
 ```bash
 hatch run check    # runs: lint, type, type-pyright, test (run locally first)
-hatch run format --check   # also run this to match CI requirements
+hatch run format-check   # also run this to match CI requirements
 ```
 
 ## Commit Messages
