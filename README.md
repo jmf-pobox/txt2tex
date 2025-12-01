@@ -299,6 +299,47 @@ txt2tex input.txt --keep-aux
 txt2tex input.txt --tex-only
 ```
 
+### Interactive Mode (REPL)
+
+Test expressions interactively without creating files:
+
+```bash
+txt2tex -i                 # Start REPL
+txt2tex --interactive      # Same as above
+txt2tex -i --zed           # Use zed-* packages instead of fuzz
+```
+
+Example session:
+
+```
+$ txt2tex -i
+txt2tex interactive mode. Type .help for commands.
+
+>>> forall x : N | x >= 0
+LaTeX: $\forall x : \nat \spot x \geq 0$
+[PDF opens in preview]
+
+>>> EQUIV:
+... p land q
+... <=> q land p [commutative]
+...
+LaTeX: \begin{center}...
+[PDF opens in preview]
+
+>>> .quit
+Goodbye!
+```
+
+**REPL Commands:**
+| Command | Description |
+|---------|-------------|
+| `.help` | Show help message |
+| `.latex` | Toggle LaTeX-only mode (no PDF preview) |
+| `.clear` | Clear screen |
+| `.quit` / `.exit` | Exit REPL |
+
+Multi-line blocks (PROOF:, EQUIV:, schema, etc.) are detected automatically — press Enter twice to execute.
+
 ### Automatic Type Checking
 
 When the fuzz binary is installed (see [Installation](#installation)), txt2tex automatically runs type checking before PDF generation. This catches undefined variables, type mismatches, and specification errors.
@@ -471,10 +512,11 @@ A few edge cases require workarounds:
 
 **Current Implementation:**
 - ✅ **Feature complete** for typical Z specifications
-- ✅ **1261 tests** - Comprehensive test suite
+- ✅ **1280 tests** - Comprehensive test suite
 - ✅ **Full Z notation** - Schemas, relations, functions, sequences
 - ✅ **Proof trees** - Natural deduction with justifications
 - ✅ **WYSIWYG line breaks** - Natural formatting controls PDF output
+- ✅ **Interactive mode** - REPL for testing expressions
 - ✅ **fuzz integration** - Optional type checking
 
 **For missing features, see [docs/guides/MISSING_FEATURES.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/MISSING_FEATURES.md)**
@@ -552,4 +594,4 @@ Online references for learning Z notation:
 
 ---
 
-**Last Updated:** 2025-11-29
+**Last Updated:** 2025-12-01
