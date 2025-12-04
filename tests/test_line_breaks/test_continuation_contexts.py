@@ -76,9 +76,9 @@ def test_continuation_in_proof():
 def test_continuation_with_long_predicate():
     """Test realistic long predicate with line break."""
     code = (
-        "schema Example\n  s : ShowId\n  e : EpisodeId\nwhere\n"
-        "  s elem dom show_episodes land e elem show_episodes s land \\\n"
-        "    card (show_episodes s) > 0\nend"
+        "schema Example\n  b : BookId\n  c : ChapterId\nwhere\n"
+        "  b elem dom book_chapters land c elem book_chapters b land \\\n"
+        "    card (book_chapters b) > 0\nend"
     )
     lexer = Lexer(code)
     tokens = lexer.tokenize()
@@ -87,4 +87,4 @@ def test_continuation_with_long_predicate():
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
     assert "\\\\" in latex
-    assert "show" in latex.lower() or "ShowId" in latex
+    assert "book" in latex.lower() or "BookId" in latex

@@ -48,16 +48,16 @@ def test_tuple_pattern_with_three_variables():
 
 def test_tuple_pattern_latex_generation():
     """Test that tuple patterns generate correct LaTeX."""
-    text = "forall (s, e) : ran my_episodes | s > 0"
+    text = "forall (b, c) : ran my_chapters | b > 0"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     doc = parser.parse()
     generator = LaTeXGenerator(use_fuzz=False)
     latex = generator.generate_document(doc)
-    assert "\\forall (s, e)" in latex or "\\forall (s, e)" in latex
+    assert "\\forall (b, c)" in latex or "\\forall (b, c)" in latex
     assert "\\ran" in latex
-    assert "my_episodes" in latex or "my\\_episodes" in latex
+    assert "my_chapters" in latex or "my\\_chapters" in latex
 
 
 def test_tuple_pattern_with_complex_domain():
@@ -198,18 +198,18 @@ def test_tuple_pattern_latex_fuzz_mode():
     assert "(a, b)" in latex
 
 
-def test_realistic_example_from_homework():
-    """Test the actual example from user's homework."""
-    text = "forall (s, e) : ran my_episodes | s > 0"
+def test_realistic_example_from_spec():
+    """Test a realistic tuple pattern example from a spec."""
+    text = "forall (b, c) : ran my_chapters | b > 0"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
     quant = parser.parse()
     assert isinstance(quant, Quantifier)
     assert quant.quantifier == "forall"
-    assert quant.variables == ["s", "e"]
+    assert quant.variables == ["b", "c"]
     assert quant.tuple_pattern is not None
     generator = LaTeXGenerator(use_fuzz=False)
     latex = generator.generate_expr(quant)
-    assert "(s, e)" in latex
+    assert "(b, c)" in latex
     assert "ran" in latex or "\\ran" in latex

@@ -4,9 +4,9 @@ Bug: Nested cross products lose parentheses when used as type parameters,
 causing fuzz type checking errors.
 
 Example:
-    Input:  seq((ShowId cross EpisodeId) cross N)
-    Wrong:  \\seq (ShowId \\cross EpisodeId \\cross N)
-    Right:  \\seq ((ShowId \\cross EpisodeId) \\cross N)
+    Input:  seq((BookId cross ChapterId) cross N)
+    Wrong:  \\seq (BookId \\cross ChapterId \\cross N)
+    Right:  \\seq ((BookId \\cross ChapterId) \\cross N)
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ from txt2tex.parser import Parser
 
 def test_nested_cross_in_seq_fuzz() -> None:
     """Test that nested cross products are parenthesized elem seq type with fuzz."""
-    txt = "Playlist == seq((ShowId cross EpisodeId) cross N)"
+    txt = "ItemList == seq((BookId cross ChapterId) cross N)"
     lexer = Lexer(txt)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -26,14 +26,14 @@ def test_nested_cross_in_seq_fuzz() -> None:
     generator = LaTeXGenerator(use_fuzz=True)
     latex = generator.generate_document(doc)
     assert (
-        "\\seq~((ShowId \\cross EpisodeId) \\cross" in latex
-        or "\\seq~((ShowId \\cross EpisodeId) \\cross \\nat)" in latex
+        "\\seq~((BookId \\cross ChapterId) \\cross" in latex
+        or "\\seq~((BookId \\cross ChapterId) \\cross \\nat)" in latex
     ), f"Expected parenthesized cross product, got: {latex}"
 
 
 def test_nested_cross_in_seq_standard() -> None:
     """Test nested cross products are parenthesized elem seq (standard LaTeX)."""
-    txt = "Playlist == seq((ShowId cross EpisodeId) cross N)"
+    txt = "ItemList == seq((BookId cross ChapterId) cross N)"
     lexer = Lexer(txt)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -41,8 +41,8 @@ def test_nested_cross_in_seq_standard() -> None:
     generator = LaTeXGenerator(use_fuzz=False)
     latex = generator.generate_document(doc)
     assert (
-        "\\seq~((ShowId \\cross EpisodeId) \\cross" in latex
-        or "\\seq~((ShowId \\cross EpisodeId) \\cross \\nat)" in latex
+        "\\seq~((BookId \\cross ChapterId) \\cross" in latex
+        or "\\seq~((BookId \\cross ChapterId) \\cross \\nat)" in latex
     ), f"Expected parenthesized cross product, got: {latex}"
 
 

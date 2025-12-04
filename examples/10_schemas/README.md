@@ -47,22 +47,22 @@ end
 
 ```
 // ❌ WRONG: Schema components are LOCAL
-schema PodcastPlatform
-  shows : F ShowId
+schema Library
+  books : F BookId
 where
   ...
 end
 
-Answer == {s : dom shows | ...}  // ERROR: shows not in scope!
+Answer == {b : dom books | ...}  // ERROR: books not in scope!
 
 // ✅ RIGHT: Use axdef for GLOBAL identifiers
 axdef
-  shows : F ShowId
+  books : F BookId
 where
   ...
 end
 
-Answer == {s : dom shows | ...}  // OK: shows is globally accessible
+Answer == {b : dom books | ...}  // OK: books is globally accessible
 ```
 
 **Rule**: Use `axdef` when other parts of your specification need to reference the declared identifiers. Use `schema` for encapsulated type definitions.

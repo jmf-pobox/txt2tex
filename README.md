@@ -221,11 +221,11 @@ txt2tex converts these to properly typeset LaTeX automatically.
 
 ```
 axdef
-  length : PossiblePlaylist -> N
+  sumList : seq N -> N
 where
-  length(<>) = 0 land
-    forall pl : PossiblePlaylist | (forall ple : ((dom status) cross N) |
-      length(<ple> ^ pl) = snd(ple) + length(pl))
+  sumList(<>) = 0 land
+    forall xs : seq N | (forall x : N |
+      sumList(<x> ^ xs) = x + sumList(xs))
 end
 ```
 

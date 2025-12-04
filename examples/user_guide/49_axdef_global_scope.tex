@@ -11,22 +11,22 @@
 \begin{document}
 
 \begin{zed}
-[ShowId, EpisodeId]
+[BookId, ChapterId]
 \end{zed}
 
 \begin{axdef}
-podcasts : \finset ShowId \\
-podcast\_episodes : ShowId \pfun \finset EpisodeId
+books : \finset BookId \\
+book\_chapters : BookId \pfun \finset ChapterId
 \where
-podcasts \subseteq \dom podcast\_episodes
+books \subseteq \dom book\_chapters
 \end{axdef}
 
-\noindent Later in document we can reference podcast\_episodes globally:
+\noindent Later in document we can reference book\_chapters globally:
 
 \bigskip
 
 \begin{zed}
-Answer == \{~ s : \dom podcast\_episodes | \# (podcast\_episodes(s)) > 5 ~\}
+Answer == \{~ b : \dom book\_chapters | \# (book\_chapters(b)) > 5 ~\}
 \end{zed}
 
 \end{document}

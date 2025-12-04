@@ -300,12 +300,12 @@ Do NOT use reserved words as identifiers:
 ❌ BAD:  given = 5           (reserved word)
 ❌ BAD:  subset = {1, 2}     (reserved word)
 ❌ BAD:  union = A union B   (reserved word)
-❌ BAD:  shows : F ShowId    (reserved word - use "podcasts" or similar)
+❌ BAD:  shows : F BookId    (reserved word - use "books" or similar)
 
 ✅ GOOD: givenSet = 5
 ✅ GOOD: mySubset = {1, 2}
 ✅ GOOD: unionSet = A union B
-✅ GOOD: podcasts : F ShowId
+✅ GOOD: books : F BookId
 ```
 
 ### Case Sensitivity

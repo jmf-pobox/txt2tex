@@ -10,4 +10,4 @@
 
 ** Test 3: Multiple semicolons **
 
-(forall s : ShowId; t_1, t_2 : Timestamp; e_1, e_2 : EpisodeId | s = s)
+(forall b : BookId; p_1, p_2 : PageNum; c_1, c_2 : ChapterId | b = b)

@@ -22,8 +22,8 @@ def test_explicit_parens_create_nested_pairs() -> None:
     txt2tex must NOT automatically add (A x B) x C parenthesization.
     """
     txt = (
-        "ListElement == (ShowId cross EpisodeId) cross "
-        "(N cross PlayedOrNot cross SavedOrNot)"
+        "EntryData == (BookId cross ChapterId) cross "
+        "(N cross StatusA cross StatusB)"
     )
     lexer = Lexer(txt)
     tokens = list(lexer.tokenize())
@@ -32,14 +32,14 @@ def test_explicit_parens_create_nested_pairs() -> None:
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
     for line in latex.split("\n"):
-        if "ListElement ==" in line:
+        if "EntryData ==" in line:
             abbrev_latex = line.strip()
             break
     else:
-        raise AssertionError("Could lnot find ListElement abbreviation elem LaTeX")
+        raise AssertionError("Could lnot find EntryData abbreviation elem LaTeX")
     print(f"Generated LaTeX: {abbrev_latex}")
-    assert "(\\mathbb{N} \\cross PlayedOrNot \\cross SavedOrNot)" in abbrev_latex, (
-        f"Expected flat 3-tuple (N x PlayedOrNot x SavedOrNot), got: {abbrev_latex}"
+    assert "(\\mathbb{N} \\cross StatusA \\cross StatusB)" in abbrev_latex, (
+        f"Expected flat 3-tuple (N x StatusA x StatusB), got: {abbrev_latex}"
     )
 
 

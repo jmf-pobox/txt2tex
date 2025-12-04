@@ -3,20 +3,20 @@
 // From USER_GUIDE.md - Schema Notation section
 
 zed
-  given ShowId, EpisodeId
+  given BookId, ChapterId
 end
 
 
 axdef
-  podcasts : F ShowId
-  podcast_episodes : ShowId +-> F EpisodeId
+  books : F BookId
+  book_chapters : BookId +-> F ChapterId
 where
-  podcasts subset dom podcast_episodes
+  books subset dom book_chapters
 end
 
-TEXT: Later in document we can reference podcast_episodes globally:
+TEXT: Later in document we can reference book_chapters globally:
 
 zed
-  Answer == {s : dom podcast_episodes | # (podcast_episodes(s)) > 5}
+  Answer == {b : dom book_chapters | # (book_chapters(b)) > 5}
 end
 

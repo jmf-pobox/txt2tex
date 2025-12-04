@@ -1,7 +1,7 @@
 """Test for parentheses around cross in iseq(X cross Y).
 
 This is critical for fuzz compatibility - without parentheses,
-iseq ShowId cross EpisodeId parses as (iseq ShowId) cross EpisodeId,
+iseq BookId cross ChapterId parses as (iseq BookId) cross ChapterId,
 which is a type error when using ran.
 """
 
@@ -16,7 +16,7 @@ class TestIseqCrossParentheses:
 
     def test_iseq_cross_parsing(self) -> None:
         """Test that iseq(X cross Y) parses as FunctionApp with BinaryOp arg."""
-        text = "iseq(ShowId cross EpisodeId)"
+        text = "iseq(BookId cross ChapterId)"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -30,7 +30,7 @@ class TestIseqCrossParentheses:
 
     def test_iseq_cross_latex(self) -> None:
         """Test that iseq(X cross Y) generates \\iseq~(X \\cross Y) with parens."""
-        text = "iseq(ShowId cross EpisodeId)"
+        text = "iseq(BookId cross ChapterId)"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -38,7 +38,7 @@ class TestIseqCrossParentheses:
         assert isinstance(ast, FunctionApp)
         gen = LaTeXGenerator(use_fuzz=True)
         result = gen.generate_expr(ast)
-        assert result == "\\iseq~(ShowId \\cross EpisodeId)"
+        assert result == "\\iseq~(BookId \\cross ChapterId)"
 
     def test_seq_union_latex(self) -> None:
         """Test that seq(X union Y) also gets parentheses."""
@@ -66,7 +66,7 @@ class TestIseqCrossParentheses:
 
     def test_iseq_identifier_no_parens(self) -> None:
         """Test that iseq(X) with simple identifier doesn't add unnecessary parens."""
-        text = "iseq(ShowId)"
+        text = "iseq(BookId)"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
@@ -74,4 +74,4 @@ class TestIseqCrossParentheses:
         assert isinstance(ast, FunctionApp)
         gen = LaTeXGenerator()
         result = gen.generate_expr(ast)
-        assert result == "\\iseq~ShowId"
+        assert result == "\\iseq~BookId"

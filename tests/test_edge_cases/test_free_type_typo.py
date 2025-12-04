@@ -15,7 +15,7 @@ def test_free_type_with_double_equals_typo():
     User wrote ::== instead of ::=. This should produce a clear error message
     suggesting the correct syntax, lnot hang elem an infinite loop.
     """
-    text = "PlayedOrNot ::== P | NotP"
+    text = "ReadStatus ::== Done | Pending"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -29,7 +29,7 @@ def test_free_type_with_double_equals_typo():
 
 def test_free_type_with_correct_syntax():
     """Test that correct ::= syntax works properly."""
-    text = "PlayedOrNot ::= P | NotP"
+    text = "ReadStatus ::= Done | Pending"
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -38,10 +38,10 @@ def test_free_type_with_correct_syntax():
     assert len(doc.items) == 1
     free_type = doc.items[0]
     assert isinstance(free_type, FreeType)
-    assert free_type.name == "PlayedOrNot"
+    assert free_type.name == "ReadStatus"
     assert len(free_type.branches) == 2
-    assert free_type.branches[0].name == "P"
-    assert free_type.branches[1].name == "NotP"
+    assert free_type.branches[0].name == "Done"
+    assert free_type.branches[1].name == "Pending"
 
 
 def test_free_type_branch_names_with_reserved_keywords():

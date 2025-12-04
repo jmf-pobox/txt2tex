@@ -1591,9 +1591,9 @@ end
 **Axdef (boxed, with declarations):**
 ```
 axdef
-  SquaresOfEvens : P Z             ← Declaration required
+  Doubled : P Z             ← Declaration required
 where
-  SquaresOfEvens = { z : Z | z mod 2 = 0 . z * z }  ← Expression in where: OK
+  Doubled = { z : Z | z mod 2 = 0 . z * 2 }  ← Expression in where: OK
 end
 ```
 
@@ -1618,31 +1618,31 @@ end
 **Named schemas** have **LOCAL scope** - components are encapsulated within the schema and cannot be referenced outside:
 
 ```
-schema PodcastPlatform
-  shows : F ShowId
-  show_episodes : ShowId +-> F EpisodeId
+schema Library
+  books : F BookId
+  book_chapters : BookId +-> F ChapterId
 where
-  shows subset dom show_episodes
+  books subset dom book_chapters
 end
 
 ** Later in document **
-Answer == {s : dom show_episodes | ...}  ❌ FUZZ ERROR: show_episodes not declared
+Answer == {b : dom book_chapters | ...}  ❌ FUZZ ERROR: book_chapters not declared
 ```
 
-The identifiers `shows` and `show_episodes` exist only within the `PodcastPlatform` schema. They are LOCAL components that define the schema's type structure.
+The identifiers `books` and `book_chapters` exist only within the `Library` schema. They are LOCAL components that define the schema's type structure.
 
 **axdef blocks** have **GLOBAL scope** - all declared identifiers are accessible throughout the entire document:
 
 ```
 axdef
-  shows : F ShowId
-  show_episodes : ShowId +-> F EpisodeId
+  books : F BookId
+  book_chapters : BookId +-> F ChapterId
 where
-  shows subset dom show_episodes
+  books subset dom book_chapters
 end
 
 ** Later in document **
-Answer == {s : dom show_episodes | ...}  ✅ OK: show_episodes is globally accessible
+Answer == {b : dom book_chapters | ...}  ✅ OK: book_chapters is globally accessible
 ```
 
 All identifiers declared in `axdef` are GLOBAL and can be referenced anywhere after the declaration.
@@ -1653,8 +1653,8 @@ All identifiers declared in `axdef` are GLOBAL and can be referenced anywhere af
 - **Use axdef** to declare global constants, variables, or functions that need to be referenced elsewhere in your specification
 
 **Other globally scoped declarations:**
-- `given` types → `given ShowId, PeopleId`
-- Abbreviations → `EpisodeId == N1`
+- `given` types → `given BookId, AuthorId`
+- Abbreviations → `ChapterId == N1`
 - Generic definitions → `gendef [X, Y] fst : X cross Y -> X`
 - Free types → `Color ::= red | blue | green`
 

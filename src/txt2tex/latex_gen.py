@@ -827,7 +827,7 @@ class LaTeXGenerator:
         # Single underscore: prioritize suffix length for subscript detection
         if len(parts) == 2:
             prefix, suffix = parts
-            # Priority 1: Single-char suffix → subscript (e.g., x_1, length_L)
+            # Priority 1: Single-char suffix → subscript (e.g., x_1, count_N)
             if len(suffix) == 1:
                 if self.use_fuzz:
                     # Fuzz: numeric subscripts are decorations (bare _)
@@ -1982,7 +1982,7 @@ class LaTeXGenerator:
     def _escape_underscores_outside_math(self, text: str) -> str:
         r"""Escape underscores only when NOT inside $...$ math mode or citations.
 
-        Prevents LaTeX errors when identifiers like length_L appear in prose.
+        Prevents LaTeX errors when identifiers like count_N appear in prose.
         Math mode already handles underscores as subscripts, so only escape
         underscores in text mode. Also skip underscores in citation keys like
         \citep{author_name_2025}.
@@ -2254,7 +2254,7 @@ class LaTeXGenerator:
         text = self._convert_comparison_operators(text)
 
         # Escape underscores outside math mode (final pass)
-        # Prevents LaTeX errors when identifiers like length_L appear in prose
+        # Prevents LaTeX errors when identifiers like count_N appear in prose
         return self._escape_underscores_outside_math(text)
 
     @generate_document_item.register(Paragraph)
@@ -3549,8 +3549,8 @@ class LaTeXGenerator:
         # Escape underscores in identifiers for prose rendering (not subscripts)
         # Must happen AFTER all operator replacements to avoid interfering
         # Pattern: word characters around underscore, not already in math mode
-        # This handles cases like length_L, played_L in justification text
-        # Escapes as length\_L (prose) not $length_L$ (subscript)
+        # This handles cases like count_N, total_S in justification text
+        # Escapes as count\_N (prose) not $count_N$ (subscript)
         return re.sub(
             r"(?<!\$)(\w+_\w+)(?!\$)", lambda m: m.group(1).replace("_", r"\_"), result
         )

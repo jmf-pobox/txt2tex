@@ -1,5 +1,5 @@
 === Bug: Bag in Free Type Constructor ===
 
-given ShowId, EpisodeId, PlayedOrNot, SavedOrNot
+given BookId, ChapterId, StatusA, StatusB
 
-List ::= nil | join <<(ShowId cross EpisodeId) cross (N cross PlayedOrNot cross SavedOrNot) cross List>>
+TreeNode ::= nil | join <<(BookId cross ChapterId) cross (N cross StatusA cross StatusB) cross TreeNode>>

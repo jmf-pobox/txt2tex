@@ -726,7 +726,7 @@ class TestBulletSeparator:
         Based on GitHub issue #8 example.
         """
         text = (
-            "(forall e_1, e_2 : EpisodeId | (e_1 elem S land e_2 elem S) . "
+            "(forall e_1, e_2 : ChapterId | (e_1 elem S land e_2 elem S) . "
             "(e_1 < e_2 => f(e_1) <= f(e_2)))"
         )
         lexer = Lexer(text)
