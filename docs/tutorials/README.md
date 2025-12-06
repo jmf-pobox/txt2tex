@@ -147,7 +147,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 4. **Read error messages:** fuzz provides helpful error messages. Learn to interpret them.
 
-5. **Use the workflow:** Always use `hatch run convert` to get both LaTeX and PDF output.
+5. **Use the workflow:** Always use `txt2tex` to get both LaTeX and PDF output.
 
 6. **Consult USER_GUIDE.md:** When you encounter unfamiliar syntax, check the user guide.
 
@@ -157,10 +157,10 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ```bash
 # Convert a single example to PDF
-hatch run convert examples/01_propositional_logic/hello_world.txt
+txt2tex examples/01_propositional_logic/hello_world.txt
 
 # Generate LaTeX only (for debugging)
-hatch run cli examples/file.txt
+txt2tex examples/file.txt --tex-only
 
 # View PDF output
 open examples/01_propositional_logic/hello_world.pdf

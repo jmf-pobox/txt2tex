@@ -11,7 +11,7 @@
 //   - Implication (=> → ⇒)
 //
 // To compile:
-//   hatch run convert 01_propositional_logic/hello_world.txt
+//   txt2tex 01_propositional_logic/hello_world.txt
 //
 // See: docs/USER_GUIDE.md - Section "Propositional Logic"
 // ============================================================================

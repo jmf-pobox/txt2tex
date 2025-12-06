@@ -383,10 +383,10 @@ Generates:
 When implementing new features, test both modes:
 ```bash
 # Fuzz mode (default - type checking enabled)
-hatch run convert file.txt
+txt2tex file.txt
 
 # zed-* packages mode (no fuzz type checking)
-hatch run convert file.txt --zed
+txt2tex file.txt --zed
 ```
 
 **Important**: Create minimal test cases in /tmp first before modifying production code.

@@ -34,7 +34,7 @@ PURETEXT: Mathematical notation like x^2 or f(n) is also treated as literal text
 
 PURETEXT: When documenting code or command-line syntax, use PURETEXT to preserve exact formatting:
 
-PURETEXT: $ hatch run convert examples/hello_world.txt
+PURETEXT: $ txt2tex examples/hello_world.txt
 
 PURETEXT: The above command compiles the example to PDF.
 

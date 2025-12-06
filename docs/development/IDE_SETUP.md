@@ -73,31 +73,19 @@ When you save a `.tex` file, LaTeX Workshop automatically:
 3. Runs pdflatex (second pass)
 4. Citations resolve correctly, no warnings remain
 
-#### 2. txt2pdf.sh Script
+#### 2. txt2tex CLI
 ```bash
-./txt2pdf.sh examples/01_propositional_logic/basic_operators.txt
+txt2tex examples/01_propositional_logic/basic_operators.txt
 ```
 
-Uses latexmk for robust compilation:
-```bash
-latexmk -pdf -gg -interaction=nonstopmode -quiet basic_operators.tex
-```
-
-latexmk automatically handles multiple passes and bibliography processing.
+Uses latexmk (when available) for robust compilation. latexmk automatically handles multiple passes and bibliography processing.
 
 #### 3. Makefile
 ```bash
 make -C examples all
 ```
 
-Uses `hatch run convert`, which calls txt2pdf.sh.
-
-#### 4. Hatch Command
-```bash
-hatch run convert examples/01_propositional_logic/basic_operators.txt
-```
-
-Calls txt2pdf.sh internally.
+Uses the txt2tex CLI via hatch.
 
 ### Verification
 
@@ -146,12 +134,11 @@ Package natbib: Citation(s) may have changed. Rerun to get citations correct.
 
 1. **Development**: Use `fuzz -> pdflatex*2` recipe (default)
 2. **Quick iteration**: Temporarily switch to `pdflatex*2` recipe
-3. **Final build**: Always use `./txt2pdf.sh file.txt --typecheck` or Makefile
+3. **Final build**: Always use `txt2tex file.txt` or Makefile
 4. **Verify**: Check PDF output with `pdftotext` to confirm citations rendered
 
 ### References
 
-- **txt2pdf.sh**: [txt2pdf.sh](../../txt2pdf.sh) - latexmk-based compilation
 - **LaTeX Workshop**: [.vscode/settings.json](../../.vscode/settings.json) - IDE configuration
 - **Makefiles**: [hw/Makefile](../../hw/Makefile), [examples/Makefile](../../examples/Makefile)
 - **Citation syntax**: [USER_GUIDE.md](../guides/USER_GUIDE.md)

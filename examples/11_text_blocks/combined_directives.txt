@@ -23,7 +23,7 @@
 TEXT: This example demonstrates how to combine different text directives effectively. Use TEXT for normal explanatory prose with proper typography.
 
 PURETEXT: Use PURETEXT when showing literal syntax or code examples:
-PURETEXT: hatch run convert examples/hello_world.txt
+PURETEXT: txt2tex examples/hello_world.txt
 
 TEXT: And use LATEX when you need specific LaTeX formatting not available otherwise.
 
@@ -60,10 +60,10 @@ TEXT: The PURETEXT block shows the syntax pattern without actually creating a fo
 TEXT: The txt2tex tool supports several commands. Here are the most common:
 
 PURETEXT: # Convert to LaTeX only
-PURETEXT: hatch run cli examples/file.txt
+PURETEXT: txt2tex examples/file.txt --tex-only
 PURETEXT:
 PURETEXT: # Convert to PDF (full pipeline)
-PURETEXT: hatch run convert examples/file.txt
+PURETEXT: txt2tex examples/file.txt
 
 TEXT: The first command generates only the LaTeX file, while the second runs the complete pipeline including PDF generation.
 

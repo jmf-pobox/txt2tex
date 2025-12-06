@@ -13,6 +13,36 @@ def get_latex_dir() -> Path:
     return Path(__file__).parent / "latex"
 
 
+def format_tex(tex_path: Path) -> bool:
+    """Format a .tex file with tex-fmt if available.
+
+    Args:
+        tex_path: Path to the .tex file
+
+    Returns:
+        True if formatting was applied, False if tex-fmt not available
+    """
+    tex_fmt = shutil.which("tex-fmt")
+    if tex_fmt is None:
+        print("Note: tex-fmt not found. Skipping formatting.")
+        return False
+
+    result = subprocess.run(  # noqa: S603
+        [tex_fmt, str(tex_path)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    if result.returncode == 0:
+        print("Formatted: tex-fmt applied")
+        return True
+
+    # tex-fmt failed - not critical, just note it
+    print("Note: tex-fmt formatting failed (continuing anyway)")
+    return False
+
+
 def copy_latex_files(work_dir: Path) -> list[Path]:
     """Copy bundled .sty and .mf files to working directory.
 

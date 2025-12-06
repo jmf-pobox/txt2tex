@@ -9,7 +9,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from txt2tex.compile import compile_pdf, copy_latex_files, get_latex_dir
+from txt2tex.compile import compile_pdf, copy_latex_files, format_tex, get_latex_dir
 from txt2tex.errors import ErrorFormatter
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer, LexerError
@@ -17,7 +17,7 @@ from txt2tex.parser import Parser, ParserError
 from txt2tex.repl import repl_main
 
 # Re-export for backward compatibility
-__all__ = ["compile_pdf", "copy_latex_files", "get_latex_dir", "main"]
+__all__ = ["compile_pdf", "copy_latex_files", "format_tex", "get_latex_dir", "main"]
 
 
 def typecheck_fuzz(tex_path: Path) -> bool:
@@ -196,6 +196,11 @@ def main() -> int:
         help="Keep auxiliary files (.aux, .log, etc.) after PDF compilation",
     )
     parser.add_argument(
+        "--format",
+        action="store_true",
+        help="Format generated .tex file with tex-fmt (if available)",
+    )
+    parser.add_argument(
         "--check-env",
         action="store_true",
         help="Check for required dependencies (LaTeX, fuzz) and exit",
@@ -288,6 +293,10 @@ def main() -> int:
     except OSError as e:
         print(f"Error writing output file: {e}", file=sys.stderr)
         return 1
+
+    # Format with tex-fmt (if requested)
+    if args.format:
+        format_tex(output_path)
 
     # Type check with fuzz (if available and using fuzz package)
     if not args.zed:

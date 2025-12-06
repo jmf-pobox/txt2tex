@@ -16,15 +16,11 @@ txt2tex examples/file.txt --zed
 ```
 
 The CLI handles:
-- PDF generation with pdflatex (default)
+- PDF generation with pdflatex/latexmk (default)
 - Bundled .sty/.mf files copied automatically
 - Fuzz typechecking when fuzz binary is available
 - Cleanup of auxiliary files
-
-For advanced use (bibliography support, tex-fmt formatting):
-```bash
-./txt2pdf.sh examples/file.txt
-```
+- tex-fmt formatting (with `--format` flag)
 
 ## Project Overview
 
@@ -112,8 +108,8 @@ txt2tex <file>
 # LaTeX generation only (txt → tex)
 txt2tex <file> --tex-only
 
-# Advanced: bibliography support, tex-fmt formatting
-./txt2pdf.sh <file>
+# With tex-fmt formatting
+txt2tex <file> --format
 
 # Quality gates (run after every change)
 hatch run type           # Type checking with mypy
@@ -133,7 +129,7 @@ hatch run check          # lint + type + test
 hatch run check-cov      # lint + type + test-cov
 ```
 
-**Important**: The CLI copies bundled .sty/.mf files automatically. The `txt2pdf.sh` script adds latexmk for bibliography handling.
+**Important**: The CLI copies bundled .sty/.mf files automatically and uses latexmk for bibliography handling when available.
 
 ## Environment Setup
 
@@ -166,7 +162,7 @@ The project supports both **fuzz** and **zed-*** packages for Z notation:
 
 ```bash
 # Generate and compile to PDF in one step
-./txt2pdf.sh examples/04_proof_trees/simple_proofs.txt
+txt2tex examples/04_proof_trees/simple_proofs.txt
 
 # Extract text from PDF for verification
 pdftotext examples/04_proof_trees/simple_proofs.pdf -
@@ -335,7 +331,7 @@ When you encounter a bug:
 
 2. **Verify it fails**:
    ```bash
-   hatch run convert tests/bugs/bugN_short_name.txt
+   txt2tex tests/bugs/bugN_short_name.txt
    ```
 
 3. **Create GitHub issue**:

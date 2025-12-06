@@ -180,10 +180,10 @@ Convert any .txt file to PDF:
 
 ```bash
 # From project root
-hatch run convert examples/01_propositional_logic/basic_operators.txt
+txt2tex examples/01_propositional_logic/basic_operators.txt
 
-# Or using the shell script
-./txt2pdf.sh examples/01_propositional_logic/basic_operators.txt
+# With tex-fmt formatting
+txt2tex examples/01_propositional_logic/basic_operators.txt --format
 ```
 
 ## File Naming Convention
@@ -200,7 +200,7 @@ When adding new examples:
 1. Place in the appropriate directory
 2. Use clear, descriptive filenames
 3. Include a header comment explaining the example's purpose
-4. Test conversion with `hatch run convert <file>`
+4. Test conversion with `txt2tex <file>`
 5. Ensure fuzz validation passes (zero errors)
 6. Update this README if adding a new category
 

@@ -20,10 +20,10 @@ Coming soon:
 
 ```bash
 # Convert a .txt file to PDF
-hatch run convert 00_getting_started/hello_world.txt
+txt2tex 00_getting_started/hello_world.txt
 
-# Or use the shell script directly
-./txt2pdf.sh 00_getting_started/hello_world.txt
+# With tex-fmt formatting
+txt2tex 00_getting_started/hello_world.txt --format
 ```
 
 ## Next Steps

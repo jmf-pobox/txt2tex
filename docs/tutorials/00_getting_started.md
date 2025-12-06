@@ -55,12 +55,12 @@ TEXT: If p land q are both true, then p is true.
 ### Step 2: Compile to PDF
 
 ```bash
-hatch run convert my_first_spec.txt
+txt2tex my_first_spec.txt
 ```
 
 This command:
 1. Converts your txt notation to LaTeX
-2. Runs pdflatex to generate a PDF
+2. Runs pdflatex/latexmk to generate a PDF
 3. Cleans up temporary files
 
 ### Step 3: View the output
@@ -134,7 +134,7 @@ Write your specification using whiteboard-style notation.
 ### 2. Convert to PDF
 
 ```bash
-hatch run convert your_file.txt
+txt2tex your_file.txt
 ```
 
 ### 3. Check for errors
@@ -229,7 +229,7 @@ TEXT: This proof shows modus ponens: from p land p => q, we conclude q.
 Save this as `basics.txt` and compile:
 
 ```bash
-hatch run convert basics.txt
+txt2tex basics.txt
 open basics.pdf
 ```
 
@@ -292,10 +292,10 @@ Now that you can create and compile basic documents:
 
 ```bash
 # Full pipeline (txt → tex → pdf)
-hatch run convert file.txt
+txt2tex file.txt
 
 # LaTeX generation only
-hatch run cli file.txt
+txt2tex file.txt --tex-only
 
 # View PDF (macOS)
 open file.pdf
@@ -324,9 +324,10 @@ your_document.log      # LaTeX compilation log
 
 ### Problem: Command not found
 
-**Solution:** Ensure you're using hatch:
+**Solution:** Ensure txt2tex is installed:
 ```bash
-hatch run convert file.txt
+pip install txt2tex
+txt2tex file.txt
 ```
 
 ### Problem: LaTeX errors
@@ -338,7 +339,7 @@ cat your_file.log | grep -i error
 
 ### Problem: Missing symbols
 
-**Solution:** Ensure fuzz packages are installed and TEXINPUTS is set (handled automatically by `hatch run convert`).
+**Solution:** Ensure fuzz packages are installed and TEXINPUTS is set (handled automatically by `txt2tex`).
 
 ### Problem: Syntax errors
 

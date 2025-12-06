@@ -87,8 +87,6 @@ check = ["lint", "type", "type-pyright", "test"]
 check-cov = ["lint", "type", "type-pyright", "test-cov"]
 # CLI wrapper - use for generating LaTeX
 cli = "PYTHONPATH=src python -m txt2tex.cli {args}"
-# Full pipeline - use for txt -> tex -> pdf
-convert = "./txt2pdf.sh {args}"
 # QA check - single PDF
 qa-check = "./qa_check.sh {args}"
 # QA check - all PDFs in hw/ and examples/

@@ -412,7 +412,7 @@ F | F | F | T | T | T | T
 Save as `my_logic.txt` and compile:
 
 ```bash
-hatch run convert my_logic.txt
+txt2tex my_logic.txt
 ```
 
 ## Resources
