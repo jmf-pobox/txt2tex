@@ -100,8 +100,7 @@ class TestUnderscoreInProofJustifications:
     def test_nested_proof_with_underscores(self) -> None:
         """Test nested proof tree with underscore identifiers."""
         text = (
-            "PROOF:\n  count_N(nil) = 0\n    0 = 0 [base case]\n"
-            "      true [arithmetic]"
+            "PROOF:\n  count_N(nil) = 0\n    0 = 0 [base case]\n      true [arithmetic]"
         )
         lexer = Lexer(text)
         tokens = lexer.tokenize()

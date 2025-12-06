@@ -21,10 +21,7 @@ def test_explicit_parens_create_nested_pairs() -> None:
     Fuzz treats A x B x C as a flat 3-tuple when written without nested parens.
     txt2tex must NOT automatically add (A x B) x C parenthesization.
     """
-    txt = (
-        "EntryData == (BookId cross ChapterId) cross "
-        "(N cross StatusA cross StatusB)"
-    )
+    txt = "EntryData == (BookId cross ChapterId) cross (N cross StatusA cross StatusB)"
     lexer = Lexer(txt)
     tokens = list(lexer.tokenize())
     parser = Parser(tokens)

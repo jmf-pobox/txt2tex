@@ -210,4 +210,3 @@ end"""
 
         assert r"\begin{schema}" in fragment
         assert r"\end{schema}" in fragment
-

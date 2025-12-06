@@ -245,4 +245,3 @@ def _show_latex_error(tex_path: Path) -> None:
                 break
     else:
         print("LaTeX compilation failed (check .log file)", file=sys.stderr)
-
