@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import html
+import re
+from dataclasses import dataclass, field
 from functools import singledispatchmethod
+from pathlib import Path
 from typing import ClassVar, cast
 
 from txt2tex.__version__ import __version__
@@ -59,8 +62,48 @@ from txt2tex.ast_nodes import (
     UnaryOp,
     Zed,
 )
+from txt2tex.bib_parser import BibEntry, BibParser
 from txt2tex.lexer import Lexer, LexerError
 from txt2tex.parser import Parser, ParserError
+
+
+@dataclass
+class TocEntry:
+    """A table of contents entry."""
+
+    title: str
+    anchor_id: str
+    level: int  # 1 = section, 2 = solution
+
+
+def _empty_toc_entries() -> list[TocEntry]:
+    """Factory for empty TOC entries list."""
+    return []
+
+
+def _empty_citations() -> list[str]:
+    """Factory for empty citations list."""
+    return []
+
+
+def _empty_citation_map() -> dict[str, int]:
+    """Factory for empty citation map."""
+    return {}
+
+
+def _empty_bib_entries() -> dict[str, BibEntry]:
+    """Factory for empty bib entries dict."""
+    return {}
+
+
+@dataclass
+class DocumentStructure:
+    """Collected document structure for two-pass generation."""
+
+    toc_entries: list[TocEntry] = field(default_factory=_empty_toc_entries)
+    citations_used: list[str] = field(default_factory=_empty_citations)
+    citation_to_number: dict[str, int] = field(default_factory=_empty_citation_map)
+    bib_entries: dict[str, BibEntry] = field(default_factory=_empty_bib_entries)
 
 
 class KaTeXGenerator:
@@ -226,12 +269,85 @@ class KaTeXGenerator:
         "F": r"\mathbb{F}",
     }
 
-    def __init__(self) -> None:
-        """Initialize the KaTeX generator."""
+    def __init__(self, source_dir: Path | None = None) -> None:
+        """Initialize the KaTeX generator.
+
+        Args:
+            source_dir: Directory containing source file (for resolving bib paths).
+        """
         self._in_math_mode = False
+        self._source_dir = source_dir or Path.cwd()
+        self._structure = DocumentStructure()
+        self._section_counter = 0
+        self._solution_counter = 0
+        self._bib_parser = BibParser()
+
+    def _collect_document_structure(self, ast: Document) -> None:
+        """First pass: collect TOC entries and citations from document.
+
+        Populates self._structure with TOC entries and citation mappings.
+        """
+        self._structure = DocumentStructure()
+        self._section_counter = 0
+        self._solution_counter = 0
+
+        # Load bibliography if specified
+        if ast.bibliography_metadata and ast.bibliography_metadata.file:
+            bib_file = ast.bibliography_metadata.file
+            bib_path = self._source_dir / bib_file
+            self._structure.bib_entries = self._bib_parser.parse(bib_path)
+
+        # Collect TOC entries and citations from items
+        for item in ast.items:
+            self._collect_from_item(item)
+
+    def _collect_from_item(self, item: DocumentItem) -> None:
+        """Recursively collect TOC entries and citations from a document item."""
+        if isinstance(item, Section):
+            self._section_counter += 1
+            anchor_id = f"section-{self._section_counter}"
+            self._structure.toc_entries.append(
+                TocEntry(title=item.title, anchor_id=anchor_id, level=1)
+            )
+            for sub_item in item.items:
+                self._collect_from_item(sub_item)
+
+        elif isinstance(item, Solution):
+            self._solution_counter += 1
+            anchor_id = f"solution-{item.number}"
+            self._structure.toc_entries.append(
+                TocEntry(title=f"Solution {item.number}", anchor_id=anchor_id, level=2)
+            )
+            for sub_item in item.items:
+                self._collect_from_item(sub_item)
+
+        elif isinstance(item, Part):
+            for sub_item in item.items:
+                self._collect_from_item(sub_item)
+
+        elif isinstance(item, Paragraph):
+            # Extract citations from paragraph text
+            self._collect_citations_from_text(item.text)
+
+    def _collect_citations_from_text(self, text: str) -> None:
+        """Extract [cite key] citations from text and track them."""
+        # Pattern: [cite key optional-locator]
+        pattern = r"\[cite\s+([a-zA-Z0-9_-]+)(?:\s+[^\]]+)?\]"
+
+        for match in re.finditer(pattern, text):
+            key = match.group(1)
+            if key not in self._structure.citation_to_number:
+                # Assign next citation number
+                num = len(self._structure.citations_used) + 1
+                self._structure.citations_used.append(key)
+                self._structure.citation_to_number[key] = num
 
     def generate_document(self, ast: Document | Expr) -> str:
         """Generate complete HTML document with KaTeX.
+
+        Uses two-pass generation:
+        1. First pass: Collect TOC entries and citations
+        2. Second pass: Generate HTML with TOC and numbered citations
 
         Args:
             ast: The AST root node.
@@ -239,6 +355,13 @@ class KaTeXGenerator:
         Returns:
             Complete HTML document string.
         """
+        # First pass: collect document structure (for Document only)
+        if isinstance(ast, Document):
+            self._collect_document_structure(ast)
+            # Reset counters for second pass
+            self._section_counter = 0
+            self._solution_counter = 0
+
         lines: list[str] = []
 
         # HTML preamble
@@ -264,12 +387,12 @@ class KaTeXGenerator:
             'href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">'
         )
         lines.append(
-            '  <script defer '
+            "  <script defer "
             'src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js">'
             "</script>"
         )
         lines.append(
-            '  <script defer '
+            "  <script defer "
             'src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/'
             'contrib/auto-render.min.js"></script>'
         )
@@ -307,10 +430,18 @@ class KaTeXGenerator:
         if isinstance(ast, Document) and ast.title_metadata:
             lines.extend(self._generate_title_block(ast.title_metadata))
 
+        # Table of Contents (if there are TOC entries)
+        if isinstance(ast, Document) and self._structure.toc_entries:
+            lines.extend(self._generate_toc())
+
         # Body content
         if isinstance(ast, Document):
             for item in ast.items:
                 lines.extend(self._generate_document_item(item))
+
+            # Bibliography (if citations were used)
+            if self._structure.citations_used:
+                lines.extend(self._generate_bibliography())
         else:
             # Single expression
             math = self.generate_expr(ast)
@@ -321,6 +452,83 @@ class KaTeXGenerator:
         lines.append("</html>")
 
         return "\n".join(lines)
+
+    def _generate_toc(self) -> list[str]:
+        """Generate table of contents HTML."""
+        lines: list[str] = ['<div class="toc">']
+        lines.append("  <h2>Contents</h2>")
+        lines.append("  <ul>")
+
+        for entry in self._structure.toc_entries:
+            indent = "    " if entry.level == 1 else "      "
+            css_class = "toc-section" if entry.level == 1 else "toc-solution"
+            lines.append(
+                f'{indent}<li class="{css_class}">'
+                f'<a href="#{entry.anchor_id}">{html.escape(entry.title)}</a></li>'
+            )
+
+        lines.append("  </ul>")
+        lines.append("</div>")
+        return lines
+
+    def _generate_bibliography(self) -> list[str]:
+        """Generate bibliography/references section HTML."""
+        lines: list[str] = ['<div class="bibliography">']
+        lines.append('  <h2 id="references">References</h2>')
+        lines.append("  <ol>")
+
+        for key in self._structure.citations_used:
+            entry = self._structure.bib_entries.get(key)
+            if entry:
+                citation_html = self._format_bib_entry(entry)
+                lines.append(f'    <li id="ref-{key}">{citation_html}</li>')
+            else:
+                # Unknown citation key
+                lines.append(
+                    f'    <li id="ref-{key}">'
+                    f"<em>[Unknown reference: {html.escape(key)}]</em></li>"
+                )
+
+        lines.append("  </ol>")
+        lines.append("</div>")
+        return lines
+
+    def _format_bib_entry(self, entry: BibEntry) -> str:
+        """Format a bibliography entry for display."""
+        parts: list[str] = []
+
+        # Author
+        if entry.author:
+            parts.append(html.escape(entry.author))
+
+        # Year
+        if entry.year:
+            parts.append(f"({html.escape(entry.year)})")
+
+        # Title (in italics for books, quotes for articles)
+        if entry.title:
+            if entry.entry_type == "book":
+                parts.append(f"<em>{html.escape(entry.title)}</em>")
+            else:
+                parts.append(f'"{html.escape(entry.title)}"')
+
+        # Publisher and address for books
+        if entry.entry_type == "book":
+            if entry.publisher:
+                pub_str = html.escape(entry.publisher)
+                if entry.address:
+                    pub_str = f"{html.escape(entry.address)}: {pub_str}"
+                parts.append(pub_str)
+
+        # Howpublished for misc entries
+        elif entry.entry_type == "misc" and entry.howpublished:
+            parts.append(html.escape(entry.howpublished))
+
+        # Note for unpublished
+        elif entry.entry_type == "unpublished" and entry.note:
+            parts.append(html.escape(entry.note))
+
+        return ". ".join(parts) + "."
 
     def _get_css_styles(self) -> str:
         """Return CSS styles for Z notation and document structure."""
@@ -382,49 +590,91 @@ class KaTeXGenerator:
       margin: 1em 0;
       padding: 0.5em;
     }
-    /* Truth table */
+    /* Truth table - compact like LaTeX */
     .truth-table {
       border-collapse: collapse;
       margin: 1em auto;
+      font-size: 0.85em;
     }
     .truth-table th, .truth-table td {
       border: 1px solid #333;
-      padding: 0.3em 0.8em;
+      padding: 0.15em 0.5em;
       text-align: center;
     }
     .truth-table th {
       background: #f5f5f5;
+      font-weight: bold;
+      white-space: nowrap;
     }
-    /* Equivalence chain */
+    .truth-table td {
+      font-style: italic;
+    }
+    /* Equivalence chain - compact two-column layout like LaTeX */
     .argue-chain {
       margin: 1em 0;
+      width: 100%;
     }
     .argue-step {
       display: flex;
-      margin: 0.25em 0;
+      justify-content: space-between;
+      align-items: baseline;
+      margin: 0;
+      padding: 0;
+      line-height: 1.8;
     }
     .argue-expr {
-      flex: 1;
+      text-align: left;
+      padding-left: 3em;
+    }
+    .argue-expr .katex-display {
+      margin: 0.1em 0 !important;
+      padding: 0;
     }
     .argue-just {
-      color: #666;
-      margin-left: 2em;
+      color: #555;
+      text-align: right;
+      flex-shrink: 0;
+      padding-left: 1.5em;
+      font-size: 0.95em;
     }
-    /* Proof tree */
+    /* Proof tree - Fitch-style nested boxes */
     .proof-tree {
       margin: 1em 0;
+      font-size: 0.95em;
     }
     .proof-node {
-      margin-left: 1.5em;
+      margin: 0.2em 0 0.2em 1.5em;
+      padding-left: 0.5em;
+      border-left: 1px solid #ccc;
+    }
+    .proof-node:first-child {
+      border-left: none;
+      margin-left: 0;
+      padding-left: 0;
+    }
+    .proof-line {
+      margin: 0.3em 0;
+      line-height: 1.8;
     }
     .proof-assumption {
-      border: 1px solid #999;
-      padding: 0.2em 0.5em;
+      border: 1px solid #666;
+      padding: 0.1em 0.4em;
+      background: #f9f9f9;
       display: inline-block;
     }
     .proof-label {
       color: #666;
-      font-size: 0.9em;
+      font-size: 0.85em;
+      margin-left: 0.3em;
+    }
+    .proof-case {
+      margin: 0.5em 0 0.5em 1em;
+      padding-left: 0.5em;
+      border-left: 2px solid #999;
+    }
+    .proof-case-header {
+      font-weight: bold;
+      margin-bottom: 0.3em;
     }
     /* Inference rule */
     .infrule {
@@ -447,13 +697,75 @@ class KaTeXGenerator:
       page-break-after: always;
       break-after: page;
     }
+    /* Table of Contents */
+    .toc {
+      margin: 2em 0;
+      padding: 1em;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .toc h2 {
+      margin-top: 0;
+      font-size: 1.3em;
+    }
+    .toc ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    .toc li {
+      margin: 0.3em 0;
+    }
+    .toc .toc-section {
+      font-weight: bold;
+    }
+    .toc .toc-solution {
+      padding-left: 1.5em;
+    }
+    .toc a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    .toc a:hover {
+      text-decoration: underline;
+    }
+    /* Bibliography */
+    .bibliography {
+      margin-top: 3em;
+      padding-top: 1em;
+      border-top: 2px solid #333;
+    }
+    .bibliography h2 {
+      margin-top: 0;
+    }
+    .bibliography ol {
+      padding-left: 2em;
+    }
+    .bibliography li {
+      margin: 0.8em 0;
+      line-height: 1.5;
+    }
+    /* Citation links */
+    .citation {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    .citation:hover {
+      text-decoration: underline;
+    }
     @media print {
       body { max-width: none; }
+      .toc { background: #fff; }
     }
 """
 
     def _get_katex_macros(self) -> str:
-        """Return KaTeX macro definitions for Z notation."""
+        """Return KaTeX macro definitions for Z notation.
+
+        Only defines macros for commands that KaTeX doesn't support natively.
+        KaTeX already supports: \\land, \\lor, \\lnot, \\mu, etc.
+        """
         macros = [
             # Type symbols
             '"\\\\nat": "\\\\mathbb{N}"',
@@ -469,18 +781,19 @@ class KaTeXGenerator:
             '"\\\\fun": "\\\\rightarrow"',
             '"\\\\pfun": "\\\\rightharpoonup"',
             '"\\\\inj": "\\\\rightarrowtail"',
-            '"\\\\pinj": "\\\\rightarrowtail\\\\kern-0.6em\\\\rightharpoonup"',
+            '"\\\\pinj": "\\\\rightarrowtail\\\\!\\\\rightharpoonup"',
             '"\\\\surj": "\\\\twoheadrightarrow"',
-            '"\\\\psurj": "\\\\rightharpoonup\\\\kern-1em\\\\twoheadrightarrow"',
-            '"\\\\bij": "\\\\rightarrowtail\\\\kern-0.5em\\\\twoheadrightarrow"',
+            '"\\\\psurj": "\\\\rightharpoonup\\\\!\\\\!\\\\twoheadrightarrow"',
+            '"\\\\bij": "\\\\rightarrowtail\\\\!\\\\twoheadrightarrow"',
             '"\\\\ffun": "\\\\rightharpoonup"',
             # Domain/range operators
             '"\\\\dom": "\\\\textrm{dom}"',
             '"\\\\ran": "\\\\textrm{ran}"',
             '"\\\\dres": "\\\\triangleleft"',
             '"\\\\rres": "\\\\triangleright"',
-            '"\\\\ndres": "\\\\mathbin{\\\\lhd\\\\kern-0.5em-}"',
-            '"\\\\nrres": "\\\\mathbin{-\\\\kern-0.5em\\\\rhd}"',
+            # Anti-restriction (use triangles with line)
+            '"\\\\ndres": "\\\\mathbin{\\\\triangleleft\\\\!\\\\!-}"',
+            '"\\\\nrres": "\\\\mathbin{-\\\\!\\\\!\\\\triangleright}"',
             '"\\\\comp": "\\\\circ"',
             '"\\\\semi": "\\\\mathbin{;}"',
             # Sequence operators
@@ -489,9 +802,9 @@ class KaTeXGenerator:
             '"\\\\filter": "\\\\upharpoonright"',
             # Bag operators
             '"\\\\bag": "\\\\textrm{bag}"',
-            # Relational image
-            '"\\\\limg": "(|"',
-            '"\\\\rimg": "|)"',
+            # Relational image (use proper delimiters)
+            '"\\\\limg": "\\\\langle\\\\!|"',
+            '"\\\\rimg": "|\\\\!\\\\rangle"',
             # Override
             '"\\\\oplus": "\\\\oplus"',
             # Range
@@ -502,14 +815,9 @@ class KaTeXGenerator:
             '"\\\\inv": "^{-1}"',
             # Turnstile
             '"\\\\shows": "\\\\vdash"',
-            # Schema operators
-            '"\\\\land": "\\\\land"',
-            '"\\\\lor": "\\\\lor"',
-            '"\\\\lnot": "\\\\lnot"',
+            # Implication/equivalence shortcuts
             '"\\\\implies": "\\\\Rightarrow"',
             '"\\\\iff": "\\\\Leftrightarrow"',
-            # Definite description
-            '"\\\\mu": "\\\\mu"',
             # Unique existence
             '"\\\\exists_1": "\\\\exists_1"',
         ]
@@ -574,7 +882,8 @@ class KaTeXGenerator:
         if isinstance(item, PageBreak):
             return ['<div class="page-break"></div>']
         if isinstance(item, Contents):
-            return ['<div class="toc">[Table of Contents]</div>']
+            # TOC is already generated at document start via two-pass generation
+            return []
         if isinstance(item, PartsFormat):
             return []  # Style directive, no output
 
@@ -584,7 +893,9 @@ class KaTeXGenerator:
 
     def _generate_section(self, section: Section) -> list[str]:
         """Generate HTML for a section."""
-        lines: list[str] = ['<div class="section">']
+        self._section_counter += 1
+        anchor_id = f"section-{self._section_counter}"
+        lines: list[str] = [f'<div class="section" id="{anchor_id}">']
         lines.append(f"  <h2>{html.escape(section.title)}</h2>")
         for item in section.items:
             lines.extend(self._generate_document_item(item))
@@ -593,7 +904,9 @@ class KaTeXGenerator:
 
     def _generate_solution(self, solution: Solution) -> list[str]:
         """Generate HTML for a solution block."""
-        lines: list[str] = ['<div class="solution">']
+        self._solution_counter += 1
+        anchor_id = f"solution-{solution.number}"
+        lines: list[str] = [f'<div class="solution" id="{anchor_id}">']
         lines.append(
             f'  <div class="solution-header">Solution {html.escape(solution.number)}'
             "</div>"
@@ -630,26 +943,37 @@ class KaTeXGenerator:
         for row in table.rows:
             lines.append("    <tr>")
             for cell in row:
-                cell_escaped = html.escape(cell)
-                lines.append(f"      <td>{cell_escaped}</td>")
+                # Convert T/F to lowercase t/f for LaTeX-style appearance
+                cell_display = cell.lower() if cell in ("T", "F") else html.escape(cell)
+                lines.append(f"      <td>{cell_display}</td>")
             lines.append("    </tr>")
         lines.append("  </tbody>")
         lines.append("</table>")
         return lines
 
     def _generate_argue_chain(self, chain: ArgueChain) -> list[str]:
-        """Generate HTML for an equivalence/argue chain."""
+        """Generate HTML for an equivalence/argue chain.
+
+        Uses table layout for proper two-column alignment:
+        - Left column: expressions (left-aligned)
+        - Right column: justifications (right-aligned)
+        """
         lines: list[str] = ['<div class="argue-chain">']
 
         for i, step in enumerate(chain.steps):
             expr_math = self.generate_expr(step.expression)
+            # Use ⇔ prefix for subsequent steps
             prefix = r"\Leftrightarrow \;" if i > 0 else ""
 
             lines.append('  <div class="argue-step">')
+            # Use display math but in table cell
             lines.append(f'    <span class="argue-expr">$${prefix}{expr_math}$$</span>')
+            # Justification column (may be empty)
             if step.justification:
                 just_escaped = html.escape(step.justification)
                 lines.append(f'    <span class="argue-just">[{just_escaped}]</span>')
+            else:
+                lines.append('    <span class="argue-just"></span>')
             lines.append("  </div>")
 
         lines.append("</div>")
@@ -867,7 +1191,7 @@ class KaTeXGenerator:
         return lines
 
     def _generate_proof_tree(self, tree: ProofTree) -> list[str]:
-        """Generate HTML for a proof tree."""
+        """Generate HTML for a proof tree (Fitch-style nested boxes)."""
         lines: list[str] = ['<div class="proof-tree">']
         lines.extend(self._generate_proof_node(tree.conclusion, 0))
         lines.append("</div>")
@@ -880,30 +1204,34 @@ class KaTeXGenerator:
 
         expr_math = self.generate_expr(node.expression)
 
-        # Build the node content
-        content_parts: list[str] = []
+        # Build the formula line
+        formula_parts: list[str] = []
         if node.is_assumption:
-            content_parts.append(f'<span class="proof-assumption">${expr_math}$</span>')
+            formula_parts.append(f'<span class="proof-assumption">${expr_math}$</span>')
         else:
-            content_parts.append(f"${expr_math}$")
+            formula_parts.append(f"${expr_math}$")
 
+        # Add labels
         if node.label is not None:
-            content_parts.append(f' <span class="proof-label">[{node.label}]</span>')
+            formula_parts.append(f'<span class="proof-label">[{node.label}]</span>')
 
         if node.justification:
-            content_parts.append(
-                f' <span class="proof-label">[{html.escape(node.justification)}]</span>'
+            formula_parts.append(
+                f'<span class="proof-label">[{html.escape(node.justification)}]</span>'
             )
 
+        # Start node container
         lines.append(f'{indent}<div class="proof-node">')
-        lines.append(f"{indent}  " + "".join(content_parts))
+        formula_html = "".join(formula_parts)
+        lines.append(f'{indent}  <div class="proof-line">{formula_html}</div>')
 
-        # Children
+        # Children (premises that lead to this conclusion)
         for child in node.children:
             if isinstance(child, CaseAnalysis):
                 lines.append(f'{indent}  <div class="proof-case">')
                 lines.append(
-                    f"{indent}    <strong>Case {html.escape(child.case_name)}:</strong>"
+                    f'{indent}    <div class="proof-case-header">'
+                    f"Case {html.escape(child.case_name)}:</div>"
                 )
                 for step in child.steps:
                     lines.extend(self._generate_proof_node(step, depth + 2))
@@ -925,9 +1253,23 @@ class KaTeXGenerator:
         return [f"<p>{html.escape(para.text)}</p>"]
 
     def _generate_latex_block(self, block: LatexBlock) -> list[str]:
-        """Generate HTML for a LaTeX block (pass through as math)."""
-        # Wrap in display math - user's raw LaTeX
-        return [f"<div>$${block.latex}$$</div>"]
+        """Generate HTML for a LaTeX block (pass through as math).
+
+        Handles raw LaTeX that may contain:
+        - Already-delimited math ($..$ or $$..$$)
+        - LaTeX commands not supported by KaTeX (e.g., \\hspace*)
+        """
+        latex = block.latex
+
+        # Convert LaTeX-only commands to KaTeX equivalents
+        latex = latex.replace(r"\hspace*", r"\hspace")
+
+        # If content already has math delimiters, output as-is in a div
+        if "$" in latex:
+            return [f"<div>{latex}</div>"]
+
+        # Otherwise wrap in display math
+        return [f"<div>$${latex}$$</div>"]
 
     def _generate_declaration(self, decl: Declaration) -> str:
         """Generate KaTeX for a declaration (var : Type)."""
@@ -936,10 +1278,104 @@ class KaTeXGenerator:
         return f"{var} : {type_math}"
 
     def _process_text_for_math(self, text: str) -> str:
-        """Process text and wrap mathematical expressions in $ delimiters."""
-        # Simple approach: escape HTML and leave math detection to KaTeX auto-render
-        # For inline math, we'd need more sophisticated parsing
-        return html.escape(text)
+        """Process text: convert operators to math symbols, citations, escape HTML."""
+        # Convert operators to KaTeX math (longest patterns first)
+        # 3-character operators
+        text = self._replace_outside_math(text, "<=>", r"\Leftrightarrow")
+        text = self._replace_outside_math(text, "|->", r"\mapsto")
+        text = self._replace_outside_math(text, "<->", r"\leftrightarrow")
+
+        # 2-character operators
+        text = self._replace_outside_math(text, "=>", r"\Rightarrow")
+        text = self._replace_outside_math(text, "->", r"\rightarrow")
+        text = self._replace_outside_math(text, "+->", r"\rightharpoonup")
+
+        # Keywords that should become math symbols
+        text = self._replace_outside_math(text, " land ", r" \land ")
+        text = self._replace_outside_math(text, " lor ", r" \lor ")
+        text = self._replace_outside_math(text, " lnot ", r" \lnot ")
+        text = self._replace_outside_math(text, "(lnot ", r"(\lnot ")
+        text = self._replace_outside_math(text, " elem ", r" \in ")
+        text = self._replace_outside_math(text, " forall ", r" \forall ")
+        text = self._replace_outside_math(text, " exists ", r" \exists ")
+
+        # Escape HTML special characters in non-math parts
+        text = self._escape_html_outside_math(text)
+
+        # Process citations AFTER HTML escaping: [cite key] → numbered link [1]
+        # (citations need to output HTML tags that shouldn't be escaped)
+        return self._process_citations_for_html(text)
+
+    def _process_citations_for_html(self, text: str) -> str:
+        """Convert [cite key locator] to numbered HTML links.
+
+        Examples:
+            "[cite spivey92]" → '<a href="#ref-..." class="citation">[1]</a>'
+            "[cite key p. 42]" → '<a href="#ref-..." class="citation">[1, p. 42]</a>'
+        """
+        # Pattern: [cite key optional-locator]
+        pattern = r"\[cite\s+([a-zA-Z0-9_-]+)(?:\s+([^\]]+))?\]"
+
+        def replace_citation(match: re.Match[str]) -> str:
+            key = match.group(1)
+            locator = match.group(2)
+
+            # Get citation number (should already exist from first pass)
+            num = self._structure.citation_to_number.get(key, "?")
+
+            if locator:
+                locator = locator.strip()
+                return f'<a href="#ref-{key}" class="citation">[{num}, {locator}]</a>'
+            return f'<a href="#ref-{key}" class="citation">[{num}]</a>'
+
+        return re.sub(pattern, replace_citation, text)
+
+    def _replace_outside_math(self, text: str, pattern: str, replacement: str) -> str:
+        """Replace pattern with math symbol only when NOT inside $...$ math mode."""
+        result: list[str] = []
+        in_math = False
+        i = 0
+
+        while i < len(text):
+            if text[i] == "$":
+                in_math = not in_math
+                result.append("$")
+                i += 1
+            elif not in_math and text[i : i + len(pattern)] == pattern:
+                result.append(f"${replacement}$")
+                i += len(pattern)
+            else:
+                result.append(text[i])
+                i += 1
+
+        return "".join(result)
+
+    def _escape_html_outside_math(self, text: str) -> str:
+        """Escape HTML special characters only outside math delimiters."""
+        result: list[str] = []
+        in_math = False
+        i = 0
+
+        while i < len(text):
+            if text[i] == "$":
+                in_math = not in_math
+                result.append("$")
+                i += 1
+            elif not in_math:
+                if text[i] == "<":
+                    result.append("&lt;")
+                elif text[i] == ">":
+                    result.append("&gt;")
+                elif text[i] == "&":
+                    result.append("&amp;")
+                else:
+                    result.append(text[i])
+                i += 1
+            else:
+                result.append(text[i])
+                i += 1
+
+        return "".join(result)
 
     def _parse_and_generate(self, text: str) -> str:
         """Parse text as expression and generate KaTeX.

@@ -311,7 +311,7 @@ def main() -> int:
                     tex_path.unlink(missing_ok=True)
 
         # Generate HTML with KaTeX
-        html_generator = KaTeXGenerator()
+        html_generator = KaTeXGenerator(source_dir=args.input.parent)
         html_output = html_generator.generate_document(ast)
 
         # Write HTML output
