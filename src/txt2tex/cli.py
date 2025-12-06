@@ -11,6 +11,7 @@ from pathlib import Path
 
 from txt2tex.compile import compile_pdf, copy_latex_files, format_tex, get_latex_dir
 from txt2tex.errors import ErrorFormatter
+from txt2tex.katex_gen import KaTeXGenerator
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer, LexerError
 from txt2tex.parser import Parser, ParserError
@@ -211,6 +212,16 @@ def main() -> int:
         action="store_true",
         help="Start interactive REPL mode",
     )
+    parser.add_argument(
+        "--html",
+        action="store_true",
+        help="Generate HTML with KaTeX instead of LaTeX/PDF",
+    )
+    parser.add_argument(
+        "--validate",
+        action="store_true",
+        help="Run fuzz validation before HTML generation (requires --html)",
+    )
 
     args = parser.parse_args()
 
@@ -226,8 +237,12 @@ def main() -> int:
     if args.input is None:
         parser.error("the following arguments are required: input")
 
-    # Check for pdflatex early unless --tex-only
-    if not args.tex_only and shutil.which("pdflatex") is None:
+    # Validate --validate requires --html
+    if args.validate and not args.html:
+        parser.error("--validate requires --html")
+
+    # Check for pdflatex early unless --tex-only or --html
+    if not args.tex_only and not args.html and shutil.which("pdflatex") is None:
         print(
             "Error: pdflatex not found. Install a LaTeX distribution "
             "(e.g., TeX Live, MacTeX, MiKTeX), or use --tex-only.",
@@ -259,14 +274,6 @@ def main() -> int:
 
         parser_obj = Parser(tokens)
         ast = parser_obj.parse()
-
-        generator = LaTeXGenerator(
-            use_fuzz=not args.zed,
-            toc_parts=args.toc_parts,
-            warn_overflow=not args.no_warn_overflow,
-            overflow_threshold=args.overflow_threshold,
-        )
-        latex = generator.generate_document(ast)
     except LexerError as e:
         formatted = formatter.format_error(e.message, e.line, e.column)
         print(formatted, file=sys.stderr)
@@ -275,6 +282,63 @@ def main() -> int:
         formatted = formatter.format_error(e.message, e.token.line, e.token.column)
         print(formatted, file=sys.stderr)
         return 1
+
+    # HTML output path
+    if args.html:
+        # Validate with fuzz first if requested
+        if args.validate:
+            # Generate LaTeX for validation
+            latex_generator = LaTeXGenerator(
+                use_fuzz=True,
+                toc_parts=args.toc_parts,
+                warn_overflow=False,
+            )
+            latex = latex_generator.generate_document(ast)
+
+            # Write to temp file and validate
+            tex_path = args.input.with_suffix(".tex")
+            try:
+                tex_path.write_text(latex)
+                if not typecheck_fuzz(tex_path):
+                    print(
+                        "Validation failed. HTML not generated.",
+                        file=sys.stderr,
+                    )
+                    return 1
+            finally:
+                # Clean up temp tex file unless --keep-aux
+                if not args.keep_aux:
+                    tex_path.unlink(missing_ok=True)
+
+        # Generate HTML with KaTeX
+        html_generator = KaTeXGenerator()
+        html_output = html_generator.generate_document(ast)
+
+        # Write HTML output
+        output_path = args.output or args.input.with_suffix(".html")
+        try:
+            output_path.write_text(html_output)
+            print(f"Generated: {output_path}")
+        except PermissionError:
+            print(f"Error: Permission denied writing: {output_path}", file=sys.stderr)
+            return 1
+        except IsADirectoryError:
+            print(f"Error: Cannot write to directory: {output_path}", file=sys.stderr)
+            return 1
+        except OSError as e:
+            print(f"Error writing output file: {e}", file=sys.stderr)
+            return 1
+
+        return 0
+
+    # LaTeX generation path
+    generator = LaTeXGenerator(
+        use_fuzz=not args.zed,
+        toc_parts=args.toc_parts,
+        warn_overflow=not args.no_warn_overflow,
+        overflow_threshold=args.overflow_threshold,
+    )
+    latex = generator.generate_document(ast)
 
     # Emit any overflow warnings
     generator.emit_warnings()
