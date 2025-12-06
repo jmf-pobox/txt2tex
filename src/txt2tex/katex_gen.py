@@ -258,28 +258,20 @@ class KaTeXGenerator:
         else:
             lines.append("  <title>txt2tex Document</title>")
 
-        # KaTeX CSS and JS from CDN
+        # KaTeX CSS and JS from CDN (version 0.16.11)
         lines.append(
             '  <link rel="stylesheet" '
-            'href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" '
-            'integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx/'
-            'Oo6OXfkLNRd2Xu+8lJ8z4j+hS" '
-            'crossorigin="anonymous">'
+            'href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">'
         )
         lines.append(
-            "  <script defer "
-            'src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" '
-            'integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbe'
-            'YFZxoGWyvMXmzS8HA2d" '
-            'crossorigin="anonymous"></script>'
+            '  <script defer '
+            'src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js">'
+            "</script>"
         )
         lines.append(
-            "  <script defer "
+            '  <script defer '
             'src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/'
-            'contrib/auto-render.min.js" '
-            'integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+'
-            'rCMvRjXZf3bYhOl1Aiue" '
-            'crossorigin="anonymous"></script>'
+            'contrib/auto-render.min.js"></script>'
         )
 
         # Custom styles for Z notation
@@ -299,7 +291,9 @@ class KaTeXGenerator:
         lines.append('        {left: "$", right: "$", display: false}')
         lines.append("      ],")
         lines.append("      macros: {")
-        lines.append(self._get_katex_macros())
+        # Add proper indentation to first macro line
+        macros_str = self._get_katex_macros()
+        lines.append("        " + macros_str)
         lines.append("      },")
         lines.append("      throwOnError: false")
         lines.append("    });")
