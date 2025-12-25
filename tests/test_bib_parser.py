@@ -205,8 +205,7 @@ class TestBibParser:
     def test_parse_entry_with_tabs(self, parser: BibParser) -> None:
         """Test parsing entry with tab indentation (BibDesk style)."""
         bib_content = (
-            "@misc{tabbed,\n\tauthor = {Author},\n\t"
-            "title = {Title},\n\tyear = {2023}}"
+            "@misc{tabbed,\n\tauthor = {Author},\n\ttitle = {Title},\n\tyear = {2023}}"
         )
         with NamedTemporaryFile(mode="w", suffix=".bib", delete=False) as f:
             f.write(bib_content)
@@ -279,10 +278,7 @@ class TestBibParser:
     def test_parse_real_bib_file(self, parser: BibParser) -> None:
         """Test parsing a real .bib file from the examples."""
         bib_path = (
-            Path(__file__).parent.parent
-            / "examples"
-            / "user_guide"
-            / "references.bib"
+            Path(__file__).parent.parent / "examples" / "user_guide" / "references.bib"
         )
         if not bib_path.exists():
             pytest.skip("Example bib file not found")
@@ -291,4 +287,3 @@ class TestBibParser:
         assert len(result) > 0
         # Check for known entries in the example file
         assert "spivey92" in result
-

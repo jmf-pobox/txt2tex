@@ -126,6 +126,48 @@ class TestParser:
         assert isinstance(ast.right, BinaryOp)
         assert ast.right.operator == "lor"
 
+    def test_precedence_implies_iff(self) -> None:
+        """Test implies has higher precedence than iff.
+
+        Standard logic precedence: land > lor > => > <=>
+        So: true => false <=> false
+        Should parse as: (true => false) <=> false
+        Not as: true => (false <=> false)
+        """
+        lexer = Lexer("true => false <=> false")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, BinaryOp)
+        # Top-level operator should be <=> (lowest precedence)
+        assert ast.operator == "<=>"
+        # Left side should be (true => false)
+        assert isinstance(ast.left, BinaryOp)
+        assert ast.left.operator == "=>"
+        # Right side should be just false
+        assert isinstance(ast.right, Identifier)
+        assert ast.right.name == "false"
+
+    def test_precedence_iff_is_lowest(self) -> None:
+        """Test that <=> has the lowest precedence.
+
+        p land q => r <=> s lor t
+        Should parse as: ((p land q) => r) <=> (s lor t)
+        """
+        lexer = Lexer("p land q => r <=> s lor t")
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, BinaryOp)
+        # Top-level operator should be <=>
+        assert ast.operator == "<=>"
+        # Left side should be ((p land q) => r)
+        assert isinstance(ast.left, BinaryOp)
+        assert ast.left.operator == "=>"
+        # Right side should be (s lor t)
+        assert isinstance(ast.right, BinaryOp)
+        assert ast.right.operator == "lor"
+
     def test_unary_not(self) -> None:
         """Test parsing lnot operation."""
         lexer = Lexer("lnot p")

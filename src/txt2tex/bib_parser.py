@@ -197,4 +197,3 @@ class BibParser:
             end += 1
 
         return content[start : end - 1]
-
