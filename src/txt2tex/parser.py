@@ -1806,6 +1806,19 @@ class Parser:
             expression: Expr | None = None
             if self._match(TokenType.PERIOD):
                 self._advance()  # Consume '.'
+
+                # Handle continuation marker or newline after bullet separator
+                if self._match(TokenType.CONTINUATION):
+                    self._advance()  # consume \
+                    # Skip newline and any leading whitespace on next line
+                    if self._match(TokenType.NEWLINE):
+                        self._advance()
+                    self._skip_newlines()
+                elif self._match(TokenType.NEWLINE):
+                    # Allow bare newline after bullet (no backslash needed)
+                    self._advance()
+                    self._skip_newlines()
+
                 # Expression after bullet is not part of comprehension body
                 self._in_comprehension_body = False
                 expression = self._parse_iff()  # Parse the expression part
@@ -1888,6 +1901,19 @@ class Parser:
             expression: Expr | None = None
             if self._match(TokenType.PERIOD):
                 self._advance()  # Consume '.'
+
+                # Handle continuation marker or newline after bullet separator
+                if self._match(TokenType.CONTINUATION):
+                    self._advance()  # consume \
+                    # Skip newline and any leading whitespace on next line
+                    if self._match(TokenType.NEWLINE):
+                        self._advance()
+                    self._skip_newlines()
+                elif self._match(TokenType.NEWLINE):
+                    # Allow bare newline after bullet (no backslash needed)
+                    self._advance()
+                    self._skip_newlines()
+
                 # Expression after bullet is not part of comprehension body
                 self._in_comprehension_body = False
                 expression = self._parse_iff()

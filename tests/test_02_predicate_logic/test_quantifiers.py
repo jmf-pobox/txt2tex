@@ -741,3 +741,95 @@ class TestBulletSeparator:
         assert ast.body.operator == "land"
         assert isinstance(ast.expression, BinaryOp)
         assert ast.expression.operator == "=>"
+
+    def test_bullet_with_continuation_backslash(self) -> None:
+        """Test bullet separator followed by continuation backslash.
+
+        Input: forall x : N | x > 0 . \\
+                 x < 10
+
+        Should parse successfully with body=(x > 0) and expression=(x < 10).
+        """
+        text = "(forall x : N | x > 0 . \\\n  x < 10)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "forall"
+        assert ast.variables == ["x"]
+        assert isinstance(ast.body, BinaryOp)
+        assert ast.body.operator == ">"
+        assert isinstance(ast.expression, BinaryOp)
+        assert ast.expression.operator == "<"
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        assert "\\mid x > 0" in latex
+        assert "\\bullet" in latex
+        assert "x < 10" in latex
+
+    def test_bullet_with_newline_no_backslash(self) -> None:
+        """Test bullet separator followed by newline (no backslash).
+
+        Input: forall x : N | x > 0 .
+                 x < 10
+
+        Should parse successfully - newlines after bullet should be skipped.
+        """
+        text = "(forall x : N | x > 0 .\n  x < 10)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "forall"
+        assert ast.variables == ["x"]
+        assert isinstance(ast.body, BinaryOp)
+        assert ast.body.operator == ">"
+        assert isinstance(ast.expression, BinaryOp)
+        assert ast.expression.operator == "<"
+
+    def test_bullet_multiline_complex_expression(self) -> None:
+        """Test multi-line bullet separator with complex body expression.
+
+        Based on real use case from axdef with viewed function.
+        """
+        text = """(forall r : Recording | r elem ran hd .
+          r.viewed = yes => result = r)"""
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "forall"
+        assert ast.variables == ["r"]
+        # Body should be the constraint (r elem ran hd)
+        assert isinstance(ast.body, BinaryOp)
+        assert ast.body.operator == "elem"
+        # Expression should be the implication after bullet
+        assert isinstance(ast.expression, BinaryOp)
+        assert ast.expression.operator == "=>"
+
+    def test_nested_quantifier_with_bullet_multiline(self) -> None:
+        """Test nested quantifiers where inner has multi-line bullet.
+
+        Input:
+        forall h : seq N | (forall r : N | r elem ran hd .
+          r > 0)
+        """
+        text = """(forall h : seq N | (forall r : N | r elem ran hd .
+          r > 0))"""
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Quantifier)
+        assert ast.quantifier == "forall"
+        # Outer quantifier body should be inner quantifier
+        assert isinstance(ast.body, Quantifier)
+        inner = ast.body
+        assert inner.quantifier == "forall"
+        # Inner quantifier should have expression (bullet separator used)
+        assert inner.expression is not None
+        assert isinstance(inner.body, BinaryOp)
+        assert inner.body.operator == "elem"
