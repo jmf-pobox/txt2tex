@@ -1255,6 +1255,9 @@ class Parser:
         Right side can be a quantifier to support patterns like:
         exists d : Dog | gentle(d) => forall t : Trainer | groomed(d, t)
 
+        Implies is right-associative: a => b => c parses as a => (b => c)
+        Implies binds tighter than iff: a => b <=> c parses as (a => b) <=> c
+
         Supports multi-line expressions with natural line breaks.
         """
         left = self._parse_or()
@@ -1277,8 +1280,9 @@ class Parser:
             else:
                 # No line break, but still skip newlines for flexibility
                 self._skip_newlines()
-            # Use _parse_expr() to allow quantifiers on RHS
-            right = self._parse_expr()
+            # Parse RHS: allow quantifiers/lambdas/conditionals but NOT iff (<=>)
+            # This ensures => binds tighter than <=>
+            right = self._parse_implies_rhs()
             left = BinaryOp(
                 operator=op_token.value,
                 left=left,
@@ -1289,6 +1293,26 @@ class Parser:
             )
 
         return left
+
+    def _parse_implies_rhs(self) -> Expr:
+        """Parse right-hand side of implies: allows quantifiers but not iff.
+
+        This ensures proper precedence: a => b <=> c parses as (a => b) <=> c
+        while still allowing: a => forall x : T | P
+        """
+        # Check for quantifier first (forall, exists, exists1, mu)
+        if self._match(
+            TokenType.FORALL, TokenType.EXISTS, TokenType.EXISTS1, TokenType.MU
+        ):
+            return self._parse_quantifier()
+        # Check for lambda expression
+        if self._match(TokenType.LAMBDA):
+            return self._parse_lambda()
+        # Check for conditional expression (if/then/else)
+        if self._match(TokenType.IF):
+            return self._parse_conditional()
+        # Parse implies level (right-associative) - NOT iff level
+        return self._parse_implies()
 
     def _parse_or(self) -> Expr:
         """Parse or operation.
