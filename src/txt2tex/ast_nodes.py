@@ -93,6 +93,7 @@ class Quantifier(ASTNode):
     body: Expr  # Constraint (before bullet) or full body (without bullet)
     expression: Expr | None = None  # Body after bullet (all quantifiers)
     line_break_after_pipe: bool = False  # True if \ continuation after |
+    line_break_after_bullet: bool = False  # True if line break after . separator
     tuple_pattern: Expr | None = None  # Tuple pattern for destructuring
 
 

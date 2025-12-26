@@ -1183,9 +1183,20 @@ class LaTeXGenerator:
                 parts.append(body_latex)
 
             # Add @ or bullet separator and expression
-            parts.append(self._get_bullet_separator())
+            bullet_sep = self._get_bullet_separator()
             expr_latex = self.generate_expr(node.expression, parent=node)
-            parts.append(expr_latex)
+
+            # Check for line break after bullet (.)
+            if node.line_break_after_bullet:
+                # Get indentation for expression after bullet
+                expr_indent = self._get_indentation()
+                if self._in_equiv_block:
+                    parts.append(f"{bullet_sep} \\\\\n& {expr_indent} {expr_latex}")
+                else:
+                    parts.append(f"{bullet_sep} \\\\\n{expr_indent} {expr_latex}")
+            else:
+                parts.append(bullet_sep)
+                parts.append(expr_latex)
         else:
             # Standard quantifier: @ or bullet separator and body
             separator = self._get_bullet_separator()

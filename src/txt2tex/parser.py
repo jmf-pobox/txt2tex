@@ -1828,18 +1828,21 @@ class Parser:
 
             # Check for bullet separator (Q x : T | pred . expr)
             expression: Expr | None = None
+            bullet_continuation = False
             if self._match(TokenType.PERIOD):
                 self._advance()  # Consume '.'
 
                 # Handle continuation marker or newline after bullet separator
                 if self._match(TokenType.CONTINUATION):
                     self._advance()  # consume \
+                    bullet_continuation = True
                     # Skip newline and any leading whitespace on next line
                     if self._match(TokenType.NEWLINE):
                         self._advance()
                     self._skip_newlines()
                 elif self._match(TokenType.NEWLINE):
-                    # Allow bare newline after bullet (no backslash needed)
+                    # Allow bare newline after bullet (no backslash needed) - WYSIWYG
+                    bullet_continuation = True
                     self._advance()
                     self._skip_newlines()
 
@@ -1856,6 +1859,7 @@ class Parser:
             body=body,
             expression=expression,
             line_break_after_pipe=has_continuation,
+            line_break_after_bullet=bullet_continuation,
             tuple_pattern=tuple_pattern,
             line=quant_token.line,
             column=quant_token.column,
@@ -1923,18 +1927,21 @@ class Parser:
 
             # Check for bullet separator (Q x : T | pred . expr)
             expression: Expr | None = None
+            bullet_continuation = False
             if self._match(TokenType.PERIOD):
                 self._advance()  # Consume '.'
 
                 # Handle continuation marker or newline after bullet separator
                 if self._match(TokenType.CONTINUATION):
                     self._advance()  # consume \
+                    bullet_continuation = True
                     # Skip newline and any leading whitespace on next line
                     if self._match(TokenType.NEWLINE):
                         self._advance()
                     self._skip_newlines()
                 elif self._match(TokenType.NEWLINE):
-                    # Allow bare newline after bullet (no backslash needed)
+                    # Allow bare newline after bullet (no backslash needed) - WYSIWYG
+                    bullet_continuation = True
                     self._advance()
                     self._skip_newlines()
 
@@ -1950,6 +1957,7 @@ class Parser:
             domain=domain,
             body=body,
             expression=expression,
+            line_break_after_bullet=bullet_continuation,
             tuple_pattern=None,  # No tuple pattern in continuation
             line=line,
             column=column,

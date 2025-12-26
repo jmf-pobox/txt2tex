@@ -833,3 +833,42 @@ class TestBulletSeparator:
         assert inner.expression is not None
         assert isinstance(inner.body, BinaryOp)
         assert inner.body.operator == "elem"
+
+    def test_bullet_wysiwyg_line_break(self) -> None:
+        """Test WYSIWYG line break after bullet separator is preserved.
+
+        When user writes:
+        forall x : N | x > 0 .
+          x < 10
+
+        The line break after '.' should produce \\\\ in LaTeX output.
+        """
+        text = "(forall x : N | x > 0 .\n  x < 10)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Quantifier)
+        # Line break after bullet should be detected
+        assert ast.line_break_after_bullet is True
+        # Generate LaTeX and verify line break is present
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        # Should have \\ after bullet separator
+        assert "\\bullet \\\\" in latex or "@ \\\\" in latex
+
+    def test_bullet_wysiwyg_line_break_fuzz_mode(self) -> None:
+        """Test WYSIWYG line break in fuzz mode produces @ followed by \\\\."""
+        text = "(forall r : Recording | r elem ran hd .\n  r.viewed = yes)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Quantifier)
+        assert ast.line_break_after_bullet is True
+        gen = LaTeXGenerator(use_fuzz=True)
+        latex = gen.generate_expr(ast)
+        # In fuzz mode, should have @ \\ with line break
+        assert "@ \\\\" in latex
+        # Expression should be on next line with indentation
+        assert "\\t" in latex or "\\quad" in latex
