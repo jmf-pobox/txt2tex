@@ -3501,7 +3501,11 @@ class LaTeXGenerator:
         """
         result = text
 
-        # Handle sequences FIRST (before operators containing < or >)
+        # Handle specific operators FIRST before sequence matching
+        # <=> must be replaced before sequences or it gets matched as <=>
+        result = result.replace("<=>", r"$\Leftrightarrow$")  # Logical equivalence
+
+        # Handle sequences (before other operators containing < or >)
         # Match sequences: < followed by anything except < or >, then >
         # This handles both <> (empty) and <a, b, c> (non-empty)
         result = re.sub(r"<\s*>", r"$\\langle \\rangle$", result)  # Empty sequence
@@ -3516,7 +3520,6 @@ class LaTeXGenerator:
         result = result.replace("-->>", r"$\surj$")  # Total surjection
 
         # 3-character operators (process before 2-character)
-        result = result.replace("<=>", r"$\Leftrightarrow$")  # Logical equivalence
         result = result.replace("<<|", r"$\ndres$")  # Domain corestriction
         result = result.replace("|>>", r"$\nrres$")  # Range corestriction
         result = result.replace("|->", r"$\mapsto$")  # Maplet (MUST be before ->)

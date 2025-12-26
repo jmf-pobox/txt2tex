@@ -782,6 +782,7 @@ class Parser:
         - ["length", "(", "<", "ple", ">", "^", "pl", ")"] → "length(<ple>^pl)"
         - ["commutativity", "of", "or"] → "commutativity of or"
         - ["x", "is", "not", "free", "in", "y", "|->", "z"] → "x is not free in y|->z"
+        - ["def", ".", "of", "=>"] → "def. of =>" (preserves space before =>)
         """
         if not parts:
             return ""
@@ -793,7 +794,10 @@ class Parser:
         # ONLY touch safe characters that aren't part of operators
         result = re.sub(r"\s*\(\s*", "(", result)  # Remove space before/after (
         result = re.sub(r"\s*\)\s*", ")", result)  # Remove space before/after )
-        result = re.sub(r"\s*=\s*", "=", result)  # Remove space around =
+        # Remove space around standalone = but NOT part of operators (=>, <=>)
+        # Negative lookahead/lookbehind avoids matching = in operators
+        result = re.sub(r"\s*(?<![<>])=(?![>])\s*", "=", result)
+        result = re.sub(r"\s*\.", ".", result)  # Remove space BEFORE period only
         return re.sub(r"\s*,", ",", result)  # Remove space BEFORE comma only
 
         # DO NOT touch < or > as they appear in many operators (=>, ->>, etc.)

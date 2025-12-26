@@ -138,3 +138,20 @@ class TestParserSmartJoinJustification:
         parts = ["length", "(", "x", ")"]
         result = parser._smart_join_justification(parts)
         assert "length(x)" in result
+
+    def test_smart_join_preserves_space_before_implies(self) -> None:
+        """Test that space before => is preserved (not removed by = regex)."""
+        parser = Parser([])
+        parts = ["def", ".", "of", "=>"]
+        result = parser._smart_join_justification(parts)
+        assert "def." in result
+        assert "of =>" in result
+
+    def test_smart_join_removes_space_before_period(self) -> None:
+        """Test that space before period is removed."""
+        parser = Parser([])
+        parts = ["def", ".", "of", "=>"]
+        result = parser._smart_join_justification(parts)
+        # Should be "def. of =>" not "def . of =>"
+        assert "def." in result
+        assert " ." not in result
