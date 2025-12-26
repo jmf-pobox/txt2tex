@@ -134,3 +134,42 @@ class TestProofTreeOperatorOrdering:
         assert "\\mapsto" in latex
         assert "|\\fun" not in latex
         assert "|$\\fun$" not in latex
+
+    def test_biimplication_not_matched_as_sequence(self) -> None:
+        """Test that <=> is not incorrectly matched as sequence <=>."""
+        text = "EQUIV:\np <=> q\nq <=> p [definition of <=>]"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        gen = LaTeXGenerator()
+        latex = gen.generate_document(ast)
+        # <=> should become \Leftrightarrow, not \langle = \rangle
+        assert "\\mbox{definition of $\\Leftrightarrow$}" in latex
+        assert "\\langle = \\rangle" not in latex
+
+    def test_biimplication_standalone_in_justification(self) -> None:
+        """Test that [<=>] works as a justification."""
+        text = "EQUIV:\np <=> q\nq <=> p [<=>]"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        gen = LaTeXGenerator()
+        latex = gen.generate_document(ast)
+        # <=> should become \Leftrightarrow
+        assert "\\mbox{$\\Leftrightarrow$}" in latex
+        assert "\\langle = \\rangle" not in latex
+
+    def test_implies_space_preserved_in_justification(self) -> None:
+        """Test that [def. of =>] preserves space before =>."""
+        text = "EQUIV:\np => q\nlnot p lor q [def. of =>]"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        gen = LaTeXGenerator()
+        latex = gen.generate_document(ast)
+        # Should have "def. of" with period attached and space before =>
+        assert "\\mbox{def. of $\\Rightarrow$}" in latex
+        assert "def . of" not in latex  # No space before period
