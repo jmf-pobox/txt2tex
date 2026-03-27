@@ -1167,7 +1167,6 @@ The argue environment's use of raw `\halign` makes this impossible - it cannot b
 ## Future Enhancements
 
 1. **Export formats**
-   - HTML with KaTeX
    - Plain text (pretty-printed)
 
 2. **LSP + IDE Integration**

@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `py.typed` marker (PEP 561)
 - CHANGELOG.md
 
+### Removed
+- HTML export with KaTeX rendering (`--html`, `--validate` flags)
+- Bibliography parser (`bib_parser.py`) — was only used by KaTeX export
+
 ### Fixed
 - Stale version `0.1.0` in `__init__.py` (now imports from `__version__.py`)
 
