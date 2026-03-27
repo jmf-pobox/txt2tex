@@ -37,7 +37,7 @@ Essential reading for understanding the project:
 - **[docs/guides/USER_GUIDE.md](docs/guides/USER_GUIDE.md)** - User-facing syntax guide, whiteboard notation reference
 - **[docs/guides/PROOF_SYNTAX.md](docs/guides/PROOF_SYNTAX.md)** - Proof tree syntax and formatting rules
 - **[docs/guides/FUZZ_VS_STD_LATEX.md](docs/guides/FUZZ_VS_STD_LATEX.md)** - Fuzz vs standard LaTeX differences (critical for understanding fuzz quirks)
-- **[docs/guides/FUZZ_FEATURE_GAPS.md](docs/guides/FUZZ_FEATURE_GAPS.md)** - Missing Z notation features, implementation roadmap
+- **[docs/guides/MISSING_FEATURES.md](docs/guides/MISSING_FEATURES.md)** - Missing Z notation features, implementation roadmap
 
 **Note**: Always check FUZZ_VS_STD_LATEX.md when debugging LaTeX/PDF rendering issues - fuzz has different requirements than standard LaTeX.
 

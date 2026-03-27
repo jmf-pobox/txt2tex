@@ -524,7 +524,7 @@ A few edge cases require workarounds:
 ### User Guides
 - **[docs/guides/USER_GUIDE.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/USER_GUIDE.md)** - Complete syntax reference
 - **[docs/guides/FUZZ_VS_STD_LATEX.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/FUZZ_VS_STD_LATEX.md)** - Fuzz compatibility guide
-- **[docs/guides/FUZZ_FEATURE_GAPS.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/FUZZ_FEATURE_GAPS.md)** - Missing features
+- **[docs/guides/MISSING_FEATURES.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/MISSING_FEATURES.md)** - Missing features
 - **[docs/guides/PROOF_SYNTAX.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/PROOF_SYNTAX.md)** - Proof tree notation
 
 ### Tutorials
