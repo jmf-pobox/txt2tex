@@ -61,7 +61,7 @@ When reviewing code or proposals:
 **Quality Verification:**
 
 Before approving any change, confirm:
-- Does this maintain or improve test coverage (1137 tests passing)?
+- Does this maintain or improve test coverage?
 - Does this follow clean parser-AST-generator architecture?
 - Is this extensible for new Z notation features?
 - Does this pass all mandatory workflow checks?

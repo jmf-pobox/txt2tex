@@ -50,7 +50,7 @@ Your core workflow:
 **Critical Requirements**:
 - ZERO tolerance for MyPy errors (--strict mode)
 - ZERO tolerance for Ruff violations
-- All 1137 tests must pass before declaring success
+- All tests must pass before declaring success
 - Never skip quality checks to save time
 - Always run the complete sequence, never partial checks
 - Maintain project's test coverage requirement

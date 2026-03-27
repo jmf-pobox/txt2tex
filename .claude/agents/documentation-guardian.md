@@ -287,7 +287,7 @@ When responding to documentation requests:
 
 Report status clearly:
 - ✅ "USER_GUIDE.md updated with quantifier bullet syntax examples"
-- ⚠️ "STATUS.md shows 1137 tests but latest run shows 1145 - needs update"
+- ⚠️ "STATUS.md test count is stale — run `make test` to get current count"
 - 🔧 "Added missing docstrings to parser.py:234-567"
 
 ## Documentation Philosophy
