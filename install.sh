@@ -28,7 +28,7 @@ for cmd in python3 python; do
     PY_VERSION=$("$cmd" -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
     PY_MAJOR=$("$cmd" -c 'import sys; print(sys.version_info.major)')
     PY_MINOR=$("$cmd" -c 'import sys; print(sys.version_info.minor)')
-    if [ "$PY_MAJOR" -ge 3 ] && [ "$PY_MINOR" -ge 12 ]; then
+    if [ "$PY_MAJOR" -gt 3 ] || { [ "$PY_MAJOR" -eq 3 ] && [ "$PY_MINOR" -ge 12 ]; }; then
       PYTHON="$cmd"
       ok "Python $PY_VERSION found ($cmd)"
       break
@@ -46,13 +46,13 @@ info "Installing txt2tex..."
 
 if command -v uv >/dev/null 2>&1; then
   ok "uv found"
-  uv tool install txt2tex 2>/dev/null && ok "txt2tex installed via uv" || {
-    uv tool install --upgrade txt2tex 2>/dev/null && ok "txt2tex upgraded via uv"
+  uv tool install txt2tex && ok "txt2tex installed via uv" || {
+    uv tool install --upgrade txt2tex && ok "txt2tex upgraded via uv"
   }
 elif command -v pipx >/dev/null 2>&1; then
   ok "pipx found"
-  pipx install txt2tex 2>/dev/null && ok "txt2tex installed via pipx" || {
-    pipx upgrade txt2tex 2>/dev/null && ok "txt2tex upgraded via pipx"
+  pipx install txt2tex && ok "txt2tex installed via pipx" || {
+    pipx upgrade txt2tex && ok "txt2tex upgraded via pipx"
   }
 else
   warn "Neither uv nor pipx found — using pip"
@@ -63,8 +63,10 @@ if command -v txt2tex >/dev/null 2>&1; then
   ok "txt2tex command available: $(txt2tex --help 2>&1 | head -1)"
 else
   warn "txt2tex installed but not on PATH"
-  printf '  You may need to add ~/.local/bin to your PATH:\n'
-  printf '    export PATH="$HOME/.local/bin:$PATH"\n'
+  USER_BASE=$("$PYTHON" -m site --user-base 2>/dev/null || echo "$HOME/.local")
+  USER_BIN="$USER_BASE/bin"
+  printf '  You may need to add %s to your PATH:\n' "$USER_BIN"
+  printf '    export PATH="%s:$PATH"\n' "$USER_BIN"
 fi
 
 # --- Step 3: LaTeX distribution ---
@@ -91,15 +93,15 @@ if [ "$TEX_OK" -eq 1 ]; then
   MISSING_PKGS=""
   for pkg in adjustbox natbib geometry amsfonts hyperref; do
     TEST_DOC="\\documentclass{article}\\usepackage{$pkg}\\begin{document}test\\end{document}"
-    TMPDIR=$(mktemp -d)
-    printf '%s' "$TEST_DOC" > "$TMPDIR/test.tex"
-    if pdflatex -interaction=batchmode -halt-on-error -output-directory="$TMPDIR" "$TMPDIR/test.tex" >/dev/null 2>&1; then
+    TEST_DIR=$(mktemp -d "${TMPDIR:-/tmp}/txt2tex.XXXXXX") || fail "Failed to create temporary directory"
+    printf '%s' "$TEST_DOC" > "$TEST_DIR/test.tex"
+    if pdflatex -interaction=batchmode -halt-on-error -output-directory="$TEST_DIR" "$TEST_DIR/test.tex" >/dev/null 2>&1; then
       ok "LaTeX package: $pkg"
     else
       warn "LaTeX package missing: $pkg"
       MISSING_PKGS="$MISSING_PKGS $pkg"
     fi
-    rm -rf "$TMPDIR"
+    rm -rf "$TEST_DIR"
   done
 
   if [ -n "$MISSING_PKGS" ]; then

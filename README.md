@@ -21,13 +21,13 @@ Perfect for:
 
 ## Installation
 
-### Quick Install (recommended)
+### Quick Install (macOS / Linux)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jmf-pobox/txt2tex/main/install.sh | sh
 ```
 
-This installs txt2tex, checks for LaTeX and optional tools (fuzz, latexmk), and provides platform-specific guidance for anything missing.
+This installs txt2tex, checks for LaTeX and optional tools (fuzz, latexmk), and provides platform-specific guidance for anything missing. Windows users: see [Manual Install](#manual-install) below.
 
 ---
 
