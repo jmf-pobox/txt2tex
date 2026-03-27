@@ -21,14 +21,17 @@ Perfect for:
 
 ## Installation
 
-There are two ways to use txt2tex:
+### Quick Install (macOS / Linux)
 
-- **End users**: Install via pip to use txt2tex on your own files
-- **Developers/learners**: Clone the repo to work with examples or contribute
+```bash
+curl -fsSL https://raw.githubusercontent.com/jmf-pobox/txt2tex/main/install.sh | sh
+```
+
+This installs txt2tex, checks for LaTeX and optional tools (fuzz, latexmk), and provides platform-specific guidance for anything missing. Windows users: see [Manual Install](#manual-install) below.
 
 ---
 
-### For End Users (pip install)
+### Manual Install
 
 #### Step 1: Install txt2tex
 
