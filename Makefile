@@ -30,7 +30,7 @@ build:
 	uvx twine check dist/*
 
 clean:
-	rm -rf dist/ build/ *.egg-info htmlcov/ .coverage
+	rm -rf dist/ build/ *.egg-info htmlcov/ .coverage || true
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name .mypy_cache -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name .ruff_cache -exec rm -rf {} + 2>/dev/null || true

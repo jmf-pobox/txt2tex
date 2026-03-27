@@ -92,7 +92,7 @@ All feature tests pass. They document working features.
 ## Quick Status Check
 
 ```bash
-cd /path/to/txt2tex/sem
+cd /path/to/txt2tex
 for f in tests/bugs/*.txt; do
   echo -n "$(basename $f): "
   uv run txt2tex "$f" --tex-only >/dev/null 2>&1 && echo "PASS" || echo "LIMITATION"

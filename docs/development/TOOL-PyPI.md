@@ -33,16 +33,13 @@ uv run --isolated --with dist/txt2tex-*.whl -- txt2tex --help
 
 ## 5. Upload to PyPI
 
-**Automated (preferred):** Push a version tag to trigger the release workflow:
+```sh
+uvx twine upload dist/*
+```
+Tag the release in git:
 ```sh
 git tag vX.Y.Z
 git push origin main vX.Y.Z
-```
-The `release.yml` workflow handles build, TestPyPI, verification, and PyPI upload via trusted publishing (OIDC — no tokens needed).
-
-**Manual (fallback):**
-```sh
-uvx twine upload dist/*
 ```
 
 ---
