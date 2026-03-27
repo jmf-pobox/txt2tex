@@ -85,7 +85,7 @@ Uses latexmk (when available) for robust compilation. latexmk automatically hand
 make -C examples all
 ```
 
-Uses the txt2tex CLI via hatch.
+Uses the txt2tex CLI via the examples Makefile.
 
 ### Verification
 

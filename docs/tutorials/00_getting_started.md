@@ -17,7 +17,7 @@ txt2tex is a tool that converts whiteboard-style mathematical notation into beau
 
 ### Prerequisites
 
-1. **Python 3.8+** - The txt2tex tool is written in Python
+1. **Python 3.12+** - The txt2tex tool is written in Python
 2. **LaTeX distribution** - For PDF generation (TeX Live recommended)
 3. **fuzz** (optional) - For Z notation type checking
 
@@ -27,11 +27,11 @@ txt2tex is a tool that converts whiteboard-style mathematical notation into beau
 # Clone the repository
 cd /path/to/txt2tex
 
-# Install with hatch (development mode)
-hatch env create
+# Install dependencies
+uv sync --group dev
 
 # Verify installation
-hatch run cli --help
+uv run txt2tex --help
 ```
 
 ## Your First Document

@@ -25,13 +25,24 @@ git branch -d feat/description
 **CI runs these commands on all PRs:**
 
 ```bash
-hatch run lint           # Ruff linting
-hatch run type           # MyPy type checking (strict)
-hatch run format --check # Code formatting
-hatch run test-cov       # Tests with coverage
+make lint           # Ruff linting
+make format-check   # Code formatting
+make type           # MyPy type checking (strict)
+make type-pyright   # Pyright type checking (strict)
+make test-cov       # Tests with coverage
 ```
 
-**Local development:** Run `hatch run check` before pushing (runs lint + type + test).
+**Local development:** Run `make check` before pushing (runs all of the above).
+
+## Toolchain
+
+| Tool | Purpose | Command |
+|------|---------|---------|
+| **uv** | Package manager, virtualenv, task runner | `uv sync`, `uv run` |
+| **ruff** | Linting and formatting | `make lint`, `make format` |
+| **mypy** | Type checking (strict) | `make type` |
+| **pyright** | Type checking (strict, second opinion) | `make type-pyright` |
+| **pytest** | Testing | `make test` |
 
 ## Commit Messages
 

@@ -36,7 +36,7 @@ There are two ways to use txt2tex:
 pip install txt2tex
 ```
 
-Requires **Python 3.10+**. This gives you the `txt2tex` command.
+Requires **Python 3.12+**. This gives you the `txt2tex` command.
 
 #### Step 2: Install LaTeX (Required for PDF output)
 
@@ -106,28 +106,24 @@ To work with examples, run tests, or contribute:
 git clone https://github.com/jmf-pobox/txt2tex.git
 cd txt2tex
 
-# Install hatch (Python project manager)
-pip install hatch
+# Install uv (Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Enter a development shell (installs dependencies automatically)
-hatch shell
+# Install dependencies
+uv sync --group dev
 
 # Now txt2tex works directly
-txt2tex examples/01_propositional_logic/hello_world.txt
+uv run txt2tex examples/01_propositional_logic/hello_world.txt
 ```
-
-**Note:** Always run `hatch shell` first after cloning. This enters a virtual environment where `txt2tex` and all dev tools are available.
 
 #### Development Commands
 
-Inside `hatch shell`:
-
 ```bash
 # Run all quality checks (lint, type check, tests)
-hatch run check
+make check
 
 # Run tests only
-hatch run test
+make test
 
 # Build all examples
 cd examples && make
@@ -381,9 +377,9 @@ The `examples/` directory contains **141 working examples** organized by topic. 
 - **user_guide** - Examples from the user guide documentation
 
 ```bash
-# After cloning and entering hatch shell:
+# After cloning:
 cd txt2tex
-hatch shell
+uv sync --group dev
 
 # Build all examples
 cd examples && make
@@ -556,7 +552,7 @@ A few edge cases require workarounds:
 Contributions welcome! See [For Developers](#for-developers-git-clone) for setup instructions.
 
 1. Read [docs/DESIGN.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/DESIGN.md) for architecture overview
-2. Follow quality gates: `hatch run check` (type, lint, format, test)
+2. Follow quality gates: `make check` (lint, format, type, test)
 3. Add tests for new features
 4. Update documentation
 

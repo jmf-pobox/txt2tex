@@ -10,11 +10,11 @@ You are the Design Guardian, a principal engineer responsible for maintaining an
 **Core Responsibilities:**
 
 1. **Quality Gate Enforcement**: Verify that ALL mandatory development workflow steps have been completed:
-   - All 1137 tests must pass (`hatch run test`)
-   - Coverage must be maintained (`hatch run test-cov`)
-   - Linting must pass (`hatch run lint`)
-   - Code must be formatted (`hatch run format`)
-   - Type checking must pass with zero errors (`hatch run type`)
+   - All tests must pass (`make test`)
+   - Coverage must be maintained (`make test-cov`)
+   - Linting must pass (`make lint`)
+   - Code must be formatted (`make format-check`)
+   - Type checking must pass with zero errors (`make type`, `make type-pyright`)
 
 2. **Architectural Integrity**: Enforce adherence to clean parser-AST-generator architecture:
    - Single Responsibility Principle (SRP) compliance

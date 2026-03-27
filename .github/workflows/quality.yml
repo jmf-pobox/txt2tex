@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.12", "3.13"]
 
     steps:
     - name: Checkout code
@@ -22,8 +22,11 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install Hatch
-      run: pip install hatch
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+
+    - name: Install dependencies
+      run: uv sync --frozen --group dev
 
     - name: Install TeX Live
       run: |
@@ -31,16 +34,19 @@ jobs:
         sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended
 
     - name: Run Ruff linting
-      run: hatch run lint
-
-    - name: Run MyPy type checking (strict mode)
-      run: hatch run type
+      run: make lint
 
     - name: Check code formatting
-      run: hatch run format --check
+      run: make format-check
+
+    - name: Run MyPy type checking (strict mode)
+      run: make type
+
+    - name: Run Pyright type checking
+      run: make type-pyright
 
     - name: Run tests with coverage
-      run: hatch run test-cov
+      run: make test-cov
 
     - name: Upload coverage to Codecov
       if: matrix.python-version == '3.13'

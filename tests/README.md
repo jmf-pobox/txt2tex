@@ -138,40 +138,40 @@ Error handling and boundary conditions.
 
 ### Run All Tests
 ```bash
-hatch run test
+make test
 ```
 
 ### Run Specific Lecture Tests
 ```bash
 # Lecture 1: Propositional logic
-hatch run test tests/test_01_propositional_logic/
+make test ARGS="tests/test_01_propositional_logic/"
 
 # Lecture 5: Sets
-hatch run test tests/test_05_sets/
+make test ARGS="tests/test_05_sets/"
 
 # Lecture 8: Functions
-hatch run test tests/test_08_functions/
+make test ARGS="tests/test_08_functions/"
 ```
 
 ### Run Specific Test File
 ```bash
-hatch run test tests/test_03_equality/test_equality_operators.py
+make test ARGS="tests/test_03_equality/test_equality_operators.py"
 ```
 
 ### Run Specific Test
 ```bash
-hatch run test tests/test_01_propositional_logic/test_operators.py::TestLexer::test_single_identifier
+make test ARGS="tests/test_01_propositional_logic/test_operators.py::TestLexer::test_single_identifier"
 ```
 
 ### Run with Verbose Output
 ```bash
-hatch run test -v
-hatch run test tests/test_04_proof_trees/ -v
+make test ARGS="-v"
+make test ARGS="tests/test_04_proof_trees/ -v"
 ```
 
 ### Run with Coverage
 ```bash
-hatch run test-cov
+make test-cov
 ```
 
 ## Test Statistics
@@ -198,7 +198,7 @@ When adding new tests:
 2. **Follow naming conventions**: Use descriptive names (test_feature_name.py)
 3. **Include docstrings**: Document what each test verifies
 4. **Test incrementally**: Add tests as you implement features
-5. **Run quality gates**: Ensure `hatch run check` passes
+5. **Run quality gates**: Ensure `make check` passes
 
 ## Test File Structure
 

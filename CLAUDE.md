@@ -47,11 +47,12 @@ Essential reading for understanding the project:
 
 ### Required Quality Gates (Run After EVERY Code Change)
 ```bash
-hatch run type           # 1. ZERO MyPy errors (strict mode)
-hatch run lint           # 2. ZERO Ruff violations
-hatch run format         # 3. Perfect formatting
-hatch run test           # 4. ALL tests pass
-hatch run test-cov       # 5. Coverage maintained
+make type           # 1. ZERO MyPy errors (strict mode)
+make type-pyright   # 2. ZERO Pyright errors (strict mode)
+make lint           # 3. ZERO Ruff violations
+make format         # 4. Perfect formatting
+make test           # 5. ALL tests pass
+make test-cov       # 6. Coverage maintained
 ```
 
 ### Code Standards (MANDATORY)
@@ -98,7 +99,7 @@ hatch run test-cov       # 5. Coverage maintained
 
 ## Workflow Commands
 
-**ALWAYS use these commands (defined in pyproject.toml):**
+**ALWAYS use `make` targets (defined in Makefile, backed by uv):**
 
 ### Development Workflow
 ```bash
@@ -112,21 +113,22 @@ txt2tex <file> --tex-only
 txt2tex <file> --format
 
 # Quality gates (run after every change)
-hatch run type           # Type checking with mypy
-hatch run lint           # Linting with ruff
-hatch run format         # Format code
-hatch run test           # Run ALL tests
-hatch run test-cov       # Run tests with coverage
+make type           # Type checking with mypy
+make type-pyright   # Type checking with pyright
+make lint           # Linting with ruff
+make format         # Format code
+make test           # Run ALL tests
+make test-cov       # Run tests with coverage
 
-# Run specific tests (use hatch run test with path arguments)
-hatch run test tests/test_08_functions/test_lambda_expressions.py                         # Single file
-hatch run test tests/test_08_functions/test_lambda_expressions.py -v                      # Verbose output
-hatch run test tests/test_08_functions/test_lambda_expressions.py::TestLambdaParsing     # Single test class
-hatch run test tests/test_08_functions/test_lambda_expressions.py::TestLambdaParsing::test_simple_lambda -v  # Single test method
+# Run specific tests
+make test ARGS="tests/test_08_functions/test_lambda_expressions.py"                                          # Single file
+make test ARGS="tests/test_08_functions/test_lambda_expressions.py -v"                                       # Verbose output
+make test ARGS="tests/test_08_functions/test_lambda_expressions.py::TestLambdaParsing"                       # Single test class
+make test ARGS="tests/test_08_functions/test_lambda_expressions.py::TestLambdaParsing::test_simple_lambda -v" # Single test method
 
 # Combined quality check
-hatch run check          # lint + type + test
-hatch run check-cov      # lint + type + test-cov
+make check          # lint + format-check + type + type-pyright + test
+make check-cov      # lint + format-check + type + type-pyright + test-cov
 ```
 
 **Important**: The CLI copies bundled .sty/.mf files automatically and uses latexmk for bibliography handling when available.
@@ -357,7 +359,7 @@ If starting fresh from the project root:
 2. Test files are in parent directory `./tests/`
 3. Use workflow commands at the top of this document
 4. Reference this document for context
-- always run hatch run check before each micro-commit and solve 100% of any issues reported
+- always run make check before each micro-commit and solve 100% of any issues reported
 - there are no pre-existing issues that should be used to justify anything
 - success is defined as 100%. Do not ask to settle for lower standards of success.
 - you should always find the root cause, which you can do it if you are patient and tenacious

@@ -176,7 +176,7 @@ def temp_input_file_with_schema(tmp_path: Path) -> Path:
 **Style:**
 - Use present tense for current features ("The parser handles...")
 - Use future tense for planned features ("Will support...")
-- Use imperative for instructions ("Run `hatch run test` to...")
+- Use imperative for instructions ("Run `make test` to...")
 - Use **bold** for emphasis, `code` for commands/variables
 - Bullet points for lists, numbered lists for sequences
 
