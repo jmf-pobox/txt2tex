@@ -2182,7 +2182,7 @@ For more information:
 ### Reference Documentation
 - **[Proof Syntax Guide](PROOF_SYNTAX.md)** - Detailed proof tree formatting rules
 - **[Fuzz vs Standard LaTeX](FUZZ_VS_STD_LATEX.md)** - Understanding fuzz typechecker quirks
-- **[Feature Gaps](FUZZ_FEATURE_GAPS.md)** - Known limitations and workarounds
+- **[Feature Gaps](MISSING_FEATURES.md)** - Known limitations and workarounds
 
 ### Development Resources
 - **[Missing Features](MISSING_FEATURES.md)** - Features not yet implemented
