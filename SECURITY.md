@@ -41,5 +41,5 @@ Out of scope:
 When using txt2tex:
 - Only process trusted input files
 - Review generated LaTeX before compilation in sensitive environments
-- Keep dependencies updated (`hatch run pip list --outdated`)
+- Keep dependencies updated (`uv pip list --outdated`)
 

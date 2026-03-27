@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "txt2tex"
 description = "Convert whiteboard-style mathematical notation to high-quality LaTeX"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = {text = "MIT"}
 authors = [
     { name = "JF", email = "jmf@pobox.com" },
@@ -16,9 +16,8 @@ dynamic = ["version"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Topic :: Text Processing :: Markup :: LaTeX",
@@ -34,12 +33,13 @@ classifiers = [
 [project.scripts]
 txt2tex = "txt2tex.cli:main"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "ruff>=0.13.0",
     "mypy>=1.18.1",
     "pyright>=1.1.0",
     "pytest>=8.4.2",
+    "pytest-cov>=4.0.0",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -58,51 +58,9 @@ exclude = [
 [tool.hatch.version]
 path = "src/txt2tex/__version__.py"
 
-[tool.hatch.envs.default]
-dependencies = [
-    "ruff>=0.13.0",
-    "mypy>=1.18.1",
-    "pyright>=1.1.0",
-    "pytest>=8.4.2",
-    "pytest-cov>=4.0.0",
-    # Complexity metrics
-    "radon>=6.0.1",
-    "xenon>=0.9.1",
-    # Migration script
-    "anthropic>=0.40.0",
-]
-
-[tool.hatch.envs.default.scripts]
-test = "PYTHONPATH=src pytest {args:tests}"
-test-cov = "PYTHONPATH=src pytest --cov=src/txt2tex --cov-report=term-missing --cov-report=html {args:tests}"
-lint = "ruff check ."
-format = "ruff format ."
-format-check = "ruff format --check ."
-type = "mypy src/txt2tex tests"
-type-quick = "mypy"
-type-pyright = "pyright"
-type-pyright-stats = "pyright --stats"
-type-all = ["type", "type-pyright"]
-check = ["lint", "type", "type-pyright", "test"]
-check-cov = ["lint", "type", "type-pyright", "test-cov"]
-# CLI wrapper - use for generating LaTeX
-cli = "PYTHONPATH=src python -m txt2tex.cli {args}"
-# QA check - single PDF
-qa-check = "./qa_check.sh {args}"
-# QA check - all PDFs in hw/ and examples/
-qa-check-all = "./qa_check_all.sh"
-# Complexity metrics
-complexity = "radon cc src/ -s -a"
-complexity-detailed = "radon cc src/ -s"
-complexity-json = "radon cc src/ -j"
-maintainability = "radon mi src/ -s"
-raw-metrics = "radon raw src/ -s"
-complexity-check = "xenon --max-absolute C --max-modules C --max-average B src/"
-complexity-monitor = ["complexity", "maintainability"]
-
 [tool.ruff]
 line-length = 88
-target-version = "py310"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = [
@@ -169,7 +127,7 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.12"
 strict = true
 warn_return_any = true
 warn_unused_configs = true
@@ -193,9 +151,8 @@ disallow_untyped_defs = false
 [tool.pytest.ini_options]
 minversion = "8.0"
 addopts = "-ra -q"
-testpaths = [
-    "tests",
-]
+testpaths = ["tests"]
+pythonpath = ["src"]
 
 [tool.coverage.run]
 source = ["src"]
@@ -223,29 +180,3 @@ max-complexity = 30
 [tool.ruff.lint.isort]
 known-first-party = ["txt2tex"]
 combine-as-imports = true
-
-# Radon complexity thresholds
-# Cyclomatic Complexity grades: A=1-5, B=6-10, C=11-20, D=21-50, E=51-100, F=100+
-# Maintainability Index grades: A=20-100, B=10-19, C=0-9
-[tool.radon]
-exclude = "tests/*,*/__init__.py"
-# Set thresholds for failing
-cc_min = "B"  # Fail if any function has CC > 10
-mi_min = "B"  # Fail if any module has MI < 10
-
-# Publishing environment for PyPI uploads
-[tool.hatch.envs.publish]
-dependencies = [
-    "build",
-    "twine",
-]
-
-[tool.hatch.envs.publish.scripts]
-build = "python -m build"
-upload = "twine upload dist/*"
-check = "twine check dist/*"
-test-publish = [
-    "python -m build",
-    "twine check dist/*",
-    "twine upload --repository testpypi dist/*"
-]

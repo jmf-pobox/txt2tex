@@ -25,7 +25,7 @@ The parser fails when prose containing mathematical expressions is followed by p
 ## Reproduction Steps
 
 ```bash
-hatch run convert tests/bugs/bug1_prose_period.txt
+uv run txt2tex tests/bugs/bug1_prose_period.txt
 ```
 
 ## Expected Behavior
@@ -86,7 +86,7 @@ TEXT: Consider the expression (mu p : ran hd; q : ran hd | p /= q | p.2 > q.2).
 ## Reproduction Steps
 
 ```bash
-hatch run convert tests/bugs/bug2_multiple_pipes.txt
+uv run txt2tex tests/bugs/bug2_multiple_pipes.txt
 pdftotext tests/bugs/bug2_multiple_pipes.pdf -
 ```
 
@@ -152,7 +152,7 @@ end
 ## Reproduction Steps
 
 ```bash
-hatch run convert tests/bugs/bug3_compound_id.txt
+uv run txt2tex tests/bugs/bug3_compound_id.txt
 ```
 
 ## Expected Behavior

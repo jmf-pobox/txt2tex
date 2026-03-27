@@ -21,7 +21,7 @@ Brief description of the bug.
 ## Reproduction Steps
 
 ```bash
-hatch run convert tests/bugs/bugX_name.txt
+uv run txt2tex tests/bugs/bugX_name.txt
 ```
 
 ## Expected Behavior

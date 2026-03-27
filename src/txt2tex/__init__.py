@@ -1,3 +1,5 @@
 """txt2tex - Convert whiteboard-style mathematical notation to LaTeX."""
 
-__version__ = "0.1.0"
+from txt2tex.__version__ import __version__
+
+__all__ = ["__version__"]

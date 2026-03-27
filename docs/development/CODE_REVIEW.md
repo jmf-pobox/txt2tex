@@ -218,6 +218,6 @@ A loop variable is reused in nested context. Generally safe but can be confusing
 ### Refactoring Guardrails
 
 When making changes:
-- Run `hatch run check` after every micro-change
+- Run `make check` after every micro-change
 - Small commits (1-5 files, <100 LOC)
 - Structure-only changes with identical observable behavior

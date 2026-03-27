@@ -14,8 +14,7 @@
   "reportUnknownMemberType": "warning",
   "reportUnknownVariableType": "warning",
   "reportMissingTypeStubs": "none",
-  "pythonVersion": "3.10",
-  "pythonPlatform": "Darwin",
+  "pythonVersion": "3.12",
   "strict": [
     "src/txt2tex"
   ],

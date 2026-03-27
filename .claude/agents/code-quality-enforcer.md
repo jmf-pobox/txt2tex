@@ -12,10 +12,11 @@ Your core workflow:
 
 1. **Immediate Quality Assessment**: After any file edit, automatically run the complete quality gate sequence:
    ```bash
-   hatch run type          # MyPy type checking - ZERO errors required
-   hatch run lint          # Ruff linting with auto-fixes
-   hatch run format        # Code formatting
-   hatch run test          # All 1137 tests to verify functionality
+   make type          # MyPy type checking - ZERO errors required
+   make type-pyright   # Pyright type checking - ZERO errors required
+   make lint          # Ruff linting with auto-fixes
+   make format        # Code formatting
+   make test          # All tests to verify functionality
    ```
 
 2. **Violation Analysis**: For each tool that reports issues:

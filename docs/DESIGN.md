@@ -993,7 +993,7 @@ txt2tex is feature-complete for typical Z specifications. See [MISSING_FEATURES.
 
 ### Language
 
-**Python 3.10+**
+**Python 3.12+**
 - Good library support
 - Dataclasses for AST nodes
 - Type hints for maintainability
