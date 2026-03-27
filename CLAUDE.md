@@ -73,11 +73,21 @@ make test-cov       # 6. Coverage maintained
 - ❌ No `hasattr()` - use protocols instead
 - ❌ No duck typing - use explicit protocol inheritance
 
-### Micro-Commit Workflow (MANDATORY)
+### Development Workflow (MANDATORY)
+
+Every code change follows this pipeline:
+
+1. **Branch**: `git checkout -b <prefix>/short-description main`
+2. **Implement**: Write tests first when feasible. Write code. Run `make check` — zero violations.
+3. **Document**: Update CHANGELOG.md under `## [Unreleased]`. Update README/DESIGN.md if user-facing.
+4. **Review**: Run `design-guardian` agent on the diff. Run `code-quality-enforcer` agent. Fix all findings.
+5. **Consult `jms` agent** when implementing new Z notation features, debugging fuzz errors, or resolving operator precedence questions.
+6. **Ship**: Commit (conventional message), push, create PR, watch CI, resolve comments, merge.
+
+**Commit discipline:**
 - **One change** = One commit (extract function, fix bug, add test)
 - **Commit size limits**: 1-5 files, <100 lines preferred
-- **Branch workflow**: ALL development on feature branches
-- **Quality gates between commits**: Run all 5 commands above
+- **Quality gates between commits**: `make check` must pass
 
 ### Communication Standards
 - ❌ Never claim "fixed" without user confirmation
@@ -132,6 +142,17 @@ make check-cov      # lint + format-check + type + type-pyright + test-cov
 ```
 
 **Important**: The CLI copies bundled .sty/.mf files automatically and uses latexmk for bibliography handling when available.
+
+## Agents
+
+Project agents live in `.claude/agents/`. Use them as part of the development workflow:
+
+| Agent | When to use |
+|-------|-------------|
+| **code-quality-enforcer** | After code edits — runs `make check` and fixes violations |
+| **design-guardian** | Before committing — reviews diffs for architectural integrity |
+| **documentation-guardian** | After features/changes — ensures docs are updated and consistent |
+| **jms** | When implementing Z notation features, debugging fuzz errors, or resolving Z semantics questions |
 
 ## Environment Setup
 
