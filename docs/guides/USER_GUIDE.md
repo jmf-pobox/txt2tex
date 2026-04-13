@@ -248,9 +248,33 @@ p land q
 <=> q land p [idempotent]
 ```
 
-Generates `align*` environment with justifications flush-right.
+Generates an array environment with justifications flush-right. Each step is
+joined by $\Leftrightarrow$ (logical equivalence).
 
-#### Justifications in Equivalence Chains
+`ARGUE:` is an alias for `EQUIV:` and produces identical output.
+
+### Equality Chains
+
+Use `EQUAL:` when the steps are expressions of the same Z type — arithmetic,
+sequence length, function values — and the correct connective is `=`, not
+$\Leftrightarrow$.
+
+```text
+EQUAL:
+length s
+length (tail s) + 1 [by definition of length]
+```
+
+Each step is joined by `=` in the rendered output. Justifications work
+identically to EQUIV: chains.
+
+When to choose `EQUAL:` over `EQUIV:`:
+
+- Steps are natural-number valued (lengths, counts, cardinalities)
+- Steps are set-valued or function-valued expressions
+- You want to write an equational calculation, not a propositional equivalence
+
+#### Justifications in Equivalence and Equality Chains
 
 Justifications are **free-form text** in square brackets after each step. You can write any reasoning you want:
 
@@ -2311,7 +2335,7 @@ end
 The following block types use `adjustbox` and automatically scale to fit the page:
 
 - `TRUTH TABLE:` blocks
-- `ARGUE:` and `EQUIV:` blocks
+- `ARGUE:`, `EQUIV:`, and `EQUAL:` blocks
 - `PROOF:` blocks (proof trees)
 
 These do not need manual line breaking.

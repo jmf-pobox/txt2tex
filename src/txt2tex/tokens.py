@@ -151,6 +151,7 @@ class TokenType(Enum):
 
     # Environments (Phase 2)
     ARGUE = auto()  # ARGUE: or EQUIV: (both map to argue environment)
+    EQUAL = auto()  # EQUAL: (expression equality chain, uses = connective)
     INFRULE = auto()  # INFRULE: (inference rule with horizontal line)
 
     # Z notation keywords (Phase 4)

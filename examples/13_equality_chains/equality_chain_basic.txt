@@ -1,0 +1,24 @@
+=== Equality Chains (EQUAL: block) ===
+
+** Example 1: Base case - length of the empty sequence **
+
+(a) Prove length <> = 0.
+
+EQUAL:
+length <>
+0 [by definition of length]
+
+** Example 2: Inductive step - length of a non-empty sequence **
+
+(a) Prove length (s ^ <x>) = length s + 1.
+
+EQUAL:
+length (s ^ <x>)
+length s + 1 [by definition of length and concatenation]
+
+** Example 3: Multi-step chain with justifications **
+
+EQUAL:
+length (s ^ t)
+length s + length t [by length-concatenation lemma]
+length t + length s [commutativity of +]

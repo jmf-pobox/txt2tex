@@ -330,3 +330,26 @@ For siblings (marked with `::`), generate side-by-side premises:
 ```
 
 For cases, generate multiple inference branches combined with lor-elimination.
+
+## Related Block Types
+
+### EQUIV: / ARGUE: (Equivalence Chains)
+
+For step-by-step propositional reasoning where each step is joined by
+$\Leftrightarrow$, use `EQUIV:` or its alias `ARGUE:`. See the User Guide.
+
+### EQUAL: (Equality Chains)
+
+For step-by-step equational reasoning where each step is joined by `=`,
+use `EQUAL:`. This is appropriate when the steps are expressions of the same
+Z type — natural-number arithmetic, sequence lengths, function values — rather
+than propositions.
+
+```text
+EQUAL:
+length s
+length (tail s) + 1 [by definition of length]
+```
+
+`EQUAL:` produces `=` between steps; `EQUIV:` produces `\Leftrightarrow`.
+Use `EQUAL:` for numeric calculations and `EQUIV:` for logical equivalences.

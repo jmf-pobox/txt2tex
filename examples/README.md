@@ -144,6 +144,12 @@ Advanced features and edge cases.
 - `generic_instantiation.txt` - Generic type instantiation
 - `if_then_else.txt` - Conditional expressions
 
+### 13_equality_chains (1 example)
+
+Expression equality chains using `EQUAL:` block syntax.
+
+- `equality_chain_basic.txt` - Multi-step equality chains with justifications
+
 ### fuzz_tests/ (4 examples)
 
 Test cases for fuzz validation and edge cases.
@@ -228,7 +234,8 @@ See existing files for format details. Key elements:
 - Parts: `(a)`, `(b)`, etc.
 - Text blocks: `TEXT: prose here`
 - Truth tables: `TRUTH TABLE:` followed by ASCII table
-- Equivalences: `EQUIV:` with chain of equivalences
+- Equivalences: `EQUIV:` with chain of logical equivalences (joins steps with ⇔)
+- Equality chains: `EQUAL:` with chain of expression equalities (joins steps with =)
 - Proofs: `PROOF:` with indented inference rules
 - Z notation: `axdef`, `schema`, `given`, etc.
 

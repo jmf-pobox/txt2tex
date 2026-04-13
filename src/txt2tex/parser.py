@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import dataclasses
 import re
+from typing import Literal
 
 from txt2tex.ast_nodes import (
     Abbreviation,
@@ -406,6 +407,7 @@ class Parser:
             TokenType.CONTENTS,
             TokenType.PARTS,
             TokenType.ARGUE,  # Both EQUIV: and ARGUE: map to this token
+            TokenType.EQUAL,  # EQUAL: expression equality chain
             TokenType.INFRULE,
             TokenType.GIVEN,
             TokenType.AXDEF,
@@ -581,7 +583,9 @@ class Parser:
         if self._match(TokenType.TRUTH_TABLE):
             return self._parse_truth_table()
         if self._match(TokenType.ARGUE):  # Handles both EQUIV: and ARGUE: keywords
-            return self._parse_argue_chain()
+            return self._parse_argue_chain(connector="iff")
+        if self._match(TokenType.EQUAL):  # Expression equality chain
+            return self._parse_argue_chain(connector="eq")
         if self._match(TokenType.INFRULE):
             return self._parse_infrule_block()
         if self._match(TokenType.GIVEN):
@@ -968,22 +972,27 @@ class Parser:
             column=start_token.column,
         )
 
-    def _parse_argue_chain(self) -> ArgueChain:
-        """Parse argue chain: ARGUE: or EQUIV: followed by reasoning steps.
+    def _parse_argue_chain(self, connector: Literal["iff", "eq"] = "iff") -> ArgueChain:
+        """Parse argue chain: ARGUE:, EQUIV:, or EQUAL: followed by reasoning steps.
 
         Both EQUIV: and ARGUE: keywords are supported (backwards-compatible).
+        EQUAL: generates equality chains with = as the connective.
         Generates argue environment for better page breaking.
         """
-        start_token = self._advance()  # Consume 'ARGUE:' or 'EQUIV:'
+        start_token = self._advance()  # Consume 'ARGUE:', 'EQUIV:', or 'EQUAL:'
         self._skip_newlines()
 
         steps: list[ArgueStep] = []
 
         # Parse steps until we hit another structural element or end
         while not self._at_end() and not self._is_structural_token():
-            # Consume leading <=> if present (for continuation lines)
-            if self._match(TokenType.IFF):
-                self._advance()  # Consume '<='
+            # Consume leading connective if present on continuation lines:
+            # - EQUIV/ARGUE chains: consume leading <=>
+            # - EQUAL chains: consume leading =
+            if connector == "eq" and self._match(TokenType.EQUALS):
+                self._advance()  # Consume '='
+            elif self._match(TokenType.IFF):
+                self._advance()  # Consume '<=>'
 
             # Parse expression
             expr = self._parse_expr()
@@ -1028,7 +1037,12 @@ class Parser:
                 "Expected at least one step in ARGUE chain", self._current()
             )
 
-        return ArgueChain(steps=steps, line=start_token.line, column=start_token.column)
+        return ArgueChain(
+            steps=steps,
+            connector=connector,
+            line=start_token.line,
+            column=start_token.column,
+        )
 
     def _parse_infrule_block(self) -> InfruleBlock:
         """Parse INFRULE: block with premises, ---, and conclusion.

@@ -224,7 +224,7 @@ class LaTeXGenerator:
     use_fuzz: bool
     toc_parts: bool
     parts_format: str
-    _in_equiv_block: bool
+    _in_argue_block: bool
     _first_part_in_solution: bool
     _in_inline_part: bool
     _quantifier_depth: int
@@ -257,7 +257,7 @@ class LaTeXGenerator:
         self.use_fuzz = use_fuzz
         self.toc_parts = toc_parts
         self.parts_format = "subsection"  # Document-level parts format
-        self._in_equiv_block = False  # Track context for line break formatting
+        self._in_argue_block = False  # Track context for line break formatting
         self._first_part_in_solution = False  # Track if we're generating first part
         self._in_inline_part = False  # Track if we're inside an inline part
         self._quantifier_depth = 0  # Track nesting for \t1, \t2 indentation
@@ -398,7 +398,7 @@ class LaTeXGenerator:
         if operator in ("=>", "implies"):
             return r"\implies"
         # In EQUIV blocks, use \Leftrightarrow; otherwise use \iff
-        if operator == "<=>" and not self._in_equiv_block:
+        if operator == "<=>" and not self._in_argue_block:
             return r"\iff"
         return base_latex
 
@@ -1060,7 +1060,7 @@ class LaTeXGenerator:
             # EQUIV blocks use array format and need & prefix for column alignment
             # Schemas and proofs use plain \\ without & prefix
             indent = self._get_indentation()
-            if self._in_equiv_block:
+            if self._in_argue_block:
                 result = f"{left} {op_latex} \\\\\n& {indent} {right}"
             else:
                 result = f"{left} {op_latex} \\\\\n{indent} {right}"
@@ -1174,7 +1174,7 @@ class LaTeXGenerator:
             # Check for line break after pipe (|)
             if node.line_break_after_pipe:
                 # LaTeX source: \\ at end of line, then newline, then \t command
-                if self._in_equiv_block:
+                if self._in_argue_block:
                     parts.append(f"{pipe_sep} \\\\\n& {indent} {body_latex}")
                 else:
                     parts.append(f"{pipe_sep} \\\\\n{indent} {body_latex}")
@@ -1190,7 +1190,7 @@ class LaTeXGenerator:
             if node.line_break_after_bullet:
                 # Get indentation for expression after bullet
                 expr_indent = self._get_indentation()
-                if self._in_equiv_block:
+                if self._in_argue_block:
                     parts.append(f"{bullet_sep} \\\\\n& {expr_indent} {expr_latex}")
                 else:
                     parts.append(f"{bullet_sep} \\\\\n{expr_indent} {expr_latex}")
@@ -1214,7 +1214,7 @@ class LaTeXGenerator:
                 # LaTeX source: \\ at end of line, then newline, then \t command
                 # EQUIV blocks use array format and need & prefix
                 # Schemas and proofs use plain \\ without &
-                if self._in_equiv_block:
+                if self._in_argue_block:
                     parts.append(f"{separator} \\\\\n& {indent} {body_latex}")
                 else:
                     parts.append(f"{separator} \\\\\n{indent} {body_latex}")
@@ -3571,9 +3571,10 @@ class LaTeXGenerator:
 
     @generate_document_item.register(ArgueChain)
     def _generate_argue_chain(self, node: ArgueChain) -> list[str]:
-        r"""Generate LaTeX for equivalence chain using array environment.
+        r"""Generate LaTeX for equivalence or equality chain using array environment.
 
-        Both EQUIV: and ARGUE: keywords generate this output (EQUIV is alias).
+        EQUIV: and ARGUE: keywords generate \Leftrightarrow between steps.
+        EQUAL: generates = between steps (for expression equality chains).
         Uses standard LaTeX array instead of argue environment for better control.
         Wraps array in display math \[...\] for proper spacing. Centers the block
         and right-aligns justifications. Auto-scales if wider than page.
@@ -3600,15 +3601,18 @@ class LaTeXGenerator:
         lines.append(r"\begin{array}{l@{\hspace{2em}}r}")
 
         # Set context for line break formatting
-        self._in_equiv_block = True
+        self._in_argue_block = True
+
+        # Select connective: EQUIV/ARGUE use \Leftrightarrow; EQUAL uses =
+        connective = r"= " if node.connector == "eq" else r"\Leftrightarrow "
 
         # Generate steps
         for i, step in enumerate(node.steps):
             expr_latex = self.generate_expr(step.expression)
 
             # No leading & - start directly with expression for flush left
-            # First step: expression; subsequent: \Leftrightarrow expression
-            line = expr_latex if i == 0 else r"\Leftrightarrow " + expr_latex
+            # First step: expression; subsequent: connective + expression
+            line = expr_latex if i == 0 else connective + expr_latex
 
             # Add justification if present (flush right)
             if step.justification:
@@ -3622,7 +3626,7 @@ class LaTeXGenerator:
             lines.append(line)
 
         # Reset context
-        self._in_equiv_block = False
+        self._in_argue_block = False
 
         lines.append(r"\end{array}$%")
         # Close adjustbox wrapper

@@ -1,0 +1,70 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Equality Chains ( EQUAL: block )}
+
+\section*{Example 1 : Base case - length of the empty sequence}
+\addcontentsline{toc}{section}{Example 1 : Base case - length of the empty sequence}
+
+\subsection*{(a)}
+
+\noindent Prove length $\langle \rangle$ = 0.
+
+\bigskip
+
+\begin{center}
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\begin{array}{l@{\hspace{2em}}r}
+length(\langle \rangle) \\
+= 0 & [\mbox{by definition of length}]
+\end{array}$%
+}
+\end{center}
+\bigskip
+
+\section*{Example 2 : Inductive step - length of a non - empty sequence}
+\addcontentsline{toc}{section}{Example 2 : Inductive step - length of a non - empty sequence}
+
+\subsection*{(a)}
+
+\noindent Prove length (s \textasciicircum$\{\}$ $\langle x \rangle$) = length s + 1.
+
+\bigskip
+
+\begin{center}
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\begin{array}{l@{\hspace{2em}}r}
+length(s \cat \langle x \rangle) \\
+= length(s) + 1 & [\mbox{by definition of length and concatenation}]
+\end{array}$%
+}
+\end{center}
+\bigskip
+
+\section*{Example 3 : Multi - step chain with justifications}
+\addcontentsline{toc}{section}{Example 3 : Multi - step chain with justifications}
+
+\begin{center}
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\begin{array}{l@{\hspace{2em}}r}
+length(s \cat t) \\
+= length(s) + length(t) & [\mbox{by length - concatenation lemma}] \\
+= length(t) + length(s) & [\mbox{commutativity of +}]
+\end{array}$%
+}
+\end{center}
+\bigskip
+
+\end{document}

@@ -841,6 +841,11 @@ class Lexer:
             keyword = f"{value}:"
             return Token(TokenType.ARGUE, keyword, start_line, start_column)
 
+        # Check for EQUAL: keyword (expression equality chain, uses = connective)
+        if value == "EQUAL" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+            return Token(TokenType.EQUAL, "EQUAL:", start_line, start_column)
+
         # Check for INFRULE: keyword
         if value == "INFRULE" and self._current_char() == ":":
             self._advance()  # Consume ':'

@@ -20,6 +20,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `py.typed` marker (PEP 561)
 - CHANGELOG.md
+- `EQUAL:` block syntax for expression equality chains. Steps are joined by `=`
+  rather than `\Leftrightarrow`, making it correct for natural-number and
+  expression-valued chains (e.g., `length s = length (tail s) + 1`). The
+  `connector` field on `ArgueChain` selects the connective: `"iff"` (default,
+  used by `EQUIV:`/`ARGUE:`) or `"eq"` (used by `EQUAL:`).
+- Renamed internal flag `_in_equiv_block` to `_in_argue_block` in `LaTeXGenerator`
+  to reflect that it covers `EQUIV:`, `ARGUE:`, and `EQUAL:` contexts.
 
 ### Removed
 
