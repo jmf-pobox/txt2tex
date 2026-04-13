@@ -1,0 +1,9 @@
+name: student
+responsibilities:
+  - Set learning and project goals
+  - Decide what to work on and prioritize
+  - Approve design directions and accept or reject deliverables
+  - Provide problem context, evidence of bugs, and acceptance criteria
+permissions:
+  - direct-team
+  - approve-merges

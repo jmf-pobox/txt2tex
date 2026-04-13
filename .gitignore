@@ -71,6 +71,7 @@ hw/*.mf
 # Temporary files
 *.tmp
 *.temp
+.tmp/
 .DS_Store
 
 # Test outputs
@@ -89,8 +90,9 @@ htmlcov/
 # ruff
 .ruff_cache/
 
-# Homework - private
+# Homework - private (instructor-provided content, personal coursework)
 hw/
+hw[0-9]*/
 
 # Tutorial project
 rpn2tex/

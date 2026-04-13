@@ -1,0 +1,14 @@
+name: python-specialist
+model: sonnet
+responsibilities:
+  - Implement Python code in src/txt2tex following the project's mypy strict + pyright + ruff gates
+  - Write tests first when feasible; full pytest coverage of new logic
+  - Honor the existing src layout, type-hint conventions, and Pythonic idioms
+  - Run `make check` to zero violations before returning a deliverable
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
