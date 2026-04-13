@@ -113,9 +113,9 @@ agent definitions are picked up.
 1. Pick a real-person archetype that fits the discipline (e.g., for
    data engineering: Codd, Stonebraker).
 2. If the personality and writing-style do not exist in
-   `.punt-labs/ethos/personalities/` or `writing-styles/`, copy them
-   from `../punt-labs/quarry/.punt-labs/ethos/` if available, or
-   author them locally.
+   `.punt-labs/ethos/personalities/` or `writing-styles/`, check the
+   upstream [punt-labs/team](https://github.com/punt-labs/team) repo
+   for existing archetypes, or author them locally.
 3. Create the talent if needed in `.punt-labs/ethos/talents/`.
 4. Create the identity in `.punt-labs/ethos/identities/<handle>.yaml`.
 5. Create the role in `.punt-labs/ethos/roles/<role>.yaml`.
@@ -126,7 +126,8 @@ agent definitions are picked up.
 
 ## Reference
 
-- ethos AGENTS guide: `../punt-labs/ethos/AGENTS.md`
-- Mission skill design: `../punt-labs/ethos/docs/mission-skill-design.md`
-- Team setup: `../punt-labs/ethos/docs/team-setup.md`
-- Agent definitions: `../punt-labs/ethos/docs/agent-definitions.md`
+- [punt-labs/team](https://github.com/punt-labs/team) — shared identity
+  registry: identities, personalities, writing styles, talents, roles,
+  teams, and agent definitions
+- [punt-labs/ethos](https://github.com/punt-labs/ethos) — ethos CLI and
+  mission skill runtime

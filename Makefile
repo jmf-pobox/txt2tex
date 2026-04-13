@@ -6,7 +6,13 @@ lint:
 
 # Markdown linting. Uses npx so contributors do not need a global install.
 # Config lives in .markdownlint.jsonc and .markdownlint-cli2.jsonc.
+# npx (Node ≥18) must be on PATH. On macOS: brew install node. On Debian/Ubuntu:
+#   curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt install -y nodejs
 lint-md:
+	@command -v npx >/dev/null 2>&1 || { \
+		echo "lint-md requires npx (Node). Install: https://nodejs.org/en/download"; \
+		exit 1; \
+	}
 	npx --yes markdownlint-cli2 "**/*.md"
 
 format:
@@ -80,8 +86,14 @@ ethos-doctor:
 
 ethos-agents:
 	@command -v ethos >/dev/null 2>&1 || { echo "ethos not installed; skipping"; exit 0; }
-	@printf '{"session_id":"manual","cwd":"$(CURDIR)"}\n' | ethos hook session-start \
-		>/dev/null 2>&1 && echo "Regenerated .claude/agents/ from ethos team data"
+	@mkdir -p .tmp
+	@# python3 generates the JSON so special chars in CURDIR (quotes, backslashes)
+	@# cannot produce invalid JSON. Errors go to .tmp/ethos-agents-errors.log so they
+	@# are visible on failure rather than silently discarded.
+	@python3 -c "import json,sys; print(json.dumps({'session_id':'manual','cwd':sys.argv[1]}))" "$(CURDIR)" \
+		| ethos hook session-start >.tmp/ethos-agents-errors.log 2>&1 \
+		&& echo "Regenerated .claude/agents/ from ethos team data" \
+		|| { echo "ethos hook session-start failed; see .tmp/ethos-agents-errors.log"; cat .tmp/ethos-agents-errors.log; exit 1; }
 
 ethos-team:
 	@command -v ethos >/dev/null 2>&1 || { echo "ethos not installed"; exit 1; }
@@ -94,7 +106,11 @@ dev-doctor: ethos-doctor
 	@command -v tex-fmt >/dev/null 2>&1 && echo "tex-fmt: present" || echo "tex-fmt: missing (--format flag disabled)"
 
 # One-shot dev-machine setup. Idempotent.
+# Pinned to v3.3.0 (latest as of 2026-04-13). To upgrade, change the tag and
+# re-test. Never pin to 'main' — that allows arbitrary upstream code execution.
+ETHOS_INSTALL_TAG ?= v3.3.0
 dev-setup:
-	@command -v ethos >/dev/null 2>&1 || curl -fsSL https://raw.githubusercontent.com/punt-labs/ethos/main/install.sh | sh
+	@command -v ethos >/dev/null 2>&1 || \
+		curl -fsSL "https://raw.githubusercontent.com/punt-labs/ethos/$(ETHOS_INSTALL_TAG)/install.sh" | sh
 	@$(MAKE) ethos-agents
 	@echo "Dev setup complete. Run 'make dev-doctor' to verify."

@@ -343,9 +343,11 @@ you can move and how confidently you can ship.
 ### Critical Dependencies
 
 1. **fuzz**: Z notation typesetting system
-   - Location: `../tex/` (relative to project root)
-   - Main file: `fuzz.sty`
-   - Fonts: `oxsz*.mf`, `zarrow.mf`, `zletter.mf`, `zsymbol.mf`
+   - Bundled assets: `src/txt2tex/latex/` (fuzz.sty, oxsz*.mf, etc.)
+   - The CLI copies these into the build directory automatically — no
+     manual `TEXINPUTS` or `MFINPUTS` configuration needed.
+   - The fuzz *typechecker binary* (`fuzz`) is a separate tool. Install
+     it system-wide so it is on `PATH`. See the project README.
 
 2. **zed-* packages** (in `src/txt2tex/latex/`):
    - `zed-cm.sty` — Z notation in Computer Modern fonts
@@ -486,18 +488,17 @@ with multiple premises.
 
 ### Common LaTeX errors
 
-1. **Missing fonts**: Ensure `MFINPUTS=../tex//:` is set.
-2. **Missing fuzz.sty**: Ensure `TEXINPUTS=../tex//:` is set.
-3. **`#` in math mode**: The `#` character needs escaping, but not in
+1. **Missing fonts or fuzz.sty**: The CLI copies bundled assets from
+   `src/txt2tex/latex/` into the build directory before running LaTeX.
+   If you see missing-file errors, run with `--keep-aux` and inspect
+   the build directory to confirm the copy step worked.
+2. **`#` in math mode**: The `#` character needs escaping, but not in
    Z notation cardinality `\# s`.
-4. **Spacing issues**: Often caused by improper math mode delimiters.
+3. **Spacing issues**: Often caused by improper math mode delimiters.
 
 ### Verification commands
 
 ```bash
-# Check if fuzz is accessible
-ls ../tex/fuzz.sty
-
 # Verify PDF was generated
 ls -lh output.pdf
 
@@ -527,7 +528,8 @@ When starting fresh:
 1. The ethos `SessionStart` hook injects your jra persona automatically.
    Run `ethos whoami` to confirm — output should be "Jean-Raymond A
    (jra)".
-2. fuzz lives in `../tex/`.
+2. Bundled fuzz/LaTeX assets live in `src/txt2tex/latex/`. The CLI
+   copies them into the build directory automatically.
 3. Test files are under `tests/`.
 4. Use the workflow commands above.
 

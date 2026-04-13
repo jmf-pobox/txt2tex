@@ -90,6 +90,9 @@ htmlcov/
 # ruff
 .ruff_cache/
 
+# Claude Code local settings (machine-specific, not team-wide)
+.claude/settings.local.json
+
 # Homework - private (instructor-provided content, personal coursework)
 hw/
 hw[0-9]*/

@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make:*)",
+      "Bash(make clean:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git mv:*)",
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)",
+      "Bash(git restore:*)",
+      "Bash(git config:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(git describe:*)",
+      "Bash(ethos --version)",
+      "Bash(ethos --help)",
+      "Bash(ethos whoami:*)",
+      "Bash(ethos identity:*)",
+      "Bash(ethos doctor:*)",
+      "Bash(ethos personality:*)",
+      "Bash(ethos talent:*)",
+      "Bash(ethos role:*)",
+      "Bash(ethos team:*)",
+      "Bash(ethos session:*)",
+      "Bash(ethos hook:*)",
+      "Bash(fuzz:*)",
+      "Bash(pdftotext:*)",
+      "Bash(latexmk:*)",
+      "Bash(chmod:*)",
+      "Bash(python3:*)",
+      "Bash(open:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

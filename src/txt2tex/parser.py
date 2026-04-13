@@ -973,11 +973,13 @@ class Parser:
         )
 
     def _parse_argue_chain(self, connector: Literal["iff", "eq"] = "iff") -> ArgueChain:
-        """Parse argue chain: ARGUE:, EQUIV:, or EQUAL: followed by reasoning steps.
+        """Parse ARGUE:, EQUIV:, or EQUAL: block into an ArgueChain.
 
-        Both EQUIV: and ARGUE: keywords are supported (backwards-compatible).
-        EQUAL: generates equality chains with = as the connective.
-        Generates argue environment for better page breaking.
+        Both EQUIV: and ARGUE: keywords produce connector='iff', rendered
+        with \\Leftrightarrow between steps. EQUAL: produces connector='eq',
+        rendered with = between steps (for expression equality chains).
+        The generator uses a standard LaTeX array environment — not fuzz's
+        argue environment — for reliable column spacing and adjustbox scaling.
         """
         start_token = self._advance()  # Consume 'ARGUE:', 'EQUIV:', or 'EQUAL:'
         self._skip_newlines()
@@ -986,13 +988,17 @@ class Parser:
 
         # Parse steps until we hit another structural element or end
         while not self._at_end() and not self._is_structural_token():
-            # Consume leading connective if present on continuation lines:
-            # - EQUIV/ARGUE chains: consume leading <=>
-            # - EQUAL chains: consume leading =
+            # Consume leading connective if present on continuation lines.
+            # Connector specificity: an EQUAL: block must never silently consume
+            # a leading <=>, and an EQUIV/ARGUE block must never consume a leading =.
+            # Note: = on a continuation line is consumed by _parse_comparison
+            # (which crosses newlines), so the EQUALS branch rarely fires in
+            # practice. The IFF branch fires because _parse_iff does NOT cross
+            # newlines, so a bare <=> at line start reaches this check.
             if connector == "eq" and self._match(TokenType.EQUALS):
-                self._advance()  # Consume '='
-            elif self._match(TokenType.IFF):
-                self._advance()  # Consume '<=>'
+                self._advance()  # Consume leading '='
+            elif connector == "iff" and self._match(TokenType.IFF):
+                self._advance()  # Consume leading '<=>'
 
             # Parse expression
             expr = self._parse_expr()
@@ -1034,7 +1040,8 @@ class Parser:
 
         if not steps:
             raise ParserError(
-                "Expected at least one step in ARGUE chain", self._current()
+                "Expected at least one step in ARGUE/EQUIV/EQUAL chain",
+                self._current(),
             )
 
         return ArgueChain(

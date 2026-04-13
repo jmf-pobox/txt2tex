@@ -18,8 +18,10 @@ import pytest
 from txt2tex.ast_nodes import (
     ArgueChain,
     ArgueStep,
+    BinaryOp,
     Document,
     Identifier,
+    Quantifier,
 )
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
@@ -308,3 +310,193 @@ class TestEqualBlockEndToEnd:
         gen = LaTeXGenerator()
         gen.generate_document(ast)
         assert gen._in_argue_block is False
+
+
+# ---------------------------------------------------------------------------
+# Regression tests for connector-specificity fix (item #1)
+# ---------------------------------------------------------------------------
+
+
+class TestConnectorSpecificity:
+    """EQUAL: must not silently consume <=> continuation; EQUIV: must not consume =."""
+
+    def test_equal_chain_rejects_iff_continuation(self) -> None:
+        """EQUAL: continuation line starting with <=> must raise ParserError.
+
+        Before the fix, _parse_argue_chain(connector='eq') hit the elif
+        branch and silently consumed <=> on continuation lines.  The resulting
+        AST looked valid but was semantically wrong: an equality chain had an
+        iff connective mixed in.
+        """
+        # A continuation line in an EQUAL: block should never start with <=>
+        # because <=> is the iff connective, not an equality connective.
+        text = "EQUAL:\na\n<=> b"
+        with pytest.raises(ParserError):
+            Parser(Lexer(text).tokenize()).parse()
+
+    def test_equal_chain_eq_on_continuation_is_expression_operator(self) -> None:
+        """In EQUAL: chains, = on a continuation line becomes an expression operator.
+
+        The comparison parser crosses newlines when it sees a comparison op.
+        So 'a\n= b' is parsed as one step with BinaryOp(a = b), not two steps.
+        This is distinct from the iff-connector bug: = is not a chain connector
+        in the outer loop sense (it is consumed by _parse_comparison instead).
+        """
+        text = "EQUAL:\na\n= b"
+        ast = Parser(Lexer(text).tokenize()).parse()
+        assert isinstance(ast, Document)
+        chain = ast.items[0]
+        assert isinstance(chain, ArgueChain)
+        # _parse_comparison crosses the newline and consumes 'a = b' as one step
+        assert len(chain.steps) == 1
+
+    def test_equiv_chain_does_not_consume_eq_continuation(self) -> None:
+        """EQUIV: continuation line starting with = keeps = in the expression."""
+        # '=' is a valid expression operator in EQUIV chains (e.g., #s = #t).
+        # It must NOT be consumed as a chain connector.
+        text = "EQUIV:\na = b\nc = d"
+        ast = Parser(Lexer(text).tokenize()).parse()
+        assert isinstance(ast, Document)
+        chain = ast.items[0]
+        assert isinstance(chain, ArgueChain)
+        assert chain.connector == "iff"
+        # Two expression steps; = was NOT swallowed as a connector
+        assert len(chain.steps) == 2
+
+
+# ---------------------------------------------------------------------------
+# Regression tests for multi-line step with justification (item #2)
+# ---------------------------------------------------------------------------
+
+
+class TestMultiLineStepWithJustification:
+    r"""Multi-line step + justification must not produce three array cells.
+
+    The array environment has two columns: l@{\hspace{2em}}r.
+    A multi-line expression in _in_argue_block mode emits '& ' as a
+    continuation prefix inside the expression.  When the step also has a
+    justification, a second '& ' appears for the right column.  That yields
+    three cells in a two-column array — a LaTeX error.
+
+    The fix: strip the leading '& ' from the continuation line (or avoid
+    emitting it) when the expression will also need a justification column.
+    The rendered LaTeX must have at most one '&' per array row.
+    """
+
+    def _count_ampersands_per_row(self, latex: str) -> list[int]:
+        """Return the number of & characters on each array row."""
+        # Rows are separated by \\
+        rows = latex.split(r"\\")
+        return [row.count("&") for row in rows]
+
+    def test_multiline_step_no_justification_one_ampersand_max(self) -> None:
+        """Multi-line step without justification has at most one & per row."""
+        # Use a line-break via \\ continuation marker in a long expression.
+        # Construct directly via AST to avoid needing continuation syntax.
+        gen = LaTeXGenerator()
+        expr = BinaryOp(
+            operator="land",
+            left=Identifier(name="p", line=1, column=1),
+            right=Identifier(name="q", line=1, column=1),
+            line_break_after=True,
+            line=1,
+            column=1,
+        )
+        step0 = ArgueStep(
+            expression=Identifier(name="a", line=1, column=1),
+            justification=None,
+            line=1,
+            column=1,
+        )
+        step1 = ArgueStep(
+            expression=expr,
+            justification=None,
+            line=2,
+            column=1,
+        )
+        chain = ArgueChain(steps=[step0, step1], connector="eq", line=1, column=1)
+        latex = "\n".join(gen._generate_argue_chain(chain))
+        counts = self._count_ampersands_per_row(latex)
+        # Rows inside the array: first step has 0, second has at most 1
+        # (for continuation)
+        assert all(c <= 1 for c in counts), f"Too many & in some rows: {counts}"
+
+    def test_multiline_step_with_justification_at_most_one_ampersand(self) -> None:
+        """Multi-line step with justification has exactly one & per array row.
+
+        One & separates the expression from the justification column.
+        The continuation prefix inside a multi-line expression must not
+        introduce a second &.
+        """
+        gen = LaTeXGenerator()
+        expr = BinaryOp(
+            operator="land",
+            left=Identifier(name="p", line=1, column=1),
+            right=Identifier(name="q", line=1, column=1),
+            line_break_after=True,
+            line=1,
+            column=1,
+        )
+        step0 = ArgueStep(
+            expression=Identifier(name="a", line=1, column=1),
+            justification=None,
+            line=1,
+            column=1,
+        )
+        step1 = ArgueStep(
+            expression=expr,
+            justification="by hypothesis",
+            line=2,
+            column=1,
+        )
+        chain = ArgueChain(steps=[step0, step1], connector="eq", line=1, column=1)
+        latex = "\n".join(gen._generate_argue_chain(chain))
+        # The row containing the justification must have exactly one &
+        rows = latex.split(r"\\")
+        justification_rows = [r for r in rows if "by hypothesis" in r]
+        assert justification_rows, "No row with justification found"
+        for row in justification_rows:
+            assert row.count("&") == 1, (
+                f"Expected exactly one & in justification row, got: {row!r}"
+            )
+
+    def test_quantifier_multiline_step_with_justification_at_most_one_ampersand(
+        self,
+    ) -> None:
+        """Quantifier with line_break_after_pipe plus justification has at most one &.
+
+        Before the fix, _generate_quantifier emitted '& {indent}' as the
+        continuation prefix when _in_argue_block was True.  When the step also
+        carried a justification, the row gained a second & — three cells in a
+        two-column array.
+        """
+        gen = LaTeXGenerator()
+        # forall x : N | x > 0, with a line break after the | pipe
+        quant = Quantifier(
+            quantifier="forall",
+            variables=["x"],
+            domain=Identifier(name="N", line=1, column=1),
+            body=Identifier(name="P", line=1, column=1),
+            line_break_after_pipe=True,
+            line=1,
+            column=1,
+        )
+        step0 = ArgueStep(
+            expression=Identifier(name="a", line=1, column=1),
+            justification=None,
+            line=1,
+            column=1,
+        )
+        step1 = ArgueStep(
+            expression=quant,
+            justification="by definition",
+            line=2,
+            column=1,
+        )
+        chain = ArgueChain(steps=[step0, step1], connector="iff", line=1, column=1)
+        latex = "\n".join(gen._generate_argue_chain(chain))
+        rows = latex.split(r"\\")
+        for row in rows:
+            assert row.count("&") <= 1, (
+                f"More than one & in array row (three-cell overflow): {row!r}"
+            )

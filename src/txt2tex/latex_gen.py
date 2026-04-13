@@ -397,7 +397,7 @@ class LaTeXGenerator:
             return base_latex
         if operator in ("=>", "implies"):
             return r"\implies"
-        # In EQUIV blocks, use \Leftrightarrow; otherwise use \iff
+        # In ARGUE/EQUIV/EQUAL blocks, use \Leftrightarrow; otherwise use \iff
         if operator == "<=>" and not self._in_argue_block:
             return r"\iff"
         return base_latex
@@ -1056,14 +1056,14 @@ class LaTeXGenerator:
 
         # Check for line break after operator
         if node.line_break_after:
-            # Multi-line expression: insert \\ and indent continuation
-            # EQUIV blocks use array format and need & prefix for column alignment
-            # Schemas and proofs use plain \\ without & prefix
+            # Multi-line expression: insert \\ and indent continuation.
+            # In argue-block (array) context, do NOT use & for the continuation
+            # prefix: & jumps to the right column, which would produce three cells
+            # in a two-column array when the step also carries a justification.
+            # The continuation stays in the left column without &; the justification
+            # column separator is added later by _generate_argue_chain when needed.
             indent = self._get_indentation()
-            if self._in_argue_block:
-                result = f"{left} {op_latex} \\\\\n& {indent} {right}"
-            else:
-                result = f"{left} {op_latex} \\\\\n{indent} {right}"
+            result = f"{left} {op_latex} \\\\\n{indent} {right}"
         else:
             # Single-line expression
             result = f"{left} {op_latex} {right}"
@@ -1174,10 +1174,7 @@ class LaTeXGenerator:
             # Check for line break after pipe (|)
             if node.line_break_after_pipe:
                 # LaTeX source: \\ at end of line, then newline, then \t command
-                if self._in_argue_block:
-                    parts.append(f"{pipe_sep} \\\\\n& {indent} {body_latex}")
-                else:
-                    parts.append(f"{pipe_sep} \\\\\n{indent} {body_latex}")
+                parts.append(f"{pipe_sep} \\\\\n{indent} {body_latex}")
             else:
                 parts.append(pipe_sep)
                 parts.append(body_latex)
@@ -1190,10 +1187,7 @@ class LaTeXGenerator:
             if node.line_break_after_bullet:
                 # Get indentation for expression after bullet
                 expr_indent = self._get_indentation()
-                if self._in_argue_block:
-                    parts.append(f"{bullet_sep} \\\\\n& {expr_indent} {expr_latex}")
-                else:
-                    parts.append(f"{bullet_sep} \\\\\n{expr_indent} {expr_latex}")
+                parts.append(f"{bullet_sep} \\\\\n{expr_indent} {expr_latex}")
             else:
                 parts.append(bullet_sep)
                 parts.append(expr_latex)
@@ -1212,12 +1206,9 @@ class LaTeXGenerator:
             if node.line_break_after_pipe:
                 # Multi-line quantifier: insert \\ and indent body
                 # LaTeX source: \\ at end of line, then newline, then \t command
-                # EQUIV blocks use array format and need & prefix
-                # Schemas and proofs use plain \\ without &
-                if self._in_argue_block:
-                    parts.append(f"{separator} \\\\\n& {indent} {body_latex}")
-                else:
-                    parts.append(f"{separator} \\\\\n{indent} {body_latex}")
+                # No & prefix: the array column separator is only for the
+                # justification column, not for expression-internal continuations.
+                parts.append(f"{separator} \\\\\n{indent} {body_latex}")
             else:
                 # Single-line quantifier
                 parts.append(separator)

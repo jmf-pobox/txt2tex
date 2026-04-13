@@ -78,8 +78,8 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 | `<<\|` | ⩤ (U+2A64) | `\ndres` | Domain subtraction | 10a |
 | `\|>>` | ⩥ (U+2A65) | `\nrres` | Range subtraction | 10a |
 | `comp` | — | `\comp` | Backward relational composition (fuzz Chapter 4) | 10 |
-| `;` | — | `\semi` | Forward relational composition (fuzz Chapter 3) | 10 |
 | `o9` | ∘ (U+2218) | `\semi` | Forward composition (fuzz Chapter 3) | 10 |
+| `;` | — | `;` | Declaration separator in schema signatures (`x : N; y : N`) | 10 |
 | `~` | — | `\inv` | Relational inverse (postfix) | 10 |
 | `(+)` | ⊕ (U+2295) | `\limg` | Relational image | 10 |
 | `+)` | — | `\rimg` | Relational image (right) | 10 |
@@ -233,6 +233,8 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 - `TEXT:` - Prose paragraph in output
 - `TRUTH TABLE:` - Truth table block
 - `EQUIV:` - Equivalence chain block
+- `EQUAL:` - Equality chain block; renders a sequence of expressions
+  joined by `=` in an aligned environment
 - `PROOF:` - Proof tree block
 
 ### Line Continuation
