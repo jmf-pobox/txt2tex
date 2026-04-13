@@ -1,5 +1,5 @@
 .PHONY: lint lint-md format format-check type type-pyright test test-cov check check-cov build clean \
-	ethos-doctor ethos-agents ethos-team dev-doctor dev-setup
+	ethos-doctor ethos-agents ethos-team dev-doctor dev-setup test-e2e regen-e2e
 
 lint:
 	uv run ruff check .
@@ -30,6 +30,30 @@ test-cov:
 check: lint lint-md format-check type type-pyright test
 
 check-cov: lint format-check type type-pyright test-cov
+
+# --- End-to-end regression tests (Stage A: generation fixture assertions) ---
+# Separate from 'make check' — subprocess per example makes this too slow for
+# the pre-commit loop. Run manually before pushing or when the generator changes.
+
+# Run the Phase 1 e2e suite in parallel via pytest-xdist.
+# All 141 examples are parametrized; each runs txt2tex --tex-only and compares
+# output to the committed .tex fixture. Do not add to 'make check'.
+# The -m e2e flag overrides the addopts default of '-m not e2e'.
+test-e2e:
+	uv run pytest tests/test_e2e_regression.py -m e2e -n auto $(ARGS)
+
+# Regenerate all committed .tex fixtures in place by running txt2tex on every
+# .txt file under examples/ (excluding examples/infrastructure/).
+# Developer tool only — CI never calls this target.
+# After running: inspect 'git diff examples/' and commit only intended changes.
+regen-e2e:
+	@echo "Regenerating .tex fixtures for all examples..."
+	@find examples -name "*.txt" -not -path "*/infrastructure/*" | sort | while read f; do \
+		uv run txt2tex "$$f" --tex-only; \
+	done
+	@echo ""
+	@echo "Done. Review 'git diff examples/' before committing."
+	@echo "Commit only fixtures whose changes are intentional."
 
 build:
 	uv build
