@@ -707,6 +707,54 @@ TEMPLATES = {
 }
 ```
 
+### Parenthesisation Policy (ADR)
+
+**Status**: SETTLED 2026-04-13.
+
+**Context**: the parser builds an AST; the generator must decide which parentheses to emit. An early debate weighed *minimalist* (print only what is required for unambiguous parsing) against *instructive* (print what helps a human reader see precedence). The author started minimalist and conceded toward instructive in specific cases, but the end state was not clearly documented. Assessment feedback on Q8(b) of the student's Oxford SE Mathematics submission surfaced the inconsistency — the grader expected parens around an existential predicate that the generator emitted bare.
+
+**Decision**: precedence-driven output with a small, enumerable set of *always-paren* contexts, plus honouring author-written parens.
+
+1. **Precedence-driven default.** The generator consults a PRECEDENCE table (`latex_gen.py:174`) and the `_needs_parens` helper (`latex_gen.py:939`) to decide whether a child expression needs parens against its parent. Standard compiler practice: emit parens iff the child's precedence is lower than the parent's (or equal with the wrong associativity).
+
+2. **Author-written parens are preserved.** `BinaryOp.explicit_parens=True` (`ast_nodes.py:34`) is set by the parser when the source wrapped an expression in parens. The generator always emits parens for `explicit_parens=True`, irrespective of precedence. This is the mechanism documented at §2 *Explicit Parentheses Preservation*.
+
+3. **Always-paren contexts** (additions on top of precedence + explicit flag):
+   - Quantifier body containing propositional connectives (`∧`, `∨`, `⇒`, `⇔`). Wrap the body for visual chunking.
+   - Set-comprehension constraint containing a nested quantifier. Wrap the inner quantifier.
+   - Nested quantifiers without a structural separator (no `•` delimiter between them). Wrap the inner.
+
+**Z RM citations**: §8.3 (concrete syntax precedence table), §2.1 (logical equivalence `⇔`), §2.3 (equality `=`), §3.6 (schema text `| … •`), §3.8.1 (set comprehension `{ … • … }`), §3.9 (quantified predicates/expressions). None of the Z RM sections *requires* the always-paren additions above — they are an Oxford convention for human legibility, not a syntactic obligation.
+
+**Rationale**:
+
+- Pure minimalism produces output that type-checks but can confuse human readers in exactly the way the Q8(b) feedback describes. The generator's output is read by Oxford-school examiners, not only by `fuzz`.
+- Blanket instructive parenthesisation (parens around every non-atomic subexpression) produces cluttered output no Z reader writes by hand.
+- Precedence-driven plus a short always-paren list matches the Z RM grammar for correctness and the Oxford house style for readability, with a rule set small enough to document in one paragraph.
+
+**Rejected alternatives**:
+
+- *Minimalist-only*: fails the legibility bar set by the graders.
+- *Instructive blanket*: fails the "textbook-quality output" requirement (Design Principle 1).
+- *Source-parens-only*: under-specifies because the AST discards paren nodes for unambiguous subexpressions; only `BinaryOp` currently carries `explicit_parens`.
+
+**Consequences**:
+
+- Positive: a single policy statement. Tests can encode it with a parametrised matrix over operator pairs.
+- Negative: the always-paren list is a judgment call per construct. Future constructs (new quantifier-like forms) will need to be classified deliberately.
+
+**Known gaps requiring follow-up** (see task #15 and a forthcoming implementation mission):
+
+1. **Arithmetic operators missing from the PRECEDENCE table.** `+`, `-`, `*`, `/` fall to the default precedence of 999. Today this yields accidentally-correct output for logical/set expressions but would produce wrong parens on mixed arithmetic, e.g., `a + b * c` emitted without parens around `b * c` when printed under a lower-precedence parent. Add explicit entries.
+
+2. **Unary special cases outside the table.** `_generate_unary_op` (`latex_gen.py:878–922`) has four conditional blocks driven by operator-string matching rather than the PRECEDENCE table. Lift these into a `UNARY_PRECEDENCE` structure so `_needs_parens` is the single source of truth.
+
+3. **Set-comprehension predicate loses parent context.** `_generate_set_comprehension` at `latex_gen.py:1314` calls `generate_expr(node.predicate)` with no `parent=` argument. Quantifiers inside `{ x : T | ∃ … }` therefore appear top-level and receive no wrapping parens. This is the direct mechanism behind the Q8(b) feedback. Pass `parent=node`; the always-paren rule for nested quantifier in comprehension constraint then fires.
+
+4. **Cross-product rationale undocumented.** Commit `6db389f` rolled back a paren-emission change on `cross`/`×` because the flat *n*-tuple semantics in fuzz conflict with nested-pair rendering. The rationale lives in the commit message, not this document. Capture it as a subsection so the constraint is discoverable.
+
+5. **Test matrix is not exhaustive.** Per-feature tests exercise specific operator pairs; a `@pytest.mark.parametrize` matrix of `(child_op, parent_op, is_left_child, expected_parens)` across the PRECEDENCE table would make the policy machine-checkable and catch future table edits that break a pair.
+
 ### 5. fuzz Validator
 
 **Responsibility**: Run fuzz typechecker on generated LaTeX.

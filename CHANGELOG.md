@@ -27,6 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   used by `EQUIV:`/`ARGUE:`) or `"eq"` (used by `EQUAL:`).
 - Renamed internal flag `_in_equiv_block` to `_in_argue_block` in `LaTeXGenerator`
   to reflect that it covers `EQUIV:`, `ARGUE:`, and `EQUAL:` contexts.
+- Documented the parenthesisation policy as a settled ADR in `docs/DESIGN.md`
+  (§4 *Parenthesisation Policy*): precedence-driven with an enumerable
+  always-paren set for quantifier bodies containing connectives and nested
+  quantifiers in set-comprehension constraints. Z RM citations included.
+  Five known gaps tracked for follow-up work (arithmetic precedence entries,
+  unary precedence unification, set-comprehension parent-arg fix, cross-product
+  rationale capture, and a parametrised precedence-matrix test).
 
 ### Removed
 
