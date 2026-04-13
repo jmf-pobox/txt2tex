@@ -145,11 +145,25 @@ def check_environment() -> int:
     return 1
 
 
+_EPILOG = """\
+modes:
+  txt2tex FILE          read FILE.txt, write FILE.tex, compile FILE.pdf (default)
+  txt2tex --tex-only FILE
+                        write FILE.tex only; skip PDF compilation
+  txt2tex -i            interactive REPL; no input file required
+  txt2tex --check-env   report LaTeX/fuzz dependencies and exit
+
+The default mode runs fuzz type-checking (if fuzz is installed) before
+compiling. Use --zed to switch from fuzz to the zed-* package family."""
+
+
 def main() -> int:
     """Main entry point for txt2tex CLI."""
     parser = argparse.ArgumentParser(
         description="Convert whiteboard notation to LaTeX",
         prog="txt2tex",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=_EPILOG,
     )
     parser.add_argument(
         "input",
@@ -223,7 +237,9 @@ def main() -> int:
 
     # Require input file for normal operation
     if args.input is None:
-        parser.error("the following arguments are required: input")
+        parser.error(
+            "input file required (use -i for REPL, --check-env to verify deps)"
+        )
 
     # Check for pdflatex early unless --tex-only
     if not args.tex_only and shutil.which("pdflatex") is None:
