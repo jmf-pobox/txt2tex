@@ -632,7 +632,3 @@ Online references for learning Z notation:
 - **[ISO Z Standard](https://www.iso.org/standard/21573.html)** - ISO/IEC 13568:2002 formal specification
 - **[Z Notation Wikipedia](https://en.wikipedia.org/wiki/Z_notation)** - Overview and history
 - **[Community Z Tools](https://czt.sourceforge.net/)** - Open source Z tools and resources
-
----
-
-**Last Updated:** 2025-12-01
