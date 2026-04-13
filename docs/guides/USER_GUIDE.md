@@ -2,6 +2,8 @@
 
 A comprehensive guide to writing mathematical specifications in txt2tex whiteboard notation.
 
+txt2tex emits standard LaTeX, so you can take any `.tex` file to Overleaf or your usual editor at any point. Use it for one question per assignment if that's all you need — no commitment to the whole document. If you want to check how an expression renders without creating a file, `txt2tex -i` opens an interactive REPL.
+
 ## Table of Contents
 
 1. [Installation](#installation)

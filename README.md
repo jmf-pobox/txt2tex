@@ -1,22 +1,18 @@
 # txt2tex
 
-**Write math like you're at a whiteboard. Get submission-quality LaTeX.**
+**Write math like you're at a whiteboard. Get LaTeX you can hand in.**
 
-txt2tex converts your plain text mathematical notation into beautifully typeset LaTeX documents. Write `forall x : N | x > 0` and get professionally formatted output perfect for assignments, papers, and proofs.
+txt2tex converts plain-text mathematical notation into LaTeX. Write `forall x : N | x > 0` and get rendered output suitable for assignments, papers, and proofs.
 
 ---
 
 ## Why txt2tex?
 
-**Avoid LaTeX complexity** - Write expressions naturally, without memorizing LaTeX commands  
-**Get LaTeX beauty** - Professional typesetting that looks publication-ready  
-**Unlock fuzz value** - Optional type checking catches errors before submission  
+**No lock-in.** txt2tex emits standard LaTeX. Take any generated `.tex` file to Overleaf, LaTeX Workshop, or any editor you already use. Nothing proprietary, nothing one-way. If txt2tex can't express something, open the `.tex` and finish it by hand.
 
-Perfect for:
+**Use it for one question, not your whole assignment.** Run txt2tex on the notation-heavy parts and write the rest in plain LaTeX. There's no commitment — drop in where it helps, step out where it doesn't.
 
-- 🎓 **University students** writing formal methods assignments
-- 📝 **Researchers** documenting Z notation specifications
-- ✍️ **Anyone** who wants beautiful math typesetting without LaTeX learning curve
+**Try an expression without creating a file.** Run `txt2tex -i` to open the REPL. Type an expression, see the LaTeX and a PDF preview. Useful for checking rendering or grabbing a snippet to paste elsewhere.
 
 ---
 
