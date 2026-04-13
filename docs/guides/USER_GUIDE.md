@@ -1877,6 +1877,59 @@ Generates:
 \end{axdef}
 ```
 
+### Paragraph Ordering Convention for Dependent Definitions
+
+The Z Reference Manual (§3.5) allows all names declared in a single `axdef` or `gendef`
+paragraph to enter scope simultaneously. Fuzz accepts cross-references between declarations
+in the same block — this is valid Z.
+
+Oxford-school convention (Spivey, *Understanding Z*; Simpson's teaching notes) favours
+splitting dependent definitions into separate paragraphs in dependency order. Each paragraph
+then stands as a self-contained mathematical object whose reliance on earlier paragraphs is
+structurally visible to the reader.
+
+**Combined form** (valid Z, accepted by fuzz):
+
+```text
+axdef
+  maxSeq : seq(N) -> N
+  minSeq : seq(N) -> N
+  maxDiff : seq(N) -> N
+where
+  forall s : seq(N) | maxSeq(s) = ...
+  forall s : seq(N) | minSeq(s) = ...
+  forall s : seq(N) | maxDiff(s) = maxSeq(s) - minSeq(s)
+end
+```
+
+**Sequential form** (Oxford-school preferred):
+
+```text
+axdef
+  maxSeq : seq(N) -> N
+where
+  forall s : seq(N) | maxSeq(s) = ...
+end
+
+axdef
+  minSeq : seq(N) -> N
+where
+  forall s : seq(N) | minSeq(s) = ...
+end
+
+axdef
+  maxDiff : seq(N) -> N
+where
+  forall s : seq(N) | maxDiff(s) = maxSeq(s) - minSeq(s)
+end
+```
+
+A Z examiner prefers the sequential form because each paragraph can be read and understood
+independently; the dependency of `maxDiff` on `maxSeq` and `minSeq` is evident from
+document order rather than inferred from the predicate. This is a presentation convention,
+not a type-checking requirement. txt2tex faithfully renders either form — the choice is
+the author's.
+
 ### Schemas
 
 Define state spaces and operations:
