@@ -12,7 +12,7 @@ This tutorial series teaches you how to write formal specifications using txt2te
 
 ## Getting Started
 
-- **[Tutorial 0: Getting Started](docs/tutorials/00_getting_started.md)** - Installation, first document, basic workflow
+- **[Tutorial 0: Getting Started](00_getting_started.md)** - Installation, first document, basic workflow
 
 Start here if you're new to txt2tex. Learn how to install the tools, write your first document, and compile to PDF.
 
@@ -22,7 +22,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ### Lecture 1: Propositional Logic
 
-- **[Tutorial 1: Propositional Logic](docs/tutorials/01_propositional_logic.md)**
+- **[Tutorial 1: Propositional Logic](01_propositional_logic.md)**
   - Boolean operators (land, lor, lnot, =>, <=>)
   - Truth tables and equivalences
   - Tautologies and logical laws
@@ -30,7 +30,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ### Lecture 2: Predicate Logic
 
-- **[Tutorial 2: Predicate Logic](docs/tutorials/02_predicate_logic.md)**
+- **[Tutorial 2: Predicate Logic](02_predicate_logic.md)**
   - Predicates and declarations
   - Universal quantifier (forall)
   - Existential quantifier (exists)
@@ -39,7 +39,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ### Lecture 3: Set Theory
 
-- **[Tutorial 3: Sets and Types](docs/tutorials/03_sets_and_types.md)**
+- **[Tutorial 3: Sets and Types](03_sets_and_types.md)**
   - Set notation and literals
   - Set operations (union, intersect, difference)
   - Power sets and Cartesian products
@@ -48,7 +48,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ### Lecture 4: Deductive Proofs
 
-- **[Tutorial 4: Proof Trees](docs/tutorials/04_proof_trees.md)**
+- **[Tutorial 4: Proof Trees](04_proof_trees.md)**
   - Natural deduction rules
   - Proof tree syntax (PROOF:, EQUIV:)
   - Introduction and elimination rules
@@ -57,7 +57,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ### Lecture 5: Z Notation Basics
 
-- **[Tutorial 5: Z Notation Definitions](docs/tutorials/05_z_definitions.md)**
+- **[Tutorial 5: Z Notation Definitions](05_z_definitions.md)**
   - given types
   - Free type definitions
   - Abbreviations (==)
@@ -67,7 +67,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ### Lecture 6: Relations
 
-- **[Tutorial 6: Relations](docs/tutorials/06_relations.md)**
+- **[Tutorial 6: Relations](06_relations.md)**
   - Binary relations (↔ or <->)
   - Maplets (|->)
   - Domain and range
@@ -77,7 +77,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ### Lecture 7: Functions
 
-- **[Tutorial 7: Functions](docs/tutorials/07_functions.md)**
+- **[Tutorial 7: Functions](07_functions.md)**
   - Function types (→, +→, ⇸, ⤖, ↣, ⤀, ↠, ⤖)
   - Total and partial functions
   - Function application
@@ -87,7 +87,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ### Lecture 8: Sequences and Bags
 
-- **[Tutorial 8: Sequences](docs/tutorials/08_sequences.md)**
+- **[Tutorial 8: Sequences](08_sequences.md)**
   - Sequence notation (⟨⟩, <> )
   - Sequence operations (head, tail, concatenation)
   - Pattern matching with sequences
@@ -96,7 +96,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ### Lecture 9: Advanced Z Notation
 
-- **[Tutorial 9: Schemas and Composition](docs/tutorials/09_schemas.md)**
+- **[Tutorial 9: Schemas and Composition](09_schemas.md)**
   - Schema notation
   - Schema composition and operations
   - State schemas and operations
@@ -106,7 +106,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ## Advanced Topics
 
-- **[Tutorial: Advanced Features](docs/tutorials/10_advanced.md)**
+- **[Tutorial: Advanced Features](10_advanced.md)**
   - Conditional expressions (if-then-else)
   - Subscripts and superscripts
   - Generic type instantiation
@@ -192,4 +192,4 @@ These tutorials and examples are part of the txt2tex project. See the main proje
 
 ---
 
-**Next Step:** Start with [Tutorial 0: Getting Started](docs/tutorials/00_getting_started.md) or jump to a specific topic using the links above.
+**Next Step:** Start with [Tutorial 0: Getting Started](00_getting_started.md) or jump to a specific topic using the links above.

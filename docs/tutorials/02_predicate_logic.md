@@ -212,7 +212,7 @@ You've learned:
 - ✅ One-point rule
 - ✅ Nested quantifiers and quantifier laws
 
-**Next Tutorial:** [Tutorial 3: Sets and Types](docs/tutorials/03_sets_and_types.md)
+**Next Tutorial:** [Tutorial 3: Sets and Types](03_sets_and_types.md)
 
 ---
 

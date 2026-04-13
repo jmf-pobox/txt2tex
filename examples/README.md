@@ -43,7 +43,7 @@ Equality and unique quantification.
 - `one_point_rule.txt` - Applications of the one-point rule in quantifier elimination
 - `equality_proofs.txt` - Proofs using equality reasoning
 
-### 04_proof_trees (8 examples)
+### 04_proof_trees (9 examples)
 
 Natural deduction proof trees with inference rules.
 
@@ -52,9 +52,10 @@ Natural deduction proof trees with inference rules.
 - `minimal_nesting.txt` - Minimal nested proof example
 - `contradiction.txt` - Proof by contradiction
 - `excluded_middle.txt` - Excluded middle proofs
-- `case_analysis.txt` - Or-elimination with case analysis
 - `advanced_proof_patterns.txt` - Advanced proof patterns
-- `implication_introduction.txt` - Implication introduction rule
+- `infrule_modus_ponens.txt` - Modus ponens inference rule
+- `shows_operator.txt` - Shows operator (|-) examples
+- `pattern_matching.txt` - Pattern matching in proofs
 
 ### 05_sets (7 examples)
 
@@ -65,21 +66,22 @@ Set theory, types, and set operations.
 - `cartesian_tuples.txt` - Cartesian products and ordered pairs
 - `set_literals.txt` - Set literal notation with maplets
 - `tuple_examples.txt` - Tuple construction and component selection
-- `set_comprehension.txt` - Set comprehension with predicates and expressions
-- `distributed_union.txt` - Distributed union (bigcup) operator
+- `strict_subset.txt` - Strict subset (psubset) and subset comparisons
+- `union_domain.txt` - Union and domain operations
 
-### 06_definitions (8 examples)
+### 06_definitions (9 examples)
 
 Z notation definitions: basic types, free types, abbreviations.
 
-- `given_types.txt` - Given type declarations
-- `free_types_basic.txt` - Basic free type definitions (Type ::= branch1 | branch2)
-- `free_types_recursive.txt` - Recursive free types (trees, lists)
-- `free_types_generic.txt` - Generic free types
-- `abbreviations.txt` - Abbreviation definitions (==)
-- `axdef_basic.txt` - Axiomatic definitions
-- `schema_basic.txt` - Schema definitions
+- `free_types_demo.txt` - Basic free type definitions (Type ::= branch1 | branch2)
+- `free_types_proper.txt` - Recursive free types (trees, lists)
+- `gendef_basic.txt` - Generic function definitions
+- `gendef_advanced.txt` - Advanced generic definitions
+- `abbrev_demo.txt` - Abbreviation definitions (==)
+- `axdef_demo.txt` - Axiomatic definitions
+- `schema_demo.txt` - Schema definitions
 - `anonymous_schema.txt` - Anonymous schema expressions
+- `syntax_demo.txt` - Z notation syntax demonstrations
 
 ### 07_relations (7 examples)
 
@@ -97,14 +99,14 @@ Relations, domain, range, and relational operators.
 
 Functions, lambda expressions, and function types.
 
-- `lambda_basic.txt` - Basic lambda expressions (lambda x : T . body)
-- `lambda_multi_variable.txt` - Multi-variable lambdas
-- `function_types.txt` - Partial (+->), total (->), injections, surjections, bijections
-- `function_application.txt` - Function application f(x)
-- `space_separated_application.txt` - Space-separated application (f x y)
-- `override.txt` - Function override (++)
-- `generic_functions.txt` - Generic function definitions
-- `recursive_functions.txt` - Recursive function definitions with pattern matching
+- `lambda_expressions.txt` - Lambda expressions (lambda x : T . body)
+- `function_definitions_simple.txt` - Function type declarations and definitions
+- `function_composition.txt` - Function composition operator
+- `composition_pipelines.txt` - Chained function composition
+- `finite_functions.txt` - Finite function types and literals
+- `higher_order_functions.txt` - Higher-order function patterns
+- `sequence_tuple_tests.txt` - Sequence and tuple function examples
+- `sequences_bags_tuples.txt` - Functions over sequences, bags, and tuples
 
 ### 09_sequences (7 examples)
 

@@ -1,0 +1,47 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{My First Proof}
+
+\noindent We prove that conjunction implies each of its components.
+
+\bigskip
+
+\section*{Part ( a ) : p land q implies p}
+\addcontentsline{toc}{section}{Part ( a ) : p land q implies p}
+
+\begin{center}
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \land q \implies p}{
+  \infer[\land\textrm{-elim-1}]{p}{\ulcorner p \land q \urcorner^{[1]}}
+}
+$%
+}
+\end{center}
+\bigskip
+
+\section*{Part ( b ) : p land q implies q}
+\addcontentsline{toc}{section}{Part ( b ) : p land q implies q}
+
+\begin{center}
+\adjustbox{max width=\textwidth}{%
+$\displaystyle
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \land q \implies q}{
+  \infer[\land\textrm{-elim-2}]{q}{\ulcorner p \land q \urcorner^{[1]}}
+}
+$%
+}
+\end{center}
+\bigskip
+
+\end{document}

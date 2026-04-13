@@ -190,7 +190,7 @@ You've learned:
 - ✅ Tuples and tuple projection
 - ✅ Set cardinality
 
-**Next Tutorial:** [Tutorial 4: Proof Trees](docs/tutorials/04_proof_trees.md)
+**Next Tutorial:** [Tutorial 4: Proof Trees](04_proof_trees.md)
 
 ---
 

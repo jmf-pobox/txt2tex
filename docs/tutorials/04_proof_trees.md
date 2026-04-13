@@ -226,7 +226,7 @@ You've learned:
 - ✅ Proper indentation
 - ✅ Proof by contradiction
 
-**Next Tutorial:** [Tutorial 5: Z Notation Definitions](docs/tutorials/05_z_definitions.md)
+**Next Tutorial:** [Tutorial 5: Z Notation Definitions](05_z_definitions.md)
 
 ---
 

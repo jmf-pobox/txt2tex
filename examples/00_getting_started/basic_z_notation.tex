@@ -1,0 +1,49 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Introduction to Z Notation}
+
+\noindent Z notation uses structured blocks to define types, constants, and schemas.
+
+\bigskip
+
+\section*{Given Types}
+\addcontentsline{toc}{section}{Given Types}
+
+\begin{zed}[Person]\end{zed}
+
+\section*{Abbreviations}
+\addcontentsline{toc}{section}{Abbreviations}
+
+\begin{zed}
+Adults == \power Person
+\end{zed}
+
+\section*{Axiomatic Definition}
+\addcontentsline{toc}{section}{Axiomatic Definition}
+
+\begin{axdef}
+capacity : \nat
+\where
+capacity > 0
+\end{axdef}
+
+\section*{Schema}
+\addcontentsline{toc}{section}{Schema}
+
+\begin{schema}{Room}
+occupants : \power Person
+\where
+\# occupants \leq capacity
+\end{schema}
+
+\end{document}

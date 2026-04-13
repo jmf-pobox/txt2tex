@@ -453,7 +453,7 @@ You've learned:
 - ✅ Tautologies and contradictions
 - ✅ EQUIV blocks for proving equivalences
 
-**Next Tutorial:** [Tutorial 2: Predicate Logic](docs/tutorials/02_predicate_logic.md)
+**Next Tutorial:** [Tutorial 2: Predicate Logic](02_predicate_logic.md)
 
 Learn about quantifiers, predicates, and reasoning about sets of objects.
 

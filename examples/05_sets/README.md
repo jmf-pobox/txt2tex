@@ -42,6 +42,6 @@ Browse the `.txt` files to see:
 ## See Also
 
 - **docs/guides/USER_GUIDE.md** - Section "Sets and Types"
-- **docs/tutorials/05_z_definitions.md** - Detailed tutorial for Lecture 5
+- **docs/tutorials/03_sets_and_types.md** - Detailed tutorial for Lecture 5
 - **Previous**: 04_proof_trees/
 - **Next**: 06_definitions/

@@ -1,0 +1,42 @@
+// ============================================================================
+// Example: Basic Z Notation - given types, abbreviations, and schemas
+// ============================================================================
+// Demonstrates:
+//   - given type declarations
+//   - Abbreviation definitions (==)
+//   - Axiomatic definitions (axdef)
+//   - Simple schema
+//
+// To compile:
+//   txt2tex examples/00_getting_started/basic_z_notation.txt
+//
+// See: docs/tutorials/05_z_definitions.md
+// ============================================================================
+
+=== Introduction to Z Notation ===
+
+TEXT: Z notation uses structured blocks to define types, constants, and schemas.
+
+** Given Types **
+
+given Person
+
+** Abbreviations **
+
+Adults == P Person
+
+** Axiomatic Definition **
+
+axdef
+  capacity : N
+where
+  capacity > 0
+end
+
+** Schema **
+
+schema Room
+  occupants : P Person
+where
+  # occupants <= capacity
+end

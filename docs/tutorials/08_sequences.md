@@ -183,7 +183,7 @@ You've learned:
 - ✅ Sequence filter
 - ✅ Bags (multisets)
 
-**Next Tutorial:** [Tutorial 9: Schemas and Composition](docs/tutorials/09_schemas.md)
+**Next Tutorial:** [Tutorial 9: Schemas and Composition](09_schemas.md)
 
 ---
 

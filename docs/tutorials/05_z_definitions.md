@@ -175,7 +175,7 @@ You've learned:
 - ✅ schema for grouping related data
 - ✅ gendef for polymorphic definitions
 
-**Next Tutorial:** [Tutorial 6: Relations](docs/tutorials/06_relations.md)
+**Next Tutorial:** [Tutorial 6: Relations](06_relations.md)
 
 ---
 

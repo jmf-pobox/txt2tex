@@ -170,7 +170,7 @@ You've learned:
 - ✅ Function composition
 - ✅ Higher-order functions
 
-**Next Tutorial:** [Tutorial 8: Sequences](docs/tutorials/08_sequences.md)
+**Next Tutorial:** [Tutorial 8: Sequences](08_sequences.md)
 
 ---
 
