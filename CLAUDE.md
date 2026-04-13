@@ -186,50 +186,50 @@ Every code change follows this pipeline. Steps are ordered.
 
 #### Phase 2: Branch
 
-4. Create a feature branch from main:
+1. Create a feature branch from main:
    `git checkout -b <prefix>/short-description main`.
    Prefixes: `feat/`, `fix/`, `chore/`, `docs/`, `refactor/`.
 
 #### Phase 3: Implement & Verify
 
-5. Delegate to the appropriate specialist (`rmh`, `adb`, `ghr`, `mdm`)
+1. Delegate to the appropriate specialist (`rmh`, `adb`, `ghr`, `mdm`)
    via mission contract or direct `Agent(...)` call.
-6. The specialist writes failing tests first when feasible, implements,
+2. The specialist writes failing tests first when feasible, implements,
    runs `make check` to zero violations, returns the deliverable.
-7. **Verify the code actually works.** `make check` is necessary, not
+3. **Verify the code actually works.** `make check` is necessary, not
    sufficient. Run the CLI on a representative input. Observe the
    output. For bug fixes, reproduce the original failure first, then
    confirm it is gone.
 
 #### Phase 4: Document
 
-8. Add an ADR to `docs/DESIGN.md` if the change involves a design
+1. Add an ADR to `docs/DESIGN.md` if the change involves a design
    decision with rejected alternatives.
-9. Update `README.md` if user-facing behavior changed.
-10. Update `CHANGELOG.md` under `## [Unreleased]`.
-11. Update affected `.md` and `.tex` files. Rebuild PDFs from `.tex`
-    sources — PDF files are committed.
+2. Update `README.md` if user-facing behavior changed.
+3. Update `CHANGELOG.md` under `## [Unreleased]`.
+4. Update affected `.md` and `.tex` files. Rebuild PDFs from `.tex`
+   sources — PDF files are committed.
 
 #### Phase 5: Local review
 
-12. Have **djb** review the diff for security issues if subprocess,
-    path, or untrusted-input handling changed.
-13. Have **ghr** review documentation changes for accuracy and tone.
-14. Apply fixes; repeat until clean.
+1. Have **djb** review the diff for security issues if subprocess,
+   path, or untrusted-input handling changed.
+2. Have **ghr** review documentation changes for accuracy and tone.
+3. Apply fixes; repeat until clean.
 
 #### Phase 6: Ship
 
-15. Commit with conventional message format (`type(scope): description`).
-    `make check` must pass.
-16. Push branch, create PR.
-17. Watch CI; resolve all comments. No "pre-existing" excuses.
-18. Merge.
+1. Commit with conventional message format (`type(scope): description`).
+   `make check` must pass.
+2. Push branch, create PR.
+3. Watch CI; resolve all comments. No "pre-existing" excuses.
+4. Merge.
 
 #### Phase 7: Close
 
-19. Close the mission via `ethos mission close <id>`.
-20. Delete the feature branch locally and remotely; switch to main; pull.
-    Leave the repo pristine.
+1. Close the mission via `ethos mission close <id>`.
+2. Delete the feature branch locally and remotely; switch to main; pull.
+   Leave the repo pristine.
 
 ## Practices
 
@@ -395,7 +395,7 @@ is used.
 
 ### Structural Elements
 
-```
+```text
 === Section Title ===         → \section*{Section Title}
 
 ** Solution N **              → \textbf{Solution N} with spacing
@@ -418,7 +418,7 @@ PROOF:                        → \begin{itemize} with indentation
 
 ### Operators
 
-```
+```text
 land   → \land              (logical AND)
 lor    → \lor               (logical OR)
 lnot   → \lnot              (logical NOT)
@@ -435,7 +435,7 @@ elem   → \in                (set membership)
 
 ### Z Notation
 
-```
+```text
 given A, B                    → \begin{zed}[A, B]\end{zed}
 Type ::= branch1 | branch2    → Free type definition
 abbrev == expression          → Abbreviation

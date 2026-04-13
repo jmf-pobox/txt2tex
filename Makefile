@@ -1,8 +1,13 @@
-.PHONY: lint format format-check type type-pyright test test-cov check check-cov build clean \
+.PHONY: lint lint-md format format-check type type-pyright test test-cov check check-cov build clean \
 	ethos-doctor ethos-agents ethos-team dev-doctor dev-setup
 
 lint:
 	uv run ruff check .
+
+# Markdown linting. Uses npx so contributors do not need a global install.
+# Config lives in .markdownlint.jsonc and .markdownlint-cli2.jsonc.
+lint-md:
+	npx --yes markdownlint-cli2 "**/*.md"
 
 format:
 	uv run ruff format .

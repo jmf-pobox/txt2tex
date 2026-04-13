@@ -13,6 +13,7 @@ txt2tex converts your plain text mathematical notation into beautifully typeset 
 **Unlock fuzz value** - Optional type checking catches errors before submission  
 
 Perfect for:
+
 - 🎓 **University students** writing formal methods assignments
 - 📝 **Researchers** documenting Z notation specifications
 - ✍️ **Anyone** who wants beautiful math typesetting without LaTeX learning curve
@@ -77,7 +78,7 @@ txt2tex --check-env
 
 Example output:
 
-```
+```text
 txt2tex environment check
 ========================================
 ✓ pdflatex: /usr/local/texlive/2025/bin/universal-darwin/pdflatex
@@ -124,6 +125,9 @@ uv run txt2tex examples/01_propositional_logic/hello_world.txt
 ```bash
 # Run all quality checks (lint, type check, tests)
 make check
+
+# Lint markdown (not yet in make check — pre-existing issues being cleaned up)
+make lint-md
 
 # Run tests only
 make test
@@ -191,7 +195,7 @@ For complete syntax reference, see **[docs/guides/USER_GUIDE.md](https://github.
 
 Create a file `example.txt`:
 
-```
+```text
 === My First Proof ===
 
 ** Solution 1 **
@@ -228,7 +232,7 @@ Open `example.pdf` to see your beautifully formatted output!
 
 Write expressions almost exactly as you would on paper:
 
-```
+```text
 forall x : N | x >= 0
 exists y : Z | y < 0
 { x : N | x mod 2 = 0 }
@@ -245,7 +249,7 @@ txt2tex converts these to properly typeset LaTeX automatically.
 
 **What You See Is What You Get** - Natural line breaks in your input control line breaks in PDF output:
 
-```
+```text
 axdef
   sumList : seq N -> N
 where
@@ -261,7 +265,7 @@ Write multi-line expressions exactly as they should appear in the final PDF. No 
 
 Full support for Z notation structures:
 
-```
+```text
 given Person, Company
 
 axdef
@@ -281,7 +285,7 @@ end
 
 Natural deduction proofs with simple indentation:
 
-```
+```text
 PROOF:
   p => q
   p
@@ -290,7 +294,7 @@ PROOF:
 
 ### Truth Tables and Equivalence Chains
 
-```
+```text
 TRUTH TABLE:
 p | q | p => q
 T | T | T
@@ -337,7 +341,7 @@ txt2tex -i --zed           # Use zed-* packages instead of fuzz
 
 Example session:
 
-```
+```text
 $ txt2tex -i
 txt2tex interactive mode. Type .help for commands.
 
@@ -357,6 +361,7 @@ Goodbye!
 ```
 
 **REPL Commands:**
+
 | Command | Description |
 |---------|-------------|
 | `.help` | Show help message |
@@ -379,6 +384,7 @@ If fuzz is not installed, you'll see a note but compilation continues normally.
 For detailed syntax documentation, see **[docs/guides/USER_GUIDE.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/USER_GUIDE.md)**.
 
 The guide covers:
+
 - Document structure (sections, solutions, parts)
 - Text blocks (with smart formula detection and citations)
 - Propositional and predicate logic
@@ -430,6 +436,7 @@ All 141 examples pass fuzz typechecking and compile to PDF
 ### Default: fuzz Package
 
 The standard for Z notation with built-in type checking:
+
 - Custom Oxford fonts
 - Type validation during compilation
 - Compatible with fuzz-based toolchains
@@ -439,6 +446,7 @@ The standard for Z notation with built-in type checking:
 ### Optional: zed-* Packages
 
 Works on any LaTeX installation, no custom fonts needed:
+
 - Computer Modern fonts
 - Excellent proof tree support
 - Industry-standard Z notation rendering
@@ -457,6 +465,7 @@ Use `--zed` flag: `txt2tex input.txt --zed`
 4. Or use `txt2tex myfile.txt --tex-only` for LaTeX Workshop live preview
 
 The project includes pre-configured settings:
+
 - `.vscode/settings.json` - LaTeX Workshop configuration
 - `.latexmkrc` - Build settings for natbib citations
 
@@ -504,12 +513,14 @@ Run `txt2tex` at least once - it copies dependencies locally. If using LaTeX Wor
 ### Parse Errors
 
 txt2tex provides clear error messages with line numbers. Common issues:
+
 - Unsupported syntax → See [docs/guides/USER_GUIDE.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/USER_GUIDE.md) for supported features
 - Missing quantifier separator → Use `forall x : N | predicate` (note the `|`)
 
 ### Fuzz Type Errors
 
 Fuzz catches genuine specification errors. Check:
+
 - Undefined variables
 - Type mismatches
 - Invalid operator usage
@@ -537,6 +548,7 @@ A few edge cases require workarounds:
 ## Project Status
 
 **Current Implementation:**
+
 - ✅ **Feature complete** for typical Z specifications
 - ✅ **1280 tests** - Comprehensive test suite
 - ✅ **Full Z notation** - Schemas, relations, functions, sequences
@@ -552,12 +564,14 @@ A few edge cases require workarounds:
 ## Documentation
 
 ### User Guides
+
 - **[docs/guides/USER_GUIDE.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/USER_GUIDE.md)** - Complete syntax reference
 - **[docs/guides/FUZZ_VS_STD_LATEX.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/FUZZ_VS_STD_LATEX.md)** - Fuzz compatibility guide
 - **[docs/guides/MISSING_FEATURES.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/MISSING_FEATURES.md)** - Missing features
 - **[docs/guides/PROOF_SYNTAX.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/PROOF_SYNTAX.md)** - Proof tree notation
 
 ### Tutorials
+
 - **[docs/tutorials/README.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/README.md)** - Tutorial index and learning path
 - **[docs/tutorials/00_getting_started.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/00_getting_started.md)** - First steps
 - **[docs/tutorials/01_propositional_logic.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/01_propositional_logic.md)** - Logic basics
@@ -572,6 +586,7 @@ A few edge cases require workarounds:
 - **[docs/tutorials/10_advanced.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/10_advanced.md)** - Advanced topics
 
 ### Development Documentation
+
 - **[docs/development/IDE_SETUP.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/development/IDE_SETUP.md)** - IDE configuration
 - **[docs/DESIGN.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/DESIGN.md)** - Architecture and design decisions
 
