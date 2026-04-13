@@ -27,7 +27,7 @@ test:
 test-cov:
 	uv run pytest --cov=src/txt2tex --cov-report=term-missing --cov-report=html $(ARGS)
 
-check: lint format-check type type-pyright test
+check: lint lint-md format-check type type-pyright test
 
 check-cov: lint format-check type type-pyright test-cov
 

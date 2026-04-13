@@ -1,5 +1,6 @@
 # Tutorial 6: Relations
 
+<!-- markdownlint-disable-next-line MD036 -->
 **Lecture 6: Relations**
 
 Learn about binary relations, maplets, domain/range, and relational operators.
@@ -14,13 +15,15 @@ Learn about binary relations, maplets, domain/range, and relational operators.
 **Relation:** Set of ordered pairs
 
 **Notation:**
-```
+
+```text
 R : X <-> Y        (relation from X to Y)
 R : X ↔ Y          (Unicode alternative)
 ```
 
 **Example:**
-```
+
+```text
 parentOf : Person <-> Person
 married : Person <-> Person
 ```
@@ -29,7 +32,7 @@ married : Person <-> Person
 
 **Maplet notation:** `x |-> y` represents the ordered pair (x, y)
 
-```
+```text
 {1 |-> 'a', 2 |-> 'b', 3 |-> 'c'}
 ```
 
@@ -40,7 +43,7 @@ married : Person <-> Person
 **Domain dom R:** Set of first components
 **Range ran R:** Set of second components
 
-```
+```text
 R = {1 |-> 'a', 2 |-> 'b', 3 |-> 'c'}
 dom R = {1, 2, 3}
 ran R = {'a', 'b', 'c'}
@@ -52,30 +55,31 @@ ran R = {'a', 'b', 'c'}
 
 ### Domain Restriction (|)
 
-```
+```text
 S <| R        (restrict R to domain S)
 ```
 
 **Example:**
-```
+
+```text
 {1, 2} <| {1 |-> 'a', 2 |-> 'b', 3 |-> 'c'} = {1 |-> 'a', 2 |-> 'b'}
 ```
 
 ### Domain Subtraction
 
-```
+```text
 S <-| R       (remove domain S from R)
 ```
 
 ### Range Restriction (|>)
 
-```
+```text
 R |> T        (restrict R to range T)
 ```
 
 ### Range Subtraction
 
-```
+```text
 R |>- T       (remove range T from R)
 ```
 
@@ -85,7 +89,7 @@ R |>- T       (remove range T from R)
 
 **Forward composition R o9 S:** Apply R then S
 
-```
+```text
 R = {1 |-> 10, 2 |-> 20}
 S = {10 |-> 100, 20 |-> 200}
 R o9 S = {1 |-> 100, 2 |-> 200}
@@ -99,7 +103,7 @@ R o9 S = {1 |-> 100, 2 |-> 200}
 
 **R~ (R inverse):** Swap pairs
 
-```
+```text
 R = {1 |-> 'a', 2 |-> 'b'}
 R~ = {'a' |-> 1, 'b' |-> 2}
 ```
@@ -108,7 +112,7 @@ R~ = {'a' |-> 1, 'b' |-> 2}
 
 **R(| S |):** Image of set S under relation R
 
-```
+```text
 R = {1 |-> 'a', 2 |-> 'b', 3 |-> 'c'}
 R(| {1, 2} |) = {'a', 'b'}
 ```
@@ -117,7 +121,7 @@ R(| {1, 2} |) = {'a', 'b'}
 
 ## Complete Example
 
-```
+```text
 === Relations Example ===
 
 given Person
@@ -136,6 +140,7 @@ end
 ## Summary
 
 You've learned:
+
 - ✅ Binary relations (X <-> Y)
 - ✅ Maplet notation (|->)
 - ✅ Domain and range (dom, ran)

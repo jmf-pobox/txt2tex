@@ -1,5 +1,6 @@
 # Tutorial 3: Sets and Types
 
+<!-- markdownlint-disable-next-line MD036 -->
 **Lecture 3: Set Theory**
 
 Learn set notation, set operations, power sets, Cartesian products, and tuples.
@@ -14,7 +15,8 @@ Learn set notation, set operations, power sets, Cartesian products, and tuples.
 **Set:** Unordered collection of distinct elements
 
 **Notation:**
-```
+
+```text
 {1, 2, 3}              (set literal)
 {x : N | x < 5}        (set comprehension)
 emptyset               (empty set)
@@ -22,20 +24,21 @@ emptyset               (empty set)
 
 ### Set Membership
 
-```
+```text
 x elem S               (x is a member of S)
 x notin S              (x is not a member of S)
 ```
 
 ### Set Comprehension
 
-```
+```text
 { x : T | constraint }
 { x : T | constraint . term }
 ```
 
 **Example:**
-```
+
+```text
 { x : N | x < 10 }                  (numbers less than 10)
 { x : N | x < 5 . x * x }           (squares of numbers less than 5)
 ```
@@ -46,25 +49,25 @@ x notin S              (x is not a member of S)
 
 ### Union (union)
 
-```
+```text
 A union B              (elements in A or B or both)
 ```
 
 ### Intersection (intersect)
 
-```
+```text
 A intersect B          (elements in both A and B)
 ```
 
 ### Difference (\)
 
-```
+```text
 A \ B                  (elements in A but not in B)
 ```
 
 ### Subset Relations
 
-```
+```text
 A subset B             (A ⊆ B: every element of A is in B)
 A subseteq B           (same as subset)
 A psubset B            (A ⊂ B: A ⊆ B and A ≠ B)
@@ -76,12 +79,13 @@ A psubset B            (A ⊂ B: A ⊆ B and A ≠ B)
 
 **Power set P(S):** Set of all subsets of S
 
-```
+```text
 P {1, 2} = {{}, {1}, {2}, {1, 2}}
 ```
 
 **Type notation:**
-```
+
+```text
 s : P N                (s is a set of natural numbers)
 S : P (P N)            (S is a set of sets of natural numbers)
 ```
@@ -91,13 +95,15 @@ S : P (P N)            (S is a set of sets of natural numbers)
 **Cartesian product A × B:** Set of all ordered pairs (a, b) where a ∈ A and b ∈ B
 
 **Notation:**
-```
+
+```text
 A cross B
 N cross N              (pairs of natural numbers)
 ```
 
 **Example:**
-```
+
+```text
 {1, 2} cross {a, b} = {(1, a), (1, b), (2, a), (2, b)}
 ```
 
@@ -108,13 +114,15 @@ N cross N              (pairs of natural numbers)
 **Tuple:** Ordered collection (can have duplicates, order matters)
 
 **Notation:**
-```
+
+```text
 (1, 2)                 (pair)
 (a, b, c)              (triple)
 ```
 
 **Tuple projection:**
-```
+
+```text
 p.1                    (first element of pair p)
 p.2                    (second element)
 (a, b, c).2 = b        (second element of triple)
@@ -126,14 +134,14 @@ p.2                    (second element)
 
 **Cardinality #S:** Number of elements in a finite set
 
-```
+```text
 # {1, 2, 3} = 3
 # {} = 0
 ```
 
 ## Complete Example
 
-```
+```text
 === Set Theory Examples ===
 
 ** Example 1: Set Literals **
@@ -174,6 +182,7 @@ TEXT: Result: {(1,a), (1,b), (2,a), (2,b)}
 ## Summary
 
 You've learned:
+
 - ✅ Set notation and set comprehension
 - ✅ Set operations (union, intersect, difference, subset)
 - ✅ Power sets

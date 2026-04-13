@@ -5,6 +5,7 @@
 ### Overview
 
 The project uses natbib for Harvard-style citations, which requires **two pdflatex passes**:
+
 1. **First pass**: Generates .aux file with citation information
 2. **Second pass**: Reads .aux file and inserts correct citations
 
@@ -13,16 +14,19 @@ The project uses natbib for Harvard-style citations, which requires **two pdflat
 #### [.vscode/settings.json](../../.vscode/settings.json)
 
 **Default Recipe**: `fuzz -> pdflatex*2`
+
 - Runs fuzz type checker
 - Runs pdflatex twice to resolve citations
 
 **Available Recipes**:
+
 1. `fuzz -> pdflatex*2` (default) - Type check with fuzz, compile twice
 2. `pdflatex*2` - Compile twice without fuzz
 3. `fuzz -> pdflatex` - Single pass (faster but citations won't resolve)
 4. `pdflatex` - Single pass without fuzz
 
 **Environment Variables**:
+
 ```json
 "env": {
     "TEXINPUTS": ".:%DIR%:%DIR%/latex//:",
@@ -33,6 +37,7 @@ The project uses natbib for Harvard-style citations, which requires **two pdflat
 #### [hw/.latexmkrc](../../hw/.latexmkrc)
 
 Configures latexmk for natbib:
+
 - Sets `$max_repeat = 5` to ensure citations resolve
 - Adds current directory to TEXINPUTS/MFINPUTS
 - Uses `pdflatex -interaction=nonstopmode`
@@ -44,7 +49,8 @@ Same configuration for examples directory.
 ### Why Two Passes Are Required
 
 **With natbib**, the first pdflatex pass produces warnings like:
-```
+
+```text
 Package natbib Warning: Citation `spivey92' on page 1 undefined.
 Package natbib Warning: Citation(s) may have changed.
 (natbib)                Rerun to get citations correct.
@@ -53,11 +59,13 @@ Package natbib Warning: Citation(s) may have changed.
 These are **expected** and resolved automatically on the second pass.
 
 **First pass**:
+
 - Reads `\citep{spivey92}` commands
 - Writes citation info to `.aux` file
 - Shows warnings about undefined citations
 
 **Second pass**:
+
 - Reads `.aux` file with citation info
 - Replaces `\citep{spivey92}` with `(Spivey, 1992)`
 - No warnings
@@ -67,13 +75,16 @@ These are **expected** and resolved automatically on the second pass.
 All build methods handle double compilation correctly:
 
 #### 1. LaTeX Workshop (IDE)
+
 When you save a `.tex` file, LaTeX Workshop automatically:
+
 1. Runs fuzz type checker
 2. Runs pdflatex (first pass)
 3. Runs pdflatex (second pass)
 4. Citations resolve correctly, no warnings remain
 
 #### 2. txt2tex CLI
+
 ```bash
 txt2tex examples/01_propositional_logic/basic_operators.txt
 ```
@@ -81,6 +92,7 @@ txt2tex examples/01_propositional_logic/basic_operators.txt
 Uses latexmk (when available) for robust compilation. latexmk automatically handles multiple passes and bibliography processing.
 
 #### 3. Makefile
+
 ```bash
 make -C examples all
 ```
@@ -106,12 +118,14 @@ pdftotext output.pdf - | grep "Spivey"
 #### Problem: IDE shows natbib warnings
 
 **Symptom**:
-```
+
+```text
 Package natbib: Citation `spivey92' on page 1 undefined.
 Package natbib: Citation(s) may have changed. Rerun to get citations correct.
 ```
 
 **Solution**:
+
 1. Check `.vscode/settings.json` has `"latex-workshop.latex.recipe.default": "fuzz -> pdflatex*2"`
 2. Manually trigger rebuild: `Cmd+Shift+P` → "LaTeX Workshop: Build LaTeX Project"
 3. Check `.latexmkrc` exists in working directory with `$max_repeat = 5`
@@ -127,6 +141,7 @@ Package natbib: Citation(s) may have changed. Rerun to get citations correct.
 **Symptom**: IDE doesn't complete build
 
 **Solution**:
+
 - Use `pdflatex*2` recipe (without fuzz) for rapid iteration
 - Fix fuzz errors, then switch back to `fuzz -> pdflatex*2`
 

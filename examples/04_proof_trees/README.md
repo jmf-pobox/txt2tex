@@ -13,7 +13,7 @@ This directory contains examples for Lecture 4, covering natural deduction and p
 
 ## Proof Tree Structure
 
-```
+```text
 PROOF:
   conclusion [rule name]
     premise1
@@ -39,6 +39,7 @@ PROOF:
 ## Examples in This Directory
 
 Browse the `.txt` files to see:
+
 - Simple inference proofs
 - Assumption discharge
 - Case analysis patterns

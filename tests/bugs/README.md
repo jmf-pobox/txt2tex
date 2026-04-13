@@ -1,6 +1,7 @@
 # txt2tex Test Files: Regressions, Features, and Limitations
 
 This directory contains test files organized into three categories:
+
 1. **Limitation Tests** (3 files) - Expected behavior with documented workarounds
 2. **Regression Tests** (16 files) - Previously fixed issues
 3. **Feature Tests** (7 files) - Edge cases and features
@@ -10,12 +11,14 @@ This directory contains test files organized into three categories:
 These tests document expected behavior limitations, not bugs. Each has a documented workaround.
 
 ### Prose with Periods (Issue #1 - CLOSED)
+
 - **File**: [bug1_prose_period.txt](bug1_prose_period.txt)
 - **Behavior**: Default parsing mode is for mathematical expressions, not prose
 - **Workaround**: Use `TEXT:` blocks for prose with inline math
 - **Reference**: See USER_GUIDE.md for TEXT block syntax
 
 ### Compound Identifiers (Issue #3 - CLOSED)
+
 - **Files**: [bug3_compound_id.txt](bug3_compound_id.txt), [bug3_test_simple.txt](bug3_test_simple.txt)
 - **Behavior**: txt2tex generates valid LaTeX (`R^+`), but fuzz type-checker rejects it
 - **Workaround**: Use `--zed` flag to bypass fuzz type-checking

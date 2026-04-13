@@ -15,7 +15,7 @@ This directory contains examples for Lecture 9, covering sequences and bags.
 
 ## Key Operators
 
-```
+```text
 seq(X)           →  seq X       [sequence type]
 iseq(X)          →  iseq X      [injective sequence type]
 ⟨⟩               →  ⟨⟩          [empty sequence]
@@ -35,7 +35,7 @@ b1 bag_union b2  →  b1 ⊎ b2     [bag union]
 
 The `^` operator has dual meaning based on whitespace:
 
-```
+```text
 <x> ^ <y>        →  ⟨x⟩ ⌢ ⟨y⟩    [concatenation - WITH SPACE]
 x^2              →  x²           [exponentiation - NO SPACE]
 ```
@@ -46,7 +46,7 @@ x^2              →  x²           [exponentiation - NO SPACE]
 
 Sequences enable recursive function definitions:
 
-```
+```text
 f(<>) = 0                        [empty sequence case]
 f(<x> ^ s) = x + f(s)            [cons pattern: head and tail]
 ```
@@ -54,6 +54,7 @@ f(<x> ^ s) = x + f(s)            [cons pattern: head and tail]
 ## Examples in This Directory
 
 Browse the `.txt` files to see:
+
 - Basic sequence operations
 - Concatenation patterns
 - Pattern matching for recursion

@@ -1,4 +1,4 @@
-`# txt2tex: Software Design Document
+# txt2tex: Software Design Document
 
 ## Executive Summary
 
@@ -7,6 +7,7 @@
 **Core Philosophy**: Parse, don't pattern-match. Understand structure semantically, then generate LaTeX with confidence.
 
 **Key Features**:
+
 1. Lexical analysis and parsing for robust conversion
 2. Context-aware formatting (math vs prose vs Z notation)
 3. fuzz validation integration
@@ -18,11 +19,13 @@ These principles guide all design decisions in txt2tex, balancing accessibility 
 
 ### Principle 1: Whiteboard Fidelity with LaTeX Transparency
 
+<!-- markdownlint-disable-next-line MD036 -->
 *"Make the simple things invisible, the complex things explicit."*
 
 Users write natural whiteboard notation, but the generated LaTeX should be recognizable and teachable. A student who learns txt2tex should be 70%+ prepared to write LaTeX with fuzz directly.
 
 **Application**:
+
 - ✅ **Automatic smart defaults**: Add `\quad` for indentation when users break lines
 - ✅ **Automatic line breaks**: Convert newlines to `\\` in appropriate contexts
 - ✅ **Automatic spacing**: Insert `~` in set comprehensions, function application
@@ -31,11 +34,13 @@ Users write natural whiteboard notation, but the generated LaTeX should be recog
 
 ### Principle 2: Align Notation with Z Standards
 
+<!-- markdownlint-disable-next-line MD036 -->
 *"When whiteboard notation matches formal notation, prefer formal notation."*
 
 Where Z notation has established conventions (like `\land`, `\lor`, `\forall`), our ASCII input mirrors these closely. This reduces cognitive load when students transition to reading research papers or formal specifications.
 
 **Application**:
+
 - ✅ **Use standard Z keywords**: `land`, `lor`, `lnot` (not `and`, `or`, `not`)
 - ✅ **Use standard Z symbols where ASCII-friendly**: `forall`, `exists`, `cross`, `subset`
 - ✅ **Preserve Z operator precedence**: Match zed2e exactly
@@ -46,6 +51,7 @@ Where Z notation has established conventions (like `\land`, `\lor`, `\forall`), 
 
 ### Principle 3: Progressive Disclosure of Complexity
 
+<!-- markdownlint-disable-next-line MD036 -->
 *"Simple cases should be simple; complex cases should be explicit."*
 
 Common patterns get smart defaults. Advanced users can override with explicit LaTeX hints. Never force complexity on beginners, never hide power from experts.
@@ -115,7 +121,7 @@ Common patterns get smart defaults. Advanced users can override with explicit La
 
 ### High-Level Pipeline
 
-```
+```text
 Input Text
     ↓
 ┌─────────────────┐
@@ -211,13 +217,14 @@ class TokenType(Enum):
 ```
 
 **Key Features**:
+
 - **Whitespace significance**: Track indentation for proof trees
 - **Line tracking**: Maintain line numbers for error messages
 - **Lookahead**: Support for multi-character operators (<=>)
 
 **Lexer State Machine**:
 
-```
+```text
 START →
   | "===" → SECTION_MARKER
   | "**"  → SOLUTION_MARKER
@@ -236,11 +243,13 @@ START →
 ```
 
 **Unicode Support**:
+
 - Accept Unicode operators directly: ∧, ∨, ¬, ⇒, ⇔, ∀, ∃
 - Map to same token types as ASCII equivalents
 - User can choose ASCII or Unicode in input
 
 **Implementation Notes**:
+
 ```python
 class Lexer:
     def __init__(self, text: str):
@@ -262,11 +271,12 @@ class Lexer:
         pass
 ```
 
-**Whitespace-Sensitive Operator Disambiguation**
+#### Whitespace-Sensitive Operator Disambiguation
 
 The lexer uses whitespace to disambiguate the `^` operator, which has dual meaning:
 
 **Disambiguation Rule**:
+
 - **Space/tab/newline before `^`** → CAT token (sequence concatenation)
 - **No space before `^`** → CARET token (exponentiation/superscript)
 - **Special case `>^<`** → LexerError with helpful message
@@ -278,7 +288,8 @@ parenthesized expressions `(s) ^ <x>`. Whitespace-based disambiguation is simple
 consistent, and matches mathematical convention (e.g., `4^2` vs `s ^ t`).
 
 **Examples**:
-```
+
+```text
 <x> ^ <y>     → CAT token (space before ^) → \langle x \rangle \cat \langle y \rangle
 R^2           → CARET token (no space) → R \bsup 2 \esup (relation iteration)
 s ^ t         → CAT token (space before ^) → s \cat t
@@ -294,6 +305,7 @@ error message directing users to add space. This prevents a common mistake when
 writing sequence concatenation.
 
 **Token Types**:
+
 - `CAT`: Sequence concatenation operator (renders as `\cat` in LaTeX)
 - `CARET`: Superscript/exponentiation operator (renders as `^{...}` in LaTeX)
 
@@ -425,7 +437,8 @@ class Application(MathExpr):
 **Parser Strategy**: Recursive descent with operator precedence
 
 **Precedence Table** (lowest to highest):
-```
+
+```text
 1. <=> (iff)
 2. => (implies)
 3. or (disjunction)
@@ -441,6 +454,7 @@ class Application(MathExpr):
 
 **Note on `^` operator**:
 The `^` symbol has dual meaning based on whitespace (disambiguated at lexing):
+
 - **With space before**: CAT token → sequence concatenation (level 8, same as multiplication)
 - **No space before**: CARET token → exponentiation/superscript (level 9, higher precedence)
 
@@ -449,12 +463,14 @@ The `^` symbol has dual meaning based on whitespace (disambiguated at lexing):
 When users write explicit parentheses like `(A and B) and C`, these are preserved in the LaTeX output even if not strictly required by precedence rules. This maintains semantic grouping clarity from the source text.
 
 **Implementation**:
+
 - Parser marks `BinaryOp` nodes with `explicit_parens=True` when wrapped in parentheses
 - LaTeX generator always adds parentheses for expressions with `explicit_parens=True`
 - Prevents double parenthesization by checking flag before adding precedence-based parens
 
 **Examples**:
-```
+
+```text
 (A land B) land C      → (A \land B) \land C   (left parens preserved)
 A land (B land C)      → A \land (B \land C)   (right parens preserved)
 A land B land C        → A \land B \land C     (no parens, left-associative)
@@ -462,12 +478,14 @@ A land B land C        → A \land B \land C     (no parens, left-associative)
 ```
 
 **Rationale**: User-written parentheses indicate semantic intent beyond operator precedence. In formal specifications, explicit grouping conveys important meaning about logical structure. The parser must distinguish between:
+
 - **Precedence-required parens**: `(A lor B) land C` (needed because `lor` has lower precedence)
 - **Explicit clarity parens**: `(A land B) land C` (not needed by precedence, but preserves grouping)
 
 **Context Handling**:
 
 The parser maintains context state to distinguish:
+
 - **Math mode**: Inside equations, truth tables, proof trees
 - **Prose mode**: Regular text paragraphs
 - **Z mode**: Inside Z notation blocks
@@ -520,6 +538,7 @@ class Parser:
 **Responsibility**: Validate and annotate the AST with type/context information.
 
 **Tasks**:
+
 1. **Identifier resolution**: Track declared variables, types
 2. **Type inference**: Determine types of expressions where possible
 3. **Scope checking**: Ensure variables are in scope
@@ -693,6 +712,7 @@ TEMPLATES = {
 **Responsibility**: Run fuzz typechecker on generated LaTeX.
 
 **Approach**:
+
 1. Generate complete LaTeX document
 2. Run fuzz typechecker (if available)
 3. Parse fuzz error output
@@ -830,7 +850,7 @@ class LaTeXError(Txt2TeXError):
 
 Clear, actionable error messages with context:
 
-```
+```text
 Error on line 42, column 15:
   (a) This is true: forall x in N, x * x >= 0
                           ^
@@ -864,7 +884,7 @@ Did you mean: forall x : N | x * x >= 0
 
 Tests are organized by feature area, mirroring the user guide topics:
 
-```
+```text
 tests/
 ├── conftest.py                    # Shared fixtures
 ├── README.md                      # Test documentation
@@ -893,6 +913,7 @@ tests/
 ```
 
 Each feature directory contains:
+
 - `README.md` - Description of tests in this area
 - `test_*.py` - Test modules organized by sub-feature
 
@@ -902,7 +923,7 @@ Each feature directory contains:
 
 The `txt2tex` command accepts the following arguments:
 
-```
+```bash
 txt2tex INPUT [-o OUTPUT] [--zed] [--toc-parts] [--no-warn-overflow] [--overflow-threshold N]
 ```
 
@@ -928,12 +949,12 @@ generator = LaTeXGenerator(
 )
 ```
 
-
 ## Supported Features
 
 txt2tex is feature-complete for typical Z specifications. See [MISSING_FEATURES.md](guides/MISSING_FEATURES.md) for advanced operators not yet implemented.
 
 ### Document Structure
+
 - Section headers (`=== Title ===`)
 - Solution markers (`** Solution N **`)
 - Part labels (`(a)`, `(b)`, `(c)`)
@@ -941,17 +962,20 @@ txt2tex is feature-complete for typical Z specifications. See [MISSING_FEATURES.
 - Proper spacing (`\bigskip`, `\medskip`)
 
 ### Logic and Proofs
+
 - **Propositional**: Truth tables, equivalence chains, operators (`land`, `lor`, `lnot`, `=>`, `<=>`)
 - **Predicate**: `forall`, `exists`, `exists1`, mu-operator with multi-variable support
 - **Proofs**: Natural deduction with inference rules, nested assumptions, discharge notation, case analysis
 
 ### Sets and Types
+
 - **Operations**: `in`, `notin`, `subset`, `subseteq`, `cup`, `cap`, `cross`, `setminus`, `P`, `P1`, `#`, `bigcup`
 - **Comprehension**: `{ x : X | predicate }`, `{ x : X | predicate . expression }`
 - **Literals**: Set literals, maplets (`{1 |-> a, 2 |-> b}`)
 - **Tuples**: `(a, b, c)` in expressions and comprehensions
 
 ### Relations
+
 - Type syntax (`<->`), maplet (`|->`)
 - Domain/range: `dom`, `ran`, restriction (`<|`, `|>`), subtraction (`<<|`, `|>>`)
 - Composition (`comp`, `o9`), inverse (`~`), transitive closure (`+`, `*`)
@@ -961,12 +985,14 @@ txt2tex is feature-complete for typical Z specifications. See [MISSING_FEATURES.
 **Note**: Semicolon (`;`) is reserved for declaration separators, not composition.
 
 ### Functions
+
 - All function types: partial (`+->`), total (`->`), injections, surjections, bijections
 - Lambda expressions: `lambda x : X . expr`
 - Function application: `f x`, `f(x)`
 - Override: `f ++ {x |-> y}`
 
 ### Sequences and Bags
+
 - Sequence literals: `<>`, `<a, b, c>`
 - Concatenation: `^` (with space: `s ^ t`)
 - Operators: `head`, `tail`, `front`, `last`, `rev`, `#`
@@ -974,6 +1000,7 @@ txt2tex is feature-complete for typical Z specifications. See [MISSING_FEATURES.
 - Bag operations: `bag`, `uplus`
 
 ### Z Notation Definitions
+
 - Given types: `given A, B`
 - Free types: `Status ::= active | inactive` with parameterized constructors
 - Abbreviations: `Name == expression`
@@ -983,6 +1010,7 @@ txt2tex is feature-complete for typical Z specifications. See [MISSING_FEATURES.
 - Generic instantiation: `Type[A, B]`, `emptyset[N]`
 
 ### Expressions
+
 - Arithmetic: `+`, `-`, `*`, `mod`, unary minus
 - Conditionals: `if condition then expr else expr`
 - Subscripts/superscripts: `x_i`, `R^n` (relation iteration)
@@ -993,12 +1021,15 @@ txt2tex is feature-complete for typical Z specifications. See [MISSING_FEATURES.
 
 ### Language
 
+<!-- markdownlint-disable-next-line MD036 -->
 **Python 3.12+**
+
 - Good library support
 - Dataclasses for AST nodes
 - Type hints for maintainability
 
 Alternative: **Rust**
+
 - Better performance
 - Strong type system
 - But steeper learning curve and longer development time
@@ -1019,7 +1050,7 @@ Alternative: **Rust**
 
 ### File Organization
 
-```
+```text
 txt2tex/
 ├── src/
 │   ├── __init__.py
@@ -1072,6 +1103,7 @@ txt2tex/
 **Implementation**: Both packages use identical macro names (`\land`, `\forall`, `\begin{schema}`, etc.), so generated LaTeX is 99% compatible. Only difference is preamble and proof tree syntax.
 
 **Configuration**:
+
 ```python
 # Default: fuzz package (for typechecking)
 # Use --zed flag for zed-* packages
@@ -1106,6 +1138,7 @@ Clear, actionable error messages more important than partial output in v1.
 **Decision**: Use standard LaTeX `array` environment, NOT fuzz's `argue` environment
 
 **Problem investigated**:
+
 - Fuzz provides an `argue` environment specifically for equivalence chains with justifications
 - Initial assumption was to use it for ARGUE/EQUIV blocks
 - However, argue has fundamental limitations that make it unsuitable
@@ -1113,6 +1146,7 @@ Clear, actionable error messages more important than partial output in v1.
 **Root cause analysis**:
 
 The fuzz `argue` environment uses this definition:
+
 ```tex
 \def\argue{\@zed \interzedlinepenalty=\interdisplaylinepenalty
   \openup\@jot \halign to\linewidth\bgroup
@@ -1122,18 +1156,21 @@ The fuzz `argue` environment uses this definition:
 ```
 
 Key issues:
+
 1. **Zero-width box for justifications**: `\hbox to0pt{\hss[...]}` places justifications in zero-width boxes
 2. **No column spacing**: No mechanism for minimum spacing between expression and justification columns
 3. **Result**: When both expressions and justifications are long, they overlap with no whitespace
 4. **Cannot be scaled**: The raw `\halign` construct is incompatible with `adjustbox` (requires LR mode, but `\halign` expects display math mode)
 
 **Attempted fixes**:
+
 - Created `argue-fixed.sty` that replaces `\hbox to0pt{\hss[...]}` with `\hspace{2em}[...]`
 - This fixed the spacing issue (2em guaranteed between columns)
 - But scaling with `adjustbox{max width=\textwidth}` still fails due to `\halign` mode incompatibility
 - Tried `\resizebox + minipage` wrapper but requires guessing content width (no conditional scaling)
 
 **Array solution**:
+
 ```latex
 \adjustbox{max width=\textwidth}{%
   $\displaystyle
@@ -1145,6 +1182,7 @@ Key issues:
 ```
 
 Advantages:
+
 - `@{\hspace{2em}}` provides guaranteed 2em spacing between columns
 - `adjustbox` works perfectly (conditional scaling only when needed)
 - Standard LaTeX - no dependency on modified fuzz packages
@@ -1182,7 +1220,8 @@ The argue environment's use of raw `\halign` makes this impossible - it cannot b
 ## Appendix: Example Conversion
 
 **Input (whiteboard.txt)**:
-```
+
+```text
 ** Solution 1 **
 
 (a) forall x : N | x * x >= 0
@@ -1196,6 +1235,7 @@ F | F | T
 ```
 
 **AST** (simplified):
+
 ```python
 Document(
   sections=[
@@ -1246,6 +1286,7 @@ Document(
 ```
 
 **Output LaTeX** (with default fuzz package):
+
 ```latex
 \documentclass{article}
 \usepackage{fuzz}

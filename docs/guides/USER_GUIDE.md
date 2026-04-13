@@ -23,6 +23,7 @@ A comprehensive guide to writing mathematical specifications in txt2tex whiteboa
 ## Installation
 
 See [README.md](../../README.md) for installation instructions, including:
+
 - Installing via `pip install txt2tex`
 - Setting up LaTeX packages for PDF generation
 - Optional fuzz typechecker binary
@@ -32,25 +33,31 @@ See [README.md](../../README.md) for installation instructions, including:
 ## Document Structure
 
 ### Sections
-```
+
+```text
 === Introduction and Propositions ===
 ```
+
 Generates: `\section*{Introduction and Propositions}`
 
 ### Solutions
-```
+
+```text
 ** Solution 1 **
 
 Content here...
 ```
+
 Generates: `\bigskip\noindent\textbf{Solution 1}\medskip`
 
 ### Part Labels
-```
+
+```text
 (a) First part
 (b) Second part
 (c) Third part
 ```
+
 Each part gets proper spacing and formatting with `(a)\par\vspace{11pt}`.
 
 ---
@@ -63,13 +70,14 @@ txt2tex provides four types of text blocks for different purposes:
 
 Use for normal prose where you want mathematical expressions automatically detected and converted:
 
-```
+```text
 TEXT: This is a plain text paragraph with => and <=> symbols.
 TEXT: The set { x : N | x > 0 } contains positive integers.
 TEXT: We know that forall x : N | x >= 0 is true.
 ```
 
 **Features:**
+
 - Operators converted: `=>` → $\Rightarrow$, `<=>` → $\Leftrightarrow$
 - Formulas automatically detected: `{ x : N | x > 0 }` → $\{ x : \mathbb{N} \mid x > 0 \}$
 - Sequence literals converted: `<a, b, c>` → $\langle a, b, c \rangle$
@@ -82,7 +90,7 @@ TEXT: We know that forall x : N | x >= 0 is true.
 
 **Citations in TEXT blocks:**
 
-```
+```text
 TEXT: The proof technique follows [cite spivey92].
 TEXT: This is discussed in [cite spivey92 p. 42].
 TEXT: See the definition in [cite woodcock96 p. 15].
@@ -90,6 +98,7 @@ TEXT: Multiple examples appear in [cite woodcock96 pp. 10-15].
 ```
 
 Renders as:
+
 - `[cite spivey92]` → (Spivey, 1992)
 - `[cite spivey92 p. 42]` → (Spivey, 1992, p. 42)
 - `[cite woodcock96 p. 15]` → (Woodcock and Davies, 1996, p. 15)
@@ -100,12 +109,13 @@ Renders as:
 
 Use for bibliography entries or prose with punctuation that would confuse the lexer:
 
-```
+```text
 PURETEXT: Spivey, J.M. (1992) "The Z Notation" & references.
 PURETEXT: Author's name, "quoted text", and more.
 ```
 
 **Features:**
+
 - Escapes LaTeX special characters: `&`, `%`, `$`, `#`, `_`, `{`, `}`, `~`, `^`, `\`
 - NO formula detection
 - NO operator conversion
@@ -116,13 +126,14 @@ PURETEXT: Author's name, "quoted text", and more.
 
 Use for custom LaTeX commands, environments, or formatting not supported by txt2tex:
 
-```
+```text
 LATEX: \begin{center}\textit{Custom formatting}\end{center}
 LATEX: \vspace{1cm}
 LATEX: \mycustomcommand{arg1}{arg2}
 ```
 
 **Features:**
+
 - NO escaping - raw LaTeX passed directly through
 - Perfect for tikz diagrams, custom environments, special commands
 - Used for bibliography setup with natbib
@@ -131,11 +142,12 @@ LATEX: \mycustomcommand{arg1}{arg2}
 
 txt2tex automatically includes the `natbib` package for author-year citations. You can manage bibliographies using either approach:
 
+<!-- markdownlint-disable-next-line MD036 -->
 **Bibliography File Approach (Recommended)**
 
 Use a separate `.bib` file with document-level directives:
 
-```
+```text
 BIBLIOGRAPHY: references.bib
 BIBLIOGRAPHY_STYLE: plainnat
 ```
@@ -143,6 +155,7 @@ BIBLIOGRAPHY_STYLE: plainnat
 The build process will automatically run BibTeX to process citations. The bibliography file should be in the same directory as your `.txt` file.
 
 **Available styles** (compatible with natbib):
+
 - `plainnat` - Author-year citations (default, similar to Harvard style)
 - `abbrvnat` - Abbreviated author names
 - `unsrtnat` - Unsorted, order of citation
@@ -150,11 +163,12 @@ The build process will automatically run BibTeX to process citations. The biblio
 
 Note: The `harvard` style is not a standard BibTeX style. Use `plainnat` for author-year citations similar to Harvard style.
 
+<!-- markdownlint-disable-next-line MD036 -->
 **Manual Bibliography Approach**
 
 For custom formatting or when you don't have a `.bib` file, use LATEX: blocks to define your bibliography manually:
 
-```
+```text
 LATEX: \setlength{\leftskip}{0pt}
 LATEX: \begin{thebibliography}{Woodcock, n.d.}
 LATEX:
@@ -171,7 +185,7 @@ The `\bibitem[Author, Year]{key}` format creates Harvard-style citations. Use `[
 
 ### PAGEBREAK: - Insert Page Break
 
-```
+```text
 PAGEBREAK:
 ```
 
@@ -181,11 +195,12 @@ Generates: `\newpage` to start a new page in the PDF.
 
 ## Propositional Logic
 
+<!-- markdownlint-disable-next-line MD036 -->
 *Lecture 1: Introduction and propositions*
 
 ### Basic Operators
 
-```
+```text
 lnot p           →  ¬p          (negation)
 p land q         →  p ∧ q       (conjunction)
 p lor q          →  p ∨ q       (disjunction)
@@ -205,7 +220,7 @@ p <=> q          →  p ⇔ q       (equivalence)
 
 ### Examples
 
-```
+```text
 lnot p land q      →  (¬p) ∧ q
 p land q => r      →  (p ∧ q) ⇒ r
 p => q => r        →  p ⇒ (q ⇒ r)    [right-associative]
@@ -213,7 +228,7 @@ p => q => r        →  p ⇒ (q ⇒ r)    [right-associative]
 
 ### Truth Tables
 
-```
+```text
 TRUTH TABLE:
 p | q | p => q
 T | T | T
@@ -226,7 +241,7 @@ Generates a centered LaTeX tabular environment with proper formatting.
 
 ### Equivalence Chains
 
-```
+```text
 EQUIV:
 p land q
 <=> q land p [commutative]
@@ -239,7 +254,7 @@ Generates `align*` environment with justifications flush-right.
 
 Justifications are **free-form text** in square brackets after each step. You can write any reasoning you want:
 
-```
+```text
 EQUIV:
 lnot (p land q)
 <=> (lnot p) lor (lnot q) [De Morgan]
@@ -249,6 +264,7 @@ lnot (p land q)
 ```
 
 **Common justifications:**
+
 - `[De Morgan]` - De Morgan's laws
 - `[distributivity]`, `[distribution]` - Distributive property
 - `[commutative]`, `[commutativity]` - Commutative property
@@ -262,6 +278,7 @@ lnot (p land q)
 **Operator conversion:** Mathematical operators in justifications are automatically converted to LaTeX:
 
 **Logical operators:**
+
 - `land` → $\land$
 - `lor` → $\lor$
 - `lnot` → $\lnot$
@@ -271,6 +288,7 @@ lnot (p land q)
 **Note on fuzz mode**: When using `--fuzz`, implication renders as `\implies` everywhere. Equivalence uses `\Leftrightarrow` in EQUIV blocks (equational reasoning) but `\iff` in predicates.
 
 **Relation operators:**
+
 - `o9` → $\circ$ (composition)
 - `|->` → $\mapsto$ (maplet)
 - `<->` → `\rel` (relation type)
@@ -281,6 +299,7 @@ lnot (p land q)
 - `++` → $\oplus$ (override)
 
 **Function type operators:**
+
 - `->` → `\fun` (total function)
 - `+->` → `\pfun` (partial function)
 - `>->` → `\inj` (injection)
@@ -290,77 +309,93 @@ lnot (p land q)
 - `77->` → `\ffun` (finite partial function)
 
 **Relation functions:**
+
 - `dom`, `ran`, `comp`, `inv`, `id`
 
 Example with logical operators:
-```
+
+```text
 <=> p lor (lnot p land q) [land land true]
 ```
+
 Renders as: $\Leftrightarrow p \lor (\lnot p \land q)$ with justification [$\land$ $\land$ true]
 
 Example with relation operators:
-```
+
+```text
 <=> (exists y : Y | w |-> y elem (R o9 S) land y |-> z elem T) [definition of o9]
 ```
+
 Renders as: $\Leftrightarrow \exists y : Y \bullet w \mapsto y \in (R \circ S) \land y \mapsto z \in T$ with justification [definition of $\circ$]
 
 ---
 
 ## Predicate Logic
 
+<!-- markdownlint-disable-next-line MD036 -->
 *Lecture 2: Predicate logic*
 
 ### Quantifiers
 
 #### Universal Quantification (∀)
 
-```
+```text
 forall x : N | x > 0
 ```
+
 Generates: $\forall x : \mathbb{N} \bullet x > 0$
 
 **With bullet separator (Phase 40):**
-```
+
+```text
 forall x : N | x > 0 . x < 10
 ```
+
 Generates: $\forall x : \mathbb{N} \mid x > 0 \bullet x < 10$
 
 The bullet separator (`.`) separates the constraint (filtering condition) from the body (conclusion). This is equivalent to:
-```
+
+```text
 forall x : N | (x > 0 => x < 10)
 ```
 
 #### Existential Quantification (∃)
 
-```
+```text
 exists y : Z | y < 0
 ```
+
 Generates: $\exists y : \mathbb{Z} \bullet y < 0$
 
 **With bullet separator (Phase 40):**
-```
+
+```text
 exists y : Z | y < 0 . y > -10
 ```
+
 Generates: $\exists y : \mathbb{Z} \mid y < 0 \bullet y > -10$
 
 #### Unique Existential Quantification (∃₁)
 
-```
+```text
 exists1 x : N | x * x = 4
 ```
+
 Generates: $\exists_1 x : \mathbb{N} \bullet x \times x = 4$
 
 **With bullet separator (Phase 40):**
-```
+
+```text
 exists1 x : N | x * x = 4 . x > 0
 ```
+
 Generates: $\exists_1 x : \mathbb{N} \mid x \times x = 4 \bullet x > 0$
 
 **Note on bullet separator limitations:**
 
 In rare cases where the bullet separator is followed by an identifier and then `=`, the parser may treat it as a field projection rather than a bullet separator. In these cases, use implication (`=>`) instead:
 
-```
+```text
 // Use implication for this pattern:
 forall i, j : dom f | f i = f j => i = j
 
@@ -374,7 +409,7 @@ The bullet separator works correctly when followed by set operators (`elem`, `no
 
 The mu operator (μ) denotes "the unique value satisfying a predicate":
 
-```
+```text
 mu x : N | x * x = 4 land x > 0
 ```
 
@@ -383,7 +418,8 @@ Generates (in fuzz mode): $(\mu x : \mathbb{N} \mid x \times x = 4 \land x > 0)$
 **Note**: In fuzz mode, mu expressions use `|` as the separator and are wrapped in parentheses. The syntax is: `mu variable : Type | predicate`
 
 **With expression part** (selecting from a set):
-```
+
+```text
 mu x : N | x elem S . f(x)
 ```
 
@@ -393,7 +429,7 @@ The mu operator is typically used when you know there exists exactly one element
 
 ### Multi-Variable Quantifiers
 
-```
+```text
 forall x, y : N | x = y
 exists a, b, c : Z | a = b
 ```
@@ -402,12 +438,13 @@ Comma-separated variables share the same domain.
 
 ### Nested Quantifiers
 
-```
+```text
 forall x : N | exists y : N | x = y
 ```
 
 **Important:** Nested quantifiers in `land`/`lor` expressions must be parenthesized:
-```
+
+```text
 ✅ Correct:   forall x : N | x > 0 land (forall y : N | y > x)
 ❌ Incorrect: forall x : N | x > 0 land forall y : N | y > x
 ```
@@ -415,7 +452,8 @@ forall x : N | exists y : N | x = y
 ### Declaration and Binding
 
 The colon `:` declares the type of a variable:
-```
+
+```text
 forall x : N | predicate        [declaration]
 { x : N | predicate }          [set comprehension]
 lambda x : N . expression      [lambda expression]
@@ -425,11 +463,12 @@ lambda x : N . expression      [lambda expression]
 
 ## Equality
 
+<!-- markdownlint-disable-next-line MD036 -->
 *Lecture 3: Equality*
 
 ### Equality Operator
 
-```
+```text
 x = y            →  x = y
 x != y           →  x ≠ y
 ```
@@ -438,36 +477,39 @@ x != y           →  x ≠ y
 
 "There is a unique value that..."
 
-```
+```text
 exists1 x : N | x = 5
 ```
+
 Generates: $\exists_1 x : \mathbb{N} \bullet x = 5$
 
 ### Mu Operator (μ)
 
 "The unique value that..."
 
-```
+```text
 mu x : N | x > 0
 ```
+
 Generates: $\mu x : \mathbb{N} \bullet x > 0$
 
 ---
 
 ## Sets and Types
 
+<!-- markdownlint-disable-next-line MD036 -->
 *Lecture 5: Sets and types*
 
 ### Set Notation
 
-```
+```text
 {1, 2, 3}                    →  {1, 2, 3}       [set literal]
 {}                           →  {}              [empty set]
 ```
 
 ### Set Membership
 
-```
+```text
 x elem A         →  x ∈ A       ['is an element of']
 x notin B        →  x ∉ B       ['not an element of']
 ```
@@ -476,7 +518,7 @@ x notin B        →  x ∉ B       ['not an element of']
 
 ### Set Relations
 
-```
+```text
 A subset B       →  A ⊆ B       [subset - includes equality]
 A psubset B      →  A ⊂ B       [strict/proper subset - excludes equality]
 A union B        →  A ∪ B       [union]
@@ -486,7 +528,7 @@ A \ B            →  A ∖ B       [set difference]
 
 ### Power Set
 
-```
+```text
 P S              →  P S         [power set - set of all subsets]
 P1 S             →  P₁ S        [non-empty power set]
 F S              →  F S         [set of finite subsets]
@@ -496,14 +538,14 @@ P (Z cross Z)    →  P (ℤ × ℤ)   [set of all relations on integers]
 
 ### Cardinality
 
-```
+```text
 # S              →  # S         [cardinality of a finite set]
 # {1, 2, 3}      →  # {1, 2, 3}
 ```
 
 ### Cartesian Product
 
-```
+```text
 A cross B        →  A × B       [Cartesian product]
 (x, y)           →  (x, y)      [ordered pair]
 (a, b, c)        →  (a, b, c)   [tuple]
@@ -512,7 +554,8 @@ A cross B        →  A × B       [Cartesian product]
 ### Tuple Component Selection and Field Projection
 
 **Numeric projection (tuples):**
-```
+
+```text
 p.1              →  p.1         [first component]
 p.2              →  p.2         [second component]
 p.3              →  p.3         [third component]
@@ -521,14 +564,16 @@ p.3              →  p.3         [third component]
 **Note:** Numeric projections (`.1`, `.2`, `.3`) are **not supported by fuzz** - they violate the fuzz grammar which requires identifiers after the period, not numbers. Use named schema fields instead (see below).
 
 **Named field projection (schemas):**
-```
+
+```text
 e.name           →  e.name      [access 'name' field]
 record.status    →  record.status [access 'status' field]
 person.age       →  person.age  [access 'age' field]
 ```
 
 Named field projections work with schema types:
-```
+
+```text
 schema Entry
   year: Year
   course: Course
@@ -543,52 +588,61 @@ end
 ```
 
 **Chained projections:**
-```
+
+```text
 record.inner.field    →  record.inner.field
 ```
 
 ### Set Comprehension
 
 **Set by predicate:**
-```
+
+```text
 { x : N | x > 0 }
 ```
+
 Generates: $\{ x : \mathbb{N} \mid x > 0 \}$
 
 **Set by expression:**
-```
+
+```text
 { x : N | x > 0 . x * x }
 ```
+
 Generates: $\{ x : \mathbb{N} \mid x > 0 \bullet x \times x \}$
 
 The bullet (`•`) separates the predicate from the expression.
 
 **Multi-variable:**
-```
+
+```text
 { x, y : N | x = y }
 ```
 
 **Without domain:**
-```
+
+```text
 { x | x elem A }
 ```
 
 **With maplets:**
-```
+
+```text
 {1 |-> a, 2 |-> b, 3 |-> c}
 ```
+
 Generates: $\{1 \mapsto a, 2 \mapsto b, 3 \mapsto c\}$
 
 ### Distributed Union and Intersection
 
-```
+```text
 bigcup S         →  ⋃ S         [distributed union]
 bigcap S         →  ⋂ S         [distributed intersection]
 ```
 
 ### Standard Sets
 
-```
+```text
 Z                →  ℤ           [the set of integers]
 N                →  ℕ           [natural numbers]
 ```
@@ -599,13 +653,15 @@ Note: Use blackboard bold for standard number sets by capitalizing: `N`, `Z`.
 
 ## Definitions
 
+<!-- markdownlint-disable-next-line MD036 -->
 *Lecture 6: Definitions*
 
 ### Basic Type Definition (Given Types)
 
-```
+```text
 given Person, Company
 ```
+
 Generates: `\begin{zed}[Person, Company]\end{zed}`
 
 ### Abbreviations
@@ -613,7 +669,8 @@ Generates: `\begin{zed}[Person, Company]\end{zed}`
 Abbreviations define shorthand names for types or expressions. They must be wrapped in `zed...end` blocks:
 
 **Basic abbreviations:**
-```
+
+```text
 zed
   Pairs == N cross N
 end
@@ -626,7 +683,8 @@ end
 Generates: `\begin{zed} Pairs == ℕ × ℕ \end{zed}` and `\begin{zed} Triples == ℕ × ℕ × ℕ \end{zed}`
 
 **With generic parameters:**
-```
+
+```text
 zed
   [X] Pair == X cross X
 end
@@ -637,7 +695,8 @@ end
 ```
 
 **Compound identifiers** (names with operator suffixes like `R+`, `R*`):
-```
+
+```text
 zed
   R+ == { a, b : N | b > a }
 end
@@ -648,6 +707,7 @@ end
 ```
 
 This generates:
+
 ```latex
 \begin{zed}
   R^+ == \{ a, b : \mathbb{N} \mid b > a \}
@@ -658,7 +718,8 @@ This generates:
 ```
 
 **Mixed content** (zed blocks can contain multiple constructs):
-```
+
+```text
 zed
   given Entry
   Status ::= active | inactive
@@ -671,18 +732,21 @@ This generates a single `\begin{zed}...\end{zed}` block containing the given typ
 ### Free Types
 
 **Simple free types:**
-```
+
+```text
 Status ::= active | inactive | pending
 ```
 
 **Recursive free types with constructor parameters:**
-```
+
+```text
 Tree ::= stalk | leaf⟨N⟩ | branch⟨Tree × Tree⟩
 List ::= nil | cons⟨N × List⟩
 ```
 
 Both Unicode `⟨⟩` and ASCII `<>` angle brackets are supported:
-```
+
+```text
 Tree ::= stalk | leaf<N> | branch<Tree × Tree>
 ```
 
@@ -691,13 +755,15 @@ Tree ::= stalk | leaf<N> | branch<Tree × Tree>
 For complex free type definitions with multiple types, the `syntax` environment provides column-aligned layout similar to BNF grammars:
 
 **Basic syntax block:**
-```
+
+```text
 syntax
   OP ::= plus | minus | times | divide
 end
 ```
 
 Generates:
+
 ```latex
 \begin{syntax}
 OP & ::= & plus | minus | times | divide
@@ -708,7 +774,7 @@ OP & ::= & plus | minus | times | divide
 
 Blank lines between definitions create visual groups using `\also`:
 
-```
+```text
 syntax
   Status ::= active | inactive | pending
 
@@ -717,6 +783,7 @@ end
 ```
 
 Generates:
+
 ```latex
 \begin{syntax}
 Status & ::= & active | inactive | pending \\
@@ -726,7 +793,8 @@ Response & ::= & ok | error \ldata \nat \rdata | timeout
 ```
 
 **Parameterized constructors:**
-```
+
+```text
 syntax
   Tree ::= leaf<N> | branch<Tree cross Tree>
 
@@ -746,7 +814,8 @@ end
 Generic definitions (gendef) define polymorphic functions and constants with type parameters:
 
 **Basic generic definition:**
-```
+
+```text
 gendef [X, Y]
   fst : X cross Y -> X
 where
@@ -757,6 +826,7 @@ end
 **Note**: Use `|` (pipe) as the separator in quantifiers, not `@`. The LaTeX generator will produce fuzz-compatible output with `@` when using the `--fuzz` flag.
 
 Generates:
+
 ```latex
 \begin{gendef}[X, Y]
 fst: X \cross Y \fun X
@@ -766,7 +836,8 @@ fst: X \cross Y \fun X
 ```
 
 **Single type parameter:**
-```
+
+```text
 gendef [X]
   identity : X -> X
 where
@@ -775,7 +846,8 @@ end
 ```
 
 **Multiple declarations (separate lines):**
-```
+
+```text
 gendef [X, Y]
   fst : X cross Y -> X
   snd : X cross Y -> Y
@@ -785,7 +857,8 @@ end
 ```
 
 **Multiple declarations (semicolon-separated on one line):**
-```
+
+```text
 gendef [X, Y]
   fst : X cross Y -> X; snd : X cross Y -> Y
 where
@@ -794,6 +867,7 @@ end
 ```
 
 Generates:
+
 ```latex
 \begin{gendef}[X, Y]
   fst: X \cross Y \fun X \\
@@ -806,6 +880,7 @@ Generates:
 **Note:** Both separate lines and semicolon-separated formats in the input generate the same LaTeX output - declarations appear on separate lines with `\\` line breaks. This ensures proper rendering in PDF where each declaration appears on its own line.
 
 Generic definitions are used for:
+
 - Polymorphic functions (like `fst`, `snd`, `head`, `tail`)
 - Generic constants that work across types
 - Type-parameterized operations
@@ -819,14 +894,16 @@ Generic definitions are used for:
 **Problem**: Free type definitions (`::=`) are NOT supported inside `gendef` blocks.
 
 **Incorrect** (will not compile):
-```
+
+```text
 gendef [X]
   Tree_X ::= leaf | node⟨X × Tree_X × Tree_X⟩
 end
 ```
 
 **Correct workaround**: Define the free type separately with `given`, then define operations in `gendef`:
-```
+
+```text
 given X
 
 Tree_X ::= leaf_X | node_X⟨X cross Tree_X cross Tree_X⟩
@@ -847,7 +924,8 @@ end
 **Problem**: Schema definitions are NOT supported inside `gendef` blocks.
 
 **Incorrect** (will not compile):
-```
+
+```text
 gendef [X]
   schema Container_X
     contents : seq X
@@ -859,7 +937,8 @@ end
 ```
 
 **Correct workaround**: Use `schema[X]` syntax (standard Z notation):
-```
+
+```text
 schema Container[X]
   contents : seq X
   capacity : N
@@ -869,7 +948,8 @@ end
 ```
 
 You can then define operations on the generic schema using `gendef`:
-```
+
+```text
 gendef [X]
   emptyContainer : Container[X]
   addToContainer : Container[X] cross X -> Container[X]
@@ -899,56 +979,58 @@ See `examples/06_definitions/gendef_advanced.txt` for complete working examples.
 
 ## Relations
 
+<!-- markdownlint-disable-next-line MD036 -->
 *Lecture 7: Relations*
 
 ### Maplet (↦)
 
-```
+```text
 x |-> y          →  x ↦ y       [maplet - ordered pair constructor]
 ```
 
 ### Relation Type
 
-```
+```text
 X <-> Y          →  X ↔ Y       [set of all relations between X and Y]
 ```
 
 ### Domain and Range
 
-```
+```text
 dom R            →  dom R       [domain of relation]
 ran R            →  ran R       [range of relation]
 ```
 
 ### Domain and Range Restriction
 
-```
+```text
 S <| R           →  S ◁ R       [domain restriction]
 R |> T           →  R ▷ T       [range restriction]
 ```
 
 ### Domain and Range Corestriction (Anti-restriction)
 
-```
+```text
 S <<| R          →  S ⩤ R       [domain corestriction]
 R |>> T          →  R ⩥ T       [range corestriction]
 ```
 
 ### Relational Inverse
 
-```
+```text
 R~               →  R⁻¹         [relational inverse - postfix]
 inv R            →  inv R       [relational inverse - prefix]
 ```
 
 ### Relational Image
 
-```
+```text
 R(| S |)         →  R(⦇ S ⦈)    [relational image]
 ```
 
 **Examples:**
-```
+
+```text
 parentOf(| {john} |)
 R(| {1, 2, 3} |)
 (R o9 S)(| A |)
@@ -956,7 +1038,7 @@ R(| {1, 2, 3} |)
 
 ### Relational Composition
 
-```
+```text
 R o9 S           →  R ∘ S       [relational composition]
 R comp S         →  R ∘ S       [relational composition alternative]
 ```
@@ -971,7 +1053,8 @@ R comp S         →  R ∘ S       [relational composition alternative]
 | `g(f(x))` | Nested application | `C` (value) | Computes specific result |
 
 **Example:**
-```
+
+```text
 successor : N -> N
 square : N -> N
 
@@ -983,12 +1066,13 @@ Both evaluate the same when applied to arguments: `(g o9 f)(x) = g(f(x))`, but c
 
 ### Closures
 
-```
+```text
 R+               →  R⁺          [transitive closure]
 R*               →  R*          [reflexive-transitive closure]
 ```
 
 **Closure operators** (postfix):
+
 - `+` (transitive): follow relation one or more times
 - `*` (reflexive-transitive): follow relation zero or more times
 
@@ -998,7 +1082,7 @@ Note: Reflexive closure (`rcl`) and symmetric closure (`s`) are not yet implemen
 
 Postfix operators (`+`, `*`, `~`) can be used as part of identifier names in abbreviations and schema definitions:
 
-```
+```text
 R+ == {a, b : N | b > a}         →  R⁺ ≙ {a, b : ℕ | b > a}
 R* == R+ union id[N]             →  R* ≙ R⁺ ∪ id[ℕ]
 R~ == inv R                      →  R⁻¹ ≙ inv R
@@ -1017,7 +1101,8 @@ end
 | Binary operator | `x + y` | Addition | `x + y` |
 
 **Examples:**
-```
+
+```text
 # R+ is the abbreviation name (compound identifier)
 R+ == {a, b : N | b > a}
 
@@ -1032,75 +1117,87 @@ rel_1+ == {x, y : N | x < y}     →  rel_1⁺
 
 ## Functions
 
+<!-- markdownlint-disable-next-line MD036 -->
 *Lecture 8: Functions*
 
 ### Function Types
 
 **Partial and Total Functions:**
-```
+
+```text
 f : X +-> Y      →  X ⇀ Y       [partial function]
 f : X -> Y       →  X → Y       [total function]
 ```
 
 **Injections (one-to-one):**
-```
+
+```text
 f : X >+> Y      →  X ⤔ Y       [partial injection]
 f : X -|> Y      →  X ⤔ Y       [partial injection - alternative]
 f : X >-> Y      →  X ↣ Y       [total injection]
 ```
 
 **Surjections (onto):**
-```
+
+```text
 f : X +->> Y     →  X ⤀ Y       [partial surjection]
 f : X -->> Y     →  X ↠ Y       [total surjection]
 ```
 
 **Bijections (one-to-one and onto):**
-```
+
+```text
 f : X >->> Y     →  X ⤖ Y       [total bijection]
 f : X >7-> Y     →  X ↣→ Y      [partial bijection]
 ```
 
 **Finite partial functions:**
-```
+
+```text
 f : Year 77-> Table     →  Year ⇸ Table    [finite partial function]
 ```
 
 ### Function Application
 
 **Standard application:**
-```
+
+```text
 f(x)             →  f(x)
 g(x, y, z)       →  g(x, y, z)
 ```
 
 **Important:** Function application requires explicit parentheses - juxtaposition is not supported:
-```
+
+```text
 ✅ Correct:   f(x), dom(R)
 ❌ Incorrect: f x, dom R
 ```
 
 **Generic instantiation:**
-```
+
+```text
 seq(N)           →  seq N
 P(X)             →  P X
 ```
 
 **Type application also requires parentheses:**
-```
+
+```text
 ✅ Correct:   seq(Entry), P(Person)
 ❌ Incorrect: seq Entry, P Person
 ```
 
 **Nested application:**
-```
+
+```text
 f(g(h(x)))       →  f(g(h(x)))
 ```
 
 **General function application:**
 
 Any expression can be applied as a function:
-```
+
+```text
 (f ++ g)(x)              [override then apply]
 ⟨a, b, c⟩(2)             [sequence indexing]
 (R o9 S)(| A |)          [composition then image]
@@ -1109,25 +1206,28 @@ Any expression can be applied as a function:
 ### Lambda Expressions (λ)
 
 **Basic lambdas:**
-```
+
+```text
 lambda x : N . x * x
 lambda f : X -> Y . f(x)
 ```
 
 **Multi-variable:**
-```
+
+```text
 lambda x, y : N . x + y
 lambda a, b, c : Z . a
 ```
 
 **Nested lambdas:**
-```
+
+```text
 lambda x : X . lambda y : Y . (x, y)
 ```
 
 ### Function Override (⊕)
 
-```
+```text
 f ++ g           →  f ⊕ g       [function override]
 f ++ g ++ h      →  f ⊕ g ⊕ h   [left-associative]
 ```
@@ -1136,7 +1236,7 @@ The second function takes precedence for overlapping domains.
 
 ### Range Operator ('up to')
 
-```
+```text
 1..10            →  1 ‥ 10      ['up to']
 1993..current    →  1993 ‥ current
 ```
@@ -1148,7 +1248,8 @@ Represents the set `{1, 2, 3, ..., 10}`.
 Functions are typically defined using `axdef` or `gendef` (for generic functions).
 
 **Simple total function:**
-```
+
+```text
 axdef
   square : N -> N
 where
@@ -1157,7 +1258,8 @@ end
 ```
 
 **Partial function:**
-```
+
+```text
 axdef
   predecessor : N +-> N
 where
@@ -1168,7 +1270,8 @@ end
 Note: `predecessor` is partial because 0 has no predecessor in N.
 
 **Generic function:**
-```
+
+```text
 gendef [X]
   identity : X -> X
 where
@@ -1177,7 +1280,8 @@ end
 ```
 
 **Generic function with multiple type parameters:**
-```
+
+```text
 gendef [X, Y]
   first : X cross Y -> X
 where
@@ -1188,51 +1292,60 @@ end
 ### Function Operators
 
 **Domain and Range:**
-```
+
+```text
 dom f            →  dom f       [domain of function]
 ran f            →  ran f       [range of function]
 ```
 
 **Domain Restriction:**
-```
+
+```text
 A <| f           →  A ⩤ f       [restrict f to domain A]
 ```
 
 **Range Restriction:**
-```
+
+```text
 f |> B           →  f ⩥ B       [restrict f to range B]
 ```
 
 **Domain Subtraction:**
-```
+
+```text
 A <-| f          →  A ⩤ f       [remove A from domain]
 ```
 
 **Range Subtraction:**
-```
+
+```text
 f |->> B         →  f ⩥ B       [remove B from range]
 ```
 
 **Function Composition:**
-```
+
+```text
 f o9 g           →  f ∘ g       [forward composition: (f ; g)(x) = g(f(x))]
 f o g            →  f ∘ g       [backward composition: (f ∘ g)(x) = f(g(x))]
 ```
 
 **Function Inverse:**
-```
+
+```text
 f~               →  f⁻¹         [inverse function (only for injective)]
 ```
 
 **Relational Image:**
-```
+
+```text
 f(| A |)         →  f⟦A⟧        [image of set A under f]
 ```
 
 ### Examples of Function Properties
 
 **Injective (one-to-one):**
-```
+
+```text
 given StudentId, Student
 
 axdef
@@ -1244,7 +1357,8 @@ end
 ```
 
 **Surjective (onto):**
-```
+
+```text
 axdef
   modulo3 : N -->> {0, 1, 2}
 where
@@ -1254,7 +1368,8 @@ end
 ```
 
 **Recursive function on sequences:**
-```
+
+```text
 gendef [X]
   length : seq X -> N
 where
@@ -1264,7 +1379,8 @@ end
 ```
 
 **Higher-order function:**
-```
+
+```text
 gendef [X, Y, Z]
   compose : (Y -> Z) cross (X -> Y) -> (X -> Z)
 where
@@ -1281,17 +1397,19 @@ end
 
 ## Sequences
 
+<!-- markdownlint-disable-next-line MD036 -->
 *Lecture 9: Sequences*
 
 ### Sequence Types
 
-```
+```text
 seq(X)           →  seq X       [set of all sequences of type X]
 iseq(X)          →  iseq X      [set of all injective sequences]
 ```
 
 **With generic instantiation:**
-```
+
+```text
 seq[N]
 iseq[Entry]
 ```
@@ -1299,14 +1417,16 @@ iseq[Entry]
 ### Sequence Literals
 
 **Unicode angle brackets:**
-```
+
+```text
 ⟨⟩               →  ⟨⟩          [empty sequence]
 ⟨a⟩              →  ⟨a⟩
 ⟨a, b, c⟩        →  ⟨a, b, c⟩
 ```
 
 **ASCII angle brackets (alternative):**
-```
+
+```text
 <>               →  ⟨⟩          [empty sequence]
 <a>              →  ⟨a⟩
 <a, b, c>        →  ⟨a, b, c⟩
@@ -1317,7 +1437,8 @@ Both produce identical LaTeX output.
 ### Concatenation (⌢)
 
 **Unicode operator (always works):**
-```
+
+```text
 ⟨a⟩ ⌢ ⟨b⟩       →  ⟨a⟩ ⌢ ⟨b⟩
 s ⌢ t            →  s ⌢ t
 ```
@@ -1332,7 +1453,8 @@ The `^` operator has dual meaning based on whitespace:
 | `...^...` (no space) | Relation iteration | `\bsup...\esup` | `R^2` |
 
 **Concatenation examples (MUST have space before `^` and be on same line):**
-```
+
+```text
 <a> ^ <b>        →  ⟨a⟩ ⌢ ⟨b⟩      [sequence literals]
 s ^ t            →  s ⌢ t           [sequence variables]
 f(x) ^ <y>       →  f(x) ⌢ ⟨y⟩     [function result]
@@ -1341,7 +1463,8 @@ f(x) ^ <y>       →  f(x) ⌢ ⟨y⟩     [function result]
 **Note**: Multi-line concatenation (splitting across lines) is not currently supported.
 
 **Relation iteration examples (NO space before `^`):**
-```
+
+```text
 R^2              →  R²          [relation composed with itself]
 R^n              →  Rⁿ          [n-fold relation composition]
 ```
@@ -1352,11 +1475,13 @@ R^n              →  Rⁿ          [n-fold relation composition]
 ❌ **Does NOT work:** `x^2`, `2^n` where x or 2 are numbers (fuzz type error)
 
 **For arithmetic exponentiation, use:**
+
 - Manual multiplication: `x * x` for x², `x * x * x` for x³
 - Define a pow function (see examples/06_definitions/pow_function.txt)
 
 **Common mistake:**
-```
+
+```text
 ❌ <x>^<y>       →  ERROR: "use '> ^ <' not '>^<'"
 ✅ <x> ^ <y>     →  ⟨x⟩ ⌢ ⟨y⟩
 ```
@@ -1365,7 +1490,7 @@ R^n              →  Rⁿ          [n-fold relation composition]
 
 ### Filter
 
-```
+```text
 s ↾ A            →  s ↾ A       [sequence filter - restricts sequence s to elements in set A]
 s filter A       →  s ↾ A       [ASCII alternative using 'filter' keyword]
 ```
@@ -1376,7 +1501,8 @@ The filter operator restricts a sequence to only include elements from a given s
 **Unicode Alternative:** Use `↾` (U+21BE) if preferred
 
 **Example:**
-```
+
+```text
 records filter {x : Entry | x.viewed = yes}    [filter sequence to viewed entries]
 ```
 
@@ -1384,13 +1510,13 @@ records filter {x : Entry | x.viewed = yes}    [filter sequence to viewed entrie
 
 ### Sequence Length
 
-```
+```text
 # s              →  # s         [length - overloading of cardinality]
 ```
 
 ### Sequence Functions
 
-```
+```text
 head s           →  head s      [head - first element]
 tail s           →  tail s      [tail - all but first]
 last s           →  last s      [last element]
@@ -1405,17 +1531,20 @@ Note: `reverse` is abbreviated as `rev` in txt2tex.
 Sequences enable pattern matching for recursive functions:
 
 **Empty sequence pattern:**
-```
+
+```text
 f(<>) = 0
 ```
 
 **Cons pattern (head and tail):**
-```
+
+```text
 f(<x> ^ s) = x + f(s)
 ```
 
 **In axiomatic definitions:**
-```
+
+```text
 axdef
   cumulative_total : seq(N) -> N
 where
@@ -1428,12 +1557,14 @@ end
 ### Bags
 
 **Bag type:**
-```
+
+```text
 bag(X)           →  bag X       [set of all bags of type X]
 ```
 
 **Bag literals:**
-```
+
+```text
 b1 == [[x]]            →  b₁ = ⟦x⟧         [bag in abbreviation]
 b2 == [[a, b, c]]      →  b₂ = ⟦a, b, c⟧
 ```
@@ -1441,7 +1572,8 @@ b2 == [[a, b, c]]      →  b₂ = ⟦a, b, c⟧
 **Note**: Bag literals must appear in an abbreviation or expression context, not as standalone statements.
 
 **Bag union:**
-```
+
+```text
 b1 ⊎ b2          →  b1 ⊎ b2     [bag union - combines two bags]
 b1 bag_union b2  →  b1 ⊎ b2     [ASCII alternative using 'bag_union' keyword]
 ```
@@ -1460,6 +1592,7 @@ The bag union operator combines two bags, preserving multiplicities (unlike set 
 Zed blocks provide a way to write Z notation content without the visual boxing of axdef/schema blocks. They correspond directly to fuzz's `\begin{zed}...\end{zed}` environment.
 
 **What can go in zed blocks:**
+
 - ✅ **Predicates**: `forall x : N | x >= 0`
 - ✅ **Given types**: `given A, B, C`
 - ✅ **Free types**: `Status ::= active | inactive`
@@ -1468,62 +1601,70 @@ Zed blocks provide a way to write Z notation content without the visual boxing o
 - ❌ **NOT bare expressions**: Cannot use standalone `{ x : N | x > 0 }` or `x + y` alone
 
 **Simple predicate:**
-```
+
+```text
 zed
   x > 0
 end
 ```
 
 **Quantified predicates:**
-```
+
+```text
 zed
   forall x : N | x >= 0
 end
 ```
 
-```
+```text
 zed
   exists n : NAME | birthday(n) elem December
 end
 ```
 
 **Given types:**
-```
+
+```text
 zed
   given Person, Company
 end
 ```
 
 **Free types:**
-```
+
+```text
 zed
   Status ::= active | inactive | pending
 end
 ```
 
 **Abbreviations:**
-```
+
+```text
 zed
   Evens == { n : N | n mod 2 = 0 }
 end
 ```
 
 **Abbreviations with generic parameters:**
-```
+
+```text
 zed
   [X] Pair == X cross X
 end
 ```
 
 **Compound identifier abbreviations:**
-```
+
+```text
 zed
   R+ == { a, b : N | b > a }
 end
 ```
 
 **Mixed content (multiple constructs in one block):**
-```
+
+```text
 zed
   given Entry
   Status ::= active | inactive
@@ -1532,13 +1673,15 @@ end
 ```
 
 **Complex predicates:**
-```
+
+```text
 zed
   forall x : S | exists y : T | x elem y
 end
 ```
 
 Generates:
+
 ```latex
 \begin{zed}
   \forall x : S \mid \exists y : T \mid x \in y
@@ -1546,6 +1689,7 @@ Generates:
 ```
 
 **Key differences from axdef/schema:**
+
 - No visual box in PDF output
 - No separate declaration and where sections
 - Can contain given types, free types, abbreviations, and predicates
@@ -1569,12 +1713,14 @@ Generates:
 **Examples:**
 
 **Standalone (no container):**
-```
+
+```text
 { x : N | x > 0 . x * x }          ← Bare expression, renders inline
 ```
 
 **Zed block (unboxed paragraph):**
-```
+
+```text
 zed
   forall x : N | x >= 0            ← Predicate: OK
 end
@@ -1589,7 +1735,8 @@ end
 ```
 
 **Axdef (boxed, with declarations):**
-```
+
+```text
 axdef
   Doubled : P Z             ← Declaration required
 where
@@ -1598,7 +1745,8 @@ end
 ```
 
 **Schema (boxed, with declarations):**
-```
+
+```text
 schema State
   count : N                        ← Declaration required
 where
@@ -1607,6 +1755,7 @@ end
 ```
 
 **Key principle:**
+
 - **zed blocks** are for predicates and abbreviations that don't need variable declarations
 - **axdef/schema** are for definitions with typed variable declarations
 - **Standalone** (no container) is for expressions you want rendered inline with math mode
@@ -1617,7 +1766,7 @@ end
 
 **Named schemas** have **LOCAL scope** - components are encapsulated within the schema and cannot be referenced outside:
 
-```
+```text
 schema Library
   books : F BookId
   book_chapters : BookId +-> F ChapterId
@@ -1633,7 +1782,7 @@ The identifiers `books` and `book_chapters` exist only within the `Library` sche
 
 **axdef blocks** have **GLOBAL scope** - all declared identifiers are accessible throughout the entire document:
 
-```
+```text
 axdef
   books : F BookId
   book_chapters : BookId +-> F ChapterId
@@ -1653,6 +1802,7 @@ All identifiers declared in `axdef` are GLOBAL and can be referenced anywhere af
 - **Use axdef** to declare global constants, variables, or functions that need to be referenced elsewhere in your specification
 
 **Other globally scoped declarations:**
+
 - `given` types → `given BookId, AuthorId`
 - Abbreviations → `ChapterId == N1`
 - Generic definitions → `gendef [X, Y] fst : X cross Y -> X`
@@ -1664,7 +1814,7 @@ All identifiers declared in `axdef` are GLOBAL and can be referenced anywhere af
 
 Define global constants and their properties:
 
-```
+```text
 axdef
   population : N
 where
@@ -1673,7 +1823,8 @@ end
 ```
 
 **With generic parameters:**
-```
+
+```text
 axdef [T]
   identity : T
 where
@@ -1682,7 +1833,8 @@ end
 ```
 
 **Multiple declarations (semicolon-separated):**
-```
+
+```text
 axdef
   x : N; y : N
 where
@@ -1691,6 +1843,7 @@ end
 ```
 
 Generates:
+
 ```latex
 \begin{axdef}
   x : \mathbb{N} \\
@@ -1704,7 +1857,7 @@ Generates:
 
 Define state spaces and operations:
 
-```
+```text
 schema State
   count : N
 where
@@ -1715,7 +1868,8 @@ end
 **Important:** Schema components (`count` in this example) have LOCAL scope and cannot be referenced outside the schema. If you need globally accessible identifiers, use `axdef` instead (see "Scoping Rules" above).
 
 **With generic parameters:**
-```
+
+```text
 schema Stack[X]
   items : seq X
 where
@@ -1729,7 +1883,8 @@ end
 ```
 
 **Multiple declarations (semicolon-separated):**
-```
+
+```text
 schema Point
   x : N; y : N
 where
@@ -1738,6 +1893,7 @@ end
 ```
 
 Generates:
+
 ```latex
 \begin{schema}{Point}
   x : \mathbb{N} \\
@@ -1751,7 +1907,7 @@ Generates:
 
 Schemas without names for inline use:
 
-```
+```text
 schema
   x : N
   y : N
@@ -1764,7 +1920,7 @@ end
 
 The `where` keyword separates declarations from predicates:
 
-```
+```text
 schema Name
   declarations
 where
@@ -1780,7 +1936,7 @@ Natural deduction proofs using indentation-based syntax.
 
 ### Basic Structure
 
-```
+```text
 PROOF:
   conclusion [rule name]
     premise1
@@ -1802,24 +1958,29 @@ Justifications in proof trees are **free-form text** in square brackets. The sys
 #### Special Formatting Patterns
 
 **Discharge notation** (for assumption elimination):
-```
+
+```text
 [=> intro from 1]
 [=> intro from 2]
 [or elim from 2 and 3]
 ```
+
 Formats as: $\Rightarrow$-intro$^{[1]}$ with superscript reference
 
 **Projection notation** (for left/right selection):
-```
+
+```text
 [and elim 1]
 [and elim 2]
 [or intro 1]
 [or intro 2]
 ```
+
 Formats as: $\land$-elim-1 with hyphenated subscript
 
 **General rules:**
-```
+
+```text
 [assumption]
 [premise]
 [from 1]
@@ -1827,6 +1988,7 @@ Formats as: $\land$-elim-1 with hyphenated subscript
 [excluded middle]
 [contradiction]
 ```
+
 Free-form text, wrapped in `\text{}` for proper spacing
 
 #### Operator Conversion in Justifications
@@ -1834,6 +1996,7 @@ Free-form text, wrapped in `\text{}` for proper spacing
 Mathematical operators in justifications are automatically converted to LaTeX symbols:
 
 **Logical operators:**
+
 - `land` → $\land$
 - `lor` → $\lor$
 - `lnot` → $\lnot$
@@ -1843,6 +2006,7 @@ Mathematical operators in justifications are automatically converted to LaTeX sy
 **Note**: In `--fuzz` mode, predicates use `\implies` and `\iff` to match fuzz package conventions.
 
 **Relation operators:**
+
 - `o9` → $\circ$ (composition)
 - `|->` → $\mapsto$ (maplet)
 - `<->` → `\rel` (relation type)
@@ -1850,12 +2014,15 @@ Mathematical operators in justifications are automatically converted to LaTeX sy
 - `++` → $\oplus$ (override)
 
 **Function type operators:**
+
 - `->` → `\fun`, `+->` → `\pfun`, `>->` → `\inj`, `-->>` → `\surj`, `>->>` → `\bij`, `>7->` → `\pbij`, `77->` → `\ffun`
 
 **Relation functions:**
+
 - `dom`, `ran`, `comp`, `inv`, `id`
 
 Examples:
+
 - `[=> intro from 1]` → $\Rightarrow$-intro$^{[1]}$
 - `[land elim 1]` → $\land$-elim-1
 - `[lor elim from 2]` → $\lor$-elim (from 2)
@@ -1865,29 +2032,34 @@ Examples:
 ### Supported Rules
 
 **Conjunction:**
+
 - `[land intro]` - introduction
 - `[land elim 1]` - left elimination
 - `[land elim 2]` - right elimination
 - `[land intro from 1 land 3]` - introduction with references
 
 **Disjunction:**
+
 - `[lor intro 1]` - left introduction
 - `[lor intro 2]` - right introduction
 - `[lor elim]` - elimination (case analysis)
 - `[lor elim from 2 land 3]` - elimination with references
 
 **Implication:**
+
 - `[=> intro]` - introduction (discharge assumption)
 - `[=> intro from 1]` - introduction discharging assumption 1
 - `[=> elim]` - modus ponens
 - `[=> elim from 1 land 2]` - modus ponens with references
 
 **Falsehood:**
+
 - `[false intro]` - contradiction
 - `[false elim]` - explosion (ex falso quodlibet)
 - `[false elim from 2]` - explosion with reference
 
 **Other:**
+
 - `[assumption]` - marks an assumption
 - `[premise]` - marks a premise
 - `[from N]` - reference to line N
@@ -1897,7 +2069,7 @@ Examples:
 
 ### Example: Simple Proof
 
-```
+```text
 PROOF:
 p land q => p [=> intro from 1]
   [1] p land q [assumption]
@@ -1907,7 +2079,8 @@ p land q => p [=> intro from 1]
 ### Example: Case Analysis
 
 **Simple case analysis:**
-```
+
+```text
 PROOF:
 p lor q => r [=> intro from 1]
   [1] p lor q [assumption]
@@ -1919,7 +2092,8 @@ p lor q => r [=> intro from 1]
 ```
 
 **Case analysis with sibling premises:**
-```
+
+```text
 PROOF:
 p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
   [1] p land (q lor r) [assumption]
@@ -1939,6 +2113,7 @@ p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
 ```
 
 **Important**: When working with case analysis:
+
 - Use `[from above]` to reference facts established before the case split
 - The `::` sibling markers indicate multiple facts that together support the next step
 - Each case should derive the same conclusion through different reasoning paths
@@ -1950,18 +2125,20 @@ p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
 
 ### Conditional Expressions
 
-```
+```text
 if x > 0 then x else -x
 if s = <> then 0 else head s
 ```
 
 **Nested conditionals:**
-```
+
+```text
 if x > 0 then 1 else if x < 0 then -1 else 0
 ```
 
 **In function definitions:**
-```
+
+```text
 abs(x) = if x > 0 then x else -x
 max(x, y) = if x > y then x else y
 ```
@@ -1969,13 +2146,15 @@ max(x, y) = if x > y then x else y
 ### Subscripts and Superscripts
 
 **Subscripts:**
-```
+
+```text
 x_i              →  xᵢ          [subscript]
 a_{n}            →  aₙ          [braces group multi-char subscripts]
 ```
 
 **Superscripts (relation iteration only):**
-```
+
+```text
 R^n              →  Rⁿ          [n-fold relation composition]
 R^{n+1}          →  Rⁿ⁺¹        [braces group multi-char superscripts]
 ```
@@ -1986,6 +2165,7 @@ R^{n+1}          →  Rⁿ⁺¹        [braces group multi-char superscripts]
 ❌ **NOT supported:** `x^2`, `2^n`, `n^k` where the base is a number (causes fuzz type error)
 
 **For arithmetic exponentiation:**
+
 - Use manual multiplication: `x * x` for x², `x * x * x` for x³
 - Define a `pow` function (see examples/06_definitions/pow_function.txt)
 
@@ -1995,20 +2175,21 @@ R^{n+1}          →  Rⁿ⁺¹        [braces group multi-char superscripts]
 
 Underscores can be used for readable multi-word variable names:
 
-```
+```text
 cumulative_total             →  cumulative_total
 not_yet_viewed               →  not_yet_viewed
 employee_count               →  employee_count
 ```
 
 **Smart rendering:**
+
 - Simple subscript: `a_i` → $a_i$
 - Multi-char subscript: `x_max` → $x_{max}$
 - Multi-word identifier: `cumulative_total` → $\mathit{cumulative\_total}$
 
 ### Comparison Operators
 
-```
+```text
 x < y            →  x < y
 x > y            →  x > y
 x <= y           →  x ≤ y
@@ -2017,7 +2198,7 @@ x >= y           →  x ≥ y
 
 ### Arithmetic Operators
 
-```
+```text
 x + y            →  x + y       [addition]
 x - y            →  x - y       [subtraction]
 -x               →  -x          [negation]
@@ -2029,7 +2210,7 @@ x mod n          →  x mod n     [modulo]
 
 Apply type parameters to polymorphic types:
 
-```
+```text
 emptyset[N]                  →  ∅[N]
 seq[N]                       →  seq[N]
 P[X]                         →  P[X]
@@ -2037,13 +2218,15 @@ Type[A, B]                   →  Type[A, B]
 ```
 
 **Complex parameters:**
-```
+
+```text
 emptyset[N cross N]          →  ∅[N × N]
 seq[N cross N]               →  seq[N × N]
 ```
 
 **Nested:**
-```
+
+```text
 Type[List[N]]                →  Type[List[N]]
 Container[seq[N]]            →  Container[seq[N]]
 ```
@@ -2058,7 +2241,7 @@ txt2tex automatically detects lines in Z notation blocks (axdef, schema, zed, ge
 
 When a line exceeds the threshold, you'll see a warning on stderr:
 
-```
+```text
 Warning: Line 270 may overflow page margin (~145 chars)
   In: axdef where clause
   Content: forall i : songs | loveHateScore(i) = if ...
@@ -2075,20 +2258,23 @@ Warning: Line 270 may overflow page margin (~145 chars)
 Use `\` (backslash) to explicitly break long lines. Line breaks are supported:
 
 **After logical operators:**
-```
+
+```text
 p land q => \
   r lor s
 ```
 
 **After `then` and before `else` in conditionals:**
-```
+
+```text
 if condition \
   then result1 \
   else result2
 ```
 
 **After `=` in equations:**
-```
+
+```text
 longFunctionName(x, y, z) = \
   complexExpression + moreTerms
 ```
@@ -2098,7 +2284,8 @@ longFunctionName(x, y, z) = \
 To fix overflowing lines, use `\` to break at logical points:
 
 **Before (overflows):**
-```
+
+```text
 axdef
   f : SongId +-> N
 where
@@ -2107,7 +2294,8 @@ end
 ```
 
 **After (fits page):**
-```
+
+```text
 axdef
   f : SongId +-> N
 where
@@ -2121,6 +2309,7 @@ end
 ### Blocks That Support Auto-Scaling
 
 The following block types use `adjustbox` and automatically scale to fit the page:
+
 - `TRUTH TABLE:` blocks
 - `ARGUE:` and `EQUIV:` blocks
 - `PROOF:` blocks (proof trees)
@@ -2156,6 +2345,7 @@ These do not need manual line breaking.
 ## Getting Help
 
 For more information:
+
 - See [../../README.md](../../README.md) for installation and setup
 - See [../DESIGN.md](../DESIGN.md) for architecture details
 - Check `examples/` directory for working examples (48 examples organized by topic)
@@ -2166,6 +2356,7 @@ For more information:
 ## See Also
 
 ### Learning Resources
+
 - **[Tutorial Index](../tutorials/README.md)** - Step-by-step learning path
 - **[Getting Started](../tutorials/00_getting_started.md)** - Your first txt2tex document
 - **[Propositional Logic Tutorial](../tutorials/01_propositional_logic.md)** - Truth tables and proofs
@@ -2180,11 +2371,12 @@ For more information:
 - **[Advanced Topics](../tutorials/10_advanced.md)** - Generic definitions and more
 
 ### Reference Documentation
+
 - **[Proof Syntax Guide](PROOF_SYNTAX.md)** - Detailed proof tree formatting rules
 - **[Fuzz vs Standard LaTeX](FUZZ_VS_STD_LATEX.md)** - Understanding fuzz typechecker quirks
 - **[Feature Gaps](MISSING_FEATURES.md)** - Known limitations and workarounds
 
 ### Development Resources
+
 - **[Missing Features](MISSING_FEATURES.md)** - Features not yet implemented
 - **[IDE Setup](../development/IDE_SETUP.md)** - VSCode/Cursor configuration
-

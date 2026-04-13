@@ -13,21 +13,22 @@ This directory contains examples of advanced txt2tex features and syntax pattern
 
 ## Conditional Expressions
 
-```
+```text
 if x > 0 then x else -x                    [absolute value]
 if s = <> then 0 else head s               [safe head with default]
 if x > 0 then 1 else if x < 0 then -1 else 0  [nested conditionals]
 ```
 
 Used in function definitions:
-```
+
+```text
 abs(x) = if x > 0 then x else -x
 max(x, y) = if x > y then x else y
 ```
 
 ## Subscripts and Superscripts
 
-```
+```text
 x_i              →  xᵢ          [simple subscript]
 x^2              →  x²          [simple superscript]
 2^n              →  2ⁿ
@@ -38,13 +39,15 @@ x^{2n}           →  x^{2n}      [braces for multi-char superscripts]
 ## Multi-Word Identifiers
 
 Underscores create readable variable names:
-```
+
+```text
 cumulative_total         [multi-word identifier]
 not_yet_viewed
 employee_count
 ```
 
 **Smart rendering**:
+
 - `a_i` → $a_i$ (simple subscript)
 - `x_max` → $x_{max}$ (multi-char subscript)
 - `cumulative_total` → $\mathit{cumulative\_total}$ (multi-word)
@@ -52,7 +55,8 @@ employee_count
 ## Generic Type Instantiation
 
 Apply type parameters to polymorphic types:
-```
+
+```text
 seq[N]                       [sequence of naturals]
 P[X]                         [power set of X]
 Type[A, B]                   [binary type constructor]
@@ -65,6 +69,7 @@ Container[seq[N]]            [nested instantiation]
 ## Examples in This Directory
 
 Browse the `.txt` files to see:
+
 - Conditional expression patterns
 - Advanced subscript/superscript usage
 - Multi-word identifier conventions

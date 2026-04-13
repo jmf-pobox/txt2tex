@@ -1,5 +1,6 @@
 # Tutorial 7: Functions
 
+<!-- markdownlint-disable-next-line MD036 -->
 **Lecture 7: Functions**
 
 Learn function types, function application, lambda expressions, and function composition.
@@ -17,7 +18,7 @@ Functions are special relations where each input maps to at most one output.
 
 **f : X -> Y** - Defined for all x in X
 
-```
+```text
 square : N -> N
 forall n : N | square(n) = n * n
 ```
@@ -26,7 +27,7 @@ forall n : N | square(n) = n * n
 
 **f : X +-> Y** - May not be defined for all x
 
-```
+```text
 predecessor : N +-> N
 forall n : N | n > 0 . predecessor(n) = n - 1
 ```
@@ -44,13 +45,14 @@ forall n : N | n > 0 . predecessor(n) = n - 1
 
 Apply functions using parentheses:
 
-```
+```text
 square(5) = 25
 add(2, 3) = 5
 ```
 
 **Multi-argument functions:**
-```
+
+```text
 add : N cross N -> N
 forall a, b : N | add(a, b) = a + b
 ```
@@ -61,13 +63,14 @@ forall a, b : N | add(a, b) = a + b
 
 Anonymous function definitions:
 
-```
+```text
 lambda x : N . x * x        (square function)
 lambda x, y : N . x + y     (add function)
 ```
 
 **Nested lambdas:**
-```
+
+```text
 lambda x : N . lambda y : N . x + y
 ```
 
@@ -79,12 +82,13 @@ lambda x : N . lambda y : N . x + y
 
 Apply f then g:
 
-```
+```text
 f o9 g = lambda x . g(f(x))
 ```
 
 **Example:**
-```
+
+```text
 addOne : N -> N
 double : N -> N
 combined = addOne o9 double
@@ -96,7 +100,7 @@ combined(5) = double(addOne(5)) = double(6) = 12
 
 Traditional math notation (apply second function first):
 
-```
+```text
 f o g = lambda x . f(g(x))
 ```
 
@@ -106,7 +110,7 @@ f o g = lambda x . f(g(x))
 
 Functions that take or return functions:
 
-```
+```text
 gendef [X, Y]
   map : (X -> Y) cross seq X -> seq Y
 where
@@ -120,7 +124,7 @@ end
 
 ## Complete Example
 
-```
+```text
 === Function Examples ===
 
 given Person, Age
@@ -159,6 +163,7 @@ TEXT: pipeline(5) = double(successor(5)) = double(6) = 12
 ## Summary
 
 You've learned:
+
 - ✅ Function types (total, partial, injection, surjection, bijection)
 - ✅ Function application syntax
 - ✅ Lambda expressions

@@ -1,5 +1,6 @@
 # Tutorial: Advanced Features
 
+<!-- markdownlint-disable-next-line MD036 -->
 **Advanced Topics**
 
 Learn conditional expressions, subscripts, generic instantiation, text blocks, and other advanced features.
@@ -13,12 +14,13 @@ Learn conditional expressions, subscripts, generic instantiation, text blocks, a
 
 **if-then-else syntax:**
 
-```
+```text
 if condition then expr1 else expr2
 ```
 
 **Example:**
-```
+
+```text
 axdef
   abs : Z -> N
 where
@@ -27,7 +29,8 @@ end
 ```
 
 **Nested conditionals:**
-```
+
+```text
 if x > 0 then 1
 else if x = 0 then 0
 else -1
@@ -38,18 +41,21 @@ else -1
 ## Subscripts and Superscripts
 
 **Subscripts:** Use underscore (_)
-```
+
+```text
 x_1, x_2, x_i
 ```
 
 **Superscripts (relation iteration only):** Use caret (^)
-```
+
+```text
 R^2   # Relation composed with itself (R o9 R)
 R^n   # N-fold relation composition
 ```
 
 **Note:** Arithmetic exponentiation (x^2, n^3) is NOT supported by fuzz. Use manual multiplication:
-```
+
+```text
 x * x        # For x squared
 n * n * n    # For n cubed
 ```
@@ -60,14 +66,15 @@ n * n * n    # For n cubed
 
 Apply type parameters to polymorphic types:
 
-```
+```text
 seq[N]              (sequence of naturals)
 P[X]                (power set of X)
 emptyset[Z]         (empty set of integers)
 ```
 
 **Complex types:**
-```
+
+```text
 seq[N cross N]      (sequence of pairs)
 P[seq[N]]           (set of sequences)
 ```
@@ -80,7 +87,7 @@ P[seq[N]]           (set of sequences)
 
 Normal prose with smart typography:
 
-```
+```text
 TEXT: This is explanatory text with "smart quotes" and inline math like (x * x).
 ```
 
@@ -90,7 +97,7 @@ TEXT: This is explanatory text with "smart quotes" and inline math like (x * x).
 
 Verbatim text without processing:
 
-```
+```text
 PURETEXT: Characters like " and ' remain literal.
 ```
 
@@ -98,7 +105,7 @@ PURETEXT: Characters like " and ' remain literal.
 
 Raw LaTeX commands:
 
-```
+```text
 LATEX: \noindent Custom formatting here.
 LATEX: \vspace{1cm}
 ```
@@ -107,7 +114,7 @@ LATEX: \vspace{1cm}
 
 Force page breaks:
 
-```
+```text
 PAGEBREAK
 ```
 
@@ -116,13 +123,15 @@ PAGEBREAK
 ## Bibliography Management
 
 **Directives:**
-```
+
+```text
 BIBLIOGRAPHY: references.bib
 BIBLIOGRAPHY_STYLE: plainnat
 ```
 
 **Citations:**
-```
+
+```text
 TEXT: As shown in [cite spivey92], Z notation is powerful.
 ```
 
@@ -130,7 +139,7 @@ TEXT: As shown in [cite spivey92], Z notation is powerful.
 
 ## Complete Example
 
-```
+```text
 === Advanced Features Demo ===
 
 ** Example 1: Conditional Expression **
@@ -196,7 +205,7 @@ TEXT: Custom spacing inserted above.
 
 ### Pattern 1: State Machine
 
-```
+```text
 Status ::= init | running | stopped | error
 
 schema System
@@ -209,7 +218,7 @@ end
 
 ### Pattern 2: Invariant Preservation
 
-```
+```text
 schema Operation
   System
   System'
@@ -221,7 +230,7 @@ end
 
 ### Pattern 3: Generic Container
 
-```
+```text
 gendef [T]
   schema Container_T
     elements : seq T
@@ -235,6 +244,7 @@ end
 ## Summary
 
 You've learned:
+
 - ✅ Conditional expressions (if-then-else)
 - ✅ Subscripts and superscripts
 - ✅ Generic type instantiation
@@ -243,6 +253,7 @@ You've learned:
 - ✅ Document structure and style
 
 **Next Steps:**
+
 - Study examples in `examples/` directories for integration patterns
 - Consult [USER_GUIDE.md](docs/guides/USER_GUIDE.md) for comprehensive reference
 - Practice with course problems

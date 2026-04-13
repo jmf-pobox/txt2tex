@@ -1,5 +1,6 @@
 # Tutorial 9: Schemas and Composition
 
+<!-- markdownlint-disable-next-line MD036 -->
 **Lecture 9: Advanced Z Notation**
 
 Learn schema composition, state schemas, operations, and zed blocks.
@@ -13,7 +14,7 @@ Learn schema composition, state schemas, operations, and zed blocks.
 
 **Schema:** Groups related variables with constraints
 
-```
+```text
 schema Counter
   count : N
   limit : N
@@ -23,7 +24,8 @@ end
 ```
 
 **Components:** Access with dot notation
-```
+
+```text
 c.count
 c.limit
 ```
@@ -32,7 +34,7 @@ c.limit
 
 Model system state:
 
-```
+```text
 schema Library
   books : P Book
   borrowed : Book +-> Member
@@ -45,7 +47,7 @@ end
 
 Model state changes using primed variables ('):
 
-```
+```text
 schema BorrowBook
   Library
   Library'
@@ -60,6 +62,7 @@ end
 ```
 
 **Conventions:**
+
 - `x'` (primed) - value after operation
 - `x?` (input) - operation input
 - `x!` (output) - operation output
@@ -68,7 +71,7 @@ end
 
 Include one schema in another:
 
-```
+```text
 schema LoggedInUser
   User
   sessionToken : N
@@ -84,17 +87,20 @@ This brings all User components and constraints into LoggedInUser.
 Combine schemas using operators:
 
 **Conjunction:**
-```
+
+```text
 SchemaA land SchemaB
 ```
 
 **Disjunction:**
-```
+
+```text
 SchemaA lor SchemaB
 ```
 
 **Sequential composition:**
-```
+
+```text
 SchemaA o9 SchemaB
 ```
 
@@ -102,7 +108,7 @@ SchemaA o9 SchemaB
 
 Group multiple definitions:
 
-```
+```text
 zed
   given Person, Account
 
@@ -135,7 +141,7 @@ end
 
 ## Complete Example
 
-```
+```text
 === Banking System ===
 
 given Customer, Account
@@ -176,6 +182,7 @@ end
 ## Summary
 
 You've learned:
+
 - ✅ Schema notation and components
 - ✅ State schemas for system modeling
 - ✅ Operation schemas with primed variables

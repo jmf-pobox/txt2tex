@@ -126,7 +126,7 @@ uv run txt2tex examples/01_propositional_logic/hello_world.txt
 # Run all quality checks (lint, type check, tests)
 make check
 
-# Lint markdown (not yet in make check — pre-existing issues being cleaned up)
+# Lint markdown only
 make lint-md
 
 # Run tests only

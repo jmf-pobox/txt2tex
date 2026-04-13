@@ -12,7 +12,7 @@ This directory contains examples for Lecture 3, covering equality and unique val
 
 ## Key Operators
 
-```
+```text
 x = y                →  x = y           (equality)
 x != y               →  x ≠ y           (inequality)
 exists1 x : N | P(x) →  ∃₁x : ℕ • P(x)  (unique existence)
@@ -22,12 +22,14 @@ mu x : N | P(x)      →  μx : ℕ • P(x)   (definite description)
 ## Mu Operator Usage
 
 The mu operator has two forms:
+
 - **Basic**: `mu x : N | x > 0` - the unique x satisfying the predicate
 - **With expression**: `mu x : N | x in S . f(x)` - select from set and apply function
 
 ## Examples in This Directory
 
 Browse the `.txt` files to see:
+
 - Equality in predicates
 - Unique existence proofs
 - Mu operator applications

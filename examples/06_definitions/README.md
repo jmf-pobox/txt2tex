@@ -13,48 +13,59 @@ This directory contains examples for Lecture 6, covering different ways to defin
 ## Definition Types
 
 ### Given Types
-```
+
+```text
 given Person, Company
 ```
+
 Declares basic types without internal structure.
 
 ### Abbreviations
-```
+
+```text
 Pairs == N cross N
 [X, Y] Product == X cross Y
 ```
+
 Create type aliases with optional generic parameters.
 
 ### Free Types
-```
+
+```text
 Status ::= active | inactive | pending
 Tree ::= stalk | leaf<N> | branch<Tree × Tree>
 ```
+
 Define algebraic data types with constructors.
 
 ### Generic Definitions
-```
+
+```text
 gendef [X, Y]
   fst : X cross Y -> X
 where
   forall x : X; y : Y | fst(x, y) = x
 end
 ```
+
 Define polymorphic functions with type parameters.
 
 ### Axiomatic Definitions
-```
+
+```text
 axdef
   population : N
 where
   population > 0
 end
 ```
+
 Define global constants with constraints.
 
 ## Examples in This Directory
 
 Browse the `.txt` files to see:
+
 - Basic and generic given types
 - Simple and recursive free types
 - Generic function definitions
