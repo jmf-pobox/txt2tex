@@ -313,7 +313,7 @@ lnot (p land q)
 
 **Relation operators:**
 
-- `o9` → $\circ$ (composition)
+- `o9` → $\semi$ (forward composition)
 - `|->` → $\mapsto$ (maplet)
 - `<->` → `\rel` (relation type)
 - `<|` → `\dres` (domain restriction)
@@ -350,7 +350,7 @@ Example with relation operators:
 <=> (exists y : Y | w |-> y elem (R o9 S) land y |-> z elem T) [definition of o9]
 ```
 
-Renders as: $\Leftrightarrow \exists y : Y \bullet w \mapsto y \in (R \circ S) \land y \mapsto z \in T$ with justification [definition of $\circ$]
+Renders as: $\Leftrightarrow \exists y : Y \bullet w \mapsto y \in (R \semi S) \land y \mapsto z \in T$ with justification [definition of $\semi$]
 
 ---
 
@@ -1063,11 +1063,11 @@ R(| {1, 2, 3} |)
 ### Relational Composition
 
 ```text
-R o9 S           →  R ∘ S       [relational composition]
-R comp S         →  R ∘ S       [relational composition alternative]
+R o9 S           →  \semi       [forward relational composition (fuzz \semi)]
+R comp S         →  \comp       [backward relational composition (fuzz \comp)]
 ```
 
-**Note:** Semicolon (`;`) is NOT supported for relational composition - it is reserved for separating declarations in `gendef`, `axdef`, and `schema` blocks. Always use `o9` or `comp` for relational composition.
+**Note:** Semicolon (`;`) in expression context emits `\semi` (forward composition). In declaration context (inside `gendef`, `axdef`, `schema` blocks) it separates declarations. For clarity, prefer `o9` for forward composition in expressions.
 
 **Composition vs Nested Application:**
 
@@ -1349,8 +1349,8 @@ f |->> B         →  f ⩥ B       [remove B from range]
 **Function Composition:**
 
 ```text
-f o9 g           →  f ∘ g       [forward composition: (f ; g)(x) = g(f(x))]
-f o g            →  f ∘ g       [backward composition: (f ∘ g)(x) = f(g(x))]
+f o9 g           →  \semi       [forward composition (fuzz \semi): (f ; g)(x) = g(f(x))]
+f comp g         →  \comp       [backward composition (fuzz \comp): (f ∘ g)(x) = f(g(x))]
 ```
 
 **Function Inverse:**
@@ -2031,7 +2031,7 @@ Mathematical operators in justifications are automatically converted to LaTeX sy
 
 **Relation operators:**
 
-- `o9` → $\circ$ (composition)
+- `o9` → $\semi$ (forward composition)
 - `|->` → $\mapsto$ (maplet)
 - `<->` → `\rel` (relation type)
 - `<|` → `\dres`, `|>` → `\rres`, `<<|` → `\ndres`, `|>>` → `\nrres`
@@ -2050,7 +2050,7 @@ Examples:
 - `[=> intro from 1]` → $\Rightarrow$-intro$^{[1]}$
 - `[land elim 1]` → $\land$-elim-1
 - `[lor elim from 2]` → $\lor$-elim (from 2)
-- `[definition of o9]` → [definition of $\circ$]
+- `[definition of o9]` → [definition of $\semi$]
 - `[definition of |->]` → [definition of $\mapsto$]
 
 ### Supported Rules

@@ -42,6 +42,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `o9` (forward composition) now emits `\semi` instead of `\circ`. `\semi` is
+  the fuzz Chapter 3 macro for schema/relation forward composition. `\circ` is
+  a standard math operator not defined by fuzz.sty. This affected expression
+  generation, text-block substitution, justification escaping, and proof-tree
+  label processing — all nine emission sites updated uniformly. `comp` (backward
+  relational composition, fuzz `\comp`) is unaffected: it maps to a distinct
+  fuzz Chapter 4 macro and was already correct.
 - Stale version `0.1.0` in `__init__.py` (now imports from `__version__.py`)
 
 ## [1.1.0] - 2025-12-01

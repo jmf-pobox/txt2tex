@@ -43,7 +43,7 @@ class TokenType(Enum):
     NRRES = auto()  # |>> (range subtraction)
     COMP = auto()  # comp or ; (relational composition)
     SEMICOLON = auto()  # ; (relational composition)
-    CIRC = auto()  # o9 (forward/backward composition)
+    CIRC = auto()  # o9 (forward composition, fuzz \semi)
     TILDE = auto()  # ~ (relational inverse postfix)
     PLUS = auto()  # + (transitive closure postfix / arithmetic)
     MINUS = auto()  # - (subtraction / negation)

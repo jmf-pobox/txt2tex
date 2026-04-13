@@ -118,13 +118,16 @@ class TestRelationalImageLatex:
         assert latex == "(R \\limg \\{1, 2\\} \\rimg)"
 
     def test_relational_image_with_composition_latex(self) -> None:
-        """Test LaTeX generation for (R o9 S)(| A |)."""
+        """Test LaTeX generation for (R o9 S)(| A |).
+
+        o9 emits \\semi (fuzz forward composition), not \\circ.
+        """
         tokens = Lexer("(R o9 S)(| A |)").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, RelationalImage)
         gen = LaTeXGenerator()
         latex = gen.generate_expr(ast)
-        assert "\\circ" in latex
+        assert "\\semi" in latex
         assert "\\limg" in latex
         assert "\\rimg" in latex
         assert "R" in latex

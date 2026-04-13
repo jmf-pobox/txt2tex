@@ -112,7 +112,7 @@ class LaTeXGenerator:
         # Extended relation operators
         "<<|": r"\ndres",  # Domain subtraction (anti-restriction)
         "|>>": r"\nrres",  # Range subtraction (anti-restriction)
-        "o9": r"\circ",  # Forward/backward composition
+        "o9": r"\semi",  # Forward composition (fuzz \semi)
         # Function type operators
         "->": r"\fun",  # Total function
         "+->": r"\pfun",  # Partial function
@@ -1515,7 +1515,7 @@ class LaTeXGenerator:
         Examples:
         - R(| {1, 2} |) -> (R \\limg \\{1, 2\\} \\rimg)
         - parentOf(| {john} |) -> (parentOf \\limg \\{john\\} \\rimg)
-        - (R o9 S)(| A |) -> ((R \\circ S) \\limg A \\rimg)
+        - (R o9 S)(| A |) -> ((R \\semi S) \\limg A \\rimg)
 
         LaTeX rendering uses \\limg and \\rimg delimiters with spaces.
         Note: fuzz requires the entire expression wrapped in parentheses with
@@ -2073,7 +2073,7 @@ class LaTeXGenerator:
             ("|>", r"\rres"),
             ("->", r"\fun"),  # After +-> and |->
             ("++", r"\oplus"),
-            ("o9", r"\circ"),
+            ("o9", r"\semi"),
             ("⌢", r"\cat"),
             ("↾", r"\filter"),  # Sequence filter (Unicode)
             ("filter", r"\filter"),  # Sequence filter (ASCII)
@@ -2192,7 +2192,7 @@ class LaTeXGenerator:
             text, "->", r"\fun"
         )  # Total function (after |->)
         text = self._replace_outside_math(text, "++", r"\oplus")  # Override
-        text = self._replace_outside_math(text, "o9", r"\circ")  # Composition
+        text = self._replace_outside_math(text, "o9", r"\semi")  # Forward composition
         text = self._replace_outside_math(text, "⌢", r"\cat")  # Concatenation
         text = self._replace_outside_math(text, "↾", r"\filter")  # Filter (Unicode)
         # Sequence filter (ASCII)
@@ -3535,7 +3535,7 @@ class LaTeXGenerator:
         result = result.replace("|>", r"$\rres$")  # Range restriction
         result = result.replace("->", r"$\fun$")  # Total function (AFTER |-> and +->)
         result = result.replace("++", r"$\oplus$")  # Override
-        result = result.replace("o9", r"$\circ$")  # Composition
+        result = result.replace("o9", r"$\semi$")  # Forward composition
 
         # Single-character operators
         result = result.replace("^", r"$\cat$")  # Sequence concatenation
@@ -4880,7 +4880,7 @@ class LaTeXGenerator:
             op_latex = op_latex.replace("|>", r"\rres")
             op_latex = op_latex.replace("->", r"\fun")  # AFTER |-> and +->
             op_latex = op_latex.replace("++", r"\oplus")
-            op_latex = op_latex.replace("o9", r"\circ")
+            op_latex = op_latex.replace("o9", r"\semi")
 
             # Word-based operators (both English and L-prefixed forms)
             op_latex = re.sub(r"\bland\b", r"\\land", op_latex)  # land → \land
@@ -4947,7 +4947,7 @@ class LaTeXGenerator:
             op_latex = op_latex.replace("|>", r"\rres")
             op_latex = op_latex.replace("->", r"\fun")  # AFTER |-> and +->
             op_latex = op_latex.replace("++", r"\oplus")
-            op_latex = op_latex.replace("o9", r"\circ")
+            op_latex = op_latex.replace("o9", r"\semi")
 
             # Word-based operators (both English and L-prefixed forms)
             op_latex = re.sub(r"\bland\b", r"\\land", op_latex)  # land → \land
@@ -5004,7 +5004,7 @@ class LaTeXGenerator:
         result = result.replace("|>", r"\rres")
         result = result.replace("->", r"\fun")  # AFTER |-> and +->
         result = result.replace("++", r"\oplus")
-        result = result.replace("o9", r"\circ")
+        result = result.replace("o9", r"\semi")
 
         # Word-based operators (both English and L-prefixed forms)
         result = re.sub(r"\bland\b", r"\\land", result)  # land → \land

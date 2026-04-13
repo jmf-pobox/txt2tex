@@ -13,7 +13,7 @@ class TestTextBlockRelationOperators:
     """Test relation operator conversion elem TEXT blocks."""
 
     def test_o9_composition_in_text(self) -> None:
-        """Test that o9 is converted to composition symbol elem TEXT."""
+        """Test that o9 is converted to \\semi (forward composition) elem TEXT."""
         text = "TEXT: The composition R o9 S is defined."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -21,7 +21,7 @@ class TestTextBlockRelationOperators:
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        assert "R $\\circ$ S" in latex
+        assert "R $\\semi$ S" in latex
         assert "o9" not in latex
 
     def test_maplet_in_text(self) -> None:
@@ -263,7 +263,10 @@ class TestTextBlockHomeworkScenario:
     """Test the actual homework scenario that revealed the missing o9."""
 
     def test_composition_in_prose(self) -> None:
-        """Test o9 conversion elem prose like homework Question 5."""
+        """Test o9 conversion elem prose like homework Question 5.
+
+        o9 emits \\semi (fuzz forward composition), not \\circ.
+        """
         text = "TEXT: Given x |-> z elem R o9 S we can apply the definition."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -272,11 +275,14 @@ class TestTextBlockHomeworkScenario:
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
         assert "\\mapsto" in latex
-        assert "\\circ" in latex
+        assert "\\semi" in latex
         assert "o9" not in latex
 
     def test_nested_composition_in_prose(self) -> None:
-        """Test multiple o9 elem same TEXT block."""
+        """Test multiple o9 elem same TEXT block.
+
+        o9 emits \\semi (fuzz forward composition), not \\circ.
+        """
         text = "TEXT: The composition (R o9 S) o9 T equals R o9 (S o9 T)."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -284,11 +290,14 @@ class TestTextBlockHomeworkScenario:
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        assert latex.count("$\\circ$") >= 3
+        assert latex.count("$\\semi$") >= 3
         assert "o9" not in latex
 
     def test_mixed_operators_in_prose(self) -> None:
-        """Test multiple different operators elem same TEXT block."""
+        """Test multiple different operators elem same TEXT block.
+
+        o9 emits \\semi (fuzz forward composition), not \\circ.
+        """
         text = "TEXT: For R elem X <-> Y land x |-> y elem R o9 S."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -298,7 +307,7 @@ class TestTextBlockHomeworkScenario:
         latex = gen.generate_document(ast)
         assert "\\rel" in latex
         assert "\\mapsto" in latex
-        assert "\\circ" in latex
+        assert "\\semi" in latex
         assert "o9" not in latex
         assert "<->" not in latex
         assert "|->" not in latex

@@ -77,9 +77,9 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 | `\|>` | ▷ (U+25B7) | `\rres` | Range restriction | 10a |
 | `<<\|` | ⩤ (U+2A64) | `\ndres` | Domain subtraction | 10a |
 | `\|>>` | ⩥ (U+2A65) | `\nrres` | Range subtraction | 10a |
-| `comp` | — | `\comp` | Relational composition (semicolon) | 10 |
-| `;` | — | `\comp` | Relational composition | 10 |
-| `o9` | ∘ (U+2218) | `\circ` | Forward/backward composition | 10 |
+| `comp` | — | `\comp` | Backward relational composition (fuzz Chapter 4) | 10 |
+| `;` | — | `\semi` | Forward relational composition (fuzz Chapter 3) | 10 |
+| `o9` | ∘ (U+2218) | `\semi` | Forward composition (fuzz Chapter 3) | 10 |
 | `~` | — | `\inv` | Relational inverse (postfix) | 10 |
 | `(+)` | ⊕ (U+2295) | `\limg` | Relational image | 10 |
 | `+)` | — | `\rimg` | Relational image (right) | 10 |
