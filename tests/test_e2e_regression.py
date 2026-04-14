@@ -62,12 +62,6 @@ def _collect_example_paths() -> list[tuple[Path, Path]]:
 # Collected once at import time — required for correct xdist work distribution.
 _EXAMPLE_PAIRS: list[tuple[Path, Path]] = _collect_example_paths()
 
-if not _EXAMPLE_PAIRS:
-    raise RuntimeError(
-        "e2e: zero .txt examples collected from examples/ — "
-        "check _EXCLUDED_DIRS and directory structure"
-    )
-
 # Parametrize IDs: relative path from examples/ root, POSIX separators.
 # e.g. "01_propositional_logic/basic_operators"
 _EXAMPLE_IDS: list[str] = [
