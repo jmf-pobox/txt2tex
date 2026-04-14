@@ -7,16 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Parenthesisation policy gaps #1, #2, #3** (ADR §4 *Known gaps*):
+  - **Gap #1** — Arithmetic operators `+`, `-`, `*`, `mod` are now
+    explicit entries in `LaTeXGenerator.PRECEDENCE` with correct relative
+    levels (`*`/`mod` = 11, `+`/`-` = 10). Previously these fell to
+    the default 999, which could produce wrong parens when arithmetic
+    expressions appeared as children of same-default-level operators.
+  - **Gap #2** — `LaTeXGenerator.UNARY_PRECEDENCE` dict is the
+    machine-readable policy for unary binding strength (level 20, above
+    all binary operators). Fuzz-mode quirks in `_generate_unary_op`
+    (cardinality `#` with function application, `bigcup`/`bigcap` with
+    prefix-function operands) are documented with citations to fuzz
+    manual §2.3-2.4 rather than inline magic strings. The logic is
+    otherwise unchanged so no output regression occurs.
+  - **Gap #3** — `_generate_set_comprehension` now passes `parent=node`
+    when generating the predicate expression, so nested quantifiers
+    inside `{ x : T | exists ... }` receive their parent context and the
+    always-paren rule fires correctly. This fixes the Q8(b) assessment
+    feedback where the grader expected parens around an existential
+    predicate inside a set comprehension.
+
 ### Changed
 
-- Migrated toolchain from hatch to uv
-- Added Makefile with standard quality gate targets (`make check`, `make test`, etc.)
-- Bumped minimum Python version from 3.10 to 3.12
-- Updated CI workflow to use uv via `astral-sh/setup-uv`
-- Consolidated pytest config into pyproject.toml (removed pytest.ini)
-- Replaced `[project.optional-dependencies] dev` with `[dependency-groups] dev`
+- Migrated toolchain from hatch to uv.
+- Added Makefile with standard quality gate targets (`make check`, `make test`, etc.).
+- Bumped minimum Python version from 3.10 to 3.12.
+- Updated CI workflow to use uv via `astral-sh/setup-uv`.
+- Consolidated pytest config into pyproject.toml (removed pytest.ini).
+- Replaced `[project.optional-dependencies] dev` with `[dependency-groups] dev`.
 
-### Added
+### Added (earlier)
 
 - `py.typed` marker (PEP 561)
 - CHANGELOG.md

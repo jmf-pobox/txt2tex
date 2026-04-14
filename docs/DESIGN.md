@@ -751,9 +751,24 @@ TEMPLATES = {
 
 3. **Set-comprehension predicate loses parent context.** `_generate_set_comprehension` at `latex_gen.py:1314` calls `generate_expr(node.predicate)` with no `parent=` argument. Quantifiers inside `{ x : T | ∃ … }` therefore appear top-level and receive no wrapping parens. This is the direct mechanism behind the Q8(b) feedback. Pass `parent=node`; the always-paren rule for nested quantifier in comprehension constraint then fires.
 
-4. **Cross-product rationale undocumented.** Commit `6db389f` rolled back a paren-emission change on `cross`/`×` because the flat *n*-tuple semantics in fuzz conflict with nested-pair rendering. The rationale lives in the commit message, not this document. Capture it as a subsection so the constraint is discoverable.
+4. **Cross-product rationale.** Documented — see subsection below.
 
 5. **Test matrix is not exhaustive.** Per-feature tests exercise specific operator pairs; a `@pytest.mark.parametrize` matrix of `(child_op, parent_op, is_left_child, expected_parens)` across the PRECEDENCE table would make the policy machine-checkable and catch future table edits that break a pair.
+
+#### Cross-product parenthesisation (settled, commit `6db389f`)
+
+Fuzz distinguishes two cross-product forms with different access syntax:
+
+- `A cross B cross C` — flat 3-tuple, destructured as `(a, b, c)`
+- `(A cross B) cross C` — nested pair, destructured with `fst`/`snd`
+
+An earlier version of `_needs_parens()` forced left-associative parenthesisation for all nested cross products, emitting `(A \cross B) \cross C` regardless of what the user wrote. This broke fuzz type-checking for flat n-tuple schemas, which require the un-parenthesised form `A \cross B \cross C`.
+
+The fix removed the special case entirely. Cross-product now follows the same rule as every other operator: emit parens only when the user wrote them (i.e. `explicit_parens=True`) or when precedence genuinely requires it against a lower-precedence parent. Fuzz treats the flat form as the canonical n-ary product, so the generator must not impose structure the user did not write.
+
+**Constraint for future work**: do not add cross-product to the always-paren list without confirming that fuzz's flat-tuple semantics are not in use. When a user needs a nested pair, they write the parens themselves.
+
+**Z RM reference**: §2.5 (Spivey, *The Z Notation*, 2nd ed.) defines Cartesian product as an n-ary type constructor. `S × T × U` is a single product type whose elements are 3-tuples; it is not equivalent to `(S × T) × U`, whose elements are pairs with a pair as first component.
 
 ### 5. fuzz Validator
 

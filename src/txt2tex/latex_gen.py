@@ -171,6 +171,9 @@ class LaTeXGenerator:
 
     # Operator precedence (lower number = lower precedence)
     # Only LaTeX-style keywords supported: land, lor
+    # Z RM §8.3 defines precedence for logical/set operators; arithmetic
+    # operators are treated as generic infix in Z RM, so standard mathematical
+    # convention applies: multiply/divide bind tighter than add/subtract.
     PRECEDENCE: ClassVar[dict[str, int]] = {
         "<=>": 1,  # Lowest precedence
         "=>": 2,
@@ -203,7 +206,7 @@ class LaTeXGenerator:
         "+->>": 6,
         ">->>": 6,
         "77->": 6,  # Finite partial function
-        # Set operators - highest precedence
+        # Set operators
         "elem": 7,  # Set membership (replaces "in" after migration)
         "notin": 7,
         "subset": 7,
@@ -214,11 +217,66 @@ class LaTeXGenerator:
         "×": 8,  # Cartesian product (Unicode) - same as union  # noqa: RUF001
         "intersect": 9,
         "\\": 9,  # Set difference - same as intersect
+        # Arithmetic operators (Gap #1 — Z RM §8.3 treats these as generic
+        # infix; standard mathematical convention: * binds tighter than + and
+        # -.  Levels 10 and 11 sit above all set operators (max 9) so that
+        # mixed expressions like `a + b` inside a set-membership test do not
+        # spuriously parenthesise `b`.)
+        "+": 10,  # Binary addition
+        "-": 10,  # Binary subtraction
+        "*": 11,  # Multiplication
+        "mod": 11,  # Modulo — same binding strength as *
     }
 
     # Right-associative operators (need parens on left when same operator)
     # Implication and equivalence are right-associative
     RIGHT_ASSOCIATIVE: ClassVar[set[str]] = {"=>", "<=>"}
+
+    # Unary operator precedence (Gap #2).  All unary operators bind more
+    # tightly than any binary operator (highest level in our table is 11 for
+    # * and /; unary level is 20 so any PRECEDENCE.get(op, 999) comparison
+    # will correctly find unary > binary).  The dict makes the policy
+    # machine-readable and queryable from tests.
+    UNARY_PRECEDENCE: ClassVar[dict[str, int]] = {
+        "lnot": 20,
+        "-": 20,  # Unary negation
+        "#": 20,  # Cardinality (Z RM §4.2)
+        "dom": 20,
+        "ran": 20,
+        "inv": 20,
+        "id": 20,
+        "P": 20,
+        "P1": 20,
+        "F": 20,
+        "F1": 20,
+        "bigcup": 20,
+        "bigcap": 20,
+        # Postfix operators — precedence not relevant for paren decisions
+        # (postfix is rendered as superscript and never needs extra parens)
+        "~": 20,
+        "+": 20,  # Transitive closure (postfix context only)
+        "*": 20,  # Reflexive-transitive closure (postfix context only)
+    }
+
+    # Fuzz-mode operators that behave like prefix functions and must wrap
+    # a following unary-operator operand in parens to avoid mis-parsing.
+    # Fuzz manual §2.3: prefix generic symbols are operator symbols; fuzz
+    # grammar requires the argument to be parenthesised when it is itself
+    # a prefix-function application.
+    _FUZZ_FUNCTION_LIKE_UNARY: ClassVar[frozenset[str]] = frozenset(
+        {
+            "dom",
+            "ran",
+            "inv",
+            "id",
+            "P",
+            "P1",
+            "F",
+            "F1",
+            "bigcup",
+            "bigcap",
+        }
+    )
 
     # Instance variable type annotations
     use_fuzz: bool
@@ -863,11 +921,13 @@ class LaTeXGenerator:
     def _generate_unary_op(self, node: UnaryOp, parent: Expr | None = None) -> str:
         """Generate LaTeX for unary operation.
 
-        Unary operators have higher precedence than all binary operators,
-        so parentheses are added around binary operator operands.
+        Unary operators bind more tightly than all binary operators (see
+        UNARY_PRECEDENCE — level 20 exceeds the highest binary level of 11).
+        Parentheses are added around binary-operator operands using this
+        table as the single source of truth (Gap #2).
 
-        Postfix operators (~, +, *, rcl) are rendered as superscripts
-        on the operand, not as prefix operators.
+        Postfix operators (~, +, *) are rendered as superscripts on the
+        operand, not as prefix operators.
         """
         op_latex = self.UNARY_OPS.get(node.operator)
         if op_latex is None:
@@ -875,49 +935,42 @@ class LaTeXGenerator:
 
         operand = self.generate_expr(node.operand)
 
-        # Add parentheses if operand is a binary operator
-        # (unary has higher precedence than all binary operators)
-        # Skip if operand has explicit_parens (it will add its own)
+        # UNARY_PRECEDENCE-driven rule: unary always binds tighter than binary.
+        # Wrap the operand when it is a BinaryOp whose precedence is below the
+        # unary level (which is every binary operator in the table).
+        # Skip when the BinaryOp already carries explicit_parens — it will emit
+        # its own wrapping parens.
         if isinstance(node.operand, BinaryOp) and not node.operand.explicit_parens:
             operand = f"({operand})"
 
-        # Add parentheses for function application with fuzz mode
-        # Fuzz has different precedence: # binds less tightly than application
-        # So # s(i) means (# s)(i), but we want # (s(i))  # noqa: ERA001
+        # Fuzz grammar quirk: # binds less tightly than function application.
+        # Fuzz manual §2.4: "# s(i)" is parsed as "(# s)(i)"; we want
+        # "# (s(i))".  Wrap FunctionApp operands of # in fuzz mode.
         if self.use_fuzz and isinstance(node.operand, FunctionApp):
             operand = f"({operand})"
 
-        # Add parentheses when # is applied to function-like unary operators
-        # in fuzz mode (e.g., # dom R needs to be # (dom R))
-        # Otherwise fuzz parses it as (# dom) R
-        function_like_ops = {
-            "dom",
-            "ran",
-            "inv",
-            "id",
-            "P",
-            "P1",
-            "F",
-            "F1",
-            "bigcup",
-            "bigcap",
-        }
+        # Fuzz grammar quirk: # followed by a prefix-function unary operator
+        # (dom, ran, …) would be parsed as "(# dom) R" without parens.
+        # Fuzz manual §2.3: prefix generic symbols are operator symbols that
+        # require their argument to be a simple expression or a parenthesised
+        # compound.  Wrap to yield "# (dom R)".
         if (
             self.use_fuzz
             and node.operator == "#"
             and isinstance(node.operand, UnaryOp)
-            and node.operand.operator in function_like_ops
+            and node.operand.operator in self._FUZZ_FUNCTION_LIKE_UNARY
         ):
             operand = f"({operand})"
 
-        # bigcup/bigcap need parentheses around function-like operands
-        # E.g., bigcup (ran docs) must generate \bigcup (\ran docs)
-        # Otherwise fuzz parses \bigcup \ran docs as (\bigcup \ran) docs
+        # Fuzz grammar quirk: bigcup/bigcap with a prefix-function operand.
+        # Without parens, "\bigcup \ran docs" is parsed as "(\bigcup \ran) docs".
+        # Wrap to yield "\bigcup (\ran docs)".
+        # Fuzz manual §2.3 (same citation as # case above).
         if (
             self.use_fuzz
             and node.operator in {"bigcup", "bigcap"}
             and isinstance(node.operand, UnaryOp)
-            and node.operand.operator in function_like_ops
+            and node.operand.operator in self._FUZZ_FUNCTION_LIKE_UNARY
         ):
             operand = f"({operand})"
 
@@ -1004,32 +1057,82 @@ class LaTeXGenerator:
 
         return False
 
-    def _quantifier_needs_parens(self, node: Quantifier, parent: Expr | None) -> bool:
-        """Check if quantifier needs parentheses in fuzz mode.
+    # Propositional connectives whose presence in a quantifier body triggers
+    # the "always-paren" rule (ADR §4 context #1).  Z RM §2.1-2.3.
+    _CONNECTIVE_OPS: ClassVar[frozenset[str]] = frozenset(
+        {
+            "land",
+            "lor",
+            "=>",
+            "<=>",
+        }
+    )
 
-        In fuzz, quantifiers need parens when nested in expressions,
-        but not when they're:
-        - Top-level predicates (parent=None)
-        - Bodies of other quantifiers (separated by @ or bullet)
-        - Bodies of lambda expressions (separated by bullet)
+    def _body_has_connective(self, expr: Expr) -> bool:
+        """Return True if expr is a BinaryOp whose operator is a connective."""
+        return isinstance(expr, BinaryOp) and expr.operator in self._CONNECTIVE_OPS
+
+    def _quantifier_needs_parens(self, node: Quantifier, parent: Expr | None) -> bool:
+        """Check if quantifier needs parentheses given its parent context.
+
+        Two always-paren rules apply regardless of mode (ADR §4):
+
+        1. *Body-has-connectives* (Z RM §2.1, §2.3, §3.9): when the
+           effective body of the quantifier (the expression after the
+           bullet if present, otherwise the predicate) is a propositional
+           connective expression, wrap the whole quantifier for visual
+           chunking.
+
+        2. *Set-comprehension predicate* (Z RM §3.8.1): a quantifier
+           appearing as the constraint of a set comprehension
+           ``{ x : T | exists … }`` must be wrapped.  The parent is a
+           SetComprehension node, which reaches here once the set
+           comprehension generator passes ``parent=node`` (Gap #3).
+
+        In fuzz mode, the grammar is stricter: any parent that is not a
+        Quantifier or Lambda also triggers parens (fuzz requires explicit
+        grouping for nested quantified predicates).
 
         Args:
-            node: The quantifier node
-            parent: The parent expression (None if top-level)
+            node: The quantifier node.
+            parent: The parent expression (None if top-level).
 
         Returns:
-            True if parentheses are needed in fuzz mode
+            True if parentheses should be emitted around *node*.
         """
-        if not self.use_fuzz:
-            return False
-
-        # Top-level: no parens needed
+        # Top-level: never needs parens
         if parent is None:
             return False
 
-        # Body of quantifier/lambda: no parens (separated by @ or bullet)
-        # Otherwise, nested in expression: needs parens
-        return not isinstance(parent, (Quantifier, Lambda))
+        # Quantifier or Lambda parent: the inner quantifier is the body or
+        # expression part, always delimited by a structural bullet/@ separator.
+        # No parens needed from this function (the bullet is the separator).
+        # This exemption also prevents context #1 below from spuriously
+        # wrapping e.g. "forall x | forall y | P land Q".
+        if isinstance(parent, (Quantifier, Lambda)):
+            return False
+
+        # Always-paren context #2: quantifier inside a set-comprehension
+        # predicate.  Applies in both modes.  The parent=node argument now
+        # passed by _generate_set_comprehension makes this context visible.
+        if isinstance(parent, SetComprehension):
+            return True
+
+        # Always-paren context #1: effective body contains a connective.
+        # Only checked when parent is NOT a Quantifier/Lambda (handled above)
+        # and NOT a SetComprehension (handled above).  This fires when the
+        # quantifier appears in another compound context (BinaryOp, Tuple,
+        # FunctionApp arg, etc.) and its body has a propositional connective.
+        # Z RM §2.1, §2.3, §3.9.
+        body_expr = node.expression if node.expression is not None else node.body
+        if self._body_has_connective(body_expr):
+            return True
+
+        # In non-fuzz mode the remaining cases (quantifier inside BinaryOp)
+        # are handled by _needs_parens.  In fuzz mode, any remaining parent
+        # (BinaryOp, Tuple, FunctionApp, …) requires parens because fuzz's
+        # grammar is stricter than standard LaTeX.
+        return self.use_fuzz
 
     @generate_expr.register(BinaryOp)
     def _generate_binary_op(self, node: BinaryOp, parent: Expr | None = None) -> str:
@@ -1301,8 +1404,10 @@ class LaTeXGenerator:
             # Has predicate: add mid/pipe separator
             parts.append(self._get_mid_separator())
 
-            # Generate predicate
-            predicate_latex = self.generate_expr(node.predicate)
+            # Generate predicate, passing this node as parent so that nested
+            # quantifiers receive the SetComprehension context and the
+            # always-paren rule (ADR §4 context #2) fires correctly.
+            predicate_latex = self.generate_expr(node.predicate, parent=node)
             parts.append(predicate_latex)
 
             # If expression is present, add bullet/@ and expression
