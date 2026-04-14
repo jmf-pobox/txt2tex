@@ -4,6 +4,6 @@ kind: agent
 writing_style: hettinger-prose
 personality: hettinger
 talents:
-    - python
-    - testing
-    - engineering
+  - python
+  - testing
+  - engineering

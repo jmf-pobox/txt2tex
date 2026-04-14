@@ -9,11 +9,11 @@ lint:
 # npx (Node ≥18) must be on PATH. On macOS: brew install node. On Debian/Ubuntu:
 #   curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt install -y nodejs
 lint-md:
-	@command -v npx >/dev/null 2>&1 || { \
-		echo "lint-md requires npx (Node). Install: https://nodejs.org/en/download"; \
-		exit 1; \
-	}
-	npx --yes markdownlint-cli2 "**/*.md"
+	@if command -v npx >/dev/null 2>&1; then \
+		npx --yes markdownlint-cli2 "**/*.md"; \
+	else \
+		echo "lint-md: npx not found — skipping. Install Node to enable: https://nodejs.org/en/download" >&2; \
+	fi
 
 format:
 	uv run ruff format .

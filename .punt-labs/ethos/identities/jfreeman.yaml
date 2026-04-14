@@ -6,6 +6,6 @@ github: jmf-pobox
 writing_style: concise-quantified
 personality: principal-engineer
 talents:
-    - engineering
-    - state-based-modeling
-    - formal-methods
+  - engineering
+  - state-based-modeling
+  - formal-methods
