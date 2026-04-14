@@ -121,10 +121,6 @@ class TestArithmeticPrecedence:
         """* has an explicit entry in PRECEDENCE."""
         assert "*" in LaTeXGenerator.PRECEDENCE
 
-    def test_table_contains_slash(self) -> None:
-        """/ has an explicit entry in PRECEDENCE."""
-        assert "/" in LaTeXGenerator.PRECEDENCE
-
     def test_table_contains_mod(self) -> None:
         """mod has an explicit entry in PRECEDENCE."""
         assert "mod" in LaTeXGenerator.PRECEDENCE
@@ -133,9 +129,9 @@ class TestArithmeticPrecedence:
         """* has higher precedence than +."""
         assert LaTeXGenerator.PRECEDENCE["*"] > LaTeXGenerator.PRECEDENCE["+"]
 
-    def test_divide_same_as_multiply(self) -> None:
-        """/ has the same precedence as *."""
-        assert LaTeXGenerator.PRECEDENCE["/"] == LaTeXGenerator.PRECEDENCE["*"]
+    def test_mod_same_as_multiply(self) -> None:
+        """mod has the same precedence as *."""
+        assert LaTeXGenerator.PRECEDENCE["mod"] == LaTeXGenerator.PRECEDENCE["*"]
 
     def test_add_and_subtract_equal(self) -> None:
         """+ and - have the same precedence."""

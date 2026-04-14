@@ -759,8 +759,8 @@ TEMPLATES = {
 
 Fuzz distinguishes two cross-product forms with different access syntax:
 
-- `A x B x C` — flat 3-tuple, destructured as `(a, b, c)`
-- `(A x B) x C` — nested pair, destructured with `fst`/`snd`
+- `A cross B cross C` — flat 3-tuple, destructured as `(a, b, c)`
+- `(A cross B) cross C` — nested pair, destructured with `fst`/`snd`
 
 An earlier version of `_needs_parens()` forced left-associative parenthesisation for all nested cross products, emitting `(A \cross B) \cross C` regardless of what the user wrote. This broke fuzz type-checking for flat n-tuple schemas, which require the un-parenthesised form `A \cross B \cross C`.
 

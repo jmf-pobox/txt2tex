@@ -10,9 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Parenthesisation policy gaps #1, #2, #3** (ADR §4 *Known gaps*):
-  - **Gap #1** — Arithmetic operators `+`, `-`, `*`, `/`, `mod` are now
+  - **Gap #1** — Arithmetic operators `+`, `-`, `*`, `mod` are now
     explicit entries in `LaTeXGenerator.PRECEDENCE` with correct relative
-    levels (`*`/`/`/`mod` = 11, `+`/`-` = 10). Previously these fell to
+    levels (`*`/`mod` = 11, `+`/`-` = 10). Previously these fell to
     the default 999, which could produce wrong parens when arithmetic
     expressions appeared as children of same-default-level operators.
   - **Gap #2** — `LaTeXGenerator.UNARY_PRECEDENCE` dict is the

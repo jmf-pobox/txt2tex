@@ -218,14 +218,14 @@ class LaTeXGenerator:
         "intersect": 9,
         "\\": 9,  # Set difference - same as intersect
         # Arithmetic operators (Gap #1 — Z RM §8.3 treats these as generic
-        # infix; standard mathematical convention: * and / bind tighter than
-        # + and -.  Levels 10 and 11 sit above all set operators so that
-        # e.g. a + b elem S does not spuriously parenthesise `b elem S`.)
+        # infix; standard mathematical convention: * binds tighter than + and
+        # -.  Levels 10 and 11 sit above all set operators (max 9) so that
+        # mixed expressions like `a + b` inside a set-membership test do not
+        # spuriously parenthesise `b`.)
         "+": 10,  # Binary addition
         "-": 10,  # Binary subtraction
         "*": 11,  # Multiplication
-        "/": 11,  # Division
-        "mod": 11,  # Modulo — same binding strength as * and /
+        "mod": 11,  # Modulo — same binding strength as *
     }
 
     # Right-associative operators (need parens on left when same operator)
