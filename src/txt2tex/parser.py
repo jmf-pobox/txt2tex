@@ -999,6 +999,28 @@ class Parser:
                 self._advance()  # Consume leading '='
             elif connector == "iff" and self._match(TokenType.IFF):
                 self._advance()  # Consume leading '<=>'
+            elif connector == "eq" and self._match(TokenType.IFF):
+                # <=> at the start of an EQUAL: continuation line means the
+                # author used the wrong block type.  A clear message is more
+                # helpful than the generic "unexpected token" from _parse_expr.
+                tok = self._current()
+                msg = (
+                    "found '<=>' continuation in an EQUAL: chain; "
+                    "use EQUIV: or ARGUE: for logical-equivalence chains"
+                )
+                raise ParserError(msg, tok)
+            elif connector == "iff" and self._match(TokenType.EQUALS):
+                # bare '=' at the start of an EQUIV:/ARGUE: continuation line
+                # — the author may have intended EQUAL:.  Note: in practice
+                # _parse_comparison absorbs 'a\n= b' as a single step, so
+                # this branch fires only for a truly bare '=' with nothing
+                # before it on the line, which is syntactically invalid.
+                tok = self._current()
+                msg = (
+                    "found '=' continuation in an EQUIV:/ARGUE: chain; "
+                    "use EQUAL: for expression-equality chains"
+                )
+                raise ParserError(msg, tok)
 
             # Parse expression
             expr = self._parse_expr()

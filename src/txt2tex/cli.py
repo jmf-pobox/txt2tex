@@ -147,8 +147,8 @@ def check_environment() -> int:
 
 _EPILOG = """\
 modes:
-  txt2tex FILE          read FILE.txt, write FILE.tex, compile FILE.pdf (default)
-  txt2tex --tex-only FILE
+  txt2tex FILE.txt      read FILE.txt, write FILE.tex, compile FILE.pdf (default)
+  txt2tex --tex-only FILE.txt
                         write FILE.tex only; skip PDF compilation
   txt2tex -i            interactive REPL; no input file required
   txt2tex --check-env   report LaTeX/fuzz dependencies and exit

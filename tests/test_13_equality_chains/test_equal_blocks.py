@@ -350,6 +350,12 @@ class TestConnectorSpecificity:
         # _parse_comparison crosses the newline and consumes 'a = b' as one step
         assert len(chain.steps) == 1
 
+    def test_equal_chain_iff_continuation_error_message(self) -> None:
+        """EQUAL: + <=> continuation produces a targeted, readable error message."""
+        text = "EQUAL:\na\n<=> b"
+        with pytest.raises(ParserError, match="found '<=>' continuation in an EQUAL:"):
+            Parser(Lexer(text).tokenize()).parse()
+
     def test_equiv_chain_does_not_consume_eq_continuation(self) -> None:
         """EQUIV: continuation line starting with = keeps = in the expression."""
         # '=' is a valid expression operator in EQUIV chains (e.g., #s = #t).

@@ -3,7 +3,9 @@
 Each .txt file under examples/ (excluding examples/infrastructure/ which
 contains no .txt files) is run through ``txt2tex --tex-only -o <tmp_path>``
 and the generated .tex is compared byte-for-byte against the committed
-.tex fixture.
+.tex fixture using ``read_bytes()``.  This catches accidental encoding
+changes, CRLF/LF drift, and trailing-whitespace differences that
+``read_text()`` would silently normalize away.
 
 Path collection is at module level so pytest-xdist can distribute tests
 across workers correctly. A lazy generator inside the test function body
@@ -124,13 +126,16 @@ def test_generation(txt_path: Path, tex_fixture: Path, tmp_path: Path) -> None:
         "Run 'make regen-e2e' to generate it."
     )
 
-    generated = generated_tex.read_text()
-    fixture = tex_fixture.read_text()
+    generated = generated_tex.read_bytes()
+    fixture = tex_fixture.read_bytes()
 
     if generated != fixture:
         # Surface a contextual diff to pinpoint the regression.
-        gen_lines = generated.splitlines(keepends=True)
-        fix_lines = fixture.splitlines(keepends=True)
+        # Decode for display only — the byte comparison above is the gate.
+        gen_text = generated.decode("utf-8", errors="replace")
+        fix_text = fixture.decode("utf-8", errors="replace")
+        gen_lines = gen_text.splitlines(keepends=True)
+        fix_lines = fix_text.splitlines(keepends=True)
 
         diff_lines: list[str] = []
         shown = 0
