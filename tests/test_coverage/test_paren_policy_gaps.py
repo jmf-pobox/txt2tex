@@ -1,4 +1,4 @@
-"""Tests for parenthesisation policy gaps #1, #2, and #3.
+"""Tests for parenthesisation policy gaps #1-#5.
 
 Gap #1: Arithmetic operators (+, -, *, /, mod) are explicit in PRECEDENCE so
         that a + b * c and similar expressions receive correct parens.
@@ -9,9 +9,15 @@ Gap #2: UNARY_PRECEDENCE is the machine-readable policy for unary-operator
 Gap #3: _generate_set_comprehension passes parent=node when generating the
         predicate, so nested quantifiers inside { x : T | exists ... } receive
         the always-paren treatment.
+
+Gap #5: A parametrized test matrix derived from PRECEDENCE and UNARY_PRECEDENCE
+        covers every binary operator pair and every unary-over-binary pair.
+        Adding a new operator to either table automatically extends coverage.
 """
 
 from __future__ import annotations
+
+import itertools
 
 import pytest
 
@@ -19,6 +25,70 @@ from txt2tex.ast_nodes import BinaryOp, Identifier, Quantifier, SetComprehension
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
+
+# ---------------------------------------------------------------------------
+# Helpers for TestPrecedenceMatrix
+# ---------------------------------------------------------------------------
+
+# A shared leaf node used wherever _needs_parens needs non-BinaryOp children.
+_ID_A = Identifier(line=0, column=0, name="a")
+_ID_B = Identifier(line=0, column=0, name="b")
+
+
+def _bin(op: str) -> BinaryOp:
+    """Return a minimal BinaryOp with leaf children and explicit_parens=False."""
+    return BinaryOp(line=0, column=0, operator=op, left=_ID_A, right=_ID_B)
+
+
+def _gen_obj() -> LaTeXGenerator:
+    """Return a default (non-fuzz) LaTeXGenerator instance."""
+    return LaTeXGenerator(use_fuzz=False)
+
+
+# ---------------------------------------------------------------------------
+# Parametrize arguments derived from the PRECEDENCE table.
+#
+# For the lower/higher-prec tests we collect all ordered pairs
+# (child_op, parent_op) where the two operators have distinct precedence
+# levels.  For the equal-prec same-operator associativity test we collect
+# every operator and its expected behaviour for left vs. right child position.
+# ---------------------------------------------------------------------------
+
+_PREC = LaTeXGenerator.PRECEDENCE
+_UNARY_PREC = LaTeXGenerator.UNARY_PRECEDENCE
+
+# All ordered pairs where child prec < parent prec → parens required.
+_LOWER_PREC_PAIRS: list[tuple[str, str]] = [
+    (child, parent)
+    for child, parent in itertools.product(_PREC, _PREC)
+    if _PREC[child] < _PREC[parent]
+]
+
+# All ordered pairs where child prec > parent prec → no parens.
+_HIGHER_PREC_PAIRS: list[tuple[str, str]] = [
+    (child, parent)
+    for child, parent in itertools.product(_PREC, _PREC)
+    if _PREC[child] > _PREC[parent]
+]
+
+# Operators whose nested same-op parens are always True for BOTH positions.
+# => and <=>: code adds parens for both left and right children when the
+# operator is the same ("for clarity in proofs"), regardless of associativity.
+_ALWAYS_PAREN_SAME_OP: frozenset[str] = frozenset({"=>", "<=>"})
+
+# Equal-precedence same-operator associativity cases.
+# Each entry: (op, is_left_child, expected_needs_parens).
+_EQUAL_PREC_ASSOC: list[tuple[str, bool, bool]] = [
+    (op, is_left, op in _ALWAYS_PAREN_SAME_OP or not is_left)
+    for op in _PREC
+    for is_left in (True, False)
+]
+
+# Unary-over-binary pairs: all (unary_op, binary_op) combinations.
+_UNARY_OVER_BINARY: list[tuple[str, int, int]] = [
+    (u_op, _UNARY_PREC[u_op], _PREC[b_op])
+    for u_op, b_op in itertools.product(_UNARY_PREC, _PREC)
+]
 
 
 def _parse_expr(text: str) -> BinaryOp | Quantifier | SetComprehension | Identifier:
@@ -233,3 +303,88 @@ class TestSetComprehensionPredicateParent:
         assert r"\{" in result
         assert r"\}" in result
         assert "x > 0" in result
+
+
+# ---------------------------------------------------------------------------
+# Gap #5 — Self-maintaining parametrized precedence matrix
+# ---------------------------------------------------------------------------
+
+
+class TestPrecedenceMatrix:
+    """Parametrized matrix derived from PRECEDENCE and UNARY_PRECEDENCE.
+
+    Test arguments are generated at import time from the class attributes,
+    so adding a new operator to either table automatically extends coverage.
+    Every test calls _needs_parens directly on fabricated BinaryOp nodes —
+    no parsing or LaTeX compilation is required.
+
+    Four families:
+
+    1. lower_prec — child_prec < parent_prec → parens required.
+    2. higher_prec — child_prec > parent_prec → no parens.
+    3. equal_prec_assoc — child_op == parent_op at equal prec;
+       left-associative: right child needs parens, left does not.
+       Right-associative (=> and <=>): both positions always need parens.
+    4. unary_over_binary — UNARY_PRECEDENCE[u] > PRECEDENCE[b] for every pair.
+    """
+
+    @pytest.mark.parametrize(("child_op", "parent_op"), _LOWER_PREC_PAIRS)
+    def test_lower_prec_child_requires_parens(
+        self, child_op: str, parent_op: str
+    ) -> None:
+        """Child with lower precedence than parent always needs parentheses."""
+        gen = _gen_obj()
+        parent = _bin(parent_op)
+        child = _bin(child_op)
+        assert gen._needs_parens(child, parent, is_left_child=False), (
+            f"expected parens: child {child_op!r} (prec {_PREC[child_op]}) "
+            f"inside parent {parent_op!r} (prec {_PREC[parent_op]})"
+        )
+
+    @pytest.mark.parametrize(("child_op", "parent_op"), _HIGHER_PREC_PAIRS)
+    def test_higher_prec_child_no_parens(self, child_op: str, parent_op: str) -> None:
+        """Child with higher precedence than parent never needs parentheses."""
+        gen = _gen_obj()
+        parent = _bin(parent_op)
+        child = _bin(child_op)
+        assert not gen._needs_parens(child, parent, is_left_child=False), (
+            f"spurious parens: child {child_op!r} (prec {_PREC[child_op]}) "
+            f"inside parent {parent_op!r} (prec {_PREC[parent_op]})"
+        )
+
+    @pytest.mark.parametrize(("op", "is_left_child", "expected"), _EQUAL_PREC_ASSOC)
+    def test_equal_prec_associativity(
+        self,
+        op: str,
+        is_left_child: bool,  # noqa: FBT001
+        expected: bool,  # noqa: FBT001
+    ) -> None:
+        """Same operator at equal precedence: right child needs parens, left does not.
+
+        Exception: => and <=> always add parens on both sides for proof clarity.
+        """
+        gen = _gen_obj()
+        parent = _bin(op)
+        child = _bin(op)
+        result = gen._needs_parens(child, parent, is_left_child=is_left_child)
+        position = "left" if is_left_child else "right"
+        assert result == expected, (
+            f"{op!r} {position} child: expected needs_parens={expected}, got {result}"
+        )
+
+    @pytest.mark.parametrize(
+        ("unary_op", "unary_prec", "binary_prec"), _UNARY_OVER_BINARY
+    )
+    def test_unary_prec_exceeds_binary(
+        self, unary_op: str, unary_prec: int, binary_prec: int
+    ) -> None:
+        """Every unary operator precedence exceeds every binary operator precedence.
+
+        This is the UNARY_PRECEDENCE table invariant: unary binds more tightly
+        than any binary operator, so a unary-operator result used as an operand
+        of any binary operator never needs parentheses on its own account.
+        """
+        assert unary_prec > binary_prec, (
+            f"UNARY_PRECEDENCE[{unary_op!r}]={unary_prec} "
+            f"must exceed binary prec {binary_prec}"
+        )
