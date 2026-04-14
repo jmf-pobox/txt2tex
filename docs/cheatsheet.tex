@@ -1,0 +1,388 @@
+\documentclass[10pt,landscape,a4paper]{article}
+\usepackage[landscape,margin=1.2cm]{geometry}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb}
+\usepackage{fuzz}
+\usepackage{adjustbox}
+\usepackage{proof}
+
+% Compact spacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt plus 1pt}
+\setlength{\columnsep}{1.2cm}
+\pagestyle{empty}
+
+% Section formatting
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries\color{darkgray}}{}{0pt}{}[\vspace{-4pt}\rule{\columnwidth}{0.4pt}]
+\titlespacing{\section}{0pt}{6pt}{2pt}
+
+% Code style
+\newcommand{\kw}[1]{\texttt{\bfseries #1}}
+\newcommand{\op}[1]{\texttt{#1}}
+\newcommand{\renders}{\,$\rightarrow$\,}
+
+% Stacked example: input then rendered output (compact)
+\newenvironment{exwrite}%
+  {\par\noindent\scriptsize\textbf{You write:}\par\vspace{0pt}\scriptsize}%
+  {\vspace{1pt}}
+\newenvironment{exget}%
+  {\par\noindent\scriptsize\textbf{You get:}\par\vspace{0pt}\small}%
+  {\par\vspace{3pt}}
+
+% Table helper — left col monospace, right col roman
+\newcolumntype{L}{>{\ttfamily}l}
+\newcolumntype{R}{>{\raggedright\arraybackslash}X}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries txt2tex Cheatsheet}\\[2pt]
+{\small Write math like you're at a whiteboard.  Get \LaTeX\ you can hand in.}\\[1pt]
+{\footnotesize\color{gray}\url{https://github.com/jmf-pobox/txt2tex}}
+\end{center}
+
+\vspace{-2pt}
+
+\begin{multicols}{3}
+\raggedcolumns
+
+% ── DOCUMENT STRUCTURE ──────────────────────────
+\section{Document Structure}
+
+\begin{tabularx}{\columnwidth}{LR}
+=== Title ===        & \verb|\section*{Title}| \\
+** Solution N **     & Bold heading with spacing \\
+(a) Text             & Part label \\
+TEXT: paragraph       & Prose block (smart formula detection) \\
+LATEX: \textbackslash cmd & Raw \LaTeX\ passthrough \\
+PAGEBREAK:           & Page break \\
+\end{tabularx}
+
+\smallskip
+\begin{tabularx}{\columnwidth}{LR}
+TITLE: ...           & Document title \\
+AUTHOR: ...          & Author name \\
+DATE: ...            & Date string \\
+BIBLIOGRAPHY: f.bib  & BibTeX file \\
+{[cite key]}         & \verb|\citep{key}| \\
+\end{tabularx}
+
+% ── LOGIC ───────────────────────────────────────
+\section{Logic}
+
+\begin{tabularx}{\columnwidth}{LR}
+p land q             & $p \land q$ \\
+p lor q              & $p \lor q$ \\
+lnot p               & $\lnot p$ \\
+p => q               & $p \Rightarrow q$ \\
+p <=> q              & $p \Leftrightarrow q$ \\
+forall x : S | P     & $\forall x : S @ P$ \\
+exists x : S | P     & $\exists x : S @ P$ \\
+exists\_1 x : S | P  & $\exists_1 x : S @ P$ \\
+lambda x : S | E     & $\lambda x : S @ E$ \\
+mu x : S | P         & $\mu x : S @ P$ \\
+\end{tabularx}
+
+\smallskip
+{\footnotesize\textbf{Note:} Use \kw{land}, \kw{lor}, \kw{lnot}. English \texttt{and}/\texttt{or}/\texttt{not} are not supported.}
+
+% ── SETS ────────────────────────────────────────
+\section{Sets \& Types}
+
+\begin{tabularx}{\columnwidth}{LR}
+x elem S             & $x \in S$ \\
+x notin S            & $x \notin S$ \\
+A subset B           & $A \subseteq B$ \\
+A union B            & $A \cup B$ \\
+A inter B            & $A \cap B$ \\
+A setminus B         & $A \setminus B$ \\
+power S              & $\power S$ \\
+F S                  & $\finset S$ \\
+\{x : S | P\}       & Set comprehension \\
+A cross B            & $A \cross B$ \\
+N / Z / N1           & $\nat$ / $\num$ / $\nat_1$ \\
+n..m                 & $n \upto m$ \\
+\end{tabularx}
+
+% ── RELATIONS ───────────────────────────────────
+\section{Relations}
+
+\begin{tabularx}{\columnwidth}{LR}
+A <-> B              & $A \rel B$ \\
+x |-> y              & $(x \mapsto y)$ \\
+dom R / ran R        & $\dom R$ / $\ran R$ \\
+A dres R             & $A \dres R$ \\
+A dsub R             & $A \ndres R$ \\
+R rres B             & $R \rres B$ \\
+R rsub B             & $R \nrres B$ \\
+R oplus S            & $R \oplus S$ (override) \\
+R o9 S               & $R \semi S$ (forward comp.) \\
+R comp S             & $R \comp S$ (backward comp.) \\
+\end{tabularx}
+
+% ── FUNCTIONS ───────────────────────────────────
+\section{Functions}
+
+\begin{tabularx}{\columnwidth}{LR}
+A pfun B             & $A \pfun B$ \\
+A fun B              & $A \fun B$ (total) \\
+A pinj B             & $A \pinj B$ \\
+A inj B              & $A \inj B$ \\
+A surj B             & $A \surj B$ \\
+A bij B              & $A \bij B$ \\
+A ffun B             & $A \ffun B$ (finite) \\
+f(x)                 & Function application \\
+\end{tabularx}
+
+% ── SEQUENCES ───────────────────────────────────
+\section{Sequences}
+
+\begin{tabularx}{\columnwidth}{LR}
+<> / <a, b>          & $\langle\rangle$ / $\langle a, b \rangle$ \\
+s \textasciicircum{} t  & $s \cat t$ (concatenation) \\
+seq S / seq1 S       & $\seq S$ / $\seq_1 S$ \\
+\# s                 & $\# s$ (length) \\
+\end{tabularx}
+
+% ── Z NOTATION BLOCKS ───────────────────────────
+\section{Z Notation Blocks}
+
+\begin{tabularx}{\columnwidth}{LR}
+given A, B           & Given types: $[A, B]$ \\
+T ::= a | b          & Free type \\
+name == expr         & Abbreviation \\
+\end{tabularx}
+
+\smallskip
+\begin{tabularx}{\columnwidth}{LR}
+\multicolumn{2}{l}{\texttt{axdef} / \texttt{schema Name} / \texttt{gendef [X]}}\\
+\quad declarations   & Variable declarations \\
+\texttt{where}       & Separator \\
+\quad predicates     & Constraining predicates \\
+\texttt{end}         & Close the block \\
+\end{tabularx}
+
+% ── PROOF SYNTAX REFERENCE ──────────────────────
+\section{Proof Tree Syntax}
+
+\begin{tabularx}{\columnwidth}{LR}
+\textrm{indent}      & Premises indented under conclusion \\
+{[rule]}              & Justification label \\
+{[rule {[n]}]}        & Discharge assumption $n$ \\
+{[n] expr}            & Boxed assumption labelled $n$ \\
+::                    & Sibling premises \\
+\end{tabularx}
+
+\smallskip
+{\footnotesize Rules: \texttt{land intro}, \texttt{land elim 1/2}, \texttt{lor intro 1/2}, \texttt{lor elim}, \texttt{=> intro/elim}, \texttt{<=> intro/elim}, \texttt{lnot intro/elim}, \texttt{forall intro/elim}, \texttt{exists intro/elim}.}
+
+% ── USAGE ───────────────────────────────────────
+\section{Usage}
+
+\begin{tabularx}{\columnwidth}{LR}
+txt2tex f.txt        & $\rightarrow$ f.tex + f.pdf \\
+txt2tex f.txt {-}{-}tex-only & $\rightarrow$ f.tex only \\
+txt2tex -i           & Interactive REPL \\
+txt2tex {-}{-}check-env  & Verify dependencies \\
+\end{tabularx}
+
+\end{multicols}
+
+%% ── PAGE 2: PROOFS BY EXAMPLE ──────────────────
+\newpage
+
+\begin{center}
+{\LARGE\bfseries txt2tex Proofs --- By Example}\\[2pt]
+{\small Each example shows what you type and what txt2tex renders.}
+\end{center}
+
+\vspace{-2pt}
+
+\begin{multicols}{3}
+\raggedcolumns
+
+% ── HOW PROOFS WORK ─────────────────────────────
+\section{How Proof Trees Work}
+
+{\scriptsize
+In txt2tex, proof trees are written \textbf{bottom-up}: the conclusion is the first line, and its premises are indented below it. Think of it as reading the inference rule from conclusion to justification:
+
+\smallskip
+\begin{tabularx}{\columnwidth}{LR}
+\textrm{conclusion}  & First line (least indented) \\
+\textrm{\quad premise}& Indented = supports the line above \\
+{[rule]}              & Justification in brackets \\
+{[n] expr}            & Boxed assumption (labelled $n$) \\
+{[rule {[n]}]}        & Discharge assumption $n$ \\
+::                    & Marks sibling premises \\
+\end{tabularx}
+
+\smallskip
+Deeper indentation = deeper in the tree. Two premises at the same indent level are siblings that jointly support their parent.
+}
+
+% ══ PROPOSITIONAL LOGIC (Lecture 1) ═════════════
+
+% ── TRUTH TABLE ─────────────────────────────────
+\section{Truth Table {\normalsize\color{gray}\textrm{\scriptsize Prop.\ Logic}}}
+
+\begin{exwrite}%
+\begin{verbatim}
+TRUTH TABLE:
+p | q | p => q
+T | T | T
+T | F | F
+F | T | T
+F | F | T
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+\begin{tabular}{ccc}
+$p$ & $q$ & $p \Rightarrow q$ \\ \hline
+T & T & T \\
+T & F & F \\
+F & T & T \\
+F & F & T \\
+\end{tabular}
+\end{center}
+\end{exget}
+
+% ── EQUIV CHAIN (De Morgan) ────────────────────
+\section{Equivalence Chain {\normalsize\color{gray}\textrm{\scriptsize Prop.\ Logic}}}
+
+\begin{exwrite}%
+\begin{verbatim}
+EQUIV:
+lnot (p land q)
+lnot p lor lnot q  [De Morgan]
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\begin{array}{l@{\hspace{2em}}r}
+\lnot (p \land q) \\
+\Leftrightarrow \lnot p \lor \lnot q
+  & [\mbox{De Morgan}]
+\end{array}$
+\end{center}
+\end{exget}
+
+{\scriptsize \kw{EQUIV:} joins steps with $\Leftrightarrow$. Use for \emph{predicate} equivalences.}
+
+% ══ PROOF TREES (Lecture 4) ═════════════════════
+
+% ── MODUS PONENS ────────────────────────────────
+\section{Modus Ponens {\normalsize\color{gray}\textrm{\scriptsize Proof Trees}}}
+
+\begin{exwrite}%
+\begin{verbatim}
+PROOF:
+  q [=> elim]
+    p => q
+    p
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\infer[\Rightarrow\textrm{-elim}]{q}{p \Rightarrow q & p}$
+\end{center}
+\end{exget}
+
+% ── AND-INTRO ───────────────────────────────────
+\section{$\land$-intro {\normalsize\color{gray}\textrm{\scriptsize Proof Trees}}}
+
+\begin{exwrite}%
+\begin{verbatim}
+PROOF:
+  p land q [land intro]
+    p
+    q
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\infer[\land\textrm{-intro}]{p \land q}{p & q}$
+\end{center}
+\end{exget}
+
+% ── IMPLIES-INTRO WITH DISCHARGE ────────────────
+\section{$\Rightarrow$-intro with discharge {\normalsize\color{gray}\textrm{\scriptsize Proof Trees}}}
+
+\begin{exwrite}%
+\begin{verbatim}
+PROOF:
+  p => p [=> intro [1]]
+    [1] p
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \Rightarrow p}{\ulcorner p \urcorner^{[1]}}$
+\end{center}
+\end{exget}
+
+{\scriptsize \texttt{[1]~p} = boxed assumption. \texttt{[=> intro~[1]]} discharges it.}
+
+% ── LOR-ELIM (CASE ANALYSIS) ───────────────────
+\section{$\lor$-elim / case analysis {\normalsize\color{gray}\textrm{\scriptsize Proof Trees}}}
+
+\begin{exwrite}%
+\begin{verbatim}
+PROOF:
+  r [lor elim]
+    p lor q
+    :: p => r
+      [1] p
+        r [from p]
+    :: q => r
+      [2] q
+        r [from q]
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\infer[\lor\textrm{-elim}]{r}{p \lor q & \infer{r}{\ulcorner p \urcorner^{[1]}} & \infer{r}{\ulcorner q \urcorner^{[2]}}}$
+\end{center}
+\end{exget}
+
+{\scriptsize \texttt{::} = sibling premises (case arms).}
+
+% ══ INDUCTION / EQUATIONAL (Lectures 11–13) ════
+
+% ── EQUAL CHAIN ─────────────────────────────────
+\section{Equality Chain {\normalsize\color{gray}\textrm{\scriptsize Induction}}}
+
+\begin{exwrite}%
+\begin{verbatim}
+EQUAL:
+0 + 0
+0      [0+0 = 0]
+length(<>)
+       [length(<>) = 0]
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\begin{array}{l@{\hspace{1.5em}}r}
+0 + 0 \\
+= 0 & [\mbox{0+0 = 0}] \\
+= length(\langle\rangle) & [\mbox{length}(\langle\rangle) = 0]
+\end{array}$
+\end{center}
+\end{exget}
+
+{\scriptsize \kw{EQUAL:} = expression chains ($=$). Use for $\mathbb{N}$/sets/sequences.}
+
+\end{multicols}
+
+\end{document}

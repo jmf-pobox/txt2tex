@@ -14,6 +14,8 @@ txt2tex converts plain-text mathematical notation into LaTeX. Write `forall x : 
 
 **Try an expression without creating a file.** Run `txt2tex -i` to open the REPL. Type an expression, see the LaTeX and a PDF preview. Useful for checking rendering or grabbing a snippet to paste elsewhere.
 
+**[Cheatsheet (PDF)](docs/cheatsheet.pdf)** — two-page reference card with every operator, block type, and proof syntax, plus side-by-side examples showing what you type and what txt2tex renders.
+
 ---
 
 ## Installation
