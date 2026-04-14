@@ -28,18 +28,20 @@ If you discover a security vulnerability in txt2tex, please report it responsibl
 ## Scope
 
 This security policy covers:
+
 - The txt2tex Python package
 - Generated LaTeX output
 - CLI tool behavior
 
 Out of scope:
+
 - Third-party dependencies (report to their maintainers)
 - The fuzz typechecker (separate project)
 
 ## Security Best Practices
 
 When using txt2tex:
+
 - Only process trusted input files
 - Review generated LaTeX before compilation in sensitive environments
 - Keep dependencies updated (`uv pip list --outdated`)
-

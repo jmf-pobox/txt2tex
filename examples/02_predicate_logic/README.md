@@ -14,7 +14,7 @@ This directory contains examples for Lecture 2, covering predicate logic and qua
 
 ## Key Quantifiers
 
-```
+```text
 forall x : N | x > 0              →  ∀x : ℕ • x > 0
 exists y : Z | y < 0              →  ∃y : ℤ • y < 0
 exists1 x : N | x * x = 4         →  ∃₁x : ℕ • x × x = 4
@@ -30,6 +30,7 @@ forall x : N | x > 0 . x < 10     →  ∀x : ℕ ∣ x > 0 • x < 10
 ## Examples in This Directory
 
 Browse the `.txt` files to see:
+
 - Basic quantifier usage
 - Multi-variable declarations
 - Nested quantification patterns

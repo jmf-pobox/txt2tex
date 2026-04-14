@@ -15,6 +15,7 @@ make fuzz      # Build fuzz test cases
 ## Directory Structure
 
 ### 01_propositional_logic (4 examples)
+
 Basic propositional logic operators and constructs.
 
 - `hello_world.txt` - Minimal example
@@ -23,6 +24,7 @@ Basic propositional logic operators and constructs.
 - `complex_formulas.txt` - Complex propositional formulas
 
 ### 02_predicate_logic (4 examples)
+
 Predicate logic with quantifiers and declarations.
 
 - `quantifiers.txt` - Universal (forall) and existential (exists) quantification
@@ -31,6 +33,7 @@ Predicate logic with quantifiers and declarations.
 - `nested_quantifiers.txt` - Nested quantification examples
 
 ### 03_equality (6 examples)
+
 Equality and unique quantification.
 
 - `equality_operators.txt` - Basic equality (=, !=) and equality in predicates
@@ -40,7 +43,8 @@ Equality and unique quantification.
 - `one_point_rule.txt` - Applications of the one-point rule in quantifier elimination
 - `equality_proofs.txt` - Proofs using equality reasoning
 
-### 04_proof_trees (8 examples)
+### 04_proof_trees (9 examples)
+
 Natural deduction proof trees with inference rules.
 
 - `simple_proofs.txt` - Basic implication and elimination proofs
@@ -48,11 +52,13 @@ Natural deduction proof trees with inference rules.
 - `minimal_nesting.txt` - Minimal nested proof example
 - `contradiction.txt` - Proof by contradiction
 - `excluded_middle.txt` - Excluded middle proofs
-- `case_analysis.txt` - Or-elimination with case analysis
 - `advanced_proof_patterns.txt` - Advanced proof patterns
-- `implication_introduction.txt` - Implication introduction rule
+- `infrule_modus_ponens.txt` - Modus ponens inference rule
+- `shows_operator.txt` - Shows operator (|-) examples
+- `pattern_matching.txt` - Pattern matching in proofs
 
 ### 05_sets (7 examples)
+
 Set theory, types, and set operations.
 
 - `set_basics.txt` - Basic set notation {}, membership (in, notin)
@@ -60,22 +66,25 @@ Set theory, types, and set operations.
 - `cartesian_tuples.txt` - Cartesian products and ordered pairs
 - `set_literals.txt` - Set literal notation with maplets
 - `tuple_examples.txt` - Tuple construction and component selection
-- `set_comprehension.txt` - Set comprehension with predicates and expressions
-- `distributed_union.txt` - Distributed union (bigcup) operator
+- `strict_subset.txt` - Strict subset (psubset) and subset comparisons
+- `union_domain.txt` - Union and domain operations
 
-### 06_definitions (8 examples)
+### 06_definitions (9 examples)
+
 Z notation definitions: basic types, free types, abbreviations.
 
-- `given_types.txt` - Given type declarations
-- `free_types_basic.txt` - Basic free type definitions (Type ::= branch1 | branch2)
-- `free_types_recursive.txt` - Recursive free types (trees, lists)
-- `free_types_generic.txt` - Generic free types
-- `abbreviations.txt` - Abbreviation definitions (==)
-- `axdef_basic.txt` - Axiomatic definitions
-- `schema_basic.txt` - Schema definitions
+- `free_types_demo.txt` - Basic free type definitions (Type ::= branch1 | branch2)
+- `free_types_proper.txt` - Recursive free types (trees, lists)
+- `gendef_basic.txt` - Generic function definitions
+- `gendef_advanced.txt` - Advanced generic definitions
+- `abbrev_demo.txt` - Abbreviation definitions (==)
+- `axdef_demo.txt` - Axiomatic definitions
+- `schema_demo.txt` - Schema definitions
 - `anonymous_schema.txt` - Anonymous schema expressions
+- `syntax_demo.txt` - Z notation syntax demonstrations
 
 ### 07_relations (7 examples)
+
 Relations, domain, range, and relational operators.
 
 - `relation_types.txt` - Relation types (X <-> Y), maplets (|->)
@@ -87,18 +96,20 @@ Relations, domain, range, and relational operators.
 - `closures.txt` - Transitive (+) and reflexive-transitive (*) closures
 
 ### 08_functions (8 examples)
+
 Functions, lambda expressions, and function types.
 
-- `lambda_basic.txt` - Basic lambda expressions (lambda x : T . body)
-- `lambda_multi_variable.txt` - Multi-variable lambdas
-- `function_types.txt` - Partial (+->), total (->), injections, surjections, bijections
-- `function_application.txt` - Function application f(x)
-- `space_separated_application.txt` - Space-separated application (f x y)
-- `override.txt` - Function override (++)
-- `generic_functions.txt` - Generic function definitions
-- `recursive_functions.txt` - Recursive function definitions with pattern matching
+- `lambda_expressions.txt` - Lambda expressions (lambda x : T . body)
+- `function_definitions_simple.txt` - Function type declarations and definitions
+- `function_composition.txt` - Function composition operator
+- `composition_pipelines.txt` - Chained function composition
+- `finite_functions.txt` - Finite function types and literals
+- `higher_order_functions.txt` - Higher-order function patterns
+- `sequence_tuple_tests.txt` - Sequence and tuple function examples
+- `sequences_bags_tuples.txt` - Functions over sequences, bags, and tuples
 
 ### 09_sequences (7 examples)
+
 Sequences, bags, and sequence operations.
 
 - `sequence_literals.txt` - Sequence types and literals (⟨⟩, <>, ⟨a,b,c⟩)
@@ -110,12 +121,14 @@ Sequences, bags, and sequence operations.
 - `ranges.txt` - Range operator (m..n)
 
 ### 10_schemas (2 examples)
+
 Schema definitions and schema expressions.
 
 - `scoping_demo.txt` - Schema scoping and variable visibility
 - `zed_blocks.txt` - Multiple Z notation block types
 
 ### 11_text_blocks (6 examples)
+
 Text blocks with inline mathematics and LaTeX integration.
 
 - `text_smart.txt` - Smart inline math detection in TEXT blocks
@@ -126,13 +139,21 @@ Text blocks with inline mathematics and LaTeX integration.
 - `bibliography_example.txt` - Bibliography and citations
 
 ### 12_advanced (3 examples)
+
 Advanced features and edge cases.
 
 - `subscripts_superscripts.txt` - Complex subscripts and superscripts
 - `generic_instantiation.txt` - Generic type instantiation
 - `if_then_else.txt` - Conditional expressions
 
+### 13_equality_chains (1 example)
+
+Expression equality chains using `EQUAL:` block syntax.
+
+- `equality_chain_basic.txt` - Multi-step equality chains with justifications
+
 ### fuzz_tests/ (4 examples)
+
 Test cases for fuzz validation and edge cases.
 
 - `test_field_projection_bug.txt` - Field projection on function applications
@@ -141,6 +162,7 @@ Test cases for fuzz validation and edge cases.
 - `test_nested_super.txt` - Nested superscripts
 
 ### user_guide/ (61 examples)
+
 Examples extracted from USER_GUIDE.md documentation, organized by feature.
 
 - Comprehensive examples for every documented feature
@@ -169,6 +191,7 @@ make -j4                     # Build with 4 parallel jobs
 ```
 
 All builds include:
+
 1. LaTeX generation from .txt
 2. LaTeX formatting with tex-fmt
 3. **Type checking with fuzz** (validates Z notation)
@@ -213,7 +236,8 @@ See existing files for format details. Key elements:
 - Parts: `(a)`, `(b)`, etc.
 - Text blocks: `TEXT: prose here`
 - Truth tables: `TRUTH TABLE:` followed by ASCII table
-- Equivalences: `EQUIV:` with chain of equivalences
+- Equivalences: `EQUIV:` with chain of logical equivalences (joins steps with ⇔)
+- Equality chains: `EQUAL:` with chain of expression equalities (joins steps with =)
 - Proofs: `PROOF:` with indented inference rules
 - Z notation: `axdef`, `schema`, `given`, etc.
 
@@ -224,6 +248,7 @@ See [tests/bugs/README.md](../tests/bugs/README.md) for complete bug tracking wi
 ## Quality Standards
 
 All examples must:
+
 - Generate valid LaTeX
 - Compile to PDF
 - Pass fuzz type checking (when using Z notation)

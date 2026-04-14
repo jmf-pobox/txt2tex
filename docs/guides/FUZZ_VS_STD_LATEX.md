@@ -23,20 +23,24 @@
 ## Type Names
 
 ### Natural Numbers
+
 **Standard LaTeX**: `\mathbb{N}` (blackboard bold)
 **Fuzz**: `\nat` (special fuzz command)
 
 **txt2tex behavior**:
+
 ```python
 if name == "N":
     return r"\nat" if self.use_fuzz else r"\mathbb{N}"
 ```
 
 ### Integers
+
 **Standard LaTeX**: `\mathbb{Z}` (blackboard bold)
 **Fuzz**: `\num` (special fuzz command)
 
 **txt2tex behavior**:
+
 ```python
 if name == "Z":
     return r"\num" if self.use_fuzz else r"\mathbb{Z}"
@@ -54,6 +58,7 @@ if name == "Z":
 **Fuzz**: `\implies` (logical connective)
 
 **txt2tex behavior**:
+
 ```python
 # In _generate_binary_op():
 if self.use_fuzz and node.operator == "=>":
@@ -66,10 +71,12 @@ if self.use_fuzz and node.operator == "=>":
 
 **Standard LaTeX**: `\Leftrightarrow` (double arrow symbol)
 **Fuzz**: Context-dependent
+
 - **Predicates** (schemas, axioms, proofs): `\iff` (logical "if and only if")
 - **EQUIV blocks**: `\Leftrightarrow` (equational reasoning)
 
 **txt2tex behavior**:
+
 ```python
 # In _generate_binary_op():
 if self.use_fuzz:
@@ -79,6 +86,7 @@ if self.use_fuzz:
 ```
 
 **Why**: Fuzz distinguishes between:
+
 - `\iff` - logical connective in predicates (same level as `\land`, `\lor`, `\implies`)
 - `\Leftrightarrow` - meta-level equivalence for equational reasoning (EQUIV chains)
 
@@ -108,7 +116,8 @@ if self.use_fuzz and isinstance(node.operand, FunctionApp):
 **Reference**: `latex_gen.py` - unary operator generation
 
 **Example**:
-```
+
+```text
 Input:  # s(i)
 Fuzz:   # (s(i))    ← Parentheses required
 LaTeX:  \# s(i)     ← No parentheses needed
@@ -138,7 +147,8 @@ if self.use_fuzz and node.operator == "#" and isinstance(node.operand, UnaryOp):
 **Reference**: `latex_gen.py` - cardinality with function-like operators
 
 **Example**:
-```
+
+```text
 Input:  # head s
 Fuzz:   # (\head s)     ← Parentheses required
 LaTeX:  \# \head s      ← No parentheses needed
@@ -153,6 +163,7 @@ LaTeX:  \# \head s      ← No parentheses needed
 **Issue discovered**: When declarations are joined with semicolons on one line, fuzz doesn't render them on separate lines in the PDF.
 
 **Standard LaTeX**:
+
 ```latex
 \begin{gendef}[X]
   f: X \fun X; g: X \fun X    % On one line - might work
@@ -160,6 +171,7 @@ LaTeX:  \# \head s      ← No parentheses needed
 ```
 
 **Fuzz requirement**:
+
 ```latex
 \begin{gendef}[X]
   f: X \fun X \\              % Line break required
@@ -181,7 +193,8 @@ for i, decl in enumerate(node.declarations):
 **Reference**: `latex_gen.py` - gendef, axdef, schema generation
 
 **PDF Result**:
-```
+
+```text
 [X ]
 f :X →X        ← Each declaration
 g :X →X        ← on its own line
@@ -198,6 +211,7 @@ g :X →X        ← on its own line
 **Alternative**: Use `o9` or `comp`
 
 **txt2tex decision**:
+
 - **REMOVED** semicolon from relational operators in parser
 - Semicolon is now **exclusively** used for declaration separators
 - Users must use `o9` or `comp` for relational composition
@@ -205,11 +219,13 @@ g :X →X        ← on its own line
 **Reference**: `parser.py` - operator handling
 
 **Reason**: Ambiguity between:
+
 - `R ; S` (relational composition - now unsupported)
 - `f : X -> X; g : X -> X` (declaration separator - supported)
 
 **User syntax**:
-```
+
+```text
 ✅ CORRECT: R o9 S    → R ∘ S
 ✅ CORRECT: R comp S  → R ∘ S
 ❌ WRONG:   R ; S     → Parse error (semicolon reserved for declarations)
@@ -224,7 +240,8 @@ g :X →X        ← on its own line
 **Issue**: Fuzz requires parentheses around nested sequence/bag/power operators
 
 **Example**:
-```
+
+```text
 Input:  seq1 seq X
 Fuzz:   \seq_1 (\seq X)    ← Parentheses required
 LaTeX:  \seq_1 \seq X      ← Might work without
@@ -257,13 +274,14 @@ if (
 
 Fuzz DOES support tuple projection when using **named fields** (identifiers):
 
-```
+```text
 tuple.fieldname    ✅ Supported - Var-Name is an identifier
 record.status      ✅ Supported - Var-Name is an identifier
 person.name        ✅ Supported - Var-Name is an identifier
 ```
 
 **Example with schemas**:
+
 ```z
 Entry == [name: NAME, course: Course, grade: N]
 
@@ -279,7 +297,7 @@ e.grade     ← Works in fuzz
 
 Fuzz does NOT support numeric positional projection:
 
-```
+```text
 e.1        ❌ NOT supported - "1" is a Number, not Var-Name
 e.2        ❌ NOT supported - "2" is a Number, not Var-Name
 e.3        ❌ NOT supported - "3" is a Number, not Var-Name
@@ -287,6 +305,7 @@ e.3        ❌ NOT supported - "3" is a Number, not Var-Name
 ```
 
 **Standard Z Mathematical Toolkit** provides projection functions only for pairs:
+
 - `first : X × Y → X` where `first(x,y) = x`
 - `second : X × Y → Y` where `second(x,y) = y`
 
@@ -295,10 +314,12 @@ No standard functions exist for 3-tuples, 4-tuples, or n-tuples.
 ### txt2tex Behavior
 
 **txt2tex generates** the numeric projection syntax when requested, but:
+
 - Fuzz validation will report syntax errors
 - Solutions using numeric projections must be wrapped in TEXT blocks
 
 **User workarounds**:
+
 1. Use schemas with named fields instead of anonymous tuples
 2. Define custom projection functions for n-tuples
 3. Wrap numeric projections in TEXT blocks (renders as plain text, no type checking)
@@ -317,6 +338,7 @@ No standard functions exist for 3-tuples, 4-tuples, or n-tuples.
 **Fuzz**: Does **NOT** recognize underscores in identifiers
 
 **Recommended alternatives for fuzz-compatible code**:
+
 1. **camelCase with initial capital** (for schemas/types): `CumulativeTotal`, `NotYetViewed`
 2. **camelCase with initial lowercase** (for variables): `cumulativeTotal`, `notYetViewed`
 3. **Single word** (when possible): `total`, `viewed`
@@ -349,26 +371,31 @@ if node.quantifier == "mu" and self.use_fuzz:
 **Examples**:
 
 Input:
-```
+
+```text
 mu n : N | n > 0
 ```
 
 Fuzz mode generates:
+
 ```latex
 (\mu n : \nat | n > 0)
 ```
 
 With expression part:
-```
+
+```text
 mu n : N | n elem S . f(n)
 ```
 
 Generates:
+
 ```latex
 (\mu n : \nat | n \in S @ f(n))
 ```
 
 **Key points**:
+
 - Parentheses wrap the ENTIRE mu expression, not just the schema text
 - Use `|` for predicate separator (not `@`)
 - Use `@` only when there's an expression part after the predicate
@@ -381,6 +408,7 @@ Generates:
 ### 1. Always Test with Fuzz
 
 When implementing new features, test both modes:
+
 ```bash
 # Fuzz mode (default - type checking enabled)
 txt2tex file.txt
@@ -429,13 +457,15 @@ Zed blocks (`\begin{zed}...\end{zed}`) are unboxed Z notation paragraphs. Unlike
 ### Syntax Difference
 
 **txt2tex input:**
-```
+
+```text
 zed
   forall x : N | x >= 0
 end
 ```
 
 **LaTeX output:**
+
 ```latex
 \begin{zed}
   \forall x : \nat \mid x \geq 0
@@ -452,11 +482,13 @@ end
 ### When to Use zed vs axdef
 
 **Use `zed`** when:
+
 - Content is a single predicate/expression
 - No visual box needed in PDF
 - No separate declaration section needed
 
 **Use `axdef`** when:
+
 - Need declaration and where sections
 - Want visual box in PDF
 - Defining global constants with types
@@ -486,6 +518,7 @@ def test_feature_fuzz_mode(self) -> None:
 ### Manual Fuzz Verification
 
 After code changes, verify with actual fuzz:
+
 ```bash
 cd /tmp
 cat > test.tex << 'EOF'

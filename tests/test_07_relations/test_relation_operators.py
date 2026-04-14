@@ -298,8 +298,9 @@ class TestRelationOperatorLaTeX:
         assert latex == "R \\comp S"
 
     def test_generate_circ_operator(self) -> None:
-        """Test generating LaTeX for o9 (circ) operator.
+        """Test generating LaTeX for o9 (forward composition) operator.
 
+        o9 emits \\semi (fuzz forward composition), not \\circ.
         Note: Semicolon is reserved for declarations, use o9 for composition.
         """
         gen = LaTeXGenerator()
@@ -311,7 +312,7 @@ class TestRelationOperatorLaTeX:
             column=3,
         )
         latex = gen.generate_expr(ast)
-        assert latex == "R \\circ S"
+        assert latex == "R \\semi S"
 
     def test_generate_dom_function(self) -> None:
         """Test generating LaTeX for dom function."""
@@ -412,8 +413,9 @@ class TestRelationOperatorIntegration:
         assert latex == "R \\comp S"
 
     def test_end_to_end_circ(self) -> None:
-        """Test complete pipeline for o9 (circ) operator.
+        """Test complete pipeline for o9 (forward composition) operator.
 
+        o9 emits \\semi (fuzz forward composition), not \\circ.
         Note: Semicolon is reserved for declarations, use o9 for composition.
         """
         text = "R o9 S"
@@ -426,7 +428,7 @@ class TestRelationOperatorIntegration:
         latex = gen.generate_expr(ast)
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "o9"
-        assert latex == "R \\circ S"
+        assert latex == "R \\semi S"
 
     def test_end_to_end_dom_function(self) -> None:
         """Test complete pipeline for dom function."""

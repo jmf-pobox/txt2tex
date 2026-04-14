@@ -1,5 +1,6 @@
 # Tutorial 2: Predicate Logic
 
+<!-- markdownlint-disable-next-line MD036 -->
 **Lecture 2: Predicate Logic**
 
 Extend propositional logic with quantifiers and predicates to reason about collections of objects.
@@ -12,6 +13,7 @@ Extend propositional logic with quantifiers and predicates to reason about colle
 ## Introduction
 
 Predicate logic adds:
+
 - **Predicates:** Properties of objects (P(x), Q(x, y))
 - **Quantifiers:** forall (∀) and exists (∃)
 - **Domains:** Sets that variables range over
@@ -20,7 +22,7 @@ Predicate logic adds:
 
 Variables must be declared with their types:
 
-```
+```text
 x : N          (x is a natural number)
 p : Person     (p is a Person)
 s : P N        (s is a set of natural numbers)
@@ -31,7 +33,8 @@ s : P N        (s is a set of natural numbers)
 **Meaning:** Property holds for all values in the domain
 
 **Syntax:**
-```
+
+```text
 forall x : N | x >= 0
 ```
 
@@ -41,7 +44,7 @@ forall x : N | x >= 0
 
 ### Multiple Variables
 
-```
+```text
 forall x, y : N | x + y = y + x
 ```
 
@@ -49,7 +52,7 @@ forall x, y : N | x + y = y + x
 
 ### With Constraints
 
-```
+```text
 forall x : N | x > 5 => x > 0
 ```
 
@@ -60,7 +63,8 @@ forall x : N | x > 5 => x > 0
 **Meaning:** Property holds for at least one value
 
 **Syntax:**
-```
+
+```text
 exists x : N | x > 100
 ```
 
@@ -70,7 +74,7 @@ exists x : N | x > 100
 
 ### Unique Existence (exists1)
 
-```
+```text
 exists1 x : N | x * x = 16
 ```
 
@@ -79,21 +83,24 @@ exists1 x : N | x * x = 16
 ## The Mu Operator
 
 **Syntax:**
-```
+
+```text
 mu x : T | constraint
 ```
 
 **Meaning:** The unique x in T satisfying the constraint
 
 **Example:**
-```
+
+```text
 mu x : N | x * x = 25
 ```
 
 Evaluates to 5 (the unique natural number whose square is 25).
 
 **With expression:**
-```
+
+```text
 mu x : N | x > 5 land x < 7 . x + 1
 ```
 
@@ -106,13 +113,15 @@ Finds x = 6, then evaluates x + 1 = 7.
 Simplify quantifiers when the variable is constrained to a single value.
 
 **Rule:**
-```
+
+```text
 forall x : T | x = a => P(x)  ≡  P(a)
 exists x : T | x = a land P(x)  ≡  P(a)
 ```
 
 **Example:**
-```
+
+```text
 forall x : N | x = 5 => x > 0
 ≡ 5 > 0
 ≡ true
@@ -124,14 +133,15 @@ forall x : N | x = 5 => x > 0
 
 Quantifiers can be nested:
 
-```
+```text
 forall x : N | exists y : N | x + y = 10
 ```
 
 "For every natural number x, there exists a y such that x + y = 10"
 
 **Order matters:**
-```
+
+```text
 forall x | exists y | P(x, y)    (different from)
 exists y | forall x | P(x, y)
 ```
@@ -139,26 +149,29 @@ exists y | forall x | P(x, y)
 ## Quantifier Laws
 
 **Distribution:**
-```
+
+```text
 forall x | P(x) land Q(x)  ≡  (forall x | P(x)) land (forall x | Q(x))
 exists x | P(x) lor Q(x)   ≡  (exists x | P(x)) lor (exists x | Q(x))
 ```
 
 **Negation:**
-```
+
+```text
 lnot (forall x | P(x))  ≡  exists x | lnot P(x)
 lnot (exists x | P(x))  ≡  forall x | lnot P(x)
 ```
 
 **Vacuous quantification:**
-```
+
+```text
 forall x : {} | P(x)  ≡  true
 exists x : {} | P(x)  ≡  false
 ```
 
 ## Complete Example
 
-```
+```text
 === Predicate Logic Examples ===
 
 ** Example 1: Universal Quantifier **
@@ -191,6 +204,7 @@ TEXT: This evaluates to 6.
 ## Summary
 
 You've learned:
+
 - ✅ Variable declarations and types
 - ✅ Universal quantifier (forall)
 - ✅ Existential quantifier (exists, exists1)
@@ -198,7 +212,7 @@ You've learned:
 - ✅ One-point rule
 - ✅ Nested quantifiers and quantifier laws
 
-**Next Tutorial:** [Tutorial 3: Sets and Types](docs/tutorials/03_sets_and_types.md)
+**Next Tutorial:** [Tutorial 3: Sets and Types](03_sets_and_types.md)
 
 ---
 

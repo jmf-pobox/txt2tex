@@ -1,5 +1,6 @@
 # Tutorial 5: Z Notation Definitions
 
+<!-- markdownlint-disable-next-line MD036 -->
 **Lecture 5: Z Notation Basics**
 
 Learn Z notation definition forms: given types, free types, abbreviations, axiomatic definitions, and schemas.
@@ -12,6 +13,7 @@ Learn Z notation definition forms: given types, free types, abbreviations, axiom
 ## Introduction to Z Notation
 
 Z notation is a formal specification language for describing systems precisely. It combines:
+
 - Set theory and logic
 - Schema notation for state and operations
 - Type system for rigor
@@ -20,7 +22,7 @@ Z notation is a formal specification language for describing systems precisely. 
 
 Declare basic types without defining their structure:
 
-```
+```text
 given Person, Department, Account
 ```
 
@@ -30,13 +32,14 @@ These are primitive types—we don't specify what they contain, just that they e
 
 Define algebraic data types with constructors:
 
-```
+```text
 Color ::= red | green | blue
 Status ::= pending | approved | rejected
 ```
 
 **With parameters:**
-```
+
+```text
 Tree ::= leaf | node⟨N × Tree × Tree⟩
 Maybe ::= nothing | just⟨N⟩
 ```
@@ -47,7 +50,7 @@ Maybe ::= nothing | just⟨N⟩
 
 Define constants and type synonyms:
 
-```
+```text
 MAX == 100
 IntSet == P Z
 Coordinate == N cross N
@@ -61,7 +64,7 @@ Coordinate == N cross N
 
 Define global constants and functions with constraints:
 
-```
+```text
 axdef
   maxSize : N
   minSize : N
@@ -73,7 +76,8 @@ end
 ```
 
 **Function definition:**
-```
+
+```text
 axdef
   square : N -> N
 where
@@ -87,7 +91,7 @@ end
 
 Group related variables with constraints:
 
-```
+```text
 schema BankAccount
   accountNumber : N
   balance : Z
@@ -98,7 +102,8 @@ end
 ```
 
 **Anonymous schema:**
-```
+
+```text
 schema
   count : N
   limit : N
@@ -113,7 +118,7 @@ end
 
 Polymorphic definitions with type parameters:
 
-```
+```text
 gendef [X]
   identity : X -> X
 where
@@ -122,7 +127,8 @@ end
 ```
 
 **Multiple parameters:**
-```
+
+```text
 gendef [X, Y]
   fst : X cross Y -> X
   snd : X cross Y -> Y
@@ -135,7 +141,7 @@ end
 
 ## Complete Example
 
-```
+```text
 === Library System Specification ===
 
 given Book, Member
@@ -161,6 +167,7 @@ end
 ## Summary
 
 You've learned:
+
 - ✅ given types for primitives
 - ✅ Free types for algebraic data
 - ✅ Abbreviations for constants
@@ -168,7 +175,7 @@ You've learned:
 - ✅ schema for grouping related data
 - ✅ gendef for polymorphic definitions
 
-**Next Tutorial:** [Tutorial 6: Relations](docs/tutorials/06_relations.md)
+**Next Tutorial:** [Tutorial 6: Relations](06_relations.md)
 
 ---
 

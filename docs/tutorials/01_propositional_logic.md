@@ -1,5 +1,6 @@
 # Tutorial 1: Propositional Logic
 
+<!-- markdownlint-disable-next-line MD036 -->
 **Lecture 1: Propositional Logic**
 
 Learn the fundamentals of propositional logic: boolean operators, truth tables, logical equivalences, and tautologies.
@@ -15,6 +16,7 @@ Learn the fundamentals of propositional logic: boolean operators, truth tables, 
 Propositional logic deals with propositions (statements that are either true or false) and logical operators that combine them.
 
 **Propositions:** Statements with truth values
+
 - "2 + 2 = 4" (true)
 - "The sky is green" (false)
 - "x > 5" (depends on x)
@@ -27,7 +29,7 @@ Propositional logic deals with propositions (statements that are either true or 
 
 **Meaning:** Both propositions must be true
 
-```
+```text
 p land q
 ```
 
@@ -35,7 +37,7 @@ p land q
 
 **Truth table:**
 
-```
+```text
 TRUTH TABLE:
 p | q | p land q
 T | T | T
@@ -50,7 +52,7 @@ F | F | F
 
 **Meaning:** At least one proposition must be true
 
-```
+```text
 p lor q
 ```
 
@@ -58,7 +60,7 @@ p lor q
 
 **Truth table:**
 
-```
+```text
 TRUTH TABLE:
 p | q | p lor q
 T | T | T
@@ -71,7 +73,7 @@ F | F | F
 
 **Meaning:** Inverts the truth value
 
-```
+```text
 lnot p
 ```
 
@@ -79,7 +81,7 @@ lnot p
 
 **Truth table:**
 
-```
+```text
 TRUTH TABLE:
 p | lnot p
 T | F
@@ -90,7 +92,7 @@ F | T
 
 **Meaning:** "if p then q"
 
-```
+```text
 p => q
 ```
 
@@ -98,7 +100,7 @@ p => q
 
 **Truth table:**
 
-```
+```text
 TRUTH TABLE:
 p | q | p => q
 T | T | T
@@ -113,7 +115,7 @@ F | F | T
 
 **Meaning:** "p if land only if q"
 
-```
+```text
 p <=> q
 ```
 
@@ -121,7 +123,7 @@ p <=> q
 
 **Truth table:**
 
-```
+```text
 TRUTH TABLE:
 p | q | p <=> q
 T | T | T
@@ -144,18 +146,19 @@ From highest to lowest binding:
 
 **Example:**
 
-```
+```text
 lnot p land q => r lor s
 ```
 
 Parses as:
-```
+
+```text
 ((lnot p) land q) => (r lor s)
 ```
 
 **Use parentheses for clarity:**
 
-```
+```text
 (lnot p) land (q => r)
 ```
 
@@ -163,7 +166,7 @@ Parses as:
 
 ### Basic Format
 
-```
+```text
 TRUTH TABLE:
 p | q | p => q
 T | T | T
@@ -174,7 +177,7 @@ F | F | T
 
 ### Complex Expressions
 
-```
+```text
 TRUTH TABLE:
 p | q | lnot p | p => q | (lnot p) lor q
 T | T | F | T | T
@@ -193,7 +196,7 @@ Two formulas are logically equivalent if they have the same truth value for all 
 
 Use `EQUIV:` blocks to show step-by-step equivalences:
 
-```
+```text
 EQUIV:
 p => q
 <=> lnot p lor q [definition of =>]
@@ -203,58 +206,68 @@ p => q
 ### Common Equivalences
 
 **Double negation:**
-```
+
+```text
 lnot (lnot p) <=> p
 ```
 
 **De Morgan's laws:**
-```
+
+```text
 lnot (p land q) <=> lnot p lor lnot q
 lnot (p lor q) <=> lnot p land lnot q
 ```
 
 **Implication:**
-```
+
+```text
 p => q <=> lnot p lor q
 ```
 
 **Contrapositive:**
-```
+
+```text
 p => q <=> lnot q => lnot p
 ```
 
 **Commutative laws:**
-```
+
+```text
 p land q <=> q land p
 p lor q <=> q lor p
 ```
 
 **Associative laws:**
-```
+
+```text
 (p land q) land r <=> p land (q land r)
 (p lor q) lor r <=> p lor (q lor r)
 ```
 
 **Distributive laws:**
-```
+
+```text
 p land (q lor r) <=> (p land q) lor (p land r)
 p lor (q land r) <=> (p lor q) land (p lor r)
 ```
 
 **Idempotence:**
-```
+
+```text
 p land p <=> p
 p lor p <=> p
 ```
 
 **Identity:**
-```
+
+```text
 p land true <=> p
 p lor false <=> p
 ```
 
 **Annihilation:**
-```
+
+```text
 p land false <=> false
 p lor true <=> true
 ```
@@ -265,7 +278,7 @@ p lor true <=> true
 
 **Tautology:** Always true (regardless of variable values)
 
-```
+```text
 p lor lnot p                    [law of excluded middle]
 lnot (p land lnot p)             [law of non-contradiction]
 p => p                        [reflexivity]
@@ -274,14 +287,14 @@ p => p                        [reflexivity]
 
 **Contradiction:** Always false
 
-```
+```text
 p land lnot p
 false
 ```
 
 **Contingency:** Sometimes true, sometimes false (depends on variables)
 
-```
+```text
 p land q
 p => q
 ```
@@ -292,7 +305,7 @@ p => q
 
 Show logical equivalence step-by-step:
 
-```
+```text
 ** Proof: p => q is equivalent to not p or q **
 
 EQUIV:
@@ -306,7 +319,7 @@ Each step should reference the law or definition used.
 
 Use square brackets to explain each step:
 
-```
+```text
 EQUIV:
 (p => q) => r
 <=> lnot (p => q) lor r [=> definition]
@@ -319,6 +332,7 @@ EQUIV:
 ### Exercise 1: Truth Tables
 
 Create truth tables for:
+
 1. `(p => q) land (q => r)`
 2. `p <=> (q land r)`
 3. `lnot (p lor q) => (lnot p land lnot q)`
@@ -343,14 +357,14 @@ Determine which are tautologies:
 
 ### Mistake 1: Confusing land/lor
 
-```
+```text
 ❌ Wrong interpretation: "p land q" means both, not one lor the other
 ✅ Correct: "p land q" requires BOTH p land q to be true
 ```
 
 ### Mistake 2: Implication confusion
 
-```
+```text
 ❌ Wrong: p => q means "p implies q" means "q implies p"
 ✅ Correct: p => q is NOT the same as q => p
 ✅ Converse: q => p
@@ -359,7 +373,7 @@ Determine which are tautologies:
 
 ### Mistake 3: Forgetting parentheses
 
-```
+```text
 ❌ Ambiguous: lnot p land q
 ✅ Clear: (lnot p) land q
 ✅ Clear: lnot (p land q)
@@ -369,7 +383,7 @@ Determine which are tautologies:
 
 Here's a complete document demonstrating propositional logic:
 
-```
+```text
 === Propositional Logic Examples ===
 
 TEXT: This document proves several logical equivalences.
@@ -418,25 +432,28 @@ txt2tex my_logic.txt
 ## Resources
 
 **Examples:**
+
 - `examples/01_propositional_logic/hello_world.txt` - Simplest example
 - `examples/01_propositional_logic/basic_operators.txt` - All operators
 - `examples/01_propositional_logic/truth_tables.txt` - Truth table examples
 - `examples/01_propositional_logic/complex_formulas.txt` - Equivalence proofs
 
 **Reference:**
+
 - [USER_GUIDE.md](docs/guides/USER_GUIDE.md) - Section "Propositional Logic"
 - [PROOF_SYNTAX.md](docs/guides/PROOF_SYNTAX.md) - EQUIV block syntax
 
 ## Summary
 
 You've learned:
+
 - ✅ Boolean operators (land, lor, lnot, =>, <=>)
 - ✅ Truth tables and how to write them
 - ✅ Logical equivalences and common laws
 - ✅ Tautologies and contradictions
 - ✅ EQUIV blocks for proving equivalences
 
-**Next Tutorial:** [Tutorial 2: Predicate Logic](docs/tutorials/02_predicate_logic.md)
+**Next Tutorial:** [Tutorial 2: Predicate Logic](02_predicate_logic.md)
 
 Learn about quantifiers, predicates, and reasoning about sets of objects.
 

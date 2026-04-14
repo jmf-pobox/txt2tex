@@ -303,3 +303,11 @@ class TestEquivalenceIntegration:
         assert "\\begin{array}" in latex
         assert "\\lnot p" in latex
         assert "\\end{array}" in latex
+
+    def test_in_argue_block_flag_resets_after_equiv(self) -> None:
+        """_in_argue_block is False after generating an EQUIV: chain (renamed flag)."""
+        text = "EQUIV:\np land q\nq land p"
+        ast = Parser(Lexer(text).tokenize()).parse()
+        gen = LaTeXGenerator()
+        gen.generate_document(ast)
+        assert gen._in_argue_block is False

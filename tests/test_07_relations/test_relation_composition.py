@@ -238,7 +238,7 @@ class TestRelationCompositionLaTeX:
         assert latex == "R \\nrres S"
 
     def test_generate_composition_operator(self) -> None:
-        """Test generating LaTeX for composition operator."""
+        """Test generating LaTeX for forward composition operator o9 -> \\semi."""
         gen = LaTeXGenerator()
         ast = BinaryOp(
             operator="o9",
@@ -248,7 +248,7 @@ class TestRelationCompositionLaTeX:
             column=3,
         )
         latex = gen.generate_expr(ast)
-        assert latex == "R \\circ S"
+        assert latex == "R \\semi S"
 
     def test_generate_inv_function(self) -> None:
         """Test generating LaTeX for inv function."""
@@ -354,7 +354,7 @@ class TestRelationCompositionIntegration:
         latex = gen.generate_expr(ast)
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "o9"
-        assert latex == "R \\circ S"
+        assert latex == "R \\semi S"
 
     def test_end_to_end_inv_function(self) -> None:
         """Test complete pipeline for inv function."""
@@ -453,7 +453,7 @@ class TestRelationCompositionIntegration:
         assert isinstance(ast, UnaryOp)
         assert ast.operator == "+"
         assert isinstance(ast.operand, BinaryOp)
-        assert latex == "(R \\circ S)^{+}"
+        assert latex == "(R \\semi S)^{+}"
 
     def test_mixed_basic_and_extended_operators(self) -> None:
         """Test mixing basic and extended relation operators."""
@@ -470,3 +470,40 @@ class TestRelationCompositionIntegration:
         assert isinstance(ast.operand, BinaryOp)
         assert ast.operand.operator == "<|"
         assert latex == "(S \\dres R)^{-1}"
+
+    def test_o9_emits_semi_not_circ(self) -> None:
+        """Regression: o9 must emit \\semi (forward composition), not \\circ.
+
+        fuzz.sty defines \\semi for schema/relation forward composition.
+        \\circ is standard math circular operator — not a fuzz macro.
+        """
+        text = "R o9 S"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, BinaryOp)
+        gen = LaTeXGenerator()
+        latex = gen.generate_expr(ast)
+        assert latex == "R \\semi S"
+        assert "\\circ" not in latex
+
+    def test_comp_emits_comp_distinct_from_semi(self) -> None:
+        """Confirm comp keyword emits \\comp (backward relational composition).
+
+        fuzz.sty defines both \\semi and \\comp as distinct operators:
+        - \\semi: forward composition (Chapter 3, schema calculus)
+        - \\comp: backward relational composition (Chapter 4, relations)
+        Neither is redundant with the other.
+        """
+        gen = LaTeXGenerator()
+        ast = BinaryOp(
+            operator="comp",
+            left=Identifier(name="R", line=1, column=1),
+            right=Identifier(name="S", line=1, column=8),
+            line=1,
+            column=3,
+        )
+        latex = gen.generate_expr(ast)
+        assert latex == "R \\comp S"
+        assert "\\semi" not in latex

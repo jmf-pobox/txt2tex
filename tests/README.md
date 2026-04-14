@@ -9,6 +9,7 @@ This directory contains 845 tests organized by lecture topic and functionality. 
 Tests organized by glossary lectures, following the course progression:
 
 #### test_01_propositional_logic/ (Lecture 1)
+
 Propositional logic operators and truth tables.
 
 - `test_operators.py` - Basic operators (not, and, or, =>, <=>)
@@ -18,6 +19,7 @@ Propositional logic operators and truth tables.
 **Key features tested**: Boolean operators, truth table construction, document structure, paragraph handling
 
 #### test_02_predicate_logic/ (Lecture 2)
+
 Predicate logic with quantifiers.
 
 - `test_quantifiers.py` - Universal (forall) and existential (exists) quantification
@@ -26,6 +28,7 @@ Predicate logic with quantifiers.
 **Key features tested**: Quantifiers, type declarations, predicates with multiple bindings
 
 #### test_03_equality/ (Lecture 3)
+
 Equality operators and unique quantification.
 
 - `test_equality_operators.py` - Equality (=, !=), unique existence (exists1), mu operator
@@ -33,6 +36,7 @@ Equality operators and unique quantification.
 **Key features tested**: Equality comparison, unique quantifier, definite description (mu), one-point rule
 
 #### test_04_proof_trees/ (Lecture 4)
+
 Natural deduction proof trees.
 
 - `test_proof_trees.py` - Proof tree structure, inference rules, indentation
@@ -41,6 +45,7 @@ Natural deduction proof trees.
 **Key features tested**: PROOF blocks, assumption management, rule citations, case analysis
 
 #### test_05_sets/ (Lecture 5)
+
 Set theory and operations.
 
 - `test_set_operations.py` - Basic operations (in, union, intersect, difference, power sets)
@@ -51,6 +56,7 @@ Set theory and operations.
 **Key features tested**: Set notation, comprehension, tuples, maplets, cartesian products
 
 #### test_06_definitions/ (Lecture 6)
+
 Z notation definitions and type systems.
 
 - `test_generic_parameters.py` - Generic types ([X], [X, Y])
@@ -62,6 +68,7 @@ Z notation definitions and type systems.
 **Key features tested**: Given types, free types, abbreviations, axiomatic definitions, schemas, generic parameters
 
 #### test_07_relations/ (Lecture 7)
+
 Relations and relational operators.
 
 - `test_relation_operators.py` - Relation types (<->), domain (dom), range (ran), restrictions (<|, |>)
@@ -71,6 +78,7 @@ Relations and relational operators.
 **Key features tested**: Relation types, maplets, domain/range, restrictions, composition, inverse, identity
 
 #### test_08_functions/ (Lecture 8)
+
 Functions and function types.
 
 - `test_function_types.py` - All function arrows (->, +->, >->, >+>, -->>, +->>, >->>)
@@ -82,6 +90,7 @@ Functions and function types.
 **Key features tested**: Total/partial functions, injections, surjections, bijections, lambda, application syntax
 
 #### test_09_sequences/ (Lecture 9)
+
 Sequences and bags.
 
 - `test_sequences.py` - Sequence types, literals (⟨⟩, <>), operations (head, tail, rev), concatenation (⌢, ^), tuple projection, ASCII brackets, pattern matching
@@ -92,6 +101,7 @@ Sequences and bags.
 ### Special Purpose Tests
 
 #### test_advanced_features/
+
 Cross-cutting features not tied to a single lecture.
 
 - `test_range_override_indexing.py` - Range operator (..), override (++), indexing
@@ -101,6 +111,7 @@ Cross-cutting features not tied to a single lecture.
 **Key features tested**: Advanced operators, conditional syntax, extended identifier rules
 
 #### test_text_formatting/
+
 TEXT block formatting and inline math.
 
 - `test_text_blocks.py` - Formula detection in TEXT, PURETEXT blocks, PAGEBREAK
@@ -110,6 +121,7 @@ TEXT block formatting and inline math.
 **Key features tested**: TEXT vs PURETEXT, inline math detection, paragraph formatting, page breaks, citations
 
 #### test_coverage/
+
 Coverage-specific tests for comprehensive code testing.
 
 - `test_latex_gen_coverage.py` - LaTeX generation coverage (merged from 3 files)
@@ -119,6 +131,7 @@ Coverage-specific tests for comprehensive code testing.
 **Key features tested**: Edge cases, error handling, code path coverage
 
 #### test_edge_cases/
+
 Error handling and boundary conditions.
 
 - `test_parser_edge_cases.py` - Parser error handling
@@ -137,11 +150,13 @@ Error handling and boundary conditions.
 ## Running Tests
 
 ### Run All Tests
+
 ```bash
 make test
 ```
 
 ### Run Specific Lecture Tests
+
 ```bash
 # Lecture 1: Propositional logic
 make test ARGS="tests/test_01_propositional_logic/"
@@ -154,22 +169,26 @@ make test ARGS="tests/test_08_functions/"
 ```
 
 ### Run Specific Test File
+
 ```bash
 make test ARGS="tests/test_03_equality/test_equality_operators.py"
 ```
 
 ### Run Specific Test
+
 ```bash
 make test ARGS="tests/test_01_propositional_logic/test_operators.py::TestLexer::test_single_identifier"
 ```
 
 ### Run with Verbose Output
+
 ```bash
 make test ARGS="-v"
 make test ARGS="tests/test_04_proof_trees/ -v"
 ```
 
 ### Run with Coverage
+
 ```bash
 make test-cov
 ```

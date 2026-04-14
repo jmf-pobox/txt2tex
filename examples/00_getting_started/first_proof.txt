@@ -1,0 +1,32 @@
+// ============================================================================
+// Example: First Proof - A Simple Natural Deduction Proof
+// ============================================================================
+// Demonstrates:
+//   - PROOF: block syntax
+//   - Assumption annotation ([assumption])
+//   - Inference rules (land elim, => intro)
+//   - Part labels (a), (b)
+//
+// To compile:
+//   txt2tex examples/00_getting_started/first_proof.txt
+//
+// See: docs/tutorials/04_proof_trees.md
+// ============================================================================
+
+=== My First Proof ===
+
+TEXT: We prove that conjunction implies each of its components.
+
+** Part (a): p land q implies p **
+
+PROOF:
+p land q => p [=> intro from 1]
+  [1] p land q [assumption]
+      p [land elim 1]
+
+** Part (b): p land q implies q **
+
+PROOF:
+p land q => q [=> intro from 1]
+  [1] p land q [assumption]
+      q [land elim 2]

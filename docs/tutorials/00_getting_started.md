@@ -7,6 +7,7 @@ Welcome to txt2tex! This tutorial will get you up and running with your first fo
 txt2tex is a tool that converts whiteboard-style mathematical notation into beautiful LaTeX documents. It allows you to write formal specifications naturally, as you would on a whiteboard, and automatically generates typeset PDF output.
 
 **Key features:**
+
 - Write math notation naturally (forall, =>, land, lor, etc.)
 - Automatic conversion to LaTeX
 - Type checking with fuzz (optional but recommended)
@@ -42,7 +43,7 @@ Let's create a simple document that demonstrates basic propositional logic.
 
 Create a new file called `my_first_spec.txt`:
 
-```
+```text
 === My First Specification ===
 
 ** Example 1: Simple Implication **
@@ -59,6 +60,7 @@ txt2tex my_first_spec.txt
 ```
 
 This command:
+
 1. Converts your txt notation to LaTeX
 2. Runs pdflatex/latexmk to generate a PDF
 3. Cleans up temporary files
@@ -70,6 +72,7 @@ open my_first_spec.pdf
 ```
 
 You'll see a nicely formatted PDF with:
+
 - Section heading
 - Explanatory text
 - Mathematical formula with proper symbols (∧, ⇒)
@@ -80,13 +83,13 @@ You'll see a nicely formatted PDF with:
 
 **Section headers:** Use `===` to create sections
 
-```
+```text
 === Section Title ===
 ```
 
 **Subsections:** Use `**` for problem/solution numbers
 
-```
+```text
 ** Solution 1 **
 ** Problem 2 **
 ```
@@ -95,11 +98,12 @@ You'll see a nicely formatted PDF with:
 
 **TEXT directive:** Add explanatory prose
 
-```
+```text
 TEXT: This is a paragraph of explanation.
 ```
 
 Features:
+
 - Smart quote conversion ("quotes" becomes "quotes")
 - Inline math operators (land, lor, =>, etc.)
 - Proper paragraph spacing
@@ -110,7 +114,7 @@ Features:
 
 **Propositional operators:**
 
-```
+```text
 p land q         →  p ∧ q
 p lor q          →  p ∨ q
 lnot p           →  ¬p
@@ -120,7 +124,7 @@ p <=> q          →  p ⇔ q
 
 **Quantifiers:**
 
-```
+```text
 forall x : N | x >= 0       →  ∀x : ℕ • x ≥ 0
 exists y : Z | y < 0        →  ∃y : ℤ • y < 0
 ```
@@ -140,6 +144,7 @@ txt2tex your_file.txt
 ### 3. Check for errors
 
 If there are errors:
+
 - Check the LaTeX log: `your_file.log`
 - Fix syntax issues in your txt file
 - Recompile
@@ -152,7 +157,7 @@ Edit your txt file and recompile until you're satisfied.
 
 ### Pattern 1: Statement and Proof
 
-```
+```text
 ** Problem 1 **
 
 TEXT: Prove that p land q implies p.
@@ -164,7 +169,7 @@ PROOF:
 
 ### Pattern 2: Definition with Examples
 
-```
+```text
 ** Definition **
 
 axdef
@@ -178,7 +183,7 @@ TEXT: For example, square(3) = 9 land square(5) = 25.
 
 ### Pattern 3: Truth Table
 
-```
+```text
 ** Truth Table for Land **
 
 TRUTH TABLE:
@@ -193,7 +198,7 @@ F | F | F
 
 Here's a complete document combining multiple features:
 
-```
+```text
 === Propositional Logic Basics ===
 
 TEXT: This document demonstrates basic propositional logic operators.
@@ -246,7 +251,7 @@ open basics.pdf
 
 ### Mistake 1: Missing end keyword
 
-```
+```text
 ❌ Wrong:
 axdef
   x : N
@@ -259,7 +264,7 @@ end
 
 ### Mistake 2: Incorrect operator spacing
 
-```
+```text
 ❌ Wrong:
 p=>q
 
@@ -269,7 +274,7 @@ p => q
 
 ### Mistake 3: Forgetting TEXT prefix
 
-```
+```text
 ❌ Wrong:
 This is explanatory text.
 
@@ -281,10 +286,11 @@ TEXT: This is explanatory text.
 
 Now that you can create and compile basic documents:
 
-1. **Explore examples:** Browse `examples/01_propositional_logic/`
-2. **Try truth tables:** Practice with `examples/01_propositional_logic/truth_tables.txt`
-3. **Learn proof trees:** See `examples/04_proof_trees/simple_proofs.txt`
-4. **Read Tutorial 1:** Learn propositional logic in depth
+1. **Start with the smallest examples:** Browse `examples/00_getting_started/` — three minimal `.txt` files (`hello_world`, `first_proof`, `basic_z_notation`) that exercise the full pipeline.
+2. **Explore examples:** Browse `examples/01_propositional_logic/`
+3. **Try truth tables:** Practice with `examples/01_propositional_logic/truth_tables.txt`
+4. **Learn proof trees:** See `examples/04_proof_trees/simple_proofs.txt`
+5. **Read Tutorial 1:** Learn propositional logic in depth
 
 ## Quick Reference
 
@@ -306,7 +312,7 @@ xdg-open file.pdf
 
 ### File Structure
 
-```
+```text
 your_document.txt      # Your source file
 your_document.tex      # Generated LaTeX (intermediate)
 your_document.pdf      # Final PDF output
@@ -325,6 +331,7 @@ your_document.log      # LaTeX compilation log
 ### Problem: Command not found
 
 **Solution:** Ensure txt2tex is installed:
+
 ```bash
 pip install txt2tex
 txt2tex file.txt
@@ -333,6 +340,7 @@ txt2tex file.txt
 ### Problem: LaTeX errors
 
 **Solution:** Check the .log file:
+
 ```bash
 cat your_file.log | grep -i error
 ```
@@ -348,13 +356,14 @@ cat your_file.log | grep -i error
 ## Summary
 
 You've learned:
+
 - ✅ How to install and run txt2tex
 - ✅ Basic document structure (sections, TEXT blocks)
 - ✅ Simple mathematical notation
 - ✅ The compilation workflow
 - ✅ Common patterns and mistakes
 
-**Next Tutorial:** [Tutorial 1: Propositional Logic](docs/tutorials/01_propositional_logic.md)
+**Next Tutorial:** [Tutorial 1: Propositional Logic](01_propositional_logic.md)
 
 Learn about boolean operators, truth tables, and logical equivalences.
 

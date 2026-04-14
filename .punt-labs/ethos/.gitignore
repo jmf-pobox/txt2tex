@@ -1,0 +1,4 @@
+# Per-handle extension directories hold tool-scoped PII (GPG keys, IMAP
+# credentials, voice configs, etc.) and must never be committed.
+# See docs/build-plan-config.md in the ethos repo for the convention.
+identities/*.ext/

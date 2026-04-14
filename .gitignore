@@ -71,6 +71,7 @@ hw/*.mf
 # Temporary files
 *.tmp
 *.temp
+.tmp/
 .DS_Store
 
 # Test outputs
@@ -89,9 +90,20 @@ htmlcov/
 # ruff
 .ruff_cache/
 
-# Homework - private
+# Claude Code local settings (machine-specific, not team-wide)
+.claude/settings.local.json
+
+# Homework - private (instructor-provided content, personal coursework)
 hw/
+hw[0-9]*/
 
 # Tutorial project
 rpn2tex/
+
+# Test-phase artefacts that must not re-enter the tree.
+# phase_a_* and phase12_* were transient PDFs from the Phase 1 test run;
+# *.disabled marks input files that were disabled pending parser fixes.
+examples/*/phase_a_*.pdf
+examples/*/phase12_*.pdf
+*.disabled
 

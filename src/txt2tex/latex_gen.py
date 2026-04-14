@@ -112,7 +112,7 @@ class LaTeXGenerator:
         # Extended relation operators
         "<<|": r"\ndres",  # Domain subtraction (anti-restriction)
         "|>>": r"\nrres",  # Range subtraction (anti-restriction)
-        "o9": r"\circ",  # Forward/backward composition
+        "o9": r"\semi",  # Forward composition (fuzz \semi)
         # Function type operators
         "->": r"\fun",  # Total function
         "+->": r"\pfun",  # Partial function
@@ -224,7 +224,7 @@ class LaTeXGenerator:
     use_fuzz: bool
     toc_parts: bool
     parts_format: str
-    _in_equiv_block: bool
+    _in_argue_block: bool
     _first_part_in_solution: bool
     _in_inline_part: bool
     _quantifier_depth: int
@@ -257,7 +257,7 @@ class LaTeXGenerator:
         self.use_fuzz = use_fuzz
         self.toc_parts = toc_parts
         self.parts_format = "subsection"  # Document-level parts format
-        self._in_equiv_block = False  # Track context for line break formatting
+        self._in_argue_block = False  # Track context for line break formatting
         self._first_part_in_solution = False  # Track if we're generating first part
         self._in_inline_part = False  # Track if we're inside an inline part
         self._quantifier_depth = 0  # Track nesting for \t1, \t2 indentation
@@ -397,8 +397,8 @@ class LaTeXGenerator:
             return base_latex
         if operator in ("=>", "implies"):
             return r"\implies"
-        # In EQUIV blocks, use \Leftrightarrow; otherwise use \iff
-        if operator == "<=>" and not self._in_equiv_block:
+        # In ARGUE/EQUIV/EQUAL blocks, use \Leftrightarrow; otherwise use \iff
+        if operator == "<=>" and not self._in_argue_block:
             return r"\iff"
         return base_latex
 
@@ -1056,14 +1056,14 @@ class LaTeXGenerator:
 
         # Check for line break after operator
         if node.line_break_after:
-            # Multi-line expression: insert \\ and indent continuation
-            # EQUIV blocks use array format and need & prefix for column alignment
-            # Schemas and proofs use plain \\ without & prefix
+            # Multi-line expression: insert \\ and indent continuation.
+            # In argue-block (array) context, do NOT use & for the continuation
+            # prefix: & jumps to the right column, which would produce three cells
+            # in a two-column array when the step also carries a justification.
+            # The continuation stays in the left column without &; the justification
+            # column separator is added later by _generate_argue_chain when needed.
             indent = self._get_indentation()
-            if self._in_equiv_block:
-                result = f"{left} {op_latex} \\\\\n& {indent} {right}"
-            else:
-                result = f"{left} {op_latex} \\\\\n{indent} {right}"
+            result = f"{left} {op_latex} \\\\\n{indent} {right}"
         else:
             # Single-line expression
             result = f"{left} {op_latex} {right}"
@@ -1174,10 +1174,7 @@ class LaTeXGenerator:
             # Check for line break after pipe (|)
             if node.line_break_after_pipe:
                 # LaTeX source: \\ at end of line, then newline, then \t command
-                if self._in_equiv_block:
-                    parts.append(f"{pipe_sep} \\\\\n& {indent} {body_latex}")
-                else:
-                    parts.append(f"{pipe_sep} \\\\\n{indent} {body_latex}")
+                parts.append(f"{pipe_sep} \\\\\n{indent} {body_latex}")
             else:
                 parts.append(pipe_sep)
                 parts.append(body_latex)
@@ -1190,10 +1187,7 @@ class LaTeXGenerator:
             if node.line_break_after_bullet:
                 # Get indentation for expression after bullet
                 expr_indent = self._get_indentation()
-                if self._in_equiv_block:
-                    parts.append(f"{bullet_sep} \\\\\n& {expr_indent} {expr_latex}")
-                else:
-                    parts.append(f"{bullet_sep} \\\\\n{expr_indent} {expr_latex}")
+                parts.append(f"{bullet_sep} \\\\\n{expr_indent} {expr_latex}")
             else:
                 parts.append(bullet_sep)
                 parts.append(expr_latex)
@@ -1212,12 +1206,9 @@ class LaTeXGenerator:
             if node.line_break_after_pipe:
                 # Multi-line quantifier: insert \\ and indent body
                 # LaTeX source: \\ at end of line, then newline, then \t command
-                # EQUIV blocks use array format and need & prefix
-                # Schemas and proofs use plain \\ without &
-                if self._in_equiv_block:
-                    parts.append(f"{separator} \\\\\n& {indent} {body_latex}")
-                else:
-                    parts.append(f"{separator} \\\\\n{indent} {body_latex}")
+                # No & prefix: the array column separator is only for the
+                # justification column, not for expression-internal continuations.
+                parts.append(f"{separator} \\\\\n{indent} {body_latex}")
             else:
                 # Single-line quantifier
                 parts.append(separator)
@@ -1515,7 +1506,7 @@ class LaTeXGenerator:
         Examples:
         - R(| {1, 2} |) -> (R \\limg \\{1, 2\\} \\rimg)
         - parentOf(| {john} |) -> (parentOf \\limg \\{john\\} \\rimg)
-        - (R o9 S)(| A |) -> ((R \\circ S) \\limg A \\rimg)
+        - (R o9 S)(| A |) -> ((R \\semi S) \\limg A \\rimg)
 
         LaTeX rendering uses \\limg and \\rimg delimiters with spaces.
         Note: fuzz requires the entire expression wrapped in parentheses with
@@ -2073,7 +2064,7 @@ class LaTeXGenerator:
             ("|>", r"\rres"),
             ("->", r"\fun"),  # After +-> and |->
             ("++", r"\oplus"),
-            ("o9", r"\circ"),
+            ("o9", r"\semi"),
             ("⌢", r"\cat"),
             ("↾", r"\filter"),  # Sequence filter (Unicode)
             ("filter", r"\filter"),  # Sequence filter (ASCII)
@@ -2192,7 +2183,7 @@ class LaTeXGenerator:
             text, "->", r"\fun"
         )  # Total function (after |->)
         text = self._replace_outside_math(text, "++", r"\oplus")  # Override
-        text = self._replace_outside_math(text, "o9", r"\circ")  # Composition
+        text = self._replace_outside_math(text, "o9", r"\semi")  # Forward composition
         text = self._replace_outside_math(text, "⌢", r"\cat")  # Concatenation
         text = self._replace_outside_math(text, "↾", r"\filter")  # Filter (Unicode)
         # Sequence filter (ASCII)
@@ -3535,7 +3526,7 @@ class LaTeXGenerator:
         result = result.replace("|>", r"$\rres$")  # Range restriction
         result = result.replace("->", r"$\fun$")  # Total function (AFTER |-> and +->)
         result = result.replace("++", r"$\oplus$")  # Override
-        result = result.replace("o9", r"$\circ$")  # Composition
+        result = result.replace("o9", r"$\semi$")  # Forward composition
 
         # Single-character operators
         result = result.replace("^", r"$\cat$")  # Sequence concatenation
@@ -3571,9 +3562,10 @@ class LaTeXGenerator:
 
     @generate_document_item.register(ArgueChain)
     def _generate_argue_chain(self, node: ArgueChain) -> list[str]:
-        r"""Generate LaTeX for equivalence chain using array environment.
+        r"""Generate LaTeX for equivalence or equality chain using array environment.
 
-        Both EQUIV: and ARGUE: keywords generate this output (EQUIV is alias).
+        EQUIV: and ARGUE: keywords generate \Leftrightarrow between steps.
+        EQUAL: generates = between steps (for expression equality chains).
         Uses standard LaTeX array instead of argue environment for better control.
         Wraps array in display math \[...\] for proper spacing. Centers the block
         and right-aligns justifications. Auto-scales if wider than page.
@@ -3600,15 +3592,18 @@ class LaTeXGenerator:
         lines.append(r"\begin{array}{l@{\hspace{2em}}r}")
 
         # Set context for line break formatting
-        self._in_equiv_block = True
+        self._in_argue_block = True
+
+        # Select connective: EQUIV/ARGUE use \Leftrightarrow; EQUAL uses =
+        connective = r"= " if node.connector == "eq" else r"\Leftrightarrow "
 
         # Generate steps
         for i, step in enumerate(node.steps):
             expr_latex = self.generate_expr(step.expression)
 
             # No leading & - start directly with expression for flush left
-            # First step: expression; subsequent: \Leftrightarrow expression
-            line = expr_latex if i == 0 else r"\Leftrightarrow " + expr_latex
+            # First step: expression; subsequent: connective + expression
+            line = expr_latex if i == 0 else connective + expr_latex
 
             # Add justification if present (flush right)
             if step.justification:
@@ -3622,7 +3617,7 @@ class LaTeXGenerator:
             lines.append(line)
 
         # Reset context
-        self._in_equiv_block = False
+        self._in_argue_block = False
 
         lines.append(r"\end{array}$%")
         # Close adjustbox wrapper
@@ -4876,7 +4871,7 @@ class LaTeXGenerator:
             op_latex = op_latex.replace("|>", r"\rres")
             op_latex = op_latex.replace("->", r"\fun")  # AFTER |-> and +->
             op_latex = op_latex.replace("++", r"\oplus")
-            op_latex = op_latex.replace("o9", r"\circ")
+            op_latex = op_latex.replace("o9", r"\semi")
 
             # Word-based operators (both English and L-prefixed forms)
             op_latex = re.sub(r"\bland\b", r"\\land", op_latex)  # land → \land
@@ -4943,7 +4938,7 @@ class LaTeXGenerator:
             op_latex = op_latex.replace("|>", r"\rres")
             op_latex = op_latex.replace("->", r"\fun")  # AFTER |-> and +->
             op_latex = op_latex.replace("++", r"\oplus")
-            op_latex = op_latex.replace("o9", r"\circ")
+            op_latex = op_latex.replace("o9", r"\semi")
 
             # Word-based operators (both English and L-prefixed forms)
             op_latex = re.sub(r"\bland\b", r"\\land", op_latex)  # land → \land
@@ -5000,7 +4995,7 @@ class LaTeXGenerator:
         result = result.replace("|>", r"\rres")
         result = result.replace("->", r"\fun")  # AFTER |-> and +->
         result = result.replace("++", r"\oplus")
-        result = result.replace("o9", r"\circ")
+        result = result.replace("o9", r"\semi")
 
         # Word-based operators (both English and L-prefixed forms)
         result = re.sub(r"\bland\b", r"\\land", result)  # land → \land

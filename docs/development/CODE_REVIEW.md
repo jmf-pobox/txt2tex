@@ -1,10 +1,11 @@
-## Code Review: txt2tex Source Code Analysis
+# Code Review: txt2tex Source Code Analysis
 
-### Executive Summary
+## Executive Summary
 
 This review analyzes the `src/txt2tex` codebase for code quality issues beyond what automated tools (ruff, mypy) catch. The codebase demonstrates good type safety and follows PEP 8 conventions.
 
 **Completed improvements (2025-11-27/28):**
+
 - Exception handling: specific types replace broad `except Exception`
 - Type dispatch: `@singledispatchmethod` replaces isinstance chains
 - Documentation: Google-style docstrings on public methods, Phase comments replaced
@@ -16,12 +17,14 @@ This review analyzes the `src/txt2tex` codebase for code quality issues beyond w
 - Extracted `_parse_free_branch()` helper to reduce `_parse_syntax_block` complexity
 
 **Acceptable as-is:**
+
 - Lexer/parser complexity is domain-appropriate (tokenizers and parsers are inherently branchy)
 - Large file sizes reflect cohesive modules, not random sprawl
 
 ### File Size and Organization
 
 Current state (~11,800 lines total):
+
 - `latex_gen.py` ≈ 5,044 lines
 - `parser.py` ≈ 4,124 lines (reduced by refactoring)
 - `lexer.py` ≈ 1,220 lines
@@ -77,6 +80,7 @@ Cyclomatic complexity measures branches, not maintainability. High CC in lexers/
 | `LaTeXGenerator._process_inline_math` | ~15 | C | Decomposed into 11 stages (was 69) |
 
 **Refactoring applied (2025-11-28):**
+
 - Extracted `_parse_free_branch()` helper method (~60 lines × 3 → 1 shared helper)
 - Reduced `_parse_syntax_block` from E (36) to D (30), removed noqa comment
 
@@ -110,6 +114,7 @@ def _process_inline_math(self, text: str) -> str:
 ```
 
 **Benefits:**
+
 - Each stage is testable in isolation
 - Clear separation of concerns
 - Easy to add/modify individual patterns
@@ -180,6 +185,7 @@ The following rules are documented for future consideration. They were assessed 
 **PLR2004 (Magic Values)** - 157 violations
 
 These are comparisons like:
+
 ```python
 if len(suffix) == 2:  # PLR2004: magic value 2
 if depth > 10:        # PLR2004: magic value 10
@@ -192,6 +198,7 @@ if depth > 10:        # PLR2004: magic value 10
 **PLR0912/PLR0915/PLR0911 (Structural Complexity)** - 49 violations
 
 These overlap significantly with C90 (mccabe complexity). Functions flagged include:
+
 - `_scan_token` - lexer main dispatch (inherently branchy)
 - `_parse_document_item` - parser main dispatch
 - `_generate_proof_node_infer` - complex proof tree rendering
@@ -218,6 +225,7 @@ A loop variable is reused in nested context. Generally safe but can be confusing
 ### Refactoring Guardrails
 
 When making changes:
+
 - Run `make check` after every micro-change
 - Small commits (1-5 files, <100 LOC)
 - Structure-only changes with identical observable behavior

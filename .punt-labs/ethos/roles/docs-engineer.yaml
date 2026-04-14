@@ -1,0 +1,14 @@
+name: docs-engineer
+model: sonnet
+responsibilities:
+  - Maintain README, docs/guides, docs/development, and CHANGELOG
+  - Curate examples/ and ensure every documented syntax has a working example
+  - Verify generated .tex and .pdf assets stay in sync with source .txt files
+  - Keep documentation accurate to the current code; no aspirational claims
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import dataclasses
 import re
+from typing import Literal
 
 from txt2tex.ast_nodes import (
     Abbreviation,
@@ -406,6 +407,7 @@ class Parser:
             TokenType.CONTENTS,
             TokenType.PARTS,
             TokenType.ARGUE,  # Both EQUIV: and ARGUE: map to this token
+            TokenType.EQUAL,  # EQUAL: expression equality chain
             TokenType.INFRULE,
             TokenType.GIVEN,
             TokenType.AXDEF,
@@ -581,7 +583,9 @@ class Parser:
         if self._match(TokenType.TRUTH_TABLE):
             return self._parse_truth_table()
         if self._match(TokenType.ARGUE):  # Handles both EQUIV: and ARGUE: keywords
-            return self._parse_argue_chain()
+            return self._parse_argue_chain(connector="iff")
+        if self._match(TokenType.EQUAL):  # Expression equality chain
+            return self._parse_argue_chain(connector="eq")
         if self._match(TokenType.INFRULE):
             return self._parse_infrule_block()
         if self._match(TokenType.GIVEN):
@@ -968,22 +972,55 @@ class Parser:
             column=start_token.column,
         )
 
-    def _parse_argue_chain(self) -> ArgueChain:
-        """Parse argue chain: ARGUE: or EQUIV: followed by reasoning steps.
+    def _parse_argue_chain(self, connector: Literal["iff", "eq"] = "iff") -> ArgueChain:
+        """Parse ARGUE:, EQUIV:, or EQUAL: block into an ArgueChain.
 
-        Both EQUIV: and ARGUE: keywords are supported (backwards-compatible).
-        Generates argue environment for better page breaking.
+        Both EQUIV: and ARGUE: keywords produce connector='iff', rendered
+        with \\Leftrightarrow between steps. EQUAL: produces connector='eq',
+        rendered with = between steps (for expression equality chains).
+        The generator uses a standard LaTeX array environment — not fuzz's
+        argue environment — for reliable column spacing and adjustbox scaling.
         """
-        start_token = self._advance()  # Consume 'ARGUE:' or 'EQUIV:'
+        start_token = self._advance()  # Consume 'ARGUE:', 'EQUIV:', or 'EQUAL:'
         self._skip_newlines()
 
         steps: list[ArgueStep] = []
 
         # Parse steps until we hit another structural element or end
         while not self._at_end() and not self._is_structural_token():
-            # Consume leading <=> if present (for continuation lines)
-            if self._match(TokenType.IFF):
-                self._advance()  # Consume '<='
+            # Consume leading connective if present on continuation lines.
+            # Connector specificity: an EQUAL: block must never silently consume
+            # a leading <=>, and an EQUIV/ARGUE block must never consume a leading =.
+            # Note: = on a continuation line is consumed by _parse_comparison
+            # (which crosses newlines), so the EQUALS branch rarely fires in
+            # practice. The IFF branch fires because _parse_iff does NOT cross
+            # newlines, so a bare <=> at line start reaches this check.
+            if connector == "eq" and self._match(TokenType.EQUALS):
+                self._advance()  # Consume leading '='
+            elif connector == "iff" and self._match(TokenType.IFF):
+                self._advance()  # Consume leading '<=>'
+            elif connector == "eq" and self._match(TokenType.IFF):
+                # <=> at the start of an EQUAL: continuation line means the
+                # author used the wrong block type.  A clear message is more
+                # helpful than the generic "unexpected token" from _parse_expr.
+                tok = self._current()
+                msg = (
+                    "found '<=>' continuation in an EQUAL: chain; "
+                    "use EQUIV: or ARGUE: for logical-equivalence chains"
+                )
+                raise ParserError(msg, tok)
+            elif connector == "iff" and self._match(TokenType.EQUALS):
+                # bare '=' at the start of an EQUIV:/ARGUE: continuation line
+                # — the author may have intended EQUAL:.  Note: in practice
+                # _parse_comparison absorbs 'a\n= b' as a single step, so
+                # this branch fires only for a truly bare '=' with nothing
+                # before it on the line, which is syntactically invalid.
+                tok = self._current()
+                msg = (
+                    "found '=' continuation in an EQUIV:/ARGUE: chain; "
+                    "use EQUAL: for expression-equality chains"
+                )
+                raise ParserError(msg, tok)
 
             # Parse expression
             expr = self._parse_expr()
@@ -1025,10 +1062,16 @@ class Parser:
 
         if not steps:
             raise ParserError(
-                "Expected at least one step in ARGUE chain", self._current()
+                "Expected at least one step in ARGUE/EQUIV/EQUAL chain",
+                self._current(),
             )
 
-        return ArgueChain(steps=steps, line=start_token.line, column=start_token.column)
+        return ArgueChain(
+            steps=steps,
+            connector=connector,
+            line=start_token.line,
+            column=start_token.column,
+        )
 
     def _parse_infrule_block(self) -> InfruleBlock:
         """Parse INFRULE: block with premises, ---, and conclusion.

@@ -26,7 +26,7 @@ These advanced operators that transform schemas into new schemas are not impleme
 
 Local definitions in expressions/predicates:
 
-```
+```text
 LET double == lambda x : N . x * 2 @
 quad(5)
 ```

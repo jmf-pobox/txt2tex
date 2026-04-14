@@ -277,7 +277,7 @@ $%
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\forall n @ n \geq 1 \implies \power n)}{
-  \infer[\lnot\textrm{-intro}^{[2]}]{\forall n @ n \geq 1 \implies \power n}{\infer[\lor \mbox{elim}]{false}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot \power m \land \power 1}{\infer[\mbox{base \mbox{case} \mbox{proved} separately}]{\power 1}{}}} & \infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot \power m \land \power m}{\infer[\mbox{by \mbox{inductive} \mbox{step} \mbox{from} P}(m - 1)]{\power m}{\infer[\mbox{since m} - 1 >=1 \land m - 1 < m]{\power (m - 1)}{\infer[\mbox{minimality of m}]{\forall k @ k \geq 1 \land k < m \implies \power k}{}}}}}}}
+  \infer[\lnot\textrm{-intro}^{[2]}]{\forall n @ n \geq 1 \implies \power n}{\infer[\lor \mbox{elim}]{false}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot \power m \land \power 1}{\infer[\mbox{base \mbox{case} \mbox{proved} separately}]{\power 1}{}}} & \infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot \power m \land \power m}{\infer[\mbox{by \mbox{inductive} \mbox{step} \mbox{from} P}(m - 1)]{\power m}{\infer[\mbox{since m} - 1 >= 1 \land m - 1 < m]{\power (m - 1)}{\infer[\mbox{minimality of m}]{\forall k @ k \geq 1 \land k < m \implies \power k}{}}}}}}}
 }
 $%
 }

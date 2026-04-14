@@ -103,7 +103,10 @@ class TestOperatorReplacementOrdering:
         assert "|$\\fun$" not in latex
 
     def test_relation_composition_with_maplet(self) -> None:
-        """Test that o9 land |-> both work elem same justification."""
+        """Test that o9 land |-> both work elem same justification.
+
+        o9 emits \\semi (fuzz forward composition), not \\circ.
+        """
         text = (
             "EQUIV:\nw |-> z elem R o9 S\n"
             "w |-> z elem S o9 R [definition of |-> land o9]"
@@ -115,8 +118,8 @@ class TestOperatorReplacementOrdering:
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
         assert "$\\mapsto$" in latex
-        assert "$\\circ$" in latex
-        assert "\\mbox{definition of $\\mapsto$ $\\land$ $\\circ$}" in latex
+        assert "$\\semi$" in latex
+        assert "\\mbox{definition of $\\mapsto$ $\\land$ $\\semi$}" in latex
 
 
 class TestProofTreeOperatorOrdering:

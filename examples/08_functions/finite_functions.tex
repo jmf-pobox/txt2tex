@@ -138,7 +138,7 @@ f = \{1 \mapsto 10, 2 \mapsto 20, 3 \mapsto 30\} \land \\
 \begin{axdef}
 f\_composed : \nat \ffun \nat
 \where
-f\_composed = g \circ f \land \# (\dom f\_composed) \leq \# (\dom f)
+f\_composed = g \semi f \land \# (\dom f\_composed) \leq \# (\dom f)
 \end{axdef}
 
 \noindent The composition has a domain size bounded by the domain of f, since we can only compose where f's range intersects g's domain.

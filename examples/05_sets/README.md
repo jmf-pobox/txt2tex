@@ -17,7 +17,7 @@ This directory contains examples for Lecture 5, covering sets, types, and set op
 
 ## Key Operators
 
-```
+```text
 {1, 2, 3}            →  {1, 2, 3}       [set literal]
 x in A               →  x ∈ A           [membership]
 A subset B           →  A ⊆ B           [subset]
@@ -32,6 +32,7 @@ A cross B            →  A × B           [Cartesian product]
 ## Examples in This Directory
 
 Browse the `.txt` files to see:
+
 - Basic set operations
 - Set comprehension patterns
 - Power set usage
@@ -41,6 +42,6 @@ Browse the `.txt` files to see:
 ## See Also
 
 - **docs/guides/USER_GUIDE.md** - Section "Sets and Types"
-- **docs/tutorials/05_z_definitions.md** - Detailed tutorial for Lecture 5
+- **docs/tutorials/03_sets_and_types.md** - Detailed tutorial for Lecture 5
 - **Previous**: 04_proof_trees/
 - **Next**: 06_definitions/

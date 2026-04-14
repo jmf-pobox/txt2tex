@@ -138,7 +138,7 @@ h : \nat \fun \nat
 \where
 \forall n : \nat @ f(n) = 2 * n \\
 \forall n : \nat @ g(n) = n + 1 \\
-h = f \circ g
+h = f \semi g
 \end{axdef}
 
 \noindent f doubles its input, g adds one to its input. h is their forward $composition : h(n)$ = f(g(n)) = 2 * (n + 1).

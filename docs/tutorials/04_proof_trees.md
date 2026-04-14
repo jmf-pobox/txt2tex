@@ -1,5 +1,6 @@
 # Tutorial 4: Proof Trees
 
+<!-- markdownlint-disable-next-line MD036 -->
 **Lecture 4: Deductive Proofs**
 
 Learn natural deduction, proof tree syntax, and how to write formal proofs.
@@ -15,7 +16,8 @@ Learn natural deduction, proof tree syntax, and how to write formal proofs.
 **Proof tree:** Structured argument showing how conclusions follow from premises using inference rules.
 
 **txt2tex syntax:**
-```
+
+```text
 PROOF:
   premise [justification]
   conclusion [rule applied]
@@ -23,7 +25,7 @@ PROOF:
 
 ## Basic Proof Structure
 
-```
+```text
 PROOF:
   p [premise]
   p => q [premise]
@@ -37,14 +39,16 @@ This proves q from premises p and p => q using modus ponens (=> elim).
 ### Conjunction (land)
 
 **And Introduction:**
-```
+
+```text
 P    Q
 ──────── [land intro]
 P land Q
 ```
 
 **And Elimination:**
-```
+
+```text
 P land Q              P land Q
 ─────── [land elim left]    ───────  [land elim right]
    P                    Q
@@ -53,14 +57,16 @@ P land Q              P land Q
 ### Disjunction (lor)
 
 **Or Introduction:**
-```
+
+```text
   P                    Q
 ───────── [lor intro left]    ───────── [lor intro right]
 P lor Q                P lor Q
 ```
 
 **Or Elimination (case analysis):**
-```
+
+```text
 P lor Q    P => R    Q => R
 ──────────────────────────── [lor elim]
            R
@@ -69,7 +75,8 @@ P lor Q    P => R    Q => R
 ### Implication (=>)
 
 **Implication Introduction:**
-```
+
+```text
   [P]
    ⋮
    Q
@@ -78,7 +85,8 @@ P => Q
 ```
 
 **Implication Elimination (modus ponens):**
-```
+
+```text
 P    P => Q
 ─────────── [=> elim]
      Q
@@ -87,7 +95,8 @@ P    P => Q
 ### Negation (lnot)
 
 **Not Introduction:**
-```
+
+```text
   [P]
    ⋮
  false
@@ -96,7 +105,8 @@ P    P => Q
 ```
 
 **Not Elimination:**
-```
+
+```text
 P    lnot P
 ────────── [contradiction]
   false
@@ -106,7 +116,7 @@ P    lnot P
 
 ### Example 1: Modus Ponens
 
-```
+```text
 PROOF:
   p [premise]
   p => q [premise]
@@ -115,7 +125,7 @@ PROOF:
 
 ### Example 2: And Elimination
 
-```
+```text
 PROOF:
   p land q [premise]
   p [land elim left]
@@ -124,7 +134,7 @@ PROOF:
 
 ### Example 3: Implication Introduction
 
-```
+```text
 PROOF:
   [1] p [assumption]
   p => p [=> intro from 1]
@@ -132,7 +142,7 @@ PROOF:
 
 ### Example 4: Nested Proof
 
-```
+```text
 PROOF:
 p => (q => p) [=> intro from 1]
   [1] p [assumption]
@@ -151,7 +161,8 @@ p => (q => p) [=> intro from 1]
 - Each nested assumption adds another indentation level
 
 **Example:**
-```
+
+```text
 PROOF:
 p => (q => (r => s)) [=> intro from 1]
   [1] p [assumption]
@@ -166,7 +177,7 @@ p => (q => (r => s)) [=> intro from 1]
 
 ## Complete Example
 
-```
+```text
 === Proof Tree Examples ===
 
 ** Example 1: Simple Implication **
@@ -208,13 +219,14 @@ PROOF:
 ## Summary
 
 You've learned:
+
 - ✅ Proof tree structure (PROOF: blocks)
 - ✅ Introduction and elimination rules
 - ✅ Nested proofs and assumptions
 - ✅ Proper indentation
 - ✅ Proof by contradiction
 
-**Next Tutorial:** [Tutorial 5: Z Notation Definitions](docs/tutorials/05_z_definitions.md)
+**Next Tutorial:** [Tutorial 5: Z Notation Definitions](05_z_definitions.md)
 
 ---
 

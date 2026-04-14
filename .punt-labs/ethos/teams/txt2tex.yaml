@@ -1,0 +1,42 @@
+name: txt2tex
+repositories:
+  - jmf-pobox/txt2tex
+members:
+  - identity: jfreeman
+    role: student
+  - identity: jra
+    role: principal
+  - identity: jms
+    role: consultant
+  - identity: rmh
+    role: python-specialist
+  - identity: adb
+    role: infra-engineer
+  - identity: ghr
+    role: docs-engineer
+  - identity: mdm
+    role: cli-specialist
+  - identity: djb
+    role: security-reviewer
+collaborations:
+  - from: principal
+    to: student
+    type: reports_to
+  - from: python-specialist
+    to: principal
+    type: reports_to
+  - from: infra-engineer
+    to: principal
+    type: reports_to
+  - from: docs-engineer
+    to: principal
+    type: reports_to
+  - from: cli-specialist
+    to: principal
+    type: reports_to
+  - from: security-reviewer
+    to: principal
+    type: reports_to
+  - from: consultant
+    to: principal
+    type: collaborates_with

@@ -1,0 +1,19 @@
+// ============================================================================
+// Example: Hello World - Your First txt2tex Document
+// ============================================================================
+// Demonstrates:
+//   - Basic document structure (section header, TEXT block)
+//   - Simple propositional logic operators
+//   - How to run txt2tex
+//
+// To compile:
+//   txt2tex examples/00_getting_started/hello_world.txt
+//
+// See: docs/tutorials/00_getting_started.md
+// ============================================================================
+
+=== Hello, txt2tex ===
+
+TEXT: This is my first txt2tex document. Below is a simple logical statement.
+
+p land q => p

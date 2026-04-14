@@ -3,6 +3,7 @@
 ## Branch Protection
 
 `main` is protected. All changes require:
+
 - Feature branch → PR → CI pass → Merge
 
 ## Quick Start

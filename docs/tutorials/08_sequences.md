@@ -1,5 +1,6 @@
 # Tutorial 8: Sequences
 
+<!-- markdownlint-disable-next-line MD036 -->
 **Lecture 8: Sequences and Bags**
 
 Learn sequence notation, sequence operations, pattern matching, and bags (multisets).
@@ -14,7 +15,8 @@ Learn sequence notation, sequence operations, pattern matching, and bags (multis
 **Sequence:** Ordered collection (unlike sets)
 
 **Notation:**
-```
+
+```text
 ⟨⟩                   (empty sequence - Unicode)
 <>                   (empty sequence - ASCII)
 ⟨1, 2, 3⟩            (sequence literal - Unicode)
@@ -22,7 +24,8 @@ Learn sequence notation, sequence operations, pattern matching, and bags (multis
 ```
 
 **Type:**
-```
+
+```text
 s : seq N            (sequence of natural numbers)
 ```
 
@@ -32,34 +35,34 @@ s : seq N            (sequence of natural numbers)
 
 ### Head and Tail
 
-```
+```text
 head <1, 2, 3> = 1
 tail <1, 2, 3> = <2, 3>
 ```
 
 ### Last and Front
 
-```
+```text
 last <1, 2, 3> = 3
 front <1, 2, 3> = <1, 2>
 ```
 
 ### Reverse
 
-```
+```text
 rev <1, 2, 3> = <3, 2, 1>
 ```
 
 ### Concatenation
 
-```
+```text
 <1, 2> ⌢ <3, 4> = <1, 2, 3, 4>
 <1, 2> ^ <3, 4> = <1, 2, 3, 4>    (ASCII alternative)
 ```
 
 ### Length (Cardinality)
 
-```
+```text
 # <1, 2, 3> = 3
 # <> = 0
 ```
@@ -70,7 +73,7 @@ rev <1, 2, 3> = <3, 2, 1>
 
 Define functions recursively using sequence patterns:
 
-```
+```text
 axdef
   total : seq N -> N
 where
@@ -88,13 +91,14 @@ end
 
 **filter operator:** Keep only elements from a set
 
-```
+```text
 s filter A          (ASCII)
 s ↾ A               (Unicode)
 ```
 
 **Example:**
-```
+
+```text
 <1, 2, 3, 4, 5> filter {2, 4, 6} = <2, 4>
 ```
 
@@ -105,17 +109,20 @@ s ↾ A               (Unicode)
 **Bag:** Unordered collection that allows duplicates
 
 **Notation:**
-```
+
+```text
 [[1, 2, 2, 3, 3, 3]]
 ```
 
 **Type:**
-```
+
+```text
 b : bag N
 ```
 
 **Operations:**
-```
+
+```text
 b1 bag_union b2     (add multiplicities)
 b1 ⊎ b2             (Unicode)
 ```
@@ -124,7 +131,7 @@ b1 ⊎ b2             (Unicode)
 
 ## Complete Example
 
-```
+```text
 === Sequence Examples ===
 
 ** Example 1: Basic Sequences **
@@ -169,13 +176,14 @@ TEXT: A bag where 1 appears twice and 3 appears three times.
 ## Summary
 
 You've learned:
+
 - ✅ Sequence notation (⟨⟩ and <>)
 - ✅ Sequence operations (head, tail, concat, reverse)
 - ✅ Pattern matching on sequences
 - ✅ Sequence filter
 - ✅ Bags (multisets)
 
-**Next Tutorial:** [Tutorial 9: Schemas and Composition](docs/tutorials/09_schemas.md)
+**Next Tutorial:** [Tutorial 9: Schemas and Composition](09_schemas.md)
 
 ---
 

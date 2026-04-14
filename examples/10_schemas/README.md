@@ -14,38 +14,44 @@ This directory contains examples of Z schema notation, including schemas, axioma
 ## Container Types
 
 ### Schemas
-```
+
+```text
 schema State
   count : N
 where
   count >= 0
 end
 ```
+
 **Scoping**: Components have **LOCAL** scope - cannot be referenced outside the schema.
 
 ### Axiomatic Definitions
-```
+
+```text
 axdef
   population : N
 where
   population > 0
 end
 ```
+
 **Scoping**: Identifiers have **GLOBAL** scope - accessible throughout the document.
 
 ### Zed Blocks
-```
+
+```text
 zed
   forall x : N | x >= 0
 end
 ```
+
 **Purpose**: Unboxed Z notation paragraphs for predicates and abbreviations.
 
 ## Critical Scoping Rule
 
 **This is the most common source of fuzz errors:**
 
-```
+```text
 // ❌ WRONG: Schema components are LOCAL
 schema Library
   books : F BookId
@@ -70,6 +76,7 @@ Answer == {b : dom books | ...}  // OK: books is globally accessible
 ## Examples in This Directory
 
 Browse the `.txt` files to see:
+
 - Basic and generic schemas
 - Axiomatic definitions with constraints
 - Zed block usage

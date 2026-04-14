@@ -16,7 +16,7 @@ This directory contains examples for Lecture 7, covering binary relations and th
 
 ## Key Operators
 
-```
+```text
 x |-> y          →  x ↦ y       [maplet]
 X <-> Y          →  X ↔ Y       [relation type]
 dom R            →  dom R       [domain]
@@ -41,6 +41,7 @@ R*               →  R*          [reflexive-transitive closure]
 ## Examples in This Directory
 
 Browse the `.txt` files to see:
+
 - Basic relation construction with maplets
 - Domain and range operations
 - Restriction and corestriction patterns

@@ -15,7 +15,7 @@ This directory contains examples for Lecture 8, covering functions and their typ
 
 ## Function Types
 
-```
+```text
 f : X +-> Y      →  X ⇀ Y       [partial function]
 f : X -> Y       →  X → Y       [total function]
 f : X >-> Y      →  X ↣ Y       [total injection]
@@ -26,7 +26,7 @@ f : X 77-> Y     →  X ⇸ Y       [finite partial function]
 
 ## Key Operations
 
-```
+```text
 f(x)                     [function application - REQUIRES parentheses]
 lambda x : N . x^2       [lambda expression]
 f o9 g                   [composition: (f o9 g)(x) = g(f(x))]
@@ -45,6 +45,7 @@ f ++ g                   [override: g takes precedence on overlap]
 ## Examples in This Directory
 
 Browse the `.txt` files to see:
+
 - Different function type declarations
 - Lambda expression patterns
 - Function composition techniques

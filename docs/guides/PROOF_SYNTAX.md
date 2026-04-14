@@ -3,6 +3,7 @@
 ## Overview
 
 Path C uses a **hybrid approach** combining:
+
 - Vertical indentation for nested reasoning
 - `::` markers for sibling premises (things proven together)
 - `[label]` for assumptions that get discharged
@@ -10,7 +11,7 @@ Path C uses a **hybrid approach** combining:
 
 ## Basic Structure
 
-```
+```text
 PROOF:
 conclusion [justification]
   [label] assumption [assumption]
@@ -21,17 +22,21 @@ conclusion [justification]
 ## Syntax Elements
 
 ### 1. Proof Header
-```
+
+```text
 PROOF:
 ```
+
 Marks the beginning of a proof tree.
 
 ### 2. Conclusion (Top Level)
+
 The conclusion is the top-level statement of the proof. It may appear:
+
 - At the beginning (most common): Shows what we're proving, with the proof deriving it
 - At the end: Some proofs build up to the conclusion as the final step
 
-```
+```text
 PROOF:
 p land q => q [=> intro from 1]
   [1] p land q [assumption]
@@ -41,32 +46,42 @@ p land q => q [=> intro from 1]
 In this example, `p land q => q` is the conclusion we're proving.
 
 ### 3. Assumptions with Labels
+
 Assumptions are marked with `[number]` and the keyword `[assumption]`:
-```
+
+```text
 [1] p land q [assumption]
 ```
+
 - The `[1]` is a **label** used to reference this assumption later
 - Everything indented under this is "within the scope" of the assumption
 
 ### 4. Regular Proof Steps
-```
+
+```text
 q [land elim]
 ```
+
 - Statement followed by justification in brackets
 - Indentation shows dependency
 
 ### 5. Sibling Premises (`::`  marker)
+
 When multiple things need to be proven together (side-by-side in tree):
-```
+
+```text
 :: p [land elim]
 :: q [from case]
 p land q [land intro]
 ```
+
 The `::` means "these are siblings that together support the next step"
 
 ### 6. Case Analysis
+
 For lor-elimination and case splits:
-```
+
+```text
 case p:
   :: p => r [land elim 1]
     :: (p => r) land (q => r) [from 1]
@@ -80,6 +95,7 @@ case q:
 ```
 
 **Key pattern for cases with "from above":**
+
 - Use `[from above]` to reference facts established before the case analysis
 - The `::` marker indicates sibling premises that together support a step
 - Each case should derive the same conclusion through different reasoning paths
@@ -90,38 +106,47 @@ case q:
 Justifications are free-form text enclosed in brackets `[...]`. Any text is accepted, but the following are standard natural deduction rules:
 
 **Basic rules:**
+
 - `[assumption]` - marks assumptions
 - `[premise]` - given fact
 
 **Conjunction (land):**
+
 - `[land elim]`, `[land elim left]`, `[land elim right]`, `[land elim 1]`, `[land elim 2]` - land elimination
 - `[land intro]` - land introduction
 
 **Disjunction (lor):**
+
 - `[lor elim]` - lor elimination (case analysis)
 - `[lor intro]`, `[lor intro left]`, `[lor intro right]`, `[lor intro 1]`, `[lor intro 2]` - lor introduction
 
 **Implication (=>):**
+
 - `[=> intro from N]` - implication introduction, discharging assumption [N]
 - `[=> elim]` - implication elimination (modus ponens)
 
 **Negation (lnot):**
+
 - `[lnot intro from N]` - negation introduction (proof by contradiction), discharging assumption [N]
 - `[lnot elim]` - negation elimination
 
 **Absurdity (false):**
+
 - `[false elim]` - ex falso quodlibet (from false, derive anything)
 - `[contradiction]`, `[contradiction with X]` - deriving false from contradictory statements
 
 **Classical logic:**
+
 - `[LEM]` - Law of Excluded Middle (p lor lnot p axiom)
 - `[double negation elim]` - classical rule: lnot lnot p implies p
 
 **Derived rules:**
+
 - `[identity]` - trivial identity step (p proves p)
 - `[negation intro from N]` - alternative form of lnot intro
 
 **Informal annotations:**
+
 - `[from above]` - reference to earlier step in proof
 - `[from case]` - reference to case hypothesis
 - `[from X]` - reference to specific statement or premise X
@@ -135,9 +160,10 @@ Justifications are free-form text enclosed in brackets `[...]`. Any text is acce
 ## Complete Examples
 
 ### Example 1: Simple Implication
+
 **Goal**: Prove `p land q => q`
 
-```
+```text
 PROOF:
 p land q => q [=> intro from 1]
   [1] p land q [assumption]
@@ -145,15 +171,17 @@ p land q => q [=> intro from 1]
 ```
 
 **Explanation**:
+
 1. To prove `A => B`, assume A and prove B
 2. We assume `p land q` (label it [1])
 3. From `p land q`, extract `q` using land-elimination
 4. This proves the implication, discharging assumption [1]
 
 ### Example 2: With Sibling Premises
+
 **Goal**: Prove `p land (p => q) => (p land q)`
 
-```
+```text
 PROOF:
 p land (p => q) => (p land q) [=> intro from 1]
   [1] p land (p => q) [assumption]
@@ -164,15 +192,17 @@ p land (p => q) => (p land q) [=> intro from 1]
 ```
 
 **Explanation**:
+
 - Assume `p land (p => q)` as [1]
 - Extract both `p` and `p => q` (marked as siblings with `::`)
 - Apply modus ponens to get `q`
 - Combine `p` and `q` to get `p land q`
 
 ### Example 3: Distribution with Cases
+
 **Goal**: Prove `p land (q lor r) => (p land q) lor (p land r)`
 
-```
+```text
 PROOF:
 p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
   [1] p land (q lor r) [assumption]
@@ -192,6 +222,7 @@ p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
 ```
 
 **Explanation**:
+
 - Assume `p land (q lor r)` as [1]
 - Extract `p` and `q lor r` from the assumption
 - Perform case analysis on `q lor r`:
@@ -202,9 +233,10 @@ p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
 **Important note on case structure**: Within each case, use `[from above]` to reference facts established before the case analysis began. The `::` sibling markers indicate multiple facts that together support the next inference step.
 
 ### Example 4: Modus Tollens
+
 **Goal**: Prove `(p => q) land lnot q => lnot p`
 
-```
+```text
 PROOF:
 (p => q) land lnot q => lnot p [=> intro from 1]
   [1] (p => q) land lnot q [assumption]
@@ -217,6 +249,7 @@ PROOF:
 ```
 
 **Explanation**:
+
 - Assume `(p => q) land lnot q` as [1]
 - To prove `lnot p`, assume `p` (as [2]) and derive contradiction
 - From `p` and `p => q`, get `q`
@@ -258,16 +291,19 @@ class CaseAnalysis:
 **IMPORTANT**: The parser requires a space between an identifier and an opening bracket `[` to avoid ambiguity with subscript notation.
 
 **Incorrect (will fail):**
-```
+
+```text
 p land q[land elim]  // Parser reads this as p with subscript "land q[land"
 ```
 
 **Correct:**
-```
+
+```text
 p land q [land elim]  // Space before [ makes it clear this is a justification
 ```
 
 This limitation affects:
+
 - Proof justifications: Always write `expression [justification]` with a space
 - Any context where brackets follow an identifier
 
@@ -286,6 +322,7 @@ $$
 ```
 
 For siblings (marked with `::`), generate side-by-side premises:
+
 ```latex
 \infer[rule]{conclusion}{
   premise1 & premise2 & premise3
@@ -293,3 +330,26 @@ For siblings (marked with `::`), generate side-by-side premises:
 ```
 
 For cases, generate multiple inference branches combined with lor-elimination.
+
+## Related Block Types
+
+### EQUIV: / ARGUE: (Equivalence Chains)
+
+For step-by-step propositional reasoning where each step is joined by
+$\Leftrightarrow$, use `EQUIV:` or its alias `ARGUE:`. See the User Guide.
+
+### EQUAL: (Equality Chains)
+
+For step-by-step equational reasoning where each step is joined by `=`,
+use `EQUAL:`. This is appropriate when the steps are expressions of the same
+Z type — natural-number arithmetic, sequence lengths, function values — rather
+than propositions.
+
+```text
+EQUAL:
+length s
+length (tail s) + 1 [by definition of length]
+```
+
+`EQUAL:` produces `=` between steps; `EQUIV:` produces `\Leftrightarrow`.
+Use `EQUAL:` for numeric calculations and `EQUIV:` for logical equivalences.

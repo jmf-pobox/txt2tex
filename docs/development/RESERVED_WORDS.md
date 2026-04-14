@@ -27,6 +27,7 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 | `exists1` | ∃₁ | `\exists_1` | Unique existence quantifier | 3 |
 
 **Notes:**
+
 - `<=>` renders as `\iff` in predicates (schemas, axioms, proofs)
 - `<=>` renders as `\Leftrightarrow` in EQUIV blocks (equational reasoning)
 - `and`, `or`, `not` are **deprecated** - use `land`, `lor`, `lnot` instead
@@ -48,6 +49,7 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 | `\` | ∖ (U+2216) | `\setminus` | Set difference | 11.5 |
 
 **Notes:**
+
 - `in` is **deprecated** - use `elem` instead (avoids ambiguity with English prose)
 
 ---
@@ -75,9 +77,9 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 | `\|>` | ▷ (U+25B7) | `\rres` | Range restriction | 10a |
 | `<<\|` | ⩤ (U+2A64) | `\ndres` | Domain subtraction | 10a |
 | `\|>>` | ⩥ (U+2A65) | `\nrres` | Range subtraction | 10a |
-| `comp` | — | `\comp` | Relational composition (semicolon) | 10 |
-| `;` | — | `\comp` | Relational composition | 10 |
-| `o9` | ∘ (U+2218) | `\circ` | Forward/backward composition | 10 |
+| `comp` | — | `\comp` | Backward relational composition (fuzz Chapter 4) | 10 |
+| `o9` | ∘ (U+2218) | `\semi` | Forward composition (fuzz Chapter 3) | 10 |
+| `;` | — | `;` | Declaration separator in schema signatures (`x : N; y : N`) | 10 |
 | `~` | — | `\inv` | Relational inverse (postfix) | 10 |
 | `(+)` | ⊕ (U+2295) | `\limg` | Relational image | 10 |
 | `+)` | — | `\rimg` | Relational image (right) | 10 |
@@ -121,6 +123,7 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 | `filter` | ↾ (U+21BE) | `\filter` | Sequence filter | 35 |
 
 **Note:** The following are **NOT reserved words** and can be used as variable names:
+
 - `seq`, `seq1` - These are regular identifiers that get special LaTeX handling when used with parentheses like `seq(N)` → `\seq N`
 - `head`, `tail`, `last`, `front`, `rev` - These are regular identifiers with no special handling (output as-is)
 
@@ -226,15 +229,20 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 ## Special Syntax
 
 ### Text Blocks
+
 - `TEXT:` - Prose paragraph in output
 - `TRUTH TABLE:` - Truth table block
 - `EQUIV:` - Equivalence chain block
+- `EQUAL:` - Equality chain block; renders a sequence of expressions
+  joined by `=` in an aligned environment
 - `PROOF:` - Proof tree block
 
 ### Line Continuation
+
 - Indented lines continue the previous line (for predicates, expressions)
 
 ### Comments
+
 - `--` - Line comment (in text blocks only)
 
 ---
@@ -244,6 +252,7 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 **Total Reserved Keywords:** ~75
 
 **Categories:**
+
 - Logical operators: 8
 - Set operators/functions: 14
 - Relation operators/functions: 20
@@ -258,6 +267,7 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 - Structural: 8
 
 **NOT Reserved (regular identifiers with special LaTeX handling):**
+
 - `seq`, `seq1`, `bag` - type constructors handled specially in `latex_gen.py`
 - `head`, `tail`, `last`, `front`, `rev` - sequence functions (no special handling)
 
@@ -266,13 +276,17 @@ This document lists all reserved words (keywords) and operators in txt2tex. Thes
 ## Implementation Notes
 
 ### Lexer Recognition
+
 All reserved words are recognized by the lexer in `src/txt2tex/lexer.py`:
+
 - Keywords in `_scan_identifier()` method
 - Multi-character operators checked before single-character operators
 - Longest-match principle applied (e.g., `+->` checked before `->`)
 
 ### Z Keywords Set
+
 Reserved words that prevent prose mode triggering (in lexer.py):
+
 ```python
 z_keywords = {
     "land", "lor", "lnot", "union", "intersect", "elem", "notin",
@@ -285,7 +299,9 @@ z_keywords = {
 ```
 
 ### LaTeX Mapping
+
 All operators map to LaTeX commands in `src/txt2tex/latex_gen.py`:
+
 - `BINARY_OPS` dictionary (line 60-140)
 - `PRECEDENCE` dictionary (line 175-215)
 - Multiple replacement locations for text processing
@@ -295,8 +311,10 @@ All operators map to LaTeX commands in `src/txt2tex/latex_gen.py`:
 ## Usage Guidelines
 
 ### Avoid as Variable Names
+
 Do NOT use reserved words as identifiers:
-```
+
+```text
 ❌ BAD:  given = 5           (reserved word)
 ❌ BAD:  subset = {1, 2}     (reserved word)
 ❌ BAD:  union = A union B   (reserved word)
@@ -309,8 +327,10 @@ Do NOT use reserved words as identifiers:
 ```
 
 ### Case Sensitivity
+
 All reserved words are lowercase. Capitalized versions are valid identifiers:
-```
+
+```text
 ✅ land  - reserved (logical AND)
 ✅ Land  - valid identifier
 ✅ LAND  - valid identifier
@@ -319,8 +339,10 @@ All reserved words are lowercase. Capitalized versions are valid identifiers:
 Note: `seq`, `seq1`, `bag`, `head`, `tail`, etc. are NOT reserved - they are regular identifiers.
 
 ### Multi-Character Operators
+
 Some operators use multiple characters:
-```
+
+```text
 ✅ 77->          - finite partial function (continuous, no spaces)
 ✅ bag_union      - bag union (underscore connects words)
 ✅ exists1        - unique existence (digit suffix, no space)

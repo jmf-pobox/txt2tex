@@ -41,9 +41,9 @@ class TokenType(Enum):
     RRES = auto()  # |> (range restriction)
     NDRES = auto()  # <<| (domain subtraction)
     NRRES = auto()  # |>> (range subtraction)
-    COMP = auto()  # comp or ; (relational composition)
-    SEMICOLON = auto()  # ; (relational composition)
-    CIRC = auto()  # o9 (forward/backward composition)
+    COMP = auto()  # comp keyword (relational composition)
+    SEMICOLON = auto()  # ; (declaration separator in schemas and axdefs)
+    CIRC = auto()  # o9 (forward composition, fuzz \semi)
     TILDE = auto()  # ~ (relational inverse postfix)
     PLUS = auto()  # + (transitive closure postfix / arithmetic)
     MINUS = auto()  # - (subtraction / negation)
@@ -151,6 +151,7 @@ class TokenType(Enum):
 
     # Environments (Phase 2)
     ARGUE = auto()  # ARGUE: or EQUIV: (both map to argue environment)
+    EQUAL = auto()  # EQUAL: block keyword (equality chain; not the = operator)
     INFRULE = auto()  # INFRULE: (inference rule with horizontal line)
 
     # Z notation keywords (Phase 4)

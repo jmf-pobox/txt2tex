@@ -14,62 +14,78 @@ This directory contains examples of text block types and bibliography management
 ## Text Block Types
 
 ### TEXT: - Smart Detection
-```
+
+```text
 TEXT: The set { x : N | x > 0 } contains positive integers.
 TEXT: We know that forall x : N | x >= 0 is true.
 ```
+
 **Features**:
+
 - Operators converted: `=>` → $\Rightarrow$, `<=>` → $\Leftrightarrow$
 - Formulas auto-detected: `{ x : N | x > 0 }` → math mode
 - Sequence literals: `<a, b, c>` → $\langle a, b, c \rangle$
 - Citations: `[cite key]` → (Author, Year)
 
 ### PURETEXT: - Escaping Only
-```
+
+```text
 PURETEXT: Author's name, "quoted text", & symbols.
 ```
+
 **Features**:
+
 - Escapes LaTeX special characters: `&`, `%`, `$`, `#`, etc.
 - NO formula detection
 - NO operator conversion
 - Perfect for bibliography entries
 
 ### LATEX: - Raw Passthrough
-```
+
+```text
 LATEX: \begin{center}\textit{Custom formatting}\end{center}
 LATEX: \vspace{1cm}
 ```
+
 **Features**:
+
 - NO escaping - raw LaTeX
 - Perfect for custom commands, tikz, environments
 
-### PAGEBREAK:
-```
+### PAGEBREAK
+
+```text
 PAGEBREAK:
 ```
+
 Generates `\newpage` for page breaks.
 
 ## Bibliography Management
 
 ### Using .bib File (Recommended)
-```
+
+```text
 BIBLIOGRAPHY: references.bib
 BIBLIOGRAPHY_STYLE: plainnat
 ```
 
 ### Citations in TEXT Blocks
-```
+
+```text
 TEXT: The proof technique follows [cite spivey92].
 TEXT: See [cite spivey92 p. 42] for details.
 ```
+
 Renders as: (Spivey, 1992), (Spivey, 1992, p. 42)
 
 ### Manual Bibliography (Alternative)
+
 Use LATEX blocks with `\begin{thebibliography}` for custom formatting.
 
 ## Examples in This Directory
 
 Browse the `.txt` files to see:
+
 - Smart formula detection in TEXT blocks
 - PURETEXT for special characters
 - LATEX passthrough usage

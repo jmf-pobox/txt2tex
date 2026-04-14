@@ -12,6 +12,7 @@
 **Pattern:** `UPPERCASE_WITH_UNDERSCORES.md`
 
 **Examples:**
+
 - `DESIGN.md` - Architecture and design decisions  
 - `USER_GUIDE.md` - Syntax reference
 - `PROOF_SYNTAX.md` - Proof tree syntax reference
@@ -26,6 +27,7 @@
 **Pattern:** `NN_lowercase_with_underscores.md`
 
 **Examples:**
+
 - `00_getting_started.md`
 - `01_propositional_logic.md`
 - `02_predicate_logic.md`
@@ -46,7 +48,7 @@
 
 ## Current File Organization
 
-```
+```text
 docs/
 ├── DESIGN.md                    # Architecture and design decisions
 ├── development/                 # Developer documentation
