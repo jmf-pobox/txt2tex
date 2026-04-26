@@ -99,75 +99,6 @@ Environment OK - ready for PDF generation
 
 ---
 
-### For Developers (git clone)
-
-To work with examples, run tests, or contribute:
-
-```bash
-# Clone the repository
-git clone https://github.com/jmf-pobox/txt2tex.git
-cd txt2tex
-
-# Install uv (Python package manager)
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Install dependencies
-uv sync --group dev
-
-# Now txt2tex works directly
-uv run txt2tex examples/01_propositional_logic/hello_world.txt
-```
-
-#### Development Commands
-
-```bash
-# Run all quality checks (lint, type check, tests)
-make check
-
-# Lint markdown only
-make lint-md
-
-# Run tests only
-make test
-
-# Build all examples
-cd examples && make
-
-# Convert a file
-txt2tex myfile.txt
-```
-
-You'll also need LaTeX and optionally fuzz (see Steps 2-3 above).
-
-#### Agent Team (ethos)
-
-txt2tex uses [ethos](https://github.com/punt-labs/ethos) for its development
-agent team — identities, roles, and Claude Code agent definitions live in
-`.punt-labs/ethos/` and are loaded automatically when you start a Claude
-Code session in this repo.
-
-```bash
-# One-shot: install ethos and regenerate .claude/agents/
-make dev-setup
-
-# Verify ethos and the dev toolchain are healthy
-make dev-doctor
-
-# Inspect the team
-make ethos-team
-```
-
-The team is **`txt2tex`**: `jra` (principal — Jean-Raymond Abrial) leads,
-`jms` (Spivey) is the read-only Z/fuzz consultant, and specialists
-(`rmh` Python, `adb` infra, `ghr` docs, `mdm` CLI, `djb` security) report
-to the principal. See [docs/development/AGENTS.md](docs/development/AGENTS.md)
-for how to delegate work to them.
-
-If you do not install ethos, txt2tex still works as a CLI — ethos is only
-required for contributors using Claude Code to extend the tool.
-
----
-
 ## Quick Start
 
 ### Syntax at a Glance
@@ -394,7 +325,7 @@ The guide covers:
 
 ## Examples
 
-The `examples/` directory contains **141 working examples** organized by topic. **To access examples, you need to clone the repository** (see [For Developers](#for-developers-git-clone) above).
+The `examples/` directory contains **141 working examples** organized by topic. **To access examples, you need to clone the repository** (see [For Developers](#for-developers-git-clone) below).
 
 - **01_propositional_logic** - Truth tables, logical operators, propositional formulas
 - **02_predicate_logic** - Quantifiers, type declarations
@@ -587,6 +518,75 @@ A few edge cases require workarounds:
 
 - **[docs/development/IDE_SETUP.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/development/IDE_SETUP.md)** - IDE configuration
 - **[docs/DESIGN.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/DESIGN.md)** - Architecture and design decisions
+
+---
+
+## For Developers (git clone)
+
+To work with examples, run tests, or contribute:
+
+```bash
+# Clone the repository
+git clone https://github.com/jmf-pobox/txt2tex.git
+cd txt2tex
+
+# Install uv (Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install dependencies
+uv sync --group dev
+
+# Now txt2tex works directly
+uv run txt2tex examples/01_propositional_logic/hello_world.txt
+```
+
+### Development Commands
+
+```bash
+# Run all quality checks (lint, type check, tests)
+make check
+
+# Lint markdown only
+make lint-md
+
+# Run tests only
+make test
+
+# Build all examples
+cd examples && make
+
+# Convert a file
+txt2tex myfile.txt
+```
+
+You'll also need LaTeX and optionally fuzz (see [Installation](#installation) above).
+
+### Agent Team (ethos)
+
+txt2tex uses [ethos](https://github.com/punt-labs/ethos) for its development
+agent team — identities, roles, and Claude Code agent definitions live in
+`.punt-labs/ethos/` and are loaded automatically when you start a Claude
+Code session in this repo.
+
+```bash
+# One-shot: install ethos and regenerate .claude/agents/
+make dev-setup
+
+# Verify ethos and the dev toolchain are healthy
+make dev-doctor
+
+# Inspect the team
+make ethos-team
+```
+
+The team is **`txt2tex`**: `jra` (principal — Jean-Raymond Abrial) leads,
+`jms` (Spivey) is the read-only Z/fuzz consultant, and specialists
+(`rmh` Python, `adb` infra, `ghr` docs, `mdm` CLI, `djb` security) report
+to the principal. See [docs/development/AGENTS.md](docs/development/AGENTS.md)
+for how to delegate work to them.
+
+If you do not install ethos, txt2tex still works as a CLI — ethos is only
+required for contributors using Claude Code to extend the tool.
 
 ---
 
