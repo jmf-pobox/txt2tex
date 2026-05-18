@@ -38,6 +38,7 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     "end": TokenType.END,
     "Delta": TokenType.DELTA,
     "Xi": TokenType.XI,
+    "theta": TokenType.THETA,
     # Conditional expression keywords
     "if": TokenType.IF,
     "then": TokenType.THEN,
@@ -102,6 +103,7 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "end",
         "Delta",
         "Xi",
+        "theta",
         "if",
         "then",
         "else",

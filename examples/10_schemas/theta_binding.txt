@@ -1,0 +1,44 @@
+// ============================================================================
+// Example: θ-Expression in State-Transition Operations
+// ============================================================================
+// Demonstrates the theta keyword (Z RM §3.10).
+//
+// theta S constructs the binding whose components are the in-scope variables
+// matching schema S's signature.  It is the standard way to pass the current
+// state as a value — for example, to record a snapshot in a history or to
+// express that the output matches the current state.
+// ============================================================================
+
+=== theta-Expression ===
+
+TEXT: The theta expression constructs the binding for a named schema.  When
+TEXT: a schema S has components x and y, theta S is the pair (x, y) viewed
+TEXT: as a named record.  The primed form theta S' is the after-state binding.
+
+zed
+  given Item
+end
+
+schema Store
+  items : P Item
+end
+
+TEXT: A read-only query that returns a snapshot of the current state uses the
+TEXT: theta expression to package the before-state as a single output value.
+
+schema SnapshotStore
+  Xi Store
+  snapshot! : Store
+where
+  snapshot! = theta Store
+end
+
+TEXT: The Ξ-style frame condition theta S = theta S' asserts that none of the
+TEXT: schema components changed.  This is the definition of Xi S expressed
+TEXT: using theta directly.
+
+schema StoreFrame
+  Xi Store
+where
+  theta Store = theta Store'
+end

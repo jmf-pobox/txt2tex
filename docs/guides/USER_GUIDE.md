@@ -2109,6 +2109,43 @@ end
 **See:** `examples/10_schemas/delta_xi_inclusion.txt`,
 `examples/10_schemas/schema_as_predicate.txt`
 
+#### θ-Expression (`theta`)
+
+`theta S` constructs the binding whose components are the in-scope variables
+matching schema S's signature (Z RM §3.10).
+
+```text
+theta Booking'        → \theta Booking'   (after-state binding)
+theta AirlineState    → \theta AirlineState
+theta S = theta S'    → \theta S = \theta S'  (frame condition)
+```
+
+The typical use is packaging a state snapshot inside a maplet:
+
+```text
+schema AddBooking
+  Delta AirlineState
+  bookingId? : BookingId
+  Booking
+where
+  bookings' = bookings oplus { bookingId? |-> theta Booking' }
+end
+```
+
+**Syntax rules:**
+
+| Rule | Detail |
+|------|--------|
+| Keyword | `theta` (lowercase; `\theta` is the Greek letter) |
+| Schema reference | Any valid identifier, including Phase-0 decorated forms (`S'`, `S?`) |
+| Decoration of keyword | Forbidden — `theta'` raises a LexerError |
+| Precedence | Primary expression, same level as `Identifier` |
+
+**Generated LaTeX:** `theta S` → `\theta S`  Works under both `fuzz.sty`
+(default) and `--zed` mode; `\theta` is a standard LaTeX Greek letter macro.
+
+**See:** `examples/10_schemas/theta_binding.txt`
+
 ---
 
 ## Proof Trees

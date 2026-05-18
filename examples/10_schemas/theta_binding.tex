@@ -1,0 +1,68 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{theta - Expression}
+
+\noindent The theta expression constructs the binding for a named schema.  When
+
+\bigskip
+
+\noindent a schema S has components x and y, theta S is the pair (x, y) viewed
+
+\bigskip
+
+\noindent as a named record.  The primed form theta S' is the after-state binding.
+
+\bigskip
+
+\begin{zed}
+[Item]
+\end{zed}
+
+\begin{schema}{Store}
+items : \power Item
+\end{schema}
+
+\noindent A read-only query that returns a snapshot of the current state uses the
+
+\bigskip
+
+\noindent theta expression to package the before-state as a single output value.
+
+\bigskip
+
+\begin{schema}{SnapshotStore}
+\Xi Store \\
+snapshot! : Store
+\where
+snapshot! = \theta Store
+\end{schema}
+
+\noindent The Ξ-style frame condition theta $S = theta$ S' asserts that none of the
+
+\bigskip
+
+\noindent schema components changed.  This is the definition of Xi S expressed
+
+\bigskip
+
+\noindent using theta directly.
+
+\bigskip
+
+\begin{schema}{StoreFrame}
+\Xi Store
+\where
+\theta Store = \theta Store'
+\end{schema}
+
+\end{document}

@@ -93,6 +93,28 @@ end
 even if the identifier to its left matches a schema name.  `count, limit : N`
 declares two variables; `Counter` alone is a bare schema inclusion.
 
+## θ-Expression (Phase 1.2)
+
+The `theta S` keyword constructs the binding whose components are the
+in-scope variables matching schema S's signature (Z RM §3.10).
+
+```text
+schema AddBooking
+  Delta AirlineState
+  bookingId? : BookingId
+  Booking
+where
+  bookings' = bookings oplus { bookingId? |-> theta Booking' }
+end
+```
+
+- `theta Booking'` packages the after-state binding for the new booking.
+- `theta S` (unprimed) refers to the before-state binding.
+- `theta S = theta S'` is the standard Ξ-style frame condition.
+
+**Rule:** `theta` is a reserved keyword.  `theta'`, `theta?`, `theta!`
+are not valid — the lexer rejects them.
+
 ## Examples in This Directory
 
 Browse the `.txt` files to see:
@@ -103,10 +125,13 @@ Browse the `.txt` files to see:
 - Scoping demonstrations (axdef vs schema)
 - **delta_xi_inclusion.txt** — Δ/Ξ airline booking probe (Phase 1.1)
 - **schema_as_predicate.txt** — schema conjunction in where clause (Phase 1.1)
+- **theta_binding.txt** — θ-expression in state-transition operations (Phase 1.2)
 
 ## See Also
 
-- **docs/guides/USER_GUIDE.md** - Section "Schema Inclusion (Bare, Δ, Ξ)"
-- **docs/tutorials/09_schemas.md** - Section "Schema Inclusion and Δ/Ξ"
+- **docs/guides/USER_GUIDE.md** - Section "Schema Inclusion (Bare, Δ, Ξ)" and
+  subsection "θ-Expression"
+- **docs/tutorials/09_schemas.md** - Section "Schema Inclusion and Δ/Ξ" and
+  subsection "θ-Expression"
 - **Previous**: 09_sequences/
 - **Next**: 11_text_blocks/

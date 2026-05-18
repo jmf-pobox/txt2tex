@@ -460,6 +460,26 @@ class GuardedCases(ASTNode):
     branches: list[GuardedBranch]  # List of conditional branches
 
 
+@dataclass(frozen=True)
+class Theta(ASTNode):
+    r"""θ-expression (Z RM §3.10).
+
+    ``theta S`` constructs the binding whose components are the in-scope
+    variables matching schema S's signature.  The schema reference is
+    typically an Identifier, optionally Phase-0 decorated (e.g.,
+    Identifier("Booking'") for ``theta Booking'``).
+
+    Examples:
+    - theta S       -> expr=Identifier("S")
+    - theta S'      -> expr=Identifier("S'")
+    - theta Booking -> expr=Identifier("Booking")
+
+    LaTeX rendering: \theta S  (Greek letter, no macro change needed)
+    """
+
+    expr: Expr  # Schema reference (typically a decorated Identifier)
+
+
 # Type alias for all expression types
 Expr = (
     BinaryOp
@@ -485,6 +505,7 @@ Expr = (
     | Conditional
     | GuardedBranch
     | GuardedCases
+    | Theta
 )
 
 

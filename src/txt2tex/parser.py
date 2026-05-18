@@ -57,6 +57,7 @@ from txt2tex.ast_nodes import (
     Superscript,
     SyntaxBlock,
     SyntaxDefinition,
+    Theta,
     TitleMetadata,
     TruthTable,
     Tuple,
@@ -3238,6 +3239,35 @@ class Parser:
             TokenType.FORALL, TokenType.EXISTS, TokenType.EXISTS1, TokenType.MU
         ):
             return self._parse_quantifier()
+
+        # θ-expression: theta SchemaRef  (Z RM §3.10)
+        # Binds tightly at primary-expression level.
+        if self._match(TokenType.THETA):
+            theta_token = self._advance()
+            # Require a schema reference (identifier-shaped atom) to follow.
+            if not self._match(
+                TokenType.IDENTIFIER,
+                TokenType.DELTA,
+                TokenType.XI,
+            ):
+                cur = self._current()
+                if cur.type == TokenType.EOF:
+                    raise ParserError(
+                        "Unexpected end of input after 'theta';"
+                        " expected schema name (e.g. theta S)",
+                        cur,
+                    )
+                raise ParserError(
+                    f"Expected schema name after theta,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            schema_ref = self._parse_atom()
+            return Theta(
+                expr=schema_ref,
+                line=theta_token.line,
+                column=theta_token.column,
+            )
 
         # Identifiers (including keywords allowed as function names)
         # Note: Function application expr(...) is handled in _parse_postfix()

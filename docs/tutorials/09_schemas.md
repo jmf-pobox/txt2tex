@@ -177,6 +177,49 @@ with `Counter` (a bare inclusion), even when both appear on the same line start.
 **See:** `examples/10_schemas/delta_xi_inclusion.txt` and
 `examples/10_schemas/schema_as_predicate.txt`
 
+### θ-Expression
+
+**Phase 1.2 feature.** The `theta S` expression constructs the binding whose
+components are the in-scope variables matching schema S's signature (Z RM §3.10).
+It is the standard way to pass or record a complete state snapshot.
+
+```text
+schema AddBooking
+  Delta AirlineState
+  bookingId? : BookingId
+  Booking
+where
+  bookings' = bookings oplus { bookingId? |-> theta Booking' }
+end
+```
+
+Here `theta Booking'` packages the after-state binding for the new booking.
+The unprimed form `theta S` refers to the before-state binding.
+
+The primed form `theta S'` is idiomatic for state-transition operations:
+
+```text
+schema SnapshotState
+  Xi AirlineState
+  snapshot! : AirlineState
+where
+  snapshot! = theta AirlineState
+end
+```
+
+**Rules:**
+
+- `theta` is lowercase (the Z RM operator is `\theta`, not `\Theta`).
+- `theta` is a reserved keyword: `theta'`, `theta?`, `theta!` are rejected
+  by the lexer.
+- The schema reference after `theta` may carry Phase-0 decoration: `theta S'`,
+  `theta S?` are valid if `S'` and `S?` are valid identifiers in scope.
+
+**Generated LaTeX:**  `theta S` emits `\theta S` — the standard Greek letter
+macro, compatible with both `fuzz.sty` and `zed-cm.sty`.
+
+**See:** `examples/10_schemas/theta_binding.txt`
+
 ## Schema Composition
 
 Combine schemas using operators:

@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- θ-expression (`theta` keyword) per Z RM §3.10.  `theta S` constructs the
+  binding whose components are the in-scope variables matching schema S's
+  signature.  Decorated forms such as `theta S'` and `theta Booking'` are
+  supported.  The keyword lexes as `THETA`, decoration is forbidden
+  (`theta'` raises `LexerError`), and the generator emits `\theta S` — the
+  standard Greek letter, compatible with both `fuzz.sty` and `--zed` mode.
+  New `Theta(expr)` AST node in `ast_nodes.py` (frozen dataclass).
+  25 new tests; new example `examples/10_schemas/theta_binding.txt` (round-trips
+  through fuzz cleanly).  Tutorial section and `USER_GUIDE.md` subsection added.
+
 - Schema inclusion in `axdef`, `schema`, and `gendef` declaration lists; `Delta`
   and `Xi` shorthand per Z RM §3.7 and §5.2. Three forms are supported:
   - bare: `Counter` on its own line brings the schema's components into scope

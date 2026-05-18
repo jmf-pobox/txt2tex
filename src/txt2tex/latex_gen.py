@@ -55,6 +55,7 @@ from txt2tex.ast_nodes import (
     Superscript,
     SyntaxBlock,
     SyntaxDefinition,
+    Theta,
     TruthTable,
     Tuple,
     TupleProjection,
@@ -936,6 +937,15 @@ class LaTeXGenerator:
         if self.use_fuzz:
             return f"`{escaped}'"
         return rf"\text{{`{escaped}'}}"
+
+    @generate_expr.register(Theta)
+    def _generate_theta(self, node: Theta, parent: Expr | None = None) -> str:
+        r"""Generate LaTeX for θ-expression (Z RM §3.10).
+
+        Emits ``\theta SchemaRef``.  The \theta macro is a standard LaTeX
+        Greek letter — no preamble change needed for either fuzz or zed mode.
+        """
+        return rf"\theta {self.generate_expr(node.expr, parent=node)}"
 
     @generate_expr.register(UnaryOp)
     def _generate_unary_op(self, node: UnaryOp, parent: Expr | None = None) -> str:
