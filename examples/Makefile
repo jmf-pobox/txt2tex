@@ -18,8 +18,9 @@ TEX_FILES := $(TXT_FILES:.txt=.tex)
 PDF_FILES := $(TXT_FILES:.txt=.pdf)
 
 # Subdirectory targets
-SUBDIRS := 01_propositional_logic 02_predicate_logic 03_equality 04_proof_trees \
-           05_sets 06_definitions 07_relations 08_functions 09_sequences fuzz_tests 
+SUBDIRS := 00_getting_started 01_propositional_logic 02_predicate_logic 03_equality \
+           04_proof_trees 05_sets 06_definitions 07_relations 08_functions \
+           09_sequences fuzz_tests
 
 # Set default goal to build all PDFs
 .DEFAULT_GOAL := all
@@ -44,7 +45,8 @@ $(SUBDIRS):
 	done
 
 # Convenient short aliases
-.PHONY: 01 02 03 04 05 06 07 08 09 fuzz
+.PHONY: 00 01 02 03 04 05 06 07 08 09 fuzz
+00: 00_getting_started
 01: 01_propositional_logic
 02: 02_predicate_logic
 03: 03_equality

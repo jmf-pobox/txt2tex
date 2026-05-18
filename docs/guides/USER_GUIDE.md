@@ -2250,6 +2250,39 @@ R^{n+1}          →  Rⁿ⁺¹        [braces group multi-char superscripts]
 
 **Why this limitation exists:** Fuzz's `\bsup...\esup` command is specifically for the `iter` operator, which applies a relation to itself n times. It expects a relation type, not a number type. See the Z Reference Manual section on `iter` for details.
 
+### Identifier Decoration
+
+Z notation uses trailing decoration characters as part of the identifier lexeme.
+This is the Z RM §3.3 convention for naming before-state, after-state, input,
+and output variables.
+
+| Decoration | Meaning | Example |
+|---|---|---|
+| `'` (prime) | After-state | `count'`, `s''` |
+| `?` | Input variable | `in?`, `x?` |
+| `!` | Output variable | `out!`, `y!` |
+
+Decorations may appear in any order and can be combined:
+
+```text
+schema StateOp
+  count, count' : N
+  in? : N
+  out! : N
+where
+  count' = count + in?
+  out! = count
+end
+```
+
+Multiple primes (`s''`) and mixed combinations (`x?'`) are all valid.
+The decoration characters are part of the identifier name; there is no
+space between the base name and its decoration.
+
+**Contrast with contractions:** apostrophes in English prose (inside TEXT
+blocks) are not treated as decoration. `don't` and `won't` pass through
+unchanged.
+
 ### Multi-Word Identifiers
 
 Underscores can be used for readable multi-word variable names:

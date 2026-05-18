@@ -1,0 +1,24 @@
+// ============================================================================
+// Example: String Literals (Phase 0 - DAT Support)
+// ============================================================================
+// Demonstrates the string literal lexeme in txt2tex.
+// String literals use single quotes in the source: 'sunk', 'survived'.
+//
+// The generator emits Z-convention quoting in output LaTeX:
+//   Standard mode: \text{`sunk'}
+//   Fuzz mode:     `sunk'
+//
+// This example uses TEXT blocks which pass apostrophes through unchanged.
+// For Z-expression string literals, see the DAT course examples.
+//
+// To compile:
+//   txt2tex examples/00_getting_started/string_literals.txt
+// ============================================================================
+
+=== String Literals in Z ===
+
+TEXT: In database modelling, constants often have string values. The txt2tex lexer recognises single-quoted strings as literal values distinct from identifiers.
+
+TEXT: A string literal like 'sunk' or 'survived' is a concrete value. When used in Z expressions, it renders with Z-convention quoting: backtick open, apostrophe close.
+
+TEXT: In this TEXT block, the apostrophes appear as written. In a Z expression block such as an axdef or schema predicate, 'sunk' would render as the Z string form.

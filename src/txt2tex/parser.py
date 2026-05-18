@@ -51,6 +51,7 @@ from txt2tex.ast_nodes import (
     SetComprehension,
     SetLiteral,
     Solution,
+    StringLit,
     Subscript,
     Superscript,
     SyntaxBlock,
@@ -824,7 +825,15 @@ class Parser:
             raise ParserError("Expected closing '===' for section", self._current())
 
         self._advance()  # Consume closing '==='
-        title = " ".join(title_parts)
+        # Reconstruct title, joining contraction/possessive suffixes directly
+        # (no space before tokens that start with apostrophe, e.g. "'s", "'t").
+        title_words: list[str] = []
+        for part in title_parts:
+            if part.startswith("'") and title_words:
+                title_words[-1] += part
+            else:
+                title_words.append(part)
+        title = " ".join(title_words)
         self._skip_newlines()
 
         # Parse section content until next section or end
@@ -853,7 +862,14 @@ class Parser:
             raise ParserError("Expected closing '**' for solution", self._current())
 
         self._advance()  # Consume closing '**'
-        number = " ".join(solution_parts)
+        # Reconstruct number, joining contraction/possessive suffixes directly.
+        number_words: list[str] = []
+        for part in solution_parts:
+            if part.startswith("'") and number_words:
+                number_words[-1] += part
+            else:
+                number_words.append(part)
+        number = " ".join(number_words)
         self._skip_newlines()
 
         # Parse solution content until next solution/section or end
@@ -3070,6 +3086,10 @@ class Parser:
             token = self._advance()
             return Number(value=token.value, line=token.line, column=token.column)
 
+        if self._match(TokenType.STRING):
+            token = self._advance()
+            return StringLit(value=token.value, line=token.line, column=token.column)
+
         if self._match(TokenType.LPAREN):
             return self._parse_parenthesized_expr_or_tuple()
 
@@ -3600,6 +3620,7 @@ class Parser:
 
         Syntax: axdef [X, Y] ... end
         Supports optional generic parameters and semicolon-separated declarations.
+        Comma-separated variable lists share a type: var1, var2 : Type.
         """
         start_token = self._advance()  # Consume 'axdef'
         self._skip_newlines()
@@ -3616,30 +3637,45 @@ class Parser:
                 self._advance()
                 continue
 
-            # Parse declaration: var : Type
+            # Parse declaration: var1, var2, ... : Type
             # Allow keywords as variable names in declarations (e.g., id, dom, ran)
             if (
                 self._match(TokenType.IDENTIFIER)
                 or self._is_keyword_usable_as_identifier()
             ):
+                var_tokens: list[Token] = []
                 var_token = self._current()
-                var_name = var_token.value
+                var_tokens.append(var_token)
                 self._advance()
+
+                # Consume additional comma-separated variable names
+                while self._match(TokenType.COMMA):
+                    self._advance()  # Consume ','
+                    if not (
+                        self._match(TokenType.IDENTIFIER)
+                        or self._is_keyword_usable_as_identifier()
+                    ):
+                        raise ParserError(
+                            "Expected variable name after ','", self._current()
+                        )
+                    var_tokens.append(self._current())
+                    self._advance()
 
                 if not self._match(TokenType.COLON):
                     raise ParserError("Expected ':' in declaration", self._current())
                 self._advance()  # Consume ':'
 
-                # Parse type expression
+                # Parse type expression (shared by all variables in the list)
                 type_expr = self._parse_expr()
 
-                declarations.append(
+                declarations.extend(
                     Declaration(
-                        variable=var_name,
+                        variable=vt.value,
                         type_expr=type_expr,
-                        line=var_token.line,
-                        column=var_token.column,
+                        line=vt.line,
+                        column=vt.column,
                     )
+                    for vt in var_tokens
                 )
 
                 # Check for semicolon separator (allows multiple declarations)
@@ -3701,30 +3737,45 @@ class Parser:
                 self._advance()
                 continue
 
-            # Parse declaration: var : Type
+            # Parse declaration: var1, var2, ... : Type
             # Allow keywords as variable names in declarations (e.g., id, dom, ran)
             if (
                 self._match(TokenType.IDENTIFIER)
                 or self._is_keyword_usable_as_identifier()
             ):
+                var_tokens: list[Token] = []
                 var_token = self._current()
-                var_name = var_token.value
+                var_tokens.append(var_token)
                 self._advance()
+
+                # Consume additional comma-separated variable names
+                while self._match(TokenType.COMMA):
+                    self._advance()  # Consume ','
+                    if not (
+                        self._match(TokenType.IDENTIFIER)
+                        or self._is_keyword_usable_as_identifier()
+                    ):
+                        raise ParserError(
+                            "Expected variable name after ','", self._current()
+                        )
+                    var_tokens.append(self._current())
+                    self._advance()
 
                 if not self._match(TokenType.COLON):
                     raise ParserError("Expected ':' in declaration", self._current())
                 self._advance()  # Consume ':'
 
-                # Parse type expression
+                # Parse type expression (shared by all variables in the list)
                 type_expr = self._parse_expr()
 
-                declarations.append(
+                declarations.extend(
                     Declaration(
-                        variable=var_name,
+                        variable=vt.value,
                         type_expr=type_expr,
-                        line=var_token.line,
-                        column=var_token.column,
+                        line=vt.line,
+                        column=vt.column,
                     )
+                    for vt in var_tokens
                 )
 
                 # Check for semicolon separator (allows multiple declarations)
@@ -3892,30 +3943,45 @@ class Parser:
                 self._advance()
                 continue
 
-            # Parse declaration: var : Type
+            # Parse declaration: var1, var2, ... : Type
             # Allow keywords as variable names in declarations (e.g., id, dom, ran)
             if (
                 self._match(TokenType.IDENTIFIER)
                 or self._is_keyword_usable_as_identifier()
             ):
+                var_tokens: list[Token] = []
                 var_token = self._current()
-                var_name = var_token.value
+                var_tokens.append(var_token)
                 self._advance()
+
+                # Consume additional comma-separated variable names
+                while self._match(TokenType.COMMA):
+                    self._advance()  # Consume ','
+                    if not (
+                        self._match(TokenType.IDENTIFIER)
+                        or self._is_keyword_usable_as_identifier()
+                    ):
+                        raise ParserError(
+                            "Expected variable name after ','", self._current()
+                        )
+                    var_tokens.append(self._current())
+                    self._advance()
 
                 if not self._match(TokenType.COLON):
                     raise ParserError("Expected ':' in declaration", self._current())
                 self._advance()  # Consume ':'
 
-                # Parse type expression
+                # Parse type expression (shared by all variables in the list)
                 type_expr = self._parse_expr()
 
-                declarations.append(
+                declarations.extend(
                     Declaration(
-                        variable=var_name,
+                        variable=vt.value,
                         type_expr=type_expr,
-                        line=var_token.line,
-                        column=var_token.column,
+                        line=vt.line,
+                        column=vt.column,
                     )
+                    for vt in var_tokens
                 )
 
                 # Check for semicolon separator (allows multiple declarations)

@@ -49,6 +49,7 @@ from txt2tex.ast_nodes import (
     SetComprehension,
     SetLiteral,
     Solution,
+    StringLit,
     Subscript,
     Superscript,
     SyntaxBlock,
@@ -916,6 +917,24 @@ class LaTeXGenerator:
     def _generate_number(self, node: Number, parent: Expr | None = None) -> str:
         """Generate LaTeX for number."""
         return node.value
+
+    @generate_expr.register(StringLit)
+    def _generate_string_lit(self, node: StringLit, parent: Expr | None = None) -> str:
+        r"""Generate LaTeX for a string literal using Z-convention quoting.
+
+        The Z convention is backtick-open, apostrophe-close: `value'
+
+        - Standard LaTeX: \text{`value'} (upright text in math mode)
+        - Fuzz mode:      `value'         (fuzz handles the backtick natively)
+
+        LaTeX special characters in the value are escaped to prevent malformed
+        output. Both paths use _escape_latex since { } \ # % $ & ~ ^ all have
+        special meaning inside LaTeX math and text modes.
+        """
+        escaped = self._escape_latex(node.value)
+        if self.use_fuzz:
+            return f"`{escaped}'"
+        return rf"\text{{`{escaped}'}}"
 
     @generate_expr.register(UnaryOp)
     def _generate_unary_op(self, node: UnaryOp, parent: Expr | None = None) -> str:

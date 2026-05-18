@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Identifier decoration (primes `'`, inputs `?`, outputs `!`) — Z RM §3.3
+  trailing-suffix rule. The identifier lexer now consumes any run of `'`, `?`,
+  `!` characters in any order after the alnum/underscore base (e.g., `count'`,
+  `in?`, `out!`, `x?'`, `s''`). This is the foundational change for SBM
+  (State-Based Modelling) course support.
+- String literal lexeme — a single-quoted value (`'sunk'`, `'survived'`) is
+  now tokenised as `STRING` and parsed as `StringLit`. The generator emits the
+  Z-convention quoting: `` `value' `` in fuzz mode and `\text{`value'}` in
+  standard LaTeX mode. This is the foundational change for DAT (Database
+  Design) course support.
+- Comma-separated variable lists in schema, axdef, and gendef declaration
+  blocks (`count, count' : N` declares two variables sharing one type).
+- Two new getting-started examples: `decorated_identifiers.txt` (SBM schema
+  probe) and `string_literals.txt` (DAT string literal syntax).
+- `examples/Makefile` now includes `00_getting_started` as a named target
+  with the short alias `00`.
+
 ## [1.2.0] - 2026-04-14
 
 ### Added

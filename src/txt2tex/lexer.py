@@ -67,6 +67,81 @@ KEYWORD_ALIASES: dict[str, TokenType] = {
     "subseteq": TokenType.SUBSET,
 }
 
+# All words the lexer treats as reserved — decoration is forbidden on these.
+# Includes KEYWORD_TO_TOKEN entries, KEYWORD_ALIASES, and all colon-postfix
+# pseudo-keywords matched by explicit string comparison in _scan_identifier.
+# Using frozenset signals immutability and gives O(1) membership tests.
+RESERVED_WORDS: frozenset[str] = frozenset(
+    {
+        # --- KEYWORD_TO_TOKEN entries ---
+        "land",
+        "lor",
+        "lnot",
+        "forall",
+        "exists1",
+        "exists",
+        "mu",
+        "lambda",
+        "notin",
+        "elem",
+        "psubset",
+        "union",
+        "intersect",
+        "cross",
+        "bigcup",
+        "bigcap",
+        "given",
+        "axdef",
+        "schema",
+        "gendef",
+        "zed",
+        "syntax",
+        "where",
+        "end",
+        "if",
+        "then",
+        "else",
+        "otherwise",
+        "comp",
+        "dom",
+        "ran",
+        "inv",
+        "id",
+        "shows",
+        "mod",
+        "P1",
+        "P",
+        "F1",
+        "F",
+        "filter",
+        "bag_union",
+        # --- KEYWORD_ALIASES ---
+        "subset",
+        "subseteq",
+        # --- Colon-postfix pseudo-keywords ---
+        "ARGUE",
+        "EQUIV",
+        "EQUAL",
+        "INFRULE",
+        "PROOF",
+        "TEXT",
+        "PURETEXT",
+        "LATEX",
+        "TRUTH",
+        "TABLE",
+        "TITLE",
+        "SUBTITLE",
+        "AUTHOR",
+        "DATE",
+        "INSTITUTION",
+        "CONTENTS",
+        "PARTS",
+        "BIBLIOGRAPHY",
+        "BIBLIOGRAPHY_STYLE",
+        "PAGEBREAK",
+    }
+)
+
 # Single-character tokens that don't require lookahead.
 # These can be dispatched directly without peek checks.
 # Note: Characters like (, [, {, |, ., :, +, -, *, = require lookahead
@@ -775,6 +850,32 @@ class Lexer:
             self._advance()
             return Token(TokenType.BAG_UNION, "⊎", start_line, start_column)
 
+        # Apostrophe handling: two distinct cases.
+        #
+        # 1. Contraction / possessive suffix: ' immediately follows an alnum char
+        #    (e.g., Morgan's — the preceding identifier was already returned, now
+        #    we see "'s").  Consume the apostrophe + trailing alpha run and emit
+        #    as IDENTIFIER so the section-title reconstructor sees "'s" as a token.
+        #
+        # 2. String literal: ' at a word boundary (preceded by non-alnum or at
+        #    start of input).  Scan as quoted string literal.
+        if char == "'":
+            prev_alnum = self.pos > 0 and self.text[self.pos - 1].isalnum()
+            if prev_alnum and self._peek_char().isalpha():
+                # Contraction suffix like "'s", "'t", "'re"
+                start_pos = self.pos
+                self._advance()  # consume '
+                while not self._at_end() and self._current_char().isalpha():
+                    self._advance()
+                return Token(
+                    TokenType.IDENTIFIER,
+                    self.text[start_pos : self.pos],
+                    start_line,
+                    start_column,
+                )
+            if not prev_alnum:
+                return self._scan_string_literal(start_line, start_column)
+
         # Unknown character
         raise LexerError(f"Unexpected character: {char!r}", self.line, self.column)
 
@@ -788,15 +889,60 @@ class Lexer:
             self._advance()  # consume '9'
             return Token(TokenType.CIRC, "o9", start_line, start_column)
 
-        # Include underscore in identifiers and apostrophes in contractions
-        # This allows multi-word identifiers like cumulative_total
-        # Subscripts like a_i are now handled in LaTeX generation
+        # Consume the alnum/underscore run.
         while not self._at_end():
             current = self._current_char()
             if current.isalnum() or current == "_":
                 self._advance()
-            elif current == "'" and self._peek_char().isalpha():
-                # Allow apostrophe if followed by a letter (contraction)
+            else:
+                break
+
+        # Consume any trailing decoration suffix per Z RM §3.3:
+        # primes ('), inputs (?), outputs (!).
+        #
+        # Rules:
+        #   - Decorations apply to names, not reserved keywords (Z RM §3.3).
+        #     If the alnum run is a keyword, raise LexerError before consuming.
+        #   - Primes are unlimited: s'', s''' are all valid.
+        #   - ? and ! appear at most once each (jms round-1 confirmation).
+        #     A second ? or ! raises LexerError.
+        #   - ' is consumed only when NOT followed by alpha, preserving English
+        #     possessives and contractions (Morgan's, don't).
+        # Note: '!=' is tokenised earlier as NOT_EQUAL; a bare '!' after an
+        # alnum run does not collide with that path.
+        base_end = self.pos  # position after the alnum run (before decoration)
+        base_value = self.text[start_pos:base_end]
+
+        # Reject decoration on reserved keywords (Z RM §3.3: names, not keywords).
+        # RESERVED_WORDS covers KEYWORD_TO_TOKEN, KEYWORD_ALIASES, and all
+        # colon-postfix pseudo-keywords (ARGUE, PROOF, TEXT, TRUTH, …).
+        if base_value in RESERVED_WORDS and not self._at_end():
+            next_ch = self._current_char()
+            if next_ch in ("'", "?", "!"):
+                # Point the error at the decoration character, not the keyword start.
+                deco_line = self.line
+                deco_column = self.column
+                msg = f"Cannot decorate reserved keyword {base_value!r}"
+                raise LexerError(msg, deco_line, deco_column)
+
+        seen_question = False
+        seen_bang = False
+        while not self._at_end():
+            current = self._current_char()
+            if current == "?":
+                if seen_question:
+                    # Point at the duplicate decoration character.
+                    msg = f"Multiple '?' decorators in identifier {base_value!r}"
+                    raise LexerError(msg, self.line, self.column)
+                seen_question = True
+                self._advance()
+            elif current == "!":
+                if seen_bang:
+                    msg = f"Multiple '!' decorators in identifier {base_value!r}"
+                    raise LexerError(msg, self.line, self.column)
+                seen_bang = True
+                self._advance()
+            elif current == "'" and not self._peek_char().isalpha():
                 self._advance()
             else:
                 break
@@ -1205,3 +1351,32 @@ class Lexer:
 
         value = self.text[start_pos : self.pos]
         return Token(TokenType.NUMBER, value, start_line, start_column)
+
+    def _scan_string_literal(self, start_line: int, start_column: int) -> Token:
+        """Scan a single-quoted string literal, handling \\' escape sequences.
+
+        The opening quote has already been identified as the current char.
+        Raises LexerError for unterminated strings (newline or EOF before closing ').
+        The token value carries the content with escape sequences resolved.
+        """
+        self._advance()  # consume opening '
+        content: list[str] = []
+        while True:
+            if self._at_end() or self._current_char() == "\n":
+                raise LexerError(
+                    "Unterminated string literal",
+                    start_line,
+                    start_column,
+                )
+            ch = self._current_char()
+            if ch == "\\" and self._peek_char() == "'":
+                self._advance()  # consume backslash
+                self._advance()  # consume escaped apostrophe
+                content.append("'")
+            elif ch == "'":
+                self._advance()  # consume closing '
+                break
+            else:
+                content.append(ch)
+                self._advance()
+        return Token(TokenType.STRING, "".join(content), start_line, start_column)

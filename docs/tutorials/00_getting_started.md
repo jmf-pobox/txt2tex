@@ -353,15 +353,50 @@ cat your_file.log | grep -i error
 
 **Solution:** Compare your syntax with examples in the `examples/` directory.
 
+## Identifier Decoration (`'`, `?`, `!`)
+
+Z notation uses decorated identifiers to distinguish before-state, after-state, input, and output variables within a schema. The decoration characters are part of the identifier lexeme.
+
+```text
+schema StateOp
+  count, count' : N
+  in? : N
+  out! : N
+where
+  count' = count + in?
+  out! = count
+end
+```
+
+A trailing `'` (prime) marks the after-state. A trailing `?` marks an input variable. A trailing `!` marks an output variable. Multiple primes (`s''`) and mixed suffixes (`x?'`) are all valid.
+
+See `examples/00_getting_started/decorated_identifiers.txt` for a runnable example.
+
+## String Literals
+
+String literals represent concrete text values in Z expressions. Write them with single quotes in the source:
+
+```text
+mode = 'active'
+```
+
+The generator emits Z-convention quoting: `` `active' `` in fuzz mode, `\text{`active'}` in standard LaTeX mode.
+
+Note: apostrophes in TEXT blocks (prose paragraphs) are not treated as string literals — `don't` and `won't` pass through unchanged.
+
+See `examples/00_getting_started/string_literals.txt` for a runnable example.
+
 ## Summary
 
 You've learned:
 
-- ✅ How to install and run txt2tex
-- ✅ Basic document structure (sections, TEXT blocks)
-- ✅ Simple mathematical notation
-- ✅ The compilation workflow
-- ✅ Common patterns and mistakes
+- How to install and run txt2tex
+- Basic document structure (sections, TEXT blocks)
+- Simple mathematical notation
+- The compilation workflow
+- Common patterns and mistakes
+- Identifier decoration for Z state-based modelling
+- String literal syntax
 
 **Next Tutorial:** [Tutorial 1: Propositional Logic](01_propositional_logic.md)
 

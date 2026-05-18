@@ -1,0 +1,27 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{String Literals in Z}
+
+\noindent In database modelling, constants often have string values. The txt2tex lexer recognises single-quoted strings as literal values distinct from identifiers.
+
+\bigskip
+
+\noindent A string literal like 'sunk' or 'survived' is a concrete value. When used in Z expressions, it renders with Z-convention $quoting : backtick open$, apostrophe close.
+
+\bigskip
+
+\noindent In this TEXT block, the apostrophes appear as written. In a Z expression block such as an axdef or schema predicate, 'sunk' would render as the Z string form.
+
+\bigskip
+
+\end{document}

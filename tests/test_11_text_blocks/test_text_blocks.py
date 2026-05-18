@@ -397,3 +397,21 @@ def test_latex_empty() -> None:
     assert len(result.items) == 1
     assert isinstance(result.items[0], LatexBlock)
     assert result.items[0].latex == ""
+
+
+# ---------------------------------------------------------------------------
+# Phase 0 regression: contractions in TEXT blocks must not break
+# ---------------------------------------------------------------------------
+
+
+def test_contractions_in_text_block() -> None:
+    """don't and won't inside TEXT: produce unchanged prose output."""
+    text = "TEXT: don't and won't cause issues."
+    lexer = Lexer(text)
+    tokens = lexer.tokenize()
+    parser = Parser(tokens)
+    result = parser.parse()
+    gen = LaTeXGenerator()
+    latex = gen.generate_document(result)
+    assert "don't" in latex
+    assert "won't" in latex

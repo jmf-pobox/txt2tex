@@ -57,6 +57,18 @@ class Number(ASTNode):
     value: str
 
 
+@dataclass(frozen=True)
+class StringLit(ASTNode):
+    """String literal node ('quoted value').
+
+    Carries the content between the single quotes, with escape sequences
+    already resolved (\\' → ').  The generator emits the Z-convention
+    LaTeX-quote form: \\text{`value'}.
+    """
+
+    value: str
+
+
 # Quantifier expression nodes
 
 
@@ -454,6 +466,7 @@ Expr = (
     | UnaryOp
     | Identifier
     | Number
+    | StringLit
     | Quantifier
     | Subscript
     | Superscript

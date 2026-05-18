@@ -128,6 +128,7 @@ class TokenType(Enum):
     # Identifiers and literals
     IDENTIFIER = auto()
     NUMBER = auto()
+    STRING = auto()  # 'quoted string literal'
 
     # Document structure (Phase 1)
     SECTION_MARKER = auto()  # ===

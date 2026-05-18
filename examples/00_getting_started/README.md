@@ -15,6 +15,8 @@ These examples demonstrate the basics of txt2tex syntax and workflow:
 - `hello_world.txt` - Your first txt2tex document: a section header, a TEXT block, and one formula
 - `first_proof.txt` - A simple natural deduction proof using PROOF: blocks
 - `basic_z_notation.txt` - Introduction to Z notation: given types, abbreviations, axdef, and schemas
+- `decorated_identifiers.txt` - Z identifier decoration: primes (`'`), inputs (`?`), outputs (`!`) in a schema
+- `string_literals.txt` - String literal syntax: single-quoted values rendered with Z-convention quoting
 
 ## Workflow
 
