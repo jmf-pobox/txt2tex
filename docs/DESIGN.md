@@ -1322,6 +1322,48 @@ customerId? : CustomerId \\
 routeId? : RouteId
 ```
 
+## ADR: Horizontal Schema Definition RHS (Phase 1.3)
+
+**Decision**: Represent the RHS of `Name defs RHS` as a union type
+`Expr | SchemaInclusion` in `HorizDef.body`, not as a strict `Expr`.
+
+**Context**: Z RM §3.8 allows the RHS of a horizontal definition to be any
+*schema expression*, which includes `Delta S` and `Xi S` — decorated schema
+references.  In txt2tex, `Delta S` and `Xi S` inside schema/axdef declaration
+lists are represented as `SchemaInclusion` nodes (not `Expr` nodes) to preserve
+semantic information about the decoration.
+
+**Options considered**:
+
+1. Add `SchemaInclusion` to the `Expr` union — rejected because `SchemaInclusion`
+   carries list-of-`Expr` generics, making the union circular and causing cascading
+   mypy narrowing failures throughout the existing codebase.
+
+2. Represent `Delta S` on the RHS as a `BinaryOp` or custom node — rejected
+   because it loses the structural information about the Delta/Xi decoration.
+
+3. Type `HorizDef.body` as `Expr | SchemaInclusion` — accepted.  The generator
+   handles both with a two-branch `isinstance` check; mypy and pyright are both
+   satisfied.
+
+**Inline schema text RHS**: The `SchemaText(declarations, predicates)` frozen
+dataclass is added to the `Expr` union.  It is only produced by
+`_parse_schema_text()` and only consumed in the `HorizDef` body slot; it does
+not appear in other expression positions.  The generator converts it to the
+bracket form `[ decl1; decl2 | pred1 \land pred2 ]`.
+
+**Predicate separator in inline schema text**: Z RM §3.6 uses `;` to separate
+predicates within a schema text.  The inline text parser accepts `;` as the
+predicate separator; the generator joins predicates with `\land` (logical AND)
+as a conservative choice, since fuzz parses both forms equivalently at the
+type-checker level and `\land` is the standard mathematical rendering.
+
+**`defs` as a prose-detection bypass**: The prose-detection heuristic for
+one-letter identifiers like `A` at column 1 checks a hardcoded set of Z
+keywords to decide whether the following token is an operator (not prose).
+`defs` was added to that set so that `A defs B` at column 1 is tokenised
+correctly rather than captured as a `TEXT` token.
+
 ## Future Enhancements
 
 1. **Export formats**

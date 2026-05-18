@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Horizontal schema definitions (`defs` keyword) per Z RM §3.8.
+  `Name [generics]? defs RHS` produces `\begin{zed} Name \defs RHS \end{zed}`.
+  Two RHS forms are supported:
+  - Schema reference (plain, Delta-decorated, or Xi-decorated):
+    `OpAlias defs Delta Counter` → `OpAlias \defs \Delta Counter`
+  - Inline schema text `[ decl-list | pred-list ]`:
+    `NatPair defs [ x, y : N | x < y ]`
+  Generic type parameters on the LHS are written in square brackets:
+  `StackAlias[X] defs GenStack[X]`.  Multiple predicates in the inline text
+  are separated by `;` in the source and joined with `\land` in the output.
+  The `\defs` macro is defined in `fuzz.sty` line 280 as `\widehat=` — no
+  preamble addition is needed.  New `HorizDef` and `SchemaText` AST nodes;
+  `DEFS` token type; `defs` in `RESERVED_WORDS` (decoration forbidden).
+  41 new tests; new example `examples/10_schemas/horizontal_defs.txt`
+  (round-trips through fuzz cleanly).  Tutorial section in
+  `docs/tutorials/09_schemas.md` and `USER_GUIDE.md` subsection added.
+
 - θ-expression (`theta` keyword) per Z RM §3.10.  `theta S` constructs the
   binding whose components are the in-scope variables matching schema S's
   signature.  Decorated forms such as `theta S'` and `theta Booking'` are

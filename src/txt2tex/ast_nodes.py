@@ -480,6 +480,34 @@ class Theta(ASTNode):
     expr: Expr  # Schema reference (typically a decorated Identifier)
 
 
+@dataclass(frozen=True)
+class SchemaText(ASTNode):
+    r"""Inline schema text in a horizontal definition (Z RM §3.8).
+
+    Written as ``[ decl-list | pred-list ]`` on the RHS of a ``defs``
+    paragraph.  Combines a declaration section with an optional predicate
+    section in a single bracket form.
+
+    Examples:
+    - [ x, y : N | x < y ]
+      -> declarations=[Declaration("x", N), Declaration("y", N)]
+         predicates=[BinaryOp("<", x, y)]
+    - [ x : N | x > 0; x < 100 ]
+      -> declarations=[Declaration("x", N)]
+         predicates=[BinaryOp(">", x, 0), BinaryOp("<", x, 100)]
+
+    LaTeX rendering: [ decl1; decl2 | pred1 \land pred2 ]
+
+    Note: ``predicates`` is a flat list.  Z RM §3.6 separates predicates
+    within a schema text with ``;``; those are collected here in order.
+    Blank-line grouping (for ``\also`` generation) is not applicable to
+    the inline form, so no nested list structure is needed.
+    """
+
+    declarations: list[Declaration | SchemaInclusion]
+    predicates: list[Expr]  # Flat list; ';' separated in source
+
+
 # Type alias for all expression types
 Expr = (
     BinaryOp
@@ -506,6 +534,7 @@ Expr = (
     | GuardedBranch
     | GuardedCases
     | Theta
+    | SchemaText
 )
 
 
@@ -797,6 +826,33 @@ class Schema(ASTNode):
     generic_params: list[str] | None = None  # Optional generic parameters
 
 
+@dataclass(frozen=True)
+class HorizDef(ASTNode):
+    r"""Horizontal schema definition (Z RM §3.8).
+
+    ``Name [generics]? defs RHS`` renders as
+    ``\begin{zed} Name \defs RHS \end{zed}``.
+
+    The RHS is either:
+    - A schema reference: an Identifier (possibly decorated, possibly with
+      generic instantiation).  Example: ``OpAlias defs Delta Counter``.
+    - An inline schema text: ``SchemaText`` node produced by ``[ decls | preds ]``.
+      Example: ``NatPair defs [ x, y : N | x < y ]``.
+
+    Examples:
+    - OpAlias defs Delta Counter
+      -> name="OpAlias", generics=None, body=SchemaInclusion("Counter", "delta")
+    - Stack[X] defs [s : seq X | true]
+      -> name="Stack", generics=["X"], body=SchemaText(...)
+    """
+
+    name: str  # LHS schema name
+    generics: list[str] | None  # Optional generic parameter names
+    # RHS: Identifier, GenericInstantiation, SchemaInclusion, or SchemaText.
+    # SchemaInclusion covers Delta/Xi decorated references (Z RM §3.8 examples).
+    body: Expr | SchemaInclusion
+
+
 # Proof tree nodes
 
 
@@ -935,6 +991,7 @@ DocumentItem = (
     | AxDef
     | GenDef
     | Schema
+    | HorizDef
     | Zed
     | ProofTree
 )

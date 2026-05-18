@@ -39,6 +39,7 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     "Delta": TokenType.DELTA,
     "Xi": TokenType.XI,
     "theta": TokenType.THETA,
+    "defs": TokenType.DEFS,
     # Conditional expression keywords
     "if": TokenType.IF,
     "then": TokenType.THEN,
@@ -104,6 +105,7 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "Delta",
         "Xi",
         "theta",
+        "defs",
         "if",
         "then",
         "else",
@@ -1325,6 +1327,7 @@ class Lexer:
                         "else",
                         "otherwise",
                         "mod",
+                        "defs",
                     }
 
                     # If next word is NOT a Z keyword, treat as prose

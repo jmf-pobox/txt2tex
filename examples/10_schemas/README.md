@@ -115,6 +115,38 @@ end
 **Rule:** `theta` is a reserved keyword.  `theta'`, `theta?`, `theta!`
 are not valid — the lexer rejects them.
 
+## Horizontal Schema Definitions (Phase 1.3)
+
+The `defs` keyword writes a Z RM §3.8 horizontal definition — a single-line
+form that assigns a name to a schema expression without a boxed paragraph.
+
+Two RHS forms:
+
+```text
+// Schema reference (possibly decorated)
+OpAlias defs Delta Counter
+
+// Inline schema text
+NatPair defs [ x, y : N | x < y ]
+```
+
+Both forms emit `\begin{zed} Name \defs RHS \end{zed}`.
+
+The `\defs` macro (defined in `fuzz.sty` as `\widehat=`) is available without
+any preamble additions.
+
+Generic type parameters on the LHS are written in square brackets:
+
+```text
+StackAlias[X] defs GenStack[X]
+```
+
+Multiple predicates in an inline schema text are separated by `;`:
+
+```text
+BoundedNat defs [n : N | n > 0; n < 100]
+```
+
 ## Examples in This Directory
 
 Browse the `.txt` files to see:
@@ -126,12 +158,13 @@ Browse the `.txt` files to see:
 - **delta_xi_inclusion.txt** — Δ/Ξ airline booking probe (Phase 1.1)
 - **schema_as_predicate.txt** — schema conjunction in where clause (Phase 1.1)
 - **theta_binding.txt** — θ-expression in state-transition operations (Phase 1.2)
+- **horizontal_defs.txt** — horizontal schema definitions with `defs` (Phase 1.3)
 
 ## See Also
 
-- **docs/guides/USER_GUIDE.md** - Section "Schema Inclusion (Bare, Δ, Ξ)" and
-  subsection "θ-Expression"
-- **docs/tutorials/09_schemas.md** - Section "Schema Inclusion and Δ/Ξ" and
-  subsection "θ-Expression"
+- **docs/guides/USER_GUIDE.md** - Section "Schema Inclusion (Bare, Δ, Ξ)",
+  subsection "θ-Expression", and subsection "Horizontal Schema Definitions"
+- **docs/tutorials/09_schemas.md** - Section "Schema Inclusion and Δ/Ξ",
+  subsection "θ-Expression", and subsection "Horizontal Schema Definitions"
 - **Previous**: 09_sequences/
 - **Next**: 11_text_blocks/

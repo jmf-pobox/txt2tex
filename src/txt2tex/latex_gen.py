@@ -28,6 +28,7 @@ from txt2tex.ast_nodes import (
     GivenType,
     GuardedBranch,
     GuardedCases,
+    HorizDef,
     Identifier,
     InfruleBlock,
     Lambda,
@@ -45,6 +46,7 @@ from txt2tex.ast_nodes import (
     RelationalImage,
     Schema,
     SchemaInclusion,
+    SchemaText,
     Section,
     SequenceLiteral,
     SetComprehension,
@@ -946,6 +948,16 @@ class LaTeXGenerator:
         Greek letter — no preamble change needed for either fuzz or zed mode.
         """
         return rf"\theta {self.generate_expr(node.expr, parent=node)}"
+
+    @generate_expr.register(SchemaText)
+    def _generate_schema_text_expr(
+        self, node: SchemaText, parent: Expr | None = None
+    ) -> str:
+        """Generate LaTeX for an inline schema text used as an Expr.
+
+        Delegates to ``_generate_schema_text`` which returns the bracket form.
+        """
+        return self._generate_schema_text(node)
 
     @generate_expr.register(UnaryOp)
     def _generate_unary_op(self, node: UnaryOp, parent: Expr | None = None) -> str:
@@ -4403,6 +4415,85 @@ class LaTeXGenerator:
         lines.append(r"\end{schema}")
         lines.append("")
 
+        return lines
+
+    def _generate_schema_text(self, node: SchemaText) -> str:
+        r"""Return the LaTeX fragment for an inline schema text body.
+
+        Emits: ``[ decl1; decl2 | pred1 \land pred2 ]``
+
+        Declaration separator is ``;`` (Z RM §3.6).  Predicates are joined
+        with ``\land``.  When there are no predicates the form is
+        ``[ decl1; decl2 ]``.
+        """
+        # Build declaration fragment
+        decl_parts: list[str] = []
+        for decl in node.declarations:
+            if isinstance(decl, SchemaInclusion):
+                decl_parts.append(self._emit_schema_inclusion(decl))
+            else:
+                var_latex = self._generate_identifier(
+                    Identifier(line=0, column=0, name=decl.variable)
+                )
+                type_latex = self.generate_expr(decl.type_expr)
+                decl_parts.append(f"{var_latex} : {type_latex}")
+
+        decl_str = "; ".join(decl_parts)
+
+        # Build predicate fragment — flat list, joined with \land
+        all_preds: list[str] = [
+            self.generate_expr(pred, parent=None) for pred in node.predicates
+        ]
+
+        if not all_preds:
+            return f"[ {decl_str} ]"
+
+        pred_str = r" \land ".join(all_preds)
+        return f"[ {decl_str} | {pred_str} ]"
+
+    @generate_document_item.register(HorizDef)
+    def _generate_horiz_def(self, node: HorizDef) -> list[str]:
+        r"""Generate LaTeX for a horizontal schema definition.
+
+        Emits::
+
+            \begin{zed}
+            Name \defs RHS
+            \end{zed}
+
+        or, when generics are present::
+
+            \begin{zed}
+            Name[X, Y] \defs RHS
+            \end{zed}
+
+        The ``\defs`` macro is defined in fuzz.sty (line 280) as
+        ``\widehat=`` — no preamble addition needed.
+        """
+        lines: list[str] = []
+
+        # Build LHS
+        name_latex = self._generate_identifier(
+            Identifier(line=node.line, column=node.column, name=node.name)
+        )
+        if node.generics:
+            params_str = ", ".join(node.generics)
+            lhs = f"{name_latex}[{params_str}]"
+        else:
+            lhs = name_latex
+
+        # Build RHS
+        if isinstance(node.body, SchemaText):
+            rhs = self._generate_schema_text(node.body)
+        elif isinstance(node.body, SchemaInclusion):
+            rhs = self._emit_schema_inclusion(node.body)
+        else:
+            rhs = self.generate_expr(node.body)
+
+        lines.append("\\begin{zed}")
+        lines.append(f"{lhs} \\defs {rhs}")
+        lines.append("\\end{zed}")
+        lines.append("")
         return lines
 
     @generate_document_item.register(ProofTree)

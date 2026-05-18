@@ -167,6 +167,7 @@ class TokenType(Enum):
     DELTA = auto()  # Delta (schema inclusion with before/after state)
     XI = auto()  # Xi (schema inclusion, read-only operation)
     THETA = auto()  # theta (binding expression, Z RM §3.10)
+    DEFS = auto()  # defs (horizontal schema definition, Z RM §3.8)
 
     # Conditional expressions (Phase 16)
     IF = auto()  # if

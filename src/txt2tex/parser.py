@@ -30,6 +30,7 @@ from txt2tex.ast_nodes import (
     GivenType,
     GuardedBranch,
     GuardedCases,
+    HorizDef,
     Identifier,
     InfruleBlock,
     Lambda,
@@ -47,6 +48,7 @@ from txt2tex.ast_nodes import (
     RelationalImage,
     Schema,
     SchemaInclusion,
+    SchemaText,
     Section,
     SequenceLiteral,
     SetComprehension,
@@ -201,6 +203,7 @@ class Parser:
             )
 
         # Check for abbreviation (identifier ==) or free type (identifier ::=)
+        # or horizontal schema definition (identifier [generics]? defs ...)
         # Note: Partial support for compound identifiers like "R+ =="
         # (GitHub #3 still open)
         if self._match(TokenType.IDENTIFIER):
@@ -226,6 +229,35 @@ class Parser:
                 # Single free type
                 return Document(
                     items=[first_free_type],
+                    title_metadata=None,
+                    parts_format=parts_format,
+                    bibliography_metadata=None,
+                    line=first_line,
+                    column=1,
+                )
+            # Detect horizontal schema definition: Name defs ... or Name[X] defs ...
+            is_horiz = next_token.type == TokenType.DEFS or (
+                next_token.type == TokenType.LBRACKET
+                and self._scan_for_defs_after_brackets(offset=1)
+            )
+            if is_horiz:
+                first_hd = self._parse_horiz_def()
+                self._skip_newlines()
+                if not self._at_end():
+                    items_with_hd: list[DocumentItem] = [first_hd]
+                    while not self._at_end():
+                        items_with_hd.append(self._parse_document_item())
+                        self._skip_newlines()
+                    return Document(
+                        items=items_with_hd,
+                        title_metadata=None,
+                        parts_format=parts_format,
+                        bibliography_metadata=None,
+                        line=first_line,
+                        column=1,
+                    )
+                return Document(
+                    items=[first_hd],
                     title_metadata=None,
                     parts_format=parts_format,
                     bibliography_metadata=None,
@@ -626,6 +658,7 @@ class Parser:
             )
 
         # Check for abbreviation (identifier == expr) or free type (identifier ::= ...)
+        # or horizontal schema definition (identifier [generics]? defs ...)
         # Note: Partial support for compound identifiers like "R+ =="
         # (GitHub #3 still open)
         if self._match(TokenType.IDENTIFIER):
@@ -633,6 +666,12 @@ class Parser:
             next_token = self._peek_ahead(1)
             if next_token.type == TokenType.FREE_TYPE:
                 return self._parse_free_type()
+            # Detect horizontal schema definition: Name defs ... or Name[X] defs ...
+            if next_token.type == TokenType.DEFS:
+                return self._parse_horiz_def()
+            has_generics = next_token.type == TokenType.LBRACKET
+            if has_generics and self._scan_for_defs_after_brackets(offset=1):
+                return self._parse_horiz_def()
             # Check for abbreviation with or without postfix operator
             # Cases: "R ==", "R+ ==", "R* ==", "R~ ==" (partial support, GitHub #3 open)
             is_abbrev = next_token.type == TokenType.ABBREV
@@ -3728,6 +3767,263 @@ class Parser:
             groups=groups,
             line=start_token.line,
             column=start_token.column,
+        )
+
+    def _scan_for_defs_after_brackets(self, offset: int) -> bool:
+        """Return True when a balanced bracket group starting at ``offset`` is
+        followed immediately by a DEFS token.
+
+        Used for lookahead disambiguation: ``Name[X, Y] defs ...`` is a
+        horizontal definition, not an expression.  The bracket group at
+        ``offset`` must start with LBRACKET; the scan terminates as soon as
+        bracket depth returns to zero and checks the next token for DEFS.
+
+        Returns False on any unexpected terminator (EOF, NEWLINE, etc.).
+        Generic parameters must be on the same line as the name — a NEWLINE
+        inside the bracket group ends the scan and returns False.
+        """
+        tok = self._peek_ahead(offset)
+        if tok.type != TokenType.LBRACKET:
+            return False
+        depth = 1
+        offset += 1
+        while depth > 0:
+            tok = self._peek_ahead(offset)
+            if tok.type in (TokenType.EOF, TokenType.NEWLINE):
+                return False
+            if tok.type == TokenType.LBRACKET:
+                depth += 1
+            elif tok.type == TokenType.RBRACKET:
+                depth -= 1
+            offset += 1
+        return self._peek_ahead(offset).type == TokenType.DEFS
+
+    def _parse_horiz_def_generic_params(self) -> list[str] | None:
+        """Parse optional generic LHS parameters for a horizontal definition.
+
+        Identical to ``_parse_generic_params`` but records the opening bracket
+        token for an improved error message when the bracket is not closed.
+
+        Returns None when no ``[`` is present.
+        """
+        if not self._match(TokenType.LBRACKET):
+            return None
+
+        open_tok = self._advance()  # Consume '[', save for error reporting
+        params: list[str] = []
+
+        while not self._match(TokenType.RBRACKET) and not self._at_end():
+            if self._match(TokenType.COMMA):
+                self._advance()  # Skip comma
+                continue
+
+            if self._match(TokenType.NEWLINE, TokenType.EOF):
+                raise ParserError(
+                    "unclosed '[' in generic parameter list for horizontal definition",
+                    open_tok,
+                )
+
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError(
+                    "expected type parameter name in generic list",
+                    self._current(),
+                )
+
+            params.append(self._current().value)
+            self._advance()
+
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "unclosed '[' in generic parameter list for horizontal definition",
+                open_tok,
+            )
+        self._advance()  # Consume ']'
+
+        return params if params else None
+
+    def _parse_horiz_def(self) -> HorizDef:
+        """Parse horizontal schema definition: Name [X, Y]? defs RHS.
+
+        Per Z RM §3.8, the RHS is one of:
+        - A schema reference — an identifier, possibly Phase-0 decorated
+          (e.g. ``Counter'``, ``Delta Counter``).
+        - An inline schema text ``[ decl-list | pred-list ]``.
+
+        Schema-calculus operators (;, >>, hide, project) are Phase 3.2 and
+        are NOT parsed here.
+        """
+        start_tok = self._current()
+
+        # Consume the LHS name
+        if not self._match(TokenType.IDENTIFIER):
+            raise ParserError(
+                "expected schema name for horizontal definition", start_tok
+            )
+        name_tok = self._advance()
+        name = name_tok.value
+
+        # Optional generic parameters on the LHS: Name[X, Y]
+        generics = self._parse_horiz_def_generic_params()
+
+        # Consume 'defs'
+        if not self._match(TokenType.DEFS):
+            raise ParserError(
+                "expected 'defs' in horizontal schema definition",
+                self._current(),
+            )
+        self._advance()  # Consume 'defs'
+
+        # --- Parse RHS ---
+        if self._at_end() or self._match(TokenType.NEWLINE):
+            raise ParserError(
+                "expected RHS after 'defs' in horizontal schema definition",
+                self._current(),
+            )
+
+        body: Expr | SchemaInclusion
+        if self._match(TokenType.LBRACKET):
+            body = self._parse_schema_text()
+        else:
+            body = self._parse_horiz_def_rhs()
+
+        return HorizDef(
+            name=name,
+            generics=generics,
+            body=body,
+            line=start_tok.line,
+            column=start_tok.column,
+        )
+
+    def _parse_horiz_def_rhs(self) -> Expr | SchemaInclusion:
+        """Parse a schema reference on the RHS of a horizontal definition.
+
+        Accepts:
+        - A plain identifier (possibly Phase-0 decorated).
+        - ``Delta Name [generics]?`` or ``Xi Name [generics]?`` — schema
+          inclusions used as the RHS (legal in Z RM §3.8 examples).
+        - A generic instantiation: ``Name[T]`` produced by ``_parse_atom``.
+
+        Returns an Expr node or SchemaInclusion for Delta/Xi decorated forms.
+        """
+        # Delta / Xi decorated reference → SchemaInclusion
+        if self._match(TokenType.DELTA, TokenType.XI):
+            start_tok = self._current()
+            decoration = "delta" if self._match(TokenType.DELTA) else "xi"
+            self._advance()  # Consume Delta / Xi
+            if not self._match(TokenType.IDENTIFIER):
+                cur = self._current()
+                kw = "Delta" if decoration == "delta" else "Xi"
+                raise ParserError(
+                    f"expected schema name after {kw},"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            name_tok = self._advance()
+            generics = self._parse_inclusion_generic_args()
+            return SchemaInclusion(
+                name=name_tok.value,
+                decoration=decoration,
+                generics=generics,
+                line=start_tok.line,
+                column=start_tok.column,
+            )
+
+        # Plain identifier or generic instantiation (e.g. Stack[N]) —
+        # _parse_postfix handles the optional [type_params] suffix.
+        return self._parse_postfix()
+
+    def _parse_schema_text(self) -> SchemaText:
+        r"""Parse an inline schema text: ``[ decl-list | pred-list ]``.
+
+        The bracket has already been detected but NOT consumed when this
+        method is called.  Grammar:
+
+            schema_text ::= '[' decl (';' decl)* '|' pred (';' pred)* ']'
+
+        The declaration forms are the same three supported inside schema and
+        axdef bodies.  Multiple predicates are separated by ``;``.
+        """
+        open_tok = self._advance()  # Consume '['
+
+        # --- Declaration section ---
+        declarations: list[Declaration | SchemaInclusion] = []
+
+        while not self._at_end() and not self._match(
+            TokenType.PIPE, TokenType.RBRACKET
+        ):
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+                continue
+            if self._match(TokenType.SEMICOLON):
+                self._advance()  # Declaration separator
+                continue
+
+            if (
+                self._match(TokenType.DELTA, TokenType.XI)
+                or self._match(TokenType.IDENTIFIER)
+                or self._is_keyword_usable_as_identifier()
+            ):
+                result = self._parse_declaration_or_inclusion()
+                if isinstance(result, list):
+                    declarations.extend(result)
+                else:
+                    declarations.append(result)
+            else:
+                cur = self._current()
+                raise ParserError(
+                    f"expected declaration or '|' in inline schema text,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+
+        # FIX 2: empty declaration list is a syntax error
+        if not declarations:
+            raise ParserError(
+                "inline schema text requires at least one declaration",
+                open_tok,
+            )
+
+        # --- Predicate separator '|' ---
+        if self._at_end():
+            raise ParserError(
+                "unclosed inline schema text '[' — expected '|' then ']'", open_tok
+            )
+        if self._match(TokenType.RBRACKET):
+            # No predicate section — parse as [ decls ] (no pipe)
+            self._advance()  # Consume ']'
+            return SchemaText(
+                declarations=declarations,
+                predicates=[],
+                line=open_tok.line,
+                column=open_tok.column,
+            )
+
+        self._advance()  # Consume '|'
+
+        # --- Predicate section (flat list; ';' and newlines are separators) ---
+        predicates: list[Expr] = []
+
+        while not self._at_end() and not self._match(TokenType.RBRACKET):
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+                continue
+            if self._match(TokenType.SEMICOLON):
+                self._advance()
+                continue
+
+            predicates.append(self._parse_expr())
+
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "unclosed inline schema text '[' — expected closing ']'", open_tok
+            )
+        self._advance()  # Consume ']'
+
+        return SchemaText(
+            declarations=declarations,
+            predicates=predicates,
+            line=open_tok.line,
+            column=open_tok.column,
         )
 
     def _parse_generic_params(self) -> list[str] | None:

@@ -2146,6 +2146,41 @@ end
 
 **See:** `examples/10_schemas/theta_binding.txt`
 
+#### Horizontal Schema Definitions (`defs`)
+
+`Name [generics]? defs RHS` writes a Z RM §3.8 *horizontal definition* —
+assigns a new name to a schema expression without a boxed schema environment.
+
+```text
+OpAlias defs Delta Counter
+NatPair defs [ x, y : N | x < y ]
+StackAlias[X] defs GenStack[X]
+```
+
+| Aspect | Detail |
+|--------|--------|
+| Keyword | `defs` (lowercase, reserved) |
+| Output environment | `\begin{zed} Name \defs RHS \end{zed}` |
+| `\defs` macro | Defined in `fuzz.sty` line 280 as `\widehat=` |
+| RHS: schema reference | Plain or decorated (`Delta`/`Xi`) identifier |
+| RHS: inline schema text | `[ decl-list \| pred-list ]` |
+| Generic LHS | `Name[X, Y] defs RHS` |
+| Decoration of keyword | Forbidden — `defs'` raises LexerError |
+| Phase 3.2 operators | `;`, `>>`, hide, project on RHS not yet supported |
+
+**Inline schema text:** declarations are separated by `;`; predicates are
+separated by `;` in the source and joined with `\land` in the output.
+
+```text
+BoundedNat defs [n : N | n > 0; n < 100]
+// → BoundedNat \defs [ n : \nat | n > 0 \land n < 100 ]
+```
+
+**Generated LaTeX:** `OpAlias defs Delta Counter` → `OpAlias \defs \Delta Counter`
+inside `\begin{zed}...\end{zed}`.
+
+**See:** `examples/10_schemas/horizontal_defs.txt`
+
 ---
 
 ## Proof Trees
