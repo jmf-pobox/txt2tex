@@ -164,6 +164,8 @@ class TokenType(Enum):
     SYNTAX = auto()  # syntax (aligned free type definitions)
     WHERE = auto()  # where
     END = auto()  # end
+    DELTA = auto()  # Delta (schema inclusion with before/after state)
+    XI = auto()  # Xi (schema inclusion, read-only operation)
 
     # Conditional expressions (Phase 16)
     IF = auto()  # if

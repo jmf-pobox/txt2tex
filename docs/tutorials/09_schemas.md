@@ -67,9 +67,12 @@ end
 - `x?` (input) - operation input
 - `x!` (output) - operation output
 
-## Schema Inclusion
+## Schema Inclusion and Δ/Ξ
 
-Include one schema in another:
+**Phase 1.1 feature.** Schema inclusion brings the components of one schema
+into the declaration list of another.  Three forms are supported.
+
+### Bare inclusion
 
 ```text
 schema LoggedInUser
@@ -80,7 +83,99 @@ where
 end
 ```
 
-This brings all User components and constraints into LoggedInUser.
+`User` on its own line (no colon) is a bare schema inclusion.  It brings all
+User components and constraints into LoggedInUser.
+
+### Delta inclusion — before/after state
+
+The Z RM §3.7 convention: `Delta S` abbreviates including both the before-state
+`S` and the after-state `S'` simultaneously.  Use this for operation schemas that
+modify state:
+
+```text
+schema Counter
+  count : N
+where
+  count >= 0
+end
+
+schema IncrCounter
+  Delta Counter
+  increment? : N
+where
+  count' = count + increment?
+end
+```
+
+LaTeX output: `\Delta Counter`
+
+### Xi inclusion — read-only operation
+
+The Z RM §5.2 convention: `Xi S` asserts the state is unchanged.  Use this for
+query operations:
+
+```text
+schema ReadCount
+  Xi Counter
+  result! : N
+where
+  result! = count
+end
+```
+
+LaTeX output: `\Xi Counter`
+
+### Generic instantiation
+
+Inclusions can carry type parameters:
+
+```text
+schema PushNat
+  Delta Stack[N]
+  value? : N
+end
+```
+
+LaTeX output: `\Delta Stack[\nat]`
+
+### Schema-as-predicate
+
+Once schemas are included in the declaration list, their names can appear in the
+`where` clause as predicates.  The conjunction `S1 land S2` applies both schema
+predicates:
+
+```text
+schema A
+  x : N
+end
+
+schema B
+  y : N
+end
+
+schema AB
+  A
+  B
+  z : N
+where
+  A land B
+  z = x + y
+end
+```
+
+### Disambiguation rule
+
+The parser uses a one-pass lookahead scan to distinguish a bare inclusion from a
+typed declaration:
+
+- If a colon `:` appears before the next newline, parse as a typed declaration.
+- Otherwise, parse as a schema inclusion.
+
+This means `count, limit : N` (two variables sharing a type) is never confused
+with `Counter` (a bare inclusion), even when both appear on the same line start.
+
+**See:** `examples/10_schemas/delta_xi_inclusion.txt` and
+`examples/10_schemas/schema_as_predicate.txt`
 
 ## Schema Composition
 

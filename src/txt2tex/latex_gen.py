@@ -44,6 +44,7 @@ from txt2tex.ast_nodes import (
     Range,
     RelationalImage,
     Schema,
+    SchemaInclusion,
     Section,
     SequenceLiteral,
     SetComprehension,
@@ -3968,6 +3969,31 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
+    def _emit_schema_inclusion(self, incl: SchemaInclusion) -> str:
+        """Return the LaTeX fragment for one schema-inclusion declaration line.
+
+        Forms emitted:
+        - decoration=None:    ``Name``          (bare inclusion)
+        - decoration="delta": ``\\Delta Name``  (state-and-operation)
+        - decoration="xi":    ``\\Xi Name``     (read-only operation)
+
+        Generic instantiation arguments are appended in brackets when present,
+        e.g. ``\\Delta Stack[\\nat]``.  The caller appends ``\\\\`` when the
+        item is not the last in the declaration list; this method returns only
+        the content fragment.
+        """
+        name_latex = self._generate_identifier(
+            Identifier(line=incl.line, column=incl.column, name=incl.name)
+        )
+        if incl.generics:
+            generic_str = ", ".join(self.generate_expr(g) for g in incl.generics)
+            name_latex = f"{name_latex}[{generic_str}]"
+        if incl.decoration == "delta":
+            return rf"\Delta {name_latex}"
+        if incl.decoration == "xi":
+            return rf"\Xi {name_latex}"
+        return name_latex
+
     @generate_document_item.register(AxDef)
     def _generate_axdef(self, node: AxDef) -> list[str]:
         """Generate LaTeX for axiomatic definition.
@@ -3987,41 +4013,44 @@ class LaTeXGenerator:
         # Generate declarations on separate lines
         if node.declarations:
             for i, decl in enumerate(node.declarations):
-                # Process variable through identifier logic for underscore handling
-                var_latex = self._generate_identifier(
-                    Identifier(line=0, column=0, name=decl.variable)
-                )
-                type_latex = self.generate_expr(decl.type_expr)
-                # Post-process: add parentheses for nested special functions
-                # Critical for fuzz: P (P Z) must be \power (\power Z)
-                # not \power \power Z which causes validation errors
-                special_ops = [
-                    r"\power \power",
-                    r"\power \finset",
-                    r"\finset \power",
-                    r"\seq \seq",
-                    r"\iseq \iseq",
-                    r"\bag \bag",
-                ]
-                for pattern in special_ops:
-                    if pattern in type_latex:
-                        # Find second operator and wrap from there
-                        parts = type_latex.split(pattern, 1)
-                        if len(parts) == 2:
-                            second_part = pattern.split()[-1] + " " + parts[1]
-                            type_latex = (
-                                parts[0] + pattern.split()[0] + f" ({second_part})"
-                            )
-                            break
+                if isinstance(decl, SchemaInclusion):
+                    decl_line = self._emit_schema_inclusion(decl)
+                else:
+                    # Process variable through identifier logic for underscore handling
+                    var_latex = self._generate_identifier(
+                        Identifier(line=0, column=0, name=decl.variable)
+                    )
+                    type_latex = self.generate_expr(decl.type_expr)
+                    # Post-process: add parentheses for nested special functions
+                    # Critical for fuzz: P (P Z) must be \power (\power Z)
+                    # not \power \power Z which causes validation errors
+                    special_ops = [
+                        r"\power \power",
+                        r"\power \finset",
+                        r"\finset \power",
+                        r"\seq \seq",
+                        r"\iseq \iseq",
+                        r"\bag \bag",
+                    ]
+                    for pattern in special_ops:
+                        if pattern in type_latex:
+                            # Find second operator and wrap from there
+                            parts = type_latex.split(pattern, 1)
+                            if len(parts) == 2:
+                                second_part = pattern.split()[-1] + " " + parts[1]
+                                type_latex = (
+                                    parts[0] + pattern.split()[0] + f" ({second_part})"
+                                )
+                                break
 
-                # Build full declaration line for overflow check
-                decl_line = f"{var_latex} : {type_latex}"
-                self._check_overflow(
-                    decl_line,
-                    decl.type_expr.line,
-                    "axdef declaration",
-                    f"{decl.variable} : ...",
-                )
+                    # Build full declaration line for overflow check
+                    decl_line = f"{var_latex} : {type_latex}"
+                    self._check_overflow(
+                        decl_line,
+                        decl.type_expr.line,
+                        "axdef declaration",
+                        f"{decl.variable} : ...",
+                    )
 
                 # Add line break after each declaration except the last
                 if i < len(node.declarations) - 1:
@@ -4078,41 +4107,44 @@ class LaTeXGenerator:
         # Generate declarations on separate lines
         if node.declarations:
             for i, decl in enumerate(node.declarations):
-                # Process variable through identifier logic for underscore handling
-                var_latex = self._generate_identifier(
-                    Identifier(line=0, column=0, name=decl.variable)
-                )
-                type_latex = self.generate_expr(decl.type_expr)
-                # Post-process: add parentheses for nested special functions
-                # Critical for fuzz: P (P Z) must be \power (\power Z)
-                # not \power \power Z which causes validation errors
-                special_ops = [
-                    r"\power \power",
-                    r"\power \finset",
-                    r"\finset \power",
-                    r"\seq \seq",
-                    r"\iseq \iseq",
-                    r"\bag \bag",
-                ]
-                for pattern in special_ops:
-                    if pattern in type_latex:
-                        # Find second operator and wrap from there
-                        parts = type_latex.split(pattern, 1)
-                        if len(parts) == 2:
-                            second_part = pattern.split()[-1] + " " + parts[1]
-                            type_latex = (
-                                parts[0] + pattern.split()[0] + f" ({second_part})"
-                            )
-                            break
+                if isinstance(decl, SchemaInclusion):
+                    decl_line = f"  {self._emit_schema_inclusion(decl)}"
+                else:
+                    # Process variable through identifier logic for underscore handling
+                    var_latex = self._generate_identifier(
+                        Identifier(line=0, column=0, name=decl.variable)
+                    )
+                    type_latex = self.generate_expr(decl.type_expr)
+                    # Post-process: add parentheses for nested special functions
+                    # Critical for fuzz: P (P Z) must be \power (\power Z)
+                    # not \power \power Z which causes validation errors
+                    special_ops = [
+                        r"\power \power",
+                        r"\power \finset",
+                        r"\finset \power",
+                        r"\seq \seq",
+                        r"\iseq \iseq",
+                        r"\bag \bag",
+                    ]
+                    for pattern in special_ops:
+                        if pattern in type_latex:
+                            # Find second operator and wrap from there
+                            parts = type_latex.split(pattern, 1)
+                            if len(parts) == 2:
+                                second_part = pattern.split()[-1] + " " + parts[1]
+                                type_latex = (
+                                    parts[0] + pattern.split()[0] + f" ({second_part})"
+                                )
+                                break
 
-                # Build full declaration line for overflow check
-                decl_line = f"  {var_latex}: {type_latex}"
-                self._check_overflow(
-                    decl_line,
-                    decl.type_expr.line,
-                    "gendef declaration",
-                    f"{decl.variable} : ...",
-                )
+                    # Build full declaration line for overflow check
+                    decl_line = f"  {var_latex}: {type_latex}"
+                    self._check_overflow(
+                        decl_line,
+                        decl.type_expr.line,
+                        "gendef declaration",
+                        f"{decl.variable} : ...",
+                    )
 
                 # Add line break after each declaration except the last
                 if i < len(node.declarations) - 1:
@@ -4285,41 +4317,44 @@ class LaTeXGenerator:
         # Generate declarations on separate lines
         if node.declarations:
             for i, decl in enumerate(node.declarations):
-                # Process variable through identifier logic for underscore handling
-                var_latex = self._generate_identifier(
-                    Identifier(line=0, column=0, name=decl.variable)
-                )
-                type_latex = self.generate_expr(decl.type_expr)
-                # Post-process: add parentheses for nested special functions
-                # Critical for fuzz: P (P Z) must be \power (\power Z)
-                # not \power \power Z which causes validation errors
-                special_ops = [
-                    r"\power \power",
-                    r"\power \finset",
-                    r"\finset \power",
-                    r"\seq \seq",
-                    r"\iseq \iseq",
-                    r"\bag \bag",
-                ]
-                for pattern in special_ops:
-                    if pattern in type_latex:
-                        # Find second operator and wrap from there
-                        parts = type_latex.split(pattern, 1)
-                        if len(parts) == 2:
-                            second_part = pattern.split()[-1] + " " + parts[1]
-                            type_latex = (
-                                parts[0] + pattern.split()[0] + f" ({second_part})"
-                            )
-                            break
+                if isinstance(decl, SchemaInclusion):
+                    decl_line = self._emit_schema_inclusion(decl)
+                else:
+                    # Process variable through identifier logic for underscore handling
+                    var_latex = self._generate_identifier(
+                        Identifier(line=0, column=0, name=decl.variable)
+                    )
+                    type_latex = self.generate_expr(decl.type_expr)
+                    # Post-process: add parentheses for nested special functions
+                    # Critical for fuzz: P (P Z) must be \power (\power Z)
+                    # not \power \power Z which causes validation errors
+                    special_ops = [
+                        r"\power \power",
+                        r"\power \finset",
+                        r"\finset \power",
+                        r"\seq \seq",
+                        r"\iseq \iseq",
+                        r"\bag \bag",
+                    ]
+                    for pattern in special_ops:
+                        if pattern in type_latex:
+                            # Find second operator and wrap from there
+                            parts = type_latex.split(pattern, 1)
+                            if len(parts) == 2:
+                                second_part = pattern.split()[-1] + " " + parts[1]
+                                type_latex = (
+                                    parts[0] + pattern.split()[0] + f" ({second_part})"
+                                )
+                                break
 
-                # Build full declaration line for overflow check
-                decl_line = f"{var_latex} : {type_latex}"
-                self._check_overflow(
-                    decl_line,
-                    decl.type_expr.line,
-                    f"{schema_context} declaration",
-                    f"{decl.variable} : ...",
-                )
+                    # Build full declaration line for overflow check
+                    decl_line = f"{var_latex} : {type_latex}"
+                    self._check_overflow(
+                        decl_line,
+                        decl.type_expr.line,
+                        f"{schema_context} declaration",
+                        f"{decl.variable} : ...",
+                    )
 
                 # Add line break after each declaration except the last
                 if i < len(node.declarations) - 1:

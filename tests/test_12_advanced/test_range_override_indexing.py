@@ -2,6 +2,7 @@
 
 from txt2tex.ast_nodes import (
     BinaryOp,
+    Declaration,
     Document,
     Identifier,
     Number,
@@ -30,6 +31,7 @@ class TestAnonymousSchemas:
         schema = ast.items[0]
         assert schema.name is None
         assert len(schema.declarations) == 1
+        assert isinstance(schema.declarations[0], Declaration)
         assert schema.declarations[0].variable == "x"
 
     def test_anonymous_schema_latex(self) -> None:
@@ -176,6 +178,7 @@ class TestRangeOperator:
         schema = ast.items[0]
         assert len(schema.declarations) == 1
         decl = schema.declarations[0]
+        assert isinstance(decl, Declaration)
         assert decl.variable == "year"
         assert isinstance(decl.type_expr, Range)
 

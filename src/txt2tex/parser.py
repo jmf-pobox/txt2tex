@@ -46,6 +46,7 @@ from txt2tex.ast_nodes import (
     Range,
     RelationalImage,
     Schema,
+    SchemaInclusion,
     Section,
     SequenceLiteral,
     SetComprehension,
@@ -775,6 +776,177 @@ class Parser:
             TokenType.BIGCAP,  # bigcap (distributed intersection)
             TokenType.FILTER,  # filter (sequence filter)
         )
+
+    def _scan_for_colon_before_newline(self) -> bool:
+        """Lookahead scan: return True if ':' appears before NEWLINE/WHERE/END/EOF.
+
+        Used to disambiguate a bare identifier line from a typed declaration.
+        ``count, count' : N`` returns True (typed declaration).
+        ``Counter``           returns False (bare schema inclusion).
+        Commas and identifiers between the current position and the colon are
+        allowed — they are the multi-name variable list.
+
+        Bracket depth is tracked so a COLON inside ``[...]`` (e.g., in a
+        type expression within generic args) is not mistaken for the
+        declaration colon.  Only a COLON at depth 0 signals a typed declaration.
+        """
+        offset = 0
+        depth = 0
+        while True:
+            tok = self._peek_ahead(offset)
+            if tok.type in (
+                TokenType.NEWLINE,
+                TokenType.WHERE,
+                TokenType.END,
+                TokenType.SEMICOLON,
+                TokenType.EOF,
+            ):
+                return False
+            if tok.type == TokenType.LBRACKET:
+                depth += 1
+            elif tok.type == TokenType.RBRACKET:
+                depth -= 1
+            elif tok.type == TokenType.COLON and depth == 0:
+                return True
+            offset += 1
+
+    def _parse_inclusion_generic_args(self) -> list[Expr] | None:
+        """Parse optional generic instantiation arguments: [expr, expr, ...].
+
+        Returns None when no '[' is present.  Consumes the brackets and their
+        contents when present (e.g., ``[Int]``, ``[N cross N]``).
+
+        Raises ParserError for:
+        - Empty brackets ``[]`` or comma-only ``[,]`` (Z RM §3.9 requires ≥1 expr)
+        - Unclosed bracket — error points at the opening ``[``
+        """
+        if not self._match(TokenType.LBRACKET):
+            return None
+        open_tok = self._advance()  # consume '[', save for error reporting
+        args: list[Expr] = []
+
+        terminators = (
+            TokenType.NEWLINE,
+            TokenType.WHERE,
+            TokenType.END,
+            TokenType.EOF,
+        )
+
+        while not self._match(TokenType.RBRACKET):
+            if self._at_end() or self._match(*terminators):
+                raise ParserError("Unclosed '[' in generic argument list", open_tok)
+            if self._match(TokenType.COMMA):
+                if not args:
+                    # Leading comma — no expression before it
+                    raise ParserError(
+                        "Expected type expression in generic argument list",
+                        self._current(),
+                    )
+                self._advance()
+                # Trailing comma before ']'
+                if self._match(TokenType.RBRACKET):
+                    raise ParserError(
+                        "Expected type expression in generic argument list",
+                        self._current(),
+                    )
+                continue
+            args.append(self._parse_expr())
+
+        if not args:
+            raise ParserError(
+                "Empty generic argument list — at least one type expression required",
+                open_tok,
+            )
+
+        self._advance()  # consume ']'
+        return args
+
+    def _parse_declaration_or_inclusion(
+        self,
+    ) -> Declaration | SchemaInclusion | list[Declaration]:
+        """Parse one declaration line or schema-inclusion line.
+
+        Three forms:
+        1. ``Delta Name [generic-args]?``  → SchemaInclusion(decoration="delta")
+        2. ``Xi Name [generic-args]?``     → SchemaInclusion(decoration="xi")
+        3. ``name1, name2, ... : Type``    → list[Declaration]  (typed, ≥1 item)
+        4. ``Name [generic-args]?``        → SchemaInclusion(decoration=None)
+           (bare inclusion — only when no ':' follows on the same line)
+
+        Returns a list of Declarations for the typed form so the caller can
+        extend its declaration list directly; returns a single SchemaInclusion
+        otherwise.
+        """
+        start_tok = self._current()
+
+        # --- Delta / Xi decorated inclusion ---
+        if self._match(TokenType.DELTA, TokenType.XI):
+            decoration = "delta" if self._match(TokenType.DELTA) else "xi"
+            kw = "Delta" if decoration == "delta" else "Xi"
+            self._advance()  # consume Delta / Xi
+            # Must be followed by an identifier (schema name)
+            if not self._match(TokenType.IDENTIFIER):
+                cur = self._current()
+                raise ParserError(
+                    f"Expected schema name after {kw},"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            name_tok = self._advance()
+            generics = self._parse_inclusion_generic_args()
+            return SchemaInclusion(
+                name=name_tok.value,
+                decoration=decoration,
+                generics=generics,
+                line=start_tok.line,
+                column=start_tok.column,
+            )
+
+        # --- IDENTIFIER (or keyword-as-identifier) ---
+        # Scan ahead to decide: typed declaration vs bare inclusion.
+        if not self._scan_for_colon_before_newline():
+            # No colon before newline → bare schema inclusion
+            name_tok = self._advance()
+            generics = self._parse_inclusion_generic_args()
+            return SchemaInclusion(
+                name=name_tok.value,
+                decoration=None,
+                generics=generics,
+                line=start_tok.line,
+                column=start_tok.column,
+            )
+
+        # Colon found → typed declaration (original path)
+        var_tokens: list[Token] = []
+        var_tok = self._current()
+        var_tokens.append(var_tok)
+        self._advance()
+
+        while self._match(TokenType.COMMA):
+            self._advance()  # consume ','
+            if not (
+                self._match(TokenType.IDENTIFIER)
+                or self._is_keyword_usable_as_identifier()
+            ):
+                raise ParserError("Expected variable name after ','", self._current())
+            var_tokens.append(self._current())
+            self._advance()
+
+        if not self._match(TokenType.COLON):
+            raise ParserError("Expected ':' in declaration", self._current())
+        self._advance()  # consume ':'
+
+        type_expr = self._parse_expr()
+
+        return [
+            Declaration(
+                variable=vt.value,
+                type_expr=type_expr,
+                line=vt.line,
+                column=vt.column,
+            )
+            for vt in var_tokens
+        ]
 
     def _smart_join_justification(self, parts: list[str]) -> str:
         """Join justification tokens intelligently.
@@ -3076,6 +3248,10 @@ class Parser:
             TokenType.UNION,
             TokenType.INTERSECT,
             TokenType.FILTER,
+            # Delta and Xi are keywords in declaration context but remain
+            # valid identifiers in expression context (e.g. Gamma shows Delta).
+            TokenType.DELTA,
+            TokenType.XI,
         ):
             name_token = self._advance()
             return Identifier(
@@ -3621,6 +3797,7 @@ class Parser:
         Syntax: axdef [X, Y] ... end
         Supports optional generic parameters and semicolon-separated declarations.
         Comma-separated variable lists share a type: var1, var2 : Type.
+        Schema inclusions (bare, Delta, Xi) are also permitted.
         """
         start_token = self._advance()  # Consume 'axdef'
         self._skip_newlines()
@@ -3629,7 +3806,7 @@ class Parser:
         generic_params = self._parse_generic_params()
         self._skip_newlines()
 
-        declarations: list[Declaration] = []
+        declarations: list[Declaration | SchemaInclusion] = []
 
         # Parse declarations until 'where' or 'end'
         while not self._at_end() and not self._match(TokenType.WHERE, TokenType.END):
@@ -3637,52 +3814,22 @@ class Parser:
                 self._advance()
                 continue
 
-            # Parse declaration: var1, var2, ... : Type
-            # Allow keywords as variable names in declarations (e.g., id, dom, ran)
+            # Three forms: Delta/Xi inclusion, bare inclusion, typed declaration.
             if (
-                self._match(TokenType.IDENTIFIER)
+                self._match(TokenType.DELTA, TokenType.XI)
+                or self._match(TokenType.IDENTIFIER)
                 or self._is_keyword_usable_as_identifier()
             ):
-                var_tokens: list[Token] = []
-                var_token = self._current()
-                var_tokens.append(var_token)
-                self._advance()
+                result = self._parse_declaration_or_inclusion()
+                if isinstance(result, list):
+                    declarations.extend(result)
+                else:
+                    declarations.append(result)
 
-                # Consume additional comma-separated variable names
-                while self._match(TokenType.COMMA):
-                    self._advance()  # Consume ','
-                    if not (
-                        self._match(TokenType.IDENTIFIER)
-                        or self._is_keyword_usable_as_identifier()
-                    ):
-                        raise ParserError(
-                            "Expected variable name after ','", self._current()
-                        )
-                    var_tokens.append(self._current())
-                    self._advance()
-
-                if not self._match(TokenType.COLON):
-                    raise ParserError("Expected ':' in declaration", self._current())
-                self._advance()  # Consume ':'
-
-                # Parse type expression (shared by all variables in the list)
-                type_expr = self._parse_expr()
-
-                declarations.extend(
-                    Declaration(
-                        variable=vt.value,
-                        type_expr=type_expr,
-                        line=vt.line,
-                        column=vt.column,
-                    )
-                    for vt in var_tokens
-                )
-
-                # Check for semicolon separator (allows multiple declarations)
+                # Semicolons are only valid after typed declarations.
                 if self._match(TokenType.SEMICOLON):
                     self._advance()  # Consume ';'
                     self._skip_newlines()
-                    # Continue to parse next declaration
                 else:
                     self._skip_newlines()
             else:
@@ -3729,7 +3876,7 @@ class Parser:
             )
         self._skip_newlines()
 
-        declarations: list[Declaration] = []
+        declarations: list[Declaration | SchemaInclusion] = []
 
         # Parse declarations until 'where' or 'end'
         while not self._at_end() and not self._match(TokenType.WHERE, TokenType.END):
@@ -3737,52 +3884,21 @@ class Parser:
                 self._advance()
                 continue
 
-            # Parse declaration: var1, var2, ... : Type
-            # Allow keywords as variable names in declarations (e.g., id, dom, ran)
+            # Three forms: Delta/Xi inclusion, bare inclusion, typed declaration.
             if (
-                self._match(TokenType.IDENTIFIER)
+                self._match(TokenType.DELTA, TokenType.XI)
+                or self._match(TokenType.IDENTIFIER)
                 or self._is_keyword_usable_as_identifier()
             ):
-                var_tokens: list[Token] = []
-                var_token = self._current()
-                var_tokens.append(var_token)
-                self._advance()
+                result = self._parse_declaration_or_inclusion()
+                if isinstance(result, list):
+                    declarations.extend(result)
+                else:
+                    declarations.append(result)
 
-                # Consume additional comma-separated variable names
-                while self._match(TokenType.COMMA):
-                    self._advance()  # Consume ','
-                    if not (
-                        self._match(TokenType.IDENTIFIER)
-                        or self._is_keyword_usable_as_identifier()
-                    ):
-                        raise ParserError(
-                            "Expected variable name after ','", self._current()
-                        )
-                    var_tokens.append(self._current())
-                    self._advance()
-
-                if not self._match(TokenType.COLON):
-                    raise ParserError("Expected ':' in declaration", self._current())
-                self._advance()  # Consume ':'
-
-                # Parse type expression (shared by all variables in the list)
-                type_expr = self._parse_expr()
-
-                declarations.extend(
-                    Declaration(
-                        variable=vt.value,
-                        type_expr=type_expr,
-                        line=vt.line,
-                        column=vt.column,
-                    )
-                    for vt in var_tokens
-                )
-
-                # Check for semicolon separator (allows multiple declarations)
                 if self._match(TokenType.SEMICOLON):
                     self._advance()  # Consume ';'
                     self._skip_newlines()
-                    # Continue to parse next declaration
                 else:
                     self._skip_newlines()
             else:
@@ -3935,7 +4051,7 @@ class Parser:
 
         self._skip_newlines()
 
-        declarations: list[Declaration] = []
+        declarations: list[Declaration | SchemaInclusion] = []
 
         # Parse declarations until 'where' or 'end'
         while not self._at_end() and not self._match(TokenType.WHERE, TokenType.END):
@@ -3943,52 +4059,21 @@ class Parser:
                 self._advance()
                 continue
 
-            # Parse declaration: var1, var2, ... : Type
-            # Allow keywords as variable names in declarations (e.g., id, dom, ran)
+            # Three forms: Delta/Xi inclusion, bare inclusion, typed declaration.
             if (
-                self._match(TokenType.IDENTIFIER)
+                self._match(TokenType.DELTA, TokenType.XI)
+                or self._match(TokenType.IDENTIFIER)
                 or self._is_keyword_usable_as_identifier()
             ):
-                var_tokens: list[Token] = []
-                var_token = self._current()
-                var_tokens.append(var_token)
-                self._advance()
+                result = self._parse_declaration_or_inclusion()
+                if isinstance(result, list):
+                    declarations.extend(result)
+                else:
+                    declarations.append(result)
 
-                # Consume additional comma-separated variable names
-                while self._match(TokenType.COMMA):
-                    self._advance()  # Consume ','
-                    if not (
-                        self._match(TokenType.IDENTIFIER)
-                        or self._is_keyword_usable_as_identifier()
-                    ):
-                        raise ParserError(
-                            "Expected variable name after ','", self._current()
-                        )
-                    var_tokens.append(self._current())
-                    self._advance()
-
-                if not self._match(TokenType.COLON):
-                    raise ParserError("Expected ':' in declaration", self._current())
-                self._advance()  # Consume ':'
-
-                # Parse type expression (shared by all variables in the list)
-                type_expr = self._parse_expr()
-
-                declarations.extend(
-                    Declaration(
-                        variable=vt.value,
-                        type_expr=type_expr,
-                        line=vt.line,
-                        column=vt.column,
-                    )
-                    for vt in var_tokens
-                )
-
-                # Check for semicolon separator (allows multiple declarations)
                 if self._match(TokenType.SEMICOLON):
                     self._advance()  # Consume ';'
                     self._skip_newlines()
-                    # Continue to parse next declaration
                 else:
                     self._skip_newlines()
             else:

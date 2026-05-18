@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Schema inclusion in `axdef`, `schema`, and `gendef` declaration lists; `Delta`
+  and `Xi` shorthand per Z RM §3.7 and §5.2. Three forms are supported:
+  - bare: `Counter` on its own line brings the schema's components into scope
+  - `Delta Airline` — before/after state convention, emits `\Delta Airline`
+  - `Xi Card` — read-only operation convention, emits `\Xi Card`
+  Generic instantiation in inclusions (`Delta Stack[Int]`) is also supported.
+  The parser disambiguates bare inclusions from typed declarations with a
+  scan-ahead rule: if a colon appears before the next newline, the line is a
+  typed declaration; otherwise it is a schema inclusion.  `count, limit : N`
+  is unambiguously a typed declaration regardless of whether schema names
+  `count` or `limit` exist.
+- `DELTA` and `XI` token types added to `TokenType`; `Delta` and `Xi` keywords
+  added to `KEYWORD_TO_TOKEN` and `RESERVED_WORDS` (decoration of these
+  keywords is forbidden by lexer, matching Z RM intent).
+- `SchemaInclusion` AST node in `ast_nodes.py` with `name`, `decoration`, and
+  `generics` fields.
+- Two new examples in `examples/10_schemas/`: `delta_xi_inclusion.txt` (Δ/Ξ
+  airline booking probe) and `schema_as_predicate.txt` (schema conjunction).
+  Both round-trip through fuzz cleanly.
+- `examples/Makefile` now includes `10_schemas` as a named target with short
+  alias `10`.
+- New tutorial section "Schema Inclusion and Δ/Ξ" in
+  `docs/tutorials/09_schemas.md`.
+- New section "Schema Inclusion (Bare, Δ, Ξ)" in `docs/guides/USER_GUIDE.md`
+  documenting all three forms, disambiguation rule, and schema-as-predicate.
+
 - Identifier decoration (primes `'`, inputs `?`, outputs `!`) — Z RM §3.3
   trailing-suffix rule. The identifier lexer now consumes any run of `'`, `?`,
   `!` characters in any order after the alnum/underscore base (e.g., `count'`,

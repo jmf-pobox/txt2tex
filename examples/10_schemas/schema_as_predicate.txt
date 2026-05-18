@@ -1,0 +1,56 @@
+// ============================================================================
+// Example: Schema as Predicate (Schema Conjunction)
+// ============================================================================
+// Demonstrates:
+//   - Including two schemas in the declaration part of a third
+//   - Conjoining the included schemas as predicates in the where clause
+//   - The Z RM §6.3 convention: S1 land S2 in predicate position
+//
+// Under fuzz semantics, once S1 and S2 are included in the declaration list
+// their components are in scope. Conjoining them with land in the where
+// clause applies both predicates simultaneously.
+// ============================================================================
+
+=== Schema Conjunction via Inclusion ===
+
+TEXT: Define two simple schemas.
+
+schema A
+  x : N
+end
+
+schema B
+  y : N
+end
+
+TEXT: Schema AB includes both A and B, adds a third component, and uses the
+TEXT: schemas as predicates in the where clause.
+
+schema AB
+  A
+  B
+  z : N
+where
+  A land B
+  z = x + y
+end
+
+=== Typed Disambiguation ===
+
+TEXT: A critical disambiguation: count, count' : N is a typed declaration
+TEXT: (two variables sharing a type), NOT an inclusion of schema count.
+TEXT: The scan-ahead rule detects the colon and routes to the typed-declaration
+TEXT: path.
+
+schema TwoNames
+  count, limit : N
+where
+  count <= limit
+end
+
+TEXT: But Counter alone on its own line (no colon) is a bare schema inclusion:
+
+schema HasCounter
+  TwoNames
+  extra : N
+end

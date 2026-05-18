@@ -1,0 +1,78 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Schema Conjunction via Inclusion}
+
+\noindent Define two simple schemas.
+
+\bigskip
+
+\begin{schema}{A}
+x : \nat
+\end{schema}
+
+\begin{schema}{B}
+y : \nat
+\end{schema}
+
+\noindent Schema AB includes both A and B, adds a third component, and uses the
+
+\bigskip
+
+\noindent schemas as predicates in the where clause.
+
+\bigskip
+
+\begin{schema}{AB}
+A \\
+B \\
+z : \nat
+\where
+A \land B \\
+z = x + y
+\end{schema}
+
+\section*{Typed Disambiguation}
+
+\noindent A critical $disambiguation : count$, count' : N is a typed declaration
+
+\bigskip
+
+\noindent (two variables sharing a type), NOT an inclusion of schema count.
+
+\bigskip
+
+\noindent The scan-ahead rule detects the colon and routes to the typed-declaration
+
+\bigskip
+
+\noindent path.
+
+\bigskip
+
+\begin{schema}{TwoNames}
+count : \nat \\
+limit : \nat
+\where
+count \leq limit
+\end{schema}
+
+\noindent But Counter alone on its own line (no colon) is a bare schema inclusion:
+
+\bigskip
+
+\begin{schema}{HasCounter}
+TwoNames \\
+extra : \nat
+\end{schema}
+
+\end{document}

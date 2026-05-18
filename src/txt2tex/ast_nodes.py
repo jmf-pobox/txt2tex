@@ -696,6 +696,27 @@ class Declaration(ASTNode):
 
 
 @dataclass(frozen=True)
+class SchemaInclusion(ASTNode):
+    """Schema inclusion in axdef, schema, or gendef declaration list.
+
+    Represents three forms per Z RM §3.7 and §5.2:
+    - bare:  ``Counter``           → decoration=None
+    - delta: ``Delta Airline``     → decoration="delta"
+    - xi:    ``Xi Card``           → decoration="xi"
+
+    The ``name`` field carries any Phase-0 decoration suffix already baked
+    in by the lexer (e.g., ``"Counter'"`` for a primed schema reference).
+    Generic instantiation parameters (e.g., ``Delta Stack[Int]``) are held
+    in ``generics`` as a list of type expressions; None for the common
+    unparameterised case.
+    """
+
+    name: str
+    decoration: str | None  # None | "delta" | "xi"
+    generics: list[Expr] | None = None
+
+
+@dataclass(frozen=True)
 class AxDef(ASTNode):
     """Axiomatic definition block.
 
@@ -710,7 +731,7 @@ class AxDef(ASTNode):
     end
     """
 
-    declarations: list[Declaration]
+    declarations: list[Declaration | SchemaInclusion]
     predicates: list[list[Expr]]  # Groups of predicates (separated by blank lines)
     generic_params: list[str] | None = None  # Optional generic parameters
 
@@ -732,7 +753,7 @@ class GenDef(ASTNode):
     """
 
     generic_params: list[str]  # Required generic parameters
-    declarations: list[Declaration]
+    declarations: list[Declaration | SchemaInclusion]
     predicates: list[list[Expr]]  # Groups of predicates (separated by blank lines)
 
 
@@ -750,7 +771,7 @@ class Schema(ASTNode):
     """
 
     name: str | None  # Optional name (None for anonymous schemas)
-    declarations: list[Declaration]
+    declarations: list[Declaration | SchemaInclusion]
     predicates: list[list[Expr]]  # Groups of predicates (separated by blank lines)
     generic_params: list[str] | None = None  # Optional generic parameters
 

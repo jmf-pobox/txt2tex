@@ -1265,6 +1265,63 @@ The argue environment's use of raw `\halign` makes this impossible - it cannot b
 
 **Conclusion**: The array-based approach is the correct solution. The argue environment, while designed for equivalence chains, has fundamental architectural limitations that prevent proper overflow handling in modern LaTeX documents.
 
+### 7. Schema inclusion as declaration form ✅ RESOLVED
+
+**Decision**: Schema inclusions (`Delta S`, `Xi S`, bare `S`) are parsed as a
+new AST node `SchemaInclusion` within the declaration list of `schema`, `axdef`,
+and `gendef` blocks.  The generator emits the schema name (with optional `\Delta`
+or `\Xi` prefix) directly; fuzz handles semantic expansion.
+
+**Alternatives considered**:
+
+1. **Inline expansion** — expand the included schema's components at parse time,
+   inserting them as `Declaration` nodes.  Rejected because: (a) the included
+   schema may be defined later in the document; (b) it duplicates work fuzz
+   already does; (c) it would break fuzz's own type checker which expects the
+   schema name in the source, not expanded fields.
+
+2. **Treat as expression in `where` clause only** — rejected because Z RM §3.7
+   explicitly positions Delta/Xi in the *signature* (declaration) part, not the
+   predicate part.  The fuzz box typesetter also requires the schema name to
+   appear before `\where`.
+
+**Disambiguation rule** (scan-ahead for colon):
+
+The token stream for a declaration line is ambiguous: `Counter` could be a
+single-name typed declaration without a type, or a bare schema inclusion.  The
+rule is: scan ahead (without consuming tokens) looking for `COLON` before the
+next `NEWLINE`, `WHERE`, `END`, `SEMICOLON`, or `EOF`.
+
+- Colon found → typed declaration (`count, limit : N`)
+- No colon found → schema inclusion (`Counter`)
+
+This is a lookahead scan over the token array, O(k) where k is the length of
+the variable list (typically 1–3 tokens).  It is not a backtracking parse.
+
+**Delta/Xi as keywords and identifiers**:
+
+`Delta` and `Xi` lex as `DELTA`/`XI` tokens when they start a declaration line.
+The same identifiers can appear in expression context (e.g., `Gamma shows Delta`)
+because `_parse_atom` accepts `DELTA` and `XI` as identifiers.  The disambiguation
+is contextual: the declaration-loop checks for `DELTA`/`XI` tokens *first*, before
+falling through to expression parsing.
+
+Per the Phase-0 `RESERVED_WORDS` pattern, `Delta'` would be a `LexerError`
+(decoration of a keyword is forbidden).  This matches Z RM intent.
+
+**Generator convention**:
+
+Inclusions emit into the schema/axdef/gendef box body, one per line, with `\\`
+after every item except the last — the same convention as typed declarations.
+
+```latex
+\Delta Airline \\
+bookingId? : BookingId \\
+BookingInit \\
+customerId? : CustomerId \\
+routeId? : RouteId
+```
+
 ## Future Enhancements
 
 1. **Export formats**

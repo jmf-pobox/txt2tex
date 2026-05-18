@@ -2007,6 +2007,108 @@ where
 end
 ```
 
+### Schema Inclusion (Bare, Δ, Ξ)
+
+A declaration line with no colon is a **schema inclusion** — it brings the
+components and predicates of the named schema into the enclosing block.
+
+#### Bare inclusion
+
+```text
+schema LoggedInUser
+  User
+  sessionToken : N
+where
+  sessionToken > 0
+end
+```
+
+`User` on its own line (no colon) brings all User components into LoggedInUser.
+The generated LaTeX is:
+
+```latex
+\begin{schema}{LoggedInUser}
+User \\
+sessionToken : \nat
+\where
+sessionToken > 0
+\end{schema}
+```
+
+#### Delta inclusion (Δ) — state-and-operation
+
+`Delta S` is the Z RM §3.7 convention for including a schema in an operation
+that modifies state.  It signals that both the before-state `S` and after-state
+`S'` are present.
+
+```text
+schema IncrCounter
+  Delta Counter
+  increment? : N
+where
+  count' = count + increment?
+end
+```
+
+Generates: `\Delta Counter \\`
+
+#### Xi inclusion (Ξ) — read-only operation
+
+`Xi S` is the Z RM §5.2 convention for a schema that does not modify state.
+
+```text
+schema ReadCount
+  Xi Counter
+  result! : N
+where
+  result! = count
+end
+```
+
+Generates: `\Xi Counter \\`
+
+#### Generic instantiation in inclusions
+
+Inclusions can carry type parameters:
+
+```text
+schema PushNat
+  Delta Stack[N]
+  value? : N
+end
+```
+
+Generates: `\Delta Stack[\nat] \\`
+
+#### Disambiguation rule
+
+The parser uses one-pass scan-ahead to tell inclusions from typed declarations:
+
+- **Colon before newline** → typed declaration: `count, limit : N`
+- **No colon before newline** → schema inclusion: `Counter`
+
+This means `count, limit : N` (two variables sharing a type) is never confused
+with a bare inclusion, even when the names would otherwise match a schema name.
+
+#### Schema-as-predicate in where clause
+
+Once a schema is included in the declaration list, its name can appear in the
+`where` clause as a predicate.  Conjunction `S1 land S2` applies both:
+
+```text
+schema AB
+  A
+  B
+  z : N
+where
+  A land B
+  z = x + y
+end
+```
+
+**See:** `examples/10_schemas/delta_xi_inclusion.txt`,
+`examples/10_schemas/schema_as_predicate.txt`
+
 ---
 
 ## Proof Trees
