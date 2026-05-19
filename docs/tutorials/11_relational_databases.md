@@ -118,8 +118,7 @@ required.
 > as a top-level expression in your source (not inside a `zed`,
 > `axdef`, `schema`, or `gendef` block). If you wrap algebra inside a
 > Z block, fuzz parses the block contents strictly as Z notation and
-> will reject the subscript form `\sigma_{p}` and the assignment
-> operator `:=`.
+> will reject the subscript form `\sigma_{p}`.
 
 ### Restriction (sigma)
 
@@ -164,7 +163,10 @@ Join on all common attributes:
 Ship bowtie Class
 ```
 
-Renders as: $Ship \bowtie Class$
+Renders as: $Ship \otimes Class$
+
+The source keyword is `bowtie`; the LaTeX emission is `\otimes` (`⊗`),
+matching Trigoni's lecture slides for the Oxford DAT course.
 
 **Theta-join** — join with an explicit predicate:
 
@@ -172,7 +174,7 @@ Renders as: $Ship \bowtie Class$
 Ship bowtie [Ship.class = Class.class] Class
 ```
 
-Renders as: $Ship \bowtie_{Ship.class = Class.class} Class$
+Renders as: $Ship \otimes_{Ship.class = Class.class} Class$
 
 ### Division (div)
 
@@ -184,21 +186,20 @@ R div S
 
 Renders as: $R \div S$
 
-### Assignment (:=)
+### Naming a query
 
-Bind a name to an algebra expression. This is a top-level statement (not
-nested inside another expression):
+Use `==` (Z abbreviation) to bind a name to an algebra expression.
+txt2tex inspects the RHS: when it contains a DAT construct, the
+abbreviation emits as `\noindent$...$` outside any Z block:
 
 ```text
-BigGuns := pi[class, country](sigma[bore >= 16](Class))
+BigGuns == pi[class, country](sigma[bore >= 16](Class))
 ```
 
-The assignment emits a `\begin{zed}...\end{zed}` block:
+Emits as:
 
 ```latex
-\begin{zed}
-BigGuns := \pi_{class, country}(\sigma_{bore \geq 16}(Class))
-\end{zed}
+\noindent$BigGuns \defs \pi_{class, country}(\sigma_{bore \geq 16}(Class))$
 ```
 
 ### Operator Precedence
@@ -361,7 +362,7 @@ GroupMembers ungroup contact
 
 ### Chaining
 
-GROUP and UNGROUP are left-associative at the same precedence as `bowtie`
+GROUP and UNGROUP are left-associative at the same precedence as `bowtie` (`\otimes`)
 and `div`. Chaining is valid:
 
 ```text

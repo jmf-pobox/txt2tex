@@ -1,5 +1,5 @@
 // Relational Algebra Operators (Phase 2.2)
-// Demonstrates: sigma, pi, rho, bowtie, div, :=
+// Demonstrates: sigma, pi, rho, bowtie (renders as ⊗, Trigoni notation), div
 // All operators use kernel LaTeX — no extra package required.
 
 TITLE: Relational Algebra
@@ -70,12 +70,6 @@ Ship bowtie [Ship.class = Class.class] Class
 // Relational division (all-or-nothing quotient):
 
 Ship div Class
-
-=== Assignment (:=) ===
-
-// Bind the result of an algebra expression to a name.
-
-BigGuns := pi[class, country](sigma[bore >= 16](Class))
 
 === Combined Query (Q1 style) ===
 

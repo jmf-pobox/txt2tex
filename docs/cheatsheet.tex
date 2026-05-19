@@ -475,32 +475,29 @@ Comma-separated names on one \kw{pk} line also work.
 sigma[p](R)          & $\sigma_{p}(R)$ — restrict \\
 pi[A,B](R)           & $\pi_{A,B}(R)$ — project \\
 rho[A as B](R)       & $\rho_{A \to B}(R)$ — rename \\
-R bowtie S           & $R \bowtie S$ — natural join \\
-R bowtie [p] S       & $R \bowtie_{p} S$ — theta-join \\
+R bowtie S           & $R \otimes S$ — natural join \\
+R bowtie [p] S       & $R \otimes_{p} S$ — theta-join \\
 R div S              & $R \div S$ — division \\
-T := R               & $T := R$ (zed block) \\
 \end{tabularx}
 
 \smallskip
 {\footnotesize \texttt{sigma}/\texttt{pi}/\texttt{rho} bind at atom level (prefix + args). \texttt{bowtie} and \texttt{div} are infix at cross-product precedence.}
 
 \smallskip
-{\scriptsize\textbf{Naming a query.} Use \texttt{Name == expr} (Z abbreviation) for both pure-Z and DAT-bearing right-hand sides. txt2tex inspects the RHS: when it contains a DAT construct (algebra, binding, GROUP/UNGROUP), the abbreviation emits as \texttt{\textbackslash noindent\$\ldots\$} outside any Z block; otherwise it emits inside a \texttt{zed} block. \texttt{T := R} is also accepted for DAT-style assignment; always emits outside zed.}
+{\scriptsize\textbf{Naming a query.} Use \texttt{Name == expr} (Z abbreviation) for both pure-Z and DAT-bearing right-hand sides. txt2tex inspects the RHS: when it contains a DAT construct (algebra, binding, GROUP/UNGROUP), the abbreviation emits as \texttt{\textbackslash noindent\$\ldots\$} outside any Z block; otherwise it emits inside a \texttt{zed} block.}
 
 \smallskip
 {\scriptsize\textbf{Fuzz note:} algebra expressions emit \emph{outside} any Z environment, so fuzz silently skips them — your schemas and axdefs in the same document still type-check cleanly. Do \emph{not} wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks; fuzz parses block contents strictly as Z and will reject the algebra subscripts.}
 
 \begin{exwrite}
 \begin{verbatim}
-BigGuns := pi[class,country](
+BigGuns == pi[class,country](
   sigma[bore >= 16](Class))
 \end{verbatim}
 \end{exwrite}
 \begin{exget}
 \begin{center}
-\begin{zed}
-BigGuns := \pi_{class,country}(\sigma_{bore \geq 16}(Class))
-\end{zed}
+\noindent$BigGuns \defs \pi_{class,country}(\sigma_{bore \geq 16}(Class))$
 \end{center}
 \end{exget}
 
@@ -577,9 +574,8 @@ pk a, b : T          & composite pk \\
 sigma[p](R)          & restrict \\
 pi[A](R)             & project \\
 rho[A as B](R)       & rename attr \\
-R bowtie S           & natural join \\
+R bowtie S           & natural join ($\otimes$) \\
 R div S              & division \\
-T := expr            & algebra assignment \\
 \{| a == e |\}       & binding bracket \\
 \{S; C | P . E\}    & multi-typed set comp \\
 R group (\{A\} as x) & group attrs \\

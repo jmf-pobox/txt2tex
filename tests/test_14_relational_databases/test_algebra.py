@@ -1,11 +1,10 @@
 """Tests for relational algebra operators (Phase 2.2).
 
-Covers the six new AST nodes (Restrict, Project, Rename, NaturalJoin,
-Divide, Assignment), their token types, parser cases, and LaTeX generator
-output.  Negative cases use the three-assertion pattern: message, line,
-column.
+Covers the five AST nodes (Restrict, Project, Rename, NaturalJoin, Divide),
+their token types, parser cases, and LaTeX generator output.  Negative cases
+use the three-assertion pattern: message, line, column.
 
-Q1(a)-(d) acceptance probes at the end verify the canonical rendering
+Q1(a)-(c) acceptance probes at the end verify the canonical rendering
 that exercises1.tex from the Oxford DAT course expects.
 """
 
@@ -14,7 +13,6 @@ from __future__ import annotations
 import pytest
 
 from txt2tex.ast_nodes import (
-    Assignment,
     BinaryOp,
     Divide,
     Document,
@@ -53,17 +51,6 @@ def _parse(src: str) -> Document:
 def _expr(src: str) -> DocumentItem:
     """Parse a single-line algebra expression and return the first document item."""
     return _parse(src).items[0]
-
-
-def _latex(src: str) -> str:
-    """Generate LaTeX from source."""
-    gen = LaTeXGenerator(use_fuzz=True)
-    ast = Parser(_lex(src)).parse()
-    doc = ast if isinstance(ast, Document) else Document(items=[ast], line=1, column=1)
-    lines: list[str] = []
-    for item in doc.items:
-        lines.extend(gen.generate_document_item(item))
-    return "\n".join(lines)
 
 
 def _expr_latex(src: str) -> str:
@@ -111,26 +98,6 @@ class TestAlgebraLexer:
         tokens = _lex("div")
         assert tokens[0].type == TokenType.DIV
         assert tokens[0].value == "div"
-
-    def test_assign_token(self) -> None:
-        """':=' lexes to ASSIGN token."""
-        tokens = _lex(":=")
-        assert tokens[0].type == TokenType.ASSIGN
-        assert tokens[0].value == ":="
-
-    def test_assign_does_not_conflict_with_free_type(self) -> None:
-        """':=' is distinct from '::='."""
-        tokens = _lex("::=")
-        assert tokens[0].type == TokenType.FREE_TYPE
-        tokens2 = _lex(":=")
-        assert tokens2[0].type == TokenType.ASSIGN
-
-    def test_assign_column_position(self) -> None:
-        """':=' token reports correct column."""
-        tokens = _lex("R :=")
-        # R at col 1, space skipped, := at col 3
-        assign_tok = next(t for t in tokens if t.type == TokenType.ASSIGN)
-        assert assign_tok.column == 3
 
 
 # ---------------------------------------------------------------------------
@@ -296,43 +263,6 @@ class TestDivideParser:
 
 
 # ---------------------------------------------------------------------------
-# Parser — Assignment
-# ---------------------------------------------------------------------------
-
-
-class TestAssignmentParser:
-    """Parser produces Assignment nodes for T := expression."""
-
-    def test_assignment_simple_identifier(self) -> None:
-        """T := R → Assignment with target=T, expression=R."""
-        node = _expr("T := R")
-        assert isinstance(node, Assignment)
-        assert isinstance(node.target, Identifier)
-        assert node.target.name == "T"
-        assert isinstance(node.expression, Identifier)
-        assert node.expression.name == "R"
-
-    def test_assignment_with_algebra_expression(self) -> None:
-        """T := pi[a](R) → Assignment with expression=Project."""
-        node = _expr("T := pi[a](R)")
-        assert isinstance(node, Assignment)
-        assert isinstance(node.expression, Project)
-
-    def test_assignment_position(self) -> None:
-        """Assignment node carries position of target identifier."""
-        node = _expr("T := R")
-        assert node.line == 1
-        assert node.column == 1
-
-    def test_assignment_multiple_items(self) -> None:
-        """Multiple assignments in a document parse correctly."""
-        doc = _parse("A := R\nB := S")
-        assert len(doc.items) == 2
-        assert isinstance(doc.items[0], Assignment)
-        assert isinstance(doc.items[1], Assignment)
-
-
-# ---------------------------------------------------------------------------
 # Parser — Composition and nesting
 # ---------------------------------------------------------------------------
 
@@ -366,12 +296,6 @@ class TestAlgebraComposition:
         assert isinstance(node, Project)
         assert isinstance(node.relation, BinaryOp)
         assert node.relation.operator == "-"
-
-    def test_assignment_with_nested_algebra(self) -> None:
-        """T := pi[a](sigma[p](R)) — assignment with nested expression."""
-        node = _expr("T := pi[a](sigma[p](R))")
-        assert isinstance(node, Assignment)
-        assert isinstance(node.expression, Project)
 
 
 # ---------------------------------------------------------------------------
@@ -466,22 +390,22 @@ class TestRenameGenerator:
 
 
 class TestNaturalJoinGenerator:
-    r"""LaTeX generator emits \bowtie for NaturalJoin nodes."""
+    r"""LaTeX generator emits \otimes for NaturalJoin nodes (Trigoni notation)."""
 
     def test_natural_join(self) -> None:
-        r"""R bowtie S → R \bowtie S."""
+        r"""R bowtie S → R \otimes S."""
         result = _expr_latex("R bowtie S")
-        assert result == r"R \bowtie S"
+        assert result == r"R \otimes S"
 
     def test_theta_join(self) -> None:
-        r"""R bowtie [p] S → R \bowtie_{p} S."""
+        r"""R bowtie [p] S → R \otimes_{p} S."""
         result = _expr_latex("R bowtie [p] S")
-        assert result == r"R \bowtie_{p} S"
+        assert result == r"R \otimes_{p} S"
 
     def test_natural_join_named_relations(self) -> None:
-        r"""Ship bowtie Outcome → Ship \bowtie Outcome (no relvar wrapping)."""
+        r"""Ship bowtie Outcome → Ship \otimes Outcome (no relvar wrapping)."""
         result = _expr_latex("Ship bowtie Outcome")
-        assert result == r"Ship \bowtie Outcome"
+        assert result == r"Ship \otimes Outcome"
 
 
 # ---------------------------------------------------------------------------
@@ -501,43 +425,6 @@ class TestDivideGenerator:
         r"""R div S → R \div S (no relvar wrapping)."""
         result = _expr_latex("R div S")
         assert result == r"R \div S"
-
-
-# ---------------------------------------------------------------------------
-# Generator — Assignment
-# ---------------------------------------------------------------------------
-
-
-class TestAssignmentGenerator:
-    r"""LaTeX generator emits \noindent$T := expr$ for Assignment.
-
-    Assignment emits as a top-level math display *outside* any Z block —
-    matching the pattern of the other DAT-specific constructs (algebra,
-    bindings, GROUP/UNGROUP). fuzz silently skips ``\noindent``-wrapped
-    math, so documents using assignment can still type-check their
-    schemas and Z-side content.
-    """
-
-    def test_assignment_simple(self) -> None:
-        """T := R emits a noindent math display, not a zed block."""
-        result = _latex("T := R")
-        assert r"\noindent" in result
-        assert "$T := R$" in result
-        assert r"\begin{zed}" not in result
-
-    def test_assignment_with_project(self) -> None:
-        r"""T := pi[a](R) — noindent math display with \pi in expression."""
-        result = _latex("T := pi[a](R)")
-        assert r"\noindent" in result
-        assert r"\pi_{a}(R)" in result
-        assert r"\begin{zed}" not in result
-
-    def test_assignment_with_named_relation(self) -> None:
-        r"""T := Class — assignment renders Class outside any Z block."""
-        result = _latex("T := Class")
-        assert r"\noindent" in result
-        assert "Class" in result
-        assert r"\begin{zed}" not in result
 
 
 # ---------------------------------------------------------------------------
@@ -628,13 +515,6 @@ class TestAlgebraNegative:
         assert "predicate" in err.message.lower()
         assert err.token.line == 1
 
-    def test_assignment_missing_expression(self) -> None:
-        """T := — missing expression after ':='."""
-        with pytest.raises(ParserError) as exc_info:
-            Parser(_lex("T :=\n")).parse()
-        err = exc_info.value
-        assert err.token.line == 1
-
 
 # ---------------------------------------------------------------------------
 # Acceptance probes -- Q1(a)-(d) from exercises1.tex
@@ -669,32 +549,19 @@ class TestQ1AcceptanceProbes:
     def test_q1b_natural_join(self) -> None:
         r"""Q1(b): Ship bowtie Class — natural join.
 
-        Expected: Ship \bowtie Class
+        Expected: Ship \otimes Class (Trigoni's ⊗ notation)
         """
         result = self._gen("Ship bowtie Class")
-        assert r"Ship \bowtie Class" in result
+        assert r"Ship \otimes Class" in result
 
     def test_q1c_rename_then_join(self) -> None:
         r"""Q1(c): rho[ship as name](Outcome) bowtie Ship.
 
-        Expected: \rho_{ship \to name}(Outcome) \bowtie Ship
+        Expected: \rho_{ship \to name}(Outcome) \otimes Ship (Trigoni's ⊗)
         """
         result = self._gen("rho[ship as name](Outcome) bowtie Ship")
         assert r"\rho_{ship \to name}(Outcome)" in result
-        assert r"\bowtie Ship" in result
-
-    def test_q1d_assignment(self) -> None:
-        r"""Q1(d): Result := pi[class, country](sigma[bore >= 16](Class)).
-
-        Expected: noindent math display containing the algebra expression.
-        Assignment emits outside any Z block so fuzz silently skips it.
-        """
-        result = self._gen("Result := pi[class, country](sigma[bore >= 16](Class))")
-        assert r"\noindent" in result
-        assert r"\pi_{class, country}" in result
-        assert r"\sigma_{bore \geq 16}" in result
-        assert "Class" in result
-        assert r"\begin{zed}" not in result
+        assert r"\otimes Ship" in result
 
 
 # ---------------------------------------------------------------------------
@@ -724,41 +591,6 @@ class TestAttrNamePassthrough:
         r"""rho[name as class'](R) → \rho_{name \to class'}(R)."""
         result = _expr_latex("rho[name as class'](R)")
         assert r"name \to class'" in result
-
-
-class TestFix2ChainedAssignment:
-    """FIX 2: T := R := S raises a clear parser error."""
-
-    def test_chained_assignment_rejected(self) -> None:
-        """T := R := S must raise ParserError mentioning 'chained'."""
-        with pytest.raises(ParserError) as exc_info:
-            Parser(_lex("T := R := S")).parse()
-        err = exc_info.value
-        assert "chained assignment" in err.message.lower()
-        assert err.token.line == 1
-
-    def test_chained_assignment_error_column(self) -> None:
-        """Error token for T := R := S points at the offending second ':='."""
-        with pytest.raises(ParserError) as exc_info:
-            Parser(_lex("T := R := S")).parse()
-        err = exc_info.value
-        # Error points at the *second* := which is the offending token, not the first.
-        # "T := R := S" — column 1=T, 2=space, 3=:=, 5=space, 6=R, 7=space, 8=:=
-        assert err.token.column == 8
-
-
-class TestFix3AssignmentNoLHS:
-    """FIX 3: := R (no LHS) raises a clear parser error at the := token."""
-
-    def test_assign_no_lhs_clear_error(self) -> None:
-        """':= R' must raise ParserError mentioning target name on the left."""
-        with pytest.raises(ParserError) as exc_info:
-            Parser(_lex(":= R")).parse()
-        err = exc_info.value
-        assert "target" in err.message.lower()
-        assert "left" in err.message.lower()
-        assert err.token.line == 1
-        assert err.token.column == 1
 
 
 class TestFix4BowtiePrecedence:

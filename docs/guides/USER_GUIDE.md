@@ -2513,8 +2513,8 @@ pk in axdef          // only schema bodies — parser error
 
 ### Relational Algebra (Phase 2.2)
 
-The five Codd/Date operators plus assignment.  All use kernel LaTeX
-(`\sigma`, `\pi`, `\rho`, `\bowtie`, `\div`) — no extra package needed.
+The five Codd/Date operators.  All use kernel LaTeX
+(`\sigma`, `\pi`, `\rho`, `\otimes`, `\div`) — no extra package needed.
 
 **Fuzz compatibility.** Algebra expressions emit *outside* any Z
 environment (as `\noindent$...$` LaTeX math). fuzz silently skips
@@ -2522,7 +2522,7 @@ them; schemas, axdefs, and other Z-side content in the same document
 still type-check cleanly. Write algebra as a top-level expression in
 your `.txt` source — never inside a `zed`/`axdef`/`schema`/`gendef`
 block. Wrapping algebra inside a Z block causes fuzz to reject the
-subscript form `\sigma_{p}` and the assignment operator `:=`.
+subscript form `\sigma_{p}`.
 
 #### Restriction
 
@@ -2562,7 +2562,10 @@ Each pair is written `old as new`; multiple pairs are comma-separated.
 Ship bowtie Class
 ```
 
-Renders: $Ship \bowtie Class$
+Renders: $Ship \otimes Class$
+
+The source keyword is `bowtie`; the LaTeX emission is `\otimes` (`⊗`),
+matching Trigoni's Oxford DAT lecture slides (topic02 onwards).
 
 **Theta-join** with explicit predicate:
 
@@ -2570,7 +2573,7 @@ Renders: $Ship \bowtie Class$
 Ship bowtie [Ship.class = Class.class] Class
 ```
 
-Renders: $Ship \bowtie_{Ship.class = Class.class} Class$
+Renders: $Ship \otimes_{Ship.class = Class.class} Class$
 
 #### Division
 
@@ -2580,15 +2583,17 @@ R div S
 
 Renders: $R \div S$
 
-#### Assignment
+#### Naming a query
 
-Top-level statement form — cannot be nested inside another expression:
+Use `==` (Z abbreviation) to bind a name to an algebra expression.
+txt2tex inspects the RHS: when it contains a DAT construct, the
+abbreviation emits outside any Z block:
 
 ```text
-BigGuns := pi[class, country](sigma[bore >= 16](Class))
+BigGuns == pi[class, country](sigma[bore >= 16](Class))
 ```
 
-Emits inside `\begin{zed}...\end{zed}`.
+Emits as `\noindent$BigGuns \defs \pi_{class, country}(\sigma_{bore \geq 16}(Class))$`.
 
 #### Combining Operators
 
@@ -2599,8 +2604,8 @@ pi[class, country](sigma[bore >= 16](Class))
 // Q1(c): rename then join
 rho[ship as name](Outcome) bowtie Ship
 
-// Q1(d): assignment
-BigGuns := pi[class, country](sigma[bore >= 16](Class))
+// Q1(d): name a query using ==
+BigGuns == pi[class, country](sigma[bore >= 16](Class))
 ```
 
 **Precedence summary** (tightest to loosest):

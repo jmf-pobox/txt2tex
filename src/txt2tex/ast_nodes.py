@@ -740,20 +740,6 @@ class Ungroup(ASTNode):
 
 
 @dataclass(frozen=True)
-class Assignment(ASTNode):
-    """Relational assignment node (top-level statement form).
-
-    Represents T := R — assign relation expression to a name.
-
-    Example:
-    - Result := pi[class](Class) -> target=Result, expression=pi[class](Class)
-    """
-
-    target: Expr
-    expression: Expr
-
-
-@dataclass(frozen=True)
 class Binding(ASTNode):
     r"""Z binding expression (Z RM §3.7).
 
@@ -1283,7 +1269,6 @@ DocumentItem = (
     | HorizDef
     | Zed
     | ProofTree
-    | Assignment
 )
 
 

@@ -11,7 +11,6 @@ from txt2tex.__version__ import __version__
 from txt2tex.ast_nodes import (
     Abbreviation,
     ArgueChain,
-    Assignment,
     AxDef,
     BagLiteral,
     BinaryOp,
@@ -2067,15 +2066,15 @@ class LaTeXGenerator:
     ) -> str:
         r"""Generate LaTeX for R bowtie S or R bowtie [p] S.
 
-        R bowtie S      → R \bowtie S
-        R bowtie [p] S  → R \bowtie_{p} S
+        R bowtie S      → R \otimes S
+        R bowtie [p] S  → R \otimes_{p} S
         """
         left_latex = self.generate_expr(node.left)
         right_latex = self.generate_expr(node.right)
         if node.subscript is None:
-            return rf"{left_latex} \bowtie {right_latex}"
+            return rf"{left_latex} \otimes {right_latex}"
         sub_latex = self.generate_expr(node.subscript)
-        return rf"{left_latex} \bowtie_{{{sub_latex}}} {right_latex}"
+        return rf"{left_latex} \otimes_{{{sub_latex}}} {right_latex}"
 
     @generate_expr.register(Divide)
     def _generate_divide(self, node: Divide, parent: Expr | None = None) -> str:
@@ -2130,26 +2129,6 @@ class LaTeXGenerator:
             components.append(f"{label_latex} == {value_latex}")
         inner = ", ".join(components)
         return rf"\lblot {inner} \rblot"
-
-    @generate_document_item.register(Assignment)
-    def _generate_assignment(self, node: Assignment) -> list[str]:
-        r"""Generate LaTeX for T := expression.
-
-        Emits as a top-level math display *outside* any Z environment,
-        matching the pattern of other DAT-specific constructs (algebra,
-        bindings, GROUP/UNGROUP). fuzz silently skips ``\noindent``-wrapped
-        math, so a document containing assignments still type-checks its
-        schemas and Z-side content cleanly.
-
-        T := pi[class](Class) → \noindent$T := \pi_{class}(Class)$
-        """
-        target_latex = self.generate_expr(node.target)
-        expr_latex = self.generate_expr(node.expression)
-        return [
-            r"\noindent",
-            f"${target_latex} := {expr_latex}$",
-            "",
-        ]
 
     @generate_document_item.register(Section)
     def _generate_section(self, node: Section) -> list[str]:

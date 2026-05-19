@@ -1487,18 +1487,19 @@ in existing corpus files.  Six forms:
 sigma[pred](R)         -- restriction    → \sigma_{pred}(R)
 pi[A, B](R)            -- projection     → \pi_{A, B}(R)
 rho[A as B, C as D](R) -- rename        → \rho_{A \to B, C \to D}(R)
-R bowtie S             -- natural join   → R \bowtie S
-R bowtie [pred] S      -- theta-join     → R \bowtie_{pred} S
+R bowtie S             -- natural join   → R \otimes S
+R bowtie [pred] S      -- theta-join     → R \otimes_{pred} S
 R div S                -- division       → R \div S
-T := R                 -- assignment     → \begin{zed}T := R\end{zed}
 ```
+
+> **Note (Trigoni alignment, 2026-05-19)**: `:=` (assignment) has been
+> removed.  Use `==` instead.  `\bowtie` has been replaced by `\otimes`.
 
 **Operator levels** (lowest binds least):
 
 | Level | Operator(s) | Grammar function | Binds |
 |-------|-------------|-----------------|-------|
-| statement | `:=` (assignment) | `_parse_document_item` | loosest |
-| union/override | `union`, `++` | `_parse_union` | |
+| union/override | `union`, `++` | `_parse_union` | loosest |
 | setminus | `\` | `_parse_setminus` | |
 | cross/join/div | `cross`, `bowtie`, `div` | `_parse_cross` | |
 | intersect | `intersect` | `_parse_intersect` | |
@@ -1507,12 +1508,11 @@ T := R                 -- assignment     → \begin{zed}T := R\end{zed}
 The complete precedence chain from loosest to tightest:
 
 ```text
-assignment (DocumentItem only)
-  < union / override (++)
-      < setminus (\)
-          < cross / bowtie / div   [left-associative; same level]
-              < intersect
-                  < sigma[...](R) / pi[...](R) / rho[...](R)   [atom]
+union / override (++)
+    < setminus (\)
+        < cross / bowtie / div   [left-associative; same level]
+            < intersect
+                < sigma[...](R) / pi[...](R) / rho[...](R)   [atom]
 ```
 
 `_parse_cross` calls `_parse_intersect` for each of its operands, so
@@ -1525,6 +1525,8 @@ first.  Consequence:
   is resolved inside `_parse_intersect` before `bowtie` completes.
 - `pi[a](R) bowtie S` parses as `(pi[a](R)) bowtie S` — `pi` is an atom.
 
+(In all three cases the LaTeX output uses `\otimes` / `\otimes_{p}`.)
+
 **Why sigma/pi/rho at atom level**: They take explicit `[args](relation)`
 syntax analogous to function calls.  Parsing them at atom level is consistent
 with how `f(x)` is handled; it also means they can appear freely as operands
@@ -1535,13 +1537,6 @@ division as binary operators on relations, at the same conceptual tier as
 Cartesian product.  Placing them alongside `cross` in `_parse_cross` avoids
 a separate precedence level while preserving the expected left-to-right
 associativity.
-
-**Assignment as DocumentItem (not Expr)**: `Assignment` appears in the
-`DocumentItem` union type only — it is absent from the `Expr` union.
-Assignment is a statement that binds a name; it is not a value to be further
-composed.  This enforces the constraint structurally: `:=` is not available
-inside expression context, so `sigma[T := R](S)` is a parser error.
-This matches Z RM §3.5 paragraph structure.
 
 **Theta-join subscript parsing**: `R bowtie [pred] S` — the `[` is consumed
 inside `_parse_cross` when it immediately follows a `bowtie` token.  A
@@ -1554,11 +1549,7 @@ checks `self._current().value == "as"` after consuming the source attribute
 name.  This avoids a reserved-word collision with any Z identifier named `as`
 in other contexts.
 
-**`:=` vs `::=` lexer ordering**: `:=` (ASSIGN) is checked before `::=`
-(FREE_TYPE) and `::` (DOUBLE_COLON) by testing `peek_char() == "=" and
-peek_char(2) != "="`.  This dispatches in one pass without backtracking.
-
-**Kernel LaTeX only**: `\sigma`, `\pi`, `\rho`, `\bowtie`, `\div` are all
+**Kernel LaTeX only**: `\sigma`, `\pi`, `\rho`, `\otimes`, `\div` are all
 standard LaTeX kernel symbols.  No preamble change is required; fuzz and
 pdflatex both accept them without extra packages.
 
@@ -1581,6 +1572,65 @@ it receives `\mathrm{}` wrapping — consistent with the general rule.
 
 3. `Assignment` as `Expr` — rejected; would allow nonsensical nesting like
    `sigma[T := R](S)`.  Statement-shaped constructs belong in `DocumentItem`.
+
+> **Superseded (Trigoni alignment, 2026-05-19):** The `:=` operator and
+> `Assignment` node have been removed entirely; the `\bowtie` emission has
+> been replaced by `\otimes`. See "ADR: Trigoni Alignment — Drop `:=`,
+> `\bowtie` → `\otimes`" below.
+
+## ADR: Trigoni Alignment — Drop `:=`, `\bowtie` → `\otimes`
+
+**Decision**: Remove the `:=` assignment operator entirely and switch the
+natural-join LaTeX emission from `\bowtie` to `\otimes`, aligning with
+Nikola Trigoni's Oxford DAT lecture slides (topic00–topic06, read
+2026-05-19).
+
+**Evidence**:
+
+- topic02 slide 408 (literal text): *"x == r assigns the name x to the
+  relation r"* — Trigoni uses `==`, not `:=`, for relational assignment.
+  The operator `==` was already supported via the smart-`==` abbreviation
+  committed in a8a02ae.
+- The only `:=` in seven slide decks is one SQL UPDATE trigger example
+  (topic05 line 425) — a SQL construct, not a DAT algebra statement.
+- Trigoni writes `A == ProperGroups ⊗ NewMembers` consistently across
+  all algebra examples. LaTeX for `⊗` is `\otimes`, a kernel symbol
+  present in fuzz and pdflatex without extra packages.
+
+**Changes**:
+
+- `TokenType.ASSIGN` removed from `tokens.py`.
+- `:=` dispatch removed from `lexer.py`; a source line `T := R` now
+  lexes as `T COLON EQUALS R` and the parser raises a
+  "Expected ':' in declaration"-style error.
+- `Assignment` dataclass removed from `ast_nodes.py`; removed from
+  `DocumentItem` union.
+- `_parse_assignment`, both ASSIGN dispatch sites, and the bare-ASSIGN
+  guard removed from `parser.py`.
+- `_generate_assignment` and its `@generate_document_item.register`
+  removed from `latex_gen.py`.
+- `_generate_natural_join` updated: emits `\otimes` / `\otimes_{p}`
+  instead of `\bowtie` / `\bowtie_{p}`.
+- All Assignment-related tests removed from
+  `tests/test_14_relational_databases/test_algebra.py`; bowtie generator
+  tests updated to expect `\otimes`.
+- `docs/cheatsheet.tex`, `docs/tutorials/11_relational_databases.md`,
+  `docs/guides/USER_GUIDE.md`, and
+  `examples/14_relational_databases/algebra_basics.{txt,tex}` updated.
+
+**Students who need the literal `:=` glyph** (e.g., for a SQL UPDATE
+trigger example) can use a `TEXT:` or `LATEX:` block.
+
+**Backward incompatibility**: Any existing `.txt` files that use `:=` will
+fail to parse. Migrate to `==`.
+
+**Options rejected**:
+
+1. Keep `:=` as a deprecated synonym — rejected; the mission mandates full
+   removal with no shims.
+
+2. Keep `\bowtie` as an option/flag — rejected; a single canonical symbol
+   per operator simplifies the output and matches the course materials.
 
 ## ADR: Z Binding Brackets and Context-Sensitive == (Phase 2.3)
 

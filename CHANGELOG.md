@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- **`:=` operator removed.** The `:=` (assignment) token type, AST node,
+  parser dispatch, and generator are gone. Use `==` for relational assignment
+  — the smart-`==` abbreviation (committed a8a02ae) already covers both
+  pure-Z and DAT-bearing right-hand sides. This matches Trigoni's lecture
+  convention (topic02 slide 408 reads *"x == r assigns the name x to the
+  relation r"*). Existing `.txt` files that use `:=` will raise a parser
+  error; migrate to `==`.
+
+- **Natural-join emission changed: `\bowtie` → `\otimes`.** The source
+  keyword `bowtie` is unchanged, but the LaTeX emission is now `\otimes`
+  (`⊗`) to match Trigoni's Oxford DAT slides. Theta-join similarly changes
+  from `\bowtie_{p}` to `\otimes_{p}`. Both are standard LaTeX kernel
+  symbols — no preamble change required. Any generated `.tex` files that
+  contain `\bowtie` in natural-join position should be regenerated.
+
 ### Added
 
 - `pk` declaration prefix for primary-key underlining (Phase 2.1 revised).

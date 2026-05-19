@@ -162,7 +162,6 @@ class TokenType(Enum):
     RHO = auto()  # rho (rename)
     BOWTIE = auto()  # bowtie (natural join / theta-join)
     DIV = auto()  # div (division)
-    ASSIGN = auto()  # := (assignment)
 
     # Binding bracket operators (Phase 2.3 — Z RM §3.7)
     LBIND = auto()  # {| (binding literal left)

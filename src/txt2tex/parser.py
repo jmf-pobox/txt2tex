@@ -10,7 +10,6 @@ from txt2tex.ast_nodes import (
     Abbreviation,
     ArgueChain,
     ArgueStep,
-    Assignment,
     AxDef,
     BagLiteral,
     BibliographyMetadata,
@@ -320,32 +319,6 @@ class Parser:
                     line=first_line,
                     column=1,
                 )
-            # Check for assignment: Name := expression (Phase 2.2)
-            if next_token.type == TokenType.ASSIGN:
-                first_assign = self._parse_assignment()
-                self._skip_newlines()
-                if not self._at_end():
-                    items_with_assign: list[DocumentItem] = [first_assign]
-                    while not self._at_end():
-                        items_with_assign.append(self._parse_document_item())
-                        self._skip_newlines()
-                    return Document(
-                        items=items_with_assign,
-                        title_metadata=None,
-                        parts_format=parts_format,
-                        bibliography_metadata=None,
-                        line=first_line,
-                        column=1,
-                    )
-                return Document(
-                    items=[first_assign],
-                    title_metadata=None,
-                    parts_format=parts_format,
-                    bibliography_metadata=None,
-                    line=first_line,
-                    column=1,
-                )
-
         # Check for abbreviation with generic parameters [X, Y] Name == expression
         # Note: Bag literals [[x]] start with [[ which is distinct
         if self._match(TokenType.LBRACKET):
@@ -387,14 +360,6 @@ class Parser:
                 bibliography_metadata=None,
                 line=first_line,
                 column=1,
-            )
-
-        # Bare ':=' with no identifier on the left — give a clear error.
-        if self._match(TokenType.ASSIGN):
-            assign_tok = self._current()
-            raise ParserError(
-                "Assignment requires a target name on the left (e.g., 'T := R')",
-                assign_tok,
             )
 
         # Try to parse as expression
@@ -660,16 +625,8 @@ class Parser:
             return style
         return "subsection"  # Default
 
-    def _parse_document_item(self) -> DocumentItem:  # noqa: C901
+    def _parse_document_item(self) -> DocumentItem:
         """Parse a document item (expression or structural element)."""
-        # Catch bare := without a LHS — give a clear error rather than a
-        # generic "Unexpected token" from the expression parser downstream.
-        if self._match(TokenType.ASSIGN):
-            assign_tok = self._current()
-            raise ParserError(
-                "Assignment requires a target name on the left (e.g., 'T := R')",
-                assign_tok,
-            )
         if self._match(TokenType.SECTION_MARKER):
             return self._parse_section()
         if self._match(TokenType.SOLUTION_MARKER):
@@ -746,9 +703,6 @@ class Parser:
                 is_abbrev = token_after_postfix.type == TokenType.ABBREV
             if is_abbrev:
                 return self._parse_abbreviation()
-            # Check for assignment: Name := expression (Phase 2.2)
-            if next_token.type == TokenType.ASSIGN:
-                return self._parse_assignment()
             # Otherwise fall through to expression parsing
 
         # Check for abbreviation with generic parameters [X, Y] Name == expression
@@ -3902,31 +3856,6 @@ class Parser:
             )
         dst = self._advance().value
         return (src, dst)
-
-    def _parse_assignment(self) -> Assignment:
-        """Parse Name := expression (top-level assignment)."""
-        target_tok = self._advance()  # consume IDENTIFIER (target name)
-        assign_tok = self._advance()  # consume ':='
-        if self._at_end() or self._match(TokenType.NEWLINE):
-            raise ParserError("Expected expression after ':='", assign_tok)
-        expression = self._parse_expr()
-        # Chained assignment (T := R := S) is not supported
-        if self._match(TokenType.ASSIGN):
-            raise ParserError(
-                "Chained assignment not supported; use separate statements",
-                self._current(),
-            )
-        target: Expr = Identifier(
-            name=target_tok.value,
-            line=target_tok.line,
-            column=target_tok.column,
-        )
-        return Assignment(
-            target=target,
-            expression=expression,
-            line=target_tok.line,
-            column=target_tok.column,
-        )
 
     def _parse_atom(self) -> Expr:
         """Parse atom.

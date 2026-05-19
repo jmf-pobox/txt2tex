@@ -512,12 +512,6 @@ class Lexer:
             self._advance()
             return Token(TokenType.PERIOD, ".", start_line, start_column)
 
-        # Assignment operator := - check before ::= and :: and : alone
-        if char == ":" and self._peek_char() == "=" and self._peek_char(2) != "=":
-            self._advance()
-            self._advance()
-            return Token(TokenType.ASSIGN, ":=", start_line, start_column)
-
         # Free type operator ::= - check before :: and :
         if char == ":" and self._peek_char() == ":" and self._peek_char(2) == "=":
             self._advance()

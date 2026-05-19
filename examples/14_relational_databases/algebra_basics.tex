@@ -64,15 +64,15 @@ $\rho_{class \to id, country \to origin}(Class)$
 \section*{Natural Join and Theta - Join ( bowtie )}
 
 \noindent
-$Ship \bowtie Class$
+$Ship \otimes Class$
 
 
 \noindent
-$\rho_{ship \to name}(Outcome) \bowtie Ship$
+$\rho_{ship \to name}(Outcome) \otimes Ship$
 
 
 \noindent
-$Ship \bowtie_{Ship.class = Class.class} Class$
+$Ship \otimes_{Ship.class = Class.class} Class$
 
 
 \section*{Division ( div )}
@@ -80,12 +80,6 @@ $Ship \bowtie_{Ship.class = Class.class} Class$
 \noindent
 $Ship \div Class$
 
-
-\section*{Assignment ( := )}
-
-\begin{zed}
-BigGuns := \pi_{class, country}(\sigma_{bore \geq 16}(Class))
-\end{zed}
 
 \section*{Combined Query ( Q1 style )}
 
