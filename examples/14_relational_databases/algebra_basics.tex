@@ -34,31 +34,31 @@ launched : \nat
 \section*{Restriction ( sigma )}
 
 \noindent
-$\sigma_{bore \geq 16}(Class)$
+$\mathrm{Restrict}_{bore \geq 16}(Class)$
 
 
 \noindent
-$\sigma_{country = UK}(\sigma_{bore \geq 16}(Class))$
+$\mathrm{Restrict}_{country = UK}(\mathrm{Restrict}_{bore \geq 16}(Class))$
 
 
 \section*{Projection ( pi )}
 
 \noindent
-$\pi_{class, country}(Class)$
+$\mathrm{Project}\{class, country\}(Class)$
 
 
 \noindent
-$\pi_{class, country}(\sigma_{bore \geq 16}(Class))$
+$\mathrm{Project}\{class, country\}(\mathrm{Restrict}_{bore \geq 16}(Class))$
 
 
 \section*{Renaming ( rho )}
 
 \noindent
-$\rho_{ship \to name}(Outcome)$
+$\mathrm{Rename}_{ship \to name}(Outcome)$
 
 
 \noindent
-$\rho_{class \to id, country \to origin}(Class)$
+$\mathrm{Rename}_{class \to id, country \to origin}(Class)$
 
 
 \section*{Natural Join and Theta - Join ( bowtie )}
@@ -68,11 +68,11 @@ $Ship \otimes Class$
 
 
 \noindent
-$\rho_{ship \to name}(Outcome) \otimes Ship$
+$\mathrm{Rename}_{ship \to name}(Outcome) \otimes Ship$
 
 
 \noindent
-$Ship \otimes_{Ship.class = Class.class} Class$
+$\mathrm{Join}_{Ship.class = Class.class}(Ship, Class)$
 
 
 \section*{Division ( div )}
@@ -84,7 +84,7 @@ $Ship \div Class$
 \section*{Combined Query ( Q1 style )}
 
 \noindent
-$\pi_{class, country}(\sigma_{bore \geq 16}(Class))$
+$\mathrm{Project}\{class, country\}(\mathrm{Restrict}_{bore \geq 16}(Class))$
 
 
 \end{document}

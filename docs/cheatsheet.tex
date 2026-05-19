@@ -472,11 +472,11 @@ Comma-separated names on one \kw{pk} line also work.
 \section{Relational Algebra}
 
 \begin{tabularx}{\columnwidth}{LR}
-sigma[p](R)          & $\sigma_{p}(R)$ — restrict \\
-pi[A,B](R)           & $\pi_{A,B}(R)$ — project \\
-rho[A as B](R)       & $\rho_{A \to B}(R)$ — rename \\
+sigma[p](R)          & $\mathrm{Restrict}_{p}(R)$ — restrict \\
+pi[A,B](R)           & $\mathrm{Project}\{A,B\}(R)$ — project \\
+rho[A as B](R)       & $\mathrm{Rename}_{A \to B}(R)$ — rename \\
 R bowtie S           & $R \otimes S$ — natural join \\
-R bowtie [p] S       & $R \otimes_{p} S$ — theta-join \\
+R bowtie [p] S       & $\mathrm{Join}_{p}(R, S)$ — theta-join \\
 R div S              & $R \div S$ — division \\
 \end{tabularx}
 
@@ -497,7 +497,7 @@ BigGuns == pi[class,country](
 \end{exwrite}
 \begin{exget}
 \begin{center}
-\noindent$BigGuns \defs \pi_{class,country}(\sigma_{bore \geq 16}(Class))$
+\noindent$BigGuns \defs \mathrm{Project}\{class,country\}(\mathrm{Restrict}_{bore \geq 16}(Class))$
 \end{center}
 \end{exget}
 

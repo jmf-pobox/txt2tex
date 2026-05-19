@@ -1549,9 +1549,12 @@ checks `self._current().value == "as"` after consuming the source attribute
 name.  This avoids a reserved-word collision with any Z identifier named `as`
 in other contexts.
 
-**Kernel LaTeX only**: `\sigma`, `\pi`, `\rho`, `\otimes`, `\div` are all
-standard LaTeX kernel symbols.  No preamble change is required; fuzz and
-pdflatex both accept them without extra packages.
+**Kernel LaTeX only** *(SUPERSEDED 2026-05-19; see the Tier-2 Trigoni
+Keyword Algebra ADR for the current emission. The glyphs listed here
+reflect the original Greek-letter rendering that has been replaced.)*
+`\sigma`, `\pi`, `\rho`, `\otimes`, `\div` are all standard LaTeX kernel
+symbols. No preamble change is required; fuzz and pdflatex both accept
+them without extra packages.
 
 **Relvar wrapping in algebra**: Attribute names in `pi[class, country](R)`
 are emitted through the same `Identifier` path as all other identifiers.
@@ -2012,5 +2015,67 @@ names are comma-separated inside the set literal.
 4. *Capitalisation heuristic* — rejected: single-letter type variables (`N`,
    `Z`, `X`) are uppercase but not relation names; explicit declaration is
    required.
+
+## ADR: Tier-2 Trigoni Keyword Algebra Rendering (Phase 2.2 revised)
+
+**Date:** 2026-05-19
+**Status:** Accepted
+
+### Context
+
+The initial Phase 2.2 implementation emitted relational algebra in
+Codd/Date Greek-letter form: `\sigma_p(R)`, `\pi_{A}(R)`, `\rho_{A \to B}(R)`,
+`R \otimes_p S`. These glyphs came from Date's textbook chapters, which use
+the Greek-letter convention. Trigoni's Oxford DAT lecture slides consistently
+use the keyword form — `Restrict`, `Project`, `Rename`, `Join` — written upright
+(`\mathrm`), with theta-join in function-call form rather than infix.
+
+### Decision
+
+Adopt **Tier 2** keyword emission for relational algebra. Source keywords
+(`sigma`, `pi`, `rho`, `bowtie`, `div`) and AST nodes (`Restrict`, `Project`,
+`Rename`, `NaturalJoin`, `Divide`) remain unchanged. Only the LaTeX *output*
+of the generator changes.
+
+| Source | Before (Greek) | After (Trigoni keyword) |
+|--------|----------------|-------------------------|
+| `sigma[p](R)` | `\sigma_{p}(R)` | `\mathrm{Restrict}_{p}(R)` |
+| `pi[A, B](R)` | `\pi_{A, B}(R)` | `\mathrm{Project}\{A, B\}(R)` |
+| `rho[A as B](R)` | `\rho_{A \to B}(R)` | `\mathrm{Rename}_{A \to B}(R)` |
+| `R bowtie S` | `R \otimes S` | `R \otimes S` — unchanged |
+| `R bowtie [p] S` | `R \otimes_{p} S` | `\mathrm{Join}_{p}(R, S)` |
+| `R div S` | `R \div S` | `R \div S` — unchanged |
+
+Two shape changes merit attention:
+
+1. **Project uses literal braces**, not subscript. Trigoni's slides write
+   `Project{username, job}(Members)` with `\{...\}` around the attribute list.
+   Restrict and Rename keep subscript form.
+
+2. **Theta-join changes from infix to function-call form**: `R \otimes_p S`
+   becomes `\mathrm{Join}_p(R, S)`. Natural join (no subscript) stays infix
+   with `\otimes`. The NaturalJoin AST node already carries `subscript: Expr |
+   None`; the generator dispatches on that field.
+
+### Rejected alternative: Tier 3 render-mode flag
+
+A `use_trigoni_style` CLI flag toggling between Greek and keyword emission was
+considered. Rejected because:
+
+- Greek glyphs were never specified by Z or by any txt2tex consumer outside
+  the DAT course. They came from Date's textbook, not from the course lecturer.
+- A flag doubles the test surface and adds CLI plumbing for a feature with one
+  user and one mode.
+- If a future user needs Greek-letter rendering, the flag can be added as a
+  one-edit-site change without rework.
+
+### Provenance
+
+Trigoni's notation observed in:
+
+- `/Users/jfreeman/Coding/course-ox-dat/slides/topic02.pdf` — `Restrict`,
+  `Project`, `Rename` used consistently from slide 02-69 onwards.
+- Topic03 and topic04 confirm the same style.
+- Theta-join function form (`Join_p(R, S)`) first appears at slide 02-69/70/71.
 
 **Test count delta**: 3893 → 3925 (32 new pk tests; relvars tests deleted).

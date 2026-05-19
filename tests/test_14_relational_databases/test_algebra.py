@@ -304,24 +304,24 @@ class TestAlgebraComposition:
 
 
 class TestRestrictGenerator:
-    r"""LaTeX generator emits \sigma_{pred}(rel) for Restrict nodes."""
+    r"""LaTeX generator emits \mathrm{Restrict}_{pred}(rel) for Restrict nodes."""
 
     def test_restrict_simple(self) -> None:
-        r"""sigma[p](R) → \sigma_{p}(R)."""
+        r"""sigma[p](R) → \mathrm{Restrict}_{p}(R)."""
         result = _expr_latex("sigma[p](R)")
-        assert result == r"\sigma_{p}(R)"
+        assert result == r"\mathrm{Restrict}_{p}(R)"
 
     def test_restrict_comparison(self) -> None:
-        r"""sigma[bore >= 16](R) → \sigma_{bore \geq 16}(R)."""
+        r"""sigma[bore >= 16](R) → \mathrm{Restrict}_{bore \geq 16}(R)."""
         result = _expr_latex("sigma[bore >= 16](R)")
-        assert r"\sigma_{" in result
+        assert r"\mathrm{Restrict}_{" in result
         assert r"\geq" in result
         assert r"16" in result
 
     def test_restrict_with_named_relation(self) -> None:
-        r"""sigma[p](Class) → \sigma_{p}(Class) (no relvar wrapping)."""
+        r"""sigma[p](Class) → \mathrm{Restrict}_{p}(Class) (no relvar wrapping)."""
         result = _expr_latex("sigma[p](Class)")
-        assert result == r"\sigma_{p}(Class)"
+        assert result == r"\mathrm{Restrict}_{p}(Class)"
 
     def test_restrict_bore_attribute_italic(self) -> None:
         r"""sigma[bore >= 16](Class) — bore and Class both render italic."""
@@ -337,27 +337,27 @@ class TestRestrictGenerator:
 
 
 class TestProjectGenerator:
-    r"""LaTeX generator emits \pi_{attrs}(rel) for Project nodes."""
+    r"""LaTeX generator emits \mathrm{Project}\{attrs\}(rel) for Project nodes."""
 
     def test_project_single_attr(self) -> None:
-        r"""pi[a](R) → \pi_{a}(R)."""
+        r"""pi[a](R) → \mathrm{Project}\{a\}(R)."""
         result = _expr_latex("pi[a](R)")
-        assert result == r"\pi_{a}(R)"
+        assert result == r"\mathrm{Project}\{a\}(R)"
 
     def test_project_multiple_attrs(self) -> None:
-        r"""pi[class, country](R) → \pi_{class, country}(R)."""
+        r"""pi[class, country](R) → \mathrm{Project}\{class, country\}(R)."""
         result = _expr_latex("pi[class, country](R)")
-        assert result == r"\pi_{class, country}(R)"
+        assert result == r"\mathrm{Project}\{class, country\}(R)"
 
     def test_project_named_relation(self) -> None:
-        r"""pi[class, country](Class) → \pi_{class, country}(Class)."""
+        r"""pi[class, country](Class) → \mathrm{Project}\{class, country\}(Class)."""
         result = _expr_latex("pi[class, country](Class)")
-        assert result == r"\pi_{class, country}(Class)"
+        assert result == r"\mathrm{Project}\{class, country\}(Class)"
 
     def test_project_attr_in_subscript(self) -> None:
-        r"""pi[Class](R) — Class in subscript rendered italic."""
+        r"""pi[Class](R) — Class in braces rendered italic."""
         result = _expr_latex("pi[Class](R)")
-        assert result == r"\pi_{Class}(R)"
+        assert result == r"\mathrm{Project}\{Class\}(R)"
 
 
 # ---------------------------------------------------------------------------
@@ -366,22 +366,22 @@ class TestProjectGenerator:
 
 
 class TestRenameGenerator:
-    r"""LaTeX generator emits \rho_{A \to B}(rel) for Rename nodes."""
+    r"""LaTeX generator emits \mathrm{Rename}_{A \to B}(rel) for Rename nodes."""
 
     def test_rename_single_pair(self) -> None:
-        r"""rho[ship as name](R) → \rho_{ship \to name}(R)."""
+        r"""rho[ship as name](R) → \mathrm{Rename}_{ship \to name}(R)."""
         result = _expr_latex("rho[ship as name](R)")
-        assert result == r"\rho_{ship \to name}(R)"
+        assert result == r"\mathrm{Rename}_{ship \to name}(R)"
 
     def test_rename_multiple_pairs(self) -> None:
-        r"""rho[A as B, C as D](R) → \rho_{A \to B, C \to D}(R)."""
+        r"""rho[A as B, C as D](R) → \mathrm{Rename}_{A \to B, C \to D}(R)."""
         result = _expr_latex("rho[A as B, C as D](R)")
-        assert result == r"\rho_{A \to B, C \to D}(R)"
+        assert result == r"\mathrm{Rename}_{A \to B, C \to D}(R)"
 
     def test_rename_named_relation(self) -> None:
-        r"""rho[ship as name](Outcome) → \rho_{ship \to name}(Outcome)."""
+        r"""rho[ship as name](Outcome) → \mathrm{Rename}_{ship \to name}(Outcome)."""
         result = _expr_latex("rho[ship as name](Outcome)")
-        assert result == r"\rho_{ship \to name}(Outcome)"
+        assert result == r"\mathrm{Rename}_{ship \to name}(Outcome)"
 
 
 # ---------------------------------------------------------------------------
@@ -390,17 +390,20 @@ class TestRenameGenerator:
 
 
 class TestNaturalJoinGenerator:
-    r"""LaTeX generator emits \otimes for NaturalJoin nodes (Trigoni notation)."""
+    r"""LaTeX generator: \otimes (natural join) or \mathrm{Join} (theta-join).
+
+    Natural join (no subscript) stays infix; theta-join becomes function form.
+    """
 
     def test_natural_join(self) -> None:
-        r"""R bowtie S → R \otimes S."""
+        r"""R bowtie S → R \otimes S (unchanged)."""
         result = _expr_latex("R bowtie S")
         assert result == r"R \otimes S"
 
     def test_theta_join(self) -> None:
-        r"""R bowtie [p] S → R \otimes_{p} S."""
+        r"""R bowtie [p] S → \mathrm{Join}_{p}(R, S) (function form)."""
         result = _expr_latex("R bowtie [p] S")
-        assert result == r"R \otimes_{p} S"
+        assert result == r"\mathrm{Join}_{p}(R, S)"
 
     def test_natural_join_named_relations(self) -> None:
         r"""Ship bowtie Outcome → Ship \otimes Outcome (no relvar wrapping)."""
@@ -539,17 +542,18 @@ class TestQ1AcceptanceProbes:
     def test_q1a_project_restrict(self) -> None:
         r"""Q1(a): pi[class, country](sigma[bore >= 16](Class)).
 
-        Expected: \pi_{class, country}(\sigma_{bore \geq 16}(Class))
+        Expected:
+            \mathrm{Project}\{class, country\}(\mathrm{Restrict}_{bore \geq 16}(Class))
         """
         result = self._gen("pi[class, country](sigma[bore >= 16](Class))")
-        assert r"\pi_{class, country}" in result
-        assert r"\sigma_{bore \geq 16}" in result
+        assert r"\mathrm{Project}\{class, country\}" in result
+        assert r"\mathrm{Restrict}_{bore \geq 16}" in result
         assert "Class" in result
 
     def test_q1b_natural_join(self) -> None:
         r"""Q1(b): Ship bowtie Class — natural join.
 
-        Expected: Ship \otimes Class (Trigoni's ⊗ notation)
+        Expected: Ship \otimes Class (Trigoni's ⊗ notation — unchanged)
         """
         result = self._gen("Ship bowtie Class")
         assert r"Ship \otimes Class" in result
@@ -557,10 +561,10 @@ class TestQ1AcceptanceProbes:
     def test_q1c_rename_then_join(self) -> None:
         r"""Q1(c): rho[ship as name](Outcome) bowtie Ship.
 
-        Expected: \rho_{ship \to name}(Outcome) \otimes Ship (Trigoni's ⊗)
+        Expected: \mathrm{Rename}_{ship \to name}(Outcome) \otimes Ship
         """
         result = self._gen("rho[ship as name](Outcome) bowtie Ship")
-        assert r"\rho_{ship \to name}(Outcome)" in result
+        assert r"\mathrm{Rename}_{ship \to name}(Outcome)" in result
         assert r"\otimes Ship" in result
 
 
@@ -570,25 +574,25 @@ class TestQ1AcceptanceProbes:
 
 
 class TestAttrNamePassthrough:
-    """Attribute names in pi/rho subscripts pass through as-is (no wrapping)."""
+    """Attribute names in pi/rho pass through as-is (no wrapping)."""
 
     def test_pi_decorated_attr(self) -> None:
-        r"""pi[class'](R) → \pi_{class'}(R) (decorated name passes through)."""
+        r"""pi[class'](R) → \mathrm{Project}\{class'\}(R) (decorated name passes through)."""  # noqa: E501
         result = _expr_latex("pi[class'](R)")
-        assert r"\pi_{class'}" in result
+        assert r"\mathrm{Project}\{class'\}" in result
 
     def test_pi_plain_attr(self) -> None:
-        r"""pi[name](R) → \pi_{name}(R)."""
+        r"""pi[name](R) → \mathrm{Project}\{name\}(R)."""
         result = _expr_latex("pi[name](R)")
-        assert result == r"\pi_{name}(R)"
+        assert result == r"\mathrm{Project}\{name\}(R)"
 
     def test_rho_decorated_src(self) -> None:
-        r"""rho[class' as id](R) → \rho_{class' \to id}(R)."""
+        r"""rho[class' as id](R) → \mathrm{Rename}_{class' \to id}(R)."""
         result = _expr_latex("rho[class' as id](R)")
-        assert r"\rho_{class' \to id}(R)" in result
+        assert r"\mathrm{Rename}_{class' \to id}(R)" in result
 
     def test_rho_decorated_dst(self) -> None:
-        r"""rho[name as class'](R) → \rho_{name \to class'}(R)."""
+        r"""rho[name as class'](R) → \mathrm{Rename}_{name \to class'}(R)."""
         result = _expr_latex("rho[name as class'](R)")
         assert r"name \to class'" in result
 

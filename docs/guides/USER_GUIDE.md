@@ -2513,8 +2513,9 @@ pk in axdef          // only schema bodies — parser error
 
 ### Relational Algebra (Phase 2.2)
 
-The five Codd/Date operators.  All use kernel LaTeX
-(`\sigma`, `\pi`, `\rho`, `\otimes`, `\div`) — no extra package needed.
+The five Codd/Date operators.  All use kernel LaTeX (`\mathrm`, `\otimes`,
+`\div`) — no extra package needed.  The emission uses Trigoni's Oxford DAT
+keyword style: `Restrict`, `Project`, `Rename`, `Join`.
 
 **Fuzz compatibility.** Algebra expressions emit *outside* any Z
 environment (as `\noindent$...$` LaTeX math). fuzz silently skips
@@ -2522,7 +2523,7 @@ them; schemas, axdefs, and other Z-side content in the same document
 still type-check cleanly. Write algebra as a top-level expression in
 your `.txt` source — never inside a `zed`/`axdef`/`schema`/`gendef`
 block. Wrapping algebra inside a Z block causes fuzz to reject the
-subscript form `\sigma_{p}`.
+algebra keyword forms.
 
 #### Restriction
 
@@ -2530,7 +2531,7 @@ subscript form `\sigma_{p}`.
 sigma[bore >= 16](Class)
 ```
 
-Renders: $\sigma_{bore \geq 16}(Class)$
+Renders: $\mathrm{Restrict}_{bore \geq 16}(Class)$
 
 The predicate inside `[...]` is a full expression (comparisons, logical
 operators, etc.).
@@ -2541,7 +2542,7 @@ operators, etc.).
 pi[class, country](Class)
 ```
 
-Renders: $\pi_{class, country}(Class)$
+Renders: $\mathrm{Project}\{class, country\}(Class)$
 
 The attribute list is comma-separated identifiers.
 
@@ -2552,7 +2553,7 @@ rho[ship as name](Outcome)
 rho[A as B, C as D](R)
 ```
 
-Renders: $\rho_{ship \to name}(Outcome)$
+Renders: $\mathrm{Rename}_{ship \to name}(Outcome)$
 
 Each pair is written `old as new`; multiple pairs are comma-separated.
 
@@ -2573,7 +2574,7 @@ matching Trigoni's Oxford DAT lecture slides (topic02 onwards).
 Ship bowtie [Ship.class = Class.class] Class
 ```
 
-Renders: $Ship \otimes_{Ship.class = Class.class} Class$
+Renders: $\mathrm{Join}_{Ship.class = Class.class}(Ship, Class)$
 
 #### Division
 
@@ -2593,7 +2594,7 @@ abbreviation emits outside any Z block:
 BigGuns == pi[class, country](sigma[bore >= 16](Class))
 ```
 
-Emits as `\noindent$BigGuns \defs \pi_{class, country}(\sigma_{bore \geq 16}(Class))$`.
+Emits as `\noindent$BigGuns \defs \mathrm{Project}\{class, country\}(\mathrm{Restrict}_{bore \geq 16}(Class))$`.
 
 #### Combining Operators
 

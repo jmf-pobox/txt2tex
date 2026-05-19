@@ -24,6 +24,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   symbols — no preamble change required. Any generated `.tex` files that
   contain `\bowtie` in natural-join position should be regenerated.
 
+- **BREAKING (visual): Relational algebra operators render in keyword form.**
+  `sigma[p](R)` now emits `\mathrm{Restrict}_{p}(R)` (previously `\sigma_p(R)`);
+  `pi[A, B](R)` emits `\mathrm{Project}\{A, B\}(R)` (previously `\pi_{A,B}(R)`);
+  `rho[A as B](R)` emits `\mathrm{Rename}_{A \to B}(R)` (previously
+  `\rho_{A \to B}(R)`). Source-level syntax is unchanged — students still write
+  `sigma`, `pi`, `rho`. Matches Trigoni's Oxford DAT course slides exactly.
+  Regenerate any `.tex` files produced by earlier versions.
+
+- **BREAKING (visual): Theta-join now emits as function form.**
+  `R bowtie [p] S` now emits `\mathrm{Join}_{p}(R, S)` (previously
+  `R \otimes_{p} S`). Natural join without a predicate (`R bowtie S`) is
+  unchanged: still `R \otimes S`.
+
 ### Added
 
 - `pk` declaration prefix for primary-key underlining (Phase 2.1 revised).

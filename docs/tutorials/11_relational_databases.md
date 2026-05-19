@@ -118,7 +118,7 @@ required.
 > as a top-level expression in your source (not inside a `zed`,
 > `axdef`, `schema`, or `gendef` block). If you wrap algebra inside a
 > Z block, fuzz parses the block contents strictly as Z notation and
-> will reject the subscript form `\sigma_{p}`.
+> will reject the algebra keyword form.
 
 ### Restriction (sigma)
 
@@ -128,7 +128,7 @@ Select tuples satisfying a predicate:
 sigma[bore >= 16](Class)
 ```
 
-Renders as: $\sigma_{bore \geq 16}(Class)$
+Renders as: $\mathrm{Restrict}_{bore \geq 16}(Class)$
 
 ### Projection (pi)
 
@@ -138,7 +138,7 @@ Keep only named attributes:
 pi[class, country](Class)
 ```
 
-Renders as: $\pi_{class, country}(Class)$
+Renders as: $\mathrm{Project}\{class, country\}(Class)$
 
 The attribute list is comma-separated identifiers.
 
@@ -151,7 +151,7 @@ rho[ship as name](Outcome)
 rho[A as B, C as D](R)
 ```
 
-Renders as: $\rho_{ship \to name}(Outcome)$
+Renders as: $\mathrm{Rename}_{ship \to name}(Outcome)$
 
 Multiple pairs are comma-separated.
 
@@ -174,7 +174,7 @@ matching Trigoni's lecture slides for the Oxford DAT course.
 Ship bowtie [Ship.class = Class.class] Class
 ```
 
-Renders as: $Ship \otimes_{Ship.class = Class.class} Class$
+Renders as: $\mathrm{Join}_{Ship.class = Class.class}(Ship, Class)$
 
 ### Division (div)
 
@@ -199,7 +199,7 @@ BigGuns == pi[class, country](sigma[bore >= 16](Class))
 Emits as:
 
 ```latex
-\noindent$BigGuns \defs \pi_{class, country}(\sigma_{bore \geq 16}(Class))$
+\noindent$BigGuns \defs \mathrm{Project}\{class, country\}(\mathrm{Restrict}_{bore \geq 16}(Class))$
 ```
 
 ### Operator Precedence

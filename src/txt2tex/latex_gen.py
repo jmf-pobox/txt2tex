@@ -2027,29 +2027,30 @@ class LaTeXGenerator:
     def _generate_restrict(self, node: Restrict, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for sigma[predicate](relation).
 
-        sigma[bore >= 16](Class) → \sigma_{bore \geq 16}(\mathrm{Class})
+        sigma[bore >= 16](Class) → \mathrm{Restrict}_{bore \geq 16}(Class)
         """
         pred_latex = self.generate_expr(node.predicate)
         rel_latex = self.generate_expr(node.relation)
-        return rf"\sigma_{{{pred_latex}}}({rel_latex})"
+        return rf"\mathrm{{Restrict}}_{{{pred_latex}}}({rel_latex})"
 
     @generate_expr.register(Project)
     def _generate_project(self, node: Project, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for pi[A, B](relation).
 
-        pi[class, country](Class) → \pi_{class, country}(Class)
+        pi[class, country](Class) → \mathrm{Project}\{class, country\}(Class)
         Attribute names are emitted via _emit_attr_name (identity pass-through);
         keyword-to-LaTeX conversions do not apply inside the attribute list.
+        Literal braces wrap the attribute list (Trigoni's notation), not subscript.
         """
         attrs_str = ", ".join(self._emit_attr_name(a) for a in node.attrs)
         rel_latex = self.generate_expr(node.relation)
-        return rf"\pi_{{{attrs_str}}}({rel_latex})"
+        return rf"\mathrm{{Project}}\{{{attrs_str}\}}({rel_latex})"
 
     @generate_expr.register(Rename)
     def _generate_rename(self, node: Rename, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for rho[A as B, ...](relation).
 
-        rho[ship as name](Outcome) → \rho_{ship \to name}(\mathrm{Outcome})
+        rho[ship as name](Outcome) → \mathrm{Rename}_{ship \to name}(Outcome)
         Both source and target names are emitted via _emit_attr_name.
         """
         pair_latexes: list[str] = []
@@ -2059,7 +2060,7 @@ class LaTeXGenerator:
             )
         pairs_str = ", ".join(pair_latexes)
         rel_latex = self.generate_expr(node.relation)
-        return rf"\rho_{{{pairs_str}}}({rel_latex})"
+        return rf"\mathrm{{Rename}}_{{{pairs_str}}}({rel_latex})"
 
     @generate_expr.register(NaturalJoin)
     def _generate_natural_join(
@@ -2067,15 +2068,15 @@ class LaTeXGenerator:
     ) -> str:
         r"""Generate LaTeX for R bowtie S or R bowtie [p] S.
 
-        R bowtie S      → R \otimes S
-        R bowtie [p] S  → R \otimes_{p} S
+        R bowtie S      → R \otimes S          (natural join — unchanged)
+        R bowtie [p] S  → \mathrm{Join}_{p}(R, S)  (theta-join — function form)
         """
         left_latex = self.generate_expr(node.left)
         right_latex = self.generate_expr(node.right)
         if node.subscript is None:
             return rf"{left_latex} \otimes {right_latex}"
         sub_latex = self.generate_expr(node.subscript)
-        return rf"{left_latex} \otimes_{{{sub_latex}}} {right_latex}"
+        return rf"\mathrm{{Join}}_{{{sub_latex}}}({left_latex}, {right_latex})"
 
     @generate_expr.register(Divide)
     def _generate_divide(self, node: Divide, parent: Expr | None = None) -> str:
