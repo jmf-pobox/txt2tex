@@ -46,6 +46,7 @@ from txt2tex.ast_nodes import (
     Quantifier,
     Range,
     RelationalImage,
+    Relvars,
     Schema,
     SchemaInclusion,
     SchemaText,
@@ -444,6 +445,7 @@ class Parser:
             TokenType.ARGUE,  # Both EQUIV: and ARGUE: map to this token
             TokenType.EQUAL,  # EQUAL: expression equality chain
             TokenType.INFRULE,
+            TokenType.RELVARS,
             TokenType.GIVEN,
             TokenType.AXDEF,
             TokenType.GENDEF,
@@ -623,6 +625,8 @@ class Parser:
             return self._parse_argue_chain(connector="eq")
         if self._match(TokenType.INFRULE):
             return self._parse_infrule_block()
+        if self._match(TokenType.RELVARS):
+            return self._parse_relvars()
         if self._match(TokenType.GIVEN):
             return self._parse_given_type()
         if self._match(TokenType.AXDEF):
@@ -3469,6 +3473,69 @@ class Parser:
             line=lbag_token.line,
             column=lbag_token.column,
         )
+
+    def _parse_relvars(self) -> Relvars:
+        """Parse relvar declaration: relvars R, S, T.
+
+        Relvar names are plain identifiers (no decoration, no generic params).
+        The declaration is consumed but emits nothing visible in the PDF —
+        it populates the generator's relvar set so that identifiers matching
+        a declared name are rendered upright (\\mathrm{Name}).
+
+        Raises:
+            ParserError: if no names follow, if a name is not an IDENTIFIER,
+                         or if a comma is followed immediately by another comma
+                         (trailing or double comma).
+        """
+        start_token = self._advance()  # Consume 'relvars'
+
+        names: list[str] = []
+        expect_name = True  # True when we expect a name (not a comma)
+
+        while not self._at_end() and not self._match(TokenType.NEWLINE):
+            if self._match(TokenType.COMMA):
+                if expect_name:
+                    # Comma where a name was expected: trailing or double comma
+                    raise ParserError(
+                        "Expected relvar name after comma in relvars declaration",
+                        self._current(),
+                    )
+                self._advance()  # Skip comma
+                expect_name = True
+                continue
+
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError(
+                    f"Expected relvar name in relvars declaration, "
+                    f"got {self._current().type.name} ({self._current().value!r})",
+                    self._current(),
+                )
+
+            if not expect_name:
+                # Name follows name with no comma between
+                raise ParserError(
+                    "Expected comma between relvar names in relvars declaration",
+                    self._current(),
+                )
+
+            names.append(self._current().value)
+            self._advance()
+            expect_name = False
+
+        if not names:
+            raise ParserError(
+                "Expected at least one relvar name in relvars declaration",
+                self._current(),
+            )
+
+        # Trailing comma: consumed a comma but hit NEWLINE/EOF before the next name
+        if expect_name and names:
+            raise ParserError(
+                "Expected relvar name after trailing comma in relvars declaration",
+                self._current(),
+            )
+
+        return Relvars(names=names, line=start_token.line, column=start_token.column)
 
     def _parse_given_type(self) -> GivenType:
         """Parse given type: given A, B, C"""

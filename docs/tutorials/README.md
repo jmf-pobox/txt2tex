@@ -104,6 +104,15 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - Zed blocks
   - **Examples:** `10_schemas/`
 
+## Course-Specific Topics
+
+- **[Tutorial 11: Relational Databases](11_relational_databases.md)** *(Level 2)*
+  - `relvars` declaration paragraph
+  - Relation names render upright; attributes stay italic
+  - DAT course typography convention
+  - Decoration and subscript interaction
+  - **Examples:** `14_relational_databases/`
+
 ## Advanced Topics
 
 - **[Tutorial: Advanced Features](10_advanced.md)**

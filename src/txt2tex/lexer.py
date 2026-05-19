@@ -28,6 +28,7 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     "bigcup": TokenType.BIGCUP,
     "bigcap": TokenType.BIGCAP,
     # Z notation keywords
+    "relvars": TokenType.RELVARS,
     "given": TokenType.GIVEN,
     "axdef": TokenType.AXDEF,
     "schema": TokenType.SCHEMA,
@@ -94,6 +95,7 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "cross",
         "bigcup",
         "bigcap",
+        "relvars",
         "given",
         "axdef",
         "schema",

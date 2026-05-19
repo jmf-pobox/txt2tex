@@ -156,6 +156,7 @@ class TokenType(Enum):
     INFRULE = auto()  # INFRULE: (inference rule with horizontal line)
 
     # Z notation keywords (Phase 4)
+    RELVARS = auto()  # relvars (Phase 2.1 — relvar declaration)
     GIVEN = auto()  # given
     AXDEF = auto()  # axdef
     SCHEMA = auto()  # schema

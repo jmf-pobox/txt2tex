@@ -2374,6 +2374,65 @@ p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
 
 ---
 
+## Relational Databases
+
+Support for the Oxford DAT (Database Design) course typography convention.
+
+### relvars Declaration
+
+Declare relation variables with a `relvars` paragraph:
+
+```text
+relvars Class, Ship, Battle, Outcome
+```
+
+Declared names render **upright** (`\mathrm{Name}`) in math context.
+Attribute names (undeclared identifiers) stay **italic** (default math mode).
+
+**Full example:**
+
+```text
+relvars Class, Ship, Battle, Outcome
+
+schema Class
+  class : N
+  country : N
+  bore : N
+end
+
+schema Ship
+  name : N
+  class : N
+end
+```
+
+In the PDF, `Class` (schema header and type reference) is upright;
+`class`, `country`, `name` (attributes) are italic.
+
+**Decoration and subscripts** — the decoration sits outside `\mathrm{}`:
+
+| Source      | LaTeX               |
+|-------------|---------------------|
+| `Class`     | `\mathrm{Class}`    |
+| `Class'`    | `\mathrm{Class}'`   |
+| `Class_1`   | `\mathrm{Class}_1`  |
+| `class`     | `class` (italic)    |
+
+**Multiple declarations** combine into one relvar set:
+
+```text
+relvars Class, Ship
+relvars Battle, Outcome
+```
+
+**Error cases:**
+
+```text
+relvars              // no names — parser error
+relvars Class,       // trailing comma — parser error
+relvars Class Ship   // missing comma — parser error
+```
+
 ## Additional Features
 
 ### Conditional Expressions

@@ -1364,6 +1364,82 @@ keywords to decide whether the following token is an operator (not prose).
 `defs` was added to that set so that `A defs B` at column 1 is tokenised
 correctly rather than captured as a `TEXT` token.
 
+## ADR: Relvar Set and Decoration-Outside-\mathrm Rule (Phase 2.1)
+
+**Decision**: Implement the relvar typography via an O(N) pre-walk that
+populates `relvar_set: frozenset[str]` before any LaTeX emission, then an O(1)
+`name in self.relvar_set` check in `_generate_identifier`.
+
+**Context**: The DAT course uses `\mathrm{Name}` for relation names and default
+italic for attribute names.  The `relvars` declaration paragraph marks which
+identifiers are relvars.  Every occurrence of a declared name as an identifier —
+in schema headers, type annotations, predicate expressions — must be wrapped.
+
+**Decoration-outside rule**: Z-decorated names (`Class'`, `Class?`, `Class!`)
+carry the decoration suffix baked into `Identifier.name` by the lexer.  When the
+base name (after stripping `'`, `?`, `!` from the right) is in `relvar_set`,
+the decoration is emitted *outside* `\mathrm{}`:
+
+```text
+Class   →  \mathrm{Class}
+Class'  →  \mathrm{Class}'
+Class_1'  →  \mathrm{Class}_1'   (subscript first, then decoration)
+```
+
+**Why decoration goes outside**: `'` is not valid inside `\mathrm{}` in
+standard LaTeX and causes fuzz typechecker errors.  More importantly, the
+decoration is semantically attached to the whole name token (Z RM §3.3), not
+to the roman-type rendering — so placing it outside is both technically correct
+and typographically consistent with handwritten notation.
+
+**Subscript interaction — heuristic alignment**: The subscript check mirrors
+the existing `_generate_identifier` heuristic for non-relvar identifiers:
+
+| Suffix form | Example     | Relvar rendering          |
+|-------------|-------------|---------------------------|
+| 1-char      | `Class_1`   | `\mathrm{Class}_1`        |
+| 2-char digit| `Class_12`  | `\mathrm{Class}_{12}`     |
+| 2-char mixed| `Class_AB`  | normal path (no `\mathrm`) |
+| 3+ chars    | `Class_test`| normal path (no `\mathrm`) |
+| Multi-`_`   | `Class_x_y` | normal path (no `\mathrm`) |
+
+Suffixes that the existing heuristic treats as multi-word identifiers (3+ chars,
+or non-digit 2-char) fall through to the normal path without `\mathrm` wrapping.
+The relvar property applies to the *relation name*, not to identifier fragments
+derived from it.
+
+**Duplicate relvars**: Multiple `relvars` paragraphs declaring the same name
+are silently merged into the `relvar_set`.  A warning is appended to
+`_overflow_warnings` (at most once per duplicate name, per `_collect_relvars`
+call) to surface the issue via `emit_warnings()` or `get_warnings()`.
+
+**REPL path**: `generate_fragment` mirrors `generate_document` by calling
+`_collect_relvars` before emitting any LaTeX, ensuring relvar declarations in
+interactive REPL input take effect immediately.
+
+**Options considered**:
+
+1. Emit decoration inside `\mathrm`: `\mathrm{Class'}` — rejected; `'` is not
+   valid inside `\mathrm{}` and causes fuzz typechecker errors.
+
+2. Infer relvars from capitalisation — explicitly forbidden by the mission.
+   Declaration must be explicit to avoid false positives on single-letter
+   type variables like `N`, `Z`, `X`.
+
+3. Re-parse identifier in generator to split base + decoration — current
+   approach: strip trailing `'`, `?`, `!` with a simple `while` loop.
+   Simple, correct, O(decoration length).
+
+**Performance**: The pre-walk is O(N) in document item count and runs once.
+The per-identifier check is O(1) (frozenset membership).  The `relvar_set` is
+empty for all existing documents, so the guard `if self.relvar_set:` short-
+circuits the strip loop entirely, giving zero overhead to existing test suites.
+
+**`relvars` paragraphs emit a comment**: The LaTeX output for a `relvars`
+paragraph is `% relvars: Class, Ship, ...` — a comment, not a visible
+environment.  This keeps the `.tex` source self-documenting while producing
+no visible output.
+
 ## Future Enhancements
 
 1. **Export formats**

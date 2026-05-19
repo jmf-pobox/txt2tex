@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Relvar declaration paragraph (`relvars`) for DAT (Database Design) course
+  support (Phase 2.1).  `relvars Class, Ship, Battle, Outcome` declares relation
+  variables; each declared name renders upright (`\mathrm{Name}`) wherever it
+  appears as an identifier in a math context.  Attribute names (undeclared
+  identifiers) stay italic (default math mode).  Decoration-outside rule:
+  `Class'` → `\mathrm{Class}'`; subscripts: `Class_1` → `\mathrm{Class}_1`.
+  Generator pre-walks the AST in O(N) to collect all `Relvars` items into
+  `relvar_set: frozenset[str]`; each identifier emission is then an O(1)
+  membership test.  New `RELVARS` token type, `Relvars` AST node, parser
+  dispatch with full error handling (empty list, leading/trailing/double comma,
+  missing comma).  `relvars` added to `KEYWORD_TO_TOKEN` and `RESERVED_WORDS`
+  (decoration forbidden).  36 new tests; new example
+  `examples/14_relational_databases/relvars_basic.txt`; Tutorial 11 added;
+  `USER_GUIDE.md` "Relational Databases" section added.
+
 - Horizontal schema definitions (`defs` keyword) per Z RM §3.8.
   `Name [generics]? defs RHS` produces `\begin{zed} Name \defs RHS \end{zed}`.
   Two RHS forms are supported:

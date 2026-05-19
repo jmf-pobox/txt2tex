@@ -1,0 +1,34 @@
+TITLE: Relational Databases: Relvar Typography
+AUTHOR: txt2tex example
+
+=== Relation Variables and Attribute Typography ===
+
+The relvars declaration marks identifiers as relation variables.
+Relation names render upright; attribute names stay italic.
+
+relvars Class, Ship, Battle, Outcome
+
+schema Class
+  class : N
+  country : N
+  bore : N
+  displacement : N
+  launched : N
+end
+
+schema Ship
+  name : N
+  class : N
+  launched : N
+end
+
+schema Battle
+  name : N
+  date : N
+end
+
+schema Outcome
+  ship : N
+  battle : N
+  result : N
+end

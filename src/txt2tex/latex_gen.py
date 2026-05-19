@@ -44,6 +44,7 @@ from txt2tex.ast_nodes import (
     Quantifier,
     Range,
     RelationalImage,
+    Relvars,
     Schema,
     SchemaInclusion,
     SchemaText,
@@ -294,6 +295,7 @@ class LaTeXGenerator:
     _warn_overflow: bool
     _overflow_threshold: int
     _overflow_warnings: list[str]
+    relvar_set: frozenset[str]
 
     # Default threshold for overflow warnings (LaTeX characters)
     # ~140 LaTeX chars ≈ text width at 10pt with 1in margins in fuzz mode
@@ -331,6 +333,7 @@ class LaTeXGenerator:
             else self.DEFAULT_OVERFLOW_THRESHOLD
         )
         self._overflow_warnings = []  # Collected warnings to emit
+        self.relvar_set: frozenset[str] = frozenset()  # Populated by generate_document
 
     # -------------------------------------------------------------------------
     # Overflow warning helpers
@@ -389,6 +392,14 @@ class LaTeXGenerator:
     def get_warnings(self) -> list[str]:
         """Return collected overflow warnings (for testing)."""
         return self._overflow_warnings.copy()
+
+    def clear_warnings(self) -> None:
+        """Clear the collected warning buffer.
+
+        Call after consuming warnings (e.g. between REPL turns) so that
+        warnings from one turn do not reappear in subsequent turns.
+        """
+        self._overflow_warnings.clear()
 
     # -------------------------------------------------------------------------
     # Fuzz/Standard LaTeX mode helpers
@@ -564,11 +575,41 @@ class LaTeXGenerator:
         """
         # Store document-level parts format
         self.parts_format = ast.parts_format
+        # Pre-walk: collect relvar declarations, mirroring generate_document.
+        # Without this, relvars declared in REPL input would have no effect.
+        self.relvar_set = self._collect_relvars(ast)
 
         # Generate all document items
         lines = self._generate_document_items_with_consolidation(ast.items)
 
         return "\n".join(lines)
+
+    def _collect_relvars(self, ast: Document | Expr) -> frozenset[str]:
+        """Walk the top-level document items and collect all declared relvar names.
+
+        Only ``Relvars`` paragraphs contribute names; all other items are ignored.
+        This single O(N) pass runs before any LaTeX emission so that
+        ``_generate_identifier`` can do an O(1) membership test per identifier.
+
+        Duplicate declarations (same name in two or more ``relvars`` paragraphs)
+        are merged silently — the name still ends up in the set.  A warning is
+        appended to ``_overflow_warnings`` (at most once per duplicate name) so
+        callers can surface it via ``emit_warnings()`` or ``get_warnings()``.
+        """
+        if not isinstance(ast, Document):
+            return frozenset()
+        names: set[str] = set()
+        warned: set[str] = set()
+        for item in ast.items:
+            if isinstance(item, Relvars):
+                for name in item.names:
+                    if name in names and name not in warned:
+                        self._overflow_warnings.append(
+                            f"Warning: relvar {name!r} declared more than once"
+                        )
+                        warned.add(name)
+                    names.add(name)
+        return frozenset(names)
 
     def generate_document(self, ast: Document | Expr) -> str:
         """Generate complete LaTeX document with preamble and postamble.
@@ -584,6 +625,11 @@ class LaTeXGenerator:
             Complete LaTeX source code ready for compilation.
         """
         lines: list[str] = []
+
+        # Pre-walk: collect all relvar names declared in this document.
+        # The relvar_set is populated before any LaTeX emission so that
+        # _generate_identifier can do an O(1) lookup per identifier.
+        self.relvar_set = self._collect_relvars(ast)
 
         # Preamble
         # Use fleqn option to left-align all equations (no centering)
@@ -873,6 +919,47 @@ class LaTeXGenerator:
         type_latex = self._get_type_latex(name)
         if type_latex is not None:
             return type_latex
+
+        # Relvar typography: declared relvars render upright (\mathrm{Name}).
+        # Rules (decoration outside \mathrm per mission decision):
+        #   Class   → \mathrm{Class}
+        #   Class'  → \mathrm{Class}'
+        #   Class_1 → \mathrm{Class}_1   (1-char subscript)
+        #   Class_12 → \mathrm{Class}_{12}  (2-char all-digit subscript)
+        #   Class_test → falls through to multi-word identifier path (no wrap)
+        # Only bare base names are in the relvar set; decorated and subscripted
+        # forms are looked up by stripping suffix characters and the subscript.
+        if self.relvar_set:
+            # Strip trailing Z-decoration characters (', ?, !) right-to-left
+            decoration_suffix = ""
+            base_name = name
+            while base_name and base_name[-1] in ("'", "?", "!"):
+                decoration_suffix = base_name[-1] + decoration_suffix
+                base_name = base_name[:-1]
+            # Check plain relvar (no subscript)
+            if base_name in self.relvar_set:
+                return rf"\mathrm{{{base_name}}}{decoration_suffix}"
+            # Check subscripted relvar: prefix before first '_', but only when
+            # the suffix qualifies as a subscript (mirrors the existing heuristic
+            # in the non-relvar path below — 1-char always, 2-char only if all
+            # digits, 3+ char → multi-word, let the normal path handle it).
+            if "_" in base_name:
+                relvar_prefix, subscript_part = base_name.split("_", 1)
+                if relvar_prefix in self.relvar_set:
+                    # 1-char suffix: always a subscript (digit or single letter)
+                    if len(subscript_part) == 1:
+                        return (
+                            rf"\mathrm{{{relvar_prefix}}}_{subscript_part}"
+                            + decoration_suffix
+                        )
+                    # 2-char suffix: subscript only when all digits (e.g. _12)
+                    if len(subscript_part) == 2 and subscript_part.isdigit():
+                        return (
+                            rf"\mathrm{{{relvar_prefix}}}_{{{subscript_part}}}"
+                            + decoration_suffix
+                        )
+                    # 3+ char suffix, or 2-char mixed: fall through to multi-word
+                    # path — \mathrm wrapping does not apply to multi-word forms.
 
         # No underscore: return as-is
         if "_" not in name:
@@ -3821,6 +3908,17 @@ class LaTeXGenerator:
         lines.append("")
 
         return lines
+
+    @generate_document_item.register(Relvars)
+    def _generate_relvars(self, node: Relvars) -> list[str]:
+        """Generate LaTeX for relvar declaration paragraph.
+
+        Relvars paragraphs are declaration-only; they emit no visible output.
+        A LaTeX comment records the declared names so the .tex source is
+        self-documenting.
+        """
+        names_str = ", ".join(node.names)
+        return [f"% relvars: {names_str}", ""]
 
     @generate_document_item.register(GivenType)
     def _generate_given_type(self, node: GivenType) -> list[str]:
