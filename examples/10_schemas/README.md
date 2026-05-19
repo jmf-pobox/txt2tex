@@ -159,6 +159,7 @@ Browse the `.txt` files to see:
 - **schema_as_predicate.txt** — schema conjunction in where clause (Phase 1.1)
 - **theta_binding.txt** — θ-expression in state-transition operations (Phase 1.2)
 - **horizontal_defs.txt** — horizontal schema definitions with `defs` (Phase 1.3)
+- **schema_rename.txt** — schema renaming `S[old/new, ...]` (Phase 3.1, Z RM §3.11)
 
 ## See Also
 

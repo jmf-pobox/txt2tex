@@ -646,6 +646,11 @@ class Lexer:
             self._advance()
             return Token(TokenType.NOTIN, "/in", start_line, start_column)
 
+        # Bare slash — separator in schema rename pairs S[a/b] (Phase 3.1)
+        if char == "/":
+            self._advance()
+            return Token(TokenType.SLASH, "/", start_line, start_column)
+
         # Abbreviation operator == - check before = alone
         # Already checked for === and => earlier
         if char == "=" and self._peek_char() == "=":

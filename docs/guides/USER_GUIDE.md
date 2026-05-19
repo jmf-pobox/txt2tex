@@ -2181,6 +2181,35 @@ inside `\begin{zed}...\end{zed}`.
 
 **See:** `examples/10_schemas/horizontal_defs.txt`
 
+#### Schema Renaming (`S[old/new, ...]`)
+
+Schema renaming produces a schema identical to an existing one except that
+named components are given new names (Z RM §3.11).  Renaming is written on
+the RHS of a `defs` paragraph:
+
+```text
+CounterN defs Counter[count/n]
+Op2 defs Counter[count'/count]
+SwappedPoint defs Point[x/y, y/x]
+```
+
+| Property | Value |
+|---|---|
+| Syntax | `SchemaName[oldName/newName, ...]` |
+| Minimum pairs | 1 |
+| Decoration on schema | `S'[a/b]` renames the primed schema `S'` |
+| Decoration in pairs | `S[a'/b]` or `S[a/b']` supported |
+| Disambiguation | Scan for `/` at depth 0 inside `[...]` |
+
+**Disambiguation from generic instantiation** (`S[X]`, Phase 1.1): if any
+`/` appears at bracket depth 0, the parser treats the bracket as rename
+pairs; otherwise it treats the bracket as type parameters.
+
+**Generated LaTeX:** `Counter[count/n]` renders as `Counter[count/n]` —
+the brackets and slashes are literal math-mode text with no special macro.
+
+**See:** `examples/10_schemas/schema_rename.txt`
+
 ---
 
 ## Proof Trees

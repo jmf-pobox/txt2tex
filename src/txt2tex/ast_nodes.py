@@ -305,6 +305,34 @@ class GenericInstantiation(ASTNode):
     type_params: list[Expr]  # Type parameters (at least one)
 
 
+@dataclass(frozen=True)
+class SchemaRename(ASTNode):
+    """Schema renaming node (Z RM §3.11).
+
+    Represents ``S[old/new, ...]`` — produce a schema identical to S except
+    that each component named ``old`` is renamed to ``new``.
+
+    The schema expression is typically a plain (possibly decorated) Identifier.
+    The ``pairs`` list holds ``(old_name, new_name)`` tuples in source order;
+    at least one pair is required.
+
+    Examples:
+    - S[a/b]         -> schema=Identifier("S"),  pairs=[("a", "b")]
+    - S[a/b, c/d]    -> schema=Identifier("S"),  pairs=[("a", "b"), ("c", "d")]
+    - S'[a/b]        -> schema=Identifier("S'"), pairs=[("a", "b")]
+    - S[a'/b]        -> schema=Identifier("S"),  pairs=[("a'", "b")]
+
+    Disambiguation from GenericInstantiation: the parser scans the bracket
+    contents at depth 0 before committing.  If any ``/`` token appears, this
+    node is constructed; otherwise GenericInstantiation is constructed.
+
+    LaTeX rendering: schema_repr[a/b, c/d]
+    """
+
+    schema: Expr  # Schema reference (typically a decorated Identifier)
+    pairs: list[tuple[str, str]]  # (old_name, new_name) pairs, at least one
+
+
 # Range node
 
 
@@ -643,6 +671,7 @@ Expr = (
     | Tuple
     | RelationalImage
     | GenericInstantiation
+    | SchemaRename
     | Range
     | SequenceLiteral
     | TupleProjection

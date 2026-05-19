@@ -54,6 +54,7 @@ from txt2tex.ast_nodes import (
     Restrict,
     Schema,
     SchemaInclusion,
+    SchemaRename,
     SchemaText,
     Section,
     SequenceLiteral,
@@ -1825,6 +1826,24 @@ class LaTeXGenerator:
             self.generate_expr(param) for param in node.type_params
         )
         return f"{base_latex}[{type_params_latex}]"
+
+    @generate_expr.register(SchemaRename)
+    def _generate_schema_rename(
+        self, node: SchemaRename, parent: Expr | None = None
+    ) -> str:
+        """Generate LaTeX for schema renaming (Z RM §3.11).
+
+        Renders ``S[old/new, ...]`` in math mode.  The brackets and ``/``
+        separators are literal LaTeX — no special macro is needed.
+
+        Examples:
+        - S[a/b]      → S[a/b]
+        - S[a/b, c/d] → S[a/b, c/d]
+        - S'[a/b]     → S'[a/b]
+        """
+        schema_latex = self.generate_expr(node.schema)
+        pairs_latex = ", ".join(f"{old}/{new}" for old, new in node.pairs)
+        return f"{schema_latex}[{pairs_latex}]"
 
     @generate_expr.register(Range)
     def _generate_range(self, node: Range, parent: Expr | None = None) -> str:

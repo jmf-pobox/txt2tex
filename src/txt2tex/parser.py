@@ -56,6 +56,7 @@ from txt2tex.ast_nodes import (
     Restrict,
     Schema,
     SchemaInclusion,
+    SchemaRename,
     SchemaText,
     Section,
     SequenceLiteral,
@@ -346,6 +347,7 @@ class Parser:
                 first_item = self._parse_expr()
                 # Single expression
                 if not self._at_end():
+                    self._reject_stray_slash()
                     raise ParserError(
                         f"Unexpected token after expression: {self._current().value!r}",
                         self._current(),
@@ -409,6 +411,7 @@ class Parser:
 
         # Single expression (backward compatibility)
         if not self._at_end():
+            self._reject_stray_slash()
             raise ParserError(
                 f"Unexpected token after expression: {self._current().value!r}",
                 self._current(),
@@ -785,6 +788,22 @@ class Parser:
             return self.tokens[pos]
         return self.tokens[-1]  # Return EOF if past end
 
+    def _reject_stray_slash(self) -> None:
+        """Raise ParserError if the current token is a stray SLASH.
+
+        '/' is only valid inside schema rename brackets ``S[a/b]``.
+        When it appears in any other position it produces a confusing
+        generic "unexpected token" message.  This helper fires first and
+        gives a targeted diagnostic.
+        """
+        if self._match(TokenType.SLASH):
+            raise ParserError(
+                "'/' is not a valid operator here; the slash is only valid"
+                " inside schema rename brackets S[a/b]."
+                " Did you mean '/=' (not equal) or '/in' (not in)?",
+                self._current(),
+            )
+
     def _skip_newlines(self) -> None:
         """Skip all consecutive newline tokens."""
         while self._match(TokenType.NEWLINE) and not self._at_end():
@@ -955,6 +974,177 @@ class Parser:
 
         self._advance()  # consume ']'
         return args
+
+    def _parse_schema_rename_or_generic(
+        self, base: Expr
+    ) -> GenericInstantiation | SchemaRename:
+        """Consume '[' then dispatch to rename or generic instantiation.
+
+        Disambiguation rule (Z RM §3.11): scan the bracket contents at
+        bracket depth 0.  If any SLASH token appears before the matching
+        ']', parse as schema rename pairs ``S[old/new, ...]``.  Otherwise,
+        parse as a generic type instantiation ``S[T, ...]``.
+
+        The '[' has NOT been consumed on entry; this method consumes it and
+        the matching ']'.
+        """
+        # Scan ahead (from the position after '[') for '/' at depth 0.
+        # pos currently points at '['
+        depth = 0
+        has_slash = False
+        offset = 1  # start scanning past the '['
+        while True:
+            tok = self._peek_ahead(offset)
+            if tok.type == TokenType.LBRACKET:
+                depth += 1
+            elif tok.type == TokenType.RBRACKET:
+                if depth == 0:
+                    break  # found matching ']' — stop scan
+                depth -= 1
+            elif tok.type == TokenType.SLASH and depth == 0:
+                has_slash = True
+                break
+            elif tok.type in (TokenType.EOF, TokenType.NEWLINE):
+                break  # let the real parser raise the error
+            offset += 1
+
+        if has_slash:
+            return self._parse_schema_rename(base)
+        return self._parse_generic_instantiation(base)
+
+    def _parse_generic_instantiation(self, base: Expr) -> GenericInstantiation:
+        """Parse generic instantiation S[T, ...] — '[' not yet consumed."""
+        lbracket_token = self._advance()  # Consume '['
+
+        type_params: list[Expr] = []
+
+        if self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "Expected at least one type parameter in generic instantiation",
+                self._current(),
+            )
+
+        type_params.append(self._parse_expr())
+
+        while self._match(TokenType.COMMA):
+            self._advance()  # Consume ','
+            if self._match(TokenType.RBRACKET):
+                # Trailing comma: Type[X,]
+                break
+            type_params.append(self._parse_expr())
+
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "Expected ']' after generic type parameters", self._current()
+            )
+        self._advance()  # Consume ']'
+
+        return GenericInstantiation(
+            base=base,
+            type_params=type_params,
+            line=lbracket_token.line,
+            column=lbracket_token.column,
+        )
+
+    def _parse_schema_rename(self, schema: Expr) -> SchemaRename:
+        """Parse schema rename S[old/new, ...] — '[' not yet consumed.
+
+        Grammar:
+            rename ::= '[' pair (',' pair)* ']'
+            pair   ::= IDENTIFIER '/' IDENTIFIER
+
+        Raises ParserError for:
+        - Empty bracket ``S[]``
+        - Missing source name ``S[/b]``
+        - Missing slash ``S[a b]``
+        - Missing target name ``S[a/]``
+        - Trailing slash ``S[a/b/]``
+        - Trailing comma ``S[a/b,]``
+        """
+        open_tok = self._advance()  # Consume '['
+
+        pairs: list[tuple[str, str]] = []
+
+        while not self._match(TokenType.RBRACKET):
+            if self._at_end() or self._match(TokenType.NEWLINE, TokenType.EOF):
+                raise ParserError(
+                    "unclosed '[' in schema rename",
+                    open_tok,
+                )
+
+            # Expect source identifier
+            if not self._match(TokenType.IDENTIFIER):
+                cur = self._current()
+                raise ParserError(
+                    f"expected identifier before '/' in schema rename pair,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            src_tok = self._advance()
+            src = src_tok.value
+
+            # Expect '/'
+            if not self._match(TokenType.SLASH):
+                cur = self._current()
+                raise ParserError(
+                    f"expected '/' in schema rename pair after {src!r},"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            self._advance()  # Consume '/'
+
+            # Expect target identifier
+            if not self._match(TokenType.IDENTIFIER):
+                cur = self._current()
+                raise ParserError(
+                    f"expected identifier after '/' in schema rename pair,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            tgt_tok = self._advance()
+            tgt = tgt_tok.value
+
+            pairs.append((src, tgt))
+
+            # Optional comma separator
+            if self._match(TokenType.COMMA):
+                self._advance()  # Consume ','
+                # Trailing comma check: next is ']'
+                if self._match(TokenType.RBRACKET):
+                    raise ParserError(
+                        "expected rename pair after ',' in schema rename",
+                        self._current(),
+                    )
+                continue
+
+            # If not comma and not ']', something is wrong
+            if not self._match(TokenType.RBRACKET):
+                cur = self._current()
+                raise ParserError(
+                    f"expected ',' or ']' in schema rename,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+
+        if not pairs:
+            raise ParserError(
+                "schema rename requires at least one pair",
+                open_tok,
+            )
+
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "expected ']' to close schema rename",
+                self._current(),
+            )
+        self._advance()  # Consume ']'
+
+        return SchemaRename(
+            schema=schema,
+            pairs=pairs,
+            line=open_tok.line,
+            column=open_tok.column,
+        )
 
     def _parse_declaration_or_inclusion(
         self,
@@ -3024,7 +3214,7 @@ class Parser:
 
         return left
 
-    def _parse_postfix(self, *, allow_space_separated: bool = True) -> Expr:  # noqa: C901
+    def _parse_postfix(self, *, allow_space_separated: bool = True) -> Expr:
         """Parse postfix operators and space-separated application.
 
         Postfix operators:
@@ -3042,11 +3232,11 @@ class Parser:
         """
         base = self._parse_atom()
 
-        # Check for generic instantiation [...] like P[X], F[T]
-        # Only treat [ as generic instantiation if:
+        # Check for generic instantiation S[X] or schema rename S[a/b].
+        # Only treat [ as such if:
         # 1. Base is a type-like construct (Identifier or GenericInstantiation)
         # 2. The '[' immediately follows the last consumed token (no whitespace)
-        # This prevents consuming '[' meant for justifications in equiv chains
+        # This prevents consuming '[' meant for justifications in equiv chains.
         while isinstance(base, (Identifier, GenericInstantiation)) and self._match(
             TokenType.LBRACKET
         ):
@@ -3055,7 +3245,7 @@ class Parser:
             lbracket_col = self._current().column
 
             # If on different lines or there's a gap,
-            # don't treat as generic instantiation
+            # don't treat as generic instantiation or schema rename
             if (
                 self._current().line != self.last_token_line
                 or lbracket_col > self.last_token_end_column
@@ -3063,40 +3253,7 @@ class Parser:
                 # There's whitespace - likely a justification, not generic
                 break
 
-            lbracket_token = self._advance()  # Consume '['
-
-            # Parse comma-separated type parameters
-            type_params: list[Expr] = []
-
-            # Parse first type parameter
-            if self._match(TokenType.RBRACKET):
-                raise ParserError(
-                    "Expected at least one type parameter in generic instantiation",
-                    self._current(),
-                )
-
-            type_params.append(self._parse_expr())
-
-            # Parse additional type parameters
-            while self._match(TokenType.COMMA):
-                self._advance()  # Consume ','
-                if self._match(TokenType.RBRACKET):
-                    # Trailing comma: Type[X,]
-                    break
-                type_params.append(self._parse_expr())
-
-            if not self._match(TokenType.RBRACKET):
-                raise ParserError(
-                    "Expected ']' after generic type parameters", self._current()
-                )
-            self._advance()  # Consume ']'
-
-            base = GenericInstantiation(
-                base=base,
-                type_params=type_params,
-                line=lbracket_token.line,
-                column=lbracket_token.column,
-            )
+            base = self._parse_schema_rename_or_generic(base)
 
         # Check for tuple projection and function application
         # These need to be in the same loop so that f(x).1 works correctly

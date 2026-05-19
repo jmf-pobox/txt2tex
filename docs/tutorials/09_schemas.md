@@ -306,6 +306,79 @@ StackAlias[X] \defs GenStack[X]
 
 **See:** `examples/10_schemas/horizontal_defs.txt`
 
+## Schema Renaming
+
+**Phase 3.1 feature.** Schema renaming produces a schema identical to an
+existing schema except that named components are given new names.  The
+notation is per Z RM §3.11:
+
+```text
+NewName defs OldSchema[oldComponent/newComponent, ...]
+```
+
+### Single rename
+
+```text
+schema Counter
+  count : N
+where
+  count >= 0
+end
+
+CounterN defs Counter[count/n]
+```
+
+Generated LaTeX:
+
+```latex
+\begin{zed}
+CounterN \defs Counter[count/n]
+\end{zed}
+```
+
+### Multiple renames
+
+Multiple pairs are comma-separated:
+
+```text
+SwappedPoint defs Point[x/y, y/x]
+```
+
+Generated LaTeX: `SwappedPoint \defs Point[x/y, y/x]`
+
+### Decorated schema reference
+
+The decoration on the schema name is tightest-binding (Z RM §3.11):
+`S'[a/b]` renames the primed schema `S'`, not the result of renaming
+and then priming.  Because Phase 0's lexer bakes the prime into the
+identifier token, `S'[a/b]` lexes as `IDENT("S'")` then `[` — the
+rename handler sees the decorated identifier directly.
+
+```text
+Op2 defs Counter[count'/count]
+```
+
+### Decorated component names in pairs
+
+The source and target names in each pair may themselves carry decoration:
+
+```text
+CounterOp defs Counter[count'/n]
+```
+
+### Disambiguation rule
+
+The parser uses a scan of the bracket contents at depth 0 to distinguish
+schema renaming from generic instantiation:
+
+- Any `/` token at depth 0 inside `[...]` → schema rename `S[a/b, ...]`
+- No `/` token → generic instantiation `S[X, Y, ...]` (Phase 1.1)
+
+This means `Stack[N]` continues to parse as generic instantiation
+unchanged, and `Counter[count/n]` parses as a rename.
+
+**See:** `examples/10_schemas/schema_rename.txt`
+
 ## Schema Composition
 
 Combine schemas using operators:

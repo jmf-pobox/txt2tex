@@ -109,6 +109,7 @@ class TokenType(Enum):
     UNDERSCORE = auto()  # _ for subscripts
     MOD = auto()  # mod (modulo arithmetic)
     CONTINUATION = auto()  # \ at end of line (Phase 27 - line break marker)
+    SLASH = auto()  # / separator in schema rename pairs S[a/b] (Phase 3.1)
 
     # Grouping
     LPAREN = auto()

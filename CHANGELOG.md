@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Schema renaming (Phase 3.1): `S[old/new, ...]` per Z RM §3.11.  Renders
+  as `S[old/new, ...]` in math mode — literal brackets and slashes, no
+  special macro.  Disambiguation from generic instantiation `S[X]` (Phase
+  1.1) uses a depth-0 scan for `/` inside the brackets before committing:
+  any `SLASH` at depth 0 triggers rename parsing; absence triggers generic
+  parsing.  New `SLASH` token type; lexer falls through to it after the
+  existing `/=` and `/in` checks.  New `SchemaRename(schema: Expr,
+  pairs: list[tuple[str, str]])` AST node added to `ast_nodes.py` and the
+  `Expr` union.  `_parse_schema_rename_or_generic` routine in parser
+  replaces the old generic instantiation loop in `_parse_postfix`;
+  `_parse_generic_instantiation` and `_parse_schema_rename` are extracted
+  subparsers.  Decoration interaction: `S'[a/b]` renames the primed schema
+  (Phase 0 lexer bakes decoration into the identifier token value — no
+  extra handling required).  Decorated component names in pairs (`S[a'/b]`,
+  `S[a/b']`) also work.  25 new tests (AST, disambiguation, decorated
+  schema, decorated pair names, acceptance probe, generator, 5 negative
+  cases with message + line + column); new example
+  `examples/10_schemas/schema_rename.txt`; tutorial 09 "Schema Renaming"
+  section added; `USER_GUIDE.md` updated; `DESIGN.md` ADR added.
+
 - Z binding brackets (Phase 2.3): `{| label == expr, ... |}` per Z RM §3.7.
   Renders as `\lblot label == expr, \ldots \rblot`; macros are defined in both
   `fuzz.sty` (lines 275-276) and `zed-lbr.sty`/`zed-cm.sty` — no preamble

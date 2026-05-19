@@ -1615,6 +1615,85 @@ to support multi-line comprehensions.
    callers.  The `extra_declarations: list[tuple[str, Expr]]` field achieves
    the same result with a smaller diff.
 
+## ADR: Schema Renaming Disambiguation — `/`-Detection in Brackets (Phase 3.1)
+
+**Decision**: Disambiguate `S[a/b]` (schema rename, Z RM §3.11) from `S[X]`
+(generic instantiation, Phase 1.1) by scanning the bracket contents at depth 0
+before consuming anything.  If any `SLASH` token appears at depth 0 before the
+matching `]`, parse as rename pairs; otherwise parse as a generic type list.
+
+**Forces**:
+
+1. Both `S[X]` and `S[a/b]` start identically: `IDENT`, `LBRACKET`.  A
+   one-token lookahead is insufficient to decide.
+2. The `/` character is already special in the lexer (`/=` → `NOT_EQUAL`,
+   `/in` → `NOTIN`).  A bare `/` was previously an `LexerError`; Phase 3.1
+   adds `SLASH` as a legal token.
+3. Generic instantiation uses `_parse_postfix`'s while-loop.  Adding a branch
+   inside the loop — without backtracking — requires knowing the branch before
+   consuming the `[`.
+4. The existing `_parse_postfix` loop cannot be extended by backtracking
+   without introducing a position-save/restore mechanism; the forbidden list in
+   the mission contract prohibits backtracking parsers.
+
+**Decision details**:
+
+*New token.* `SLASH` added to `TokenType` and to the lexer.  The lexer checks
+`/=` and `/in` first (existing behavior), then falls through to `SLASH` for
+any remaining bare `/`.
+
+*New method `_parse_schema_rename_or_generic`.* Called from `_parse_postfix`
+when the conditions for generic/rename bracket are met (same whitespace checks
+as before).  Scans `_peek_ahead(offset)` tokens from offset 1 (the position
+after the `[`), tracking bracket depth.  Returns on the first `SLASH` at depth
+0 (rename) or on the matching `]` (generic).
+
+*`_parse_generic_instantiation`.* Extracted from the old while-loop body.
+Identical behavior; now called from `_parse_schema_rename_or_generic`.
+
+*`_parse_schema_rename`.* New method that consumes `[`, then iterates:
+`IDENTIFIER SLASH IDENTIFIER (COMMA IDENTIFIER SLASH IDENTIFIER)*`.  Raises
+`ParserError` with message + line + column for every malformed case (missing
+source, missing slash, missing target, trailing slash, trailing comma).
+
+*AST.* `SchemaRename(schema: Expr, pairs: list[tuple[str, str]])` — frozen
+dataclass added to `ast_nodes.py` and to the `Expr` union.
+
+*Generator.* `_generate_schema_rename` emits `schema_repr[old/new, ...]`
+using plain math-mode text.  No special LaTeX macro needed.
+
+*Decoration interaction.* Per Z RM §3.11, decoration is tighter than
+renaming: `S'[a/b]` renames the primed schema `S'`.  Because Phase 0's lexer
+bakes decoration into the identifier value (`Identifier("S'")`), the rename
+handler sees the base identifier already carrying the prime — no special
+treatment required.
+
+**Alternatives rejected**:
+
+1. *Context flag in the parser* — flip a boolean when inside `[...]` and
+   check for `/`.  Rejected: the flag would need to be set before the `[` is
+   consumed, leaking state across unrelated parse calls.
+
+2. *Distinct bracket syntax for rename* — e.g., `S{a/b}` or `S(a/b)`.
+   Rejected: conflicts with Z RM §3.11 notation; fuzz typechecker expects `[`.
+
+3. *Backtracking parser* — try generic, catch error, retry as rename.
+   Rejected: explicitly forbidden in the mission contract and inconsistent with
+   the project's no-backtracking discipline.
+
+4. *Keyword prefix* — `rename S with [a/b]`.  Rejected: not Z RM notation.
+
+**Known limitation — depth-tracking scan vs. two-token lookahead**: The
+depth-0 scan in `_parse_schema_rename_or_generic` correctly handles all
+current grammar forms.  A future grammar addition that places `/` at depth 0
+inside brackets for a purpose other than rename (e.g., arithmetic division
+inside a type expression) would require changing the disambiguation strategy.
+The two-token lookahead alternative (check if the second token after `[` is
+`/`) was considered and rejected: it handles only the single-pair case and
+breaks on `S[a, b/c]` (multi-pair with a non-pair element first) or
+`S[some_longer_name/target]`.  The depth-tracking scan is correct for all
+current and planned Z notation within Phase 3.x scope.
+
 ## Future Enhancements
 
 1. **Export formats**
