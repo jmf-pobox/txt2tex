@@ -1,0 +1,40 @@
+// Z Binding Brackets (Phase 2.3)
+// Demonstrates: {| ... |} binding literals per Z RM §3.7
+// Used in relational-calculus queries (DAT course style).
+
+TITLE: Z Binding Calculus
+AUTHOR: txt2tex example
+
+relvars Ship, Class
+
+=== Atomic Binding ===
+
+// A binding constructs a labelled tuple.
+
+{| name == s.name |}
+
+=== Binding in Set Comprehension (Q2(a) style) ===
+
+// Select name of every ship launched before 1921.
+
+{ s : Ship | s.launched < 1921 . {| name == s.name |} }
+
+=== Multi-Component Binding ===
+
+// Multiple comma-separated label-expression pairs.
+
+{| name == s.name, displacement == c.displacement, numGuns == c.numGuns |}
+
+=== Multi-Variable Comprehension with Binding (Q2(d) style) ===
+
+// Cross two relvars and project into a binding.
+
+{ s : Ship; c : Class | s.class = c.class .
+  {| name == s.name, displacement == c.displacement, numGuns == c.numGuns |}
+}
+
+=== Empty Binding ===
+
+// Z RM §3.7 permits an empty binding (rare but valid).
+
+{| |}

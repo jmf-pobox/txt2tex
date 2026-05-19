@@ -2527,6 +2527,60 @@ BigGuns := pi[class, country](sigma[bore >= 16](Class))
 | `bowtie`, `div`, `cross` | infix | same as cross |
 | `union`, `intersect` | infix | set ops |
 
+### Z Binding Calculus (Phase 2.3)
+
+Binding brackets construct labelled tuples per Z RM §3.7.  Used in
+relational-calculus queries (DAT course style).
+
+**Syntax:**
+
+```text
+{| label == expression, ... |}
+```
+
+Components are **comma-separated** (not semicolons).
+
+**Examples:**
+
+```text
+{| name == s.name |}
+
+{| name == s.name, displacement == c.displacement, numGuns == c.numGuns |}
+
+{| |}                         // empty binding (Z RM permits it)
+```
+
+**In set comprehensions:**
+
+```text
+{ s : Ship | s.launched < 1921 . {| name == s.name |} }
+
+{ s : Ship; c : Class | s.class = c.class .
+  {| name == s.name, displacement == c.displacement |}
+}
+```
+
+The `;` in `s : Ship; c : Class` separates variable-type pairs with
+different domains (multi-typed comprehension).
+
+**LaTeX output:**
+
+- `{| a == 1 |}` → `\lblot a == 1 \rblot`
+- `{| a == 1, b == 2 |}` → `\lblot a == 1, b == 2 \rblot`
+- `{| |}` → `\lblot \rblot`
+
+The macros `\lblot` and `\rblot` are defined in both `fuzz.sty` and the
+`zed-*` family.  No preamble change is needed.
+
+**Token disambiguation:**
+
+- `{|` — Binding bracket left (LBIND)
+- `|}` — Binding bracket right (RBIND)
+- `{` — Set brace (LBRACE)
+- `|` — Quantifier/comprehension pipe (PIPE)
+- `(|` — Relational image left (LIMG)
+- `|)` — Relational image right (RIMG)
+
 ## Additional Features
 
 ### Conditional Expressions

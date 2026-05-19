@@ -15,6 +15,7 @@ from txt2tex.ast_nodes import (
     BagLiteral,
     BibliographyMetadata,
     BinaryOp,
+    Binding,
     CaseAnalysis,
     Conditional,
     Contents,
@@ -2354,6 +2355,113 @@ class Parser:
             column=lambda_token.column,
         )
 
+    def _parse_binding(self) -> Binding:
+        r"""Parse a Z binding literal: {| name == expr, ... |} (Z RM §3.7).
+
+        Consumes LBIND, then a comma-separated list of ``IDENTIFIER == expr``
+        pairs, then RBIND.  Empty bindings ``{| |}`` are accepted (Z RM §3.7
+        permits them).
+
+        The ``==`` inside binding context reuses the ABBREV token; the parser
+        disambiguates by position — we are inside ``{| ... |}``, not at
+        top-level abbreviation position.
+
+        Raises:
+            ParserError: Missing ``==``, missing label, missing value, missing
+                closing ``|}``, or semicolon used between components.
+        """
+        start_token = self._current()
+        self._advance()  # consume {|
+
+        pairs: list[tuple[str, Expr]] = []
+
+        # Empty binding: {| |}
+        if self._match(TokenType.RBIND):
+            self._advance()  # consume |}
+            return Binding(pairs=[], line=start_token.line, column=start_token.column)
+
+        # Parse first component
+        pairs.append(self._parse_binding_component())
+
+        # Parse remaining components
+        while self._match(TokenType.COMMA):
+            self._advance()  # consume ,
+            # Skip any newlines between components
+            self._skip_newlines()
+            pairs.append(self._parse_binding_component())
+
+        # Closing |}
+        if not self._match(TokenType.RBIND):
+            cur = self._current()
+            if cur.type == TokenType.SEMICOLON:
+                raise ParserError(
+                    "binding components are comma-separated, not semicolons;"
+                    " use ',' between components",
+                    cur,
+                )
+            if cur.type == TokenType.EOF:
+                raise ParserError(
+                    "unclosed binding: expected '|}' to close '{|'",
+                    cur,
+                )
+            raise ParserError(
+                f"expected ',' or '|}}' in binding, got {cur.type.name}",
+                cur,
+            )
+        self._advance()  # consume |}
+
+        return Binding(pairs=pairs, line=start_token.line, column=start_token.column)
+
+    def _parse_binding_component(self) -> tuple[str, Expr]:
+        """Parse a single binding component: IDENTIFIER == expr.
+
+        Raises:
+            ParserError: If label is missing, ``==`` is missing, or value is
+                missing.
+        """
+        # Expect an identifier as the label
+        if not self._match(TokenType.IDENTIFIER):
+            cur = self._current()
+            if cur.type == TokenType.ABBREV:
+                raise ParserError(
+                    "binding component requires a label before '==';"
+                    " got '==' with no label",
+                    cur,
+                )
+            if cur.type in (TokenType.RBIND, TokenType.EOF):
+                raise ParserError(
+                    "expected binding label (identifier) before '=='",
+                    cur,
+                )
+            raise ParserError(
+                f"expected identifier as binding label, got {cur.type.name}",
+                cur,
+            )
+        label_token = self._advance()  # consume identifier
+
+        # Expect ==
+        if not self._match(TokenType.ABBREV):
+            cur = self._current()
+            raise ParserError(
+                f"expected '==' after binding label {label_token.value!r},"
+                f" got {cur.type.name}",
+                cur,
+            )
+        self._advance()  # consume ==
+
+        # Parse value expression — stop before , or |}
+        # Use _parse_expr to allow full expressions as values
+        if self._match(TokenType.COMMA, TokenType.RBIND, TokenType.EOF):
+            cur = self._current()
+            raise ParserError(
+                f"expected expression after '==' in binding component"
+                f" {label_token.value!r}",
+                cur,
+            )
+        value = self._parse_expr()
+
+        return (label_token.value, value)
+
     def _parse_set(self) -> Expr:
         """Parse set literal or set comprehension.
 
@@ -2475,6 +2583,35 @@ class Parser:
             finally:
                 self._parsing_schema_text = False
 
+        # Parse optional extra declarations: ; var : Type ; var : Type ...
+        # Handles multi-typed set comprehensions like { s : Ship; c : Class | ... }
+        extra_declarations: list[tuple[str, Expr]] | None = None
+        while self._match(TokenType.SEMICOLON):
+            self._advance()  # Consume ';'
+            self._skip_newlines()
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError(
+                    "Expected variable name after ';' in set comprehension",
+                    self._current(),
+                )
+            extra_var = self._advance().value
+            extra_domain: Expr | None = None
+            if self._match(TokenType.COLON):
+                self._advance()  # Consume ':'
+                self._parsing_schema_text = True
+                try:
+                    extra_domain = self._parse_function_type()
+                finally:
+                    self._parsing_schema_text = False
+            if extra_domain is None:
+                raise ParserError(
+                    f"Expected ':' and type after '{extra_var}' in set comprehension",
+                    self._current(),
+                )
+            if extra_declarations is None:
+                extra_declarations = []
+            extra_declarations.append((extra_var, extra_domain))
+
         # Parse separator | or . for set comprehension
         # Syntax: {x : T | predicate . expr} or {x : T . expr} (no predicate)
         predicate: Expr | None
@@ -2512,7 +2649,8 @@ class Parser:
                 self._current(),
             )
 
-        # Expect closing brace
+        # Expect closing brace (skip newlines for multi-line comprehensions)
+        self._skip_newlines()
         if not self._match(TokenType.RBRACE):
             raise ParserError(
                 "Expected '}' to close set comprehension", self._current()
@@ -2526,6 +2664,7 @@ class Parser:
             domain=domain,
             predicate=predicate,
             expression=expression,
+            extra_declarations=extra_declarations,
             line=start_token.line,
             column=start_token.column,
         )
@@ -2539,8 +2678,16 @@ class Parser:
         return self._parse_iff()
 
     def _parse_set_expression(self) -> Expr:
-        """Parse expression in set comprehension (after . and up to })."""
-        # Parse expression up to }
+        """Parse expression in set comprehension (after . and up to }).
+
+        Newlines between the bullet separator and the expression are skipped
+        to support multi-line comprehensions like:
+            { s : Ship | pred .
+              {| name == s.name |}
+            }
+        """
+        # Skip newlines before expression (multi-line comprehension support)
+        self._skip_newlines()
         return self._parse_iff()
 
     def _parse_comparison(self) -> Expr:
@@ -3121,6 +3268,7 @@ class Parser:
                         TokenType.OR,  # .field or
                         TokenType.PLUS,  # .field +
                         TokenType.MINUS,  # .field -
+                        TokenType.RBIND,  # .field |} (inside binding {| ... |})
                         TokenType.EOF,  # .field (standalone)
                         TokenType.NEWLINE,  # .field\n (end of line)
                     )
@@ -3614,6 +3762,10 @@ class Parser:
         if self._match(TokenType.LPAREN):
             return self._parse_parenthesized_expr_or_tuple()
 
+        # Binding literal {| name == expr, ... |} (Z RM §3.7)
+        if self._match(TokenType.LBIND):
+            return self._parse_binding()
+
         # Set comprehension or set literal {x : X | pred} or {a, b, c}
         if self._match(TokenType.LBRACE):
             return self._parse_set()
@@ -3641,7 +3793,7 @@ class Parser:
             return self._parse_unary()
 
         raise ParserError(
-            f"Expected identifier, number, '(', '{{', '⟨', or lambda,"
+            f"Expected identifier, number, '(', '{{', '{{|', '⟨', or lambda,"
             f" got {self._current().type.name}",
             self._current(),
         )

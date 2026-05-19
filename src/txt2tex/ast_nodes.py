@@ -148,6 +148,9 @@ class SetComprehension(ASTNode):
     domain: Expr | None  # Optional domain (e.g., N, Z, P X)
     predicate: Expr | None  # The condition/predicate (can be None)
     expression: Expr | None  # Optional expression (if present, set by expression)
+    # Additional semicolon-separated declaration groups for multi-typed bindings:
+    # { s : Ship; c : Class | ... } → extra_declarations=[("c", Class)]
+    extra_declarations: list[tuple[str, Expr]] | None = None
 
 
 @dataclass(frozen=True)
@@ -597,6 +600,31 @@ class Assignment(ASTNode):
     expression: Expr
 
 
+@dataclass(frozen=True)
+class Binding(ASTNode):
+    r"""Z binding expression (Z RM §3.7).
+
+    Constructs a labelled tuple whose components are name-expression pairs.
+    Written ``{| name == expr, ... |}`` in source; rendered as
+    ``\lblot name == expr, \ldots \rblot`` in LaTeX.
+
+    Components are comma-separated (Z RM §3.7 uses commas, not semicolons).
+    The ``==`` operator is the ABBREV token reused in binding context;
+    the parser disambiguates by position (inside ``{| ... |}``, not at
+    top-level abbreviation position).
+
+    Examples:
+    - {| name == s.name |}
+      -> pairs=[("name", TupleProjection(s, "name"))]
+    - {| name == s.name, displacement == c.displacement |}
+      -> pairs=[("name", ...), ("displacement", ...)]
+    - {| |} (empty binding, Z RM permits it)
+      -> pairs=[]
+    """
+
+    pairs: list[tuple[str, Expr]]
+
+
 # Type alias for all expression types
 Expr = (
     BinaryOp
@@ -629,6 +657,7 @@ Expr = (
     | Rename
     | NaturalJoin
     | Divide
+    | Binding
 )
 
 

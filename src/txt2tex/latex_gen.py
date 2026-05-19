@@ -15,6 +15,7 @@ from txt2tex.ast_nodes import (
     AxDef,
     BagLiteral,
     BinaryOp,
+    Binding,
     CaseAnalysis,
     Conditional,
     Contents,
@@ -1527,6 +1528,16 @@ class LaTeXGenerator:
             parts.append(self._get_colon_separator())
             parts.append(domain_latex)
 
+        # Emit extra semicolon-separated declarations for multi-typed comprehensions.
+        # { s : Ship; c : Class | ... } → ...; c \colon \mathrm{Class} ...
+        if node.extra_declarations:
+            for extra_var, extra_domain in node.extra_declarations:
+                extra_domain_latex = self.generate_expr(extra_domain)
+                parts.append(";")
+                parts.append(extra_var)
+                parts.append(self._get_colon_separator())
+                parts.append(extra_domain_latex)
+
         # Handle case with no predicate
         if node.predicate is None:
             # No predicate: { x : X . expr } -> use bullet/@ directly
@@ -2068,6 +2079,28 @@ class LaTeXGenerator:
         left_latex = self.generate_expr(node.left)
         right_latex = self.generate_expr(node.right)
         return rf"{left_latex} \div {right_latex}"
+
+    @generate_expr.register(Binding)
+    def _generate_binding(self, node: Binding, parent: Expr | None = None) -> str:
+        r"""Generate LaTeX for a Z binding literal (Z RM §3.7).
+
+        {| name == expr, ... |} → \lblot name == expr, \ldots \rblot
+
+        Component labels are emitted via ``_emit_attr_name`` so that a
+        declared relvar appearing as a label receives ``\mathrm{}``.
+        Component values are emitted with the full expression generator.
+
+        Empty binding ``{| |}`` → ``\lblot \rblot``.
+        """
+        if not node.pairs:
+            return r"\lblot \rblot"
+        components: list[str] = []
+        for label, value_expr in node.pairs:
+            label_latex = self._emit_attr_name(label)
+            value_latex = self.generate_expr(value_expr)
+            components.append(f"{label_latex} == {value_latex}")
+        inner = ", ".join(components)
+        return rf"\lblot {inner} \rblot"
 
     @generate_document_item.register(Assignment)
     def _generate_assignment(self, node: Assignment) -> list[str]:

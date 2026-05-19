@@ -1545,6 +1545,76 @@ it receives `\mathrm{}` wrapping — consistent with the general rule.
 3. `Assignment` as `Expr` — rejected; would allow nonsensical nesting like
    `sigma[T := R](S)`.  Statement-shaped constructs belong in `DocumentItem`.
 
+## ADR: Z Binding Brackets and Context-Sensitive == (Phase 2.3)
+
+**Decision**: Add `{| ... |}` binding literals per Z RM §3.7.  Render as
+`\lblot ... \rblot`.  Reuse the existing `ABBREV` token for `==` inside
+binding context.
+
+**Forces**:
+
+1. DAT course exercises1.tex Q2(a)-(e) require binding-calculus expressions
+   of the form `{ s : Ship | pred . {| name == s.name |} }`.
+2. Z RM §3.7 specifies `\lblot a == e_1, b == e_2 \rblot`; the macros
+   `\lblot` and `\rblot` exist in both `fuzz.sty` and the `zed-*` family
+   (confirmed by jms round-1 verification at `fuzz.sty:275-276` and
+   `zed-lbr.sty:222-223`/`zed-cm.sty:471-472`).
+3. The `==` operator is already used for abbreviations (`Color == red | blue`);
+   adding a second meaning requires disambiguation.
+4. Components in Z RM §3.7 bindings use commas, not semicolons.
+
+**Decision details**:
+
+*Tokens.* Two new two-character tokens `LBIND` (`{|`) and `RBIND` (`|}`).
+Lexer placement: `{|` check precedes the bare `{` branch; `|}` check follows
+the existing `|)` branch (no conflict because no existing multi-char `|`
+prefix peeks at `}`).
+
+*== disambiguation.* The parser dispatches to `_parse_binding` when it
+encounters `LBIND` at atom level.  Inside `_parse_binding_component`, `==`
+is consumed as the label-equals operator.  No parser state flag is needed:
+the context is implicitly established by being inside `_parse_binding`.
+
+*AST.* `Binding(pairs: list[tuple[str, Expr]])` — a frozen dataclass added
+to the `Expr` union.  Each pair is `(label_name, value_expression)`.
+
+*Generator.* Labels are emitted via `_emit_attr_name` (the same helper used
+by `pi` and `rho`), so a declared relvar appearing as a label receives
+`\mathrm{}` wrapping.  Values are emitted with the full `generate_expr`
+path.  Format: `\lblot label_1 == value_1, ..., label_n == value_n \rblot`.
+
+*Field-projection in binding values.* The `_parse_postfix` `safe_followers`
+set was extended to include `RBIND`, enabling `s.name` to parse as a
+`TupleProjection` before `|}`.
+
+*Multi-typed set comprehensions.* DAT Q2(d) uses `{ s : Ship; c : Class | ... }`.
+`SetComprehension` gained an `extra_declarations: list[tuple[str, Expr]] | None`
+field (default `None`; backward-compatible).  The parser consumes optional
+`;`-separated `var : Type` pairs after the first declaration.  The generator
+emits them as `; var \colon Type` immediately after the first domain.
+`_parse_set_expression` and the closing-`}` branch now skip leading newlines
+to support multi-line comprehensions.
+
+**Alternatives rejected**:
+
+1. *New keyword for `==` in binding context* — unnecessary complexity;
+   the disambiguation is local (position inside `{| ... |}`) and
+   unambiguous.
+
+2. *Angle-bracket or Unicode syntax* — `⟪ a == e ⟫` would require new
+   Unicode input or macro definitions.  The `{| ... |}` form is the standard
+   ASCII encoding in Z reference materials.
+
+3. *`;` as component separator* — Z RM §3.7 explicitly uses commas.
+   Semicolons are already the schema-declaration separator; mixing them into
+   binding context would be confusing.
+
+4. *Separate `decls` field in SetComprehension* — a `list[Declaration]`
+   approach would be semantically cleaner but requires changing `Declaration`
+   to support the single-variable-per-`:` form and updating all existing
+   callers.  The `extra_declarations: list[tuple[str, Expr]]` field achieves
+   the same result with a smaller diff.
+
 ## Future Enhancements
 
 1. **Export formats**

@@ -224,3 +224,85 @@ file demonstrating all operators.
 ```bash
 txt2tex examples/14_relational_databases/algebra_basics.txt
 ```
+
+---
+
+## Z Binding Calculus
+
+Phase 2.3 adds binding brackets — the Z RM §3.7 notation for labelled tuples.
+These appear in relational-calculus queries of the form used in the Oxford DAT
+course exercises.
+
+### Binding Syntax
+
+A binding constructs a tuple whose components are labelled:
+
+```text
+{| name == s.name |}
+```
+
+Renders as: $\lblot name == s.name \rblot$
+
+Multiple components are **comma-separated** (not semicolons — Z RM §3.7):
+
+```text
+{| name == s.name, displacement == c.displacement, numGuns == c.numGuns |}
+```
+
+Renders as:
+$\lblot name == s.name, displacement == c.displacement, numGuns == c.numGuns \rblot$
+
+An empty binding is valid (rare, but permitted by Z RM §3.7):
+
+```text
+{| |}
+```
+
+### Binding in Set Comprehension (DAT Q2 style)
+
+The main use case is the expression part of a set comprehension:
+
+```text
+{ s : Ship | s.launched < 1921 . {| name == s.name |} }
+```
+
+This renders as a Z set comprehension with a binding body.  The relation
+variable `Ship` receives `\mathrm{}` wrapping when declared with `relvars`.
+
+A multi-variable comprehension uses `;` to separate variable-type pairs:
+
+```text
+{ s : Ship; c : Class | s.class = c.class .
+  {| name == s.name, displacement == c.displacement, numGuns == c.numGuns |}
+}
+```
+
+### Token Disambiguation
+
+The two-character tokens `{|` (LBIND) and `|}` (RBIND) are distinct from
+all existing tokens:
+
+- `{` (LBRACE) — Set brace / subscript group
+- `{|` (LBIND) — Binding bracket left
+- `|` (PIPE) — Quantifier separator
+- `|}` (RBIND) — Binding bracket right
+- `(|` (LIMG) — Relational image left
+- `|)` (RIMG) — Relational image right
+
+The `==` inside `{| ... |}` reuses the ABBREV token.  The parser
+disambiguates by position: inside binding brackets, `==` is the
+label-equals operator; at top-level, it is an abbreviation definition.
+
+### LaTeX Macros
+
+The macros `\lblot` and `\rblot` are defined in both `fuzz.sty` (lines
+275-276) and `zed-lbr.sty`/`zed-cm.sty`.  No preamble change is needed.
+
+### Complete Bindings Example
+
+See `examples/14_relational_databases/bindings.txt` for a working file
+demonstrating all binding forms.
+
+```bash
+txt2tex examples/14_relational_databases/bindings.txt
+```

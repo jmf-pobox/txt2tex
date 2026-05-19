@@ -210,6 +210,7 @@ class Lexer:
     line: int
     column: int
     _in_solution_marker: bool
+    _bind_depth: int  # Tracks nested {| ... |} binding bracket depth
 
     def __init__(self, text: str) -> None:
         """Initialize lexer with input text."""
@@ -218,6 +219,7 @@ class Lexer:
         self.line = 1
         self.column = 1
         self._in_solution_marker = False  # Track if inside ** ... **
+        self._bind_depth = 0  # Track open {| ... |} nesting depth
 
     def _raise_infinite_loop_error(
         self,
@@ -428,6 +430,13 @@ class Lexer:
             self._advance()
             return Token(TokenType.LBRACKET, "[", start_line, start_column)
 
+        # Binding bracket left {| — check before bare {
+        if char == "{" and self._peek_char() == "|":
+            self._advance()
+            self._advance()
+            self._bind_depth += 1
+            return Token(TokenType.LBIND, "{|", start_line, start_column)
+
         # Braces (for sets and grouping subscripts/superscripts)
         if char == "{":
             self._advance()
@@ -458,6 +467,16 @@ class Lexer:
             self._advance()
             self._advance()
             return Token(TokenType.RIMG, "|)", start_line, start_column)
+
+        # Binding bracket right |} — only emit RBIND when inside an open {|.
+        # If _bind_depth is 0, fall through and lex as bare | then bare }.
+        # This prevents { x : N | x > 0|} from silently swallowing the
+        # closing pipe+brace as an RBIND when no binding is open.
+        if char == "|" and self._peek_char() == "}" and self._bind_depth > 0:
+            self._advance()
+            self._advance()
+            self._bind_depth -= 1
+            return Token(TokenType.RBIND, "|}", start_line, start_column)
 
         # Pipe (for truth tables and quantifiers)
         if char == "|":

@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Z binding brackets (Phase 2.3): `{| label == expr, ... |}` per Z RM §3.7.
+  Renders as `\lblot label == expr, \ldots \rblot`; macros are defined in both
+  `fuzz.sty` (lines 275-276) and `zed-lbr.sty`/`zed-cm.sty` — no preamble
+  change.  Two new token types: `LBIND` (`{|`) and `RBIND` (`|}`), both
+  two-character; lexer inserts `{|` check before bare `{` and `|}` check
+  before bare `|`, after all existing multi-char `|` prefixes.  New `Binding`
+  AST node with `pairs: list[tuple[str, Expr]]`; added to `Expr` union.
+  Parser dispatches at atom level; `==` reuses the `ABBREV` token
+  (context-disambiguated by position inside `{| ... |}`).  Components are
+  comma-separated per Z RM §3.7; semicolons raise a clear error.  Empty
+  binding `{| |}` accepted.  Generator emits via `_emit_attr_name` so
+  declared relvars receive `\mathrm{}` wrapping in both labels and values.
+  `RBIND` added to `safe_followers` in `_parse_postfix` to allow field
+  projections like `s.name` before `|}`.  Set comprehension extended to
+  support `;`-separated variable-type pairs (`s : Ship; c : Class`) for
+  multi-typed DAT queries; `_parse_set_expression` skips leading newlines
+  for multi-line comprehensions; closing `}` also skips newlines.  38 new
+  tests (lexer, parser, generator, acceptance probes, negative cases,
+  regression); new example `examples/14_relational_databases/bindings.txt`;
+  Tutorial 11 extended with Z Binding Calculus section; `USER_GUIDE.md`
+  binding subsection added; `DESIGN.md` ADR added.
+
 - Relational algebra operators (Phase 2.2): `sigma[pred](R)` (restriction,
   `\sigma`), `pi[A, B](R)` (projection, `\pi`), `rho[A as B](R)` (renaming,
   `\rho`), `R bowtie S` (natural join, `\bowtie`), `R bowtie [p] S`

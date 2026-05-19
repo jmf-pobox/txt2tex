@@ -163,6 +163,10 @@ class TokenType(Enum):
     DIV = auto()  # div (division)
     ASSIGN = auto()  # := (assignment)
 
+    # Binding bracket operators (Phase 2.3 — Z RM §3.7)
+    LBIND = auto()  # {| (binding literal left)
+    RBIND = auto()  # |} (binding literal right)
+
     # Z notation keywords (Phase 4)
     RELVARS = auto()  # relvars (Phase 2.1 — relvar declaration)
     GIVEN = auto()  # given
