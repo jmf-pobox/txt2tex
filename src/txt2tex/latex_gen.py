@@ -4724,6 +4724,9 @@ class LaTeXGenerator:
                     rf"\noindent$\mathrm{{PK}}(\mathrm{{{schema_name}}})"
                     rf" = \{{{attrs_str}\}}$"
                 )
+                # Blank line after the PK annotation so the next paragraph
+                # (often another schema) renders with visible breathing room.
+                lines.append("")
 
         lines.append("")
 
