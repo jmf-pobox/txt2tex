@@ -2016,6 +2016,75 @@ names are comma-separated inside the set literal.
    `Z`, `X`) are uppercase but not relation names; explicit declaration is
    required.
 
+## ADR: WYSIWYG Line Breaks for Algebra and Set Operators
+
+**Date:** 2026-05-19
+**Status:** Accepted
+
+**Context.** Long relational-algebra and set expressions overflow the page.
+The Guadalcanal example from Q1(d) of the DAT assessment is representative:
+
+```text
+pi[name, displacement, numGuns](Class bowtie Ship bowtie
+  rho[ship as name](pi[ship](sigma[battle = 'Guadalcanal'](Outcome))))
+```
+
+That expression is approximately 145 characters on one line. The existing
+line-break mechanism (`\` continuation and natural newline after operator)
+already worked for logical operators (`land`, `lor`), comparisons, equality,
+and quantifier separators (`@`, `|`). The algebra and set operators
+(`bowtie`, `cross`, `div`, `intersect`, `union`, `setminus`, `++`,
+`group`, `ungroup`) were not included, so any attempt to break them across
+lines silently failed or produced malformed LaTeX.
+
+**Decision.** Extend the same line-break mechanism to all algebra and set
+operators. The parser recognises a natural newline or an explicit `\`
+continuation after any of these tokens and sets a `line_break` flag on
+the resulting AST node. The generator dispatches on context:
+
+- **Display position** (outside any environment body): the chain wraps in
+  `\begin{array}{l}...\end{array}` with `\\` between continuations.
+- **Inside `where` predicate** (`schema`, `axdef`, `zed`): `\\` is emitted
+  inline, with no array wrapper. This matches the existing `land`/`lor`
+  behaviour and is the form fuzz type-checks correctly (per jms guidance).
+
+Z-semantic neutrality confirmed by jms: no operator's parse tree changes —
+only presentation. The same expression tree is produced whether or not the
+author inserts line breaks.
+
+**Alternatives considered.**
+
+1. *`adjustbox` auto-shrink everywhere* — applied globally, this shrinks
+   content past the ~70% threshold where subscripts become illegible.
+   Rejected: adjustbox is retained for ARGUE/EQUIV/PROOF blocks where
+   the author has no natural break points; it is not appropriate as a
+   fallback for structured algebra expressions.
+
+2. *Automatic line-breaking by the generator* — the generator could insert
+   breaks at every operator boundary when the estimated line length exceeds
+   a threshold.  Rejected: the author controls where breaks are meaningful
+   (e.g., between major sub-expressions, not inside arguments to `sigma`).
+   Forced breaks obscure proof structure.
+
+3. *Named-relation abbreviation via `==`* — introduce an abbreviation for
+   each sub-expression to shorten the outermost line.  Valid as a Z
+   technique, and still recommended for very deeply nested expressions.
+   Rejected as the sole mechanism because it forces schema-level names for
+   transient query fragments, polluting the specification namespace.
+
+**Caveat: `setminus` and the `\` token.** The `setminus` keyword renders
+as `\setminus`, but the continuation marker is also the character `\`. The
+lexer rule is: `\` at end of line → `CONTINUATION`; `\` followed by any
+non-newline character → `SETMINUS`. This means a continuation cannot be
+placed immediately after `setminus` — break before `setminus` instead, or
+use parentheses to group.
+
+**Implementation.** Parser changes in `src/txt2tex/parser.py`; generator
+changes in `src/txt2tex/latex_gen.py`. No new AST nodes; `line_break: bool`
+field added to the affected binary-operator dataclasses.
+
+---
+
 ## ADR: Tier-2 Trigoni Keyword Algebra Rendering (Phase 2.2 revised)
 
 **Date:** 2026-05-19

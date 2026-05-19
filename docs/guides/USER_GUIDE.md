@@ -2919,6 +2919,63 @@ longFunctionName(x, y, z) = \
   complexExpression + moreTerms
 ```
 
+#### Algebra and Set Operators
+
+The following operators also support WYSIWYG line breaks — both a natural
+newline after the operator and an explicit `\` continuation:
+
+| Keyword | LaTeX | Notes |
+|---------|-------|-------|
+| `bowtie` | `\otimes` | natural join / theta-join |
+| `cross` | `\times` | Cartesian product |
+| `div` | `\div` | relational division |
+| `intersect` | `\cap` | set intersection |
+| `union` | `\cup` | set union |
+| `setminus` | `\setminus` | set difference — see caveat |
+| `++` | `\oplus` | override |
+| `group` | `\mathop{\mathrm{GROUP}}` | Date nested-relation operator |
+| `ungroup` | `\mathop{\mathrm{UNGROUP}}` | Date nested-relation operator |
+
+**Display position** (free-standing expression): the broken chain wraps in
+`\begin{array}{l}...\end{array}` with `\\` between continuations.
+
+**Inside a `where` predicate** (`schema`, `axdef`, `zed`): `\\` is emitted
+inline with no array wrapper — the same form fuzz type-checks for `land`
+and `lor`.
+
+Example — long algebra expression broken at operator boundaries:
+
+```text
+pi[name, displacement, numGuns](Class bowtie
+  Ship bowtie
+  rho[ship as name](pi[ship](sigma[battle = 'Guadalcanal'](Outcome))))
+```
+
+Example — inside a schema `where` clause:
+
+```text
+schema S
+  x, y, z : P A
+where
+  x = y union
+    z intersect A
+end
+```
+
+**`setminus` caveat.** The `setminus` token is the character `\`. The lexer
+reads `\` at end of line as a continuation marker, and `\` followed by any
+non-newline character as `setminus`. You cannot place a continuation
+immediately after `setminus`. Break *before* `setminus` instead:
+
+```text
+-- OK: break before setminus
+A setminus B setminus \
+  C
+-- NOT OK: continuation immediately after setminus is a lex error
+A \        -- this is "A setminus (next line)" -- wrong
+  B
+```
+
 ### Fixing Overflow
 
 To fix overflowing lines, use `\` to break at logical points:

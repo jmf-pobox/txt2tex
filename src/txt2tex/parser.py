@@ -3163,16 +3163,32 @@ class Parser:
         Union: union operator (set union)
         Override: ++ (function/sequence override)
         Both have similar precedence in Z notation.
+
+        Supports multi-line expressions with natural line breaks.
         """
         left = self._parse_cross()
 
         while self._match(TokenType.UNION, TokenType.OVERRIDE):
             op_token = self._advance()
+            # Detect line continuation (backslash or natural newline)
+            has_continuation = False
+            if self._match(TokenType.CONTINUATION):
+                self._advance()  # consume \
+                has_continuation = True
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
+            elif self._match(TokenType.NEWLINE):
+                has_continuation = True
+                self._skip_newlines()
+            else:
+                self._skip_newlines()
             right = self._parse_cross()
             left = BinaryOp(
                 operator=op_token.value,
                 left=left,
                 right=right,
+                line_break_after=has_continuation,
                 line=op_token.line,
                 column=op_token.column,
             )
@@ -3186,6 +3202,8 @@ class Parser:
         level between set operators and arithmetic (Phase 2.2 / 4.1).
         BOWTIE handles an optional subscript bracket: R bowtie [p] S.
         GROUP and UNGROUP are Date's nested-relation operators.
+
+        Supports multi-line expressions with natural line breaks.
         """
         left = self._parse_intersect()
 
@@ -3213,38 +3231,166 @@ class Parser:
                             "Expected ']' after bowtie predicate", bracket_tok
                         )
                     self._advance()  # consume ']'
+                # Detect line continuation after optional subscript
+                has_continuation = False
+                if self._match(TokenType.CONTINUATION):
+                    self._advance()  # consume \
+                    has_continuation = True
+                    if self._match(TokenType.NEWLINE):
+                        self._advance()
+                    self._skip_newlines()
+                elif self._match(TokenType.NEWLINE):
+                    has_continuation = True
+                    self._skip_newlines()
+                else:
+                    self._skip_newlines()
                 right = self._parse_intersect()
                 left = NaturalJoin(
                     left=left,
                     right=right,
                     subscript=subscript,
+                    line_break_after=has_continuation,
                     line=op_token.line,
                     column=op_token.column,
                 )
             elif op_token.type == TokenType.DIV:
+                # Detect line continuation
+                has_continuation = False
+                if self._match(TokenType.CONTINUATION):
+                    self._advance()  # consume \
+                    has_continuation = True
+                    if self._match(TokenType.NEWLINE):
+                        self._advance()
+                    self._skip_newlines()
+                elif self._match(TokenType.NEWLINE):
+                    has_continuation = True
+                    self._skip_newlines()
+                else:
+                    self._skip_newlines()
                 right = self._parse_intersect()
                 left = Divide(
                     left=left,
                     right=right,
+                    line_break_after=has_continuation,
                     line=op_token.line,
                     column=op_token.column,
                 )
             elif op_token.type == TokenType.GROUP:
-                left = self._parse_group_rhs(left, op_token)
+                group_node = self._parse_group_rhs(left, op_token)
+                # Detect line continuation after full GROUP expression
+                has_continuation = False
+                if self._match(TokenType.CONTINUATION):
+                    self._advance()  # consume \
+                    has_continuation = True
+                    if self._match(TokenType.NEWLINE):
+                        self._advance()
+                    self._skip_newlines()
+                elif self._match(TokenType.NEWLINE):
+                    has_continuation = True
+                    self._skip_newlines()
+                else:
+                    self._skip_newlines()
+                if has_continuation:
+                    # Replace the frozen Group node with line_break_after=True
+                    left = Group(
+                        relation=group_node.relation,
+                        attrs=group_node.attrs,
+                        alias=group_node.alias,
+                        line_break_after=True,
+                        line=group_node.line,
+                        column=group_node.column,
+                    )
+                else:
+                    left = group_node
             elif op_token.type == TokenType.UNGROUP:
-                left = self._parse_ungroup_rhs(left, op_token)
+                ungroup_node = self._parse_ungroup_rhs(left, op_token)
+                # Detect line continuation after full UNGROUP expression
+                has_continuation = False
+                if self._match(TokenType.CONTINUATION):
+                    self._advance()  # consume \
+                    has_continuation = True
+                    if self._match(TokenType.NEWLINE):
+                        self._advance()
+                    self._skip_newlines()
+                elif self._match(TokenType.NEWLINE):
+                    has_continuation = True
+                    self._skip_newlines()
+                else:
+                    self._skip_newlines()
+                if has_continuation:
+                    # Replace the frozen Ungroup node with line_break_after=True
+                    left = Ungroup(
+                        relation=ungroup_node.relation,
+                        alias=ungroup_node.alias,
+                        line_break_after=True,
+                        line=ungroup_node.line,
+                        column=ungroup_node.column,
+                    )
+                else:
+                    left = ungroup_node
             else:
                 # CROSS
+                has_continuation = False
+                if self._match(TokenType.CONTINUATION):
+                    self._advance()  # consume \
+                    has_continuation = True
+                    if self._match(TokenType.NEWLINE):
+                        self._advance()
+                    self._skip_newlines()
+                elif self._match(TokenType.NEWLINE):
+                    has_continuation = True
+                    self._skip_newlines()
+                else:
+                    self._skip_newlines()
                 right = self._parse_intersect()
                 left = BinaryOp(
                     operator=op_token.value,
                     left=left,
                     right=right,
+                    line_break_after=has_continuation,
                     line=op_token.line,
                     column=op_token.column,
                 )
 
+            # After constructing the node, check for trailing continuation
+            # that marks a break before the next operator in the chain.
+            # Example: R bowtie S \    ← \ after RHS, before next bowtie
+            #            bowtie T
+            # The just-constructed node gets line_break_after=True so the
+            # caller knows to emit \\ before the next operator.
+            if self._match(TokenType.CONTINUATION):
+                self._advance()  # consume \
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
+                left = dataclasses.replace(left, line_break_after=True)
+            elif (
+                self._match(TokenType.NEWLINE) and self._next_non_newline_is_cross_op()
+            ):
+                # Natural line break before another cross-level operator
+                self._skip_newlines()
+                left = dataclasses.replace(left, line_break_after=True)
+
         return left
+
+    def _next_non_newline_is_cross_op(self) -> bool:
+        """Peek ahead past newlines to see if a cross-level operator follows.
+
+        Returns True when the next non-newline token is one of CROSS, BOWTIE,
+        DIV, GROUP, or UNGROUP, indicating a natural line break in a chain.
+        """
+        pos = self.pos
+        while pos < len(self.tokens) and self.tokens[pos].type == TokenType.NEWLINE:
+            pos += 1
+        if pos >= len(self.tokens):
+            return False
+        return self.tokens[pos].type in (
+            TokenType.CROSS,
+            TokenType.BOWTIE,
+            TokenType.DIV,
+            TokenType.GROUP,
+            TokenType.UNGROUP,
+        )
 
     def _parse_group_rhs(self, relation: Expr, group_tok: Token) -> Group:
         """Parse the RHS of a GROUP expression: ({A, B, ...} as alias).
@@ -3324,16 +3470,33 @@ class Parser:
         )
 
     def _parse_intersect(self) -> Expr:
-        """Parse intersect and set difference operators."""
+        """Parse intersect and set difference operators.
+
+        Supports multi-line expressions with natural line breaks.
+        """
         left = self._parse_unary()
 
         while self._match(TokenType.INTERSECT, TokenType.SETMINUS):
             op_token = self._advance()
+            # Detect line continuation (backslash or natural newline)
+            has_continuation = False
+            if self._match(TokenType.CONTINUATION):
+                self._advance()  # consume \
+                has_continuation = True
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
+            elif self._match(TokenType.NEWLINE):
+                has_continuation = True
+                self._skip_newlines()
+            else:
+                self._skip_newlines()
             right = self._parse_unary()
             left = BinaryOp(
                 operator=op_token.value,
                 left=left,
                 right=right,
+                line_break_after=has_continuation,
                 line=op_token.line,
                 column=op_token.column,
             )

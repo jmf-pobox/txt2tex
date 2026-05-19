@@ -678,6 +678,7 @@ class NaturalJoin(ASTNode):
     left: Expr
     right: Expr
     subscript: Expr | None  # None for natural join, predicate for theta-join
+    line_break_after: bool = False
 
 
 @dataclass(frozen=True)
@@ -692,6 +693,7 @@ class Divide(ASTNode):
 
     left: Expr
     right: Expr
+    line_break_after: bool = False
 
 
 @dataclass(frozen=True)
@@ -716,6 +718,7 @@ class Group(ASTNode):
     relation: Expr
     attrs: list[str]
     alias: str
+    line_break_after: bool = False
 
 
 @dataclass(frozen=True)
@@ -737,6 +740,7 @@ class Ungroup(ASTNode):
 
     relation: Expr
     alias: str
+    line_break_after: bool = False
 
 
 @dataclass(frozen=True)

@@ -764,18 +764,47 @@ class LaTeXGenerator:
         Returns:
             True if expr or any sub-expression has line breaks
         """
-        if isinstance(expr, BinaryOp):
-            if expr.line_break_after:
-                return True
-            return self._has_line_breaks(expr.left) or self._has_line_breaks(expr.right)
-        if isinstance(expr, UnaryOp):
-            return self._has_line_breaks(expr.operand)
+        # Nodes with line_break_after flag — check flag first, then children
+        if isinstance(expr, (BinaryOp, NaturalJoin, Divide, Group, Ungroup)):
+            return self._has_line_breaks_flagged(expr)
+        # Quantifier has a different flag name
         if isinstance(expr, Quantifier):
             if expr.line_break_after_pipe:
                 return True
             if expr.domain and self._has_line_breaks(expr.domain):
                 return True
             return self._has_line_breaks(expr.body)
+        # Relational algebra wrappers: recurse into the inner relation
+        if isinstance(expr, (Restrict, Project, Rename)):
+            has_rel = self._has_line_breaks(expr.relation)
+            if isinstance(expr, Restrict):
+                return has_rel or self._has_line_breaks(expr.predicate)
+            return has_rel
+        return self._has_line_breaks_structural(expr)
+
+    def _has_line_breaks_flagged(
+        self,
+        expr: BinaryOp | NaturalJoin | Divide | Group | Ungroup,
+    ) -> bool:
+        """Check line breaks for nodes that carry a line_break_after flag."""
+        if expr.line_break_after:
+            return True
+        if isinstance(expr, BinaryOp):
+            return self._has_line_breaks(expr.left) or self._has_line_breaks(expr.right)
+        if isinstance(expr, NaturalJoin):
+            left_has = self._has_line_breaks(expr.left)
+            right_has = self._has_line_breaks(expr.right)
+            sub_has = bool(expr.subscript and self._has_line_breaks(expr.subscript))
+            return left_has or right_has or sub_has
+        if isinstance(expr, Divide):
+            return self._has_line_breaks(expr.left) or self._has_line_breaks(expr.right)
+        # Group and Ungroup: only the relation child matters
+        return self._has_line_breaks(expr.relation)
+
+    def _has_line_breaks_structural(self, expr: Expr) -> bool:
+        """Check line breaks for structural/container expression nodes."""
+        if isinstance(expr, UnaryOp):
+            return self._has_line_breaks(expr.operand)
         if isinstance(expr, Lambda):
             return self._has_line_breaks(expr.body)
         if isinstance(expr, Subscript):
@@ -785,13 +814,12 @@ class LaTeXGenerator:
                 expr.exponent
             )
         if isinstance(expr, SetComprehension):
-            # Check all parts of set comprehension
             if expr.domain and self._has_line_breaks(expr.domain):
                 return True
             if expr.predicate and self._has_line_breaks(expr.predicate):
                 return True
             return bool(expr.expression and self._has_line_breaks(expr.expression))
-        if isinstance(expr, SetLiteral):
+        if isinstance(expr, (SetLiteral, SequenceLiteral)):
             return any(self._has_line_breaks(elem) for elem in expr.elements)
         if isinstance(expr, FunctionApp):
             if self._has_line_breaks(expr.function):
@@ -807,15 +835,13 @@ class LaTeXGenerator:
             if self._has_line_breaks(expr.base):
                 return True
             return any(self._has_line_breaks(param) for param in expr.type_params)
-        if isinstance(expr, SequenceLiteral):
-            return any(self._has_line_breaks(elem) for elem in expr.elements)
         if isinstance(expr, Conditional):
             return (
                 self._has_line_breaks(expr.condition)
                 or self._has_line_breaks(expr.then_expr)
                 or self._has_line_breaks(expr.else_expr)
             )
-        # Base cases: Identifier, Number, etc. - no line breaks
+        # Base cases: Identifier, Number, StringLit, etc. - no line breaks
         return False
 
     @singledispatchmethod
@@ -2068,25 +2094,41 @@ class LaTeXGenerator:
     ) -> str:
         r"""Generate LaTeX for R bowtie S or R bowtie [p] S.
 
-        R bowtie S      → R \otimes S          (natural join — unchanged)
-        R bowtie [p] S  → \mathrm{Join}_{p}(R, S)  (theta-join — function form)
+        R bowtie S      → R \otimes S                     (natural join)
+        R bowtie [p] S  → \mathrm{Join}_{p}(R, S)         (theta-join)
+
+        When line_break_after is set, inserts \\ before the RHS so the
+        right operand starts on the next indented line.
         """
         left_latex = self.generate_expr(node.left)
         right_latex = self.generate_expr(node.right)
         if node.subscript is None:
-            return rf"{left_latex} \otimes {right_latex}"
+            if node.line_break_after:
+                indent = self._get_indentation()
+                return f"{left_latex} \\otimes \\\\\n{indent} {right_latex}"
+            return f"{left_latex} \\otimes {right_latex}"
         sub_latex = self.generate_expr(node.subscript)
-        return rf"\mathrm{{Join}}_{{{sub_latex}}}({left_latex}, {right_latex})"
+        if node.line_break_after:
+            indent = self._get_indentation()
+            # Break inside the function-call parens before the right argument
+            join_op = f"\\mathrm{{Join}}_{{{sub_latex}}}"
+            return f"{join_op}({left_latex}, \\\\\n{indent} {right_latex})"
+        return f"\\mathrm{{Join}}_{{{sub_latex}}}({left_latex}, {right_latex})"
 
     @generate_expr.register(Divide)
     def _generate_divide(self, node: Divide, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for R div S.
 
         R div S → R \div S
+
+        When line_break_after is set, inserts \\ before the RHS.
         """
         left_latex = self.generate_expr(node.left)
         right_latex = self.generate_expr(node.right)
-        return rf"{left_latex} \div {right_latex}"
+        if node.line_break_after:
+            indent = self._get_indentation()
+            return f"{left_latex} \\div \\\\\n{indent} {right_latex}"
+        return f"{left_latex} \\div {right_latex}"
 
     @generate_expr.register(Group)
     def _generate_group(self, node: Group, parent: Expr | None = None) -> str:
@@ -2094,24 +2136,38 @@ class LaTeXGenerator:
 
         R group ({A} as m) →
             R \mathop{\mathrm{GROUP}} (\{A\} \mathop{\mathrm{AS}} m)
+
+        When line_break_after is set, inserts \\ after the GROUP expression
+        so the next operator in a chain starts on the following line.
         """
         relation_latex = self.generate_expr(node.relation)
         attrs_str = ", ".join(self._emit_attr_name(a) for a in node.attrs)
         alias_str = self._emit_attr_name(node.alias)
-        return (
+        result = (
             rf"{relation_latex} \mathop{{\mathrm{{GROUP}}}}"
             rf" (\{{{attrs_str}\}} \mathop{{\mathrm{{AS}}}} {alias_str})"
         )
+        if node.line_break_after:
+            indent = self._get_indentation()
+            return f"{result} \\\\\n{indent} "
+        return result
 
     @generate_expr.register(Ungroup)
     def _generate_ungroup(self, node: Ungroup, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for R ungroup alias.
 
         R ungroup members → R \mathop{\mathrm{UNGROUP}} members
+
+        When line_break_after is set, inserts \\ after the UNGROUP expression
+        so the next operator in a chain starts on the following line.
         """
         relation_latex = self.generate_expr(node.relation)
         alias_str = self._emit_attr_name(node.alias)
-        return rf"{relation_latex} \mathop{{\mathrm{{UNGROUP}}}} {alias_str}"
+        result = f"{relation_latex} \\mathop{{\\mathrm{{UNGROUP}}}} {alias_str}"
+        if node.line_break_after:
+            indent = self._get_indentation()
+            return f"{result} \\\\\n{indent} "
+        return result
 
     @generate_expr.register(Binding)
     def _generate_binding(self, node: Binding, parent: Expr | None = None) -> str:

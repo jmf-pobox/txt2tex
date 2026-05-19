@@ -39,6 +39,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- WYSIWYG line-break support for algebra and set operators. Natural newline
+  or explicit `\` continuation is now recognised after `bowtie`, `cross`,
+  `div`, `intersect`, `union`, `setminus`, `++`, `group`, and `ungroup`.
+  In display position the broken chain wraps in `\begin{array}{l}...\end{array}`;
+  inside a `where` predicate `\\` is emitted inline (same form as `land`/`lor`,
+  fuzz type-checks cleanly). Example:
+
+  ```text
+  pi[name, displacement, numGuns](Class bowtie
+    Ship bowtie
+    rho[ship as name](pi[ship](sigma[battle = 'Guadalcanal'](Outcome))))
+  ```
+
+  Note: a `\` continuation cannot follow `setminus` directly because `\` is
+  also the `setminus` token; break *before* `setminus` instead.
+
 - `pk` declaration prefix for primary-key underlining (Phase 2.1 revised).
   `pk attrname : Type` in a schema or axdef body sets `is_primary_key=True`
   on the `Declaration` AST node; the generator emits `\underline{attrname}`
