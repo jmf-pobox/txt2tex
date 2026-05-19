@@ -1807,3 +1807,38 @@ F & F & T \\
 ```
 
 **Note**: With `--zed` flag, `\usepackage{fuzz}` becomes `\usepackage{zed-cm}` and `\usepackage{zed-maths}`.
+
+## ADR: GROUP / UNGROUP `\mathop` Wrapping (Phase 4.1)
+
+**Context.** Date's GROUP and UNGROUP operators are multi-letter operator
+names written in all-caps (`GROUP`, `UNGROUP`, `AS`).  In LaTeX math mode,
+a bare `\mathrm{GROUP}` renders as an upright roman word but with text-level
+spacing — it does not behave as a math operator.  Using `\mathop{\mathrm{GROUP}}`
+promotes the box to an ordinary binary math operator with correct inter-atom
+spacing on both sides (`\thickmuskip` = `5mu plus 5mu`).
+
+**Decision.** Per jms round-2 refinement (DAT-GAPS.md), all three multi-letter
+keywords — GROUP, UNGROUP, and AS — are wrapped with `\mathop`:
+
+```latex
+R \mathop{\mathrm{GROUP}} (\{A, B\} \mathop{\mathrm{AS}} alias)
+R \mathop{\mathrm{UNGROUP}} alias
+```
+
+**Alternatives considered.**
+
+1. *Bare `\mathrm{GROUP}`* — no operator spacing; GROUP and AS appear glued
+   to adjacent atoms.  Rejected: visually ambiguous.
+2. *`\operatorname{GROUP}`* (amsmath) — semantically correct but requires
+   `amsmath` in the preamble.  Rejected: adds a dependency not present in
+   the fuzz template and inconsistent with the kernel-only goal for relational
+   algebra operators.
+3. *`\text{GROUP}`* — text spacing, not math spacing.  Rejected: same problem
+   as bare `\mathrm`.
+
+**No `.sty` changes required.** `\mathrm` and `\mathop` are LaTeX kernel
+primitives available in every LaTeX distribution.
+
+**Implementation.** `_generate_group` and `_generate_ungroup` in
+`src/txt2tex/latex_gen.py`.  Attribute and alias names pass through
+`_emit_attr_name` so declared relvars receive `\mathrm{}` wrapping.

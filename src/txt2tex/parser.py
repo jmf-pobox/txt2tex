@@ -31,6 +31,7 @@ from txt2tex.ast_nodes import (
     GenDef,
     GenericInstantiation,
     GivenType,
+    Group,
     GuardedBranch,
     GuardedCases,
     HorizDef,
@@ -74,6 +75,7 @@ from txt2tex.ast_nodes import (
     Tuple,
     TupleProjection,
     UnaryOp,
+    Ungroup,
     Zed,
 )
 from txt2tex.constants import PROSE_WORDS
@@ -889,6 +891,8 @@ class Parser:
             TokenType.BIGCUP,  # bigcup (distributed union)
             TokenType.BIGCAP,  # bigcap (distributed intersection)
             TokenType.FILTER,  # filter (sequence filter)
+            TokenType.GROUP,  # group (DAT operator; legal as attr name)
+            TokenType.UNGROUP,  # ungroup (DAT operator; legal as attr name)
         )
 
     def _scan_for_colon_before_newline(self) -> bool:
@@ -3142,15 +3146,22 @@ class Parser:
         return left
 
     def _parse_cross(self) -> Expr:
-        """Parse Cartesian product, natural join, theta-join, and division operators.
+        """Parse Cartesian product, natural join, theta-join, division, GROUP, UNGROUP.
 
-        CROSS, BOWTIE, and DIV sit at the same precedence level between
-        set operators and arithmetic (Phase 2.2).  BOWTIE handles an
-        optional subscript bracket: R bowtie [p] S.
+        CROSS, BOWTIE, DIV, GROUP, and UNGROUP sit at the same precedence
+        level between set operators and arithmetic (Phase 2.2 / 4.1).
+        BOWTIE handles an optional subscript bracket: R bowtie [p] S.
+        GROUP and UNGROUP are Date's nested-relation operators.
         """
         left = self._parse_intersect()
 
-        while self._match(TokenType.CROSS, TokenType.BOWTIE, TokenType.DIV):
+        while self._match(
+            TokenType.CROSS,
+            TokenType.BOWTIE,
+            TokenType.DIV,
+            TokenType.GROUP,
+            TokenType.UNGROUP,
+        ):
             op_token = self._advance()
 
             if op_token.type == TokenType.BOWTIE:
@@ -3184,6 +3195,10 @@ class Parser:
                     line=op_token.line,
                     column=op_token.column,
                 )
+            elif op_token.type == TokenType.GROUP:
+                left = self._parse_group_rhs(left, op_token)
+            elif op_token.type == TokenType.UNGROUP:
+                left = self._parse_ungroup_rhs(left, op_token)
             else:
                 # CROSS
                 right = self._parse_intersect()
@@ -3196,6 +3211,83 @@ class Parser:
                 )
 
         return left
+
+    def _parse_group_rhs(self, relation: Expr, group_tok: Token) -> Group:
+        """Parse the RHS of a GROUP expression: ({A, B, ...} as alias).
+
+        Called after the 'group' keyword has been consumed.  Expects:
+            ( { attr-list } as alias )
+        """
+        if not self._match(TokenType.LPAREN):
+            raise ParserError("Expected '(' after 'group'", self._current())
+        self._advance()  # consume '('
+        if not self._match(TokenType.LBRACE):
+            raise ParserError(
+                "Expected '{' for attribute list in 'group'", self._current()
+            )
+        self._advance()  # consume '{'
+        attrs: list[str] = []
+        if not self._is_attr_name_token():
+            raise ParserError(
+                "Expected at least one attribute name in 'group' attribute list",
+                self._current(),
+            )
+        attrs.append(self._advance().value)
+        while self._match(TokenType.COMMA):
+            self._advance()  # consume ','
+            if not self._is_attr_name_token():
+                raise ParserError(
+                    "Expected attribute name after ',' in 'group' attribute list",
+                    self._current(),
+                )
+            attrs.append(self._advance().value)
+        if not self._match(TokenType.RBRACE):
+            raise ParserError(
+                "Expected '}' after attribute list in 'group'", self._current()
+            )
+        self._advance()  # consume '}'
+        # 'as' is not a reserved keyword; it tokenizes as IDENTIFIER
+        if not (self._match(TokenType.IDENTIFIER) and self._current().value == "as"):
+            cur = self._current()
+            raise ParserError(
+                f"Expected 'as' after attribute list in 'group', "
+                f"got {cur.type.name} ({cur.value!r})",
+                cur,
+            )
+        self._advance()  # consume 'as'
+        if not self._is_attr_name_token():
+            raise ParserError(
+                "Expected alias name after 'as' in 'group'", self._current()
+            )
+        alias = self._advance().value
+        if not self._match(TokenType.RPAREN):
+            raise ParserError(
+                "Expected ')' to close 'group' expression", self._current()
+            )
+        self._advance()  # consume ')'
+        return Group(
+            relation=relation,
+            attrs=attrs,
+            alias=alias,
+            line=group_tok.line,
+            column=group_tok.column,
+        )
+
+    def _parse_ungroup_rhs(self, relation: Expr, ungroup_tok: Token) -> Ungroup:
+        """Parse the RHS of an UNGROUP expression: alias.
+
+        Called after the 'ungroup' keyword has been consumed.  Expects a
+        single identifier naming the nested-relation attribute to flatten.
+        """
+        if not self._is_attr_name_token():
+            raise ParserError("Expected alias name after 'ungroup'", self._current())
+        alias = self._advance().value
+        return Ungroup(
+            relation=relation,
+            alias=alias,
+            line=ungroup_tok.line,
+            column=ungroup_tok.column,
+        )
 
     def _parse_intersect(self) -> Expr:
         """Parse intersect and set difference operators."""

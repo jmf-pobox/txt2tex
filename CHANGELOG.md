@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- GROUP / UNGROUP operators (Phase 4.1): Date's nested-relation operators.
+  `R group ({A, B, ...} as alias)` bundles attributes into a relation-valued
+  attribute; `R ungroup alias` flattens it back.  Both operators use
+  `\mathop{\mathrm{GROUP}}` / `\mathop{\mathrm{UNGROUP}}` per jms round-2
+  refinement — `\mathop{}` gives proper binary-operator spacing without
+  requiring `amsmath` (LaTeX kernel only).  Two new `TokenType` members
+  (`GROUP`, `UNGROUP`); both added to `KEYWORD_TO_TOKEN` and `RESERVED_WORDS`
+  in the lexer.  Two new frozen dataclasses: `Group(relation, attrs, alias)`
+  and `Ungroup(relation, alias)`, both added to the `Expr` union.  Parser
+  extends `_parse_cross` to handle both forms; helper methods
+  `_parse_group_rhs` and `_parse_ungroup_rhs` are extracted subparsers.
+  Generator methods `_generate_group` and `_generate_ungroup` emit the
+  `\mathop{\mathrm{...}}` form; attribute and alias names pass through
+  `_emit_attr_name` for relvar wrapping.  28 new tests (lexer, parser,
+  generator, 4 negative cases with message + line + column, acceptance probe,
+  regression); new example `examples/14_relational_databases/group_ungroup.txt`;
+  tutorial section added; `USER_GUIDE.md` updated; `DESIGN.md` ADR added.
+
 - Schema renaming (Phase 3.1): `S[old/new, ...]` per Z RM §3.11.  Renders
   as `S[old/new, ...]` in math mode — literal brackets and slashes, no
   special macro.  Disambiguation from generic instantiation `S[X]` (Phase

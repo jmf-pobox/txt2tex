@@ -2553,8 +2553,55 @@ BigGuns := pi[class, country](sigma[bore >= 16](Class))
 | Operator | Form | Level |
 |----------|------|-------|
 | `sigma`, `pi`, `rho` | prefix-with-args | atom |
-| `bowtie`, `div`, `cross` | infix | same as cross |
+| `bowtie`, `div`, `cross`, `group`, `ungroup` | infix | same as cross |
 | `union`, `intersect` | infix | set ops |
+
+### GROUP and UNGROUP (Phase 4.1)
+
+Date's nested-relation operators.  Bundle attributes into a
+relation-valued attribute (`group`) or flatten them back (`ungroup`).
+
+#### GROUP
+
+```text
+R group ({A, B, ...} as alias)
+```
+
+Renders: $R \mathop{\mathrm{GROUP}} (\{A, B\} \mathop{\mathrm{AS}} alias)$
+
+The attribute list inside `{...}` is comma-separated.  The alias after
+`as` names the resulting nested-relation column.
+
+Example with declared relvar:
+
+```text
+relvars GroupMembers
+
+GroupMembers group ({username} as members)
+```
+
+Renders: $\mathrm{GroupMembers} \mathop{\mathrm{GROUP}} (\{username\}
+\mathop{\mathrm{AS}} members)$
+
+#### UNGROUP
+
+```text
+R ungroup alias
+```
+
+Renders: $R \mathop{\mathrm{UNGROUP}} alias$
+
+Inverse of GROUP — removes the nested-relation attribute and restores
+the original flat columns.
+
+#### Chaining
+
+GROUP and UNGROUP are left-associative at the same precedence as
+`bowtie` and `div`:
+
+```text
+R group ({A} as sub) ungroup sub
+```
 
 ### Z Binding Calculus (Phase 2.3)
 

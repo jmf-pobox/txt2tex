@@ -33,6 +33,9 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     "rho": TokenType.RHO,
     "bowtie": TokenType.BOWTIE,
     "div": TokenType.DIV,
+    # Nested-relation operators (Phase 4.1)
+    "group": TokenType.GROUP,
+    "ungroup": TokenType.UNGROUP,
     # Z notation keywords
     "relvars": TokenType.RELVARS,
     "given": TokenType.GIVEN,
@@ -107,6 +110,8 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "rho",
         "bowtie",
         "div",
+        "group",
+        "ungroup",
         "relvars",
         "given",
         "axdef",

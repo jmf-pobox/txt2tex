@@ -615,6 +615,51 @@ class Divide(ASTNode):
 
 
 @dataclass(frozen=True)
+class Group(ASTNode):
+    """Date's GROUP operator — bundle attributes into a nested relation (Phase 4.1).
+
+    Represents ``R group ({A, B, ...} as alias)``.
+
+    Bundles the named attributes of R into a single nested relation-valued
+    attribute called alias.
+
+    Examples:
+    - R group ({A} as members)
+      -> relation=Identifier("R"), attrs=["A"], alias="members"
+    - R group ({A, B, C} as nested)
+      -> relation=Identifier("R"), attrs=["A", "B", "C"], alias="nested"
+
+    LaTeX rendering:
+      R \\mathop{\\mathrm{GROUP}} (\\{A, B\\} \\mathop{\\mathrm{AS}} alias)
+    """
+
+    relation: Expr
+    attrs: list[str]
+    alias: str
+
+
+@dataclass(frozen=True)
+class Ungroup(ASTNode):
+    """Date's UNGROUP operator — flatten a nested relation (Phase 4.1).
+
+    Represents ``R ungroup alias``.
+
+    Inverse of GROUP: removes the nested relation-valued attribute alias,
+    restoring the original flat structure.
+
+    Examples:
+    - R ungroup members
+      -> relation=Identifier("R"), alias="members"
+
+    LaTeX rendering:
+      R \\mathop{\\mathrm{UNGROUP}} alias
+    """
+
+    relation: Expr
+    alias: str
+
+
+@dataclass(frozen=True)
 class Assignment(ASTNode):
     """Relational assignment node (top-level statement form).
 
@@ -686,6 +731,8 @@ Expr = (
     | Rename
     | NaturalJoin
     | Divide
+    | Group
+    | Ungroup
     | Binding
 )
 

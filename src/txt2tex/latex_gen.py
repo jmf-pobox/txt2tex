@@ -29,6 +29,7 @@ from txt2tex.ast_nodes import (
     GenDef,
     GenericInstantiation,
     GivenType,
+    Group,
     GuardedBranch,
     GuardedCases,
     HorizDef,
@@ -71,6 +72,7 @@ from txt2tex.ast_nodes import (
     Tuple,
     TupleProjection,
     UnaryOp,
+    Ungroup,
     Zed,
 )
 from txt2tex.constants import PROSE_WORDS
@@ -2098,6 +2100,38 @@ class LaTeXGenerator:
         left_latex = self.generate_expr(node.left)
         right_latex = self.generate_expr(node.right)
         return rf"{left_latex} \div {right_latex}"
+
+    @generate_expr.register(Group)
+    def _generate_group(self, node: Group, parent: Expr | None = None) -> str:
+        r"""Generate LaTeX for R group ({A, B, ...} as alias).
+
+        R group ({A} as m) →
+            R \mathop{\mathrm{GROUP}} (\{A\} \mathop{\mathrm{AS}} m)
+
+        Attribute names go through _emit_attr_name so declared relvars
+        receive \mathrm{} wrapping.  The alias is also emitted through
+        _emit_attr_name for the same reason.
+        """
+        relation_latex = self.generate_expr(node.relation)
+        attrs_str = ", ".join(self._emit_attr_name(a) for a in node.attrs)
+        alias_str = self._emit_attr_name(node.alias)
+        return (
+            rf"{relation_latex} \mathop{{\mathrm{{GROUP}}}}"
+            rf" (\{{{attrs_str}\}} \mathop{{\mathrm{{AS}}}} {alias_str})"
+        )
+
+    @generate_expr.register(Ungroup)
+    def _generate_ungroup(self, node: Ungroup, parent: Expr | None = None) -> str:
+        r"""Generate LaTeX for R ungroup alias.
+
+        R ungroup members → R \mathop{\mathrm{UNGROUP}} members
+
+        The alias is emitted through _emit_attr_name so declared relvars
+        receive \mathrm{} wrapping.
+        """
+        relation_latex = self.generate_expr(node.relation)
+        alias_str = self._emit_attr_name(node.alias)
+        return rf"{relation_latex} \mathop{{\mathrm{{UNGROUP}}}} {alias_str}"
 
     @generate_expr.register(Binding)
     def _generate_binding(self, node: Binding, parent: Expr | None = None) -> str:

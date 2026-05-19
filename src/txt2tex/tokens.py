@@ -168,6 +168,10 @@ class TokenType(Enum):
     LBIND = auto()  # {| (binding literal left)
     RBIND = auto()  # |} (binding literal right)
 
+    # Nested-relation operators (Phase 4.1 — Date's GROUP / UNGROUP)
+    GROUP = auto()  # group (bundle attributes into nested relation)
+    UNGROUP = auto()  # ungroup (flatten nested relation)
+
     # Z notation keywords (Phase 4)
     RELVARS = auto()  # relvars (Phase 2.1 — relvar declaration)
     GIVEN = auto()  # given

@@ -306,3 +306,80 @@ demonstrating all binding forms.
 ```bash
 txt2tex examples/14_relational_databases/bindings.txt
 ```
+
+## GROUP and UNGROUP
+
+Date's GROUP and UNGROUP operators model nested relations — relation-valued
+attributes where one attribute column contains a whole sub-relation.
+
+### GROUP
+
+Bundle a set of attributes into a single nested relation-valued attribute:
+
+```text
+R group ({A, B, ...} as alias)
+```
+
+LaTeX output:
+
+```latex
+R \mathop{\mathrm{GROUP}} (\{A, B\} \mathop{\mathrm{AS}} alias)
+```
+
+The `\mathop{}` wrapper gives proper binary-operator spacing in math mode.
+No `.sty` changes are needed: `\mathrm` and `\mathop` are LaTeX kernel.
+
+Example — bundle name and email into a contact nested relation:
+
+```text
+relvars GroupMembers
+
+GroupMembers group ({name, email} as contact)
+```
+
+Renders as:
+
+```latex
+\mathrm{GroupMembers} \mathop{\mathrm{GROUP}}
+  (\{name, email\} \mathop{\mathrm{AS}} contact)
+```
+
+Relation names declared with `relvars` receive `\mathrm{}` wrapping;
+attribute names and aliases stay italic (default math mode).
+
+### UNGROUP
+
+Flatten a nested relation-valued attribute back to ordinary columns:
+
+```text
+R ungroup alias
+```
+
+LaTeX output:
+
+```latex
+R \mathop{\mathrm{UNGROUP}} alias
+```
+
+Example — recover the flat structure from a grouped relation:
+
+```text
+GroupMembers ungroup contact
+```
+
+### Chaining
+
+GROUP and UNGROUP are left-associative at the same precedence as `bowtie`
+and `div`.  Chaining is valid:
+
+```text
+R group ({A, B} as sub) ungroup sub
+```
+
+### Complete Example
+
+See `examples/14_relational_databases/group_ungroup.txt`:
+
+```bash
+txt2tex examples/14_relational_databases/group_ungroup.txt
+```

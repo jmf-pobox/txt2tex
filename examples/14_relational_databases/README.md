@@ -52,6 +52,16 @@ Demonstrates the relational algebra operators added in Phase 2.2:
 
 All operators use kernel LaTeX (no extra preamble packages required).
 
+### group_ungroup.txt
+
+Demonstrates Date's GROUP and UNGROUP operators for nested relations (Phase 4.1):
+
+- `R group ({A, B} as alias)` — bundle attributes into a nested relation
+- `R ungroup alias` — flatten a nested-relation attribute
+
+LaTeX output uses `\mathop{\mathrm{GROUP}}` and `\mathop{\mathrm{UNGROUP}}`
+for proper math-mode operator spacing (per jms round-2 refinement).
+
 ### bindings.txt
 
 Demonstrates Z binding brackets per Z RM §3.7, used in relational-calculus
@@ -72,4 +82,5 @@ The `{|` and `|}` tokens are distinct from `{` (set brace), `|` (pipe),
 txt2tex examples/14_relational_databases/relvars_basic.txt
 txt2tex examples/14_relational_databases/algebra_basics.txt
 txt2tex examples/14_relational_databases/bindings.txt
+txt2tex examples/14_relational_databases/group_ungroup.txt
 ```

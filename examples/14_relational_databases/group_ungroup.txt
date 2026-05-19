@@ -1,0 +1,38 @@
+// GROUP and UNGROUP Operators (Phase 4.1)
+// Demonstrates Date's nested-relation operators.
+// Both use kernel LaTeX - no extra package required.
+
+TITLE: GROUP and UNGROUP
+AUTHOR: txt2tex example
+
+relvars GroupMembers, Enrollment, Course
+
+=== GROUP - Bundle Attributes into a Nested Relation ===
+
+// Bundle {name, email} into a nested relation called contact.
+
+GroupMembers group ({name, email} as contact)
+
+// Single-attribute group:
+
+GroupMembers group ({username} as members)
+
+// Group then project:
+
+pi[groupId, members](GroupMembers group ({username} as members))
+
+=== UNGROUP - Flatten a Nested Relation ===
+
+// Flatten the nested relation attribute contact.
+
+GroupMembers ungroup contact
+
+// Ungroup the members nested relation:
+
+Enrollment ungroup members
+
+=== Combined: GROUP then UNGROUP ===
+
+// Round-trip: group then ungroup recovers the original structure.
+
+GroupMembers group ({name, email} as contact) ungroup contact
