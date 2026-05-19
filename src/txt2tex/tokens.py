@@ -140,6 +140,7 @@ class TokenType(Enum):
     PURETEXT = auto()  # PURETEXT: (raw text, no processing)
     LATEX = auto()  # LATEX: (raw LaTeX passthrough, no escaping)
     PAGEBREAK = auto()  # PAGEBREAK: (insert page break)
+    LINEBREAK = auto()  # LINEBREAK: (insert \medskip vertical space)
     CONTENTS = auto()  # CONTENTS: (table of contents)
     PARTS = auto()  # PARTS: (parts formatting style)
     BIBLIOGRAPHY = auto()  # BIBLIOGRAPHY: (bibliography file)

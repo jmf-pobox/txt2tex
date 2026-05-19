@@ -172,6 +172,7 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "BIBLIOGRAPHY",
         "BIBLIOGRAPHY_STYLE",
         "PAGEBREAK",
+        "LINEBREAK",
     }
 )
 
@@ -1205,6 +1206,11 @@ class Lexer:
             return Token(
                 TokenType.BIBLIOGRAPHY_STYLE, style_value, start_line, start_column
             )
+
+        # Check for LINEBREAK: keyword
+        if value == "LINEBREAK" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+            return Token(TokenType.LINEBREAK, "LINEBREAK:", start_line, start_column)
 
         # Check for PAGEBREAK: keyword
         if value == "PAGEBREAK" and self._current_char() == ":":

@@ -38,6 +38,7 @@ from txt2tex.ast_nodes import (
     InfruleBlock,
     Lambda,
     LatexBlock,
+    LineBreak,
     NaturalJoin,
     Number,
     PageBreak,
@@ -457,6 +458,7 @@ class Parser:
             TokenType.PURETEXT,
             TokenType.LATEX,
             TokenType.PAGEBREAK,
+            TokenType.LINEBREAK,
             TokenType.CONTENTS,
             TokenType.PARTS,
             TokenType.ARGUE,  # Both EQUIV: and ARGUE: map to this token
@@ -546,6 +548,17 @@ class Parser:
             raise ParserError("Expected PAGEBREAK token", pagebreak_token)
 
         return PageBreak(line=pagebreak_token.line, column=pagebreak_token.column)
+
+    def _parse_linebreak(self) -> LineBreak:
+        r"""Parse line break (vertical \medskip) from LINEBREAK token.
+
+        LINEBREAK: inserts a medium vertical space in the PDF output.
+        """
+        linebreak_token = self._advance()  # Consume LINEBREAK token
+        if linebreak_token.type != TokenType.LINEBREAK:
+            raise ParserError("Expected LINEBREAK token", linebreak_token)
+
+        return LineBreak(line=linebreak_token.line, column=linebreak_token.column)
 
     def _parse_contents(self) -> Contents:
         """Parse table of contents directive from CONTENTS token.
@@ -663,6 +676,8 @@ class Parser:
             return self._parse_latex_block()
         if self._match(TokenType.PAGEBREAK):
             return self._parse_pagebreak()
+        if self._match(TokenType.LINEBREAK):
+            return self._parse_linebreak()
         if self._match(TokenType.CONTENTS):
             return self._parse_contents()
         if self._match(TokenType.PARTS):

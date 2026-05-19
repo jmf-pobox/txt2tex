@@ -37,6 +37,7 @@ from txt2tex.ast_nodes import (
     InfruleBlock,
     Lambda,
     LatexBlock,
+    LineBreak,
     NaturalJoin,
     Number,
     PageBreak,
@@ -2720,6 +2721,16 @@ class LaTeXGenerator:
         PAGEBREAK: inserts a page break in PDF output.
         """
         return [r"\newpage", ""]
+
+    @generate_document_item.register(LineBreak)
+    def _generate_linebreak(self, node: LineBreak) -> list[str]:
+        r"""Generate LaTeX for line break.
+
+        LINEBREAK: inserts a \medskip vertical space in PDF output.
+        Useful for visual separation between logical groups of paragraphs
+        when neither a paragraph boundary nor a full page break is right.
+        """
+        return [r"\medskip", ""]
 
     @generate_document_item.register(Contents)
     def _generate_contents(self, node: Contents) -> list[str]:

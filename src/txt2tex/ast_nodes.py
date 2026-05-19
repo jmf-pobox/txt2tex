@@ -1205,6 +1205,16 @@ class PageBreak(ASTNode):
 
 
 @dataclass(frozen=True)
+class LineBreak(ASTNode):
+    """Vertical line break (\\medskip) in document.
+
+    Inserts a medium vertical skip between paragraphs in the PDF output.
+    Useful for separating logical groups of related content (e.g., a schema
+    and its auto-emitted PK/FK predicates from the next schema).
+    """
+
+
+@dataclass(frozen=True)
 class Contents(ASTNode):
     """Table of contents directive.
 
@@ -1254,6 +1264,7 @@ DocumentItem = (
     | PureParagraph
     | LatexBlock
     | PageBreak
+    | LineBreak
     | Contents
     | PartsFormat
     | TruthTable
