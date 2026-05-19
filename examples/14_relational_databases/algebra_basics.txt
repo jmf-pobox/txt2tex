@@ -1,0 +1,70 @@
+// Relational Algebra Operators (Phase 2.2)
+// Demonstrates: sigma, pi, rho, bowtie, div, :=
+// All operators use kernel LaTeX — no extra package required.
+
+TITLE: Relational Algebra
+AUTHOR: txt2tex example
+
+relvars Class, Ship, Battle, Outcome
+
+=== Restriction (sigma) ===
+
+// Select tuples satisfying a predicate.
+
+sigma[bore >= 16](Class)
+
+// Nested restriction:
+
+sigma[country = UK](sigma[bore >= 16](Class))
+
+=== Projection (pi) ===
+
+// Keep only named attributes.
+
+pi[class, country](Class)
+
+// Project after restrict:
+
+pi[class, country](sigma[bore >= 16](Class))
+
+=== Renaming (rho) ===
+
+// Rename attributes before joining.
+
+rho[ship as name](Outcome)
+
+// Multiple renames:
+
+rho[class as id, country as origin](Class)
+
+=== Natural Join and Theta-Join (bowtie) ===
+
+// Natural join of two relation variables:
+
+Ship bowtie Class
+
+// Rename then join:
+
+rho[ship as name](Outcome) bowtie Ship
+
+// Theta-join with explicit predicate:
+
+Ship bowtie [Ship.class = Class.class] Class
+
+=== Division (div) ===
+
+// Relational division (all-or-nothing quotient):
+
+Ship div Class
+
+=== Assignment (:=) ===
+
+// Bind the result of an algebra expression to a name.
+
+BigGuns := pi[class, country](sigma[bore >= 16](Class))
+
+=== Combined Query (Q1 style) ===
+
+// Classes of ships with big guns (bore >= 16):
+
+pi[class, country](sigma[bore >= 16](Class))

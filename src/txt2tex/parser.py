@@ -10,6 +10,7 @@ from txt2tex.ast_nodes import (
     Abbreviation,
     ArgueChain,
     ArgueStep,
+    Assignment,
     AxDef,
     BagLiteral,
     BibliographyMetadata,
@@ -18,6 +19,7 @@ from txt2tex.ast_nodes import (
     Conditional,
     Contents,
     Declaration,
+    Divide,
     Document,
     DocumentItem,
     Expr,
@@ -35,11 +37,13 @@ from txt2tex.ast_nodes import (
     InfruleBlock,
     Lambda,
     LatexBlock,
+    NaturalJoin,
     Number,
     PageBreak,
     Paragraph,
     Part,
     PartsFormat,
+    Project,
     ProofNode,
     ProofTree,
     PureParagraph,
@@ -47,6 +51,8 @@ from txt2tex.ast_nodes import (
     Range,
     RelationalImage,
     Relvars,
+    Rename,
+    Restrict,
     Schema,
     SchemaInclusion,
     SchemaText,
@@ -303,6 +309,31 @@ class Parser:
                     line=first_line,
                     column=1,
                 )
+            # Check for assignment: Name := expression (Phase 2.2)
+            if next_token.type == TokenType.ASSIGN:
+                first_assign = self._parse_assignment()
+                self._skip_newlines()
+                if not self._at_end():
+                    items_with_assign: list[DocumentItem] = [first_assign]
+                    while not self._at_end():
+                        items_with_assign.append(self._parse_document_item())
+                        self._skip_newlines()
+                    return Document(
+                        items=items_with_assign,
+                        title_metadata=None,
+                        parts_format=parts_format,
+                        bibliography_metadata=None,
+                        line=first_line,
+                        column=1,
+                    )
+                return Document(
+                    items=[first_assign],
+                    title_metadata=None,
+                    parts_format=parts_format,
+                    bibliography_metadata=None,
+                    line=first_line,
+                    column=1,
+                )
 
         # Check for abbreviation with generic parameters [X, Y] Name == expression
         # Note: Bag literals [[x]] start with [[ which is distinct
@@ -344,6 +375,14 @@ class Parser:
                 bibliography_metadata=None,
                 line=first_line,
                 column=1,
+            )
+
+        # Bare ':=' with no identifier on the left — give a clear error.
+        if self._match(TokenType.ASSIGN):
+            assign_tok = self._current()
+            raise ParserError(
+                "Assignment requires a target name on the left (e.g., 'T := R')",
+                assign_tok,
             )
 
         # Try to parse as expression
@@ -609,8 +648,16 @@ class Parser:
             return style
         return "subsection"  # Default
 
-    def _parse_document_item(self) -> DocumentItem:
+    def _parse_document_item(self) -> DocumentItem:  # noqa: C901
         """Parse a document item (expression or structural element)."""
+        # Catch bare := without a LHS — give a clear error rather than a
+        # generic "Unexpected token" from the expression parser downstream.
+        if self._match(TokenType.ASSIGN):
+            assign_tok = self._current()
+            raise ParserError(
+                "Assignment requires a target name on the left (e.g., 'T := R')",
+                assign_tok,
+            )
         if self._match(TokenType.SECTION_MARKER):
             return self._parse_section()
         if self._match(TokenType.SOLUTION_MARKER):
@@ -689,6 +736,9 @@ class Parser:
                 is_abbrev = token_after_postfix.type == TokenType.ABBREV
             if is_abbrev:
                 return self._parse_abbreviation()
+            # Check for assignment: Name := expression (Phase 2.2)
+            if next_token.type == TokenType.ASSIGN:
+                return self._parse_assignment()
             # Otherwise fall through to expression parsing
 
         # Check for abbreviation with generic parameters [X, Y] Name == expression
@@ -1819,6 +1869,9 @@ class Parser:
             TokenType.MU,
             TokenType.LAMBDA,
             TokenType.IF,  # Conditional expressions (if/then/else)
+            TokenType.SIGMA,  # sigma[...](...)
+            TokenType.PI,  # pi[...](...)
+            TokenType.RHO,  # rho[...](...)
         )
 
     def _should_parse_space_separated_arg(self) -> bool:
@@ -1916,6 +1969,8 @@ class Parser:
             TokenType.FINFUN,  # 77-> (finite partial function)
             TokenType.IMPLIES,  # =>
             TokenType.IFF,  # <=>
+            TokenType.BOWTIE,  # bowtie (natural join / theta-join)
+            TokenType.DIV,  # div (relational division)
         ):
             return False
 
@@ -1940,6 +1995,9 @@ class Parser:
             TokenType.BIGCAP,
             TokenType.LAMBDA,
             TokenType.IF,
+            TokenType.SIGMA,
+            TokenType.PI,
+            TokenType.RHO,
         )
 
     def _parse_quantifier(self) -> Expr:
@@ -2747,19 +2805,58 @@ class Parser:
         return left
 
     def _parse_cross(self) -> Expr:
-        """Parse Cartesian product operator (cross)."""
+        """Parse Cartesian product, natural join, theta-join, and division operators.
+
+        CROSS, BOWTIE, and DIV sit at the same precedence level between
+        set operators and arithmetic (Phase 2.2).  BOWTIE handles an
+        optional subscript bracket: R bowtie [p] S.
+        """
         left = self._parse_intersect()
 
-        while self._match(TokenType.CROSS):
+        while self._match(TokenType.CROSS, TokenType.BOWTIE, TokenType.DIV):
             op_token = self._advance()
-            right = self._parse_intersect()
-            left = BinaryOp(
-                operator=op_token.value,
-                left=left,
-                right=right,
-                line=op_token.line,
-                column=op_token.column,
-            )
+
+            if op_token.type == TokenType.BOWTIE:
+                # Check for theta-join subscript: bowtie [predicate]
+                subscript: Expr | None = None
+                if self._match(TokenType.LBRACKET):
+                    bracket_tok = self._advance()  # consume '['
+                    if self._match(TokenType.RBRACKET):
+                        raise ParserError(
+                            "Expected predicate in bowtie subscript", self._current()
+                        )
+                    subscript = self._parse_expr()
+                    if not self._match(TokenType.RBRACKET):
+                        raise ParserError(
+                            "Expected ']' after bowtie predicate", bracket_tok
+                        )
+                    self._advance()  # consume ']'
+                right = self._parse_intersect()
+                left = NaturalJoin(
+                    left=left,
+                    right=right,
+                    subscript=subscript,
+                    line=op_token.line,
+                    column=op_token.column,
+                )
+            elif op_token.type == TokenType.DIV:
+                right = self._parse_intersect()
+                left = Divide(
+                    left=left,
+                    right=right,
+                    line=op_token.line,
+                    column=op_token.column,
+                )
+            else:
+                # CROSS
+                right = self._parse_intersect()
+                left = BinaryOp(
+                    operator=op_token.value,
+                    left=left,
+                    right=right,
+                    line=op_token.line,
+                    column=op_token.column,
+                )
 
         return left
 
@@ -3194,13 +3291,188 @@ class Parser:
 
         return first_expr
 
+    # ------------------------------------------------------------------
+    # Relational algebra parsers (Phase 2.2)
+    # ------------------------------------------------------------------
+
+    def _parse_restrict(self) -> Restrict:
+        """Parse sigma[predicate](relation)."""
+        op_tok = self._advance()  # consume 'sigma'
+        if not self._match(TokenType.LBRACKET):
+            raise ParserError("Expected '[' after sigma", self._current())
+        bracket_tok = self._advance()  # consume '['
+        if self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "Expected predicate expression in sigma[...]", self._current()
+            )
+        predicate = self._parse_expr()
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError("Expected ']' after sigma predicate", bracket_tok)
+        self._advance()  # consume ']'
+        if not self._match(TokenType.LPAREN):
+            raise ParserError("Expected '(' after sigma[...]", self._current())
+        self._advance()  # consume '('
+        relation = self._parse_expr()
+        if not self._match(TokenType.RPAREN):
+            raise ParserError(
+                "Expected ')' after sigma relation argument", self._current()
+            )
+        self._advance()  # consume ')'
+        return Restrict(
+            predicate=predicate,
+            relation=relation,
+            line=op_tok.line,
+            column=op_tok.column,
+        )
+
+    def _parse_project(self) -> Project:
+        """Parse pi[A, B, ...](relation)."""
+        op_tok = self._advance()  # consume 'pi'
+        if not self._match(TokenType.LBRACKET):
+            raise ParserError("Expected '[' after pi", self._current())
+        bracket_tok = self._advance()  # consume '['
+        if self._match(TokenType.RBRACKET):
+            raise ParserError("Expected attribute list in pi[...]", self._current())
+        # Parse comma-separated attribute names (identifiers or keyword-identifiers)
+        attrs: list[str] = []
+        if not self._is_attr_name_token():
+            raise ParserError("Expected attribute name in pi[...]", self._current())
+        attrs.append(self._advance().value)
+        while self._match(TokenType.COMMA):
+            self._advance()  # consume ','
+            if not self._is_attr_name_token():
+                raise ParserError(
+                    "Expected attribute name after ',' in pi[...]", self._current()
+                )
+            attrs.append(self._advance().value)
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError("Expected ']' after pi attribute list", bracket_tok)
+        self._advance()  # consume ']'
+        if not self._match(TokenType.LPAREN):
+            raise ParserError("Expected '(' after pi[...]", self._current())
+        self._advance()  # consume '('
+        relation = self._parse_expr()
+        if not self._match(TokenType.RPAREN):
+            raise ParserError(
+                "Expected ')' after pi relation argument", self._current()
+            )
+        self._advance()  # consume ')'
+        return Project(
+            attrs=attrs,
+            relation=relation,
+            line=op_tok.line,
+            column=op_tok.column,
+        )
+
+    def _parse_rename(self) -> Rename:
+        """Parse rho[A as B, C as D, ...](relation)."""
+        op_tok = self._advance()  # consume 'rho'
+        if not self._match(TokenType.LBRACKET):
+            raise ParserError("Expected '[' after rho", self._current())
+        bracket_tok = self._advance()  # consume '['
+        if self._match(TokenType.RBRACKET):
+            raise ParserError("Expected rename pair in rho[...]", self._current())
+        # Parse comma-separated "A as B" pairs
+        pairs: list[tuple[str, str]] = []
+        pairs.append(self._parse_rename_pair(bracket_tok))
+        while self._match(TokenType.COMMA):
+            self._advance()  # consume ','
+            pairs.append(self._parse_rename_pair(bracket_tok))
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError("Expected ']' after rho rename list", bracket_tok)
+        self._advance()  # consume ']'
+        if not self._match(TokenType.LPAREN):
+            raise ParserError("Expected '(' after rho[...]", self._current())
+        self._advance()  # consume '('
+        relation = self._parse_expr()
+        if not self._match(TokenType.RPAREN):
+            raise ParserError(
+                "Expected ')' after rho relation argument", self._current()
+            )
+        self._advance()  # consume ')'
+        return Rename(
+            pairs=pairs,
+            relation=relation,
+            line=op_tok.line,
+            column=op_tok.column,
+        )
+
+    def _is_attr_name_token(self) -> bool:
+        """Return True if the current token is usable as an attribute name.
+
+        Attribute names in pi[...] and rho[...] contexts are plain names.
+        They admit keywords-as-identifiers (id, dom, ran, etc.) because Z
+        field names can coincide with operator keywords.
+        """
+        return (
+            self._match(TokenType.IDENTIFIER) or self._is_keyword_usable_as_identifier()
+        )
+
+    def _parse_rename_pair(self, bracket_tok: Token) -> tuple[str, str]:
+        """Parse a single 'A as B' rename pair inside rho[...]."""
+        if not self._is_attr_name_token():
+            raise ParserError(
+                "Expected attribute name in rho rename pair", self._current()
+            )
+        src = self._advance().value
+        # 'as' is not a keyword; it tokenizes as IDENTIFIER with value "as"
+        if not (self._match(TokenType.IDENTIFIER) and self._current().value == "as"):
+            raise ParserError(
+                f"Expected 'as' after {src!r} in rho rename pair, "
+                f"got {self._current().value!r}",
+                self._current(),
+            )
+        self._advance()  # consume 'as'
+        if not self._is_attr_name_token():
+            raise ParserError(
+                "Expected target attribute name after 'as' in rho rename pair",
+                self._current(),
+            )
+        dst = self._advance().value
+        return (src, dst)
+
+    def _parse_assignment(self) -> Assignment:
+        """Parse Name := expression (top-level relvar assignment)."""
+        target_tok = self._advance()  # consume IDENTIFIER (target name)
+        assign_tok = self._advance()  # consume ':='
+        if self._at_end() or self._match(TokenType.NEWLINE):
+            raise ParserError("Expected expression after ':='", assign_tok)
+        expression = self._parse_expr()
+        # Chained assignment (T := R := S) is not supported
+        if self._match(TokenType.ASSIGN):
+            raise ParserError(
+                "Chained assignment not supported; use separate statements",
+                self._current(),
+            )
+        target: Expr = Identifier(
+            name=target_tok.value,
+            line=target_tok.line,
+            column=target_tok.column,
+        )
+        return Assignment(
+            target=target,
+            expression=expression,
+            line=target_tok.line,
+            column=target_tok.column,
+        )
+
     def _parse_atom(self) -> Expr:
         """Parse atom.
 
         Handles: identifier, number, parenthesized expression, set comprehension,
         prefix operators (dom, ran, inv, id, P, P1, F, F1, bigcup, bigcap),
-        function application f(x), and lambda expressions.
+        function application f(x), lambda expressions, and relational algebra
+        prefix operators (sigma, pi, rho).
         """
+        # Relational algebra prefix-with-args operators (Phase 2.2)
+        # sigma[pred](R), pi[A, B](R), rho[A as B, ...](R)
+        if self._match(TokenType.SIGMA):
+            return self._parse_restrict()
+        if self._match(TokenType.PI):
+            return self._parse_project()
+        if self._match(TokenType.RHO):
+            return self._parse_rename()
+
         # Prefix operators: relation functions, set functions, sequence operators
         # Check for generic instantiation P[X] before treating as prefix
         if self._match(

@@ -2433,6 +2433,100 @@ relvars Class,       // trailing comma — parser error
 relvars Class Ship   // missing comma — parser error
 ```
 
+### Relational Algebra (Phase 2.2)
+
+The five Codd/Date operators plus assignment.  All use kernel LaTeX
+(`\sigma`, `\pi`, `\rho`, `\bowtie`, `\div`) — no extra package needed.
+
+#### Restriction
+
+```text
+sigma[bore >= 16](Class)
+```
+
+Renders: $\sigma_{bore \geq 16}(\mathrm{Class})$
+
+The predicate inside `[...]` is a full expression (comparisons, logical
+operators, etc.).
+
+#### Projection
+
+```text
+pi[class, country](Class)
+```
+
+Renders: $\pi_{class, country}(\mathrm{Class})$
+
+The attribute list is comma-separated identifiers.
+
+#### Renaming
+
+```text
+rho[ship as name](Outcome)
+rho[A as B, C as D](R)
+```
+
+Renders: $\rho_{ship \to name}(\mathrm{Outcome})$
+
+Each pair is written `old as new`; multiple pairs are comma-separated.
+
+#### Natural Join
+
+```text
+Ship bowtie Class
+```
+
+Renders: $\mathrm{Ship} \bowtie \mathrm{Class}$
+
+**Theta-join** with explicit predicate:
+
+```text
+Ship bowtie [Ship.class = Class.class] Class
+```
+
+Renders: $\mathrm{Ship} \bowtie_{Ship.class = Class.class} \mathrm{Class}$
+
+#### Division
+
+```text
+R div S
+```
+
+Renders: $R \div S$
+
+#### Assignment
+
+Top-level statement form — cannot be nested inside another expression:
+
+```text
+BigGuns := pi[class, country](sigma[bore >= 16](Class))
+```
+
+Emits inside `\begin{zed}...\end{zed}`.
+
+#### Combining Operators
+
+```text
+relvars Class, Ship, Battle, Outcome
+
+// Q1(a): classes of big-gun ships
+pi[class, country](sigma[bore >= 16](Class))
+
+// Q1(c): rename then join
+rho[ship as name](Outcome) bowtie Ship
+
+// Q1(d): assignment
+BigGuns := pi[class, country](sigma[bore >= 16](Class))
+```
+
+**Precedence summary** (tightest to loosest):
+
+| Operator | Form | Level |
+|----------|------|-------|
+| `sigma`, `pi`, `rho` | prefix-with-args | atom |
+| `bowtie`, `div`, `cross` | infix | same as cross |
+| `union`, `intersect` | infix | set ops |
+
 ## Additional Features
 
 ### Conditional Expressions

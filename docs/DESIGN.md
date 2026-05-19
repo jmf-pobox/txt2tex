@@ -1440,6 +1440,111 @@ paragraph is `% relvars: Class, Ship, ...` — a comment, not a visible
 environment.  This keeps the `.tex` source self-documenting while producing
 no visible output.
 
+## ADR: Relational Algebra Operator Syntax and Precedence (Phase 2.2)
+
+**Decision**: Implement relational algebra in operator-form only.  No
+keyword form `project ... from ...` — `from` is used as a Z field name
+in existing corpus files.  Six forms:
+
+```text
+sigma[pred](R)         -- restriction    → \sigma_{pred}(R)
+pi[A, B](R)            -- projection     → \pi_{A, B}(R)
+rho[A as B, C as D](R) -- rename        → \rho_{A \to B, C \to D}(R)
+R bowtie S             -- natural join   → R \bowtie S
+R bowtie [pred] S      -- theta-join     → R \bowtie_{pred} S
+R div S                -- division       → R \div S
+T := R                 -- assignment     → \begin{zed}T := R\end{zed}
+```
+
+**Operator levels** (lowest binds least):
+
+| Level | Operator(s) | Grammar function | Binds |
+|-------|-------------|-----------------|-------|
+| statement | `:=` (assignment) | `_parse_document_item` | loosest |
+| union/override | `union`, `++` | `_parse_union` | |
+| setminus | `\` | `_parse_setminus` | |
+| cross/join/div | `cross`, `bowtie`, `div` | `_parse_cross` | |
+| intersect | `intersect` | `_parse_intersect` | |
+| prefix ops | `sigma`, `pi`, `rho` | `_parse_atom` | tightest |
+
+The complete precedence chain from loosest to tightest:
+
+```text
+assignment (DocumentItem only)
+  < union / override (++)
+      < setminus (\)
+          < cross / bowtie / div   [left-associative; same level]
+              < intersect
+                  < sigma[...](R) / pi[...](R) / rho[...](R)   [atom]
+```
+
+`_parse_cross` calls `_parse_intersect` for each of its operands, so
+`intersect` binds **tighter** than `bowtie`/`div`/`cross` — it is resolved
+first.  Consequence:
+
+- `R bowtie S union T` parses as `(R bowtie S) union T` — `bowtie` sits
+  below `union` and is consumed first by `_parse_cross`.
+- `R bowtie S intersect T` parses as `R bowtie (S intersect T)` — `intersect`
+  is resolved inside `_parse_intersect` before `bowtie` completes.
+- `pi[a](R) bowtie S` parses as `(pi[a](R)) bowtie S` — `pi` is an atom.
+
+**Why sigma/pi/rho at atom level**: They take explicit `[args](relation)`
+syntax analogous to function calls.  Parsing them at atom level is consistent
+with how `f(x)` is handled; it also means they can appear freely as operands
+in any higher-level expression (`pi[a](R) bowtie S`, `sigma[p](R union S)`).
+
+**Why bowtie and div at cross level**: The Codd/Date algebra treats join and
+division as binary operators on relations, at the same conceptual tier as
+Cartesian product.  Placing them alongside `cross` in `_parse_cross` avoids
+a separate precedence level while preserving the expected left-to-right
+associativity.
+
+**Assignment as DocumentItem (not Expr)**: `Assignment` appears in the
+`DocumentItem` union type only — it is absent from the `Expr` union.
+Assignment is a statement that binds a name; it is not a value to be further
+composed.  This enforces the constraint structurally: `:=` is not available
+inside expression context, so `sigma[T := R](S)` is a parser error.
+This matches Z RM §3.5 paragraph structure.
+
+**Theta-join subscript parsing**: `R bowtie [pred] S` — the `[` is consumed
+inside `_parse_cross` when it immediately follows a `bowtie` token.  A
+separate `bracket_tok` is saved for error reporting; an empty bracket
+(`bowtie []`) raises "Expected predicate in bowtie subscript".
+
+**`as` keyword**: `as` is not a reserved keyword — it tokenizes as
+`IDENTIFIER` with value `"as"`.  The rename-pair parser (`_parse_rename_pair`)
+checks `self._current().value == "as"` after consuming the source attribute
+name.  This avoids a reserved-word collision with any Z identifier named `as`
+in other contexts.
+
+**`:=` vs `::=` lexer ordering**: `:=` (ASSIGN) is checked before `::=`
+(FREE_TYPE) and `::` (DOUBLE_COLON) by testing `peek_char() == "=" and
+peek_char(2) != "="`.  This dispatches in one pass without backtracking.
+
+**Kernel LaTeX only**: `\sigma`, `\pi`, `\rho`, `\bowtie`, `\div` are all
+standard LaTeX kernel symbols.  No preamble change is required; fuzz and
+pdflatex both accept them without extra packages.
+
+**Relvar wrapping in algebra**: Attribute names in `pi[class, country](R)`
+are emitted through the same `Identifier` path as all other identifiers.
+Since attribute names (lowercase) are typically not in `relvar_set`, they
+stay italic.  If an attribute is also a declared relvar (unusual but valid),
+it receives `\mathrm{}` wrapping — consistent with the general rule.
+
+**Options rejected**:
+
+1. `project A, B from R` / `select pred from R` keyword form — rejected;
+   `from` appears as a Z field name in `examples/10_schemas/zed_blocks.txt`.
+   Keyword-form would require a reserved word that conflicts with the corpus.
+
+2. Separate precedence level for `bowtie`/`div` above `cross` — rejected;
+   the precedence difference between cross-product and join is not significant
+   in algebra expressions at this stage, and a single level avoids one parser
+   function.
+
+3. `Assignment` as `Expr` — rejected; would allow nonsensical nesting like
+   `sigma[T := R](S)`.  Statement-shaped constructs belong in `DocumentItem`.
+
 ## Future Enhancements
 
 1. **Export formats**

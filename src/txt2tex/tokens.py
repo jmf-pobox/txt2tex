@@ -155,6 +155,14 @@ class TokenType(Enum):
     EQUAL = auto()  # EQUAL: block keyword (equality chain; not the = operator)
     INFRULE = auto()  # INFRULE: (inference rule with horizontal line)
 
+    # Relational algebra operators (Phase 2.2)
+    SIGMA = auto()  # sigma (restriction)
+    PI = auto()  # pi (projection)
+    RHO = auto()  # rho (rename)
+    BOWTIE = auto()  # bowtie (natural join / theta-join)
+    DIV = auto()  # div (division)
+    ASSIGN = auto()  # := (assignment)
+
     # Z notation keywords (Phase 4)
     RELVARS = auto()  # relvars (Phase 2.1 — relvar declaration)
     GIVEN = auto()  # given

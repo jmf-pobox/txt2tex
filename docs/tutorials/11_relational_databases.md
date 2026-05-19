@@ -113,3 +113,114 @@ Build it:
 ```bash
 txt2tex examples/14_relational_databases/relvars_basic.txt
 ```
+
+---
+
+## Relational Algebra
+
+Phase 2.2 adds the five core Codd/Date relational algebra operators, plus
+an assignment statement.  All operators use kernel LaTeX — no extra package
+required.
+
+### Restriction (sigma)
+
+Select tuples satisfying a predicate:
+
+```text
+sigma[bore >= 16](Class)
+```
+
+Renders as: $\sigma_{bore \geq 16}(\mathrm{Class})$
+
+### Projection (pi)
+
+Keep only named attributes:
+
+```text
+pi[class, country](Class)
+```
+
+Renders as: $\pi_{class, country}(\mathrm{Class})$
+
+The attribute list is comma-separated identifiers.  Relation names in the
+list receive `\mathrm{}` wrapping if declared with `relvars`; attribute
+names (lowercase, not declared) stay italic.
+
+### Renaming (rho)
+
+Rename attributes using `old as new` pairs:
+
+```text
+rho[ship as name](Outcome)
+rho[A as B, C as D](R)
+```
+
+Renders as: $\rho_{ship \to name}(\mathrm{Outcome})$
+
+Multiple pairs are comma-separated.
+
+### Natural Join (bowtie)
+
+Join on all common attributes:
+
+```text
+Ship bowtie Class
+```
+
+Renders as: $\mathrm{Ship} \bowtie \mathrm{Class}$
+
+**Theta-join** — join with an explicit predicate:
+
+```text
+Ship bowtie [Ship.class = Class.class] Class
+```
+
+Renders as: $\mathrm{Ship} \bowtie_{Ship.class = Class.class} \mathrm{Class}$
+
+### Division (div)
+
+Relational division:
+
+```text
+R div S
+```
+
+Renders as: $R \div S$
+
+### Assignment (:=)
+
+Bind a name to an algebra expression.  This is a top-level statement (not
+nested inside another expression):
+
+```text
+BigGuns := pi[class, country](sigma[bore >= 16](Class))
+```
+
+The assignment emits a `\begin{zed}...\end{zed}` block:
+
+```latex
+\begin{zed}
+BigGuns := \pi_{class, country}(\sigma_{bore \geq 16}(\mathrm{Class}))
+\end{zed}
+```
+
+### Operator Precedence
+
+Algebra prefix operators (`sigma`, `pi`, `rho`) bind at atom level — they
+are parsed as prefix-with-arguments, like function calls.  `bowtie` and
+`div` are infix and sit at the same precedence as `cross` (Cartesian
+product), above union/intersect.
+
+```text
+pi[a](R union S)          // pi wraps (R union S) — correct
+pi[a](R) bowtie pi[b](S)  // join of two projected relations
+```
+
+### Complete Algebra Example
+
+See `examples/14_relational_databases/algebra_basics.txt` for a working
+file demonstrating all operators.
+
+```bash
+txt2tex examples/14_relational_databases/algebra_basics.txt
+```

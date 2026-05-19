@@ -38,8 +38,23 @@ In the compiled PDF:
 - `class` (attribute name) → italic
 - `N` (type) → `\nat` or `\mathbb{N}`
 
+### algebra_basics.txt
+
+Demonstrates the relational algebra operators added in Phase 2.2:
+
+- `sigma[pred](R)` — restriction (`\sigma`)
+- `pi[A, B](R)` — projection (`\pi`)
+- `rho[A as B](R)` — renaming (`\rho`)
+- `R bowtie S` — natural join (`\bowtie`)
+- `R bowtie [pred] S` — theta-join (`\bowtie_{pred}`)
+- `R div S` — division (`\div`)
+- `T := R` — assignment
+
+All operators use kernel LaTeX (no extra preamble packages required).
+
 ## Building
 
 ```bash
 txt2tex examples/14_relational_databases/relvars_basic.txt
+txt2tex examples/14_relational_databases/algebra_basics.txt
 ```

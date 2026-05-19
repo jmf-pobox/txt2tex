@@ -1,0 +1,82 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\title{Relational Algebra}
+\author{txt2tex example}
+\hypersetup{pdftitle={Relational Algebra},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.2.0}}
+\begin{document}
+
+\maketitle
+
+% relvars: Class, Ship, Battle, Outcome
+
+\section*{Restriction ( sigma )}
+
+\noindent
+$\sigma_{bore \geq 16}(\mathrm{Class})$
+
+
+\noindent
+$\sigma_{country = UK}(\sigma_{bore \geq 16}(\mathrm{Class}))$
+
+
+\section*{Projection ( pi )}
+
+\noindent
+$\pi_{class, country}(\mathrm{Class})$
+
+
+\noindent
+$\pi_{class, country}(\sigma_{bore \geq 16}(\mathrm{Class}))$
+
+
+\section*{Renaming ( rho )}
+
+\noindent
+$\rho_{ship \to name}(\mathrm{Outcome})$
+
+
+\noindent
+$\rho_{class \to id, country \to origin}(\mathrm{Class})$
+
+
+\section*{Natural Join and Theta - Join ( bowtie )}
+
+\noindent
+$\mathrm{Ship} \bowtie \mathrm{Class}$
+
+
+\noindent
+$\rho_{ship \to name}(\mathrm{Outcome}) \bowtie \mathrm{Ship}$
+
+
+\noindent
+$\mathrm{Ship} \bowtie_{\mathrm{Ship}.class = \mathrm{Class}.class} \mathrm{Class}$
+
+
+\section*{Division ( div )}
+
+\noindent
+$\mathrm{Ship} \div \mathrm{Class}$
+
+
+\section*{Assignment ( := )}
+
+\begin{zed}
+BigGuns := \pi_{class, country}(\sigma_{bore \geq 16}(\mathrm{Class}))
+\end{zed}
+
+\section*{Combined Query ( Q1 style )}
+
+\noindent
+$\pi_{class, country}(\sigma_{bore \geq 16}(\mathrm{Class}))$
+
+
+\end{document}

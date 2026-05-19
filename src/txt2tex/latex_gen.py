@@ -11,12 +11,14 @@ from txt2tex.__version__ import __version__
 from txt2tex.ast_nodes import (
     Abbreviation,
     ArgueChain,
+    Assignment,
     AxDef,
     BagLiteral,
     BinaryOp,
     CaseAnalysis,
     Conditional,
     Contents,
+    Divide,
     Document,
     DocumentItem,
     Expr,
@@ -33,11 +35,13 @@ from txt2tex.ast_nodes import (
     InfruleBlock,
     Lambda,
     LatexBlock,
+    NaturalJoin,
     Number,
     PageBreak,
     Paragraph,
     Part,
     PartsFormat,
+    Project,
     ProofNode,
     ProofTree,
     PureParagraph,
@@ -45,6 +49,8 @@ from txt2tex.ast_nodes import (
     Range,
     RelationalImage,
     Relvars,
+    Rename,
+    Restrict,
     Schema,
     SchemaInclusion,
     SchemaText,
@@ -1972,6 +1978,113 @@ class LaTeXGenerator:
         expr_latex = self.generate_expr(node.expression)
         guard_latex = self.generate_expr(node.guard)
         return f"{expr_latex} \\mbox{{if }} {guard_latex}"
+
+    # -------------------------------------------------------------------------
+    # Relational algebra expression generators (Phase 2.2)
+    # -------------------------------------------------------------------------
+
+    def _emit_attr_name(self, name: str) -> str:
+        r"""Emit an attribute name for use inside pi[...] or rho[...] subscripts.
+
+        Attribute names are field names — they render italic by default.  If
+        the name happens to be a declared relvar, it gets \mathrm{} wrapping.
+        Operator-keyword mappings (dom → \dom, id → \id) do NOT apply here:
+        in the rho/pi bracket context every name is unambiguously a field name.
+
+        Decoration characters (', ?, !) are stripped before the relvar lookup,
+        mirroring _generate_identifier, so that pi[Class'](R) correctly wraps
+        Class in \mathrm{} when Class is declared as a relvar.
+        """
+        if self.relvar_set:
+            decoration_suffix = ""
+            base_name = name
+            while base_name and base_name[-1] in ("'", "?", "!"):
+                decoration_suffix = base_name[-1] + decoration_suffix
+                base_name = base_name[:-1]
+            if base_name in self.relvar_set:
+                return rf"\mathrm{{{base_name}}}{decoration_suffix}"
+        return name
+
+    @generate_expr.register(Restrict)
+    def _generate_restrict(self, node: Restrict, parent: Expr | None = None) -> str:
+        r"""Generate LaTeX for sigma[predicate](relation).
+
+        sigma[bore >= 16](Class) → \sigma_{bore \geq 16}(\mathrm{Class})
+        """
+        pred_latex = self.generate_expr(node.predicate)
+        rel_latex = self.generate_expr(node.relation)
+        return rf"\sigma_{{{pred_latex}}}({rel_latex})"
+
+    @generate_expr.register(Project)
+    def _generate_project(self, node: Project, parent: Expr | None = None) -> str:
+        r"""Generate LaTeX for pi[A, B](relation).
+
+        pi[class, country](Class) → \pi_{class, country}(\mathrm{Class})
+        Attribute names are emitted via _emit_attr_name: relvar wrapping applies
+        if the name is declared, but keyword-to-LaTeX conversions do not.
+        """
+        attrs_str = ", ".join(self._emit_attr_name(a) for a in node.attrs)
+        rel_latex = self.generate_expr(node.relation)
+        return rf"\pi_{{{attrs_str}}}({rel_latex})"
+
+    @generate_expr.register(Rename)
+    def _generate_rename(self, node: Rename, parent: Expr | None = None) -> str:
+        r"""Generate LaTeX for rho[A as B, ...](relation).
+
+        rho[ship as name](Outcome) → \rho_{ship \to name}(\mathrm{Outcome})
+        Both source and target names are emitted via _emit_attr_name.
+        """
+        pair_latexes: list[str] = []
+        for src, dst in node.pairs:
+            pair_latexes.append(
+                rf"{self._emit_attr_name(src)} \to {self._emit_attr_name(dst)}"
+            )
+        pairs_str = ", ".join(pair_latexes)
+        rel_latex = self.generate_expr(node.relation)
+        return rf"\rho_{{{pairs_str}}}({rel_latex})"
+
+    @generate_expr.register(NaturalJoin)
+    def _generate_natural_join(
+        self, node: NaturalJoin, parent: Expr | None = None
+    ) -> str:
+        r"""Generate LaTeX for R bowtie S or R bowtie [p] S.
+
+        R bowtie S      → R \bowtie S
+        R bowtie [p] S  → R \bowtie_{p} S
+        """
+        left_latex = self.generate_expr(node.left)
+        right_latex = self.generate_expr(node.right)
+        if node.subscript is None:
+            return rf"{left_latex} \bowtie {right_latex}"
+        sub_latex = self.generate_expr(node.subscript)
+        return rf"{left_latex} \bowtie_{{{sub_latex}}} {right_latex}"
+
+    @generate_expr.register(Divide)
+    def _generate_divide(self, node: Divide, parent: Expr | None = None) -> str:
+        r"""Generate LaTeX for R div S.
+
+        R div S → R \div S
+        """
+        left_latex = self.generate_expr(node.left)
+        right_latex = self.generate_expr(node.right)
+        return rf"{left_latex} \div {right_latex}"
+
+    @generate_document_item.register(Assignment)
+    def _generate_assignment(self, node: Assignment) -> list[str]:
+        r"""Generate LaTeX for T := R (relvar assignment).
+
+        Emits inside a zed environment so that the assignment appears
+        in display-math mode consistent with Z notation paragraphs.
+        T := pi[class](Class) → \begin{zed}T := \pi_{class}(\mathrm{Class})\end{zed}
+        """
+        target_latex = self.generate_expr(node.target)
+        expr_latex = self.generate_expr(node.expression)
+        return [
+            r"\begin{zed}",
+            f"{target_latex} := {expr_latex}",
+            r"\end{zed}",
+            "",
+        ]
 
     @generate_document_item.register(Section)
     def _generate_section(self, node: Section) -> list[str]:

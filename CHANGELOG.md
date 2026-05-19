@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Relational algebra operators (Phase 2.2): `sigma[pred](R)` (restriction,
+  `\sigma`), `pi[A, B](R)` (projection, `\pi`), `rho[A as B](R)` (renaming,
+  `\rho`), `R bowtie S` (natural join, `\bowtie`), `R bowtie [p] S`
+  (theta-join, `\bowtie_{p}`), `R div S` (division, `\div`), `T := R`
+  (assignment, `\begin{zed}T := R\end{zed}`).  All use kernel LaTeX — no
+  preamble change.  Relvar wrapping (`\mathrm{}`) fires correctly in all
+  algebra contexts including subscripts and argument positions.  Six new AST
+  nodes (`Restrict`, `Project`, `Rename`, `NaturalJoin`, `Divide`,
+  `Assignment`); six new token types (`SIGMA`, `PI`, `RHO`, `BOWTIE`, `DIV`,
+  `ASSIGN`); `:=` lexed before `::=` to avoid conflict; `bowtie` and `div`
+  added to infix stop set.  69 new tests; new example
+  `examples/14_relational_databases/algebra_basics.txt`; Tutorial 11 extended
+  with Relational Algebra section; `USER_GUIDE.md` Relational Algebra subsection
+  added; `DESIGN.md` ADR added.
+
 - Relvar declaration paragraph (`relvars`) for DAT (Database Design) course
   support (Phase 2.1).  `relvars Class, Ship, Battle, Outcome` declares relation
   variables; each declared name renders upright (`\mathrm{Name}`) wherever it

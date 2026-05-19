@@ -508,6 +508,95 @@ class SchemaText(ASTNode):
     predicates: list[Expr]  # Flat list; ';' separated in source
 
 
+# Relational algebra nodes (Phase 2.2)
+
+
+@dataclass(frozen=True)
+class Restrict(ASTNode):
+    """Relational restriction (sigma) node.
+
+    Represents sigma[predicate](relation) — select tuples satisfying predicate.
+
+    Example:
+    - sigma[bore >= 16](Class) -> predicate=(bore >= 16), relation=Class
+    """
+
+    predicate: Expr
+    relation: Expr
+
+
+@dataclass(frozen=True)
+class Project(ASTNode):
+    """Relational projection (pi) node.
+
+    Represents pi[A, B](relation) — keep only named attributes.
+
+    Example:
+    - pi[class, country](Class) -> attrs=["class", "country"], relation=Class
+    """
+
+    attrs: list[str]
+    relation: Expr
+
+
+@dataclass(frozen=True)
+class Rename(ASTNode):
+    """Relational renaming (rho) node.
+
+    Represents rho[A as B, C as D](relation) — rename attributes.
+
+    Example:
+    - rho[ship as name](Outcome) -> pairs=[("ship", "name")], relation=Outcome
+    """
+
+    pairs: list[tuple[str, str]]
+    relation: Expr
+
+
+@dataclass(frozen=True)
+class NaturalJoin(ASTNode):
+    """Natural join or theta-join (bowtie) node.
+
+    Represents R bowtie S (natural join) or R bowtie [p] S (theta-join).
+
+    Examples:
+    - R bowtie S -> left=R, right=S, subscript=None
+    - R bowtie [R.x = S.y] S -> left=R, right=S, subscript=(R.x = S.y)
+    """
+
+    left: Expr
+    right: Expr
+    subscript: Expr | None  # None for natural join, predicate for theta-join
+
+
+@dataclass(frozen=True)
+class Divide(ASTNode):
+    """Relational division (div) node.
+
+    Represents R div S.
+
+    Example:
+    - R div S -> left=R, right=S
+    """
+
+    left: Expr
+    right: Expr
+
+
+@dataclass(frozen=True)
+class Assignment(ASTNode):
+    """Relational assignment node (top-level statement form).
+
+    Represents T := R — assign relation expression to a name.
+
+    Example:
+    - Result := pi[class](Class) -> target=Result, expression=pi[class](Class)
+    """
+
+    target: Expr
+    expression: Expr
+
+
 # Type alias for all expression types
 Expr = (
     BinaryOp
@@ -535,6 +624,11 @@ Expr = (
     | GuardedCases
     | Theta
     | SchemaText
+    | Restrict
+    | Project
+    | Rename
+    | NaturalJoin
+    | Divide
 )
 
 
@@ -1010,6 +1104,7 @@ DocumentItem = (
     | HorizDef
     | Zed
     | ProofTree
+    | Assignment
 )
 
 
