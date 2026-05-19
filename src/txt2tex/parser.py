@@ -3631,59 +3631,6 @@ class Parser:
                         # Likely expression separator, not projection
                         break
 
-                    # In quantifier bodies, avoid parsing .identifier as
-                    # projection when it's actually a bullet separator
-                    # Heuristic: Check what follows the identifier
-                    next_token = self._peek_ahead(1)
-                    if (
-                        self._in_comprehension_body
-                        and next_token.type == TokenType.IDENTIFIER
-                        and not next_token.value.isdigit()
-                    ):
-                        token_after_id = self._peek_ahead(2)
-
-                        # Strong bullet separator indicators:
-                        # - Set/logical operators starting new predicates
-                        # - Base is complex expression (not simple id)
-                        is_bullet_indicator = token_after_id.type in (
-                            TokenType.IN,
-                            TokenType.NOTIN,
-                            TokenType.SUBSET,
-                            TokenType.PSUBSET,
-                            TokenType.AND,
-                            TokenType.OR,
-                            TokenType.IMPLIES,
-                            TokenType.IFF,
-                        )
-
-                        # Special case: When base is FunctionApp and followed by
-                        # .identifier = , this is almost always a bullet separator
-                        # Example: f(x) = g(y) . x = y (the . is bullet, not projection)
-                        # This pattern is common in quantifier bodies like:
-                        # forall x : X | f(x) = g(x) . h(x) = k(x)
-                        if (
-                            isinstance(base, FunctionApp)
-                            and token_after_id.type == TokenType.EQUALS
-                        ):
-                            is_bullet_indicator = True
-
-                        # Allow field projection on safe base types that can have fields
-                        # (GitHub issue #13: FunctionApp and TupleProjection are safe)
-                        safe_projection_bases = (
-                            Identifier,
-                            FunctionApp,
-                            TupleProjection,
-                        )
-                        if is_bullet_indicator or not isinstance(
-                            base, safe_projection_bases
-                        ):
-                            # Likely bullet separator - break
-                            break
-
-                        # For other cases (like EQUALS on non-FunctionApp),
-                        # rely on safe_followers.
-                        # Allows "e.field = value" while catching most bullets
-
                     # Only parse if followed by safe token
                     # (not ambiguous with separator)
 

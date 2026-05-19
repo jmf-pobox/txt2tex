@@ -117,17 +117,6 @@ class TestMultiDeclPredicateChain:
     # Test 3 — multi-decl, predicate is two-conjunct projection equality chain
     # -----------------------------------------------------------------------
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "Q2(d) bug: _parse_postfix breaks on .field when peek_ahead(2) returns "
-            "IDENTIFIER (the field name), which is not in safe_followers. "
-            "ParserError: Line 1, column 64: Expected '}' to close set comprehension. "
-            "The second conjunct 's.name = c.name' causes c to be parsed without "
-            "the '.name' projection, leaving PERIOD+IDENTIFIER tokens unconsumed "
-            "before the bullet '.' at column 64."
-        ),
-    )
     def test_multi_decl_two_conjuncts_projections(self) -> None:
         """Multi-decl comprehension with two-conjunct projection predicate.
 
@@ -166,17 +155,6 @@ class TestMultiDeclPredicateChain:
     # Test 4 — canonical Q2(d) bug: three decls, three conjuncts
     # -----------------------------------------------------------------------
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "Q2(d) bug: same as test 3, triggered by the third declaration "
-            "(o : Outcome) and three-conjunct predicate chain. "
-            "ParserError: Line 1, column 71: Expected '}' to close set "
-            "comprehension. The projection 'o.ship' fails to parse 'o' "
-            "with '.ship' because peek_ahead(2) returns IDENTIFIER('ship') "
-            "— not in safe_followers."
-        ),
-    )
     def test_q2d_three_decl_three_conjuncts(self) -> None:
         """Canonical ex1 Q2(d) input: three declarations, three-conjunct predicate.
 
@@ -220,17 +198,6 @@ class TestMultiDeclPredicateChain:
     # Test 5 — forall multi-decl, conjunction predicate, bullet body
     # -----------------------------------------------------------------------
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "Q2(d) bug (silent data loss): forall with multi-decl and conjunction "
-            "predicate parses without raising, but the inner Quantifier body is "
-            "BinaryOp('=', TupleProjection(s,'class'), Identifier('c')) "
-            "instead of BinaryOp('land', ...). The '.' bullet is consumed correctly "
-            "but the predicate is truncated — same root cause as test 6. "
-            "inner.expression contains the orphaned tokens as a malformed tree."
-        ),
-    )
     def test_forall_multi_decl_conjunction(self) -> None:
         """forall with multi-decl and conjunction predicate, txt2tex '.' bullet.
 
@@ -262,19 +229,6 @@ class TestMultiDeclPredicateChain:
     # Test 6 — exists multi-decl, conjunction predicate (no body separator)
     # -----------------------------------------------------------------------
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "Q2(d) bug (silent data loss): exists with multi-decl and conjunction "
-            "predicate parses without raising, but produces a truncated AST. "
-            "The field projection 'c.class' fails to parse in the nested-quantifier "
-            "body path (_parse_quantifier_continuation), so the body is "
-            "BinaryOp('=', TupleProjection(s, 'class'), Identifier('c')) "
-            "instead of BinaryOp('land', ...). Tokens 'class land s.name = c.name' "
-            "are silently consumed as a Document-level stray expression or dropped. "
-            "The test asserts the correct (post-fix) AST shape."
-        ),
-    )
     def test_exists_multi_decl_conjunction(self) -> None:
         """exists with multi-decl and conjunction predicate.
 
@@ -381,12 +335,15 @@ class TestMultiDeclPredicateChain:
     @pytest.mark.xfail(
         strict=True,
         reason=(
-            "Q2(d) bug (silent data loss): mu with multi-decl and conjunction "
-            "predicate parses without raising, but the inner Quantifier body is "
-            "BinaryOp('=', TupleProjection(s,'class'), Identifier('c')) "
-            "instead of BinaryOp('land', ...). The extra tokens are misrouted "
-            "into inner.expression as a malformed tree. "
-            "Same peek_ahead(2) root cause as tests 3, 5, 6."
+            "Bug 1 partial fix: 'c.name . s' causes the PERIOD-loop to greedily "
+            "consume the bullet '.' as a chained projection on "
+            "TupleProjection(c,'name') because PERIOD is in safe_followers. "
+            "After 'c.name' is parsed, the loop re-enters and sees "
+            "PERIOD(bullet) + IDENTIFIER('s') + EOF; EOF is in safe_followers "
+            "so '.s' is consumed as TupleProjection(TupleProjection(c,'name'),'s'). "
+            "The quantifier continuation never sees the bullet PERIOD and sets "
+            "expression=None. Requires a separate fix: remove PERIOD from "
+            "safe_followers when _in_comprehension_body=True."
         ),
     )
     def test_mu_multi_decl_projection_conjunction(self) -> None:
@@ -475,11 +432,17 @@ class TestMultiDeclPredicateChain:
     @pytest.mark.xfail(
         strict=True,
         reason=(
-            "Q2(d) bug: set comprehension with multi-decl, conjunction predicate, "
-            "and NO body separator raises ParserError. "
-            "ParserError: Line 1, column 58: Expected '}' to close set comprehension. "
-            "The characteristic tuple (signature default) form has no '.' bullet; "
-            "the bug fires on the second conjunct just as in tests 3 and 4."
+            "Bug 1 partial fix: in "
+            "'{ s : Ship; c : Class | ... land s.name = c.name }', "
+            "the final 's.name' is blocked by the RBRACE guard "
+            "(parser.py:3627-3632: _in_comprehension_body and "
+            "peek_ahead(2)==RBRACE). The guard fires correctly for "
+            "bullet+expression patterns, but here 's.name' is a legitimate "
+            "projection (the RHS of '= s.name'). After the guard fires, 's' "
+            "alone is returned; the comprehension parser sees '. name }' and "
+            "consumes '.' as bullet and 'name' as expression. "
+            "Requires a targeted fix to the RBRACE guard to allow projections "
+            "when the base is a comparison RHS."
         ),
     )
     def test_comprehension_no_characteristic_expression(self) -> None:
@@ -517,16 +480,6 @@ class TestMultiDeclPredicateChain:
     # Test 12 — RHS-first projection: direction independence
     # -----------------------------------------------------------------------
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "Q2(d) bug: conjunction with RHS-first projections (c.class = s.class) "
-            "triggers the same ParserError as LHS-first form. "
-            "ParserError: Line 1, column 64: Expected '}' to close set comprehension. "
-            "The bug is position-independent — it fires on any .field access on "
-            "a multi-decl variable inside a conjunction predicate."
-        ),
-    )
     def test_rhs_first_projection_order(self) -> None:
         """Comprehension with RHS-first projections to confirm direction independence.
 
@@ -563,17 +516,6 @@ class TestMultiDeclPredicateChain:
     # Test 13 — three decls, second-var projection on conjunction RHS
     # -----------------------------------------------------------------------
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "Q2(d) bug: three-decl comprehension with c.class as the LHS of the "
-            "first conjunct (second declaration's projection) raises ParserError. "
-            "ParserError: Line 1, column 77: Expected '}' to close set comprehension. "
-            "Isolates that the failure fires when the second declaration's variable "
-            "appears in the conjunction predicate — not only as the third decl "
-            "(test 4)."
-        ),
-    )
     def test_three_decl_second_var_projection_first(self) -> None:
         """Three-decl comprehension: second-decl projection fails in conjunction.
 
