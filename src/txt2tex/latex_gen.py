@@ -565,10 +565,13 @@ class LaTeXGenerator:
                     branch_strs.append(f"{branch.name} \\ldata {params_latex} \\rdata")
             branches_str = " | ".join(branch_strs)
             return f"{item.name} ::= {branches_str}"
-        # Abbreviation
+        # Abbreviation. wrap_relvar=False — same reasoning as the standalone
+        # _generate_abbreviation site: the LHS is a definition slot, not a
+        # math-mode reference, so \mathrm{} would be wrong here too.
         expr_latex = self.generate_expr(item.expression)
         name_latex = self._generate_identifier(
-            Identifier(line=0, column=0, name=item.name)
+            Identifier(line=0, column=0, name=item.name),
+            wrap_relvar=False,
         )
         if item.generic_params:
             params_str = ", ".join(item.generic_params)
@@ -877,7 +880,13 @@ class LaTeXGenerator:
         raise TypeError(f"Unknown expression type: {type(expr).__name__}")
 
     @generate_expr.register(Identifier)
-    def _generate_identifier(self, node: Identifier, parent: Expr | None = None) -> str:
+    def _generate_identifier(
+        self,
+        node: Identifier,
+        parent: Expr | None = None,
+        *,
+        wrap_relvar: bool = True,
+    ) -> str:
         """Generate LaTeX for identifier with smart underscore handling.
 
         Handles three cases:
@@ -888,6 +897,11 @@ class LaTeXGenerator:
 
         Special keywords (Issue #3 from QA):
         - emptyset → \\emptyset (empty set symbol)
+
+        Relvar wrapping (``\\mathrm{}``) is applied in math-expression contexts
+        only. Pass ``wrap_relvar=False`` from positions that are LaTeX
+        "title" / "name" slots — schema-box title, abbreviation LHS, horizontal
+        defs LHS — where fuzz does not accept a math construct.
         """
         name = node.name
 
@@ -907,17 +921,17 @@ class LaTeXGenerator:
             base = name[:-1]
             # Render as R^+ (transitive closure)
             base_id = Identifier(line=0, column=0, name=base)
-            return f"{self._generate_identifier(base_id)}^+"
+            return f"{self._generate_identifier(base_id, wrap_relvar=wrap_relvar)}^+"
         if name.endswith("*"):
             base = name[:-1]
             # Render as R^* (reflexive-transitive closure)
             base_id = Identifier(line=0, column=0, name=base)
-            return f"{self._generate_identifier(base_id)}^*"
+            return f"{self._generate_identifier(base_id, wrap_relvar=wrap_relvar)}^*"
         if name.endswith("~"):
             base = name[:-1]
             # Render as R^{-1} (standard) or R^{\sim} (fuzz)
             base_id = Identifier(line=0, column=0, name=base)
-            base_latex = self._generate_identifier(base_id)
+            base_latex = self._generate_identifier(base_id, wrap_relvar=wrap_relvar)
             return self._get_closure_operator_latex("~", base_latex)
 
         # Check if this is an operator/function from UNARY_OPS dictionary
@@ -943,7 +957,9 @@ class LaTeXGenerator:
         #   Class_test → falls through to multi-word identifier path (no wrap)
         # Only bare base names are in the relvar set; decorated and subscripted
         # forms are looked up by stripping suffix characters and the subscript.
-        if self.relvar_set:
+        # Skipped when wrap_relvar=False (e.g., schema-box title position),
+        # because fuzz does not accept \mathrm{} in those LaTeX slots.
+        if wrap_relvar and self.relvar_set:
             # Strip trailing Z-decoration characters (', ?, !) right-to-left
             decoration_suffix = ""
             base_name = name
@@ -4339,9 +4355,12 @@ class LaTeXGenerator:
         lines: list[str] = []
         expr_latex = self.generate_expr(node.expression)
 
-        # Process name through _generate_identifier() for compound identifiers
+        # Process name through _generate_identifier() for compound identifiers.
+        # wrap_relvar=False: abbreviation LHS (Name == expr) is a definition
+        # slot, not a math-mode reference; fuzz expects a plain identifier here.
         name_latex = self._generate_identifier(
-            Identifier(line=0, column=0, name=node.name)
+            Identifier(line=0, column=0, name=node.name),
+            wrap_relvar=False,
         )
 
         # Wrap in zed environment for fuzz compatibility
@@ -4634,9 +4653,11 @@ class LaTeXGenerator:
 
                 # Generate abbreviations: Name == expression
                 elif isinstance(item, Abbreviation):
+                    # wrap_relvar=False: abbreviation LHS is a definition slot.
                     expr_latex = self.generate_expr(item.expression)
                     name_latex = self._generate_identifier(
-                        Identifier(line=0, column=0, name=item.name)
+                        Identifier(line=0, column=0, name=item.name),
+                        wrap_relvar=False,
                     )
                     if item.generic_params:
                         params_str = ", ".join(item.generic_params)
@@ -4689,9 +4710,13 @@ class LaTeXGenerator:
 
         # Determine schema name (empty string for anonymous)
         # Process name through _generate_identifier() for compound identifiers
+        # (S+, S*, S~). Pass wrap_relvar=False because the schema-box title is
+        # a LaTeX-argument slot that does not accept \mathrm{} — if the schema
+        # name is also declared as a relvar, fuzz rejects the wrapped form.
         if node.name is not None:
             schema_name = self._generate_identifier(
-                Identifier(line=0, column=0, name=node.name)
+                Identifier(line=0, column=0, name=node.name),
+                wrap_relvar=False,
             )
         else:
             schema_name = ""
@@ -4842,9 +4867,12 @@ class LaTeXGenerator:
         """
         lines: list[str] = []
 
-        # Build LHS
+        # Build LHS. wrap_relvar=False: horizontal-defs LHS is a definition
+        # slot inside \begin{zed}, not a math-mode reference; fuzz expects a
+        # plain identifier here.
         name_latex = self._generate_identifier(
-            Identifier(line=node.line, column=node.column, name=node.name)
+            Identifier(line=node.line, column=node.column, name=node.name),
+            wrap_relvar=False,
         )
         if node.generics:
             params_str = ", ".join(node.generics)

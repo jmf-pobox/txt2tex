@@ -374,7 +374,15 @@ class TestRelvarDocumentIntegration:
         assert r"\begin{zed}" not in latex
 
     def test_acceptance_probe_class_ship_schemas(self) -> None:
-        """Acceptance probe: Class and Ship are upright; class/name are italic."""
+        """Acceptance probe: relvars are upright in math context; schema-box
+        titles stay plain so fuzz accepts the document.
+
+        Schema names appear in two distinct positions:
+        (a) ``\\begin{schema}{Name}`` — the box title; a LaTeX-argument slot
+            where fuzz rejects ``\\mathrm{}``. Emitted plain.
+        (b) As a type reference inside another schema's declarations (e.g.
+            ``class : Class``) — a math-mode position. Wrapped in ``\\mathrm``.
+        """
         src = (
             "relvars Class, Ship, Battle, Outcome\n"
             "\n"
@@ -392,14 +400,50 @@ class TestRelvarDocumentIntegration:
         ast = Parser(Lexer(src).tokenize()).parse()
         gen = LaTeXGenerator(use_fuzz=True)
         latex = gen.generate_document(ast)
-        # Relvar names render upright wherever they appear as identifiers
-        assert r"\mathrm{Class}" in latex
-        # Ship appears as the schema name — schema names go through identifier emission
-        assert r"\mathrm{Ship}" in latex
+        # Schema-box titles stay plain (no \mathrm) so fuzz accepts the document.
+        assert r"\begin{schema}{Class}" in latex
+        assert r"\begin{schema}{Ship}" in latex
+        # Type reference in math context: relvar wrapping fires.
+        assert r"class : \mathrm{Class}" in latex
         # Attribute names are not wrapped (they are lowercase, not in relvar_set)
         assert r"\mathrm{class}" not in latex
         assert r"\mathrm{name}" not in latex
         assert r"\mathrm{bore}" not in latex
+
+    def test_schema_title_not_wrapped_when_name_is_relvar(self) -> None:
+        """Regression: ``\\begin{schema}{Name}`` keeps the name plain even if
+        ``Name`` is declared as a relvar. Fuzz rejects ``\\mathrm{}`` in the
+        schema-box-title argument position."""
+        src = "relvars Foo\n\nschema Foo\n  x : N\nend"
+        ast = Parser(Lexer(src).tokenize()).parse()
+        gen = LaTeXGenerator(use_fuzz=True)
+        latex = gen.generate_document(ast)
+        # Plain schema title, no \mathrm wrapper.
+        assert r"\begin{schema}{Foo}" in latex
+        assert r"\begin{schema}{\mathrm{Foo}}" not in latex
+
+    def test_abbreviation_lhs_not_wrapped_when_name_is_relvar(self) -> None:
+        """Regression: abbreviation LHS ``Name == expr`` stays plain even when
+        ``Name`` is in the relvar set."""
+        src = "relvars Bar\n\nzed\n  Bar == {1, 2, 3}\nend"
+        ast = Parser(Lexer(src).tokenize()).parse()
+        gen = LaTeXGenerator(use_fuzz=True)
+        latex = gen.generate_document(ast)
+        # The LHS of the abbreviation must be a plain identifier.
+        assert "Bar ==" in latex or "Bar \\defs" in latex or "Bar ::=" in latex
+        # Not wrapped at the LHS.
+        # (The relvar set is non-empty, so a wrap would be the bug.)
+        assert r"\mathrm{Bar} ==" not in latex
+        assert r"\mathrm{Bar} \defs" not in latex
+
+    def test_horiz_def_lhs_not_wrapped_when_name_is_relvar(self) -> None:
+        """Regression: ``Name defs ...`` LHS stays plain when Name is a relvar."""
+        src = "relvars Op2\n\nschema Counter\n  count : N\nend\n\nOp2 defs Counter\n"
+        ast = Parser(Lexer(src).tokenize()).parse()
+        gen = LaTeXGenerator(use_fuzz=True)
+        latex = gen.generate_document(ast)
+        assert r"Op2 \defs" in latex
+        assert r"\mathrm{Op2}" not in latex
 
 
 # ---------------------------------------------------------------------------
