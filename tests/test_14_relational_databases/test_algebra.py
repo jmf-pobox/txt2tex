@@ -509,26 +509,35 @@ class TestDivideGenerator:
 
 
 class TestAssignmentGenerator:
-    r"""LaTeX generator emits \begin{zed}T := expr\end{zed} for Assignment."""
+    r"""LaTeX generator emits \noindent$T := expr$ for Assignment.
+
+    Assignment emits as a top-level math display *outside* any Z block —
+    matching the pattern of the other DAT-specific constructs (algebra,
+    bindings, GROUP/UNGROUP). fuzz silently skips ``\noindent``-wrapped
+    math, so documents using assignment can still type-check their
+    schemas and Z-side content.
+    """
 
     def test_assignment_simple(self) -> None:
-        """T := R emits a zed block containing 'T := R'."""
+        """T := R emits a noindent math display, not a zed block."""
         result = _latex("T := R")
-        assert r"\begin{zed}" in result
-        assert "T := R" in result
-        assert r"\end{zed}" in result
+        assert r"\noindent" in result
+        assert "$T := R$" in result
+        assert r"\begin{zed}" not in result
 
     def test_assignment_with_project(self) -> None:
-        r"""T := pi[a](R) — zed block with \pi in expression."""
+        r"""T := pi[a](R) — noindent math display with \pi in expression."""
         result = _latex("T := pi[a](R)")
-        assert r"\begin{zed}" in result
+        assert r"\noindent" in result
         assert r"\pi_{a}(R)" in result
+        assert r"\begin{zed}" not in result
 
     def test_assignment_with_named_relation(self) -> None:
-        r"""T := Class — assignment renders Class without wrapping."""
+        r"""T := Class — assignment renders Class outside any Z block."""
         result = _latex("T := Class")
-        assert r"\begin{zed}" in result
+        assert r"\noindent" in result
         assert "Class" in result
+        assert r"\begin{zed}" not in result
 
 
 # ---------------------------------------------------------------------------
@@ -677,13 +686,15 @@ class TestQ1AcceptanceProbes:
     def test_q1d_assignment(self) -> None:
         r"""Q1(d): Result := pi[class, country](sigma[bore >= 16](Class)).
 
-        Expected: Result := \pi_{class, country}(\sigma_{bore \geq 16}(Class))
+        Expected: noindent math display containing the algebra expression.
+        Assignment emits outside any Z block so fuzz silently skips it.
         """
         result = self._gen("Result := pi[class, country](sigma[bore >= 16](Class))")
-        assert r"\begin{zed}" in result
+        assert r"\noindent" in result
         assert r"\pi_{class, country}" in result
         assert r"\sigma_{bore \geq 16}" in result
         assert "Class" in result
+        assert r"\begin{zed}" not in result
 
 
 # ---------------------------------------------------------------------------

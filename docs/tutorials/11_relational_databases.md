@@ -111,6 +111,16 @@ Phase 2.2 adds the five core Codd/Date relational algebra operators, plus
 an assignment statement. All operators use kernel LaTeX — no extra package
 required.
 
+> **Fuzz compatibility.** Algebra expressions emit *outside* any Z
+> environment — as `\noindent$\ldots$` LaTeX math — so fuzz silently
+> skips them. Your schemas, axdefs, and other Z-side content in the
+> same document still type-check cleanly. The rule is: write algebra
+> as a top-level expression in your source (not inside a `zed`,
+> `axdef`, `schema`, or `gendef` block). If you wrap algebra inside a
+> Z block, fuzz parses the block contents strictly as Z notation and
+> will reject the subscript form `\sigma_{p}` and the assignment
+> operator `:=`.
+
 ### Restriction (sigma)
 
 Select tuples satisfying a predicate:
@@ -219,6 +229,16 @@ txt2tex examples/14_relational_databases/algebra_basics.txt
 Phase 2.3 adds binding brackets — the Z RM §3.7 notation for labelled tuples.
 These appear in relational-calculus queries of the form used in the Oxford DAT
 course exercises.
+
+> **Fuzz compatibility.** Bindings emit *outside* any Z environment —
+> as `\noindent$\ldots$` LaTeX math — so fuzz silently skips them.
+> Schemas and axdefs in the same document still type-check cleanly.
+> The rule is: write the binding-bearing comprehension as a top-level
+> expression in your source (not inside a `zed`/`axdef`/`schema`
+> block). If you wrap a binding inside a Z block, fuzz parses the
+> contents strictly and rejects `==` inside `\lblot ... \rblot` even
+> though both the brackets and the operator are defined in
+> `fuzz.sty`.
 
 ### Binding Syntax
 

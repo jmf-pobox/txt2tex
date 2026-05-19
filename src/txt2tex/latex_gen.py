@@ -2135,16 +2135,19 @@ class LaTeXGenerator:
     def _generate_assignment(self, node: Assignment) -> list[str]:
         r"""Generate LaTeX for T := expression.
 
-        Emits inside a zed environment so that the assignment appears
-        in display-math mode consistent with Z notation paragraphs.
-        T := pi[class](Class) → \begin{zed}T := \pi_{class}(Class)\end{zed}
+        Emits as a top-level math display *outside* any Z environment,
+        matching the pattern of other DAT-specific constructs (algebra,
+        bindings, GROUP/UNGROUP). fuzz silently skips ``\noindent``-wrapped
+        math, so a document containing assignments still type-checks its
+        schemas and Z-side content cleanly.
+
+        T := pi[class](Class) → \noindent$T := \pi_{class}(Class)$
         """
         target_latex = self.generate_expr(node.target)
         expr_latex = self.generate_expr(node.expression)
         return [
-            r"\begin{zed}",
-            f"{target_latex} := {expr_latex}",
-            r"\end{zed}",
+            r"\noindent",
+            f"${target_latex} := {expr_latex}$",
             "",
         ]
 

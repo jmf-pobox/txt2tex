@@ -484,6 +484,9 @@ T := R               & $T := R$ (zed block) \\
 \smallskip
 {\footnotesize \texttt{sigma}/\texttt{pi}/\texttt{rho} bind at atom level (prefix + args). \texttt{bowtie} and \texttt{div} are infix at cross-product precedence.}
 
+\smallskip
+{\scriptsize\textbf{Fuzz note:} algebra expressions emit \emph{outside} any Z environment (as \texttt{\textbackslash noindent\$\ldots\$}), so fuzz silently skips them — your schemas and axdefs in the same document still type-check cleanly. Do \emph{not} wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks; fuzz parses block contents strictly as Z and will reject the algebra subscripts.}
+
 \begin{exwrite}
 \begin{verbatim}
 BigGuns := pi[class,country](
@@ -527,6 +530,9 @@ $\{ s : Ship; c : Class \mid s.class = c.class \bullet \lblot name == s.name \rb
 
 {\scriptsize Use \texttt{;} to separate variable-type pairs inside \texttt{\{ \}}. Binding components are \textbf{comma}-separated (Z RM §3.7).}
 
+\smallskip
+{\scriptsize\textbf{Fuzz note:} bindings emit \emph{outside} any Z environment, so fuzz silently skips them. Schemas and axdefs in the same document still type-check. Do \emph{not} place a binding inside a \texttt{zed}/\texttt{axdef}/\texttt{schema} block; fuzz parses block contents strictly and rejects \texttt{==} inside $\lblot \ldots \rblot$ even though both the brackets and the operator are defined in \texttt{fuzz.sty}.}
+
 % ── GROUP / UNGROUP ──────────────────────────────
 \section{GROUP \& UNGROUP}
 
@@ -547,6 +553,13 @@ Members ungroup contact
 \begin{center}
 $Members\ \mathop{\mathrm{GROUP}}\ (\{name,email\}\ \mathop{\mathrm{AS}}\ contact)$\\[3pt]
 $Members\ \mathop{\mathrm{UNGROUP}}\ contact$
+\end{center}
+\end{exget}
+
+{\scriptsize\textbf{Fuzz note:} GROUP/UNGROUP emit \emph{outside} any Z environment, so fuzz silently skips them. Do \emph{not} place these inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks — the \texttt{\textbackslash mathop} wrapping and Date braces sit outside Z's grammar and fuzz rejects them in block contents.}
+
+\begin{exget}
+\begin{center}
 \end{center}
 \end{exget}
 

@@ -2516,6 +2516,14 @@ pk in axdef          // only schema bodies — parser error
 The five Codd/Date operators plus assignment.  All use kernel LaTeX
 (`\sigma`, `\pi`, `\rho`, `\bowtie`, `\div`) — no extra package needed.
 
+**Fuzz compatibility.** Algebra expressions emit *outside* any Z
+environment (as `\noindent$...$` LaTeX math). fuzz silently skips
+them; schemas, axdefs, and other Z-side content in the same document
+still type-check cleanly. Write algebra as a top-level expression in
+your `.txt` source — never inside a `zed`/`axdef`/`schema`/`gendef`
+block. Wrapping algebra inside a Z block causes fuzz to reject the
+subscript form `\sigma_{p}` and the assignment operator `:=`.
+
 #### Restriction
 
 ```text
@@ -2608,6 +2616,12 @@ BigGuns := pi[class, country](sigma[bore >= 16](Class))
 Date's nested-relation operators.  Bundle attributes into a
 relation-valued attribute (`group`) or flatten them back (`ungroup`).
 
+**Fuzz compatibility.** GROUP/UNGROUP emit *outside* any Z
+environment, so fuzz silently skips them. Use them as top-level
+expressions in your source — not inside `zed`/`axdef`/`schema`
+blocks. The `\mathop{\mathrm{GROUP}}` wrapping and Date-style braces
+sit outside Z grammar; fuzz rejects them in Z-block contents.
+
 #### GROUP
 
 ```text
@@ -2651,6 +2665,13 @@ R group ({A} as sub) ungroup sub
 
 Binding brackets construct labelled tuples per Z RM §3.7.  Used in
 relational-calculus queries (DAT course style).
+
+**Fuzz compatibility.** Bindings emit *outside* any Z environment, so
+fuzz silently skips them. Write binding-bearing comprehensions as
+top-level expressions — not inside `zed`/`axdef`/`schema` blocks.
+fuzz parses Z-block contents strictly and rejects `==` inside
+`\lblot ... \rblot` even though both the brackets and the operator
+are defined in `fuzz.sty`.
 
 **Syntax:**
 
