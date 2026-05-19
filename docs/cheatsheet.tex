@@ -485,7 +485,10 @@ T := R               & $T := R$ (zed block) \\
 {\footnotesize \texttt{sigma}/\texttt{pi}/\texttt{rho} bind at atom level (prefix + args). \texttt{bowtie} and \texttt{div} are infix at cross-product precedence.}
 
 \smallskip
-{\scriptsize\textbf{Fuzz note:} algebra expressions emit \emph{outside} any Z environment (as \texttt{\textbackslash noindent\$\ldots\$}), so fuzz silently skips them — your schemas and axdefs in the same document still type-check cleanly. Do \emph{not} wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks; fuzz parses block contents strictly as Z and will reject the algebra subscripts.}
+{\scriptsize\textbf{Naming a query.} Use \texttt{Name == expr} (Z abbreviation) for both pure-Z and DAT-bearing right-hand sides. txt2tex inspects the RHS: when it contains a DAT construct (algebra, binding, GROUP/UNGROUP), the abbreviation emits as \texttt{\textbackslash noindent\$\ldots\$} outside any Z block; otherwise it emits inside a \texttt{zed} block. \texttt{T := R} is also accepted for DAT-style assignment; always emits outside zed.}
+
+\smallskip
+{\scriptsize\textbf{Fuzz note:} algebra expressions emit \emph{outside} any Z environment, so fuzz silently skips them — your schemas and axdefs in the same document still type-check cleanly. Do \emph{not} wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks; fuzz parses block contents strictly as Z and will reject the algebra subscripts.}
 
 \begin{exwrite}
 \begin{verbatim}

@@ -4216,20 +4216,64 @@ class LaTeXGenerator:
 
         return [first_line]
 
+    _DAT_EXPRESSION_TYPES: ClassVar[tuple[type, ...]] = (
+        Restrict,
+        Project,
+        Rename,
+        NaturalJoin,
+        Divide,
+        Binding,
+        Group,
+        Ungroup,
+    )
+
+    def _expression_contains_dat_construct(self, expr: object) -> bool:
+        """True if expr's AST tree contains any DAT-specific node.
+
+        DAT constructs (relational algebra, bindings, GROUP/UNGROUP) cannot
+        sit inside a Z environment without fuzz rejecting their syntax.
+        This recursive walk lets abbreviation emission switch between an
+        in-zed form (pure Z RHS) and a noindent-math form (DAT-bearing RHS).
+        """
+        if isinstance(expr, self._DAT_EXPRESSION_TYPES):
+            return True
+        fields = getattr(expr, "__dataclass_fields__", None)
+        if fields is None:
+            return False
+        for field_name in fields:
+            value: object = getattr(expr, field_name)
+            if isinstance(value, list):
+                items = cast("list[object]", value)
+                if any(self._expression_contains_dat_construct(v) for v in items):
+                    return True
+            elif self._expression_contains_dat_construct(value):
+                return True
+        return False
+
     @generate_document_item.register(Abbreviation)
     def _generate_abbreviation(self, node: Abbreviation) -> list[str]:
         r"""Generate LaTeX for abbreviation definition.
 
         Supports optional generic parameters.
 
-        Note: Abbreviations must be wrapped in \begin{zed}...\end{zed}
-        for fuzz type checker to recognize them.
+        Emission depends on the RHS:
+        - Pure Z RHS → ``\begin{zed} Name \defs Expr \end{zed}``. fuzz
+          parses it as a standard Z abbreviation paragraph.
+        - DAT-bearing RHS (algebra, binding, GROUP/UNGROUP) →
+          ``\noindent$Name \defs Expr$`` outside any Z block. fuzz
+          silently skips it; schemas/axdefs in the same document still
+          type-check.
+
+        This lets students use one operator (``==``) for both Z and DAT
+        definitions and have txt2tex pick the fuzz-compatible emission
+        form automatically.
 
         Fuzz syntax requires generic parameters AFTER the name: Name[X, Y]
-        not before: [X, Y]Name
+        not before: [X, Y]Name.
 
-        Processes abbreviation names through _generate_identifier() for compound
-        identifiers like R+, R*, R~ (partial support, GitHub #3 still open).
+        Processes abbreviation names through _generate_identifier() for
+        compound identifiers like R+, R*, R~ (partial support, GitHub #3
+        still open).
         """
         lines: list[str] = []
         expr_latex = self.generate_expr(node.expression)
@@ -4239,16 +4283,20 @@ class LaTeXGenerator:
             Identifier(line=0, column=0, name=node.name),
         )
 
-        # Wrap in zed environment for fuzz compatibility
-        # Fuzz requires: Name[X] not [X]Name
+        # Build the abbreviation body (without environment wrapping)
         if node.generic_params:
             params_str = ", ".join(node.generic_params)
             abbrev = f"{name_latex}[{params_str}] == {expr_latex}"
-            lines.append("\\begin{zed}")
-            lines.append(abbrev)
-            lines.append("\\end{zed}")
         else:
             abbrev = f"{name_latex} == {expr_latex}"
+
+        # Pick the wrapping based on RHS content
+        if self._expression_contains_dat_construct(node.expression):
+            # DAT RHS — emit outside any Z environment so fuzz silently skips
+            lines.append("\\noindent")
+            lines.append(f"${abbrev}$")
+        else:
+            # Pure Z RHS — emit inside a zed paragraph for fuzz type-checking
             lines.append("\\begin{zed}")
             lines.append(abbrev)
             lines.append("\\end{zed}")
