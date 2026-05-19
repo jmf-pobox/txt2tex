@@ -106,6 +106,14 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ## Course-Specific Topics
 
+- **[Tutorial 12: Schema Calculus](12_schema_calculus.md)** *(Level 3 — Advanced)*
+  - Schema composition with `;` (`\semi`)
+  - Schema piping with `>>` (`\pipe`)
+  - Schema hiding: `S hide (x, y)` (`\hide`)
+  - Schema projection: `S project T` (`\project`)
+  - Precedence rules and combining operators
+  - **Examples:** `15_schema_calculus/`
+
 - **[Tutorial 11: Relational Databases](11_relational_databases.md)** *(Level 2)*
   - `relvars` declaration paragraph
   - Relation names render upright; attributes stay italic

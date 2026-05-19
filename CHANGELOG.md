@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Schema calculus operators (Phase 3.2): Z RM §3.11 composition (`;`),
+  piping (`>>`), hiding (`hide`), and projection (`project`) on the RHS of
+  `defs` paragraphs.  Three new `TokenType` members: `PIPE_PIPE` (`>>`),
+  `HIDE`, and `PROJECT`; `hide` and `project` added to `KEYWORD_TO_TOKEN` and
+  `RESERVED_WORDS`.  `>>` lexed as `PIPE_PIPE` only when preceded by
+  whitespace to avoid conflict with closing RANGLE in nested sequence literals.
+  Four new frozen AST dataclasses: `SchemaCompose(left, right)`,
+  `SchemaPipe(left, right)`, `SchemaHide(schema, names)`, and
+  `SchemaProject(left, right)`, all added to the `Expr` union.  Parser flag
+  `_in_schema_expr_context` gates the new precedence cascade
+  (`_parse_schema_pipe` → `_parse_schema_compose` →
+  `_parse_schema_project_hide`), which is entered only from
+  `_parse_horiz_def_rhs`; `_parse_parenthesized_expr_or_tuple` respects the
+  flag so that `(S ; T) hide (x)` works correctly.  SEMICOLON remains a
+  declaration separator inside `axdef`, `schema`, and `gendef` bodies
+  unchanged.  Generator methods emit `\semi`, `\pipe`, `\hide`, `\project`
+  (defined in `fuzz.sty` lines 295–302; no preamble change needed).  34 new
+  tests in `tests/test_15_schema_calculus/`; new examples in
+  `examples/15_schema_calculus/`; tutorial `docs/tutorials/12_schema_calculus.md`
+  added; `USER_GUIDE.md`, `MISSING_FEATURES.md`, and `DESIGN.md` (ADR)
+  updated.
+
 - GROUP / UNGROUP operators (Phase 4.1): Date's nested-relation operators.
   `R group ({A, B, ...} as alias)` bundles attributes into a relation-valued
   attribute; `R ungroup alias` flattens it back.  Both operators use

@@ -770,6 +770,38 @@ The fix removed the special case entirely. Cross-product now follows the same ru
 
 **Z RM reference**: §2.5 (Spivey, *The Z Notation*, 2nd ed.) defines Cartesian product as an n-ary type constructor. `S × T × U` is a single product type whose elements are 3-tuples; it is not equivalent to `(S × T) × U`, whose elements are pairs with a pair as first component.
 
+### Schema Calculus Operators — Context-Sensitive `;` Lift (ADR, Phase 3.2)
+
+**Status**: SETTLED 2026-05-19.
+
+**Context**: Z RM §3.11 defines `;` as schema-composition at the schema-expression level. The existing parser uses SEMICOLON as a declaration separator inside `axdef`, `schema`, and `gendef` bodies — and as a stop-token in `_can_continue_expression()`. Both uses must coexist without ambiguity.
+
+**Decision**: Introduce a parser flag `_in_schema_expr_context` (default `False`). The flag is set to `True` in `_parse_horiz_def` immediately before parsing the RHS (after consuming `defs`), and restored to its previous value in a `try/finally` block. When the flag is `True`, a new schema-calculus precedence cascade handles the four operators:
+
+1. `_parse_schema_pipe()`  — handles `>>`; calls compose for operands.
+2. `_parse_schema_compose()` — handles `;` by consuming SEMICOLON; calls project/hide.
+3. `_parse_schema_project_hide()` — handles `hide (names)` and `project T`; calls `_parse_expr()` for atomic operands.
+
+Parenthesised sub-expressions `(S ; T)` are handled by modifying `_parse_parenthesized_expr_or_tuple()`: when `_in_schema_expr_context` is `True`, the inner expression is parsed by `_parse_schema_pipe()` rather than `_parse_expr()`. The tuple-element branch has the same conditional.
+
+**Precedence implemented** (Z RM §3.11, tightest to loosest within schema-calculus):
+
+1. `hide` / `project` — tightest
+2. `;` (composition)
+3. `>>` (piping) — loosest
+
+**Tokens**: `PIPE_PIPE` (`>>`, two-char token detected in the lexer `>` branch, requiring whitespace before the first `>` to avoid conflict with closing RANGLE in nested sequences such as `<<a>, <b>>`). `HIDE` and `PROJECT` are keywords added to `KEYWORD_TO_TOKEN` and `RESERVED_WORDS`.
+
+**Macros**: `\semi`, `\pipe`, `\hide`, `\project` — all defined in `fuzz.sty` (lines 295–302) and `zed-cm.sty` (lines 493–500). No preamble change is needed.
+
+**Rejected alternative**: Add the four operators to the main expression-precedence cascade and use the flag only to gate SEMICOLON consumption. This would have required modifying the existing `_parse_iff` → … → `_parse_relation` chain, touching more code and risking regressions in non-schema expression contexts. The separate cascade is isolated behind the flag and adds ~120 LOC with no contact with existing precedence levels.
+
+**Context-sensitivity guarantee**: `_parse_schema_compose()` is only reachable via `_parse_horiz_def_rhs()` when `_in_schema_expr_context` is `True`. The declaration-separator loops inside `axdef`, `schema`, and `gendef` bodies never call into the schema-calculus cascade; they consume SEMICOLON directly as a loop-continuation token.
+
+**Test surface** (Phase 3.2):
+
+- `tests/test_15_schema_calculus/test_schema_calculus.py` — 34 cases covering AST construction, generator output, precedence, context-sensitivity, and 4 negative cases.
+
 ### 5. fuzz Validator
 
 **Responsibility**: Run fuzz typechecker on generated LaTeX.

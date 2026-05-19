@@ -20,7 +20,7 @@ PDF_FILES := $(TXT_FILES:.txt=.pdf)
 # Subdirectory targets
 SUBDIRS := 00_getting_started 01_propositional_logic 02_predicate_logic 03_equality \
            04_proof_trees 05_sets 06_definitions 07_relations 08_functions \
-           09_sequences 10_schemas 14_relational_databases fuzz_tests
+           09_sequences 10_schemas 14_relational_databases 15_schema_calculus fuzz_tests
 
 # Set default goal to build all PDFs
 .DEFAULT_GOAL := all
@@ -45,7 +45,7 @@ $(SUBDIRS):
 	done
 
 # Convenient short aliases
-.PHONY: 00 01 02 03 04 05 06 07 08 09 10 14 fuzz
+.PHONY: 00 01 02 03 04 05 06 07 08 09 10 14 15 fuzz
 00: 00_getting_started
 01: 01_propositional_logic
 02: 02_predicate_logic
@@ -58,6 +58,7 @@ $(SUBDIRS):
 09: 09_sequences
 10: 10_schemas
 14: 14_relational_databases
+15: 15_schema_calculus
 fuzz: fuzz_tests
 
 # Clean auxiliary files in all subdirectories
@@ -93,6 +94,7 @@ list:
 	@echo "  08_functions           - Build examples in 08_functions/"
 	@echo "  09_sequences           - Build examples in 09_sequences/"
 	@echo "  14_relational_databases - Build examples in 14_relational_databases/"
+	@echo "  15_schema_calculus     - Build examples in 15_schema_calculus/"
 	@echo "  fuzz_tests / fuzz      - Build examples in fuzz_tests/"
 	@echo "  clean                  - Remove auxiliary files"
 	@echo "  distclean              - Remove all generated files"

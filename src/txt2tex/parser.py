@@ -56,7 +56,11 @@ from txt2tex.ast_nodes import (
     Rename,
     Restrict,
     Schema,
+    SchemaCompose,
+    SchemaHide,
     SchemaInclusion,
+    SchemaPipe,
+    SchemaProject,
     SchemaRename,
     SchemaText,
     Section,
@@ -142,6 +146,7 @@ class Parser:
     last_token_line: int
     _parsing_schema_text: bool
     _in_comprehension_body: bool
+    _in_schema_expr_context: bool
 
     def __init__(self, tokens: list[Token]) -> None:
         """Initialize parser with token list.
@@ -161,6 +166,9 @@ class Parser:
         # periods can be expression separators
         # ({ x : X | pred . expr } or mu x : X | pred . expr)
         self._in_comprehension_body = False
+        # Track whether we're parsing a schema-expression context (RHS of defs,
+        # schema inclusion body) where ';' is schema composition, not a separator.
+        self._in_schema_expr_context = False
 
     def parse(self) -> Document | Expr:
         """Parse tokens and return AST.
@@ -3642,11 +3650,18 @@ class Parser:
 
         This parses (expr), (expr,), or (expr1, expr2, ...).
         Used by both _parse_atom and _parse_quantifier for tuple patterns.
+
+        When _in_schema_expr_context is True, the inner expression is parsed
+        with schema-calculus precedence so that ``(S ; T)`` works correctly.
         """
         lparen_token = self._advance()  # Consume '('
 
-        # Parse first expression
-        first_expr = self._parse_expr()
+        # Parse first expression — use schema-calculus entry point when in
+        # schema-expression context so that ';' is treated as composition.
+        if self._in_schema_expr_context:
+            first_expr = self._parse_schema_pipe()
+        else:
+            first_expr = self._parse_expr()
 
         # Allow newlines for multi-line expressions
         self._skip_newlines()
@@ -3663,7 +3678,10 @@ class Parser:
                 # Check for trailing comma: (a, b,)
                 if self._match(TokenType.RPAREN):
                     break
-                elements.append(self._parse_expr())
+                if self._in_schema_expr_context:
+                    elements.append(self._parse_schema_pipe())
+                else:
+                    elements.append(self._parse_expr())
                 # Allow newlines for multi-line tuples
                 self._skip_newlines()
 
@@ -4581,6 +4599,127 @@ class Parser:
 
         return params if params else None
 
+    # ------------------------------------------------------------------
+    # Schema-calculus operators (Phase 3.2 — Z RM §3.11)
+    # ------------------------------------------------------------------
+    # Precedence (tightest to loosest):
+    #   1. hide / project   (_parse_schema_project_hide)
+    #   2. composition ;    (_parse_schema_compose)
+    #   3. piping >>        (_parse_schema_pipe)
+    #
+    # These methods are only entered from _parse_horiz_def_rhs (and any
+    # future schema-expression context) when _in_schema_expr_context is
+    # True.  Inside axdef / schema / gendef bodies SEMICOLON remains a
+    # plain declaration separator — those loops never call these methods.
+    # ------------------------------------------------------------------
+
+    def _parse_schema_pipe(self) -> Expr:
+        """Parse schema piping ``S >> T`` (lowest schema-calculus precedence).
+
+        Left-associative: ``A >> B >> C`` parses as ``(A >> B) >> C``.
+        """
+        left = self._parse_schema_compose()
+
+        while self._match(TokenType.PIPE_PIPE):
+            op_tok = self._advance()
+            right = self._parse_schema_compose()
+            left = SchemaPipe(
+                left=left,
+                right=right,
+                line=op_tok.line,
+                column=op_tok.column,
+            )
+
+        return left
+
+    def _parse_schema_compose(self) -> Expr:
+        """Parse schema composition ``S ; T`` (middle schema-calculus precedence).
+
+        Left-associative: ``A ; B ; C`` parses as ``(A ; B) ; C``.
+        SEMICOLON is consumed here only because _in_schema_expr_context is True;
+        callers in declaration-loop contexts never invoke this method.
+        """
+        left = self._parse_schema_project_hide()
+
+        while self._match(TokenType.SEMICOLON):
+            op_tok = self._advance()
+            right = self._parse_schema_project_hide()
+            left = SchemaCompose(
+                left=left,
+                right=right,
+                line=op_tok.line,
+                column=op_tok.column,
+            )
+
+        return left
+
+    def _parse_schema_project_hide(self) -> Expr:
+        """Parse schema hiding and projection (tightest schema-calculus precedence).
+
+        ``S hide (x, y)``  — existentially quantify named components.
+        ``S project T``    — project S onto the signature of T.
+
+        Both are left-associative and at the same precedence level, so they
+        chain: ``S hide (x) project T`` is ``(S hide (x)) project T``.
+        """
+        # Start with a base schema expression (ordinary expression precedence).
+        left = self._parse_expr()
+
+        while self._match(TokenType.HIDE, TokenType.PROJECT):
+            op_tok = self._advance()
+
+            if op_tok.type == TokenType.HIDE:
+                # Expect '(' name, name, ... ')'
+                if not self._match(TokenType.LPAREN):
+                    raise ParserError(
+                        "expected '(' after 'hide' in schema hiding expression",
+                        self._current(),
+                    )
+                self._advance()  # Consume '('
+
+                names: list[str] = []
+                while not self._match(TokenType.RPAREN):
+                    if self._at_end():
+                        raise ParserError(
+                            "unclosed '(' in 'hide' expression — expected ')'",
+                            op_tok,
+                        )
+                    if self._match(TokenType.COMMA):
+                        self._advance()
+                        continue
+                    if not self._match(TokenType.IDENTIFIER):
+                        cur = self._current()
+                        raise ParserError(
+                            f"expected identifier in 'hide' name list,"
+                            f" got {cur.type.name} ({cur.value!r})",
+                            cur,
+                        )
+                    names.append(self._advance().value)
+
+                if not names:
+                    raise ParserError(
+                        "'hide' requires at least one component name", op_tok
+                    )
+                self._advance()  # Consume ')'
+
+                left = SchemaHide(
+                    schema=left,
+                    names=names,
+                    line=op_tok.line,
+                    column=op_tok.column,
+                )
+
+            else:  # PROJECT
+                right = self._parse_expr()
+                left = SchemaProject(
+                    left=left,
+                    right=right,
+                    line=op_tok.line,
+                    column=op_tok.column,
+                )
+
+        return left
+
     def _parse_horiz_def(self) -> HorizDef:
         """Parse horizontal schema definition: Name [X, Y]? defs RHS.
 
@@ -4588,9 +4727,8 @@ class Parser:
         - A schema reference — an identifier, possibly Phase-0 decorated
           (e.g. ``Counter'``, ``Delta Counter``).
         - An inline schema text ``[ decl-list | pred-list ]``.
-
-        Schema-calculus operators (;, >>, hide, project) are Phase 3.2 and
-        are NOT parsed here.
+        - A schema-calculus expression (Phase 3.2): S ; T, S >> T,
+          S hide (x, y), S project T, and combinations.
         """
         start_tok = self._current()
 
@@ -4624,7 +4762,13 @@ class Parser:
         if self._match(TokenType.LBRACKET):
             body = self._parse_schema_text()
         else:
-            body = self._parse_horiz_def_rhs()
+            # Enable schema-expression context so ';' becomes composition.
+            prev = self._in_schema_expr_context
+            self._in_schema_expr_context = True
+            try:
+                body = self._parse_horiz_def_rhs()
+            finally:
+                self._in_schema_expr_context = prev
 
         return HorizDef(
             name=name,
@@ -4635,17 +4779,24 @@ class Parser:
         )
 
     def _parse_horiz_def_rhs(self) -> Expr | SchemaInclusion:
-        """Parse a schema reference on the RHS of a horizontal definition.
+        """Parse a schema expression on the RHS of a horizontal definition.
 
         Accepts:
         - A plain identifier (possibly Phase-0 decorated).
         - ``Delta Name [generics]?`` or ``Xi Name [generics]?`` — schema
           inclusions used as the RHS (legal in Z RM §3.8 examples).
         - A generic instantiation: ``Name[T]`` produced by ``_parse_atom``.
+        - A schema-calculus expression (Phase 3.2): ``S ; T``, ``S >> T``,
+          ``S hide (x, y)``, ``S project T``, and combinations.
 
         Returns an Expr node or SchemaInclusion for Delta/Xi decorated forms.
+        Delta/Xi are handled first because they begin with reserved keywords
+        that would otherwise stop expression parsing.
         """
         # Delta / Xi decorated reference → SchemaInclusion
+        # These are handled before schema-calculus parsing because Delta/Xi
+        # are keywords that mark the decorated form; schema-calculus operators
+        # cannot apply to a bare Delta/Xi keyword start.
         if self._match(TokenType.DELTA, TokenType.XI):
             start_tok = self._current()
             decoration = "delta" if self._match(TokenType.DELTA) else "xi"
@@ -4668,9 +4819,10 @@ class Parser:
                 column=start_tok.column,
             )
 
-        # Plain identifier or generic instantiation (e.g. Stack[N]) —
-        # _parse_postfix handles the optional [type_params] suffix.
-        return self._parse_postfix()
+        # Schema-calculus expression (possibly just a plain identifier).
+        # _parse_schema_pipe is the entry point of the schema-calculus
+        # precedence cascade (pipe < compose < hide/project < base expr).
+        return self._parse_schema_pipe()
 
     def _parse_schema_text(self) -> SchemaText:
         r"""Parse an inline schema text: ``[ decl-list | pred-list ]``.

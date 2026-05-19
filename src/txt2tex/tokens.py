@@ -172,6 +172,11 @@ class TokenType(Enum):
     GROUP = auto()  # group (bundle attributes into nested relation)
     UNGROUP = auto()  # ungroup (flatten nested relation)
 
+    # Schema-calculus operators (Phase 3.2 — Z RM §3.11)
+    PIPE_PIPE = auto()  # >> (schema piping)
+    HIDE = auto()  # hide keyword (schema hiding)
+    PROJECT = auto()  # project keyword (schema projection)
+
     # Z notation keywords (Phase 4)
     RELVARS = auto()  # relvars (Phase 2.1 — relvar declaration)
     GIVEN = auto()  # given

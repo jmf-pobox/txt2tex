@@ -54,7 +54,11 @@ from txt2tex.ast_nodes import (
     Rename,
     Restrict,
     Schema,
+    SchemaCompose,
+    SchemaHide,
     SchemaInclusion,
+    SchemaPipe,
+    SchemaProject,
     SchemaRename,
     SchemaText,
     Section,
@@ -1846,6 +1850,75 @@ class LaTeXGenerator:
         schema_latex = self.generate_expr(node.schema)
         pairs_latex = ", ".join(f"{old}/{new}" for old, new in node.pairs)
         return f"{schema_latex}[{pairs_latex}]"
+
+    @generate_expr.register(SchemaCompose)
+    def _generate_schema_compose(
+        self, node: SchemaCompose, parent: Expr | None = None
+    ) -> str:
+        r"""Generate LaTeX for schema composition (Z RM §3.11).
+
+        Renders ``S ; T`` as ``S \semi T``.
+        The ``\semi`` macro is defined in fuzz.sty (line 295) and zed-cm.sty
+        (line 493).  No preamble change is needed.
+
+        Examples:
+        - OpA ; OpB  → OpA \semi OpB
+        """
+        left_latex = self.generate_expr(node.left)
+        right_latex = self.generate_expr(node.right)
+        return f"{left_latex} \\semi {right_latex}"
+
+    @generate_expr.register(SchemaPipe)
+    def _generate_schema_pipe(
+        self, node: SchemaPipe, parent: Expr | None = None
+    ) -> str:
+        r"""Generate LaTeX for schema piping (Z RM §3.11).
+
+        Renders ``S >> T`` as ``S \pipe T``.
+        The ``\pipe`` macro is defined in fuzz.sty (line 296) and zed-cm.sty
+        (line 494).
+
+        Examples:
+        - Send >> Receive  → Send \pipe Receive
+        """
+        left_latex = self.generate_expr(node.left)
+        right_latex = self.generate_expr(node.right)
+        return f"{left_latex} \\pipe {right_latex}"
+
+    @generate_expr.register(SchemaHide)
+    def _generate_schema_hide(
+        self, node: SchemaHide, parent: Expr | None = None
+    ) -> str:
+        r"""Generate LaTeX for schema hiding (Z RM §3.11).
+
+        Renders ``S hide (x, y)`` as ``S \hide (x, y)``.
+        The ``\hide`` macro is defined in fuzz.sty (line 300) and zed-cm.sty
+        (line 497).
+
+        Examples:
+        - S hide (x)      → S \hide (x)
+        - S hide (x, y)   → S \hide (x, y)
+        """
+        schema_latex = self.generate_expr(node.schema)
+        names_latex = ", ".join(node.names)
+        return f"{schema_latex} \\hide ({names_latex})"
+
+    @generate_expr.register(SchemaProject)
+    def _generate_schema_project(
+        self, node: SchemaProject, parent: Expr | None = None
+    ) -> str:
+        r"""Generate LaTeX for schema projection (Z RM §3.11).
+
+        Renders ``S project T`` as ``S \project T``.
+        The ``\project`` macro is defined in fuzz.sty (line 302) and
+        zed-cm.sty (line 499).
+
+        Examples:
+        - S project T  → S \project T
+        """
+        left_latex = self.generate_expr(node.left)
+        right_latex = self.generate_expr(node.right)
+        return f"{left_latex} \\project {right_latex}"
 
     @generate_expr.register(Range)
     def _generate_range(self, node: Range, parent: Expr | None = None) -> str:

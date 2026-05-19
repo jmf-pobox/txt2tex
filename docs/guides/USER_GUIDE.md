@@ -2166,7 +2166,7 @@ StackAlias[X] defs GenStack[X]
 | RHS: inline schema text | `[ decl-list \| pred-list ]` |
 | Generic LHS | `Name[X, Y] defs RHS` |
 | Decoration of keyword | Forbidden — `defs'` raises LexerError |
-| Phase 3.2 operators | `;`, `>>`, hide, project on RHS not yet supported |
+| Schema calculus RHS | `;`, `>>`, `hide`, `project` — see below |
 
 **Inline schema text:** declarations are separated by `;`; predicates are
 separated by `;` in the source and joined with `\land` in the output.
@@ -2209,6 +2209,51 @@ pairs; otherwise it treats the bracket as type parameters.
 the brackets and slashes are literal math-mode text with no special macro.
 
 **See:** `examples/10_schemas/schema_rename.txt`
+
+#### Schema Calculus Operators (Z RM §3.11)
+
+Schema-calculus operators combine, filter, and pipeline schemas.  They appear
+only on the RHS of a `defs` paragraph.  The macros (`\semi`, `\pipe`, `\hide`,
+`\project`) are defined in `fuzz.sty` and `zed-cm.sty`; no preamble change is
+needed.
+
+| Source notation      | LaTeX emitted         | Meaning                          |
+|----------------------|-----------------------|----------------------------------|
+| `S ; T`              | `S \semi T`           | Sequential composition           |
+| `S >> T`             | `S \pipe T`           | Output-to-input piping           |
+| `S hide (x, y)`      | `S \hide (x, y)`      | Existentially quantify components |
+| `S project T`        | `S \project T`        | Project S onto T's signature     |
+
+**Precedence (tightest to loosest):**
+
+1. `hide` and `project`
+2. `;` (composition)
+3. `>>` (piping)
+
+So `S hide (x) ; T >> U` parses as `((S hide (x)) ; T) >> U`.
+
+```text
+OpAB defs OpA ; OpB
+// → \begin{zed} OpAB \defs OpA \semi OpB \end{zed}
+
+Pipeline defs Send >> Receive
+// → \begin{zed} Pipeline \defs Send \pipe Receive \end{zed}
+
+Visible defs State hide (temp)
+// → \begin{zed} Visible \defs State \hide (temp) \end{zed}
+
+Projected defs State project View
+// → \begin{zed} Projected \defs State \project View \end{zed}
+
+Combined defs (OpA ; OpB) hide (x)
+// → \begin{zed} Combined \defs OpA \semi OpB \hide (x) \end{zed}
+```
+
+**Context sensitivity:** `;` is a schema-composition operator only on the RHS
+of a `defs` paragraph.  Inside `axdef`, `schema`, and `gendef` bodies, `;`
+remains a declaration separator — this is unchanged.
+
+**See:** `examples/15_schema_calculus/`
 
 ---
 

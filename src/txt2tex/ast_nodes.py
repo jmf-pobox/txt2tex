@@ -306,6 +306,86 @@ class GenericInstantiation(ASTNode):
 
 
 @dataclass(frozen=True)
+class SchemaCompose(ASTNode):
+    """Schema composition node (Z RM §3.11).
+
+    Represents ``S ; T`` — combine two operations sequentially.
+
+    The composed schema ``S ; T`` connects the output state of S to the
+    input state of T by identifying primed components of S with unprimed
+    components of T, then hiding the intermediate state.
+
+    Examples:
+    - OpA ; OpB      -> left=Identifier("OpA"), right=Identifier("OpB")
+    - (S ; T) ; U   -> nested composition (left-associative)
+
+    LaTeX rendering: S \\semi T
+    """
+
+    left: Expr
+    right: Expr
+
+
+@dataclass(frozen=True)
+class SchemaPipe(ASTNode):
+    """Schema piping node (Z RM §3.11).
+
+    Represents ``S >> T`` — pipeline two operations output-to-input.
+
+    Piping connects the output of S to the input of T by identifying the
+    output channel of S (decorated with ``!``) with the input channel of T
+    (decorated with ``?``), then hiding the communication channels.
+
+    Examples:
+    - Send >> Receive  -> left=Identifier("Send"), right=Identifier("Receive")
+
+    LaTeX rendering: S \\pipe T
+    """
+
+    left: Expr
+    right: Expr
+
+
+@dataclass(frozen=True)
+class SchemaHide(ASTNode):
+    """Schema hiding node (Z RM §3.11).
+
+    Represents ``S hide (x, y)`` — existentially quantify components.
+
+    Hiding removes the named components from the signature of S, replacing
+    them with existential quantification in the predicate part.
+
+    Examples:
+    - S hide (x)         -> schema=Identifier("S"), names=["x"]
+    - S hide (x, y, z)   -> schema=Identifier("S"), names=["x", "y", "z"]
+
+    LaTeX rendering: S \\hide (x, y)
+    """
+
+    schema: Expr
+    names: list[str]
+
+
+@dataclass(frozen=True)
+class SchemaProject(ASTNode):
+    """Schema projection node (Z RM §3.11).
+
+    Represents ``S project T`` — project schema S onto the signature of T.
+
+    The result is the schema with the same predicate as S but restricted to
+    the components declared in T.
+
+    Examples:
+    - S project T   -> left=Identifier("S"), right=Identifier("T")
+
+    LaTeX rendering: S \\project T
+    """
+
+    left: Expr
+    right: Expr
+
+
+@dataclass(frozen=True)
 class SchemaRename(ASTNode):
     """Schema renaming node (Z RM §3.11).
 
@@ -716,6 +796,10 @@ Expr = (
     | Tuple
     | RelationalImage
     | GenericInstantiation
+    | SchemaCompose
+    | SchemaPipe
+    | SchemaHide
+    | SchemaProject
     | SchemaRename
     | Range
     | SequenceLiteral

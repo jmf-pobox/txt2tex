@@ -1,0 +1,41 @@
+=== Schema Calculus: Composition ===
+
+** Example 1: Sequential operations **
+
+schema OpA
+  x, x' : N
+where
+  x' > x
+end
+
+schema OpB
+  x, x' : N
+where
+  x' < 100
+end
+
+OpAB defs OpA ; OpB
+
+** Example 2: Three-way composition **
+
+schema Inc
+  n, n' : N
+where
+  n' = n + 1
+end
+
+schema Double
+  n, n' : N
+where
+  n' = n + n
+end
+
+schema Clamp
+  n, n' : N
+where
+  n' = 100
+end
+
+IncThenDouble defs Inc ; Double
+
+IncThenDoubleClamp defs Inc ; Double ; Clamp

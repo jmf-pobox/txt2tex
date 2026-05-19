@@ -36,6 +36,9 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     # Nested-relation operators (Phase 4.1)
     "group": TokenType.GROUP,
     "ungroup": TokenType.UNGROUP,
+    # Schema-calculus operators (Phase 3.2)
+    "hide": TokenType.HIDE,
+    "project": TokenType.PROJECT,
     # Z notation keywords
     "relvars": TokenType.RELVARS,
     "given": TokenType.GIVEN,
@@ -112,6 +115,9 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "div",
         "group",
         "ungroup",
+        # --- Schema-calculus operators ---
+        "hide",
+        "project",
         "relvars",
         "given",
         "axdef",
@@ -572,6 +578,19 @@ class Lexer:
             self._advance()
             self._advance()
             return Token(TokenType.GREATER_EQUAL, ">=", start_line, start_column)
+
+        # Schema piping operator >> (Phase 3.2) — two consecutive > characters
+        # preceded by whitespace (i.e., used as an operator, not as two closing
+        # RANGLE brackets from nested sequences like <<a>, <b>>).
+        # We require whitespace before the first > to distinguish S >> T from
+        # the closing >> in <<a>, <b>>.
+        if char == ">" and self._peek_char() == ">":
+            prev_pos = self.pos - 1
+            has_space_before = prev_pos >= 0 and self.text[prev_pos] in " \t"
+            if has_space_before:
+                self._advance()
+                self._advance()
+                return Token(TokenType.PIPE_PIPE, ">>", start_line, start_column)
 
         # Function type operators starting with >
         # Check 4-character first: >->>
