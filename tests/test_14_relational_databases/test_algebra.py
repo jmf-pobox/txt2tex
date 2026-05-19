@@ -23,7 +23,6 @@ from txt2tex.ast_nodes import (
     Identifier,
     NaturalJoin,
     Project,
-    Relvars,
     Rename,
     Restrict,
 )
@@ -56,10 +55,9 @@ def _expr(src: str) -> DocumentItem:
     return _parse(src).items[0]
 
 
-def _latex(src: str, *, relvars: frozenset[str] = frozenset()) -> str:
-    """Generate LaTeX from source, optionally with relvar declarations."""
+def _latex(src: str) -> str:
+    """Generate LaTeX from source."""
     gen = LaTeXGenerator(use_fuzz=True)
-    gen.relvar_set = relvars
     ast = Parser(_lex(src)).parse()
     doc = ast if isinstance(ast, Document) else Document(items=[ast], line=1, column=1)
     lines: list[str] = []
@@ -68,10 +66,9 @@ def _latex(src: str, *, relvars: frozenset[str] = frozenset()) -> str:
     return "\n".join(lines)
 
 
-def _expr_latex(src: str, *, relvars: frozenset[str] = frozenset()) -> str:
+def _expr_latex(src: str) -> str:
     """Generate LaTeX for an expression (math content without wrapper)."""
     gen = LaTeXGenerator(use_fuzz=True)
-    gen.relvar_set = relvars
     ast = Parser(_lex(src)).parse()
     item: Expr = ast.items[0] if isinstance(ast, Document) else ast  # type: ignore[assignment]
     return gen.generate_expr(item)
@@ -370,12 +367,6 @@ class TestAlgebraComposition:
         assert isinstance(node.relation, BinaryOp)
         assert node.relation.operator == "-"
 
-    def test_relvars_then_algebra(self) -> None:
-        """relvars + algebra expression in same document."""
-        doc = _parse("relvars R, S\npi[a](R)")
-        assert isinstance(doc.items[0], Relvars)
-        assert isinstance(doc.items[1], Project)
-
     def test_assignment_with_nested_algebra(self) -> None:
         """T := pi[a](sigma[p](R)) — assignment with nested expression."""
         node = _expr("T := pi[a](sigma[p](R))")
@@ -403,16 +394,17 @@ class TestRestrictGenerator:
         assert r"\geq" in result
         assert r"16" in result
 
-    def test_restrict_relvar_wrapping(self) -> None:
-        r"""sigma[p](Class) with Class as relvar → \sigma_{p}(\mathrm{Class})."""
-        result = _expr_latex("sigma[p](Class)", relvars=frozenset({"Class"}))
-        assert result == r"\sigma_{p}(\mathrm{Class})"
+    def test_restrict_with_named_relation(self) -> None:
+        r"""sigma[p](Class) → \sigma_{p}(Class) (no relvar wrapping)."""
+        result = _expr_latex("sigma[p](Class)")
+        assert result == r"\sigma_{p}(Class)"
 
-    def test_restrict_attribute_not_wrapped(self) -> None:
-        r"""sigma[bore >= 16](Class) — bore stays italic, not \mathrm."""
-        result = _expr_latex("sigma[bore >= 16](Class)", relvars=frozenset({"Class"}))
+    def test_restrict_bore_attribute_italic(self) -> None:
+        r"""sigma[bore >= 16](Class) — bore and Class both render italic."""
+        result = _expr_latex("sigma[bore >= 16](Class)")
         assert r"\mathrm{bore}" not in result
-        assert r"\mathrm{Class}" in result
+        assert r"\mathrm{Class}" not in result
+        assert "Class" in result
 
 
 # ---------------------------------------------------------------------------
@@ -433,15 +425,15 @@ class TestProjectGenerator:
         result = _expr_latex("pi[class, country](R)")
         assert result == r"\pi_{class, country}(R)"
 
-    def test_project_relvar_relation(self) -> None:
-        r"""pi[class, country](Class) with relvar wraps Class in \mathrm."""
-        result = _expr_latex("pi[class, country](Class)", relvars=frozenset({"Class"}))
-        assert result == r"\pi_{class, country}(\mathrm{Class})"
+    def test_project_named_relation(self) -> None:
+        r"""pi[class, country](Class) → \pi_{class, country}(Class)."""
+        result = _expr_latex("pi[class, country](Class)")
+        assert result == r"\pi_{class, country}(Class)"
 
-    def test_project_attr_is_relvar_gets_mathrm(self) -> None:
-        r"""pi[Class](R) where Class is a relvar — Class in subscript gets \mathrm."""
-        result = _expr_latex("pi[Class](R)", relvars=frozenset({"Class"}))
-        assert r"\mathrm{Class}" in result
+    def test_project_attr_in_subscript(self) -> None:
+        r"""pi[Class](R) — Class in subscript rendered italic."""
+        result = _expr_latex("pi[Class](R)")
+        assert result == r"\pi_{Class}(R)"
 
 
 # ---------------------------------------------------------------------------
@@ -462,12 +454,10 @@ class TestRenameGenerator:
         result = _expr_latex("rho[A as B, C as D](R)")
         assert result == r"\rho_{A \to B, C \to D}(R)"
 
-    def test_rename_relvar_relation(self) -> None:
-        r"""rho[ship as name](Outcome) with relvar wraps Outcome in \mathrm."""
-        result = _expr_latex(
-            "rho[ship as name](Outcome)", relvars=frozenset({"Outcome"})
-        )
-        assert result == r"\rho_{ship \to name}(\mathrm{Outcome})"
+    def test_rename_named_relation(self) -> None:
+        r"""rho[ship as name](Outcome) → \rho_{ship \to name}(Outcome)."""
+        result = _expr_latex("rho[ship as name](Outcome)")
+        assert result == r"\rho_{ship \to name}(Outcome)"
 
 
 # ---------------------------------------------------------------------------
@@ -488,12 +478,10 @@ class TestNaturalJoinGenerator:
         result = _expr_latex("R bowtie [p] S")
         assert result == r"R \bowtie_{p} S"
 
-    def test_natural_join_with_relvars(self) -> None:
-        r"""Ship bowtie Outcome with relvars wraps both in \mathrm."""
-        result = _expr_latex(
-            "Ship bowtie Outcome", relvars=frozenset({"Ship", "Outcome"})
-        )
-        assert result == r"\mathrm{Ship} \bowtie \mathrm{Outcome}"
+    def test_natural_join_named_relations(self) -> None:
+        r"""Ship bowtie Outcome → Ship \bowtie Outcome (no relvar wrapping)."""
+        result = _expr_latex("Ship bowtie Outcome")
+        assert result == r"Ship \bowtie Outcome"
 
 
 # ---------------------------------------------------------------------------
@@ -509,10 +497,10 @@ class TestDivideGenerator:
         result = _expr_latex("R div S")
         assert result == r"R \div S"
 
-    def test_divide_with_relvars(self) -> None:
-        r"""R div S with relvars → \mathrm{R} \div \mathrm{S}."""
-        result = _expr_latex("R div S", relvars=frozenset({"R", "S"}))
-        assert result == r"\mathrm{R} \div \mathrm{S}"
+    def test_divide_named_relations(self) -> None:
+        r"""R div S → R \div S (no relvar wrapping)."""
+        result = _expr_latex("R div S")
+        assert result == r"R \div S"
 
 
 # ---------------------------------------------------------------------------
@@ -536,14 +524,11 @@ class TestAssignmentGenerator:
         assert r"\begin{zed}" in result
         assert r"\pi_{a}(R)" in result
 
-    def test_assignment_with_relvar(self) -> None:
-        r"""T := Class with Class as relvar — assignment renders \mathrm."""
-        full_src = "relvars Class\nT := Class"
-        gen = LaTeXGenerator(use_fuzz=True)
-        ast = Parser(_lex(full_src)).parse()
-        assert isinstance(ast, Document)
-        result = gen.generate_document(ast)
-        assert r"\mathrm{Class}" in result
+    def test_assignment_with_named_relation(self) -> None:
+        r"""T := Class — assignment renders Class without wrapping."""
+        result = _latex("T := Class")
+        assert r"\begin{zed}" in result
+        assert "Class" in result
 
 
 # ---------------------------------------------------------------------------
@@ -651,57 +636,54 @@ class TestQ1AcceptanceProbes:
     """Exercise 1 from the Oxford DAT course, rendered via txt2tex.
 
     These probes verify the canonical rendering that the course expects.
-    Each probe declares the relvars used in the query, then writes the
-    algebra expression, and checks the LaTeX output.
+    Relation names render italic (default fuzz output, matching Trigoni's materials).
     """
 
-    _RELVARS = frozenset({"Class", "Ship", "Outcome", "Battle"})
-
     def _gen(self, src: str) -> str:
-        """Generate LaTeX for src with the standard warships relvars."""
-        full_src = f"relvars Class, Ship, Battle, Outcome\n{src}"
+        """Generate LaTeX for src."""
         gen = LaTeXGenerator(use_fuzz=True)
-        ast = Parser(_lex(full_src)).parse()
-        assert isinstance(ast, Document)
-        return gen.generate_document(ast)
+        ast = Parser(_lex(src)).parse()
+        if isinstance(ast, Document):
+            return gen.generate_document(ast)
+        return gen.generate_expr(ast)
 
     def test_q1a_project_restrict(self) -> None:
         r"""Q1(a): pi[class, country](sigma[bore >= 16](Class)).
 
-        Expected: \pi_{class, country}(\sigma_{bore \geq 16}(\mathrm{Class}))
+        Expected: \pi_{class, country}(\sigma_{bore \geq 16}(Class))
         """
         result = self._gen("pi[class, country](sigma[bore >= 16](Class))")
         assert r"\pi_{class, country}" in result
         assert r"\sigma_{bore \geq 16}" in result
-        assert r"\mathrm{Class}" in result
+        assert "Class" in result
 
     def test_q1b_natural_join(self) -> None:
-        r"""Q1(b): Ship bowtie Class — natural join of two relvars.
+        r"""Q1(b): Ship bowtie Class — natural join.
 
-        Expected: \mathrm{Ship} \bowtie \mathrm{Class}
+        Expected: Ship \bowtie Class
         """
         result = self._gen("Ship bowtie Class")
-        assert r"\mathrm{Ship} \bowtie \mathrm{Class}" in result
+        assert r"Ship \bowtie Class" in result
 
     def test_q1c_rename_then_join(self) -> None:
         r"""Q1(c): rho[ship as name](Outcome) bowtie Ship.
 
-        Expected: \rho_{ship \to name}(\mathrm{Outcome}) \bowtie \mathrm{Ship}
+        Expected: \rho_{ship \to name}(Outcome) \bowtie Ship
         """
         result = self._gen("rho[ship as name](Outcome) bowtie Ship")
-        assert r"\rho_{ship \to name}(\mathrm{Outcome})" in result
-        assert r"\bowtie \mathrm{Ship}" in result
+        assert r"\rho_{ship \to name}(Outcome)" in result
+        assert r"\bowtie Ship" in result
 
     def test_q1d_assignment(self) -> None:
         r"""Q1(d): Result := pi[class, country](sigma[bore >= 16](Class)).
 
-        Expected: Result := \pi_{class, country}(\sigma_{bore \geq 16}(\mathrm{Class}))
+        Expected: Result := \pi_{class, country}(\sigma_{bore \geq 16}(Class))
         """
         result = self._gen("Result := pi[class, country](sigma[bore >= 16](Class))")
         assert r"\begin{zed}" in result
         assert r"\pi_{class, country}" in result
         assert r"\sigma_{bore \geq 16}" in result
-        assert r"\mathrm{Class}" in result
+        assert "Class" in result
 
 
 # ---------------------------------------------------------------------------
@@ -709,45 +691,28 @@ class TestQ1AcceptanceProbes:
 # ---------------------------------------------------------------------------
 
 
-class TestFix1DecorationAwareAttrName:
-    r"""FIX 1: _emit_attr_name strips trailing decoration before relvar lookup.
+class TestAttrNamePassthrough:
+    """Attribute names in pi/rho subscripts pass through as-is (no wrapping)."""
 
-    pi[class'](R) and rho[class' as name](R) must emit \mathrm{class}'
-    when 'class' is a declared relvar.
-    """
+    def test_pi_decorated_attr(self) -> None:
+        r"""pi[class'](R) → \pi_{class'}(R) (decorated name passes through)."""
+        result = _expr_latex("pi[class'](R)")
+        assert r"\pi_{class'}" in result
 
-    _RELVARS = frozenset({"class", "Class"})
+    def test_pi_plain_attr(self) -> None:
+        r"""pi[name](R) → \pi_{name}(R)."""
+        result = _expr_latex("pi[name](R)")
+        assert result == r"\pi_{name}(R)"
 
-    def test_pi_decorated_attr_relvar(self) -> None:
-        r"""pi[class'](R) with 'class' as relvar: class' → \mathrm{class}'."""
-        result = _expr_latex("pi[class'](R)", relvars=self._RELVARS)
-        assert r"\mathrm{class}'" in result
+    def test_rho_decorated_src(self) -> None:
+        r"""rho[class' as id](R) → \rho_{class' \to id}(R)."""
+        result = _expr_latex("rho[class' as id](R)")
+        assert r"\rho_{class' \to id}(R)" in result
 
-    def test_pi_non_relvar_attr_unchanged(self) -> None:
-        """pi[name'](R) with 'name' not in relvar_set: name' stays italic."""
-        result = _expr_latex("pi[name'](R)", relvars=self._RELVARS)
-        assert r"\mathrm{name}" not in result
-        assert "name'" in result
-
-    def test_rho_decorated_src_relvar(self) -> None:
-        r"""rho[class' as id](R) with 'class' as relvar: class' → \mathrm{class}'."""
-        result = _expr_latex("rho[class' as id](R)", relvars=self._RELVARS)
-        assert r"\mathrm{class}'" in result
-
-    def test_rho_decorated_dst_relvar(self) -> None:
-        r"""rho[name as class'](R) with 'class' as relvar: class' → \mathrm{class}'."""
-        result = _expr_latex("rho[name as class'](R)", relvars=self._RELVARS)
-        assert r"\mathrm{class}'" in result
-
-    def test_pi_question_mark_decoration(self) -> None:
-        r"""pi[class?](R) with 'class' as relvar: class? → \mathrm{class}?."""
-        result = _expr_latex("pi[class?](R)", relvars=self._RELVARS)
-        assert r"\mathrm{class}?" in result
-
-    def test_pi_exclamation_decoration(self) -> None:
-        r"""pi[class!](R) with 'class' as relvar: class! → \mathrm{class}!."""
-        result = _expr_latex("pi[class!](R)", relvars=self._RELVARS)
-        assert r"\mathrm{class}!" in result
+    def test_rho_decorated_dst(self) -> None:
+        r"""rho[name as class'](R) → \rho_{name \to class'}(R)."""
+        result = _expr_latex("rho[name as class'](R)")
+        assert r"name \to class'" in result
 
 
 class TestFix2ChainedAssignment:

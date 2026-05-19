@@ -115,10 +115,10 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - **Examples:** `15_schema_calculus/`
 
 - **[Tutorial 11: Relational Databases](11_relational_databases.md)** *(Level 2)*
-  - `relvars` declaration paragraph
-  - Relation names render upright; attributes stay italic
-  - DAT course typography convention
-  - Decoration and subscript interaction
+  - `pk` prefix for primary-key underlining (DAT course convention)
+  - Relational algebra: `sigma`, `pi`, `rho`, `bowtie`, `div`, `:=`
+  - Z binding calculus: `{| label == expr |}` per Z RM §3.7
+  - GROUP and UNGROUP operators for nested relations
   - **Examples:** `14_relational_databases/`
 
 ## Advanced Topics

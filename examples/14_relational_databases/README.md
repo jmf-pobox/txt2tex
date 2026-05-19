@@ -1,42 +1,33 @@
 # Relational Databases Examples
 
-Examples demonstrating the `relvars` declaration paragraph for DAT
+Examples demonstrating relational-database schema notation for DAT
 (Database Design) course support.
 
 ## The DAT Convention
 
-The Oxford DAT course uses two typography conventions for relation schemas:
-
-- **Relation names** (Class, Ship, Battle, Outcome) render **upright**:
-  `\mathrm{Class}`
-- **Attribute names** (class, name, bore, country) render **italic** (default
-  math mode)
-
-The `relvars` paragraph declares which identifiers are relation variables.
-Everything else stays italic.
-
-## Examples
-
-### relvars_basic.txt
-
-Declares four relation variables from the classic warships database and
-defines their schemas. Shows the upright/italic distinction:
+The Oxford DAT course marks primary keys by underlining the attribute name
+in the schema body. The `pk` prefix produces this:
 
 ```text
-relvars Class, Ship, Battle, Outcome
-
 schema Class
-  class : N
-  country : N
+  pk class : ClassName
+  country : CountryName
   bore : N
 end
 ```
 
-In the compiled PDF:
+The rendered PDF shows `class` underlined; `country` and `bore` are plain
+italic. Schema names stay in their default math font — no `\mathrm{}` wrapper.
 
-- `Class` (relation name) → upright roman
-- `class` (attribute name) → italic
-- `N` (type) → `\nat` or `\mathbb{N}`
+## Examples
+
+### primary_keys.txt
+
+Demonstrates the `pk` prefix for marking primary-key attributes:
+
+- Single primary key: `pk class : ClassName`
+- Composite primary key: two `pk` lines in one schema
+- PK/FK constraints as plain Z predicates in `axdef`
 
 ### algebra_basics.txt
 
@@ -79,7 +70,7 @@ The `{|` and `|}` tokens are distinct from `{` (set brace), `|` (pipe),
 ## Building
 
 ```bash
-txt2tex examples/14_relational_databases/relvars_basic.txt
+txt2tex examples/14_relational_databases/primary_keys.txt
 txt2tex examples/14_relational_databases/algebra_basics.txt
 txt2tex examples/14_relational_databases/bindings.txt
 txt2tex examples/14_relational_databases/group_ungroup.txt

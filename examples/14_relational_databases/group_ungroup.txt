@@ -5,7 +5,19 @@
 TITLE: GROUP and UNGROUP
 AUTHOR: txt2tex example
 
-relvars GroupMembers, Enrollment, Course
+given MemberName, GroupID, CourseID
+
+schema GroupMembers
+  groupId : GroupID
+  username : MemberName
+  name : MemberName
+  email : MemberName
+end
+
+schema Enrollment
+  groupId : GroupID
+  members : P GroupID
+end
 
 === GROUP - Bundle Attributes into a Nested Relation ===
 

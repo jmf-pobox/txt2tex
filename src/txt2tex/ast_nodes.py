@@ -922,21 +922,6 @@ class InfruleBlock(ASTNode):
 
 
 @dataclass(frozen=True)
-class Relvars(ASTNode):
-    """Relvar declaration paragraph (relvars R, S, T).
-
-    Declares a set of relation-variable names.  The generator wraps each
-    declared name in ``\\mathrm{...}`` wherever it appears as an identifier
-    in a math context, rendering it upright (DAT course convention).
-
-    Attributes are left italic (default math mode) — only the declared
-    relvar names receive the positive marker.
-    """
-
-    names: list[str]
-
-
-@dataclass(frozen=True)
 class GivenType(ASTNode):
     """Given type declaration (given A, B, C)."""
 
@@ -1037,10 +1022,16 @@ class Abbreviation(ASTNode):
 
 @dataclass(frozen=True)
 class Declaration(ASTNode):
-    """Declaration in axdef or schema (var : Type)."""
+    """Declaration in axdef or schema (var : Type).
+
+    When ``is_primary_key`` is True the generator emits ``\\underline{var}``
+    instead of bare ``var``, marking the attribute as a primary key per the
+    DAT course convention.
+    """
 
     variable: str
     type_expr: Expr
+    is_primary_key: bool = False
 
 
 @dataclass(frozen=True)
@@ -1282,7 +1273,6 @@ DocumentItem = (
     | TruthTable
     | ArgueChain  # Renamed from EquivChain (EQUIV: and ARGUE: both use this)
     | InfruleBlock
-    | Relvars
     | GivenType
     | FreeType
     | SyntaxBlock

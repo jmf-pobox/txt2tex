@@ -55,10 +55,9 @@ def _parse_expr(src: str) -> Expr:
     return result
 
 
-def _expr_latex(src: str, *, relvars: frozenset[str] = frozenset()) -> str:
+def _expr_latex(src: str) -> str:
     """Generate LaTeX for a single expression."""
     gen = LaTeXGenerator(use_fuzz=True)
-    gen.relvar_set = relvars
     result = Parser(_lex(src)).parse()
     item: Expr = result.items[0] if isinstance(result, Document) else result  # type: ignore[assignment]
     return gen.generate_expr(item)
@@ -264,16 +263,15 @@ class TestBindingGenerator:
         out = _expr_latex("{| |}")
         assert out == r"\lblot \rblot"
 
-    def test_relvar_wrapping_in_value(self) -> None:
-        r"""{| r == Ship |} with Ship declared → \lblot r == \mathrm{Ship} \rblot."""
-        out = _expr_latex("{| r == Ship |}", relvars=frozenset({"Ship"}))
-        assert out == r"\lblot r == \mathrm{Ship} \rblot"
+    def test_identifier_in_value(self) -> None:
+        r"""{| r == Ship |} → \lblot r == Ship \rblot (no wrapping)."""
+        out = _expr_latex("{| r == Ship |}")
+        assert out == r"\lblot r == Ship \rblot"
 
-    def test_relvar_label_wrapping(self) -> None:
-        r"""Label that is a declared relvar gets \mathrm{} wrapping."""
-        # Ship declared as relvar; when Ship is a label name it wraps
-        out = _expr_latex("{| Ship == x |}", relvars=frozenset({"Ship"}))
-        assert out == r"\lblot \mathrm{Ship} == x \rblot"
+    def test_identifier_label(self) -> None:
+        r"""{| Ship == x |} → \lblot Ship == x \rblot (label passes through)."""
+        out = _expr_latex("{| Ship == x |}")
+        assert out == r"\lblot Ship == x \rblot"
 
     def test_field_projection_value_latex(self) -> None:
         r"""{| name == s.name |} → \lblot name == s.name \rblot."""
@@ -298,15 +296,14 @@ class TestBindingAcceptanceProbes:
         r"""Q2(a): single-component binding in set comprehension.
 
         { s : Ship | s.launched < 1921 . {| name == s.name |} }
-        must render the comprehension body as
-        \lblot name == s.name \rblot, with Ship wrapped if declared.
+        must render the comprehension body as \lblot name == s.name \rblot.
         """
         src = "{ s : Ship | s.launched < 1921 . {| name == s.name |} }"
-        out = _expr_latex(src, relvars=frozenset({"Ship"}))
+        out = _expr_latex(src)
         assert r"\lblot" in out
         assert r"\rblot" in out
         assert "name == " in out
-        assert r"\mathrm{Ship}" in out
+        assert "Ship" in out
 
     def test_q2d_multi_component(self) -> None:
         r"""Q2(d): multi-component binding in multi-variable comprehension.
@@ -324,7 +321,7 @@ class TestBindingAcceptanceProbes:
             " numGuns == c.numGuns |}\n"
             "}"
         )
-        out = _expr_latex(src, relvars=frozenset({"Ship", "Class"}))
+        out = _expr_latex(src)
         assert r"\lblot" in out
         assert r"\rblot" in out
         assert "name ==" in out

@@ -2,116 +2,105 @@
 
 **Level 2** — Requires familiarity with Z schemas (Tutorial 9).
 
-## Relation Variables and Attribute Typography
+## Primary Keys
 
-The Oxford DAT (Database Design) course uses a two-tier naming convention for
-relation schemas:
-
-- **Relation names** (Class, Ship, Battle, Outcome) are written in upright
-  roman type: $\mathrm{Class}$, $\mathrm{Ship}$
-- **Attribute names** (class, name, bore, country) stay in default italic type:
-  $class$, $name$
-
-This matches the `\relvar` / `\attr` macros from the course LaTeX template:
-
-```latex
-\newcommand{\relvar}[1]{\mathrm{#1}}
-\newcommand{\attr}[1]{\mathit{#1}}
-```
-
-txt2tex implements this via the `relvars` declaration paragraph.
-
-## The relvars Paragraph
-
-Declare relation variables with `relvars` followed by a comma-separated list
-of names:
+The `pk` prefix marks an attribute as the primary key of a **named** schema.
+txt2tex records this in the AST and emits a PK statement after the schema box:
 
 ```text
-relvars Class, Ship, Battle, Outcome
-```
-
-The declaration is **document-global**: once declared, every occurrence of
-`Class`, `Ship`, `Battle`, or `Outcome` as an identifier in a math context
-renders as `\mathrm{Class}`, `\mathrm{Ship}`, etc.
-
-Attributes (`class`, `name`, `bore`) do not need any special marker — they
-stay italic by default.
-
-## Example: Warships Database
-
-```text
-relvars Class, Ship, Battle, Outcome
-
 schema Class
-  class : N
-  country : N
+  pk class : ClassName
+  country : CountryName
   bore : N
   displacement : N
-  launched : N
-end
-
-schema Ship
-  name : N
-  class : N
-  launched : N
+  numGuns : N
 end
 ```
 
-In the compiled PDF:
+Generated LaTeX (abridged):
 
-- The schema header `Class` is upright: `\begin{schema}{\mathrm{Class}}`
-- The declaration `class : N` uses italic `class` (attribute name)
-- The declaration `class : Class` (Ship schema) has italic `class` on the left
-  and upright `\mathrm{Class}` on the right
+```latex
+\begin{schema}{Class}
+class : ClassName \\
+country : CountryName \\
+...
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Class}) = \{class\}$
+```
 
-## Decoration and Subscripts
+The schema body is plain Z — fuzz type-checks it cleanly. The PK line sits
+outside any Z environment, so fuzz ignores it; pdflatex renders it in upright
+math as a visible annotation below the schema box.
 
-Decoration characters (`'`, `?`, `!`) and subscripts interact cleanly with
-relvars. The decoration appears **outside** `\mathrm{}`:
+**Why not underline inside the schema box?** fuzz rejects any LaTeX macro
+with a brace argument (such as `\underline{class}`) in the variable-name
+position of a schema declaration. The PK line is the fuzz-compatible
+alternative.
 
-| txt2tex source | LaTeX output        |
-|----------------|---------------------|
-| `Class`        | `\mathrm{Class}`    |
-| `Class'`       | `\mathrm{Class}'`   |
-| `Class?`       | `\mathrm{Class}?`   |
-| `Class_1`      | `\mathrm{Class}_1`  |
-| `Class_12`     | `\mathrm{Class}_{12}` |
+### Composite Primary Keys
 
-## Multiple relvars Paragraphs
-
-You can split declarations across multiple paragraphs — they combine into
-one relvar set:
+Two `pk` lines list both attributes in the PK set:
 
 ```text
-relvars Class, Ship
-relvars Battle, Outcome
+schema CentreStaff
+  pk centreId : CentreID
+  pk staffId : PersonID
+end
 ```
 
-## Syntax Rules
+Generated:
 
-- Names must be plain identifiers (no decoration, no generic parameters)
-- At least one name is required
-- Commas are mandatory between names; trailing commas are not allowed
-- `relvars` is a reserved keyword and cannot be used as an identifier
+```latex
+\noindent$\mathrm{PK}(\mathrm{CentreStaff}) = \{centreId, staffId\}$
+```
+
+### Comma-Separated pk Names
+
+A single `pk` line may declare multiple names sharing one type:
+
+```text
+schema S
+  pk a, b : T
+end
+```
+
+Both `a` and `b` are included in the PK set.
+
+### Scope: Named Schemas Only
+
+`pk` is valid **only** inside named schema bodies. It is rejected elsewhere:
+
+| Context | Result |
+|---------|--------|
+| `schema Name ... end` | accepted — named schema |
+| `schema ... end` | ParserError — anonymous schema has no relation name |
+| `axdef ... end` | ParserError — primary key is a relational concept |
+| `gendef [X] ... end` | ParserError — primary key is a relational concept |
+| `S defs [ pk a : T ]` | ParserError — inline schema text is anonymous |
+
+### Syntax Rules
+
+- `pk` must be followed by at least one attribute name and a colon
+- `pk Delta S` and `pk Xi S` are rejected — Delta and Xi introduce
+  schema inclusions, not attribute names
+- `pk` is a reserved keyword and cannot be used as an identifier
+- Decorated names are valid: `pk count' : N`
 
 **Invalid examples that raise parser errors:**
 
 ```text
-relvars              // no names — error
-relvars Class,       // trailing comma — error
-relvars Class, ,Ship // double comma — error
-relvars Class Ship   // missing comma — error
+pk               // no attribute name — error
+pk noType        // missing colon — error
+pk Delta S       // Delta inclusion after pk — error
+pk in axdef      // only schema bodies — error
 ```
 
-## Complete Example
+### Complete Primary Keys Example
 
-See `examples/14_relational_databases/relvars_basic.txt` for a full working
-example with four relation variables and their schemas.
-
-Build it:
+See `examples/14_relational_databases/primary_keys.txt`.
 
 ```bash
-txt2tex examples/14_relational_databases/relvars_basic.txt
+txt2tex examples/14_relational_databases/primary_keys.txt
 ```
 
 ---
@@ -119,7 +108,7 @@ txt2tex examples/14_relational_databases/relvars_basic.txt
 ## Relational Algebra
 
 Phase 2.2 adds the five core Codd/Date relational algebra operators, plus
-an assignment statement.  All operators use kernel LaTeX — no extra package
+an assignment statement. All operators use kernel LaTeX — no extra package
 required.
 
 ### Restriction (sigma)
@@ -130,7 +119,7 @@ Select tuples satisfying a predicate:
 sigma[bore >= 16](Class)
 ```
 
-Renders as: $\sigma_{bore \geq 16}(\mathrm{Class})$
+Renders as: $\sigma_{bore \geq 16}(Class)$
 
 ### Projection (pi)
 
@@ -140,11 +129,9 @@ Keep only named attributes:
 pi[class, country](Class)
 ```
 
-Renders as: $\pi_{class, country}(\mathrm{Class})$
+Renders as: $\pi_{class, country}(Class)$
 
-The attribute list is comma-separated identifiers.  Relation names in the
-list receive `\mathrm{}` wrapping if declared with `relvars`; attribute
-names (lowercase, not declared) stay italic.
+The attribute list is comma-separated identifiers.
 
 ### Renaming (rho)
 
@@ -155,7 +142,7 @@ rho[ship as name](Outcome)
 rho[A as B, C as D](R)
 ```
 
-Renders as: $\rho_{ship \to name}(\mathrm{Outcome})$
+Renders as: $\rho_{ship \to name}(Outcome)$
 
 Multiple pairs are comma-separated.
 
@@ -167,7 +154,7 @@ Join on all common attributes:
 Ship bowtie Class
 ```
 
-Renders as: $\mathrm{Ship} \bowtie \mathrm{Class}$
+Renders as: $Ship \bowtie Class$
 
 **Theta-join** — join with an explicit predicate:
 
@@ -175,7 +162,7 @@ Renders as: $\mathrm{Ship} \bowtie \mathrm{Class}$
 Ship bowtie [Ship.class = Class.class] Class
 ```
 
-Renders as: $\mathrm{Ship} \bowtie_{Ship.class = Class.class} \mathrm{Class}$
+Renders as: $Ship \bowtie_{Ship.class = Class.class} Class$
 
 ### Division (div)
 
@@ -189,7 +176,7 @@ Renders as: $R \div S$
 
 ### Assignment (:=)
 
-Bind a name to an algebra expression.  This is a top-level statement (not
+Bind a name to an algebra expression. This is a top-level statement (not
 nested inside another expression):
 
 ```text
@@ -200,14 +187,14 @@ The assignment emits a `\begin{zed}...\end{zed}` block:
 
 ```latex
 \begin{zed}
-BigGuns := \pi_{class, country}(\sigma_{bore \geq 16}(\mathrm{Class}))
+BigGuns := \pi_{class, country}(\sigma_{bore \geq 16}(Class))
 \end{zed}
 ```
 
 ### Operator Precedence
 
 Algebra prefix operators (`sigma`, `pi`, `rho`) bind at atom level — they
-are parsed as prefix-with-arguments, like function calls.  `bowtie` and
+are parsed as prefix-with-arguments, like function calls. `bowtie` and
 `div` are infix and sit at the same precedence as `cross` (Cartesian
 product), above union/intersect.
 
@@ -266,9 +253,6 @@ The main use case is the expression part of a set comprehension:
 { s : Ship | s.launched < 1921 . {| name == s.name |} }
 ```
 
-This renders as a Z set comprehension with a binding body.  The relation
-variable `Ship` receives `\mathrm{}` wrapping when declared with `relvars`.
-
 A multi-variable comprehension uses `;` to separate variable-type pairs:
 
 ```text
@@ -289,14 +273,14 @@ all existing tokens:
 - `(|` (LIMG) — Relational image left
 - `|)` (RIMG) — Relational image right
 
-The `==` inside `{| ... |}` reuses the ABBREV token.  The parser
+The `==` inside `{| ... |}` reuses the ABBREV token. The parser
 disambiguates by position: inside binding brackets, `==` is the
 label-equals operator; at top-level, it is an abbreviation definition.
 
 ### LaTeX Macros
 
 The macros `\lblot` and `\rblot` are defined in both `fuzz.sty` (lines
-275-276) and `zed-lbr.sty`/`zed-cm.sty`.  No preamble change is needed.
+275-276) and `zed-lbr.sty`/`zed-cm.sty`. No preamble change is needed.
 
 ### Complete Bindings Example
 
@@ -332,20 +316,8 @@ No `.sty` changes are needed: `\mathrm` and `\mathop` are LaTeX kernel.
 Example — bundle name and email into a contact nested relation:
 
 ```text
-relvars GroupMembers
-
 GroupMembers group ({name, email} as contact)
 ```
-
-Renders as:
-
-```latex
-\mathrm{GroupMembers} \mathop{\mathrm{GROUP}}
-  (\{name, email\} \mathop{\mathrm{AS}} contact)
-```
-
-Relation names declared with `relvars` receive `\mathrm{}` wrapping;
-attribute names and aliases stay italic (default math mode).
 
 ### UNGROUP
 
@@ -370,7 +342,7 @@ GroupMembers ungroup contact
 ### Chaining
 
 GROUP and UNGROUP are left-associative at the same precedence as `bowtie`
-and `div`.  Chaining is valid:
+and `div`. Chaining is valid:
 
 ```text
 R group ({A, B} as sub) ungroup sub

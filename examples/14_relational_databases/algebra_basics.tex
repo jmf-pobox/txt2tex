@@ -15,68 +15,82 @@
 
 \maketitle
 
-% relvars: Class, Ship, Battle, Outcome
+\begin{zed}[ClassName, ShipName, BattleName, OutcomeName]\end{zed}
+
+\begin{schema}{Class}
+class : ClassName \\
+country : \nat \\
+bore : \nat \\
+displacement : \nat \\
+numGuns : \nat
+\end{schema}
+
+\begin{schema}{Ship}
+name : ShipName \\
+class : ClassName \\
+launched : \nat
+\end{schema}
 
 \section*{Restriction ( sigma )}
 
 \noindent
-$\sigma_{bore \geq 16}(\mathrm{Class})$
+$\sigma_{bore \geq 16}(Class)$
 
 
 \noindent
-$\sigma_{country = UK}(\sigma_{bore \geq 16}(\mathrm{Class}))$
+$\sigma_{country = UK}(\sigma_{bore \geq 16}(Class))$
 
 
 \section*{Projection ( pi )}
 
 \noindent
-$\pi_{class, country}(\mathrm{Class})$
+$\pi_{class, country}(Class)$
 
 
 \noindent
-$\pi_{class, country}(\sigma_{bore \geq 16}(\mathrm{Class}))$
+$\pi_{class, country}(\sigma_{bore \geq 16}(Class))$
 
 
 \section*{Renaming ( rho )}
 
 \noindent
-$\rho_{ship \to name}(\mathrm{Outcome})$
+$\rho_{ship \to name}(Outcome)$
 
 
 \noindent
-$\rho_{class \to id, country \to origin}(\mathrm{Class})$
+$\rho_{class \to id, country \to origin}(Class)$
 
 
 \section*{Natural Join and Theta - Join ( bowtie )}
 
 \noindent
-$\mathrm{Ship} \bowtie \mathrm{Class}$
+$Ship \bowtie Class$
 
 
 \noindent
-$\rho_{ship \to name}(\mathrm{Outcome}) \bowtie \mathrm{Ship}$
+$\rho_{ship \to name}(Outcome) \bowtie Ship$
 
 
 \noindent
-$\mathrm{Ship} \bowtie_{\mathrm{Ship}.class = \mathrm{Class}.class} \mathrm{Class}$
+$Ship \bowtie_{Ship.class = Class.class} Class$
 
 
 \section*{Division ( div )}
 
 \noindent
-$\mathrm{Ship} \div \mathrm{Class}$
+$Ship \div Class$
 
 
 \section*{Assignment ( := )}
 
 \begin{zed}
-BigGuns := \pi_{class, country}(\sigma_{bore \geq 16}(\mathrm{Class}))
+BigGuns := \pi_{class, country}(\sigma_{bore \geq 16}(Class))
 \end{zed}
 
 \section*{Combined Query ( Q1 style )}
 
 \noindent
-$\pi_{class, country}(\sigma_{bore \geq 16}(\mathrm{Class}))$
+$\pi_{class, country}(\sigma_{bore \geq 16}(Class))$
 
 
 \end{document}

@@ -1,0 +1,52 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\title{Primary Keys in Relational Schemas}
+\author{txt2tex example}
+\hypersetup{pdftitle={Primary Keys in Relational Schemas},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.2.0}}
+\begin{document}
+
+\maketitle
+
+\begin{zed}[ClassName, ShipName, BattleName, CountryName, PersonID, CentreID]\end{zed}
+
+\section*{Single Primary Key}
+
+\begin{schema}{Class}
+class : ClassName \\
+country : CountryName \\
+numGuns : \nat \\
+bore : \nat \\
+displacement : \nat
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Class}) = \{class\}$
+
+\begin{schema}{Ship}
+name : ShipName \\
+class : ClassName \\
+launched : \nat
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Ship}) = \{name\}$
+
+\begin{schema}{Battle}
+name : BattleName \\
+date : \nat
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Battle}) = \{name\}$
+
+\section*{Composite Primary Key}
+
+\begin{schema}{CentreStaff}
+centreId : CentreID \\
+staffId : PersonID
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{CentreStaff}) = \{centreId, staffId\}$
+
+\end{document}

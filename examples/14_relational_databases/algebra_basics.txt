@@ -5,7 +5,21 @@
 TITLE: Relational Algebra
 AUTHOR: txt2tex example
 
-relvars Class, Ship, Battle, Outcome
+given ClassName, ShipName, BattleName, OutcomeName
+
+schema Class
+  class : ClassName
+  country : N
+  bore : N
+  displacement : N
+  numGuns : N
+end
+
+schema Ship
+  name : ShipName
+  class : ClassName
+  launched : N
+end
 
 === Restriction (sigma) ===
 
@@ -39,7 +53,7 @@ rho[class as id, country as origin](Class)
 
 === Natural Join and Theta-Join (bowtie) ===
 
-// Natural join of two relation variables:
+// Natural join of two relations:
 
 Ship bowtie Class
 

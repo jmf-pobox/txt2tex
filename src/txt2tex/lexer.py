@@ -40,7 +40,7 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     "hide": TokenType.HIDE,
     "project": TokenType.PROJECT,
     # Z notation keywords
-    "relvars": TokenType.RELVARS,
+    "pk": TokenType.PK,
     "given": TokenType.GIVEN,
     "axdef": TokenType.AXDEF,
     "schema": TokenType.SCHEMA,
@@ -118,7 +118,7 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         # --- Schema-calculus operators ---
         "hide",
         "project",
-        "relvars",
+        "pk",
         "given",
         "axdef",
         "schema",

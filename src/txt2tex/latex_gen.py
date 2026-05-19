@@ -19,6 +19,7 @@ from txt2tex.ast_nodes import (
     CaseAnalysis,
     Conditional,
     Contents,
+    Declaration,
     Divide,
     Document,
     DocumentItem,
@@ -50,7 +51,6 @@ from txt2tex.ast_nodes import (
     Quantifier,
     Range,
     RelationalImage,
-    Relvars,
     Rename,
     Restrict,
     Schema,
@@ -309,7 +309,6 @@ class LaTeXGenerator:
     _warn_overflow: bool
     _overflow_threshold: int
     _overflow_warnings: list[str]
-    relvar_set: frozenset[str]
 
     # Default threshold for overflow warnings (LaTeX characters)
     # ~140 LaTeX chars ≈ text width at 10pt with 1in margins in fuzz mode
@@ -347,7 +346,6 @@ class LaTeXGenerator:
             else self.DEFAULT_OVERFLOW_THRESHOLD
         )
         self._overflow_warnings = []  # Collected warnings to emit
-        self.relvar_set: frozenset[str] = frozenset()  # Populated by generate_document
 
     # -------------------------------------------------------------------------
     # Overflow warning helpers
@@ -565,13 +563,10 @@ class LaTeXGenerator:
                     branch_strs.append(f"{branch.name} \\ldata {params_latex} \\rdata")
             branches_str = " | ".join(branch_strs)
             return f"{item.name} ::= {branches_str}"
-        # Abbreviation. wrap_relvar=False — same reasoning as the standalone
-        # _generate_abbreviation site: the LHS is a definition slot, not a
-        # math-mode reference, so \mathrm{} would be wrong here too.
+        # Abbreviation LHS: definition slot, not a math-mode reference.
         expr_latex = self.generate_expr(item.expression)
         name_latex = self._generate_identifier(
             Identifier(line=0, column=0, name=item.name),
-            wrap_relvar=False,
         )
         if item.generic_params:
             params_str = ", ".join(item.generic_params)
@@ -592,41 +587,11 @@ class LaTeXGenerator:
         """
         # Store document-level parts format
         self.parts_format = ast.parts_format
-        # Pre-walk: collect relvar declarations, mirroring generate_document.
-        # Without this, relvars declared in REPL input would have no effect.
-        self.relvar_set = self._collect_relvars(ast)
 
         # Generate all document items
         lines = self._generate_document_items_with_consolidation(ast.items)
 
         return "\n".join(lines)
-
-    def _collect_relvars(self, ast: Document | Expr) -> frozenset[str]:
-        """Walk the top-level document items and collect all declared relvar names.
-
-        Only ``Relvars`` paragraphs contribute names; all other items are ignored.
-        This single O(N) pass runs before any LaTeX emission so that
-        ``_generate_identifier`` can do an O(1) membership test per identifier.
-
-        Duplicate declarations (same name in two or more ``relvars`` paragraphs)
-        are merged silently — the name still ends up in the set.  A warning is
-        appended to ``_overflow_warnings`` (at most once per duplicate name) so
-        callers can surface it via ``emit_warnings()`` or ``get_warnings()``.
-        """
-        if not isinstance(ast, Document):
-            return frozenset()
-        names: set[str] = set()
-        warned: set[str] = set()
-        for item in ast.items:
-            if isinstance(item, Relvars):
-                for name in item.names:
-                    if name in names and name not in warned:
-                        self._overflow_warnings.append(
-                            f"Warning: relvar {name!r} declared more than once"
-                        )
-                        warned.add(name)
-                    names.add(name)
-        return frozenset(names)
 
     def generate_document(self, ast: Document | Expr) -> str:
         """Generate complete LaTeX document with preamble and postamble.
@@ -642,11 +607,6 @@ class LaTeXGenerator:
             Complete LaTeX source code ready for compilation.
         """
         lines: list[str] = []
-
-        # Pre-walk: collect all relvar names declared in this document.
-        # The relvar_set is populated before any LaTeX emission so that
-        # _generate_identifier can do an O(1) lookup per identifier.
-        self.relvar_set = self._collect_relvars(ast)
 
         # Preamble
         # Use fleqn option to left-align all equations (no centering)
@@ -884,8 +844,6 @@ class LaTeXGenerator:
         self,
         node: Identifier,
         parent: Expr | None = None,
-        *,
-        wrap_relvar: bool = True,
     ) -> str:
         """Generate LaTeX for identifier with smart underscore handling.
 
@@ -897,11 +855,6 @@ class LaTeXGenerator:
 
         Special keywords (Issue #3 from QA):
         - emptyset → \\emptyset (empty set symbol)
-
-        Relvar wrapping (``\\mathrm{}``) is applied in math-expression contexts
-        only. Pass ``wrap_relvar=False`` from positions that are LaTeX
-        "title" / "name" slots — schema-box title, abbreviation LHS, horizontal
-        defs LHS — where fuzz does not accept a math construct.
         """
         name = node.name
 
@@ -921,17 +874,17 @@ class LaTeXGenerator:
             base = name[:-1]
             # Render as R^+ (transitive closure)
             base_id = Identifier(line=0, column=0, name=base)
-            return f"{self._generate_identifier(base_id, wrap_relvar=wrap_relvar)}^+"
+            return f"{self._generate_identifier(base_id)}^+"
         if name.endswith("*"):
             base = name[:-1]
             # Render as R^* (reflexive-transitive closure)
             base_id = Identifier(line=0, column=0, name=base)
-            return f"{self._generate_identifier(base_id, wrap_relvar=wrap_relvar)}^*"
+            return f"{self._generate_identifier(base_id)}^*"
         if name.endswith("~"):
             base = name[:-1]
             # Render as R^{-1} (standard) or R^{\sim} (fuzz)
             base_id = Identifier(line=0, column=0, name=base)
-            base_latex = self._generate_identifier(base_id, wrap_relvar=wrap_relvar)
+            base_latex = self._generate_identifier(base_id)
             return self._get_closure_operator_latex("~", base_latex)
 
         # Check if this is an operator/function from UNARY_OPS dictionary
@@ -947,49 +900,6 @@ class LaTeXGenerator:
         type_latex = self._get_type_latex(name)
         if type_latex is not None:
             return type_latex
-
-        # Relvar typography: declared relvars render upright (\mathrm{Name}).
-        # Rules (decoration outside \mathrm per mission decision):
-        #   Class   → \mathrm{Class}
-        #   Class'  → \mathrm{Class}'
-        #   Class_1 → \mathrm{Class}_1   (1-char subscript)
-        #   Class_12 → \mathrm{Class}_{12}  (2-char all-digit subscript)
-        #   Class_test → falls through to multi-word identifier path (no wrap)
-        # Only bare base names are in the relvar set; decorated and subscripted
-        # forms are looked up by stripping suffix characters and the subscript.
-        # Skipped when wrap_relvar=False (e.g., schema-box title position),
-        # because fuzz does not accept \mathrm{} in those LaTeX slots.
-        if wrap_relvar and self.relvar_set:
-            # Strip trailing Z-decoration characters (', ?, !) right-to-left
-            decoration_suffix = ""
-            base_name = name
-            while base_name and base_name[-1] in ("'", "?", "!"):
-                decoration_suffix = base_name[-1] + decoration_suffix
-                base_name = base_name[:-1]
-            # Check plain relvar (no subscript)
-            if base_name in self.relvar_set:
-                return rf"\mathrm{{{base_name}}}{decoration_suffix}"
-            # Check subscripted relvar: prefix before first '_', but only when
-            # the suffix qualifies as a subscript (mirrors the existing heuristic
-            # in the non-relvar path below — 1-char always, 2-char only if all
-            # digits, 3+ char → multi-word, let the normal path handle it).
-            if "_" in base_name:
-                relvar_prefix, subscript_part = base_name.split("_", 1)
-                if relvar_prefix in self.relvar_set:
-                    # 1-char suffix: always a subscript (digit or single letter)
-                    if len(subscript_part) == 1:
-                        return (
-                            rf"\mathrm{{{relvar_prefix}}}_{subscript_part}"
-                            + decoration_suffix
-                        )
-                    # 2-char suffix: subscript only when all digits (e.g. _12)
-                    if len(subscript_part) == 2 and subscript_part.isdigit():
-                        return (
-                            rf"\mathrm{{{relvar_prefix}}}_{{{subscript_part}}}"
-                            + decoration_suffix
-                        )
-                    # 3+ char suffix, or 2-char mixed: fall through to multi-word
-                    # path — \mathrm wrapping does not apply to multi-word forms.
 
         # No underscore: return as-is
         if "_" not in name:
@@ -2107,23 +2017,10 @@ class LaTeXGenerator:
     def _emit_attr_name(self, name: str) -> str:
         r"""Emit an attribute name for use inside pi[...] or rho[...] subscripts.
 
-        Attribute names are field names — they render italic by default.  If
-        the name happens to be a declared relvar, it gets \mathrm{} wrapping.
+        Attribute names are field names — they render italic by default.
         Operator-keyword mappings (dom → \dom, id → \id) do NOT apply here:
         in the rho/pi bracket context every name is unambiguously a field name.
-
-        Decoration characters (', ?, !) are stripped before the relvar lookup,
-        mirroring _generate_identifier, so that pi[Class'](R) correctly wraps
-        Class in \mathrm{} when Class is declared as a relvar.
         """
-        if self.relvar_set:
-            decoration_suffix = ""
-            base_name = name
-            while base_name and base_name[-1] in ("'", "?", "!"):
-                decoration_suffix = base_name[-1] + decoration_suffix
-                base_name = base_name[:-1]
-            if base_name in self.relvar_set:
-                return rf"\mathrm{{{base_name}}}{decoration_suffix}"
         return name
 
     @generate_expr.register(Restrict)
@@ -2140,9 +2037,9 @@ class LaTeXGenerator:
     def _generate_project(self, node: Project, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for pi[A, B](relation).
 
-        pi[class, country](Class) → \pi_{class, country}(\mathrm{Class})
-        Attribute names are emitted via _emit_attr_name: relvar wrapping applies
-        if the name is declared, but keyword-to-LaTeX conversions do not.
+        pi[class, country](Class) → \pi_{class, country}(Class)
+        Attribute names are emitted via _emit_attr_name (identity pass-through);
+        keyword-to-LaTeX conversions do not apply inside the attribute list.
         """
         attrs_str = ", ".join(self._emit_attr_name(a) for a in node.attrs)
         rel_latex = self.generate_expr(node.relation)
@@ -2196,10 +2093,6 @@ class LaTeXGenerator:
 
         R group ({A} as m) →
             R \mathop{\mathrm{GROUP}} (\{A\} \mathop{\mathrm{AS}} m)
-
-        Attribute names go through _emit_attr_name so declared relvars
-        receive \mathrm{} wrapping.  The alias is also emitted through
-        _emit_attr_name for the same reason.
         """
         relation_latex = self.generate_expr(node.relation)
         attrs_str = ", ".join(self._emit_attr_name(a) for a in node.attrs)
@@ -2214,9 +2107,6 @@ class LaTeXGenerator:
         r"""Generate LaTeX for R ungroup alias.
 
         R ungroup members → R \mathop{\mathrm{UNGROUP}} members
-
-        The alias is emitted through _emit_attr_name so declared relvars
-        receive \mathrm{} wrapping.
         """
         relation_latex = self.generate_expr(node.relation)
         alias_str = self._emit_attr_name(node.alias)
@@ -2228,10 +2118,7 @@ class LaTeXGenerator:
 
         {| name == expr, ... |} → \lblot name == expr, \ldots \rblot
 
-        Component labels are emitted via ``_emit_attr_name`` so that a
-        declared relvar appearing as a label receives ``\mathrm{}``.
         Component values are emitted with the full expression generator.
-
         Empty binding ``{| |}`` → ``\lblot \rblot``.
         """
         if not node.pairs:
@@ -2246,11 +2133,11 @@ class LaTeXGenerator:
 
     @generate_document_item.register(Assignment)
     def _generate_assignment(self, node: Assignment) -> list[str]:
-        r"""Generate LaTeX for T := R (relvar assignment).
+        r"""Generate LaTeX for T := expression.
 
         Emits inside a zed environment so that the assignment appears
         in display-math mode consistent with Z notation paragraphs.
-        T := pi[class](Class) → \begin{zed}T := \pi_{class}(\mathrm{Class})\end{zed}
+        T := pi[class](Class) → \begin{zed}T := \pi_{class}(Class)\end{zed}
         """
         target_latex = self.generate_expr(node.target)
         expr_latex = self.generate_expr(node.expression)
@@ -4197,17 +4084,6 @@ class LaTeXGenerator:
 
         return lines
 
-    @generate_document_item.register(Relvars)
-    def _generate_relvars(self, node: Relvars) -> list[str]:
-        """Generate LaTeX for relvar declaration paragraph.
-
-        Relvars paragraphs are declaration-only; they emit no visible output.
-        A LaTeX comment records the declared names so the .tex source is
-        self-documenting.
-        """
-        names_str = ", ".join(node.names)
-        return [f"% relvars: {names_str}", ""]
-
     @generate_document_item.register(GivenType)
     def _generate_given_type(self, node: GivenType) -> list[str]:
         """Generate LaTeX for given type declaration."""
@@ -4356,11 +4232,8 @@ class LaTeXGenerator:
         expr_latex = self.generate_expr(node.expression)
 
         # Process name through _generate_identifier() for compound identifiers.
-        # wrap_relvar=False: abbreviation LHS (Name == expr) is a definition
-        # slot, not a math-mode reference; fuzz expects a plain identifier here.
         name_latex = self._generate_identifier(
             Identifier(line=0, column=0, name=node.name),
-            wrap_relvar=False,
         )
 
         # Wrap in zed environment for fuzz compatibility
@@ -4653,11 +4526,9 @@ class LaTeXGenerator:
 
                 # Generate abbreviations: Name == expression
                 elif isinstance(item, Abbreviation):
-                    # wrap_relvar=False: abbreviation LHS is a definition slot.
                     expr_latex = self.generate_expr(item.expression)
                     name_latex = self._generate_identifier(
                         Identifier(line=0, column=0, name=item.name),
-                        wrap_relvar=False,
                     )
                     if item.generic_params:
                         params_str = ", ".join(item.generic_params)
@@ -4710,13 +4581,10 @@ class LaTeXGenerator:
 
         # Determine schema name (empty string for anonymous)
         # Process name through _generate_identifier() for compound identifiers
-        # (S+, S*, S~). Pass wrap_relvar=False because the schema-box title is
-        # a LaTeX-argument slot that does not accept \mathrm{} — if the schema
-        # name is also declared as a relvar, fuzz rejects the wrapped form.
+        # (S+, S*, S~).
         if node.name is not None:
             schema_name = self._generate_identifier(
                 Identifier(line=0, column=0, name=node.name),
-                wrap_relvar=False,
             )
         else:
             schema_name = ""
@@ -4808,6 +4676,25 @@ class LaTeXGenerator:
                     lines.append(r"\also")
 
         lines.append(r"\end{schema}")
+
+        # Emit a fuzz-compatible PK annotation after the schema box.
+        # \underline{} is rejected by fuzz inside schema declaration positions,
+        # so we record the primary-key set as a plain math statement outside
+        # the box: \noindent$\mathrm{PK}(\mathrm{Name}) = \{attr1, attr2\}$
+        # fuzz ignores content outside Z environments; pdflatex renders it.
+        if node.name is not None:
+            pk_attrs = [
+                decl.variable
+                for decl in node.declarations
+                if isinstance(decl, Declaration) and decl.is_primary_key
+            ]
+            if pk_attrs:
+                attrs_str = ", ".join(pk_attrs)
+                lines.append(
+                    rf"\noindent$\mathrm{{PK}}(\mathrm{{{schema_name}}})"
+                    rf" = \{{{attrs_str}\}}$"
+                )
+
         lines.append("")
 
         return lines
@@ -4867,12 +4754,9 @@ class LaTeXGenerator:
         """
         lines: list[str] = []
 
-        # Build LHS. wrap_relvar=False: horizontal-defs LHS is a definition
-        # slot inside \begin{zed}, not a math-mode reference; fuzz expects a
-        # plain identifier here.
+        # Build LHS: definition slot inside \begin{zed}.
         name_latex = self._generate_identifier(
             Identifier(line=node.line, column=node.column, name=node.name),
-            wrap_relvar=False,
         )
         if node.generics:
             params_str = ", ".join(node.generics)

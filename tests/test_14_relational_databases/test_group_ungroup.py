@@ -21,7 +21,6 @@ from txt2tex.ast_nodes import (
     Identifier,
     NaturalJoin,
     Project,
-    Relvars,
     Rename,
     Restrict,
     Ungroup,
@@ -54,10 +53,9 @@ def _expr(src: str) -> DocumentItem:
     return _parse(src).items[0]
 
 
-def _expr_latex(src: str, *, relvars: frozenset[str] = frozenset()) -> str:
+def _expr_latex(src: str) -> str:
     """Generate LaTeX for an expression (math content without wrapper)."""
     gen = LaTeXGenerator(use_fuzz=True)
-    gen.relvar_set = relvars
     ast = Parser(_lex(src)).parse()
     item: Expr = ast.items[0] if isinstance(ast, Document) else ast  # type: ignore[assignment]
     return gen.generate_expr(item)
@@ -286,13 +284,11 @@ class TestGroupGenerator:
         )
         assert result == expected
 
-    def test_group_relvar_wrapping(self) -> None:
-        r"""Members group ({username} as m) — Members wrapped in \mathrm{}."""
-        result = _expr_latex(
-            "Members group ({username} as m)",
-            relvars=frozenset({"Members"}),
-        )
-        assert r"\mathrm{Members}" in result
+    def test_group_named_relation(self) -> None:
+        r"""Members group ({username} as m) — Members renders italic (no wrap)."""
+        result = _expr_latex("Members group ({username} as m)")
+        assert "Members" in result
+        assert r"\mathrm{Members}" not in result
 
     def test_group_multi_attr_full(self) -> None:
         r"""Multi-attr: attrs appear comma-separated inside \{...\}."""
@@ -317,13 +313,11 @@ class TestUngroupGenerator:
         result = _expr_latex("R ungroup members")
         assert result == r"R \mathop{\mathrm{UNGROUP}} members"
 
-    def test_ungroup_relvar_wrapping(self) -> None:
-        r"""Members ungroup sub — Members wrapped in \mathrm{}."""
-        result = _expr_latex(
-            "Members ungroup sub",
-            relvars=frozenset({"Members"}),
-        )
-        assert r"\mathrm{Members}" in result
+    def test_ungroup_named_relation(self) -> None:
+        r"""Members ungroup sub — Members renders italic (no wrap)."""
+        result = _expr_latex("Members ungroup sub")
+        assert "Members" in result
+        assert r"\mathrm{Members}" not in result
 
     def test_ungroup_mathop(self) -> None:
         r"""UNGROUP uses \mathop{\mathrm{UNGROUP}} for proper spacing."""
@@ -342,29 +336,21 @@ class TestGroupUngroupAcceptance:
     def test_acceptance_probe(self) -> None:
         r"""Full round-trip acceptance probe per mission contract.
 
-        relvars GroupMembers
-
         GroupMembers group ({username} as members)
 
         Must render:
-        \mathrm{GroupMembers} \mathop{\mathrm{GROUP}}
-        (\{username\} \mathop{\mathrm{AS}} members)
+        GroupMembers \mathop{\mathrm{GROUP}} (\{username\} \mathop{\mathrm{AS}} members)
         """
-        src = "relvars GroupMembers\n\nGroupMembers group ({username} as members)"
+        src = "GroupMembers group ({username} as members)"
         doc = _parse(src)
-        assert isinstance(doc.items[0], Relvars)
-        assert doc.items[0].names == ["GroupMembers"]
-        group_node = doc.items[1]
+        group_node = doc.items[0]
         assert isinstance(group_node, Group)
         assert group_node.attrs == ["username"]
         assert group_node.alias == "members"
 
-        result = _expr_latex(
-            "GroupMembers group ({username} as members)",
-            relvars=frozenset({"GroupMembers"}),
-        )
+        result = _expr_latex(src)
         expected = (
-            r"\mathrm{GroupMembers} \mathop{\mathrm{GROUP}}"
+            r"GroupMembers \mathop{\mathrm{GROUP}}"
             r" (\{username\} \mathop{\mathrm{AS}} members)"
         )
         assert result == expected

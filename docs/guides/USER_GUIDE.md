@@ -2452,59 +2452,63 @@ p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
 
 Support for the Oxford DAT (Database Design) course typography convention.
 
-### relvars Declaration
+### pk Declaration
 
-Declare relation variables with a `relvars` paragraph:
-
-```text
-relvars Class, Ship, Battle, Outcome
-```
-
-Declared names render **upright** (`\mathrm{Name}`) in math context.
-Attribute names (undeclared identifiers) stay **italic** (default math mode).
-
-**Full example:**
+Mark an attribute as a primary key with the `pk` prefix inside a **named**
+schema body.  txt2tex emits a fuzz-compatible PK statement after the schema
+box:
 
 ```text
-relvars Class, Ship, Battle, Outcome
-
 schema Class
-  class : N
-  country : N
+  pk class : ClassName
+  country : CountryName
   bore : N
 end
+```
 
-schema Ship
-  name : N
-  class : N
+Generated LaTeX (abridged):
+
+```latex
+\begin{schema}{Class}
+class : ClassName \\
+country : CountryName \\
+bore : \nat
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Class}) = \{class\}$
+```
+
+The schema body stays plain so fuzz type-checks it cleanly.  The PK line
+sits outside the Z environment and is rendered by pdflatex.
+
+**Composite primary key** — two or more `pk` lines:
+
+```text
+schema CentreStaff
+  pk centreId : CentreID
+  pk staffId : PersonID
 end
 ```
 
-In the PDF, `Class` (schema header and type reference) is upright;
-`class`, `country`, `name` (attributes) are italic.
+Emits: `\noindent$\mathrm{PK}(\mathrm{CentreStaff}) = \{centreId, staffId\}$`
 
-**Decoration and subscripts** — the decoration sits outside `\mathrm{}`:
-
-| Source      | LaTeX               |
-|-------------|---------------------|
-| `Class`     | `\mathrm{Class}`    |
-| `Class'`    | `\mathrm{Class}'`   |
-| `Class_1`   | `\mathrm{Class}_1`  |
-| `class`     | `class` (italic)    |
-
-**Multiple declarations** combine into one relvar set:
+**Comma-separated pk names** (when names share a type):
 
 ```text
-relvars Class, Ship
-relvars Battle, Outcome
+schema S
+  pk a, b : T
+end
 ```
+
+**Scope**: `pk` is only valid in named schema bodies.  It raises
+ParserError in axdef, gendef, anonymous schemas, and inline schema text.
 
 **Error cases:**
 
 ```text
-relvars              // no names — parser error
-relvars Class,       // trailing comma — parser error
-relvars Class Ship   // missing comma — parser error
+pk                   // no attribute name — parser error
+pk noType            // missing colon — parser error
+pk Delta S           // Delta is a schema inclusion, not an attribute — parser error
+pk in axdef          // only schema bodies — parser error
 ```
 
 ### Relational Algebra (Phase 2.2)
@@ -2518,7 +2522,7 @@ The five Codd/Date operators plus assignment.  All use kernel LaTeX
 sigma[bore >= 16](Class)
 ```
 
-Renders: $\sigma_{bore \geq 16}(\mathrm{Class})$
+Renders: $\sigma_{bore \geq 16}(Class)$
 
 The predicate inside `[...]` is a full expression (comparisons, logical
 operators, etc.).
@@ -2529,7 +2533,7 @@ operators, etc.).
 pi[class, country](Class)
 ```
 
-Renders: $\pi_{class, country}(\mathrm{Class})$
+Renders: $\pi_{class, country}(Class)$
 
 The attribute list is comma-separated identifiers.
 
@@ -2540,7 +2544,7 @@ rho[ship as name](Outcome)
 rho[A as B, C as D](R)
 ```
 
-Renders: $\rho_{ship \to name}(\mathrm{Outcome})$
+Renders: $\rho_{ship \to name}(Outcome)$
 
 Each pair is written `old as new`; multiple pairs are comma-separated.
 
@@ -2550,7 +2554,7 @@ Each pair is written `old as new`; multiple pairs are comma-separated.
 Ship bowtie Class
 ```
 
-Renders: $\mathrm{Ship} \bowtie \mathrm{Class}$
+Renders: $Ship \bowtie Class$
 
 **Theta-join** with explicit predicate:
 
@@ -2558,7 +2562,7 @@ Renders: $\mathrm{Ship} \bowtie \mathrm{Class}$
 Ship bowtie [Ship.class = Class.class] Class
 ```
 
-Renders: $\mathrm{Ship} \bowtie_{Ship.class = Class.class} \mathrm{Class}$
+Renders: $Ship \bowtie_{Ship.class = Class.class} Class$
 
 #### Division
 
@@ -2581,8 +2585,6 @@ Emits inside `\begin{zed}...\end{zed}`.
 #### Combining Operators
 
 ```text
-relvars Class, Ship, Battle, Outcome
-
 // Q1(a): classes of big-gun ships
 pi[class, country](sigma[bore >= 16](Class))
 
@@ -2617,16 +2619,13 @@ Renders: $R \mathop{\mathrm{GROUP}} (\{A, B\} \mathop{\mathrm{AS}} alias)$
 The attribute list inside `{...}` is comma-separated.  The alias after
 `as` names the resulting nested-relation column.
 
-Example with declared relvar:
+Example:
 
 ```text
-relvars GroupMembers
-
 GroupMembers group ({username} as members)
 ```
 
-Renders: $\mathrm{GroupMembers} \mathop{\mathrm{GROUP}} (\{username\}
-\mathop{\mathrm{AS}} members)$
+Renders: $GroupMembers \mathop{\mathrm{GROUP}} (\{username\} \mathop{\mathrm{AS}} members)$
 
 #### UNGROUP
 

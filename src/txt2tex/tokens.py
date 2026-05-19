@@ -178,7 +178,7 @@ class TokenType(Enum):
     PROJECT = auto()  # project keyword (schema projection)
 
     # Z notation keywords (Phase 4)
-    RELVARS = auto()  # relvars (Phase 2.1 — relvar declaration)
+    PK = auto()  # pk (primary-key declaration prefix)
     GIVEN = auto()  # given
     AXDEF = auto()  # axdef
     SCHEMA = auto()  # schema

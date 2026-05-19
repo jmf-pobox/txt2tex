@@ -1396,7 +1396,12 @@ keywords to decide whether the following token is an operator (not prose).
 `defs` was added to that set so that `A defs B` at column 1 is tokenised
 correctly rather than captured as a `TEXT` token.
 
-## ADR: Relvar Set and Decoration-Outside-\mathrm Rule (Phase 2.1)
+## ADR: Relvar Set and Decoration-Outside-\mathrm Rule (Phase 2.1) — SUPERSEDED
+
+> **SUPERSEDED** by "ADR: Remove relvars, Add pk Primary-Key Underlining
+> (Phase 2.1 revised)" at the end of this document. The relvars feature
+> was removed; the code described here no longer exists. This section is
+> retained as historical record.
 
 **Decision**: Implement the relvar typography via an O(N) pre-walk that
 populates `relvar_set: frozenset[str]` before any LaTeX emission, then an O(1)
@@ -1873,4 +1878,89 @@ primitives available in every LaTeX distribution.
 
 **Implementation.** `_generate_group` and `_generate_ungroup` in
 `src/txt2tex/latex_gen.py`.  Attribute and alias names pass through
-`_emit_attr_name` so declared relvars receive `\mathrm{}` wrapping.
+`_emit_attr_name` (identity function after the relvar removal; see the next ADR).
+
+## ADR: Remove relvars, Add pk Primary-Key PK-Line Annotation (Phase 2.1 revised)
+
+**Decision**: Remove the `relvars` declaration feature entirely.  Replace it
+with a `pk` prefix in **named schema bodies only**.  The generator emits a
+plain-math PK statement after the schema box rather than using `\underline{}`
+inside the box.
+
+**Supersedes**: "ADR: Relvar Set and Decoration-Outside-\mathrm Rule (Phase 2.1)"
+above, which is now historical record only.
+
+**Context**: The original Phase 2.1 design added `relvars` to render relation
+names in `\mathrm{}` (upright roman).  After further review of Trigoni's
+actual DAT materials and fuzz constraints:
+
+1. Fuzz rejects `\mathrm{}` in schema title positions.
+2. Fuzz also rejects `\underline{attrname}` in declaration-variable positions —
+   the fuzz schema parser expects a plain identifier in the variable-name slot;
+   any macro with a brace argument (`\underline{class}`) is a syntax error.
+3. The only visible DAT convention for primary keys is an annotation below the
+   schema box, not inline markup.
+
+**pk scope** — named schemas only:
+
+`pk` is parsed and accepted in `_parse_schema` when `name is not None`.  It
+raises `ParserError` in all other declaration contexts:
+
+- `axdef` / `gendef` — "Primary-key annotation is only valid in schema bodies"
+- Anonymous `schema ... end` — "Primary-key annotation requires a named schema"
+- Inline schema text `[ pk a : T | ... ]` — "Primary-key annotation requires
+  a named schema; inline schema text is anonymous"
+
+**pk grammar** (named schema bodies only):
+
+```text
+pk_decl ::= 'pk' name (',' name)* ':' expr
+```
+
+`pk` before `Delta` or `Xi` is rejected: those tokens introduce schema
+inclusions, not attribute declarations.
+
+**What changed**:
+
+- `TokenType.RELVARS` → `TokenType.PK`; keyword `"relvars"` → `"pk"`
+- `Relvars` AST node removed from `ast_nodes.py` and `DocumentItem` union
+- `Declaration` gains `is_primary_key: bool = False` (frozen dataclass default)
+- Parser: `_parse_relvars` removed; `_parse_declaration_or_inclusion` gains a
+  `pk`-prefix branch; `_parse_schema` adds PK dispatch (named only);
+  `_parse_axdef`, `_parse_gendef`, `_parse_schema_text` raise ParserError on PK
+- Generator: `_collect_relvars`, `relvar_set`, `wrap_relvar` parameter,
+  `_generate_relvars` all removed; `_emit_attr_name` returns `name` unchanged;
+  `_generate_schema` collects pk attribute names and appends the PK line after
+  `\end{schema}` when the schema has a name and any pk attrs exist
+- Tests: `test_relvars.py` deleted; test_algebra, test_bindings, test_group_ungroup
+  updated; `test_primary_keys.py` added (32 tests)
+
+**LaTeX emission** — after `\end{schema}`, if any pk attrs and schema is named:
+
+```latex
+\noindent$\mathrm{PK}(\mathrm{SchemaName}) = \{attr1, attr2\}$
+```
+
+This sits outside every Z environment: fuzz ignores it; pdflatex renders it in
+upright math below the schema box.  For composite keys, all pk-marked attribute
+names are comma-separated inside the set literal.
+
+**Schema box is plain**: Declaration lines inside the schema box emit
+`attrname : TypeExpr` with no markup on `attrname`, regardless of
+`is_primary_key`.  This keeps fuzz happy.
+
+**Options considered**:
+
+1. *Keep relvars, add pk* — rejected: relvars is incorrect (fuzz type errors
+   in schema titles) and the actual DAT materials do not use upright relation
+   names.
+2. *`\underline{attrname}` inside schema box* — attempted; rejected: fuzz
+   rejects any braced macro in the variable-name position of a schema
+   declaration.  The PK-line approach is the only fuzz-compatible alternative.
+3. *Custom fuzz macro* — rejected: would require modifying `fuzz.sty`, which
+   is a third-party asset under its own license.
+4. *Capitalisation heuristic* — rejected: single-letter type variables (`N`,
+   `Z`, `X`) are uppercase but not relation names; explicit declaration is
+   required.
+
+**Test count delta**: 3893 → 3925 (32 new pk tests; relvars tests deleted).

@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `pk` declaration prefix for primary-key underlining (Phase 2.1 revised).
+  `pk attrname : Type` in a schema or axdef body sets `is_primary_key=True`
+  on the `Declaration` AST node; the generator emits `\underline{attrname}`
+  using the LaTeX kernel command (no fuzz.sty dependency).  Composite primary
+  keys use two `pk` lines; comma-separated names share one `pk` line.  24 new
+  tests in `tests/test_14_relational_databases/test_primary_keys.py`.
+  New example `examples/14_relational_databases/primary_keys.txt`.
+
+### Removed
+
+- The `relvars` declaration paragraph is removed.  The `relvars` keyword no
+  longer exists; existing `.txt` files using `relvars` will raise a `LexerError`
+  on the unknown keyword.  The `Relvars` AST node, `TokenType.RELVARS`,
+  `LaTeXGenerator.relvar_set`, and `_collect_relvars` are all removed from the
+  public API.  The `wrap_relvar` parameter is removed from internal generator
+  methods.  Migration: delete `relvars` lines; mark primary-key attributes with
+  `pk` instead.
+
+### Added (earlier releases)
+
 - Schema calculus operators (Phase 3.2): Z RM §3.11 composition (`;`),
   piping (`>>`), hiding (`hide`), and projection (`project`) on the RHS of
   `defs` paragraphs.  Three new `TokenType` members: `PIPE_PIPE` (`>>`),

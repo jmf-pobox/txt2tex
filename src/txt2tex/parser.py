@@ -52,7 +52,6 @@ from txt2tex.ast_nodes import (
     Quantifier,
     Range,
     RelationalImage,
-    Relvars,
     Rename,
     Restrict,
     Schema,
@@ -498,7 +497,6 @@ class Parser:
             TokenType.ARGUE,  # Both EQUIV: and ARGUE: map to this token
             TokenType.EQUAL,  # EQUAL: expression equality chain
             TokenType.INFRULE,
-            TokenType.RELVARS,
             TokenType.GIVEN,
             TokenType.AXDEF,
             TokenType.GENDEF,
@@ -686,8 +684,6 @@ class Parser:
             return self._parse_argue_chain(connector="eq")
         if self._match(TokenType.INFRULE):
             return self._parse_infrule_block()
-        if self._match(TokenType.RELVARS):
-            return self._parse_relvars()
         if self._match(TokenType.GIVEN):
             return self._parse_given_type()
         if self._match(TokenType.AXDEF):
@@ -1163,11 +1159,12 @@ class Parser:
     ) -> Declaration | SchemaInclusion | list[Declaration]:
         """Parse one declaration line or schema-inclusion line.
 
-        Three forms:
-        1. ``Delta Name [generic-args]?``  → SchemaInclusion(decoration="delta")
-        2. ``Xi Name [generic-args]?``     → SchemaInclusion(decoration="xi")
-        3. ``name1, name2, ... : Type``    → list[Declaration]  (typed, ≥1 item)
-        4. ``Name [generic-args]?``        → SchemaInclusion(decoration=None)
+        Five forms:
+        1. ``pk name1, name2, ... : Type``  → list[Declaration] with is_primary_key=True
+        2. ``Delta Name [generic-args]?``   → SchemaInclusion(decoration="delta")
+        3. ``Xi Name [generic-args]?``      → SchemaInclusion(decoration="xi")
+        4. ``name1, name2, ... : Type``     → list[Declaration]  (typed, ≥1 item)
+        5. ``Name [generic-args]?``         → SchemaInclusion(decoration=None)
            (bare inclusion — only when no ':' follows on the same line)
 
         Returns a list of Declarations for the typed form so the caller can
@@ -1175,6 +1172,66 @@ class Parser:
         otherwise.
         """
         start_tok = self._current()
+
+        # --- pk prefix: primary-key declaration ---
+        if self._match(TokenType.PK):
+            pk_tok = self._advance()  # consume 'pk'
+            cur = self._current()
+            # Reject pk before Delta/Xi or bare-schema inclusion (no attribute name)
+            if self._match(TokenType.DELTA):
+                raise ParserError(
+                    "pk cannot precede Delta inclusion"
+                    " (no attribute name to underline)",
+                    cur,
+                )
+            if self._match(TokenType.XI):
+                raise ParserError(
+                    "pk cannot precede Xi inclusion (no attribute name to underline)",
+                    cur,
+                )
+            # Must have an identifier (attribute name) followed eventually by ':'
+            is_ident = self._match(TokenType.IDENTIFIER)
+            is_kw_as_ident = self._is_keyword_usable_as_identifier()
+            if not is_ident and not is_kw_as_ident:
+                raise ParserError(
+                    f"pk must be followed by an attribute name,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            if not self._scan_for_colon_before_newline():
+                raise ParserError(
+                    "pk declaration requires a type annotation (name : Type)",
+                    cur,
+                )
+            pk_var_tokens: list[Token] = []
+            pk_var_tok = self._current()
+            pk_var_tokens.append(pk_var_tok)
+            self._advance()
+            while self._match(TokenType.COMMA):
+                self._advance()  # consume ','
+                if not (
+                    self._match(TokenType.IDENTIFIER)
+                    or self._is_keyword_usable_as_identifier()
+                ):
+                    raise ParserError(
+                        "Expected variable name after ','", self._current()
+                    )
+                pk_var_tokens.append(self._current())
+                self._advance()
+            if not self._match(TokenType.COLON):
+                raise ParserError("Expected ':' in pk declaration", self._current())
+            self._advance()  # consume ':'
+            pk_type_expr = self._parse_expr()
+            return [
+                Declaration(
+                    variable=vt.value,
+                    type_expr=pk_type_expr,
+                    is_primary_key=True,
+                    line=pk_tok.line,
+                    column=pk_tok.column,
+                )
+                for vt in pk_var_tokens
+            ]
 
         # --- Delta / Xi decorated inclusion ---
         if self._match(TokenType.DELTA, TokenType.XI):
@@ -3847,7 +3904,7 @@ class Parser:
         return (src, dst)
 
     def _parse_assignment(self) -> Assignment:
-        """Parse Name := expression (top-level relvar assignment)."""
+        """Parse Name := expression (top-level assignment)."""
         target_tok = self._advance()  # consume IDENTIFIER (target name)
         assign_tok = self._advance()  # consume ':='
         if self._at_end() or self._match(TokenType.NEWLINE):
@@ -4164,69 +4221,6 @@ class Parser:
             line=lbag_token.line,
             column=lbag_token.column,
         )
-
-    def _parse_relvars(self) -> Relvars:
-        """Parse relvar declaration: relvars R, S, T.
-
-        Relvar names are plain identifiers (no decoration, no generic params).
-        The declaration is consumed but emits nothing visible in the PDF —
-        it populates the generator's relvar set so that identifiers matching
-        a declared name are rendered upright (\\mathrm{Name}).
-
-        Raises:
-            ParserError: if no names follow, if a name is not an IDENTIFIER,
-                         or if a comma is followed immediately by another comma
-                         (trailing or double comma).
-        """
-        start_token = self._advance()  # Consume 'relvars'
-
-        names: list[str] = []
-        expect_name = True  # True when we expect a name (not a comma)
-
-        while not self._at_end() and not self._match(TokenType.NEWLINE):
-            if self._match(TokenType.COMMA):
-                if expect_name:
-                    # Comma where a name was expected: trailing or double comma
-                    raise ParserError(
-                        "Expected relvar name after comma in relvars declaration",
-                        self._current(),
-                    )
-                self._advance()  # Skip comma
-                expect_name = True
-                continue
-
-            if not self._match(TokenType.IDENTIFIER):
-                raise ParserError(
-                    f"Expected relvar name in relvars declaration, "
-                    f"got {self._current().type.name} ({self._current().value!r})",
-                    self._current(),
-                )
-
-            if not expect_name:
-                # Name follows name with no comma between
-                raise ParserError(
-                    "Expected comma between relvar names in relvars declaration",
-                    self._current(),
-                )
-
-            names.append(self._current().value)
-            self._advance()
-            expect_name = False
-
-        if not names:
-            raise ParserError(
-                "Expected at least one relvar name in relvars declaration",
-                self._current(),
-            )
-
-        # Trailing comma: consumed a comma but hit NEWLINE/EOF before the next name
-        if expect_name and names:
-            raise ParserError(
-                "Expected relvar name after trailing comma in relvars declaration",
-                self._current(),
-            )
-
-        return Relvars(names=names, line=start_token.line, column=start_token.column)
 
     def _parse_given_type(self) -> GivenType:
         """Parse given type: given A, B, C"""
@@ -4850,6 +4844,14 @@ class Parser:
                 self._advance()  # Declaration separator
                 continue
 
+            # pk has no relation name in inline schema text — reject with clear message.
+            if self._match(TokenType.PK):
+                raise ParserError(
+                    "Primary-key annotation requires a named schema;"
+                    " inline schema text is anonymous",
+                    self._current(),
+                )
+
             if (
                 self._match(TokenType.DELTA, TokenType.XI)
                 or self._match(TokenType.IDENTIFIER)
@@ -5032,7 +5034,15 @@ class Parser:
                 self._advance()
                 continue
 
-            # Three forms: Delta/Xi inclusion, bare inclusion, typed declaration.
+            # pk is only valid in schema bodies — reject it here with a clear message.
+            if self._match(TokenType.PK):
+                raise ParserError(
+                    "Primary-key annotation is only valid in schema bodies,"
+                    " not inside axdef",
+                    self._current(),
+                )
+
+            # Three forms: Delta/Xi inclusion, bare inclusion, typed decl.
             if (
                 self._match(TokenType.DELTA, TokenType.XI)
                 or self._match(TokenType.IDENTIFIER)
@@ -5101,6 +5111,14 @@ class Parser:
             if self._match(TokenType.NEWLINE):
                 self._advance()
                 continue
+
+            # pk is only valid in schema bodies — reject it here with a clear message.
+            if self._match(TokenType.PK):
+                raise ParserError(
+                    "Primary-key annotation is only valid in schema bodies,"
+                    " not inside gendef",
+                    self._current(),
+                )
 
             # Three forms: Delta/Xi inclusion, bare inclusion, typed declaration.
             if (
@@ -5277,9 +5295,19 @@ class Parser:
                 self._advance()
                 continue
 
-            # Three forms: Delta/Xi inclusion, bare inclusion, typed declaration.
+            # pk requires a named schema — reject it in anonymous schemas.
+            if self._match(TokenType.PK) and name is None:
+                raise ParserError(
+                    "Primary-key annotation requires a named schema;"
+                    " anonymous schemas have no relation name for PK notation",
+                    self._current(),
+                )
+
+            # Four forms: pk prefix (named schemas only), Delta/Xi inclusion,
+            # bare inclusion, typed declaration.
             if (
-                self._match(TokenType.DELTA, TokenType.XI)
+                self._match(TokenType.PK)
+                or self._match(TokenType.DELTA, TokenType.XI)
                 or self._match(TokenType.IDENTIFIER)
                 or self._is_keyword_usable_as_identifier()
             ):

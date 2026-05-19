@@ -5,7 +5,21 @@
 TITLE: Z Binding Calculus
 AUTHOR: txt2tex example
 
-relvars Ship, Class
+given ShipName, ClassName
+
+schema Ship
+  name : ShipName
+  class : ClassName
+  launched : N
+end
+
+schema Class
+  class : ClassName
+  country : N
+  bore : N
+  displacement : N
+  numGuns : N
+end
 
 === Atomic Binding ===
 
@@ -27,7 +41,7 @@ relvars Ship, Class
 
 === Multi-Variable Comprehension with Binding (Q2(d) style) ===
 
-// Cross two relvars and project into a binding.
+// Cross two schemas and project into a binding.
 
 { s : Ship; c : Class | s.class = c.class .
   {| name == s.name, displacement == c.displacement, numGuns == c.numGuns |}
