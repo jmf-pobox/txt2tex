@@ -72,6 +72,19 @@ BIBLIOGRAPHY: f.bib  & BibTeX file \\
 {[cite key]}         & \verb|\citep{key}| \\
 \end{tabularx}
 
+% ── IDENTIFIERS ─────────────────────────────────
+\section{Identifier Decoration}
+
+\begin{tabularx}{\columnwidth}{LR}
+count'               & $count'$ (after-state) \\
+in?                  & $in?$ (input) \\
+out!                 & $out!$ (output) \\
+x?'                  & $x?'$ (runs may combine) \\
+'sunk'               & $\mbox{`sunk'}$ (string literal) \\
+\end{tabularx}
+
+{\footnotesize Decoration attaches to any identifier. Reserved words (\texttt{theta}, \texttt{defs}, \texttt{hide}, \texttt{project}, \texttt{Delta}, \texttt{Xi}) cannot be decorated.}
+
 % ── LOGIC ───────────────────────────────────────
 \section{Logic}
 
@@ -165,6 +178,37 @@ name == expr         & Abbreviation \\
 \texttt{where}       & Separator \\
 \quad predicates     & Constraining predicates \\
 \texttt{end}         & Close the block \\
+\end{tabularx}
+
+% ── SCHEMA INCLUSION & CALCULUS ─────────────────
+\section{Schema Inclusion \& Calculus}
+
+\begin{tabularx}{\columnwidth}{LR}
+Delta Counter        & $\Delta Counter$ (before/after) \\
+Xi Card              & $\Xi Card$ (read-only) \\
+SName                & bare inclusion \\
+theta S              & $\theta S$ (state binding) \\
+theta S'             & $\theta S'$ (after-state) \\
+\end{tabularx}
+
+\smallskip
+\begin{tabularx}{\columnwidth}{LR}
+\multicolumn{2}{l}{\texttt{Name defs RHS} — horizontal definition:}\\
+Name defs Schema     & $Name \defs Schema$ \\
+N defs Delta C       & $N \defs \Delta C$ \\
+N defs [d : T | P]  & inline schema text \\
+N[X] defs G[X]      & generic form \\
+\end{tabularx}
+
+\smallskip
+\begin{tabularx}{\columnwidth}{LR}
+\multicolumn{2}{l}{\texttt{defs} RHS operators (schema calculus):}\\
+S[old/new]           & rename component \\
+S[a/b, c/d]         & multiple renames \\
+S ; T                & $S \semi T$ (composition) \\
+S >> T               & $S \pipe T$ (piping) \\
+S hide (x, y)        & $S \hide (x,y)$ \\
+S project T          & $S \project T$ \\
 \end{tabularx}
 
 % ── PROOF SYNTAX REFERENCE ──────────────────────
@@ -378,6 +422,153 @@ $\begin{array}{l@{\hspace{1.5em}}r}
 \end{exget}
 
 {\scriptsize \kw{EQUAL:} = expression chains ($=$). Use for $\mathbb{N}$/sets/sequences.}
+
+\end{multicols}
+
+%% ── PAGE 3: RELATIONAL DATABASES ──────────────
+\newpage
+
+\begin{center}
+{\LARGE\bfseries txt2tex Relational Databases --- By Example}\\[2pt]
+{\small DAT course notation: primary keys, relational algebra, bindings, GROUP/UNGROUP.}
+\end{center}
+
+\vspace{-2pt}
+
+\begin{multicols}{3}
+\raggedcolumns
+
+% ── PRIMARY KEYS ────────────────────────────────
+\section{Primary Keys}
+
+{\scriptsize Mark a primary-key attribute with \kw{pk} in a named schema body.
+The PK annotation sits \emph{outside} the Z box so fuzz can type-check the schema cleanly.}
+
+\begin{exwrite}
+\begin{verbatim}
+schema Class
+  pk class : ClassName
+  country  : CountryName
+  bore     : N
+end
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+\begin{schema}{Class}
+class : ClassName \\
+country : CountryName \\
+bore : \nat
+\end{schema}\\[2pt]
+\noindent$\mathrm{PK}(\mathrm{Class}) = \{class\}$
+\end{center}
+\end{exget}
+
+{\scriptsize Composite: two \kw{pk} lines $\Rightarrow$ $\mathrm{PK}(S)=\{a,b\}$.
+Comma-separated names on one \kw{pk} line also work.
+\kw{pk} is rejected in \texttt{axdef} / \texttt{gendef} / inline schema text.}
+
+% ── RELATIONAL ALGEBRA ──────────────────────────
+\section{Relational Algebra}
+
+\begin{tabularx}{\columnwidth}{LR}
+sigma[p](R)          & $\sigma_{p}(R)$ — restrict \\
+pi[A,B](R)           & $\pi_{A,B}(R)$ — project \\
+rho[A as B](R)       & $\rho_{A \to B}(R)$ — rename \\
+R bowtie S           & $R \bowtie S$ — natural join \\
+R bowtie [p] S       & $R \bowtie_{p} S$ — theta-join \\
+R div S              & $R \div S$ — division \\
+T := R               & $T := R$ (zed block) \\
+\end{tabularx}
+
+\smallskip
+{\footnotesize \texttt{sigma}/\texttt{pi}/\texttt{rho} bind at atom level (prefix + args). \texttt{bowtie} and \texttt{div} are infix at cross-product precedence.}
+
+\begin{exwrite}
+\begin{verbatim}
+BigGuns := pi[class,country](
+  sigma[bore >= 16](Class))
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+\begin{zed}
+BigGuns := \pi_{class,country}(\sigma_{bore \geq 16}(Class))
+\end{zed}
+\end{center}
+\end{exget}
+
+% ── BINDINGS ────────────────────────────────────
+\section{Z Bindings \& Set Comprehension}
+
+{\scriptsize Z RM §3.7 binding brackets construct labelled tuples.}
+
+\begin{tabularx}{\columnwidth}{LR}
+\{| name == e |\}    & $\lblot name == e \rblot$ \\
+\{| a == e, b == f |\} & multiple components \\
+\{| |\}              & empty binding \\
+\end{tabularx}
+
+\smallskip
+{\scriptsize Multi-typed comprehension with binding:}
+
+\begin{exwrite}
+\begin{verbatim}
+{ s : Ship; c : Class |
+  s.class = c.class .
+  {| name == s.name |} }
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+$\{ s : Ship; c : Class \mid s.class = c.class \bullet \lblot name == s.name \rblot \}$
+\end{center}
+\end{exget}
+
+{\scriptsize Use \texttt{;} to separate variable-type pairs inside \texttt{\{ \}}. Binding components are \textbf{comma}-separated (Z RM §3.7).}
+
+% ── GROUP / UNGROUP ──────────────────────────────
+\section{GROUP \& UNGROUP}
+
+{\scriptsize Date's nested-relation operators.}
+
+\begin{tabularx}{\columnwidth}{LR}
+R group (\{A,B\} as alias) & $R\ \mathop{\mathrm{GROUP}} (\{A,B\}\ \mathop{\mathrm{AS}}\ alias)$ \\
+R ungroup alias    & $R\ \mathop{\mathrm{UNGROUP}}\ alias$ \\
+\end{tabularx}
+
+\begin{exwrite}
+\begin{verbatim}
+Members group ({name,email} as contact)
+Members ungroup contact
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+$Members\ \mathop{\mathrm{GROUP}}\ (\{name,email\}\ \mathop{\mathrm{AS}}\ contact)$\\[3pt]
+$Members\ \mathop{\mathrm{UNGROUP}}\ contact$
+\end{center}
+\end{exget}
+
+{\scriptsize \texttt{group}/\texttt{ungroup} use \texttt{\textbackslash mathop\{\textbackslash mathrm\{...\}\}} — kernel LaTeX, no extra package.}
+
+% ── QUICK REFERENCE ─────────────────────────────
+\section{DAT Quick Reference}
+
+\begin{tabularx}{\columnwidth}{LR}
+pk a : T             & primary key in schema \\
+pk a, b : T          & composite pk \\
+sigma[p](R)          & restrict \\
+pi[A](R)             & project \\
+rho[A as B](R)       & rename attr \\
+R bowtie S           & natural join \\
+R div S              & division \\
+T := expr            & algebra assignment \\
+\{| a == e |\}       & binding bracket \\
+\{S; C | P . E\}    & multi-typed set comp \\
+R group (\{A\} as x) & group attrs \\
+R ungroup x          & ungroup attr \\
+\end{tabularx}
 
 \end{multicols}
 
