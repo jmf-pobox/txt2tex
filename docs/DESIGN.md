@@ -1044,6 +1044,61 @@ generator = LaTeXGenerator(
 )
 ```
 
+### ADR: Q2(d) parser-bug fix — multi-decl + conjunction-predicate Z comprehensions
+
+**Status**: SETTLED 2026-05-19.
+
+**Context**: The parser's `_parse_postfix` method contained a 45-line heuristic (`is_bullet_indicator`) intended to stop field-projection consumption when a PERIOD token appeared to be a quantifier/comprehension bullet separator. In practice the heuristic conflated two distinct PERIOD roles:
+
+- `s.x` — field projection, should be consumed by `_parse_postfix`
+- `{ s : Ship | P . E }` — bullet separator, belongs to the outer comprehension/quantifier parser
+
+The heuristic fired inside comprehension and quantifier bodies, blocking legitimate `s.field` projections in expression position. This caused 13 tests in `tests/test_q2d_calculus_predicate_chain.py` to fail. Two follow-on issues were also present: chained `TupleProjection` inside `mu` expressions greedily consumed the bullet PERIOD, and the RBRACE-separator heuristic in `_parse_postfix` swallowed RHS projections when parsing comparison expressions.
+
+Separately, `_parse_lambda` lacked SEMICOLON and PIPE branches, so multi-declaration lambda expressions (`lambda s : Ship; c : Class | P . E`) raised a parse error.
+
+**Decision**:
+
+1. **Delete `is_bullet_indicator`** (parser.py lines 3637–3681). The `safe_followers` set at `_parse_postfix` (line 3722) already contains AND, OR, IN, IMPLIES, RBRACE, PIPE, and other tokens that legitimately follow a field-projection chain. Removing the heuristic lets `safe_followers` handle termination correctly. Bullet detection is the responsibility of the outer comprehension/quantifier parsers, not `_parse_postfix`.
+
+2. **Add SEMICOLON/PIPE branches to `_parse_lambda`**. Multi-decl lambda now delegates to `_parse_quantifier_continuation`, producing nested `Quantifier(quantifier="lambda")` AST nodes. Single-decl `lambda x : T . body` continues to produce a `Lambda` node unchanged.
+
+3. **Two residual fixes**: stop chained `TupleProjection` inside comprehension bodies; add `_in_comparison_rhs` flag to gate the RBRACE-separator heuristic so RHS projections are not swallowed.
+
+4. **`_parse_quantifier_continuation` latent fix**: set `_parsing_schema_text` around domain parsing so multi-decl quantifiers parse domain types correctly. `latex_gen.py` QUANTIFIERS dict gains `"lambda": r"\lambda"`.
+
+**AST shape for multi-decl lambda**: nested `Quantifier(quantifier="lambda")` nodes, not a single `Lambda` with a multi-decl SchemaText. Z RM §3.12 defines `lambda S • E` as syntactic sugar for `{ S • (\theta S, E) }`, so the nesting is a denormalized but semantically equivalent representation. This parallels how `forall`, `exists`, and `mu` handle multi-decl forms (nested `Quantifier` nodes), avoids inventing a new AST shape for a single edge case, and satisfies the type-checker boundary: fuzz sees LaTeX, not the AST.
+
+**Z-semantic neutrality**: no Z RM construct's parse result changes. Only parser internals change. Confirmed with jms: `safe_followers` termination is an implementation detail of the descent parser and does not affect the accepted language.
+
+**Rejected alternatives**:
+
+- *(a) Keep heuristic, add context flag*: adds parser state and couples `_parse_postfix` to comprehension/quantifier context — exactly the design error the heuristic introduced. Does not fix the root cause (bullet detection belongs at the outer parser).
+- *(b) Remove PERIOD/EOF from `safe_followers` globally*: would break chained projections outside comprehension bodies (e.g., `s.name.length` at the top level of a `zed` block). Too broad.
+
+**Open question for jfreeman — LaTeX form of multi-decl lambda**:
+
+The current generator emits nested lambdas:
+
+```latex
+\lambda s : Ship @ \lambda c : Class | P @ E
+```
+
+The Z RM canonical form (Spivey, §3.12) is a single lambda with a semicolon-separated SchemaText:
+
+```latex
+\lambda s : Ship; c : Class | P @ E
+```
+
+Both type-check in fuzz. The current code follows the same `_generate_quantifier` path used by multi-decl `forall`/`exists`, which is correct for those quantifiers. A specialisation of `_generate_quantifier` for `node.quantifier == "lambda"` could emit the Spivey form. This is not a blocker — fuzz accepts both — but the Spivey form is what Z RM readers expect to see. Decision deferred to jfreeman.
+
+**Consequences**:
+
+- All 13 tests in `tests/test_q2d_calculus_predicate_chain.py` pass.
+- DAT relational-calculus expressions (multi-typed Z comprehensions with conjunction predicates over tuple projections, multi-decl `forall`/`exists`/`mu`/`lambda`) can be written natively without dropping into raw LaTeX.
+- The `is_bullet_indicator` deletion removes 45 lines and one category of parser state. `_parse_postfix` is now simpler and more regular.
+- Known limitation: multi-decl lambda without a pipe-predicate (e.g., `lambda s : Ship; c : Class . (s, c)`) is not yet supported. See `MISSING_FEATURES.md`.
+
 ## Supported Features
 
 txt2tex is feature-complete for typical Z specifications. See [MISSING_FEATURES.md](guides/MISSING_FEATURES.md) for advanced operators not yet implemented.

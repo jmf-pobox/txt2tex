@@ -61,6 +61,7 @@
 TEXT: paragraph       & Prose block (smart formula detection) \\
 LATEX: \textbackslash cmd & Raw \LaTeX\ passthrough \\
 PAGEBREAK:           & Page break \\
+LINEBREAK:           & Vertical gap (\verb|\medskip|) — between blocks, no page break \\
 \end{tabularx}
 
 \smallskip
@@ -487,8 +488,7 @@ R div S              & $R \div S$ — division \\
 {\scriptsize\textbf{Naming a query.} Use \texttt{Name == expr} (Z abbreviation) for both pure-Z and DAT-bearing right-hand sides. txt2tex inspects the RHS: when it contains a DAT construct (algebra, binding, GROUP/UNGROUP), the abbreviation emits as \texttt{\textbackslash noindent\$\ldots\$} outside any Z block; otherwise it emits inside a \texttt{zed} block.}
 
 \smallskip
-{\scriptsize\textbf{Fuzz note:} algebra expressions emit \emph{outside} any Z environment, so fuzz silently skips them — your schemas and axdefs in the same document still type-check cleanly. Do \emph{not} wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks; fuzz parses block contents strictly as Z and will reject the algebra subscripts.}
-
+{\scriptsize\textbf{Fuzz note:} algebra expressions emit \emph{outside} any Z environment, so fuzz silently skips them — your schemas and axdefs in the same document still type-check cleanly. Do \emph{not} wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks; fuzz parses block contents strictly as Z and will reject the algebra subscripts. \textbf{Multi-line:} infix algebra operators wrap across lines (bare newline or \texttt{\textbackslash}). Break \emph{before} \kw{setminus} — \texttt{\textbackslash} is its token.}
 \begin{exwrite}
 \begin{verbatim}
 BigGuns == pi[class,country](
@@ -557,11 +557,6 @@ $Members\ \mathop{\mathrm{UNGROUP}}\ contact$
 \end{exget}
 
 {\scriptsize\textbf{Fuzz note:} GROUP/UNGROUP emit \emph{outside} any Z environment, so fuzz silently skips them. Do \emph{not} place these inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks — the \texttt{\textbackslash mathop} wrapping and Date braces sit outside Z's grammar and fuzz rejects them in block contents.}
-
-\begin{exget}
-\begin{center}
-\end{center}
-\end{exget}
 
 {\scriptsize \texttt{group}/\texttt{ungroup} use \texttt{\textbackslash mathop\{\textbackslash mathrm\{...\}\}} — kernel LaTeX, no extra package.}
 

@@ -43,6 +43,7 @@ Component renaming syntax: `State[x'/x, y'/y]`
 
 1. **Superscript `^`**: Only for relation iteration (`R^n`), not arithmetic (`x^2`)
 2. **Tuple projection**: Only named fields (`x.field`), not numeric (`.1`, `.2`)
+3. **Multi-decl lambda without pipe-predicate**: `lambda s : Ship; c : Class . (s, c)` is not accepted. Z RM §3.12 SchemaText predicate is optional, but `_parse_quantifier_continuation` (reused for multi-decl lambda) requires a PIPE token before the body. Single-decl lambda (`lambda x : T . body`) and multi-decl lambda with a predicate (`lambda s : Ship; c : Class | P . E`) both work. No test forces this form yet; low priority.
 
 ---
 

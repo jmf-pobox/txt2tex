@@ -187,6 +187,7 @@ class LaTeXGenerator:
         "exists": r"\exists",
         "exists1": r"\exists_1",  # Unique existence quantifier
         "mu": r"\mu",  # Definite description (mu-operator)
+        "lambda": r"\lambda",  # Multi-decl lambda (Quantifier node form)
     }
 
     # Operator precedence (lower number = lower precedence)
@@ -1286,6 +1287,173 @@ class LaTeXGenerator:
             return r"\quad"  # Fallback for non-quantifier contexts
         return f"\\t{self._quantifier_depth}"
 
+    def _collect_lambda_chain(
+        self, node: Quantifier
+    ) -> tuple[list[tuple[list[str], str]], Expr, Expr | None]:
+        """Walk a nested lambda Quantifier chain and collect all bindings.
+
+        Returns:
+            A triple (bindings, predicate, expression) where:
+            - bindings: list of (variables, domain_latex) pairs, one per level
+            - predicate: the innermost body (predicate before @ separator)
+            - expression: the expression after @, or None if absent
+
+        The innermost Quantifier("lambda") node is the one whose body is NOT
+        itself a Quantifier("lambda"); it carries the predicate and expression.
+        """
+        bindings: list[tuple[list[str], str]] = []
+        current: Quantifier = node
+        while True:
+            domain_latex = (
+                self.generate_expr(current.domain, parent=current)
+                if current.domain is not None
+                else ""
+            )
+            bindings.append((list(current.variables), domain_latex))
+            inner = current.body
+            if isinstance(inner, Quantifier) and inner.quantifier == "lambda":
+                current = inner
+            else:
+                # Base case: body is the predicate, expression is after @
+                return bindings, current.body, current.expression
+
+    def _generate_lambda_quantifier(
+        self, node: Quantifier, parent: Expr | None = None
+    ) -> str:
+        """Emit Spivey-canonical LaTeX for multi-decl lambda Quantifier nodes.
+
+        Collects the full binding chain into a single SchemaText and emits:
+            \\lambda v0, ... : D0; v1, ... : D1; ... | predicate @ expression
+
+        Wrapped in parentheses in fuzz mode when appearing inside an expression.
+        """
+        bindings, predicate, expression = self._collect_lambda_chain(node)
+
+        # Build the schema text: levels joined by "; "
+        decl_parts: list[str] = []
+        colon = self._get_colon_separator()
+        for variables, domain_latex in bindings:
+            vars_str = ", ".join(variables)
+            decl_parts.append(f"{vars_str} {colon} {domain_latex}")
+        schema_text = "; ".join(decl_parts)
+
+        parts = [r"\lambda", schema_text]
+
+        # Predicate (before @) — always present in the multi-decl form
+        pipe_sep = self._get_mid_separator()
+        pred_latex = self.generate_expr(predicate, parent=node)
+        parts.append(f"{pipe_sep} {pred_latex}")
+
+        # Expression (after @)
+        if expression is not None:
+            bullet_sep = self._get_bullet_separator()
+            expr_latex = self.generate_expr(expression, parent=node)
+            parts.append(f"{bullet_sep} {expr_latex}")
+
+        result = " ".join(parts)
+
+        # Fuzz requires parentheses around every lambda expression
+        if self.use_fuzz:
+            result = f"({result})"
+
+        return result
+
+    def _collect_quantifier_chain(
+        self, node: Quantifier
+    ) -> tuple[list[tuple[list[str], str]], Expr, Expr | None]:
+        """Walk a nested same-quantifier chain and collect all bindings.
+
+        Mirrors _collect_lambda_chain but works for forall/exists/exists1/mu.
+        Stops when the body is not a Quantifier with the same quantifier attribute.
+
+        Returns:
+            A triple (bindings, predicate, expression) where:
+            - bindings: list of (variables, domain_latex) pairs, one per level
+            - predicate: the innermost body (predicate before @ or | separator)
+            - expression: the expression after @, or None if absent
+        """
+        bindings: list[tuple[list[str], str]] = []
+        current: Quantifier = node
+        while True:
+            domain_latex = (
+                self.generate_expr(current.domain, parent=current)
+                if current.domain is not None
+                else ""
+            )
+            bindings.append((list(current.variables), domain_latex))
+            inner = current.body
+            if isinstance(inner, Quantifier) and inner.quantifier == node.quantifier:
+                current = inner
+            else:
+                return bindings, current.body, current.expression
+
+    def _generate_logical_quantifier(
+        self, node: Quantifier, parent: Expr | None = None
+    ) -> str:
+        """Emit Spivey-canonical LaTeX for multi-decl logical Quantifier nodes.
+
+        Collects the full binding chain into a single SchemaText and emits one
+        of two forms depending on whether a bullet (.) separator was present:
+
+        Without bullet (body is the whole predicate, no constraint):
+            \\forall v0 : D0; v1 : D1; ... @ predicate
+
+        With bullet (body is a range constraint, expression is the predicate):
+            \\forall v0 : D0; v1 : D1; ... | constraint @ expression
+
+        Mu always uses | before its predicate, per Z RM §3.8:
+            (\\mu v0 : D0; v1 : D1; ... | predicate @ expression)
+
+        Single-decl nodes never reach this method; they flow through the
+        existing _generate_quantifier body unchanged.
+        """
+        quant_latex = self.QUANTIFIERS[node.quantifier]
+        bindings, predicate, expression = self._collect_quantifier_chain(node)
+
+        colon = self._get_colon_separator()
+        decl_parts: list[str] = []
+        for variables, domain_latex in bindings:
+            vars_str = ", ".join(variables)
+            decl_parts.append(f"{vars_str} {colon} {domain_latex}")
+        schema_text = "; ".join(decl_parts)
+
+        parts = [quant_latex, schema_text]
+
+        self._quantifier_depth += 1
+        pred_latex = self.generate_expr(predicate, parent=node)
+        self._quantifier_depth -= 1
+
+        bullet_sep = self._get_bullet_separator()
+
+        if node.quantifier == "mu":
+            # Mu always uses | before the predicate, then optional @ expression.
+            pipe_sep = self._get_mid_separator()
+            parts.append(f"{pipe_sep} {pred_latex}")
+            if expression is not None:
+                expr_latex = self.generate_expr(expression, parent=node)
+                parts.append(f"{bullet_sep} {expr_latex}")
+        elif expression is not None:
+            # Constraint + body: | constraint @ body
+            pipe_sep = self._get_mid_separator()
+            parts.append(f"{pipe_sep} {pred_latex}")
+            expr_latex = self.generate_expr(expression, parent=node)
+            parts.append(f"{bullet_sep} {expr_latex}")
+        else:
+            # No constraint: @ predicate (body is the sole predicate)
+            parts.append(f"{bullet_sep} {pred_latex}")
+
+        result = " ".join(parts)
+
+        # Mu always parenthesized in fuzz mode (consistent with single-decl mu)
+        if node.quantifier == "mu" and self.use_fuzz:
+            return f"({result})"
+
+        # Smart parenthesization for other quantifiers
+        if node.quantifier != "mu" and self._quantifier_needs_parens(node, parent):
+            return f"({result})"
+
+        return result
+
     @generate_expr.register(Quantifier)
     def _generate_quantifier(self, node: Quantifier, parent: Expr | None = None) -> str:
         """Generate LaTeX for quantifier (forall, exists, exists1, mu).
@@ -1305,6 +1473,19 @@ class LaTeXGenerator:
             forall (x, y) : T | pred -> \\forall (x, y) \\colon T \\bullet pred
             mu x : N | pred . expr -> \\mu x \\colon N \\mid pred \\bullet expr
         """
+        # Multi-decl lambda: specialize to emit Spivey-canonical single-token form.
+        # Single-decl lambda uses Lambda AST node and routes through _generate_lambda.
+        if node.quantifier == "lambda":
+            return self._generate_lambda_quantifier(node, parent)
+
+        # Multi-decl chain: route to Spivey-canonical single-quantifier form.
+        # A chain exists when the body is a Quantifier with the same operator.
+        if (
+            isinstance(node.body, Quantifier)
+            and node.body.quantifier == node.quantifier
+        ):
+            return self._generate_logical_quantifier(node, parent)
+
         quant_latex = self.QUANTIFIERS.get(node.quantifier)
         if quant_latex is None:
             raise ValueError(f"Unknown quantifier: {node.quantifier}")
@@ -1448,8 +1629,8 @@ class LaTeXGenerator:
 
         result = " ".join(parts)
 
-        # Fuzz requires lambdas to be parenthesized when appearing in expressions
-        if self.use_fuzz and parent is not None:
+        # Fuzz requires parentheses around every lambda expression
+        if self.use_fuzz:
             result = f"({result})"
 
         return result
@@ -1543,7 +1724,9 @@ class LaTeXGenerator:
             return r"\{\}"
 
         # Generate comma-separated elements
-        elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
+        elements_latex = ", ".join(
+            self.generate_expr(elem, parent=node) for elem in node.elements
+        )
         return f"\\{{{elements_latex}\\}}"
 
     @generate_expr.register(Subscript)

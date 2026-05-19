@@ -1,0 +1,91 @@
+% cheatsheet-common.tex — shared fragment for course-specific cheatsheet drivers.
+% No preamble, no \begin{document}, no \begin{multicols}.
+% Drivers must define: \kw, \op, \renders, exwrite/exget environments, L and R column types.
+% This file is \input{} inside a \begin{multicols}{3} block.
+
+% ── DOCUMENT STRUCTURE ──────────────────────────
+\section{Document Structure}
+
+\begin{tabularx}{\columnwidth}{LR}
+=== Title ===        & \verb|\section*{Title}| \\
+** Solution N **     & Bold heading with spacing \\
+(a) Text             & Part label \\
+TEXT: paragraph       & Prose block (smart formula detection) \\
+LATEX: \textbackslash cmd & Raw \LaTeX\ passthrough \\
+PAGEBREAK:           & Page break \\
+LINEBREAK:           & Vertical gap (\verb|\medskip|) — between blocks, no page break \\
+\end{tabularx}
+
+\smallskip
+\begin{tabularx}{\columnwidth}{LR}
+TITLE: ...           & Document title \\
+AUTHOR: ...          & Author name \\
+DATE: ...            & Date string \\
+BIBLIOGRAPHY: f.bib  & BibTeX file \\
+{[cite key]}         & \verb|\citep{key}| \\
+\end{tabularx}
+
+% ── LOGIC ───────────────────────────────────────
+\section{Logic}
+
+\begin{tabularx}{\columnwidth}{LR}
+p land q             & $p \land q$ \\
+p lor q              & $p \lor q$ \\
+lnot p               & $\lnot p$ \\
+p => q               & $p \Rightarrow q$ \\
+p <=> q              & $p \Leftrightarrow q$ \\
+forall x : S | P     & $\forall x : S @ P$ \\
+exists x : S | P     & $\exists x : S @ P$ \\
+exists\_1 x : S | P  & $\exists_1 x : S @ P$ \\
+lambda x : S | E     & $\lambda x : S @ E$ \\
+mu x : S | P         & $\mu x : S @ P$ \\
+\end{tabularx}
+
+\smallskip
+{\footnotesize\textbf{Note:} Use \kw{land}, \kw{lor}, \kw{lnot}. English \texttt{and}/\texttt{or}/\texttt{not} are not supported.}
+
+% ── SETS ────────────────────────────────────────
+\section{Sets \& Types}
+
+\begin{tabularx}{\columnwidth}{LR}
+x elem S             & $x \in S$ \\
+x notin S            & $x \notin S$ \\
+A subset B           & $A \subseteq B$ \\
+A union B            & $A \cup B$ \\
+A inter B            & $A \cap B$ \\
+A setminus B         & $A \setminus B$ \\
+power S              & $\power S$ \\
+F S                  & $\finset S$ \\
+\{x : S | P\}       & Set comprehension \\
+A cross B            & $A \cross B$ \\
+N / Z / N1           & $\nat$ / $\num$ / $\nat_1$ \\
+n..m                 & $n \upto m$ \\
+\end{tabularx}
+
+% ── Z NOTATION BLOCKS ───────────────────────────
+\section{Z Notation Blocks}
+
+\begin{tabularx}{\columnwidth}{LR}
+given A, B           & Given types: $[A, B]$ \\
+T ::= a | b          & Free type \\
+name == expr         & Abbreviation \\
+\end{tabularx}
+
+\smallskip
+\begin{tabularx}{\columnwidth}{LR}
+\multicolumn{2}{l}{\texttt{axdef} / \texttt{schema Name} / \texttt{gendef [X]}}\\
+\quad declarations   & Variable declarations \\
+\texttt{where}       & Separator \\
+\quad predicates     & Constraining predicates \\
+\texttt{end}         & Close the block \\
+\end{tabularx}
+
+% ── USAGE ───────────────────────────────────────
+\section{Usage}
+
+\begin{tabularx}{\columnwidth}{LR}
+txt2tex f.txt        & $\rightarrow$ f.tex + f.pdf \\
+txt2tex f.txt {-}{-}tex-only & $\rightarrow$ f.tex only \\
+txt2tex -i           & Interactive REPL \\
+txt2tex {-}{-}check-env  & Verify dependencies \\
+\end{tabularx}

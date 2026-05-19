@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Q2(d) comprehension/quantifier parser bugs** (commits `20a6daa`, follow-on
+  residual fix, and `fix(parser): add SEMICOLON/PIPE branches to _parse_lambda`).
+  Three interrelated bugs prevented DAT relational-calculus expressions from being
+  written natively without LaTeX escape:
+
+  - The `is_bullet_indicator` heuristic (45 lines, `_parse_postfix` lines 3637–3681)
+    conflated field-projection PERIOD (`s.x`) with the comprehension bullet separator
+    (`. E` in `{ s : Ship | P . E }`). Deletion lets `safe_followers` handle
+    termination correctly; bullet detection remains the outer parser's responsibility.
+  - Two residual disambiguation bugs: chained `TupleProjection` inside `mu` greedily
+    consumed the bullet PERIOD; the RBRACE-separator heuristic swallowed RHS
+    projections in comparison expressions. Both fixed with targeted flags.
+  - `_parse_lambda` lacked SEMICOLON/PIPE branches; multi-decl lambda now delegates
+    to `_parse_quantifier_continuation`, producing nested `Quantifier(quantifier="lambda")`
+    nodes. `latex_gen.py` QUANTIFIERS dict gains `"lambda": r"\lambda"`.
+
+  All 13 tests in `tests/test_q2d_calculus_predicate_chain.py` pass. Before this fix:
+
+  ```text
+  { s : Ship; c : Class | s.name = c.name land s.displacement > 500 . (s, c) }
+  ```
+
+  raised a parser error. After:
+
+  ```text
+  \{ s : Ship; c : Class | s.name = c.name \land s.displacement > 500 \bullet (s, c) \}
+  ```
+
+  Multi-typed comprehensions, multi-decl `forall`/`exists`/`mu`/`lambda`, and
+  conjunction predicates over tuple projections all now work. See `DESIGN.md` ADR
+  for the open question on multi-decl lambda LaTeX form (nested vs Spivey canonical).
+
 ### Breaking Changes
 
 - **`:=` operator removed.** The `:=` (assignment) token type, AST node,

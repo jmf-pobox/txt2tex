@@ -1,0 +1,221 @@
+\documentclass[10pt,landscape,a4paper]{article}
+\usepackage[landscape,margin=1.2cm]{geometry}
+\usepackage{multicol}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb}
+\usepackage{fuzz}
+\usepackage{proof}
+
+% Compact spacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt plus 1pt}
+\setlength{\columnsep}{1.2cm}
+\pagestyle{empty}
+
+% Section formatting
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries\color{darkgray}}{}{0pt}{}[\vspace{-4pt}\rule{\columnwidth}{0.4pt}]
+\titlespacing{\section}{0pt}{6pt}{2pt}
+
+% Code style
+\newcommand{\kw}[1]{\texttt{\bfseries #1}}
+\newcommand{\op}[1]{\texttt{#1}}
+\newcommand{\renders}{\,$\rightarrow$\,}
+
+% Stacked example: input then rendered output (compact)
+\newenvironment{exwrite}%
+  {\par\noindent\scriptsize\textbf{You write:}\par\vspace{0pt}\scriptsize}%
+  {\vspace{1pt}}
+\newenvironment{exget}%
+  {\par\noindent\scriptsize\textbf{You get:}\par\vspace{0pt}\small}%
+  {\par\vspace{3pt}}
+
+% Table helper — left col monospace, right col roman
+\newcolumntype{L}{>{\ttfamily}l}
+\newcolumntype{R}{>{\raggedright\arraybackslash}X}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries txt2tex DAT Reference}\\[2pt]
+{\small Database Design: primary keys, relational algebra, bindings, GROUP/UNGROUP.}\\[1pt]
+{\footnotesize\color{gray}\url{https://github.com/jmf-pobox/txt2tex}}
+\end{center}
+
+\vspace{-2pt}
+
+\begin{multicols}{3}
+\raggedcolumns
+
+\input{cheatsheet-common.tex}
+
+\end{multicols}
+
+\newpage
+
+\begin{center}
+{\LARGE\bfseries txt2tex DAT --- By Example}\\[2pt]
+{\small Database Design: primary keys, relational algebra, bindings, GROUP/UNGROUP.}
+\end{center}
+
+\vspace{-2pt}
+
+\begin{multicols}{3}
+\raggedcolumns
+
+% ── PRIMARY KEYS ────────────────────────────────
+\section{Primary Keys}
+
+{\scriptsize Mark a primary-key attribute with \kw{pk} in a named schema body. Fuzz-compatible.}
+
+\begin{exwrite}
+\begin{verbatim}
+schema Class
+  pk class : ClassName
+  country  : CountryName
+  bore     : N
+end
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+\begin{schema}{Class}
+class : ClassName \\
+country : CountryName \\
+bore : \nat
+\end{schema}\\[2pt]
+\noindent$\mathrm{PK}(\mathrm{Class}) = \{class\}$
+\end{center}
+\end{exget}
+
+{\scriptsize Composite key: two \kw{pk} lines $\Rightarrow$ $\mathrm{PK}(S)=\{a,b\}$.
+Comma-separated names on one \kw{pk} line also work.
+\kw{pk} is only valid inside a named \texttt{schema}; not allowed in \texttt{axdef}, \texttt{gendef}, or inline schema text.}
+
+% ── RELATIONAL ALGEBRA ──────────────────────────
+\section{Relational Algebra}
+
+\begin{tabularx}{\columnwidth}{LR}
+sigma[p](R)          & $\mathrm{Restrict}_{p}(R)$ — restrict \\
+pi[A,B](R)           & $\mathrm{Project}\{A,B\}(R)$ — project \\
+rho[A as B](R)       & $\mathrm{Rename}_{A \to B}(R)$ — rename \\
+R bowtie S           & $R \otimes S$ — natural join \\
+R bowtie [p] S       & $\mathrm{Join}_{p}(R, S)$ — theta-join \\
+R div S              & $R \div S$ — division \\
+\end{tabularx}
+
+\smallskip
+{\scriptsize\textbf{Naming a query.} Use \texttt{Name == expr} for any right-hand side — pure Z or DAT algebra.}
+
+\smallskip
+{\scriptsize\textbf{Fuzz-compatible:} write algebra as free-standing lines in the document, not inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks. Schemas and axdefs in the same document still type-check.}
+
+\smallskip
+{\scriptsize\textbf{Long expressions:} break at any operator — bare newline or trailing \texttt{\textbackslash}. Break \emph{before} \kw{setminus}, not after.}
+
+\begin{exwrite}
+\begin{verbatim}
+BigGuns == pi[class,country](
+  sigma[bore >= 16](Class))
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+\noindent$BigGuns \defs \mathrm{Project}\{class,country\}(\mathrm{Restrict}_{bore \geq 16}(Class))$
+\end{center}
+\end{exget}
+
+% ── BINDINGS ────────────────────────────────────
+\section{Z Bindings \& Set Comprehension}
+
+{\scriptsize Z RM §3.7 binding brackets construct labelled tuples.}
+
+\begin{tabularx}{\columnwidth}{LR}
+\{| name == e |\}    & $\lblot name == e \rblot$ \\
+\{| a == e, b == f |\} & multiple components \\
+\{| |\}              & empty binding \\
+\end{tabularx}
+
+\smallskip
+{\scriptsize Multi-typed comprehension with binding:}
+
+\begin{exwrite}
+\begin{verbatim}
+{ s : Ship; c : Class |
+  s.class = c.class .
+  {| name == s.name |} }
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+$\{ s : Ship; c : Class \mid s.class = c.class \bullet \lblot name == s.name \rblot \}$
+\end{center}
+\end{exget}
+
+{\scriptsize Use \texttt{;} to separate variable-type pairs inside \texttt{\{ \}}. Binding components are \textbf{comma}-separated (Z RM §3.7).}
+
+\smallskip
+{\scriptsize\textbf{Fuzz-compatible:} write bindings as free-standing expressions in the document, not inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
+
+% ── GROUP / UNGROUP ──────────────────────────────
+\section{GROUP \& UNGROUP}
+
+{\scriptsize Date's nested-relation operators.}
+
+\begin{tabularx}{\columnwidth}{LR}
+R group (\{A,B\} as alias) & $R\ \mathop{\mathrm{GROUP}} (\{A,B\}\ \mathop{\mathrm{AS}}\ alias)$ \\
+R ungroup alias    & $R\ \mathop{\mathrm{UNGROUP}}\ alias$ \\
+\end{tabularx}
+
+\begin{exwrite}
+\begin{verbatim}
+Members group ({name,email} as contact)
+Members ungroup contact
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+$Members\ \mathop{\mathrm{GROUP}}\ (\{name,email\}\ \mathop{\mathrm{AS}}\ contact)$\\[3pt]
+$Members\ \mathop{\mathrm{UNGROUP}}\ contact$
+\end{center}
+\end{exget}
+
+{\scriptsize\textbf{Fuzz-compatible:} write GROUP/UNGROUP as free-standing expressions in the document, not inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
+
+% ── QUICK REFERENCE ─────────────────────────────
+\section{DAT Quick Reference}
+
+\begin{tabularx}{\columnwidth}{LR}
+pk a : T             & primary key in schema \\
+pk a, b : T          & composite pk \\
+sigma[p](R)          & restrict \\
+pi[A](R)             & project \\
+rho[A as B](R)       & rename attr \\
+R bowtie S           & natural join ($\otimes$) \\
+R div S              & division \\
+\{| a == e |\}       & binding bracket \\
+\{S; C | P . E\}    & multi-typed set comp \\
+R group (\{A\} as x) & group attrs \\
+R ungroup x          & ungroup attr \\
+\end{tabularx}
+
+% ── IDENTIFIERS ─────────────────────────────────
+\section{Identifier Decoration}
+
+\begin{tabularx}{\columnwidth}{LR}
+count'               & $count'$ (after-state) \\
+in?                  & $in?$ (input) \\
+out!                 & $out!$ (output) \\
+x?'                  & $x?'$ (runs may combine) \\
+'sunk'               & $\mbox{`sunk'}$ (string literal) \\
+\end{tabularx}
+
+{\footnotesize Decoration attaches to any identifier. Reserved words (\texttt{theta}, \texttt{defs}, \texttt{hide}, \texttt{project}, \texttt{Delta}, \texttt{Xi}) cannot be decorated.}
+
+\end{multicols}
+
+\end{document}

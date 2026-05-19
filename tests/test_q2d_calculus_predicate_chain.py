@@ -18,8 +18,6 @@ the moment the fix lands.
 
 from __future__ import annotations
 
-import pytest
-
 from txt2tex.ast_nodes import (
     BinaryOp,
     Binding,
@@ -29,6 +27,7 @@ from txt2tex.ast_nodes import (
     Quantifier,
     SetComprehension,
 )
+from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
 
@@ -332,20 +331,6 @@ class TestMultiDeclPredicateChain:
     # Test 9 — mu multi-decl with conjunction predicate and projection body
     # -----------------------------------------------------------------------
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "Bug 1 partial fix: 'c.name . s' causes the PERIOD-loop to greedily "
-            "consume the bullet '.' as a chained projection on "
-            "TupleProjection(c,'name') because PERIOD is in safe_followers. "
-            "After 'c.name' is parsed, the loop re-enters and sees "
-            "PERIOD(bullet) + IDENTIFIER('s') + EOF; EOF is in safe_followers "
-            "so '.s' is consumed as TupleProjection(TupleProjection(c,'name'),'s'). "
-            "The quantifier continuation never sees the bullet PERIOD and sets "
-            "expression=None. Requires a separate fix: remove PERIOD from "
-            "safe_followers when _in_comprehension_body=True."
-        ),
-    )
     def test_mu_multi_decl_projection_conjunction(self) -> None:
         """Definite-description (mu) with multi-decl and conjunction predicate.
 
@@ -384,17 +369,6 @@ class TestMultiDeclPredicateChain:
     # Test 10 — lambda multi-decl with conjunction predicate and projection body
     # -----------------------------------------------------------------------
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "Q2(d) bug (parser surface): lambda with multi-decl fails at parse "
-            "boundary. The semicolon in 'lambda s : Ship; c : Class' is not a "
-            "supported form — the parser raises at column 16: "
-            "ParserError: Line 1, column 16: Expected '.' after lambda binding. "
-            "The lambda quantifier path does not share the multi-decl continuation "
-            "logic used by forall/exists/mu."
-        ),
-    )
     def test_lambda_multi_decl_projection_conjunction(self) -> None:
         """Lambda with multi-decl and conjunction predicate (Z RM §3.12).
 
@@ -429,22 +403,6 @@ class TestMultiDeclPredicateChain:
     # Test 11 — comprehension with no characteristic expression (Z RM §3.9)
     # -----------------------------------------------------------------------
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "Bug 1 partial fix: in "
-            "'{ s : Ship; c : Class | ... land s.name = c.name }', "
-            "the final 's.name' is blocked by the RBRACE guard "
-            "(parser.py:3627-3632: _in_comprehension_body and "
-            "peek_ahead(2)==RBRACE). The guard fires correctly for "
-            "bullet+expression patterns, but here 's.name' is a legitimate "
-            "projection (the RHS of '= s.name'). After the guard fires, 's' "
-            "alone is returned; the comprehension parser sees '. name }' and "
-            "consumes '.' as bullet and 'name' as expression. "
-            "Requires a targeted fix to the RBRACE guard to allow projections "
-            "when the base is a comparison RHS."
-        ),
-    )
     def test_comprehension_no_characteristic_expression(self) -> None:
         """Set comprehension without characteristic expression (signature default).
 
@@ -549,3 +507,121 @@ class TestMultiDeclPredicateChain:
         assert isinstance(node.predicate.right, BinaryOp)
         assert node.predicate.right.operator == "="
         assert isinstance(node.expression, Binding)
+
+
+# ---------------------------------------------------------------------------
+# TestMultiDeclLambdaGenerator — generator-level tests (Spivey canonical form)
+# ---------------------------------------------------------------------------
+
+
+def _gen_fuzz(src: str, *, nested: bool = False) -> str:
+    """Parse src and generate LaTeX with use_fuzz=True.
+
+    When nested=True, pass a dummy parent so the parenthesization rule fires.
+    """
+    tokens = Lexer(src).tokenize()
+    ast = Parser(tokens).parse()
+    if isinstance(ast, Document):
+        node: Expr = ast.items[0]  # type: ignore[assignment]
+    else:
+        node = ast
+    gen = LaTeXGenerator(use_fuzz=True)
+    parent: Expr | None = Identifier(name="_", line=0, column=0) if nested else None
+    return gen.generate_expr(node, parent=parent)
+
+
+class TestMultiDeclLambdaGenerator:
+    """Generator tests: multi-decl lambda emits Spivey-canonical single-token form."""
+
+    # -----------------------------------------------------------------------
+    # Test 14 — two-decl lambda, top-level (no parens at top level)
+    # -----------------------------------------------------------------------
+
+    def test_two_decl_lambda_top_level(self) -> None:
+        """Two-decl lambda at top level is always wrapped in parens in fuzz mode.
+
+        Fuzz requires ``(\\lambda ...)`` unconditionally — not only when nested.
+        The ``parent is not None`` guard has been removed; wrapping is now
+        unconditional when ``use_fuzz=True``.
+
+        ``lambda s : Ship; c : Class | s.class = c.class . s.class``
+        should produce:
+        ``(\\lambda s : Ship; c : Class | s.class = c.class @ s.class)``
+        """
+        result = _gen_fuzz(
+            "lambda s : Ship; c : Class | s.class = c.class . s.class",
+            nested=False,
+        )
+        assert result == r"(\lambda s : Ship; c : Class | s.class = c.class @ s.class)"
+
+    # -----------------------------------------------------------------------
+    # Test 15 — two-decl lambda, nested (parens in fuzz mode)
+    # -----------------------------------------------------------------------
+
+    def test_two_decl_lambda_nested_parens(self) -> None:
+        """Two-decl lambda inside an expression is wrapped in parentheses.
+
+        Expected:
+        ``(\\lambda s : Ship; c : Class | s.class = c.class @ s.class)``
+        """
+        result = _gen_fuzz(
+            "lambda s : Ship; c : Class | s.class = c.class . s.class",
+            nested=True,
+        )
+        assert result == r"(\lambda s : Ship; c : Class | s.class = c.class @ s.class)"
+
+    # -----------------------------------------------------------------------
+    # Test 16 — three-decl lambda (arbitrary depth walker)
+    # -----------------------------------------------------------------------
+
+    def test_three_decl_lambda(self) -> None:
+        """Three-decl lambda: walker handles arbitrary nesting depth.
+
+        ``lambda s : Ship; c : Class; n : N | s.class = c.class . s.class``
+        should produce:
+        ``(\\lambda s : Ship; c : Class; n : \\nat | s.class = c.class @ s.class)``
+        """
+        result = _gen_fuzz(
+            "lambda s : Ship; c : Class; n : N | s.class = c.class . s.class",
+            nested=True,
+        )
+        assert (
+            result
+            == r"(\lambda s : Ship; c : Class; n : \nat | s.class = c.class @ s.class)"
+        )
+
+    # -----------------------------------------------------------------------
+    # Test 17 — conjunction predicate passes through unchanged
+    # -----------------------------------------------------------------------
+
+    def test_two_decl_lambda_conjunction_predicate(self) -> None:
+        """Conjunction predicate emitted verbatim after the single | separator.
+
+        ``lambda s : Ship; c : Class | s.class = c.class land s.name = c.name . s.name``
+        """
+        result = _gen_fuzz(
+            "lambda s : Ship; c : Class"
+            " | s.class = c.class land s.name = c.name . s.name",
+            nested=True,
+        )
+        assert "\\lambda s : Ship; c : Class |" in result
+        assert "\\land" in result
+        assert result.startswith("(")
+        assert result.endswith(")")
+
+    # -----------------------------------------------------------------------
+    # Test 18 — single-decl with pipe still works (Quantifier("lambda") path)
+    # -----------------------------------------------------------------------
+
+    def test_single_decl_lambda_with_pipe(self) -> None:
+        """Single-decl lambda with pipe: routes through _generate_lambda_quantifier.
+
+        ``lambda s : Ship | s.name = 'X' . s.name``
+        should produce single binding, no spurious nesting.
+        """
+        result = _gen_fuzz(
+            "lambda s : Ship | s.name = 'X' . s.name",
+            nested=True,
+        )
+        assert result.startswith("(\\lambda s : Ship |")
+        assert "@" in result

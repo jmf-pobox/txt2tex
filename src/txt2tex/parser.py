@@ -146,6 +146,8 @@ class Parser:
     _parsing_schema_text: bool
     _in_comprehension_body: bool
     _in_schema_expr_context: bool
+    _in_comparison_rhs: bool
+    _current_quantifier_vars: set[str]
 
     def __init__(self, tokens: list[Token]) -> None:
         """Initialize parser with token list.
@@ -168,6 +170,15 @@ class Parser:
         # Track whether we're parsing a schema-expression context (RHS of defs,
         # schema inclusion body) where ';' is schema composition, not a separator.
         self._in_schema_expr_context = False
+        # Track whether we're parsing the RHS of a comparison operator inside
+        # a comprehension body.  Used to allow field projections like 's.name'
+        # in 'c.class = s.name }' even though the RBRACE follows immediately.
+        self._in_comparison_rhs = False
+        # All variable names declared in the current comprehension/quantifier
+        # schema-text (across the entire semicolon chain).  Used by _parse_postfix
+        # to distinguish bullet `.` from named-field projection: `.IDENT` where
+        # IDENT is a declared variable cannot be a field selector (Z RM §3.16).
+        self._current_quantifier_vars: set[str] = set()
 
     def parse(self) -> Document | Expr:
         """Parse tokens and return AST.
@@ -2322,7 +2333,10 @@ class Parser:
             # Parse the rest as if it were a new quantifier of the same type
             # This will handle: y : U | body or y : U; z : V | body
             nested_quant = self._parse_quantifier_continuation(
-                quant_token.value, nested_line, nested_column
+                quant_token.value,
+                nested_line,
+                nested_column,
+                inherited_vars=set(variables),
             )
 
             # Now wrap the nested quantifier as the body of this quantifier
@@ -2360,6 +2374,11 @@ class Parser:
             self._skip_newlines()
 
         # Set flag: we're in quantifier body where . can be separator (for mu)
+        # Also record all declared variables so _parse_postfix can distinguish
+        # bullet `.` from field projection (Z RM §3.16: declared variables are
+        # not field selectors of sibling bindings in the same schema-text).
+        prev_quantifier_vars = self._current_quantifier_vars
+        self._current_quantifier_vars = set(variables)
         self._in_comprehension_body = True
         try:
             # Parse body (may be followed by constraint pipe)
@@ -2417,6 +2436,7 @@ class Parser:
                 expression = self._parse_iff()  # Parse the expression part
         finally:
             self._in_comprehension_body = False
+            self._current_quantifier_vars = prev_quantifier_vars
 
         return Quantifier(
             quantifier=quant_token.value,
@@ -2432,13 +2452,23 @@ class Parser:
         )
 
     def _parse_quantifier_continuation(
-        self, quantifier: str, line: int, column: int
+        self,
+        quantifier: str,
+        line: int,
+        column: int,
+        inherited_vars: set[str] | None = None,
     ) -> Expr:
         """Parse continuation of semicolon-separated quantifier bindings.
 
         Helper for parsing y : U | body or y : U; z : V | body
         after we've already parsed x : T;
+
+        inherited_vars accumulates all variables declared in earlier bindings of
+        the same schema-text chain so that _parse_postfix can see the full set
+        when disambiguating bullet `.` from field projection (Z RM §3.16).
         """
+        prior_vars: set[str] = inherited_vars if inherited_vars is not None else set()
+
         # Parse variable(s)
         if not self._match(TokenType.IDENTIFIER):
             raise ParserError(
@@ -2457,14 +2487,23 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Parse type expression to match main quantifier parser
-            domain = self._parse_function_type()
+            # Parse type expression to match main quantifier parser.
+            # Mirror _parse_quantifier (parser.py:2305-2309): set the flag so
+            # compound domain types like X -> Y stop at PIPE/PERIOD correctly.
+            self._parsing_schema_text = True
+            try:
+                domain = self._parse_function_type()
+            finally:
+                self._parsing_schema_text = False
 
         # Check for another semicolon (more bindings)
         if self._match(TokenType.SEMICOLON):
             self._advance()  # Consume ';'
             nested_quant = self._parse_quantifier_continuation(
-                quantifier, self._current().line, self._current().column
+                quantifier,
+                self._current().line,
+                self._current().column,
+                inherited_vars=prior_vars | set(variables),
             )
             return Quantifier(
                 quantifier=quantifier,
@@ -2486,6 +2525,10 @@ class Parser:
         self._skip_newlines()
 
         # Set flag: we're in quantifier body where . can be separator (for mu)
+        # Expose the full declared-variable set (this level + all inherited levels)
+        # so _parse_postfix can apply the Z RM §3.16 bullet disambiguation rule.
+        prev_quantifier_vars = self._current_quantifier_vars
+        self._current_quantifier_vars = prior_vars | set(variables)
         self._in_comprehension_body = True
         try:
             # Parse body (constraint part if bullet separator follows)
@@ -2516,6 +2559,7 @@ class Parser:
                 expression = self._parse_iff()
         finally:
             self._in_comprehension_body = False
+            self._current_quantifier_vars = prev_quantifier_vars
 
         return Quantifier(
             quantifier=quantifier,
@@ -2564,7 +2608,59 @@ class Parser:
         finally:
             self._parsing_schema_text = False
 
-        # Parse separator . (period)
+        # Multi-decl form: lambda s : Ship; c : Class | P . E
+        # Delegate to _parse_quantifier_continuation (same path as forall/exists/mu),
+        # which handles PIPE + optional bullet, producing nested Quantifier nodes.
+        if self._match(TokenType.SEMICOLON):
+            self._advance()  # Consume ';'
+            nested_quant = self._parse_quantifier_continuation(
+                "lambda",
+                self._current().line,
+                self._current().column,
+                inherited_vars=set(variables),
+            )
+            return Quantifier(
+                quantifier="lambda",
+                variables=variables,
+                domain=domain,
+                body=nested_quant,
+                expression=None,
+                tuple_pattern=None,
+                line=lambda_token.line,
+                column=lambda_token.column,
+            )
+
+        # Single-decl form with predicate pipe: lambda s : Ship | P . E
+        # Produces Quantifier(quantifier="lambda") consistent with multi-decl path.
+        if self._match(TokenType.PIPE):
+            self._advance()  # Consume '|'
+            self._skip_newlines()
+            prev_quantifier_vars = self._current_quantifier_vars
+            self._current_quantifier_vars = set(variables)
+            self._in_comprehension_body = True
+            try:
+                body = self._parse_iff()
+                expression: Expr | None = None
+                if self._match(TokenType.PERIOD):
+                    self._advance()  # Consume '.'
+                    self._in_comprehension_body = False
+                    expression = self._parse_iff()
+            finally:
+                self._in_comprehension_body = False
+                self._current_quantifier_vars = prev_quantifier_vars
+            return Quantifier(
+                quantifier="lambda",
+                variables=variables,
+                domain=domain,
+                body=body,
+                expression=expression,
+                tuple_pattern=None,
+                line=lambda_token.line,
+                column=lambda_token.column,
+            )
+
+        # Original PERIOD-only path: lambda x : T . body  (no pipe, no semicolon)
+        # Produces a Lambda node — single-decl abstraction.
         if not self._match(TokenType.PERIOD):
             raise ParserError("Expected '.' after lambda binding", self._current())
         self._advance()  # Consume '.'
@@ -2853,7 +2949,15 @@ class Parser:
         elif self._match(TokenType.PIPE):
             # Pipe separator: parse predicate, optionally followed by . expr
             self._advance()  # Consume '|'
-            # Set flag: we're in comprehension body where . can be separator
+            # Set flag: we're in comprehension body where . can be separator.
+            # Expose all declared variables (primary + extra) for bullet
+            # disambiguation in _parse_postfix (Z RM §3.16).
+            all_comp_vars: set[str] = set(variables)
+            if extra_declarations is not None:
+                for ev, _ in extra_declarations:
+                    all_comp_vars.add(ev)
+            prev_quantifier_vars = self._current_quantifier_vars
+            self._current_quantifier_vars = all_comp_vars
             self._in_comprehension_body = True
             try:
                 predicate = self._parse_set_predicate()
@@ -2866,6 +2970,7 @@ class Parser:
                     expression = self._parse_set_expression()
             finally:
                 self._in_comprehension_body = False
+                self._current_quantifier_vars = prev_quantifier_vars
         elif self._match(TokenType.RBRACE):
             # No separator: both predicate and expression are omitted
             # {x : T} means "all x of type T", equivalent to just T
@@ -2957,7 +3062,12 @@ class Parser:
                 # Allow newlines after comparison operator
                 self._skip_newlines()
 
-            right = self._parse_function_type()
+            prev_in_comparison_rhs = self._in_comparison_rhs
+            self._in_comparison_rhs = True
+            try:
+                right = self._parse_function_type()
+            finally:
+                self._in_comparison_rhs = prev_in_comparison_rhs
 
             # Check for guarded cases after = operator (pattern matching)
             # Syntax: expr1 = expr2 \n if cond2 \n expr3 \n if cond3 ...
@@ -3579,6 +3689,13 @@ class Parser:
                             # Ambiguous context - don't parse as projection
                             break
 
+                    # In a comprehension/quantifier body, `.NUMBER` is not a valid
+                    # tuple-projection: the base (last declared variable) has a
+                    # basic type (N, Z, etc.), so §3.16 projection is ill-typed.
+                    # The period must be the bullet separator.
+                    if self._in_comprehension_body:
+                        break
+
                     # Safe to parse as numeric projection
                     period_token = self._advance()  # Consume '.'
                     number_token = self._advance()  # Consume number
@@ -3624,11 +3741,39 @@ class Parser:
                     # In comprehension body, .identifier} likely means separator + expr
                     # Example: {z : Z | z = z_0 * z_0 * z_0 . z}
                     #          period is separator, not projection
+                    # Exception: allow the projection when we are parsing the RHS
+                    # of a comparison operator (e.g. 'c.class = s.name }'), where
+                    # the field is genuinely part of the predicate, not a body expr.
                     if (
                         self._in_comprehension_body
                         and token_after_id.type == TokenType.RBRACE
+                        and not self._in_comparison_rhs
                     ):
                         # Likely expression separator, not projection
+                        break
+
+                    # In a comprehension body, do not allow chaining a second
+                    # projection onto an existing TupleProjection.  The pattern
+                    # 'base.field . bullet' (where base is already a projection)
+                    # is always a bullet separator followed by a simple expression,
+                    # never a doubly-chained projection.  Doubly-chained projections
+                    # in comprehension bodies require explicit parentheses.
+                    if self._in_comprehension_body and isinstance(
+                        base, TupleProjection
+                    ):
+                        break
+
+                    # Z RM §3.16: field selection requires the LHS to have a
+                    # schema (binding) type.  If the identifier after `.` is itself
+                    # a declared variable in the current schema-text, the LHS
+                    # cannot be a schema-typed expression of that variable, so the
+                    # period must be the bullet separator.
+                    # Example: `mu c : N; d : N | c = d . c + d` — `.c` has `c`
+                    # in `_current_quantifier_vars`, so the period is the bullet.
+                    if (
+                        self._in_comprehension_body
+                        and next_token.value in self._current_quantifier_vars
+                    ):
                         break
 
                     # Only parse if followed by safe token
