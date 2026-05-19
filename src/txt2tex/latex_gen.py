@@ -4724,9 +4724,10 @@ class LaTeXGenerator:
                     rf"\noindent$\mathrm{{PK}}(\mathrm{{{schema_name}}})"
                     rf" = \{{{attrs_str}\}}$"
                 )
-                # Blank line after the PK annotation so the next paragraph
-                # (often another schema) renders with visible breathing room.
+                # Blank line + \smallskip so the next paragraph (often another
+                # schema) gets visible breathing room from the PK annotation.
                 lines.append("")
+                lines.append(r"\smallskip")
 
         lines.append("")
 
