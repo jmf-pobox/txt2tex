@@ -1,0 +1,140 @@
+505c505
+< \Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is not free $\in$ y $\mapsto$ z $\in$ T}] \\
+---
+> \Leftrightarrow \exists y : Y; x : X @ w \mapsto x \in R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is not free $\in$ y $\mapsto$ z $\in$ T}] \\
+592c592
+<   \forall a : X @ \forall b : Y @ fst(a, b) = a
+---
+>   \forall a : X; b : Y @ fst(a, b) = a
+598c598
+<   \forall a : X @ \forall b : Y @ snd(a, b) = b
+---
+>   \forall a : X; b : Y @ snd(a, b) = b
+609,610c609
+< \forall s : \dom podcast\_episodes @ \forall e : podcast\_episodes(s) @ \\
+< \t2 e \in podcast\_episodes(s) \iff (s, e) \in \dom episode\_info \\
+---
+> \forall s : \dom podcast\_episodes; e : podcast\_episodes(s) @ e \in podcast\_episodes(s) \iff (s, e) \in \dom episode\_info \\
+612,615c611,613
+< \forall s : podcasts @ \forall e : EpisodeId @ \forall p : PeopleId @ p \in fst(episode\_info(s, e)) \iff p \in podcast\_info(s) \\
+< \forall s : podcasts @ \forall e_1, e_2 : EpisodeId @ \\
+< \t2 (((s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom episode\_info) \implies \\
+< \t2 ((e_1 < e_2) \implies (snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))))
+---
+> \forall s : podcasts; e : EpisodeId; p : PeopleId @ p \in fst(episode\_info(s, e)) \iff p \in podcast\_info(s) \\
+> \forall s : podcasts; e_1, e_2 : EpisodeId @ (((s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom episode\_info) \implies \\
+> \t1 ((e_1 < e_2) \implies (snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))))
+653,654c651
+< \forall s : \dom podcast\_episodes @ \forall e : podcast\_episodes(s) @ \\
+< \t2 e \in podcast\_episodes(s) \iff (s, e) \in \dom episode\_info
+---
+> \forall s : \dom podcast\_episodes; e : podcast\_episodes(s) @ e \in podcast\_episodes(s) \iff (s, e) \in \dom episode\_info
+691,692c688,689
+< \forall s : podcasts @ \forall e : EpisodeId @ \forall p : PeopleId @ p \in fst(episode\_info(s, e)) \iff \\
+< \t3 p \in podcast\_info(s)
+---
+> \forall s : podcasts; e : EpisodeId; p : PeopleId @ p \in fst(episode\_info(s, e)) \iff \\
+> \t1 p \in podcast\_info(s)
+715,717c712,713
+< \forall s : podcasts @ \forall e_1, e_2 : EpisodeId @ \\
+< \t2 (((s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom episode\_info) \implies \\
+< \t2 ((e_1 < e_2) \implies (snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))))
+---
+> \forall s : podcasts; e_1, e_2 : EpisodeId @ (((s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom episode\_info) \implies \\
+> \t1 ((e_1 < e_2) \implies (snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))))
+812,817c808,812
+< \forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
+< \t2 e \in podcast\_episodes(s) \\
+< \forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
+< \t2 s \in my\_shows \\
+< \forall s : ShowId @ \forall e : EpisodeId @ \\
+< \t2 (s, e) \in \ran my\_episodes \iff (s, e) \in \dom status
+---
+> \forall s : ShowId; e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
+> \t1 e \in podcast\_episodes(s) \\
+> \forall s : ShowId; e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
+> \t1 s \in my\_shows \\
+> \forall s : ShowId; e : EpisodeId @ (s, e) \in \ran my\_episodes \iff (s, e) \in \dom status
+839,840c834,835
+< \forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
+< \t2 e \in podcast\_episodes(s)
+---
+> \forall s : ShowId; e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
+> \t1 e \in podcast\_episodes(s)
+863,864c858,859
+< \forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
+< \t2 s \in my\_shows
+---
+> \forall s : ShowId; e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
+> \t1 s \in my\_shows
+887,888c882
+< \forall s : ShowId @ \forall e : EpisodeId @ \\
+< \t2 (s, e) \in \ran my\_episodes \iff (s, e) \in \dom status
+---
+> \forall s : ShowId; e : EpisodeId @ (s, e) \in \ran my\_episodes \iff (s, e) \in \dom status
+919,920c913
+< \quad (\forall pl : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
+< \t2 length(\langle ple \rangle \cat pl) = snd(ple) + length(pl))
+---
+> \quad (\forall pl : PossiblePlaylist; ple : (\dom status \cross \nat) @ length(\langle ple \rangle \cat pl) = snd(ple) + length(pl))
+929,931c922,923
+< \quad (\forall pl : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
+< \t2 (fst(status(fst(ple))) = Played) \implies ((unplayed(\langle ple \rangle \cat pl) = unplayed(pl)) \land \\
+< \t2 (fst(status(fst(ple))) = NotP) \implies (unplayed(\langle ple \rangle \cat pl) = \langle ple \rangle \cat unplayed(pl))))
+---
+> \quad (\forall pl : PossiblePlaylist; ple : (\dom status \cross \nat) @ (fst(status(fst(ple))) = Played) \implies ((unplayed(\langle ple \rangle \cat pl) = unplayed(pl)) \land \\
+> \t1 (fst(status(fst(ple))) = NotP) \implies (unplayed(\langle ple \rangle \cat pl) = \langle ple \rangle \cat unplayed(pl))))
+940,942c932,933
+< \quad (\forall pl : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
+< \t2 (fst(status(fst(ple))) = NotP) \implies ((played(\langle ple \rangle \cat pl) = played(pl)) \land \\
+< \t2 (fst(status(fst(ple))) = Played) \implies (played(\langle ple \rangle \cat pl) = \langle ple \rangle \cat played(pl))))
+---
+> \quad (\forall pl : PossiblePlaylist; ple : (\dom status \cross \nat) @ (fst(status(fst(ple))) = NotP) \implies ((played(\langle ple \rangle \cat pl) = played(pl)) \land \\
+> \t1 (fst(status(fst(ple))) = Played) \implies (played(\langle ple \rangle \cat pl) = \langle ple \rangle \cat played(pl))))
+975,977c966,967
+< \forall t : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
+< \t2 length(played(t)) + length(unplayed(t)) = length(t) \implies \\
+< \t2 length(played(\langle ple \rangle \cat t)) + length(unplayed(\langle ple \rangle \cat t)) = length(\langle ple \rangle \cat t)
+---
+> \forall t : PossiblePlaylist; ple : (\dom status \cross \nat) @ length(played(t)) + length(unplayed(t)) = length(t) \implies \\
+> \t1 length(played(\langle ple \rangle \cat t)) + length(unplayed(\langle ple \rangle \cat t)) = length(\langle ple \rangle \cat t)
+1087c1077
+< \forall e : ListElement @ \forall l : List @ Q(l) \implies Q(join(e, l))
+---
+> \forall e : ListElement; l : List @ Q(l) \implies Q(join(e, l))
+1110c1100
+<   \forall a : A @ \forall b : B @ \forall c : C @ fstOfTriple(a, b, c) = a
+---
+>   \forall a : A; b : B; c : C @ fstOfTriple(a, b, c) = a
+1116c1106
+<   \forall a : A @ \forall b : B @ \forall c : C @ sndOfTriple(a, b, c) = b
+---
+>   \forall a : A; b : B; c : C @ sndOfTriple(a, b, c) = b
+1122c1112
+<   \forall a : A @ \forall b : B @ \forall c : C @ thrdOfTriple(a, b, c) = c
+---
+>   \forall a : A; b : B; c : C @ thrdOfTriple(a, b, c) = c
+1133c1123
+< \forall e : ListElement @ \forall l : List @ length\_L(join(e, l)) = fstOfTriple(snd(e)) + length\_L(l)
+---
+> \forall e : ListElement; l : List @ length\_L(join(e, l)) = fstOfTriple(snd(e)) + length\_L(l)
+1144,1147c1134,1137
+< \forall e : ListElement @ \forall l : List @ sndOfTriple(snd(e)) = NotP \implies \\
+< \t2 unplayed\_L(join(e, l)) = join(e, unplayed\_L(l)) \\
+< \forall e : ListElement @ \forall l : List @ sndOfTriple(snd(e)) = Played \implies \\
+< \t2 unplayed\_L(join(e, l)) = unplayed\_L(l)
+---
+> \forall e : ListElement; l : List @ sndOfTriple(snd(e)) = NotP \implies \\
+> \t1 unplayed\_L(join(e, l)) = join(e, unplayed\_L(l)) \\
+> \forall e : ListElement; l : List @ sndOfTriple(snd(e)) = Played \implies \\
+> \t1 unplayed\_L(join(e, l)) = unplayed\_L(l)
+1158,1161c1148,1151
+< \forall e : ListElement @ \forall l : List @ sndOfTriple(snd(e)) = Played \implies \\
+< \t2 played\_L(join(e, l)) = join(e, played\_L(l)) \\
+< \forall e : ListElement @ \forall l : List @ sndOfTriple(snd(e)) = NotP \implies \\
+< \t2 played\_L(join(e, l)) = played\_L(l)
+---
+> \forall e : ListElement; l : List @ sndOfTriple(snd(e)) = Played \implies \\
+> \t1 played\_L(join(e, l)) = join(e, played\_L(l)) \\
+> \forall e : ListElement; l : List @ sndOfTriple(snd(e)) = NotP \implies \\
+> \t1 played\_L(join(e, l)) = played\_L(l)
