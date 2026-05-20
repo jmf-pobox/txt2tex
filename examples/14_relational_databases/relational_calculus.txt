@@ -1,0 +1,82 @@
+// Relational Calculus Queries (Phase 3.2)
+// Domain: music streaming library.
+// Demonstrates: multi-decl set comprehension with conjunction predicates
+// over schema projections, Z bindings {| ... |}, multi-decl forall,
+// and queries with no characteristic expression (Z RM §3.9 default).
+
+TITLE: Relational Calculus --- Music Library
+AUTHOR: txt2tex example
+
+given TrackId, ArtistId, AlbumId, PlaylistId, GenreName, TrackTitle, AlbumTitle, ArtistName
+
+schema Track
+  tid : TrackId
+  title : TrackTitle
+  alid : AlbumId
+  duration : N
+  genre : GenreName
+end
+
+schema Artist
+  arid : ArtistId
+  name : ArtistName
+end
+
+schema Album
+  alid : AlbumId
+  title : AlbumTitle
+  arid : ArtistId
+end
+
+// Membership relation: each PlaylistId is related to zero or more TrackIds.
+
+axdef
+  member : PlaylistId <-> TrackId
+end
+
+=== Query 1: Single-relation selection ===
+
+TEXT: Retrieve the title and genre of every jazz track. This is a plain single-relation query over `Track` --- no join required.
+
+{ t : Track | t.genre = 'Jazz' .
+  {| title == t.title, genre == t.genre |} }
+
+=== Query 2: Two-relation join via comprehension ===
+
+TEXT: For each track, return its title together with the name of the artist who recorded the album it belongs to. Joins `Track` and `Album` on `AlbumId`, then `Album` and `Artist` on `ArtistId`.
+
+{ t : Track; al : Album; ar : Artist | t.alid = al.alid land
+    al.arid = ar.arid .
+  {| track == t.title, artist == ar.name |} }
+
+=== Query 3: Three-relation chain with playlist ===
+
+TEXT: List every track title that appears on at least one playlist, together with the album title. Chains `member`, `Track`, and `Album` through three declarations.
+
+{ p : PlaylistId; t : Track; al : Album | (p, t.tid) elem member land
+    t.alid = al.alid .
+  {| playlist == p, track == t.title, album == al.title |} }
+
+=== Query 4: Binding output, filtered by duration ===
+
+TEXT: Return a binding of `(track title, album title)` for every track whose duration exceeds 300 seconds. The characteristic expression is a two-component binding; no plain variable appears in the output.
+
+{ t : Track; al : Album | t.alid = al.alid land
+    t.duration > 300 .
+  {| track == t.title, album == al.title |} }
+
+=== Query 5: Multi-decl forall ===
+
+TEXT: Assert that every track on any playlist belongs to a known album. Universal quantifier over two declarations with a conjunction predicate over projections.
+
+zed
+  forall p : PlaylistId; t : Track |
+      (p, t.tid) elem member . t.alid elem { al : Album . al.alid }
+end
+
+=== Query 6: Multi-decl comprehension, no characteristic expression ===
+
+TEXT: Collect the set of `(Track, Album)` schema pairs for long tracks. When the characteristic expression is omitted Z defaults to the signature tuple (Z RM §3.9). The Q2(d) parser fix makes the dot-separator optional.
+
+{ t : Track; al : Album | t.alid = al.alid land
+    t.duration > 300 }

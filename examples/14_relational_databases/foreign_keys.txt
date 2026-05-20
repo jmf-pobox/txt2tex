@@ -1,0 +1,88 @@
+// Foreign Keys (Phase 3.2)
+// Four patterns: single-attr PK, composite PK, single-attr FK,
+// composite FK + self-referential FK.
+// Domain: kitchen-management (Recipe, Ingredient, RecipeIngredient, Employee)
+
+TITLE: Foreign Keys in Relational Schemas
+AUTHOR: txt2tex example
+
+given RecipeId, IngredientId, EmployeeId, CuisineTag, IngredientName, RecipeName, EmployeeName, PositionName
+
+// FK is the global foreign-key relation — declared once, used in all FK predicates.
+// FKEE is a separate FK relation covering the employee self-join.
+
+axdef
+  FK : (P RecipeId) <-> (P IngredientId)
+  FKEE : (P EmployeeId) <-> (P EmployeeId)
+end
+
+LINEBREAK:
+
+=== Pattern 1: Single-Attribute Primary Key ===
+
+TEXT: Each relation has exactly one pk line.  txt2tex underlines the attribute
+TEXT: in the schema box and emits a PK statement immediately after.
+
+schema Recipe
+  pk recipeId : RecipeId
+  name : RecipeName
+  cuisine : CuisineTag
+end
+
+schema Ingredient
+  pk ingredientId : IngredientId
+  name : IngredientName
+end
+
+LINEBREAK:
+
+=== Pattern 2: Composite Primary Key ===
+
+TEXT: Two pk lines in one schema body.  Both attributes are underlined;
+TEXT: txt2tex collapses them into one PK set: PK(RecipeIngredient) = {recipeId, ingredientId}.
+
+schema RecipeIngredient
+  pk recipeId : RecipeId
+  pk ingredientId : IngredientId
+end
+
+LINEBREAK:
+
+=== Pattern 3: Single-Attribute Foreign Key ===
+
+TEXT: A foreign key is a standalone Z predicate.  The binding-expression form maps
+TEXT: one source attribute to one target attribute:
+TEXT:   (SourceRelation, TargetRelation) |-> {srcAttr |-> tgtAttr} elem FK
+
+TEXT: RecipeIngredient.recipeId must match a Recipe.recipeId:
+
+(RecipeIngredient, Recipe) |-> {recipeId |-> recipeId} elem FK
+
+TEXT: RecipeIngredient.ingredientId must match an Ingredient.ingredientId:
+
+(RecipeIngredient, Ingredient) |-> {ingredientId |-> ingredientId} elem FK
+
+LINEBREAK:
+
+=== Pattern 4: Composite FK and Self-Referential FK ===
+
+TEXT: Both FK predicates for RecipeIngredient can be stated together.
+TEXT: Each is a separate standalone predicate.
+
+(RecipeIngredient, Recipe) |-> {recipeId |-> recipeId} elem FK
+
+(RecipeIngredient, Ingredient) |-> {ingredientId |-> ingredientId} elem FK
+
+TEXT: Employee carries a managerId that references another row in the same relation.
+TEXT: The self-referential FK predicate uses FKEE, declared above.
+
+schema Employee
+  pk employeeId : EmployeeId
+  name : EmployeeName
+  position : PositionName
+  managerId : EmployeeId
+end
+
+TEXT: Every managerId in Employee must match a valid employeeId in the same relation:
+
+(Employee, Employee) |-> {managerId |-> employeeId} elem FKEE
