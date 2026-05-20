@@ -236,6 +236,189 @@ lnot (p land q)
 
 ---
 
+## Conceptual Coverage
+
+txt2tex covers the full notation curriculum of three Oxford Software Engineering courses: **SEM** (Sets, Equality and Mathematics), **SBM** (State-Based Modelling), and **DAT** (Databases). The topics below appear roughly in dependency order — simpler things first, concepts that build on them after.
+
+### 1. Document Structure
+
+Control page layout, sections, and metadata from plain text.
+
+```text
+title: My Assignment
+author: J. Freeman
+
+=== Section One ===
+
+** Solution 1 **
+
+(a) First part.
+
+PAGEBREAK:
+LINEBREAK:
+```
+
+Supports `TEXT:` (prose with embedded formulas), `LATEX:` (raw LaTeX passthrough), title/author metadata, `\cite{key}` citations, and identifier decoration (`'`, `?`, `!`).
+
+### 2. Propositional Logic
+
+`land`, `lor`, `lnot`, `=>`, `<=>` map to ∧ ∨ ¬ ⇒ ⟺.
+
+```text
+TRUTH TABLE:
+p | q | p => q
+T | F | F
+```
+
+Truth tables and `EQUIV:` equivalence chains (with justifications) are first-class block types.
+
+### 3. Numbers and Arithmetic
+
+```text
+forall n : N | n + 1 > n
+```
+
+Numeric types `N`, `Z`, `N1`; comparison operators; `+ - * div mod`.
+
+### 4. Sets and Types
+
+```text
+{ x : N | x mod 2 = 0 }
+A union B inter C
+P (A cross B)
+3..10
+```
+
+Set membership (`elem`), subset, union/inter/setminus, powerset, set comprehension, and range expressions.
+
+### 5. Predicate Logic
+
+```text
+forall x : N | x > 0 => x >= 1
+exists1 y : Z | y * y = 1
+mu x : N | x * x = 4
+```
+
+`forall`, `exists`, `exists1`, `mu`; multi-declaration quantifiers using Spivey schema-text form; tuple-pattern destructuring.
+
+### 6. Relations
+
+```text
+R o9 S
+dom R <| S
+f oplus g
+```
+
+Relation type `<->`, maplet `|->`, `dom`/`ran`, domain/range restriction and subtraction, relational override (`oplus`), forward composition (`o9`), backward composition (`comp`), and relational image.
+
+### 7. Functions
+
+```text
+lambda x : N . x * 2
+f : N -+-> N
+```
+
+Partial/total/injection/surjection/bijection/finite function types; lambda abstraction (single and multi-declaration); function application.
+
+### 8. Sequences
+
+```text
+<1, 2, 3> ^ <4>
+head s
+# s
+```
+
+Sequence display (`<>`/`<a,b>`), concatenation (`^`), `seq`/`seq1`/`iseq` types, length (`#`), `head`/`tail`/`last`/`front`.
+
+### 9. Z Paragraphs
+
+Global constants, types, and abbreviations:
+
+```text
+given Person
+Status ::= active | inactive
+MaxSize == 100
+
+axdef
+  capacity : N
+where
+  capacity = MaxSize
+end
+```
+
+`given` for carrier sets, free-type definitions, abbreviation `==`, and `axdef` for global axioms.
+
+### 10. Schemas
+
+A schema is a named bundle of declarations plus an invariant — the central structuring concept of state-based Z modelling. Schemas act as predicates, as types in declarations, and as building blocks for operations.
+
+```text
+schema Ship
+  name : seq CHAR
+  cargo : N
+where
+  cargo >= 0
+end
+```
+
+Write `s : Ship` to declare a variable of schema type. Generic schemas use `gendef [X]`. Schemas enforce type-checked invariants; fuzz reports violations before PDF generation.
+
+### 11. Schema Operations
+
+```text
+DeltaFleet defs Fleet /\ Fleet'
+HidePort defs Op hide (port)
+Renamed defs State[x' / x]
+```
+
+Delta/Xi inclusion, theta-binding (`theta`), schema composition (`;`), piping (`>>`), hiding (`hide`), projection (`project`), renaming (`S[old/new]`), and horizontal definitions (`Name defs Schema-Exp`). These are the tools SBM uses to compose state machines from simpler pieces.
+
+### 12. Z Bindings
+
+```text
+{| name == "cargo", count == 42 |}
+```
+
+Explicit binding-display for constructing and working with schema instances as first-class values.
+
+### 13. Proof Trees
+
+Natural deduction with indentation-driven structure:
+
+```text
+PROOF:
+  p => q :: p => r
+    q => r :: p
+      r [modus-ponens, modus-ponens]
+```
+
+Intro/elim rules, discharged assumptions, sibling premises (`::`); equational chains (`EQUAL:`), equivalence chains (`EQUIV:`), and structured argumentation (`ARGUE:`).
+
+### 14. Database Notation (DAT)
+
+Relational algebra and extended Z for DAT specifications:
+
+```text
+sigma[cargo > 0](Fleet)
+pi[name, cargo](Fleet)
+R bowtie S
+pk shipID
+```
+
+Primary key annotation (`pk`), FK predicates in `axdef`, relational algebra in keyword form (Restrict `sigma`, Project `pi`, Rename `rho`, Join `bowtie`, division), and `GROUP`/`UNGROUP` for nested relations.
+
+---
+
+### Course Cheatsheets
+
+Printable two-page references for each course:
+
+- **[docs/cheatsheet-sem-sbm.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet-sem-sbm.pdf)** — SEM (logic, sets, proofs) and SBM (schemas, state, schema calculus)
+- **[docs/cheatsheet-dat.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet-dat.pdf)** — DAT (relational algebra, pk annotation, bindings, GROUP/UNGROUP)
+- **[docs/cheatsheet.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet.pdf)** — combined reference covering all of the above
+
+---
+
 ## Usage
 
 ### Generate PDF (default)
