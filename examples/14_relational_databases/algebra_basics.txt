@@ -1,78 +1,90 @@
-// Relational Algebra Operators (Phase 2.2)
-// Demonstrates: sigma, pi, rho, bowtie (renders as ⊗), div
-// All operators use kernel LaTeX — no extra package required.
+// Relational Algebra Operators
+// Demonstrates: sigma, pi, rho, bowtie (renders as ⊗), div.
 
 TITLE: Relational Algebra
 AUTHOR: txt2tex example
 
-given ClassName, ShipName, BattleName, OutcomeName
+given Title, Author, MemberName, Genre
 
-schema Class
-  class : ClassName
-  country : N
-  bore : N
-  displacement : N
-  numGuns : N
+schema Book
+  bookId : N
+  title : Title
+  author : Author
+  genre : Genre
+  pages : N
+  year : N
 end
 
-schema Ship
-  name : ShipName
-  class : ClassName
-  launched : N
+schema Member
+  memberId : N
+  name : MemberName
 end
+
+schema Loan
+  loanId : N
+  bookId : N
+  memberId : N
+  dueYear : N
+end
+
 
 === Restriction (sigma) ===
 
 // Select tuples satisfying a predicate.
 
-sigma[bore >= 16](Class)
+sigma[pages >= 500](Book)
 
-// Nested restriction:
+// Nested restriction (chain predicates):
 
-sigma[country = UK](sigma[bore >= 16](Class))
+sigma[year >= 1990](sigma[pages >= 500](Book))
+
 
 === Projection (pi) ===
 
 // Keep only named attributes.
 
-pi[class, country](Class)
+pi[title, author](Book)
 
 // Project after restrict:
 
-pi[class, country](sigma[bore >= 16](Class))
+pi[title, author](sigma[pages >= 500](Book))
+
 
 === Renaming (rho) ===
 
-// Rename attributes before joining.
+// Rename one attribute before joining.
 
-rho[ship as name](Outcome)
+rho[bookId as id](Book)
 
-// Multiple renames:
+// Multiple renames at once:
 
-rho[class as id, country as origin](Class)
+rho[bookId as id, author as writer](Book)
+
 
 === Natural Join and Theta-Join (bowtie) ===
 
-// Natural join of two relations:
+// Natural join — joins on attributes with matching names.
 
-Ship bowtie Class
+Loan bowtie Book
 
 // Rename then join:
 
-rho[ship as name](Outcome) bowtie Ship
+rho[bookId as id](Loan) bowtie rho[bookId as id](Book)
 
 // Theta-join with explicit predicate:
 
-Ship bowtie [Ship.class = Class.class] Class
+Member bowtie [Member.memberId = Loan.memberId] Loan
+
 
 === Division (div) ===
 
-// Relational division (all-or-nothing quotient):
+// Relational division — tuples in R associated with every tuple in S.
 
-Ship div Class
+Loan div Book
 
-=== Combined Query (Q1 style) ===
 
-// Classes of ships with big guns (bore >= 16):
+=== Combined Query ===
 
-pi[class, country](sigma[bore >= 16](Class))
+// Titles and authors of books over 500 pages.
+
+pi[title, author](sigma[pages >= 500](Book))

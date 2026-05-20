@@ -15,76 +15,83 @@
 
 \maketitle
 
-\begin{zed}[ClassName, ShipName, BattleName, OutcomeName]\end{zed}
+\begin{zed}[Title, Author, MemberName, Genre]\end{zed}
 
-\begin{schema}{Class}
-class : ClassName \\
-country : \nat \\
-bore : \nat \\
-displacement : \nat \\
-numGuns : \nat
+\begin{schema}{Book}
+bookId : \nat \\
+title : Title \\
+author : Author \\
+genre : Genre \\
+pages : \nat \\
+year : \nat
 \end{schema}
 
-\begin{schema}{Ship}
-name : ShipName \\
-class : ClassName \\
-launched : \nat
+\begin{schema}{Member}
+memberId : \nat \\
+name : MemberName
+\end{schema}
+
+\begin{schema}{Loan}
+loanId : \nat \\
+bookId : \nat \\
+memberId : \nat \\
+dueYear : \nat
 \end{schema}
 
 \section*{Restriction ( sigma )}
 
 \noindent
-$\mathrm{Restrict}_{bore \geq 16}(Class)$
+$\mathrm{Restrict}_{pages \geq 500}(Book)$
 
 
 \noindent
-$\mathrm{Restrict}_{country = UK}(\mathrm{Restrict}_{bore \geq 16}(Class))$
+$\mathrm{Restrict}_{year \geq 1990}(\mathrm{Restrict}_{pages \geq 500}(Book))$
 
 
 \section*{Projection ( pi )}
 
 \noindent
-$\mathrm{Project}\{class, country\}(Class)$
+$\mathrm{Project}\{title, author\}(Book)$
 
 
 \noindent
-$\mathrm{Project}\{class, country\}(\mathrm{Restrict}_{bore \geq 16}(Class))$
+$\mathrm{Project}\{title, author\}(\mathrm{Restrict}_{pages \geq 500}(Book))$
 
 
 \section*{Renaming ( rho )}
 
 \noindent
-$\mathrm{Rename}_{ship \to name}(Outcome)$
+$\mathrm{Rename}_{bookId \to id}(Book)$
 
 
 \noindent
-$\mathrm{Rename}_{class \to id, country \to origin}(Class)$
+$\mathrm{Rename}_{bookId \to id, author \to writer}(Book)$
 
 
 \section*{Natural Join and Theta - Join ( bowtie )}
 
 \noindent
-$Ship \otimes Class$
+$Loan \otimes Book$
 
 
 \noindent
-$\mathrm{Rename}_{ship \to name}(Outcome) \otimes Ship$
+$\mathrm{Rename}_{bookId \to id}(Loan) \otimes \mathrm{Rename}_{bookId \to id}(Book)$
 
 
 \noindent
-$\mathrm{Join}_{Ship.class = Class.class}(Ship, Class)$
+$\mathrm{Join}_{Member.memberId = Loan.memberId}(Member, Loan)$
 
 
 \section*{Division ( div )}
 
 \noindent
-$Ship \div Class$
+$Loan \div Book$
 
 
-\section*{Combined Query ( Q1 style )}
+\section*{Combined Query}
 
 \noindent
-$\mathrm{Project}\{class, country\}(\mathrm{Restrict}_{bore \geq 16}(Class))$
+$\mathrm{Project}\{title, author\}(\mathrm{Restrict}_{pages \geq 500}(Book))$
 
 
 \end{document}
