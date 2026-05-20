@@ -502,7 +502,7 @@ $\displaystyle
 w \mapsto z \in (R \semi S) \semi T \\
 \Leftrightarrow \exists y : Y @ w \mapsto y \in (R \semi S) \land y \mapsto z \in T & [\mbox{definition of $\semi$}] \\
 \Leftrightarrow \exists y : Y @ (\exists x : X @ w \mapsto x \in R \land x \mapsto y \in S) \land y \mapsto z \in T & [\mbox{definition of $\semi$}] \\
-\Leftrightarrow \exists y : Y @ \exists x : X @ w \mapsto x \in R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is not free $\in$ y $\mapsto$ z $\in$ T}] \\
+\Leftrightarrow \exists y : Y; x : X @ w \mapsto x \in R \land x \mapsto y \in S \land y \mapsto z \in T & [\mbox{x is not free $\in$ y $\mapsto$ z $\in$ T}] \\
 \Leftrightarrow \exists x : X @ w \mapsto x \in R \land (\exists y : Y @ x \mapsto y \in S \land y \mapsto z \in T) & [\mbox{y is not free $\in$ w $\mapsto$ x $\in$ R}] \\
 \Leftrightarrow \exists x : X @ w \mapsto x \in R \land x \mapsto z \in (S \semi T) & [\mbox{definition of $\semi$}] \\
 \Leftrightarrow w \mapsto z \in R \semi (S \semi T)
@@ -589,13 +589,13 @@ Timestamp == \nat
 \begin{gendef}[X, Y]
   fst: X \cross Y \fun X
 \where
-  \forall a : X @ \forall b : Y @ fst(a, b) = a
+  \forall a : X; b : Y @ fst(a, b) = a
 \end{gendef}
 
 \begin{gendef}[X, Y]
   snd: X \cross Y \fun Y
 \where
-  \forall a : X @ \forall b : Y @ snd(a, b) = b
+  \forall a : X; b : Y @ snd(a, b) = b
 \end{gendef}
 
 \begin{axdef}
@@ -606,13 +606,11 @@ podcast\_info : ShowId \pfun \finset PeopleId
 \where
 podcasts = \dom podcast\_episodes \\
 \forall es : \ran podcast\_episodes @ \exists n : \nat @ es = 1 \upto n \\
-\forall s : \dom podcast\_episodes @ \forall e : podcast\_episodes(s) @ \\
-\t2 e \in podcast\_episodes(s) \iff (s, e) \in \dom episode\_info \\
+\forall s : \dom podcast\_episodes @ \forall e : podcast\_episodes(s) @ e \in podcast\_episodes(s) \iff (s, e) \in \dom episode\_info \\
 podcasts = \dom podcast\_info \\
-\forall s : podcasts @ \forall e : EpisodeId @ \forall p : PeopleId @ p \in fst(episode\_info(s, e)) \iff p \in podcast\_info(s) \\
-\forall s : podcasts @ \forall e_1, e_2 : EpisodeId @ \\
-\t2 (((s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom episode\_info) \implies \\
-\t2 ((e_1 < e_2) \implies (snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))))
+\forall s : podcasts; e : EpisodeId; p : PeopleId @ p \in fst(episode\_info(s, e)) \iff p \in podcast\_info(s) \\
+\forall s : podcasts; e_1, e_2 : EpisodeId @ (((s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom episode\_info) \implies \\
+\t1 ((e_1 < e_2) \implies (snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))))
 \end{axdef}
 
 \noindent The above Z is type-checked with fuzz. Each part is briefly explained below:
@@ -650,8 +648,7 @@ podcasts = \dom podcast\_info \\
 \noindent
 $\displaystyle
 \begin{array}{l}
-\forall s : \dom podcast\_episodes @ \forall e : podcast\_episodes(s) @ \\
-\t2 e \in podcast\_episodes(s) \iff (s, e) \in \dom episode\_info
+\forall s : \dom podcast\_episodes @ \forall e : podcast\_episodes(s) @ e \in podcast\_episodes(s) \iff (s, e) \in \dom episode\_info
 \end{array}$
 
 \bigskip
@@ -688,8 +685,8 @@ $\displaystyle
 \noindent
 $\displaystyle
 \begin{array}{l}
-\forall s : podcasts @ \forall e : EpisodeId @ \forall p : PeopleId @ p \in fst(episode\_info(s, e)) \iff \\
-\t3 p \in podcast\_info(s)
+\forall s : podcasts; e : EpisodeId; p : PeopleId @ p \in fst(episode\_info(s, e)) \iff \\
+\t1 p \in podcast\_info(s)
 \end{array}$
 
 \bigskip
@@ -712,9 +709,8 @@ $\displaystyle
 \noindent
 $\displaystyle
 \begin{array}{l}
-\forall s : podcasts @ \forall e_1, e_2 : EpisodeId @ \\
-\t2 (((s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom episode\_info) \implies \\
-\t2 ((e_1 < e_2) \implies (snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))))
+\forall s : podcasts; e_1, e_2 : EpisodeId @ (((s, e_1) \in \dom episode\_info \land (s, e_2) \in \dom episode\_info) \implies \\
+\t1 ((e_1 < e_2) \implies (snd(episode\_info(s, e_1)) \leq snd(episode\_info(s, e_2)))))
 \end{array}$
 
 \bigskip
@@ -809,12 +805,11 @@ my\_episodes : \iseq~(ShowId \cross EpisodeId) \\
 status : ShowId \cross EpisodeId \pfun (PlayedOrNot \cross SavedOrNot)
 \where
 my\_shows \subseteq podcasts \\
-\forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
-\t2 e \in podcast\_episodes(s) \\
-\forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
-\t2 s \in my\_shows \\
-\forall s : ShowId @ \forall e : EpisodeId @ \\
-\t2 (s, e) \in \ran my\_episodes \iff (s, e) \in \dom status
+\forall s : ShowId; e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
+\t1 e \in podcast\_episodes(s) \\
+\forall s : ShowId; e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
+\t1 s \in my\_shows \\
+\forall s : ShowId; e : EpisodeId @ (s, e) \in \ran my\_episodes \iff (s, e) \in \dom status
 \end{axdef}
 
 \noindent\hspace*{\parindent}(a) $my\_shows \subseteq podcasts$
@@ -836,8 +831,8 @@ my\_shows \subseteq podcasts \\
 \noindent
 $\displaystyle
 \begin{array}{l}
-\forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
-\t2 e \in podcast\_episodes(s)
+\forall s : ShowId; e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
+\t1 e \in podcast\_episodes(s)
 \end{array}$
 
 \bigskip
@@ -860,8 +855,8 @@ $\displaystyle
 \noindent
 $\displaystyle
 \begin{array}{l}
-\forall s : ShowId @ \forall e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
-\t2 s \in my\_shows
+\forall s : ShowId; e : EpisodeId @ (s, e) \in \ran my\_episodes \implies \\
+\t1 s \in my\_shows
 \end{array}$
 
 \bigskip
@@ -884,8 +879,7 @@ $\displaystyle
 \noindent
 $\displaystyle
 \begin{array}{l}
-\forall s : ShowId @ \forall e : EpisodeId @ \\
-\t2 (s, e) \in \ran my\_episodes \iff (s, e) \in \dom status
+\forall s : ShowId; e : EpisodeId @ (s, e) \in \ran my\_episodes \iff (s, e) \in \dom status
 \end{array}$
 
 \bigskip
@@ -916,8 +910,7 @@ PossiblePlaylist = \seq~(\dom status \cross \nat)
 length : PossiblePlaylist \fun \nat
 \where
 length(\langle \rangle) = 0 \land \\
-\quad (\forall pl : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
-\t2 length(\langle ple \rangle \cat pl) = snd(ple) + length(pl))
+\quad (\forall pl : PossiblePlaylist; ple : (\dom status \cross \nat) @ length(\langle ple \rangle \cat pl) = snd(ple) + length(pl))
 \end{axdef}
 
 \medskip
@@ -926,9 +919,8 @@ length(\langle \rangle) = 0 \land \\
 unplayed : PossiblePlaylist \fun PossiblePlaylist
 \where
 unplayed(\langle \rangle) = \langle \rangle \land \\
-\quad (\forall pl : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
-\t2 (fst(status(fst(ple))) = Played) \implies ((unplayed(\langle ple \rangle \cat pl) = unplayed(pl)) \land \\
-\t2 (fst(status(fst(ple))) = NotP) \implies (unplayed(\langle ple \rangle \cat pl) = \langle ple \rangle \cat unplayed(pl))))
+\quad (\forall pl : PossiblePlaylist; ple : (\dom status \cross \nat) @ (fst(status(fst(ple))) = Played) \implies ((unplayed(\langle ple \rangle \cat pl) = unplayed(pl)) \land \\
+\t1 (fst(status(fst(ple))) = NotP) \implies (unplayed(\langle ple \rangle \cat pl) = \langle ple \rangle \cat unplayed(pl))))
 \end{axdef}
 
 \medskip
@@ -937,9 +929,8 @@ unplayed(\langle \rangle) = \langle \rangle \land \\
 played : PossiblePlaylist \fun PossiblePlaylist
 \where
 played(\langle \rangle) = \langle \rangle \land \\
-\quad (\forall pl : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
-\t2 (fst(status(fst(ple))) = NotP) \implies ((played(\langle ple \rangle \cat pl) = played(pl)) \land \\
-\t2 (fst(status(fst(ple))) = Played) \implies (played(\langle ple \rangle \cat pl) = \langle ple \rangle \cat played(pl))))
+\quad (\forall pl : PossiblePlaylist; ple : (\dom status \cross \nat) @ (fst(status(fst(ple))) = NotP) \implies ((played(\langle ple \rangle \cat pl) = played(pl)) \land \\
+\t1 (fst(status(fst(ple))) = Played) \implies (played(\langle ple \rangle \cat pl) = \langle ple \rangle \cat played(pl))))
 \end{axdef}
 
 \section*{Question 11}
@@ -972,9 +963,8 @@ length(played(\langle \rangle)) + length(unplayed(\langle \rangle)) \\
 \bigskip
 
 \begin{zed}
-\forall t : PossiblePlaylist @ \forall ple : (\dom status \cross \nat) @ \\
-\t2 length(played(t)) + length(unplayed(t)) = length(t) \implies \\
-\t2 length(played(\langle ple \rangle \cat t)) + length(unplayed(\langle ple \rangle \cat t)) = length(\langle ple \rangle \cat t)
+\forall t : PossiblePlaylist; ple : (\dom status \cross \nat) @ length(played(t)) + length(unplayed(t)) = length(t) \implies \\
+\t1 length(played(\langle ple \rangle \cat t)) + length(unplayed(\langle ple \rangle \cat t)) = length(\langle ple \rangle \cat t)
 \end{zed}
 
 \noindent The status of a playlist element is of type (PlayedOrNot, SavedOrNot). The inductive hypothesis proof begins by establishing that there are two mutually exclusive and exhaustive $cases : one$ where the playlist element's PlayedOrNot free type value is Played and another where it is NotP.  The proof will establish that for both cases, the same conclusion can be proven. The proof relies upon the inductive hypothesis length(played(t)) + length(unplayed(t)) = length(t). 
@@ -1084,7 +1074,7 @@ $\displaystyle
 \infer{\forall l : List @ Q(l)}{
   Q(nil)
 &
-\forall e : ListElement @ \forall l : List @ Q(l) \implies Q(join(e, l))
+\forall e : ListElement; l : List @ Q(l) \implies Q(join(e, l))
 }
 $%
 }
@@ -1107,19 +1097,19 @@ $%
 \begin{gendef}[A, B, C]
   fstOfTriple: A \cross B \cross C \fun A
 \where
-  \forall a : A @ \forall b : B @ \forall c : C @ fstOfTriple(a, b, c) = a
+  \forall a : A; b : B; c : C @ fstOfTriple(a, b, c) = a
 \end{gendef}
 
 \begin{gendef}[A, B, C]
   sndOfTriple: A \cross B \cross C \fun B
 \where
-  \forall a : A @ \forall b : B @ \forall c : C @ sndOfTriple(a, b, c) = b
+  \forall a : A; b : B; c : C @ sndOfTriple(a, b, c) = b
 \end{gendef}
 
 \begin{gendef}[A, B, C]
   thrdOfTriple: A \cross B \cross C \fun C
 \where
-  \forall a : A @ \forall b : B @ \forall c : C @ thrdOfTriple(a, b, c) = c
+  \forall a : A; b : B; c : C @ thrdOfTriple(a, b, c) = c
 \end{gendef}
 
 \noindent Next, we specify our recursive functions
@@ -1130,7 +1120,7 @@ $%
 length\_L : List \fun \nat
 \where
 length\_L(nil) = 0 \\
-\forall e : ListElement @ \forall l : List @ length\_L(join(e, l)) = fstOfTriple(snd(e)) + length\_L(l)
+\forall e : ListElement; l : List @ length\_L(join(e, l)) = fstOfTriple(snd(e)) + length\_L(l)
 \end{axdef}
 
 \noindent The length of a List is the recursive sum of $seconds : N$, found in the first position of the triple found in the second element of the tuple of each ListElement.
@@ -1141,10 +1131,10 @@ length\_L(nil) = 0 \\
 unplayed\_L : List \fun List
 \where
 unplayed\_L(nil) = nil \\
-\forall e : ListElement @ \forall l : List @ sndOfTriple(snd(e)) = NotP \implies \\
-\t2 unplayed\_L(join(e, l)) = join(e, unplayed\_L(l)) \\
-\forall e : ListElement @ \forall l : List @ sndOfTriple(snd(e)) = Played \implies \\
-\t2 unplayed\_L(join(e, l)) = unplayed\_L(l)
+\forall e : ListElement; l : List @ sndOfTriple(snd(e)) = NotP \implies \\
+\t1 unplayed\_L(join(e, l)) = join(e, unplayed\_L(l)) \\
+\forall e : ListElement; l : List @ sndOfTriple(snd(e)) = Played \implies \\
+\t1 unplayed\_L(join(e, l)) = unplayed\_L(l)
 \end{axdef}
 
 \noindent The unplayed list of any given list is a new list, which recursively includes or excludes each ListElement based on the PlayedOrNot free type value of NotP found in the second position of the triple found in the second element of the tuple of each ListElement. 
@@ -1155,10 +1145,10 @@ unplayed\_L(nil) = nil \\
 played\_L : List \fun List
 \where
 played\_L(nil) = nil \\
-\forall e : ListElement @ \forall l : List @ sndOfTriple(snd(e)) = Played \implies \\
-\t2 played\_L(join(e, l)) = join(e, played\_L(l)) \\
-\forall e : ListElement @ \forall l : List @ sndOfTriple(snd(e)) = NotP \implies \\
-\t2 played\_L(join(e, l)) = played\_L(l)
+\forall e : ListElement; l : List @ sndOfTriple(snd(e)) = Played \implies \\
+\t1 played\_L(join(e, l)) = join(e, played\_L(l)) \\
+\forall e : ListElement; l : List @ sndOfTriple(snd(e)) = NotP \implies \\
+\t1 played\_L(join(e, l)) = played\_L(l)
 \end{axdef}
 
 \noindent The played list of any given list is a new list, which recursively includes or excludes each ListElement based on the PlayedOrNot free type value of Played found in the second position of the triple found in the second element of the tuple of each ListElement. 

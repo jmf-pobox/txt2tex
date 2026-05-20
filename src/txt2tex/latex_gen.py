@@ -80,6 +80,7 @@ from txt2tex.ast_nodes import (
     Zed,
 )
 from txt2tex.constants import PROSE_WORDS
+from txt2tex.free_vars import expr_free_vars
 from txt2tex.lexer import Lexer, LexerError
 from txt2tex.parser import Parser, ParserError
 
@@ -1289,19 +1290,26 @@ class LaTeXGenerator:
 
     def _collect_lambda_chain(
         self, node: Quantifier
-    ) -> tuple[list[tuple[list[str], str]], Expr, Expr | None]:
+    ) -> tuple[list[tuple[list[str], Expr | None, str]], Expr, Expr | None]:
         """Walk a nested lambda Quantifier chain and collect all bindings.
 
         Returns:
             A triple (bindings, predicate, expression) where:
-            - bindings: list of (variables, domain_latex) pairs, one per level
-            - predicate: the innermost body (predicate before @ separator)
-            - expression: the expression after @, or None if absent
+            - bindings: list of (variables, raw_domain, domain_latex) triples,
+              one per collected level
+            - predicate: the innermost body (predicate before @ separator), or
+              the un-collapsed inner Quantifier when a dependency stops early
+            - expression: the expression after @, or None if absent/stopped
 
         The innermost Quantifier("lambda") node is the one whose body is NOT
         itself a Quantifier("lambda"); it carries the predicate and expression.
+
+        When a later level's domain references a variable already accumulated
+        in the chain, collection stops early: the returned predicate is the
+        inner Quantifier node and expression is None (dependency-stop sentinel).
         """
-        bindings: list[tuple[list[str], str]] = []
+        bindings: list[tuple[list[str], Expr | None, str]] = []
+        accumulated_names: frozenset[str] = frozenset()
         current: Quantifier = node
         while True:
             domain_latex = (
@@ -1309,9 +1317,16 @@ class LaTeXGenerator:
                 if current.domain is not None
                 else ""
             )
-            bindings.append((list(current.variables), domain_latex))
+            bindings.append((list(current.variables), current.domain, domain_latex))
+            accumulated_names = accumulated_names | frozenset(current.variables)
             inner = current.body
             if isinstance(inner, Quantifier) and inner.quantifier == "lambda":
+                # Check whether the next level's domain references a bound name.
+                if inner.domain is not None:
+                    inner_domain_free = expr_free_vars(inner.domain)
+                    if inner_domain_free & accumulated_names:
+                        # Dependency detected: stop here.
+                        return bindings, inner, None
                 current = inner
             else:
                 # Base case: body is the predicate, expression is after @
@@ -1325,14 +1340,39 @@ class LaTeXGenerator:
         Collects the full binding chain into a single SchemaText and emits:
             \\lambda v0, ... : D0; v1, ... : D1; ... | predicate @ expression
 
+        When a later domain references an earlier-bound variable (dependent domain),
+        collection stops at the dependency boundary.  The prefix is emitted as a
+        single-level lambda and the remainder is recursed into afresh.
+
         Wrapped in parentheses in fuzz mode when appearing inside an expression.
         """
         bindings, predicate, expression = self._collect_lambda_chain(node)
 
-        # Build the schema text: levels joined by "; "
-        decl_parts: list[str] = []
         colon = self._get_colon_separator()
-        for variables, domain_latex in bindings:
+
+        # Dependency-stop case: predicate is the un-collapsed inner Quantifier.
+        if (
+            isinstance(predicate, Quantifier)
+            and predicate.quantifier == "lambda"
+            and expression is None
+        ):
+            decl_parts: list[str] = []
+            for variables, _raw_domain, domain_latex in bindings:
+                vars_str = ", ".join(variables)
+                decl_parts.append(f"{vars_str} {colon} {domain_latex}")
+            schema_text = "; ".join(decl_parts)
+
+            pipe_sep = self._get_mid_separator()
+            # Recurse: the inner lambda will attempt its own collapse from scratch.
+            inner_latex = self._generate_lambda_quantifier(predicate, parent=node)
+            result = rf"\lambda {schema_text} {pipe_sep} {inner_latex}"
+            if self.use_fuzz:
+                result = f"({result})"
+            return result
+
+        # Normal full-collapse path.
+        decl_parts = []
+        for variables, _raw_domain, domain_latex in bindings:
             vars_str = ", ".join(variables)
             decl_parts.append(f"{vars_str} {colon} {domain_latex}")
         schema_text = "; ".join(decl_parts)
@@ -1360,7 +1400,7 @@ class LaTeXGenerator:
 
     def _collect_quantifier_chain(
         self, node: Quantifier
-    ) -> tuple[list[tuple[list[str], str]], Expr, Expr | None]:
+    ) -> tuple[list[tuple[list[str], Expr | None, str]], Expr, Expr | None]:
         """Walk a nested same-quantifier chain and collect all bindings.
 
         Mirrors _collect_lambda_chain but works for forall/exists/exists1/mu.
@@ -1368,11 +1408,18 @@ class LaTeXGenerator:
 
         Returns:
             A triple (bindings, predicate, expression) where:
-            - bindings: list of (variables, domain_latex) pairs, one per level
-            - predicate: the innermost body (predicate before @ or | separator)
-            - expression: the expression after @, or None if absent
+            - bindings: list of (variables, raw_domain, domain_latex) triples,
+              one per collected level
+            - predicate: the innermost body (predicate before @ or | separator),
+              or the un-collapsed inner Quantifier when dependency stops early
+            - expression: the expression after @, or None if absent/stopped
+
+        When a later level's domain references a variable already accumulated
+        in the chain, collection stops early: the returned predicate is the
+        inner Quantifier node and expression is None (dependency-stop sentinel).
         """
-        bindings: list[tuple[list[str], str]] = []
+        bindings: list[tuple[list[str], Expr | None, str]] = []
+        accumulated_names: frozenset[str] = frozenset()
         current: Quantifier = node
         while True:
             domain_latex = (
@@ -1380,9 +1427,16 @@ class LaTeXGenerator:
                 if current.domain is not None
                 else ""
             )
-            bindings.append((list(current.variables), domain_latex))
+            bindings.append((list(current.variables), current.domain, domain_latex))
+            accumulated_names = accumulated_names | frozenset(current.variables)
             inner = current.body
             if isinstance(inner, Quantifier) and inner.quantifier == node.quantifier:
+                # Check whether the next level's domain references a bound name.
+                if inner.domain is not None:
+                    inner_domain_free = expr_free_vars(inner.domain)
+                    if inner_domain_free & accumulated_names:
+                        # Dependency detected: stop here.
+                        return bindings, inner, None
                 current = inner
             else:
                 return bindings, current.body, current.expression
@@ -1411,8 +1465,33 @@ class LaTeXGenerator:
         bindings, predicate, expression = self._collect_quantifier_chain(node)
 
         colon = self._get_colon_separator()
-        decl_parts: list[str] = []
-        for variables, domain_latex in bindings:
+        bullet_sep = self._get_bullet_separator()
+
+        # Dependency-stop case: predicate is the un-collapsed inner Quantifier.
+        if (
+            isinstance(predicate, Quantifier)
+            and predicate.quantifier == node.quantifier
+            and expression is None
+        ):
+            decl_parts: list[str] = []
+            for variables, _raw_domain, domain_latex in bindings:
+                vars_str = ", ".join(variables)
+                decl_parts.append(f"{vars_str} {colon} {domain_latex}")
+            schema_text = "; ".join(decl_parts)
+
+            # Recursively generate the inner quantifier (fresh collapse attempt).
+            inner_latex = self._generate_logical_quantifier(predicate, parent=node)
+            result = f"{quant_latex} {schema_text} {bullet_sep} {inner_latex}"
+
+            if node.quantifier == "mu" and self.use_fuzz:
+                return f"({result})"
+            if node.quantifier != "mu" and self._quantifier_needs_parens(node, parent):
+                return f"({result})"
+            return result
+
+        # Normal full-collapse path.
+        decl_parts = []
+        for variables, _raw_domain, domain_latex in bindings:
             vars_str = ", ".join(variables)
             decl_parts.append(f"{vars_str} {colon} {domain_latex}")
         schema_text = "; ".join(decl_parts)
@@ -1422,8 +1501,6 @@ class LaTeXGenerator:
         self._quantifier_depth += 1
         pred_latex = self.generate_expr(predicate, parent=node)
         self._quantifier_depth -= 1
-
-        bullet_sep = self._get_bullet_separator()
 
         if node.quantifier == "mu":
             # Mu always uses | before the predicate, then optional @ expression.
@@ -1671,7 +1748,24 @@ class LaTeXGenerator:
         # Emit extra semicolon-separated declarations for multi-typed comprehensions.
         # { s : Ship; c : Class | ... } → ...; c \colon \mathrm{Class} ...
         if node.extra_declarations:
+            # Primary variables are in scope for all extra_declaration domains.
+            primary_bound = frozenset(node.variables)
+            accumulated_bound = primary_bound
             for extra_var, extra_domain in node.extra_declarations:
+                domain_free = expr_free_vars(extra_domain)
+                if domain_free & accumulated_bound:
+                    offending = sorted(domain_free & accumulated_bound)
+                    prior = offending[0]
+                    msg = (
+                        f"set comprehension declaration {extra_var!r} is dependent"
+                        f" on prior declaration {prior!r} (Z RM §3.10);"
+                        f" fuzz parallel-binds schema-text declarations and will"
+                        f" reject this; rewrite using a tuple-typed binding"
+                        f" (e.g., {{p : T cross U | p.1 elem dom f}}) or move"
+                        f" the dependent condition into the predicate"
+                    )
+                    raise ValueError(msg)
+                accumulated_bound = accumulated_bound | {extra_var}
                 extra_domain_latex = self.generate_expr(extra_domain)
                 parts.append(";")
                 parts.append(extra_var)
