@@ -50,7 +50,7 @@
 
 %% ── PAGE 1: FOUNDATIONS ──────────────────────────
 
-\begin{multicols}{3}
+\begin{multicols}{2}
 \raggedcolumns
 
 % ── DOCUMENT STRUCTURE ──────────────────────────
@@ -141,14 +141,6 @@ n <= m / n >= m      & non-strict ordering \\
 n = m / n /= m       & equality / inequality \\
 \end{tabularx}
 
-\end{multicols}
-
-%% ── PAGE 2: SETS & PREDICATES ────────────────────
-\newpage
-
-\begin{multicols}{3}
-\raggedcolumns
-
 % ── SETS & TYPES ────────────────────────────────
 \section{Sets \& Types}
 
@@ -213,14 +205,6 @@ $\forall (x, y) : \nat \cross \nat @ x + y \geq 0$
 \smallskip
 {\footnotesize \textbf{Schema-text scope:} a bare \texttt{[d : T | P]} in a quantifier or function acts as an inline schema text.}
 
-\end{multicols}
-
-%% ── PAGE 3: RELATIONS & FUNCTIONS ───────────────
-\newpage
-
-\begin{multicols}{3}
-\raggedcolumns
-
 % ── RELATIONS ───────────────────────────────────
 \section{Relations}
 
@@ -280,14 +264,6 @@ double == lambda n : N | n * 2
 $double \defs \lambda n : \nat @ n * 2$
 \end{center}
 \end{exget}
-
-\end{multicols}
-
-%% ── PAGE 4: SEQUENCES + Z PARAGRAPHS + SCHEMAS PART 1 ──
-\newpage
-
-\begin{multicols}{3}
-\raggedcolumns
 
 % ── SEQUENCES ───────────────────────────────────
 \section{Sequences}
@@ -384,17 +360,7 @@ end
 \end{verbatim}
 \end{exwrite}
 
-\end{multicols}
-
-%% ── PAGE 5: SCHEMAS PART 2 + SCHEMA OPERATIONS ──
-\newpage
-
-\begin{multicols}{3}
-\raggedcolumns
-
-% ── SCHEMAS (CONTINUED) ─────────────────────────
-\section{Schemas (continued)}
-
+\smallskip
 \textbf{Schemas in declarations.}
 
 {\scriptsize A schema name used as a type pulls in that schema's signature:}
@@ -481,14 +447,6 @@ S >> T               & $S \pipe T$ (piping) \\
 S hide (x, y)        & $S \hide (x,y)$ \\
 S project T          & $S \project T$ \\
 \end{tabularx}
-
-\end{multicols}
-
-%% ── PAGE 6: Z BINDINGS + PROOFS PART 1 ──────────
-\newpage
-
-\begin{multicols}{3}
-\raggedcolumns
 
 % ── Z BINDINGS ──────────────────────────────────
 \section{Z Bindings}
@@ -580,15 +538,22 @@ $\begin{array}{l@{\hspace{2em}}r}
 %% ── PAGE 7: PROOFS PART 2 ────────────────────────
 \newpage
 
-\begin{multicols}{3}
+\begin{multicols}{2}
 \raggedcolumns
 
 % ── PROOFS (CONTINUED) ──────────────────────────
 \section{Proofs (continued)}
 
-\textbf{Proof tree syntax (\kw{PROOF:}):}
+\textbf{How proof trees work:}
 
-{\scriptsize Trees are written \textbf{bottom-up}: conclusion first, premises indented below.}
+{\scriptsize Proof trees are written \textbf{bottom-up}: the
+conclusion is the first line and premises are indented below it.
+Deeper indentation = deeper in the tree. Two premises at the same
+indent level are siblings that jointly support their parent.
+\texttt{::} marks sibling case-arms in a case analysis.}
+
+\smallskip
+\textbf{Proof tree syntax (\kw{PROOF:}):}
 
 \begin{tabularx}{\columnwidth}{LR}
 \textrm{indent}      & Premises indented under conclusion \\
@@ -701,7 +666,7 @@ $\begin{array}{l@{\hspace{1.5em}}r}
 %% ── PAGE 8: RELATIONAL DATABASE NOTATION ─────────
 \newpage
 
-\begin{multicols}{3}
+\begin{multicols}{2}
 \raggedcolumns
 
 % ── RELATIONAL DATABASE NOTATION ────────────────
@@ -750,18 +715,6 @@ R div S              & $R \div S$ — division \\
 {\footnotesize \texttt{sigma}/\texttt{pi}/\texttt{rho} bind at atom level. \texttt{bowtie} and \texttt{div} are infix at cross-product precedence.}
 
 {\footnotesize\textbf{Fuzz note:} algebra expressions emit outside any Z environment — fuzz silently skips them. Do not wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
-
-\begin{exwrite}
-\begin{verbatim}
-BigGuns == pi[class,country](
-  sigma[bore >= 16](Class))
-\end{verbatim}
-\end{exwrite}
-\begin{exget}
-\begin{center}
-\noindent$BigGuns \defs \mathrm{Project}\{class,country\}(\mathrm{Restrict}_{bore \geq 16}(Class))$
-\end{center}
-\end{exget}
 
 \smallskip
 \textbf{FK predicate form.}
