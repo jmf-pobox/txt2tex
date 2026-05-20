@@ -22,7 +22,7 @@ files compile unchanged; output LaTeX may differ visually.
   fuzz-rejected output. If your `.txt` used `id : T` as a schema
   field, rename to `id1`, `idVal`, `myId`, etc.
 
-**LaTeX-output changes — same input, different rendering:**
+**Rendering improvements — same input, better-looking or fuzz-cleaner output:**
 
 | Construct | Before | After |
 |---|---|---|
@@ -31,11 +31,14 @@ files compile unchanged; output LaTeX may differ visually.
 | Multi-decl `lambda` | nested + conditional paren-wrap | Spivey + unconditional paren-wrap in fuzz mode |
 | Bindings | `\lblot name == e \rblot` (flush) | `\lblot~name == e~\rblot` (thin-spaced) |
 | Relational algebra | `\sigma_p(R)`, `\pi_{A,B}(R)`, `\rho_{...}`, `\bowtie`, `\bowtie_p` | `\mathrm{Restrict}_p(R)`, `\mathrm{Project}\{A,B\}(R)`, `\mathrm{Rename}_{...}`, `\otimes`, `\mathrm{Join}_p` |
-The Spivey-form, paren-wrap, dependent-domain, and binding-spacing
-changes are strict improvements — same semantics, but fuzz now accepts
-several cases that previously failed. The relational-algebra keyword
-rendering is the one purely stylistic change. Regenerate any `.tex`
-files produced by an earlier version.
+
+These are not breaking — your `.txt` parses the same; only the
+rendered `.tex` differs. The Spivey-form, paren-wrap, dependent-domain,
+and binding-spacing changes are strict improvements: same semantics
+and fuzz now accepts several forms it previously rejected.
+The relational-algebra keyword rendering is the one purely
+stylistic change. Regenerate any `.tex` files produced by an earlier
+version to pick up the new output.
 
 **Strictly additive** (never affect existing `.txt` files):
 
@@ -111,6 +114,9 @@ files produced by an earlier version.
 
 ### Breaking Changes
 
+Source-syntax breaks only. Visual rendering changes are listed under
+**Changed (rendering)** below.
+
 - **Reserved Z operator names rejected in declaration positions** (commit
   `7fb6567` and the parser change folded into it). `id`, `dom`, `ran`,
   `inv`, `comp`, `mod`, `bigcup`, `bigcap`, `filter` used as declaration
@@ -119,52 +125,52 @@ files produced by an earlier version.
   emitted broken LaTeX. Migration: rename the field (`id` → `id1`,
   `idVal`, etc.).
 
-- **`:=` operator removed.** The `:=` (assignment) token type, AST node,
-  parser dispatch, and generator are gone. Use `==` for relational assignment
-  — the smart-`==` abbreviation (committed a8a02ae) already covers both
-  pure-Z and algebra right-hand sides. Existing `.txt` files that use `:=`
-  will raise a parser error; migrate to `==`.
+(Notes: `:=` and `relvars` are documented as removed below but were
+added *and* removed within this branch's development; they never
+reached the prior release, so they are not user-visible breaks.)
 
-- **Natural-join emission changed: `\bowtie` → `\otimes`.** The source
-  keyword `bowtie` is unchanged, but the LaTeX emission is now `\otimes`
-  (`⊗`) to match the keyword-algebra rendering convention. Theta-join similarly changes
-  from `\bowtie_{p}` to `\otimes_{p}`. Both are standard LaTeX kernel
-  symbols — no preamble change required. Any generated `.tex` files that
-  contain `\bowtie` in natural-join position should be regenerated.
+### Changed (rendering)
 
-- **BREAKING (visual): Relational algebra operators render in keyword form.**
-  `sigma[p](R)` now emits `\mathrm{Restrict}_{p}(R)` (previously `\sigma_p(R)`);
-  `pi[A, B](R)` emits `\mathrm{Project}\{A, B\}(R)` (previously `\pi_{A,B}(R)`);
-  `rho[A as B](R)` emits `\mathrm{Rename}_{A \to B}(R)` (previously
-  `\rho_{A \to B}(R)`). Source-level syntax is unchanged — students still write
-  `sigma`, `pi`, `rho`. Regenerate any `.tex` files produced by earlier versions.
+The source syntax is unchanged for everything below — same `.txt`
+parses the same. Only the rendered LaTeX differs. Regenerate any
+`.tex` produced by an earlier version to pick up the new output.
 
-- **BREAKING (visual): Theta-join now emits as function form.**
-  `R bowtie [p] S` now emits `\mathrm{Join}_{p}(R, S)` (previously
-  `R \otimes_{p} S`). Natural join without a predicate (`R bowtie S`) is
-  unchanged: still `R \otimes S`.
+- **Natural-join emission `\bowtie` → `\otimes`.** Source `R bowtie S`
+  now renders as `R \otimes S`. Theta-join `R bowtie [p] S` was
+  similarly `\bowtie_p`; see entry below.
 
-- **BREAKING (visual): Spivey-canonical form for multi-decl quantifiers**
-  (commits `71ce521`, `92823b7`). Multi-decl `forall`/`exists`/`exists1`/`mu`/
-  `lambda` chains now emit as one quantifier token with semicolon-separated
+- **Relational algebra renders in keyword form.**
+  `sigma[p](R)` now emits `\mathrm{Restrict}_{p}(R)` (previously
+  `\sigma_p(R)`); `pi[A, B](R)` emits `\mathrm{Project}\{A, B\}(R)`
+  (previously `\pi_{A,B}(R)`); `rho[A as B](R)` emits
+  `\mathrm{Rename}_{A \to B}(R)` (previously `\rho_{A \to B}(R)`).
+
+- **Theta-join function form.** `R bowtie [p] S` now emits
+  `\mathrm{Join}_{p}(R, S)` (previously `R \otimes_{p} S`). Natural
+  join without a predicate (`R bowtie S`) is unchanged: still
+  `R \otimes S`.
+
+- **Spivey-canonical multi-decl quantifiers** (commits `71ce521`,
+  `92823b7`). Multi-decl `forall`/`exists`/`exists1`/`mu`/`lambda`
+  chains now emit as one quantifier token with semicolon-separated
   SchemaText (`\forall x : T; y : U @ P`) instead of nested tokens
-  (`\forall x : T @ \forall y : U @ P`). Same semantics; matches Z RM §3.9
-  split identity and what Z literature prints. The previous nested form for
-  multi-decl `mu` was actually fuzz-rejected; the new Spivey form is
-  fuzz-clean — a strict improvement.
+  (`\forall x : T @ \forall y : U @ P`). Matches Z RM §3.9 split
+  identity. The previous nested form for multi-decl `mu` was actually
+  fuzz-rejected; the new Spivey form is fuzz-clean — a strict
+  improvement.
 
-- **BREAKING (visual): Lambda always paren-wrapped in fuzz mode** (commits
-  `71ce521`, follow-on). Fuzz requires `(\lambda S @ E)` around every
-  lambda expression. The generator previously wrapped only when
-  `parent is not None`, which missed abbreviation RHS, set literals,
-  sequence displays, and top-level zed predicates. Now unconditional
-  in `use_fuzz=True`. Source-level: unchanged. Generated `.tex`:
-  every lambda gains surrounding parens.
+- **Lambda unconditional paren-wrap in fuzz mode** (commits `71ce521`,
+  follow-on). Fuzz requires `(\lambda S @ E)` around every lambda.
+  The generator previously wrapped only when `parent is not None`,
+  which missed abbreviation RHS, set literals, sequence displays, and
+  top-level zed predicates. Now unconditional in `use_fuzz=True`.
+  Every lambda in the output gains surrounding parens — strict
+  improvement; fuzz accepts cases it previously rejected.
 
-- **BREAKING (visual): Z bindings now thin-spaced inside brackets**
-  (commit `1cd9761`). `{| name == e |}` previously emitted
-  `\lblot name == e \rblot` (content flush against bracket symbols);
-  now emits `\lblot~name == e~\rblot`. Source-level: unchanged.
+- **Z bindings thin-spaced inside brackets** (commit `1cd9761`).
+  `{| name == e |}` previously emitted `\lblot name == e \rblot`
+  (content flush against bracket symbols); now emits
+  `\lblot~name == e~\rblot`.
 
 ### Added
 
@@ -192,15 +198,16 @@ files produced by an earlier version.
   tests in `tests/test_14_relational_databases/test_primary_keys.py`.
   New example `examples/14_relational_databases/primary_keys.txt`.
 
-### Removed
+### Removed (within-branch churn — no impact on prior-release users)
 
-- The `relvars` declaration paragraph is removed.  The `relvars` keyword no
-  longer exists; existing `.txt` files using `relvars` will raise a `LexerError`
-  on the unknown keyword.  The `Relvars` AST node, `TokenType.RELVARS`,
-  `LaTeXGenerator.relvar_set`, and `_collect_relvars` are all removed from the
-  public API.  The `wrap_relvar` parameter is removed from internal generator
-  methods.  Migration: delete `relvars` lines; mark primary-key attributes with
-  `pk` instead.
+- **`relvars` declaration paragraph**: added in Phase 2.1 (commit
+  `4bb13d9`), replaced by the `pk` annotation in commit `d93e061`. Did
+  not ship in any released version. No migration needed for prior-release
+  users (`.txt` from a released version cannot use `relvars`).
+
+- **`:=` assignment operator**: added in commit `f640074` (Phase 2.2),
+  dropped in commit `0422bd4` in favour of the smart `==` abbreviation.
+  Did not ship in any released version. No migration needed.
 
 ### Added (earlier releases)
 
