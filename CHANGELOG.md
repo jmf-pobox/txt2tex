@@ -31,8 +31,6 @@ files compile unchanged; output LaTeX may differ visually.
 | Multi-decl `lambda` | nested + conditional paren-wrap | Spivey + unconditional paren-wrap in fuzz mode |
 | Bindings | `\lblot name == e \rblot` (flush) | `\lblot~name == e~\rblot` (thin-spaced) |
 | Relational algebra | `\sigma_p(R)`, `\pi_{A,B}(R)`, `\rho_{...}`, `\bowtie`, `\bowtie_p` | `\mathrm{Restrict}_p(R)`, `\mathrm{Project}\{A,B\}(R)`, `\mathrm{Rename}_{...}`, `\otimes`, `\mathrm{Join}_p` |
-| `==` (abbreviation) | (some paths used `\defs`) | always `==` literally; `\defs` reserved for horizontal schema definition |
-
 The Spivey-form, paren-wrap, dependent-domain, and binding-spacing
 changes are strict improvements — same semantics, but fuzz now accepts
 several cases that previously failed. The relational-algebra keyword
@@ -167,13 +165,6 @@ files produced by an earlier version.
   (commit `1cd9761`). `{| name == e |}` previously emitted
   `\lblot name == e \rblot` (content flush against bracket symbols);
   now emits `\lblot~name == e~\rblot`. Source-level: unchanged.
-
-- **BREAKING (visual): `==` literal for abbreviation, `\defs` reserved for
-  schema definition** (commit `d4ec45a`). Some prior paths used `\defs`
-  where the Z RM specifies literal `==` (Spivey RM 2nd ed §3.2.4 — `==`
-  is the abbreviation symbol; `\defs`/`\widehat{=}` is for horizontal schema
-  definitions only). The generator now consistently emits literal `==`
-  for `Name == Expr` abbreviations.
 
 ### Added
 
