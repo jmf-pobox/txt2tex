@@ -4582,10 +4582,12 @@ class LaTeXGenerator:
         Supports optional generic parameters.
 
         Emission depends on the RHS:
-        - Pure Z RHS → ``\begin{zed} Name \defs Expr \end{zed}``. fuzz
-          parses it as a standard Z abbreviation paragraph.
+        - Pure Z RHS → ``\begin{zed} Name == Expr \end{zed}``. fuzz
+          parses it as a standard Z abbreviation paragraph (Z RM
+          §3.2.4 abbreviation uses literal ``==``, not ``\defs``;
+          ``\defs`` is reserved for horizontal schema definition).
         - Relational RHS (algebra, binding, GROUP/UNGROUP) →
-          ``\noindent$Name \defs Expr$`` outside any Z block. fuzz
+          ``\noindent$Name == Expr$`` outside any Z block. fuzz
           silently skips it; schemas/axdefs in the same document still
           type-check.
 
