@@ -1,0 +1,824 @@
+\documentclass[10pt,landscape,a4paper]{article}
+\usepackage[landscape,margin=1.2cm]{geometry}
+\usepackage{multicol}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb}
+\usepackage{fuzz}
+\usepackage{proof}
+
+% Compact spacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt plus 1pt}
+\setlength{\columnsep}{1.2cm}
+\pagestyle{empty}
+
+% Section formatting
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries\color{darkgray}}{}{0pt}{}[\vspace{-4pt}\rule{\columnwidth}{0.4pt}]
+\titlespacing{\section}{0pt}{6pt}{2pt}
+
+% Code style
+\newcommand{\kw}[1]{\texttt{\bfseries #1}}
+\newcommand{\op}[1]{\texttt{#1}}
+\newcommand{\renders}{\,$\rightarrow$\,}
+
+% Stacked example: input then rendered output (compact)
+\newenvironment{exwrite}%
+  {\par\noindent\scriptsize\textbf{You write:}\par\vspace{0pt}\scriptsize}%
+  {\vspace{1pt}}
+\newenvironment{exget}%
+  {\par\noindent\scriptsize\textbf{You get:}\par\vspace{0pt}\small}%
+  {\par\vspace{3pt}}
+
+% Table helper — left col monospace, right col roman
+\newcolumntype{L}{>{\ttfamily}l}
+\newcolumntype{R}{>{\raggedright\arraybackslash}X}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries txt2tex Reference}\\[2pt]
+{\small Write math like you're at a whiteboard.  Get \LaTeX\ you can hand in.}\\[1pt]
+{\footnotesize\color{gray}\url{https://github.com/jmf-pobox/txt2tex}}
+\end{center}
+
+\vspace{-2pt}
+
+%% ── PAGE 1: FOUNDATIONS ──────────────────────────
+
+\begin{multicols}{3}
+\raggedcolumns
+
+% ── DOCUMENT STRUCTURE ──────────────────────────
+\section{Document Structure}
+
+\begin{tabularx}{\columnwidth}{LR}
+=== Title ===        & \verb|\section*{Title}| \\
+** Solution N **     & Bold heading with spacing \\
+(a) Text             & Part label \\
+TEXT: paragraph      & Prose block (smart formula detection) \\
+LATEX: \textbackslash cmd & Raw \LaTeX\ passthrough \\
+PAGEBREAK:           & Page break \\
+LINEBREAK:           & Vertical gap (\verb|\medskip|) — between blocks, no page break \\
+\end{tabularx}
+
+\smallskip
+\begin{tabularx}{\columnwidth}{LR}
+TITLE: \ldots        & Document title \\
+AUTHOR: \ldots       & Author name \\
+DATE: \ldots         & Date string \\
+BIBLIOGRAPHY: f.bib  & BibTeX file \\
+{[cite key]}         & \verb|\citep{key}| \\
+\end{tabularx}
+
+\smallskip
+\textbf{Identifier Decoration}
+
+\begin{tabularx}{\columnwidth}{LR}
+count'               & $count'$ (after-state) \\
+in?                  & $in?$ (input) \\
+out!                 & $out!$ (output) \\
+x?'                  & $x?'$ (runs may combine) \\
+'sunk'               & $\mbox{`sunk'}$ (string literal) \\
+\end{tabularx}
+
+{\footnotesize Decoration attaches to any identifier. Reserved words (\texttt{theta}, \texttt{defs}, \texttt{hide}, \texttt{project}, \texttt{Delta}, \texttt{Xi}) cannot be decorated.}
+
+% ── PROPOSITIONAL LOGIC ─────────────────────────
+\section{Propositional Logic}
+
+\begin{tabularx}{\columnwidth}{LR}
+p land q             & $p \land q$ \\
+p lor q              & $p \lor q$ \\
+lnot p               & $\lnot p$ \\
+p => q               & $p \Rightarrow q$ \\
+p <=> q              & $p \Leftrightarrow q$ \\
+\end{tabularx}
+
+{\footnotesize\textbf{Note:} Use \kw{land}, \kw{lor}, \kw{lnot}. English \texttt{and}/\texttt{or}/\texttt{not} are not supported.}
+
+\smallskip
+\textbf{Truth-table example:}
+
+\begin{exwrite}%
+\begin{verbatim}
+TRUTH TABLE:
+p | q | p => q
+T | T | T
+T | F | F
+F | T | T
+F | F | T
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+\begin{tabular}{ccc}
+$p$ & $q$ & $p \Rightarrow q$ \\ \hline
+T & T & T \\
+T & F & F \\
+F & T & T \\
+F & F & T \\
+\end{tabular}
+\end{center}
+\end{exget}
+
+% ── NUMBERS & ARITHMETIC ────────────────────────
+\section{Numbers \& Arithmetic}
+
+\begin{tabularx}{\columnwidth}{LR}
+N                    & $\nat$ (natural numbers) \\
+Z                    & $\num$ (integers) \\
+N1                   & $\nat_1$ (positive naturals) \\
+n + m / n - m        & addition / subtraction \\
+n * m / n div m      & multiplication / division \\
+n mod m              & modulo \\
+n < m / n > m        & strict ordering \\
+n <= m / n >= m      & non-strict ordering \\
+n = m / n /= m       & equality / inequality \\
+\end{tabularx}
+
+\end{multicols}
+
+%% ── PAGE 2: SETS & PREDICATES ────────────────────
+\newpage
+
+\begin{multicols}{3}
+\raggedcolumns
+
+% ── SETS & TYPES ────────────────────────────────
+\section{Sets \& Types}
+
+\begin{tabularx}{\columnwidth}{LR}
+x elem S             & $x \in S$ \\
+x notin S            & $x \notin S$ \\
+A subset B           & $A \subseteq B$ \\
+A union B            & $A \cup B$ \\
+A inter B            & $A \cap B$ \\
+A setminus B         & $A \setminus B$ \\
+power S              & $\power S$ \\
+F S                  & $\finset S$ \\
+A cross B            & $A \cross B$ \\
+\{x : S | P\}        & Set comprehension \\
+n..m                 & $n \upto m$ (integer range) \\
+\end{tabularx}
+
+\smallskip
+\textbf{Set comprehension example:}
+
+\begin{exwrite}%
+\begin{verbatim}
+{x : N | x > 0 land x < 5}
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\{x : \nat \mid x > 0 \land x < 5\}$
+\end{center}
+\end{exget}
+
+% ── PREDICATE LOGIC ─────────────────────────────
+\section{Predicate Logic}
+
+\begin{tabularx}{\columnwidth}{LR}
+forall x : S | P     & $\forall x : S @ P$ \\
+exists x : S | P     & $\exists x : S @ P$ \\
+exists\_1 x : S | P  & $\exists_1 x : S @ P$ (unique) \\
+lambda x : S | E     & $\lambda x : S @ E$ \\
+mu x : S | P         & $\mu x : S @ P$ (definite desc.) \\
+\end{tabularx}
+
+{\footnotesize \textbf{Bullet form:} \texttt{x : S | P} means $x : S \bullet P$ (bullet is implied). The vertical bar is the quantifier separator.}
+
+\smallskip
+\textbf{Tuple-pattern:}
+
+\begin{exwrite}%
+\begin{verbatim}
+forall (x, y) : N cross N |
+  x + y >= 0
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\forall (x, y) : \nat \cross \nat @ x + y \geq 0$
+\end{center}
+\end{exget}
+
+{\footnotesize \textbf{Multi-decl:} separate variable groups with \texttt{;} inside a quantifier: \texttt{forall x : A; y : B | P}.}
+
+\smallskip
+{\footnotesize \textbf{Schema-text scope:} a bare \texttt{[d : T | P]} in a quantifier or function acts as an inline schema text.}
+
+\end{multicols}
+
+%% ── PAGE 3: RELATIONS & FUNCTIONS ───────────────
+\newpage
+
+\begin{multicols}{3}
+\raggedcolumns
+
+% ── RELATIONS ───────────────────────────────────
+\section{Relations}
+
+\begin{tabularx}{\columnwidth}{LR}
+A <-> B              & $A \rel B$ (relation type) \\
+x |-> y              & $(x \mapsto y)$ (maplet) \\
+dom R / ran R        & $\dom R$ / $\ran R$ \\
+A dres R             & $A \dres R$ (domain restrict) \\
+A dsub R             & $A \ndres R$ (domain subtract) \\
+R rres B             & $R \rres B$ (range restrict) \\
+R rsub B             & $R \nrres B$ (range subtract) \\
+R oplus S            & $R \oplus S$ (relational override) \\
+R o9 S               & $R \semi S$ (forward comp.) \\
+R comp S             & $R \comp S$ (backward comp.) \\
+R~{[A]}              & $R\,[\,A\,]$ (relational image) \\
+\end{tabularx}
+
+\smallskip
+\textbf{Worked example — domain restrict:}
+
+\begin{exwrite}%
+\begin{verbatim}
+{1, 2} dres {1 |-> a, 2 |-> b, 3 |-> c}
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\{1,2\} \dres \{1 \mapsto a, 2 \mapsto b, 3 \mapsto c\}$
+\end{center}
+\end{exget}
+
+% ── FUNCTIONS ───────────────────────────────────
+\section{Functions}
+
+\begin{tabularx}{\columnwidth}{LR}
+A pfun B             & $A \pfun B$ (partial) \\
+A fun B              & $A \fun B$ (total) \\
+A pinj B             & $A \pinj B$ (partial injection) \\
+A inj B              & $A \inj B$ (total injection) \\
+A surj B             & $A \surj B$ (surjection) \\
+A bij B              & $A \bij B$ (bijection) \\
+A ffun B             & $A \ffun B$ (finite partial) \\
+f(x)                 & function application \\
+lambda x : T | f(x)  & $\lambda x : T @ f(x)$ \\
+\end{tabularx}
+
+\smallskip
+\textbf{Worked example — lambda:}
+
+\begin{exwrite}%
+\begin{verbatim}
+double == lambda n : N | n * 2
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$double \defs \lambda n : \nat @ n * 2$
+\end{center}
+\end{exget}
+
+\end{multicols}
+
+%% ── PAGE 4: SEQUENCES + Z PARAGRAPHS + SCHEMAS PART 1 ──
+\newpage
+
+\begin{multicols}{3}
+\raggedcolumns
+
+% ── SEQUENCES ───────────────────────────────────
+\section{Sequences}
+
+\begin{tabularx}{\columnwidth}{LR}
+<> / <a, b>          & $\langle\rangle$ / $\langle a, b \rangle$ \\
+s \textasciicircum{} t  & $s \cat t$ (concatenation) \\
+seq S / seq1 S       & $\seq S$ / $\seq_1 S$ \\
+\# s                 & $\# s$ (length) \\
+head s / tail s      & first / rest \\
+last s / front s     & last / all-but-last \\
+rev s                & reverse \\
+s(i)                 & index (1-based) \\
+\end{tabularx}
+
+% ── Z PARAGRAPHS ────────────────────────────────
+\section{Z Paragraphs}
+
+\begin{tabularx}{\columnwidth}{LR}
+given A, B           & Given types: $[A, B]$ \\
+T ::= a | b          & Free type definition \\
+name == expr         & Abbreviation \\
+\end{tabularx}
+
+\smallskip
+\begin{tabularx}{\columnwidth}{LR}
+\multicolumn{2}{l}{\kw{axdef} / \kw{schema Name} / \kw{gendef [X]}}\\
+\quad declarations   & Variable declarations \\
+\texttt{where}       & Separator \\
+\quad predicates     & Constraining predicates \\
+\texttt{end}         & Close the block \\
+\end{tabularx}
+
+{\footnotesize \kw{axdef} introduces global constants; \kw{gendef [X]} parameterises by a type; \kw{schema Name} names a state or operation.}
+
+% ── SCHEMAS ─────────────────────────────────────
+\section{Schemas}
+
+{\scriptsize A named schema introduces a signature (declarations) and an invariant (where clause).}
+
+\begin{exwrite}%
+\begin{verbatim}
+schema Counter
+  size : N
+  nums : seq N
+where
+  size = # nums
+end
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{schema}{Counter}
+size : \nat \\
+nums : \seq \nat
+\where
+size = \# nums
+\end{schema}
+\end{exget}
+
+\smallskip
+\textbf{Where-clause patterns:}
+
+\textbf{1. Simple comparison.}
+\begin{exwrite}%
+\begin{verbatim}
+schema Bounded
+  size : N
+where
+  size < 10
+end
+\end{verbatim}
+\end{exwrite}
+
+\textbf{2. Set comprehension.}
+\begin{exwrite}%
+\begin{verbatim}
+schema Inventory
+  items : seq N
+  stock : N
+where
+  stock = # {x : ran items | x > 0}
+end
+\end{verbatim}
+\end{exwrite}
+
+\textbf{3. Quantifier.}
+\begin{exwrite}%
+\begin{verbatim}
+schema NonNeg
+  s : seq Z
+where
+  forall i : 1..#s | s(i) >= 0
+end
+\end{verbatim}
+\end{exwrite}
+
+\end{multicols}
+
+%% ── PAGE 5: SCHEMAS PART 2 + SCHEMA OPERATIONS ──
+\newpage
+
+\begin{multicols}{3}
+\raggedcolumns
+
+% ── SCHEMAS (CONTINUED) ─────────────────────────
+\section{Schemas (continued)}
+
+\textbf{Schemas in declarations.}
+
+{\scriptsize A schema name used as a type pulls in that schema's signature:}
+
+\begin{exwrite}%
+\begin{verbatim}
+schema Voyage
+  s : Ship
+  dest : Port
+end
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+{\scriptsize \texttt{s} inherits all fields of \texttt{Ship} as \texttt{s.field}}
+\end{center}
+\end{exget}
+
+\smallskip
+\textbf{Generic schemas.}
+
+\begin{exwrite}%
+\begin{verbatim}
+gendef [X]
+  empty : F X
+where
+  empty = {}
+end
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+{\scriptsize $\langle X \rangle$ is the type parameter; instantiate with \texttt{G[T]}.}
+\end{exget}
+
+\smallskip
+\textbf{Schemas as predicates.}
+
+{\scriptsize Inside a quantifier, a schema name acts as a predicate (both its signature and its where clause must be satisfied):}
+
+\begin{exwrite}%
+\begin{verbatim}
+forall c : Counter |
+  c.size >= 0
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\forall c : Counter @ c.size \geq 0$
+\end{center}
+\end{exget}
+
+% ── SCHEMA OPERATIONS ───────────────────────────
+\section{Schema Operations}
+
+\textbf{Inclusion operators.}
+
+\begin{tabularx}{\columnwidth}{LR}
+SName                & bare inclusion \\
+Delta Counter        & $\Delta Counter$ (before/after-state pair) \\
+Xi Card              & $\Xi Card$ (read-only state) \\
+theta S              & $\theta S$ (binding of current state) \\
+theta S'             & $\theta S'$ (binding of after-state) \\
+\end{tabularx}
+
+\smallskip
+\textbf{Horizontal definition.}
+
+\begin{tabularx}{\columnwidth}{LR}
+\multicolumn{2}{l}{\texttt{Name defs RHS}:}\\
+Name defs Schema     & $Name \defs Schema$ \\
+N defs Delta C       & $N \defs \Delta C$ \\
+N defs [d : T | P]   & inline schema text \\
+N[X] defs G[X]       & generic form \\
+\end{tabularx}
+
+\smallskip
+\textbf{Schema calculus operators (RHS of \texttt{defs}).}
+
+\begin{tabularx}{\columnwidth}{LR}
+S[old/new]           & rename component \\
+S[a/b, c/d]          & multiple renames \\
+S ; T                & $S \semi T$ (composition) \\
+S >> T               & $S \pipe T$ (piping) \\
+S hide (x, y)        & $S \hide (x,y)$ \\
+S project T          & $S \project T$ \\
+\end{tabularx}
+
+\end{multicols}
+
+%% ── PAGE 6: Z BINDINGS + PROOFS PART 1 ──────────
+\newpage
+
+\begin{multicols}{3}
+\raggedcolumns
+
+% ── Z BINDINGS ──────────────────────────────────
+\section{Z Bindings}
+
+{\scriptsize Z RM §3.7: binding brackets construct labelled tuples.}
+
+\begin{tabularx}{\columnwidth}{LR}
+\{| name == e |\}      & $\lblot name == e \rblot$ \\
+\{| a == e, b == f |\} & multiple components \\
+\{| |\}                & empty binding \\
+\end{tabularx}
+
+\smallskip
+\textbf{Multi-typed comprehension with binding:}
+
+\begin{exwrite}
+\begin{verbatim}
+{ s : Ship; c : Class |
+  s.class = c.class .
+  {| name == s.name |} }
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+$\{ s : Ship; c : Class \mid s.class = c.class$\\
+$\bullet \lblot name == s.name \rblot \}$
+\end{center}
+\end{exget}
+
+{\scriptsize Use \texttt{;} to separate variable-type pairs inside \texttt{\{ \}}. Binding components are \textbf{comma}-separated (Z RM §3.7).}
+
+\smallskip
+{\scriptsize\textbf{Fuzz note:} bindings emit outside any Z environment. Do not place them inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks — fuzz rejects \texttt{==} inside $\lblot \ldots \rblot$ in block contents.}
+
+\smallskip
+\textbf{Scope rules.} Identifiers declared in the left-hand signature of a comprehension are in scope in the predicate and the body expression.
+
+% ── PROOFS ──────────────────────────────────────
+\section{Proofs}
+
+\textbf{Truth-table format:}
+
+\begin{exwrite}%
+\begin{verbatim}
+TRUTH TABLE:
+p | q | p land q
+T | T | T
+T | F | F
+F | T | F
+F | F | F
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+\begin{tabular}{ccc}
+$p$ & $q$ & $p \land q$ \\ \hline
+T & T & T \\
+T & F & F \\
+F & T & F \\
+F & F & F \\
+\end{tabular}
+\end{center}
+\end{exget}
+
+\smallskip
+\textbf{Equivalence chain (\kw{EQUIV:}):}
+
+\begin{exwrite}%
+\begin{verbatim}
+EQUIV:
+lnot (p land q)
+lnot p lor lnot q  [De Morgan]
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\begin{array}{l@{\hspace{2em}}r}
+\lnot (p \land q) \\
+\Leftrightarrow \lnot p \lor \lnot q
+  & [\mbox{De Morgan}]
+\end{array}$
+\end{center}
+\end{exget}
+
+{\scriptsize \kw{EQUIV:} joins steps with $\Leftrightarrow$. Use for predicate equivalences.}
+
+\end{multicols}
+
+%% ── PAGE 7: PROOFS PART 2 ────────────────────────
+\newpage
+
+\begin{multicols}{3}
+\raggedcolumns
+
+% ── PROOFS (CONTINUED) ──────────────────────────
+\section{Proofs (continued)}
+
+\textbf{Proof tree syntax (\kw{PROOF:}):}
+
+{\scriptsize Trees are written \textbf{bottom-up}: conclusion first, premises indented below.}
+
+\begin{tabularx}{\columnwidth}{LR}
+\textrm{indent}      & Premises indented under conclusion \\
+{[rule]}              & Justification label \\
+{[rule {[n]}]}        & Discharge assumption $n$ \\
+{[n] expr}            & Boxed assumption labelled $n$ \\
+::                    & Sibling premises \\
+\end{tabularx}
+
+{\footnotesize\textbf{Rules:} \texttt{land intro}, \texttt{land elim 1/2}, \texttt{lor intro 1/2}, \texttt{lor elim}, \texttt{=> intro/elim}, \texttt{<=> intro/elim}, \texttt{lnot intro/elim}, \texttt{forall intro/elim}, \texttt{exists intro/elim}.}
+
+\smallskip
+\textbf{Modus ponens:}
+
+\begin{exwrite}%
+\begin{verbatim}
+PROOF:
+  q [=> elim]
+    p => q
+    p
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\infer[\Rightarrow\textrm{-elim}]{q}{p \Rightarrow q & p}$
+\end{center}
+\end{exget}
+
+\textbf{$\land$-intro:}
+
+\begin{exwrite}%
+\begin{verbatim}
+PROOF:
+  p land q [land intro]
+    p
+    q
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\infer[\land\textrm{-intro}]{p \land q}{p & q}$
+\end{center}
+\end{exget}
+
+\textbf{$\Rightarrow$-intro with discharge:}
+
+\begin{exwrite}%
+\begin{verbatim}
+PROOF:
+  p => p [=> intro [1]]
+    [1] p
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \Rightarrow p}{\ulcorner p \urcorner^{[1]}}$
+\end{center}
+\end{exget}
+
+{\scriptsize \texttt{[1]~p} = boxed assumption. \texttt{[=> intro~[1]]} discharges it.}
+
+\textbf{$\lor$-elim / case analysis:}
+
+\begin{exwrite}%
+\begin{verbatim}
+PROOF:
+  r [lor elim]
+    p lor q
+    :: p => r
+      [1] p
+        r [from p]
+    :: q => r
+      [2] q
+        r [from q]
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\infer[\lor\textrm{-elim}]{r}{p \lor q & \infer{r}{\ulcorner p \urcorner^{[1]}} & \infer{r}{\ulcorner q \urcorner^{[2]}}}$
+\end{center}
+\end{exget}
+
+{\scriptsize \texttt{::} = sibling premises (case arms).}
+
+\textbf{Equality chain (\kw{EQUAL:}):}
+
+\begin{exwrite}%
+\begin{verbatim}
+EQUAL:
+0 + 0
+0      [0+0 = 0]
+length(<>)
+       [length(<>) = 0]
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\begin{array}{l@{\hspace{1.5em}}r}
+0 + 0 \\
+= 0 & [\mbox{0+0 = 0}] \\
+= length(\langle\rangle) & [\mbox{length}(\langle\rangle) = 0]
+\end{array}$
+\end{center}
+\end{exget}
+
+{\scriptsize \kw{EQUAL:} = expression chains ($=$). \kw{ARGUE:} = forward-reasoning argumentation blocks.}
+
+\end{multicols}
+
+%% ── PAGE 8: RELATIONAL DATABASE NOTATION ─────────
+\newpage
+
+\begin{multicols}{3}
+\raggedcolumns
+
+% ── RELATIONAL DATABASE NOTATION ────────────────
+\section{Relational Database Notation}
+
+\textbf{Primary key annotation.}
+
+{\scriptsize Mark a primary-key attribute with \kw{pk} in a named schema body. The annotation sits outside the Z box so fuzz type-checks cleanly.}
+
+\begin{exwrite}
+\begin{verbatim}
+schema Class
+  pk class : ClassName
+  country  : CountryName
+  bore     : N
+end
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+\begin{schema}{Class}
+class : ClassName \\
+country : CountryName \\
+bore : \nat
+\end{schema}\\[2pt]
+\noindent$\mathrm{PK}(\mathrm{Class}) = \{class\}$
+\end{center}
+\end{exget}
+
+{\scriptsize Composite: two \kw{pk} lines $\Rightarrow$ $\mathrm{PK}(S)=\{a,b\}$.
+Comma-separated names on one \kw{pk} line also work.
+\kw{pk} is rejected in \texttt{axdef}/\texttt{gendef}/inline schema text.}
+
+\smallskip
+\textbf{Relational algebra.}
+
+\begin{tabularx}{\columnwidth}{LR}
+sigma[p](R)          & $\mathrm{Restrict}_{p}(R)$ — restrict \\
+pi[A,B](R)           & $\mathrm{Project}\{A,B\}(R)$ — project \\
+rho[A as B](R)       & $\mathrm{Rename}_{A \to B}(R)$ — rename \\
+R bowtie S           & $R \otimes S$ — natural join \\
+R bowtie [p] S       & $\mathrm{Join}_{p}(R, S)$ — theta-join \\
+R div S              & $R \div S$ — division \\
+\end{tabularx}
+
+{\footnotesize \texttt{sigma}/\texttt{pi}/\texttt{rho} bind at atom level. \texttt{bowtie} and \texttt{div} are infix at cross-product precedence.}
+
+{\footnotesize\textbf{Fuzz note:} algebra expressions emit outside any Z environment — fuzz silently skips them. Do not wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
+
+\begin{exwrite}
+\begin{verbatim}
+BigGuns == pi[class,country](
+  sigma[bore >= 16](Class))
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+\noindent$BigGuns \defs \mathrm{Project}\{class,country\}(\mathrm{Restrict}_{bore \geq 16}(Class))$
+\end{center}
+\end{exget}
+
+\smallskip
+\textbf{FK predicate form.}
+
+{\scriptsize Foreign-key constraints are expressed as axdef predicates:}
+
+\begin{exwrite}
+\begin{verbatim}
+axdef
+where
+  (R, S) |-> {a |-> b} elem FK
+end
+\end{verbatim}
+\end{exwrite}
+
+\smallskip
+\textbf{GROUP \& UNGROUP.}
+
+{\scriptsize Date's nested-relation operators.}
+
+\begin{tabularx}{\columnwidth}{LR}
+R group (\{A,B\} as x) & $R\ \mathop{\mathrm{GROUP}} (\{A,B\}\ \mathop{\mathrm{AS}}\ x)$ \\
+R ungroup x          & $R\ \mathop{\mathrm{UNGROUP}}\ x$ \\
+\end{tabularx}
+
+\begin{exwrite}
+\begin{verbatim}
+Members group ({name,email} as contact)
+Members ungroup contact
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+$Members\ \mathop{\mathrm{GROUP}}\ (\{name,email\}\ \mathop{\mathrm{AS}}\ contact)$\\[3pt]
+$Members\ \mathop{\mathrm{UNGROUP}}\ contact$
+\end{center}
+\end{exget}
+
+{\scriptsize\textbf{Fuzz note:} GROUP/UNGROUP emit outside any Z environment. Do not place them inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
+
+\smallskip
+\textbf{Quick reference.}
+
+\begin{tabularx}{\columnwidth}{LR}
+pk a : T             & primary key in schema \\
+pk a, b : T          & composite pk \\
+sigma[p](R)          & restrict \\
+pi[A](R)             & project \\
+rho[A as B](R)       & rename attr \\
+R bowtie S           & natural join ($\otimes$) \\
+R div S              & division \\
+\{| a == e |\}       & binding bracket \\
+\{S; C | P . E\}    & multi-typed set comp \\
+R group (\{A\} as x) & group attrs \\
+R ungroup x          & ungroup attr \\
+\end{tabularx}
+
+\end{multicols}
+
+\end{document}

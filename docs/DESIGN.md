@@ -1669,7 +1669,7 @@ the keyword-algebra rendering convention reviewed 2026-05-19.
 - All Assignment-related tests removed from
   `tests/test_14_relational_databases/test_algebra.py`; bowtie generator
   tests updated to expect `\otimes`.
-- `docs/cheatsheet.tex`, `docs/tutorials/11_relational_databases.md`,
+- `docs/reference.tex`, `docs/tutorials/11_relational_databases.md`,
   `docs/guides/USER_GUIDE.md`, and
   `examples/14_relational_databases/algebra_basics.{txt,tex}` updated.
 

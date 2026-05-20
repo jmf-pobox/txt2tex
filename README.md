@@ -14,7 +14,7 @@ txt2tex converts plain-text mathematical notation into LaTeX. Write `forall x : 
 
 **Try an expression without creating a file.** Run `txt2tex -i` to open the REPL. Type an expression, see the LaTeX and a PDF preview. Useful for checking rendering or grabbing a snippet to paste elsewhere.
 
-**[Reference Card (PDF)](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet.pdf)** — two-page reference with every operator, block type, and proof syntax, plus side-by-side examples showing what you type and what txt2tex renders.
+**[Reference (PDF)](https://github.com/jmf-pobox/txt2tex/blob/main/docs/reference.pdf)** — eight-page reference covering every operator, block type, proof syntax, Z schemas, schema calculus, bindings, and relational database notation, with side-by-side examples showing what you type and what txt2tex renders.
 
 ---
 
@@ -409,13 +409,11 @@ Primary key annotation (`pk`), FK predicates in `axdef`, relational algebra in k
 
 ---
 
-### Cheatsheets
+### Reference
 
-Printable two-page references:
+Printable eight-page reference:
 
-- **[docs/cheatsheet-modelling.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet-modelling.pdf)** — Logic, sets, proofs, schemas, schema calculus
-- **[docs/cheatsheet-relational.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet-relational.pdf)** — Relational algebra, pk annotation, bindings, GROUP/UNGROUP
-- **[docs/cheatsheet.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet.pdf)** — Combined reference covering all of the above
+- **[docs/reference.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/reference.pdf)** — All operators, block types, proof syntax, Z schemas, schema calculus, bindings, and relational database notation
 
 ---
 

@@ -335,7 +335,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   under pytest-xdist with exact `.tex` fixture diffs
 - Markdownlint adopted and wired into `make check`
 - CLI help epilog distinguishing default/`--tex-only`/`-i`/`--check-env` modes
-- Two-page reference card (`docs/cheatsheet.pdf`) with proof examples
+- Reference card (`docs/reference.pdf`) with proof examples
 - Three getting-started examples (`examples/00_getting_started/`)
 - Ethos agent team for development workflow (`.punt-labs/ethos/`)
 - `py.typed` marker (PEP 561)
