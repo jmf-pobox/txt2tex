@@ -47,7 +47,7 @@ member : PlaylistId \rel TrackId
 \bigskip
 
 \noindent
-$\{~ t : Track | t.genre = `Jazz' @ \lblot title == t.title, genre == t.genre \rblot ~\}$
+$\{~ t : Track | t.genre = `Jazz' @ \lblot~title == t.title, genre == t.genre~\rblot ~\}$
 
 
 \section*{Query 2 : Two - relation join via comprehension}
@@ -60,7 +60,7 @@ $\{~ t : Track | t.genre = `Jazz' @ \lblot title == t.title, genre == t.genre \r
 $\displaystyle
 \begin{array}{l}
 \{~ t : Track ; al : Album ; ar : Artist | t.alid = al.alid \land \\
-\quad al.arid = ar.arid @ \lblot track == t.title, artist == ar.name \rblot ~\}
+\quad al.arid = ar.arid @ \lblot~track == t.title, artist == ar.name~\rblot ~\}
 \end{array}$
 
 \bigskip
@@ -75,7 +75,7 @@ $\displaystyle
 $\displaystyle
 \begin{array}{l}
 \{~ p : PlaylistId ; t : Track ; al : Album | (p, t.tid) \in member \land \\
-\quad t.alid = al.alid @ \lblot playlist == p, track == t.title, album == al.title \rblot ~\}
+\quad t.alid = al.alid @ \lblot~playlist == p, track == t.title, album == al.title~\rblot ~\}
 \end{array}$
 
 \bigskip
@@ -90,7 +90,7 @@ $\displaystyle
 $\displaystyle
 \begin{array}{l}
 \{~ t : Track ; al : Album | t.alid = al.alid \land \\
-\quad t.duration > 300 @ \lblot track == t.title, album == al.title \rblot ~\}
+\quad t.duration > 300 @ \lblot~track == t.title, album == al.title~\rblot ~\}
 \end{array}$
 
 \bigskip

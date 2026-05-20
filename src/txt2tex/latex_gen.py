@@ -2457,14 +2457,14 @@ class LaTeXGenerator:
         Empty binding ``{| |}`` → ``\lblot \rblot``.
         """
         if not node.pairs:
-            return r"\lblot \rblot"
+            return r"\lblot~\rblot"
         components: list[str] = []
         for label, value_expr in node.pairs:
             label_latex = self._emit_attr_name(label)
             value_latex = self.generate_expr(value_expr)
             components.append(f"{label_latex} == {value_latex}")
         inner = ", ".join(components)
-        return rf"\lblot {inner} \rblot"
+        return rf"\lblot~{inner}~\rblot"
 
     @generate_document_item.register(Section)
     def _generate_section(self, node: Section) -> list[str]:

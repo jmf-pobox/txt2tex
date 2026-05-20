@@ -243,39 +243,39 @@ class TestBindingGenerator:
     """Generator emits correct \\lblot ... \\rblot LaTeX."""
 
     def test_single_component_latex(self) -> None:
-        r"""{| name == x |} → \lblot name == x \rblot."""
+        r"""{| name == x |} → \lblot~name == x~\rblot."""
         out = _expr_latex("{| name == x |}")
-        assert out == r"\lblot name == x \rblot"
+        assert out == r"\lblot~name == x~\rblot"
 
     def test_two_components_latex(self) -> None:
-        r"""{| a == 1, b == 2 |} → \lblot a == 1, b == 2 \rblot."""
+        r"""{| a == 1, b == 2 |} → \lblot~a == 1, b == 2~\rblot."""
         out = _expr_latex("{| a == 1, b == 2 |}")
-        assert out == r"\lblot a == 1, b == 2 \rblot"
+        assert out == r"\lblot~a == 1, b == 2~\rblot"
 
     def test_three_components_latex(self) -> None:
-        r"""{| a == 1, b == 2, c == 3 |} → \lblot a == 1, b == 2, c == 3 \rblot."""
+        r"""{| a == 1, b == 2, c == 3 |} → \lblot~a == 1, b == 2, c == 3~\rblot."""
         out = _expr_latex("{| a == 1, b == 2, c == 3 |}")
-        assert out == r"\lblot a == 1, b == 2, c == 3 \rblot"
+        assert out == r"\lblot~a == 1, b == 2, c == 3~\rblot"
 
     def test_empty_binding_latex(self) -> None:
-        r"""{| |} → \lblot \rblot."""
+        r"""{| |} → \lblot~\rblot."""
         out = _expr_latex("{| |}")
-        assert out == r"\lblot \rblot"
+        assert out == r"\lblot~\rblot"
 
     def test_identifier_in_value(self) -> None:
-        r"""{| r == Ship |} → \lblot r == Ship \rblot (no wrapping)."""
+        r"""{| r == Ship |} → \lblot~r == Ship~\rblot (no wrapping)."""
         out = _expr_latex("{| r == Ship |}")
-        assert out == r"\lblot r == Ship \rblot"
+        assert out == r"\lblot~r == Ship~\rblot"
 
     def test_identifier_label(self) -> None:
-        r"""{| Ship == x |} → \lblot Ship == x \rblot (label passes through)."""
+        r"""{| Ship == x |} → \lblot~Ship == x~\rblot (label passes through)."""
         out = _expr_latex("{| Ship == x |}")
-        assert out == r"\lblot Ship == x \rblot"
+        assert out == r"\lblot~Ship == x~\rblot"
 
     def test_field_projection_value_latex(self) -> None:
-        r"""{| name == s.name |} → \lblot name == s.name \rblot."""
+        r"""{| name == s.name |} → \lblot~name == s.name~\rblot."""
         out = _expr_latex("{| name == s.name |}")
-        assert out == r"\lblot name == s.name \rblot"
+        assert out == r"\lblot~name == s.name~\rblot"
 
     def test_decorated_value_latex(self) -> None:
         r"""{| x == y' |} emits the prime decoration."""

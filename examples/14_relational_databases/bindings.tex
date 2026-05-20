@@ -1,0 +1,64 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\title{Z Binding Calculus}
+\author{txt2tex example}
+\hypersetup{pdftitle={Z Binding Calculus},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.2.0}}
+\begin{document}
+
+\maketitle
+
+\begin{zed}[ShipName, ClassName]\end{zed}
+
+\begin{schema}{Ship}
+name : ShipName \\
+class : ClassName \\
+launched : \nat
+\end{schema}
+
+\begin{schema}{Class}
+class : ClassName \\
+country : \nat \\
+bore : \nat \\
+displacement : \nat \\
+numGuns : \nat
+\end{schema}
+
+\section*{Atomic Binding}
+
+\noindent
+$\lblot~name == s.name~\rblot$
+
+
+\section*{Binding in Set Comprehension ( Q2 ( a ) style )}
+
+\noindent
+$\{~ s : Ship | s.launched < 1921 @ \lblot~name == s.name~\rblot ~\}$
+
+
+\section*{Multi - Component Binding}
+
+\noindent
+$\lblot~name == s.name, displacement == c.displacement, numGuns == c.numGuns~\rblot$
+
+
+\section*{Multi - Variable Comprehension with Binding ( Q2 ( d ) style )}
+
+\noindent
+$\{~ s : Ship ; c : Class | s.class = c.class @ \lblot~name == s.name, displacement == c.displacement, numGuns == c.numGuns~\rblot ~\}$
+
+
+\section*{Empty Binding}
+
+\noindent
+$\lblot~\rblot$
+
+
+\end{document}
