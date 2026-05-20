@@ -2458,22 +2458,22 @@ schema body.  txt2tex emits a fuzz-compatible PK statement after the schema
 box:
 
 ```text
-schema Class
-  pk class : ClassName
-  country : CountryName
-  bore : N
+schema Book
+  pk bookId : BookId
+  isbn : ISBN
+  pages : N
 end
 ```
 
 Generated LaTeX (abridged):
 
 ```latex
-\begin{schema}{Class}
-class : ClassName \\
-country : CountryName \\
-bore : \nat
+\begin{schema}{Book}
+bookId : BookId \\
+isbn : ISBN \\
+pages : \nat
 \end{schema}
-\noindent$\mathrm{PK}(\mathrm{Class}) = \{class\}$
+\noindent$\mathrm{PK}(\mathrm{Book}) = \{bookId\}$
 ```
 
 The schema body stays plain so fuzz type-checks it cleanly.  The PK line
@@ -2527,10 +2527,10 @@ algebra keyword forms.
 #### Restriction
 
 ```text
-sigma[bore >= 16](Class)
+sigma[pages >= 200](Book)
 ```
 
-Renders: $\mathrm{Restrict}_{bore \geq 16}(Class)$
+Renders: $\mathrm{Restrict}_{pages \geq 200}(Book)$
 
 The predicate inside `[...]` is a full expression (comparisons, logical
 operators, etc.).
@@ -2538,41 +2538,41 @@ operators, etc.).
 #### Projection
 
 ```text
-pi[class, country](Class)
+pi[bookId, isbn](Book)
 ```
 
-Renders: $\mathrm{Project}\{class, country\}(Class)$
+Renders: $\mathrm{Project}\{bookId, isbn\}(Book)$
 
 The attribute list is comma-separated identifiers.
 
 #### Renaming
 
 ```text
-rho[ship as name](Outcome)
+rho[bookId as id](Book)
 rho[A as B, C as D](R)
 ```
 
-Renders: $\mathrm{Rename}_{ship \to name}(Outcome)$
+Renders: $\mathrm{Rename}_{bookId \to id}(Book)$
 
 Each pair is written `old as new`; multiple pairs are comma-separated.
 
 #### Natural Join
 
 ```text
-Ship bowtie Class
+Track bowtie Album
 ```
 
-Renders: $Ship \otimes Class$
+Renders: $Track \otimes Album$
 
 The source keyword is `bowtie`; the LaTeX emission is `\otimes` (`⊗`).
 
 **Theta-join** with explicit predicate:
 
 ```text
-Ship bowtie [Ship.class = Class.class] Class
+Track bowtie [Track.albumId = Album.albumId] Album
 ```
 
-Renders: $\mathrm{Join}_{Ship.class = Class.class}(Ship, Class)$
+Renders: $\mathrm{Join}_{Track.albumId = Album.albumId}(Track, Album)$
 
 #### Division
 
@@ -2589,22 +2589,22 @@ txt2tex inspects the RHS: when it contains a relational construct (algebra,
 binding, GROUP/UNGROUP), the abbreviation emits outside any Z block:
 
 ```text
-BigGuns == pi[class, country](sigma[bore >= 16](Class))
+LongBooks == pi[bookId, isbn](sigma[pages >= 200](Book))
 ```
 
-Emits as `\noindent$BigGuns \defs \mathrm{Project}\{class, country\}(\mathrm{Restrict}_{bore \geq 16}(Class))$`.
+Emits as `\noindent$LongBooks \defs \mathrm{Project}\{bookId, isbn\}(\mathrm{Restrict}_{pages \geq 200}(Book))$`.
 
 #### Combining Operators
 
 ```text
-// Q1(a): classes of big-gun ships
-pi[class, country](sigma[bore >= 16](Class))
+// long books projected to key and isbn
+pi[bookId, isbn](sigma[pages >= 200](Book))
 
-// Q1(c): rename then join
-rho[ship as name](Outcome) bowtie Ship
+// rename then join
+rho[bookId as id](Book) bowtie Loan
 
-// Q1(d): name a query using ==
-BigGuns == pi[class, country](sigma[bore >= 16](Class))
+// name a query using ==
+LongBooks == pi[bookId, isbn](sigma[pages >= 200](Book))
 ```
 
 **Precedence summary** (tightest to loosest):
@@ -2688,9 +2688,9 @@ Components are **comma-separated** (not semicolons).
 **Examples:**
 
 ```text
-{| name == s.name |}
+{| trackId == t.trackId |}
 
-{| name == s.name, displacement == c.displacement, numGuns == c.numGuns |}
+{| trackId == t.trackId, year == a.year, tracks == a.tracks |}
 
 {| |}                         // empty binding (Z RM permits it)
 ```
@@ -2698,10 +2698,10 @@ Components are **comma-separated** (not semicolons).
 **In set comprehensions:**
 
 ```text
-{ s : Ship | s.launched < 1921 . {| name == s.name |} }
+{ t : Track | t.duration < 180 . {| trackId == t.trackId |} }
 
-{ s : Ship; c : Class | s.class = c.class .
-  {| name == s.name, displacement == c.displacement |}
+{ t : Track; a : Album | t.albumId = a.albumId .
+  {| trackId == t.trackId, year == a.year |}
 }
 ```
 
@@ -2944,9 +2944,9 @@ and `lor`.
 Example — long algebra expression broken at operator boundaries:
 
 ```text
-pi[name, displacement, numGuns](Class bowtie
-  Ship bowtie
-  rho[ship as name](pi[ship](sigma[battle = 'Guadalcanal'](Outcome))))
+pi[winner, venue, tier](Tournament bowtie
+  Match bowtie
+  rho[tournament as id](pi[tournament](sigma[venue = 'Centre Court'](Match))))
 ```
 
 Example — inside a schema `where` clause:

@@ -464,15 +464,15 @@ S project T          & $S \project T$ \\
 
 \begin{exwrite}
 \begin{verbatim}
-{ s : Ship; c : Class |
-  s.class = c.class .
-  {| name == s.name |} }
+{ t : Track; a : Album |
+  t.albumId = a.albumId .
+  {| trackId == t.trackId |} }
 \end{verbatim}
 \end{exwrite}
 \begin{exget}
 \begin{center}
-$\{ s : Ship; c : Class \mid s.class = c.class$\\
-$\bullet \lblot name == s.name \rblot \}$
+$\{ t : Track; a : Album \mid t.albumId = a.albumId$\\
+$\bullet \lblot trackId == t.trackId \rblot \}$
 \end{center}
 \end{exget}
 
@@ -678,21 +678,21 @@ $\begin{array}{l@{\hspace{1.5em}}r}
 
 \begin{exwrite}
 \begin{verbatim}
-schema Class
-  pk class : ClassName
-  country  : CountryName
-  bore     : N
+schema Book
+  pk bookId : BookId
+  isbn      : ISBN
+  pages     : N
 end
 \end{verbatim}
 \end{exwrite}
 \begin{exget}
 \begin{center}
-\begin{schema}{Class}
-class : ClassName \\
-country : CountryName \\
-bore : \nat
+\begin{schema}{Book}
+bookId : BookId \\
+isbn : ISBN \\
+pages : \nat
 \end{schema}\\[2pt]
-\noindent$\mathrm{PK}(\mathrm{Class}) = \{class\}$
+\noindent$\mathrm{PK}(\mathrm{Book}) = \{bookId\}$
 \end{center}
 \end{exget}
 

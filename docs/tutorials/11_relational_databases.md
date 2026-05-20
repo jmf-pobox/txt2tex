@@ -8,24 +8,23 @@ The `pk` prefix marks an attribute as the primary key of a **named** schema.
 txt2tex records this in the AST and emits a PK statement after the schema box:
 
 ```text
-schema Class
-  pk class : ClassName
-  country : CountryName
-  bore : N
-  displacement : N
-  numGuns : N
+schema Book
+  pk bookId : BookId
+  isbn : ISBN
+  pages : N
+  year : N
 end
 ```
 
 Generated LaTeX (abridged):
 
 ```latex
-\begin{schema}{Class}
-class : ClassName \\
-country : CountryName \\
+\begin{schema}{Book}
+bookId : BookId \\
+isbn : ISBN \\
 ...
 \end{schema}
-\noindent$\mathrm{PK}(\mathrm{Class}) = \{class\}$
+\noindent$\mathrm{PK}(\mathrm{Book}) = \{bookId\}$
 ```
 
 The schema body is plain Z — fuzz type-checks it cleanly. The PK line sits
@@ -125,20 +124,20 @@ required.
 Select tuples satisfying a predicate:
 
 ```text
-sigma[bore >= 16](Class)
+sigma[pages >= 200](Book)
 ```
 
-Renders as: $\mathrm{Restrict}_{bore \geq 16}(Class)$
+Renders as: $\mathrm{Restrict}_{pages \geq 200}(Book)$
 
 ### Projection (pi)
 
 Keep only named attributes:
 
 ```text
-pi[class, country](Class)
+pi[bookId, isbn](Book)
 ```
 
-Renders as: $\mathrm{Project}\{class, country\}(Class)$
+Renders as: $\mathrm{Project}\{bookId, isbn\}(Book)$
 
 The attribute list is comma-separated identifiers.
 
@@ -147,11 +146,11 @@ The attribute list is comma-separated identifiers.
 Rename attributes using `old as new` pairs:
 
 ```text
-rho[ship as name](Outcome)
+rho[bookId as id](Book)
 rho[A as B, C as D](R)
 ```
 
-Renders as: $\mathrm{Rename}_{ship \to name}(Outcome)$
+Renders as: $\mathrm{Rename}_{bookId \to id}(Book)$
 
 Multiple pairs are comma-separated.
 
@@ -160,20 +159,20 @@ Multiple pairs are comma-separated.
 Join on all common attributes:
 
 ```text
-Ship bowtie Class
+Track bowtie Album
 ```
 
-Renders as: $Ship \otimes Class$
+Renders as: $Track \otimes Album$
 
 The source keyword is `bowtie`; the LaTeX emission is `\otimes` (`⊗`).
 
 **Theta-join** — join with an explicit predicate:
 
 ```text
-Ship bowtie [Ship.class = Class.class] Class
+Track bowtie [Track.albumId = Album.albumId] Album
 ```
 
-Renders as: $\mathrm{Join}_{Ship.class = Class.class}(Ship, Class)$
+Renders as: $\mathrm{Join}_{Track.albumId = Album.albumId}(Track, Album)$
 
 ### Division (div)
 
@@ -192,13 +191,13 @@ txt2tex inspects the RHS: when it contains a relational construct (algebra,
 binding, GROUP/UNGROUP), the abbreviation emits as `\noindent$...$` outside any Z block:
 
 ```text
-BigGuns == pi[class, country](sigma[bore >= 16](Class))
+LongBooks == pi[bookId, isbn](sigma[pages >= 200](Book))
 ```
 
 Emits as:
 
 ```latex
-\noindent$BigGuns \defs \mathrm{Project}\{class, country\}(\mathrm{Restrict}_{bore \geq 16}(Class))$
+\noindent$LongBooks \defs \mathrm{Project}\{bookId, isbn\}(\mathrm{Restrict}_{pages \geq 200}(Book))$
 ```
 
 ### Operator Precedence
@@ -244,19 +243,19 @@ These appear in relational-calculus queries.
 A binding constructs a tuple whose components are labelled:
 
 ```text
-{| name == s.name |}
+{| trackId == t.trackId |}
 ```
 
-Renders as: $\lblot name == s.name \rblot$
+Renders as: $\lblot trackId == t.trackId \rblot$
 
 Multiple components are **comma-separated** (not semicolons — Z RM §3.7):
 
 ```text
-{| name == s.name, displacement == c.displacement, numGuns == c.numGuns |}
+{| trackId == t.trackId, year == a.year, tracks == a.tracks |}
 ```
 
 Renders as:
-$\lblot name == s.name, displacement == c.displacement, numGuns == c.numGuns \rblot$
+$\lblot trackId == t.trackId, year == a.year, tracks == a.tracks \rblot$
 
 An empty binding is valid (rare, but permitted by Z RM §3.7):
 
@@ -269,14 +268,14 @@ An empty binding is valid (rare, but permitted by Z RM §3.7):
 The main use case is the expression part of a set comprehension:
 
 ```text
-{ s : Ship | s.launched < 1921 . {| name == s.name |} }
+{ t : Track | t.duration < 180 . {| trackId == t.trackId |} }
 ```
 
 A multi-variable comprehension uses `;` to separate variable-type pairs:
 
 ```text
-{ s : Ship; c : Class | s.class = c.class .
-  {| name == s.name, displacement == c.displacement, numGuns == c.numGuns |}
+{ t : Track; a : Album | t.albumId = a.albumId .
+  {| trackId == t.trackId, year == a.year, tracks == a.tracks |}
 }
 ```
 

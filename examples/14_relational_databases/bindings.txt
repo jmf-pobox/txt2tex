@@ -1,50 +1,49 @@
-// Z Binding Brackets (Phase 2.3)
+// Z Binding Brackets
 // Demonstrates: {| ... |} binding literals per Z RM §3.7
 // Used in relational-calculus queries.
 
 TITLE: Z Binding Calculus
 AUTHOR: txt2tex example
 
-given ShipName, ClassName
+given TrackId, AlbumId, ArtistId
 
-schema Ship
-  name : ShipName
-  class : ClassName
-  launched : N
+schema Track
+  trackId : TrackId
+  albumId : AlbumId
+  duration : N
 end
 
-schema Class
-  class : ClassName
-  country : N
-  bore : N
-  displacement : N
-  numGuns : N
+schema Album
+  albumId : AlbumId
+  artistId : ArtistId
+  year : N
+  tracks : N
 end
 
 === Atomic Binding ===
 
 // A binding constructs a labelled tuple.
 
-{| name == s.name |}
+{| trackId == t.trackId |}
 
-=== Binding in Set Comprehension (Q2(a) style) ===
+=== Binding in Set Comprehension ===
 
-// Select name of every ship launched before 1921.
+// Select trackId of every track shorter than 180 seconds.
 
-{ s : Ship | s.launched < 1921 . {| name == s.name |} }
+{ t : Track | t.duration < 180 . {| trackId == t.trackId |} }
 
 === Multi-Component Binding ===
 
 // Multiple comma-separated label-expression pairs.
 
-{| name == s.name, displacement == c.displacement, numGuns == c.numGuns |}
+{| trackId == t.trackId, year == a.year, tracks == a.tracks |}
 
-=== Multi-Variable Comprehension with Binding (Q2(d) style) ===
+=== Multi-Variable Comprehension with Binding ===
 
 // Cross two schemas and project into a binding.
 
-{ s : Ship; c : Class | s.class = c.class .
-  {| name == s.name, displacement == c.displacement, numGuns == c.numGuns |}
+{ t : Track; a : Album | t.albumId = a.albumId .
+  {| trackId == t.trackId, year == a.year, tracks == a.tracks |}
 }
 
 === Empty Binding ===

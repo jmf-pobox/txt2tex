@@ -8,24 +8,26 @@ The `pk` prefix marks primary-key attributes. A PK annotation is emitted
 below the schema box. The `pk` prefix produces this:
 
 ```text
-schema Class
-  pk class : ClassName
-  country : CountryName
-  bore : N
+schema Book
+  pk bookId : BookId
+  isbn : ISBN
+  pages : N
+  year : N
 end
 ```
 
-The generator emits a `PK(Class) = {class}` annotation below the schema box.
-`country` and `bore` are plain declarations — no annotation. Schema names
+The generator emits a `PK(Book) = {bookId}` annotation below the schema box.
+`isbn`, `pages`, and `year` are plain declarations — no annotation. Schema names
 stay in their default math font — no `\mathrm{}` wrapper.
 
 ## Examples
 
 ### primary_keys.txt
 
-Demonstrates the `pk` prefix for marking primary-key attributes:
+Demonstrates the `pk` prefix for marking primary-key attributes using a
+library domain (Book, Member, Loan):
 
-- Single primary key: `pk class : ClassName`
+- Single primary key: `pk bookId : BookId`
 - Composite primary key: two `pk` lines in one schema
 - PK/FK constraints as plain Z predicates in `axdef`
 
@@ -55,12 +57,12 @@ for proper math-mode operator spacing (per jms round-2 refinement).
 ### bindings.txt
 
 Demonstrates Z binding brackets per Z RM §3.7, used in relational-calculus
-queries:
+queries, with a music collection domain (Track, Album, Artist):
 
-- `{| name == s.name |}` — single-component binding (`\lblot ... \rblot`)
+- `{| trackId == t.trackId |}` — single-component binding (`\lblot ... \rblot`)
 - `{| a == e1, b == e2 |}` — multi-component binding with comma separators
-- `{ s : Ship | pred . {| name == s.name |} }` — binding in set comprehension
-- `{ s : Ship; c : Class | pred . {| ... |} }` — multi-variable comprehension
+- `{ t : Track | pred . {| trackId == t.trackId |} }` — binding in set comprehension
+- `{ t : Track; a : Album | pred . {| ... |} }` — multi-variable comprehension
 - `{| |}` — empty binding (Z RM permits it)
 
 The `{|` and `|}` tokens are distinct from `{` (set brace), `|` (pipe),

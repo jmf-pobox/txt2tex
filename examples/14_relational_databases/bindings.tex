@@ -15,44 +15,43 @@
 
 \maketitle
 
-\begin{zed}[ShipName, ClassName]\end{zed}
+\begin{zed}[TrackId, AlbumId, ArtistId]\end{zed}
 
-\begin{schema}{Ship}
-name : ShipName \\
-class : ClassName \\
-launched : \nat
+\begin{schema}{Track}
+trackId : TrackId \\
+albumId : AlbumId \\
+duration : \nat
 \end{schema}
 
-\begin{schema}{Class}
-class : ClassName \\
-country : \nat \\
-bore : \nat \\
-displacement : \nat \\
-numGuns : \nat
+\begin{schema}{Album}
+albumId : AlbumId \\
+artistId : ArtistId \\
+year : \nat \\
+tracks : \nat
 \end{schema}
 
 \section*{Atomic Binding}
 
 \noindent
-$\lblot~name == s.name~\rblot$
+$\lblot~trackId == t.trackId~\rblot$
 
 
-\section*{Binding in Set Comprehension ( Q2 ( a ) style )}
+\section*{Binding in Set Comprehension}
 
 \noindent
-$\{~ s : Ship | s.launched < 1921 @ \lblot~name == s.name~\rblot ~\}$
+$\{~ t : Track | t.duration < 180 @ \lblot~trackId == t.trackId~\rblot ~\}$
 
 
 \section*{Multi - Component Binding}
 
 \noindent
-$\lblot~name == s.name, displacement == c.displacement, numGuns == c.numGuns~\rblot$
+$\lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot$
 
 
-\section*{Multi - Variable Comprehension with Binding ( Q2 ( d ) style )}
+\section*{Multi - Variable Comprehension with Binding}
 
 \noindent
-$\{~ s : Ship ; c : Class | s.class = c.class @ \lblot~name == s.name, displacement == c.displacement, numGuns == c.numGuns~\rblot ~\}$
+$\{~ t : Track ; a : Album | t.albumId = a.albumId @ \lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot ~\}$
 
 
 \section*{Empty Binding}

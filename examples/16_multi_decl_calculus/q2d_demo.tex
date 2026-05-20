@@ -8,49 +8,49 @@
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \newdimen\savedleftskip
-\title{Multi-Declaration Z Constructs --- Q2(d) Demo}
+\title{Multi-Declaration Z Constructs --- Demo}
 \author{txt2tex}
-\hypersetup{pdftitle={Multi-Declaration Z Constructs --- Q2(d) Demo},pdfauthor={txt2tex},pdfcreator={txt2tex v1.2.0}}
+\hypersetup{pdftitle={Multi-Declaration Z Constructs --- Demo},pdfauthor={txt2tex},pdfcreator={txt2tex v1.2.0}}
 \begin{document}
 
 \maketitle
 
 \section*{Background}
 
-\noindent The constructs in this file all share a single grammatical shape: a Z paragraph that introduces two or more typed variables in one declaration list, with a conjunction predicate over their projections, optionally followed by a characteristic expression. Until the Q2(d) parser fix, none of them parsed natively — students wrote them as raw LaTeX. They now compile to fuzz-clean output.
+\noindent The constructs in this file all share a single grammatical shape: a Z paragraph that introduces two or more typed variables in one declaration list, with a conjunction predicate over their projections, optionally followed by a characteristic expression. Until the multi-decl parser fix, none of them parsed natively — users wrote them as raw LaTeX. They now compile to fuzz-clean output.
 
 \bigskip
 
-\begin{zed}[ShipName, ClassName, BattleName, CountryName, Result]\end{zed}
+\begin{zed}[PlayerName, TournamentId, MatchId, VenueName]\end{zed}
 
 \medskip
 
-\begin{schema}{Class}
-class : ClassName \\
-country : CountryName \\
-numGuns : \nat \\
-bore : \nat
+\begin{schema}{Tournament}
+tournamentId : TournamentId \\
+venue : VenueName \\
+tier : \nat
 \where
-bore \leq 16
+tier \leq 5
 \end{schema}
-\noindent$\mathrm{PK}(\mathrm{Class}) = \{class\}$
+\noindent$\mathrm{PK}(\mathrm{Tournament}) = \{tournamentId\}$
 
 \smallskip
 
-\begin{schema}{Ship}
-name : ShipName \\
-class : ClassName
+\begin{schema}{Player}
+name : PlayerName \\
+ranking : \nat
 \end{schema}
-\noindent$\mathrm{PK}(\mathrm{Ship}) = \{name\}$
+\noindent$\mathrm{PK}(\mathrm{Player}) = \{name\}$
 
 \smallskip
 
-\begin{schema}{Outcome}
-ship : ShipName \\
-battle : BattleName \\
-result : Result
+\begin{schema}{Match}
+matchId : MatchId \\
+tournament : TournamentId \\
+winner : PlayerName \\
+loser : PlayerName
 \end{schema}
-\noindent$\mathrm{PK}(\mathrm{Outcome}) = \{ship, battle\}$
+\noindent$\mathrm{PK}(\mathrm{Match}) = \{matchId, tournament\}$
 
 \smallskip
 
@@ -63,9 +63,8 @@ result : Result
 \noindent
 $\displaystyle
 \begin{array}{l}
-\mathrm{Project}\{name, country\}(Class \otimes \\
-\quad Ship \otimes \\
-\quad \mathrm{Rename}_{ship \to name}(\mathrm{Project}\{ship\}(\mathrm{Restrict}_{battle = `Guadalcanal'}(Outcome))))
+\mathrm{Project}\{winner, venue, tier\}(Tournament \otimes \\
+\quad \mathrm{Rename}_{tournament \to tournamentId}(\mathrm{Project}\{tournament\}(\mathrm{Restrict}_{winner = `Ali'}(Match))))
 \end{array}$
 
 \bigskip
@@ -79,9 +78,9 @@ $\displaystyle
 \noindent
 $\displaystyle
 \begin{array}{l}
-\{~ s : Ship ; c : Class ; o : Outcome | s.class = c.class \land \\
-\quad o.ship = s.name \land \\
-\quad o.battle = `Guadalcanal' @ \lblot name == s.name, country == c.country, bore == c.bore \rblot ~\}
+\{~ m : Match ; t : Tournament ; p : Player | m.tournament = t.tournamentId \land \\
+\quad m.winner = p.name \land \\
+\quad t.venue = `Centre Court' @ \lblot~winner == m.winner, venue == t.venue, tier == t.tier~\rblot ~\}
 \end{array}$
 
 \bigskip
@@ -93,7 +92,7 @@ $\displaystyle
 \bigskip
 
 \begin{zed}
-\forall s : Ship; c : Class | s.class = c.class \land c.bore \geq 16 @ c.numGuns > 8
+\forall m : Match; t : Tournament | m.tournament = t.tournamentId \land t.tier \leq 2 @ m.winner \neq m.loser
 \end{zed}
 
 \section*{4 . Multi - decl quantifier without characteristic expression}
@@ -103,7 +102,7 @@ $\displaystyle
 \bigskip
 
 \noindent
-$\{~ s : Ship ; c : Class | s.class = c.class \land c.bore \geq 16 ~\}$
+$\{~ m : Match ; t : Tournament | m.tournament = t.tournamentId \land t.tier \leq 2 ~\}$
 
 
 \section*{5 . Multi - decl mu ( definite description )}
@@ -113,7 +112,7 @@ $\{~ s : Ship ; c : Class | s.class = c.class \land c.bore \geq 16 ~\}$
 \bigskip
 
 \begin{zed}
-bigGun == (\mu c : Class | c.bore = 16 @ c.numGuns)
+topFinal == (\mu t : Tournament | t.tier = 1 @ t.venue)
 \end{zed}
 
 \section*{6 . Multi - decl lambda --- Spivey - canonical form}
@@ -123,7 +122,7 @@ bigGun == (\mu c : Class | c.bore = 16 @ c.numGuns)
 \bigskip
 
 \begin{zed}
-fleet == (\lambda s : Ship; c : Class | s.class = c.class @ s.name)
+roster == (\lambda m : Match; t : Tournament | m.tournament = t.tournamentId @ m.winner)
 \end{zed}
 
 \section*{7 . Paren - wrap fix}

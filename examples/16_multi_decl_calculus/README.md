@@ -1,4 +1,4 @@
-# Multi-Declaration Z Constructs --- Q2(d) Demo
+# Multi-Declaration Z Constructs --- Demo
 
 Showcases the parser and generator capabilities added to support
 multi-typed Z comprehensions, quantifiers, and lambdas with conjunction
@@ -8,6 +8,8 @@ relational-calculus form.
 Until these features shipped, multi-typed queries required dropping into
 raw LaTeX for any expression crossing two or more relations. The demo
 also flags one known follow-up: the paren-wrap gap on top-level lambdas.
+
+Uses a tournament scheduling domain (Player, Tournament, Match).
 
 ## What's in here
 
@@ -38,4 +40,4 @@ nodes only apply when nested.
 ## Background
 
 Test pin file: `tests/test_q2d_calculus_predicate_chain.py` (13 tests).
-ADR: `docs/DESIGN.md` --- "Q2(d) parser-bug fix".
+ADR: `docs/DESIGN.md` --- "multi-decl parser fix".

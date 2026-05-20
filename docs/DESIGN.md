@@ -2074,11 +2074,11 @@ names are comma-separated inside the set literal.
 **Status:** Accepted
 
 **Context.** Long relational-algebra and set expressions overflow the page.
-The Guadalcanal example is representative:
+A multi-join chain is representative:
 
 ```text
-pi[name, displacement, numGuns](Class bowtie Ship bowtie
-  rho[ship as name](pi[ship](sigma[battle = 'Guadalcanal'](Outcome))))
+pi[winner, venue, tier](Tournament bowtie Match bowtie
+  rho[tournament as id](pi[tournament](sigma[venue = 'Centre Court'](Match))))
 ```
 
 That expression is approximately 145 characters on one line. The existing
