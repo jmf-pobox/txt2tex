@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Migration Notes (Prior-Release Users)
+
+This section summarises what to expect when upgrading. Most `.txt`
+files compile unchanged; output LaTeX may differ visually.
+
+**Parse-time changes — one new error to know about:**
+
+- Reserved Z operator names (`id`, `dom`, `ran`, `inv`, `comp`, `mod`,
+  `bigcup`, `bigcap`, `filter`) used as a declaration variable name in
+  a `schema`, `axdef`, or `gendef` body now raise a clear
+  `ParserError`. Previously the parser silently accepted them and the
+  generator emitted the operator symbol (`\id`, `\dom`, …), producing
+  fuzz-rejected output. If your `.txt` used `id : T` as a schema
+  field, rename to `id1`, `idVal`, `myId`, etc.
+
+**LaTeX-output changes — same input, different rendering:**
+
+| Construct | Before | After |
+|---|---|---|
+| Multi-decl `forall`/`exists`/`exists1` | `\forall x : T @ \forall y : U @ P` | `\forall x : T; y : U @ P` (Spivey) |
+| Multi-decl `mu` | `(\mu x : T \| (\mu y : U \| ...))` (fuzz REJECTED) | `(\mu x : T; y : U \| ...)` (fuzz-clean) |
+| Multi-decl `lambda` | nested + conditional paren-wrap | Spivey + unconditional paren-wrap in fuzz mode |
+| Bindings | `\lblot name == e \rblot` (flush) | `\lblot~name == e~\rblot` (thin-spaced) |
+| Relational algebra | `\sigma_p(R)`, `\pi_{A,B}(R)`, `\rho_{...}`, `\bowtie`, `\bowtie_p` | `\mathrm{Restrict}_p(R)`, `\mathrm{Project}\{A,B\}(R)`, `\mathrm{Rename}_{...}`, `\otimes`, `\mathrm{Join}_p` |
+| `==` (abbreviation) | (some paths used `\defs`) | always `==` literally; `\defs` reserved for horizontal schema definition |
+
+The Spivey-form, paren-wrap, dependent-domain, and binding-spacing
+changes are strict improvements — same semantics, but fuzz now accepts
+several cases that previously failed. The relational-algebra keyword
+rendering is the one purely stylistic change. Regenerate any `.tex`
+files produced by an earlier version.
+
+**Strictly additive** (never affect existing `.txt` files):
+
+- `LINEBREAK:` directive, `pk` annotation, Z bindings `{| ... |}`,
+  schema renaming `S[a/b]`, horizontal schema definitions
+  `Name defs Schema-Exp`, schema-calculus operators in `defs` RHS
+  (`;`, `>>`, `hide`, `project`), GROUP/UNGROUP, multi-typed
+  comprehensions with conjunction predicates over tuple projections,
+  algebra WYSIWYG line breaks, dependent-domain detection.
+
 ### Fixed
 
 - **Dependent-domain detection in Spivey-form quantifier collapse** (commit
@@ -72,6 +113,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking Changes
 
+- **Reserved Z operator names rejected in declaration positions** (commit
+  `7fb6567` and the parser change folded into it). `id`, `dom`, `ran`,
+  `inv`, `comp`, `mod`, `bigcup`, `bigcap`, `filter` used as declaration
+  variable names in `schema`, `axdef`, or `gendef` now raise
+  `ParserError` with a clear message. Previously parsed silently and
+  emitted broken LaTeX. Migration: rename the field (`id` → `id1`,
+  `idVal`, etc.).
+
 - **`:=` operator removed.** The `:=` (assignment) token type, AST node,
   parser dispatch, and generator are gone. Use `==` for relational assignment
   — the smart-`==` abbreviation (committed a8a02ae) already covers both
@@ -96,6 +145,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `R bowtie [p] S` now emits `\mathrm{Join}_{p}(R, S)` (previously
   `R \otimes_{p} S`). Natural join without a predicate (`R bowtie S`) is
   unchanged: still `R \otimes S`.
+
+- **BREAKING (visual): Spivey-canonical form for multi-decl quantifiers**
+  (commits `71ce521`, `92823b7`). Multi-decl `forall`/`exists`/`exists1`/`mu`/
+  `lambda` chains now emit as one quantifier token with semicolon-separated
+  SchemaText (`\forall x : T; y : U @ P`) instead of nested tokens
+  (`\forall x : T @ \forall y : U @ P`). Same semantics; matches Z RM §3.9
+  split identity and what Z literature prints. The previous nested form for
+  multi-decl `mu` was actually fuzz-rejected; the new Spivey form is
+  fuzz-clean — a strict improvement.
+
+- **BREAKING (visual): Lambda always paren-wrapped in fuzz mode** (commits
+  `71ce521`, follow-on). Fuzz requires `(\lambda S @ E)` around every
+  lambda expression. The generator previously wrapped only when
+  `parent is not None`, which missed abbreviation RHS, set literals,
+  sequence displays, and top-level zed predicates. Now unconditional
+  in `use_fuzz=True`. Source-level: unchanged. Generated `.tex`:
+  every lambda gains surrounding parens.
+
+- **BREAKING (visual): Z bindings now thin-spaced inside brackets**
+  (commit `1cd9761`). `{| name == e |}` previously emitted
+  `\lblot name == e \rblot` (content flush against bracket symbols);
+  now emits `\lblot~name == e~\rblot`. Source-level: unchanged.
+
+- **BREAKING (visual): `==` literal for abbreviation, `\defs` reserved for
+  schema definition** (commit `d4ec45a`). Some prior paths used `\defs`
+  where the Z RM specifies literal `==` (Spivey RM 2nd ed §3.2.4 — `==`
+  is the abbreviation symbol; `\defs`/`\widehat{=}` is for horizontal schema
+  definitions only). The generator now consistently emits literal `==`
+  for `Name == Expr` abbreviations.
 
 ### Added
 
