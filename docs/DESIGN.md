@@ -2202,4 +2202,79 @@ Trigoni's notation observed in:
 - Topic03 and topic04 confirm the same style.
 - Theta-join function form (`Join_p(R, S)`) first appears at slide 02-69/70/71.
 
+---
+
+## ADR: Dependent-domain detection in Spivey-form quantifier collapse
+
+**Date:** 2026-05-20
+**Status:** Accepted
+
+### Context
+
+The Spivey-form generator (Phase 3.1) collapses nested same-quantifier
+chains into a single Z schema-text argument: `\forall x : A; y : B @ P`
+instead of `\forall x : A @ \forall y : B @ P`. Z RM §3.5 specifies that
+schema-text declarations are *sequentially scoped* — a later declaration's
+domain may reference a name bound by an earlier one (e.g., `y : 1..x`
+where `x` is already declared). Fuzz, however, *parallel-binds* all
+declarations in one schema text: names introduced by one declaration are
+not in scope for co-declarations' domains. Collapsing a dependent chain
+therefore produces output fuzz rejects.
+
+The same structural issue applies to `lambda` chains via
+`_collect_lambda_chain`, and to set comprehensions via
+`_generate_set_comprehension`.
+
+### Decision
+
+Thread a free-variable analysis through the chain helpers. A new module,
+`src/txt2tex/free_vars.py`, exports `expr_free_vars(expr) → frozenset[str]`
+with an explicit branch for every `Expr` member (38 total). Binders subtract
+their bound names before recursing into body/expression but do *not* subtract
+from domain analysis (correct: the domain is in the outer scope).
+
+At each step in `_collect_quantifier_chain` and `_collect_lambda_chain`, the
+helper checks whether the next declaration's domain mentions any name already
+accumulated by prior declarations. On a dependency, it stops the collapse,
+emits the independent prefix as a partial Spivey schema text, and recurses on
+the remaining tail — the split-identity of Z RM §3.9 (`\forall D_1 @ \forall D_2 @ P`
+≡ `\forall D_1; D_2 @ P` only when D₂'s domain is free of D₁'s names).
+
+For set comprehensions, no analogous split identity exists in Z RM §3.10.
+`_generate_set_comprehension` raises `ValueError` with a clear message when
+a dependent extra declaration is detected, directing the user to rewrite.
+
+### Alternatives rejected
+
+1. **Fuzz-style parallel-binding semantics in the parser.** Changing the
+   parser to treat schema-text declarations as parallel-bound would be
+   semantically incorrect — Z is sequentially scoped. Invasive and wrong.
+2. **Speculative parse-then-backtrack.** Generate collapsed form, run fuzz,
+   backtrack on rejection. Adds latency, couples the generator to the fuzz
+   binary, and produces misleading error attribution.
+3. **All-or-nothing collapse.** Disable collapse whenever any declaration in
+   the chain references a prior name. Correct but forfeits the Spivey benefit
+   on the independent prefix, which is often the majority of the chain.
+4. **New AST node `MixedQuantifierChain`.** Distinguishing dependent and
+   independent sub-chains at the AST level is over-engineering for what is a
+   private generator helper concern.
+
+### Consequences
+
+- Fuzz-clean output in both shapes: Spivey collapsed form for independent
+  chains; nested form for dependent chains.
+- `expr_free_vars` is reusable for future generator work (capture analysis
+  for substitution, occurrence checking, etc.).
+- `sem/solutions-corrected.txt` — the Phase 3 regression input — now
+  fuzz-typechecks without the v2 workaround conjunct that was required before
+  this fix.
+- 11 xfail tests in `tests/test_spivey_dependent_domain.py` flipped to PASS.
+
+### Z RM citations
+
+- §3.5 — schema-text sequential scoping
+- §3.9 — forall/exists split identity (valid only for independent declarations)
+- §3.10 — set comprehension (no split identity; dependent case is a user error)
+- §3.12 — lambda domain rule
+
 **Test count delta**: 3893 → 3925 (32 new pk tests; relvars tests deleted).

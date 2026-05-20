@@ -403,6 +403,26 @@ Generates:
 
 ---
 
+## Schema-Text Parallel Binding
+
+Z RM §3.5 specifies that declarations within a schema text are *sequentially
+scoped*: a later declaration's domain may reference names bound by earlier
+ones. Example: `x : N; y : 1..x` — `y`'s domain depends on `x`.
+
+Fuzz *parallel-binds* all co-declarations in a single schema text. A domain
+that references a sibling's name is therefore rejected by fuzz, even though
+it is valid Z.
+
+txt2tex detects this case in `_collect_quantifier_chain` and
+`_collect_lambda_chain` via `expr_free_vars` (`src/txt2tex/free_vars.py`).
+When a dependency is found, the generator emits nested quantifiers for the
+dependent portion rather than the collapsed Spivey form, satisfying fuzz
+without changing the Z semantics. Set comprehensions with dependent extra
+declarations produce a generator error — Z RM §3.10 has no split identity
+for that case; the user must rewrite.
+
+---
+
 ## Key Lessons for Future Development
 
 ### 1. Always Test with Fuzz

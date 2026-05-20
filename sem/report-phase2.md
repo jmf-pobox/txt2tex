@@ -63,7 +63,7 @@ nested form plus the noop conjunct:
 
 ## Verification
 
-```
+```text
 uv run txt2tex sem/solutions-corrected-v2.txt
 → Generated: solutions-corrected-v2.tex
 → Type checking: passed

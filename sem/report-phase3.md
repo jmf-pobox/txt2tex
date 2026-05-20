@@ -89,7 +89,7 @@ All other source changes (category A) are output-equivalent.
 
 ## Verification
 
-```
+```text
 uv run txt2tex sem/solutions-corrected-v3.txt
 → Generated: solutions-corrected-v3.tex
 → Type checking: passed

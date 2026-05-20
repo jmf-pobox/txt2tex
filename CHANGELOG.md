@@ -9,6 +9,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Dependent-domain detection in Spivey-form quantifier collapse** (commit
+  `92823b7`). `_collect_quantifier_chain` and `_collect_lambda_chain`
+  previously collapsed all same-quantifier chains into a single Spivey schema
+  text regardless of whether later declarations' domains referenced earlier-bound
+  names. Fuzz parallel-binds co-declarations (Z RM §3.5), so such output was
+  rejected. A new module `src/txt2tex/free_vars.py` provides
+  `expr_free_vars(expr) → frozenset[str]`; the chain helpers use it to stop
+  collapse at the first dependency, emit the independent prefix in Spivey form,
+  and recurse on the tail (Z RM §3.9 split identity). Set comprehensions with
+  dependent extra declarations now raise a clear `ValueError` (Z RM §3.10 has
+  no split identity). 11 xfails in `tests/test_spivey_dependent_domain.py`
+  flipped to PASS.
+
+  Before (fuzz-rejected — `y`'s domain references `x` in the same schema text):
+
+  ```text
+  forall x : N; y : 1..x . y <= x
+  ```
+
+  ```latex
+  \forall x : \nat; y : 1 \upto x @ y \leq x   % fuzz rejects
+  ```
+
+  After (fuzz-clean — nested form for the dependent declaration):
+
+  ```latex
+  \forall x : \nat @ \forall y : 1 \upto x @ y \leq x
+  ```
+
 - **Q2(d) comprehension/quantifier parser bugs** (commits `20a6daa`, follow-on
   residual fix, and `fix(parser): add SEMICOLON/PIPE branches to _parse_lambda`).
   Three interrelated bugs prevented DAT relational-calculus expressions from being

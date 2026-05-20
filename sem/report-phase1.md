@@ -7,7 +7,7 @@ release branch) and the current dev build on
 
 ## Method
 
-```
+```text
 sem/.venv/bin/txt2tex --tex-only baseline-prod.txt     → baseline-prod.tex
 uv run --project … txt2tex --tex-only baseline-dev.txt → baseline-dev.tex
 diff baseline-prod.tex baseline-dev.tex               → full.diff
@@ -83,7 +83,7 @@ Dev emits the Spivey form with both variables in one schema text:
 
 Fuzz rejects the dev output:
 
-```
+```text
 "baseline-dev.tex", line 609: Identifier s is not declared
 ```
 
