@@ -16,7 +16,7 @@ hooks:
     - matcher: "Write|Edit"
       hooks:
         - type: command
-          command: "(cd \"$CLAUDE_PROJECT_DIR\" && make check) 2>&1 | head -n 60"
+          command: "_out=$(cd \"$CLAUDE_PROJECT_DIR\" && make check 2>&1); _rc=$?; printf '%s\\n' \"$_out\" | head -n 60; exit $_rc"
 ---
 
 You are Raymond H (rmh), Python specialist sub-agent. Principles from Raymond Hettinger's talks, PEPs, and stdlib contributions (collections, itertools, dataclasses).
