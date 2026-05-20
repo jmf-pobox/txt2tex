@@ -238,7 +238,7 @@ lnot (p land q)
 
 ## Conceptual Coverage
 
-txt2tex covers the full notation curriculum of three Oxford Software Engineering courses: **SEM** (Sets, Equality and Mathematics), **SBM** (State-Based Modelling), and **DAT** (Databases). The topics below appear roughly in dependency order — simpler things first, concepts that build on them after.
+txt2tex covers a broad range of formal-methods and relational-database notation. The topics below appear roughly in dependency order — simpler things first, concepts that build on them after.
 
 ### 1. Document Structure
 
@@ -371,7 +371,7 @@ HidePort defs Op hide (port)
 Renamed defs State[x' / x]
 ```
 
-Delta/Xi inclusion, theta-binding (`theta`), schema composition (`;`), piping (`>>`), hiding (`hide`), projection (`project`), renaming (`S[old/new]`), and horizontal definitions (`Name defs Schema-Exp`). These are the tools SBM uses to compose state machines from simpler pieces.
+Delta/Xi inclusion, theta-binding (`theta`), schema composition (`;`), piping (`>>`), hiding (`hide`), projection (`project`), renaming (`S[old/new]`), and horizontal definitions (`Name defs Schema-Exp`). These are the tools for composing state machines from simpler pieces in Z.
 
 ### 12. Z Bindings
 
@@ -394,9 +394,9 @@ PROOF:
 
 Intro/elim rules, discharged assumptions, sibling premises (`::`); equational chains (`EQUAL:`), equivalence chains (`EQUIV:`), and structured argumentation (`ARGUE:`).
 
-### 14. Database Notation (DAT)
+### 14. Relational Database Notation
 
-Relational algebra and extended Z for DAT specifications:
+Relational algebra and extended Z for database specifications:
 
 ```text
 sigma[cargo > 0](Fleet)
@@ -405,17 +405,17 @@ R bowtie S
 pk shipID
 ```
 
-Primary key annotation (`pk`), FK predicates in `axdef`, relational algebra in keyword form (Restrict `sigma`, Project `pi`, Rename `rho`, Join `bowtie`, division), and `GROUP`/`UNGROUP` for nested relations.
+Primary key annotation (`pk`), FK predicates in `axdef`, relational algebra in keyword form (Restrict `sigma`, Project `pi`, Rename `rho`, Join `bowtie`, division), and `GROUP`/`UNGROUP` for nested relations (Date's operators).
 
 ---
 
-### Course Cheatsheets
+### Cheatsheets
 
-Printable two-page references for each course:
+Printable two-page references:
 
-- **[docs/cheatsheet-sem-sbm.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet-sem-sbm.pdf)** — SEM (logic, sets, proofs) and SBM (schemas, state, schema calculus)
-- **[docs/cheatsheet-dat.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet-dat.pdf)** — DAT (relational algebra, pk annotation, bindings, GROUP/UNGROUP)
-- **[docs/cheatsheet.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet.pdf)** — combined reference covering all of the above
+- **[docs/cheatsheet-modelling.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet-modelling.pdf)** — Logic, sets, proofs, schemas, schema calculus
+- **[docs/cheatsheet-relational.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet-relational.pdf)** — Relational algebra, pk annotation, bindings, GROUP/UNGROUP
+- **[docs/cheatsheet.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet.pdf)** — Combined reference covering all of the above
 
 ---
 
@@ -549,7 +549,7 @@ All 141 examples pass fuzz typechecking and compile to PDF
 
 The standard for Z notation with built-in type checking:
 
-- Custom Oxford fonts
+- Custom Z notation fonts
 - Type validation during compilation
 - Compatible with fuzz-based toolchains
 

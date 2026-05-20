@@ -165,8 +165,7 @@ Ship bowtie Class
 
 Renders as: $Ship \otimes Class$
 
-The source keyword is `bowtie`; the LaTeX emission is `\otimes` (`⊗`),
-matching Trigoni's lecture slides for the Oxford DAT course.
+The source keyword is `bowtie`; the LaTeX emission is `\otimes` (`⊗`).
 
 **Theta-join** — join with an explicit predicate:
 
@@ -189,8 +188,8 @@ Renders as: $R \div S$
 ### Naming a query
 
 Use `==` (Z abbreviation) to bind a name to an algebra expression.
-txt2tex inspects the RHS: when it contains a DAT construct, the
-abbreviation emits as `\noindent$...$` outside any Z block:
+txt2tex inspects the RHS: when it contains a relational construct (algebra,
+binding, GROUP/UNGROUP), the abbreviation emits as `\noindent$...$` outside any Z block:
 
 ```text
 BigGuns == pi[class, country](sigma[bore >= 16](Class))
@@ -228,8 +227,7 @@ txt2tex examples/14_relational_databases/algebra_basics.txt
 ## Z Binding Calculus
 
 Phase 2.3 adds binding brackets — the Z RM §3.7 notation for labelled tuples.
-These appear in relational-calculus queries of the form used in the Oxford DAT
-course exercises.
+These appear in relational-calculus queries.
 
 > **Fuzz compatibility.** Bindings emit *outside* any Z environment —
 > as `\noindent$\ldots$` LaTeX math — so fuzz silently skips them.
@@ -266,7 +264,7 @@ An empty binding is valid (rare, but permitted by Z RM §3.7):
 {| |}
 ```
 
-### Binding in Set Comprehension (DAT Q2 style)
+### Binding in Set Comprehension
 
 The main use case is the expression part of a set comprehension:
 

@@ -19,9 +19,8 @@ You lead the **txt2tex** team:
 - `djb` (Bernstein) — security review
 
 `jfreeman` is the **student** — sets goals, picks priorities, accepts
-deliverables. Treat as a peer engineer with 30 years of experience who
-is currently doing Oxford SE graduate coursework. Skip introductory
-framing.
+deliverables. Treat as a peer engineer with 30 years of experience.
+Skip introductory framing.
 
 The team graph and reporting structure are in
 [docs/development/AGENTS.md](docs/development/AGENTS.md).
@@ -31,11 +30,10 @@ The team graph and reporting structure are in
 ### Always consult jms before Z/fuzz decisions
 
 Any change that touches Z notation semantics, schema calculus, operator
-precedence, fuzz acceptance, or the LaTeX that Oxford-school formal
-methods readers will see — route through jms first via
-`Agent(subagent_type="jms", ...)`. The cost of asking is small; the
-cost of inventing a rule is a wrong type checker output that the
-student then debugs.
+precedence, fuzz acceptance, or the LaTeX that a Z-trained reader will
+see — route through jms first via `Agent(subagent_type="jms", ...)`.
+The cost of asking is small; the cost of inventing a rule is a wrong
+type checker output that the student then debugs.
 
 ### Delegate, do not do everything yourself
 
@@ -105,10 +103,9 @@ For txt2tex specifically:
 high-quality LaTeX that can be type-checked with fuzz and compiled
 to PDF.
 
-**Goal**: Enable users (Jim and other Oxford SE grad students) to
-write mathematical proofs and solutions in plain ASCII (as they would
-on a whiteboard) and automatically convert them to properly formatted
-LaTeX documents.
+**Goal**: Enable users to write mathematical proofs and solutions in
+plain ASCII (as they would on a whiteboard) and automatically convert
+them to properly formatted LaTeX documents.
 
 ## Key Documentation Files
 
@@ -386,7 +383,7 @@ pdftotext examples/04_proof_trees/simple_proofs.pdf -
 The CLI automatically copies bundled `.sty` and `.mf` files to the
 working directory before compilation:
 
-- `fuzz.sty` — Z notation with Oxford fonts (default)
+- `fuzz.sty` — Z notation with bundled `oxsz*` fonts (default)
 - `zed-*.sty` — Z notation with Computer Modern fonts (`--zed` flag)
 - `*.mf` — METAFONT font definitions
 

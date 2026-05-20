@@ -5,8 +5,7 @@ at expression-atom level, and LaTeX generation with ``\\lblot ... \\rblot``.
 
 Negative cases follow the three-assertion pattern: message + line + column.
 
-Acceptance probes at the end verify the DAT calculus queries from
-exercises1.tex Q2(a)-(e).
+Acceptance probes at the end verify relational-calculus queries.
 """
 
 from __future__ import annotations
@@ -285,12 +284,12 @@ class TestBindingGenerator:
 
 
 # ---------------------------------------------------------------------------
-# Generator — acceptance probes (DAT exercises1.tex Q2-style)
+# Generator — acceptance probes (relational-calculus style)
 # ---------------------------------------------------------------------------
 
 
 class TestBindingAcceptanceProbes:
-    """Full DAT calculus query round-trips per mission acceptance criteria."""
+    """Full relational-calculus query round-trips per mission acceptance criteria."""
 
     def test_q2a_single_component(self) -> None:
         r"""Q2(a): single-component binding in set comprehension.

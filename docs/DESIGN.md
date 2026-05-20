@@ -711,7 +711,7 @@ TEMPLATES = {
 
 **Status**: SETTLED 2026-04-13.
 
-**Context**: the parser builds an AST; the generator must decide which parentheses to emit. An early debate weighed *minimalist* (print only what is required for unambiguous parsing) against *instructive* (print what helps a human reader see precedence). The author started minimalist and conceded toward instructive in specific cases, but the end state was not clearly documented. Assessment feedback on Q8(b) of the student's Oxford SE Mathematics submission surfaced the inconsistency — the grader expected parens around an existential predicate that the generator emitted bare.
+**Context**: the parser builds an AST; the generator must decide which parentheses to emit. An early debate weighed *minimalist* (print only what is required for unambiguous parsing) against *instructive* (print what helps a human reader see precedence). The author started minimalist and conceded toward instructive in specific cases, but the end state was not clearly documented. Assessment feedback on Q8(b) surfaced the inconsistency — the grader expected parens around an existential predicate that the generator emitted bare.
 
 **Decision**: precedence-driven output with a small, enumerable set of *always-paren* contexts, plus honouring author-written parens.
 
@@ -724,13 +724,13 @@ TEMPLATES = {
    - Set-comprehension constraint containing a nested quantifier. Wrap the inner quantifier.
    - Nested quantifiers without a structural separator (no `•` delimiter between them). Wrap the inner.
 
-**Z RM citations**: §8.3 (concrete syntax precedence table), §2.1 (logical equivalence `⇔`), §2.3 (equality `=`), §3.6 (schema text `| … •`), §3.8.1 (set comprehension `{ … • … }`), §3.9 (quantified predicates/expressions). None of the Z RM sections *requires* the always-paren additions above — they are an Oxford convention for human legibility, not a syntactic obligation.
+**Z RM citations**: §8.3 (concrete syntax precedence table), §2.1 (logical equivalence `⇔`), §2.3 (equality `=`), §3.6 (schema text `| … •`), §3.8.1 (set comprehension `{ … • … }`), §3.9 (quantified predicates/expressions). None of the Z RM sections *requires* the always-paren additions above — they are a Z-community convention for human legibility, not a syntactic obligation.
 
 **Rationale**:
 
-- Pure minimalism produces output that type-checks but can confuse human readers in exactly the way the Q8(b) feedback describes. The generator's output is read by Oxford-school examiners, not only by `fuzz`.
+- Pure minimalism produces output that type-checks but can confuse human readers in exactly the way the Q8(b) feedback describes. The generator's output is read by human reviewers, not only by `fuzz`.
 - Blanket instructive parenthesisation (parens around every non-atomic subexpression) produces cluttered output no Z reader writes by hand.
-- Precedence-driven plus a short always-paren list matches the Z RM grammar for correctness and the Oxford house style for readability, with a rule set small enough to document in one paragraph.
+- Precedence-driven plus a short always-paren list matches the Z RM grammar for correctness and the standard Z style for readability, with a rule set small enough to document in one paragraph.
 
 **Rejected alternatives**:
 
@@ -1095,7 +1095,7 @@ Both type-check in fuzz. The current code follows the same `_generate_quantifier
 **Consequences**:
 
 - All 13 tests in `tests/test_q2d_calculus_predicate_chain.py` pass.
-- DAT relational-calculus expressions (multi-typed Z comprehensions with conjunction predicates over tuple projections, multi-decl `forall`/`exists`/`mu`/`lambda`) can be written natively without dropping into raw LaTeX.
+- Multi-typed relational-calculus expressions (Z comprehensions with conjunction predicates over tuple projections, multi-decl `forall`/`exists`/`mu`/`lambda`) can be written natively without dropping into raw LaTeX.
 - The `is_bullet_indicator` deletion removes 45 lines and one category of parser state. `_parse_postfix` is now simpler and more regular.
 - Known limitation: multi-decl lambda without a pipe-predicate (e.g., `lambda s : Ship; c : Class . (s, c)`) is not yet supported. See `MISSING_FEATURES.md`.
 
@@ -1462,7 +1462,7 @@ correctly rather than captured as a `TEXT` token.
 populates `relvar_set: frozenset[str]` before any LaTeX emission, then an O(1)
 `name in self.relvar_set` check in `_generate_identifier`.
 
-**Context**: The DAT course uses `\mathrm{Name}` for relation names and default
+**Context**: The relational algebra convention uses `\mathrm{Name}` for relation names and default
 italic for attribute names.  The `relvars` declaration paragraph marks which
 identifiers are relvars.  Every occurrence of a declared name as an identifier —
 in schema headers, type annotations, predicate expressions — must be wrapped.
@@ -1547,7 +1547,7 @@ R bowtie [pred] S      -- theta-join     → R \otimes_{pred} S
 R div S                -- division       → R \div S
 ```
 
-> **Note (Trigoni alignment, 2026-05-19)**: `:=` (assignment) has been
+> **Note (2026-05-19)**: `:=` (assignment) has been
 > removed.  Use `==` instead.  `\bowtie` has been replaced by `\otimes`.
 
 **Operator levels** (lowest binds least):
@@ -1604,9 +1604,9 @@ checks `self._current().value == "as"` after consuming the source attribute
 name.  This avoids a reserved-word collision with any Z identifier named `as`
 in other contexts.
 
-**Kernel LaTeX only** *(SUPERSEDED 2026-05-19; see the Tier-2 Trigoni
-Keyword Algebra ADR for the current emission. The glyphs listed here
-reflect the original Greek-letter rendering that has been replaced.)*
+**Kernel LaTeX only** *(SUPERSEDED 2026-05-19; see the Tier-2 Keyword Algebra ADR
+for the current emission. The glyphs listed here reflect the original
+Greek-letter rendering that has been replaced.)*
 `\sigma`, `\pi`, `\rho`, `\otimes`, `\div` are all standard LaTeX kernel
 symbols. No preamble change is required; fuzz and pdflatex both accept
 them without extra packages.
@@ -1631,28 +1631,25 @@ it receives `\mathrm{}` wrapping — consistent with the general rule.
 3. `Assignment` as `Expr` — rejected; would allow nonsensical nesting like
    `sigma[T := R](S)`.  Statement-shaped constructs belong in `DocumentItem`.
 
-> **Superseded (Trigoni alignment, 2026-05-19):** The `:=` operator and
-> `Assignment` node have been removed entirely; the `\bowtie` emission has
-> been replaced by `\otimes`. See "ADR: Trigoni Alignment — Drop `:=`,
-> `\bowtie` → `\otimes`" below.
+> **Superseded (2026-05-19):** The `:=` operator and `Assignment` node have been
+> removed entirely; the `\bowtie` emission has been replaced by `\otimes`.
+> See "ADR: Keyword Algebra Alignment — Drop `:=`, `\bowtie` → `\otimes`" below.
 
-## ADR: Trigoni Alignment — Drop `:=`, `\bowtie` → `\otimes`
+## ADR: Keyword Algebra Alignment — Drop `:=`, `\bowtie` → `\otimes`
 
 **Decision**: Remove the `:=` assignment operator entirely and switch the
 natural-join LaTeX emission from `\bowtie` to `\otimes`, aligning with
-Nikola Trigoni's Oxford DAT lecture slides (topic00–topic06, read
-2026-05-19).
+the keyword-algebra rendering convention reviewed 2026-05-19.
 
 **Evidence**:
 
-- topic02 slide 408 (literal text): *"x == r assigns the name x to the
-  relation r"* — Trigoni uses `==`, not `:=`, for relational assignment.
-  The operator `==` was already supported via the smart-`==` abbreviation
-  committed in a8a02ae.
-- The only `:=` in seven slide decks is one SQL UPDATE trigger example
-  (topic05 line 425) — a SQL construct, not a DAT algebra statement.
-- Trigoni writes `A == ProperGroups ⊗ NewMembers` consistently across
-  all algebra examples. LaTeX for `⊗` is `\otimes`, a kernel symbol
+- The keyword-algebra convention uses `==` for naming a relation, not `:=`,
+  for relational assignment. The operator `==` was already supported via
+  the smart-`==` abbreviation committed in a8a02ae.
+- The only `:=` use case reviewed was one SQL UPDATE trigger example —
+  a SQL construct, not a relational algebra statement.
+- Keyword algebra writes `A == ProperGroups ⊗ NewMembers` consistently
+  across all algebra examples. LaTeX for `⊗` is `\otimes`, a kernel symbol
   present in fuzz and pdflatex without extra packages.
 
 **Changes**:
@@ -1698,7 +1695,7 @@ binding context.
 
 **Forces**:
 
-1. DAT course exercises1.tex Q2(a)-(e) require binding-calculus expressions
+1. Relational-calculus exercises require binding-calculus expressions
    of the form `{ s : Ship | pred . {| name == s.name |} }`.
 2. Z RM §3.7 specifies `\lblot a == e_1, b == e_2 \rblot`; the macros
    `\lblot` and `\rblot` exist in both `fuzz.sty` and the `zed-*` family
@@ -1732,7 +1729,7 @@ path.  Format: `\lblot label_1 == value_1, ..., label_n == value_n \rblot`.
 set was extended to include `RBIND`, enabling `s.name` to parse as a
 `TupleProjection` before `|}`.
 
-*Multi-typed set comprehensions.* DAT Q2(d) uses `{ s : Ship; c : Class | ... }`.
+*Multi-typed set comprehensions.* Multi-decl comprehension uses `{ s : Ship; c : Class | ... }`.
 `SetComprehension` gained an `extra_declarations: list[tuple[str, Expr]] | None`
 field (default `None`; backward-compatible).  The parser consumes optional
 `;`-separated `var : Type` pairs after the first declaration.  The generator
@@ -1962,7 +1959,7 @@ spacing — it does not behave as a math operator.  Using `\mathop{\mathrm{GROUP
 promotes the box to an ordinary binary math operator with correct inter-atom
 spacing on both sides (`\thickmuskip` = `5mu plus 5mu`).
 
-**Decision.** Per jms round-2 refinement (DAT-GAPS.md), all three multi-letter
+**Decision.** Per jms round-2 refinement, all three multi-letter
 keywords — GROUP, UNGROUP, and AS — are wrapped with `\mathop`:
 
 ```latex
@@ -1999,14 +1996,14 @@ inside the box.
 above, which is now historical record only.
 
 **Context**: The original Phase 2.1 design added `relvars` to render relation
-names in `\mathrm{}` (upright roman).  After further review of Trigoni's
-actual DAT materials and fuzz constraints:
+names in `\mathrm{}` (upright roman).  After further review of the relational
+algebra materials and fuzz constraints:
 
 1. Fuzz rejects `\mathrm{}` in schema title positions.
 2. Fuzz also rejects `\underline{attrname}` in declaration-variable positions —
    the fuzz schema parser expects a plain identifier in the variable-name slot;
    any macro with a brace argument (`\underline{class}`) is a syntax error.
-3. The only visible DAT convention for primary keys is an annotation below the
+3. The only visible convention for primary keys is an annotation below the
    schema box, not inline markup.
 
 **pk scope** — named schemas only:
@@ -2060,8 +2057,8 @@ names are comma-separated inside the set literal.
 **Options considered**:
 
 1. *Keep relvars, add pk* — rejected: relvars is incorrect (fuzz type errors
-   in schema titles) and the actual DAT materials do not use upright relation
-   names.
+   in schema titles) and the relational algebra convention does not use upright
+   relation names.
 2. *`\underline{attrname}` inside schema box* — attempted; rejected: fuzz
    rejects any braced macro in the variable-name position of a schema
    declaration.  The PK-line approach is the only fuzz-compatible alternative.
@@ -2077,7 +2074,7 @@ names are comma-separated inside the set literal.
 **Status:** Accepted
 
 **Context.** Long relational-algebra and set expressions overflow the page.
-The Guadalcanal example from Q1(d) of the DAT assessment is representative:
+The Guadalcanal example is representative:
 
 ```text
 pi[name, displacement, numGuns](Class bowtie Ship bowtie
@@ -2140,7 +2137,7 @@ field added to the affected binary-operator dataclasses.
 
 ---
 
-## ADR: Tier-2 Trigoni Keyword Algebra Rendering (Phase 2.2 revised)
+## ADR: Tier-2 Keyword Algebra Rendering (Phase 2.2 revised)
 
 **Date:** 2026-05-19
 **Status:** Accepted
@@ -2150,8 +2147,8 @@ field added to the affected binary-operator dataclasses.
 The initial Phase 2.2 implementation emitted relational algebra in
 Codd/Date Greek-letter form: `\sigma_p(R)`, `\pi_{A}(R)`, `\rho_{A \to B}(R)`,
 `R \otimes_p S`. These glyphs came from Date's textbook chapters, which use
-the Greek-letter convention. Trigoni's Oxford DAT lecture slides consistently
-use the keyword form — `Restrict`, `Project`, `Rename`, `Join` — written upright
+the Greek-letter convention. The keyword-algebra convention consistently
+uses the keyword form — `Restrict`, `Project`, `Rename`, `Join` — written upright
 (`\mathrm`), with theta-join in function-call form rather than infix.
 
 ### Decision
@@ -2161,8 +2158,8 @@ Adopt **Tier 2** keyword emission for relational algebra. Source keywords
 `Rename`, `NaturalJoin`, `Divide`) remain unchanged. Only the LaTeX *output*
 of the generator changes.
 
-| Source | Before (Greek) | After (Trigoni keyword) |
-|--------|----------------|-------------------------|
+| Source | Before (Greek) | After (keyword form) |
+|--------|----------------|----------------------|
 | `sigma[p](R)` | `\sigma_{p}(R)` | `\mathrm{Restrict}_{p}(R)` |
 | `pi[A, B](R)` | `\pi_{A, B}(R)` | `\mathrm{Project}\{A, B\}(R)` |
 | `rho[A as B](R)` | `\rho_{A \to B}(R)` | `\mathrm{Rename}_{A \to B}(R)` |
@@ -2172,7 +2169,7 @@ of the generator changes.
 
 Two shape changes merit attention:
 
-1. **Project uses literal braces**, not subscript. Trigoni's slides write
+1. **Project uses literal braces**, not subscript. The keyword-algebra convention writes
    `Project{username, job}(Members)` with `\{...\}` around the attribute list.
    Restrict and Rename keep subscript form.
 
@@ -2187,7 +2184,8 @@ A `use_trigoni_style` CLI flag toggling between Greek and keyword emission was
 considered. Rejected because:
 
 - Greek glyphs were never specified by Z or by any txt2tex consumer outside
-  the DAT course. They came from Date's textbook, not from the course lecturer.
+  the keyword-algebra convention. They came from Date's textbook and are not
+  used in the keyword form adopted here.
 - A flag doubles the test surface and adds CLI plumbing for a feature with one
   user and one mode.
 - If a future user needs Greek-letter rendering, the flag can be added as a
@@ -2195,12 +2193,11 @@ considered. Rejected because:
 
 ### Provenance
 
-Trigoni's notation observed in:
+Keyword-algebra style observed in reviewed materials:
 
-- `/Users/jfreeman/Coding/course-ox-dat/slides/topic02.pdf` — `Restrict`,
-  `Project`, `Rename` used consistently from slide 02-69 onwards.
-- Topic03 and topic04 confirm the same style.
-- Theta-join function form (`Join_p(R, S)`) first appears at slide 02-69/70/71.
+- `Restrict`, `Project`, `Rename` used consistently for the sigma/pi/rho operators.
+- `Join_p(R, S)` function-call form for theta-join (infix `\otimes_p` rejected).
+- Natural join stays `R \otimes S` (infix, no function-call form).
 
 ---
 

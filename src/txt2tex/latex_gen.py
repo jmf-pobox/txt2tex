@@ -2343,7 +2343,8 @@ class LaTeXGenerator:
         pi[class, country](Class) → \mathrm{Project}\{class, country\}(Class)
         Attribute names are emitted via _emit_attr_name (identity pass-through);
         keyword-to-LaTeX conversions do not apply inside the attribute list.
-        Literal braces wrap the attribute list (Trigoni's notation), not subscript.
+        Literal braces wrap the attribute list (keyword-algebra convention),
+        not subscript form.
         """
         attrs_str = ", ".join(self._emit_attr_name(a) for a in node.attrs)
         rel_latex = self.generate_expr(node.relation)
@@ -4552,12 +4553,12 @@ class LaTeXGenerator:
     )
 
     def _expression_contains_dat_construct(self, expr: object) -> bool:
-        """True if expr's AST tree contains any DAT-specific node.
+        """True if expr's AST tree contains any relational construct.
 
-        DAT constructs (relational algebra, bindings, GROUP/UNGROUP) cannot
-        sit inside a Z environment without fuzz rejecting their syntax.
+        Relational constructs (algebra, bindings, GROUP/UNGROUP) cannot sit
+        inside a Z environment without fuzz rejecting their syntax.
         This recursive walk lets abbreviation emission switch between an
-        in-zed form (pure Z RHS) and a noindent-math form (DAT-bearing RHS).
+        in-zed form (pure Z RHS) and a noindent-math form (relational RHS).
         """
         if isinstance(expr, self._DAT_EXPRESSION_TYPES):
             return True
@@ -4583,12 +4584,12 @@ class LaTeXGenerator:
         Emission depends on the RHS:
         - Pure Z RHS → ``\begin{zed} Name \defs Expr \end{zed}``. fuzz
           parses it as a standard Z abbreviation paragraph.
-        - DAT-bearing RHS (algebra, binding, GROUP/UNGROUP) →
+        - Relational RHS (algebra, binding, GROUP/UNGROUP) →
           ``\noindent$Name \defs Expr$`` outside any Z block. fuzz
           silently skips it; schemas/axdefs in the same document still
           type-check.
 
-        This lets students use one operator (``==``) for both Z and DAT
+        This lets users write one operator (``==``) for both Z and relational
         definitions and have txt2tex pick the fuzz-compatible emission
         form automatically.
 
@@ -4616,7 +4617,7 @@ class LaTeXGenerator:
 
         # Pick the wrapping based on RHS content
         if self._expression_contains_dat_construct(node.expression):
-            # DAT RHS — emit outside any Z environment so fuzz silently skips
+            # Relational RHS — emit outside any Z environment so fuzz silently skips
             lines.append("\\noindent")
             lines.append(f"${abbrev}$")
         else:

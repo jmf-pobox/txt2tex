@@ -41,7 +41,7 @@ pi[name, country](Class bowtie
 
 === 2. Multi-decl comprehension with conjunction predicate ===
 
-TEXT: This is the canonical DAT relational-calculus form for any query that crosses two or more relations. Before the fix it required a raw LATEX block; now it parses natively.
+TEXT: This is the canonical multi-typed relational-calculus form for any query that crosses two or more relations. Before the fix it required a raw LATEX block; now it parses natively.
 
 { s : Ship; c : Class; o : Outcome | s.class = c.class land
     o.ship = s.name land

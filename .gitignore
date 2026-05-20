@@ -100,6 +100,9 @@ hw[0-9]*/
 # Tutorial project
 rpn2tex/
 
+# user-specific assignments; not for upstream
+sem/
+
 # Test-phase artefacts that must not re-enter the tree.
 # phase_a_* and phase12_* were transient PDFs from the Phase 1 test run;
 # *.disabled marks input files that were disabled pending parser fixes.

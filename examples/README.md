@@ -152,6 +152,12 @@ Expression equality chains using `EQUAL:` block syntax.
 
 - `equality_chain_basic.txt` - Multi-step equality chains with justifications
 
+### 17_state_machines (1 example)
+
+Z state machine specifications using the canonical four-piece layout.
+
+- `turnstile.txt` — State schema, Init schema, two Delta operations (Coin, Push), and one Xi query (IsLocked). Exercises Delta/Xi inclusion, prime after-state decoration, and ?/! identifier decoration.
+
 ### fuzz_tests/ (4 examples)
 
 Test cases for fuzz validation and edge cases.

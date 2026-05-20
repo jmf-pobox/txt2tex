@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import dataclasses
 import re
-from typing import Literal
+from typing import ClassVar, Literal
 
 from txt2tex.ast_nodes import (
     Abbreviation,
@@ -875,9 +875,35 @@ class Parser:
             TokenType.BIGCUP,  # bigcup (distributed union)
             TokenType.BIGCAP,  # bigcap (distributed intersection)
             TokenType.FILTER,  # filter (sequence filter)
-            TokenType.GROUP,  # group (DAT operator; legal as attr name)
-            TokenType.UNGROUP,  # ungroup (DAT operator; legal as attr name)
+            TokenType.GROUP,  # group (relational operator; legal as attr name)
+            TokenType.UNGROUP,  # ungroup (relational operator; legal as attr name)
         )
+
+    # Operator keywords whose LaTeX expansion (e.g. \id, \dom) collides
+    # with declaration-name use. Even though the parser can accept these
+    # as attribute names, the LaTeX generator emits the operator symbol,
+    # which fuzz then rejects in declaration position. Reject at the
+    # parser level with a clear error.
+    _RESERVED_DECL_NAMES: ClassVar[frozenset[str]] = frozenset(
+        {"id", "dom", "ran", "inv", "comp", "mod", "bigcup", "bigcap", "filter"}
+    )
+
+    def _reject_reserved_decl_name(self, tok: Token) -> None:
+        """Raise ParserError if `tok.value` is a reserved operator keyword.
+
+        Operator names that have a dedicated LaTeX expansion (id → \\id,
+        dom → \\dom, etc.) cannot be used as declaration variable names
+        because the generator emits the operator symbol, producing
+        invalid Z that fuzz rejects.
+        """
+        if tok.value in self._RESERVED_DECL_NAMES:
+            msg = (
+                f"{tok.value!r} is a reserved Z operator name and cannot be used "
+                f"as a declaration variable (it would render as the operator "
+                f"in LaTeX). Rename to a non-conflicting identifier "
+                f"(e.g. {tok.value}1, {tok.value}Val, my{tok.value.capitalize()})."
+            )
+            raise ParserError(msg, tok)
 
     def _scan_for_colon_before_newline(self) -> bool:
         """Lookahead scan: return True if ':' appears before NEWLINE/WHERE/END/EOF.
@@ -1185,6 +1211,7 @@ class Parser:
                 )
             pk_var_tokens: list[Token] = []
             pk_var_tok = self._current()
+            self._reject_reserved_decl_name(pk_var_tok)
             pk_var_tokens.append(pk_var_tok)
             self._advance()
             while self._match(TokenType.COMMA):
@@ -1196,6 +1223,7 @@ class Parser:
                     raise ParserError(
                         "Expected variable name after ','", self._current()
                     )
+                self._reject_reserved_decl_name(self._current())
                 pk_var_tokens.append(self._current())
                 self._advance()
             if not self._match(TokenType.COLON):
@@ -1253,6 +1281,7 @@ class Parser:
         # Colon found → typed declaration (original path)
         var_tokens: list[Token] = []
         var_tok = self._current()
+        self._reject_reserved_decl_name(var_tok)
         var_tokens.append(var_tok)
         self._advance()
 
@@ -1263,6 +1292,7 @@ class Parser:
                 or self._is_keyword_usable_as_identifier()
             ):
                 raise ParserError("Expected variable name after ','", self._current())
+            self._reject_reserved_decl_name(self._current())
             var_tokens.append(self._current())
             self._advance()
 

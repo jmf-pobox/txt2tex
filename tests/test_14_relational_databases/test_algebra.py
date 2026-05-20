@@ -4,8 +4,8 @@ Covers the five AST nodes (Restrict, Project, Rename, NaturalJoin, Divide),
 their token types, parser cases, and LaTeX generator output.  Negative cases
 use the three-assertion pattern: message, line, column.
 
-Q1(a)-(c) acceptance probes at the end verify the canonical rendering
-that exercises1.tex from the Oxford DAT course expects.
+Acceptance probes at the end verify the canonical rendering for
+relational algebra expressions.
 """
 
 from __future__ import annotations
@@ -525,10 +525,10 @@ class TestAlgebraNegative:
 
 
 class TestQ1AcceptanceProbes:
-    """Exercise 1 from the Oxford DAT course, rendered via txt2tex.
+    """Acceptance probes for relational algebra rendering.
 
-    These probes verify the canonical rendering that the course expects.
-    Relation names render italic (default fuzz output, matching Trigoni's materials).
+    These probes verify the canonical keyword-algebra rendering.
+    Relation names render italic (default fuzz output).
     """
 
     def _gen(self, src: str) -> str:
@@ -553,7 +553,7 @@ class TestQ1AcceptanceProbes:
     def test_q1b_natural_join(self) -> None:
         r"""Q1(b): Ship bowtie Class — natural join.
 
-        Expected: Ship \otimes Class (Trigoni's ⊗ notation — unchanged)
+        Expected: Ship \otimes Class (⊗ notation, natural join)
         """
         result = self._gen("Ship bowtie Class")
         assert r"Ship \otimes Class" in result

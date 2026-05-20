@@ -1,5 +1,5 @@
 // Relational Algebra Operators (Phase 2.2)
-// Demonstrates: sigma, pi, rho, bowtie (renders as ⊗, Trigoni notation), div
+// Demonstrates: sigma, pi, rho, bowtie (renders as ⊗), div
 // All operators use kernel LaTeX — no extra package required.
 
 TITLE: Relational Algebra

@@ -40,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Q2(d) comprehension/quantifier parser bugs** (commits `20a6daa`, follow-on
   residual fix, and `fix(parser): add SEMICOLON/PIPE branches to _parse_lambda`).
-  Three interrelated bugs prevented DAT relational-calculus expressions from being
+  Three interrelated bugs prevented multi-typed relational-calculus expressions from being
   written natively without LaTeX escape:
 
   - The `is_bullet_indicator` heuristic (45 lines, `_parse_postfix` lines 3637–3681)
@@ -75,14 +75,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`:=` operator removed.** The `:=` (assignment) token type, AST node,
   parser dispatch, and generator are gone. Use `==` for relational assignment
   — the smart-`==` abbreviation (committed a8a02ae) already covers both
-  pure-Z and DAT-bearing right-hand sides. This matches Trigoni's lecture
-  convention (topic02 slide 408 reads *"x == r assigns the name x to the
-  relation r"*). Existing `.txt` files that use `:=` will raise a parser
-  error; migrate to `==`.
+  pure-Z and algebra right-hand sides. Existing `.txt` files that use `:=`
+  will raise a parser error; migrate to `==`.
 
 - **Natural-join emission changed: `\bowtie` → `\otimes`.** The source
   keyword `bowtie` is unchanged, but the LaTeX emission is now `\otimes`
-  (`⊗`) to match Trigoni's Oxford DAT slides. Theta-join similarly changes
+  (`⊗`) to match the keyword-algebra rendering convention. Theta-join similarly changes
   from `\bowtie_{p}` to `\otimes_{p}`. Both are standard LaTeX kernel
   symbols — no preamble change required. Any generated `.tex` files that
   contain `\bowtie` in natural-join position should be regenerated.
@@ -92,8 +90,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `pi[A, B](R)` emits `\mathrm{Project}\{A, B\}(R)` (previously `\pi_{A,B}(R)`);
   `rho[A as B](R)` emits `\mathrm{Rename}_{A \to B}(R)` (previously
   `\rho_{A \to B}(R)`). Source-level syntax is unchanged — students still write
-  `sigma`, `pi`, `rho`. Matches Trigoni's Oxford DAT course slides exactly.
-  Regenerate any `.tex` files produced by earlier versions.
+  `sigma`, `pi`, `rho`. Regenerate any `.tex` files produced by earlier versions.
 
 - **BREAKING (visual): Theta-join now emits as function form.**
   `R bowtie [p] S` now emits `\mathrm{Join}_{p}(R, S)` (previously
@@ -213,7 +210,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `RBIND` added to `safe_followers` in `_parse_postfix` to allow field
   projections like `s.name` before `|}`.  Set comprehension extended to
   support `;`-separated variable-type pairs (`s : Ship; c : Class`) for
-  multi-typed DAT queries; `_parse_set_expression` skips leading newlines
+  multi-typed set comprehension queries; `_parse_set_expression` skips leading newlines
   for multi-line comprehensions; closing `}` also skips newlines.  38 new
   tests (lexer, parser, generator, acceptance probes, negative cases,
   regression); new example `examples/14_relational_databases/bindings.txt`;
@@ -235,8 +232,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with Relational Algebra section; `USER_GUIDE.md` Relational Algebra subsection
   added; `DESIGN.md` ADR added.
 
-- Relvar declaration paragraph (`relvars`) for DAT (Database Design) course
-  support (Phase 2.1).  `relvars Class, Ship, Battle, Outcome` declares relation
+- Relvar declaration paragraph (`relvars`) for relational database support (Phase 2.1).  `relvars Class, Ship, Battle, Outcome` declares relation
   variables; each declared name renders upright (`\mathrm{Name}`) wherever it
   appears as an identifier in a math context.  Attribute names (undeclared
   identifiers) stay italic (default math mode).  Decoration-outside rule:
@@ -306,17 +302,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Identifier decoration (primes `'`, inputs `?`, outputs `!`) — Z RM §3.3
   trailing-suffix rule. The identifier lexer now consumes any run of `'`, `?`,
   `!` characters in any order after the alnum/underscore base (e.g., `count'`,
-  `in?`, `out!`, `x?'`, `s''`). This is the foundational change for SBM
-  (State-Based Modelling) course support.
+  `in?`, `out!`, `x?'`, `s''`). This is the foundational change for Z schema
+  operation notation (before/after state, inputs, outputs).
 - String literal lexeme — a single-quoted value (`'sunk'`, `'survived'`) is
   now tokenised as `STRING` and parsed as `StringLit`. The generator emits the
   Z-convention quoting: `` `value' `` in fuzz mode and `\text{`value'}` in
-  standard LaTeX mode. This is the foundational change for DAT (Database
-  Design) course support.
+  standard LaTeX mode. This is the foundational change for relational database
+  notation support.
 - Comma-separated variable lists in schema, axdef, and gendef declaration
   blocks (`count, count' : N` declares two variables sharing one type).
-- Two new getting-started examples: `decorated_identifiers.txt` (SBM schema
-  probe) and `string_literals.txt` (DAT string literal syntax).
+- Two new getting-started examples: `decorated_identifiers.txt` (schema
+  decoration probe) and `string_literals.txt` (string literal syntax).
 - `examples/Makefile` now includes `00_getting_started` as a named target
   with the short alias `00`.
 

@@ -2,11 +2,11 @@
 
 Showcases the parser and generator capabilities added to support
 multi-typed Z comprehensions, quantifiers, and lambdas with conjunction
-predicates over tuple projections --- the canonical DAT
+predicates over tuple projections --- the canonical multi-typed
 relational-calculus form.
 
-Until these features shipped, students writing DAT exercises had to drop
-into raw LaTeX for any query crossing two or more relations. The demo
+Until these features shipped, multi-typed queries required dropping into
+raw LaTeX for any expression crossing two or more relations. The demo
 also flags one known follow-up: the paren-wrap gap on top-level lambdas.
 
 ## What's in here

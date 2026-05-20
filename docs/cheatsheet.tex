@@ -431,7 +431,7 @@ $\begin{array}{l@{\hspace{1.5em}}r}
 
 \begin{center}
 {\LARGE\bfseries txt2tex Relational Databases --- By Example}\\[2pt]
-{\small DAT course notation: primary keys, relational algebra, bindings, GROUP/UNGROUP.}
+{\small Primary keys, relational algebra, bindings, GROUP/UNGROUP.}
 \end{center}
 
 \vspace{-2pt}
@@ -485,7 +485,7 @@ R div S              & $R \div S$ — division \\
 {\footnotesize \texttt{sigma}/\texttt{pi}/\texttt{rho} bind at atom level (prefix + args). \texttt{bowtie} and \texttt{div} are infix at cross-product precedence.}
 
 \smallskip
-{\scriptsize\textbf{Naming a query.} Use \texttt{Name == expr} (Z abbreviation) for both pure-Z and DAT-bearing right-hand sides. txt2tex inspects the RHS: when it contains a DAT construct (algebra, binding, GROUP/UNGROUP), the abbreviation emits as \texttt{\textbackslash noindent\$\ldots\$} outside any Z block; otherwise it emits inside a \texttt{zed} block.}
+{\scriptsize\textbf{Naming a query.} Use \texttt{Name == expr} (Z abbreviation) for both pure-Z and algebra right-hand sides. txt2tex inspects the RHS: when it contains a relational construct (algebra, binding, GROUP/UNGROUP), the abbreviation emits as \texttt{\textbackslash noindent\$\ldots\$} outside any Z block; otherwise it emits inside a \texttt{zed} block.}
 
 \smallskip
 {\scriptsize\textbf{Fuzz note:} algebra expressions emit \emph{outside} any Z environment, so fuzz silently skips them — your schemas and axdefs in the same document still type-check cleanly. Do \emph{not} wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks; fuzz parses block contents strictly as Z and will reject the algebra subscripts. \textbf{Multi-line:} infix algebra operators wrap across lines (bare newline or \texttt{\textbackslash}). Break \emph{before} \kw{setminus} — \texttt{\textbackslash} is its token.}
@@ -561,7 +561,7 @@ $Members\ \mathop{\mathrm{UNGROUP}}\ contact$
 {\scriptsize \texttt{group}/\texttt{ungroup} use \texttt{\textbackslash mathop\{\textbackslash mathrm\{...\}\}} — kernel LaTeX, no extra package.}
 
 % ── QUICK REFERENCE ─────────────────────────────
-\section{DAT Quick Reference}
+\section{Quick Reference}
 
 \begin{tabularx}{\columnwidth}{LR}
 pk a : T             & primary key in schema \\

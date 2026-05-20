@@ -1885,10 +1885,9 @@ The Z Reference Manual (§3.5) allows all names declared in a single `axdef` or 
 paragraph to enter scope simultaneously. Fuzz accepts cross-references between declarations
 in the same block — this is valid Z.
 
-Oxford-school convention (Spivey, *Understanding Z*; Simpson's teaching notes) favours
-splitting dependent definitions into separate paragraphs in dependency order. Each paragraph
-then stands as a self-contained mathematical object whose reliance on earlier paragraphs is
-structurally visible to the reader.
+The Z community convention (Spivey, *Understanding Z*) favours splitting dependent definitions
+into separate paragraphs in dependency order. Each paragraph then stands as a self-contained
+mathematical object whose reliance on earlier paragraphs is structurally visible to the reader.
 
 **Combined form** (valid Z, accepted by fuzz):
 
@@ -1904,7 +1903,7 @@ where
 end
 ```
 
-**Sequential form** (Oxford-school preferred):
+**Sequential form** (recommended):
 
 ```text
 axdef
@@ -2450,7 +2449,7 @@ p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
 
 ## Relational Databases
 
-Support for the Oxford DAT (Database Design) course typography convention.
+Notation for relational database specifications.
 
 ### pk Declaration
 
@@ -2514,8 +2513,8 @@ pk in axdef          // only schema bodies — parser error
 ### Relational Algebra (Phase 2.2)
 
 The five Codd/Date operators.  All use kernel LaTeX (`\mathrm`, `\otimes`,
-`\div`) — no extra package needed.  The emission uses Trigoni's Oxford DAT
-keyword style: `Restrict`, `Project`, `Rename`, `Join`.
+`\div`) — no extra package needed.  The emission uses keyword style:
+`Restrict`, `Project`, `Rename`, `Join`.
 
 **Fuzz compatibility.** Algebra expressions emit *outside* any Z
 environment (as `\noindent$...$` LaTeX math). fuzz silently skips
@@ -2565,8 +2564,7 @@ Ship bowtie Class
 
 Renders: $Ship \otimes Class$
 
-The source keyword is `bowtie`; the LaTeX emission is `\otimes` (`⊗`),
-matching Trigoni's Oxford DAT lecture slides (topic02 onwards).
+The source keyword is `bowtie`; the LaTeX emission is `\otimes` (`⊗`).
 
 **Theta-join** with explicit predicate:
 
@@ -2587,8 +2585,8 @@ Renders: $R \div S$
 #### Naming a query
 
 Use `==` (Z abbreviation) to bind a name to an algebra expression.
-txt2tex inspects the RHS: when it contains a DAT construct, the
-abbreviation emits outside any Z block:
+txt2tex inspects the RHS: when it contains a relational construct (algebra,
+binding, GROUP/UNGROUP), the abbreviation emits outside any Z block:
 
 ```text
 BigGuns == pi[class, country](sigma[bore >= 16](Class))
@@ -2670,7 +2668,7 @@ R group ({A} as sub) ungroup sub
 ### Z Binding Calculus (Phase 2.3)
 
 Binding brackets construct labelled tuples per Z RM §3.7.  Used in
-relational-calculus queries (DAT course style).
+relational-calculus queries.
 
 **Fuzz compatibility.** Bindings emit *outside* any Z environment, so
 fuzz silently skips them. Write binding-bearing comprehensions as

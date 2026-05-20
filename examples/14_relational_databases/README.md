@@ -1,12 +1,11 @@
 # Relational Databases Examples
 
-Examples demonstrating relational-database schema notation for DAT
-(Database Design) course support.
+Examples demonstrating relational-database schema notation.
 
-## The DAT Convention
+## The PK Convention
 
-The Oxford DAT course marks primary keys by underlining the attribute name
-in the schema body. The `pk` prefix produces this:
+The `pk` prefix marks primary-key attributes. A PK annotation is emitted
+below the schema box. The `pk` prefix produces this:
 
 ```text
 schema Class
@@ -16,8 +15,9 @@ schema Class
 end
 ```
 
-The rendered PDF shows `class` underlined; `country` and `bore` are plain
-italic. Schema names stay in their default math font — no `\mathrm{}` wrapper.
+The generator emits a `PK(Class) = {class}` annotation below the schema box.
+`country` and `bore` are plain declarations — no annotation. Schema names
+stay in their default math font — no `\mathrm{}` wrapper.
 
 ## Examples
 
@@ -55,7 +55,7 @@ for proper math-mode operator spacing (per jms round-2 refinement).
 ### bindings.txt
 
 Demonstrates Z binding brackets per Z RM §3.7, used in relational-calculus
-queries (DAT course style):
+queries:
 
 - `{| name == s.name |}` — single-component binding (`\lblot ... \rblot`)
 - `{| a == e1, b == e2 |}` — multi-component binding with comma separators
@@ -66,6 +66,57 @@ queries (DAT course style):
 The `{|` and `|}` tokens are distinct from `{` (set brace), `|` (pipe),
 `(|` (relational-image left), and `|)` (relational-image right).
 
+### relational_calculus.txt
+
+Demonstrates the Phase 3.2 multi-typed set-comprehension parser and generator
+on a music streaming library domain (`Track`, `Artist`, `Album`, `Playlist`).
+
+Six worked queries, each with a prose description and Z form:
+
+1. **Single-relation selection** — `{ t : Track | t.genre = 'Jazz' . {| ... |} }`.
+   Plain filter over one schema type.
+2. **Two-relation join** — `{ t : Track; al : Album; ar : Artist | t.alid = al.alid land al.arid = ar.arid . {| ... |} }`.
+   Three-variable comprehension joining three schema types on shared keys.
+3. **Three-relation chain with playlist** — joins `PlaylistId <-> TrackId` with
+   `Track` and `Album` in one comprehension.
+4. **Binding output, duration filter** — characteristic expression is a
+   two-component `{| ... |}` binding with no plain variable in the output.
+5. **Multi-decl `forall`** — `forall p : PlaylistId; t : Track | ... . ...`
+   asserts playlist membership implies album membership.
+6. **No characteristic expression** — `{ t : Track; al : Album | ... }` with
+   the dot-separator omitted; Z RM §3.9 signature default. Exercises the
+   Q2(d) parser fix directly.
+
+Exercises: multi-typed comprehension with conjunction predicates, Spivey-form
+multi-decl syntax (`;`-separated declarations), bullet-vs-projection
+disambiguation, and `{| name == e |}` bindings as characteristic expressions.
+Fuzz type-checks clean.
+
+### foreign_keys.txt
+
+Demonstrates the full PK + FK pattern using a kitchen-management toy domain
+(Recipe, Ingredient, RecipeIngredient, Employee).  Four worked patterns:
+
+1. **Single-attribute PK** — `pk recipeId : RecipeId` underlines the attribute
+   and auto-emits `PK(Recipe) = {recipeId}`.
+
+2. **Composite PK** — two `pk` lines in one schema; txt2tex collapses them into
+   `PK(RecipeIngredient) = {recipeId, ingredientId}`.
+
+3. **Single-attribute FK** — standalone Z predicate in binding-expression form:
+   `(RecipeIngredient, Recipe) |-> {recipeId |-> recipeId} elem FK`.
+
+4. **Composite FK + self-referential FK** — both FK predicates for
+   RecipeIngredient stated separately, plus a self-join:
+   `(Employee, Employee) |-> {managerId |-> employeeId} elem FKEE`.
+
+`FK` must be declared in an `axdef` before any FK predicate references it.
+FK predicates written outside any schema or `axdef` block emit as
+`\noindent$...$` math — fuzz ignores them (consistent with the PK
+auto-emission pattern); pdflatex compiles them correctly.
+
+Also exercises: `LINEBREAK:` between sections, `<->` for the relation type.
+
 ## Building
 
 ```bash
@@ -73,4 +124,6 @@ txt2tex examples/14_relational_databases/primary_keys.txt
 txt2tex examples/14_relational_databases/algebra_basics.txt
 txt2tex examples/14_relational_databases/bindings.txt
 txt2tex examples/14_relational_databases/group_ungroup.txt
+txt2tex examples/14_relational_databases/relational_calculus.txt
+txt2tex examples/14_relational_databases/foreign_keys.txt
 ```

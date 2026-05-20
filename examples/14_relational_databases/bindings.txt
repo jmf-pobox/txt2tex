@@ -1,6 +1,6 @@
 // Z Binding Brackets (Phase 2.3)
 // Demonstrates: {| ... |} binding literals per Z RM §3.7
-// Used in relational-calculus queries (DAT course style).
+// Used in relational-calculus queries.
 
 TITLE: Z Binding Calculus
 AUTHOR: txt2tex example

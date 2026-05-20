@@ -1014,9 +1014,8 @@ class Abbreviation(ASTNode):
 class Declaration(ASTNode):
     """Declaration in axdef or schema (var : Type).
 
-    When ``is_primary_key`` is True the generator emits ``\\underline{var}``
-    instead of bare ``var``, marking the attribute as a primary key per the
-    DAT course convention.
+    When ``is_primary_key`` is True the generator emits a PK annotation
+    line below the schema box, marking the attribute as a primary key.
     """
 
     variable: str

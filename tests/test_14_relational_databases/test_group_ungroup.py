@@ -4,8 +4,8 @@ Covers AST nodes, token types, parser cases, LaTeX generator output, and
 negative error cases.  Negative cases follow the three-assertion pattern:
 message substring, line, and column.
 
-Acceptance probe at the end verifies the canonical rendering that the
-DAT course expects for the group/ungroup operators.
+Acceptance probe at the end verifies the canonical rendering for the
+group/ungroup operators.
 """
 
 from __future__ import annotations

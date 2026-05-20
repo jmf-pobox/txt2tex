@@ -1,5 +1,5 @@
 // ============================================================================
-// Example: Decorated Identifiers (Phase 0 - SBM Support)
+// Example: Decorated Identifiers (Phase 0 - Schema Operation Support)
 // ============================================================================
 // Demonstrates Z notation identifier decoration:
 //   - Primes (') for after-state variables: count'

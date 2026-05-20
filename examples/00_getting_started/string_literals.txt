@@ -1,5 +1,5 @@
 // ============================================================================
-// Example: String Literals (Phase 0 - DAT Support)
+// Example: String Literals (Phase 0 - Relational Database Support)
 // ============================================================================
 // Demonstrates the string literal lexeme in txt2tex.
 // String literals use single quotes in the source: 'sunk', 'survived'.
@@ -9,7 +9,7 @@
 //   Fuzz mode:     `sunk'
 //
 // This example uses TEXT blocks which pass apostrophes through unchanged.
-// For Z-expression string literals, see the DAT course examples.
+// For Z-expression string literals, see the relational database examples.
 //
 // To compile:
 //   txt2tex examples/00_getting_started/string_literals.txt
