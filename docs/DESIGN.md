@@ -26,7 +26,7 @@ Users write natural whiteboard notation, but the generated LaTeX should be recog
 
 **Application**:
 
-- ✅ **Automatic smart defaults**: Add `\quad` for indentation when users break lines
+- ✅ **Automatic smart defaults**: Add `\t1` for indentation when users break lines (Spivey-canonical Z RM §3 form; `\t1` is fuzz's tab-stop, not `\quad`)
 - ✅ **Automatic line breaks**: Convert newlines to `\\` in appropriate contexts
 - ✅ **Automatic spacing**: Insert `~` in set comprehensions, function application
 - ❌ **Don't hide LaTeX structure**: Keep environment boundaries clear (`schema...end`, not implicit)

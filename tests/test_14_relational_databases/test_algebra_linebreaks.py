@@ -325,9 +325,9 @@ class TestExprLineBreakRendering:
         assert "S" in result
 
     def test_div_break_in_expr(self) -> None:
-        r"""R div\\nS → R \div \\\\ ... S."""
+        r"""R div\\nS → R~\div~\\\\ ... S."""
         result = _expr_latex("R div\nS")
-        assert r"\div \\" in result
+        assert r"\div~\\" in result
 
     def test_intersect_break_in_expr(self) -> None:
         r"""R intersect\\nS → R \cap \\\\ ... S."""
@@ -450,8 +450,8 @@ class TestRegressionNoBreak:
         assert _expr_latex("R bowtie [p] S") == r"\mathrm{Join}_{p}(R, S)"
 
     def test_divide_unchanged(self) -> None:
-        r"""R div S → R \div S (unchanged)."""
-        assert _expr_latex("R div S") == r"R \div S"
+        r"""R div S → R~\div~S (unchanged)."""
+        assert _expr_latex("R div S") == r"R~\div~S"
 
     def test_union_unchanged(self) -> None:
         r"""R union S — single line."""

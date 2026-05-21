@@ -2917,6 +2917,43 @@ longFunctionName(x, y, z) = \
   complexExpression + moreTerms
 ```
 
+**After `|` in quantifier bindings (single-decl and semicolon-chained):**
+
+A natural newline or explicit `\` after the `|` separator in a quantifier
+binding causes the body to be placed on the next line, indented with `\t1`
+(the Spivey-canonical fuzz tab-stop).
+
+Single-binding form:
+
+```text
+forall i : songs |
+  loveHateScore(i) = someExpression
+```
+
+Semicolon-chained form — all four quantifier types (`forall`, `exists`,
+`exists1`, `mu`) honour the break equally:
+
+```text
+forall s : Ship; o : Outcome; b : Battle |
+  (o.ship = s.name land o.battle = b.name) =>
+  (s.launched <= b.date)
+```
+
+Both forms emit `@ \\` followed by a newline and `\t1` indentation:
+
+```latex
+\forall s : Ship; o : Outcome; b : Battle @ \\
+\t1 (o.ship = s.name \land o.battle = b.name) \implies ...
+```
+
+The bullet (`.`) separator in constraint-plus-body quantifiers also supports
+the same break:
+
+```text
+forall x : N; y : N | x > 0 .
+  x < y
+```
+
 #### Algebra and Set Operators
 
 The following operators also support WYSIWYG line breaks — both a natural

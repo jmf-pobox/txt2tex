@@ -2551,8 +2551,22 @@ class Parser:
             raise ParserError("Expected '|' after quantifier binding", self._current())
         self._advance()  # Consume '|'
 
-        # Allow newlines after | for multi-line quantifiers
-        self._skip_newlines()
+        # Detect line continuation (backslash or natural newline).
+        # Mirrors the logic in _parse_quantifier so that semicolon-chained
+        # quantifier bindings (forall x : T; y : U; z : V | body) honour an
+        # explicit `\` continuation and bare WYSIWYG newlines after `|`.
+        has_continuation = False
+        if self._match(TokenType.CONTINUATION):
+            self._advance()  # consume \
+            has_continuation = True
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+            self._skip_newlines()
+        elif self._match(TokenType.NEWLINE):
+            has_continuation = True
+            self._skip_newlines()
+        else:
+            self._skip_newlines()
 
         # Set flag: we're in quantifier body where . can be separator (for mu)
         # Expose the full declared-variable set (this level + all inherited levels)
@@ -2597,6 +2611,7 @@ class Parser:
             domain=domain,
             body=body,
             expression=expression,
+            line_break_after_pipe=has_continuation,
             line_break_after_bullet=bullet_continuation,
             tuple_pattern=None,  # No tuple pattern in continuation
             line=line,

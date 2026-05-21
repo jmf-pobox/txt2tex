@@ -420,14 +420,14 @@ class TestDivideGenerator:
     r"""LaTeX generator emits \div for Divide nodes."""
 
     def test_divide(self) -> None:
-        r"""R div S → R \div S."""
+        r"""R div S → R~\div~S."""
         result = _expr_latex("R div S")
-        assert result == r"R \div S"
+        assert result == r"R~\div~S"
 
     def test_divide_named_relations(self) -> None:
-        r"""R div S → R \div S (no relvar wrapping)."""
+        r"""R div S → R~\div~S (no relvar wrapping)."""
         result = _expr_latex("R div S")
-        assert result == r"R \div S"
+        assert result == r"R~\div~S"
 
 
 # ---------------------------------------------------------------------------

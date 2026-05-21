@@ -1400,19 +1400,22 @@ class LaTeXGenerator:
 
     def _collect_quantifier_chain(
         self, node: Quantifier
-    ) -> tuple[list[tuple[list[str], Expr | None, str]], Expr, Expr | None]:
+    ) -> tuple[list[tuple[list[str], Expr | None, str]], Expr, Expr | None, Quantifier]:
         """Walk a nested same-quantifier chain and collect all bindings.
 
         Mirrors _collect_lambda_chain but works for forall/exists/exists1/mu.
         Stops when the body is not a Quantifier with the same quantifier attribute.
 
         Returns:
-            A triple (bindings, predicate, expression) where:
+            A 4-tuple (bindings, predicate, expression, innermost) where:
             - bindings: list of (variables, raw_domain, domain_latex) triples,
               one per collected level
             - predicate: the innermost body (predicate before @ or | separator),
               or the un-collapsed inner Quantifier when dependency stops early
             - expression: the expression after @, or None if absent/stopped
+            - innermost: the innermost Quantifier node in the chain (carries
+              the line_break_after_pipe / line_break_after_bullet flags that
+              the parser set when scanning the actual `|` or `.` separator)
 
         When a later level's domain references a variable already accumulated
         in the chain, collection stops early: the returned predicate is the
@@ -1436,10 +1439,10 @@ class LaTeXGenerator:
                     inner_domain_free = expr_free_vars(inner.domain)
                     if inner_domain_free & accumulated_names:
                         # Dependency detected: stop here.
-                        return bindings, inner, None
+                        return bindings, inner, None, current
                 current = inner
             else:
-                return bindings, current.body, current.expression
+                return bindings, current.body, current.expression, current
 
     def _generate_logical_quantifier(
         self, node: Quantifier, parent: Expr | None = None
@@ -1462,7 +1465,9 @@ class LaTeXGenerator:
         existing _generate_quantifier body unchanged.
         """
         quant_latex = self.QUANTIFIERS[node.quantifier]
-        bindings, predicate, expression = self._collect_quantifier_chain(node)
+        bindings, predicate, expression, innermost = self._collect_quantifier_chain(
+            node
+        )
 
         colon = self._get_colon_separator()
         bullet_sep = self._get_bullet_separator()
@@ -1499,25 +1504,47 @@ class LaTeXGenerator:
         parts = [quant_latex, schema_text]
 
         self._quantifier_depth += 1
+        indent = self._get_indentation()
         pred_latex = self.generate_expr(predicate, parent=node)
         self._quantifier_depth -= 1
+
+        # Honour line_break_after_pipe / line_break_after_bullet from the
+        # innermost Quantifier (where the parser scanned the actual `|` or
+        # `.` separator). Collapsed chains otherwise drop these flags.
+        pipe_break = innermost.line_break_after_pipe
+        bullet_break = innermost.line_break_after_bullet
 
         if node.quantifier == "mu":
             # Mu always uses | before the predicate, then optional @ expression.
             pipe_sep = self._get_mid_separator()
-            parts.append(f"{pipe_sep} {pred_latex}")
+            if pipe_break:
+                parts.append(f"{pipe_sep} \\\\\n{indent} {pred_latex}")
+            else:
+                parts.append(f"{pipe_sep} {pred_latex}")
             if expression is not None:
                 expr_latex = self.generate_expr(expression, parent=node)
-                parts.append(f"{bullet_sep} {expr_latex}")
+                if bullet_break:
+                    parts.append(f"{bullet_sep} \\\\\n{indent} {expr_latex}")
+                else:
+                    parts.append(f"{bullet_sep} {expr_latex}")
         elif expression is not None:
             # Constraint + body: | constraint @ body
             pipe_sep = self._get_mid_separator()
-            parts.append(f"{pipe_sep} {pred_latex}")
+            if pipe_break:
+                parts.append(f"{pipe_sep} \\\\\n{indent} {pred_latex}")
+            else:
+                parts.append(f"{pipe_sep} {pred_latex}")
             expr_latex = self.generate_expr(expression, parent=node)
-            parts.append(f"{bullet_sep} {expr_latex}")
+            if bullet_break:
+                parts.append(f"{bullet_sep} \\\\\n{indent} {expr_latex}")
+            else:
+                parts.append(f"{bullet_sep} {expr_latex}")
         else:
             # No constraint: @ predicate (body is the sole predicate)
-            parts.append(f"{bullet_sep} {pred_latex}")
+            if pipe_break:
+                parts.append(f"{bullet_sep} \\\\\n{indent} {pred_latex}")
+            else:
+                parts.append(f"{bullet_sep} {pred_latex}")
 
         result = " ".join(parts)
 
@@ -2397,7 +2424,12 @@ class LaTeXGenerator:
     def _generate_divide(self, node: Divide, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for R div S.
 
-        R div S → R \div S
+        R div S → R~\div~S
+
+        Surround the `\div` (which fuzz.sty renders as a sans-serif "div"
+        word, not the ÷ symbol) with explicit ~ non-breaking spaces so
+        the operator does not visually crowd identifiers in dense
+        contexts such as binding bodies and inline math.
 
         When line_break_after is set, inserts \\ before the RHS.
         """
@@ -2405,8 +2437,8 @@ class LaTeXGenerator:
         right_latex = self.generate_expr(node.right)
         if node.line_break_after:
             indent = self._get_indentation()
-            return f"{left_latex} \\div \\\\\n{indent} {right_latex}"
-        return f"{left_latex} \\div {right_latex}"
+            return f"{left_latex}~\\div~\\\\\n{indent} {right_latex}"
+        return f"{left_latex}~\\div~{right_latex}"
 
     @generate_expr.register(Group)
     def _generate_group(self, node: Group, parent: Expr | None = None) -> str:

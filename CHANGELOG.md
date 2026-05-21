@@ -80,6 +80,35 @@ version to pick up the new output.
   \forall x : \nat @ \forall y : 1 \upto x @ y \leq x
   ```
 
+- **Natural newline and `\` continuation after `|` in semicolon-chained
+  quantifier bindings.** `_parse_quantifier_continuation` now honours an
+  explicit `\` continuation or a bare WYSIWYG newline immediately after `|`,
+  mirroring the logic already present in `_parse_quantifier` for single-binding
+  quantifiers. Previously, `forall x : T; y : U; z : V | body` with a newline
+  after `|` silently collapsed to a single line; the single-binding form
+  `forall x : T | body` already worked. The fix applies to all four quantifier
+  types (`forall`, `exists`, `exists1`, `mu`). The bullet (`.`) separator in
+  constraint-plus-body form was already handled by the continuation path.
+
+  Before (chained form silently dropped the newline):
+
+  ```text
+  forall s : Ship; o : Outcome; b : Battle |
+    (o.ship = s.name land o.battle = b.name) => (s.launched <= b.date)
+  ```
+
+  ```latex
+  % old output — newline after | ignored, everything on one line:
+  \forall s : Ship; o : Outcome; b : Battle @ (o.ship = s.name ...
+  ```
+
+  After (newline honoured):
+
+  ```latex
+  \forall s : Ship; o : Outcome; b : Battle @ \\
+  \t1 (o.ship = s.name \land o.battle = b.name) \implies ...
+  ```
+
 - **Q2(d) comprehension/quantifier parser bugs** (commits `20a6daa`, follow-on
   residual fix, and `fix(parser): add SEMICOLON/PIPE branches to _parse_lambda`).
   Three interrelated bugs prevented multi-typed relational-calculus expressions from being
@@ -166,6 +195,14 @@ parses the same. Only the rendered LaTeX differs. Regenerate any
   top-level zed predicates. Now unconditional in `use_fuzz=True`.
   Every lambda in the output gains surrounding parens — strict
   improvement; fuzz accepts cases it previously rejected.
+
+- **`\div` operator surrounded by non-breaking spaces.** Source `R div S`
+  previously emitted `R \div S`; it now emits `R~\div~S`. fuzz.sty renders
+  `\div` as the sans-serif word "div" (not the ÷ glyph), and the default
+  `\mathbin` spacing was too tight in dense binding-body contexts such as
+  `numScripts(p) div numSessions(p)`. The `~` non-breaking spaces provide
+  consistent visual separation without altering semantics. The line-break form
+  similarly changed from `R \div \\\\ ...` to `R~\div~\\\\ ...`.
 
 - **Z bindings thin-spaced inside brackets** (commit `1cd9761`).
   `{| name == e |}` previously emitted `\lblot name == e \rblot`
