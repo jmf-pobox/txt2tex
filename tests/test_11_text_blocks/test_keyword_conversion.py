@@ -25,22 +25,27 @@ from txt2tex.parser import Parser
 
 
 class TestTextBlockKeywordConversion:
-    """Test keyword conversion elem TEXT blocks."""
+    """Test that bare English keywords pass through as text in TEXT blocks.
 
-    def test_forall_conversion(self):
-        """Test 'forall' converts to ∀ symbol elem TEXT blocks."""
-        text = "=== Test ===\n\nTEXT: Prove that forall x elem N, x >= 0."
+    Since DAT #11 / engine bug #136, math keywords like 'forall', 'exists',
+    'emptyset' in TEXT prose are NOT converted to math glyphs.  Math
+    substitution is opt-in: use $...$ to get symbols, e.g. $\\forall$.
+    """
+
+    def test_forall_stays_as_prose(self):
+        """Test 'forall' stays as English text in TEXT blocks (no conversion)."""
+        text = "=== Test ===\n\nTEXT: Prove that forall x holds for all N."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        assert "$\\forall$" in latex
-        assert "forall" not in latex.lower() or "\\forall" in latex
+        assert "forall" in latex
+        assert "$\\forall$" not in latex
 
-    def test_exists_conversion(self):
-        """Test 'exists' converts to ∃ symbol elem TEXT blocks."""
+    def test_exists_stays_as_prose(self):
+        """Test 'exists' stays as English text in TEXT blocks (no conversion)."""
         text = "=== Test ===\n\nTEXT: There exists a natural number n such that n > 10."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -48,21 +53,23 @@ class TestTextBlockKeywordConversion:
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        assert "$\\exists$" in latex
+        assert "exists" in latex
+        assert "$\\exists$" not in latex
 
-    def test_exists1_conversion(self):
-        """Test 'exists1' converts to ∃₁ symbol elem TEXT blocks."""
-        text = "=== Test ===\n\nTEXT: Prove exists1 x elem N such that x * x = 4."
+    def test_exists1_stays_as_prose(self):
+        """Test 'exists1' stays as English text in TEXT blocks (no conversion)."""
+        text = "=== Test ===\n\nTEXT: The exists1 quantifier means unique existence."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        assert "$\\exists_1$" in latex
+        assert "exists1" in latex
+        assert "$\\exists_1$" not in latex
 
-    def test_emptyset_conversion(self):
-        """Test 'emptyset' converts to ∅ symbol elem TEXT blocks."""
+    def test_emptyset_stays_as_prose(self):
+        """Test 'emptyset' stays as English text in TEXT blocks (no conversion)."""
         text = "=== Test ===\n\nTEXT: The set S is not equal to emptyset."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -70,26 +77,34 @@ class TestTextBlockKeywordConversion:
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        assert "$\\emptyset$" in latex
+        assert "emptyset" in latex
+        assert "$\\emptyset$" not in latex
 
-    def test_multiple_keywords_in_one_paragraph(self):
-        """Test multiple keywords elem same TEXT block."""
-        text = (
-            "=== Test ===\n\n"
-            "TEXT: For all x, exists y such that x != emptyset implies y elem x."
-        )
+    def test_dollar_math_still_works(self):
+        """Test that $...$ inline math still converts keywords inside TEXT blocks."""
+        text = "=== Test ===\n\nTEXT: The quantifier $\\exists$ is used here."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        assert "$\\forall$" in latex or "For all" in latex
         assert "$\\exists$" in latex
-        assert "\\emptyset" in latex
+
+    def test_multiple_keywords_stay_as_prose(self):
+        """Test multiple keywords in same TEXT block stay as English text."""
+        text = "=== Test ===\n\nTEXT: For all x, exists y such that x is in some set."
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        gen = LaTeXGenerator()
+        latex = gen.generate_document(ast)
+        assert "For all" in latex
+        assert "exists" in latex
 
     def test_latex_commands_not_converted(self):
-        """Test that LaTeX commands like \\forall are lnot converted."""
+        """Test that LaTeX commands like \\forall pass through unchanged."""
         text = (
             "=== Test ===\n\n"
             "TEXT: The LaTeX command \\forall is used for universal quantification."
@@ -102,19 +117,16 @@ class TestTextBlockKeywordConversion:
         latex = gen.generate_document(ast)
         assert "forall" in latex
 
-    def test_word_boundaries_respected(self):
-        """Test keyword conversion respects word boundaries."""
-        text = (
-            "=== Test ===\n\n"
-            "TEXT: The forall keyword should convert but forallx should lnot."
-        )
+    def test_non_keyword_words_unaffected(self):
+        """Test non-keyword words are not altered."""
+        text = "=== Test ===\n\nTEXT: The forall keyword is present but forallx is not."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        assert "$\\forall$" in latex
+        assert "forall" in latex
         assert "forallx" in latex
 
 
@@ -231,12 +243,16 @@ class TestPuretextNoConversion:
 
 
 class TestMixedTextAndPuretext:
-    """Test mixing TEXT (with conversion) land PURETEXT (without)."""
+    """Test mixing TEXT and PURETEXT blocks."""
 
-    def test_text_converts_puretext_does_not(self):
-        """Test TEXT converts keywords but PURETEXT doesn't."""
+    def test_both_preserve_keywords_as_text(self):
+        """Test both TEXT and PURETEXT preserve keywords as literal text.
+
+        Since DAT #11, TEXT blocks no longer auto-convert keywords.
+        Both TEXT and PURETEXT now pass 'forall' through as English text.
+        """
         text = (
-            "TEXT: For any set S, forall x elem S means all elements.\n\n"
+            "TEXT: For any set S, forall x in S means all elements.\n\n"
             "PURETEXT: The syntax forall x : T | predicate shows literal notation.\n"
         )
         lexer = Lexer(text)
@@ -250,15 +266,16 @@ class TestMixedTextAndPuretext:
         assert "forall" in result.items[1].text
         gen = LaTeXGenerator()
         latex = gen.generate_document(result)
-        assert "$\\forall$" in latex
+        # Neither TEXT nor PURETEXT converts bare 'forall'.
         assert "forall" in latex
+        assert "$\\forall$" not in latex
 
 
 class TestEdgeCases:
-    """Test edge cases for keyword conversion."""
+    """Test edge cases for prose text in TEXT blocks."""
 
-    def test_exists1_plus_conversion(self):
-        """Test 'exists1+' converts to ∃ (exists1+ is exists)."""
+    def test_exists1_stays_as_prose(self):
+        """Test 'exists1+' stays as literal text (no math conversion)."""
         text = "=== Test ===\n\nTEXT: The notation exists1+ means at least one."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -266,13 +283,14 @@ class TestEdgeCases:
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        assert "$\\exists$" in latex
+        assert "exists1+" in latex
+        assert "$\\exists$" not in latex
 
-    def test_case_sensitivity(self):
-        """Test keyword conversion is case-sensitive."""
+    def test_all_variants_stay_as_prose(self):
+        """Test all keyword variants stay as text (no math conversion)."""
         text = (
             "=== Test ===\n\n"
-            "TEXT: The keyword forall is different from Forall lor FORALL."
+            "TEXT: The keyword forall is different from Forall and FORALL."
         )
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -280,23 +298,25 @@ class TestEdgeCases:
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        assert "$\\forall$" in latex
+        assert "forall" in latex
         assert "Forall" in latex
         assert "FORALL" in latex
+        assert "$\\forall$" not in latex
 
-    def test_keyword_at_start_of_paragraph(self):
-        """Test keyword conversion at start of TEXT block."""
-        text = "=== Test ===\n\nTEXT: forall x elem N, the property P(x) holds."
+    def test_keyword_at_start_of_paragraph_stays_as_prose(self):
+        """Test keyword at start of TEXT block stays as English text."""
+        text = "=== Test ===\n\nTEXT: forall x in N, the property P(x) holds."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        assert "$\\forall$" in latex
+        assert "forall" in latex
+        assert "$\\forall$" not in latex
 
-    def test_keyword_at_end_of_paragraph(self):
-        """Test keyword conversion at end of TEXT block."""
+    def test_keyword_at_end_of_paragraph_stays_as_prose(self):
+        """Test keyword at end of TEXT block stays as English text."""
         text = "=== Test ===\n\nTEXT: This statement is true for forall."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -304,4 +324,5 @@ class TestEdgeCases:
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        assert "$\\forall$" in latex
+        assert "forall" in latex
+        assert "$\\forall$" not in latex

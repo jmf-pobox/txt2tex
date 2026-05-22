@@ -108,11 +108,17 @@ class TestJustificationOperatorFormatting:
         assert "\\mbox" in latex
 
     def test_land_intro_formatting(self) -> None:
-        """Test: [land intro] formats correctly."""
+        """Test: [land intro] formats correctly.
+
+        Plain rule labels (no discharge, no subscript) emit ``\\textrm`` via
+        the Bug 4 fix (mission m-2026-05-21-010) — consistent with the
+        discharge and subscript patterns. Multi-word justifications still
+        emit ``\\mbox`` via ``_wrap_text_in_mathrm``.
+        """
         input_text = "PROOF:\np land q [land intro]\n"
         latex = generate_latex(input_text)
         assert "\\land" in latex
-        assert "\\mbox" in latex
+        assert "\\textrm{-intro}" in latex
 
 
 class TestParserSmartJoinJustification:

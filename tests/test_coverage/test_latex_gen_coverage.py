@@ -119,12 +119,19 @@ def test_quantifier_at_sentence_end() -> None:
 
 
 def test_quantifier_without_pipe() -> None:
-    """Test quantifier-like text without pipe (line 973-974)."""
+    """Test quantifier-like text without pipe renders as English prose.
+
+    Since DAT #11 / engine bug #136, bare English keywords like 'forall'
+    in TEXT prose are NOT converted to math glyphs.  Math rewrite is
+    opt-in via $...$ delimiters.
+    """
     para = Paragraph(text="The keyword forall x appears here.", line=1, column=1)
     gen = LaTeXGenerator()
     latex_lines = gen._generate_paragraph(para)
     latex = "\n".join(latex_lines)
-    assert "\\forall" in latex
+    # 'forall' stays as literal text; no $\forall$ conversion.
+    assert "forall" in latex
+    assert "$\\forall$" not in latex
 
 
 def test_inline_math_parse_failure() -> None:
