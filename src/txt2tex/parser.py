@@ -55,6 +55,7 @@ from txt2tex.ast_nodes import (
     PureParagraph,
     Quantifier,
     Range,
+    RawLatexBlock,
     RelationalImage,
     Rename,
     Restrict,
@@ -474,6 +475,7 @@ class Parser:
             TokenType.PURETEXT,
             TokenType.LATEX,
             TokenType.B_BLOCK,
+            TokenType.RAW_LATEX_BLOCK,
             TokenType.PAGEBREAK,
             TokenType.LINEBREAK,
             TokenType.CONTENTS,
@@ -695,6 +697,20 @@ class Parser:
             raise ParserError("Expected B_BLOCK token for B-machine block", b_token)
         return BMachine(body=b_token.value, line=b_token.line, column=b_token.column)
 
+    def _parse_raw_latex_block(self) -> RawLatexBlock:
+        """Parse multi-line raw LaTeX block from RAW_LATEX_BLOCK token.
+
+        The token value is the verbatim body already slurped by the lexer
+        (body lines only — the END terminator is not included).  Emitted
+        directly to .tex output with no escaping and no environment wrapper.
+        """
+        tok = self._advance()  # Consume RAW_LATEX_BLOCK token
+        if tok.type != TokenType.RAW_LATEX_BLOCK:
+            raise ParserError(
+                "Expected RAW_LATEX_BLOCK token for multi-line LATEX block", tok
+            )
+        return RawLatexBlock(body=tok.value, line=tok.line, column=tok.column)
+
     def _parse_pagebreak(self) -> PageBreak:
         """Parse page break from PAGEBREAK token.
 
@@ -831,6 +847,8 @@ class Parser:
             return self._parse_pure_paragraph()
         if self._match(TokenType.LATEX):
             return self._parse_latex_block()
+        if self._match(TokenType.RAW_LATEX_BLOCK):
+            return self._parse_raw_latex_block()
         if self._match(TokenType.B_BLOCK):
             return self._parse_b_block()
         if self._match(TokenType.PAGEBREAK):

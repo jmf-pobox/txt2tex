@@ -1194,22 +1194,60 @@ class Lexer:
 
             return Token(TokenType.PURETEXT, text_content, start_line, start_column)
 
-        # Check for LATEX: keyword - capture rest of line as raw LaTeX (no escaping)
+        # Check for LATEX: keyword — two forms:
+        #   Single-line:  LATEX: <content>   (non-empty on same line)
+        #   Multi-line:   LATEX:             (only whitespace before newline)
+        # The distinguishing rule: peek past the colon; if ONLY optional
+        # whitespace remains before the newline (or EOF), open a multi-line
+        # block.  Any non-whitespace character means single-line.
         if value == "LATEX" and self._current_char() == ":":
             self._advance()  # Consume ':'
 
-            # Skip any whitespace after the colon
+            # Scan ahead to decide form — do NOT advance pos yet.
+            scan = self.pos
+            while scan < len(self.text) and self.text[scan] in " \t":
+                scan += 1
+            # Multi-line only when a newline follows the optional whitespace.
+            # At EOF without a newline the single-line form is used.
+            rest_is_blank = scan < len(self.text) and self.text[scan] == "\n"
+
+            if rest_is_blank:
+                # Multi-line block: slurp body until column-0 END.
+                # Consume any trailing whitespace on the LATEX: line.
+                while not self._at_end() and self._current_char() in " \t":
+                    self._advance()
+                # Consume the newline ending the LATEX: line.
+                if not self._at_end() and self._current_char() == "\n":
+                    self._advance()
+                # Slurp body lines verbatim until column-0 END.
+                latex_block_lines: list[str] = []
+                found_end = False
+                while not self._at_end():
+                    line_start = self.pos
+                    while not self._at_end() and self._current_char() != "\n":
+                        self._advance()
+                    raw_line = self.text[line_start : self.pos]
+                    if not self._at_end() and self._current_char() == "\n":
+                        self._advance()
+                    if raw_line == "END":
+                        found_end = True
+                        break
+                    latex_block_lines.append(raw_line)
+                if not found_end:
+                    raise LexerError(
+                        f"LATEX: block opened at line {start_line} has no closing END",
+                        start_line,
+                        start_column,
+                    )
+                body = "\n".join(latex_block_lines)
+                return Token(TokenType.RAW_LATEX_BLOCK, body, start_line, start_column)
+            # Single-line: skip whitespace, capture rest of line.
             while not self._at_end() and self._current_char() in " \t":
                 self._advance()
-
-            # Capture the rest of the line as raw LaTeX (don't tokenize)
             text_start = self.pos
             while not self._at_end() and self._current_char() != "\n":
                 self._advance()
-
-            # Extract the raw LaTeX content
             text_content = self.text[text_start : self.pos]
-
             return Token(TokenType.LATEX, text_content, start_line, start_column)
 
         # Check for title metadata keywords: TITLE:, AUTHOR:, DATE:, etc.

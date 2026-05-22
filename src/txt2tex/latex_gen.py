@@ -53,6 +53,7 @@ from txt2tex.ast_nodes import (
     PureParagraph,
     Quantifier,
     Range,
+    RawLatexBlock,
     RelationalImage,
     Rename,
     Restrict,
@@ -3617,6 +3618,20 @@ class LaTeXGenerator:
         """
         lines: list[str] = []
         lines.append(node.latex)  # Raw LaTeX, no processing
+        lines.append("")
+        return lines
+
+    @generate_document_item.register(RawLatexBlock)
+    def _generate_raw_latex_block(self, node: RawLatexBlock) -> list[str]:
+        """Generate LaTeX for multi-line raw LaTeX passthrough block.
+
+        Body is emitted verbatim with NO escaping and NO environment
+        wrapper.  The user owns the raw LaTeX — indentation and blank
+        lines are preserved exactly as written between LATEX: and END.
+        """
+        lines: list[str] = []
+        if node.body:
+            lines.append(node.body)
         lines.append("")
         return lines
 

@@ -1309,6 +1309,19 @@ class BMachine(ASTNode):
 
 
 @dataclass(frozen=True)
+class RawLatexBlock(ASTNode):
+    """Multi-line raw LaTeX passthrough block (LATEX:\\n...END).
+
+    Body lines are slurped verbatim until a column-0 END terminator.
+    Indentation and internal blank lines are preserved exactly.
+    The body is emitted directly to .tex output with NO escaping and
+    NO wrapping — the user owns the raw LaTeX.
+    """
+
+    body: str  # Raw multi-line body (excluding the final END line)
+
+
+@dataclass(frozen=True)
 class PageBreak(ASTNode):
     """Page break in document.
 
@@ -1376,6 +1389,7 @@ DocumentItem = (
     | PureParagraph
     | LatexBlock
     | BMachine
+    | RawLatexBlock
     | PageBreak
     | LineBreak
     | Contents

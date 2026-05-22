@@ -49,9 +49,19 @@ version to pick up the new output.
   comprehensions with conjunction predicates over tuple projections,
   algebra WYSIWYG line breaks, dependent-domain detection,
   `B:` block (B-machine verbatim passthrough), GROUP aggregate form
-  (`Count`, `Sum`, `Avg`, `Min`, `Max`, `Median` inside `group` RHS).
+  (`Count`, `Sum`, `Avg`, `Min`, `Max`, `Median` inside `group` RHS),
+  multi-line `LATEX:` block form.
 
 ### Fixed
+
+- **Engine bug #137 — Multi-line LaTeX listings rendered double-spaced
+  and de-indented when written with consecutive single-line `LATEX:`
+  directives.**  Each `LATEX:` line became its own paragraph and leading
+  whitespace was stripped, so multi-line listings came out wrong.  Fixed
+  by the new `LATEX:` block form (`LATEX:\n...body...\nEND`): the body
+  is slurped verbatim, emitted directly to `.tex` output with no
+  escaping, no environment wrapper, and no paragraph breaks between lines
+  (#137).
 
 - **Engine bug #131 — Parser rejects a natural newline or `\` continuation
   immediately after `;` in a semicolon-chained quantifier prefix.**
@@ -350,10 +360,13 @@ parses the same. Only the rendered LaTeX differs. Regenerate any
   in txt2tex documents — see `docs/guides/USER_GUIDE.md §B: - B-Machine
   Verbatim Block`.
 
-  **Note:** The multi-line `LATEX:` block double-spacing / indentation bug
-  (#137) is not fixed in this release. The `B:` block sidesteps bug #137
-  entirely for B-machine use cases; bug #137 remains tracked for general
-  `LATEX:` multi-line use.
+- **Multi-line `LATEX:` block form** — `LATEX:` alone on a line opens a
+  raw-LaTeX block whose body is slurped verbatim until a column-0 `END`.
+  Preserves indentation and avoids the per-line paragraph breaks of the
+  single-line `LATEX:` directive (#137). Mirrors the `B:` block (#138)
+  precedent. Token: `RAW_LATEX_BLOCK`; AST node: `RawLatexBlock`. The body
+  is emitted directly to `.tex` output with NO escaping and NO environment
+  wrapper — the user owns the raw LaTeX.
 
 - WYSIWYG line-break support for algebra and set operators. Natural newline
   or explicit `\` continuation is now recognised after `bowtie`, `cross`,
