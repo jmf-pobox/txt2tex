@@ -2897,6 +2897,17 @@ Each renders as:
 
 $$R~\mathrm{Group}(\mathrm{Aggregator}(attr)~\mathrm{as}~alias)$$
 
+Concrete examples for each aggregator:
+
+```text
+Sales group (Count(orderId) as orderCount)
+Sales group (Sum(amount) as totalRevenue)
+Sales group (Avg(amount) as meanRevenue)
+Sales group (Min(amount) as cheapest)
+Sales group (Max(amount) as priciest)
+Sales group (Median(amount) as midRevenue)
+```
+
 Multiple aggregators are comma-separated:
 
 ```text

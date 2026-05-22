@@ -38,7 +38,7 @@ memberId : \nat \\
 dueYear : \nat
 \end{schema}
 
-\section*{Restriction ( sigma )}
+\section*{Restriction (sigma)}
 
 \noindent
 $\mathrm{Restrict}_{pages \geq 500}(Book)$
@@ -48,7 +48,7 @@ $\mathrm{Restrict}_{pages \geq 500}(Book)$
 $\mathrm{Restrict}_{year \geq 1990}(\mathrm{Restrict}_{pages \geq 500}(Book))$
 
 
-\section*{Projection ( pi )}
+\section*{Projection (pi)}
 
 \noindent
 $\mathrm{Project}\{title, author\}(Book)$
@@ -58,7 +58,7 @@ $\mathrm{Project}\{title, author\}(Book)$
 $\mathrm{Project}\{title, author\}(\mathrm{Restrict}_{pages \geq 500}(Book))$
 
 
-\section*{Renaming ( rho )}
+\section*{Renaming (rho)}
 
 \noindent
 $\mathrm{Rename}_{bookId \to id}(Book)$
@@ -68,7 +68,7 @@ $\mathrm{Rename}_{bookId \to id}(Book)$
 $\mathrm{Rename}_{bookId \to id, author \to writer}(Book)$
 
 
-\section*{Natural Join and Theta - Join ( bowtie )}
+\section*{Natural Join and Theta-Join (bowtie)}
 
 \noindent
 $Loan \otimes Book$
@@ -82,7 +82,7 @@ $\mathrm{Rename}_{bookId \to id}(Loan) \otimes \mathrm{Rename}_{bookId \to id}(B
 $\mathrm{Join}_{Member.memberId = Loan.memberId}(Member, Loan)$
 
 
-\section*{Division ( div )}
+\section*{Division (div)}
 
 \noindent
 $Loan~\div~Book$
