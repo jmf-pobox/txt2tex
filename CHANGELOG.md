@@ -52,6 +52,14 @@ version to pick up the new output.
   (`Count`, `Sum`, `Avg`, `Min`, `Max`, `Median` inside `group` RHS),
   multi-line `LATEX:` block form.
 
+### Changed
+
+- Refreshed `examples/README.md` index to catalogue every example
+  in the directory (#83).
+- `free_vars.expr_free_vars` now raises `NotImplementedError` on
+  `Binding` nodes instead of silently returning an incomplete result
+  (#141, djb INFO finding).
+
 ### Fixed
 
 - **Engine bug #137 — Multi-line LaTeX listings rendered double-spaced
@@ -62,6 +70,15 @@ version to pick up the new output.
   is slurped verbatim, emitted directly to `.tex` output with no
   escaping, no environment wrapper, and no paragraph breaks between lines
   (#137).
+
+- **Engine bug #144 — Set-comprehension parser rejects a natural newline or `\`
+  continuation after `|` and after `;` in the binding-prefix.**
+  `{ o : Outcome; c : Class; s : Ship |\n  o.battle = Guadalcanal ... }` raised
+  `Expected identifier, number, '(', '{', '{|', '⟨', or lambda, got NEWLINE`.
+  Fix: inserted the same CONTINUATION/NEWLINE skip block at both post-`|` and
+  post-`;` sites in `_parse_set_comprehension_from_brace`, completing the
+  line-break parity with quantifier prefixes (#131). Adds 6 regression tests
+  covering single, double, and triple-binding forms plus the `\` continuation (#144).
 
 - **Engine bug #131 — Parser rejects a natural newline or `\` continuation
   immediately after `;` in a semicolon-chained quantifier prefix.**

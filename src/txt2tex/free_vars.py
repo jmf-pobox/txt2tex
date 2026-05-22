@@ -206,7 +206,8 @@ def expr_free_vars(expr: Expr) -> frozenset[str]:
     if isinstance(expr, Divide):
         return expr_free_vars(expr.left) | expr_free_vars(expr.right)
     # Binding is the only remaining Expr member at this point.
-    result: frozenset[str] = _EMPTY
-    for _, val in expr.pairs:
-        result = result | expr_free_vars(val)
-    return result
+    msg = (
+        f"expr_free_vars: Binding node not yet supported "
+        f"(line={expr.line}, column={expr.column})"
+    )
+    raise NotImplementedError(msg)

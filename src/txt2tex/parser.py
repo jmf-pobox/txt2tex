@@ -3238,7 +3238,16 @@ class Parser:
         extra_declarations: list[tuple[str, Expr]] | None = None
         while self._match(TokenType.SEMICOLON):
             self._advance()  # Consume ';'
-            self._skip_newlines()
+            # After ';' the caller may have placed a natural newline or an explicit
+            # `\` continuation before the next binding.  Mirror the post-`|` handling
+            # so that `;`-chained set-comprehension prefixes may span source lines.
+            if self._match(TokenType.CONTINUATION):
+                self._advance()
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
+            elif self._match(TokenType.NEWLINE):
+                self._skip_newlines()
             if not self._match(TokenType.IDENTIFIER):
                 raise ParserError(
                     "Expected variable name after ';' in set comprehension",
@@ -3275,6 +3284,16 @@ class Parser:
         elif self._match(TokenType.PIPE):
             # Pipe separator: parse predicate, optionally followed by . expr
             self._advance()  # Consume '|'
+            # After '|' the caller may have placed a natural newline or an explicit
+            # `\` continuation before the predicate.  Mirror the quantifier post-`|`
+            # handling so that long comprehensions may span source lines.
+            if self._match(TokenType.CONTINUATION):
+                self._advance()
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
+            elif self._match(TokenType.NEWLINE):
+                self._skip_newlines()
             # Set flag: we're in comprehension body where . can be separator.
             # Expose all declared variables (primary + extra) for bullet
             # disambiguation in _parse_postfix (Z RM §3.16).
