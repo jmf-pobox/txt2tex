@@ -1,10 +1,17 @@
-# txt2tex Test Files: Regressions, Features, and Limitations
+# txt2tex Test Files: Regressions, Features, Limitations, and Active Bugs
 
-This directory contains test files organized into three categories:
+This directory contains test files organized into four categories:
 
-1. **Limitation Tests** (3 files) - Expected behavior with documented workarounds
-2. **Regression Tests** (16 files) - Previously fixed issues
-3. **Feature Tests** (7 files) - Edge cases and features
+1. **Active Bugs** (0 files) - Open defects with minimal repros, awaiting fix
+2. **Limitation Tests** (3 files) - Expected behavior with documented workarounds
+3. **Regression Tests** (20 files) - Previously fixed issues
+4. **Feature Tests** (7 files) - Edge cases and features
+
+---
+
+## Active Bugs (0 files)
+
+No open defects.
 
 ## Limitation Tests (3 files)
 
@@ -26,9 +33,46 @@ These tests document expected behavior limitations, not bugs. Each has a documen
 
 ---
 
-## Regression Tests (16 files)
+## Regression Tests (20 files)
 
 All regression tests pass. They verify previously fixed issues remain fixed.
+
+### Resolved: Bug 4 — PROOF rule-label typography (m-2026-05-21-010, CLOSED)
+
+- **bug4_proof_label_typography.txt** ✓
+- **Test**: `tests/test_bug4_proof_label.py`
+- **Fix**: Added pattern 3 in `_format_justification_label`. Labels of the form
+  `<op>[\s-]+(intro|elim)` (no discharge number, no subscript) now emit the
+  tight `{op_latex}\textrm{-{rule_name}}` form — matching patterns 1 and 2.
+  Previously, `[false-intro]` rendered as `\mbox{false}-\mbox{intro}` (spaced
+  binary minus in math mode) and `[=> elim]` as `\Rightarrow \mbox{elim}`
+  (no hyphen). Both now render tight.
+
+### Resolved: Bug 5 — `o9` composition context (m-2026-05-21-008, CLOSED)
+
+- **bug5_o9_emits_semi_not_comp.txt** ✓
+- **Fix**: `o9` now emits `\comp` inside Z paragraph environments
+  (`\begin{zed}`, `\begin{axdef}`, `\begin{schema}`) and `\semi` in
+  display math and inline `$...$` prose contexts.
+
+### Resolved: Bug 7 — TEXT-block math-mode heuristic (m-2026-05-21-008/009, CLOSED)
+
+All seven sub-symptoms (7.A–7.F) are fixed.
+
+- **bug7_text_block_math_heuristic.txt** ✓ (7.A–7.D fixed, m-2026-05-21-008)
+  - 7.A: `^` in prose escaped correctly; `^` inside `$...$` renders as math.
+  - 7.B: Colon in prose does not trigger math-mode wrap.
+  - 7.C: Math-operator keywords in bare prose are not auto-mathed.
+  - 7.D: Backtick/backslash adjacency in prose does not garble.
+- **bug7e_text_dollar_backslash.txt** ✓ (7.E fixed, m-2026-05-21-009)
+  - Backslash-prefixed LaTeX commands inside `$...$` (`\Leftrightarrow`,
+    `\forall`, `\Rightarrow`, etc.) pass through verbatim without
+    re-lexing as SETMINUS + identifier.
+- **bug7f_text_colon_auto_math.txt** ✓ (7.F fixed, m-2026-05-21-009)
+  - Bare colons in TEXT prose are English punctuation; the
+    colon-detection heuristic (`_process_type_declarations`) has been
+    removed from the inline-math pipeline. Only explicit `$...$`
+    content is parsed as math.
 
 ### Resolved: Multiple Pipes in TEXT Blocks (Issue #2 - CLOSED)
 
@@ -85,10 +129,11 @@ All feature tests pass. They document working features.
 
 | Category | Count | Status |
 |----------|-------|--------|
+| Active Bugs | 0 | None open |
 | Limitation Tests | 3 | Expected behavior |
-| Regression Tests | 16 | All PASS |
+| Regression Tests | 20 | All PASS |
 | Feature Tests | 7 | All PASS |
-| **Total** | **26** | **23 PASS, 3 limitations** |
+| **Total** | **30** | **27 PASS, 3 limitations, 0 open** |
 
 ---
 
@@ -111,6 +156,11 @@ done
 
 ---
 
-**Last Updated**: 2025-11-29
+**Last Updated**: 2026-05-21
 **Active Bugs**: 0
+**Retracted**: bug6 (`cat` keyword) — author error; canonical concat operator is `^`
+(with leading space → CAT, no leading space → CARET/exponent per `lexer.py:691-716`).
+`cat` is not in the txt2tex grammar.
+**Closed**: bug4 (m-2026-05-21-010), bug5 (m-2026-05-21-008),
+bug7 all sub-symptoms 7.A–7.F (m-2026-05-21-008 + m-2026-05-21-009)
 **GitHub Issues**: All closed (#1, #2, #3, #4, #5, #7)

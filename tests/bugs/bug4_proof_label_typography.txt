@@ -1,0 +1,33 @@
+TITLE: bug4 --- PROOF: rule label typography inconsistency
+AUTHOR: txt2tex bug tracker
+
+=== Bug 4 repro ===
+
+TEXT: This minimal PROOF: tree mixes rule labels that contain hyphens, multi-word forms, and the "from N" pattern. The generator renders them inconsistently. Severity: low (cosmetic).
+
+PROOF:
+((p => q) land lnot q) => lnot p [=> intro from 1]
+  [1] (p => q) land lnot q [assumption]
+  :: lnot p [false elim from 2]
+    [2] p [assumption]
+    :: false [false-intro]
+      :: q [=> elim]
+        :: p => q [land elim 1]
+          (p => q) land lnot q [from 1]
+        :: p [from 2]
+      :: lnot q [land elim 2]
+        (p => q) land lnot q [from 1]
+
+TEXT: Expected: all five rule labels render with consistent typography (tight hyphenation, no stray spaces around dashes). Actual --- inspect the rendered PDF and the emitted .tex:
+
+TEXT: 1. [=> intro from 1] renders tight as \Rightarrow\textrm{-intro}^{[1]} (good).
+TEXT: 2. [false elim from 2] renders tight as false\textrm{-elim}^{[2]} (good).
+TEXT: 3. [land elim 1] renders tight as \land\textrm{-elim-1} (good).
+TEXT: 4. [false-intro] renders LOOSE as \mbox{false} - \mbox{intro} (the source hyphen becomes a spaced en-dash-like gap, the words become separate \mbox{} boxes).
+TEXT: 5. [=> elim] renders LOOSE as \Rightarrow \mbox{elim} (no hyphen between operator and word).
+
+TEXT: Pattern: the "from N" form triggers a special tight emission. Labels without "from N" --- whether containing an internal hyphen (false-intro) or two words (=> elim) --- fall through a path that wraps each token in \mbox{} and inserts visible spacing.
+
+TEXT: Workaround: write all rule labels in the "from N" form even when N is irrelevant, or stick to one-word labels. A more durable fix is to normalise bracket-label tokenisation in the generator so any "<op> <word>" or "<word>-<word>" content produces the tight hyphenated form.
+
+TEXT: First observed: SEM Solution 15 verification, judge round 2 (2026-05-21).

@@ -1,0 +1,14 @@
+TITLE: bug7f --- `word : identifier` in TEXT prose still triggers auto-math wrapping
+AUTHOR: txt2tex bug tracker
+
+=== Bug 7.F repro ===
+
+TEXT: Grouped by cardinality: empty, four singletons, six pairs, four triples, one full.
+
+TEXT: Expected: the line above renders as plain English text. Actual: the substring `cardinality: empty` is wrapped in $...$ math mode (looks like a Z type ascription `cardinality : empty`), so the words appear italicised and the colon is positioned as a math operator.
+
+TEXT: This is one of the original symptoms of bug 7 (colon-in-prose triggers math-mode wrap). The bug 7 fix landed the opt-in `$...$` routing for explicit math but did not remove the implicit-colon heuristic from the TEXT-block emitter.
+
+TEXT: First observed: SEM Solution 27 verification, round 3 (2026-05-21). Severity: medium (silently breaks any prose that uses a colon-after-noun as English punctuation, e.g. "Cases: foo and bar." or "Notes: ...").
+
+TEXT: Required fix: remove the colon-detection heuristic from the TEXT-block emitter. After the bug 7 round 1 fix, the only math content should be content inside `$...$`. Bare colons in prose are punctuation.

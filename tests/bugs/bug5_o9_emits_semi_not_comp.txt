@@ -1,0 +1,30 @@
+TITLE: bug5 --- o9 emits \semi but fuzz reads \semi as schema-text separator
+AUTHOR: txt2tex bug tracker
+
+=== Bug 5 repro ===
+
+TEXT: The relational composition operator o9 emits \semi to LaTeX, but fuzz.sty declares \semi as math class 3 (closing-bracket / schema-text separator), not as a binary operator. The correct fuzz symbol for relational composition is \comp (math class 2, binary). As a result, any source using o9 fails fuzz typechecking in default mode (fuzz.sty), though it renders to PDF correctly because zed-cm.sty defines \semi as \mathrel{\comp}. Severity: medium (blocks fuzz validation of any expression using relational composition, including foundational identities like (R o9 S) o9 T = R o9 (S o9 T)).
+
+given Q
+
+axdef
+  R : Q <-> Q
+  S : Q <-> Q
+  T : Q <-> Q
+where
+  T = R o9 S
+end
+
+TEXT: Expected: fuzz typecheck passes. Actual: fuzz reports
+
+TEXT: solutions-bug5.tex line N: Syntax error at symbol "\semi"
+
+TEXT: or "Closing parenthesis expected at symbol \semi" when the composition is parenthesised.
+
+TEXT: Root cause: src/txt2tex/latex_gen.py emits "\\semi" for the o9 token. fuzz.sty:298 declares "\\@ms \\semi \"3?1C" --- math class 3 is closing-bracket. Should be "\\comp" which fuzz.sty:314 declares as "\\@ms \\comp \"2?1C" --- math class 2 is binary operator.
+
+TEXT: Workaround: use --zed mode (zed-cm.sty defines \semi as \mathrel{\comp}, so PDF renders correctly though fuzz still rejects under fuzz.sty mode). Or rewrite expressions to avoid o9 (e.g. via explicit set comprehension on maplets).
+
+TEXT: First observed: SEM Solution 30 verification (parentOf, siblingOf, cousinOf), 2026-05-21.
+
+TEXT: Filing: change the o9 generator to emit \\comp instead of \\semi when targeting fuzz.sty. Or document the divergence and require --zed for any source using composition.
