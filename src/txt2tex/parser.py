@@ -2750,6 +2750,18 @@ class Parser:
         """
         prior_vars: set[str] = inherited_vars if inherited_vars is not None else set()
 
+        # After ';' the caller may have placed a natural newline or an explicit
+        # `\` continuation before the next binding.  Mirror the post-`|` handling
+        # (lines 2810-2820) so that `;`-chained quantifier prefixes may span
+        # source lines (Z RM authoring convenience).
+        if self._match(TokenType.CONTINUATION):
+            self._advance()
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+            self._skip_newlines()
+        elif self._match(TokenType.NEWLINE):
+            self._skip_newlines()
+
         # Parse variable(s)
         if not self._match(TokenType.IDENTIFIER):
             raise ParserError(

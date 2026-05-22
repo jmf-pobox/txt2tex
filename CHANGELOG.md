@@ -53,6 +53,14 @@ version to pick up the new output.
 
 ### Fixed
 
+- **Engine bug #131 — Parser rejects a natural newline or `\` continuation
+  immediately after `;` in a semicolon-chained quantifier prefix.**
+  `forall d : Date; c : Course;\n  s : Student | body` raised
+  `Expected variable name after ';' in quantifier`. Fix: inserted newline-skip
+  logic at the top of `_parse_quantifier_continuation`, mirroring the post-`|`
+  handling shipped by m-2026-05-20-001. Both call-sites flow through the helper,
+  so all `;`-chained quantifiers now accept newlines at every `;` position (#131).
+
 - **Engine bug #133 — Generator strips grouping parentheses around nested
   prefix-operator applications, causing fuzz syntax errors.**
   `seq (P X)` emitted `\seq~\power X` (fuzz: "Syntax error at \power");
