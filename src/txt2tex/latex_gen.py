@@ -1100,13 +1100,15 @@ class LaTeXGenerator:
         ):
             operand = f"({operand})"
 
-        # Fuzz grammar quirk: bigcup/bigcap with a prefix-function operand.
-        # Without parens, "\bigcup \ran docs" is parsed as "(\bigcup \ran) docs".
-        # Wrap to yield "\bigcup (\ran docs)".
-        # Fuzz manual §2.3 (same citation as # case above).
+        # Fuzz grammar rule (Z RM §3.7 / fuzz §2.3): prefix-generic operators
+        # require an atomic Expression0 as their immediate right operand.
+        # A nested prefix application is not atomic, so wrap it.
+        # Generalised form subsumes the earlier bigcup/bigcap-only rule:
+        # any _FUZZ_FUNCTION_LIKE_UNARY outer with a _FUZZ_FUNCTION_LIKE_UNARY
+        # inner operand must be wrapped.  Example: \ran (\bigcup (\ran s)).
         if (
             self.use_fuzz
-            and node.operator in {"bigcup", "bigcap"}
+            and node.operator in self._FUZZ_FUNCTION_LIKE_UNARY
             and isinstance(node.operand, UnaryOp)
             and node.operand.operator in self._FUZZ_FUNCTION_LIKE_UNARY
         ):
@@ -2061,7 +2063,9 @@ class LaTeXGenerator:
                 # FunctionApp: P (P Z), seq (seq X)
                 # BinaryOp: seq (X cross Y), P (A union B)
                 # GenericInstantiation: seq (P[X])  # noqa: ERA001
-                if isinstance(arg, (FunctionApp, BinaryOp, GenericInstantiation)):
+                if isinstance(
+                    arg, (FunctionApp, BinaryOp, GenericInstantiation, UnaryOp)
+                ):
                     arg_latex = f"({arg_latex})"
                 # Add ~ spacing hint between function and argument
                 return f"{func_latex}~{arg_latex}"

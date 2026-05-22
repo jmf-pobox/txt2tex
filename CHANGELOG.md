@@ -53,6 +53,19 @@ version to pick up the new output.
 
 ### Fixed
 
+- **Engine bug #133 — Generator strips grouping parentheses around nested
+  prefix-operator applications, causing fuzz syntax errors.**
+  `seq (P X)` emitted `\seq~\power X` (fuzz: "Syntax error at \power");
+  `ran (bigcup (ran s))` emitted `\ran \bigcup (\ran s)` (fuzz mis-parsed
+  as `(\ran \bigcup)(\ran s)`).  Z RM §3.7 requires prefix-generic operators
+  to take an atomic Expression0 (identifier, `(...)`, `{...}`) as their
+  immediate right operand; a nested prefix application is not atomic.
+  Fix: (1) add `UnaryOp` to the `isinstance` check in `_generate_function_app`
+  so special-function calls (`seq`, `P`, `F`, …) wrap a `UnaryOp` argument;
+  (2) generalise the `_generate_unary_op` wrapping rule from bigcup/bigcap-only
+  to all `_FUZZ_FUNCTION_LIKE_UNARY` operators as outer, covering `ran`, `dom`,
+  `inv`, `id`, `P`, `P1`, `F`, `F1`, `bigcup`, `bigcap`.
+
 - **Engine bug #142 — Abbreviation `Name == <relational-algebra-expr>`
   routed through `\begin{zed}` instead of inline math.**  Surfaced
   during DAT #9 GROUP-aggregator empirical verification.  The
