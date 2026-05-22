@@ -57,6 +57,8 @@ ENV/
 *.tfm
 *.pk
 *.gf
+*pk
+*gf
 
 # LaTeX infrastructure (copied during build, originals in examples/infrastructure/)
 examples/*/*.sty
@@ -110,3 +112,10 @@ examples/*/phase_a_*.pdf
 examples/*/phase12_*.pdf
 *.disabled
 
+/.punt-labs/quarry/captures/
+
+# Stray root-level cheatsheet from prior workflow (now consolidated into docs/reference.pdf)
+/cheatsheet.pdf
+/B-summary.pdf
+/dat_requirements.md
+/docs/txt2tex-reference.pdf

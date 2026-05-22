@@ -26,8 +26,6 @@
       "Bash(fuzz:*)",
       "Bash(pdftotext:*)",
       "Bash(latexmk:*)",
-      "Bash(chmod:*)",
-      "Bash(python3:*)",
       "Bash(open:*)"
     ],
     "deny": [],
