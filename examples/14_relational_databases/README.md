@@ -119,6 +119,22 @@ auto-emission pattern); pdflatex compiles them correctly.
 
 Also exercises: `LINEBREAK:` between sections, `<->` for the relation type.
 
+### normalisation.txt
+
+Demonstrates functional dependencies and step-by-step normalisation on a
+generic employee/project/department domain (#84):
+
+- Universal relation with composite PK `(empID, projID)`
+- Full FD set: partial dependencies on `empID` and `projID` alone; transitive
+  dependency `dept -> deptHead`
+- 2NF analysis: removes partial dependencies; identifies the remaining
+  transitive violation
+- 3NF decomposition into four relations: `Employee`, `Department`, `Project`,
+  `Assignment` — no partial or transitive dependencies remain
+- Lossless-join property stated in closing TEXT block
+
+Fuzz type-checks clean against all four final schemas.
+
 ## Building
 
 ```bash
@@ -128,4 +144,5 @@ txt2tex examples/14_relational_databases/bindings.txt
 txt2tex examples/14_relational_databases/group_ungroup.txt
 txt2tex examples/14_relational_databases/relational_calculus.txt
 txt2tex examples/14_relational_databases/foreign_keys.txt
+txt2tex examples/14_relational_databases/normalisation.txt
 ```

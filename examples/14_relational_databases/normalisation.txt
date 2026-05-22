@@ -1,0 +1,109 @@
+// Functional Dependencies and Normalisation
+// Domain: employee/project/department (classic textbook relation).
+// Walks through 1NF -> 2NF -> 3NF decomposition step by step.
+
+TITLE: Functional Dependencies and Normalisation
+AUTHOR: txt2tex example
+
+given EmpID, EmpName, DeptName, HeadName, ProjID, ProjName
+
+=== The Universal Relation ===
+
+TEXT: We start with a single unnormalised relation that bundles every
+TEXT: attribute together.  The composite primary key is (empID, projID) --
+TEXT: an employee can be assigned to many projects, and a project involves
+TEXT: many employees.
+
+schema Universal
+  pk empID : EmpID
+  empName : EmpName
+  dept : DeptName
+  deptHead : HeadName
+  pk projID : ProjID
+  projName : ProjName
+end
+
+TEXT: The relation is in 1NF: every attribute is single-valued and every
+TEXT: row is uniquely identified by (empID, projID).
+
+LINEBREAK:
+
+=== Functional Dependencies ===
+
+TEXT: We identify the following functional dependencies (FDs).
+
+TEXT: Full-key dependency (no issue):
+
+TEXT:   empID, projID -> empName, dept, deptHead, projName
+
+TEXT: Partial dependencies -- empName, dept, and deptHead depend on empID
+TEXT: alone; projName depends on projID alone.  These violate 2NF.
+
+TEXT:   empID -> empName, dept, deptHead
+TEXT:   projID -> projName
+
+TEXT: Transitive dependency -- deptHead is determined by dept, not directly
+TEXT: by empID.  This violates 3NF even after removing the partial dependencies.
+
+TEXT:   dept -> deptHead
+
+LINEBREAK:
+
+=== 2NF: Remove Partial Dependencies ===
+
+TEXT: A relation is in 2NF when every non-key attribute depends on the whole
+TEXT: primary key, not just part of it.  We remove empName, dept, deptHead
+TEXT: (which depend only on empID) and projName (which depends only on projID)
+TEXT: into their own relations.
+
+TEXT: Remaining composite relation after 2NF lift -- empID and projID are the
+TEXT: composite primary key; all remaining attributes depend on the full key:
+
+TEXT:   EmpProj2NF(empID, projID)
+
+TEXT: Employee attributes extracted into a separate relation:
+
+TEXT:   EmpDept2NF(empID, empName, dept, deptHead)
+
+TEXT: Project attributes extracted into a separate relation:
+
+TEXT:   Proj2NF(projID, projName)
+
+TEXT: EmpDept2NF is still not in 3NF: dept -> deptHead is a transitive
+TEXT: dependency.  deptHead is a fact about the department, not the employee.
+
+LINEBREAK:
+
+=== 3NF: Remove Transitive Dependencies ===
+
+TEXT: A relation is in 3NF when every non-key attribute depends directly on
+TEXT: the primary key and on nothing else.  We remove deptHead (determined by
+TEXT: dept) into a Department relation and drop it from EmployeeProj.
+
+TEXT: Final 3NF decomposition -- four relations:
+
+schema Employee
+  pk empID : EmpID
+  empName : EmpName
+  dept : DeptName
+end
+
+schema Department
+  pk dept : DeptName
+  deptHead : HeadName
+end
+
+schema Project
+  pk projID : ProjID
+  projName : ProjName
+end
+
+schema Assignment
+  pk empID : EmpID
+  pk projID : ProjID
+end
+
+TEXT: Every non-key attribute now depends only on its own primary key.
+TEXT: No partial or transitive dependencies remain.  The decomposition is
+TEXT: lossless: rejoining Employee, Department, Assignment, and Project on
+TEXT: their shared keys reconstructs the original Universal relation exactly.

@@ -1,0 +1,159 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\title{Functional Dependencies and Normalisation}
+\author{txt2tex example}
+\hypersetup{pdftitle={Functional Dependencies and Normalisation},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.2.0}}
+\begin{document}
+
+\maketitle
+
+\begin{zed}[EmpID, EmpName, DeptName, HeadName, ProjID, ProjName]\end{zed}
+
+\section*{The Universal Relation}
+
+\noindent We start with a single unnormalised relation that bundles every attribute together.  The composite primary key is (empID, projID) -- an employee can be assigned to many projects, and a project involves many employees.
+
+\bigskip
+
+\begin{schema}{Universal}
+empID : EmpID \\
+empName : EmpName \\
+dept : DeptName \\
+deptHead : HeadName \\
+projID : ProjID \\
+projName : ProjName
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Universal}) = \{empID, projID\}$
+
+\smallskip
+
+\noindent The relation is in 1NF: every attribute is single-valued and every row is uniquely identified by (empID, projID).
+
+\bigskip
+
+\medskip
+
+\section*{Functional Dependencies}
+
+\noindent We identify the following functional dependencies (FDs).
+
+\bigskip
+
+\noindent Full-key dependency (no issue):
+
+\bigskip
+
+\noindent empID, $projID \fun empName$, dept, deptHead, projName
+
+\bigskip
+
+\noindent Partial dependencies -- empName, dept, and deptHead depend on empID alone; projName depends on projID alone.  These violate 2NF.
+
+\bigskip
+
+\noindent $empID \fun empName$, dept, deptHead $projID \fun projName$
+
+\bigskip
+
+\noindent Transitive dependency -- deptHead is determined by dept, not directly by empID.  This violates 3NF even after removing the partial dependencies.
+
+\bigskip
+
+\noindent $dept \fun deptHead$
+
+\bigskip
+
+\medskip
+
+\section*{2NF: Remove Partial Dependencies}
+
+\noindent A relation is in 2NF when every non-key attribute depends on the whole primary key, not just part of it.  We remove empName, dept, deptHead (which depend only on empID) and projName (which depends only on projID) into their own relations.
+
+\bigskip
+
+\noindent Remaining composite relation after 2NF lift -- empID and projID are the composite primary key; all remaining attributes depend on the full key:
+
+\bigskip
+
+\noindent EmpProj2NF(empID, projID)
+
+\bigskip
+
+\noindent Employee attributes extracted into a separate relation:
+
+\bigskip
+
+\noindent EmpDept2NF(empID, empName, dept, deptHead)
+
+\bigskip
+
+\noindent Project attributes extracted into a separate relation:
+
+\bigskip
+
+\noindent Proj2NF(projID, projName)
+
+\bigskip
+
+\noindent EmpDept2NF is still not in 3NF: $dept \fun deptHead$ is a transitive dependency.  deptHead is a fact about the department, not the employee.
+
+\bigskip
+
+\medskip
+
+\section*{3NF: Remove Transitive Dependencies}
+
+\noindent A relation is in 3NF when every non-key attribute depends directly on the primary key and on nothing else.  We remove deptHead (determined by dept) into a Department relation and drop it from EmployeeProj.
+
+\bigskip
+
+\noindent Final 3NF decomposition -- four relations:
+
+\bigskip
+
+\begin{schema}{Employee}
+empID : EmpID \\
+empName : EmpName \\
+dept : DeptName
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Employee}) = \{empID\}$
+
+\smallskip
+
+\begin{schema}{Department}
+dept : DeptName \\
+deptHead : HeadName
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Department}) = \{dept\}$
+
+\smallskip
+
+\begin{schema}{Project}
+projID : ProjID \\
+projName : ProjName
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Project}) = \{projID\}$
+
+\smallskip
+
+\begin{schema}{Assignment}
+empID : EmpID \\
+projID : ProjID
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Assignment}) = \{empID, projID\}$
+
+\smallskip
+
+\noindent Every non-key attribute now depends only on its own primary key. No partial or transitive dependencies remain.  The decomposition is lossless: rejoining Employee, Department, Assignment, and Project on their shared keys reconstructs the original Universal relation exactly.
+
+\bigskip
+
+\end{document}

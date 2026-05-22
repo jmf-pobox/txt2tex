@@ -207,7 +207,7 @@ Schema calculus features beyond the basic vertical form.
 
 ---
 
-## 14_relational_databases (6 examples)
+## 14_relational_databases (7 examples)
 
 Relational-database modelling in Z, including the schema-based relational calculus.
 
@@ -219,6 +219,7 @@ Relational-database modelling in Z, including the schema-based relational calcul
 | `group_ungroup.txt` | GROUP / UNGROUP nested-relation operators |
 | `primary_keys.txt` | `pk` attribute annotation; PK statement generated after schema box |
 | `relational_calculus.txt` | Multi-declaration set comprehensions over schema projections; multi-decl forall |
+| `normalisation.txt` | Functional dependencies; 1NF→2NF→3NF decomposition on employee/project/department domain |
 
 ---
 

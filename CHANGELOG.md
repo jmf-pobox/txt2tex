@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New example: `examples/14_relational_databases/normalisation.txt`
+  walks through functional dependencies and 1NF→3NF decomposition
+  on a generic employee/project/department relation (#84).
+
 ### Migration Notes (Prior-Release Users)
 
 This section summarises what to expect when upgrading. Most `.txt`
@@ -352,7 +358,7 @@ parses the same. Only the rendered LaTeX differs. Regenerate any
   (content flush against bracket symbols); now emits
   `\lblot~name == e~\rblot`.
 
-### Added
+### Added (engine + rendering)
 
 - **DAT #9 — GROUP aggregate form.** Six new aggregator keywords
   (`Count`, `Sum`, `Avg`, `Min`, `Max`, `Median`) are now accepted
