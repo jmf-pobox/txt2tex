@@ -212,14 +212,21 @@ end
 
 ### Proof Trees
 
-Natural deduction proofs with simple indentation:
+Natural deduction proofs. Each rule's conclusion is the parent line;
+its premises are indented children. Multi-premise rules mark each
+premise with `::` so the rendered tree branches:
 
 ```text
 PROOF:
-  p => q
-  p
-    q [modus-ponens]
+q [=> elim]
+  :: p [premise]
+  :: p => q [premise]
 ```
+
+Discharged assumptions pair `[N] X [assumption]` with `Y [from N]` at
+each leaf use; case analysis on disjunctions uses `case X:` blocks.
+See **[Tutorial 4: Proof Trees](docs/tutorials/04_proof_trees.md)** for
+the full syntax.
 
 ### Truth Tables and Equivalence Chains
 
@@ -383,16 +390,30 @@ Explicit binding-display for constructing and working with schema instances as f
 
 ### 13. Proof Trees
 
-Natural deduction with indentation-driven structure:
+Natural deduction. Conclusions sit at parent lines; their premises are
+indented children. Each premise of a multi-premise rule is prefixed
+with `::` so the generator emits a true branching `\infer` node rather
+than a linear chain. Discharged assumptions pair `[N] X [assumption]`
+under the discharging rule with `Y [from N]` at each leaf use.
+Case analysis on disjunctions uses `case X:` blocks.
 
 ```text
 PROOF:
-  p => q :: p => r
-    q => r :: p
-      r [modus-ponens, modus-ponens]
+(p land (p => q)) => (p land q) [=> intro from 1]
+  [1] p land (p => q) [assumption]
+  :: p land q [land intro]
+    :: p [land elim 1]
+      p land (p => q) [from 1]
+    :: q [=> elim]
+      :: p => q [land elim 2]
+        p land (p => q) [from 1]
+      :: p [land elim 1]
+        p land (p => q) [from 1]
 ```
 
-Intro/elim rules, discharged assumptions, sibling premises (`::`); equational chains (`EQUAL:`), equivalence chains (`EQUIV:`), and structured argumentation (`ARGUE:`).
+Intro/elim rules for `land`/`lor`/`=>`/`lnot`/`false`, discharged
+assumptions, case analysis; equational chains (`EQUAL:`), equivalence
+chains (`EQUIV:`), and structured argumentation (`ARGUE:`).
 
 ### 14. Relational Database Notation
 

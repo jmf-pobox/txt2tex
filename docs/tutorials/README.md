@@ -49,10 +49,12 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 ### Lecture 4: Deductive Proofs
 
 - **[Tutorial 4: Proof Trees](04_proof_trees.md)**
-  - Natural deduction rules
-  - Proof tree syntax (PROOF:, EQUIV:)
-  - Introduction and elimination rules
-  - Nested proofs and assumptions
+  - Conclusion-first nesting in `PROOF:` blocks
+  - The `::` marker for multi-premise rules (skip it and the tree collapses to a linear chain)
+  - Discharge pairing: `[N] X [assumption]` and `Y [from N]`
+  - Case analysis with `case X:` for `lor`-elimination
+  - Natural-deduction rules — math form alongside txt2tex form
+  - Common pitfalls
   - **Examples:** `04_proof_trees/`
 
 ### Lecture 5: Z Notation Basics
@@ -134,9 +136,9 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 ## Reference Materials
 
-- **[USER_GUIDE.md](docs/guides/USER_GUIDE.md)** - Complete syntax reference
-- **[PROOF_SYNTAX.md](docs/guides/PROOF_SYNTAX.md)** - Proof tree formatting rules
-- **[DESIGN.md](docs/DESIGN.md)** - Architecture and design decisions
+- **[USER_GUIDE.md](../guides/USER_GUIDE.md)** - Complete syntax reference
+- **[PROOF_SYNTAX.md](../guides/PROOF_SYNTAX.md)** - Proof tree formatting rules
+- **[DESIGN.md](../DESIGN.md)** - Architecture and design decisions
 - **[MISSING_FEATURES.md](../guides/MISSING_FEATURES.md)** - Features not yet implemented
 
 ## How to Use This Tutorial

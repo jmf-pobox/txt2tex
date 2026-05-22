@@ -42,6 +42,17 @@ See [README.md](../../README.md) for installation instructions, including:
 
 Generates: `\section*{Introduction and Propositions}`
 
+Section titles may contain hyphens, colons, parentheses, and other
+punctuation — the title text is captured verbatim and LaTeX-escaped
+(DAT #15). Example:
+
+```text
+=== Foreign-key constraints ===
+```
+
+Generates: `\section*{Foreign-key constraints}` (the hyphen is preserved
+as a literal hyphen, not widened to math-mode spacing).
+
 ### Solutions
 
 ```text
@@ -62,6 +73,22 @@ Generates: `\bigskip\noindent\textbf{Solution 1}\medskip`
 
 Each part gets proper spacing and formatting with `(a)\par\vspace{11pt}`.
 
+**Part-label scope rule (DAT #18 / DAT #1):** A `(label)` token is recognised
+as a structural part label only when it appears at the start of a paragraph
+AND uses a short, recognised form: a single letter `(a)-(z)`, a single digit
+`(1)-(9)`, or a short Roman numeral `(i)-(x)`.  Parenthesised words like
+`(underlined)` or `(continued)` that appear mid-sentence or that are too long
+are treated as literal prose, not part labels.
+
+Example of `(word)` inside TEXT prose passing through as literal text:
+
+```text
+TEXT: Each primary key is highlighted (underlined) in the schema box.
+```
+
+Generates: `Each primary key is highlighted (underlined) in the schema box.`
+— no spurious `\subsection*{(underlined)}` is inserted.
+
 ---
 
 ## Text Blocks
@@ -75,7 +102,7 @@ Use for normal prose where you want mathematical expressions automatically detec
 ```text
 TEXT: This is a plain text paragraph with => and <=> symbols.
 TEXT: The set { x : N | x > 0 } contains positive integers.
-TEXT: We know that forall x : N | x >= 0 is true.
+TEXT: We write $\forall x : N | x \geq 0$ to mean all natural numbers.
 ```
 
 **Features:**
@@ -83,12 +110,42 @@ TEXT: We know that forall x : N | x >= 0 is true.
 - Operators converted: `=>` → $\Rightarrow$, `<=>` → $\Leftrightarrow$
 - Formulas automatically detected: `{ x : N | x > 0 }` → $\{ x : \mathbb{N} \mid x > 0 \}$
 - Sequence literals converted: `<a, b, c>` → $\langle a, b, c \rangle$
-- **Keywords automatically converted** to symbols:
-  - `forall` → ∀ ($\forall$)
-  - `exists` → ∃ ($\exists$)
-  - `exists1` → ∃₁ ($\exists_1$)
-  - `emptyset` → ∅ ($\emptyset$)
+- **Math-keyword rewrite is opt-in via `$...$`** (#136 / DAT #11): bare
+  English words like `exists`, `forall`, `group`, `union` are NOT
+  automatically converted to math glyphs. Write `$\exists$`, `$\forall$`,
+  etc. when you want the symbol.
+
+  Compare:
+
+  ```text
+  TEXT: There exists a witness in the constraint set.
+  ```
+
+  Generates: `There exists a witness in the constraint set.` (bare
+  `exists` stays as English prose.)
+
+  ```text
+  TEXT: We write $\exists x : N$ to mean "some natural number".
+  ```
+
+  Generates the `∃` glyph inside the inline `$...$`, English prose
+  outside.
+
 - Citations supported: `[cite key]` → (Author, Year) in Harvard style
+
+**Paragraph coalescing (DAT #16):** Consecutive `TEXT:` directives on
+adjacent lines (with no blank line between them) are joined into a single
+paragraph.  A blank line between two `TEXT:` directives produces two
+separate paragraphs.
+
+```text
+TEXT: First sentence of the paragraph.
+TEXT: Second sentence continues here.
+TEXT: Third sentence wraps up the thought.
+```
+
+The three lines above produce one paragraph. A blank line between any two of
+them would start a new paragraph.
 
 **Citations in TEXT blocks:**
 
@@ -123,6 +180,68 @@ PURETEXT: Author's name, "quoted text", and more.
 - NO operator conversion
 - NO keyword conversion (preserves literal `forall`, `exists`, `emptyset` for teaching)
 - Preserves punctuation like quotes, commas, parentheses
+
+### B: - B-Machine Verbatim Block
+
+Use `B:` to embed an Atelier-B / B-Method machine listing verbatim. The body
+is passed directly to a LaTeX `verbatim` environment — no Z-parser heuristics,
+no keyword conversion, no escaping. Indentation and blank lines are preserved
+exactly as written.
+
+**Syntax:**
+
+```text
+B:
+MACHINE MachineName
+SETS
+   MySet
+VARIABLES
+   v
+INVARIANT
+   v : MySet
+INITIALISATION
+   v := default
+END
+```
+
+**Rules:**
+
+- The `B:` line opens the block. Any text on the same line after `:` is ignored.
+- Every line after `B:` is captured verbatim until a line that is exactly `END`
+  at column 0 (no leading whitespace, no trailing content beyond a newline).
+- The `END` line is part of the emitted block — it is the standard B-Method
+  machine terminator (Abrial, *The B-Book*, 1996).
+- Multiple `B:` blocks in one file are independent; each produces its own
+  `\begin{verbatim}…\end{verbatim}` region.
+- A `B:` block opened without a matching `END` is a lexer error; the error
+  message cites the source line of the `B:` opener.
+
+**Why not use `LATEX:` for B machines?**
+
+Multi-line `LATEX:` blocks render double-spaced and strip leading whitespace
+because each `LATEX:` directive is an independent paragraph. `B:` solves this
+correctly: the entire body is one verbatim environment, single-spaced, with all
+indentation preserved.
+
+**Example — full machine with prose before and after:**
+
+```text
+TEXT: Below is the B machine for the Trains case study.
+
+B:
+MACHINE Trains
+SETS
+   PLACE
+VARIABLES
+   trains
+INVARIANT
+   trains : iseq(PLACE * PLACE)
+INITIALISATION
+   trains := []
+END
+
+TEXT: The invariant ensures trains is a sequence of directed edges.
+```
 
 ### LATEX: - Raw LaTeX Passthrough
 
@@ -474,6 +593,92 @@ forall x : N | exists y : N | x = y
 ✅ Correct:   forall x : N | x > 0 land (forall y : N | y > x)
 ❌ Incorrect: forall x : N | x > 0 land forall y : N | y > x
 ```
+
+### Schema-text Quantification
+
+Z RM §3.10 permits schemas to appear directly as quantifier bindings, without
+spelling out all the variables and domain types manually.  txt2tex supports all
+four forms for `forall`, `exists`, and `exists1`.
+
+#### State-change binding (ΔS)
+
+```text
+exists Delta S | P
+```
+
+Generates (fuzz mode): `\exists \Delta S @ P`
+
+Asserts there is some state change of schema `S` satisfying predicate `P`.
+fuzz expands `\Delta S` into the full before-and-after variable list; the
+engine emits the binding literally.
+
+Example — miniature promotion predicate (mirrors SBM Ex 21):
+
+```text
+exists Delta BoxOffice | Promote
+```
+
+#### Read-only binding (ΞS)
+
+```text
+exists Xi S | P
+```
+
+Generates: `\exists \Xi S @ P`
+
+Like `Delta` but additionally constrains that all outputs equal their
+inputs (the state is not changed).
+
+#### Schema-as-declaration (S)
+
+```text
+exists S | P
+```
+
+Generates: `\exists S @ P`
+
+Existentially quantifies over all components of schema `S`.  `S` must
+start with an uppercase letter (Z naming convention) to distinguish it
+from a value variable.
+
+#### Primed schema (S')
+
+```text
+exists S' | P
+```
+
+Generates: `\exists S^{\prime} @ P`
+
+Like the bare form but uses the after-state components of schema `S`.
+
+#### forall and exists1
+
+All three quantifiers (`forall`, `exists`, `exists1`) support every
+schema binding form:
+
+```text
+forall Delta S | P         →  \forall \Delta S @ P
+exists1 Delta S | P        →  \exists_1 \Delta S @ P
+exists Xi S | P            →  \exists \Xi S @ P
+```
+
+#### Disambiguation
+
+The parser uses the first character of the identifier to distinguish a
+schema name from a variable name:
+
+- Uppercase initial letter → schema binding (e.g., `BoxOffice`, `S`, `State`)
+- Lowercase initial letter → value binding (e.g., `x`, `state`, `n`)
+
+This follows Z's own naming convention.  To force a value binding for an
+identifier starting with uppercase, add a `:` domain declaration:
+
+```text
+exists S : SchemaType | P      [value binding — S is a variable of SchemaType]
+exists S | P                   [schema binding — S is the schema name]
+```
+
+See the [Schemas section](#schemas) for how `Delta` and `Xi` are defined.
 
 ### Declaration and Binding
 
@@ -1609,6 +1814,21 @@ The bag union operator combines two bags, preserving multiplicities (unlike set 
 **ASCII Notation:** Use the `bag_union` keyword (e.g., `b1 bag_union b2`)
 **Unicode Alternative:** Use `⊎` (U+228E) if preferred
 
+**Bag difference (Z RM §4.6.2):**
+
+```text
+b1 bag_diff b2        →  b1 \uminus b2   [bag difference]
+coins bag_diff [[c?]] →  coins \uminus [\![ c? ]\!]
+```
+
+The bag difference operator `bag_diff` emits `\uminus`. For bags `b1` and `b2` and any element `x`, `(b1 bag_diff b2)(x) = max(0, b1(x) - b2(x))` — multiplicity clamped at zero. This is the natural notation for operations such as removing a coin from a multiset:
+
+```text
+coins' = coins bag_diff [[c?]]
+```
+
+**ASCII Notation:** Use the `bag_diff` keyword — there is no single-character Unicode alternative for `\uminus` in txt2tex source.
+
 ---
 
 ## Schema Notation
@@ -2258,24 +2478,40 @@ remains a declaration separator — this is unchanged.
 
 ## Proof Trees
 
-Natural deduction proofs using indentation-based syntax.
+Natural deduction proofs using indentation-based syntax. For a
+worked walkthrough, read
+**[Tutorial 4: Proof Trees](../tutorials/04_proof_trees.md)** first.
+The full specification is in
+[PROOF_SYNTAX.md](PROOF_SYNTAX.md).
 
 ### Basic Structure
 
 ```text
 PROOF:
-  conclusion [rule name]
-    premise1
-    premise2
+conclusion [rule name]
+  :: premise_1
+  :: premise_2
 ```
+
+The conclusion is written first; its premises are **indented children**.
+Multi-premise rules (`land intro`, `=> elim`, `false-intro`, `<=> intro`,
+`lor elim`) require `::` on each premise — without it, consecutive
+indented lines collapse to a *linear chain* and the extra premises are
+silently dropped from the rendered tree.
+
+Unary rules (`land elim 1`, `lor intro 1`, `false elim`, single-premise
+applications) take a single indented child with no `::` needed.
 
 ### Indentation Rules
 
 - **2 spaces per level** for proof structure
-- **Siblings:** Use `::` prefix for parallel premises
-- **Assumptions:** Label with `[1]`, `[2]`, etc.
-- **Discharge:** Reference assumptions with `[=> intro from 1]`
-- **References:** Use `[from 1]` to refer to labeled assumptions
+- **Multi-premise rules:** every premise carries a `::` prefix
+- **Unary rules:** single indented child, no `::`
+- **Assumptions:** mark with `[N] X [assumption]` directly under the
+  discharging rule
+- **Discharge:** reference at any leaf with `Y [from N]`
+- **Case analysis:** `case X:` blocks inside `lor elim from N`; the
+  case formula is available as `X [from N]` within the block
 
 ### Justifications in Proof Trees
 
@@ -2399,51 +2635,48 @@ Examples:
 PROOF:
 p land q => p [=> intro from 1]
   [1] p land q [assumption]
-      p [land elim 1]
+  :: p [land elim 1]
+    p land q [from 1]
 ```
 
 ### Example: Case Analysis
 
-**Simple case analysis:**
-
 ```text
 PROOF:
-p lor q => r [=> intro from 1]
-  [1] p lor q [assumption]
-      r [lor elim]
-        case p:
-          r [from assumption p]
-        case q:
-          r [from assumption q]
+((p => r) land (q => r)) => ((p lor q) => r) [=> intro from 1]
+  [1] (p => r) land (q => r) [assumption]
+  :: (p lor q) => r [=> intro from 2]
+    [2] p lor q [assumption]
+    :: r [lor elim from 2]
+      :: p lor q [from 2]
+      case p:
+        :: r [=> elim]
+          :: p [from 2]
+          :: p => r [land elim 1]
+            (p => r) land (q => r) [from 1]
+      case q:
+        :: r [=> elim]
+          :: q [from 2]
+          :: q => r [land elim 2]
+            (p => r) land (q => r) [from 1]
 ```
 
-**Case analysis with sibling premises:**
+The `lor elim from 2` rule has three premises: the disjunction
+(`p lor q [from 2]`) plus two `case` blocks. Inside each case, the
+case formula is referenced with the discharge label of the enclosing
+rule (`p [from 2]`, `q [from 2]`). The two `:: r [=> elim]` nodes are
+binary, so each has `::` on its premises (the case formula plus the
+relevant implication extracted from assumption [1]).
 
-```text
-PROOF:
-p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
-  [1] p land (q lor r) [assumption]
-      p [land elim 1]
-      q lor r [land elim 2]
-      (p land q) lor (p land r) [lor elim]
-        case q:
-          :: p [from above]
-          :: q [from case]
-          p land q [land intro]
-          (p land q) lor (p land r) [lor intro 1]
-        case r:
-          :: p [from above]
-          :: r [from case]
-          p land r [land intro]
-          (p land q) lor (p land r) [lor intro 2]
-```
+**Working notes on case analysis:**
 
-**Important**: When working with case analysis:
-
-- Use `[from above]` to reference facts established before the case split
-- The `::` sibling markers indicate multiple facts that together support the next step
-- Each case should derive the same conclusion through different reasoning paths
-- Facts proven before case analysis remain available within all cases
+- Inside a `case X:` block, the case formula `X` is available via
+  `X [from N]` where `N` is the label discharged by the enclosing
+  `lor elim from N` rule.
+- Facts proven outside the case analysis remain available via their
+  own `[from M]` references at any leaf where they're used.
+- Each case derives the same conclusion through different reasoning
+  paths.
 
 ---
 
@@ -2626,7 +2859,7 @@ expressions in your source — not inside `zed`/`axdef`/`schema`
 blocks. The `\mathop{\mathrm{GROUP}}` wrapping and Date-style braces
 sit outside Z grammar; fuzz rejects them in Z-block contents.
 
-#### GROUP
+#### GROUP — regroup form
 
 ```text
 R group ({A, B, ...} as alias)
@@ -2644,6 +2877,41 @@ GroupMembers group ({username} as members)
 ```
 
 Renders: $GroupMembers \mathop{\mathrm{GROUP}} (\{username\} \mathop{\mathrm{AS}} members)$
+
+#### GROUP — aggregate form
+
+Computes scalar aggregates per partition.  The aggregator keywords are
+`Count`, `Sum`, `Avg`, `Min`, `Max`, and `Median` — each takes a
+single attribute name and an alias:
+
+```text
+R group (Count(attr) as alias)
+R group (Sum(attr) as alias)
+R group (Avg(attr) as alias)
+R group (Min(attr) as alias)
+R group (Max(attr) as alias)
+R group (Median(attr) as alias)
+```
+
+Each renders as:
+
+$$R~\mathrm{Group}(\mathrm{Aggregator}(attr)~\mathrm{as}~alias)$$
+
+Multiple aggregators are comma-separated:
+
+```text
+R group (Count(x) as total, Sum(y) as grand)
+```
+
+Renders: $R~\mathrm{Group}(\mathrm{Count}(x)~\mathrm{as}~total,~\mathrm{Sum}(y)~\mathrm{as}~grand)$
+
+**Constraints.**
+
+- The aggregate form and the regroup form (`{...} as alias`) are
+  mutually exclusive within a single `group` expression.  Mixing them
+  is a parse error.
+- Each aggregator accepts exactly one attribute identifier — no nested
+  aggregators, no compound expressions.
 
 #### UNGROUP
 
@@ -2970,6 +3238,7 @@ newline after the operator and an explicit `\` continuation:
 | `++` | `\oplus` | override |
 | `group` | `\mathop{\mathrm{GROUP}}` | Date nested-relation operator |
 | `ungroup` | `\mathop{\mathrm{UNGROUP}}` | Date nested-relation operator |
+| `Count`, `Sum`, `Avg`, `Min`, `Max`, `Median` | `\mathrm{Count}(attr)~\mathrm{as}~alias` | Aggregators inside `group` RHS |
 
 **Display position** (free-standing expression): the broken chain wraps in
 `\begin{array}{l}...\end{array}` with `\\` between continuations.

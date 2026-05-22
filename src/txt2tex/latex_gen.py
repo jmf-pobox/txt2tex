@@ -10,11 +10,13 @@ from typing import ClassVar, cast
 from txt2tex.__version__ import __version__
 from txt2tex.ast_nodes import (
     Abbreviation,
+    AggregatorClause,
     ArgueChain,
     AxDef,
     BagLiteral,
     BinaryOp,
     Binding,
+    BMachine,
     CaseAnalysis,
     Conditional,
     Contents,
@@ -30,6 +32,7 @@ from txt2tex.ast_nodes import (
     GenericInstantiation,
     GivenType,
     Group,
+    GroupAggregate,
     GuardedBranch,
     GuardedCases,
     HorizDef,
@@ -54,6 +57,7 @@ from txt2tex.ast_nodes import (
     Rename,
     Restrict,
     Schema,
+    SchemaBinding,
     SchemaCompose,
     SchemaHide,
     SchemaInclusion,
@@ -83,6 +87,26 @@ from txt2tex.constants import PROSE_WORDS
 from txt2tex.free_vars import expr_free_vars
 from txt2tex.lexer import Lexer, LexerError
 from txt2tex.parser import Parser, ParserError
+
+
+def _is_atomic_predicate(node: Expr) -> bool:
+    """Return True when node is an atomic predicate in fuzz's grammar.
+
+    Atomic predicates (Z RM §3.8.1, fuzz parser restriction):
+
+    1. A predicate name — ``Identifier``.
+    2. The constants ``true`` and ``false`` — also ``Identifier``.
+    3. A relation application ``e_1 R e_2`` — ``BinaryOp``.  These are
+       already wrapped by the BinaryOp rule in ``_generate_unary_op``,
+       so treating them as atomic here prevents double-parenthesisation.
+    4. A schema reference — ``Identifier`` (same as category 1).
+    5. An already-parenthesised predicate — ``BinaryOp`` with
+       ``explicit_parens=True`` (the BinaryOp generator emits its own
+       outer parens; the UnaryOp handler skips the BinaryOp rule for it).
+
+    Quantifiers, lambdas, and all other compound forms return False.
+    """
+    return isinstance(node, (Identifier, Number, BinaryOp))
 
 
 class LaTeXGenerator:
@@ -157,6 +181,7 @@ class LaTeXGenerator:
         # Bag operators
         "⊎": r"\uplus",  # Bag union (Unicode)
         "bag_union": r"\uplus",  # Bag union (ASCII alternative)
+        "bag_diff": r"\uminus",  # Bag difference (Z RM §4.6.2)
     }
 
     UNARY_OPS: ClassVar[dict[str, str]] = {
@@ -307,15 +332,20 @@ class LaTeXGenerator:
     _in_argue_block: bool
     _first_part_in_solution: bool
     _in_inline_part: bool
+    _in_z_paragraph: bool
     _quantifier_depth: int
     _warn_overflow: bool
     _overflow_threshold: int
     _overflow_warnings: list[str]
+    _dollar_sanitise_registry: dict[str, str]
 
-    # Default threshold for overflow warnings (LaTeX characters)
-    # ~140 LaTeX chars ≈ text width at 10pt with 1in margins in fuzz mode
-    # Empirically calibrated: 136 chars fits, 150+ chars likely overflows
-    DEFAULT_OVERFLOW_THRESHOLD: ClassVar[int] = 140
+    # Default threshold for line-wrap (LaTeX characters).
+    # Z math content is denser than plain text; empirical observation shows
+    # predicates of 100+ LaTeX chars frequently overflow the column width.
+    # The lower bound (100) is conservative enough to wrap genuinely long
+    # predicates while leaving normal one-line schema predicates alone.
+    # Use --overflow-threshold to adjust for specific documents.
+    DEFAULT_OVERFLOW_THRESHOLD: ClassVar[int] = 80
 
     def __init__(
         self,
@@ -340,6 +370,8 @@ class LaTeXGenerator:
         self._in_argue_block = False  # Track context for line break formatting
         self._first_part_in_solution = False  # Track if we're generating first part
         self._in_inline_part = False  # Track if we're inside an inline part
+        # True when generating inside axdef/schema/gendef/zed
+        self._in_z_paragraph = False
         self._quantifier_depth = 0  # Track nesting for \t1, \t2 indentation
         self._warn_overflow = warn_overflow
         self._overflow_threshold = (
@@ -348,6 +380,8 @@ class LaTeXGenerator:
             else self.DEFAULT_OVERFLOW_THRESHOLD
         )
         self._overflow_warnings = []  # Collected warnings to emit
+        # Populated by _pre_sanitise_dollars, consumed by _restore_dollar_sanitise
+        self._dollar_sanitise_registry = {}
 
     # -------------------------------------------------------------------------
     # Overflow warning helpers
@@ -527,6 +561,11 @@ class LaTeXGenerator:
                             lines.append(r"\also")
                         # Generate content without wrapping zed environment
                         content = self._generate_zed_content(zed_item)
+                        self._check_overflow(
+                            content,
+                            zed_item.line,
+                            "zed abbreviation (consolidated)",
+                        )
                         lines.append(content)
                     lines.append(r"\end{zed}")
                     lines.append("")
@@ -767,7 +806,9 @@ class LaTeXGenerator:
             True if expr or any sub-expression has line breaks
         """
         # Nodes with line_break_after flag — check flag first, then children
-        if isinstance(expr, (BinaryOp, NaturalJoin, Divide, Group, Ungroup)):
+        if isinstance(
+            expr, (BinaryOp, NaturalJoin, Divide, Group, Ungroup, GroupAggregate)
+        ):
             return self._has_line_breaks_flagged(expr)
         # Quantifier has a different flag name
         if isinstance(expr, Quantifier):
@@ -786,7 +827,7 @@ class LaTeXGenerator:
 
     def _has_line_breaks_flagged(
         self,
-        expr: BinaryOp | NaturalJoin | Divide | Group | Ungroup,
+        expr: BinaryOp | NaturalJoin | Divide | Group | Ungroup | GroupAggregate,
     ) -> bool:
         """Check line breaks for nodes that carry a line_break_after flag."""
         if expr.line_break_after:
@@ -800,7 +841,7 @@ class LaTeXGenerator:
             return left_has or right_has or sub_has
         if isinstance(expr, Divide):
             return self._has_line_breaks(expr.left) or self._has_line_breaks(expr.right)
-        # Group and Ungroup: only the relation child matters
+        # Group, Ungroup, GroupAggregate: only the relation child matters
         return self._has_line_breaks(expr.relation)
 
     def _has_line_breaks_structural(self, expr: Expr) -> bool:
@@ -1071,6 +1112,18 @@ class LaTeXGenerator:
         ):
             operand = f"({operand})"
 
+        # Fuzz parser restriction (jms ruling 2026-05-22, Z RM §3.8.1):
+        # \lnot requires an atomic predicate as its direct operand.
+        # Quantifiers, lambdas, and other non-atomic forms must be parenthesised.
+        # BinaryOp operands are already wrapped by the rule above (line 1056),
+        # so only non-atomic non-BinaryOp nodes need treatment here.
+        if (
+            self.use_fuzz
+            and node.operator == "lnot"
+            and not _is_atomic_predicate(node.operand)
+        ):
+            operand = f"({operand})"
+
         # Check if this is a postfix operator (rendered as superscript)
         if node.operator in {"~", "+", "*"}:
             return self._get_closure_operator_latex(node.operator, operand)
@@ -1240,6 +1293,14 @@ class LaTeXGenerator:
         op_latex = self.BINARY_OPS.get(node.operator)
         if op_latex is None:
             raise ValueError(f"Unknown binary operator: {node.operator}")
+
+        # o9 (relational composition) uses context-sensitive LaTeX.
+        # fuzz.sty declares:
+        #   \comp  math class 2 (binary op)   — required inside Z environments
+        #   \semi  math class 3 (closing/separator) — correct in $...$, display math
+        # All other operators are context-independent.
+        if node.operator == "o9" and self._in_z_paragraph:
+            op_latex = r"\comp"
 
         # Apply fuzz-specific operator mappings
         op_latex = self._map_binary_operator(node.operator, op_latex)
@@ -1558,11 +1619,40 @@ class LaTeXGenerator:
 
         return result
 
+    def _generate_schema_binding_latex(self, sb: SchemaBinding) -> str:
+        """Return the LaTeX fragment for a schema-text binding (Z RM §3.10).
+
+        Forms emitted (jms ruling 2026-05-21: no thin-space between decoration
+        and schema name):
+        - decoration="Delta" → ``\\Delta S``
+        - decoration="Xi"    → ``\\Xi S``
+        - decoration="None"  → ``S``
+        - decoration="Prime" → ``S^{\\prime}``  (the name already carries ``'``)
+
+        The prime form uses fuzz's superscript-prime convention.  The raw
+        identifier value (e.g., ``"S'"``]) is stripped of its trailing ``'``
+        and the ``^{\\prime}`` superscript is appended so fuzz recognises
+        the primed schema reference correctly.
+        """
+        schema_name = sb.schema_name
+        if sb.decoration == "Delta":
+            return rf"\Delta {schema_name}"
+        if sb.decoration == "Xi":
+            return rf"\Xi {schema_name}"
+        if sb.decoration == "Prime":
+            # Strip trailing primes and emit as superscript for fuzz compatibility.
+            base = schema_name.rstrip("'")
+            primes = len(schema_name) - len(base)
+            suffix = r"^{\prime}" * primes
+            return f"{base}{suffix}"
+        return schema_name  # decoration is None
+
     @generate_expr.register(Quantifier)
     def _generate_quantifier(self, node: Quantifier, parent: Expr | None = None) -> str:
         """Generate LaTeX for quantifier (forall, exists, exists1, mu).
 
-        Supports multiple variables, tuple patterns, and expression parts.
+        Supports multiple variables, tuple patterns, expression parts, and
+        schema-text quantification (Z RM §3.10).
 
         Args:
             node: The quantifier node to generate.
@@ -1576,7 +1666,15 @@ class LaTeXGenerator:
             forall x, y : N | pred -> \\forall x, y \\colon N \\bullet pred
             forall (x, y) : T | pred -> \\forall (x, y) \\colon T \\bullet pred
             mu x : N | pred . expr -> \\mu x \\colon N \\mid pred \\bullet expr
+            exists Delta S | P -> \\exists \\Delta S \\spot P
+            exists Xi S | P    -> \\exists \\Xi S \\spot P
+            exists S | P       -> \\exists S \\spot P
+            exists S' | P      -> \\exists S^{\\prime} \\spot P
         """
+        # Schema-text quantification path (Z RM §3.10).
+        if node.schema_binding is not None:
+            return self._generate_schema_quantifier(node, parent)
+
         # Multi-decl lambda: specialize to emit Spivey-canonical single-token form.
         # Single-decl lambda uses Lambda AST node and routes through _generate_lambda.
         if node.quantifier == "lambda":
@@ -1704,6 +1802,48 @@ class LaTeXGenerator:
         if node.quantifier != "mu" and self._quantifier_needs_parens(node, parent):
             return f"({result})"
 
+        return result
+
+    def _generate_schema_quantifier(
+        self, node: Quantifier, parent: Expr | None = None
+    ) -> str:
+        r"""Emit LaTeX for a schema-text quantifier (Z RM §3.10).
+
+        The binding is emitted literally; fuzz expands the schema invariant.
+        jms ruling (2026-05-21): no thin-space between decoration and name.
+
+        Output form:
+            \exists \Delta S \spot P
+            \exists \Xi S \spot P
+            \exists S \spot P
+            \exists S^{\prime} \spot P
+            \forall \Delta S \spot P
+            \exists_1 \Delta S \spot P
+        """
+        if node.schema_binding is None:
+            raise ValueError("_generate_schema_quantifier: schema_binding is None")
+
+        quant_latex = self.QUANTIFIERS.get(node.quantifier)
+        if quant_latex is None:
+            raise ValueError(f"Unknown quantifier: {node.quantifier}")
+
+        binding_latex = self._generate_schema_binding_latex(node.schema_binding)
+        bullet = self._get_bullet_separator()
+
+        self._quantifier_depth += 1
+        indent = self._get_indentation()
+        body_latex = self.generate_expr(node.body, parent=node)
+        self._quantifier_depth -= 1
+
+        if node.line_break_after_pipe:
+            result = (
+                f"{quant_latex} {binding_latex} {bullet} \\\\\n{indent} {body_latex}"
+            )
+        else:
+            result = f"{quant_latex} {binding_latex} {bullet} {body_latex}"
+
+        if self._quantifier_needs_parens(node, parent):
+            return f"({result})"
         return result
 
     @generate_expr.register(Lambda)
@@ -2462,6 +2602,41 @@ class LaTeXGenerator:
             return f"{result} \\\\\n{indent} "
         return result
 
+    @generate_expr.register(GroupAggregate)
+    def _generate_group_aggregate(
+        self, node: GroupAggregate, parent: Expr | None = None
+    ) -> str:
+        r"""Generate LaTeX for R Group (Count(x) as t, Sum(y) as g).
+
+        Each AggregatorClause renders as:
+            \mathrm{Count}(x)~\mathrm{as}~t
+
+        The full expression renders as:
+            R \mathrm{Group}(\mathrm{Count}(x)~\mathrm{as}~t,
+                             \mathrm{Sum}(y)~\mathrm{as}~g)
+
+        When line_break_after is set, inserts \\ after the GROUP expression.
+        """
+        relation_latex = self.generate_expr(node.relation)
+        clause_parts = ", ".join(
+            self._generate_aggregator_clause(c) for c in node.clauses
+        )
+        result = rf"{relation_latex} \mathrm{{Group}}({clause_parts})"
+        if node.line_break_after:
+            indent = self._get_indentation()
+            return f"{result} \\\\\n{indent} "
+        return result
+
+    def _generate_aggregator_clause(self, clause: AggregatorClause) -> str:
+        r"""Render a single AggregatorClause as LaTeX.
+
+        Count(attr) as alias  →  \mathrm{Count}(attr)~\mathrm{as}~alias
+        """
+        label = clause.agg.label()
+        attr = self._emit_attr_name(clause.attr)
+        alias = self._emit_attr_name(clause.alias)
+        return rf"\mathrm{{{label}}}({attr})~\mathrm{{as}}~{alias}"
+
     @generate_expr.register(Ungroup)
     def _generate_ungroup(self, node: Ungroup, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for R ungroup alias.
@@ -2502,7 +2677,10 @@ class LaTeXGenerator:
     def _generate_section(self, node: Section) -> list[str]:
         """Generate LaTeX for section."""
         lines: list[str] = []
-        title = self._convert_unicode_symbols(node.title)
+        # Use _escape_latex_text: the raw title is already verbatim (captured
+        # by the lexer without math-pipeline spacing).  Only LaTeX-unsafe
+        # characters need escaping; punctuation like - ( ) : . is safe in text mode.
+        title = self._escape_latex_text(node.title)
         lines.append(r"\section*{" + title + "}")
         lines.append("")
 
@@ -2829,6 +3007,7 @@ class LaTeXGenerator:
             ("filter", r"\filter"),  # Sequence filter (ASCII)
             ("⊎", r"\uplus"),  # Bag union (Unicode)
             ("bag_union", r"\uplus"),  # Bag union (ASCII)
+            ("bag_diff", r"\uminus"),  # Bag difference (Z RM §4.6.2)
         ]
 
         result = text
@@ -2880,6 +3059,351 @@ class LaTeXGenerator:
             result = result.replace(symbol, latex)
         return result
 
+    def _pre_sanitise_dollars(self, text: str) -> str:
+        r"""Sanitise dollar signs in TEXT prose before any math parsing.
+
+        Two unsafe patterns are handled:
+
+        1. **``$$``**: display-math delimiters have no meaning in TEXT prose and
+           interact badly with the ``$...$`` span splitter.  Every ``$$..$$``
+           span (and bare ``$$`` without a matching pair) is replaced with an
+           opaque placeholder whose expansion (``\$\$ escaped_content \$\$``)
+           is stored in ``_dollar_sanitise_registry``.  The placeholder contains
+           no ``$`` or ``\`` so every downstream step ignores it.
+
+        2. **Unbalanced ``$``**: a line with an odd number of ``$`` characters
+           would leave a stray ``$`` that silently opens math mode, potentially
+           swallowing subsequent prose until the next ``$`` elsewhere in the
+           document.  When the count is odd every ``$`` on the line is escaped
+           to ``\$``.
+
+        This method must be called *before* ``_process_explicit_dollar_math``
+        so that ``$$`` sequences and unbalanced singles never reach the span
+        matcher.  Call ``_restore_dollar_sanitise`` at the end of the pipeline
+        to expand the placeholders to their final escaped forms.
+        """
+        self._dollar_sanitise_registry = {}
+
+        def _make_placeholder(escaped_form: str) -> str:
+            idx = len(self._dollar_sanitise_registry)
+            key = f"\x00DS{idx}\x00"
+            self._dollar_sanitise_registry[key] = escaped_form
+            return key
+
+        # Pass 1: replace $$...$$ spans with opaque placeholders whose escaped
+        # expansion is stored in the registry.  The content between $$ markers
+        # is also escaped with \textbackslash{} so no TeX command survives.
+        def _escape_dbl_span(m: re.Match[str]) -> str:
+            inner = m.group(1) if m.lastindex else ""
+            safe_inner = inner.replace("\\", r"\textbackslash{}")
+            return _make_placeholder(r"\$\$" + safe_inner + r"\$\$")
+
+        # Match $$...$$ (non-newline content) or bare $$ (empty)
+        sanitised = re.sub(r"\$\$([^$\n]*)\$\$", _escape_dbl_span, text)
+        # Also escape any remaining bare $$ (e.g. $$\n, or $$ at end of line)
+        sanitised = re.sub(r"\$\$", lambda _: _make_placeholder(r"\$\$"), sanitised)
+
+        # Pass 2: count remaining $ characters.  If odd, escape them all so
+        # no stray $ reaches pdflatex.
+        if sanitised.count("$") % 2 == 1:
+            sanitised = sanitised.replace("$", r"\$")
+
+        # Pass 3: any $-escaped singles (from Pass 2) also get opaque placeholders
+        # so downstream pipeline steps do not see their $ character.
+        # Replace \$ (but not already-placeholder content) with a per-instance
+        # placeholder so math-tracking loops don't count them.
+        return re.sub(
+            r"\\\$",
+            lambda _m: _make_placeholder(r"\$"),
+            sanitised,
+        )
+
+    def _restore_dollar_sanitise(self, text: str) -> str:
+        """Expand all dollar-sanitise placeholders to their escaped LaTeX forms.
+
+        Must be called at the very end of _process_paragraph_text, after all
+        pipeline steps that interpret $ as a math delimiter have finished.
+        """
+        for key, value in self._dollar_sanitise_registry.items():
+            text = text.replace(key, value)
+        return text
+
+    # Matches a backslash followed by one or more letters — a LaTeX command.
+    # Used in _process_explicit_dollar_math to detect already-rendered LaTeX.
+    _LATEX_COMMAND_RE: re.Pattern[str] = re.compile(r"\\[a-zA-Z]+")
+
+    # Allow-list of fuzz/zed math commands that are safe to pass through verbatim
+    # when they appear inside $...$ in TEXT prose.  Only commands in this set are
+    # allowed; anything else is either on the block-list (escaped outright) or
+    # unknown (treated as unsafe and escaped).
+    _ALLOWED_LATEX_COMMANDS: ClassVar[frozenset[str]] = frozenset(
+        {
+            # logical
+            r"\land",
+            r"\lor",
+            r"\lnot",
+            r"\neg",
+            r"\implies",
+            r"\iff",
+            r"\Rightarrow",
+            r"\Leftarrow",
+            r"\Leftrightarrow",
+            # quantifiers
+            r"\forall",
+            r"\exists",
+            r"\bullet",
+            # sets / types
+            r"\in",
+            r"\notin",
+            r"\subseteq",
+            r"\subset",
+            r"\supseteq",
+            r"\supset",
+            r"\cup",
+            r"\cap",
+            r"\setminus",
+            r"\emptyset",
+            r"\nat",
+            r"\num",
+            r"\rel",
+            r"\fun",
+            r"\pfun",
+            r"\inj",
+            r"\surj",
+            r"\bij",
+            r"\pinj",
+            r"\ffun",
+            r"\finj",
+            r"\psurj",
+            # relations
+            r"\dom",
+            r"\ran",
+            r"\semi",
+            r"\comp",
+            r"\inv",
+            r"\id",
+            r"\dres",
+            r"\rres",
+            r"\ndres",
+            r"\nrres",
+            r"\oplus",
+            r"\mapsto",
+            r"\uplus",
+            r"\uminus",
+            # sequences
+            r"\cat",
+            r"\langle",
+            r"\rangle",
+            r"\seq",
+            r"\iseq",
+            r"\filter",
+            # schema
+            r"\Delta",
+            r"\Xi",
+            r"\theta",
+            # arithmetic / comparison
+            r"\leq",
+            r"\geq",
+            r"\neq",
+            r"\div",
+            r"\mod",
+            r"\times",
+            r"\cross",
+            # structure / styling
+            r"\bsup",
+            r"\esup",
+            r"\mathrm",
+            r"\mathit",
+            r"\textrm",
+            r"\mbox",
+            r"\text",
+            r"\quad",
+            r"\qquad",
+            r"\vdash",
+            r"\power",
+            r"\finset",
+            r"\bag",
+            r"\mu",
+            r"\lambda",
+            r"\rightarrow",
+            r"\leftarrow",
+            r"\leftrightarrow",
+            r"\uparrow",
+            r"\downarrow",
+            # spacing (single-character commands handled separately)
+            r"\,",
+            r"\;",
+            r"\!",
+            r"\ ",
+            r"\{",
+            r"\}",
+            r"\|",
+        }
+    )
+
+    # Commands that must never appear in emitted LaTeX — they can execute
+    # arbitrary code (shell-escape, file I/O) or redefine the TeX engine.
+    _BLOCKED_LATEX_COMMANDS: ClassVar[frozenset[str]] = frozenset(
+        {
+            r"\input",
+            r"\include",
+            r"\write",
+            r"\catcode",
+            r"\openout",
+            r"\closeout",
+            r"\read",
+            r"\immediate",
+            r"\def",
+            r"\edef",
+            r"\gdef",
+            r"\xdef",
+            r"\let",
+            r"\csname",
+            r"\endcsname",
+            r"\loop",
+            r"\repeat",
+            r"\directlua",
+            r"\openin",
+            r"\afterassignment",
+            r"\expandafter",
+            r"\noexpand",
+            r"\string",
+            r"\meaning",
+            r"\jobname",
+            r"\romannumeral",
+        }
+    )
+
+    def _classify_latex_commands(self, inner: str) -> str:
+        """Classify the LaTeX commands found in a $...$ span.
+
+        Returns:
+            'allowed'  — all commands are on the safe allow-list; pass through.
+            'blocked'  — at least one command is on the block-list; escape the span.
+            'unknown'  — commands present but none blocked, some not on allow-list;
+                         escape the span (fail closed).
+            'none'     — no backslash commands present.
+        """
+        commands = self._LATEX_COMMAND_RE.findall(inner)
+        if not commands:
+            return "none"
+        command_set = frozenset(commands)
+        if command_set & self._BLOCKED_LATEX_COMMANDS:
+            return "blocked"
+        if command_set <= self._ALLOWED_LATEX_COMMANDS:
+            return "allowed"
+        return "unknown"
+
+    def _process_explicit_dollar_math(self, text: str) -> str:
+        """Parse explicit $...$ inline-math spans through the math/Z parser.
+
+        Called before any character-escaping so that ^ and other special chars
+        inside $...$ are handled by the math parser, not by the prose escaper.
+
+        Each $content$ span is handled as follows:
+
+        1. Spans containing only allow-listed LaTeX commands (e.g. \\forall,
+           \\Leftrightarrow, \\in) are already-rendered LaTeX and pass through
+           verbatim.  Re-lexing them would mis-parse \\ as the SETMINUS
+           operator (bug 7.E).
+
+        2. Spans containing any blocked command (\\input, \\write18, \\def,
+           \\csname, etc.) have their $ delimiters escaped to \\$ so the span
+           is never handed to pdflatex as math.
+
+        3. Spans containing unknown commands (not on the allow-list, not
+           blocked) are treated as unsafe and escaped the same way.
+
+        4. Spans with no backslash commands are parsed by Lexer/Parser as a
+           math expression and rendered via generate_expr
+           (with _in_z_paragraph=False so o9→\\semi).  If parsing fails the
+           span is left unchanged.
+
+        Stray $$ sequences and unbalanced $ delimiters are handled by
+        _pre_sanitise_dollars before this method is called.
+        """
+        result = text
+        # Match balanced $...$ (non-nested, no newlines inside)
+        dollar_pattern = re.compile(r"\$([^$\n]+)\$")
+        matches = list(dollar_pattern.finditer(result))
+
+        for match in reversed(matches):
+            start = match.start()
+            end = match.end()
+            inner = match.group(1)
+
+            # Skip if already inside a math span (odd $ count before this match)
+            before = result[:start]
+            if before.count("$") % 2 == 1:
+                continue
+
+            classification = self._classify_latex_commands(inner)
+
+            if classification == "allowed":
+                # Already-rendered LaTeX with only safe commands — pass through
+                # verbatim to avoid re-lexing \\ as SETMINUS (bug 7.E).
+                continue
+
+            if classification in ("blocked", "unknown"):
+                # Dangerous or unrecognised command — escape the entire span
+                # as literal text.  Escape the $ delimiters and also replace
+                # backslashes in the inner content with \textbackslash{} so
+                # that no TeX command survives into the emitted .tex file.
+                safe_inner = inner.replace("\\", r"\textbackslash{}")
+                result = result[:start] + r"\$" + safe_inner + r"\$" + result[end:]
+                continue
+
+            # classification == "none": no LaTeX commands — parse as math
+            try:
+                lexer = Lexer(inner)
+                tokens = lexer.tokenize()
+                parser = Parser(tokens)
+                ast = parser.parse()
+                if isinstance(ast, Expr):
+                    # Generate with _in_z_paragraph=False (inline context → \semi)
+                    prev_z = self._in_z_paragraph
+                    self._in_z_paragraph = False
+                    try:
+                        math_latex = self.generate_expr(ast)
+                    finally:
+                        self._in_z_paragraph = prev_z
+                    result = result[:start] + f"${math_latex}$" + result[end:]
+            except (LexerError, ParserError):
+                # Not valid math — leave the span unchanged.
+                pass
+
+        return result
+
+    def _escape_special_chars_outside_math(self, text: str) -> str:
+        r"""Escape LaTeX-special characters that appear outside $...$ spans.
+
+        Handles: % & # ~ ^ (in that order).
+        Leaves characters inside existing $...$ spans untouched.
+
+        Note: _ (underscore) is handled separately by
+        _escape_underscores_outside_math at the end of the pipeline, because
+        that function also skips underscores inside \citep{} keys.
+        """
+        parts: list[str] = []
+        # Split on $...$ boundaries; alternate: prose, math, prose, math, ...
+        segments = re.split(r"(\$[^$\n]*\$)", text)
+        for i, seg in enumerate(segments):
+            if i % 2 == 0:
+                # Prose segment — apply escapes in the order that avoids
+                # double-escaping.  % must come before other replacements
+                # because LaTeX treats % as a line comment, silently discarding
+                # everything that follows it on the line.
+                seg = seg.replace("%", r"\%")
+                seg = seg.replace("&", r"\&")
+                seg = seg.replace("#", r"\#")
+                seg = seg.replace("~", r"\textasciitilde{}")
+                # \textasciicircum{} is used rather than \^{} because subsequent
+                # pipeline steps parse {} as brace notation, corrupting \^{} to
+                # \^$\{\}$.  \textasciicircum{} does not have this problem.
+                seg = seg.replace("^", r"\textasciicircum{}")
+            parts.append(seg)
+        return "".join(parts)
+
     def _process_paragraph_text(self, text: str) -> str:
         """Process paragraph text: convert operators, handle inline math, etc.
 
@@ -2887,12 +3411,20 @@ class LaTeXGenerator:
         spacing or formatting commands. Used both in _generate_paragraph()
         and when rendering paragraphs inline with part labels.
         """
-        # Escape special LaTeX characters FIRST
-        # # is a macro parameter character
-        # ^ is a superscript character (only valid in math mode)
-        # Must escape before any other processing that might add LaTeX commands
-        text = text.replace("#", r"\#")
-        text = text.replace("^", r"\textasciicircum{}")
+        # Step 0: Sanitise dollar signs.  Reject $$ and escape unbalanced $
+        # before any span matching runs.  This prevents stray $ from silently
+        # opening math mode and stops $$ display-math delimiters from confusing
+        # the span splitter.
+        text = self._pre_sanitise_dollars(text)
+
+        # Step 1: Parse explicit $...$ spans through the math parser FIRST,
+        # before any character escaping.  This fixes bug 7.A (^ inside $...$
+        # was being pre-escaped) and adds proper opt-in inline math support.
+        text = self._process_explicit_dollar_math(text)
+
+        # Step 2: Escape special LaTeX characters outside $...$ spans.
+        # # is a macro parameter character; ^ is only valid in math mode.
+        text = self._escape_special_chars_outside_math(text)
 
         # Convert sequence literals FIRST to protect <x> patterns
         # Must happen before _process_inline_math() which can break up < and >
@@ -2950,6 +3482,8 @@ class LaTeXGenerator:
         text = self._replace_outside_math(text, "⊎", r"\uplus")  # Bag union (Unicode)
         # Bag union (ASCII)
         text = self._replace_outside_math(text, " bag_union ", r" \uplus ")
+        # Bag difference (ASCII, Z RM §4.6.2)
+        text = self._replace_outside_math(text, " bag_diff ", r" \uminus ")
 
         # Additional Unicode symbols that need conversion in TEXT blocks
         text = self._replace_outside_math(text, "∈", r"\in")  # Element of
@@ -2981,15 +3515,11 @@ class LaTeXGenerator:
         text = self._replace_outside_math(text, "←", r"\leftarrow")
         text = self._replace_outside_math(text, "↔", r"\leftrightarrow")
 
-        # Convert keywords to symbols (QA fixes)
-        # Negative lookbehind (?<!\\) ensures we don't match LaTeX commands like \forall
-        # These are for standalone keywords in prose, not parsed quantifier expressions
-        # Order matters: exists1+ must come before exists1 to avoid partial match
-        text = re.sub(r"(?<!\\)exists1\+", r"$\\exists$", text)  # exists1+ → ∃
-        text = re.sub(r"(?<!\\)\bexists1\b", r"$\\exists_1$", text)  # exists1 → ∃₁
-        text = re.sub(r"(?<!\\)\bexists\b", r"$\\exists$", text)  # exists → ∃
-        text = re.sub(r"(?<!\\)\bemptyset\b", r"$\\emptyset$", text)  # emptyset → ∅
-        text = re.sub(r"(?<!\\)\bforall\b", r"$\\forall$", text)  # forall → ∀
+        # NOTE: Bare English keywords (exists, forall, exists1, emptyset) are NOT
+        # converted to math glyphs in TEXT prose.  Math substitution in TEXT prose
+        # is opt-in: wrap the expression in $...$, e.g. $\exists x : N | x > 0$.
+        # This prevents English sentences containing "exists" or "group" from
+        # being silently rewritten as math symbols.
 
         # Convert "elem" and "not elem" for set membership
         # NOTE: "not elem" is English prose, not "notin" keyword
@@ -3016,7 +3546,12 @@ class LaTeXGenerator:
 
         # Escape underscores outside math mode (final pass)
         # Prevents LaTeX errors when identifiers like count_N appear in prose
-        return self._escape_underscores_outside_math(text)
+        text = self._escape_underscores_outside_math(text)
+
+        # Restore dollar-sanitise placeholders to their escaped LaTeX forms.
+        # Done last so that no pipeline step re-interprets the replacement $
+        # characters as math delimiters.
+        return self._restore_dollar_sanitise(text)
 
     @generate_document_item.register(Paragraph)
     def _generate_paragraph(self, node: Paragraph) -> list[str]:
@@ -3078,6 +3613,20 @@ class LaTeXGenerator:
         """
         lines: list[str] = []
         lines.append(node.latex)  # Raw LaTeX, no processing
+        lines.append("")
+        return lines
+
+    @generate_document_item.register(BMachine)
+    def _generate_b_machine(self, node: BMachine) -> list[str]:
+        r"""Generate LaTeX for B-machine verbatim block.
+
+        Wraps the body in \begin{verbatim}…\end{verbatim}.
+        Body indentation and blank lines are preserved exactly.
+        """
+        lines: list[str] = []
+        lines.append(r"\begin{verbatim}")
+        lines.append(node.body)
+        lines.append(r"\end{verbatim}")
         lines.append("")
         return lines
 
@@ -4137,9 +4686,14 @@ class LaTeXGenerator:
         6. Relational image: R(| S |)
         7. Set expressions: { ... }
         8. Quantifiers: forall, exists, exists1, mu
-        9. Type declarations: x : T
-        10. Function application: f x > y
-        11. Simple expressions: x > 1
+        9. Function application: f x > y
+        10. Simple expressions: x > 1
+
+        Note: _process_type_declarations is intentionally absent.  The
+        colon-detection heuristic (identifier : type → $identifier : type$)
+        fires on ordinary English punctuation such as "cardinality: empty"
+        and silently corrupts prose (bug 7.F).  Authors who want inline type
+        ascriptions should use explicit $...$ delimiters.
         """
         result = text
         result = self._process_manual_markup(result)
@@ -4150,7 +4704,6 @@ class LaTeXGenerator:
         result = self._process_relational_image(result)
         result = self._process_set_expressions(result)
         result = self._process_quantifiers(result)
-        result = self._process_type_declarations(result)
         result = self._process_function_applications(result)
         return self._process_simple_expressions(result)
 
@@ -4239,6 +4792,31 @@ class LaTeXGenerator:
         # Escape backslash first to avoid double-escaping
         result = text.replace("\\", r"\textbackslash{}")
         # Escape other special characters
+        result = result.replace("&", r"\&")
+        result = result.replace("%", r"\%")
+        result = result.replace("$", r"\$")
+        result = result.replace("#", r"\#")
+        result = result.replace("_", r"\_")
+        result = result.replace("{", r"\{")
+        result = result.replace("}", r"\}")
+        result = result.replace("~", r"\textasciitilde{}")
+        return result.replace("^", r"\textasciicircum{}")
+
+    def _escape_latex_text(self, text: str) -> str:
+        """Escape LaTeX-unsafe characters for verbatim heading text.
+
+        Used for section and subsection headings where the text should pass
+        through verbatim.  Only characters that are structurally significant
+        to LaTeX are escaped; punctuation like ``-``, ``(``, ``)``, ``:`` and
+        ``.`` is left untouched.
+
+        Escaped: \\ → \\textbackslash{}, & → \\&, % → \\%,
+                 $ → \\$, # → \\#, _ → \\_, { → \\{, } → \\},
+                 ~ → \\textasciitilde{}, ^ → \\textasciicircum{}.
+        NOT escaped: ( ) : . - (safe in LaTeX text mode).
+        """
+        # Escape backslash first to avoid double-escaping later replacements.
+        result = text.replace("\\", r"\textbackslash{}")
         result = result.replace("&", r"\&")
         result = result.replace("%", r"\%")
         result = result.replace("$", r"\$")
@@ -4635,12 +5213,23 @@ class LaTeXGenerator:
         still open).
         """
         lines: list[str] = []
-        expr_latex = self.generate_expr(node.expression)
 
         # Process name through _generate_identifier() for compound identifiers.
         name_latex = self._generate_identifier(
             Identifier(line=0, column=0, name=node.name),
         )
+
+        # Decide wrapping before generating the RHS so the math-context flag
+        # is set correctly for context-sensitive operators like o9 (→ \comp
+        # inside zed, → \semi inside inline $...$ math).
+        is_relational_rhs = self._expression_contains_dat_construct(node.expression)
+
+        prev_z = self._in_z_paragraph
+        self._in_z_paragraph = not is_relational_rhs
+        try:
+            expr_latex = self.generate_expr(node.expression)
+        finally:
+            self._in_z_paragraph = prev_z
 
         # Build the abbreviation body (without environment wrapping)
         if node.generic_params:
@@ -4650,12 +5239,18 @@ class LaTeXGenerator:
             abbrev = f"{name_latex} == {expr_latex}"
 
         # Pick the wrapping based on RHS content
-        if self._expression_contains_dat_construct(node.expression):
+        if is_relational_rhs:
             # Relational RHS — emit outside any Z environment so fuzz silently skips
             lines.append("\\noindent")
             lines.append(f"${abbrev}$")
         else:
             # Pure Z RHS — emit inside a zed paragraph for fuzz type-checking
+            self._check_overflow(
+                abbrev,
+                node.line,
+                "zed abbreviation",
+                f"{node.name} == ...",
+            )
             lines.append("\\begin{zed}")
             lines.append(abbrev)
             lines.append("\\end{zed}")
@@ -4704,81 +5299,90 @@ class LaTeXGenerator:
         else:
             lines.append(r"\begin{axdef}")
 
-        # Generate declarations on separate lines
-        if node.declarations:
-            for i, decl in enumerate(node.declarations):
-                if isinstance(decl, SchemaInclusion):
-                    decl_line = self._emit_schema_inclusion(decl)
-                else:
-                    # Process variable through identifier logic for underscore handling
-                    var_latex = self._generate_identifier(
-                        Identifier(line=0, column=0, name=decl.variable)
-                    )
-                    type_latex = self.generate_expr(decl.type_expr)
-                    # Post-process: add parentheses for nested special functions
-                    # Critical for fuzz: P (P Z) must be \power (\power Z)
-                    # not \power \power Z which causes validation errors
-                    special_ops = [
-                        r"\power \power",
-                        r"\power \finset",
-                        r"\finset \power",
-                        r"\seq \seq",
-                        r"\iseq \iseq",
-                        r"\bag \bag",
-                    ]
-                    for pattern in special_ops:
-                        if pattern in type_latex:
-                            # Find second operator and wrap from there
-                            parts = type_latex.split(pattern, 1)
-                            if len(parts) == 2:
-                                second_part = pattern.split()[-1] + " " + parts[1]
-                                type_latex = (
-                                    parts[0] + pattern.split()[0] + f" ({second_part})"
-                                )
-                                break
-
-                    # Build full declaration line for overflow check
-                    decl_line = f"{var_latex} : {type_latex}"
-                    self._check_overflow(
-                        decl_line,
-                        decl.type_expr.line,
-                        "axdef declaration",
-                        f"{decl.variable} : ...",
-                    )
-
-                # Add line break after each declaration except the last
-                if i < len(node.declarations) - 1:
-                    lines.append(f"{decl_line} \\\\")
-                else:
-                    lines.append(decl_line)
-
-        # Generate where clause if predicate groups exist
-        if node.predicates and any(group for group in node.predicates):
-            lines.append(r"\where")
-
-            # Iterate through predicate groups (separated by blank lines)
-            for group_idx, group in enumerate(node.predicates):
-                # Generate predicates in current group
-                for pred_idx, pred in enumerate(group):
-                    # Top-level predicates: pass parent=None for smart parenthesization
-                    pred_latex = self.generate_expr(pred, parent=None)
-
-                    # Check for overflow in where clause predicates
-                    self._check_overflow(
-                        pred_latex,
-                        pred.line,
-                        "axdef where clause",
-                    )
-
-                    # Use \\ as separator within group
-                    if pred_idx < len(group) - 1:
-                        lines.append(f"{pred_latex} \\\\")
+        # All expression generation inside this block uses Z-paragraph context so
+        # that context-sensitive operators (e.g. o9 → \comp) emit correctly.
+        prev_z = self._in_z_paragraph
+        self._in_z_paragraph = True
+        try:
+            # Generate declarations on separate lines
+            if node.declarations:
+                for i, decl in enumerate(node.declarations):
+                    if isinstance(decl, SchemaInclusion):
+                        decl_line = self._emit_schema_inclusion(decl)
                     else:
-                        lines.append(pred_latex)
+                        # Process variable through identifier logic
+                        var_latex = self._generate_identifier(
+                            Identifier(line=0, column=0, name=decl.variable)
+                        )
+                        type_latex = self.generate_expr(decl.type_expr)
+                        # Post-process: add parentheses for nested special functions
+                        # Critical for fuzz: P (P Z) must be \power (\power Z)
+                        # not \power \power Z which causes validation errors
+                        special_ops = [
+                            r"\power \power",
+                            r"\power \finset",
+                            r"\finset \power",
+                            r"\seq \seq",
+                            r"\iseq \iseq",
+                            r"\bag \bag",
+                        ]
+                        for pattern in special_ops:
+                            if pattern in type_latex:
+                                # Find second operator and wrap from there
+                                parts = type_latex.split(pattern, 1)
+                                if len(parts) == 2:
+                                    second_part = pattern.split()[-1] + " " + parts[1]
+                                    type_latex = (
+                                        parts[0]
+                                        + pattern.split()[0]
+                                        + f" ({second_part})"
+                                    )
+                                    break
 
-                # Add \also between groups (not after last group)
-                if group_idx < len(node.predicates) - 1:
-                    lines.append(r"\also")
+                        # Build full declaration line for overflow check
+                        decl_line = f"{var_latex} : {type_latex}"
+                        self._check_overflow(
+                            decl_line,
+                            decl.type_expr.line,
+                            "axdef declaration",
+                            f"{decl.variable} : ...",
+                        )
+
+                    # Add line break after each declaration except the last
+                    if i < len(node.declarations) - 1:
+                        lines.append(f"{decl_line} \\\\")
+                    else:
+                        lines.append(decl_line)
+
+            # Generate where clause if predicate groups exist
+            if node.predicates and any(group for group in node.predicates):
+                lines.append(r"\where")
+
+                # Iterate through predicate groups (separated by blank lines)
+                for group_idx, group in enumerate(node.predicates):
+                    # Generate predicates in current group
+                    for pred_idx, pred in enumerate(group):
+                        # Pass parent=None for smart parenthesization
+                        pred_latex = self.generate_expr(pred, parent=None)
+
+                        # Auto-wrap long predicates; fall back to warning
+                        self._check_overflow(
+                            pred_latex,
+                            pred.line,
+                            "axdef where clause",
+                        )
+
+                        # Use \\ as separator within group
+                        if pred_idx < len(group) - 1:
+                            lines.append(f"{pred_latex} \\\\")
+                        else:
+                            lines.append(pred_latex)
+
+                    # Add \also between groups (not after last group)
+                    if group_idx < len(node.predicates) - 1:
+                        lines.append(r"\also")
+        finally:
+            self._in_z_paragraph = prev_z
 
         lines.append(r"\end{axdef}")
         lines.append("")
@@ -4798,81 +5402,89 @@ class LaTeXGenerator:
         params_str = ", ".join(node.generic_params)
         lines.append(f"\\begin{{gendef}}[{params_str}]")
 
-        # Generate declarations on separate lines
-        if node.declarations:
-            for i, decl in enumerate(node.declarations):
-                if isinstance(decl, SchemaInclusion):
-                    decl_line = f"  {self._emit_schema_inclusion(decl)}"
-                else:
-                    # Process variable through identifier logic for underscore handling
-                    var_latex = self._generate_identifier(
-                        Identifier(line=0, column=0, name=decl.variable)
-                    )
-                    type_latex = self.generate_expr(decl.type_expr)
-                    # Post-process: add parentheses for nested special functions
-                    # Critical for fuzz: P (P Z) must be \power (\power Z)
-                    # not \power \power Z which causes validation errors
-                    special_ops = [
-                        r"\power \power",
-                        r"\power \finset",
-                        r"\finset \power",
-                        r"\seq \seq",
-                        r"\iseq \iseq",
-                        r"\bag \bag",
-                    ]
-                    for pattern in special_ops:
-                        if pattern in type_latex:
-                            # Find second operator and wrap from there
-                            parts = type_latex.split(pattern, 1)
-                            if len(parts) == 2:
-                                second_part = pattern.split()[-1] + " " + parts[1]
-                                type_latex = (
-                                    parts[0] + pattern.split()[0] + f" ({second_part})"
-                                )
-                                break
-
-                    # Build full declaration line for overflow check
-                    decl_line = f"  {var_latex}: {type_latex}"
-                    self._check_overflow(
-                        decl_line,
-                        decl.type_expr.line,
-                        "gendef declaration",
-                        f"{decl.variable} : ...",
-                    )
-
-                # Add line break after each declaration except the last
-                if i < len(node.declarations) - 1:
-                    lines.append(f"{decl_line} \\\\")
-                else:
-                    lines.append(decl_line)
-
-        # Generate where clause if predicate groups exist
-        if node.predicates and any(group for group in node.predicates):
-            lines.append(r"\where")
-
-            # Iterate through predicate groups (separated by blank lines)
-            for group_idx, group in enumerate(node.predicates):
-                # Generate predicates in current group
-                for pred_idx, pred in enumerate(group):
-                    # Top-level predicates: pass parent=None for smart parenthesization
-                    pred_latex = self.generate_expr(pred, parent=None)
-
-                    # Check for overflow in where clause predicates
-                    self._check_overflow(
-                        pred_latex,
-                        pred.line,
-                        "gendef where clause",
-                    )
-
-                    # Fuzz requires \\ after each predicate except the last in group
-                    if self.use_fuzz and pred_idx < len(group) - 1:
-                        lines.append(f"  {pred_latex} \\\\")
+        # All expression generation inside this block uses Z-paragraph context.
+        prev_z = self._in_z_paragraph
+        self._in_z_paragraph = True
+        try:
+            # Generate declarations on separate lines
+            if node.declarations:
+                for i, decl in enumerate(node.declarations):
+                    if isinstance(decl, SchemaInclusion):
+                        decl_line = f"  {self._emit_schema_inclusion(decl)}"
                     else:
-                        lines.append(f"  {pred_latex}")
+                        # Process variable through identifier logic
+                        var_latex = self._generate_identifier(
+                            Identifier(line=0, column=0, name=decl.variable)
+                        )
+                        type_latex = self.generate_expr(decl.type_expr)
+                        # Post-process: add parentheses for nested special functions
+                        # Critical for fuzz: P (P Z) must be \power (\power Z)
+                        # not \power \power Z which causes validation errors
+                        special_ops = [
+                            r"\power \power",
+                            r"\power \finset",
+                            r"\finset \power",
+                            r"\seq \seq",
+                            r"\iseq \iseq",
+                            r"\bag \bag",
+                        ]
+                        for pattern in special_ops:
+                            if pattern in type_latex:
+                                # Find second operator and wrap from there
+                                parts = type_latex.split(pattern, 1)
+                                if len(parts) == 2:
+                                    second_part = pattern.split()[-1] + " " + parts[1]
+                                    type_latex = (
+                                        parts[0]
+                                        + pattern.split()[0]
+                                        + f" ({second_part})"
+                                    )
+                                    break
 
-                # Add \also between groups (not after last group)
-                if group_idx < len(node.predicates) - 1:
-                    lines.append(r"\also")
+                        # Build full declaration line for overflow check
+                        decl_line = f"  {var_latex}: {type_latex}"
+                        self._check_overflow(
+                            decl_line,
+                            decl.type_expr.line,
+                            "gendef declaration",
+                            f"{decl.variable} : ...",
+                        )
+
+                    # Add line break after each declaration except the last
+                    if i < len(node.declarations) - 1:
+                        lines.append(f"{decl_line} \\\\")
+                    else:
+                        lines.append(decl_line)
+
+            # Generate where clause if predicate groups exist
+            if node.predicates and any(group for group in node.predicates):
+                lines.append(r"\where")
+
+                # Iterate through predicate groups (separated by blank lines)
+                for group_idx, group in enumerate(node.predicates):
+                    # Generate predicates in current group
+                    for pred_idx, pred in enumerate(group):
+                        # Pass parent=None for smart parenthesization
+                        pred_latex = self.generate_expr(pred, parent=None)
+
+                        # Auto-wrap long predicates; fall back to warning
+                        self._check_overflow(
+                            pred_latex,
+                            pred.line,
+                            "gendef where clause",
+                        )
+
+                        # Fuzz requires \\ after each predicate except the last in group
+                        if self.use_fuzz and pred_idx < len(group) - 1:
+                            lines.append(f"  {pred_latex} \\\\")
+                        else:
+                            lines.append(f"  {pred_latex}")
+
+                    # Add \also between groups (not after last group)
+                    if group_idx < len(node.predicates) - 1:
+                        lines.append(r"\also")
+        finally:
+            self._in_z_paragraph = prev_z
 
         lines.append(r"\end{gendef}")
         lines.append("")
@@ -4895,82 +5507,90 @@ class LaTeXGenerator:
 
         lines.append(r"\begin{zed}")
 
-        # Handle Document content (multiple items in zed block)
-        if isinstance(node.content, Document):
-            for idx, item in enumerate(node.content.items):
-                # Add \also separator before all items except the first
-                # Note: fuzz requires \also between Z paragraphs, not \\
-                if idx > 0:
-                    lines.append(r"\also")
+        # All expression generation inside this block uses Z-paragraph context.
+        prev_z = self._in_z_paragraph
+        self._in_z_paragraph = True
+        try:
+            # Handle Document content (multiple items in zed block)
+            if isinstance(node.content, Document):
+                for idx, item in enumerate(node.content.items):
+                    # Add \also separator before all items except the first
+                    # Note: fuzz requires \also between Z paragraphs, not \\
+                    if idx > 0:
+                        lines.append(r"\also")
 
-                # Generate given types: [A, B, C]
-                if isinstance(item, GivenType):
-                    names_str = ", ".join(item.names)
-                    given_line = f"[{names_str}]"
-                    self._check_overflow(
-                        given_line,
-                        item.line,
-                        "zed given types",
-                    )
-                    lines.append(given_line)
+                    # Generate given types: [A, B, C]
+                    if isinstance(item, GivenType):
+                        names_str = ", ".join(item.names)
+                        given_line = f"[{names_str}]"
+                        self._check_overflow(
+                            given_line,
+                            item.line,
+                            "zed given types",
+                        )
+                        lines.append(given_line)
 
-                # Generate free types: Type ::= branch1 | branch2
-                elif isinstance(item, FreeType):
-                    branch_strs: list[str] = []
-                    for branch in item.branches:
-                        if branch.parameters is None:
-                            branch_strs.append(branch.name)
+                    # Generate free types: Type ::= branch1 | branch2
+                    elif isinstance(item, FreeType):
+                        branch_strs: list[str] = []
+                        for branch in item.branches:
+                            if branch.parameters is None:
+                                branch_strs.append(branch.name)
+                            else:
+                                params_latex = self.generate_expr(branch.parameters)
+                                branch_str = (
+                                    f"{branch.name} \\ldata {params_latex} \\rdata"
+                                )
+                                branch_strs.append(branch_str)
+                        branches_str = " | ".join(branch_strs)
+                        free_type_line = f"{item.name} ::= {branches_str}"
+                        self._check_overflow(
+                            free_type_line,
+                            item.line,
+                            "zed free type",
+                            f"{item.name} ::= ...",
+                        )
+                        lines.append(free_type_line)
+
+                    # Generate abbreviations: Name == expression
+                    elif isinstance(item, Abbreviation):
+                        expr_latex = self.generate_expr(item.expression)
+                        name_latex = self._generate_identifier(
+                            Identifier(line=0, column=0, name=item.name),
+                        )
+                        if item.generic_params:
+                            params_str = ", ".join(item.generic_params)
+                            abbrev_line = f"{name_latex}[{params_str}] == {expr_latex}"
                         else:
-                            params_latex = self.generate_expr(branch.parameters)
-                            branch_str = f"{branch.name} \\ldata {params_latex} \\rdata"
-                            branch_strs.append(branch_str)
-                    branches_str = " | ".join(branch_strs)
-                    free_type_line = f"{item.name} ::= {branches_str}"
-                    self._check_overflow(
-                        free_type_line,
-                        item.line,
-                        "zed free type",
-                        f"{item.name} ::= ...",
-                    )
-                    lines.append(free_type_line)
+                            abbrev_line = f"{name_latex} == {expr_latex}"
+                        self._check_overflow(
+                            abbrev_line,
+                            item.line,
+                            "zed abbreviation",
+                            f"{item.name} == ...",
+                        )
+                        lines.append(abbrev_line)
 
-                # Generate abbreviations: Name == expression
-                elif isinstance(item, Abbreviation):
-                    expr_latex = self.generate_expr(item.expression)
-                    name_latex = self._generate_identifier(
-                        Identifier(line=0, column=0, name=item.name),
-                    )
-                    if item.generic_params:
-                        params_str = ", ".join(item.generic_params)
-                        abbrev_line = f"{name_latex}[{params_str}] == {expr_latex}"
-                    else:
-                        abbrev_line = f"{name_latex} == {expr_latex}"
-                    self._check_overflow(
-                        abbrev_line,
-                        item.line,
-                        "zed abbreviation",
-                        f"{item.name} == ...",
-                    )
-                    lines.append(abbrev_line)
-
-                # Generate expressions/predicates
-                elif isinstance(item, Expr):
-                    content_latex = self.generate_expr(item)
-                    self._check_overflow(
-                        content_latex,
-                        item.line,
-                        "zed predicate",
-                    )
-                    lines.append(f"{content_latex}")
-        else:
-            # Single expression (backward compatible)
-            content_latex = self.generate_expr(node.content)
-            self._check_overflow(
-                content_latex,
-                node.content.line,
-                "zed predicate",
-            )
-            lines.append(f"{content_latex}")
+                    # Generate expressions/predicates
+                    elif isinstance(item, Expr):
+                        content_latex = self.generate_expr(item)
+                        self._check_overflow(
+                            content_latex,
+                            item.line,
+                            "zed predicate",
+                        )
+                        lines.append(f"{content_latex}")
+            else:
+                # Single expression (backward compatible)
+                content_latex = self.generate_expr(node.content)
+                self._check_overflow(
+                    content_latex,
+                    node.content.line,
+                    "zed predicate",
+                )
+                lines.append(f"{content_latex}")
+        finally:
+            self._in_z_paragraph = prev_z
 
         lines.append(r"\end{zed}")
         lines.append("")
@@ -5009,81 +5629,89 @@ class LaTeXGenerator:
         else:
             lines.append(r"\begin{schema}{" + schema_name + "}")
 
-        # Generate declarations on separate lines
-        if node.declarations:
-            for i, decl in enumerate(node.declarations):
-                if isinstance(decl, SchemaInclusion):
-                    decl_line = self._emit_schema_inclusion(decl)
-                else:
-                    # Process variable through identifier logic for underscore handling
-                    var_latex = self._generate_identifier(
-                        Identifier(line=0, column=0, name=decl.variable)
-                    )
-                    type_latex = self.generate_expr(decl.type_expr)
-                    # Post-process: add parentheses for nested special functions
-                    # Critical for fuzz: P (P Z) must be \power (\power Z)
-                    # not \power \power Z which causes validation errors
-                    special_ops = [
-                        r"\power \power",
-                        r"\power \finset",
-                        r"\finset \power",
-                        r"\seq \seq",
-                        r"\iseq \iseq",
-                        r"\bag \bag",
-                    ]
-                    for pattern in special_ops:
-                        if pattern in type_latex:
-                            # Find second operator and wrap from there
-                            parts = type_latex.split(pattern, 1)
-                            if len(parts) == 2:
-                                second_part = pattern.split()[-1] + " " + parts[1]
-                                type_latex = (
-                                    parts[0] + pattern.split()[0] + f" ({second_part})"
-                                )
-                                break
-
-                    # Build full declaration line for overflow check
-                    decl_line = f"{var_latex} : {type_latex}"
-                    self._check_overflow(
-                        decl_line,
-                        decl.type_expr.line,
-                        f"{schema_context} declaration",
-                        f"{decl.variable} : ...",
-                    )
-
-                # Add line break after each declaration except the last
-                if i < len(node.declarations) - 1:
-                    lines.append(f"{decl_line} \\\\")
-                else:
-                    lines.append(decl_line)
-
-        # Generate where clause if predicate groups exist
-        if node.predicates and any(group for group in node.predicates):
-            lines.append(r"\where")
-
-            # Iterate through predicate groups (separated by blank lines)
-            for group_idx, group in enumerate(node.predicates):
-                # Generate predicates in current group
-                for pred_idx, pred in enumerate(group):
-                    # Top-level predicates: pass parent=None for smart parenthesization
-                    pred_latex = self.generate_expr(pred, parent=None)
-
-                    # Check for overflow in where clause predicates
-                    self._check_overflow(
-                        pred_latex,
-                        pred.line,
-                        f"{schema_context} where clause",
-                    )
-
-                    # Use \\ as separator within group
-                    if pred_idx < len(group) - 1:
-                        lines.append(f"{pred_latex} \\\\")
+        # All expression generation inside this block uses Z-paragraph context.
+        prev_z = self._in_z_paragraph
+        self._in_z_paragraph = True
+        try:
+            # Generate declarations on separate lines
+            if node.declarations:
+                for i, decl in enumerate(node.declarations):
+                    if isinstance(decl, SchemaInclusion):
+                        decl_line = self._emit_schema_inclusion(decl)
                     else:
-                        lines.append(pred_latex)
+                        # Process variable through identifier logic
+                        var_latex = self._generate_identifier(
+                            Identifier(line=0, column=0, name=decl.variable)
+                        )
+                        type_latex = self.generate_expr(decl.type_expr)
+                        # Post-process: add parentheses for nested special functions
+                        # Critical for fuzz: P (P Z) must be \power (\power Z)
+                        # not \power \power Z which causes validation errors
+                        special_ops = [
+                            r"\power \power",
+                            r"\power \finset",
+                            r"\finset \power",
+                            r"\seq \seq",
+                            r"\iseq \iseq",
+                            r"\bag \bag",
+                        ]
+                        for pattern in special_ops:
+                            if pattern in type_latex:
+                                # Find second operator and wrap from there
+                                parts = type_latex.split(pattern, 1)
+                                if len(parts) == 2:
+                                    second_part = pattern.split()[-1] + " " + parts[1]
+                                    type_latex = (
+                                        parts[0]
+                                        + pattern.split()[0]
+                                        + f" ({second_part})"
+                                    )
+                                    break
 
-                # Add \also between groups (not after last group)
-                if group_idx < len(node.predicates) - 1:
-                    lines.append(r"\also")
+                        # Build full declaration line for overflow check
+                        decl_line = f"{var_latex} : {type_latex}"
+                        self._check_overflow(
+                            decl_line,
+                            decl.type_expr.line,
+                            f"{schema_context} declaration",
+                            f"{decl.variable} : ...",
+                        )
+
+                    # Add line break after each declaration except the last
+                    if i < len(node.declarations) - 1:
+                        lines.append(f"{decl_line} \\\\")
+                    else:
+                        lines.append(decl_line)
+
+            # Generate where clause if predicate groups exist
+            if node.predicates and any(group for group in node.predicates):
+                lines.append(r"\where")
+
+                # Iterate through predicate groups (separated by blank lines)
+                for group_idx, group in enumerate(node.predicates):
+                    # Generate predicates in current group
+                    for pred_idx, pred in enumerate(group):
+                        # Pass parent=None for smart parenthesization
+                        pred_latex = self.generate_expr(pred, parent=None)
+
+                        # Auto-wrap long predicates; fall back to warning
+                        self._check_overflow(
+                            pred_latex,
+                            pred.line,
+                            f"{schema_context} where clause",
+                        )
+
+                        # Use \\ as separator within group
+                        if pred_idx < len(group) - 1:
+                            lines.append(f"{pred_latex} \\\\")
+                        else:
+                            lines.append(pred_latex)
+
+                    # Add \also between groups (not after last group)
+                    if group_idx < len(node.predicates) - 1:
+                        lines.append(r"\also")
+        finally:
+            self._in_z_paragraph = prev_z
 
         lines.append(r"\end{schema}")
 
@@ -5780,13 +6408,13 @@ class LaTeXGenerator:
         return current_result
 
     def _format_justification_label(self, just: str) -> str:
-        """
-        Format justification text for \\infer label.
+        """Format justification text for \\infer label.
 
         Converts patterns:
-        - "=> intro from 1" → "$\\Rightarrow$-intro^{[1]}" (discharge superscript)
-        - "and elim 1" → "$\\land$-elim-1" (left/right projection, regular text)
-        - "or intro 2" → "$\\lor$-intro-2" (left/right injection, regular text)
+        - "=> intro from 1" → "\\Rightarrow\\textrm{-intro}^{[1]}" (discharge)
+        - "and elim 1"      → "\\land\\textrm{-elim-1}" (projection subscript)
+        - "false-intro"     → "false\\textrm{-intro}" (plain rule label)
+        - "=> elim"         → "\\Rightarrow\\textrm{-elim}" (plain rule label)
         """
         # First, check for discharge pattern: "rule from N" or "rule[N]"
         # Match: operator + rule name + (from N | [N])
@@ -5921,6 +6549,73 @@ class LaTeXGenerator:
             # Format as: operator-rule-number (just regular text, no subscript)
             # Use \textrm instead of \mbox to work correctly in math mode contexts
             return f"{op_latex}\\textrm{{-{rule_name}-{subscript_num}}}"
+
+        # Pattern 3: plain rule label (no discharge, no subscript).
+        # Matches: "false-intro", "=> elim", "and intro", "lnot elim", etc.
+        # The separator between operator and rule name may be whitespace or hyphen.
+        plain_pattern = r"^(.*?)[\s-]+(intro|elim)$"
+        match = re.match(plain_pattern, just)
+
+        if match:
+            operator_part = match.group(1).strip()
+            rule_name = match.group(2)
+
+            # Convert operator to LaTeX (no $ delimiters - already in math mode)
+            # CRITICAL: Process by length (longest first) to avoid partial matches
+            op_latex = operator_part
+
+            # 5-character operators
+            op_latex = op_latex.replace("77->", r"\ffun")
+
+            # 4-character operators
+            op_latex = op_latex.replace(">->>", r"\bij")
+            op_latex = op_latex.replace("+->>", r"\psurj")
+            op_latex = op_latex.replace("-->>", r"\surj")
+
+            # 3-character operators (process before 2-character)
+            op_latex = op_latex.replace("<=>", r"\Leftrightarrow")
+            op_latex = op_latex.replace("<<|", r"\ndres")
+            op_latex = op_latex.replace("|>>", r"\nrres")
+            op_latex = op_latex.replace("|->", r"\mapsto")  # MUST be before ->
+            op_latex = op_latex.replace("<->", r"\rel")
+            op_latex = op_latex.replace(">+>", r"\pinj")
+            op_latex = op_latex.replace("-|>", r"\pinj")
+            op_latex = op_latex.replace(">->", r"\inj")
+            op_latex = op_latex.replace("+->", r"\pfun")
+
+            # 2-character operators (process after longer operators)
+            op_latex = op_latex.replace("=>", r"\Rightarrow")
+            op_latex = op_latex.replace("<|", r"\dres")
+            op_latex = op_latex.replace("|>", r"\rres")
+            op_latex = op_latex.replace("->", r"\fun")  # AFTER |-> and +->
+            op_latex = op_latex.replace("++", r"\oplus")
+            op_latex = op_latex.replace("o9", r"\semi")
+
+            # Word-based operators (both English and L-prefixed forms)
+            op_latex = re.sub(r"\bland\b", r"\\land", op_latex)  # land → \land
+            op_latex = re.sub(r"\blor\b", r"\\lor", op_latex)  # lor → \lor
+            op_latex = re.sub(r"\blnot\b", r"\\lnot", op_latex)  # lnot → \lnot
+            op_latex = re.sub(r"\band\b", r"\\land", op_latex)  # and → \land
+            op_latex = re.sub(r"\bor\b", r"\\lor", op_latex)  # or → \lor
+            op_latex = re.sub(r"\bnot\b", r"\\lnot", op_latex)  # not → \lnot
+            op_latex = re.sub(r"\bin\b", r"\\in", op_latex)  # Set membership
+            op_latex = re.sub(r"\bdom\b", r"\\dom", op_latex)
+            op_latex = re.sub(r"\bran\b", r"\\ran", op_latex)
+            op_latex = re.sub(r"\bcomp\b", r"\\comp", op_latex)
+            op_latex = re.sub(r"\binv\b", r"\\inv", op_latex)
+            op_latex = re.sub(r"\bid\b", r"\\id", op_latex)
+
+            # Z notation keywords (QA fixes - matches _escape_justification)
+            # Order matters: exists1+ before exists1 to avoid partial match
+            op_latex = re.sub(r"exists1\+", r"\\exists", op_latex)  # exists1+ → ∃
+            op_latex = re.sub(r"\bexists1\b", r"\\exists_1", op_latex)  # exists1 → ∃₁
+            op_latex = re.sub(r"\bexists\b", r"\\exists", op_latex)  # exists → ∃
+            op_latex = re.sub(r"\bemptyset\b", r"\\emptyset", op_latex)  # emptyset → ∅
+            op_latex = re.sub(r"\bforall\b", r"\\forall", op_latex)  # forall → ∀
+
+            # Format as: operator-rule (tight, matching patterns 1 and 2)
+            # Use \textrm instead of \mbox to work correctly in math mode contexts
+            return f"{op_latex}\\textrm{{-{rule_name}}}"
 
         # No special pattern - process normally
         # CRITICAL: Process by length (longest first) to avoid partial matches

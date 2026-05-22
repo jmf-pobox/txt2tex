@@ -1851,6 +1851,23 @@ current and planned Z notation within Phase 3.x scope.
    - Recognize mathematical notation from handwriting
    - Challenging but high-value for real whiteboard workflows
 
+## Deferred Designs
+
+Designs that have been scoped against the Z RM and fuzz behaviour but
+not implemented. Each entry has a standalone design document under
+`docs/deferred/`; see those files for the full engine surface and the
+references behind the decision.
+
+- **User-defined operator names** — full engine surface for
+  underscored operator templates (`_⊕_`, `_R_`, `op _`, `_ †`) as
+  the LHS of an abbreviation or declaration, including the fuzz
+  announce-before-define directive machinery and the operator-table
+  state in the parser. See
+  [docs/deferred/user-defined-operators.md](deferred/user-defined-operators.md)
+  for the full scope. Author-side workaround until then is documented
+  in
+  [docs/guides/MISSING_FEATURES.md § User-Defined Operator Names](guides/MISSING_FEATURES.md#user-defined-operator-names).
+
 ## Appendix: Example Conversion
 
 **Input (whiteboard.txt)**:
@@ -2275,3 +2292,102 @@ a dependent extra declaration is detected, directing the user to rewrite.
 - §3.12 — lambda domain rule
 
 **Test count delta**: 3893 → 3925 (32 new pk tests; relvars tests deleted).
+
+## ADR: Schema-text Quantification — Extend Quantifier, Not New Node (Z RM §3.10)
+
+### Context
+
+Z RM §3.10 permits schemas to appear directly as quantifier bindings:
+
+```text
+∃ ΔS • P     ∃ ΞS • P     ∃ S • P     ∃ S' • P
+```
+
+and the same for `∀` and `∃₁`.  Before this change, txt2tex rejected all
+four forms with "Expected variable name or tuple pattern after exists".
+The SBM coursework exercises (Ex 21, 24, 26) fell back to `LATEX:` blocks,
+defeating the engine's purpose.
+
+### Decision
+
+**Extend the existing `Quantifier` node** with a `schema_binding` field
+(`SchemaBinding | None`) rather than introducing a separate
+`SchemaQuantifier` node.
+
+jms reasoning (2026-05-21): "The variation lives in the *declaration*, not
+in the quantifier.  A `\forall` is a `\forall` regardless of whether its
+binding is a variable list or a schema name.  Separating them into two AST
+nodes would either require the generator to dispatch twice on the same
+semantic concept, or force every visitor to handle both nodes for what is
+really one idea."
+
+`SchemaBinding` is a frozen dataclass with four fields:
+
+```python
+@dataclass(frozen=True)
+class SchemaBinding(ASTNode):
+    decoration: Literal["Delta", "Xi", "None", "Prime"]
+    schema_name: str  # raw lexer value, e.g. "BoxOffice", "S'"
+```
+
+When `Quantifier.schema_binding is not None`, the `variables`, `domain`,
+and `tuple_pattern` fields are unused (`[]` / `None`).
+
+### Alternatives rejected
+
+1. **Separate `SchemaQuantifier` node.** Would duplicate all quantifier
+   generator logic (paren wrapping, depth tracking, `_quantifier_needs_parens`)
+   and require every caller that handles `Quantifier` to also handle
+   `SchemaQuantifier`.  jms rejected this directly.
+
+2. **Desugar in the engine** (expand `ΔS` into its component variables).
+   Requires knowing schema signatures at parse time, which would couple the
+   parser to a schema symbol table.  Also wrong semantically: fuzz's own
+   `\Delta` macro does the expansion; the engine should emit the schema
+   reference and let fuzz handle it.  jms ruling: "emit literally, let fuzz
+   expand".
+
+3. **Treat all uppercase-identifier-without-`:` as schema binding.**
+   Would break `exists N | P` where `N` is a variable of a known type used
+   without a domain annotation.  The uppercase-initial heuristic is correct
+   for Z convention (schema names are capitalised; variables are not) and
+   matches the disambiguation specified in jms's ruling.
+
+### Disambiguation rule
+
+After consuming the quantifier keyword, the parser inspects the next token:
+
+- `DELTA` or `XI` token → schema binding (explicit decoration).
+- `IDENTIFIER` with uppercase initial, followed by a token that is
+  NOT `:` or `,` → schema binding (bare or primed schema).
+- Anything else → value-binding path (existing behaviour unchanged).
+
+The `:` test preserves `exists S : T | P` as a value binding where `S`
+happens to start with uppercase.
+
+### LaTeX emission (jms ruling 2026-05-21)
+
+No thin-space (`\,`) between decoration and schema name.  fuzz's `\Delta`
+macro bonds lexically to the following identifier.  Emit:
+
+```text
+\exists \Delta S @ P     (fuzz mode; @ is the spot/bullet)
+\exists \Xi S @ P
+\exists S @ P
+\exists S^{\prime} @ P   (prime as superscript, not a raw apostrophe)
+```
+
+Prime handling: strip trailing `'` from the raw identifier, emit
+`^{\prime}` for each one.  fuzz recognises this as a decoration.
+
+### Consequences
+
+- `_generate_schema_quantifier` routes at the top of `_generate_quantifier`
+  before the lambda and chain-collapse branches — no interference.
+- `_quantifier_needs_parens` works unchanged: it inspects `node.body` and
+  `node.expression`, not `node.variables`.
+- The fuzz round-trip tests (Counter/IncrCounter miniature promotion) pass,
+  confirming fuzz accepts `\exists \Delta Counter @ true` and
+  `\exists \Delta Counter @ IncrCounter`.
+
+**Test count delta**: 4230 → 4257 (27 new schema-text quantifier tests).

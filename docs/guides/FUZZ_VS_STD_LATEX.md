@@ -156,6 +156,83 @@ LaTeX:  \# \head s      ← No parentheses needed
 
 ---
 
+## Negation of Non-Atomic Predicates
+
+### Z RM §3.8.1 vs Fuzz Parser Restriction
+
+**Z RM §3.8.1** permits the bare form `\lnot \exists_1 s @ P` — quantifiers
+extend as far right as possible, so the parse is unambiguous.
+
+**Fuzz** is stricter: its parser requires the operand of `\lnot` to be an
+atomic predicate.  Presenting a quantifier or connective directly after
+`\lnot` triggers:
+
+```text
+Opening parenthesis expected at symbol \exists_1
+```
+
+**jms ruling (2026-05-22)**: emit `\lnot (child)` whenever `child` is
+non-atomic.  Atomic predicates in fuzz are:
+
+1. A predicate name (identifier, e.g. `p`, `Inv`).
+2. The constants `true` and `false`.
+3. A relation application `e_1 R e_2` where `R` is an infix relation
+   symbol (e.g. `x \in s`, `a = b`, `x < y`).
+4. A schema reference (e.g. `\Xi S`, `S`).
+5. An already-parenthesised predicate.
+
+Quantifiers (`\forall`, `\exists`, `\exists_1`), binary connectives
+(`\land`, `\lor`, `\implies`, `\iff`), and lambda expressions are
+**non-atomic** and must be parenthesised when they appear as the operand
+of `\lnot`.
+
+**txt2tex behavior** (fuzz mode only):
+
+```python
+# In _generate_unary_op(), after existing BinaryOp wrapping:
+if self.use_fuzz and node.operator == "lnot" and not _is_atomic_predicate(node.operand):
+    operand = f"({operand})"
+```
+
+`_is_atomic_predicate(node)` returns `True` for `Identifier` and
+`BinaryOp` nodes.  `BinaryOp` nodes are already parenthesised by
+the preceding BinaryOp-wrap rule, so they are treated as atomic here to
+prevent double-parenthesisation.  (`Number` is also accepted by the
+helper for defensive symmetry, but a numeric literal is not a
+well-formed predicate operand for `\lnot` and will never reach this
+path in practice.)
+
+**What this means for you**: no change to your `.txt` input is needed.
+Write `lnot (exists1 s : N | s > 0)` exactly as you would on a
+whiteboard. txt2tex inserts the parens fuzz requires automatically.
+
+**Reference**: `latex_gen.py` — `_is_atomic_predicate`, `_generate_unary_op`
+
+**Examples**:
+
+```text
+Input:  lnot (exists1 s : N | s > 0)
+Fuzz:   \lnot (\exists_1 s : \nat @ s > 0)   ← parens required
+LaTeX:  \lnot \exists_1 s : \nat @ s > 0     ← bare form accepted
+
+Input:  lnot (a land b)
+Fuzz:   \lnot (a \land b)   ← parens required
+LaTeX:  \lnot a \land b     ← bare form parses, but binds as (\lnot a) \land b
+                              — semantically different from the parenthesised form
+
+Input:  lnot true
+Fuzz:   \lnot true          ← no parens (atomic)
+LaTeX:  \lnot true          ← same
+
+Input:  lnot p
+Fuzz:   \lnot p             ← no parens (atomic identifier)
+LaTeX:  \lnot p             ← same
+```
+
+**Bug reference**: engine bug #132 (SEM Ex 51 part (b) repro).
+
+---
+
 ## Semicolons in Declarations
 
 ### Multiple Declarations Must Use Line Breaks

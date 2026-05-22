@@ -36,6 +36,14 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     # Nested-relation operators (Phase 4.1)
     "group": TokenType.GROUP,
     "ungroup": TokenType.UNGROUP,
+    # Aggregator keywords (Phase 4.2)
+    "Count": TokenType.COUNT,
+    "Sum": TokenType.SUM,
+    "Avg": TokenType.AVG,
+    "Min": TokenType.MIN,
+    "Max": TokenType.MAX,
+    "Median": TokenType.MEDIAN,
+    "as": TokenType.AS,
     # Schema-calculus operators (Phase 3.2)
     "hide": TokenType.HIDE,
     "project": TokenType.PROJECT,
@@ -76,6 +84,7 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     # Filter and bag operators
     "filter": TokenType.FILTER,
     "bag_union": TokenType.BAG_UNION,
+    "bag_diff": TokenType.BAG_DIFF,
 }
 
 # Keywords that map to the same token type (aliases)
@@ -115,6 +124,14 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "div",
         "group",
         "ungroup",
+        # --- Aggregator keywords (Phase 4.2) ---
+        "Count",
+        "Sum",
+        "Avg",
+        "Min",
+        "Max",
+        "Median",
+        "as",
         # --- Schema-calculus operators ---
         "hide",
         "project",
@@ -148,6 +165,7 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "F",
         "filter",
         "bag_union",
+        "bag_diff",
         # --- KEYWORD_ALIASES ---
         "subset",
         "subseteq",
@@ -173,6 +191,7 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "BIBLIOGRAPHY_STYLE",
         "PAGEBREAK",
         "LINEBREAK",
+        "B",
     }
 )
 
@@ -223,6 +242,7 @@ class Lexer:
     column: int
     _in_solution_marker: bool
     _bind_depth: int  # Tracks nested {| ... |} binding bracket depth
+    _token_buffer: list[Token]  # Buffer for tokens produced as lookahead side-effects
 
     def __init__(self, text: str) -> None:
         """Initialize lexer with input text."""
@@ -232,6 +252,7 @@ class Lexer:
         self.column = 1
         self._in_solution_marker = False  # Track if inside ** ... **
         self._bind_depth = 0  # Track open {| ... |} nesting depth
+        self._token_buffer = []  # Drain before scanning new characters
 
     def _raise_infinite_loop_error(
         self,
@@ -270,10 +291,17 @@ class Lexer:
     def tokenize(self) -> list[Token]:
         """Tokenize entire input and return list of tokens."""
         tokens: list[Token] = []
-        while not self._at_end():
+        while not self._at_end() or self._token_buffer:
+            # Drain the side-effect buffer before consuming more characters.
+            if self._token_buffer:
+                tokens.append(self._token_buffer.pop(0))
+                continue
             token = self._scan_token()
             if token is not None:
                 tokens.append(token)
+        # Drain any remaining buffered tokens before EOF.
+        while self._token_buffer:
+            tokens.append(self._token_buffer.pop(0))
         tokens.append(self._make_token(TokenType.EOF, ""))
         return tokens
 
@@ -343,7 +371,64 @@ class Lexer:
             return Token(SINGLE_CHAR_TOKENS[char], char, start_line, start_column)
 
         # Section marker: ===
+        # When followed by a closing === on the same line, capture the raw title
+        # text between them as a TEXT token so the parser receives verbatim content
+        # without inter-character whitespace padding from the math-token pipeline.
         if char == "=" and self._peek_char() == "=" and self._peek_char(2) == "=":
+            # Scan ahead to detect the pattern: === <text> === on one line.
+            # We look for a closing "===" before the next newline.
+            scan = self.pos + 3  # skip past the opening ===
+            found_close = -1
+            while scan < len(self.text) and self.text[scan] != "\n":
+                if (
+                    self.text[scan] == "="
+                    and scan + 1 < len(self.text)
+                    and self.text[scan + 1] == "="
+                    and scan + 2 < len(self.text)
+                    and self.text[scan + 2] == "="
+                ):
+                    found_close = scan
+                    break
+                scan += 1
+
+            if found_close != -1:
+                # Consume the opening ===
+                self._advance()
+                self._advance()
+                self._advance()
+                open_marker = Token(
+                    TokenType.SECTION_MARKER, "===", start_line, start_column
+                )
+
+                # Capture raw title text between the two === markers,
+                # stripping leading/trailing whitespace.
+                raw_title_start = self.pos
+                while self.pos < found_close:
+                    self._advance()
+                raw_title = self.text[raw_title_start : self.pos].strip()
+
+                # Consume the closing ===
+                close_line = self.line
+                close_column = self.column
+                self._advance()
+                self._advance()
+                self._advance()
+                close_marker = Token(
+                    TokenType.SECTION_MARKER, "===", close_line, close_column
+                )
+
+                # The lexer returns one token at a time, so we store the extras
+                # in a small buffer.  _scan_token() is the only call site; we
+                # shadow it by inserting a helper that drains the buffer first.
+                # Emit open marker now; buffer the title TEXT token and the
+                # closing SECTION_MARKER so subsequent _scan_token() calls
+                # return them in order.
+                title_token = Token(TokenType.TEXT, raw_title, start_line, start_column)
+                self._token_buffer.append(title_token)
+                self._token_buffer.append(close_marker)
+                return open_marker
+
+            # No closing === on this line — emit a bare === marker as before.
             self._advance()
             self._advance()
             self._advance()
@@ -1217,6 +1302,57 @@ class Lexer:
             self._advance()  # Consume ':'
             return Token(TokenType.PAGEBREAK, "PAGEBREAK:", start_line, start_column)
 
+        # Check for B: keyword — B-machine verbatim block.
+        # Consume body lines verbatim until a line that is exactly "END" at
+        # column 0 (no leading whitespace, optional trailing newline).
+        # The END line itself is included in the body.
+        if value == "B" and self._current_char() == ":":
+            self._advance()  # consume ':'
+            # Skip optional trailing whitespace/rest of B: line up to newline
+            while not self._at_end() and self._current_char() != "\n":
+                self._advance()
+            # Consume the newline that ends the B: line, if present
+            if not self._at_end() and self._current_char() == "\n":
+                self._advance()
+            # Slurp body lines verbatim until column-0 END
+            body_lines: list[str] = []
+            found_end = False
+            while not self._at_end():
+                # Scan one line
+                line_start = self.pos
+                while not self._at_end() and self._current_char() != "\n":
+                    self._advance()
+                # Capture the line content (without its trailing newline)
+                raw_line = self.text[line_start : self.pos]
+                # Consume the newline, if present
+                if not self._at_end() and self._current_char() == "\n":
+                    self._advance()
+                body_lines.append(raw_line)
+                # Check if this line is the terminator: exactly "END"
+                if raw_line == "END":
+                    found_end = True
+                    break
+            if not found_end:
+                raise LexerError(
+                    f"B: block opened at line {start_line} has no closing END",
+                    start_line,
+                    start_column,
+                )
+            body = "\n".join(body_lines)
+            # Reject a literal \end{verbatim} in the body: it would close the
+            # generator's verbatim env early and let arbitrary LaTeX follow.
+            # No in-band escape exists inside LaTeX verbatim; rejection is the
+            # only safe posture (djb 2026-05-22 review).
+            if "\\end{verbatim}" in body:
+                raise LexerError(
+                    f"B: block at line {start_line} contains a literal "
+                    f"'\\end{{verbatim}}' which would prematurely terminate "
+                    f"the rendered verbatim environment",
+                    start_line,
+                    start_column,
+                )
+            return Token(TokenType.B_BLOCK, body, start_line, start_column)
+
         # Auto-detect prose paragraphs BEFORE keyword checks
         # Also detect prose after part labels (any column)
         # Check for capitalized prose starters
@@ -1396,6 +1532,8 @@ class Lexer:
                         "otherwise",
                         "mod",
                         "defs",
+                        "group",
+                        "ungroup",
                     }
 
                     # If next word is NOT a Z keyword, treat as prose

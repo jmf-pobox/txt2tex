@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum, auto
 from typing import Literal
 
 
@@ -73,17 +74,48 @@ class StringLit(ASTNode):
 
 
 @dataclass(frozen=True)
+class SchemaBinding(ASTNode):
+    """Schema-text binding in a quantifier (Z RM §3.10).
+
+    Used when a quantifier binds a schema name rather than individual
+    variables with a domain.  The four forms are:
+
+    - decoration="Delta"  →  exists Delta S | P    (state-change)
+    - decoration="Xi"     →  exists Xi S | P       (read-only)
+    - decoration="None"   →  exists S | P          (schema-as-declaration)
+    - decoration="Prime"  →  exists S' | P         (primed schema)
+
+    The schema_name field carries the raw identifier value, including any
+    prime suffix already baked in by the lexer (e.g., ``"S'"`` for the
+    primed form).  The decoration field records the explicit keyword prefix,
+    if any.
+
+    fuzz expands the invariant; the engine emits the schema reference
+    literally (jms ruling 2026-05-21).
+    """
+
+    decoration: Literal["Delta", "Xi", "None", "Prime"]
+    schema_name: str  # Raw identifier (e.g., "S", "S'", "BoxOffice")
+
+
+@dataclass(frozen=True)
 class Quantifier(ASTNode):
     """Quantifier node (forall, exists, exists1, mu).
 
     Supports:
-        - Multiple variables with shared domain
+        - Multiple variables with shared domain (value_binding path)
+        - Schema-text quantification (schema_binding path, Z RM §3.10)
         - Mu-operator (definite description)
         - Mu with expression part (mu x : X | P . E)
         - Tuple patterns for destructuring
         - Bullet separator for all quantifiers
 
-    Examples:
+    Exactly one of ``value_binding`` and ``schema_binding`` is populated.
+    When ``schema_binding`` is not None the ``variables``, ``domain``, and
+    ``tuple_pattern`` fields are unused (empty/None) and the ``body`` carries
+    the predicate after ``|``.
+
+    Examples (value-binding path):
     - forall x : N | pred  -> variables=["x"], domain=N, body=pred
     - forall x : N | constraint . body -> body=constraint, expression=body
     - forall x, y : N | pred -> variables=["x", "y"], domain=N, body=pred
@@ -92,6 +124,13 @@ class Quantifier(ASTNode):
     - exists1 x : N | pred -> quantifier="exists1", variables=["x"]
     - mu x : N | pred -> quantifier="mu", body=pred, expression=None
     - mu x : N | pred . expr -> quantifier="mu", body=pred, expression=expr
+
+    Examples (schema-binding path):
+    - exists Delta S | P -> schema_binding=SchemaBinding("Delta", "S"), body=P
+    - exists Xi S | P    -> schema_binding=SchemaBinding("Xi", "S"), body=P
+    - exists S | P       -> schema_binding=SchemaBinding("None", "S"), body=P
+    - exists S' | P      -> schema_binding=SchemaBinding("Prime", "S'"), body=P
+    - forall Delta S | P -> schema_binding=SchemaBinding("Delta", "S"), body=P
 
     Note on expression field semantics:
     - For mu: expression is the term/value to select
@@ -108,6 +147,7 @@ class Quantifier(ASTNode):
     line_break_after_pipe: bool = False  # True if \ continuation after |
     line_break_after_bullet: bool = False  # True if line break after . separator
     tuple_pattern: Expr | None = None  # Tuple pattern for destructuring
+    schema_binding: SchemaBinding | None = None  # Schema-text binding (Z RM §3.10)
 
 
 @dataclass(frozen=True)
@@ -619,6 +659,37 @@ class SchemaText(ASTNode):
     predicates: list[Expr]  # Flat list; ';' separated in source
 
 
+# Aggregator support (Phase 4.2 — GROUP aggregate form)
+
+
+class Aggregator(Enum):
+    """Aggregation function names for the GROUP aggregate form."""
+
+    COUNT = auto()
+    SUM = auto()
+    AVG = auto()
+    MIN = auto()
+    MAX = auto()
+    MEDIAN = auto()
+
+    def label(self) -> str:
+        """Return the display label used in \\mathrm{...} output."""
+        return self.name.capitalize()
+
+
+@dataclass(frozen=True)
+class AggregatorClause(ASTNode):
+    """Single aggregator application inside a GROUP aggregate expression.
+
+    Represents ``Count(attr) as alias``.  The rendered form is
+    ``\\mathrm{Count}(attr)~\\mathrm{as}~alias``.
+    """
+
+    agg: Aggregator
+    attr: str  # Single attribute identifier (no nested expressions)
+    alias: str  # Name the aggregated column receives in the output relation
+
+
 # Relational algebra nodes (Phase 2.2)
 
 
@@ -744,6 +815,32 @@ class Ungroup(ASTNode):
 
 
 @dataclass(frozen=True)
+class GroupAggregate(ASTNode):
+    """Date's GROUP operator in aggregate form (Phase 4.2).
+
+    Represents ``R Group (Count(x) as total, Sum(y) as grand)``.
+
+    Computes one or more scalar aggregates per partition of R.  Each
+    aggregator clause names the aggregation function, the input attribute,
+    and the output alias.  Multiple clauses are comma-separated.
+
+    Examples:
+    - R Group (Count(x) as total)
+      -> relation=Identifier("R"), clauses=[AggregatorClause(COUNT, "x", "total")]
+    - R Group (Count(x) as t, Sum(y) as g)
+      -> relation=Identifier("R"), clauses=[AggregatorClause(COUNT, "x", "t"),
+                                            AggregatorClause(SUM, "y", "g")]
+
+    LaTeX rendering:
+      R \\mathrm{Group}(\\mathrm{Count}(x)~\\mathrm{as}~total)
+    """
+
+    relation: Expr
+    clauses: list[AggregatorClause]
+    line_break_after: bool = False
+
+
+@dataclass(frozen=True)
 class Binding(ASTNode):
     r"""Z binding expression (Z RM §3.7).
 
@@ -807,6 +904,7 @@ Expr = (
     | Divide
     | Group
     | Ungroup
+    | GroupAggregate
     | Binding
 )
 
@@ -1200,6 +1298,17 @@ class LatexBlock(ASTNode):
 
 
 @dataclass(frozen=True)
+class BMachine(ASTNode):
+    """B-machine verbatim block (B: ... END).
+
+    Body text is passed verbatim inside a LaTeX verbatim environment.
+    The body includes the terminating END line; indentation is preserved.
+    """
+
+    body: str  # Raw multi-line body including the final END line
+
+
+@dataclass(frozen=True)
 class PageBreak(ASTNode):
     """Page break in document.
 
@@ -1266,6 +1375,7 @@ DocumentItem = (
     | Paragraph
     | PureParagraph
     | LatexBlock
+    | BMachine
     | PageBreak
     | LineBreak
     | Contents

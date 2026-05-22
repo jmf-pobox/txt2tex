@@ -163,9 +163,14 @@ Edit your txt file and recompile until you're satisfied.
 TEXT: Prove that p land q implies p.
 
 PROOF:
+p [land elim 1]
   p land q [premise]
-  p [land elim left]
 ```
+
+The conclusion `p` is written first; its single premise `p land q` is
+indented below it. `land elim 1` is unary so no `::` markers are
+needed. For multi-premise rules, see
+**[Tutorial 4: Proof Trees](04_proof_trees.md)**.
 
 ### Pattern 2: Definition with Examples
 
@@ -223,12 +228,16 @@ F | F | F
 TEXT: Implication p => q means "if p then q".
 
 PROOF:
-  p land (p => q) [premise]
-  p [land elim left]
-  p => q [land elim right]
-  q [=> elim]
+q [=> elim]
+  :: p [land elim 1]
+    p land (p => q) [premise]
+  :: p => q [land elim 2]
+    p land (p => q) [premise]
 
-TEXT: This proof shows modus ponens: from p land p => q, we conclude q.
+TEXT: This proof shows modus ponens: from p land (p => q), we conclude q.
+The `=> elim` rule is binary, so its two premises each carry a `::`
+marker. Each premise is itself derived by `land elim` from the shared
+top assumption.
 ```
 
 Save this as `basics.txt` and compile:

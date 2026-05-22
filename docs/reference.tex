@@ -546,34 +546,38 @@ $\begin{array}{l@{\hspace{2em}}r}
 
 \textbf{How proof trees work:}
 
-{\scriptsize Proof trees are written \textbf{bottom-up}: the
-conclusion is the first line and premises are indented below it.
-Deeper indentation = deeper in the tree. Two premises at the same
-indent level are siblings that jointly support their parent.
-\texttt{::} marks sibling case-arms in a case analysis.}
+{\scriptsize The source is \textbf{conclusion-first} (rendered tree reads
+bottom-up). Premises are indented under their conclusion. A rule with
+two or more premises requires \texttt{::} on each premise --- without
+it, indented lines collapse into a \emph{linear chain} (each line
+becomes the sole premise of the line above) and the extra premises
+are silently dropped. Unary rules take a single indented child with
+no \texttt{::}.}
 
 \smallskip
 \textbf{Proof tree syntax (\kw{PROOF:}):}
 
 \begin{tabularx}{\columnwidth}{LR}
-\textrm{indent}      & Premises indented under conclusion \\
-{[rule]}              & Justification label \\
-{[rule {[n]}]}        & Discharge assumption $n$ \\
-{[n] expr}            & Boxed assumption labelled $n$ \\
-::                    & Sibling premises \\
+\textrm{indent}          & Premises indented under conclusion \\
+{[rule]}                  & Justification label \\
+{[rule from $n$]}         & Discharge assumption $n$ \\
+{[$n$] expr [assumption]} & Boxed assumption labelled $n$ \\
+expr [from $n$]           & Leaf reference to assumption $n$ \\
+::                        & Premise of a multi-premise rule \\
+case $X$:                 & Branch in a \kw{lor elim} case analysis \\
 \end{tabularx}
 
 {\footnotesize\textbf{Rules:} \texttt{land intro}, \texttt{land elim 1/2}, \texttt{lor intro 1/2}, \texttt{lor elim}, \texttt{=> intro/elim}, \texttt{<=> intro/elim}, \texttt{lnot intro/elim}, \texttt{forall intro/elim}, \texttt{exists intro/elim}.}
 
 \smallskip
-\textbf{Modus ponens:}
+\textbf{Modus ponens (binary --- requires \texttt{::} on each premise):}
 
 \begin{exwrite}%
 \begin{verbatim}
 PROOF:
-  q [=> elim]
-    p => q
-    p
+q [=> elim]
+  :: p => q
+  :: p
 \end{verbatim}
 \end{exwrite}
 \begin{exget}%
@@ -582,14 +586,14 @@ $\infer[\Rightarrow\textrm{-elim}]{q}{p \Rightarrow q & p}$
 \end{center}
 \end{exget}
 
-\textbf{$\land$-intro:}
+\textbf{$\land$-intro (binary):}
 
 \begin{exwrite}%
 \begin{verbatim}
 PROOF:
-  p land q [land intro]
-    p
-    q
+p land q [land intro]
+  :: p
+  :: q
 \end{verbatim}
 \end{exwrite}
 \begin{exget}%
@@ -598,13 +602,14 @@ $\infer[\land\textrm{-intro}]{p \land q}{p & q}$
 \end{center}
 \end{exget}
 
-\textbf{$\Rightarrow$-intro with discharge:}
+\textbf{$\Rightarrow$-intro with discharge (use \kw{from N}):}
 
 \begin{exwrite}%
 \begin{verbatim}
 PROOF:
-  p => p [=> intro [1]]
-    [1] p
+p => p [=> intro from 1]
+  [1] p [assumption]
+  :: p [from 1]
 \end{verbatim}
 \end{exwrite}
 \begin{exget}%
@@ -613,30 +618,32 @@ $\infer[\Rightarrow\textrm{-intro}^{[1]}]{p \Rightarrow p}{\ulcorner p \urcorner
 \end{center}
 \end{exget}
 
-{\scriptsize \texttt{[1]~p} = boxed assumption. \texttt{[=> intro~[1]]} discharges it.}
+{\scriptsize \kw{[1] p [assumption]} declares the discharge binder.
+\kw{p [from 1]} marks every leaf use. \kw{[=> intro from 1]} discharges it.}
 
-\textbf{$\lor$-elim / case analysis:}
+\textbf{$\lor$-elim / case analysis (ternary --- disjunction + two cases):}
 
 \begin{exwrite}%
 \begin{verbatim}
 PROOF:
-  r [lor elim]
-    p lor q
-    :: p => r
-      [1] p
-        r [from p]
-    :: q => r
-      [2] q
-        r [from q]
+(p lor q) => r [=> intro from 1]
+  [1] p lor q [assumption]
+  :: r [lor elim from 1]
+    :: p lor q [from 1]
+    case p:
+      :: r [...derive r from p...]
+    case q:
+      :: r [...derive r from q...]
 \end{verbatim}
 \end{exwrite}
 \begin{exget}%
 \begin{center}
-$\infer[\lor\textrm{-elim}]{r}{p \lor q & \infer{r}{\ulcorner p \urcorner^{[1]}} & \infer{r}{\ulcorner q \urcorner^{[2]}}}$
+$\infer[\lor\textrm{-elim}]{r}{p \lor q & \infer{r}{\ulcorner p \urcorner^{[1]}} & \infer{r}{\ulcorner q \urcorner^{[1]}}}$
 \end{center}
 \end{exget}
 
-{\scriptsize \texttt{::} = sibling premises (case arms).}
+{\scriptsize \kw{lor elim from N} discharges the disjunction's assumption [N];
+inside each \kw{case X:} block, the case formula is referenced as \kw{X [from N]}.}
 
 \textbf{Equality chain (\kw{EQUAL:}):}
 

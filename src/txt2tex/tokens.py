@@ -76,6 +76,7 @@ class TokenType(Enum):
     LBAG = auto()  # [[ (bag literal left)
     RBAG = auto()  # ]] (bag literal right)
     BAG_UNION = auto()  # ⊎ (bag union)
+    BAG_DIFF = auto()  # bag_diff keyword (bag difference, Z RM §4.6.2)
     OVERRIDE = auto()  # ++ (function/sequence override) - Phase 13
 
     # Function type operators (Phase 11, enhanced Phase 18)
@@ -143,6 +144,7 @@ class TokenType(Enum):
     LINEBREAK = auto()  # LINEBREAK: (insert \medskip vertical space)
     CONTENTS = auto()  # CONTENTS: (table of contents)
     PARTS = auto()  # PARTS: (parts formatting style)
+    B_BLOCK = auto()  # B: (B-machine verbatim block, terminated by column-0 END)
     BIBLIOGRAPHY = auto()  # BIBLIOGRAPHY: (bibliography file)
     BIBLIOGRAPHY_STYLE = auto()  # BIBLIOGRAPHY_STYLE: (bibliography style)
     # Title metadata
@@ -171,6 +173,15 @@ class TokenType(Enum):
     # Nested-relation operators (Phase 4.1 — Date's GROUP / UNGROUP)
     GROUP = auto()  # group (bundle attributes into nested relation)
     UNGROUP = auto()  # ungroup (flatten nested relation)
+
+    # Aggregator keywords (Phase 4.2 — GROUP aggregate form)
+    COUNT = auto()  # Count (aggregate count of values)
+    SUM = auto()  # Sum (aggregate sum of values)
+    AVG = auto()  # Avg (aggregate average of values)
+    MIN = auto()  # Min (aggregate minimum value)
+    MAX = auto()  # Max (aggregate maximum value)
+    MEDIAN = auto()  # Median (aggregate median value)
+    AS = auto()  # as (alias keyword in aggregator clauses)
 
     # Schema-calculus operators (Phase 3.2 — Z RM §3.11)
     PIPE_PIPE = auto()  # >> (schema piping)

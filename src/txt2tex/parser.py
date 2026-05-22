@@ -8,6 +8,8 @@ from typing import ClassVar, Literal
 
 from txt2tex.ast_nodes import (
     Abbreviation,
+    Aggregator,
+    AggregatorClause,
     ArgueChain,
     ArgueStep,
     AxDef,
@@ -15,6 +17,7 @@ from txt2tex.ast_nodes import (
     BibliographyMetadata,
     BinaryOp,
     Binding,
+    BMachine,
     CaseAnalysis,
     Conditional,
     Contents,
@@ -31,6 +34,7 @@ from txt2tex.ast_nodes import (
     GenericInstantiation,
     GivenType,
     Group,
+    GroupAggregate,
     GuardedBranch,
     GuardedCases,
     HorizDef,
@@ -55,6 +59,7 @@ from txt2tex.ast_nodes import (
     Rename,
     Restrict,
     Schema,
+    SchemaBinding,
     SchemaCompose,
     SchemaHide,
     SchemaInclusion,
@@ -468,6 +473,7 @@ class Parser:
             TokenType.TEXT,
             TokenType.PURETEXT,
             TokenType.LATEX,
+            TokenType.B_BLOCK,
             TokenType.PAGEBREAK,
             TokenType.LINEBREAK,
             TokenType.CONTENTS,
@@ -499,23 +505,101 @@ class Parser:
         # The token value contains the raw text (already captured by lexer)
         text = text_token.value
 
-        # Check if text starts with part label pattern: (letter) or (roman numeral)
-        part_match = re.match(r"^\(([a-z]+|[ivxlcdm]+)\)\s+(.+)", text, re.IGNORECASE)
+        # Check if text starts with a structural part label at paragraph start.
+        # Only short, recognised label forms are promoted to Part nodes:
+        # single letter (a)-(z), single digit (1)-(9), or a short Roman numeral.
+        # Longer words like (underlined) or (continued) stay as prose text.
+        roman_numerals: frozenset[str] = frozenset(
+            {"i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"}
+        )
+        part_match = re.match(r"^\(([a-z0-9]+)\)\s+(.+)", text, re.IGNORECASE)
         if part_match:
-            label = part_match.group(1)
-            content = part_match.group(2)
-            # Return a Part containing a Paragraph
-            paragraph = Paragraph(
-                text=content, line=text_token.line, column=text_token.column
-            )
-            return Part(
-                label=label,
-                items=[paragraph],
-                line=text_token.line,
-                column=text_token.column,
-            )
+            label = part_match.group(1).lower()
+            is_single_letter = len(label) == 1 and label.isalpha()
+            is_single_digit = len(label) == 1 and label.isdigit()
+            is_roman = label in roman_numerals
+            if is_single_letter or is_single_digit or is_roman:
+                content = part_match.group(2)
+                paragraph = Paragraph(
+                    text=content, line=text_token.line, column=text_token.column
+                )
+                return Part(
+                    label=label,
+                    items=[paragraph],
+                    line=text_token.line,
+                    column=text_token.column,
+                )
 
         return Paragraph(text=text, line=text_token.line, column=text_token.column)
+
+    def _parse_paragraph_coalesced(self) -> Paragraph | Part:
+        """Parse one or more adjacent TEXT: directives as a single paragraph.
+
+        Adjacent TEXT: lines (separated only by a single newline, no blank
+        line between them) are joined into one paragraph separated by a
+        single space.  A blank line (two successive NEWLINEs, or any
+        non-TEXT structural token) breaks the paragraph.
+
+        Delegates to _parse_paragraph for the first token so the
+        part-label promotion rule still applies when the leading TEXT:
+        line starts with a recognised structural label like ``(a)``.
+        """
+        # Parse the first TEXT token (may return a Part for labelled content).
+        result = self._parse_paragraph()
+
+        # If the first token produced a Part, do not attempt coalescing —
+        # the content already belongs to the Part's item list.
+        if isinstance(result, Part):
+            return result
+
+        # Coalesce following TEXT tokens that are adjacent (no blank line).
+        # A blank line is signalled by two consecutive NEWLINEs or by any
+        # token that is not NEWLINE + TEXT.
+        accumulated: list[str] = [result.text]
+        while True:
+            # Peek: is the next token a NEWLINE followed directly by TEXT?
+            if not self._match(TokenType.NEWLINE):
+                break
+            # Save position in case we need to back off.
+            saved_pos = self.pos
+            self._advance()  # consume the NEWLINE
+            if not self._match(TokenType.TEXT):
+                # Not followed by TEXT — restore to before the NEWLINE.
+                self.pos = saved_pos
+                break
+            # Check it is not a blank line (another NEWLINE would appear before TEXT).
+            # Since we consumed exactly one NEWLINE and the next token is TEXT,
+            # this is a single-newline separation — coalesce it.
+            text_token = self._advance()  # consume TEXT token
+            text = text_token.value
+            # Apply the same part-label guard: if this line starts with a
+            # structural label, stop coalescing (it forms a new Part).
+            roman_numerals: frozenset[str] = frozenset(
+                {"i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"}
+            )
+            pm = re.match(r"^\(([a-z0-9]+)\)\s+(.+)", text, re.IGNORECASE)
+            if pm:
+                lbl = pm.group(1).lower()
+                if (
+                    (len(lbl) == 1 and lbl.isalpha())
+                    or (len(lbl) == 1 and lbl.isdigit())
+                    or lbl in roman_numerals
+                ):
+                    # Back off: put pos back before the TEXT token and stop.
+                    self.pos = saved_pos
+                    break
+            accumulated.append(text)
+
+        if len(accumulated) == 1:
+            # No coalescing happened; return the already-parsed result.
+            return result
+
+        merged_text = " ".join(accumulated)
+        return Paragraph(
+            text=merged_text,
+            line=result.line,
+            column=result.column,
+        )
 
     def _parse_pure_paragraph(self) -> PureParagraph:
         """Parse pure text paragraph from PURETEXT token.
@@ -548,6 +632,68 @@ class Parser:
         latex = latex_token.value
 
         return LatexBlock(latex=latex, line=latex_token.line, column=latex_token.column)
+
+    def _parse_identifier_document_item(self) -> DocumentItem:
+        """Parse document item starting with an IDENTIFIER token.
+
+        Dispatches to free type, horizontal schema definition, or abbreviation
+        based on the tokens that follow the identifier.
+        Note: Partial support for compound identifiers like "R+ ==" (GitHub #3).
+        """
+        next_token = self._peek_ahead(1)
+        if next_token.type == TokenType.FREE_TYPE:
+            return self._parse_free_type()
+        if next_token.type == TokenType.DEFS:
+            return self._parse_horiz_def()
+        has_generics = next_token.type == TokenType.LBRACKET
+        if has_generics and self._scan_for_defs_after_brackets(offset=1):
+            return self._parse_horiz_def()
+        is_abbrev = next_token.type == TokenType.ABBREV
+        if not is_abbrev and next_token.type in (
+            TokenType.PLUS,
+            TokenType.STAR,
+            TokenType.TILDE,
+        ):
+            token_after_postfix = self._peek_ahead(2)
+            is_abbrev = token_after_postfix.type == TokenType.ABBREV
+        if is_abbrev:
+            return self._parse_abbreviation()
+        return self._parse_expr()
+
+    def _parse_bracket_document_item(self) -> DocumentItem:
+        """Parse document item starting with a left-bracket token.
+
+        Distinguishes bag literals ([[...]]) from abbreviations with generic
+        parameters ([X, Y] Name == expression).
+        """
+        next_token = self._peek_ahead(1)
+        if next_token.type == TokenType.LBRACKET:
+            return self._parse_expr()
+        return self._parse_abbreviation()
+
+    def _parse_parts_directive(self) -> PartsFormat:
+        """Parse PARTS directive from PARTS token.
+
+        PARTS directives parsed at document start are the authoritative source;
+        one appearing later in content is parsed but has no effect.
+        """
+        parts_token = self._advance()
+        return PartsFormat(
+            style=parts_token.value.strip().lower(),
+            line=parts_token.line,
+            column=parts_token.column,
+        )
+
+    def _parse_b_block(self) -> BMachine:
+        """Parse B-machine verbatim block from B_BLOCK token.
+
+        The token value is the raw multi-line body (including the final END
+        line) already captured by the lexer.  No Z-parser involvement.
+        """
+        b_token = self._advance()  # Consume B_BLOCK token
+        if b_token.type != TokenType.B_BLOCK:
+            raise ParserError("Expected B_BLOCK token for B-machine block", b_token)
+        return BMachine(body=b_token.value, line=b_token.line, column=b_token.column)
 
     def _parse_pagebreak(self) -> PageBreak:
         """Parse page break from PAGEBREAK token.
@@ -680,11 +826,13 @@ class Parser:
         if self._match(TokenType.PROOF):
             return self._parse_proof_tree()
         if self._match(TokenType.TEXT):
-            return self._parse_paragraph()
+            return self._parse_paragraph_coalesced()
         if self._match(TokenType.PURETEXT):
             return self._parse_pure_paragraph()
         if self._match(TokenType.LATEX):
             return self._parse_latex_block()
+        if self._match(TokenType.B_BLOCK):
+            return self._parse_b_block()
         if self._match(TokenType.PAGEBREAK):
             return self._parse_pagebreak()
         if self._match(TokenType.LINEBREAK):
@@ -692,55 +840,17 @@ class Parser:
         if self._match(TokenType.CONTENTS):
             return self._parse_contents()
         if self._match(TokenType.PARTS):
-            # PARTS directive parsed at document start, but can appear in content
-            # Parse it but it will be ignored (document-level setting already applied)
-            parts_token = self._advance()
-            return PartsFormat(
-                style=parts_token.value.strip().lower(),
-                line=parts_token.line,
-                column=parts_token.column,
-            )
+            return self._parse_parts_directive()
 
         # Check for abbreviation (identifier == expr) or free type (identifier ::= ...)
         # or horizontal schema definition (identifier [generics]? defs ...)
-        # Note: Partial support for compound identifiers like "R+ =="
-        # (GitHub #3 still open)
         if self._match(TokenType.IDENTIFIER):
-            # Look ahead to determine type
-            next_token = self._peek_ahead(1)
-            if next_token.type == TokenType.FREE_TYPE:
-                return self._parse_free_type()
-            # Detect horizontal schema definition: Name defs ... or Name[X] defs ...
-            if next_token.type == TokenType.DEFS:
-                return self._parse_horiz_def()
-            has_generics = next_token.type == TokenType.LBRACKET
-            if has_generics and self._scan_for_defs_after_brackets(offset=1):
-                return self._parse_horiz_def()
-            # Check for abbreviation with or without postfix operator
-            # Cases: "R ==", "R+ ==", "R* ==", "R~ ==" (partial support, GitHub #3 open)
-            is_abbrev = next_token.type == TokenType.ABBREV
-            if not is_abbrev and next_token.type in (
-                TokenType.PLUS,
-                TokenType.STAR,
-                TokenType.TILDE,
-            ):
-                # Check if postfix operator is followed by ==
-                token_after_postfix = self._peek_ahead(2)
-                is_abbrev = token_after_postfix.type == TokenType.ABBREV
-            if is_abbrev:
-                return self._parse_abbreviation()
-            # Otherwise fall through to expression parsing
+            return self._parse_identifier_document_item()
 
         # Check for abbreviation with generic parameters [X, Y] Name == expression
         # Note: Bag literals [[x]] start with [[ which is distinct
         if self._match(TokenType.LBRACKET):
-            # Check if this is a bag literal [[...]] or abbreviation [X, Y] Name ==
-            next_token = self._peek_ahead(1)
-            if next_token.type == TokenType.LBRACKET:
-                # It's a bag literal - parse as expression
-                return self._parse_expr()
-            # It's an abbreviation with generic parameters
-            return self._parse_abbreviation()
+            return self._parse_bracket_document_item()
 
         # Default: parse as expression
         return self._parse_expr()
@@ -1349,27 +1459,37 @@ class Parser:
         """Parse section: === Title ==="""
         start_token = self._advance()  # Consume first '==='
 
-        # Collect title text (all identifiers until closing ===)
-        title_parts: list[str] = []
-        while not self._match(TokenType.SECTION_MARKER) and not self._at_end():
-            if self._match(TokenType.NEWLINE):
-                break  # Section title on one line
-            title_parts.append(self._current().value)
-            self._advance()
+        # The lexer emits a TEXT token carrying the raw title text between the
+        # two === markers (verbatim, stripped of surrounding whitespace).  Fall
+        # back to collecting individual tokens for malformed inputs.
+        if self._match(TokenType.TEXT):
+            title = self._advance().value
+            # Consume the closing ===
+            if self._match(TokenType.SECTION_MARKER):
+                self._advance()
+        else:
+            # Fallback: collect individual tokens until closing ===.
+            title_parts: list[str] = []
+            while not self._match(TokenType.SECTION_MARKER) and not self._at_end():
+                if self._match(TokenType.NEWLINE):
+                    break  # Section title on one line
+                title_parts.append(self._current().value)
+                self._advance()
 
-        if not self._match(TokenType.SECTION_MARKER):
-            raise ParserError("Expected closing '===' for section", self._current())
+            if not self._match(TokenType.SECTION_MARKER):
+                raise ParserError("Expected closing '===' for section", self._current())
 
-        self._advance()  # Consume closing '==='
-        # Reconstruct title, joining contraction/possessive suffixes directly
-        # (no space before tokens that start with apostrophe, e.g. "'s", "'t").
-        title_words: list[str] = []
-        for part in title_parts:
-            if part.startswith("'") and title_words:
-                title_words[-1] += part
-            else:
-                title_words.append(part)
-        title = " ".join(title_words)
+            self._advance()  # Consume closing '==='
+            # Reconstruct title, joining contraction/possessive suffixes directly
+            # (no space before tokens that start with apostrophe, e.g. "'s", "'t").
+            title_words: list[str] = []
+            for part in title_parts:
+                if part.startswith("'") and title_words:
+                    title_words[-1] += part
+                else:
+                    title_words.append(part)
+            title = " ".join(title_words)
+
         self._skip_newlines()
 
         # Parse section content until next section or end
@@ -2049,9 +2169,10 @@ class Parser:
             TokenType.CAT,
             TokenType.FILTER,
             TokenType.BAG_UNION,
+            TokenType.BAG_DIFF,
         ):
             # Lookahead for +: only treat as infix if followed by operand
-            # CAT, FILTER, BAG_UNION, and MINUS are always infix
+            # CAT, FILTER, BAG_UNION, BAG_DIFF, and MINUS are always infix
             if self._match(TokenType.PLUS) and not self._is_operand_start():
                 break
             op_token = self._advance()
@@ -2204,6 +2325,7 @@ class Parser:
             TokenType.CAT,  # ⌢ concatenation
             TokenType.FILTER,  # ↾ sequence filter
             TokenType.BAG_UNION,  # ⊎ bag union
+            TokenType.BAG_DIFF,  # bag_diff bag difference
             TokenType.RANGE,  # ..
             TokenType.EQUALS,
             TokenType.NOT_EQUAL,
@@ -2278,6 +2400,18 @@ class Parser:
             - Tuple patterns for destructuring: forall (x, y) : T | pred
             - Semicolon-separated bindings (nested): forall x : T; y : U | pred
             - Mu-operator with expression: mu x : N | pred . expr
+            - Schema-text quantification (Z RM §3.10):
+                exists Delta S | P
+                exists Xi S | P
+                exists S | P
+                exists S' | P
+                forall Delta S | P
+
+        Disambiguation rule (Z RM §3.10):
+            If `:` follows the identifier  → value-binding (existing path).
+            If `Delta`/`Xi` precedes the identifier, or
+            if the identifier is followed directly by `|` or NEWLINE→`|`
+                → schema-binding (new path).
 
         Examples:
             forall x : N | pred
@@ -2285,8 +2419,70 @@ class Parser:
             forall (x, y) : T | pred
             exists1 x : N | pred
             mu x : N | pred . expr
+            exists Delta S | P
+            exists Xi S | P
+            exists S | P
+            exists S' | P
         """
         quant_token = self._advance()  # Consume 'forall', 'exists', 'exists1', or 'mu'
+
+        # --- Schema-text quantification (Z RM §3.10) ---
+        #
+        # Check for Delta/Xi decoration before identifier.
+        if self._match(TokenType.DELTA, TokenType.XI):
+            decoration: Literal["Delta", "Xi", "None", "Prime"] = (
+                "Delta" if self._match(TokenType.DELTA) else "Xi"
+            )
+            self._advance()  # Consume Delta or Xi
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError(
+                    f"Expected schema name after {decoration}",
+                    self._current(),
+                )
+            schema_token = self._advance()
+            schema_binding = SchemaBinding(
+                decoration=decoration,
+                schema_name=schema_token.value,
+                line=schema_token.line,
+                column=schema_token.column,
+            )
+            return self._parse_schema_quantifier_body(quant_token, schema_binding)
+
+        # Check for bare IDENTIFIER followed by | (schema-as-declaration or primed).
+        #
+        # Disambiguation (Z naming convention, Z RM §3.2):
+        #   - Schema names begin with an uppercase letter.
+        #   - Variable names begin with a lowercase letter.
+        #   - Presence of `:` after the identifier → value binding regardless.
+        #   - Uppercase initial + no `:` or `,` follows → schema binding.
+        #
+        # Examples:
+        #   exists S | P        → schema binding  (S is uppercase)
+        #   exists S' | P       → schema binding  (S' is uppercase-initial)
+        #   exists x | P        → value binding   (x is lowercase, no domain)
+        #   exists x : T | P    → value binding   (: follows)
+        if self._match(TokenType.IDENTIFIER):
+            ident_token = self._peek_ahead(0)  # peek at current without consuming
+            next_tok = self._peek_ahead(1)
+            schema_name = ident_token.value
+            # Strip trailing prime for the uppercase check
+            base_name = schema_name.rstrip("'")
+            is_schema_name = bool(base_name) and base_name[0].isupper()
+            not_decl = next_tok.type not in (TokenType.COLON, TokenType.COMMA)
+            if is_schema_name and not_decl:
+                # Schema binding: bare S | P or S' | P
+                self._advance()  # consume the identifier
+                deco: Literal["Delta", "Xi", "None", "Prime"] = (
+                    "Prime" if schema_name.endswith("'") else "None"
+                )
+                schema_binding = SchemaBinding(
+                    decoration=deco,
+                    schema_name=schema_name,
+                    line=ident_token.line,
+                    column=ident_token.column,
+                )
+                return self._parse_schema_quantifier_body(quant_token, schema_binding)
+            # Fall through to value-binding path (: follows, or lowercase name)
 
         # Parse variable pattern: simple identifiers or tuple pattern like (x, y)
         tuple_pattern: Expr | None = None
@@ -2477,6 +2673,61 @@ class Parser:
             line_break_after_pipe=has_continuation,
             line_break_after_bullet=bullet_continuation,
             tuple_pattern=tuple_pattern,
+            line=quant_token.line,
+            column=quant_token.column,
+        )
+
+    def _parse_schema_quantifier_body(
+        self,
+        quant_token: Token,
+        schema_binding: SchemaBinding,
+    ) -> Quantifier:
+        """Parse the ``| body`` tail of a schema-text quantifier (Z RM §3.10).
+
+        Called after the schema binding (Delta S / Xi S / S / S') has been
+        consumed.  Expects ``|`` followed by the predicate body.
+
+        The body is the predicate after the spot character; fuzz expands the
+        schema invariant, so the engine emits the binding literally.
+        """
+        # Expect | separator
+        if not self._match(TokenType.PIPE):
+            raise ParserError(
+                "Expected '|' after schema binding in quantifier",
+                self._current(),
+            )
+        self._advance()  # Consume |
+
+        # Detect line continuation after |
+        has_continuation = False
+        if self._match(TokenType.CONTINUATION):
+            self._advance()
+            has_continuation = True
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+            self._skip_newlines()
+        elif self._match(TokenType.NEWLINE):
+            has_continuation = True
+            self._skip_newlines()
+        else:
+            self._skip_newlines()
+
+        self._in_comprehension_body = True
+        try:
+            body = self._parse_expr()
+        finally:
+            self._in_comprehension_body = False
+
+        return Quantifier(
+            quantifier=quant_token.value,
+            variables=[],
+            domain=None,
+            body=body,
+            expression=None,
+            line_break_after_pipe=has_continuation,
+            line_break_after_bullet=False,
+            tuple_pattern=None,
+            schema_binding=schema_binding,
             line=quant_token.line,
             column=quant_token.column,
         )
@@ -3446,15 +3697,24 @@ class Parser:
                 else:
                     self._skip_newlines()
                 if has_continuation:
-                    # Replace the frozen Group node with line_break_after=True
-                    left = Group(
-                        relation=group_node.relation,
-                        attrs=group_node.attrs,
-                        alias=group_node.alias,
-                        line_break_after=True,
-                        line=group_node.line,
-                        column=group_node.column,
-                    )
+                    # Replace the frozen node with line_break_after=True
+                    if isinstance(group_node, GroupAggregate):
+                        left = GroupAggregate(
+                            relation=group_node.relation,
+                            clauses=group_node.clauses,
+                            line_break_after=True,
+                            line=group_node.line,
+                            column=group_node.column,
+                        )
+                    else:
+                        left = Group(
+                            relation=group_node.relation,
+                            attrs=group_node.attrs,
+                            alias=group_node.alias,
+                            line_break_after=True,
+                            line=group_node.line,
+                            column=group_node.column,
+                        )
                 else:
                     left = group_node
             elif op_token.type == TokenType.UNGROUP:
@@ -3547,19 +3807,60 @@ class Parser:
             TokenType.UNGROUP,
         )
 
-    def _parse_group_rhs(self, relation: Expr, group_tok: Token) -> Group:
-        """Parse the RHS of a GROUP expression: ({A, B, ...} as alias).
+    # Token types that start an aggregator clause.
+    _AGGREGATOR_TOKEN_TYPES: ClassVar[frozenset[TokenType]] = frozenset(
+        {
+            TokenType.COUNT,
+            TokenType.SUM,
+            TokenType.AVG,
+            TokenType.MIN,
+            TokenType.MAX,
+            TokenType.MEDIAN,
+        }
+    )
 
-        Called after the 'group' keyword has been consumed.  Expects:
-            ( { attr-list } as alias )
+    # Mapping from aggregator token type to Aggregator enum value.
+    _TOKEN_TO_AGGREGATOR: ClassVar[dict[TokenType, Aggregator]] = {
+        TokenType.COUNT: Aggregator.COUNT,
+        TokenType.SUM: Aggregator.SUM,
+        TokenType.AVG: Aggregator.AVG,
+        TokenType.MIN: Aggregator.MIN,
+        TokenType.MAX: Aggregator.MAX,
+        TokenType.MEDIAN: Aggregator.MEDIAN,
+    }
+
+    def _parse_group_rhs(
+        self, relation: Expr, group_tok: Token
+    ) -> Group | GroupAggregate:
+        """Parse the RHS of a GROUP expression.
+
+        Dispatches on the first token after '(':
+        - LBRACE → regroup form: ({A, B, ...} as alias)
+        - aggregator keyword → aggregate form: (Count(x) as t, Sum(y) as g)
+
+        Mixing the two forms in one GROUP RHS is rejected with a clear message.
         """
         if not self._match(TokenType.LPAREN):
             raise ParserError("Expected '(' after 'group'", self._current())
         self._advance()  # consume '('
-        if not self._match(TokenType.LBRACE):
-            raise ParserError(
-                "Expected '{' for attribute list in 'group'", self._current()
-            )
+
+        if self._match(TokenType.LBRACE):
+            return self._parse_group_regroup_rhs(relation, group_tok)
+        if self._current().type in self._AGGREGATOR_TOKEN_TYPES:
+            return self._parse_group_aggregate_rhs(relation, group_tok)
+        cur = self._current()
+        raise ParserError(
+            f"Expected '{{' (regroup form) or an aggregator keyword "
+            f"(Count, Sum, Avg, Min, Max, Median) after '(' in 'group', "
+            f"got {cur.type.name} ({cur.value!r})",
+            cur,
+        )
+
+    def _parse_group_regroup_rhs(self, relation: Expr, group_tok: Token) -> Group:
+        """Parse the regroup form: {A, B, ...} as alias ).
+
+        The opening '(' has already been consumed by _parse_group_rhs.
+        """
         self._advance()  # consume '{'
         attrs: list[str] = []
         if not self._is_attr_name_token():
@@ -3581,8 +3882,7 @@ class Parser:
                 "Expected '}' after attribute list in 'group'", self._current()
             )
         self._advance()  # consume '}'
-        # 'as' is not a reserved keyword; it tokenizes as IDENTIFIER
-        if not (self._match(TokenType.IDENTIFIER) and self._current().value == "as"):
+        if not self._match(TokenType.AS):
             cur = self._current()
             raise ParserError(
                 f"Expected 'as' after attribute list in 'group', "
@@ -3606,6 +3906,89 @@ class Parser:
             alias=alias,
             line=group_tok.line,
             column=group_tok.column,
+        )
+
+    def _parse_group_aggregate_rhs(
+        self, relation: Expr, group_tok: Token
+    ) -> GroupAggregate:
+        """Parse the aggregate form: Count(x) as t, Sum(y) as g ).
+
+        The opening '(' has already been consumed by _parse_group_rhs.
+        Parses one or more comma-separated AggregatorClause entries,
+        then expects ')' to close the GROUP RHS.
+        """
+        clauses: list[AggregatorClause] = []
+        clauses.append(self._parse_aggregator_clause())
+        while self._match(TokenType.COMMA):
+            self._advance()  # consume ','
+            # Guard: if the next token is a '{', reject the mix
+            if self._match(TokenType.LBRACE):
+                raise ParserError(
+                    "cannot mix regroup and aggregator forms in the same 'group' RHS",
+                    self._current(),
+                )
+            clauses.append(self._parse_aggregator_clause())
+        if not self._match(TokenType.RPAREN):
+            raise ParserError(
+                "Expected ')' to close 'group' expression", self._current()
+            )
+        self._advance()  # consume ')'
+        return GroupAggregate(
+            relation=relation,
+            clauses=clauses,
+            line=group_tok.line,
+            column=group_tok.column,
+        )
+
+    def _parse_aggregator_clause(self) -> AggregatorClause:
+        """Parse a single ``Count(attr) as alias`` clause."""
+        agg_tok = self._current()
+        if agg_tok.type not in self._AGGREGATOR_TOKEN_TYPES:
+            raise ParserError(
+                f"Expected aggregator keyword (Count, Sum, Avg, Min, Max, Median), "
+                f"got {agg_tok.type.name} ({agg_tok.value!r})",
+                agg_tok,
+            )
+        agg = self._TOKEN_TO_AGGREGATOR[agg_tok.type]
+        self._advance()  # consume aggregator keyword
+        if not self._match(TokenType.LPAREN):
+            raise ParserError(
+                f"Expected '(' after '{agg_tok.value}' in aggregator clause",
+                self._current(),
+            )
+        self._advance()  # consume '('
+        if not self._is_attr_name_token():
+            raise ParserError(
+                f"Expected attribute name inside '{agg_tok.value}(...)'",
+                self._current(),
+            )
+        attr = self._advance().value
+        if not self._match(TokenType.RPAREN):
+            raise ParserError(
+                f"Expected ')' after attribute in '{agg_tok.value}({attr})'",
+                self._current(),
+            )
+        self._advance()  # consume ')'
+        if not self._match(TokenType.AS):
+            cur = self._current()
+            raise ParserError(
+                f"Expected 'as' after '{agg_tok.value}({attr})', "
+                f"got {cur.type.name} ({cur.value!r})",
+                cur,
+            )
+        self._advance()  # consume 'as'
+        if not self._is_attr_name_token():
+            raise ParserError(
+                f"Expected alias name after 'as' in '{agg_tok.value}({attr}) as ...'",
+                self._current(),
+            )
+        alias = self._advance().value
+        return AggregatorClause(
+            agg=agg,
+            attr=attr,
+            alias=alias,
+            line=agg_tok.line,
+            column=agg_tok.column,
         )
 
     def _parse_ungroup_rhs(self, relation: Expr, ungroup_tok: Token) -> Ungroup:
@@ -4156,8 +4539,7 @@ class Parser:
                 "Expected attribute name in rho rename pair", self._current()
             )
         src = self._advance().value
-        # 'as' is not a keyword; it tokenizes as IDENTIFIER with value "as"
-        if not (self._match(TokenType.IDENTIFIER) and self._current().value == "as"):
+        if not self._match(TokenType.AS):
             raise ParserError(
                 f"Expected 'as' after {src!r} in rho rename pair, "
                 f"got {self._current().value!r}",

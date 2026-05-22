@@ -12,6 +12,7 @@ from txt2tex.ast_nodes import (
     FunctionType,
     GenericInstantiation,
     Group,
+    GroupAggregate,
     GuardedBranch,
     GuardedCases,
     Identifier,
@@ -195,7 +196,7 @@ def expr_free_vars(expr: Expr) -> frozenset[str]:
         return expr_free_vars(expr.expr)
     if isinstance(expr, Restrict):
         return expr_free_vars(expr.predicate) | expr_free_vars(expr.relation)
-    if isinstance(expr, (Project, Rename, Group, Ungroup)):
+    if isinstance(expr, (Project, Rename, Group, Ungroup, GroupAggregate)):
         return expr_free_vars(expr.relation)
     if isinstance(expr, NaturalJoin):
         sub_free = (

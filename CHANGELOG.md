@@ -47,9 +47,86 @@ version to pick up the new output.
   `Name defs Schema-Exp`, schema-calculus operators in `defs` RHS
   (`;`, `>>`, `hide`, `project`), GROUP/UNGROUP, multi-typed
   comprehensions with conjunction predicates over tuple projections,
-  algebra WYSIWYG line breaks, dependent-domain detection.
+  algebra WYSIWYG line breaks, dependent-domain detection,
+  `B:` block (B-machine verbatim passthrough), GROUP aggregate form
+  (`Count`, `Sum`, `Avg`, `Min`, `Max`, `Median` inside `group` RHS).
 
 ### Fixed
+
+- **DAT #15 — Section heading text padded with inter-character whitespace.**
+  `=== Foreign-key constraints ===` previously emitted `Foreign - key constraints`
+  because `-` was lexed as a MINUS token and re-joined with spaces. The lexer now
+  captures the raw heading text verbatim between the two `===` markers; a new
+  `_escape_latex_text` helper in `latex_gen.py` escapes only LaTeX-unsafe characters
+  (`& % $ # _ { } \ ~ ^`) without adding any whitespace around punctuation.
+
+  Before:
+
+  ```text
+  === Foreign-key constraints ===
+  ```
+
+  rendered as `Foreign - key constraints`. After: renders as
+  `Foreign-key constraints`.
+
+- **DAT #16 — Consecutive `TEXT:` directives emit as separate paragraphs.**
+  Two or more adjacent `TEXT:` lines (no blank line between them) now coalesce
+  into a single `\noindent` paragraph. A blank line between `TEXT:` directives
+  still starts a new paragraph.
+
+  Before:
+
+  ```text
+  TEXT: First sentence.
+  TEXT: Second sentence.
+  TEXT: Third sentence.
+  ```
+
+  emitted three `\noindent ... \par \bigskip` paragraphs. After: emits one
+  paragraph `First sentence. Second sentence. Third sentence.`
+
+- **DAT #18 / DAT #1 — Part-label parser too aggressive.**
+  The parser promoted any `(word)` at the start of a TEXT token to a `Part` AST
+  node, including `(underlined)`, `(continued)`, and other parenthetical prose.
+  The rule is now restricted to short structural labels only: single letter
+  `(a)-(z)`, single digit `(1)-(9)`, or a short Roman numeral `(i)-(x)`.
+  Arbitrary parenthesised words are treated as prose.
+
+- **Engine bug #136 / DAT #11 — Bare English keywords silently rewritten to math
+  glyphs in TEXT prose.**  Words like `exists`, `forall`, `exists1`, `emptyset`,
+  `group`, `union` in TEXT blocks were automatically converted to `$\exists$`,
+  `$\forall$`, etc., rewriting natural English sentences. Math substitution in
+  TEXT prose is now opt-in: use `$\exists$`, `$\forall$`, etc. explicitly when
+  you want the math glyph. Bare English words pass through unchanged.
+
+- **Bug #132 — `lnot` of non-atomic predicate rejected by fuzz** (jms ruling
+  2026-05-22). Previously, `lnot (exists1 s | P)` produced fuzz-rejected
+  LaTeX (`\lnot \exists_1 s @ P` → fuzz error
+  `Opening parenthesis expected at symbol \exists_1`). It now produces
+  fuzz-clean output automatically: `\lnot (\exists_1 s @ P)`. **No change
+  to your `.txt` input is needed** — write `lnot (...)` as you would on a
+  whiteboard and txt2tex inserts the parens fuzz requires. Z RM §3.8.1
+  permits the bare form, but fuzz's parser is stricter: the operand of
+  `\lnot` must be an atomic predicate (identifier, constant, relation
+  application, or already-parenthesised form). The generator now wraps
+  quantifiers, binary connectives, lambdas, and all other non-atomic
+  operands. Atomic operands (`lnot true`, `lnot p`) are emitted bare.
+  New helper `_is_atomic_predicate` in `latex_gen.py` encodes the
+  five-category jms ruling. Eight new tests in
+  `tests/test_lnot_paren.py` cover all cases.
+
+- **Bug 4 — PROOF rule-label typography** (m-2026-05-21-010). Rule labels
+  inside `[...]` brackets in PROOF blocks now render with uniform tight
+  typography regardless of form. Previously, labels without a discharge
+  number fell through to the fallback path: `[false-intro]` produced
+  `\mbox{false}-\mbox{intro}` (bare `-` in math mode renders as a spaced
+  binary minus), and `[=> elim]` produced `\Rightarrow \mbox{elim}` (no
+  hyphen at all). A new pattern 3 in `_format_justification_label` matches
+  `<op>[\s-]+(intro|elim)$` and emits the same tight
+  `{op_latex}\textrm{-{rule_name}}` form used by the discharge and subscript
+  patterns. All four repro cases now produce correct output:
+  `false\textrm{-intro}`, `\Rightarrow\textrm{-elim}`,
+  `\land\textrm{-intro}`, `\lnot\textrm{-elim}`.
 
 - **Dependent-domain detection in Spivey-form quantifier collapse** (commit
   `92823b7`). `_collect_quantifier_chain` and `_collect_lambda_chain`
@@ -210,6 +287,34 @@ parses the same. Only the rendered LaTeX differs. Regenerate any
   `\lblot~name == e~\rblot`.
 
 ### Added
+
+- **DAT #9 — GROUP aggregate form.** Six new aggregator keywords
+  (`Count`, `Sum`, `Avg`, `Min`, `Max`, `Median`) are now accepted
+  inside the RHS of a `group` expression, replacing the raw `LATEX:`
+  workaround. Syntax: `R group (Count(attr) as alias)`. Multiple
+  aggregators are comma-separated. The aggregate and regroup forms
+  (`{attrs} as alias`) are mutually exclusive; mixing them is a parse
+  error. The `as` keyword is now a reserved word (`TokenType.AS`).
+  Each aggregator renders as
+  `\mathrm{Aggregator}(attr)~\mathrm{as}~alias`.
+
+- **`B:` block — B-machine verbatim passthrough.** A new block type for
+  embedding Atelier-B / B-Method machine listings. The entire body is
+  captured verbatim by the lexer (no Z-parser heuristics, no keyword
+  conversion, no escaping) and emitted as `\begin{verbatim}…\end{verbatim}`.
+  Indentation and blank lines inside the body are preserved exactly.
+  The block is terminated by a column-0 `END` line, which is included in the
+  emitted verbatim (it is the standard B-Method machine terminator, per
+  Abrial, *The B-Book*, 1996). Multiple `B:` blocks per file are
+  independent. A `B:` block without a matching `END` is a lexer error that
+  cites the opener line. This is the **recommended way to embed B machines**
+  in txt2tex documents — see `docs/guides/USER_GUIDE.md §B: - B-Machine
+  Verbatim Block`.
+
+  **Note:** The multi-line `LATEX:` block double-spacing / indentation bug
+  (#137) is not fixed in this release. The `B:` block sidesteps bug #137
+  entirely for B-machine use cases; bug #137 remains tracked for general
+  `LATEX:` multi-line use.
 
 - WYSIWYG line-break support for algebra and set operators. Natural newline
   or explicit `\` continuation is now recognised after `bowtie`, `cross`,
