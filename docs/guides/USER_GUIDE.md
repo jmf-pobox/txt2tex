@@ -218,10 +218,12 @@ END
 
 **Why not use `LATEX:` for B machines?**
 
-Multi-line `LATEX:` blocks render double-spaced and strip leading whitespace
-because each `LATEX:` directive is an independent paragraph. `B:` solves this
-correctly: the entire body is one verbatim environment, single-spaced, with all
-indentation preserved.
+`B:` wraps its body in `\begin{verbatim}…\end{verbatim}`, which gives you
+fixed-width font and literal-character rendering — backslashes, braces, and
+percent signs appear exactly as typed. The multi-line `LATEX:` block form
+(see below) also captures the full body as one unit, but it emits the lines
+as live LaTeX, not verbatim text. Use `B:` for listings you want rendered
+as-written; use multi-line `LATEX:` for raw LaTeX you want interpreted.
 
 **Example — full machine with prose before and after:**
 
@@ -258,6 +260,43 @@ LATEX: \mycustomcommand{arg1}{arg2}
 - NO escaping - raw LaTeX passed directly through
 - Perfect for tikz diagrams, custom environments, special commands
 - Used for bibliography setup with natbib
+
+#### Multi-line block form
+
+When you need to pass several lines of LaTeX through as a single unit — with
+indentation preserved and no paragraph breaks inserted between lines — use the
+block form instead of repeating `LATEX:` on every line.
+
+**Syntax:** write `LATEX:` alone on a line (nothing after the colon except
+optional trailing whitespace), then the body, then `END` at column 0.
+
+```text
+LATEX:
+\begin{tikzpicture}
+  \draw (0,0) -- (1,1);
+  \node at (0.5,0.5) {midpoint};
+\end{tikzpicture}
+END
+```
+
+The body is emitted as live LaTeX — backslashes are interpreted, environments
+are processed. The `END` terminator (column 0, no trailing text) closes the
+block; `\end{...}` lines inside the body are not confused with `END`.
+
+**When to use the block form vs. single-line `LATEX:`:**
+
+| Situation | Use |
+|-----------|-----|
+| One short command | `LATEX: \vspace{1cm}` |
+| Multi-line environment or diagram | Block form |
+| Indentation must be preserved | Block form |
+| Content should appear as literal text (verbatim) | `B:` instead |
+
+A `LATEX:` block opened without a matching `END` is a lexer error; the error
+message cites the source line of the opener.
+
+For B-machine listings specifically, use `B:` — it wraps the body in
+`\begin{verbatim}` so backslashes and braces appear as typed.
 
 **Bibliography Setup (Harvard Style):**
 
@@ -301,6 +340,23 @@ LATEX: \end{thebibliography}
 ```
 
 The `\bibitem[Author, Year]{key}` format creates Harvard-style citations. Use `[cite key]` in TEXT: blocks to reference them (see TEXT: section above).
+
+The multi-line block form can also be used for the bibliography, which keeps
+the entire environment as one block rather than one `LATEX:` directive per
+line:
+
+```text
+LATEX:
+\setlength{\leftskip}{0pt}
+\begin{thebibliography}{Woodcock, n.d.}
+
+\bibitem[Spivey, 1992]{spivey92} Spivey, J.M. (1992). \textit{The Z Notation: A Reference Manual}. Prentice Hall.
+
+\bibitem[Woodcock and Davies, 1996]{woodcock96} Woodcock, J. and Davies, J. (1996). \textit{Using Z}. Prentice Hall.
+
+\end{thebibliography}
+END
+```
 
 **Note**: If `BIBLIOGRAPHY:` is specified, the bibliography file approach takes precedence. LATEX blocks will still work for other purposes.
 
