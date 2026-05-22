@@ -191,7 +191,6 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "BIBLIOGRAPHY_STYLE",
         "PAGEBREAK",
         "LINEBREAK",
-        "B",
     }
 )
 

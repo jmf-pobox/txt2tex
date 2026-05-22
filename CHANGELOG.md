@@ -68,6 +68,16 @@ version to pick up the new output.
 
 ### Fixed
 
+- **Regression from #138: bare `B` identifier could not be decorated.**
+  The `B:` block keyword (#138) added `"B"` to the lexer's RESERVED_WORDS,
+  which then caused declarations like `B! : P BookingId` (SBM ex14) to
+  raise `Cannot decorate reserved keyword 'B'`.  The lexer's B-block
+  trigger is the `B:` *sequence* (already a literal string comparison),
+  not the reserved-words set, so removing `"B"` from RESERVED_WORDS is
+  safe — `B:` at line start still opens a block; bare `B` is once
+  again a usable identifier with the full `' ? !` decoration set.
+  Adds 4 regression tests covering both behaviours.
+
 - **Engine bug #137 — Multi-line LaTeX listings rendered double-spaced
   and de-indented when written with consecutive single-line `LATEX:`
   directives.**  Each `LATEX:` line became its own paragraph and leading
