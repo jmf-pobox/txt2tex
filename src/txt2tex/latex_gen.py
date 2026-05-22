@@ -5159,6 +5159,7 @@ class LaTeXGenerator:
         Divide,
         Binding,
         Group,
+        GroupAggregate,
         Ungroup,
     )
 

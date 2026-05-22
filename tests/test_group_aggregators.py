@@ -262,3 +262,30 @@ def test_error_unknown_token_after_lparen() -> None:
     """An unexpected token after '(' in GROUP raises ParserError."""
     with pytest.raises(ParserError):
         _expr("R group (x as t)")
+
+
+# ---------------------------------------------------------------------------
+# Abbreviation routing: aggregate form must emit as inline math, not zed (#142)
+# ---------------------------------------------------------------------------
+
+
+def test_abbreviation_aggregator_routes_to_inline_math() -> None:
+    """`A == R group (Count(x) as t)` must emit as `\\noindent $...$`,
+    not inside a `\\begin{zed}` paragraph. The `\\mathrm{Group}` and
+    `\\mathrm{Count}` labels are not Z identifiers; fuzz rejects them
+    in a Z paragraph but accepts them inside `$...$` math (fuzz skips
+    inline math content).
+    """
+    src = (
+        "TITLE: probe\n\n"
+        "given Foo\nschema R\n  x : Foo\nend\n\n"
+        "A == R group (Count(x) as t)\n"
+    )
+    tokens = Lexer(src).tokenize()
+    ast = Parser(tokens).parse()
+    latex = LaTeXGenerator().generate_document(ast)
+    # The abbreviation must NOT be inside a zed paragraph
+    assert "\\begin{zed}\nA ==" not in latex
+    # It must be inside inline math
+    assert "\\noindent" in latex
+    assert "$A == R \\mathrm{Group}" in latex

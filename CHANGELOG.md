@@ -53,6 +53,24 @@ version to pick up the new output.
 
 ### Fixed
 
+- **Engine bug #142 — Abbreviation `Name == <relational-algebra-expr>`
+  routed through `\begin{zed}` instead of inline math.**  Surfaced
+  during DAT #9 GROUP-aggregator empirical verification.  The
+  abbreviation generator routes `Name == E` through `\begin{zed}` for
+  pure-Z `E` and through `\noindent $Name == E$` for relational `E`.
+  The detector `_DAT_EXPRESSION_TYPES` was missing the new
+  `GroupAggregate` AST variant added by DAT #9, so the new aggregate
+  form fell through to the zed path and fuzz rejected the rendered
+  `\mathrm{Group}(\mathrm{Count}(x)~\mathrm{as}~t)` body.  One-line
+  fix: add `GroupAggregate` to the detector tuple.  Affected the
+  new aggregate form only; the pre-existing regroup form
+  (`R group ({attrs} as alias)`) was correctly classified.
+
+  Before: `A == R group (Count(x) as t)` produced
+  `\begin{zed} A == R \mathrm{Group}(...) \end{zed}` — fuzz error
+  `Identifier \mathrm is not declared`.
+  After: `\noindent $A == R \mathrm{Group}(...)$` — fuzz accepts.
+
 - **DAT #15 — Section heading text padded with inter-character whitespace.**
   `=== Foreign-key constraints ===` previously emitted `Foreign - key constraints`
   because `-` was lexed as a MINUS token and re-joined with spaces. The lexer now
