@@ -403,29 +403,30 @@ SchemaA o9 SchemaB
 
 ## Zed Blocks
 
-Group multiple definitions:
+Wrap `given` types, free-type definitions, and abbreviations in a `zed` block
+to group them in a single `\begin{zed}...\end{zed}` LaTeX environment.
+Use `axdef` and `schema` at the top level (not nested inside `zed`).
 
 ```text
 zed
   given Person, Account
-
   Status ::= active | suspended | closed
+end
 
-  axdef
-    maxAccounts : N
-  where
-    maxAccounts = 10
-  end
+axdef
+  maxAccounts : N
+where
+  maxAccounts = 10
+end
 
-  schema Bank
-    accounts : Person +-> Account
-  where
-    forall p : Person | # (accounts(| {p} |)) <= maxAccounts
-  end
+schema Bank
+  accounts : Person +-> Account
+where
+  forall p : Person | # (accounts(| {p} |)) <= maxAccounts
 end
 ```
 
-**Note:** The zed block syntax shown above is aspirational. Currently txt2tex's `zed` blocks only wrap single expressions, not nested definitions with `where` clauses. See `examples/10_schemas/future/zed_blocks.txt` for the full example (requires parser enhancements).
+**See:** `examples/10_schemas/zed_blocks.txt`
 
 ## Scoping
 

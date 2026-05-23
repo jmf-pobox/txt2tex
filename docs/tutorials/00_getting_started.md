@@ -295,7 +295,7 @@ TEXT: This is explanatory text.
 
 Now that you can create and compile basic documents:
 
-1. **Start with the smallest examples:** Browse `examples/00_getting_started/` — three minimal `.txt` files (`hello_world`, `first_proof`, `basic_z_notation`) that exercise the full pipeline.
+1. **Start with the smallest examples:** Browse `examples/00_getting_started/` — five runnable `.txt` files (`hello_world`, `first_proof`, `basic_z_notation`, `decorated_identifiers`, `string_literals`) that exercise the full pipeline.
 2. **Explore examples:** Browse `examples/01_propositional_logic/`
 3. **Try truth tables:** Practice with `examples/01_propositional_logic/truth_tables.txt`
 4. **Learn proof trees:** See `examples/04_proof_trees/simple_proofs.txt`
@@ -427,4 +427,4 @@ Learn about boolean operators, truth tables, and logical equivalences.
 
 ---
 
-**Questions?** Consult the [User Guide](docs/guides/USER_GUIDE.md) or explore the [examples directory](examples/).
+**Questions?** Consult the [User Guide](../guides/USER_GUIDE.md) or explore the `examples/` directory.

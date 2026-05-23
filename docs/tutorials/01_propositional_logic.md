@@ -440,8 +440,8 @@ txt2tex my_logic.txt
 
 **Reference:**
 
-- [USER_GUIDE.md](docs/guides/USER_GUIDE.md) - Section "Propositional Logic"
-- [PROOF_SYNTAX.md](docs/guides/PROOF_SYNTAX.md) - EQUIV block syntax
+- [USER_GUIDE.md](../guides/USER_GUIDE.md) - Section "Propositional Logic"
+- [PROOF_SYNTAX.md](../guides/PROOF_SYNTAX.md) - EQUIV block syntax
 
 ## Summary
 

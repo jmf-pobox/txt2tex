@@ -36,7 +36,7 @@ else if x = 0 then 0
 else -1
 ```
 
-**Note:** See `examples/12_advanced/future/if_then_else.txt` (requires division operator `/` which is not yet implemented)
+**See:** `examples/12_advanced/if_then_else.txt`
 
 ## Subscripts and Superscripts
 
@@ -79,7 +79,7 @@ seq[N cross N]      (sequence of pairs)
 P[seq[N]]           (set of sequences)
 ```
 
-**Note:** See `examples/12_advanced/future/generic_instantiation.txt` (requires prime notation `x'` which is not yet implemented)
+**See:** `examples/12_advanced/generic_instantiation.txt`
 
 ## Text Blocks
 
@@ -255,7 +255,7 @@ You've learned:
 **Next Steps:**
 
 - Study examples in `examples/` directories for integration patterns
-- Consult [USER_GUIDE.md](docs/guides/USER_GUIDE.md) for comprehensive reference
+- Consult [USER_GUIDE.md](../guides/USER_GUIDE.md) for comprehensive reference
 - Practice with course problems
 
 ---
