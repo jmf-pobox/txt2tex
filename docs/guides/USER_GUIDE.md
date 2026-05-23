@@ -97,7 +97,14 @@ txt2tex provides four types of text blocks for different purposes:
 
 ### TEXT: - Smart Text with Formula Detection
 
-Use for normal prose where you want mathematical expressions automatically detected and converted:
+Each `TEXT:` directive covers **one line**.  There is no multi-line `TEXT:`
+block — `TEXT:` is not terminated by `END`.  For a multi-line paragraph,
+write consecutive `TEXT:` lines (they coalesce — see "Paragraph coalescing"
+below).  For multi-line raw LaTeX, use the multi-line [`LATEX:` block
+form](#latex---raw-latex-passthrough).
+
+Use `TEXT:` for normal prose where you want mathematical expressions
+automatically detected and converted:
 
 ```text
 TEXT: This is a plain text paragraph with => and <=> symbols.
@@ -166,7 +173,11 @@ Renders as:
 
 ### PURETEXT: - Raw Text with LaTeX Escaping
 
-Use for bibliography entries or prose with punctuation that would confuse the lexer:
+Like `TEXT:`, each `PURETEXT:` covers **one line** and is not terminated by
+`END`.  Use multiple lines for multiple sentences.
+
+Use `PURETEXT:` for bibliography entries or prose with punctuation that
+would confuse the lexer:
 
 ```text
 PURETEXT: Spivey, J.M. (1992) "The Z Notation" & references.
@@ -247,7 +258,13 @@ TEXT: The invariant ensures trains is a sequence of directed edges.
 
 ### LATEX: - Raw LaTeX Passthrough
 
-Use for custom LaTeX commands, environments, or formatting not supported by txt2tex:
+Unlike `TEXT:` and `PURETEXT:` (one line each, no terminator), `LATEX:`
+has **two forms**: a single-line directive `LATEX: <content>` and a
+multi-line block `LATEX:` ... `END` (see [§Multi-line block
+form](#multi-line-block-form) below).
+
+Use `LATEX:` for custom LaTeX commands, environments, or formatting not
+supported by txt2tex:
 
 ```text
 LATEX: \begin{center}\textit{Custom formatting}\end{center}
