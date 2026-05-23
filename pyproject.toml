@@ -133,6 +133,9 @@ ignore = [
 "src/txt2tex/latex_gen.py" = ["ARG002"]
 # Allow unused parent_indent in proof tree parsing
 "src/txt2tex/parser.py" = ["ARG002"]
+# Project-level dev scripts run subprocesses with literal arg lists and use
+# `print` for user-visible output; both are appropriate for CLI tooling.
+"scripts/*" = ["T20", "S603"]
 
 [tool.ruff.format]
 quote-style = "double"

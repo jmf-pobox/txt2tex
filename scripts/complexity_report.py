@@ -38,9 +38,7 @@ REPORT_JSON = REPO_ROOT / "docs" / "complexity-report.json"
 
 
 def _run(cmd: list[str], *, cwd: Path = REPO_ROOT, check: bool = True) -> str:
-    proc = subprocess.run(
-        cmd, cwd=cwd, capture_output=True, text=True, check=False
-    )
+    proc = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False)
     if check and proc.returncode != 0:
         raise RuntimeError(
             f"command failed ({proc.returncode}): {' '.join(cmd)}\n"
@@ -104,11 +102,24 @@ def collect_cc(src: Path, min_grade: str = "D") -> list[dict[str, Any]]:
     return rows
 
 
-def collect_lizard(src: Path, ccn_threshold: int = 20, length_threshold: int = 100) -> list[dict[str, Any]]:
-    out = _run([
-        "uv", "run", "lizard", str(src),
-        "--CCN", str(ccn_threshold), "--length", str(length_threshold),
-    ], check=False)
+def collect_lizard(
+    src: Path,
+    ccn_threshold: int = 20,
+    length_threshold: int = 100,
+) -> list[dict[str, Any]]:
+    out = _run(
+        [
+            "uv",
+            "run",
+            "lizard",
+            str(src),
+            "--CCN",
+            str(ccn_threshold),
+            "--length",
+            str(length_threshold),
+        ],
+        check=False,
+    )
     rows: list[dict[str, Any]] = []
     for line in out.splitlines():
         parts = line.split()
@@ -145,8 +156,7 @@ def collect_lizard(src: Path, ccn_threshold: int = 20, length_threshold: int = 1
     # lizard emits every function in its detail table; --CCN / --length
     # only affect the summary line.  Filter to the actual warnings ourselves.
     rows = [
-        r for r in rows
-        if r["ccn"] >= ccn_threshold or r["nloc"] >= length_threshold
+        r for r in rows if r["ccn"] >= ccn_threshold or r["nloc"] >= length_threshold
     ]
     # lizard also emits each warning twice (per-file section + summary block).
     seen: set[tuple[str, str, int, int]] = set()
@@ -162,7 +172,10 @@ def collect_lizard(src: Path, ccn_threshold: int = 20, length_threshold: int = 1
 
 
 def collect_pydeps(src: Path) -> list[dict[str, Any]]:
-    raw = _run(["uv", "run", "pydeps", str(src), "--show-deps", "--no-show"], check=False)
+    raw = _run(
+        ["uv", "run", "pydeps", str(src), "--show-deps", "--no-show"],
+        check=False,
+    )
     try:
         data = json.loads(raw)
     except json.JSONDecodeError:
@@ -205,10 +218,18 @@ def collect_wily_trend(src: Path, *, n: int = 20) -> dict[str, list[dict[str, An
             continue
         rel = str(f.relative_to(REPO_ROOT))
         try:
-            out = _run(
-                ["uv", "run", "wily", "report", rel, "raw.loc", "cyclomatic.complexity", "-n", str(n)],
-                check=False,
-            )
+            wily_cmd = [
+                "uv",
+                "run",
+                "wily",
+                "report",
+                rel,
+                "raw.loc",
+                "cyclomatic.complexity",
+                "-n",
+                str(n),
+            ]
+            out = _run(wily_cmd, check=False)
         except RuntimeError:
             continue
         series: list[dict[str, Any]] = []
@@ -257,7 +278,8 @@ def diff_mi(prior: list[dict[str, Any]], curr: list[dict[str, Any]]) -> list[str
             delta = r["mi"] - prior_map[r["file"]]
             arrow = "↑" if delta > 0 else "↓"
             notes.append(
-                f"  {r['file']}: MI {prior_map[r['file']]:.2f} → {r['mi']:.2f} ({arrow}{abs(delta):.2f})"
+                f"  {r['file']}: MI {prior_map[r['file']]:.2f} -> "
+                f"{r['mi']:.2f} ({arrow}{abs(delta):.2f})"
             )
     return notes
 
@@ -275,7 +297,7 @@ def render_markdown(snapshot: dict[str, Any], prior: dict[str, Any] | None) -> s
     parts: list[str] = []
     ts = snapshot["generated"]
     commit = snapshot.get("commit", "unknown")
-    parts.append(f"# Complexity Report\n")
+    parts.append("# Complexity Report\n")
     parts.append(f"_Generated {ts} at commit `{commit}`._\n")
     parts.append(
         "This snapshot is produced by `make complexity-report` (see "
@@ -286,11 +308,12 @@ def render_markdown(snapshot: dict[str, Any], prior: dict[str, Any] | None) -> s
 
     # Maintainability Index
     parts.append("## Maintainability Index (radon mi)\n")
-    parts.append("Lower = harder to maintain.  Grades: A ≥ 20, B 10–19, C < 10.\n")
+    parts.append("Lower = harder to maintain.  Grades: A >= 20, B 10-19, C < 10.\n")
     parts.append("| File | MI | Grade |")
     parts.append("|------|---:|:-----:|")
-    for r in snapshot["mi"]:
-        parts.append(f"| `{r['file']}` | {r['mi']:.2f} | {r['grade']} |")
+    parts.extend(
+        f"| `{r['file']}` | {r['mi']:.2f} | {r['grade']} |" for r in snapshot["mi"]
+    )
     parts.append("")
 
     # Cyclomatic Complexity (D+)
@@ -302,11 +325,11 @@ def render_markdown(snapshot: dict[str, Any], prior: dict[str, Any] | None) -> s
     else:
         parts.append("| File | Line | Name | CC | Grade |")
         parts.append("|------|-----:|------|---:|:-----:|")
-        for r in cc_rows[:25]:
-            parts.append(
-                f"| `{r['file']}` | {r['line']} | `{r['name']}` | "
-                f"{r['complexity']} | {r['grade']} |"
-            )
+        parts.extend(
+            f"| `{r['file']}` | {r['line']} | `{r['name']}` | "
+            f"{r['complexity']} | {r['grade']} |"
+            for r in cc_rows[:25]
+        )
         if len(cc_rows) > 25:
             parts.append(f"\n_…{len(cc_rows) - 25} more not shown._\n")
         else:
@@ -321,11 +344,11 @@ def render_markdown(snapshot: dict[str, Any], prior: dict[str, Any] | None) -> s
         parts.append(f"_{len(liz)} function(s) exceed thresholds._\n")
         parts.append("| File | Function | CCN | NLOC | Tokens | Params |")
         parts.append("|------|----------|----:|-----:|-------:|-------:|")
-        for r in liz[:20]:
-            parts.append(
-                f"| `{r['file']}` | `{r['function']}` | "
-                f"{r['ccn']} | {r['nloc']} | {r['tokens']} | {r['params']} |"
-            )
+        parts.extend(
+            f"| `{r['file']}` | `{r['function']}` | "
+            f"{r['ccn']} | {r['nloc']} | {r['tokens']} | {r['params']} |"
+            for r in liz[:20]
+        )
         if len(liz) > 20:
             parts.append(f"\n_…{len(liz) - 20} more not shown._\n")
         else:
@@ -339,11 +362,12 @@ def render_markdown(snapshot: dict[str, Any], prior: dict[str, Any] | None) -> s
     else:
         parts.append("| Module | Fan-in | Fan-out |")
         parts.append("|--------|-------:|--------:|")
-        for r in deps:
-            parts.append(f"| `{r['module']}` | {r['fan_in']} | {r['fan_out']} |")
+        parts.extend(
+            f"| `{r['module']}` | {r['fan_in']} | {r['fan_out']} |" for r in deps
+        )
         parts.append("")
 
-    # Trend (wily)
+    # Recent trend section, populated only when wily history is available.
     trends = snapshot.get("trend", {})
     parts.append("## Recent Trend (wily)\n")
     if not trends:
@@ -357,8 +381,14 @@ def render_markdown(snapshot: dict[str, Any], prior: dict[str, Any] | None) -> s
             "revisions in the wily window.  Files with zero net change in both "
             "metrics are omitted.\n"
         )
-        parts.append("| File | Oldest commit | Oldest LoC | Oldest CC | Newest commit | Newest LoC | Newest CC | LoC Δ | CC Δ |")
-        parts.append("|------|--------------|-----------:|----------:|---------------|-----------:|----------:|------:|-----:|")
+        parts.append(
+            "| File | Oldest commit | Oldest LoC | Oldest CC | Newest commit "
+            "| Newest LoC | Newest CC | LoC d | CC d |"
+        )
+        parts.append(
+            "|------|--------------|-----------:|----------:|---------------"
+            "|-----------:|----------:|------:|-----:|"
+        )
         sig_rows: list[tuple[str, dict[str, Any], dict[str, Any], int, int]] = []
         for path, series in trends.items():
             if not series:
@@ -406,8 +436,9 @@ def render_markdown(snapshot: dict[str, Any], prior: dict[str, Any] | None) -> s
 
     parts.append("---\n")
     parts.append(
-        "_Generated by `scripts/complexity_report.py`.  Both `docs/complexity-report.md` "
-        "and `docs/complexity-report.json` are committed so future runs can show deltas._\n"
+        "_Generated by `scripts/complexity_report.py`.  Both "
+        "`docs/complexity-report.md` and `docs/complexity-report.json` are "
+        "committed so future runs can show deltas._\n"
     )
     return "\n".join(parts)
 

@@ -1,12 +1,12 @@
 # Complexity Report
 
-_Generated 2026-05-23T09:46:06+00:00 at commit `f1a6a68`._
+_Generated 2026-05-23T09:54:44+00:00 at commit `5ef7054`._
 
 This snapshot is produced by `make complexity-report` (see `scripts/complexity_report.py`).  It composes radon, lizard, pydeps, and wily into a point-in-time view of the codebase plus a trend window if a wily history exists.
 
 ## Maintainability Index (radon mi)
 
-Lower = harder to maintain.  Grades: A ≥ 20, B 10–19, C < 10.
+Lower = harder to maintain.  Grades: A >= 20, B 10-19, C < 10.
 
 | File | MI | Grade |
 |------|---:|:-----:|
@@ -105,7 +105,7 @@ _…6 more not shown._
 
 LoC and cyclomatic complexity at the **oldest** and **newest** revisions in the wily window.  Files with zero net change in both metrics are omitted.
 
-| File | Oldest commit | Oldest LoC | Oldest CC | Newest commit | Newest LoC | Newest CC | LoC Δ | CC Δ |
+| File | Oldest commit | Oldest LoC | Oldest CC | Newest commit | Newest LoC | Newest CC | LoC d | CC d |
 |------|--------------|-----------:|----------:|---------------|-----------:|----------:|------:|-----:|
 | `src/txt2tex/latex_gen.py` | `0606052` (2026-05-19) | 5802 | 771 | `3b80a19` (2026-05-22) | 6815 | 868 | +1013 | +97 |
 | `src/txt2tex/parser.py` | `c62874b` (2026-05-19) | 5425 | 794 | `17e0be0` (2026-05-22) | 6280 | 912 | +855 | +118 |
@@ -116,12 +116,12 @@ LoC and cyclomatic complexity at the **oldest** and **newest** revisions in the 
 
 ## Delta vs Prior Snapshot
 
-Prior snapshot: 2026-05-23T09:45:05+00:00 @ `f1a6a68`
+Prior snapshot: 2026-05-23T09:46:06+00:00 @ `f1a6a68`
 
 _No MI shifts ≥ 0.5._
 
   D-or-worse functions: 23 → 23
-  Lizard warnings: 304 → 26
+  Lizard warnings: 26 → 26
 
 ---
 
