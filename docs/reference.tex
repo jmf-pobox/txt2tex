@@ -720,10 +720,10 @@ TwoBumps \defs Bump \semi Bump
 schema PromoteBump
   Delta Bank
   Delta Counter
-  id? : ID
+  key? : ID
 where
-  counters(id?) = theta Counter
-  counters' = counters [+] {id? |-> theta Counter'}
+  counters(key?) = theta Counter
+  counters' = counters ++ {key? |-> theta Counter'}
 end
 \end{verbatim}
 \end{exwrite}
@@ -731,10 +731,10 @@ end
 \begin{schema}{PromoteBump}
 \Delta Bank \\
 \Delta Counter \\
-id? : ID
+key? : ID
 \where
-counters~id? = \theta Counter \\
-counters' = counters \oplus \{id? \mapsto \theta Counter'\}
+counters~key? = \theta Counter \\
+counters' = counters \oplus \{key? \mapsto \theta Counter'\}
 \end{schema}
 \end{exget}
 

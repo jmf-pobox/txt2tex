@@ -14,7 +14,7 @@ txt2tex converts plain-text mathematical notation into LaTeX. Write `forall x : 
 
 **Try an expression without creating a file.** Run `txt2tex -i` to open the REPL. Type an expression, see the LaTeX and a PDF preview. Useful for checking rendering or grabbing a snippet to paste elsewhere.
 
-**[Reference (PDF)](https://github.com/jmf-pobox/txt2tex/blob/main/docs/reference.pdf)** — eight-page reference covering every operator, block type, proof syntax, Z schemas, schema calculus, bindings, and relational database notation, with side-by-side examples showing what you type and what txt2tex renders.
+**[Reference (PDF)](https://github.com/jmf-pobox/txt2tex/blob/main/docs/reference.pdf)** — printable reference covering every operator, block type, proof syntax, Z schemas, schema calculus, bindings, and relational database notation, with side-by-side examples showing what you type and what txt2tex renders.
 
 ---
 
@@ -422,17 +422,18 @@ Relational algebra and extended Z for database specifications:
 ```text
 sigma[cargo > 0](Fleet)
 pi[name, cargo](Fleet)
-R bowtie S
+R join S
+Fleet[ID/shipID]
 pk shipID
 ```
 
-Primary key annotation (`pk`), FK predicates in `axdef`, relational algebra in keyword form (Restrict `sigma`, Project `pi`, Rename `rho`, Join `bowtie`, division), and `GROUP`/`UNGROUP` for nested relations (Date's operators).
+Primary key annotation (`pk`), FK predicates in `axdef`, relational algebra (Restrict `sigma[p](R)`, Project `pi[A,B](R)`, Rename `R[NEW/OLD]` postfix, Join `R join S`, division `R div S`), and `GROUP`/`UNGROUP` for nested relations (Date's operators).
 
 ---
 
 ### Reference
 
-Printable eight-page reference:
+Printable reference:
 
 - **[docs/reference.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/reference.pdf)** — All operators, block types, proof syntax, Z schemas, schema calculus, bindings, and relational database notation
 
