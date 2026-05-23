@@ -1,78 +1,72 @@
 #!/bin/bash
-# QA Script for checking all PDFs in hw/ and examples/
+# QA Script for checking all PDFs under examples/.
 # Usage: ./qa_check_all.sh
+#
+# Runs qa_check.sh against every PDF in examples/, excluding the reference/
+# and infrastructure/ subdirectories.  hw1/, hw2/, hw/, and sem/ are out of
+# scope — the gate covers only the published examples corpus.
 
-set -e
+set -u
 
-# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Create unique temporary file and ensure cleanup on exit
 TEMP_FILE=$(mktemp /tmp/qa_check_output.XXXXXX)
-trap "rm -f $TEMP_FILE" EXIT
+trap 'rm -f "$TEMP_FILE"' EXIT
 
 echo "=========================================="
-echo "txt2tex QA Check - All PDFs"
+echo "txt2tex QA Check — examples/ PDFs"
 echo "=========================================="
 echo ""
 
-# Find all PDFs in hw/ and examples/ (excluding reference/ and infrastructure/)
-PDFS=$(find hw/ examples/ -name "*.pdf" ! -path "*/reference/*" ! -path "*/infrastructure/*" | sort)
+PDFS=$(find examples/ -name "*.pdf" \
+    ! -path "*/reference/*" \
+    ! -path "*/infrastructure/*" \
+    | sort)
 
 if [ -z "$PDFS" ]; then
-    echo -e "${YELLOW}WARNING: No PDF files found in hw/ or examples/${NC}"
+    printf "${YELLOW}WARNING: No PDF files found under examples/${NC}\n"
     exit 0
 fi
 
-TOTAL_COUNT=$(echo "$PDFS" | wc -l | tr -d ' ')
+TOTAL_COUNT=$(printf '%s\n' "$PDFS" | wc -l | tr -d ' ')
 echo "Found $TOTAL_COUNT PDF file(s) to check"
 echo ""
 
-# Counters
 TOTAL_PASSED=0
 TOTAL_FAILED=0
 FAILED_FILES=""
 
-# Check each PDF
 for PDF in $PDFS; do
-    echo -e "${BLUE}Checking: $PDF${NC}"
-    
-    # Run qa_check.sh but capture output and exit code
+    printf "${BLUE}Checking: %s${NC}\n" "$PDF"
     if ./qa_check.sh "$PDF" > "$TEMP_FILE" 2>&1; then
-        echo -e "${GREEN}✓ PASS: $PDF${NC}"
+        printf "${GREEN}\xe2\x9c\x93 PASS: %s${NC}\n" "$PDF"
         TOTAL_PASSED=$((TOTAL_PASSED + 1))
     else
-        EXIT_CODE=$?
-        echo -e "${RED}✗ FAIL: $PDF${NC}"
+        printf "${RED}\xe2\x9c\x97 FAIL: %s${NC}\n" "$PDF"
         TOTAL_FAILED=$((TOTAL_FAILED + 1))
-        FAILED_FILES="$FAILED_FILES\n  - $PDF"
-        
-        # Show summary of issues (last few lines of output)
-        echo "  Issues found:"
-        tail -n 10 "$TEMP_FILE" | grep -E "Found|garbled|forall|emptyset" | head -5 | sed 's/^/    /' || true
+        FAILED_FILES="${FAILED_FILES}\n  - ${PDF}"
+        echo "  Issues:"
+        grep -E "FAIL|Found [0-9]+ issue" "$TEMP_FILE" | head -6 | sed 's/^/    /'
     fi
     echo ""
 done
 
-# Final summary
 echo "=========================================="
-echo "QA Check Summary - All PDFs"
+echo "QA Check Summary — examples/ PDFs"
 echo "=========================================="
 echo ""
 echo "Total PDFs checked: $TOTAL_COUNT"
-echo -e "${GREEN}Passed: $TOTAL_PASSED${NC}"
+printf "${GREEN}Passed: %d${NC}\n" "$TOTAL_PASSED"
 if [ $TOTAL_FAILED -gt 0 ]; then
-    echo -e "${RED}Failed: $TOTAL_FAILED${NC}"
-    echo -e "\nFailed files:"
-    echo -e "$FAILED_FILES"
+    printf "${RED}Failed: %d${NC}\n" "$TOTAL_FAILED"
+    printf "\nFailed files:%b\n" "$FAILED_FILES"
     exit 1
 else
-    echo -e "${GREEN}Failed: 0${NC}"
-    echo -e "\n${GREEN}✓ All PDFs passed QA checks!${NC}"
+    printf "${GREEN}Failed: 0${NC}\n"
+    printf "\n${GREEN}\xe2\x9c\x93 All examples passed QA checks!${NC}\n"
     exit 0
 fi
-
