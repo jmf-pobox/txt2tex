@@ -360,5 +360,5 @@ class TestGroupUngroupAcceptance:
         assert isinstance(_expr("sigma[p](R)"), Restrict)
         assert isinstance(_expr("pi[a, b](R)"), Project)
         assert isinstance(_expr("rho[a as b](R)"), Rename)
-        assert isinstance(_expr("R bowtie S"), NaturalJoin)
+        assert isinstance(_expr("R join S"), NaturalJoin)
         assert isinstance(_expr("R div S"), Divide)

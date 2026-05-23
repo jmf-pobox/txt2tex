@@ -59,8 +59,9 @@ class TestUnderscoreInEquivJustifications:
 
     def test_function_name_with_underscore_in_justification(self) -> None:
         """Test function names with underscores appear elem justifications."""
+        # Note: 'join' is a reserved keyword; use 'cons' as the list-constructor name.
         text = (
-            "EQUIV:\ncount_N(join(e, l)) = n + count_N(l)\n"
+            "EQUIV:\ncount_N(cons(e, l)) = n + count_N(l)\n"
             "n + count_N(l) = count_N(l) + n [definition of count_N]"
         )
         lexer = Lexer(text)

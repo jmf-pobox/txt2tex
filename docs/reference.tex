@@ -800,12 +800,12 @@ Comma-separated names on one \kw{pk} line also work.
 sigma[p](R)          & $\mathrm{Restrict}_{p}(R)$ — restrict \\
 pi[A,B](R)           & $\mathrm{Project}_{A,B}(R)$ — project \\
 rho[A as B](R)       & $\mathrm{Rename}_{A \to B}(R)$ — rename \\
-R bowtie S           & $R \otimes S$ — natural join \\
-R bowtie [p] S       & $\mathrm{Join}_{p}(R, S)$ — theta-join \\
+R join S             & $\mathrm{Join}(R, S)$ — natural join \\
+R join [p] S         & $\mathrm{Join}_{p}(R, S)$ — theta-join \\
 R div S              & $R \div S$ — division \\
 \end{tabularx}
 
-{\footnotesize \texttt{sigma}/\texttt{pi}/\texttt{rho} bind at atom level. \texttt{bowtie} and \texttt{div} are infix at cross-product precedence.}
+{\footnotesize \texttt{sigma}/\texttt{pi}/\texttt{rho} bind at atom level. \texttt{join} and \texttt{div} are infix at cross-product precedence.}
 
 {\footnotesize\textbf{Fuzz note:} algebra expressions emit outside any Z environment — fuzz silently skips them. Do not wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
 
@@ -886,7 +886,7 @@ pk a, b : T          & composite pk \\
 sigma[p](R)          & restrict \\
 pi[A](R)             & project \\
 rho[A as B](R)       & rename attr \\
-R bowtie S           & natural join ($\otimes$) \\
+R join S             & natural join ($\mathrm{Join}(R, S)$) \\
 R div S              & division \\
 \{| a == e |\}       & binding bracket \\
 \{S; C | P . E\}    & multi-typed set comp \\

@@ -1525,13 +1525,17 @@ in existing corpus files.  Six forms:
 sigma[pred](R)         -- restriction    → \sigma_{pred}(R)
 pi[A, B](R)            -- projection     → \pi_{A, B}(R)
 rho[A as B, C as D](R) -- rename        → \rho_{A \to B, C \to D}(R)
-R bowtie S             -- natural join   → R \otimes S
-R bowtie [pred] S      -- theta-join     → R \otimes_{pred} S
+R join S               -- natural join   → \mathrm{Join}(R, S)
+R join [pred] S        -- theta-join     → \mathrm{Join}_{pred}(R, S)
 R div S                -- division       → R \div S
 ```
 
 > **Note (2026-05-19)**: `:=` (assignment) has been
 > removed.  Use `==` instead.  `\bowtie` has been replaced by `\otimes`.
+>
+> **Note (2026-05-23)**: `bowtie` keyword has been renamed to `join`;
+> `\otimes` emission replaced by `\mathrm{Join}(R, S)`.  See
+> "ADR: Source keyword `bowtie` → `join`; emit `\mathrm{Join}` not `\otimes`".
 
 **Operator levels** (lowest binds least):
 
@@ -1539,7 +1543,7 @@ R div S                -- division       → R \div S
 |-------|-------------|-----------------|-------|
 | union/override | `union`, `++` | `_parse_union` | loosest |
 | setminus | `\` | `_parse_setminus` | |
-| cross/join/div | `cross`, `bowtie`, `div` | `_parse_cross` | |
+| cross/join/div | `cross`, `join`, `div` | `_parse_cross` | |
 | intersect | `intersect` | `_parse_intersect` | |
 | prefix ops | `sigma`, `pi`, `rho` | `_parse_atom` | tightest |
 
@@ -1548,38 +1552,36 @@ The complete precedence chain from loosest to tightest:
 ```text
 union / override (++)
     < setminus (\)
-        < cross / bowtie / div   [left-associative; same level]
+        < cross / join / div   [left-associative; same level]
             < intersect
                 < sigma[...](R) / pi[...](R) / rho[...](R)   [atom]
 ```
 
 `_parse_cross` calls `_parse_intersect` for each of its operands, so
-`intersect` binds **tighter** than `bowtie`/`div`/`cross` — it is resolved
+`intersect` binds **tighter** than `join`/`div`/`cross` — it is resolved
 first.  Consequence:
 
-- `R bowtie S union T` parses as `(R bowtie S) union T` — `bowtie` sits
+- `R join S union T` parses as `(R join S) union T` — `join` sits
   below `union` and is consumed first by `_parse_cross`.
-- `R bowtie S intersect T` parses as `R bowtie (S intersect T)` — `intersect`
-  is resolved inside `_parse_intersect` before `bowtie` completes.
-- `pi[a](R) bowtie S` parses as `(pi[a](R)) bowtie S` — `pi` is an atom.
-
-(In all three cases the LaTeX output uses `\otimes` / `\otimes_{p}`.)
+- `R join S intersect T` parses as `R join (S intersect T)` — `intersect`
+  is resolved inside `_parse_intersect` before `join` completes.
+- `pi[a](R) join S` parses as `(pi[a](R)) join S` — `pi` is an atom.
 
 **Why sigma/pi/rho at atom level**: They take explicit `[args](relation)`
 syntax analogous to function calls.  Parsing them at atom level is consistent
 with how `f(x)` is handled; it also means they can appear freely as operands
-in any higher-level expression (`pi[a](R) bowtie S`, `sigma[p](R union S)`).
+in any higher-level expression (`pi[a](R) join S`, `sigma[p](R union S)`).
 
-**Why bowtie and div at cross level**: The Codd/Date algebra treats join and
+**Why join and div at cross level**: The Codd/Date algebra treats join and
 division as binary operators on relations, at the same conceptual tier as
 Cartesian product.  Placing them alongside `cross` in `_parse_cross` avoids
 a separate precedence level while preserving the expected left-to-right
 associativity.
 
-**Theta-join subscript parsing**: `R bowtie [pred] S` — the `[` is consumed
-inside `_parse_cross` when it immediately follows a `bowtie` token.  A
+**Theta-join subscript parsing**: `R join [pred] S` — the `[` is consumed
+inside `_parse_cross` when it immediately follows a `join` token.  A
 separate `bracket_tok` is saved for error reporting; an empty bracket
-(`bowtie []`) raises "Expected predicate in bowtie subscript".
+(`join []`) raises "Expected predicate in join subscript".
 
 **`as` keyword**: `as` is not a reserved keyword — it tokenizes as
 `IDENTIFIER` with value `"as"`.  The rename-pair parser (`_parse_rename_pair`)
@@ -1590,7 +1592,7 @@ in other contexts.
 **Kernel LaTeX only** *(SUPERSEDED 2026-05-19; see the Tier-2 Keyword Algebra ADR
 for the current emission. The glyphs listed here reflect the original
 Greek-letter rendering that has been replaced.)*
-`\sigma`, `\pi`, `\rho`, `\otimes`, `\div` are all standard LaTeX kernel
+`\sigma`, `\pi`, `\rho`, `\div` are all standard LaTeX kernel
 symbols. No preamble change is required; fuzz and pdflatex both accept
 them without extra packages.
 
@@ -1606,7 +1608,7 @@ it receives `\mathrm{}` wrapping — consistent with the general rule.
    `from` appears as a Z field name in `examples/10_schemas/zed_blocks.txt`.
    Keyword-form would require a reserved word that conflicts with the corpus.
 
-2. Separate precedence level for `bowtie`/`div` above `cross` — rejected;
+2. Separate precedence level for `join`/`div` above `cross` — rejected;
    the precedence difference between cross-product and join is not significant
    in algebra expressions at this stage, and a single level avoids one parser
    function.
@@ -1617,8 +1619,17 @@ it receives `\mathrm{}` wrapping — consistent with the general rule.
 > **Superseded (2026-05-19):** The `:=` operator and `Assignment` node have been
 > removed entirely; the `\bowtie` emission has been replaced by `\otimes`.
 > See "ADR: Keyword Algebra Alignment — Drop `:=`, `\bowtie` → `\otimes`" below.
+>
+> **Further superseded (2026-05-23):** `\otimes` was subsequently replaced by
+> `\mathrm{Join}(R, S)` and the source keyword renamed `bowtie` → `join`.
+> See "ADR: Source keyword `bowtie` → `join`; emit `\mathrm{Join}` not `\otimes`".
 
 ## ADR: Keyword Algebra Alignment — Drop `:=`, `\bowtie` → `\otimes`
+
+> **SUPERSEDED (2026-05-23)**: The `\otimes` emit was itself incorrect —
+> it denotes the degenerate Cartesian-product case, not the natural join.
+> See "ADR: Source keyword `bowtie` → `join`; emit `\mathrm{Join}` not `\otimes`"
+> for the current design.
 
 **Decision**: Remove the `:=` assignment operator entirely and switch the
 natural-join LaTeX emission from `\bowtie` to `\otimes`, aligning with
@@ -2154,7 +2165,7 @@ uses the keyword form — `Restrict`, `Project`, `Rename`, `Join` — written up
 ### Decision
 
 Adopt **Tier 2** keyword emission for relational algebra. Source keywords
-(`sigma`, `pi`, `rho`, `bowtie`, `div`) and AST nodes (`Restrict`, `Project`,
+(`sigma`, `pi`, `rho`, `join`, `div`) and AST nodes (`Restrict`, `Project`,
 `Rename`, `NaturalJoin`, `Divide`) remain unchanged. Only the LaTeX *output*
 of the generator changes.
 
@@ -2163,9 +2174,13 @@ of the generator changes.
 | `sigma[p](R)` | `\sigma_{p}(R)` | `\mathrm{Restrict}_{p}(R)` |
 | `pi[A, B](R)` | `\pi_{A, B}(R)` | `\mathrm{Project}\{A, B\}(R)` |
 | `rho[A as B](R)` | `\rho_{A \to B}(R)` | `\mathrm{Rename}_{A \to B}(R)` |
-| `R bowtie S` | `R \otimes S` | `R \otimes S` — unchanged |
-| `R bowtie [p] S` | `R \otimes_{p} S` | `\mathrm{Join}_{p}(R, S)` |
+| `R join S` | `R \otimes S` | `\mathrm{Join}(R, S)` |
+| `R join [p] S` | `R \otimes_{p} S` | `\mathrm{Join}_{p}(R, S)` |
 | `R div S` | `R \div S` | `R \div S` — unchanged |
+
+> **Note (2026-05-23)**: The `bowtie` keyword was renamed to `join` and the
+> natural-join emit changed from `\otimes` to `\mathrm{Join}(R, S)`. See
+> "ADR: Source keyword `bowtie` → `join`; emit `\mathrm{Join}` not `\otimes`".
 
 Two shape changes merit attention:
 
@@ -2173,10 +2188,10 @@ Two shape changes merit attention:
    `Project{username, job}(Members)` with `\{...\}` around the attribute list.
    Restrict and Rename keep subscript form.
 
-2. **Theta-join changes from infix to function-call form**: `R \otimes_p S`
-   becomes `\mathrm{Join}_p(R, S)`. Natural join (no subscript) stays infix
-   with `\otimes`. The NaturalJoin AST node already carries `subscript: Expr |
-   None`; the generator dispatches on that field.
+2. **Both join forms use function-call form**: `R join S` emits
+   `\mathrm{Join}(R, S)` and `R join [p] S` emits `\mathrm{Join}_{p}(R, S)`.
+   The NaturalJoin AST node carries `subscript: Expr | None`; the generator
+   dispatches on that field.
 
 ### Rejected alternative: Tier 3 render-mode flag
 
@@ -2197,7 +2212,8 @@ Keyword-algebra style observed in reviewed materials:
 
 - `Restrict`, `Project`, `Rename` used consistently for the sigma/pi/rho operators.
 - `Join_p(R, S)` function-call form for theta-join (infix `\otimes_p` rejected).
-- Natural join stays `R \otimes S` (infix, no function-call form).
+- Natural join: as of 2026-05-23, emits `\mathrm{Join}(R, S)` (not `\otimes`).
+  See "ADR: Source keyword `bowtie` → `join`; emit `\mathrm{Join}` not `\otimes`".
 
 ---
 
@@ -2619,7 +2635,77 @@ treated uniformly: `Restrict`, `Project`, `Rename`, `NaturalJoin`,
 ### Consequences
 
 - DAT s2q5 (c) algebra chain — three abbreviation lines using
-  `Count(...)` and a `rho`/`bowtie`/`pi` composition — fuzz-typechecks
+  `Count(...)` and a `rho`/`join`/`pi` composition — fuzz-typechecks
   and renders cleanly without any `LATEX:` passthrough.
 - 1 regression test in `tests/test_group_aggregators.py`
   (`test_abbreviation_aggregator_routes_to_inline_math`).
+
+## ADR: Source keyword `bowtie` → `join`; emit `\mathrm{Join}` not `\otimes`
+
+### Context
+
+The original engine used:
+
+- Source keyword: `bowtie` (a LaTeX symbol name, not an English word)
+- Natural-join emit: `R \otimes S`  (the ⊗ tensor-product symbol)
+- Theta-join emit: `\mathrm{Join}_{p}(R, S)` (already correct)
+
+The instructor's canonical vocabulary, confirmed in slides/topic02.pdf page 45, is:
+
+> "We write Join(r, s). This kind of join is commonly referred to as a
+> 'natural join'. Note that if r and s have nothing in common then
+> Join(r, s) degenerates to r ⊗ s."
+
+Two problems followed:
+
+1. **Wrong symbol.** `⊗` denotes the *degenerate* Cartesian-product case
+   (no common attributes), not the natural join. Emitting `\otimes` for
+   every natural join was semantically incorrect.
+2. **Wrong keyword.** `bowtie` names a LaTeX macro, not an English operator.
+   The course uses `Join` consistently. Students who read the slides then
+   write `R join S` in their `.txt` files got a parse error.
+
+jms confirmed (prior to this change) that `\mathrm{Join}(R, S)` (no
+subscript) is fuzz-compatible: fuzz parses `\mathrm{...}` as an identifier,
+and a subscript-less form is a strict subset of the already-accepted
+`\mathrm{Join}_{p}(R, S)`.
+
+### Decision
+
+1. Rename the source keyword `bowtie` → `join` (hard rename; no alias).
+2. Rename `TokenType.BOWTIE` → `TokenType.JOIN` in `tokens.py`.
+3. Change the natural-join emit: `R \otimes S` → `\mathrm{Join}(R, S)`.
+4. Preserve theta-join emit: `R join [p] S` → `\mathrm{Join}_{p}(R, S)`.
+5. Migrate all source `.txt` files in `examples/` and
+   `course-ox-dat/exercises-worked/` (sbm/sem had no join usage).
+
+The AST class `NaturalJoin` retains its name for internal clarity; only
+the source-level keyword and token type rename.
+
+### Rejected alternatives
+
+1. **Keep `bowtie` as a deprecated alias.** Rejected — the mission mandates
+   a hard rename with no shims. Aliases accumulate forever and confuse
+   error messages.
+
+2. **Keep `\otimes` and just rename the keyword.** Rejected — `\otimes`
+   is semantically wrong per the slides. The symbol denotes the degenerate
+   case; using it for the general case is a lie to fuzz-trained readers.
+
+3. **Use the bowtie Unicode symbol ⋈ as an alternate emit.** Rejected —
+   fuzz does not define `\bowtie` as a Z operator; ⋈ requires an
+   extra LaTeX package and is not in fuzz.sty.
+
+### Consequences
+
+- Any `.txt` file using `bowtie` must be migrated to `join` — the old
+  keyword lexes as an IDENTIFIER, so parsers won't silently misinterpret it;
+  they produce a type error at the expression level.
+- Natural join now reads `\mathrm{Join}(R, S)`, matching the instructor's
+  slides and the theta-join form, giving a consistent vocabulary:
+  `Join`, `Restrict`, `Project`, `Rename`.
+- `\otimes` is gone from all generated output; the symbol is now available
+  for its correct Z-algebra meaning (degenerate cross-product), should a
+  future operator need it.
+- 5 new regression tests in `tests/test_14_relational_databases/test_algebra.py`
+  (`TestJoinRenameRegression`) confirm the rename end-to-end.

@@ -63,8 +63,8 @@ loser : PlayerName
 \noindent
 $\displaystyle
 \begin{array}{l}
-\mathrm{Project}_{winner, venue, tier}(Tournament \otimes \\
-\quad \mathrm{Rename}_{tournament \to tournamentId}(\mathrm{Project}_{tournament}(\mathrm{Restrict}_{winner = `Ali'}(Match))))
+\mathrm{Project}_{winner, venue, tier}(\mathrm{Join}(Tournament, \\
+\quad \mathrm{Rename}_{tournament \to tournamentId}(\mathrm{Project}_{tournament}(\mathrm{Restrict}_{winner = `Ali'}(Match)))))
 \end{array}$
 
 \bigskip

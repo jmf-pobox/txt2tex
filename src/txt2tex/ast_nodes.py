@@ -737,13 +737,13 @@ class Rename(ASTNode):
 
 @dataclass(frozen=True)
 class NaturalJoin(ASTNode):
-    """Natural join or theta-join (bowtie) node.
+    """Natural join or theta-join (join) node.
 
-    Represents R bowtie S (natural join) or R bowtie [p] S (theta-join).
+    Represents R join S (natural join) or R join [p] S (theta-join).
 
     Examples:
-    - R bowtie S -> left=R, right=S, subscript=None
-    - R bowtie [R.x = S.y] S -> left=R, right=S, subscript=(R.x = S.y)
+    - R join S -> left=R, right=S, subscript=None
+    - R join [R.x = S.y] S -> left=R, right=S, subscript=(R.x = S.y)
     """
 
     left: Expr

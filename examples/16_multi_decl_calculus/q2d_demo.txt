@@ -34,7 +34,7 @@ end
 
 TEXT: Long relational-algebra chains can be broken at any operator. Natural newlines work; explicit \ continuation also works. Display position wraps in array; the chain reads top-to-bottom instead of running off the page.
 
-pi[winner, venue, tier](Tournament bowtie
+pi[winner, venue, tier](Tournament join
   rho[tournament as tournamentId](pi[tournament](sigma[winner = 'Ali'](Match))))
 
 

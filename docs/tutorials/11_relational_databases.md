@@ -154,22 +154,23 @@ Renders as: $\mathrm{Rename}_{bookId \to id}(Book)$
 
 Multiple pairs are comma-separated.
 
-### Natural Join (bowtie)
+### Natural Join (join)
 
 Join on all common attributes:
 
 ```text
-Track bowtie Album
+Track join Album
 ```
 
-Renders as: $Track \otimes Album$
+Renders as: $\mathrm{Join}(Track, Album)$
 
-The source keyword is `bowtie`; the LaTeX emission is `\otimes` (`⊗`).
+The source keyword is `join`; the LaTeX emission is `\mathrm{Join}(R, S)`,
+matching the instructor's canonical vocabulary (slides/topic02.pdf §45).
 
 **Theta-join** — join with an explicit predicate:
 
 ```text
-Track bowtie [Track.albumId = Album.albumId] Album
+Track join [Track.albumId = Album.albumId] Album
 ```
 
 Renders as: $\mathrm{Join}_{Track.albumId = Album.albumId}(Track, Album)$
@@ -203,13 +204,13 @@ Emits as:
 ### Operator Precedence
 
 Algebra prefix operators (`sigma`, `pi`, `rho`) bind at atom level — they
-are parsed as prefix-with-arguments, like function calls. `bowtie` and
+are parsed as prefix-with-arguments, like function calls. `join` and
 `div` are infix and sit at the same precedence as `cross` (Cartesian
 product), above union/intersect.
 
 ```text
 pi[a](R union S)          // pi wraps (R union S) — correct
-pi[a](R) bowtie pi[b](S)  // join of two projected relations
+pi[a](R) join pi[b](S)    // join of two projected relations
 ```
 
 ### Complete Algebra Example
@@ -359,8 +360,8 @@ GroupMembers ungroup contact
 
 ### Chaining
 
-GROUP and UNGROUP are left-associative at the same precedence as `bowtie` (`\otimes`)
-and `div`. Chaining is valid:
+GROUP and UNGROUP are left-associative at the same precedence as `join` and `div`.
+Chaining is valid:
 
 ```text
 R group ({A, B} as sub) ungroup sub

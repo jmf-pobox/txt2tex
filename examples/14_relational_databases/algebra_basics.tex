@@ -68,14 +68,14 @@ $\mathrm{Rename}_{bookId \to id}(Book)$
 $\mathrm{Rename}_{bookId \to id, author \to writer}(Book)$
 
 
-\section*{Natural Join and Theta-Join (bowtie)}
+\section*{Natural Join and Theta-Join (join)}
 
 \noindent
-$Loan \otimes Book$
+$\mathrm{Join}(Loan, Book)$
 
 
 \noindent
-$\mathrm{Rename}_{bookId \to id}(Loan) \otimes \mathrm{Rename}_{bookId \to id}(Book)$
+$\mathrm{Join}(\mathrm{Rename}_{bookId \to id}(Loan), \mathrm{Rename}_{bookId \to id}(Book))$
 
 
 \noindent

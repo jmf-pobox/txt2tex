@@ -2379,7 +2379,7 @@ class Parser:
             TokenType.FINFUN,  # 77-> (finite partial function)
             TokenType.IMPLIES,  # =>
             TokenType.IFF,  # <=>
-            TokenType.BOWTIE,  # bowtie (natural join / theta-join)
+            TokenType.JOIN,  # join (natural join / theta-join)
             TokenType.DIV,  # div (relational division)
         ):
             return False
@@ -3653,9 +3653,9 @@ class Parser:
     def _parse_cross(self) -> Expr:
         """Parse Cartesian product, natural join, theta-join, division, GROUP, UNGROUP.
 
-        CROSS, BOWTIE, DIV, GROUP, and UNGROUP sit at the same precedence
+        CROSS, JOIN, DIV, GROUP, and UNGROUP sit at the same precedence
         level between set operators and arithmetic (Phase 2.2 / 4.1).
-        BOWTIE handles an optional subscript bracket: R bowtie [p] S.
+        JOIN handles an optional subscript bracket: R join [p] S.
         GROUP and UNGROUP are Date's nested-relation operators.
 
         Supports multi-line expressions with natural line breaks.
@@ -3664,26 +3664,26 @@ class Parser:
 
         while self._match(
             TokenType.CROSS,
-            TokenType.BOWTIE,
+            TokenType.JOIN,
             TokenType.DIV,
             TokenType.GROUP,
             TokenType.UNGROUP,
         ):
             op_token = self._advance()
 
-            if op_token.type == TokenType.BOWTIE:
-                # Check for theta-join subscript: bowtie [predicate]
+            if op_token.type == TokenType.JOIN:
+                # Check for theta-join subscript: join [predicate]
                 subscript: Expr | None = None
                 if self._match(TokenType.LBRACKET):
                     bracket_tok = self._advance()  # consume '['
                     if self._match(TokenType.RBRACKET):
                         raise ParserError(
-                            "Expected predicate in bowtie subscript", self._current()
+                            "Expected predicate in join subscript", self._current()
                         )
                     subscript = self._parse_expr()
                     if not self._match(TokenType.RBRACKET):
                         raise ParserError(
-                            "Expected ']' after bowtie predicate", bracket_tok
+                            "Expected ']' after join predicate", bracket_tok
                         )
                     self._advance()  # consume ']'
                 # Detect line continuation after optional subscript
@@ -3818,8 +3818,8 @@ class Parser:
 
             # After constructing the node, check for trailing continuation
             # that marks a break before the next operator in the chain.
-            # Example: R bowtie S \    ← \ after RHS, before next bowtie
-            #            bowtie T
+            # Example: R join S \    ← \ after RHS, before next join
+            #            join T
             # The just-constructed node gets line_break_after=True so the
             # caller knows to emit \\ before the next operator.
             if self._match(TokenType.CONTINUATION):
@@ -3840,7 +3840,7 @@ class Parser:
     def _next_non_newline_is_cross_op(self) -> bool:
         """Peek ahead past newlines to see if a cross-level operator follows.
 
-        Returns True when the next non-newline token is one of CROSS, BOWTIE,
+        Returns True when the next non-newline token is one of CROSS, JOIN,
         DIV, GROUP, or UNGROUP, indicating a natural line break in a chain.
         """
         pos = self.pos
@@ -3850,7 +3850,7 @@ class Parser:
             return False
         return self.tokens[pos].type in (
             TokenType.CROSS,
-            TokenType.BOWTIE,
+            TokenType.JOIN,
             TokenType.DIV,
             TokenType.GROUP,
             TokenType.UNGROUP,

@@ -164,7 +164,7 @@ class TokenType(Enum):
     SIGMA = auto()  # sigma (restriction)
     PI = auto()  # pi (projection)
     RHO = auto()  # rho (rename)
-    BOWTIE = auto()  # bowtie (natural join / theta-join)
+    JOIN = auto()  # join (natural join / theta-join)
     DIV = auto()  # div (division)
 
     # Binding bracket operators (Phase 2.3 — Z RM §3.7)

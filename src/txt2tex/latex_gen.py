@@ -2541,10 +2541,10 @@ class LaTeXGenerator:
     def _generate_natural_join(
         self, node: NaturalJoin, parent: Expr | None = None
     ) -> str:
-        r"""Generate LaTeX for R bowtie S or R bowtie [p] S.
+        r"""Generate LaTeX for R join S or R join [p] S.
 
-        R bowtie S      → R \otimes S                     (natural join)
-        R bowtie [p] S  → \mathrm{Join}_{p}(R, S)         (theta-join)
+        R join S      → \mathrm{Join}(R, S)               (natural join)
+        R join [p] S  → \mathrm{Join}_{p}(R, S)           (theta-join)
 
         When line_break_after is set, inserts \\ before the RHS so the
         right operand starts on the next indented line.
@@ -2554,8 +2554,8 @@ class LaTeXGenerator:
         if node.subscript is None:
             if node.line_break_after:
                 indent = self._get_indentation()
-                return f"{left_latex} \\otimes \\\\\n{indent} {right_latex}"
-            return f"{left_latex} \\otimes {right_latex}"
+                return f"\\mathrm{{Join}}({left_latex}, \\\\\n{indent} {right_latex})"
+            return f"\\mathrm{{Join}}({left_latex}, {right_latex})"
         sub_latex = self.generate_expr(node.subscript)
         if node.line_break_after:
             indent = self._get_indentation()

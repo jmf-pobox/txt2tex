@@ -31,7 +31,7 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     "sigma": TokenType.SIGMA,
     "pi": TokenType.PI,
     "rho": TokenType.RHO,
-    "bowtie": TokenType.BOWTIE,
+    "join": TokenType.JOIN,
     "div": TokenType.DIV,
     # Nested-relation operators (Phase 4.1)
     "group": TokenType.GROUP,
@@ -120,7 +120,7 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "sigma",
         "pi",
         "rho",
-        "bowtie",
+        "join",
         "div",
         "group",
         "ungroup",

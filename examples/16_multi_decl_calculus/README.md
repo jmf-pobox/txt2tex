@@ -15,7 +15,7 @@ Uses a tournament scheduling domain (Player, Tournament, Match).
 
 `q2d_demo.txt` --- one file, seven sections:
 
-1. WYSIWYG line breaks for algebra operators (bowtie, intersect, etc.).
+1. WYSIWYG line breaks for algebra operators (join, intersect, etc.).
 2. Multi-decl set comprehension with conjunction predicate over projections.
 3. Multi-decl `forall` with conjunction predicate.
 4. Multi-decl quantifier with no characteristic expression (Z RM §3.9

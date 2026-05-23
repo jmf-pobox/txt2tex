@@ -122,6 +122,10 @@ These items were missing in earlier versions and are now shipped:
   `\begin{verbatim}…\end{verbatim}`, terminated by column-0 `END`.
 - **#140** — GROUP aggregate forms: `Count`, `Sum`, `Avg`, `Min`, `Max`,
   and `Median` aggregator keywords inside `group` RHS.
+- **join rename** (2026-05-23) — Source keyword `bowtie` renamed to `join`;
+  natural-join emission changed from `R \otimes S` (wrong: denotes the
+  degenerate Cartesian-product case) to `\mathrm{Join}(R, S)` (instructor's
+  canonical vocabulary, slides/topic02.pdf §45).
 - **#141** — `free_vars` Binding: `expr_free_vars` now raises
   `NotImplementedError` on `Binding` nodes instead of silently returning
   an incomplete result.
@@ -158,4 +162,4 @@ All fundamental Z notation is complete:
 - **Schema calculus**: composition (`;`), piping (`>>`), hiding (`hide`), projection (`project`), renaming (`S[a/b]`), horizontal definitions (`Name defs Schema-Exp`)
 - **Operators**: All logic, set, relation, function, and sequence operators
 - **Formatting**: `\also`, `\t` indentation, `~` spacing, line breaks
-- **Relational database extensions**: relational algebra (sigma, pi, rho, bowtie, division), GROUP/UNGROUP, primary key annotation
+- **Relational database extensions**: relational algebra (sigma, pi, rho, join, division), GROUP/UNGROUP, primary key annotation

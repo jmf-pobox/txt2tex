@@ -87,11 +87,11 @@ class TestAlgebraLexer:
         assert tokens[0].type == TokenType.RHO
         assert tokens[0].value == "rho"
 
-    def test_bowtie_token(self) -> None:
-        """'bowtie' lexes to BOWTIE token."""
-        tokens = _lex("bowtie")
-        assert tokens[0].type == TokenType.BOWTIE
-        assert tokens[0].value == "bowtie"
+    def test_join_token(self) -> None:
+        """'join' lexes to JOIN token."""
+        tokens = _lex("join")
+        assert tokens[0].type == TokenType.JOIN
+        assert tokens[0].value == "join"
 
     def test_div_token(self) -> None:
         """'div' lexes to DIV token."""
@@ -201,16 +201,16 @@ class TestRenameParser:
 
 
 # ---------------------------------------------------------------------------
-# Parser — NaturalJoin (bowtie)
+# Parser — NaturalJoin (join)
 # ---------------------------------------------------------------------------
 
 
 class TestNaturalJoinParser:
-    """Parser produces NaturalJoin nodes for R bowtie S and R bowtie [p] S."""
+    """Parser produces NaturalJoin nodes for R join S and R join [p] S."""
 
     def test_natural_join_no_subscript(self) -> None:
-        """R bowtie S → NaturalJoin with subscript=None."""
-        node = _expr("R bowtie S")
+        """R join S → NaturalJoin with subscript=None."""
+        node = _expr("R join S")
         assert isinstance(node, NaturalJoin)
         assert isinstance(node.left, Identifier)
         assert node.left.name == "R"
@@ -219,23 +219,23 @@ class TestNaturalJoinParser:
         assert node.subscript is None
 
     def test_theta_join(self) -> None:
-        """R bowtie [p] S → NaturalJoin with subscript=p."""
-        node = _expr("R bowtie [p] S")
+        """R join [p] S → NaturalJoin with subscript=p."""
+        node = _expr("R join [p] S")
         assert isinstance(node, NaturalJoin)
         assert node.subscript is not None
         assert isinstance(node.subscript, Identifier)
         assert node.subscript.name == "p"
 
     def test_theta_join_equality_predicate(self) -> None:
-        """R bowtie [x = y] S → subscript is BinaryOp(=)."""
-        node = _expr("R bowtie [x = y] S")
+        """R join [x = y] S → subscript is BinaryOp(=)."""
+        node = _expr("R join [x = y] S")
         assert isinstance(node, NaturalJoin)
         assert isinstance(node.subscript, BinaryOp)
         assert node.subscript.operator == "="
 
     def test_natural_join_position(self) -> None:
-        """NaturalJoin node carries position of bowtie operator."""
-        node = _expr("R bowtie S")
+        """NaturalJoin node carries position of join operator."""
+        node = _expr("R join S")
         assert node.line == 1
 
 
@@ -395,25 +395,26 @@ class TestRenameGenerator:
 
 
 class TestNaturalJoinGenerator:
-    r"""LaTeX generator: \otimes (natural join) or \mathrm{Join} (theta-join).
+    r"""LaTeX generator: \mathrm{Join}(R, S) for both natural join and theta-join.
 
-    Natural join (no subscript) stays infix; theta-join becomes function form.
+    Natural join (no subscript) emits \mathrm{Join}(R, S).
+    Theta-join emits \mathrm{Join}_{p}(R, S).
     """
 
     def test_natural_join(self) -> None:
-        r"""R bowtie S → R \otimes S (unchanged)."""
-        result = _expr_latex("R bowtie S")
-        assert result == r"R \otimes S"
+        r"""R join S → \mathrm{Join}(R, S)."""
+        result = _expr_latex("R join S")
+        assert result == r"\mathrm{Join}(R, S)"
 
     def test_theta_join(self) -> None:
-        r"""R bowtie [p] S → \mathrm{Join}_{p}(R, S) (function form)."""
-        result = _expr_latex("R bowtie [p] S")
+        r"""R join [p] S → \mathrm{Join}_{p}(R, S) (function form)."""
+        result = _expr_latex("R join [p] S")
         assert result == r"\mathrm{Join}_{p}(R, S)"
 
     def test_natural_join_named_relations(self) -> None:
-        r"""Ship bowtie Outcome → Ship \otimes Outcome (no relvar wrapping)."""
-        result = _expr_latex("Ship bowtie Outcome")
-        assert result == r"Ship \otimes Outcome"
+        r"""Ship join Outcome → \mathrm{Join}(Ship, Outcome) (no relvar wrapping)."""
+        result = _expr_latex("Ship join Outcome")
+        assert result == r"\mathrm{Join}(Ship, Outcome)"
 
 
 # ---------------------------------------------------------------------------
@@ -515,10 +516,10 @@ class TestAlgebraNegative:
         assert "target attribute" in err.message.lower()
         assert err.token.line == 1
 
-    def test_bowtie_empty_subscript(self) -> None:
-        """R bowtie [] S — empty theta-join subscript."""
+    def test_join_empty_subscript(self) -> None:
+        """R join [] S — empty theta-join subscript."""
         with pytest.raises(ParserError) as exc_info:
-            Parser(_lex("R bowtie [] S")).parse()
+            Parser(_lex("R join [] S")).parse()
         err = exc_info.value
         assert "predicate" in err.message.lower()
         assert err.token.line == 1
@@ -556,21 +557,21 @@ class TestQ1AcceptanceProbes:
         assert "Class" in result
 
     def test_q1b_natural_join(self) -> None:
-        r"""Q1(b): Ship bowtie Class — natural join.
+        r"""Q1(b): Ship join Class — natural join.
 
-        Expected: Ship \otimes Class (⊗ notation, natural join)
+        Expected: \mathrm{Join}(Ship, Class)
         """
-        result = self._gen("Ship bowtie Class")
-        assert r"Ship \otimes Class" in result
+        result = self._gen("Ship join Class")
+        assert r"\mathrm{Join}(Ship, Class)" in result
 
     def test_q1c_rename_then_join(self) -> None:
-        r"""Q1(c): rho[ship as name](Outcome) bowtie Ship.
+        r"""Q1(c): rho[ship as name](Outcome) join Ship.
 
-        Expected: \mathrm{Rename}_{ship \to name}(Outcome) \otimes Ship
+        Expected: \mathrm{Join}(\mathrm{Rename}_{ship \to name}(Outcome), Ship)
         """
-        result = self._gen("rho[ship as name](Outcome) bowtie Ship")
+        result = self._gen("rho[ship as name](Outcome) join Ship")
         assert r"\mathrm{Rename}_{ship \to name}(Outcome)" in result
-        assert r"\otimes Ship" in result
+        assert r"\mathrm{Join}(" in result
 
 
 # ---------------------------------------------------------------------------
@@ -602,16 +603,16 @@ class TestAttrNamePassthrough:
         assert r"name \to class'" in result
 
 
-class TestFix4BowtiePrecedence:
-    """FIX 4: bowtie binds tighter than union.
+class TestJoinPrecedence:
+    """join binds tighter than union.
 
-    R bowtie S union T must parse as (R bowtie S) union T, not
-    R bowtie (S union T).  Verified by inspecting the AST structure.
+    R join S union T must parse as (R join S) union T, not
+    R join (S union T).  Verified by inspecting the AST structure.
     """
 
-    def test_bowtie_binds_tighter_than_union(self) -> None:
-        """R bowtie S union T → BinaryOp('union', NaturalJoin(R, S), T)."""
-        ast = _expr("R bowtie S union T")
+    def test_join_binds_tighter_than_union(self) -> None:
+        """R join S union T → BinaryOp('union', NaturalJoin(R, S), T)."""
+        ast = _expr("R join S union T")
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "union"
         assert isinstance(ast.left, NaturalJoin)
@@ -622,23 +623,66 @@ class TestFix4BowtiePrecedence:
         assert isinstance(ast.right, Identifier)
         assert ast.right.name == "T"
 
-    def test_intersect_binds_tighter_than_bowtie(self) -> None:
-        """R bowtie S intersect T → NaturalJoin(R, intersect(S, T)).
+    def test_intersect_binds_tighter_than_join(self) -> None:
+        """R join S intersect T → NaturalJoin(R, intersect(S, T)).
 
         intersect is at _parse_intersect, which is called from _parse_cross
-        to resolve operands.  intersect therefore binds tighter than bowtie.
+        to resolve operands.  intersect therefore binds tighter than join.
         """
-        ast = _expr("R bowtie S intersect T")
+        ast = _expr("R join S intersect T")
         assert isinstance(ast, NaturalJoin)
         assert isinstance(ast.left, Identifier)
         assert ast.left.name == "R"
         assert isinstance(ast.right, BinaryOp)
         assert ast.right.operator == "intersect"
 
-    def test_pi_atom_feeds_bowtie(self) -> None:
-        """pi[a](R) bowtie S → NaturalJoin(pi[a](R), S)."""
-        ast = _expr("pi[a](R) bowtie S")
+    def test_pi_atom_feeds_join(self) -> None:
+        """pi[a](R) join S → NaturalJoin(pi[a](R), S)."""
+        ast = _expr("pi[a](R) join S")
         assert isinstance(ast, NaturalJoin)
         assert isinstance(ast.left, Project)
         assert isinstance(ast.right, Identifier)
         assert ast.right.name == "S"
+
+
+# ---------------------------------------------------------------------------
+# Regression: bowtie → join rename; \otimes → \mathrm{Join}
+# ---------------------------------------------------------------------------
+
+
+class TestJoinRenameRegression:
+    r"""Regression: bowtie→join rename; \otimes→\mathrm{Join} emit.
+
+    Added when the source keyword was renamed from ``bowtie`` to ``join``
+    and the natural-join emission changed from ``R \otimes S`` to
+    ``\mathrm{Join}(R, S)`` per the instructor's canonical vocabulary
+    (slides/topic02.pdf page 45).
+    """
+
+    def test_natural_join_emits_mathrm_join(self) -> None:
+        r"""R join S → \mathrm{Join}(R, S) (not \otimes)."""
+        result = _expr_latex("R join S")
+        assert result == r"\mathrm{Join}(R, S)"
+        assert r"\otimes" not in result
+
+    def test_theta_join_emits_mathrm_join_subscript(self) -> None:
+        r"""R join [p] S → \mathrm{Join}_{p}(R, S)."""
+        result = _expr_latex("R join [p] S")
+        assert result == r"\mathrm{Join}_{p}(R, S)"
+
+    def test_natural_join_three_way(self) -> None:
+        r"""R join S join T is left-associative: Join(Join(R, S), T)."""
+        result = _expr_latex("R join S join T")
+        assert result == r"\mathrm{Join}(\mathrm{Join}(R, S), T)"
+
+    def test_join_keyword_is_reserved(self) -> None:
+        """'join' lexes to JOIN, not IDENTIFIER — it is reserved."""
+        tokens = _lex("join")
+        assert tokens[0].type == TokenType.JOIN
+        assert tokens[0].value == "join"
+
+    def test_bowtie_is_no_longer_a_keyword(self) -> None:
+        """'bowtie' now lexes as IDENTIFIER (no longer reserved)."""
+        tokens = _lex("bowtie")
+        assert tokens[0].type == TokenType.IDENTIFIER
+        assert tokens[0].value == "bowtie"

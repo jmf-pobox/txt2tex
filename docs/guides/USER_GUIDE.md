@@ -2834,7 +2834,7 @@ pk in axdef          // only schema bodies — parser error
 
 ### Relational Algebra (Phase 2.2)
 
-The five Codd/Date operators.  All use kernel LaTeX (`\mathrm`, `\otimes`,
+The five Codd/Date operators.  All use kernel LaTeX (`\mathrm`,
 `\div`) — no extra package needed.  The emission uses keyword style:
 `Restrict`, `Project`, `Rename`, `Join`.
 
@@ -2881,17 +2881,18 @@ Each pair is written `old as new`; multiple pairs are comma-separated.
 #### Natural Join
 
 ```text
-Track bowtie Album
+Track join Album
 ```
 
-Renders: $Track \otimes Album$
+Renders: $\mathrm{Join}(Track, Album)$
 
-The source keyword is `bowtie`; the LaTeX emission is `\otimes` (`⊗`).
+The source keyword is `join`; the LaTeX emission is `\mathrm{Join}(R, S)`,
+matching the instructor's canonical vocabulary (per slides/topic02.pdf §45).
 
 **Theta-join** with explicit predicate:
 
 ```text
-Track bowtie [Track.albumId = Album.albumId] Album
+Track join [Track.albumId = Album.albumId] Album
 ```
 
 Renders: $\mathrm{Join}_{Track.albumId = Album.albumId}(Track, Album)$
@@ -2923,7 +2924,7 @@ Emits as `\noindent$LongBooks \defs \mathrm{Project}_{bookId, isbn}(\mathrm{Rest
 pi[bookId, isbn](sigma[pages >= 200](Book))
 
 // rename then join
-rho[bookId as id](Book) bowtie Loan
+rho[bookId as id](Book) join Loan
 
 // name a query using ==
 LongBooks == pi[bookId, isbn](sigma[pages >= 200](Book))
@@ -2934,7 +2935,7 @@ LongBooks == pi[bookId, isbn](sigma[pages >= 200](Book))
 | Operator | Form | Level |
 |----------|------|-------|
 | `sigma`, `pi`, `rho` | prefix-with-args | atom |
-| `bowtie`, `div`, `cross`, `group`, `ungroup` | infix | same as cross |
+| `join`, `div`, `cross`, `group`, `ungroup` | infix | same as cross |
 | `union`, `intersect` | infix | set ops |
 
 ### GROUP and UNGROUP (Phase 4.1)
@@ -3027,7 +3028,7 @@ the original flat columns.
 #### Chaining
 
 GROUP and UNGROUP are left-associative at the same precedence as
-`bowtie` and `div`:
+`join` and `div`:
 
 ```text
 R group ({A} as sub) ungroup sub
@@ -3329,7 +3330,7 @@ newline after the operator and an explicit `\` continuation:
 
 | Keyword | LaTeX | Notes |
 |---------|-------|-------|
-| `bowtie` | `\otimes` | natural join / theta-join |
+| `join` | `\mathrm{Join}(R, S)` | natural join / theta-join |
 | `cross` | `\times` | Cartesian product |
 | `div` | `\div` | relational division |
 | `intersect` | `\cap` | set intersection |
@@ -3350,8 +3351,8 @@ and `lor`.
 Example — long algebra expression broken at operator boundaries:
 
 ```text
-pi[winner, venue, tier](Tournament bowtie
-  Match bowtie
+pi[winner, venue, tier](Tournament join
+  Match join
   rho[tournament as id](pi[tournament](sigma[venue = 'Centre Court'](Match))))
 ```
 

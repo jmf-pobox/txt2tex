@@ -1,5 +1,5 @@
 // Relational Algebra Operators
-// Demonstrates: sigma, pi, rho, bowtie (renders as ⊗), div.
+// Demonstrates: sigma, pi, rho, join (renders as ⊗), div.
 
 TITLE: Relational Algebra
 AUTHOR: txt2tex example
@@ -61,19 +61,19 @@ rho[bookId as id](Book)
 rho[bookId as id, author as writer](Book)
 
 
-=== Natural Join and Theta-Join (bowtie) ===
+=== Natural Join and Theta-Join (join) ===
 
 // Natural join — joins on attributes with matching names.
 
-Loan bowtie Book
+Loan join Book
 
 // Rename then join:
 
-rho[bookId as id](Loan) bowtie rho[bookId as id](Book)
+rho[bookId as id](Loan) join rho[bookId as id](Book)
 
 // Theta-join with explicit predicate:
 
-Member bowtie [Member.memberId = Loan.memberId] Loan
+Member join [Member.memberId = Loan.memberId] Loan
 
 
 === Division (div) ===

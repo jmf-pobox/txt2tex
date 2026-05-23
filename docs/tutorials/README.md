@@ -118,7 +118,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 
 - **[Tutorial 11: Relational Databases](11_relational_databases.md)** *(Level 2)*
   - `pk` prefix for primary-key underlining
-  - Relational algebra: `sigma`, `pi`, `rho`, `bowtie`, `div`, `:=`
+  - Relational algebra: `sigma`, `pi`, `rho`, `join`, `div`, `==`
   - Z binding calculus: `{| label == expr |}` per Z RM §3.7
   - GROUP and UNGROUP operators for nested relations
   - **Examples:** `14_relational_databases/`

@@ -213,7 +213,7 @@ Relational-database modelling in Z, including the schema-based relational calcul
 
 | File | Demonstrates |
 |------|-------------|
-| `algebra_basics.txt` | Relational algebra operators: `sigma`, `pi`, `rho`, `bowtie`, `div` |
+| `algebra_basics.txt` | Relational algebra operators: `sigma`, `pi`, `rho`, `join`, `div` |
 | `bindings.txt` | Z binding literals `{\| name == e \|}` for relational-calculus queries |
 | `foreign_keys.txt` | `pk` primary-key annotation; single and composite foreign-key constraints |
 | `group_ungroup.txt` | GROUP / UNGROUP nested-relation operators |

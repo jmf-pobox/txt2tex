@@ -38,8 +38,8 @@ Demonstrates the relational algebra operators added in Phase 2.2:
 - `sigma[pred](R)` — restriction (`\mathrm{Restrict}_{pred}(R)`)
 - `pi[A, B](R)` — projection (`\mathrm{Project}\{A, B\}(R)`)
 - `rho[A as B](R)` — renaming (`\mathrm{Rename}_{A \to B}(R)`)
-- `R bowtie S` — natural join (`R \otimes S`)
-- `R bowtie [pred] S` — theta-join (`\mathrm{Join}_{pred}(R, S)`, function form)
+- `R join S` — natural join (`\mathrm{Join}(R, S)`)
+- `R join [pred] S` — theta-join (`\mathrm{Join}_{pred}(R, S)`, function form)
 - `R div S` — division (`R \div S`)
 
 All operators use kernel LaTeX (no extra preamble packages required).

@@ -1,7 +1,7 @@
 """Tests for WYSIWYG line-break support in relational-algebra and set operators.
 
 Covers natural newline and explicit backslash continuation for:
-bowtie, cross, div, intersect, union, setminus, ++, group, ungroup.
+join, cross, div, intersect, union, setminus, ++, group, ungroup.
 
 Tests follow the pattern established in _parse_iff: operator + continuation
 detection → line_break_after=True on the AST node → \\\\ in LaTeX output.
@@ -71,9 +71,9 @@ def _doc_latex(src: str) -> str:
 class TestNaturalNewlineContinuation:
     """Natural newline after operator sets line_break_after=True on the AST node."""
 
-    def test_bowtie_natural_newline(self) -> None:
-        """R bowtie\\nS → NaturalJoin with line_break_after=True."""
-        node = _expr("R bowtie\nS")
+    def test_join_natural_newline(self) -> None:
+        """R join\\nS → NaturalJoin with line_break_after=True."""
+        node = _expr("R join\nS")
         assert isinstance(node, NaturalJoin)
         assert node.line_break_after is True
 
@@ -135,16 +135,16 @@ class TestNaturalNewlineContinuation:
         assert node.line_break_after is True
 
     def test_group_natural_newline(self) -> None:
-        """R group ({A} as m)\\nbowtie S → Group with line_break_after=True."""
-        node = _expr("R group ({A} as m)\nbowtie S")
+        """R group ({A} as m)\\njoin S → Group with line_break_after=True."""
+        node = _expr("R group ({A} as m)\njoin S")
         # The group result is on the left of the NaturalJoin
         assert isinstance(node, NaturalJoin)
         assert isinstance(node.left, Group)
         assert node.left.line_break_after is True
 
     def test_ungroup_natural_newline(self) -> None:
-        """R ungroup m\\nbowtie S → Ungroup with line_break_after=True."""
-        node = _expr("R ungroup m\nbowtie S")
+        """R ungroup m\\njoin S → Ungroup with line_break_after=True."""
+        node = _expr("R ungroup m\njoin S")
         assert isinstance(node, NaturalJoin)
         assert isinstance(node.left, Ungroup)
         assert node.left.line_break_after is True
@@ -158,9 +158,9 @@ class TestNaturalNewlineContinuation:
 class TestExplicitBackslashContinuation:
     r"""Explicit \\ (CONTINUATION token) sets line_break_after=True."""
 
-    def test_bowtie_backslash(self) -> None:
-        r"""R bowtie \\\nS → NaturalJoin with line_break_after=True."""
-        node = _expr("R bowtie \\\nS")
+    def test_join_backslash(self) -> None:
+        r"""R join \\\nS → NaturalJoin with line_break_after=True."""
+        node = _expr("R join \\\nS")
         assert isinstance(node, NaturalJoin)
         assert node.line_break_after is True
 
@@ -218,15 +218,15 @@ class TestExplicitBackslashContinuation:
         assert node.line_break_after is True
 
     def test_group_backslash(self) -> None:
-        r"""R group ({A} as m) \\\nbowtie S → Group with line_break_after=True."""
-        node = _expr("R group ({A} as m) \\\nbowtie S")
+        r"""R group ({A} as m) \\\njoin S → Group with line_break_after=True."""
+        node = _expr("R group ({A} as m) \\\njoin S")
         assert isinstance(node, NaturalJoin)
         assert isinstance(node.left, Group)
         assert node.left.line_break_after is True
 
     def test_ungroup_backslash(self) -> None:
-        r"""R ungroup m \\\nbowtie S → Ungroup with line_break_after=True."""
-        node = _expr("R ungroup m \\\nbowtie S")
+        r"""R ungroup m \\\njoin S → Ungroup with line_break_after=True."""
+        node = _expr("R ungroup m \\\njoin S")
         assert isinstance(node, NaturalJoin)
         assert isinstance(node.left, Ungroup)
         assert node.left.line_break_after is True
@@ -244,38 +244,38 @@ class TestMixedChain:
     document context.  Use multi-char identifiers (AA, BB, CC) throughout.
     """
 
-    def test_bowtie_chain_trailing_continuation(self) -> None:
-        r"""AA bowtie BB \\\nbowtie CC — inner join gets line_break_after=True.
+    def test_join_chain_trailing_continuation(self) -> None:
+        r"""AA join BB \\\njoin CC — inner join gets line_break_after=True.
 
         The \\ after BB is a trailing continuation: it is consumed after
         NaturalJoin(AA, BB) is built, so the inner join node gets the flag.
         The outer join NaturalJoin(inner, CC) has no break.
         """
-        node = _expr("AA bowtie BB \\\nbowtie CC")
-        # (AA bowtie BB) bowtie CC
+        node = _expr("AA join BB \\\njoin CC")
+        # (AA join BB) join CC
         assert isinstance(node, NaturalJoin)
         assert isinstance(node.left, NaturalJoin)
         # Trailing \\ after BB sets flag on the inner join
         assert node.left.line_break_after is True
 
-    def test_bowtie_chain_natural_newline_trailing(self) -> None:
-        """AA bowtie BB\\nbowtie CC — inner join has line_break_after=True."""
-        node = _expr("AA bowtie BB\nbowtie CC")
-        # (AA bowtie BB) bowtie CC
+    def test_join_chain_natural_newline_trailing(self) -> None:
+        """AA join BB\\njoin CC — inner join has line_break_after=True."""
+        node = _expr("AA join BB\njoin CC")
+        # (AA join BB) join CC
         assert isinstance(node, NaturalJoin)
         assert isinstance(node.left, NaturalJoin)
-        # Natural newline after BB (before next bowtie) → inner join gets flag
+        # Natural newline after BB (before next join) → inner join gets flag
         assert node.left.line_break_after is True
 
-    def test_bowtie_three_way_break(self) -> None:
-        r"""AA bowtie\\nBB bowtie\\nCC — each operator carries the break."""
-        node = _expr("AA bowtie\nBB bowtie\nCC")
-        # (AA bowtie BB) bowtie CC
+    def test_join_three_way_break(self) -> None:
+        r"""AA join\\nBB join\\nCC — each operator carries the break."""
+        node = _expr("AA join\nBB join\nCC")
+        # (AA join BB) join CC
         assert isinstance(node, NaturalJoin)
-        # Outer join: bowtie\\nCC → line_break_after=True
+        # Outer join: join\\nCC → line_break_after=True
         assert node.line_break_after is True
         assert isinstance(node.left, NaturalJoin)
-        # Inner join: bowtie\\nBB → line_break_after=True
+        # Inner join: join\\nBB → line_break_after=True
         assert node.left.line_break_after is True
 
 
@@ -288,15 +288,15 @@ class TestThetaJoinContinuation:
     """Theta-join records line_break_after=True after the optional subscript."""
 
     def test_theta_join_backslash_continuation(self) -> None:
-        r"""R bowtie [R.x = S.y] \\\nS → NaturalJoin with line_break_after=True."""
-        node = _expr("R bowtie [R.x = S.y] \\\nS")
+        r"""R join [R.x = S.y] \\\nS → NaturalJoin with line_break_after=True."""
+        node = _expr("R join [R.x = S.y] \\\nS")
         assert isinstance(node, NaturalJoin)
         assert node.subscript is not None
         assert node.line_break_after is True
 
     def test_theta_join_natural_newline(self) -> None:
-        """R bowtie [p]\\nS → NaturalJoin with line_break_after=True."""
-        node = _expr("R bowtie [p]\nS")
+        """R join [p]\\nS → NaturalJoin with line_break_after=True."""
+        node = _expr("R join [p]\nS")
         assert isinstance(node, NaturalJoin)
         assert node.subscript is not None
         assert node.line_break_after is True
@@ -310,10 +310,11 @@ class TestThetaJoinContinuation:
 class TestExprLineBreakRendering:
     r"""generate_expr emits \\\\ before the right operand when line_break_after=True."""
 
-    def test_bowtie_break_in_expr(self) -> None:
-        r"""R bowtie\\nS → R \otimes \\\\ ... S in generated LaTeX."""
-        result = _expr_latex("R bowtie\nS")
-        assert r"\otimes \\" in result
+    def test_join_break_in_expr(self) -> None:
+        r"""R join\\nS → \mathrm{Join}(R, \\\\ ...) in generated LaTeX."""
+        result = _expr_latex("R join\nS")
+        assert r"\mathrm{Join}(" in result
+        assert "\\\\" in result
         assert "R" in result
         assert "S" in result
 
@@ -345,10 +346,10 @@ class TestExprLineBreakRendering:
         assert "\\\\" in result
 
     def test_no_break_is_single_line(self) -> None:
-        r"""R bowtie S (no newline) → single line without \\."""
-        result = _expr_latex("R bowtie S")
+        r"""R join S (no newline) → single line without \\."""
+        result = _expr_latex("R join S")
         assert "\\\\" not in result
-        assert result == r"R \otimes S"
+        assert result == r"\mathrm{Join}(R, S)"
 
 
 # ---------------------------------------------------------------------------
@@ -359,9 +360,9 @@ class TestExprLineBreakRendering:
 class TestDocumentItemArrayWrap:
     r"""In display position, line-break expressions wrap in \begin{array}{l}."""
 
-    def test_bowtie_break_wraps_in_array(self) -> None:
-        r"""R bowtie\\nS at document level → array{l} wrapper."""
-        latex = _doc_latex("R bowtie\nS")
+    def test_join_break_wraps_in_array(self) -> None:
+        r"""R join\\nS at document level → array{l} wrapper."""
+        latex = _doc_latex("R join\nS")
         assert r"\begin{array}{l}" in latex
         assert r"\end{array}" in latex
         assert r"\\" in latex
@@ -391,8 +392,8 @@ class TestDocumentItemArrayWrap:
         assert r"\end{array}" in latex
 
     def test_no_break_no_array(self) -> None:
-        r"""R bowtie S (no break) at document level → no array wrapper."""
-        latex = _doc_latex("R bowtie S")
+        r"""R join S (no break) at document level → no array wrapper."""
+        latex = _doc_latex("R join S")
         assert r"\begin{array}{l}" not in latex
 
 
@@ -411,9 +412,9 @@ class TestSchemaWhereInlineMode:
         lines = gen.generate_document_item(ast.items[0])
         return "\n".join(lines)
 
-    def test_bowtie_break_in_schema_where(self) -> None:
-        r"""Schema predicate with bowtie break emits \\\\ inline, not array wrap."""
-        src = "schema TestPred\n  R : X\nwhere\n  result = A bowtie\n    B\nend"
+    def test_join_break_in_schema_where(self) -> None:
+        r"""Schema predicate with join break emits \\\\ inline, not array wrap."""
+        src = "schema TestPred\n  R : X\nwhere\n  result = A join\n    B\nend"
         latex = self._gen_schema_latex(src)
         # Must be inside schema environment, not wrapped in array{l}
         assert r"\begin{schema}" in latex
@@ -421,11 +422,9 @@ class TestSchemaWhereInlineMode:
         # The expression must contain \\
         assert r"\\" in latex
 
-    def test_bowtie_chain_in_schema_where(self) -> None:
-        r"""Three-way bowtie in schema where-clause emits \\\\ without array."""
-        src = (
-            "schema JoinPred\n  x : X\nwhere\n  x = A bowtie\n    B bowtie\n    C\nend"
-        )
+    def test_join_chain_in_schema_where(self) -> None:
+        r"""Three-way join in schema where-clause emits \\\\ without array."""
+        src = "schema JoinPred\n  x : X\nwhere\n  x = A join\n    B join\n    C\nend"
         latex = self._gen_schema_latex(src)
         assert r"\begin{schema}" in latex
         assert r"\begin{array}{l}" not in latex
@@ -442,12 +441,12 @@ class TestRegressionNoBreak:
     """Existing single-line rendering must not change."""
 
     def test_natural_join_unchanged(self) -> None:
-        r"""R bowtie S → R \otimes S (unchanged)."""
-        assert _expr_latex("R bowtie S") == r"R \otimes S"
+        r"""R join S → \mathrm{Join}(R, S)."""
+        assert _expr_latex("R join S") == r"\mathrm{Join}(R, S)"
 
     def test_theta_join_unchanged(self) -> None:
-        r"""R bowtie [p] S → \mathrm{Join}_{p}(R, S) (unchanged)."""
-        assert _expr_latex("R bowtie [p] S") == r"\mathrm{Join}_{p}(R, S)"
+        r"""R join [p] S → \mathrm{Join}_{p}(R, S) (unchanged)."""
+        assert _expr_latex("R join [p] S") == r"\mathrm{Join}_{p}(R, S)"
 
     def test_divide_unchanged(self) -> None:
         r"""R div S → R~\div~S (unchanged)."""
