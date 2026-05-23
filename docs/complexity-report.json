@@ -1,6 +1,6 @@
 {
-  "generated": "2026-05-23T09:43:45+00:00",
-  "commit": "eb7e1b2",
+  "generated": "2026-05-23T09:46:06+00:00",
+  "commit": "f1a6a68",
   "src": "src/txt2tex",
   "mi": [
     {
@@ -267,39 +267,12 @@
     },
     {
       "file": "src/txt2tex/lexer.py",
-      "function": "_scan_token",
-      "nloc": 438,
-      "ccn": 192,
-      "tokens": 3373,
-      "params": 1,
-      "length": 695
-    },
-    {
-      "file": "src/txt2tex/lexer.py",
       "function": "_scan_identifier",
       "nloc": 398,
       "ccn": 138,
       "tokens": 2433,
       "params": 3,
       "length": 560
-    },
-    {
-      "file": "src/txt2tex/lexer.py",
-      "function": "_scan_identifier",
-      "nloc": 398,
-      "ccn": 138,
-      "tokens": 2433,
-      "params": 3,
-      "length": 560
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_proof_node_infer",
-      "nloc": 100,
-      "ccn": 37,
-      "tokens": 616,
-      "params": 2,
-      "length": 186
     },
     {
       "file": "src/txt2tex/latex_gen.py",
@@ -321,24 +294,6 @@
     },
     {
       "file": "src/txt2tex/parser.py",
-      "function": "_parse_postfix",
-      "nloc": 178,
-      "ccn": 35,
-      "tokens": 862,
-      "params": 2,
-      "length": 312
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_quantifier",
-      "nloc": 169,
-      "ccn": 32,
-      "tokens": 971,
-      "params": 1,
-      "length": 284
-    },
-    {
-      "file": "src/txt2tex/parser.py",
       "function": "_parse_quantifier",
       "nloc": 169,
       "ccn": 32,
@@ -354,24 +309,6 @@
       "tokens": 820,
       "params": 1,
       "length": 186
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_cross",
-      "nloc": 152,
-      "ccn": 30,
-      "tokens": 820,
-      "params": 1,
-      "length": 186
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_syntax_block",
-      "nloc": 96,
-      "ccn": 30,
-      "tokens": 575,
-      "params": 1,
-      "length": 154
     },
     {
       "file": "src/txt2tex/parser.py",
@@ -393,39 +330,12 @@
     },
     {
       "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_part",
-      "nloc": 133,
-      "ccn": 29,
-      "tokens": 895,
-      "params": 2,
-      "length": 188
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
       "function": "_generate_complex_assumption_scope",
       "nloc": 107,
       "ccn": 29,
       "tokens": 572,
       "params": 3,
       "length": 166
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_complex_assumption_scope",
-      "nloc": 107,
-      "ccn": 29,
-      "tokens": 572,
-      "params": 3,
-      "length": 166
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_has_line_breaks_structural",
-      "nloc": 40,
-      "ccn": 28,
-      "tokens": 343,
-      "params": 2,
-      "length": 42
     },
     {
       "file": "src/txt2tex/latex_gen.py",
@@ -447,24 +357,6 @@
     },
     {
       "file": "src/txt2tex/parser.py",
-      "function": "parse",
-      "nloc": 170,
-      "ccn": 26,
-      "tokens": 875,
-      "params": 1,
-      "length": 223
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_set_comprehension_from_brace",
-      "nloc": 106,
-      "ccn": 26,
-      "tokens": 636,
-      "params": 1,
-      "length": 147
-    },
-    {
-      "file": "src/txt2tex/parser.py",
       "function": "_parse_set_comprehension_from_brace",
       "nloc": 106,
       "ccn": 26,
@@ -480,24 +372,6 @@
       "tokens": 420,
       "params": 1,
       "length": 61
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_document_item",
-      "nloc": 52,
-      "ccn": 26,
-      "tokens": 420,
-      "params": 1,
-      "length": 61
-    },
-    {
-      "file": "src/txt2tex/free_vars.py",
-      "function": "expr_free_vars",
-      "nloc": 67,
-      "ccn": 25,
-      "tokens": 529,
-      "params": 1,
-      "length": 87
     },
     {
       "file": "src/txt2tex/free_vars.py",
@@ -519,39 +393,12 @@
     },
     {
       "file": "src/txt2tex/latex_gen.py",
-      "function": "_convert_comparison_operators",
-      "nloc": 49,
-      "ccn": 25,
-      "tokens": 348,
-      "params": 2,
-      "length": 69
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
       "function": "_generate_schema",
       "nloc": 91,
       "ccn": 24,
       "tokens": 525,
       "params": 2,
       "length": 142
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_schema",
-      "nloc": 91,
-      "ccn": 24,
-      "tokens": 525,
-      "params": 2,
-      "length": 142
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_proof_node",
-      "nloc": 84,
-      "ccn": 24,
-      "tokens": 531,
-      "params": 3,
-      "length": 116
     },
     {
       "file": "src/txt2tex/parser.py",
@@ -572,15 +419,6 @@
       "length": 193
     },
     {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_atom",
-      "nloc": 132,
-      "ccn": 23,
-      "tokens": 725,
-      "params": 1,
-      "length": 193
-    },
-    {
       "file": "src/txt2tex/cli.py",
       "function": "main",
       "nloc": 153,
@@ -588,24 +426,6 @@
       "tokens": 684,
       "params": 0,
       "length": 180
-    },
-    {
-      "file": "src/txt2tex/cli.py",
-      "function": "main",
-      "nloc": 153,
-      "ccn": 22,
-      "tokens": 684,
-      "params": 0,
-      "length": 180
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_declaration_or_inclusion",
-      "nloc": 120,
-      "ccn": 22,
-      "tokens": 644,
-      "params": 1,
-      "length": 151
     },
     {
       "file": "src/txt2tex/parser.py",
@@ -627,39 +447,12 @@
     },
     {
       "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_logical_quantifier",
-      "nloc": 72,
-      "ccn": 22,
-      "tokens": 451,
-      "params": 3,
-      "length": 113
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
       "function": "generate_document",
       "nloc": 66,
       "ccn": 22,
       "tokens": 508,
       "params": 2,
       "length": 117
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "generate_document",
-      "nloc": 66,
-      "ccn": 22,
-      "tokens": 508,
-      "params": 2,
-      "length": 117
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_quantifier_continuation",
-      "nloc": 100,
-      "ccn": 20,
-      "tokens": 584,
-      "params": 5,
-      "length": 148
     },
     {
       "file": "src/txt2tex/parser.py",
@@ -680,528 +473,6 @@
       "length": 84
     },
     {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_quantifiers",
-      "nloc": 78,
-      "ccn": 19,
-      "tokens": 377,
-      "params": 2,
-      "length": 113
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_quantifiers",
-      "nloc": 78,
-      "ccn": 19,
-      "tokens": 377,
-      "params": 2,
-      "length": 113
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_quantifier",
-      "nloc": 75,
-      "ccn": 19,
-      "tokens": 533,
-      "params": 3,
-      "length": 155
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_quantifier",
-      "nloc": 75,
-      "ccn": 19,
-      "tokens": 533,
-      "params": 3,
-      "length": 155
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_truth_table",
-      "nloc": 60,
-      "ccn": 19,
-      "tokens": 416,
-      "params": 1,
-      "length": 81
-    },
-    {
-      "file": "src/txt2tex/repl.py",
-      "function": "repl_main",
-      "nloc": 59,
-      "ccn": 19,
-      "tokens": 259,
-      "params": 1,
-      "length": 90
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_schema_text",
-      "nloc": 73,
-      "ccn": 18,
-      "tokens": 371,
-      "params": 1,
-      "length": 101
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_schema_text",
-      "nloc": 73,
-      "ccn": 18,
-      "tokens": 371,
-      "params": 1,
-      "length": 101
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_infrule_block",
-      "nloc": 63,
-      "ccn": 18,
-      "tokens": 434,
-      "params": 1,
-      "length": 99
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_axdef",
-      "nloc": 70,
-      "ccn": 17,
-      "tokens": 409,
-      "params": 2,
-      "length": 104
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_axdef",
-      "nloc": 70,
-      "ccn": 17,
-      "tokens": 409,
-      "params": 2,
-      "length": 104
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_gendef",
-      "nloc": 67,
-      "ccn": 17,
-      "tokens": 396,
-      "params": 2,
-      "length": 100
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_argue_chain",
-      "nloc": 60,
-      "ccn": 17,
-      "tokens": 358,
-      "params": 2,
-      "length": 100
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_identifier",
-      "nloc": 52,
-      "ccn": 17,
-      "tokens": 331,
-      "params": 3,
-      "length": 103
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_case_analysis",
-      "nloc": 52,
-      "ccn": 17,
-      "tokens": 317,
-      "params": 2,
-      "length": 85
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_identifier",
-      "nloc": 52,
-      "ccn": 17,
-      "tokens": 331,
-      "params": 3,
-      "length": 103
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_convert_sequence_literals",
-      "nloc": 48,
-      "ccn": 16,
-      "tokens": 290,
-      "params": 3,
-      "length": 101
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_convert_sequence_literals",
-      "nloc": 48,
-      "ccn": 16,
-      "tokens": 290,
-      "params": 3,
-      "length": 101
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_case_analysis",
-      "nloc": 42,
-      "ccn": 16,
-      "tokens": 318,
-      "params": 3,
-      "length": 65
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_escape_underscores_outside_math",
-      "nloc": 32,
-      "ccn": 16,
-      "tokens": 213,
-      "params": 2,
-      "length": 49
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_schema",
-      "nloc": 53,
-      "ccn": 15,
-      "tokens": 340,
-      "params": 1,
-      "length": 85
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_function_app",
-      "nloc": 43,
-      "ccn": 15,
-      "tokens": 324,
-      "params": 3,
-      "length": 84
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_free_type",
-      "nloc": 46,
-      "ccn": 14,
-      "tokens": 268,
-      "params": 1,
-      "length": 66
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_find_balanced_angles",
-      "nloc": 31,
-      "ccn": 14,
-      "tokens": 194,
-      "params": 2,
-      "length": 51
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_zed",
-      "nloc": 56,
-      "ccn": 13,
-      "tokens": 355,
-      "params": 1,
-      "length": 99
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_gendef",
-      "nloc": 53,
-      "ccn": 13,
-      "tokens": 310,
-      "params": 1,
-      "length": 76
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_set",
-      "nloc": 52,
-      "ccn": 13,
-      "tokens": 328,
-      "params": 1,
-      "length": 86
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_title_metadata",
-      "nloc": 42,
-      "ccn": 13,
-      "tokens": 267,
-      "params": 1,
-      "length": 53
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_schema_rename",
-      "nloc": 68,
-      "ccn": 12,
-      "tokens": 329,
-      "params": 2,
-      "length": 99
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_proof_tree",
-      "nloc": 50,
-      "ccn": 12,
-      "tokens": 309,
-      "params": 1,
-      "length": 71
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_axdef",
-      "nloc": 48,
-      "ccn": 12,
-      "tokens": 294,
-      "params": 1,
-      "length": 73
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_paragraph_coalesced",
-      "nloc": 37,
-      "ccn": 12,
-      "tokens": 241,
-      "params": 1,
-      "length": 68
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_section",
-      "nloc": 31,
-      "ccn": 12,
-      "tokens": 250,
-      "params": 1,
-      "length": 46
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_zed",
-      "nloc": 76,
-      "ccn": 11,
-      "tokens": 393,
-      "params": 2,
-      "length": 104
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_zed",
-      "nloc": 76,
-      "ccn": 11,
-      "tokens": 393,
-      "params": 2,
-      "length": 104
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_lambda",
-      "nloc": 73,
-      "ccn": 11,
-      "tokens": 432,
-      "params": 1,
-      "length": 105
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_lambda",
-      "nloc": 73,
-      "ccn": 11,
-      "tokens": 432,
-      "params": 1,
-      "length": 105
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_proof_node_infer_with_assumption",
-      "nloc": 33,
-      "ccn": 11,
-      "tokens": 210,
-      "params": 4,
-      "length": 48
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_parenthesized_logic",
-      "nloc": 30,
-      "ccn": 11,
-      "tokens": 191,
-      "params": 2,
-      "length": 49
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_needs_parens",
-      "nloc": 22,
-      "ccn": 11,
-      "tokens": 137,
-      "params": 4,
-      "length": 67
-    },
-    {
-      "file": "src/txt2tex/free_vars.py",
-      "function": "_free_vars_binder",
-      "nloc": 34,
-      "ccn": 10,
-      "tokens": 243,
-      "params": 1,
-      "length": 42
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_solution",
-      "nloc": 28,
-      "ccn": 10,
-      "tokens": 218,
-      "params": 1,
-      "length": 37
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_syntax_block",
-      "nloc": 22,
-      "ccn": 10,
-      "tokens": 175,
-      "params": 2,
-      "length": 45
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_calculate_tree_depth",
-      "nloc": 22,
-      "ccn": 10,
-      "tokens": 130,
-      "params": 2,
-      "length": 34
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_has_line_breaks_flagged",
-      "nloc": 16,
-      "ccn": 10,
-      "tokens": 142,
-      "params": 2,
-      "length": 18
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_try_parse_guarded_cases",
-      "nloc": 49,
-      "ccn": 9,
-      "tokens": 259,
-      "params": 2,
-      "length": 92
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_schema_project_hide",
-      "nloc": 49,
-      "ccn": 9,
-      "tokens": 242,
-      "params": 1,
-      "length": 66
-    },
-    {
-      "file": "src/txt2tex/cli.py",
-      "function": "check_environment",
-      "nloc": 43,
-      "ccn": 9,
-      "tokens": 194,
-      "params": 0,
-      "length": 57
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_lambda_quantifier",
-      "nloc": 38,
-      "ccn": 9,
-      "tokens": 255,
-      "params": 3,
-      "length": 65
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_truth_table",
-      "nloc": 38,
-      "ccn": 9,
-      "tokens": 322,
-      "params": 2,
-      "length": 62
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_project",
-      "nloc": 36,
-      "ccn": 9,
-      "tokens": 259,
-      "params": 1,
-      "length": 38
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_inclusion_generic_args",
-      "nloc": 35,
-      "ccn": 9,
-      "tokens": 178,
-      "params": 1,
-      "length": 50
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_parenthesized_expr_or_tuple",
-      "nloc": 33,
-      "ccn": 9,
-      "tokens": 219,
-      "params": 1,
-      "length": 60
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_bibliography_metadata",
-      "nloc": 30,
-      "ccn": 9,
-      "tokens": 189,
-      "params": 1,
-      "length": 41
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_horiz_def_generic_params",
-      "nloc": 28,
-      "ccn": 9,
-      "tokens": 168,
-      "params": 1,
-      "length": 42
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_schema_rename_or_generic",
-      "nloc": 23,
-      "ccn": 9,
-      "tokens": 117,
-      "params": 2,
-      "length": 36
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_has_line_breaks",
-      "nloc": 17,
-      "ccn": 9,
-      "tokens": 131,
-      "params": 2,
-      "length": 28
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_should_parse_space_separated_arg",
-      "nloc": 105,
-      "ccn": 8,
-      "tokens": 422,
-      "params": 1,
-      "length": 126
-    },
-    {
       "file": "src/txt2tex/parser.py",
       "function": "_should_parse_space_separated_arg",
       "nloc": 105,
@@ -1212,2109 +483,12 @@
     },
     {
       "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_type_declarations",
-      "nloc": 81,
-      "ccn": 8,
-      "tokens": 409,
-      "params": 2,
-      "length": 118
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_type_declarations",
-      "nloc": 81,
-      "ccn": 8,
-      "tokens": 409,
-      "params": 2,
-      "length": 118
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_group_regroup_rhs",
-      "nloc": 47,
-      "ccn": 8,
-      "tokens": 253,
-      "params": 3,
-      "length": 51
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_set_comprehension",
-      "nloc": 47,
-      "ccn": 8,
-      "tokens": 298,
-      "params": 3,
-      "length": 88
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_relational_image",
-      "nloc": 47,
-      "ccn": 8,
-      "tokens": 253,
-      "params": 2,
-      "length": 70
-    },
-    {
-      "file": "src/txt2tex/repl.py",
-      "function": "process_input",
-      "nloc": 46,
-      "ccn": 8,
-      "tokens": 287,
-      "params": 4,
-      "length": 77
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_document_items_with_consolidation",
-      "nloc": 39,
-      "ccn": 8,
-      "tokens": 233,
-      "params": 2,
-      "length": 55
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_explicit_dollar_math",
-      "nloc": 34,
-      "ccn": 8,
-      "tokens": 230,
-      "params": 2,
-      "length": 79
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_argue_chain",
-      "nloc": 31,
-      "ccn": 8,
-      "tokens": 230,
-      "params": 2,
-      "length": 69
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_zed_content",
-      "nloc": 30,
-      "ccn": 8,
-      "tokens": 200,
-      "params": 2,
-      "length": 33
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_paragraph",
-      "nloc": 26,
-      "ccn": 8,
-      "tokens": 212,
-      "params": 1,
-      "length": 41
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_generic_params",
-      "nloc": 21,
-      "ccn": 8,
-      "tokens": 146,
-      "params": 1,
-      "length": 32
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_binary_op",
-      "nloc": 21,
-      "ccn": 8,
-      "tokens": 171,
-      "params": 3,
-      "length": 51
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_identifier_document_item",
-      "nloc": 20,
-      "ccn": 8,
-      "tokens": 137,
-      "params": 1,
-      "length": 26
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_find_balanced_braces",
-      "nloc": 19,
-      "ccn": 8,
-      "tokens": 121,
-      "params": 2,
-      "length": 26
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_find_balanced_parens",
-      "nloc": 19,
-      "ccn": 8,
-      "tokens": 121,
-      "params": 2,
-      "length": 26
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_expression_contains_dat_construct",
-      "nloc": 15,
-      "ccn": 8,
-      "tokens": 101,
-      "params": 2,
-      "length": 22
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_aggregator_clause",
-      "nloc": 49,
-      "ccn": 7,
-      "tokens": 231,
-      "params": 1,
-      "length": 50
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_horiz_def",
-      "nloc": 37,
-      "ccn": 7,
-      "tokens": 186,
-      "params": 1,
-      "length": 57
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_rename",
-      "nloc": 30,
-      "ccn": 7,
-      "tokens": 224,
-      "params": 1,
-      "length": 32
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_check_overflow",
-      "nloc": 27,
-      "ccn": 7,
-      "tokens": 135,
-      "params": 5,
-      "length": 44
-    },
-    {
-      "file": "src/txt2tex/cli.py",
-      "function": "typecheck_fuzz",
-      "nloc": 26,
-      "ccn": 7,
-      "tokens": 143,
-      "params": 1,
-      "length": 43
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_collect_lambda_chain",
-      "nloc": 23,
-      "ccn": 7,
-      "tokens": 190,
-      "params": 2,
-      "length": 43
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_collect_quantifier_chain",
-      "nloc": 23,
-      "ccn": 7,
-      "tokens": 198,
-      "params": 2,
-      "length": 45
-    },
-    {
-      "file": "src/txt2tex/lexer.py",
-      "function": "_scan_string_literal",
-      "nloc": 22,
-      "ccn": 7,
-      "tokens": 136,
-      "params": 3,
-      "length": 28
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_scan_for_colon_before_newline",
-      "nloc": 20,
-      "ccn": 7,
-      "tokens": 97,
-      "params": 1,
-      "length": 32
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_predicate_groups",
-      "nloc": 19,
-      "ccn": 7,
-      "tokens": 125,
-      "params": 2,
-      "length": 38
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_function_applications",
-      "nloc": 42,
-      "ccn": 6,
-      "tokens": 307,
-      "params": 2,
-      "length": 65
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_schema_quantifier_body",
-      "nloc": 41,
-      "ccn": 6,
-      "tokens": 187,
-      "params": 3,
-      "length": 54
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_comparison",
-      "nloc": 41,
-      "ccn": 6,
-      "tokens": 199,
-      "params": 1,
-      "length": 64
-    },
-    {
-      "file": "src/txt2tex/compile.py",
-      "function": "_compile_with_latexmk",
-      "nloc": 39,
-      "ccn": 6,
-      "tokens": 154,
-      "params": 5,
-      "length": 50
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_binding_component",
-      "nloc": 36,
-      "ccn": 6,
-      "tokens": 173,
-      "params": 1,
-      "length": 49
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_generic_instantiation",
-      "nloc": 34,
-      "ccn": 6,
-      "tokens": 166,
-      "params": 3,
-      "length": 57
-    },
-    {
-      "file": "src/txt2tex/compile.py",
-      "function": "_compile_with_pdflatex",
-      "nloc": 33,
-      "ccn": 6,
-      "tokens": 149,
-      "params": 5,
-      "length": 51
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_binding",
-      "nloc": 31,
-      "ccn": 6,
-      "tokens": 196,
-      "params": 1,
-      "length": 56
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_and",
-      "nloc": 30,
-      "ccn": 6,
-      "tokens": 170,
-      "params": 1,
-      "length": 44
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_standalone_keywords",
-      "nloc": 30,
-      "ccn": 6,
-      "tokens": 211,
-      "params": 2,
-      "length": 50
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_restrict",
-      "nloc": 28,
-      "ccn": 6,
-      "tokens": 180,
-      "params": 1,
-      "length": 29
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_bag_literal",
-      "nloc": 25,
-      "ccn": 6,
-      "tokens": 171,
-      "params": 1,
-      "length": 41
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_given_type",
-      "nloc": 18,
-      "ccn": 6,
-      "tokens": 135,
-      "params": 1,
-      "length": 27
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_scan_for_defs_after_brackets",
-      "nloc": 16,
-      "ccn": 6,
-      "tokens": 107,
-      "params": 2,
-      "length": 28
-    },
-    {
-      "file": "src/txt2tex/lexer.py",
-      "function": "tokenize",
-      "nloc": 13,
-      "ccn": 6,
-      "tokens": 105,
-      "params": 1,
-      "length": 16
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_quantifier_needs_parens",
-      "nloc": 11,
-      "ccn": 6,
-      "tokens": 79,
-      "params": 3,
-      "length": 61
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
       "function": "_format_justification_label",
       "nloc": 170,
       "ccn": 5,
       "tokens": 1964,
       "params": 2,
       "length": 271
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_format_justification_label",
-      "nloc": 170,
-      "ccn": 5,
-      "tokens": 1964,
-      "params": 2,
-      "length": 271
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_simple_expressions",
-      "nloc": 37,
-      "ccn": 5,
-      "tokens": 205,
-      "params": 2,
-      "length": 69
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_conditional",
-      "nloc": 30,
-      "ccn": 5,
-      "tokens": 182,
-      "params": 1,
-      "length": 70
-    },
-    {
-      "file": "src/txt2tex/compile.py",
-      "function": "compile_pdf",
-      "nloc": 28,
-      "ccn": 5,
-      "tokens": 123,
-      "params": 2,
-      "length": 51
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_logical_formulas",
-      "nloc": 28,
-      "ccn": 5,
-      "tokens": 167,
-      "params": 2,
-      "length": 43
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_generic_instantiation",
-      "nloc": 25,
-      "ccn": 5,
-      "tokens": 147,
-      "params": 2,
-      "length": 33
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_iff",
-      "nloc": 25,
-      "ccn": 5,
-      "tokens": 139,
-      "params": 1,
-      "length": 36
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_implies",
-      "nloc": 25,
-      "ccn": 5,
-      "tokens": 139,
-      "params": 1,
-      "length": 44
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_or",
-      "nloc": 25,
-      "ccn": 5,
-      "tokens": 139,
-      "params": 1,
-      "length": 36
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_union",
-      "nloc": 25,
-      "ccn": 5,
-      "tokens": 143,
-      "params": 1,
-      "length": 37
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_intersect",
-      "nloc": 25,
-      "ccn": 5,
-      "tokens": 143,
-      "params": 1,
-      "length": 33
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_sequence_literal",
-      "nloc": 24,
-      "ccn": 5,
-      "tokens": 152,
-      "params": 1,
-      "length": 35
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_horiz_def_rhs",
-      "nloc": 23,
-      "ccn": 5,
-      "tokens": 138,
-      "params": 1,
-      "length": 45
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_schema_quantifier",
-      "nloc": 23,
-      "ccn": 5,
-      "tokens": 136,
-      "params": 3,
-      "length": 41
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_free_type",
-      "nloc": 19,
-      "ccn": 5,
-      "tokens": 136,
-      "params": 2,
-      "length": 38
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_syntax_definition_branches",
-      "nloc": 19,
-      "ccn": 5,
-      "tokens": 120,
-      "params": 2,
-      "length": 31
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_schema_text",
-      "nloc": 19,
-      "ccn": 5,
-      "tokens": 142,
-      "params": 2,
-      "length": 33
-    },
-    {
-      "file": "src/txt2tex/repl.py",
-      "function": "open_pdf",
-      "nloc": 17,
-      "ccn": 5,
-      "tokens": 112,
-      "params": 1,
-      "length": 27
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_superscripts",
-      "nloc": 17,
-      "ccn": 5,
-      "tokens": 135,
-      "params": 2,
-      "length": 31
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_replace_outside_math",
-      "nloc": 16,
-      "ccn": 5,
-      "tokens": 116,
-      "params": 4,
-      "length": 21
-    },
-    {
-      "file": "src/txt2tex/compile.py",
-      "function": "_show_latex_error",
-      "nloc": 14,
-      "ccn": 5,
-      "tokens": 93,
-      "params": 1,
-      "length": 15
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_emit_schema_inclusion",
-      "nloc": 12,
-      "ccn": 5,
-      "tokens": 89,
-      "params": 2,
-      "length": 24
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_map_binary_operator",
-      "nloc": 8,
-      "ccn": 5,
-      "tokens": 51,
-      "params": 3,
-      "length": 15
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_abbreviation",
-      "nloc": 32,
-      "ccn": 4,
-      "tokens": 174,
-      "params": 2,
-      "length": 71
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_unary",
-      "nloc": 29,
-      "ccn": 4,
-      "tokens": 164,
-      "params": 1,
-      "length": 38
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_free_branch",
-      "nloc": 27,
-      "ccn": 4,
-      "tokens": 144,
-      "params": 2,
-      "length": 48
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_group_aggregate_rhs",
-      "nloc": 24,
-      "ccn": 4,
-      "tokens": 133,
-      "params": 3,
-      "length": 31
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_additive",
-      "nloc": 22,
-      "ccn": 4,
-      "tokens": 111,
-      "params": 1,
-      "length": 32
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_infrule_block",
-      "nloc": 22,
-      "ccn": 4,
-      "tokens": 154,
-      "params": 2,
-      "length": 42
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_horiz_def",
-      "nloc": 21,
-      "ccn": 4,
-      "tokens": 156,
-      "params": 2,
-      "length": 43
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_rename_pair",
-      "nloc": 20,
-      "ccn": 4,
-      "tokens": 111,
-      "params": 2,
-      "length": 21
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_conditional",
-      "nloc": 19,
-      "ccn": 4,
-      "tokens": 91,
-      "params": 3,
-      "length": 39
-    },
-    {
-      "file": "src/txt2tex/errors.py",
-      "function": "_get_context",
-      "nloc": 18,
-      "ccn": 4,
-      "tokens": 162,
-      "params": 4,
-      "length": 42
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_group_rhs",
-      "nloc": 17,
-      "ccn": 4,
-      "tokens": 106,
-      "params": 3,
-      "length": 26
-    },
-    {
-      "file": "src/txt2tex/free_vars.py",
-      "function": "_free_vars_schema_calculus",
-      "nloc": 16,
-      "ccn": 4,
-      "tokens": 96,
-      "params": 1,
-      "length": 23
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_abbreviation",
-      "nloc": 16,
-      "ccn": 4,
-      "tokens": 110,
-      "params": 1,
-      "length": 28
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_natural_join",
-      "nloc": 16,
-      "ccn": 4,
-      "tokens": 98,
-      "params": 3,
-      "length": 25
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_set_expressions",
-      "nloc": 16,
-      "ccn": 4,
-      "tokens": 115,
-      "params": 2,
-      "length": 30
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_multiplicative",
-      "nloc": 15,
-      "ccn": 4,
-      "tokens": 94,
-      "params": 1,
-      "length": 24
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_next_non_newline_is_cross_op",
-      "nloc": 13,
-      "ccn": 4,
-      "tokens": 83,
-      "params": 1,
-      "length": 18
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_function_type",
-      "nloc": 13,
-      "ccn": 4,
-      "tokens": 94,
-      "params": 3,
-      "length": 30
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_has_blank_line",
-      "nloc": 12,
-      "ccn": 4,
-      "tokens": 70,
-      "params": 1,
-      "length": 20
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_schema_binding_latex",
-      "nloc": 12,
-      "ccn": 4,
-      "tokens": 74,
-      "params": 2,
-      "length": 27
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_expr",
-      "nloc": 10,
-      "ccn": 4,
-      "tokens": 74,
-      "params": 1,
-      "length": 14
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_implies_rhs",
-      "nloc": 10,
-      "ccn": 4,
-      "tokens": 74,
-      "params": 1,
-      "length": 19
-    },
-    {
-      "file": "src/txt2tex/compile.py",
-      "function": "copy_latex_files",
-      "nloc": 10,
-      "ccn": 4,
-      "tokens": 77,
-      "params": 1,
-      "length": 15
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_classify_latex_commands",
-      "nloc": 10,
-      "ccn": 4,
-      "tokens": 54,
-      "params": 2,
-      "length": 19
-    },
-    {
-      "file": "src/txt2tex/compile.py",
-      "function": "_has_latex_error",
-      "nloc": 9,
-      "ccn": 4,
-      "tokens": 64,
-      "params": 1,
-      "length": 10
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_get_closure_operator_latex",
-      "nloc": 9,
-      "ccn": 4,
-      "tokens": 58,
-      "params": 3,
-      "length": 20
-    },
-    {
-      "file": "src/txt2tex/repl.py",
-      "function": "is_block_input",
-      "nloc": 8,
-      "ccn": 4,
-      "tokens": 57,
-      "params": 1,
-      "length": 20
-    },
-    {
-      "file": "src/txt2tex/lexer.py",
-      "function": "_raise_infinite_loop_error",
-      "nloc": 21,
-      "ccn": 3,
-      "tokens": 129,
-      "params": 4,
-      "length": 33
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_proof_tree",
-      "nloc": 20,
-      "ccn": 3,
-      "tokens": 137,
-      "params": 2,
-      "length": 34
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "generate_document_item",
-      "nloc": 19,
-      "ccn": 3,
-      "tokens": 136,
-      "params": 2,
-      "length": 42
-    },
-    {
-      "file": "src/txt2tex/compile.py",
-      "function": "format_tex",
-      "nloc": 16,
-      "ccn": 3,
-      "tokens": 76,
-      "params": 1,
-      "length": 28
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_part",
-      "nloc": 15,
-      "ccn": 3,
-      "tokens": 105,
-      "params": 1,
-      "length": 21
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_parts_format",
-      "nloc": 12,
-      "ccn": 3,
-      "tokens": 66,
-      "params": 1,
-      "length": 19
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_guarded_cases",
-      "nloc": 12,
-      "ccn": 3,
-      "tokens": 94,
-      "params": 3,
-      "length": 26
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_group",
-      "nloc": 12,
-      "ccn": 3,
-      "tokens": 85,
-      "params": 3,
-      "length": 20
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_group_aggregate",
-      "nloc": 12,
-      "ccn": 3,
-      "tokens": 71,
-      "params": 3,
-      "length": 23
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_escape_special_chars_outside_math",
-      "nloc": 12,
-      "ccn": 3,
-      "tokens": 118,
-      "params": 2,
-      "length": 29
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_inference_from_assumption",
-      "nloc": 12,
-      "ccn": 3,
-      "tokens": 70,
-      "params": 4,
-      "length": 18
-    },
-    {
-      "file": "src/txt2tex/lexer.py",
-      "function": "_advance",
-      "nloc": 11,
-      "ccn": 3,
-      "tokens": 56,
-      "params": 1,
-      "length": 12
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_binding",
-      "nloc": 10,
-      "ccn": 3,
-      "tokens": 82,
-      "params": 3,
-      "length": 17
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_argument_list",
-      "nloc": 9,
-      "ccn": 3,
-      "tokens": 69,
-      "params": 1,
-      "length": 21
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_compound_identifier_name",
-      "nloc": 9,
-      "ccn": 3,
-      "tokens": 76,
-      "params": 1,
-      "length": 28
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_set_literal",
-      "nloc": 9,
-      "ccn": 3,
-      "tokens": 55,
-      "params": 3,
-      "length": 19
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_sequence_literal",
-      "nloc": 7,
-      "ccn": 3,
-      "tokens": 51,
-      "params": 3,
-      "length": 17
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_get_type_latex",
-      "nloc": 6,
-      "ccn": 3,
-      "tokens": 71,
-      "params": 2,
-      "length": 10
-    },
-    {
-      "file": "src/txt2tex/lexer.py",
-      "function": "_scan_number",
-      "nloc": 6,
-      "ccn": 3,
-      "tokens": 69,
-      "params": 3,
-      "length": 8
-    },
-    {
-      "file": "src/txt2tex/errors.py",
-      "function": "_get_hint",
-      "nloc": 5,
-      "ccn": 3,
-      "tokens": 43,
-      "params": 2,
-      "length": 13
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_convert_sequence_literals.is_contained",
-      "nloc": 4,
-      "ccn": 3,
-      "tokens": 60,
-      "params": 2,
-      "length": 5
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_skip_newlines",
-      "nloc": 3,
-      "ccn": 3,
-      "tokens": 30,
-      "params": 1,
-      "length": 4
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_wrap_text_in_mathrm",
-      "nloc": 73,
-      "ccn": 2,
-      "tokens": 186,
-      "params": 2,
-      "length": 113
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_wrap_text_in_mathrm",
-      "nloc": 73,
-      "ccn": 2,
-      "tokens": 186,
-      "params": 2,
-      "length": 113
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_convert_unicode_symbols",
-      "nloc": 36,
-      "ccn": 2,
-      "tokens": 241,
-      "params": 2,
-      "length": 42
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_convert_operators_bare",
-      "nloc": 32,
-      "ccn": 2,
-      "tokens": 215,
-      "params": 2,
-      "length": 47
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_function_type",
-      "nloc": 24,
-      "ccn": 2,
-      "tokens": 108,
-      "params": 1,
-      "length": 34
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "__init__",
-      "nloc": 24,
-      "ccn": 2,
-      "tokens": 110,
-      "params": 5,
-      "length": 35
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_relation",
-      "nloc": 22,
-      "ccn": 2,
-      "tokens": 101,
-      "params": 1,
-      "length": 31
-    },
-    {
-      "file": "src/txt2tex/repl.py",
-      "function": "generate_preview_document",
-      "nloc": 19,
-      "ccn": 2,
-      "tokens": 132,
-      "params": 2,
-      "length": 31
-    },
-    {
-      "file": "src/txt2tex/errors.py",
-      "function": "format_error",
-      "nloc": 18,
-      "ccn": 2,
-      "tokens": 100,
-      "params": 5,
-      "length": 36
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_set_op",
-      "nloc": 15,
-      "ccn": 2,
-      "tokens": 84,
-      "params": 1,
-      "length": 18
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_manual_markup",
-      "nloc": 15,
-      "ccn": 2,
-      "tokens": 92,
-      "params": 2,
-      "length": 24
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_pre_sanitise_dollars",
-      "nloc": 13,
-      "ccn": 2,
-      "tokens": 99,
-      "params": 2,
-      "length": 58
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_range",
-      "nloc": 12,
-      "ccn": 2,
-      "tokens": 65,
-      "params": 1,
-      "length": 20
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_schema_pipe",
-      "nloc": 12,
-      "ccn": 2,
-      "tokens": 66,
-      "params": 1,
-      "length": 18
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_schema_compose",
-      "nloc": 12,
-      "ccn": 2,
-      "tokens": 66,
-      "params": 1,
-      "length": 20
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_lambda",
-      "nloc": 12,
-      "ccn": 2,
-      "tokens": 101,
-      "params": 3,
-      "length": 31
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_ungroup_rhs",
-      "nloc": 10,
-      "ccn": 2,
-      "tokens": 68,
-      "params": 3,
-      "length": 15
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_reject_reserved_decl_name",
-      "nloc": 9,
-      "ccn": 2,
-      "tokens": 40,
-      "params": 2,
-      "length": 16
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_smart_join_justification",
-      "nloc": 9,
-      "ccn": 2,
-      "tokens": 93,
-      "params": 2,
-      "length": 28
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_rename",
-      "nloc": 9,
-      "ccn": 2,
-      "tokens": 67,
-      "params": 3,
-      "length": 14
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_section",
-      "nloc": 9,
-      "ccn": 2,
-      "tokens": 74,
-      "params": 2,
-      "length": 15
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_contents",
-      "nloc": 9,
-      "ccn": 2,
-      "tokens": 70,
-      "params": 2,
-      "length": 17
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_contents",
-      "nloc": 8,
-      "ccn": 2,
-      "tokens": 59,
-      "params": 1,
-      "length": 15
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_reject_stray_slash",
-      "nloc": 8,
-      "ccn": 2,
-      "tokens": 32,
-      "params": 1,
-      "length": 15
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_superscript",
-      "nloc": 8,
-      "ccn": 2,
-      "tokens": 57,
-      "params": 3,
-      "length": 16
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_ungroup",
-      "nloc": 8,
-      "ccn": 2,
-      "tokens": 62,
-      "params": 3,
-      "length": 15
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_raw_latex_block",
-      "nloc": 7,
-      "ccn": 2,
-      "tokens": 52,
-      "params": 1,
-      "length": 13
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_advance",
-      "nloc": 7,
-      "ccn": 2,
-      "tokens": 54,
-      "params": 1,
-      "length": 9
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_tuple_projection",
-      "nloc": 7,
-      "ccn": 2,
-      "tokens": 47,
-      "params": 3,
-      "length": 29
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_divide",
-      "nloc": 7,
-      "ccn": 2,
-      "tokens": 59,
-      "params": 3,
-      "length": 18
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_citations.replace_citation",
-      "nloc": 7,
-      "ccn": 2,
-      "tokens": 46,
-      "params": 1,
-      "length": 8
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_pure_paragraph",
-      "nloc": 6,
-      "ccn": 2,
-      "tokens": 55,
-      "params": 1,
-      "length": 16
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_latex_block",
-      "nloc": 6,
-      "ccn": 2,
-      "tokens": 55,
-      "params": 1,
-      "length": 14
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_subscript",
-      "nloc": 6,
-      "ccn": 2,
-      "tokens": 54,
-      "params": 3,
-      "length": 9
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_schema_rename",
-      "nloc": 6,
-      "ccn": 2,
-      "tokens": 50,
-      "params": 3,
-      "length": 16
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_raw_latex_block",
-      "nloc": 6,
-      "ccn": 2,
-      "tokens": 45,
-      "params": 2,
-      "length": 12
-    },
-    {
-      "file": "src/txt2tex/free_vars.py",
-      "function": "_union",
-      "nloc": 5,
-      "ccn": 2,
-      "tokens": 39,
-      "params": 1,
-      "length": 6
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_bracket_document_item",
-      "nloc": 5,
-      "ccn": 2,
-      "tokens": 37,
-      "params": 1,
-      "length": 10
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_b_block",
-      "nloc": 5,
-      "ccn": 2,
-      "tokens": 52,
-      "params": 1,
-      "length": 10
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_pagebreak",
-      "nloc": 5,
-      "ccn": 2,
-      "tokens": 46,
-      "params": 1,
-      "length": 10
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_linebreak",
-      "nloc": 5,
-      "ccn": 2,
-      "tokens": 47,
-      "params": 1,
-      "length": 10
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_peek_ahead",
-      "nloc": 5,
-      "ccn": 2,
-      "tokens": 46,
-      "params": 2,
-      "length": 6
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_format_multiword_identifier",
-      "nloc": 5,
-      "ccn": 2,
-      "tokens": 33,
-      "params": 2,
-      "length": 10
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_string_lit",
-      "nloc": 5,
-      "ccn": 2,
-      "tokens": 42,
-      "params": 3,
-      "length": 16
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_bag_literal",
-      "nloc": 5,
-      "ccn": 2,
-      "tokens": 42,
-      "params": 3,
-      "length": 14
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_format_boxed_assumption",
-      "nloc": 5,
-      "ccn": 2,
-      "tokens": 38,
-      "params": 3,
-      "length": 7
-    },
-    {
-      "file": "src/txt2tex/lexer.py",
-      "function": "_peek_char",
-      "nloc": 5,
-      "ccn": 2,
-      "tokens": 40,
-      "params": 2,
-      "length": 6
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_is_attr_name_token",
-      "nloc": 4,
-      "ccn": 2,
-      "tokens": 25,
-      "params": 1,
-      "length": 10
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_get_indentation",
-      "nloc": 4,
-      "ccn": 2,
-      "tokens": 21,
-      "params": 1,
-      "length": 11
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_project",
-      "nloc": 4,
-      "ccn": 2,
-      "tokens": 53,
-      "params": 3,
-      "length": 12
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_pre_sanitise_dollars._escape_dbl_span",
-      "nloc": 4,
-      "ccn": 2,
-      "tokens": 50,
-      "params": 1,
-      "length": 4
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_restore_dollar_sanitise",
-      "nloc": 4,
-      "ccn": 2,
-      "tokens": 37,
-      "params": 2,
-      "length": 9
-    },
-    {
-      "file": "src/txt2tex/lexer.py",
-      "function": "_current_char",
-      "nloc": 4,
-      "ccn": 2,
-      "tokens": 26,
-      "params": 1,
-      "length": 5
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "emit_warnings",
-      "nloc": 3,
-      "ccn": 2,
-      "tokens": 25,
-      "params": 1,
-      "length": 4
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_tuple",
-      "nloc": 3,
-      "ccn": 2,
-      "tokens": 42,
-      "params": 3,
-      "length": 12
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_get_bullet_separator",
-      "nloc": 2,
-      "ccn": 2,
-      "tokens": 17,
-      "params": 1,
-      "length": 3
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_get_colon_separator",
-      "nloc": 2,
-      "ccn": 2,
-      "tokens": 17,
-      "params": 1,
-      "length": 3
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_get_mid_separator",
-      "nloc": 2,
-      "ccn": 2,
-      "tokens": 17,
-      "params": 1,
-      "length": 3
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_body_has_connective",
-      "nloc": 2,
-      "ccn": 2,
-      "tokens": 27,
-      "params": 2,
-      "length": 3
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_paragraph_text",
-      "nloc": 81,
-      "ccn": 1,
-      "tokens": 802,
-      "params": 2,
-      "length": 148
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_paragraph_text",
-      "nloc": 81,
-      "ccn": 1,
-      "tokens": 802,
-      "params": 2,
-      "length": 148
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_escape_justification",
-      "nloc": 41,
-      "ccn": 1,
-      "tokens": 487,
-      "params": 2,
-      "length": 79
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_is_structural_token",
-      "nloc": 26,
-      "ccn": 1,
-      "tokens": 106,
-      "params": 1,
-      "length": 27
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_is_operand_start",
-      "nloc": 25,
-      "ccn": 1,
-      "tokens": 107,
-      "params": 1,
-      "length": 31
-    },
-    {
-      "file": "src/txt2tex/repl.py",
-      "function": "print_help",
-      "nloc": 16,
-      "ccn": 1,
-      "tokens": 11,
-      "params": 0,
-      "length": 17
-    },
-    {
-      "file": "src/txt2tex/cli.py",
-      "function": "_check_latex_package",
-      "nloc": 16,
-      "ccn": 1,
-      "tokens": 82,
-      "params": 2,
-      "length": 19
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_is_keyword_usable_as_identifier",
-      "nloc": 14,
-      "ccn": 1,
-      "tokens": 63,
-      "params": 1,
-      "length": 23
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_inline_math",
-      "nloc": 12,
-      "ccn": 1,
-      "tokens": 94,
-      "params": 2,
-      "length": 40
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_escape_latex",
-      "nloc": 11,
-      "ccn": 1,
-      "tokens": 121,
-      "params": 2,
-      "length": 18
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_escape_latex_text",
-      "nloc": 11,
-      "ccn": 1,
-      "tokens": 121,
-      "params": 2,
-      "length": 24
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "__init__",
-      "nloc": 10,
-      "ccn": 1,
-      "tokens": 67,
-      "params": 2,
-      "length": 30
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_pure_paragraph",
-      "nloc": 10,
-      "ccn": 1,
-      "tokens": 74,
-      "params": 2,
-      "length": 21
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_solution",
-      "nloc": 9,
-      "ccn": 1,
-      "tokens": 81,
-      "params": 2,
-      "length": 14
-    },
-    {
-      "file": "src/txt2tex/compile.py",
-      "function": "_compile_with_pdflatex.run_pdflatex",
-      "nloc": 8,
-      "ccn": 1,
-      "tokens": 43,
-      "params": 0,
-      "length": 8
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_paragraph",
-      "nloc": 8,
-      "ccn": 1,
-      "tokens": 64,
-      "params": 2,
-      "length": 26
-    },
-    {
-      "file": "src/txt2tex/lexer.py",
-      "function": "__init__",
-      "nloc": 8,
-      "ccn": 1,
-      "tokens": 48,
-      "params": 2,
-      "length": 9
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_parts_directive",
-      "nloc": 7,
-      "ccn": 1,
-      "tokens": 45,
-      "params": 1,
-      "length": 12
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_b_machine",
-      "nloc": 7,
-      "ccn": 1,
-      "tokens": 55,
-      "params": 2,
-      "length": 12
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_convert_operators_to_latex",
-      "nloc": 7,
-      "ccn": 1,
-      "tokens": 89,
-      "params": 2,
-      "length": 11
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_relational_image",
-      "nloc": 6,
-      "ccn": 1,
-      "tokens": 43,
-      "params": 3,
-      "length": 19
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_schema_compose",
-      "nloc": 6,
-      "ccn": 1,
-      "tokens": 44,
-      "params": 3,
-      "length": 15
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_schema_pipe",
-      "nloc": 6,
-      "ccn": 1,
-      "tokens": 44,
-      "params": 3,
-      "length": 15
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_schema_hide",
-      "nloc": 6,
-      "ccn": 1,
-      "tokens": 44,
-      "params": 3,
-      "length": 16
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_schema_project",
-      "nloc": 6,
-      "ccn": 1,
-      "tokens": 44,
-      "params": 3,
-      "length": 15
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_guarded_branch",
-      "nloc": 6,
-      "ccn": 1,
-      "tokens": 43,
-      "params": 3,
-      "length": 10
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_given_type",
-      "nloc": 6,
-      "ccn": 1,
-      "tokens": 49,
-      "params": 2,
-      "length": 8
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_aggregator_clause",
-      "nloc": 5,
-      "ccn": 1,
-      "tokens": 45,
-      "params": 2,
-      "length": 9
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_pre_sanitise_dollars._make_placeholder",
-      "nloc": 5,
-      "ccn": 1,
-      "tokens": 31,
-      "params": 1,
-      "length": 5
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_latex_block",
-      "nloc": 5,
-      "ccn": 1,
-      "tokens": 40,
-      "params": 2,
-      "length": 10
-    },
-    {
-      "file": "src/txt2tex/lexer.py",
-      "function": "__init__",
-      "nloc": 5,
-      "ccn": 1,
-      "tokens": 44,
-      "params": 4,
-      "length": 6
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "__init__",
-      "nloc": 4,
-      "ccn": 1,
-      "tokens": 35,
-      "params": 3,
-      "length": 5
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "generate_fragment",
-      "nloc": 4,
-      "ccn": 1,
-      "tokens": 36,
-      "params": 2,
-      "length": 19
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_schema_text_expr",
-      "nloc": 4,
-      "ccn": 1,
-      "tokens": 27,
-      "params": 3,
-      "length": 8
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_range",
-      "nloc": 4,
-      "ccn": 1,
-      "tokens": 43,
-      "params": 3,
-      "length": 15
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_restrict",
-      "nloc": 4,
-      "ccn": 1,
-      "tokens": 44,
-      "params": 3,
-      "length": 8
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_process_citations",
-      "nloc": 4,
-      "ccn": 1,
-      "tokens": 29,
-      "params": 2,
-      "length": 30
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_set_expression",
-      "nloc": 3,
-      "ccn": 1,
-      "tokens": 19,
-      "params": 1,
-      "length": 12
-    },
-    {
-      "file": "src/txt2tex/errors.py",
-      "function": "__init__",
-      "nloc": 3,
-      "ccn": 1,
-      "tokens": 26,
-      "params": 2,
-      "length": 8
-    },
-    {
-      "file": "src/txt2tex/tokens.py",
-      "function": "__repr__",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 11,
-      "params": 1,
-      "length": 3
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_at_end",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 20,
-      "params": 1,
-      "length": 3
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_current",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 17,
-      "params": 1,
-      "length": 3
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_match",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 23,
-      "params": 2,
-      "length": 3
-    },
-    {
-      "file": "src/txt2tex/parser.py",
-      "function": "_parse_set_predicate",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 14,
-      "params": 1,
-      "length": 7
-    },
-    {
-      "file": "src/txt2tex/compile.py",
-      "function": "get_latex_dir",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 16,
-      "params": 0,
-      "length": 3
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_is_atomic_predicate",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 23,
-      "params": 1,
-      "length": 18
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "get_warnings",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 19,
-      "params": 1,
-      "length": 3
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "clear_warnings",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 15,
-      "params": 1,
-      "length": 7
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "generate_expr",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 26,
-      "params": 3,
-      "length": 19
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_number",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 24,
-      "params": 3,
-      "length": 3
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_theta",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 24,
-      "params": 3,
-      "length": 7
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_emit_attr_name",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 15,
-      "params": 2,
-      "length": 8
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_pagebreak",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 22,
-      "params": 2,
-      "length": 6
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_linebreak",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 23,
-      "params": 2,
-      "length": 8
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_generate_parts_format",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 18,
-      "params": 2,
-      "length": 7
-    },
-    {
-      "file": "src/txt2tex/latex_gen.py",
-      "function": "_wrap_text_in_mathrm.wrap_multi",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 17,
-      "params": 1,
-      "length": 2
-    },
-    {
-      "file": "src/txt2tex/lexer.py",
-      "function": "_at_end",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 19,
-      "params": 1,
-      "length": 3
-    },
-    {
-      "file": "src/txt2tex/lexer.py",
-      "function": "_make_token",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 36,
-      "params": 3,
-      "length": 3
-    },
-    {
-      "file": "src/txt2tex/ast_nodes.py",
-      "function": "label",
-      "nloc": 2,
-      "ccn": 1,
-      "tokens": 16,
-      "params": 1,
-      "length": 3
     }
   ],
   "pydeps": [
@@ -3384,5 +558,430 @@
       "fan_out": 0
     }
   ],
-  "trend": {}
+  "trend": {
+    "src/txt2tex/ast_nodes.py": [
+      {
+        "commit": "3b80a19",
+        "date": "2026-05-22",
+        "loc": 1427,
+        "cc": 80
+      },
+      {
+        "commit": "8df6696",
+        "date": "2026-05-22",
+        "loc": 1413,
+        "cc": 79
+      },
+      {
+        "commit": "7fb6567",
+        "date": "2026-05-20",
+        "loc": 1303,
+        "cc": 72
+      },
+      {
+        "commit": "f2475a8",
+        "date": "2026-05-19",
+        "loc": 1304,
+        "cc": 72
+      },
+      {
+        "commit": "97c93ec",
+        "date": "2026-05-19",
+        "loc": 1300,
+        "cc": 72
+      },
+      {
+        "commit": "0422bd4",
+        "date": "2026-05-19",
+        "loc": 1289,
+        "cc": 71
+      },
+      {
+        "commit": "d93e061",
+        "date": "2026-05-19",
+        "loc": 1304,
+        "cc": 72
+      },
+      {
+        "commit": "11773d3",
+        "date": "2026-05-19",
+        "loc": 1314,
+        "cc": 73
+      },
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 1230,
+        "cc": 69
+      }
+    ],
+    "src/txt2tex/cli.py": [
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 344,
+        "cc": 38
+      }
+    ],
+    "src/txt2tex/compile.py": [
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 248,
+        "cc": 33
+      }
+    ],
+    "src/txt2tex/constants.py": [
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 72,
+        "cc": 0
+      }
+    ],
+    "src/txt2tex/errors.py": [
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 136,
+        "cc": 13
+      }
+    ],
+    "src/txt2tex/free_vars.py": [
+      {
+        "commit": "17e0be0",
+        "date": "2026-05-22",
+        "loc": 214,
+        "cc": 41
+      },
+      {
+        "commit": "8df6696",
+        "date": "2026-05-22",
+        "loc": 213,
+        "cc": 42
+      },
+      {
+        "commit": "92823b7",
+        "date": "2026-05-20",
+        "loc": 212,
+        "cc": 42
+      }
+    ],
+    "src/txt2tex/latex_gen.py": [
+      {
+        "commit": "3b80a19",
+        "date": "2026-05-22",
+        "loc": 6815,
+        "cc": 868
+      },
+      {
+        "commit": "bc29493",
+        "date": "2026-05-22",
+        "loc": 6800,
+        "cc": 866
+      },
+      {
+        "commit": "ec297ea",
+        "date": "2026-05-22",
+        "loc": 6796,
+        "cc": 866
+      },
+      {
+        "commit": "8df6696",
+        "date": "2026-05-22",
+        "loc": 6795,
+        "cc": 866
+      },
+      {
+        "commit": "9ca24d2",
+        "date": "2026-05-21",
+        "loc": 6100,
+        "cc": 825
+      },
+      {
+        "commit": "d4ec45a",
+        "date": "2026-05-20",
+        "loc": 6068,
+        "cc": 820
+      },
+      {
+        "commit": "1cd9761",
+        "date": "2026-05-20",
+        "loc": 6066,
+        "cc": 820
+      },
+      {
+        "commit": "7fb6567",
+        "date": "2026-05-20",
+        "loc": 6066,
+        "cc": 820
+      },
+      {
+        "commit": "92823b7",
+        "date": "2026-05-20",
+        "loc": 6065,
+        "cc": 820
+      },
+      {
+        "commit": "71ce521",
+        "date": "2026-05-19",
+        "loc": 5971,
+        "cc": 802
+      },
+      {
+        "commit": "f2475a8",
+        "date": "2026-05-19",
+        "loc": 5788,
+        "cc": 777
+      },
+      {
+        "commit": "8a15c55",
+        "date": "2026-05-19",
+        "loc": 5732,
+        "cc": 762
+      },
+      {
+        "commit": "97c93ec",
+        "date": "2026-05-19",
+        "loc": 5731,
+        "cc": 762
+      },
+      {
+        "commit": "92f14d8",
+        "date": "2026-05-19",
+        "loc": 5720,
+        "cc": 761
+      },
+      {
+        "commit": "88b87fb",
+        "date": "2026-05-19",
+        "loc": 5719,
+        "cc": 761
+      },
+      {
+        "commit": "0422bd4",
+        "date": "2026-05-19",
+        "loc": 5716,
+        "cc": 761
+      },
+      {
+        "commit": "a8a02ae",
+        "date": "2026-05-19",
+        "loc": 5737,
+        "cc": 762
+      },
+      {
+        "commit": "3178a86",
+        "date": "2026-05-19",
+        "loc": 5689,
+        "cc": 753
+      },
+      {
+        "commit": "d93e061",
+        "date": "2026-05-19",
+        "loc": 5686,
+        "cc": 753
+      },
+      {
+        "commit": "0606052",
+        "date": "2026-05-19",
+        "loc": 5802,
+        "cc": 771
+      }
+    ],
+    "src/txt2tex/lexer.py": [
+      {
+        "commit": "772861d",
+        "date": "2026-05-22",
+        "loc": 1635,
+        "cc": 394
+      },
+      {
+        "commit": "3b80a19",
+        "date": "2026-05-22",
+        "loc": 1636,
+        "cc": 394
+      },
+      {
+        "commit": "8df6696",
+        "date": "2026-05-22",
+        "loc": 1598,
+        "cc": 377
+      },
+      {
+        "commit": "97c93ec",
+        "date": "2026-05-19",
+        "loc": 1460,
+        "cc": 349
+      },
+      {
+        "commit": "0422bd4",
+        "date": "2026-05-19",
+        "loc": 1454,
+        "cc": 347
+      },
+      {
+        "commit": "d93e061",
+        "date": "2026-05-19",
+        "loc": 1460,
+        "cc": 350
+      },
+      {
+        "commit": "11773d3",
+        "date": "2026-05-19",
+        "loc": 1460,
+        "cc": 350
+      },
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 1441,
+        "cc": 346
+      }
+    ],
+    "src/txt2tex/parser.py": [
+      {
+        "commit": "17e0be0",
+        "date": "2026-05-22",
+        "loc": 6280,
+        "cc": 912
+      },
+      {
+        "commit": "3b80a19",
+        "date": "2026-05-22",
+        "loc": 6261,
+        "cc": 906
+      },
+      {
+        "commit": "92ef574",
+        "date": "2026-05-22",
+        "loc": 6243,
+        "cc": 903
+      },
+      {
+        "commit": "8df6696",
+        "date": "2026-05-22",
+        "loc": 6231,
+        "cc": 900
+      },
+      {
+        "commit": "9ca24d2",
+        "date": "2026-05-21",
+        "loc": 5849,
+        "cc": 851
+      },
+      {
+        "commit": "7fb6567",
+        "date": "2026-05-20",
+        "loc": 5834,
+        "cc": 848
+      },
+      {
+        "commit": "71ce521",
+        "date": "2026-05-19",
+        "loc": 5804,
+        "cc": 846
+      },
+      {
+        "commit": "20a6daa",
+        "date": "2026-05-19",
+        "loc": 5659,
+        "cc": 834
+      },
+      {
+        "commit": "f2475a8",
+        "date": "2026-05-19",
+        "loc": 5712,
+        "cc": 841
+      },
+      {
+        "commit": "97c93ec",
+        "date": "2026-05-19",
+        "loc": 5549,
+        "cc": 808
+      },
+      {
+        "commit": "0422bd4",
+        "date": "2026-05-19",
+        "loc": 5534,
+        "cc": 805
+      },
+      {
+        "commit": "d93e061",
+        "date": "2026-05-19",
+        "loc": 5605,
+        "cc": 815
+      },
+      {
+        "commit": "11773d3",
+        "date": "2026-05-19",
+        "loc": 5577,
+        "cc": 809
+      },
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 5425,
+        "cc": 794
+      }
+    ],
+    "src/txt2tex/repl.py": [
+      {
+        "commit": "d93e061",
+        "date": "2026-05-19",
+        "loc": 321,
+        "cc": 38
+      },
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 321,
+        "cc": 38
+      }
+    ],
+    "src/txt2tex/tokens.py": [
+      {
+        "commit": "3b80a19",
+        "date": "2026-05-22",
+        "loc": 239,
+        "cc": 4
+      },
+      {
+        "commit": "8df6696",
+        "date": "2026-05-22",
+        "loc": 238,
+        "cc": 4
+      },
+      {
+        "commit": "97c93ec",
+        "date": "2026-05-19",
+        "loc": 227,
+        "cc": 4
+      },
+      {
+        "commit": "0422bd4",
+        "date": "2026-05-19",
+        "loc": 226,
+        "cc": 4
+      },
+      {
+        "commit": "d93e061",
+        "date": "2026-05-19",
+        "loc": 227,
+        "cc": 4
+      },
+      {
+        "commit": "11773d3",
+        "date": "2026-05-19",
+        "loc": 227,
+        "cc": 4
+      },
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 222,
+        "cc": 4
+      }
+    ]
+  }
 }

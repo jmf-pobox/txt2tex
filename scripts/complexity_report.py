@@ -142,8 +142,13 @@ def collect_lizard(src: Path, ccn_threshold: int = 20, length_threshold: int = 1
                 "length": length,
             }
         )
-    # lizard emits each warning twice — once in the per-file section and once
-    # in the summary block.  Dedupe on (file, function, ccn, nloc).
+    # lizard emits every function in its detail table; --CCN / --length
+    # only affect the summary line.  Filter to the actual warnings ourselves.
+    rows = [
+        r for r in rows
+        if r["ccn"] >= ccn_threshold or r["nloc"] >= length_threshold
+    ]
+    # lizard also emits each warning twice (per-file section + summary block).
     seen: set[tuple[str, str, int, int]] = set()
     deduped: list[dict[str, Any]] = []
     for r in rows:
@@ -348,11 +353,13 @@ def render_markdown(snapshot: dict[str, Any], prior: dict[str, Any] | None) -> s
         )
     else:
         parts.append(
-            "LoC and cyclomatic complexity at the **oldest** and **newest** revisions "
-            "in the wily window, for the three largest files only.\n"
+            "LoC and cyclomatic complexity at the **oldest** and **newest** "
+            "revisions in the wily window.  Files with zero net change in both "
+            "metrics are omitted.\n"
         )
         parts.append("| File | Oldest commit | Oldest LoC | Oldest CC | Newest commit | Newest LoC | Newest CC | LoC Δ | CC Δ |")
         parts.append("|------|--------------|-----------:|----------:|---------------|-----------:|----------:|------:|-----:|")
+        sig_rows: list[tuple[str, dict[str, Any], dict[str, Any], int, int]] = []
         for path, series in trends.items():
             if not series:
                 continue
@@ -360,6 +367,12 @@ def render_markdown(snapshot: dict[str, Any], prior: dict[str, Any] | None) -> s
             newest = series[0]
             loc_d = (newest["loc"] or 0) - (oldest["loc"] or 0)
             cc_d = (newest["cc"] or 0) - (oldest["cc"] or 0)
+            if loc_d == 0 and cc_d == 0:
+                continue
+            sig_rows.append((path, oldest, newest, loc_d, cc_d))
+        # Sort by absolute LoC change (largest moves first).
+        sig_rows.sort(key=lambda t: abs(t[3]), reverse=True)
+        for path, oldest, newest, loc_d, cc_d in sig_rows:
             parts.append(
                 f"| `{path}` | `{oldest['commit']}` ({oldest['date']}) | "
                 f"{oldest['loc']} | {oldest['cc']} | "
@@ -367,6 +380,8 @@ def render_markdown(snapshot: dict[str, Any], prior: dict[str, Any] | None) -> s
                 f"{newest['loc']} | {newest['cc']} | "
                 f"{loc_d:+d} | {cc_d:+d} |"
             )
+        if not sig_rows:
+            parts.append("| _no changes in window_ |  |  |  |  |  |  |  |  |")
         parts.append("")
 
     # Diff vs prior snapshot
