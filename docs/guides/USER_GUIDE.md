@@ -982,7 +982,7 @@ Generates: `\begin{zed}[Person, Company]\end{zed}`
 
 ### Abbreviations
 
-Abbreviations define shorthand names for types or expressions. They must be wrapped in `zed...end` blocks:
+Abbreviations define shorthand names for types or expressions.  They can appear standalone at the top level (the engine wraps them in `zed` automatically) or inside an explicit `zed...end` block when you want to group several with other paragraph kinds:
 
 **Basic abbreviations:**
 
@@ -1629,13 +1629,13 @@ f |> B           →  f ⩥ B       [restrict f to range B]
 **Domain Subtraction:**
 
 ```text
-A <-| f          →  A ⩤ f       [remove A from domain]
+A <<| f          →  A ⩤ f       [remove A from domain]
 ```
 
 **Range Subtraction:**
 
 ```text
-f |->> B         →  f ⩥ B       [remove B from range]
+f |>> B          →  f ⩥ B       [remove B from range]
 ```
 
 **Function Composition:**

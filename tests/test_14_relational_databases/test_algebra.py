@@ -563,6 +563,12 @@ class TestAlgebraNegative:
         with pytest.raises(ParserError) as exc_info:
             Parser(_lex("sigma[p(R)")).parse()
         err = exc_info.value
+        # Message must implicate the sigma/predicate bracket, not some
+        # downstream parse error that happens to fire first.
+        msg = err.message.lower()
+        assert any(word in msg for word in ("sigma", "predicate", "]")), (
+            f"unexpected error message: {err.message!r}"
+        )
         assert err.token.line == 1
 
     def test_sigma_missing_paren(self) -> None:
@@ -689,8 +695,10 @@ class TestJoinPrecedence:
     def test_intersect_binds_tighter_than_join(self) -> None:
         """R join S intersect T → NaturalJoin(R, intersect(S, T)).
 
-        intersect is at _parse_intersect, which is called from _parse_cross
-        to resolve operands.  intersect therefore binds tighter than join.
+        Call chain: ``_parse_cross`` (which handles join/div/cross) invokes
+        ``_parse_intersect`` to parse each of its operands.  That means
+        ``intersect`` resolves first inside each operand and therefore binds
+        tighter than ``join``.
         """
         ast = _expr("R join S intersect T")
         assert isinstance(ast, NaturalJoin)
