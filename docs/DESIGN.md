@@ -2555,6 +2555,10 @@ Each aggregator emits
 rendering style of the other relational-algebra operators
 (`\mathrm{Project}`, `\mathrm{Restrict}`, `\mathrm{Rename}`, etc.).
 
+> **Note (2026-05-23)**: `\mathrm{Rename}` was retired by #147; relation
+> rename now emits as a literal pass-through `R[NEW/OLD]`.  The example
+> list above is from the pre-#147 era and is preserved as written.
+
 ### Alternatives rejected
 
 1. **Separate `groupby` keyword for the aggregate form.**  Forks the

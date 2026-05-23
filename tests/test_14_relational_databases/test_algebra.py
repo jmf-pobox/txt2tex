@@ -263,6 +263,22 @@ class TestRelationRenameParser:
         # The abbreviation must NOT be inside a Z paragraph.
         assert "\\begin{zed}\nB ==" not in latex
 
+    def test_plain_abbreviation_still_emits_in_zed(self) -> None:
+        """Plain `A == B` without a relational construct stays in `\\begin{zed}`.
+
+        Pins that the `_in_relational_context=True` set in `_parse_abbreviation`
+        does NOT silently shove every abbreviation into inline math — only
+        ones whose RHS the DAT-expression detector flags as relational.
+        """
+        src = "TITLE: probe\n\ngiven Foo\n\nThing == Foo\n"
+        ast_result = Parser(Lexer(src).tokenize()).parse()
+        assert isinstance(ast_result, Document)
+        latex = LaTeXGenerator().generate_document(ast_result)
+        # The abbreviation MUST be inside a Z paragraph (begin{zed}).
+        assert "\\begin{zed}" in latex
+        # And NOT routed to inline math.
+        assert "$Thing == Foo$" not in latex
+
 
 # ---------------------------------------------------------------------------
 # Parser — NaturalJoin (join)
@@ -404,9 +420,11 @@ class TestProjectGenerator:
     r"""LaTeX generator emits \mathrm{Project}_{attrs}(rel) for Project nodes."""
 
     def test_project_subscript_form(self) -> None:
-        r"""pi[a](R) → \mathrm{Project}_{a}(R) (subscript, not braces)."""
+        r"""pi[a](R) emits subscript form, never the legacy brace form (#146)."""
         result = _expr_latex("pi[a](R)")
-        assert result == r"\mathrm{Project}_{a}(R)"
+        assert r"\mathrm{Project}_{a}(R)" in result
+        # Pin: the legacy brace form must never appear in current output.
+        assert r"\mathrm{Project}\{" not in result
 
     def test_project_single_attr(self) -> None:
         r"""pi[a](R) → \mathrm{Project}_{a}(R)."""

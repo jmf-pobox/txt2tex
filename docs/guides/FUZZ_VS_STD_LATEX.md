@@ -385,18 +385,25 @@ those contexts, so fuzz rejects the expression.
 ❌ WRONG:   axdef ... Book[id/bookId] ... end  → fuzz rejects /
 ```
 
-**Context requirement**: `[NEW/OLD]` is only recognised as a relation rename
-inside a *relational context* (argument to `sigma`, `pi`, or right operand of
-`join`/`div`).  At the top level of an abbreviation RHS, wrap in `pi` to force
-the context:
+**Context requirement**: `[NEW/OLD]` is recognised as a relation rename in
+any relational context: as an argument to `sigma`/`pi`, as an operand of
+`join`/`div`, or directly on the RHS of a top-level abbreviation
+(`B == R[new/old]` — the abbreviation parser enters relational context for
+the RHS).  All three forms route through inline math:
 
 ```text
-// Correct: pi forces relational context so [ship/name] is RelationRename
-B == pi[ship, class, launched](Ship[ship/name])
+// All three are equivalent in routing — RelationRename → inline math
+A == Ship[ship/name]                              // bare abbreviation
+B == pi[ship, class, launched](Ship[ship/name])   // wrapped in pi
+sigma[ship = 'Hood'](Ship[ship/name])             // wrapped in sigma
 ```
 
+Inside a Z paragraph (\texttt{zed}, \texttt{axdef}, \texttt{schema}), the same
+syntax \texttt{S[a/b]} is a \textit{schema} rename — that form is fuzz-clean
+because schema rename doesn't carry a `/` token at this level.
+
 **Reference**: `latex_gen.py` — `_DAT_EXPRESSION_TYPES`; `parser.py` —
-`_in_relational_context` flag.
+`_in_relational_context` flag set in `_parse_abbreviation`.
 
 ---
 

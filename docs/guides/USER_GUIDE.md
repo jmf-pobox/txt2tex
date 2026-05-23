@@ -3244,6 +3244,7 @@ x + y            →  x + y       [addition]
 x - y            →  x - y       [subtraction]
 -x               →  -x          [negation]
 x * y            →  x × y       [multiplication]
+x div n          →  x ÷ n       [integer division — same `div` keyword as relational div]
 x mod n          →  x mod n     [modulo]
 ```
 
