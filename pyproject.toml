@@ -33,6 +33,12 @@ classifiers = [
 [project.scripts]
 txt2tex = "txt2tex.cli:main"
 
+[tool.uv]
+# wily 2.x is currently on alpha but is the version compatible with radon 5+;
+# pin the prerelease policy at the project level so `uv sync` resolves cleanly
+# without contributors needing to pass --prerelease=allow.
+prerelease = "allow"
+
 [dependency-groups]
 dev = [
     "ruff>=0.13.0",
@@ -41,6 +47,13 @@ dev = [
     "pytest>=8.4.2",
     "pytest-cov>=4.0.0",
     "pytest-xdist>=3.0.0",
+    # Complexity / quality assessment (make complexity-report).
+    # wily 2.0.0a1 is the version that supports radon 5.1+; pinned to that
+    # major track via `--prerelease=allow` in uv sync (set in uv.lock).
+    "radon>=5.1.0",
+    "lizard>=1.17.0",
+    "wily>=2.0.0a1",
+    "pydeps>=3.0.0",
 ]
 
 [tool.hatch.build.targets.wheel]

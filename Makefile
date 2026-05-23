@@ -1,5 +1,6 @@
 .PHONY: lint lint-md format format-check type type-pyright test test-cov check check-cov build clean \
-	ethos-doctor ethos-agents ethos-team dev-doctor dev-setup test-e2e regen-e2e
+	ethos-doctor ethos-agents ethos-team dev-doctor dev-setup test-e2e regen-e2e \
+	complexity-report complexity-history
 
 lint:
 	uv run ruff check .
@@ -71,6 +72,24 @@ clean:
 	find . -type d -name .mypy_cache -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name .ruff_cache -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
+
+# --- Complexity / code-quality assessment ---
+# Composes radon, lizard, pydeps, and wily into a single point-in-time
+# snapshot.  Writes docs/complexity-report.{md,json}; the JSON is the
+# baseline for the next run's delta section.  Not part of `make check`.
+
+# Seed or extend the wily history so the trend section in the report
+# has data.  Safe to re-run — wily skips revisions already in its cache.
+# WILY_REVS controls how far back to walk (default 50).
+WILY_REVS ?= 50
+complexity-history:
+	@command -v uv >/dev/null 2>&1 || { echo "uv not found; install: https://docs.astral.sh/uv/"; exit 1; }
+	uv run wily build src/txt2tex --max-revisions $(WILY_REVS)
+
+# Generate the report.  Idempotent.  If no wily history exists, the
+# trend section is omitted (with a hint to run `make complexity-history`).
+complexity-report:
+	uv run python scripts/complexity_report.py
 
 # --- Ethos (developer toolchain) ---
 # These targets manage the txt2tex agent team via ethos. End users running
