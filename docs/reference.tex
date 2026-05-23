@@ -112,13 +112,13 @@ elem, notin, subset, subseteq, psubset     & set membership / subset \\
 union, intersect, cross, bigcup, bigcap    & set operations \\
 dom, ran, inv, id, comp                    & relation operators \\
 P, P1, F, F1                               & power / finite set \\
-mod, div                                   & arithmetic / cardinality \\
+mod                                        & arithmetic \\
 if, then, else, otherwise                  & conditional \\
 schema, axdef, gendef, zed, syntax         & block-paragraph headers \\
 given, where, end                          & paragraph delimiters \\
 Delta, Xi, theta, defs                     & schema operators \\
 hide, project, pk                          & schema calculus / annotation \\
-sigma, pi, join, group, ungroup            & relational algebra \\
+sigma, pi, join, div, group, ungroup       & relational algebra \\
 Count, Sum, Avg, Min, Max, Median, as      & aggregators \\
 filter, bag\_union, bag\_diff              & sequence / bag \\
 ARGUE, EQUIV, EQUAL, INFRULE, PROOF        & proof-paragraph markers \\
@@ -1054,25 +1054,25 @@ $\mathrm{Sum}(amount)~\mathrm{as}~totalRevenue)$
 \begin{tabularx}{\textwidth}{rX}
 1  & postfix \texttt{\textasciitilde}, \texttt{+}, \texttt{*}, \texttt{\^{}} (inverse, closures, iter) \\
 2  & prefix \texttt{dom}, \texttt{ran}, \texttt{\#}, \texttt{P}, \texttt{F}, \texttt{seq}, \texttt{bigcup}, \texttt{bigcap}, \texttt{inv}, \texttt{id} \\
-3  & function application \texttt{f(x)} \\
-4  & relational rename \texttt{R[B/A]} (postfix) \\
-5  & relational atoms \texttt{sigma[..]}, \texttt{pi[..]} (prefix) \\
-6  & \texttt{*}, \texttt{div}, \texttt{mod} \\
-7  & \texttt{+}, \texttt{-} (binary) \\
-8  & range \texttt{..} \\
-9  & \texttt{cross}, \texttt{join}, \texttt{div} (cross-product) \\
-10 & \texttt{union}, \texttt{setminus} (\texttt{\textbackslash}) \\
-11 & \texttt{intersect} \\
-12 & relational \texttt{<->}, \texttt{|->}, \texttt{<|}, \texttt{|>}, \texttt{<<|}, \texttt{|>>}, \texttt{o9}, \texttt{comp}, \texttt{;} \\
-13 & function arrows \texttt{->}, \texttt{+->}, \texttt{>->}, \texttt{>->>}, \texttt{-->>}, \texttt{+->>}, \texttt{77->} \\
-14 & \texttt{elem}, \texttt{notin}, \texttt{subset}, \texttt{subseteq}, \texttt{psubset} \\
-15 & comparison \texttt{<}, \texttt{>}, \texttt{<=}, \texttt{>=}, \texttt{=}, \texttt{!=} \\
-16 & \texttt{lnot} \\
-17 & \texttt{land} \\
-18 & \texttt{lor} \\
-19 & \texttt{=>} (right-associative) \\
-20 & \texttt{<=>} (right-associative) \\
-21 & quantifiers \texttt{forall}, \texttt{exists}, \texttt{exists1}, \texttt{mu}, \texttt{lambda} (loosest) \\
+3  & postfix at atom level: function application \texttt{f(x)}, relational rename \texttt{R[B/A]}, relational atoms \texttt{sigma[..]}, \texttt{pi[..]} \\
+4  & \texttt{*}, \texttt{mod} \\
+5  & \texttt{+}, \texttt{-} (binary) \\
+6  & range \texttt{..} \\
+7  & \texttt{cross}, \texttt{join}, \texttt{div} (cross-product / relational) \\
+8  & \texttt{union}, \texttt{setminus} (\texttt{\textbackslash}) \\
+9  & \texttt{intersect} \\
+10 & relational \texttt{<->}, \texttt{|->}, \texttt{<|}, \texttt{|>}, \texttt{<<|}, \texttt{|>>}, \texttt{o9}, \texttt{comp} \\
+11 & function arrows \texttt{->}, \texttt{+->}, \texttt{>->}, \texttt{>->>}, \texttt{-->>}, \texttt{+->>}, \texttt{77->} (finite) \\
+12 & \texttt{elem}, \texttt{notin}, \texttt{subset}, \texttt{subseteq}, \texttt{psubset} \\
+13 & comparison \texttt{<}, \texttt{>}, \texttt{<=}, \texttt{>=}, \texttt{=}, \texttt{!=} \\
+14 & \texttt{lnot} \\
+15 & \texttt{land} \\
+16 & \texttt{lor} \\
+17 & \texttt{=>} (right-associative) \\
+18 & \texttt{<=>} (right-associative) \\
+19 & quantifiers \texttt{forall}, \texttt{exists}, \texttt{exists1}, \texttt{mu}, \texttt{lambda} (loosest) \\
 \end{tabularx}
+
+{\scriptsize Schema-calculus operators (\texttt{;} composition, \texttt{>{}>} piping, \kw{hide}, \kw{project}) appear only on the RHS of \kw{defs}; they bind looser than expression-level operators and aren't part of this table.}
 
 \end{document}

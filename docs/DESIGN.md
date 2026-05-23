@@ -1536,6 +1536,17 @@ R div S                -- division       → R \div S
 > **Note (2026-05-23)**: `bowtie` keyword has been renamed to `join`;
 > `\otimes` emission replaced by `\mathrm{Join}(R, S)`.  See
 > "ADR: Source keyword `bowtie` → `join`; emit `\mathrm{Join}` not `\otimes`".
+>
+> **Note (2026-05-23)**: `rho[A as B](R)` prefix rename has been retired;
+> the postfix bracket form `R[NEW/OLD]` (Z RM §3.11, NEW first) replaces
+> it.  `rho` now lexes as a plain identifier.  See "ADR: Relation Rename
+> — adopt `R[NEW/OLD]`, retire `rho`".  Every mention of `rho` below
+> describes the prior parser; that prefix is no longer accepted.
+>
+> **Note (2026-05-23)**: Project keyword emission changed from the brace
+> form `\mathrm{Project}\{A, B\}(R)` to the subscript form
+> `\mathrm{Project}_{A, B}(R)` to match the instructor's canonical
+> vocabulary (#146).
 
 **Operator levels** (lowest binds least):
 
@@ -2181,6 +2192,18 @@ of the generator changes.
 > **Note (2026-05-23)**: The `bowtie` keyword was renamed to `join` and the
 > natural-join emit changed from `\otimes` to `\mathrm{Join}(R, S)`. See
 > "ADR: Source keyword `bowtie` → `join`; emit `\mathrm{Join}` not `\otimes`".
+>
+> **Note (2026-05-23)**: Project emission changed from the brace form
+> `\mathrm{Project}\{A, B\}(R)` to the subscript form
+> `\mathrm{Project}_{A, B}(R)` (#146).  The row above for `pi[A, B](R)`
+> now emits `\mathrm{Project}_{A, B}(R)`.
+>
+> **Note (2026-05-23)**: The `rho[A as B](R)` prefix keyword has been
+> retired (#147); relation rename now uses the postfix bracket form
+> `R[NEW/OLD]` and emits as a literal pass-through `R[B/A]` (no
+> `\mathrm{Rename}` macro).  The row above for `rho[A as B](R)` no
+> longer parses.  See "ADR: Relation Rename — adopt `R[NEW/OLD]`,
+> retire `rho`".
 
 Two shape changes merit attention:
 

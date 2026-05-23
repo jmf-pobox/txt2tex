@@ -138,12 +138,20 @@ These items were missing in earlier versions and are now shipped:
 - **bare-B identifier restored** — lexer regression from #138 where `"B"` in
   `RESERVED_WORDS` prevented decorating bare `B` identifiers; fix removes `"B"`
   from the reserved-words set.
+- **#146 — Project subscript form** (2026-05-23) —
+  `pi[A, B](R)` keyword emission changed from the brace form
+  `\mathrm{Project}\{A, B\}(R)` to the subscript form
+  `\mathrm{Project}_{A, B}(R)`, matching the instructor's canonical
+  vocabulary (slides/topic02.pdf).  Source syntax unchanged.
+
 - **#147 — Relation rename: retire `rho`, adopt `R[NEW/OLD]`** (2026-05-23) —
   `rho[A as B](R)` prefix syntax retired; replaced by Z RM §3.11 postfix form
   `R[B/A]` (NEW first, OLD second).  `rho` now lexes as a plain identifier.
   Engine routes `RelationRename` through `_DAT_EXPRESSION_TYPES` (inline math)
   so fuzz never sees the `/` inside a Z paragraph.  Compound bases are
-  parenthesised automatically: `(pi[x](R))[b/a]`.
+  parenthesised automatically: `(pi[x](R))[b/a]`.  Top-level abbreviations
+  `B == R[a/b]` route to inline math via `_in_relational_context` in
+  `_parse_abbreviation`.
 
 - **Schema-text quantification** (`exists Delta S | P`, `exists Xi S | P`,
   `exists S | P`, `exists S' | P`, and the same for `forall` and `exists1`) —

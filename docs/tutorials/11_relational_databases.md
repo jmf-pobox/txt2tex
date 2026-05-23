@@ -137,22 +137,24 @@ Keep only named attributes:
 pi[bookId, isbn](Book)
 ```
 
-Renders as: $\mathrm{Project}\{bookId, isbn\}(Book)$
+Renders as: $\mathrm{Project}_{bookId, isbn}(Book)$
 
 The attribute list is comma-separated identifiers.
 
-### Renaming (rho)
+### Renaming (postfix bracket)
 
-Rename attributes using `old as new` pairs:
+Rename attributes with the postfix bracket form `R[NEW/OLD]` (Z RM §3.11):
+NEW name first, OLD name second.
 
 ```text
-rho[bookId as id](Book)
-rho[A as B, C as D](R)
+Book[id/bookId]
+R[B/A, D/C]
 ```
 
-Renders as: $\mathrm{Rename}_{bookId \to id}(Book)$
+Renders as: $Book[id/bookId]$
 
-Multiple pairs are comma-separated.
+Multiple pairs are comma-separated.  The pass-through emission mirrors
+the source: there is no `\mathrm{Rename}` macro.
 
 ### Natural Join (join)
 
@@ -198,14 +200,15 @@ LongBooks == pi[bookId, isbn](sigma[pages >= 200](Book))
 Emits as:
 
 ```latex
-\noindent$LongBooks \defs \mathrm{Project}\{bookId, isbn\}(\mathrm{Restrict}_{pages \geq 200}(Book))$
+\noindent$LongBooks \defs \mathrm{Project}_{bookId, isbn}(\mathrm{Restrict}_{pages \geq 200}(Book))$
 ```
 
 ### Operator Precedence
 
-Algebra prefix operators (`sigma`, `pi`, `rho`) bind at atom level — they
-are parsed as prefix-with-arguments, like function calls. `join` and
-`div` are infix and sit at the same precedence as `cross` (Cartesian
+Algebra prefix operators (`sigma`, `pi`) bind at atom level — they are
+parsed as prefix-with-arguments, like function calls.  The postfix rename
+`R[NEW/OLD]` is also at atom level, applied to any expression.  `join`
+and `div` are infix and sit at the same precedence as `cross` (Cartesian
 product), above union/intersect.
 
 ```text

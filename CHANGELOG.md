@@ -73,10 +73,15 @@ version to pick up the new output.
 ### Removed
 
 - **`rho` keyword retired** (#147) — `rho[A as B](R)` prefix syntax removed.
-  `rho` now lexes as a plain identifier. Migrate to `R[B/A]` inside a
-  relational context (sigma/pi arg, join/div right operand), or wrap in
-  `pi[all-attrs](R[B/A])` to force relational context at abbreviation top level.
-  `\mathrm{Rename}` never appears in output from this version onward.
+  `rho` now lexes as a plain identifier. Migrate to `R[B/A]` (postfix
+  bracket form, Z RM §3.11, NEW first / OLD second).  A top-level
+  abbreviation `B == R[a/b]` now routes through inline math automatically;
+  no `pi`-wrapping needed.  `\mathrm{Rename}` never appears in output
+  from this version onward.
+- **`bowtie` keyword renamed to `join`** (#148) — `R bowtie S` no longer
+  parses. Migrate to `R join S` (natural join) or `R join [p] S`
+  (theta-join).  The `\bowtie` / `\otimes` emissions are gone; natural
+  join now emits `\mathrm{Join}(R, S)`.
 
 ### Changed
 

@@ -5754,8 +5754,17 @@ class Parser:
             raise ParserError("Expected '==' in abbreviation", self._current())
         self._advance()  # Consume '=='
 
-        # Parse expression
-        expr = self._parse_expr()
+        # Parse expression in relational context: a top-level abbreviation RHS
+        # is an expression, not a Z paragraph body, so a postfix `R[a/b]` is a
+        # relational rename (RelationRename → inline math) rather than a
+        # schema rename (SchemaRename, which fuzz rejects when emitted with a
+        # `/` inside a Z paragraph).
+        prev_relational = self._in_relational_context
+        self._in_relational_context = True
+        try:
+            expr = self._parse_expr()
+        finally:
+            self._in_relational_context = prev_relational
 
         return Abbreviation(
             name=name,

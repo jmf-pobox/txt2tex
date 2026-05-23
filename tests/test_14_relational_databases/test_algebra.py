@@ -13,6 +13,7 @@ from __future__ import annotations
 import pytest
 
 from txt2tex.ast_nodes import (
+    Abbreviation,
     BinaryOp,
     Divide,
     Document,
@@ -237,6 +238,30 @@ class TestRelationRenameParser:
         inner = node.relation
         assert isinstance(inner, RelationRename)
         assert inner.pairs[0] == ("ship", "name")  # new, old per Z RM §3.11
+
+    def test_top_level_abbreviation_routes_to_relation_rename(self) -> None:
+        """`B == R[a/b]` at top level — RHS routes via _in_relational_context."""
+        ast = _parse("B == R[new/old]")
+        item = ast.items[0]
+        assert isinstance(item, Abbreviation)
+        assert isinstance(item.expression, RelationRename)
+        assert item.expression.pairs == [("new", "old")]
+
+    def test_top_level_abbreviation_rename_emits_inline_math(self) -> None:
+        """`B == R[a/b]` emits via `\\noindent $...$`, not inside a Z paragraph.
+
+        Regression for the engine routing bug: SchemaRename inside `\\begin{zed}`
+        contains an unescaped `/`, which fuzz rejects.  RelationRename routes
+        through inline math (fuzz skips inline math content).
+        """
+        src = "TITLE: probe\n\ngiven Foo\nschema R\n  a : Foo\nend\n\nB == R[new/old]\n"
+        ast_result = Parser(Lexer(src).tokenize()).parse()
+        assert isinstance(ast_result, Document)
+        latex = LaTeXGenerator().generate_document(ast_result)
+        assert "\\noindent" in latex
+        assert "$B == R[new/old]$" in latex
+        # The abbreviation must NOT be inside a Z paragraph.
+        assert "\\begin{zed}\nB ==" not in latex
 
 
 # ---------------------------------------------------------------------------

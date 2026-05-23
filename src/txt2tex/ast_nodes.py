@@ -1,4 +1,12 @@
-"""AST node definitions for txt2tex parser."""
+"""AST node definitions for txt2tex parser.
+
+Nodes use ``@dataclass(frozen=True)``.  This protects against accidental
+attribute rebinding; it does *not* deep-freeze ``list``-valued fields.
+Calling ``hash()`` on a node that carries a mutable list raises
+``TypeError`` — the correct behaviour, since these nodes are never used
+as dict keys or set elements.  A future call site that needs hashability
+should switch the relevant field to a ``tuple``.
+"""
 
 from __future__ import annotations
 
