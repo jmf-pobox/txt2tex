@@ -533,49 +533,32 @@ class Parser:
     # ... more precedence levels
 ```
 
-### 3. Semantic Analyzer
+### 3. Semantic checks (no dedicated phase)
 
-**Responsibility**: Validate and annotate the AST with type/context information.
+txt2tex does **not** ship a separate semantic-analysis pass.  The pipeline
+runs `Lexer` → `Parser` → `LaTeXGenerator`, with no intermediate
+annotated-AST stage.
 
-**Tasks**:
+That choice is deliberate.  The two consumers of semantic information are:
 
-1. **Identifier resolution**: Track declared variables, types
-2. **Type inference**: Determine types of expressions where possible
-3. **Scope checking**: Ensure variables are in scope
-4. **Operator validation**: Check operators are used correctly
-5. **Z notation validation**: Verify schema/axdef structure
+1. **fuzz**, the downstream Z typechecker, which runs on the generated
+   `.tex` and reports identifier-resolution, type, and scope errors with
+   precise source positions.  Re-implementing those checks in Python
+   would duplicate fuzz's grammar and miss its semantic rules; fuzz is
+   the authority.
 
-**Example**:
+2. **Targeted helpers**, where the *generator* needs structural
+   information at emission time — for example
+   `src/txt2tex/free_vars.py`, which computes free-variable sets used
+   by the quantifier-chain collapse to decide when the Spivey
+   multi-decl form is safe (see the dependent-domain ADR).  Such
+   helpers run only on the AST nodes that need them; they are not a
+   whole-tree analysis phase.
 
-```python
-class SemanticAnalyzer:
-    def __init__(self, ast: Document):
-        self.ast = ast
-        self.symbol_table = SymbolTable()
-        self.errors = []
-
-    def analyze(self) -> AnnotatedAST:
-        self.visit(self.ast)
-        if self.errors:
-            raise SemanticError(self.errors)
-        return self.ast
-
-    def visit_quantifier(self, node: Quantifier):
-        # Add variable to scope
-        self.symbol_table.enter_scope()
-        self.symbol_table.define(node.variable)
-
-        # Analyze body with variable in scope
-        self.visit(node.body)
-
-        self.symbol_table.exit_scope()
-
-    def visit_identifier(self, node: Identifier):
-        if not self.symbol_table.lookup(node.name):
-            self.errors.append(
-                f"Line {node.line}: Undefined variable '{node.name}'"
-            )
-```
+Constructs the parser does validate inline — primary-key uniqueness in
+a schema, free-type branch shapes, syntactic well-formedness of `axdef`
+declaration / `where` predicate split — raise `ParserError` at the
+offending token.
 
 ### 4. LaTeX Generator
 
@@ -2247,6 +2230,11 @@ with an explicit branch for every `Expr` member (38 total). Binders subtract
 their bound names before recursing into body/expression but do *not* subtract
 from domain analysis (correct: the domain is in the outer scope).
 
+`Binding` nodes raise `NotImplementedError` rather than falling through
+to a generic case (#141, djb 2026-05-22 INFO).  A `Binding` reaching
+this code path indicates a generator bug; silent fall-through would
+return an empty free-variable set and mask the upstream defect.
+
 At each step in `_collect_quantifier_chain` and `_collect_lambda_chain`, the
 helper checks whether the next declaration's domain mentions any name already
 accumulated by prior declarations. On a dependency, it stops the collapse,
@@ -2391,3 +2379,247 @@ Prime handling: strip trailing `'` from the raw identifier, emit
   `\exists \Delta Counter @ IncrCounter`.
 
 **Test count delta**: 4230 → 4257 (27 new schema-text quantifier tests).
+
+## ADR: Multi-line `LATEX:` block (issue #137, commit `3b80a19`)
+
+### Context
+
+Each single-line `LATEX:` directive becomes its own paragraph and strips
+leading whitespace, so multi-line listings — manual bibliographies, tikz
+diagrams, multi-line environments — rendered double-spaced and de-indented.
+Wrapping in `\begin{verbatim}` is no help: the paragraph breaks are
+inserted before LaTeX sees the body.
+
+### Decision
+
+Add an **additive** multi-line block form parallel to the existing
+single-line directive.  A line that is exactly `LATEX:` followed by only
+optional whitespace before its newline opens the block; a column-0 `END`
+on its own line closes it.  The body is captured verbatim by the lexer
+and emitted directly to the `.tex` output with no escaping, no wrapper,
+and no paragraph breaks between lines.
+
+Single-line `LATEX: <content>` semantics are unchanged.  The
+disambiguation is lexical: if a non-whitespace character follows the
+colon on the same line, the directive is single-line.
+
+### Alternatives rejected
+
+1. **Modify consecutive single-line `LATEX:` to coalesce into one block.**
+   Would silently change the rendering of existing documents — manual
+   `thebibliography` entries rely on the per-line `\par` to separate
+   `\bibitem` entries.
+2. **Add an escape syntax (`LATEX_BLOCK:` or `LATEX{`).**  Two distinct
+   keywords with overlapping purpose multiplies surface area; the
+   alone-on-a-line / `END` rule is unambiguous and mirrors `B:`.
+
+### Consequences
+
+- The user guide documents both forms side-by-side; reference.tex
+  documents them as one entry with two syntaxes.
+- 9 regression tests in `tests/test_multiline_latex.py`.
+
+## ADR: `B:` block for B-machine verbatim listings (issue #138)
+
+### Context
+
+B-Method / Atelier-B machine listings need fixed-width font and
+literal-character rendering — backslashes, braces, percent signs appear
+exactly as typed.  `LATEX:` does not provide that: its body is emitted
+as live LaTeX, so `\` triggers macro expansion and `{` opens a group.
+
+### Decision
+
+Introduce a dedicated `B:` block.  The lexer slurps the body verbatim
+until a column-0 `END`; the generator wraps the body in
+`\begin{verbatim}…\end{verbatim}`.  The block rejects a literal
+`\end{verbatim}` in the body (djb 2026-05-22 security review): inside
+LaTeX `\begin{verbatim}` there is no in-band escape sequence, so a
+literal terminator would close the environment and allow arbitrary
+LaTeX to follow.
+
+### Alternatives rejected
+
+1. **A `--raw` flag on `LATEX:`.**  Overloads one keyword with
+   incompatible semantics (interpreted vs verbatim).  The two
+   constructs render fundamentally differently — fixed-width vs body
+   font, literal vs interpreted — and a flag obscures that.
+2. **Generic `VERBATIM:` block.**  `B:` makes the intent explicit
+   (B-machine listings) and keeps the door open for other
+   domain-specific verbatim forms if needed.
+
+### Consequences
+
+- B-method coursework can embed machines without escaping; cf.
+  `examples/05_sets/bags.txt` and the SBM coursework.
+- The bare `B` identifier subsequently regressed (see the next ADR);
+  the regression was fixed by lexing `B:` from the two-character
+  sequence rather than reserved-word membership.
+
+## ADR: Bare-`B` identifier preserved alongside `B:` block keyword
+
+### Context
+
+The `B:` block (#138) added `"B"` to `RESERVED_WORDS` in the lexer, on
+the assumption that a one-letter reserved word would not collide with
+identifier use.  The all-courseware regression sweep surfaced SBM
+ex14, which declares `B! : P BookingId` — an output-state variable
+literally named `B`.  The lexer raised
+`Cannot decorate reserved keyword 'B'`, breaking a valid Z
+declaration (commit `772861d` ships the fix).
+
+### Decision
+
+Remove `"B"` from `RESERVED_WORDS`.  The `B:` block trigger at
+`lexer.py:1347` is the literal two-character comparison
+`value == "B" and self._current_char() == ":"`; it does **not**
+require `B` to be in the reserved-words set.  Bare `B` is once again
+a usable identifier with the full `' ? !` decoration set.
+
+### Alternatives rejected
+
+1. **Forbid `B` as an identifier name.**  Too aggressive for Z's free-
+   name convention; users may pick any one-letter name in any binding.
+2. **Reserve `B` only when followed by `:` at column 0.**  The lexer
+   already does this implicitly via the two-character trigger; no
+   additional reservation is needed.
+
+### Consequences
+
+- 4 regression tests in `tests/test_b_decoration.py` lock in both
+  behaviours: `B!`/`B'`/`B?` lex as decorated identifiers; `B:` at
+  line start still opens the block.
+- The all-courseware regression sweep moved from 95/96 to 96/96.
+
+## ADR: GROUP aggregate form (issue #140)
+
+### Context
+
+The relational `group` operator originally supported only the regroup
+form `R group ({attrs} as alias)`, which bundles attribute values into
+a nested relation.  Computing summary statistics required a manual
+`LATEX:` workaround for every column, defeating the engine's typed-AST
+benefits and making per-column changes a passthrough edit.
+
+### Decision
+
+Add a second, **mutually exclusive** form to the parser:
+`R group (Count(attr) as alias)`, with six aggregator keywords
+recognised as reserved tokens — `Count`, `Sum`, `Avg`, `Min`, `Max`,
+`Median`.  Multiple aggregators may be comma-separated.  Mixing the
+regroup form (`{attrs}`) with aggregate form within the same `group`
+RHS is a parse error.  The `as` keyword is reserved (`TokenType.AS`)
+so the alias position is unambiguous.
+
+Each aggregator emits
+`\mathrm{Aggregator}(attr)~\mathrm{as}~alias`, matching the
+rendering style of the other relational-algebra operators
+(`\mathrm{Project}`, `\mathrm{Restrict}`, `\mathrm{Rename}`, etc.).
+
+### Alternatives rejected
+
+1. **Separate `groupby` keyword for the aggregate form.**  Forks the
+   relational-algebra surface and creates two operators users must
+   remember.  `group` is the conceptual operation; aggregate vs
+   regroup is a sub-form.
+2. **Allow both forms in the same RHS** (e.g. `group ({a} as b,
+   Count(c) as d)`).  Z RM has no canonical semantics for the mix;
+   forcing a choice keeps the engine pre-canonical.
+
+### Consequences
+
+- DAT sheet 1 question 3 and sheet 2 question 5 use the aggregate form
+  natively; both were previously `LATEX:` passthrough.
+- 33 tests in `tests/test_group_aggregators.py`.
+
+## ADR: Prefix-operator atomic-argument paren wrap (issue #133, jms ruling 2026-05-22)
+
+### Context
+
+Z RM §3.7 (and the operator table in §3.10) makes every prefix-generic
+operator — `\power`, `\seq`, `\seq_1`, `\iseq`, `\bag`, `\dom`,
+`\ran`, `\bigcup`, `\bigcap`, `\#`, `\id`, `\inv` — parse with the
+*atomic* expression to its immediate right.  The grammar production is
+`PrefixOp Expression0`, where `Expression0` is an atom: an identifier,
+a `(…)`-group, a `{…}`-set, or a `[…]`-binding.  A prefix application
+is **not** itself `Expression0`.
+
+txt2tex's emitter previously special-cased only `bigcup`/`bigcap` for
+this — `\bigcup (\ran s)` worked, but `\seq \power X` and
+`\ran \bigcup (\ran s)` did not, and fuzz rejected them.
+
+### Decision
+
+Generalise the wrap condition.  When the outer prefix-generic operator
+is in `_FUZZ_FUNCTION_LIKE_UNARY` *and* its operand is also a prefix
+application from that set, wrap the operand in parens.  A single
+condition replaces several special cases.
+
+jms ruling (2026-05-22): "Parentheses around a prefix application are
+semantically transparent — `(\power X)` and `\power X` denote the same
+set.  You cannot over-parenthesise this class.  Wrap the operand
+whenever it is another prefix application."
+
+### Alternatives rejected
+
+1. **Require users to write the parentheses themselves.**  Leaks fuzz's
+   atomicity quirks into the surface notation.  The whole point of the
+   engine is to keep the input close to whiteboard form.
+2. **Wrap unconditionally** (always emit `\seq (X)`).  Over-parens
+   that, while harmless to fuzz, clutter the rendered output and
+   contradict Z RM convention for atomic right-operands.
+
+### Consequences
+
+- 8 regression tests in `tests/test_prefix_paren_wrap.py` (`seq (P X)`,
+  `ran (bigcup (ran s))`, `P (P X)`, etc.).
+- The all-courseware sweep emits these forms in the byte-identical
+  shape fuzz accepts.
+
+## ADR: `GroupAggregate` abbreviation routes to inline math (issue #142)
+
+### Context
+
+`Name == <expr>` is two different things to the engine depending on
+the RHS shape:
+
+- **Z paragraph** (the default): wrapped in `\begin{zed}…\end{zed}`,
+  which fuzz typechecks.
+- **Inline math** (relational-algebra family): emitted as
+  `\noindent $Name == \mathrm{...}$`, which fuzz does *not* typecheck,
+  because the `\mathrm{Project}(...)`, `\mathrm{Restrict}(...)`,
+  `\mathrm{Group}(...)` labels are not Z paragraph syntax.
+
+The choice is made by checking the RHS AST against
+`_DAT_EXPRESSION_TYPES`, a tuple of node classes that route to inline
+math.  Before #142, `GroupAggregate` was missing from that tuple, so
+`B == R group (Count(x) as t)` routed to `\begin{zed}` and fuzz
+rejected the body.
+
+### Decision
+
+Add `GroupAggregate` to `_DAT_EXPRESSION_TYPES` (single-line change at
+`latex_gen.py:5154`).  All six relational-algebra families are now
+treated uniformly: `Restrict`, `Project`, `Rename`, `NaturalJoin`,
+`Divide`, `Binding`, `Group`, `GroupAggregate`, `Ungroup`.
+
+### Alternatives rejected
+
+1. **Emit the aggregate as a Z paragraph and add corresponding
+   `\Group`, `\Count`, … macros to a custom `.sty` file.**  Would
+   require shipping a patched fuzz stylesheet and re-coordinating with
+   any future fuzz upgrade.  The inline-math route exists precisely
+   for engine-internal labels that don't map to fuzz's Z grammar.
+2. **Move the routing decision into a `routes_to_inline_math` method
+   on each AST node.**  Spreads the policy across 50+ classes when
+   today the policy is a single small tuple.  A tuple is the right
+   data structure until the count of "yes"-classes exceeds the count
+   of "no"-classes.
+
+### Consequences
+
+- DAT s2q5 (c) algebra chain — three abbreviation lines using
+  `Count(...)` and a `rho`/`bowtie`/`pi` composition — fuzz-typechecks
+  and renders cleanly without any `LATEX:` passthrough.
+- 1 regression test in `tests/test_group_aggregators.py`
+  (`test_abbreviation_aggregator_routes_to_inline_math`).
