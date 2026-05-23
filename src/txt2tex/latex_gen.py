@@ -197,9 +197,9 @@ class LaTeXGenerator:
         "id": r"\id",  # Identity relation
         # Set functions
         "P": r"\power",  # Power set
-        "P1": r"\power_1",  # Non-empty power set
+        "P1": r"\power_{1}",  # Non-empty power set (braced subscript)
         "F": r"\finset",  # Finite set
-        "F1": r"\finset_1",  # Non-empty finite set
+        "F1": r"\finset_{1}",  # Non-empty finite set (braced subscript)
         "bigcup": r"\bigcup",  # Distributed union
         "bigcap": r"\bigcap",  # Distributed intersection
         # Postfix operators - special handling needed
@@ -2523,8 +2523,8 @@ class LaTeXGenerator:
 
         sigma[bore >= 16](Class) → \mathrm{Restrict}_{bore \geq 16}(Class)
         """
-        pred_latex = self.generate_expr(node.predicate)
-        rel_latex = self.generate_expr(node.relation)
+        pred_latex = self.generate_expr(node.predicate, parent=node)
+        rel_latex = self.generate_expr(node.relation, parent=node)
         return rf"\mathrm{{Restrict}}_{{{pred_latex}}}({rel_latex})"
 
     @generate_expr.register(Project)
@@ -2537,7 +2537,7 @@ class LaTeXGenerator:
         Subscript form matches the instructor's canonical notation (slides/topic02.pdf).
         """
         attrs_str = ", ".join(self._emit_attr_name(a) for a in node.attrs)
-        rel_latex = self.generate_expr(node.relation)
+        rel_latex = self.generate_expr(node.relation, parent=node)
         return rf"\mathrm{{Project}}_{{{attrs_str}}}({rel_latex})"
 
     @generate_expr.register(RelationRename)
@@ -2558,7 +2558,7 @@ class LaTeXGenerator:
         - R[b/a, d/c]                 → R[b/a, d/c]
         - (pi[x](R))[b/a]             → (pi[x](R))[b/a]  (compound base)
         """
-        rel_latex = self.generate_expr(node.relation)
+        rel_latex = self.generate_expr(node.relation, parent=node)
         # Wrap compound (non-identifier) bases in parens for clarity
         if not isinstance(node.relation, Identifier):
             rel_latex = f"({rel_latex})"
