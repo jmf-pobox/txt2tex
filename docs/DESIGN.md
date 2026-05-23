@@ -1579,8 +1579,17 @@ union / override (++)
 > 3. `group` and `ungroup` join `cross`/`join`/`div` in `_parse_cross`
 >    (parser.py:3671).
 >
-> Reference card and USER_GUIDE precedence tables follow the corrected
-> chain.  Original ADR table preserved as written.
+> The corrected chain (loosest → tightest):
+>
+> ```text
+> union / override (++)
+>     < cross / join / div / group / ungroup
+>         < intersect / setminus (\)
+>             < sigma[..](R) / pi[..](R) / R[B/A] / f(x)   [atom]
+> ```
+>
+> Reference card and USER_GUIDE precedence tables follow this chain.
+> Original ADR table preserved as written.
 
 `_parse_cross` calls `_parse_intersect` for each of its operands, so
 `intersect` binds **tighter** than `join`/`div`/`cross` — it is resolved

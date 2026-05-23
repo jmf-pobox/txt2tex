@@ -49,9 +49,13 @@ Q [modus ponens]
 ```
 
 Renders as a horizontal `\derive` rule: premises above the line,
-conclusion below, optional label on the right.  Each line above the
-three-dash separator is a premise; the line below is the conclusion.
-The `[label]` is optional; without it the rule is unlabelled.
+conclusion below, optional **rule name** on the right.  Each line
+above the three-dash separator is a premise; the line below is the
+conclusion.  The bracketed text after the conclusion is the rule
+*name* (the engine emits it to the right of the bar, in the second
+column of the `\derive` layout) — not a fuzz side-condition.  Without
+it, the rule is unlabelled.  Side-condition support is not currently
+exposed by the engine.
 
 Multiple premises are supported by listing them on separate lines.
 See `examples/04_proof_trees/infrule_modus_ponens.txt` for working

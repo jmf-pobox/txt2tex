@@ -795,7 +795,9 @@ Generates: $\exists_1 x : \mathbb{N} \bullet x = 5$
 mu x : N | x > 0
 ```
 
-Generates: $\mu x : \mathbb{N} \bullet x > 0$
+Generates: $(\mu x : \mathbb{N} \mid x > 0)$  (fuzz mode wraps the
+binder in parens and uses `\mid`, not `\bullet`; see Predicate Logic
+section)
 
 ---
 
@@ -1617,13 +1619,13 @@ ran f            →  ran f       [range of function]
 **Domain Restriction:**
 
 ```text
-A <| f           →  A ⩤ f       [restrict f to domain A]
+A <| f           →  A ◁ f       [restrict f to domain A]
 ```
 
 **Range Restriction:**
 
 ```text
-f |> B           →  f ⩥ B       [restrict f to range B]
+f |> B           →  f ▷ B       [restrict f to range B]
 ```
 
 **Domain Subtraction:**
@@ -1689,7 +1691,7 @@ end
 gendef [X]
   length : seq X -> N
 where
-  length(<>) = 0 and
+  length(<>) = 0 land
   forall x : X; s : seq X | length(<x> ^ s) = 1 + length(s)
 end
 ```
@@ -2282,7 +2284,7 @@ Generates:
   x : \mathbb{N} \\
   y : \mathbb{N}
 \where
-  x > 0 land y > 0
+  x > 0 \land y > 0
 \end{schema}
 ```
 

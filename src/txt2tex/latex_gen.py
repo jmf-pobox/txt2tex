@@ -264,23 +264,30 @@ class LaTeXGenerator:
         "psubset": 7,  # Strict/proper subset
         "union": 8,
         "++": 8,  # Function/relation override — same level as union per parser
-        "cross": 8,  # Cartesian product - same as union
-        "×": 8,  # Cartesian product (Unicode) - same as union  # noqa: RUF001
-        "intersect": 9,
-        "\\": 9,  # Set difference - same as intersect
+        # cross/join/div are strictly tighter than union; loosen union to
+        # 8 and bump the cross family so _needs_parens emits the right
+        # parens around mixed-level children.
+        "cross": 9,  # Cartesian product (parser: _parse_cross, tighter than union)
+        "×": 9,  # Cartesian product (Unicode)  # noqa: RUF001
+        "intersect": 10,
+        "\\": 10,  # Set difference - same level as intersect (parser: _parse_intersect)
         # Arithmetic operators (Gap #1 — Z RM §8.3 treats these as generic
         # infix; standard mathematical convention: * binds tighter than + and
-        # -.  Levels 10 and 11 sit above all set operators (max 9) so that
+        # -.  Levels 11 and 12 sit above all set operators (max 10) so that
         # mixed expressions like `a + b` inside a set-membership test do not
         # spuriously parenthesise `b`.)
-        "+": 10,  # Binary addition
-        "-": 10,  # Binary subtraction
-        "*": 11,  # Multiplication
-        "mod": 11,  # Modulo — same binding strength as *
+        "+": 11,  # Binary addition
+        "-": 11,  # Binary subtraction
+        "*": 12,  # Multiplication
+        "mod": 12,  # Modulo — same binding strength as *
     }
 
-    # Right-associative operators (need parens on left when same operator)
-    # Implication and equivalence are right-associative
+    # Documentary only.  Z RM treats `=>` as right-associative and `<=>` as
+    # logically commutative.  The parser builds left-folded trees for both
+    # (parser.py:_parse_iff / _parse_implies are `while` loops), and the
+    # paren behaviour for these operators is hard-coded in _needs_parens
+    # rather than driven by this set.  Kept for documentation; not consulted
+    # at runtime.
     RIGHT_ASSOCIATIVE: ClassVar[set[str]] = {"=>", "<=>"}
 
     # Unary operator precedence (Gap #2).  All unary operators bind more
@@ -2572,8 +2579,8 @@ class LaTeXGenerator:
         When line_break_after is set, inserts \\ before the RHS so the
         right operand starts on the next indented line.
         """
-        left_latex = self.generate_expr(node.left)
-        right_latex = self.generate_expr(node.right)
+        left_latex = self.generate_expr(node.left, parent=node)
+        right_latex = self.generate_expr(node.right, parent=node)
         if node.subscript is None:
             if node.line_break_after:
                 indent = self._get_indentation()
@@ -2600,8 +2607,8 @@ class LaTeXGenerator:
 
         When line_break_after is set, inserts \\ before the RHS.
         """
-        left_latex = self.generate_expr(node.left)
-        right_latex = self.generate_expr(node.right)
+        left_latex = self.generate_expr(node.left, parent=node)
+        right_latex = self.generate_expr(node.right, parent=node)
         if node.line_break_after:
             indent = self._get_indentation()
             return f"{left_latex}~\\div~\\\\\n{indent} {right_latex}"
