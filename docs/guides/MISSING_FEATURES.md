@@ -2,7 +2,7 @@
 
 This document lists Z notation features not yet implemented in txt2tex.
 
-**Status**: Feature-complete for typical Z and relational-database specifications (4062+ tests, 100% pass rate). Comprehensive Z notation coverage including schema calculus. Some edge-case quirks documented below.
+**Status**: Feature-complete for typical Z and relational-database specifications (4382+ tests, 100% pass rate). Comprehensive Z notation coverage including schema calculus. Some edge-case quirks documented below.
 
 ---
 
@@ -108,6 +108,32 @@ The right workaround depends on what the exercise is asking for:
 ## Recently Resolved
 
 These items were missing in earlier versions and are now shipped:
+
+- **#131** — Quantifier `;`-prefix newline: parser now honours a natural
+  newline or `\` continuation after `;` in semicolon-chained quantifier
+  prefixes for all four quantifier types.
+- **#133** — Prefix-operator paren wrapping: generator wraps nested prefix
+  applications (`seq (P X)` → `\seq~(\power X)`) per Z RM §3.7.
+  See `tests/test_prefix_paren_wrap.py`.
+- **#137** — Multi-line `LATEX:` block: `LATEX:` alone on a line opens a
+  verbatim-pass block terminated by column-0 `END`, eliminating the
+  double-spacing and de-indentation of consecutive single-line directives.
+- **#138** — `B:` block for B-machine listings: verbatim passthrough to
+  `\begin{verbatim}…\end{verbatim}`, terminated by column-0 `END`.
+- **#140** — GROUP aggregate forms: `Count`, `Sum`, `Avg`, `Min`, `Max`,
+  and `Median` aggregator keywords inside `group` RHS.
+- **#141** — `free_vars` Binding: `expr_free_vars` now raises
+  `NotImplementedError` on `Binding` nodes instead of silently returning
+  an incomplete result.
+- **#142** — GroupAggregate abbreviation routing: `GroupAggregate` added to
+  the `_DAT_EXPRESSION_TYPES` detector so aggregate abbreviations route
+  to inline math rather than `\begin{zed}`.
+- **#144** — Set-comprehension newline after `|`/`;`: CONTINUATION/NEWLINE
+  skip inserted at both post-`|` and post-`;` sites in the set-comprehension
+  parser, completing line-break parity with quantifier prefixes.
+- **bare-B identifier restored** — lexer regression from #138 where `"B"` in
+  `RESERVED_WORDS` prevented decorating bare `B` identifiers; fix removes `"B"`
+  from the reserved-words set.
 
 - **Schema-text quantification** (`exists Delta S | P`, `exists Xi S | P`,
   `exists S | P`, `exists S' | P`, and the same for `forall` and `exists1`) —

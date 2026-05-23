@@ -927,6 +927,18 @@ bigcup S         →  ⋃ S         [distributed union]
 bigcap S         →  ⋂ S         [distributed intersection]
 ```
 
+**Automatic parenthesisation of nested prefix operators (fuzz mode):**
+
+Z RM §3.7 requires prefix-generic operators (`seq`, `P`, `dom`, `ran`,
+`bigcup`, `bigcap`, etc.) to take an *atomic* operand. A nested prefix
+application is not atomic, so the engine wraps it in parens automatically.
+You do not need to add explicit parens in your source:
+
+```text
+seq (P X)              →  \seq~(\power X)     ← parens added by engine
+ran (bigcup (ran s))   →  \ran~(\bigcup~(\ran s))
+```
+
 ### Standard Sets
 
 ```text
@@ -2739,6 +2751,10 @@ relevant implication extracted from assumption [1]).
 ## Relational Databases
 
 Notation for relational database specifications.
+
+For a worked normalisation walkthrough (functional dependencies, 1NF → 3NF
+decomposition), see
+`examples/14_relational_databases/normalisation.txt`.
 
 ### pk Declaration
 

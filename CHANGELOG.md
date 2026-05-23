@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New example: `examples/14_relational_databases/normalisation.txt`
   walks through functional dependencies and 1NF→3NF decomposition
   on a generic employee/project/department relation (#84).
+- `make complexity-report` and `make complexity-history` — radon /
+  lizard / pydeps / wily snapshot; outputs committed at
+  `docs/complexity-report.{md,json}`.
+- `make help` (now the default `make` target) lists every Makefile
+  target by category.
 
 ### Migration Notes (Prior-Release Users)
 
@@ -60,6 +65,11 @@ version to pick up the new output.
 
 ### Changed
 
+- `qa_check.sh` / `qa_check_all.sh`: scope tightened to `examples/`
+  only (no longer touches `hw1/`, `hw2/`, `hw/`, or `sem/`). The
+  bare-keyword check (`forall`, `emptyset`, etc.) now scopes to math
+  environments only, eliminating false positives in section headers
+  and prose. 150/150 example PDFs pass.
 - Refreshed `examples/README.md` index to catalogue every example
   in the directory (#83).
 - `free_vars.expr_free_vars` now raises `NotImplementedError` on

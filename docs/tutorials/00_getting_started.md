@@ -145,7 +145,7 @@ txt2tex your_file.txt
 
 If there are errors:
 
-- Check the LaTeX log: `your_file.log`
+- Check the LaTeX log: `grep -i error your_file.log`
 - Fix syntax issues in your txt file
 - Recompile
 
@@ -301,6 +301,20 @@ Now that you can create and compile basic documents:
 4. **Learn proof trees:** See `examples/04_proof_trees/simple_proofs.txt`
 5. **Read Tutorial 1:** Learn propositional logic in depth
 
+### What You Can Write Next
+
+Beyond the basics, txt2tex supports several additional block types — see the
+[User Guide](../guides/USER_GUIDE.md) for full syntax:
+
+- **`B:` block** — embed an Atelier-B / B-Method machine listing verbatim.
+  The body is passed to `\begin{verbatim}…\end{verbatim}` unchanged.
+  Terminated by a column-0 `END` line.
+- **Multi-line `LATEX:` block** — `LATEX:` alone on a line opens a raw-LaTeX
+  block whose body is slurped verbatim until a column-0 `END`.
+  Indentation is preserved and no paragraph breaks are inserted between lines.
+- **GROUP aggregate forms** — `Count`, `Sum`, `Avg`, `Min`, `Max`, and `Median`
+  aggregator keywords inside a `group` RHS for scalar per-partition aggregation.
+
 ## Quick Reference
 
 ### Compilation Commands
@@ -330,7 +344,7 @@ your_document.log      # LaTeX compilation log
 
 ### Getting Help
 
-- **Examples:** `examples/` directory has 60+ example files
+- **Examples:** `examples/` directory has 159 example files
 - **User Guide:** `docs/guides/USER_GUIDE.md` - complete syntax reference
 - **README:** Each example directory has a README
 - **Missing Features:** `docs/guides/MISSING_FEATURES.md` - features not yet implemented
@@ -351,7 +365,7 @@ txt2tex file.txt
 **Solution:** Check the .log file:
 
 ```bash
-cat your_file.log | grep -i error
+grep -i error your_file.log
 ```
 
 ### Problem: Missing symbols

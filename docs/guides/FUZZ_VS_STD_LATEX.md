@@ -2,7 +2,7 @@
 
 **Purpose**: This document captures important differences between fuzz (Mike Spivey's Z notation typesetter) and standard LaTeX that affect txt2tex code generation.
 
-**Last Updated**: 2025-11-27
+**Last Updated**: 2026-05-22
 
 ---
 
@@ -153,6 +153,51 @@ Input:  # head s
 Fuzz:   # (\head s)     ← Parentheses required
 LaTeX:  \# \head s      ← No parentheses needed
 ```
+
+---
+
+## Prefix-Operator Atomic-Argument Rule
+
+### Z RM §3.7 Requirement
+
+Prefix-generic operators (`\seq`, `\power`, `\dom`, `\ran`, `\bigcup`,
+`\bigcap`, `\id`, `\inv`, etc.) take an *atomic* Expression0 as their
+immediate right operand.  An atomic operand is an identifier, a
+parenthesised expression `(...)`, or a brace expression `{...}`.
+
+A nested prefix application is **not** atomic.  Fuzz rejects it with a
+syntax error:
+
+```text
+\seq~\power X    →  fuzz: "Syntax error at \power"
+\ran \bigcup (\ran s)  →  fuzz mis-parses as (\ran \bigcup)(\ran s)
+```
+
+**jms ruling (2026-05-22):** wrap the inner prefix application in parens
+so the outer operator sees an atomic argument.
+
+**txt2tex behaviour (fuzz mode only):** the generator wraps a `UnaryOp`
+argument in parens whenever the outer operator is in
+`_FUZZ_FUNCTION_LIKE_UNARY`.  The fix covers all combinations of
+`seq`, `P`, `P1`, `F`, `F1`, `dom`, `ran`, `inv`, `id`, `bigcup`,
+`bigcap` as outer or inner operator.
+
+**What this means for you:** write the natural form in your `.txt` source
+and txt2tex inserts the required parens automatically.
+
+```text
+Input:  seq (P X)
+Fuzz:   \seq~(\power X)   ← parens inserted automatically
+LaTeX:  \seq~\power X     ← bare form accepted in standard mode
+
+Input:  ran (bigcup (ran s))
+Fuzz:   \ran~(\bigcup~(\ran s))
+LaTeX:  \ran \bigcup (\ran s)
+```
+
+**Reference:** `latex_gen.py` — `_generate_unary_op`,
+`_generate_function_app`; `tests/test_prefix_paren_wrap.py` (engine
+bug #133, jms ruling 2026-05-22).
 
 ---
 

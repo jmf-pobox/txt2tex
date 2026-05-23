@@ -527,7 +527,7 @@ The guide covers:
 
 ## Examples
 
-The `examples/` directory contains **141 working examples** organized by topic. **To access examples, you need to clone the repository** (see [For Developers](#for-developers-git-clone) below).
+The `examples/` directory contains **159 working examples** organized by topic. **To access examples, you need to clone the repository** (see [For Developers](#for-developers-git-clone) below).
 
 - **01_propositional_logic** - Truth tables, logical operators, propositional formulas
 - **02_predicate_logic** - Quantifiers, type declarations
@@ -541,6 +541,11 @@ The `examples/` directory contains **141 working examples** organized by topic. 
 - **10_schemas** - Schema definitions, scoping, zed blocks
 - **11_text_blocks** - TEXT, PURETEXT, citations, bibliography
 - **12_advanced** - Conditionals, subscripts, generic instantiation
+- **13_equality_chains** - EQUAL: blocks for equational reasoning
+- **14_relational_databases** - Relational algebra, GROUP/UNGROUP, primary keys, normalisation
+- **15_schema_calculus** - Schema composition, piping, hiding, projection
+- **16_multi_decl_calculus** - Multi-declaration quantifier and comprehension forms
+- **17_state_machines** - State-based modelling with schemas
 - **user_guide** - Examples from the user guide documentation
 
 ```bash
@@ -558,7 +563,7 @@ cd examples && make 01_propositional_logic
 txt2tex examples/01_propositional_logic/hello_world.txt
 ```
 
-All 141 examples pass fuzz typechecking and compile to PDF
+All 159 examples pass fuzz typechecking and compile to PDF
 
 ---
 
@@ -681,12 +686,14 @@ A few edge cases require workarounds:
 **Current Implementation:**
 
 - ✅ **Feature complete** for typical Z specifications
-- ✅ **1280 tests** - Comprehensive test suite
+- ✅ **4382 tests** - Comprehensive test suite
 - ✅ **Full Z notation** - Schemas, relations, functions, sequences
 - ✅ **Proof trees** - Natural deduction with justifications
 - ✅ **WYSIWYG line breaks** - Natural formatting controls PDF output
 - ✅ **Interactive mode** - REPL for testing expressions
 - ✅ **fuzz integration** - Optional type checking
+- ✅ **B: blocks** - Verbatim B-machine listings
+- ✅ **Multi-line LATEX: blocks** - Raw LaTeX passthrough with preserved indentation
 
 **For missing features, see [docs/guides/MISSING_FEATURES.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/MISSING_FEATURES.md)**
 
@@ -745,6 +752,9 @@ uv run txt2tex examples/01_propositional_logic/hello_world.txt
 ### Development Commands
 
 ```bash
+# List all available Makefile targets by category
+make help
+
 # Run all quality checks (lint, type check, tests)
 make check
 
@@ -759,9 +769,18 @@ cd examples && make
 
 # Convert a file
 txt2tex myfile.txt
+
+# Code complexity snapshot (radon / lizard / pydeps / wily)
+make complexity-report
 ```
 
 You'll also need LaTeX and optionally fuzz (see [Installation](#installation) above).
+
+### Quality Assurance
+
+`qa_check_all.sh` re-runs all 159 examples end-to-end, checking for bare math
+keywords in math environments and verifying PDF generation. Run it before
+releasing to confirm the full example suite is clean.
 
 ### Agent Team (ethos)
 
