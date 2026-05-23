@@ -15,15 +15,7 @@
 \section*{1 . Carrier type}
 \addcontentsline{toc}{section}{1 . Carrier type}
 
-\noindent Define the two gate positions as a free type.  Using a named type
-
-\bigskip
-
-\noindent (rather than a boolean) makes the state schema self-documenting and
-
-\bigskip
-
-\noindent prevents silent confusion between the two values.
+\noindent Define the two gate positions as a free type.  Using a named type (rather than a boolean) makes the state schema self-documenting and prevents silent confusion between the two values.
 
 \bigskip
 
@@ -34,19 +26,7 @@ Gate ::= locked | unlocked
 \section*{2 . State schema}
 \addcontentsline{toc}{section}{2 . State schema}
 
-\noindent The state schema declares every persistent variable and states the
-
-\bigskip
-
-\noindent invariant that every reachable state must satisfy.  Here the invariant
-
-\bigskip
-
-\noindent records that the passage count is always non-negative --- a property
-
-\bigskip
-
-\noindent that every operation must preserve.
+\noindent The state schema declares every persistent variable and states the invariant that every reachable state must satisfy.  Here the invariant records that the passage count is always non-negative --- a property that every operation must preserve.
 
 \bigskip
 
@@ -60,23 +40,7 @@ passed \geq 0
 \section*{3 . Init schema}
 \addcontentsline{toc}{section}{3 . Init schema}
 
-\noindent The Init schema pins down the initial configuration.  Writing
-
-\bigskip
-
-\noindent theta TurnstileState' = ... packages the entire after-state as a
-
-\bigskip
-
-\noindent single binding, which is the Spivey convention for initial-state
-
-\bigskip
-
-\noindent predicates.  It says: the initial state is exactly the turnstile
-
-\bigskip
-
-\noindent in the locked position with a zero passage count.
+\noindent The Init schema pins down the initial configuration.  Writing theta TurnstileState' = ... packages the entire after-state as a single binding, which is the Spivey convention for initial-state predicates.  It says: the initial state is exactly the turnstile in the locked position with a zero passage count.
 
 \bigskip
 
@@ -90,23 +54,7 @@ passed' = 0
 \section*{4 a . Delta operation : Coin}
 \addcontentsline{toc}{section}{4 a . Delta operation : Coin}
 
-\noindent Inserting a coin unlocks the gate.  The Delta inclusion brings both
-
-\bigskip
-
-\noindent the before-state (gate, passed) and the after-state (gate', passed')
-
-\bigskip
-
-\noindent into scope.  The precondition requires the gate to be locked before
-
-\bigskip
-
-\noindent the coin is accepted; the postcondition sets gate' to unlocked and
-
-\bigskip
-
-\noindent leaves the passage count unchanged.
+\noindent Inserting a coin unlocks the gate.  The Delta inclusion brings both the before-state (gate, passed) and the after-state (gate', passed') into scope.  The precondition requires the gate to be locked before the coin is accepted; the postcondition sets gate' to unlocked and leaves the passage count unchanged.
 
 \bigskip
 
@@ -121,27 +69,7 @@ passed' = passed
 \section*{4 b . Delta operation : Push}
 \addcontentsline{toc}{section}{4 b . Delta operation : Push}
 
-\noindent Pushing the bar when the gate is unlocked lets someone through.
-
-\bigskip
-
-\noindent The gate relocks and the passage count increments by one.  The
-
-\bigskip
-
-\noindent input decoration is not needed here because no external value
-
-\bigskip
-
-\noindent enters the system --- the push is a pure physical event.  An
-
-\bigskip
-
-\noindent output result! reports the new passage count so the caller can
-
-\bigskip
-
-\noindent log it without a separate query.
+\noindent Pushing the bar when the gate is unlocked lets someone through. The gate relocks and the passage count increments by one.  The input decoration is not needed here because no external value enters the system --- the push is a pure physical event.  An output result! reports the new passage count so the caller can log it without a separate query.
 
 \bigskip
 
@@ -158,19 +86,7 @@ result! = passed'
 \section*{5 . Xi query : IsLocked}
 \addcontentsline{toc}{section}{5 . Xi query : IsLocked}
 
-\noindent A query operation uses Xi to assert that no state variable changes.
-
-\bigskip
-
-\noindent The input is not required; the output status! carries the answer.
-
-\bigskip
-
-\noindent Because Xi TurnstileState guarantees $gate = gate$' and $passed = passed$',
-
-\bigskip
-
-\noindent the caller learns the current state without any risk of mutation.
+\noindent A query operation uses Xi to assert that no state variable changes. The input is not required; the output status! carries the answer. Because Xi TurnstileState guarantees $gate = gate$' and $passed = passed$', the caller learns the current state without any risk of mutation.
 
 \bigskip
 

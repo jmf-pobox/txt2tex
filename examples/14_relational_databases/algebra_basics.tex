@@ -51,11 +51,11 @@ $\mathrm{Restrict}_{year \geq 1990}(\mathrm{Restrict}_{pages \geq 500}(Book))$
 \section*{Projection (pi)}
 
 \noindent
-$\mathrm{Project}\{title, author\}(Book)$
+$\mathrm{Project}_{title, author}(Book)$
 
 
 \noindent
-$\mathrm{Project}\{title, author\}(\mathrm{Restrict}_{pages \geq 500}(Book))$
+$\mathrm{Project}_{title, author}(\mathrm{Restrict}_{pages \geq 500}(Book))$
 
 
 \section*{Renaming (rho)}
@@ -91,7 +91,7 @@ $Loan~\div~Book$
 \section*{Combined Query}
 
 \noindent
-$\mathrm{Project}\{title, author\}(\mathrm{Restrict}_{pages \geq 500}(Book))$
+$\mathrm{Project}_{title, author}(\mathrm{Restrict}_{pages \geq 500}(Book))$
 
 
 \end{document}

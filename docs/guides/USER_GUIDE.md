@@ -2863,7 +2863,7 @@ operators, etc.).
 pi[bookId, isbn](Book)
 ```
 
-Renders: $\mathrm{Project}\{bookId, isbn\}(Book)$
+Renders: $\mathrm{Project}_{bookId, isbn}(Book)$
 
 The attribute list is comma-separated identifiers.
 
@@ -2914,7 +2914,7 @@ binding, GROUP/UNGROUP), the abbreviation emits outside any Z block:
 LongBooks == pi[bookId, isbn](sigma[pages >= 200](Book))
 ```
 
-Emits as `\noindent$LongBooks \defs \mathrm{Project}\{bookId, isbn\}(\mathrm{Restrict}_{pages \geq 200}(Book))$`.
+Emits as `\noindent$LongBooks \defs \mathrm{Project}_{bookId, isbn}(\mathrm{Restrict}_{pages \geq 200}(Book))$`.
 
 #### Combining Operators
 

@@ -65,6 +65,9 @@ version to pick up the new output.
 
 ### Changed
 
+- Project operator renders as `\mathrm{Project}_{A,B}(R)` instead of
+  `\mathrm{Project}\{A,B\}(R)`, matching the instructor's canonical
+  subscript form (slides/topic02.pdf).  Source syntax `pi[A,B](R)` unchanged.
 - `qa_check.sh` / `qa_check_all.sh`: scope tightened to `examples/`
   only (no longer touches `hw1/`, `hw2/`, `hw/`, or `sem/`). The
   bare-keyword check (`forall`, `emptyset`, etc.) now scopes to math

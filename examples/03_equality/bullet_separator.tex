@@ -73,7 +73,7 @@ $\{~ n : \nat | n < 5 ~\}$
 \addcontentsline{toc}{section}{Example 4 : Complex Set Comprehension}
 
 \noindent
-$\{~ x : \num | x \mod 2 = 0 \land x \geq -10 \land x \leq 10 @ x(div)(2) ~\}$
+$\{~ x : \num | x \mod 2 = 0 \land x \geq -10 \land x \leq 10 @ x~\div~2 ~\}$
 
 
 \noindent This gives the set $\{-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5\}$ by taking even integers from -10 to 10 and dividing by 2.
@@ -132,7 +132,7 @@ $\{~ x : \nat | x < 3 @ \{~ y : \nat | y < x @ (x, y) ~\} ~\}$
 
 \bigskip
 
-\noindent NOTE: Full bullet support in $\forall$/$\exists$ quantifiers is not yet implemented. Currently use implication instead:
+\noindent NOTE: Full bullet support in forall/exists quantifiers is not yet implemented. Currently use implication instead:
 
 \bigskip
 
@@ -211,11 +211,7 @@ $\{~ n : \nat | n \mod 2 = 0 ~\}$
 
 \bigskip
 
-\noindent Before $bullet : constraint$ (declaration and filter)
-
-\bigskip
-
-\noindent After $bullet : term$ (what to compute or select)
+\noindent Before bullet: constraint (declaration and filter) After bullet: term (what to compute or select)
 
 \bigskip
 

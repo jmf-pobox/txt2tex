@@ -12,11 +12,7 @@
 
 \section*{Airline Booking State}
 
-\noindent Define the airline state schema, which holds the set of routes and
-
-\bigskip
-
-\noindent the bookings relation.
+\noindent Define the airline state schema, which holds the set of routes and the bookings relation.
 
 \bigskip
 
@@ -29,11 +25,7 @@ routes : \power RouteId \\
 bookings : BookingId \pfun CustomerId \cross RouteId
 \end{schema}
 
-\noindent A read-only operation that queries whether a route $\exists$ uses Xi to
-
-\bigskip
-
-\noindent signal that the state is unchanged.
+\noindent A read-only operation that queries whether a route exists uses Xi to signal that the state is unchanged.
 
 \bigskip
 
@@ -46,19 +38,7 @@ routeId? \in routes \\
 result! = 1
 \end{schema}
 
-\noindent An operation that adds a booking uses Delta to include both the before-
-
-\bigskip
-
-\noindent state and the after-state. The primes on bookings' and routes' are Z
-
-\bigskip
-
-\noindent convention for the output state; here bookings' is added as a typed
-
-\bigskip
-
-\noindent declaration because the assignment is the predicate.
+\noindent An operation that adds a booking uses Delta to include both the before- state and the after-state. The primes on bookings' and routes' are Z convention for the output state; here bookings' is added as a typed declaration because the assignment is the predicate.
 
 \bigskip
 
@@ -74,11 +54,7 @@ routeId? \in routes
 
 \section*{Stack with Generic Inclusion}
 
-\noindent Schema inclusion works with generic types. Delta Stack[N] brings in
-
-\bigskip
-
-\noindent the before-and-after state of a stack instantiated over the naturals.
+\noindent Schema inclusion works with generic types. Delta Stack[N] brings in the before-and-after state of a stack instantiated over the naturals.
 
 \bigskip
 

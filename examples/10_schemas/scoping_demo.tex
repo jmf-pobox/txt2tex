@@ -38,7 +38,7 @@ $\forall x : \nat @ x > 0$
 $\forall x : \nat @ \exists y : \nat @ x + y = 10$
 
 
-\noindent x is in scope for the entire outer quantifier, including the inner quantifier. y is only in scope within the $\exists$ quantifier.
+\noindent x is in scope for the entire outer quantifier, including the inner quantifier. y is only in scope within the exists quantifier.
 
 \bigskip
 
@@ -49,7 +49,7 @@ $\forall x : \nat @ \exists y : \nat @ x + y = 10$
 $\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
 
 
-\noindent The inner x shadows the outer x. Within the $\exists$ quantifier, x refers to the inner binding. This is allowed but can be confusing.
+\noindent The inner x shadows the outer x. Within the exists quantifier, x refers to the inner binding. This is allowed but can be confusing.
 
 \bigskip
 
@@ -99,7 +99,7 @@ c.count = 5 \\
 c.limit = 10
 \end{axdef}
 
-\noindent When referencing schema components from outside, use dot $notation : c.count$ and c.limit.
+\noindent When referencing schema components from outside, use dot notation: c.count and c.limit.
 
 \bigskip
 
@@ -206,7 +206,7 @@ x = 10 \\
 \addcontentsline{toc}{section}{Example 13 : Lambda Scope}
 
 \noindent
-$\lambda x : \nat @ x * x$
+$(\lambda x : \nat @ x * x)$
 
 
 \noindent x is in scope only within the lambda body (x * x). The lambda introduces its own scope for the parameter.
@@ -217,7 +217,7 @@ $\lambda x : \nat @ x * x$
 \addcontentsline{toc}{section}{Example 14 : Nested Lambdas}
 
 \noindent
-$\lambda x : \nat @ \lambda y : \nat @ x + y$
+$(\lambda x : \nat @ (\lambda y : \nat @ x + y))$
 
 
 \noindent x is in scope in both the outer lambda body and the inner lambda body. y is only in scope in the inner lambda body.
@@ -264,27 +264,7 @@ $\exists Database @ \# records > 100$
 \section*{Example 18 : Scope Hygiene Best Practices}
 \addcontentsline{toc}{section}{Example 18 : Scope Hygiene Best Practices}
 
-\noindent To avoid confusion:
-
-\bigskip
-
-\noindent 1. Don't shadow names unnecessarily---use different variable names
-
-\bigskip
-
-\noindent 2. Keep quantifier nesting shallow when possible
-
-\bigskip
-
-\noindent 3. Use descriptive names that make scope obvious
-
-\bigskip
-
-\noindent 4. Avoid reusing schema component names in nested contexts
-
-\bigskip
-
-\noindent 5. Document intentional shadowing with comments
+\noindent To avoid confusion: 1. Don't shadow names unnecessarily---use different variable names 2. Keep quantifier nesting shallow when possible 3. Use descriptive names that make scope obvious 4. Avoid reusing schema component names in nested contexts 5. Document intentional shadowing with comments
 
 \bigskip
 
@@ -313,19 +293,7 @@ $\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
 \section*{Example 21 : Scoping elem Definitions}
 \addcontentsline{toc}{section}{Example 21 : Scoping elem Definitions}
 
-\noindent Poor style example (not valid due to name shadowing):
-
-\bigskip
-
-\noindent If we had: axdef with square : $\nat \fun \nat$ and $n : N$, where $\forall$ $n : N$ shadows the global n.
-
-\bigskip
-
-\noindent The quantifier's n would be local to the quantifier, and the global $n = 5$ would be separate.
-
-\bigskip
-
-\noindent This is legal but confusing. Better to use different names:
+\noindent Poor style example (not valid due to name shadowing): If we had: axdef with square : $\nat \fun \nat$ and n : N, where forall n : N shadows the global n. The quantifier's n would be local to the quantifier, and the global $n = 5$ would be separate. This is legal but confusing. Better to use different names:
 
 \bigskip
 

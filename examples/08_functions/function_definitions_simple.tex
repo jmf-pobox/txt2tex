@@ -74,13 +74,13 @@ predecessor : \nat \pfun \nat
 \begin{gendef}[X, Y]
   fst: X \cross Y \fun X
 \where
-  \forall x : X @ \forall y : Y @ fst(x, y) = x
+  \forall x : X; y : Y @ fst(x, y) = x
 \end{gendef}
 
 \begin{gendef}[X, Y]
   snd: X \cross Y \fun Y
 \where
-  \forall x : X @ \forall y : Y @ snd(x, y) = y
+  \forall x : X; y : Y @ snd(x, y) = y
 \end{gendef}
 
 \section*{Example 4 : Functions with Given Types}
@@ -138,10 +138,10 @@ h : \nat \fun \nat
 \where
 \forall n : \nat @ f(n) = 2 * n \\
 \forall n : \nat @ g(n) = n + 1 \\
-h = f \semi g
+h = f \comp g
 \end{axdef}
 
-\noindent f doubles its input, g adds one to its input. h is their forward $composition : h(n)$ = f(g(n)) = 2 * (n + 1).
+\noindent f doubles its input, g adds one to its input. h is their forward composition: h(n) = f(g(n)) = 2 * (n + 1).
 
 \bigskip
 

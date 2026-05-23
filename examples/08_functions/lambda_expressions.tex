@@ -10,7 +10,7 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\section*{Phase 11 d : Lambda Expressions}
+\section*{Phase 11d: Lambda Expressions}
 
 \noindent Lambda expressions provide a concise way to define anonymous functions.
 
@@ -25,7 +25,7 @@
 \bigskip
 
 \noindent
-$\lambda x : \nat @ x \bsup 2 \esup$
+$(\lambda x : \nat @ x \bsup 2 \esup)$
 
 
 \medskip
@@ -37,7 +37,7 @@ $\lambda x : \nat @ x \bsup 2 \esup$
 \bigskip
 
 \noindent
-$\lambda x, y : \nat @ x \land y$
+$(\lambda x, y : \nat @ x \land y)$
 
 
 \medskip
@@ -49,7 +49,7 @@ $\lambda x, y : \nat @ x \land y$
 \bigskip
 
 \noindent
-$\lambda x : \nat @ x > 0$
+$(\lambda x : \nat @ x > 0)$
 
 
 \medskip
@@ -61,7 +61,7 @@ $\lambda x : \nat @ x > 0$
 \bigskip
 
 \noindent
-$\lambda x : X @ \lambda y : Y @ x \land y$
+$(\lambda x : X @ (\lambda y : Y @ x \land y))$
 
 
 \medskip
@@ -73,7 +73,7 @@ $\lambda x : X @ \lambda y : Y @ x \land y$
 \bigskip
 
 \noindent
-$\lambda x : X @ \forall y : Y @ x \lor y$
+$(\lambda x : X @ \forall y : Y @ x \lor y)$
 
 
 \end{document}

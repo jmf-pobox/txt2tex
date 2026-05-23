@@ -12,11 +12,7 @@
 
 \section*{Simple Schema Reference}
 
-\noindent A horizontal definition gives a new name to an existing schema or
-
-\bigskip
-
-\noindent schema expression without creating a new boxed schema paragraph.
+\noindent A horizontal definition gives a new name to an existing schema or schema expression without creating a new boxed schema paragraph.
 
 \bigskip
 
@@ -24,7 +20,7 @@
 n : \nat
 \end{schema}
 
-\noindent Plain $alias : CounterRef$ is definitionally equal to Counter.
+\noindent Plain alias: CounterRef is definitionally equal to Counter.
 
 \bigskip
 
@@ -40,13 +36,9 @@ CounterRef \defs Counter
 NatPair \defs [ x : \nat; y : \nat | x < y ]
 \end{zed}
 
-\section*{Multi - predicate Inline Text}
+\section*{Multi-predicate Inline Text}
 
-\noindent Multiple predicates within the inline text are separated by semicolons
-
-\bigskip
-
-\noindent and joined with logical-and in the output.
+\noindent Multiple predicates within the inline text are separated by semicolons and joined with logical-and in the output.
 
 \bigskip
 
@@ -56,11 +48,7 @@ BoundedNat \defs [ n : \nat | n > 0 \land n < 100 ]
 
 \section*{Generic LHS}
 
-\noindent The LHS may carry generic type parameters for parameterised
-
-\bigskip
-
-\noindent horizontal definitions per Z RM §3.8.
+\noindent The LHS may carry generic type parameters for parameterised horizontal definitions per Z RM §3.8.
 
 \bigskip
 

@@ -2512,15 +2512,14 @@ class LaTeXGenerator:
     def _generate_project(self, node: Project, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for pi[A, B](relation).
 
-        pi[class, country](Class) → \mathrm{Project}\{class, country\}(Class)
+        pi[class, country](Class) → \mathrm{Project}_{class, country}(Class)
         Attribute names are emitted via _emit_attr_name (identity pass-through);
         keyword-to-LaTeX conversions do not apply inside the attribute list.
-        Literal braces wrap the attribute list (keyword-algebra convention),
-        not subscript form.
+        Subscript form matches the instructor's canonical notation (slides/topic02.pdf).
         """
         attrs_str = ", ".join(self._emit_attr_name(a) for a in node.attrs)
         rel_latex = self.generate_expr(node.relation)
-        return rf"\mathrm{{Project}}\{{{attrs_str}\}}({rel_latex})"
+        return rf"\mathrm{{Project}}_{{{attrs_str}}}({rel_latex})"
 
     @generate_expr.register(Rename)
     def _generate_rename(self, node: Rename, parent: Expr | None = None) -> str:

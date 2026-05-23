@@ -42,13 +42,13 @@ $\lblot~trackId == t.trackId~\rblot$
 $\{~ t : Track | t.duration < 180 @ \lblot~trackId == t.trackId~\rblot ~\}$
 
 
-\section*{Multi - Component Binding}
+\section*{Multi-Component Binding}
 
 \noindent
 $\lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot$
 
 
-\section*{Multi - Variable Comprehension with Binding}
+\section*{Multi-Variable Comprehension with Binding}
 
 \noindent
 $\{~ t : Track ; a : Album | t.albumId = a.albumId @ \lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot ~\}$

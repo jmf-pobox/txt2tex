@@ -10,17 +10,9 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\section*{theta - Expression}
+\section*{theta-Expression}
 
-\noindent The theta expression constructs the binding for a named schema.  When
-
-\bigskip
-
-\noindent a schema S has components x and y, theta S is the pair (x, y) viewed
-
-\bigskip
-
-\noindent as a named record.  The primed form theta S' is the after-state binding.
+\noindent The theta expression constructs the binding for a named schema.  When a schema S has components x and y, theta S is the pair (x, y) viewed as a named record.  The primed form theta S' is the after-state binding.
 
 \bigskip
 
@@ -32,11 +24,7 @@
 items : \power Item
 \end{schema}
 
-\noindent A read-only query that returns a snapshot of the current state uses the
-
-\bigskip
-
-\noindent theta expression to package the before-state as a single output value.
+\noindent A read-only query that returns a snapshot of the current state uses the theta expression to package the before-state as a single output value.
 
 \bigskip
 
@@ -47,15 +35,7 @@ snapshot! : Store
 snapshot! = \theta Store
 \end{schema}
 
-\noindent The Ξ-style frame condition theta $S = theta$ S' asserts that none of the
-
-\bigskip
-
-\noindent schema components changed.  This is the definition of Xi S expressed
-
-\bigskip
-
-\noindent using theta directly.
+\noindent The Ξ-style frame condition theta $S = theta$ S' asserts that none of the schema components changed.  This is the definition of Xi S expressed using theta directly.
 
 \bigskip
 

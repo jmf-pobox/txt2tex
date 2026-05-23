@@ -337,27 +337,32 @@ class TestRestrictGenerator:
 
 
 class TestProjectGenerator:
-    r"""LaTeX generator emits \mathrm{Project}\{attrs\}(rel) for Project nodes."""
+    r"""LaTeX generator emits \mathrm{Project}_{attrs}(rel) for Project nodes."""
+
+    def test_project_subscript_form(self) -> None:
+        r"""pi[a](R) → \mathrm{Project}_{a}(R) (subscript, not braces)."""
+        result = _expr_latex("pi[a](R)")
+        assert result == r"\mathrm{Project}_{a}(R)"
 
     def test_project_single_attr(self) -> None:
-        r"""pi[a](R) → \mathrm{Project}\{a\}(R)."""
+        r"""pi[a](R) → \mathrm{Project}_{a}(R)."""
         result = _expr_latex("pi[a](R)")
-        assert result == r"\mathrm{Project}\{a\}(R)"
+        assert result == r"\mathrm{Project}_{a}(R)"
 
     def test_project_multiple_attrs(self) -> None:
-        r"""pi[class, country](R) → \mathrm{Project}\{class, country\}(R)."""
+        r"""pi[class, country](R) → \mathrm{Project}_{class, country}(R)."""
         result = _expr_latex("pi[class, country](R)")
-        assert result == r"\mathrm{Project}\{class, country\}(R)"
+        assert result == r"\mathrm{Project}_{class, country}(R)"
 
     def test_project_named_relation(self) -> None:
-        r"""pi[class, country](Class) → \mathrm{Project}\{class, country\}(Class)."""
+        r"""pi[class, country](Class) → \mathrm{Project}_{class, country}(Class)."""
         result = _expr_latex("pi[class, country](Class)")
-        assert result == r"\mathrm{Project}\{class, country\}(Class)"
+        assert result == r"\mathrm{Project}_{class, country}(Class)"
 
     def test_project_attr_in_subscript(self) -> None:
-        r"""pi[Class](R) — Class in braces rendered italic."""
+        r"""pi[Class](R) — Class in subscript."""
         result = _expr_latex("pi[Class](R)")
-        assert result == r"\mathrm{Project}\{Class\}(R)"
+        assert result == r"\mathrm{Project}_{Class}(R)"
 
 
 # ---------------------------------------------------------------------------
@@ -543,10 +548,10 @@ class TestQ1AcceptanceProbes:
         r"""Q1(a): pi[class, country](sigma[bore >= 16](Class)).
 
         Expected:
-            \mathrm{Project}\{class, country\}(\mathrm{Restrict}_{bore \geq 16}(Class))
+            \mathrm{Project}_{class, country}(\mathrm{Restrict}_{bore \geq 16}(Class))
         """
         result = self._gen("pi[class, country](sigma[bore >= 16](Class))")
-        assert r"\mathrm{Project}\{class, country\}" in result
+        assert r"\mathrm{Project}_{class, country}" in result
         assert r"\mathrm{Restrict}_{bore \geq 16}" in result
         assert "Class" in result
 
@@ -577,14 +582,14 @@ class TestAttrNamePassthrough:
     """Attribute names in pi/rho pass through as-is (no wrapping)."""
 
     def test_pi_decorated_attr(self) -> None:
-        r"""pi[class'](R) → \mathrm{Project}\{class'\}(R) (decorated name passes through)."""  # noqa: E501
+        r"""pi[class'](R) — decorated attribute name passes through."""
         result = _expr_latex("pi[class'](R)")
-        assert r"\mathrm{Project}\{class'\}" in result
+        assert r"\mathrm{Project}_{class'}" in result
 
     def test_pi_plain_attr(self) -> None:
-        r"""pi[name](R) → \mathrm{Project}\{name\}(R)."""
+        r"""pi[name](R) → \mathrm{Project}_{name}(R)."""
         result = _expr_latex("pi[name](R)")
-        assert result == r"\mathrm{Project}\{name\}(R)"
+        assert result == r"\mathrm{Project}_{name}(R)"
 
     def test_rho_decorated_src(self) -> None:
         r"""rho[class' as id](R) → \mathrm{Rename}_{class' \to id}(R)."""

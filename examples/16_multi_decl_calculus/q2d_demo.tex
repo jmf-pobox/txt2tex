@@ -54,7 +54,7 @@ loser : PlayerName
 
 \smallskip
 
-\section*{1 . WYSIWYG line breaks for algebra operators}
+\section*{1. WYSIWYG line breaks for algebra operators}
 
 \noindent Long relational-algebra chains can be broken at any operator. Natural newlines work; explicit \ continuation also works. Display position wraps in array; the chain reads top-to-bottom instead of running off the page.
 
@@ -63,13 +63,13 @@ loser : PlayerName
 \noindent
 $\displaystyle
 \begin{array}{l}
-\mathrm{Project}\{winner, venue, tier\}(Tournament \otimes \\
-\quad \mathrm{Rename}_{tournament \to tournamentId}(\mathrm{Project}\{tournament\}(\mathrm{Restrict}_{winner = `Ali'}(Match))))
+\mathrm{Project}_{winner, venue, tier}(Tournament \otimes \\
+\quad \mathrm{Rename}_{tournament \to tournamentId}(\mathrm{Project}_{tournament}(\mathrm{Restrict}_{winner = `Ali'}(Match))))
 \end{array}$
 
 \bigskip
 
-\section*{2 . Multi - decl comprehension with conjunction predicate}
+\section*{2. Multi-decl comprehension with conjunction predicate}
 
 \noindent This is the canonical multi-typed relational-calculus form for any query that crosses two or more relations. Before the fix it required a raw LATEX block; now it parses natively.
 
@@ -85,7 +85,7 @@ $\displaystyle
 
 \bigskip
 
-\section*{3 . Multi - decl quantifier with conjunction predicate}
+\section*{3. Multi-decl quantifier with conjunction predicate}
 
 \noindent `$\forall s : T; c : U @ predicate$. body` works the same way --- nested Quantifier nodes covering the chained declarations.
 
@@ -95,7 +95,7 @@ $\displaystyle
 \forall m : Match; t : Tournament | m.tournament = t.tournamentId \land t.tier \leq 2 @ m.winner \neq m.loser
 \end{zed}
 
-\section*{4 . Multi - decl quantifier without characteristic expression}
+\section*{4. Multi-decl quantifier without characteristic expression}
 
 \noindent When the predicate alone suffices --- no `.` separator, no body expression --- the comprehension defaults the characteristic tuple to the signature (Z RM §3.9).
 
@@ -105,7 +105,7 @@ $\displaystyle
 $\{~ m : Match ; t : Tournament | m.tournament = t.tournamentId \land t.tier \leq 2 ~\}$
 
 
-\section*{5 . Multi - decl mu ( definite description )}
+\section*{5. Multi-decl mu (definite description)}
 
 \noindent `mu` parses with multi-decl signatures the same way. The current generator emits nested `(\mu ... $\mid$ (\mu ...))` --- semantically equivalent but not Spivey-canonical. The same special-case treatment lambda just received is a follow-up for mu. Single-decl mu (shown here) emits cleanly.
 
@@ -115,7 +115,7 @@ $\{~ m : Match ; t : Tournament | m.tournament = t.tournamentId \land t.tier \le
 topFinal == (\mu t : Tournament | t.tier = 1 @ t.venue)
 \end{zed}
 
-\section*{6 . Multi - decl lambda --- Spivey - canonical form}
+\section*{6. Multi-decl lambda --- Spivey-canonical form}
 
 \noindent Lambdas of more than one variable now emit as a single \lambda token with semicolon-joined SchemaText, matching Z RM §3.12 and the Spivey convention. Previously the generator emitted nested lambdas (one per declaration).
 
@@ -125,7 +125,7 @@ topFinal == (\mu t : Tournament | t.tier = 1 @ t.venue)
 roster == (\lambda m : Match; t : Tournament | m.tournament = t.tournamentId @ m.winner)
 \end{zed}
 
-\section*{7 . Paren - wrap fix}
+\section*{7. Paren-wrap fix}
 
 \noindent Fuzz requires `(\lambda ... @ ...)` --- parentheses around every lambda expression, at any position. The generator previously only wrapped when the lambda appeared inside another expression (`parent is not None`). This meant abbreviation RHS, set literals, sequence displays, and top-level zed predicates emitted bare `\lambda`, which fuzz rejected with "Opening parenthesis expected at symbol \lambda".
 
@@ -133,7 +133,7 @@ roster == (\lambda m : Match; t : Tournament | m.tournament = t.tournamentId @ m
 
 \medskip
 
-\noindent The $fix : drop$ the `parent is not None` guard. Wrapping is now unconditional when `$use\_fuzz = True$`, matching how `\mu` has always been handled. All thirteen lambda-paren tests now pass without xfail markers. Section 6 above also now fuzz-typechecks cleanly.
+\noindent The fix: drop the `parent is not None` guard. Wrapping is now unconditional when `$use\_fuzz = True$`, matching how `\mu` has always been handled. All thirteen lambda-paren tests now pass without xfail markers. Section 6 above also now fuzz-typechecks cleanly.
 
 \bigskip
 

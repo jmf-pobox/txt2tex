@@ -1,0 +1,74 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Schema Renaming}
+
+\noindent Schema renaming lets you create a version of an existing schema with some component names changed.  The notation S[old/new] is per Z RM §3.11.
+
+\bigskip
+
+\begin{schema}{Counter}
+count : \nat
+\where
+count \geq 0
+\end{schema}
+
+\noindent Single rename: produce a Counter with component ''count'' renamed to ''n''.
+
+\bigskip
+
+\begin{zed}
+CounterN \defs Counter[count/n]
+\end{zed}
+
+\noindent Multiple renames in one step:
+
+\bigskip
+
+\begin{schema}{Point}
+x : \nat \\
+y : \nat
+\end{schema}
+
+\noindent Rename both components at once.
+
+\bigskip
+
+\begin{zed}
+SwappedPoint \defs Point[x/y, y/x]
+\end{zed}
+
+\section*{Renaming Primed Schemas}
+
+\noindent The decoration is tightest-binding per Z RM §3.11: S'[a/b] renames the primed schema S', not the result of renaming then priming.
+
+\bigskip
+
+\begin{zed}
+Op2 \defs Counter[count'/count]
+\end{zed}
+
+\noindent In an operation schema context, this captures the after-state renaming: the primed component count' is renamed back to count in the view.
+
+\bigskip
+
+\section*{Decorated Component Names}
+
+\noindent The rename pairs themselves may carry decoration.
+
+\bigskip
+
+\begin{zed}
+CounterOp \defs Counter[count'/n]
+\end{zed}
+
+\end{document}
