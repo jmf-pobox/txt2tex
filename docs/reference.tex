@@ -10,6 +10,7 @@
 \usepackage{amssymb}
 \usepackage{fuzz}
 \usepackage{proof}
+\usepackage{needspace}
 
 % Compact spacing
 \setlength{\parindent}{0pt}
@@ -27,12 +28,14 @@
 \newcommand{\op}[1]{\texttt{#1}}
 \newcommand{\renders}{\,$\rightarrow$\,}
 
-% Stacked example: input then rendered output (compact)
+% Stacked example: input then rendered output (compact).
+% \nobreak after each \par in vertical mode forbids column/page breaks
+% between the label and its content, and between exwrite and exget.
 \newenvironment{exwrite}%
-  {\par\noindent\scriptsize\textbf{You write:}\par\vspace{0pt}\scriptsize}%
-  {\vspace{1pt}}
+  {\par\nobreak\noindent\scriptsize\textbf{You write:}\par\nobreak\vspace{0pt}\scriptsize}%
+  {\vspace{1pt}\nobreak}
 \newenvironment{exget}%
-  {\par\noindent\scriptsize\textbf{You get:}\par\vspace{0pt}\small}%
+  {\par\nobreak\noindent\scriptsize\textbf{You get:}\par\nobreak\vspace{0pt}\small}%
   {\par\vspace{3pt}}
 
 % Table helper — left col monospace, right col roman
@@ -57,6 +60,7 @@
 % ── DOCUMENT STRUCTURE ──────────────────────────
 \section{Document Structure}
 
+\needspace{4\baselineskip}
 \textbf{Single-line directives.}
 
 \begin{tabularx}{\columnwidth}{LR}
@@ -80,9 +84,12 @@ LATEX: \textbackslash cmd & Raw \LaTeX\ passthrough (single-line) \\
 {[cite key]}         & \verb|\citep{key}| (in TEXT blocks) \\
 \end{tabularx}
 
-\smallskip
-\begin{minipage}[t]{\columnwidth}
-\textbf{Identifier Decoration.}
+% ── IDENTIFIERS ─────────────────────────────────
+\needspace{18\baselineskip}
+\section{Identifiers}
+
+\needspace{4\baselineskip}
+\textbf{Decorations.}
 
 \begin{tabularx}{\columnwidth}{LR}
 count'               & $count'$ (after-state) \\
@@ -92,8 +99,31 @@ x?'                  & $x?'$ (combinations allowed) \\
 'sunk'               & $\mbox{`sunk'}$ (string literal) \\
 \end{tabularx}
 
-{\footnotesize Decoration attaches to any identifier. Reserved words (\texttt{theta}, \texttt{defs}, \texttt{hide}, \texttt{project}, \texttt{Delta}, \texttt{Xi}) cannot be decorated.}
-\end{minipage}
+\smallskip
+\needspace{4\baselineskip}
+\textbf{Reserved words.}
+
+{\footnotesize None of the keywords below can be used as an identifier name or carry decorations.  Watch out for the short ones (\texttt{id}, \texttt{dom}, \texttt{P}, \texttt{F}, \texttt{as}).}
+
+\begin{tabularx}{\columnwidth}{LR}
+land, lor, lnot                            & propositional \\
+forall, exists, exists1, mu, lambda        & quantifiers / binders \\
+elem, notin, subset, subseteq, psubset     & set membership / subset \\
+union, intersect, cross, bigcup, bigcap    & set operations \\
+dom, ran, inv, id, comp                    & relation operators \\
+P, P1, F, F1                               & power / finite set \\
+mod, div                                   & arithmetic / cardinality \\
+if, then, else, otherwise                  & conditional \\
+schema, axdef, gendef, zed, syntax         & block-paragraph headers \\
+given, where, end                          & paragraph delimiters \\
+Delta, Xi, theta, defs                     & schema operators \\
+hide, project, pk                          & schema calculus / annotation \\
+sigma, pi, join, group, ungroup            & relational algebra \\
+Count, Sum, Avg, Min, Max, Median, as      & aggregators \\
+filter, bag\_union, bag\_diff              & sequence / bag \\
+ARGUE, EQUIV, EQUAL, INFRULE, PROOF        & proof-paragraph markers \\
+TEXT, PURETEXT, LATEX, TRUTH, TABLE        & prose / table markers \\
+\end{tabularx}
 
 % ── NUMBERS & ARITHMETIC ────────────────────────
 \section{Numbers \& Arithmetic}
@@ -123,7 +153,6 @@ $R \bsup 3 \esup \qquad x * x$
 \end{exget}
 
 \end{multicols}
-\newpage
 \begin{multicols}{2}
 \raggedcolumns
 
@@ -141,68 +170,81 @@ p <=> q              & $p \Leftrightarrow q$ \\
 {\footnotesize\textbf{Note:} Use \kw{land}, \kw{lor}, \kw{lnot}. English \texttt{and}/\texttt{or}/\texttt{not} are not supported.}
 
 \smallskip
-\textbf{Truth-table example:}
+\needspace{14\baselineskip}
+\textbf{Example — truth table (validate De~Morgan).}
 
 \begin{exwrite}%
 \begin{verbatim}
 TRUTH TABLE:
-p | q | p => q
-T | T | T
-T | F | F
-F | T | T
-F | F | T
+p | q | p land q | lnot (p land q) | lnot p | lnot q | lnot p lor lnot q
+T | T | T | F | F | F | F
+T | F | F | T | F | T | T
+F | T | F | T | T | F | T
+F | F | F | T | T | T | T
 \end{verbatim}
 \end{exwrite}
 \begin{exget}%
 \begin{center}
-\begin{tabular}{ccc}
-$p$ & $q$ & $p \Rightarrow q$ \\ \hline
-T & T & T \\
-T & F & F \\
-F & T & T \\
-F & F & T \\
+\begin{tabular}{ccccccc}
+$p$ & $q$ & $p \land q$ & $\lnot (p \land q)$ & $\lnot p$ & $\lnot q$ & $\lnot p \lor \lnot q$ \\ \hline
+T & T & T & F & F & F & F \\
+T & F & F & T & F & T & T \\
+F & T & F & T & T & F & T \\
+F & F & F & T & T & T & T \\
 \end{tabular}
 \end{center}
 \end{exget}
 
-\textbf{Equivalence chain (\kw{EQUIV:}):}
+{\scriptsize Build intermediate columns step by step.  Columns 4 and 7 match on every row, so $\lnot (p \land q) \Leftrightarrow \lnot p \lor \lnot q$ (De~Morgan).}
+
+\needspace{14\baselineskip}
+\textbf{Example — EQUIV chain.}
 
 \begin{exwrite}%
 \begin{verbatim}
 EQUIV:
-lnot (p land q)
-lnot p lor lnot q  [De Morgan]
+lnot (p land (q lor r))
+lnot p lor lnot (q lor r)         [De Morgan]
+lnot p lor (lnot q land lnot r)   [De Morgan]
+(lnot p lor lnot q) land
+    (lnot p lor lnot r)           [distribute]
 \end{verbatim}
 \end{exwrite}
 \begin{exget}%
 \begin{center}
 $\begin{array}{l@{\hspace{2em}}r}
-\lnot (p \land q) \\
-\Leftrightarrow \lnot p \lor \lnot q
-  & [\mbox{De Morgan}]
+\lnot (p \land (q \lor r)) \\
+\Leftrightarrow \lnot p \lor \lnot (q \lor r)
+  & [\mbox{De Morgan}] \\
+\Leftrightarrow \lnot p \lor (\lnot q \land \lnot r)
+  & [\mbox{De Morgan}] \\
+\Leftrightarrow (\lnot p \lor \lnot q) \land (\lnot p \lor \lnot r)
+  & [\mbox{distribute}]
 \end{array}$
 \end{center}
 \end{exget}
 
 {\scriptsize \kw{EQUIV:} and its alias \kw{ARGUE:} join steps with $\Leftrightarrow$. Use for predicate equivalences.}
 
-\textbf{Equality chain (\kw{EQUAL:}):}
+\needspace{14\baselineskip}
+\textbf{Example — EQUAL chain.}
 
 \begin{exwrite}%
 \begin{verbatim}
 EQUAL:
-0 + 0
-0      [0+0 = 0]
-length(<>)
-       [length(<>) = 0]
+#(s ^ <a, b, c>)
+#s + #<a, b, c>            [#-concat]
+#s + 3                      [literal length]
+3 + #s                      [+ commutative]
 \end{verbatim}
 \end{exwrite}
 \begin{exget}%
 \begin{center}
 $\begin{array}{l@{\hspace{1.5em}}r}
-0 + 0 \\
-= 0 & [\mbox{0+0 = 0}] \\
-= length(\langle\rangle) & [\mbox{length}(\langle\rangle) = 0]
+\#(s \cat \langle a, b, c \rangle) \\
+= \#s + \#\langle a, b, c \rangle & [\mbox{\#-concat}] \\
+= \#s + 3 & [\mbox{literal length}] \\
+= 3 + \#s & [\mbox{$+$ commutative}]
 \end{array}$
 \end{center}
 \end{exget}
@@ -213,7 +255,6 @@ $\begin{array}{l@{\hspace{1.5em}}r}
 
 %% ── PAGE 2: SETS, SEQUENCES, PREDICATE LOGIC ─────
 \newpage
-
 \begin{multicols}{2}
 \raggedcolumns
 
@@ -240,9 +281,10 @@ n..m                 & $n \upto m$ (integer range) \\
 \# S                 & $\# S$ (cardinality / length) \\
 \end{tabularx}
 
-{\footnotesize\textbf{Prefix-operator rule (\#133):} prefix-generic operators (\texttt{seq}, \texttt{P}, \texttt{dom}, \texttt{ran}, \texttt{bigcup}, …) require an atomic argument. The engine automatically wraps a nested prefix call in parentheses: \texttt{seq (P X)} $\to$ \verb|\seq~(\power X)|.}
+{\footnotesize\textbf{Nested prefix operators.} Prefix-generic operators (\texttt{seq}, \texttt{P}, \texttt{dom}, \texttt{ran}, \texttt{bigcup}, …) take a single atomic operand. The engine wraps a nested prefix call in parentheses automatically: \texttt{seq (P X)} $\to$ \verb|\seq~(\power X)|.}
 
 \smallskip
+\needspace{14\baselineskip}
 \textbf{Set comprehension:}
 
 \begin{exwrite}%
@@ -271,6 +313,7 @@ if p then e1 else e2 & conditional expression \\
 {\footnotesize \textbf{Bullet form:} \texttt{x : S | P} means $x : S \bullet P$ (bullet is implied). The vertical bar is the quantifier separator.}
 
 \smallskip
+\needspace{14\baselineskip}
 \textbf{Tuple-pattern:}
 
 \begin{exwrite}%
@@ -312,7 +355,8 @@ shows                & $\vdash$ (turnstile / judgment) \\
 {\footnotesize\textbf{o9 vs comp:} \texttt{o9} $\to$ \texttt{\textbackslash semi} (forward, $(R;S)(x)=S(R(x))$). \texttt{comp} $\to$ \texttt{\textbackslash comp} (backward, $(R\circ S)(x)=R(S(x))$).}
 
 \smallskip
-\textbf{Worked example — domain restrict:}
+\needspace{14\baselineskip}
+\textbf{Example — domain restrict.}
 
 \begin{exwrite}%
 \begin{verbatim}
@@ -344,7 +388,8 @@ f\textasciitilde     & $f^{-1}$ (postfix inverse) \\
 \end{tabularx}
 
 \smallskip
-\textbf{Worked example — lambda:}
+\needspace{14\baselineskip}
+\textbf{Example — lambda.}
 
 \begin{exwrite}%
 \begin{verbatim}
@@ -387,28 +432,72 @@ b1 bag\_diff b2      & $b_1 \uminus b_2$ \\
 \begin{multicols}{2}
 \raggedcolumns
 
-% ── Z PARAGRAPHS ────────────────────────────────
-\section{Z Paragraphs}
+% ── Z ───────────────────────────────────────────
+\section{Z}
+
+{\scriptsize A Z specification is a sequence of paragraphs.  Each paragraph either introduces names or constrains them.  The kinds below cover the building blocks; \kw{schema} (the most-used kind) gets its own section.}
+
+\smallskip
+\needspace{4\baselineskip}
+\textbf{Given (carrier) type.} An opaque set whose elements are not enumerated --- used when identity matters but structure does not.
 
 \begin{tabularx}{\columnwidth}{LR}
-given A, B           & Given types: $[A, B]$ \\
-T ::= a | b          & Free type definition \\
-name == expr         & Abbreviation \\
+given A, B           & $[A, B]$ \\
 \end{tabularx}
 
 \smallskip
+\needspace{4\baselineskip}
+\textbf{Free type.} A named type with a fixed enumeration of constructors.  Branches can carry data via \texttt{<\ldots>}.
+
 \begin{tabularx}{\columnwidth}{LR}
-\multicolumn{2}{l}{\kw{axdef} / \kw{schema Name} / \kw{gendef [X]}}\\
-\quad declarations   & Variable declarations \\
-\texttt{where}       & Separator \\
-\quad predicates     & Constraining predicates \\
-\texttt{end}         & Close the block \\
+Status ::= active | inactive  & $Status ::= active \mid inactive$ \\
 \end{tabularx}
 
-{\footnotesize \kw{axdef} introduces global constants; \kw{gendef [X]} parameterises by a type; \kw{schema Name} names a state or operation.}
+\smallskip
+\needspace{4\baselineskip}
+\textbf{Abbreviation.} Binds a name to an expression for reuse --- no new type.
+
+\begin{tabularx}{\columnwidth}{LR}
+MaxSize == 100              & $MaxSize == 100$ \\
+\end{tabularx}
 
 \smallskip
-\textbf{Zed block (unboxed paragraph):}
+\needspace{14\baselineskip}
+\textbf{Axiomatic definition.} Introduces global constants constrained by predicates.  Form: \kw{axdef} declarations \kw{where} predicates \kw{end}.  (See \textit{Generic schemas} for the \kw{gendef [X]} variant.)
+
+\begin{exwrite}%
+\begin{verbatim}
+axdef
+  MaxSize : N
+  Reset : N -> N
+where
+  MaxSize > 0
+  Reset(MaxSize) = 0
+end
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{axdef}
+MaxSize : \nat \\
+Reset : \nat \fun \nat
+\where
+MaxSize > 0 \\
+Reset(MaxSize) = 0
+\end{axdef}
+\end{exget}
+
+\smallskip
+\needspace{4\baselineskip}
+\textbf{Source-level containers.} The forms above stand alone (the engine wraps them in \kw{zed}).  Use explicit containers to bundle several paragraphs or align multiple free types.
+
+\begin{tabularx}{\columnwidth}{LR}
+zed \ldots end       & bundle several standalone paragraphs (unboxed) \\
+syntax \ldots end    & column-aligned multi-type free definitions \\
+\end{tabularx}
+
+\smallskip
+\needspace{14\baselineskip}
+\textbf{Example — zed bundle.}  Combines a \textit{given type}, a \textit{free type}, and an \textit{abbreviation} in one unboxed block.
 
 \begin{exwrite}%
 \begin{verbatim}
@@ -427,10 +516,9 @@ MaxSize == 100
 \end{zed}
 \end{exget}
 
-{\scriptsize \kw{zed} blocks can mix given types, free types, abbreviations, and predicates in one environment. No visual box. Use for global type definitions; use \kw{axdef}/\kw{schema} for declarations with a \kw{where} clause.}
-
 \smallskip
-\textbf{Syntax block (multi-type free definitions):}
+\needspace{14\baselineskip}
+\textbf{Example — syntax (aligned free types).}  Two mutually-recursive free types defined together with their \texttt{::=} columns aligned.
 
 \begin{exwrite}%
 \begin{verbatim}
@@ -443,13 +531,17 @@ end
 \begin{exget}%
 \begin{tabular}{rcl}
 $OP$   & $::=$ & $plus \mid minus \mid times$ \\
-$Expr$ & $::=$ & $const \llangle \nat \rrangle \mid binop \llangle OP \cross Expr \rrangle$
+$Expr$ & $::=$ & $const \ldata \nat \rdata \mid binop \ldata OP \cross Expr \rdata$
 \end{tabular}
 \end{exget}
 
-{\scriptsize \kw{syntax} produces a column-aligned fuzz \texttt{syntax} environment. Blank lines between definitions emit \texttt{\textbackslash also} (visual group separator).}
+{\scriptsize Blank lines between definitions inside \kw{syntax}/\kw{zed} emit \texttt{\textbackslash also} (visual group separator).}
 
 % ── SCHEMAS ─────────────────────────────────────
+\end{multicols}
+\newpage
+\begin{multicols}{2}
+\raggedcolumns
 \section{Schemas}
 
 {\scriptsize A named schema introduces a signature (declarations) and an invariant (where clause).}
@@ -474,27 +566,11 @@ size = \# nums
 \end{exget}
 
 \smallskip
-\textbf{Where-clause patterns:}
+\needspace{14\baselineskip}
+\textbf{Where-clause patterns.}
 
-\textbf{1. Simple comparison.}
-\begin{exwrite}%
-\begin{verbatim}
-schema Bounded
-  size : N
-where
-  size < 10
-end
-\end{verbatim}
-\end{exwrite}
-\begin{exget}%
-\begin{schema}{Bounded}
-size : \nat
-\where
-size < 10
-\end{schema}
-\end{exget}
-
-\textbf{2. Set comprehension.}
+\needspace{14\baselineskip}
+\textbf{1. Set comprehension.}
 \begin{exwrite}%
 \begin{verbatim}
 schema Inventory
@@ -514,7 +590,8 @@ stock = \# \{~ x : \ran items \mid x > 0 ~\}
 \end{schema}
 \end{exget}
 
-\textbf{3. Quantifier.}
+\needspace{14\baselineskip}
+\textbf{2. Quantifier.}
 \begin{exwrite}%
 \begin{verbatim}
 schema NonNeg
@@ -533,6 +610,7 @@ s : \seq \num
 \end{exget}
 
 \smallskip
+\needspace{14\baselineskip}
 \textbf{Generic schemas.}
 
 \begin{exwrite}%
@@ -554,26 +632,10 @@ empty = \{\}
 
 {\scriptsize $[X]$ is the type parameter; instantiate at use with \texttt{empty[T]}.}
 
-\smallskip
-\textbf{Schemas as predicates.}
-
-{\scriptsize Inside a quantifier, a schema name acts as a predicate (both its signature and its where clause must be satisfied):}
-
-\begin{exwrite}%
-\begin{verbatim}
-forall c : Counter |
-  c.size >= 0
-\end{verbatim}
-\end{exwrite}
-\begin{exget}%
-\begin{center}
-$\forall c : Counter @ c.size \geq 0$
-\end{center}
-\end{exget}
-
 % ── SCHEMA OPERATIONS ───────────────────────────
 \section{Schema Operations}
 
+\needspace{4\baselineskip}
 \textbf{Inclusion operators.}
 
 \begin{tabularx}{\columnwidth}{LR}
@@ -585,6 +647,7 @@ theta S'             & $\theta S'$ (binding of after-state) \\
 \end{tabularx}
 
 \smallskip
+\needspace{4\baselineskip}
 \textbf{Horizontal definition.}
 
 \begin{tabularx}{\columnwidth}{LR}
@@ -596,6 +659,7 @@ N[X] defs G[X]       & generic form \\
 \end{tabularx}
 
 \smallskip
+\needspace{4\baselineskip}
 \textbf{Schema calculus operators (RHS of \texttt{defs}).}
 
 \begin{tabularx}{\columnwidth}{LR}
@@ -607,16 +671,86 @@ S hide (x, y)        & $S \hide (x,y)$ \\
 S project T          & $S \project T$ \\
 \end{tabularx}
 
+\smallskip
+\needspace{14\baselineskip}
+\textbf{Example — operation schema with \kw{Delta}.}
+
+\begin{exwrite}%
+\begin{verbatim}
+schema Bump
+  Delta Counter
+where
+  size' = size + 1
+  nums' = nums
+end
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{schema}{Bump}
+\Delta Counter
+\where
+size' = size + 1 \\
+nums' = nums
+\end{schema}
+\end{exget}
+
+\smallskip
+\needspace{10\baselineskip}
+\textbf{Example — schema calculus (composition).}
+
+\begin{exwrite}%
+\begin{verbatim}
+TwoBumps defs Bump ; Bump
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{zed}
+TwoBumps \defs Bump \semi Bump
+\end{zed}
+\end{exget}
+
+\smallskip
+\needspace{16\baselineskip}
+\textbf{Example — promotion schema (\kw{theta} lifts local to global).}
+
+{\scriptsize \kw{Bank} has \texttt{counters : ID -> Counter}; promotion lifts a local \kw{Bump} into one entry:}
+
+\begin{exwrite}%
+\begin{verbatim}
+schema PromoteBump
+  Delta Bank
+  Delta Counter
+  id? : ID
+where
+  counters(id?) = theta Counter
+  counters' = counters [+] {id? |-> theta Counter'}
+end
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{schema}{PromoteBump}
+\Delta Bank \\
+\Delta Counter \\
+id? : ID
+\where
+counters~id? = \theta Counter \\
+counters' = counters \oplus \{id? \mapsto \theta Counter'\}
+\end{schema}
+\end{exget}
+
 % ── Z BINDINGS ──────────────────────────────────
 \section{Z Bindings}
 
 \begin{tabularx}{\columnwidth}{LR}
-\{| name == e |\}      & $\lblot name == e \rblot$ \\
+theta S                & $\theta S$ (binding of $S$ in scope; fuzz-typed) \\
+theta S'               & $\theta S'$ (primed-component binding) \\
+\{| name == e |\}      & $\lblot name == e \rblot$ (literal — fuzz-incompatible) \\
 \{| a == e, b == f |\} & multiple components \\
 \{| |\}                & empty binding \\
 \end{tabularx}
 
 \smallskip
+\needspace{14\baselineskip}
 \textbf{Multi-typed comprehension with binding:}
 
 \begin{exwrite}
@@ -628,15 +762,15 @@ S project T          & $S \project T$ \\
 \end{exwrite}
 \begin{exget}
 \begin{center}
-$\{ t : Track; a : Album \mid t.albumId = a.albumId$\\
-$\bullet \lblot trackId == t.trackId \rblot \}$
+$\{~ t : Track; a : Album \mid t.albumId = a.albumId$\\
+$\bullet~ \lblot trackId == t.trackId \rblot ~\}$
 \end{center}
 \end{exget}
 
 {\scriptsize Use \texttt{;} to separate variable-type pairs inside \texttt{\{ \}}. Binding components are \textbf{comma}-separated.}
 
 \smallskip
-{\scriptsize\textbf{Fuzz note:} binding expressions emit outside any Z environment — fuzz silently skips them. Do not wrap bindings inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
+{\scriptsize\textbf{Fuzz note:} the \texttt{\{|\ldots|\}} literal binding is fuzz-incompatible — the engine emits it outside any Z paragraph so it renders without participating in fuzz type-checking. Use \kw{theta} when you need a fuzz-typed binding inside a schema.}
 
 \end{multicols}
 
@@ -649,6 +783,7 @@ $\bullet \lblot trackId == t.trackId \rblot \}$
 % ── PROOFS ──────────────────────────────────────
 \section{Proofs}
 
+\needspace{14\baselineskip}
 \textbf{INFRULE: — named inference rule display:}
 
 \begin{exwrite}%
@@ -669,6 +804,7 @@ $\infer[\mbox{Rule name}]{conclusion}{premise_1 & premise_2}$
 {\scriptsize \kw{INFRULE:} renders a labelled rule schema. Use for displaying rule definitions (not proofs). The three-dash line \texttt{---} separates premises from conclusion.}
 
 \smallskip
+\needspace{4\baselineskip}
 \textbf{How proof trees work (\kw{PROOF:}):}
 
 {\scriptsize The source is \textbf{conclusion-first} (rendered tree reads
@@ -680,6 +816,7 @@ are silently dropped. Unary rules take a single indented child with
 no \texttt{::}.}
 
 \smallskip
+\needspace{4\baselineskip}
 \textbf{Proof tree syntax:}
 
 \begin{tabularx}{\columnwidth}{LR}
@@ -695,6 +832,7 @@ case $X$:                 & Branch in a \kw{lor elim} case analysis \\
 {\footnotesize\textbf{Rules:} \texttt{land intro}, \texttt{land elim 1/2}, \texttt{lor intro 1/2}, \texttt{lor elim}, \texttt{=> intro/elim}, \texttt{<=> intro/elim}, \texttt{lnot intro/elim}, \texttt{forall intro/elim}, \texttt{exists intro/elim}.}
 
 \smallskip
+\needspace{14\baselineskip}
 \textbf{Modus ponens (binary --- requires \texttt{::} on each premise):}
 
 \begin{exwrite}%
@@ -781,6 +919,7 @@ inside each \kw{case X:} block, the case formula is referenced as \kw{X [from N]
 % ── RELATIONAL DATABASE NOTATION ────────────────
 \section{Relational Database Notation}
 
+\needspace{14\baselineskip}
 \textbf{Primary key annotation.}
 
 {\scriptsize Mark a primary-key attribute with \kw{pk} in a named schema body. The annotation sits outside the Z box so fuzz type-checks cleanly.}
@@ -810,6 +949,7 @@ Comma-separated names on one \kw{pk} line also work.
 \kw{pk} is rejected in \texttt{axdef}/\texttt{gendef}/inline schema text.}
 
 \smallskip
+\needspace{4\baselineskip}
 \textbf{Relational algebra.}
 
 \begin{tabularx}{\columnwidth}{LR}
@@ -821,9 +961,10 @@ R join [p] S         & $\mathrm{Join}_{p}(R, S)$ — theta-join \\
 R div S              & $R \div S$ — division \\
 \end{tabularx}
 
-{\scriptsize\textbf{Fuzz note:} algebra expressions emit outside any Z environment — fuzz silently skips them. Do not wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
+{\scriptsize\textbf{Fuzz note:} relational-algebra operators are fuzz-incompatible — the engine emits them outside any Z paragraph so they render without participating in fuzz type-checking. Do not wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
 
 \smallskip
+\needspace{14\baselineskip}
 \textbf{FK predicate form.}
 
 {\scriptsize Foreign-key constraints are expressed as axdef predicates:}
@@ -844,6 +985,7 @@ end
 \end{exget}
 
 \smallskip
+\needspace{4\baselineskip}
 \textbf{GROUP \& UNGROUP.}
 
 {\scriptsize Date's nested-relation operators.}
@@ -866,7 +1008,7 @@ $Members\ \mathop{\mathrm{UNGROUP}}\ contact$
 \end{center}
 \end{exget}
 
-{\scriptsize\textbf{Fuzz note:} GROUP and UNGROUP expressions emit outside any Z environment — fuzz silently skips them. Do not wrap GROUP/UNGROUP inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
+{\scriptsize\textbf{Fuzz note:} GROUP and UNGROUP are fuzz-incompatible — the engine emits them outside any Z paragraph so they render without participating in fuzz type-checking. Do not wrap GROUP/UNGROUP inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
 
 \smallskip
 \textbf{GROUP aggregator form.}
@@ -897,24 +1039,40 @@ $\mathrm{Sum}(amount)~\mathrm{as}~totalRevenue)$
 
 {\scriptsize Multiple aggregators are comma-separated. Each accepts exactly one attribute identifier — no nested aggregators, no compound expressions.}
 
-\smallskip
-\textbf{Quick reference.}
-
-\begin{tabularx}{\columnwidth}{LR}
-pk a : T             & primary key in schema \\
-pk a, b : T          & composite pk \\
-sigma[p](R)          & restrict \\
-pi[A](R)             & project \\
-R[B/A]               & rename attr (NEW/OLD) \\
-R join S             & natural join ($\mathrm{Join}(R, S)$) \\
-R div S              & division \\
-\{| a == e |\}       & binding bracket \\
-\{S; C | P . E\}    & multi-typed set comp \\
-R group (\{A\} as x) & regroup attrs \\
-R group (Count(a) as n) & aggregate \\
-R ungroup x          & ungroup attr \\
-\end{tabularx}
-
 \end{multicols}
+
+%% ── PAGE: OPERATOR PRECEDENCE ────────────────────
+\newpage
+
+% ── OPERATOR PRECEDENCE ─────────────────────────
+\section{Operator Precedence}
+
+{\scriptsize Tightest binding at the top.  Same level groups are left-associative unless noted.  Use parentheses to override.}
+
+\smallskip
+
+\begin{tabularx}{\textwidth}{rX}
+1  & postfix \texttt{\textasciitilde}, \texttt{+}, \texttt{*}, \texttt{\^{}} (inverse, closures, iter) \\
+2  & prefix \texttt{dom}, \texttt{ran}, \texttt{\#}, \texttt{P}, \texttt{F}, \texttt{seq}, \texttt{bigcup}, \texttt{bigcap}, \texttt{inv}, \texttt{id} \\
+3  & function application \texttt{f(x)} \\
+4  & relational rename \texttt{R[B/A]} (postfix) \\
+5  & relational atoms \texttt{sigma[..]}, \texttt{pi[..]} (prefix) \\
+6  & \texttt{*}, \texttt{div}, \texttt{mod} \\
+7  & \texttt{+}, \texttt{-} (binary) \\
+8  & range \texttt{..} \\
+9  & \texttt{cross}, \texttt{join}, \texttt{div} (cross-product) \\
+10 & \texttt{union}, \texttt{setminus} (\texttt{\textbackslash}) \\
+11 & \texttt{intersect} \\
+12 & relational \texttt{<->}, \texttt{|->}, \texttt{<|}, \texttt{|>}, \texttt{<<|}, \texttt{|>>}, \texttt{o9}, \texttt{comp}, \texttt{;} \\
+13 & function arrows \texttt{->}, \texttt{+->}, \texttt{>->}, \texttt{>->>}, \texttt{-->>}, \texttt{+->>}, \texttt{77->} \\
+14 & \texttt{elem}, \texttt{notin}, \texttt{subset}, \texttt{subseteq}, \texttt{psubset} \\
+15 & comparison \texttt{<}, \texttt{>}, \texttt{<=}, \texttt{>=}, \texttt{=}, \texttt{!=} \\
+16 & \texttt{lnot} \\
+17 & \texttt{land} \\
+18 & \texttt{lor} \\
+19 & \texttt{=>} (right-associative) \\
+20 & \texttt{<=>} (right-associative) \\
+21 & quantifiers \texttt{forall}, \texttt{exists}, \texttt{exists1}, \texttt{mu}, \texttt{lambda} (loosest) \\
+\end{tabularx}
 
 \end{document}

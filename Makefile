@@ -1,6 +1,6 @@
 .PHONY: help lint lint-md format format-check type type-pyright test test-cov check check-cov build clean \
 	ethos-doctor ethos-agents ethos-team dev-doctor dev-setup test-e2e regen-e2e \
-	complexity-report complexity-history qa qa-one
+	complexity-report complexity-history qa qa-one reference
 
 # `make` with no arguments prints the help.
 .DEFAULT_GOAL := help
@@ -85,6 +85,17 @@ WILY_REVS ?= 50
 
 complexity-report:  ## Generate docs/complexity-report.{md,json} (radon+lizard+pydeps+wily)
 	uv run python scripts/complexity_report.py
+
+##@ Reference card
+
+reference:  ## Rebuild docs/reference.pdf and regenerate per-page PNGs in docs/_pages/
+	cd docs && rm -f reference.pdf reference.aux reference.log reference.out reference.fls reference.fdb_latexmk
+	cd docs && rm -f _pages/reference-*.png
+	cd docs && mkdir -p _pages
+	cd docs && pdflatex -interaction=nonstopmode reference.tex >/dev/null
+	cd docs && pdflatex -interaction=nonstopmode reference.tex >/dev/null
+	cd docs && pdftoppm -r 150 -png reference.pdf _pages/reference
+	@echo "reference.pdf rebuilt; page PNGs in docs/_pages/"
 
 ##@ Build / clean
 
