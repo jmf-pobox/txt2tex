@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from txt2tex.ast_nodes import (
     BagLiteral,
     BinaryOp,
@@ -47,8 +49,13 @@ from txt2tex.ast_nodes import (
 _EMPTY: frozenset[str] = frozenset()
 
 
-def _union(exprs: list[Expr]) -> frozenset[str]:
-    """Return the union of free variables across a list of expressions."""
+def _union(exprs: Iterable[Expr]) -> frozenset[str]:
+    """Return the union of free variables across a sequence of expressions.
+
+    Accepts any ``Iterable[Expr]`` (covariant read) so callers can pass a
+    ``list[GuardedBranch]`` or ``list[Identifier]`` without an ``arg-type``
+    cast — both are ``Expr`` subtypes, but ``list[T]`` is invariant in T.
+    """
     result: frozenset[str] = _EMPTY
     for e in exprs:
         result = result | expr_free_vars(e)
@@ -191,7 +198,7 @@ def expr_free_vars(expr: Expr) -> frozenset[str]:
     if isinstance(expr, GuardedBranch):
         return expr_free_vars(expr.expression) | expr_free_vars(expr.guard)
     if isinstance(expr, GuardedCases):
-        return _union(expr.branches)  # type: ignore[arg-type]
+        return _union(expr.branches)
     if isinstance(expr, Theta):
         return expr_free_vars(expr.expr)
     if isinstance(expr, Restrict):

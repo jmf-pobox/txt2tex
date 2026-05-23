@@ -175,9 +175,20 @@ Parentheses override the default grouping.
 OpFiltered defs (OpA ; OpB) hide (temp)
 ```
 
-The parentheses group `OpA ; OpB` before hiding `temp`.
+You write `(OpA ; OpB)` to force grouping in the source, but txt2tex
+drops the source parentheses in the emitted LaTeX:
 
 Generated: `OpA \semi OpB \hide (temp)`
+
+Because fuzz's `\hide` binds tighter than `\semi`, the rendered output
+is read as `OpA \semi (OpB \hide (temp))` — the opposite of what the
+source parentheses suggest.  To preserve grouping in the output, use
+an explicit intermediate name:
+
+```text
+Joined defs OpA ; OpB
+OpFiltered defs Joined hide (temp)
+```
 
 ### Example: compose then pipe
 

@@ -235,6 +235,7 @@ class LaTeXGenerator:
         ">=": 5,
         "=": 5,
         "!=": 5,
+        "/=": 5,  # Z slash-negation alias of !=
         # Relation operators - between comparison and set ops
         "<->": 6,
         "|->": 6,
@@ -257,10 +258,12 @@ class LaTeXGenerator:
         # Set operators
         "elem": 7,  # Set membership (replaces "in" after migration)
         "notin": 7,
+        "/in": 7,  # Z slash-negation alias of notin
         "subset": 7,
         "subseteq": 7,  # Alternative notation for subset
         "psubset": 7,  # Strict/proper subset
         "union": 8,
+        "++": 8,  # Function/relation override — same level as union per parser
         "cross": 8,  # Cartesian product - same as union
         "×": 8,  # Cartesian product (Unicode) - same as union  # noqa: RUF001
         "intersect": 9,
@@ -422,8 +425,14 @@ class LaTeXGenerator:
         if max_line_len <= self._overflow_threshold:
             return
 
-        # Build warning message
-        preview = content_preview or latex[:50] + "..." if len(latex) > 50 else latex
+        # Build warning message.  Parenthesise to avoid the `or` binding
+        # tighter than the conditional expression, which would discard a
+        # caller-supplied `content_preview` whenever `len(latex) <= 50`.
+        preview = (
+            (content_preview or (latex[:50] + "..."))
+            if len(latex) > 50
+            else (content_preview or latex)
+        )
         warning = (
             f"Warning: Line {source_line} may overflow page margin "
             f"(~{max_line_len} chars)\n"

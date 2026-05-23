@@ -34,6 +34,32 @@ conclusion [justification]
       ...
 ```
 
+## Related: `INFRULE:` (rule schema display)
+
+`PROOF:` builds a derivation tree from premises up to a conclusion.  Use
+the sibling keyword `INFRULE:` when you want to *display* an inference
+rule itself — a labelled premise/conclusion pair, not a derivation.
+
+```text
+INFRULE:
+P
+P => Q
+---
+Q [modus ponens]
+```
+
+Renders as a horizontal `\derive` rule: premises above the line,
+conclusion below, optional label on the right.  Each line above the
+three-dash separator is a premise; the line below is the conclusion.
+The `[label]` is optional; without it the rule is unlabelled.
+
+Multiple premises are supported by listing them on separate lines.
+See `examples/04_proof_trees/infrule_modus_ponens.txt` for working
+examples.
+
+`INFRULE:` is for showing what a rule *is*; `PROOF:` is for applying
+rules to derive a result.
+
 ## Syntax Elements
 
 ### 1. Proof Header

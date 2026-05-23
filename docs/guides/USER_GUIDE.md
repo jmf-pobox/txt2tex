@@ -2569,6 +2569,30 @@ worked walkthrough, read
 The full specification is in
 [PROOF_SYNTAX.md](PROOF_SYNTAX.md).
 
+There are two related keywords:
+
+- **`PROOF:`** — *applies* rules to build a derivation tree.  Use this
+  when you want to show that a conclusion follows from premises by a
+  sequence of natural-deduction steps.
+- **`INFRULE:`** — *displays* a single inference rule schema as a
+  horizontal premise/conclusion pair.  Use this when you want to
+  exhibit the rule itself, not derive a result with it.
+
+### `INFRULE:` — rule schema display
+
+```text
+INFRULE:
+P
+P => Q
+---
+Q [modus ponens]
+```
+
+Lines above the `---` separator are premises; the line below is the
+conclusion; the bracketed text is an optional label.  The output is a
+horizontal `\derive` rule.  See `examples/04_proof_trees/infrule_*.txt`
+for working examples.
+
 ### Basic Structure
 
 ```text
@@ -2967,10 +2991,12 @@ LongBooks == pi[bookId, isbn](sigma[pages >= 200](Book))
 
 | Operator | Form | Level |
 |----------|------|-------|
-| `sigma`, `pi` | prefix-with-args | atom |
+| `sigma`, `pi` | prefix-with-args | atom (tightest) |
 | `R[NEW/OLD]` | postfix (inside relational context) | atom |
-| `join`, `div`, `cross`, `group`, `ungroup` | infix | same as cross |
-| `union`, `intersect` | infix | set ops |
+| `f(x)` | function application | atom |
+| `intersect`, `setminus` (`\`) | infix | tighter than cross |
+| `cross`, `join`, `div`, `group`, `ungroup` | infix | middle |
+| `union`, `++` (override) | infix | loosest (of this group) |
 
 ### GROUP and UNGROUP (Phase 4.1)
 

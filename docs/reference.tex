@@ -1061,22 +1061,21 @@ $\mathrm{Sum}(amount)~\mathrm{as}~totalRevenue)$
 4  & \texttt{*}, \texttt{mod} (multiplicative) \\
 5  & \texttt{+}, \texttt{-} (binary); \texttt{s\ \^{}\ t} concat (spaces required); \texttt{filter}, \texttt{bag\_union}, \texttt{bag\_diff} \\
 6  & range \texttt{..} \\
-7  & \texttt{intersect} \\
+7  & \texttt{intersect}, \texttt{setminus} (\texttt{\textbackslash}) \\
 8  & \texttt{cross}, \texttt{join}, \texttt{div}, \texttt{group}, \texttt{ungroup} (cross-product / relational) \\
-9  & \texttt{setminus} (\texttt{\textbackslash}) \\
-10 & \texttt{union}, \texttt{++} (override) \\
-11 & relational infix \texttt{|->}, \texttt{<|}, \texttt{|>}, \texttt{<<|}, \texttt{|>>}, \texttt{o9}, \texttt{comp} \\
-12 & function / relation arrows \texttt{->}, \texttt{<->}, \texttt{+->}, \texttt{>->}, \texttt{>+>}, \texttt{-|>}, \texttt{>->>}, \texttt{-->>}, \texttt{+->>}, \texttt{77->} \\
-13 & \texttt{elem}, \texttt{notin}, \texttt{subset}, \texttt{subseteq}, \texttt{psubset} \\
-14 & comparison \texttt{<}, \texttt{>}, \texttt{<=}, \texttt{>=}, \texttt{=}, \texttt{!=} \\
-15 & \texttt{lnot} \\
-16 & \texttt{land} \\
-17 & \texttt{lor} \\
-18 & \texttt{=>} (right-associative) \\
-19 & \texttt{<=>} (left-associative; logically commutative) \\
-20 & quantifiers \texttt{forall}, \texttt{exists}, \texttt{exists1}, \texttt{mu}, \texttt{lambda} (loosest) \\
+9  & \texttt{union}, \texttt{++} (override) \\
+10 & relational infix \texttt{|->}, \texttt{<|}, \texttt{|>}, \texttt{<<|}, \texttt{|>>}, \texttt{o9}, \texttt{comp} \\
+11 & function / relation arrows \texttt{->}, \texttt{<->}, \texttt{+->}, \texttt{>->}, \texttt{>+>}, \texttt{-|>}, \texttt{>->>}, \texttt{-->>}, \texttt{+->>}, \texttt{77->} \\
+12 & \texttt{elem}, \texttt{notin}, \texttt{subset}, \texttt{subseteq}, \texttt{psubset} \\
+13 & comparison \texttt{<}, \texttt{>}, \texttt{<=}, \texttt{>=}, \texttt{=}, \texttt{!=} \\
+14 & \texttt{lnot} \\
+15 & \texttt{land} \\
+16 & \texttt{lor} \\
+17 & \texttt{=>} (right-associative) \\
+18 & \texttt{<=>} (left-associative; logically commutative) \\
+19 & quantifiers \texttt{forall}, \texttt{exists}, \texttt{exists1}, \texttt{mu}, \texttt{lambda} (loosest) \\
 \end{tabularx}
 
-{\scriptsize Schema-calculus operators (\texttt{;} composition, \texttt{>{}>} piping, \kw{hide}, \kw{project}) appear only on the RHS of \kw{defs}; they bind looser than expression-level operators and aren't part of this table.}
+{\scriptsize Schema-calculus operators appear only on the RHS of \kw{defs}; they bind looser than expression-level operators and aren't part of this table.  Internal order, tightest to loosest: \kw{hide} / \kw{project} (postfix) $<$ \texttt{;} composition $<$ \texttt{>{}>} piping.}
 
 \end{document}

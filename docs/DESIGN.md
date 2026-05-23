@@ -1568,6 +1568,20 @@ union / override (++)
                 < sigma[...](R) / pi[...](R) / rho[...](R)   [atom]
 ```
 
+> **Note (2026-05-23)**: Three corrections that reflect the current parser:
+>
+> 1. `setminus` is handled by `_parse_intersect` (parser.py:4081) alongside
+>    `intersect`, not by a separate `_parse_setminus`.  The two are at the
+>    same precedence level.
+> 2. `rho` was retired by #147; relation rename is now postfix `R[B/A]`
+>    and is handled at the atom level by `_parse_postfix` rather than as
+>    a prefix.
+> 3. `group` and `ungroup` join `cross`/`join`/`div` in `_parse_cross`
+>    (parser.py:3671).
+>
+> Reference card and USER_GUIDE precedence tables follow the corrected
+> chain.  Original ADR table preserved as written.
+
 `_parse_cross` calls `_parse_intersect` for each of its operands, so
 `intersect` binds **tighter** than `join`/`div`/`cross` — it is resolved
 first.  Consequence:
