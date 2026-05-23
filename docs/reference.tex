@@ -81,39 +81,6 @@ LATEX: \textbackslash cmd & Raw \LaTeX\ passthrough (single-line) \\
 \end{tabularx}
 
 \smallskip
-\textbf{END-terminated blocks.}
-
-\begin{tabularx}{\columnwidth}{LR}
-LATEX:               & Multi-line raw \LaTeX\ block; body until \texttt{END} \\
-B:                   & B-machine verbatim block; body until \texttt{END} \\
-\end{tabularx}
-
-{\footnotesize \kw{LATEX:} with content on the same line is single-line form.
-\kw{LATEX:} alone on a line opens the block form — the body is live \LaTeX.
-\kw{B:} wraps its body in \texttt{verbatim} — backslashes print as typed.
-Both require a bare \texttt{END} at column~0 to close.}
-
-\begin{exwrite}%
-\begin{verbatim}
-LATEX:
-\begin{tikzpicture}
-  \draw (0,0) -- (1,1);
-\end{tikzpicture}
-END
-\end{verbatim}
-\end{exwrite}
-
-\begin{exwrite}%
-\begin{verbatim}
-B:
-MACHINE Counter
-VARIABLES n
-INVARIANT n : NAT
-END
-\end{verbatim}
-\end{exwrite}
-
-\smallskip
 \textbf{Identifier Decoration.}
 
 \begin{tabularx}{\columnwidth}{LR}
@@ -125,6 +92,38 @@ x?'                  & $x?'$ (combinations allowed) \\
 \end{tabularx}
 
 {\footnotesize Decoration attaches to any identifier. Reserved words (\texttt{theta}, \texttt{defs}, \texttt{hide}, \texttt{project}, \texttt{Delta}, \texttt{Xi}) cannot be decorated.}
+
+% ── NUMBERS & ARITHMETIC ────────────────────────
+\section{Numbers \& Arithmetic}
+
+\begin{tabularx}{\columnwidth}{LR}
+N                    & $\nat$ (natural numbers) \\
+Z                    & $\num$ (integers) \\
+N1                   & $\nat_1$ (positive naturals) \\
+n + m / n - m        & addition / subtraction \\
+n * m / n div m      & multiplication / integer division \\
+n mod m              & modulo \\
+n < m / n > m        & strict ordering \\
+n <= m / n >= m      & non-strict ordering \\
+n = m / n /= m       & equality / inequality \\
+\end{tabularx}
+
+{\footnotesize \textbf{Exponentiation.} The \texttt{\^{}} operator is fuzz \textit{iter}: it composes a relation with itself. It does NOT square a number. For powers of numbers, multiply directly.}
+
+\begin{exwrite}%
+\begin{verbatim}
+R^3                 (relation iterated three times)
+x * x               (square of a number)
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+$R \bsup 3 \esup \qquad x * x$
+\end{exget}
+
+\end{multicols}
+\newpage
+\begin{multicols}{2}
+\raggedcolumns
 
 % ── PROPOSITIONAL LOGIC ─────────────────────────
 \section{Propositional Logic}
@@ -207,23 +206,6 @@ $\begin{array}{l@{\hspace{1.5em}}r}
 \end{exget}
 
 {\scriptsize \kw{EQUAL:} joins steps with $=$. Use when steps are arithmetic/set-valued, not propositional equivalences.}
-
-% ── NUMBERS & ARITHMETIC ────────────────────────
-\section{Numbers \& Arithmetic}
-
-\begin{tabularx}{\columnwidth}{LR}
-N                    & $\nat$ (natural numbers) \\
-Z                    & $\num$ (integers) \\
-N1                   & $\nat_1$ (positive naturals) \\
-n + m / n - m        & addition / subtraction \\
-n * m / n div m      & multiplication / integer division \\
-n mod m              & modulo \\
-n < m / n > m        & strict ordering \\
-n <= m / n >= m      & non-strict ordering \\
-n = m / n /= m       & equality / inequality \\
-\end{tabularx}
-
-{\footnotesize \textbf{Exponentiation:} \texttt{R\^{}n} (no space) emits \texttt{\textbackslash bsup n\textbackslash esup} — the fuzz \textit{iter} operator. It is only valid for relations, not arithmetic. For $x^2$ write \texttt{x * x}.}
 
 \end{multicols}
 
@@ -356,7 +338,7 @@ A 77-> B             & $A \ffun B$ (finite partial) \\
 f(x)                 & function application \\
 lambda x : T | f(x)  & $\lambda x : T @ f(x)$ \\
 f ++ g               & $f \oplus g$ (override) \\
-f~                   & $f^{-1}$ (postfix inverse) \\
+f\textasciitilde     & $f^{-1}$ (postfix inverse) \\
 \end{tabularx}
 
 \smallskip
@@ -456,8 +438,14 @@ syntax
 end
 \end{verbatim}
 \end{exwrite}
+\begin{exget}%
+\begin{tabular}{rcl}
+$OP$   & $::=$ & $plus \mid minus \mid times$ \\
+$Expr$ & $::=$ & $const \llangle \nat \rrangle \mid binop \llangle OP \cross Expr \rrangle$
+\end{tabular}
+\end{exget}
 
-{\scriptsize \kw{syntax} produces a column-aligned fuzz \texttt{syntax} environment. Blank lines between definitions emit \texttt{\textbackslash also} (visual group separator). Use for BNF-style grammars and type hierarchies.}
+{\scriptsize \kw{syntax} produces a column-aligned fuzz \texttt{syntax} environment. Blank lines between definitions emit \texttt{\textbackslash also} (visual group separator).}
 
 % ── SCHEMAS ─────────────────────────────────────
 \section{Schemas}
@@ -496,6 +484,13 @@ where
 end
 \end{verbatim}
 \end{exwrite}
+\begin{exget}%
+\begin{schema}{Bounded}
+size : \nat
+\where
+size < 10
+\end{schema}
+\end{exget}
 
 \textbf{2. Set comprehension.}
 \begin{exwrite}%
@@ -508,6 +503,14 @@ where
 end
 \end{verbatim}
 \end{exwrite}
+\begin{exget}%
+\begin{schema}{Inventory}
+items : \seq \nat \\
+stock : \nat
+\where
+stock = \# \{~ x : \ran items \mid x > 0 ~\}
+\end{schema}
+\end{exget}
 
 \textbf{3. Quantifier.}
 \begin{exwrite}%
@@ -519,6 +522,13 @@ where
 end
 \end{verbatim}
 \end{exwrite}
+\begin{exget}%
+\begin{schema}{NonNeg}
+s : \seq \num
+\where
+\forall i : 1 \upto \# s @ s(i) \geq 0
+\end{schema}
+\end{exget}
 
 \smallskip
 \textbf{Generic schemas.}
@@ -533,8 +543,14 @@ end
 \end{verbatim}
 \end{exwrite}
 \begin{exget}%
-{\scriptsize $\langle X \rangle$ is the type parameter; instantiate with \texttt{G[T]}.}
+\begin{gendef}[X]
+empty : \finset X
+\where
+empty = \{\}
+\end{gendef}
 \end{exget}
+
+{\scriptsize $[X]$ is the type parameter; instantiate at use with \texttt{empty[T]}.}
 
 \smallskip
 \textbf{Schemas as predicates.}
@@ -592,8 +608,6 @@ S project T          & $S \project T$ \\
 % ── Z BINDINGS ──────────────────────────────────
 \section{Z Bindings}
 
-{\scriptsize Z RM §3.7: binding brackets construct labelled tuples.}
-
 \begin{tabularx}{\columnwidth}{LR}
 \{| name == e |\}      & $\lblot name == e \rblot$ \\
 \{| a == e, b == f |\} & multiple components \\
@@ -617,10 +631,10 @@ $\bullet \lblot trackId == t.trackId \rblot \}$
 \end{center}
 \end{exget}
 
-{\scriptsize Use \texttt{;} to separate variable-type pairs inside \texttt{\{ \}}. Binding components are \textbf{comma}-separated (Z RM §3.7).}
+{\scriptsize Use \texttt{;} to separate variable-type pairs inside \texttt{\{ \}}. Binding components are \textbf{comma}-separated.}
 
 \smallskip
-{\scriptsize\textbf{Fuzz note:} bindings emit outside any Z environment. Do not place them inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks — fuzz rejects \texttt{==} inside $\lblot \ldots \rblot$ in block contents.}
+{\scriptsize\textbf{Fuzz note:} binding expressions emit outside any Z environment — fuzz silently skips them. Do not wrap bindings inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
 
 \end{multicols}
 
@@ -799,15 +813,13 @@ Comma-separated names on one \kw{pk} line also work.
 \begin{tabularx}{\columnwidth}{LR}
 sigma[p](R)          & $\mathrm{Restrict}_{p}(R)$ — restrict \\
 pi[A,B](R)           & $\mathrm{Project}_{A,B}(R)$ — project \\
-R[B/A]               & $R[B/A]$ — rename (Z RM §3.11, NEW first) \\
+R[B/A]               & $R[B/A]$ — rename \\
 R join S             & $\mathrm{Join}(R, S)$ — natural join \\
 R join [p] S         & $\mathrm{Join}_{p}(R, S)$ — theta-join \\
 R div S              & $R \div S$ — division \\
 \end{tabularx}
 
-{\footnotesize \texttt{sigma}/\texttt{pi} bind at atom level. \texttt{R[B/A]} postfix rename requires relational context (inside \texttt{sigma}/\texttt{pi} arg or \texttt{join}/\texttt{div} right operand). \texttt{join} and \texttt{div} are infix at cross-product precedence.}
-
-{\footnotesize\textbf{Fuzz note:} algebra expressions emit outside any Z environment — fuzz silently skips them. Do not wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
+{\scriptsize\textbf{Fuzz note:} algebra expressions emit outside any Z environment — fuzz silently skips them. Do not wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
 
 \smallskip
 \textbf{FK predicate form.}
@@ -822,6 +834,12 @@ where
 end
 \end{verbatim}
 \end{exwrite}
+\begin{exget}%
+\begin{axdef}
+\where
+(R, S) \mapsto \{a \mapsto b\} \in FK
+\end{axdef}
+\end{exget}
 
 \smallskip
 \textbf{GROUP \& UNGROUP.}
@@ -846,7 +864,7 @@ $Members\ \mathop{\mathrm{UNGROUP}}\ contact$
 \end{center}
 \end{exget}
 
-{\scriptsize\textbf{Fuzz note:} GROUP/UNGROUP emit outside any Z environment. Do not place them inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
+{\scriptsize\textbf{Fuzz note:} GROUP and UNGROUP expressions emit outside any Z environment — fuzz silently skips them. Do not wrap GROUP/UNGROUP inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
 
 \smallskip
 \textbf{GROUP aggregator form.}
