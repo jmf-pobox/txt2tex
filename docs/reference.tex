@@ -6,6 +6,7 @@
 \usepackage{hyperref}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{fuzz}
 \usepackage{proof}
@@ -56,33 +57,70 @@
 % ── DOCUMENT STRUCTURE ──────────────────────────
 \section{Document Structure}
 
+\textbf{Single-line directives.}
+
 \begin{tabularx}{\columnwidth}{LR}
 === Title ===        & \verb|\section*{Title}| \\
 ** Solution N **     & Bold heading with spacing \\
 (a) Text             & Part label \\
-TEXT: paragraph      & Prose block (smart formula detection) \\
-LATEX: \textbackslash cmd & Raw \LaTeX\ passthrough \\
-PAGEBREAK:           & Page break \\
-LINEBREAK:           & Vertical gap (\verb|\medskip|) — between blocks, no page break \\
-\end{tabularx}
-
-\smallskip
-\begin{tabularx}{\columnwidth}{LR}
-TITLE: \ldots        & Document title \\
-AUTHOR: \ldots       & Author name \\
-DATE: \ldots         & Date string \\
+TITLE: My Doc        & Document title (\verb|\title{}|) \\
+SUBTITLE: Sub        & Document subtitle \\
+AUTHOR: Name         & Author name \\
+DATE: 2026           & Date string \\
+INSTITUTION: Univ    & Institution line \\
 BIBLIOGRAPHY: f.bib  & BibTeX file \\
-{[cite key]}         & \verb|\citep{key}| \\
+BIBLIOGRAPHY\_STYLE: plainnat & Citation style \\
+CONTENTS:            & Table of contents \\
+PARTS: inline        & Parts formatting style \\
+PAGEBREAK:           & \verb|\newpage| \\
+LINEBREAK:           & \verb|\medskip| (gap, no new page) \\
+TEXT: prose here     & Smart prose (auto-detects formulas) \\
+PURETEXT: raw \&\ text & Verbatim prose; escapes \LaTeX\ specials \\
+LATEX: \textbackslash cmd & Raw \LaTeX\ passthrough (single-line) \\
+{[cite key]}         & \verb|\citep{key}| (in TEXT blocks) \\
 \end{tabularx}
 
 \smallskip
-\textbf{Identifier Decoration}
+\textbf{END-terminated blocks.}
+
+\begin{tabularx}{\columnwidth}{LR}
+LATEX:               & Multi-line raw \LaTeX\ block; body until \texttt{END} \\
+B:                   & B-machine verbatim block; body until \texttt{END} \\
+\end{tabularx}
+
+{\footnotesize \kw{LATEX:} with content on the same line is single-line form.
+\kw{LATEX:} alone on a line opens the block form — the body is live \LaTeX.
+\kw{B:} wraps its body in \texttt{verbatim} — backslashes print as typed.
+Both require a bare \texttt{END} at column~0 to close.}
+
+\begin{exwrite}%
+\begin{verbatim}
+LATEX:
+\begin{tikzpicture}
+  \draw (0,0) -- (1,1);
+\end{tikzpicture}
+END
+\end{verbatim}
+\end{exwrite}
+
+\begin{exwrite}%
+\begin{verbatim}
+B:
+MACHINE Counter
+VARIABLES n
+INVARIANT n : NAT
+END
+\end{verbatim}
+\end{exwrite}
+
+\smallskip
+\textbf{Identifier Decoration.}
 
 \begin{tabularx}{\columnwidth}{LR}
 count'               & $count'$ (after-state) \\
 in?                  & $in?$ (input) \\
 out!                 & $out!$ (output) \\
-x?'                  & $x?'$ (runs may combine) \\
+x?'                  & $x?'$ (combinations allowed) \\
 'sunk'               & $\mbox{`sunk'}$ (string literal) \\
 \end{tabularx}
 
@@ -126,6 +164,50 @@ F & F & T \\
 \end{center}
 \end{exget}
 
+\textbf{Equivalence chain (\kw{EQUIV:}):}
+
+\begin{exwrite}%
+\begin{verbatim}
+EQUIV:
+lnot (p land q)
+lnot p lor lnot q  [De Morgan]
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\begin{array}{l@{\hspace{2em}}r}
+\lnot (p \land q) \\
+\Leftrightarrow \lnot p \lor \lnot q
+  & [\mbox{De Morgan}]
+\end{array}$
+\end{center}
+\end{exget}
+
+{\scriptsize \kw{EQUIV:} and its alias \kw{ARGUE:} join steps with $\Leftrightarrow$. Use for predicate equivalences.}
+
+\textbf{Equality chain (\kw{EQUAL:}):}
+
+\begin{exwrite}%
+\begin{verbatim}
+EQUAL:
+0 + 0
+0      [0+0 = 0]
+length(<>)
+       [length(<>) = 0]
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\begin{array}{l@{\hspace{1.5em}}r}
+0 + 0 \\
+= 0 & [\mbox{0+0 = 0}] \\
+= length(\langle\rangle) & [\mbox{length}(\langle\rangle) = 0]
+\end{array}$
+\end{center}
+\end{exget}
+
+{\scriptsize \kw{EQUAL:} joins steps with $=$. Use when steps are arithmetic/set-valued, not propositional equivalences.}
+
 % ── NUMBERS & ARITHMETIC ────────────────────────
 \section{Numbers \& Arithmetic}
 
@@ -134,12 +216,22 @@ N                    & $\nat$ (natural numbers) \\
 Z                    & $\num$ (integers) \\
 N1                   & $\nat_1$ (positive naturals) \\
 n + m / n - m        & addition / subtraction \\
-n * m / n div m      & multiplication / division \\
+n * m / n div m      & multiplication / integer division \\
 n mod m              & modulo \\
 n < m / n > m        & strict ordering \\
 n <= m / n >= m      & non-strict ordering \\
 n = m / n /= m       & equality / inequality \\
 \end{tabularx}
+
+{\footnotesize \textbf{Exponentiation:} \texttt{R\^{}n} (no space) emits \texttt{\textbackslash bsup n\textbackslash esup} — the fuzz \textit{iter} operator. It is only valid for relations, not arithmetic. For $x^2$ write \texttt{x * x}.}
+
+\end{multicols}
+
+%% ── PAGE 2: SETS, SEQUENCES, PREDICATE LOGIC ─────
+\newpage
+
+\begin{multicols}{2}
+\raggedcolumns
 
 % ── SETS & TYPES ────────────────────────────────
 \section{Sets \& Types}
@@ -148,18 +240,26 @@ n = m / n /= m       & equality / inequality \\
 x elem S             & $x \in S$ \\
 x notin S            & $x \notin S$ \\
 A subset B           & $A \subseteq B$ \\
+A psubset B          & $A \subset B$ (proper subset) \\
 A union B            & $A \cup B$ \\
-A inter B            & $A \cap B$ \\
+A intersect B        & $A \cap B$ \\
 A setminus B         & $A \setminus B$ \\
+bigcup S             & $\bigcup S$ \\
+bigcap S             & $\bigcap S$ \\
 power S              & $\power S$ \\
+P1 S                 & $\power_1 S$ (non-empty) \\
 F S                  & $\finset S$ \\
+F1 S                 & $\finset_1 S$ (non-empty finite) \\
 A cross B            & $A \cross B$ \\
 \{x : S | P\}        & Set comprehension \\
 n..m                 & $n \upto m$ (integer range) \\
+\# S                 & $\# S$ (cardinality / length) \\
 \end{tabularx}
 
+{\footnotesize\textbf{Prefix-operator rule (\#133):} prefix-generic operators (\texttt{seq}, \texttt{P}, \texttt{dom}, \texttt{ran}, \texttt{bigcup}, …) require an atomic argument. The engine automatically wraps a nested prefix call in parentheses: \texttt{seq (P X)} $\to$ \verb|\seq~(\power X)|.}
+
 \smallskip
-\textbf{Set comprehension example:}
+\textbf{Set comprehension:}
 
 \begin{exwrite}%
 \begin{verbatim}
@@ -181,6 +281,7 @@ exists x : S | P     & $\exists x : S @ P$ \\
 exists\_1 x : S | P  & $\exists_1 x : S @ P$ (unique) \\
 lambda x : S | E     & $\lambda x : S @ E$ \\
 mu x : S | P         & $\mu x : S @ P$ (definite desc.) \\
+if p then e1 else e2 & conditional expression \\
 \end{tabularx}
 
 {\footnotesize \textbf{Bullet form:} \texttt{x : S | P} means $x : S \bullet P$ (bullet is implied). The vertical bar is the quantifier separator.}
@@ -202,7 +303,6 @@ $\forall (x, y) : \nat \cross \nat @ x + y \geq 0$
 
 {\footnotesize \textbf{Multi-decl:} separate variable groups with \texttt{;} inside a quantifier: \texttt{forall x : A; y : B | P}.}
 
-\smallskip
 {\footnotesize \textbf{Schema-text scope:} a bare \texttt{[d : T | P]} in a quantifier or function acts as an inline schema text.}
 
 % ── RELATIONS ───────────────────────────────────
@@ -212,15 +312,20 @@ $\forall (x, y) : \nat \cross \nat @ x + y \geq 0$
 A <-> B              & $A \rel B$ (relation type) \\
 x |-> y              & $(x \mapsto y)$ (maplet) \\
 dom R / ran R        & $\dom R$ / $\ran R$ \\
-A dres R             & $A \dres R$ (domain restrict) \\
-A dsub R             & $A \ndres R$ (domain subtract) \\
-R rres B             & $R \rres B$ (range restrict) \\
-R rsub B             & $R \nrres B$ (range subtract) \\
-R oplus S            & $R \oplus S$ (relational override) \\
+id                   & identity relation \\
+inv R / R\textasciitilde & $R^{-1}$ (inverse; postfix or prefix) \\
+A dres R / A <| R    & $A \dres R$ (domain restrict) \\
+A dsub R / A <<| R   & $A \ndres R$ (domain subtract) \\
+R rres B / R |> B    & $R \rres B$ (range restrict) \\
+R rsub B / R |>> B   & $R \nrres B$ (range subtract) \\
+R oplus S / R ++ S   & $R \oplus S$ (relational override) \\
 R o9 S               & $R \semi S$ (forward comp.) \\
 R comp S             & $R \comp S$ (backward comp.) \\
-R~{[A]}              & $R\,[\,A\,]$ (relational image) \\
+R(| A |)             & $R\,[\,A\,]$ (relational image) \\
+shows                & $\vdash$ (turnstile / judgment) \\
 \end{tabularx}
+
+{\footnotesize\textbf{o9 vs comp:} \texttt{o9} $\to$ \texttt{\textbackslash semi} (forward, $(R;S)(x)=S(R(x))$). \texttt{comp} $\to$ \texttt{\textbackslash comp} (backward, $(R\circ S)(x)=R(S(x))$).}
 
 \smallskip
 \textbf{Worked example — domain restrict:}
@@ -240,15 +345,18 @@ $\{1,2\} \dres \{1 \mapsto a, 2 \mapsto b, 3 \mapsto c\}$
 \section{Functions}
 
 \begin{tabularx}{\columnwidth}{LR}
-A pfun B             & $A \pfun B$ (partial) \\
-A fun B              & $A \fun B$ (total) \\
-A pinj B             & $A \pinj B$ (partial injection) \\
-A inj B              & $A \inj B$ (total injection) \\
-A surj B             & $A \surj B$ (surjection) \\
-A bij B              & $A \bij B$ (bijection) \\
-A ffun B             & $A \ffun B$ (finite partial) \\
+A +-> B              & $A \pfun B$ (partial) \\
+A -> B               & $A \fun B$ (total) \\
+A >+> B / A -|> B    & $A \pinj B$ (partial injection) \\
+A >-> B              & $A \inj B$ (total injection) \\
+A +->> B             & $A \psurj B$ (partial surjection) \\
+A -->> B             & $A \surj B$ (total surjection) \\
+A >->> B             & $A \bij B$ (bijection) \\
+A 77-> B             & $A \ffun B$ (finite partial) \\
 f(x)                 & function application \\
 lambda x : T | f(x)  & $\lambda x : T @ f(x)$ \\
+f ++ g               & $f \oplus g$ (override) \\
+f~                   & $f^{-1}$ (postfix inverse) \\
 \end{tabularx}
 
 \smallskip
@@ -266,18 +374,34 @@ $double == \lambda n : \nat @ n * 2$
 \end{exget}
 
 % ── SEQUENCES ───────────────────────────────────
-\section{Sequences}
+\section{Sequences \& Bags}
 
 \begin{tabularx}{\columnwidth}{LR}
 <> / <a, b>          & $\langle\rangle$ / $\langle a, b \rangle$ \\
-s \textasciicircum{} t  & $s \cat t$ (concatenation) \\
+s \textasciicircum{} t  & $s \cat t$ (concat; space before \texttt{\^} required) \\
 seq S / seq1 S       & $\seq S$ / $\seq_1 S$ \\
+iseq S               & $\iseq S$ (injective sequences) \\
 \# s                 & $\# s$ (length) \\
 head s / tail s      & first / rest \\
 last s / front s     & last / all-but-last \\
 rev s                & reverse \\
 s(i)                 & index (1-based) \\
+s filter A           & $s \upharpoonright A$ (filter) \\
+bag S                & $\bag S$ \\
+{[}\![a, b]\!{]}     & $\lbag a, b \rbag$ (bag literal) \\
+b1 bag\_union b2     & $b_1 \uplus b_2$ \\
+b1 bag\_diff b2      & $b_1 \uminus b_2$ \\
 \end{tabularx}
+
+{\footnotesize\textbf{Concat:} write \texttt{<a> \^{} <b>} (space before \texttt{\^}).  No space $\to$ relation iteration (\texttt{\textbackslash bsup}). \textbf{bag\_diff:} emits \texttt{\textbackslash uminus} — bag subtraction clamped at zero.}
+
+\end{multicols}
+
+%% ── PAGE 3: Z PARAGRAPHS ─────────────────────────
+\newpage
+
+\begin{multicols}{2}
+\raggedcolumns
 
 % ── Z PARAGRAPHS ────────────────────────────────
 \section{Z Paragraphs}
@@ -298,6 +422,42 @@ name == expr         & Abbreviation \\
 \end{tabularx}
 
 {\footnotesize \kw{axdef} introduces global constants; \kw{gendef [X]} parameterises by a type; \kw{schema Name} names a state or operation.}
+
+\smallskip
+\textbf{Zed block (unboxed paragraph):}
+
+\begin{exwrite}%
+\begin{verbatim}
+zed
+  given Entry
+  Status ::= active | inactive
+  MaxSize == 100
+end
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{zed}
+[Entry] \also
+Status ::= active | inactive \also
+MaxSize == 100
+\end{zed}
+\end{exget}
+
+{\scriptsize \kw{zed} blocks can mix given types, free types, abbreviations, and predicates in one environment. No visual box. Use for global type definitions; use \kw{axdef}/\kw{schema} for declarations with a \kw{where} clause.}
+
+\smallskip
+\textbf{Syntax block (multi-type free definitions):}
+
+\begin{exwrite}%
+\begin{verbatim}
+syntax
+  OP ::= plus | minus | times
+  Expr ::= const<N> | binop<OP cross Expr>
+end
+\end{verbatim}
+\end{exwrite}
+
+{\scriptsize \kw{syntax} produces a column-aligned fuzz \texttt{syntax} environment. Blank lines between definitions emit \texttt{\textbackslash also} (visual group separator). Use for BNF-style grammars and type hierarchies.}
 
 % ── SCHEMAS ─────────────────────────────────────
 \section{Schemas}
@@ -359,25 +519,6 @@ where
 end
 \end{verbatim}
 \end{exwrite}
-
-\smallskip
-\textbf{Schemas in declarations.}
-
-{\scriptsize A schema name used as a type pulls in that schema's signature:}
-
-\begin{exwrite}%
-\begin{verbatim}
-schema Voyage
-  s : Ship
-  dest : Port
-end
-\end{verbatim}
-\end{exwrite}
-\begin{exget}%
-\begin{center}
-{\scriptsize \texttt{s} inherits all fields of \texttt{Ship} as \texttt{s.field}}
-\end{center}
-\end{exget}
 
 \smallskip
 \textbf{Generic schemas.}
@@ -481,70 +622,38 @@ $\bullet \lblot trackId == t.trackId \rblot \}$
 \smallskip
 {\scriptsize\textbf{Fuzz note:} bindings emit outside any Z environment. Do not place them inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks — fuzz rejects \texttt{==} inside $\lblot \ldots \rblot$ in block contents.}
 
-\smallskip
-\textbf{Scope rules.} Identifiers declared in the left-hand signature of a comprehension are in scope in the predicate and the body expression.
-
-% ── PROOFS ──────────────────────────────────────
-\section{Proofs}
-
-\textbf{Truth-table format:}
-
-\begin{exwrite}%
-\begin{verbatim}
-TRUTH TABLE:
-p | q | p land q
-T | T | T
-T | F | F
-F | T | F
-F | F | F
-\end{verbatim}
-\end{exwrite}
-\begin{exget}%
-\begin{center}
-\begin{tabular}{ccc}
-$p$ & $q$ & $p \land q$ \\ \hline
-T & T & T \\
-T & F & F \\
-F & T & F \\
-F & F & F \\
-\end{tabular}
-\end{center}
-\end{exget}
-
-\smallskip
-\textbf{Equivalence chain (\kw{EQUIV:}):}
-
-\begin{exwrite}%
-\begin{verbatim}
-EQUIV:
-lnot (p land q)
-lnot p lor lnot q  [De Morgan]
-\end{verbatim}
-\end{exwrite}
-\begin{exget}%
-\begin{center}
-$\begin{array}{l@{\hspace{2em}}r}
-\lnot (p \land q) \\
-\Leftrightarrow \lnot p \lor \lnot q
-  & [\mbox{De Morgan}]
-\end{array}$
-\end{center}
-\end{exget}
-
-{\scriptsize \kw{EQUIV:} joins steps with $\Leftrightarrow$. Use for predicate equivalences.}
-
 \end{multicols}
 
-%% ── PAGE 7: PROOFS PART 2 ────────────────────────
+%% ── PAGE 4: PROOFS ───────────────────────────────
 \newpage
 
 \begin{multicols}{2}
 \raggedcolumns
 
-% ── PROOFS (CONTINUED) ──────────────────────────
-\section{Proofs (continued)}
+% ── PROOFS ──────────────────────────────────────
+\section{Proofs}
 
-\textbf{How proof trees work:}
+\textbf{INFRULE: — named inference rule display:}
+
+\begin{exwrite}%
+\begin{verbatim}
+INFRULE:
+premise_1
+premise_2
+---
+conclusion [Rule name]
+\end{verbatim}
+\end{exwrite}
+\begin{exget}%
+\begin{center}
+$\infer[\mbox{Rule name}]{conclusion}{premise_1 & premise_2}$
+\end{center}
+\end{exget}
+
+{\scriptsize \kw{INFRULE:} renders a labelled rule schema. Use for displaying rule definitions (not proofs). The three-dash line \texttt{---} separates premises from conclusion.}
+
+\smallskip
+\textbf{How proof trees work (\kw{PROOF:}):}
 
 {\scriptsize The source is \textbf{conclusion-first} (rendered tree reads
 bottom-up). Premises are indented under their conclusion. A rule with
@@ -555,7 +664,7 @@ are silently dropped. Unary rules take a single indented child with
 no \texttt{::}.}
 
 \smallskip
-\textbf{Proof tree syntax (\kw{PROOF:}):}
+\textbf{Proof tree syntax:}
 
 \begin{tabularx}{\columnwidth}{LR}
 \textrm{indent}          & Premises indented under conclusion \\
@@ -645,32 +754,9 @@ $\infer[\lor\textrm{-elim}]{r}{p \lor q & \infer{r}{\ulcorner p \urcorner^{[1]}}
 {\scriptsize \kw{lor elim from N} discharges the disjunction's assumption [N];
 inside each \kw{case X:} block, the case formula is referenced as \kw{X [from N]}.}
 
-\textbf{Equality chain (\kw{EQUAL:}):}
-
-\begin{exwrite}%
-\begin{verbatim}
-EQUAL:
-0 + 0
-0      [0+0 = 0]
-length(<>)
-       [length(<>) = 0]
-\end{verbatim}
-\end{exwrite}
-\begin{exget}%
-\begin{center}
-$\begin{array}{l@{\hspace{1.5em}}r}
-0 + 0 \\
-= 0 & [\mbox{0+0 = 0}] \\
-= length(\langle\rangle) & [\mbox{length}(\langle\rangle) = 0]
-\end{array}$
-\end{center}
-\end{exget}
-
-{\scriptsize \kw{EQUAL:} = expression chains ($=$). \kw{ARGUE:} = forward-reasoning argumentation blocks.}
-
 \end{multicols}
 
-%% ── PAGE 8: RELATIONAL DATABASE NOTATION ─────────
+%% ── PAGE 5: RELATIONAL DATABASE NOTATION ─────────
 \newpage
 
 \begin{multicols}{2}
@@ -763,6 +849,35 @@ $Members\ \mathop{\mathrm{UNGROUP}}\ contact$
 {\scriptsize\textbf{Fuzz note:} GROUP/UNGROUP emit outside any Z environment. Do not place them inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
 
 \smallskip
+\textbf{GROUP aggregator form.}
+
+{\scriptsize The aggregator keywords are \kw{Count}, \kw{Sum}, \kw{Avg}, \kw{Min}, \kw{Max}, \kw{Median}. Each takes one attribute name and an alias. The regroup form (\texttt{\{...\} as alias}) and the aggregator form are mutually exclusive in a single \texttt{group} expression.}
+
+\begin{tabularx}{\columnwidth}{LR}
+R group (Count(x) as n)   & $R~\mathrm{Group}(\mathrm{Count}(x)~\mathrm{as}~n)$ \\
+R group (Sum(x) as n)     & $R~\mathrm{Group}(\mathrm{Sum}(x)~\mathrm{as}~n)$ \\
+R group (Avg(x) as n)     & $R~\mathrm{Group}(\mathrm{Avg}(x)~\mathrm{as}~n)$ \\
+R group (Min(x) as n)     & $R~\mathrm{Group}(\mathrm{Min}(x)~\mathrm{as}~n)$ \\
+R group (Max(x) as n)     & $R~\mathrm{Group}(\mathrm{Max}(x)~\mathrm{as}~n)$ \\
+R group (Median(x) as n)  & $R~\mathrm{Group}(\mathrm{Median}(x)~\mathrm{as}~n)$ \\
+\end{tabularx}
+
+\begin{exwrite}
+\begin{verbatim}
+Sales group (Count(orderId) as orderCount,
+             Sum(amount) as totalRevenue)
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+$Sales~\mathrm{Group}(\mathrm{Count}(orderId)~\mathrm{as}~orderCount,$\\
+$\mathrm{Sum}(amount)~\mathrm{as}~totalRevenue)$
+\end{center}
+\end{exget}
+
+{\scriptsize Multiple aggregators are comma-separated. Each accepts exactly one attribute identifier — no nested aggregators, no compound expressions.}
+
+\smallskip
 \textbf{Quick reference.}
 
 \begin{tabularx}{\columnwidth}{LR}
@@ -775,7 +890,8 @@ R bowtie S           & natural join ($\otimes$) \\
 R div S              & division \\
 \{| a == e |\}       & binding bracket \\
 \{S; C | P . E\}    & multi-typed set comp \\
-R group (\{A\} as x) & group attrs \\
+R group (\{A\} as x) & regroup attrs \\
+R group (Count(a) as n) & aggregate \\
 R ungroup x          & ungroup attr \\
 \end{tabularx}
 
