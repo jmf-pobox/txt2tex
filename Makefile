@@ -1,6 +1,6 @@
 .PHONY: help lint lint-md format format-check type type-pyright test test-cov check check-cov build clean \
 	ethos-doctor ethos-agents ethos-team dev-doctor dev-setup test-e2e regen-e2e \
-	complexity-report complexity-history
+	complexity-report complexity-history qa qa-one
 
 # `make` with no arguments prints the help.
 .DEFAULT_GOAL := help
@@ -62,6 +62,18 @@ regen-e2e:  ## Regenerate every .tex fixture under examples/ (review diff before
 	@echo ""
 	@echo "Done. Review 'git diff examples/' before committing."
 	@echo "Commit only fixtures whose changes are intentional."
+
+##@ PDF / LaTeX surface QA (examples corpus)
+
+qa:  ## Run scripts/qa_check_all.sh over every examples/ PDF (150 files)
+	scripts/qa_check_all.sh
+
+qa-one:  ## Run scripts/qa_check.sh on a single PDF (PDF=path/to.pdf)
+	@if [ -z "$(PDF)" ]; then \
+		echo "Usage: make qa-one PDF=examples/01_propositional_logic/basic_operators.pdf" >&2; \
+		exit 1; \
+	fi
+	scripts/qa_check.sh "$(PDF)"
 
 ##@ Complexity / code-quality assessment
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # QA Script for txt2tex PDF and LaTeX Quality Checks
-# Usage: ./qa_check.sh <pdf_file>
+# Usage: scripts/qa_check.sh <pdf_file>
 #
 # Checks a single PDF + .tex pair for rendering defects that are not caught
 # by fuzz typecheck or unit tests. Each check is narrowly scoped to avoid
@@ -23,8 +23,8 @@ fail() { printf "${RED}FAIL: %s${NC}\n" "$1"; }
 warn() { printf "${YELLOW}WARNING: %s${NC}\n" "$1"; }
 
 if [ -z "$1" ]; then
-    echo "Usage: ./qa_check.sh <pdf_file>"
-    echo "Example: ./qa_check.sh examples/01_propositional_logic/basic_operators.pdf"
+    echo "Usage: scripts/qa_check.sh <pdf_file>"
+    echo "Example: scripts/qa_check.sh examples/01_propositional_logic/basic_operators.pdf"
     exit 1
 fi
 PDF_FILE="$1"

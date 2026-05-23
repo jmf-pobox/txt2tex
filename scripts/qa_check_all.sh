@@ -1,12 +1,20 @@
 #!/bin/bash
 # QA Script for checking all PDFs under examples/.
-# Usage: ./qa_check_all.sh
+# Usage: scripts/qa_check_all.sh  (run from the repository root)
 #
-# Runs qa_check.sh against every PDF in examples/, excluding the reference/
-# and infrastructure/ subdirectories.  hw1/, hw2/, hw/, and sem/ are out of
-# scope — the gate covers only the published examples corpus.
+# Runs scripts/qa_check.sh against every PDF in examples/, excluding the
+# reference/ and infrastructure/ subdirectories.  hw1/, hw2/, hw/, and
+# sem/ are out of scope — the gate covers only the published examples
+# corpus.
 
 set -u
+
+# Resolve paths so the script works whether invoked from the repo root
+# or from inside scripts/.
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
+QA_CHECK="$SCRIPT_DIR/qa_check.sh"
+cd "$REPO_ROOT"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -42,7 +50,7 @@ FAILED_FILES=""
 
 for PDF in $PDFS; do
     printf "${BLUE}Checking: %s${NC}\n" "$PDF"
-    if ./qa_check.sh "$PDF" > "$TEMP_FILE" 2>&1; then
+    if "$QA_CHECK" "$PDF" > "$TEMP_FILE" 2>&1; then
         printf "${GREEN}\xe2\x9c\x93 PASS: %s${NC}\n" "$PDF"
         TOTAL_PASSED=$((TOTAL_PASSED + 1))
     else
