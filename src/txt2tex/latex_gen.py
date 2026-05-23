@@ -2630,8 +2630,13 @@ class LaTeXGenerator:
             \mathrm{Count}(x)~\mathrm{as}~t
 
         The full expression renders as:
-            R \mathrm{Group}(\mathrm{Count}(x)~\mathrm{as}~t,
-                             \mathrm{Sum}(y)~\mathrm{as}~g)
+            R \mathop{\mathrm{Group}}(\mathrm{Count}(x)~\mathrm{as}~t,
+                                      \mathrm{Sum}(y)~\mathrm{as}~g)
+
+        The `\mathop` wrapper gives `Group` proper binary-operator spacing
+        in math mode so the left operand (`R`) does not collide with the
+        operator symbol.  Consistent with `_generate_group` (regroup) and
+        `_generate_ungroup` which use `\mathop` for the same reason.
 
         When line_break_after is set, inserts \\ after the GROUP expression.
         """
@@ -2639,7 +2644,7 @@ class LaTeXGenerator:
         clause_parts = ", ".join(
             self._generate_aggregator_clause(c) for c in node.clauses
         )
-        result = rf"{relation_latex} \mathrm{{Group}}({clause_parts})"
+        result = rf"{relation_latex} \mathop{{\mathrm{{Group}}}}({clause_parts})"
         if node.line_break_after:
             indent = self._get_indentation()
             return f"{result} \\\\\n{indent} "

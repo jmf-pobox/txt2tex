@@ -199,7 +199,7 @@ def test_emit_count() -> None:
     r"""R group (Count(x) as total) emits \mathrm{Count}(x)~\mathrm{as}~total."""
     result = _expr_latex("R group (Count(x) as total)")
     assert r"\mathrm{Count}(x)~\mathrm{as}~total" in result
-    assert r"\mathrm{Group}" in result
+    assert r"\mathop{\mathrm{Group}}" in result
 
 
 def test_emit_sum() -> None:
@@ -288,4 +288,4 @@ def test_abbreviation_aggregator_routes_to_inline_math() -> None:
     assert "\\begin{zed}\nA ==" not in latex
     # It must be inside inline math
     assert "\\noindent" in latex
-    assert "$A == R \\mathrm{Group}" in latex
+    assert "$A == R \\mathop{\\mathrm{Group}}" in latex
