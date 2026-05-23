@@ -30,7 +30,6 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     # Relational algebra operators (Phase 2.2)
     "sigma": TokenType.SIGMA,
     "pi": TokenType.PI,
-    "rho": TokenType.RHO,
     "join": TokenType.JOIN,
     "div": TokenType.DIV,
     # Nested-relation operators (Phase 4.1)
@@ -119,7 +118,6 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         # --- Relational algebra operators ---
         "sigma",
         "pi",
-        "rho",
         "join",
         "div",
         "group",

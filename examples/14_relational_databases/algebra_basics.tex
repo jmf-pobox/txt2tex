@@ -58,14 +58,14 @@ $\mathrm{Project}_{title, author}(Book)$
 $\mathrm{Project}_{title, author}(\mathrm{Restrict}_{pages \geq 500}(Book))$
 
 
-\section*{Renaming (rho)}
+\section*{Renaming (R[new/old])}
 
 \noindent
-$\mathrm{Rename}_{bookId \to id}(Book)$
+$\mathrm{Project}_{id, title, author, genre, pages, year}(Book[id/bookId])$
 
 
 \noindent
-$\mathrm{Rename}_{bookId \to id, author \to writer}(Book)$
+$\mathrm{Project}_{id, writer, genre, pages, year}(Book[id/bookId, writer/author])$
 
 
 \section*{Natural Join and Theta-Join (join)}
@@ -75,7 +75,7 @@ $\mathrm{Join}(Loan, Book)$
 
 
 \noindent
-$\mathrm{Join}(\mathrm{Rename}_{bookId \to id}(Loan), \mathrm{Rename}_{bookId \to id}(Book))$
+$\mathrm{Project}_{id, memberId, dueYear, title, author, genre, pages, year}(\mathrm{Join}(Loan[id/bookId], Book[id/bookId]))$
 
 
 \noindent

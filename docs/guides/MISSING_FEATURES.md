@@ -138,6 +138,12 @@ These items were missing in earlier versions and are now shipped:
 - **bare-B identifier restored** — lexer regression from #138 where `"B"` in
   `RESERVED_WORDS` prevented decorating bare `B` identifiers; fix removes `"B"`
   from the reserved-words set.
+- **#147 — Relation rename: retire `rho`, adopt `R[NEW/OLD]`** (2026-05-23) —
+  `rho[A as B](R)` prefix syntax retired; replaced by Z RM §3.11 postfix form
+  `R[B/A]` (NEW first, OLD second).  `rho` now lexes as a plain identifier.
+  Engine routes `RelationRename` through `_DAT_EXPRESSION_TYPES` (inline math)
+  so fuzz never sees the `/` inside a Z paragraph.  Compound bases are
+  parenthesised automatically: `(pi[x](R))[b/a]`.
 
 - **Schema-text quantification** (`exists Delta S | P`, `exists Xi S | P`,
   `exists S | P`, `exists S' | P`, and the same for `forall` and `exists1`) —
@@ -162,4 +168,4 @@ All fundamental Z notation is complete:
 - **Schema calculus**: composition (`;`), piping (`>>`), hiding (`hide`), projection (`project`), renaming (`S[a/b]`), horizontal definitions (`Name defs Schema-Exp`)
 - **Operators**: All logic, set, relation, function, and sequence operators
 - **Formatting**: `\also`, `\t` indentation, `~` spacing, line breaks
-- **Relational database extensions**: relational algebra (sigma, pi, rho, join, division), GROUP/UNGROUP, primary key annotation
+- **Relational database extensions**: relational algebra (sigma, pi, R[NEW/OLD] rename, join, division), GROUP/UNGROUP, primary key annotation

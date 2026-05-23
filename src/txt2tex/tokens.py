@@ -163,7 +163,6 @@ class TokenType(Enum):
     # Relational algebra operators (Phase 2.2)
     SIGMA = auto()  # sigma (restriction)
     PI = auto()  # pi (projection)
-    RHO = auto()  # rho (rename)
     JOIN = auto()  # join (natural join / theta-join)
     DIV = auto()  # div (division)
 

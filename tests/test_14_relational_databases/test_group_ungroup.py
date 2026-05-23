@@ -21,7 +21,7 @@ from txt2tex.ast_nodes import (
     Identifier,
     NaturalJoin,
     Project,
-    Rename,
+    RelationRename,
     Restrict,
     Ungroup,
 )
@@ -359,6 +359,8 @@ class TestGroupUngroupAcceptance:
         """Existing algebra operators continue to parse and render."""
         assert isinstance(_expr("sigma[p](R)"), Restrict)
         assert isinstance(_expr("pi[a, b](R)"), Project)
-        assert isinstance(_expr("rho[a as b](R)"), Rename)
+        inner = _expr("pi[b](R[b/a])")
+        assert isinstance(inner, Project)
+        assert isinstance(inner.relation, RelationRename)
         assert isinstance(_expr("R join S"), NaturalJoin)
         assert isinstance(_expr("R div S"), Divide)

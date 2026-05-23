@@ -1,6 +1,6 @@
 """Tests for relational algebra operators (Phase 2.2).
 
-Covers the five AST nodes (Restrict, Project, Rename, NaturalJoin, Divide),
+Covers the five AST nodes (Restrict, Project, RelationRename, NaturalJoin, Divide),
 their token types, parser cases, and LaTeX generator output.  Negative cases
 use the three-assertion pattern: message, line, column.
 
@@ -21,7 +21,7 @@ from txt2tex.ast_nodes import (
     Identifier,
     NaturalJoin,
     Project,
-    Rename,
+    RelationRename,
     Restrict,
 )
 from txt2tex.latex_gen import LaTeXGenerator
@@ -81,10 +81,10 @@ class TestAlgebraLexer:
         assert tokens[0].type == TokenType.PI
         assert tokens[0].value == "pi"
 
-    def test_rho_token(self) -> None:
-        """'rho' lexes to RHO token."""
+    def test_rho_is_identifier(self) -> None:
+        """'rho' is no longer reserved — lexes as IDENTIFIER."""
         tokens = _lex("rho")
-        assert tokens[0].type == TokenType.RHO
+        assert tokens[0].type == TokenType.IDENTIFIER
         assert tokens[0].value == "rho"
 
     def test_join_token(self) -> None:
@@ -172,32 +172,71 @@ class TestProjectParser:
 
 
 # ---------------------------------------------------------------------------
-# Parser — Rename (rho)
+# Parser — RelationRename
 # ---------------------------------------------------------------------------
 
 
-class TestRenameParser:
-    """Parser produces Rename nodes for rho[A as B, ...](R)."""
+class TestRelationRenameParser:
+    """Parser produces RelationRename nodes for R[new/old] in relational context."""
 
-    def test_rename_single_pair(self) -> None:
-        """rho[ship as name](Outcome) produces Rename with one pair."""
-        node = _expr("rho[ship as name](Outcome)")
-        assert isinstance(node, Rename)
-        assert node.pairs == [("ship", "name")]
-        assert isinstance(node.relation, Identifier)
-        assert node.relation.name == "Outcome"
+    def test_rename_single_pair_in_pi(self) -> None:
+        """R[b/a] inside pi[...](R[b/a]) produces RelationRename with one pair."""
+        node = _expr("pi[b](R[b/a])")
+        assert isinstance(node, Project)
+        assert isinstance(node.relation, RelationRename)
+        assert node.relation.pairs == [("b", "a")]
+        assert isinstance(node.relation.relation, Identifier)
+        assert node.relation.relation.name == "R"
 
-    def test_rename_multiple_pairs(self) -> None:
-        """rho[A as B, C as D](R) produces Rename with two pairs."""
-        node = _expr("rho[A as B, C as D](R)")
-        assert isinstance(node, Rename)
-        assert node.pairs == [("A", "B"), ("C", "D")]
+    def test_rename_multiple_pairs_in_pi(self) -> None:
+        """R[b/a, d/c] inside pi produces RelationRename with two pairs."""
+        node = _expr("pi[b, d](R[b/a, d/c])")
+        assert isinstance(node, Project)
+        assert isinstance(node.relation, RelationRename)
+        assert node.relation.pairs == [("b", "a"), ("d", "c")]
+
+    def test_rename_in_sigma(self) -> None:
+        """R[b/a] inside sigma[p](R[b/a]) produces RelationRename."""
+        node = _expr("sigma[b != 0](R[b/a])")
+        assert isinstance(node, Restrict)
+        assert isinstance(node.relation, RelationRename)
+        assert node.relation.pairs == [("b", "a")]
+
+    def test_rename_right_of_join(self) -> None:
+        """R[b/a] as right operand of join produces RelationRename."""
+        # The right operand of join is parsed in relational context
+        node = _expr("pi[b](S join R[b/a])")
+        assert isinstance(node, Project)
+        inner = node.relation
+        assert isinstance(inner, NaturalJoin)
+        assert isinstance(inner.right, RelationRename)
+        assert inner.right.pairs == [("b", "a")]
 
     def test_rename_position(self) -> None:
-        """Rename node carries start position of rho keyword."""
-        node = _expr("rho[x as y](R)")
-        assert node.line == 1
-        assert node.column == 1
+        """RelationRename node carries position of opening bracket."""
+        node = _expr("pi[b](R[b/a])")
+        assert isinstance(node, Project)
+        inner = node.relation
+        assert isinstance(inner, RelationRename)
+        assert inner.line >= 1
+        assert inner.column >= 1
+
+    def test_compound_base_rename(self) -> None:
+        """(pi[x](R))[b/a] — compound base produces RelationRename."""
+        node = _expr("pi[b](pi[x](R)[b/a])")
+        assert isinstance(node, Project)
+        inner = node.relation
+        assert isinstance(inner, RelationRename)
+        assert inner.pairs == [("b", "a")]
+        assert isinstance(inner.relation, Project)
+
+    def test_rename_pair_direction(self) -> None:
+        """RelationRename pairs[0] is the new name, pairs[1] is the old name."""
+        node = _expr("pi[ship](Ship[ship/name])")
+        assert isinstance(node, Project)
+        inner = node.relation
+        assert isinstance(inner, RelationRename)
+        assert inner.pairs[0] == ("ship", "name")  # new, old per Z RM §3.11
 
 
 # ---------------------------------------------------------------------------
@@ -276,12 +315,12 @@ class TestAlgebraComposition:
         assert isinstance(node, Project)
         assert isinstance(node.relation, Restrict)
 
-    def test_nested_sigma_in_pi_in_rho(self) -> None:
-        """pi[A](sigma[p](rho[B as C](R))) — triple nesting."""
-        node = _expr("pi[A](sigma[p](rho[B as C](R)))")
+    def test_nested_rename_in_sigma_in_pi(self) -> None:
+        """pi[b](sigma[b=0](R[b/a])) — rename inside sigma inside pi."""
+        node = _expr("pi[b](sigma[b = 0](R[b/a]))")
         assert isinstance(node, Project)
         assert isinstance(node.relation, Restrict)
-        assert isinstance(node.relation.relation, Rename)
+        assert isinstance(node.relation.relation, RelationRename)
 
     def test_algebra_with_set_union(self) -> None:
         """pi[a](R union S) — project of union."""
@@ -366,27 +405,42 @@ class TestProjectGenerator:
 
 
 # ---------------------------------------------------------------------------
-# Generator — Rename
+# Generator — RelationRename
 # ---------------------------------------------------------------------------
 
 
-class TestRenameGenerator:
-    r"""LaTeX generator emits \mathrm{Rename}_{A \to B}(rel) for Rename nodes."""
+class TestRelationRenameGenerator:
+    """LaTeX generator emits R[new/old] pass-through for RelationRename nodes."""
 
     def test_rename_single_pair(self) -> None:
-        r"""rho[ship as name](R) → \mathrm{Rename}_{ship \to name}(R)."""
-        result = _expr_latex("rho[ship as name](R)")
-        assert result == r"\mathrm{Rename}_{ship \to name}(R)"
+        """pi[b](R[b/a]) → R[b/a] literal emit (no mathrm)."""
+        result = _expr_latex("pi[b](R[b/a])")
+        assert "R[b/a]" in result
+        assert r"\mathrm{Rename}" not in result
 
     def test_rename_multiple_pairs(self) -> None:
-        r"""rho[A as B, C as D](R) → \mathrm{Rename}_{A \to B, C \to D}(R)."""
-        result = _expr_latex("rho[A as B, C as D](R)")
-        assert result == r"\mathrm{Rename}_{A \to B, C \to D}(R)"
+        """pi[b, d](R[b/a, d/c]) → R[b/a, d/c] literal emit."""
+        result = _expr_latex("pi[b, d](R[b/a, d/c])")
+        assert "R[b/a, d/c]" in result
 
     def test_rename_named_relation(self) -> None:
-        r"""rho[ship as name](Outcome) → \mathrm{Rename}_{ship \to name}(Outcome)."""
-        result = _expr_latex("rho[ship as name](Outcome)")
-        assert result == r"\mathrm{Rename}_{ship \to name}(Outcome)"
+        """pi[ship](Ship[ship/name]) → Ship[ship/name] literal emit."""
+        result = _expr_latex("pi[ship](Ship[ship/name])")
+        assert "Ship[ship/name]" in result
+        assert r"\mathrm{Rename}" not in result
+
+    def test_rename_no_mathrm(self) -> None:
+        """RelationRename never emits mathrm anywhere."""
+        result = _expr_latex("pi[b](R[b/a])")
+        assert r"\mathrm{Rename}" not in result
+        assert r"\mathrm{rename}" not in result
+
+    def test_compound_base_rename_emit(self) -> None:
+        """(pi[x](R))[b/a] emits with parentheses around compound base."""
+        result = _expr_latex("pi[b]((pi[x](R))[b/a])")
+        assert "[b/a]" in result
+        # Compound base is wrapped in parens
+        assert "(" in result
 
 
 # ---------------------------------------------------------------------------
@@ -492,30 +546,6 @@ class TestAlgebraNegative:
         assert "attribute" in err.message.lower()
         assert err.token.line == 1
 
-    def test_rho_missing_as(self) -> None:
-        """rho[A B](R) — missing 'as' between attribute names."""
-        with pytest.raises(ParserError) as exc_info:
-            Parser(_lex("rho[A B](R)")).parse()
-        err = exc_info.value
-        assert "'as'" in err.message
-        assert err.token.line == 1
-
-    def test_rho_empty_bracket(self) -> None:
-        """rho[](R) — empty rename list."""
-        with pytest.raises(ParserError) as exc_info:
-            Parser(_lex("rho[](R)")).parse()
-        err = exc_info.value
-        assert "rename pair" in err.message.lower()
-        assert err.token.line == 1
-
-    def test_rho_missing_target(self) -> None:
-        """rho[A as](R) — missing target after 'as'."""
-        with pytest.raises(ParserError) as exc_info:
-            Parser(_lex("rho[A as](R)")).parse()
-        err = exc_info.value
-        assert "target attribute" in err.message.lower()
-        assert err.token.line == 1
-
     def test_join_empty_subscript(self) -> None:
         """R join [] S — empty theta-join subscript."""
         with pytest.raises(ParserError) as exc_info:
@@ -565,12 +595,12 @@ class TestQ1AcceptanceProbes:
         assert r"\mathrm{Join}(Ship, Class)" in result
 
     def test_q1c_rename_then_join(self) -> None:
-        r"""Q1(c): rho[ship as name](Outcome) join Ship.
+        r"""Q1(c): pi[ship](Ship[ship/name]) join Class.
 
-        Expected: \mathrm{Join}(\mathrm{Rename}_{ship \to name}(Outcome), Ship)
+        Expected: Ship[ship/name] inside a \mathrm{Join}
         """
-        result = self._gen("rho[ship as name](Outcome) join Ship")
-        assert r"\mathrm{Rename}_{ship \to name}(Outcome)" in result
+        result = self._gen("pi[ship, class, launched](Ship[ship/name] join Class)")
+        assert "Ship[ship/name]" in result
         assert r"\mathrm{Join}(" in result
 
 
@@ -580,7 +610,7 @@ class TestQ1AcceptanceProbes:
 
 
 class TestAttrNamePassthrough:
-    """Attribute names in pi/rho pass through as-is (no wrapping)."""
+    """Attribute names in pi pass through as-is (no wrapping)."""
 
     def test_pi_decorated_attr(self) -> None:
         r"""pi[class'](R) — decorated attribute name passes through."""
@@ -591,16 +621,6 @@ class TestAttrNamePassthrough:
         r"""pi[name](R) → \mathrm{Project}_{name}(R)."""
         result = _expr_latex("pi[name](R)")
         assert result == r"\mathrm{Project}_{name}(R)"
-
-    def test_rho_decorated_src(self) -> None:
-        r"""rho[class' as id](R) → \mathrm{Rename}_{class' \to id}(R)."""
-        result = _expr_latex("rho[class' as id](R)")
-        assert r"\mathrm{Rename}_{class' \to id}(R)" in result
-
-    def test_rho_decorated_dst(self) -> None:
-        r"""rho[name as class'](R) → \mathrm{Rename}_{name \to class'}(R)."""
-        result = _expr_latex("rho[name as class'](R)")
-        assert r"name \to class'" in result
 
 
 class TestJoinPrecedence:

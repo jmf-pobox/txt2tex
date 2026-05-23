@@ -429,15 +429,17 @@ class SchemaProject(ASTNode):
 class SchemaRename(ASTNode):
     """Schema renaming node (Z RM §3.11).
 
-    Represents ``S[old/new, ...]`` — produce a schema identical to S except
+    Represents ``S[new/old, ...]`` — produce a schema identical to S except
     that each component named ``old`` is renamed to ``new``.
 
+    Per Z RM §3.11 the NEW name appears first, the OLD name second.
+
     The schema expression is typically a plain (possibly decorated) Identifier.
-    The ``pairs`` list holds ``(old_name, new_name)`` tuples in source order;
+    The ``pairs`` list holds ``(new_name, old_name)`` tuples in source order;
     at least one pair is required.
 
     Examples:
-    - S[a/b]         -> schema=Identifier("S"),  pairs=[("a", "b")]
+    - S[a/b]         -> schema=Identifier("S"),  pairs=[("a", "b")]  # new=a, old=b
     - S[a/b, c/d]    -> schema=Identifier("S"),  pairs=[("a", "b"), ("c", "d")]
     - S'[a/b]        -> schema=Identifier("S'"), pairs=[("a", "b")]
     - S[a'/b]        -> schema=Identifier("S"),  pairs=[("a'", "b")]
@@ -446,11 +448,11 @@ class SchemaRename(ASTNode):
     contents at depth 0 before committing.  If any ``/`` token appears, this
     node is constructed; otherwise GenericInstantiation is constructed.
 
-    LaTeX rendering: schema_repr[a/b, c/d]
+    LaTeX rendering: schema_repr[new/old, ...]
     """
 
     schema: Expr  # Schema reference (typically a decorated Identifier)
-    pairs: list[tuple[str, str]]  # (old_name, new_name) pairs, at least one
+    pairs: list[tuple[str, str]]  # (new_name, old_name) per Z RM §3.11, at least one
 
 
 # Range node
@@ -722,17 +724,36 @@ class Project(ASTNode):
 
 
 @dataclass(frozen=True)
-class Rename(ASTNode):
-    """Relational renaming (rho) node.
+class RelationRename(ASTNode):
+    """Relation renaming node (Z RM §3.11).
 
-    Represents rho[A as B, C as D](relation) — rename attributes.
+    Represents ``R[new/old, ...]`` — rename attributes of a relation.
 
-    Example:
-    - rho[ship as name](Outcome) -> pairs=[("ship", "name")], relation=Outcome
+    Per Z RM §3.11 the NEW name appears first, the OLD name second.
+    The ``pairs`` list holds ``(new_name, old_name)`` tuples in source order.
+
+    The ``relation`` field accepts any expression (compound operands supported,
+    per jra decision A, 2026-05-23).  Examples:
+
+    - R[b/a]                            -> relation=Identifier("R"), pairs=[("b", "a")]
+    - R[b/a, d/c]   -> relation=Identifier("R"), pairs=[("b", "a"), ("d", "c")]
+    - (pi[x](R))[b/a]                   -> relation=Project(...), pairs=[("b", "a")]
+    - (pi[t](sigma[w='Ali'](M)))[id/t]  -> relation=Project(...), pairs=[("id", "t")]
+
+    This node is produced only when the parser is in a relational context
+    (inside pi, sigma, join, div, group, ungroup operand positions).  In a
+    Z paragraph context the identical surface form ``S[a/b]`` produces
+    ``SchemaRename`` instead.
+
+    LaTeX rendering routes through inline math (not a Z environment) because
+    fuzz rejects ``R[new/old]`` on a relation value inside Z paragraphs
+    (jms ruling Q1, 2026-05-23; fuzz syntax error at ``/``).
+
+    LaTeX output: ``relation[new/old, ...]`` — literal pass-through, no \\mathrm.
     """
 
-    pairs: list[tuple[str, str]]
-    relation: Expr
+    relation: Expr  # Any expression (compound operands allowed)
+    pairs: list[tuple[str, str]]  # (new_name, old_name) per Z RM §3.11, at least one
 
 
 @dataclass(frozen=True)
@@ -899,7 +920,7 @@ Expr = (
     | SchemaText
     | Restrict
     | Project
-    | Rename
+    | RelationRename
     | NaturalJoin
     | Divide
     | Group

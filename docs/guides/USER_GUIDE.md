@@ -2836,7 +2836,8 @@ pk in axdef          // only schema bodies — parser error
 
 The five Codd/Date operators.  All use kernel LaTeX (`\mathrm`,
 `\div`) — no extra package needed.  The emission uses keyword style:
-`Restrict`, `Project`, `Rename`, `Join`.
+`Restrict`, `Project`, `Join`; renaming emits as literal `R[NEW/OLD]`
+pass-through (Z RM §3.11).
 
 **Fuzz compatibility.** Algebra expressions emit *outside* any Z
 environment (as `\noindent$...$` LaTeX math). fuzz silently skips
@@ -2869,14 +2870,46 @@ The attribute list is comma-separated identifiers.
 
 #### Renaming
 
+Z RM §3.11 postfix form: `R[NEW/OLD]`.  NEW is written first, OLD second.
+
 ```text
-rho[bookId as id](Book)
-rho[A as B, C as D](R)
+Book[id/bookId]
+R[B/A, D/C]
 ```
 
-Renders: $\mathrm{Rename}_{bookId \to id}(Book)$
+Renders: $Book[id/bookId]$
 
-Each pair is written `old as new`; multiple pairs are comma-separated.
+The base may be any relation expression.  Compound bases are automatically
+parenthesised:
+
+```text
+pi[tournament](sigma[venue = 'Wimbledon'](Match))[id/tournament]
+```
+
+Renders: $(\mathrm{Project}_{tournament}(\mathrm{Restrict}_{venue = `Wimbledon'}(Match)))[id/tournament]$
+
+Multiple pairs are comma-separated; each pair writes NEW first then `/` then OLD:
+
+```text
+R[B/A, D/C]
+```
+
+**Context requirement.** The postfix `[NEW/OLD]` form is recognised only
+inside a relational context — that is, as the argument to `sigma`, `pi`, or
+the right operand of `join`/`div`.  At the top level of an abbreviation RHS,
+wrap the rename inside a projection to force relational context:
+
+```text
+// Force relational context with pi (project all attributes):
+B == pi[ship, class, launched](Ship[ship/name])
+```
+
+**Fuzz note.** `R[NEW/OLD]` on a relation is not valid inside Z paragraphs
+(`zed`, `axdef`, `schema`).  The engine routes relational expressions through
+inline math (`\noindent$...$`) automatically, so fuzz never sees the `/`.
+
+The old `rho[A as B](R)` prefix keyword is retired.  `rho` now lexes as a
+plain identifier.
 
 #### Natural Join
 
@@ -2923,8 +2956,8 @@ Emits as `\noindent$LongBooks \defs \mathrm{Project}_{bookId, isbn}(\mathrm{Rest
 // long books projected to key and isbn
 pi[bookId, isbn](sigma[pages >= 200](Book))
 
-// rename then join
-rho[bookId as id](Book) join Loan
+// rename then join (rename inside pi forces relational context)
+pi[id, isbn, pages, year](Book[id/bookId]) join Loan
 
 // name a query using ==
 LongBooks == pi[bookId, isbn](sigma[pages >= 200](Book))
@@ -2934,7 +2967,8 @@ LongBooks == pi[bookId, isbn](sigma[pages >= 200](Book))
 
 | Operator | Form | Level |
 |----------|------|-------|
-| `sigma`, `pi`, `rho` | prefix-with-args | atom |
+| `sigma`, `pi` | prefix-with-args | atom |
+| `R[NEW/OLD]` | postfix (inside relational context) | atom |
 | `join`, `div`, `cross`, `group`, `ungroup` | infix | same as cross |
 | `union`, `intersect` | infix | set ops |
 
@@ -3353,7 +3387,7 @@ Example — long algebra expression broken at operator boundaries:
 ```text
 pi[winner, venue, tier](Tournament join
   Match join
-  rho[tournament as id](pi[tournament](sigma[venue = 'Centre Court'](Match))))
+  (pi[tournament](sigma[venue = 'Centre Court'](Match)))[id/tournament])
 ```
 
 Example — inside a schema `where` clause:

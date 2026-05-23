@@ -57,7 +57,7 @@ from txt2tex.ast_nodes import (
     Range,
     RawLatexBlock,
     RelationalImage,
-    Rename,
+    RelationRename,
     Restrict,
     Schema,
     SchemaBinding,
@@ -154,6 +154,7 @@ class Parser:
     _in_schema_expr_context: bool
     _in_comparison_rhs: bool
     _current_quantifier_vars: set[str]
+    _in_relational_context: bool
 
     def __init__(self, tokens: list[Token]) -> None:
         """Initialize parser with token list.
@@ -185,6 +186,10 @@ class Parser:
         # to distinguish bullet `.` from named-field projection: `.IDENT` where
         # IDENT is a declared variable cannot be a field selector (Z RM §3.16).
         self._current_quantifier_vars: set[str] = set()
+        # True when parsing a relational-algebra argument position (inside sigma,
+        # pi, join, div, group, ungroup operands).  Governs disambiguation of
+        # Expr[new/old] postfix: RelationRename when True, SchemaRename when False.
+        self._in_relational_context: bool = False
 
     def parse(self) -> Document | Expr:
         """Parse tokens and return AST.
@@ -1117,23 +1122,13 @@ class Parser:
         self._advance()  # consume ']'
         return args
 
-    def _parse_schema_rename_or_generic(
-        self, base: Expr
-    ) -> GenericInstantiation | SchemaRename:
-        """Consume '[' then dispatch to rename or generic instantiation.
+    def _bracket_contains_slash(self) -> bool:
+        """Return True if the next bracket group (starting at '[') contains '/'.
 
-        Disambiguation rule (Z RM §3.11): scan the bracket contents at
-        bracket depth 0.  If any SLASH token appears before the matching
-        ']', parse as schema rename pairs ``S[old/new, ...]``.  Otherwise,
-        parse as a generic type instantiation ``S[T, ...]``.
-
-        The '[' has NOT been consumed on entry; this method consumes it and
-        the matching ']'.
+        Scans ahead from the current position (which must point at '[') for a
+        SLASH token at bracket depth 0.  Does not consume any tokens.
         """
-        # Scan ahead (from the position after '[') for '/' at depth 0.
-        # pos currently points at '['
         depth = 0
-        has_slash = False
         offset = 1  # start scanning past the '['
         while True:
             tok = self._peek_ahead(offset)
@@ -1141,16 +1136,28 @@ class Parser:
                 depth += 1
             elif tok.type == TokenType.RBRACKET:
                 if depth == 0:
-                    break  # found matching ']' — stop scan
+                    return False
                 depth -= 1
             elif tok.type == TokenType.SLASH and depth == 0:
-                has_slash = True
-                break
+                return True
             elif tok.type in (TokenType.EOF, TokenType.NEWLINE):
-                break  # let the real parser raise the error
+                return False
             offset += 1
 
-        if has_slash:
+    def _parse_schema_rename_or_generic(
+        self, base: Expr
+    ) -> GenericInstantiation | SchemaRename:
+        """Consume '[' then dispatch to rename or generic instantiation.
+
+        Disambiguation rule (Z RM §3.11): scan the bracket contents at
+        bracket depth 0.  If any SLASH token appears before the matching
+        ']', parse as schema rename pairs ``S[new/old, ...]``.  Otherwise,
+        parse as a generic type instantiation ``S[T, ...]``.
+
+        The '[' has NOT been consumed on entry; this method consumes it and
+        the matching ']'.
+        """
+        if self._bracket_contains_slash():
             return self._parse_schema_rename(base)
         return self._parse_generic_instantiation(base)
 
@@ -2280,7 +2287,6 @@ class Parser:
             TokenType.IF,  # Conditional expressions (if/then/else)
             TokenType.SIGMA,  # sigma[...](...)
             TokenType.PI,  # pi[...](...)
-            TokenType.RHO,  # rho[...](...)
         )
 
     def _should_parse_space_separated_arg(self) -> bool:
@@ -2407,7 +2413,6 @@ class Parser:
             TokenType.IF,
             TokenType.SIGMA,
             TokenType.PI,
-            TokenType.RHO,
         )
 
     def _parse_quantifier(self) -> Expr:
@@ -3699,7 +3704,12 @@ class Parser:
                     self._skip_newlines()
                 else:
                     self._skip_newlines()
-                right = self._parse_intersect()
+                prev_relational = self._in_relational_context
+                self._in_relational_context = True
+                try:
+                    right = self._parse_intersect()
+                finally:
+                    self._in_relational_context = prev_relational
                 left = NaturalJoin(
                     left=left,
                     right=right,
@@ -3722,7 +3732,12 @@ class Parser:
                     self._skip_newlines()
                 else:
                     self._skip_newlines()
-                right = self._parse_intersect()
+                prev_relational = self._in_relational_context
+                self._in_relational_context = True
+                try:
+                    right = self._parse_intersect()
+                finally:
+                    self._in_relational_context = prev_relational
                 left = Divide(
                     left=left,
                     right=right,
@@ -4129,7 +4144,25 @@ class Parser:
                 # There's whitespace - likely a justification, not generic
                 break
 
-            base = self._parse_schema_rename_or_generic(base)
+            if self._in_relational_context and self._bracket_contains_slash():
+                # In a relational context, S[new/old] → RelationRename
+                base = self._parse_relation_rename(base)
+            else:
+                base = self._parse_schema_rename_or_generic(base)
+
+        # In a relational context, ANY expression base can take a [new/old]
+        # postfix to form a RelationRename — handles compound operands such as
+        # (pi[tournament](sigma[...](Match)))[tournamentId/tournament].
+        # The '[' must immediately follow the closing token (no whitespace).
+        if (
+            self._in_relational_context
+            and not isinstance(base, (Identifier, GenericInstantiation))
+            and self._match(TokenType.LBRACKET)
+            and self._current().line == self.last_token_line
+            and self._current().column <= self.last_token_end_column
+            and self._bracket_contains_slash()
+        ):
+            base = self._parse_relation_rename(base)
 
         # Check for tuple projection and function application
         # These need to be in the same loop so that f(x).1 works correctly
@@ -4485,7 +4518,12 @@ class Parser:
         if not self._match(TokenType.LPAREN):
             raise ParserError("Expected '(' after sigma[...]", self._current())
         self._advance()  # consume '('
-        relation = self._parse_expr()
+        prev_relational = self._in_relational_context
+        self._in_relational_context = True
+        try:
+            relation = self._parse_expr()
+        finally:
+            self._in_relational_context = prev_relational
         if not self._match(TokenType.RPAREN):
             raise ParserError(
                 "Expected ')' after sigma relation argument", self._current()
@@ -4524,7 +4562,12 @@ class Parser:
         if not self._match(TokenType.LPAREN):
             raise ParserError("Expected '(' after pi[...]", self._current())
         self._advance()  # consume '('
-        relation = self._parse_expr()
+        prev_relational = self._in_relational_context
+        self._in_relational_context = True
+        try:
+            relation = self._parse_expr()
+        finally:
+            self._in_relational_context = prev_relational
         if not self._match(TokenType.RPAREN):
             raise ParserError(
                 "Expected ')' after pi relation argument", self._current()
@@ -4537,43 +4580,104 @@ class Parser:
             column=op_tok.column,
         )
 
-    def _parse_rename(self) -> Rename:
-        """Parse rho[A as B, C as D, ...](relation)."""
-        op_tok = self._advance()  # consume 'rho'
-        if not self._match(TokenType.LBRACKET):
-            raise ParserError("Expected '[' after rho", self._current())
-        bracket_tok = self._advance()  # consume '['
-        if self._match(TokenType.RBRACKET):
-            raise ParserError("Expected rename pair in rho[...]", self._current())
-        # Parse comma-separated "A as B" pairs
+    def _parse_relation_rename(self, base: Expr) -> RelationRename:
+        """Parse R[new/old, ...] postfix in a relational context.
+
+        Called from ``_parse_postfix`` when ``_in_relational_context`` is True
+        and the bracket contents contain a ``/`` separator.  The ``[`` has NOT
+        been consumed on entry; this method consumes it and the matching ``]``.
+
+        Grammar:
+            relation_rename ::= '[' pair (',' pair)* ']'
+            pair            ::= name '/' name
+            name            ::= IDENTIFIER | keyword-usable-as-identifier
+
+        Per Z RM §3.11 the new name appears first (``new``), the old name
+        second (``old``).  Pair direction: ``(new_name, old_name)``.
+
+        Attribute names admit keywords as identifiers (``id``, ``dom``, ``ran``,
+        etc.) because relation attribute names can coincide with operator keywords.
+        """
+        open_tok = self._advance()  # Consume '['
+
         pairs: list[tuple[str, str]] = []
-        pairs.append(self._parse_rename_pair(bracket_tok))
-        while self._match(TokenType.COMMA):
-            self._advance()  # consume ','
-            pairs.append(self._parse_rename_pair(bracket_tok))
-        if not self._match(TokenType.RBRACKET):
-            raise ParserError("Expected ']' after rho rename list", bracket_tok)
-        self._advance()  # consume ']'
-        if not self._match(TokenType.LPAREN):
-            raise ParserError("Expected '(' after rho[...]", self._current())
-        self._advance()  # consume '('
-        relation = self._parse_expr()
-        if not self._match(TokenType.RPAREN):
+
+        while not self._match(TokenType.RBRACKET):
+            if self._at_end() or self._match(TokenType.NEWLINE, TokenType.EOF):
+                raise ParserError(
+                    "unclosed '[' in relation rename",
+                    open_tok,
+                )
+
+            # Expect new (target) name (identifier or keyword-as-identifier)
+            if not self._is_attr_name_token():
+                cur = self._current()
+                raise ParserError(
+                    f"expected identifier before '/' in relation rename pair,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            new_name = self._advance().value
+
+            # Expect '/'
+            if not self._match(TokenType.SLASH):
+                cur = self._current()
+                raise ParserError(
+                    f"expected '/' in relation rename pair after {new_name!r},"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            self._advance()  # Consume '/'
+
+            # Expect old (source) name (identifier or keyword-as-identifier)
+            if not self._is_attr_name_token():
+                cur = self._current()
+                raise ParserError(
+                    f"expected identifier after '/' in relation rename pair,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            old_name = self._advance().value
+
+            pairs.append((new_name, old_name))
+
+            # Optional comma separator
+            if self._match(TokenType.COMMA):
+                self._advance()  # Consume ','
+                if self._match(TokenType.RBRACKET):
+                    raise ParserError(
+                        "expected rename pair after ',' in relation rename",
+                        self._current(),
+                    )
+                continue
+
+            if not self._match(TokenType.RBRACKET):
+                cur = self._current()
+                raise ParserError(
+                    f"expected ',' or ']' in relation rename,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+
+        if not pairs:
             raise ParserError(
-                "Expected ')' after rho relation argument", self._current()
+                "relation rename requires at least one pair",
+                open_tok,
             )
-        self._advance()  # consume ')'
-        return Rename(
+
+        self._advance()  # Consume ']'
+
+        return RelationRename(
+            relation=base,
             pairs=pairs,
-            relation=relation,
-            line=op_tok.line,
-            column=op_tok.column,
+            line=open_tok.line,
+            column=open_tok.column,
         )
 
     def _is_attr_name_token(self) -> bool:
         """Return True if the current token is usable as an attribute name.
 
-        Attribute names in pi[...] and rho[...] contexts are plain names.
+        Attribute names in pi[...] contexts are plain names.
         They admit keywords-as-identifiers (id, dom, ran, etc.) because Z
         field names can coincide with operator keywords.
         """
@@ -4581,44 +4685,19 @@ class Parser:
             self._match(TokenType.IDENTIFIER) or self._is_keyword_usable_as_identifier()
         )
 
-    def _parse_rename_pair(self, bracket_tok: Token) -> tuple[str, str]:
-        """Parse a single 'A as B' rename pair inside rho[...]."""
-        if not self._is_attr_name_token():
-            raise ParserError(
-                "Expected attribute name in rho rename pair", self._current()
-            )
-        src = self._advance().value
-        if not self._match(TokenType.AS):
-            raise ParserError(
-                f"Expected 'as' after {src!r} in rho rename pair, "
-                f"got {self._current().value!r}",
-                self._current(),
-            )
-        self._advance()  # consume 'as'
-        if not self._is_attr_name_token():
-            raise ParserError(
-                "Expected target attribute name after 'as' in rho rename pair",
-                self._current(),
-            )
-        dst = self._advance().value
-        return (src, dst)
-
     def _parse_atom(self) -> Expr:
         """Parse atom.
 
         Handles: identifier, number, parenthesized expression, set comprehension,
         prefix operators (dom, ran, inv, id, P, P1, F, F1, bigcup, bigcap),
         function application f(x), lambda expressions, and relational algebra
-        prefix operators (sigma, pi, rho).
+        prefix operators (sigma, pi).
         """
-        # Relational algebra prefix-with-args operators (Phase 2.2)
-        # sigma[pred](R), pi[A, B](R), rho[A as B, ...](R)
+        # Relational algebra prefix-with-args operators (Phase 2.2): sigma and pi
         if self._match(TokenType.SIGMA):
             return self._parse_restrict()
         if self._match(TokenType.PI):
             return self._parse_project()
-        if self._match(TokenType.RHO):
-            return self._parse_rename()
 
         # Prefix operators: relation functions, set functions, sequence operators
         # Check for generic instantiation P[X] before treating as prefix

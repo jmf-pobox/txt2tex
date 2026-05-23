@@ -55,7 +55,7 @@ from txt2tex.ast_nodes import (
     Range,
     RawLatexBlock,
     RelationalImage,
-    Rename,
+    RelationRename,
     Restrict,
     Schema,
     SchemaBinding,
@@ -819,7 +819,7 @@ class LaTeXGenerator:
                 return True
             return self._has_line_breaks(expr.body)
         # Relational algebra wrappers: recurse into the inner relation
-        if isinstance(expr, (Restrict, Project, Rename)):
+        if isinstance(expr, (Restrict, Project, RelationRename)):
             has_rel = self._has_line_breaks(expr.relation)
             if isinstance(expr, Restrict):
                 return has_rel or self._has_line_breaks(expr.predicate)
@@ -2240,16 +2240,19 @@ class LaTeXGenerator:
     ) -> str:
         """Generate LaTeX for schema renaming (Z RM §3.11).
 
-        Renders ``S[old/new, ...]`` in math mode.  The brackets and ``/``
+        Renders ``S[new/old, ...]`` in math mode.  Per Z RM §3.11 the new
+        name appears first, the old name second.  The brackets and ``/``
         separators are literal LaTeX — no special macro is needed.
 
         Examples:
-        - S[a/b]      → S[a/b]
+        - S[a/b]      → S[a/b]   (a is new name, b is old name)
         - S[a/b, c/d] → S[a/b, c/d]
         - S'[a/b]     → S'[a/b]
         """
         schema_latex = self.generate_expr(node.schema)
-        pairs_latex = ", ".join(f"{old}/{new}" for old, new in node.pairs)
+        pairs_latex = ", ".join(
+            f"{new_name}/{old_name}" for new_name, old_name in node.pairs
+        )
         return f"{schema_latex}[{pairs_latex}]"
 
     @generate_expr.register(SchemaCompose)
@@ -2490,11 +2493,11 @@ class LaTeXGenerator:
     # -------------------------------------------------------------------------
 
     def _emit_attr_name(self, name: str) -> str:
-        r"""Emit an attribute name for use inside pi[...] or rho[...] subscripts.
+        r"""Emit an attribute name for use inside pi[...] or R[new/old] brackets.
 
         Attribute names are field names — they render italic by default.
         Operator-keyword mappings (dom → \dom, id → \id) do NOT apply here:
-        in the rho/pi bracket context every name is unambiguously a field name.
+        in the pi or rename bracket context every name is unambiguously a field name.
         """
         return name
 
@@ -2521,21 +2524,32 @@ class LaTeXGenerator:
         rel_latex = self.generate_expr(node.relation)
         return rf"\mathrm{{Project}}_{{{attrs_str}}}({rel_latex})"
 
-    @generate_expr.register(Rename)
-    def _generate_rename(self, node: Rename, parent: Expr | None = None) -> str:
-        r"""Generate LaTeX for rho[A as B, ...](relation).
+    @generate_expr.register(RelationRename)
+    def _generate_relation_rename(
+        self, node: RelationRename, parent: Expr | None = None
+    ) -> str:
+        """Generate LaTeX for relation renaming (Z RM §3.11).
 
-        rho[ship as name](Outcome) → \mathrm{Rename}_{ship \to name}(Outcome)
-        Both source and target names are emitted via _emit_attr_name.
+        Emits ``R[new/old, ...]`` as a literal pass-through — no ``\\mathrm``.
+        Per Z RM §3.11 the new name appears first, the old name second.
+        Pair direction in the AST: ``(new_name, old_name)``.
+
+        When the relation operand is a compound expression (not a bare
+        identifier), it is wrapped in parentheses for readability.
+
+        Examples:
+        - R[b/a]                      → R[b/a]
+        - R[b/a, d/c]                 → R[b/a, d/c]
+        - (pi[x](R))[b/a]             → (pi[x](R))[b/a]  (compound base)
         """
-        pair_latexes: list[str] = []
-        for src, dst in node.pairs:
-            pair_latexes.append(
-                rf"{self._emit_attr_name(src)} \to {self._emit_attr_name(dst)}"
-            )
-        pairs_str = ", ".join(pair_latexes)
         rel_latex = self.generate_expr(node.relation)
-        return rf"\mathrm{{Rename}}_{{{pairs_str}}}({rel_latex})"
+        # Wrap compound (non-identifier) bases in parens for clarity
+        if not isinstance(node.relation, Identifier):
+            rel_latex = f"({rel_latex})"
+        pairs_str = ", ".join(
+            f"{new_name}/{old_name}" for new_name, old_name in node.pairs
+        )
+        return f"{rel_latex}[{pairs_str}]"
 
     @generate_expr.register(NaturalJoin)
     def _generate_natural_join(
@@ -5172,7 +5186,7 @@ class LaTeXGenerator:
     _DAT_EXPRESSION_TYPES: ClassVar[tuple[type, ...]] = (
         Restrict,
         Project,
-        Rename,
+        RelationRename,
         NaturalJoin,
         Divide,
         Binding,

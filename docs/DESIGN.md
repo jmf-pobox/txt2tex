@@ -2709,3 +2709,91 @@ the source-level keyword and token type rename.
   future operator need it.
 - 5 new regression tests in `tests/test_14_relational_databases/test_algebra.py`
   (`TestJoinRenameRegression`) confirm the rename end-to-end.
+
+---
+
+## ADR: Relation Rename — adopt `R[NEW/OLD]`, retire `rho` (issue #147)
+
+### Context
+
+The original engine used a prefix keyword `rho[A as B](R)` to express relation
+renaming, emitting `\mathrm{Rename}_{A \to B}(R)`.  This has three problems:
+
+1. **Not Z RM.** Z RM §3.11 writes `R[b/a]` as postfix syntax on an expression,
+   not a prefix function call.  The `rho` keyword was an invention with no
+   grounding in Spivey or the course slides.
+
+2. **Fuzz rejects it in Z paragraphs.** `\mathrm{Rename}_{...}(...)` is not
+   part of fuzz's Z grammar.  Any attempt to use rename inside a Z block fails.
+
+3. **Direction inversion.** The old implementation stored pairs as
+   `(old, new)` internally but the Z RM convention is `(new, old)` — `b/a`
+   means rename `a` to `b`, so `b` (the new name) appears first.
+
+jms ruling (2026-05-23):
+
+> "`R[b/a]` on a relation is NEVER valid Z in any paragraph context; fuzz
+> rejects `/` in bracket position.  Emit `R[NEW/OLD]` literally as a
+> pass-through.  Do not call it `\mathrm{Rename}` anywhere."
+
+### Decision
+
+1. **Retire `rho`.** Remove `TokenType.RHO` from `tokens.py`; remove `"rho"`
+   from `KEYWORD_TO_TOKEN` and `RESERVED_WORDS` in `lexer.py`.  `rho` now
+   lexes as a plain `IDENTIFIER`.
+
+2. **New AST node `RelationRename`.** Replace the `Rename` dataclass.
+   - `relation: Expr` — accepts any expression as base (compound operands).
+   - `pairs: list[tuple[str, str]]` — `(new_name, old_name)` per Z RM §3.11.
+
+3. **Postfix parsing via `_in_relational_context`.** A parser flag
+   `_in_relational_context` is set `True` inside `sigma`/`pi` relation
+   arguments and the right operand of `join`/`div`.  Inside that context,
+   `_parse_postfix` inspects the next `[...]` group; if it contains `/` at
+   depth 0, it produces a `RelationRename`.  Outside that context, `[...]` on
+   an `Identifier` continues to produce `SchemaRename`.
+
+4. **Compound-base support.** A second block in `_parse_postfix` handles
+   non-Identifier/GenericInstantiation bases in relational context.  The
+   adjacency check (`column <= last_token_end_column`) ensures `R [b/a]` with
+   a space is not treated as postfix.
+
+5. **Generator emits literal pass-through.** `_generate_relation_rename`
+   emits `R[NEW/OLD]` with no `\mathrm` wrapper.  Compound bases are wrapped
+   in parentheses: `(pi[x](R))[b/a]`.
+
+6. **`RelationRename` in `_DAT_EXPRESSION_TYPES`.** This routes every
+   abbreviation containing a relation rename through inline math
+   (`\noindent$...$`), so fuzz never sees the `/`.
+
+7. **`SchemaRename` docstring corrected.** The existing `SchemaRename`
+   docstring had the pair direction as `(old_name, new_name)`.  Z RM §3.11
+   puts the new name first; corrected to `(new_name, old_name)`.
+
+### Rejected alternatives
+
+1. **`\mathrm{Rename}` with a new name.** Rejected — jms ruling is
+   unambiguous: "Do not call it `\mathrm{Rename}` anywhere."
+
+2. **Keep `rho` as a deprecated alias.** Rejected — aliases accumulate; the
+   old form was non-standard and there is no use case for teaching it.
+
+3. **Require parentheses `(R)[b/a]` even for simple names.** Rejected —
+   `R[b/a]` is the Z RM canonical form; requiring extra parens departs from
+   the standard needlessly.
+
+4. **Set `_in_relational_context` for abbreviation RHS unconditionally.**
+   Rejected (jra decision A) — an abbreviation RHS like `S[a/b]` is
+   legitimately a `SchemaRename`.  Forcing relational context would break
+   all existing schema-rename abbreviations.  The contract is: wrap in a
+   projection when a relational rename is needed at top level.
+
+### Consequences
+
+- All `.txt` files using `rho[A as B](R)` must be migrated to `R[B/A]`
+  inside a relational context, or wrapped in `pi[all attrs](R[B/A])`.
+- Generated output changes: `\mathrm{Rename}_{A \to B}(R)` → `R[B/A]`.
+- fuzz acceptance: unchanged (relational expressions already routed through
+  inline math; fuzz never processed them).
+- 6 new parser tests (`TestRelationRenameParser`) and 2 generator tests
+  (`TestRelationRenameGenerator`) in `test_algebra.py` cover the new form.

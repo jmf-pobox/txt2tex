@@ -799,13 +799,13 @@ Comma-separated names on one \kw{pk} line also work.
 \begin{tabularx}{\columnwidth}{LR}
 sigma[p](R)          & $\mathrm{Restrict}_{p}(R)$ — restrict \\
 pi[A,B](R)           & $\mathrm{Project}_{A,B}(R)$ — project \\
-rho[A as B](R)       & $\mathrm{Rename}_{A \to B}(R)$ — rename \\
+R[B/A]               & $R[B/A]$ — rename (Z RM §3.11, NEW first) \\
 R join S             & $\mathrm{Join}(R, S)$ — natural join \\
 R join [p] S         & $\mathrm{Join}_{p}(R, S)$ — theta-join \\
 R div S              & $R \div S$ — division \\
 \end{tabularx}
 
-{\footnotesize \texttt{sigma}/\texttt{pi}/\texttt{rho} bind at atom level. \texttt{join} and \texttt{div} are infix at cross-product precedence.}
+{\footnotesize \texttt{sigma}/\texttt{pi} bind at atom level. \texttt{R[B/A]} postfix rename requires relational context (inside \texttt{sigma}/\texttt{pi} arg or \texttt{join}/\texttt{div} right operand). \texttt{join} and \texttt{div} are infix at cross-product precedence.}
 
 {\footnotesize\textbf{Fuzz note:} algebra expressions emit outside any Z environment — fuzz silently skips them. Do not wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
 
@@ -885,7 +885,7 @@ pk a : T             & primary key in schema \\
 pk a, b : T          & composite pk \\
 sigma[p](R)          & restrict \\
 pi[A](R)             & project \\
-rho[A as B](R)       & rename attr \\
+R[B/A]               & rename attr (NEW/OLD) \\
 R join S             & natural join ($\mathrm{Join}(R, S)$) \\
 R div S              & division \\
 \{| a == e |\}       & binding bracket \\

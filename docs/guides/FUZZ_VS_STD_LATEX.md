@@ -355,6 +355,51 @@ g :X →X        ← on its own line
 
 ---
 
+## Relation Rename (`R[NEW/OLD]`) and Fuzz
+
+### Fuzz rejects `R[NEW/OLD]` inside Z paragraphs
+
+**Standard Z Notation (Z RM §3.11)**: `R[b/a]` is valid relational rename
+syntax — `b` is the NEW attribute name, `a` is the OLD attribute name.
+
+**Fuzz**: Inside a `\begin{zed}`, `\begin{axdef}`, or `\begin{schema}`
+environment, fuzz parses `[...]` on an expression as a generic instantiation.
+A `/` at bracket depth 0 is not part of any Z grammar rule fuzz recognises in
+those contexts, so fuzz rejects the expression.
+
+**txt2tex decision**:
+
+- `R[NEW/OLD]` relational rename is classified as a `RelationRename` AST node,
+  which is included in `_DAT_EXPRESSION_TYPES` alongside `Restrict`, `Project`,
+  `Join`, etc.
+- When a `RelationRename` node appears anywhere in an expression (including as
+  an abbreviation RHS), the engine routes the entire abbreviation through inline
+  math (`\noindent$...$`) instead of `\begin{zed}`.
+- Fuzz never sees the `/` — it only processes the Z-paragraph content.
+
+**User syntax**:
+
+```text
+✅ CORRECT: pi[id, isbn](Book[id/bookId])      → inline math, fuzz skips it
+✅ CORRECT: B == pi[ship, class](Ship[ship/name])  → inline math, fuzz skips it
+❌ WRONG:   axdef ... Book[id/bookId] ... end  → fuzz rejects /
+```
+
+**Context requirement**: `[NEW/OLD]` is only recognised as a relation rename
+inside a *relational context* (argument to `sigma`, `pi`, or right operand of
+`join`/`div`).  At the top level of an abbreviation RHS, wrap in `pi` to force
+the context:
+
+```text
+// Correct: pi forces relational context so [ship/name] is RelationRename
+B == pi[ship, class, launched](Ship[ship/name])
+```
+
+**Reference**: `latex_gen.py` — `_DAT_EXPRESSION_TYPES`; `parser.py` —
+`_in_relational_context` flag.
+
+---
+
 ## Nested Sequence Types
 
 ### Parentheses Required for Nested Special Functions

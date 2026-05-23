@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Relation rename `R[NEW/OLD]`** (#147) — Z RM §3.11 postfix renaming syntax.
+  `R[new/old]` is recognised inside relational contexts (sigma/pi args,
+  join/div right operands). Compound bases parenthesised automatically:
+  `(pi[x](R))[b/a]`. Emits as literal pass-through; engine routes through
+  inline math so fuzz never sees `/`. Multiple pairs comma-separated.
+  See `docs/DESIGN.md § ADR: Relation Rename`.
+
 - New example: `examples/14_relational_databases/normalisation.txt`
   walks through functional dependencies and 1NF→3NF decomposition
   on a generic employee/project/department relation (#84).
@@ -41,7 +48,7 @@ files compile unchanged; output LaTeX may differ visually.
 | Multi-decl `mu` | `(\mu x : T \| (\mu y : U \| ...))` (fuzz REJECTED) | `(\mu x : T; y : U \| ...)` (fuzz-clean) |
 | Multi-decl `lambda` | nested + conditional paren-wrap | Spivey + unconditional paren-wrap in fuzz mode |
 | Bindings | `\lblot name == e \rblot` (flush) | `\lblot~name == e~\rblot` (thin-spaced) |
-| Relational algebra | `\sigma_p(R)`, `\pi_{A,B}(R)`, `\rho_{...}`, `\bowtie`, `\bowtie_p` | `\mathrm{Restrict}_p(R)`, `\mathrm{Project}\{A,B\}(R)`, `\mathrm{Rename}_{...}`, `\otimes`, `\mathrm{Join}_p` |
+| Relational algebra | `\sigma_p(R)`, `\pi_{A,B}(R)`, `\rho_{...}`, `\bowtie`, `\bowtie_p` | `\mathrm{Restrict}_p(R)`, `\mathrm{Project}_{A,B}(R)`, `R[NEW/OLD]` literal, `\mathrm{Join}(R,S)`, `\mathrm{Join}_p(R,S)` |
 
 These are not breaking — your `.txt` parses the same; only the
 rendered `.tex` differs. The Spivey-form, paren-wrap, dependent-domain,
@@ -62,6 +69,14 @@ version to pick up the new output.
   `B:` block (B-machine verbatim passthrough), GROUP aggregate form
   (`Count`, `Sum`, `Avg`, `Min`, `Max`, `Median` inside `group` RHS),
   multi-line `LATEX:` block form.
+
+### Removed
+
+- **`rho` keyword retired** (#147) — `rho[A as B](R)` prefix syntax removed.
+  `rho` now lexes as a plain identifier. Migrate to `R[B/A]` inside a
+  relational context (sigma/pi arg, join/div right operand), or wrap in
+  `pi[all-attrs](R[B/A])` to force relational context at abbreviation top level.
+  `\mathrm{Rename}` never appears in output from this version onward.
 
 ### Changed
 

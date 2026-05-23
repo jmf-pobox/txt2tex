@@ -1,5 +1,5 @@
 // Relational Algebra Operators
-// Demonstrates: sigma, pi, rho, join (renders as ⊗), div.
+// Demonstrates: sigma, pi, rename (R[new/old]), join (renders as ⊗), div.
 
 TITLE: Relational Algebra
 AUTHOR: txt2tex example
@@ -50,15 +50,15 @@ pi[title, author](Book)
 pi[title, author](sigma[pages >= 500](Book))
 
 
-=== Renaming (rho) ===
+=== Renaming (R[new/old]) ===
 
-// Rename one attribute before joining.
+// Rename one attribute before joining (Z RM §3.11: new/old order).
 
-rho[bookId as id](Book)
+pi[id, title, author, genre, pages, year](Book[id/bookId])
 
 // Multiple renames at once:
 
-rho[bookId as id, author as writer](Book)
+pi[id, writer, genre, pages, year](Book[id/bookId, writer/author])
 
 
 === Natural Join and Theta-Join (join) ===
@@ -67,9 +67,9 @@ rho[bookId as id, author as writer](Book)
 
 Loan join Book
 
-// Rename then join:
+// Rename then join (natural join on matching id):
 
-rho[bookId as id](Loan) join rho[bookId as id](Book)
+pi[id, memberId, dueYear, title, author, genre, pages, year](Loan[id/bookId] join Book[id/bookId])
 
 // Theta-join with explicit predicate:
 

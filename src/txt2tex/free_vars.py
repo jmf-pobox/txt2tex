@@ -23,7 +23,7 @@ from txt2tex.ast_nodes import (
     Quantifier,
     Range,
     RelationalImage,
-    Rename,
+    RelationRename,
     Restrict,
     SchemaCompose,
     SchemaHide,
@@ -196,7 +196,7 @@ def expr_free_vars(expr: Expr) -> frozenset[str]:
         return expr_free_vars(expr.expr)
     if isinstance(expr, Restrict):
         return expr_free_vars(expr.predicate) | expr_free_vars(expr.relation)
-    if isinstance(expr, (Project, Rename, Group, Ungroup, GroupAggregate)):
+    if isinstance(expr, (Project, RelationRename, Group, Ungroup, GroupAggregate)):
         return expr_free_vars(expr.relation)
     if isinstance(expr, NaturalJoin):
         sub_free = (
