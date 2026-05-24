@@ -8,5 +8,6 @@ from txt2tex.parser_pkg import (
     paragraphs,  # noqa: F401  # pyright: ignore[reportUnusedImport]
     proofs,  # noqa: F401  # pyright: ignore[reportUnusedImport]
     schemas,  # noqa: F401  # pyright: ignore[reportUnusedImport]
+    text_blocks,  # noqa: F401  # pyright: ignore[reportUnusedImport]
     types,  # noqa: F401  # pyright: ignore[reportUnusedImport]
 )
