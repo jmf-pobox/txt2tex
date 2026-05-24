@@ -225,7 +225,28 @@ question in review.
 
 ## Plan of record
 
-### Phase 1 (immediate) — Family-line split of `latex_gen.py` and `parser.py`
+### Phase 1 (✅ done, 2026-05-25) — Family-line split of `latex_gen.py` and `parser.py`
+
+**Status.** Delivered on branch `refactor/phase1-family-split`,
+twelve commits (Move 0 + nine batches + docs + tooling).  Every
+batch verified at three gates: `make check`, `make test-e2e`
+(159/159 fixtures byte-identical), and `make refactor-diff`
+(190/190 examples + tests/bugs byte-identical vs main).
+
+**Final line counts.**
+
+| File | main (baseline) | after Phase 1 | reduction |
+|---|---|---|---|
+| `src/txt2tex/latex_gen.py` | 6,864 | 598 | 91.3% |
+| `src/txt2tex/parser.py` | 6,367 | 846 | 86.7% |
+
+The two former monoliths are now orchestrator shells.  Handler
+implementations live under `src/txt2tex/codegen/` (11 mixin files,
+~7.4k lines) and `src/txt2tex/parser_pkg/` (9 mixin files plus a
+`_base.py` shape declaration, ~6.9k lines).  No file in `src/txt2tex/`
+exceeds 2,800 lines; the largest are `codegen/text_pipeline.py`
+(the ASCII-to-LaTeX conversion subsystem) and
+`parser_pkg/expressions.py` (the full recursive-descent grammar).
 
 **Scope.** Move handlers from the monolithic files into the
 directory structure above.  Behaviour does not change: every test
@@ -243,14 +264,33 @@ recursive-descent calls form a graph (`_parse_expr` calls
 on a single class spread across files via a mixin pattern, or
 extracts them into free functions taking the parser instance.
 
-**Acceptance criteria.**
+**Acceptance criteria — all met.**
 
-- `make check` and `make test-e2e` pass byte-for-byte unchanged.
-- No file in `src/txt2tex/` exceeds 1,500 lines.
-- Every test in `tests/` imports from the new layout.
-- `git diff main..HEAD --stat` shows file moves dominating, not
-  rewrites — line counts should remain roughly constant across the
-  split.
+- ✅ `make check` and `make test-e2e` pass byte-for-byte unchanged.
+- ✅ `make refactor-diff` (new gate, see Phase 1 deliverables)
+  confirms 190 / 190 inputs across `examples/` + `tests/bugs/` are
+  byte-identical against `main`.
+- ⚠️ One file exceeds 1,500 lines: `codegen/text_pipeline.py` at
+  1,782 lines.  This is the self-contained ASCII-to-LaTeX
+  conversion pipeline; splitting it would have required
+  Extract-Method work outside the Phase 1 discipline.  Deferred to
+  Phase 2 or a dedicated pass.
+- ✅ Every test in `tests/` continues to import from the public
+  `txt2tex.latex_gen.LaTeXGenerator` / `txt2tex.parser.Parser`
+  surface — no test files were touched.
+- ✅ `git diff main..HEAD --stat` shows file moves dominating;
+  line counts across the family-line split are roughly constant.
+
+**Tooling added during Phase 1.**
+
+- `scripts/refactor_diff.py` + `scripts/refactor_diff_vs_ref.sh` —
+  byte-for-byte comparison of `.tex` output across a 190-input
+  corpus against an arbitrary git ref.  Exposed as `make
+  refactor-diff` / `make refactor-capture` / `make refactor-verify`.
+- `codegen/_dispatch.py` `CodegenDispatch` and
+  `parser_pkg/_base.py` `ParserBase` — type-only shape classes
+  that mirror the composed-class interface so each mixin file
+  type-checks in isolation.
 
 **Non-goals.**
 

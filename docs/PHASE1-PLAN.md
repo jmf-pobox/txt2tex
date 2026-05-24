@@ -1,8 +1,30 @@
 # Phase 1 Plan — Family-Line Split of `latex_gen.py` and `parser.py`
 
-Operational plan for the Phase 1 refactor outlined in
-[DESIGN-ROADMAP.md](DESIGN-ROADMAP.md).  Behaviour does not change.
-Only file boundaries move.
+**Status: ✅ done, 2026-05-25.** Operational plan for the Phase 1
+refactor outlined in [DESIGN-ROADMAP.md](DESIGN-ROADMAP.md).
+Behaviour does not change.  Only file boundaries moved.
+
+Delivered as twelve commits on branch
+`refactor/phase1-family-split`: Move 0 (dispatch infrastructure) +
+nine numbered batches + the IO-contract tooling commit + this
+plan's own close-out edit.  Each batch is independently revertible
+via `git revert`.
+
+**Final line counts.**
+
+| File | main (baseline) | after Phase 1 | reduction |
+|---|---|---|---|
+| `src/txt2tex/latex_gen.py` | 6,864 | 598 | 91.3% |
+| `src/txt2tex/parser.py` | 6,367 | 846 | 86.7% |
+
+**Verification.** Every gate green:
+
+- `make check` — lint + markdown + format + mypy + pyright + 4,700
+  unit tests.
+- `make test-e2e` — 159 / 159 `examples/**/*.tex` fixtures
+  byte-identical.
+- `make refactor-diff` — 190 / 190 `examples/` + `tests/bugs/`
+  outputs byte-identical against `main`.
 
 ## Goal
 
