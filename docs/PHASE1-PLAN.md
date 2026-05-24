@@ -235,14 +235,85 @@ submodules`.
 **Gate 4.** `make check && make test-e2e`.  Commit as
 `refactor(codegen): extract fuzz routing and paren policy modules`.
 
+### Batch 5 (Moves A, B) — Phase 1A close-out: atoms and text pipeline
+
+Original Batches 1–4 leave `latex_gen.py` at ~2,500 lines.  The
+plan's "~200 lines or fewer" target requires two further moves
+that were not enumerated in the original Phase 1A listing:
+
+1. Nine simple expression handlers
+   (`StringLit`, `SetLiteral`, `Subscript`, `Superscript`, `Tuple`,
+   `RelationalImage`, `SequenceLiteral`, `TupleProjection`,
+   `BagLiteral`) that the original Batch 2 (Move 5) listing did not
+   enumerate.  ~250 lines.
+2. The plain-text → LaTeX processing pipeline that implements
+   `TEXT:` / `PURETEXT:` / `LATEX:` emission.  ~1,500 lines, ~25
+   helpers, two `ClassVar` allow-lists.  Self-contained subsystem:
+   takes a `str`, returns a `str`.
+
+These two moves are gated together as Batch 5.
+
+- **Move A** → `codegen/expressions.py` (append; no new file)
+  Handlers for: `StringLit`, `SetLiteral`, `Subscript`,
+  `Superscript`, `Tuple`, `RelationalImage`, `SequenceLiteral`,
+  `TupleProjection`, `BagLiteral`.  Same byte-identical Move
+  Method discipline; the existing `_ExpressionsCodegen` mixin
+  grows by 9 handlers.
+
+- **Move B** → `codegen/text_pipeline.py` (new file)
+  Extract the entire ASCII-to-LaTeX text pipeline as one cohesive
+  unit:
+
+  - **Orchestrator** — `_process_paragraph_text`
+  - **Operator conversion** — `_convert_operators_bare`,
+    `_convert_unicode_symbols`, `_convert_comparison_operators`,
+    `_convert_sequence_literals`, `_convert_operators_to_latex`
+  - **Dollar-math handling** — `_pre_sanitise_dollars`,
+    `_restore_dollar_sanitise`, `_process_explicit_dollar_math`
+  - **Pattern processors** — `_process_citations`,
+    `_process_manual_markup`, `_process_logical_formulas`,
+    `_process_parenthesized_logic`, `_process_standalone_keywords`,
+    `_process_superscripts`, `_process_relational_image`,
+    `_process_set_expressions`, `_process_quantifiers`,
+    `_process_type_declarations`, `_process_function_applications`,
+    `_process_simple_expressions`, `_process_inline_math`
+  - **LaTeX command policy** — `_classify_latex_commands`,
+    `_ALLOWED_LATEX_COMMANDS`, `_BLOCKED_LATEX_COMMANDS`
+  - **Balanced-bracket finders** — `_find_balanced_braces`,
+    `_find_balanced_parens`, `_find_balanced_angles`
+  - **Text escaping** — `_replace_outside_math`,
+    `_escape_underscores_outside_math`,
+    `_escape_special_chars_outside_math`, `_escape_latex`,
+    `_escape_latex_text`
+
+  This is the largest single extract in Phase 1.  Splitting it is
+  not worth the churn: the pipeline is leaf-cohesive (every helper
+  calls only its peers and a few generic `re`/`str` operations)
+  and is consumed by exactly three callers (`_generate_paragraph`,
+  `_generate_pure_paragraph`, and `_generate_part`), all of which
+  live in `text_blocks.py` and reach into the pipeline through
+  `self._process_paragraph_text`.
+
+**Gate 5 (Phase 1A close-out).** `make check && make test-e2e &&
+make refactor-diff` must all pass.  Commit as a single batch:
+`refactor(codegen): close out Phase 1A — atoms and text pipeline`.
+
 ### Finalisation of Phase 1A
 
-After Move 11, `latex_gen.py` should be ~200 lines or fewer — it
-contains only the `LaTeXGenerator` class shell, its `__init__`, and
-top-level orchestration (`generate_document`, `generate_expr` entry,
-state initialisation).  Optional: rename `latex_gen.py` to
-`codegen/__init__.py` proper and update every import site.  Defer
-this rename to a final clean-up commit so the diff stays mechanical.
+After Move B, `latex_gen.py` should be ~250 lines or fewer — it
+contains only the `LaTeXGenerator` class shell, its `__init__`,
+top-level orchestration (`generate_document`, `generate_fragment`,
+`_generate_document_items_with_consolidation`, `_generate_zed_content`),
+the three `_has_line_breaks*` helpers, the small zed-mode
+formatting helpers (`_get_*_separator`, `_get_type_latex`,
+`_get_closure_operator_latex`, `_format_multiword_identifier`,
+`_get_indentation`), and the three operator-table `ClassVar`s that
+are still referenced from the orchestrator (`UNARY_OPS`,
+`QUANTIFIERS`, `_FUZZ_FUNCTION_LIKE_UNARY`).
+
+Optional: rename `latex_gen.py` to `codegen/__init__.py` proper
+and update every import site.  Defer this rename to a final
+clean-up commit so the diff stays mechanical.
 
 ## Phase 1B — `parser.py` split (Moves 12–22)
 
