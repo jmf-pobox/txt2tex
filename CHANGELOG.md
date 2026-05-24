@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-05-24
+
+### Added
+
+- **`--version` / `-V` CLI flag** (#46) — prints `txt2tex <version>` using
+  the package `__version__` constant.  Useful when debugging install or
+  cache issues to confirm which version is actually loaded.
+
 ## [1.3.0] - 2026-05-24
 
 ### Added
