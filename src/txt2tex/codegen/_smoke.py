@@ -1,23 +1,14 @@
-"""Smoke-test mixin — verifies the mixin dispatch pattern with one handler.
+"""Smoke-test mixin — placeholder retained after Move 0.
 
-This module will be absorbed into text_blocks.py in Batch 3 (Move 8).
-It exists only to validate that the codegen/ mixin infrastructure works
-before Batch 1 begins.
+The PageBreak handler that originally lived here was moved to
+``text_blocks.py`` in Batch 3.  This stub remains so the import chain
+in ``codegen/__init__.py`` does not need rewriting mid-phase.
 """
 
 from __future__ import annotations
 
-from txt2tex.ast_nodes import PageBreak
-from txt2tex.codegen._dispatch import item_register
+from txt2tex.codegen._dispatch import CodegenDispatch
 
 
-class _SmokeTestMixin:  # pyright: ignore[reportUnusedClass]
-    """Single-handler mixin used to validate the mixin dispatch infrastructure."""
-
-    @item_register.register(PageBreak)
-    def _generate_pagebreak(self, node: PageBreak) -> list[str]:
-        """Generate LaTeX for page break.
-
-        PAGEBREAK: inserts a page break in PDF output.
-        """
-        return [r"\newpage", ""]
+class _SmokeTestMixin(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
+    """Empty placeholder; behaviour now lives in _TextBlocksCodegen."""

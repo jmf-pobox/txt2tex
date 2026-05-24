@@ -59,6 +59,12 @@ class CodegenDispatch:
         _in_z_paragraph: bool
         _in_inline_part: bool
         _quantifier_depth: int
+        _warn_overflow: bool
+        _overflow_warnings: list[str]
+        _overflow_threshold: int
+        _first_part_in_solution: bool
+        parts_format: str
+        toc_parts: bool
         use_fuzz: bool
         BINARY_OPS: ClassVar[dict[str, str]]
         UNARY_OPS: ClassVar[dict[str, str]]
@@ -92,6 +98,14 @@ class CodegenDispatch:
         def _quantifier_needs_parens(
             self, node: Quantifier, parent: Expr | None
         ) -> bool: ...
+        def _escape_latex(self, text: str) -> str: ...
+        def _escape_latex_text(self, text: str) -> str: ...
+        def _process_paragraph_text(self, text: str) -> str: ...
+        def _convert_operators_to_latex(self, text: str) -> str: ...
+        def _generate_document_items_with_consolidation(
+            self, items: list[DocumentItem]
+        ) -> list[str]: ...
+        def _emit_attr_name(self, name: str) -> str: ...
 
     @singledispatchmethod
     def generate_document_item(self, item: DocumentItem) -> list[str]:

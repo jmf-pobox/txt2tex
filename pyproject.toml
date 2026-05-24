@@ -140,6 +140,8 @@ ignore = [
 "src/txt2tex/cli.py" = ["T20"]
 "src/txt2tex/compile.py" = ["T20"]
 "src/txt2tex/repl.py" = ["T20"]
+# Allow print in overflow emit_warnings - intentional user-facing warning emission
+"src/txt2tex/codegen/overflow.py" = ["ARG002", "T20"]
 # Allow unused parent arg in singledispatch visitor pattern
 "src/txt2tex/latex_gen.py" = ["ARG002"]
 "src/txt2tex/codegen/*.py" = ["ARG002"]
