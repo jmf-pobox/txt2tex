@@ -17,19 +17,20 @@ Each stage has a clear input and output type, and the boundaries
 between stages are clean: nothing in `latex_gen.py` reaches back into
 the lexer, nothing in `parser.py` knows about LaTeX output.
 
-Inside the stages, however, there is essentially no further structure:
+Inside the stages, however, there is essentially no further structure.
+Approximate line counts as of v1.3.1:
 
 | Module | Lines | Internal organisation |
 |---|---:|---|
-| `latex_gen.py` | 6,848 | one class, ~150 methods |
-| `parser.py` | 6,367 | one class, ~120 methods |
-| `lexer.py` | 1,632 | one class |
-| `ast_nodes.py` | 1,455 | flat list of `@dataclass(frozen=True)` definitions |
-| `cli.py` | 350 | one function |
+| `latex_gen.py` | ~6.8 k | one class, ~150 methods |
+| `parser.py` | ~6.4 k | one class, ~120 methods |
+| `lexer.py` | ~1.6 k | one class |
+| `ast_nodes.py` | ~1.5 k | flat list of `@dataclass(frozen=True)` definitions |
+| `cli.py` | ~350 | one function |
 
 The `latex_gen.py` file already uses `@generate_expr.register(NodeType)`
 for dispatch — so the *machinery* for modular handlers is there, but
-every registered handler lives in the same 6,848-line file.  The
+every registered handler lives in that single file.  The
 parser is the same: clean recursive-descent design, but all 120
 production rules in one class with no internal boundaries.
 
@@ -75,7 +76,7 @@ language feature being lowered (`es2015.ts`, `es2017.ts`,
 via `@singledispatch`; sharding handlers across files is a literal
 file-move with no behaviour change, and the resulting boundaries
 match how a reader navigates the code ("where is GROUP rendered?"
-→ `codegen/algebra.py`, not "grep `Group` in a 6,848-line file").
+→ `codegen/algebra.py`, not "grep `Group` in a single multi-thousand-line file").
 
 ### 2. Pass-based pipeline
 
