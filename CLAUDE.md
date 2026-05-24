@@ -219,8 +219,45 @@ Every code change follows this pipeline. Steps are ordered.
 1. Commit with conventional message format (`type(scope): description`).
    `make check` must pass.
 2. Push branch, create PR.
-3. Watch CI; resolve all comments. No "pre-existing" excuses.
-4. Merge.
+3. Watch CI.  Wait for the bot review (Copilot or Cursor Bugbot) to
+   land.  If review threads are absent, the bot has not finished —
+   wait for it.
+4. **Diligence on the bot review — the only path to merge.**
+
+   **Case A — bot opens line-level threads.**  For every thread:
+   - Read the comment in full.
+   - Address the issue with a code change, even if the finding is
+     small.  ("Nit-only" findings still get fixed unless they are
+     factually wrong.)
+   - Reply on the thread linking the commit that addressed it.
+   - Resolve the thread via the GraphQL `resolveReviewThread`
+     mutation.
+   Replying to threads automatically creates a `jmf-pobox COMMENTED`
+   review entry, which is what branch protection actually requires.
+
+   **Case B — bot leaves a summary review with no line-level threads
+   (typical for docs-only PRs).**  There is nothing to resolve, but
+   branch protection still expects a maintainer review entry.  Add
+   one explicitly:
+
+   ```bash
+   gh pr review <N> --comment --body "Reviewed. <one-sentence ack>."
+   ```
+
+   This creates the missing `jmf-pobox COMMENTED` review and unblocks
+   the merge.
+
+   **The actual protection rule is:** at least one COMMENTED or
+   APPROVED review entry from a maintainer must exist on the PR.
+   Resolving threads (Case A) creates one as a side effect.  When
+   there are no threads (Case B), the maintainer-side review must be
+   added manually.  Either way, branch protection enforces *engaged
+   review*, not admin workarounds.  **Do not use `--admin` to
+   bypass.**  If `gh pr merge <N> --merge` reports "base branch
+   policy prohibits the merge," the missing piece is either an
+   unresolved thread or a missing maintainer review entry.
+5. Merge with `gh pr merge <N> --merge` (preserves the per-batch
+   history; never `--squash` for refactors or releases).
 
 #### Phase 7: Close
 
