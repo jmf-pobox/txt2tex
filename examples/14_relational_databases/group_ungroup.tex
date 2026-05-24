@@ -1,0 +1,87 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\title{GROUP and UNGROUP}
+\author{txt2tex example}
+\hypersetup{pdftitle={GROUP and UNGROUP},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.2.0}}
+\begin{document}
+
+\maketitle
+
+\begin{zed}[MemberName, GroupID, CourseID]\end{zed}
+
+\begin{schema}{GroupMembers}
+groupId : GroupID \\
+username : MemberName \\
+name : MemberName \\
+email : MemberName
+\end{schema}
+
+\begin{schema}{Enrollment}
+groupId : GroupID \\
+members : \power GroupID
+\end{schema}
+
+\section*{GROUP - Bundle Attributes into a Nested Relation}
+
+\noindent
+$\displaystyle
+\begin{array}{l}
+GroupMembers \mathop{\mathrm{GROUP}} (\{name, email\} \mathop{\mathrm{AS}} contact) \\
+\quad 
+\end{array}$
+
+\bigskip
+
+\noindent
+$\displaystyle
+\begin{array}{l}
+GroupMembers \mathop{\mathrm{GROUP}} (\{username\} \mathop{\mathrm{AS}} members) \\
+\quad 
+\end{array}$
+
+\bigskip
+
+\noindent
+$\mathrm{Project}_{groupId, members}(GroupMembers \mathop{\mathrm{GROUP}} (\{username\} \mathop{\mathrm{AS}} members))$
+
+
+\section*{UNGROUP - Flatten a Nested Relation}
+
+\noindent
+$\displaystyle
+\begin{array}{l}
+GroupMembers \mathop{\mathrm{UNGROUP}} contact \\
+\quad 
+\end{array}$
+
+\bigskip
+
+\noindent
+$\displaystyle
+\begin{array}{l}
+Enrollment \mathop{\mathrm{UNGROUP}} members \\
+\quad 
+\end{array}$
+
+\bigskip
+
+\section*{Combined: GROUP then UNGROUP}
+
+\noindent
+$\displaystyle
+\begin{array}{l}
+GroupMembers \mathop{\mathrm{GROUP}} (\{name, email\} \mathop{\mathrm{AS}} contact) \mathop{\mathrm{UNGROUP}} contact \\
+\quad 
+\end{array}$
+
+\bigskip
+
+\end{document}

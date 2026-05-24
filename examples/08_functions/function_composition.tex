@@ -30,7 +30,7 @@ h : \nat \fun \nat
 \where
 \forall n : \nat @ f(n) = n + 1 \\
 \forall n : \nat @ g(n) = n * 2 \\
-h = f \semi g
+h = f \comp g
 \end{axdef}
 
 \noindent h(n) = g(f(n)) = g(n + 1) = (n + 1) * $2 = 2$n + 2
@@ -61,31 +61,15 @@ h2 = f2 \comp g2
 \section*{Example 3 : Comparison - Forward vs Backward}
 \addcontentsline{toc}{section}{Example 3 : Comparison - Forward vs Backward}
 
-\noindent Forward composition f $\semi$ g:
+\noindent Forward composition f $\semi$ g: Input $\rightarrow$ f $\rightarrow$ g $\rightarrow$ Output (f $\semi$ g)(x) = g(f(x))
 
 \bigskip
 
-\noindent Input $\rightarrow$ f $\rightarrow$ g $\rightarrow$ Output
+\noindent Backward composition f o g: Input $\rightarrow$ g $\rightarrow$ f $\rightarrow$ Output (f o g)(x) = f(g(x))
 
 \bigskip
 
-\noindent (f $\semi$ g)(x) = g(f(x))
-
-\bigskip
-
-\noindent Backward composition f o g:
-
-\bigskip
-
-\noindent Input $\rightarrow$ g $\rightarrow$ f $\rightarrow$ Output
-
-\bigskip
-
-\noindent (f o g)(x) = f(g(x))
-
-\bigskip
-
-\noindent Notice the $reversal :  \semi  applies left-to-right$, o applies right-to-left.
+\noindent Notice the reversal: $\semi$ applies left-to-right, o applies right-to-left.
 
 \bigskip
 
@@ -101,7 +85,7 @@ pipeline : \nat \fun \nat
 \forall n : \nat @ addOne(n) = n + 1 \\
 \forall n : \nat @ double(n) = 2 * n \\
 \forall n : \nat @ square(n) = n * n \\
-pipeline = addOne \semi double \semi square
+pipeline = addOne \comp double \comp square
 \end{axdef}
 
 \noindent pipeline(n) = square(double(addOne(n))) = square(double(n + 1)) = square(2(n + 1)) = (2(n + 1))\textasciicircum$\{\}$2
@@ -119,15 +103,11 @@ rightId : \nat \fun \nat
 \where
 \forall n : \nat @ identity(n) = n \\
 \forall n : \nat @ anyFunc(n) = n * n \\
-leftId = identity \semi anyFunc \\
-rightId = anyFunc \semi identity
+leftId = identity \comp anyFunc \\
+rightId = anyFunc \comp identity
 \end{axdef}
 
-\noindent $leftId = anyFunc$ (identity is left identity for $\semi$)
-
-\bigskip
-
-\noindent $rightId = anyFunc$ (identity is right identity for $\semi$)
+\noindent $leftId = anyFunc$ (identity is left identity for $\semi$) $rightId = anyFunc$ (identity is right identity for $\semi$)
 
 \bigskip
 
@@ -156,8 +136,8 @@ comp2 : \nat \fun \nat
 \forall n : \nat @ f3(n) = n + 1 \\
 \forall n : \nat @ g3(n) = n * 2 \\
 \forall n : \nat @ h3(n) = n * n \\
-comp1 = (f3 \semi g3) \semi h3 \\
-comp2 = f3 \semi (g3 \semi h3)
+comp1 = (f3 \comp g3) \comp h3 \\
+comp2 = f3 \comp (g3 \comp h3)
 \end{axdef}
 
 \noindent $comp1 = comp2$ for all inputs.
@@ -174,7 +154,7 @@ composed : \nat \pfun \nat
 \where
 \forall n : \nat @ n * n = n \implies safeSqrt(n) = n \\
 \forall n : \nat @ addTen(n) = n + 10 \\
-composed = safeSqrt \semi addTen
+composed = safeSqrt \comp addTen
 \end{axdef}
 
 \noindent composed is only defined where safeSqrt is defined, then adds 10 to the result.
@@ -192,7 +172,7 @@ composed = safeSqrt \semi addTen
 parent : Person \rel Person \\
 grandparent : Person \rel Person
 \where
-grandparent = parent \semi parent
+grandparent = parent \comp parent
 \end{axdef}
 
 \noindent grandparent relates a person to their grandparents via two parent links.
@@ -208,7 +188,7 @@ trim : \seq~Char \fun \seq~Char \\
 reverse : \seq~Char \fun \seq~Char \\
 process : \seq~Char \fun \seq~Char
 \where
-process = toLowerCase \semi trim \semi reverse
+process = toLowerCase \comp trim \comp reverse
 \end{axdef}
 
 \noindent Process a string by converting to lowercase, trimming whitespace, then reversing.
@@ -225,7 +205,7 @@ combined : \nat \fun \nat
 \where
 \forall n : \nat @ squareFunc(n) = n * n \\
 \forall n : \nat @ tripleFunc(n) = 3 * n \\
-combined = squareFunc \semi tripleFunc
+combined = squareFunc \comp tripleFunc
 \end{axdef}
 
 \noindent Combined applies squareFunc first, then triples the result.
@@ -240,7 +220,7 @@ encrypt : \seq~Char \fun \seq~Char \\
 decrypt : \seq~Char \fun \seq~Char \\
 identity\_check : \seq~Char \fun \seq~Char
 \where
-identity\_check = encrypt \semi decrypt
+identity\_check = encrypt \comp decrypt
 \end{axdef}
 
 \noindent If encrypt and decrypt are inverses, then identity\_check should be the identity function.
@@ -250,7 +230,7 @@ identity\_check = encrypt \semi decrypt
 \section*{Example 12 : Partial Composition}
 \addcontentsline{toc}{section}{Example 12 : Partial Composition}
 
-\noindent When composing f : $A \fun B$ and $g : C$ $\fun$ D, we need ran f subseteq dom g.
+\noindent When composing f : $A \fun B$ and g : $C \fun D$, we need ran f subseteq dom g.
 
 \bigskip
 
@@ -261,7 +241,7 @@ h4 : \nat \pfun \nat
 \where
 f4 = \{1 \mapsto 10, 2 \mapsto 20\} \\
 g4 = \{10 \mapsto 100, 20 \mapsto 200\} \\
-h4 = f4 \semi g4
+h4 = f4 \comp g4
 \end{axdef}
 
 \noindent h4 = $\{1 \mapsto 100, 2 \mapsto 200\}$. Composition is defined where ranges align.
@@ -271,26 +251,14 @@ h4 = f4 \semi g4
 \section*{Example 13 : Monoid Structure}
 \addcontentsline{toc}{section}{Example 13 : Monoid Structure}
 
-\noindent Functions from $A \fun A$ with composition form a monoid:
-
-\bigskip
-
-\noindent 1. Composition is associative: (f $\semi$ g) $\semi$ $h = f$ $\semi$ (g $\semi$ h)
-
-\bigskip
-
-\noindent 2. Identity $element : id(x)$ = x, id $\semi$ $f = f = f$ $\semi$ id
-
-\bigskip
-
-\noindent 3. Closure: composing $A \fun A$ functions gives another $A \fun A$ function
+\noindent Functions from $A \fun A$ with composition form a monoid: 1. Composition is associative: (f $\semi$ g) $\semi$ $h = f$ $\semi$ (g $\semi$ h) 2. Identity element: id(x) = x, id $\semi$ $f = f = f$ $\semi$ id 3. Closure: composing $A \fun A$ functions gives another $A \fun A$ function
 
 \bigskip
 
 \section*{Example 14 : Practical Example - Data Processing Pipeline}
 \addcontentsline{toc}{section}{Example 14 : Practical Example - Data Processing Pipeline}
 
-\noindent In practice, you might compose functions to create data processing $pipelines : validate  \semi  process  \semi  format. Each stage transforms data through$ a series of operations. The notation f $\semi$ g $\semi$ h means "apply f, then g, then h" which creates a pipeline from input to output.
+\noindent In practice, you might compose functions to create data processing pipelines: validate $\semi$ process $\semi$ format. Each stage transforms data through a series of operations. The notation f $\semi$ g $\semi$ h means "apply f, then g, then h" which creates a pipeline from input to output.
 
 \bigskip
 
@@ -317,7 +285,7 @@ doubleIt : \nat \fun \nat \\
 quadrupleIt : \nat \fun \nat
 \where
 \forall n : \nat @ doubleIt(n) = 2 * n \\
-quadrupleIt = doubleIt \semi doubleIt
+quadrupleIt = doubleIt \comp doubleIt
 \end{axdef}
 
 \noindent quadrupleIt(n) = doubleIt(doubleIt(n)) = 2 * (2 * n) = 4n
@@ -332,7 +300,7 @@ increment : \nat \fun \nat \\
 addFive : \nat \fun \nat
 \where
 \forall n : \nat @ increment(n) = n + 1 \\
-addFive = increment \semi increment \semi increment \semi increment \semi increment
+addFive = increment \comp increment \comp increment \comp increment \comp increment
 \end{axdef}
 
 \noindent Composing increment 5 times gives addFive.
@@ -346,11 +314,7 @@ addFive = increment \semi increment \semi increment \semi increment \semi increm
 
 \bigskip
 
-\noindent Instead $of : result$ = h(g(f(x)))
-
-\bigskip
-
-\noindent $Use : pipeline$ = f $\semi$ g $\semi$ h; $result = pipeline$(x)
+\noindent Instead of: $result = h$(g(f(x))) Use: $pipeline = f$ $\semi$ g $\semi$ h; $result = pipeline$(x)
 
 \bigskip
 
@@ -361,35 +325,7 @@ addFive = increment \semi increment \semi increment \semi increment \semi increm
 \section*{Example 19 : Best Practices}
 \addcontentsline{toc}{section}{Example 19 : Best Practices}
 
-\noindent When using composition:
-
-\bigskip
-
-\noindent 1. Choose forward ($\semi$) or backward (o) consistently in your codebase
-
-\bigskip
-
-\noindent 2. Document the data flow direction
-
-\bigskip
-
-\noindent 3. Break complex pipelines into named intermediate steps
-
-\bigskip
-
-\noindent 4. Type-check that domains and ranges align
-
-\bigskip
-
-\noindent 5. Use composition to create reusable pipelines
-
-\bigskip
-
-\noindent 6. Test individual functions before composing them
-
-\bigskip
-
-\noindent 7. $Remember :  \semi  reads left-to-right$ (natural for pipelines), o reads right-to-left (traditional math notation)
+\noindent When using composition: 1. Choose forward ($\semi$) or backward (o) consistently in your codebase 2. Document the data flow direction 3. Break complex pipelines into named intermediate steps 4. Type-check that domains and ranges align 5. Use composition to create reusable pipelines 6. Test individual functions before composing them 7. Remember: $\semi$ reads left-to-right (natural for pipelines), o reads right-to-left (traditional math notation)
 
 \bigskip
 

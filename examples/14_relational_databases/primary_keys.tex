@@ -1,0 +1,60 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\title{Primary Keys in Relational Schemas}
+\author{txt2tex example}
+\hypersetup{pdftitle={Primary Keys in Relational Schemas},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.2.0}}
+\begin{document}
+
+\maketitle
+
+\begin{zed}[BookId, MemberId, LoanId, ISBN]\end{zed}
+
+\section*{Single Primary Key}
+
+\begin{schema}{Book}
+bookId : BookId \\
+isbn : ISBN \\
+pages : \nat \\
+year : \nat
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Book}) = \{bookId\}$
+
+\smallskip
+
+\begin{schema}{Member}
+memberId : MemberId \\
+age : \nat
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Member}) = \{memberId\}$
+
+\smallskip
+
+\begin{schema}{Loan}
+loanId : LoanId \\
+bookId : BookId \\
+memberId : MemberId \\
+daysOut : \nat
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Loan}) = \{loanId\}$
+
+\smallskip
+
+\section*{Composite Primary Key}
+
+\begin{schema}{LoanHistory}
+bookId : BookId \\
+memberId : MemberId
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{LoanHistory}) = \{bookId, memberId\}$
+
+\smallskip
+
+\end{document}

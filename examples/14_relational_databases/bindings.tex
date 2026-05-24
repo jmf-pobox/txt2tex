@@ -1,0 +1,63 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\title{Z Binding Calculus}
+\author{txt2tex example}
+\hypersetup{pdftitle={Z Binding Calculus},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.2.0}}
+\begin{document}
+
+\maketitle
+
+\begin{zed}[TrackId, AlbumId, ArtistId]\end{zed}
+
+\begin{schema}{Track}
+trackId : TrackId \\
+albumId : AlbumId \\
+duration : \nat
+\end{schema}
+
+\begin{schema}{Album}
+albumId : AlbumId \\
+artistId : ArtistId \\
+year : \nat \\
+tracks : \nat
+\end{schema}
+
+\section*{Atomic Binding}
+
+\noindent
+$\lblot~trackId == t.trackId~\rblot$
+
+
+\section*{Binding in Set Comprehension}
+
+\noindent
+$\{~ t : Track | t.duration < 180 @ \lblot~trackId == t.trackId~\rblot ~\}$
+
+
+\section*{Multi-Component Binding}
+
+\noindent
+$\lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot$
+
+
+\section*{Multi-Variable Comprehension with Binding}
+
+\noindent
+$\{~ t : Track ; a : Album | t.albumId = a.albumId @ \lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot ~\}$
+
+
+\section*{Empty Binding}
+
+\noindent
+$\lblot~\rblot$
+
+
+\end{document}

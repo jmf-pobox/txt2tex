@@ -1,0 +1,70 @@
+// ============================================================================
+// Example: Delta and Xi Schema Inclusion
+// ============================================================================
+// Demonstrates:
+//   - Delta S: before/after state convention (Z RM §3.7)
+//   - Xi S: read-only operation convention (Z RM §5.2)
+//   - Bare schema inclusion: bringing components into scope
+//   - Mixed declarations (inclusions and typed fields on same schema)
+//
+// The Airline booking system fragment shows a realistic state-and-operation
+// pattern: Delta Airline includes the full before/after state, bare inclusion
+// brings additional schemas into scope, and typed declarations add the inputs.
+// ============================================================================
+
+=== Airline Booking State ===
+
+TEXT: Define the airline state schema, which holds the set of routes and
+TEXT: the bookings relation.
+
+zed
+  given Airline, BookingId, CustomerId, RouteId
+end
+
+schema AirlineState
+  routes : P RouteId
+  bookings : BookingId +-> CustomerId cross RouteId
+end
+
+TEXT: A read-only operation that queries whether a route exists uses Xi to
+TEXT: signal that the state is unchanged.
+
+schema RouteExists
+  Xi AirlineState
+  routeId? : RouteId
+  result! : N
+where
+  routeId? elem routes
+  result! = 1
+end
+
+TEXT: An operation that adds a booking uses Delta to include both the before-
+TEXT: state and the after-state. The primes on bookings' and routes' are Z
+TEXT: convention for the output state; here bookings' is added as a typed
+TEXT: declaration because the assignment is the predicate.
+
+schema AddBooking
+  Delta AirlineState
+  bookingId? : BookingId
+  customerId? : CustomerId
+  routeId? : RouteId
+where
+  bookingId? notin dom bookings
+  routeId? elem routes
+end
+
+=== Stack with Generic Inclusion ===
+
+TEXT: Schema inclusion works with generic types. Delta Stack[N] brings in
+TEXT: the before-and-after state of a stack instantiated over the naturals.
+
+schema StackOp[X]
+  delta : N
+end
+
+schema PushNat
+  Delta StackOp[N]
+  value? : N
+where
+  delta > 0
+end

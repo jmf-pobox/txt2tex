@@ -4,7 +4,7 @@ This feature allows multiple declarations to be specified on one line using
 semicolons as separators, which is required for fuzz compatibility.
 """
 
-from txt2tex.ast_nodes import AxDef, Document, GenDef, Schema
+from txt2tex.ast_nodes import AxDef, Declaration, Document, GenDef, Schema
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
@@ -25,6 +25,7 @@ class TestSemicolonDeclarationsParsing:
         assert isinstance(ast.items[0], GenDef)
         gendef = ast.items[0]
         assert len(gendef.declarations) == 1
+        assert isinstance(gendef.declarations[0], Declaration)
         assert gendef.declarations[0].variable == "f"
 
     def test_gendef_two_declarations_with_semicolon(self) -> None:
@@ -39,6 +40,8 @@ class TestSemicolonDeclarationsParsing:
         assert isinstance(ast.items[0], GenDef)
         gendef = ast.items[0]
         assert len(gendef.declarations) == 2
+        assert isinstance(gendef.declarations[0], Declaration)
+        assert isinstance(gendef.declarations[1], Declaration)
         assert gendef.declarations[0].variable == "f"
         assert gendef.declarations[1].variable == "g"
 
@@ -54,6 +57,9 @@ class TestSemicolonDeclarationsParsing:
         assert isinstance(ast.items[0], GenDef)
         gendef = ast.items[0]
         assert len(gendef.declarations) == 3
+        assert isinstance(gendef.declarations[0], Declaration)
+        assert isinstance(gendef.declarations[1], Declaration)
+        assert isinstance(gendef.declarations[2], Declaration)
         assert gendef.declarations[0].variable == "f"
         assert gendef.declarations[1].variable == "g"
         assert gendef.declarations[2].variable == "h"
@@ -70,6 +76,8 @@ class TestSemicolonDeclarationsParsing:
         assert isinstance(ast.items[0], AxDef)
         axdef = ast.items[0]
         assert len(axdef.declarations) == 2
+        assert isinstance(axdef.declarations[0], Declaration)
+        assert isinstance(axdef.declarations[1], Declaration)
         assert axdef.declarations[0].variable == "x"
         assert axdef.declarations[1].variable == "y"
 
@@ -99,6 +107,8 @@ class TestSemicolonDeclarationsParsing:
         assert isinstance(ast.items[0], Schema)
         schema = ast.items[0]
         assert len(schema.declarations) == 2
+        assert isinstance(schema.declarations[0], Declaration)
+        assert isinstance(schema.declarations[1], Declaration)
         assert schema.declarations[0].variable == "x"
         assert schema.declarations[1].variable == "y"
 

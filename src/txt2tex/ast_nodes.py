@@ -1,8 +1,17 @@
-"""AST node definitions for txt2tex parser."""
+"""AST node definitions for txt2tex parser.
+
+Nodes use ``@dataclass(frozen=True)``.  This protects against accidental
+attribute rebinding; it does *not* deep-freeze ``list``-valued fields.
+Calling ``hash()`` on a node that carries a mutable list raises
+``TypeError`` — the correct behaviour, since these nodes are never used
+as dict keys or set elements.  A future call site that needs hashability
+should switch the relevant field to a ``tuple``.
+"""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum, auto
 from typing import Literal
 
 
@@ -57,7 +66,44 @@ class Number(ASTNode):
     value: str
 
 
+@dataclass(frozen=True)
+class StringLit(ASTNode):
+    """String literal node ('quoted value').
+
+    Carries the content between the single quotes, with escape sequences
+    already resolved (\\' → ').  The generator emits the Z-convention
+    LaTeX-quote form: \\text{`value'}.
+    """
+
+    value: str
+
+
 # Quantifier expression nodes
+
+
+@dataclass(frozen=True)
+class SchemaBinding(ASTNode):
+    """Schema-text binding in a quantifier (Z RM §3.10).
+
+    Used when a quantifier binds a schema name rather than individual
+    variables with a domain.  The four forms are:
+
+    - decoration="Delta"  →  exists Delta S | P    (state-change)
+    - decoration="Xi"     →  exists Xi S | P       (read-only)
+    - decoration="None"   →  exists S | P          (schema-as-declaration)
+    - decoration="Prime"  →  exists S' | P         (primed schema)
+
+    The schema_name field carries the raw identifier value, including any
+    prime suffix already baked in by the lexer (e.g., ``"S'"`` for the
+    primed form).  The decoration field records the explicit keyword prefix,
+    if any.
+
+    fuzz expands the invariant; the engine emits the schema reference
+    literally (jms ruling 2026-05-21).
+    """
+
+    decoration: Literal["Delta", "Xi", "None", "Prime"]
+    schema_name: str  # Raw identifier (e.g., "S", "S'", "BoxOffice")
 
 
 @dataclass(frozen=True)
@@ -65,13 +111,19 @@ class Quantifier(ASTNode):
     """Quantifier node (forall, exists, exists1, mu).
 
     Supports:
-        - Multiple variables with shared domain
+        - Multiple variables with shared domain (value_binding path)
+        - Schema-text quantification (schema_binding path, Z RM §3.10)
         - Mu-operator (definite description)
         - Mu with expression part (mu x : X | P . E)
         - Tuple patterns for destructuring
         - Bullet separator for all quantifiers
 
-    Examples:
+    Exactly one of ``value_binding`` and ``schema_binding`` is populated.
+    When ``schema_binding`` is not None the ``variables``, ``domain``, and
+    ``tuple_pattern`` fields are unused (empty/None) and the ``body`` carries
+    the predicate after ``|``.
+
+    Examples (value-binding path):
     - forall x : N | pred  -> variables=["x"], domain=N, body=pred
     - forall x : N | constraint . body -> body=constraint, expression=body
     - forall x, y : N | pred -> variables=["x", "y"], domain=N, body=pred
@@ -80,6 +132,13 @@ class Quantifier(ASTNode):
     - exists1 x : N | pred -> quantifier="exists1", variables=["x"]
     - mu x : N | pred -> quantifier="mu", body=pred, expression=None
     - mu x : N | pred . expr -> quantifier="mu", body=pred, expression=expr
+
+    Examples (schema-binding path):
+    - exists Delta S | P -> schema_binding=SchemaBinding("Delta", "S"), body=P
+    - exists Xi S | P    -> schema_binding=SchemaBinding("Xi", "S"), body=P
+    - exists S | P       -> schema_binding=SchemaBinding("None", "S"), body=P
+    - exists S' | P      -> schema_binding=SchemaBinding("Prime", "S'"), body=P
+    - forall Delta S | P -> schema_binding=SchemaBinding("Delta", "S"), body=P
 
     Note on expression field semantics:
     - For mu: expression is the term/value to select
@@ -96,6 +155,7 @@ class Quantifier(ASTNode):
     line_break_after_pipe: bool = False  # True if \ continuation after |
     line_break_after_bullet: bool = False  # True if line break after . separator
     tuple_pattern: Expr | None = None  # Tuple pattern for destructuring
+    schema_binding: SchemaBinding | None = None  # Schema-text binding (Z RM §3.10)
 
 
 @dataclass(frozen=True)
@@ -136,6 +196,9 @@ class SetComprehension(ASTNode):
     domain: Expr | None  # Optional domain (e.g., N, Z, P X)
     predicate: Expr | None  # The condition/predicate (can be None)
     expression: Expr | None  # Optional expression (if present, set by expression)
+    # Additional semicolon-separated declaration groups for multi-typed bindings:
+    # { s : Ship; c : Class | ... } → extra_declarations=[("c", Class)]
+    extra_declarations: list[tuple[str, Expr]] | None = None
 
 
 @dataclass(frozen=True)
@@ -288,6 +351,116 @@ class GenericInstantiation(ASTNode):
 
     base: Expr  # The generic type being instantiated
     type_params: list[Expr]  # Type parameters (at least one)
+
+
+@dataclass(frozen=True)
+class SchemaCompose(ASTNode):
+    """Schema composition node (Z RM §3.11).
+
+    Represents ``S ; T`` — combine two operations sequentially.
+
+    The composed schema ``S ; T`` connects the output state of S to the
+    input state of T by identifying primed components of S with unprimed
+    components of T, then hiding the intermediate state.
+
+    Examples:
+    - OpA ; OpB      -> left=Identifier("OpA"), right=Identifier("OpB")
+    - (S ; T) ; U   -> nested composition (left-associative)
+
+    LaTeX rendering: S \\semi T
+    """
+
+    left: Expr
+    right: Expr
+
+
+@dataclass(frozen=True)
+class SchemaPipe(ASTNode):
+    """Schema piping node (Z RM §3.11).
+
+    Represents ``S >> T`` — pipeline two operations output-to-input.
+
+    Piping connects the output of S to the input of T by identifying the
+    output channel of S (decorated with ``!``) with the input channel of T
+    (decorated with ``?``), then hiding the communication channels.
+
+    Examples:
+    - Send >> Receive  -> left=Identifier("Send"), right=Identifier("Receive")
+
+    LaTeX rendering: S \\pipe T
+    """
+
+    left: Expr
+    right: Expr
+
+
+@dataclass(frozen=True)
+class SchemaHide(ASTNode):
+    """Schema hiding node (Z RM §3.11).
+
+    Represents ``S hide (x, y)`` — existentially quantify components.
+
+    Hiding removes the named components from the signature of S, replacing
+    them with existential quantification in the predicate part.
+
+    Examples:
+    - S hide (x)         -> schema=Identifier("S"), names=["x"]
+    - S hide (x, y, z)   -> schema=Identifier("S"), names=["x", "y", "z"]
+
+    LaTeX rendering: S \\hide (x, y)
+    """
+
+    schema: Expr
+    names: list[str]
+
+
+@dataclass(frozen=True)
+class SchemaProject(ASTNode):
+    """Schema projection node (Z RM §3.11).
+
+    Represents ``S project T`` — project schema S onto the signature of T.
+
+    The result is the schema with the same predicate as S but restricted to
+    the components declared in T.
+
+    Examples:
+    - S project T   -> left=Identifier("S"), right=Identifier("T")
+
+    LaTeX rendering: S \\project T
+    """
+
+    left: Expr
+    right: Expr
+
+
+@dataclass(frozen=True)
+class SchemaRename(ASTNode):
+    """Schema renaming node (Z RM §3.11).
+
+    Represents ``S[new/old, ...]`` — produce a schema identical to S except
+    that each component named ``old`` is renamed to ``new``.
+
+    Per Z RM §3.11 the NEW name appears first, the OLD name second.
+
+    The schema expression is typically a plain (possibly decorated) Identifier.
+    The ``pairs`` list holds ``(new_name, old_name)`` tuples in source order;
+    at least one pair is required.
+
+    Examples:
+    - S[a/b]         -> schema=Identifier("S"),  pairs=[("a", "b")]  # new=a, old=b
+    - S[a/b, c/d]    -> schema=Identifier("S"),  pairs=[("a", "b"), ("c", "d")]
+    - S'[a/b]        -> schema=Identifier("S'"), pairs=[("a", "b")]
+    - S[a'/b]        -> schema=Identifier("S"),  pairs=[("a'", "b")]
+
+    Disambiguation from GenericInstantiation: the parser scans the bracket
+    contents at depth 0 before committing.  If any ``/`` token appears, this
+    node is constructed; otherwise GenericInstantiation is constructed.
+
+    LaTeX rendering: schema_repr[new/old, ...]
+    """
+
+    schema: Expr  # Schema reference (typically a decorated Identifier)
+    pairs: list[tuple[str, str]]  # (new_name, old_name) per Z RM §3.11, at least one
 
 
 # Range node
@@ -448,12 +621,286 @@ class GuardedCases(ASTNode):
     branches: list[GuardedBranch]  # List of conditional branches
 
 
+@dataclass(frozen=True)
+class Theta(ASTNode):
+    r"""θ-expression (Z RM §3.10).
+
+    ``theta S`` constructs the binding whose components are the in-scope
+    variables matching schema S's signature.  The schema reference is
+    typically an Identifier, optionally Phase-0 decorated (e.g.,
+    Identifier("Booking'") for ``theta Booking'``).
+
+    Examples:
+    - theta S       -> expr=Identifier("S")
+    - theta S'      -> expr=Identifier("S'")
+    - theta Booking -> expr=Identifier("Booking")
+
+    LaTeX rendering: \theta S  (Greek letter, no macro change needed)
+    """
+
+    expr: Expr  # Schema reference (typically a decorated Identifier)
+
+
+@dataclass(frozen=True)
+class SchemaText(ASTNode):
+    r"""Inline schema text in a horizontal definition (Z RM §3.8).
+
+    Written as ``[ decl-list | pred-list ]`` on the RHS of a ``defs``
+    paragraph.  Combines a declaration section with an optional predicate
+    section in a single bracket form.
+
+    Examples:
+    - [ x, y : N | x < y ]
+      -> declarations=[Declaration("x", N), Declaration("y", N)]
+         predicates=[BinaryOp("<", x, y)]
+    - [ x : N | x > 0; x < 100 ]
+      -> declarations=[Declaration("x", N)]
+         predicates=[BinaryOp(">", x, 0), BinaryOp("<", x, 100)]
+
+    LaTeX rendering: [ decl1; decl2 | pred1 \land pred2 ]
+
+    Note: ``predicates`` is a flat list.  Z RM §3.6 separates predicates
+    within a schema text with ``;``; those are collected here in order.
+    Blank-line grouping (for ``\also`` generation) is not applicable to
+    the inline form, so no nested list structure is needed.
+    """
+
+    declarations: list[Declaration | SchemaInclusion]
+    predicates: list[Expr]  # Flat list; ';' separated in source
+
+
+# Aggregator support (Phase 4.2 — GROUP aggregate form)
+
+
+class Aggregator(Enum):
+    """Aggregation function names for the GROUP aggregate form."""
+
+    COUNT = auto()
+    SUM = auto()
+    AVG = auto()
+    MIN = auto()
+    MAX = auto()
+    MEDIAN = auto()
+
+    def label(self) -> str:
+        """Return the display label used in \\mathrm{...} output."""
+        return self.name.capitalize()
+
+
+@dataclass(frozen=True)
+class AggregatorClause(ASTNode):
+    """Single aggregator application inside a GROUP aggregate expression.
+
+    Represents ``Count(attr) as alias``.  The rendered form is
+    ``\\mathrm{Count}(attr)~\\mathrm{as}~alias``.
+    """
+
+    agg: Aggregator
+    attr: str  # Single attribute identifier (no nested expressions)
+    alias: str  # Name the aggregated column receives in the output relation
+
+
+# Relational algebra nodes (Phase 2.2)
+
+
+@dataclass(frozen=True)
+class Restrict(ASTNode):
+    """Relational restriction (sigma) node.
+
+    Represents sigma[predicate](relation) — select tuples satisfying predicate.
+
+    Example:
+    - sigma[bore >= 16](Class) -> predicate=(bore >= 16), relation=Class
+    """
+
+    predicate: Expr
+    relation: Expr
+
+
+@dataclass(frozen=True)
+class Project(ASTNode):
+    """Relational projection (pi) node.
+
+    Represents pi[A, B](relation) — keep only named attributes.
+
+    Example:
+    - pi[class, country](Class) -> attrs=["class", "country"], relation=Class
+    """
+
+    attrs: list[str]
+    relation: Expr
+
+
+@dataclass(frozen=True)
+class RelationRename(ASTNode):
+    """Relation renaming node (Z RM §3.11).
+
+    Represents ``R[new/old, ...]`` — rename attributes of a relation.
+
+    Per Z RM §3.11 the NEW name appears first, the OLD name second.
+    The ``pairs`` list holds ``(new_name, old_name)`` tuples in source order.
+
+    The ``relation`` field accepts any expression (compound operands supported,
+    per jra decision A, 2026-05-23).  Examples:
+
+    - R[b/a]                            -> relation=Identifier("R"), pairs=[("b", "a")]
+    - R[b/a, d/c]   -> relation=Identifier("R"), pairs=[("b", "a"), ("d", "c")]
+    - (pi[x](R))[b/a]                   -> relation=Project(...), pairs=[("b", "a")]
+    - (pi[t](sigma[w='Ali'](M)))[id/t]  -> relation=Project(...), pairs=[("id", "t")]
+
+    This node is produced only when the parser is in a relational context
+    (inside pi, sigma, join, div, group, ungroup operand positions).  In a
+    Z paragraph context the identical surface form ``S[a/b]`` produces
+    ``SchemaRename`` instead.
+
+    LaTeX rendering routes through inline math (not a Z environment) because
+    fuzz rejects ``R[new/old]`` on a relation value inside Z paragraphs
+    (jms ruling Q1, 2026-05-23; fuzz syntax error at ``/``).
+
+    LaTeX output: ``relation[new/old, ...]`` — literal pass-through, no \\mathrm.
+    """
+
+    relation: Expr  # Any expression (compound operands allowed)
+    pairs: list[tuple[str, str]]  # (new_name, old_name) per Z RM §3.11, at least one
+
+
+@dataclass(frozen=True)
+class NaturalJoin(ASTNode):
+    """Natural join or theta-join (join) node.
+
+    Represents R join S (natural join) or R join [p] S (theta-join).
+
+    Examples:
+    - R join S -> left=R, right=S, subscript=None
+    - R join [R.x = S.y] S -> left=R, right=S, subscript=(R.x = S.y)
+    """
+
+    left: Expr
+    right: Expr
+    subscript: Expr | None  # None for natural join, predicate for theta-join
+    line_break_after: bool = False
+
+
+@dataclass(frozen=True)
+class Divide(ASTNode):
+    """Relational division (div) node.
+
+    Represents R div S.
+
+    Example:
+    - R div S -> left=R, right=S
+    """
+
+    left: Expr
+    right: Expr
+    line_break_after: bool = False
+
+
+@dataclass(frozen=True)
+class Group(ASTNode):
+    """Date's GROUP operator — bundle attributes into a nested relation (Phase 4.1).
+
+    Represents ``R group ({A, B, ...} as alias)``.
+
+    Bundles the named attributes of R into a single nested relation-valued
+    attribute called alias.
+
+    Examples:
+    - R group ({A} as members)
+      -> relation=Identifier("R"), attrs=["A"], alias="members"
+    - R group ({A, B, C} as nested)
+      -> relation=Identifier("R"), attrs=["A", "B", "C"], alias="nested"
+
+    LaTeX rendering:
+      R \\mathop{\\mathrm{GROUP}} (\\{A, B\\} \\mathop{\\mathrm{AS}} alias)
+    """
+
+    relation: Expr
+    attrs: list[str]
+    alias: str
+    line_break_after: bool = False
+
+
+@dataclass(frozen=True)
+class Ungroup(ASTNode):
+    """Date's UNGROUP operator — flatten a nested relation (Phase 4.1).
+
+    Represents ``R ungroup alias``.
+
+    Inverse of GROUP: removes the nested relation-valued attribute alias,
+    restoring the original flat structure.
+
+    Examples:
+    - R ungroup members
+      -> relation=Identifier("R"), alias="members"
+
+    LaTeX rendering:
+      R \\mathop{\\mathrm{UNGROUP}} alias
+    """
+
+    relation: Expr
+    alias: str
+    line_break_after: bool = False
+
+
+@dataclass(frozen=True)
+class GroupAggregate(ASTNode):
+    """Date's GROUP operator in aggregate form (Phase 4.2).
+
+    Represents ``R Group (Count(x) as total, Sum(y) as grand)``.
+
+    Computes one or more scalar aggregates per partition of R.  Each
+    aggregator clause names the aggregation function, the input attribute,
+    and the output alias.  Multiple clauses are comma-separated.
+
+    Examples:
+    - R Group (Count(x) as total)
+      -> relation=Identifier("R"), clauses=[AggregatorClause(COUNT, "x", "total")]
+    - R Group (Count(x) as t, Sum(y) as g)
+      -> relation=Identifier("R"), clauses=[AggregatorClause(COUNT, "x", "t"),
+                                            AggregatorClause(SUM, "y", "g")]
+
+    LaTeX rendering:
+      R \\mathrm{Group}(\\mathrm{Count}(x)~\\mathrm{as}~total)
+    """
+
+    relation: Expr
+    clauses: list[AggregatorClause]
+    line_break_after: bool = False
+
+
+@dataclass(frozen=True)
+class Binding(ASTNode):
+    r"""Z binding expression (Z RM §3.7).
+
+    Constructs a labelled tuple whose components are name-expression pairs.
+    Written ``{| name == expr, ... |}`` in source; rendered as
+    ``\lblot name == expr, \ldots \rblot`` in LaTeX.
+
+    Components are comma-separated (Z RM §3.7 uses commas, not semicolons).
+    The ``==`` operator is the ABBREV token reused in binding context;
+    the parser disambiguates by position (inside ``{| ... |}``, not at
+    top-level abbreviation position).
+
+    Examples:
+    - {| name == s.name |}
+      -> pairs=[("name", TupleProjection(s, "name"))]
+    - {| name == s.name, displacement == c.displacement |}
+      -> pairs=[("name", ...), ("displacement", ...)]
+    - {| |} (empty binding, Z RM permits it)
+      -> pairs=[]
+    """
+
+    pairs: list[tuple[str, Expr]]
+
+
 # Type alias for all expression types
 Expr = (
     BinaryOp
     | UnaryOp
     | Identifier
     | Number
+    | StringLit
     | Quantifier
     | Subscript
     | Superscript
@@ -465,6 +912,11 @@ Expr = (
     | Tuple
     | RelationalImage
     | GenericInstantiation
+    | SchemaCompose
+    | SchemaPipe
+    | SchemaHide
+    | SchemaProject
+    | SchemaRename
     | Range
     | SequenceLiteral
     | TupleProjection
@@ -472,6 +924,17 @@ Expr = (
     | Conditional
     | GuardedBranch
     | GuardedCases
+    | Theta
+    | SchemaText
+    | Restrict
+    | Project
+    | RelationRename
+    | NaturalJoin
+    | Divide
+    | Group
+    | Ungroup
+    | GroupAggregate
+    | Binding
 )
 
 
@@ -676,10 +1139,36 @@ class Abbreviation(ASTNode):
 
 @dataclass(frozen=True)
 class Declaration(ASTNode):
-    """Declaration in axdef or schema (var : Type)."""
+    """Declaration in axdef or schema (var : Type).
+
+    When ``is_primary_key`` is True the generator emits a PK annotation
+    line below the schema box, marking the attribute as a primary key.
+    """
 
     variable: str
     type_expr: Expr
+    is_primary_key: bool = False
+
+
+@dataclass(frozen=True)
+class SchemaInclusion(ASTNode):
+    """Schema inclusion in axdef, schema, or gendef declaration list.
+
+    Represents three forms per Z RM §3.7 and §5.2:
+    - bare:  ``Counter``           → decoration=None
+    - delta: ``Delta Airline``     → decoration="delta"
+    - xi:    ``Xi Card``           → decoration="xi"
+
+    The ``name`` field carries any Phase-0 decoration suffix already baked
+    in by the lexer (e.g., ``"Counter'"`` for a primed schema reference).
+    Generic instantiation parameters (e.g., ``Delta Stack[Int]``) are held
+    in ``generics`` as a list of type expressions; None for the common
+    unparameterised case.
+    """
+
+    name: str
+    decoration: str | None  # None | "delta" | "xi"
+    generics: list[Expr] | None = None
 
 
 @dataclass(frozen=True)
@@ -697,7 +1186,7 @@ class AxDef(ASTNode):
     end
     """
 
-    declarations: list[Declaration]
+    declarations: list[Declaration | SchemaInclusion]
     predicates: list[list[Expr]]  # Groups of predicates (separated by blank lines)
     generic_params: list[str] | None = None  # Optional generic parameters
 
@@ -719,7 +1208,7 @@ class GenDef(ASTNode):
     """
 
     generic_params: list[str]  # Required generic parameters
-    declarations: list[Declaration]
+    declarations: list[Declaration | SchemaInclusion]
     predicates: list[list[Expr]]  # Groups of predicates (separated by blank lines)
 
 
@@ -737,9 +1226,36 @@ class Schema(ASTNode):
     """
 
     name: str | None  # Optional name (None for anonymous schemas)
-    declarations: list[Declaration]
+    declarations: list[Declaration | SchemaInclusion]
     predicates: list[list[Expr]]  # Groups of predicates (separated by blank lines)
     generic_params: list[str] | None = None  # Optional generic parameters
+
+
+@dataclass(frozen=True)
+class HorizDef(ASTNode):
+    r"""Horizontal schema definition (Z RM §3.8).
+
+    ``Name [generics]? defs RHS`` renders as
+    ``\begin{zed} Name \defs RHS \end{zed}``.
+
+    The RHS is either:
+    - A schema reference: an Identifier (possibly decorated, possibly with
+      generic instantiation).  Example: ``OpAlias defs Delta Counter``.
+    - An inline schema text: ``SchemaText`` node produced by ``[ decls | preds ]``.
+      Example: ``NatPair defs [ x, y : N | x < y ]``.
+
+    Examples:
+    - OpAlias defs Delta Counter
+      -> name="OpAlias", generics=None, body=SchemaInclusion("Counter", "delta")
+    - Stack[X] defs [s : seq X | true]
+      -> name="Stack", generics=["X"], body=SchemaText(...)
+    """
+
+    name: str  # LHS schema name
+    generics: list[str] | None  # Optional generic parameter names
+    # RHS: Identifier, GenericInstantiation, SchemaInclusion, or SchemaText.
+    # SchemaInclusion covers Delta/Xi decorated references (Z RM §3.8 examples).
+    body: Expr | SchemaInclusion
 
 
 # Proof tree nodes
@@ -811,10 +1327,44 @@ class LatexBlock(ASTNode):
 
 
 @dataclass(frozen=True)
+class BMachine(ASTNode):
+    """B-machine verbatim block (B: ... END).
+
+    Body text is passed verbatim inside a LaTeX verbatim environment.
+    The body includes the terminating END line; indentation is preserved.
+    """
+
+    body: str  # Raw multi-line body including the final END line
+
+
+@dataclass(frozen=True)
+class RawLatexBlock(ASTNode):
+    """Multi-line raw LaTeX passthrough block (LATEX:\\n...END).
+
+    Body lines are slurped verbatim until a column-0 END terminator.
+    Indentation and internal blank lines are preserved exactly.
+    The body is emitted directly to .tex output with NO escaping and
+    NO wrapping — the user owns the raw LaTeX.
+    """
+
+    body: str  # Raw multi-line body (excluding the final END line)
+
+
+@dataclass(frozen=True)
 class PageBreak(ASTNode):
     """Page break in document.
 
     Inserts a page break in the PDF output.
+    """
+
+
+@dataclass(frozen=True)
+class LineBreak(ASTNode):
+    """Vertical line break (\\medskip) in document.
+
+    Inserts a medium vertical skip between paragraphs in the PDF output.
+    Useful for separating logical groups of related content (e.g., a schema
+    and its auto-emitted PK/FK predicates from the next schema).
     """
 
 
@@ -867,7 +1417,10 @@ DocumentItem = (
     | Paragraph
     | PureParagraph
     | LatexBlock
+    | BMachine
+    | RawLatexBlock
     | PageBreak
+    | LineBreak
     | Contents
     | PartsFormat
     | TruthTable
@@ -880,6 +1433,7 @@ DocumentItem = (
     | AxDef
     | GenDef
     | Schema
+    | HorizDef
     | Zed
     | ProofTree
 )

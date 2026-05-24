@@ -76,6 +76,7 @@ class TokenType(Enum):
     LBAG = auto()  # [[ (bag literal left)
     RBAG = auto()  # ]] (bag literal right)
     BAG_UNION = auto()  # ⊎ (bag union)
+    BAG_DIFF = auto()  # bag_diff keyword (bag difference, Z RM §4.6.2)
     OVERRIDE = auto()  # ++ (function/sequence override) - Phase 13
 
     # Function type operators (Phase 11, enhanced Phase 18)
@@ -109,6 +110,7 @@ class TokenType(Enum):
     UNDERSCORE = auto()  # _ for subscripts
     MOD = auto()  # mod (modulo arithmetic)
     CONTINUATION = auto()  # \ at end of line (Phase 27 - line break marker)
+    SLASH = auto()  # / separator in schema rename pairs S[a/b] (Phase 3.1)
 
     # Grouping
     LPAREN = auto()
@@ -128,6 +130,7 @@ class TokenType(Enum):
     # Identifiers and literals
     IDENTIFIER = auto()
     NUMBER = auto()
+    STRING = auto()  # 'quoted string literal'
 
     # Document structure (Phase 1)
     SECTION_MARKER = auto()  # ===
@@ -138,8 +141,11 @@ class TokenType(Enum):
     PURETEXT = auto()  # PURETEXT: (raw text, no processing)
     LATEX = auto()  # LATEX: (raw LaTeX passthrough, no escaping)
     PAGEBREAK = auto()  # PAGEBREAK: (insert page break)
+    LINEBREAK = auto()  # LINEBREAK: (insert \medskip vertical space)
     CONTENTS = auto()  # CONTENTS: (table of contents)
     PARTS = auto()  # PARTS: (parts formatting style)
+    B_BLOCK = auto()  # B: (B-machine verbatim block, terminated by column-0 END)
+    RAW_LATEX_BLOCK = auto()  # LATEX:\n...END (multi-line raw LaTeX, col-0 END)
     BIBLIOGRAPHY = auto()  # BIBLIOGRAPHY: (bibliography file)
     BIBLIOGRAPHY_STYLE = auto()  # BIBLIOGRAPHY_STYLE: (bibliography style)
     # Title metadata
@@ -154,7 +160,36 @@ class TokenType(Enum):
     EQUAL = auto()  # EQUAL: block keyword (equality chain; not the = operator)
     INFRULE = auto()  # INFRULE: (inference rule with horizontal line)
 
+    # Relational algebra operators (Phase 2.2)
+    SIGMA = auto()  # sigma (restriction)
+    PI = auto()  # pi (projection)
+    JOIN = auto()  # join (natural join / theta-join)
+    DIV = auto()  # div (division)
+
+    # Binding bracket operators (Phase 2.3 — Z RM §3.7)
+    LBIND = auto()  # {| (binding literal left)
+    RBIND = auto()  # |} (binding literal right)
+
+    # Nested-relation operators (Phase 4.1 — Date's GROUP / UNGROUP)
+    GROUP = auto()  # group (bundle attributes into nested relation)
+    UNGROUP = auto()  # ungroup (flatten nested relation)
+
+    # Aggregator keywords (Phase 4.2 — GROUP aggregate form)
+    COUNT = auto()  # Count (aggregate count of values)
+    SUM = auto()  # Sum (aggregate sum of values)
+    AVG = auto()  # Avg (aggregate average of values)
+    MIN = auto()  # Min (aggregate minimum value)
+    MAX = auto()  # Max (aggregate maximum value)
+    MEDIAN = auto()  # Median (aggregate median value)
+    AS = auto()  # as (alias keyword in aggregator clauses)
+
+    # Schema-calculus operators (Phase 3.2 — Z RM §3.11)
+    PIPE_PIPE = auto()  # >> (schema piping)
+    HIDE = auto()  # hide keyword (schema hiding)
+    PROJECT = auto()  # project keyword (schema projection)
+
     # Z notation keywords (Phase 4)
+    PK = auto()  # pk (primary-key declaration prefix)
     GIVEN = auto()  # given
     AXDEF = auto()  # axdef
     SCHEMA = auto()  # schema
@@ -163,6 +198,10 @@ class TokenType(Enum):
     SYNTAX = auto()  # syntax (aligned free type definitions)
     WHERE = auto()  # where
     END = auto()  # end
+    DELTA = auto()  # Delta (schema inclusion with before/after state)
+    XI = auto()  # Xi (schema inclusion, read-only operation)
+    THETA = auto()  # theta (binding expression, Z RM §3.10)
+    DEFS = auto()  # defs (horizontal schema definition, Z RM §3.8)
 
     # Conditional expressions (Phase 16)
     IF = auto()  # if

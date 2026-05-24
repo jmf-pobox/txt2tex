@@ -85,7 +85,8 @@ $\{~ x : \nat | x < 10 @ \IF x \mod 2 = 0 \THEN x \ELSE x + 1 ~\}$
 filterPositives : \seq~\num \fun \seq~\num
 \where
 filterPositives(\langle \rangle) = \langle \rangle \\
-\forall x : \num @ \forall s : \seq~\num @ filterPositives(\langle x \rangle \cat s) = \IF x > 0 \\
+\forall x : \num; s : \seq~\num @ \\
+\t1 filterPositives(\langle x \rangle \cat s) = \IF x > 0 \\
 \t1 \THEN \langle x \rangle \cat filterPositives(s) \\
 \t1 \ELSE filterPositives(s)
 \end{axdef}
@@ -132,7 +133,7 @@ piecewise : \num \fun \num
 \addcontentsline{toc}{section}{Example 9 : Conditional elem Lambda}
 
 \noindent
-$\lambda x : \nat @ \IF x > 100 \THEN 100 \ELSE x$
+$(\lambda x : \nat @ \IF x > 100 \THEN 100 \ELSE x)$
 
 
 \noindent Lambda function that caps values at 100.
@@ -204,11 +205,7 @@ factorial(0) = 1 \\
 
 \bigskip
 
-\noindent $C : x$ $>$ 0 ? 1 : -1
-
-\bigskip
-
-\noindent $\num : if x$ $>$ 0 then 1 else -1
+\noindent C: $x > 0$ ? 1 : -1 Z: if $x > 0$ then 1 else -1
 
 \bigskip
 
@@ -219,7 +216,7 @@ factorial(0) = 1 \\
 \section*{Example 15 : Short - Circuit Evaluation Note}
 \addcontentsline{toc}{section}{Example 15 : Short - Circuit Evaluation Note}
 
-\noindent In Z notation, if-then-else expressions should be evaluated $lazily : only$ the selected branch should be evaluated. This matters when branches have side effects or may be undefined.
+\noindent In Z notation, if-then-else expressions should be evaluated lazily: only the selected branch should be evaluated. This matters when branches have side effects or may be undefined.
 
 \bigskip
 
@@ -230,31 +227,7 @@ factorial(0) = 1 \\
 \section*{Example 16 : Best Practices}
 \addcontentsline{toc}{section}{Example 16 : Best Practices}
 
-\noindent When using if-then-else:
-
-\bigskip
-
-\noindent 1. Keep branches simple and readable
-
-\bigskip
-
-\noindent 2. For many cases, consider using free types with pattern matching
-
-\bigskip
-
-\noindent 3. Nest carefully—deep nesting hurts readability
-
-\bigskip
-
-\noindent 4. Document complex conditions
-
-\bigskip
-
-\noindent 5. Ensure both branches have the same type
-
-\bigskip
-
-\noindent 6. Consider using helper predicates for complex conditions
+\noindent When using if-then-else: 1. Keep branches simple and readable 2. For many cases, consider using free types with pattern matching 3. Nest carefully—deep nesting hurts readability 4. Document complex conditions 5. Ensure both branches have the same type 6. Consider using helper predicates for complex conditions
 
 \bigskip
 

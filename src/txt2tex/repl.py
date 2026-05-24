@@ -174,6 +174,11 @@ def process_input(
         print(formatted, file=sys.stderr)
         return False
 
+    # Surface any accumulated warnings (e.g. overflow) and reset
+    # the accumulator so warnings do not repeat on subsequent REPL turns.
+    generator.emit_warnings()
+    generator.clear_warnings()
+
     # Show LaTeX
     print("\nLaTeX:")
     print(latex_fragment)

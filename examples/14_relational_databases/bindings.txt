@@ -1,0 +1,53 @@
+// Z Binding Brackets
+// Demonstrates: {| ... |} binding literals per Z RM §3.7
+// Used in relational-calculus queries.
+
+TITLE: Z Binding Calculus
+AUTHOR: txt2tex example
+
+given TrackId, AlbumId, ArtistId
+
+schema Track
+  trackId : TrackId
+  albumId : AlbumId
+  duration : N
+end
+
+schema Album
+  albumId : AlbumId
+  artistId : ArtistId
+  year : N
+  tracks : N
+end
+
+=== Atomic Binding ===
+
+// A binding constructs a labelled tuple.
+
+{| trackId == t.trackId |}
+
+=== Binding in Set Comprehension ===
+
+// Select trackId of every track shorter than 180 seconds.
+
+{ t : Track | t.duration < 180 . {| trackId == t.trackId |} }
+
+=== Multi-Component Binding ===
+
+// Multiple comma-separated label-expression pairs.
+
+{| trackId == t.trackId, year == a.year, tracks == a.tracks |}
+
+=== Multi-Variable Comprehension with Binding ===
+
+// Cross two schemas and project into a binding.
+
+{ t : Track; a : Album | t.albumId = a.albumId .
+  {| trackId == t.trackId, year == a.year, tracks == a.tracks |}
+}
+
+=== Empty Binding ===
+
+// Z RM §3.7 permits an empty binding (rare but valid).
+
+{| |}

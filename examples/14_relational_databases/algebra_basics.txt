@@ -1,0 +1,90 @@
+// Relational Algebra Operators
+// Demonstrates: sigma, pi, rename (R[new/old]), join (renders as ⊗), div.
+
+TITLE: Relational Algebra
+AUTHOR: txt2tex example
+
+given Title, Author, MemberName, Genre
+
+schema Book
+  bookId : N
+  title : Title
+  author : Author
+  genre : Genre
+  pages : N
+  year : N
+end
+
+schema Member
+  memberId : N
+  name : MemberName
+end
+
+schema Loan
+  loanId : N
+  bookId : N
+  memberId : N
+  dueYear : N
+end
+
+
+=== Restriction (sigma) ===
+
+// Select tuples satisfying a predicate.
+
+sigma[pages >= 500](Book)
+
+// Nested restriction (chain predicates):
+
+sigma[year >= 1990](sigma[pages >= 500](Book))
+
+
+=== Projection (pi) ===
+
+// Keep only named attributes.
+
+pi[title, author](Book)
+
+// Project after restrict:
+
+pi[title, author](sigma[pages >= 500](Book))
+
+
+=== Renaming (R[new/old]) ===
+
+// Rename one attribute before joining (Z RM §3.11: new/old order).
+
+pi[id, title, author, genre, pages, year](Book[id/bookId])
+
+// Multiple renames at once:
+
+pi[id, writer, genre, pages, year](Book[id/bookId, writer/author])
+
+
+=== Natural Join and Theta-Join (join) ===
+
+// Natural join — joins on attributes with matching names.
+
+Loan join Book
+
+// Rename then join (natural join on matching id):
+
+pi[id, memberId, dueYear, title, author, genre, pages, year](Loan[id/bookId] join Book[id/bookId])
+
+// Theta-join with explicit predicate:
+
+Member join [Member.memberId = Loan.memberId] Loan
+
+
+=== Division (div) ===
+
+// Relational division — tuples in R associated with every tuple in S.
+
+Loan div Book
+
+
+=== Combined Query ===
+
+// Titles and authors of books over 500 pages.
+
+pi[title, author](sigma[pages >= 500](Book))

@@ -1,0 +1,124 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\title{Relational Calculus --- Music Library}
+\author{txt2tex example}
+\hypersetup{pdftitle={Relational Calculus --- Music Library},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.2.0}}
+\begin{document}
+
+\maketitle
+
+\begin{zed}[TrackId, ArtistId, AlbumId, PlaylistId, GenreName, TrackTitle, AlbumTitle, ArtistName]\end{zed}
+
+\begin{schema}{Track}
+tid : TrackId \\
+title : TrackTitle \\
+alid : AlbumId \\
+duration : \nat \\
+genre : GenreName
+\end{schema}
+
+\begin{schema}{Artist}
+arid : ArtistId \\
+name : ArtistName
+\end{schema}
+
+\begin{schema}{Album}
+alid : AlbumId \\
+title : AlbumTitle \\
+arid : ArtistId
+\end{schema}
+
+\begin{axdef}
+member : PlaylistId \rel TrackId
+\end{axdef}
+
+\section*{Query 1: Single-relation selection}
+
+\noindent Retrieve the title and genre of every jazz track. This is a plain single-relation query over `Track` --- no join required.
+
+\bigskip
+
+\noindent
+$\{~ t : Track | t.genre = `Jazz' @ \lblot~title == t.title, genre == t.genre~\rblot ~\}$
+
+
+\section*{Query 2: Two-relation join via comprehension}
+
+\noindent For each track, return its title together with the name of the artist who recorded the album it belongs to. Joins `Track` and `Album` on `AlbumId`, then `Album` and `Artist` on `ArtistId`.
+
+\bigskip
+
+\noindent
+$\displaystyle
+\begin{array}{l}
+\{~ t : Track ; al : Album ; ar : Artist | t.alid = al.alid \land \\
+\quad al.arid = ar.arid @ \lblot~track == t.title, artist == ar.name~\rblot ~\}
+\end{array}$
+
+\bigskip
+
+\section*{Query 3: Three-relation chain with playlist}
+
+\noindent List every track title that appears on at least one playlist, together with the album title. Chains `member`, `Track`, and `Album` through three declarations.
+
+\bigskip
+
+\noindent
+$\displaystyle
+\begin{array}{l}
+\{~ p : PlaylistId ; t : Track ; al : Album | (p, t.tid) \in member \land \\
+\quad t.alid = al.alid @ \lblot~playlist == p, track == t.title, album == al.title~\rblot ~\}
+\end{array}$
+
+\bigskip
+
+\section*{Query 4: Binding output, filtered by duration}
+
+\noindent Return a binding of `(track title, album title)` for every track whose duration exceeds 300 seconds. The characteristic expression is a two-component binding; no plain variable appears in the output.
+
+\bigskip
+
+\noindent
+$\displaystyle
+\begin{array}{l}
+\{~ t : Track ; al : Album | t.alid = al.alid \land \\
+\quad t.duration > 300 @ \lblot~track == t.title, album == al.title~\rblot ~\}
+\end{array}$
+
+\bigskip
+
+\section*{Query 5: Multi-decl forall}
+
+\noindent Assert that every track on any playlist belongs to a known album. Universal quantifier over two declarations with a conjunction predicate over projections.
+
+\bigskip
+
+\begin{zed}
+\forall p : PlaylistId; t : Track | \\
+\t1 (p, t.tid) \in member @ t.alid \in \{~ al : Album @ al.alid ~\}
+\end{zed}
+
+\section*{Query 6: Multi-decl comprehension, no characteristic expression}
+
+\noindent Collect the set of `(Track, Album)` schema pairs for long tracks. When the characteristic expression is omitted Z defaults to the signature tuple (Z RM §3.9). The Q2(d) parser fix makes the dot-separator optional.
+
+\bigskip
+
+\noindent
+$\displaystyle
+\begin{array}{l}
+\{~ t : Track ; al : Album | t.alid = al.alid \land \\
+\quad t.duration > 300 ~\}
+\end{array}$
+
+\bigskip
+
+\end{document}

@@ -1,0 +1,40 @@
+// Primary Keys
+// The pk prefix marks the primary-key attribute in a named schema body.
+// txt2tex emits a PK statement after the schema box — fuzz-compatible.
+
+TITLE: Primary Keys in Relational Schemas
+AUTHOR: txt2tex example
+
+given BookId, MemberId, LoanId, ISBN
+
+=== Single Primary Key ===
+
+// The pk prefix marks the attribute; a PK line appears after the schema box.
+
+schema Book
+  pk bookId : BookId
+  isbn : ISBN
+  pages : N
+  year : N
+end
+
+schema Member
+  pk memberId : MemberId
+  age : N
+end
+
+schema Loan
+  pk loanId : LoanId
+  bookId : BookId
+  memberId : MemberId
+  daysOut : N
+end
+
+=== Composite Primary Key ===
+
+// Two pk lines list both attributes in the PK set.
+
+schema LoanHistory
+  pk bookId : BookId
+  pk memberId : MemberId
+end

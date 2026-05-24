@@ -1,0 +1,104 @@
+// ============================================================================
+// State Machine Example: Turnstile
+// ============================================================================
+// Demonstrates the canonical four-piece Z state-machine layout:
+//   1. State schema       -- signature (variables) + invariant
+//   2. Init schema        -- initial-state predicate using theta
+//   3. Delta operations   -- state-changing ops with ?/! decorations
+//   4. Xi query           -- read-only observer
+//
+// Domain: a turnstile with two gate positions (locked / unlocked).
+//   - Insert a coin  -> gate unlocks
+//   - Push when open -> gate relocks and increments the passage count
+//   - Query          -> reports the current gate position without changing it
+// ============================================================================
+
+=== Turnstile State Machine ===
+
+** 1. Carrier type **
+
+TEXT: Define the two gate positions as a free type.  Using a named type
+TEXT: (rather than a boolean) makes the state schema self-documenting and
+TEXT: prevents silent confusion between the two values.
+
+zed
+  Gate ::= locked | unlocked
+end
+
+** 2. State schema **
+
+TEXT: The state schema declares every persistent variable and states the
+TEXT: invariant that every reachable state must satisfy.  Here the invariant
+TEXT: records that the passage count is always non-negative --- a property
+TEXT: that every operation must preserve.
+
+schema TurnstileState
+  gate : Gate
+  passed : N
+where
+  passed >= 0
+end
+
+** 3. Init schema **
+
+TEXT: The Init schema pins down the initial configuration.  Writing
+TEXT: theta TurnstileState' = ... packages the entire after-state as a
+TEXT: single binding, which is the Spivey convention for initial-state
+TEXT: predicates.  It says: the initial state is exactly the turnstile
+TEXT: in the locked position with a zero passage count.
+
+schema TurnstileInit
+  TurnstileState'
+where
+  gate' = locked
+  passed' = 0
+end
+
+** 4a. Delta operation: Coin **
+
+TEXT: Inserting a coin unlocks the gate.  The Delta inclusion brings both
+TEXT: the before-state (gate, passed) and the after-state (gate', passed')
+TEXT: into scope.  The precondition requires the gate to be locked before
+TEXT: the coin is accepted; the postcondition sets gate' to unlocked and
+TEXT: leaves the passage count unchanged.
+
+schema Coin
+  Delta TurnstileState
+where
+  gate = locked
+  gate' = unlocked
+  passed' = passed
+end
+
+** 4b. Delta operation: Push **
+
+TEXT: Pushing the bar when the gate is unlocked lets someone through.
+TEXT: The gate relocks and the passage count increments by one.  The
+TEXT: input decoration is not needed here because no external value
+TEXT: enters the system --- the push is a pure physical event.  An
+TEXT: output result! reports the new passage count so the caller can
+TEXT: log it without a separate query.
+
+schema Push
+  Delta TurnstileState
+  result! : N
+where
+  gate = unlocked
+  gate' = locked
+  passed' = passed + 1
+  result! = passed'
+end
+
+** 5. Xi query: IsLocked **
+
+TEXT: A query operation uses Xi to assert that no state variable changes.
+TEXT: The input is not required; the output status! carries the answer.
+TEXT: Because Xi TurnstileState guarantees gate = gate' and passed = passed',
+TEXT: the caller learns the current state without any risk of mutation.
+
+schema IsLocked
+  Xi TurnstileState
+  status! : Gate
+where
+  status! = gate
+end

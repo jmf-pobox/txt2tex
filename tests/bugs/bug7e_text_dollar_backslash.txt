@@ -1,0 +1,12 @@
+TITLE: bug7e --- backslash-prefixed LaTeX commands inside `$...$` in TEXT are re-lexed
+AUTHOR: txt2tex bug tracker
+
+=== Bug 7.E repro ===
+
+TEXT: This sentence contains $p \Leftrightarrow x > 1$ inline math. Expected: the `\Leftrightarrow` and `>` render as a properly typeset biconditional and comparison. Actual: `\` is parsed as the setminus operator and `Leftrightarrow` as an identifier applied to `(x)`, producing `p \setminus Leftrightarrow(x) > 1`.
+
+TEXT: Affects any prose with explicit LaTeX commands inside `$...$`: `\Rightarrow`, `\forall`, `\exists`, `\neg`, `\land`, `\lor`, `\bullet`, `\nat`, etc.
+
+TEXT: Workaround: use the txt2tex ascii operators inside `$...$` (e.g. `$p <=> x > 1$`, `$forall x : N | p$`) instead of LaTeX backslash commands. Or rewrite the prose to avoid inline math.
+
+TEXT: First observed: SEM Solution 7 verification, round 3 (2026-05-21). Severity: medium (regression introduced by bug 7 fix — the original heuristic at least passed backslash sequences through).

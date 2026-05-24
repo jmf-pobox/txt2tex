@@ -42,6 +42,17 @@ See [README.md](../../README.md) for installation instructions, including:
 
 Generates: `\section*{Introduction and Propositions}`
 
+Section titles may contain hyphens, colons, parentheses, and other
+punctuation — the title text is captured verbatim and LaTeX-escaped
+(DAT #15). Example:
+
+```text
+=== Foreign-key constraints ===
+```
+
+Generates: `\section*{Foreign-key constraints}` (the hyphen is preserved
+as a literal hyphen, not widened to math-mode spacing).
+
 ### Solutions
 
 ```text
@@ -62,6 +73,22 @@ Generates: `\bigskip\noindent\textbf{Solution 1}\medskip`
 
 Each part gets proper spacing and formatting with `(a)\par\vspace{11pt}`.
 
+**Part-label scope rule (DAT #18 / DAT #1):** A `(label)` token is recognised
+as a structural part label only when it appears at the start of a paragraph
+AND uses a short, recognised form: a single letter `(a)-(z)`, a single digit
+`(1)-(9)`, or a short Roman numeral `(i)-(x)`.  Parenthesised words like
+`(underlined)` or `(continued)` that appear mid-sentence or that are too long
+are treated as literal prose, not part labels.
+
+Example of `(word)` inside TEXT prose passing through as literal text:
+
+```text
+TEXT: Each primary key is highlighted (underlined) in the schema box.
+```
+
+Generates: `Each primary key is highlighted (underlined) in the schema box.`
+— no spurious `\subsection*{(underlined)}` is inserted.
+
 ---
 
 ## Text Blocks
@@ -70,12 +97,19 @@ txt2tex provides four types of text blocks for different purposes:
 
 ### TEXT: - Smart Text with Formula Detection
 
-Use for normal prose where you want mathematical expressions automatically detected and converted:
+Each `TEXT:` directive covers **one line**.  There is no multi-line `TEXT:`
+block — `TEXT:` is not terminated by `END`.  For a multi-line paragraph,
+write consecutive `TEXT:` lines (they coalesce — see "Paragraph coalescing"
+below).  For multi-line raw LaTeX, use the multi-line [`LATEX:` block
+form](#latex---raw-latex-passthrough).
+
+Use `TEXT:` for normal prose where you want mathematical expressions
+automatically detected and converted:
 
 ```text
 TEXT: This is a plain text paragraph with => and <=> symbols.
 TEXT: The set { x : N | x > 0 } contains positive integers.
-TEXT: We know that forall x : N | x >= 0 is true.
+TEXT: We write $\forall x : N | x \geq 0$ to mean all natural numbers.
 ```
 
 **Features:**
@@ -83,12 +117,42 @@ TEXT: We know that forall x : N | x >= 0 is true.
 - Operators converted: `=>` → $\Rightarrow$, `<=>` → $\Leftrightarrow$
 - Formulas automatically detected: `{ x : N | x > 0 }` → $\{ x : \mathbb{N} \mid x > 0 \}$
 - Sequence literals converted: `<a, b, c>` → $\langle a, b, c \rangle$
-- **Keywords automatically converted** to symbols:
-  - `forall` → ∀ ($\forall$)
-  - `exists` → ∃ ($\exists$)
-  - `exists1` → ∃₁ ($\exists_1$)
-  - `emptyset` → ∅ ($\emptyset$)
+- **Math-keyword rewrite is opt-in via `$...$`** (#136 / DAT #11): bare
+  English words like `exists`, `forall`, `group`, `union` are NOT
+  automatically converted to math glyphs. Write `$\exists$`, `$\forall$`,
+  etc. when you want the symbol.
+
+  Compare:
+
+  ```text
+  TEXT: There exists a witness in the constraint set.
+  ```
+
+  Generates: `There exists a witness in the constraint set.` (bare
+  `exists` stays as English prose.)
+
+  ```text
+  TEXT: We write $\exists x : N$ to mean "some natural number".
+  ```
+
+  Generates the `∃` glyph inside the inline `$...$`, English prose
+  outside.
+
 - Citations supported: `[cite key]` → (Author, Year) in Harvard style
+
+**Paragraph coalescing (DAT #16):** Consecutive `TEXT:` directives on
+adjacent lines (with no blank line between them) are joined into a single
+paragraph.  A blank line between two `TEXT:` directives produces two
+separate paragraphs.
+
+```text
+TEXT: First sentence of the paragraph.
+TEXT: Second sentence continues here.
+TEXT: Third sentence wraps up the thought.
+```
+
+The three lines above produce one paragraph. A blank line between any two of
+them would start a new paragraph.
 
 **Citations in TEXT blocks:**
 
@@ -109,7 +173,11 @@ Renders as:
 
 ### PURETEXT: - Raw Text with LaTeX Escaping
 
-Use for bibliography entries or prose with punctuation that would confuse the lexer:
+Like `TEXT:`, each `PURETEXT:` covers **one line** and is not terminated by
+`END`.  Use multiple lines for multiple sentences.
+
+Use `PURETEXT:` for bibliography entries or prose with punctuation that
+would confuse the lexer:
 
 ```text
 PURETEXT: Spivey, J.M. (1992) "The Z Notation" & references.
@@ -124,9 +192,79 @@ PURETEXT: Author's name, "quoted text", and more.
 - NO keyword conversion (preserves literal `forall`, `exists`, `emptyset` for teaching)
 - Preserves punctuation like quotes, commas, parentheses
 
+### B: - B-Machine Verbatim Block
+
+Use `B:` to embed an Atelier-B / B-Method machine listing verbatim. The body
+is passed directly to a LaTeX `verbatim` environment — no Z-parser heuristics,
+no keyword conversion, no escaping. Indentation and blank lines are preserved
+exactly as written.
+
+**Syntax:**
+
+```text
+B:
+MACHINE MachineName
+SETS
+   MySet
+VARIABLES
+   v
+INVARIANT
+   v : MySet
+INITIALISATION
+   v := default
+END
+```
+
+**Rules:**
+
+- The `B:` line opens the block. Any text on the same line after `:` is ignored.
+- Every line after `B:` is captured verbatim until a line that is exactly `END`
+  at column 0 (no leading whitespace, no trailing content beyond a newline).
+- The `END` line is part of the emitted block — it is the standard B-Method
+  machine terminator (Abrial, *The B-Book*, 1996).
+- Multiple `B:` blocks in one file are independent; each produces its own
+  `\begin{verbatim}…\end{verbatim}` region.
+- A `B:` block opened without a matching `END` is a lexer error; the error
+  message cites the source line of the `B:` opener.
+
+**Why not use `LATEX:` for B machines?**
+
+`B:` wraps its body in `\begin{verbatim}…\end{verbatim}`, which gives you
+fixed-width font and literal-character rendering — backslashes, braces, and
+percent signs appear exactly as typed. The multi-line `LATEX:` block form
+(see below) also captures the full body as one unit, but it emits the lines
+as live LaTeX, not verbatim text. Use `B:` for listings you want rendered
+as-written; use multi-line `LATEX:` for raw LaTeX you want interpreted.
+
+**Example — full machine with prose before and after:**
+
+```text
+TEXT: Below is the B machine for the Trains case study.
+
+B:
+MACHINE Trains
+SETS
+   PLACE
+VARIABLES
+   trains
+INVARIANT
+   trains : iseq(PLACE * PLACE)
+INITIALISATION
+   trains := []
+END
+
+TEXT: The invariant ensures trains is a sequence of directed edges.
+```
+
 ### LATEX: - Raw LaTeX Passthrough
 
-Use for custom LaTeX commands, environments, or formatting not supported by txt2tex:
+Unlike `TEXT:` and `PURETEXT:` (one line each, no terminator), `LATEX:`
+has **two forms**: a single-line directive `LATEX: <content>` and a
+multi-line block `LATEX:` ... `END` (see [§Multi-line block
+form](#multi-line-block-form) below).
+
+Use `LATEX:` for custom LaTeX commands, environments, or formatting not
+supported by txt2tex:
 
 ```text
 LATEX: \begin{center}\textit{Custom formatting}\end{center}
@@ -139,6 +277,43 @@ LATEX: \mycustomcommand{arg1}{arg2}
 - NO escaping - raw LaTeX passed directly through
 - Perfect for tikz diagrams, custom environments, special commands
 - Used for bibliography setup with natbib
+
+#### Multi-line block form
+
+When you need to pass several lines of LaTeX through as a single unit — with
+indentation preserved and no paragraph breaks inserted between lines — use the
+block form instead of repeating `LATEX:` on every line.
+
+**Syntax:** write `LATEX:` alone on a line (nothing after the colon except
+optional trailing whitespace), then the body, then `END` at column 0.
+
+```text
+LATEX:
+\begin{tikzpicture}
+  \draw (0,0) -- (1,1);
+  \node at (0.5,0.5) {midpoint};
+\end{tikzpicture}
+END
+```
+
+The body is emitted as live LaTeX — backslashes are interpreted, environments
+are processed. The `END` terminator (column 0, no trailing text) closes the
+block; `\end{...}` lines inside the body are not confused with `END`.
+
+**When to use the block form vs. single-line `LATEX:`:**
+
+| Situation | Use |
+|-----------|-----|
+| One short command | `LATEX: \vspace{1cm}` |
+| Multi-line environment or diagram | Block form |
+| Indentation must be preserved | Block form |
+| Content should appear as literal text (verbatim) | `B:` instead |
+
+A `LATEX:` block opened without a matching `END` is a lexer error; the error
+message cites the source line of the opener.
+
+For B-machine listings specifically, use `B:` — it wraps the body in
+`\begin{verbatim}` so backslashes and braces appear as typed.
 
 **Bibliography Setup (Harvard Style):**
 
@@ -182,6 +357,23 @@ LATEX: \end{thebibliography}
 ```
 
 The `\bibitem[Author, Year]{key}` format creates Harvard-style citations. Use `[cite key]` in TEXT: blocks to reference them (see TEXT: section above).
+
+The multi-line block form can also be used for the bibliography, which keeps
+the entire environment as one block rather than one `LATEX:` directive per
+line:
+
+```text
+LATEX:
+\setlength{\leftskip}{0pt}
+\begin{thebibliography}{Woodcock, n.d.}
+
+\bibitem[Spivey, 1992]{spivey92} Spivey, J.M. (1992). \textit{The Z Notation: A Reference Manual}. Prentice Hall.
+
+\bibitem[Woodcock and Davies, 1996]{woodcock96} Woodcock, J. and Davies, J. (1996). \textit{Using Z}. Prentice Hall.
+
+\end{thebibliography}
+END
+```
 
 **Note**: If `BIBLIOGRAPHY:` is specified, the bibliography file approach takes precedence. LATEX blocks will still work for other purposes.
 
@@ -475,6 +667,92 @@ forall x : N | exists y : N | x = y
 ❌ Incorrect: forall x : N | x > 0 land forall y : N | y > x
 ```
 
+### Schema-text Quantification
+
+Z RM §3.10 permits schemas to appear directly as quantifier bindings, without
+spelling out all the variables and domain types manually.  txt2tex supports all
+four forms for `forall`, `exists`, and `exists1`.
+
+#### State-change binding (ΔS)
+
+```text
+exists Delta S | P
+```
+
+Generates (fuzz mode): `\exists \Delta S @ P`
+
+Asserts there is some state change of schema `S` satisfying predicate `P`.
+fuzz expands `\Delta S` into the full before-and-after variable list; the
+engine emits the binding literally.
+
+Example — miniature promotion predicate (mirrors SBM Ex 21):
+
+```text
+exists Delta BoxOffice | Promote
+```
+
+#### Read-only binding (ΞS)
+
+```text
+exists Xi S | P
+```
+
+Generates: `\exists \Xi S @ P`
+
+Like `Delta` but additionally constrains that all outputs equal their
+inputs (the state is not changed).
+
+#### Schema-as-declaration (S)
+
+```text
+exists S | P
+```
+
+Generates: `\exists S @ P`
+
+Existentially quantifies over all components of schema `S`.  `S` must
+start with an uppercase letter (Z naming convention) to distinguish it
+from a value variable.
+
+#### Primed schema (S')
+
+```text
+exists S' | P
+```
+
+Generates: `\exists S^{\prime} @ P`
+
+Like the bare form but uses the after-state components of schema `S`.
+
+#### forall and exists1
+
+All three quantifiers (`forall`, `exists`, `exists1`) support every
+schema binding form:
+
+```text
+forall Delta S | P         →  \forall \Delta S @ P
+exists1 Delta S | P        →  \exists_1 \Delta S @ P
+exists Xi S | P            →  \exists \Xi S @ P
+```
+
+#### Disambiguation
+
+The parser uses the first character of the identifier to distinguish a
+schema name from a variable name:
+
+- Uppercase initial letter → schema binding (e.g., `BoxOffice`, `S`, `State`)
+- Lowercase initial letter → value binding (e.g., `x`, `state`, `n`)
+
+This follows Z's own naming convention.  To force a value binding for an
+identifier starting with uppercase, add a `:` domain declaration:
+
+```text
+exists S : SchemaType | P      [value binding — S is a variable of SchemaType]
+exists S | P                   [schema binding — S is the schema name]
+```
+
+See the [Schemas section](#schemas) for how `Delta` and `Xi` are defined.
+
 ### Declaration and Binding
 
 The colon `:` declares the type of a variable:
@@ -517,7 +795,9 @@ Generates: $\exists_1 x : \mathbb{N} \bullet x = 5$
 mu x : N | x > 0
 ```
 
-Generates: $\mu x : \mathbb{N} \bullet x > 0$
+Generates: $(\mu x : \mathbb{N} \mid x > 0)$  (fuzz mode wraps the
+binder in parens and uses `\mid`, not `\bullet`; see Predicate Logic
+section)
 
 ---
 
@@ -666,6 +946,18 @@ bigcup S         →  ⋃ S         [distributed union]
 bigcap S         →  ⋂ S         [distributed intersection]
 ```
 
+**Automatic parenthesisation of nested prefix operators (fuzz mode):**
+
+Z RM §3.7 requires prefix-generic operators (`seq`, `P`, `dom`, `ran`,
+`bigcup`, `bigcap`, etc.) to take an *atomic* operand. A nested prefix
+application is not atomic, so the engine wraps it in parens automatically.
+You do not need to add explicit parens in your source:
+
+```text
+seq (P X)              →  \seq~(\power X)     ← parens added by engine
+ran (bigcup (ran s))   →  \ran~(\bigcup~(\ran s))
+```
+
 ### Standard Sets
 
 ```text
@@ -692,7 +984,7 @@ Generates: `\begin{zed}[Person, Company]\end{zed}`
 
 ### Abbreviations
 
-Abbreviations define shorthand names for types or expressions. They must be wrapped in `zed...end` blocks:
+Abbreviations define shorthand names for types or expressions.  They can appear standalone at the top level (the engine wraps them in `zed` automatically) or inside an explicit `zed...end` block when you want to group several with other paragraph kinds:
 
 **Basic abbreviations:**
 
@@ -1327,25 +1619,25 @@ ran f            →  ran f       [range of function]
 **Domain Restriction:**
 
 ```text
-A <| f           →  A ⩤ f       [restrict f to domain A]
+A <| f           →  A ◁ f       [restrict f to domain A]
 ```
 
 **Range Restriction:**
 
 ```text
-f |> B           →  f ⩥ B       [restrict f to range B]
+f |> B           →  f ▷ B       [restrict f to range B]
 ```
 
 **Domain Subtraction:**
 
 ```text
-A <-| f          →  A ⩤ f       [remove A from domain]
+A <<| f          →  A ⩤ f       [remove A from domain]
 ```
 
 **Range Subtraction:**
 
 ```text
-f |->> B         →  f ⩥ B       [remove B from range]
+f |>> B          →  f ⩥ B       [remove B from range]
 ```
 
 **Function Composition:**
@@ -1399,7 +1691,7 @@ end
 gendef [X]
   length : seq X -> N
 where
-  length(<>) = 0 and
+  length(<>) = 0 land
   forall x : X; s : seq X | length(<x> ^ s) = 1 + length(s)
 end
 ```
@@ -1608,6 +1900,21 @@ The bag union operator combines two bags, preserving multiplicities (unlike set 
 
 **ASCII Notation:** Use the `bag_union` keyword (e.g., `b1 bag_union b2`)
 **Unicode Alternative:** Use `⊎` (U+228E) if preferred
+
+**Bag difference (Z RM §4.6.2):**
+
+```text
+b1 bag_diff b2        →  b1 \uminus b2   [bag difference]
+coins bag_diff [[c?]] →  coins \uminus [\![ c? ]\!]
+```
+
+The bag difference operator `bag_diff` emits `\uminus`. For bags `b1` and `b2` and any element `x`, `(b1 bag_diff b2)(x) = max(0, b1(x) - b2(x))` — multiplicity clamped at zero. This is the natural notation for operations such as removing a coin from a multiset:
+
+```text
+coins' = coins bag_diff [[c?]]
+```
+
+**ASCII Notation:** Use the `bag_diff` keyword — there is no single-character Unicode alternative for `\uminus` in txt2tex source.
 
 ---
 
@@ -1885,10 +2192,9 @@ The Z Reference Manual (§3.5) allows all names declared in a single `axdef` or 
 paragraph to enter scope simultaneously. Fuzz accepts cross-references between declarations
 in the same block — this is valid Z.
 
-Oxford-school convention (Spivey, *Understanding Z*; Simpson's teaching notes) favours
-splitting dependent definitions into separate paragraphs in dependency order. Each paragraph
-then stands as a self-contained mathematical object whose reliance on earlier paragraphs is
-structurally visible to the reader.
+The Z community convention (Spivey, *Understanding Z*) favours splitting dependent definitions
+into separate paragraphs in dependency order. Each paragraph then stands as a self-contained
+mathematical object whose reliance on earlier paragraphs is structurally visible to the reader.
 
 **Combined form** (valid Z, accepted by fuzz):
 
@@ -1904,7 +2210,7 @@ where
 end
 ```
 
-**Sequential form** (Oxford-school preferred):
+**Sequential form** (recommended):
 
 ```text
 axdef
@@ -1978,7 +2284,7 @@ Generates:
   x : \mathbb{N} \\
   y : \mathbb{N}
 \where
-  x > 0 land y > 0
+  x > 0 \land y > 0
 \end{schema}
 ```
 
@@ -2007,28 +2313,316 @@ where
 end
 ```
 
+### Schema Inclusion (Bare, Δ, Ξ)
+
+A declaration line with no colon is a **schema inclusion** — it brings the
+components and predicates of the named schema into the enclosing block.
+
+#### Bare inclusion
+
+```text
+schema LoggedInUser
+  User
+  sessionToken : N
+where
+  sessionToken > 0
+end
+```
+
+`User` on its own line (no colon) brings all User components into LoggedInUser.
+The generated LaTeX is:
+
+```latex
+\begin{schema}{LoggedInUser}
+User \\
+sessionToken : \nat
+\where
+sessionToken > 0
+\end{schema}
+```
+
+#### Delta inclusion (Δ) — state-and-operation
+
+`Delta S` is the Z RM §3.7 convention for including a schema in an operation
+that modifies state.  It signals that both the before-state `S` and after-state
+`S'` are present.
+
+```text
+schema IncrCounter
+  Delta Counter
+  increment? : N
+where
+  count' = count + increment?
+end
+```
+
+Generates: `\Delta Counter \\`
+
+#### Xi inclusion (Ξ) — read-only operation
+
+`Xi S` is the Z RM §5.2 convention for a schema that does not modify state.
+
+```text
+schema ReadCount
+  Xi Counter
+  result! : N
+where
+  result! = count
+end
+```
+
+Generates: `\Xi Counter \\`
+
+#### Generic instantiation in inclusions
+
+Inclusions can carry type parameters:
+
+```text
+schema PushNat
+  Delta Stack[N]
+  value? : N
+end
+```
+
+Generates: `\Delta Stack[\nat] \\`
+
+#### Disambiguation rule
+
+The parser uses one-pass scan-ahead to tell inclusions from typed declarations:
+
+- **Colon before newline** → typed declaration: `count, limit : N`
+- **No colon before newline** → schema inclusion: `Counter`
+
+This means `count, limit : N` (two variables sharing a type) is never confused
+with a bare inclusion, even when the names would otherwise match a schema name.
+
+#### Schema-as-predicate in where clause
+
+Once a schema is included in the declaration list, its name can appear in the
+`where` clause as a predicate.  Conjunction `S1 land S2` applies both:
+
+```text
+schema AB
+  A
+  B
+  z : N
+where
+  A land B
+  z = x + y
+end
+```
+
+**See:** `examples/10_schemas/delta_xi_inclusion.txt`,
+`examples/10_schemas/schema_as_predicate.txt`
+
+#### θ-Expression (`theta`)
+
+`theta S` constructs the binding whose components are the in-scope variables
+matching schema S's signature (Z RM §3.10).
+
+```text
+theta Booking'        → \theta Booking'   (after-state binding)
+theta AirlineState    → \theta AirlineState
+theta S = theta S'    → \theta S = \theta S'  (frame condition)
+```
+
+The typical use is packaging a state snapshot inside a maplet:
+
+```text
+schema AddBooking
+  Delta AirlineState
+  bookingId? : BookingId
+  Booking
+where
+  bookings' = bookings oplus { bookingId? |-> theta Booking' }
+end
+```
+
+**Syntax rules:**
+
+| Rule | Detail |
+|------|--------|
+| Keyword | `theta` (lowercase; `\theta` is the Greek letter) |
+| Schema reference | Any valid identifier, including Phase-0 decorated forms (`S'`, `S?`) |
+| Decoration of keyword | Forbidden — `theta'` raises a LexerError |
+| Precedence | Primary expression, same level as `Identifier` |
+
+**Generated LaTeX:** `theta S` → `\theta S`  Works under both `fuzz.sty`
+(default) and `--zed` mode; `\theta` is a standard LaTeX Greek letter macro.
+
+**See:** `examples/10_schemas/theta_binding.txt`
+
+#### Horizontal Schema Definitions (`defs`)
+
+`Name [generics]? defs RHS` writes a Z RM §3.8 *horizontal definition* —
+assigns a new name to a schema expression without a boxed schema environment.
+
+```text
+OpAlias defs Delta Counter
+NatPair defs [ x, y : N | x < y ]
+StackAlias[X] defs GenStack[X]
+```
+
+| Aspect | Detail |
+|--------|--------|
+| Keyword | `defs` (lowercase, reserved) |
+| Output environment | `\begin{zed} Name \defs RHS \end{zed}` |
+| `\defs` macro | Defined in `fuzz.sty` line 280 as `\widehat=` |
+| RHS: schema reference | Plain or decorated (`Delta`/`Xi`) identifier |
+| RHS: inline schema text | `[ decl-list \| pred-list ]` |
+| Generic LHS | `Name[X, Y] defs RHS` |
+| Decoration of keyword | Forbidden — `defs'` raises LexerError |
+| Schema calculus RHS | `;`, `>>`, `hide`, `project` — see below |
+
+**Inline schema text:** declarations are separated by `;`; predicates are
+separated by `;` in the source and joined with `\land` in the output.
+
+```text
+BoundedNat defs [n : N | n > 0; n < 100]
+// → BoundedNat \defs [ n : \nat | n > 0 \land n < 100 ]
+```
+
+**Generated LaTeX:** `OpAlias defs Delta Counter` → `OpAlias \defs \Delta Counter`
+inside `\begin{zed}...\end{zed}`.
+
+**See:** `examples/10_schemas/horizontal_defs.txt`
+
+#### Schema Renaming (`S[old/new, ...]`)
+
+Schema renaming produces a schema identical to an existing one except that
+named components are given new names (Z RM §3.11).  Renaming is written on
+the RHS of a `defs` paragraph:
+
+```text
+CounterN defs Counter[count/n]
+Op2 defs Counter[count'/count]
+SwappedPoint defs Point[x/y, y/x]
+```
+
+| Property | Value |
+|---|---|
+| Syntax | `SchemaName[oldName/newName, ...]` |
+| Minimum pairs | 1 |
+| Decoration on schema | `S'[a/b]` renames the primed schema `S'` |
+| Decoration in pairs | `S[a'/b]` or `S[a/b']` supported |
+| Disambiguation | Scan for `/` at depth 0 inside `[...]` |
+
+**Disambiguation from generic instantiation** (`S[X]`, Phase 1.1): if any
+`/` appears at bracket depth 0, the parser treats the bracket as rename
+pairs; otherwise it treats the bracket as type parameters.
+
+**Generated LaTeX:** `Counter[count/n]` renders as `Counter[count/n]` —
+the brackets and slashes are literal math-mode text with no special macro.
+
+**See:** `examples/10_schemas/schema_rename.txt`
+
+#### Schema Calculus Operators (Z RM §3.11)
+
+Schema-calculus operators combine, filter, and pipeline schemas.  They appear
+only on the RHS of a `defs` paragraph.  The macros (`\semi`, `\pipe`, `\hide`,
+`\project`) are defined in `fuzz.sty` and `zed-cm.sty`; no preamble change is
+needed.
+
+| Source notation      | LaTeX emitted         | Meaning                          |
+|----------------------|-----------------------|----------------------------------|
+| `S ; T`              | `S \semi T`           | Sequential composition           |
+| `S >> T`             | `S \pipe T`           | Output-to-input piping           |
+| `S hide (x, y)`      | `S \hide (x, y)`      | Existentially quantify components |
+| `S project T`        | `S \project T`        | Project S onto T's signature     |
+
+**Precedence (tightest to loosest):**
+
+1. `hide` and `project`
+2. `;` (composition)
+3. `>>` (piping)
+
+So `S hide (x) ; T >> U` parses as `((S hide (x)) ; T) >> U`.
+
+```text
+OpAB defs OpA ; OpB
+// → \begin{zed} OpAB \defs OpA \semi OpB \end{zed}
+
+Pipeline defs Send >> Receive
+// → \begin{zed} Pipeline \defs Send \pipe Receive \end{zed}
+
+Visible defs State hide (temp)
+// → \begin{zed} Visible \defs State \hide (temp) \end{zed}
+
+Projected defs State project View
+// → \begin{zed} Projected \defs State \project View \end{zed}
+
+Combined defs (OpA ; OpB) hide (x)
+// → \begin{zed} Combined \defs OpA \semi OpB \hide (x) \end{zed}
+```
+
+**Context sensitivity:** `;` is a schema-composition operator only on the RHS
+of a `defs` paragraph.  Inside `axdef`, `schema`, and `gendef` bodies, `;`
+remains a declaration separator — this is unchanged.
+
+**See:** `examples/15_schema_calculus/`
+
 ---
 
 ## Proof Trees
 
-Natural deduction proofs using indentation-based syntax.
+Natural deduction proofs using indentation-based syntax. For a
+worked walkthrough, read
+**[Tutorial 4: Proof Trees](../tutorials/04_proof_trees.md)** first.
+The full specification is in
+[PROOF_SYNTAX.md](PROOF_SYNTAX.md).
+
+There are two related keywords:
+
+- **`PROOF:`** — *applies* rules to build a derivation tree.  Use this
+  when you want to show that a conclusion follows from premises by a
+  sequence of natural-deduction steps.
+- **`INFRULE:`** — *displays* a single inference rule schema as a
+  horizontal premise/conclusion pair.  Use this when you want to
+  exhibit the rule itself, not derive a result with it.
+
+### `INFRULE:` — rule schema display
+
+```text
+INFRULE:
+P
+P => Q
+---
+Q [modus ponens]
+```
+
+Lines above the `---` separator are premises; the line below is the
+conclusion; the bracketed text is an optional label.  The output is a
+horizontal `\derive` rule.  See `examples/04_proof_trees/infrule_*.txt`
+for working examples.
 
 ### Basic Structure
 
 ```text
 PROOF:
-  conclusion [rule name]
-    premise1
-    premise2
+conclusion [rule name]
+  :: premise_1
+  :: premise_2
 ```
+
+The conclusion is written first; its premises are **indented children**.
+Multi-premise rules (`land intro`, `=> elim`, `false-intro`, `<=> intro`,
+`lor elim`) require `::` on each premise — without it, consecutive
+indented lines collapse to a *linear chain* and the extra premises are
+silently dropped from the rendered tree.
+
+Unary rules (`land elim 1`, `lor intro 1`, `false elim`, single-premise
+applications) take a single indented child with no `::` needed.
 
 ### Indentation Rules
 
 - **2 spaces per level** for proof structure
-- **Siblings:** Use `::` prefix for parallel premises
-- **Assumptions:** Label with `[1]`, `[2]`, etc.
-- **Discharge:** Reference assumptions with `[=> intro from 1]`
-- **References:** Use `[from 1]` to refer to labeled assumptions
+- **Multi-premise rules:** every premise carries a `::` prefix
+- **Unary rules:** single indented child, no `::`
+- **Assumptions:** mark with `[N] X [assumption]` directly under the
+  discharging rule
+- **Discharge:** reference at any leaf with `Y [from N]`
+- **Case analysis:** `case X:` blocks inside `lor elim from N`; the
+  case formula is available as `X [from N]` within the block
 
 ### Justifications in Proof Trees
 
@@ -2152,53 +2746,416 @@ Examples:
 PROOF:
 p land q => p [=> intro from 1]
   [1] p land q [assumption]
-      p [land elim 1]
+  :: p [land elim 1]
+    p land q [from 1]
 ```
 
 ### Example: Case Analysis
 
-**Simple case analysis:**
-
 ```text
 PROOF:
-p lor q => r [=> intro from 1]
-  [1] p lor q [assumption]
-      r [lor elim]
-        case p:
-          r [from assumption p]
-        case q:
-          r [from assumption q]
+((p => r) land (q => r)) => ((p lor q) => r) [=> intro from 1]
+  [1] (p => r) land (q => r) [assumption]
+  :: (p lor q) => r [=> intro from 2]
+    [2] p lor q [assumption]
+    :: r [lor elim from 2]
+      :: p lor q [from 2]
+      case p:
+        :: r [=> elim]
+          :: p [from 2]
+          :: p => r [land elim 1]
+            (p => r) land (q => r) [from 1]
+      case q:
+        :: r [=> elim]
+          :: q [from 2]
+          :: q => r [land elim 2]
+            (p => r) land (q => r) [from 1]
 ```
 
-**Case analysis with sibling premises:**
+The `lor elim from 2` rule has three premises: the disjunction
+(`p lor q [from 2]`) plus two `case` blocks. Inside each case, the
+case formula is referenced with the discharge label of the enclosing
+rule (`p [from 2]`, `q [from 2]`). The two `:: r [=> elim]` nodes are
+binary, so each has `::` on its premises (the case formula plus the
+relevant implication extracted from assumption [1]).
 
-```text
-PROOF:
-p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
-  [1] p land (q lor r) [assumption]
-      p [land elim 1]
-      q lor r [land elim 2]
-      (p land q) lor (p land r) [lor elim]
-        case q:
-          :: p [from above]
-          :: q [from case]
-          p land q [land intro]
-          (p land q) lor (p land r) [lor intro 1]
-        case r:
-          :: p [from above]
-          :: r [from case]
-          p land r [land intro]
-          (p land q) lor (p land r) [lor intro 2]
-```
+**Working notes on case analysis:**
 
-**Important**: When working with case analysis:
-
-- Use `[from above]` to reference facts established before the case split
-- The `::` sibling markers indicate multiple facts that together support the next step
-- Each case should derive the same conclusion through different reasoning paths
-- Facts proven before case analysis remain available within all cases
+- Inside a `case X:` block, the case formula `X` is available via
+  `X [from N]` where `N` is the label discharged by the enclosing
+  `lor elim from N` rule.
+- Facts proven outside the case analysis remain available via their
+  own `[from M]` references at any leaf where they're used.
+- Each case derives the same conclusion through different reasoning
+  paths.
 
 ---
+
+## Relational Databases
+
+Notation for relational database specifications.
+
+For a worked normalisation walkthrough (functional dependencies, 1NF → 3NF
+decomposition), see
+`examples/14_relational_databases/normalisation.txt`.
+
+### pk Declaration
+
+Mark an attribute as a primary key with the `pk` prefix inside a **named**
+schema body.  txt2tex emits a fuzz-compatible PK statement after the schema
+box:
+
+```text
+schema Book
+  pk bookId : BookId
+  isbn : ISBN
+  pages : N
+end
+```
+
+Generated LaTeX (abridged):
+
+```latex
+\begin{schema}{Book}
+bookId : BookId \\
+isbn : ISBN \\
+pages : \nat
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Book}) = \{bookId\}$
+```
+
+The schema body stays plain so fuzz type-checks it cleanly.  The PK line
+sits outside the Z environment and is rendered by pdflatex.
+
+**Composite primary key** — two or more `pk` lines:
+
+```text
+schema CentreStaff
+  pk centreId : CentreID
+  pk staffId : PersonID
+end
+```
+
+Emits: `\noindent$\mathrm{PK}(\mathrm{CentreStaff}) = \{centreId, staffId\}$`
+
+**Comma-separated pk names** (when names share a type):
+
+```text
+schema S
+  pk a, b : T
+end
+```
+
+**Scope**: `pk` is only valid in named schema bodies.  It raises
+ParserError in axdef, gendef, anonymous schemas, and inline schema text.
+
+**Error cases:**
+
+```text
+pk                   // no attribute name — parser error
+pk noType            // missing colon — parser error
+pk Delta S           // Delta is a schema inclusion, not an attribute — parser error
+pk in axdef          // only schema bodies — parser error
+```
+
+### Relational Algebra (Phase 2.2)
+
+The five Codd/Date operators.  All use kernel LaTeX (`\mathrm`,
+`\div`) — no extra package needed.  The emission uses keyword style:
+`Restrict`, `Project`, `Join`; renaming emits as literal `R[NEW/OLD]`
+pass-through (Z RM §3.11).
+
+**Fuzz compatibility.** Algebra expressions emit *outside* any Z
+environment (as `\noindent$...$` LaTeX math). fuzz silently skips
+them; schemas, axdefs, and other Z-side content in the same document
+still type-check cleanly. Write algebra as a top-level expression in
+your `.txt` source — never inside a `zed`/`axdef`/`schema`/`gendef`
+block. Wrapping algebra inside a Z block causes fuzz to reject the
+algebra keyword forms.
+
+#### Restriction
+
+```text
+sigma[pages >= 200](Book)
+```
+
+Renders: $\mathrm{Restrict}_{pages \geq 200}(Book)$
+
+The predicate inside `[...]` is a full expression (comparisons, logical
+operators, etc.).
+
+#### Projection
+
+```text
+pi[bookId, isbn](Book)
+```
+
+Renders: $\mathrm{Project}_{bookId, isbn}(Book)$
+
+The attribute list is comma-separated identifiers.
+
+#### Renaming
+
+Z RM §3.11 postfix form: `R[NEW/OLD]`.  NEW is written first, OLD second.
+
+```text
+Book[id/bookId]
+R[B/A, D/C]
+```
+
+Renders: $Book[id/bookId]$
+
+The base may be any relation expression.  Compound bases are automatically
+parenthesised:
+
+```text
+pi[tournament](sigma[venue = 'Wimbledon'](Match))[id/tournament]
+```
+
+Renders: $(\mathrm{Project}_{tournament}(\mathrm{Restrict}_{venue = `Wimbledon'}(Match)))[id/tournament]$
+
+Multiple pairs are comma-separated; each pair writes NEW first then `/` then OLD:
+
+```text
+R[B/A, D/C]
+```
+
+**Context requirement.** The postfix `[NEW/OLD]` form is recognised only
+inside a relational context — that is, as the argument to `sigma`, `pi`, or
+the right operand of `join`/`div`.  At the top level of an abbreviation RHS,
+wrap the rename inside a projection to force relational context:
+
+```text
+// Force relational context with pi (project all attributes):
+B == pi[ship, class, launched](Ship[ship/name])
+```
+
+**Fuzz note.** `R[NEW/OLD]` on a relation is not valid inside Z paragraphs
+(`zed`, `axdef`, `schema`).  The engine routes relational expressions through
+inline math (`\noindent$...$`) automatically, so fuzz never sees the `/`.
+
+The old `rho[A as B](R)` prefix keyword is retired.  `rho` now lexes as a
+plain identifier.
+
+#### Natural Join
+
+```text
+Track join Album
+```
+
+Renders: $\mathrm{Join}(Track, Album)$
+
+The source keyword is `join`; the LaTeX emission is `\mathrm{Join}(R, S)`,
+matching the instructor's canonical vocabulary (per slides/topic02.pdf §45).
+
+**Theta-join** with explicit predicate:
+
+```text
+Track join [Track.albumId = Album.albumId] Album
+```
+
+Renders: $\mathrm{Join}_{Track.albumId = Album.albumId}(Track, Album)$
+
+#### Division
+
+```text
+R div S
+```
+
+Renders: $R \div S$
+
+#### Naming a query
+
+Use `==` (Z abbreviation) to bind a name to an algebra expression.
+txt2tex inspects the RHS: when it contains a relational construct (algebra,
+binding, GROUP/UNGROUP), the abbreviation emits outside any Z block:
+
+```text
+LongBooks == pi[bookId, isbn](sigma[pages >= 200](Book))
+```
+
+Emits as `\noindent$LongBooks \defs \mathrm{Project}_{bookId, isbn}(\mathrm{Restrict}_{pages \geq 200}(Book))$`.
+
+#### Combining Operators
+
+```text
+// long books projected to key and isbn
+pi[bookId, isbn](sigma[pages >= 200](Book))
+
+// rename then join (rename inside pi forces relational context)
+pi[id, isbn, pages, year](Book[id/bookId]) join Loan
+
+// name a query using ==
+LongBooks == pi[bookId, isbn](sigma[pages >= 200](Book))
+```
+
+**Precedence summary** (tightest to loosest):
+
+| Operator | Form | Level |
+|----------|------|-------|
+| `sigma`, `pi` | prefix-with-args | atom (tightest) |
+| `R[NEW/OLD]` | postfix (inside relational context) | atom |
+| `f(x)` | function application | atom |
+| `intersect`, `setminus` (`\`) | infix | tighter than cross |
+| `cross`, `join`, `div`, `group`, `ungroup` | infix | middle |
+| `union`, `++` (override) | infix | loosest (of this group) |
+
+### GROUP and UNGROUP (Phase 4.1)
+
+Date's nested-relation operators.  Bundle attributes into a
+relation-valued attribute (`group`) or flatten them back (`ungroup`).
+
+**Fuzz compatibility.** GROUP/UNGROUP emit *outside* any Z
+environment, so fuzz silently skips them. Use them as top-level
+expressions in your source — not inside `zed`/`axdef`/`schema`
+blocks. The `\mathop{\mathrm{GROUP}}` wrapping and Date-style braces
+sit outside Z grammar; fuzz rejects them in Z-block contents.
+
+#### GROUP — regroup form
+
+```text
+R group ({A, B, ...} as alias)
+```
+
+Renders: $R \mathop{\mathrm{GROUP}} (\{A, B\} \mathop{\mathrm{AS}} alias)$
+
+The attribute list inside `{...}` is comma-separated.  The alias after
+`as` names the resulting nested-relation column.
+
+Example:
+
+```text
+GroupMembers group ({username} as members)
+```
+
+Renders: $GroupMembers \mathop{\mathrm{GROUP}} (\{username\} \mathop{\mathrm{AS}} members)$
+
+#### GROUP — aggregate form
+
+Computes scalar aggregates per partition.  The aggregator keywords are
+`Count`, `Sum`, `Avg`, `Min`, `Max`, and `Median` — each takes a
+single attribute name and an alias:
+
+```text
+R group (Count(attr) as alias)
+R group (Sum(attr) as alias)
+R group (Avg(attr) as alias)
+R group (Min(attr) as alias)
+R group (Max(attr) as alias)
+R group (Median(attr) as alias)
+```
+
+Each renders as:
+
+$$R~\mathrm{Group}(\mathrm{Aggregator}(attr)~\mathrm{as}~alias)$$
+
+Concrete examples for each aggregator:
+
+```text
+Sales group (Count(orderId) as orderCount)
+Sales group (Sum(amount) as totalRevenue)
+Sales group (Avg(amount) as meanRevenue)
+Sales group (Min(amount) as cheapest)
+Sales group (Max(amount) as priciest)
+Sales group (Median(amount) as midRevenue)
+```
+
+Multiple aggregators are comma-separated:
+
+```text
+R group (Count(x) as total, Sum(y) as grand)
+```
+
+Renders: $R~\mathrm{Group}(\mathrm{Count}(x)~\mathrm{as}~total,~\mathrm{Sum}(y)~\mathrm{as}~grand)$
+
+**Constraints.**
+
+- The aggregate form and the regroup form (`{...} as alias`) are
+  mutually exclusive within a single `group` expression.  Mixing them
+  is a parse error.
+- Each aggregator accepts exactly one attribute identifier — no nested
+  aggregators, no compound expressions.
+
+#### UNGROUP
+
+```text
+R ungroup alias
+```
+
+Renders: $R \mathop{\mathrm{UNGROUP}} alias$
+
+Inverse of GROUP — removes the nested-relation attribute and restores
+the original flat columns.
+
+#### Chaining
+
+GROUP and UNGROUP are left-associative at the same precedence as
+`join` and `div`:
+
+```text
+R group ({A} as sub) ungroup sub
+```
+
+### Z Binding Calculus (Phase 2.3)
+
+Binding brackets construct labelled tuples per Z RM §3.7.  Used in
+relational-calculus queries.
+
+**Fuzz compatibility.** Bindings emit *outside* any Z environment, so
+fuzz silently skips them. Write binding-bearing comprehensions as
+top-level expressions — not inside `zed`/`axdef`/`schema` blocks.
+fuzz parses Z-block contents strictly and rejects `==` inside
+`\lblot ... \rblot` even though both the brackets and the operator
+are defined in `fuzz.sty`.
+
+**Syntax:**
+
+```text
+{| label == expression, ... |}
+```
+
+Components are **comma-separated** (not semicolons).
+
+**Examples:**
+
+```text
+{| trackId == t.trackId |}
+
+{| trackId == t.trackId, year == a.year, tracks == a.tracks |}
+
+{| |}                         // empty binding (Z RM permits it)
+```
+
+**In set comprehensions:**
+
+```text
+{ t : Track | t.duration < 180 . {| trackId == t.trackId |} }
+
+{ t : Track; a : Album | t.albumId = a.albumId .
+  {| trackId == t.trackId, year == a.year |}
+}
+```
+
+The `;` in `s : Ship; c : Class` separates variable-type pairs with
+different domains (multi-typed comprehension).
+
+**LaTeX output:**
+
+- `{| a == 1 |}` → `\lblot a == 1 \rblot`
+- `{| a == 1, b == 2 |}` → `\lblot a == 1, b == 2 \rblot`
+- `{| |}` → `\lblot \rblot`
+
+The macros `\lblot` and `\rblot` are defined in both `fuzz.sty` and the
+`zed-*` family.  No preamble change is needed.
+
+**Token disambiguation:**
+
+- `{|` — Binding bracket left (LBIND)
+- `|}` — Binding bracket right (RBIND)
+- `{` — Set brace (LBRACE)
+- `|` — Quantifier/comprehension pipe (PIPE)
+- `(|` — Relational image left (LIMG)
+- `|)` — Relational image right (RIMG)
 
 ## Additional Features
 
@@ -2250,6 +3207,39 @@ R^{n+1}          →  Rⁿ⁺¹        [braces group multi-char superscripts]
 
 **Why this limitation exists:** Fuzz's `\bsup...\esup` command is specifically for the `iter` operator, which applies a relation to itself n times. It expects a relation type, not a number type. See the Z Reference Manual section on `iter` for details.
 
+### Identifier Decoration
+
+Z notation uses trailing decoration characters as part of the identifier lexeme.
+This is the Z RM §3.3 convention for naming before-state, after-state, input,
+and output variables.
+
+| Decoration | Meaning | Example |
+|---|---|---|
+| `'` (prime) | After-state | `count'`, `s''` |
+| `?` | Input variable | `in?`, `x?` |
+| `!` | Output variable | `out!`, `y!` |
+
+Decorations may appear in any order and can be combined:
+
+```text
+schema StateOp
+  count, count' : N
+  in? : N
+  out! : N
+where
+  count' = count + in?
+  out! = count
+end
+```
+
+Multiple primes (`s''`) and mixed combinations (`x?'`) are all valid.
+The decoration characters are part of the identifier name; there is no
+space between the base name and its decoration.
+
+**Contrast with contractions:** apostrophes in English prose (inside TEXT
+blocks) are not treated as decoration. `don't` and `won't` pass through
+unchanged.
+
 ### Multi-Word Identifiers
 
 Underscores can be used for readable multi-word variable names:
@@ -2282,6 +3272,7 @@ x + y            →  x + y       [addition]
 x - y            →  x - y       [subtraction]
 -x               →  -x          [negation]
 x * y            →  x × y       [multiplication]
+x div n          →  x ÷ n       [integer division — same `div` keyword as relational div]
 x mod n          →  x mod n     [modulo]
 ```
 
@@ -2356,6 +3347,101 @@ if condition \
 ```text
 longFunctionName(x, y, z) = \
   complexExpression + moreTerms
+```
+
+**After `|` in quantifier bindings (single-decl and semicolon-chained):**
+
+A natural newline or explicit `\` after the `|` separator in a quantifier
+binding causes the body to be placed on the next line, indented with `\t1`
+(the Spivey-canonical fuzz tab-stop).
+
+Single-binding form:
+
+```text
+forall i : songs |
+  loveHateScore(i) = someExpression
+```
+
+Semicolon-chained form — all four quantifier types (`forall`, `exists`,
+`exists1`, `mu`) honour the break equally:
+
+```text
+forall s : Ship; o : Outcome; b : Battle |
+  (o.ship = s.name land o.battle = b.name) =>
+  (s.launched <= b.date)
+```
+
+Both forms emit `@ \\` followed by a newline and `\t1` indentation:
+
+```latex
+\forall s : Ship; o : Outcome; b : Battle @ \\
+\t1 (o.ship = s.name \land o.battle = b.name) \implies ...
+```
+
+The bullet (`.`) separator in constraint-plus-body quantifiers also supports
+the same break:
+
+```text
+forall x : N; y : N | x > 0 .
+  x < y
+```
+
+#### Algebra and Set Operators
+
+The following operators also support WYSIWYG line breaks — both a natural
+newline after the operator and an explicit `\` continuation:
+
+| Keyword | LaTeX | Notes |
+|---------|-------|-------|
+| `join` | `\mathrm{Join}(R, S)` | natural join / theta-join |
+| `cross` | `\times` | Cartesian product |
+| `div` | `\div` | relational division |
+| `intersect` | `\cap` | set intersection |
+| `union` | `\cup` | set union |
+| `setminus` | `\setminus` | set difference — see caveat |
+| `++` | `\oplus` | override |
+| `group` | `\mathop{\mathrm{GROUP}}` | Date nested-relation operator |
+| `ungroup` | `\mathop{\mathrm{UNGROUP}}` | Date nested-relation operator |
+| `Count`, `Sum`, `Avg`, `Min`, `Max`, `Median` | `\mathrm{Count}(attr)~\mathrm{as}~alias` | Aggregators inside `group` RHS |
+
+**Display position** (free-standing expression): the broken chain wraps in
+`\begin{array}{l}...\end{array}` with `\\` between continuations.
+
+**Inside a `where` predicate** (`schema`, `axdef`, `zed`): `\\` is emitted
+inline with no array wrapper — the same form fuzz type-checks for `land`
+and `lor`.
+
+Example — long algebra expression broken at operator boundaries:
+
+```text
+pi[winner, venue, tier](Tournament join
+  Match join
+  (pi[tournament](sigma[venue = 'Centre Court'](Match)))[id/tournament])
+```
+
+Example — inside a schema `where` clause:
+
+```text
+schema S
+  x, y, z : P A
+where
+  x = y union
+    z intersect A
+end
+```
+
+**`setminus` caveat.** The `setminus` token is the character `\`. The lexer
+reads `\` at end of line as a continuation marker, and `\` followed by any
+non-newline character as `setminus`. You cannot place a continuation
+immediately after `setminus`. Break *before* `setminus` instead:
+
+```text
+-- OK: break before setminus
+A setminus B setminus \
+  C
+-- NOT OK: continuation immediately after setminus is a lex error
+A \        -- this is "A setminus (next line)" -- wrong
+  B
 ```
 
 ### Fixing Overflow

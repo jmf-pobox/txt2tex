@@ -10,21 +10,13 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\section*{Phase 39 : Strict Subset Operator}
+\section*{Phase 39: Strict Subset Operator}
 
 \noindent The strict subset operator (psubset, $\subset$) represents proper subset relationships, where A is a subset of B AND A is not equal to B.
 
 \bigskip
 
-\noindent Distinction from subset ($\subseteq$):
-
-\bigskip
-
-\noindent - A subset B means: every element of A is $\in$ B (may be equal)
-
-\bigskip
-
-\noindent - A psubset B means: every element of A is $\in$ B AND $A \neq B$ (strict inequality)
+\noindent Distinction from subset ($\subseteq$): - A subset B means: every element of A is $\in$ B (may be equal) - A psubset B means: every element of A is $\in$ B AND $A \neq B$ (strict inequality)
 
 \bigskip
 
@@ -53,15 +45,7 @@ W : \power \nat
 X = \{1, 2\} \land Y = \{1, 2, 3\} \land W = \{1, 2\} \land X \subset Y \land X \subseteq W
 \end{axdef}
 
-\noindent X psubset Y is true (X is strictly contained in Y)
-
-\bigskip
-
-\noindent X subset W is true (X is a subset of W, including the case where $X = W$)
-
-\bigskip
-
-\noindent X psubset W would be FALSE (they are equal sets)
+\noindent X psubset Y is true (X is strictly contained in Y) X subset W is true (X is a subset of W, including the case where $X = W$) X psubset W would be FALSE (they are equal sets)
 
 \bigskip
 

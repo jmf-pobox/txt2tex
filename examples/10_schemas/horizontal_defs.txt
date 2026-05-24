@@ -1,0 +1,50 @@
+// ============================================================================
+// Example: Horizontal Schema Definitions
+// ============================================================================
+// Demonstrates the Z RM §3.8 horizontal definition form:
+//   Name [generics]? defs RHS
+//
+// Two RHS forms are supported:
+//   1. Schema reference (possibly decorated, possibly generic):
+//        OpAlias defs Delta Counter
+//   2. Inline schema text [ decl-list | pred-list ]:
+//        NatPair defs [ x, y : N | x < y ]
+//
+// The \defs macro (from fuzz.sty:280, defined as \widehat=) renders the
+// horizontal definition without a boxed schema environment.
+// ============================================================================
+
+=== Simple Schema Reference ===
+
+TEXT: A horizontal definition gives a new name to an existing schema or
+TEXT: schema expression without creating a new boxed schema paragraph.
+
+schema Counter
+  n : N
+end
+
+TEXT: Plain alias: CounterRef is definitionally equal to Counter.
+
+CounterRef defs Counter
+
+TEXT: Inline schema text: a compact one-line schema form.
+
+NatPair defs [ x, y : N | x < y ]
+
+=== Multi-predicate Inline Text ===
+
+TEXT: Multiple predicates within the inline text are separated by semicolons
+TEXT: and joined with logical-and in the output.
+
+BoundedNat defs [n : N | n > 0; n < 100]
+
+=== Generic LHS ===
+
+TEXT: The LHS may carry generic type parameters for parameterised
+TEXT: horizontal definitions per Z RM §3.8.
+
+schema GenStack[X]
+  top : X
+end
+
+StackAlias[X] defs GenStack[X]

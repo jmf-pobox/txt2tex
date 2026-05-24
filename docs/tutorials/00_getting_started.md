@@ -145,7 +145,7 @@ txt2tex your_file.txt
 
 If there are errors:
 
-- Check the LaTeX log: `your_file.log`
+- Check the LaTeX log: `grep -i error your_file.log`
 - Fix syntax issues in your txt file
 - Recompile
 
@@ -163,9 +163,14 @@ Edit your txt file and recompile until you're satisfied.
 TEXT: Prove that p land q implies p.
 
 PROOF:
+p [land elim 1]
   p land q [premise]
-  p [land elim left]
 ```
+
+The conclusion `p` is written first; its single premise `p land q` is
+indented below it. `land elim 1` is unary so no `::` markers are
+needed. For multi-premise rules, see
+**[Tutorial 4: Proof Trees](04_proof_trees.md)**.
 
 ### Pattern 2: Definition with Examples
 
@@ -223,12 +228,16 @@ F | F | F
 TEXT: Implication p => q means "if p then q".
 
 PROOF:
-  p land (p => q) [premise]
-  p [land elim left]
-  p => q [land elim right]
-  q [=> elim]
+q [=> elim]
+  :: p [land elim 1]
+    p land (p => q) [premise]
+  :: p => q [land elim 2]
+    p land (p => q) [premise]
 
-TEXT: This proof shows modus ponens: from p land p => q, we conclude q.
+TEXT: This proof shows modus ponens: from p land (p => q), we conclude q.
+The `=> elim` rule is binary, so its two premises each carry a `::`
+marker. Each premise is itself derived by `land elim` from the shared
+top assumption.
 ```
 
 Save this as `basics.txt` and compile:
@@ -286,11 +295,25 @@ TEXT: This is explanatory text.
 
 Now that you can create and compile basic documents:
 
-1. **Start with the smallest examples:** Browse `examples/00_getting_started/` — three minimal `.txt` files (`hello_world`, `first_proof`, `basic_z_notation`) that exercise the full pipeline.
+1. **Start with the smallest examples:** Browse `examples/00_getting_started/` — five runnable `.txt` files (`hello_world`, `first_proof`, `basic_z_notation`, `decorated_identifiers`, `string_literals`) that exercise the full pipeline.
 2. **Explore examples:** Browse `examples/01_propositional_logic/`
 3. **Try truth tables:** Practice with `examples/01_propositional_logic/truth_tables.txt`
 4. **Learn proof trees:** See `examples/04_proof_trees/simple_proofs.txt`
 5. **Read Tutorial 1:** Learn propositional logic in depth
+
+### What You Can Write Next
+
+Beyond the basics, txt2tex supports several additional block types — see the
+[User Guide](../guides/USER_GUIDE.md) for full syntax:
+
+- **`B:` block** — embed an Atelier-B / B-Method machine listing verbatim.
+  The body is passed to `\begin{verbatim}…\end{verbatim}` unchanged.
+  Terminated by a column-0 `END` line.
+- **Multi-line `LATEX:` block** — `LATEX:` alone on a line opens a raw-LaTeX
+  block whose body is slurped verbatim until a column-0 `END`.
+  Indentation is preserved and no paragraph breaks are inserted between lines.
+- **GROUP aggregate forms** — `Count`, `Sum`, `Avg`, `Min`, `Max`, and `Median`
+  aggregator keywords inside a `group` RHS for scalar per-partition aggregation.
 
 ## Quick Reference
 
@@ -321,7 +344,7 @@ your_document.log      # LaTeX compilation log
 
 ### Getting Help
 
-- **Examples:** `examples/` directory has 60+ example files
+- **Examples:** `examples/` directory has 159 example files
 - **User Guide:** `docs/guides/USER_GUIDE.md` - complete syntax reference
 - **README:** Each example directory has a README
 - **Missing Features:** `docs/guides/MISSING_FEATURES.md` - features not yet implemented
@@ -342,7 +365,7 @@ txt2tex file.txt
 **Solution:** Check the .log file:
 
 ```bash
-cat your_file.log | grep -i error
+grep -i error your_file.log
 ```
 
 ### Problem: Missing symbols
@@ -353,15 +376,50 @@ cat your_file.log | grep -i error
 
 **Solution:** Compare your syntax with examples in the `examples/` directory.
 
+## Identifier Decoration (`'`, `?`, `!`)
+
+Z notation uses decorated identifiers to distinguish before-state, after-state, input, and output variables within a schema. The decoration characters are part of the identifier lexeme.
+
+```text
+schema StateOp
+  count, count' : N
+  in? : N
+  out! : N
+where
+  count' = count + in?
+  out! = count
+end
+```
+
+A trailing `'` (prime) marks the after-state. A trailing `?` marks an input variable. A trailing `!` marks an output variable. Multiple primes (`s''`) and mixed suffixes (`x?'`) are all valid.
+
+See `examples/00_getting_started/decorated_identifiers.txt` for a runnable example.
+
+## String Literals
+
+String literals represent concrete text values in Z expressions. Write them with single quotes in the source:
+
+```text
+mode = 'active'
+```
+
+The generator emits Z-convention quoting: `` `active' `` in fuzz mode, `\text{`active'}` in standard LaTeX mode.
+
+Note: apostrophes in TEXT blocks (prose paragraphs) are not treated as string literals — `don't` and `won't` pass through unchanged.
+
+See `examples/00_getting_started/string_literals.txt` for a runnable example.
+
 ## Summary
 
 You've learned:
 
-- ✅ How to install and run txt2tex
-- ✅ Basic document structure (sections, TEXT blocks)
-- ✅ Simple mathematical notation
-- ✅ The compilation workflow
-- ✅ Common patterns and mistakes
+- How to install and run txt2tex
+- Basic document structure (sections, TEXT blocks)
+- Simple mathematical notation
+- The compilation workflow
+- Common patterns and mistakes
+- Identifier decoration for Z state-based modelling
+- String literal syntax
 
 **Next Tutorial:** [Tutorial 1: Propositional Logic](01_propositional_logic.md)
 
@@ -369,4 +427,4 @@ Learn about boolean operators, truth tables, and logical equivalences.
 
 ---
 
-**Questions?** Consult the [User Guide](docs/guides/USER_GUIDE.md) or explore the [examples directory](examples/).
+**Questions?** Consult the [User Guide](../guides/USER_GUIDE.md) or explore the `examples/` directory.

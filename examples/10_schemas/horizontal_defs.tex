@@ -1,0 +1,63 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Simple Schema Reference}
+
+\noindent A horizontal definition gives a new name to an existing schema or schema expression without creating a new boxed schema paragraph.
+
+\bigskip
+
+\begin{schema}{Counter}
+n : \nat
+\end{schema}
+
+\noindent Plain alias: CounterRef is definitionally equal to Counter.
+
+\bigskip
+
+\begin{zed}
+CounterRef \defs Counter
+\end{zed}
+
+\noindent Inline schema text: a compact one-line schema form.
+
+\bigskip
+
+\begin{zed}
+NatPair \defs [ x : \nat; y : \nat | x < y ]
+\end{zed}
+
+\section*{Multi-predicate Inline Text}
+
+\noindent Multiple predicates within the inline text are separated by semicolons and joined with logical-and in the output.
+
+\bigskip
+
+\begin{zed}
+BoundedNat \defs [ n : \nat | n > 0 \land n < 100 ]
+\end{zed}
+
+\section*{Generic LHS}
+
+\noindent The LHS may carry generic type parameters for parameterised horizontal definitions per Z RM §3.8.
+
+\bigskip
+
+\begin{schema}{GenStack}[X]
+top : X
+\end{schema}
+
+\begin{zed}
+StackAlias[X] \defs GenStack[X]
+\end{zed}
+
+\end{document}

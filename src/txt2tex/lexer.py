@@ -27,7 +27,27 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     "cross": TokenType.CROSS,
     "bigcup": TokenType.BIGCUP,
     "bigcap": TokenType.BIGCAP,
+    # Relational algebra operators (Phase 2.2)
+    "sigma": TokenType.SIGMA,
+    "pi": TokenType.PI,
+    "join": TokenType.JOIN,
+    "div": TokenType.DIV,
+    # Nested-relation operators (Phase 4.1)
+    "group": TokenType.GROUP,
+    "ungroup": TokenType.UNGROUP,
+    # Aggregator keywords (Phase 4.2)
+    "Count": TokenType.COUNT,
+    "Sum": TokenType.SUM,
+    "Avg": TokenType.AVG,
+    "Min": TokenType.MIN,
+    "Max": TokenType.MAX,
+    "Median": TokenType.MEDIAN,
+    "as": TokenType.AS,
+    # Schema-calculus operators (Phase 3.2)
+    "hide": TokenType.HIDE,
+    "project": TokenType.PROJECT,
     # Z notation keywords
+    "pk": TokenType.PK,
     "given": TokenType.GIVEN,
     "axdef": TokenType.AXDEF,
     "schema": TokenType.SCHEMA,
@@ -36,6 +56,10 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     "syntax": TokenType.SYNTAX,
     "where": TokenType.WHERE,
     "end": TokenType.END,
+    "Delta": TokenType.DELTA,
+    "Xi": TokenType.XI,
+    "theta": TokenType.THETA,
+    "defs": TokenType.DEFS,
     # Conditional expression keywords
     "if": TokenType.IF,
     "then": TokenType.THEN,
@@ -59,6 +83,7 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     # Filter and bag operators
     "filter": TokenType.FILTER,
     "bag_union": TokenType.BAG_UNION,
+    "bag_diff": TokenType.BAG_DIFF,
 }
 
 # Keywords that map to the same token type (aliases)
@@ -66,6 +91,106 @@ KEYWORD_ALIASES: dict[str, TokenType] = {
     "subset": TokenType.SUBSET,
     "subseteq": TokenType.SUBSET,
 }
+
+# All words the lexer treats as reserved — decoration is forbidden on these.
+# Includes KEYWORD_TO_TOKEN entries, KEYWORD_ALIASES, and all colon-postfix
+# pseudo-keywords matched by explicit string comparison in _scan_identifier.
+# Using frozenset signals immutability and gives O(1) membership tests.
+RESERVED_WORDS: frozenset[str] = frozenset(
+    {
+        # --- KEYWORD_TO_TOKEN entries ---
+        "land",
+        "lor",
+        "lnot",
+        "forall",
+        "exists1",
+        "exists",
+        "mu",
+        "lambda",
+        "notin",
+        "elem",
+        "psubset",
+        "union",
+        "intersect",
+        "cross",
+        "bigcup",
+        "bigcap",
+        # --- Relational algebra operators ---
+        "sigma",
+        "pi",
+        "join",
+        "div",
+        "group",
+        "ungroup",
+        # --- Aggregator keywords (Phase 4.2) ---
+        "Count",
+        "Sum",
+        "Avg",
+        "Min",
+        "Max",
+        "Median",
+        "as",
+        # --- Schema-calculus operators ---
+        "hide",
+        "project",
+        "pk",
+        "given",
+        "axdef",
+        "schema",
+        "gendef",
+        "zed",
+        "syntax",
+        "where",
+        "end",
+        "Delta",
+        "Xi",
+        "theta",
+        "defs",
+        "if",
+        "then",
+        "else",
+        "otherwise",
+        "comp",
+        "dom",
+        "ran",
+        "inv",
+        "id",
+        "shows",
+        "mod",
+        "P1",
+        "P",
+        "F1",
+        "F",
+        "filter",
+        "bag_union",
+        "bag_diff",
+        # --- KEYWORD_ALIASES ---
+        "subset",
+        "subseteq",
+        # --- Colon-postfix pseudo-keywords ---
+        "ARGUE",
+        "EQUIV",
+        "EQUAL",
+        "INFRULE",
+        "PROOF",
+        "TEXT",
+        "PURETEXT",
+        "LATEX",
+        "TRUTH",
+        "TABLE",
+        "TITLE",
+        "SUBTITLE",
+        "AUTHOR",
+        "DATE",
+        "INSTITUTION",
+        "CONTENTS",
+        "PARTS",
+        "BIBLIOGRAPHY",
+        "BIBLIOGRAPHY_STYLE",
+        "PAGEBREAK",
+        "LINEBREAK",
+    }
+)
 
 # Single-character tokens that don't require lookahead.
 # These can be dispatched directly without peek checks.
@@ -113,6 +238,8 @@ class Lexer:
     line: int
     column: int
     _in_solution_marker: bool
+    _bind_depth: int  # Tracks nested {| ... |} binding bracket depth
+    _token_buffer: list[Token]  # Buffer for tokens produced as lookahead side-effects
 
     def __init__(self, text: str) -> None:
         """Initialize lexer with input text."""
@@ -121,6 +248,8 @@ class Lexer:
         self.line = 1
         self.column = 1
         self._in_solution_marker = False  # Track if inside ** ... **
+        self._bind_depth = 0  # Track open {| ... |} nesting depth
+        self._token_buffer = []  # Drain before scanning new characters
 
     def _raise_infinite_loop_error(
         self,
@@ -159,10 +288,17 @@ class Lexer:
     def tokenize(self) -> list[Token]:
         """Tokenize entire input and return list of tokens."""
         tokens: list[Token] = []
-        while not self._at_end():
+        while not self._at_end() or self._token_buffer:
+            # Drain the side-effect buffer before consuming more characters.
+            if self._token_buffer:
+                tokens.append(self._token_buffer.pop(0))
+                continue
             token = self._scan_token()
             if token is not None:
                 tokens.append(token)
+        # Drain any remaining buffered tokens before EOF.
+        while self._token_buffer:
+            tokens.append(self._token_buffer.pop(0))
         tokens.append(self._make_token(TokenType.EOF, ""))
         return tokens
 
@@ -232,7 +368,64 @@ class Lexer:
             return Token(SINGLE_CHAR_TOKENS[char], char, start_line, start_column)
 
         # Section marker: ===
+        # When followed by a closing === on the same line, capture the raw title
+        # text between them as a TEXT token so the parser receives verbatim content
+        # without inter-character whitespace padding from the math-token pipeline.
         if char == "=" and self._peek_char() == "=" and self._peek_char(2) == "=":
+            # Scan ahead to detect the pattern: === <text> === on one line.
+            # We look for a closing "===" before the next newline.
+            scan = self.pos + 3  # skip past the opening ===
+            found_close = -1
+            while scan < len(self.text) and self.text[scan] != "\n":
+                if (
+                    self.text[scan] == "="
+                    and scan + 1 < len(self.text)
+                    and self.text[scan + 1] == "="
+                    and scan + 2 < len(self.text)
+                    and self.text[scan + 2] == "="
+                ):
+                    found_close = scan
+                    break
+                scan += 1
+
+            if found_close != -1:
+                # Consume the opening ===
+                self._advance()
+                self._advance()
+                self._advance()
+                open_marker = Token(
+                    TokenType.SECTION_MARKER, "===", start_line, start_column
+                )
+
+                # Capture raw title text between the two === markers,
+                # stripping leading/trailing whitespace.
+                raw_title_start = self.pos
+                while self.pos < found_close:
+                    self._advance()
+                raw_title = self.text[raw_title_start : self.pos].strip()
+
+                # Consume the closing ===
+                close_line = self.line
+                close_column = self.column
+                self._advance()
+                self._advance()
+                self._advance()
+                close_marker = Token(
+                    TokenType.SECTION_MARKER, "===", close_line, close_column
+                )
+
+                # The lexer returns one token at a time, so we store the extras
+                # in a small buffer.  _scan_token() is the only call site; we
+                # shadow it by inserting a helper that drains the buffer first.
+                # Emit open marker now; buffer the title TEXT token and the
+                # closing SECTION_MARKER so subsequent _scan_token() calls
+                # return them in order.
+                title_token = Token(TokenType.TEXT, raw_title, start_line, start_column)
+                self._token_buffer.append(title_token)
+                self._token_buffer.append(close_marker)
+                return open_marker
+
+            # No closing === on this line — emit a bare === marker as before.
             self._advance()
             self._advance()
             self._advance()
@@ -331,6 +524,13 @@ class Lexer:
             self._advance()
             return Token(TokenType.LBRACKET, "[", start_line, start_column)
 
+        # Binding bracket left {| — check before bare {
+        if char == "{" and self._peek_char() == "|":
+            self._advance()
+            self._advance()
+            self._bind_depth += 1
+            return Token(TokenType.LBIND, "{|", start_line, start_column)
+
         # Braces (for sets and grouping subscripts/superscripts)
         if char == "{":
             self._advance()
@@ -361,6 +561,16 @@ class Lexer:
             self._advance()
             self._advance()
             return Token(TokenType.RIMG, "|)", start_line, start_column)
+
+        # Binding bracket right |} — only emit RBIND when inside an open {|.
+        # If _bind_depth is 0, fall through and lex as bare | then bare }.
+        # This prevents { x : N | x > 0|} from silently swallowing the
+        # closing pipe+brace as an RBIND when no binding is open.
+        if char == "|" and self._peek_char() == "}" and self._bind_depth > 0:
+            self._advance()
+            self._advance()
+            self._bind_depth -= 1
+            return Token(TokenType.RBIND, "|}", start_line, start_column)
 
         # Pipe (for truth tables and quantifiers)
         if char == "|":
@@ -446,6 +656,19 @@ class Lexer:
             self._advance()
             return Token(TokenType.GREATER_EQUAL, ">=", start_line, start_column)
 
+        # Schema piping operator >> (Phase 3.2) — two consecutive > characters
+        # preceded by whitespace (i.e., used as an operator, not as two closing
+        # RANGLE brackets from nested sequences like <<a>, <b>>).
+        # We require whitespace before the first > to distinguish S >> T from
+        # the closing >> in <<a>, <b>>.
+        if char == ">" and self._peek_char() == ">":
+            prev_pos = self.pos - 1
+            has_space_before = prev_pos >= 0 and self.text[prev_pos] in " \t"
+            if has_space_before:
+                self._advance()
+                self._advance()
+                return Token(TokenType.PIPE_PIPE, ">>", start_line, start_column)
+
         # Function type operators starting with >
         # Check 4-character first: >->>
         if (
@@ -523,6 +746,11 @@ class Lexer:
             self._advance()
             self._advance()
             return Token(TokenType.NOTIN, "/in", start_line, start_column)
+
+        # Bare slash — separator in schema rename pairs S[a/b] (Phase 3.1)
+        if char == "/":
+            self._advance()
+            return Token(TokenType.SLASH, "/", start_line, start_column)
 
         # Abbreviation operator == - check before = alone
         # Already checked for === and => earlier
@@ -775,6 +1003,32 @@ class Lexer:
             self._advance()
             return Token(TokenType.BAG_UNION, "⊎", start_line, start_column)
 
+        # Apostrophe handling: two distinct cases.
+        #
+        # 1. Contraction / possessive suffix: ' immediately follows an alnum char
+        #    (e.g., Morgan's — the preceding identifier was already returned, now
+        #    we see "'s").  Consume the apostrophe + trailing alpha run and emit
+        #    as IDENTIFIER so the section-title reconstructor sees "'s" as a token.
+        #
+        # 2. String literal: ' at a word boundary (preceded by non-alnum or at
+        #    start of input).  Scan as quoted string literal.
+        if char == "'":
+            prev_alnum = self.pos > 0 and self.text[self.pos - 1].isalnum()
+            if prev_alnum and self._peek_char().isalpha():
+                # Contraction suffix like "'s", "'t", "'re"
+                start_pos = self.pos
+                self._advance()  # consume '
+                while not self._at_end() and self._current_char().isalpha():
+                    self._advance()
+                return Token(
+                    TokenType.IDENTIFIER,
+                    self.text[start_pos : self.pos],
+                    start_line,
+                    start_column,
+                )
+            if not prev_alnum:
+                return self._scan_string_literal(start_line, start_column)
+
         # Unknown character
         raise LexerError(f"Unexpected character: {char!r}", self.line, self.column)
 
@@ -788,15 +1042,60 @@ class Lexer:
             self._advance()  # consume '9'
             return Token(TokenType.CIRC, "o9", start_line, start_column)
 
-        # Include underscore in identifiers and apostrophes in contractions
-        # This allows multi-word identifiers like cumulative_total
-        # Subscripts like a_i are now handled in LaTeX generation
+        # Consume the alnum/underscore run.
         while not self._at_end():
             current = self._current_char()
             if current.isalnum() or current == "_":
                 self._advance()
-            elif current == "'" and self._peek_char().isalpha():
-                # Allow apostrophe if followed by a letter (contraction)
+            else:
+                break
+
+        # Consume any trailing decoration suffix per Z RM §3.3:
+        # primes ('), inputs (?), outputs (!).
+        #
+        # Rules:
+        #   - Decorations apply to names, not reserved keywords (Z RM §3.3).
+        #     If the alnum run is a keyword, raise LexerError before consuming.
+        #   - Primes are unlimited: s'', s''' are all valid.
+        #   - ? and ! appear at most once each (jms round-1 confirmation).
+        #     A second ? or ! raises LexerError.
+        #   - ' is consumed only when NOT followed by alpha, preserving English
+        #     possessives and contractions (Morgan's, don't).
+        # Note: '!=' is tokenised earlier as NOT_EQUAL; a bare '!' after an
+        # alnum run does not collide with that path.
+        base_end = self.pos  # position after the alnum run (before decoration)
+        base_value = self.text[start_pos:base_end]
+
+        # Reject decoration on reserved keywords (Z RM §3.3: names, not keywords).
+        # RESERVED_WORDS covers KEYWORD_TO_TOKEN, KEYWORD_ALIASES, and all
+        # colon-postfix pseudo-keywords (ARGUE, PROOF, TEXT, TRUTH, …).
+        if base_value in RESERVED_WORDS and not self._at_end():
+            next_ch = self._current_char()
+            if next_ch in ("'", "?", "!"):
+                # Point the error at the decoration character, not the keyword start.
+                deco_line = self.line
+                deco_column = self.column
+                msg = f"Cannot decorate reserved keyword {base_value!r}"
+                raise LexerError(msg, deco_line, deco_column)
+
+        seen_question = False
+        seen_bang = False
+        while not self._at_end():
+            current = self._current_char()
+            if current == "?":
+                if seen_question:
+                    # Point at the duplicate decoration character.
+                    msg = f"Multiple '?' decorators in identifier {base_value!r}"
+                    raise LexerError(msg, self.line, self.column)
+                seen_question = True
+                self._advance()
+            elif current == "!":
+                if seen_bang:
+                    msg = f"Multiple '!' decorators in identifier {base_value!r}"
+                    raise LexerError(msg, self.line, self.column)
+                seen_bang = True
+                self._advance()
+            elif current == "'" and not self._peek_char().isalpha():
                 self._advance()
             else:
                 break
@@ -892,22 +1191,60 @@ class Lexer:
 
             return Token(TokenType.PURETEXT, text_content, start_line, start_column)
 
-        # Check for LATEX: keyword - capture rest of line as raw LaTeX (no escaping)
+        # Check for LATEX: keyword — two forms:
+        #   Single-line:  LATEX: <content>   (non-empty on same line)
+        #   Multi-line:   LATEX:             (only whitespace before newline)
+        # The distinguishing rule: peek past the colon; if ONLY optional
+        # whitespace remains before the newline (or EOF), open a multi-line
+        # block.  Any non-whitespace character means single-line.
         if value == "LATEX" and self._current_char() == ":":
             self._advance()  # Consume ':'
 
-            # Skip any whitespace after the colon
+            # Scan ahead to decide form — do NOT advance pos yet.
+            scan = self.pos
+            while scan < len(self.text) and self.text[scan] in " \t":
+                scan += 1
+            # Multi-line only when a newline follows the optional whitespace.
+            # At EOF without a newline the single-line form is used.
+            rest_is_blank = scan < len(self.text) and self.text[scan] == "\n"
+
+            if rest_is_blank:
+                # Multi-line block: slurp body until column-0 END.
+                # Consume any trailing whitespace on the LATEX: line.
+                while not self._at_end() and self._current_char() in " \t":
+                    self._advance()
+                # Consume the newline ending the LATEX: line.
+                if not self._at_end() and self._current_char() == "\n":
+                    self._advance()
+                # Slurp body lines verbatim until column-0 END.
+                latex_block_lines: list[str] = []
+                found_end = False
+                while not self._at_end():
+                    line_start = self.pos
+                    while not self._at_end() and self._current_char() != "\n":
+                        self._advance()
+                    raw_line = self.text[line_start : self.pos]
+                    if not self._at_end() and self._current_char() == "\n":
+                        self._advance()
+                    if raw_line == "END":
+                        found_end = True
+                        break
+                    latex_block_lines.append(raw_line)
+                if not found_end:
+                    raise LexerError(
+                        f"LATEX: block opened at line {start_line} has no closing END",
+                        start_line,
+                        start_column,
+                    )
+                body = "\n".join(latex_block_lines)
+                return Token(TokenType.RAW_LATEX_BLOCK, body, start_line, start_column)
+            # Single-line: skip whitespace, capture rest of line.
             while not self._at_end() and self._current_char() in " \t":
                 self._advance()
-
-            # Capture the rest of the line as raw LaTeX (don't tokenize)
             text_start = self.pos
             while not self._at_end() and self._current_char() != "\n":
                 self._advance()
-
-            # Extract the raw LaTeX content
             text_content = self.text[text_start : self.pos]
-
             return Token(TokenType.LATEX, text_content, start_line, start_column)
 
         # Check for title metadata keywords: TITLE:, AUTHOR:, DATE:, etc.
@@ -990,10 +1327,66 @@ class Lexer:
                 TokenType.BIBLIOGRAPHY_STYLE, style_value, start_line, start_column
             )
 
+        # Check for LINEBREAK: keyword
+        if value == "LINEBREAK" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+            return Token(TokenType.LINEBREAK, "LINEBREAK:", start_line, start_column)
+
         # Check for PAGEBREAK: keyword
         if value == "PAGEBREAK" and self._current_char() == ":":
             self._advance()  # Consume ':'
             return Token(TokenType.PAGEBREAK, "PAGEBREAK:", start_line, start_column)
+
+        # Check for B: keyword — B-machine verbatim block.
+        # Consume body lines verbatim until a line that is exactly "END" at
+        # column 0 (no leading whitespace, optional trailing newline).
+        # The END line itself is included in the body.
+        if value == "B" and self._current_char() == ":":
+            self._advance()  # consume ':'
+            # Skip optional trailing whitespace/rest of B: line up to newline
+            while not self._at_end() and self._current_char() != "\n":
+                self._advance()
+            # Consume the newline that ends the B: line, if present
+            if not self._at_end() and self._current_char() == "\n":
+                self._advance()
+            # Slurp body lines verbatim until column-0 END
+            body_lines: list[str] = []
+            found_end = False
+            while not self._at_end():
+                # Scan one line
+                line_start = self.pos
+                while not self._at_end() and self._current_char() != "\n":
+                    self._advance()
+                # Capture the line content (without its trailing newline)
+                raw_line = self.text[line_start : self.pos]
+                # Consume the newline, if present
+                if not self._at_end() and self._current_char() == "\n":
+                    self._advance()
+                body_lines.append(raw_line)
+                # Check if this line is the terminator: exactly "END"
+                if raw_line == "END":
+                    found_end = True
+                    break
+            if not found_end:
+                raise LexerError(
+                    f"B: block opened at line {start_line} has no closing END",
+                    start_line,
+                    start_column,
+                )
+            body = "\n".join(body_lines)
+            # Reject a literal \end{verbatim} in the body: it would close the
+            # generator's verbatim env early and let arbitrary LaTeX follow.
+            # No in-band escape exists inside LaTeX verbatim; rejection is the
+            # only safe posture (djb 2026-05-22 review).
+            if "\\end{verbatim}" in body:
+                raise LexerError(
+                    f"B: block at line {start_line} contains a literal "
+                    f"'\\end{{verbatim}}' which would prematurely terminate "
+                    f"the rendered verbatim environment",
+                    start_line,
+                    start_column,
+                )
+            return Token(TokenType.B_BLOCK, body, start_line, start_column)
 
         # Auto-detect prose paragraphs BEFORE keyword checks
         # Also detect prose after part labels (any column)
@@ -1173,6 +1566,9 @@ class Lexer:
                         "else",
                         "otherwise",
                         "mod",
+                        "defs",
+                        "group",
+                        "ungroup",
                     }
 
                     # If next word is NOT a Z keyword, treat as prose
@@ -1205,3 +1601,32 @@ class Lexer:
 
         value = self.text[start_pos : self.pos]
         return Token(TokenType.NUMBER, value, start_line, start_column)
+
+    def _scan_string_literal(self, start_line: int, start_column: int) -> Token:
+        """Scan a single-quoted string literal, handling \\' escape sequences.
+
+        The opening quote has already been identified as the current char.
+        Raises LexerError for unterminated strings (newline or EOF before closing ').
+        The token value carries the content with escape sequences resolved.
+        """
+        self._advance()  # consume opening '
+        content: list[str] = []
+        while True:
+            if self._at_end() or self._current_char() == "\n":
+                raise LexerError(
+                    "Unterminated string literal",
+                    start_line,
+                    start_column,
+                )
+            ch = self._current_char()
+            if ch == "\\" and self._peek_char() == "'":
+                self._advance()  # consume backslash
+                self._advance()  # consume escaped apostrophe
+                content.append("'")
+            elif ch == "'":
+                self._advance()  # consume closing '
+                break
+            else:
+                content.append(ch)
+                self._advance()
+        return Token(TokenType.STRING, "".join(content), start_line, start_column)

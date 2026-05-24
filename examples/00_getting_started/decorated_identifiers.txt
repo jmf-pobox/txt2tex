@@ -1,0 +1,26 @@
+// ============================================================================
+// Example: Decorated Identifiers (Phase 0 - Schema Operation Support)
+// ============================================================================
+// Demonstrates Z notation identifier decoration:
+//   - Primes (') for after-state variables: count'
+//   - Input decoration (?) for input variables: in?
+//   - Output decoration (!) for output variables: out!
+//
+// Per Z RM §3.3, these decorations are part of the identifier lexeme.
+//
+// To compile:
+//   txt2tex examples/00_getting_started/decorated_identifiers.txt
+// ============================================================================
+
+=== Identifier Decoration in Z ===
+
+TEXT: Z notation uses decorated identifiers to distinguish input, output, and after-state variables. A prime (') marks the after-state; a question mark (?) marks an input; an exclamation mark (!) marks an output.
+
+schema StateOp
+  count, count' : N
+  in? : N
+  out! : N
+where
+  count' = count + in?
+  out! = count
+end

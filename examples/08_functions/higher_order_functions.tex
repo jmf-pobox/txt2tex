@@ -10,7 +10,7 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\section*{Higher - Order Functions}
+\section*{Higher-Order Functions}
 
 \section*{Example 1 : Apply Function}
 \addcontentsline{toc}{section}{Example 1 : Apply Function}
@@ -22,7 +22,7 @@
 \begin{gendef}[X, Y]
   apply: (X \fun Y) \fun (X \fun Y)
 \where
-  \forall f : X \fun Y @ \forall x : X @ apply(f)(x) = f(x)
+  \forall f : X \fun Y; x : X @ apply(f)(x) = f(x)
 \end{gendef}
 
 \noindent apply takes a function and a value, returns the result.
@@ -54,7 +54,7 @@ result = apply(square)(5)
 \begin{gendef}[A, B, C]
   compose: (B \fun C) \cross (A \fun B) \fun (A \fun C)
 \where
-  \forall f : B \fun C @ \forall g : A \fun B @ \forall x : A @ compose(f, g)(x) = f(g(x))
+  \forall f : B \fun C; g : A \fun B; x : A @ compose(f, g)(x) = f(g(x))
 \end{gendef}
 
 \noindent compose takes two functions and returns their composition.
@@ -88,7 +88,7 @@ addOneAndDouble = compose(double, addOne)
 \begin{gendef}[X]
   twice: (X \fun X) \fun (X \fun X)
 \where
-  \forall f : X \fun X @ \forall x : X @ twice(f)(x) = f(f(x))
+  \forall f : X \fun X; x : X @ twice(f)(x) = f(f(x))
 \end{gendef}
 
 \noindent twice takes a function and returns a function that applies it twice.
@@ -120,7 +120,7 @@ addTwo = twice(increment)
 \begin{gendef}[X, Y]
   constant: Y \fun (X \fun Y)
 \where
-  \forall y : Y @ \forall x : X @ constant(y)(x) = y
+  \forall y : Y; x : X @ constant(y)(x) = y
 \end{gendef}
 
 \noindent constant takes a value and returns a function that always returns that value.
@@ -133,7 +133,7 @@ addTwo = twice(increment)
 \begin{axdef}
 resultLambda : \nat
 \where
-resultLambda = apply(\lambda x : \nat @ x * x)(7)
+resultLambda = apply((\lambda x : \nat @ x * x))(7)
 \end{axdef}
 
 \noindent $resultLambda = 49$
@@ -150,7 +150,7 @@ resultLambda = apply(\lambda x : \nat @ x * x)(7)
 \begin{gendef}[X, Y, Z]
   flip: (X \cross Y \fun \num) \fun (Y \cross X \fun \num)
 \where
-  \forall f : X \cross Y \fun \num @ \forall x : X @ \forall y : Y @ flip(f)(y, x) = f(x, y)
+  \forall f : X \cross Y \fun \num; x : X; y : Y @ flip(f)(y, x) = f(x, y)
 \end{gendef}
 
 \noindent flip swaps the order of arguments to a function.
@@ -160,27 +160,7 @@ resultLambda = apply(\lambda x : \nat @ x * x)(7)
 \section*{Example 10 : Best Practices}
 \addcontentsline{toc}{section}{Example 10 : Best Practices}
 
-\noindent When using higher-order functions:
-
-\bigskip
-
-\noindent 1. Use type parameters to make functions generic
-
-\bigskip
-
-\noindent 2. Keep function signatures clear and simple
-
-\bigskip
-
-\noindent 3. Compose small functions to build complex behavior
-
-\bigskip
-
-\noindent 4. Use lambda expressions for inline function definitions
-
-\bigskip
-
-\noindent 5. Higher-order functions enable functional programming patterns
+\noindent When using higher-order functions: 1. Use type parameters to make functions generic 2. Keep function signatures clear and simple 3. Compose small functions to build complex behavior 4. Use lambda expressions for inline function definitions 5. Higher-order functions enable functional programming patterns
 
 \bigskip
 

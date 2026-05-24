@@ -46,7 +46,7 @@ emptyNats = \emptyset[\nat] \\
 emptyInts = \emptyset[\num]
 \end{axdef}
 
-\noindent $\emptyset$ is generic; $\emptyset$[N] is the empty set of naturals.
+\noindent emptyset is generic; emptyset[N] is the empty set of naturals.
 
 \bigskip
 
@@ -69,8 +69,8 @@ integers = \langle -1, 0, 1 \rangle
 \addcontentsline{toc}{section}{Example 4 : Power Set Instantiation}
 
 \begin{axdef}
-subsetsOfN : \power (\power  \nat) \\
-example : \power (\power  \nat)
+subsetsOfN : \power (\power \nat) \\
+example : \power (\power \nat)
 \where
 example = \{\{1, 2\}, \{3\}, \emptyset[\nat]\}
 \end{axdef}
@@ -269,11 +269,7 @@ validSeq : \seq \nat
 validSeq = \langle 1, 2, 3 \rangle
 \end{axdef}
 
-\noindent $INVALID : seq[N] cannot contain non-naturals$
-
-\bigskip
-
-\noindent invalidSeq = ⟨1, -1, 2⟩  -- would be type error if -1 not in N
+\noindent INVALID: seq[N] cannot contain non-naturals invalidSeq = ⟨1, -1, 2⟩  -- would be type error if -1 not in N
 
 \bigskip
 
@@ -299,19 +295,7 @@ validSeq = \langle 1, 2, 3 \rangle
 
 \bigskip
 
-\noindent IntSet == P Z (set of integers)
-
-\bigskip
-
-\noindent NatSeq == seq N (sequence of naturals)
-
-\bigskip
-
-\noindent Coordinate == N cross N (pair of naturals)
-
-\bigskip
-
-\noindent Path == seq Coordinate (sequence of coordinates)
+\noindent IntSet == P Z (set of integers) NatSeq == seq N (sequence of naturals) Coordinate == N cross N (pair of naturals) Path == seq Coordinate (sequence of coordinates)
 
 \bigskip
 
@@ -342,7 +326,7 @@ $\forall s : \seq \nat @ \# s \geq 0$
 
 
 \noindent
-$\exists p : \nat \cross \nat @ p.1 = p.2$
+$\exists p : \nat \cross \nat | p @ 1 = p.2$
 
 
 \noindent Quantifying over instantiated generic types.
@@ -367,66 +351,14 @@ mapping = \{1 \mapsto 2, 2 \mapsto 4, 3 \mapsto 6\}
 \section*{Example 22 : Best Practices}
 \addcontentsline{toc}{section}{Example 22 : Best Practices}
 
-\noindent When using generic instantiation:
-
-\bigskip
-
-\noindent 1. Be explicit about type parameters for clarity
-
-\bigskip
-
-\noindent 2. Use consistent naming (seq[T], not mixed seq T and T seq)
-
-\bigskip
-
-\noindent 3. Document what type parameters represent
-
-\bigskip
-
-\noindent 4. Instantiate at the right abstraction level
-
-\bigskip
-
-\noindent 5. Prefer generic definitions over duplicate specific definitions
-
-\bigskip
-
-\noindent 6. Type-check that instantiations make sense
+\noindent When using generic instantiation: 1. Be explicit about type parameters for clarity 2. Use consistent naming (seq[T], not mixed seq T and T seq) 3. Document what type parameters represent 4. Instantiate at the right abstraction level 5. Prefer generic definitions over duplicate specific definitions 6. Type-check that instantiations make sense
 
 \bigskip
 
 \section*{Example 23 : Common Patterns}
 \addcontentsline{toc}{section}{Example 23 : Common Patterns}
 
-\noindent Common instantiation patterns:
-
-\bigskip
-
-\noindent - seq[T] for sequences of T
-
-\bigskip
-
-\noindent - P[T] for sets of T
-
-\bigskip
-
-\noindent - $T \pfun U$ for partial functions
-
-\bigskip
-
-\noindent - T $\rel$ U for relations
-
-\bigskip
-
-\noindent - bag[T] for multisets of T
-
-\bigskip
-
-\noindent - T cross U for pairs
-
-\bigskip
-
-\noindent - $T \fun U$ for total functions
+\noindent Common instantiation patterns: - seq[T] for sequences of T - P[T] for sets of T - $T \pfun U$ for partial functions - T $\rel$ U for relations - bag[T] for multisets of T - T cross U for pairs - $T \fun U$ for total functions
 
 \bigskip
 
@@ -447,19 +379,7 @@ safe = \langle 1, 2, 3 \rangle
 
 \bigskip
 
-\noindent COMPILE ERROR examples:
-
-\bigskip
-
-\noindent - seq[N] = ⟨1, 2, 'a'⟩ -- 'a' is not a natural
-
-\bigskip
-
-\noindent - P[N] = $\{1, 2, -1\}$ -- -1 might not be in N depending on N definition
-
-\bigskip
-
-\noindent - bag[Z] = [[1, "hello"]] -- "hello" is not an integer
+\noindent COMPILE ERROR examples: - seq[N] = ⟨1, 2, 'a'⟩ -- 'a' is not a natural - P[N] = $\{1, 2, -1\}$ -- -1 might not be in N depending on N definition - bag[Z] = [[1, "hello"]] -- "hello" is not an integer
 
 \bigskip
 

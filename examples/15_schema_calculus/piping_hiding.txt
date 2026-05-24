@@ -1,0 +1,44 @@
+=== Schema Calculus: Piping and Hiding ===
+
+** Example 1: Schema piping (output-to-input pipeline) **
+
+schema Send
+  chan! : N
+where
+  chan! > 0
+end
+
+schema Receive
+  chan? : N
+where
+  chan? < 100
+end
+
+Pipeline defs Send >> Receive
+
+** Example 2: Schema hiding **
+
+schema State
+  x, y, temp : N
+where
+  x < y
+  temp > 0
+end
+
+Visible defs State hide (temp)
+
+** Example 3: Combined piping and hiding **
+
+schema OpA
+  x, x' : N
+where
+  x' > x
+end
+
+schema OpB
+  x, x' : N
+where
+  x' < 100
+end
+
+OpFiltered defs (OpA ; OpB) hide (x)

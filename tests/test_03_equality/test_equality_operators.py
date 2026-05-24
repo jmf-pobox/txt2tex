@@ -167,6 +167,8 @@ end"""
         axdef = ast.items[0]
         assert isinstance(axdef, AxDef)
         assert len(axdef.declarations) == 2
+        assert isinstance(axdef.declarations[0], Declaration)
+        assert isinstance(axdef.declarations[1], Declaration)
         assert axdef.declarations[0].variable == "x"
         assert axdef.declarations[1].variable == "y"
         assert len(axdef.predicates) == 0
@@ -206,6 +208,8 @@ end"""
         assert isinstance(schema, Schema)
         assert schema.name == "Library"
         assert len(schema.declarations) == 2
+        assert isinstance(schema.declarations[0], Declaration)
+        assert isinstance(schema.declarations[1], Declaration)
         assert schema.declarations[0].variable == "books"
         assert schema.declarations[1].variable == "members"
 

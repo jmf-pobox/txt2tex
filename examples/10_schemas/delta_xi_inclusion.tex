@@ -1,0 +1,72 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Airline Booking State}
+
+\noindent Define the airline state schema, which holds the set of routes and the bookings relation.
+
+\bigskip
+
+\begin{zed}
+[Airline, BookingId, CustomerId, RouteId]
+\end{zed}
+
+\begin{schema}{AirlineState}
+routes : \power RouteId \\
+bookings : BookingId \pfun CustomerId \cross RouteId
+\end{schema}
+
+\noindent A read-only operation that queries whether a route exists uses Xi to signal that the state is unchanged.
+
+\bigskip
+
+\begin{schema}{RouteExists}
+\Xi AirlineState \\
+routeId? : RouteId \\
+result! : \nat
+\where
+routeId? \in routes \\
+result! = 1
+\end{schema}
+
+\noindent An operation that adds a booking uses Delta to include both the before- state and the after-state. The primes on bookings' and routes' are Z convention for the output state; here bookings' is added as a typed declaration because the assignment is the predicate.
+
+\bigskip
+
+\begin{schema}{AddBooking}
+\Delta AirlineState \\
+bookingId? : BookingId \\
+customerId? : CustomerId \\
+routeId? : RouteId
+\where
+bookingId? \notin \dom bookings \\
+routeId? \in routes
+\end{schema}
+
+\section*{Stack with Generic Inclusion}
+
+\noindent Schema inclusion works with generic types. Delta Stack[N] brings in the before-and-after state of a stack instantiated over the naturals.
+
+\bigskip
+
+\begin{schema}{StackOp}[X]
+delta : \nat
+\end{schema}
+
+\begin{schema}{PushNat}
+\Delta StackOp[\nat] \\
+value? : \nat
+\where
+delta > 0
+\end{schema}
+
+\end{document}

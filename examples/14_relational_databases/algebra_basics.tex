@@ -1,0 +1,97 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\title{Relational Algebra}
+\author{txt2tex example}
+\hypersetup{pdftitle={Relational Algebra},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.2.0}}
+\begin{document}
+
+\maketitle
+
+\begin{zed}[Title, Author, MemberName, Genre]\end{zed}
+
+\begin{schema}{Book}
+bookId : \nat \\
+title : Title \\
+author : Author \\
+genre : Genre \\
+pages : \nat \\
+year : \nat
+\end{schema}
+
+\begin{schema}{Member}
+memberId : \nat \\
+name : MemberName
+\end{schema}
+
+\begin{schema}{Loan}
+loanId : \nat \\
+bookId : \nat \\
+memberId : \nat \\
+dueYear : \nat
+\end{schema}
+
+\section*{Restriction (sigma)}
+
+\noindent
+$\mathrm{Restrict}_{pages \geq 500}(Book)$
+
+
+\noindent
+$\mathrm{Restrict}_{year \geq 1990}(\mathrm{Restrict}_{pages \geq 500}(Book))$
+
+
+\section*{Projection (pi)}
+
+\noindent
+$\mathrm{Project}_{title, author}(Book)$
+
+
+\noindent
+$\mathrm{Project}_{title, author}(\mathrm{Restrict}_{pages \geq 500}(Book))$
+
+
+\section*{Renaming (R[new/old])}
+
+\noindent
+$\mathrm{Project}_{id, title, author, genre, pages, year}(Book[id/bookId])$
+
+
+\noindent
+$\mathrm{Project}_{id, writer, genre, pages, year}(Book[id/bookId, writer/author])$
+
+
+\section*{Natural Join and Theta-Join (join)}
+
+\noindent
+$\mathrm{Join}(Loan, Book)$
+
+
+\noindent
+$\mathrm{Project}_{id, memberId, dueYear, title, author, genre, pages, year}(\mathrm{Join}(Loan[id/bookId], Book[id/bookId]))$
+
+
+\noindent
+$\mathrm{Join}_{Member.memberId = Loan.memberId}(Member, Loan)$
+
+
+\section*{Division (div)}
+
+\noindent
+$Loan~\div~Book$
+
+
+\section*{Combined Query}
+
+\noindent
+$\mathrm{Project}_{title, author}(\mathrm{Restrict}_{pages \geq 500}(Book))$
+
+
+\end{document}

@@ -10,7 +10,7 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\section*{User - Defined Squash Function}
+\section*{User-Defined Squash Function}
 
 \noindent The squash operator appears in the Z notation glossary but is not built into the fuzz type-checker. However, we can define it ourselves as a user-defined function using an axiomatic specification.
 
@@ -33,7 +33,7 @@
   \forall f : \nat_1 \pfun X @ \ran (squashFunc(f)) = \ran f \land \# (squashFunc(f)) = \# (\ran f)
 \end{gendef}
 
-\noindent This axiomatically defines squashFunc (a user-defined version of squash) with two key properties that hold for all partial functions f from N1 to X: (1) squashFunc preserves the $range : ran$ (squashFunc f) = ran f, and (2) the resulting sequence length equals the range cardinality: \# (squashFunc f) = \# (ran f). These properties characterize squashFunc as compacting partial functions by removing domain gaps while preserving all elements and their relative order.
+\noindent This axiomatically defines squashFunc (a user-defined version of squash) with two key properties that hold for all partial functions f from N1 to X: (1) squashFunc preserves the range: ran (squashFunc f) = ran f, and (2) the resulting sequence length equals the range cardinality: \# (squashFunc f) = \# (ran f). These properties characterize squashFunc as compacting partial functions by removing domain gaps while preserving all elements and their relative order.
 
 \bigskip
 
@@ -87,7 +87,7 @@ s3 : \seq~\nat
 f3 = \{\} \land s3 = squashFunc(f3)
 \end{axdef}
 
-\noindent Squashing an empty function yields an empty $sequence : s3$ = $\langle \rangle$.
+\noindent Squashing an empty function yields an empty sequence: s3 = $\langle \rangle$.
 
 \bigskip
 
@@ -101,7 +101,7 @@ s4 : \seq~\nat
 f4 = \{1 \mapsto 100, 2 \mapsto 200, 3 \mapsto 300\} \land s4 = squashFunc(f4)
 \end{axdef}
 
-\noindent When the function has no gaps (dom $f4 = 1$..3), squashFunc simply converts it to a $sequence : s4$ = $\langle 100, 200, 300 \rangle$.
+\noindent When the function has no gaps (dom $f4 = 1$..3), squashFunc simply converts it to a sequence: s4 = $\langle 100, 200, 300 \rangle$.
 
 \bigskip
 

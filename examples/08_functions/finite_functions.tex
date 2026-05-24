@@ -10,7 +10,7 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\section*{Phase 34 : Finite Partial Functions}
+\section*{Phase 34: Finite Partial Functions}
 
 \noindent Finite partial functions are partial functions with a finite domain. The $operator \ffun denotes$ a finite partial function, meaning the function may not be defined everywhere, and its domain must be finite.
 
@@ -33,19 +33,7 @@ records : Year \ffun TableFF
 \# (\dom records) \leq 1000
 \end{axdef}
 
-\noindent The records relation is a finite partial function because:
-
-\bigskip
-
-\noindent 1. It is partial: not all years need to have a table
-
-\bigskip
-
-\noindent 2. Its domain is finite: at most 1000 years have records
-
-\bigskip
-
-\noindent 3. It is functional: each year maps to at most one table
+\noindent The records relation is a finite partial function because: 1. It is partial: not all years need to have a table 2. Its domain is finite: at most 1000 years have records 3. It is functional: each year maps to at most one table
 
 \bigskip
 
@@ -56,19 +44,7 @@ records : Year \ffun TableFF
 
 \bigskip
 
-\noindent - Total function ($\fun$): defined for all inputs, domain is entire source set
-
-\bigskip
-
-\noindent - Partial function ($\pfun$): may not be defined for all inputs, domain may be infinite
-
-\bigskip
-
-\noindent - Finite partial function ($\ffun$): partial function with finite domain
-
-\bigskip
-
-\noindent - Total bijection ($\bij$): defined everywhere, injective and surjective
+\noindent - Total function ($\fun$): defined for all inputs, domain is entire source set - Partial function ($\pfun$): may not be defined for all inputs, domain may be infinite - Finite partial function ($\ffun$): partial function with finite domain - Total bijection ($\bij$): defined everywhere, injective and surjective
 
 \bigskip
 
@@ -102,19 +78,7 @@ preferences : CustomerID \ffun Preference
 \# (\dom preferences) \leq 10000
 \end{axdef}
 
-\noindent This models a preference database where:
-
-\bigskip
-
-\noindent - Not all customers have preferences recorded (partial)
-
-\bigskip
-
-\noindent - The database has a capacity limit (finite domain)
-
-\bigskip
-
-\noindent - Each customer maps to one preference value (functional)
+\noindent This models a preference database where: - Not all customers have preferences recorded (partial) - The database has a capacity limit (finite domain) - Each customer maps to one preference value (functional)
 
 \bigskip
 
@@ -138,7 +102,7 @@ f = \{1 \mapsto 10, 2 \mapsto 20, 3 \mapsto 30\} \land \\
 \begin{axdef}
 f\_composed : \nat \ffun \nat
 \where
-f\_composed = g \semi f \land \# (\dom f\_composed) \leq \# (\dom f)
+f\_composed = g \comp f \land \# (\dom f\_composed) \leq \# (\dom f)
 \end{axdef}
 
 \noindent The composition has a domain size bounded by the domain of f, since we can only compose where f's range intersects g's domain.

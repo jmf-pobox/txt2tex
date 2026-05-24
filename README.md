@@ -14,7 +14,7 @@ txt2tex converts plain-text mathematical notation into LaTeX. Write `forall x : 
 
 **Try an expression without creating a file.** Run `txt2tex -i` to open the REPL. Type an expression, see the LaTeX and a PDF preview. Useful for checking rendering or grabbing a snippet to paste elsewhere.
 
-**[Reference Card (PDF)](https://github.com/jmf-pobox/txt2tex/blob/main/docs/cheatsheet.pdf)** — two-page reference with every operator, block type, and proof syntax, plus side-by-side examples showing what you type and what txt2tex renders.
+**[Reference (PDF)](https://github.com/jmf-pobox/txt2tex/blob/main/docs/reference.pdf)** — printable reference covering every operator, block type, proof syntax, Z schemas, schema calculus, bindings, and relational database notation, with side-by-side examples showing what you type and what txt2tex renders.
 
 ---
 
@@ -212,14 +212,21 @@ end
 
 ### Proof Trees
 
-Natural deduction proofs with simple indentation:
+Natural deduction proofs. Each rule's conclusion is the parent line;
+its premises are indented children. Multi-premise rules mark each
+premise with `::` so the rendered tree branches:
 
 ```text
 PROOF:
-  p => q
-  p
-    q [modus-ponens]
+q [=> elim]
+  :: p [premise]
+  :: p => q [premise]
 ```
+
+Discharged assumptions pair `[N] X [assumption]` with `Y [from N]` at
+each leaf use; case analysis on disjunctions uses `case X:` blocks.
+See **[Tutorial 4: Proof Trees](docs/tutorials/04_proof_trees.md)** for
+the full syntax.
 
 ### Truth Tables and Equivalence Chains
 
@@ -233,6 +240,202 @@ EQUIV:
 lnot (p land q)
 <=> lnot p lor lnot q [De Morgan]
 ```
+
+---
+
+## Conceptual Coverage
+
+txt2tex covers a broad range of formal-methods and relational-database notation. The topics below appear roughly in dependency order — simpler things first, concepts that build on them after.
+
+### 1. Document Structure
+
+Control page layout, sections, and metadata from plain text.
+
+```text
+title: My Assignment
+author: J. Freeman
+
+=== Section One ===
+
+** Solution 1 **
+
+(a) First part.
+
+PAGEBREAK:
+LINEBREAK:
+```
+
+Supports `TEXT:` (prose with embedded formulas), `LATEX:` (raw LaTeX passthrough), title/author metadata, `\cite{key}` citations, and identifier decoration (`'`, `?`, `!`).
+
+### 2. Propositional Logic
+
+`land`, `lor`, `lnot`, `=>`, `<=>` map to ∧ ∨ ¬ ⇒ ⟺.
+
+```text
+TRUTH TABLE:
+p | q | p => q
+T | F | F
+```
+
+Truth tables and `EQUIV:` equivalence chains (with justifications) are first-class block types.
+
+### 3. Numbers and Arithmetic
+
+```text
+forall n : N | n + 1 > n
+```
+
+Numeric types `N`, `Z`, `N1`; comparison operators; `+ - * div mod`.
+
+### 4. Sets and Types
+
+```text
+{ x : N | x mod 2 = 0 }
+A union B inter C
+P (A cross B)
+3..10
+```
+
+Set membership (`elem`), subset, union/inter/setminus, powerset, set comprehension, and range expressions.
+
+### 5. Predicate Logic
+
+```text
+forall x : N | x > 0 => x >= 1
+exists1 y : Z | y * y = 1
+mu x : N | x * x = 4
+```
+
+`forall`, `exists`, `exists1`, `mu`; multi-declaration quantifiers using Spivey schema-text form; tuple-pattern destructuring.
+
+### 6. Relations
+
+```text
+R o9 S
+dom R <| S
+f oplus g
+```
+
+Relation type `<->`, maplet `|->`, `dom`/`ran`, domain/range restriction and subtraction, relational override (`oplus`), forward composition (`o9`), backward composition (`comp`), and relational image.
+
+### 7. Functions
+
+```text
+lambda x : N . x * 2
+f : N -+-> N
+```
+
+Partial/total/injection/surjection/bijection/finite function types; lambda abstraction (single and multi-declaration); function application.
+
+### 8. Sequences
+
+```text
+<1, 2, 3> ^ <4>
+head s
+# s
+```
+
+Sequence display (`<>`/`<a,b>`), concatenation (`^`), `seq`/`seq1`/`iseq` types, length (`#`), `head`/`tail`/`last`/`front`.
+
+### 9. Z Paragraphs
+
+Global constants, types, and abbreviations:
+
+```text
+given Person
+Status ::= active | inactive
+MaxSize == 100
+
+axdef
+  capacity : N
+where
+  capacity = MaxSize
+end
+```
+
+`given` for carrier sets, free-type definitions, abbreviation `==`, and `axdef` for global axioms.
+
+### 10. Schemas
+
+A schema is a named bundle of declarations plus an invariant — the central structuring concept of state-based Z modelling. Schemas act as predicates, as types in declarations, and as building blocks for operations.
+
+```text
+schema Ship
+  name : seq CHAR
+  cargo : N
+where
+  cargo >= 0
+end
+```
+
+Write `s : Ship` to declare a variable of schema type. Generic schemas use `gendef [X]`. Schemas enforce type-checked invariants; fuzz reports violations before PDF generation.
+
+### 11. Schema Operations
+
+```text
+DeltaFleet defs Fleet /\ Fleet'
+HidePort defs Op hide (port)
+Renamed defs State[x' / x]
+```
+
+Delta/Xi inclusion, theta-binding (`theta`), schema composition (`;`), piping (`>>`), hiding (`hide`), projection (`project`), renaming (`S[old/new]`), and horizontal definitions (`Name defs Schema-Exp`). These are the tools for composing state machines from simpler pieces in Z.
+
+### 12. Z Bindings
+
+```text
+{| name == "cargo", count == 42 |}
+```
+
+Explicit binding-display for constructing and working with schema instances as first-class values.
+
+### 13. Proof Trees
+
+Natural deduction. Conclusions sit at parent lines; their premises are
+indented children. Each premise of a multi-premise rule is prefixed
+with `::` so the generator emits a true branching `\infer` node rather
+than a linear chain. Discharged assumptions pair `[N] X [assumption]`
+under the discharging rule with `Y [from N]` at each leaf use.
+Case analysis on disjunctions uses `case X:` blocks.
+
+```text
+PROOF:
+(p land (p => q)) => (p land q) [=> intro from 1]
+  [1] p land (p => q) [assumption]
+  :: p land q [land intro]
+    :: p [land elim 1]
+      p land (p => q) [from 1]
+    :: q [=> elim]
+      :: p => q [land elim 2]
+        p land (p => q) [from 1]
+      :: p [land elim 1]
+        p land (p => q) [from 1]
+```
+
+Intro/elim rules for `land`/`lor`/`=>`/`lnot`/`false`, discharged
+assumptions, case analysis; equational chains (`EQUAL:`), equivalence
+chains (`EQUIV:`), and structured argumentation (`ARGUE:`).
+
+### 14. Relational Database Notation
+
+Relational algebra and extended Z for database specifications:
+
+```text
+sigma[cargo > 0](Fleet)
+pi[name, cargo](Fleet)
+R join S
+Fleet[ID/shipID]
+pk shipID
+```
+
+Primary key annotation (`pk`), FK predicates in `axdef`, relational algebra (Restrict `sigma[p](R)`, Project `pi[A,B](R)`, Rename `R[NEW/OLD]` postfix, Join `R join S`, division `R div S`), and `GROUP`/`UNGROUP` for nested relations (Date's operators).
+
+---
+
+### Reference
+
+Printable reference:
+
+- **[docs/reference.pdf](https://github.com/jmf-pobox/txt2tex/blob/main/docs/reference.pdf)** — All operators, block types, proof syntax, Z schemas, schema calculus, bindings, and relational database notation
 
 ---
 
@@ -325,21 +528,27 @@ The guide covers:
 
 ## Examples
 
-The `examples/` directory contains **141 working examples** organized by topic. **To access examples, you need to clone the repository** (see [For Developers](#for-developers-git-clone) below).
+The `examples/` directory contains **159 working examples** organized by topic. **To access examples, you need to clone the repository** (see [For Developers](#for-developers-git-clone) below).
 
-- **01_propositional_logic** - Truth tables, logical operators, propositional formulas
-- **02_predicate_logic** - Quantifiers, type declarations
-- **03_equality** - Equality operators, unique existence, mu operator, one-point rule
-- **04_proof_trees** - Natural deduction proofs, nested proofs, pattern matching
-- **05_sets** - Set operations, Cartesian products, tuples, set literals
-- **06_definitions** - Free types, abbreviations, axiomatic definitions, schemas
-- **07_relations** - Relation types, domain/range, restrictions, composition, relational image
-- **08_functions** - Lambda expressions, function types, function definitions
-- **09_sequences** - Sequence operations, concatenation, pattern matching, bags
-- **10_schemas** - Schema definitions, scoping, zed blocks
-- **11_text_blocks** - TEXT, PURETEXT, citations, bibliography
-- **12_advanced** - Conditionals, subscripts, generic instantiation
-- **user_guide** - Examples from the user guide documentation
+- **[00_getting_started](https://github.com/jmf-pobox/txt2tex/tree/main/examples/00_getting_started)** - Minimal first examples
+- **[01_propositional_logic](https://github.com/jmf-pobox/txt2tex/tree/main/examples/01_propositional_logic)** - Truth tables, logical operators, propositional formulas
+- **[02_predicate_logic](https://github.com/jmf-pobox/txt2tex/tree/main/examples/02_predicate_logic)** - Quantifiers, type declarations
+- **[03_equality](https://github.com/jmf-pobox/txt2tex/tree/main/examples/03_equality)** - Equality operators, unique existence, mu operator, one-point rule
+- **[04_proof_trees](https://github.com/jmf-pobox/txt2tex/tree/main/examples/04_proof_trees)** - Natural deduction proofs, nested proofs, pattern matching
+- **[05_sets](https://github.com/jmf-pobox/txt2tex/tree/main/examples/05_sets)** - Set operations, Cartesian products, tuples, set literals
+- **[06_definitions](https://github.com/jmf-pobox/txt2tex/tree/main/examples/06_definitions)** - Free types, abbreviations, axiomatic definitions, schemas
+- **[07_relations](https://github.com/jmf-pobox/txt2tex/tree/main/examples/07_relations)** - Relation types, domain/range, restrictions, composition, relational image
+- **[08_functions](https://github.com/jmf-pobox/txt2tex/tree/main/examples/08_functions)** - Lambda expressions, function types, function definitions
+- **[09_sequences](https://github.com/jmf-pobox/txt2tex/tree/main/examples/09_sequences)** - Sequence operations, concatenation, pattern matching, bags
+- **[10_schemas](https://github.com/jmf-pobox/txt2tex/tree/main/examples/10_schemas)** - Schema definitions, scoping, zed blocks
+- **[11_text_blocks](https://github.com/jmf-pobox/txt2tex/tree/main/examples/11_text_blocks)** - TEXT, PURETEXT, citations, bibliography
+- **[12_advanced](https://github.com/jmf-pobox/txt2tex/tree/main/examples/12_advanced)** - Conditionals, subscripts, generic instantiation
+- **[13_equality_chains](https://github.com/jmf-pobox/txt2tex/tree/main/examples/13_equality_chains)** - EQUAL: blocks for equational reasoning
+- **[14_relational_databases](https://github.com/jmf-pobox/txt2tex/tree/main/examples/14_relational_databases)** - Relational algebra, GROUP/UNGROUP, primary keys, normalisation
+- **[15_schema_calculus](https://github.com/jmf-pobox/txt2tex/tree/main/examples/15_schema_calculus)** - Schema composition, piping, hiding, projection
+- **[16_multi_decl_calculus](https://github.com/jmf-pobox/txt2tex/tree/main/examples/16_multi_decl_calculus)** - Multi-declaration quantifier and comprehension forms
+- **[17_state_machines](https://github.com/jmf-pobox/txt2tex/tree/main/examples/17_state_machines)** - State-based modelling with schemas
+- **[user_guide](https://github.com/jmf-pobox/txt2tex/tree/main/examples/user_guide)** - Examples from the user guide documentation
 
 ```bash
 # After cloning:
@@ -356,7 +565,7 @@ cd examples && make 01_propositional_logic
 txt2tex examples/01_propositional_logic/hello_world.txt
 ```
 
-All 141 examples pass fuzz typechecking and compile to PDF
+All 159 examples pass fuzz typechecking and compile to PDF
 
 ---
 
@@ -366,7 +575,7 @@ All 141 examples pass fuzz typechecking and compile to PDF
 
 The standard for Z notation with built-in type checking:
 
-- Custom Oxford fonts
+- Custom Z notation fonts
 - Type validation during compilation
 - Compatible with fuzz-based toolchains
 
@@ -479,12 +688,14 @@ A few edge cases require workarounds:
 **Current Implementation:**
 
 - ✅ **Feature complete** for typical Z specifications
-- ✅ **1280 tests** - Comprehensive test suite
+- ✅ **4382 tests** - Comprehensive test suite
 - ✅ **Full Z notation** - Schemas, relations, functions, sequences
 - ✅ **Proof trees** - Natural deduction with justifications
 - ✅ **WYSIWYG line breaks** - Natural formatting controls PDF output
 - ✅ **Interactive mode** - REPL for testing expressions
 - ✅ **fuzz integration** - Optional type checking
+- ✅ **B: blocks** - Verbatim B-machine listings
+- ✅ **Multi-line LATEX: blocks** - Raw LaTeX passthrough with preserved indentation
 
 **For missing features, see [docs/guides/MISSING_FEATURES.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/MISSING_FEATURES.md)**
 
@@ -513,6 +724,8 @@ A few edge cases require workarounds:
 - **[docs/tutorials/08_sequences.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/08_sequences.md)** - Sequences
 - **[docs/tutorials/09_schemas.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/09_schemas.md)** - Schemas
 - **[docs/tutorials/10_advanced.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/10_advanced.md)** - Advanced topics
+- **[docs/tutorials/11_relational_databases.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/11_relational_databases.md)** - Relational databases
+- **[docs/tutorials/12_schema_calculus.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/12_schema_calculus.md)** - Schema calculus
 
 ### Development Documentation
 
@@ -543,6 +756,9 @@ uv run txt2tex examples/01_propositional_logic/hello_world.txt
 ### Development Commands
 
 ```bash
+# List all available Makefile targets by category
+make help
+
 # Run all quality checks (lint, type check, tests)
 make check
 
@@ -557,9 +773,18 @@ cd examples && make
 
 # Convert a file
 txt2tex myfile.txt
+
+# Code complexity snapshot (radon / lizard / pydeps / wily)
+make complexity-report
 ```
 
 You'll also need LaTeX and optionally fuzz (see [Installation](#installation) above).
+
+### Quality Assurance
+
+`qa_check_all.sh` re-runs all 159 examples end-to-end, checking for bare math
+keywords in math environments and verifying PDF generation. Run it before
+releasing to confirm the full example suite is clean.
 
 ### Agent Team (ethos)
 

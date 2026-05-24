@@ -36,7 +36,7 @@ f(\langle \rangle) = 0
 g : \seq~\nat \fun \nat
 \where
 g(\langle \rangle) = 0 \\
-\forall x : \nat @ \forall s : \seq~\nat @ g(\langle x \rangle \cat s) = x
+\forall x : \nat; s : \seq~\nat @ g(\langle x \rangle \cat s) = x
 \end{axdef}
 
 \section*{Example 3 : Recursive Sum}
@@ -50,7 +50,7 @@ g(\langle \rangle) = 0 \\
 total : \seq~\nat \fun \nat
 \where
 total(\langle \rangle) = 0 \\
-\forall x : \nat @ \forall s : \seq~\nat @ total(\langle x \rangle \cat s) = x + total(s)
+\forall x : \nat; s : \seq~\nat @ total(\langle x \rangle \cat s) = x + total(s)
 \end{axdef}
 
 \section*{Example 4 : Cumulative Total}
@@ -64,7 +64,8 @@ total(\langle \rangle) = 0 \\
 cumulative\_total : \seq~\nat \fun \nat
 \where
 cumulative\_total(\langle \rangle) = 0 \\
-\forall x : \nat @ \forall s : \seq~\nat @ cumulative\_total(\langle x \rangle \cat s) = x + cumulative\_total(s)
+\forall x : \nat; s : \seq~\nat @ \\
+\t1 cumulative\_total(\langle x \rangle \cat s) = x + cumulative\_total(s)
 \end{axdef}
 
 \section*{Example 5 : Filter Pattern}
@@ -78,7 +79,8 @@ cumulative\_total(\langle \rangle) = 0 \\
 positives : \seq~\num \fun \seq~\num
 \where
 positives(\langle \rangle) = \langle \rangle \\
-\forall x : \num @ \forall s : \seq~\num @ positives(\langle x \rangle \cat s) = \IF x > 0 \\
+\forall x : \num; s : \seq~\num @ \\
+\t1 positives(\langle x \rangle \cat s) = \IF x > 0 \\
 \t1 \THEN \langle x \rangle \cat positives(s) \\
 \t1 \ELSE positives(s)
 \end{axdef}

@@ -1,0 +1,71 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\begin{document}
+
+\section*{Schema Calculus: Piping and Hiding}
+
+\section*{Example 1 : Schema piping ( output - to - input pipeline )}
+\addcontentsline{toc}{section}{Example 1 : Schema piping ( output - to - input pipeline )}
+
+\begin{schema}{Send}
+chan! : \nat
+\where
+chan! > 0
+\end{schema}
+
+\begin{schema}{Receive}
+chan? : \nat
+\where
+chan? < 100
+\end{schema}
+
+\begin{zed}
+Pipeline \defs Send \pipe Receive
+\end{zed}
+
+\section*{Example 2 : Schema hiding}
+\addcontentsline{toc}{section}{Example 2 : Schema hiding}
+
+\begin{schema}{State}
+x : \nat \\
+y : \nat \\
+temp : \nat
+\where
+x < y \\
+temp > 0
+\end{schema}
+
+\begin{zed}
+Visible \defs State \hide (temp)
+\end{zed}
+
+\section*{Example 3 : Combined piping and hiding}
+\addcontentsline{toc}{section}{Example 3 : Combined piping and hiding}
+
+\begin{schema}{OpA}
+x : \nat \\
+x' : \nat
+\where
+x' > x
+\end{schema}
+
+\begin{schema}{OpB}
+x : \nat \\
+x' : \nat
+\where
+x' < 100
+\end{schema}
+
+\begin{zed}
+OpFiltered \defs OpA \semi OpB \hide (x)
+\end{zed}
+
+\end{document}

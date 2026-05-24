@@ -10,7 +10,7 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\section*{Bug 13 Test : Field Projection on Function Application}
+\section*{Bug 13 Test: Field Projection on Function Application}
 
 \begin{schema}{Programme}
 length : \nat
@@ -19,7 +19,7 @@ length : \nat
 \begin{axdef}
 f : \nat \fun Programme
 \where
-\forall i : \nat @ \forall p : Programme @ p = f(i) \implies p.length > 0
+\forall i : \nat; p : Programme @ p = f(i) \implies p.length > 0
 \end{axdef}
 
 \end{document}

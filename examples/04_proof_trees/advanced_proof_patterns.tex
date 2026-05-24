@@ -44,13 +44,13 @@ $%
 $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{((p \lor q) \land (r \lor s)) \implies (p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{
   \infer[\lor \mbox{elim on p} \lor q]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\lor \mbox{elim on r} \lor s]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{
-  \raiseproof{10ex}{\infer[\lor \mbox{intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land \mbox{intro}]{p \land r}{}}}
+  \raiseproof{10ex}{\infer[\lor\textrm{-intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land\textrm{-intro}]{p \land r}{}}}
 &
-\hskip 6em \raiseproof{26ex}{\infer[\lor \mbox{intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land \mbox{intro}]{p \land s}{}}}
+\hskip 6em \raiseproof{26ex}{\infer[\lor\textrm{-intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land\textrm{-intro}]{p \land s}{}}}
 } & \infer[\lor \mbox{elim on r} \lor s]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{
-  \raiseproof{10ex}{\infer[\lor \mbox{intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land \mbox{intro}]{q \land r}{}}}
+  \raiseproof{10ex}{\infer[\lor\textrm{-intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land\textrm{-intro}]{q \land r}{}}}
 &
-\hskip 6em \raiseproof{26ex}{\infer[\lor \mbox{intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land \mbox{intro}]{q \land s}{}}}
+\hskip 6em \raiseproof{26ex}{\infer[\lor\textrm{-intro}]{(p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)}{\infer[\land\textrm{-intro}]{q \land s}{}}}
 }}
 }
 $%
@@ -76,8 +76,8 @@ $%
 \begin{center}
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (sum\_{to}(0) = 0 * ((0 + 1))(div)(2))}{
-  \infer[\mbox{equality}]{sum\_{to}(0) = 0 * ((0 + 1))(div)(2)}{\infer[\mbox{arithmetic}]{0 * ((0 + 1))(div)(2) = 0}{\infer[\mbox{definition}]{sum\_{to}(0) = 0}{\ulcorner true \urcorner^{[1]}}}}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (sum\_{to}(0) = 0 * (0 + 1)~\div~2)}{
+  \infer[\mbox{equality}]{sum\_{to}(0) = 0 * (0 + 1)~\div~2}{\infer[\mbox{arithmetic}]{0 * (0 + 1)~\div~2 = 0}{\infer[\mbox{definition}]{sum\_{to}(0) = 0}{\ulcorner true \urcorner^{[1]}}}}
 }
 $%
 }
@@ -91,8 +91,8 @@ $%
 \begin{center}
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{(sum\_{to}(n) = n * ((n + 1))(div)(2)) \implies (sum\_{to}(n + 1) = (n + 1) * ((n + 2))(div)(2))}{
-  \infer[\mbox{factoring}]{sum\_{to}(n + 1) = (n + 1) * ((n + 2))(div)(2)}{\infer[\mbox{algebra}]{sum\_{to}(n + 1) = ((n * (n + 1) + 2 * (n + 1)))(div)(2)}{\infer[\mbox{substitution}]{sum\_{to}(n + 1) = n * ((n + 1))(div)(2) + (n + 1)}{\infer[\mbox{definition}]{sum\_{to}(n + 1) = sum\_{to}(n) + (n + 1)}{\ulcorner sum\_{to}(n) = n * ((n + 1))(div)(2) \urcorner^{[1]}}}}}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{(sum\_{to}(n) = n * (n + 1)~\div~2) \implies (sum\_{to}(n + 1) = (n + 1) * (n + 2)~\div~2)}{
+  \infer[\mbox{factoring}]{sum\_{to}(n + 1) = (n + 1) * (n + 2)~\div~2}{\infer[\mbox{algebra}]{sum\_{to}(n + 1) = (n * (n + 1) + 2 * (n + 1))~\div~2}{\infer[\mbox{substitution}]{sum\_{to}(n + 1) = n * (n + 1)~\div~2 + (n + 1)}{\infer[\mbox{definition}]{sum\_{to}(n + 1) = sum\_{to}(n) + (n + 1)}{\ulcorner sum\_{to}(n) = n * (n + 1)~\div~2 \urcorner^{[1]}}}}}
 }
 $%
 }
@@ -147,7 +147,7 @@ $%
 \section*{Example 5 : Constructive Existence Proof}
 \addcontentsline{toc}{section}{Example 5 : Constructive Existence Proof}
 
-\noindent Prove: There $\exists$ an even number greater than 10
+\noindent Prove: There exists an even number greater than 10
 
 \bigskip
 
@@ -155,7 +155,7 @@ $%
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\exists n : \nat @ even(n) \land n > 10)}{
-  \infer[\exists \mbox{intro with n}=12]{\exists n : \nat @ even(n) \land n > 10}{\infer[\land \mbox{intro}]{even(12) \land 12 > 10}{\infer[\mbox{arithmetic}]{12 > 10}{\infer[\mbox{definition of even}, 12=2 * 6]{even(12)}{\infer[\mbox{arithmetic}]{12 = 2 * 6}{\ulcorner true \urcorner^{[1]}}}}}}
+  \infer[\exists \mbox{intro with n}=12]{\exists n : \nat @ even(n) \land n > 10}{\infer[\land\textrm{-intro}]{even(12) \land 12 > 10}{\infer[\mbox{arithmetic}]{12 > 10}{\infer[\mbox{definition of even}, 12=2 * 6]{even(12)}{\infer[\mbox{arithmetic}]{12 = 2 * 6}{\ulcorner true \urcorner^{[1]}}}}}}
 }
 $%
 }
@@ -177,7 +177,7 @@ $%
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{irrational(sqrt(2)) \implies (\exists a, b @ irrational(a) \land irrational(b) \land rational(power(a, b)))}{
-  \infer[\lor \mbox{elim}]{\exists a, b @ irrational(a) \land irrational(b) \land rational(power(a, b))}{\infer[\exists \mbox{intro with a}=b=sqrt(2)]{\exists a, b @ irrational(a) \land irrational(b) \land rational(power(a, b))}{\infer[\land \mbox{intro}]{irrational(sqrt(2)) \land irrational(sqrt(2)) \land rational(power(sqrt(2), sqrt(2)))}{}} & \infer[\exists \mbox{intro}]{\exists a, b @ irrational(a) \land irrational(b) \land rational(power(a, b))}{\infer[\land \mbox{intro}]{irrational(power(sqrt(2), sqrt(2))) \land irrational(sqrt(2)) \land rational(power(power(sqrt(2), sqrt(2)), sqrt(2)))}{\infer[\mbox{known}]{rational(2)}{\infer[\mbox{simplification}]{power(sqrt(2), 2) = 2}{\infer[\mbox{arithmetic}]{power(sqrt(2), sqrt(2) * sqrt(2)) = power(sqrt(2), 2)}{\infer[\mbox{exponent law}]{power(power(sqrt(2), sqrt(2)), sqrt(2)) = power(sqrt(2), sqrt(2) * sqrt(2))}{}}}}}}}
+  \infer[\lor\textrm{-elim}]{\exists a, b @ irrational(a) \land irrational(b) \land rational(power(a, b))}{\infer[\exists \mbox{intro with a}=b=sqrt(2)]{\exists a, b @ irrational(a) \land irrational(b) \land rational(power(a, b))}{\infer[\land\textrm{-intro}]{irrational(sqrt(2)) \land irrational(sqrt(2)) \land rational(power(sqrt(2), sqrt(2)))}{}} & \infer[\exists\textrm{-intro}]{\exists a, b @ irrational(a) \land irrational(b) \land rational(power(a, b))}{\infer[\land\textrm{-intro}]{irrational(power(sqrt(2), sqrt(2))) \land irrational(sqrt(2)) \land rational(power(power(sqrt(2), sqrt(2)), sqrt(2)))}{\infer[\mbox{known}]{rational(2)}{\infer[\mbox{simplification}]{power(sqrt(2), 2) = 2}{\infer[\mbox{arithmetic}]{power(sqrt(2), sqrt(2) * sqrt(2)) = power(sqrt(2), 2)}{\infer[\mbox{exponent law}]{power(power(sqrt(2), sqrt(2)), sqrt(2)) = power(sqrt(2), sqrt(2) * sqrt(2))}{}}}}}}}
 }
 $%
 }
@@ -218,7 +218,7 @@ $%
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{(n \geq 2) \implies prime\_factorization(n)}{
-  \infer[\lor \mbox{elim}]{prime\_factorization(n)}{\infer[\mbox{trivial}, \mbox{singleton factorization}]{prime\_factorization(n)}{} & \infer[n=a * b]{prime\_factorization(n)}{\infer[\mbox{multiplication of factorizations}]{prime\_factorization(a * b)}{\infer[\mbox{strong IH}, b < n]{prime\_factorization(b)}{\infer[\mbox{strong IH}, a < n]{prime\_factorization(a)}{\infer[\mbox{definition of composite}]{\exists a, b @ 2 \leq a \land a < n \land 2 \leq b \land b < n \land n = a * b}{}}}}}}
+  \infer[\lor\textrm{-elim}]{prime\_factorization(n)}{\infer[\mbox{trivial}, \mbox{singleton factorization}]{prime\_factorization(n)}{} & \infer[n=a * b]{prime\_factorization(n)}{\infer[\mbox{multiplication of factorizations}]{prime\_factorization(a * b)}{\infer[\mbox{strong IH}, b < n]{prime\_factorization(b)}{\infer[\mbox{strong IH}, a < n]{prime\_factorization(a)}{\infer[\mbox{definition of composite}]{\exists a, b @ 2 \leq a \land a < n \land 2 \leq b \land b < n \land n = a * b}{}}}}}}
 }
 $%
 }
@@ -255,7 +255,7 @@ $%
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{odd(power(n, 2)) \implies odd(n)}{
-  \infer[\lor \mbox{elim}]{odd(n)}{\infer[\mbox{false elim}]{odd(n)}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{odd(power(n, 2)) \land even(power(n, 2))}{\infer[Lemma 1]{even(power(n, 2))}{}}}} & \infer[\mbox{identity}]{odd(n)}{}}
+  \infer[\lor\textrm{-elim}]{odd(n)}{\infer[false\textrm{-elim}]{odd(n)}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{odd(power(n, 2)) \land even(power(n, 2))}{\infer[Lemma 1]{even(power(n, 2))}{}}}} & \infer[\mbox{identity}]{odd(n)}{}}
 }
 $%
 }
@@ -277,7 +277,7 @@ $%
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\forall n @ n \geq 1 \implies \power n)}{
-  \infer[\lnot\textrm{-intro}^{[2]}]{\forall n @ n \geq 1 \implies \power n}{\infer[\lor \mbox{elim}]{false}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot \power m \land \power 1}{\infer[\mbox{base \mbox{case} \mbox{proved} separately}]{\power 1}{}}} & \infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot \power m \land \power m}{\infer[\mbox{by \mbox{inductive} \mbox{step} \mbox{from} P}(m - 1)]{\power m}{\infer[\mbox{since m} - 1 >= 1 \land m - 1 < m]{\power (m - 1)}{\infer[\mbox{minimality of m}]{\forall k @ k \geq 1 \land k < m \implies \power k}{}}}}}}}
+  \infer[\lnot\textrm{-intro}^{[2]}]{\forall n @ n \geq 1 \implies \power n}{\infer[\lor\textrm{-elim}]{false}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot (\power m) \land \power 1}{\infer[\mbox{base \mbox{case} \mbox{proved} separately}]{\power 1}{}}} & \infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot (\power m) \land \power m}{\infer[\mbox{by \mbox{inductive} \mbox{step} \mbox{from} P}(m - 1)]{\power m}{\infer[\mbox{since m} - 1 >= 1 \land m - 1 < m]{\power (m - 1)}{\infer[\mbox{minimality of m}]{\forall k @ k \geq 1 \land k < m \implies \power k}{}}}}}}}
 }
 $%
 }
@@ -333,7 +333,7 @@ $%
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{loop\_terminates \implies desired\_property}{
-  \infer[\mbox{logic}]{desired\_property}{\infer[\land \mbox{intro}]{invariant(termination\_state) \land termination\_condition}{\infer[\mbox{by preservation}]{invariant(termination\_state)}{\ulcorner loop\_terminates \urcorner^{[1]}}}}
+  \infer[\mbox{logic}]{desired\_property}{\infer[\land\textrm{-intro}]{invariant(termination\_state) \land termination\_condition}{\infer[\mbox{by preservation}]{invariant(termination\_state)}{\ulcorner loop\_terminates \urcorner^{[1]}}}}
 }
 $%
 }
@@ -369,19 +369,7 @@ $%
 
 \bigskip
 
-\noindent Strategy:
-
-\bigskip
-
-\noindent 1. Explicitly construct a witness w
-
-\bigskip
-
-\noindent 2. Verify P(w) holds
-
-\bigskip
-
-\noindent 3. Conclude $\exists x @ \power x$with $x = w$
+\noindent Strategy: 1. Explicitly construct a witness w 2. Verify P(w) holds 3. Conclude $\exists x @ \power x$with $x = w$
 
 \bigskip
 
@@ -393,7 +381,7 @@ $%
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\exists n @ n > 100 \land even(n))}{
-  \infer[\exists \mbox{intro with n}=102]{\exists n @ n > 100 \land even(n)}{\infer[\land \mbox{intro}]{102 > 100 \land even(102)}{\infer[\mbox{definition}]{even(102)}{\infer[\mbox{arithmetic}]{102 = 2 * 51}{\infer[\mbox{arithmetic}]{102 > 100}{\infer[\mbox{construction}]{witness\_construction(102)}{\ulcorner true \urcorner^{[1]}}}}}}}
+  \infer[\exists \mbox{intro with n}=102]{\exists n @ n > 100 \land even(n)}{\infer[\land\textrm{-intro}]{102 > 100 \land even(102)}{\infer[\mbox{definition}]{even(102)}{\infer[\mbox{arithmetic}]{102 = 2 * 51}{\infer[\mbox{arithmetic}]{102 > 100}{\infer[\mbox{construction}]{witness\_construction(102)}{\ulcorner true \urcorner^{[1]}}}}}}}
 }
 $%
 }
@@ -421,7 +409,7 @@ $\displaystyle
 \infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\forall n @ \power n)}{
   \infer[\lor \mbox{elim over cases}]{\forall n @ \power n}{\infer[\mbox{direct proof}]{\power base}{} & \infer[\lor \mbox{elim over subcases}]{\power n}{
   \raiseproof{12ex}{\infer[\lnot\textrm{-intro}^{[2]}]{\power n}{
-  \infer[\mbox{contradiction}]{false}{\infer[\mbox{proof steps}]{contradiction\_derived}{\ulcorner \lnot \power n \urcorner^{[2]}}}
+  \infer[\mbox{contradiction}]{false}{\infer[\mbox{proof steps}]{contradiction\_derived}{\ulcorner \lnot (\power n) \urcorner^{[2]}}}
 }}
 &
 \hskip 6em \raiseproof{30ex}{\infer[\Rightarrow\textrm{-intro}^{[3]}]{\power n}{
@@ -441,43 +429,7 @@ $%
 
 \bigskip
 
-\noindent 1. State strategy at the beginning
-
-\bigskip
-
-\noindent 2. Label cases clearly
-
-\bigskip
-
-\noindent 3. Discharge assumptions promptly
-
-\bigskip
-
-\noindent 4. Reference lemmas explicitly
-
-\bigskip
-
-\noindent 5. Show key algebraic steps
-
-\bigskip
-
-\noindent 6. Justify non-obvious steps
-
-\bigskip
-
-\noindent 7. Use proof by cases when structure suggests it
-
-\bigskip
-
-\noindent 8. Use induction for recursive definitions
-
-\bigskip
-
-\noindent 9. Use contradiction for negative conclusions
-
-\bigskip
-
-\noindent 10. Verify base cases thoroughly
+\noindent 1. State strategy at the beginning 2. Label cases clearly 3. Discharge assumptions promptly 4. Reference lemmas explicitly 5. Show key algebraic steps 6. Justify non-obvious steps 7. Use proof by cases when structure suggests it 8. Use induction for recursive definitions 9. Use contradiction for negative conclusions 10. Verify base cases thoroughly
 
 \bigskip
 
@@ -488,27 +440,7 @@ $%
 
 \bigskip
 
-\noindent - **Goal**: State what you're proving
-
-\bigskip
-
-\noindent - **Strategy**: Explain the proof approach
-
-\bigskip
-
-\noindent - **Lemmas needed**: List dependencies
-
-\bigskip
-
-\noindent - **Key insights**: Highlight non-obvious steps
-
-\bigskip
-
-\noindent - **Pitfalls**: Note where proof could go wrong
-
-\bigskip
-
-\noindent - **Generalization**: Explain how proof extends
+\noindent - **Goal**: State what you're proving - **Strategy**: Explain the proof approach - **Lemmas needed**: List dependencies - **Key insights**: Highlight non-obvious steps - **Pitfalls**: Note where proof could go wrong - **Generalization**: Explain how proof extends
 
 \bigskip
 

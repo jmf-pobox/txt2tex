@@ -4,20 +4,25 @@ from __future__ import annotations
 
 import dataclasses
 import re
-from typing import Literal
+from typing import ClassVar, Literal
 
 from txt2tex.ast_nodes import (
     Abbreviation,
+    Aggregator,
+    AggregatorClause,
     ArgueChain,
     ArgueStep,
     AxDef,
     BagLiteral,
     BibliographyMetadata,
     BinaryOp,
+    Binding,
+    BMachine,
     CaseAnalysis,
     Conditional,
     Contents,
     Declaration,
+    Divide,
     Document,
     DocumentItem,
     Expr,
@@ -28,38 +33,58 @@ from txt2tex.ast_nodes import (
     GenDef,
     GenericInstantiation,
     GivenType,
+    Group,
+    GroupAggregate,
     GuardedBranch,
     GuardedCases,
+    HorizDef,
     Identifier,
     InfruleBlock,
     Lambda,
     LatexBlock,
+    LineBreak,
+    NaturalJoin,
     Number,
     PageBreak,
     Paragraph,
     Part,
     PartsFormat,
+    Project,
     ProofNode,
     ProofTree,
     PureParagraph,
     Quantifier,
     Range,
+    RawLatexBlock,
     RelationalImage,
+    RelationRename,
+    Restrict,
     Schema,
+    SchemaBinding,
+    SchemaCompose,
+    SchemaHide,
+    SchemaInclusion,
+    SchemaPipe,
+    SchemaProject,
+    SchemaRename,
+    SchemaText,
     Section,
     SequenceLiteral,
     SetComprehension,
     SetLiteral,
     Solution,
+    StringLit,
     Subscript,
     Superscript,
     SyntaxBlock,
     SyntaxDefinition,
+    Theta,
     TitleMetadata,
     TruthTable,
     Tuple,
     TupleProjection,
     UnaryOp,
+    Ungroup,
     Zed,
 )
 from txt2tex.constants import PROSE_WORDS
@@ -126,6 +151,10 @@ class Parser:
     last_token_line: int
     _parsing_schema_text: bool
     _in_comprehension_body: bool
+    _in_schema_expr_context: bool
+    _in_comparison_rhs: bool
+    _current_quantifier_vars: set[str]
+    _in_relational_context: bool
 
     def __init__(self, tokens: list[Token]) -> None:
         """Initialize parser with token list.
@@ -145,6 +174,22 @@ class Parser:
         # periods can be expression separators
         # ({ x : X | pred . expr } or mu x : X | pred . expr)
         self._in_comprehension_body = False
+        # Track whether we're parsing a schema-expression context (RHS of defs,
+        # schema inclusion body) where ';' is schema composition, not a separator.
+        self._in_schema_expr_context = False
+        # Track whether we're parsing the RHS of a comparison operator inside
+        # a comprehension body.  Used to allow field projections like 's.name'
+        # in 'c.class = s.name }' even though the RBRACE follows immediately.
+        self._in_comparison_rhs = False
+        # All variable names declared in the current comprehension/quantifier
+        # schema-text (across the entire semicolon chain).  Used by _parse_postfix
+        # to distinguish bullet `.` from named-field projection: `.IDENT` where
+        # IDENT is a declared variable cannot be a field selector (Z RM §3.16).
+        self._current_quantifier_vars: set[str] = set()
+        # True when parsing a relational-algebra argument position (inside sigma,
+        # pi, join, div, group, ungroup operands).  Governs disambiguation of
+        # Expr[new/old] postfix: RelationRename when True, SchemaRename when False.
+        self._in_relational_context: bool = False
 
     def parse(self) -> Document | Expr:
         """Parse tokens and return AST.
@@ -198,6 +243,7 @@ class Parser:
             )
 
         # Check for abbreviation (identifier ==) or free type (identifier ::=)
+        # or horizontal schema definition (identifier [generics]? defs ...)
         # Note: Partial support for compound identifiers like "R+ =="
         # (GitHub #3 still open)
         if self._match(TokenType.IDENTIFIER):
@@ -223,6 +269,35 @@ class Parser:
                 # Single free type
                 return Document(
                     items=[first_free_type],
+                    title_metadata=None,
+                    parts_format=parts_format,
+                    bibliography_metadata=None,
+                    line=first_line,
+                    column=1,
+                )
+            # Detect horizontal schema definition: Name defs ... or Name[X] defs ...
+            is_horiz = next_token.type == TokenType.DEFS or (
+                next_token.type == TokenType.LBRACKET
+                and self._scan_for_defs_after_brackets(offset=1)
+            )
+            if is_horiz:
+                first_hd = self._parse_horiz_def()
+                self._skip_newlines()
+                if not self._at_end():
+                    items_with_hd: list[DocumentItem] = [first_hd]
+                    while not self._at_end():
+                        items_with_hd.append(self._parse_document_item())
+                        self._skip_newlines()
+                    return Document(
+                        items=items_with_hd,
+                        title_metadata=None,
+                        parts_format=parts_format,
+                        bibliography_metadata=None,
+                        line=first_line,
+                        column=1,
+                    )
+                return Document(
+                    items=[first_hd],
                     title_metadata=None,
                     parts_format=parts_format,
                     bibliography_metadata=None,
@@ -267,7 +342,6 @@ class Parser:
                     line=first_line,
                     column=1,
                 )
-
         # Check for abbreviation with generic parameters [X, Y] Name == expression
         # Note: Bag literals [[x]] start with [[ which is distinct
         if self._match(TokenType.LBRACKET):
@@ -278,6 +352,7 @@ class Parser:
                 first_item = self._parse_expr()
                 # Single expression
                 if not self._at_end():
+                    self._reject_stray_slash()
                     raise ParserError(
                         f"Unexpected token after expression: {self._current().value!r}",
                         self._current(),
@@ -333,6 +408,7 @@ class Parser:
 
         # Single expression (backward compatibility)
         if not self._at_end():
+            self._reject_stray_slash()
             raise ParserError(
                 f"Unexpected token after expression: {self._current().value!r}",
                 self._current(),
@@ -403,7 +479,10 @@ class Parser:
             TokenType.TEXT,
             TokenType.PURETEXT,
             TokenType.LATEX,
+            TokenType.B_BLOCK,
+            TokenType.RAW_LATEX_BLOCK,
             TokenType.PAGEBREAK,
+            TokenType.LINEBREAK,
             TokenType.CONTENTS,
             TokenType.PARTS,
             TokenType.ARGUE,  # Both EQUIV: and ARGUE: map to this token
@@ -433,23 +512,101 @@ class Parser:
         # The token value contains the raw text (already captured by lexer)
         text = text_token.value
 
-        # Check if text starts with part label pattern: (letter) or (roman numeral)
-        part_match = re.match(r"^\(([a-z]+|[ivxlcdm]+)\)\s+(.+)", text, re.IGNORECASE)
+        # Check if text starts with a structural part label at paragraph start.
+        # Only short, recognised label forms are promoted to Part nodes:
+        # single letter (a)-(z), single digit (1)-(9), or a short Roman numeral.
+        # Longer words like (underlined) or (continued) stay as prose text.
+        roman_numerals: frozenset[str] = frozenset(
+            {"i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"}
+        )
+        part_match = re.match(r"^\(([a-z0-9]+)\)\s+(.+)", text, re.IGNORECASE)
         if part_match:
-            label = part_match.group(1)
-            content = part_match.group(2)
-            # Return a Part containing a Paragraph
-            paragraph = Paragraph(
-                text=content, line=text_token.line, column=text_token.column
-            )
-            return Part(
-                label=label,
-                items=[paragraph],
-                line=text_token.line,
-                column=text_token.column,
-            )
+            label = part_match.group(1).lower()
+            is_single_letter = len(label) == 1 and label.isalpha()
+            is_single_digit = len(label) == 1 and label.isdigit()
+            is_roman = label in roman_numerals
+            if is_single_letter or is_single_digit or is_roman:
+                content = part_match.group(2)
+                paragraph = Paragraph(
+                    text=content, line=text_token.line, column=text_token.column
+                )
+                return Part(
+                    label=label,
+                    items=[paragraph],
+                    line=text_token.line,
+                    column=text_token.column,
+                )
 
         return Paragraph(text=text, line=text_token.line, column=text_token.column)
+
+    def _parse_paragraph_coalesced(self) -> Paragraph | Part:
+        """Parse one or more adjacent TEXT: directives as a single paragraph.
+
+        Adjacent TEXT: lines (separated only by a single newline, no blank
+        line between them) are joined into one paragraph separated by a
+        single space.  A blank line (two successive NEWLINEs, or any
+        non-TEXT structural token) breaks the paragraph.
+
+        Delegates to _parse_paragraph for the first token so the
+        part-label promotion rule still applies when the leading TEXT:
+        line starts with a recognised structural label like ``(a)``.
+        """
+        # Parse the first TEXT token (may return a Part for labelled content).
+        result = self._parse_paragraph()
+
+        # If the first token produced a Part, do not attempt coalescing —
+        # the content already belongs to the Part's item list.
+        if isinstance(result, Part):
+            return result
+
+        # Coalesce following TEXT tokens that are adjacent (no blank line).
+        # A blank line is signalled by two consecutive NEWLINEs or by any
+        # token that is not NEWLINE + TEXT.
+        accumulated: list[str] = [result.text]
+        while True:
+            # Peek: is the next token a NEWLINE followed directly by TEXT?
+            if not self._match(TokenType.NEWLINE):
+                break
+            # Save position in case we need to back off.
+            saved_pos = self.pos
+            self._advance()  # consume the NEWLINE
+            if not self._match(TokenType.TEXT):
+                # Not followed by TEXT — restore to before the NEWLINE.
+                self.pos = saved_pos
+                break
+            # Check it is not a blank line (another NEWLINE would appear before TEXT).
+            # Since we consumed exactly one NEWLINE and the next token is TEXT,
+            # this is a single-newline separation — coalesce it.
+            text_token = self._advance()  # consume TEXT token
+            text = text_token.value
+            # Apply the same part-label guard: if this line starts with a
+            # structural label, stop coalescing (it forms a new Part).
+            roman_numerals: frozenset[str] = frozenset(
+                {"i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"}
+            )
+            pm = re.match(r"^\(([a-z0-9]+)\)\s+(.+)", text, re.IGNORECASE)
+            if pm:
+                lbl = pm.group(1).lower()
+                if (
+                    (len(lbl) == 1 and lbl.isalpha())
+                    or (len(lbl) == 1 and lbl.isdigit())
+                    or lbl in roman_numerals
+                ):
+                    # Back off: put pos back before the TEXT token and stop.
+                    self.pos = saved_pos
+                    break
+            accumulated.append(text)
+
+        if len(accumulated) == 1:
+            # No coalescing happened; return the already-parsed result.
+            return result
+
+        merged_text = " ".join(accumulated)
+        return Paragraph(
+            text=merged_text,
+            line=result.line,
+            column=result.column,
+        )
 
     def _parse_pure_paragraph(self) -> PureParagraph:
         """Parse pure text paragraph from PURETEXT token.
@@ -483,6 +640,82 @@ class Parser:
 
         return LatexBlock(latex=latex, line=latex_token.line, column=latex_token.column)
 
+    def _parse_identifier_document_item(self) -> DocumentItem:
+        """Parse document item starting with an IDENTIFIER token.
+
+        Dispatches to free type, horizontal schema definition, or abbreviation
+        based on the tokens that follow the identifier.
+        Note: Partial support for compound identifiers like "R+ ==" (GitHub #3).
+        """
+        next_token = self._peek_ahead(1)
+        if next_token.type == TokenType.FREE_TYPE:
+            return self._parse_free_type()
+        if next_token.type == TokenType.DEFS:
+            return self._parse_horiz_def()
+        has_generics = next_token.type == TokenType.LBRACKET
+        if has_generics and self._scan_for_defs_after_brackets(offset=1):
+            return self._parse_horiz_def()
+        is_abbrev = next_token.type == TokenType.ABBREV
+        if not is_abbrev and next_token.type in (
+            TokenType.PLUS,
+            TokenType.STAR,
+            TokenType.TILDE,
+        ):
+            token_after_postfix = self._peek_ahead(2)
+            is_abbrev = token_after_postfix.type == TokenType.ABBREV
+        if is_abbrev:
+            return self._parse_abbreviation()
+        return self._parse_expr()
+
+    def _parse_bracket_document_item(self) -> DocumentItem:
+        """Parse document item starting with a left-bracket token.
+
+        Distinguishes bag literals ([[...]]) from abbreviations with generic
+        parameters ([X, Y] Name == expression).
+        """
+        next_token = self._peek_ahead(1)
+        if next_token.type == TokenType.LBRACKET:
+            return self._parse_expr()
+        return self._parse_abbreviation()
+
+    def _parse_parts_directive(self) -> PartsFormat:
+        """Parse PARTS directive from PARTS token.
+
+        PARTS directives parsed at document start are the authoritative source;
+        one appearing later in content is parsed but has no effect.
+        """
+        parts_token = self._advance()
+        return PartsFormat(
+            style=parts_token.value.strip().lower(),
+            line=parts_token.line,
+            column=parts_token.column,
+        )
+
+    def _parse_b_block(self) -> BMachine:
+        """Parse B-machine verbatim block from B_BLOCK token.
+
+        The token value is the raw multi-line body (including the final END
+        line) already captured by the lexer.  No Z-parser involvement.
+        """
+        b_token = self._advance()  # Consume B_BLOCK token
+        if b_token.type != TokenType.B_BLOCK:
+            raise ParserError("Expected B_BLOCK token for B-machine block", b_token)
+        return BMachine(body=b_token.value, line=b_token.line, column=b_token.column)
+
+    def _parse_raw_latex_block(self) -> RawLatexBlock:
+        """Parse multi-line raw LaTeX block from RAW_LATEX_BLOCK token.
+
+        The token value is the verbatim body already slurped by the lexer
+        (body lines only — the END terminator is not included).  Emitted
+        directly to .tex output with no escaping and no environment wrapper.
+        """
+        tok = self._advance()  # Consume RAW_LATEX_BLOCK token
+        if tok.type != TokenType.RAW_LATEX_BLOCK:
+            raise ParserError(
+                "Expected RAW_LATEX_BLOCK token for multi-line LATEX block", tok
+            )
+        return RawLatexBlock(body=tok.value, line=tok.line, column=tok.column)
+
     def _parse_pagebreak(self) -> PageBreak:
         """Parse page break from PAGEBREAK token.
 
@@ -493,6 +726,17 @@ class Parser:
             raise ParserError("Expected PAGEBREAK token", pagebreak_token)
 
         return PageBreak(line=pagebreak_token.line, column=pagebreak_token.column)
+
+    def _parse_linebreak(self) -> LineBreak:
+        r"""Parse line break (vertical \medskip) from LINEBREAK token.
+
+        LINEBREAK: inserts a medium vertical space in the PDF output.
+        """
+        linebreak_token = self._advance()  # Consume LINEBREAK token
+        if linebreak_token.type != TokenType.LINEBREAK:
+            raise ParserError("Expected LINEBREAK token", linebreak_token)
+
+        return LineBreak(line=linebreak_token.line, column=linebreak_token.column)
 
     def _parse_contents(self) -> Contents:
         """Parse table of contents directive from CONTENTS token.
@@ -603,58 +847,33 @@ class Parser:
         if self._match(TokenType.PROOF):
             return self._parse_proof_tree()
         if self._match(TokenType.TEXT):
-            return self._parse_paragraph()
+            return self._parse_paragraph_coalesced()
         if self._match(TokenType.PURETEXT):
             return self._parse_pure_paragraph()
         if self._match(TokenType.LATEX):
             return self._parse_latex_block()
+        if self._match(TokenType.RAW_LATEX_BLOCK):
+            return self._parse_raw_latex_block()
+        if self._match(TokenType.B_BLOCK):
+            return self._parse_b_block()
         if self._match(TokenType.PAGEBREAK):
             return self._parse_pagebreak()
+        if self._match(TokenType.LINEBREAK):
+            return self._parse_linebreak()
         if self._match(TokenType.CONTENTS):
             return self._parse_contents()
         if self._match(TokenType.PARTS):
-            # PARTS directive parsed at document start, but can appear in content
-            # Parse it but it will be ignored (document-level setting already applied)
-            parts_token = self._advance()
-            return PartsFormat(
-                style=parts_token.value.strip().lower(),
-                line=parts_token.line,
-                column=parts_token.column,
-            )
+            return self._parse_parts_directive()
 
         # Check for abbreviation (identifier == expr) or free type (identifier ::= ...)
-        # Note: Partial support for compound identifiers like "R+ =="
-        # (GitHub #3 still open)
+        # or horizontal schema definition (identifier [generics]? defs ...)
         if self._match(TokenType.IDENTIFIER):
-            # Look ahead to determine type
-            next_token = self._peek_ahead(1)
-            if next_token.type == TokenType.FREE_TYPE:
-                return self._parse_free_type()
-            # Check for abbreviation with or without postfix operator
-            # Cases: "R ==", "R+ ==", "R* ==", "R~ ==" (partial support, GitHub #3 open)
-            is_abbrev = next_token.type == TokenType.ABBREV
-            if not is_abbrev and next_token.type in (
-                TokenType.PLUS,
-                TokenType.STAR,
-                TokenType.TILDE,
-            ):
-                # Check if postfix operator is followed by ==
-                token_after_postfix = self._peek_ahead(2)
-                is_abbrev = token_after_postfix.type == TokenType.ABBREV
-            if is_abbrev:
-                return self._parse_abbreviation()
-            # Otherwise fall through to expression parsing
+            return self._parse_identifier_document_item()
 
         # Check for abbreviation with generic parameters [X, Y] Name == expression
         # Note: Bag literals [[x]] start with [[ which is distinct
         if self._match(TokenType.LBRACKET):
-            # Check if this is a bag literal [[...]] or abbreviation [X, Y] Name ==
-            next_token = self._peek_ahead(1)
-            if next_token.type == TokenType.LBRACKET:
-                # It's a bag literal - parse as expression
-                return self._parse_expr()
-            # It's an abbreviation with generic parameters
-            return self._parse_abbreviation()
+            return self._parse_bracket_document_item()
 
         # Default: parse as expression
         return self._parse_expr()
@@ -687,6 +906,22 @@ class Parser:
         if pos < len(self.tokens):
             return self.tokens[pos]
         return self.tokens[-1]  # Return EOF if past end
+
+    def _reject_stray_slash(self) -> None:
+        """Raise ParserError if the current token is a stray SLASH.
+
+        '/' is only valid inside schema rename brackets ``S[a/b]``.
+        When it appears in any other position it produces a confusing
+        generic "unexpected token" message.  This helper fires first and
+        gives a targeted diagnostic.
+        """
+        if self._match(TokenType.SLASH):
+            raise ParserError(
+                "'/' is not a valid operator here; the slash is only valid"
+                " inside schema rename brackets S[a/b]."
+                " Did you mean '/=' (not equal) or '/in' (not in)?",
+                self._current(),
+            )
 
     def _skip_newlines(self) -> None:
         """Skip all consecutive newline tokens."""
@@ -773,7 +1008,444 @@ class Parser:
             TokenType.BIGCUP,  # bigcup (distributed union)
             TokenType.BIGCAP,  # bigcap (distributed intersection)
             TokenType.FILTER,  # filter (sequence filter)
+            TokenType.GROUP,  # group (relational operator; legal as attr name)
+            TokenType.UNGROUP,  # ungroup (relational operator; legal as attr name)
         )
+
+    # Operator keywords whose LaTeX expansion (e.g. \id, \dom) collides
+    # with declaration-name use. Even though the parser can accept these
+    # as attribute names, the LaTeX generator emits the operator symbol,
+    # which fuzz then rejects in declaration position. Reject at the
+    # parser level with a clear error.
+    _RESERVED_DECL_NAMES: ClassVar[frozenset[str]] = frozenset(
+        {"id", "dom", "ran", "inv", "comp", "mod", "bigcup", "bigcap", "filter"}
+    )
+
+    def _reject_reserved_decl_name(self, tok: Token) -> None:
+        """Raise ParserError if `tok.value` is a reserved operator keyword.
+
+        Operator names that have a dedicated LaTeX expansion (id → \\id,
+        dom → \\dom, etc.) cannot be used as declaration variable names
+        because the generator emits the operator symbol, producing
+        invalid Z that fuzz rejects.
+        """
+        if tok.value in self._RESERVED_DECL_NAMES:
+            msg = (
+                f"{tok.value!r} is a reserved Z operator name and cannot be used "
+                f"as a declaration variable (it would render as the operator "
+                f"in LaTeX). Rename to a non-conflicting identifier "
+                f"(e.g. {tok.value}1, {tok.value}Val, my{tok.value.capitalize()})."
+            )
+            raise ParserError(msg, tok)
+
+    def _scan_for_colon_before_newline(self) -> bool:
+        """Lookahead scan: return True if ':' appears before NEWLINE/WHERE/END/EOF.
+
+        Used to disambiguate a bare identifier line from a typed declaration.
+        ``count, count' : N`` returns True (typed declaration).
+        ``Counter``           returns False (bare schema inclusion).
+        Commas and identifiers between the current position and the colon are
+        allowed — they are the multi-name variable list.
+
+        Bracket depth is tracked so a COLON inside ``[...]`` (e.g., in a
+        type expression within generic args) is not mistaken for the
+        declaration colon.  Only a COLON at depth 0 signals a typed declaration.
+        """
+        offset = 0
+        depth = 0
+        while True:
+            tok = self._peek_ahead(offset)
+            if tok.type in (
+                TokenType.NEWLINE,
+                TokenType.WHERE,
+                TokenType.END,
+                TokenType.SEMICOLON,
+                TokenType.EOF,
+            ):
+                return False
+            if tok.type == TokenType.LBRACKET:
+                depth += 1
+            elif tok.type == TokenType.RBRACKET:
+                depth -= 1
+            elif tok.type == TokenType.COLON and depth == 0:
+                return True
+            offset += 1
+
+    def _parse_inclusion_generic_args(self) -> list[Expr] | None:
+        """Parse optional generic instantiation arguments: [expr, expr, ...].
+
+        Returns None when no '[' is present.  Consumes the brackets and their
+        contents when present (e.g., ``[Int]``, ``[N cross N]``).
+
+        Raises ParserError for:
+        - Empty brackets ``[]`` or comma-only ``[,]`` (Z RM §3.9 requires ≥1 expr)
+        - Unclosed bracket — error points at the opening ``[``
+        """
+        if not self._match(TokenType.LBRACKET):
+            return None
+        open_tok = self._advance()  # consume '[', save for error reporting
+        args: list[Expr] = []
+
+        terminators = (
+            TokenType.NEWLINE,
+            TokenType.WHERE,
+            TokenType.END,
+            TokenType.EOF,
+        )
+
+        while not self._match(TokenType.RBRACKET):
+            if self._at_end() or self._match(*terminators):
+                raise ParserError("Unclosed '[' in generic argument list", open_tok)
+            if self._match(TokenType.COMMA):
+                if not args:
+                    # Leading comma — no expression before it
+                    raise ParserError(
+                        "Expected type expression in generic argument list",
+                        self._current(),
+                    )
+                self._advance()
+                # Trailing comma before ']'
+                if self._match(TokenType.RBRACKET):
+                    raise ParserError(
+                        "Expected type expression in generic argument list",
+                        self._current(),
+                    )
+                continue
+            args.append(self._parse_expr())
+
+        if not args:
+            raise ParserError(
+                "Empty generic argument list — at least one type expression required",
+                open_tok,
+            )
+
+        self._advance()  # consume ']'
+        return args
+
+    def _bracket_contains_slash(self) -> bool:
+        """Return True if the next bracket group (starting at '[') contains '/'.
+
+        Scans ahead from the current position (which must point at '[') for a
+        SLASH token at bracket depth 0.  Does not consume any tokens.
+        """
+        depth = 0
+        offset = 1  # start scanning past the '['
+        while True:
+            tok = self._peek_ahead(offset)
+            if tok.type == TokenType.LBRACKET:
+                depth += 1
+            elif tok.type == TokenType.RBRACKET:
+                if depth == 0:
+                    return False
+                depth -= 1
+            elif tok.type == TokenType.SLASH and depth == 0:
+                return True
+            elif tok.type in (TokenType.EOF, TokenType.NEWLINE):
+                return False
+            offset += 1
+
+    def _parse_schema_rename_or_generic(
+        self, base: Expr
+    ) -> GenericInstantiation | SchemaRename:
+        """Consume '[' then dispatch to rename or generic instantiation.
+
+        Disambiguation rule (Z RM §3.11): scan the bracket contents at
+        bracket depth 0.  If any SLASH token appears before the matching
+        ']', parse as schema rename pairs ``S[new/old, ...]``.  Otherwise,
+        parse as a generic type instantiation ``S[T, ...]``.
+
+        The '[' has NOT been consumed on entry; this method consumes it and
+        the matching ']'.
+        """
+        if self._bracket_contains_slash():
+            return self._parse_schema_rename(base)
+        return self._parse_generic_instantiation(base)
+
+    def _parse_generic_instantiation(self, base: Expr) -> GenericInstantiation:
+        """Parse generic instantiation S[T, ...] — '[' not yet consumed."""
+        lbracket_token = self._advance()  # Consume '['
+
+        type_params: list[Expr] = []
+
+        if self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "Expected at least one type parameter in generic instantiation",
+                self._current(),
+            )
+
+        type_params.append(self._parse_expr())
+
+        while self._match(TokenType.COMMA):
+            self._advance()  # Consume ','
+            if self._match(TokenType.RBRACKET):
+                # Trailing comma: Type[X,]
+                break
+            type_params.append(self._parse_expr())
+
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "Expected ']' after generic type parameters", self._current()
+            )
+        self._advance()  # Consume ']'
+
+        return GenericInstantiation(
+            base=base,
+            type_params=type_params,
+            line=lbracket_token.line,
+            column=lbracket_token.column,
+        )
+
+    def _parse_schema_rename(self, schema: Expr) -> SchemaRename:
+        """Parse schema rename S[old/new, ...] — '[' not yet consumed.
+
+        Grammar:
+            rename ::= '[' pair (',' pair)* ']'
+            pair   ::= IDENTIFIER '/' IDENTIFIER
+
+        Raises ParserError for:
+        - Empty bracket ``S[]``
+        - Missing source name ``S[/b]``
+        - Missing slash ``S[a b]``
+        - Missing target name ``S[a/]``
+        - Trailing slash ``S[a/b/]``
+        - Trailing comma ``S[a/b,]``
+        """
+        open_tok = self._advance()  # Consume '['
+
+        pairs: list[tuple[str, str]] = []
+
+        while not self._match(TokenType.RBRACKET):
+            if self._at_end() or self._match(TokenType.NEWLINE, TokenType.EOF):
+                raise ParserError(
+                    "unclosed '[' in schema rename",
+                    open_tok,
+                )
+
+            # Expect source identifier
+            if not self._match(TokenType.IDENTIFIER):
+                cur = self._current()
+                raise ParserError(
+                    f"expected identifier before '/' in schema rename pair,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            src_tok = self._advance()
+            src = src_tok.value
+
+            # Expect '/'
+            if not self._match(TokenType.SLASH):
+                cur = self._current()
+                raise ParserError(
+                    f"expected '/' in schema rename pair after {src!r},"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            self._advance()  # Consume '/'
+
+            # Expect target identifier
+            if not self._match(TokenType.IDENTIFIER):
+                cur = self._current()
+                raise ParserError(
+                    f"expected identifier after '/' in schema rename pair,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            tgt_tok = self._advance()
+            tgt = tgt_tok.value
+
+            pairs.append((src, tgt))
+
+            # Optional comma separator
+            if self._match(TokenType.COMMA):
+                self._advance()  # Consume ','
+                # Trailing comma check: next is ']'
+                if self._match(TokenType.RBRACKET):
+                    raise ParserError(
+                        "expected rename pair after ',' in schema rename",
+                        self._current(),
+                    )
+                continue
+
+            # If not comma and not ']', something is wrong
+            if not self._match(TokenType.RBRACKET):
+                cur = self._current()
+                raise ParserError(
+                    f"expected ',' or ']' in schema rename,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+
+        if not pairs:
+            raise ParserError(
+                "schema rename requires at least one pair",
+                open_tok,
+            )
+
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "expected ']' to close schema rename",
+                self._current(),
+            )
+        self._advance()  # Consume ']'
+
+        return SchemaRename(
+            schema=schema,
+            pairs=pairs,
+            line=open_tok.line,
+            column=open_tok.column,
+        )
+
+    def _parse_declaration_or_inclusion(
+        self,
+    ) -> Declaration | SchemaInclusion | list[Declaration]:
+        """Parse one declaration line or schema-inclusion line.
+
+        Five forms:
+        1. ``pk name1, name2, ... : Type``  → list[Declaration] with is_primary_key=True
+        2. ``Delta Name [generic-args]?``   → SchemaInclusion(decoration="delta")
+        3. ``Xi Name [generic-args]?``      → SchemaInclusion(decoration="xi")
+        4. ``name1, name2, ... : Type``     → list[Declaration]  (typed, ≥1 item)
+        5. ``Name [generic-args]?``         → SchemaInclusion(decoration=None)
+           (bare inclusion — only when no ':' follows on the same line)
+
+        Returns a list of Declarations for the typed form so the caller can
+        extend its declaration list directly; returns a single SchemaInclusion
+        otherwise.
+        """
+        start_tok = self._current()
+
+        # --- pk prefix: primary-key declaration ---
+        if self._match(TokenType.PK):
+            pk_tok = self._advance()  # consume 'pk'
+            cur = self._current()
+            # Reject pk before Delta/Xi or bare-schema inclusion (no attribute name)
+            if self._match(TokenType.DELTA):
+                raise ParserError(
+                    "pk cannot precede Delta inclusion"
+                    " (no attribute name to underline)",
+                    cur,
+                )
+            if self._match(TokenType.XI):
+                raise ParserError(
+                    "pk cannot precede Xi inclusion (no attribute name to underline)",
+                    cur,
+                )
+            # Must have an identifier (attribute name) followed eventually by ':'
+            is_ident = self._match(TokenType.IDENTIFIER)
+            is_kw_as_ident = self._is_keyword_usable_as_identifier()
+            if not is_ident and not is_kw_as_ident:
+                raise ParserError(
+                    f"pk must be followed by an attribute name,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            if not self._scan_for_colon_before_newline():
+                raise ParserError(
+                    "pk declaration requires a type annotation (name : Type)",
+                    cur,
+                )
+            pk_var_tokens: list[Token] = []
+            pk_var_tok = self._current()
+            self._reject_reserved_decl_name(pk_var_tok)
+            pk_var_tokens.append(pk_var_tok)
+            self._advance()
+            while self._match(TokenType.COMMA):
+                self._advance()  # consume ','
+                if not (
+                    self._match(TokenType.IDENTIFIER)
+                    or self._is_keyword_usable_as_identifier()
+                ):
+                    raise ParserError(
+                        "Expected variable name after ','", self._current()
+                    )
+                self._reject_reserved_decl_name(self._current())
+                pk_var_tokens.append(self._current())
+                self._advance()
+            if not self._match(TokenType.COLON):
+                raise ParserError("Expected ':' in pk declaration", self._current())
+            self._advance()  # consume ':'
+            pk_type_expr = self._parse_expr()
+            return [
+                Declaration(
+                    variable=vt.value,
+                    type_expr=pk_type_expr,
+                    is_primary_key=True,
+                    line=pk_tok.line,
+                    column=pk_tok.column,
+                )
+                for vt in pk_var_tokens
+            ]
+
+        # --- Delta / Xi decorated inclusion ---
+        if self._match(TokenType.DELTA, TokenType.XI):
+            decoration = "delta" if self._match(TokenType.DELTA) else "xi"
+            kw = "Delta" if decoration == "delta" else "Xi"
+            self._advance()  # consume Delta / Xi
+            # Must be followed by an identifier (schema name)
+            if not self._match(TokenType.IDENTIFIER):
+                cur = self._current()
+                raise ParserError(
+                    f"Expected schema name after {kw},"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            name_tok = self._advance()
+            generics = self._parse_inclusion_generic_args()
+            return SchemaInclusion(
+                name=name_tok.value,
+                decoration=decoration,
+                generics=generics,
+                line=start_tok.line,
+                column=start_tok.column,
+            )
+
+        # --- IDENTIFIER (or keyword-as-identifier) ---
+        # Scan ahead to decide: typed declaration vs bare inclusion.
+        if not self._scan_for_colon_before_newline():
+            # No colon before newline → bare schema inclusion
+            name_tok = self._advance()
+            generics = self._parse_inclusion_generic_args()
+            return SchemaInclusion(
+                name=name_tok.value,
+                decoration=None,
+                generics=generics,
+                line=start_tok.line,
+                column=start_tok.column,
+            )
+
+        # Colon found → typed declaration (original path)
+        var_tokens: list[Token] = []
+        var_tok = self._current()
+        self._reject_reserved_decl_name(var_tok)
+        var_tokens.append(var_tok)
+        self._advance()
+
+        while self._match(TokenType.COMMA):
+            self._advance()  # consume ','
+            if not (
+                self._match(TokenType.IDENTIFIER)
+                or self._is_keyword_usable_as_identifier()
+            ):
+                raise ParserError("Expected variable name after ','", self._current())
+            self._reject_reserved_decl_name(self._current())
+            var_tokens.append(self._current())
+            self._advance()
+
+        if not self._match(TokenType.COLON):
+            raise ParserError("Expected ':' in declaration", self._current())
+        self._advance()  # consume ':'
+
+        type_expr = self._parse_expr()
+
+        return [
+            Declaration(
+                variable=vt.value,
+                type_expr=type_expr,
+                line=vt.line,
+                column=vt.column,
+            )
+            for vt in var_tokens
+        ]
 
     def _smart_join_justification(self, parts: list[str]) -> str:
         """Join justification tokens intelligently.
@@ -812,19 +1484,37 @@ class Parser:
         """Parse section: === Title ==="""
         start_token = self._advance()  # Consume first '==='
 
-        # Collect title text (all identifiers until closing ===)
-        title_parts: list[str] = []
-        while not self._match(TokenType.SECTION_MARKER) and not self._at_end():
-            if self._match(TokenType.NEWLINE):
-                break  # Section title on one line
-            title_parts.append(self._current().value)
-            self._advance()
+        # The lexer emits a TEXT token carrying the raw title text between the
+        # two === markers (verbatim, stripped of surrounding whitespace).  Fall
+        # back to collecting individual tokens for malformed inputs.
+        if self._match(TokenType.TEXT):
+            title = self._advance().value
+            # Consume the closing ===
+            if self._match(TokenType.SECTION_MARKER):
+                self._advance()
+        else:
+            # Fallback: collect individual tokens until closing ===.
+            title_parts: list[str] = []
+            while not self._match(TokenType.SECTION_MARKER) and not self._at_end():
+                if self._match(TokenType.NEWLINE):
+                    break  # Section title on one line
+                title_parts.append(self._current().value)
+                self._advance()
 
-        if not self._match(TokenType.SECTION_MARKER):
-            raise ParserError("Expected closing '===' for section", self._current())
+            if not self._match(TokenType.SECTION_MARKER):
+                raise ParserError("Expected closing '===' for section", self._current())
 
-        self._advance()  # Consume closing '==='
-        title = " ".join(title_parts)
+            self._advance()  # Consume closing '==='
+            # Reconstruct title, joining contraction/possessive suffixes directly
+            # (no space before tokens that start with apostrophe, e.g. "'s", "'t").
+            title_words: list[str] = []
+            for part in title_parts:
+                if part.startswith("'") and title_words:
+                    title_words[-1] += part
+                else:
+                    title_words.append(part)
+            title = " ".join(title_words)
+
         self._skip_newlines()
 
         # Parse section content until next section or end
@@ -853,7 +1543,14 @@ class Parser:
             raise ParserError("Expected closing '**' for solution", self._current())
 
         self._advance()  # Consume closing '**'
-        number = " ".join(solution_parts)
+        # Reconstruct number, joining contraction/possessive suffixes directly.
+        number_words: list[str] = []
+        for part in solution_parts:
+            if part.startswith("'") and number_words:
+                number_words[-1] += part
+            else:
+                number_words.append(part)
+        number = " ".join(number_words)
         self._skip_newlines()
 
         # Parse solution content until next solution/section or end
@@ -1497,9 +2194,10 @@ class Parser:
             TokenType.CAT,
             TokenType.FILTER,
             TokenType.BAG_UNION,
+            TokenType.BAG_DIFF,
         ):
             # Lookahead for +: only treat as infix if followed by operand
-            # CAT, FILTER, BAG_UNION, and MINUS are always infix
+            # CAT, FILTER, BAG_UNION, BAG_DIFF, and MINUS are always infix
             if self._match(TokenType.PLUS) and not self._is_operand_start():
                 break
             op_token = self._advance()
@@ -1587,6 +2285,8 @@ class Parser:
             TokenType.MU,
             TokenType.LAMBDA,
             TokenType.IF,  # Conditional expressions (if/then/else)
+            TokenType.SIGMA,  # sigma[...](...)
+            TokenType.PI,  # pi[...](...)
         )
 
     def _should_parse_space_separated_arg(self) -> bool:
@@ -1649,6 +2349,7 @@ class Parser:
             TokenType.CAT,  # ⌢ concatenation
             TokenType.FILTER,  # ↾ sequence filter
             TokenType.BAG_UNION,  # ⊎ bag union
+            TokenType.BAG_DIFF,  # bag_diff bag difference
             TokenType.RANGE,  # ..
             TokenType.EQUALS,
             TokenType.NOT_EQUAL,
@@ -1684,6 +2385,8 @@ class Parser:
             TokenType.FINFUN,  # 77-> (finite partial function)
             TokenType.IMPLIES,  # =>
             TokenType.IFF,  # <=>
+            TokenType.JOIN,  # join (natural join / theta-join)
+            TokenType.DIV,  # div (relational division)
         ):
             return False
 
@@ -1708,6 +2411,8 @@ class Parser:
             TokenType.BIGCAP,
             TokenType.LAMBDA,
             TokenType.IF,
+            TokenType.SIGMA,
+            TokenType.PI,
         )
 
     def _parse_quantifier(self) -> Expr:
@@ -1718,6 +2423,18 @@ class Parser:
             - Tuple patterns for destructuring: forall (x, y) : T | pred
             - Semicolon-separated bindings (nested): forall x : T; y : U | pred
             - Mu-operator with expression: mu x : N | pred . expr
+            - Schema-text quantification (Z RM §3.10):
+                exists Delta S | P
+                exists Xi S | P
+                exists S | P
+                exists S' | P
+                forall Delta S | P
+
+        Disambiguation rule (Z RM §3.10):
+            If `:` follows the identifier  → value-binding (existing path).
+            If `Delta`/`Xi` precedes the identifier, or
+            if the identifier is followed directly by `|` or NEWLINE→`|`
+                → schema-binding (new path).
 
         Examples:
             forall x : N | pred
@@ -1725,8 +2442,70 @@ class Parser:
             forall (x, y) : T | pred
             exists1 x : N | pred
             mu x : N | pred . expr
+            exists Delta S | P
+            exists Xi S | P
+            exists S | P
+            exists S' | P
         """
         quant_token = self._advance()  # Consume 'forall', 'exists', 'exists1', or 'mu'
+
+        # --- Schema-text quantification (Z RM §3.10) ---
+        #
+        # Check for Delta/Xi decoration before identifier.
+        if self._match(TokenType.DELTA, TokenType.XI):
+            decoration: Literal["Delta", "Xi", "None", "Prime"] = (
+                "Delta" if self._match(TokenType.DELTA) else "Xi"
+            )
+            self._advance()  # Consume Delta or Xi
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError(
+                    f"Expected schema name after {decoration}",
+                    self._current(),
+                )
+            schema_token = self._advance()
+            schema_binding = SchemaBinding(
+                decoration=decoration,
+                schema_name=schema_token.value,
+                line=schema_token.line,
+                column=schema_token.column,
+            )
+            return self._parse_schema_quantifier_body(quant_token, schema_binding)
+
+        # Check for bare IDENTIFIER followed by | (schema-as-declaration or primed).
+        #
+        # Disambiguation (Z naming convention, Z RM §3.2):
+        #   - Schema names begin with an uppercase letter.
+        #   - Variable names begin with a lowercase letter.
+        #   - Presence of `:` after the identifier → value binding regardless.
+        #   - Uppercase initial + no `:` or `,` follows → schema binding.
+        #
+        # Examples:
+        #   exists S | P        → schema binding  (S is uppercase)
+        #   exists S' | P       → schema binding  (S' is uppercase-initial)
+        #   exists x | P        → value binding   (x is lowercase, no domain)
+        #   exists x : T | P    → value binding   (: follows)
+        if self._match(TokenType.IDENTIFIER):
+            ident_token = self._peek_ahead(0)  # peek at current without consuming
+            next_tok = self._peek_ahead(1)
+            schema_name = ident_token.value
+            # Strip trailing prime for the uppercase check
+            base_name = schema_name.rstrip("'")
+            is_schema_name = bool(base_name) and base_name[0].isupper()
+            not_decl = next_tok.type not in (TokenType.COLON, TokenType.COMMA)
+            if is_schema_name and not_decl:
+                # Schema binding: bare S | P or S' | P
+                self._advance()  # consume the identifier
+                deco: Literal["Delta", "Xi", "None", "Prime"] = (
+                    "Prime" if schema_name.endswith("'") else "None"
+                )
+                schema_binding = SchemaBinding(
+                    decoration=deco,
+                    schema_name=schema_name,
+                    line=ident_token.line,
+                    column=ident_token.column,
+                )
+                return self._parse_schema_quantifier_body(quant_token, schema_binding)
+            # Fall through to value-binding path (: follows, or lowercase name)
 
         # Parse variable pattern: simple identifiers or tuple pattern like (x, y)
         tuple_pattern: Expr | None = None
@@ -1803,7 +2582,10 @@ class Parser:
             # Parse the rest as if it were a new quantifier of the same type
             # This will handle: y : U | body or y : U; z : V | body
             nested_quant = self._parse_quantifier_continuation(
-                quant_token.value, nested_line, nested_column
+                quant_token.value,
+                nested_line,
+                nested_column,
+                inherited_vars=set(variables),
             )
 
             # Now wrap the nested quantifier as the body of this quantifier
@@ -1841,6 +2623,11 @@ class Parser:
             self._skip_newlines()
 
         # Set flag: we're in quantifier body where . can be separator (for mu)
+        # Also record all declared variables so _parse_postfix can distinguish
+        # bullet `.` from field projection (Z RM §3.16: declared variables are
+        # not field selectors of sibling bindings in the same schema-text).
+        prev_quantifier_vars = self._current_quantifier_vars
+        self._current_quantifier_vars = set(variables)
         self._in_comprehension_body = True
         try:
             # Parse body (may be followed by constraint pipe)
@@ -1898,6 +2685,7 @@ class Parser:
                 expression = self._parse_iff()  # Parse the expression part
         finally:
             self._in_comprehension_body = False
+            self._current_quantifier_vars = prev_quantifier_vars
 
         return Quantifier(
             quantifier=quant_token.value,
@@ -1912,14 +2700,91 @@ class Parser:
             column=quant_token.column,
         )
 
+    def _parse_schema_quantifier_body(
+        self,
+        quant_token: Token,
+        schema_binding: SchemaBinding,
+    ) -> Quantifier:
+        """Parse the ``| body`` tail of a schema-text quantifier (Z RM §3.10).
+
+        Called after the schema binding (Delta S / Xi S / S / S') has been
+        consumed.  Expects ``|`` followed by the predicate body.
+
+        The body is the predicate after the spot character; fuzz expands the
+        schema invariant, so the engine emits the binding literally.
+        """
+        # Expect | separator
+        if not self._match(TokenType.PIPE):
+            raise ParserError(
+                "Expected '|' after schema binding in quantifier",
+                self._current(),
+            )
+        self._advance()  # Consume |
+
+        # Detect line continuation after |
+        has_continuation = False
+        if self._match(TokenType.CONTINUATION):
+            self._advance()
+            has_continuation = True
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+            self._skip_newlines()
+        elif self._match(TokenType.NEWLINE):
+            has_continuation = True
+            self._skip_newlines()
+        else:
+            self._skip_newlines()
+
+        self._in_comprehension_body = True
+        try:
+            body = self._parse_expr()
+        finally:
+            self._in_comprehension_body = False
+
+        return Quantifier(
+            quantifier=quant_token.value,
+            variables=[],
+            domain=None,
+            body=body,
+            expression=None,
+            line_break_after_pipe=has_continuation,
+            line_break_after_bullet=False,
+            tuple_pattern=None,
+            schema_binding=schema_binding,
+            line=quant_token.line,
+            column=quant_token.column,
+        )
+
     def _parse_quantifier_continuation(
-        self, quantifier: str, line: int, column: int
+        self,
+        quantifier: str,
+        line: int,
+        column: int,
+        inherited_vars: set[str] | None = None,
     ) -> Expr:
         """Parse continuation of semicolon-separated quantifier bindings.
 
         Helper for parsing y : U | body or y : U; z : V | body
         after we've already parsed x : T;
+
+        inherited_vars accumulates all variables declared in earlier bindings of
+        the same schema-text chain so that _parse_postfix can see the full set
+        when disambiguating bullet `.` from field projection (Z RM §3.16).
         """
+        prior_vars: set[str] = inherited_vars if inherited_vars is not None else set()
+
+        # After ';' the caller may have placed a natural newline or an explicit
+        # `\` continuation before the next binding.  Mirror the post-`|` handling
+        # (lines 2810-2820) so that `;`-chained quantifier prefixes may span
+        # source lines (Z RM authoring convenience).
+        if self._match(TokenType.CONTINUATION):
+            self._advance()
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+            self._skip_newlines()
+        elif self._match(TokenType.NEWLINE):
+            self._skip_newlines()
+
         # Parse variable(s)
         if not self._match(TokenType.IDENTIFIER):
             raise ParserError(
@@ -1938,14 +2803,23 @@ class Parser:
         domain: Expr | None = None
         if self._match(TokenType.COLON):
             self._advance()  # Consume ':'
-            # Parse type expression to match main quantifier parser
-            domain = self._parse_function_type()
+            # Parse type expression to match main quantifier parser.
+            # Mirror _parse_quantifier (parser.py:2305-2309): set the flag so
+            # compound domain types like X -> Y stop at PIPE/PERIOD correctly.
+            self._parsing_schema_text = True
+            try:
+                domain = self._parse_function_type()
+            finally:
+                self._parsing_schema_text = False
 
         # Check for another semicolon (more bindings)
         if self._match(TokenType.SEMICOLON):
             self._advance()  # Consume ';'
             nested_quant = self._parse_quantifier_continuation(
-                quantifier, self._current().line, self._current().column
+                quantifier,
+                self._current().line,
+                self._current().column,
+                inherited_vars=prior_vars | set(variables),
             )
             return Quantifier(
                 quantifier=quantifier,
@@ -1963,10 +2837,28 @@ class Parser:
             raise ParserError("Expected '|' after quantifier binding", self._current())
         self._advance()  # Consume '|'
 
-        # Allow newlines after | for multi-line quantifiers
-        self._skip_newlines()
+        # Detect line continuation (backslash or natural newline).
+        # Mirrors the logic in _parse_quantifier so that semicolon-chained
+        # quantifier bindings (forall x : T; y : U; z : V | body) honour an
+        # explicit `\` continuation and bare WYSIWYG newlines after `|`.
+        has_continuation = False
+        if self._match(TokenType.CONTINUATION):
+            self._advance()  # consume \
+            has_continuation = True
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+            self._skip_newlines()
+        elif self._match(TokenType.NEWLINE):
+            has_continuation = True
+            self._skip_newlines()
+        else:
+            self._skip_newlines()
 
         # Set flag: we're in quantifier body where . can be separator (for mu)
+        # Expose the full declared-variable set (this level + all inherited levels)
+        # so _parse_postfix can apply the Z RM §3.16 bullet disambiguation rule.
+        prev_quantifier_vars = self._current_quantifier_vars
+        self._current_quantifier_vars = prior_vars | set(variables)
         self._in_comprehension_body = True
         try:
             # Parse body (constraint part if bullet separator follows)
@@ -1997,6 +2889,7 @@ class Parser:
                 expression = self._parse_iff()
         finally:
             self._in_comprehension_body = False
+            self._current_quantifier_vars = prev_quantifier_vars
 
         return Quantifier(
             quantifier=quantifier,
@@ -2004,6 +2897,7 @@ class Parser:
             domain=domain,
             body=body,
             expression=expression,
+            line_break_after_pipe=has_continuation,
             line_break_after_bullet=bullet_continuation,
             tuple_pattern=None,  # No tuple pattern in continuation
             line=line,
@@ -2045,7 +2939,59 @@ class Parser:
         finally:
             self._parsing_schema_text = False
 
-        # Parse separator . (period)
+        # Multi-decl form: lambda s : Ship; c : Class | P . E
+        # Delegate to _parse_quantifier_continuation (same path as forall/exists/mu),
+        # which handles PIPE + optional bullet, producing nested Quantifier nodes.
+        if self._match(TokenType.SEMICOLON):
+            self._advance()  # Consume ';'
+            nested_quant = self._parse_quantifier_continuation(
+                "lambda",
+                self._current().line,
+                self._current().column,
+                inherited_vars=set(variables),
+            )
+            return Quantifier(
+                quantifier="lambda",
+                variables=variables,
+                domain=domain,
+                body=nested_quant,
+                expression=None,
+                tuple_pattern=None,
+                line=lambda_token.line,
+                column=lambda_token.column,
+            )
+
+        # Single-decl form with predicate pipe: lambda s : Ship | P . E
+        # Produces Quantifier(quantifier="lambda") consistent with multi-decl path.
+        if self._match(TokenType.PIPE):
+            self._advance()  # Consume '|'
+            self._skip_newlines()
+            prev_quantifier_vars = self._current_quantifier_vars
+            self._current_quantifier_vars = set(variables)
+            self._in_comprehension_body = True
+            try:
+                body = self._parse_iff()
+                expression: Expr | None = None
+                if self._match(TokenType.PERIOD):
+                    self._advance()  # Consume '.'
+                    self._in_comprehension_body = False
+                    expression = self._parse_iff()
+            finally:
+                self._in_comprehension_body = False
+                self._current_quantifier_vars = prev_quantifier_vars
+            return Quantifier(
+                quantifier="lambda",
+                variables=variables,
+                domain=domain,
+                body=body,
+                expression=expression,
+                tuple_pattern=None,
+                line=lambda_token.line,
+                column=lambda_token.column,
+            )
+
+        # Original PERIOD-only path: lambda x : T . body  (no pipe, no semicolon)
+        # Produces a Lambda node — single-decl abstraction.
         if not self._match(TokenType.PERIOD):
             raise ParserError("Expected '.' after lambda binding", self._current())
         self._advance()  # Consume '.'
@@ -2063,6 +3009,113 @@ class Parser:
             line=lambda_token.line,
             column=lambda_token.column,
         )
+
+    def _parse_binding(self) -> Binding:
+        r"""Parse a Z binding literal: {| name == expr, ... |} (Z RM §3.7).
+
+        Consumes LBIND, then a comma-separated list of ``IDENTIFIER == expr``
+        pairs, then RBIND.  Empty bindings ``{| |}`` are accepted (Z RM §3.7
+        permits them).
+
+        The ``==`` inside binding context reuses the ABBREV token; the parser
+        disambiguates by position — we are inside ``{| ... |}``, not at
+        top-level abbreviation position.
+
+        Raises:
+            ParserError: Missing ``==``, missing label, missing value, missing
+                closing ``|}``, or semicolon used between components.
+        """
+        start_token = self._current()
+        self._advance()  # consume {|
+
+        pairs: list[tuple[str, Expr]] = []
+
+        # Empty binding: {| |}
+        if self._match(TokenType.RBIND):
+            self._advance()  # consume |}
+            return Binding(pairs=[], line=start_token.line, column=start_token.column)
+
+        # Parse first component
+        pairs.append(self._parse_binding_component())
+
+        # Parse remaining components
+        while self._match(TokenType.COMMA):
+            self._advance()  # consume ,
+            # Skip any newlines between components
+            self._skip_newlines()
+            pairs.append(self._parse_binding_component())
+
+        # Closing |}
+        if not self._match(TokenType.RBIND):
+            cur = self._current()
+            if cur.type == TokenType.SEMICOLON:
+                raise ParserError(
+                    "binding components are comma-separated, not semicolons;"
+                    " use ',' between components",
+                    cur,
+                )
+            if cur.type == TokenType.EOF:
+                raise ParserError(
+                    "unclosed binding: expected '|}' to close '{|'",
+                    cur,
+                )
+            raise ParserError(
+                f"expected ',' or '|}}' in binding, got {cur.type.name}",
+                cur,
+            )
+        self._advance()  # consume |}
+
+        return Binding(pairs=pairs, line=start_token.line, column=start_token.column)
+
+    def _parse_binding_component(self) -> tuple[str, Expr]:
+        """Parse a single binding component: IDENTIFIER == expr.
+
+        Raises:
+            ParserError: If label is missing, ``==`` is missing, or value is
+                missing.
+        """
+        # Expect an identifier as the label
+        if not self._match(TokenType.IDENTIFIER):
+            cur = self._current()
+            if cur.type == TokenType.ABBREV:
+                raise ParserError(
+                    "binding component requires a label before '==';"
+                    " got '==' with no label",
+                    cur,
+                )
+            if cur.type in (TokenType.RBIND, TokenType.EOF):
+                raise ParserError(
+                    "expected binding label (identifier) before '=='",
+                    cur,
+                )
+            raise ParserError(
+                f"expected identifier as binding label, got {cur.type.name}",
+                cur,
+            )
+        label_token = self._advance()  # consume identifier
+
+        # Expect ==
+        if not self._match(TokenType.ABBREV):
+            cur = self._current()
+            raise ParserError(
+                f"expected '==' after binding label {label_token.value!r},"
+                f" got {cur.type.name}",
+                cur,
+            )
+        self._advance()  # consume ==
+
+        # Parse value expression — stop before , or |}
+        # Use _parse_expr to allow full expressions as values
+        if self._match(TokenType.COMMA, TokenType.RBIND, TokenType.EOF):
+            cur = self._current()
+            raise ParserError(
+                f"expected expression after '==' in binding component"
+                f" {label_token.value!r}",
+                cur,
+            )
+        value = self._parse_expr()
+
+        return (label_token.value, value)
 
     def _parse_set(self) -> Expr:
         """Parse set literal or set comprehension.
@@ -2185,6 +3238,44 @@ class Parser:
             finally:
                 self._parsing_schema_text = False
 
+        # Parse optional extra declarations: ; var : Type ; var : Type ...
+        # Handles multi-typed set comprehensions like { s : Ship; c : Class | ... }
+        extra_declarations: list[tuple[str, Expr]] | None = None
+        while self._match(TokenType.SEMICOLON):
+            self._advance()  # Consume ';'
+            # After ';' the caller may have placed a natural newline or an explicit
+            # `\` continuation before the next binding.  Mirror the post-`|` handling
+            # so that `;`-chained set-comprehension prefixes may span source lines.
+            if self._match(TokenType.CONTINUATION):
+                self._advance()
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
+            elif self._match(TokenType.NEWLINE):
+                self._skip_newlines()
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError(
+                    "Expected variable name after ';' in set comprehension",
+                    self._current(),
+                )
+            extra_var = self._advance().value
+            extra_domain: Expr | None = None
+            if self._match(TokenType.COLON):
+                self._advance()  # Consume ':'
+                self._parsing_schema_text = True
+                try:
+                    extra_domain = self._parse_function_type()
+                finally:
+                    self._parsing_schema_text = False
+            if extra_domain is None:
+                raise ParserError(
+                    f"Expected ':' and type after '{extra_var}' in set comprehension",
+                    self._current(),
+                )
+            if extra_declarations is None:
+                extra_declarations = []
+            extra_declarations.append((extra_var, extra_domain))
+
         # Parse separator | or . for set comprehension
         # Syntax: {x : T | predicate . expr} or {x : T . expr} (no predicate)
         predicate: Expr | None
@@ -2198,7 +3289,25 @@ class Parser:
         elif self._match(TokenType.PIPE):
             # Pipe separator: parse predicate, optionally followed by . expr
             self._advance()  # Consume '|'
-            # Set flag: we're in comprehension body where . can be separator
+            # After '|' the caller may have placed a natural newline or an explicit
+            # `\` continuation before the predicate.  Mirror the quantifier post-`|`
+            # handling so that long comprehensions may span source lines.
+            if self._match(TokenType.CONTINUATION):
+                self._advance()
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
+            elif self._match(TokenType.NEWLINE):
+                self._skip_newlines()
+            # Set flag: we're in comprehension body where . can be separator.
+            # Expose all declared variables (primary + extra) for bullet
+            # disambiguation in _parse_postfix (Z RM §3.16).
+            all_comp_vars: set[str] = set(variables)
+            if extra_declarations is not None:
+                for ev, _ in extra_declarations:
+                    all_comp_vars.add(ev)
+            prev_quantifier_vars = self._current_quantifier_vars
+            self._current_quantifier_vars = all_comp_vars
             self._in_comprehension_body = True
             try:
                 predicate = self._parse_set_predicate()
@@ -2211,6 +3320,7 @@ class Parser:
                     expression = self._parse_set_expression()
             finally:
                 self._in_comprehension_body = False
+                self._current_quantifier_vars = prev_quantifier_vars
         elif self._match(TokenType.RBRACE):
             # No separator: both predicate and expression are omitted
             # {x : T} means "all x of type T", equivalent to just T
@@ -2222,7 +3332,8 @@ class Parser:
                 self._current(),
             )
 
-        # Expect closing brace
+        # Expect closing brace (skip newlines for multi-line comprehensions)
+        self._skip_newlines()
         if not self._match(TokenType.RBRACE):
             raise ParserError(
                 "Expected '}' to close set comprehension", self._current()
@@ -2236,6 +3347,7 @@ class Parser:
             domain=domain,
             predicate=predicate,
             expression=expression,
+            extra_declarations=extra_declarations,
             line=start_token.line,
             column=start_token.column,
         )
@@ -2249,8 +3361,16 @@ class Parser:
         return self._parse_iff()
 
     def _parse_set_expression(self) -> Expr:
-        """Parse expression in set comprehension (after . and up to })."""
-        # Parse expression up to }
+        """Parse expression in set comprehension (after . and up to }).
+
+        Newlines between the bullet separator and the expression are skipped
+        to support multi-line comprehensions like:
+            { s : Ship | pred .
+              {| name == s.name |}
+            }
+        """
+        # Skip newlines before expression (multi-line comprehension support)
+        self._skip_newlines()
         return self._parse_iff()
 
     def _parse_comparison(self) -> Expr:
@@ -2292,7 +3412,12 @@ class Parser:
                 # Allow newlines after comparison operator
                 self._skip_newlines()
 
-            right = self._parse_function_type()
+            prev_in_comparison_rhs = self._in_comparison_rhs
+            self._in_comparison_rhs = True
+            try:
+                right = self._parse_function_type()
+            finally:
+                self._in_comparison_rhs = prev_in_comparison_rhs
 
             # Check for guarded cases after = operator (pattern matching)
             # Syntax: expr1 = expr2 \n if cond2 \n expr3 \n if cond3 ...
@@ -2498,16 +3623,32 @@ class Parser:
         Union: union operator (set union)
         Override: ++ (function/sequence override)
         Both have similar precedence in Z notation.
+
+        Supports multi-line expressions with natural line breaks.
         """
         left = self._parse_cross()
 
         while self._match(TokenType.UNION, TokenType.OVERRIDE):
             op_token = self._advance()
+            # Detect line continuation (backslash or natural newline)
+            has_continuation = False
+            if self._match(TokenType.CONTINUATION):
+                self._advance()  # consume \
+                has_continuation = True
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
+            elif self._match(TokenType.NEWLINE):
+                has_continuation = True
+                self._skip_newlines()
+            else:
+                self._skip_newlines()
             right = self._parse_cross()
             left = BinaryOp(
                 operator=op_token.value,
                 left=left,
                 right=right,
+                line_break_after=has_continuation,
                 line=op_token.line,
                 column=op_token.column,
             )
@@ -2515,40 +3656,456 @@ class Parser:
         return left
 
     def _parse_cross(self) -> Expr:
-        """Parse Cartesian product operator (cross)."""
+        """Parse Cartesian product, natural join, theta-join, division, GROUP, UNGROUP.
+
+        CROSS, JOIN, DIV, GROUP, and UNGROUP sit at the same precedence
+        level between set operators and arithmetic (Phase 2.2 / 4.1).
+        JOIN handles an optional subscript bracket: R join [p] S.
+        GROUP and UNGROUP are Date's nested-relation operators.
+
+        Supports multi-line expressions with natural line breaks.
+        """
         left = self._parse_intersect()
 
-        while self._match(TokenType.CROSS):
+        while self._match(
+            TokenType.CROSS,
+            TokenType.JOIN,
+            TokenType.DIV,
+            TokenType.GROUP,
+            TokenType.UNGROUP,
+        ):
             op_token = self._advance()
-            right = self._parse_intersect()
-            left = BinaryOp(
-                operator=op_token.value,
-                left=left,
-                right=right,
-                line=op_token.line,
-                column=op_token.column,
-            )
+
+            if op_token.type == TokenType.JOIN:
+                # Check for theta-join subscript: join [predicate]
+                subscript: Expr | None = None
+                if self._match(TokenType.LBRACKET):
+                    bracket_tok = self._advance()  # consume '['
+                    if self._match(TokenType.RBRACKET):
+                        raise ParserError(
+                            "Expected predicate in join subscript", self._current()
+                        )
+                    subscript = self._parse_expr()
+                    if not self._match(TokenType.RBRACKET):
+                        raise ParserError(
+                            "Expected ']' after join predicate", bracket_tok
+                        )
+                    self._advance()  # consume ']'
+                # Detect line continuation after optional subscript
+                has_continuation = False
+                if self._match(TokenType.CONTINUATION):
+                    self._advance()  # consume \
+                    has_continuation = True
+                    if self._match(TokenType.NEWLINE):
+                        self._advance()
+                    self._skip_newlines()
+                elif self._match(TokenType.NEWLINE):
+                    has_continuation = True
+                    self._skip_newlines()
+                else:
+                    self._skip_newlines()
+                prev_relational = self._in_relational_context
+                self._in_relational_context = True
+                try:
+                    right = self._parse_intersect()
+                finally:
+                    self._in_relational_context = prev_relational
+                left = NaturalJoin(
+                    left=left,
+                    right=right,
+                    subscript=subscript,
+                    line_break_after=has_continuation,
+                    line=op_token.line,
+                    column=op_token.column,
+                )
+            elif op_token.type == TokenType.DIV:
+                # Detect line continuation
+                has_continuation = False
+                if self._match(TokenType.CONTINUATION):
+                    self._advance()  # consume \
+                    has_continuation = True
+                    if self._match(TokenType.NEWLINE):
+                        self._advance()
+                    self._skip_newlines()
+                elif self._match(TokenType.NEWLINE):
+                    has_continuation = True
+                    self._skip_newlines()
+                else:
+                    self._skip_newlines()
+                prev_relational = self._in_relational_context
+                self._in_relational_context = True
+                try:
+                    right = self._parse_intersect()
+                finally:
+                    self._in_relational_context = prev_relational
+                left = Divide(
+                    left=left,
+                    right=right,
+                    line_break_after=has_continuation,
+                    line=op_token.line,
+                    column=op_token.column,
+                )
+            elif op_token.type == TokenType.GROUP:
+                group_node = self._parse_group_rhs(left, op_token)
+                # Detect line continuation after full GROUP expression
+                has_continuation = False
+                if self._match(TokenType.CONTINUATION):
+                    self._advance()  # consume \
+                    has_continuation = True
+                    if self._match(TokenType.NEWLINE):
+                        self._advance()
+                    self._skip_newlines()
+                elif self._match(TokenType.NEWLINE):
+                    has_continuation = True
+                    self._skip_newlines()
+                else:
+                    self._skip_newlines()
+                if has_continuation:
+                    # Replace the frozen node with line_break_after=True
+                    if isinstance(group_node, GroupAggregate):
+                        left = GroupAggregate(
+                            relation=group_node.relation,
+                            clauses=group_node.clauses,
+                            line_break_after=True,
+                            line=group_node.line,
+                            column=group_node.column,
+                        )
+                    else:
+                        left = Group(
+                            relation=group_node.relation,
+                            attrs=group_node.attrs,
+                            alias=group_node.alias,
+                            line_break_after=True,
+                            line=group_node.line,
+                            column=group_node.column,
+                        )
+                else:
+                    left = group_node
+            elif op_token.type == TokenType.UNGROUP:
+                ungroup_node = self._parse_ungroup_rhs(left, op_token)
+                # Detect line continuation after full UNGROUP expression
+                has_continuation = False
+                if self._match(TokenType.CONTINUATION):
+                    self._advance()  # consume \
+                    has_continuation = True
+                    if self._match(TokenType.NEWLINE):
+                        self._advance()
+                    self._skip_newlines()
+                elif self._match(TokenType.NEWLINE):
+                    has_continuation = True
+                    self._skip_newlines()
+                else:
+                    self._skip_newlines()
+                if has_continuation:
+                    # Replace the frozen Ungroup node with line_break_after=True
+                    left = Ungroup(
+                        relation=ungroup_node.relation,
+                        alias=ungroup_node.alias,
+                        line_break_after=True,
+                        line=ungroup_node.line,
+                        column=ungroup_node.column,
+                    )
+                else:
+                    left = ungroup_node
+            else:
+                # CROSS
+                has_continuation = False
+                if self._match(TokenType.CONTINUATION):
+                    self._advance()  # consume \
+                    has_continuation = True
+                    if self._match(TokenType.NEWLINE):
+                        self._advance()
+                    self._skip_newlines()
+                elif self._match(TokenType.NEWLINE):
+                    has_continuation = True
+                    self._skip_newlines()
+                else:
+                    self._skip_newlines()
+                right = self._parse_intersect()
+                left = BinaryOp(
+                    operator=op_token.value,
+                    left=left,
+                    right=right,
+                    line_break_after=has_continuation,
+                    line=op_token.line,
+                    column=op_token.column,
+                )
+
+            # After constructing the node, check for trailing continuation
+            # that marks a break before the next operator in the chain.
+            # Example: R join S \    ← \ after RHS, before next join
+            #            join T
+            # The just-constructed node gets line_break_after=True so the
+            # caller knows to emit \\ before the next operator.
+            if self._match(TokenType.CONTINUATION):
+                self._advance()  # consume \
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
+                left = dataclasses.replace(left, line_break_after=True)
+            elif (
+                self._match(TokenType.NEWLINE) and self._next_non_newline_is_cross_op()
+            ):
+                # Natural line break before another cross-level operator
+                self._skip_newlines()
+                left = dataclasses.replace(left, line_break_after=True)
 
         return left
 
+    def _next_non_newline_is_cross_op(self) -> bool:
+        """Peek ahead past newlines to see if a cross-level operator follows.
+
+        Returns True when the next non-newline token is one of CROSS, JOIN,
+        DIV, GROUP, or UNGROUP, indicating a natural line break in a chain.
+        """
+        pos = self.pos
+        while pos < len(self.tokens) and self.tokens[pos].type == TokenType.NEWLINE:
+            pos += 1
+        if pos >= len(self.tokens):
+            return False
+        return self.tokens[pos].type in (
+            TokenType.CROSS,
+            TokenType.JOIN,
+            TokenType.DIV,
+            TokenType.GROUP,
+            TokenType.UNGROUP,
+        )
+
+    # Token types that start an aggregator clause.
+    _AGGREGATOR_TOKEN_TYPES: ClassVar[frozenset[TokenType]] = frozenset(
+        {
+            TokenType.COUNT,
+            TokenType.SUM,
+            TokenType.AVG,
+            TokenType.MIN,
+            TokenType.MAX,
+            TokenType.MEDIAN,
+        }
+    )
+
+    # Mapping from aggregator token type to Aggregator enum value.
+    _TOKEN_TO_AGGREGATOR: ClassVar[dict[TokenType, Aggregator]] = {
+        TokenType.COUNT: Aggregator.COUNT,
+        TokenType.SUM: Aggregator.SUM,
+        TokenType.AVG: Aggregator.AVG,
+        TokenType.MIN: Aggregator.MIN,
+        TokenType.MAX: Aggregator.MAX,
+        TokenType.MEDIAN: Aggregator.MEDIAN,
+    }
+
+    def _parse_group_rhs(
+        self, relation: Expr, group_tok: Token
+    ) -> Group | GroupAggregate:
+        """Parse the RHS of a GROUP expression.
+
+        Dispatches on the first token after '(':
+        - LBRACE → regroup form: ({A, B, ...} as alias)
+        - aggregator keyword → aggregate form: (Count(x) as t, Sum(y) as g)
+
+        Mixing the two forms in one GROUP RHS is rejected with a clear message.
+        """
+        if not self._match(TokenType.LPAREN):
+            raise ParserError("Expected '(' after 'group'", self._current())
+        self._advance()  # consume '('
+
+        if self._match(TokenType.LBRACE):
+            return self._parse_group_regroup_rhs(relation, group_tok)
+        if self._current().type in self._AGGREGATOR_TOKEN_TYPES:
+            return self._parse_group_aggregate_rhs(relation, group_tok)
+        cur = self._current()
+        raise ParserError(
+            f"Expected '{{' (regroup form) or an aggregator keyword "
+            f"(Count, Sum, Avg, Min, Max, Median) after '(' in 'group', "
+            f"got {cur.type.name} ({cur.value!r})",
+            cur,
+        )
+
+    def _parse_group_regroup_rhs(self, relation: Expr, group_tok: Token) -> Group:
+        """Parse the regroup form: {A, B, ...} as alias ).
+
+        The opening '(' has already been consumed by _parse_group_rhs.
+        """
+        self._advance()  # consume '{'
+        attrs: list[str] = []
+        if not self._is_attr_name_token():
+            raise ParserError(
+                "Expected at least one attribute name in 'group' attribute list",
+                self._current(),
+            )
+        attrs.append(self._advance().value)
+        while self._match(TokenType.COMMA):
+            self._advance()  # consume ','
+            if not self._is_attr_name_token():
+                raise ParserError(
+                    "Expected attribute name after ',' in 'group' attribute list",
+                    self._current(),
+                )
+            attrs.append(self._advance().value)
+        if not self._match(TokenType.RBRACE):
+            raise ParserError(
+                "Expected '}' after attribute list in 'group'", self._current()
+            )
+        self._advance()  # consume '}'
+        if not self._match(TokenType.AS):
+            cur = self._current()
+            raise ParserError(
+                f"Expected 'as' after attribute list in 'group', "
+                f"got {cur.type.name} ({cur.value!r})",
+                cur,
+            )
+        self._advance()  # consume 'as'
+        if not self._is_attr_name_token():
+            raise ParserError(
+                "Expected alias name after 'as' in 'group'", self._current()
+            )
+        alias = self._advance().value
+        if not self._match(TokenType.RPAREN):
+            raise ParserError(
+                "Expected ')' to close 'group' expression", self._current()
+            )
+        self._advance()  # consume ')'
+        return Group(
+            relation=relation,
+            attrs=attrs,
+            alias=alias,
+            line=group_tok.line,
+            column=group_tok.column,
+        )
+
+    def _parse_group_aggregate_rhs(
+        self, relation: Expr, group_tok: Token
+    ) -> GroupAggregate:
+        """Parse the aggregate form: Count(x) as t, Sum(y) as g ).
+
+        The opening '(' has already been consumed by _parse_group_rhs.
+        Parses one or more comma-separated AggregatorClause entries,
+        then expects ')' to close the GROUP RHS.
+        """
+        clauses: list[AggregatorClause] = []
+        clauses.append(self._parse_aggregator_clause())
+        while self._match(TokenType.COMMA):
+            self._advance()  # consume ','
+            # Guard: if the next token is a '{', reject the mix
+            if self._match(TokenType.LBRACE):
+                raise ParserError(
+                    "cannot mix regroup and aggregator forms in the same 'group' RHS",
+                    self._current(),
+                )
+            clauses.append(self._parse_aggregator_clause())
+        if not self._match(TokenType.RPAREN):
+            raise ParserError(
+                "Expected ')' to close 'group' expression", self._current()
+            )
+        self._advance()  # consume ')'
+        return GroupAggregate(
+            relation=relation,
+            clauses=clauses,
+            line=group_tok.line,
+            column=group_tok.column,
+        )
+
+    def _parse_aggregator_clause(self) -> AggregatorClause:
+        """Parse a single ``Count(attr) as alias`` clause."""
+        agg_tok = self._current()
+        if agg_tok.type not in self._AGGREGATOR_TOKEN_TYPES:
+            raise ParserError(
+                f"Expected aggregator keyword (Count, Sum, Avg, Min, Max, Median), "
+                f"got {agg_tok.type.name} ({agg_tok.value!r})",
+                agg_tok,
+            )
+        agg = self._TOKEN_TO_AGGREGATOR[agg_tok.type]
+        self._advance()  # consume aggregator keyword
+        if not self._match(TokenType.LPAREN):
+            raise ParserError(
+                f"Expected '(' after '{agg_tok.value}' in aggregator clause",
+                self._current(),
+            )
+        self._advance()  # consume '('
+        if not self._is_attr_name_token():
+            raise ParserError(
+                f"Expected attribute name inside '{agg_tok.value}(...)'",
+                self._current(),
+            )
+        attr = self._advance().value
+        if not self._match(TokenType.RPAREN):
+            raise ParserError(
+                f"Expected ')' after attribute in '{agg_tok.value}({attr})'",
+                self._current(),
+            )
+        self._advance()  # consume ')'
+        if not self._match(TokenType.AS):
+            cur = self._current()
+            raise ParserError(
+                f"Expected 'as' after '{agg_tok.value}({attr})', "
+                f"got {cur.type.name} ({cur.value!r})",
+                cur,
+            )
+        self._advance()  # consume 'as'
+        if not self._is_attr_name_token():
+            raise ParserError(
+                f"Expected alias name after 'as' in '{agg_tok.value}({attr}) as ...'",
+                self._current(),
+            )
+        alias = self._advance().value
+        return AggregatorClause(
+            agg=agg,
+            attr=attr,
+            alias=alias,
+            line=agg_tok.line,
+            column=agg_tok.column,
+        )
+
+    def _parse_ungroup_rhs(self, relation: Expr, ungroup_tok: Token) -> Ungroup:
+        """Parse the RHS of an UNGROUP expression: alias.
+
+        Called after the 'ungroup' keyword has been consumed.  Expects a
+        single identifier naming the nested-relation attribute to flatten.
+        """
+        if not self._is_attr_name_token():
+            raise ParserError("Expected alias name after 'ungroup'", self._current())
+        alias = self._advance().value
+        return Ungroup(
+            relation=relation,
+            alias=alias,
+            line=ungroup_tok.line,
+            column=ungroup_tok.column,
+        )
+
     def _parse_intersect(self) -> Expr:
-        """Parse intersect and set difference operators."""
+        """Parse intersect and set difference operators.
+
+        Supports multi-line expressions with natural line breaks.
+        """
         left = self._parse_unary()
 
         while self._match(TokenType.INTERSECT, TokenType.SETMINUS):
             op_token = self._advance()
+            # Detect line continuation (backslash or natural newline)
+            has_continuation = False
+            if self._match(TokenType.CONTINUATION):
+                self._advance()  # consume \
+                has_continuation = True
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
+            elif self._match(TokenType.NEWLINE):
+                has_continuation = True
+                self._skip_newlines()
+            else:
+                self._skip_newlines()
             right = self._parse_unary()
             left = BinaryOp(
                 operator=op_token.value,
                 left=left,
                 right=right,
+                line_break_after=has_continuation,
                 line=op_token.line,
                 column=op_token.column,
             )
 
         return left
 
-    def _parse_postfix(self, *, allow_space_separated: bool = True) -> Expr:  # noqa: C901
+    def _parse_postfix(self, *, allow_space_separated: bool = True) -> Expr:
         """Parse postfix operators and space-separated application.
 
         Postfix operators:
@@ -2566,11 +4123,11 @@ class Parser:
         """
         base = self._parse_atom()
 
-        # Check for generic instantiation [...] like P[X], F[T]
-        # Only treat [ as generic instantiation if:
+        # Check for generic instantiation S[X] or schema rename S[a/b].
+        # Only treat [ as such if:
         # 1. Base is a type-like construct (Identifier or GenericInstantiation)
         # 2. The '[' immediately follows the last consumed token (no whitespace)
-        # This prevents consuming '[' meant for justifications in equiv chains
+        # This prevents consuming '[' meant for justifications in equiv chains.
         while isinstance(base, (Identifier, GenericInstantiation)) and self._match(
             TokenType.LBRACKET
         ):
@@ -2579,7 +4136,7 @@ class Parser:
             lbracket_col = self._current().column
 
             # If on different lines or there's a gap,
-            # don't treat as generic instantiation
+            # don't treat as generic instantiation or schema rename
             if (
                 self._current().line != self.last_token_line
                 or lbracket_col > self.last_token_end_column
@@ -2587,40 +4144,25 @@ class Parser:
                 # There's whitespace - likely a justification, not generic
                 break
 
-            lbracket_token = self._advance()  # Consume '['
+            if self._in_relational_context and self._bracket_contains_slash():
+                # In a relational context, S[new/old] → RelationRename
+                base = self._parse_relation_rename(base)
+            else:
+                base = self._parse_schema_rename_or_generic(base)
 
-            # Parse comma-separated type parameters
-            type_params: list[Expr] = []
-
-            # Parse first type parameter
-            if self._match(TokenType.RBRACKET):
-                raise ParserError(
-                    "Expected at least one type parameter in generic instantiation",
-                    self._current(),
-                )
-
-            type_params.append(self._parse_expr())
-
-            # Parse additional type parameters
-            while self._match(TokenType.COMMA):
-                self._advance()  # Consume ','
-                if self._match(TokenType.RBRACKET):
-                    # Trailing comma: Type[X,]
-                    break
-                type_params.append(self._parse_expr())
-
-            if not self._match(TokenType.RBRACKET):
-                raise ParserError(
-                    "Expected ']' after generic type parameters", self._current()
-                )
-            self._advance()  # Consume ']'
-
-            base = GenericInstantiation(
-                base=base,
-                type_params=type_params,
-                line=lbracket_token.line,
-                column=lbracket_token.column,
-            )
+        # In a relational context, ANY expression base can take a [new/old]
+        # postfix to form a RelationRename — handles compound operands such as
+        # (pi[tournament](sigma[...](Match)))[tournamentId/tournament].
+        # The '[' must immediately follow the closing token (no whitespace).
+        if (
+            self._in_relational_context
+            and not isinstance(base, (Identifier, GenericInstantiation))
+            and self._match(TokenType.LBRACKET)
+            and self._current().line == self.last_token_line
+            and self._current().column <= self.last_token_end_column
+            and self._bracket_contains_slash()
+        ):
+            base = self._parse_relation_rename(base)
 
         # Check for tuple projection and function application
         # These need to be in the same loop so that f(x).1 works correctly
@@ -2656,6 +4198,13 @@ class Parser:
                         if token_after_num.type in likely_separator:
                             # Ambiguous context - don't parse as projection
                             break
+
+                    # In a comprehension/quantifier body, `.NUMBER` is not a valid
+                    # tuple-projection: the base (last declared variable) has a
+                    # basic type (N, Z, etc.), so §3.16 projection is ill-typed.
+                    # The period must be the bullet separator.
+                    if self._in_comprehension_body:
+                        break
 
                     # Safe to parse as numeric projection
                     period_token = self._advance()  # Consume '.'
@@ -2702,65 +4251,40 @@ class Parser:
                     # In comprehension body, .identifier} likely means separator + expr
                     # Example: {z : Z | z = z_0 * z_0 * z_0 . z}
                     #          period is separator, not projection
+                    # Exception: allow the projection when we are parsing the RHS
+                    # of a comparison operator (e.g. 'c.class = s.name }'), where
+                    # the field is genuinely part of the predicate, not a body expr.
                     if (
                         self._in_comprehension_body
                         and token_after_id.type == TokenType.RBRACE
+                        and not self._in_comparison_rhs
                     ):
                         # Likely expression separator, not projection
                         break
 
-                    # In quantifier bodies, avoid parsing .identifier as
-                    # projection when it's actually a bullet separator
-                    # Heuristic: Check what follows the identifier
-                    next_token = self._peek_ahead(1)
+                    # In a comprehension body, do not allow chaining a second
+                    # projection onto an existing TupleProjection.  The pattern
+                    # 'base.field . bullet' (where base is already a projection)
+                    # is always a bullet separator followed by a simple expression,
+                    # never a doubly-chained projection.  Doubly-chained projections
+                    # in comprehension bodies require explicit parentheses.
+                    if self._in_comprehension_body and isinstance(
+                        base, TupleProjection
+                    ):
+                        break
+
+                    # Z RM §3.16: field selection requires the LHS to have a
+                    # schema (binding) type.  If the identifier after `.` is itself
+                    # a declared variable in the current schema-text, the LHS
+                    # cannot be a schema-typed expression of that variable, so the
+                    # period must be the bullet separator.
+                    # Example: `mu c : N; d : N | c = d . c + d` — `.c` has `c`
+                    # in `_current_quantifier_vars`, so the period is the bullet.
                     if (
                         self._in_comprehension_body
-                        and next_token.type == TokenType.IDENTIFIER
-                        and not next_token.value.isdigit()
+                        and next_token.value in self._current_quantifier_vars
                     ):
-                        token_after_id = self._peek_ahead(2)
-
-                        # Strong bullet separator indicators:
-                        # - Set/logical operators starting new predicates
-                        # - Base is complex expression (not simple id)
-                        is_bullet_indicator = token_after_id.type in (
-                            TokenType.IN,
-                            TokenType.NOTIN,
-                            TokenType.SUBSET,
-                            TokenType.PSUBSET,
-                            TokenType.AND,
-                            TokenType.OR,
-                            TokenType.IMPLIES,
-                            TokenType.IFF,
-                        )
-
-                        # Special case: When base is FunctionApp and followed by
-                        # .identifier = , this is almost always a bullet separator
-                        # Example: f(x) = g(y) . x = y (the . is bullet, not projection)
-                        # This pattern is common in quantifier bodies like:
-                        # forall x : X | f(x) = g(x) . h(x) = k(x)
-                        if (
-                            isinstance(base, FunctionApp)
-                            and token_after_id.type == TokenType.EQUALS
-                        ):
-                            is_bullet_indicator = True
-
-                        # Allow field projection on safe base types that can have fields
-                        # (GitHub issue #13: FunctionApp and TupleProjection are safe)
-                        safe_projection_bases = (
-                            Identifier,
-                            FunctionApp,
-                            TupleProjection,
-                        )
-                        if is_bullet_indicator or not isinstance(
-                            base, safe_projection_bases
-                        ):
-                            # Likely bullet separator - break
-                            break
-
-                        # For other cases (like EQUALS on non-FunctionApp),
-                        # rely on safe_followers.
-                        # Allows "e.field = value" while catching most bullets
+                        break
 
                     # Only parse if followed by safe token
                     # (not ambiguous with separator)
@@ -2792,6 +4316,7 @@ class Parser:
                         TokenType.OR,  # .field or
                         TokenType.PLUS,  # .field +
                         TokenType.MINUS,  # .field -
+                        TokenType.RBIND,  # .field |} (inside binding {| ... |})
                         TokenType.EOF,  # .field (standalone)
                         TokenType.NEWLINE,  # .field\n (end of line)
                     )
@@ -2916,11 +4441,18 @@ class Parser:
 
         This parses (expr), (expr,), or (expr1, expr2, ...).
         Used by both _parse_atom and _parse_quantifier for tuple patterns.
+
+        When _in_schema_expr_context is True, the inner expression is parsed
+        with schema-calculus precedence so that ``(S ; T)`` works correctly.
         """
         lparen_token = self._advance()  # Consume '('
 
-        # Parse first expression
-        first_expr = self._parse_expr()
+        # Parse first expression — use schema-calculus entry point when in
+        # schema-expression context so that ';' is treated as composition.
+        if self._in_schema_expr_context:
+            first_expr = self._parse_schema_pipe()
+        else:
+            first_expr = self._parse_expr()
 
         # Allow newlines for multi-line expressions
         self._skip_newlines()
@@ -2937,7 +4469,10 @@ class Parser:
                 # Check for trailing comma: (a, b,)
                 if self._match(TokenType.RPAREN):
                     break
-                elements.append(self._parse_expr())
+                if self._in_schema_expr_context:
+                    elements.append(self._parse_schema_pipe())
+                else:
+                    elements.append(self._parse_expr())
                 # Allow newlines for multi-line tuples
                 self._skip_newlines()
 
@@ -2962,13 +4497,208 @@ class Parser:
 
         return first_expr
 
+    # ------------------------------------------------------------------
+    # Relational algebra parsers (Phase 2.2)
+    # ------------------------------------------------------------------
+
+    def _parse_restrict(self) -> Restrict:
+        """Parse sigma[predicate](relation)."""
+        op_tok = self._advance()  # consume 'sigma'
+        if not self._match(TokenType.LBRACKET):
+            raise ParserError("Expected '[' after sigma", self._current())
+        bracket_tok = self._advance()  # consume '['
+        if self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "Expected predicate expression in sigma[...]", self._current()
+            )
+        predicate = self._parse_expr()
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError("Expected ']' after sigma predicate", bracket_tok)
+        self._advance()  # consume ']'
+        if not self._match(TokenType.LPAREN):
+            raise ParserError("Expected '(' after sigma[...]", self._current())
+        self._advance()  # consume '('
+        prev_relational = self._in_relational_context
+        self._in_relational_context = True
+        try:
+            relation = self._parse_expr()
+        finally:
+            self._in_relational_context = prev_relational
+        if not self._match(TokenType.RPAREN):
+            raise ParserError(
+                "Expected ')' after sigma relation argument", self._current()
+            )
+        self._advance()  # consume ')'
+        return Restrict(
+            predicate=predicate,
+            relation=relation,
+            line=op_tok.line,
+            column=op_tok.column,
+        )
+
+    def _parse_project(self) -> Project:
+        """Parse pi[A, B, ...](relation)."""
+        op_tok = self._advance()  # consume 'pi'
+        if not self._match(TokenType.LBRACKET):
+            raise ParserError("Expected '[' after pi", self._current())
+        bracket_tok = self._advance()  # consume '['
+        if self._match(TokenType.RBRACKET):
+            raise ParserError("Expected attribute list in pi[...]", self._current())
+        # Parse comma-separated attribute names (identifiers or keyword-identifiers)
+        attrs: list[str] = []
+        if not self._is_attr_name_token():
+            raise ParserError("Expected attribute name in pi[...]", self._current())
+        attrs.append(self._advance().value)
+        while self._match(TokenType.COMMA):
+            self._advance()  # consume ','
+            if not self._is_attr_name_token():
+                raise ParserError(
+                    "Expected attribute name after ',' in pi[...]", self._current()
+                )
+            attrs.append(self._advance().value)
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError("Expected ']' after pi attribute list", bracket_tok)
+        self._advance()  # consume ']'
+        if not self._match(TokenType.LPAREN):
+            raise ParserError("Expected '(' after pi[...]", self._current())
+        self._advance()  # consume '('
+        prev_relational = self._in_relational_context
+        self._in_relational_context = True
+        try:
+            relation = self._parse_expr()
+        finally:
+            self._in_relational_context = prev_relational
+        if not self._match(TokenType.RPAREN):
+            raise ParserError(
+                "Expected ')' after pi relation argument", self._current()
+            )
+        self._advance()  # consume ')'
+        return Project(
+            attrs=attrs,
+            relation=relation,
+            line=op_tok.line,
+            column=op_tok.column,
+        )
+
+    def _parse_relation_rename(self, base: Expr) -> RelationRename:
+        """Parse R[new/old, ...] postfix in a relational context.
+
+        Called from ``_parse_postfix`` when ``_in_relational_context`` is True
+        and the bracket contents contain a ``/`` separator.  The ``[`` has NOT
+        been consumed on entry; this method consumes it and the matching ``]``.
+
+        Grammar:
+            relation_rename ::= '[' pair (',' pair)* ']'
+            pair            ::= name '/' name
+            name            ::= IDENTIFIER | keyword-usable-as-identifier
+
+        Per Z RM §3.11 the new name appears first (``new``), the old name
+        second (``old``).  Pair direction: ``(new_name, old_name)``.
+
+        Attribute names admit keywords as identifiers (``id``, ``dom``, ``ran``,
+        etc.) because relation attribute names can coincide with operator keywords.
+        """
+        open_tok = self._advance()  # Consume '['
+
+        pairs: list[tuple[str, str]] = []
+
+        while not self._match(TokenType.RBRACKET):
+            if self._at_end() or self._match(TokenType.NEWLINE, TokenType.EOF):
+                raise ParserError(
+                    "unclosed '[' in relation rename",
+                    open_tok,
+                )
+
+            # Expect new (target) name (identifier or keyword-as-identifier)
+            if not self._is_attr_name_token():
+                cur = self._current()
+                raise ParserError(
+                    f"expected identifier before '/' in relation rename pair,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            new_name = self._advance().value
+
+            # Expect '/'
+            if not self._match(TokenType.SLASH):
+                cur = self._current()
+                raise ParserError(
+                    f"expected '/' in relation rename pair after {new_name!r},"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            self._advance()  # Consume '/'
+
+            # Expect old (source) name (identifier or keyword-as-identifier)
+            if not self._is_attr_name_token():
+                cur = self._current()
+                raise ParserError(
+                    f"expected identifier after '/' in relation rename pair,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            old_name = self._advance().value
+
+            pairs.append((new_name, old_name))
+
+            # Optional comma separator
+            if self._match(TokenType.COMMA):
+                self._advance()  # Consume ','
+                if self._match(TokenType.RBRACKET):
+                    raise ParserError(
+                        "expected rename pair after ',' in relation rename",
+                        self._current(),
+                    )
+                continue
+
+            if not self._match(TokenType.RBRACKET):
+                cur = self._current()
+                raise ParserError(
+                    f"expected ',' or ']' in relation rename,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+
+        if not pairs:
+            raise ParserError(
+                "relation rename requires at least one pair",
+                open_tok,
+            )
+
+        self._advance()  # Consume ']'
+
+        return RelationRename(
+            relation=base,
+            pairs=pairs,
+            line=open_tok.line,
+            column=open_tok.column,
+        )
+
+    def _is_attr_name_token(self) -> bool:
+        """Return True if the current token is usable as an attribute name.
+
+        Attribute names in pi[...] contexts are plain names.
+        They admit keywords-as-identifiers (id, dom, ran, etc.) because Z
+        field names can coincide with operator keywords.
+        """
+        return (
+            self._match(TokenType.IDENTIFIER) or self._is_keyword_usable_as_identifier()
+        )
+
     def _parse_atom(self) -> Expr:
         """Parse atom.
 
         Handles: identifier, number, parenthesized expression, set comprehension,
         prefix operators (dom, ran, inv, id, P, P1, F, F1, bigcup, bigcap),
-        function application f(x), and lambda expressions.
+        function application f(x), lambda expressions, and relational algebra
+        prefix operators (sigma, pi).
         """
+        # Relational algebra prefix-with-args operators (Phase 2.2): sigma and pi
+        if self._match(TokenType.SIGMA):
+            return self._parse_restrict()
+        if self._match(TokenType.PI):
+            return self._parse_project()
+
         # Prefix operators: relation functions, set functions, sequence operators
         # Check for generic instantiation P[X] before treating as prefix
         if self._match(
@@ -3051,6 +4781,35 @@ class Parser:
         ):
             return self._parse_quantifier()
 
+        # θ-expression: theta SchemaRef  (Z RM §3.10)
+        # Binds tightly at primary-expression level.
+        if self._match(TokenType.THETA):
+            theta_token = self._advance()
+            # Require a schema reference (identifier-shaped atom) to follow.
+            if not self._match(
+                TokenType.IDENTIFIER,
+                TokenType.DELTA,
+                TokenType.XI,
+            ):
+                cur = self._current()
+                if cur.type == TokenType.EOF:
+                    raise ParserError(
+                        "Unexpected end of input after 'theta';"
+                        " expected schema name (e.g. theta S)",
+                        cur,
+                    )
+                raise ParserError(
+                    f"Expected schema name after theta,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            schema_ref = self._parse_atom()
+            return Theta(
+                expr=schema_ref,
+                line=theta_token.line,
+                column=theta_token.column,
+            )
+
         # Identifiers (including keywords allowed as function names)
         # Note: Function application expr(...) is handled in _parse_postfix()
         # Note: Generic instantiation Type[X] is handled in _parse_postfix()
@@ -3060,6 +4819,10 @@ class Parser:
             TokenType.UNION,
             TokenType.INTERSECT,
             TokenType.FILTER,
+            # Delta and Xi are keywords in declaration context but remain
+            # valid identifiers in expression context (e.g. Gamma shows Delta).
+            TokenType.DELTA,
+            TokenType.XI,
         ):
             name_token = self._advance()
             return Identifier(
@@ -3070,8 +4833,16 @@ class Parser:
             token = self._advance()
             return Number(value=token.value, line=token.line, column=token.column)
 
+        if self._match(TokenType.STRING):
+            token = self._advance()
+            return StringLit(value=token.value, line=token.line, column=token.column)
+
         if self._match(TokenType.LPAREN):
             return self._parse_parenthesized_expr_or_tuple()
+
+        # Binding literal {| name == expr, ... |} (Z RM §3.7)
+        if self._match(TokenType.LBIND):
+            return self._parse_binding()
 
         # Set comprehension or set literal {x : X | pred} or {a, b, c}
         if self._match(TokenType.LBRACE):
@@ -3100,7 +4871,7 @@ class Parser:
             return self._parse_unary()
 
         raise ParserError(
-            f"Expected identifier, number, '(', '{{', '⟨', or lambda,"
+            f"Expected identifier, number, '(', '{{', '{{|', '⟨', or lambda,"
             f" got {self._current().type.name}",
             self._current(),
         )
@@ -3504,6 +5275,405 @@ class Parser:
             column=start_token.column,
         )
 
+    def _scan_for_defs_after_brackets(self, offset: int) -> bool:
+        """Return True when a balanced bracket group starting at ``offset`` is
+        followed immediately by a DEFS token.
+
+        Used for lookahead disambiguation: ``Name[X, Y] defs ...`` is a
+        horizontal definition, not an expression.  The bracket group at
+        ``offset`` must start with LBRACKET; the scan terminates as soon as
+        bracket depth returns to zero and checks the next token for DEFS.
+
+        Returns False on any unexpected terminator (EOF, NEWLINE, etc.).
+        Generic parameters must be on the same line as the name — a NEWLINE
+        inside the bracket group ends the scan and returns False.
+        """
+        tok = self._peek_ahead(offset)
+        if tok.type != TokenType.LBRACKET:
+            return False
+        depth = 1
+        offset += 1
+        while depth > 0:
+            tok = self._peek_ahead(offset)
+            if tok.type in (TokenType.EOF, TokenType.NEWLINE):
+                return False
+            if tok.type == TokenType.LBRACKET:
+                depth += 1
+            elif tok.type == TokenType.RBRACKET:
+                depth -= 1
+            offset += 1
+        return self._peek_ahead(offset).type == TokenType.DEFS
+
+    def _parse_horiz_def_generic_params(self) -> list[str] | None:
+        """Parse optional generic LHS parameters for a horizontal definition.
+
+        Identical to ``_parse_generic_params`` but records the opening bracket
+        token for an improved error message when the bracket is not closed.
+
+        Returns None when no ``[`` is present.
+        """
+        if not self._match(TokenType.LBRACKET):
+            return None
+
+        open_tok = self._advance()  # Consume '[', save for error reporting
+        params: list[str] = []
+
+        while not self._match(TokenType.RBRACKET) and not self._at_end():
+            if self._match(TokenType.COMMA):
+                self._advance()  # Skip comma
+                continue
+
+            if self._match(TokenType.NEWLINE, TokenType.EOF):
+                raise ParserError(
+                    "unclosed '[' in generic parameter list for horizontal definition",
+                    open_tok,
+                )
+
+            if not self._match(TokenType.IDENTIFIER):
+                raise ParserError(
+                    "expected type parameter name in generic list",
+                    self._current(),
+                )
+
+            params.append(self._current().value)
+            self._advance()
+
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "unclosed '[' in generic parameter list for horizontal definition",
+                open_tok,
+            )
+        self._advance()  # Consume ']'
+
+        return params if params else None
+
+    # ------------------------------------------------------------------
+    # Schema-calculus operators (Phase 3.2 — Z RM §3.11)
+    # ------------------------------------------------------------------
+    # Precedence (tightest to loosest):
+    #   1. hide / project   (_parse_schema_project_hide)
+    #   2. composition ;    (_parse_schema_compose)
+    #   3. piping >>        (_parse_schema_pipe)
+    #
+    # These methods are only entered from _parse_horiz_def_rhs (and any
+    # future schema-expression context) when _in_schema_expr_context is
+    # True.  Inside axdef / schema / gendef bodies SEMICOLON remains a
+    # plain declaration separator — those loops never call these methods.
+    # ------------------------------------------------------------------
+
+    def _parse_schema_pipe(self) -> Expr:
+        """Parse schema piping ``S >> T`` (lowest schema-calculus precedence).
+
+        Left-associative: ``A >> B >> C`` parses as ``(A >> B) >> C``.
+        """
+        left = self._parse_schema_compose()
+
+        while self._match(TokenType.PIPE_PIPE):
+            op_tok = self._advance()
+            right = self._parse_schema_compose()
+            left = SchemaPipe(
+                left=left,
+                right=right,
+                line=op_tok.line,
+                column=op_tok.column,
+            )
+
+        return left
+
+    def _parse_schema_compose(self) -> Expr:
+        """Parse schema composition ``S ; T`` (middle schema-calculus precedence).
+
+        Left-associative: ``A ; B ; C`` parses as ``(A ; B) ; C``.
+        SEMICOLON is consumed here only because _in_schema_expr_context is True;
+        callers in declaration-loop contexts never invoke this method.
+        """
+        left = self._parse_schema_project_hide()
+
+        while self._match(TokenType.SEMICOLON):
+            op_tok = self._advance()
+            right = self._parse_schema_project_hide()
+            left = SchemaCompose(
+                left=left,
+                right=right,
+                line=op_tok.line,
+                column=op_tok.column,
+            )
+
+        return left
+
+    def _parse_schema_project_hide(self) -> Expr:
+        """Parse schema hiding and projection (tightest schema-calculus precedence).
+
+        ``S hide (x, y)``  — existentially quantify named components.
+        ``S project T``    — project S onto the signature of T.
+
+        Both are left-associative and at the same precedence level, so they
+        chain: ``S hide (x) project T`` is ``(S hide (x)) project T``.
+        """
+        # Start with a base schema expression (ordinary expression precedence).
+        left = self._parse_expr()
+
+        while self._match(TokenType.HIDE, TokenType.PROJECT):
+            op_tok = self._advance()
+
+            if op_tok.type == TokenType.HIDE:
+                # Expect '(' name, name, ... ')'
+                if not self._match(TokenType.LPAREN):
+                    raise ParserError(
+                        "expected '(' after 'hide' in schema hiding expression",
+                        self._current(),
+                    )
+                self._advance()  # Consume '('
+
+                names: list[str] = []
+                while not self._match(TokenType.RPAREN):
+                    if self._at_end():
+                        raise ParserError(
+                            "unclosed '(' in 'hide' expression — expected ')'",
+                            op_tok,
+                        )
+                    if self._match(TokenType.COMMA):
+                        self._advance()
+                        continue
+                    if not self._match(TokenType.IDENTIFIER):
+                        cur = self._current()
+                        raise ParserError(
+                            f"expected identifier in 'hide' name list,"
+                            f" got {cur.type.name} ({cur.value!r})",
+                            cur,
+                        )
+                    names.append(self._advance().value)
+
+                if not names:
+                    raise ParserError(
+                        "'hide' requires at least one component name", op_tok
+                    )
+                self._advance()  # Consume ')'
+
+                left = SchemaHide(
+                    schema=left,
+                    names=names,
+                    line=op_tok.line,
+                    column=op_tok.column,
+                )
+
+            else:  # PROJECT
+                right = self._parse_expr()
+                left = SchemaProject(
+                    left=left,
+                    right=right,
+                    line=op_tok.line,
+                    column=op_tok.column,
+                )
+
+        return left
+
+    def _parse_horiz_def(self) -> HorizDef:
+        """Parse horizontal schema definition: Name [X, Y]? defs RHS.
+
+        Per Z RM §3.8, the RHS is one of:
+        - A schema reference — an identifier, possibly Phase-0 decorated
+          (e.g. ``Counter'``, ``Delta Counter``).
+        - An inline schema text ``[ decl-list | pred-list ]``.
+        - A schema-calculus expression (Phase 3.2): S ; T, S >> T,
+          S hide (x, y), S project T, and combinations.
+        """
+        start_tok = self._current()
+
+        # Consume the LHS name
+        if not self._match(TokenType.IDENTIFIER):
+            raise ParserError(
+                "expected schema name for horizontal definition", start_tok
+            )
+        name_tok = self._advance()
+        name = name_tok.value
+
+        # Optional generic parameters on the LHS: Name[X, Y]
+        generics = self._parse_horiz_def_generic_params()
+
+        # Consume 'defs'
+        if not self._match(TokenType.DEFS):
+            raise ParserError(
+                "expected 'defs' in horizontal schema definition",
+                self._current(),
+            )
+        self._advance()  # Consume 'defs'
+
+        # --- Parse RHS ---
+        if self._at_end() or self._match(TokenType.NEWLINE):
+            raise ParserError(
+                "expected RHS after 'defs' in horizontal schema definition",
+                self._current(),
+            )
+
+        body: Expr | SchemaInclusion
+        if self._match(TokenType.LBRACKET):
+            body = self._parse_schema_text()
+        else:
+            # Enable schema-expression context so ';' becomes composition.
+            prev = self._in_schema_expr_context
+            self._in_schema_expr_context = True
+            try:
+                body = self._parse_horiz_def_rhs()
+            finally:
+                self._in_schema_expr_context = prev
+
+        return HorizDef(
+            name=name,
+            generics=generics,
+            body=body,
+            line=start_tok.line,
+            column=start_tok.column,
+        )
+
+    def _parse_horiz_def_rhs(self) -> Expr | SchemaInclusion:
+        """Parse a schema expression on the RHS of a horizontal definition.
+
+        Accepts:
+        - A plain identifier (possibly Phase-0 decorated).
+        - ``Delta Name [generics]?`` or ``Xi Name [generics]?`` — schema
+          inclusions used as the RHS (legal in Z RM §3.8 examples).
+        - A generic instantiation: ``Name[T]`` produced by ``_parse_atom``.
+        - A schema-calculus expression (Phase 3.2): ``S ; T``, ``S >> T``,
+          ``S hide (x, y)``, ``S project T``, and combinations.
+
+        Returns an Expr node or SchemaInclusion for Delta/Xi decorated forms.
+        Delta/Xi are handled first because they begin with reserved keywords
+        that would otherwise stop expression parsing.
+        """
+        # Delta / Xi decorated reference → SchemaInclusion
+        # These are handled before schema-calculus parsing because Delta/Xi
+        # are keywords that mark the decorated form; schema-calculus operators
+        # cannot apply to a bare Delta/Xi keyword start.
+        if self._match(TokenType.DELTA, TokenType.XI):
+            start_tok = self._current()
+            decoration = "delta" if self._match(TokenType.DELTA) else "xi"
+            self._advance()  # Consume Delta / Xi
+            if not self._match(TokenType.IDENTIFIER):
+                cur = self._current()
+                kw = "Delta" if decoration == "delta" else "Xi"
+                raise ParserError(
+                    f"expected schema name after {kw},"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+            name_tok = self._advance()
+            generics = self._parse_inclusion_generic_args()
+            return SchemaInclusion(
+                name=name_tok.value,
+                decoration=decoration,
+                generics=generics,
+                line=start_tok.line,
+                column=start_tok.column,
+            )
+
+        # Schema-calculus expression (possibly just a plain identifier).
+        # _parse_schema_pipe is the entry point of the schema-calculus
+        # precedence cascade (pipe < compose < hide/project < base expr).
+        return self._parse_schema_pipe()
+
+    def _parse_schema_text(self) -> SchemaText:
+        r"""Parse an inline schema text: ``[ decl-list | pred-list ]``.
+
+        The bracket has already been detected but NOT consumed when this
+        method is called.  Grammar:
+
+            schema_text ::= '[' decl (';' decl)* '|' pred (';' pred)* ']'
+
+        The declaration forms are the same three supported inside schema and
+        axdef bodies.  Multiple predicates are separated by ``;``.
+        """
+        open_tok = self._advance()  # Consume '['
+
+        # --- Declaration section ---
+        declarations: list[Declaration | SchemaInclusion] = []
+
+        while not self._at_end() and not self._match(
+            TokenType.PIPE, TokenType.RBRACKET
+        ):
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+                continue
+            if self._match(TokenType.SEMICOLON):
+                self._advance()  # Declaration separator
+                continue
+
+            # pk has no relation name in inline schema text — reject with clear message.
+            if self._match(TokenType.PK):
+                raise ParserError(
+                    "Primary-key annotation requires a named schema;"
+                    " inline schema text is anonymous",
+                    self._current(),
+                )
+
+            if (
+                self._match(TokenType.DELTA, TokenType.XI)
+                or self._match(TokenType.IDENTIFIER)
+                or self._is_keyword_usable_as_identifier()
+            ):
+                result = self._parse_declaration_or_inclusion()
+                if isinstance(result, list):
+                    declarations.extend(result)
+                else:
+                    declarations.append(result)
+            else:
+                cur = self._current()
+                raise ParserError(
+                    f"expected declaration or '|' in inline schema text,"
+                    f" got {cur.type.name} ({cur.value!r})",
+                    cur,
+                )
+
+        # FIX 2: empty declaration list is a syntax error
+        if not declarations:
+            raise ParserError(
+                "inline schema text requires at least one declaration",
+                open_tok,
+            )
+
+        # --- Predicate separator '|' ---
+        if self._at_end():
+            raise ParserError(
+                "unclosed inline schema text '[' — expected '|' then ']'", open_tok
+            )
+        if self._match(TokenType.RBRACKET):
+            # No predicate section — parse as [ decls ] (no pipe)
+            self._advance()  # Consume ']'
+            return SchemaText(
+                declarations=declarations,
+                predicates=[],
+                line=open_tok.line,
+                column=open_tok.column,
+            )
+
+        self._advance()  # Consume '|'
+
+        # --- Predicate section (flat list; ';' and newlines are separators) ---
+        predicates: list[Expr] = []
+
+        while not self._at_end() and not self._match(TokenType.RBRACKET):
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+                continue
+            if self._match(TokenType.SEMICOLON):
+                self._advance()
+                continue
+
+            predicates.append(self._parse_expr())
+
+        if not self._match(TokenType.RBRACKET):
+            raise ParserError(
+                "unclosed inline schema text '[' — expected closing ']'", open_tok
+            )
+        self._advance()  # Consume ']'
+
+        return SchemaText(
+            declarations=declarations,
+            predicates=predicates,
+            line=open_tok.line,
+            column=open_tok.column,
+        )
+
     def _parse_generic_params(self) -> list[str] | None:
         """Parse optional generic parameters: [X, Y, Z].
 
@@ -3584,8 +5754,17 @@ class Parser:
             raise ParserError("Expected '==' in abbreviation", self._current())
         self._advance()  # Consume '=='
 
-        # Parse expression
-        expr = self._parse_expr()
+        # Parse expression in relational context: a top-level abbreviation RHS
+        # is an expression, not a Z paragraph body, so a postfix `R[a/b]` is a
+        # relational rename (RelationRename → inline math) rather than a
+        # schema rename (SchemaRename, which fuzz rejects when emitted with a
+        # `/` inside a Z paragraph).
+        prev_relational = self._in_relational_context
+        self._in_relational_context = True
+        try:
+            expr = self._parse_expr()
+        finally:
+            self._in_relational_context = prev_relational
 
         return Abbreviation(
             name=name,
@@ -3600,6 +5779,8 @@ class Parser:
 
         Syntax: axdef [X, Y] ... end
         Supports optional generic parameters and semicolon-separated declarations.
+        Comma-separated variable lists share a type: var1, var2 : Type.
+        Schema inclusions (bare, Delta, Xi) are also permitted.
         """
         start_token = self._advance()  # Consume 'axdef'
         self._skip_newlines()
@@ -3608,7 +5789,7 @@ class Parser:
         generic_params = self._parse_generic_params()
         self._skip_newlines()
 
-        declarations: list[Declaration] = []
+        declarations: list[Declaration | SchemaInclusion] = []
 
         # Parse declarations until 'where' or 'end'
         while not self._at_end() and not self._match(TokenType.WHERE, TokenType.END):
@@ -3616,37 +5797,30 @@ class Parser:
                 self._advance()
                 continue
 
-            # Parse declaration: var : Type
-            # Allow keywords as variable names in declarations (e.g., id, dom, ran)
-            if (
-                self._match(TokenType.IDENTIFIER)
-                or self._is_keyword_usable_as_identifier()
-            ):
-                var_token = self._current()
-                var_name = var_token.value
-                self._advance()
-
-                if not self._match(TokenType.COLON):
-                    raise ParserError("Expected ':' in declaration", self._current())
-                self._advance()  # Consume ':'
-
-                # Parse type expression
-                type_expr = self._parse_expr()
-
-                declarations.append(
-                    Declaration(
-                        variable=var_name,
-                        type_expr=type_expr,
-                        line=var_token.line,
-                        column=var_token.column,
-                    )
+            # pk is only valid in schema bodies — reject it here with a clear message.
+            if self._match(TokenType.PK):
+                raise ParserError(
+                    "Primary-key annotation is only valid in schema bodies,"
+                    " not inside axdef",
+                    self._current(),
                 )
 
-                # Check for semicolon separator (allows multiple declarations)
+            # Three forms: Delta/Xi inclusion, bare inclusion, typed decl.
+            if (
+                self._match(TokenType.DELTA, TokenType.XI)
+                or self._match(TokenType.IDENTIFIER)
+                or self._is_keyword_usable_as_identifier()
+            ):
+                result = self._parse_declaration_or_inclusion()
+                if isinstance(result, list):
+                    declarations.extend(result)
+                else:
+                    declarations.append(result)
+
+                # Semicolons are only valid after typed declarations.
                 if self._match(TokenType.SEMICOLON):
                     self._advance()  # Consume ';'
                     self._skip_newlines()
-                    # Continue to parse next declaration
                 else:
                     self._skip_newlines()
             else:
@@ -3693,7 +5867,7 @@ class Parser:
             )
         self._skip_newlines()
 
-        declarations: list[Declaration] = []
+        declarations: list[Declaration | SchemaInclusion] = []
 
         # Parse declarations until 'where' or 'end'
         while not self._at_end() and not self._match(TokenType.WHERE, TokenType.END):
@@ -3701,37 +5875,29 @@ class Parser:
                 self._advance()
                 continue
 
-            # Parse declaration: var : Type
-            # Allow keywords as variable names in declarations (e.g., id, dom, ran)
-            if (
-                self._match(TokenType.IDENTIFIER)
-                or self._is_keyword_usable_as_identifier()
-            ):
-                var_token = self._current()
-                var_name = var_token.value
-                self._advance()
-
-                if not self._match(TokenType.COLON):
-                    raise ParserError("Expected ':' in declaration", self._current())
-                self._advance()  # Consume ':'
-
-                # Parse type expression
-                type_expr = self._parse_expr()
-
-                declarations.append(
-                    Declaration(
-                        variable=var_name,
-                        type_expr=type_expr,
-                        line=var_token.line,
-                        column=var_token.column,
-                    )
+            # pk is only valid in schema bodies — reject it here with a clear message.
+            if self._match(TokenType.PK):
+                raise ParserError(
+                    "Primary-key annotation is only valid in schema bodies,"
+                    " not inside gendef",
+                    self._current(),
                 )
 
-                # Check for semicolon separator (allows multiple declarations)
+            # Three forms: Delta/Xi inclusion, bare inclusion, typed declaration.
+            if (
+                self._match(TokenType.DELTA, TokenType.XI)
+                or self._match(TokenType.IDENTIFIER)
+                or self._is_keyword_usable_as_identifier()
+            ):
+                result = self._parse_declaration_or_inclusion()
+                if isinstance(result, list):
+                    declarations.extend(result)
+                else:
+                    declarations.append(result)
+
                 if self._match(TokenType.SEMICOLON):
                     self._advance()  # Consume ';'
                     self._skip_newlines()
-                    # Continue to parse next declaration
                 else:
                     self._skip_newlines()
             else:
@@ -3884,7 +6050,7 @@ class Parser:
 
         self._skip_newlines()
 
-        declarations: list[Declaration] = []
+        declarations: list[Declaration | SchemaInclusion] = []
 
         # Parse declarations until 'where' or 'end'
         while not self._at_end() and not self._match(TokenType.WHERE, TokenType.END):
@@ -3892,37 +6058,31 @@ class Parser:
                 self._advance()
                 continue
 
-            # Parse declaration: var : Type
-            # Allow keywords as variable names in declarations (e.g., id, dom, ran)
-            if (
-                self._match(TokenType.IDENTIFIER)
-                or self._is_keyword_usable_as_identifier()
-            ):
-                var_token = self._current()
-                var_name = var_token.value
-                self._advance()
-
-                if not self._match(TokenType.COLON):
-                    raise ParserError("Expected ':' in declaration", self._current())
-                self._advance()  # Consume ':'
-
-                # Parse type expression
-                type_expr = self._parse_expr()
-
-                declarations.append(
-                    Declaration(
-                        variable=var_name,
-                        type_expr=type_expr,
-                        line=var_token.line,
-                        column=var_token.column,
-                    )
+            # pk requires a named schema — reject it in anonymous schemas.
+            if self._match(TokenType.PK) and name is None:
+                raise ParserError(
+                    "Primary-key annotation requires a named schema;"
+                    " anonymous schemas have no relation name for PK notation",
+                    self._current(),
                 )
 
-                # Check for semicolon separator (allows multiple declarations)
+            # Four forms: pk prefix (named schemas only), Delta/Xi inclusion,
+            # bare inclusion, typed declaration.
+            if (
+                self._match(TokenType.PK)
+                or self._match(TokenType.DELTA, TokenType.XI)
+                or self._match(TokenType.IDENTIFIER)
+                or self._is_keyword_usable_as_identifier()
+            ):
+                result = self._parse_declaration_or_inclusion()
+                if isinstance(result, list):
+                    declarations.extend(result)
+                else:
+                    declarations.append(result)
+
                 if self._match(TokenType.SEMICOLON):
                     self._advance()  # Consume ';'
                     self._skip_newlines()
-                    # Continue to parse next declaration
                 else:
                     self._skip_newlines()
             else:

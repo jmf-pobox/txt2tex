@@ -1,0 +1,128 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\title{Foreign Keys in Relational Schemas}
+\author{txt2tex example}
+\hypersetup{pdftitle={Foreign Keys in Relational Schemas},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.2.0}}
+\begin{document}
+
+\maketitle
+
+\begin{zed}[RecipeId, IngredientId, EmployeeId, CuisineTag, IngredientName, RecipeName, EmployeeName, PositionName]\end{zed}
+
+\begin{axdef}
+FK : \power RecipeId \rel \power IngredientId \\
+FKEE : \power EmployeeId \rel \power EmployeeId
+\end{axdef}
+
+\medskip
+
+\section*{Pattern 1: Single-Attribute Primary Key}
+
+\noindent Each relation has exactly one pk line.  txt2tex underlines the attribute in the schema box and emits a PK statement immediately after.
+
+\bigskip
+
+\begin{schema}{Recipe}
+recipeId : RecipeId \\
+name : RecipeName \\
+cuisine : CuisineTag
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Recipe}) = \{recipeId\}$
+
+\smallskip
+
+\begin{schema}{Ingredient}
+ingredientId : IngredientId \\
+name : IngredientName
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Ingredient}) = \{ingredientId\}$
+
+\smallskip
+
+\medskip
+
+\section*{Pattern 2: Composite Primary Key}
+
+\noindent Two pk lines in one schema body.  Both attributes are underlined; txt2tex collapses them into one PK set: PK(RecipeIngredient) = $\{recipeId, ingredientId\}$.
+
+\bigskip
+
+\begin{schema}{RecipeIngredient}
+recipeId : RecipeId \\
+ingredientId : IngredientId
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{RecipeIngredient}) = \{recipeId, ingredientId\}$
+
+\smallskip
+
+\medskip
+
+\section*{Pattern 3: Single-Attribute Foreign Key}
+
+\noindent A foreign key is a standalone Z predicate.  The binding-expression form maps one source attribute to one target attribute: (SourceRelation, TargetRelation) $\mapsto$ $\{srcAttr \mapsto tgtAttr\}$ $\in$ FK
+
+\bigskip
+
+\noindent RecipeIngredient.recipeId must match a Recipe.recipeId:
+
+\bigskip
+
+\noindent
+$(RecipeIngredient, Recipe) \mapsto \{recipeId \mapsto recipeId\} \in FK$
+
+
+\noindent RecipeIngredient.ingredientId must match an Ingredient.ingredientId:
+
+\bigskip
+
+\noindent
+$(RecipeIngredient, Ingredient) \mapsto \{ingredientId \mapsto ingredientId\} \in FK$
+
+
+\medskip
+
+\section*{Pattern 4: Composite FK and Self-Referential FK}
+
+\noindent Both FK predicates for RecipeIngredient can be stated together. Each is a separate standalone predicate.
+
+\bigskip
+
+\noindent
+$(RecipeIngredient, Recipe) \mapsto \{recipeId \mapsto recipeId\} \in FK$
+
+
+\noindent
+$(RecipeIngredient, Ingredient) \mapsto \{ingredientId \mapsto ingredientId\} \in FK$
+
+
+\noindent Employee carries a managerId that references another row in the same relation. The self-referential FK predicate uses FKEE, declared above.
+
+\bigskip
+
+\begin{schema}{Employee}
+employeeId : EmployeeId \\
+name : EmployeeName \\
+position : PositionName \\
+managerId : EmployeeId
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Employee}) = \{employeeId\}$
+
+\smallskip
+
+\noindent Every managerId in Employee must match a valid employeeId in the same relation:
+
+\bigskip
+
+\noindent
+$(Employee, Employee) \mapsto \{managerId \mapsto employeeId\} \in FKEE$
+
+
+\end{document}

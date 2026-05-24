@@ -1,13 +1,28 @@
-# Phase 5: Proof Trees - Path C Syntax Specification
+# Proof Trees — Syntax Specification
+
+> **For learners:** read
+> **[Tutorial 4: Proof Trees](../tutorials/04_proof_trees.md)** first.
+> It explains the format with worked examples. This document is the
+> authoritative specification — keep it for reference.
 
 ## Overview
 
-Path C uses a **hybrid approach** combining:
+Proof trees in txt2tex use:
 
-- Vertical indentation for nested reasoning
-- `::` markers for sibling premises (things proven together)
-- `[label]` for assumptions that get discharged
-- Natural reading order (top-to-bottom)
+- **Conclusion-first nesting**: each line is a conclusion; indented
+  lines beneath it are its premises (or the assumption marker for a
+  discharging rule).
+- **`::` markers for multi-premise rules**: every premise of a
+  rule with arity ≥ 2 must be prefixed with `::`. Without `::`,
+  consecutive indented lines form a *linear chain* — each line
+  becomes the sole premise of the line above it.
+- **`[N] X [assumption]` paired with `Y [from N]`**: declares a
+  discharged assumption and references it at every leaf.
+- **`case X:` blocks** for `lor`-elimination.
+
+Natural reading order in the source is top-down (conclusion first);
+the rendered `\infer` tree reads bottom-up — exactly the
+natural-deduction layout.
 
 ## Basic Structure
 
@@ -18,6 +33,36 @@ conclusion [justification]
       derived-statement [justification]
       ...
 ```
+
+## Related: `INFRULE:` (rule schema display)
+
+`PROOF:` builds a derivation tree from premises up to a conclusion.  Use
+the sibling keyword `INFRULE:` when you want to *display* an inference
+rule itself — a labelled premise/conclusion pair, not a derivation.
+
+```text
+INFRULE:
+P
+P => Q
+---
+Q [modus ponens]
+```
+
+Renders as a horizontal `\derive` rule: premises above the line,
+conclusion below, optional **rule name** on the right.  Each line
+above the three-dash separator is a premise; the line below is the
+conclusion.  The bracketed text after the conclusion is the rule
+*name* (the engine emits it to the right of the bar, in the second
+column of the `\derive` layout) — not a fuzz side-condition.  Without
+it, the rule is unlabelled.  Side-condition support is not currently
+exposed by the engine.
+
+Multiple premises are supported by listing them on separate lines.
+See `examples/04_proof_trees/infrule_modus_ponens.txt` for working
+examples.
+
+`INFRULE:` is for showing what a rule *is*; `PROOF:` is for applying
+rules to derive a result.
 
 ## Syntax Elements
 
@@ -31,19 +76,23 @@ Marks the beginning of a proof tree.
 
 ### 2. Conclusion (Top Level)
 
-The conclusion is the top-level statement of the proof. It may appear:
-
-- At the beginning (most common): Shows what we're proving, with the proof deriving it
-- At the end: Some proofs build up to the conclusion as the final step
+The conclusion is the top-level statement of the proof. It appears
+**first**: the rest of the proof derives it. Premises (or the
+discharged assumption + body for a discharging rule) are indented
+beneath.
 
 ```text
 PROOF:
 p land q => q [=> intro from 1]
   [1] p land q [assumption]
-      q [land elim]
+  :: q [land elim 1]
+    p land q [from 1]
 ```
 
-In this example, `p land q => q` is the conclusion we're proving.
+`p land q => q` is the conclusion. `=>-intro from 1` discharges the
+assumption `[1] p land q` and produces the implication; the body of
+the implication is `q [land elim 1]`, derived at a single leaf
+referencing the assumption with `[from 1]`.
 
 ### 3. Assumptions with Labels
 
@@ -67,39 +116,71 @@ q [land elim]
 
 ### 5. Sibling Premises (`::`  marker)
 
-When multiple things need to be proven together (side-by-side in tree):
+When a rule takes two or more premises, each premise line is prefixed
+with `::` and nested **below** the rule's conclusion:
 
 ```text
-:: p [land elim]
-:: q [from case]
-p land q [land intro]
+:: p land q [land intro]
+  :: p [...]
+  :: q [...]
 ```
 
-The `::` means "these are siblings that together support the next step"
+The `::` means "this is a premise of the conclusion above me." The
+generator emits a real branching `\infer` node with one premise per
+`::` line. Without `::`, indented siblings collapse into a linear
+chain (each line becomes the sole premise of the line above) — the
+rule's other premises are silently dropped.
+
+**Arity matters**: `land intro`, `=> elim`, `false-intro`, `<=> intro`,
+and `lor elim` are all multi-premise and require `::`. Unary rules
+like `land elim 1`, `lor intro 1`, and `false elim` do not — their
+single premise can be a plain indented line.
 
 ### 6. Case Analysis
 
-For lor-elimination and case splits:
+`lor`-elimination is ternary: the disjunction itself plus one
+sub-proof per disjunct. Encode it with a `lor elim from N` rule whose
+premises are the disjunction (via `[from N]`) and `case X:` blocks.
+Each case block introduces the disjunct as a local assumption that
+shares label N.
 
 ```text
-case p:
-  :: p => r [land elim 1]
-    :: (p => r) land (q => r) [from 1]
-  :: r [=> elim]
-    [3] p [assumption]
-case q:
-  :: q => r [land elim 2]
-    :: (p => r) land (q => r) [from 1]
-  :: r [=> elim]
-    [3] q [assumption]
+:: r [lor elim from 2]
+  :: p lor q [from 2]
+  case p:
+    :: r [...derivation using p [from 2]...]
+  case q:
+    :: r [...derivation using q [from 2]...]
 ```
 
-**Key pattern for cases with "from above":**
+Inside a `case p:` block, references to the case formula use the same
+label N as the enclosing `lor elim from N` — e.g. `p [from 2]`. Facts
+derived outside the case analysis remain available via their own
+`[from M]` references.
 
-- Use `[from above]` to reference facts established before the case analysis
-- The `::` marker indicates sibling premises that together support a step
-- Each case should derive the same conclusion through different reasoning paths
-- Facts derived before the case split remain available within all cases
+**Label sharing under `lor elim from N`.** A single discharge label N
+is shared by three formulas: the disjunction itself (referenced as
+`p lor q [from N]`), and the two case-introduced formulas (`p [from
+N]` inside `case p:` and `q [from N]` inside `case q:`). All three
+are discharged together by the single `lor elim from N` step. The
+context — which leaf, in which branch — disambiguates which formula
+each `[from N]` reference cites.
+
+### 6a. Discharging-rule body and the `::` marker
+
+`=>-intro`, `false-elim`, `lor-elim` are *discharging* rules. In
+natural deduction they are unary in the sense of having one
+composite premise (the derivation under the assumption). The
+`::` marker on the body line of a discharging rule (e.g. `:: q
+[land elim 2]` in `=>-intro from 1`) is a **structural delimiter**
+between the bare assumption marker `[N] X [assumption]` and the
+body — not a multi-premise signal. Use `::` on the body of every
+discharging rule even though arity is 1 in the natural-deduction
+sense.
+
+For non-discharging unary rules like `land elim 1`, `lor intro 1`,
+or `false elim` (without `from N`), the single premise is a plain
+indented child — no `::` needed.
 
 ### 7. Justifications
 
@@ -159,6 +240,12 @@ Justifications are free-form text enclosed in brackets `[...]`. Any text is acce
 
 ## Complete Examples
 
+These examples are kept consistent with
+[Tutorial 4](../tutorials/04_proof_trees.md) and the hand-coded
+reference proofs in the project. Every multi-premise rule uses `::`
+on each premise; every discharged assumption pairs `[N] X
+[assumption]` with `Y [from N]` at every leaf use.
+
 ### Example 1: Simple Implication
 
 **Goal**: Prove `p land q => q`
@@ -167,94 +254,90 @@ Justifications are free-form text enclosed in brackets `[...]`. Any text is acce
 PROOF:
 p land q => q [=> intro from 1]
   [1] p land q [assumption]
-      q [land elim]
+  :: q [land elim 2]
+    p land q [from 1]
 ```
 
-**Explanation**:
+The outer `=>-intro from 1` discharges `[1] p land q`. Its body is
+`q`, derived by the unary `land elim 2` from a leaf use of the
+assumption.
 
-1. To prove `A => B`, assume A and prove B
-2. We assume `p land q` (label it [1])
-3. From `p land q`, extract `q` using land-elimination
-4. This proves the implication, discharging assumption [1]
+### Example 2: Modus Ponens via Conjunction
 
-### Example 2: With Sibling Premises
-
-**Goal**: Prove `p land (p => q) => (p land q)`
+**Goal**: Prove `(p land (p => q)) => (p land q)`
 
 ```text
 PROOF:
-p land (p => q) => (p land q) [=> intro from 1]
+(p land (p => q)) => (p land q) [=> intro from 1]
   [1] p land (p => q) [assumption]
-      :: p [land elim]
-      :: p => q [land elim]
-      q [=> elim]
-      p land q [land intro]
+  :: p land q [land intro]
+    :: p [land elim 1]
+      p land (p => q) [from 1]
+    :: q [=> elim]
+      :: p => q [land elim 2]
+        p land (p => q) [from 1]
+      :: p [land elim 1]
+        p land (p => q) [from 1]
 ```
 
-**Explanation**:
-
-- Assume `p land (p => q)` as [1]
-- Extract both `p` and `p => q` (marked as siblings with `::`)
-- Apply modus ponens to get `q`
-- Combine `p` and `q` to get `p land q`
+`land intro` is binary, so both `p` and `q` carry `::`. Inside, `q
+[=> elim]` is also binary, so its two premises (`p => q` and `p`)
+each carry `::`. Every land-elim is unary (single indented premise).
+Every leaf use of the assumption is tagged `[from 1]`.
 
 ### Example 3: Distribution with Cases
 
-**Goal**: Prove `p land (q lor r) => (p land q) lor (p land r)`
+**Goal**: Prove `(p land (q lor r)) => ((p land q) lor (p land r))`
 
 ```text
 PROOF:
-p land (q lor r) => (p land q) lor (p land r) [=> intro from 1]
+(p land (q lor r)) => ((p land q) lor (p land r)) [=> intro from 1]
   [1] p land (q lor r) [assumption]
-      p [land elim 1]
-      q lor r [land elim 2]
-      (p land q) lor (p land r) [lor elim]
-        case q:
-          :: p [from above]
-          :: q [from case]
-          p land q [land intro]
-          (p land q) lor (p land r) [lor intro 1]
-        case r:
-          :: p [from above]
-          :: r [from case]
-          p land r [land intro]
-          (p land q) lor (p land r) [lor intro 2]
+  :: (p land q) lor (p land r) [lor elim from 2]
+    :: q lor r [land elim 2]
+      p land (q lor r) [from 1]
+    case q:
+      :: (p land q) lor (p land r) [lor intro 1]
+        :: p land q [land intro]
+          :: p [land elim 1]
+            p land (q lor r) [from 1]
+          :: q [from 2]
+    case r:
+      :: (p land q) lor (p land r) [lor intro 2]
+        :: p land r [land intro]
+          :: p [land elim 1]
+            p land (q lor r) [from 1]
+          :: r [from 2]
 ```
 
-**Explanation**:
-
-- Assume `p land (q lor r)` as [1]
-- Extract `p` and `q lor r` from the assumption
-- Perform case analysis on `q lor r`:
-  - **Case q**: Use `p` from above and case assumption `q`, build `p land q`, then introduce to disjunction
-  - **Case r**: Use `p` from above and case assumption `r`, build `p land r`, then introduce to disjunction
-- Both cases derive the same conclusion
-
-**Important note on case structure**: Within each case, use `[from above]` to reference facts established before the case analysis began. The `::` sibling markers indicate multiple facts that together support the next inference step.
+The inner `lor elim from 2` rule has three premises: the disjunction
+`q lor r` (via `[from 2]`) plus the two `case` blocks. Each case
+derives the target disjunction from the case-introduced formula
+referenced as `q [from 2]` / `r [from 2]`.
 
 ### Example 4: Modus Tollens
 
-**Goal**: Prove `(p => q) land lnot q => lnot p`
+**Goal**: Prove `((p => q) land lnot q) => lnot p`
 
 ```text
 PROOF:
-(p => q) land lnot q => lnot p [=> intro from 1]
+((p => q) land lnot q) => lnot p [=> intro from 1]
   [1] (p => q) land lnot q [assumption]
-      p => q [land elim]
-      lnot q [land elim]
-      lnot p [negation intro from 2]
-        [2] p [assumption]
-            q [=> elim]
-            false [contradiction]
+  :: lnot p [false elim from 2]
+    [2] p [assumption]
+    :: false [false-intro]
+      :: q [=> elim]
+        :: p => q [land elim 1]
+          (p => q) land lnot q [from 1]
+        :: p [from 2]
+      :: lnot q [land elim 2]
+        (p => q) land lnot q [from 1]
 ```
 
-**Explanation**:
-
-- Assume `(p => q) land lnot q` as [1]
-- To prove `lnot p`, assume `p` (as [2]) and derive contradiction
-- From `p` and `p => q`, get `q`
-- But we have `lnot q`, so contradiction
-- Therefore `lnot p`, discharging assumption [2]
+Two discharges nested. `=> intro from 1` discharges `[1]`;
+`false elim from 2` discharges `[2]`. Inside, `false-intro` is
+binary (`q` and `lnot q`) and `=> elim` is binary (`p => q` and `p`).
+Every multi-premise rule has `::` on its premises.
 
 ## Indentation Rules
 

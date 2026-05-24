@@ -56,7 +56,7 @@
 \begin{gendef}[X, Y]
   fst: X \cross Y \fun X
 \where
-  \forall x : X @ \forall y : Y @ fst(x, y) = x
+  \forall x : X; y : Y @ fst(x, y) = x
 \end{gendef}
 
 \noindent Extract the second element:
@@ -66,7 +66,7 @@
 \begin{gendef}[X, Y]
   snd: X \cross Y \fun Y
 \where
-  \forall x : X @ \forall y : Y @ snd(x, y) = y
+  \forall x : X; y : Y @ snd(x, y) = y
 \end{gendef}
 
 \noindent These work for pairs of any types.
@@ -117,7 +117,7 @@
 \section*{Example 7 : Generic Optional Type ( Conceptual )}
 \addcontentsline{toc}{section}{Example 7 : Generic Optional Type ( Conceptual )}
 
-\noindent Optional values can be modeled with free types in Z notation. For a specific type, you would $define : Option$ ::= none $\mid$ some⟨T⟩. Generic optional types require more complex setup beyond basic gendef blocks, as free types in Z are typically defined for specific types rather than being polymorphic.
+\noindent Optional values can be modeled with free types in Z notation. For a specific type, you would define: Option ::= none $\mid$ some⟨T⟩. Generic optional types require more complex setup beyond basic gendef blocks, as free types in Z are typically defined for specific types rather than being polymorphic.
 
 \bigskip
 
@@ -131,7 +131,7 @@
 \begin{gendef}[X, Y]
   swap: X \cross Y \fun Y \cross X
 \where
-  \forall x : X @ \forall y : Y @ swap(x, y) = (y, x)
+  \forall x : X; y : Y @ swap(x, y) = (y, x)
 \end{gendef}
 
 \noindent Converts (x, y) to (y, x).

@@ -63,8 +63,8 @@ $\langle x \rangle \cat t = s$
 fst : \seq_1~X \fun X \\
 rest : \seq_1~X \fun \seq~X
 \where
-\forall x : X @ \forall s : \seq~X @ fst(\langle x \rangle \cat s) = x \\
-\forall x : X @ \forall s : \seq~X @ rest(\langle x \rangle \cat s) = s
+\forall x : X; s : \seq~X @ fst(\langle x \rangle \cat s) = x \\
+\forall x : X; s : \seq~X @ rest(\langle x \rangle \cat s) = s
 \end{axdef}
 
 \section*{Example 4 : User - Defined Last and Init Functions}
@@ -74,8 +74,8 @@ rest : \seq_1~X \fun \seq~X
 lst : \seq_1~X \fun X \\
 init : \seq_1~X \fun \seq~X
 \where
-\forall x : X @ \forall s : \seq~X @ lst(s \cat \langle x \rangle) = x \\
-\forall x : X @ \forall s : \seq~X @ init(s \cat \langle x \rangle) = s
+\forall x : X; s : \seq~X @ lst(s \cat \langle x \rangle) = x \\
+\forall x : X; s : \seq~X @ init(s \cat \langle x \rangle) = s
 \end{axdef}
 
 \section*{Example 5 : Domain land Range}
@@ -124,7 +124,7 @@ $\langle a \rangle \cat \langle b, c \rangle \cat \langle d \rangle$
 \bigskip
 
 \noindent
-$\forall s : \seq_1~\nat @ \exists x : \nat @ \exists t : \seq~\nat @ s = \langle x \rangle \cat t$
+$\forall s : \seq_1~\nat @ \exists x : \nat; t : \seq~\nat @ s = \langle x \rangle \cat t$
 
 
 \noindent This asserts that every non-empty sequence can be decomposed.
@@ -142,7 +142,7 @@ $\forall s : \seq_1~\nat @ \exists x : \nat @ \exists t : \seq~\nat @ s = \langl
 sumSeq : \seq~\nat \fun \nat
 \where
 sumSeq(\langle \rangle) = 0 \\
-\forall x : \nat @ \forall s : \seq~\nat @ sumSeq(\langle x \rangle \cat s) = x + sumSeq(s)
+\forall x : \nat; s : \seq~\nat @ sumSeq(\langle x \rangle \cat s) = x + sumSeq(s)
 \end{axdef}
 
 \end{document}

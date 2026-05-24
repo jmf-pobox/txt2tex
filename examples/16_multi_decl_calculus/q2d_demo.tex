@@ -1,0 +1,150 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\title{Multi-Declaration Z Constructs --- Demo}
+\author{txt2tex}
+\hypersetup{pdftitle={Multi-Declaration Z Constructs --- Demo},pdfauthor={txt2tex},pdfcreator={txt2tex v1.2.0}}
+\begin{document}
+
+\maketitle
+
+\section*{Background}
+
+\noindent The constructs in this file all share a single grammatical shape: a Z paragraph that introduces two or more typed variables in one declaration list, with a conjunction predicate over their projections, optionally followed by a characteristic expression. Until the multi-decl parser fix, none of them parsed natively — users wrote them as raw LaTeX. They now compile to fuzz-clean output.
+
+\bigskip
+
+\begin{zed}[PlayerName, TournamentId, MatchId, VenueName]\end{zed}
+
+\medskip
+
+\begin{schema}{Tournament}
+tournamentId : TournamentId \\
+venue : VenueName \\
+tier : \nat
+\where
+tier \leq 5
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Tournament}) = \{tournamentId\}$
+
+\smallskip
+
+\begin{schema}{Player}
+name : PlayerName \\
+ranking : \nat
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Player}) = \{name\}$
+
+\smallskip
+
+\begin{schema}{Match}
+matchId : MatchId \\
+tournament : TournamentId \\
+winner : PlayerName \\
+loser : PlayerName
+\end{schema}
+\noindent$\mathrm{PK}(\mathrm{Match}) = \{matchId, tournament\}$
+
+\smallskip
+
+\section*{1. WYSIWYG line breaks for algebra operators}
+
+\noindent Long relational-algebra chains can be broken at any operator. Natural newlines work; explicit \ continuation also works. Display position wraps in array; the chain reads top-to-bottom instead of running off the page.
+
+\bigskip
+
+\noindent
+$\displaystyle
+\begin{array}{l}
+\mathrm{Project}_{winner, venue, tier}(\mathrm{Join}(Tournament, \\
+\quad (\mathrm{Project}_{tournament}(\mathrm{Restrict}_{winner = `Ali'}(Match)))[tournamentId/tournament]))
+\end{array}$
+
+\bigskip
+
+\section*{2. Multi-decl comprehension with conjunction predicate}
+
+\noindent This is the canonical multi-typed relational-calculus form for any query that crosses two or more relations. Before the fix it required a raw LATEX block; now it parses natively.
+
+\bigskip
+
+\noindent
+$\displaystyle
+\begin{array}{l}
+\{~ m : Match ; t : Tournament ; p : Player | m.tournament = t.tournamentId \land \\
+\quad m.winner = p.name \land \\
+\quad t.venue = `Centre Court' @ \lblot~winner == m.winner, venue == t.venue, tier == t.tier~\rblot ~\}
+\end{array}$
+
+\bigskip
+
+\section*{3. Multi-decl quantifier with conjunction predicate}
+
+\noindent `$\forall s : T; c : U @ predicate$. body` works the same way --- nested Quantifier nodes covering the chained declarations.
+
+\bigskip
+
+\begin{zed}
+\forall m : Match; t : Tournament | m.tournament = t.tournamentId \land t.tier \leq 2 @ m.winner \neq m.loser
+\end{zed}
+
+\section*{4. Multi-decl quantifier without characteristic expression}
+
+\noindent When the predicate alone suffices --- no `.` separator, no body expression --- the comprehension defaults the characteristic tuple to the signature (Z RM §3.9).
+
+\bigskip
+
+\noindent
+$\{~ m : Match ; t : Tournament | m.tournament = t.tournamentId \land t.tier \leq 2 ~\}$
+
+
+\section*{5. Multi-decl mu (definite description)}
+
+\noindent `mu` parses with multi-decl signatures the same way. The current generator emits nested `(\mu ... $\mid$ (\mu ...))` --- semantically equivalent but not Spivey-canonical. The same special-case treatment lambda just received is a follow-up for mu. Single-decl mu (shown here) emits cleanly.
+
+\bigskip
+
+\begin{zed}
+topFinal == (\mu t : Tournament | t.tier = 1 @ t.venue)
+\end{zed}
+
+\section*{6. Multi-decl lambda --- Spivey-canonical form}
+
+\noindent Lambdas of more than one variable now emit as a single \lambda token with semicolon-joined SchemaText, matching Z RM §3.12 and the Spivey convention. Previously the generator emitted nested lambdas (one per declaration).
+
+\bigskip
+
+\begin{zed}
+roster == (\lambda m : Match; t : Tournament | m.tournament = t.tournamentId @ m.winner)
+\end{zed}
+
+\section*{7. Paren-wrap fix}
+
+\noindent Fuzz requires `(\lambda ... @ ...)` --- parentheses around every lambda expression, at any position. The generator previously only wrapped when the lambda appeared inside another expression (`parent is not None`). This meant abbreviation RHS, set literals, sequence displays, and top-level zed predicates emitted bare `\lambda`, which fuzz rejected with "Opening parenthesis expected at symbol \lambda".
+
+\bigskip
+
+\medskip
+
+\noindent The fix: drop the `parent is not None` guard. Wrapping is now unconditional when `$use\_fuzz = True$`, matching how `\mu` has always been handled. All thirteen lambda-paren tests now pass without xfail markers. Section 6 above also now fuzz-typechecks cleanly.
+
+\bigskip
+
+\medskip
+
+\noindent Additional positions confirmed working: lambda as abbreviation RHS (`f == lambda ...`), inside a set literal (`{lambda ...}`), inside a sequence display (`$\langle lambda ... \rangle$`), as a function argument (`f(lambda ...)`), as a tuple component (`(lambda ..., 0)`), and as a unary-operator argument (`dom (lambda ...)`).
+
+\bigskip
+
+\begin{zed}
+f == (\lambda x : \nat @ x + 1)
+\end{zed}
+
+\end{document}

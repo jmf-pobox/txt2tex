@@ -46,7 +46,7 @@ $(\mu x : \nat | x * x = 16 @ x + 1)$
 \addcontentsline{toc}{section}{Example 3 : Finding land Doubling}
 
 \noindent
-$(\mu n : \nat | n > 10 \land n < 12.2 * n)$
+$(\mu n : \nat | n > 10 \land n < 12 @ 2 * n)$
 
 
 \noindent Finds $n = 11$ (unique n between 10 and 12), then returns 2 * $11 = 22$.
@@ -75,7 +75,8 @@ $(\mu x : \nat | x * x = 25 @ x * x * x)$
 charAt : String \cross \nat \fun Char \\
 findChar : String \cross Char \fun \nat
 \where
-\forall s : String @ \forall c : Char @ findChar(s, c) = (\mu i : \nat | charAt(s, i) = c)
+\forall s : String; c : Char @ \\
+\t1 findChar(s, c) = (\mu i : \nat | charAt(s, i) = c)
 \end{axdef}
 
 \noindent findChar returns the index of the first (unique) occurrence of character c.
@@ -88,7 +89,8 @@ findChar : String \cross Char \fun \nat
 \begin{axdef}
 findAndAdvance : String \cross Char \fun \nat
 \where
-\forall s : String @ \forall c : Char @ findAndAdvance(s, c) = (\mu i : \nat | charAt(s, i) = c) + 1
+\forall s : String; c : Char @ \\
+\t1 findAndAdvance(s, c) = (\mu i : \nat | charAt(s, i) = c) + 1
 \end{axdef}
 
 \noindent Finds the index, then returns the next index.
@@ -101,7 +103,8 @@ findAndAdvance : String \cross Char \fun \nat
 \begin{axdef}
 inverse : (\nat \fun \nat) \cross \nat \fun \nat
 \where
-\forall f : \nat \fun \nat @ \forall y : \nat @ inverse(f, y) = (\mu x : \nat | f(x) = y)
+\forall f : \nat \fun \nat; y : \nat @ \\
+\t1 inverse(f, y) = (\mu x : \nat | f(x) = y)
 \end{axdef}
 
 \noindent For an injective function f, inverse(f, y) finds the unique x such that f(x) = y.
@@ -114,7 +117,8 @@ inverse : (\nat \fun \nat) \cross \nat \fun \nat
 \begin{axdef}
 inverseSquared : (\nat \fun \nat) \cross \nat \fun \nat
 \where
-\forall f : \nat \fun \nat @ \forall y : \nat @ inverseSquared(f, y) = (\mu x : \nat | f(x) = y @ x * x)
+\forall f : \nat \fun \nat; y : \nat @ \\
+\t1 inverseSquared(f, y) = (\mu x : \nat | f(x) = y @ x * x)
 \end{axdef}
 
 \noindent Finds the inverse, then squares it.
@@ -148,13 +152,15 @@ parseValue : ConfigValue \fun \nat
 \begin{axdef}
 getConfigWithDefault : ConfigKey \cross \nat \fun \nat
 \where
-\forall k : ConfigKey @ \forall default : \nat @ k \in \dom configs \implies \\
-\t2 getConfigWithDefault(k, default) = (\mu v : \nat | parseValue(configs(k)) = v) \\
-\forall k : ConfigKey @ \forall default : \nat @ k \notin \dom configs \implies \\
-\t2 getConfigWithDefault(k, default) = default
+\forall k : ConfigKey; default : \nat @ \\
+\t1 k \in \dom configs \implies \\
+\t1 getConfigWithDefault(k, default) = (\mu v : \nat | parseValue(configs(k)) = v) \\
+\forall k : ConfigKey; default : \nat @ \\
+\t1 k \notin \dom configs \implies \\
+\t1 getConfigWithDefault(k, default) = default
 \end{axdef}
 
-\noindent Uses mu to parse the value when key $\exists$, otherwise returns default.
+\noindent Uses mu to parse the value when key exists, otherwise returns default.
 
 \bigskip
 
@@ -218,19 +224,11 @@ $(\mu x : \nat | x * x = 16 @ (\mu y : \nat | y * y = (x + 5) @ y + x))$
 
 \bigskip
 
-\noindent Zero solutions:
+\noindent Zero solutions: $(\mu x : \nat | x * x = -1)$(no natural number has negative square)
 
 \bigskip
 
-\noindent $(\mu x : \nat | x * x = -1)$(no natural number has negative square)
-
-\bigskip
-
-\noindent Multiple solutions:
-
-\bigskip
-
-\noindent $(\mu x : \nat | x < 5)$(0, 1, 2, 3, 4 all satisfy this)
+\noindent Multiple solutions: $(\mu x : \nat | x < 5)$(0, 1, 2, 3, 4 all satisfy this)
 
 \bigskip
 
@@ -241,39 +239,11 @@ $(\mu x : \nat | x * x = 16 @ (\mu y : \nat | y * y = (x + 5) @ y + x))$
 \section*{Example 15 : Design Pattern}
 \addcontentsline{toc}{section}{Example 15 : Design Pattern}
 
-\noindent The pattern "$(\mu x : T | uniqueness\_constraint)$. expression" is useful when:
+\noindent The pattern "$(\mu x : T | uniqueness\_constraint)$. expression" is useful when: 1. You need to find a unique value satisfying a constraint 2. You want to transform or compute something based on that value 3. The transformation is more than just returning the value itself
 
 \bigskip
 
-\noindent 1. You need to find a unique value satisfying a constraint
-
-\bigskip
-
-\noindent 2. You want to transform or compute something based on that value
-
-\bigskip
-
-\noindent 3. The transformation is more than just returning the value itself
-
-\bigskip
-
-\noindent Common use cases:
-
-\bigskip
-
-\noindent - Database lookups with post-processing
-
-\bigskip
-
-\noindent - Finding and transforming configuration values
-
-\bigskip
-
-\noindent - Inverse functions with additional computation
-
-\bigskip
-
-\noindent - Unique element selection with modification
+\noindent Common use cases: - Database lookups with post-processing - Finding and transforming configuration values - Inverse functions with additional computation - Unique element selection with modification
 
 \bigskip
 

@@ -10,17 +10,13 @@
 \newdimen\savedleftskip
 \begin{document}
 
-\section*{Phase 35 : Sequence Filter Operator}
+\section*{Phase 35: Sequence Filter Operator}
 
 \noindent The sequence$ \filter $operator restricts a sequence to elements from a specified set. It removes elements not in the$ \filter $set while preserving order.
 
 \bigskip
 
-\noindent ASCII notation: s$ \filter $A
-
-\bigskip
-
-\noindent Unicode $alternative : s$ $\filter$ A (U+21BE)
+\noindent ASCII notation: s$ \filter $A Unicode alternative: s $\filter$ A (U+21BE)
 
 \bigskip
 
@@ -65,15 +61,7 @@ long\_titles = \{~ t : Title2 | true ~\} \land filtered\_titles = all\_titles \f
 \section*{Example 3 : Comparison with Range Restriction}
 \addcontentsline{toc}{section}{Example 3 : Comparison with Range Restriction}
 
-\noindent Sequence$ \filter $(filter) is different from range restriction ($\rres$):
-
-\bigskip
-
-\noindent - filter: operates on sequences, preserves order
-
-\bigskip
-
-\noindent - $\rres$: operates on relations, restricts range
+\noindent Sequence$ \filter $(filter) is different from range restriction ($\rres$): - filter: operates on sequences, preserves order - $\rres$: operates on relations, restricts range
 
 \bigskip
 
@@ -91,11 +79,7 @@ s3 = \langle 1, 2, 3, 4, 5 \rangle \land \\
 \quad restricted\_rel3 = R3 \rres \{10, 20\}
 \end{axdef}
 
-\noindent filtered\_seq is $\langle 2, 3, 4 \rangle$ (sequence elements in A)
-
-\bigskip
-
-\noindent restricted\_rel is $\{1 \mapsto 10, 2 \mapsto 20\}$ (relation pairs with range in $\{10, 20\}$)
+\noindent filtered\_seq is $\langle 2, 3, 4 \rangle$ (sequence elements in A) restricted\_rel is $\{1 \mapsto 10, 2 \mapsto 20\}$ (relation pairs with range in $\{10, 20\}$)
 
 \bigskip
 
@@ -157,26 +141,14 @@ s6 = \langle 1, 2, 3 \rangle \land \\
 \quad result6b = s6 \filter disjoint\_set6
 \end{axdef}
 
-\noindent Filtering by an empty set or disjoint set results in an empty sequence.
-
-\bigskip
-
-\noindent result1 = $\langle \rangle$ $\land$ result2 = $\langle \rangle$
+\noindent Filtering by an empty set or disjoint set results in an empty sequence. result1 = $\langle \rangle$ $\land$ result2 = $\langle \rangle$
 
 \bigskip
 
 \section*{Example 7 : Bag Union ( Related Phase 35 Feature )}
 \addcontentsline{toc}{section}{Example 7 : Bag Union ( Related Phase 35 Feature )}
 
-\noindent Phase 35 also includes the bag union operator.
-
-\bigskip
-
-\noindent ASCII $notation : b1  \uplus  b2$
-
-\bigskip
-
-\noindent Unicode $alternative : b1$ $\uplus$ b2 (U+228E)
+\noindent Phase 35 also includes the bag union operator. ASCII notation: b1$ \uplus $b2 Unicode alternative: b1 $\uplus$ b2 (U+228E)
 
 \bigskip
 
@@ -188,11 +160,7 @@ combined : \bag~\nat
 b1 = \lbag 1, 1, 2, 3 \rbag \land b2 = \lbag 2, 3, 3, 4 \rbag \land combined = b1 \uplus b2
 \end{axdef}
 
-\noindent Bag union adds $multiplicities : combined$ = [[1, 1, 2, 2, 3, 3, 3, 4]]
-
-\bigskip
-
-\noindent Element 1 appears 2 times (2 from b1), element 2 appears 2 times (1 from each), element 3 appears 3 times (1 from b1, 2 from b2), element 4 appears 1 time (1 from b2).
+\noindent Bag union adds multiplicities: combined = [[1, 1, 2, 2, 3, 3, 3, 4]] Element 1 appears 2 times (2 from b1), element 2 appears 2 times (1 from each), element 3 appears 3 times (1 from b1, 2 from b2), element 4 appears 1 time (1 from b2).
 
 \bigskip
 

@@ -1,0 +1,987 @@
+{
+  "generated": "2026-05-23T09:54:44+00:00",
+  "commit": "5ef7054",
+  "src": "src/txt2tex",
+  "mi": [
+    {
+      "file": "src/txt2tex/parser.py",
+      "grade": "C",
+      "mi": 0.0
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "grade": "C",
+      "mi": 0.0
+    },
+    {
+      "file": "src/txt2tex/lexer.py",
+      "grade": "C",
+      "mi": 0.0
+    },
+    {
+      "file": "src/txt2tex/ast_nodes.py",
+      "grade": "A",
+      "mi": 30.57
+    },
+    {
+      "file": "src/txt2tex/cli.py",
+      "grade": "A",
+      "mi": 47.91
+    },
+    {
+      "file": "src/txt2tex/free_vars.py",
+      "grade": "A",
+      "mi": 53.22
+    },
+    {
+      "file": "src/txt2tex/repl.py",
+      "grade": "A",
+      "mi": 56.62
+    },
+    {
+      "file": "src/txt2tex/compile.py",
+      "grade": "A",
+      "mi": 60.84
+    },
+    {
+      "file": "src/txt2tex/errors.py",
+      "grade": "A",
+      "mi": 74.27
+    },
+    {
+      "file": "src/txt2tex/constants.py",
+      "grade": "A",
+      "mi": 100.0
+    },
+    {
+      "file": "src/txt2tex/__init__.py",
+      "grade": "A",
+      "mi": 100.0
+    },
+    {
+      "file": "src/txt2tex/__version__.py",
+      "grade": "A",
+      "mi": 100.0
+    },
+    {
+      "file": "src/txt2tex/tokens.py",
+      "grade": "A",
+      "mi": 100.0
+    }
+  ],
+  "cc": [
+    {
+      "file": "src/txt2tex/lexer.py",
+      "line": 341,
+      "kind": "method",
+      "name": "Lexer._scan_token",
+      "grade": "F",
+      "complexity": 192
+    },
+    {
+      "file": "src/txt2tex/lexer.py",
+      "line": 1037,
+      "kind": "method",
+      "name": "Lexer._scan_identifier",
+      "grade": "F",
+      "complexity": 138
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "line": 5922,
+      "kind": "method",
+      "name": "LaTeXGenerator._generate_proof_node_infer",
+      "grade": "E",
+      "complexity": 37
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "line": 4093,
+      "kind": "method",
+      "name": "Parser._parse_postfix",
+      "grade": "E",
+      "complexity": 35
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "line": 3653,
+      "kind": "method",
+      "name": "Parser._parse_cross",
+      "grade": "E",
+      "complexity": 31
+    },
+    {
+      "file": "src/txt2tex/lexer.py",
+      "line": 228,
+      "kind": "class",
+      "name": "Lexer",
+      "grade": "E",
+      "complexity": 31
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "line": 2413,
+      "kind": "method",
+      "name": "Parser._parse_quantifier",
+      "grade": "D",
+      "complexity": 30
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "line": 5044,
+      "kind": "method",
+      "name": "Parser._parse_syntax_block",
+      "grade": "D",
+      "complexity": 30
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "line": 2715,
+      "kind": "method",
+      "name": "LaTeXGenerator._generate_part",
+      "grade": "D",
+      "complexity": 29
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "line": 6177,
+      "kind": "method",
+      "name": "LaTeXGenerator._generate_complex_assumption_scope",
+      "grade": "D",
+      "complexity": 29
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "line": 848,
+      "kind": "method",
+      "name": "LaTeXGenerator._has_line_breaks_structural",
+      "grade": "D",
+      "complexity": 28
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "line": 189,
+      "kind": "method",
+      "name": "Parser.parse",
+      "grade": "D",
+      "complexity": 26
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "line": 814,
+      "kind": "method",
+      "name": "Parser._parse_document_item",
+      "grade": "D",
+      "complexity": 26
+    },
+    {
+      "file": "src/txt2tex/free_vars.py",
+      "line": 127,
+      "kind": "function",
+      "name": "expr_free_vars",
+      "grade": "D",
+      "complexity": 25
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "line": 3698,
+      "kind": "method",
+      "name": "LaTeXGenerator._convert_comparison_operators",
+      "grade": "D",
+      "complexity": 25
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "line": 6098,
+      "kind": "method",
+      "name": "Parser._parse_proof_node",
+      "grade": "D",
+      "complexity": 24
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "line": 3202,
+      "kind": "method",
+      "name": "Parser._parse_set_comprehension_from_brace",
+      "grade": "D",
+      "complexity": 23
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "line": 4606,
+      "kind": "method",
+      "name": "Parser._parse_atom",
+      "grade": "D",
+      "complexity": 23
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "line": 5621,
+      "kind": "method",
+      "name": "LaTeXGenerator._generate_schema",
+      "grade": "D",
+      "complexity": 23
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "line": 1291,
+      "kind": "method",
+      "name": "Parser._parse_declaration_or_inclusion",
+      "grade": "D",
+      "complexity": 22
+    },
+    {
+      "file": "src/txt2tex/cli.py",
+      "line": 160,
+      "kind": "function",
+      "name": "main",
+      "grade": "D",
+      "complexity": 22
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "line": 638,
+      "kind": "method",
+      "name": "LaTeXGenerator.generate_document",
+      "grade": "D",
+      "complexity": 22
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "line": 1511,
+      "kind": "method",
+      "name": "LaTeXGenerator._generate_logical_quantifier",
+      "grade": "D",
+      "complexity": 22
+    }
+  ],
+  "lizard": [
+    {
+      "file": "src/txt2tex/lexer.py",
+      "function": "_scan_token",
+      "nloc": 438,
+      "ccn": 192,
+      "tokens": 3373,
+      "params": 1,
+      "length": 695
+    },
+    {
+      "file": "src/txt2tex/lexer.py",
+      "function": "_scan_identifier",
+      "nloc": 398,
+      "ccn": 138,
+      "tokens": 2433,
+      "params": 3,
+      "length": 560
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "function": "_generate_proof_node_infer",
+      "nloc": 100,
+      "ccn": 37,
+      "tokens": 616,
+      "params": 2,
+      "length": 186
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "function": "_parse_postfix",
+      "nloc": 178,
+      "ccn": 35,
+      "tokens": 862,
+      "params": 2,
+      "length": 312
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "function": "_parse_quantifier",
+      "nloc": 169,
+      "ccn": 32,
+      "tokens": 971,
+      "params": 1,
+      "length": 284
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "function": "_parse_cross",
+      "nloc": 152,
+      "ccn": 30,
+      "tokens": 820,
+      "params": 1,
+      "length": 186
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "function": "_parse_syntax_block",
+      "nloc": 96,
+      "ccn": 30,
+      "tokens": 575,
+      "params": 1,
+      "length": 154
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "function": "_generate_part",
+      "nloc": 133,
+      "ccn": 29,
+      "tokens": 895,
+      "params": 2,
+      "length": 188
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "function": "_generate_complex_assumption_scope",
+      "nloc": 107,
+      "ccn": 29,
+      "tokens": 572,
+      "params": 3,
+      "length": 166
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "function": "_has_line_breaks_structural",
+      "nloc": 40,
+      "ccn": 28,
+      "tokens": 343,
+      "params": 2,
+      "length": 42
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "function": "parse",
+      "nloc": 170,
+      "ccn": 26,
+      "tokens": 875,
+      "params": 1,
+      "length": 223
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "function": "_parse_set_comprehension_from_brace",
+      "nloc": 106,
+      "ccn": 26,
+      "tokens": 636,
+      "params": 1,
+      "length": 147
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "function": "_parse_document_item",
+      "nloc": 52,
+      "ccn": 26,
+      "tokens": 420,
+      "params": 1,
+      "length": 61
+    },
+    {
+      "file": "src/txt2tex/free_vars.py",
+      "function": "expr_free_vars",
+      "nloc": 67,
+      "ccn": 25,
+      "tokens": 529,
+      "params": 1,
+      "length": 87
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "function": "_convert_comparison_operators",
+      "nloc": 49,
+      "ccn": 25,
+      "tokens": 348,
+      "params": 2,
+      "length": 69
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "function": "_generate_schema",
+      "nloc": 91,
+      "ccn": 24,
+      "tokens": 525,
+      "params": 2,
+      "length": 142
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "function": "_parse_proof_node",
+      "nloc": 84,
+      "ccn": 24,
+      "tokens": 531,
+      "params": 3,
+      "length": 116
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "function": "_parse_atom",
+      "nloc": 132,
+      "ccn": 23,
+      "tokens": 725,
+      "params": 1,
+      "length": 193
+    },
+    {
+      "file": "src/txt2tex/cli.py",
+      "function": "main",
+      "nloc": 153,
+      "ccn": 22,
+      "tokens": 684,
+      "params": 0,
+      "length": 180
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "function": "_parse_declaration_or_inclusion",
+      "nloc": 120,
+      "ccn": 22,
+      "tokens": 644,
+      "params": 1,
+      "length": 151
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "function": "_generate_logical_quantifier",
+      "nloc": 72,
+      "ccn": 22,
+      "tokens": 451,
+      "params": 3,
+      "length": 113
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "function": "generate_document",
+      "nloc": 66,
+      "ccn": 22,
+      "tokens": 508,
+      "params": 2,
+      "length": 117
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "function": "_parse_quantifier_continuation",
+      "nloc": 100,
+      "ccn": 20,
+      "tokens": 584,
+      "params": 5,
+      "length": 148
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "function": "_generate_unary_op",
+      "nloc": 36,
+      "ccn": 20,
+      "tokens": 246,
+      "params": 3,
+      "length": 84
+    },
+    {
+      "file": "src/txt2tex/parser.py",
+      "function": "_should_parse_space_separated_arg",
+      "nloc": 105,
+      "ccn": 8,
+      "tokens": 422,
+      "params": 1,
+      "length": 126
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "function": "_format_justification_label",
+      "nloc": 170,
+      "ccn": 5,
+      "tokens": 1964,
+      "params": 2,
+      "length": 271
+    }
+  ],
+  "pydeps": [
+    {
+      "module": "txt2tex",
+      "fan_in": 8,
+      "fan_out": 2
+    },
+    {
+      "module": "txt2tex.__version__",
+      "fan_in": 3,
+      "fan_out": 0
+    },
+    {
+      "module": "txt2tex.ast_nodes",
+      "fan_in": 5,
+      "fan_out": 0
+    },
+    {
+      "module": "txt2tex.cli",
+      "fan_in": 1,
+      "fan_out": 7
+    },
+    {
+      "module": "txt2tex.compile",
+      "fan_in": 3,
+      "fan_out": 0
+    },
+    {
+      "module": "txt2tex.constants",
+      "fan_in": 3,
+      "fan_out": 0
+    },
+    {
+      "module": "txt2tex.errors",
+      "fan_in": 3,
+      "fan_out": 0
+    },
+    {
+      "module": "txt2tex.free_vars",
+      "fan_in": 2,
+      "fan_out": 2
+    },
+    {
+      "module": "txt2tex.latex_gen",
+      "fan_in": 3,
+      "fan_out": 7
+    },
+    {
+      "module": "txt2tex.lexer",
+      "fan_in": 4,
+      "fan_out": 2
+    },
+    {
+      "module": "txt2tex.parser",
+      "fan_in": 4,
+      "fan_out": 4
+    },
+    {
+      "module": "txt2tex.repl",
+      "fan_in": 2,
+      "fan_out": 7
+    },
+    {
+      "module": "txt2tex.tokens",
+      "fan_in": 3,
+      "fan_out": 0
+    }
+  ],
+  "trend": {
+    "src/txt2tex/ast_nodes.py": [
+      {
+        "commit": "3b80a19",
+        "date": "2026-05-22",
+        "loc": 1427,
+        "cc": 80
+      },
+      {
+        "commit": "8df6696",
+        "date": "2026-05-22",
+        "loc": 1413,
+        "cc": 79
+      },
+      {
+        "commit": "7fb6567",
+        "date": "2026-05-20",
+        "loc": 1303,
+        "cc": 72
+      },
+      {
+        "commit": "f2475a8",
+        "date": "2026-05-19",
+        "loc": 1304,
+        "cc": 72
+      },
+      {
+        "commit": "97c93ec",
+        "date": "2026-05-19",
+        "loc": 1300,
+        "cc": 72
+      },
+      {
+        "commit": "0422bd4",
+        "date": "2026-05-19",
+        "loc": 1289,
+        "cc": 71
+      },
+      {
+        "commit": "d93e061",
+        "date": "2026-05-19",
+        "loc": 1304,
+        "cc": 72
+      },
+      {
+        "commit": "11773d3",
+        "date": "2026-05-19",
+        "loc": 1314,
+        "cc": 73
+      },
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 1230,
+        "cc": 69
+      }
+    ],
+    "src/txt2tex/cli.py": [
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 344,
+        "cc": 38
+      }
+    ],
+    "src/txt2tex/compile.py": [
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 248,
+        "cc": 33
+      }
+    ],
+    "src/txt2tex/constants.py": [
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 72,
+        "cc": 0
+      }
+    ],
+    "src/txt2tex/errors.py": [
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 136,
+        "cc": 13
+      }
+    ],
+    "src/txt2tex/free_vars.py": [
+      {
+        "commit": "17e0be0",
+        "date": "2026-05-22",
+        "loc": 214,
+        "cc": 41
+      },
+      {
+        "commit": "8df6696",
+        "date": "2026-05-22",
+        "loc": 213,
+        "cc": 42
+      },
+      {
+        "commit": "92823b7",
+        "date": "2026-05-20",
+        "loc": 212,
+        "cc": 42
+      }
+    ],
+    "src/txt2tex/latex_gen.py": [
+      {
+        "commit": "3b80a19",
+        "date": "2026-05-22",
+        "loc": 6815,
+        "cc": 868
+      },
+      {
+        "commit": "bc29493",
+        "date": "2026-05-22",
+        "loc": 6800,
+        "cc": 866
+      },
+      {
+        "commit": "ec297ea",
+        "date": "2026-05-22",
+        "loc": 6796,
+        "cc": 866
+      },
+      {
+        "commit": "8df6696",
+        "date": "2026-05-22",
+        "loc": 6795,
+        "cc": 866
+      },
+      {
+        "commit": "9ca24d2",
+        "date": "2026-05-21",
+        "loc": 6100,
+        "cc": 825
+      },
+      {
+        "commit": "d4ec45a",
+        "date": "2026-05-20",
+        "loc": 6068,
+        "cc": 820
+      },
+      {
+        "commit": "1cd9761",
+        "date": "2026-05-20",
+        "loc": 6066,
+        "cc": 820
+      },
+      {
+        "commit": "7fb6567",
+        "date": "2026-05-20",
+        "loc": 6066,
+        "cc": 820
+      },
+      {
+        "commit": "92823b7",
+        "date": "2026-05-20",
+        "loc": 6065,
+        "cc": 820
+      },
+      {
+        "commit": "71ce521",
+        "date": "2026-05-19",
+        "loc": 5971,
+        "cc": 802
+      },
+      {
+        "commit": "f2475a8",
+        "date": "2026-05-19",
+        "loc": 5788,
+        "cc": 777
+      },
+      {
+        "commit": "8a15c55",
+        "date": "2026-05-19",
+        "loc": 5732,
+        "cc": 762
+      },
+      {
+        "commit": "97c93ec",
+        "date": "2026-05-19",
+        "loc": 5731,
+        "cc": 762
+      },
+      {
+        "commit": "92f14d8",
+        "date": "2026-05-19",
+        "loc": 5720,
+        "cc": 761
+      },
+      {
+        "commit": "88b87fb",
+        "date": "2026-05-19",
+        "loc": 5719,
+        "cc": 761
+      },
+      {
+        "commit": "0422bd4",
+        "date": "2026-05-19",
+        "loc": 5716,
+        "cc": 761
+      },
+      {
+        "commit": "a8a02ae",
+        "date": "2026-05-19",
+        "loc": 5737,
+        "cc": 762
+      },
+      {
+        "commit": "3178a86",
+        "date": "2026-05-19",
+        "loc": 5689,
+        "cc": 753
+      },
+      {
+        "commit": "d93e061",
+        "date": "2026-05-19",
+        "loc": 5686,
+        "cc": 753
+      },
+      {
+        "commit": "0606052",
+        "date": "2026-05-19",
+        "loc": 5802,
+        "cc": 771
+      }
+    ],
+    "src/txt2tex/lexer.py": [
+      {
+        "commit": "772861d",
+        "date": "2026-05-22",
+        "loc": 1635,
+        "cc": 394
+      },
+      {
+        "commit": "3b80a19",
+        "date": "2026-05-22",
+        "loc": 1636,
+        "cc": 394
+      },
+      {
+        "commit": "8df6696",
+        "date": "2026-05-22",
+        "loc": 1598,
+        "cc": 377
+      },
+      {
+        "commit": "97c93ec",
+        "date": "2026-05-19",
+        "loc": 1460,
+        "cc": 349
+      },
+      {
+        "commit": "0422bd4",
+        "date": "2026-05-19",
+        "loc": 1454,
+        "cc": 347
+      },
+      {
+        "commit": "d93e061",
+        "date": "2026-05-19",
+        "loc": 1460,
+        "cc": 350
+      },
+      {
+        "commit": "11773d3",
+        "date": "2026-05-19",
+        "loc": 1460,
+        "cc": 350
+      },
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 1441,
+        "cc": 346
+      }
+    ],
+    "src/txt2tex/parser.py": [
+      {
+        "commit": "17e0be0",
+        "date": "2026-05-22",
+        "loc": 6280,
+        "cc": 912
+      },
+      {
+        "commit": "3b80a19",
+        "date": "2026-05-22",
+        "loc": 6261,
+        "cc": 906
+      },
+      {
+        "commit": "92ef574",
+        "date": "2026-05-22",
+        "loc": 6243,
+        "cc": 903
+      },
+      {
+        "commit": "8df6696",
+        "date": "2026-05-22",
+        "loc": 6231,
+        "cc": 900
+      },
+      {
+        "commit": "9ca24d2",
+        "date": "2026-05-21",
+        "loc": 5849,
+        "cc": 851
+      },
+      {
+        "commit": "7fb6567",
+        "date": "2026-05-20",
+        "loc": 5834,
+        "cc": 848
+      },
+      {
+        "commit": "71ce521",
+        "date": "2026-05-19",
+        "loc": 5804,
+        "cc": 846
+      },
+      {
+        "commit": "20a6daa",
+        "date": "2026-05-19",
+        "loc": 5659,
+        "cc": 834
+      },
+      {
+        "commit": "f2475a8",
+        "date": "2026-05-19",
+        "loc": 5712,
+        "cc": 841
+      },
+      {
+        "commit": "97c93ec",
+        "date": "2026-05-19",
+        "loc": 5549,
+        "cc": 808
+      },
+      {
+        "commit": "0422bd4",
+        "date": "2026-05-19",
+        "loc": 5534,
+        "cc": 805
+      },
+      {
+        "commit": "d93e061",
+        "date": "2026-05-19",
+        "loc": 5605,
+        "cc": 815
+      },
+      {
+        "commit": "11773d3",
+        "date": "2026-05-19",
+        "loc": 5577,
+        "cc": 809
+      },
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 5425,
+        "cc": 794
+      }
+    ],
+    "src/txt2tex/repl.py": [
+      {
+        "commit": "d93e061",
+        "date": "2026-05-19",
+        "loc": 321,
+        "cc": 38
+      },
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 321,
+        "cc": 38
+      }
+    ],
+    "src/txt2tex/tokens.py": [
+      {
+        "commit": "3b80a19",
+        "date": "2026-05-22",
+        "loc": 239,
+        "cc": 4
+      },
+      {
+        "commit": "8df6696",
+        "date": "2026-05-22",
+        "loc": 238,
+        "cc": 4
+      },
+      {
+        "commit": "97c93ec",
+        "date": "2026-05-19",
+        "loc": 227,
+        "cc": 4
+      },
+      {
+        "commit": "0422bd4",
+        "date": "2026-05-19",
+        "loc": 226,
+        "cc": 4
+      },
+      {
+        "commit": "d93e061",
+        "date": "2026-05-19",
+        "loc": 227,
+        "cc": 4
+      },
+      {
+        "commit": "11773d3",
+        "date": "2026-05-19",
+        "loc": 227,
+        "cc": 4
+      },
+      {
+        "commit": "c62874b",
+        "date": "2026-05-19",
+        "loc": 222,
+        "cc": 4
+      }
+    ]
+  }
+}

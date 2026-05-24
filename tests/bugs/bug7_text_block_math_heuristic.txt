@@ -1,0 +1,20 @@
+TITLE: bug7 --- TEXT block emitter applies a fragile math-mode heuristic that corrupts prose
+AUTHOR: txt2tex bug tracker
+
+=== Bug 7 repro ===
+
+TEXT: The TEXT-block emitter currently runs a heuristic "math-mode wrap" pass over prose content. The heuristic produces multiple silent-corruption modes, each easy to hit in normal authoring. Severity: medium (affects every prose-heavy exercise that mentions math).
+
+TEXT: Repro line 1 - caret in prose: a^b renders as a textasciicircum empty-group b, broken even when wrapped in dollar math: $a^b$ produces the same broken escape.
+
+TEXT: Repro line 2 - colon in prose: word : more text triggers math-mode wrap on "word : more" with the rest of the sentence absorbed.
+
+TEXT: Repro line 3 - math operator keywords: forall x : T | P x renders with inconsistent math-mode boundaries; words near operators collide (e.g. "P is" comes out "Pis"), spaces around quantifier-bullet are lost.
+
+TEXT: Repro line 4 - mixed math and prose: when a sentence has "x in N" or "x cross y" the keyword gets math-mode-wrapped but the surrounding prose does not, so "the value of $x cross y$ is..." renders italic and detached from neighbouring words.
+
+TEXT: Expected: TEXT prose should be plain text. Only content inside dollar math delimiters should be parsed as math. Special characters caret, underscore, ampersand, hash should be escaped as LaTeX punctuation (backslash-caret-bracebrace, backslash-underscore, backslash-ampersand, backslash-hash).
+
+TEXT: First observed: across SEM Solutions 6, 7, 23, 27, 33, 44, 45, 48 in this verification pass, 2026-05-21.
+
+TEXT: Workaround: avoid math operators, caret, and colons in TEXT prose entirely. Move math statements into zed, axdef, or EQUAL blocks. Use only pure English in TEXT.

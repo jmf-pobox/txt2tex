@@ -2,7 +2,7 @@
 
 **Purpose**: This document captures important differences between fuzz (Mike Spivey's Z notation typesetter) and standard LaTeX that affect txt2tex code generation.
 
-**Last Updated**: 2025-11-27
+**Last Updated**: 2026-05-22
 
 ---
 
@@ -156,6 +156,128 @@ LaTeX:  \# \head s      ← No parentheses needed
 
 ---
 
+## Prefix-Operator Atomic-Argument Rule
+
+### Z RM §3.7 Requirement
+
+Prefix-generic operators (`\seq`, `\power`, `\dom`, `\ran`, `\bigcup`,
+`\bigcap`, `\id`, `\inv`, etc.) take an *atomic* Expression0 as their
+immediate right operand.  An atomic operand is an identifier, a
+parenthesised expression `(...)`, or a brace expression `{...}`.
+
+A nested prefix application is **not** atomic.  Fuzz rejects it with a
+syntax error:
+
+```text
+\seq~\power X    →  fuzz: "Syntax error at \power"
+\ran \bigcup (\ran s)  →  fuzz mis-parses as (\ran \bigcup)(\ran s)
+```
+
+**jms ruling (2026-05-22):** wrap the inner prefix application in parens
+so the outer operator sees an atomic argument.
+
+**txt2tex behaviour (fuzz mode only):** the generator wraps a `UnaryOp`
+argument in parens whenever the outer operator is in
+`_FUZZ_FUNCTION_LIKE_UNARY`.  The fix covers all combinations of
+`seq`, `P`, `P1`, `F`, `F1`, `dom`, `ran`, `inv`, `id`, `bigcup`,
+`bigcap` as outer or inner operator.
+
+**What this means for you:** write the natural form in your `.txt` source
+and txt2tex inserts the required parens automatically.
+
+```text
+Input:  seq (P X)
+Fuzz:   \seq~(\power X)   ← parens inserted automatically
+LaTeX:  \seq~\power X     ← bare form accepted in standard mode
+
+Input:  ran (bigcup (ran s))
+Fuzz:   \ran~(\bigcup~(\ran s))
+LaTeX:  \ran \bigcup (\ran s)
+```
+
+**Reference:** `latex_gen.py` — `_generate_unary_op`,
+`_generate_function_app`; `tests/test_prefix_paren_wrap.py` (engine
+bug #133, jms ruling 2026-05-22).
+
+---
+
+## Negation of Non-Atomic Predicates
+
+### Z RM §3.8.1 vs Fuzz Parser Restriction
+
+**Z RM §3.8.1** permits the bare form `\lnot \exists_1 s @ P` — quantifiers
+extend as far right as possible, so the parse is unambiguous.
+
+**Fuzz** is stricter: its parser requires the operand of `\lnot` to be an
+atomic predicate.  Presenting a quantifier or connective directly after
+`\lnot` triggers:
+
+```text
+Opening parenthesis expected at symbol \exists_1
+```
+
+**jms ruling (2026-05-22)**: emit `\lnot (child)` whenever `child` is
+non-atomic.  Atomic predicates in fuzz are:
+
+1. A predicate name (identifier, e.g. `p`, `Inv`).
+2. The constants `true` and `false`.
+3. A relation application `e_1 R e_2` where `R` is an infix relation
+   symbol (e.g. `x \in s`, `a = b`, `x < y`).
+4. A schema reference (e.g. `\Xi S`, `S`).
+5. An already-parenthesised predicate.
+
+Quantifiers (`\forall`, `\exists`, `\exists_1`), binary connectives
+(`\land`, `\lor`, `\implies`, `\iff`), and lambda expressions are
+**non-atomic** and must be parenthesised when they appear as the operand
+of `\lnot`.
+
+**txt2tex behavior** (fuzz mode only):
+
+```python
+# In _generate_unary_op(), after existing BinaryOp wrapping:
+if self.use_fuzz and node.operator == "lnot" and not _is_atomic_predicate(node.operand):
+    operand = f"({operand})"
+```
+
+`_is_atomic_predicate(node)` returns `True` for `Identifier` and
+`BinaryOp` nodes.  `BinaryOp` nodes are already parenthesised by
+the preceding BinaryOp-wrap rule, so they are treated as atomic here to
+prevent double-parenthesisation.  (`Number` is also accepted by the
+helper for defensive symmetry, but a numeric literal is not a
+well-formed predicate operand for `\lnot` and will never reach this
+path in practice.)
+
+**What this means for you**: no change to your `.txt` input is needed.
+Write `lnot (exists1 s : N | s > 0)` exactly as you would on a
+whiteboard. txt2tex inserts the parens fuzz requires automatically.
+
+**Reference**: `latex_gen.py` — `_is_atomic_predicate`, `_generate_unary_op`
+
+**Examples**:
+
+```text
+Input:  lnot (exists1 s : N | s > 0)
+Fuzz:   \lnot (\exists_1 s : \nat @ s > 0)   ← parens required
+LaTeX:  \lnot \exists_1 s : \nat @ s > 0     ← bare form accepted
+
+Input:  lnot (a land b)
+Fuzz:   \lnot (a \land b)   ← parens required
+LaTeX:  \lnot a \land b     ← bare form parses, but binds as (\lnot a) \land b
+                              — semantically different from the parenthesised form
+
+Input:  lnot true
+Fuzz:   \lnot true          ← no parens (atomic)
+LaTeX:  \lnot true          ← same
+
+Input:  lnot p
+Fuzz:   \lnot p             ← no parens (atomic identifier)
+LaTeX:  \lnot p             ← same
+```
+
+**Bug reference**: engine bug #132 (SEM Ex 51 part (b) repro).
+
+---
+
 ## Semicolons in Declarations
 
 ### Multiple Declarations Must Use Line Breaks
@@ -230,6 +352,58 @@ g :X →X        ← on its own line
 ✅ CORRECT: R comp S  → R ∘ S
 ❌ WRONG:   R ; S     → Parse error (semicolon reserved for declarations)
 ```
+
+---
+
+## Relation Rename (`R[NEW/OLD]`) and Fuzz
+
+### Fuzz rejects `R[NEW/OLD]` inside Z paragraphs
+
+**Standard Z Notation (Z RM §3.11)**: `R[b/a]` is valid relational rename
+syntax — `b` is the NEW attribute name, `a` is the OLD attribute name.
+
+**Fuzz**: Inside a `\begin{zed}`, `\begin{axdef}`, or `\begin{schema}`
+environment, fuzz parses `[...]` on an expression as a generic instantiation.
+A `/` at bracket depth 0 is not part of any Z grammar rule fuzz recognises in
+those contexts, so fuzz rejects the expression.
+
+**txt2tex decision**:
+
+- `R[NEW/OLD]` relational rename is classified as a `RelationRename` AST node,
+  which is included in `_DAT_EXPRESSION_TYPES` alongside `Restrict`, `Project`,
+  `Join`, etc.
+- When a `RelationRename` node appears anywhere in an expression (including as
+  an abbreviation RHS), the engine routes the entire abbreviation through inline
+  math (`\noindent$...$`) instead of `\begin{zed}`.
+- Fuzz never sees the `/` — it only processes the Z-paragraph content.
+
+**User syntax**:
+
+```text
+✅ CORRECT: pi[id, isbn](Book[id/bookId])      → inline math, fuzz skips it
+✅ CORRECT: B == pi[ship, class](Ship[ship/name])  → inline math, fuzz skips it
+❌ WRONG:   axdef ... Book[id/bookId] ... end  → fuzz rejects /
+```
+
+**Context requirement**: `[NEW/OLD]` is recognised as a relation rename in
+any relational context: as an argument to `sigma`/`pi`, as an operand of
+`join`/`div`, or directly on the RHS of a top-level abbreviation
+(`B == R[new/old]` — the abbreviation parser enters relational context for
+the RHS).  All three forms route through inline math:
+
+```text
+// All three are equivalent in routing — RelationRename → inline math
+A == Ship[ship/name]                              // bare abbreviation
+B == pi[ship, class, launched](Ship[ship/name])   // wrapped in pi
+sigma[ship = 'Hood'](Ship[ship/name])             // wrapped in sigma
+```
+
+Inside a Z paragraph (\texttt{zed}, \texttt{axdef}, \texttt{schema}), the same
+syntax \texttt{S[a/b]} is a \textit{schema} rename — that form is fuzz-clean
+because schema rename doesn't carry a `/` token at this level.
+
+**Reference**: `latex_gen.py` — `_DAT_EXPRESSION_TYPES`; `parser.py` —
+`_in_relational_context` flag set in `_parse_abbreviation`.
 
 ---
 
@@ -400,6 +574,26 @@ Generates:
 - Use `|` for predicate separator (not `@`)
 - Use `@` only when there's an expression part after the predicate
 - The error "Opening parenthesis expected at symbol `\mu`" means fuzz is expecting `(` before `\mu`
+
+---
+
+## Schema-Text Parallel Binding
+
+Z RM §3.5 specifies that declarations within a schema text are *sequentially
+scoped*: a later declaration's domain may reference names bound by earlier
+ones. Example: `x : N; y : 1..x` — `y`'s domain depends on `x`.
+
+Fuzz *parallel-binds* all co-declarations in a single schema text. A domain
+that references a sibling's name is therefore rejected by fuzz, even though
+it is valid Z.
+
+txt2tex detects this case in `_collect_quantifier_chain` and
+`_collect_lambda_chain` via `expr_free_vars` (`src/txt2tex/free_vars.py`).
+When a dependency is found, the generator emits nested quantifiers for the
+dependent portion rather than the collapsed Spivey form, satisfying fuzz
+without changing the Z semantics. Set comprehensions with dependent extra
+declarations produce a generator error — Z RM §3.10 has no split identity
+for that case; the user must rewrite.
 
 ---
 
