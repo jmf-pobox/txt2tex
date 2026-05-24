@@ -98,6 +98,7 @@ class ParserBase:
         # --- Class-level dispatch tables ---
         _AGGREGATOR_TOKEN_TYPES: ClassVar[frozenset[TokenType]]
         _TOKEN_TO_AGGREGATOR: ClassVar[dict[TokenType, Aggregator]]
+        _RESERVED_DECL_NAMES: ClassVar[frozenset[str]]
 
         # --- Token stream + position state ---
         tokens: list[Token]

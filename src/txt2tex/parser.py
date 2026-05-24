@@ -16,8 +16,14 @@ from txt2tex.parser_pkg._base import ParserBase, ParserError as ParserError
 from txt2tex.parser_pkg.algebra import (
     _AlgebraParser,  # pyright: ignore[reportPrivateUsage]
 )
+from txt2tex.parser_pkg.errors import (
+    _ErrorsParser,  # pyright: ignore[reportPrivateUsage]
+)
 from txt2tex.parser_pkg.expressions import (
     _ExpressionsParser,  # pyright: ignore[reportPrivateUsage]
+)
+from txt2tex.parser_pkg.lexer_state import (
+    _LexerStateParser,  # pyright: ignore[reportPrivateUsage]
 )
 from txt2tex.parser_pkg.paragraphs import (
     _ParagraphsParser,  # pyright: ignore[reportPrivateUsage]
@@ -45,6 +51,8 @@ class Parser(
     _ExpressionsParser,
     _TypesParser,
     _TextBlocksParser,
+    _LexerStateParser,
+    _ErrorsParser,
     ParserBase,
 ):
     """Recursive descent parser for txt2tex whiteboard notation.
@@ -500,77 +508,6 @@ class Parser(
         # Default: parse as expression
         return self._parse_expr()
 
-    def _at_end(self) -> bool:
-        """Check if we've consumed all tokens."""
-        return self._current().type == TokenType.EOF
-
-    def _current(self) -> Token:
-        """Return current token without consuming it."""
-        return self.tokens[self.pos]
-
-    def _advance(self) -> Token:
-        """Consume and return current token."""
-        token = self.tokens[self.pos]
-        if not self._at_end():
-            self.pos += 1
-        # Track the end position of this token for whitespace detection
-        self.last_token_end_column = token.column + len(token.value)
-        self.last_token_line = token.line
-        return token
-
-    def _match(self, *types: TokenType) -> bool:
-        """Check if current token matches any of the given types."""
-        return self._current().type in types
-
-    def _peek_ahead(self, offset: int = 1) -> Token:
-        """Look ahead at token without consuming it."""
-        pos = self.pos + offset
-        if pos < len(self.tokens):
-            return self.tokens[pos]
-        return self.tokens[-1]  # Return EOF if past end
-
-    def _reject_stray_slash(self) -> None:
-        """Raise ParserError if the current token is a stray SLASH.
-
-        '/' is only valid inside schema rename brackets ``S[a/b]``.
-        When it appears in any other position it produces a confusing
-        generic "unexpected token" message.  This helper fires first and
-        gives a targeted diagnostic.
-        """
-        if self._match(TokenType.SLASH):
-            raise ParserError(
-                "'/' is not a valid operator here; the slash is only valid"
-                " inside schema rename brackets S[a/b]."
-                " Did you mean '/=' (not equal) or '/in' (not in)?",
-                self._current(),
-            )
-
-    def _skip_newlines(self) -> None:
-        """Skip all consecutive newline tokens."""
-        while self._match(TokenType.NEWLINE) and not self._at_end():
-            self._advance()
-
-    def _has_blank_line(self) -> bool:
-        """Check if there are multiple consecutive newlines (blank line).
-
-        Returns:
-            True if there are 2+ consecutive NEWLINE tokens (indicating blank line)
-        """
-        if not self._match(TokenType.NEWLINE):
-            return False
-
-        # Count consecutive newlines
-        newline_count = 0
-        offset = 0
-        while (
-            self.pos + offset < len(self.tokens)
-            and self.tokens[self.pos + offset].type == TokenType.NEWLINE
-        ):
-            newline_count += 1
-            offset += 1
-
-        return newline_count >= 2
-
     def _parse_predicate_groups(
         self, end_tokens: tuple[TokenType, ...]
     ) -> list[list[Expr]]:
@@ -642,23 +579,6 @@ class Parser(
     _RESERVED_DECL_NAMES: ClassVar[frozenset[str]] = frozenset(
         {"id", "dom", "ran", "inv", "comp", "mod", "bigcup", "bigcap", "filter"}
     )
-
-    def _reject_reserved_decl_name(self, tok: Token) -> None:
-        """Raise ParserError if `tok.value` is a reserved operator keyword.
-
-        Operator names that have a dedicated LaTeX expansion (id → \\id,
-        dom → \\dom, etc.) cannot be used as declaration variable names
-        because the generator emits the operator symbol, producing
-        invalid Z that fuzz rejects.
-        """
-        if tok.value in self._RESERVED_DECL_NAMES:
-            msg = (
-                f"{tok.value!r} is a reserved Z operator name and cannot be used "
-                f"as a declaration variable (it would render as the operator "
-                f"in LaTeX). Rename to a non-conflicting identifier "
-                f"(e.g. {tok.value}1, {tok.value}Val, my{tok.value.capitalize()})."
-            )
-            raise ParserError(msg, tok)
 
     def _scan_for_colon_before_newline(self) -> bool:
         """Lookahead scan: return True if ':' appears before NEWLINE/WHERE/END/EOF.
@@ -743,28 +663,6 @@ class Parser(
 
         self._advance()  # consume ']'
         return args
-
-    def _bracket_contains_slash(self) -> bool:
-        """Return True if the next bracket group (starting at '[') contains '/'.
-
-        Scans ahead from the current position (which must point at '[') for a
-        SLASH token at bracket depth 0.  Does not consume any tokens.
-        """
-        depth = 0
-        offset = 1  # start scanning past the '['
-        while True:
-            tok = self._peek_ahead(offset)
-            if tok.type == TokenType.LBRACKET:
-                depth += 1
-            elif tok.type == TokenType.RBRACKET:
-                if depth == 0:
-                    return False
-                depth -= 1
-            elif tok.type == TokenType.SLASH and depth == 0:
-                return True
-            elif tok.type in (TokenType.EOF, TokenType.NEWLINE):
-                return False
-            offset += 1
 
     def _parse_declaration_or_inclusion(
         self,
