@@ -15,6 +15,7 @@ changed.
 from __future__ import annotations
 
 from txt2tex.ast_nodes import (
+    BagLiteral,
     BinaryOp,
     Conditional,
     Expr,
@@ -27,8 +28,16 @@ from txt2tex.ast_nodes import (
     Number,
     Quantifier,
     Range,
+    RelationalImage,
     SchemaBinding,
+    SequenceLiteral,
     SetComprehension,
+    SetLiteral,
+    StringLit,
+    Subscript,
+    Superscript,
+    Tuple,
+    TupleProjection,
     UnaryOp,
 )
 from txt2tex.codegen._dispatch import CodegenDispatch, expr_register
@@ -1110,3 +1119,172 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         expr_latex = self.generate_expr(node.expression)
         guard_latex = self.generate_expr(node.guard)
         return f"{expr_latex} \\mbox{{if }} {guard_latex}"
+
+    @expr_register.register(StringLit)
+    def _generate_string_lit(self, node: StringLit, parent: Expr | None = None) -> str:
+        r"""Generate LaTeX for a string literal using Z-convention quoting.
+
+        The Z convention is backtick-open, apostrophe-close: `value'
+
+        - Standard LaTeX: \text{`value'} (upright text in math mode)
+        - Fuzz mode:      `value'         (fuzz handles the backtick natively)
+
+        LaTeX special characters in the value are escaped to prevent malformed
+        output. Both paths use _escape_latex since { } \ # % $ & ~ ^ all have
+        special meaning inside LaTeX math and text modes.
+        """
+        escaped = self._escape_latex(node.value)
+        if self.use_fuzz:
+            return f"`{escaped}'"
+        return rf"\text{{`{escaped}'}}"
+
+    @expr_register.register(SetLiteral)
+    def _generate_set_literal(
+        self, node: SetLiteral, parent: Expr | None = None
+    ) -> str:
+        """Generate LaTeX for set literal.
+
+        Examples:
+        - {1, 2, 3} -> \\{1, 2, 3\\}
+        - {a, b} -> \\{a, b\\}
+        - {} -> \\{\\} (empty set)
+        """
+        if not node.elements:
+            # Empty set - render as \{\}
+            return r"\{\}"
+
+        # Generate comma-separated elements
+        elements_latex = ", ".join(
+            self.generate_expr(elem, parent=node) for elem in node.elements
+        )
+        return f"\\{{{elements_latex}\\}}"
+
+    @expr_register.register(Subscript)
+    def _generate_subscript(self, node: Subscript, parent: Expr | None = None) -> str:
+        """Generate LaTeX for subscript (a_1, x_i)."""
+        base = self.generate_expr(node.base)
+        index = self.generate_expr(node.index)
+
+        # Wrap index in braces if it's more than one character
+        if len(index) > 1:
+            return f"{base}_{{{index}}}"
+        return f"{base}_{index}"
+
+    @expr_register.register(Superscript)
+    def _generate_superscript(
+        self, node: Superscript, parent: Expr | None = None
+    ) -> str:
+        """Generate LaTeX for superscript using \\bsup...\\esup (fuzz-compatible)."""
+        base = self.generate_expr(node.base)
+        exponent = self.generate_expr(node.exponent)
+
+        # Use \bsup...\esup for fuzz compatibility
+        # Standard ^{n} doesn't work in fuzz mode
+        # This syntax works in both fuzz and zed modes
+
+        # If base is itself a superscript, wrap in braces to avoid double superscript
+        if isinstance(node.base, Superscript):
+            base = f"{{{base}}}"
+
+        return f"{base} \\bsup {exponent} \\esup"
+
+    @expr_register.register(Tuple)
+    def _generate_tuple(self, node: Tuple, parent: Expr | None = None) -> str:
+        """Generate LaTeX for tuple expression.
+
+        Examples:
+        - (1, 2) -> (1, 2)
+        - (x, y, z) -> (x, y, z)
+        - (a, b+1, f(c)) -> (a, b+1, f(c))
+
+        Tuples are rendered as comma-separated expressions in parentheses.
+        """
+        elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
+        return f"({elements_latex})"
+
+    @expr_register.register(RelationalImage)
+    def _generate_relational_image(
+        self, node: RelationalImage, parent: Expr | None = None
+    ) -> str:
+        """Generate LaTeX for relational image.
+
+        The relational image R(| S |) gives the image of set S under relation R.
+
+        Examples:
+        - R(| {1, 2} |) -> (R \\limg \\{1, 2\\} \\rimg)
+        - parentOf(| {john} |) -> (parentOf \\limg \\{john\\} \\rimg)
+        - (R o9 S)(| A |) -> ((R \\semi S) \\limg A \\rimg)
+
+        LaTeX rendering uses \\limg and \\rimg delimiters with spaces.
+        Note: fuzz requires the entire expression wrapped in parentheses with
+        spaces around \\limg/\\rimg, not function application syntax.
+        """
+        relation_latex = self.generate_expr(node.relation)
+        set_latex = self.generate_expr(node.set)
+        return f"({relation_latex} \\limg {set_latex} \\rimg)"
+
+    @expr_register.register(SequenceLiteral)
+    def _generate_sequence_literal(
+        self, node: SequenceLiteral, parent: Expr | None = None
+    ) -> str:
+        """Generate LaTeX for sequence literal.
+
+        Examples:
+        - ⟨⟩ -> \\langle \\rangle (empty sequence)
+        - ⟨a⟩ -> \\langle a \\rangle
+        - ⟨1, 2, 3⟩ -> \\langle 1, 2, 3 \\rangle
+        """
+        if not node.elements:
+            # Empty sequence
+            return r"\langle \rangle"
+
+        # Generate comma-separated elements
+        elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
+        return f"\\langle {elements_latex} \\rangle"
+
+    @expr_register.register(TupleProjection)
+    def _generate_tuple_projection(
+        self, node: TupleProjection, parent: Expr | None = None
+    ) -> str:
+        """Generate LaTeX for tuple projection.
+
+        Supports both numeric projection and named field projection.
+
+        Examples (numeric):
+        - x.1 -> x.1
+        - (a, b).2 -> (a, b).2
+        - f(x).3 -> f(x).3
+
+        Examples (named fields):
+        - e.name -> e.name
+        - record.status -> record.status
+        - person.age -> person.age
+
+        Note: Fuzz only supports named field projection (identifiers).
+        Numeric projections (.1, .2) violate fuzz grammar
+        (requires Var-Name, not Number).
+        """
+        base_latex = self.generate_expr(node.base)
+
+        # Add parentheses if base is a binary operator
+        if isinstance(node.base, BinaryOp):
+            base_latex = f"({base_latex})"
+
+        # Generate projection suffix (works for both int and str)
+        return f"{base_latex}.{node.index}"
+
+    @expr_register.register(BagLiteral)
+    def _generate_bag_literal(
+        self, node: BagLiteral, parent: Expr | None = None
+    ) -> str:
+        """Generate LaTeX for bag literal.
+
+        Examples:
+        - [[x]] -> \\lbag x \\rbag
+        - [[1, 2, 2, 3]] -> \\lbag 1, 2, 2, 3 \\rbag
+
+        Bags are multisets where elements can appear multiple times.
+        """
+        # Generate comma-separated elements
+        elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
+        return f"\\lbag {elements_latex} \\rbag"

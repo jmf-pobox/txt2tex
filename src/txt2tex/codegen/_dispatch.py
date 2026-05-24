@@ -64,6 +64,7 @@ class CodegenDispatch:
         _overflow_threshold: int
         _first_part_in_solution: bool
         _in_argue_block: bool
+        _dollar_sanitise_registry: dict[str, str]
         parts_format: str
         toc_parts: bool
         use_fuzz: bool
