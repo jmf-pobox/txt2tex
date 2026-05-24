@@ -75,16 +75,16 @@ qa-one:  ## Run scripts/qa_check.sh on a single PDF (PDF=path/to.pdf)
 	fi
 	scripts/qa_check.sh "$(PDF)"
 
-##@ Complexity / code-quality assessment
+##@ Complexity / code-quality assessment (local only; install with: uv sync --group complexity)
 
 complexity-history:  ## Seed/extend wily history (run after fresh clone; WILY_REVS=N to widen)
 	@command -v uv >/dev/null 2>&1 || { echo "uv not found; install: https://docs.astral.sh/uv/"; exit 1; }
-	uv run wily build src/txt2tex --max-revisions $(WILY_REVS)
+	uv run --group complexity wily build src/txt2tex --max-revisions $(WILY_REVS)
 
 WILY_REVS ?= 50
 
 complexity-report:  ## Generate docs/complexity-report.{md,json} (radon+lizard+pydeps+wily)
-	uv run python scripts/complexity_report.py
+	uv run --group complexity python scripts/complexity_report.py
 
 ##@ Reference card
 

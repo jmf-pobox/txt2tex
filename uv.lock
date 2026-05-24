@@ -759,33 +759,37 @@ name = "txt2tex"
 source = { editable = "." }
 
 [package.dev-dependencies]
-dev = [
+complexity = [
     { name = "lizard" },
-    { name = "mypy" },
     { name = "pydeps" },
+    { name = "radon" },
+    { name = "wily" },
+]
+dev = [
+    { name = "mypy" },
     { name = "pyright" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "pytest-xdist" },
-    { name = "radon" },
     { name = "ruff" },
-    { name = "wily" },
 ]
 
 [package.metadata]
 
 [package.metadata.requires-dev]
-dev = [
+complexity = [
     { name = "lizard", specifier = ">=1.17.0" },
-    { name = "mypy", specifier = ">=1.18.1" },
     { name = "pydeps", specifier = ">=3.0.0" },
+    { name = "radon", specifier = ">=5.1.0" },
+    { name = "wily", specifier = ">=2.0.0a1" },
+]
+dev = [
+    { name = "mypy", specifier = ">=1.18.1" },
     { name = "pyright", specifier = ">=1.1.0" },
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest-cov", specifier = ">=4.0.0" },
     { name = "pytest-xdist", specifier = ">=3.0.0" },
-    { name = "radon", specifier = ">=5.1.0" },
     { name = "ruff", specifier = ">=0.13.0" },
-    { name = "wily", specifier = ">=2.0.0a1" },
 ]
 
 [[package]]

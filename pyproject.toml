@@ -40,6 +40,11 @@ txt2tex = "txt2tex.cli:main"
 prerelease = "allow"
 
 [dependency-groups]
+# `dev` is the minimal group needed by `make check` and the unit/integration
+# test suite — what CI runs.  Kept platform-portable: every entry here must
+# have wheels (or a source dist) for Linux x86_64, Linux aarch64, macOS
+# arm64, and Windows x86_64 so CI on any of those reproduces the local
+# environment.
 dev = [
     "ruff>=0.13.0",
     "mypy>=1.18.1",
@@ -47,9 +52,15 @@ dev = [
     "pytest>=8.4.2",
     "pytest-cov>=4.0.0",
     "pytest-xdist>=3.0.0",
-    # Complexity / quality assessment (make complexity-report).
+]
+# `complexity` is the local-only complexity-report toolchain
+# (`make complexity-report`).  It is NOT installed in CI because some of
+# these distributions (notably `wily==2.0.0a1`) currently ship wheels only
+# for a subset of platforms.  Install on demand with
+# `uv sync --group complexity`.
+complexity = [
     # wily 2.0.0a1 is the version that supports radon 5.1+; pinned to that
-    # major track via `--prerelease=allow` in uv sync (set in uv.lock).
+    # major track via `--prerelease=allow` (project-level).
     "radon>=5.1.0",
     "lizard>=1.17.0",
     "wily>=2.0.0a1",
