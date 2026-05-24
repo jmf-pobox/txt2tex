@@ -530,24 +530,25 @@ The guide covers:
 
 The `examples/` directory contains **159 working examples** organized by topic. **To access examples, you need to clone the repository** (see [For Developers](#for-developers-git-clone) below).
 
-- **01_propositional_logic** - Truth tables, logical operators, propositional formulas
-- **02_predicate_logic** - Quantifiers, type declarations
-- **03_equality** - Equality operators, unique existence, mu operator, one-point rule
-- **04_proof_trees** - Natural deduction proofs, nested proofs, pattern matching
-- **05_sets** - Set operations, Cartesian products, tuples, set literals
-- **06_definitions** - Free types, abbreviations, axiomatic definitions, schemas
-- **07_relations** - Relation types, domain/range, restrictions, composition, relational image
-- **08_functions** - Lambda expressions, function types, function definitions
-- **09_sequences** - Sequence operations, concatenation, pattern matching, bags
-- **10_schemas** - Schema definitions, scoping, zed blocks
-- **11_text_blocks** - TEXT, PURETEXT, citations, bibliography
-- **12_advanced** - Conditionals, subscripts, generic instantiation
-- **13_equality_chains** - EQUAL: blocks for equational reasoning
-- **14_relational_databases** - Relational algebra, GROUP/UNGROUP, primary keys, normalisation
-- **15_schema_calculus** - Schema composition, piping, hiding, projection
-- **16_multi_decl_calculus** - Multi-declaration quantifier and comprehension forms
-- **17_state_machines** - State-based modelling with schemas
-- **user_guide** - Examples from the user guide documentation
+- **[00_getting_started](https://github.com/jmf-pobox/txt2tex/tree/main/examples/00_getting_started)** - Minimal first examples
+- **[01_propositional_logic](https://github.com/jmf-pobox/txt2tex/tree/main/examples/01_propositional_logic)** - Truth tables, logical operators, propositional formulas
+- **[02_predicate_logic](https://github.com/jmf-pobox/txt2tex/tree/main/examples/02_predicate_logic)** - Quantifiers, type declarations
+- **[03_equality](https://github.com/jmf-pobox/txt2tex/tree/main/examples/03_equality)** - Equality operators, unique existence, mu operator, one-point rule
+- **[04_proof_trees](https://github.com/jmf-pobox/txt2tex/tree/main/examples/04_proof_trees)** - Natural deduction proofs, nested proofs, pattern matching
+- **[05_sets](https://github.com/jmf-pobox/txt2tex/tree/main/examples/05_sets)** - Set operations, Cartesian products, tuples, set literals
+- **[06_definitions](https://github.com/jmf-pobox/txt2tex/tree/main/examples/06_definitions)** - Free types, abbreviations, axiomatic definitions, schemas
+- **[07_relations](https://github.com/jmf-pobox/txt2tex/tree/main/examples/07_relations)** - Relation types, domain/range, restrictions, composition, relational image
+- **[08_functions](https://github.com/jmf-pobox/txt2tex/tree/main/examples/08_functions)** - Lambda expressions, function types, function definitions
+- **[09_sequences](https://github.com/jmf-pobox/txt2tex/tree/main/examples/09_sequences)** - Sequence operations, concatenation, pattern matching, bags
+- **[10_schemas](https://github.com/jmf-pobox/txt2tex/tree/main/examples/10_schemas)** - Schema definitions, scoping, zed blocks
+- **[11_text_blocks](https://github.com/jmf-pobox/txt2tex/tree/main/examples/11_text_blocks)** - TEXT, PURETEXT, citations, bibliography
+- **[12_advanced](https://github.com/jmf-pobox/txt2tex/tree/main/examples/12_advanced)** - Conditionals, subscripts, generic instantiation
+- **[13_equality_chains](https://github.com/jmf-pobox/txt2tex/tree/main/examples/13_equality_chains)** - EQUAL: blocks for equational reasoning
+- **[14_relational_databases](https://github.com/jmf-pobox/txt2tex/tree/main/examples/14_relational_databases)** - Relational algebra, GROUP/UNGROUP, primary keys, normalisation
+- **[15_schema_calculus](https://github.com/jmf-pobox/txt2tex/tree/main/examples/15_schema_calculus)** - Schema composition, piping, hiding, projection
+- **[16_multi_decl_calculus](https://github.com/jmf-pobox/txt2tex/tree/main/examples/16_multi_decl_calculus)** - Multi-declaration quantifier and comprehension forms
+- **[17_state_machines](https://github.com/jmf-pobox/txt2tex/tree/main/examples/17_state_machines)** - State-based modelling with schemas
+- **[user_guide](https://github.com/jmf-pobox/txt2tex/tree/main/examples/user_guide)** - Examples from the user guide documentation
 
 ```bash
 # After cloning:
@@ -723,6 +724,8 @@ A few edge cases require workarounds:
 - **[docs/tutorials/08_sequences.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/08_sequences.md)** - Sequences
 - **[docs/tutorials/09_schemas.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/09_schemas.md)** - Schemas
 - **[docs/tutorials/10_advanced.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/10_advanced.md)** - Advanced topics
+- **[docs/tutorials/11_relational_databases.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/11_relational_databases.md)** - Relational databases
+- **[docs/tutorials/12_schema_calculus.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/12_schema_calculus.md)** - Schema calculus
 
 ### Development Documentation
 
