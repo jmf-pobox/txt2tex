@@ -9,7 +9,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from txt2tex import __version__
+from txt2tex.__version__ import __version__
 from txt2tex.compile import compile_pdf, copy_latex_files, format_tex, get_latex_dir
 from txt2tex.errors import ErrorFormatter
 from txt2tex.latex_gen import LaTeXGenerator
