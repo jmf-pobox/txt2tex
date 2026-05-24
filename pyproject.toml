@@ -142,6 +142,7 @@ ignore = [
 "src/txt2tex/repl.py" = ["T20"]
 # Allow unused parent arg in singledispatch visitor pattern
 "src/txt2tex/latex_gen.py" = ["ARG002"]
+"src/txt2tex/codegen/*.py" = ["ARG002"]
 # Allow unused parent_indent in proof tree parsing
 "src/txt2tex/parser.py" = ["ARG002"]
 # Project-level dev scripts run subprocesses with literal arg lists and use

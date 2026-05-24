@@ -16,9 +16,12 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from functools import singledispatchmethod
-from typing import TypeVar, cast
+from typing import TYPE_CHECKING, TypeVar, cast
 
 from txt2tex.ast_nodes import DocumentItem, Expr
+
+if TYPE_CHECKING:
+    from txt2tex.ast_nodes import Identifier, SchemaInclusion
 
 F = TypeVar("F", bound=Callable[..., object])
 
@@ -42,7 +45,34 @@ class CodegenDispatch:
     mixin classes in this package.  ``LaTeXGenerator`` inherits from both the
     mixin classes and ``_CodegenDispatch`` so every registered handler is
     reachable through the normal MRO.
+
+    The ``TYPE_CHECKING`` block below declares cross-cutting state attributes
+    and helper methods that live on ``LaTeXGenerator`` (or in mixins not yet
+    extracted).  These declarations let mypy/pyright resolve ``self.X``
+    references from mixin method bodies without any runtime effect — the
+    actual implementations remain on ``LaTeXGenerator`` and are reached
+    through the normal MRO.  As subsequent moves consolidate these helpers
+    into their own mixin files, the declarations migrate out of here.
     """
+
+    if TYPE_CHECKING:
+        _in_z_paragraph: bool
+        _in_inline_part: bool
+        use_fuzz: bool
+
+        def _has_line_breaks(self, expr: Expr) -> bool: ...
+        def _generate_identifier(
+            self, node: Identifier, parent: Expr | None = None
+        ) -> str: ...
+        def _check_overflow(
+            self,
+            latex: str,
+            source_line: int,
+            context: str,
+            content_preview: str | None = None,
+        ) -> None: ...
+        def _expression_contains_dat_construct(self, expr: object) -> bool: ...
+        def _emit_schema_inclusion(self, incl: SchemaInclusion) -> str: ...
 
     @singledispatchmethod
     def generate_document_item(self, item: DocumentItem) -> list[str]:
@@ -63,12 +93,12 @@ class CodegenDispatch:
         expr = cast("Expr", item)
         latex_expr = self.generate_expr(expr)
 
-        if self._has_line_breaks(expr):  # type: ignore[attr-defined]
+        if self._has_line_breaks(expr):
             # Multi-line expression: use display math with array
             # Respect inline part context for proper positioning
             lines: list[str] = []
 
-            if self._in_inline_part:  # type: ignore[attr-defined]
+            if self._in_inline_part:
                 # Inside part with leftskip: position naturally with leftskip
                 lines.append(r"\savedleftskip=\leftskip")
                 lines.append(r"\noindent")
@@ -89,7 +119,7 @@ class CodegenDispatch:
         return [r"\noindent", f"${latex_expr}$", "", ""]
 
     @singledispatchmethod
-    def generate_expr(self, expr: Expr, parent: Expr | None = None) -> str:  # noqa: ARG002
+    def generate_expr(self, expr: Expr, parent: Expr | None = None) -> str:
         """Generate LaTeX for expression (without wrapping in math mode).
 
         Uses singledispatch to select the appropriate generator based on

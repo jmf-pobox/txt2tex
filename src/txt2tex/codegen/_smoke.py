@@ -15,7 +15,7 @@ class _SmokeTestMixin:  # pyright: ignore[reportUnusedClass]
     """Single-handler mixin used to validate the mixin dispatch infrastructure."""
 
     @item_register.register(PageBreak)
-    def _generate_pagebreak(self, node: PageBreak) -> list[str]:  # noqa: ARG002
+    def _generate_pagebreak(self, node: PageBreak) -> list[str]:
         """Generate LaTeX for page break.
 
         PAGEBREAK: inserts a page break in PDF output.
