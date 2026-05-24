@@ -18,7 +18,7 @@ declarations migrate out of this module in lockstep.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from txt2tex.tokens import (
     Token,
@@ -42,6 +42,7 @@ class ParserError(Exception):
 
 if TYPE_CHECKING:
     from txt2tex.ast_nodes import (
+        Aggregator,
         ArgueChain,
         AxDef,
         BibliographyMetadata,
@@ -56,6 +57,8 @@ if TYPE_CHECKING:
         GenDef,
         GenericInstantiation,
         GivenType,
+        Group,
+        GroupAggregate,
         InfruleBlock,
         LatexBlock,
         LineBreak,
@@ -75,6 +78,7 @@ if TYPE_CHECKING:
         SyntaxBlock,
         TitleMetadata,
         TruthTable,
+        Ungroup,
         Zed,
     )
 
@@ -89,6 +93,10 @@ class ParserBase:
     """
 
     if TYPE_CHECKING:
+        # --- Class-level dispatch tables ---
+        _AGGREGATOR_TOKEN_TYPES: ClassVar[frozenset[TokenType]]
+        _TOKEN_TO_AGGREGATOR: ClassVar[dict[TokenType, Aggregator]]
+
         # --- Token stream + position state ---
         tokens: list[Token]
         pos: int
@@ -108,7 +116,7 @@ class ParserBase:
         def _current(self) -> Token: ...
         def _advance(self) -> Token: ...
         def _match(self, *types: TokenType) -> bool: ...
-        def _peek_ahead(self, offset: int = 1) -> Token | None: ...
+        def _peek_ahead(self, offset: int = 1) -> Token: ...
         def _skip_newlines(self) -> None: ...
         def _has_blank_line(self) -> bool: ...
         def _is_keyword_usable_as_identifier(self) -> bool: ...
@@ -169,15 +177,17 @@ class ParserBase:
         def _parse_project(self) -> Expr: ...
         def _parse_relation_rename(self, base: Expr) -> Expr: ...
         def _parse_generic_instantiation(self, base: Expr) -> GenericInstantiation: ...
-        def _parse_group_rhs(self, relation: Expr, group_tok: Token) -> Expr: ...
+        def _parse_group_rhs(
+            self, relation: Expr, group_tok: Token
+        ) -> Group | GroupAggregate: ...
         def _parse_group_regroup_rhs(
             self, relation: Expr, group_tok: Token
-        ) -> Expr: ...
+        ) -> Group: ...
         def _parse_group_aggregate_rhs(
             self, relation: Expr, group_tok: Token
-        ) -> Expr: ...
+        ) -> GroupAggregate: ...
         def _parse_aggregator_clause(self) -> object: ...
-        def _parse_ungroup_rhs(self, relation: Expr, ungroup_tok: Token) -> Expr: ...
+        def _parse_ungroup_rhs(self, relation: Expr, ungroup_tok: Token) -> Ungroup: ...
 
         # --- Schema parsers (Move 13) ---
         def _parse_schema_pipe(self) -> Expr: ...
