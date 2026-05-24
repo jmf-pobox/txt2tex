@@ -220,8 +220,15 @@ Every code change follows this pipeline. Steps are ordered.
    `make check` must pass.
 2. Push branch, create PR.
 3. Watch CI.  Wait for the bot review (Copilot or Cursor Bugbot) to
-   land.  If review threads are absent, the bot has not finished —
-   wait for it.
+   land.  A bot review can land in one of two shapes:
+
+   - line-level threads on specific files (the usual code-PR case), or
+   - a summary review only, with zero threads (typical for docs-only
+     PRs).
+
+   Either shape counts as "review landed."  Poll
+   `gh pr view <N> --json reviews,reviewThreads` until at least one
+   bot entry appears in either field; only then proceed to step 4.
 4. **Diligence on the bot review — the only path to merge.**
 
    **Case A — bot opens line-level threads.**  For every thread:
