@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import re
 import sys
-from functools import singledispatchmethod
 from typing import ClassVar, cast
 
 from txt2tex.__version__ import __version__
@@ -43,7 +42,6 @@ from txt2tex.ast_nodes import (
     LineBreak,
     NaturalJoin,
     Number,
-    PageBreak,
     Paragraph,
     Part,
     PartsFormat,
@@ -84,6 +82,7 @@ from txt2tex.ast_nodes import (
     Ungroup,
     Zed,
 )
+from txt2tex.codegen._dispatch import CodegenDispatch, expr_register, item_register
 from txt2tex.constants import PROSE_WORDS
 from txt2tex.free_vars import expr_free_vars
 from txt2tex.lexer import Lexer, LexerError
@@ -110,7 +109,7 @@ def _is_atomic_predicate(node: Expr) -> bool:
     return isinstance(node, (Identifier, Number, BinaryOp))
 
 
-class LaTeXGenerator:
+class LaTeXGenerator(CodegenDispatch):
     """Converts txt2tex AST to LaTeX source code.
 
     Supports propositional/predicate logic, Z notation (schemas, axdefs, free types),
@@ -769,49 +768,8 @@ class LaTeXGenerator:
 
         return "\n".join(lines)
 
-    @singledispatchmethod
-    def generate_document_item(self, item: DocumentItem) -> list[str]:
-        """Generate LaTeX lines for a document item.
-
-        Uses singledispatch to select the appropriate generator based on
-        the item type. This fallback handles bare Expr nodes that appear
-        as document items.
-
-        Args:
-            item: The document item node to generate. Can be Section,
-                Solution, TruthTable, EquivChain, Schema, AxDef, or Expr.
-
-        Returns:
-            List of LaTeX lines (without newline characters).
-        """
-        # Fallback only reached for Expr types (all document types are registered)
-        expr = cast("Expr", item)
-        latex_expr = self.generate_expr(expr)
-
-        if self._has_line_breaks(expr):
-            # Multi-line expression: use display math with array
-            # Respect inline part context for proper positioning
-            lines: list[str] = []
-
-            if self._in_inline_part:
-                # Inside part with leftskip: position naturally with leftskip
-                lines.append(r"\savedleftskip=\leftskip")
-                lines.append(r"\noindent")
-            else:
-                # Normal context: just prevent paragraph indentation
-                lines.append(r"\noindent")
-
-            lines.append(r"$\displaystyle")
-            lines.append(r"\begin{array}{l}")  # Left-aligned single column
-            lines.append(latex_expr)
-            lines.append(r"\end{array}$")
-            lines.append("")
-            # Add trailing spacing for separation from following content
-            lines.append(r"\bigskip")
-            lines.append("")
-            return lines
-        # Single-line expression: use inline math (original behavior)
-        return [r"\noindent", f"${latex_expr}$", "", ""]
+    # generate_document_item is inherited from _CodegenDispatch (dispatch stub +
+    # fallback body for bare Expr items).
 
     def _has_line_breaks(self, expr: Expr) -> bool:
         """Recursively check if expression contains any line breaks.
@@ -904,28 +862,9 @@ class LaTeXGenerator:
         # Base cases: Identifier, Number, StringLit, etc. - no line breaks
         return False
 
-    @singledispatchmethod
-    def generate_expr(self, expr: Expr, parent: Expr | None = None) -> str:
-        """Generate LaTeX for expression (without wrapping in math mode).
+    # generate_expr is inherited from _CodegenDispatch (dispatch stub).
 
-        Uses singledispatch to select the appropriate generator based on
-        the expression type. Each registered handler generates LaTeX for
-        its specific node type, with precedence-aware parenthesization.
-
-        Args:
-            expr: The expression AST node to generate LaTeX for.
-            parent: The parent expression context for precedence handling
-                (None if top-level).
-
-        Returns:
-            LaTeX math-mode source code (caller wraps in $...$ or environments).
-
-        Raises:
-            TypeError: If expression type has no registered handler.
-        """
-        raise TypeError(f"Unknown expression type: {type(expr).__name__}")
-
-    @generate_expr.register(Identifier)
+    @expr_register.register(Identifier)
     def _generate_identifier(
         self,
         node: Identifier,
@@ -1030,12 +969,12 @@ class LaTeXGenerator:
         # Fallback: multi-word identifier
         return self._format_multiword_identifier(name)
 
-    @generate_expr.register(Number)
+    @expr_register.register(Number)
     def _generate_number(self, node: Number, parent: Expr | None = None) -> str:
         """Generate LaTeX for number."""
         return node.value
 
-    @generate_expr.register(StringLit)
+    @expr_register.register(StringLit)
     def _generate_string_lit(self, node: StringLit, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for a string literal using Z-convention quoting.
 
@@ -1053,7 +992,7 @@ class LaTeXGenerator:
             return f"`{escaped}'"
         return rf"\text{{`{escaped}'}}"
 
-    @generate_expr.register(Theta)
+    @expr_register.register(Theta)
     def _generate_theta(self, node: Theta, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for θ-expression (Z RM §3.10).
 
@@ -1062,7 +1001,7 @@ class LaTeXGenerator:
         """
         return rf"\theta {self.generate_expr(node.expr, parent=node)}"
 
-    @generate_expr.register(SchemaText)
+    @expr_register.register(SchemaText)
     def _generate_schema_text_expr(
         self, node: SchemaText, parent: Expr | None = None
     ) -> str:
@@ -1072,7 +1011,7 @@ class LaTeXGenerator:
         """
         return self._generate_schema_text(node)
 
-    @generate_expr.register(UnaryOp)
+    @expr_register.register(UnaryOp)
     def _generate_unary_op(self, node: UnaryOp, parent: Expr | None = None) -> str:
         """Generate LaTeX for unary operation.
 
@@ -1303,7 +1242,7 @@ class LaTeXGenerator:
         # grammar is stricter than standard LaTeX.
         return self.use_fuzz
 
-    @generate_expr.register(BinaryOp)
+    @expr_register.register(BinaryOp)
     def _generate_binary_op(self, node: BinaryOp, parent: Expr | None = None) -> str:
         """Generate LaTeX for binary operation.
 
@@ -1666,7 +1605,7 @@ class LaTeXGenerator:
             return f"{base}{suffix}"
         return schema_name  # decoration is None
 
-    @generate_expr.register(Quantifier)
+    @expr_register.register(Quantifier)
     def _generate_quantifier(self, node: Quantifier, parent: Expr | None = None) -> str:
         """Generate LaTeX for quantifier (forall, exists, exists1, mu).
 
@@ -1865,7 +1804,7 @@ class LaTeXGenerator:
             return f"({result})"
         return result
 
-    @generate_expr.register(Lambda)
+    @expr_register.register(Lambda)
     def _generate_lambda(self, node: Lambda, parent: Expr | None = None) -> str:
         """Generate LaTeX for lambda expression.
 
@@ -1898,7 +1837,7 @@ class LaTeXGenerator:
 
         return result
 
-    @generate_expr.register(SetComprehension)
+    @expr_register.register(SetComprehension)
     def _generate_set_comprehension(
         self, node: SetComprehension, parent: Expr | None = None
     ) -> str:
@@ -1988,7 +1927,7 @@ class LaTeXGenerator:
 
         return " ".join(parts)
 
-    @generate_expr.register(SetLiteral)
+    @expr_register.register(SetLiteral)
     def _generate_set_literal(
         self, node: SetLiteral, parent: Expr | None = None
     ) -> str:
@@ -2009,7 +1948,7 @@ class LaTeXGenerator:
         )
         return f"\\{{{elements_latex}\\}}"
 
-    @generate_expr.register(Subscript)
+    @expr_register.register(Subscript)
     def _generate_subscript(self, node: Subscript, parent: Expr | None = None) -> str:
         """Generate LaTeX for subscript (a_1, x_i)."""
         base = self.generate_expr(node.base)
@@ -2020,7 +1959,7 @@ class LaTeXGenerator:
             return f"{base}_{{{index}}}"
         return f"{base}_{index}"
 
-    @generate_expr.register(Superscript)
+    @expr_register.register(Superscript)
     def _generate_superscript(
         self, node: Superscript, parent: Expr | None = None
     ) -> str:
@@ -2038,7 +1977,7 @@ class LaTeXGenerator:
 
         return f"{base} \\bsup {exponent} \\esup"
 
-    @generate_expr.register(FunctionApp)
+    @expr_register.register(FunctionApp)
     def _generate_function_app(
         self, node: FunctionApp, parent: Expr | None = None
     ) -> str:
@@ -2124,7 +2063,7 @@ class LaTeXGenerator:
         args_latex = ", ".join(self.generate_expr(arg) for arg in node.args)
         return f"{func_latex}({args_latex})"
 
-    @generate_expr.register(FunctionType)
+    @expr_register.register(FunctionType)
     def _generate_function_type(
         self, node: FunctionType, parent: Expr | None = None
     ) -> str:
@@ -2156,7 +2095,7 @@ class LaTeXGenerator:
 
         return f"{domain_latex} {arrow_latex} {range_latex}"
 
-    @generate_expr.register(Tuple)
+    @expr_register.register(Tuple)
     def _generate_tuple(self, node: Tuple, parent: Expr | None = None) -> str:
         """Generate LaTeX for tuple expression.
 
@@ -2170,7 +2109,7 @@ class LaTeXGenerator:
         elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
         return f"({elements_latex})"
 
-    @generate_expr.register(RelationalImage)
+    @expr_register.register(RelationalImage)
     def _generate_relational_image(
         self, node: RelationalImage, parent: Expr | None = None
     ) -> str:
@@ -2191,7 +2130,7 @@ class LaTeXGenerator:
         set_latex = self.generate_expr(node.set)
         return f"({relation_latex} \\limg {set_latex} \\rimg)"
 
-    @generate_expr.register(GenericInstantiation)
+    @expr_register.register(GenericInstantiation)
     def _generate_generic_instantiation(
         self, node: GenericInstantiation, parent: Expr | None = None
     ) -> str:
@@ -2250,7 +2189,7 @@ class LaTeXGenerator:
         )
         return f"{base_latex}[{type_params_latex}]"
 
-    @generate_expr.register(SchemaRename)
+    @expr_register.register(SchemaRename)
     def _generate_schema_rename(
         self, node: SchemaRename, parent: Expr | None = None
     ) -> str:
@@ -2271,7 +2210,7 @@ class LaTeXGenerator:
         )
         return f"{schema_latex}[{pairs_latex}]"
 
-    @generate_expr.register(SchemaCompose)
+    @expr_register.register(SchemaCompose)
     def _generate_schema_compose(
         self, node: SchemaCompose, parent: Expr | None = None
     ) -> str:
@@ -2288,7 +2227,7 @@ class LaTeXGenerator:
         right_latex = self.generate_expr(node.right)
         return f"{left_latex} \\semi {right_latex}"
 
-    @generate_expr.register(SchemaPipe)
+    @expr_register.register(SchemaPipe)
     def _generate_schema_pipe(
         self, node: SchemaPipe, parent: Expr | None = None
     ) -> str:
@@ -2305,7 +2244,7 @@ class LaTeXGenerator:
         right_latex = self.generate_expr(node.right)
         return f"{left_latex} \\pipe {right_latex}"
 
-    @generate_expr.register(SchemaHide)
+    @expr_register.register(SchemaHide)
     def _generate_schema_hide(
         self, node: SchemaHide, parent: Expr | None = None
     ) -> str:
@@ -2323,7 +2262,7 @@ class LaTeXGenerator:
         names_latex = ", ".join(node.names)
         return f"{schema_latex} \\hide ({names_latex})"
 
-    @generate_expr.register(SchemaProject)
+    @expr_register.register(SchemaProject)
     def _generate_schema_project(
         self, node: SchemaProject, parent: Expr | None = None
     ) -> str:
@@ -2340,7 +2279,7 @@ class LaTeXGenerator:
         right_latex = self.generate_expr(node.right)
         return f"{left_latex} \\project {right_latex}"
 
-    @generate_expr.register(Range)
+    @expr_register.register(Range)
     def _generate_range(self, node: Range, parent: Expr | None = None) -> str:
         """Generate LaTeX for range expression (m..n).
 
@@ -2357,7 +2296,7 @@ class LaTeXGenerator:
         end_latex = self.generate_expr(node.end)
         return f"{start_latex} \\upto {end_latex}"
 
-    @generate_expr.register(SequenceLiteral)
+    @expr_register.register(SequenceLiteral)
     def _generate_sequence_literal(
         self, node: SequenceLiteral, parent: Expr | None = None
     ) -> str:
@@ -2376,7 +2315,7 @@ class LaTeXGenerator:
         elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
         return f"\\langle {elements_latex} \\rangle"
 
-    @generate_expr.register(TupleProjection)
+    @expr_register.register(TupleProjection)
     def _generate_tuple_projection(
         self, node: TupleProjection, parent: Expr | None = None
     ) -> str:
@@ -2407,7 +2346,7 @@ class LaTeXGenerator:
         # Generate projection suffix (works for both int and str)
         return f"{base_latex}.{node.index}"
 
-    @generate_expr.register(BagLiteral)
+    @expr_register.register(BagLiteral)
     def _generate_bag_literal(
         self, node: BagLiteral, parent: Expr | None = None
     ) -> str:
@@ -2423,7 +2362,7 @@ class LaTeXGenerator:
         elements_latex = ", ".join(self.generate_expr(elem) for elem in node.elements)
         return f"\\lbag {elements_latex} \\rbag"
 
-    @generate_expr.register(Conditional)
+    @expr_register.register(Conditional)
     def _generate_conditional(
         self, node: Conditional, parent: Expr | None = None
     ) -> str:
@@ -2464,7 +2403,7 @@ class LaTeXGenerator:
             f"\\mbox{{ else }} {else_latex})"
         )
 
-    @generate_expr.register(GuardedCases)
+    @expr_register.register(GuardedCases)
     def _generate_guarded_cases(
         self, node: GuardedCases, parent: Expr | None = None
     ) -> str:
@@ -2492,7 +2431,7 @@ class LaTeXGenerator:
 
         return "\n".join(lines)
 
-    @generate_expr.register(GuardedBranch)
+    @expr_register.register(GuardedBranch)
     def _generate_guarded_branch(
         self, node: GuardedBranch, parent: Expr | None = None
     ) -> str:
@@ -2517,7 +2456,7 @@ class LaTeXGenerator:
         """
         return name
 
-    @generate_expr.register(Restrict)
+    @expr_register.register(Restrict)
     def _generate_restrict(self, node: Restrict, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for sigma[predicate](relation).
 
@@ -2527,7 +2466,7 @@ class LaTeXGenerator:
         rel_latex = self.generate_expr(node.relation, parent=node)
         return rf"\mathrm{{Restrict}}_{{{pred_latex}}}({rel_latex})"
 
-    @generate_expr.register(Project)
+    @expr_register.register(Project)
     def _generate_project(self, node: Project, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for pi[A, B](relation).
 
@@ -2540,7 +2479,7 @@ class LaTeXGenerator:
         rel_latex = self.generate_expr(node.relation, parent=node)
         return rf"\mathrm{{Project}}_{{{attrs_str}}}({rel_latex})"
 
-    @generate_expr.register(RelationRename)
+    @expr_register.register(RelationRename)
     def _generate_relation_rename(
         self, node: RelationRename, parent: Expr | None = None
     ) -> str:
@@ -2567,7 +2506,7 @@ class LaTeXGenerator:
         )
         return f"{rel_latex}[{pairs_str}]"
 
-    @generate_expr.register(NaturalJoin)
+    @expr_register.register(NaturalJoin)
     def _generate_natural_join(
         self, node: NaturalJoin, parent: Expr | None = None
     ) -> str:
@@ -2594,7 +2533,7 @@ class LaTeXGenerator:
             return f"{join_op}({left_latex}, \\\\\n{indent} {right_latex})"
         return f"\\mathrm{{Join}}_{{{sub_latex}}}({left_latex}, {right_latex})"
 
-    @generate_expr.register(Divide)
+    @expr_register.register(Divide)
     def _generate_divide(self, node: Divide, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for R div S.
 
@@ -2614,7 +2553,7 @@ class LaTeXGenerator:
             return f"{left_latex}~\\div~\\\\\n{indent} {right_latex}"
         return f"{left_latex}~\\div~{right_latex}"
 
-    @generate_expr.register(Group)
+    @expr_register.register(Group)
     def _generate_group(self, node: Group, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for R group ({A, B, ...} as alias).
 
@@ -2636,7 +2575,7 @@ class LaTeXGenerator:
             return f"{result} \\\\\n{indent} "
         return result
 
-    @generate_expr.register(GroupAggregate)
+    @expr_register.register(GroupAggregate)
     def _generate_group_aggregate(
         self, node: GroupAggregate, parent: Expr | None = None
     ) -> str:
@@ -2676,7 +2615,7 @@ class LaTeXGenerator:
         alias = self._emit_attr_name(clause.alias)
         return rf"\mathrm{{{label}}}({attr})~\mathrm{{as}}~{alias}"
 
-    @generate_expr.register(Ungroup)
+    @expr_register.register(Ungroup)
     def _generate_ungroup(self, node: Ungroup, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for R ungroup alias.
 
@@ -2693,7 +2632,7 @@ class LaTeXGenerator:
             return f"{result} \\\\\n{indent} "
         return result
 
-    @generate_expr.register(Binding)
+    @expr_register.register(Binding)
     def _generate_binding(self, node: Binding, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for a Z binding literal (Z RM §3.7).
 
@@ -2712,7 +2651,7 @@ class LaTeXGenerator:
         inner = ", ".join(components)
         return rf"\lblot~{inner}~\rblot"
 
-    @generate_document_item.register(Section)
+    @item_register.register(Section)
     def _generate_section(self, node: Section) -> list[str]:
         """Generate LaTeX for section."""
         lines: list[str] = []
@@ -2729,7 +2668,7 @@ class LaTeXGenerator:
 
         return lines
 
-    @generate_document_item.register(Solution)
+    @item_register.register(Solution)
     def _generate_solution(self, node: Solution) -> list[str]:
         """Generate LaTeX for solution as unnumbered section."""
         lines: list[str] = []
@@ -2745,7 +2684,7 @@ class LaTeXGenerator:
 
         return lines
 
-    @generate_document_item.register(Part)
+    @item_register.register(Part)
     def _generate_part(self, node: Part) -> list[str]:
         r"""Generate LaTeX for part label.
 
@@ -3592,7 +3531,7 @@ class LaTeXGenerator:
         # characters as math delimiters.
         return self._restore_dollar_sanitise(text)
 
-    @generate_document_item.register(Paragraph)
+    @item_register.register(Paragraph)
     def _generate_paragraph(self, node: Paragraph) -> list[str]:
         """Generate LaTeX for plain text paragraph.
 
@@ -3620,7 +3559,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
-    @generate_document_item.register(PureParagraph)
+    @item_register.register(PureParagraph)
     def _generate_pure_paragraph(self, node: PureParagraph) -> list[str]:
         """Generate LaTeX for pure text paragraph with NO processing.
 
@@ -3643,7 +3582,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
-    @generate_document_item.register(LatexBlock)
+    @item_register.register(LatexBlock)
     def _generate_latex_block(self, node: LatexBlock) -> list[str]:
         """Generate LaTeX for raw LaTeX passthrough block.
 
@@ -3655,7 +3594,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
-    @generate_document_item.register(RawLatexBlock)
+    @item_register.register(RawLatexBlock)
     def _generate_raw_latex_block(self, node: RawLatexBlock) -> list[str]:
         """Generate LaTeX for multi-line raw LaTeX passthrough block.
 
@@ -3669,7 +3608,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
-    @generate_document_item.register(BMachine)
+    @item_register.register(BMachine)
     def _generate_b_machine(self, node: BMachine) -> list[str]:
         r"""Generate LaTeX for B-machine verbatim block.
 
@@ -3683,15 +3622,9 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
-    @generate_document_item.register(PageBreak)
-    def _generate_pagebreak(self, node: PageBreak) -> list[str]:
-        """Generate LaTeX for page break.
+    # _generate_pagebreak moved to codegen/_smoke.py (will be in text_blocks.py)
 
-        PAGEBREAK: inserts a page break in PDF output.
-        """
-        return [r"\newpage", ""]
-
-    @generate_document_item.register(LineBreak)
+    @item_register.register(LineBreak)
     def _generate_linebreak(self, node: LineBreak) -> list[str]:
         r"""Generate LaTeX for line break.
 
@@ -3701,7 +3634,7 @@ class LaTeXGenerator:
         """
         return [r"\medskip", ""]
 
-    @generate_document_item.register(Contents)
+    @item_register.register(Contents)
     def _generate_contents(self, node: Contents) -> list[str]:
         """Generate LaTeX for table of contents.
 
@@ -3720,7 +3653,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
-    @generate_document_item.register(PartsFormat)
+    @item_register.register(PartsFormat)
     def _generate_parts_format(self, node: PartsFormat) -> list[str]:
         """Generate LaTeX for parts format directive.
 
@@ -4760,7 +4693,7 @@ class LaTeXGenerator:
         result = self._process_function_applications(result)
         return self._process_simple_expressions(result)
 
-    @generate_document_item.register(TruthTable)
+    @item_register.register(TruthTable)
     def _generate_truth_table(self, node: TruthTable) -> list[str]:
         """Generate LaTeX for truth table (centered, with auto-scaling if needed)."""
         lines: list[str] = []
@@ -4960,7 +4893,7 @@ class LaTeXGenerator:
             r"(?<!\$)(\w+_\w+)(?!\$)", lambda m: m.group(1).replace("_", r"\_"), result
         )
 
-    @generate_document_item.register(ArgueChain)
+    @item_register.register(ArgueChain)
     def _generate_argue_chain(self, node: ArgueChain) -> list[str]:
         r"""Generate LaTeX for equivalence or equality chain using array environment.
 
@@ -5031,7 +4964,7 @@ class LaTeXGenerator:
 
         return lines
 
-    @generate_document_item.register(InfruleBlock)
+    @item_register.register(InfruleBlock)
     def _generate_infrule_block(self, node: InfruleBlock) -> list[str]:
         r"""Generate LaTeX for infrule block.
 
@@ -5075,7 +5008,7 @@ class LaTeXGenerator:
 
         return lines
 
-    @generate_document_item.register(GivenType)
+    @item_register.register(GivenType)
     def _generate_given_type(self, node: GivenType) -> list[str]:
         """Generate LaTeX for given type declaration."""
         lines: list[str] = []
@@ -5085,7 +5018,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
-    @generate_document_item.register(FreeType)
+    @item_register.register(FreeType)
     def _generate_free_type(self, node: FreeType) -> list[str]:
         """Generate LaTeX for free type definition.
 
@@ -5125,7 +5058,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
-    @generate_document_item.register(SyntaxBlock)
+    @item_register.register(SyntaxBlock)
     def _generate_syntax_block(self, node: SyntaxBlock) -> list[str]:
         """Generate LaTeX for syntax environment (aligned free type definitions).
 
@@ -5239,7 +5172,7 @@ class LaTeXGenerator:
                 return True
         return False
 
-    @generate_document_item.register(Abbreviation)
+    @item_register.register(Abbreviation)
     def _generate_abbreviation(self, node: Abbreviation) -> list[str]:
         r"""Generate LaTeX for abbreviation definition.
 
@@ -5337,7 +5270,7 @@ class LaTeXGenerator:
             return rf"\Xi {name_latex}"
         return name_latex
 
-    @generate_document_item.register(AxDef)
+    @item_register.register(AxDef)
     def _generate_axdef(self, node: AxDef) -> list[str]:
         """Generate LaTeX for axiomatic definition.
 
@@ -5443,7 +5376,7 @@ class LaTeXGenerator:
 
         return lines
 
-    @generate_document_item.register(GenDef)
+    @item_register.register(GenDef)
     def _generate_gendef(self, node: GenDef) -> list[str]:
         """Generate LaTeX for generic definition.
 
@@ -5545,7 +5478,7 @@ class LaTeXGenerator:
 
         return lines
 
-    @generate_document_item.register(Zed)
+    @item_register.register(Zed)
     def _generate_zed(self, node: Zed) -> list[str]:
         """Generate LaTeX for zed block (unboxed paragraph).
 
@@ -5651,7 +5584,7 @@ class LaTeXGenerator:
 
         return lines
 
-    @generate_document_item.register(Schema)
+    @item_register.register(Schema)
     def _generate_schema(self, node: Schema) -> list[str]:
         """Generate LaTeX for schema definition.
 
@@ -5829,7 +5762,7 @@ class LaTeXGenerator:
         pred_str = r" \land ".join(all_preds)
         return f"[ {decl_str} | {pred_str} ]"
 
-    @generate_document_item.register(HorizDef)
+    @item_register.register(HorizDef)
     def _generate_horiz_def(self, node: HorizDef) -> list[str]:
         r"""Generate LaTeX for a horizontal schema definition.
 
@@ -5874,7 +5807,7 @@ class LaTeXGenerator:
         lines.append("")
         return lines
 
-    @generate_document_item.register(ProofTree)
+    @item_register.register(ProofTree)
     def _generate_proof_tree(self, node: ProofTree) -> list[str]:
         """Generate LaTeX for proof tree (auto-scales if needed)."""
         lines: list[str] = []
