@@ -63,6 +63,7 @@ class CodegenDispatch:
         _overflow_warnings: list[str]
         _overflow_threshold: int
         _first_part_in_solution: bool
+        _in_argue_block: bool
         parts_format: str
         toc_parts: bool
         use_fuzz: bool
