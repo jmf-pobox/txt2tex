@@ -16,12 +16,12 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from functools import singledispatchmethod
-from typing import TYPE_CHECKING, TypeVar, cast
+from typing import TYPE_CHECKING, ClassVar, TypeVar, cast
 
 from txt2tex.ast_nodes import DocumentItem, Expr
 
 if TYPE_CHECKING:
-    from txt2tex.ast_nodes import Identifier, SchemaInclusion
+    from txt2tex.ast_nodes import BinaryOp, Identifier, Quantifier, SchemaInclusion
 
 F = TypeVar("F", bound=Callable[..., object])
 
@@ -58,7 +58,12 @@ class CodegenDispatch:
     if TYPE_CHECKING:
         _in_z_paragraph: bool
         _in_inline_part: bool
+        _quantifier_depth: int
         use_fuzz: bool
+        BINARY_OPS: ClassVar[dict[str, str]]
+        UNARY_OPS: ClassVar[dict[str, str]]
+        QUANTIFIERS: ClassVar[dict[str, str]]
+        _FUZZ_FUNCTION_LIKE_UNARY: ClassVar[frozenset[str]]
 
         def _has_line_breaks(self, expr: Expr) -> bool: ...
         def _generate_identifier(
@@ -73,6 +78,20 @@ class CodegenDispatch:
         ) -> None: ...
         def _expression_contains_dat_construct(self, expr: object) -> bool: ...
         def _emit_schema_inclusion(self, incl: SchemaInclusion) -> str: ...
+        def _get_indentation(self) -> str: ...
+        def _get_bullet_separator(self) -> str: ...
+        def _get_colon_separator(self) -> str: ...
+        def _get_mid_separator(self) -> str: ...
+        def _get_type_latex(self, name: str) -> str | None: ...
+        def _get_closure_operator_latex(self, operator: str, operand: str) -> str: ...
+        def _format_multiword_identifier(self, name: str) -> str: ...
+        def _map_binary_operator(self, operator: str, base_latex: str) -> str: ...
+        def _needs_parens(
+            self, child: Expr, parent: BinaryOp, *, is_left_child: bool
+        ) -> bool: ...
+        def _quantifier_needs_parens(
+            self, node: Quantifier, parent: Expr | None
+        ) -> bool: ...
 
     @singledispatchmethod
     def generate_document_item(self, item: DocumentItem) -> list[str]:

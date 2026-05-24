@@ -32,6 +32,7 @@ import argparse
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -52,8 +53,7 @@ def collect_corpus() -> list[Path]:
         if any(txt.is_relative_to(d) for d in EXCLUDED_DIRS):
             continue
         paths.append(txt)
-    for txt in sorted(BUGS_DIR.glob("*.txt")):
-        paths.append(txt)
+    paths.extend(sorted(BUGS_DIR.glob("*.txt")))
     return paths
 
 
@@ -70,7 +70,7 @@ def generate_one(txt: Path, dst: Path) -> tuple[Path, bool]:
     if uv is None:
         print("ERROR: uv not found on PATH", file=sys.stderr)
         sys.exit(2)
-    result = subprocess.run(  # noqa: S603
+    result = subprocess.run(
         [
             uv,
             "run",
@@ -126,8 +126,6 @@ def verify(baseline: Path) -> int:
             missing_baseline.append(txt)
             continue
         # Generate to a sibling temp area
-        import tempfile
-
         with tempfile.TemporaryDirectory() as tmp:
             dst = Path(tmp) / key
             generate_one(txt, dst)
