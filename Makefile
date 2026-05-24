@@ -63,6 +63,15 @@ regen-e2e:  ## Regenerate every .tex fixture under examples/ (review diff before
 	@echo "Done. Review 'git diff examples/' before committing."
 	@echo "Commit only fixtures whose changes are intentional."
 
+refactor-diff:  ## Compare .tex output of HEAD against REF (default: main) over examples/ + tests/bugs/
+	scripts/refactor_diff_vs_ref.sh $(REF)
+
+refactor-capture:  ## Snapshot .tex output from the current tree (use BASELINE=path to override)
+	uv run python scripts/refactor_diff.py capture $(if $(BASELINE),$(BASELINE),.tmp/refactor-baseline)
+
+refactor-verify:  ## Verify .tex output against a previously captured baseline (BASELINE=path or .tmp/refactor-baseline)
+	uv run python scripts/refactor_diff.py verify $(if $(BASELINE),$(BASELINE),.tmp/refactor-baseline)
+
 ##@ PDF / LaTeX surface QA (examples corpus)
 
 qa:  ## Run scripts/qa_check_all.sh over every examples/ PDF (150 files)
