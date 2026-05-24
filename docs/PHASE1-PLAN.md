@@ -67,9 +67,10 @@ regeneration *and* a separate commit.
 ## Principles
 
 1. **Behaviour is unchanged.** The e2e fixture comparison is the test
-   of this — if a `.tex` file's byte count shifts, the move broke
-   something.  Regenerate the fixtures only when the *generator*
-   semantics change deliberately; this phase has no such changes.
+   of this — if the generated `.tex` differs byte-for-byte from the
+   committed fixture, the move broke something.  Regenerate the
+   fixtures only when the *generator* semantics change deliberately;
+   this phase has no such changes.
 2. **Mixins over free functions.** The handlers in `latex_gen.py` and
    `parser.py` carry state on `self` (`self._in_z_paragraph`,
    `self._in_relational_context`, `self._overflow_warnings`, etc.).
@@ -77,10 +78,13 @@ regeneration *and* a separate commit.
    that the final `LaTeXGenerator` and `Parser` inherit from.  All
    state stays on the final class; mixins are organisation only.
 3. **Dispatch by import side-effect.** `latex_gen.py` already uses
-   `@generate_expr.register(NodeType)`.  This decorator registers
-   handlers when the module is imported.  As long as
-   `codegen/__init__.py` imports every submodule, every handler is
-   reachable.
+   `@generate_expr.register(NodeType)` on methods of the generator
+   class — the underlying mechanism is `functools.singledispatchmethod`
+   (single-dispatch dispatch table bound to a method, not a free
+   function).  The decorator registers handlers when the module is
+   imported.  As long as `codegen/__init__.py` imports every
+   submodule (and each submodule defines its handlers as methods on
+   a mixin class), every handler is reachable.
 4. **One thematic file per move.**  A move is the extraction of one
    construct family into one new file.  Smaller moves are easier to
    review and revert.
@@ -119,11 +123,14 @@ Before any code moves:
    as `latex_gen/` for the entire phase.  Pick one before starting
    and stick with it.
 
-4. **Decide the dispatch import location.**  The `@singledispatch`
-   dispatcher must live in one well-known place.  Recommendation:
-   `codegen/_dispatch.py` exports `generate_expr`; every handler
-   file imports it.  The `LaTeXGenerator` class lives in
-   `codegen/__init__.py` and composes the mixins.
+4. **Decide the dispatch location.**  The `singledispatchmethod`
+   table must live in one well-known place.  Recommendation:
+   `codegen/_dispatch.py` defines a `_Dispatcher` base class whose
+   single method `generate_expr` carries the dispatch decorator.
+   Every mixin file imports `_Dispatcher` and registers handlers
+   against it via `@_Dispatcher.generate_expr.register(NodeType)`.
+   The final `LaTeXGenerator` class lives in `codegen/__init__.py`
+   and inherits both the mixins and `_Dispatcher`.
 
 5. **Smoke-test the mixin pattern.**  Before doing real moves,
    verify the mixin composition works:
@@ -247,17 +254,17 @@ without explicit re-wiring.
 
 ### Batch 5 (Moves 12–14) — paragraphs, schemas, proofs
 
-- **Move 12** → `parser/paragraphs.py`
+- **Move 12** → `parser_pkg/paragraphs.py`
   Rules for: `_parse_given`, `_parse_free_type`, `_parse_abbreviation`,
   `_parse_axdef`, `_parse_gendef`, `_parse_zed_block`,
   `_parse_syntax_block`.
 
-- **Move 13** → `parser/schemas.py`
+- **Move 13** → `parser_pkg/schemas.py`
   Rules for: `_parse_schema`, `_parse_schema_body`,
   `_parse_where_clause`, `_parse_horiz_def`, `_parse_schema_calculus`,
   `_parse_schema_rename_or_generic`.
 
-- **Move 14** → `parser/proofs.py`
+- **Move 14** → `parser_pkg/proofs.py`
   Rules for: `_parse_proof_tree`, `_parse_infrule`,
   `_parse_argue_chain` (covers ARGUE / EQUIV / EQUAL).
 
@@ -265,13 +272,13 @@ without explicit re-wiring.
 
 ### Batch 6 (Moves 15–17) — algebra, expressions, types
 
-- **Move 15** → `parser/algebra.py`
+- **Move 15** → `parser_pkg/algebra.py`
   Rules for: `_parse_restrict` (sigma), `_parse_project` (pi),
   `_parse_relation_rename` (R[B/A]), `_parse_natural_join`,
   `_parse_divide`, `_parse_group`, `_parse_ungroup`,
   `_parse_group_aggregate`.
 
-- **Move 16** → `parser/expressions.py`
+- **Move 16** → `parser_pkg/expressions.py`
   Rules for: `_parse_expr`, `_parse_iff`, `_parse_implies`,
   `_parse_lor`, `_parse_land`, `_parse_lnot`, `_parse_comparison`,
   `_parse_set_op`, `_parse_cross`, `_parse_intersect`,
@@ -285,7 +292,7 @@ without explicit re-wiring.
   ~2,000 lines, split it into `expressions/core.py` and
   `expressions/quantifiers.py` as a preparatory move first.
 
-- **Move 17** → `parser/types.py`
+- **Move 17** → `parser_pkg/types.py`
   Rules for: `_parse_function_type`, `_parse_relation_type`,
   `_parse_generic_instantiation`, `_parse_free_type_constructor`,
   `_parse_generic_params`.
@@ -294,17 +301,17 @@ without explicit re-wiring.
 
 ### Batch 7 (Moves 18–20) — bindings, text blocks, postfix
 
-- **Move 18** → `parser/bindings.py`
+- **Move 18** → `parser_pkg/bindings.py`
   Rules for: `_parse_binding_literal` (`{|...|}`), `_parse_theta`,
   `_parse_multi_typed_comprehension`.
 
-- **Move 19** → `parser/text_blocks.py`
+- **Move 19** → `parser_pkg/text_blocks.py`
   Rules for: `_parse_text_block`, `_parse_puretext_block`,
   `_parse_latex_block`, `_parse_b_block`, `_parse_truth_table`,
   `_parse_parts_directive`, `_parse_pagebreak`, `_parse_linebreak`,
   `_parse_section`, `_parse_subsection`.
 
-- **Move 20** → `parser/postfix.py`
+- **Move 20** → `parser_pkg/postfix.py`
   Postfix-handling helpers: `_parse_postfix` and its branches for
   function application, generic instantiation, relation rename,
   schema rename.  Co-located with the relational-context flag
@@ -314,13 +321,13 @@ without explicit re-wiring.
 
 ### Batch 8 (Moves 21–22) — lexer-state, error-formatting
 
-- **Move 21** → `parser/lexer_state.py`
+- **Move 21** → `parser_pkg/lexer_state.py`
   Token-cursor helpers: `_current`, `_peek_ahead`, `_advance`,
   `_match`, `_skip_newlines`, `_bracket_contains_slash`,
   `_is_operand_start`, `_at_end`.  These are the I/O of the parser
   and are heavily called from every rule.
 
-- **Move 22** → `parser/errors.py`
+- **Move 22** → `parser_pkg/errors.py`
   Error-construction helpers: `_unexpected_token`, `_raise_*`,
   position tracking.  Already partly in `errors.py`; this move
   consolidates parser-side error construction with the existing
@@ -353,9 +360,16 @@ After all 8 gates pass:
 2. **Optional rename pass** for cleanliness:
    - `git mv src/txt2tex/latex_gen.py src/txt2tex/codegen/_orchestrator.py`
      (or fold the shell into `codegen/__init__.py`).
-   - Same for `parser.py` → `parser/_orchestrator.py`.
-   - Update every import site (`grep -rn "from txt2tex.latex_gen
-     import"`).
+   - Same for `parser.py` → `parser_pkg/_orchestrator.py`, then
+     `git mv src/txt2tex/parser_pkg src/txt2tex/parser` once
+     `parser.py` is gone.
+   - Update every import site:
+
+     ```bash
+     grep -rn "from txt2tex.latex_gen import" src/ tests/
+     grep -rn "from txt2tex.parser import" src/ tests/
+     ```
+
    - This is one commit at the end.  Keep it separate from the
      mechanical moves.
 
@@ -373,12 +387,14 @@ After all 8 gates pass:
 Run this at every numbered gate.  Any failure stops the phase.
 
 ```bash
-# Both gates must pass cleanly.
+# Both gates must pass cleanly.  The e2e suite collects examples
+# dynamically; the count grows as new examples are added.
 make check            # lint + lint-md + format-check + type + type-pyright + test
-make test-e2e         # 159 fixture comparisons, byte-for-byte
+make test-e2e         # every example .txt → .tex byte-for-byte
 
-# Sanity check on what moved.
-git diff --stat HEAD~3..HEAD   # file moves should dominate
+# Sanity check on what just moved.  Each batch is one commit, so
+# inspect the single most recent commit:
+git show --stat       # file moves should dominate
 ```
 
 `make test` is included in `make check` (the `test` target is a
@@ -389,7 +405,8 @@ this phase.
 
 ## Rollback strategy
 
-Each gate-marked commit is one batch of three moves.  If a future
+Each gate-marked commit is one batch — three moves in most batches,
+two in Gates 4 (Moves 10–11) and 8 (Moves 21–22).  If a future
 discovery reveals a bug introduced by the split:
 
 - `git revert <batch-commit>` reverts that batch cleanly.
