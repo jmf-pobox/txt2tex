@@ -17,11 +17,6 @@
 
 \begin{zed}[RecipeId, IngredientId, EmployeeId, CuisineTag, IngredientName, RecipeName, EmployeeName, PositionName]\end{zed}
 
-\begin{axdef}
-FK : \power RecipeId \rel \power IngredientId \\
-FKEE : \power EmployeeId \rel \power EmployeeId
-\end{axdef}
-
 \medskip
 
 \section*{Pattern 1: Single-Attribute Primary Key}
@@ -67,43 +62,49 @@ ingredientId : IngredientId
 
 \section*{Pattern 3: Single-Attribute Foreign Key}
 
-\noindent A foreign key is a standalone Z predicate.  The binding-expression form maps one source attribute to one target attribute: (SourceRelation, TargetRelation) $\mapsto$ $\{srcAttr \mapsto tgtAttr\}$ $\in$ FK
+\noindent A foreign key constraint says every value of the referencing attribute must appear in the referenced relation.  No special keyword is needed: write the constraint as a Z predicate using forall/exists or projection with subset.
 
 \bigskip
 
-\noindent RecipeIngredient.recipeId must match a Recipe.recipeId:
-
-\bigskip
-
-\noindent
-$(RecipeIngredient, Recipe) \mapsto \{recipeId \mapsto recipeId\} \in FK$
-
-
-\noindent RecipeIngredient.ingredientId must match an Ingredient.ingredientId:
+\noindent RecipeIngredient.recipeId must reference an existing Recipe:
 
 \bigskip
 
 \noindent
-$(RecipeIngredient, Ingredient) \mapsto \{ingredientId \mapsto ingredientId\} \in FK$
+$\forall ri : RecipeIngredient @ \exists r : Recipe @ ri.recipeId = r.recipeId$
+
+
+\noindent Equivalently, using projection and subset:
+
+\bigskip
+
+\noindent
+$\mathrm{Project}_{recipeId}(RecipeIngredient) \subseteq \mathrm{Project}_{recipeId}(Recipe)$
+
+
+\noindent RecipeIngredient.ingredientId must reference an existing Ingredient:
+
+\bigskip
+
+\noindent
+$\forall ri : RecipeIngredient @ \exists i : Ingredient @ ri.ingredientId = i.ingredientId$
 
 
 \medskip
 
 \section*{Pattern 4: Composite FK and Self-Referential FK}
 
-\noindent Both FK predicates for RecipeIngredient can be stated together. Each is a separate standalone predicate.
+\noindent Both FK constraints for RecipeIngredient can be stated together in a single zed block.  Each predicate is separated by an also command in the output.
 
 \bigskip
 
-\noindent
-$(RecipeIngredient, Recipe) \mapsto \{recipeId \mapsto recipeId\} \in FK$
+\begin{zed}
+\forall ri : RecipeIngredient @ \exists r : Recipe @ ri.recipeId = r.recipeId
+\also
+\forall ri : RecipeIngredient @ \exists i : Ingredient @ ri.ingredientId = i.ingredientId
+\end{zed}
 
-
-\noindent
-$(RecipeIngredient, Ingredient) \mapsto \{ingredientId \mapsto ingredientId\} \in FK$
-
-
-\noindent Employee carries a managerId that references another row in the same relation. The self-referential FK predicate uses FKEE, declared above.
+\noindent Employee carries a managerId that references another row in the same relation.  The self-referential FK constraint:
 
 \bigskip
 
@@ -121,8 +122,8 @@ managerId : EmployeeId
 
 \bigskip
 
-\noindent
-$(Employee, Employee) \mapsto \{managerId \mapsto employeeId\} \in FKEE$
-
+\begin{zed}
+\forall e : Employee @ \exists m : Employee @ e.managerId = m.employeeId
+\end{zed}
 
 \end{document}

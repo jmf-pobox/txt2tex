@@ -215,7 +215,7 @@ Relational-database modelling in Z, including the schema-based relational calcul
 |------|-------------|
 | `algebra_basics.txt` | Relational algebra operators: `sigma`, `pi`, `R[new/old]`, `join`, `div` |
 | `bindings.txt` | Z binding literals `{\| name == e \|}` for relational-calculus queries |
-| `foreign_keys.txt` | `pk` primary-key annotation; single and composite foreign-key constraints |
+| `foreign_keys.txt` | `pk` primary-key annotation; FK constraints as Z predicates (`forall`/`exists`, `pi`/`subset`) |
 | `group_ungroup.txt` | GROUP / UNGROUP nested-relation operators |
 | `primary_keys.txt` | `pk` attribute annotation; PK statement generated after schema box |
 | `relational_calculus.txt` | Multi-declaration set comprehensions over schema projections; multi-decl forall |

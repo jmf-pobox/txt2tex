@@ -283,7 +283,7 @@ Then move to the next row.
 3. Predicate logic statements are logically equivalent under
    classical propositional + first-order rewriting (de Morgan,
    contraposition, predicate distribution over conjunction, etc.).
-4. Cross-schema invariants (zed paragraphs / FK statements / global
+4. Cross-schema invariants (zed paragraphs / FK predicates / global
    constraints) are present in ours when present in the
    instructor's, and they capture the same property.
 5. Numerical answers (counts, ranges, marks) match exactly.

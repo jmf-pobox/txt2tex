@@ -8,14 +8,6 @@ AUTHOR: txt2tex example
 
 given RecipeId, IngredientId, EmployeeId, CuisineTag, IngredientName, RecipeName, EmployeeName, PositionName
 
-// FK is the global foreign-key relation — declared once, used in all FK predicates.
-// FKEE is a separate FK relation covering the employee self-join.
-
-axdef
-  FK : (P RecipeId) <-> (P IngredientId)
-  FKEE : (P EmployeeId) <-> (P EmployeeId)
-end
-
 LINEBREAK:
 
 === Pattern 1: Single-Attribute Primary Key ===
@@ -50,31 +42,39 @@ LINEBREAK:
 
 === Pattern 3: Single-Attribute Foreign Key ===
 
-TEXT: A foreign key is a standalone Z predicate.  The binding-expression form maps
-TEXT: one source attribute to one target attribute:
-TEXT:   (SourceRelation, TargetRelation) |-> {srcAttr |-> tgtAttr} elem FK
+TEXT: A foreign key constraint says every value of the referencing attribute
+TEXT: must appear in the referenced relation.  No special keyword is needed:
+TEXT: write the constraint as a Z predicate using forall/exists or
+TEXT: projection with subset.
 
-TEXT: RecipeIngredient.recipeId must match a Recipe.recipeId:
+TEXT: RecipeIngredient.recipeId must reference an existing Recipe:
 
-(RecipeIngredient, Recipe) |-> {recipeId |-> recipeId} elem FK
+forall ri : RecipeIngredient | exists r : Recipe | ri.recipeId = r.recipeId
 
-TEXT: RecipeIngredient.ingredientId must match an Ingredient.ingredientId:
+TEXT: Equivalently, using projection and subset:
 
-(RecipeIngredient, Ingredient) |-> {ingredientId |-> ingredientId} elem FK
+pi[recipeId](RecipeIngredient) subset pi[recipeId](Recipe)
+
+TEXT: RecipeIngredient.ingredientId must reference an existing Ingredient:
+
+forall ri : RecipeIngredient | exists i : Ingredient | ri.ingredientId = i.ingredientId
 
 LINEBREAK:
 
 === Pattern 4: Composite FK and Self-Referential FK ===
 
-TEXT: Both FK predicates for RecipeIngredient can be stated together.
-TEXT: Each is a separate standalone predicate.
+TEXT: Both FK constraints for RecipeIngredient can be stated together
+TEXT: in a single zed block.  Each predicate is separated by an also
+TEXT: command in the output.
 
-(RecipeIngredient, Recipe) |-> {recipeId |-> recipeId} elem FK
+zed
+  forall ri : RecipeIngredient | exists r : Recipe | ri.recipeId = r.recipeId
 
-(RecipeIngredient, Ingredient) |-> {ingredientId |-> ingredientId} elem FK
+  forall ri : RecipeIngredient | exists i : Ingredient | ri.ingredientId = i.ingredientId
+end
 
-TEXT: Employee carries a managerId that references another row in the same relation.
-TEXT: The self-referential FK predicate uses FKEE, declared above.
+TEXT: Employee carries a managerId that references another row in the
+TEXT: same relation.  The self-referential FK constraint:
 
 schema Employee
   pk employeeId : EmployeeId
@@ -83,6 +83,9 @@ schema Employee
   managerId : EmployeeId
 end
 
-TEXT: Every managerId in Employee must match a valid employeeId in the same relation:
+TEXT: Every managerId in Employee must match a valid employeeId in the
+TEXT: same relation:
 
-(Employee, Employee) |-> {managerId |-> employeeId} elem FKEE
+zed
+  forall e : Employee | exists m : Employee | e.managerId = m.employeeId
+end

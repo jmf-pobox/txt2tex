@@ -105,19 +105,23 @@ Demonstrates the full PK + FK pattern using a kitchen-management toy domain
 2. **Composite PK** — two `pk` lines in one schema; txt2tex collapses them into
    `PK(RecipeIngredient) = {recipeId, ingredientId}`.
 
-3. **Single-attribute FK** — standalone Z predicate in binding-expression form:
-   `(RecipeIngredient, Recipe) |-> {recipeId |-> recipeId} elem FK`.
+3. **Single-attribute FK** — a foreign key is a Z predicate, not a keyword.
+   Two natural forms:
+   - `forall ri : RecipeIngredient | exists r : Recipe | ri.recipeId = r.recipeId`
+   - `pi[recipeId](RecipeIngredient) subset pi[recipeId](Recipe)`
+
+   Both say the same thing: every value of the referencing attribute must
+   appear in the referenced relation.  No special syntax or axdef
+   declaration is needed — the constraint is a standard Z predicate using
+   constructs the engine already supports.
 
 4. **Composite FK + self-referential FK** — both FK predicates for
-   RecipeIngredient stated separately, plus a self-join:
-   `(Employee, Employee) |-> {managerId |-> employeeId} elem FKEE`.
+   RecipeIngredient stated as separate `forall`/`exists` predicates,
+   plus a self-referential constraint on Employee:
+   `forall e : Employee | exists m : Employee | e.managerId = m.employeeId`.
 
-`FK` must be declared in an `axdef` before any FK predicate references it.
-FK predicates written outside any schema or `axdef` block emit as
-`\noindent$...$` math — fuzz ignores them (consistent with the PK
-auto-emission pattern); pdflatex compiles them correctly.
-
-Also exercises: `LINEBREAK:` between sections, `<->` for the relation type.
+Fuzz type-checks the entire document cleanly.
+Also exercises: `LINEBREAK:` between sections.
 
 ### normalisation.txt
 

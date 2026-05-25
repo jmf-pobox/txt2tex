@@ -460,3 +460,31 @@ class TestZedBlockMixedContent:
         assert "Status ::=" in latex
         assert "DefaultStatus ==" in latex
         assert "\\end{zed}" in latex
+
+    def test_multiple_predicates(self) -> None:
+        """Test zed block with multiple predicate expressions."""
+        text = "zed\n  forall x : N | x >= 0\n  forall y : N | y >= 0\nend"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Document)
+        zed_block = ast.items[0]
+        assert isinstance(zed_block, Zed)
+        assert isinstance(zed_block.content, Document)
+        assert len(zed_block.content.items) == 2
+
+    def test_multiple_predicates_latex(self) -> None:
+        """Test LaTeX generation for multi-predicate zed block."""
+        text = "zed\n  forall x : N | x >= 0\n  forall y : N | y >= 0\nend"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=False)
+        latex = generator.generate_document(ast)
+        assert "\\begin{zed}" in latex
+        assert "\\also" in latex
+        assert "\\forall x" in latex
+        assert "\\forall y" in latex
+        assert "\\end{zed}" in latex
