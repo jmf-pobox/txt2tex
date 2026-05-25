@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Family-line split of `latex_gen.py` and `parser.py`** (Phase 1
+  of [docs/DESIGN-ROADMAP.md](docs/DESIGN-ROADMAP.md)).  Behaviour
+  is unchanged: every `.tex` output across the
+  `examples/` + `tests/bugs/` corpus is byte-identical against the
+  pre-refactor baseline (190 / 190).
+  - `src/txt2tex/latex_gen.py`: 6,864 → 598 lines (91.3% reduction).
+    Handlers now live under `src/txt2tex/codegen/` in 11 mixin
+    files grouped by construct family (paragraphs, schemas, proofs,
+    algebra, expressions, types, bindings, text-blocks, text
+    pipeline, overflow, fuzz-routing, paren-policy).
+  - `src/txt2tex/parser.py`: 6,367 → 846 lines (86.7% reduction).
+    Rules now live under `src/txt2tex/parser_pkg/` in 9 mixin files
+    (paragraphs, schemas, proofs, algebra, expressions, types,
+    text-blocks, lexer-state, errors) plus a `_base.py` type-shape
+    declaration.
+
+### Added
+
+- **`make refactor-diff`** — byte-for-byte regression gate that
+  compares `.tex` output against an arbitrary git ref (default
+  `main`) over a 190-input corpus (`examples/` + `tests/bugs/`).
+  Used during the family-line split to verify every batch.  See
+  `scripts/refactor_diff.py` and `scripts/refactor_diff_vs_ref.sh`.
+
 ## [1.3.1] - 2026-05-24
 
 ### Added
