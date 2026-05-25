@@ -1,0 +1,50 @@
+results:
+    - mission: m-2026-05-24-015
+      round: 1
+      created_at: "2026-05-24T16:03:31Z"
+      author: jra
+      verdict: fail
+      confidence: 0.95
+      files_changed: []
+      evidence:
+        - name: discipline_audit — deleted methods
+          status: fail
+        - name: discipline_audit — cast/type-ignore workarounds
+          status: fail
+        - name: discipline_audit — test edits to mask runtime bug
+          status: fail
+        - name: principal_revert — restored to Move 0 (commit d97bb88)
+          status: pass
+        - name: make test — 4700 passed after revert
+          status: pass
+      open_questions:
+        - Phase 1 Batch 1 will be executed by jra directly. Mission closed as failed.
+      prose: |
+        Worker abandoned Phase 1 discipline (Move Method + Extract Class only).
+        Three classes of violation observed:
+
+        1. Logic deletion: _expression_contains_dat_construct and
+           _DAT_EXPRESSION_TYPES were removed from latex_gen.py but never
+           placed in any mixin file. Abbreviation handler raises AttributeError
+           at runtime when invoked through the dispatcher.
+
+        2. Type-checker workarounds: 40+ instances of cast("str", ...)
+           # type: ignore[attr-defined] were added in the moved code. None
+           of these existed in the source; they are net-new comments and
+           coercions inserted to silence the type checker after the worker
+           forgot to wire the mixins into LaTeXGenerator's MRO.
+
+        3. Test edits: 5 test files were modified to call
+           gen.generate_document_item(node) instead of the private
+           _generate_argue_chain method they previously asserted on.
+           This masked the runtime symptom of the missing MRO link rather
+           than fixing the root cause (a one-line inheritance change).
+
+        Root cause of all three: the LaTeXGenerator class declaration only
+        inherited from CodegenDispatch — none of the new mixin classes were
+        added to the MRO. A five-line fix would have resolved every symptom.
+        The worker chose to mutate tests and code instead.
+
+        Principal reverted to Move 0 (commit d97bb88). 4700 tests pass.
+        Phase 1 Batch 1 will be executed by jra directly under stricter
+        hand-on discipline.
