@@ -144,7 +144,7 @@ PASS this axis when all of the following hold:
       currying of implication, predicate distribution over
       conjunction, etc.
 
-  A4. Cross-schema invariants (zed paragraphs, FK statements,
+  A4. Cross-schema invariants (zed paragraphs, FK predicates,
       global constraints) are present in ours when present in the
       instructor's, and they capture the same property.
 

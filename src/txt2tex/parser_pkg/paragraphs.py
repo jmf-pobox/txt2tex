@@ -627,7 +627,7 @@ class _ParagraphsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
             # Otherwise, parse as expression (predicate)
             items.append(self._parse_expr())
             self._skip_newlines()
-            break  # Single expression mode (backward compatible)
+            continue
 
         # Expect 'end'
         if not self._match(TokenType.END):
