@@ -76,13 +76,22 @@ def out_key(txt: Path) -> str:
 
 
 def generate_one(txt: Path, dst: Path) -> tuple[Path, bool]:
-    """Run txt2tex on `txt`, write output to `dst`.  Return (dst, ok)."""
+    """Run txt2tex on `txt`, write output to `dst`.  Return (dst, ok).
+
+    The contract is byte-equality of the generated ``.tex`` file.  We
+    therefore decide success on file presence, not on the subprocess
+    exit code: ``txt2tex --tex-only`` exits non-zero when fuzz emits
+    a type-check warning even though the ``.tex`` was generated
+    correctly, and that ``.tex`` is exactly the artifact we want to
+    compare.  Only when no file was produced do we record a sentinel
+    so that verify can detect a *change* in rejection status.
+    """
     dst.parent.mkdir(parents=True, exist_ok=True)
     uv = shutil.which("uv")
     if uv is None:
         print("ERROR: uv not found on PATH", file=sys.stderr)
         sys.exit(2)
-    result = subprocess.run(
+    subprocess.run(
         [
             uv,
             "run",
@@ -97,8 +106,8 @@ def generate_one(txt: Path, dst: Path) -> tuple[Path, bool]:
         text=True,
         cwd=str(ROOT),
     )
-    if result.returncode != 0 or not dst.exists():
-        # Record the failure so verify can detect a *change* in failure status.
+    if not dst.exists():
+        # Genuine rejection — txt2tex declined to produce any output.
         dst.write_text(FAILURE_SENTINEL)
         return dst, False
     return dst, True
