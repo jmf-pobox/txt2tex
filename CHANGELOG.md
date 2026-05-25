@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-05-25
+
+### Added
+
+- **Multiple predicates in `zed` blocks** — `zed...end` now accepts
+  any number of predicate expressions, separated by `\also` in the
+  LaTeX output.  Previously only one expression was allowed per
+  block; a second `forall` on the next line raised a parser error.
+- **`make refactor-diff`** — byte-for-byte regression gate that
+  compares `.tex` output against an arbitrary git ref (default
+  `main`) over a 190-input corpus (`examples/` + `tests/bugs/`).
+  See `scripts/refactor_diff.py` and `scripts/refactor_diff_vs_ref.sh`.
+
 ### Changed
 
 - **Family-line split of `latex_gen.py` and `parser.py`** (Phase 1
@@ -24,14 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     (paragraphs, schemas, proofs, algebra, expressions, types,
     text-blocks, lexer-state, errors) plus a `_base.py` type-shape
     declaration.
-
-### Added
-
-- **`make refactor-diff`** — byte-for-byte regression gate that
-  compares `.tex` output against an arbitrary git ref (default
-  `main`) over a 190-input corpus (`examples/` + `tests/bugs/`).
-  Used during the family-line split to verify every batch.  See
-  `scripts/refactor_diff.py` and `scripts/refactor_diff_vs_ref.sh`.
+- **FK example rewritten** — `examples/14_relational_databases/foreign_keys.txt`
+  replaced the semantically-vacuous `elem FK` binding pattern with
+  proper Z predicates (`forall`/`exists` and `pi`/`subset`) that
+  express referential integrity correctly.
 
 ## [1.3.1] - 2026-05-24
 
