@@ -35,7 +35,15 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+# Resolve the project root from the current working directory, not from
+# the script's __file__ location.  refactor_diff_vs_ref.sh runs this
+# script from inside a temporary worktree
+# (``cd $WT && python $REPO/scripts/refactor_diff.py capture ...``),
+# and we want both the corpus enumeration and the ``txt2tex``
+# subprocess invocation to be relative to that worktree — otherwise
+# the "baseline" capture is taken from the current branch's checkout
+# and the gate compares the tree against itself.
+ROOT = Path.cwd().resolve()
 EXAMPLES_DIR = ROOT / "examples"
 BUGS_DIR = ROOT / "tests" / "bugs"
 EXCLUDED_DIRS = {EXAMPLES_DIR / "infrastructure"}
@@ -58,9 +66,13 @@ def collect_corpus() -> list[Path]:
 
 
 def out_key(txt: Path) -> str:
-    """Flat, filesystem-safe key for the input file (basename in baseline dir)."""
+    """Flat, filesystem-safe key for the input file (basename in baseline dir).
+
+    Use POSIX separators in the key so capture and verify produce the
+    same key on Windows and POSIX hosts.
+    """
     rel = txt.relative_to(ROOT)
-    return str(rel).replace("/", "__").removesuffix(".txt") + ".tex"
+    return rel.as_posix().replace("/", "__").removesuffix(".txt") + ".tex"
 
 
 def generate_one(txt: Path, dst: Path) -> tuple[Path, bool]:
@@ -142,18 +154,31 @@ def verify(baseline: Path) -> int:
                 else:
                     reason = "content differs"
                 mismatches.append((txt, reason))
-    if missing_baseline:
-        print(
-            f"WARN: {len(missing_baseline)} inputs missing in baseline "
-            f"(baseline was captured earlier; rerun capture).",
-            file=sys.stderr,
-        )
     if mismatches:
         print(f"FAIL: {len(mismatches)} mismatches:")
         for txt, reason in mismatches:
             print(f"  {txt.relative_to(ROOT)}: {reason}")
+        if missing_baseline:
+            print(
+                f"FAIL: {len(missing_baseline)} inputs are missing from the "
+                f"baseline (baseline coverage gap; rerun capture).",
+                file=sys.stderr,
+            )
         return 1
-    print(f"PASS: {len(corpus) - len(missing_baseline)} inputs match baseline")
+    if missing_baseline:
+        # No mismatches among compared inputs, but the baseline does not
+        # cover the current corpus.  This is a coverage gap: the gate has
+        # not actually verified those inputs.  Per the module docstring,
+        # exit 1.
+        print(
+            f"FAIL: {len(missing_baseline)} inputs are missing from the "
+            f"baseline (baseline coverage gap; rerun capture).",
+            file=sys.stderr,
+        )
+        for txt in missing_baseline:
+            print(f"  {txt.relative_to(ROOT)}: missing baseline", file=sys.stderr)
+        return 1
+    print(f"PASS: {len(corpus)} inputs match baseline")
     return 0
 
 

@@ -55,7 +55,11 @@ class _SchemasParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         return self._parse_generic_instantiation(base)
 
     def _parse_schema_rename(self, schema: Expr) -> SchemaRename:
-        """Parse schema rename S[old/new, ...] — '[' not yet consumed.
+        """Parse schema rename S[new/old, ...] — '[' not yet consumed.
+
+        Per Z RM §3.11 the new name is the left operand of '/' and the
+        old name is the right operand, matching the codegen emitter
+        (``codegen/schemas.py:_generate_schema_rename``).
 
         Grammar:
             rename ::= '[' pair (',' pair)* ']'

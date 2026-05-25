@@ -357,8 +357,6 @@ class _TextBlocksCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         lines.append("")
         return lines
 
-    # _generate_pagebreak moved to codegen/_smoke.py (will be in text_blocks.py)
-
     @item_register.register(LineBreak)
     def _generate_linebreak(self, node: LineBreak) -> list[str]:
         r"""Generate LaTeX for line break.
