@@ -47,10 +47,3 @@ jobs:
 
     - name: Run tests with coverage
       run: make test-cov
-
-    - name: Upload coverage to Codecov
-      if: matrix.python-version == '3.13'
-      uses: codecov/codecov-action@v6
-      with:
-        fail_ci_if_error: false
-        token: ${{ secrets.CODECOV_TOKEN }}
