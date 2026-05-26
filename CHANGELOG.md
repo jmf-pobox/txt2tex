@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **GOTCHAS.md** — known rough edges and workarounds, linked from
+  README.  Five entries: abbreviation-chain routing, reserved
+  single-letter identifiers, fuzz vs relational algebra, dot-separator
+  disambiguation (now fixed), rename on compound expressions.
+- **WYSIWYG line breaks in set comprehensions** — source-level line
+  breaks after `|` and `.` separators now render as `\\` inside an
+  `array` environment, matching the quantifier line-break behaviour.
+
+### Fixed
+
+- **Dot-separator disambiguation** — the parser now uses whitespace
+  to distinguish the bullet separator (`. expr`) from field access
+  (`s.x`).  Previously `{ c : C | ... . c.field }` consumed `c` as
+  a field access on the bullet dot, producing a parse error.
+
 ## [1.4.0] - 2026-05-25
 
 ### Added
