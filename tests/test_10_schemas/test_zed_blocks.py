@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from txt2tex.ast_nodes import (
     Abbreviation,
     BinaryOp,
@@ -590,3 +592,212 @@ class TestDotSeparatorQuantifiers:
         generator = LaTeXGenerator(use_fuzz=True)
         latex = generator.generate_document(ast)
         assert "@ s.x" in latex
+
+
+def _assert_multiline_braces(latex: str) -> None:
+    """Assert that a multi-line comprehension has correct brace placement.
+
+    The opening ``\\{~`` must be inside the array (on the first row)
+    and the closing ``~\\}`` must also be inside the array (on the
+    last row).  Braces outside the array produce misaligned rendering.
+    """
+    assert r"\begin{array}" in latex, "expected array environment"
+    # Extract the array body
+    start = latex.index(r"\begin{array}{l}")
+    end = latex.index(r"\end{array}", start)
+    body = latex[start:end]
+    assert r"\{~" in body, r"opening \{ must be inside the array"
+    assert r"~\}" in body, r"closing \} must be inside the array"
+
+
+class TestSetComprehensionLineBreaks:
+    """Tests for WYSIWYG line breaks in set comprehensions.
+
+    Line breaks in the .txt source should produce line breaks in the
+    rendered LaTeX output, matching how quantifiers already handle
+    continuation.
+    """
+
+    def test_single_line_stays_single_line(self) -> None:
+        """A single-line comprehension must NOT gain spurious line breaks."""
+        text = "given X\nschema S\n  x : X\nend\n{ s : S | s.x = s.x . (s.x) }"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        # Should be a single $...$ line with no array or line breaks
+        assert "\\\\\n" not in latex
+        assert "\\begin{array}" not in latex
+
+    def test_break_after_pipe(self) -> None:
+        """A newline after | should produce a line break in the output."""
+        text = "given X\nschema S\n  x : X\nend\n{ s : S |\n    s.x = s.x }"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        _assert_multiline_braces(latex)
+
+    def test_break_after_bullet(self) -> None:
+        """A newline after . should produce a line break in the output."""
+        text = "given X\nschema S\n  x : X\nend\n{ s : S | s.x = s.x .\n    (s.x) }"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        _assert_multiline_braces(latex)
+
+    def test_break_after_land_in_predicate(self) -> None:
+        """A newline after land should produce a line break in the output."""
+        text = (
+            "given X, Y\n"
+            "schema S\n  x : X\n  y : Y\nend\n"
+            "{ s : S | s.x = s.x land\n"
+            "    s.y = s.y }"
+        )
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        _assert_multiline_braces(latex)
+
+    @pytest.mark.xfail(reason="semicolon-declaration breaks not yet tracked")
+    def test_break_after_semicolon_declaration(self) -> None:
+        """A newline after ; between declarations should produce a line break."""
+        text = (
+            "given X\n"
+            "schema S\n  x : X\nend\n"
+            "schema T\n  x : X\nend\n"
+            "{ s : S;\n"
+            "  t : T | s.x = t.x . (s.x) }"
+        )
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        _assert_multiline_braces(latex)
+
+    def test_multiple_breaks(self) -> None:
+        """Breaks after | AND after . in the same comprehension."""
+        text = (
+            "given X\nschema S\n  x : X\nend\n{ s : S |\n    s.x = s.x .\n    (s.x) }"
+        )
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        _assert_multiline_braces(latex)
+        # Should have at least two line breaks inside the array
+        start = latex.index(r"\begin{array}{l}")
+        end = latex.index(r"\end{array}", start)
+        body = latex[start:end]
+        assert body.count("\\\\") >= 2
+
+    def test_binding_output_after_break(self) -> None:
+        """The realistic DAT pattern: pred .\n {| ... |}."""
+        text = (
+            "given X\n"
+            "schema S\n  x : X\nend\n"
+            "{ s : S | s.x = s.x .\n"
+            "    {| x == s.x |} }"
+        )
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        _assert_multiline_braces(latex)
+
+    def test_long_realistic_comprehension(self) -> None:
+        """A realistic multi-line three-variable comprehension."""
+        text = (
+            "given X, Y, Z\n"
+            "schema S\n  x : X\n  y : Y\n  z : Z\nend\n"
+            "schema T\n  x : X\nend\n"
+            "{ s : S; t : T |\n"
+            "    s.x = t.x land\n"
+            "    s.y = s.y .\n"
+            "    {| x == s.x |} }"
+        )
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        _assert_multiline_braces(latex)
+
+    def test_break_after_lor_in_predicate(self) -> None:
+        """A newline after lor should produce a line break in the output."""
+        text = (
+            "given X, Y\n"
+            "schema S\n  x : X\n  y : Y\nend\n"
+            "{ s : S | s.x = s.x lor\n"
+            "    s.y = s.y }"
+        )
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        _assert_multiline_braces(latex)
+
+    def test_break_with_parenthesised_char_expr(self) -> None:
+        """Break before a parenthesised characteristic expression."""
+        text = (
+            "given X, Y\n"
+            "schema S\n  x : X\n  y : Y\nend\n"
+            "{ s : S | s.x = s.x .\n"
+            "    (s.x, s.y) }"
+        )
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        _assert_multiline_braces(latex)
+
+    def test_break_with_nested_comprehension(self) -> None:
+        """A comprehension whose char expr is itself a comprehension."""
+        text = (
+            "given X\n"
+            "schema S\n  x : X\nend\n"
+            "schema T\n  x : X\nend\n"
+            "{ s : S | s.x = s.x .\n"
+            "    { t : T | t.x = s.x } }"
+        )
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        _assert_multiline_braces(latex)
+
+    def test_break_after_implies_in_predicate(self) -> None:
+        """A newline after => should produce a line break in the output."""
+        text = (
+            "given X\nschema S\n  x : X\nend\n{ s : S | s.x = s.x =>\n    s.x = s.x }"
+        )
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        _assert_multiline_braces(latex)

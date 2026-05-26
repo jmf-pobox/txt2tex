@@ -78,9 +78,9 @@ $\displaystyle
 \noindent
 $\displaystyle
 \begin{array}{l}
-\{~ m : Match ; t : Tournament ; p : Player | m.tournament = t.tournamentId \land \\
+\begin{array}{l}\{~ m : Match ; t : Tournament ; p : Player | m.tournament = t.tournamentId \land \\
 \quad m.winner = p.name \land \\
-\quad t.venue = `Centre Court' @ \lblot~winner == m.winner, venue == t.venue, tier == t.tier~\rblot ~\}
+\quad t.venue = `Centre Court' @ \\ \lblot~winner == m.winner, venue == t.venue, tier == t.tier~\rblot  ~\}\end{array}
 \end{array}$
 
 \bigskip

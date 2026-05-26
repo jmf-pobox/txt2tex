@@ -918,6 +918,9 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
             # Has predicate: add mid/pipe separator
             parts.append(self._get_mid_separator())
 
+            if node.line_break_after_pipe:
+                parts.append(r"\\")
+
             # Generate predicate, passing this node as parent so that nested
             # quantifiers receive the SetComprehension context and the
             # always-paren rule (ADR §4 context #2) fires correctly.
@@ -927,6 +930,8 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
             # If expression is present, add bullet/@ and expression
             if node.expression:
                 parts.append(self._get_bullet_separator())
+                if node.line_break_after_bullet:
+                    parts.append(r"\\")
                 expression_latex = self.generate_expr(node.expression)
                 parts.append(expression_latex)
 
@@ -934,7 +939,21 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         # Add ~ spacing hint before closing brace
         parts.append(r"~\}")
 
-        return " ".join(parts)
+        result = " ".join(parts)
+
+        # When the comprehension has line breaks, wrap in an array
+        # environment for proper multi-line rendering.  The opening
+        # brace sits on the first row and the closing brace on the
+        # last row (textbook convention).
+        if node.line_break_after_pipe or node.line_break_after_bullet:
+            inner = result[len(r"\{~ ") :].removesuffix(r"~\}")
+            return (
+                r"\begin{array}{l}"
+                r"\{~ " + inner + r" ~\}"
+                r"\end{array}"
+            )
+
+        return result
 
     @expr_register.register(FunctionApp)
     def _generate_function_app(

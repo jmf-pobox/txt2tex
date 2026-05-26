@@ -199,6 +199,8 @@ class SetComprehension(ASTNode):
     # Additional semicolon-separated declaration groups for multi-typed bindings:
     # { s : Ship; c : Class | ... } → extra_declarations=[("c", Class)]
     extra_declarations: list[tuple[str, Expr]] | None = None
+    line_break_after_pipe: bool = False
+    line_break_after_bullet: bool = False
 
 
 @dataclass(frozen=True)
