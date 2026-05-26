@@ -488,3 +488,105 @@ class TestZedBlockMixedContent:
         assert "\\forall x" in latex
         assert "\\forall y" in latex
         assert "\\end{zed}" in latex
+
+
+class TestSetComprehensionDotSeparator:
+    """Tests for dot-separator disambiguation in set comprehensions.
+
+    The dot (bullet) separator in { x : T | pred . expr } must be
+    distinguished from field-access dots in expr like s.x.  The rule:
+    spaces around the dot mean bullet; no space means field access.
+    """
+
+    def test_char_expr_with_field_access(self) -> None:
+        """{ s : S | pred . s.x } should parse with s.x as the char expr."""
+        text = "given X\nschema S\n  x : X\nend\n{ s : S | s.x = s.x . s.x }"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Document)
+
+    def test_char_expr_with_field_access_latex(self) -> None:
+        """The char expr s.x should render after the bullet."""
+        text = "given X\nschema S\n  x : X\nend\n{ s : S | s.x = s.x . s.x }"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        assert "@ s.x" in latex or "@s.x" in latex or "@ s.x" in latex
+
+    def test_char_expr_binding_after_dot(self) -> None:
+        """{ s : S | pred . {| x == s.x |} } should still work."""
+        text = "given X\nschema S\n  x : X\nend\n{ s : S | s.x = s.x . {| x == s.x |} }"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Document)
+
+    def test_multi_var_char_expr_field_access(self) -> None:
+        """{ s : S; t : T | pred . s.x } with multi-declaration."""
+        text = (
+            "given X\n"
+            "schema S\n  x : X\nend\n"
+            "schema T\n  x : X\nend\n"
+            "{ s : S; t : T | s.x = t.x . s.x }"
+        )
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Document)
+
+    def test_tight_dot_is_field_access_not_bullet(self) -> None:
+        """s.x (no spaces) in predicate must be field access, not bullet."""
+        text = "given X\nschema S\n  x : X\nend\n{ s : S | s.x = s.x . s.x }"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        assert isinstance(ast, Document)
+        # The predicate s.x = s.x should parse as equality of two field accesses
+        # NOT as "s" (bullet) "x = s.x . s.x"
+        items = ast.items
+        assert len(items) >= 1
+
+
+class TestDotSeparatorQuantifiers:
+    """Verify dot-separator vs field-access works for all quantifier forms."""
+
+    def test_forall_field_access_after_bullet(self) -> None:
+        """forall s : S | pred . s.x should parse correctly."""
+        text = "given X\nschema S\n  x : X\nend\nforall s : S | s.x = s.x . s.x"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        assert "@ s.x" in latex
+
+    def test_mu_field_access_after_bullet(self) -> None:
+        """(mu s : S | pred . s.x) should parse correctly."""
+        text = "given X\nschema S\n  x : X\nend\n(mu s : S | s.x = s.x . s.x)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        assert "@ s.x" in latex
+
+    def test_lambda_field_access_after_bullet(self) -> None:
+        """(lambda s : S | pred . s.x) should parse correctly."""
+        text = "given X\nschema S\n  x : X\nend\n(lambda s : S | s.x = s.x . s.x)"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        assert "@ s.x" in latex

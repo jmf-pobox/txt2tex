@@ -2081,6 +2081,15 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
 
         return left
 
+    def _dot_is_spaced(self, next_token: Token) -> bool:
+        """True when the current PERIOD token has whitespace before the next token.
+
+        Used to disambiguate the bullet separator (spaced: `pred . expr`)
+        from field access (tight: `s.x`).  The current token must be a PERIOD.
+        """
+        period_token = self._current()
+        return period_token.column + 1 < next_token.column
+
     def _parse_postfix(self, *, allow_space_separated: bool = True) -> Expr:
         """Parse postfix operators and space-separated application.
 
@@ -2234,8 +2243,8 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                         self._in_comprehension_body
                         and token_after_id.type == TokenType.RBRACE
                         and not self._in_comparison_rhs
+                        and self._dot_is_spaced(next_token)
                     ):
-                        # Likely expression separator, not projection
                         break
 
                     # In a comprehension body, do not allow chaining a second
@@ -2251,14 +2260,16 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
 
                     # Z RM §3.16: field selection requires the LHS to have a
                     # schema (binding) type.  If the identifier after `.` is itself
-                    # a declared variable in the current schema-text, the LHS
-                    # cannot be a schema-typed expression of that variable, so the
-                    # period must be the bullet separator.
-                    # Example: `mu c : N; d : N | c = d . c + d` — `.c` has `c`
-                    # in `_current_quantifier_vars`, so the period is the bullet.
+                    # a declared variable in the current schema-text, the period
+                    # COULD be the bullet separator — but only if there is
+                    # whitespace around the dot.  Tight `s.x` (no space) is always
+                    # field access; spaced `. s` is the bullet.
+                    # Example: `{ s : S | pred . s.x }` — the spaced `. ` is the
+                    # bullet; the tight `.x` is field access on `s`.
                     if (
                         self._in_comprehension_body
                         and next_token.value in self._current_quantifier_vars
+                        and self._dot_is_spaced(next_token)
                     ):
                         break
 
