@@ -812,3 +812,4 @@ class TestSetComprehensionLineBreaks:
         generator = LaTeXGenerator(use_fuzz=True)
         latex = generator.generate_document(ast)
         _assert_multiline_braces(latex)
+        assert r"@ \\" in latex, "bullet must be followed by \\\\ line break"

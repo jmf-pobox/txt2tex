@@ -911,6 +911,8 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
             # No predicate: { x : X . expr } -> use bullet/@ directly
             if node.expression:
                 parts.append(self._get_bullet_separator())
+                if node.line_break_after_bullet:
+                    parts.append(r"\\")
                 expression_latex = self.generate_expr(node.expression)
                 parts.append(expression_latex)
             # else: {x : T} with no predicate or expression - just the binding
