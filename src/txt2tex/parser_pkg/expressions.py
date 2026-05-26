@@ -1475,6 +1475,15 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         if self._match(TokenType.PERIOD):
             # Period separator: no predicate, directly to expression
             self._advance()  # Consume '.'
+            if self._match(TokenType.CONTINUATION):
+                self._advance()
+                bullet_continuation = True
+                if self._match(TokenType.NEWLINE):
+                    self._advance()
+                self._skip_newlines()
+            elif self._match(TokenType.NEWLINE):
+                bullet_continuation = True
+                self._skip_newlines()
             predicate = None
             expression = self._parse_set_expression()
         elif self._match(TokenType.PIPE):

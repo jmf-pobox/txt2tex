@@ -801,3 +801,14 @@ class TestSetComprehensionLineBreaks:
         generator = LaTeXGenerator(use_fuzz=True)
         latex = generator.generate_document(ast)
         _assert_multiline_braces(latex)
+
+    def test_break_after_bullet_no_predicate(self) -> None:
+        """{ x : T .\n  expr } — no predicate, break after bullet."""
+        text = "given X\nschema S\n  x : X\nend\n{ s : S .\n    (s.x) }"
+        lexer = Lexer(text)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        generator = LaTeXGenerator(use_fuzz=True)
+        latex = generator.generate_document(ast)
+        _assert_multiline_braces(latex)
