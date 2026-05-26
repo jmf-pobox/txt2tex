@@ -709,6 +709,7 @@ A few edge cases require workarounds:
 - **[docs/guides/FUZZ_VS_STD_LATEX.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/FUZZ_VS_STD_LATEX.md)** - Fuzz compatibility guide
 - **[docs/guides/MISSING_FEATURES.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/MISSING_FEATURES.md)** - Missing features
 - **[docs/guides/PROOF_SYNTAX.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/PROOF_SYNTAX.md)** - Proof tree notation
+- **[docs/guides/GOTCHAS.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/GOTCHAS.md)** - Known rough edges and workarounds
 
 ### Tutorials
 
