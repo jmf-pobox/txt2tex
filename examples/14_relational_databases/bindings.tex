@@ -51,7 +51,7 @@ $\lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot$
 \section*{Multi-Variable Comprehension with Binding}
 
 \noindent
-$\{~ t : Track ; a : Album | t.albumId = a.albumId @ \lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot ~\}$
+$\begin{array}{l}\{~ t : Track ; a : Album | t.albumId = a.albumId @ \\ \lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot  ~\}\end{array}$
 
 
 \section*{Empty Binding}

@@ -295,6 +295,22 @@ Reported problems are almost always real bugs in the code.
 Tests are infrastructure. A project's test suite determines how fast
 you can move and how confidently you can ship.
 
+- **TDD is mandatory for bug fixes and features.** The sequence is
+  strict and every step is visible:
+  1. Write the test.  Show the code.
+  2. Run it.  Show it fails.
+  3. Implement the fix.  Show the code.
+  4. Run the test.  Show it passes.
+  5. Run `make check`.  Show the gate is green.
+  Never combine steps 1–3.  Never write tests after the fix.
+  Never skip showing the failure.
+- **Tests assert on actual output, not structural markers.** A
+  test that checks "does `\\` appear somewhere in the document"
+  passes when the feature is broken.  Tests must assert on the
+  specific property that makes the feature correct — extract the
+  relevant fragment and verify its structure.  Ask: "if someone
+  breaks this property, which test fails?"  If the answer is
+  none, the test is insufficient.
 - **Test pyramid is mandatory.** Unit tests (lexer/parser/generator
   in isolation), integration tests (txt → tex round-trip), end-to-end
   (txt → pdf with fuzz validation).

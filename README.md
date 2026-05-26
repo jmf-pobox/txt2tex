@@ -679,7 +679,8 @@ A few edge cases require workarounds:
 | Identifiers like `R+`, `R*` | Use `RPlus`, `RStar` instead |
 | Multiple pipes in TEXT blocks | Use `axdef`/`schema` for complex notation |
 
-**For details and test cases, see [tests/bugs/README.md](https://github.com/jmf-pobox/txt2tex/blob/main/tests/bugs/README.md)**
+**For workarounds, see [docs/guides/GOTCHAS.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/GOTCHAS.md).**
+**For details and test cases, see [tests/bugs/README.md](https://github.com/jmf-pobox/txt2tex/blob/main/tests/bugs/README.md).**
 
 ---
 
@@ -709,6 +710,7 @@ A few edge cases require workarounds:
 - **[docs/guides/FUZZ_VS_STD_LATEX.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/FUZZ_VS_STD_LATEX.md)** - Fuzz compatibility guide
 - **[docs/guides/MISSING_FEATURES.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/MISSING_FEATURES.md)** - Missing features
 - **[docs/guides/PROOF_SYNTAX.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/PROOF_SYNTAX.md)** - Proof tree notation
+- **[docs/guides/GOTCHAS.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/GOTCHAS.md)** - Known rough edges and workarounds
 
 ### Tutorials
 
