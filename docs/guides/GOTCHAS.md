@@ -84,3 +84,61 @@ verify.
 **See also.** Gotcha #1 for the edge case where this routing
 logic is fooled by a pure-Z expression that references
 algebra-defined names.
+
+---
+
+## 4. Characteristic expression after `.` cannot start with a field access
+
+**Symptom.** A set comprehension whose characteristic expression
+begins with a dotted field access fails to parse:
+
+```text
+{ s : S | pred . s.x }
+```
+
+The parser cannot disambiguate `.` as the comprehension separator
+(bullet) from `.` as a field-access operator.  It consumes `. s`
+as a field projection on the last token of the predicate, then
+chokes on `.x`.
+
+**Workaround.** Parenthesise the characteristic expression:
+
+```text
+{ s : S | pred . (s.x) }
+```
+
+Or use binding notation (the Z-canonical form for relational
+calculus, which returns a named-attribute relation):
+
+```text
+{ s : S | pred . {| x == s.x |} }
+```
+
+This is a parser bug, not a design limitation.  Tracked for fix.
+
+---
+
+## 5. Rename `[new/old]` only works on bare identifiers
+
+**Symptom.** Applying a rename postfix to a compound expression
+fails, even when parenthesised:
+
+```text
+(S join T)[a/x]         // parse error
+sigma[p](R)[a/x]        // parse error
+```
+
+The parser treats `[` after a non-identifier as the start of a
+generic-instantiation parameter list, not a rename.
+
+**Workaround.** Assign the compound expression to an abbreviation,
+then rename the abbreviation:
+
+```text
+A == S join T
+A[a/x]
+```
+
+This is a parser limitation.  Rename dispatches correctly when the
+base is a bare identifier (`S[a/x]`) or a decorated identifier
+(`S'[a/x]`).
