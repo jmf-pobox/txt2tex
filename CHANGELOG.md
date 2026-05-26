@@ -9,13 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **WYSIWYG line breaks in set comprehensions** — source-level line
+  breaks after `|` and `.` separators now render as `\\` inside an
+  `array` environment, matching the quantifier line-break behaviour.
 - **GOTCHAS.md** — known rough edges and workarounds, linked from
   README.  Five entries: abbreviation-chain routing, reserved
   single-letter identifiers, fuzz vs relational algebra, dot-separator
   disambiguation (now fixed), rename on compound expressions.
-- **WYSIWYG line breaks in set comprehensions** — source-level line
-  breaks after `|` and `.` separators now render as `\\` inside an
-  `array` environment, matching the quantifier line-break behaviour.
 
 ### Fixed
 

@@ -114,7 +114,10 @@ calculus, which returns a named-attribute relation):
 { s : S | pred . {| x == s.x |} }
 ```
 
-This is a parser bug, not a design limitation.  Tracked for fix.
+**Fixed** in v1.4.1+.  The parser now uses whitespace to
+disambiguate: tight `s.x` is field access, spaced `. s` is the
+bullet separator.  Parenthesising (`(s.x)`) remains a portable
+workaround for older builds.
 
 ---
 
@@ -124,12 +127,13 @@ This is a parser bug, not a design limitation.  Tracked for fix.
 fails, even when parenthesised:
 
 ```text
-(S join T)[a/x]         // parse error
-sigma[p](R)[a/x]        // parse error
+(S join T)[a/x]
+sigma[p](R)[a/x]
 ```
 
-The parser treats `[` after a non-identifier as the start of a
-generic-instantiation parameter list, not a rename.
+Both lines produce a parse error.  The parser treats `[` after a
+non-identifier as the start of a generic-instantiation parameter
+list, not a rename.
 
 **Workaround.** Assign the compound expression to an abbreviation,
 then rename the abbreviation:
