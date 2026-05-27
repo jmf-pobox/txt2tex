@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-05-27
+
+### Fixed
+
+- **`F`/`P` as abbreviation names** — `F == expr` and `P == expr`
+  no longer fail; the parser now recognizes `FINSET`/`POWER` tokens
+  followed by `==` as abbreviation definitions.
+- **Paren-free `sigma` and `pi`** — `sigma[p]R` and `pi[a,b]R`
+  now parse without requiring parentheses around the relation.
+- **Rename on compound expressions** — `(S join T)[a/x]` and
+  `sigma[p](R)[a/x]` now parse as relation renames.
+- **Better error for unspaced `>` `<` in `sigma[...]`** — error
+  message now suggests adding spaces instead of the cryptic
+  "Expected ']' after sigma predicate".
+
 ## [1.6.1] - 2026-05-27
 
 ### Fixed
