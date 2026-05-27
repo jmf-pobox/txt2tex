@@ -2159,13 +2159,14 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
             else:
                 base = self._parse_schema_rename_or_generic(base)
 
-        # In a relational context, ANY expression base can take a [new/old]
-        # postfix to form a RelationRename — handles compound operands such as
-        # (pi[tournament](sigma[...](Match)))[tournamentId/tournament].
-        # The '[' must immediately follow the closing token (no whitespace).
+        # ANY expression base can take a [new/old] postfix to form a
+        # RelationRename — handles compound operands such as
+        # (S join T)[a/x] or sigma[p](R)[a/x].
+        # The '[' must immediately follow the closing token (no whitespace),
+        # and the bracket must contain a '/' to disambiguate from generic
+        # instantiation.
         if (
-            self._in_relational_context
-            and not isinstance(base, (Identifier, GenericInstantiation))
+            not isinstance(base, (Identifier, GenericInstantiation))
             and self._match(TokenType.LBRACKET)
             and self._current().line == self.last_token_line
             and self._current().column <= self.last_token_end_column

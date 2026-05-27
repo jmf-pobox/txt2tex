@@ -43,22 +43,23 @@ difference is only whether fuzz complains.
 
 ---
 
-## 2. Reserved single-letter identifiers
+## 2. ~~Reserved single-letter identifiers~~ (PARTIALLY RESOLVED)
 
-**Symptom.** Using `F`, `P`, `N`, or `Z` as an abbreviation name
-or variable name causes a parse error or unexpected rendering.
+`F` and `P` are reserved keywords (`\finset` and `\power`).
+Previously, `F == expr` failed because the parser treated `F` as a
+prefix operator.
 
-```text
-F == A union B
-```
+**Fixed:** `F` and `P` followed by `==` now parse as abbreviation
+names.  They remain reserved in expression context (e.g. `F S`
+still means `\finset S`).
 
-`F` is the `\finset` (finite set) operator keyword.  `P` is
-`\power` (power set).  `N` is `\nat` (natural numbers).  `Z` is
-`\arithmos` (integers).  The lexer consumes these before the
-parser sees them.
+| Letter | Token | Z operator |
+|--------|-------|------------|
+| `F`    | FINSET | `\finset` (finite sets) |
+| `P`    | POWER  | `\power` (power set) |
 
-**Workaround.** Use multi-character names: `FC`, `PS`, `Nums`,
-etc.
+`N` and `Z` are not reserved — they lex as plain identifiers and
+have always worked as abbreviation names.
 
 ---
 
@@ -87,62 +88,71 @@ algebra-defined names.
 
 ---
 
-## 4. Characteristic expression after `.` cannot start with a field access
+## 4. ~~Characteristic expression after `.` cannot start with a field access~~ (RESOLVED)
 
-**Symptom.** A set comprehension whose characteristic expression
-begins with a dotted field access fails to parse:
-
-```text
-{ s : S | pred . s.x }
-```
-
-The parser cannot disambiguate `.` as the comprehension separator
-(bullet) from `.` as a field-access operator.  It consumes `. s`
-as a field projection on the last token of the predicate, then
-chokes on `.x`.
-
-**Workaround.** Parenthesise the characteristic expression:
-
-```text
-{ s : S | pred . (s.x) }
-```
-
-Or use binding notation (the Z-canonical form for relational
-calculus, which returns a named-attribute relation):
-
-```text
-{ s : S | pred . {| x == s.x |} }
-```
-
-**Fixed** in v1.4.1+.  The parser now uses whitespace to
+**Fixed in v1.4.1.**  The parser now uses whitespace to
 disambiguate: tight `s.x` is field access, spaced `. s` is the
-bullet separator.  Parenthesising (`(s.x)`) remains a portable
-workaround for older builds.
+bullet separator.
 
 ---
 
-## 5. Rename `[new/old]` only works on bare identifiers
+## 5. ~~Rename `[new/old]` only works on bare identifiers~~ (RESOLVED)
 
-**Symptom.** Applying a rename postfix to a compound expression
-fails, even when parenthesised:
+**Fixed.**  `(S join T)[a/x]`, `sigma[p](R)[a/x]`, and
+`pi[a,b](R)[c/a]` now parse correctly as relation renames on
+compound expressions.  The `[` must immediately follow the closing
+token (no whitespace) and the bracket must contain `/`.
+
+---
+
+## 6. ~~`sigma` and `pi` require parentheses around the relation~~ (RESOLVED)
+
+**Fixed.**  Both `sigma[p]R` and `pi[a,b]R` (no parentheses) now
+parse correctly.  Parentheses are still accepted and recommended
+for complex relation arguments.
+
+---
+
+## 7. Unspaced `>` or `<` inside `sigma[...]` lexes as angle bracket
+
+**Symptom.** A sigma predicate with an unspaced `>` or `<` fails
+to parse:
 
 ```text
-(S join T)[a/x]
-sigma[p](R)[a/x]
+sigma[groupcount>1](R)
 ```
-
-Both lines produce a parse error.  The parser treats `[` after a
-non-identifier as the start of a generic-instantiation parameter
-list, not a rename.
-
-**Workaround.** Assign the compound expression to an abbreviation,
-then rename the abbreviation:
 
 ```text
-A == S join T
-A[a/x]
+Error: Expected ']' after sigma predicate
+
+1 | sigma[groupcount>1](R)
+  |      ^
 ```
 
-This is a parser limitation.  Rename dispatches correctly when the
-base is a bare identifier (`S[a/x]`) or a decorated identifier
-(`S'[a/x]`).
+The lexer disambiguates `>` and `<` based on spacing: without a
+leading space, `>` becomes RANGLE (closing angle bracket `⟩`) and
+`<` becomes LANGLE (opening angle bracket `⟨`).  The sigma
+predicate parser then sees a broken expression and reports a
+missing `]`.
+
+The two-character operators `>=` and `<=` are not affected — they
+always lex correctly regardless of spacing.
+
+**Triggering examples.**
+
+```text
+sigma[x>1](R)            -- FAILS: > lexes as RANGLE
+sigma[x<10](R)           -- FAILS: < lexes as LANGLE
+sigma[x > 1](R)          -- OK: spaced > lexes as GREATER_THAN
+sigma[x < 10](R)         -- OK: spaced < lexes as LESS_THAN
+sigma[x>=1](R)           -- OK: >= always lexes as GREATER_EQUAL
+sigma[x<=10](R)          -- OK: <= always lexes as LESS_EQUAL
+```
+
+**Workaround.** Always put spaces around `>` and `<` inside
+`sigma[...]`:
+
+```text
+sigma[groupcount > 1](R)
+sigma[x > 1 and y < 10](R)
+```

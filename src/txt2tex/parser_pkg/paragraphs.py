@@ -351,7 +351,13 @@ class _ParagraphsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         Returns:
             Compound identifier string (e.g., "R+", "R*", "R~")
         """
-        if not self._match(TokenType.IDENTIFIER):
+        if not self._match(
+            TokenType.IDENTIFIER,
+            TokenType.FINSET,
+            TokenType.FINSET1,
+            TokenType.POWER,
+            TokenType.POWER1,
+        ):
             raise ParserError("Expected identifier", self._current())
 
         name_token = self._advance()
