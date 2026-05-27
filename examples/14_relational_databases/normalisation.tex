@@ -11,7 +11,7 @@
 \newdimen\savedleftskip
 \title{Functional Dependencies and Normalisation}
 \author{txt2tex example}
-\hypersetup{pdftitle={Functional Dependencies and Normalisation},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.6.0}}
+\hypersetup{pdftitle={Functional Dependencies and Normalisation},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.6.1}}
 \begin{document}
 
 \maketitle
@@ -24,7 +24,7 @@
 
 \bigskip
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Universal}
 empID : EmpID \\
 empName : EmpName \\
@@ -127,7 +127,7 @@ projName : ProjName
 
 \bigskip
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Employee}
 empID : EmpID \\
 empName : EmpName \\
@@ -140,7 +140,7 @@ empName : EmpName \\
 dept : DeptName
 \end{schemapk}
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Department}
 dept : DeptName \\
 deptHead : HeadName
@@ -151,7 +151,7 @@ deptHead : HeadName
 deptHead : HeadName
 \end{schemapk}
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Project}
 projID : ProjID \\
 projName : ProjName
@@ -162,7 +162,7 @@ projName : ProjName
 projName : ProjName
 \end{schemapk}
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Assignment}
 empID : EmpID \\
 projID : ProjID
