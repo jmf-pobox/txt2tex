@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **PK fields rendered with underline** — primary-key attributes
+  in schemas now render as `\underline{field}` inside the schema
+  box, matching the instructor's format.  Uses a dual-emit
+  technique: fuzz type-checks a hidden plain copy; pdflatex renders
+  a `schemapk` copy with underlines.  The old
+  `\mathrm{PK}(Name) = \{...\}` line below the box is removed.
+
 ## [1.5.0] - 2026-05-26
 
 ### Added

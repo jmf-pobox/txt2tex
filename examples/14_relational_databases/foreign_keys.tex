@@ -5,6 +5,7 @@
 \usepackage{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
+\usepackage{schemapk}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \newdimen\savedleftskip
@@ -25,22 +26,29 @@
 
 \bigskip
 
+\savebox{\schemapkbox}{%
 \begin{schema}{Recipe}
 recipeId : RecipeId \\
 name : RecipeName \\
 cuisine : CuisineTag
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Recipe}) = \{recipeId\}$
+\end{schema}%
+}
+\begin{schemapk}{Recipe}
+\underline{recipeId} : RecipeId \\
+name : RecipeName \\
+cuisine : CuisineTag
+\end{schemapk}
 
-\smallskip
-
+\savebox{\schemapkbox}{%
 \begin{schema}{Ingredient}
 ingredientId : IngredientId \\
 name : IngredientName
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Ingredient}) = \{ingredientId\}$
-
-\smallskip
+\end{schema}%
+}
+\begin{schemapk}{Ingredient}
+\underline{ingredientId} : IngredientId \\
+name : IngredientName
+\end{schemapk}
 
 \medskip
 
@@ -50,13 +58,16 @@ name : IngredientName
 
 \bigskip
 
+\savebox{\schemapkbox}{%
 \begin{schema}{RecipeIngredient}
 recipeId : RecipeId \\
 ingredientId : IngredientId
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{RecipeIngredient}) = \{recipeId, ingredientId\}$
-
-\smallskip
+\end{schema}%
+}
+\begin{schemapk}{RecipeIngredient}
+\underline{recipeId} : RecipeId \\
+\underline{ingredientId} : IngredientId
+\end{schemapk}
 
 \medskip
 
@@ -108,15 +119,20 @@ $\forall ri : RecipeIngredient @ \exists i : Ingredient @ ri.ingredientId = i.in
 
 \bigskip
 
+\savebox{\schemapkbox}{%
 \begin{schema}{Employee}
 employeeId : EmployeeId \\
 name : EmployeeName \\
 position : PositionName \\
 managerId : EmployeeId
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Employee}) = \{employeeId\}$
-
-\smallskip
+\end{schema}%
+}
+\begin{schemapk}{Employee}
+\underline{employeeId} : EmployeeId \\
+name : EmployeeName \\
+position : PositionName \\
+managerId : EmployeeId
+\end{schemapk}
 
 \noindent Every managerId in Employee must match a valid employeeId in the same relation:
 

@@ -2032,6 +2032,11 @@ primitives available in every LaTeX distribution.
 
 ## ADR: Remove relvars, Add pk Primary-Key PK-Line Annotation (Phase 2.1 revised)
 
+> **SUPERSEDED** by "ADR: pk Primary-Key Underline via Dual-Emit
+> (Phase 2.1 revised 2)" below.  The PK-line approach described here
+> has been replaced by `\underline{field}` inside a `schemapk`
+> environment.
+
 **Decision**: Remove the `relvars` declaration feature entirely.  Replace it
 with a `pk` prefix in **named schema bodies only**.  The generator emits a
 plain-math PK statement after the schema box rather than using `\underline{}`
@@ -2112,6 +2117,61 @@ names are comma-separated inside the set literal.
 4. *Capitalisation heuristic* — rejected: single-letter type variables (`N`,
    `Z`, `X`) are uppercase but not relation names; explicit declaration is
    required.
+
+## ADR: pk Primary-Key Underline via Dual-Emit (Phase 2.1 revised 2)
+
+**Decision**: Render `pk`-marked attributes with `\underline{field}` inside
+the schema box, matching the instructor's format.  Use dual-emit to keep
+fuzz happy.
+
+**Supersedes**: "ADR: Remove relvars, Add pk Primary-Key PK-Line Annotation
+(Phase 2.1 revised)" above.  The `\mathrm{PK}(Name) = \{...\}` line is
+removed.
+
+**Context**: The instructor's slides and worksheets underline primary-key
+attributes inside schema boxes.  The previous ADR rejected `\underline{}`
+because fuzz's schema parser requires a plain identifier in the variable-name
+position — any macro with braces is a syntax error.
+
+**Dual-emit technique**: For schemas with at least one `pk` field, the
+generator emits two copies:
+
+1. A fuzz-checked copy inside `\setbox0=\vbox{%...\end{schema}%\n}`.  fuzz
+   sees `\begin{schema}` with plain identifiers and type-checks it.  pdflatex
+   typesets the content into a discarded box register — it never appears in
+   the PDF.
+
+2. A rendered copy using `\begin{schemapk}{Name}` with `\underline{field}`
+   on each PK attribute.  The `schemapk` environment (defined in
+   `schemapk.sty` as a clone of `schema`) is unknown to fuzz, so fuzz skips
+   it.  pdflatex renders it identically to a normal schema, with underlines.
+
+Schemas without PK fields emit `\begin{schema}` as before — no `\setbox`,
+no `schemapk`.
+
+**`schemapk.sty`**: Bundled in `src/txt2tex/latex/`, auto-copied by the
+`glob("*.sty")` pattern in `compile.py`.  Contents:
+
+```latex
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{schemapk}
+\newenvironment{schemapk}[1]{\begin{schema}{#1}}{\end{schema}}
+```
+
+**Compound PKs**: Each PK field is underlined independently.  A schema
+with `pk a : T` and `pk b : U` renders `\underline{a} : T` and
+`\underline{b} : U`.
+
+**Options considered**:
+
+1. *`\underline{field}` directly in `\begin{schema}`* — rejected: fuzz
+   syntax error on `{` in the identifier position.
+2. *fuzz pragmas (`%%ignore`, `%%zap`, `%%cmd`)* — tested; none exist.
+3. *Custom fuzz prelude* — rejected: would require modifying fuzz internals.
+4. *Post-processing the .tex after fuzz* — rejected: the committed .tex
+   would differ from what fuzz checked.
+5. *`schemapk`-only (no fuzz copy)* — rejected: the schema must be
+   fuzz-validated.
 
 ## ADR: WYSIWYG Line Breaks for Algebra and Set Operators
 

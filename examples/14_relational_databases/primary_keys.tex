@@ -5,6 +5,7 @@
 \usepackage{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
+\usepackage{schemapk}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \newdimen\savedleftskip
@@ -19,42 +20,58 @@
 
 \section*{Single Primary Key}
 
+\savebox{\schemapkbox}{%
 \begin{schema}{Book}
 bookId : BookId \\
 isbn : ISBN \\
 pages : \nat \\
 year : \nat
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Book}) = \{bookId\}$
+\end{schema}%
+}
+\begin{schemapk}{Book}
+\underline{bookId} : BookId \\
+isbn : ISBN \\
+pages : \nat \\
+year : \nat
+\end{schemapk}
 
-\smallskip
-
+\savebox{\schemapkbox}{%
 \begin{schema}{Member}
 memberId : MemberId \\
 age : \nat
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Member}) = \{memberId\}$
+\end{schema}%
+}
+\begin{schemapk}{Member}
+\underline{memberId} : MemberId \\
+age : \nat
+\end{schemapk}
 
-\smallskip
-
+\savebox{\schemapkbox}{%
 \begin{schema}{Loan}
 loanId : LoanId \\
 bookId : BookId \\
 memberId : MemberId \\
 daysOut : \nat
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Loan}) = \{loanId\}$
-
-\smallskip
+\end{schema}%
+}
+\begin{schemapk}{Loan}
+\underline{loanId} : LoanId \\
+bookId : BookId \\
+memberId : MemberId \\
+daysOut : \nat
+\end{schemapk}
 
 \section*{Composite Primary Key}
 
+\savebox{\schemapkbox}{%
 \begin{schema}{LoanHistory}
 bookId : BookId \\
 memberId : MemberId
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{LoanHistory}) = \{bookId, memberId\}$
-
-\smallskip
+\end{schema}%
+}
+\begin{schemapk}{LoanHistory}
+\underline{bookId} : BookId \\
+\underline{memberId} : MemberId
+\end{schemapk}
 
 \end{document}

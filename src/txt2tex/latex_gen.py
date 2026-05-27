@@ -408,6 +408,7 @@ class LaTeXGenerator(
             lines.append(r"\usepackage{fuzz}")  # Replaces zed-cm (fonts/styling)
         else:
             lines.append(r"\usepackage{zed-cm}")  # Computer Modern fonts/styling
+        lines.append(r"\usepackage{schemapk}")  # schemapk env for PK underlines
         # These packages work with both fuzz and zed-cm
         lines.append(r"\usepackage{zed-maths}")  # Mathematical operators
         lines.append(r"\usepackage{zed-proof}")  # Proof tree macros (\infer)
