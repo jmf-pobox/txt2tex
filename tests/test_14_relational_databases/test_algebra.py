@@ -137,6 +137,30 @@ class TestRestrictParser:
         assert isinstance(node, Restrict)
         assert isinstance(node.relation, Restrict)
 
+    def test_restrict_without_parens(self) -> None:
+        """sigma[p]R (no parentheses) produces Restrict."""
+        node = _expr("sigma[p]R")
+        assert isinstance(node, Restrict)
+        assert isinstance(node.predicate, Identifier)
+        assert node.predicate.name == "p"
+        assert isinstance(node.relation, Identifier)
+        assert node.relation.name == "R"
+
+    def test_restrict_without_parens_comparison(self) -> None:
+        """sigma[bore >= 16]Class — paren-free with comparison predicate."""
+        node = _expr("sigma[bore >= 16]Class")
+        assert isinstance(node, Restrict)
+        assert isinstance(node.predicate, BinaryOp)
+        assert node.predicate.operator == ">="
+        assert isinstance(node.relation, Identifier)
+        assert node.relation.name == "Class"
+
+    def test_restrict_without_parens_nested(self) -> None:
+        """sigma[p]sigma[q](R) — paren-free sigma wrapping parenthesised sigma."""
+        node = _expr("sigma[p]sigma[q](R)")
+        assert isinstance(node, Restrict)
+        assert isinstance(node.relation, Restrict)
+
 
 # ---------------------------------------------------------------------------
 # Parser — Project (pi)
@@ -168,6 +192,22 @@ class TestProjectParser:
         """Project relation is an Identifier."""
         node = _expr("pi[a](R)")
         assert isinstance(node, Project)
+        assert isinstance(node.relation, Identifier)
+        assert node.relation.name == "R"
+
+    def test_project_without_parens(self) -> None:
+        """pi[a,b]R (no parentheses) produces Project."""
+        node = _expr("pi[a,b]R")
+        assert isinstance(node, Project)
+        assert node.attrs == ["a", "b"]
+        assert isinstance(node.relation, Identifier)
+        assert node.relation.name == "R"
+
+    def test_project_without_parens_single_attr(self) -> None:
+        """pi[a]R — paren-free with single attribute."""
+        node = _expr("pi[a]R")
+        assert isinstance(node, Project)
+        assert node.attrs == ["a"]
         assert isinstance(node.relation, Identifier)
         assert node.relation.name == "R"
 
@@ -212,6 +252,27 @@ class TestRelationRenameParser:
         assert isinstance(inner, NaturalJoin)
         assert isinstance(inner.right, RelationRename)
         assert inner.right.pairs == [("b", "a")]
+
+    def test_rename_on_parenthesised_join(self) -> None:
+        """(S join T)[a/x] — rename on a parenthesised compound expression."""
+        node = _expr("(S join T)[a/x]")
+        assert isinstance(node, RelationRename)
+        assert node.pairs == [("a", "x")]
+        assert isinstance(node.relation, NaturalJoin)
+
+    def test_rename_on_sigma_result(self) -> None:
+        """sigma[p](R)[a/x] — rename on the result of a sigma."""
+        node = _expr("sigma[p](R)[a/x]")
+        assert isinstance(node, RelationRename)
+        assert node.pairs == [("a", "x")]
+        assert isinstance(node.relation, Restrict)
+
+    def test_rename_on_pi_result(self) -> None:
+        """pi[a,b](R)[c/a] — rename on the result of a pi."""
+        node = _expr("pi[a,b](R)[c/a]")
+        assert isinstance(node, RelationRename)
+        assert node.pairs == [("c", "a")]
+        assert isinstance(node.relation, Project)
 
     def test_rename_position(self) -> None:
         """RelationRename node carries position of opening bracket."""
@@ -410,6 +471,10 @@ class TestRestrictGenerator:
         assert r"\mathrm{Class}" not in result
         assert "Class" in result
 
+    def test_restrict_without_parens_same_output(self) -> None:
+        r"""sigma[p]R renders identically to sigma[p](R)."""
+        assert _expr_latex("sigma[p]R") == _expr_latex("sigma[p](R)")
+
 
 # ---------------------------------------------------------------------------
 # Generator — Project
@@ -445,6 +510,10 @@ class TestProjectGenerator:
         r"""pi[Class](R) — Class in subscript."""
         result = _expr_latex("pi[Class](R)")
         assert result == r"\mathrm{Project}_{Class}(R)"
+
+    def test_project_without_parens_same_output(self) -> None:
+        r"""pi[a,b]R renders identically to pi[a,b](R)."""
+        assert _expr_latex("pi[a,b]R") == _expr_latex("pi[a,b](R)")
 
 
 # ---------------------------------------------------------------------------
@@ -571,13 +640,26 @@ class TestAlgebraNegative:
         )
         assert err.token.line == 1
 
-    def test_sigma_missing_paren(self) -> None:
-        """sigma[p] R — missing '(' after sigma[...]."""
+    def test_sigma_unspaced_greater_than_hint(self) -> None:
+        """sigma[x>1](R) — error message suggests adding spaces around >."""
         with pytest.raises(ParserError) as exc_info:
-            Parser(_lex("sigma[p] R")).parse()
+            Parser(_lex("sigma[x>1](R)")).parse()
         err = exc_info.value
-        assert "Expected '(' after sigma" in err.message
-        assert err.token.line == 1
+        assert "space" in err.message.lower()
+
+    def test_sigma_unspaced_less_than_hint(self) -> None:
+        """sigma[x<1](R) — error message suggests adding spaces around <."""
+        with pytest.raises(ParserError) as exc_info:
+            Parser(_lex("sigma[x<1](R)")).parse()
+        err = exc_info.value
+        assert "space" in err.message.lower()
+
+    def test_sigma_paren_free_is_valid(self) -> None:
+        """sigma[p] R — paren-free form is now valid syntax."""
+        node = _expr("sigma[p] R")
+        assert isinstance(node, Restrict)
+        assert isinstance(node.relation, Identifier)
+        assert node.relation.name == "R"
 
     def test_pi_empty_attr_list(self) -> None:
         """pi[](R) — empty attribute list."""

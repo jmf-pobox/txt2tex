@@ -211,7 +211,7 @@ class _AlgebraParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         )
 
     def _parse_restrict(self) -> Restrict:
-        """Parse sigma[predicate](relation)."""
+        """Parse sigma[predicate](relation) or sigma[predicate]relation."""
         op_tok = self._advance()  # consume 'sigma'
         if not self._match(TokenType.LBRACKET):
             raise ParserError("Expected '[' after sigma", self._current())
@@ -220,24 +220,42 @@ class _AlgebraParser(ParserBase):  # pyright: ignore[reportUnusedClass]
             raise ParserError(
                 "Expected predicate expression in sigma[...]", self._current()
             )
-        predicate = self._parse_expr()
+        try:
+            predicate = self._parse_expr()
+        except ParserError as inner:
+            if "⟩" in inner.message or "sequence literal" in inner.message:
+                raise ParserError(
+                    "Unspaced '<' inside sigma[...] is parsed as an angle "
+                    "bracket — add spaces around the operator "
+                    "(e.g. sigma[x < 1] not sigma[x<1])",
+                    bracket_tok,
+                ) from None
+            raise
         if not self._match(TokenType.RBRACKET):
+            if self._match(TokenType.RANGLE):
+                raise ParserError(
+                    "Unspaced '>' inside sigma[...] is parsed as an angle "
+                    "bracket — add spaces around the operator "
+                    "(e.g. sigma[x > 1] not sigma[x>1])",
+                    bracket_tok,
+                )
             raise ParserError("Expected ']' after sigma predicate", bracket_tok)
         self._advance()  # consume ']'
-        if not self._match(TokenType.LPAREN):
-            raise ParserError("Expected '(' after sigma[...]", self._current())
-        self._advance()  # consume '('
         prev_relational = self._in_relational_context
         self._in_relational_context = True
         try:
-            relation = self._parse_expr()
+            if self._match(TokenType.LPAREN):
+                self._advance()  # consume '('
+                relation = self._parse_expr()
+                if not self._match(TokenType.RPAREN):
+                    raise ParserError(
+                        "Expected ')' after sigma relation argument", self._current()
+                    )
+                self._advance()  # consume ')'
+            else:
+                relation = self._parse_postfix(allow_space_separated=False)
         finally:
             self._in_relational_context = prev_relational
-        if not self._match(TokenType.RPAREN):
-            raise ParserError(
-                "Expected ')' after sigma relation argument", self._current()
-            )
-        self._advance()  # consume ')'
         return Restrict(
             predicate=predicate,
             relation=relation,
@@ -246,7 +264,7 @@ class _AlgebraParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         )
 
     def _parse_project(self) -> Project:
-        """Parse pi[A, B, ...](relation)."""
+        """Parse pi[A, B, ...](relation) or pi[A, B, ...]relation."""
         op_tok = self._advance()  # consume 'pi'
         if not self._match(TokenType.LBRACKET):
             raise ParserError("Expected '[' after pi", self._current())
@@ -268,20 +286,21 @@ class _AlgebraParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         if not self._match(TokenType.RBRACKET):
             raise ParserError("Expected ']' after pi attribute list", bracket_tok)
         self._advance()  # consume ']'
-        if not self._match(TokenType.LPAREN):
-            raise ParserError("Expected '(' after pi[...]", self._current())
-        self._advance()  # consume '('
         prev_relational = self._in_relational_context
         self._in_relational_context = True
         try:
-            relation = self._parse_expr()
+            if self._match(TokenType.LPAREN):
+                self._advance()  # consume '('
+                relation = self._parse_expr()
+                if not self._match(TokenType.RPAREN):
+                    raise ParserError(
+                        "Expected ')' after pi relation argument", self._current()
+                    )
+                self._advance()  # consume ')'
+            else:
+                relation = self._parse_postfix(allow_space_separated=False)
         finally:
             self._in_relational_context = prev_relational
-        if not self._match(TokenType.RPAREN):
-            raise ParserError(
-                "Expected ')' after pi relation argument", self._current()
-            )
-        self._advance()  # consume ')'
         return Project(
             attrs=attrs,
             relation=relation,

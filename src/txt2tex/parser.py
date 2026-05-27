@@ -195,7 +195,17 @@ class Parser(
         # or horizontal schema definition (identifier [generics]? defs ...)
         # Note: Partial support for compound identifiers like "R+ =="
         # (GitHub #3 still open)
-        if self._match(TokenType.IDENTIFIER):
+        #
+        # Prefix-operator keywords (F, P, F1, P1) can also be abbreviation
+        # names when followed by ==.  Check for that before falling through
+        # to expression parsing, which would consume them as operators.
+        if self._match(
+            TokenType.IDENTIFIER,
+            TokenType.FINSET,
+            TokenType.FINSET1,
+            TokenType.POWER,
+            TokenType.POWER1,
+        ):
             next_token = self._peek_ahead(1)
             if next_token.type == TokenType.FREE_TYPE:
                 # Parse free type and check for more items
@@ -497,7 +507,13 @@ class Parser(
 
         # Check for abbreviation (identifier == expr) or free type (identifier ::= ...)
         # or horizontal schema definition (identifier [generics]? defs ...)
-        if self._match(TokenType.IDENTIFIER):
+        if self._match(
+            TokenType.IDENTIFIER,
+            TokenType.FINSET,
+            TokenType.FINSET1,
+            TokenType.POWER,
+            TokenType.POWER1,
+        ):
             return self._parse_identifier_document_item()
 
         # Check for abbreviation with generic parameters [X, Y] Name == expression
