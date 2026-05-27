@@ -5,6 +5,7 @@
 \usepackage{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
+\usepackage{schemapk}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \newdimen\savedleftskip
@@ -23,6 +24,7 @@
 
 \bigskip
 
+\setbox0=\vbox{%
 \begin{schema}{Universal}
 empID : EmpID \\
 empName : EmpName \\
@@ -30,10 +32,16 @@ dept : DeptName \\
 deptHead : HeadName \\
 projID : ProjID \\
 projName : ProjName
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Universal}) = \{empID, projID\}$
-
-\smallskip
+\end{schema}%
+}
+\begin{schemapk}{Universal}
+\underline{empID} : EmpID \\
+empName : EmpName \\
+dept : DeptName \\
+deptHead : HeadName \\
+\underline{projID} : ProjID \\
+projName : ProjName
+\end{schemapk}
 
 \noindent The relation is in 1NF: every attribute is single-valued and every row is uniquely identified by (empID, projID).
 
@@ -119,38 +127,51 @@ projName : ProjName
 
 \bigskip
 
+\setbox0=\vbox{%
 \begin{schema}{Employee}
 empID : EmpID \\
 empName : EmpName \\
 dept : DeptName
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Employee}) = \{empID\}$
+\end{schema}%
+}
+\begin{schemapk}{Employee}
+\underline{empID} : EmpID \\
+empName : EmpName \\
+dept : DeptName
+\end{schemapk}
 
-\smallskip
-
+\setbox0=\vbox{%
 \begin{schema}{Department}
 dept : DeptName \\
 deptHead : HeadName
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Department}) = \{dept\}$
+\end{schema}%
+}
+\begin{schemapk}{Department}
+\underline{dept} : DeptName \\
+deptHead : HeadName
+\end{schemapk}
 
-\smallskip
-
+\setbox0=\vbox{%
 \begin{schema}{Project}
 projID : ProjID \\
 projName : ProjName
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Project}) = \{projID\}$
+\end{schema}%
+}
+\begin{schemapk}{Project}
+\underline{projID} : ProjID \\
+projName : ProjName
+\end{schemapk}
 
-\smallskip
-
+\setbox0=\vbox{%
 \begin{schema}{Assignment}
 empID : EmpID \\
 projID : ProjID
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Assignment}) = \{empID, projID\}$
-
-\smallskip
+\end{schema}%
+}
+\begin{schemapk}{Assignment}
+\underline{empID} : EmpID \\
+\underline{projID} : ProjID
+\end{schemapk}
 
 \noindent Every non-key attribute now depends only on its own primary key. No partial or transitive dependencies remain.  The decomposition is lossless: rejoining Employee, Department, Assignment, and Project on their shared keys reconstructs the original Universal relation exactly.
 

@@ -118,6 +118,7 @@ def generate_preview_document(latex_fragment: str, *, use_fuzz: bool) -> str:
     else:
         lines.append(r"\usepackage{zed-cm}")
 
+    lines.append(r"\usepackage{schemapk}")
     lines.append(r"\usepackage{zed-maths}")
     lines.append(r"\usepackage{zed-proof}")
     lines.append(r"\newdimen\savedleftskip")

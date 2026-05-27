@@ -164,6 +164,11 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         Supports optional generic parameters and anonymous schemas (name=None).
         Multiple declarations appear on separate lines with line breaks.
 
+        For schemas with pk-marked fields, uses dual-emit: a fuzz-checked copy
+        inside ``\\setbox0=\\vbox{%…}`` (invisible to LaTeX output) and a
+        rendered copy using the ``schemapk`` environment with
+        ``\\underline{field}`` for each primary-key attribute.
+
         Processes schema names through _generate_identifier() for compound
         identifiers like S+, S*, S~ (partial support, GitHub #3 still open).
         """
@@ -182,24 +187,43 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         # Context for overflow warnings
         schema_context = f"schema {schema_name}" if schema_name else "anonymous schema"
 
-        # Add generic parameters if present
+        # Detect PK fields early so we know whether dual-emit is needed.
+        pk_vars: set[str] = set()
+        if node.name is not None:
+            pk_vars = {
+                decl.variable
+                for decl in node.declarations
+                if isinstance(decl, Declaration) and decl.is_primary_key
+            }
+
+        # Build the begin line (reused for both copies when dual-emit).
         if node.generic_params:
             params_str = ", ".join(node.generic_params)
-            lines.append(f"\\begin{{schema}}{{{schema_name}}}[{params_str}]")
+            begin_schema = f"\\begin{{schema}}{{{schema_name}}}[{params_str}]"
+            begin_schemapk = f"\\begin{{schemapk}}{{{schema_name}}}[{params_str}]"
         else:
-            lines.append(r"\begin{schema}{" + schema_name + "}")
+            begin_schema = r"\begin{schema}{" + schema_name + "}"
+            begin_schemapk = r"\begin{schemapk}{" + schema_name + "}"
 
-        # All expression generation inside this block uses Z-paragraph context.
+        # Build declaration and where-clause body lines (shared between copies).
+        # Returns (plain_lines, pk_lines) where pk_lines has \underline on PK vars.
         prev_z = self._in_z_paragraph
         self._in_z_paragraph = True
+        plain_body: list[str] = []
+        pk_body: list[str] = []
         try:
             # Generate declarations on separate lines
             if node.declarations:
                 for i, decl in enumerate(node.declarations):
                     if isinstance(decl, SchemaInclusion):
                         decl_line = self._emit_schema_inclusion(decl)
+                        plain_body.append(
+                            f"{decl_line} \\\\"
+                            if i < len(node.declarations) - 1
+                            else decl_line
+                        )
+                        pk_body.append(plain_body[-1])
                     else:
-                        # Process variable through identifier logic
                         var_latex = self._generate_identifier(
                             Identifier(line=0, column=0, name=decl.variable)
                         )
@@ -217,7 +241,6 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                         ]
                         for pattern in special_ops:
                             if pattern in type_latex:
-                                # Find second operator and wrap from there
                                 parts = type_latex.split(pattern, 1)
                                 if len(parts) == 2:
                                     second_part = pattern.split()[-1] + " " + parts[1]
@@ -228,74 +251,64 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                                     )
                                     break
 
-                        # Build full declaration line for overflow check
-                        decl_line = f"{var_latex} : {type_latex}"
+                        plain_decl_line = f"{var_latex} : {type_latex}"
                         self._check_overflow(
-                            decl_line,
+                            plain_decl_line,
                             decl.type_expr.line,
                             f"{schema_context} declaration",
                             f"{decl.variable} : ...",
                         )
 
-                    # Add line break after each declaration except the last
-                    if i < len(node.declarations) - 1:
-                        lines.append(f"{decl_line} \\\\")
-                    else:
-                        lines.append(decl_line)
+                        sep = " \\\\" if i < len(node.declarations) - 1 else ""
+                        plain_body.append(f"{plain_decl_line}{sep}")
+
+                        # Wrap identifier in \underline for PK fields
+                        if decl.variable in pk_vars:
+                            pk_var_latex = rf"\underline{{{var_latex}}}"
+                            pk_decl_line = f"{pk_var_latex} : {type_latex}"
+                        else:
+                            pk_decl_line = plain_decl_line
+                        pk_body.append(f"{pk_decl_line}{sep}")
 
             # Generate where clause if predicate groups exist
+            where_lines: list[str] = []
             if node.predicates and any(group for group in node.predicates):
-                lines.append(r"\where")
-
-                # Iterate through predicate groups (separated by blank lines)
+                where_lines.append(r"\where")
                 for group_idx, group in enumerate(node.predicates):
-                    # Generate predicates in current group
                     for pred_idx, pred in enumerate(group):
-                        # Pass parent=None for smart parenthesization
                         pred_latex = self.generate_expr(pred, parent=None)
-
-                        # Auto-wrap long predicates; fall back to warning
                         self._check_overflow(
                             pred_latex,
                             pred.line,
                             f"{schema_context} where clause",
                         )
-
-                        # Use \\ as separator within group
                         if pred_idx < len(group) - 1:
-                            lines.append(f"{pred_latex} \\\\")
+                            where_lines.append(f"{pred_latex} \\\\")
                         else:
-                            lines.append(pred_latex)
-
-                    # Add \also between groups (not after last group)
+                            where_lines.append(pred_latex)
                     if group_idx < len(node.predicates) - 1:
-                        lines.append(r"\also")
+                        where_lines.append(r"\also")
         finally:
             self._in_z_paragraph = prev_z
 
-        lines.append(r"\end{schema}")
-
-        # Emit a fuzz-compatible PK annotation after the schema box.
-        # \underline{} is rejected by fuzz inside schema declaration positions,
-        # so we record the primary-key set as a plain math statement outside
-        # the box: \noindent$\mathrm{PK}(\mathrm{Name}) = \{attr1, attr2\}$
-        # fuzz ignores content outside Z environments; pdflatex renders it.
-        if node.name is not None:
-            pk_attrs = [
-                decl.variable
-                for decl in node.declarations
-                if isinstance(decl, Declaration) and decl.is_primary_key
-            ]
-            if pk_attrs:
-                attrs_str = ", ".join(pk_attrs)
-                lines.append(
-                    rf"\noindent$\mathrm{{PK}}(\mathrm{{{schema_name}}})"
-                    rf" = \{{{attrs_str}\}}$"
-                )
-                # Blank line + \smallskip so the next paragraph (often another
-                # schema) gets visible breathing room from the PK annotation.
-                lines.append("")
-                lines.append(r"\smallskip")
+        if pk_vars:
+            # Dual-emit: fuzz-checked copy inside \setbox (invisible), then
+            # rendered schemapk copy with \underline on PK fields.
+            lines.append(r"\setbox0=\vbox{%")
+            lines.append(begin_schema)
+            lines.extend(plain_body)
+            lines.extend(where_lines)
+            lines.append(r"\end{schema}%")
+            lines.append("}")
+            lines.append(begin_schemapk)
+            lines.extend(pk_body)
+            lines.extend(where_lines)
+            lines.append(r"\end{schemapk}")
+        else:
+            lines.append(begin_schema)
+            lines.extend(plain_body)
+            lines.extend(where_lines)
+            lines.append(r"\end{schema}")
 
         lines.append("")
 

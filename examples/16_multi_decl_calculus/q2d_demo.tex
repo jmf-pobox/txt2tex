@@ -5,6 +5,7 @@
 \usepackage{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
+\usepackage{schemapk}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \newdimen\savedleftskip
@@ -25,34 +26,48 @@
 
 \medskip
 
+\setbox0=\vbox{%
 \begin{schema}{Tournament}
 tournamentId : TournamentId \\
 venue : VenueName \\
 tier : \nat
 \where
 tier \leq 5
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Tournament}) = \{tournamentId\}$
+\end{schema}%
+}
+\begin{schemapk}{Tournament}
+\underline{tournamentId} : TournamentId \\
+venue : VenueName \\
+tier : \nat
+\where
+tier \leq 5
+\end{schemapk}
 
-\smallskip
-
+\setbox0=\vbox{%
 \begin{schema}{Player}
 name : PlayerName \\
 ranking : \nat
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Player}) = \{name\}$
+\end{schema}%
+}
+\begin{schemapk}{Player}
+\underline{name} : PlayerName \\
+ranking : \nat
+\end{schemapk}
 
-\smallskip
-
+\setbox0=\vbox{%
 \begin{schema}{Match}
 matchId : MatchId \\
 tournament : TournamentId \\
 winner : PlayerName \\
 loser : PlayerName
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Match}) = \{matchId, tournament\}$
-
-\smallskip
+\end{schema}%
+}
+\begin{schemapk}{Match}
+\underline{matchId} : MatchId \\
+\underline{tournament} : TournamentId \\
+winner : PlayerName \\
+loser : PlayerName
+\end{schemapk}
 
 \section*{1. WYSIWYG line breaks for algebra operators}
 
