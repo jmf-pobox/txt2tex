@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **`F`/`P` as abbreviation names** — `F == expr` and `P == expr`
-  no longer fail; the parser now recognizes FINSET/POWER tokens
+  no longer fail; the parser now recognizes `FINSET`/`POWER` tokens
   followed by `==` as abbreviation definitions.
 - **Paren-free `sigma` and `pi`** — `sigma[p]R` and `pi[a,b]R`
   now parse without requiring parentheses around the relation.
