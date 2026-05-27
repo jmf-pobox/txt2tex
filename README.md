@@ -427,7 +427,7 @@ Fleet[ID/shipID]
 pk shipID
 ```
 
-Primary key annotation (`pk`), FK predicates in `axdef`, relational algebra (Restrict `sigma[p](R)`, Project `pi[A,B](R)`, Rename `R[NEW/OLD]` postfix, Join `R join S`, division `R div S`), and `GROUP`/`UNGROUP` for nested relations (Date's operators).
+Primary key underline (`pk` — renders `\underline{field}` inside the schema box), FK predicates in `axdef`, relational algebra (Restrict `sigma[p](R)`, Project `pi[A,B](R)`, Rename `R[NEW/OLD]` postfix, Join `R join S`, division `R div S`), and `GROUP`/`UNGROUP` for nested relations (Date's operators).
 
 ---
 

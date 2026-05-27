@@ -2802,8 +2802,8 @@ decomposition), see
 ### pk Declaration
 
 Mark an attribute as a primary key with the `pk` prefix inside a **named**
-schema body.  txt2tex emits a fuzz-compatible PK statement after the schema
-box:
+schema body.  txt2tex renders `pk` fields with `\underline{field}` inside
+the schema box:
 
 ```text
 schema Book
@@ -2816,16 +2816,16 @@ end
 Generated LaTeX (abridged):
 
 ```latex
-\begin{schema}{Book}
-bookId : BookId \\
+\begin{schemapk}{Book}
+\underline{bookId} : BookId \\
 isbn : ISBN \\
 pages : \nat
-\end{schema}
-\noindent$\mathrm{PK}(\mathrm{Book}) = \{bookId\}$
+\end{schemapk}
 ```
 
-The schema body stays plain so fuzz type-checks it cleanly.  The PK line
-sits outside the Z environment and is rendered by pdflatex.
+Fuzz type-checks the schema via a hidden plain copy (using
+`\setbox0=\vbox{...}`).  The rendered copy uses the `schemapk`
+environment, which fuzz ignores.
 
 **Composite primary key** — two or more `pk` lines:
 
@@ -2836,7 +2836,8 @@ schema CentreStaff
 end
 ```
 
-Emits: `\noindent$\mathrm{PK}(\mathrm{CentreStaff}) = \{centreId, staffId\}$`
+Each PK field is underlined independently:
+`\underline{centreId}` and `\underline{staffId}`.
 
 **Comma-separated pk names** (when names share a type):
 
