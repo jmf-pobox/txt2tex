@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-05-27
+
+### Fixed
+
+- **PK dual-emit compilation failure** — `\savebox` (which creates an
+  `\hbox`) broke fuzz.sty's `\halign` inside the schema environment.
+  Reverted to `\setbox0=\vbox{%}` which provides the correct context
+  for alignment-based environments.
+
 ## [1.6.0] - 2026-05-27
 
 ### Changed

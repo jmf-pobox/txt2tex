@@ -11,7 +11,7 @@
 \newdimen\savedleftskip
 \title{Multi-Declaration Z Constructs --- Demo}
 \author{txt2tex}
-\hypersetup{pdftitle={Multi-Declaration Z Constructs --- Demo},pdfauthor={txt2tex},pdfcreator={txt2tex v1.6.0}}
+\hypersetup{pdftitle={Multi-Declaration Z Constructs --- Demo},pdfauthor={txt2tex},pdfcreator={txt2tex v1.6.1}}
 \begin{document}
 
 \maketitle
@@ -26,7 +26,7 @@
 
 \medskip
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Tournament}
 tournamentId : TournamentId \\
 venue : VenueName \\
@@ -43,7 +43,7 @@ tier : \nat
 tier \leq 5
 \end{schemapk}
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Player}
 name : PlayerName \\
 ranking : \nat
@@ -54,7 +54,7 @@ ranking : \nat
 ranking : \nat
 \end{schemapk}
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Match}
 matchId : MatchId \\
 tournament : TournamentId \\

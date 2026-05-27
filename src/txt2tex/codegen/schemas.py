@@ -292,9 +292,11 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             self._in_z_paragraph = prev_z
 
         if pk_vars:
-            # Dual-emit: fuzz-checked copy inside \savebox (invisible), then
+            # Dual-emit: fuzz-checked copy inside \vbox (invisible), then
             # rendered schemapk copy with \underline on PK fields.
-            lines.append(r"\savebox{\schemapkbox}{%")
+            # Must use \setbox0=\vbox, not \savebox — fuzz.sty's schema
+            # environment uses \halign which requires a \vbox context.
+            lines.append(r"\setbox0=\vbox{%")
             lines.append(begin_schema)
             lines.extend(plain_body)
             lines.extend(where_lines)

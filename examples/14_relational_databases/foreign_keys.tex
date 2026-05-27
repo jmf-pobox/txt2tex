@@ -11,7 +11,7 @@
 \newdimen\savedleftskip
 \title{Foreign Keys in Relational Schemas}
 \author{txt2tex example}
-\hypersetup{pdftitle={Foreign Keys in Relational Schemas},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.6.0}}
+\hypersetup{pdftitle={Foreign Keys in Relational Schemas},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.6.1}}
 \begin{document}
 
 \maketitle
@@ -26,7 +26,7 @@
 
 \bigskip
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Recipe}
 recipeId : RecipeId \\
 name : RecipeName \\
@@ -39,7 +39,7 @@ name : RecipeName \\
 cuisine : CuisineTag
 \end{schemapk}
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Ingredient}
 ingredientId : IngredientId \\
 name : IngredientName
@@ -58,7 +58,7 @@ name : IngredientName
 
 \bigskip
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{RecipeIngredient}
 recipeId : RecipeId \\
 ingredientId : IngredientId
@@ -119,7 +119,7 @@ $\forall ri : RecipeIngredient @ \exists i : Ingredient @ ri.ingredientId = i.in
 
 \bigskip
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Employee}
 employeeId : EmployeeId \\
 name : EmployeeName \\

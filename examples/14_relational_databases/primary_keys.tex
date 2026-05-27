@@ -11,7 +11,7 @@
 \newdimen\savedleftskip
 \title{Primary Keys in Relational Schemas}
 \author{txt2tex example}
-\hypersetup{pdftitle={Primary Keys in Relational Schemas},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.6.0}}
+\hypersetup{pdftitle={Primary Keys in Relational Schemas},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.6.1}}
 \begin{document}
 
 \maketitle
@@ -20,7 +20,7 @@
 
 \section*{Single Primary Key}
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Book}
 bookId : BookId \\
 isbn : ISBN \\
@@ -35,7 +35,7 @@ pages : \nat \\
 year : \nat
 \end{schemapk}
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Member}
 memberId : MemberId \\
 age : \nat
@@ -46,7 +46,7 @@ age : \nat
 age : \nat
 \end{schemapk}
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{Loan}
 loanId : LoanId \\
 bookId : BookId \\
@@ -63,7 +63,7 @@ daysOut : \nat
 
 \section*{Composite Primary Key}
 
-\savebox{\schemapkbox}{%
+\setbox0=\vbox{%
 \begin{schema}{LoanHistory}
 bookId : BookId \\
 memberId : MemberId

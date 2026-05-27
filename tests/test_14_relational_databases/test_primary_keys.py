@@ -183,12 +183,12 @@ class TestPKGenerator:
         r"""Schema without pk has no schemapk environment or \setbox."""
         frag = _fragment("schema S\n  b : U\nend")
         assert r"\begin{schemapk}" not in frag
-        assert r"\savebox{\schemapkbox}" not in frag
+        assert r"\setbox0=\vbox" not in frag
 
     def test_fuzz_copy_inside_savebox(self) -> None:
         r"""PK schema emits \savebox wrapping a plain \begin{schema}."""
         frag = _fragment("schema S\n  pk a : T\nend")
-        assert r"\savebox{\schemapkbox}{%" in frag
+        assert r"\setbox0=\vbox{%" in frag
         assert r"\begin{schema}{S}" in frag
 
     def test_pk_line_removed(self) -> None:
@@ -204,7 +204,7 @@ class TestPKGenerator:
     def test_fuzz_copy_no_underline(self) -> None:
         r"""The fuzz-checked copy inside \savebox must not contain \underline."""
         frag = _fragment("schema S\n  pk a : T\nend")
-        savebox_start = frag.find(r"\savebox{\schemapkbox}{%")
+        savebox_start = frag.find(r"\setbox0=\vbox{%")
         end_schema = frag.find(r"\end{schema}", savebox_start)
         box_end = frag.find("\n}", end_schema)
         fuzz_copy = frag[savebox_start : box_end + 2]
