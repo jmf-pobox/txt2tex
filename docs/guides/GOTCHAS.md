@@ -43,46 +43,23 @@ difference is only whether fuzz complains.
 
 ---
 
-## 2. Reserved single-letter identifiers
+## 2. ~~Reserved single-letter identifiers~~ (PARTIALLY RESOLVED)
 
-**Symptom.** Using `F`, `P`, `N`, or `Z` as an abbreviation name
-or variable name causes a parse error or unexpected rendering.
+`F` and `P` are reserved keywords (`\finset` and `\power`).
+Previously, `F == expr` failed because the parser treated `F` as a
+prefix operator.
 
-**Triggering example.**
-
-```text
-E == D group (Count(username) as total)
-F == pi[username,job](E)
-```
-
-```text
-Error: Expected identifier, number, '(', '{', '{|', '⟨', or lambda, got ABBREV
-
-2 | F == pi[username,job](E)
-  |   ^
-```
-
-The parser treats `F` as the finite-set prefix operator (`\finset`),
-then tries to parse `==` as its operand and fails.
-
-**Reserved letters and their meanings.**
+**Fixed:** `F` and `P` followed by `==` now parse as abbreviation
+names.  They remain reserved in expression context (e.g. `F S`
+still means `\finset S`).
 
 | Letter | Token | Z operator |
 |--------|-------|------------|
 | `F`    | FINSET | `\finset` (finite sets) |
 | `P`    | POWER  | `\power` (power set) |
-| `N`    | NAT    | `\nat` (natural numbers) |
-| `Z`    | ARITHMOS | `\arithmos` (integers) |
 
-**Workaround.** Use multi-character names:
-
-```text
-E == D group (Count(username) as total)
-Res == pi[username,job](E)
-```
-
-Any name longer than one character, or a single letter not in the
-table above, works as expected.
+`N` and `Z` are not reserved — they lex as plain identifiers and
+have always worked as abbreviation names.
 
 ---
 
