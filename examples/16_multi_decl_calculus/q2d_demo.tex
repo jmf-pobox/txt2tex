@@ -26,7 +26,7 @@
 
 \medskip
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Tournament}
 tournamentId : TournamentId \\
 venue : VenueName \\
@@ -43,7 +43,7 @@ tier : \nat
 tier \leq 5
 \end{schemapk}
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Player}
 name : PlayerName \\
 ranking : \nat
@@ -54,7 +54,7 @@ ranking : \nat
 ranking : \nat
 \end{schemapk}
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Match}
 matchId : MatchId \\
 tournament : TournamentId \\

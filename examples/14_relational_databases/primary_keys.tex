@@ -20,7 +20,7 @@
 
 \section*{Single Primary Key}
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Book}
 bookId : BookId \\
 isbn : ISBN \\
@@ -35,7 +35,7 @@ pages : \nat \\
 year : \nat
 \end{schemapk}
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Member}
 memberId : MemberId \\
 age : \nat
@@ -46,7 +46,7 @@ age : \nat
 age : \nat
 \end{schemapk}
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Loan}
 loanId : LoanId \\
 bookId : BookId \\
@@ -63,7 +63,7 @@ daysOut : \nat
 
 \section*{Composite Primary Key}
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{LoanHistory}
 bookId : BookId \\
 memberId : MemberId

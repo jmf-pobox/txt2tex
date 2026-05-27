@@ -183,12 +183,12 @@ class TestPKGenerator:
         r"""Schema without pk has no schemapk environment or \setbox."""
         frag = _fragment("schema S\n  b : U\nend")
         assert r"\begin{schemapk}" not in frag
-        assert r"\setbox0=\vbox" not in frag
+        assert r"\savebox{\schemapkbox}" not in frag
 
-    def test_fuzz_copy_inside_setbox(self) -> None:
-        r"""PK schema emits \setbox0=\vbox{%…} wrapping a plain \begin{schema}."""
+    def test_fuzz_copy_inside_savebox(self) -> None:
+        r"""PK schema emits \savebox wrapping a plain \begin{schema}."""
         frag = _fragment("schema S\n  pk a : T\nend")
-        assert r"\setbox0=\vbox{%" in frag
+        assert r"\savebox{\schemapkbox}{%" in frag
         assert r"\begin{schema}{S}" in frag
 
     def test_pk_line_removed(self) -> None:
@@ -202,13 +202,12 @@ class TestPKGenerator:
         assert r"\begin{schemapk}{Class}" in frag
 
     def test_fuzz_copy_no_underline(self) -> None:
-        r"""The fuzz-checked copy inside \setbox must not contain \underline."""
+        r"""The fuzz-checked copy inside \savebox must not contain \underline."""
         frag = _fragment("schema S\n  pk a : T\nend")
-        setbox_start = frag.find(r"\setbox0=\vbox{%")
-        end_schema = frag.find(r"\end{schema}", setbox_start)
-        # Find the closing brace of the vbox (appears after \end{schema})
-        vbox_end = frag.find("\n}", end_schema)
-        fuzz_copy = frag[setbox_start : vbox_end + 2]
+        savebox_start = frag.find(r"\savebox{\schemapkbox}{%")
+        end_schema = frag.find(r"\end{schema}", savebox_start)
+        box_end = frag.find("\n}", end_schema)
+        fuzz_copy = frag[savebox_start : box_end + 2]
         assert r"\underline" not in fuzz_copy
 
     def test_rendered_copy_uses_schemapk_env(self) -> None:
@@ -223,6 +222,13 @@ class TestPKGenerator:
         assert r"\underline{a}" in frag
         # b must appear without \underline wrapping
         assert r"\underline{b}" not in frag
+
+    def test_comma_separated_pk_both_underlined(self) -> None:
+        r"""pk a, b : T — both names underlined independently."""
+        frag = _fragment("schema S\n  pk a, b : T\nend")
+        assert r"\underline{a}" in frag
+        assert r"\underline{b}" in frag
+        assert r"\begin{schemapk}{S}" in frag
 
     def test_generic_params_duplicated(self) -> None:
         r"""Schema with generic params: both fuzz copy and schemapk copy carry [X]."""

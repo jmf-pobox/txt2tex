@@ -24,7 +24,7 @@
 
 \bigskip
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Universal}
 empID : EmpID \\
 empName : EmpName \\
@@ -127,7 +127,7 @@ projName : ProjName
 
 \bigskip
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Employee}
 empID : EmpID \\
 empName : EmpName \\
@@ -140,7 +140,7 @@ empName : EmpName \\
 dept : DeptName
 \end{schemapk}
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Department}
 dept : DeptName \\
 deptHead : HeadName
@@ -151,7 +151,7 @@ deptHead : HeadName
 deptHead : HeadName
 \end{schemapk}
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Project}
 projID : ProjID \\
 projName : ProjName
@@ -162,7 +162,7 @@ projName : ProjName
 projName : ProjName
 \end{schemapk}
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Assignment}
 empID : EmpID \\
 projID : ProjID

@@ -26,7 +26,7 @@
 
 \bigskip
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Recipe}
 recipeId : RecipeId \\
 name : RecipeName \\
@@ -39,7 +39,7 @@ name : RecipeName \\
 cuisine : CuisineTag
 \end{schemapk}
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Ingredient}
 ingredientId : IngredientId \\
 name : IngredientName
@@ -58,7 +58,7 @@ name : IngredientName
 
 \bigskip
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{RecipeIngredient}
 recipeId : RecipeId \\
 ingredientId : IngredientId
@@ -119,7 +119,7 @@ $\forall ri : RecipeIngredient @ \exists i : Ingredient @ ri.ingredientId = i.in
 
 \bigskip
 
-\setbox0=\vbox{%
+\savebox{\schemapkbox}{%
 \begin{schema}{Employee}
 employeeId : EmployeeId \\
 name : EmployeeName \\
