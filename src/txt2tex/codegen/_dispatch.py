@@ -18,10 +18,15 @@ from collections.abc import Callable
 from functools import singledispatchmethod
 from typing import TYPE_CHECKING, ClassVar, TypeVar, cast
 
-from txt2tex.ast_nodes import DocumentItem, Expr
+from txt2tex.ast_nodes import Binding, DocumentItem, Expr, SetComprehension
 
 if TYPE_CHECKING:
-    from txt2tex.ast_nodes import BinaryOp, Identifier, Quantifier, SchemaInclusion
+    from txt2tex.ast_nodes import (
+        BinaryOp,
+        Identifier,
+        Quantifier,
+        SchemaInclusion,
+    )
 
 F = TypeVar("F", bound=Callable[..., object])
 
@@ -65,6 +70,8 @@ class CodegenDispatch:
         _first_part_in_solution: bool
         _in_argue_block: bool
         _dollar_sanitise_registry: dict[str, str]
+        _synth_abbrev_counter: int
+        _in_hidden_fuzz_block: bool
         parts_format: str
         toc_parts: bool
         use_fuzz: bool
@@ -108,6 +115,14 @@ class CodegenDispatch:
             self, items: list[DocumentItem]
         ) -> list[str]: ...
         def _emit_attr_name(self, name: str) -> str: ...
+        def _next_synth_name(self) -> str: ...
+        def _binding_to_tuple_expr(self, binding: Binding) -> Expr: ...
+        def _replace_binding_with_tuple(
+            self, node: SetComprehension
+        ) -> SetComprehension: ...
+        def _emit_hidden_abbreviation(
+            self, name_latex: str, expr: Expr
+        ) -> list[str]: ...
 
     @singledispatchmethod
     def generate_document_item(self, item: DocumentItem) -> list[str]:
@@ -126,31 +141,38 @@ class CodegenDispatch:
         """
         # Fallback only reached for Expr types (all document types are registered)
         expr = cast("Expr", item)
+
+        # Standalone set comprehension in fuzz mode: emit a hidden synthetic
+        # abbreviation for fuzz validation before the visible inline-math copy.
+        if self.use_fuzz and isinstance(expr, SetComprehension):
+            hidden_expr = self._replace_binding_with_tuple(expr)
+            synth_name = self._next_synth_name()
+            hidden_lines = self._emit_hidden_abbreviation(synth_name, hidden_expr)
+            return hidden_lines + self._generate_expr_document_item(expr)
+
+        return self._generate_expr_document_item(expr)
+
+    def _generate_expr_document_item(self, expr: Expr) -> list[str]:
+        """Emit the visible inline-math lines for an expression document item."""
         latex_expr = self.generate_expr(expr)
 
         if self._has_line_breaks(expr):
-            # Multi-line expression: use display math with array
-            # Respect inline part context for proper positioning
             lines: list[str] = []
 
             if self._in_inline_part:
-                # Inside part with leftskip: position naturally with leftskip
                 lines.append(r"\savedleftskip=\leftskip")
                 lines.append(r"\noindent")
             else:
-                # Normal context: just prevent paragraph indentation
                 lines.append(r"\noindent")
 
             lines.append(r"$\displaystyle")
-            lines.append(r"\begin{array}{l}")  # Left-aligned single column
+            lines.append(r"\begin{array}{l}")
             lines.append(latex_expr)
             lines.append(r"\end{array}$")
             lines.append("")
-            # Add trailing spacing for separation from following content
             lines.append(r"\bigskip")
             lines.append("")
             return lines
-        # Single-line expression: use inline math (original behavior)
         return [r"\noindent", f"${latex_expr}$", "", ""]
 
     @singledispatchmethod

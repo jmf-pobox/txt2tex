@@ -165,6 +165,8 @@ class LaTeXGenerator(
     _overflow_threshold: int
     _overflow_warnings: list[str]
     _dollar_sanitise_registry: dict[str, str]
+    _synth_abbrev_counter: int
+    _in_hidden_fuzz_block: bool
 
     def __init__(
         self,
@@ -201,6 +203,13 @@ class LaTeXGenerator(
         self._overflow_warnings = []  # Collected warnings to emit
         # Populated by _pre_sanitise_dollars, consumed by _restore_dollar_sanitise
         self._dollar_sanitise_registry = {}
+        self._synth_abbrev_counter = 0
+        self._in_hidden_fuzz_block = False
+
+    def _next_synth_name(self) -> str:
+        """Generate the next synthetic abbreviation name for fuzz validation."""
+        self._synth_abbrev_counter += 1
+        return f"zS_{self._synth_abbrev_counter}"
 
     # -------------------------------------------------------------------------
     # Overflow warning helpers

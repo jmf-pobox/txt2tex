@@ -2907,3 +2907,68 @@ jms ruling (2026-05-23):
   inline math; fuzz never processed them).
 - 6 new parser tests (`TestRelationRenameParser`) and 2 generator tests
   (`TestRelationRenameGenerator`) in `test_algebra.py` cover the new form.
+
+## ADR: Dual-emit fuzz validation for set comprehensions with bindings
+
+**Context.**  Binding literals (`{| a == e1, b == e2 |}`) are not part
+of fuzz's Z grammar — fuzz rejects `==` inside a binding bracket.  Set
+comprehensions whose characteristic expression is a binding therefore
+route to inline math (`\noindent$...$`), which fuzz silently skips.
+This means fuzz never validates the types of the variables, domain, or
+predicate in these expressions.  Standalone set comprehensions (not
+wrapped in an abbreviation) also escape fuzz validation because fuzz
+only accepts abbreviations inside `\begin{zed}...\end{zed}`, not bare
+expressions.  The PK underline dual-emit pattern (this document, "ADR:
+pk Primary-Key Underline via Dual-Emit") established the technique of
+emitting a hidden fuzz-valid copy inside `\setbox0=\vbox{%...}` and a
+visible PDF copy.
+
+**Decision.**  Two orthogonal transforms, applied at LaTeX generation
+time:
+
+1. **Synthetic abbreviation wrapping.**  Any standalone set
+   comprehension (not already the RHS of an abbreviation) is assigned
+   a synthetic name (`zS_1`, `zS_2`, ...) and emitted as a hidden
+   `\setbox0=\vbox{\begin{zed}zS_N == ...\end{zed}}` before the
+   visible inline-math copy.  fuzz validates the hidden abbreviation;
+   pdflatex discards the box.
+
+2. **Binding-to-tuple conversion.**  When a set comprehension's
+   characteristic expression is a `Binding` node, the hidden fuzz copy
+   replaces it with the equivalent tuple: single-field `{| a == e1 |}`
+   becomes `e1`; multi-field `{| a == e1, b == e2 |}` becomes
+   `(e1, e2)`.  The visible copy keeps the binding intact.
+
+fuzz's `\begin{zed}` parser does not accept `\begin{array}` (used for
+WYSIWYG line breaks in set comprehensions).  The `_in_hidden_fuzz_block`
+flag suppresses this wrapping inside hidden copies.
+
+Synthetic names use the prefix `zS_` (verified to be valid fuzz
+identifiers; the alternative `\_S` was rejected — fuzz treats `\_` as
+a syntax error).
+
+**Implementation.**  `codegen/fuzz_routing.py` (binding-to-tuple,
+hidden-emit helpers), `codegen/paragraphs.py` (abbreviation dual-emit),
+`codegen/_dispatch.py` (standalone set comp dual-emit),
+`codegen/expressions.py` (`_in_hidden_fuzz_block` check).
+
+**Rejected alternatives.**
+
+1. *Modify fuzz to accept bindings.* Not feasible — fuzz is an
+   external tool we do not maintain.
+
+2. *Only validate abbreviations, not standalone expressions.*
+   Standalone set comprehensions in exercise solutions are common;
+   leaving them unvalidated defeats the purpose.
+
+**Consequences.**
+
+- Set comprehensions with bindings are now fuzz-validated via the
+  tuple-equivalent hidden copy.  Type errors in declarations,
+  predicates, and field projections are caught.
+- Standalone set comprehensions are fuzz-validated via synthetic
+  abbreviations.  Previously they had no fuzz coverage.
+- The synthetic abbreviation names (`zS_1`, `zS_2`, ...) appear in
+  `fuzz -t` output but are invisible in the PDF.
+- 14 new tests in `test_set_comp_fuzz_validation.py` cover all four
+  cases (standalone ± binding, abbreviation ± binding).
