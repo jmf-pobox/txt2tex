@@ -261,15 +261,12 @@ Every code change follows this pipeline. Steps are ordered.
          thread { isResolved } } }'
      ```
 
-     Resolving creates a `jmf-pobox COMMENTED` review entry as a
-     side effect.
    - Wait for the next round of reviews on the new commit.  Do not
      treat "all threads resolved" as sufficient — the new push may
      trigger new findings.
 
 5. **When feedback is marginal or zero** and **all CI checks have
-   passed** (quality 3.12, quality 3.13; Cursor Bugbot may be
-   skipped after 6 minutes), merge:
+   passed** and **all review threads are resolved**, merge:
 
    ```bash
    gh pr merge <N> --merge
@@ -279,11 +276,12 @@ Every code change follows this pipeline. Steps are ordered.
    or releases.  If Cursor Bugbot has not responded after 6 minutes,
    it is safe to proceed without it.
 
-   **Do not use `--admin` to bypass.**  Do not add explicit
-   `gh pr review --comment` calls — that creates a self-review under
-   `jmf-pobox` (the PR author), which is not valid.  Branch
-   protection does not require a human reviewer; the maintainer
-   review entry created by resolving threads is sufficient.
+   **Branch protection rules** — merge requires:
+   - All required status checks passed (quality 3.12, quality 3.13).
+     Cursor Bugbot is not a required check.
+   - All review threads resolved.
+
+   **Do not use `--admin` to bypass.**
 
 #### Phase 7: Close
 
