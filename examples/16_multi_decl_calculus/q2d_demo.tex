@@ -11,7 +11,7 @@
 \newdimen\savedleftskip
 \title{Multi-Declaration Z Constructs --- Demo}
 \author{txt2tex}
-\hypersetup{pdftitle={Multi-Declaration Z Constructs --- Demo},pdfauthor={txt2tex},pdfcreator={txt2tex v1.6.2}}
+\hypersetup{pdftitle={Multi-Declaration Z Constructs --- Demo},pdfauthor={txt2tex},pdfcreator={txt2tex v1.6.3}}
 \begin{document}
 
 \maketitle
@@ -90,6 +90,13 @@ $\displaystyle
 
 \bigskip
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_1 == \{~ m : Match ; t : Tournament ; p : Player | m.tournament = t.tournamentId \land \\
+\quad m.winner = p.name \land \\
+\quad t.venue = `Centre Court' @ \\ (m.winner, t.venue, t.tier) ~\}
+\end{zed}%
+}
 \noindent
 $\displaystyle
 \begin{array}{l}
@@ -116,6 +123,11 @@ $\displaystyle
 
 \bigskip
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_2 == \{~ m : Match ; t : Tournament | m.tournament = t.tournamentId \land t.tier \leq 2 ~\}
+\end{zed}%
+}
 \noindent
 $\{~ m : Match ; t : Tournament | m.tournament = t.tournamentId \land t.tier \leq 2 ~\}$
 

@@ -11,7 +11,7 @@
 \newdimen\savedleftskip
 \title{Z Binding Calculus}
 \author{txt2tex example}
-\hypersetup{pdftitle={Z Binding Calculus},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.6.2}}
+\hypersetup{pdftitle={Z Binding Calculus},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.6.3}}
 \begin{document}
 
 \maketitle
@@ -39,6 +39,11 @@ $\lblot~trackId == t.trackId~\rblot$
 
 \section*{Binding in Set Comprehension}
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_1 == \{~ t : Track | t.duration < 180 @ t.trackId ~\}
+\end{zed}%
+}
 \noindent
 $\{~ t : Track | t.duration < 180 @ \lblot~trackId == t.trackId~\rblot ~\}$
 
@@ -51,6 +56,11 @@ $\lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot$
 
 \section*{Multi-Variable Comprehension with Binding}
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_2 == \{~ t : Track ; a : Album | t.albumId = a.albumId @ \\ (t.trackId, a.year, a.tracks) ~\}
+\end{zed}%
+}
 \noindent
 $\begin{array}{l}\{~ t : Track ; a : Album | t.albumId = a.albumId @ \\ \lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot  ~\}\end{array}$
 

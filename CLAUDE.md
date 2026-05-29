@@ -222,7 +222,7 @@ Every code change follows this pipeline. Steps are ordered.
 3. **Enter the review loop.**  This is iterative — typically 2–6
    rounds.  Use `/loop 2m` to poll; never block the session.
 
-   ```
+   ```text
    Push → wait for bot reviews → address findings → push → repeat
    ```
 

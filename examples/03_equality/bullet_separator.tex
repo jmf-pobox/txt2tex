@@ -20,6 +20,11 @@
 
 \bigskip
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_1 == \{~ x : \nat | x > 0 @ x * x ~\}
+\end{zed}%
+}
 \noindent
 $\{~ x : \nat | x > 0 @ x * x ~\}$
 
@@ -35,6 +40,11 @@ $\{~ x : \nat | x > 0 @ x * x ~\}$
 
 \bigskip
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_2 == \{~ x : \nat | x > 0 \land x < 10 ~\}
+\end{zed}%
+}
 \noindent
 $\{~ x : \nat | x > 0 \land x < 10 ~\}$
 
@@ -50,6 +60,11 @@ $\{~ x : \nat | x > 0 \land x < 10 ~\}$
 
 \bigskip
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_3 == \{~ n : \nat | n < 5 @ n * n ~\}
+\end{zed}%
+}
 \noindent
 $\{~ n : \nat | n < 5 @ n * n ~\}$
 
@@ -62,6 +77,11 @@ $\{~ n : \nat | n < 5 @ n * n ~\}$
 
 \bigskip
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_4 == \{~ n : \nat | n < 5 ~\}
+\end{zed}%
+}
 \noindent
 $\{~ n : \nat | n < 5 ~\}$
 
@@ -110,6 +130,11 @@ $(\mu n : \nat | n * n = 16 @ n + 1)$
 \section*{Example 7 : Nested Expressions}
 \addcontentsline{toc}{section}{Example 7 : Nested Expressions}
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_5 == \{~ x : \nat | x < 3 @ \{~ y : \nat | y < x @ (x, y) ~\} ~\}
+\end{zed}%
+}
 \noindent
 $\{~ x : \nat | x < 3 @ \{~ y : \nat | y < x @ (x, y) ~\} ~\}$
 
@@ -185,6 +210,11 @@ high\_salaries = \{~ e : Employee | salaries(e) > 100000 @ salaries(e) ~\}
 
 \bigskip
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_6 == \{~ n : \nat | n < 10 @ n * n ~\}
+\end{zed}%
+}
 \noindent
 $\{~ n : \nat | n < 10 @ n * n ~\}$
 
@@ -197,6 +227,11 @@ $\{~ n : \nat | n < 10 @ n * n ~\}$
 
 \bigskip
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_7 == \{~ n : \nat | n \mod 2 = 0 ~\}
+\end{zed}%
+}
 \noindent
 $\{~ n : \nat | n \mod 2 = 0 ~\}$
 

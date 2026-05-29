@@ -11,18 +11,38 @@
 \newdimen\savedleftskip
 \begin{document}
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_1 == \{~ x : \nat | x > 0 ~\}
+\end{zed}%
+}
 \noindent
 $\{~ x : \nat | x > 0 ~\}$
 
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_2 == \{~ x : \nat | x > 0 @ x \bsup 2 \esup ~\}
+\end{zed}%
+}
 \noindent
 $\{~ x : \nat | x > 0 @ x \bsup 2 \esup ~\}$
 
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_3 == \{~ x, y : \nat | x = y ~\}
+\end{zed}%
+}
 \noindent
 $\{~ x, y : \nat | x = y ~\}$
 
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_4 == \{~ x | x \in A ~\}
+\end{zed}%
+}
 \noindent
 $\{~ x | x \in A ~\}$
 
