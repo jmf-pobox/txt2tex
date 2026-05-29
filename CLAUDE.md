@@ -227,19 +227,23 @@ Every code change follows this pipeline. Steps are ordered.
    ```
 
    Each push triggers fresh reviews from Copilot and Cursor Bugbot.
-   Poll with:
+   Poll reviews and CI status with:
 
    ```bash
-   gh pr view <N> --json reviews
+   gh pr view <N> --json reviews,statusCheckRollup \
+     --jq '{reviews: [.reviews[] | "\(.author.login) \(.state)"],
+            checks:  [.statusCheckRollup[] |
+                      "\(.context // .name) \(.state // .status)"]}'
    gh api repos/jmf-pobox/txt2tex/pulls/<N>/comments --jq 'length'
    ```
 
    When a review lands, check for unresolved threads:
 
    ```bash
-   gh api graphql -f query='{ repository(owner: "jmf-pobox", name: "txt2tex") {
-     pullRequest(number: <N>) { reviewThreads(first: 20) { nodes {
-       id isResolved comments(first: 1) { nodes { body } } } } } } }'
+   gh api graphql -f query='{ repository(owner: "jmf-pobox",
+     name: "txt2tex") { pullRequest(number: <N>) {
+     reviewThreads(first: 100) { nodes { id isResolved
+     comments(first: 1) { nodes { path line body } } } } } } }'
    ```
 
 4. **For every unresolved thread:**
@@ -249,13 +253,23 @@ Every code change follows this pipeline. Steps are ordered.
      factually wrong.)
    - Push the fix.
    - Resolve the thread via the GraphQL `resolveReviewThread`
-     mutation.  Resolving creates a `jmf-pobox COMMENTED` review
-     entry as a side effect.
+     mutation:
+
+     ```bash
+     gh api graphql -f query='mutation {
+       resolveReviewThread(input: {threadId: "<THREAD_ID>"}) {
+         thread { isResolved } } }'
+     ```
+
+     Resolving creates a `jmf-pobox COMMENTED` review entry as a
+     side effect.
    - Wait for the next round of reviews on the new commit.  Do not
      treat "all threads resolved" as sufficient — the new push may
      trigger new findings.
 
-5. **When feedback is marginal or zero**, merge:
+5. **When feedback is marginal or zero** and **all CI checks have
+   passed** (quality 3.12, quality 3.13; Cursor Bugbot may be
+   skipped after 6 minutes), merge:
 
    ```bash
    gh pr merge <N> --merge
