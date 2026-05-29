@@ -165,6 +165,8 @@ class LaTeXGenerator(
     _overflow_threshold: int
     _overflow_warnings: list[str]
     _dollar_sanitise_registry: dict[str, str]
+    _synth_abbrev_counter: int
+    _in_hidden_fuzz_block: bool
 
     def __init__(
         self,
@@ -201,6 +203,13 @@ class LaTeXGenerator(
         self._overflow_warnings = []  # Collected warnings to emit
         # Populated by _pre_sanitise_dollars, consumed by _restore_dollar_sanitise
         self._dollar_sanitise_registry = {}
+        self._synth_abbrev_counter = 0
+        self._in_hidden_fuzz_block = False
+
+    def _next_synth_name(self) -> str:
+        """Generate the next synthetic abbreviation name for fuzz validation."""
+        self._synth_abbrev_counter += 1
+        return f"zS_{self._synth_abbrev_counter}"
 
     # -------------------------------------------------------------------------
     # Overflow warning helpers
@@ -274,13 +283,20 @@ class LaTeXGenerator(
         while i < len(items):
             item = items[i]
             # Check if this is a zed-generating item
-            if isinstance(item, (GivenType, FreeType, Abbreviation)):
-                # Collect consecutive zed items
+            if isinstance(item, (GivenType, FreeType, Abbreviation)) and not (
+                isinstance(item, Abbreviation)
+                and self._expression_contains_dat_construct(item.expression)
+            ):
+                # Collect consecutive zed items (exclude DAT abbreviations)
                 zed_items: list[GivenType | FreeType | Abbreviation] = [item]
                 j = i + 1
                 while j < len(items):
                     next_item = items[j]
                     if not isinstance(next_item, (GivenType, FreeType, Abbreviation)):
+                        break
+                    if isinstance(
+                        next_item, Abbreviation
+                    ) and self._expression_contains_dat_construct(next_item.expression):
                         break
                     zed_items.append(next_item)
                     j += 1

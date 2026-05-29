@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Dual-emit fuzz validation for set comprehensions** — set
+  comprehensions with binding characteristic expressions (`{| a == e1 |}`)
+  are now fuzz-validated via a hidden copy that converts bindings to
+  tuples.  Standalone set comprehensions (not wrapped in abbreviations)
+  are also validated via synthetic abbreviations (`zS_1`, `zS_2`, ...).
+  Previously, both cases bypassed fuzz entirely.
+
 ## [1.6.2] - 2026-05-27
 
 ### Fixed

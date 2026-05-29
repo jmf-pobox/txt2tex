@@ -947,7 +947,9 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         # environment for proper multi-line rendering.  The opening
         # brace sits on the first row and the closing brace on the
         # last row (textbook convention).
-        if node.line_break_after_pipe or node.line_break_after_bullet:
+        if (
+            node.line_break_after_pipe or node.line_break_after_bullet
+        ) and not self._in_hidden_fuzz_block:
             inner = result[len(r"\{~ ") :].removesuffix(r"~\}")
             return (
                 r"\begin{array}{l}"

@@ -13,6 +13,7 @@ from __future__ import annotations
 from txt2tex.ast_nodes import (
     Abbreviation,
     AxDef,
+    Binding,
     Document,
     Expr,
     FreeType,
@@ -21,6 +22,7 @@ from txt2tex.ast_nodes import (
     Identifier,
     SchemaInclusion,
     SequenceLiteral,
+    SetComprehension,
     SyntaxBlock,
     SyntaxDefinition,
     Zed,
@@ -215,6 +217,21 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
 
         # Pick the wrapping based on RHS content
         if is_relational_rhs:
+            # Dual-emit for binding set comprehensions: hidden copy with
+            # tuple for fuzz validation, visible copy with binding for PDF.
+            if (
+                self.use_fuzz
+                and isinstance(node.expression, SetComprehension)
+                and isinstance(node.expression.expression, Binding)
+            ):
+                converted = self._replace_binding_with_tuple(node.expression)
+                if not self._expression_contains_dat_construct(converted):
+                    if node.generic_params:
+                        params_str = ", ".join(node.generic_params)
+                        hidden_name = f"{name_latex}[{params_str}]"
+                    else:
+                        hidden_name = name_latex
+                    lines.extend(self._emit_hidden_abbreviation(hidden_name, converted))
             # Relational RHS — emit outside any Z environment so fuzz silently skips
             lines.append("\\noindent")
             lines.append(f"${abbrev}$")
