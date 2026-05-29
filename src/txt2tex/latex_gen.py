@@ -283,13 +283,20 @@ class LaTeXGenerator(
         while i < len(items):
             item = items[i]
             # Check if this is a zed-generating item
-            if isinstance(item, (GivenType, FreeType, Abbreviation)):
-                # Collect consecutive zed items
+            if isinstance(item, (GivenType, FreeType, Abbreviation)) and not (
+                isinstance(item, Abbreviation)
+                and self._expression_contains_dat_construct(item.expression)
+            ):
+                # Collect consecutive zed items (exclude DAT abbreviations)
                 zed_items: list[GivenType | FreeType | Abbreviation] = [item]
                 j = i + 1
                 while j < len(items):
                     next_item = items[j]
                     if not isinstance(next_item, (GivenType, FreeType, Abbreviation)):
+                        break
+                    if isinstance(
+                        next_item, Abbreviation
+                    ) and self._expression_contains_dat_construct(next_item.expression):
                         break
                     zed_items.append(next_item)
                     j += 1
