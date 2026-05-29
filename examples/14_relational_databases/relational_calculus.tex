@@ -11,7 +11,7 @@
 \newdimen\savedleftskip
 \title{Relational Calculus --- Music Library}
 \author{txt2tex example}
-\hypersetup{pdftitle={Relational Calculus --- Music Library},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.6.2}}
+\hypersetup{pdftitle={Relational Calculus --- Music Library},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.6.3}}
 \begin{document}
 
 \maketitle
@@ -47,6 +47,11 @@ member : PlaylistId \rel TrackId
 
 \bigskip
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_1 == \{~ t : Track | t.genre = `Jazz' @ \\ (t.title, t.genre) ~\}
+\end{zed}%
+}
 \noindent
 $\begin{array}{l}\{~ t : Track | t.genre = `Jazz' @ \\ \lblot~title == t.title, genre == t.genre~\rblot  ~\}\end{array}$
 
@@ -57,6 +62,12 @@ $\begin{array}{l}\{~ t : Track | t.genre = `Jazz' @ \\ \lblot~title == t.title, 
 
 \bigskip
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_2 == \{~ t : Track ; al : Album ; ar : Artist | t.alid = al.alid \land \\
+\quad al.arid = ar.arid @ \\ (t.title, ar.name) ~\}
+\end{zed}%
+}
 \noindent
 $\displaystyle
 \begin{array}{l}
@@ -72,6 +83,12 @@ $\displaystyle
 
 \bigskip
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_3 == \{~ p : PlaylistId ; t : Track ; al : Album | (p, t.tid) \in member \land \\
+\quad t.alid = al.alid @ \\ (p, t.title, al.title) ~\}
+\end{zed}%
+}
 \noindent
 $\displaystyle
 \begin{array}{l}
@@ -87,6 +104,12 @@ $\displaystyle
 
 \bigskip
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_4 == \{~ t : Track ; al : Album | t.alid = al.alid \land \\
+\quad t.duration > 300 @ \\ (t.title, al.title) ~\}
+\end{zed}%
+}
 \noindent
 $\displaystyle
 \begin{array}{l}
@@ -113,6 +136,12 @@ $\displaystyle
 
 \bigskip
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_5 == \{~ t : Track ; al : Album | t.alid = al.alid \land \\
+\quad t.duration > 300 ~\}
+\end{zed}%
+}
 \noindent
 $\displaystyle
 \begin{array}{l}

@@ -57,6 +57,11 @@ $\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
 \section*{Example 4 : Set Comprehension Scope}
 \addcontentsline{toc}{section}{Example 4 : Set Comprehension Scope}
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_1 == \{~ x : \nat | x > 0 \land x < 10 ~\}
+\end{zed}%
+}
 \noindent
 $\{~ x : \nat | x > 0 \land x < 10 ~\}$
 
@@ -68,6 +73,11 @@ $\{~ x : \nat | x > 0 \land x < 10 ~\}$
 \section*{Example 5 : Bullet Separator Scope}
 \addcontentsline{toc}{section}{Example 5 : Bullet Separator Scope}
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_2 == \{~ x : \nat | x < 5 @ x * x ~\}
+\end{zed}%
+}
 \noindent
 $\{~ x : \nat | x < 5 @ x * x ~\}$
 
@@ -239,6 +249,11 @@ $(\mu x : \nat | x * x = 25)$
 \section*{Example 16 : Set Comprehension with Multiple Variables}
 \addcontentsline{toc}{section}{Example 16 : Set Comprehension with Multiple Variables}
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_3 == \{~ x, y : \nat | x < y \land y < 10 @ (x, y) ~\}
+\end{zed}%
+}
 \noindent
 $\{~ x, y : \nat | x < y \land y < 10 @ (x, y) ~\}$
 

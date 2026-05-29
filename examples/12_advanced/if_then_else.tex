@@ -71,6 +71,11 @@ sign : \num \fun \{-1, 0, 1\}
 \section*{Example 5 : Conditional elem Set Comprehension}
 \addcontentsline{toc}{section}{Example 5 : Conditional elem Set Comprehension}
 
+\setbox0=\vbox{%
+\begin{zed}
+zS_1 == \{~ x : \nat | x < 10 @ \IF x \mod 2 = 0 \THEN x \ELSE x + 1 ~\}
+\end{zed}%
+}
 \noindent
 $\{~ x : \nat | x < 10 @ \IF x \mod 2 = 0 \THEN x \ELSE x + 1 ~\}$
 
