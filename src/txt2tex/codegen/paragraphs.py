@@ -225,12 +225,13 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                 and isinstance(node.expression.expression, Binding)
             ):
                 converted = self._replace_binding_with_tuple(node.expression)
-                if node.generic_params:
-                    params_str = ", ".join(node.generic_params)
-                    hidden_name = f"{name_latex}[{params_str}]"
-                else:
-                    hidden_name = name_latex
-                lines.extend(self._emit_hidden_abbreviation(hidden_name, converted))
+                if not self._expression_contains_dat_construct(converted):
+                    if node.generic_params:
+                        params_str = ", ".join(node.generic_params)
+                        hidden_name = f"{name_latex}[{params_str}]"
+                    else:
+                        hidden_name = name_latex
+                    lines.extend(self._emit_hidden_abbreviation(hidden_name, converted))
             # Relational RHS — emit outside any Z environment so fuzz silently skips
             lines.append("\\noindent")
             lines.append(f"${abbrev}$")
