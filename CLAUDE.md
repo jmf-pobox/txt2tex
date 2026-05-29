@@ -219,52 +219,57 @@ Every code change follows this pipeline. Steps are ordered.
 1. Commit with conventional message format (`type(scope): description`).
    `make check` must pass.
 2. Push branch, create PR.
-3. Watch CI.  Wait for the bot review (Copilot or Cursor Bugbot) to
-   land.  A bot review can land in one of two shapes:
+3. **Enter the review loop.**  This is iterative — typically 2–6
+   rounds.  Use `/loop 2m` to poll; never block the session.
 
-   - line-level threads on specific files (the usual code-PR case), or
-   - a summary review only, with zero threads (typical for docs-only
-     PRs).
+   ```
+   Push → wait for bot reviews → address findings → push → repeat
+   ```
 
-   Either shape counts as "review landed."  Poll
-   `gh pr view <N> --json reviews,reviewThreads` until at least one
-   bot entry appears in either field; only then proceed to step 4.
-4. **Diligence on the bot review — the only path to merge.**
+   Each push triggers fresh reviews from Copilot and Cursor Bugbot.
+   Poll with:
 
-   **Case A — bot opens line-level threads.**  For every thread:
+   ```bash
+   gh pr view <N> --json reviews
+   gh api repos/jmf-pobox/txt2tex/pulls/<N>/comments --jq 'length'
+   ```
+
+   When a review lands, check for unresolved threads:
+
+   ```bash
+   gh api graphql -f query='{ repository(owner: "jmf-pobox", name: "txt2tex") {
+     pullRequest(number: <N>) { reviewThreads(first: 20) { nodes {
+       id isResolved comments(first: 1) { nodes { body } } } } } } }'
+   ```
+
+4. **For every unresolved thread:**
    - Read the comment in full.
    - Address the issue with a code change, even if the finding is
      small.  ("Nit-only" findings still get fixed unless they are
      factually wrong.)
-   - Reply on the thread linking the commit that addressed it.
+   - Push the fix.
    - Resolve the thread via the GraphQL `resolveReviewThread`
-     mutation.
-   Replying to threads automatically creates a `jmf-pobox COMMENTED`
-   review entry, which is what branch protection actually requires.
+     mutation.  Resolving creates a `jmf-pobox COMMENTED` review
+     entry as a side effect.
+   - Wait for the next round of reviews on the new commit.  Do not
+     treat "all threads resolved" as sufficient — the new push may
+     trigger new findings.
 
-   **Case B — bot leaves a summary review with no line-level threads
-   (typical for docs-only PRs).**  There is nothing to resolve, but
-   branch protection still expects a maintainer review entry.  Add
-   one explicitly:
+5. **When feedback is marginal or zero**, merge:
 
    ```bash
-   gh pr review <N> --comment --body "Reviewed. <one-sentence ack>."
+   gh pr merge <N> --merge
    ```
 
-   This creates the missing `jmf-pobox COMMENTED` review and unblocks
-   the merge.
+   Preserves the per-batch history; never `--squash` for refactors
+   or releases.  If Cursor Bugbot has not responded after 6 minutes,
+   it is safe to proceed without it.
 
-   **The actual protection rule is:** at least one COMMENTED or
-   APPROVED review entry from a maintainer must exist on the PR.
-   Resolving threads (Case A) creates one as a side effect.  When
-   there are no threads (Case B), the maintainer-side review must be
-   added manually.  Either way, branch protection enforces *engaged
-   review*, not admin workarounds.  **Do not use `--admin` to
-   bypass.**  If `gh pr merge <N> --merge` reports "base branch
-   policy prohibits the merge," the missing piece is either an
-   unresolved thread or a missing maintainer review entry.
-5. Merge with `gh pr merge <N> --merge` (preserves the per-batch
-   history; never `--squash` for refactors or releases).
+   **Do not use `--admin` to bypass.**  Do not add explicit
+   `gh pr review --comment` calls — that creates a self-review under
+   `jmf-pobox` (the PR author), which is not valid.  Branch
+   protection does not require a human reviewer; the maintainer
+   review entry created by resolving threads is sufficient.
 
 #### Phase 7: Close
 
