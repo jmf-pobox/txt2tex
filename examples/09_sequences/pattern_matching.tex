@@ -12,9 +12,10 @@
 \begin{document}
 
 \section*{Pattern Matching with Sequences}
+\addcontentsline{toc}{section}{Pattern Matching with Sequences}
 
-\section*{Example 1 : Empty Sequence Pattern}
-\addcontentsline{toc}{section}{Example 1 : Empty Sequence Pattern}
+\subsection*{Example 1 : Empty Sequence Pattern}
+\addcontentsline{toc}{subsection}{Example 1 : Empty Sequence Pattern}
 
 \noindent Pattern matching on the empty sequence:
 
@@ -26,8 +27,8 @@ f : \seq~\nat \fun \nat
 f(\langle \rangle) = 0
 \end{axdef}
 
-\section*{Example 2 : Cons Pattern ( Head land Tail )}
-\addcontentsline{toc}{section}{Example 2 : Cons Pattern ( Head land Tail )}
+\subsection*{Example 2 : Cons Pattern ( Head land Tail )}
+\addcontentsline{toc}{subsection}{Example 2 : Cons Pattern ( Head land Tail )}
 
 \noindent Decomposing a sequence into head and tail:
 
@@ -40,8 +41,8 @@ g(\langle \rangle) = 0 \\
 \forall x : \nat; s : \seq~\nat @ g(\langle x \rangle \cat s) = x
 \end{axdef}
 
-\section*{Example 3 : Recursive Sum}
-\addcontentsline{toc}{section}{Example 3 : Recursive Sum}
+\subsection*{Example 3 : Recursive Sum}
+\addcontentsline{toc}{subsection}{Example 3 : Recursive Sum}
 
 \noindent Computing the sum of elements using pattern matching:
 
@@ -54,8 +55,8 @@ total(\langle \rangle) = 0 \\
 \forall x : \nat; s : \seq~\nat @ total(\langle x \rangle \cat s) = x + total(s)
 \end{axdef}
 
-\section*{Example 4 : Cumulative Total}
-\addcontentsline{toc}{section}{Example 4 : Cumulative Total}
+\subsection*{Example 4 : Cumulative Total}
+\addcontentsline{toc}{subsection}{Example 4 : Cumulative Total}
 
 \noindent A more descriptive example from the solutions:
 
@@ -69,8 +70,8 @@ cumulative\_total(\langle \rangle) = 0 \\
 \t1 cumulative\_total(\langle x \rangle \cat s) = x + cumulative\_total(s)
 \end{axdef}
 
-\section*{Example 5 : Filter Pattern}
-\addcontentsline{toc}{section}{Example 5 : Filter Pattern}
+\subsection*{Example 5 : Filter Pattern}
+\addcontentsline{toc}{subsection}{Example 5 : Filter Pattern}
 
 \noindent Filtering sequences based on a condition:
 

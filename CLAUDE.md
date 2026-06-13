@@ -472,12 +472,17 @@ is used.
 ### Structural Elements
 
 ```text
-=== Section Title ===         → \section*{Section Title}
+=== Section Title ===         → \section*{Section Title}      (TOC level 1)
 
-** Solution N **              → \textbf{Solution N} with spacing
+** Solution N **              → \subsection*{Solution N}      (TOC level 2)
 
-(a) Text here                 → Part label with \medskip after
+(a) Text here                 → \subsubsection*{(a)}          (TOC level 3)
 (b) Another part
+
+CONTENTS:                     → table of contents (depth 2: sections + solutions)
+CONTENTS: 1                   → depth 1 (sections only)
+CONTENTS: 3                   → depth 3 (sections + solutions + parts)
+CONTENTS: full                → same as depth 3
 
 TRUTH TABLE:                  → \begin{tabular}...\end{tabular}
 p | q | p land q
@@ -491,6 +496,10 @@ PROOF:                        → \begin{itemize} with indentation
   premise
     conclusion
 ```
+
+TOC depth is enforced by filtering `\addcontentsline` calls. LaTeX
+`tocdepth` is inert for starred headings. `--toc-parts` forces depth 3
+regardless of the `CONTENTS:` keyword.
 
 ### Operators
 

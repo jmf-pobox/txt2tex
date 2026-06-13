@@ -12,13 +12,14 @@
 \begin{document}
 
 \section*{Advanced Generic Definitions}
+\addcontentsline{toc}{section}{Advanced Generic Definitions}
 
 \begin{zed}
 [BGA]
 \end{zed}
 
-\section*{Example 1 : Generic Three - Way Product}
-\addcontentsline{toc}{section}{Example 1 : Generic Three - Way Product}
+\subsection*{Example 1 : Generic Three - Way Product}
+\addcontentsline{toc}{subsection}{Example 1 : Generic Three - Way Product}
 
 \noindent Generic function for three-component tuples:
 
@@ -41,15 +42,15 @@
 
 \bigskip
 
-\section*{Example 2 : Generic Binary Tree ( Conceptual )}
-\addcontentsline{toc}{section}{Example 2 : Generic Binary Tree ( Conceptual )}
+\subsection*{Example 2 : Generic Binary Tree ( Conceptual )}
+\addcontentsline{toc}{subsection}{Example 2 : Generic Binary Tree ( Conceptual )}
 
 \noindent Binary trees are typically defined for specific types in Z notation rather than as fully polymorphic structures. For a concrete type like N, you would define: Tree ::= leaf $\mid$ node⟨N cross Tree cross Tree⟩. Generic trees require complex workarounds beyond standard gendef blocks, as free types in fuzz are not easily parameterized.
 
 \bigskip
 
-\section*{Example 6 : Generic State Schema}
-\addcontentsline{toc}{section}{Example 6 : Generic State Schema}
+\subsection*{Example 6 : Generic State Schema}
+\addcontentsline{toc}{subsection}{Example 6 : Generic State Schema}
 
 \noindent A generic container with capacity:  Note: Fuzz supports generic schemas using the schema[X] syntax (not gendef):
 
@@ -66,8 +67,8 @@ capacity : \nat
 
 \bigskip
 
-\section*{Example 7 : Generic Relation Operations}
-\addcontentsline{toc}{section}{Example 7 : Generic Relation Operations}
+\subsection*{Example 7 : Generic Relation Operations}
+\addcontentsline{toc}{subsection}{Example 7 : Generic Relation Operations}
 
 \noindent Relational composition for any types:
 
@@ -84,15 +85,15 @@ capacity : \nat
 
 \bigskip
 
-\section*{Example 8 : Generic Option Type ( Conceptual )}
-\addcontentsline{toc}{section}{Example 8 : Generic Option Type ( Conceptual )}
+\subsection*{Example 8 : Generic Option Type ( Conceptual )}
+\addcontentsline{toc}{subsection}{Example 8 : Generic Option Type ( Conceptual )}
 
 \noindent Optional values (like Maybe or Option in other languages) are challenging to express generically in Z notation due to limitations with parameterized free types. For a specific type, you would define: Option ::= none $\mid$ some⟨T⟩. Fully generic option types with operations require advanced patterns beyond standard gendef blocks.
 
 \bigskip
 
-\section*{Example 9 : Generic Stack Schema}
-\addcontentsline{toc}{section}{Example 9 : Generic Stack Schema}
+\subsection*{Example 9 : Generic Stack Schema}
+\addcontentsline{toc}{subsection}{Example 9 : Generic Stack Schema}
 
 \noindent Note: Define generic schema separately, then declare operations in gendef:
 
@@ -117,8 +118,8 @@ maxSize : \nat
 
 \bigskip
 
-\section*{Example 10 : Generic Pair Schema}
-\addcontentsline{toc}{section}{Example 10 : Generic Pair Schema}
+\subsection*{Example 10 : Generic Pair Schema}
+\addcontentsline{toc}{subsection}{Example 10 : Generic Pair Schema}
 
 \noindent Use schema[X, Y] syntax for generic schemas:
 
@@ -133,8 +134,8 @@ second : Y
 
 \bigskip
 
-\section*{Example 11 : Generic Zip Function}
-\addcontentsline{toc}{section}{Example 11 : Generic Zip Function}
+\subsection*{Example 11 : Generic Zip Function}
+\addcontentsline{toc}{subsection}{Example 11 : Generic Zip Function}
 
 \noindent Combine two sequences into a sequence of pairs:
 
@@ -155,8 +156,8 @@ second : Y
 
 \bigskip
 
-\section*{Example 12 : Practical Example - Generic Database TableGA}
-\addcontentsline{toc}{section}{Example 12 : Practical Example - Generic Database TableGA}
+\subsection*{Example 12 : Practical Example - Generic Database TableGA}
+\addcontentsline{toc}{subsection}{Example 12 : Practical Example - Generic Database TableGA}
 
 \noindent Note: Define generic schema separately, then query operations in gendef:
 

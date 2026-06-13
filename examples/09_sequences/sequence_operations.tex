@@ -12,9 +12,10 @@
 \begin{document}
 
 \section*{Sequence Operations}
+\addcontentsline{toc}{section}{Sequence Operations}
 
-\section*{Example 1 : Sequence Length}
-\addcontentsline{toc}{section}{Example 1 : Sequence Length}
+\subsection*{Example 1 : Sequence Length}
+\addcontentsline{toc}{subsection}{Example 1 : Sequence Length}
 
 \noindent The cardinality operator gives the length of a sequence:
 
@@ -32,8 +33,8 @@ $\# \langle a, b, c \rangle$
 $\# s$
 
 
-\section*{Example 2 : Pattern Matching for Head and Tail}
-\addcontentsline{toc}{section}{Example 2 : Pattern Matching for Head and Tail}
+\subsection*{Example 2 : Pattern Matching for Head and Tail}
+\addcontentsline{toc}{subsection}{Example 2 : Pattern Matching for Head and Tail}
 
 \noindent In Z, decomposing a sequence uses pattern matching with concatenation.
 
@@ -51,8 +52,8 @@ $\langle x \rangle \cat t = s$
 
 \bigskip
 
-\section*{Example 3 : User - Defined First and Rest Functions}
-\addcontentsline{toc}{section}{Example 3 : User - Defined First and Rest Functions}
+\subsection*{Example 3 : User - Defined First and Rest Functions}
+\addcontentsline{toc}{subsection}{Example 3 : User - Defined First and Rest Functions}
 
 \noindent You can define explicit functions for sequence decomposition:
 
@@ -68,8 +69,8 @@ rest : \seq_1~X \fun \seq~X
 \forall x : X; s : \seq~X @ rest(\langle x \rangle \cat s) = s
 \end{axdef}
 
-\section*{Example 4 : User - Defined Last and Init Functions}
-\addcontentsline{toc}{section}{Example 4 : User - Defined Last and Init Functions}
+\subsection*{Example 4 : User - Defined Last and Init Functions}
+\addcontentsline{toc}{subsection}{Example 4 : User - Defined Last and Init Functions}
 
 \begin{axdef}
 lst : \seq_1~X \fun X \\
@@ -79,8 +80,8 @@ init : \seq_1~X \fun \seq~X
 \forall x : X; s : \seq~X @ init(s \cat \langle x \rangle) = s
 \end{axdef}
 
-\section*{Example 5 : Domain land Range}
-\addcontentsline{toc}{section}{Example 5 : Domain land Range}
+\subsection*{Example 5 : Domain land Range}
+\addcontentsline{toc}{subsection}{Example 5 : Domain land Range}
 
 \noindent Sequences are functions from indices to elements:
 
@@ -98,8 +99,8 @@ $\dom \langle a, b, c, d \rangle$
 $\ran \langle a, b, c \rangle$
 
 
-\section*{Example 6 : Concatenation}
-\addcontentsline{toc}{section}{Example 6 : Concatenation}
+\subsection*{Example 6 : Concatenation}
+\addcontentsline{toc}{subsection}{Example 6 : Concatenation}
 
 \noindent The concatenation operator joins sequences:
 
@@ -117,8 +118,8 @@ $\langle 1, 2 \rangle \cat \langle 3, 4 \rangle$
 $\langle a \rangle \cat \langle b, c \rangle \cat \langle d \rangle$
 
 
-\section*{Example 7 : Using Pattern Matching}
-\addcontentsline{toc}{section}{Example 7 : Using Pattern Matching}
+\subsection*{Example 7 : Using Pattern Matching}
+\addcontentsline{toc}{subsection}{Example 7 : Using Pattern Matching}
 
 \noindent Pattern matching extracts elements from sequences:
 
@@ -132,8 +133,8 @@ $\forall s : \seq_1~\nat @ \exists x : \nat; t : \seq~\nat @ s = \langle x \rang
 
 \bigskip
 
-\section*{Example 8 : Recursive Function Example}
-\addcontentsline{toc}{section}{Example 8 : Recursive Function Example}
+\subsection*{Example 8 : Recursive Function Example}
+\addcontentsline{toc}{subsection}{Example 8 : Recursive Function Example}
 
 \noindent Define a sum function using pattern matching style:
 

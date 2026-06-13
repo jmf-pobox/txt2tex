@@ -12,6 +12,7 @@
 \begin{document}
 
 \section*{Function Application Examples}
+\addcontentsline{toc}{section}{Function Application Examples}
 
 \begin{zed}
 [Item, Dog, PersonRes, XRes]
@@ -21,8 +22,8 @@
 
 \bigskip
 
-\section*{Example 1 : Basic function definitions}
-\addcontentsline{toc}{section}{Example 1 : Basic function definitions}
+\subsection*{Example 1 : Basic function definitions}
+\addcontentsline{toc}{subsection}{Example 1 : Basic function definitions}
 
 \begin{axdef}
 squareRes : \nat \fun \nat \\
@@ -32,8 +33,8 @@ double : \nat \fun \nat
 \forall n : \nat @ double(n) = 2 * n
 \end{axdef}
 
-\section*{Example 2 : Functions with multiple arguments}
-\addcontentsline{toc}{section}{Example 2 : Functions with multiple arguments}
+\subsection*{Example 2 : Functions with multiple arguments}
+\addcontentsline{toc}{subsection}{Example 2 : Functions with multiple arguments}
 
 \begin{axdef}
 add : \nat \cross \nat \fun \nat \\
@@ -43,15 +44,15 @@ maximum : \nat \cross \nat \fun \nat
 \forall a, b : \nat @ (maximum(a, b) = a \lor maximum(a, b) = b) \land maximum(a, b) \geq a \land maximum(a, b) \geq b
 \end{axdef}
 
-\section*{Example 3 : Generic functions}
-\addcontentsline{toc}{section}{Example 3 : Generic functions}
+\subsection*{Example 3 : Generic functions}
+\addcontentsline{toc}{subsection}{Example 3 : Generic functions}
 
 \begin{gendef}[XRes]
   collection: \seq~XRes
 \end{gendef}
 
-\section*{Example 4 : Function application elem quantifiers}
-\addcontentsline{toc}{section}{Example 4 : Function application elem quantifiers}
+\subsection*{Example 4 : Function application elem quantifiers}
+\addcontentsline{toc}{subsection}{Example 4 : Function application elem quantifiers}
 
 \begin{axdef}
 posFunc : \nat \fun \nat
@@ -59,8 +60,8 @@ posFunc : \nat \fun \nat
 \forall x : \nat @ posFunc(x) > 0 \implies posFunc(x) > 0
 \end{axdef}
 
-\section*{Example 5 : Schema with function type}
-\addcontentsline{toc}{section}{Example 5 : Schema with function type}
+\subsection*{Example 5 : Schema with function type}
+\addcontentsline{toc}{subsection}{Example 5 : Schema with function type}
 
 \begin{schema}{Heights}
 height : PersonRes \fun \nat
@@ -68,8 +69,8 @@ height : PersonRes \fun \nat
 \forall p : PersonRes @ height(p) > 0 \land height(p) < 300
 \end{schema}
 
-\section*{Example 6 : Nested function application}
-\addcontentsline{toc}{section}{Example 6 : Nested function application}
+\subsection*{Example 6 : Nested function application}
+\addcontentsline{toc}{subsection}{Example 6 : Nested function application}
 
 \begin{axdef}
 func1 : \nat \fun \nat \\

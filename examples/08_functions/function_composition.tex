@@ -12,13 +12,14 @@
 \begin{document}
 
 \section*{Function Composition}
+\addcontentsline{toc}{section}{Function Composition}
 
 \begin{zed}
 [Person, Char, B, Record, ValidatedRecord, ProcessedRecord, Output]
 \end{zed}
 
-\section*{Example 1 : Basic Forward Composition}
-\addcontentsline{toc}{section}{Example 1 : Basic Forward Composition}
+\subsection*{Example 1 : Basic Forward Composition}
+\addcontentsline{toc}{subsection}{Example 1 : Basic Forward Composition}
 
 \noindent Forward composition applies f first, then g:
 
@@ -38,8 +39,8 @@ h = f \comp g
 
 \bigskip
 
-\section*{Example 2 : Backward Composition}
-\addcontentsline{toc}{section}{Example 2 : Backward Composition}
+\subsection*{Example 2 : Backward Composition}
+\addcontentsline{toc}{subsection}{Example 2 : Backward Composition}
 
 \noindent Backward composition applies the second function first (using comp):
 
@@ -59,8 +60,8 @@ h2 = f2 \comp g2
 
 \bigskip
 
-\section*{Example 3 : Comparison - Forward vs Backward}
-\addcontentsline{toc}{section}{Example 3 : Comparison - Forward vs Backward}
+\subsection*{Example 3 : Comparison - Forward vs Backward}
+\addcontentsline{toc}{subsection}{Example 3 : Comparison - Forward vs Backward}
 
 \noindent Forward composition f $\semi$ g: Input $\rightarrow$ f $\rightarrow$ g $\rightarrow$ Output (f $\semi$ g)(x) = g(f(x))
 
@@ -74,8 +75,8 @@ h2 = f2 \comp g2
 
 \bigskip
 
-\section*{Example 4 : Three - Function Composition}
-\addcontentsline{toc}{section}{Example 4 : Three - Function Composition}
+\subsection*{Example 4 : Three - Function Composition}
+\addcontentsline{toc}{subsection}{Example 4 : Three - Function Composition}
 
 \begin{axdef}
 addOne : \nat \fun \nat \\
@@ -93,8 +94,8 @@ pipeline = addOne \comp double \comp square
 
 \bigskip
 
-\section*{Example 5 : Identity Composition Laws}
-\addcontentsline{toc}{section}{Example 5 : Identity Composition Laws}
+\subsection*{Example 5 : Identity Composition Laws}
+\addcontentsline{toc}{subsection}{Example 5 : Identity Composition Laws}
 
 \begin{axdef}
 identity : \nat \fun \nat \\
@@ -112,8 +113,8 @@ rightId = anyFunc \comp identity
 
 \bigskip
 
-\section*{Example 6 : Associativity}
-\addcontentsline{toc}{section}{Example 6 : Associativity}
+\subsection*{Example 6 : Associativity}
+\addcontentsline{toc}{subsection}{Example 6 : Associativity}
 
 \noindent Composition is associative:
 
@@ -145,8 +146,8 @@ comp2 = f3 \comp (g3 \comp h3)
 
 \bigskip
 
-\section*{Example 7 : Composition with Partial Functions}
-\addcontentsline{toc}{section}{Example 7 : Composition with Partial Functions}
+\subsection*{Example 7 : Composition with Partial Functions}
+\addcontentsline{toc}{subsection}{Example 7 : Composition with Partial Functions}
 
 \begin{axdef}
 safeSqrt : \nat \pfun \nat \\
@@ -162,8 +163,8 @@ composed = safeSqrt \comp addTen
 
 \bigskip
 
-\section*{Example 8 : Relation Composition}
-\addcontentsline{toc}{section}{Example 8 : Relation Composition}
+\subsection*{Example 8 : Relation Composition}
+\addcontentsline{toc}{subsection}{Example 8 : Relation Composition}
 
 \noindent Composition works for relations too:
 
@@ -180,8 +181,8 @@ grandparent = parent \comp parent
 
 \bigskip
 
-\section*{Example 9 : Function Pipeline Example}
-\addcontentsline{toc}{section}{Example 9 : Function Pipeline Example}
+\subsection*{Example 9 : Function Pipeline Example}
+\addcontentsline{toc}{subsection}{Example 9 : Function Pipeline Example}
 
 \begin{axdef}
 toLowerCase : \seq~Char \fun \seq~Char \\
@@ -196,8 +197,8 @@ process = toLowerCase \comp trim \comp reverse
 
 \bigskip
 
-\section*{Example 10 : Mathematical Functions}
-\addcontentsline{toc}{section}{Example 10 : Mathematical Functions}
+\subsection*{Example 10 : Mathematical Functions}
+\addcontentsline{toc}{subsection}{Example 10 : Mathematical Functions}
 
 \begin{axdef}
 squareFunc : \nat \fun \nat \\
@@ -213,8 +214,8 @@ combined = squareFunc \comp tripleFunc
 
 \bigskip
 
-\section*{Example 11 : Inverse via Composition}
-\addcontentsline{toc}{section}{Example 11 : Inverse via Composition}
+\subsection*{Example 11 : Inverse via Composition}
+\addcontentsline{toc}{subsection}{Example 11 : Inverse via Composition}
 
 \begin{axdef}
 encrypt : \seq~Char \fun \seq~Char \\
@@ -228,8 +229,8 @@ identity\_check = encrypt \comp decrypt
 
 \bigskip
 
-\section*{Example 12 : Partial Composition}
-\addcontentsline{toc}{section}{Example 12 : Partial Composition}
+\subsection*{Example 12 : Partial Composition}
+\addcontentsline{toc}{subsection}{Example 12 : Partial Composition}
 
 \noindent When composing f : $A \fun B$ and g : $C \fun D$, we need ran f subseteq dom g.
 
@@ -249,22 +250,22 @@ h4 = f4 \comp g4
 
 \bigskip
 
-\section*{Example 13 : Monoid Structure}
-\addcontentsline{toc}{section}{Example 13 : Monoid Structure}
+\subsection*{Example 13 : Monoid Structure}
+\addcontentsline{toc}{subsection}{Example 13 : Monoid Structure}
 
 \noindent Functions from $A \fun A$ with composition form a monoid: 1. Composition is associative: (f $\semi$ g) $\semi$ $h = f$ $\semi$ (g $\semi$ h) 2. Identity element: id(x) = x, id $\semi$ $f = f = f$ $\semi$ id 3. Closure: composing $A \fun A$ functions gives another $A \fun A$ function
 
 \bigskip
 
-\section*{Example 14 : Practical Example - Data Processing Pipeline}
-\addcontentsline{toc}{section}{Example 14 : Practical Example - Data Processing Pipeline}
+\subsection*{Example 14 : Practical Example - Data Processing Pipeline}
+\addcontentsline{toc}{subsection}{Example 14 : Practical Example - Data Processing Pipeline}
 
 \noindent In practice, you might compose functions to create data processing pipelines: validate $\semi$ process $\semi$ format. Each stage transforms data through a series of operations. The notation f $\semi$ g $\semi$ h means "apply f, then g, then h" which creates a pipeline from input to output.
 
 \bigskip
 
-\section*{Example 15 : Composition Operator Precedence}
-\addcontentsline{toc}{section}{Example 15 : Composition Operator Precedence}
+\subsection*{Example 15 : Composition Operator Precedence}
+\addcontentsline{toc}{subsection}{Example 15 : Composition Operator Precedence}
 
 \noindent Composition operators bind tighter than logical operators:
 
@@ -278,8 +279,8 @@ h4 = f4 \comp g4
 
 \bigskip
 
-\section*{Example 16 : Self - Composition}
-\addcontentsline{toc}{section}{Example 16 : Self - Composition}
+\subsection*{Example 16 : Self - Composition}
+\addcontentsline{toc}{subsection}{Example 16 : Self - Composition}
 
 \begin{axdef}
 doubleIt : \nat \fun \nat \\
@@ -293,8 +294,8 @@ quadrupleIt = doubleIt \comp doubleIt
 
 \bigskip
 
-\section*{Example 17 : Iterated Composition}
-\addcontentsline{toc}{section}{Example 17 : Iterated Composition}
+\subsection*{Example 17 : Iterated Composition}
+\addcontentsline{toc}{subsection}{Example 17 : Iterated Composition}
 
 \begin{axdef}
 increment : \nat \fun \nat \\
@@ -308,8 +309,8 @@ addFive = increment \comp increment \comp increment \comp increment \comp increm
 
 \bigskip
 
-\section*{Example 18 : Functional Programming Style}
-\addcontentsline{toc}{section}{Example 18 : Functional Programming Style}
+\subsection*{Example 18 : Functional Programming Style}
+\addcontentsline{toc}{subsection}{Example 18 : Functional Programming Style}
 
 \noindent Composition enables a functional programming style:
 
@@ -323,8 +324,8 @@ addFive = increment \comp increment \comp increment \comp increment \comp increm
 
 \bigskip
 
-\section*{Example 19 : Best Practices}
-\addcontentsline{toc}{section}{Example 19 : Best Practices}
+\subsection*{Example 19 : Best Practices}
+\addcontentsline{toc}{subsection}{Example 19 : Best Practices}
 
 \noindent When using composition: 1. Choose forward ($\semi$) or backward (o) consistently in your codebase 2. Document the data flow direction 3. Break complex pipelines into named intermediate steps 4. Type-check that domains and ranges align 5. Use composition to create reusable pipelines 6. Test individual functions before composing them 7. Remember: $\semi$ reads left-to-right (natural for pipelines), o reads right-to-left (traditional math notation)
 

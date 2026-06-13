@@ -2972,3 +2972,78 @@ hidden-emit helpers), `codegen/paragraphs.py` (abbreviation dual-emit),
   `fuzz -t` output but are invisible in the PDF.
 - 14 new tests in `test_set_comp_fuzz_validation.py` cover all four
   cases (standalone ± binding, abbreviation ± binding).
+
+## ADR: Three-Level TOC Hierarchy — Heading Demotion and Depth Filter
+
+**Status**: SETTLED 2026-06-13.
+
+**Context.**  The original heading scheme mapped `** Solution N **` to
+`\section*` and `(a)` part labels to `\subsection*`.  Section markers
+(`=== Title ===`) rendered `\section*` too, making sections and solutions
+visually indistinguishable in the LaTeX output and colliding in any TOC.
+Additionally, LaTeX's `tocdepth` counter is inert for starred headings
+with manual `\addcontentsline` calls, so depth control had to be handled
+explicitly in the generator.
+
+**Decision.**
+
+1. **Three distinct native heading levels.**  The generator now emits:
+   - `=== Title ===` → `\section*{Title}` (section)
+   - `** Solution N **` → `\subsection*{Solution N}` (subsection)
+   - `(a)` part label → `\subsubsection*{(a)}` (subsubsection)
+
+   This eliminates the `\section*` collision between sections and
+   solutions, and gives the PDF a visible visual hierarchy.
+
+2. **Depth enforced by filtering `\addcontentsline` emission.**  Because
+   `tocdepth` is inert for starred headings, the generator tracks the
+   current TOC depth (from the `CONTENTS:` keyword or `--toc-parts` flag)
+   and simply omits `\addcontentsline` calls for headings below the
+   requested level.
+
+3. **Default depth is 2 (sections + solutions).**  A bare `CONTENTS:`
+   directive produces a contents list with sections and solutions but no
+   individual part labels.  This is the sensible default for the common
+   question/solution document format.
+
+4. **`CONTENTS:` depth keywords.**  The accepted forms and their depths:
+   - bare `CONTENTS:` → depth 2
+   - `CONTENTS: 1` → depth 1 (sections only)
+   - `CONTENTS: 2` → depth 2 (sections + solutions)
+   - `CONTENTS: 3` / `CONTENTS: full` / `CONTENTS: all` → depth 3 (all)
+
+5. **`--toc-parts` is a depth override.**  The flag forces parts into the
+   TOC (equivalent to depth 3) regardless of what `CONTENTS:` says in the
+   source file.
+
+**Rejected alternative.**  Keep `** **` at `\section*` and promote
+`=== ===` to `\part*`.  This would have preserved the rendering of
+existing solution documents, but the student chose three native levels so
+that heading size encodes nesting depth consistently.  `\part*` is also a
+heavyweight, page-dominating heading in the article class — disproportionate
+for a homework section divider.
+
+**Rationale.**
+
+- The `\section*` collision between `===` sections and `** **` solutions
+  meant a section could not nest its solutions in any TOC — both appeared
+  at the same level.  The demotion resolves this structurally.
+- Filtering `\addcontentsline` at emission time is the only reliable way
+  to gate depth for starred headings.  `\addcontentsline` writes to the
+  `.toc` unconditionally; `tocdepth` gates only the *automatic* entry an
+  *unstarred* sectioning command makes, which txt2tex never emits.
+  Confirmed by compiling test documents: a bare `CONTENTS:` over starred
+  headings lists every entry regardless of the `tocdepth` value.
+- Default depth 2 covers the most common use case (a solutions document
+  with a solution-level contents list) without requiring any extra syntax.
+
+**Consequences.**
+
+- Positive: sections, solutions, and parts now occupy three visually
+  distinct levels in the PDF.  TOC depth is predictable.
+- Negative: users who relied on `** **` rendering `\section*` (e.g., to
+  achieve section-level bold headings without a `===` wrapper) now get
+  `\subsection*` instead.  Upgrade path: add a `=== … ===` wrapper.
+- The `full` keyword alias is a convenience for users who want everything
+  in the TOC without remembering the number 3.  It replaces the previous
+  meaning of `full` (which was depth 2).

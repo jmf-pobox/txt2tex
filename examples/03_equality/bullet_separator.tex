@@ -12,9 +12,10 @@
 \begin{document}
 
 \section*{Bullet Separator Examples}
+\addcontentsline{toc}{section}{Bullet Separator Examples}
 
-\section*{Example 1 : Set Comprehension with Bullet}
-\addcontentsline{toc}{section}{Example 1 : Set Comprehension with Bullet}
+\subsection*{Example 1 : Set Comprehension with Bullet}
+\addcontentsline{toc}{subsection}{Example 1 : Set Comprehension with Bullet}
 
 \noindent The bullet separator distinguishes the constraint (filter) from the term (selector):
 
@@ -33,8 +34,8 @@ $\{~ x : \nat | x > 0 @ x * x ~\}$
 
 \bigskip
 
-\section*{Example 2 : Set Comprehension Without Bullet}
-\addcontentsline{toc}{section}{Example 2 : Set Comprehension Without Bullet}
+\subsection*{Example 2 : Set Comprehension Without Bullet}
+\addcontentsline{toc}{subsection}{Example 2 : Set Comprehension Without Bullet}
 
 \noindent Without the bullet, the set contains the values that satisfy the predicate:
 
@@ -53,8 +54,8 @@ $\{~ x : \nat | x > 0 \land x < 10 ~\}$
 
 \bigskip
 
-\section*{Example 3 : Comparing With land Without Bullet}
-\addcontentsline{toc}{section}{Example 3 : Comparing With land Without Bullet}
+\subsection*{Example 3 : Comparing With land Without Bullet}
+\addcontentsline{toc}{subsection}{Example 3 : Comparing With land Without Bullet}
 
 \noindent With bullet (maps/transforms values):
 
@@ -90,8 +91,8 @@ $\{~ n : \nat | n < 5 ~\}$
 
 \bigskip
 
-\section*{Example 4 : Complex Set Comprehension}
-\addcontentsline{toc}{section}{Example 4 : Complex Set Comprehension}
+\subsection*{Example 4 : Complex Set Comprehension}
+\addcontentsline{toc}{subsection}{Example 4 : Complex Set Comprehension}
 
 \noindent
 $\{~ x : \num | x \mod 2 = 0 \land x \geq -10 \land x \leq 10 @ x~\div~2 ~\}$
@@ -101,8 +102,8 @@ $\{~ x : \num | x \mod 2 = 0 \land x \geq -10 \land x \leq 10 @ x~\div~2 ~\}$
 
 \bigskip
 
-\section*{Example 5 : Mu Operator with Bullet}
-\addcontentsline{toc}{section}{Example 5 : Mu Operator with Bullet}
+\subsection*{Example 5 : Mu Operator with Bullet}
+\addcontentsline{toc}{subsection}{Example 5 : Mu Operator with Bullet}
 
 \noindent The mu operator finds the unique value satisfying a condition:
 
@@ -116,8 +117,8 @@ $(\mu x : \nat | x > 5 \land x < 7 @ x)$
 
 \bigskip
 
-\section*{Example 6 : Mu with Complex Expression}
-\addcontentsline{toc}{section}{Example 6 : Mu with Complex Expression}
+\subsection*{Example 6 : Mu with Complex Expression}
+\addcontentsline{toc}{subsection}{Example 6 : Mu with Complex Expression}
 
 \noindent
 $(\mu n : \nat | n * n = 16 @ n + 1)$
@@ -127,8 +128,8 @@ $(\mu n : \nat | n * n = 16 @ n + 1)$
 
 \bigskip
 
-\section*{Example 7 : Nested Expressions}
-\addcontentsline{toc}{section}{Example 7 : Nested Expressions}
+\subsection*{Example 7 : Nested Expressions}
+\addcontentsline{toc}{subsection}{Example 7 : Nested Expressions}
 
 \setbox0=\vbox{%
 \begin{zed}
@@ -143,8 +144,8 @@ $\{~ x : \nat | x < 3 @ \{~ y : \nat | y < x @ (x, y) ~\} ~\}$
 
 \bigskip
 
-\section*{Example 8 : Quantifiers with Bullet ( Limited Support )}
-\addcontentsline{toc}{section}{Example 8 : Quantifiers with Bullet ( Limited Support )}
+\subsection*{Example 8 : Quantifiers with Bullet ( Limited Support )}
+\addcontentsline{toc}{subsection}{Example 8 : Quantifiers with Bullet ( Limited Support )}
 
 \noindent Standard Z notation supports bullet in quantifiers to separate constraints from body:
 
@@ -166,8 +167,8 @@ $\{~ x : \nat | x < 3 @ \{~ y : \nat | y < x @ (x, y) ~\} ~\}$
 $\forall x : \nat @ x > 0 \implies x \geq 0$
 
 
-\section*{Example 9 : Partial Functions with Bullet}
-\addcontentsline{toc}{section}{Example 9 : Partial Functions with Bullet}
+\subsection*{Example 9 : Partial Functions with Bullet}
+\addcontentsline{toc}{subsection}{Example 9 : Partial Functions with Bullet}
 
 \noindent In pattern matching and function definitions:
 
@@ -183,8 +184,8 @@ predecessor : \nat \pfun \nat
 
 \bigskip
 
-\section*{Example 10 : Practical Example - Data Filtering}
-\addcontentsline{toc}{section}{Example 10 : Practical Example - Data Filtering}
+\subsection*{Example 10 : Practical Example - Data Filtering}
+\addcontentsline{toc}{subsection}{Example 10 : Practical Example - Data Filtering}
 
 \begin{zed}
 [Employee]
@@ -203,8 +204,8 @@ high\_salaries = \{~ e : Employee | salaries(e) > 100000 @ salaries(e) ~\}
 
 \bigskip
 
-\section*{Example 11 : Mathematical Sets}
-\addcontentsline{toc}{section}{Example 11 : Mathematical Sets}
+\subsection*{Example 11 : Mathematical Sets}
+\addcontentsline{toc}{subsection}{Example 11 : Mathematical Sets}
 
 \noindent The set of perfect squares less than 100:
 
@@ -240,8 +241,8 @@ $\{~ n : \nat | n \mod 2 = 0 ~\}$
 
 \bigskip
 
-\section*{Example 12 : Design Pattern}
-\addcontentsline{toc}{section}{Example 12 : Design Pattern}
+\subsection*{Example 12 : Design Pattern}
+\addcontentsline{toc}{subsection}{Example 12 : Design Pattern}
 
 \noindent The bullet separator follows a consistent pattern across Z notation:
 

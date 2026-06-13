@@ -61,7 +61,9 @@ as a literal hyphen, not widened to math-mode spacing).
 Content here...
 ```
 
-Generates: `\bigskip\noindent\textbf{Solution 1}\medskip`
+Generates: `\subsection*{Solution 1}`
+
+**Note:** In previous versions, `** **` rendered `\section*` (same level as `=== ===`). It now renders `\subsection*`, one level smaller, so solutions nest under sections in the table of contents.
 
 ### Part Labels
 
@@ -72,6 +74,79 @@ Generates: `\bigskip\noindent\textbf{Solution 1}\medskip`
 ```
 
 Each part gets proper spacing and formatting with `(a)\par\vspace{11pt}`.
+
+**Note:** In previous versions, `(a)` rendered `\subsection*`. It now renders `\subsubsection*`, one level smaller.
+
+### Table of Contents
+
+Use `CONTENTS:` anywhere in the document to insert a table of contents at that point.
+
+#### Heading hierarchy
+
+The three structural markers map to three LaTeX heading levels:
+
+| Input marker | LaTeX heading | TOC level |
+|---|---|---|
+| `=== Title ===` | `\section*{Title}` | section |
+| `** Solution N **` | `\subsection*{Solution N}` | subsection |
+| `(a)` (part label) | `\subsubsection*{(a)}` | subsubsection |
+
+#### Depth control
+
+`CONTENTS:` accepts an optional depth argument that controls which headings appear in the contents list. Depth is enforced by selectively emitting `\addcontentsline` calls — **not** via LaTeX's `tocdepth` counter, which has no effect on starred headings.
+
+| Keyword | Depth | What appears |
+|---|---|---|
+| `CONTENTS:` (bare) | 2 | Sections and solutions |
+| `CONTENTS: 1` | 1 | Sections only |
+| `CONTENTS: 2` | 2 | Sections and solutions |
+| `CONTENTS: 3` | 3 | Sections, solutions, and parts |
+| `CONTENTS: full` | 3 | Sections, solutions, and parts |
+| `CONTENTS: all` | 3 | Sections, solutions, and parts |
+
+Bare `CONTENTS:` defaults to depth 2 — the right default for a typical question/solution document where you want the solutions listed but not every sub-part.
+
+#### --toc-parts flag
+
+The `--toc-parts` CLI flag forces parts `(a)`, `(b)`, etc. into the TOC regardless of the `CONTENTS:` depth keyword. Use it when you want full depth without adding `CONTENTS: full` to the source file.
+
+#### Worked example
+
+```text
+CONTENTS: full
+
+=== Question 1 ===
+
+** Solution 1 **
+
+TEXT: The proof proceeds by induction.
+
+(a) Base case.
+
+TEXT: We show the base case holds.
+
+(b) Inductive step.
+
+TEXT: Assume the hypothesis for n; prove it for n + 1.
+
+=== Question 2 ===
+
+** Solution 2 **
+```
+
+This produces a nested contents list:
+
+```text
+Contents
+  Question 1
+    Solution 1
+      (a)
+      (b)
+  Question 2
+    Solution 2
+```
+
+With bare `CONTENTS:` (depth 2), only "Question 1", "Solution 1", "Question 2", and "Solution 2" would appear — the `(a)` and `(b)` entries are suppressed.
 
 **Part-label scope rule (DAT #18 / DAT #1):** A `(label)` token is recognised
 as a structural part label only when it appears at the start of a paragraph

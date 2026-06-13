@@ -12,13 +12,14 @@
 \begin{document}
 
 \section*{Phase 34: Finite Partial Functions}
+\addcontentsline{toc}{section}{Phase 34: Finite Partial Functions}
 
 \noindent Finite partial functions are partial functions with a finite domain. The $operator \ffun denotes$ a finite partial function, meaning the function may not be defined everywhere, and its domain must be finite.
 
 \bigskip
 
-\section*{Example 1 : Basic Finite Function Type}
-\addcontentsline{toc}{section}{Example 1 : Basic Finite Function Type}
+\subsection*{Example 1 : Basic Finite Function Type}
+\addcontentsline{toc}{subsection}{Example 1 : Basic Finite Function Type}
 
 \noindent A finite partial function from X to Y is a partial function whose domain is finite. This is useful when modeling resources with limited capacity or databases with a bounded number of entries.
 
@@ -38,8 +39,8 @@ records : Year \ffun TableFF
 
 \bigskip
 
-\section*{Example 2 : Comparison with Other Function Types}
-\addcontentsline{toc}{section}{Example 2 : Comparison with Other Function Types}
+\subsection*{Example 2 : Comparison with Other Function Types}
+\addcontentsline{toc}{subsection}{Example 2 : Comparison with Other Function Types}
 
 \noindent Comparison of function type operators:
 
@@ -62,8 +63,8 @@ totalBij : X \bij Y
 \dom totalFunc = X \land \dom totalBij = X \land (\forall x1, x2 : X | totalBij(x1) = totalBij(x2) @ x1 = x2) \land \ran totalBij = Y
 \end{axdef}
 
-\section*{Example 3 : Finite Functions elem Practice}
-\addcontentsline{toc}{section}{Example 3 : Finite Functions elem Practice}
+\subsection*{Example 3 : Finite Functions elem Practice}
+\addcontentsline{toc}{subsection}{Example 3 : Finite Functions elem Practice}
 
 \noindent Real-world example: A database table storing customer preferences.
 
@@ -83,8 +84,8 @@ preferences : CustomerID \ffun Preference
 
 \bigskip
 
-\section*{Example 4 : Operations on Finite Functions}
-\addcontentsline{toc}{section}{Example 4 : Operations on Finite Functions}
+\subsection*{Example 4 : Operations on Finite Functions}
+\addcontentsline{toc}{subsection}{Example 4 : Operations on Finite Functions}
 
 \begin{axdef}
 f : \nat \ffun \nat \\
@@ -110,8 +111,8 @@ f\_composed = g \comp f \land \# (\dom f\_composed) \leq \# (\dom f)
 
 \bigskip
 
-\section*{Example 5 : Domain Restrictions land Finiteness}
-\addcontentsline{toc}{section}{Example 5 : Domain Restrictions land Finiteness}
+\subsection*{Example 5 : Domain Restrictions land Finiteness}
+\addcontentsline{toc}{subsection}{Example 5 : Domain Restrictions land Finiteness}
 
 \begin{zed}
 [Title, Length, ViewDate]

@@ -42,6 +42,7 @@ member : PlaylistId \rel TrackId
 \end{axdef}
 
 \section*{Query 1: Single-relation selection}
+\addcontentsline{toc}{section}{Query 1: Single-relation selection}
 
 \noindent Retrieve the title and genre of every jazz track. This is a plain single-relation query over `Track` --- no join required.
 
@@ -57,6 +58,7 @@ $\begin{array}{l}\{~ t : Track | t.genre = `Jazz' @ \\ \lblot~title == t.title, 
 
 
 \section*{Query 2: Two-relation join via comprehension}
+\addcontentsline{toc}{section}{Query 2: Two-relation join via comprehension}
 
 \noindent For each track, return its title together with the name of the artist who recorded the album it belongs to. Joins `Track` and `Album` on `AlbumId`, then `Album` and `Artist` on `ArtistId`.
 
@@ -78,6 +80,7 @@ $\displaystyle
 \bigskip
 
 \section*{Query 3: Three-relation chain with playlist}
+\addcontentsline{toc}{section}{Query 3: Three-relation chain with playlist}
 
 \noindent List every track title that appears on at least one playlist, together with the album title. Chains `member`, `Track`, and `Album` through three declarations.
 
@@ -99,6 +102,7 @@ $\displaystyle
 \bigskip
 
 \section*{Query 4: Binding output, filtered by duration}
+\addcontentsline{toc}{section}{Query 4: Binding output, filtered by duration}
 
 \noindent Return a binding of `(track title, album title)` for every track whose duration exceeds 300 seconds. The characteristic expression is a two-component binding; no plain variable appears in the output.
 
@@ -120,6 +124,7 @@ $\displaystyle
 \bigskip
 
 \section*{Query 5: Multi-decl forall}
+\addcontentsline{toc}{section}{Query 5: Multi-decl forall}
 
 \noindent Assert that every track on any playlist belongs to a known album. Universal quantifier over two declarations with a conjunction predicate over projections.
 
@@ -131,6 +136,7 @@ $\displaystyle
 \end{zed}
 
 \section*{Query 6: Multi-decl comprehension, no characteristic expression}
+\addcontentsline{toc}{section}{Query 6: Multi-decl comprehension, no characteristic expression}
 
 \noindent Collect the set of `(Track, Album)` schema pairs for long tracks. When the characteristic expression is omitted Z defaults to the signature tuple (Z RM §3.9). The Q2(d) parser fix makes the dot-separator optional.
 

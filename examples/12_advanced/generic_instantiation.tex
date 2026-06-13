@@ -12,9 +12,10 @@
 \begin{document}
 
 \section*{Generic Type Instantiation}
+\addcontentsline{toc}{section}{Generic Type Instantiation}
 
-\section*{Example 1 : Basic Type Instantiation}
-\addcontentsline{toc}{section}{Example 1 : Basic Type Instantiation}
+\subsection*{Example 1 : Basic Type Instantiation}
+\addcontentsline{toc}{subsection}{Example 1 : Basic Type Instantiation}
 
 \noindent Apply type parameters to polymorphic types using square brackets:
 
@@ -36,8 +37,8 @@ $\emptyset[\num]$
 
 \bigskip
 
-\section*{Example 2 : Empty Set Instantiation}
-\addcontentsline{toc}{section}{Example 2 : Empty Set Instantiation}
+\subsection*{Example 2 : Empty Set Instantiation}
+\addcontentsline{toc}{subsection}{Example 2 : Empty Set Instantiation}
 
 \begin{axdef}
 emptyNats : \power \nat \\
@@ -51,8 +52,8 @@ emptyInts = \emptyset[\num]
 
 \bigskip
 
-\section*{Example 3 : Sequence Type Instantiation}
-\addcontentsline{toc}{section}{Example 3 : Sequence Type Instantiation}
+\subsection*{Example 3 : Sequence Type Instantiation}
+\addcontentsline{toc}{subsection}{Example 3 : Sequence Type Instantiation}
 
 \begin{axdef}
 numbers : \seq \nat \\
@@ -66,8 +67,8 @@ integers = \langle -1, 0, 1 \rangle
 
 \bigskip
 
-\section*{Example 4 : Power Set Instantiation}
-\addcontentsline{toc}{section}{Example 4 : Power Set Instantiation}
+\subsection*{Example 4 : Power Set Instantiation}
+\addcontentsline{toc}{subsection}{Example 4 : Power Set Instantiation}
 
 \begin{axdef}
 subsetsOfN : \power (\power \nat) \\
@@ -80,8 +81,8 @@ example = \{\{1, 2\}, \{3\}, \emptyset[\nat]\}
 
 \bigskip
 
-\section*{Example 5 : Complex Type Parameters}
-\addcontentsline{toc}{section}{Example 5 : Complex Type Parameters}
+\subsection*{Example 5 : Complex Type Parameters}
+\addcontentsline{toc}{subsection}{Example 5 : Complex Type Parameters}
 
 \begin{axdef}
 pairsSeq : \seq (\nat \cross \nat) \\
@@ -95,8 +96,8 @@ pairsSet = \{(1, 2), (3, 4)\}
 
 \bigskip
 
-\section*{Example 6 : Nested Instantiation}
-\addcontentsline{toc}{section}{Example 6 : Nested Instantiation}
+\subsection*{Example 6 : Nested Instantiation}
+\addcontentsline{toc}{subsection}{Example 6 : Nested Instantiation}
 
 \begin{axdef}
 seqOfSets : \seq (\power \nat) \\
@@ -110,8 +111,8 @@ setOfSeqs = \{\langle 1, 2 \rangle, \langle 3, 4 \rangle\}
 
 \bigskip
 
-\section*{Example 7 : Generic Function Instantiation}
-\addcontentsline{toc}{section}{Example 7 : Generic Function Instantiation}
+\subsection*{Example 7 : Generic Function Instantiation}
+\addcontentsline{toc}{subsection}{Example 7 : Generic Function Instantiation}
 
 \begin{gendef}[X]
   identity: X \fun X
@@ -131,8 +132,8 @@ id\_int = identity[\num]
 
 \bigskip
 
-\section*{Example 8 : Multiple Type Parameters}
-\addcontentsline{toc}{section}{Example 8 : Multiple Type Parameters}
+\subsection*{Example 8 : Multiple Type Parameters}
+\addcontentsline{toc}{subsection}{Example 8 : Multiple Type Parameters}
 
 \begin{gendef}[X, Y]
   pairType: X \cross Y
@@ -150,8 +151,8 @@ intNatPair = pairType[\num, \nat]
 
 \bigskip
 
-\section*{Example 9 : Bag Instantiation}
-\addcontentsline{toc}{section}{Example 9 : Bag Instantiation}
+\subsection*{Example 9 : Bag Instantiation}
+\addcontentsline{toc}{subsection}{Example 9 : Bag Instantiation}
 
 \begin{axdef}
 natBag : \bag \nat \\
@@ -165,8 +166,8 @@ intBag = \lbag -1, 0, 1 \rbag
 
 \bigskip
 
-\section*{Example 10 : Generic Relation Types}
-\addcontentsline{toc}{section}{Example 10 : Generic Relation Types}
+\subsection*{Example 10 : Generic Relation Types}
+\addcontentsline{toc}{subsection}{Example 10 : Generic Relation Types}
 
 \begin{axdef}
 natRelation : \nat \rel \nat \\
@@ -180,8 +181,8 @@ mixedRelation = \{1 \mapsto -1, 2 \mapsto -2\}
 
 \bigskip
 
-\section*{Example 11 : Sequence of Pairs}
-\addcontentsline{toc}{section}{Example 11 : Sequence of Pairs}
+\subsection*{Example 11 : Sequence of Pairs}
+\addcontentsline{toc}{subsection}{Example 11 : Sequence of Pairs}
 
 \begin{axdef}
 coordSeq : \seq (\nat \cross \nat)
@@ -193,8 +194,8 @@ coordSeq = \langle (0, 0), (1, 1), (2, 4), (3, 9) \rangle
 
 \bigskip
 
-\section*{Example 12 : Set of Functions}
-\addcontentsline{toc}{section}{Example 12 : Set of Functions}
+\subsection*{Example 12 : Set of Functions}
+\addcontentsline{toc}{subsection}{Example 12 : Set of Functions}
 
 \begin{axdef}
 square : \nat \fun \nat \\
@@ -216,8 +217,8 @@ funcSet = \{square, double, successor\}
 
 \bigskip
 
-\section*{Example 13 : Practical Example - Generic Pair}
-\addcontentsline{toc}{section}{Example 13 : Practical Example - Generic Pair}
+\subsection*{Example 13 : Practical Example - Generic Pair}
+\addcontentsline{toc}{subsection}{Example 13 : Practical Example - Generic Pair}
 
 \begin{gendef}[T]
   makePair: T \cross T \fun T \cross T
@@ -229,8 +230,8 @@ funcSet = \{square, double, successor\}
 
 \bigskip
 
-\section*{Example 14 : Generic Pair Extraction}
-\addcontentsline{toc}{section}{Example 14 : Generic Pair Extraction}
+\subsection*{Example 14 : Generic Pair Extraction}
+\addcontentsline{toc}{subsection}{Example 14 : Generic Pair Extraction}
 
 \begin{gendef}[X]
   fst: X \cross X \fun X \\
@@ -244,8 +245,8 @@ funcSet = \{square, double, successor\}
 
 \bigskip
 
-\section*{Example 15 : List of Lists}
-\addcontentsline{toc}{section}{Example 15 : List of Lists}
+\subsection*{Example 15 : List of Lists}
+\addcontentsline{toc}{subsection}{Example 15 : List of Lists}
 
 \begin{axdef}
 matrix : \seq (\seq \nat)
@@ -257,8 +258,8 @@ matrix = \langle \langle 1, 2, 3 \rangle, \langle 4, 5, 6 \rangle, \langle 7, 8,
 
 \bigskip
 
-\section*{Example 16 : Homogeneous Collections}
-\addcontentsline{toc}{section}{Example 16 : Homogeneous Collections}
+\subsection*{Example 16 : Homogeneous Collections}
+\addcontentsline{toc}{subsection}{Example 16 : Homogeneous Collections}
 
 \noindent Type instantiation ensures homogeneity:
 
@@ -274,8 +275,8 @@ validSeq = \langle 1, 2, 3 \rangle
 
 \bigskip
 
-\section*{Example 17 : Generic Queue}
-\addcontentsline{toc}{section}{Example 17 : Generic Queue}
+\subsection*{Example 17 : Generic Queue}
+\addcontentsline{toc}{subsection}{Example 17 : Generic Queue}
 
 \begin{gendef}[T]
   wrap: T \fun \seq T \\
@@ -289,8 +290,8 @@ validSeq = \langle 1, 2, 3 \rangle
 
 \bigskip
 
-\section*{Example 18 : Type Synonyms with Instantiation}
-\addcontentsline{toc}{section}{Example 18 : Type Synonyms with Instantiation}
+\subsection*{Example 18 : Type Synonyms with Instantiation}
+\addcontentsline{toc}{subsection}{Example 18 : Type Synonyms with Instantiation}
 
 \noindent Type abbreviations can use instantiated types:
 
@@ -304,8 +305,8 @@ validSeq = \langle 1, 2, 3 \rangle
 
 \bigskip
 
-\section*{Example 19 : Higher - Order Types}
-\addcontentsline{toc}{section}{Example 19 : Higher - Order Types}
+\subsection*{Example 19 : Higher - Order Types}
+\addcontentsline{toc}{subsection}{Example 19 : Higher - Order Types}
 
 \begin{axdef}
 transformers : \power (\nat \fun \nat) \\
@@ -319,8 +320,8 @@ sequences = \{\langle 1, 2 \rangle, \langle 3, 4 \rangle\}
 
 \bigskip
 
-\section*{Example 20 : Instantiation elem Quantifiers}
-\addcontentsline{toc}{section}{Example 20 : Instantiation elem Quantifiers}
+\subsection*{Example 20 : Instantiation elem Quantifiers}
+\addcontentsline{toc}{subsection}{Example 20 : Instantiation elem Quantifiers}
 
 \noindent
 $\forall s : \seq \nat @ \# s \geq 0$
@@ -334,8 +335,8 @@ $\exists p : \nat \cross \nat | p @ 1 = p.2$
 
 \bigskip
 
-\section*{Example 21 : Partial Function Types}
-\addcontentsline{toc}{section}{Example 21 : Partial Function Types}
+\subsection*{Example 21 : Partial Function Types}
+\addcontentsline{toc}{subsection}{Example 21 : Partial Function Types}
 
 \begin{axdef}
 lookup : \nat \pfun \seq \nat \\
@@ -349,22 +350,22 @@ mapping = \{1 \mapsto 2, 2 \mapsto 4, 3 \mapsto 6\}
 
 \bigskip
 
-\section*{Example 22 : Best Practices}
-\addcontentsline{toc}{section}{Example 22 : Best Practices}
+\subsection*{Example 22 : Best Practices}
+\addcontentsline{toc}{subsection}{Example 22 : Best Practices}
 
 \noindent When using generic instantiation: 1. Be explicit about type parameters for clarity 2. Use consistent naming (seq[T], not mixed seq T and T seq) 3. Document what type parameters represent 4. Instantiate at the right abstraction level 5. Prefer generic definitions over duplicate specific definitions 6. Type-check that instantiations make sense
 
 \bigskip
 
-\section*{Example 23 : Common Patterns}
-\addcontentsline{toc}{section}{Example 23 : Common Patterns}
+\subsection*{Example 23 : Common Patterns}
+\addcontentsline{toc}{subsection}{Example 23 : Common Patterns}
 
 \noindent Common instantiation patterns: - seq[T] for sequences of T - P[T] for sets of T - $T \pfun U$ for partial functions - T $\rel$ U for relations - bag[T] for multisets of T - T cross U for pairs - $T \fun U$ for total functions
 
 \bigskip
 
-\section*{Example 24 : Type Safety}
-\addcontentsline{toc}{section}{Example 24 : Type Safety}
+\subsection*{Example 24 : Type Safety}
+\addcontentsline{toc}{subsection}{Example 24 : Type Safety}
 
 \noindent Generic instantiation provides type safety:
 

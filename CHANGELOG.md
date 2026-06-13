@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **`** **` solutions now render `\subsection*`** — previously `\section*`.
+  This is one heading level smaller. Solutions now nest under sections in
+  the table of contents instead of colliding with them.
+
+- **`(a)` parts now render `\subsubsection*`** — previously `\subsection*`.
+  One heading level smaller. Parts now nest under solutions in the table
+  of contents.
+
+- **`=== ===` sections now appear in the TOC** — previously sections were
+  invisible to the table of contents. `\section*` entries are now added
+  via `\addcontentsline` when a `CONTENTS:` directive is present.
+
+- **`CONTENTS:` depth semantics revised** — bare `CONTENTS:` now means
+  depth 2 (sections + solutions). Explicit depth keywords:
+  - `CONTENTS: 1` — sections only
+  - `CONTENTS: 2` — sections and solutions
+  - `CONTENTS: 3` — sections, solutions, and parts
+  - `CONTENTS: full` — all three levels (depth 3); previously meant depth 2
+  - `CONTENTS: all` — all three levels (depth 3)
+
+  Depth is enforced by filtering `\addcontentsline` calls at generator
+  time. LaTeX's `tocdepth` counter is inert for starred headings with
+  manual `\addcontentsline` and is not used.
+
+- **`--toc-parts` is now a depth override** — forces parts into the TOC
+  at depth 3 regardless of the `CONTENTS:` keyword in the source file.
+  Previously it was the only way to get parts in the TOC at all.
+
 ## [1.6.3] - 2026-05-29
 
 ### Added

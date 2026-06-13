@@ -40,6 +40,7 @@ dueYear : \nat
 \end{schema}
 
 \section*{Restriction (sigma)}
+\addcontentsline{toc}{section}{Restriction (sigma)}
 
 \noindent
 $\mathrm{Restrict}_{pages \geq 500}(Book)$
@@ -50,6 +51,7 @@ $\mathrm{Restrict}_{year \geq 1990}(\mathrm{Restrict}_{pages \geq 500}(Book))$
 
 
 \section*{Projection (pi)}
+\addcontentsline{toc}{section}{Projection (pi)}
 
 \noindent
 $\mathrm{Project}_{title, author}(Book)$
@@ -60,6 +62,7 @@ $\mathrm{Project}_{title, author}(\mathrm{Restrict}_{pages \geq 500}(Book))$
 
 
 \section*{Renaming (R[new/old])}
+\addcontentsline{toc}{section}{Renaming (R[new/old])}
 
 \noindent
 $\mathrm{Project}_{id, title, author, genre, pages, year}(Book[id/bookId])$
@@ -70,6 +73,7 @@ $\mathrm{Project}_{id, writer, genre, pages, year}(Book[id/bookId, writer/author
 
 
 \section*{Natural Join and Theta-Join (join)}
+\addcontentsline{toc}{section}{Natural Join and Theta-Join (join)}
 
 \noindent
 $\mathrm{Join}(Loan, Book)$
@@ -84,12 +88,14 @@ $\mathrm{Join}_{Member.memberId = Loan.memberId}(Member, Loan)$
 
 
 \section*{Division (div)}
+\addcontentsline{toc}{section}{Division (div)}
 
 \noindent
 $Loan~\div~Book$
 
 
 \section*{Combined Query}
+\addcontentsline{toc}{section}{Combined Query}
 
 \noindent
 $\mathrm{Project}_{title, author}(\mathrm{Restrict}_{pages \geq 500}(Book))$

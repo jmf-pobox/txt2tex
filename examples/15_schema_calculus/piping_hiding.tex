@@ -12,9 +12,10 @@
 \begin{document}
 
 \section*{Schema Calculus: Piping and Hiding}
+\addcontentsline{toc}{section}{Schema Calculus: Piping and Hiding}
 
-\section*{Example 1 : Schema piping ( output - to - input pipeline )}
-\addcontentsline{toc}{section}{Example 1 : Schema piping ( output - to - input pipeline )}
+\subsection*{Example 1 : Schema piping ( output - to - input pipeline )}
+\addcontentsline{toc}{subsection}{Example 1 : Schema piping ( output - to - input pipeline )}
 
 \begin{schema}{Send}
 chan! : \nat
@@ -32,8 +33,8 @@ chan? < 100
 Pipeline \defs Send \pipe Receive
 \end{zed}
 
-\section*{Example 2 : Schema hiding}
-\addcontentsline{toc}{section}{Example 2 : Schema hiding}
+\subsection*{Example 2 : Schema hiding}
+\addcontentsline{toc}{subsection}{Example 2 : Schema hiding}
 
 \begin{schema}{State}
 x : \nat \\
@@ -48,8 +49,8 @@ temp > 0
 Visible \defs State \hide (temp)
 \end{zed}
 
-\section*{Example 3 : Combined piping and hiding}
-\addcontentsline{toc}{section}{Example 3 : Combined piping and hiding}
+\subsection*{Example 3 : Combined piping and hiding}
+\addcontentsline{toc}{subsection}{Example 3 : Combined piping and hiding}
 
 \begin{schema}{OpA}
 x : \nat \\

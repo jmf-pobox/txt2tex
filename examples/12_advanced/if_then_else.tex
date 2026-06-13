@@ -12,9 +12,10 @@
 \begin{document}
 
 \section*{Conditional Expressions}
+\addcontentsline{toc}{section}{Conditional Expressions}
 
-\section*{Example 1 : Basic If - Then - Else}
-\addcontentsline{toc}{section}{Example 1 : Basic If - Then - Else}
+\subsection*{Example 1 : Basic If - Then - Else}
+\addcontentsline{toc}{subsection}{Example 1 : Basic If - Then - Else}
 
 \noindent The if-then-else expression evaluates to one of two values based on a condition:
 
@@ -28,8 +29,8 @@ $\IF x > 0 \THEN 1 \ELSE -1$
 
 \bigskip
 
-\section*{Example 2 : Absolute Value Function}
-\addcontentsline{toc}{section}{Example 2 : Absolute Value Function}
+\subsection*{Example 2 : Absolute Value Function}
+\addcontentsline{toc}{subsection}{Example 2 : Absolute Value Function}
 
 \begin{axdef}
 abs : \num \fun \nat
@@ -41,8 +42,8 @@ abs : \num \fun \nat
 
 \bigskip
 
-\section*{Example 3 : Maximum Function}
-\addcontentsline{toc}{section}{Example 3 : Maximum Function}
+\subsection*{Example 3 : Maximum Function}
+\addcontentsline{toc}{subsection}{Example 3 : Maximum Function}
 
 \begin{axdef}
 maximum : \nat \cross \nat \fun \nat
@@ -54,8 +55,8 @@ maximum : \nat \cross \nat \fun \nat
 
 \bigskip
 
-\section*{Example 4 : Sign Function}
-\addcontentsline{toc}{section}{Example 4 : Sign Function}
+\subsection*{Example 4 : Sign Function}
+\addcontentsline{toc}{subsection}{Example 4 : Sign Function}
 
 \begin{axdef}
 sign : \num \fun \{-1, 0, 1\}
@@ -68,8 +69,8 @@ sign : \num \fun \{-1, 0, 1\}
 
 \bigskip
 
-\section*{Example 5 : Conditional elem Set Comprehension}
-\addcontentsline{toc}{section}{Example 5 : Conditional elem Set Comprehension}
+\subsection*{Example 5 : Conditional elem Set Comprehension}
+\addcontentsline{toc}{subsection}{Example 5 : Conditional elem Set Comprehension}
 
 \setbox0=\vbox{%
 \begin{zed}
@@ -84,8 +85,8 @@ $\{~ x : \nat | x < 10 @ \IF x \mod 2 = 0 \THEN x \ELSE x + 1 ~\}$
 
 \bigskip
 
-\section*{Example 6 : Pattern Matching with Conditionals}
-\addcontentsline{toc}{section}{Example 6 : Pattern Matching with Conditionals}
+\subsection*{Example 6 : Pattern Matching with Conditionals}
+\addcontentsline{toc}{subsection}{Example 6 : Pattern Matching with Conditionals}
 
 \begin{axdef}
 filterPositives : \seq~\num \fun \seq~\num
@@ -101,8 +102,8 @@ filterPositives(\langle \rangle) = \langle \rangle \\
 
 \bigskip
 
-\section*{Example 7 : Grade Assignment}
-\addcontentsline{toc}{section}{Example 7 : Grade Assignment}
+\subsection*{Example 7 : Grade Assignment}
+\addcontentsline{toc}{subsection}{Example 7 : Grade Assignment}
 
 \begin{zed}Grade ::= GradeA | GradeB | GradeC | GradeD | GradeF\end{zed}
 
@@ -121,8 +122,8 @@ scoreToGrade : \nat \fun Grade
 
 \bigskip
 
-\section*{Example 8 : Piecewise Function}
-\addcontentsline{toc}{section}{Example 8 : Piecewise Function}
+\subsection*{Example 8 : Piecewise Function}
+\addcontentsline{toc}{subsection}{Example 8 : Piecewise Function}
 
 \begin{axdef}
 piecewise : \num \fun \num
@@ -135,8 +136,8 @@ piecewise : \num \fun \num
 
 \bigskip
 
-\section*{Example 9 : Conditional elem Lambda}
-\addcontentsline{toc}{section}{Example 9 : Conditional elem Lambda}
+\subsection*{Example 9 : Conditional elem Lambda}
+\addcontentsline{toc}{subsection}{Example 9 : Conditional elem Lambda}
 
 \noindent
 $(\lambda x : \nat @ \IF x > 100 \THEN 100 \ELSE x)$
@@ -146,8 +147,8 @@ $(\lambda x : \nat @ \IF x > 100 \THEN 100 \ELSE x)$
 
 \bigskip
 
-\section*{Example 10 : Conditional Set Selection}
-\addcontentsline{toc}{section}{Example 10 : Conditional Set Selection}
+\subsection*{Example 10 : Conditional Set Selection}
+\addcontentsline{toc}{subsection}{Example 10 : Conditional Set Selection}
 
 \begin{axdef}
 evenSet : \power \nat \\
@@ -161,8 +162,8 @@ oddSet = \{~ n : \nat | n \mod 2 = 1 ~\}
 
 \bigskip
 
-\section*{Example 11 : Practical Example - Tax Rate Selection}
-\addcontentsline{toc}{section}{Example 11 : Practical Example - Tax Rate Selection}
+\subsection*{Example 11 : Practical Example - Tax Rate Selection}
+\addcontentsline{toc}{subsection}{Example 11 : Practical Example - Tax Rate Selection}
 
 \begin{axdef}
 taxRate : \nat \fun \nat
@@ -175,8 +176,8 @@ taxRate : \nat \fun \nat
 
 \bigskip
 
-\section*{Example 12 : Conditional with Complex Expression}
-\addcontentsline{toc}{section}{Example 12 : Conditional with Complex Expression}
+\subsection*{Example 12 : Conditional with Complex Expression}
+\addcontentsline{toc}{subsection}{Example 12 : Conditional with Complex Expression}
 
 \begin{axdef}
 complexFunc : \nat \fun \nat
@@ -189,8 +190,8 @@ complexFunc : \nat \fun \nat
 
 \bigskip
 
-\section*{Example 13 : Guard Conditions elem Recursion}
-\addcontentsline{toc}{section}{Example 13 : Guard Conditions elem Recursion}
+\subsection*{Example 13 : Guard Conditions elem Recursion}
+\addcontentsline{toc}{subsection}{Example 13 : Guard Conditions elem Recursion}
 
 \begin{axdef}
 factorial : \nat \fun \nat
@@ -204,8 +205,8 @@ factorial(0) = 1 \\
 
 \bigskip
 
-\section*{Example 14 : Ternary - Style Expression}
-\addcontentsline{toc}{section}{Example 14 : Ternary - Style Expression}
+\subsection*{Example 14 : Ternary - Style Expression}
+\addcontentsline{toc}{subsection}{Example 14 : Ternary - Style Expression}
 
 \noindent Z notation's if-then-else is similar to C's ternary operator (? :):
 
@@ -219,8 +220,8 @@ factorial(0) = 1 \\
 
 \bigskip
 
-\section*{Example 15 : Short - Circuit Evaluation Note}
-\addcontentsline{toc}{section}{Example 15 : Short - Circuit Evaluation Note}
+\subsection*{Example 15 : Short - Circuit Evaluation Note}
+\addcontentsline{toc}{subsection}{Example 15 : Short - Circuit Evaluation Note}
 
 \noindent In Z notation, if-then-else expressions should be evaluated lazily: only the selected branch should be evaluated. This matters when branches have side effects or may be undefined.
 
@@ -230,8 +231,8 @@ factorial(0) = 1 \\
 
 \bigskip
 
-\section*{Example 16 : Best Practices}
-\addcontentsline{toc}{section}{Example 16 : Best Practices}
+\subsection*{Example 16 : Best Practices}
+\addcontentsline{toc}{subsection}{Example 16 : Best Practices}
 
 \noindent When using if-then-else: 1. Keep branches simple and readable 2. For many cases, consider using free types with pattern matching 3. Nest carefully—deep nesting hurts readability 4. Document complex conditions 5. Ensure both branches have the same type 6. Consider using helper predicates for complex conditions
 

@@ -12,9 +12,10 @@
 \begin{document}
 
 \section*{Combined Text Directives}
+\addcontentsline{toc}{section}{Combined Text Directives}
 
-\section*{Example 1 : Documentation Style}
-\addcontentsline{toc}{section}{Example 1 : Documentation Style}
+\subsection*{Example 1 : Documentation Style}
+\addcontentsline{toc}{subsection}{Example 1 : Documentation Style}
 
 \noindent This example demonstrates how to combine different text directives effectively. Use TEXT for normal explanatory prose with proper typography.
 
@@ -36,8 +37,8 @@ txt2tex examples/hello\_world.txt
 
 \bigskip
 
-\section*{Example 2 : Tutorial Format}
-\addcontentsline{toc}{section}{Example 2 : Tutorial Format}
+\subsection*{Example 2 : Tutorial Format}
+\addcontentsline{toc}{subsection}{Example 2 : Tutorial Format}
 
 \noindent Let's explore the natural numbers. In Z notation, we write N for the set of natural numbers: {0, 1, 2, 3, ...}.
 
@@ -55,8 +56,8 @@ first\_five = \{0, 1, 2, 3, 4\}
 
 \bigskip
 
-\section*{Example 3 : Showing Syntax vs Using Syntax}
-\addcontentsline{toc}{section}{Example 3 : Showing Syntax vs Using Syntax}
+\subsection*{Example 3 : Showing Syntax vs Using Syntax}
+\addcontentsline{toc}{subsection}{Example 3 : Showing Syntax vs Using Syntax}
 
 \noindent To demonstrate the difference between showing syntax and using it, consider quantifiers.
 
@@ -84,8 +85,8 @@ forall x : T | predicate
 
 \bigskip
 
-\section*{Example 4 : Code Examples with Explanations}
-\addcontentsline{toc}{section}{Example 4 : Code Examples with Explanations}
+\subsection*{Example 4 : Code Examples with Explanations}
+\addcontentsline{toc}{subsection}{Example 4 : Code Examples with Explanations}
 
 \noindent The txt2tex tool supports several commands. Here are the most common:
 
@@ -127,8 +128,8 @@ txt2tex examples/file.txt
 
 \medskip\noindent\textit{Tip:} Always use the convert command for final output.
 
-\section*{Example 5 : Mathematical Explanation}
-\addcontentsline{toc}{section}{Example 5 : Mathematical Explanation}
+\subsection*{Example 5 : Mathematical Explanation}
+\addcontentsline{toc}{subsection}{Example 5 : Mathematical Explanation}
 
 \noindent Consider the function f(n) = n\textasciicircum$\{\}$2. We can define this formally in Z notation:
 
@@ -168,8 +169,8 @@ $n$ & $f(n)$ \\ \hline
 
 \bigskip
 
-\section*{Example 6 : Syntax Reference}
-\addcontentsline{toc}{section}{Example 6 : Syntax Reference}
+\subsection*{Example 6 : Syntax Reference}
+\addcontentsline{toc}{subsection}{Example 6 : Syntax Reference}
 
 \noindent Here's a quick reference for text directives:
 
@@ -217,8 +218,8 @@ PAGEBREAK
 
 \bigskip
 
-\section*{Example 7 : Best Practices}
-\addcontentsline{toc}{section}{Example 7 : Best Practices}
+\subsection*{Example 7 : Best Practices}
+\addcontentsline{toc}{subsection}{Example 7 : Best Practices}
 
 \noindent When writing specifications, follow these guidelines:
 
@@ -246,20 +247,22 @@ PAGEBREAK
 
 \bigskip
 
-\section*{Example 8 : Real - World Document Structure}
-\addcontentsline{toc}{section}{Example 8 : Real - World Document Structure}
+\subsection*{Example 8 : Real - World Document Structure}
+\addcontentsline{toc}{subsection}{Example 8 : Real - World Document Structure}
 
 \noindent A typical specification document might look like this:
 
 \bigskip
 
 \section*{Section 1: Introduction}
+\addcontentsline{toc}{section}{Section 1: Introduction}
 
 \noindent Prose introduction explaining the problem domain.
 
 \bigskip
 
 \section*{Section 2: Data Types}
+\addcontentsline{toc}{section}{Section 2: Data Types}
 
 \begin{zed}
 [User, Document, Permission]
@@ -270,6 +273,7 @@ PAGEBREAK
 \bigskip
 
 \section*{Section 3: State Schema}
+\addcontentsline{toc}{section}{Section 3: State Schema}
 
 \begin{schema}{FileSystem}
 docs : User \pfun \power Document \\
@@ -289,6 +293,7 @@ $PAGEBREAK$
 
 
 \section*{Section 4: Operations}
+\addcontentsline{toc}{section}{Section 4: Operations}
 
 \noindent Now we define the operations on the file system...
 

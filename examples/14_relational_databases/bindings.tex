@@ -32,12 +32,14 @@ tracks : \nat
 \end{schema}
 
 \section*{Atomic Binding}
+\addcontentsline{toc}{section}{Atomic Binding}
 
 \noindent
 $\lblot~trackId == t.trackId~\rblot$
 
 
 \section*{Binding in Set Comprehension}
+\addcontentsline{toc}{section}{Binding in Set Comprehension}
 
 \setbox0=\vbox{%
 \begin{zed}
@@ -49,12 +51,14 @@ $\{~ t : Track | t.duration < 180 @ \lblot~trackId == t.trackId~\rblot ~\}$
 
 
 \section*{Multi-Component Binding}
+\addcontentsline{toc}{section}{Multi-Component Binding}
 
 \noindent
 $\lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot$
 
 
 \section*{Multi-Variable Comprehension with Binding}
+\addcontentsline{toc}{section}{Multi-Variable Comprehension with Binding}
 
 \setbox0=\vbox{%
 \begin{zed}
@@ -66,6 +70,7 @@ $\begin{array}{l}\{~ t : Track ; a : Album | t.albumId = a.albumId @ \\ \lblot~t
 
 
 \section*{Empty Binding}
+\addcontentsline{toc}{section}{Empty Binding}
 
 \noindent
 $\lblot~\rblot$

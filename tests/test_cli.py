@@ -148,7 +148,7 @@ def test_cli_with_complex_document(tmp_path: Path) -> None:
     output_file = input_file.with_suffix(".tex")
     assert output_file.exists()
     latex = output_file.read_text()
-    assert "\\section*{Solution 1}" in latex
+    assert "\\subsection*{Solution 1}" in latex
 
 
 def test_cli_empty_input_file(tmp_path: Path) -> None:

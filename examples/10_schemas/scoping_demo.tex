@@ -12,13 +12,14 @@
 \begin{document}
 
 \section*{Scoping Rules Examples}
+\addcontentsline{toc}{section}{Scoping Rules Examples}
 
 \begin{zed}
 [Char]
 \end{zed}
 
-\section*{Example 1 : Quantifier Scope}
-\addcontentsline{toc}{section}{Example 1 : Quantifier Scope}
+\subsection*{Example 1 : Quantifier Scope}
+\addcontentsline{toc}{subsection}{Example 1 : Quantifier Scope}
 
 \noindent Variables introduced in quantifiers are local to that quantifier:
 
@@ -32,8 +33,8 @@ $\forall x : \nat @ x > 0$
 
 \bigskip
 
-\section*{Example 2 : Nested Quantifiers}
-\addcontentsline{toc}{section}{Example 2 : Nested Quantifiers}
+\subsection*{Example 2 : Nested Quantifiers}
+\addcontentsline{toc}{subsection}{Example 2 : Nested Quantifiers}
 
 \noindent
 $\forall x : \nat @ \exists y : \nat @ x + y = 10$
@@ -43,8 +44,8 @@ $\forall x : \nat @ \exists y : \nat @ x + y = 10$
 
 \bigskip
 
-\section*{Example 3 : Shadowing elem Nested Quantifiers}
-\addcontentsline{toc}{section}{Example 3 : Shadowing elem Nested Quantifiers}
+\subsection*{Example 3 : Shadowing elem Nested Quantifiers}
+\addcontentsline{toc}{subsection}{Example 3 : Shadowing elem Nested Quantifiers}
 
 \noindent
 $\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
@@ -54,8 +55,8 @@ $\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
 
 \bigskip
 
-\section*{Example 4 : Set Comprehension Scope}
-\addcontentsline{toc}{section}{Example 4 : Set Comprehension Scope}
+\subsection*{Example 4 : Set Comprehension Scope}
+\addcontentsline{toc}{subsection}{Example 4 : Set Comprehension Scope}
 
 \setbox0=\vbox{%
 \begin{zed}
@@ -70,8 +71,8 @@ $\{~ x : \nat | x > 0 \land x < 10 ~\}$
 
 \bigskip
 
-\section*{Example 5 : Bullet Separator Scope}
-\addcontentsline{toc}{section}{Example 5 : Bullet Separator Scope}
+\subsection*{Example 5 : Bullet Separator Scope}
+\addcontentsline{toc}{subsection}{Example 5 : Bullet Separator Scope}
 
 \setbox0=\vbox{%
 \begin{zed}
@@ -86,8 +87,8 @@ $\{~ x : \nat | x < 5 @ x * x ~\}$
 
 \bigskip
 
-\section*{Example 6 : Schema Component Scope}
-\addcontentsline{toc}{section}{Example 6 : Schema Component Scope}
+\subsection*{Example 6 : Schema Component Scope}
+\addcontentsline{toc}{subsection}{Example 6 : Schema Component Scope}
 
 \begin{schema}{Counter}
 count : \nat \\
@@ -100,8 +101,8 @@ count \leq limit
 
 \bigskip
 
-\section*{Example 7 : Schema Reference}
-\addcontentsline{toc}{section}{Example 7 : Schema Reference}
+\subsection*{Example 7 : Schema Reference}
+\addcontentsline{toc}{subsection}{Example 7 : Schema Reference}
 
 \begin{axdef}
 c : Counter
@@ -114,8 +115,8 @@ c.limit = 10
 
 \bigskip
 
-\section*{Example 8 : Multiple Schemas - No Name Conflict}
-\addcontentsline{toc}{section}{Example 8 : Multiple Schemas - No Name Conflict}
+\subsection*{Example 8 : Multiple Schemas - No Name Conflict}
+\addcontentsline{toc}{subsection}{Example 8 : Multiple Schemas - No Name Conflict}
 
 \begin{schema}{Account}
 balance : \nat
@@ -133,8 +134,8 @@ balance \geq 0
 
 \bigskip
 
-\section*{Example 9 : Schema Inclusion Scope}
-\addcontentsline{toc}{section}{Example 9 : Schema Inclusion Scope}
+\subsection*{Example 9 : Schema Inclusion Scope}
+\addcontentsline{toc}{subsection}{Example 9 : Schema Inclusion Scope}
 
 \begin{schema}{User}
 userId : \nat \\
@@ -153,8 +154,8 @@ sessionToken > 0
 
 \bigskip
 
-\section*{Example 10 : Global vs Local Names}
-\addcontentsline{toc}{section}{Example 10 : Global vs Local Names}
+\subsection*{Example 10 : Global vs Local Names}
+\addcontentsline{toc}{subsection}{Example 10 : Global vs Local Names}
 
 \begin{zed}
 [GlobalType]
@@ -176,8 +177,8 @@ x = globalVar + 1
 
 \bigskip
 
-\section*{Example 11 : Quantifier with Global Names}
-\addcontentsline{toc}{section}{Example 11 : Quantifier with Global Names}
+\subsection*{Example 11 : Quantifier with Global Names}
+\addcontentsline{toc}{subsection}{Example 11 : Quantifier with Global Names}
 
 \begin{axdef}
 maximum : \nat
@@ -195,8 +196,8 @@ value : \nat
 
 \bigskip
 
-\section*{Example 12 : Name Capture Avoidance}
-\addcontentsline{toc}{section}{Example 12 : Name Capture Avoidance}
+\subsection*{Example 12 : Name Capture Avoidance}
+\addcontentsline{toc}{subsection}{Example 12 : Name Capture Avoidance}
 
 \noindent Be careful with name shadowing in complex expressions:
 
@@ -213,8 +214,8 @@ x = 10 \\
 
 \bigskip
 
-\section*{Example 13 : Lambda Scope}
-\addcontentsline{toc}{section}{Example 13 : Lambda Scope}
+\subsection*{Example 13 : Lambda Scope}
+\addcontentsline{toc}{subsection}{Example 13 : Lambda Scope}
 
 \noindent
 $(\lambda x : \nat @ x * x)$
@@ -224,8 +225,8 @@ $(\lambda x : \nat @ x * x)$
 
 \bigskip
 
-\section*{Example 14 : Nested Lambdas}
-\addcontentsline{toc}{section}{Example 14 : Nested Lambdas}
+\subsection*{Example 14 : Nested Lambdas}
+\addcontentsline{toc}{subsection}{Example 14 : Nested Lambdas}
 
 \noindent
 $(\lambda x : \nat @ (\lambda y : \nat @ x + y))$
@@ -235,8 +236,8 @@ $(\lambda x : \nat @ (\lambda y : \nat @ x + y))$
 
 \bigskip
 
-\section*{Example 15 : Mu Operator Scope}
-\addcontentsline{toc}{section}{Example 15 : Mu Operator Scope}
+\subsection*{Example 15 : Mu Operator Scope}
+\addcontentsline{toc}{subsection}{Example 15 : Mu Operator Scope}
 
 \noindent
 $(\mu x : \nat | x * x = 25)$
@@ -246,8 +247,8 @@ $(\mu x : \nat | x * x = 25)$
 
 \bigskip
 
-\section*{Example 16 : Set Comprehension with Multiple Variables}
-\addcontentsline{toc}{section}{Example 16 : Set Comprehension with Multiple Variables}
+\subsection*{Example 16 : Set Comprehension with Multiple Variables}
+\addcontentsline{toc}{subsection}{Example 16 : Set Comprehension with Multiple Variables}
 
 \setbox0=\vbox{%
 \begin{zed}
@@ -262,8 +263,8 @@ $\{~ x, y : \nat | x < y \land y < 10 @ (x, y) ~\}$
 
 \bigskip
 
-\section*{Example 17 : Schema Quantification}
-\addcontentsline{toc}{section}{Example 17 : Schema Quantification}
+\subsection*{Example 17 : Schema Quantification}
+\addcontentsline{toc}{subsection}{Example 17 : Schema Quantification}
 
 \begin{schema}{Database}
 records : \power \nat
@@ -277,15 +278,15 @@ $\exists Database @ \# records > 100$
 
 \bigskip
 
-\section*{Example 18 : Scope Hygiene Best Practices}
-\addcontentsline{toc}{section}{Example 18 : Scope Hygiene Best Practices}
+\subsection*{Example 18 : Scope Hygiene Best Practices}
+\addcontentsline{toc}{subsection}{Example 18 : Scope Hygiene Best Practices}
 
 \noindent To avoid confusion: 1. Don't shadow names unnecessarily---use different variable names 2. Keep quantifier nesting shallow when possible 3. Use descriptive names that make scope obvious 4. Avoid reusing schema component names in nested contexts 5. Document intentional shadowing with comments
 
 \bigskip
 
-\section*{Example 19 : Good Style ( Distinct Names )}
-\addcontentsline{toc}{section}{Example 19 : Good Style ( Distinct Names )}
+\subsection*{Example 19 : Good Style ( Distinct Names )}
+\addcontentsline{toc}{subsection}{Example 19 : Good Style ( Distinct Names )}
 
 \noindent
 $\forall x : \nat @ x > 0 \implies (\exists y : \nat @ y < x \land y > 0)$
@@ -295,8 +296,8 @@ $\forall x : \nat @ x > 0 \implies (\exists y : \nat @ y < x \land y > 0)$
 
 \bigskip
 
-\section*{Example 20 : Poor Style ( Shadowing )}
-\addcontentsline{toc}{section}{Example 20 : Poor Style ( Shadowing )}
+\subsection*{Example 20 : Poor Style ( Shadowing )}
+\addcontentsline{toc}{subsection}{Example 20 : Poor Style ( Shadowing )}
 
 \noindent
 $\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
@@ -306,8 +307,8 @@ $\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
 
 \bigskip
 
-\section*{Example 21 : Scoping elem Definitions}
-\addcontentsline{toc}{section}{Example 21 : Scoping elem Definitions}
+\subsection*{Example 21 : Scoping elem Definitions}
+\addcontentsline{toc}{subsection}{Example 21 : Scoping elem Definitions}
 
 \noindent Poor style example (not valid due to name shadowing): If we had: axdef with square : $\nat \fun \nat$ and n : N, where forall n : N shadows the global n. The quantifier's n would be local to the quantifier, and the global $n = 5$ would be separate. This is legal but confusing. Better to use different names:
 
@@ -325,8 +326,8 @@ testValue = 5
 
 \bigskip
 
-\section*{Example 22 : Schema Composition Scope}
-\addcontentsline{toc}{section}{Example 22 : Schema Composition Scope}
+\subsection*{Example 22 : Schema Composition Scope}
+\addcontentsline{toc}{subsection}{Example 22 : Schema Composition Scope}
 
 \begin{schema}{StateA}
 x : \nat
@@ -347,8 +348,8 @@ x + y > 0
 
 \bigskip
 
-\section*{Example 23 : Free Type Scope}
-\addcontentsline{toc}{section}{Example 23 : Free Type Scope}
+\subsection*{Example 23 : Free Type Scope}
+\addcontentsline{toc}{subsection}{Example 23 : Free Type Scope}
 
 \begin{zed}
 Color ::= red | green | blue

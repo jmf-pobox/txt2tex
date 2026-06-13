@@ -21,6 +21,7 @@
 \medskip
 
 \section*{Pattern 1: Single-Attribute Primary Key}
+\addcontentsline{toc}{section}{Pattern 1: Single-Attribute Primary Key}
 
 \noindent Each relation has exactly one pk line.  txt2tex underlines the attribute in the schema box and emits a PK statement immediately after.
 
@@ -53,6 +54,7 @@ name : IngredientName
 \medskip
 
 \section*{Pattern 2: Composite Primary Key}
+\addcontentsline{toc}{section}{Pattern 2: Composite Primary Key}
 
 \noindent Two pk lines in one schema body.  Both attributes are underlined; txt2tex collapses them into one PK set: PK(RecipeIngredient) = $\{recipeId, ingredientId\}$.
 
@@ -72,6 +74,7 @@ ingredientId : IngredientId
 \medskip
 
 \section*{Pattern 3: Single-Attribute Foreign Key}
+\addcontentsline{toc}{section}{Pattern 3: Single-Attribute Foreign Key}
 
 \noindent A foreign key constraint says every value of the referencing attribute must appear in the referenced relation.  No special keyword is needed: write the constraint as a Z predicate using forall/exists or projection with subset.
 
@@ -104,6 +107,7 @@ $\forall ri : RecipeIngredient @ \exists i : Ingredient @ ri.ingredientId = i.in
 \medskip
 
 \section*{Pattern 4: Composite FK and Self-Referential FK}
+\addcontentsline{toc}{section}{Pattern 4: Composite FK and Self-Referential FK}
 
 \noindent Both FK constraints for RecipeIngredient can be stated together in a single zed block.  Each predicate is separated by an also command in the output.
 

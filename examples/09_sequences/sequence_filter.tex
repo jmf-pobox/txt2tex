@@ -12,6 +12,7 @@
 \begin{document}
 
 \section*{Phase 35: Sequence Filter Operator}
+\addcontentsline{toc}{section}{Phase 35: Sequence Filter Operator}
 
 \noindent The sequence$ \filter $operator restricts a sequence to elements from a specified set. It removes elements not in the$ \filter $set while preserving order.
 
@@ -21,8 +22,8 @@
 
 \bigskip
 
-\section*{Example 1 : Basic Filter Operation}
-\addcontentsline{toc}{section}{Example 1 : Basic Filter Operation}
+\subsection*{Example 1 : Basic Filter Operation}
+\addcontentsline{toc}{subsection}{Example 1 : Basic Filter Operation}
 
 \noindent Filter a sequence to only include elements from a set.
 
@@ -40,8 +41,8 @@ s1 = \langle 1, 2, 3, 4, 5, 6 \rangle \land evens1 = \{2, 4, 6, 8\} \land filter
 
 \bigskip
 
-\section*{Example 2 : Filter with Set Comprehension}
-\addcontentsline{toc}{section}{Example 2 : Filter with Set Comprehension}
+\subsection*{Example 2 : Filter with Set Comprehension}
+\addcontentsline{toc}{subsection}{Example 2 : Filter with Set Comprehension}
 
 \begin{zed}
 [Title2, Length2]
@@ -59,8 +60,8 @@ long\_titles = \{~ t : Title2 | true ~\} \land filtered\_titles = all\_titles \f
 
 \bigskip
 
-\section*{Example 3 : Comparison with Range Restriction}
-\addcontentsline{toc}{section}{Example 3 : Comparison with Range Restriction}
+\subsection*{Example 3 : Comparison with Range Restriction}
+\addcontentsline{toc}{subsection}{Example 3 : Comparison with Range Restriction}
 
 \noindent Sequence$ \filter $(filter) is different from range restriction ($\rres$): - filter: operates on sequences, preserves order - $\rres$: operates on relations, restricts range
 
@@ -84,8 +85,8 @@ s3 = \langle 1, 2, 3, 4, 5 \rangle \land \\
 
 \bigskip
 
-\section*{Example 4 : Practical Example - Video Database}
-\addcontentsline{toc}{section}{Example 4 : Practical Example - Video Database}
+\subsection*{Example 4 : Practical Example - Video Database}
+\addcontentsline{toc}{subsection}{Example 4 : Practical Example - Video Database}
 
 \begin{zed}
 [Title4, Length4]
@@ -106,8 +107,8 @@ family\_friendly4 = \{G4, PG4\}
 
 \bigskip
 
-\section*{Example 5 : Multiple Filters}
-\addcontentsline{toc}{section}{Example 5 : Multiple Filters}
+\subsection*{Example 5 : Multiple Filters}
+\addcontentsline{toc}{subsection}{Example 5 : Multiple Filters}
 
 \begin{axdef}
 s5 : \seq~\nat \\
@@ -125,8 +126,8 @@ s5 = \langle 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 \rangle \land \\
 
 \bigskip
 
-\section*{Example 6 : Empty Filter}
-\addcontentsline{toc}{section}{Example 6 : Empty Filter}
+\subsection*{Example 6 : Empty Filter}
+\addcontentsline{toc}{subsection}{Example 6 : Empty Filter}
 
 \begin{axdef}
 s6 : \seq~\nat \\
@@ -146,8 +147,8 @@ s6 = \langle 1, 2, 3 \rangle \land \\
 
 \bigskip
 
-\section*{Example 7 : Bag Union ( Related Phase 35 Feature )}
-\addcontentsline{toc}{section}{Example 7 : Bag Union ( Related Phase 35 Feature )}
+\subsection*{Example 7 : Bag Union ( Related Phase 35 Feature )}
+\addcontentsline{toc}{subsection}{Example 7 : Bag Union ( Related Phase 35 Feature )}
 
 \noindent Phase 35 also includes the bag union operator. ASCII notation: b1$ \uplus $b2 Unicode alternative: b1 $\uplus$ b2 (U+228E)
 

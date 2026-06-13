@@ -12,6 +12,7 @@
 \begin{document}
 
 \section*{User-Defined Squash Function}
+\addcontentsline{toc}{section}{User-Defined Squash Function}
 
 \noindent The squash operator appears in the Z notation glossary but is not built into the fuzz type-checker. However, we can define it ourselves as a user-defined function using an axiomatic specification.
 
@@ -21,8 +22,8 @@
 
 \bigskip
 
-\section*{Example 1 : Axiomatic Definition of Squash}
-\addcontentsline{toc}{section}{Example 1 : Axiomatic Definition of Squash}
+\subsection*{Example 1 : Axiomatic Definition of Squash}
+\addcontentsline{toc}{subsection}{Example 1 : Axiomatic Definition of Squash}
 
 \noindent We define squash axiomatically by specifying its key properties using only fuzz-compatible notation.
 
@@ -38,8 +39,8 @@
 
 \bigskip
 
-\section*{Example 2 : Using Squash on a Simple Function}
-\addcontentsline{toc}{section}{Example 2 : Using Squash on a Simple Function}
+\subsection*{Example 2 : Using Squash on a Simple Function}
+\addcontentsline{toc}{subsection}{Example 2 : Using Squash on a Simple Function}
 
 \noindent Demonstrate squash on a sparse partial function.
 
@@ -56,8 +57,8 @@ f1 = \{1 \mapsto 10, 3 \mapsto 30, 5 \mapsto 50\} \land s1 = squashFunc(f1)
 
 \bigskip
 
-\section*{Example 3 : Squash with Letters}
-\addcontentsline{toc}{section}{Example 3 : Squash with Letters}
+\subsection*{Example 3 : Squash with Letters}
+\addcontentsline{toc}{subsection}{Example 3 : Squash with Letters}
 
 \begin{zed}
 [Letter]
@@ -78,8 +79,8 @@ f2 = \{2 \mapsto a, 4 \mapsto b, 7 \mapsto c, 9 \mapsto d\} \land s2 = squashFun
 
 \bigskip
 
-\section*{Example 4 : Empty Function}
-\addcontentsline{toc}{section}{Example 4 : Empty Function}
+\subsection*{Example 4 : Empty Function}
+\addcontentsline{toc}{subsection}{Example 4 : Empty Function}
 
 \begin{axdef}
 f3 : \nat_1 \pfun \nat \\
@@ -92,8 +93,8 @@ f3 = \{\} \land s3 = squashFunc(f3)
 
 \bigskip
 
-\section*{Example 5 : Continuous Function ( No Gaps )}
-\addcontentsline{toc}{section}{Example 5 : Continuous Function ( No Gaps )}
+\subsection*{Example 5 : Continuous Function ( No Gaps )}
+\addcontentsline{toc}{subsection}{Example 5 : Continuous Function ( No Gaps )}
 
 \begin{axdef}
 f4 : \nat_1 \pfun \nat \\
@@ -106,8 +107,8 @@ f4 = \{1 \mapsto 100, 2 \mapsto 200, 3 \mapsto 300\} \land s4 = squashFunc(f4)
 
 \bigskip
 
-\section*{Example 6 : Relationship Between Function land Sequence}
-\addcontentsline{toc}{section}{Example 6 : Relationship Between Function land Sequence}
+\subsection*{Example 6 : Relationship Between Function land Sequence}
+\addcontentsline{toc}{subsection}{Example 6 : Relationship Between Function land Sequence}
 
 \noindent For any partial function f with a continuous domain starting at 1, squashFunc is the identity.
 
@@ -124,8 +125,8 @@ s\_continuous\_N : \seq~\nat
 
 \bigskip
 
-\section*{Example 7 : Squash Preserves Injectivity}
-\addcontentsline{toc}{section}{Example 7 : Squash Preserves Injectivity}
+\subsection*{Example 7 : Squash Preserves Injectivity}
+\addcontentsline{toc}{subsection}{Example 7 : Squash Preserves Injectivity}
 
 \noindent If the input function is injective, the output sequence has no duplicates.
 
@@ -142,8 +143,8 @@ inj\_seq : \seq~\nat
 
 \bigskip
 
-\section*{Example 8 : Practical Use Case - Video Database}
-\addcontentsline{toc}{section}{Example 8 : Practical Use Case - Video Database}
+\subsection*{Example 8 : Practical Use Case - Video Database}
+\addcontentsline{toc}{subsection}{Example 8 : Practical Use Case - Video Database}
 
 \begin{zed}
 [VideoID, Title]
