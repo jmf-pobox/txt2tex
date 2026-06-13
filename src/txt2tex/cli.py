@@ -192,7 +192,7 @@ def main() -> int:
     parser.add_argument(
         "--toc-parts",
         action="store_true",
-        help="Include parts (a, b, c) in table of contents",
+        help="Force parts (a, b, c) into the TOC, overriding CONTENTS: depth",
     )
     parser.add_argument(
         "--no-warn-overflow",

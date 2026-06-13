@@ -12,9 +12,10 @@
 \begin{document}
 
 \section*{Higher-Order Functions}
+\addcontentsline{toc}{section}{Higher-Order Functions}
 
-\section*{Example 1 : Apply Function}
-\addcontentsline{toc}{section}{Example 1 : Apply Function}
+\subsection*{Example 1 : Apply Function}
+\addcontentsline{toc}{subsection}{Example 1 : Apply Function}
 
 \noindent A simple higher-order function that applies a function to a value:
 
@@ -30,8 +31,8 @@
 
 \bigskip
 
-\section*{Example 2 : Using Apply}
-\addcontentsline{toc}{section}{Example 2 : Using Apply}
+\subsection*{Example 2 : Using Apply}
+\addcontentsline{toc}{subsection}{Example 2 : Using Apply}
 
 \begin{axdef}
 square : \nat \fun \nat \\
@@ -45,8 +46,8 @@ result = apply(square)(5)
 
 \bigskip
 
-\section*{Example 3 : Compose Function}
-\addcontentsline{toc}{section}{Example 3 : Compose Function}
+\subsection*{Example 3 : Compose Function}
+\addcontentsline{toc}{subsection}{Example 3 : Compose Function}
 
 \noindent Function composition as a higher-order operation:
 
@@ -62,8 +63,8 @@ result = apply(square)(5)
 
 \bigskip
 
-\section*{Example 4 : Using Compose}
-\addcontentsline{toc}{section}{Example 4 : Using Compose}
+\subsection*{Example 4 : Using Compose}
+\addcontentsline{toc}{subsection}{Example 4 : Using Compose}
 
 \begin{axdef}
 addOne : \nat \fun \nat \\
@@ -79,8 +80,8 @@ addOneAndDouble = compose(double, addOne)
 
 \bigskip
 
-\section*{Example 5 : Twice Function}
-\addcontentsline{toc}{section}{Example 5 : Twice Function}
+\subsection*{Example 5 : Twice Function}
+\addcontentsline{toc}{subsection}{Example 5 : Twice Function}
 
 \noindent A function that applies another function twice:
 
@@ -96,8 +97,8 @@ addOneAndDouble = compose(double, addOne)
 
 \bigskip
 
-\section*{Example 6 : Using Twice}
-\addcontentsline{toc}{section}{Example 6 : Using Twice}
+\subsection*{Example 6 : Using Twice}
+\addcontentsline{toc}{subsection}{Example 6 : Using Twice}
 
 \begin{axdef}
 increment : \nat \fun \nat \\
@@ -111,8 +112,8 @@ addTwo = twice(increment)
 
 \bigskip
 
-\section*{Example 7 : Constant Function}
-\addcontentsline{toc}{section}{Example 7 : Constant Function}
+\subsection*{Example 7 : Constant Function}
+\addcontentsline{toc}{subsection}{Example 7 : Constant Function}
 
 \noindent A higher-order function that returns a constant function:
 
@@ -128,8 +129,8 @@ addTwo = twice(increment)
 
 \bigskip
 
-\section*{Example 8 : Using Lambda with Higher - Order Functions}
-\addcontentsline{toc}{section}{Example 8 : Using Lambda with Higher - Order Functions}
+\subsection*{Example 8 : Using Lambda with Higher - Order Functions}
+\addcontentsline{toc}{subsection}{Example 8 : Using Lambda with Higher - Order Functions}
 
 \begin{axdef}
 resultLambda : \nat
@@ -141,8 +142,8 @@ resultLambda = apply((\lambda x : \nat @ x * x))(7)
 
 \bigskip
 
-\section*{Example 9 : Flip Function}
-\addcontentsline{toc}{section}{Example 9 : Flip Function}
+\subsection*{Example 9 : Flip Function}
+\addcontentsline{toc}{subsection}{Example 9 : Flip Function}
 
 \noindent A function that flips the arguments of a binary function:
 
@@ -158,8 +159,8 @@ resultLambda = apply((\lambda x : \nat @ x * x))(7)
 
 \bigskip
 
-\section*{Example 10 : Best Practices}
-\addcontentsline{toc}{section}{Example 10 : Best Practices}
+\subsection*{Example 10 : Best Practices}
+\addcontentsline{toc}{subsection}{Example 10 : Best Practices}
 
 \noindent When using higher-order functions: 1. Use type parameters to make functions generic 2. Keep function signatures clear and simple 3. Compose small functions to build complex behavior 4. Use lambda expressions for inline function definitions 5. Higher-order functions enable functional programming patterns
 

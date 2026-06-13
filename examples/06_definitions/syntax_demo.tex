@@ -12,13 +12,14 @@
 \begin{document}
 
 \section*{Syntax Environment Examples}
+\addcontentsline{toc}{section}{Syntax Environment Examples}
 
 \begin{zed}
 [NAME]
 \end{zed}
 
-\section*{Example 1 : Simple Enumeration}
-\addcontentsline{toc}{section}{Example 1 : Simple Enumeration}
+\subsection*{Example 1 : Simple Enumeration}
+\addcontentsline{toc}{subsection}{Example 1 : Simple Enumeration}
 
 \noindent For simple free types with several branches, syntax provides column-aligned layout:
 
@@ -32,8 +33,8 @@ OP1 & ::= & plus | minus | times | divide
 
 \bigskip
 
-\section*{Example 2 : Parameterized Constructors}
-\addcontentsline{toc}{section}{Example 2 : Parameterized Constructors}
+\subsection*{Example 2 : Parameterized Constructors}
+\addcontentsline{toc}{subsection}{Example 2 : Parameterized Constructors}
 
 \noindent Constructors can have type parameters using angle brackets:
 
@@ -47,8 +48,8 @@ Tree & ::= & leaf \ldata \nat \rdata | branch \ldata Tree \cross Tree \rdata
 
 \bigskip
 
-\section*{Example 3 : Multiple Definitions with Grouping}
-\addcontentsline{toc}{section}{Example 3 : Multiple Definitions with Grouping}
+\subsection*{Example 3 : Multiple Definitions with Grouping}
+\addcontentsline{toc}{subsection}{Example 3 : Multiple Definitions with Grouping}
 
 \noindent Blank lines between definitions create visual groups using \textbackslash also:
 
@@ -63,8 +64,8 @@ Response & ::= & ok | error \ldata \nat \rdata | timeout
 
 \bigskip
 
-\section*{Example 4 : Complex BNF - Style Definitions}
-\addcontentsline{toc}{section}{Example 4 : Complex BNF - Style Definitions}
+\subsection*{Example 4 : Complex BNF - Style Definitions}
+\addcontentsline{toc}{subsection}{Example 4 : Complex BNF - Style Definitions}
 
 \noindent Syntax environment is ideal for BNF-style grammar definitions:
 
@@ -79,8 +80,8 @@ Stmt & ::= & assign \ldata NAME \cross Expr \rdata | seq \ldata Stmt \cross Stmt
 
 \bigskip
 
-\section*{Comparison : Syntax vs Zed Blocks}
-\addcontentsline{toc}{section}{Comparison : Syntax vs Zed Blocks}
+\subsection*{Comparison : Syntax vs Zed Blocks}
+\addcontentsline{toc}{subsection}{Comparison : Syntax vs Zed Blocks}
 
 \noindent Standard zed blocks work for simple types:
 

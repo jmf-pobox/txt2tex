@@ -12,13 +12,14 @@
 \begin{document}
 
 \section*{Simple Function Definitions}
+\addcontentsline{toc}{section}{Simple Function Definitions}
 
 \noindent This file demonstrates basic function definitions in Z notation that work well with fuzz type checking.
 
 \bigskip
 
-\section*{Example 1 : Simple Total Functions}
-\addcontentsline{toc}{section}{Example 1 : Simple Total Functions}
+\subsection*{Example 1 : Simple Total Functions}
+\addcontentsline{toc}{subsection}{Example 1 : Simple Total Functions}
 
 \noindent Total functions are defined over their entire domain.
 
@@ -42,8 +43,8 @@ double : \nat \fun \nat
 \forall n : \nat @ double(n) = 2 * n
 \end{axdef}
 
-\section*{Example 2 : Partial Functions}
-\addcontentsline{toc}{section}{Example 2 : Partial Functions}
+\subsection*{Example 2 : Partial Functions}
+\addcontentsline{toc}{subsection}{Example 2 : Partial Functions}
 
 \noindent Partial functions are not defined over their entire domain.
 
@@ -59,8 +60,8 @@ predecessor : \nat \pfun \nat
 
 \bigskip
 
-\section*{Example 3 : Generic Functions}
-\addcontentsline{toc}{section}{Example 3 : Generic Functions}
+\subsection*{Example 3 : Generic Functions}
+\addcontentsline{toc}{subsection}{Example 3 : Generic Functions}
 
 \noindent Generic functions work with any type parameter.
 
@@ -84,8 +85,8 @@ predecessor : \nat \pfun \nat
   \forall x : X; y : Y @ snd(x, y) = y
 \end{gendef}
 
-\section*{Example 4 : Functions with Given Types}
-\addcontentsline{toc}{section}{Example 4 : Functions with Given Types}
+\subsection*{Example 4 : Functions with Given Types}
+\addcontentsline{toc}{subsection}{Example 4 : Functions with Given Types}
 
 \begin{zed}
 [Person, Department]
@@ -99,8 +100,8 @@ assignment : Person \pfun Department
 
 \bigskip
 
-\section*{Example 5 : Functions on Numbers}
-\addcontentsline{toc}{section}{Example 5 : Functions on Numbers}
+\subsection*{Example 5 : Functions on Numbers}
+\addcontentsline{toc}{subsection}{Example 5 : Functions on Numbers}
 
 \begin{axdef}
 triple : \nat \fun \nat
@@ -114,8 +115,8 @@ addOne : \num \fun \num
 \forall n : \num @ addOne(n) = n + 1
 \end{axdef}
 
-\section*{Example 6 : Function with Given Types}
-\addcontentsline{toc}{section}{Example 6 : Function with Given Types}
+\subsection*{Example 6 : Function with Given Types}
+\addcontentsline{toc}{subsection}{Example 6 : Function with Given Types}
 
 \begin{zed}
 [Student, Grade]
@@ -129,8 +130,8 @@ grades : Student \pfun Grade
 
 \bigskip
 
-\section*{Example 7 : Function Composition Example}
-\addcontentsline{toc}{section}{Example 7 : Function Composition Example}
+\subsection*{Example 7 : Function Composition Example}
+\addcontentsline{toc}{subsection}{Example 7 : Function Composition Example}
 
 \begin{axdef}
 f : \nat \fun \nat \\
@@ -146,8 +147,8 @@ h = f \comp g
 
 \bigskip
 
-\section*{Example 8 : Modulo Function}
-\addcontentsline{toc}{section}{Example 8 : Modulo Function}
+\subsection*{Example 8 : Modulo Function}
+\addcontentsline{toc}{subsection}{Example 8 : Modulo Function}
 
 \begin{axdef}
 modulo3 : \nat \fun \nat

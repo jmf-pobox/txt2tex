@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__all__ = ["LaTeXGenerator", "toc_depth_from_keyword"]
+
 from typing import ClassVar
 
 from txt2tex.__version__ import __version__
@@ -9,6 +11,7 @@ from txt2tex.ast_nodes import (
     Abbreviation,
     BinaryOp,
     Conditional,
+    Contents,
     Divide,
     Document,
     DocumentItem,
@@ -40,6 +43,7 @@ from txt2tex.codegen._dispatch import CodegenDispatch
 from txt2tex.codegen._smoke import (
     _SmokeTestMixin,  # pyright: ignore[reportPrivateUsage]
 )
+from txt2tex.codegen._toc import toc_depth_from_keyword
 from txt2tex.codegen.algebra import (
     _AlgebraCodegen,  # pyright: ignore[reportPrivateUsage]
 )
@@ -155,6 +159,7 @@ class LaTeXGenerator(
     # Instance variable type annotations
     use_fuzz: bool
     toc_parts: bool
+    _toc_depth: int
     parts_format: str
     _in_argue_block: bool
     _first_part_in_solution: bool
@@ -187,6 +192,7 @@ class LaTeXGenerator(
         """
         self.use_fuzz = use_fuzz
         self.toc_parts = toc_parts
+        self._toc_depth = 3  # Default: emit all three heading levels into TOC
         self.parts_format = "subsection"  # Document-level parts format
         self._in_argue_block = False  # Track context for line break formatting
         self._first_part_in_solution = False  # Track if we're generating first part
@@ -475,6 +481,14 @@ class LaTeXGenerator(
         if isinstance(ast, Document):
             # Store document-level parts format
             self.parts_format = ast.parts_format
+            # Pre-scan for the first Contents node to set TOC depth before generation
+            for _item in ast.items:
+                if isinstance(_item, Contents):
+                    self._toc_depth = toc_depth_from_keyword(_item.depth)
+                    break
+            # toc_parts overrides depth to 3: all three heading levels enter the TOC
+            if self.toc_parts:
+                self._toc_depth = 3
             # Multi-line document: generate each item
             # Consolidate consecutive zed environments
             lines.extend(self._generate_document_items_with_consolidation(ast.items))

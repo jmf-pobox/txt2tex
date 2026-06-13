@@ -72,6 +72,7 @@ class CodegenDispatch:
         _dollar_sanitise_registry: dict[str, str]
         _synth_abbrev_counter: int
         _in_hidden_fuzz_block: bool
+        _toc_depth: int
         parts_format: str
         toc_parts: bool
         use_fuzz: bool

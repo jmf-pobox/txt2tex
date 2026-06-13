@@ -235,7 +235,7 @@ def test_latex_gen_solution_marker() -> None:
     ast = parser.parse()
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
-    assert "\\section*{Solution 5}" in latex
+    assert "\\subsection*{Solution 5}" in latex
 
 
 def test_latex_gen_section() -> None:
@@ -259,7 +259,7 @@ def test_latex_gen_part_label() -> None:
     ast = parser.parse()
     gen = LaTeXGenerator()
     latex = gen.generate_document(ast)
-    assert "\\subsection*{(a)}" in latex
+    assert "\\subsubsection*{(a)}" in latex
     assert "First part" in latex
 
 

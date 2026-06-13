@@ -12,9 +12,10 @@
 \begin{document}
 
 \section*{Zed Block Examples}
+\addcontentsline{toc}{section}{Zed Block Examples}
 
-\section*{Example 1 : Basic Variable Declarations}
-\addcontentsline{toc}{section}{Example 1 : Basic Variable Declarations}
+\subsection*{Example 1 : Basic Variable Declarations}
+\addcontentsline{toc}{subsection}{Example 1 : Basic Variable Declarations}
 
 \noindent Use axdef for variable declarations with types:
 
@@ -34,8 +35,8 @@ departments : \finset Department
 
 \bigskip
 
-\section*{Example 2 : Abbreviations}
-\addcontentsline{toc}{section}{Example 2 : Abbreviations}
+\subsection*{Example 2 : Abbreviations}
+\addcontentsline{toc}{subsection}{Example 2 : Abbreviations}
 
 \begin{zed}
 N\_PLUS == \{~ n : \nat | n > 0 ~\}
@@ -49,8 +50,8 @@ N\_ODD == \{~ n : \nat | n \mod 2 = 1 ~\}
 
 \bigskip
 
-\section*{Example 3 : Type Parameters}
-\addcontentsline{toc}{section}{Example 3 : Type Parameters}
+\subsection*{Example 3 : Type Parameters}
+\addcontentsline{toc}{subsection}{Example 3 : Type Parameters}
 
 \begin{zed}
 [Company]
@@ -60,8 +61,8 @@ N\_ODD == \{~ n : \nat | n \mod 2 = 1 ~\}
 
 \bigskip
 
-\section*{Example 4 : Predicates elem Zed Block}
-\addcontentsline{toc}{section}{Example 4 : Predicates elem Zed Block}
+\subsection*{Example 4 : Predicates elem Zed Block}
+\addcontentsline{toc}{subsection}{Example 4 : Predicates elem Zed Block}
 
 \begin{axdef}
 x : \nat \\
@@ -76,8 +77,8 @@ x + y < 100
 
 \bigskip
 
-\section*{Example 5 : Free Type Definitions}
-\addcontentsline{toc}{section}{Example 5 : Free Type Definitions}
+\subsection*{Example 5 : Free Type Definitions}
+\addcontentsline{toc}{subsection}{Example 5 : Free Type Definitions}
 
 \begin{zed}
 Color ::= red | green | blue
@@ -97,8 +98,8 @@ price > 0
 
 \bigskip
 
-\section*{Example 6 : Multiple Schemas}
-\addcontentsline{toc}{section}{Example 6 : Multiple Schemas}
+\subsection*{Example 6 : Multiple Schemas}
+\addcontentsline{toc}{subsection}{Example 6 : Multiple Schemas}
 
 \begin{zed}
 [AccountZB, BalanceZB]
@@ -124,8 +125,8 @@ from.balance \geq amount
 
 \bigskip
 
-\section*{Example 7 : Schema with External Variables}
-\addcontentsline{toc}{section}{Example 7 : Schema with External Variables}
+\subsection*{Example 7 : Schema with External Variables}
+\addcontentsline{toc}{subsection}{Example 7 : Schema with External Variables}
 
 \begin{zed}
 [Student, Course]
@@ -154,8 +155,8 @@ courses = \ran enrolled \\
 
 \bigskip
 
-\section*{Example 8 : Nested Schemas}
-\addcontentsline{toc}{section}{Example 8 : Nested Schemas}
+\subsection*{Example 8 : Nested Schemas}
+\addcontentsline{toc}{subsection}{Example 8 : Nested Schemas}
 
 \begin{zed}
 [Char]
@@ -185,8 +186,8 @@ population : \finset PersonData
 
 \bigskip
 
-\section*{Example 9 : Constants land Functions}
-\addcontentsline{toc}{section}{Example 9 : Constants land Functions}
+\subsection*{Example 9 : Constants land Functions}
+\addcontentsline{toc}{subsection}{Example 9 : Constants land Functions}
 
 \begin{zed}
 PI == 3
@@ -206,8 +207,8 @@ area : \nat \fun \nat
 
 \bigskip
 
-\section*{Example 10 : Permission System Example}
-\addcontentsline{toc}{section}{Example 10 : Permission System Example}
+\subsection*{Example 10 : Permission System Example}
+\addcontentsline{toc}{subsection}{Example 10 : Permission System Example}
 
 \begin{zed}
 [UserID, DocumentID]
@@ -238,8 +239,8 @@ users : UserID \pfun User
 
 \bigskip
 
-\section*{Example 11 : Best Practices}
-\addcontentsline{toc}{section}{Example 11 : Best Practices}
+\subsection*{Example 11 : Best Practices}
+\addcontentsline{toc}{subsection}{Example 11 : Best Practices}
 
 \noindent Use zed blocks for: 1. Type parameter declarations [X, Y] 2. Abbreviations (N\_PLUS, N\_EVEN, etc.) 3. Simple predicates without variable declarations
 

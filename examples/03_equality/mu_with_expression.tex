@@ -12,9 +12,10 @@
 \begin{document}
 
 \section*{Mu Operator with Expressions}
+\addcontentsline{toc}{section}{Mu Operator with Expressions}
 
-\section*{Example 1 : Basic Mu ( Returns the Value )}
-\addcontentsline{toc}{section}{Example 1 : Basic Mu ( Returns the Value )}
+\subsection*{Example 1 : Basic Mu ( Returns the Value )}
+\addcontentsline{toc}{subsection}{Example 1 : Basic Mu ( Returns the Value )}
 
 \noindent The basic mu operator finds and returns the unique value:
 
@@ -28,8 +29,8 @@ $(\mu x : \nat | x * x = 16)$
 
 \bigskip
 
-\section*{Example 2 : Mu with Expression ( Returns Transformed Value )}
-\addcontentsline{toc}{section}{Example 2 : Mu with Expression ( Returns Transformed Value )}
+\subsection*{Example 2 : Mu with Expression ( Returns Transformed Value )}
+\addcontentsline{toc}{subsection}{Example 2 : Mu with Expression ( Returns Transformed Value )}
 
 \noindent Adding a bullet and expression transforms the result:
 
@@ -43,8 +44,8 @@ $(\mu x : \nat | x * x = 16 @ x + 1)$
 
 \bigskip
 
-\section*{Example 3 : Finding land Doubling}
-\addcontentsline{toc}{section}{Example 3 : Finding land Doubling}
+\subsection*{Example 3 : Finding land Doubling}
+\addcontentsline{toc}{subsection}{Example 3 : Finding land Doubling}
 
 \noindent
 $(\mu n : \nat | n > 10 \land n < 12 @ 2 * n)$
@@ -54,8 +55,8 @@ $(\mu n : \nat | n > 10 \land n < 12 @ 2 * n)$
 
 \bigskip
 
-\section*{Example 4 : Square Root land Square Again}
-\addcontentsline{toc}{section}{Example 4 : Square Root land Square Again}
+\subsection*{Example 4 : Square Root land Square Again}
+\addcontentsline{toc}{subsection}{Example 4 : Square Root land Square Again}
 
 \noindent
 $(\mu x : \nat | x * x = 25 @ x * x * x)$
@@ -65,8 +66,8 @@ $(\mu x : \nat | x * x = 25 @ x * x * x)$
 
 \bigskip
 
-\section*{Example 5 : String Indexing Example}
-\addcontentsline{toc}{section}{Example 5 : String Indexing Example}
+\subsection*{Example 5 : String Indexing Example}
+\addcontentsline{toc}{subsection}{Example 5 : String Indexing Example}
 
 \begin{zed}
 [String, Char]
@@ -84,8 +85,8 @@ findChar : String \cross Char \fun \nat
 
 \bigskip
 
-\section*{Example 6 : With Transformation}
-\addcontentsline{toc}{section}{Example 6 : With Transformation}
+\subsection*{Example 6 : With Transformation}
+\addcontentsline{toc}{subsection}{Example 6 : With Transformation}
 
 \begin{axdef}
 findAndAdvance : String \cross Char \fun \nat
@@ -98,8 +99,8 @@ findAndAdvance : String \cross Char \fun \nat
 
 \bigskip
 
-\section*{Example 7 : Mathematical Example - Inverse Function}
-\addcontentsline{toc}{section}{Example 7 : Mathematical Example - Inverse Function}
+\subsection*{Example 7 : Mathematical Example - Inverse Function}
+\addcontentsline{toc}{subsection}{Example 7 : Mathematical Example - Inverse Function}
 
 \begin{axdef}
 inverse : (\nat \fun \nat) \cross \nat \fun \nat
@@ -112,8 +113,8 @@ inverse : (\nat \fun \nat) \cross \nat \fun \nat
 
 \bigskip
 
-\section*{Example 8 : With Computation}
-\addcontentsline{toc}{section}{Example 8 : With Computation}
+\subsection*{Example 8 : With Computation}
+\addcontentsline{toc}{subsection}{Example 8 : With Computation}
 
 \begin{axdef}
 inverseSquared : (\nat \fun \nat) \cross \nat \fun \nat
@@ -126,8 +127,8 @@ inverseSquared : (\nat \fun \nat) \cross \nat \fun \nat
 
 \bigskip
 
-\section*{Example 9 : Practical - Finding Configuration Values}
-\addcontentsline{toc}{section}{Example 9 : Practical - Finding Configuration Values}
+\subsection*{Example 9 : Practical - Finding Configuration Values}
+\addcontentsline{toc}{subsection}{Example 9 : Practical - Finding Configuration Values}
 
 \begin{zed}
 [ConfigKey, ConfigValue]
@@ -147,8 +148,8 @@ parseValue : ConfigValue \fun \nat
 
 \bigskip
 
-\section*{Example 10 : With Default Processing}
-\addcontentsline{toc}{section}{Example 10 : With Default Processing}
+\subsection*{Example 10 : With Default Processing}
+\addcontentsline{toc}{subsection}{Example 10 : With Default Processing}
 
 \begin{axdef}
 getConfigWithDefault : ConfigKey \cross \nat \fun \nat
@@ -165,8 +166,8 @@ getConfigWithDefault : ConfigKey \cross \nat \fun \nat
 
 \bigskip
 
-\section*{Example 11 : Comparison - With land Without Bullet}
-\addcontentsline{toc}{section}{Example 11 : Comparison - With land Without Bullet}
+\subsection*{Example 11 : Comparison - With land Without Bullet}
+\addcontentsline{toc}{subsection}{Example 11 : Comparison - With land Without Bullet}
 
 \noindent Without bullet (returns the value itself):
 
@@ -196,8 +197,8 @@ findRootPlusOne = (\mu x : \nat | x * x = 49 @ x + 1)
 
 \bigskip
 
-\section*{Example 12 : Complex Expression}
-\addcontentsline{toc}{section}{Example 12 : Complex Expression}
+\subsection*{Example 12 : Complex Expression}
+\addcontentsline{toc}{subsection}{Example 12 : Complex Expression}
 
 \noindent
 $(\mu x : \nat | x > 5 \land x < 7 @ (x * x) + (x + 1))$
@@ -207,8 +208,8 @@ $(\mu x : \nat | x > 5 \land x < 7 @ (x * x) + (x + 1))$
 
 \bigskip
 
-\section*{Example 13 : Nested Mu Expressions}
-\addcontentsline{toc}{section}{Example 13 : Nested Mu Expressions}
+\subsection*{Example 13 : Nested Mu Expressions}
+\addcontentsline{toc}{subsection}{Example 13 : Nested Mu Expressions}
 
 \noindent
 $(\mu x : \nat | x * x = 16 @ (\mu y : \nat | y * y = (x + 5) @ y + x))$
@@ -218,8 +219,8 @@ $(\mu x : \nat | x * x = 16 @ (\mu y : \nat | y * y = (x + 5) @ y + x))$
 
 \bigskip
 
-\section*{Example 14 : Error Conditions}
-\addcontentsline{toc}{section}{Example 14 : Error Conditions}
+\subsection*{Example 14 : Error Conditions}
+\addcontentsline{toc}{subsection}{Example 14 : Error Conditions}
 
 \noindent The mu operator requires the constraint to have exactly one solution. If there are zero solutions or multiple solutions, mu is undefined (evaluation error).
 
@@ -237,8 +238,8 @@ $(\mu x : \nat | x * x = 16 @ (\mu y : \nat | y * y = (x + 5) @ y + x))$
 
 \bigskip
 
-\section*{Example 15 : Design Pattern}
-\addcontentsline{toc}{section}{Example 15 : Design Pattern}
+\subsection*{Example 15 : Design Pattern}
+\addcontentsline{toc}{subsection}{Example 15 : Design Pattern}
 
 \noindent The pattern "$(\mu x : T | uniqueness\_constraint)$. expression" is useful when: 1. You need to find a unique value satisfying a constraint 2. You want to transform or compute something based on that value 3. The transformation is more than just returning the value itself
 

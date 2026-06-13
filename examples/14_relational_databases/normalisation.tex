@@ -19,6 +19,7 @@
 \begin{zed}[EmpID, EmpName, DeptName, HeadName, ProjID, ProjName]\end{zed}
 
 \section*{The Universal Relation}
+\addcontentsline{toc}{section}{The Universal Relation}
 
 \noindent We start with a single unnormalised relation that bundles every attribute together.  The composite primary key is (empID, projID) -- an employee can be assigned to many projects, and a project involves many employees.
 
@@ -50,6 +51,7 @@ projName : ProjName
 \medskip
 
 \section*{Functional Dependencies}
+\addcontentsline{toc}{section}{Functional Dependencies}
 
 \noindent We identify the following functional dependencies (FDs).
 
@@ -82,6 +84,7 @@ projName : ProjName
 \medskip
 
 \section*{2NF: Remove Partial Dependencies}
+\addcontentsline{toc}{section}{2NF: Remove Partial Dependencies}
 
 \noindent A relation is in 2NF when every non-key attribute depends on the whole primary key, not just part of it.  We remove empName, dept, deptHead (which depend only on empID) and projName (which depends only on projID) into their own relations.
 
@@ -118,6 +121,7 @@ projName : ProjName
 \medskip
 
 \section*{3NF: Remove Transitive Dependencies}
+\addcontentsline{toc}{section}{3NF: Remove Transitive Dependencies}
 
 \noindent A relation is in 3NF when every non-key attribute depends directly on the primary key and on nothing else.  We remove deptHead (determined by dept) into a Department relation and drop it from EmployeeProj.
 

@@ -52,6 +52,8 @@ class _TextBlocksCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         # characters need escaping; punctuation like - ( ) : . is safe in text mode.
         title = self._escape_latex_text(node.title)
         lines.append(r"\section*{" + title + "}")
+        if self._toc_depth >= 1:
+            lines.append(r"\addcontentsline{toc}{section}{" + title + "}")
         lines.append("")
 
         for item in node.items:
@@ -62,10 +64,11 @@ class _TextBlocksCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
 
     @item_register.register(Solution)
     def _generate_solution(self, node: Solution) -> list[str]:
-        """Generate LaTeX for solution as unnumbered section."""
+        """Generate LaTeX for solution as unnumbered subsection."""
         lines: list[str] = []
-        lines.append(r"\section*{" + node.number + "}")
-        lines.append(r"\addcontentsline{toc}{section}{" + node.number + "}")
+        lines.append(r"\subsection*{" + node.number + "}")
+        if self._toc_depth >= 2:
+            lines.append(r"\addcontentsline{toc}{subsection}{" + node.number + "}")
         lines.append("")
 
         # Track first part in solution for indentation
@@ -254,10 +257,12 @@ class _TextBlocksCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             # Reset flag after first part
             if self._first_part_in_solution:
                 self._first_part_in_solution = False
-            lines.append(r"\subsection*{" + part_label + "}")
-            # Add to table of contents with hyperlink (if enabled)
-            if self.toc_parts:
-                lines.append(r"\addcontentsline{toc}{subsection}{" + part_label + "}")
+            lines.append(r"\subsubsection*{" + part_label + "}")
+            # Add to table of contents: always at depth>=3, or when toc_parts override
+            if self._toc_depth >= 3 or self.toc_parts:
+                lines.append(
+                    r"\addcontentsline{toc}{subsubsection}{" + part_label + "}"
+                )
             lines.append("")
 
             for item in node.items:
@@ -371,17 +376,14 @@ class _TextBlocksCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
     def _generate_contents(self, node: Contents) -> list[str]:
         """Generate LaTeX for table of contents.
 
-        CONTENTS: generates \tableofcontents (sections only, depth 1)
-        CONTENTS: full generates \tableofcontents with depth 2 (sections + subsections)
-        CONTENTS: 2 also generates \tableofcontents with depth 2
+        tocdepth is set from self._toc_depth (the effective depth), which is
+        derived from the keyword ("1"→1, empty/"2"→2, "3"/"full"/"all"→3) and
+        then raised to 3 when --toc-parts is active.  Both the printed TOC
+        (gated by tocdepth) and the addcontentsline emissions are driven by the
+        same effective depth, so they cannot disagree.
         """
         lines: list[str] = []
-        # Determine depth: empty = 1 (sections only)
-        # "full" or "2" = 2 (sections + subsections)
-        if node.depth.lower() in ("full", "2"):
-            lines.append(r"\setcounter{tocdepth}{2}")
-        else:
-            lines.append(r"\setcounter{tocdepth}{1}")
+        lines.append(rf"\setcounter{{tocdepth}}{{{self._toc_depth}}}")
         lines.append(r"\tableofcontents")
         lines.append("")
         return lines

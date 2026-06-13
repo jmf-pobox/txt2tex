@@ -12,23 +12,24 @@
 \begin{document}
 
 \section*{Testing Range Operator}
+\addcontentsline{toc}{section}{Testing Range Operator}
 
-\section*{Test 1 : Simple Numeric Range}
-\addcontentsline{toc}{section}{Test 1 : Simple Numeric Range}
+\subsection*{Test 1 : Simple Numeric Range}
+\addcontentsline{toc}{subsection}{Test 1 : Simple Numeric Range}
 
 \noindent
 $1 \upto 10$
 
 
-\section*{Test 2 : Range with Identifiers}
-\addcontentsline{toc}{section}{Test 2 : Range with Identifiers}
+\subsection*{Test 2 : Range with Identifiers}
+\addcontentsline{toc}{subsection}{Test 2 : Range with Identifiers}
 
 \noindent
 $1993 \upto current$
 
 
-\section*{Test 3 : Range elem Set Comprehension}
-\addcontentsline{toc}{section}{Test 3 : Range elem Set Comprehension}
+\subsection*{Test 3 : Range elem Set Comprehension}
+\addcontentsline{toc}{subsection}{Test 3 : Range elem Set Comprehension}
 
 \setbox0=\vbox{%
 \begin{zed}
@@ -39,15 +40,15 @@ zS_1 == \{~ x : 1 \upto 20 | x \mod 2 = 0 ~\}
 $\{~ x : 1 \upto 20 | x \mod 2 = 0 ~\}$
 
 
-\section*{Test 4 : Range with Expressions}
-\addcontentsline{toc}{section}{Test 4 : Range with Expressions}
+\subsection*{Test 4 : Range with Expressions}
+\addcontentsline{toc}{subsection}{Test 4 : Range with Expressions}
 
 \noindent
 $a + 1 \upto b + 2$
 
 
-\section*{Test 5 : Range elem Schema}
-\addcontentsline{toc}{section}{Test 5 : Range elem Schema}
+\subsection*{Test 5 : Range elem Schema}
+\addcontentsline{toc}{subsection}{Test 5 : Range elem Schema}
 
 \begin{schema}{ValidYear}
 year : 1900 \upto 2100
@@ -55,22 +56,22 @@ year : 1900 \upto 2100
 year \geq 1900
 \end{schema}
 
-\section*{Test 6 : Union of Ranges}
-\addcontentsline{toc}{section}{Test 6 : Union of Ranges}
+\subsection*{Test 6 : Union of Ranges}
+\addcontentsline{toc}{subsection}{Test 6 : Union of Ranges}
 
 \noindent
 $1 \upto 5 \cup 10 \upto 15$
 
 
-\section*{Test 7 : Range with Tuple Projections}
-\addcontentsline{toc}{section}{Test 7 : Range with Tuple Projections}
+\subsection*{Test 7 : Range with Tuple Projections}
+\addcontentsline{toc}{subsection}{Test 7 : Range with Tuple Projections}
 
 \noindent
 $p.1 \upto p.2$
 
 
-\section*{Test 8 : Complex Set Comprehension}
-\addcontentsline{toc}{section}{Test 8 : Complex Set Comprehension}
+\subsection*{Test 8 : Complex Set Comprehension}
+\addcontentsline{toc}{subsection}{Test 8 : Complex Set Comprehension}
 
 \setbox0=\vbox{%
 \begin{zed}

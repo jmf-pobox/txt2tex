@@ -12,9 +12,10 @@
 \begin{document}
 
 \section*{Basic Generic Definitions}
+\addcontentsline{toc}{section}{Basic Generic Definitions}
 
-\section*{Example 1 : Generic Identity Function}
-\addcontentsline{toc}{section}{Example 1 : Generic Identity Function}
+\subsection*{Example 1 : Generic Identity Function}
+\addcontentsline{toc}{subsection}{Example 1 : Generic Identity Function}
 
 \noindent The identityGB function works for any type:
 
@@ -30,8 +31,8 @@
 
 \bigskip
 
-\section*{Example 2 : Generic Constant}
-\addcontentsline{toc}{section}{Example 2 : Generic Constant}
+\subsection*{Example 2 : Generic Constant}
+\addcontentsline{toc}{subsection}{Example 2 : Generic Constant}
 
 \noindent A generic empty set:
 
@@ -47,8 +48,8 @@
 
 \bigskip
 
-\section*{Example 3 : Generic Pair Functions}
-\addcontentsline{toc}{section}{Example 3 : Generic Pair Functions}
+\subsection*{Example 3 : Generic Pair Functions}
+\addcontentsline{toc}{subsection}{Example 3 : Generic Pair Functions}
 
 \noindent Extract the first element of a pair:
 
@@ -74,8 +75,8 @@
 
 \bigskip
 
-\section*{Example 4 : Generic Singleton Set}
-\addcontentsline{toc}{section}{Example 4 : Generic Singleton Set}
+\subsection*{Example 4 : Generic Singleton Set}
+\addcontentsline{toc}{subsection}{Example 4 : Generic Singleton Set}
 
 \noindent Create a set containing a single element:
 
@@ -91,8 +92,8 @@
 
 \bigskip
 
-\section*{Example 5 : Generic Sequence Operations}
-\addcontentsline{toc}{section}{Example 5 : Generic Sequence Operations}
+\subsection*{Example 5 : Generic Sequence Operations}
+\addcontentsline{toc}{subsection}{Example 5 : Generic Sequence Operations}
 
 \noindent The head of a sequence (generic version):
 
@@ -108,22 +109,22 @@
 
 \bigskip
 
-\section*{Example 6 : Generic Set Membership ( Conceptual )}
-\addcontentsline{toc}{section}{Example 6 : Generic Set Membership ( Conceptual )}
+\subsection*{Example 6 : Generic Set Membership ( Conceptual )}
+\addcontentsline{toc}{subsection}{Example 6 : Generic Set Membership ( Conceptual )}
 
 \noindent Set membership can be tested using the built-in 'in' operator in Z notation. In other contexts, you might define a membership test function, but Z notation provides this as a primitive predicate: x in S is true exactly when x is an element of S.
 
 \bigskip
 
-\section*{Example 7 : Generic Optional Type ( Conceptual )}
-\addcontentsline{toc}{section}{Example 7 : Generic Optional Type ( Conceptual )}
+\subsection*{Example 7 : Generic Optional Type ( Conceptual )}
+\addcontentsline{toc}{subsection}{Example 7 : Generic Optional Type ( Conceptual )}
 
 \noindent Optional values can be modeled with free types in Z notation. For a specific type, you would define: Option ::= none $\mid$ some⟨T⟩. Generic optional types require more complex setup beyond basic gendef blocks, as free types in Z are typically defined for specific types rather than being polymorphic.
 
 \bigskip
 
-\section*{Example 8 : Generic Swap Function}
-\addcontentsline{toc}{section}{Example 8 : Generic Swap Function}
+\subsection*{Example 8 : Generic Swap Function}
+\addcontentsline{toc}{subsection}{Example 8 : Generic Swap Function}
 
 \noindent Swap the components of a pair:
 
@@ -139,8 +140,8 @@
 
 \bigskip
 
-\section*{Example 9 : Generic Cardinality}
-\addcontentsline{toc}{section}{Example 9 : Generic Cardinality}
+\subsection*{Example 9 : Generic Cardinality}
+\addcontentsline{toc}{subsection}{Example 9 : Generic Cardinality}
 
 \noindent Size of a set (for finite sets):
 
@@ -156,8 +157,8 @@
 
 \bigskip
 
-\section*{Example 10 : Generic List Construction}
-\addcontentsline{toc}{section}{Example 10 : Generic List Construction}
+\subsection*{Example 10 : Generic List Construction}
+\addcontentsline{toc}{subsection}{Example 10 : Generic List Construction}
 
 \noindent Construct a singleton sequence:
 
@@ -173,8 +174,8 @@
 
 \bigskip
 
-\section*{Example 11 : Using Generic Definitions}
-\addcontentsline{toc}{section}{Example 11 : Using Generic Definitions}
+\subsection*{Example 11 : Using Generic Definitions}
+\addcontentsline{toc}{subsection}{Example 11 : Using Generic Definitions}
 
 \noindent Once defined, generic functions can be instantiated for specific types:
 
@@ -192,8 +193,8 @@ id\_set = identityGB[\power \nat]
 
 \bigskip
 
-\section*{Example 12 : Generic Constants}
-\addcontentsline{toc}{section}{Example 12 : Generic Constants}
+\subsection*{Example 12 : Generic Constants}
+\addcontentsline{toc}{subsection}{Example 12 : Generic Constants}
 
 \noindent Define a generic empty sequence:
 

@@ -12,16 +12,17 @@
 \begin{document}
 
 \section*{Zed Block Test}
+\addcontentsline{toc}{section}{Zed Block Test}
 
-\section*{Test 1 : Simple Abbreviation}
-\addcontentsline{toc}{section}{Test 1 : Simple Abbreviation}
+\subsection*{Test 1 : Simple Abbreviation}
+\addcontentsline{toc}{subsection}{Test 1 : Simple Abbreviation}
 
 \begin{zed}
 SimpleConst == 42
 \end{zed}
 
-\section*{Test 2 : Forall elem Axiom}
-\addcontentsline{toc}{section}{Test 2 : Forall elem Axiom}
+\subsection*{Test 2 : Forall elem Axiom}
+\addcontentsline{toc}{subsection}{Test 2 : Forall elem Axiom}
 
 \begin{axdef}
 constraint : \nat
@@ -30,8 +31,8 @@ constraint = 0 \\
 \forall x : \nat @ x \geq 0
 \end{axdef}
 
-\section*{Test 3 : Exists elem Axiom}
-\addcontentsline{toc}{section}{Test 3 : Exists elem Axiom}
+\subsection*{Test 3 : Exists elem Axiom}
+\addcontentsline{toc}{subsection}{Test 3 : Exists elem Axiom}
 
 \begin{axdef}
 hasRoot : \nat
@@ -40,8 +41,8 @@ hasRoot = 4 \\
 \exists n : \nat @ n * n = hasRoot
 \end{axdef}
 
-\section*{Test 4 : Nested Quantifiers elem Axiom}
-\addcontentsline{toc}{section}{Test 4 : Nested Quantifiers elem Axiom}
+\subsection*{Test 4 : Nested Quantifiers elem Axiom}
+\addcontentsline{toc}{subsection}{Test 4 : Nested Quantifiers elem Axiom}
 
 \begin{axdef}
 sumTen : \nat
