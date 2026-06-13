@@ -110,6 +110,8 @@ Bare `CONTENTS:` defaults to depth 2 — the right default for a typical questio
 
 The `--toc-parts` CLI flag forces parts `(a)`, `(b)`, etc. into the TOC regardless of the `CONTENTS:` depth keyword. Use it when you want full depth without adding `CONTENTS: full` to the source file.
 
+**Note:** Part entries appear in the TOC only when parts render as headings — i.e. the default `PARTS: subsection` mode. With `PARTS: inline`, parts render inline with no heading and are therefore not added to the contents, regardless of `CONTENTS:` depth or `--toc-parts`.
+
 #### Worked example
 
 ```text
