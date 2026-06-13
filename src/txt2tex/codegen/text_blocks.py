@@ -30,7 +30,6 @@ from txt2tex.ast_nodes import (
     TruthTable,
 )
 from txt2tex.codegen._dispatch import CodegenDispatch, item_register
-from txt2tex.codegen._toc import toc_depth_from_keyword
 
 
 class _TextBlocksCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
@@ -377,14 +376,14 @@ class _TextBlocksCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
     def _generate_contents(self, node: Contents) -> list[str]:
         """Generate LaTeX for table of contents.
 
-        Depth is determined by the keyword: "1" → 1; empty/"2"/unrecognised → 2;
-        "3"/"full"/"all" → 3.  The counter tells LaTeX how many heading levels
-        to render in the printed TOC; filtering of addcontentsline calls is
-        handled by _toc_depth on the generator.
+        tocdepth is set from self._toc_depth (the effective depth), which is
+        derived from the keyword ("1"→1, empty/"2"→2, "3"/"full"/"all"→3) and
+        then raised to 3 when --toc-parts is active.  Both the printed TOC
+        (gated by tocdepth) and the addcontentsline emissions are driven by the
+        same effective depth, so they cannot disagree.
         """
         lines: list[str] = []
-        depth = toc_depth_from_keyword(node.depth)
-        lines.append(rf"\setcounter{{tocdepth}}{{{depth}}}")
+        lines.append(rf"\setcounter{{tocdepth}}{{{self._toc_depth}}}")
         lines.append(r"\tableofcontents")
         lines.append("")
         return lines

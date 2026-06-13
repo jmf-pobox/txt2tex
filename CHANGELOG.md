@@ -29,9 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `CONTENTS: full` — all three levels (depth 3); previously meant depth 2
   - `CONTENTS: all` — all three levels (depth 3)
 
-  Depth is enforced by filtering `\addcontentsline` calls at generator
-  time. LaTeX's `tocdepth` counter is inert for starred headings with
-  manual `\addcontentsline` and is not used.
+  Depth is driven by a single effective depth that sets both
+  `\setcounter{tocdepth}` and which `\addcontentsline` calls are emitted,
+  so the printed TOC and the written entries always agree.
 
 - **`--toc-parts` is now a depth override** — forces parts into the TOC
   at depth 3 regardless of the `CONTENTS:` keyword in the source file.

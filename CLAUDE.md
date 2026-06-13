@@ -497,9 +497,10 @@ PROOF:                        → \begin{itemize} with indentation
     conclusion
 ```
 
-TOC depth is enforced by filtering `\addcontentsline` calls. LaTeX
-`tocdepth` is inert for starred headings. `--toc-parts` forces depth 3
-regardless of the `CONTENTS:` keyword.
+TOC depth is driven by one effective depth that sets both
+`\setcounter{tocdepth}` and which `\addcontentsline` calls are emitted
+(`tocdepth` does gate manually-added entries). `--toc-parts` forces depth
+3 regardless of the `CONTENTS:` keyword.
 
 ### Operators
 

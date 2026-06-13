@@ -93,7 +93,7 @@ The three structural markers map to three LaTeX heading levels:
 
 #### Depth control
 
-`CONTENTS:` accepts an optional depth argument that controls which headings appear in the contents list. Depth is enforced by selectively emitting `\addcontentsline` calls — **not** via LaTeX's `tocdepth` counter, which has no effect on starred headings.
+`CONTENTS:` accepts an optional depth argument that controls which headings appear in the contents list. The depth sets both `\setcounter{tocdepth}` and which `\addcontentsline` calls are emitted, so the printed contents and the written entries always agree.
 
 | Keyword | Depth | What appears |
 |---|---|---|

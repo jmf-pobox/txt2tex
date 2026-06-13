@@ -213,9 +213,36 @@ class TestDefaultDepth:
 
 
 class TestTocPartsOverride:
-    """toc_parts=True forces part addcontentsline even at depth 1."""
+    """toc_parts=True raises effective depth to 3, keeping tocdepth consistent.
 
-    def test_toc_parts_forces_subsubsection_at_depth1(self) -> None:
-        src = "CONTENTS:\n\n(a) content\n"
-        latex = _latex(src, toc_parts=True)
+    Both the addcontentsline emission guards and \\setcounter{tocdepth} derive
+    from self._toc_depth, which is bumped to 3 when toc_parts is set.
+    """
+
+    _SRC = "CONTENTS: 1\n\n=== Title ===\n\n** Q1 **\n\n(a) content\n"
+
+    def test_toc_parts_subsubsection_present(self) -> None:
+        latex = _latex(self._SRC, toc_parts=True)
         assert r"\addcontentsline{toc}{subsubsection}{(a)}" in latex
+
+    def test_toc_parts_subsection_present(self) -> None:
+        # Override pulls solutions in too — no orphaned subsubsection entries
+        latex = _latex(self._SRC, toc_parts=True)
+        assert r"\addcontentsline{toc}{subsection}{Q1}" in latex
+
+    def test_toc_parts_tocdepth_set_to_3(self) -> None:
+        # \setcounter{tocdepth}{3} keeps the printed TOC consistent with emission
+        latex = _latex(self._SRC, toc_parts=True)
+        assert r"\setcounter{tocdepth}{3}" in latex
+
+    def test_no_toc_parts_depth1_tocdepth_is_1(self) -> None:
+        # Contrast: without override, CONTENTS: 1 → tocdepth 1
+        latex = _latex(self._SRC)
+        assert r"\setcounter{tocdepth}{1}" in latex
+
+    def test_no_toc_parts_depth1_only_section_addcontentsline(self) -> None:
+        # Contrast: without override, only section entry emitted
+        latex = _latex(self._SRC)
+        assert r"\addcontentsline{toc}{section}{Title}" in latex
+        assert r"\addcontentsline{toc}{subsection}{Q1}" not in latex
+        assert r"\addcontentsline{toc}{subsubsection}{(a)}" not in latex

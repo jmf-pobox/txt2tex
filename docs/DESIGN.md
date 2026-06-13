@@ -2981,9 +2981,11 @@ hidden-emit helpers), `codegen/paragraphs.py` (abbreviation dual-emit),
 `\section*` and `(a)` part labels to `\subsection*`.  Section markers
 (`=== Title ===`) rendered `\section*` too, making sections and solutions
 visually indistinguishable in the LaTeX output and colliding in any TOC.
-Additionally, LaTeX's `tocdepth` counter is inert for starred headings
-with manual `\addcontentsline` calls, so depth control had to be handled
-explicitly in the generator.
+The starred headings carry manual `\addcontentsline` calls, so depth
+control has two levers that must agree: which entries the generator
+writes, and LaTeX's `tocdepth` counter, which gates which written entries
+the printed TOC actually shows (`\l@subsection` and friends test
+`\c@tocdepth`).
 
 **Decision.**
 
@@ -2995,11 +2997,15 @@ explicitly in the generator.
    This eliminates the `\section*` collision between sections and
    solutions, and gives the PDF a visible visual hierarchy.
 
-2. **Depth enforced by filtering `\addcontentsline` emission.**  Because
-   `tocdepth` is inert for starred headings, the generator tracks the
-   current TOC depth (from the `CONTENTS:` keyword or `--toc-parts` flag)
-   and simply omits `\addcontentsline` calls for headings below the
-   requested level.
+2. **Depth driven by a single effective depth.**  The generator computes
+   one effective depth (from the `CONTENTS:` keyword, raised to 3 by
+   `--toc-parts`) and drives *both* levers from it: it sets
+   `\setcounter{tocdepth}` to that value, and it omits `\addcontentsline`
+   calls for headings below it.  Because both come from one number, the
+   printed TOC (gated by `tocdepth`) and the written entries cannot
+   disagree — the failure mode where parts are written but `tocdepth`
+   hides them, or written without their parent level, is structurally
+   impossible.
 
 3. **Default depth is 2 (sections + solutions).**  A bare `CONTENTS:`
    directive produces a contents list with sections and solutions but no
@@ -3028,12 +3034,14 @@ for a homework section divider.
 - The `\section*` collision between `===` sections and `** **` solutions
   meant a section could not nest its solutions in any TOC — both appeared
   at the same level.  The demotion resolves this structurally.
-- Filtering `\addcontentsline` at emission time is the only reliable way
-  to gate depth for starred headings.  `\addcontentsline` writes to the
-  `.toc` unconditionally; `tocdepth` gates only the *automatic* entry an
-  *unstarred* sectioning command makes, which txt2tex never emits.
-  Confirmed by compiling test documents: a bare `CONTENTS:` over starred
-  headings lists every entry regardless of the `tocdepth` value.
+- `tocdepth` is *not* inert for manually-added entries.  Verified by
+  compiling a document with `\setcounter{tocdepth}{1}` and `\addcontentsline`
+  calls at section, subsection, and subsubsection levels: only the section
+  entry appeared in the printed TOC.  So `tocdepth` must be set to the
+  effective depth, not the raw keyword — otherwise `--toc-parts` would
+  write subsubsection entries that `tocdepth` then hides.  Driving both
+  `tocdepth` and emission from one effective-depth value keeps them
+  consistent.
 - Default depth 2 covers the most common use case (a solutions document
   with a solution-level contents list) without requiring any extra syntax.
 

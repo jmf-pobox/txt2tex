@@ -486,6 +486,9 @@ class LaTeXGenerator(
                 if isinstance(_item, Contents):
                     self._toc_depth = toc_depth_from_keyword(_item.depth)
                     break
+            # toc_parts overrides depth to 3: all three heading levels enter the TOC
+            if self.toc_parts:
+                self._toc_depth = 3
             # Multi-line document: generate each item
             # Consolidate consecutive zed environments
             lines.extend(self._generate_document_items_with_consolidation(ast.items))
