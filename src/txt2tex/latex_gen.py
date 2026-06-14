@@ -25,14 +25,17 @@ from txt2tex.ast_nodes import (
     Identifier,
     Lambda,
     NaturalJoin,
+    Part,
     Project,
     Quantifier,
     RelationalImage,
     RelationRename,
     Restrict,
+    Section,
     SequenceLiteral,
     SetComprehension,
     SetLiteral,
+    Solution,
     Subscript,
     Superscript,
     Tuple,
@@ -217,6 +220,40 @@ class LaTeXGenerator(
         self._synth_abbrev_counter += 1
         return f"zS_{self._synth_abbrev_counter}"
 
+    def _find_contents_depth(self, items: list[DocumentItem]) -> int | None:
+        """Return the toc depth from the first Contents node found in document order.
+
+        Performs a pre-order DFS through items, descending into the .items of
+        Section, Solution, and Part nodes so that a CONTENTS: directive nested
+        inside a section heading is not silently ignored.
+
+        Returns None when no Contents node exists anywhere in the subtree.
+        """
+        for item in items:
+            if isinstance(item, Contents):
+                return toc_depth_from_keyword(item.depth)
+            if isinstance(item, (Section, Solution, Part)):
+                result = self._find_contents_depth(item.items)
+                if result is not None:
+                    return result
+        return None
+
+    def _resolve_toc_depth(self, items: list[DocumentItem]) -> None:
+        """Set self._toc_depth for one document body.
+
+        Reset to the default, derive from the first Contents node anywhere in
+        the tree, then apply the --toc-parts override.  Called by both
+        generate_document and generate_fragment so the two entry points cannot
+        diverge: generate_fragment previously skipped this, ignoring CONTENTS:
+        depth in REPL previews and leaking _toc_depth across inputs.
+        """
+        self._toc_depth = 3
+        found_depth = self._find_contents_depth(items)
+        if found_depth is not None:
+            self._toc_depth = found_depth
+        if self.toc_parts:
+            self._toc_depth = 3
+
     # -------------------------------------------------------------------------
     # Overflow warning helpers
     # -------------------------------------------------------------------------
@@ -387,6 +424,7 @@ class LaTeXGenerator(
         """
         # Store document-level parts format
         self.parts_format = ast.parts_format
+        self._resolve_toc_depth(ast.items)
 
         # Generate all document items
         lines = self._generate_document_items_with_consolidation(ast.items)
@@ -481,14 +519,7 @@ class LaTeXGenerator(
         if isinstance(ast, Document):
             # Store document-level parts format
             self.parts_format = ast.parts_format
-            # Pre-scan for the first Contents node to set TOC depth before generation
-            for _item in ast.items:
-                if isinstance(_item, Contents):
-                    self._toc_depth = toc_depth_from_keyword(_item.depth)
-                    break
-            # toc_parts overrides depth to 3: all three heading levels enter the TOC
-            if self.toc_parts:
-                self._toc_depth = 3
+            self._resolve_toc_depth(ast.items)
             # Multi-line document: generate each item
             # Consolidate consecutive zed environments
             lines.extend(self._generate_document_items_with_consolidation(ast.items))
