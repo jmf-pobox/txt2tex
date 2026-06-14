@@ -238,6 +238,22 @@ class LaTeXGenerator(
                     return result
         return None
 
+    def _resolve_toc_depth(self, items: list[DocumentItem]) -> None:
+        """Set self._toc_depth for one document body.
+
+        Reset to the default, derive from the first Contents node anywhere in
+        the tree, then apply the --toc-parts override.  Called by both
+        generate_document and generate_fragment so the two entry points cannot
+        diverge: generate_fragment previously skipped this, ignoring CONTENTS:
+        depth in REPL previews and leaking _toc_depth across inputs.
+        """
+        self._toc_depth = 3
+        found_depth = self._find_contents_depth(items)
+        if found_depth is not None:
+            self._toc_depth = found_depth
+        if self.toc_parts:
+            self._toc_depth = 3
+
     # -------------------------------------------------------------------------
     # Overflow warning helpers
     # -------------------------------------------------------------------------
@@ -408,6 +424,7 @@ class LaTeXGenerator(
         """
         # Store document-level parts format
         self.parts_format = ast.parts_format
+        self._resolve_toc_depth(ast.items)
 
         # Generate all document items
         lines = self._generate_document_items_with_consolidation(ast.items)
@@ -502,17 +519,7 @@ class LaTeXGenerator(
         if isinstance(ast, Document):
             # Store document-level parts format
             self.parts_format = ast.parts_format
-            # Reset per-document TOC depth so a reused generator starts clean.
-            self._toc_depth = 3
-            # Pre-scan: DFS search for the first Contents node anywhere in the
-            # tree.  Top-level-only iteration misses Contents inside Section /
-            # Solution / Part, so we recurse into their .items lists.
-            found_depth = self._find_contents_depth(ast.items)
-            if found_depth is not None:
-                self._toc_depth = found_depth
-            # toc_parts overrides depth to 3: all three heading levels enter the TOC
-            if self.toc_parts:
-                self._toc_depth = 3
+            self._resolve_toc_depth(ast.items)
             # Multi-line document: generate each item
             # Consolidate consecutive zed environments
             lines.extend(self._generate_document_items_with_consolidation(ast.items))

@@ -265,34 +265,72 @@ class TestReuseIsolation:
     _DOC1 = "CONTENTS: 1\n\n=== Title ===\n\n** Q1 **\n\n(a) content\n"
     _DOC2 = "=== Title ===\n\n** Q1 **\n\n(a) content\n"
 
-    def _parse_ast(self, src: str) -> object:
+    def _parse_ast(self, src: str) -> Document:
         lexer = Lexer(src)
         tokens = lexer.tokenize()
-        return Parser(tokens).parse()
+        ast = Parser(tokens).parse()
+        assert isinstance(ast, Document)
+        return ast
 
     def test_second_call_subsubsection_present(self) -> None:
         # If depth leaks, this is absent because depth 1 was set by doc1.
         gen = LaTeXGenerator()
-        gen.generate_document(self._parse_ast(self._DOC1))  # type: ignore[arg-type]
-        latex2 = gen.generate_document(self._parse_ast(self._DOC2))  # type: ignore[arg-type]
+        gen.generate_document(self._parse_ast(self._DOC1))
+        latex2 = gen.generate_document(self._parse_ast(self._DOC2))
         assert r"\addcontentsline{toc}{subsubsection}{(a)}" in latex2
 
     def test_second_call_subsection_present(self) -> None:
         gen = LaTeXGenerator()
-        gen.generate_document(self._parse_ast(self._DOC1))  # type: ignore[arg-type]
-        latex2 = gen.generate_document(self._parse_ast(self._DOC2))  # type: ignore[arg-type]
+        gen.generate_document(self._parse_ast(self._DOC1))
+        latex2 = gen.generate_document(self._parse_ast(self._DOC2))
         assert r"\addcontentsline{toc}{subsection}{Q1}" in latex2
 
     def test_second_call_matches_fresh_generator(self) -> None:
         # The reused generator's second output must equal a fresh generator's output.
         gen_reused = LaTeXGenerator()
-        gen_reused.generate_document(self._parse_ast(self._DOC1))  # type: ignore[arg-type]
-        latex_reused = gen_reused.generate_document(self._parse_ast(self._DOC2))  # type: ignore[arg-type]
+        gen_reused.generate_document(self._parse_ast(self._DOC1))
+        latex_reused = gen_reused.generate_document(self._parse_ast(self._DOC2))
 
         gen_fresh = LaTeXGenerator()
-        latex_fresh = gen_fresh.generate_document(self._parse_ast(self._DOC2))  # type: ignore[arg-type]
+        latex_fresh = gen_fresh.generate_document(self._parse_ast(self._DOC2))
 
         assert latex_reused == latex_fresh
+
+
+# ---------------------------------------------------------------------------
+# generate_fragment must resolve TOC depth too (REPL/preview path)
+# ---------------------------------------------------------------------------
+
+
+class TestFragmentTocDepth:
+    """generate_fragment (REPL/preview) must honor CONTENTS: and not leak depth.
+
+    It shares _resolve_toc_depth with generate_document, so CONTENTS: depth is
+    applied and _toc_depth resets per call.
+    """
+
+    _DOC1 = "CONTENTS: 1\n\n=== Title ===\n\n** Q1 **\n\n(a) content\n"
+    _DOC2 = "=== Title ===\n\n** Q1 **\n\n(a) content\n"
+    _DOC3 = "CONTENTS: 3\n\n=== Title ===\n\n** Q1 **\n\n(a) content\n"
+
+    def _parse_ast(self, src: str) -> Document:
+        ast = Parser(Lexer(src).tokenize()).parse()
+        assert isinstance(ast, Document)
+        return ast
+
+    def test_fragment_honors_contents_depth(self) -> None:
+        # CONTENTS: 3 in a fragment must set tocdepth 3 and emit all levels.
+        latex = LaTeXGenerator().generate_fragment(self._parse_ast(self._DOC3))
+        assert r"\setcounter{tocdepth}{3}" in latex
+        assert r"\addcontentsline{toc}{subsubsection}{(a)}" in latex
+
+    def test_fragment_does_not_leak_depth(self) -> None:
+        # Reused generator: depth 1 fragment then a no-CONTENTS fragment must
+        # revert to default 3 (subsubsection present), not leak depth 1.
+        gen = LaTeXGenerator()
+        gen.generate_fragment(self._parse_ast(self._DOC1))
+        latex2 = gen.generate_fragment(self._parse_ast(self._DOC2))
+        assert r"\addcontentsline{toc}{subsubsection}{(a)}" in latex2
 
 
 # ---------------------------------------------------------------------------
