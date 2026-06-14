@@ -73,7 +73,7 @@ Generates: `\subsection*{Solution 1}`
 (c) Third part
 ```
 
-Each part gets proper spacing and formatting with `(a)\par\vspace{11pt}`.
+In the default `PARTS: subsection` mode each part renders as a `\subsubsection*{(a)}` heading; under `PARTS: inline` it renders inline as `(a) ...` with the part text following on the same line.
 
 **Note:** In previous versions, `(a)` rendered `\subsection*`. It now renders `\subsubsection*`, one level smaller.
 

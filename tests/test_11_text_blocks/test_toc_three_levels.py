@@ -7,6 +7,7 @@ CONTENTS: keyword and toc_depth_from_keyword.
 
 from __future__ import annotations
 
+from txt2tex.ast_nodes import Contents, Document, Section
 from txt2tex.codegen._toc import toc_depth_from_keyword
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
@@ -246,3 +247,90 @@ class TestTocPartsOverride:
         assert r"\addcontentsline{toc}{section}{Title}" in latex
         assert r"\addcontentsline{toc}{subsection}{Q1}" not in latex
         assert r"\addcontentsline{toc}{subsubsection}{(a)}" not in latex
+
+
+# ---------------------------------------------------------------------------
+# Reuse isolation (defect 1)
+# ---------------------------------------------------------------------------
+
+
+class TestReuseIsolation:
+    """A reused LaTeXGenerator must not leak _toc_depth across calls.
+
+    The first document sets depth 1 via CONTENTS: 1.  The second document
+    has no CONTENTS: directive, so it must revert to the default depth of 3
+    — meaning all three addcontentsline levels are emitted.
+    """
+
+    _DOC1 = "CONTENTS: 1\n\n=== Title ===\n\n** Q1 **\n\n(a) content\n"
+    _DOC2 = "=== Title ===\n\n** Q1 **\n\n(a) content\n"
+
+    def _parse_ast(self, src: str) -> object:
+        lexer = Lexer(src)
+        tokens = lexer.tokenize()
+        return Parser(tokens).parse()
+
+    def test_second_call_subsubsection_present(self) -> None:
+        # If depth leaks, this is absent because depth 1 was set by doc1.
+        gen = LaTeXGenerator()
+        gen.generate_document(self._parse_ast(self._DOC1))  # type: ignore[arg-type]
+        latex2 = gen.generate_document(self._parse_ast(self._DOC2))  # type: ignore[arg-type]
+        assert r"\addcontentsline{toc}{subsubsection}{(a)}" in latex2
+
+    def test_second_call_subsection_present(self) -> None:
+        gen = LaTeXGenerator()
+        gen.generate_document(self._parse_ast(self._DOC1))  # type: ignore[arg-type]
+        latex2 = gen.generate_document(self._parse_ast(self._DOC2))  # type: ignore[arg-type]
+        assert r"\addcontentsline{toc}{subsection}{Q1}" in latex2
+
+    def test_second_call_matches_fresh_generator(self) -> None:
+        # The reused generator's second output must equal a fresh generator's output.
+        gen_reused = LaTeXGenerator()
+        gen_reused.generate_document(self._parse_ast(self._DOC1))  # type: ignore[arg-type]
+        latex_reused = gen_reused.generate_document(self._parse_ast(self._DOC2))  # type: ignore[arg-type]
+
+        gen_fresh = LaTeXGenerator()
+        latex_fresh = gen_fresh.generate_document(self._parse_ast(self._DOC2))  # type: ignore[arg-type]
+
+        assert latex_reused == latex_fresh
+
+
+# ---------------------------------------------------------------------------
+# Nested CONTENTS: (defect 2)
+# ---------------------------------------------------------------------------
+
+
+class TestNestedContentsDepth:
+    """CONTENTS: inside a Section must still set _toc_depth.
+
+    Verifies that the parser nests the Contents node inside Section.items
+    (structural fact), and that the generator's recursive pre-scan finds it.
+    """
+
+    _SRC = "=== Introduction ===\n\nCONTENTS: 3\n\n** Q1 **\n\n(a) content\n"
+
+    def test_parser_nests_contents_inside_section(self) -> None:
+        # Confirm structural assumption: Contents is inside Section.items.
+        lexer = Lexer(self._SRC)
+        tokens = lexer.tokenize()
+        ast = Parser(tokens).parse()
+        assert isinstance(ast, Document)
+        assert len(ast.items) >= 1
+        section = ast.items[0]
+        assert isinstance(section, Section)
+        contents_nodes = [item for item in section.items if isinstance(item, Contents)]
+        assert len(contents_nodes) == 1
+        assert contents_nodes[0].depth == "3"
+
+    def test_nested_contents_depth3_tocdepth_set(self) -> None:
+        latex = _latex(self._SRC)
+        assert r"\setcounter{tocdepth}{3}" in latex
+
+    def test_nested_contents_depth3_section_present(self) -> None:
+        latex = _latex(self._SRC)
+        assert r"\addcontentsline{toc}{section}{Introduction}" in latex
+
+    def test_nested_contents_depth3_subsubsection_present(self) -> None:
+        # Absent if depth was silently dropped and defaulted to something else.
+        latex = _latex(self._SRC)
+        assert r"\addcontentsline{toc}{subsubsection}{(a)}" in latex

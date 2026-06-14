@@ -25,14 +25,17 @@ from txt2tex.ast_nodes import (
     Identifier,
     Lambda,
     NaturalJoin,
+    Part,
     Project,
     Quantifier,
     RelationalImage,
     RelationRename,
     Restrict,
+    Section,
     SequenceLiteral,
     SetComprehension,
     SetLiteral,
+    Solution,
     Subscript,
     Superscript,
     Tuple,
@@ -216,6 +219,24 @@ class LaTeXGenerator(
         """Generate the next synthetic abbreviation name for fuzz validation."""
         self._synth_abbrev_counter += 1
         return f"zS_{self._synth_abbrev_counter}"
+
+    def _find_contents_depth(self, items: list[DocumentItem]) -> int | None:
+        """Return the toc depth from the first Contents node found in document order.
+
+        Performs a pre-order DFS through items, descending into the .items of
+        Section, Solution, and Part nodes so that a CONTENTS: directive nested
+        inside a section heading is not silently ignored.
+
+        Returns None when no Contents node exists anywhere in the subtree.
+        """
+        for item in items:
+            if isinstance(item, Contents):
+                return toc_depth_from_keyword(item.depth)
+            if isinstance(item, (Section, Solution, Part)):
+                result = self._find_contents_depth(item.items)
+                if result is not None:
+                    return result
+        return None
 
     # -------------------------------------------------------------------------
     # Overflow warning helpers
@@ -481,11 +502,14 @@ class LaTeXGenerator(
         if isinstance(ast, Document):
             # Store document-level parts format
             self.parts_format = ast.parts_format
-            # Pre-scan for the first Contents node to set TOC depth before generation
-            for _item in ast.items:
-                if isinstance(_item, Contents):
-                    self._toc_depth = toc_depth_from_keyword(_item.depth)
-                    break
+            # Reset per-document TOC depth so a reused generator starts clean.
+            self._toc_depth = 3
+            # Pre-scan: DFS search for the first Contents node anywhere in the
+            # tree.  Top-level-only iteration misses Contents inside Section /
+            # Solution / Part, so we recurse into their .items lists.
+            found_depth = self._find_contents_depth(ast.items)
+            if found_depth is not None:
+                self._toc_depth = found_depth
             # toc_parts overrides depth to 3: all three heading levels enter the TOC
             if self.toc_parts:
                 self._toc_depth = 3
