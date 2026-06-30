@@ -1942,14 +1942,8 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                         self._advance()
                     self._skip_newlines()
                 elif self._match(TokenType.NEWLINE):
+                    has_continuation = self._next_non_newline_is_cross_op()
                     self._skip_newlines()
-                    has_continuation = self._match(
-                        TokenType.CROSS,
-                        TokenType.JOIN,
-                        TokenType.DIV,
-                        TokenType.GROUP,
-                        TokenType.UNGROUP,
-                    )
                 else:
                     self._skip_newlines()
                 if has_continuation:
