@@ -37,6 +37,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   at depth 3 regardless of the `CONTENTS:` keyword in the source file.
   Previously it was the only way to get parts in the TOC at all.
 
+### Fixed
+
+- **Spurious line break after a single-line `group`** — a `group (…)`
+  expression ending a line emitted a stray `\\` (and `\quad`) into the
+  inline math, because the parser treated the end-of-line newline as a
+  continuation. A bare newline now counts as a continuation only when a
+  chaining relational operator (`join`, `div`, `cross`, `group`,
+  `ungroup`) follows on the next line; an explicit trailing `\` still
+  forces the break.
+
 ## [1.6.3] - 2026-05-29
 
 ### Added
