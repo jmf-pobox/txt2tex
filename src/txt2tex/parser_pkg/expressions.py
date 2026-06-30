@@ -1925,7 +1925,15 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                 )
             elif op_token.type == TokenType.GROUP:
                 group_node = self._parse_group_rhs(left, op_token)
-                # Detect line continuation after full GROUP expression
+                # Detect line continuation after full GROUP expression.
+                # Unlike Divide/Join (which check *before* their right
+                # operand), GROUP checks *after* its fully-parsed RHS.
+                # A bare NEWLINE is only a continuation when a chaining
+                # relational operator immediately follows on the next line
+                # (join, div, cross, group, ungroup).  A NEWLINE before
+                # EOF or any non-relational token is just a statement
+                # terminator; treating it as a continuation injects \\
+                # into inline math, producing invalid LaTeX.
                 has_continuation = False
                 if self._match(TokenType.CONTINUATION):
                     self._advance()  # consume \
@@ -1934,8 +1942,14 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                         self._advance()
                     self._skip_newlines()
                 elif self._match(TokenType.NEWLINE):
-                    has_continuation = True
                     self._skip_newlines()
+                    has_continuation = self._match(
+                        TokenType.CROSS,
+                        TokenType.JOIN,
+                        TokenType.DIV,
+                        TokenType.GROUP,
+                        TokenType.UNGROUP,
+                    )
                 else:
                     self._skip_newlines()
                 if has_continuation:
