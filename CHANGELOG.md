@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`extend` operator and two-argument aggregates** — Date's `EXTEND` for
+  adding a per-tuple computed attribute, plus the two-argument aggregate
+  `Agg(rel, attr)` (e.g. `Sum(payments, amountPaid)`) for summarising a
+  relation-valued attribute produced by `group ({…} as rva)`.
+  `R extend (Sum(payments, amountPaid) as total)` renders
+  `R \mathop{\mathrm{Extend}}(\mathrm{Sum}(payments, amountPaid)~\mathrm{as}~total)`.
+  The single-argument aggregate form is unchanged. Relational-algebra
+  constructs (including `extend`) render as inline math and are not
+  fuzz type-checked.
+
 ### Changed
 
 - **`** **` solutions now render `\subsection*`** — previously `\section*`.

@@ -25,6 +25,7 @@ from txt2tex.ast_nodes import (
     Conditional,
     Divide,
     Expr,
+    ExtendAggregate,
     FunctionApp,
     GenericInstantiation,
     Group,
@@ -1851,6 +1852,7 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
             TokenType.DIV,
             TokenType.GROUP,
             TokenType.UNGROUP,
+            TokenType.EXTEND,
         ):
             op_token = self._advance()
 
@@ -1993,6 +1995,8 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                     )
                 else:
                     left = ungroup_node
+            elif op_token.type == TokenType.EXTEND:
+                left = self._parse_extend_full(left, op_token)
             else:
                 # CROSS
                 has_continuation = False
@@ -2023,18 +2027,7 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
             #            join T
             # The just-constructed node gets line_break_after=True so the
             # caller knows to emit \\ before the next operator.
-            if self._match(TokenType.CONTINUATION):
-                self._advance()  # consume \
-                if self._match(TokenType.NEWLINE):
-                    self._advance()
-                self._skip_newlines()
-                left = dataclasses.replace(left, line_break_after=True)
-            elif (
-                self._match(TokenType.NEWLINE) and self._next_non_newline_is_cross_op()
-            ):
-                # Natural line break before another cross-level operator
-                self._skip_newlines()
-                left = dataclasses.replace(left, line_break_after=True)
+            left = self._apply_trailing_continuation(left)
 
         return left
 
@@ -2055,7 +2048,55 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
             TokenType.DIV,
             TokenType.GROUP,
             TokenType.UNGROUP,
+            TokenType.EXTEND,
         )
+
+    def _parse_extend_full(self, left: Expr, op_token: Token) -> Expr:
+        """Parse an extend expression and handle post-expression line continuation.
+
+        Mirrors the GROUP branch continuation logic: a bare NEWLINE only sets
+        line_break_after when a chaining relational operator follows immediately.
+        """
+        extend_node = self._parse_extend_aggregate_rhs(left, op_token)
+        has_continuation = False
+        if self._match(TokenType.CONTINUATION):
+            self._advance()  # consume \
+            has_continuation = True
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+            self._skip_newlines()
+        elif self._match(TokenType.NEWLINE):
+            has_continuation = self._next_non_newline_is_cross_op()
+            self._skip_newlines()
+        else:
+            self._skip_newlines()
+        if has_continuation:
+            return ExtendAggregate(
+                relation=extend_node.relation,
+                clauses=extend_node.clauses,
+                line_break_after=True,
+                line=extend_node.line,
+                column=extend_node.column,
+            )
+        return extend_node
+
+    def _apply_trailing_continuation(self, left: Expr) -> Expr:
+        """Apply trailing continuation marker after a cross-level operator.
+
+        Checks for a ``\\`` or natural newline-before-cross-op pattern after
+        the just-constructed node.  Returns left with line_break_after=True
+        if a continuation was detected, otherwise returns left unchanged.
+        """
+        if self._match(TokenType.CONTINUATION):
+            self._advance()  # consume \
+            if self._match(TokenType.NEWLINE):
+                self._advance()
+            self._skip_newlines()
+            return dataclasses.replace(left, line_break_after=True)  # type: ignore[arg-type]
+        if self._match(TokenType.NEWLINE) and self._next_non_newline_is_cross_op():
+            self._skip_newlines()
+            return dataclasses.replace(left, line_break_after=True)  # type: ignore[arg-type]
+        return left
 
     # Token types that start an aggregator clause.
     _AGGREGATOR_TOKEN_TYPES: ClassVar[frozenset[TokenType]] = frozenset(

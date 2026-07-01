@@ -17,6 +17,7 @@ from txt2tex.ast_nodes import (
     AggregatorClause,
     Divide,
     Expr,
+    ExtendAggregate,
     Group,
     GroupAggregate,
     Identifier,
@@ -197,12 +198,48 @@ class _AlgebraCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
     def _generate_aggregator_clause(self, clause: AggregatorClause) -> str:
         r"""Render a single AggregatorClause as LaTeX.
 
-        Count(attr) as alias  →  \mathrm{Count}(attr)~\mathrm{as}~alias
+        Single-arg: Count(attr) as alias  →  \mathrm{Count}(attr)~\mathrm{as}~alias
+        Two-arg:    Sum(rel, attr) as alias → \mathrm{Sum}(rel, attr)~\mathrm{as}~alias
         """
         label = clause.agg.label()
         attr = self._emit_attr_name(clause.attr)
         alias = self._emit_attr_name(clause.alias)
-        return rf"\mathrm{{{label}}}({attr})~\mathrm{{as}}~{alias}"
+        if clause.source_rel is not None:
+            rel = self._emit_attr_name(clause.source_rel)
+            args = f"{rel}, {attr}"
+        else:
+            args = attr
+        return rf"\mathrm{{{label}}}({args})~\mathrm{{as}}~{alias}"
+
+    @expr_register.register(ExtendAggregate)
+    def _generate_extend_aggregate(
+        self, node: ExtendAggregate, parent: Expr | None = None
+    ) -> str:
+        r"""Generate LaTeX for R extend (Sum(payments, amountPaid) as total).
+
+        Each AggregatorClause renders as:
+            \mathrm{Sum}(payments, amountPaid)~\mathrm{as}~total
+
+        The full expression renders as:
+            R \mathop{\mathrm{Extend}}(
+                \mathrm{Sum}(payments, amountPaid)~\mathrm{as}~total)
+
+        The ``\mathop`` wrapper gives ``Extend`` proper binary-operator spacing
+        in math mode so the left operand does not collide with the operator symbol.
+        Consistent with ``_generate_group_aggregate`` which uses ``\mathop`` for
+        the same reason.
+
+        When line_break_after is set, inserts \\ after the EXTEND expression.
+        """
+        relation_latex = self.generate_expr(node.relation)
+        clause_parts = ", ".join(
+            self._generate_aggregator_clause(c) for c in node.clauses
+        )
+        result = rf"{relation_latex} \mathop{{\mathrm{{Extend}}}}({clause_parts})"
+        if node.line_break_after:
+            indent = self._get_indentation()
+            return f"{result} \\\\\n{indent} "
+        return result
 
     @expr_register.register(Ungroup)
     def _generate_ungroup(self, node: Ungroup, parent: Expr | None = None) -> str:

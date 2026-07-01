@@ -53,6 +53,7 @@ if TYPE_CHECKING:
         Declaration,
         DocumentItem,
         Expr,
+        ExtendAggregate,
         FreeBranch,
         FreeType,
         GenDef,
@@ -191,6 +192,9 @@ class ParserBase:
         ) -> GroupAggregate: ...
         def _parse_aggregator_clause(self) -> object: ...
         def _parse_ungroup_rhs(self, relation: Expr, ungroup_tok: Token) -> Ungroup: ...
+        def _parse_extend_aggregate_rhs(
+            self, relation: Expr, extend_tok: Token
+        ) -> ExtendAggregate: ...
 
         # --- Schema parsers (Move 13) ---
         def _parse_schema_pipe(self) -> Expr: ...

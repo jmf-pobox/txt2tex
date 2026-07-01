@@ -19,6 +19,7 @@ from txt2tex.ast_nodes import (
     Binding,
     Divide,
     Expr,
+    ExtendAggregate,
     Group,
     GroupAggregate,
     Identifier,
@@ -45,6 +46,7 @@ class _FuzzRoutingCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         Binding,
         Group,
         GroupAggregate,
+        ExtendAggregate,
         Ungroup,
     )
 
