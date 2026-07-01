@@ -25,7 +25,6 @@ from txt2tex.ast_nodes import (
     Conditional,
     Divide,
     Expr,
-    ExtendAggregate,
     FunctionApp,
     GenericInstantiation,
     Group,
@@ -2071,13 +2070,7 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         else:
             self._skip_newlines()
         if has_continuation:
-            return ExtendAggregate(
-                relation=extend_node.relation,
-                clauses=extend_node.clauses,
-                line_break_after=True,
-                line=extend_node.line,
-                column=extend_node.column,
-            )
+            return dataclasses.replace(extend_node, line_break_after=True)
         return extend_node
 
     def _apply_trailing_continuation(self, left: Expr) -> Expr:
