@@ -283,3 +283,15 @@ def test_extend_abbreviation_after_extend_no_swallow() -> None:
     assert isinstance(doc_result.items[0].expression, ExtendAggregate)
     assert isinstance(doc_result.items[1], Abbreviation)
     assert doc_result.items[1].name == "G"
+
+
+def test_extend_is_legal_as_attribute_name() -> None:
+    r"""`extend` is a reserved keyword but must remain usable as an attribute
+    name (like `group`/`ungroup`), so fields literally named `extend` still
+    parse in projection lists and two-argument aggregates."""
+    # projection attribute list
+    proj = _expr_latex("pi[extend, amount] R")
+    assert "extend" in proj
+    # `extend` as the relation-valued-attribute name in a two-arg aggregate
+    agg = _expr_latex("R extend (Sum(extend, amount) as t)")
+    assert r"\mathrm{Sum}(extend, amount)" in agg

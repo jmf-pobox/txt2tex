@@ -585,6 +585,7 @@ class Parser(
             TokenType.FILTER,  # filter (sequence filter)
             TokenType.GROUP,  # group (relational operator; legal as attr name)
             TokenType.UNGROUP,  # ungroup (relational operator; legal as attr name)
+            TokenType.EXTEND,  # extend (relational operator; legal as attr name)
         )
 
     # Operator keywords whose LaTeX expansion (e.g. \id, \dom) collides
