@@ -1834,12 +1834,13 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         return left
 
     def _parse_cross(self) -> Expr:
-        """Parse Cartesian product, natural join, theta-join, division, GROUP, UNGROUP.
+        """Parse product, join, division, GROUP, UNGROUP, and EXTEND.
 
-        CROSS, JOIN, DIV, GROUP, and UNGROUP sit at the same precedence
-        level between set operators and arithmetic (Phase 2.2 / 4.1).
+        CROSS, JOIN, DIV, GROUP, UNGROUP, and EXTEND sit at the same
+        precedence level between set operators and arithmetic (Phase 2.2 / 4.1).
         JOIN handles an optional subscript bracket: R join [p] S.
-        GROUP and UNGROUP are Date's nested-relation operators.
+        GROUP and UNGROUP are Date's nested-relation operators; EXTEND adds
+        a per-tuple computed attribute.
 
         Supports multi-line expressions with natural line breaks.
         """
@@ -2034,7 +2035,7 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         """Peek ahead past newlines to see if a cross-level operator follows.
 
         Returns True when the next non-newline token is one of CROSS, JOIN,
-        DIV, GROUP, or UNGROUP, indicating a natural line break in a chain.
+        DIV, GROUP, UNGROUP, or EXTEND, indicating a natural line break in a chain.
         """
         pos = self.pos
         while pos < len(self.tokens) and self.tokens[pos].type == TokenType.NEWLINE:

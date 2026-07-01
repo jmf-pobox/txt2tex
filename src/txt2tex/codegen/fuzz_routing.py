@@ -1,6 +1,6 @@
 """Fuzz-vs-inline-math routing helpers.
 
-Some AST nodes — algebra, bindings, GROUP/UNGROUP — cannot sit inside
+Some AST nodes — algebra, bindings, GROUP/UNGROUP/EXTEND — cannot sit inside
 a Z environment because fuzz rejects their syntax.  Abbreviation
 emission inspects the right-hand side and switches between an in-Z
 form (``\begin{zed}...\\end{zed}``) and a noindent inline-math form
