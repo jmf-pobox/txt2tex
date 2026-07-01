@@ -18,6 +18,7 @@ from __future__ import annotations
 from txt2tex.ast_nodes import (
     AggregatorClause,
     Expr,
+    ExtendAggregate,
     Group,
     GroupAggregate,
     Project,
@@ -144,7 +145,12 @@ class _AlgebraParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         )
 
     def _parse_aggregator_clause(self) -> AggregatorClause:
-        """Parse a single ``Count(attr) as alias`` clause."""
+        """Parse a single ``Count(attr) as alias`` or ``Sum(rel, attr) as alias``.
+
+        The two-arg form (Date SUM(rel, exp)) is accepted when a COMMA follows
+        the first identifier inside the parens.  First arg becomes ``source_rel``,
+        second arg becomes ``attr``.  Single-arg form leaves ``source_rel=None``.
+        """
         agg_tok = self._current()
         if agg_tok.type not in self._AGGREGATOR_TOKEN_TYPES:
             raise ParserError(
@@ -165,7 +171,21 @@ class _AlgebraParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                 f"Expected attribute name inside '{agg_tok.value}(...)'",
                 self._current(),
             )
-        attr = self._advance().value
+        first = self._advance().value
+        # Two-arg form: Agg(source_rel, attr) as alias
+        source_rel: str | None = None
+        if self._match(TokenType.COMMA):
+            self._advance()  # consume ','
+            if not self._is_attr_name_token():
+                msg = (
+                    f"Expected attribute name after ',' "
+                    f"in '{agg_tok.value}({first}, ...)'"
+                )
+                raise ParserError(msg, self._current())
+            source_rel = first
+            attr = self._advance().value
+        else:
+            attr = first
         if not self._match(TokenType.RPAREN):
             raise ParserError(
                 f"Expected ')' after attribute in '{agg_tok.value}({attr})'",
@@ -190,6 +210,7 @@ class _AlgebraParser(ParserBase):  # pyright: ignore[reportUnusedClass]
             agg=agg,
             attr=attr,
             alias=alias,
+            source_rel=source_rel,
             line=agg_tok.line,
             column=agg_tok.column,
         )
@@ -208,6 +229,35 @@ class _AlgebraParser(ParserBase):  # pyright: ignore[reportUnusedClass]
             alias=alias,
             line=ungroup_tok.line,
             column=ungroup_tok.column,
+        )
+
+    def _parse_extend_aggregate_rhs(
+        self, relation: Expr, extend_tok: Token
+    ) -> ExtendAggregate:
+        """Parse the RHS of an EXTEND expression.
+
+        Called after the 'extend' keyword has been consumed.  Expects
+        ``( clause, clause, ... )`` where each clause is an aggregator
+        clause (single- or two-arg form).
+        """
+        if not self._match(TokenType.LPAREN):
+            raise ParserError("Expected '(' after 'extend'", self._current())
+        self._advance()  # consume '('
+        clauses: list[AggregatorClause] = []
+        clauses.append(self._parse_aggregator_clause())
+        while self._match(TokenType.COMMA):
+            self._advance()  # consume ','
+            clauses.append(self._parse_aggregator_clause())
+        if not self._match(TokenType.RPAREN):
+            raise ParserError(
+                "Expected ')' to close 'extend' expression", self._current()
+            )
+        self._advance()  # consume ')'
+        return ExtendAggregate(
+            relation=relation,
+            clauses=clauses,
+            line=extend_tok.line,
+            column=extend_tok.column,
         )
 
     def _parse_restrict(self) -> Restrict:

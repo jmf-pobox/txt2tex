@@ -170,9 +170,10 @@ class TokenType(Enum):
     LBIND = auto()  # {| (binding literal left)
     RBIND = auto()  # |} (binding literal right)
 
-    # Nested-relation operators (Phase 4.1 — Date's GROUP / UNGROUP)
+    # Nested-relation operators (Phase 4.1 — Date's GROUP / UNGROUP / EXTEND)
     GROUP = auto()  # group (bundle attributes into nested relation)
     UNGROUP = auto()  # ungroup (flatten nested relation)
+    EXTEND = auto()  # extend (add computed attributes to a relation)
 
     # Aggregator keywords (Phase 4.2 — GROUP aggregate form)
     COUNT = auto()  # Count (aggregate count of values)

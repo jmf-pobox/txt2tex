@@ -691,15 +691,19 @@ class Aggregator(Enum):
 
 @dataclass(frozen=True)
 class AggregatorClause(ASTNode):
-    """Single aggregator application inside a GROUP aggregate expression.
+    """Single aggregator application inside a GROUP or EXTEND expression.
 
-    Represents ``Count(attr) as alias``.  The rendered form is
-    ``\\mathrm{Count}(attr)~\\mathrm{as}~alias``.
+    Represents ``Count(attr) as alias`` (single-arg form) or
+    ``Sum(rel, attr) as alias`` (two-arg Date form).
+
+    Single-arg rendered form: ``\\mathrm{Count}(attr)~\\mathrm{as}~alias``.
+    Two-arg rendered form:    ``\\mathrm{Sum}(rel, attr)~\\mathrm{as}~alias``.
     """
 
     agg: Aggregator
     attr: str  # Single attribute identifier (no nested expressions)
     alias: str  # Name the aggregated column receives in the output relation
+    source_rel: str | None = None  # Two-arg form: relation-valued attribute (Date)
 
 
 # Relational algebra nodes (Phase 2.2)
@@ -872,6 +876,35 @@ class GroupAggregate(ASTNode):
 
 
 @dataclass(frozen=True)
+class ExtendAggregate(ASTNode):
+    """Date's EXTEND operator — add computed aggregate attributes (Phase 4.3).
+
+    Represents ``R extend (Sum(payments, amountPaid) as totalInvoicePayment)``.
+
+    Computes one or more scalar aggregates and appends them as new attributes
+    to every tuple in R.  Each aggregator clause names the aggregation
+    function, optionally the source relation-valued attribute, the input
+    attribute, and the output alias.
+
+    Examples:
+    - R extend (Count(x) as n)
+      -> relation=Identifier("R"), clauses=[AggregatorClause(COUNT, "x", "n")]
+    - R extend (Sum(payments, amountPaid) as total)
+      -> relation=Identifier("R"),
+         clauses=[AggregatorClause(SUM, "amountPaid", "total", source_rel="payments")]
+
+    LaTeX rendering::
+
+      R \\mathop{\\mathrm{Extend}}(
+          \\mathrm{Sum}(payments, amountPaid)~\\mathrm{as}~total)
+    """
+
+    relation: Expr
+    clauses: list[AggregatorClause]
+    line_break_after: bool = False
+
+
+@dataclass(frozen=True)
 class Binding(ASTNode):
     r"""Z binding expression (Z RM §3.7).
 
@@ -936,6 +969,7 @@ Expr = (
     | Group
     | Ungroup
     | GroupAggregate
+    | ExtendAggregate
     | Binding
 )
 

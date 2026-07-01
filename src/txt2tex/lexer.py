@@ -32,9 +32,10 @@ KEYWORD_TO_TOKEN: dict[str, TokenType] = {
     "pi": TokenType.PI,
     "join": TokenType.JOIN,
     "div": TokenType.DIV,
-    # Nested-relation operators (Phase 4.1)
+    # Nested-relation operators (Phase 4.1 / 4.3)
     "group": TokenType.GROUP,
     "ungroup": TokenType.UNGROUP,
+    "extend": TokenType.EXTEND,
     # Aggregator keywords (Phase 4.2)
     "Count": TokenType.COUNT,
     "Sum": TokenType.SUM,
@@ -122,6 +123,7 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "div",
         "group",
         "ungroup",
+        "extend",
         # --- Aggregator keywords (Phase 4.2) ---
         "Count",
         "Sum",

@@ -3055,3 +3055,44 @@ for a homework section divider.
 - The `full` keyword alias is a convenience for users who want everything
   in the TOC without remembering the number 3.  It replaces the previous
   meaning of `full` (which was depth 2).
+
+## ADR: EXTEND operator and two-argument aggregates
+
+**Status**: SETTLED 2026-07-01.
+
+**Context.**  The relational-algebra family supported single-argument
+aggregates inside `group` (e.g. `R group (Sum(x) as t)`), which group by
+the complement of the named attribute (SUMMARIZE semantics).  It could not
+aggregate a *relation-valued attribute* (RVA) produced by the regroup form
+`R group ({A, B} as rva)`.  This matters because summing a projected
+attribute deduplicates equal values under set semantics and undercounts —
+two equal payments on one invoice collapse to a single row before `Sum`.
+Preserving multiplicity requires nesting the distinct tuples (carrying
+their key) and aggregating the RVA.
+
+**Decision.**
+
+1. **Two-argument aggregate** `Agg(rel, attr)` — Date's aggregate-operator
+   form `SUM(r, exp)`, with the second argument restricted to an attribute
+   name.  Renders `\mathrm{Sum}(payments, amountPaid)`.  The single-argument
+   form is unchanged; two arguments is a distinct arity of the same clause.
+2. **`extend` operator** — Date's `EXTEND`, adding a per-tuple scalar.
+   `R extend (Sum(rva, attr) as alias)` renders
+   `R \mathop{\mathrm{Extend}}(\mathrm{Sum}(rva, attr)~\mathrm{as}~alias)`.
+
+**Rejected alternative.**  Allow the two-argument aggregate inside `group`
+only, with no `extend`.  Rejected because aggregating an RVA per tuple is
+EXTEND, not GROUP: GROUP *produces* an RVA and reduces cardinality; EXTEND
+*consumes* an RVA and preserves it.  Rendering the operation under `Group`
+mislabels it, and the course teaches Date's algebra where the distinction
+is real.  Reviewed by jms (2026-07-01).
+
+**Consequences.**
+
+- `extend` is a new reserved keyword; relational-algebra documents can now
+  express multiplicity-preserving aggregation correctly.
+- `ExtendAggregate` is in the DAT expression set, so `extend` renders as
+  inline math and is never routed into a fuzz-checked `zed` block (per the
+  `cross` fuzz-routing fix).
+- The course did not teach `extend`, so its use is a per-document choice;
+  single-argument `group` aggregation is unaffected.

@@ -3174,6 +3174,81 @@ GROUP and UNGROUP are left-associative at the same precedence as
 R group ({A} as sub) ungroup sub
 ```
 
+#### Two-argument aggregate form
+
+The aggregators (`Count`, `Sum`, `Avg`, `Min`, `Max`, `Median`) accept
+a second argument when you want to aggregate a specific attribute over
+a **relation-valued attribute** (RVA) rather than grouping by its
+complement.
+
+```text
+Sum(payments, amountPaid)
+```
+
+Renders: $\mathrm{Sum}(payments, amountPaid)$
+
+The first argument names the RVA column; the second names the scalar
+attribute inside it to aggregate.  The second argument must be a plain
+attribute identifier — not a general expression.
+
+The two-argument form is accepted in any aggregate clause, but its
+correct home is `extend` (see below): aggregating a relation-valued
+attribute per tuple is Date's EXTEND, not GROUP.  The single-argument
+form `Sum(attr)` inside `group` is unchanged.
+
+#### EXTEND
+
+Date's EXTEND operator adds a per-tuple computed attribute to a
+relation.  Each clause applies a two-argument aggregate to an existing
+RVA column and names the resulting scalar attribute.
+
+```text
+R extend (Agg(rva, attr) as alias)
+R extend (Agg(rva, attr) as alias, Agg2(rva2, attr2) as alias2)
+```
+
+Example:
+
+```text
+InvPayGrouped extend (Sum(payments, amountPaid) as totalInvoicePayment)
+```
+
+Renders: $InvPayGrouped \mathop{\mathrm{Extend}}(\mathrm{Sum}(payments, amountPaid)~\mathrm{as}~totalInvoicePayment)$
+
+Multiple comma-separated clauses are allowed:
+
+```text
+R extend (Sum(payments, amountPaid) as total, Count(payments, paymentId) as n)
+```
+
+**When to use `extend` vs `group`.**
+
+| Operator | Effect | Cardinality |
+|----------|--------|-------------|
+| `R group ({A, B} as rva)` | Nests columns `A, B` into an RVA | Reduces (one row per key) |
+| `R extend (Agg(rva, attr) as alias)` | Adds a scalar computed from an existing RVA | Preserves (same number of rows) |
+
+**Why nest-then-extend instead of project-then-aggregate.**
+
+Under set semantics, projecting to `(key, amount)` deduplicates equal
+values — two payments of the same amount for the same invoice collapse
+to one row, and a subsequent sum undercounts.  Nesting the distinct
+tuples (which carry their own key) into an RVA preserves multiplicity,
+so the aggregate is correct.
+
+Worked example:
+
+```text
+InvPayGrouped == Payment group ({paymentId, amountPaid} as payments)
+PaidPerInv    == InvPayGrouped extend (Sum(payments, amountPaid) as totalInvoicePayment)
+```
+
+`InvPayGrouped` nests each payment tuple (with its own `paymentId`) into
+the `payments` RVA, one row per invoice.  `PaidPerInv` then sums the
+`amountPaid` values inside each nested relation, producing a correct
+total per invoice.  The result renders inline — relational algebra is
+not fuzz type-checked.
+
 ### Z Binding Calculus (Phase 2.3)
 
 Binding brackets construct labelled tuples per Z RM §3.7.  Used in
