@@ -1,0 +1,30 @@
+given CaseID, PropertyID, ParticipantID
+
+zed
+  zBool ::= zTrue | zFalse
+end
+
+schema Case
+  caseId : CaseID
+  propertyId : PropertyID
+  hasBeenReviewed : zBool
+end
+
+schema CaseParticipant
+  participantId : ParticipantID
+  caseId : CaseID
+end
+
+** Single line (works, but overflows page) **
+
+zed
+  BusyOK == { c : Case | (#({cp : CaseParticipant | cp.caseId = c.caseId}) >= 2) land c.hasBeenReviewed = zFalse . c.propertyId }
+end
+
+** Multi-line (must type-check AND render with bare backslash-backslash, not array) **
+
+zed
+  BusyBad == { c : Case |
+      (#({cp : CaseParticipant | cp.caseId = c.caseId}) >= 2) land
+      c.hasBeenReviewed = zFalse . c.propertyId }
+end

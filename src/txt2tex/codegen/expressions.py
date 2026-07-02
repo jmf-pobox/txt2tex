@@ -906,13 +906,20 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
                 parts.append(self._get_colon_separator())
                 parts.append(extra_domain_latex)
 
+        # In Z-paragraph contexts (zed/axdef/gendef/schema/hidden-fuzz), emit
+        # a fuzz-safe line-break with \t1 indentation.  fuzz rejects
+        # \begin{array} inside a Z paragraph (fuzz manual §3, §3.2).  In
+        # the display (inline-math) context the outer \begin{array}{l}
+        # provides layout, so plain \\ suffices there.
+        _break = "\\\\\n\\t1" if self._in_z_paragraph else r"\\"
+
         # Handle case with no predicate
         if node.predicate is None:
             # No predicate: { x : X . expr } -> use bullet/@ directly
             if node.expression:
                 parts.append(self._get_bullet_separator())
                 if node.line_break_after_bullet:
-                    parts.append(r"\\")
+                    parts.append(_break)
                 expression_latex = self.generate_expr(node.expression)
                 parts.append(expression_latex)
             # else: {x : T} with no predicate or expression - just the binding
@@ -921,7 +928,7 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
             parts.append(self._get_mid_separator())
 
             if node.line_break_after_pipe:
-                parts.append(r"\\")
+                parts.append(_break)
 
             # Generate predicate, passing this node as parent so that nested
             # quantifiers receive the SetComprehension context and the
@@ -933,7 +940,7 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
             if node.expression:
                 parts.append(self._get_bullet_separator())
                 if node.line_break_after_bullet:
-                    parts.append(r"\\")
+                    parts.append(_break)
                 expression_latex = self.generate_expr(node.expression)
                 parts.append(expression_latex)
 
@@ -943,13 +950,15 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
 
         result = " ".join(parts)
 
-        # When the comprehension has line breaks, wrap in an array
-        # environment for proper multi-line rendering.  The opening
-        # brace sits on the first row and the closing brace on the
-        # last row (textbook convention).
+        # When the comprehension has line breaks AND we are in a display
+        # (non-Z-paragraph) context, wrap in an array environment for proper
+        # multi-line rendering.  The opening brace sits on the first row and
+        # the closing brace on the last row (textbook convention).
+        # In Z-paragraph contexts the bare \\ + \t1 form is already embedded
+        # above; \begin{array} inside a Z paragraph is rejected by fuzz.
         if (
             node.line_break_after_pipe or node.line_break_after_bullet
-        ) and not self._in_hidden_fuzz_block:
+        ) and not self._in_z_paragraph:
             inner = result[len(r"\{~ ") :].removesuffix(r"~\}")
             return (
                 r"\begin{array}{l}"
