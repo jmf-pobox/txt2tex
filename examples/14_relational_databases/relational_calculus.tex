@@ -41,6 +41,10 @@ arid : ArtistId
 member : PlaylistId \rel TrackId
 \end{axdef}
 
+\begin{axdef}
+Jazz : GenreName
+\end{axdef}
+
 \section*{Query 1: Single-relation selection}
 \addcontentsline{toc}{section}{Query 1: Single-relation selection}
 
@@ -50,12 +54,12 @@ member : PlaylistId \rel TrackId
 
 \setbox0=\vbox{%
 \begin{zed}
-zS_1 == \{~ t : Track | t.genre = `Jazz' @ \\
+zS_1 == \{~ t : Track | t.genre = Jazz @ \\
 \t1 (t.title, t.genre) ~\}
 \end{zed}%
 }
 \noindent
-$\begin{array}{l}\{~ t : Track | t.genre = `Jazz' @ \\ \lblot~title == t.title, genre == t.genre~\rblot  ~\}\end{array}$
+$\begin{array}{l}\{~ t : Track | t.genre = Jazz @ \\ \lblot~title == t.title, genre == t.genre~\rblot  ~\}\end{array}$
 
 
 \section*{Query 2: Two-relation join via comprehension}

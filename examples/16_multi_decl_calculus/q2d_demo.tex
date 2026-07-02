@@ -70,6 +70,11 @@ winner : PlayerName \\
 loser : PlayerName
 \end{schemapk}
 
+\begin{axdef}
+Ali : PlayerName \\
+CentreCourt : VenueName
+\end{axdef}
+
 \section*{1. WYSIWYG line breaks for algebra operators}
 \addcontentsline{toc}{section}{1. WYSIWYG line breaks for algebra operators}
 
@@ -81,7 +86,7 @@ loser : PlayerName
 $\displaystyle
 \begin{array}{l}
 \mathrm{Project}_{winner, venue, tier}(\mathrm{Join}(Tournament, \\
-\quad (\mathrm{Project}_{tournament}(\mathrm{Restrict}_{winner = `Ali'}(Match)))[tournamentId/tournament]))
+\quad (\mathrm{Project}_{tournament}(\mathrm{Restrict}_{winner = Ali}(Match)))[tournamentId/tournament]))
 \end{array}$
 
 \bigskip
@@ -97,7 +102,7 @@ $\displaystyle
 \begin{zed}
 zS_1 == \{~ m : Match ; t : Tournament ; p : Player | m.tournament = t.tournamentId \land \\
 \quad m.winner = p.name \land \\
-\quad t.venue = `Centre Court' @ \\
+\quad t.venue = CentreCourt @ \\
 \t1 (m.winner, t.venue, t.tier) ~\}
 \end{zed}%
 }
@@ -106,7 +111,7 @@ $\displaystyle
 \begin{array}{l}
 \begin{array}{l}\{~ m : Match ; t : Tournament ; p : Player | m.tournament = t.tournamentId \land \\
 \quad m.winner = p.name \land \\
-\quad t.venue = `Centre Court' @ \\ \lblot~winner == m.winner, venue == t.venue, tier == t.tier~\rblot  ~\}\end{array}
+\quad t.venue = CentreCourt @ \\ \lblot~winner == m.winner, venue == t.venue, tier == t.tier~\rblot  ~\}\end{array}
 \end{array}$
 
 \bigskip
