@@ -51,6 +51,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Relational-calculus examples used non-Z string literals** —
+  `relational_calculus` and `q2d_demo` compared attributes to quoted
+  strings (`'Jazz'`, `'Ali'`, `'Centre Court'`), which fuzz rejected with a
+  syntax error on the backtick (Z has no string literals). Each value is
+  now declared as a constant of its given set via `axdef` (e.g.
+  `axdef Jazz : GenreName end`) and used unquoted. Both examples now
+  type-check.
+
 - **Multi-line set comprehensions in Z paragraphs** — multi-line set
   comprehensions and comprehension abbreviations inside fuzz Z paragraphs now
   emit `\\` line breaks with `\t1` indentation instead of `\begin{array}`,

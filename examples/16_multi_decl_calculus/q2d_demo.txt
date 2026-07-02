@@ -29,13 +29,21 @@ schema Match
   loser : PlayerName
 end
 
+// Named values (Z has no string literals): declared as constants of
+// their given sets and used unquoted in predicates.
+
+axdef
+  Ali : PlayerName
+  CentreCourt : VenueName
+end
+
 
 === 1. WYSIWYG line breaks for algebra operators ===
 
 TEXT: Long relational-algebra chains can be broken at any operator. Natural newlines work; explicit \ continuation also works. Display position wraps in array; the chain reads top-to-bottom instead of running off the page.
 
 pi[winner, venue, tier](Tournament join
-  (pi[tournament](sigma[winner = 'Ali'](Match)))[tournamentId/tournament])
+  (pi[tournament](sigma[winner = Ali](Match)))[tournamentId/tournament])
 
 
 === 2. Multi-decl comprehension with conjunction predicate ===
@@ -44,7 +52,7 @@ TEXT: This is the canonical multi-typed relational-calculus form for any query t
 
 { m : Match; t : Tournament; p : Player | m.tournament = t.tournamentId land
     m.winner = p.name land
-    t.venue = 'Centre Court' .
+    t.venue = CentreCourt .
   {| winner == m.winner, venue == t.venue, tier == t.tier |} }
 
 

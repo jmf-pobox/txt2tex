@@ -34,11 +34,18 @@ axdef
   member : PlaylistId <-> TrackId
 end
 
+// Z has no string literals: a named value like the "Jazz" genre is
+// declared as a constant of the given set and used unquoted.
+
+axdef
+  Jazz : GenreName
+end
+
 === Query 1: Single-relation selection ===
 
 TEXT: Retrieve the title and genre of every jazz track. This is a plain single-relation query over `Track` --- no join required.
 
-{ t : Track | t.genre = 'Jazz' .
+{ t : Track | t.genre = Jazz .
   {| title == t.title, genre == t.genre |} }
 
 === Query 2: Two-relation join via comprehension ===
