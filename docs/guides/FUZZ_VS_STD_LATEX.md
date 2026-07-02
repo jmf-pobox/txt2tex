@@ -677,7 +677,7 @@ end
 
 Fuzz cannot parse `\begin{array}` inside a Z paragraph (`zed`, `axdef`, `schema`). The error is:
 
-```
+```text
 Identifier \begin is not declared
 ```
 

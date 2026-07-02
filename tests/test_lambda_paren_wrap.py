@@ -101,6 +101,7 @@ def _run_fuzz(tex: str, tmp_path: Path) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         text=True,
         check=False,
+        timeout=120,
     )
 
 

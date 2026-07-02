@@ -4,7 +4,7 @@ This directory contains test files organized into four categories:
 
 1. **Active Bugs** (0 files) - Open defects with minimal repros, awaiting fix
 2. **Limitation Tests** (3 files) - Expected behavior with documented workarounds
-3. **Regression Tests** (20 files) - Previously fixed issues
+3. **Regression Tests** (21 files) - Previously fixed issues
 4. **Feature Tests** (7 files) - Edge cases and features
 
 ---
@@ -33,7 +33,7 @@ These tests document expected behavior limitations, not bugs. Each has a documen
 
 ---
 
-## Regression Tests (20 files)
+## Regression Tests (21 files)
 
 All regression tests pass. They verify previously fixed issues remain fixed.
 
@@ -73,6 +73,16 @@ All seven sub-symptoms (7.A–7.F) are fixed.
     colon-detection heuristic (`_process_type_declarations`) has been
     removed from the inline-math pipeline. Only explicit `$...$`
     content is parsed as math.
+
+### Resolved: Bug 8 — multi-line comprehension array-wrap breaks fuzz (CLOSED)
+
+- **bug8_multiline_abbrev_fuzz.txt** ✓
+- **Test**: `tests/test_10_schemas/test_zed_blocks.py`
+- **Fix**: Multi-line set comprehensions and comprehension abbreviations inside
+  a Z paragraph (`\begin{zed}`/`axdef`/`schema`) emitted `\begin{array}`, which
+  fuzz rejects (`Identifier \begin is not declared`). They now emit fuzz-native
+  `\\` line breaks with `\t1` indentation; the `\begin{array}` wrapper is kept
+  only for the non-fuzz inline-math display path.
 
 ### Resolved: Multiple Pipes in TEXT Blocks (Issue #2 - CLOSED)
 
@@ -131,9 +141,9 @@ All feature tests pass. They document working features.
 |----------|-------|--------|
 | Active Bugs | 0 | None open |
 | Limitation Tests | 3 | Expected behavior |
-| Regression Tests | 20 | All PASS |
+| Regression Tests | 21 | All PASS |
 | Feature Tests | 7 | All PASS |
-| **Total** | **30** | **27 PASS, 3 limitations, 0 open** |
+| **Total** | **31** | **28 PASS, 3 limitations, 0 open** |
 
 ---
 
@@ -156,11 +166,12 @@ done
 
 ---
 
-**Last Updated**: 2026-05-21
+**Last Updated**: 2026-07-02
 **Active Bugs**: 0
 **Retracted**: bug6 (`cat` keyword) — author error; canonical concat operator is `^`
 (with leading space → CAT, no leading space → CARET/exponent per `lexer.py:691-716`).
 `cat` is not in the txt2tex grammar.
 **Closed**: bug4 (m-2026-05-21-010), bug5 (m-2026-05-21-008),
-bug7 all sub-symptoms 7.A–7.F (m-2026-05-21-008 + m-2026-05-21-009)
+bug7 all sub-symptoms 7.A–7.F (m-2026-05-21-008 + m-2026-05-21-009),
+bug8 (multi-line comprehension array-wrap breaks fuzz)
 **GitHub Issues**: All closed (#1, #2, #3, #4, #5, #7)
