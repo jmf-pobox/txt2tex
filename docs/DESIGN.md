@@ -3087,6 +3087,16 @@ EXTEND, not GROUP: GROUP *produces* an RVA and reduces cardinality; EXTEND
 mislabels it, and the course teaches Date's algebra where the distinction
 is real.  Reviewed by jms (2026-07-01).
 
+**Grounding.**  Confirmed against C. J. Date, *An Introduction to Database
+Systems*, 8e, Ch. 7 (Relational Algebra), pp. 225–229:
+`EXTEND R ADD (exp AS name)` adds a computed attribute; aggregating a
+relation-valued
+attribute uses EXTEND (`EXTEND T3 ADD COUNT(Y) AS NP`, where `Y` is
+relation-valued); the two-argument aggregate `SUM(rel, attr)` requires the
+attribute unless the relation is of degree one; and SUMMARIZE (8e:
+`SUMMARIZE R PER R2{…} ADD …`) is explicitly non-primitive, reducible to
+EXTEND — so EXTEND is the correct primitive to add.
+
 **Consequences.**
 
 - `extend` is a new reserved keyword; relational-algebra documents can now
