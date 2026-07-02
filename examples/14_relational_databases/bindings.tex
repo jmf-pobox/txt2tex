@@ -62,7 +62,8 @@ $\lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot$
 
 \setbox0=\vbox{%
 \begin{zed}
-zS_2 == \{~ t : Track ; a : Album | t.albumId = a.albumId @ \\ (t.trackId, a.year, a.tracks) ~\}
+zS_2 == \{~ t : Track ; a : Album | t.albumId = a.albumId @ \\
+\t1 (t.trackId, a.year, a.tracks) ~\}
 \end{zed}%
 }
 \noindent

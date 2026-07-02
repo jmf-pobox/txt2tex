@@ -673,6 +673,34 @@ end
 - Quantifiers must follow fuzz syntax requirements
 - No special fuzz-specific handling needed for the environment itself
 
+### Multi-Line Constructs Inside Z Paragraphs
+
+Fuzz cannot parse `\begin{array}` inside a Z paragraph (`zed`, `axdef`, `schema`). The error is:
+
+```
+Identifier \begin is not declared
+```
+
+Use bare `\\` line breaks with `\t1` indentation instead:
+
+```latex
+Evens == \{ x : \nat | \\
+\t1  x \mod 2 = 0 \}
+```
+
+**Safe break points** — `\\` is only valid at grammatically open positions:
+
+- After an infix operator (`\land`, `=`, `\cross`, ...)
+- After the constraint bar `|`
+- After the bullet `@`
+- After an opening bracket, brace, or `==`
+
+**Never** break after a closing delimiter (`}`, `)`, `]`) or across `\where`.
+
+**`\t1` / `\t2`** are fuzz typographic spacing commands (fuzz manual §3.2). The type checker ignores them; they affect PDF indentation only.
+
+txt2tex emits this form automatically for multi-line set comprehensions and comprehension abbreviations inside Z paragraphs. The `\begin{array}` wrapper is kept only for the non-fuzz inline-math display path.
+
 ### When to Use zed vs axdef
 
 **Use `zed`** when:

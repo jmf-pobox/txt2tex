@@ -51,6 +51,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Multi-line set comprehensions in Z paragraphs** — multi-line set
+  comprehensions and comprehension abbreviations inside fuzz Z paragraphs now
+  emit `\\` line breaks with `\t1` indentation instead of `\begin{array}`,
+  which fuzz rejected ("Identifier \\begin is not declared"); the array
+  wrapper is retained only for inline-math display.
+
 - **Nested set comprehensions** — a set comprehension inside a predicate or
   characteristic expression no longer breaks the enclosing comprehension's
   bullet separator; the inner comprehension is now parsed in the scope of all
