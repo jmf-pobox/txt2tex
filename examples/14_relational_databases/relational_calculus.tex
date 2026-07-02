@@ -50,7 +50,8 @@ member : PlaylistId \rel TrackId
 
 \setbox0=\vbox{%
 \begin{zed}
-zS_1 == \{~ t : Track | t.genre = `Jazz' @ \\ (t.title, t.genre) ~\}
+zS_1 == \{~ t : Track | t.genre = `Jazz' @ \\
+\t1 (t.title, t.genre) ~\}
 \end{zed}%
 }
 \noindent
@@ -67,7 +68,8 @@ $\begin{array}{l}\{~ t : Track | t.genre = `Jazz' @ \\ \lblot~title == t.title, 
 \setbox0=\vbox{%
 \begin{zed}
 zS_2 == \{~ t : Track ; al : Album ; ar : Artist | t.alid = al.alid \land \\
-\quad al.arid = ar.arid @ \\ (t.title, ar.name) ~\}
+\quad al.arid = ar.arid @ \\
+\t1 (t.title, ar.name) ~\}
 \end{zed}%
 }
 \noindent
@@ -89,7 +91,8 @@ $\displaystyle
 \setbox0=\vbox{%
 \begin{zed}
 zS_3 == \{~ p : PlaylistId ; t : Track ; al : Album | (p, t.tid) \in member \land \\
-\quad t.alid = al.alid @ \\ (p, t.title, al.title) ~\}
+\quad t.alid = al.alid @ \\
+\t1 (p, t.title, al.title) ~\}
 \end{zed}%
 }
 \noindent
@@ -111,7 +114,8 @@ $\displaystyle
 \setbox0=\vbox{%
 \begin{zed}
 zS_4 == \{~ t : Track ; al : Album | t.alid = al.alid \land \\
-\quad t.duration > 300 @ \\ (t.title, al.title) ~\}
+\quad t.duration > 300 @ \\
+\t1 (t.title, al.title) ~\}
 \end{zed}%
 }
 \noindent

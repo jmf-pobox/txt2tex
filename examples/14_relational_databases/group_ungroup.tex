@@ -34,22 +34,12 @@ members : \power GroupID
 \addcontentsline{toc}{section}{GROUP - Bundle Attributes into a Nested Relation}
 
 \noindent
-$\displaystyle
-\begin{array}{l}
-GroupMembers \mathop{\mathrm{GROUP}} (\{name, email\} \mathop{\mathrm{AS}} contact) \\
-\quad 
-\end{array}$
+$GroupMembers \mathop{\mathrm{GROUP}} (\{name, email\} \mathop{\mathrm{AS}} contact)$
 
-\bigskip
 
 \noindent
-$\displaystyle
-\begin{array}{l}
-GroupMembers \mathop{\mathrm{GROUP}} (\{username\} \mathop{\mathrm{AS}} members) \\
-\quad 
-\end{array}$
+$GroupMembers \mathop{\mathrm{GROUP}} (\{username\} \mathop{\mathrm{AS}} members)$
 
-\bigskip
 
 \noindent
 $\mathrm{Project}_{groupId, members}(GroupMembers \mathop{\mathrm{GROUP}} (\{username\} \mathop{\mathrm{AS}} members))$

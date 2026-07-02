@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import shutil
+import subprocess
+from pathlib import Path
+
 import pytest
 
 from txt2tex.ast_nodes import (
@@ -17,6 +21,11 @@ from txt2tex.ast_nodes import (
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
+
+
+def _fuzz_available() -> bool:
+    """Return True when the fuzz binary is on PATH."""
+    return shutil.which("fuzz") is not None
 
 
 class TestZedBlockParsing:
@@ -813,3 +822,201 @@ class TestSetComprehensionLineBreaks:
         latex = generator.generate_document(ast)
         _assert_multiline_braces(latex)
         assert r"@ \\" in latex, "bullet must be followed by \\\\ line break"
+
+
+# ---------------------------------------------------------------------------
+# Bug 8: multi-line set-comprehension inside Z paragraph must not emit array
+# ---------------------------------------------------------------------------
+
+
+class TestMultilineComprehensionInZParagraph:
+    """Multi-line set comprehensions inside Z paragraphs must not use \\begin{array}.
+
+    Bug 8: a multi-line comprehension abbreviation was wrapped in
+    \\begin{array}{l} inside \\begin{zed}, which fuzz rejects with
+    "Identifier \\begin is not declared".
+
+    Fix: \\begin{array} is emitted only when _in_z_paragraph=False (the
+    display inline-math path).  Z-paragraph contexts (zed/axdef/schema/gendef)
+    use bare \\\\ + \\t1 indentation instead (fuzz manual §3.2: \\t1 is
+    parse-invisible).
+    """
+
+    def test_multiline_abbrev_in_zed_no_array(self) -> None:
+        """Multi-line comprehension in zed must not emit \\begin{array}."""
+        src = (
+            "given X\n"
+            "schema S\n  x : X\nend\n"
+            "zed\n"
+            "  BusyBad == { s : S |\n"
+            "      s.x = s.x }\n"
+            "end"
+        )
+        tokens = Lexer(src).tokenize()
+        ast = Parser(tokens).parse()
+        assert isinstance(ast, Document)
+        latex = LaTeXGenerator(use_fuzz=True).generate_document(ast)
+
+        # Locate the BusyBad zed block — not the first \begin{zed} (given type).
+        abbrev_pos = latex.index("BusyBad")
+        zed_start = latex.rindex(r"\begin{zed}", 0, abbrev_pos)
+        zed_end = latex.index(r"\end{zed}", abbrev_pos)
+        zed_body = latex[zed_start:zed_end]
+
+        assert r"\begin{array}" not in zed_body, (
+            r"array must not appear inside \begin{zed}: " + repr(zed_body)
+        )
+        assert r"\\" in zed_body, (
+            r"\\ line break must be present inside \begin{zed}: " + repr(zed_body)
+        )
+
+    def test_multiline_abbrev_zed_has_t1_indent(self) -> None:
+        """Multi-line comprehension continuation uses \\t1 indent inside zed."""
+        src = (
+            "given X\n"
+            "schema S\n  x : X\nend\n"
+            "zed\n"
+            "  BusyBad == { s : S |\n"
+            "      s.x = s.x }\n"
+            "end"
+        )
+        tokens = Lexer(src).tokenize()
+        ast = Parser(tokens).parse()
+        assert isinstance(ast, Document)
+        latex = LaTeXGenerator(use_fuzz=True).generate_document(ast)
+
+        abbrev_pos = latex.index("BusyBad")
+        zed_start = latex.rindex(r"\begin{zed}", 0, abbrev_pos)
+        zed_end = latex.index(r"\end{zed}", abbrev_pos)
+        zed_body = latex[zed_start:zed_end]
+
+        assert "\\t1" in zed_body, (
+            r"\t1 indentation must follow \\ in zed body: " + repr(zed_body)
+        )
+
+    def test_standalone_multiline_still_uses_array(self) -> None:
+        """Standalone multi-line comprehension at document level still uses array."""
+        src = "given X\nschema S\n  x : X\nend\n{ s : S |\n    s.x = s.x }"
+        tokens = Lexer(src).tokenize()
+        ast = Parser(tokens).parse()
+        assert isinstance(ast, Document)
+        latex = LaTeXGenerator(use_fuzz=True).generate_document(ast)
+
+        assert r"\begin{array}{l}" in latex, (
+            "standalone multiline comprehension must still use array: " + repr(latex)
+        )
+
+    def test_multiline_comprehension_in_axdef_predicate_no_array(self) -> None:
+        """Multi-line comprehension in axdef where clause must not emit array."""
+        src = (
+            "given X\n"
+            "axdef\n"
+            "  result : P X\n"
+            "where\n"
+            "  result = { x : X |\n"
+            "      x = x }\n"
+            "end"
+        )
+        tokens = Lexer(src).tokenize()
+        ast = Parser(tokens).parse()
+        assert isinstance(ast, Document)
+        latex = LaTeXGenerator(use_fuzz=True).generate_document(ast)
+
+        axdef_start = latex.index(r"\begin{axdef}")
+        axdef_end = latex.index(r"\end{axdef}", axdef_start)
+        axdef_body = latex[axdef_start:axdef_end]
+
+        assert r"\begin{array}" not in axdef_body, (
+            r"array must not appear inside \begin{axdef}: " + repr(axdef_body)
+        )
+        assert r"\\" in axdef_body, (
+            r"\\ line break must be present inside \begin{axdef}: " + repr(axdef_body)
+        )
+
+    def test_multiline_comprehension_in_schema_predicate_no_array(self) -> None:
+        """Multi-line comprehension in schema where clause must not emit array."""
+        src = (
+            "given X\n"
+            "schema MySchema\n"
+            "  xs : P X\n"
+            "where\n"
+            "  xs = { x : X |\n"
+            "      x = x }\n"
+            "end"
+        )
+        tokens = Lexer(src).tokenize()
+        ast = Parser(tokens).parse()
+        assert isinstance(ast, Document)
+        latex = LaTeXGenerator(use_fuzz=True).generate_document(ast)
+
+        schema_start = latex.index(r"\begin{schema}")
+        schema_end = latex.index(r"\end{schema}", schema_start)
+        schema_body = latex[schema_start:schema_end]
+
+        assert r"\begin{array}" not in schema_body, (
+            r"array must not appear inside \begin{schema}: " + repr(schema_body)
+        )
+        assert r"\\" in schema_body, (
+            r"\\ line break must be present inside \begin{schema}: " + repr(schema_body)
+        )
+
+
+@pytest.mark.skipif(not _fuzz_available(), reason="fuzz binary not on PATH")
+def test_bug8_multiline_abbrev_fuzz_round_trip(tmp_path: Path) -> None:
+    """Bug 8 repro: multi-line abbreviation inside zed type-checks under fuzz.
+
+    Before the fix, fuzz rejected with "Identifier \\begin is not declared"
+    because \\begin{array} was emitted inside \\begin{zed}.
+    """
+    src = """\
+given CaseID, PropertyID, ParticipantID
+
+zed
+  zBool ::= zTrue | zFalse
+end
+
+schema Case
+  caseId : CaseID
+  propertyId : PropertyID
+  hasBeenReviewed : zBool
+end
+
+schema CaseParticipant
+  participantId : ParticipantID
+  caseId : CaseID
+end
+
+zed
+  BusyBad == { c : Case |
+      (#({cp : CaseParticipant | cp.caseId = c.caseId}) >= 2) land
+      c.hasBeenReviewed = zFalse . c.propertyId }
+end
+"""
+    tokens = Lexer(src).tokenize()
+    doc = Parser(tokens).parse()
+    assert isinstance(doc, Document)
+    tex = LaTeXGenerator(use_fuzz=True).generate_document(doc)
+
+    # Confirm \begin{array} not inside the BusyBad zed block.
+    last_zed_start = tex.rindex(r"\begin{zed}")
+    last_zed_end = tex.index(r"\end{zed}", last_zed_start)
+    zed_body = tex[last_zed_start:last_zed_end]
+    assert r"\begin{array}" not in zed_body, (
+        r"\begin{array} still inside \begin{zed} after fix: " + repr(zed_body)
+    )
+
+    fuzz_bin = shutil.which("fuzz")
+    assert fuzz_bin is not None
+    tex_file = tmp_path / "bug8.tex"
+    tex_file.write_text(tex, encoding="utf-8")
+    result = subprocess.run(  # noqa: S603
+        [fuzz_bin, str(tex_file)],
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=120,
+    )
+    assert result.returncode == 0, (
+        f"fuzz rejected fixed output\n"
+        f"tex:\n{tex}\nstdout: {result.stdout}\nstderr: {result.stderr}"
+    )
