@@ -54,6 +54,22 @@ Demonstrates Date's GROUP and UNGROUP operators for nested relations (Phase 4.1)
 LaTeX output uses `\mathop{\mathrm{GROUP}}` and `\mathop{\mathrm{UNGROUP}}`
 for proper math-mode operator spacing (per jms round-2 refinement).
 
+### aggregation.txt
+
+Demonstrates aggregation, `extend`, and the two-argument aggregate:
+
+- `R group (Count(x) as n)` — group aggregate (one summary row per group)
+- `R group ({A, B} as rva)` then `R extend (Sum(rva, attr) as n)` — nest the
+  distinct tuples, then aggregate the relation-valued attribute per tuple.
+  This preserves multiplicity where projecting-then-summing would drop equal
+  values under set semantics.
+- `Agg(rel, attr)` — Date's two-argument aggregate over a relation-valued
+  attribute; `Agg(x)` single-argument form is unchanged.
+- `R cross S` — Cartesian product.
+
+`extend` renders `\mathop{\mathrm{Extend}}`; relational-algebra constructs
+render outside any Z paragraph and are not fuzz type-checked.
+
 ### bindings.txt
 
 Demonstrates Z binding brackets per Z RM §3.7, used in relational-calculus
@@ -146,6 +162,7 @@ txt2tex examples/14_relational_databases/primary_keys.txt
 txt2tex examples/14_relational_databases/algebra_basics.txt
 txt2tex examples/14_relational_databases/bindings.txt
 txt2tex examples/14_relational_databases/group_ungroup.txt
+txt2tex examples/14_relational_databases/aggregation.txt
 txt2tex examples/14_relational_databases/relational_calculus.txt
 txt2tex examples/14_relational_databases/foreign_keys.txt
 txt2tex examples/14_relational_databases/normalisation.txt

@@ -1,0 +1,67 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{fuzz}
+\usepackage{schemapk}
+\usepackage{zed-maths}
+\usepackage{zed-proof}
+\newdimen\savedleftskip
+\title{Aggregation and EXTEND}
+\author{txt2tex example}
+\hypersetup{pdftitle={Aggregation and EXTEND},pdfauthor={txt2tex example},pdfcreator={txt2tex v1.6.3}}
+\begin{document}
+
+\maketitle
+
+\begin{zed}[InvoiceID, PaymentID, Currency]\end{zed}
+
+\setbox0=\vbox{%
+\begin{schema}{Payment}
+paymentId : PaymentID \\
+invoiceId : InvoiceID \\
+amountPaid : Currency
+\end{schema}%
+}
+\begin{schemapk}{Payment}
+\underline{paymentId} : PaymentID \\
+invoiceId : InvoiceID \\
+amountPaid : Currency
+\end{schemapk}
+
+\section*{Group aggregate: one summary row per group}
+\addcontentsline{toc}{section}{Group aggregate: one summary row per group}
+
+\noindent
+$InvoicePayments == \mathrm{Project}_{invoiceId, paymentId}(Payment)$
+
+\noindent
+$InvoicePayments \mathop{\mathrm{Group}}(\mathrm{Count}(paymentId)~\mathrm{as}~numPayments)$
+
+
+\section*{Nest then EXTEND: a multiplicity-preserving sum}
+\addcontentsline{toc}{section}{Nest then EXTEND: a multiplicity-preserving sum}
+
+\noindent
+$InvPay == \mathrm{Project}_{invoiceId, paymentId, amountPaid}(Payment)$
+
+\noindent
+$InvPayNested == InvPay \mathop{\mathrm{GROUP}} (\{paymentId, amountPaid\} \mathop{\mathrm{AS}} payments)$
+
+\noindent
+$PaidPerInv == InvPayNested \mathop{\mathrm{Extend}}(\mathrm{Sum}(payments, amountPaid)~\mathrm{as}~totalInvoicePayment)$
+
+\noindent
+$InvPayNested \mathop{\mathrm{Extend}}(\mathrm{Sum}(payments, amountPaid)~\mathrm{as}~totalPaid, \mathrm{Count}(payments)~\mathrm{as}~numPaid)$
+
+
+\section*{Cartesian product}
+\addcontentsline{toc}{section}{Cartesian product}
+
+\noindent
+$InvoicePayments \cross InvoicePayments$
+
+
+\end{document}
