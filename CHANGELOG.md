@@ -51,6 +51,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Nested set comprehensions** — a set comprehension inside a predicate or
+  characteristic expression no longer breaks the enclosing comprehension's
+  bullet separator; the inner comprehension is now parsed in the scope of all
+  enclosing schema-text variables.
+
 - **Spurious line break after a single-line `group`** — a `group (…)`
   expression ending a line emitted a stray `\\` (and `\quad`) into the
   inline math, because the parser treated the end-of-line newline as a

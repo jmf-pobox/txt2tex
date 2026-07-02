@@ -816,7 +816,9 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         # bullet `.` from field projection (Z RM §3.16: declared variables are
         # not field selectors of sibling bindings in the same schema-text).
         prev_quantifier_vars = self._current_quantifier_vars
-        self._current_quantifier_vars = set(variables)
+        # Union with enclosing scope so inner comps can see outer variables.
+        self._current_quantifier_vars = prev_quantifier_vars | set(variables)
+        prev_in_comprehension_q = self._in_comprehension_body
         self._in_comprehension_body = True
         try:
             # Parse body (may be followed by constraint pipe)
@@ -873,7 +875,7 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                 self._in_comprehension_body = False
                 expression = self._parse_iff()  # Parse the expression part
         finally:
-            self._in_comprehension_body = False
+            self._in_comprehension_body = prev_in_comprehension_q
             self._current_quantifier_vars = prev_quantifier_vars
 
         return Quantifier(
@@ -924,11 +926,12 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         else:
             self._skip_newlines()
 
+        prev_in_comprehension_sq = self._in_comprehension_body
         self._in_comprehension_body = True
         try:
             body = self._parse_expr()
         finally:
-            self._in_comprehension_body = False
+            self._in_comprehension_body = prev_in_comprehension_sq
 
         return Quantifier(
             quantifier=quant_token.value,
@@ -1047,7 +1050,11 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         # Expose the full declared-variable set (this level + all inherited levels)
         # so _parse_postfix can apply the Z RM §3.16 bullet disambiguation rule.
         prev_quantifier_vars = self._current_quantifier_vars
-        self._current_quantifier_vars = prior_vars | set(variables)
+        # Union with enclosing scope so inner comps can see outer variables.
+        self._current_quantifier_vars = (
+            prev_quantifier_vars | prior_vars | set(variables)
+        )
+        prev_in_comprehension_qc = self._in_comprehension_body
         self._in_comprehension_body = True
         try:
             # Parse body (constraint part if bullet separator follows)
@@ -1077,7 +1084,7 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                 self._in_comprehension_body = False
                 expression = self._parse_iff()
         finally:
-            self._in_comprehension_body = False
+            self._in_comprehension_body = prev_in_comprehension_qc
             self._current_quantifier_vars = prev_quantifier_vars
 
         return Quantifier(
@@ -1156,7 +1163,9 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
             self._advance()  # Consume '|'
             self._skip_newlines()
             prev_quantifier_vars = self._current_quantifier_vars
-            self._current_quantifier_vars = set(variables)
+            # Union with enclosing scope so inner comps can see outer variables.
+            self._current_quantifier_vars = prev_quantifier_vars | set(variables)
+            prev_in_comprehension_lm = self._in_comprehension_body
             self._in_comprehension_body = True
             try:
                 body = self._parse_iff()
@@ -1166,7 +1175,7 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                     self._in_comprehension_body = False
                     expression = self._parse_iff()
             finally:
-                self._in_comprehension_body = False
+                self._in_comprehension_body = prev_in_comprehension_lm
                 self._current_quantifier_vars = prev_quantifier_vars
             return Quantifier(
                 quantifier="lambda",
@@ -1393,6 +1402,18 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
             "Expected ',', ':', '|', or '}' in set expression", self._current()
         )
 
+    @staticmethod
+    def _collect_comp_vars(
+        variables: list[str],
+        extra_declarations: list[tuple[str, Expr]] | None,
+    ) -> set[str]:
+        """Return the union of primary variables and extra-declaration names."""
+        result: set[str] = set(variables)
+        if extra_declarations is not None:
+            for ev, _ in extra_declarations:
+                result.add(ev)
+        return result
+
     def _parse_set_comprehension_from_brace(self) -> Expr:
         """Parse set comprehension after '{' already consumed.
 
@@ -1485,7 +1506,19 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                 bullet_continuation = True
                 self._skip_newlines()
             predicate = None
-            expression = self._parse_set_expression()
+            # Expose all declared variables for bullet disambiguation in nested
+            # comprehensions (Z RM §3.16).  Union with enclosing scope so a
+            # nested comprehension inside expr can see the outer-bound names.
+            all_comp_vars_pb = self._collect_comp_vars(variables, extra_declarations)
+            prev_quantifier_vars_pb = self._current_quantifier_vars
+            self._current_quantifier_vars = prev_quantifier_vars_pb | all_comp_vars_pb
+            prev_in_comprehension_pb = self._in_comprehension_body
+            self._in_comprehension_body = True
+            try:
+                expression = self._parse_set_expression()
+            finally:
+                self._in_comprehension_body = prev_in_comprehension_pb
+                self._current_quantifier_vars = prev_quantifier_vars_pb
         elif self._match(TokenType.PIPE):
             # Pipe separator: parse predicate, optionally followed by . expr
             self._advance()  # Consume '|'
@@ -1508,7 +1541,9 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                 for ev, _ in extra_declarations:
                     all_comp_vars.add(ev)
             prev_quantifier_vars = self._current_quantifier_vars
-            self._current_quantifier_vars = all_comp_vars
+            # Union with enclosing scope so inner comps can see outer variables.
+            self._current_quantifier_vars = prev_quantifier_vars | all_comp_vars
+            prev_in_comprehension_sc = self._in_comprehension_body
             self._in_comprehension_body = True
             try:
                 predicate = self._parse_set_predicate()
@@ -1530,7 +1565,7 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                         self._skip_newlines()
                     expression = self._parse_set_expression()
             finally:
-                self._in_comprehension_body = False
+                self._in_comprehension_body = prev_in_comprehension_sc
                 self._current_quantifier_vars = prev_quantifier_vars
         elif self._match(TokenType.RBRACE):
             # No separator: both predicate and expression are omitted
