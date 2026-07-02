@@ -926,11 +926,12 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         else:
             self._skip_newlines()
 
+        prev_in_comprehension_sq = self._in_comprehension_body
         self._in_comprehension_body = True
         try:
             body = self._parse_expr()
         finally:
-            self._in_comprehension_body = False
+            self._in_comprehension_body = prev_in_comprehension_sq
 
         return Quantifier(
             quantifier=quant_token.value,
@@ -1401,6 +1402,18 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
             "Expected ',', ':', '|', or '}' in set expression", self._current()
         )
 
+    @staticmethod
+    def _collect_comp_vars(
+        variables: list[str],
+        extra_declarations: list[tuple[str, Expr]] | None,
+    ) -> set[str]:
+        """Return the union of primary variables and extra-declaration names."""
+        result: set[str] = set(variables)
+        if extra_declarations is not None:
+            for ev, _ in extra_declarations:
+                result.add(ev)
+        return result
+
     def _parse_set_comprehension_from_brace(self) -> Expr:
         """Parse set comprehension after '{' already consumed.
 
@@ -1493,7 +1506,19 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                 bullet_continuation = True
                 self._skip_newlines()
             predicate = None
-            expression = self._parse_set_expression()
+            # Expose all declared variables for bullet disambiguation in nested
+            # comprehensions (Z RM §3.16).  Union with enclosing scope so a
+            # nested comprehension inside expr can see the outer-bound names.
+            all_comp_vars_pb = self._collect_comp_vars(variables, extra_declarations)
+            prev_quantifier_vars_pb = self._current_quantifier_vars
+            self._current_quantifier_vars = prev_quantifier_vars_pb | all_comp_vars_pb
+            prev_in_comprehension_pb = self._in_comprehension_body
+            self._in_comprehension_body = True
+            try:
+                expression = self._parse_set_expression()
+            finally:
+                self._in_comprehension_body = prev_in_comprehension_pb
+                self._current_quantifier_vars = prev_quantifier_vars_pb
         elif self._match(TokenType.PIPE):
             # Pipe separator: parse predicate, optionally followed by . expr
             self._advance()  # Consume '|'

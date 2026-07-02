@@ -398,6 +398,94 @@ def test_shape7b_constrained_mu_inner_bullet_outer_var() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Shape 8 (load-bearing, Fix 1 Site A): schema-text quantifier body nested
+# inside an outer set comprehension — exercises _parse_schema_quantifier_body.
+#
+# Input:  { c : Cls | (forall Env | c.status = zFalse) . c }
+# Bug:    _parse_schema_quantifier_body sets _in_comprehension_body = True and
+#         unconditionally resets it to False in finally (NOT stacked).
+#         After the schema-text quantifier returns, the outer comprehension's
+#         _in_comprehension_body is False.  Postfix sees `. c` with False →
+#         rule at §3.16 spaced-dot var-check does not fire → outer bullet missed.
+# Fix:    Site A stacks the flag: save prev before True, restore it in finally.
+# ---------------------------------------------------------------------------
+
+_SHAPE8_SRC = "{ c : Cls | (forall Env | c.status = zFalse) . c }"
+
+
+def test_shape8_schema_text_quantifier_nested_outer_bullet() -> None:
+    """Outer bullet is detected after a nested schema-text quantifier body.
+
+    ``_parse_schema_quantifier_body`` unconditionally assigns
+    ``_in_comprehension_body = False`` in its ``finally`` (Site A).  When
+    nested inside an outer set comprehension predicate the outer ``True`` is
+    clobbered.  Postfix then treats ``. c`` as field projection instead of the
+    outer bullet separator.
+
+    After the fix: outer ``SetComprehension.expression`` is
+    ``Identifier('c')`` and the LaTeX ends with ``@ c ~\\}``.
+    """
+    ast = _parse(_SHAPE8_SRC)
+    assert isinstance(ast, SetComprehension)
+    assert ast.expression is not None, (
+        "outer bullet was not detected — "
+        "schema-text quantifier finally clobbered _in_comprehension_body"
+    )
+    latex = _gen(_SHAPE8_SRC)
+    assert "@ c ~\\}" in latex, f"outer bullet '@ c' absent from output: {latex!r}"
+
+
+# ---------------------------------------------------------------------------
+# Shape 9 (load-bearing, Fix 2 Site B): period-without-predicate
+# { x : T . expr } where expr is a nested comprehension referencing x in
+# bullet position — exercises the PERIOD branch of
+# _parse_set_comprehension_from_brace.
+#
+# Input:  { a : Arr . { b : Items | b.ref = idx . a } }
+# Bug:    PERIOD branch parses expression = self._parse_set_expression()
+#         WITHOUT updating _current_quantifier_vars.
+#         Inner PIPE branch unions prev_quantifier_vars | {b} — no 'a'.
+#         Inner postfix sees `idx . a }`: 'a' not in {b}, _in_comparison_rhs
+#         is True so RBRACE-check is gated out; safe_followers sees 'a}'
+#         → idx.a parsed as projection, no inner bullet.
+# Fix:    PERIOD branch computes all_comp_vars ({a}), unions into
+#         _current_quantifier_vars, and save/restores both vars and flag.
+#         Inner PIPE branch inherits {a} and unions {b} → {a, b}.
+#         'a' in {a, b} AND spaced → var-check fires → inner bullet `. a`.
+# ---------------------------------------------------------------------------
+
+_SHAPE9_SRC = "{ a : Arr . { b : Items | b.ref = idx . a } }"
+
+
+def test_shape9_period_branch_nested_comp_outer_var_bullet() -> None:
+    """Period-without-predicate outer comp: nested inner comp sees outer var.
+
+    The PERIOD (no-predicate) branch of ``_parse_set_comprehension_from_brace``
+    does not update ``_current_quantifier_vars`` before parsing the expression.
+    The inner comprehension's PIPE branch unions ``prev_quantifier_vars | {b}``
+    — without Fix 2, ``a`` is absent and the inner bullet ``. a`` is not
+    detected.
+
+    After the fix: inner ``SetComprehension.expression`` is ``Identifier('a')``
+    and the LaTeX contains ``@ a ~\\}``.  The regression artefact ``idx.a``
+    must be absent.
+    """
+    ast = _parse(_SHAPE9_SRC)
+    assert isinstance(ast, SetComprehension)
+    inner = ast.expression
+    assert isinstance(inner, SetComprehension), (
+        f"outer expression should be inner SetComprehension, got {type(inner).__name__}"
+    )
+    assert inner.expression is not None, (
+        "inner bullet '. a' was not detected — "
+        "'a' was not in inner _current_quantifier_vars (PERIOD branch union missing)"
+    )
+    latex = _gen(_SHAPE9_SRC)
+    assert "@ a ~\\}" in latex, f"inner bullet '@ a' absent from output: {latex!r}"
+    assert "idx.a" not in latex, f"projection artefact 'idx.a' in output: {latex!r}"
+
+
+# ---------------------------------------------------------------------------
 # Optional fuzz round-trip for shape 1 (requires fuzz binary)
 # ---------------------------------------------------------------------------
 
@@ -406,9 +494,9 @@ def test_shape7b_constrained_mu_inner_bullet_outer_var() -> None:
 def test_shape1_fuzz_round_trip(tmp_path: Path) -> None:
     """Fuzz accepts the fixed output for shape 1.
 
-    If the bullet fix regresses, the generator re-emits ``zFalse.c``.  Fuzz
+    If the bullet fix regresses, the generator re-emits ``zF.c``.  Fuzz
     then rejects with "Argument of selection must have schema type" (Z RM §3.16)
-    because ``zFalse : zBool`` is not a schema type.
+    because ``zF : zBool`` is not a schema type.
 
     This test pins the semantic-level regression: a generator-level change that
     re-introduces the projection bug will be caught here even if the parser-unit
@@ -444,7 +532,7 @@ end
     assert isinstance(doc, Document)
     tex = LaTeXGenerator(use_fuzz=True).generate_document(doc)
     assert "@ c ~\\}" in tex, f"expected bullet output in tex:\n{tex}"
-    assert "zFalse.c" not in tex, f"projection artefact 'zFalse.c' in tex:\n{tex}"
+    assert "zF.c" not in tex, f"projection artefact 'zF.c' in tex:\n{tex}"
     result = _run_fuzz(tex, tmp_path)
     assert result.returncode == 0, (
         f"fuzz rejected the fixed output\n"

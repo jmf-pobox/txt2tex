@@ -998,9 +998,10 @@ The bullet (`•`) separates the predicate from the expression.
 
 Comprehensions can be nested: an inner comprehension appearing in a predicate or
 characteristic expression is valid — for example,
-`{ x : T | #({ y : U | Q(x, y) }) > 0 . x }`. The bullet `.` always binds to
-the innermost comprehension, so each level's predicate and expression are
-parsed independently.
+`{ x : T | #({ y : U | Q(x, y) }) > 0 . x }`. The bullet `.` binds to the
+innermost comprehension still open at that point — in the example the inner
+`{ y : U | ... }` has already closed, so the `.` is the outer comprehension's
+separator. Each level's predicate and expression are parsed independently.
 
 **Multi-variable:**
 
