@@ -1,0 +1,49 @@
+// Aggregation, EXTEND, and two-argument aggregates (Date's algebra).
+// Relational-algebra operators render outside any Z paragraph, so they
+// are not fuzz type-checked; the schema below is.
+
+TITLE: Aggregation and EXTEND
+AUTHOR: txt2tex example
+
+given InvoiceID, PaymentID, Currency
+
+schema Payment
+  pk paymentId : PaymentID
+  invoiceId : InvoiceID
+  amountPaid : Currency
+end
+
+=== Group aggregate: one summary row per group ===
+
+// The single-argument aggregate groups by the COMPLEMENT of the counted
+// attribute. Projecting to {invoiceId, paymentId} first makes the grouping
+// key exactly invoiceId, so this counts payments per invoice.
+
+InvoicePayments == pi[invoiceId, paymentId]Payment
+InvoicePayments group (Count(paymentId) as numPayments)
+
+// The aggregator keywords are Count, Sum, Avg, Min, Max, and Median.
+
+=== Nest then EXTEND: a multiplicity-preserving sum ===
+
+// Summing a projected {invoiceId, amountPaid} would drop duplicate equal
+// payments under set semantics and undercount. Instead, nest the distinct
+// payments (paymentId keeps them distinct) into a relation-valued attribute
+// with group, then aggregate that attribute per tuple with EXTEND and the
+// two-argument aggregate Sum(rel, attr).
+
+InvPay == pi[invoiceId, paymentId, amountPaid]Payment
+InvPayNested == InvPay group ({paymentId, amountPaid} as payments)
+PaidPerInv == InvPayNested extend (Sum(payments, amountPaid) as totalInvoicePayment)
+
+// EXTEND adds a per-tuple scalar and preserves cardinality; GROUP nests and
+// reduces it. Multiple clauses are comma-separated:
+
+InvPayNested extend (Sum(payments, amountPaid) as totalPaid, Count(payments) as numPaid)
+
+=== Cartesian product ===
+
+// cross forms every pair of tuples — e.g. to rank each tuple against the
+// others by comparing counts.
+
+InvoicePayments cross InvoicePayments

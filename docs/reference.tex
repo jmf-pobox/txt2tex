@@ -103,7 +103,7 @@ x?'                  & $x?'$ (combinations allowed) \\
 \needspace{4\baselineskip}
 \textbf{Reserved words.}
 
-{\footnotesize None of the keywords below can be used as an identifier name or carry decorations.  Watch out for the short ones (\texttt{id}, \texttt{dom}, \texttt{P}, \texttt{F}, \texttt{as}).}
+{\footnotesize None of the keywords below can be used as an identifier name or carry decorations (watch the short ones: \texttt{id}, \texttt{dom}, \texttt{P}, \texttt{F}, \texttt{as}) --- except that the relational operators \texttt{group}, \texttt{ungroup}, and \texttt{extend} are still accepted as attribute names in relational-algebra contexts.}
 
 \begin{tabularx}{\columnwidth}{LR}
 land, lor, lnot                            & propositional \\
@@ -119,7 +119,7 @@ given, where, end                          & paragraph delimiters \\
 Delta, Xi, theta, defs, shows              & schema operators \\
 hide, project                              & schema calculus \\
 pk                                         & txt2tex extension (primary-key annotation) \\
-sigma, pi, join, div, group, ungroup       & relational algebra \\
+sigma, pi, join, div, group, ungroup, extend & relational algebra \\
 Count, Sum, Avg, Min, Max, Median, as      & aggregators \\
 filter, bag\_union, bag\_diff              & sequence / bag \\
 ARGUE, EQUIV, EQUAL, INFRULE, PROOF        & proof-paragraph markers \\
@@ -962,6 +962,7 @@ R[B/A]               & $R[B/A]$ — rename \\
 R join S             & $\mathrm{Join}(R, S)$ — natural join \\
 R join [p] S         & $\mathrm{Join}_{p}(R, S)$ — theta-join \\
 R div S              & $R \div S$ — division \\
+R cross S            & $R \cross S$ — Cartesian product \\
 \end{tabularx}
 
 {\scriptsize\textbf{Fuzz note:} relational-algebra operators are fuzz-incompatible — the engine emits them outside any Z paragraph so they render without participating in fuzz type-checking. Do not wrap algebra inside \texttt{zed}/\texttt{axdef}/\texttt{schema} blocks.}
@@ -1016,7 +1017,7 @@ $Members\ \mathop{\mathrm{UNGROUP}}\ contact$
 \smallskip
 \textbf{GROUP aggregator form.}
 
-{\scriptsize The aggregator keywords are \kw{Count}, \kw{Sum}, \kw{Avg}, \kw{Min}, \kw{Max}, \kw{Median}. Each takes one attribute name and an alias. The regroup form (\texttt{\{...\} as alias}) and the aggregator form are mutually exclusive in a single \texttt{group} expression.}
+{\scriptsize The aggregator keywords are \kw{Count}, \kw{Sum}, \kw{Avg}, \kw{Min}, \kw{Max}, \kw{Median}. The single-argument form \texttt{Agg(x)} groups by the complement; the two-argument form \texttt{Agg(rel, attr)} aggregates \texttt{attr} over a relation-valued attribute (used with \kw{extend}). The regroup form (\texttt{\{...\} as alias}) and the aggregator form are mutually exclusive in a single \texttt{group} expression.}
 
 \begin{tabularx}{\columnwidth}{LR}
 R group (Count(x) as n)   & $R \mathop{\mathrm{Group}}(\mathrm{Count}(x)~\mathrm{as}~n)$ \\
@@ -1040,7 +1041,30 @@ $\mathrm{Sum}(amount)~\mathrm{as}~totalRevenue)$
 \end{center}
 \end{exget}
 
-{\scriptsize Multiple aggregators are comma-separated. Each accepts exactly one attribute identifier — no nested aggregators, no compound expressions.}
+{\scriptsize Multiple aggregators are comma-separated. Each accepts one attribute identifier, or two for the \texttt{Agg(rel, attr)} form — no nested aggregators, no compound expressions.}
+
+\smallskip
+\needspace{10\baselineskip}
+\textbf{EXTEND \& two-argument aggregate.}
+
+{\scriptsize \kw{extend} adds a per-tuple computed attribute (Date's EXTEND). The two-argument aggregate \texttt{Agg(rel, attr)} aggregates \texttt{attr} over a relation-valued attribute produced by \texttt{group (\{...\} as rel)}. GROUP nests and reduces cardinality; EXTEND preserves it.}
+
+\begin{tabularx}{\columnwidth}{LR}
+R extend (Sum(p, a) as t) & $R \mathop{\mathrm{Extend}}(\mathrm{Sum}(p, a)~\mathrm{as}~t)$ \\
+\end{tabularx}
+
+\begin{exwrite}
+\begin{verbatim}
+Nested extend (Sum(payments, amountPaid)
+               as totalPaid)
+\end{verbatim}
+\end{exwrite}
+\begin{exget}
+\begin{center}
+$Nested~\mathop{\mathrm{Extend}}(\mathrm{Sum}(payments, amountPaid)$\\
+$~\mathrm{as}~totalPaid)$
+\end{center}
+\end{exget}
 
 \end{multicols}
 
