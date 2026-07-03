@@ -213,10 +213,14 @@ class TestUnderscoreEscape:
         assert "_" not in cleaned
 
     def test_underscore_inside_dollar_math_not_escaped(self) -> None:
-        """_ inside $...$ is handled by the math parser, not escaped as \\_ ."""
-        latex = _gen("TEXT: The element $x elem S$ is in the set.")
-        # The prose escaper must not insert \\_ inside the math span
-        assert r"\in" in latex
+        r"""_ inside $...$ is preserved by the math parser, not escaped as \_ ."""
+        # x_1 has an underscore inside the $...$ span.  The prose underscore
+        # escaper (_escape_underscores_outside_math) must skip characters that
+        # are inside $...$ math delimiters; only the math parser owns them.
+        latex = _gen("TEXT: The subscript $x_1$ is a variable.")
+        # Underscore preserved inside the math span (not escaped to \_).
+        assert "$x_1$" in latex
+        assert r"$x\_1$" not in latex
 
 
 # ---------------------------------------------------------------------------

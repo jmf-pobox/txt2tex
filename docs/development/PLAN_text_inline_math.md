@@ -65,7 +65,8 @@ Confirm before any code:
   Only 3 generator sites branch on it: `o9`→`\semi` (`expressions.py:281`), and
   two comprehension line-break sites (`914`, `959-961`) that are unreachable
   inline (the `$...$` matcher forbids newlines). Current code already sets
-  `False` at `text_pipeline.py:504-510`.
+  `False` in the `$...$` routing (the `_process_explicit_dollar_math` /
+  inline-math path in `text_pipeline.py`).
 - The `$...$` path already routes content through the real parser and gates on
   `isinstance(ast, Expr)`; on the `else` it silently passes the span through.
   Under strict mode, change that to **raise** (paragraph construct in `$...$`).
@@ -74,7 +75,9 @@ Confirm before any code:
 - One entry point: `Parser(tokens).parse()`. Predicates and expressions both
   return `Expr`; no caller-side disambiguation.
 - Strict `$...$`: delete the allow/block/unknown backslash classification
-  (`text_pipeline.py:483-486`); any backslash in `$...$` → raise.
+  (the `_classify_latex_commands` allow/block logic in the `$...$` routing);
+  a `\`+letter LaTeX command in `$...$` → raise (the bare `\` set-difference
+  operator stays valid whiteboard).
 - `\power`/`\mu`/`@`/decorations are flag-independent — no inline-specific work.
 
 ### Phase 1 — rmh: parser-backed `$...$` (additive, behind the seam)

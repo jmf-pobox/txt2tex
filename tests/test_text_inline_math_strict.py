@@ -53,15 +53,48 @@ class TestWhiteboardInlineMath:
         assert r"\comp" not in latex
 
 
+class TestSetDifferenceInlineMath:
+    r"""$A \ B$ (whiteboard set difference) is allowed in $...$ spans.
+
+    The whiteboard set-difference operator is always written ``A \\ B``
+    (backslash surrounded by spaces).  ``re.search(r"\\\\[A-Za-z]", inner)``
+    does NOT match it, so it is not rejected as a raw LaTeX command.
+    """
+
+    def test_set_difference_inline(self) -> None:
+        r"""$A \ B$ parses and emits A \setminus B."""
+        latex = _gen("TEXT: The complement is $A \\ B$ here.")
+        assert r"\setminus" in latex
+
+    def test_set_difference_in_expression(self) -> None:
+        r"""$S \ T$ works as inline set difference."""
+        latex = _gen("TEXT: The result $S \\ T$ is non-empty.")
+        assert r"\setminus" in latex
+
+
 class TestStrictBackslashError:
-    r"""Any backslash inside $...$ raises InlineMathError in Phase 1.
+    r"""Raw LaTeX commands (\cmd) in $...$ raise InlineMathError.
+
+    A ``\\cmd`` pattern (backslash immediately before a letter) is rejected.
+    The whiteboard set-difference operator ``A \\ B`` (backslash + space) is
+    allowed and does NOT trigger this error.
 
     Error message: "$...$ is whiteboard-only inline math; raw LaTeX (...) belongs
     in a LATEX: block."
     """
 
+    def test_raw_geq_raises(self) -> None:
+        r"""$\geq$ raises InlineMathError — starts with SETMINUS, no left operand."""
+        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+            _gen(r"TEXT: We need $\geq 0$ to hold.")
+
+    def test_raw_forall_raises(self) -> None:
+        r"""$\forall x$ raises InlineMathError — write $forall x : T | P$ instead."""
+        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+            _gen(r"TEXT: The claim $\forall x$ is universal.")
+
     def test_backslash_geq_raises(self) -> None:
-        r"""$\geq$ raises InlineMathError — raw LaTeX must go through LATEX:."""
+        r"""$n \geq 0$ raises InlineMathError — \g is a raw LaTeX command pattern."""
         with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
             _gen(r"TEXT: We need $n \geq 0$ here.")
 

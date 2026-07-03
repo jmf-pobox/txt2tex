@@ -40,10 +40,12 @@ def _gen(source: str) -> str:
 
 
 class TestBackslashInDollarMathRaisesError:
-    r"""Bug 7.E superseded: any backslash in $...$ raises ValueError.
+    r"""Bug 7.E superseded: raw LaTeX commands in $...$ raise InlineMathError.
 
     The old behaviour (allow-list pass-through, bug 7.E fix) is replaced by a
-    hard error.  Use whiteboard notation inside $...$:
+    hard error for ``\cmd`` patterns (backslash immediately before a letter).
+    The whiteboard set-difference operator ``A \ B`` (backslash + space) is
+    allowed.  Use whiteboard notation inside $...$:
 
         $p <=> q$       (not $p \Leftrightarrow q$)
         $forall x : N | P$  (not $\forall x : N | P$)

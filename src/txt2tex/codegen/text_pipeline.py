@@ -38,8 +38,10 @@ class InlineMathError(Exception):
 
     Two cases trigger this error:
 
-    - A backslash inside $...$: raw LaTeX must go through ``LATEX:`` blocks.
-      Use whiteboard notation (``$p <=> q$``, ``$forall x : N | P$``) instead.
+    - A raw LaTeX command inside $...$: any ``\\cmd`` pattern (backslash
+      immediately before a letter) must go through a ``LATEX:`` block.
+      The whiteboard set-difference operator ``A \\ B`` (backslash + space)
+      is allowed.  Use ``$p <=> q$``, ``$forall x : N | P$`` etc. instead.
     - A Z paragraph construct (schema, axdef, gendef, given, ``::=``, ``==``)
       written inline: these are block-level constructs, not expressions.
     """
@@ -289,14 +291,16 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
         $...$ is strictly whiteboard notation — the same engine as zed/axdef/schema
         blocks.  Two error conditions are raised:
 
-        1. **Backslash in $...$**: raw LaTeX must go through ``LATEX:`` blocks.
-           Any ``\`` inside a span raises ``ValueError``.  Write ``$p <=> q$``
-           (whiteboard) not ``$p \Leftrightarrow q$`` (raw LaTeX).
+        1. **Raw LaTeX command in $...$**: raw LaTeX must go through ``LATEX:``
+           blocks.  Any ``\\cmd`` pattern (backslash immediately before a letter)
+           raises ``InlineMathError``.  The whiteboard set-difference operator
+           ``A \\ B`` is allowed because its backslash is followed by a space.
+           Write ``$p <=> q$`` (whiteboard) not ``$p \\Leftrightarrow q$``.
 
         2. **Paragraph construct in $...$**: ``Parser.parse()`` returns a
            ``Document`` when the content is a Z paragraph (schema, axdef, gendef,
            given, ``::=``, ``==``).  These cannot be written inline; raise
-           ``ValueError``.
+           ``InlineMathError``.
 
         Whiteboard expressions (``Parser.parse()`` returns ``Expr``): rendered via
         ``generate_expr`` with ``_in_z_paragraph=False`` so ``o9`` → ``\semi``.
@@ -320,9 +324,12 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
             if before.count("$") % 2 == 1:
                 continue
 
-            # Strict: any backslash in $...$ is an error.
-            # Raw LaTeX belongs in a LATEX: block, not inside $...$.
-            if "\\" in inner:
+            # Strict: raw LaTeX commands (\cmd) in $...$ are an error.
+            # The whiteboard set-difference operator is written "A \ B" (space
+            # after the backslash), so re.search(r"\\[A-Za-z]", inner) never
+            # matches it.  Raw LaTeX commands (\geq, \forall, \input, …) place
+            # a letter immediately after the backslash and always match.
+            if re.search(r"\\[A-Za-z]", inner):
                 msg = (
                     "$...$ is whiteboard-only inline math; "
                     r"raw LaTeX (\geq, \Leftrightarrow, ...) belongs in a LATEX: block."

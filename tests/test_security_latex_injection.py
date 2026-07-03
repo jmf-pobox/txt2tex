@@ -37,7 +37,7 @@ def _gen(source: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Dangerous commands — each raises ValueError before any output is produced
+# Dangerous commands — each raises InlineMathError before any output is produced
 # ---------------------------------------------------------------------------
 
 
@@ -72,7 +72,7 @@ def _gen(source: str) -> str:
     ],
 )
 def test_dangerous_command_raises(prose_fragment: str) -> None:
-    """Dangerous LaTeX commands in $...$ raise ValueError before any output."""
+    """Dangerous LaTeX commands in $...$ raise InlineMathError before any output."""
     with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
         _gen(prose_fragment)
 
