@@ -684,10 +684,11 @@ def test_carveout_predicate_ending_with_projection_sees_bullet() -> None:
 # End-to-end fuzz round-trip (guarded)
 # ---------------------------------------------------------------------------
 
-# Parse-only source — mirrors .tmp/inv.txt (the user's motivating example).
-# Uses +-> (partial function type constructor) for the comprehension
-# char-expr.  This is what the user originally wrote; the parse test
-# confirms the parser accepts it after the fix.
+# Parse-only source — mirrors the user's motivating example.  The
+# comprehension char-expr uses the maplet |-> (paymentId |-> amount) — the
+# reported bug: a field selection as an operand of |-> now parses after the
+# fix.  (The `+->` in the gendef signature is the partial-function *type*
+# arrow and is unrelated.)
 _INV_SRC = (
     "given InvoiceId, PaymentId\n"
     "\n"
@@ -716,7 +717,7 @@ _INV_SRC = (
     "zed\n"
     "  forall i : Invoice |\n"
     "    i.amountPaid = sum({ p : Payment | i.invoiceId = p.invoiceId"
-    " . p.paymentId +-> p.amount })\n"
+    " . p.paymentId |-> p.amount })\n"
     "end\n"
 )
 
@@ -743,7 +744,7 @@ def test_invoice_comprehension_parses_without_error() -> None:
 
     Confirms that `i.invoiceId`, `p.invoiceId`, `p.paymentId`, and
     `p.amount` (each a TupleProjection) are accepted as operands next to
-    `=` and `+->`, and inside a comprehension char-expr.
+    `=` and the maplet `|->`, and inside a comprehension char-expr.
     """
     tokens = Lexer(_INV_SRC).tokenize()
     doc = Parser(tokens).parse()
