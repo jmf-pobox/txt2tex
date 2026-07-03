@@ -142,6 +142,22 @@ class TestProcessInput:
         )
         assert result is False
 
+    def test_process_inline_math_error_is_clean(
+        self, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """A strict $...$ error in a TEXT block is handled cleanly, no traceback."""
+        generator = LaTeXGenerator(use_fuzz=True)
+        result = process_input(
+            r"TEXT: bad $n \geq 0$ here.",
+            generator,
+            latex_only=True,
+        )
+        assert result is False
+        err = capsys.readouterr().err
+        assert "Error:" in err
+        assert "whiteboard notation only" in err
+        assert "Traceback" not in err
+
     def test_process_truth_table(self) -> None:
         """Should process a truth table."""
         generator = LaTeXGenerator(use_fuzz=True)

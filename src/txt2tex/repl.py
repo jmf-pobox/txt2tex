@@ -12,6 +12,7 @@ import tempfile
 from pathlib import Path
 
 from txt2tex.ast_nodes import Document
+from txt2tex.codegen.text_pipeline import InlineMathError
 from txt2tex.compile import compile_pdf, copy_latex_files
 from txt2tex.errors import ErrorFormatter
 from txt2tex.latex_gen import LaTeXGenerator
@@ -173,6 +174,10 @@ def process_input(
     except ParserError as e:
         formatted = formatter.format_error(e.message, e.token.line, e.token.column)
         print(formatted, file=sys.stderr)
+        return False
+    except InlineMathError as e:
+        # Strict $...$ inline-math error already carries "line N: $span$ — ...".
+        print(f"Error: {e}", file=sys.stderr)
         return False
 
     # Surface any accumulated warnings (e.g. overflow) and reset
