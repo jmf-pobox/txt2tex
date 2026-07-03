@@ -194,7 +194,7 @@ def test_cli_inline_math_backslash_error_is_clean(
     assert result == 1
     captured = capsys.readouterr()
     assert "Error:" in captured.err
-    assert "whiteboard-only inline math" in captured.err
+    assert "whiteboard notation only" in captured.err
     assert "Traceback" not in captured.err
 
 
@@ -213,5 +213,5 @@ def test_cli_inline_math_paragraph_construct_error_is_clean(
     assert result == 1
     captured = capsys.readouterr()
     assert "Error:" in captured.err
-    assert "Z paragraph" in captured.err
+    assert "block-level Z" in captured.err
     assert "Traceback" not in captured.err

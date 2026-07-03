@@ -83,7 +83,7 @@ Confirm before any code:
 ### Phase 1 — rmh: parser-backed `$...$` (additive, behind the seam)
 
 - In `text_pipeline.py`, replace the *content conversion* inside
-  `_process_explicit_dollar_math` (and `_process_inline_math`) with a call into
+  `_process_explicit_dollar_math` with a call into
   the existing engine: lex the span → parse as an expression → generate LaTeX
   (with the inline flag from Phase 0) → wrap in `$...$`.
 - Reuse the existing lexer/parser/generator; do NOT write a new parser.

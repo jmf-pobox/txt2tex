@@ -143,7 +143,7 @@ class _TextBlocksParser(ParserBase):  # pyright: ignore[reportUnusedClass]
             # No coalescing happened; return the already-parsed result.
             return result
 
-        merged_text = " ".join(accumulated)
+        merged_text = "\n".join(accumulated)
         return Paragraph(
             text=merged_text,
             line=result.line,

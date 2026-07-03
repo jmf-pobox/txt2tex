@@ -56,47 +56,47 @@ class TestBackslashInDollarMathRaisesError:
 
     def test_leftrightarrow_raises(self) -> None:
         r"""$p \Leftrightarrow q$ raises — use $p <=> q$ instead."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: The formula $p \Leftrightarrow x > 1$ holds.")
 
     def test_rightarrow_raises(self) -> None:
         r"""$p \Rightarrow q$ raises — use $p => q$ instead."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: Note that $p \Rightarrow q$ is an implication.")
 
     def test_forall_backslash_raises(self) -> None:
         r"""$\forall x$ raises — use $forall x : T | P$ instead."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: The claim $\forall x$ is universal.")
 
     def test_exists_backslash_raises(self) -> None:
         r"""$\exists x$ raises — use $exists x : T | P$ instead."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: We have $\exists x$ in the set.")
 
     def test_land_backslash_raises(self) -> None:
         r"""$p \land q$ raises — use $p land q$ instead."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: The conjunction $p \land q$ is true.")
 
     def test_lor_backslash_raises(self) -> None:
         r"""$p \lor q$ raises — use $p lor q$ instead."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: The disjunction $p \lor q$ is false.")
 
     def test_neg_backslash_raises(self) -> None:
         r"""$\neg p$ raises — use $lnot p$ instead."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: Negation $\neg p$ is the complement.")
 
     def test_in_backslash_raises(self) -> None:
         r"""$x \in S$ raises — use $x elem S$ instead."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: We know $x \in S$.")
 
     def test_multiple_backslash_commands_raise(self) -> None:
         r"""Multiple \cmd in a single $...$ span raise on the first backslash."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: $\forall x \in S \bullet x > 0$")
 
 

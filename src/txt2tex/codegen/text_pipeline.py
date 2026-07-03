@@ -33,6 +33,17 @@ from txt2tex.lexer import Lexer, LexerError
 from txt2tex.parser import Parser, ParserError
 
 
+def _sanitise_span_for_error(inner: str) -> str:
+    """Return *inner* with non-printable characters removed.
+
+    Applied to the raw content of a $...$ span before interpolating it into
+    an InlineMathError message, so that control bytes (ESC, BEL, NUL, …) can
+    never reach stderr.  Printable ASCII and printable Unicode pass through
+    unchanged; Python's ``str.isprintable()`` is the gate.
+    """
+    return "".join(ch for ch in inner if ch.isprintable())
+
+
 class InlineMathError(Exception):
     """Raised when a $...$ span in TEXT: prose contains invalid content.
 
@@ -329,7 +340,7 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
             # captures so before.count("\n") is usually 0; for text with embedded
             # newlines (e.g. constructed in tests) it gives the correct offset.
             actual_line = base_line + before.count("\n")
-            span = f"${inner}$"
+            span = f"${_sanitise_span_for_error(inner)}$"
 
             # Strict: raw LaTeX commands (\cmd) in $...$ are an error.
             # The whiteboard set-difference operator is written "A \ B" (space
@@ -339,8 +350,9 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
             if re.search(r"\\[A-Za-z]", inner):
                 msg = (
                     f"line {actual_line}: {span} — "
-                    "$...$ is whiteboard-only inline math; "
-                    r"raw LaTeX (\geq, \Leftrightarrow, ...) belongs in a LATEX: block."
+                    "$...$ takes whiteboard notation only "
+                    r"(e.g. $n >= 0$, $forall x : N | P$); "
+                    r"raw LaTeX (\geq, \Leftrightarrow) belongs in a LATEX: block."
                 )
                 raise InlineMathError(msg)
 
@@ -374,7 +386,7 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
                 msg = (
                     f"line {actual_line}: {span} — "
                     "$...$ takes an inline Z expression or predicate; "
-                    "schema/axdef/gendef/given/::=/== is a Z paragraph "
+                    "schema/axdef/gendef/given/::=/== is a block-level Z construct "
                     "— use a schema/axdef/zed block, not inline."
                 )
                 raise InlineMathError(msg)

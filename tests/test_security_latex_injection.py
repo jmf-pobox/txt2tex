@@ -73,7 +73,7 @@ def _gen(source: str) -> str:
 )
 def test_dangerous_command_raises(prose_fragment: str) -> None:
     """Dangerous LaTeX commands in $...$ raise InlineMathError before any output."""
-    with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+    with pytest.raises(InlineMathError, match="whiteboard notation only"):
         _gen(prose_fragment)
 
 
@@ -84,7 +84,7 @@ def test_dangerous_command_raises(prose_fragment: str) -> None:
 
 def test_unknown_command_raises() -> None:
     r"""$\unknowncmd{x}$ raises — all backslashes are rejected."""
-    with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+    with pytest.raises(InlineMathError, match="whiteboard notation only"):
         _gen(r"TEXT: Unknown $\unknowncmd{x}$ is rejected.")
 
 
@@ -95,31 +95,31 @@ def test_unknown_command_raises() -> None:
 
 def test_forall_backslash_raises() -> None:
     r"""$\forall x$ raises — write $forall x : T | P$ (whiteboard) instead."""
-    with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+    with pytest.raises(InlineMathError, match="whiteboard notation only"):
         _gen(r"TEXT: The claim $\forall x$ is universal.")
 
 
 def test_land_backslash_raises() -> None:
     r"""$p \land q$ raises — write $p land q$ (whiteboard) instead."""
-    with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+    with pytest.raises(InlineMathError, match="whiteboard notation only"):
         _gen(r"TEXT: The conjunction $p \land q$ is true.")
 
 
 def test_leftrightarrow_backslash_raises() -> None:
     r"""$p \Leftrightarrow q$ raises — write $p <=> q$ (whiteboard) instead."""
-    with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+    with pytest.raises(InlineMathError, match="whiteboard notation only"):
         _gen(r"TEXT: The biconditional $p \Leftrightarrow q$ holds.")
 
 
 def test_in_backslash_raises() -> None:
     r"""$x \in S$ raises — write $x elem S$ (whiteboard) instead."""
-    with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+    with pytest.raises(InlineMathError, match="whiteboard notation only"):
         _gen(r"TEXT: We know $x \in S$.")
 
 
 def test_exists_backslash_raises() -> None:
     r"""$\exists x$ raises — write $exists x : T | P$ (whiteboard) instead."""
-    with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+    with pytest.raises(InlineMathError, match="whiteboard notation only"):
         _gen(r"TEXT: We have $\exists x$ in the set.")
 
 

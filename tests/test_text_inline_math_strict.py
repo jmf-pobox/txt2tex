@@ -79,48 +79,48 @@ class TestStrictBackslashError:
     The whiteboard set-difference operator ``A \\ B`` (backslash + space) is
     allowed and does NOT trigger this error.
 
-    Error message: "$...$ is whiteboard-only inline math; raw LaTeX (...) belongs
+    Error message: "$...$ is whiteboard notation only; raw LaTeX (...) belongs
     in a LATEX: block."
     """
 
     def test_raw_geq_raises(self) -> None:
         r"""$\geq$ raises InlineMathError — starts with SETMINUS, no left operand."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: We need $\geq 0$ to hold.")
 
     def test_raw_forall_raises(self) -> None:
         r"""$\forall x$ raises InlineMathError — write $forall x : T | P$ instead."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: The claim $\forall x$ is universal.")
 
     def test_backslash_geq_raises(self) -> None:
         r"""$n \geq 0$ raises InlineMathError — \g is a raw LaTeX command pattern."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: We need $n \geq 0$ here.")
 
     def test_backslash_leftrightarrow_raises(self) -> None:
         r"""$p \Leftrightarrow q$ raises — use $p <=> q$ (whiteboard) instead."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: The biconditional $p \Leftrightarrow q$ holds.")
 
     def test_backslash_forall_raises(self) -> None:
         r"""$\forall x$ raises — use $forall x$ (whiteboard) instead."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: The claim $\forall x$ is universal.")
 
     def test_backslash_in_raises(self) -> None:
         r"""$x \in S$ raises — use $x elem S$ (whiteboard) instead."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: We have $x \in S$.")
 
     def test_blocked_command_raises(self) -> None:
         r"""$\input{secret.tex}$ raises — dangerous commands also hit strict check."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: The value $\input{secret.tex}$ is computed.")
 
     def test_multiple_backslash_commands_raise(self) -> None:
         r"""$\forall x \in S \bullet x > 0$ raises on first backslash."""
-        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+        with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: We require $\forall x \in S \bullet x > 0$.")
 
 
@@ -133,7 +133,7 @@ class TestParagraphConstructError:
 
     def test_schema_inline_raises(self) -> None:
         """$schema S end$ raises InlineMathError — Z paragraphs not allowed inline."""
-        with pytest.raises(InlineMathError, match="Z paragraph"):
+        with pytest.raises(InlineMathError, match="block-level Z"):
             _gen("TEXT: $schema S end$")
 
 
@@ -215,3 +215,24 @@ class TestEmptyInlineMath:
         # Must not raise; the sentence renders around the untouched span.
         latex = _gen("TEXT: Text $  $ more.")
         assert "more" in latex
+
+
+class TestCoalescedBlockLineNumber:
+    """A bad span on a later line of a COALESCED TEXT block reports its own line.
+
+    Adjacent TEXT: lines (no blank line between) coalesce into one Paragraph.
+    The coalesced text is joined with newlines (parser_pkg/text_blocks.py), so
+    the per-line arithmetic (base line + newlines-before-match) stays exact
+    (Bugbot #78). LaTeX collapses the joining newline to a space, so rendering
+    is unchanged.
+    """
+
+    def test_span_on_second_coalesced_line_reports_that_line(self) -> None:
+        """A $\\geq$ on the 2nd of two coalesced TEXT: lines reports line 4."""
+        # _gen prepends "=== Test ===\n\n" (lines 1-2); the two TEXT: lines are
+        # 3 and 4 and coalesce; the bad span sits on line 4.
+        with pytest.raises(InlineMathError) as exc_info:
+            _gen("TEXT: first line here.\nTEXT: second has $\\geq$ x.")
+        msg = str(exc_info.value)
+        assert "line 4:" in msg
+        assert "line 3:" not in msg
