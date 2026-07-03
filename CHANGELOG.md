@@ -21,6 +21,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **`$...$` in `TEXT:` is now strict whiteboard inline math** — its content is
+  parsed by the real lexer/parser/generator (the same engine as `zed`/`axdef`
+  blocks) and rendered inline, so `$forall x : X | p.a |-> p.b$` works with no
+  LaTeX knowledge. A raw LaTeX command (a backslash immediately before a letter,
+  e.g. `\forall`, `\geq`) inside `$...$` is now an error — write whiteboard
+  (`$forall x : N | P$`, `$n >= 0$`) or put raw LaTeX in a `LATEX:` block; the
+  set-difference operator `$A \ B$` is still valid. A block-level Z construct
+  (`schema`/`axdef`/`gendef`/`given`/`::=`/`==`) inside `$...$` is likewise an
+  error. Each surfaces as a clean CLI error naming the source line and span, not
+  a traceback. (Phase 1 of the TEXT inline-math refactor; bare-prose
+  auto-detection is unchanged for now.)
+
 - **`** **` solutions now render `\subsection*`** — previously `\section*`.
   This is one heading level smaller. Solutions now nest under sections in
   the table of contents instead of colliding with them.

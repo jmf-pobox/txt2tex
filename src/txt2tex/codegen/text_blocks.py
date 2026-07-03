@@ -108,7 +108,7 @@ class _TextBlocksCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                 if isinstance(item, Paragraph):
                     # Single paragraph: (a) text
                     # Process the text to convert operators and handle inline math
-                    processed_text = self._process_paragraph_text(item.text)
+                    processed_text = self._process_paragraph_text(item.text, item.line)
                     lines.append(indent_prefix + part_label + " " + processed_text)
                     lines.append("")
                 elif isinstance(item, Expr):
@@ -284,7 +284,7 @@ class _TextBlocksCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         lines: list[str] = []
 
         # Process the paragraph text
-        text = self._process_paragraph_text(node.text)
+        text = self._process_paragraph_text(node.text, node.line)
 
         # Prevent first-line indentation for all paragraphs
         # Paragraphs inside parts will be indented via \leftskip set at part level

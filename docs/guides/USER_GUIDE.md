@@ -186,7 +186,7 @@ automatically detected and converted:
 ```text
 TEXT: This is a plain text paragraph with => and <=> symbols.
 TEXT: The set { x : N | x > 0 } contains positive integers.
-TEXT: We write $\forall x : N | x \geq 0$ to mean all natural numbers.
+TEXT: We write $forall x : N | x >= 0$ to mean all natural numbers.
 ```
 
 **Features:**
@@ -194,10 +194,14 @@ TEXT: We write $\forall x : N | x \geq 0$ to mean all natural numbers.
 - Operators converted: `=>` → $\Rightarrow$, `<=>` → $\Leftrightarrow$
 - Formulas automatically detected: `{ x : N | x > 0 }` → $\{ x : \mathbb{N} \mid x > 0 \}$
 - Sequence literals converted: `<a, b, c>` → $\langle a, b, c \rangle$
-- **Math-keyword rewrite is opt-in via `$...$`** (#136 / DAT #11): bare
-  English words like `exists`, `forall`, `group`, `union` are NOT
-  automatically converted to math glyphs. Write `$\exists$`, `$\forall$`,
-  etc. when you want the symbol.
+- **Inline math is opt-in via `$...$`, and it is strict whiteboard notation**
+  — the same syntax as `zed`/`axdef` blocks. Bare English words like `exists`,
+  `forall`, `union` in prose are NOT converted to math glyphs. Write a
+  *complete* whiteboard expression inside `$...$` — e.g. `$forall x : N | P$` —
+  when you want math. Raw LaTeX commands (`$\forall$`, `$n \geq 0$`) now raise
+  an error; put raw LaTeX in a `LATEX:` block instead. The set-difference
+  operator `$A \ B$` is valid whiteboard and unchanged. (Bare-operator symbols
+  such as `$|->$` are not yet rendered as glyphs.)
 
   Compare:
 
@@ -209,10 +213,10 @@ TEXT: We write $\forall x : N | x \geq 0$ to mean all natural numbers.
   `exists` stays as English prose.)
 
   ```text
-  TEXT: We write $\exists x : N$ to mean "some natural number".
+  TEXT: We write $exists x : N | x > 0$ to mean "some positive number".
   ```
 
-  Generates the `∃` glyph inside the inline `$...$`, English prose
+  Generates the `∃` expression inside the inline `$...$`, English prose
   outside.
 
 - Citations supported: `[cite key]` → (Author, Year) in Harvard style

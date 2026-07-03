@@ -143,6 +143,13 @@ class _TextBlocksParser(ParserBase):  # pyright: ignore[reportUnusedClass]
             # No coalescing happened; return the already-parsed result.
             return result
 
+        # Join with a space, not a newline: the Phase 1 bare-prose heuristics
+        # (e.g. _process_quantifiers' sentence-boundary detection) assume
+        # ". "/"! "/"? " boundaries and mis-handle ".\n".  A consequence is that
+        # inline-math error line numbers approximate to this block's first line
+        # for coalesced adjacent TEXT: lines; single and blank-separated blocks
+        # are exact.  Phase 2 removes the heuristics and makes exact coalesced
+        # line numbers safe.
         merged_text = " ".join(accumulated)
         return Paragraph(
             text=merged_text,

@@ -151,9 +151,9 @@ class TestBalancedDollarsUnaffected:
         # No run of \$...\$ patterns for the math content
         assert r"\$a\$" not in latex
 
-    def test_forall_balanced_span_not_escaped(self) -> None:
-        r"""$\forall x$ span (balanced) is allowed through."""
-        latex = _gen(r"TEXT: The claim $\forall x$ is universal.")
+    def test_forall_whiteboard_span_parses(self) -> None:
+        r"""$forall x : N | x > 0$ (whiteboard) is parsed and emits \forall."""
+        latex = _gen("TEXT: The claim $forall x : N | x > 0$ is universal.")
         assert r"\forall" in latex
         assert r"\$" not in latex
 
