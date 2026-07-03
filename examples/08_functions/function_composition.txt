@@ -58,15 +58,15 @@ TEXT: h2(n) = f2(g2(n)) = f2(n * 2) = (n * 2) + 1 = 2n + 1
 
 ** Example 3: Comparison - Forward vs Backward **
 
-TEXT: Forward composition f o9 g:
-TEXT: Input → f → g → Output
-TEXT: (f o9 g)(x) = g(f(x))
+TEXT: Forward composition f $o9$ g:
+TEXT: Input $→$ f $→$ g $→$ Output
+TEXT: (f $o9$ g)(x) = g(f(x))
 
 TEXT: Backward composition f o g:
-TEXT: Input → g → f → Output
+TEXT: Input $→$ g $→$ f $→$ Output
 TEXT: (f o g)(x) = f(g(x))
 
-TEXT: Notice the reversal: o9 applies left-to-right, o applies right-to-left.
+TEXT: Notice the reversal: $o9$ applies left-to-right, o applies right-to-left.
 
 ** Example 4: Three-Function Composition **
 
@@ -98,14 +98,14 @@ where
   rightId = anyFunc o9 identity
 end
 
-TEXT: leftId = anyFunc (identity is left identity for o9)
-TEXT: rightId = anyFunc (identity is right identity for o9)
+TEXT: leftId = anyFunc (identity is left identity for $o9$)
+TEXT: rightId = anyFunc (identity is right identity for $o9$)
 
 ** Example 6: Associativity **
 
 TEXT: Composition is associative:
 
-TEXT: (f o9 g) o9 h = f o9 (g o9 h)
+TEXT: $(f o9 g) o9 h = f o9 (g o9 h)$
 
 TEXT: You can group compositions in any order—the result is the same.
 
@@ -193,7 +193,7 @@ TEXT: If encrypt and decrypt are inverses, then identity_check should be the ide
 
 ** Example 12: Partial Composition **
 
-TEXT: When composing f : A -> B and g : C -> D, we need ran f subseteq dom g.
+TEXT: When composing $f : A -> B$ and $g : C -> D$, we need $ran f subseteq dom g$.
 
 axdef
   f4 : N +-> N
@@ -205,26 +205,26 @@ where
   h4 = f4 o9 g4
 end
 
-TEXT: h4 = {1 |-> 100, 2 |-> 200}. Composition is defined where ranges align.
+TEXT: $h4 = {1 |-> 100, 2 |-> 200}$. Composition is defined where ranges align.
 
 ** Example 13: Monoid Structure **
 
-TEXT: Functions from A -> A with composition form a monoid:
-TEXT: 1. Composition is associative: (f o9 g) o9 h = f o9 (g o9 h)
-TEXT: 2. Identity element: id(x) = x, id o9 f = f = f o9 id
-TEXT: 3. Closure: composing A -> A functions gives another A -> A function
+TEXT: Functions from $A -> A$ with composition form a monoid:
+TEXT: 1. Composition is associative: $(f o9 g) o9 h = f o9 (g o9 h)$
+TEXT: 2. Identity element: $id(x) = x$, id $o9$ f = f = f $o9$ id
+TEXT: 3. Closure: composing $A -> A$ functions gives another $A -> A$ function
 
 ** Example 14: Practical Example - Data Processing Pipeline **
 
-TEXT: In practice, you might compose functions to create data processing pipelines: validate o9 process o9 format. Each stage transforms data through a series of operations. The notation f o9 g o9 h means "apply f, then g, then h" which creates a pipeline from input to output.
+TEXT: In practice, you might compose functions to create data processing pipelines: $validate o9 process o9 format$. Each stage transforms data through a series of operations. The notation $f o9 g o9 h$ means "apply f, then g, then h" which creates a pipeline from input to output.
 
 ** Example 15: Composition Operator Precedence **
 
 TEXT: Composition operators bind tighter than logical operators:
 
-TEXT: f o9 g = h means (f o9 g) = h, not f o9 (g = h)
+TEXT: $f o9 g = h$ means $(f o9 g) = h$, not $f o9 (g = h)$
 
-TEXT: Use parentheses to clarify: (f o9 g) or f o9 (g o9 h)
+TEXT: Use parentheses to clarify: $(f o9 g)$ or $f o9 (g o9 h)$
 
 ** Example 16: Self-Composition **
 
@@ -255,7 +255,7 @@ TEXT: Composing increment 5 times gives addFive.
 TEXT: Composition enables a functional programming style:
 
 TEXT: Instead of: result = h(g(f(x)))
-TEXT: Use: pipeline = f o9 g o9 h; result = pipeline(x)
+TEXT: Use: $pipeline = f o9 g o9 h$; $result = pipeline(x)$
 
 TEXT: This separates pipeline definition from application, improving modularity.
 
@@ -268,4 +268,4 @@ TEXT: 3. Break complex pipelines into named intermediate steps
 TEXT: 4. Type-check that domains and ranges align
 TEXT: 5. Use composition to create reusable pipelines
 TEXT: 6. Test individual functions before composing them
-TEXT: 7. Remember: o9 reads left-to-right (natural for pipelines), o reads right-to-left (traditional math notation)
+TEXT: 7. Remember: $o9$ reads left-to-right (natural for pipelines), o reads right-to-left (traditional math notation)

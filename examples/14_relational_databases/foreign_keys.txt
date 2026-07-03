@@ -31,7 +31,7 @@ LINEBREAK:
 === Pattern 2: Composite Primary Key ===
 
 TEXT: Two pk lines in one schema body.  Both attributes are underlined;
-TEXT: txt2tex collapses them into one PK set: PK(RecipeIngredient) = {recipeId, ingredientId}.
+TEXT: txt2tex collapses them into one PK set: PK(RecipeIngredient) = ${recipeId, ingredientId}$.
 
 schema RecipeIngredient
   pk recipeId : RecipeId

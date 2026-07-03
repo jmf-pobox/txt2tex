@@ -22,7 +22,7 @@
 
 TEXT: The squash operator appears in the Z notation glossary but is not built into the fuzz type-checker. However, we can define it ourselves as a user-defined function using an axiomatic specification.
 
-TEXT: Squash takes a partial function from N1 (positive naturals) to some type X and compacts it into a sequence by removing gaps in the domain. For example, {1 |-> a, 3 |-> b, 7 |-> c} becomes <a, b, c>.
+TEXT: Squash takes a partial function from N1 (positive naturals) to some type X and compacts it into a sequence by removing gaps in the domain. For example, ${1 |-> a, 3 |-> b, 7 |-> c}$ becomes $<a, b, c>$.
 
 ** Example 1: Axiomatic Definition of Squash **
 
@@ -47,7 +47,7 @@ where
   f1 = {1 |-> 10, 3 |-> 30, 5 |-> 50} land s1 = squashFunc f1
 end
 
-TEXT: The result s1 is <10, 30, 50>, containing exactly the range elements in the order of their original indices.
+TEXT: The result s1 is $<10, 30, 50>$, containing exactly the range elements in the order of their original indices.
 
 ** Example 3: Squash with Letters **
 
@@ -67,7 +67,7 @@ where
   f2 = {2 |-> a, 4 |-> b, 7 |-> c, 9 |-> d} land s2 = squashFunc f2
 end
 
-TEXT: The result s2 is <a, b, c, d>. The gaps at positions 1, 3, 5, 6, 8 are removed.
+TEXT: The result s2 is $<a, b, c, d>$. The gaps at positions 1, 3, 5, 6, 8 are removed.
 
 ** Example 4: Empty Function **
 
@@ -78,7 +78,7 @@ where
   f3 = {} land s3 = squashFunc f3
 end
 
-TEXT: Squashing an empty function yields an empty sequence: s3 = <>.
+TEXT: Squashing an empty function yields an empty sequence: s3 = $<>$.
 
 ** Example 5: Continuous Function (No Gaps) **
 
@@ -89,7 +89,7 @@ where
   f4 = {1 |-> 100, 2 |-> 200, 3 |-> 300} land s4 = squashFunc f4
 end
 
-TEXT: When the function has no gaps (dom f4 = 1..3), squashFunc simply converts it to a sequence: s4 = <100, 200, 300>.
+TEXT: When the function has no gaps ($dom f4 = 1..3$), squashFunc simply converts it to a sequence: s4 = $<100, 200, 300>$.
 
 ** Example 6: Relationship Between Function land Sequence **
 
@@ -102,7 +102,7 @@ where
   dom continuous_N = 1 .. # (ran continuous_N) land s_continuous_N = squashFunc continuous_N
 end
 
-TEXT: In this case, continuous_N is already a sequence, and squashFunc continuous_N = continuous_N as a sequence.
+TEXT: In this case, continuous_N is already a sequence, and $squashFunc continuous_N = continuous_N$ as a sequence.
 
 ** Example 7: Squash Preserves Injectivity **
 

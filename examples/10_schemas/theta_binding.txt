@@ -33,7 +33,7 @@ where
   snapshot! = theta Store
 end
 
-TEXT: The Ξ-style frame condition theta S = theta S' asserts that none of the
+TEXT: The Xi-style frame condition $theta S = theta S'$ asserts that none of the
 TEXT: schema components changed.  This is the definition of Xi S expressed
 TEXT: using theta directly.
 

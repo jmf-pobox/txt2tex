@@ -2,7 +2,7 @@
 
 ** Example 1: Base case - length of the empty sequence **
 
-(a) Prove length <> = 0.
+(a) Prove length $<>$ = 0.
 
 EQUAL:
 length <>
@@ -10,7 +10,7 @@ length <>
 
 ** Example 2: Inductive step - length of a non-empty sequence **
 
-(a) Prove length (s ^ <x>) = length s + 1.
+(a) Prove length (s ^ $<x>$) = length s + 1.
 
 EQUAL:
 length (s ^ <x>)

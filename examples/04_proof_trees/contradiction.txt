@@ -36,7 +36,7 @@ TEXT: Once we derive false, we can conclude anything—here we conclude p by dis
 
 ** Example 2: Simple Example - Proving q **
 
-TEXT: Prove: (p land lnot p) => q
+TEXT: Prove: $(p land lnot p) => q$
 
 PROOF:
 (p land lnot p) => q [=> intro from 1]
@@ -50,7 +50,7 @@ TEXT: From a contradiction, we can derive anything (ex falso quodlibet).
 
 ** Example 3: Law of Non-Contradiction **
 
-TEXT: Prove that p land lnot p leads to a contradiction.
+TEXT: Prove that $p land lnot p$ leads to a contradiction.
 
 PROOF:
 p land lnot p => false [=> intro from 1]
@@ -61,7 +61,7 @@ TEXT: This proves the law of non-contradiction - no proposition can be both true
 
 ** Example 4: Indirect Proof **
 
-TEXT: Prove: (lnot p => false) => lnot lnot p
+TEXT: Prove: $(lnot p => false) => lnot lnot p$
 
 PROOF:
 (lnot p => false) => lnot lnot p [=> intro from 1]
@@ -70,11 +70,11 @@ PROOF:
           false [=> elim]
       lnot lnot p [lnot intro from 2]
 
-TEXT: This is the pattern for indirect proof: if assuming lnot p leads to false, then lnot not p holds.
+TEXT: This is the pattern for indirect proof: if assuming $lnot p$ leads to false, then $lnot lnot p$ holds.
 
 ** Example 5: Modus Tollens via Contradiction **
 
-TEXT: Prove: (p => q) land lnot q => lnot p
+TEXT: Prove: $(p => q) land lnot q => lnot p$
 
 PROOF:
 ((p => q) land lnot q) => lnot p [=> intro from 1]
@@ -90,7 +90,7 @@ TEXT: Classic modus tollens pattern using contradiction.
 
 ** Example 6: Disjunction from Contradiction **
 
-TEXT: Prove: lnot p => (p => q)
+TEXT: Prove: $lnot p => (p => q)$
 
 PROOF:
 lnot p => (p => q) [=> intro from 1]
@@ -100,11 +100,11 @@ lnot p => (p => q) [=> intro from 1]
             false [contradiction]
             q [false elim]
 
-TEXT: From lnot p, we can prove p => q for any q.
+TEXT: From $lnot p$, we can prove $p => q$ for any q.
 
 ** Example 7: Double Negation Elimination **
 
-TEXT: Prove: lnot lnot p => p (requires classical logic)
+TEXT: Prove: $lnot lnot p => p$ (requires classical logic)
 
 PROOF:
 lnot lnot p => lnot lnot lnot p [=> intro from 1]
@@ -114,11 +114,11 @@ lnot lnot p => lnot lnot lnot p [=> intro from 1]
             false [contradiction]
             p [false elim]
 
-TEXT: In classical logic, not lnot p implies p. This requires excluded middle or equivalent axiom.
+TEXT: In classical logic, not $lnot p$ implies p. This requires excluded middle or equivalent axiom.
 
 ** Example 8: Reductio ad Absurdum **
 
-TEXT: Prove: (lnot p => (q land lnot q)) => p
+TEXT: Prove: $(lnot p => (q land lnot q)) => p$
 
 PROOF:
 (lnot p => (q land lnot q)) => lnot lnot p [=> intro from 1]
@@ -135,22 +135,22 @@ TEXT: Reductio ad absurdum: if assuming not p leads to absurdity, then p holds.
 
 ** Example 9: Contradiction with Universal Quantifier **
 
-TEXT: Prove: (forall x | P(x)) land (exists x | lnot P(x)) is contradictory.
+TEXT: Prove: $(forall x | p(x)) land (exists x | lnot p(x))$ is contradictory.
 
 PROOF:
-((forall x | P(x)) land (exists x | lnot P(x))) => false [=> intro from 1]
-  [1] (forall x | P(x)) land (exists x | lnot P(x)) [assumption]
-      forall x | P(x) [land elim 1]
-      exists x | lnot P(x) [land elim 2]
-      lnot P(a) [exists elim, fresh a]
-      P(a) [forall elim]
+((forall x | p(x)) land (exists x | lnot p(x))) => false [=> intro from 1]
+  [1] (forall x | p(x)) land (exists x | lnot p(x)) [assumption]
+      forall x | p(x) [land elim 1]
+      exists x | lnot p(x) [land elim 2]
+      lnot p(a) [exists elim, fresh a]
+      p(a) [forall elim]
       false [contradiction]
 
 TEXT: If something holds for all x, it cannot fail for some x.
 
 ** Example 10: Proving Uniqueness by Contradiction **
 
-TEXT: Prove: if f is injective, then f(x) = f(y) => x = y.
+TEXT: Prove: if f is injective, then $f(x) = f(y) => x = y$.
 
 PROOF:
 (injective(f) land f(x) = f(y)) => x = y [=> intro from 1]
@@ -166,7 +166,7 @@ TEXT: Uses contradiction to prove equality.
 
 ** Example 11: Case Analysis Leading to Contradiction **
 
-TEXT: Prove: p lor q, lnot p, lnot q => false
+TEXT: Prove: $p lor q$, $lnot p$, $lnot q$ $=> false$
 
 PROOF:
 ((p lor q) land lnot p land lnot q) => false [=> intro from 1]

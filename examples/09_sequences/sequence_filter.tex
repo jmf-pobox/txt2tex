@@ -14,11 +14,11 @@
 \section*{Phase 35: Sequence Filter Operator}
 \addcontentsline{toc}{section}{Phase 35: Sequence Filter Operator}
 
-\noindent The sequence$ \filter $operator restricts a sequence to elements from a specified set. It removes elements not in the$ \filter $set while preserving order.
+\noindent The sequence filter operator restricts a sequence to elements from a specified set. It removes elements not in the filter set while preserving order.
 
 \bigskip
 
-\noindent ASCII notation: s$ \filter $A Unicode alternative: s $\filter$ A (U+21BE)
+\noindent ASCII notation: $s \filter A$ Unicode alternative: s $\filter$ A (U+21BE)
 
 \bigskip
 
@@ -63,7 +63,7 @@ long\_titles = \{~ t : Title2 | true ~\} \land filtered\_titles = all\_titles \f
 \subsection*{Example 3 : Comparison with Range Restriction}
 \addcontentsline{toc}{subsection}{Example 3 : Comparison with Range Restriction}
 
-\noindent Sequence$ \filter $(filter) is different from range restriction ($\rres$): - filter: operates on sequences, preserves order - $\rres$: operates on relations, restricts range
+\noindent Sequence filter (filter) is different from range restriction ($\rres$): - filter: operates on sequences, preserves order - $\rres$: operates on relations, restricts range
 
 \bigskip
 
@@ -103,7 +103,7 @@ family\_friendly4 : \power Rating4
 family\_friendly4 = \{G4, PG4\}
 \end{axdef}
 
-\noindent The family\_friendly set contains ratings G and PG. A$ \filter $could be applied to the catalog sequence to only include entries with ratings in this set.
+\noindent The family\_friendly set contains ratings G and PG. A filter could be applied to the catalog sequence to only include entries with ratings in this set.
 
 \bigskip
 
@@ -122,7 +122,7 @@ s5 = \langle 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 \rangle \land \\
 \quad result5 = (s5 \filter evens5) \filter large5
 \end{axdef}
 
-\noindent Multiple filters can be applied sequentially. First$ \filter $to evens gives $\langle 2, 4, 6, 8, 10 \rangle$, then$ \filter $to large gives $\langle 6, 8, 10 \rangle$.
+\noindent Multiple filters can be applied sequentially. First filter to evens gives $\langle 2, 4, 6, 8, 10 \rangle$, then filter to large gives $\langle 6, 8, 10 \rangle$.
 
 \bigskip
 
@@ -143,14 +143,14 @@ s6 = \langle 1, 2, 3 \rangle \land \\
 \quad result6b = s6 \filter disjoint\_set6
 \end{axdef}
 
-\noindent Filtering by an empty set or disjoint set results in an empty sequence. result1 = $\langle \rangle$ $\land$ result2 = $\langle \rangle$
+\noindent Filtering by an empty set or disjoint set results in an empty sequence. $result1 = \langle \rangle \land result2 = \langle \rangle$
 
 \bigskip
 
 \subsection*{Example 7 : Bag Union ( Related Phase 35 Feature )}
 \addcontentsline{toc}{subsection}{Example 7 : Bag Union ( Related Phase 35 Feature )}
 
-\noindent Phase 35 also includes the bag union operator. ASCII notation: b1$ \uplus $b2 Unicode alternative: b1 $\uplus$ b2 (U+228E)
+\noindent Phase 35 also includes the bag union operator. ASCII notation: $b1 \uplus b2$ Unicode alternative: b1 $\uplus$ b2 (U+228E)
 
 \bigskip
 

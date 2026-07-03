@@ -1,7 +1,10 @@
 # Plan: Parser-backed inline math in `TEXT:` (Option 3)
 
-**Status:** Phase 0–1 DONE (merged, PR #78, `762c794`); Phase 2 in progress
-(branch `refactor/text-phase2-delete-heuristics`)
+**Status:** Phase 0–1 DONE (merged, PR #78, `762c794`); Phase 2 implemented
+(branch `refactor/text-phase2-delete-heuristics`): heuristics deleted (1670→542
+lines), bare-symbol + Unicode mode added, all 34 affected examples migrated +
+verified (PDF-compiled), #79 closed. Docs (CHANGELOG, DESIGN ADR, USER_GUIDE) in
+progress; PR pending.
 **Type:** T1 — cross-cutting architecture change + breaking migration
 **Owner:** jra (principal); jms (semantics), rmh (engine/tests), ghr (docs), adb (regeneration)
 

@@ -93,7 +93,7 @@ end
 
 TEXT: A query operation uses Xi to assert that no state variable changes.
 TEXT: The input is not required; the output status! carries the answer.
-TEXT: Because Xi TurnstileState guarantees gate = gate' and passed = passed',
+TEXT: Because Xi TurnstileState guarantees $gate = gate'$ and $passed = passed'$,
 TEXT: the caller learns the current state without any risk of mutation.
 
 schema IsLocked

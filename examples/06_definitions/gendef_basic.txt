@@ -93,7 +93,7 @@ TEXT: Set membership can be tested using the built-in 'in' operator in Z notatio
 
 ** Example 7: Generic Optional Type (Conceptual) **
 
-TEXT: Optional values can be modeled with free types in Z notation. For a specific type, you would define: Option ::= none | some⟨T⟩. Generic optional types require more complex setup beyond basic gendef blocks, as free types in Z are typically defined for specific types rather than being polymorphic.
+TEXT: Optional values can be modeled with free types in Z notation. For a specific type, you would define: Option ::= none $|$ some$<T>$. Generic optional types require more complex setup beyond basic gendef blocks, as free types in Z are typically defined for specific types rather than being polymorphic.
 
 ** Example 8: Generic Swap Function **
 

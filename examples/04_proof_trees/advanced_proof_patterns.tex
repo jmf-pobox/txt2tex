@@ -17,7 +17,7 @@
 \subsection*{Example 1 : Proof by Cases ( Three - Way Split )}
 \addcontentsline{toc}{subsection}{Example 1 : Proof by Cases ( Three - Way Split )}
 
-\noindent Prove: For all integers n, n $\langle 0(or)(n) = 0(or)(n) \rangle$ 0
+\noindent Prove: For all integers n, $n < 0 \lor n = 0 \lor n > 0$
 
 \bigskip
 
@@ -37,7 +37,7 @@ $%
 \subsection*{Example 2 : Multi - Level Case Analysis}
 \addcontentsline{toc}{subsection}{Example 2 : Multi - Level Case Analysis}
 
-\noindent Prove: $(p \lor q)$ $\land$ $(r \lor s)$ $\Rightarrow$ $(p \land r)$ $\lor$ $(p \land s)$ $\lor$ $(q \land r)$ $\lor$ $(q \land s)$
+\noindent Prove: $(p \lor q) \land (r \lor s) \implies (p \land r) \lor (p \land s) \lor (q \land r) \lor (q \land s)$
 
 \bigskip
 
@@ -64,14 +64,14 @@ $%
 
 \bigskip
 
-\subsection*{Example 3 : Proof by Mathematical Induction ( Base land Step )}
-\addcontentsline{toc}{subsection}{Example 3 : Proof by Mathematical Induction ( Base land Step )}
+\subsection*{Example 3 : Proof by Mathematical Induction ( Base and Step )}
+\addcontentsline{toc}{subsection}{Example 3 : Proof by Mathematical Induction ( Base and Step )}
 
-\noindent Prove: For all n $\in$ $\nat$, sum(1 to n) = n(n+1)/2
+\noindent Prove: For all $n \in \nat$, sum(1 to n) = n(n+1)/2
 
 \bigskip
 
-\noindent Base case ($n = 0$):
+\noindent Base case $(n = 0)$:
 
 \bigskip
 
@@ -171,7 +171,7 @@ $%
 \subsection*{Example 6 : Non - Constructive Existence Proof}
 \addcontentsline{toc}{subsection}{Example 6 : Non - Constructive Existence Proof}
 
-\noindent Prove: There exist irrational numbers a and b such that a\textasciicircum$\{\}$b is rational
+\noindent Prove: There exist irrational numbers a and b such that a\textasciicircum{}b is rational
 
 \bigskip
 
@@ -193,11 +193,11 @@ $%
 \subsection*{Example 7 : Proof by Strong Induction}
 \addcontentsline{toc}{subsection}{Example 7 : Proof by Strong Induction}
 
-\noindent Prove: Every natural number n $\geq$ 2 has a prime factorization
+\noindent Prove: Every natural number $n \geq 2$ has a prime factorization
 
 \bigskip
 
-\noindent Base case ($n = 2$):
+\noindent Base case $(n = 2)$:
 
 \bigskip
 
@@ -234,7 +234,7 @@ $%
 \subsection*{Example 8 : Proof Using Lemmas}
 \addcontentsline{toc}{subsection}{Example 8 : Proof Using Lemmas}
 
-\noindent Lemma 1: If n is even, then n\textasciicircum$\{\}$2 is even
+\noindent Lemma 1: If n is even, then n\textasciicircum{}2 is even
 
 \bigskip
 
@@ -249,7 +249,7 @@ $%
 \end{center}
 \bigskip
 
-\noindent Main theorem: If n\textasciicircum$\{\}$2 is odd, then n is odd
+\noindent Main theorem: If n\textasciicircum{}2 is odd, then n is odd
 
 \bigskip
 
@@ -271,15 +271,15 @@ $%
 \subsection*{Example 9 : Proof by Minimal Counterexample}
 \addcontentsline{toc}{subsection}{Example 9 : Proof by Minimal Counterexample}
 
-\noindent Prove: All natural numbers n $\geq$ 1 satisfy P(n)
+\noindent Prove: All natural numbers $n \geq 1$ satisfy $p(n)$
 
 \bigskip
 
 \begin{center}
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\forall n @ n \geq 1 \implies \power n)}{
-  \infer[\lnot\textrm{-intro}^{[2]}]{\forall n @ n \geq 1 \implies \power n}{\infer[\lor\textrm{-elim}]{false}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot (\power m) \land \power 1}{\infer[\mbox{base \mbox{case} \mbox{proved} separately}]{\power 1}{}}} & \infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot (\power m) \land \power m}{\infer[\mbox{by \mbox{inductive} \mbox{step} \mbox{from} P}(m - 1)]{\power m}{\infer[\mbox{since m} - 1 >= 1 \land m - 1 < m]{\power (m - 1)}{\infer[\mbox{minimality of m}]{\forall k @ k \geq 1 \land k < m \implies \power k}{}}}}}}}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\forall n @ n \geq 1 \implies p(n))}{
+  \infer[\lnot\textrm{-intro}^{[2]}]{\forall n @ n \geq 1 \implies p(n)}{\infer[\lor\textrm{-elim}]{false}{\infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot ((p(m))) \land p(1)}{\infer[\mbox{base \mbox{case} \mbox{proved} separately}]{p(1)}{}}} & \infer[\mbox{contradiction}]{false}{\infer[\mbox{contradiction}]{\lnot ((p(m))) \land p(m)}{\infer[\mbox{by \mbox{inductive} \mbox{step} \mbox{from} p}(m - 1)]{p(m)}{\infer[\mbox{since m} - 1 >= 1 \land m - 1 < m]{p(m - 1)}{\infer[\mbox{minimality of m}]{\forall k @ k \geq 1 \land k < m \implies p(k)}{}}}}}}}
 }
 $%
 }
@@ -367,15 +367,15 @@ $%
 \subsection*{Example 12 : Constructive Proof Pattern}
 \addcontentsline{toc}{subsection}{Example 12 : Constructive Proof Pattern}
 
-\noindent To constructively prove: $\exists x @ \power x$
+\noindent To constructively prove: $\exists x @ p(x)$
 
 \bigskip
 
-\noindent Strategy: 1. Explicitly construct a witness w 2. Verify P(w) holds 3. Conclude $\exists x @ \power x$with $x = w$
+\noindent Strategy: 1. Explicitly construct a witness w 2. Verify $p(w)$ holds 3. Conclude $\exists x @ p(x)$ with $x = w$
 
 \bigskip
 
-\noindent Example: Prove $\exists n : \nat @ n > 100$$\land$ n is even
+\noindent Example: Prove $\exists n : \nat @ n > 100 \land even(n)$
 
 \bigskip
 
@@ -408,14 +408,14 @@ $%
 \begin{center}
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\forall n @ \power n)}{
-  \infer[\lor \mbox{elim over cases}]{\forall n @ \power n}{\infer[\mbox{direct proof}]{\power base}{} & \infer[\lor \mbox{elim over subcases}]{\power n}{
-  \raiseproof{12ex}{\infer[\lnot\textrm{-intro}^{[2]}]{\power n}{
-  \infer[\mbox{contradiction}]{false}{\infer[\mbox{proof steps}]{contradiction\_derived}{\ulcorner \lnot (\power n) \urcorner^{[2]}}}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{true \implies (\forall n @ p(n))}{
+  \infer[\lor \mbox{elim over cases}]{\forall n @ p(n)}{\infer[\mbox{direct proof}]{p(base)}{} & \infer[\lor \mbox{elim over subcases}]{p(n)}{
+  \raiseproof{12ex}{\infer[\lnot\textrm{-intro}^{[2]}]{p(n)}{
+  \infer[\mbox{contradiction}]{false}{\infer[\mbox{proof steps}]{contradiction\_derived}{\ulcorner \lnot ((p(n))) \urcorner^{[2]}}}
 }}
 &
-\hskip 6em \raiseproof{30ex}{\infer[\Rightarrow\textrm{-intro}^{[3]}]{\power n}{
-  \infer[\mbox{inductive step}]{\power n}{\ulcorner \power (n - 1) \urcorner^{[3]}}
+\hskip 6em \raiseproof{30ex}{\infer[\Rightarrow\textrm{-intro}^{[3]}]{p(n)}{
+  \infer[\mbox{inductive step}]{p(n)}{\ulcorner p(n - 1) \urcorner^{[3]}}
 }}
 }}
 }

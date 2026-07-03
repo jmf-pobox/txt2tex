@@ -20,7 +20,7 @@
 
 ** Example 1: Partial injection operator **
 
-TEXT: Basic function type with partial injection (-|>) operator:
+TEXT: Basic function type with partial injection ($-|>$) operator:
 
 axdef
   f : N -|> N
@@ -33,7 +33,7 @@ end
 
 ** Example 2: Partial function operator **
 
-TEXT: Basic function type with partial function (+->) operator:
+TEXT: Basic function type with partial function ($+->$) operator:
 
 axdef
   g : N +-> N
@@ -45,7 +45,7 @@ end
 
 ** Example 3: Complex types with partial injection **
 
-TEXT: Using partial injection (-|>) with custom types:
+TEXT: Using partial injection ($-|>$) with custom types:
 
 zed
   Year == N

@@ -170,60 +170,150 @@ Generates: `Each primary key is highlighted (underlined) in the schema box.`
 
 ## Text Blocks
 
-txt2tex provides four types of text blocks for different purposes:
+**You never need to know LaTeX to write math in prose — wrap whiteboard notation in `$...$`.**
 
-### TEXT: - Smart Text with Formula Detection
+txt2tex provides three prose block types and one verbatim block:
 
-Each `TEXT:` directive covers **one line**.  There is no multi-line `TEXT:`
-block — `TEXT:` is not terminated by `END`.  For a multi-line paragraph,
+| Block | Contents | What happens |
+|-------|----------|-------------|
+| `TEXT:` | Prose; inline math in `$...$` | Prose escaped verbatim; `$...$` → real whiteboard parser |
+| `PURETEXT:` | Verbatim | LaTeX character escaping only — no math processing |
+| `LATEX:` | Raw LaTeX | Passed through unchanged |
+
+The `B:` block is for B-Method machine listings (see below).
+
+### TEXT: — Prose with Explicit Inline Math
+
+Each `TEXT:` directive covers **one line**. There is no multi-line `TEXT:`
+block — `TEXT:` is not terminated by `END`. For a multi-line paragraph,
 write consecutive `TEXT:` lines (they coalesce — see "Paragraph coalescing"
-below).  For multi-line raw LaTeX, use the multi-line [`LATEX:` block
+below). For multi-line raw LaTeX, use the multi-line [`LATEX:` block
 form](#latex---raw-latex-passthrough).
 
-Use `TEXT:` for normal prose where you want mathematical expressions
-automatically detected and converted:
+#### Prose is literal
+
+Bare prose is escaped but never converted to math glyphs. Words that happen
+to be operator names stay as English:
 
 ```text
-TEXT: This is a plain text paragraph with => and <=> symbols.
-TEXT: The set { x : N | x > 0 } contains positive integers.
-TEXT: We write $forall x : N | x >= 0$ to mean all natural numbers.
+TEXT: There exists a witness in the constraint set.
+TEXT: We filter the relation by domain restriction.
 ```
 
-**Features:**
+Generate:
 
-- Operators converted: `=>` → $\Rightarrow$, `<=>` → $\Leftrightarrow$
-- Formulas automatically detected: `{ x : N | x > 0 }` → $\{ x : \mathbb{N} \mid x > 0 \}$
-- Sequence literals converted: `<a, b, c>` → $\langle a, b, c \rangle$
-- **Inline math is opt-in via `$...$`, and it is strict whiteboard notation**
-  — the same syntax as `zed`/`axdef` blocks. Bare English words like `exists`,
-  `forall`, `union` in prose are NOT converted to math glyphs. Write a
-  *complete* whiteboard expression inside `$...$` — e.g. `$forall x : N | P$` —
-  when you want math. Raw LaTeX commands (`$\forall$`, `$n \geq 0$`) now raise
-  an error; put raw LaTeX in a `LATEX:` block instead. The set-difference
-  operator `$A \ B$` is valid whiteboard and unchanged. (Bare-operator symbols
-  such as `$|->$` are not yet rendered as glyphs.)
+```text
+There exists a witness in the constraint set.
+We filter the relation by domain restriction.
+```
 
-  Compare:
+The words `exists` and `filter` render as English. English prose is never
+silently mathified.
 
-  ```text
-  TEXT: There exists a witness in the constraint set.
-  ```
+#### Inline math in `$...$`
 
-  Generates: `There exists a witness in the constraint set.` (bare
-  `exists` stays as English prose.)
+To render math in prose, wrap whiteboard notation in `$...$`. The content
+inside `$...$` is the same notation used in `zed`, `axdef`, and `schema`
+blocks — the full whiteboard parser:
 
-  ```text
-  TEXT: We write $exists x : N | x > 0$ to mean "some positive number".
-  ```
+```text
+TEXT: We write $forall x : N | x > 0$ to mean every positive integer.
+TEXT: The type $N -> N$ describes total functions on the naturals.
+TEXT: Two elements are related if $x |-> y elem R$.
+TEXT: We know $x >= 0$ and $x <= 10$.
+```
 
-  Generates the `∃` expression inside the inline `$...$`, English prose
-  outside.
+Common inline expressions:
 
-- Citations supported: `[cite key]` → (Author, Year) in Harvard style
+| Source | Rendered |
+|--------|---------|
+| `$forall x : N \| x > 0$` | ∀ x : ℕ • x > 0 |
+| `$exists y : Z \| y < 0$` | ∃ y : ℤ • y < 0 |
+| `$N -> N$` | ℕ → ℕ (total function type) |
+| `$A +-> B$` | A ⇀ B (partial function) |
+| `$x \|-> y$` | x ↦ y (maplet) |
+| `$x >= 0$` | x ≥ 0 |
+| `$A subset B$` | A ⊆ B |
+| `$A \ B$` | A ∖ B (set difference — backslash with surrounding spaces) |
+| `$<1, 2, 3>$` | ⟨1, 2, 3⟩ |
+| `${1 \|-> 10, 2 \|-> 20}$` | {1 ↦ 10, 2 ↦ 20} |
+
+Any whiteboard expression valid in a `zed` or `axdef` block is valid
+inside `$...$`.
+
+#### Bare-symbol mode
+
+A `$...$` span containing exactly one known whiteboard token emits that
+symbol directly. Use this to name a symbol in prose without writing a full
+expression:
+
+```text
+TEXT: The $|->$ symbol denotes a maplet.
+TEXT: Use $forall$ for universal quantification and $exists$ for existential.
+TEXT: The $o9$ operator is forward relational composition.
+TEXT: Logical connectives: $land$, $lor$, and $lnot$.
+```
+
+Supported single-token spans (representative selection):
+
+| Source | Symbol | Meaning |
+|--------|--------|---------|
+| `$\|->$` | ↦ | Maplet |
+| `$->$` | → | Total function arrow |
+| `$+->$` | ⇀ | Partial function arrow |
+| `$<->$` | ↔ | Relation type |
+| `$++$` | ⊕ | Function override |
+| `$o9$` | ⨟ | Forward composition |
+| `$forall$` | ∀ | Universal quantifier |
+| `$exists$` | ∃ | Existential quantifier |
+| `$mu$` | μ | Definite description |
+| `$lambda$` | λ | Lambda |
+| `$land$` | ∧ | Conjunction |
+| `$lor$` | ∨ | Disjunction |
+| `$lnot$` | ¬ | Negation |
+| `$=>$` | ⇒ | Implication |
+| `$<=>$` | ⇔ | Equivalence |
+| `$elem$` | ∈ | Set membership |
+| `$notin$` | ∉ | Non-membership |
+| `$union$` | ∪ | Set union |
+| `$inter$` | ∩ | Set intersection |
+| `$dom$` | dom | Domain |
+| `$ran$` | ran | Range |
+| `$>=$` | ≥ | Greater-or-equal |
+| `$<=$` | ≤ | Less-or-equal |
+
+Unicode input also works: `$∈$` → ∈, `$⊆$` → ⊆, `$∀$` → ∀.
+
+#### Strict `$...$`: whiteboard notation only
+
+**`$...$` accepts whiteboard notation only. Raw LaTeX commands inside `$...$`
+are an error.**
+
+```text
+// Error — raw LaTeX inside $...$:
+TEXT: For all $n \geq 0$ we have a result.
+
+// Correct — whiteboard notation:
+TEXT: For all $n >= 0$ we have a result.
+```
+
+The error message tells you exactly what to write instead:
+
+```text
+line 3: $n \geq 0$ — $...$ takes whiteboard notation only
+(e.g. $n >= 0$, $forall x : N | P$); raw LaTeX (\geq, \Leftrightarrow)
+belongs in a LATEX: block. For set difference write $A \ B$ (with a space).
+```
+
+If you need raw LaTeX inline, put it in a `LATEX:` block (see below).
+
+Block-level Z constructs (`schema`, `axdef`, `gendef`, `given`, `::=`, `==`)
+are not valid inside `$...$` — they are paragraph-level constructs, not
+inline expressions. Write them as standalone blocks.
 
 **Paragraph coalescing (DAT #16):** Consecutive `TEXT:` directives on
 adjacent lines (with no blank line between them) are joined into a single
-paragraph.  A blank line between two `TEXT:` directives produces two
+paragraph. A blank line between two `TEXT:` directives produces two
 separate paragraphs.
 
 ```text

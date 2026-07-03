@@ -78,7 +78,7 @@ CentreCourt : VenueName
 \section*{1. WYSIWYG line breaks for algebra operators}
 \addcontentsline{toc}{section}{1. WYSIWYG line breaks for algebra operators}
 
-\noindent Long relational-algebra chains can be broken at any operator. Natural newlines work; explicit \ continuation also works. Display position wraps in array; the chain reads top-to-bottom instead of running off the page.
+\noindent Long relational-algebra chains can be broken at any operator. Natural newlines work; explicit \textbackslash{} continuation also works. Display position wraps in array; the chain reads top-to-bottom instead of running off the page.
 
 \bigskip
 
@@ -119,7 +119,7 @@ $\displaystyle
 \section*{3. Multi-decl quantifier with conjunction predicate}
 \addcontentsline{toc}{section}{3. Multi-decl quantifier with conjunction predicate}
 
-\noindent `$\forall s : T; c : U @ predicate$. body` works the same way --- nested Quantifier nodes covering the chained declarations.
+\noindent `forall s : T; c : U | predicate . body` works the same way --- nested Quantifier nodes covering the chained declarations.
 
 \bigskip
 
@@ -146,7 +146,7 @@ $\{~ m : Match ; t : Tournament | m.tournament = t.tournamentId \land t.tier \le
 \section*{5. Multi-decl mu (definite description)}
 \addcontentsline{toc}{section}{5. Multi-decl mu (definite description)}
 
-\noindent `mu` parses with multi-decl signatures the same way. The current generator emits nested `(\mu ... $\mid$ (\mu ...))` --- semantically equivalent but not Spivey-canonical. The same special-case treatment lambda just received is a follow-up for mu. Single-decl mu (shown here) emits cleanly.
+\noindent `mu` parses with multi-decl signatures the same way. The current generator emits nested `(\textbackslash{}mu ... | (\textbackslash{}mu ...))` --- semantically equivalent but not Spivey-canonical. The same special-case treatment lambda just received is a follow-up for mu. Single-decl mu (shown here) emits cleanly.
 
 \bigskip
 
@@ -157,7 +157,7 @@ topFinal == (\mu t : Tournament | t.tier = 1 @ t.venue)
 \section*{6. Multi-decl lambda --- Spivey-canonical form}
 \addcontentsline{toc}{section}{6. Multi-decl lambda --- Spivey-canonical form}
 
-\noindent Lambdas of more than one variable now emit as a single \lambda token with semicolon-joined SchemaText, matching Z RM §3.12 and the Spivey convention. Previously the generator emitted nested lambdas (one per declaration).
+\noindent Lambdas of more than one variable now emit as a single \textbackslash{}lambda token with semicolon-joined SchemaText, matching Z RM §3.12 and the Spivey convention. Previously the generator emitted nested lambdas (one per declaration).
 
 \bigskip
 
@@ -168,19 +168,19 @@ roster == (\lambda m : Match; t : Tournament | m.tournament = t.tournamentId @ m
 \section*{7. Paren-wrap fix}
 \addcontentsline{toc}{section}{7. Paren-wrap fix}
 
-\noindent Fuzz requires `(\lambda ... @ ...)` --- parentheses around every lambda expression, at any position. The generator previously only wrapped when the lambda appeared inside another expression (`parent is not None`). This meant abbreviation RHS, set literals, sequence displays, and top-level zed predicates emitted bare `\lambda`, which fuzz rejected with "Opening parenthesis expected at symbol \lambda".
+\noindent Fuzz requires `(\textbackslash{}lambda ... @ ...)` --- parentheses around every lambda expression, at any position. The generator previously only wrapped when the lambda appeared inside another expression (`parent is not None`). This meant abbreviation RHS, set literals, sequence displays, and top-level zed predicates emitted bare `\textbackslash{}lambda`, which fuzz rejected with "Opening parenthesis expected at symbol \textbackslash{}lambda".
 
 \bigskip
 
 \medskip
 
-\noindent The fix: drop the `parent is not None` guard. Wrapping is now unconditional when `$use\_fuzz = True$`, matching how `\mu` has always been handled. All thirteen lambda-paren tests now pass without xfail markers. Section 6 above also now fuzz-typechecks cleanly.
+\noindent The fix: drop the `parent is not None` guard. Wrapping is now unconditional when `use\_fuzz=True`, matching how `\textbackslash{}mu` has always been handled. All thirteen lambda-paren tests now pass without xfail markers. Section 6 above also now fuzz-typechecks cleanly.
 
 \bigskip
 
 \medskip
 
-\noindent Additional positions confirmed working: lambda as abbreviation RHS (`f == lambda ...`), inside a set literal (`{lambda ...}`), inside a sequence display (`$\langle lambda ... \rangle$`), as a function argument (`f(lambda ...)`), as a tuple component (`(lambda ..., 0)`), and as a unary-operator argument (`dom (lambda ...)`).
+\noindent Additional positions confirmed working: lambda as abbreviation RHS (`f == lambda ...`), inside a set literal (`\{lambda ...\}`), inside a sequence display (`<lambda ...>`), as a function argument (`f(lambda ...)`), as a tuple component (`(lambda ..., 0)`), and as a unary-operator argument (`dom (lambda ...)`).
 
 \bigskip
 

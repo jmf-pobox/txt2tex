@@ -34,18 +34,18 @@ TEXT: We identify the following functional dependencies (FDs).
 
 TEXT: Full-key dependency (no issue):
 
-TEXT:   empID, projID -> empName, dept, deptHead, projName
+TEXT:   $empID, projID -> empName, dept, deptHead, projName$
 
 TEXT: Partial dependencies -- empName, dept, and deptHead depend on empID
 TEXT: alone; projName depends on projID alone.  These violate 2NF.
 
-TEXT:   empID -> empName, dept, deptHead
-TEXT:   projID -> projName
+TEXT:   $empID -> empName, dept, deptHead$
+TEXT:   $projID -> projName$
 
 TEXT: Transitive dependency -- deptHead is determined by dept, not directly
 TEXT: by empID.  This violates 3NF even after removing the partial dependencies.
 
-TEXT:   dept -> deptHead
+TEXT:   $dept -> deptHead$
 
 LINEBREAK:
 
@@ -69,7 +69,7 @@ TEXT: Project attributes extracted into a separate relation:
 
 TEXT:   Proj2NF(projID, projName)
 
-TEXT: EmpDept2NF is still not in 3NF: dept -> deptHead is a transitive
+TEXT: EmpDept2NF is still not in 3NF: $dept -> deptHead$ is a transitive
 TEXT: dependency.  deptHead is a fact about the department, not the employee.
 
 LINEBREAK:

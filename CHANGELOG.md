@@ -21,6 +21,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **`TEXT:` prose no longer auto-detects math (BREAKING)** — bare operators and
+  keywords in `TEXT:` prose are no longer silently converted to math symbols.
+  Previously the tool guessed whether `->`, `filter`, `forall`, `land`, etc. in
+  running prose were mathematics; that heuristic was unbounded-ambiguous and
+  frequently wrong (it mangled English, split expressions, and rendered
+  predicate `P(x)` as the powerset `ℙx`). **Inline math is now explicit: wrap it
+  in `$...$`.** Bare prose is escaped verbatim — "the filter operator" renders as
+  those words, not the ↾ symbol. To migrate a document, wrap each genuine inline
+  expression in `$...$` (whiteboard notation); inside a multi-token span use
+  ASCII whiteboard (`$n elem N$`, `$n >= 2$`), not raw Unicode. Every bundled
+  example has been migrated. This deletes ~1000 lines of regex heuristics from
+  the generator (`text_pipeline.py`: 1670 → 542 lines). (Phase 2 of the TEXT
+  inline-math refactor.)
+
+- **Bare-symbol mode in `$...$`** — a `$...$` span containing exactly one known
+  whiteboard token emits that symbol directly: `$|->$`→↦, `$forall$`→∀, `$->$`→→,
+  `$o9$`→⨟, `$elem$`→∈, `$dom$`, `$subseteq$`, and the Unicode equivalents as a
+  lone token (`$⊂$`, `$→$`, `$∈$`, …). Use it to name a symbol in prose without
+  writing a full expression.
+
 - **`$...$` in `TEXT:` is now strict whiteboard inline math** — its content is
   parsed by the real lexer/parser/generator (the same engine as `zed`/`axdef`
   blocks) and rendered inline, so `$forall x : X | p.a |-> p.b$` works with no
@@ -31,7 +51,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`schema`/`axdef`/`gendef`/`given`/`::=`/`==`) inside `$...$` is likewise an
   error. Each surfaces as a clean CLI error naming the source line and span, not
   a traceback. (Phase 1 of the TEXT inline-math refactor; bare-prose
-  auto-detection is unchanged for now.)
+  auto-detection was removed in Phase 2 — see the BREAKING entry above.)
+
+### Security
+
+- **`\`, `{`, `}` in `TEXT:` prose are now escaped** (`\` → `\textbackslash{}`).
+  Undelimited prose previously passed a backslash through to LaTeX verbatim, so a
+  `TEXT:` line containing `\input{...}` or `\write18{...}` could execute during
+  compilation. Prose is now escape-only; such text renders as literal glyphs.
+  Closes GitHub issue #79.
 
 - **`** **` solutions now render `\subsection*`** — previously `\section*`.
   This is one heading level smaller. Solutions now nest under sections in

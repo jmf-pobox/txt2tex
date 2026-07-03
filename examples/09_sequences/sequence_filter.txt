@@ -22,8 +22,8 @@
 
 TEXT: The sequence filter operator restricts a sequence to elements from a specified set. It removes elements not in the filter set while preserving order.
 
-TEXT: ASCII notation: s filter A
-TEXT: Unicode alternative: s ↾ A (U+21BE)
+TEXT: ASCII notation: $s filter A$
+TEXT: Unicode alternative: s $↾$ A (U+21BE)
 
 ** Example 1: Basic Filter Operation **
 
@@ -37,7 +37,7 @@ where
   s1 = <1, 2, 3, 4, 5, 6> land evens1 = {2, 4, 6, 8} land filtered1 = (s1 filter evens1)
 end
 
-TEXT: The filtered sequence is <2, 4, 6>, keeping only elements that are in evens and preserving their original order.
+TEXT: The filtered sequence is $<2, 4, 6>$, keeping only elements that are in evens and preserving their original order.
 
 ** Example 2: Filter with Set Comprehension **
 
@@ -58,9 +58,9 @@ TEXT: This filters a sequence of titles to include only titles with length great
 
 ** Example 3: Comparison with Range Restriction **
 
-TEXT: Sequence filter (filter) is different from range restriction (|>):
+TEXT: Sequence filter (filter) is different from range restriction ($|>$):
 TEXT: - filter: operates on sequences, preserves order
-TEXT: - |>: operates on relations, restricts range
+TEXT: - $|>$: operates on relations, restricts range
 
 axdef
   s3 : seq N
@@ -76,8 +76,8 @@ where
     restricted_rel3 = R3 |> {10, 20}
 end
 
-TEXT: filtered_seq is <2, 3, 4> (sequence elements in A)
-TEXT: restricted_rel is {1 |-> 10, 2 |-> 20} (relation pairs with range in {10, 20})
+TEXT: filtered_seq is $<2, 3, 4>$ (sequence elements in A)
+TEXT: restricted_rel is ${1 |-> 10, 2 |-> 20}$ (relation pairs with range in ${10, 20}$)
 
 ** Example 4: Practical Example - Video Database **
 
@@ -114,7 +114,7 @@ where
     result5 = (s5 filter evens5) filter large5
 end
 
-TEXT: Multiple filters can be applied sequentially. First filter to evens gives <2, 4, 6, 8, 10>, then filter to large gives <6, 8, 10>.
+TEXT: Multiple filters can be applied sequentially. First filter to evens gives $<2, 4, 6, 8, 10>$, then filter to large gives $<6, 8, 10>$.
 
 ** Example 6: Empty Filter **
 
@@ -133,13 +133,13 @@ where
 end
 
 TEXT: Filtering by an empty set or disjoint set results in an empty sequence.
-TEXT: result1 = <> land result2 = <>
+TEXT: $result1 = <> land result2 = <>$
 
 ** Example 7: Bag Union (Related Phase 35 Feature) **
 
 TEXT: Phase 35 also includes the bag union operator.
-TEXT: ASCII notation: b1 bag_union b2
-TEXT: Unicode alternative: b1 ⊎ b2 (U+228E)
+TEXT: ASCII notation: $b1 bag_union b2$
+TEXT: Unicode alternative: b1 $⊎$ b2 (U+228E)
 
 axdef
   b1 : bag N

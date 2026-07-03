@@ -46,7 +46,7 @@ TEXT: The above predicate states that all natural numbers are non-negative, whic
 
 ** Example 5: Explaining Z Notation **
 
-TEXT: When defining a function like square : N -> N, we're declaring a total function from natural numbers to natural numbers.
+TEXT: When defining a function like square : $N -> N$, we're declaring a total function from natural numbers to natural numbers.
 
 axdef
   square : N -> N

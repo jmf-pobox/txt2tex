@@ -17,11 +17,11 @@
 
 === Phase 39: Strict Subset Operator ===
 
-TEXT: The strict subset operator (psubset, ⊂) represents proper subset relationships, where A is a subset of B AND A is not equal to B.
+TEXT: The strict subset operator (psubset, $⊂$) represents proper subset relationships, where A is a subset of B AND A is not equal to B.
 
-TEXT: Distinction from subset (⊆):
-TEXT: - A subset B means: every element of A is elem B (may be equal)
-TEXT: - A psubset B means: every element of A is elem B AND A != B (strict inequality)
+TEXT: Distinction from subset ($⊆$):
+TEXT: - A subset B means: every element of A is $elem$ B (may be equal)
+TEXT: - A psubset B means: every element of A is $elem$ B AND $A != B$ (strict inequality)
 
 ** Example 1: Basic Strict Subset **
 
@@ -34,7 +34,7 @@ end
 
 TEXT: Here A psubset B holds because all elements of A are in B, and A contains fewer elements than B.
 
-** Example 2: Comparing subset land psubset **
+** Example 2: Comparing subset and psubset **
 
 axdef
   X : P N
@@ -45,7 +45,7 @@ where
 end
 
 TEXT: X psubset Y is true (X is strictly contained in Y)
-TEXT: X subset W is true (X is a subset of W, including the case where X = W)
+TEXT: X subset W is true (X is a subset of W, including the case where $X = W$)
 TEXT: X psubset W would be FALSE (they are equal sets)
 
 ** Example 3: Empty Set **
@@ -61,7 +61,7 @@ TEXT: The empty set is a strict subset of any non-empty set.
 
 ** Example 4: Transitive Property **
 
-TEXT: If A psubset B land B psubset C, then A psubset C.
+TEXT: If A psubset B $land$ B psubset C, then A psubset C.
 
 axdef
   A1 : P N

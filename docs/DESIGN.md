@@ -785,6 +785,47 @@ Parenthesised sub-expressions `(S ; T)` are handled by modifying `_parse_parenth
 
 - `tests/test_15_schema_calculus/test_schema_calculus.py` — 34 cases covering AST construction, generator output, precedence, context-sensitivity, and 4 negative cases.
 
+### Inline math in `TEXT:` — delimited whiteboard, not prose auto-detection (ADR)
+
+**Status**: Accepted (TEXT inline-math refactor, Phases 1–2).
+
+**Context**: `TEXT:` prose originally *auto-detected* mathematics in undelimited
+English — ~1000 lines of regex heuristics (≈16 functions in `text_pipeline.py`)
+that guessed whether `filter` was a word or an operator, whether `|` was "or" or
+`\mid`, whether `P` was a predicate letter or the powerset ℙ. The ambiguity is
+inherent to guessing math in free prose, and it produced real defects: mangled
+English, half-converted operators, split expressions, `P(x)` rendered as `ℙx`,
+and — because a bare `\` passed through verbatim — a `\input`/`\write18`
+injection surface (issue #79).
+
+**Decision**: Delete the auto-detection. Inline math in `TEXT:` is **explicit and
+delimited**: the content of `$...$` is whiteboard notation, routed through the
+same lexer/parser/generator as `zed`/`axdef`/`schema` blocks (with
+`_in_z_paragraph = False`, so `o9` → `\semi`). Prose outside `$...$` is escaped
+verbatim — no guessing. Two refinements make it ergonomic and safe:
+
+1. **Bare-symbol mode**: a `$...$` span holding exactly one known whiteboard
+   token (or lone Unicode symbol) emits that symbol directly, so a user can name
+   `$|->$` or `$forall$` in prose without a full expression.
+2. **Strict `$...$`**: a raw LaTeX command (`\`+letter) inside `$...$` is an
+   error, steering the raw-LaTeX escape hatch to `LATEX:` blocks and keeping
+   `$...$` unambiguously whiteboard. `_escape_special_chars_outside_math` now
+   also escapes `\`, `{`, `}`, closing #79.
+
+**Rejected alternatives**:
+
+- *Robust prose auto-detection* — no amount of heuristic tightening removes the
+  inherent ambiguity of math-in-English; every rule added mis-fires on some
+  legitimate sentence. The failure mode is silent (wrong output that compiles).
+- *Require raw LaTeX in `TEXT:`* — contradicts the project goal that a user needs
+  zero LaTeX knowledge to present math.
+
+**Consequences**: `text_pipeline.py` shrinks 1670 → 542 lines; TEXT output is
+predictable; #79 is closed. Cost: a one-time migration of every document (bundled
+examples migrated) to wrap inline math in `$...$`. Inside a multi-token span,
+whiteboard ASCII (`$n elem N$`) is required; lone Unicode symbols work via
+bare-symbol mode but Unicode inside a multi-token span is not lexed.
+
 ### 5. fuzz Validator
 
 **Responsibility**: Run fuzz typechecker on generated LaTeX.

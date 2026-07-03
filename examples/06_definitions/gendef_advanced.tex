@@ -45,7 +45,7 @@
 \subsection*{Example 2 : Generic Binary Tree ( Conceptual )}
 \addcontentsline{toc}{subsection}{Example 2 : Generic Binary Tree ( Conceptual )}
 
-\noindent Binary trees are typically defined for specific types in Z notation rather than as fully polymorphic structures. For a concrete type like N, you would define: Tree ::= leaf $\mid$ node⟨N cross Tree cross Tree⟩. Generic trees require complex workarounds beyond standard gendef blocks, as free types in fuzz are not easily parameterized.
+\noindent Binary trees are typically defined for specific types in Z notation rather than as fully polymorphic structures. For a concrete type like N, you would define: Tree ::= leaf $|$ node$\langle \nat \cross Tree \cross Tree \rangle$. Generic trees require complex workarounds beyond standard gendef blocks, as free types in fuzz are not easily parameterized.
 
 \bigskip
 
@@ -88,7 +88,7 @@ capacity : \nat
 \subsection*{Example 8 : Generic Option Type ( Conceptual )}
 \addcontentsline{toc}{subsection}{Example 8 : Generic Option Type ( Conceptual )}
 
-\noindent Optional values (like Maybe or Option in other languages) are challenging to express generically in Z notation due to limitations with parameterized free types. For a specific type, you would define: Option ::= none $\mid$ some⟨T⟩. Fully generic option types with operations require advanced patterns beyond standard gendef blocks.
+\noindent Optional values (like Maybe or Option in other languages) are challenging to express generically in Z notation due to limitations with parameterized free types. For a specific type, you would define: Option ::= none $|$ some$\langle T \rangle$. Fully generic option types with operations require advanced patterns beyond standard gendef blocks.
 
 \bigskip
 

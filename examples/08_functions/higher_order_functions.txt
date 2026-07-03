@@ -37,7 +37,7 @@ where
   result = apply(square)(5)
 end
 
-TEXT: result = 25
+TEXT: $result = 25$
 
 ** Example 3: Compose Function **
 
@@ -109,7 +109,7 @@ where
   resultLambda = apply(lambda x : N . x * x)(7)
 end
 
-TEXT: resultLambda = 49
+TEXT: $resultLambda = 49$
 
 ** Example 9: Flip Function **
 
