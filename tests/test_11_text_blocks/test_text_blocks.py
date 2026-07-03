@@ -16,8 +16,8 @@ from txt2tex.parser import Parser
 
 
 def test_simple_implication_formula():
-    """Test p => q formula in TEXT block."""
-    text = "=== Test ===\n\nTEXT: The formula p => q is simple."
+    """Test $p => q$ formula in TEXT block (explicit $...$)."""
+    text = "=== Test ===\n\nTEXT: The formula $p => q$ is simple."
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -29,8 +29,8 @@ def test_simple_implication_formula():
 
 
 def test_not_in_formula():
-    """Test lnot p elem formula context."""
-    text = "=== Test ===\n\nTEXT: The formula p => (lnot p => p) is a tautology."
+    """Test $p => (lnot p => p)$ formula in TEXT block (explicit $...$)."""
+    text = "=== Test ===\n\nTEXT: The formula $p => (lnot p => p)$ is a tautology."
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -42,9 +42,9 @@ def test_not_in_formula():
 
 
 def test_equivalence_formula():
-    """Test <=> formula elem TEXT block."""
+    """Test <=> formula in TEXT block (explicit $...$)."""
     text = (
-        "=== Test ===\n\nTEXT: The statement (lnot p => lnot q) <=> (q => p) is true."
+        "=== Test ===\n\nTEXT: The statement $(lnot p => lnot q) <=> (q => p)$ is true."
     )
     lexer = Lexer(text)
     tokens = lexer.tokenize()
@@ -60,8 +60,8 @@ def test_equivalence_formula():
 
 
 def test_formula_with_and_or():
-    """Test formula with and/or operators inside implication."""
-    text = "=== Test ===\n\nTEXT: The expression (p land q) => (p lor q) is valid."
+    """Test formula with and/or operators inside implication (explicit $...$)."""
+    text = "=== Test ===\n\nTEXT: The expression $((p land q) => (p lor q))$ is valid."
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -73,7 +73,7 @@ def test_formula_with_and_or():
 
 
 def test_not_in_prose_not_converted():
-    """Test 'lnot' elem English prose lnot converted (lnot before variable)."""
+    """Bare 'not' in English prose is not converted to \\lnot."""
     text = "=== Test ===\n\nTEXT: This is not relevant to the formula discussion."
     lexer = Lexer(text)
     tokens = lexer.tokenize()
@@ -86,8 +86,8 @@ def test_not_in_prose_not_converted():
 
 
 def test_standalone_not_variable():
-    """Test standalone 'lnot p' converted to logical not."""
-    text = "=== Test ===\n\nTEXT: We assume lnot p land lnot q for this proof."
+    """$lnot p$ and $lnot q$ in TEXT produce logical-not symbols."""
+    text = "=== Test ===\n\nTEXT: We assume $lnot p$ and $lnot q$ for this proof."
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -100,10 +100,10 @@ def test_standalone_not_variable():
 
 
 def test_multiple_formulas_in_one_paragraph():
-    """Test multiple formulas elem same TEXT block."""
+    """Multiple explicit $...$ formulas in the same TEXT block."""
     text = (
         "=== Test ===\n\n"
-        "TEXT: First p => q land then q => r gives us p => r by transitivity."
+        "TEXT: First $p => q$, then $q => r$, gives us $p => r$ by transitivity."
     )
     lexer = Lexer(text)
     tokens = lexer.tokenize()
@@ -118,10 +118,10 @@ def test_multiple_formulas_in_one_paragraph():
 
 
 def test_complex_nested_formula():
-    """Test complex nested formula with multiple operators."""
+    """Complex nested formula with multiple operators (explicit $...$)."""
     text = (
         "=== Test ===\n\n"
-        "TEXT: Consider ((p => r) land (q => r)) <=> ((p lor q) => r) as an example."
+        "TEXT: Consider $((p => r) land (q => r)) <=> ((p lor q) => r)$ as an example."
     )
     lexer = Lexer(text)
     tokens = lexer.tokenize()
@@ -135,8 +135,8 @@ def test_complex_nested_formula():
 
 
 def test_formula_stops_at_sentence_boundary():
-    """Test that formula detection stops at sentence boundaries."""
-    text = "=== Test ===\n\nTEXT: The formula p => q is valid for all values."
+    """Explicit $p => q$ is self-contained; prose boundary is clear."""
+    text = "=== Test ===\n\nTEXT: The formula $p => q$ is valid for all values."
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)
@@ -149,8 +149,8 @@ def test_formula_stops_at_sentence_boundary():
 
 
 def test_formula_with_parentheses_at_start():
-    """Test formula starting with parentheses."""
-    text = "=== Test ===\n\nTEXT: The statement (lnot p) => (lnot q) is interesting."
+    """Formula with parentheses at start (explicit $...$)."""
+    text = "=== Test ===\n\nTEXT: The statement $(lnot p) => (lnot q)$ is interesting."
     lexer = Lexer(text)
     tokens = lexer.tokenize()
     parser = Parser(tokens)

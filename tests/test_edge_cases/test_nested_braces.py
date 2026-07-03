@@ -1,4 +1,9 @@
-"""Tests for nested brace handling elem inline math (Pattern 1 enhancement)."""
+"""Tests for brace handling in TEXT prose (escape-only mode).
+
+In escape-only mode, bare { } in prose are escaped to \\{ \\}.
+Set comprehensions in prose pass through with escaped braces; use
+explicit $...$ to trigger the full parser pipeline.
+"""
 
 from __future__ import annotations
 
@@ -7,7 +12,7 @@ from txt2tex.latex_gen import LaTeXGenerator
 
 
 def test_nested_braces_simple() -> None:
-    """Test set comprehension with nested braces."""
+    """Set comprehension with nested braces passes through as escaped prose."""
     para = Paragraph(
         text="The function {p : Person . p |-> {p}} is simple.", line=1, column=1
     )
@@ -19,11 +24,11 @@ def test_nested_braces_simple() -> None:
 
 
 def test_nested_braces_relational_image() -> None:
-    """Test that complex lambda expressions elem TEXT are preserved.
+    """Complex lambda expressions in TEXT are preserved with escaped braces.
 
-    Note: {p : Person . p |-> expr} uses '.' lnot '|', so it's a lambda
-    expression, lnot a set comprehension. Parser won't recognize it.
-    These belong elem axdef blocks, lnot TEXT paragraphs.
+    Note: {p : Person . p |-> expr} uses '.' not '|', so it's a lambda
+    expression, not a set comprehension. Parser won't recognise it.
+    These belong in axdef blocks, not TEXT paragraphs.
     """
     para = Paragraph(
         text="Define children = {p : Person . p |-> parentOf(| {p} |)}.",
@@ -37,61 +42,38 @@ def test_nested_braces_relational_image() -> None:
 
 
 def test_nested_braces_set_comprehension() -> None:
-    """Test actual set comprehension with nested braces."""
+    """Bare {x : N | x elem {1, 2, 3}} in TEXT has braces escaped."""
     para = Paragraph(
         text="The set {x : N | x elem {1, 2, 3}} is valid.", line=1, column=1
     )
     gen = LaTeXGenerator()
     latex_lines = gen._generate_paragraph(para)
     latex = "\n".join(latex_lines)
-    assert "$" in latex
+    # Escape-only: braces are escaped, content preserved.
+    assert "\\{" in latex
+    assert "N" in latex
+    assert "1, 2, 3" in latex
 
 
 def test_multiple_set_comprehensions() -> None:
-    """Test multiple simple set comprehensions."""
+    """Multiple bare set comprehensions in TEXT have their braces escaped."""
     para = Paragraph(
-        text="We have {x : N | x > 0} land {y : N | y < 10}.", line=1, column=1
+        text="We have {x : N | x > 0} and {y : N | y < 10}.", line=1, column=1
     )
     gen = LaTeXGenerator()
     latex_lines = gen._generate_paragraph(para)
     latex = "\n".join(latex_lines)
-    assert latex.count("$") >= 2
+    # Escape-only: both brace pairs are escaped, content preserved.
+    assert latex.count("\\{") >= 2
+    assert "x > 0" in latex
+    assert "y < 10" in latex
 
 
 def test_nested_set_in_set_comprehension() -> None:
-    """Test set comprehension containing a set literal."""
+    """Set comprehension containing a set literal has braces escaped."""
     para = Paragraph(text="Consider {x : N | x elem {1, 2}}.", line=1, column=1)
     gen = LaTeXGenerator()
     latex_lines = gen._generate_paragraph(para)
     latex = "\n".join(latex_lines)
-    assert "$" in latex
-
-
-def test_balanced_braces_finder() -> None:
-    """Test the _find_balanced_braces helper.
-
-    This finds OUTERMOST balanced braces only (not all nested braces).
-    """
-    gen = LaTeXGenerator()
-    matches = gen._find_balanced_braces("text {a} more {b} text")
-    assert len(matches) == 2
-    assert matches[0] == (5, 8)
-    assert matches[1] == (14, 17)
-    matches = gen._find_balanced_braces("text {a {b} c} more")
-    assert len(matches) == 1
-    assert matches[0] == (5, 14)
-    matches = gen._find_balanced_braces("{a {b {c} d} e}")
-    assert len(matches) == 1
-    assert matches[0] == (0, 15)
-
-
-def test_unbalanced_braces_ignored() -> None:
-    """Test that unbalanced braces are safely ignored."""
-    gen = LaTeXGenerator()
-    matches = gen._find_balanced_braces("text {unclosed")
-    assert len(matches) == 0
-    matches = gen._find_balanced_braces("text } extra")
-    assert len(matches) == 0
-    matches = gen._find_balanced_braces("{good} {bad")
-    assert len(matches) == 1
-    assert matches[0] == (0, 6)
+    assert "\\{" in latex
+    assert "1, 2" in latex

@@ -251,3 +251,75 @@ class TestCombinedEscapes:
         assert r"\forall" in latex
         assert r"\%" in latex
         assert r"\&" in latex
+
+
+# ---------------------------------------------------------------------------
+# \ { } — backslash and curly braces (Phase 2c additions)
+# ---------------------------------------------------------------------------
+
+
+class TestBackslashBraceEscape:
+    r"""\ { } in TEXT prose are escaped to safe glyph forms.
+
+    Backslash:  \  →  \textbackslash{}
+    Open brace: {  →  \{
+    Close brace: }  →  \}
+
+    Characters inside $...$ math spans must not be touched.
+    """
+
+    def test_backslash_in_prose_is_escaped(self) -> None:
+        r"""A bare \ in prose becomes \textbackslash{} in the emitted LaTeX."""
+        latex = _gen(r"TEXT: a \lambda b")
+        assert r"\textbackslash{}" in latex
+        assert "lambda" in latex
+
+    def test_backslash_not_raw_in_prose(self) -> None:
+        r"""No command-like \word appears raw in prose output."""
+        latex = _gen(r"TEXT: The term \alpha is written in prose.")
+        body_start = latex.find(r"\noindent")
+        body = latex[body_start:] if body_start != -1 else latex
+        assert r"\textbackslash{}" in body
+
+    def test_open_brace_in_prose_is_escaped(self) -> None:
+        """A bare { in prose becomes \\{ in the emitted LaTeX."""
+        latex = _gen("TEXT: The set {a, b} is finite.")
+        assert r"\{" in latex
+        assert r"\}" in latex
+
+    def test_close_brace_in_prose_is_escaped(self) -> None:
+        """A bare } in prose becomes \\} in the emitted LaTeX."""
+        latex = _gen("TEXT: The group {x, y} contains two elements.")
+        assert r"\{x, y\}" in latex
+
+    def test_braces_do_not_appear_raw_in_prose(self) -> None:
+        """No unescaped { or } appears in prose output."""
+        latex = _gen("TEXT: Use braces {like this} in text.")
+        body_start = latex.find(r"\noindent")
+        body = latex[body_start:] if body_start != -1 else latex
+        # Strip the escaped forms before checking for raw braces.
+        cleaned = body.replace(r"\{", "").replace(r"\}", "")
+        # Also strip LaTeX commands that contain braces (e.g. \textbackslash{})
+        cleaned = re.sub(r"\\[a-zA-Z]+\{[^}]*\}", "", cleaned)
+        assert "{" not in cleaned
+        assert "}" not in cleaned
+
+    def test_backslash_inside_dollar_math_not_escaped(self) -> None:
+        r"""\ inside a $...$ span is processed by the parser, not prose-escaped."""
+        # The bare-symbol path maps "\" → \setminus inside $...$.
+        latex = _gen(r"TEXT: Set difference $\ $ here.")
+        assert r"\textbackslash{}" not in latex
+        assert r"\setminus" in latex
+
+    def test_brace_inside_dollar_math_not_prose_escaped(self) -> None:
+        """{ } inside a whiteboard $...$ span are not prose-escaped."""
+        latex = _gen("TEXT: The set ${ x : N | x > 0 }$ is non-empty.")
+        # Math braces \{~ ... ~\} come from the parser, not the prose escaper.
+        assert r"\{~" in latex or r"\{" in latex
+
+    def test_backslash_brace_combo_in_prose(self) -> None:
+        r"""Both \ and { } in the same prose line are each escaped."""
+        latex = _gen(r"TEXT: Write \lambda{} as a command.")
+        assert r"\textbackslash{}" in latex
+        assert r"\{" in latex
+        assert r"\}" in latex

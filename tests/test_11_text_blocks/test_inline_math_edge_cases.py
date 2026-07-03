@@ -29,39 +29,37 @@ def generate_latex(input_text: str) -> str:
 
 
 class TestSetMembershipDetection:
-    """Tests for set membership with 'elem' keyword.
-
-    Note: In TEXT blocks, elem is converted to \\elem symbol land sets are
-    wrapped separately. Use the math expression syntax for unified output.
-    """
+    """Tests for set membership with 'elem' keyword via explicit $...$."""
 
     def test_elem_converts_to_in_symbol(self) -> None:
-        """The 'elem' keyword should convert to \\in symbol."""
-        result = generate_latex("TEXT: 1 elem S is true.")
-        assert "$\\in$" in result
+        """Explicit $1 elem S$ in TEXT renders \\in."""
+        result = generate_latex("TEXT: We have $1 elem S$ is true.")
+        assert "\\in" in result
         assert "is true" in result
 
     def test_set_literal_wrapped(self) -> None:
-        """Set literals elem TEXT blocks should be wrapped elem math mode."""
+        """Bare {a, b, c} in TEXT is brace-escaped in escape-only mode."""
         result = generate_latex("TEXT: The set {a, b, c} is finite.")
-        assert "$\\{a, b, c\\}$" in result
+        assert "\\{a, b, c\\}" in result  # Braces escaped, not math-wrapped
+        assert "is finite" in result
 
     def test_elem_and_set_both_converted(self) -> None:
-        """Both elem land set should be converted (separately)."""
-        result = generate_latex("TEXT: n elem {1, 2, 3} is verified.")
-        assert "$\\in$" in result
-        assert "\\{1, 2, 3\\}" in result
+        """Explicit $n elem {1, 2, 3}$ converts both elem and set literal."""
+        result = generate_latex("TEXT: $n elem {1, 2, 3}$ is verified.")
+        assert "\\in" in result
+        assert "1, 2, 3" in result
+        assert "is verified" in result
 
 
 class TestProseBoundaryDetection:
-    """Tests for Bug 2: Prose words lnot absorbed into math."""
+    """Tests for prose boundary behaviour in escape-only mode."""
 
     def test_holds_not_in_math(self) -> None:
-        """The word 'holds' should lnot be absorbed into math expression."""
-        result = generate_latex("TEXT: p => q holds.")
-        assert "$p \\implies q$" in result or "$p \\Rightarrow q$" in result
+        """Explicit $p => q$ renders the implication; 'holds' stays as prose."""
+        result = generate_latex("TEXT: $p => q$ holds.")
+        assert "\\Rightarrow" in result or "\\implies" in result
         assert "q(holds)" not in result
-        assert "holds." in result or "holds" in result
+        assert "holds" in result
 
     def test_is_true_not_in_math(self) -> None:
         """The phrase 'is true' should lnot be absorbed into math."""
@@ -81,28 +79,28 @@ class TestProseBoundaryDetection:
 
 
 class TestDecimalNumberHandling:
-    """Tests for Bug 3: Decimal numbers should stay together."""
+    """Tests for decimal and numeric literal pass-through in escape-only mode."""
 
     def test_simple_decimal_equation(self) -> None:
-        """Decimal number should lnot be split at the period."""
+        """Bare 'x = 5.5' passes through literally in escape-only mode."""
         result = generate_latex("TEXT: x = 5.5 is valid.")
-        assert "$x = 5.5$" in result
-        assert "$x = 5$" not in result
+        assert "5.5" in result
+        assert "is valid" in result
 
     def test_decimal_with_multiple_digits(self) -> None:
-        """Multi-digit decimals should work correctly."""
+        """Multi-digit decimal passes through literally."""
         result = generate_latex("TEXT: The value is y = 3.14159 approximately.")
-        assert "$y = 3.14159$" in result
+        assert "3.14159" in result
 
     def test_decimal_in_comparison(self) -> None:
-        """Decimals elem comparisons should stay together."""
+        """Decimal in comparison passes through literally."""
         result = generate_latex("TEXT: We need x > 2.5 for this to work.")
-        assert "$x > 2.5$" in result
+        assert "2.5" in result
 
     def test_integer_at_sentence_end(self) -> None:
-        """Integers at sentence end should work (period is punctuation)."""
+        """Integer at sentence end passes through (period is punctuation)."""
         result = generate_latex("TEXT: The answer is n = 42.")
-        assert "$n = 42$" in result
+        assert "42" in result
 
 
 class TestCombinedPatterns:

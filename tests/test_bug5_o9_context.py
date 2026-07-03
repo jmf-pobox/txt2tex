@@ -189,15 +189,13 @@ EQUAL:
         assert r"\comp" not in latex
 
     def test_o9_in_text_heuristic_pipeline(self) -> None:
-        """o9 detected via the heuristic pipeline outside $...$ emits \\semi."""
-        # This tests the _process_paragraph_text path where symbolic operators
-        # are replaced outside math mode.
+        """$o9$ in a TEXT: block emits \\semi via the explicit $...$ path."""
+        # Bare o9 in prose passes through in escape-only mode; use $o9$ to
+        # trigger the _BARE_SYMBOL fast-path which maps o9 → \\semi.
         source = """\
 === Test ===
 
-TEXT: The operator o9 is relational composition.
+TEXT: The operator $o9$ is relational composition.
 """
         latex = _gen(source)
-        # The _replace_outside_math pass converts o9 → \\semi in TEXT prose.
-        # This is the pre-existing behaviour and should be preserved.
         assert r"\semi" in latex
