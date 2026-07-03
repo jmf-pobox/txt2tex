@@ -43,7 +43,7 @@ TEXT: Parameters are rendered with special data delimiters in LaTeX.
 
 ** Example 3: Multiple Definitions with Grouping **
 
-TEXT: Blank lines between definitions create visual groups using \also:
+TEXT: Blank lines between definitions create visual groups:
 
 syntax
   Status2 ::= active2 | inactive2 | pending2

@@ -211,7 +211,7 @@ TEXT: $h4 = {1 |-> 100, 2 |-> 200}$. Composition is defined where ranges align.
 
 TEXT: Functions from $A -> A$ with composition form a monoid:
 TEXT: 1. Composition is associative: $(f o9 g) o9 h = f o9 (g o9 h)$
-TEXT: 2. Identity element: $id(x) = x$, id $o9$ f = f = f $o9$ id
+TEXT: 2. Identity element: id(x) = x, id $o9$ f = f = f $o9$ id
 TEXT: 3. Closure: composing $A -> A$ functions gives another $A -> A$ function
 
 ** Example 14: Practical Example - Data Processing Pipeline **

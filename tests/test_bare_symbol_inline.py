@@ -174,6 +174,30 @@ class TestBareSymbolNonInterference:
             _gen(r"TEXT: A lone $\forall$ symbol appears.")
 
 
+class TestBareSymbolAsciiSubset:
+    """ASCII subset operators emit their LaTeX macro as lone bare symbols."""
+
+    def test_subseteq_lone(self) -> None:
+        r"""$subseteq$ emits $\subseteq$."""
+        latex = _gen(r"TEXT: The inclusion $subseteq$ symbol.")
+        assert r"$\subseteq$" in latex
+
+    def test_subset_lone(self) -> None:
+        r"""$subset$ emits $\subseteq$ (matches paren_policy ASCII mapping)."""
+        latex = _gen(r"TEXT: The subset $subset$ symbol.")
+        assert r"$\subseteq$" in latex
+
+    def test_psubset_lone(self) -> None:
+        r"""$psubset$ emits $\subset$ (strict/proper subset)."""
+        latex = _gen(r"TEXT: The proper subset $psubset$ symbol.")
+        assert r"$\subset$" in latex
+
+    def test_subset_full_expression_unaffected(self) -> None:
+        r"""$A subset B$ (multi-token) still routes via parser → $A \subseteq B$."""
+        latex = _gen("TEXT: We have $A subset B$ always.")
+        assert r"A \subseteq B" in latex
+
+
 class TestUnicodeBareSymbol:
     """Unicode math symbols in $...$ emit their fuzz LaTeX macros."""
 

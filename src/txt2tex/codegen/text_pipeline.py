@@ -76,6 +76,9 @@ _BARE_SYMBOL: Final[dict[str, str]] = {
     "nat": r"\nat",
     "num": r"\num",
     "emptyset": r"\emptyset",
+    "subseteq": r"\subseteq",
+    "subset": r"\subseteq",  # ASCII "subset" maps to \subseteq (matches paren_policy)
+    "psubset": r"\subset",  # strict/proper subset
     "dom": r"\dom",
     "ran": r"\ran",
     # Unicode math symbols (lone references in prose)
