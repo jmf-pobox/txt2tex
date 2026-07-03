@@ -31,6 +31,7 @@ def format_tex(tex_path: Path) -> bool:
         [tex_fmt, str(tex_path)],
         capture_output=True,
         text=True,
+        errors="replace",
         check=False,
     )
 
@@ -137,6 +138,7 @@ def _compile_with_latexmk(
         cwd=work_dir,
         capture_output=True,
         text=True,
+        errors="replace",
         check=False,
     )
 
@@ -195,6 +197,7 @@ def _compile_with_pdflatex(
             cwd=work_dir,
             capture_output=True,
             text=True,
+            errors="replace",
             check=False,
         )
 
