@@ -51,6 +51,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`UnicodeDecodeError` when compiling documents with non-UTF-8 output** —
+  `compile.py` ran latexmk/pdflatex/tex-fmt with `text=True` and no
+  `errors=` handler, so a non-UTF-8 byte in the tool's captured output
+  (e.g. `0xa7`/`§` echoed by latexmk) crashed the CLI with an uncaught
+  traceback even though the PDF compiled. All three subprocess calls now
+  pass `errors="replace"`, matching the log-file reads that already used it.
+
 - **Relational-calculus examples used non-Z string literals** —
   `relational_calculus` and `q2d_demo` compared attributes to quoted
   strings (`'Jazz'`, `'Ali'`, `'Centre Court'`), which fuzz rejected with a
