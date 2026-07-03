@@ -1,6 +1,7 @@
 # Plan: Parser-backed inline math in `TEXT:` (Option 3)
 
-**Status:** Phase 0–1 implemented (in review, PR #78); Phases 2–3 pending
+**Status:** Phase 0–1 DONE (merged, PR #78, `762c794`); Phase 2 in progress
+(branch `refactor/text-phase2-delete-heuristics`)
 **Type:** T1 — cross-cutting architecture change + breaking migration
 **Owner:** jra (principal); jms (semantics), rmh (engine/tests), ghr (docs), adb (regeneration)
 
@@ -93,34 +94,74 @@ Confirm before any code:
   (`forall`→`\forall`, `land`→`\land`, `+->`→`\pfun`, `mu t : T | P . e`→…).
   Assert on emitted fragments.
 
-### Phase 2 — rmh: delete bare-prose auto-detection
+### Phase 2 — rmh: delete bare-prose auto-detection + bare-symbol mode
 
-- Remove the ~15 heuristics: `_process_logical_formulas`,
-  `_process_parenthesized_logic`, `_process_quantifiers`,
-  `_process_set_expressions`, `_process_type_declarations`,
-  `_process_function_applications`, `_process_relational_image`,
-  `_process_superscripts`, `_process_standalone_keywords`,
-  `_process_simple_expressions`, `_convert_comparison_operators`,
-  `_convert_sequence_literals`, `_convert_operators_bare`,
-  `_convert_unicode_symbols` (assess), and their orchestration in
-  `_process_paragraph_text`.
-- Keep: `$...$` extraction/routing, `_escape_latex` /
-  `_escape_special_chars_outside_math`, `_process_citations`,
-  `_process_manual_markup`. The dollar-sanitise machinery likely shrinks (content
-  is parsed, not regex-scanned).
+**Bare-symbol mode (DECIDED, jfreeman): operators + keywords.** Inside a `$...$`
+span, if the content is exactly ONE known whiteboard token, emit its LaTeX symbol
+directly (pre-parse lookup in `_process_explicit_dollar_math`, before the strict
+`\`-check and full parse). Covers the arrow/relation family AND quantifier/binder
+keywords (`$|->$`→↦, `$forall$`→∀, `$mu$`→μ, `$elem$`→∈). The table is the exact
+map reused from the deleted heuristics (lines 474–545); jms confirms the
+lone-symbol edge cases. This is still explicit + delimited — no prose
+auto-detect returns. Full expressions (`$N -> N$`) already parse without it.
+
+- Remove the 16 heuristic methods: `_convert_operators_bare`,
+  `_convert_unicode_symbols`, `_convert_comparison_operators`,
+  `_convert_sequence_literals`, `_process_logical_formulas`,
+  `_process_parenthesized_logic`, `_process_standalone_keywords`,
+  `_process_superscripts`, `_process_relational_image`,
+  `_process_set_expressions`, `_process_quantifiers`,
+  `_process_type_declarations`, `_process_function_applications`,
+  `_process_simple_expressions`, `_process_inline_math`,
+  `_convert_operators_to_latex`. Strip their orchestration from
+  `_process_paragraph_text` (the operator/unicode/keyword block, lines 474–574,
+  and the `not elem`/`elem` regex subs).
+- New `_process_paragraph_text` pipeline (escape-only): `_pre_sanitise_dollars`
+  → `_process_explicit_dollar_math` (+ bare-symbol lookup) →
+  `_escape_special_chars_outside_math` → `_process_citations` →
+  `_escape_underscores_outside_math` → `_restore_dollar_sanitise`.
+- Keep the balanced-brace/paren/angle finders only if a kept method still uses
+  them; otherwise delete.
+- **`_escape_special_chars_outside_math` now also escapes `\` → `\textbackslash{}`
+  (and `{` `}`).** This closes security issue #79 (undelimited-prose backslash →
+  `\write18`/`\input` injection): today bare `\lambda` in prose passes through raw.
 - Bare prose is now escape-only. This intentionally BREAKS every `TEXT:` block
-  that relied on bare-math detection — that is the migration surface, handled in
-  Phase 3. Rewrite the pipeline unit tests to the new model.
-- Target: ~1000 lines removed from `text_pipeline.py`.
+  that relied on bare-math detection — that is the migration surface (Phase 3).
+  Rewrite the pipeline unit tests to the new model.
+- Target: ~1000 lines removed from `text_pipeline.py` (1670 → ~650).
 
 ### Phase 3 — migration (the "proper list"): manual, one file at a time
 
-74 example files and ~40 test files use `TEXT:`. **Source edits are made by
-hand, one file at a time, with the Edit tool — NEVER with `sed`, a rewrite
-script, `awk`, `perl -i`, or any batch process.** Batch rewriting of these
-`.txt` sources has corrupted ("royally horked") files before; it is prohibited
-here without exception. Automation is confined to *diagnosis* and *verification*
-— never to *editing the sources*.
+**Migration surface (measured, not estimated).** The read-only inventory
+(`.tmp/phase2_inventory.py`) finds bare math in **21 example `.txt` files, 111
+`TEXT:` blocks** — the byte-for-byte e2e set (`test_e2e_regression.py`). PURETEXT
+is excluded (already literal). This is far smaller than the earlier "74 files"
+guess; the count still over-includes English `->` and descriptive "forall", so
+the true edit count is lower. `tests/bugs/`, `hw1/`, courseware, and docs are
+NOT in the e2e gate but get migrated for user-facing correctness.
+
+**Execution order — green at every commit** (jms insight). Bare-symbol mode and
+`$...$` both live in the KEPT `_process_explicit_dollar_math`, so:
+
+- **2a (additive):** add bare-symbol mode. No deletions. e2e unaffected (no
+  current fixture has a lone `$token$`). `make check` green. Commit.
+- **2b (migrate + regen):** wrap bare math in `$...$`/bare-symbol across the 21
+  files; `make regen-e2e`. Fixtures now reflect the kept `$...$` paths. Green.
+- **2c (delete):** remove the 16 heuristics + add `\`/`{`/`}` escaping. Migrated
+  examples use only kept paths, so deletion leaves their output unchanged — any
+  e2e red after 2c is a MISSED migration (a free safety net). Regen the few
+  prose-backslash fixtures the escape change touches. Rewrite heuristic unit
+  tests. Green.
+
+This replaces the earlier "one big red branch" plan: `test_e2e_regression.py`
+diffs each example's `.tex` byte-for-byte, and this ordering keeps it passing
+throughout instead of red until the end.
+
+**Source edits are made by hand, one file at a time, with the Edit tool — NEVER
+with `sed`, a rewrite script, `awk`, `perl -i`, or any batch process.** Batch
+rewriting of these `.txt` sources has corrupted ("royally horked") files before;
+it is prohibited here without exception. Automation is confined to *diagnosis*
+and *verification* — never to *editing the sources*.
 
 1. **Diagnostic harness (read-only).** A throwaway script runs the OLD pipeline
    and the NEW (escape-only + `$...$`) pipeline on each `TEXT:` block and REPORTS

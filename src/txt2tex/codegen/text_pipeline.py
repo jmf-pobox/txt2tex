@@ -19,6 +19,7 @@ changed.
 from __future__ import annotations
 
 import re
+from typing import Final
 
 from txt2tex.ast_nodes import (
     Expr,
@@ -31,6 +32,60 @@ from txt2tex.codegen._dispatch import CodegenDispatch
 from txt2tex.constants import PROSE_WORDS
 from txt2tex.lexer import Lexer, LexerError
 from txt2tex.parser import Parser, ParserError
+
+# Bare-symbol lookup table (jms-confirmed against bundled fuzz.sty).
+# A $...$ span whose stripped content matches exactly one key here is emitted
+# as the corresponding LaTeX macro, bypassing the full expression parser.
+# Keys are the raw ASCII whiteboard tokens; values are ready-to-use LaTeX.
+# Ordered by descending key length to aid readability; lookup is by dict key.
+_BARE_SYMBOL: Final[dict[str, str]] = {
+    # Arrow / relation / operator family
+    "77->": r"\ffun",
+    ">->>": r"\bij",
+    "+->>": r"\psurj",
+    "-->>": r"\surj",
+    "|>>": r"\nrres",
+    "<<|": r"\ndres",
+    "|->": r"\mapsto",
+    "<->": r"\rel",
+    "-|>": r"\pinj",
+    ">+>": r"\pinj",
+    ">->": r"\inj",
+    "+->": r"\pfun",
+    "<|": r"\dres",
+    "|>": r"\rres",
+    "->": r"\fun",
+    "++": r"\oplus",
+    "o9": r"\semi",
+    "<=>": r"\Leftrightarrow",
+    "=>": r"\Rightarrow",
+    "<=": r"\leq",
+    ">=": r"\geq",
+    "/=": r"\neq",
+    "\\": r"\setminus",
+    "cat": r"\cat",
+    "filter": r"\filter",
+    # Quantifiers / binders / logical / membership / sets
+    "forall": r"\forall",
+    "exists": r"\exists",
+    "exists1": r"\exists_1",
+    "lambda": r"\lambda",
+    "mu": r"\mu",
+    "land": r"\land",
+    "lor": r"\lor",
+    "lnot": r"\lnot",
+    "elem": r"\in",
+    "notin": r"\notin",
+    "union": r"\cup",
+    "inter": r"\cap",
+    "cross": r"\cross",
+    "power": r"\power",
+    "nat": r"\nat",
+    "num": r"\num",
+    "emptyset": r"\emptyset",
+    "dom": r"\dom",
+    "ran": r"\ran",
+}
 
 
 def _sanitise_span_for_error(inner: str) -> str:
@@ -341,6 +396,15 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
             # newlines (e.g. constructed in tests) it gives the correct offset.
             actual_line = base_line + before.count("\n")
             span = f"${_sanitise_span_for_error(inner)}$"
+
+            # Bare-symbol fast path: a span containing exactly one known
+            # whiteboard token is emitted directly without parsing.
+            # This runs BEFORE the strict backslash check so that the lone
+            # set-difference backslash ("\\") maps to \setminus cleanly.
+            stripped = inner.strip()
+            if stripped in _BARE_SYMBOL:
+                result = result[:start] + f"${_BARE_SYMBOL[stripped]}$" + result[end:]
+                continue
 
             # Strict: a raw LaTeX command (backslash + letter, e.g. \geq,
             # \forall, \input) in $...$ is an error.  This runs BEFORE parsing so
