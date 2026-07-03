@@ -113,10 +113,10 @@ class TestStrictBackslashError:
         with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: The biconditional $p \Leftrightarrow q$ holds.")
 
-    def test_backslash_forall_raises(self) -> None:
-        r"""$\forall x$ raises — use $forall x$ (whiteboard) instead."""
+    def test_bare_backslash_forall_raises(self) -> None:
+        r"""A lone $\forall$ (no operand) raises — distinct from the $\forall x$ case."""
         with pytest.raises(InlineMathError, match="whiteboard notation only"):
-            _gen(r"TEXT: The claim $\forall x$ is universal.")
+            _gen(r"TEXT: A lone $\forall$ symbol appears.")
 
     def test_backslash_in_raises(self) -> None:
         r"""$x \in S$ raises — use $x elem S$ (whiteboard) instead."""

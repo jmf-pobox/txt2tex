@@ -61,8 +61,8 @@ class TestPercentEscape:
         latex = _gen("TEXT: From 10% to 90% is an 80% increase.")
         assert latex.count(r"\%") >= 3
 
-    def test_percent_in_prose_adjacent_to_math_not_escaped(self) -> None:
-        """% in prose is escaped; a whiteboard $...$ math span is not corrupted."""
+    def test_percent_in_prose_escaped_math_span_preserved(self) -> None:
+        """% in prose is escaped; an adjacent whiteboard $...$ span is preserved."""
         # The whiteboard $...$ math span must parse and render correctly
         # while % in the surrounding prose is escaped.
         latex = _gen("TEXT: 50% coverage; $forall x : N | x > 0$ holds.")
