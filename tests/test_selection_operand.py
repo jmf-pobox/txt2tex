@@ -1,14 +1,17 @@
 """Tests for field-selection (`p.field`) as an operand of infix operators.
 
-Bug: `p.field` was rejected as a left or right operand of many infix
-operators because `safe_followers` in `_parse_postfix` was incomplete.
-The fix adds all missing infix operator tokens to the whitelist so that
-`p.amount |-> q.amount`, `p.a union q.b`, etc., parse correctly.
+Phase 1 fix: extended `safe_followers` in `_parse_postfix` with all infix
+operator tokens so that `p.amount |-> q.amount`, `p.a union q.b`, etc.,
+parse correctly.
+
+Phase 2 fix (Copilot review of PR #77): a tight dot — no whitespace between
+`.` and the field name — now bypasses `safe_followers` entirely via the
+short-circuit `not self._dot_is_spaced(next_token)`.  Z RM §3.16: selection
+binds tighter than every infix operator, and syntactically a tight dot is
+unambiguous.  The whitelist is now belt-and-suspenders for the spaced-dot path.
 
 Root cause: `src/txt2tex/parser_pkg/expressions.py` `_parse_postfix`,
-`safe_followers` at ~line 2384.  Omitted: UNION, OVERRIDE, MAPLET,
-RELATION, DRES, RRES, NDRES, NRRES, CIRC, COMP, CROSS, JOIN, DIV,
-STAR, INTERSECT, SETMINUS, PFUN, TFUN, and other function-type arrows.
+condition around the `safe_followers` check.
 """
 
 from __future__ import annotations
@@ -28,7 +31,9 @@ from txt2tex.ast_nodes import (
     Number,
     SetComprehension,
     SetLiteral,
+    Superscript,
     TupleProjection,
+    UnaryOp,
 )
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
@@ -75,6 +80,7 @@ def _run_fuzz(tex_body: str, tmp_path: Path) -> subprocess.CompletedProcess[str]
         text=True,
         check=False,
         timeout=120,
+        cwd=tmp_path,
     )
 
 
@@ -325,6 +331,120 @@ def test_div_selection_operand() -> None:
     assert isinstance(ast.right, TupleProjection), (
         f"Expected TupleProjection on right, got {type(ast.right).__name__!r}"
     )
+
+
+# ---------------------------------------------------------------------------
+# Matrix: sequence and judgment operators (Phase 2 additions)
+# ---------------------------------------------------------------------------
+
+
+def test_filter_selection_operand() -> None:
+    """p.a filter s must parse with TupleProjection on the left.
+
+    `filter` (↾) is a sequence restriction operator.  It was missing from
+    `safe_followers` before the Phase 2 fix; the tight-dot bypass now ensures
+    it is always handled even for future operator gaps in the whitelist.
+    """
+    tokens = Lexer("p.a filter s").tokenize()
+    ast = Parser(tokens).parse()
+    assert isinstance(ast, BinaryOp), f"Expected BinaryOp, got {type(ast).__name__!r}"
+    assert ast.operator == "filter"
+    assert isinstance(ast.left, TupleProjection), (
+        f"Expected TupleProjection on left, got {type(ast.left).__name__!r}"
+    )
+    assert ast.left.index == "a"
+    assert isinstance(ast.right, Identifier)
+    assert ast.right.name == "s"
+
+
+def test_shows_selection_operand() -> None:
+    """p.a shows q.b must parse with TupleProjection on both sides.
+
+    `shows` (⊢) is a sequent/judgment operator.  Both operands are field
+    selections; the tight-dot bypass ensures both are parsed as projections.
+    """
+    tokens = Lexer("p.a shows q.b").tokenize()
+    ast = Parser(tokens).parse()
+    assert isinstance(ast, BinaryOp), f"Expected BinaryOp, got {type(ast).__name__!r}"
+    assert ast.operator == "shows"
+    assert isinstance(ast.left, TupleProjection), (
+        f"Expected TupleProjection on left, got {type(ast.left).__name__!r}"
+    )
+    assert ast.left.index == "a"
+    assert isinstance(ast.right, TupleProjection), (
+        f"Expected TupleProjection on right, got {type(ast.right).__name__!r}"
+    )
+    assert ast.right.index == "b"
+
+
+# ---------------------------------------------------------------------------
+# Matrix: postfix operators applied to a selection result (Phase 2 additions)
+# ---------------------------------------------------------------------------
+
+
+def test_postfix_superscript_after_selection() -> None:
+    """p.a^2 must parse as Superscript(TupleProjection(p, 'a'), Number('2')).
+
+    The tight dot in `p.a` binds before the postfix `^`, so the base of the
+    Superscript is the projection, not the bare identifier `a`.
+    """
+    tokens = Lexer("p.a^2").tokenize()
+    ast = Parser(tokens).parse()
+    assert isinstance(ast, Superscript), (
+        f"Expected Superscript, got {type(ast).__name__!r}"
+    )
+    assert isinstance(ast.base, TupleProjection), (
+        f"Expected TupleProjection as Superscript.base, got {type(ast.base).__name__!r}"
+    )
+    assert ast.base.index == "a"
+    assert isinstance(ast.exponent, Number)
+    assert ast.exponent.value == "2"
+
+
+def test_postfix_inverse_after_selection() -> None:
+    """p.a~ must parse as UnaryOp('~', TupleProjection(p, 'a')).
+
+    The `~` postfix operator (relational inverse) applies to the projected
+    field, not to the base identifier.  The tight dot ensures the projection
+    is built first.
+    """
+    tokens = Lexer("p.a~").tokenize()
+    ast = Parser(tokens).parse()
+    assert isinstance(ast, UnaryOp), f"Expected UnaryOp, got {type(ast).__name__!r}"
+    assert ast.operator == "~"
+    assert isinstance(ast.operand, TupleProjection), (
+        f"Expected TupleProjection as operand, got {type(ast.operand).__name__!r}"
+    )
+    assert ast.operand.index == "a"
+
+
+def test_selection_field_name_with_underscore() -> None:
+    """p.a_1 must parse as TupleProjection with field name 'a_1'.
+
+    In the lexer, `a_1` is a single IDENTIFIER token — the underscore is
+    part of the name, not a subscript operator.  The safe_followers whitelist
+    includes UNDERSCORE for the spaced-dot path, but tight `p.a_1` goes via
+    the tight-dot bypass and the selected field is 'a_1'.
+    """
+    tokens = Lexer("p.a_1").tokenize()
+    ast = Parser(tokens).parse()
+    assert isinstance(ast, TupleProjection), (
+        f"Expected TupleProjection, got {type(ast).__name__!r}"
+    )
+    assert ast.index == "a_1", f"Expected field name 'a_1', got {ast.index!r}"
+    assert isinstance(ast.base, Identifier)
+    assert ast.base.name == "p"
+
+
+def test_selection_field_with_underscore_then_operator() -> None:
+    """p.a_1 union s must parse with TupleProjection(field='a_1') as left operand."""
+    tokens = Lexer("p.a_1 union s").tokenize()
+    ast = Parser(tokens).parse()
+    assert isinstance(ast, BinaryOp), f"Expected BinaryOp, got {type(ast).__name__!r}"
+    assert ast.operator == "union"
+    assert isinstance(ast.left, TupleProjection)
+    assert ast.left.index == "a_1"
+    assert isinstance(ast.right, Identifier)
 
 
 # ---------------------------------------------------------------------------
