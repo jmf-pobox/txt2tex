@@ -282,7 +282,7 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
             text = text.replace(key, value)
         return text
 
-    def _process_explicit_dollar_math(self, text: str) -> str:
+    def _process_explicit_dollar_math(self, text: str, base_line: int = 1) -> str:
         r"""Parse explicit $...$ inline-math spans through the whiteboard parser.
 
         Called before any character-escaping so that ^ and other special chars
@@ -324,6 +324,13 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
             if before.count("$") % 2 == 1:
                 continue
 
+            # Source line of this span: base_line plus the number of newlines in
+            # the block text before the match.  TEXT: values are single-line
+            # captures so before.count("\n") is usually 0; for text with embedded
+            # newlines (e.g. constructed in tests) it gives the correct offset.
+            actual_line = base_line + before.count("\n")
+            span = f"${inner}$"
+
             # Strict: raw LaTeX commands (\cmd) in $...$ are an error.
             # The whiteboard set-difference operator is written "A \ B" (space
             # after the backslash), so re.search(r"\\[A-Za-z]", inner) never
@@ -331,6 +338,7 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
             # a letter immediately after the backslash and always match.
             if re.search(r"\\[A-Za-z]", inner):
                 msg = (
+                    f"line {actual_line}: {span} — "
                     "$...$ is whiteboard-only inline math; "
                     r"raw LaTeX (\geq, \Leftrightarrow, ...) belongs in a LATEX: block."
                 )
@@ -364,6 +372,7 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
                 # Parser returned a non-empty Document — user wrote a Z paragraph
                 # construct inline (schema, axdef, gendef, given, ::=, ==).
                 msg = (
+                    f"line {actual_line}: {span} — "
                     "$...$ takes an inline Z expression or predicate; "
                     "schema/axdef/gendef/given/::=/== is a Z paragraph "
                     "— use a schema/axdef/zed block, not inline."
@@ -402,12 +411,17 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
             parts.append(seg)
         return "".join(parts)
 
-    def _process_paragraph_text(self, text: str) -> str:
+    def _process_paragraph_text(self, text: str, base_line: int = 1) -> str:
         """Process paragraph text: convert operators, handle inline math, etc.
 
         This is a helper method that processes paragraph text without adding
         spacing or formatting commands. Used both in _generate_paragraph()
         and when rendering paragraphs inline with part labels.
+
+        ``base_line`` is the 1-indexed source line of the enclosing paragraph
+        node.  It is threaded into ``_process_explicit_dollar_math`` so that
+        ``InlineMathError`` messages can report the exact source line of the
+        offending ``$...$`` span.
         """
         # Step 0: Sanitise dollar signs.  Reject $$ and escape unbalanced $
         # before any span matching runs.  This prevents stray $ from silently
@@ -418,7 +432,7 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
         # Step 1: Parse explicit $...$ spans through the math parser FIRST,
         # before any character escaping.  This fixes bug 7.A (^ inside $...$
         # was being pre-escaped) and adds proper opt-in inline math support.
-        text = self._process_explicit_dollar_math(text)
+        text = self._process_explicit_dollar_math(text, base_line)
 
         # Step 2: Escape special LaTeX characters outside $...$ spans.
         # # is a macro parameter character; ^ is only valid in math mode.

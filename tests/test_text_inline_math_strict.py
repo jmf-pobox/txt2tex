@@ -137,6 +137,66 @@ class TestParagraphConstructError:
             _gen("TEXT: $schema S end$")
 
 
+class TestSourceLocationInError:
+    r"""InlineMathError messages include the source line number and span text.
+
+    The format is "line N: $span$ — <original message>".  Every raise site in
+    _process_explicit_dollar_math embeds ``actual_line`` (node base line + the
+    count of newlines in the block text before the match) and the full
+    ``$inner$`` span so users can locate the offending text in a large file.
+    """
+
+    # _gen prepends "=== Test ===\n\n" (2 lines), so the first TEXT: is line 3.
+
+    def test_raw_latex_error_includes_line_number(self) -> None:
+        r"""InlineMathError for $\geq$ includes the source line number."""
+        with pytest.raises(InlineMathError) as exc_info:
+            _gen(r"TEXT: We need $\geq 0$ here.")
+        msg = str(exc_info.value)
+        assert "line 3:" in msg
+
+    def test_raw_latex_error_includes_span_text(self) -> None:
+        r"""InlineMathError for $\geq$ includes the offending $...$  span."""
+        with pytest.raises(InlineMathError) as exc_info:
+            _gen(r"TEXT: We need $\geq 0$ here.")
+        msg = str(exc_info.value)
+        # Span text is the full $inner$ with delimiters.
+        assert r"$\geq 0$" in msg
+
+    def test_paragraph_construct_error_includes_line_number(self) -> None:
+        """InlineMathError for $schema S end$ includes the source line number."""
+        with pytest.raises(InlineMathError) as exc_info:
+            _gen("TEXT: $schema S end$")
+        msg = str(exc_info.value)
+        assert "line 3:" in msg
+
+    def test_paragraph_construct_error_includes_span_text(self) -> None:
+        """InlineMathError for $schema S end$ includes the offending span."""
+        with pytest.raises(InlineMathError) as exc_info:
+            _gen("TEXT: $schema S end$")
+        msg = str(exc_info.value)
+        assert "$schema S end$" in msg
+
+    def test_line_arithmetic_across_blocks(self) -> None:
+        r"""Error on the third TEXT: block reports its source line, not block 1's line.
+
+        Three separate TEXT: paragraphs (blank lines between them) produce three
+        Paragraph nodes.  The bad $\rightarrow$ span is in the third paragraph
+        (source line 7 after the "=== Test ===\\n\\n" prefix).  The error must
+        say "line 7:", not "line 3:" (the first paragraph's line).
+        """
+        source = (
+            "TEXT: first paragraph.\n\n"
+            "TEXT: second paragraph.\n\n"
+            r"TEXT: third paragraph with bad $\rightarrow$ span."
+        )
+        with pytest.raises(InlineMathError) as exc_info:
+            _gen(source)
+        msg = str(exc_info.value)
+        assert "line 7:" in msg
+        assert "line 3:" not in msg
+
+
 class TestEmptyInlineMath:
     """A whitespace/empty $...$ span is left unchanged, not an error.
 
