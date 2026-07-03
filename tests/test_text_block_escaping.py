@@ -213,7 +213,7 @@ class TestUnderscoreEscape:
         assert "_" not in cleaned
 
     def test_underscore_inside_dollar_math_not_escaped(self) -> None:
-        r"""_ inside $...$ is preserved by the math parser, not escaped as \_ ."""
+        r"""_ inside $...$ is preserved by the math parser, not escaped as ``\_``."""
         # x_1 has an underscore inside the $...$ span.  The prose underscore
         # escaper (_escape_underscores_outside_math) must skip characters that
         # are inside $...$ math delimiters; only the math parser owns them.
