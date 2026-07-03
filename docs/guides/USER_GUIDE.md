@@ -225,18 +225,16 @@ TEXT: We know $x >= 0$ and $x <= 10$.
 
 Common inline expressions:
 
-| Source | Rendered |
-|--------|---------|
-| `$forall x : N \| x > 0$` | ∀ x : ℕ • x > 0 |
-| `$exists y : Z \| y < 0$` | ∃ y : ℤ • y < 0 |
-| `$N -> N$` | ℕ → ℕ (total function type) |
-| `$A +-> B$` | A ⇀ B (partial function) |
-| `$x \|-> y$` | x ↦ y (maplet) |
-| `$x >= 0$` | x ≥ 0 |
-| `$A subset B$` | A ⊆ B |
-| `$A \ B$` | A ∖ B (set difference — backslash with surrounding spaces) |
-| `$<1, 2, 3>$` | ⟨1, 2, 3⟩ |
-| `${1 \|-> 10, 2 \|-> 20}$` | {1 ↦ 10, 2 ↦ 20} |
+- `$forall x : N | x > 0$` → ∀ x : ℕ • x > 0
+- `$exists y : Z | y < 0$` → ∃ y : ℤ • y < 0
+- `$N -> N$` → ℕ → ℕ (total function type)
+- `$A +-> B$` → A ⇀ B (partial function)
+- `$x |-> y$` → x ↦ y (maplet)
+- `$x >= 0$` → x ≥ 0
+- `$A subset B$` → A ⊆ B
+- `$A \ B$` → A ∖ B (set difference — backslash with surrounding spaces)
+- `$<1, 2, 3>$` → ⟨1, 2, 3⟩
+- `${1 |-> 10, 2 |-> 20}$` → {1 ↦ 10, 2 ↦ 20}
 
 Any whiteboard expression valid in a `zed` or `axdef` block is valid
 inside `$...$`.

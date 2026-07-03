@@ -181,7 +181,7 @@ def test_equals_operator_inline() -> None:
     assert "5" in latex
 
 
-def test_domain_restriction_inline() -> None:
+def test_partial_injection_inline() -> None:
     """$S -|> A$ in TEXT prose renders as partial injection."""
     para = Paragraph(
         text="The relation $S -|> A$ restricts the domain.", line=1, column=1

@@ -24,11 +24,13 @@ def test_nested_braces_simple() -> None:
 
 
 def test_nested_braces_relational_image() -> None:
-    """Complex lambda expressions in TEXT are preserved with escaped braces.
+    """Set comprehension with '.' bullet in TEXT prose is handled as escape-only.
 
-    Note: {p : Person . p |-> expr} uses '.' not '|', so it's a lambda
-    expression, not a set comprehension. Parser won't recognise it.
-    These belong in axdef blocks, not TEXT paragraphs.
+    Note: {p : Person . p |-> expr} uses '.' as the set-comprehension bullet
+    (predicate omitted). The parser recognises '.' as the bullet and processes
+    the expression as a set comprehension, not a lambda. In a TEXT paragraph
+    the braces are escaped for LaTeX, so the output is verified structurally
+    rather than by Z environment rendering.
     """
     para = Paragraph(
         text="Define children = {p : Person . p |-> parentOf(| {p} |)}.",
