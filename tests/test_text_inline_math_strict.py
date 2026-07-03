@@ -57,7 +57,7 @@ class TestSetDifferenceInlineMath:
     r"""$A \ B$ (whiteboard set difference) is allowed in $...$ spans.
 
     The whiteboard set-difference operator is always written ``A \\ B``
-    (backslash surrounded by spaces).  ``re.search(r"\\\\[A-Za-z]", inner)``
+    (backslash surrounded by spaces).  ``re.search(r"\\[A-Za-z]", inner)``
     does NOT match it, so it is not rejected as a raw LaTeX command.
     """
 

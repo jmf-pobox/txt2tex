@@ -1,6 +1,6 @@
 # Plan: Parser-backed inline math in `TEXT:` (Option 3)
 
-**Status:** proposed (awaiting execution)
+**Status:** Phase 0–1 implemented (in review, PR #78); Phases 2–3 pending
 **Type:** T1 — cross-cutting architecture change + breaking migration
 **Owner:** jra (principal); jms (semantics), rmh (engine/tests), ghr (docs), adb (regeneration)
 
