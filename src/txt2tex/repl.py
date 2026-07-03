@@ -177,6 +177,10 @@ def process_input(
         return False
     except InlineMathError as e:
         # Strict $...$ inline-math error already carries "line N: $span$ — ...".
+        # This is the one error path raised *during* generation, so drop any
+        # warnings accumulated before it — the success path clears them below,
+        # and we must not leak them into the next REPL turn.
+        generator.clear_warnings()
         print(f"Error: {e}", file=sys.stderr)
         return False
 
