@@ -356,6 +356,14 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
                 )
                 raise InlineMathError(msg)
 
+            # Control *symbols* (backslash + non-letter: \\, \_, \%, \#, \&, ...)
+            # pass the check above. They are inert in math mode — none execute
+            # code (confirmed in the Phase 1 security review); at worst a benign
+            # render. If the whiteboard parse below fails, such a span is left
+            # literal by the fallback. Making the fallback itself strict (raise
+            # on any residual backslash) is a deliberate later-phase decision,
+            # tied to how bare operators (`$|->$`, `$\ $`) should behave.
+
             # Parse as whiteboard math.
             try:
                 lexer = Lexer(inner)
