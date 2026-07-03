@@ -19,7 +19,6 @@ changed.
 from __future__ import annotations
 
 import re
-from typing import ClassVar
 
 from txt2tex.ast_nodes import (
     Expr,
@@ -32,6 +31,18 @@ from txt2tex.codegen._dispatch import CodegenDispatch
 from txt2tex.constants import PROSE_WORDS
 from txt2tex.lexer import Lexer, LexerError
 from txt2tex.parser import Parser, ParserError
+
+
+class InlineMathError(Exception):
+    """Raised when a $...$ span in TEXT: prose contains invalid content.
+
+    Two cases trigger this error:
+
+    - A backslash inside $...$: raw LaTeX must go through ``LATEX:`` blocks.
+      Use whiteboard notation (``$p <=> q$``, ``$forall x : N | P$``) instead.
+    - A Z paragraph construct (schema, axdef, gendef, given, ``::=``, ``==``)
+      written inline: these are block-level constructs, not expressions.
+    """
 
 
 class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
@@ -269,199 +280,30 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
             text = text.replace(key, value)
         return text
 
-    # Matches a backslash followed by one or more letters — a LaTeX command.
-    # Used in _process_explicit_dollar_math to detect already-rendered LaTeX.
-    _LATEX_COMMAND_RE: re.Pattern[str] = re.compile(r"\\[a-zA-Z]+")
-
-    # Allow-list of fuzz/zed math commands that are safe to pass through verbatim
-    # when they appear inside $...$ in TEXT prose.  Only commands in this set are
-    # allowed; anything else is either on the block-list (escaped outright) or
-    # unknown (treated as unsafe and escaped).
-    _ALLOWED_LATEX_COMMANDS: ClassVar[frozenset[str]] = frozenset(
-        {
-            # logical
-            r"\land",
-            r"\lor",
-            r"\lnot",
-            r"\neg",
-            r"\implies",
-            r"\iff",
-            r"\Rightarrow",
-            r"\Leftarrow",
-            r"\Leftrightarrow",
-            # quantifiers
-            r"\forall",
-            r"\exists",
-            r"\bullet",
-            # sets / types
-            r"\in",
-            r"\notin",
-            r"\subseteq",
-            r"\subset",
-            r"\supseteq",
-            r"\supset",
-            r"\cup",
-            r"\cap",
-            r"\setminus",
-            r"\emptyset",
-            r"\nat",
-            r"\num",
-            r"\rel",
-            r"\fun",
-            r"\pfun",
-            r"\inj",
-            r"\surj",
-            r"\bij",
-            r"\pinj",
-            r"\ffun",
-            r"\finj",
-            r"\psurj",
-            # relations
-            r"\dom",
-            r"\ran",
-            r"\semi",
-            r"\comp",
-            r"\inv",
-            r"\id",
-            r"\dres",
-            r"\rres",
-            r"\ndres",
-            r"\nrres",
-            r"\oplus",
-            r"\mapsto",
-            r"\uplus",
-            r"\uminus",
-            # sequences
-            r"\cat",
-            r"\langle",
-            r"\rangle",
-            r"\seq",
-            r"\iseq",
-            r"\filter",
-            # schema
-            r"\Delta",
-            r"\Xi",
-            r"\theta",
-            # arithmetic / comparison
-            r"\leq",
-            r"\geq",
-            r"\neq",
-            r"\div",
-            r"\mod",
-            r"\times",
-            r"\cross",
-            # structure / styling
-            r"\bsup",
-            r"\esup",
-            r"\mathrm",
-            r"\mathit",
-            r"\textrm",
-            r"\mbox",
-            r"\text",
-            r"\quad",
-            r"\qquad",
-            r"\vdash",
-            r"\power",
-            r"\finset",
-            r"\bag",
-            r"\mu",
-            r"\lambda",
-            r"\rightarrow",
-            r"\leftarrow",
-            r"\leftrightarrow",
-            r"\uparrow",
-            r"\downarrow",
-            # spacing (single-character commands handled separately)
-            r"\,",
-            r"\;",
-            r"\!",
-            r"\ ",
-            r"\{",
-            r"\}",
-            r"\|",
-        }
-    )
-
-    # Commands that must never appear in emitted LaTeX — they can execute
-    # arbitrary code (shell-escape, file I/O) or redefine the TeX engine.
-    _BLOCKED_LATEX_COMMANDS: ClassVar[frozenset[str]] = frozenset(
-        {
-            r"\input",
-            r"\include",
-            r"\write",
-            r"\catcode",
-            r"\openout",
-            r"\closeout",
-            r"\read",
-            r"\immediate",
-            r"\def",
-            r"\edef",
-            r"\gdef",
-            r"\xdef",
-            r"\let",
-            r"\csname",
-            r"\endcsname",
-            r"\loop",
-            r"\repeat",
-            r"\directlua",
-            r"\openin",
-            r"\afterassignment",
-            r"\expandafter",
-            r"\noexpand",
-            r"\string",
-            r"\meaning",
-            r"\jobname",
-            r"\romannumeral",
-        }
-    )
-
-    def _classify_latex_commands(self, inner: str) -> str:
-        """Classify the LaTeX commands found in a $...$ span.
-
-        Returns:
-            'allowed'  — all commands are on the safe allow-list; pass through.
-            'blocked'  — at least one command is on the block-list; escape the span.
-            'unknown'  — commands present but none blocked, some not on allow-list;
-                         escape the span (fail closed).
-            'none'     — no backslash commands present.
-        """
-        commands = self._LATEX_COMMAND_RE.findall(inner)
-        if not commands:
-            return "none"
-        command_set = frozenset(commands)
-        if command_set & self._BLOCKED_LATEX_COMMANDS:
-            return "blocked"
-        if command_set <= self._ALLOWED_LATEX_COMMANDS:
-            return "allowed"
-        return "unknown"
-
     def _process_explicit_dollar_math(self, text: str) -> str:
-        """Parse explicit $...$ inline-math spans through the math/Z parser.
+        r"""Parse explicit $...$ inline-math spans through the whiteboard parser.
 
         Called before any character-escaping so that ^ and other special chars
         inside $...$ are handled by the math parser, not by the prose escaper.
 
-        Each $content$ span is handled as follows:
+        $...$ is strictly whiteboard notation — the same engine as zed/axdef/schema
+        blocks.  Two error conditions are raised:
 
-        1. Spans containing only allow-listed LaTeX commands (e.g. \\forall,
-           \\Leftrightarrow, \\in) are already-rendered LaTeX and pass through
-           verbatim.  Re-lexing them would mis-parse \\ as the SETMINUS
-           operator (bug 7.E).
+        1. **Backslash in $...$**: raw LaTeX must go through ``LATEX:`` blocks.
+           Any ``\`` inside a span raises ``ValueError``.  Write ``$p <=> q$``
+           (whiteboard) not ``$p \Leftrightarrow q$`` (raw LaTeX).
 
-        2. Spans containing any blocked command (\\input, \\write18, \\def,
-           \\csname, etc.) have their $ delimiters escaped to \\$ so the span
-           is never handed to pdflatex as math.
+        2. **Paragraph construct in $...$**: ``Parser.parse()`` returns a
+           ``Document`` when the content is a Z paragraph (schema, axdef, gendef,
+           given, ``::=``, ``==``).  These cannot be written inline; raise
+           ``ValueError``.
 
-        3. Spans containing unknown commands (not on the allow-list, not
-           blocked) are treated as unsafe and escaped the same way.
-
-        4. Spans with no backslash commands are parsed by Lexer/Parser as a
-           math expression and rendered via generate_expr
-           (with _in_z_paragraph=False so o9→\\semi).  If parsing fails the
-           span is left unchanged.
+        Whiteboard expressions (``Parser.parse()`` returns ``Expr``): rendered via
+        ``generate_expr`` with ``_in_z_paragraph=False`` so ``o9`` → ``\semi``.
+        If parsing fails (``LexerError``/``ParserError``) the span is left unchanged.
 
         Stray $$ sequences and unbalanced $ delimiters are handled by
-        _pre_sanitise_dollars before this method is called.
+        ``_pre_sanitise_dollars`` before this method is called.
         """
         result = text
         # Match balanced $...$ (non-nested, no newlines inside)
@@ -478,40 +320,43 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
             if before.count("$") % 2 == 1:
                 continue
 
-            classification = self._classify_latex_commands(inner)
+            # Strict: any backslash in $...$ is an error.
+            # Raw LaTeX belongs in a LATEX: block, not inside $...$.
+            if "\\" in inner:
+                msg = (
+                    "$...$ is whiteboard-only inline math; "
+                    r"raw LaTeX (\geq, \Leftrightarrow, ...) belongs in a LATEX: block."
+                )
+                raise InlineMathError(msg)
 
-            if classification == "allowed":
-                # Already-rendered LaTeX with only safe commands — pass through
-                # verbatim to avoid re-lexing \\ as SETMINUS (bug 7.E).
-                continue
-
-            if classification in ("blocked", "unknown"):
-                # Dangerous or unrecognised command — escape the entire span
-                # as literal text.  Escape the $ delimiters and also replace
-                # backslashes in the inner content with \textbackslash{} so
-                # that no TeX command survives into the emitted .tex file.
-                safe_inner = inner.replace("\\", r"\textbackslash{}")
-                result = result[:start] + r"\$" + safe_inner + r"\$" + result[end:]
-                continue
-
-            # classification == "none": no LaTeX commands — parse as math
+            # Parse as whiteboard math.
             try:
                 lexer = Lexer(inner)
                 tokens = lexer.tokenize()
                 parser = Parser(tokens)
                 ast = parser.parse()
-                if isinstance(ast, Expr):
-                    # Generate with _in_z_paragraph=False (inline context → \semi)
-                    prev_z = self._in_z_paragraph
-                    self._in_z_paragraph = False
-                    try:
-                        math_latex = self.generate_expr(ast)
-                    finally:
-                        self._in_z_paragraph = prev_z
-                    result = result[:start] + f"${math_latex}$" + result[end:]
             except (LexerError, ParserError):
-                # Not valid math — leave the span unchanged.
-                pass
+                # Not valid whiteboard math — leave the span unchanged.
+                continue
+
+            if isinstance(ast, Expr):
+                # Generate with _in_z_paragraph=False (inline context → \semi)
+                prev_z = self._in_z_paragraph
+                self._in_z_paragraph = False
+                try:
+                    math_latex = self.generate_expr(ast)
+                finally:
+                    self._in_z_paragraph = prev_z
+                result = result[:start] + f"${math_latex}$" + result[end:]
+            else:
+                # Parser returned a Document — user wrote a Z paragraph construct
+                # inline (schema, axdef, gendef, given, ::=, ==).
+                msg = (
+                    "$...$ takes an inline Z expression or predicate; "
+                    "schema/axdef/gendef/given/::=/== is a Z paragraph "
+                    "— use a schema/axdef/zed block, not inline."
+                )
+                raise InlineMathError(msg)
 
         return result
 

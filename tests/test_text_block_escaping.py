@@ -61,11 +61,12 @@ class TestPercentEscape:
         latex = _gen("TEXT: From 10% to 90% is an 80% increase.")
         assert latex.count(r"\%") >= 3
 
-    def test_percent_inside_math_not_escaped(self) -> None:
-        """% inside $...$ is not an LaTeX active character in math mode."""
-        # This is a degenerate case; % has no special meaning in math mode
-        # but we confirm the math span itself is not mangled.
-        latex = _gen(r"TEXT: See $\forall x$ for all x.")
+    def test_percent_in_prose_adjacent_to_math_not_escaped(self) -> None:
+        """% in prose is escaped; a whiteboard $...$ math span is not corrupted."""
+        # The whiteboard $...$ math span must parse and render correctly
+        # while % in the surrounding prose is escaped.
+        latex = _gen("TEXT: 50% coverage; $forall x : N | x > 0$ holds.")
+        assert r"\%" in latex
         assert r"\forall" in latex
 
 
@@ -213,7 +214,7 @@ class TestUnderscoreEscape:
 
     def test_underscore_inside_dollar_math_not_escaped(self) -> None:
         """_ inside $...$ is handled by the math parser, not escaped as \\_ ."""
-        latex = _gen(r"TEXT: The element $x \in S$ is in the set.")
+        latex = _gen("TEXT: The element $x elem S$ is in the set.")
         # The prose escaper must not insert \\_ inside the math span
         assert r"\in" in latex
 
@@ -242,7 +243,7 @@ class TestCombinedEscapes:
 
     def test_math_span_not_corrupted_by_prose_escaping(self) -> None:
         """A $...$ math span adjacent to special chars is not corrupted."""
-        latex = _gen(r"TEXT: The set $\forall x$ has 50% coverage & more.")
+        latex = _gen("TEXT: The set $forall x : N | x > 0$ has 50% coverage & more.")
         assert r"\forall" in latex
         assert r"\%" in latex
         assert r"\&" in latex

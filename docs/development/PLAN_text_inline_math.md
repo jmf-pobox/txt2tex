@@ -50,6 +50,7 @@ existing `TEXT:` block's math *explicit*; it does not change meaning.
 ### Phase 0 — jms consult (semantics)
 
 Confirm before any code:
+
 1. Routing a `$...$` span through the expression parser + generator yields the
    same LaTeX a math block would for the same source.
 2. **Inline context flag.** Inline `$...$` is NOT a Z paragraph, so the codegen
@@ -57,6 +58,24 @@ Confirm before any code:
    check `\power`, spacing). Confirm the correct flag state for the inline path.
 3. Which constructs are legal inline (expressions: yes; paragraph-level
    constructs like `schema`/`axdef`: no) and the error to raise otherwise.
+
+### Phase 0 findings (jms, DONE)
+
+- Inline path must use `_in_z_paragraph = False` — necessary and sufficient.
+  Only 3 generator sites branch on it: `o9`→`\semi` (`expressions.py:281`), and
+  two comprehension line-break sites (`914`, `959-961`) that are unreachable
+  inline (the `$...$` matcher forbids newlines). Current code already sets
+  `False` at `text_pipeline.py:504-510`.
+- The `$...$` path already routes content through the real parser and gates on
+  `isinstance(ast, Expr)`; on the `else` it silently passes the span through.
+  Under strict mode, change that to **raise** (paragraph construct in `$...$`).
+- Legal-inline boundary is `Parser.parse()`'s return type: `Expr` = legal;
+  `Document` (schema/axdef/gendef/given/`::=`/`==`) = raise with a clear message.
+- One entry point: `Parser(tokens).parse()`. Predicates and expressions both
+  return `Expr`; no caller-side disambiguation.
+- Strict `$...$`: delete the allow/block/unknown backslash classification
+  (`text_pipeline.py:483-486`); any backslash in `$...$` → raise.
+- `\power`/`\mu`/`@`/decorations are flag-independent — no inline-specific work.
 
 ### Phase 1 — rmh: parser-backed `$...$` (additive, behind the seam)
 

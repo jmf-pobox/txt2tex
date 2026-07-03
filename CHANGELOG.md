@@ -21,6 +21,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **`$...$` in `TEXT:` is now strict whiteboard inline math** — its content is
+  parsed by the real lexer/parser/generator (the same engine as `zed`/`axdef`
+  blocks) and rendered inline, so `$forall x : X | p.a |-> p.b$` works with no
+  LaTeX knowledge. A backslash command inside `$...$` is now an error (raw LaTeX
+  belongs in a `LATEX:` block), as is a Z paragraph construct
+  (`schema`/`axdef`/`==`/`::=`). Both surface as a clean CLI error, not a
+  traceback. (Phase 1 of the TEXT inline-math refactor; bare-prose auto-detection
+  is unchanged for now.)
+
 - **`** **` solutions now render `\subsection*`** — previously `\section*`.
   This is one heading level smaller. Solutions now nest under sections in
   the table of contents instead of colliding with them.

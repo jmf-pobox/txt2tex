@@ -176,3 +176,42 @@ def test_cli_no_arguments() -> None:
         with pytest.raises(SystemExit) as exc_info:
             main()
         assert exc_info.value.code == 2
+
+
+def test_cli_inline_math_backslash_error_is_clean(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """InlineMathError from $...$ with a backslash surfaces as a single clean error.
+
+    Regression: bare ValueError was uncaught, producing a Python traceback.
+    Now the CLI catches InlineMathError, prints one 'Error: ...' line to stderr,
+    and returns 1 — no traceback.
+    """
+    input_file = tmp_path / "backslash_dollar.txt"
+    input_file.write_text(r"TEXT: The value $n \geq 0$ holds." + "\n")
+    with patch.object(sys, "argv", ["txt2tex", str(input_file), "--tex-only"]):
+        result = main()
+    assert result == 1
+    captured = capsys.readouterr()
+    assert "Error:" in captured.err
+    assert "whiteboard-only inline math" in captured.err
+    assert "Traceback" not in captured.err
+
+
+def test_cli_inline_math_paragraph_construct_error_is_clean(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """InlineMathError from $...$ containing a Z paragraph surfaces cleanly.
+
+    A schema/axdef inside $...$ raises InlineMathError (Z paragraphs are not
+    inline expressions).  The CLI must catch this and print one error line.
+    """
+    input_file = tmp_path / "paragraph_dollar.txt"
+    input_file.write_text("TEXT: $schema S end$\n")
+    with patch.object(sys, "argv", ["txt2tex", str(input_file), "--tex-only"]):
+        result = main()
+    assert result == 1
+    captured = capsys.readouterr()
+    assert "Error:" in captured.err
+    assert "Z paragraph" in captured.err
+    assert "Traceback" not in captured.err

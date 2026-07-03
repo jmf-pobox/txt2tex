@@ -145,16 +145,18 @@ class TestTextKeywordNotRewritten:
         assert "union" in latex
 
     def test_dollar_math_inline_still_works(self) -> None:
-        """$\\exists$ inside TEXT prose still renders as a math glyph."""
+        """Whiteboard $exists ...$ inside TEXT prose renders as a math glyph."""
         _, latex = parse_and_generate(
-            "TEXT: The statement $\\exists x : \\nat | x > 0$ is trivially true."
+            "TEXT: The statement $exists x : N | x > 0$ is trivially true."
         )
-        assert "$\\exists x" in latex or "\\exists" in latex
+        assert r"\exists" in latex
 
     def test_dollar_forall_inline_still_works(self) -> None:
-        """$\\forall$ inside TEXT prose renders as math."""
-        _, latex = parse_and_generate("TEXT: We write $\\forall$ to mean for all.")
-        assert "\\forall" in latex
+        """Whiteboard $forall ...$ inside TEXT prose renders as math."""
+        _, latex = parse_and_generate(
+            "TEXT: We write $forall x : N | x > 0$ to mean for all."
+        )
+        assert r"\forall" in latex
 
 
 # ---------------------------------------------------------------------------

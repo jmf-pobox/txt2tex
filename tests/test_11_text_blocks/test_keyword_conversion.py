@@ -81,15 +81,15 @@ class TestTextBlockKeywordConversion:
         assert "$\\emptyset$" not in latex
 
     def test_dollar_math_still_works(self):
-        """Test that $...$ inline math still converts keywords inside TEXT blocks."""
-        text = "=== Test ===\n\nTEXT: The quantifier $\\exists$ is used here."
+        """Whiteboard $...$ inline math converts operators in TEXT blocks."""
+        text = "=== Test ===\n\nTEXT: $exists x : N | x > 0$ is used here."
         lexer = Lexer(text)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        assert "$\\exists$" in latex
+        assert r"\exists" in latex
 
     def test_multiple_keywords_stay_as_prose(self):
         """Test multiple keywords in same TEXT block stay as English text."""

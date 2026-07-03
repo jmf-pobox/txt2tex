@@ -1,15 +1,27 @@
-"""Regression tests for bug 7.E: backslash LaTeX commands inside $...$ are re-lexed.
+"""Tests for the strict $...$ inline-math model superseding bug 7.E.
 
-When TEXT prose contains ``$p \\Leftrightarrow x > 1$``, the engine previously
-routed the inner content through the math/Z lexer, which parsed \\ as the
-SETMINUS operator and Leftrightarrow as an identifier.
+Bug 7.E (2026-05-21): backslash-prefixed LaTeX commands inside $...$ were
+re-lexed by the whiteboard engine, producing garbled output — a backslash parsed as
+SETMINUS, ``Leftrightarrow`` as an applied identifier.
 
-Required behaviour: backslash-prefixed LaTeX commands inside $...$ in TEXT
-prose are already-rendered LaTeX and must pass through verbatim.
+The original fix (allow-list pass-through) is superseded by the Phase 1 strict
+inline-math model (docs/development/PLAN_text_inline_math.md §Phase 1):
+
+- $...$ in TEXT: prose is whiteboard-only.  The content is routed through the
+  real lexer → parser → generator (no backslash).
+- A backslash inside $...$ raises ``InlineMathError`` with a clear message
+  directing the author to either use whiteboard notation (``$p <=> q$``) or
+  move raw LaTeX to a ``LATEX:`` block.
+
+The garbled-output symptom of bug 7.E can no longer occur because any span
+with a backslash is rejected before parsing.
 """
 
 from __future__ import annotations
 
+import pytest
+
+from txt2tex.codegen.text_pipeline import InlineMathError
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
@@ -27,88 +39,94 @@ def _gen(source: str) -> str:
     return gen.generate_document(doc)
 
 
-class TestBackslashCommandsInDollarMath:
-    """Bug 7.E: \\cmd inside $...$ in TEXT prose must pass through verbatim."""
+class TestBackslashInDollarMathRaisesError:
+    r"""Bug 7.E superseded: any backslash in $...$ raises ValueError.
 
-    def test_leftrightarrow_passes_through(self) -> None:
-        """$p \\Leftrightarrow x > 1$ emits verbatim, not as setminus + identifier."""
-        latex = _gen(r"TEXT: The formula $p \Leftrightarrow x > 1$ holds.")
-        # The LaTeX command must appear verbatim in the output
-        assert r"\Leftrightarrow" in latex
-        # The broken parse must NOT appear
-        assert r"\setminus" not in latex
-        assert "Leftrightarrow(" not in latex
+    The old behaviour (allow-list pass-through, bug 7.E fix) is replaced by a
+    hard error.  Use whiteboard notation inside $...$:
 
-    def test_rightarrow_passes_through(self) -> None:
-        """$p \\Rightarrow q$ emits verbatim."""
-        latex = _gen(r"TEXT: Note that $p \Rightarrow q$ is an implication.")
-        assert r"\Rightarrow" in latex
-        assert r"\setminus" not in latex
+        $p <=> q$       (not $p \Leftrightarrow q$)
+        $forall x : N | P$  (not $\forall x : N | P$)
+        $x elem S$      (not $x \in S$)
 
-    def test_forall_backslash_passes_through(self) -> None:
-        """$\\forall x$ emits verbatim."""
-        latex = _gen(r"TEXT: The claim $\forall x$ is universal.")
+    Or move raw LaTeX to a LATEX: block.
+    """
+
+    def test_leftrightarrow_raises(self) -> None:
+        r"""$p \Leftrightarrow q$ raises — use $p <=> q$ instead."""
+        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+            _gen(r"TEXT: The formula $p \Leftrightarrow x > 1$ holds.")
+
+    def test_rightarrow_raises(self) -> None:
+        r"""$p \Rightarrow q$ raises — use $p => q$ instead."""
+        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+            _gen(r"TEXT: Note that $p \Rightarrow q$ is an implication.")
+
+    def test_forall_backslash_raises(self) -> None:
+        r"""$\forall x$ raises — use $forall x : T | P$ instead."""
+        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+            _gen(r"TEXT: The claim $\forall x$ is universal.")
+
+    def test_exists_backslash_raises(self) -> None:
+        r"""$\exists x$ raises — use $exists x : T | P$ instead."""
+        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+            _gen(r"TEXT: We have $\exists x$ in the set.")
+
+    def test_land_backslash_raises(self) -> None:
+        r"""$p \land q$ raises — use $p land q$ instead."""
+        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+            _gen(r"TEXT: The conjunction $p \land q$ is true.")
+
+    def test_lor_backslash_raises(self) -> None:
+        r"""$p \lor q$ raises — use $p lor q$ instead."""
+        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+            _gen(r"TEXT: The disjunction $p \lor q$ is false.")
+
+    def test_neg_backslash_raises(self) -> None:
+        r"""$\neg p$ raises — use $lnot p$ instead."""
+        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+            _gen(r"TEXT: Negation $\neg p$ is the complement.")
+
+    def test_in_backslash_raises(self) -> None:
+        r"""$x \in S$ raises — use $x elem S$ instead."""
+        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+            _gen(r"TEXT: We know $x \in S$.")
+
+    def test_multiple_backslash_commands_raise(self) -> None:
+        r"""Multiple \cmd in a single $...$ span raise on the first backslash."""
+        with pytest.raises(InlineMathError, match="whiteboard-only inline math"):
+            _gen(r"TEXT: $\forall x \in S \bullet x > 0$")
+
+
+class TestWhiteboardAlternatives:
+    r"""Whiteboard equivalents of the old backslash constructs parse correctly.
+
+    The authors' workaround from bug 7.E — "use the txt2tex ascii operators
+    inside $...$" — is now the required approach.
+    """
+
+    def test_ascii_biconditional(self) -> None:
+        r"""$p <=> q$ (whiteboard) emits \Leftrightarrow (or \iff in fuzz)."""
+        latex = _gen("TEXT: We have $p <=> q$ as an equivalence.")
+        assert r"\iff" in latex or r"\Leftrightarrow" in latex
+
+    def test_ascii_implication(self) -> None:
+        r"""$p => q$ (whiteboard) emits \implies (fuzz) or \Rightarrow (std)."""
+        latex = _gen("TEXT: We have $p => q$ as an implication.")
+        assert r"\implies" in latex or r"\Rightarrow" in latex
+
+    def test_ascii_forall(self) -> None:
+        r"""$forall x : N | x > 0$ (whiteboard) emits \forall."""
+        latex = _gen("TEXT: The claim $forall x : N | x > 0$ holds.")
         assert r"\forall" in latex
-        assert r"\setminus" not in latex
 
-    def test_exists_backslash_passes_through(self) -> None:
-        """$\\exists x$ emits verbatim."""
-        latex = _gen(r"TEXT: We have $\exists x$ in the set.")
-        assert r"\exists" in latex
-        assert r"\setminus" not in latex
-
-    def test_land_backslash_passes_through(self) -> None:
-        """$p \\land q$ emits verbatim."""
-        latex = _gen(r"TEXT: The conjunction $p \land q$ is true.")
-        assert r"\land" in latex
-        assert r"\setminus" not in latex
-
-    def test_lor_backslash_passes_through(self) -> None:
-        """$p \\lor q$ emits verbatim."""
-        latex = _gen(r"TEXT: The disjunction $p \lor q$ is false.")
-        assert r"\lor" in latex
-        assert r"\setminus" not in latex
-
-    def test_neg_backslash_passes_through(self) -> None:
-        """$\\neg p$ emits verbatim."""
-        latex = _gen(r"TEXT: Negation $\neg p$ is the complement.")
-        assert r"\neg" in latex
-        assert r"\setminus" not in latex
-
-    def test_in_backslash_passes_through(self) -> None:
-        """$x \\in S$ emits verbatim."""
-        latex = _gen(r"TEXT: We know $x \in S$.")
+    def test_ascii_elem(self) -> None:
+        r"""$x elem S$ (whiteboard) emits \in."""
+        latex = _gen("TEXT: We know $x elem S$.")
         assert r"\in" in latex
-        assert r"\setminus" not in latex
 
-    def test_mixed_ascii_and_backslash_commands(self) -> None:
-        """Mixed: txt2tex ascii syntax and backslash commands coexist."""
-        # txt2tex syntax (no backslash): should be translated to some biconditional
-        # In fuzz mode <=> → \iff; in standard LaTeX mode → \Leftrightarrow
-        latex_ascii = _gen("TEXT: We have $p <=> q$ as an equivalence.")
-        assert r"\iff" in latex_ascii or r"\Leftrightarrow" in latex_ascii
-
-        # LaTeX backslash command: should pass through verbatim
-        latex_bs = _gen(r"TEXT: We have $p \Leftrightarrow q$ as an equivalence.")
-        assert r"\Leftrightarrow" in latex_bs
-
-    def test_surrounding_prose_is_preserved(self) -> None:
-        """Prose outside $...$ is not affected by the fix."""
-        latex = _gen(r"TEXT: The formula $p \Leftrightarrow q$ is important here.")
+    def test_prose_preserved_around_whiteboard_span(self) -> None:
+        """Prose outside $...$ is not affected."""
+        latex = _gen("TEXT: The formula $p <=> q$ is important here.")
         assert "The formula" in latex
         assert "is important here" in latex
-
-    def test_no_setminus_corruption(self) -> None:
-        """The primary corruption symptom — setminus + identifier — is absent."""
-        latex = _gen(r"TEXT: $p \Leftrightarrow x > 1$")
-        # setminus should not appear (it is not a valid inline operator here)
-        assert r"\setminus" not in latex
-        # The identifier must not appear as a function call
-        assert "Leftrightarrow(" not in latex
-
-    def test_multiple_backslash_commands_in_span(self) -> None:
-        """Multiple \\cmd in a single $...$ span all pass through."""
-        latex = _gen(r"TEXT: $\forall x \in S \bullet x > 0$")
-        assert r"\forall" in latex
-        assert r"\in" in latex
-        assert r"\setminus" not in latex
