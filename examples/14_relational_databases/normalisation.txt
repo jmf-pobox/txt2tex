@@ -34,12 +34,12 @@ TEXT: We identify the following functional dependencies (FDs).
 
 TEXT: Full-key dependency (no issue):
 
-TEXT:   $empID, projID -> empName, dept, deptHead, projName$
+TEXT:   empID, projID $->$ empName, dept, deptHead, projName
 
 TEXT: Partial dependencies -- empName, dept, and deptHead depend on empID
 TEXT: alone; projName depends on projID alone.  These violate 2NF.
 
-TEXT:   $empID -> empName, dept, deptHead$
+TEXT:   empID $->$ empName, dept, deptHead
 TEXT:   $projID -> projName$
 
 TEXT: Transitive dependency -- deptHead is determined by dept, not directly

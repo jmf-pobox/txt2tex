@@ -79,7 +79,7 @@ TEXT: This creates a set of sets of tuples. For each $x < 3$, we create the set 
 
 TEXT: Standard Z notation supports bullet in quantifiers to separate constraints from body:
 
-TEXT: PROPOSED: $forall x : N | x > 0$. $x >= 0$
+TEXT: PROPOSED: $forall x : N | x > 0 . x >= 0$
 
 TEXT: This would read: "for all positive x, x is non-negative". The constraint $x > 0$ restricts the quantification domain.
 
