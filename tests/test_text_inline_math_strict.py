@@ -102,3 +102,23 @@ class TestParagraphConstructError:
         """$schema S end$ raises InlineMathError — Z paragraphs not allowed inline."""
         with pytest.raises(InlineMathError, match="Z paragraph"):
             _gen("TEXT: $schema S end$")
+
+
+class TestEmptyInlineMath:
+    """A whitespace/empty $...$ span is left unchanged, not an error.
+
+    An empty or whitespace-only span parses to an empty Document (no items),
+    which is NOT a Z paragraph construct and must not raise the paragraph
+    error — it is left in place like a parse failure (Bugbot #78).
+    """
+
+    def test_whitespace_span_does_not_raise(self) -> None:
+        """$ $ (whitespace only) does not raise InlineMathError."""
+        latex = _gen("TEXT: A degenerate $ $ span here.")
+        assert "span here" in latex
+
+    def test_whitespace_span_left_unchanged(self) -> None:
+        """The whitespace span is emitted unchanged (no paragraph error)."""
+        # Must not raise; the sentence renders around the untouched span.
+        latex = _gen("TEXT: Text $  $ more.")
+        assert "more" in latex

@@ -348,9 +348,14 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
                 finally:
                     self._in_z_paragraph = prev_z
                 result = result[:start] + f"${math_latex}$" + result[end:]
+            elif not ast.items:
+                # Empty/whitespace/comment-only span (parse produced a Document
+                # with no items) — not a paragraph construct; leave it unchanged,
+                # like a parse failure.
+                continue
             else:
-                # Parser returned a Document — user wrote a Z paragraph construct
-                # inline (schema, axdef, gendef, given, ::=, ==).
+                # Parser returned a non-empty Document — user wrote a Z paragraph
+                # construct inline (schema, axdef, gendef, given, ::=, ==).
                 msg = (
                     "$...$ takes an inline Z expression or predicate; "
                     "schema/axdef/gendef/given/::=/== is a Z paragraph "
