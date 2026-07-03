@@ -71,6 +71,16 @@ class TestSetDifferenceInlineMath:
         latex = _gen("TEXT: The result $S \\ T$ is non-empty.")
         assert r"\setminus" in latex
 
+    def test_compact_set_difference_rejected_with_hint(self) -> None:
+        r"""$A\B$ (no space) is rejected — indistinguishable from a raw command.
+
+        Compact ``A\B`` matches the raw-LaTeX guard (``\B``), so it must be
+        written spaced (``$A \ B$``). The error message says how, so the
+        rejection is actionable rather than a silent misparse.
+        """
+        with pytest.raises(InlineMathError, match=r"set difference write"):
+            _gen(r"TEXT: The compact $A\B$ form.")
+
 
 class TestStrictBackslashError:
     r"""Raw LaTeX commands (\cmd) in $...$ raise InlineMathError.

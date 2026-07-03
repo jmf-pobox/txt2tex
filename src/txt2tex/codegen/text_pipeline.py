@@ -342,27 +342,24 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
             actual_line = base_line + before.count("\n")
             span = f"${_sanitise_span_for_error(inner)}$"
 
-            # Strict: raw LaTeX commands (\cmd) in $...$ are an error.
-            # The whiteboard set-difference operator is written "A \ B" (space
-            # after the backslash), so re.search(r"\\[A-Za-z]", inner) never
-            # matches it.  Raw LaTeX commands (\geq, \forall, \input, …) place
-            # a letter immediately after the backslash and always match.
+            # Strict: a raw LaTeX command (backslash + letter, e.g. \geq,
+            # \forall, \input) in $...$ is an error.  This runs BEFORE parsing so
+            # that a raw comparison like "$n \geq 0$" gives a clear error, rather
+            # than silently parsing as "n \setminus geq(0)".  Trade-off: the
+            # whiteboard set-difference operator must be written with a space
+            # ("A \ B"); compact "A\B" is indistinguishable from a raw command
+            # here, so it is rejected — the message says how to write it.
+            # Control symbols (\%, \_, \\, ...) do not match and are inert in
+            # math mode (Phase 1 security review).
             if re.search(r"\\[A-Za-z]", inner):
                 msg = (
                     f"line {actual_line}: {span} — "
                     "$...$ takes whiteboard notation only "
                     r"(e.g. $n >= 0$, $forall x : N | P$); "
-                    r"raw LaTeX (\geq, \Leftrightarrow) belongs in a LATEX: block."
+                    r"raw LaTeX (\geq, \Leftrightarrow) belongs in a LATEX: block. "
+                    r"For set difference write $A \ B$ (with a space)."
                 )
                 raise InlineMathError(msg)
-
-            # Control *symbols* (backslash + non-letter: \\, \_, \%, \#, \&, ...)
-            # pass the check above. They are inert in math mode — none execute
-            # code (confirmed in the Phase 1 security review); at worst a benign
-            # render. If the whiteboard parse below fails, such a span is left
-            # literal by the fallback. Making the fallback itself strict (raise
-            # on any residual backslash) is a deliberate later-phase decision,
-            # tied to how bare operators (`$|->$`, `$\ $`) should behave.
 
             # Parse as whiteboard math.
             try:
