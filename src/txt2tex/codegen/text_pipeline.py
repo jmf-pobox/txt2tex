@@ -78,6 +78,38 @@ _BARE_SYMBOL: Final[dict[str, str]] = {
     "emptyset": r"\emptyset",
     "dom": r"\dom",
     "ran": r"\ran",
+    # Unicode math symbols (lone references in prose)
+    "∈": r"\in",
+    "∉": r"\notin",
+    "⊆": r"\subseteq",
+    "⊂": r"\subset",
+    "⊇": r"\supseteq",
+    "⊃": r"\supset",
+    "∪": r"\cup",  # noqa: RUF001
+    "∩": r"\cap",
+    "≤": r"\leq",
+    "≥": r"\geq",
+    "≠": r"\neq",
+    "→": r"\rightarrow",
+    "←": r"\leftarrow",
+    "↔": r"\leftrightarrow",
+    "↾": r"\filter",
+    "⊎": r"\uplus",
+    "⌢": r"\cat",
+    "ℕ": r"\nat",  # noqa: RUF001
+    "ℤ": r"\num",  # noqa: RUF001
+    "×": r"\cross",  # noqa: RUF001
+    "∀": r"\forall",
+    "∃": r"\exists",
+    "∅": r"\emptyset",
+    "μ": r"\mu",
+    "λ": r"\lambda",
+    "∧": r"\land",
+    "∨": r"\lor",  # noqa: RUF001
+    "¬": r"\lnot",
+    "⇒": r"\Rightarrow",
+    "⇔": r"\Leftrightarrow",
+    "⊢": r"\vdash",
 }
 
 

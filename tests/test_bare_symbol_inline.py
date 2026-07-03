@@ -172,3 +172,47 @@ class TestBareSymbolNonInterference:
         r"""$\forall$ (raw LaTeX) still raises; only "forall" (no backslash) maps."""
         with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: A lone $\forall$ symbol appears.")
+
+
+class TestUnicodeBareSymbol:
+    """Unicode math symbols in $...$ emit their fuzz LaTeX macros."""
+
+    def test_subset(self) -> None:
+        r"""$⊂$ emits $\subset$."""
+        latex = _gen("TEXT: The strict inclusion $⊂$ symbol.")
+        assert r"$\subset$" in latex
+
+    def test_subseteq(self) -> None:
+        r"""$⊆$ emits $\subseteq$."""
+        latex = _gen("TEXT: The inclusion $⊆$ symbol.")
+        assert r"$\subseteq$" in latex
+
+    def test_rightarrow(self) -> None:
+        r"""$→$ emits $\rightarrow$."""
+        latex = _gen("TEXT: The arrow $→$ symbol.")
+        assert r"$\rightarrow$" in latex
+
+    def test_in(self) -> None:
+        r"""$∈$ emits $\in$."""
+        latex = _gen("TEXT: The membership $∈$ symbol.")
+        assert r"$\in$" in latex
+
+    def test_geq(self) -> None:
+        r"""$≥$ emits $\geq$."""
+        latex = _gen("TEXT: The ordering $≥$ symbol.")
+        assert r"$\geq$" in latex
+
+    def test_filter(self) -> None:
+        r"""$↾$ emits $\filter$."""
+        latex = _gen("TEXT: The filter $↾$ symbol.")
+        assert r"$\filter$" in latex
+
+    def test_uplus(self) -> None:
+        r"""$⊎$ emits $\uplus$."""
+        latex = _gen("TEXT: The disjoint union $⊎$ symbol.")
+        assert r"$\uplus$" in latex
+
+    def test_nat(self) -> None:
+        r"""$ℕ$ emits $\nat$."""  # noqa: RUF002
+        latex = _gen("TEXT: The naturals $ℕ$ set.")  # noqa: RUF001
+        assert r"$\nat$" in latex
