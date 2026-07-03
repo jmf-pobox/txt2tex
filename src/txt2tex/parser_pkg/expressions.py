@@ -2380,8 +2380,19 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                     # (not ambiguous with separator)
 
                     # Safe followers that indicate this is field projection,
-                    # not separator
+                    # not separator.
+                    #
+                    # Z RM §3.16: selection (`.field`) binds TIGHTER than every
+                    # infix operator.  `p.a |-> q.b` must parse as
+                    # `(p.a) |-> (q.b)`.  Consequently, any infix operator that
+                    # can follow a postfix expression is a safe follower.
+                    #
+                    # The three genuine separator cases (bullet in comprehension
+                    # body, chained projection in comprehension body, spaced dot
+                    # before a quantifier variable) are caught by the earlier
+                    # break guards above and never reach this check.
                     safe_followers = (
+                        # Grouping / punctuation
                         TokenType.PERIOD,  # .field.other (chained)
                         TokenType.LPAREN,  # .field(x)
                         TokenType.RPAREN,  # .field)
@@ -2390,25 +2401,70 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                         TokenType.RANGLE,  # .field>
                         TokenType.COMMA,  # .field,
                         TokenType.SEMICOLON,  # .field;
+                        TokenType.RBIND,  # .field |} (inside binding {| ... |})
+                        TokenType.EOF,  # .field (standalone)
+                        TokenType.NEWLINE,  # .field\n (end of line)
+                        # Comparison operators
                         TokenType.EQUALS,  # .field =
                         TokenType.NOT_EQUAL,  # .field !=
-                        TokenType.IN,  # .field in
-                        TokenType.NOTIN,  # .field notin
-                        TokenType.SUBSET,  # .field subset
-                        TokenType.PSUBSET,  # .field psubset
                         TokenType.LESS_THAN,  # .field <
                         TokenType.GREATER_THAN,  # .field >
                         TokenType.LESS_EQUAL,  # .field <=
                         TokenType.GREATER_EQUAL,  # .field >=
+                        # Set membership / subset
+                        TokenType.IN,  # .field in / elem
+                        TokenType.NOTIN,  # .field notin
+                        TokenType.SUBSET,  # .field subset
+                        TokenType.PSUBSET,  # .field psubset
+                        # Propositional connectives
                         TokenType.IMPLIES,  # .field =>
                         TokenType.IFF,  # .field <=>
-                        TokenType.AND,  # .field and
-                        TokenType.OR,  # .field or
+                        TokenType.AND,  # .field land
+                        TokenType.OR,  # .field lor
+                        # Arithmetic
                         TokenType.PLUS,  # .field +
                         TokenType.MINUS,  # .field -
-                        TokenType.RBIND,  # .field |} (inside binding {| ... |})
-                        TokenType.EOF,  # .field (standalone)
-                        TokenType.NEWLINE,  # .field\n (end of line)
+                        TokenType.STAR,  # .field *
+                        TokenType.MOD,  # .field mod
+                        TokenType.DIV,  # .field div
+                        # Set / relation operators (Z RM §3.16: selection
+                        # binds tighter than all of these)
+                        TokenType.UNION,  # .field union
+                        TokenType.INTERSECT,  # .field intersect
+                        TokenType.SETMINUS,  # .field setminus
+                        TokenType.CROSS,  # .field cross
+                        TokenType.OVERRIDE,  # .field ++
+                        TokenType.MAPLET,  # .field |->
+                        TokenType.RELATION,  # .field <->
+                        TokenType.DRES,  # .field <|
+                        TokenType.RRES,  # .field |>
+                        TokenType.NDRES,  # .field <<|
+                        TokenType.NRRES,  # .field |>>
+                        TokenType.COMP,  # .field comp
+                        TokenType.CIRC,  # .field o9
+                        TokenType.RANGE,  # .field ..
+                        # Sequence / bag operators
+                        TokenType.CAT,  # .field ⌢ (concatenation)
+                        TokenType.BAG_UNION,  # .field ⊎
+                        TokenType.BAG_DIFF,  # .field bag_diff
+                        # Relational-algebra operators
+                        TokenType.JOIN,  # .field join
+                        # Function-type arrows (appear in type expressions)
+                        TokenType.TFUN,  # .field ->
+                        TokenType.PFUN,  # .field +->
+                        TokenType.TINJ,  # .field >->
+                        TokenType.PINJ,  # .field >+>
+                        TokenType.PINJ_ALT,  # .field -|>
+                        TokenType.TSURJ,  # .field -->>
+                        TokenType.PSURJ,  # .field +->>
+                        TokenType.BIJECTION,  # .field >->>
+                        TokenType.FINFUN,  # .field 77->
+                        # Schema-calculus operators
+                        TokenType.PIPE_PIPE,  # .field >> (schema piping)
+                        TokenType.HIDE,  # .field hide
+                        TokenType.PROJECT,  # .field project
+                        # Relational image
+                        TokenType.LIMG,  # .field (|
                     )
 
                     if token_after_id.type in safe_followers:
