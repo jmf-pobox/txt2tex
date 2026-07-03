@@ -20,7 +20,10 @@ def test_compile_pdf_non_utf8_stdout(tmp_path: Path) -> None:
     # Stub executable: writes a raw latin-1 byte (0xa7, §) and exits 0.
     # This simulates latexmk echoing the source file's non-UTF-8 content.
     stub = tmp_path / "latexmk"
-    stub.write_text("#!/bin/sh\nprintf '\\xa7\\n'\nexit 0\n")
+    # Emit a raw 0xa7 (§, latin-1) byte. Use a POSIX octal escape (\247) —
+    # printf's \xHH hex escape is not portable (dash's printf lacks it),
+    # whereas \ddd octal is required by POSIX and works in every /bin/sh.
+    stub.write_text("#!/bin/sh\nprintf '\\247\\n'\nexit 0\n")
     stub.chmod(stub.stat().st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
 
     # Minimal .tex file — content doesn't matter; the stub exits 0.
