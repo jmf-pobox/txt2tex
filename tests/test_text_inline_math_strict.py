@@ -114,7 +114,7 @@ class TestStrictBackslashError:
             _gen(r"TEXT: The biconditional $p \Leftrightarrow q$ holds.")
 
     def test_bare_backslash_forall_raises(self) -> None:
-        r"""A lone $\forall$ (no operand) raises — distinct from the $\forall x$ case."""
+        r"""A lone $\forall$ (no operand) raises — a distinct variant."""
         with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: A lone $\forall$ symbol appears.")
 
