@@ -217,22 +217,33 @@ class TestEmptyInlineMath:
         assert "more" in latex
 
 
-class TestCoalescedBlockLineNumber:
-    """A bad span on a later line of a COALESCED TEXT block reports its own line.
+class TestBlockLineNumber:
+    """Line numbers are exact for separated blocks; coalesced blocks approximate.
 
-    Adjacent TEXT: lines (no blank line between) coalesce into one Paragraph.
-    The coalesced text is joined with newlines (parser_pkg/text_blocks.py), so
-    the per-line arithmetic (base line + newlines-before-match) stays exact
-    (Bugbot #78). LaTeX collapses the joining newline to a space, so rendering
-    is unchanged.
+    Adjacent TEXT: lines (no blank line between) coalesce into one Paragraph,
+    joined with a space (required by the Phase 1 bare-prose heuristics, which
+    assume ". " sentence boundaries). So a coalesced block's error reports the
+    block's FIRST line — a documented Phase-1 approximation. Single and
+    blank-separated blocks are exact. Phase 2 removes the heuristics and makes
+    coalesced line numbers exact.
     """
 
-    def test_span_on_second_coalesced_line_reports_that_line(self) -> None:
-        """A $\\geq$ on the 2nd of two coalesced TEXT: lines reports line 4."""
-        # _gen prepends "=== Test ===\n\n" (lines 1-2); the two TEXT: lines are
-        # 3 and 4 and coalesce; the bad span sits on line 4.
+    def test_separated_block_reports_exact_line(self) -> None:
+        r"""A blank-separated TEXT block reports the span's exact line."""
+        # _gen prepends "=== Test ===\n\n" (lines 1-2); blank-separated blocks
+        # are at lines 3 and 5; the bad span sits on line 5.
+        with pytest.raises(InlineMathError) as exc_info:
+            _gen("TEXT: first block.\n\nTEXT: second has $\\geq$ x.")
+        assert "line 5:" in str(exc_info.value)
+
+    def test_coalesced_block_reports_block_first_line(self) -> None:
+        r"""A span on a coalesced block reports the block's first line.
+
+        Documented Phase-1 approximation (space-join for heuristic
+        compatibility); exact coalesced line numbers land in Phase 2.
+        """
         with pytest.raises(InlineMathError) as exc_info:
             _gen("TEXT: first line here.\nTEXT: second has $\\geq$ x.")
-        msg = str(exc_info.value)
-        assert "line 4:" in msg
-        assert "line 3:" not in msg
+        # Both TEXT: lines coalesce; the block starts at line 3, so the span
+        # reports line 3 (the exact line is 4 — see class docstring).
+        assert "line 3:" in str(exc_info.value)
