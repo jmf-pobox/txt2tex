@@ -1082,6 +1082,20 @@ Both type-check in fuzz. The current code follows the same `_generate_quantifier
 - The `is_bullet_indicator` deletion removes 45 lines and one category of parser state. `_parse_postfix` is now simpler and more regular.
 - Known limitation: multi-decl lambda without a pipe-predicate (e.g., `lambda s : Ship; c : Class . (s, c)`) is not yet supported. See `MISSING_FEATURES.md`.
 
+### ADR: field selection as an operand of every infix operator
+
+**Context**: The `safe_followers` set in `_parse_postfix` gated whether a tight `.field` was parsed as a projection: the projection was consumed only when the token *after* the field name was in `safe_followers`. The set listed `=`, `+`, `-`, the comparisons, and the connectives, but omitted the set/relation/product operators (`union`, `intersect`, `setminus`, `cross`, `*`, `++`, the maplet `|->`, `<->`, the domain/range restrictions `<|`/`|>`/`<<|`/`|>>`, `o9`, `comp`, `join`, `div`). So `p.a |-> q.b` failed to parse — the `.` was left unconsumed — while `p.a = q.b` and `x |-> y` parsed. Reported via a real Z model summing `paymentId |-> amount` maplets.
+
+**Z rule (jms)**: selection binds tighter than every infix operator (Z RM §3.16; Chapter 6 grammar places selection in the maximal-binding tier). `p.a |-> q.b` must parse as `(p.a) |-> (q.b)`. A maplet `a |-> b` is definitionally the pair `(a, b)`, so a set of `p.a |-> p.b` maplets has the same type as the pair form `(p.a, p.b)`.
+
+**Decision (two-tier)**: a **tight** dot (no whitespace between the dot and the field identifier) is *always* a field projection — it bypasses the `safe_followers` whitelist entirely, per jms's rule that a tight `.field` is unconditionally selection (Z RM §3.16). A **spaced** dot `. field` may still be a bullet separator, so it consults `safe_followers`, which is extended to every infix/postfix operator that can follow a selection (`shows`, `filter`, the postfix `^`/`~`, the set/relation/product operators, function-type arrows, sequence/bag operators). The genuine separator cases — the spaced comprehension/quantifier bullet, and a chained projection inside a comprehension body — are caught by `break` guards *earlier* in `_parse_postfix` and never reach this check.
+
+The tight-dot bypass is what actually eliminates the bug class: every real-world selection (`p.paymentId |-> p.amount`, `p.a filter s`, `p.a^2`) uses a tight dot and no longer depends on the operator being enumerated. This is jms's preferred inversion, scoped to tight dots so the delicate spaced-dot / comprehension-body paths are untouched. The extended whitelist is a belt-and-suspenders guard for the rare spaced-dot case.
+
+**Rejected alternative**: extend the whitelist *only* (keep gating tight dots on it too). Lower-diff, but it must be re-synchronised whenever a new infix operator is added to the lexer — Copilot's review of the first attempt caught three operators (`shows`, `filter`, postfix `^`/`~`) the whitelist still missed, demonstrating the fragility. The tight-dot bypass removes that maintenance burden for the cases that matter. (Note: `UNDERSCORE` is never emitted by the lexer — `a_1` lexes as a single identifier — so no `Subscript` handling is needed.)
+
+**Consequences**: `tests/test_selection_operand.py` covers the operator × selection-operand matrix across comprehension, axdef, and set-display contexts, the postfix operators after a selection, the end-to-end `sum(...)` fuzz round-trip, and the spaced-bullet carve-out. Known limitation (unchanged): a chained selection `a.b.c |-> d` inside a comprehension body still needs explicit parentheses.
+
 ## Supported Features
 
 txt2tex is feature-complete for typical Z specifications. See [MISSING_FEATURES.md](guides/MISSING_FEATURES.md) for advanced operators not yet implemented.

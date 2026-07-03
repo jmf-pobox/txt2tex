@@ -2379,9 +2379,30 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                     # Only parse if followed by safe token
                     # (not ambiguous with separator)
 
-                    # Safe followers that indicate this is field projection,
-                    # not separator
+                    # Decide whether to parse `.field` as named-field projection.
+                    #
+                    # Primary rule (Z RM §3.16): a TIGHT dot (no whitespace
+                    # between the dot and the following identifier) is ALWAYS
+                    # field selection, regardless of what follows the field name.
+                    # `p.a |-> q.b` == `(p.a) |-> (q.b)`.
+                    #
+                    # Secondary rule: a SPACED dot `. field` might be a bullet
+                    # separator.  The three genuine separator cases (spaced dot
+                    # in comprehension body before `}`, double-projection chain
+                    # in comprehension body, spaced dot before a quantifier
+                    # variable) are caught by the earlier break guards and never
+                    # reach this point.  For any remaining spaced-dot case the
+                    # token following the field name must be in `safe_followers`
+                    # to confirm the dot is selection and not a separator we
+                    # have not anticipated.
+                    #
+                    # This two-tier design eliminates the class of
+                    # "operator missing from the whitelist" bugs for tight dots —
+                    # which is every real-world case — while keeping the spaced-
+                    # dot whitelist as a belt-and-suspenders guard for unusual
+                    # tokens in unusual contexts.
                     safe_followers = (
+                        # Grouping / punctuation
                         TokenType.PERIOD,  # .field.other (chained)
                         TokenType.LPAREN,  # .field(x)
                         TokenType.RPAREN,  # .field)
@@ -2390,29 +2411,84 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                         TokenType.RANGLE,  # .field>
                         TokenType.COMMA,  # .field,
                         TokenType.SEMICOLON,  # .field;
+                        TokenType.RBIND,  # .field |} (inside binding {| ... |})
+                        TokenType.EOF,  # .field (standalone)
+                        TokenType.NEWLINE,  # .field\n (end of line)
+                        # Postfix operators that may follow a projection
+                        TokenType.CARET,  # .field^n (superscript)
+                        TokenType.UNDERSCORE,  # .field_n (subscript)
+                        TokenType.TILDE,  # .field~ (relational inverse)
+                        # Comparison / judgment operators
                         TokenType.EQUALS,  # .field =
                         TokenType.NOT_EQUAL,  # .field !=
-                        TokenType.IN,  # .field in
-                        TokenType.NOTIN,  # .field notin
-                        TokenType.SUBSET,  # .field subset
-                        TokenType.PSUBSET,  # .field psubset
                         TokenType.LESS_THAN,  # .field <
                         TokenType.GREATER_THAN,  # .field >
                         TokenType.LESS_EQUAL,  # .field <=
                         TokenType.GREATER_EQUAL,  # .field >=
+                        TokenType.SHOWS,  # .field shows (sequent ⊢)
+                        # Set membership / subset
+                        TokenType.IN,  # .field in / elem
+                        TokenType.NOTIN,  # .field notin
+                        TokenType.SUBSET,  # .field subset
+                        TokenType.PSUBSET,  # .field psubset
+                        # Propositional connectives
                         TokenType.IMPLIES,  # .field =>
                         TokenType.IFF,  # .field <=>
-                        TokenType.AND,  # .field and
-                        TokenType.OR,  # .field or
+                        TokenType.AND,  # .field land
+                        TokenType.OR,  # .field lor
+                        # Arithmetic
                         TokenType.PLUS,  # .field +
                         TokenType.MINUS,  # .field -
-                        TokenType.RBIND,  # .field |} (inside binding {| ... |})
-                        TokenType.EOF,  # .field (standalone)
-                        TokenType.NEWLINE,  # .field\n (end of line)
+                        TokenType.STAR,  # .field *
+                        TokenType.MOD,  # .field mod
+                        TokenType.DIV,  # .field div
+                        # Set / relation operators (Z RM §3.16: selection
+                        # binds tighter than all of these)
+                        TokenType.UNION,  # .field union
+                        TokenType.INTERSECT,  # .field intersect
+                        TokenType.SETMINUS,  # .field \ (set difference)
+                        TokenType.CROSS,  # .field cross
+                        TokenType.OVERRIDE,  # .field ++
+                        TokenType.MAPLET,  # .field |->
+                        TokenType.RELATION,  # .field <->
+                        TokenType.DRES,  # .field <|
+                        TokenType.RRES,  # .field |>
+                        TokenType.NDRES,  # .field <<|
+                        TokenType.NRRES,  # .field |>>
+                        TokenType.COMP,  # .field comp
+                        TokenType.CIRC,  # .field o9
+                        TokenType.RANGE,  # .field ..
+                        # Sequence / bag operators
+                        TokenType.CAT,  # .field ⌢ (concatenation)
+                        TokenType.FILTER,  # .field ↾ (sequence filter)
+                        TokenType.BAG_UNION,  # .field ⊎
+                        TokenType.BAG_DIFF,  # .field bag_diff
+                        # Relational-algebra operators
+                        TokenType.JOIN,  # .field join
+                        # Function-type arrows (appear in type expressions)
+                        TokenType.TFUN,  # .field ->
+                        TokenType.PFUN,  # .field +->
+                        TokenType.TINJ,  # .field >->
+                        TokenType.PINJ,  # .field >+>
+                        TokenType.PINJ_ALT,  # .field -|>
+                        TokenType.TSURJ,  # .field -->>
+                        TokenType.PSURJ,  # .field +->>
+                        TokenType.BIJECTION,  # .field >->>
+                        TokenType.FINFUN,  # .field 77->
+                        # Schema-calculus operators
+                        TokenType.PIPE_PIPE,  # .field >> (schema piping)
+                        TokenType.HIDE,  # .field hide
+                        TokenType.PROJECT,  # .field project
+                        # Relational image
+                        TokenType.LIMG,  # .field (|
                     )
 
-                    if token_after_id.type in safe_followers:
-                        # Safe context - parse as field projection
+                    if (not self._dot_is_spaced(next_token)) or (
+                        token_after_id.type in safe_followers
+                    ):
+                        # Tight dot: always selection (Z RM §3.16).
+                        # Spaced dot: safe when the follower is a known operator
+                        # or punctuation — confirmed as selection, not separator.
                         period_token = self._advance()  # Consume '.'
                         field_token = self._advance()  # Consume identifier
 
@@ -2423,7 +2499,8 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                             column=period_token.column,
                         )
                     else:
-                        # Not safe - likely a separator, leave PERIOD unparsed
+                        # Spaced dot with unknown follower — leave PERIOD
+                        # unparsed (conservative: treat as separator).
                         break
                 else:
                     # Not projection, leave PERIOD for other uses
