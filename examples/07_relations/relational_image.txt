@@ -19,7 +19,7 @@
 
 ** Phase 11.8: Relational Image **
 
-TEXT: The relational image R(| S |) gives the image of set S under relation R.
+TEXT: The relational image $R(| S |)$ gives the image of set S under relation R.
 
 ** Example 1: Simple relational image **
 

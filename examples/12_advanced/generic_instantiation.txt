@@ -293,11 +293,11 @@ TEXT: 6. Type-check that instantiations make sense
 TEXT: Common instantiation patterns:
 TEXT: - seq[T] for sequences of T
 TEXT: - P[T] for sets of T
-TEXT: - T +-> U for partial functions
-TEXT: - T <-> U for relations
+TEXT: - $T +-> U$ for partial functions
+TEXT: - $T <-> U$ for relations
 TEXT: - bag[T] for multisets of T
 TEXT: - T cross U for pairs
-TEXT: - T -> U for total functions
+TEXT: - $T -> U$ for total functions
 
 ** Example 24: Type Safety **
 
@@ -313,7 +313,7 @@ TEXT: Type checker ensures all elements match the instantiated type.
 
 TEXT: COMPILE ERROR examples:
 TEXT: - seq[N] = ⟨1, 2, 'a'⟩ -- 'a' is not a natural
-TEXT: - P[N] = {1, 2, -1} -- -1 might not be in N depending on N definition
+TEXT: - P[N] = ${1, 2, -1}$ -- -1 might not be in N depending on N definition
 TEXT: - bag[Z] = [[1, "hello"]] -- "hello" is not an integer
 
 TEXT: The type system catches these errors at compile/check time.

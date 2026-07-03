@@ -251,3 +251,132 @@ class TestCombinedEscapes:
         assert r"\forall" in latex
         assert r"\%" in latex
         assert r"\&" in latex
+
+
+# ---------------------------------------------------------------------------
+# \ { } — backslash and curly braces (Phase 2c additions)
+# ---------------------------------------------------------------------------
+
+
+class TestBackslashBraceEscape:
+    r"""\ { } in TEXT prose are escaped to safe glyph forms.
+
+    Backslash:  \  →  \textbackslash{}
+    Open brace: {  →  \{
+    Close brace: }  →  \}
+
+    Characters inside $...$ math spans must not be touched.
+    """
+
+    def test_backslash_in_prose_is_escaped(self) -> None:
+        r"""A bare \ in prose becomes \textbackslash{} in the emitted LaTeX."""
+        latex = _gen(r"TEXT: a \lambda b")
+        assert r"\textbackslash{}" in latex
+        assert "lambda" in latex
+
+    def test_backslash_not_raw_in_prose(self) -> None:
+        r"""No command-like \word appears raw in prose output."""
+        latex = _gen(r"TEXT: The term \alpha is written in prose.")
+        body_start = latex.find(r"\noindent")
+        body = latex[body_start:] if body_start != -1 else latex
+        assert r"\textbackslash{}" in body
+
+    def test_open_brace_in_prose_is_escaped(self) -> None:
+        """A bare { in prose becomes \\{ in the emitted LaTeX."""
+        latex = _gen("TEXT: The set {a, b} is finite.")
+        assert r"\{" in latex
+        assert r"\}" in latex
+
+    def test_close_brace_in_prose_is_escaped(self) -> None:
+        """A bare } in prose becomes \\} in the emitted LaTeX."""
+        latex = _gen("TEXT: The group {x, y} contains two elements.")
+        assert r"\{x, y\}" in latex
+
+    def test_braces_do_not_appear_raw_in_prose(self) -> None:
+        """No unescaped { or } appears in prose output."""
+        latex = _gen("TEXT: Use braces {like this} in text.")
+        body_start = latex.find(r"\noindent")
+        body = latex[body_start:] if body_start != -1 else latex
+        # Strip the escaped forms before checking for raw braces.
+        cleaned = body.replace(r"\{", "").replace(r"\}", "")
+        # Also strip LaTeX commands that contain braces (e.g. \textbackslash{})
+        cleaned = re.sub(r"\\[a-zA-Z]+\{[^}]*\}", "", cleaned)
+        assert "{" not in cleaned
+        assert "}" not in cleaned
+
+    def test_backslash_inside_dollar_math_not_escaped(self) -> None:
+        r"""\ inside a $...$ span is processed by the parser, not prose-escaped."""
+        # The bare-symbol path maps "\" → \setminus inside $...$.
+        latex = _gen(r"TEXT: Set difference $\ $ here.")
+        assert r"\textbackslash{}" not in latex
+        assert r"\setminus" in latex
+
+    def test_brace_inside_dollar_math_not_prose_escaped(self) -> None:
+        """{ } inside a whiteboard $...$ span are not prose-escaped."""
+        latex = _gen("TEXT: The set ${ x : N | x > 0 }$ is non-empty.")
+        # Math braces \{~ ... ~\} come from the parser, not the prose escaper.
+        assert r"\{~" in latex or r"\{" in latex
+
+    def test_backslash_brace_combo_in_prose(self) -> None:
+        r"""Both \ and { } in the same prose line are each escaped."""
+        latex = _gen(r"TEXT: Write \lambda{} as a command.")
+        assert r"\textbackslash{}" in latex
+        assert r"\{" in latex
+        assert r"\}" in latex
+
+
+# ---------------------------------------------------------------------------
+# $ parity bugs — literal \$ skewing the parity guard (#80)
+# ---------------------------------------------------------------------------
+
+
+class TestDollarParityBugs:
+    r"""Regression tests for \$-parity bugs in _pre_sanitise_dollars (#80).
+
+    Bug 1 (compile failure): a line with a literal \$ plus an odd number of
+    real $ nets to even parity, defeating the odd-parity guard.  The lone
+    real $ reaches the .tex raw and pdflatex fails.
+
+    Bug 2 (correctness): when \$ precedes a real $...$, the odd total
+    triggers the escape-all path and the real span is emitted as literal
+    text instead of math.
+    """
+
+    def _noindent_line(self, latex: str) -> str:
+        r"""Return the first \noindent prose line from generated LaTeX."""
+        for line in latex.splitlines():
+            if r"\noindent" in line:
+                return line
+        return ""
+
+    def test_literal_dollar_plus_lone_real_dollar_both_escaped(self) -> None:
+        r"""foo\$bar$baz: both dollars render as \$, no raw $ in prose (Bug 1)."""
+        latex = _gen(r"TEXT: foo\$bar$baz")
+        prose = self._noindent_line(latex)
+        # At least one escaped dollar must appear
+        assert r"\$" in prose
+        # No raw unescaped $ may survive in the prose line
+        cleaned = prose.replace(r"\$", "")
+        assert "$" not in cleaned
+
+    def test_literal_dollar_preserves_adjacent_math_span(self) -> None:
+        r"""price \$5 then $x >= 0$ end: \$ literal AND $x \geq 0$ math (Bug 2)."""
+        latex = _gen(r"TEXT: price \$5 then $x >= 0$ end")
+        prose = self._noindent_line(latex)
+        # Literal \$ must appear in the prose
+        assert r"\$" in prose
+        # The real math span must be rendered as math, not as literal text
+        assert r"\geq" in latex
+
+    def test_balanced_dollar_span_unaffected(self) -> None:
+        r"""value $x >= 0$ here: real $...$ span still renders as math (regression)."""
+        latex = _gen("TEXT: value $x >= 0$ here")
+        assert r"\geq" in latex
+
+    def test_literal_dollar_only_renders_escaped(self) -> None:
+        r"""price is \$10: the literal \$ renders as \$ in prose (regression)."""
+        latex = _gen(r"TEXT: price is \$10")
+        prose = self._noindent_line(latex)
+        assert r"\$" in prose
+        cleaned = prose.replace(r"\$", "")
+        assert "$" not in cleaned

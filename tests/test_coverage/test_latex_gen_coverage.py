@@ -135,12 +135,12 @@ def test_quantifier_without_pipe() -> None:
 
 
 def test_inline_math_parse_failure() -> None:
-    """Test inline math that fails to parse (exception handlers)."""
+    """Bare {not valid syntax} is brace-escaped in escape-only mode."""
     para = Paragraph(text="Consider {not valid syntax} here.", line=1, column=1)
     gen = LaTeXGenerator()
     latex_lines = gen._generate_paragraph(para)
     latex = "\n".join(latex_lines)
-    assert "{not valid syntax}" in latex
+    assert "\\{not valid syntax\\}" in latex
 
 
 def test_latex_gen_use_fuzz_true() -> None:

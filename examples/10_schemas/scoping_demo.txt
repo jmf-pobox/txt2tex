@@ -47,13 +47,13 @@ TEXT: The inner x shadows the outer x. Within the exists quantifier, x refers to
 
 { x : N | x > 0 land x < 10 }
 
-TEXT: x is in scope only within the set comprehension. The constraint x > 0 and x < 10 uses the same x.
+TEXT: x is in scope only within the set comprehension. The constraint $x > 0$ and $x < 10$ uses the same x.
 
 ** Example 5: Bullet Separator Scope **
 
 { x : N | x < 5 . x * x }
 
-TEXT: x is in scope both before and after the bullet. The constraint x < 5 and the term x * x refer to the same x.
+TEXT: x is in scope both before and after the bullet. The constraint $x < 5$ and the term x * x refer to the same x.
 
 ** Example 6: Schema Component Scope **
 
@@ -157,7 +157,7 @@ where
   forall x : N | x > 0 => x >= 0
 end
 
-TEXT: The global x = 10, but the quantifier in the where clause uses a local x that shadows the global x within its scope.
+TEXT: The global $x = 10$, but the quantifier in the where clause uses a local x that shadows the global x within its scope.
 
 ** Example 13: Lambda Scope **
 
@@ -217,8 +217,8 @@ TEXT: Inner x shadows outer x---confusing and error-prone. Avoid this pattern.
 ** Example 21: Scoping elem Definitions **
 
 TEXT: Poor style example (not valid due to name shadowing):
-TEXT: If we had: axdef with square : N -> N and n : N, where forall n : N shadows the global n.
-TEXT: The quantifier's n would be local to the quantifier, and the global n = 5 would be separate.
+TEXT: If we had: axdef with square : $N -> N$ and $n : N$, where $forall n : N$ shadows the global n.
+TEXT: The quantifier's n would be local to the quantifier, and the global $n = 5$ would be separate.
 TEXT: This is legal but confusing. Better to use different names:
 
 axdef

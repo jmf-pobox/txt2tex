@@ -51,7 +51,7 @@ $(\mu x : \nat | x * x = 16 @ x + 1)$
 $(\mu n : \nat | n > 10 \land n < 12 @ 2 * n)$
 
 
-\noindent Finds $n = 11$ (unique n between 10 and 12), then returns 2 * $11 = 22$.
+\noindent Finds $n = 11$ (unique n between 10 and 12), then returns $2 * 11 = 22$.
 
 \bigskip
 
@@ -204,7 +204,7 @@ findRootPlusOne = (\mu x : \nat | x * x = 49 @ x + 1)
 $(\mu x : \nat | x > 5 \land x < 7 @ (x * x) + (x + 1))$
 
 
-\noindent Finds $x = 6$, then evaluates (6 * 6) + (6 + 1) = 36 + $7 = 43$.
+\noindent Finds $x = 6$, then evaluates (6 * 6) + (6 + 1) = $36 + 7 = 43$.
 
 \bigskip
 
@@ -215,7 +215,7 @@ $(\mu x : \nat | x > 5 \land x < 7 @ (x * x) + (x + 1))$
 $(\mu x : \nat | x * x = 16 @ (\mu y : \nat | y * y = (x + 5) @ y + x))$
 
 
-\noindent Finds $x = 4$, then finds y where y² = (4 + 5) = 9, so $y = 3$, then returns 3 + $4 = 7$.
+\noindent Finds $x = 4$, then finds y where y² = (4 + 5) = 9, so $y = 3$, then returns $3 + 4 = 7$.
 
 \bigskip
 
@@ -226,11 +226,11 @@ $(\mu x : \nat | x * x = 16 @ (\mu y : \nat | y * y = (x + 5) @ y + x))$
 
 \bigskip
 
-\noindent Zero solutions: $(\mu x : \nat | x * x = -1)$(no natural number has negative square)
+\noindent Zero solutions: $(\mu x : \nat | x * x = -1)$ (no natural number has negative square)
 
 \bigskip
 
-\noindent Multiple solutions: $(\mu x : \nat | x < 5)$(0, 1, 2, 3, 4 all satisfy this)
+\noindent Multiple solutions: $(\mu x : \nat | x < 5)$ (0, 1, 2, 3, 4 all satisfy this)
 
 \bigskip
 
@@ -241,7 +241,7 @@ $(\mu x : \nat | x * x = 16 @ (\mu y : \nat | y * y = (x + 5) @ y + x))$
 \subsection*{Example 15 : Design Pattern}
 \addcontentsline{toc}{subsection}{Example 15 : Design Pattern}
 
-\noindent The pattern "$(\mu x : T | uniqueness\_constraint)$. expression" is useful when: 1. You need to find a unique value satisfying a constraint 2. You want to transform or compute something based on that value 3. The transformation is more than just returning the value itself
+\noindent The pattern "mu x : T | uniqueness\_constraint . expression" is useful when: 1. You need to find a unique value satisfying a constraint 2. You want to transform or compute something based on that value 3. The transformation is more than just returning the value itself
 
 \bigskip
 

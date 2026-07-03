@@ -91,10 +91,11 @@ class TestTextBlockProseDetection:
         assert "induction" in latex.lower()
 
     def test_valid_type_declaration_still_works(self) -> None:
-        """Ensure valid type declarations still get math mode."""
-        input_text = "TEXT: Consider the function f : N -> N that doubles its input.\n"
+        """Explicit $N -> N$ in TEXT renders \\fun; surrounding prose is kept."""
+        input_text = "TEXT: Consider the function type $N -> N$ that doubles.\n"
         latex = generate_latex(input_text)
-        assert "$" in latex
+        assert "\\fun" in latex
+        assert "doubles" in latex
 
 
 class TestJustificationOperatorFormatting:

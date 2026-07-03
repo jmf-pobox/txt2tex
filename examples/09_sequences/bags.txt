@@ -40,7 +40,7 @@ TEXT: Bags are written with double square brackets:
 
 TEXT: Unlike sets, bags preserve multiplicity:
 
-TEXT: The bag [[1, 2, 2, 3]] is different from the set {1, 2, 3}
+TEXT: The bag [[1, 2, 2, 3]] is different from the set ${1, 2, 3}$
 
 TEXT: The bag [[a, a, a]] contains three copies of a
 

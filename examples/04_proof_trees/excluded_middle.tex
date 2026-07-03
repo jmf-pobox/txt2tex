@@ -47,14 +47,14 @@ $%
 \end{center}
 \bigskip
 
-\noindent By LEM, we can case-analyze on p $\lor$ $\lnot p$. In both cases we derive q.
+\noindent By LEM, we can case-analyze on $p \lor \lnot p$. In both cases we derive q.
 
 \bigskip
 
 \subsection*{Example 3 : Double Negation Elimination Using LEM}
 \addcontentsline{toc}{subsection}{Example 3 : Double Negation Elimination Using LEM}
 
-\noindent Prove: $\lnot$ $\lnot p \implies p$
+\noindent Prove: $\lnot (\lnot p) \implies p$
 
 \bigskip
 
@@ -76,7 +76,7 @@ $%
 \subsection*{Example 4 : De Morgan's Law Using LEM}
 \addcontentsline{toc}{subsection}{Example 4 : De Morgan's Law Using LEM}
 
-\noindent Prove: $\lnot$ $(p \land q)$ $\Rightarrow$ $(\lnot p \lor \lnot q)$
+\noindent Prove: $\lnot (p \land q) \implies (\lnot p \lor \lnot q)$
 
 \bigskip
 
@@ -98,7 +98,7 @@ $%
 \subsection*{Example 5 : Decidability}
 \addcontentsline{toc}{subsection}{Example 5 : Decidability}
 
-\noindent A proposition is decidable if we can prove p or not p. In logical notation, we would write: decidable(p) means $p(or)(\lnot p)$.
+\noindent A proposition is decidable if we can prove p or not p. In logical notation, we would write: decidable(p) means (p or $\lnot p$).
 
 \bigskip
 
@@ -172,7 +172,7 @@ $%
 \subsection*{Example 8 : Pierce's Law}
 \addcontentsline{toc}{subsection}{Example 8 : Pierce's Law}
 
-\noindent Prove: $((p \implies q) \implies p)$ $\Rightarrow$ p
+\noindent Prove: $((p \implies q) \implies p) \implies p$
 
 \bigskip
 
@@ -263,14 +263,14 @@ $\forall p @ p \lor \lnot (p - -(requires(LEM))) \in general(case)$
 
 \bigskip
 
-\subsection*{Example 13 : LEM land Indirect Proof}
-\addcontentsline{toc}{subsection}{Example 13 : LEM land Indirect Proof}
+\subsection*{Example 13 : LEM and Indirect Proof}
+\addcontentsline{toc}{subsection}{Example 13 : LEM and Indirect Proof}
 
 \noindent Indirect proof pattern using LEM:
 
 \bigskip
 
-\noindent To prove p: 1. Assume not p [assumption 1] 2. Derive false 3. Conclude $\lnot$ $\lnot p$ [$\lnot$ intro from 1] 4. Apply LEM: p $\lor$ $\lnot p$ 5. [case] p p 6. [case] $\lnot p$ contradicts $\lnot$ $\lnot p$, derive p by false elim 7. Conclude p [or elim]
+\noindent To prove p: 1. Assume not p [assumption 1] 2. Derive false 3. Conclude $\lnot (\lnot p)$ [lnot intro from 1] 4. Apply LEM: $p \lor \lnot p$ 5. [case] p p 6. [case] $\lnot p$ contradicts $\lnot (\lnot p)$, derive p by false elim 7. Conclude p [or elim]
 
 \bigskip
 
@@ -305,7 +305,7 @@ $%
 \subsection*{Example 15 : When to Use LEM}
 \addcontentsline{toc}{subsection}{Example 15 : When to Use LEM}
 
-\noindent Use LEM when: 1. You need to prove something by case analysis on an arbitrary proposition 2. You're working in classical logic (not constructive) 3. You need double negation elimination 4. Your proof strategy requires considering both p $\land$ $\lnot p$
+\noindent Use LEM when: 1. You need to prove something by case analysis on an arbitrary proposition 2. You're working in classical logic (not constructive) 3. You need double negation elimination 4. Your proof strategy requires considering both $p \land \lnot p$
 
 \bigskip
 
@@ -316,7 +316,7 @@ $%
 \subsection*{Example 16 : Relationship to Other Principles}
 \addcontentsline{toc}{subsection}{Example 16 : Relationship to Other Principles}
 
-\noindent In classical logic, these are equivalent: - Law of excluded middle: p $\lor$ $\lnot p$ - Double negation elimination: $\lnot$ $\lnot p$ $\Rightarrow$ p - Pierce's law: $((p \implies q) \implies p)$ $\Rightarrow$ p - Reductio ad absurdum: $(\lnot p \implies false)$ $\Rightarrow$ p
+\noindent In classical logic, these are equivalent: - Law of excluded middle: $p \lor \lnot p$ - Double negation elimination: $\lnot (\lnot p) \implies p$ - Pierce's law: $((p \implies q) \implies p) \implies p$ - Reductio ad absurdum: $(\lnot p \implies false) \implies p$
 
 \bigskip
 

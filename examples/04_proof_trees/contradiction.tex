@@ -39,7 +39,7 @@ $%
 \subsection*{Example 2 : Simple Example - Proving q}
 \addcontentsline{toc}{subsection}{Example 2 : Simple Example - Proving q}
 
-\noindent Prove: $(p \land \lnot p)$ $\Rightarrow$ q
+\noindent Prove: $(p \land \lnot p) \implies q$
 
 \bigskip
 
@@ -61,7 +61,7 @@ $%
 \subsection*{Example 3 : Law of Non - Contradiction}
 \addcontentsline{toc}{subsection}{Example 3 : Law of Non - Contradiction}
 
-\noindent Prove that p $\land$ $\lnot p$ leads to a contradiction.
+\noindent Prove that $p \land \lnot p$ leads to a contradiction.
 
 \bigskip
 
@@ -98,7 +98,7 @@ $%
 \end{center}
 \bigskip
 
-\noindent This is the pattern for indirect proof: if assuming $\lnot p$ leads to false, then $\lnot$ not p holds.
+\noindent This is the pattern for indirect proof: if assuming $\lnot p$ leads to false, then $\lnot (\lnot p)$ holds.
 
 \bigskip
 
@@ -149,7 +149,7 @@ $%
 \subsection*{Example 7 : Double Negation Elimination}
 \addcontentsline{toc}{subsection}{Example 7 : Double Negation Elimination}
 
-\noindent Prove: $\lnot$ $\lnot p \implies p(requires(classical)(logic))$
+\noindent Prove: $\lnot (\lnot p) \implies p$ (requires classical logic)
 
 \bigskip
 
@@ -193,15 +193,15 @@ $%
 \subsection*{Example 9 : Contradiction with Universal Quantifier}
 \addcontentsline{toc}{subsection}{Example 9 : Contradiction with Universal Quantifier}
 
-\noindent Prove: ($\forall x @ \power x$) $\land$ $\exists x @ \lnot (\power x)$ is contradictory.
+\noindent Prove: $(\forall x @ p(x)) \land (\exists x @ \lnot ((p(x))))$ is contradictory.
 
 \bigskip
 
 \begin{center}
 \adjustbox{max width=\textwidth}{%
 $\displaystyle
-\infer[\Rightarrow\textrm{-intro}^{[1]}]{((\forall x @ \power x) \land (\exists x @ \lnot (\power x))) \implies false}{
-  \infer[\mbox{contradiction}]{false}{\infer[\forall\textrm{-elim}]{\power a}{\infer[\exists \mbox{elim}, \mbox{fresh a}]{\lnot (\power a)}{\infer[\land\textrm{-elim-2}]{\exists x @ \lnot (\power x)}{\infer[\land\textrm{-elim-1}]{\forall x @ \power x}{\ulcorner (\forall x @ \power x) \land (\exists x @ \lnot (\power x)) \urcorner^{[1]}}}}}}
+\infer[\Rightarrow\textrm{-intro}^{[1]}]{((\forall x @ p(x)) \land (\exists x @ \lnot ((p(x))))) \implies false}{
+  \infer[\mbox{contradiction}]{false}{\infer[\forall\textrm{-elim}]{p(a)}{\infer[\exists \mbox{elim}, \mbox{fresh a}]{\lnot ((p(a)))}{\infer[\land\textrm{-elim-2}]{\exists x @ \lnot ((p(x)))}{\infer[\land\textrm{-elim-1}]{\forall x @ p(x)}{\ulcorner (\forall x @ p(x)) \land (\exists x @ \lnot ((p(x)))) \urcorner^{[1]}}}}}}
 }
 $%
 }
@@ -215,7 +215,7 @@ $%
 \subsection*{Example 10 : Proving Uniqueness by Contradiction}
 \addcontentsline{toc}{subsection}{Example 10 : Proving Uniqueness by Contradiction}
 
-\noindent Prove: if f is injective, then f(x) = f(y) $\Rightarrow$ $x = y$.
+\noindent Prove: if f is injective, then $f(x) = f(y) \implies x = y$.
 
 \bigskip
 
@@ -237,7 +237,7 @@ $%
 \subsection*{Example 11 : Case Analysis Leading to Contradiction}
 \addcontentsline{toc}{subsection}{Example 11 : Case Analysis Leading to Contradiction}
 
-\noindent Prove: p $\lor$ q, $\lnot p$, $\lnot q \implies false$
+\noindent Prove: $p \lor q$, $\lnot p$, $\lnot q$ $=> false$
 
 \bigskip
 

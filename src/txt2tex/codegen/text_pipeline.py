@@ -1,6 +1,6 @@
 """Plain-text to LaTeX conversion pipeline.
 
-This module owns the ~25-helper subsystem that converts user ASCII
+This module owns the escape-and-parse subsystem that converts user ASCII
 text inside ``Paragraph`` (``TEXT:``), ``PureParagraph`` (``PURETEXT:``),
 ``LatexBlock`` (``LATEX:``), and the inline-text portions of
 ``_generate_part`` into LaTeX.  The pipeline is leaf-cohesive: every
@@ -11,26 +11,109 @@ The entry point is :meth:`_process_paragraph_text`; the other public
 helpers (``_escape_latex``, ``_escape_latex_text``) are consumed
 elsewhere in the codegen package.
 
-Method bodies are byte-identical to their counterparts in the
-pre-refactor monolithic ``latex_gen.py``; only their file location has
-changed.
+Inline math is opt-in: wrap expressions in ``$whiteboard-expr$`` to
+render them as LaTeX math.  Bare prose words pass through with only
+LaTeX character escaping applied.
 """
 
 from __future__ import annotations
 
 import re
+from typing import Final
 
-from txt2tex.ast_nodes import (
-    Expr,
-    Identifier,
-    Quantifier,
-    SetComprehension,
-    SetLiteral,
-)
+from txt2tex.ast_nodes import Expr
 from txt2tex.codegen._dispatch import CodegenDispatch
-from txt2tex.constants import PROSE_WORDS
 from txt2tex.lexer import Lexer, LexerError
 from txt2tex.parser import Parser, ParserError
+
+# Bare-symbol lookup table (jms-confirmed against bundled fuzz.sty).
+# A $...$ span whose stripped content matches exactly one key here is emitted
+# as the corresponding LaTeX macro, bypassing the full expression parser.
+# Keys are the raw ASCII whiteboard tokens; values are ready-to-use LaTeX.
+# Ordered by descending key length to aid readability; lookup is by dict key.
+_BARE_SYMBOL: Final[dict[str, str]] = {
+    # Arrow / relation / operator family
+    "77->": r"\ffun",
+    ">->>": r"\bij",
+    "+->>": r"\psurj",
+    "-->>": r"\surj",
+    "|>>": r"\nrres",
+    "<<|": r"\ndres",
+    "|->": r"\mapsto",
+    "<->": r"\rel",
+    "-|>": r"\pinj",
+    ">+>": r"\pinj",
+    ">->": r"\inj",
+    "+->": r"\pfun",
+    "<|": r"\dres",
+    "|>": r"\rres",
+    "->": r"\fun",
+    "++": r"\oplus",
+    "o9": r"\semi",
+    "<=>": r"\Leftrightarrow",
+    "=>": r"\Rightarrow",
+    "<=": r"\leq",
+    ">=": r"\geq",
+    "/=": r"\neq",
+    "\\": r"\setminus",
+    "cat": r"\cat",
+    "filter": r"\filter",
+    # Quantifiers / binders / logical / membership / sets
+    "forall": r"\forall",
+    "exists": r"\exists",
+    "exists1": r"\exists_1",
+    "lambda": r"\lambda",
+    "mu": r"\mu",
+    "land": r"\land",
+    "lor": r"\lor",
+    "lnot": r"\lnot",
+    "elem": r"\in",
+    "notin": r"\notin",
+    "union": r"\cup",
+    "inter": r"\cap",
+    "cross": r"\cross",
+    "power": r"\power",
+    "nat": r"\nat",
+    "num": r"\num",
+    "emptyset": r"\emptyset",
+    "subseteq": r"\subseteq",
+    "subset": r"\subseteq",  # ASCII "subset" maps to \subseteq (matches paren_policy)
+    "psubset": r"\subset",  # strict/proper subset
+    "dom": r"\dom",
+    "ran": r"\ran",
+    # Unicode math symbols (lone references in prose)
+    "∈": r"\in",
+    "∉": r"\notin",
+    "⊆": r"\subseteq",
+    "⊂": r"\subset",
+    "⊇": r"\supseteq",
+    "⊃": r"\supset",
+    "∪": r"\cup",  # noqa: RUF001
+    "∩": r"\cap",
+    "≤": r"\leq",
+    "≥": r"\geq",
+    "≠": r"\neq",
+    "→": r"\rightarrow",
+    "←": r"\leftarrow",
+    "↔": r"\leftrightarrow",
+    "↾": r"\filter",
+    "⊎": r"\uplus",
+    "⌢": r"\cat",
+    "ℕ": r"\nat",  # noqa: RUF001
+    "ℤ": r"\num",  # noqa: RUF001
+    "×": r"\cross",  # noqa: RUF001
+    "∀": r"\forall",
+    "∃": r"\exists",
+    "∅": r"\emptyset",
+    "μ": r"\mu",
+    "λ": r"\lambda",
+    "∧": r"\land",
+    "∨": r"\lor",  # noqa: RUF001
+    "¬": r"\lnot",
+    "⇒": r"\Rightarrow",
+    "⇔": r"\Leftrightarrow",
+    "⊢": r"\vdash",
+}
 
 
 def _sanitise_span_for_error(inner: str) -> str:
@@ -60,28 +143,6 @@ class InlineMathError(Exception):
 
 class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
     """Mixin: plain-text to LaTeX conversion pipeline."""
-
-    def _replace_outside_math(self, text: str, pattern: str, replacement: str) -> str:
-        """Replace pattern with LaTeX command only when NOT inside $...$ math mode."""
-        result: list[str] = []
-        in_math = False
-        i = 0
-
-        while i < len(text):
-            # Check for $ to toggle math mode
-            if text[i] == "$":
-                in_math = not in_math
-                result.append("$")
-                i += 1
-            # Check for pattern match
-            elif not in_math and text[i : i + len(pattern)] == pattern:
-                result.append(f"${replacement}$")
-                i += len(pattern)
-            else:
-                result.append(text[i])
-                i += 1
-
-        return "".join(result)
 
     def _escape_underscores_outside_math(self, text: str) -> str:
         r"""Escape underscores only when NOT inside $...$ math mode or citations.
@@ -133,97 +194,6 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
 
         return "".join(result)
 
-    def _convert_operators_bare(self, text: str) -> str:
-        r"""Convert Z operators to LaTeX commands without wrapping in $...$.
-
-        Used when content will be wrapped in math mode externally.
-        Converts operators like |-> to \mapsto, <-> to \rel, etc.
-
-        CRITICAL: Operators are processed by length (longest first) to avoid
-        partial matches. For example, +-> must be replaced before ->.
-        """
-        # Order matters: longer operators first to avoid partial matches
-        replacements = [
-            # 5-character operators (process first)
-            ("77->", r"\ffun"),  # Finite partial function
-            # 4-character operators
-            (">->>", r"\bij"),  # Bijection
-            ("+->>", r"\psurj"),  # Partial surjection
-            ("-->>", r"\surj"),  # Total surjection
-            # 3-character operators
-            ("<=>", r"\Leftrightarrow"),
-            ("|>>", r"\nrres"),
-            ("<<|", r"\ndres"),
-            ("|->", r"\mapsto"),  # Maplet (before ->)
-            ("<->", r"\rel"),
-            ("-|>", r"\pinj"),
-            (">+>", r"\pinj"),  # Partial injection (alt)
-            (">->", r"\inj"),
-            ("+->", r"\pfun"),  # Partial function (before ->)
-            # 2-character operators
-            ("=>", r"\Rightarrow"),
-            ("<|", r"\dres"),
-            ("|>", r"\rres"),
-            ("->", r"\fun"),  # After +-> and |->
-            ("++", r"\oplus"),
-            ("o9", r"\semi"),
-            ("⌢", r"\cat"),
-            ("↾", r"\filter"),  # Sequence filter (Unicode)
-            ("filter", r"\filter"),  # Sequence filter (ASCII)
-            ("⊎", r"\uplus"),  # Bag union (Unicode)
-            ("bag_union", r"\uplus"),  # Bag union (ASCII)
-            ("bag_diff", r"\uminus"),  # Bag difference (Z RM §4.6.2)
-        ]
-
-        result = text
-        for pattern, replacement in replacements:
-            result = result.replace(pattern, f" {replacement} ")
-
-        return result
-
-    def _convert_unicode_symbols(self, text: str) -> str:
-        """Convert Unicode symbols to LaTeX equivalents.
-
-        Used for section titles and other contexts where Unicode may appear
-        but needs to be rendered as LaTeX math.
-        """
-        # Map of Unicode symbols to LaTeX (wrapped in $...$)
-        replacements = [
-            ("∈", r"$\in$"),
-            ("∉", r"$\notin$"),
-            ("⊂", r"$\subset$"),
-            ("⊆", r"$\subseteq$"),
-            ("⊃", r"$\supset$"),
-            ("⊇", r"$\supseteq$"),
-            ("∪", r"$\cup$"),  # noqa: RUF001
-            ("∩", r"$\cap$"),
-            ("∅", r"$\emptyset$"),
-            ("∀", r"$\forall$"),
-            ("∃", r"$\exists$"),
-            ("¬", r"$\lnot$"),
-            ("∧", r"$\land$"),
-            ("∨", r"$\lor$"),  # noqa: RUF001
-            ("⇒", r"$\Rightarrow$"),
-            ("⇔", r"$\Leftrightarrow$"),
-            ("⊢", r"$\vdash$"),
-            ("μ", r"$\mu$"),
-            ("λ", r"$\lambda$"),
-            ("×", r"$\cross$"),  # noqa: RUF001
-            ("ℕ", r"$\nat$"),  # noqa: RUF001
-            ("ℤ", r"$\num$"),  # noqa: RUF001
-            ("⌢", r"$\cat$"),
-            ("≤", r"$\leq$"),
-            ("≥", r"$\geq$"),
-            ("≠", r"$\neq$"),
-            ("→", r"$\rightarrow$"),
-            ("←", r"$\leftarrow$"),
-            ("↔", r"$\leftrightarrow$"),
-        ]
-        result = text
-        for symbol, latex in replacements:
-            result = result.replace(symbol, latex)
-        return result
-
     def _pre_sanitise_dollars(self, text: str) -> str:
         r"""Sanitise dollar signs in TEXT prose before any math parsing.
 
@@ -268,10 +238,18 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
         # Also escape any remaining bare $$ (e.g. $$\n, or $$ at end of line)
         sanitised = re.sub(r"\$\$", lambda _: _make_placeholder(r"\$\$"), sanitised)
 
-        # Pass 2: count remaining $ characters.  If odd, escape them all so
-        # no stray $ reaches pdflatex.
-        if sanitised.count("$") % 2 == 1:
-            sanitised = sanitised.replace("$", r"\$")
+        # Pass 2: count remaining *real* $ characters — those not already
+        # escaped as \$.  Mask the user-written \$ first so they do not skew
+        # the odd-parity guard: a literal \$ on the line must not cancel out
+        # or create an apparent imbalance among the real $...$  spans.
+        bs_dollar_mask = "\x00BSDOLLAR\x00"
+        masked = sanitised.replace(r"\$", bs_dollar_mask)
+        if masked.count("$") % 2 == 1:
+            # Odd real $: escape every real $ to \$, then restore masked ones.
+            sanitised = masked.replace("$", r"\$").replace(bs_dollar_mask, r"\$")
+        else:
+            # Even real $: just restore already-escaped ones unchanged.
+            sanitised = masked.replace(bs_dollar_mask, r"\$")
 
         # Pass 3: any $-escaped singles (from Pass 2) also get opaque placeholders
         # so downstream pipeline steps do not see their $ character.
@@ -342,6 +320,15 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
             actual_line = base_line + before.count("\n")
             span = f"${_sanitise_span_for_error(inner)}$"
 
+            # Bare-symbol fast path: a span containing exactly one known
+            # whiteboard token is emitted directly without parsing.
+            # This runs BEFORE the strict backslash check so that the lone
+            # set-difference backslash ("\\") maps to \setminus cleanly.
+            stripped = inner.strip()
+            if stripped in _BARE_SYMBOL:
+                result = result[:start] + f"${_BARE_SYMBOL[stripped]}$" + result[end:]
+                continue
+
             # Strict: a raw LaTeX command (backslash + letter, e.g. \geq,
             # \forall, \input) in $...$ is an error.  This runs BEFORE parsing so
             # that a raw comparison like "$n \geq 0$" gives a clear error, rather
@@ -401,464 +388,84 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
     def _escape_special_chars_outside_math(self, text: str) -> str:
         r"""Escape LaTeX-special characters that appear outside $...$ spans.
 
-        Handles: % & # ~ ^ (in that order).
-        Leaves characters inside existing $...$ spans untouched.
+        Handles ``\ { } % & # ~ ^`` in each prose segment (outside ``$...$``).
+        Leaves characters inside existing ``$...$`` spans untouched.
 
-        Note: _ (underscore) is handled separately by
-        _escape_underscores_outside_math at the end of the pipeline, because
-        that function also skips underscores inside \citep{} keys.
+        Processing order within each prose segment:
+
+        1. Replace ``\``, ``~``, ``^`` with NUL-byte placeholders.  These
+           characters expand to LaTeX commands containing ``{}``, so they must
+           be shielded before the brace-escaping step (step 4) to prevent
+           double-escaping the braces in ``\textbackslash{}``,
+           ``\textasciitilde{}``, and ``\textasciicircum{}``.
+        2. Escape ``%``, ``&``, ``#`` — none of these expand to ``{}``.
+        3. Escape ``{`` → ``\{`` and ``}`` → ``\}``.
+        4. Restore placeholders to their final LaTeX forms.
+
+        Note: ``_`` (underscore) is handled separately by
+        ``_escape_underscores_outside_math`` at the end of the pipeline,
+        because that function also skips underscores inside ``\citep{}`` keys.
         """
+        bsl = "\x00BSL\x00"  # placeholder for backslash
+        tld = "\x00TLD\x00"  # placeholder for tilde
+        crt = "\x00CRT\x00"  # placeholder for caret
+
         parts: list[str] = []
         # Split on $...$ boundaries; alternate: prose, math, prose, math, ...
         segments = re.split(r"(\$[^$\n]*\$)", text)
         for i, seg in enumerate(segments):
             if i % 2 == 0:
-                # Prose segment — apply escapes in the order that avoids
-                # double-escaping.  % must come before other replacements
-                # because LaTeX treats % as a line comment, silently discarding
-                # everything that follows it on the line.
+                # Prose segment — use placeholders to shield the braces in the
+                # final LaTeX expansions of \, ~, ^ from the {} escaping step.
+                seg = seg.replace("\\", bsl)
+                seg = seg.replace("~", tld)
+                seg = seg.replace("^", crt)
+                # Escape characters that expand to safe forms (no braces).
                 seg = seg.replace("%", r"\%")
                 seg = seg.replace("&", r"\&")
                 seg = seg.replace("#", r"\#")
-                seg = seg.replace("~", r"\textasciitilde{}")
-                # \textasciicircum{} is used rather than \^{} because subsequent
-                # pipeline steps parse {} as brace notation, corrupting \^{} to
-                # \^$\{\}$.  \textasciicircum{} does not have this problem.
-                seg = seg.replace("^", r"\textasciicircum{}")
+                # Escape braces (safe now: \ ~ ^ placeholders contain no braces).
+                seg = seg.replace("{", r"\{")
+                seg = seg.replace("}", r"\}")
+                # Restore placeholders to their final LaTeX forms.
+                seg = seg.replace(bsl, r"\textbackslash{}")
+                seg = seg.replace(tld, r"\textasciitilde{}")
+                seg = seg.replace(crt, r"\textasciicircum{}")
             parts.append(seg)
         return "".join(parts)
 
     def _process_paragraph_text(self, text: str, base_line: int = 1) -> str:
-        """Process paragraph text: convert operators, handle inline math, etc.
+        """Process paragraph text through the escape-only pipeline.
 
-        This is a helper method that processes paragraph text without adding
-        spacing or formatting commands. Used both in _generate_paragraph()
-        and when rendering paragraphs inline with part labels.
+        Inline math is opt-in: wrap expressions in ``$...$`` to render them
+        as whiteboard math.  Bare prose passes through with only LaTeX
+        character escaping applied.
+
+        Pipeline (in order):
+
+        1. ``_pre_sanitise_dollars`` — reject ``$$`` and escape unbalanced
+           ``$`` before any span matching.
+        2. ``_process_explicit_dollar_math`` — parse ``$...$`` spans through
+           the whiteboard math engine.
+        3. ``_escape_special_chars_outside_math`` — escape ``\\ { } % & # ~ ^``
+           in all prose segments (closes issue #79).
+        4. ``_process_citations`` — convert ``[cite key]`` to ``\\citep{key}``.
+        5. ``_process_manual_markup`` — convert bracketed operators
+           (``[and]``, ``[or]``, ``[not]``) to their LaTeX symbols.
+        6. ``_escape_underscores_outside_math`` — escape ``_`` in prose,
+           preserving underscores inside ``$...$`` and ``\\citep{}`` keys.
+        7. ``_restore_dollar_sanitise`` — expand sanitised-dollar placeholders.
 
         ``base_line`` is the 1-indexed source line of the enclosing paragraph
-        node.  It is threaded into ``_process_explicit_dollar_math`` so that
-        ``InlineMathError`` messages can report the exact source line of the
-        offending ``$...$`` span.
+        node, threaded into ``_process_explicit_dollar_math`` for error messages.
         """
-        # Step 0: Sanitise dollar signs.  Reject $$ and escape unbalanced $
-        # before any span matching runs.  This prevents stray $ from silently
-        # opening math mode and stops $$ display-math delimiters from confusing
-        # the span splitter.
         text = self._pre_sanitise_dollars(text)
-
-        # Step 1: Parse explicit $...$ spans through the math parser FIRST,
-        # before any character escaping.  This fixes bug 7.A (^ inside $...$
-        # was being pre-escaped) and adds proper opt-in inline math support.
         text = self._process_explicit_dollar_math(text, base_line)
-
-        # Step 2: Escape special LaTeX characters outside $...$ spans.
-        # # is a macro parameter character; ^ is only valid in math mode.
         text = self._escape_special_chars_outside_math(text)
-
-        # Convert sequence literals FIRST to protect <x> patterns
-        # Must happen before _process_inline_math() which can break up < and >
-        text = self._convert_sequence_literals(text)
-
-        # Process inline math expressions (includes formula detection)
-        text = self._process_inline_math(text)
-
-        # Process citations: [cite key] → \citep{key}
         text = self._process_citations(text)
-
-        # Then convert remaining symbolic operators to LaTeX math symbols
-        # Only replace if NOT already wrapped in math mode
-        # Do NOT convert and/or/not - those are English words in prose context
-        # CRITICAL: Process by length (longest first) to avoid partial matches
-
-        # 5-character operators (process first)
-        text = self._replace_outside_math(text, "77->", r"\ffun")  # Finite pfun
-
-        # 4-character operators
-        text = self._replace_outside_math(text, ">->>", r"\bij")  # Bijection
-        text = self._replace_outside_math(text, "+->>", r"\psurj")  # Partial surjection
-        text = self._replace_outside_math(text, "-->>", r"\surj")  # Total surjection
-
-        # 3-character operators (process before 2-character)
-        text = self._replace_outside_math(
-            text, "<=>", r"\Leftrightarrow"
-        )  # Equivalence
-        text = self._replace_outside_math(text, "|>>", r"\nrres")  # Range corestriction
-        text = self._replace_outside_math(
-            text, "<<|", r"\ndres"
-        )  # Domain corestriction
-        text = self._replace_outside_math(text, "|->", r"\mapsto")  # Maplet (before ->)
-        text = self._replace_outside_math(text, "<->", r"\rel")  # Relation type
-        text = self._replace_outside_math(text, "-|>", r"\pinj")  # Partial injection
-        text = self._replace_outside_math(
-            text, ">+>", r"\pinj"
-        )  # Partial injection (alt)
-        text = self._replace_outside_math(text, ">->", r"\inj")  # Total injection
-        text = self._replace_outside_math(text, "+->", r"\pfun")  # Partial function
-
-        # 2-character operators (process after all longer operators)
-        text = self._replace_outside_math(text, "=>", r"\Rightarrow")  # Implication
-        text = self._replace_outside_math(text, "<|", r"\dres")  # Domain restriction
-        text = self._replace_outside_math(text, "|>", r"\rres")  # Range restriction
-        text = self._replace_outside_math(
-            text, "->", r"\fun"
-        )  # Total function (after |->)
-        text = self._replace_outside_math(text, "++", r"\oplus")  # Override
-        text = self._replace_outside_math(text, "o9", r"\semi")  # Forward composition
-        text = self._replace_outside_math(text, "⌢", r"\cat")  # Concatenation
-        text = self._replace_outside_math(text, "↾", r"\filter")  # Filter (Unicode)
-        # Sequence filter (ASCII)
-        text = self._replace_outside_math(text, " filter ", r" \filter ")
-        text = self._replace_outside_math(text, "⊎", r"\uplus")  # Bag union (Unicode)
-        # Bag union (ASCII)
-        text = self._replace_outside_math(text, " bag_union ", r" \uplus ")
-        # Bag difference (ASCII, Z RM §4.6.2)
-        text = self._replace_outside_math(text, " bag_diff ", r" \uminus ")
-
-        # Additional Unicode symbols that need conversion in TEXT blocks
-        text = self._replace_outside_math(text, "∈", r"\in")  # Element of
-        text = self._replace_outside_math(text, "∉", r"\notin")  # Not element of
-        text = self._replace_outside_math(text, "⊂", r"\subset")  # Proper subset
-        text = self._replace_outside_math(text, "⊆", r"\subseteq")  # Subset or equal
-        text = self._replace_outside_math(text, "⊃", r"\supset")  # Proper superset
-        text = self._replace_outside_math(text, "⊇", r"\supseteq")  # Superset or equal
-        text = self._replace_outside_math(text, "∪", r"\cup")  # noqa: RUF001
-        text = self._replace_outside_math(text, "∩", r"\cap")  # Intersection
-        text = self._replace_outside_math(text, "∅", r"\emptyset")  # Empty set
-        text = self._replace_outside_math(text, "∀", r"\forall")  # For all
-        text = self._replace_outside_math(text, "∃", r"\exists")  # Exists
-        text = self._replace_outside_math(text, "¬", r"\lnot")  # Negation
-        text = self._replace_outside_math(text, "∧", r"\land")  # Logical and
-        text = self._replace_outside_math(text, "∨", r"\lor")  # noqa: RUF001
-        text = self._replace_outside_math(text, "⇒", r"\Rightarrow")  # Implies
-        text = self._replace_outside_math(text, "⇔", r"\Leftrightarrow")  # Iff
-        text = self._replace_outside_math(text, "⊢", r"\vdash")  # Turnstile
-        text = self._replace_outside_math(text, "μ", r"\mu")  # Mu
-        text = self._replace_outside_math(text, "λ", r"\lambda")  # Lambda
-        text = self._replace_outside_math(text, "×", r"\cross")  # noqa: RUF001
-        text = self._replace_outside_math(text, "ℕ", r"\nat")  # noqa: RUF001
-        text = self._replace_outside_math(text, "ℤ", r"\num")  # noqa: RUF001
-        text = self._replace_outside_math(text, "≤", r"\leq")
-        text = self._replace_outside_math(text, "≥", r"\geq")
-        text = self._replace_outside_math(text, "≠", r"\neq")
-        text = self._replace_outside_math(text, "→", r"\rightarrow")
-        text = self._replace_outside_math(text, "←", r"\leftarrow")
-        text = self._replace_outside_math(text, "↔", r"\leftrightarrow")
-
-        # NOTE: Bare English keywords (exists, forall, exists1, emptyset) are NOT
-        # converted to math glyphs in TEXT prose.  Math substitution in TEXT prose
-        # is opt-in: wrap the expression in $...$, e.g. $\exists x : N | x > 0$.
-        # This prevents English sentences containing "exists" or "group" from
-        # being silently rewritten as math symbols.
-
-        # Convert "elem" and "not elem" for set membership
-        # NOTE: "not elem" is English prose, not "notin" keyword
-        # NOTE: Pattern for "not elem" must come before "elem" to avoid partial match
-        # Pattern: expression followed by "not elem"/"elem" + capitalized set name
-        # Matches: identifier/number, optionally with operators (-, +, *, /)
-        # Examples: "0 elem N", "4 - 0 elem N", "x - 1 not elem N"
-        # NOTE: "not in" and "in" are no longer converted after migration to elem
-        text = re.sub(
-            r"\b(\w+(?:\s*[\+\-\*/]\s*\w+)*)\s+not\s+elem\s+([A-Z]\w*)\b",
-            r"$\1 \\notin \2$",
-            text,
-        )  # x - 1 not elem N → $x - 1 \notin N$
-        text = re.sub(
-            r"\b(\w+(?:\s*[\+\-\*/]\s*\w+)*)\s+elem\s+([A-Z]\w*)\b",
-            r"$\1 \\in \2$",
-            text,
-        )  # 4 - 0 elem N → $4 - 0 \in N$
-
-        # Convert bare comparison operators (garbled character fix - final pass)
-        # Catches cases not handled by _process_inline_math() (complex expressions)
-        # Tracks math mode to avoid nested $...$
-        text = self._convert_comparison_operators(text)
-
-        # Escape underscores outside math mode (final pass)
-        # Prevents LaTeX errors when identifiers like count_N appear in prose
+        text = self._process_manual_markup(text)
         text = self._escape_underscores_outside_math(text)
-
-        # Restore dollar-sanitise placeholders to their escaped LaTeX forms.
-        # Done last so that no pipeline step re-interprets the replacement $
-        # characters as math delimiters.
         return self._restore_dollar_sanitise(text)
-
-    def _convert_comparison_operators(self, text: str) -> str:
-        """Convert bare comparison operators to math mode, avoiding nested math.
-
-        Handles: >=, <=, >, <, | (pipe)
-        Only converts when NOT inside existing $...$ math mode.
-        """
-        result: list[str] = []
-        i = 0
-        in_math = False  # Track if we're inside $...$ math mode
-
-        while i < len(text):
-            # Check for $ to track math mode transitions
-            if text[i] == "$":
-                in_math = not in_math
-                result.append(text[i])
-                i += 1
-                continue
-
-            # Only try conversions if NOT in math mode
-            if not in_math:
-                # Try >= first (multi-char before single-char)
-                if i + 1 < len(text) and text[i : i + 2] == ">=":
-                    result.append(r"$\geq$")
-                    i += 2
-                    continue
-                # Try <=
-                if i + 1 < len(text) and text[i : i + 2] == "<=":
-                    result.append(r"$\leq$")
-                    i += 2
-                    continue
-                # Try > (only with surrounding spaces)
-                if (
-                    text[i] == ">"
-                    and (i == 0 or text[i - 1].isspace())
-                    and (i + 1 >= len(text) or text[i + 1].isspace())
-                ):
-                    result.append(r"$>$")
-                    i += 1
-                    continue
-                # Try < (only with surrounding spaces or end of string)
-                # Special case: also convert at end like "then <x>"
-                if (
-                    text[i] == "<"
-                    and (i == 0 or text[i - 1].isspace())
-                    and (i + 1 >= len(text) or text[i + 1].isspace())
-                ):
-                    result.append(r"$<$")
-                    i += 1
-                    continue
-                # Try | (pipe/bullet - causes garbled output in text mode)
-                # Only convert if preceded by space or $ (end of math mode)
-                # and followed by space/newline/end
-                if text[i] == "|":
-                    prev_ok = i == 0 or text[i - 1].isspace() or text[i - 1] == "$"
-                    next_ok = (
-                        i + 1 >= len(text)
-                        or text[i + 1].isspace()
-                        or text[i + 1] == "\n"
-                    )
-                    if prev_ok and next_ok:
-                        result.append(r"$\mid$")
-                        i += 1
-                        continue
-
-            # No match, copy character as-is
-            result.append(text[i])
-            i += 1
-
-        return "".join(result)
-
-    def _convert_sequence_literals(self, text: str, *, wrap_math: bool = True) -> str:
-        """Convert sequence literals <...> to math mode \\langle ... \\rangle.
-
-        Handles patterns like:
-        - <> → $\\langle \\rangle$
-        - <a> → $\\langle a \\rangle$
-        - <x, y> → $\\langle x, y \\rangle$
-        - <1, 2, 3> → $\\langle 1, 2, 3 \\rangle$
-        - <<x, y>, <>> → $\\langle \\langle x, y \\rangle, \\langle \\rangle \\rangle$
-
-        Uses balanced bracket matching to handle nested sequences correctly.
-        Must NOT match operators like <=> or <-> or comparison operators.
-
-        Args:
-            text: Text containing sequence literals
-            wrap_math: If True, wrap results in $...$. False for recursive calls.
-        """
-        # Keep processing until no more angle brackets remain
-        # This handles cases where parsing fails and we need multiple passes
-        result = text
-        max_iterations = 10  # Prevent infinite loops
-        iteration = 0
-
-        while iteration < max_iterations:
-            # Find all balanced angle bracket pairs (handles nesting)
-            all_matches = self._find_balanced_angles(result)
-
-            if not all_matches:
-                # No more sequences to convert
-                break
-
-            # Filter to find only outermost, non-overlapping matches
-            # A match is outermost if it's not contained within any other match
-            def is_contained(match: tuple[int, int], other: tuple[int, int]) -> bool:
-                """Check if match is strictly contained within other."""
-                return (
-                    other[0] < match[0] < other[1] or other[0] < match[1] < other[1]
-                ) and match != other
-
-            outermost_matches = [
-                m
-                for m in all_matches
-                if not any(is_contained(m, other) for other in all_matches)
-            ]
-
-            # Sort by start position (descending) to process rightmost first
-            # This preserves positions during replacement
-            matches_sorted = sorted(outermost_matches, key=lambda m: m[0], reverse=True)
-
-            # Process matches from right to left
-            for start_pos, end_pos in matches_sorted:
-                sequence_text = result[start_pos:end_pos]
-
-                # Sanity check: should still start/end with angle brackets
-                if not sequence_text.startswith("<") or not sequence_text.endswith(">"):
-                    continue
-
-                content = sequence_text[1:-1]  # Strip < and >
-
-                # Try to parse the ORIGINAL content (not converted)
-                # The parser will handle nested sequences correctly
-                # Try to parse and generate LaTeX for sequence content
-                parsed_successfully = False
-                latex = ""  # Will be set by either branch
-                try:
-                    lexer = Lexer(content)
-                    tokens = lexer.tokenize()
-                    parser = Parser(tokens)
-                    ast = parser.parse()
-
-                    # Generate LaTeX for the sequence content
-                    # Note: parser.parse() returns Document | Expr
-                    if isinstance(ast, Expr):
-                        # Successfully parsed as expression
-                        if content.strip() == "":
-                            latex = r"\langle \rangle"
-                        else:
-                            latex_content = self.generate_expr(ast)
-                            latex = rf"\langle {latex_content} \rangle"
-                        parsed_successfully = True
-                except (LexerError, ParserError):
-                    # Parsing failed - will use fallback below
-                    pass
-
-                if not parsed_successfully:
-                    # Fallback: convert operators without full parsing
-                    if not content.strip():
-                        latex = r"\langle \rangle"
-                    else:
-                        content_with_ops = self._convert_operators_bare(content)
-                        latex = rf"\langle {content_with_ops} \rangle"
-
-                # Wrap in math mode only on first iteration (outermost sequences)
-                if wrap_math and iteration == 0:
-                    result = result[:start_pos] + f"${latex}$" + result[end_pos:]
-                else:
-                    result = result[:start_pos] + latex + result[end_pos:]
-
-            iteration += 1
-
-        return result
-
-    def _find_balanced_braces(self, text: str) -> list[tuple[int, int]]:
-        """Find all balanced brace pairs in text.
-
-        Returns list of (start_pos, end_pos) tuples for each balanced {...}.
-        Handles nested braces correctly.
-        """
-        matches: list[tuple[int, int]] = []
-        i = 0
-        while i < len(text):
-            if text[i] == "{":
-                # Found opening brace, find matching closing brace
-                depth = 1
-                start = i
-                i += 1
-                while i < len(text) and depth > 0:
-                    if text[i] == "{":
-                        depth += 1
-                    elif text[i] == "}":
-                        depth -= 1
-                    i += 1
-                if depth == 0:
-                    # Found balanced pair
-                    matches.append((start, i))
-            else:
-                i += 1
-        return matches
-
-    def _find_balanced_parens(self, text: str) -> list[tuple[int, int]]:
-        """Find all balanced parenthesis pairs in text.
-
-        Returns list of (start_pos, end_pos) tuples for each balanced (...).
-        Handles nested parentheses correctly.
-        """
-        matches: list[tuple[int, int]] = []
-        i = 0
-        while i < len(text):
-            if text[i] == "(":
-                # Found opening paren, find matching closing paren
-                depth = 1
-                start = i
-                i += 1
-                while i < len(text) and depth > 0:
-                    if text[i] == "(":
-                        depth += 1
-                    elif text[i] == ")":
-                        depth -= 1
-                    i += 1
-                if depth == 0:
-                    # Found balanced pair
-                    matches.append((start, i))
-            else:
-                i += 1
-        return matches
-
-    def _find_balanced_angles(self, text: str) -> list[tuple[int, int]]:
-        """Find all balanced angle bracket pairs in text for sequences.
-
-        Returns list of (start_pos, end_pos) tuples for each balanced <...>.
-        Handles nested angle brackets correctly by finding ALL pairs, including nested.
-
-        Distinguishes sequences from operators:
-        - Sequences: <>, <x>, <a, b>, <<x>, <y>>
-        - Operators: <=>, <->, <|, |>, <<|, |>>
-
-        Strategy: For each opening <, find its matching >, record the pair,
-        then continue searching from just after the opening < to find nested pairs.
-        """
-        matches: list[tuple[int, int]] = []
-        i = 0
-        while i < len(text):
-            if text[i] == "<":
-                # Check if this is part of an operator
-                if i + 1 < len(text):
-                    next_char = text[i + 1]
-                    # Skip operators: <=>, <->, <|, <<|
-                    if next_char in "=-|":
-                        i += 1
-                        continue
-
-                # Found opening angle, find matching closing angle
-                depth = 1
-                start = i
-                j = i + 1
-                while j < len(text) and depth > 0:
-                    if text[j] == "<":
-                        # Check if operator start
-                        if j + 1 < len(text) and text[j + 1] in "=-|":
-                            j += 2  # Skip operator
-                            continue
-                        depth += 1
-                    elif text[j] == ">":
-                        # Check if operator end (=>, ->, |>, |>>)
-                        if j > 0 and text[j - 1] in "=-|":
-                            j += 1
-                            continue
-                        depth -= 1
-                    j += 1
-                if depth == 0:
-                    # Found balanced pair
-                    matches.append((start, j))
-                # Continue from next position to find nested/adjacent pairs
-                i += 1
-            else:
-                i += 1
-        return matches
 
     def _process_citations(self, text: str) -> str:
         """Process citation markup in text.
@@ -891,19 +498,11 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
 
         return re.sub(pattern, replace_citation, text)
 
-    # -------------------------------------------------------------------------
-    # Inline Math Pipeline Stages
-    # -------------------------------------------------------------------------
-    # These methods form a pipeline that transforms prose text by detecting
-    # mathematical expressions and wrapping them in $...$ for LaTeX.
-    # Order matters: earlier stages must run before later ones.
-    # -------------------------------------------------------------------------
-
     def _process_manual_markup(self, text: str) -> str:
-        """Stage -1.5: Convert bracketed operator markup to LaTeX symbols.
+        """Convert bracketed operator markup to LaTeX symbols.
 
         Converts explicit markup like [and], [or], [not] to LaTeX symbols.
-        Must run first before any expression parsing.
+        This is explicit opt-in notation, not auto-detection.
 
         Example: "([not], [and], [or])" becomes "($\\lnot$, $\\land$, $\\lor$)"
         """
@@ -924,697 +523,13 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
 
         return result
 
-    def _process_logical_formulas(self, text: str) -> str:
-        """Stage -1: Detect logical formulas with =>, <=>, lnot, land, lor.
-
-        Matches expressions like "p => (lnot p => p)" and wraps in math mode.
-        Stops at sentence boundaries (is, as, are, etc.) or punctuation.
-        Only LaTeX-style keywords (lnot, land, lor), not English.
-        """
-        result = text
-        formula_pattern = (
-            r"(\()?(?:lnot\s+)?([a-zA-Z]\w*)\s*(=>|<=>)\s*[^.!?]*?"
-            r"(?=\s+(?:is|as|are|for|to|be|a|an|the|in|on|at|by|with|"
-            r"holds|means|implies|shows|proves|states|says|gives|follows|"
-            r"so|then|therefore|hence|thus|because|since|when|where|which|that)\b|[.!?]|$)"
-        )
-
-        matches = list(re.finditer(formula_pattern, result))
-        for match in reversed(matches):
-            start_pos = match.start()
-            end_pos = match.end()
-
-            # Check if already in math mode
-            before = result[:start_pos]
-            dollars_before = before.count("$")
-            if dollars_before % 2 == 1:
-                continue
-
-            formula_text = result[start_pos:end_pos].strip()
-
-            # Try to parse as logical expression
-            try:
-                lexer = Lexer(formula_text)
-                tokens = lexer.tokenize()
-                parser = Parser(tokens)
-                ast = parser.parse()
-
-                if isinstance(ast, Expr):
-                    math_latex = self.generate_expr(ast)
-                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except (LexerError, ParserError):
-                # Parsing failed - expression is not valid math, leave as prose
-                pass
-
-        return result
-
-    def _process_parenthesized_logic(self, text: str) -> str:
-        """Stage -0.5: Detect parenthesized logical expressions.
-
-        Matches balanced parentheses containing logical operators like
-        (p lor q), (p land q), ((p => r) land ...).
-        Also handles (lnot p => lnot q) which Pattern -1 misses.
-        Only LaTeX-style keywords (lnot, land, lor), not English.
-        """
-        result = text
-        paren_matches = self._find_balanced_parens(result)
-
-        for start_pos, end_pos in reversed(paren_matches):
-            # Check if already in math mode
-            before = result[:start_pos]
-            dollars_before = before.count("$")
-            if dollars_before % 2 == 1:
-                continue
-
-            paren_text = result[start_pos:end_pos]
-
-            # Only process if it contains logical operators or keywords
-            # Look for: lor, land, lnot, elem, =>, <=>
-            has_logic = bool(
-                re.search(r"\blor\b", paren_text)
-                or re.search(r"\bland\b", paren_text)
-                or re.search(r"\blnot\b", paren_text)
-                or re.search(r"\belem\b", paren_text)
-                or "=>" in paren_text
-                or "<=>" in paren_text
-            )
-
-            if not has_logic:
-                continue
-
-            # Try to parse as logical expression
-            try:
-                lexer = Lexer(paren_text)
-                tokens = lexer.tokenize()
-                parser = Parser(tokens)
-                ast = parser.parse()
-
-                if isinstance(ast, Expr):
-                    math_latex = self.generate_expr(ast)
-                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except (LexerError, ParserError):
-                # Parsing failed - expression is not valid math, leave as prose
-                pass
-
-        return result
-
-    def _process_standalone_keywords(self, text: str) -> str:
-        """Stage -0.3: Convert standalone logical keywords to symbols.
-
-        Converts lor, land, lnot, elem to their LaTeX equivalents.
-        These should ALWAYS render as symbols, never as literal text.
-        Special case: lnot followed by single variable (lnot p) -> $\\lnot p$
-        """
-        result = text
-
-        # First, handle "lnot <variable>" as a unit
-        lnot_var_pattern = r"\blnot\s+([a-zA-Z])\b"
-        matches = list(re.finditer(lnot_var_pattern, result))
-        for match in reversed(matches):
-            start_pos = match.start()
-            end_pos = match.end()
-
-            # Check if already in math mode
-            before = result[:start_pos]
-            dollars_before = before.count("$")
-            if dollars_before % 2 == 1:
-                continue  # Already in math mode
-
-            var_name = match.group(1)
-            result = result[:start_pos] + f"$\\lnot {var_name}$" + result[end_pos:]
-
-        # Then handle other standalone keywords
-        standalone_keywords = {
-            r"\blor\b": "$\\lor$",
-            r"\bland\b": "$\\land$",
-            r"\blnot\b": "$\\lnot$",  # Only matches lnot NOT followed by variable
-            r"\belem\b": "$\\in$",
-        }
-
-        for pattern, replacement in standalone_keywords.items():
-            # Find all matches and replace from right to left (to preserve positions)
-            matches = list(re.finditer(pattern, result))
-            for match in reversed(matches):
-                start_pos = match.start()
-                end_pos = match.end()
-
-                # Check if already in math mode
-                before = result[:start_pos]
-                dollars_before = before.count("$")
-                if dollars_before % 2 == 1:
-                    continue  # Already in math mode
-
-                # Replace with math mode wrapped keyword
-                result = result[:start_pos] + replacement + result[end_pos:]
-
-        return result
-
-    def _process_superscripts(self, text: str) -> str:
-        """Stage 0: Wrap standalone superscripts in math mode.
-
-        Matches patterns like x^2, a_i^2, 2^n, x^{2n}.
-        Skips sequence concatenation (<x> ^ <y>).
-        """
-        result = text
-        superscript_pattern = r"(\w+_?\w*)\^(\{[^}]+\}|\w+)"
-
-        matches = list(re.finditer(superscript_pattern, result))
-        for match in reversed(matches):
-            start_pos = match.start()
-            end_pos = match.end()
-
-            # Check if already in math mode
-            before = result[:start_pos]
-            dollars_before = before.count("$")
-            if dollars_before % 2 == 1:
-                continue  # Already in math mode
-
-            # Check if this looks like sequence concatenation (<x> ^ <y>)
-            # Look for closing > before the ^
-            context_before = result[max(0, start_pos - 10) : start_pos]
-            if ">" in context_before and context_before.rstrip().endswith(">"):
-                continue  # This is sequence concatenation, skip
-
-            expr = match.group(0)
-            # Wrap in math mode: x^2 -> $x^{2}$
-            result = result[:start_pos] + f"${expr}$" + result[end_pos:]
-
-        return result
-
-    def _process_relational_image(self, text: str) -> str:
-        """Stage 0.5: Detect relational image notation R(| S |).
-
-        Matches patterns:
-        1. identifier(| ... |) - simple relation like R(| S |)
-        2. (expr)(| ... |) - composition like (R o9 S)(| A |)
-        3. standalone (| ... |) - describing the notation in prose
-        """
-        result = text
-        relimg_pattern = r"(?:(\([^)]+\)|[a-zA-Z_]\w*)\s*)?\(\|[^$]*?\|\)"
-
-        matches = list(re.finditer(relimg_pattern, result))
-        for match in reversed(matches):
-            start_pos = match.start()
-            end_pos = match.end()
-
-            # Check if already in math mode
-            before = result[:start_pos]
-            dollars_before = before.count("$")
-            if dollars_before % 2 == 1:
-                continue  # Already in math mode
-
-            math_text = match.group(0)
-
-            # Skip if identifier is a common prose word
-            first_token = math_text.split("(|")[0].strip()
-            if first_token.lower() in {
-                "the",
-                "a",
-                "an",
-                "this",
-                "that",
-                "image",
-                "relation",
-                "set",
-                "function",
-                "gives",
-                "returns",
-                "where",
-                "when",
-                "which",
-            }:
-                continue
-
-            # Special case: standalone (| ... |) with ellipsis for describing notation
-            if "(| ... |)" in math_text or "(| |)" in math_text:
-                # Replace with LaTeX notation
-                math_latex = math_text.replace(
-                    "(| ... |)", r"$\limg \ldots \rimg$"
-                ).replace("(| |)", r"$\limg \rimg$")
-                result = result[:start_pos] + math_latex + result[end_pos:]
-                continue
-
-            # Try to parse as expression
-            try:
-                lexer = Lexer(math_text)
-                tokens = lexer.tokenize()
-                parser = Parser(tokens)
-                ast = parser.parse()
-
-                # Check if we got a valid expression
-                if isinstance(ast, Expr):
-                    # Generate LaTeX
-                    math_latex = self.generate_expr(ast)
-                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except (LexerError, ParserError):
-                # Parsing failed - expression is not valid math, leave as prose
-                pass
-
-        return result
-
-    def _process_set_expressions(self, text: str) -> str:
-        """Stage 1: Detect set expressions { ... }.
-
-        Matches balanced braces and parses as set comprehensions or literals.
-        Handles nested braces correctly.
-        """
-        result = text
-        brace_matches = self._find_balanced_braces(result)
-
-        # Process matches in reverse order to preserve positions
-        for start_pos, end_pos in reversed(brace_matches):
-            math_text = result[start_pos:end_pos]
-            try:
-                # Try to parse as math expression
-                lexer = Lexer(math_text)
-                tokens = lexer.tokenize()
-                parser = Parser(tokens)
-                ast = parser.parse()
-
-                # Check if it's a set expression (comprehension or literal)
-                if isinstance(ast, (SetComprehension, SetLiteral)):
-                    # Generate LaTeX for the expression
-                    math_latex = self.generate_expr(ast)
-                    # Wrap in $...$
-                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except (LexerError, ParserError):
-                # Parsing failed - expression is not valid math, leave as prose
-                pass
-
-        return result
-
-    def _process_quantifiers(self, text: str) -> str:
-        """Stage 2: Detect quantifier expressions.
-
-        Matches forall, exists, exists1, mu with their predicates.
-        Strategy: Find keyword, then try parsing increasingly longer substrings.
-        """
-        result = text
-        quant_keywords = ["forall", "exists", "exists1", "mu"]
-        for keyword in quant_keywords:
-            # Find all occurrences of quantifier keywords
-            pattern = rf"\b{keyword}\b"
-            matches = list(re.finditer(pattern, result))
-
-            # Process matches in reverse order to preserve positions
-            for match in reversed(matches):
-                start_pos = match.start()
-
-                # Try to parse increasingly longer substrings from this point
-                # Stop at sentence boundaries or when parsing fails
-                for end_offset in range(
-                    len(result) - start_pos, 0, -1
-                ):  # Try longest first
-                    end_pos = start_pos + end_offset
-                    # Don't go past sentence boundaries
-                    if any(
-                        result[start_pos:end_pos].count(boundary) > 0
-                        for boundary in [". ", "! ", "? "]
-                    ):
-                        # Found a sentence boundary - try up to that point
-                        for boundary in [". ", "! ", "? "]:
-                            if boundary in result[start_pos:end_pos]:
-                                end_pos = start_pos + result[start_pos:end_pos].index(
-                                    boundary
-                                )
-                                break
-
-                    math_text = result[start_pos:end_pos].strip()
-
-                    # Must contain a pipe for quantifier syntax
-                    if "|" not in math_text:
-                        continue
-
-                    try:
-                        # Try to parse as quantifier
-                        lexer = Lexer(math_text)
-                        tokens = lexer.tokenize()
-                        parser = Parser(tokens)
-                        ast = parser.parse()
-
-                        if isinstance(ast, Quantifier):
-                            # Check if parsed expression contains prose words
-                            # (due to space-separated application)
-                            prose_words = {
-                                "is",
-                                "are",
-                                "be",
-                                "was",
-                                "were",
-                                "true",
-                                "false",
-                                "the",
-                                "a",
-                                "an",
-                                "in",
-                                "on",
-                                "at",
-                                "to",
-                                "of",
-                                "for",
-                                "with",
-                                "as",
-                                "by",
-                                "from",
-                                "that",
-                                "syntax",
-                                "valid",
-                                "here",
-                                "there",
-                            }
-
-                            # Check if math_text ends with any prose words
-                            # Split and check last few tokens
-                            text_words = math_text.lower().split()
-                            if text_words and text_words[-1] in prose_words:
-                                # Contains prose word - try shorter substring
-                                continue
-                            if len(text_words) >= 2 and text_words[-2] in prose_words:
-                                # Second-to-last word is prose - try shorter
-                                continue
-
-                            # Check if we're cutting off a word ("is" -> "i" + "s")
-                            if end_pos < len(result) and end_pos > 0:
-                                prev_char = result[end_pos - 1]
-                                next_char = result[end_pos]
-                                # If both sides are alphanumeric, splitting a word
-                                if prev_char.isalnum() and next_char.isalnum():
-                                    # We're in the middle of a word - skip this
-                                    continue
-
-                            # Successfully parsed! Generate LaTeX
-                            math_latex = self.generate_expr(ast)
-                            # Wrap in $...$
-                            result = (
-                                result[:start_pos]
-                                + f"${math_latex}$"
-                                + result[end_pos:]
-                            )
-                            break  # Move to next match
-                    except (LexerError, ParserError):
-                        # This substring doesn't parse - try shorter one
-                        continue
-
-        return result
-
-    def _process_type_declarations(self, text: str) -> str:
-        """Stage 2.5: Detect type declarations (identifier : type).
-
-        Matches patterns like "x : N" or "f : A -> B".
-        Stops at commas, periods, or common prose words.
-        """
-        result = text
-
-        # Build pattern: identifier : type_expr
-        # Type expr stops at prose words using negative lookahead
-        prose_pattern = (
-            r"(?:where|and|or|but|if|then|else|shadows|gives|returns|which|that|"
-            r"is|are|was|were|be|been|have|has|had|the|a|an|this)"
-        )
-        neg_lookahead = r"(?!" + prose_pattern + r"\b)"
-        type_word = r"[a-zA-Z_][^\s,]*"
-        type_continuation = r"(?:\s+" + neg_lookahead + type_word + r")*"
-        type_expr_part = r"(" + type_word + type_continuation + r")"
-        type_decl_pattern = r"\b([a-zA-Z_]\w*)\s*:\s*" + type_expr_part
-
-        # Words that appear BEFORE colons in prose (not type declarations)
-        prose_intro_words = {
-            "proof",
-            "theorem",
-            "induction",
-            "example",
-            "note",
-            "strategy",
-            "hint",
-            "warning",
-            "remark",
-            "observation",
-            "claim",
-            "lemma",
-            "corollary",
-            "definition",
-            "assumption",
-            "goal",
-            "objective",
-            "result",
-            "conclusion",
-            "summary",
-            "overview",
-            "introduction",
-            "background",
-            "context",
-            "constructive",
-            "non",
-            "strong",
-            "main",
-            "base",
-        }
-
-        matches = list(re.finditer(type_decl_pattern, result))
-        for match in reversed(matches):
-            start_pos = match.start()
-            end_pos = match.end()
-
-            # Check if already in math mode
-            before = result[:start_pos]
-            dollars_before = before.count("$")
-            if dollars_before % 2 == 1:
-                continue  # Already in math mode
-
-            # Extract the identifier (word before colon)
-            identifier = match.group(1).lower()
-
-            # Skip if identifier is a prose intro word (like "proof:", "theorem:")
-            if identifier in prose_intro_words:
-                continue
-
-            # Extract the matched expression
-            expr = match.group(0)
-
-            # Try to parse as a type declaration
-            try:
-                lexer = Lexer(expr)
-                tokens = lexer.tokenize()
-                parser = Parser(tokens)
-                ast = parser.parse()
-
-                # If it parses successfully, generate LaTeX
-                if isinstance(ast, Expr):
-                    math_latex = self.generate_expr(ast)
-                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except (LexerError, ParserError):
-                # Parsing failed - check if this looks like prose (not math)
-                # Common English words that appear in prose but not in math
-                expr_words = set(expr.lower().split())
-                if expr_words & PROSE_WORDS:
-                    # Contains prose words - skip this match
-                    continue
-
-                # If parsing fails, manually process the identifier and operators
-                # Extract identifier from "identifier : type_expr" pattern
-                match_parts = re.match(r"([a-zA-Z_]\w*)\s*:\s*(.+)", expr)
-                if match_parts:
-                    identifier_name = match_parts.group(1)
-                    type_part = match_parts.group(2)
-
-                    # Process identifier through normal logic for underscore handling
-                    id_node = Identifier(line=0, column=0, name=identifier_name)
-                    identifier_latex = self._generate_identifier(id_node)
-
-                    # Convert operators in type part (use comprehensive converter)
-                    type_latex = self._convert_operators_bare(type_part)
-
-                    # Combine
-                    full_latex = f"{identifier_latex} : {type_latex}"
-                    result = result[:start_pos] + f"${full_latex}$" + result[end_pos:]
-                else:
-                    # Fallback: just convert operators
-                    expr_with_ops = self._convert_operators_bare(expr)
-                    result = (
-                        result[:start_pos] + f"${expr_with_ops}$" + result[end_pos:]
-                    )
-
-        return result
-
-    def _process_function_applications(self, text: str) -> str:
-        """Stage 2.75: Detect function application followed by operator.
-
-        Matches patterns like "f_name x <= 5".
-        ONLY matches identifiers with underscores to avoid false positives.
-        """
-        result = text
-        math_op_pattern = r"(77->|\+->|-\|>|<-\||->|>->|>->>|<=>|=>|>=|<=|!=|>|<|=)"
-        func_app_pattern = (
-            r"\b([a-zA-Z_]\w*_\w+)\s+"  # Function name (must contain underscore)
-            r"([a-zA-Z_]\w*)\s*"  # Argument
-            + math_op_pattern  # Operator
-            + r"\s*([a-zA-Z_0-9]\w*)"  # Value
-        )
-
-        matches = list(re.finditer(func_app_pattern, result))
-        for match in reversed(matches):
-            start_pos = match.start()
-            end_pos = match.end()
-
-            # Check if already in math mode
-            before = result[:start_pos]
-            dollars_before = before.count("$")
-            if dollars_before % 2 == 1:
-                continue  # Already in math mode
-
-            expr = match.group(0)
-
-            # Try to parse the full expression
-            try:
-                lexer = Lexer(expr)
-                tokens = lexer.tokenize()
-                parser = Parser(tokens)
-                ast = parser.parse()
-
-                if isinstance(ast, Expr):
-                    math_latex = self.generate_expr(ast)
-                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except (LexerError, ParserError):
-                # Parsing failed - manually process components
-                # Extract: func_name arg operator value
-                parts = expr.split()
-                if len(parts) >= 3:
-                    func_name = parts[0]
-                    arg_name = parts[1]
-                    op_and_value = " ".join(parts[2:])
-
-                    # Process function identifier
-                    func_node = Identifier(line=0, column=0, name=func_name)
-                    func_latex = self._generate_identifier(func_node)
-
-                    # Process argument identifier
-                    arg_node = Identifier(line=0, column=0, name=arg_name)
-                    arg_latex = self._generate_identifier(arg_node)
-
-                    # Convert operators in rest
-                    op_and_value_latex = op_and_value.replace("<=", r"\leq")
-                    op_and_value_latex = op_and_value_latex.replace(">=", r"\geq")
-                    op_and_value_latex = op_and_value_latex.replace("!=", r"\neq")
-
-                    # Combine as function application
-                    full_latex = f"{func_latex}({arg_latex}) {op_and_value_latex}"
-                    result = result[:start_pos] + f"${full_latex}$" + result[end_pos:]
-
-        return result
-
-    def _process_simple_expressions(self, text: str) -> str:
-        """Stage 3: Detect simple inline math expressions.
-
-        Matches expressions with operators like x > 1, f +-> g.
-        Strategy: Match sequences of identifiers/numbers connected by operators.
-        """
-        result = text
-
-        # All operators that need math mode
-        math_op_pattern = r"(77->|\+->|-\|>|<-\||->|>->|>->>|<=>|=>|>=|<=|!=|>|<|=)"
-
-        # Operand pattern: identifier OR decimal number
-        # This ensures "5.5" stays together as a decimal, not split at the period
-        operand = r"(?:[a-zA-Z_]\w*|\d+(?:\.\d+)?)"
-
-        # Pattern: identifier/number, followed by (operator identifier/number)+
-        # This matches chains like "p <=> x > 1" and "x = 5.5"
-        full_pattern = (
-            r"\b"
-            + operand
-            + r"\s*"  # First identifier/number
-            + math_op_pattern  # Operator
-            + r"\s*"
-            + operand  # Second operand
-            + r"(?:\s*"
-            + math_op_pattern
-            + r"\s*"
-            + operand
-            + r")*"  # More ops
-        )
-
-        matches = list(re.finditer(full_pattern, result))
-
-        # Process matches in reverse order to preserve positions
-        for match in reversed(matches):
-            # Check if already in math mode (look for $ before)
-            start_pos = match.start()
-            end_pos = match.end()
-
-            # Look backwards for $
-            before = result[:start_pos]
-
-            # Count $ symbols before this position
-            dollars_before = before.count("$")
-            # If odd number of $, we're already in math mode
-            if dollars_before % 2 == 1:
-                continue
-
-            # Extract the matched expression
-            expr = match.group(0)
-
-            # Convert the operator to LaTeX
-            try:
-                # Try to parse and generate proper LaTeX
-                lexer = Lexer(expr)
-                tokens = lexer.tokenize()
-                parser = Parser(tokens)
-                ast = parser.parse()
-
-                # Generate LaTeX for the expression if it's an Expr
-                if isinstance(ast, Expr):
-                    math_latex = self.generate_expr(ast)
-                    # Wrap in $...$
-                    result = result[:start_pos] + f"${math_latex}$" + result[end_pos:]
-            except (LexerError, ParserError):
-                # Parsing failed - wrap expression as-is
-                result = result[:start_pos] + f"${expr}$" + result[end_pos:]
-
-        return result
-
-    def _process_inline_math(self, text: str) -> str:
-        """Process inline math expressions in text via pipeline stages.
-
-        Detects patterns like:
-        - Superscripts: x^2, a_i^2, 2^n (wrap in math mode)
-        - Set comprehensions: { x : N | x > 0 }
-        - Set comprehensions with nested braces: {p : P . p |-> {p}}
-        - Quantifiers: forall x : N | predicate
-
-        Parses them and converts to $...$ wrapped LaTeX.
-
-        Pipeline stages (order matters):
-        1. Manual markup: [operator] -> LaTeX symbols
-        2. Logical formulas: p => q, p <=> q
-        3. Parenthesized logic: (p lor q)
-        4. Standalone keywords: lor, land, lnot, elem
-        5. Superscripts: x^2
-        6. Relational image: R(| S |)
-        7. Set expressions: { ... }
-        8. Quantifiers: forall, exists, exists1, mu
-        9. Function application: f x > y
-        10. Simple expressions: x > 1
-
-        Note: _process_type_declarations is intentionally absent.  The
-        colon-detection heuristic (identifier : type → $identifier : type$)
-        fires on ordinary English punctuation such as "cardinality: empty"
-        and silently corrupts prose (bug 7.F).  Authors who want inline type
-        ascriptions should use explicit $...$ delimiters.
-        """
-        result = text
-        result = self._process_manual_markup(result)
-        result = self._process_logical_formulas(result)
-        result = self._process_parenthesized_logic(result)
-        result = self._process_standalone_keywords(result)
-        result = self._process_superscripts(result)
-        result = self._process_relational_image(result)
-        result = self._process_set_expressions(result)
-        result = self._process_quantifiers(result)
-        result = self._process_function_applications(result)
-        return self._process_simple_expressions(result)
-
     def _convert_operators_to_latex(self, text: str) -> str:
-        """Convert operator keywords to LaTeX symbols in text."""
+        """Convert operator keywords to LaTeX symbols in text.
+
+        Used by truth-table header processing in text_blocks.py.  Headers
+        are already inside ``$...$`` math mode when this is called, so no
+        math-mode wrapping is added here.
+        """
         # Replace operators with LaTeX commands using word boundaries
         # Order matters: replace longer operators first
         result = text.replace("<=>", r"\Leftrightarrow")

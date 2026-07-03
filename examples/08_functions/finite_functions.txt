@@ -18,7 +18,7 @@
 
 === Phase 34: Finite Partial Functions ===
 
-TEXT: Finite partial functions are partial functions with a finite domain. The operator 77-> denotes a finite partial function, meaning the function may not be defined everywhere, and its domain must be finite.
+TEXT: Finite partial functions are partial functions with a finite domain. The operator $77->$ denotes a finite partial function, meaning the function may not be defined everywhere, and its domain must be finite.
 
 ** Example 1: Basic Finite Function Type **
 
@@ -44,10 +44,10 @@ TEXT: 3. It is functional: each year maps to at most one table
 
 TEXT: Comparison of function type operators:
 
-TEXT: - Total function (->): defined for all inputs, domain is entire source set
-TEXT: - Partial function (+->): may not be defined for all inputs, domain may be infinite
-TEXT: - Finite partial function (77->): partial function with finite domain
-TEXT: - Total bijection (>->>): defined everywhere, injective and surjective
+TEXT: - Total function ($->$): defined for all inputs, domain is entire source set
+TEXT: - Partial function ($+->$): may not be defined for all inputs, domain may be infinite
+TEXT: - Finite partial function ($77->$): partial function with finite domain
+TEXT: - Total bijection ($>->>$): defined everywhere, injective and surjective
 
 zed
   given X, Y

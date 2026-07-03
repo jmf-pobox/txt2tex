@@ -45,7 +45,7 @@ TEXT: Projection functions for triples.
 
 ** Example 2: Generic Binary Tree (Conceptual) **
 
-TEXT: Binary trees are typically defined for specific types in Z notation rather than as fully polymorphic structures. For a concrete type like N, you would define: Tree ::= leaf | node⟨N cross Tree cross Tree⟩. Generic trees require complex workarounds beyond standard gendef blocks, as free types in fuzz are not easily parameterized.
+TEXT: Binary trees are typically defined for specific types in Z notation rather than as fully polymorphic structures. For a concrete type like N, you would define: Tree ::= leaf $|$ node$<N cross Tree cross Tree>$. Generic trees require complex workarounds beyond standard gendef blocks, as free types in fuzz are not easily parameterized.
 
 ** Example 6: Generic State Schema **
 
@@ -78,7 +78,7 @@ TEXT: Composes two relations using forward composition.
 
 ** Example 8: Generic Option Type (Conceptual) **
 
-TEXT: Optional values (like Maybe or Option in other languages) are challenging to express generically in Z notation due to limitations with parameterized free types. For a specific type, you would define: Option ::= none | some⟨T⟩. Fully generic option types with operations require advanced patterns beyond standard gendef blocks.
+TEXT: Optional values (like Maybe or Option in other languages) are challenging to express generically in Z notation due to limitations with parameterized free types. For a specific type, you would define: Option ::= none $|$ some$<T>$. Fully generic option types with operations require advanced patterns beyond standard gendef blocks.
 
 ** Example 9: Generic Stack Schema **
 

@@ -310,7 +310,7 @@ $\forall x : \nat @ x > 0 \implies (\exists x : \nat @ x < 10)$
 \subsection*{Example 21 : Scoping elem Definitions}
 \addcontentsline{toc}{subsection}{Example 21 : Scoping elem Definitions}
 
-\noindent Poor style example (not valid due to name shadowing): If we had: axdef with square : $\nat \fun \nat$ and n : N, where forall n : N shadows the global n. The quantifier's n would be local to the quantifier, and the global $n = 5$ would be separate. This is legal but confusing. Better to use different names:
+\noindent Poor style example (not valid due to name shadowing): If we had: axdef with square : $\nat \fun \nat$ and $n : N$, where $forall n : N$ shadows the global n. The quantifier's n would be local to the quantifier, and the global $n = 5$ would be separate. This is legal but confusing. Better to use different names:
 
 \bigskip
 

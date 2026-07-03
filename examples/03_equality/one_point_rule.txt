@@ -35,7 +35,7 @@ exists x, y : N | x + y = 4 land x < y
 <=> exists x : N | 4 - x elem N land x < 4 - x
 <=> true
 
-TEXT: The final equivalence holds because 0 in N, 4 - 0 in N, and 0 < 4.
+TEXT: The final equivalence holds because 0 in N, 4 - 0 in N, and $0 < 4$.
 
 ** Example 3: One-Point with Disjunction **
 

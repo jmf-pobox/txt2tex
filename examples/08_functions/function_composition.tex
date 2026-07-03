@@ -35,7 +35,7 @@ h : \nat \fun \nat
 h = f \comp g
 \end{axdef}
 
-\noindent h(n) = g(f(n)) = g(n + 1) = (n + 1) * $2 = 2$n + 2
+\noindent h(n) = g(f(n)) = g(n + 1) = (n + 1) * 2 = 2n + 2
 
 \bigskip
 
@@ -56,7 +56,7 @@ h2 : \nat \fun \nat
 h2 = f2 \comp g2
 \end{axdef}
 
-\noindent h2(n) = f2(g2(n)) = f2(n * 2) = (n * 2) + $1 = 2$n + 1
+\noindent h2(n) = f2(g2(n)) = f2(n * 2) = (n * 2) + 1 = 2n + 1
 
 \bigskip
 
@@ -90,7 +90,7 @@ pipeline : \nat \fun \nat
 pipeline = addOne \comp double \comp square
 \end{axdef}
 
-\noindent pipeline(n) = square(double(addOne(n))) = square(double(n + 1)) = square(2(n + 1)) = (2(n + 1))\textasciicircum$\{\}$2
+\noindent pipeline(n) = square(double(addOne(n))) = square(double(n + 1)) = square(2(n + 1)) = (2(n + 1))\textasciicircum{}2
 
 \bigskip
 
@@ -109,7 +109,7 @@ leftId = identity \comp anyFunc \\
 rightId = anyFunc \comp identity
 \end{axdef}
 
-\noindent $leftId = anyFunc$ (identity is left identity for $\semi$) $rightId = anyFunc$ (identity is right identity for $\semi$)
+\noindent leftId = anyFunc (identity is left identity for $\semi$) rightId = anyFunc (identity is right identity for $\semi$)
 
 \bigskip
 
@@ -120,7 +120,7 @@ rightId = anyFunc \comp identity
 
 \bigskip
 
-\noindent (f $\semi$ g) $\semi$ $h = f$ $\semi$ (g $\semi$ h)
+\noindent $(f \semi g) \semi h = f \semi (g \semi h)$
 
 \bigskip
 
@@ -142,7 +142,7 @@ comp1 = (f3 \comp g3) \comp h3 \\
 comp2 = f3 \comp (g3 \comp h3)
 \end{axdef}
 
-\noindent $comp1 = comp2$ for all inputs.
+\noindent comp1 = comp2 for all inputs.
 
 \bigskip
 
@@ -232,7 +232,7 @@ identity\_check = encrypt \comp decrypt
 \subsection*{Example 12 : Partial Composition}
 \addcontentsline{toc}{subsection}{Example 12 : Partial Composition}
 
-\noindent When composing f : $A \fun B$ and g : $C \fun D$, we need ran f subseteq dom g.
+\noindent When composing $f : A -> B$ and $g : C -> D$, we need $\ran f \subseteq \dom g$.
 
 \bigskip
 
@@ -246,21 +246,21 @@ g4 = \{10 \mapsto 100, 20 \mapsto 200\} \\
 h4 = f4 \comp g4
 \end{axdef}
 
-\noindent h4 = $\{1 \mapsto 100, 2 \mapsto 200\}$. Composition is defined where ranges align.
+\noindent $h4 = \{1 \mapsto 100, 2 \mapsto 200\}$. Composition is defined where ranges align.
 
 \bigskip
 
 \subsection*{Example 13 : Monoid Structure}
 \addcontentsline{toc}{subsection}{Example 13 : Monoid Structure}
 
-\noindent Functions from $A \fun A$ with composition form a monoid: 1. Composition is associative: (f $\semi$ g) $\semi$ $h = f$ $\semi$ (g $\semi$ h) 2. Identity element: id(x) = x, id $\semi$ $f = f = f$ $\semi$ id 3. Closure: composing $A \fun A$ functions gives another $A \fun A$ function
+\noindent Functions from $A \fun A$ with composition form a monoid: 1. Composition is associative: $(f \semi g) \semi h = f \semi (g \semi h)$ 2. Identity element: id(x) = x, id $\semi$ f = f = f $\semi$ id 3. Closure: composing $A \fun A$ functions gives another $A \fun A$ function
 
 \bigskip
 
 \subsection*{Example 14 : Practical Example - Data Processing Pipeline}
 \addcontentsline{toc}{subsection}{Example 14 : Practical Example - Data Processing Pipeline}
 
-\noindent In practice, you might compose functions to create data processing pipelines: validate $\semi$ process $\semi$ format. Each stage transforms data through a series of operations. The notation f $\semi$ g $\semi$ h means "apply f, then g, then h" which creates a pipeline from input to output.
+\noindent In practice, you might compose functions to create data processing pipelines: $validate \semi process \semi format$. Each stage transforms data through a series of operations. The notation $f \semi g \semi h$ means "apply f, then g, then h" which creates a pipeline from input to output.
 
 \bigskip
 
@@ -271,11 +271,11 @@ h4 = f4 \comp g4
 
 \bigskip
 
-\noindent f $\semi$ $g = h$ means (f $\semi$ g) = h, not f $\semi$ ($g = h$)
+\noindent $f \semi g = h$ means $(f \semi g) = h$, not $f \semi (g = h)$
 
 \bigskip
 
-\noindent Use parentheses to clarify: (f $\semi$ g) or f $\semi$ (g $\semi$ h)
+\noindent Use parentheses to clarify: $(f \semi g)$ or $f \semi (g \semi h)$
 
 \bigskip
 
@@ -316,7 +316,7 @@ addFive = increment \comp increment \comp increment \comp increment \comp increm
 
 \bigskip
 
-\noindent Instead of: $result = h$(g(f(x))) Use: $pipeline = f$ $\semi$ g $\semi$ h; $result = pipeline$(x)
+\noindent Instead of: result = h(g(f(x))) Use: $pipeline = f \semi g \semi h$; $result = pipeline(x)$
 
 \bigskip
 
@@ -327,7 +327,7 @@ addFive = increment \comp increment \comp increment \comp increment \comp increm
 \subsection*{Example 19 : Best Practices}
 \addcontentsline{toc}{subsection}{Example 19 : Best Practices}
 
-\noindent When using composition: 1. Choose forward ($\semi$) or backward (o) consistently in your codebase 2. Document the data flow direction 3. Break complex pipelines into named intermediate steps 4. Type-check that domains and ranges align 5. Use composition to create reusable pipelines 6. Test individual functions before composing them 7. Remember: $\semi$ reads left-to-right (natural for pipelines), o reads right-to-left (traditional math notation)
+\noindent When using composition: 1. Choose forward (o9) or backward (o) consistently in your codebase 2. Document the data flow direction 3. Break complex pipelines into named intermediate steps 4. Type-check that domains and ranges align 5. Use composition to create reusable pipelines 6. Test individual functions before composing them 7. Remember: $\semi$ reads left-to-right (natural for pipelines), o reads right-to-left (traditional math notation)
 
 \bigskip
 

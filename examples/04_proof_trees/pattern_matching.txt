@@ -29,4 +29,4 @@ where
   forall x : EntryPM; s : seq EntryPM | filterSeq(<x> ^ s) = <x> ^ filterSeq(s)
 end
 
-TEXT: This demonstrates pattern matching on sequences with base case (<>) and recursive case (<x> ^ s).
+TEXT: This demonstrates pattern matching on sequences with base case ($<>$) and recursive case ($<x> ^ s$).

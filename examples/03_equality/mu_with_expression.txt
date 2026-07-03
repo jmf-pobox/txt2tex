@@ -32,19 +32,19 @@ TEXT: Adding a bullet and expression transforms the result:
 
 mu x : N | x * x = 16 . x + 1
 
-TEXT: This finds x = 4, then evaluates x + 1, giving 5.
+TEXT: This finds $x = 4$, then evaluates x + 1, giving 5.
 
 ** Example 3: Finding land Doubling **
 
 mu n : N | n > 10 land n < 12 . 2 * n
 
-TEXT: Finds n = 11 (unique n between 10 and 12), then returns 2 * 11 = 22.
+TEXT: Finds $n = 11$ (unique n between 10 and 12), then returns $2 * 11 = 22$.
 
 ** Example 4: Square Root land Square Again **
 
 mu x : N | x * x = 25 . x * x * x
 
-TEXT: Finds x = 5, then returns 5³ = 125.
+TEXT: Finds $x = 5$, then returns 5³ = 125.
 
 ** Example 5: String Indexing Example **
 
@@ -138,7 +138,7 @@ where
   findRoot = mu x : N | x * x = 49
 end
 
-TEXT: findRoot = 7
+TEXT: $findRoot = 7$
 
 TEXT: With bullet (returns a transformed value):
 
@@ -148,29 +148,29 @@ where
   findRootPlusOne = mu x : N | x * x = 49 . x + 1
 end
 
-TEXT: findRootPlusOne = 8
+TEXT: $findRootPlusOne = 8$
 
 ** Example 12: Complex Expression **
 
 mu x : N | x > 5 land x < 7 . (x * x) + (x + 1)
 
-TEXT: Finds x = 6, then evaluates (6 * 6) + (6 + 1) = 36 + 7 = 43.
+TEXT: Finds $x = 6$, then evaluates (6 * 6) + (6 + 1) = $36 + 7 = 43$.
 
 ** Example 13: Nested Mu Expressions **
 
 mu x : N | x * x = 16 . mu y : N | y * y = (x + 5) . y + x
 
-TEXT: Finds x = 4, then finds y where y² = (4 + 5) = 9, so y = 3, then returns 3 + 4 = 7.
+TEXT: Finds $x = 4$, then finds y where y² = (4 + 5) = 9, so $y = 3$, then returns $3 + 4 = 7$.
 
 ** Example 14: Error Conditions **
 
 TEXT: The mu operator requires the constraint to have exactly one solution. If there are zero solutions or multiple solutions, mu is undefined (evaluation error).
 
 TEXT: Zero solutions:
-TEXT: mu x : N | x * x = -1 (no natural number has negative square)
+TEXT: $mu x : N | x * x = -1$ (no natural number has negative square)
 
 TEXT: Multiple solutions:
-TEXT: mu x : N | x < 5 (0, 1, 2, 3, 4 all satisfy this)
+TEXT: $mu x : N | x < 5$ (0, 1, 2, 3, 4 all satisfy this)
 
 TEXT: For mu to be well-defined, the constraint must uniquely identify exactly one value.
 

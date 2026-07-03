@@ -23,7 +23,7 @@
 
 ** Example 1: Proof by Cases (Three-Way Split) **
 
-TEXT: Prove: For all integers n, n < 0 or n = 0 or n > 0
+TEXT: Prove: For all integers n, $n < 0 lor n = 0 lor n > 0$
 
 PROOF:
   n < 0 lor n = 0 lor n > 0 [trichotomy of integers, axiom]
@@ -32,7 +32,7 @@ TEXT: This uses the trichotomy property as an axiom. To prove something about al
 
 ** Example 2: Multi-Level Case Analysis **
 
-TEXT: Prove: (p lor q) land (r lor s) => (p land r) lor (p land s) lor (q land r) lor (q land s)
+TEXT: Prove: $(p lor q) land (r lor s) => (p land r) lor (p land s) lor (q land r) lor (q land s)$
 
 PROOF:
 ((p lor q) land (r lor s)) => (p land r) lor (p land s) lor (q land r) lor (q land s) [=> intro from 1]
@@ -59,11 +59,11 @@ PROOF:
 
 TEXT: Nested case analysis on two disjunctions, exploring all four combinations.
 
-** Example 3: Proof by Mathematical Induction (Base land Step) **
+** Example 3: Proof by Mathematical Induction (Base and Step) **
 
-TEXT: Prove: For all n ∈ ℕ, sum(1 to n) = n(n+1)/2
+TEXT: Prove: For all $n elem N$, sum(1 to n) = n(n+1)/2
 
-TEXT: Base case (n = 0):
+TEXT: Base case $(n = 0)$:
 
 PROOF:
 true => (sum_to(0) = 0 * (0+1) div 2) [=> intro from 1]
@@ -148,9 +148,9 @@ TEXT: Non-constructive: we don't know which case is true, but both lead to the c
 
 ** Example 7: Proof by Strong Induction **
 
-TEXT: Prove: Every natural number n ≥ 2 has a prime factorization
+TEXT: Prove: Every natural number $n >= 2$ has a prime factorization
 
-TEXT: Base case (n = 2):
+TEXT: Base case $(n = 2)$:
 
 PROOF:
 true => prime_factorization(2) [=> intro from 1]
@@ -158,7 +158,7 @@ true => prime_factorization(2) [=> intro from 1]
       prime(2) [definition]
       prime_factorization(2) [trivial, singleton factorization]
 
-TEXT: Inductive step (assume for all k < n, prove for n):
+TEXT: Inductive step (assume for all $k < n$, prove for n):
 
 PROOF:
 (n >= 2) => prime_factorization(n) [=> intro from 1]
@@ -209,26 +209,26 @@ TEXT: Proof by contrapositive using lemma.
 
 ** Example 9: Proof by Minimal Counterexample **
 
-TEXT: Prove: All natural numbers n ≥ 1 satisfy P(n)
+TEXT: Prove: All natural numbers $n >= 1$ satisfy $p(n)$
 
 PROOF:
-true => (forall n | n >= 1 => P(n)) [=> intro from 1]
+true => (forall n | n >= 1 => p(n)) [=> intro from 1]
   [1] true [assumption]
-      (forall n | n >= 1 => P(n)) [lnot intro from 2]
-        [2] lnot (forall n | n >= 1 => P(n)) [assumption]
-            exists n | n >= 1 land lnot P(n) [negation of forall]
+      (forall n | n >= 1 => p(n)) [lnot intro from 2]
+        [2] lnot (forall n | n >= 1 => p(n)) [assumption]
+            exists n | n >= 1 land lnot p(n) [negation of forall]
             smallest_counterexample(m) [well-ordering principle]
-            m >= 1 land lnot P(m) [by choice of m]
+            m >= 1 land lnot p(m) [by choice of m]
             false [lor elim]
               case m = 1:
-                P(1) [base case proved separately]
-                lnot P(m) land P(1) [contradiction]
+                p(1) [base case proved separately]
+                lnot p(m) land p(1) [contradiction]
                 false [contradiction]
               case m > 1:
-                forall k | k >= 1 land k < m => P(k) [minimality of m]
-                P(m - 1) [since m - 1 >= 1 land m - 1 < m]
-                P(m) [by inductive step from P(m - 1)]
-                lnot P(m) land P(m) [contradiction]
+                forall k | k >= 1 land k < m => p(k) [minimality of m]
+                p(m - 1) [since m - 1 >= 1 land m - 1 < m]
+                p(m) [by inductive step from p(m - 1)]
+                lnot p(m) land p(m) [contradiction]
                 false [contradiction]
 
 TEXT: Minimal counterexample combines well-ordering with contradiction.
@@ -282,14 +282,14 @@ TEXT: Cantor's diagonal argument (outline).
 
 ** Example 12: Constructive Proof Pattern **
 
-TEXT: To constructively prove: exists x | P(x)
+TEXT: To constructively prove: $exists x | p(x)$
 
 TEXT: Strategy:
 TEXT: 1. Explicitly construct a witness w
-TEXT: 2. Verify P(w) holds
-TEXT: 3. Conclude exists x | P(x) with x = w
+TEXT: 2. Verify $p(w)$ holds
+TEXT: 3. Conclude $exists x | p(x)$ with $x = w$
 
-TEXT: Example: Prove exists n : N | n > 100 land n is even
+TEXT: Example: Prove $exists n : N | n > 100 land even(n)$
 
 PROOF:
 true => (exists n | n > 100 land even(n)) [=> intro from 1]
@@ -310,22 +310,22 @@ TEXT: Theorem: Property P holds for all cases
 TEXT: Overall strategy: Case analysis + Induction + Contradiction
 
 PROOF:
-true => (forall n | P(n)) [=> intro from 1]
+true => (forall n | p(n)) [=> intro from 1]
   [1] true [assumption]
-      forall n | P(n) [lor elim over cases]
+      forall n | p(n) [lor elim over cases]
         case base:
-          P(base) [direct proof]
+          p(base) [direct proof]
         case inductive:
-          P(n) [lor elim over subcases]
+          p(n) [lor elim over subcases]
             case subcase_a:
-              P(n) [lnot intro from 2]
-                [2] lnot P(n) [assumption]
+              p(n) [lnot intro from 2]
+                [2] lnot p(n) [assumption]
                     contradiction_derived [proof steps]
                     false [contradiction]
             case subcase_b:
-              P(n) [=> intro from 3]
-                [3] P(n - 1) [assumption]
-                    P(n) [inductive step]
+              p(n) [=> intro from 3]
+                [3] p(n - 1) [assumption]
+                    p(n) [inductive step]
 
 ** Example 14: Best Practices for Complex Proofs **
 
