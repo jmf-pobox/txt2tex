@@ -1082,6 +1082,18 @@ Both type-check in fuzz. The current code follows the same `_generate_quantifier
 - The `is_bullet_indicator` deletion removes 45 lines and one category of parser state. `_parse_postfix` is now simpler and more regular.
 - Known limitation: multi-decl lambda without a pipe-predicate (e.g., `lambda s : Ship; c : Class . (s, c)`) is not yet supported. See `MISSING_FEATURES.md`.
 
+### ADR: field selection as an operand of every infix operator
+
+**Context**: The `safe_followers` set in `_parse_postfix` gates whether a tight `.field` is parsed as a projection: the projection is consumed only when the token *after* the field name is in `safe_followers`. The set listed `=`, `+`, `-`, the comparisons, and the connectives, but omitted the set/relation/product operators (`union`, `intersect`, `setminus`, `cross`, `*`, `++`, the maplet `|->`, `<->`, the domain/range restrictions `<|`/`|>`/`<<|`/`|>>`, `o9`, `comp`, `join`, `div`). So `p.a |-> q.b` failed to parse — the `.` was left unconsumed — while `p.a = q.b` and `x |-> y` parsed. Reported via a real Z model summing `paymentId |-> amount` maplets.
+
+**Z rule (jms)**: selection binds tighter than every infix operator (Z RM §3.16; Chapter 6 grammar places selection in the maximal-binding tier). `p.a |-> q.b` must parse as `(p.a) |-> (q.b)`. A maplet `a |-> b` is definitionally the pair `(a, b)`, so a set of `p.a |-> p.b` maplets has the same type as the pair form `(p.a, p.b)`.
+
+**Decision**: extend `safe_followers` to include every infix/postfix operator that can follow a selection (the omitted ones above, plus the function-type arrows, sequence/bag operators, schema-calculus operators, and relational image). The genuine separator cases — the spaced comprehension/quantifier bullet, and a chained projection inside a comprehension body — are caught by `break` guards *earlier* in `_parse_postfix` and never reach this check, so widening `safe_followers` cannot disturb them.
+
+**Rejected alternative**: *invert* `safe_followers` into a deny-list — treat a tight `.field` as selection unconditionally and enumerate only the separator cases (jms's preferred shape, per the Q2(d) ADR: a tight dot is always selection). More robust against future operator additions, but it moves the burden to correctly enumerating every separator break and carries more regression risk in the comprehension-body paths. We chose the lower-risk allow-list extension. **Maintenance note**: the allow-list must be re-synchronised whenever a new infix operator token is added to the lexer — a new operator that can follow a selection must be added here too, or it re-introduces this class of bug.
+
+**Consequences**: 30 tests in `tests/test_selection_operand.py` cover the operator × selection-operand matrix across comprehension, axdef, and set-display contexts, the end-to-end `sum(...)` fuzz round-trip, and the spaced-bullet carve-out. Known limitation (unchanged): a chained selection `a.b.c |-> d` inside a comprehension body still needs explicit parentheses.
+
 ## Supported Features
 
 txt2tex is feature-complete for typical Z specifications. See [MISSING_FEATURES.md](guides/MISSING_FEATURES.md) for advanced operators not yet implemented.

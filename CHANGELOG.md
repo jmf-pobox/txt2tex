@@ -51,6 +51,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Field selection rejected as an operand of set/relation operators** — a
+  tight selection like `p.amount` parsed as an operand of `=` and `+` but not
+  of `union`, `cross`, `intersect`, `setminus`, `*`, the maplet `|->`, `<->`,
+  the domain/range restrictions, or `o9`. So `p.paymentId |-> p.amount` failed
+  to parse while `x |-> y` worked. Selection binds tighter than every infix
+  operator (Z RM §3.16), so the parser now accepts a selection before all of
+  them. Maplets with selection operands (`{ p : T | ... . p.a |-> p.b }`) now
+  parse and render.
+
 - **`UnicodeDecodeError` when compiling documents with non-UTF-8 output** —
   `compile.py` ran latexmk/pdflatex/tex-fmt with `text=True` and no
   `errors=` handler, so a non-UTF-8 byte in the tool's captured output
