@@ -84,7 +84,7 @@ class TestStrictBackslashError:
     """
 
     def test_raw_geq_raises(self) -> None:
-        r"""$\geq$ raises InlineMathError — starts with SETMINUS, no left operand."""
+        r"""$\geq$ raises InlineMathError — `\g` is a raw-LaTeX command pattern."""
         with pytest.raises(InlineMathError, match="whiteboard notation only"):
             _gen(r"TEXT: We need $\geq 0$ to hold.")
 
