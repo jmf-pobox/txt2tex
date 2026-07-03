@@ -76,8 +76,10 @@ class TestInlineMath:
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        # In escape-only mode, bare { } are escaped to \{ \}
-        assert "{this}" in latex or "\\{this\\}" in latex
+        # In escape-only mode, bare { } are escaped to \{ \}.
+        # Raw unescaped {this} must not survive in the output.
+        assert "\\{this\\}" in latex
+        assert "{this}" not in latex.replace("\\{this\\}", "")
 
     def test_inline_math_in_part(self) -> None:
         """Explicit $...$ in part content renders correctly."""
@@ -164,8 +166,9 @@ def test_multiple_operators_in_text() -> None:
     gen = LaTeXGenerator()
     latex_lines = gen._generate_paragraph(para)
     latex = "\n".join(latex_lines)
-    # Bare x > 1 stays as literal prose (> is not a LaTeX-special character).
-    assert "x >" in latex or "x" in latex
+    # Bare x > 1 stays as literal prose; no $ wrapping is inserted.
+    assert "x > 1" in latex
+    assert "$x" not in latex
 
 
 def test_equals_operator_inline() -> None:

@@ -204,8 +204,10 @@ class TestTextBlockSequenceOperators:
         ast = parser.parse()
         gen = LaTeXGenerator()
         latex = gen.generate_document(ast)
-        # In escape-only mode, Unicode ⌢ is not auto-converted; it passes through.
-        assert "⌢" in latex or "s" in latex
+        # In escape-only mode, Unicode ⌢ passes through as the literal glyph.
+        # It must NOT be converted to the \cat macro (that only fires for $⌢$).
+        assert "⌢" in latex
+        assert r"\cat" not in latex
 
 
 class TestTextBlockOperatorOrdering:

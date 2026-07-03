@@ -235,10 +235,18 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
         # Also escape any remaining bare $$ (e.g. $$\n, or $$ at end of line)
         sanitised = re.sub(r"\$\$", lambda _: _make_placeholder(r"\$\$"), sanitised)
 
-        # Pass 2: count remaining $ characters.  If odd, escape them all so
-        # no stray $ reaches pdflatex.
-        if sanitised.count("$") % 2 == 1:
-            sanitised = sanitised.replace("$", r"\$")
+        # Pass 2: count remaining *real* $ characters — those not already
+        # escaped as \$.  Mask the user-written \$ first so they do not skew
+        # the odd-parity guard: a literal \$ on the line must not cancel out
+        # or create an apparent imbalance among the real $...$  spans.
+        bs_dollar_mask = "\x00BSDOLLAR\x00"
+        masked = sanitised.replace(r"\$", bs_dollar_mask)
+        if masked.count("$") % 2 == 1:
+            # Odd real $: escape every real $ to \$, then restore masked ones.
+            sanitised = masked.replace("$", r"\$").replace(bs_dollar_mask, r"\$")
+        else:
+            # Even real $: just restore already-escaped ones unchanged.
+            sanitised = masked.replace(bs_dollar_mask, r"\$")
 
         # Pass 3: any $-escaped singles (from Pass 2) also get opaque placeholders
         # so downstream pipeline steps do not see their $ character.

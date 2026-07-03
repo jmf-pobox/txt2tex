@@ -323,3 +323,60 @@ class TestBackslashBraceEscape:
         assert r"\textbackslash{}" in latex
         assert r"\{" in latex
         assert r"\}" in latex
+
+
+# ---------------------------------------------------------------------------
+# $ parity bugs — literal \$ skewing the parity guard (#80)
+# ---------------------------------------------------------------------------
+
+
+class TestDollarParityBugs:
+    r"""Regression tests for \$-parity bugs in _pre_sanitise_dollars (#80).
+
+    Bug 1 (compile failure): a line with a literal \$ plus an odd number of
+    real $ nets to even parity, defeating the odd-parity guard.  The lone
+    real $ reaches the .tex raw and pdflatex fails.
+
+    Bug 2 (correctness): when \$ precedes a real $...$, the odd total
+    triggers the escape-all path and the real span is emitted as literal
+    text instead of math.
+    """
+
+    def _noindent_line(self, latex: str) -> str:
+        r"""Return the first \noindent prose line from generated LaTeX."""
+        for line in latex.splitlines():
+            if r"\noindent" in line:
+                return line
+        return ""
+
+    def test_literal_dollar_plus_lone_real_dollar_both_escaped(self) -> None:
+        r"""foo\$bar$baz: both dollars render as \$, no raw $ in prose (Bug 1)."""
+        latex = _gen(r"TEXT: foo\$bar$baz")
+        prose = self._noindent_line(latex)
+        # At least one escaped dollar must appear
+        assert r"\$" in prose
+        # No raw unescaped $ may survive in the prose line
+        cleaned = prose.replace(r"\$", "")
+        assert "$" not in cleaned
+
+    def test_literal_dollar_preserves_adjacent_math_span(self) -> None:
+        r"""price \$5 then $x >= 0$ end: \$ literal AND $x \geq 0$ math (Bug 2)."""
+        latex = _gen(r"TEXT: price \$5 then $x >= 0$ end")
+        prose = self._noindent_line(latex)
+        # Literal \$ must appear in the prose
+        assert r"\$" in prose
+        # The real math span must be rendered as math, not as literal text
+        assert r"\geq" in latex
+
+    def test_balanced_dollar_span_unaffected(self) -> None:
+        r"""value $x >= 0$ here: real $...$ span still renders as math (regression)."""
+        latex = _gen("TEXT: value $x >= 0$ here")
+        assert r"\geq" in latex
+
+    def test_literal_dollar_only_renders_escaped(self) -> None:
+        r"""price is \$10: the literal \$ renders as \$ in prose (regression)."""
+        latex = _gen(r"TEXT: price is \$10")
+        prose = self._noindent_line(latex)
+        assert r"\$" in prose
+        cleaned = prose.replace(r"\$", "")
+        assert "$" not in cleaned
