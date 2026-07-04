@@ -1,6 +1,6 @@
 {
-  "generated": "2026-05-25T08:52:21+00:00",
-  "commit": "6a31c21",
+  "generated": "2026-07-04T22:04:19+00:00",
+  "commit": "dde0216",
   "src": "src/txt2tex",
   "mi": [
     {
@@ -14,14 +14,9 @@
       "mi": 0.0
     },
     {
-      "file": "src/txt2tex/codegen/text_pipeline.py",
-      "grade": "B",
-      "mi": 11.9
-    },
-    {
       "file": "src/txt2tex/codegen/expressions.py",
       "grade": "A",
-      "mi": 22.11
+      "mi": 20.36
     },
     {
       "file": "src/txt2tex/codegen/proofs.py",
@@ -31,7 +26,12 @@
     {
       "file": "src/txt2tex/ast_nodes.py",
       "grade": "A",
-      "mi": 29.32
+      "mi": 28.81
+    },
+    {
+      "file": "src/txt2tex/latex_gen.py",
+      "grade": "A",
+      "mi": 33.09
     },
     {
       "file": "src/txt2tex/parser.py",
@@ -39,19 +39,14 @@
       "mi": 33.93
     },
     {
-      "file": "src/txt2tex/latex_gen.py",
-      "grade": "A",
-      "mi": 38.89
-    },
-    {
       "file": "src/txt2tex/parser_pkg/text_blocks.py",
       "grade": "A",
-      "mi": 39.6
+      "mi": 39.75
     },
     {
       "file": "src/txt2tex/parser_pkg/paragraphs.py",
       "grade": "A",
-      "mi": 40.65
+      "mi": 40.57
     },
     {
       "file": "src/txt2tex/parser_pkg/proofs.py",
@@ -61,7 +56,7 @@
     {
       "file": "src/txt2tex/codegen/paragraphs.py",
       "grade": "A",
-      "mi": 45.55
+      "mi": 42.78
     },
     {
       "file": "src/txt2tex/parser_pkg/schemas.py",
@@ -71,17 +66,27 @@
     {
       "file": "src/txt2tex/codegen/text_blocks.py",
       "grade": "A",
-      "mi": 47.11
+      "mi": 46.51
     },
     {
       "file": "src/txt2tex/cli.py",
       "grade": "A",
-      "mi": 47.6
+      "mi": 46.6
     },
     {
       "file": "src/txt2tex/parser_pkg/algebra.py",
       "grade": "A",
-      "mi": 51.04
+      "mi": 47.32
+    },
+    {
+      "file": "src/txt2tex/codegen/text_pipeline.py",
+      "grade": "A",
+      "mi": 51.75
+    },
+    {
+      "file": "src/txt2tex/codegen/schemas.py",
+      "grade": "A",
+      "mi": 52.65
     },
     {
       "file": "src/txt2tex/free_vars.py",
@@ -91,22 +96,22 @@
     {
       "file": "src/txt2tex/repl.py",
       "grade": "A",
-      "mi": 56.62
-    },
-    {
-      "file": "src/txt2tex/codegen/schemas.py",
-      "grade": "A",
-      "mi": 57.64
+      "mi": 56.12
     },
     {
       "file": "src/txt2tex/compile.py",
       "grade": "A",
-      "mi": 60.84
+      "mi": 60.7
+    },
+    {
+      "file": "src/txt2tex/codegen/_dispatch.py",
+      "grade": "A",
+      "mi": 66.1
     },
     {
       "file": "src/txt2tex/codegen/paren_policy.py",
       "grade": "A",
-      "mi": 67.1
+      "mi": 67.09
     },
     {
       "file": "src/txt2tex/parser_pkg/lexer_state.py",
@@ -114,14 +119,19 @@
       "mi": 68.07
     },
     {
-      "file": "src/txt2tex/errors.py",
+      "file": "src/txt2tex/codegen/fuzz_routing.py",
       "grade": "A",
-      "mi": 74.27
+      "mi": 70.75
     },
     {
       "file": "src/txt2tex/codegen/algebra.py",
       "grade": "A",
-      "mi": 74.99
+      "mi": 70.92
+    },
+    {
+      "file": "src/txt2tex/errors.py",
+      "grade": "A",
+      "mi": 74.27
     },
     {
       "file": "src/txt2tex/parser_pkg/types.py",
@@ -139,11 +149,6 @@
       "mi": 82.2
     },
     {
-      "file": "src/txt2tex/codegen/fuzz_routing.py",
-      "grade": "A",
-      "mi": 91.61
-    },
-    {
       "file": "src/txt2tex/codegen/bindings.py",
       "grade": "A",
       "mi": 92.32
@@ -152,6 +157,11 @@
       "file": "src/txt2tex/parser_pkg/errors.py",
       "grade": "A",
       "mi": 93.86
+    },
+    {
+      "file": "src/txt2tex/codegen/_toc.py",
+      "grade": "A",
+      "mi": 98.85
     },
     {
       "file": "src/txt2tex/constants.py",
@@ -189,11 +199,6 @@
       "mi": 100.0
     },
     {
-      "file": "src/txt2tex/codegen/_dispatch.py",
-      "grade": "A",
-      "mi": 100.0
-    },
-    {
       "file": "src/txt2tex/codegen/_smoke.py",
       "grade": "A",
       "mi": 100.0
@@ -202,7 +207,7 @@
   "cc": [
     {
       "file": "src/txt2tex/lexer.py",
-      "line": 339,
+      "line": 343,
       "kind": "method",
       "name": "Lexer._scan_token",
       "grade": "F",
@@ -210,7 +215,7 @@
     },
     {
       "file": "src/txt2tex/lexer.py",
-      "line": 1035,
+      "line": 1039,
       "kind": "method",
       "name": "Lexer._scan_identifier",
       "grade": "F",
@@ -218,11 +223,11 @@
     },
     {
       "file": "src/txt2tex/parser_pkg/expressions.py",
-      "line": 2084,
+      "line": 2195,
       "kind": "method",
       "name": "_ExpressionsParser._parse_postfix",
       "grade": "F",
-      "complexity": 43
+      "complexity": 45
     },
     {
       "file": "src/txt2tex/codegen/proofs.py",
@@ -234,17 +239,9 @@
     },
     {
       "file": "src/txt2tex/lexer.py",
-      "line": 226,
+      "line": 230,
       "kind": "class",
       "name": "Lexer",
-      "grade": "E",
-      "complexity": 31
-    },
-    {
-      "file": "src/txt2tex/parser_pkg/expressions.py",
-      "line": 1812,
-      "kind": "method",
-      "name": "_ExpressionsParser._parse_cross",
       "grade": "E",
       "complexity": 31
     },
@@ -266,9 +263,17 @@
     },
     {
       "file": "src/txt2tex/codegen/text_blocks.py",
-      "line": 80,
+      "line": 83,
       "kind": "method",
       "name": "_TextBlocksCodegen._generate_part",
+      "grade": "D",
+      "complexity": 30
+    },
+    {
+      "file": "src/txt2tex/parser_pkg/expressions.py",
+      "line": 1417,
+      "kind": "method",
+      "name": "_ExpressionsParser._parse_set_comprehension_from_brace",
       "grade": "D",
       "complexity": 29
     },
@@ -282,9 +287,17 @@
     },
     {
       "file": "src/txt2tex/latex_gen.py",
-      "line": 543,
+      "line": 715,
       "kind": "method",
       "name": "LaTeXGenerator._has_line_breaks_structural",
+      "grade": "D",
+      "complexity": 28
+    },
+    {
+      "file": "src/txt2tex/parser_pkg/expressions.py",
+      "line": 1871,
+      "kind": "method",
+      "name": "_ExpressionsParser._parse_cross",
       "grade": "D",
       "complexity": 28
     },
@@ -298,7 +311,7 @@
     },
     {
       "file": "src/txt2tex/parser.py",
-      "line": 449,
+      "line": 459,
       "kind": "method",
       "name": "Parser._parse_document_item",
       "grade": "D",
@@ -313,12 +326,20 @@
       "complexity": 25
     },
     {
-      "file": "src/txt2tex/codegen/text_pipeline.py",
-      "line": 697,
+      "file": "src/txt2tex/codegen/schemas.py",
+      "line": 183,
       "kind": "method",
-      "name": "_TextPipelineCodegen._convert_comparison_operators",
+      "name": "_SchemasCodegen._generate_schema",
       "grade": "D",
       "complexity": 25
+    },
+    {
+      "file": "src/txt2tex/cli.py",
+      "line": 163,
+      "kind": "function",
+      "name": "main",
+      "grade": "D",
+      "complexity": 24
     },
     {
       "file": "src/txt2tex/parser_pkg/proofs.py",
@@ -329,40 +350,16 @@
       "complexity": 24
     },
     {
-      "file": "src/txt2tex/parser_pkg/expressions.py",
-      "line": 1396,
-      "kind": "method",
-      "name": "_ExpressionsParser._parse_set_comprehension_from_brace",
-      "grade": "D",
-      "complexity": 23
-    },
-    {
-      "file": "src/txt2tex/codegen/schemas.py",
-      "line": 161,
-      "kind": "method",
-      "name": "_SchemasCodegen._generate_schema",
-      "grade": "D",
-      "complexity": 23
-    },
-    {
       "file": "src/txt2tex/parser.py",
-      "line": 667,
+      "line": 684,
       "kind": "method",
       "name": "Parser._parse_declaration_or_inclusion",
       "grade": "D",
       "complexity": 22
     },
     {
-      "file": "src/txt2tex/cli.py",
-      "line": 161,
-      "kind": "function",
-      "name": "main",
-      "grade": "D",
-      "complexity": 22
-    },
-    {
       "file": "src/txt2tex/latex_gen.py",
-      "line": 374,
+      "line": 544,
       "kind": "method",
       "name": "LaTeXGenerator.generate_document",
       "grade": "D",
@@ -370,7 +367,7 @@
     },
     {
       "file": "src/txt2tex/parser_pkg/expressions.py",
-      "line": 2480,
+      "line": 2671,
       "kind": "method",
       "name": "_ExpressionsParser._parse_atom",
       "grade": "D",
@@ -378,7 +375,7 @@
     },
     {
       "file": "src/txt2tex/codegen/expressions.py",
-      "line": 475,
+      "line": 485,
       "kind": "method",
       "name": "_ExpressionsCodegen._generate_logical_quantifier",
       "grade": "D",
@@ -398,20 +395,20 @@
     {
       "file": "src/txt2tex/lexer.py",
       "function": "_scan_identifier",
-      "nloc": 398,
+      "nloc": 399,
       "ccn": 138,
-      "tokens": 2433,
+      "tokens": 2435,
       "params": 3,
-      "length": 560
+      "length": 561
     },
     {
       "file": "src/txt2tex/parser_pkg/expressions.py",
       "function": "_parse_postfix",
-      "nloc": 190,
-      "ccn": 43,
-      "tokens": 949,
+      "nloc": 232,
+      "ccn": 45,
+      "tokens": 1127,
       "params": 2,
-      "length": 330
+      "length": 410
     },
     {
       "file": "src/txt2tex/codegen/proofs.py",
@@ -424,21 +421,39 @@
     },
     {
       "file": "src/txt2tex/parser_pkg/expressions.py",
-      "function": "_parse_quantifier",
-      "nloc": 169,
-      "ccn": 32,
-      "tokens": 971,
+      "function": "_parse_set_comprehension_from_brace",
+      "nloc": 142,
+      "ccn": 33,
+      "tokens": 827,
       "params": 1,
-      "length": 284
+      "length": 185
+    },
+    {
+      "file": "src/txt2tex/parser_pkg/expressions.py",
+      "function": "_parse_quantifier",
+      "nloc": 170,
+      "ccn": 32,
+      "tokens": 978,
+      "params": 1,
+      "length": 286
     },
     {
       "file": "src/txt2tex/parser_pkg/expressions.py",
       "function": "_parse_cross",
-      "nloc": 162,
-      "ccn": 32,
-      "tokens": 858,
+      "nloc": 156,
+      "ccn": 30,
+      "tokens": 821,
       "params": 1,
-      "length": 196
+      "length": 197
+    },
+    {
+      "file": "src/txt2tex/codegen/text_blocks.py",
+      "function": "_generate_part",
+      "nloc": 135,
+      "ccn": 30,
+      "tokens": 905,
+      "params": 2,
+      "length": 190
     },
     {
       "file": "src/txt2tex/parser_pkg/paragraphs.py",
@@ -448,15 +463,6 @@
       "tokens": 575,
       "params": 1,
       "length": 154
-    },
-    {
-      "file": "src/txt2tex/codegen/text_blocks.py",
-      "function": "_generate_part",
-      "nloc": 133,
-      "ccn": 29,
-      "tokens": 895,
-      "params": 2,
-      "length": 188
     },
     {
       "file": "src/txt2tex/codegen/proofs.py",
@@ -479,29 +485,29 @@
     {
       "file": "src/txt2tex/parser.py",
       "function": "parse",
-      "nloc": 170,
+      "nloc": 176,
       "ccn": 26,
-      "tokens": 875,
+      "tokens": 892,
       "params": 1,
-      "length": 223
+      "length": 233
     },
     {
-      "file": "src/txt2tex/parser_pkg/expressions.py",
-      "function": "_parse_set_comprehension_from_brace",
-      "nloc": 106,
+      "file": "src/txt2tex/codegen/schemas.py",
+      "function": "_generate_schema",
+      "nloc": 121,
       "ccn": 26,
-      "tokens": 636,
-      "params": 1,
-      "length": 147
+      "tokens": 709,
+      "params": 2,
+      "length": 164
     },
     {
       "file": "src/txt2tex/parser.py",
       "function": "_parse_document_item",
-      "nloc": 52,
+      "nloc": 58,
       "ccn": 26,
-      "tokens": 420,
+      "tokens": 437,
       "params": 1,
-      "length": 61
+      "length": 67
     },
     {
       "file": "src/txt2tex/free_vars.py",
@@ -513,22 +519,13 @@
       "length": 87
     },
     {
-      "file": "src/txt2tex/codegen/text_pipeline.py",
-      "function": "_convert_comparison_operators",
-      "nloc": 49,
-      "ccn": 25,
-      "tokens": 348,
-      "params": 2,
-      "length": 69
-    },
-    {
-      "file": "src/txt2tex/codegen/schemas.py",
-      "function": "_generate_schema",
-      "nloc": 91,
+      "file": "src/txt2tex/cli.py",
+      "function": "main",
+      "nloc": 166,
       "ccn": 24,
-      "tokens": 525,
-      "params": 2,
-      "length": 142
+      "tokens": 740,
+      "params": 0,
+      "length": 193
     },
     {
       "file": "src/txt2tex/parser_pkg/proofs.py",
@@ -538,15 +535,6 @@
       "tokens": 531,
       "params": 3,
       "length": 116
-    },
-    {
-      "file": "src/txt2tex/cli.py",
-      "function": "main",
-      "nloc": 159,
-      "ccn": 22,
-      "tokens": 702,
-      "params": 0,
-      "length": 186
     },
     {
       "file": "src/txt2tex/parser_pkg/expressions.py",
@@ -578,20 +566,20 @@
     {
       "file": "src/txt2tex/latex_gen.py",
       "function": "generate_document",
-      "nloc": 66,
+      "nloc": 68,
       "ccn": 22,
-      "tokens": 508,
+      "tokens": 523,
       "params": 2,
-      "length": 117
+      "length": 119
     },
     {
       "file": "src/txt2tex/parser_pkg/expressions.py",
       "function": "_parse_quantifier_continuation",
-      "nloc": 100,
+      "nloc": 103,
       "ccn": 20,
-      "tokens": 584,
+      "tokens": 593,
       "params": 5,
-      "length": 148
+      "length": 152
     },
     {
       "file": "src/txt2tex/codegen/expressions.py",
@@ -640,11 +628,11 @@
     {
       "module": "txt2tex.cli",
       "fan_in": 1,
-      "fan_out": 8
+      "fan_out": 11
     },
     {
       "module": "txt2tex.codegen",
-      "fan_in": 16,
+      "fan_in": 18,
       "fan_out": 15
     },
     {
@@ -656,6 +644,11 @@
       "module": "txt2tex.codegen._smoke",
       "fan_in": 3,
       "fan_out": 3
+    },
+    {
+      "module": "txt2tex.codegen._toc",
+      "fan_in": 2,
+      "fan_out": 0
     },
     {
       "module": "txt2tex.codegen.algebra",
@@ -684,7 +677,7 @@
     },
     {
       "module": "txt2tex.codegen.paragraphs",
-      "fan_in": 3,
+      "fan_in": 5,
       "fan_out": 4
     },
     {
@@ -709,8 +702,8 @@
     },
     {
       "module": "txt2tex.codegen.text_pipeline",
-      "fan_in": 3,
-      "fan_out": 7
+      "fan_in": 5,
+      "fan_out": 6
     },
     {
       "module": "txt2tex.codegen.types",
@@ -724,7 +717,7 @@
     },
     {
       "module": "txt2tex.constants",
-      "fan_in": 3,
+      "fan_in": 2,
       "fan_out": 0
     },
     {
@@ -740,7 +733,7 @@
     {
       "module": "txt2tex.latex_gen",
       "fan_in": 3,
-      "fan_out": 18
+      "fan_out": 19
     },
     {
       "module": "txt2tex.lexer",
@@ -810,7 +803,7 @@
     {
       "module": "txt2tex.repl",
       "fan_in": 2,
-      "fan_out": 7
+      "fan_out": 10
     },
     {
       "module": "txt2tex.tokens",
@@ -864,13 +857,13 @@
       },
       {
         "commit": "11773d3",
-        "date": "2026-05-19",
+        "date": "2026-05-18",
         "loc": 1314,
         "cc": 73
       },
       {
         "commit": "c62874b",
-        "date": "2026-05-19",
+        "date": "2026-05-18",
         "loc": 1230,
         "cc": 69
       }
@@ -878,7 +871,7 @@
     "src/txt2tex/cli.py": [
       {
         "commit": "c62874b",
-        "date": "2026-05-19",
+        "date": "2026-05-18",
         "loc": 344,
         "cc": 38
       }
@@ -886,7 +879,7 @@
     "src/txt2tex/compile.py": [
       {
         "commit": "c62874b",
-        "date": "2026-05-19",
+        "date": "2026-05-18",
         "loc": 248,
         "cc": 33
       }
@@ -894,7 +887,7 @@
     "src/txt2tex/constants.py": [
       {
         "commit": "c62874b",
-        "date": "2026-05-19",
+        "date": "2026-05-18",
         "loc": 72,
         "cc": 0
       }
@@ -902,7 +895,7 @@
     "src/txt2tex/errors.py": [
       {
         "commit": "c62874b",
-        "date": "2026-05-19",
+        "date": "2026-05-18",
         "loc": 136,
         "cc": 13
       }
@@ -954,7 +947,7 @@
       },
       {
         "commit": "9ca24d2",
-        "date": "2026-05-21",
+        "date": "2026-05-20",
         "loc": 6100,
         "cc": 825
       },
@@ -1088,13 +1081,13 @@
       },
       {
         "commit": "11773d3",
-        "date": "2026-05-19",
+        "date": "2026-05-18",
         "loc": 1460,
         "cc": 350
       },
       {
         "commit": "c62874b",
-        "date": "2026-05-19",
+        "date": "2026-05-18",
         "loc": 1441,
         "cc": 346
       }
@@ -1126,7 +1119,7 @@
       },
       {
         "commit": "9ca24d2",
-        "date": "2026-05-21",
+        "date": "2026-05-20",
         "loc": 5849,
         "cc": 851
       },
@@ -1174,13 +1167,13 @@
       },
       {
         "commit": "11773d3",
-        "date": "2026-05-19",
+        "date": "2026-05-18",
         "loc": 5577,
         "cc": 809
       },
       {
         "commit": "c62874b",
-        "date": "2026-05-19",
+        "date": "2026-05-18",
         "loc": 5425,
         "cc": 794
       }
@@ -1194,7 +1187,7 @@
       },
       {
         "commit": "c62874b",
-        "date": "2026-05-19",
+        "date": "2026-05-18",
         "loc": 321,
         "cc": 38
       }
@@ -1232,13 +1225,13 @@
       },
       {
         "commit": "11773d3",
-        "date": "2026-05-19",
+        "date": "2026-05-18",
         "loc": 227,
         "cc": 4
       },
       {
         "commit": "c62874b",
-        "date": "2026-05-19",
+        "date": "2026-05-18",
         "loc": 222,
         "cc": 4
       }
