@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-07-04
+
+### Fixed
+
+- **Reject relational-algebra constructs inside boxed Z environments** (`zed`,
+  `axdef`, `gendef`, `schema`, `syntax`, and horizontal definitions) with an
+  actionable error instead of emitting invalid Z that `fuzz` rejects with an
+  opaque `Syntax error at symbol "{"`. A relational-algebra expression renders
+  as `\mathrm{Join}(…)` etc. — not Z — so it belongs at top level, where it
+  renders as display math; the error names the offending line and directs the
+  user there. Enforced at every site where an expression enters a fuzz-checked
+  box, and presented as a clean `Error:` line by both the CLI and the
+  interactive REPL. Inline math is unaffected — relational algebra written at
+  top level still renders as display math as before. (#83)
+
 ## [2.0.0] - 2026-07-04
 
 ### Added
