@@ -24,7 +24,16 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from txt2tex.ast_nodes import AxDef, Document, Part, Section, Solution
+from txt2tex.ast_nodes import (
+    Abbreviation,
+    AxDef,
+    Document,
+    Identifier,
+    Part,
+    Section,
+    Solution,
+    Zed,
+)
 from txt2tex.cli import typecheck_fuzz
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
@@ -262,6 +271,102 @@ class TestNoBridgeStillTaints:
 
 
 # ---------------------------------------------------------------------------
+# Forward reference: B references A, but A's RA-tainting definition appears
+# LATER in the document. RA names are display-math only, so fuzz imposes no
+# declare-before-use ordering on them -- a single forward collection pass
+# missed this because B was visited before A had been marked tainted.
+# ---------------------------------------------------------------------------
+
+
+class TestForwardReferenceTaint:
+    """RA taint reaches a fixpoint, independent of document order."""
+
+    def test_b_referencing_later_a_is_display_math(self) -> None:
+        """`B == A union S`, with `A == S join S` defined afterward, degrades."""
+        latex = _fragment(_FORWARD_REF_SRC)
+        assert "\\noindent\n$B == A \\cup S$" in latex
+
+    def test_d_referencing_b_is_display_math(self) -> None:
+        """`D == B union S` must also degrade -- B is tainted only by forward ref."""
+        latex = _fragment(_FORWARD_REF_SRC)
+        assert "\\noindent\n$D == B \\cup S$" in latex
+
+    def test_b_and_d_not_left_in_zed_block(self) -> None:
+        """Neither `B` nor `D` may land inside `\\begin{zed}...\\end{zed}`."""
+        latex = _fragment(_FORWARD_REF_SRC)
+        for block in _zed_blocks(latex):
+            assert "B" not in block
+            assert "D" not in block
+
+    def test_forward_ref_document_fuzz_checks_clean(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Without the fixpoint, `D` was left in a zed block referencing an
+        undeclared `B`, and fuzz reported "Identifier B is not declared".
+        """
+        ast = Parser(Lexer(_FORWARD_REF_SRC).tokenize()).parse()
+        assert isinstance(ast, Document)
+        latex = LaTeXGenerator(use_fuzz=True).generate_document(ast)
+
+        tex_path = tmp_path / "ra_taint_forward_ref.tex"
+        tex_path.write_text(latex)
+
+        passed = typecheck_fuzz(tex_path)
+        captured = capsys.readouterr()
+
+        assert passed, captured.out + captured.err
+        assert "is not declared" not in captured.err
+
+
+# ---------------------------------------------------------------------------
+# Transitive forward chain: C references B, B references A, and only A
+# contains a literal RA operator -- taint must propagate across two forward
+# hops (C -> B -> A), all defined in reverse dependency order.
+# ---------------------------------------------------------------------------
+
+
+class TestTransitiveForwardChainTaint:
+    """RA taint propagates across multiple forward hops to a fixpoint."""
+
+    def test_c_two_hops_from_tainting_operator_is_display_math(self) -> None:
+        """`C == B union S` degrades even though the tainting `join` is on `A`,
+        two forward references away.
+        """
+        latex = _fragment(_TRANSITIVE_FORWARD_SRC)
+        assert "\\noindent\n$C == B \\cup S$" in latex
+
+    def test_b_one_hop_from_tainting_operator_is_display_math(self) -> None:
+        """`B == A union S` degrades -- one forward reference from the `join`."""
+        latex = _fragment(_TRANSITIVE_FORWARD_SRC)
+        assert "\\noindent\n$B == A \\cup S$" in latex
+
+    def test_none_of_the_chain_left_in_zed_block(self) -> None:
+        """`A`, `B`, and `C` must all sit outside any zed block."""
+        latex = _fragment(_TRANSITIVE_FORWARD_SRC)
+        for block in _zed_blocks(latex):
+            assert "A" not in block
+            assert "B" not in block
+            assert "C" not in block
+
+    def test_transitive_forward_chain_fuzz_checks_clean(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """The full two-hop forward chain still fuzz-checks clean."""
+        ast = Parser(Lexer(_TRANSITIVE_FORWARD_SRC).tokenize()).parse()
+        assert isinstance(ast, Document)
+        latex = LaTeXGenerator(use_fuzz=True).generate_document(ast)
+
+        tex_path = tmp_path / "ra_taint_transitive_forward.tex"
+        tex_path.write_text(latex)
+
+        passed = typecheck_fuzz(tex_path)
+        captured = capsys.readouterr()
+
+        assert passed, captured.out + captured.err
+        assert "is not declared" not in captured.err
+
+
+# ---------------------------------------------------------------------------
 # Nested-under-Part: the axdef/RA chain is not a Document-level sibling --
 # it is entirely inside a single Part's ``.items``.  ``_parse_part`` consumes
 # every item after ``(a) ...`` up to the next part/solution/section marker,
@@ -340,6 +445,83 @@ class TestNestedUnderPartTaint:
 
         assert passed, captured.out + captured.err
         assert "is not declared" not in captured.err
+
+
+# ---------------------------------------------------------------------------
+# Nested-inside-Zed: an explicit ``zed ... end`` block wraps its paragraphs
+# in a *nested* Document (``Zed.content``), not a flat ``.items`` list like
+# Section/Solution/Part.  Before the walker recursed into it, an RA
+# abbreviation defined inside a zed block was invisible to the
+# declared/tainted-name pre-pass -- ``Combined`` (a Document-level sibling
+# referencing ``RJoin``) was wrongly left inside its own top-level zed
+# block, referencing an identifier fuzz never saw declared.
+#
+# Note: the zed block's OWN rendering of ``RJoin == S join U`` is a
+# separate, still-open defect -- ``_generate_zed`` renders every item
+# unconditionally, so the RA-tainted line still ends up inside
+# ``\begin{zed}...\end{zed}`` where fuzz will reject its ``\mathrm{Join}``.
+# That is a generator/rendering gap, not a traversal gap, and is out of
+# scope here (see PR #82 review discussion) -- these tests only pin the
+# traversal fix's effect on ``Combined``, not a full fuzz round-trip.
+# ---------------------------------------------------------------------------
+
+_RA_INSIDE_ZED_SRC = """zed
+  RJoin == S join U
+end
+
+Combined == RJoin union S
+"""
+
+
+class TestRAInsideZedBlockTaints:
+    """RA taint from an abbreviation nested inside a zed block still propagates."""
+
+    def test_combined_is_display_math_not_zed(self) -> None:
+        """`Combined` degrades to inline math -- `RJoin` is defined inside `zed`."""
+        latex = _fragment(_RA_INSIDE_ZED_SRC)
+        assert "\\noindent\n$Combined == RJoin \\cup S$" in latex
+
+    def test_combined_not_left_in_a_zed_block(self) -> None:
+        """`Combined` must not sit in any `\\begin{zed}...\\end{zed}` block.
+
+        Before the fix, this was exactly the regression: the pre-pass
+        never descended into the zed block's nested Document, so
+        ``RJoin`` was never marked RA-tainted, and ``Combined`` was left
+        in its own zed block referencing an identifier fuzz never
+        declared -- a real "not declared" error.
+        """
+        latex = _fragment(_RA_INSIDE_ZED_SRC)
+        for block in _zed_blocks(latex):
+            assert "Combined" not in block
+
+
+class TestIterItemsDescendsIntoZed:
+    """Direct unit test on the walker: it must yield a zed-nested item."""
+
+    def test_walker_yields_abbreviation_nested_inside_zed(self) -> None:
+        """A hand-built `Zed(content=Document([...]))` must surface its item.
+
+        This pins the traversal contract itself, independent of whether
+        any particular RA/taint scenario is reachable through the parser
+        for a given nested item type (GivenType, FreeType, Abbreviation).
+        """
+        nested_abbrev = Abbreviation(
+            name="Inner",
+            expression=Identifier(name="S", line=2, column=3),
+            line=2,
+            column=3,
+        )
+        zed = Zed(
+            content=Document(items=[nested_abbrev], line=1, column=1),
+            line=1,
+            column=1,
+        )
+        generator = LaTeXGenerator(use_fuzz=True)
+
+        seen = list(generator._iter_items_in_document_order([zed]))
+
+        assert zed in seen
+        assert nested_abbrev in seen
 
 
 def _zed_blocks(latex: str) -> list[str]:

@@ -42,6 +42,7 @@ from txt2tex.ast_nodes import (
     Tuple,
     UnaryOp,
     Ungroup,
+    Zed,
 )
 from txt2tex.codegen._dispatch import CodegenDispatch
 from txt2tex.codegen._smoke import (
@@ -284,13 +285,19 @@ class LaTeXGenerator(
         Section, Solution, and Part all carry a ``.items`` list of their
         own — a declaration or RA abbreviation can be nested arbitrarily
         deep inside any of them (a Part inside a Solution inside a
-        Section, for instance).  Pre-order traversal preserves document
+        Section, for instance).  A ``Zed`` node is different: it wraps a
+        *nested* ``Document`` of its own (``zed ... end`` with multiple
+        paragraphs), and that nested Document's items — given types,
+        free types, abbreviations — are just as declared/taint-relevant
+        as any top-level sibling.  Pre-order traversal preserves document
         order, which is what fuzz's declare-before-use rule requires.
         """
         for item in items:
             yield item
             if isinstance(item, (Section, Solution, Part)):
                 yield from self._iter_items_in_document_order(item.items)
+            elif isinstance(item, Zed) and isinstance(item.content, Document):
+                yield from self._iter_items_in_document_order(item.content.items)
 
     def _collect_declared_and_tainted_names(self, items: list[DocumentItem]) -> None:
         """Populate ``_fuzz_declared_names`` and ``_ra_tainted_names`` up front.
