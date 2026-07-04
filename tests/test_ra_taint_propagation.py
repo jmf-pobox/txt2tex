@@ -10,9 +10,13 @@ block, producing a fuzz "Identifier ... is not declared" error, because RA
 names are invisible to fuzz.
 
 These tests pin the fix: RA-ness propagates by reference through
-``LaTeXGenerator._ra_tainted_names``, a forward-built set of names defined
-by earlier RA abbreviations.  Fuzz requires declare-before-use, so a single
-forward pass over document items suffices.
+``LaTeXGenerator._ra_tainted_names``, a set of names defined by RA
+abbreviations, computed to a fixpoint over document items.  RA names are
+display-math only, so fuzz imposes no declare-before-use ordering on
+them -- an abbreviation may legally reference an RA name defined *later*
+in the document, or transitively through a chain of forward references.
+A single forward pass over the abbreviation list misses that; the
+collection loop repeats until a full scan adds nothing.
 """
 
 from __future__ import annotations
@@ -84,6 +88,30 @@ end
 RJoin == S join U
 
 Combined == RJoin union S
+"""
+
+_FORWARD_REF_SRC = """given T
+axdef
+  S : T <-> T
+end
+
+B == A union S
+
+A == S join S
+
+D == B union S
+"""
+
+_TRANSITIVE_FORWARD_SRC = """given T
+axdef
+  S : T <-> T
+end
+
+C == B union S
+
+B == A union S
+
+A == S join S
 """
 
 

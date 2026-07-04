@@ -217,17 +217,19 @@ class LaTeXGenerator(
         self._dollar_sanitise_registry = {}
         self._synth_abbrev_counter = 0
         self._in_hidden_fuzz_block = False
-        # Names defined by an RA (relational-algebra) abbreviation, built as a
-        # forward pass over document items. Fuzz requires declare-before-use,
-        # so a name always lands here before anything downstream references
-        # it — see _is_ra_tainted.
+        # Names defined by an RA (relational-algebra) abbreviation, built by
+        # iterating document items to a fixpoint. RA names are display-math
+        # only, so fuzz imposes no declare-before-use ordering on them — an
+        # abbreviation may reference an RA name defined later in the
+        # document. See _is_ra_tainted and _collect_declared_and_tainted_names.
         self._ra_tainted_names = set()
         # Names fuzz genuinely knows about (given types, axdef/gendef/schema
-        # declaration signatures, free-type left-hand sides), built by the
-        # same forward pass. A name in this set can never be RA-tainted by
-        # reference alone — the "axdef bridge" pattern in
-        # FUZZ_VS_STD_LATEX.md relies on this to keep such names inside a
-        # fuzz-checked zed block. See _is_ra_tainted.
+        # declaration signatures, free-type left-hand sides), built by a
+        # single forward pass (order does not matter — it is a pure union).
+        # A name in this set can never be RA-tainted by reference alone —
+        # the "axdef bridge" pattern in FUZZ_VS_STD_LATEX.md relies on this
+        # to keep such names inside a fuzz-checked zed block. See
+        # _is_ra_tainted.
         self._fuzz_declared_names = set()
 
     def _next_synth_name(self) -> str:
@@ -293,23 +295,46 @@ class LaTeXGenerator(
     def _collect_declared_and_tainted_names(self, items: list[DocumentItem]) -> None:
         """Populate ``_fuzz_declared_names`` and ``_ra_tainted_names`` up front.
 
-        A single forward pass over the *entire* item tree — including
-        items nested under Section/Solution/Part — computed once before
-        any rendering starts.  Rendering code (the consolidation loop,
-        ``generate_document_item``, ``_generate_part``, ...) only reads
-        these sets afterward; none of it mutates them.  That decouples
-        the taint/declaration bookkeeping from which render path happens
-        to visit a given item, so a declaration nested three parts deep
-        is seen exactly like a top-level sibling.
+        Walks the *entire* item tree — including items nested under
+        Section/Solution/Part — computed once before any rendering starts.
+        Rendering code (the consolidation loop, ``generate_document_item``,
+        ``_generate_part``, ...) only reads these sets afterward; none of
+        it mutates them.  That decouples the taint/declaration bookkeeping
+        from which render path happens to visit a given item, so a
+        declaration nested three parts deep is seen exactly like a
+        top-level sibling.
+
+        ``_fuzz_declared_names`` is a single forward pass — it is a pure
+        union, so document order does not matter.  ``_ra_tainted_names``
+        is different: RA (relational-algebra) names are display-math
+        only, so fuzz imposes no declare-before-use ordering on them —
+        an abbreviation may reference an RA name defined *later* in the
+        document (or transitively, through a chain of forward references).
+        A single forward pass misses that, so this loops to a fixpoint:
+        repeat scanning every abbreviation, adding names ``_is_ra_tainted``
+        newly flags, until a full scan adds nothing.  Bounded by
+        ``len(abbreviations)`` — each pass either grows the (finite) tainted
+        set or the loop stops.
         """
         for item in self._iter_items_in_document_order(items):
-            if (
-                isinstance(item, Abbreviation)
-                and item.name not in self._fuzz_declared_names
-                and self._is_ra_tainted(item.expression)
-            ):
-                self._ra_tainted_names.add(item.name)
             self._fuzz_declared_names |= self._collect_fuzz_declared_names(item)
+
+        abbreviations = [
+            item
+            for item in self._iter_items_in_document_order(items)
+            if isinstance(item, Abbreviation)
+        ]
+        changed = True
+        while changed:
+            changed = False
+            for abbrev in abbreviations:
+                if (
+                    abbrev.name not in self._fuzz_declared_names
+                    and abbrev.name not in self._ra_tainted_names
+                    and self._is_ra_tainted(abbrev.expression)
+                ):
+                    self._ra_tainted_names.add(abbrev.name)
+                    changed = True
 
     # -------------------------------------------------------------------------
     # Overflow warning helpers
