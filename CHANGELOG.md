@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.3] - 2026-07-04
+
+### Fixed
+
+- **Display-math indentation now matches the `zed` path.** A
+  set-comprehension/quantifier that renders as unboxed **display math** (because
+  it yields a binding `⟨…⟩` or contains relational algebra, so it can't sit in a
+  fuzz `zed` box) used to wrap *each* comprehension in its own `\begin{array}`
+  and break with a bare `\\` — producing ragged, staircased indentation with
+  nested arrays on different left edges, unlike the same construct in a `zed`
+  block. It now wraps the whole expression in **one** `\begin{array}{l}` and
+  emits binding-depth `\t{depth}` at every break, so the display form reads
+  line-for-line like the boxed form, differing only in the yielded value. This
+  also fixed three `_has_line_breaks` gaps the change exposed (`Quantifier`
+  bullet/expression child, `SetComprehension` own pipe/bullet flags, and
+  `ExtendAggregate`). Layout only — fuzz's type checker ignores `\t{n}`, so
+  type-checking is unaffected. Extends the 2.0.2 binding-depth ADR to the
+  display-math path; see `docs/DESIGN.md`.
+
 ## [2.0.2] - 2026-07-04
 
 ### Fixed

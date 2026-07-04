@@ -806,8 +806,56 @@ indentation, never type-checking.
 
 txt2tex emits this form automatically for multi-line set comprehensions and
 comprehension abbreviations inside Z paragraphs, computing `n` from binder
-depth rather than hardcoding it. The `\begin{array}` wrapper is kept only
-for the non-fuzz inline-math display path.
+depth rather than hardcoding it.
+
+### Binding Depth Applies to Display Math Too
+
+Some expressions can't go in a fuzz `zed`/`axdef`/`schema` box at all —
+fuzz never parses `\lblot ... \rblot` (a **binding**, `{| ... |}` in
+whiteboard notation) or relational-algebra output. Those render as
+unboxed **display math** (`$...$`) instead. The same `\t{depth}` rule
+from the previous section applies here, unchanged: the entire display
+expression is wrapped in one `\begin{array}{l}`, and every break emits
+`\t{depth}` computed from binder count — never a bare `\\` and never a
+separate `\begin{array}` per comprehension.
+
+The result: a comprehension reads identically whether it lands in a
+`zed` box or in display math. The only visible difference is the
+yielded value — a plain expression in the `zed` case, a binding
+(`⟨...⟩`) or RA label when that's what forces display math.
+
+Input (a comprehension yielding a binding, so it cannot sit in a `zed`
+box):
+
+```text
+{ p : Property | p.active = true .
+    {| propertyId == p.propertyId |} }
+```
+
+Output (verified with `txt2tex --tex-only`):
+
+```latex
+$\displaystyle
+\begin{array}{l}
+\{~ p : Property | p.active = true @ \\
+\t1 \lblot~propertyId == p.propertyId~\rblot ~\}
+\end{array}$
+```
+
+Compare to the same declaration part rendered inside a `zed` box (only
+the yielded term differs — `p.propertyId` vs. the binding above):
+
+```latex
+\begin{zed}
+zS_1 == \{~ p : Property | p.active = true @ \\
+\t1 p.propertyId ~\}
+\end{zed}
+```
+
+Same `\t1`, same break point, same left margin — the binding-depth rule
+does not care which path an expression takes. See [DESIGN.md, "ADR:
+Z-paragraph indentation tracks binding depth"](../DESIGN.md), which
+covers both the `zed` and display-math paths as one ruling.
 
 ### When to Use zed vs axdef
 

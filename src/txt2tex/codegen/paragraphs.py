@@ -296,9 +296,20 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                     else:
                         hidden_name = name_latex
                     lines.extend(self._emit_hidden_abbreviation(hidden_name, converted))
-            # Relational RHS — emit outside any Z environment so fuzz silently skips
+            # Relational RHS — emit outside any Z environment so fuzz silently
+            # skips it.  When the RHS breaks across lines, wrap the whole
+            # abbreviation in a single \begin{array}{l}: every \t{depth} break
+            # inside it (comprehensions, quantifiers, RA line breaks) then
+            # shares one left margin, exactly like the zed box's own \t{depth}
+            # commands (jms ruling, fix/display-math-binding-indent).
             lines.append("\\noindent")
-            lines.append(f"${abbrev}$")
+            if self._has_line_breaks(node.expression):
+                lines.append(r"$\displaystyle")
+                lines.append(r"\begin{array}{l}")
+                lines.append(abbrev)
+                lines.append(r"\end{array}$")
+            else:
+                lines.append(f"${abbrev}$")
         else:
             # Pure Z RHS — emit inside a zed paragraph for fuzz type-checking
             self._check_overflow(

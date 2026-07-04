@@ -67,8 +67,13 @@ zS_2 == \{~ t : Track ; a : Album | t.albumId = a.albumId @ \\
 \end{zed}%
 }
 \noindent
-$\begin{array}{l}\{~ t : Track ; a : Album | t.albumId = a.albumId @ \\ \lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot  ~\}\end{array}$
+$\displaystyle
+\begin{array}{l}
+\{~ t : Track ; a : Album | t.albumId = a.albumId @ \\
+\t1 \lblot~trackId == t.trackId, year == a.year, tracks == a.tracks~\rblot ~\}
+\end{array}$
 
+\bigskip
 
 \section*{Empty Binding}
 \addcontentsline{toc}{section}{Empty Binding}
