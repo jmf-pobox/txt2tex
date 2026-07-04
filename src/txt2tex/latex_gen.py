@@ -176,6 +176,7 @@ class LaTeXGenerator(
     _synth_abbrev_counter: int
     _in_hidden_fuzz_block: bool
     _ra_tainted_names: set[str]
+    _fuzz_declared_names: set[str]
 
     def __init__(
         self,
@@ -220,6 +221,13 @@ class LaTeXGenerator(
         # so a name always lands here before anything downstream references
         # it — see _is_ra_tainted.
         self._ra_tainted_names = set()
+        # Names fuzz genuinely knows about (given types, axdef/gendef/schema
+        # declaration signatures, free-type left-hand sides), built by the
+        # same forward pass. A name in this set can never be RA-tainted by
+        # reference alone — the "axdef bridge" pattern in
+        # FUZZ_VS_STD_LATEX.md relies on this to keep such names inside a
+        # fuzz-checked zed block. See _is_ra_tainted.
+        self._fuzz_declared_names = set()
 
     def _next_synth_name(self) -> str:
         """Generate the next synthetic abbreviation name for fuzz validation."""
@@ -262,6 +270,7 @@ class LaTeXGenerator(
         # Reset RA taint tracking so a reused generator (REPL) does not leak
         # tainted names from a previous, unrelated document.
         self._ra_tainted_names = set()
+        self._fuzz_declared_names = set()
 
     # -------------------------------------------------------------------------
     # Overflow warning helpers
@@ -352,6 +361,14 @@ class LaTeXGenerator(
                     zed_items.append(next_item)
                     j += 1
 
+                # Record names this group declares to fuzz (given types,
+                # free-type left-hand sides) before generating, so a later
+                # RA abbreviation referencing one of them is not tainted.
+                for zed_item in zed_items:
+                    self._fuzz_declared_names |= self._collect_fuzz_declared_names(
+                        zed_item
+                    )
+
                 # Generate consolidated zed environment
                 if len(zed_items) == 1:
                     # Single item: generate normally
@@ -377,10 +394,20 @@ class LaTeXGenerator(
                 # Skip processed items
                 i = j
             else:
+                # Record names this item declares to fuzz (axdef/gendef/
+                # schema signatures) before checking taint, so the "axdef
+                # bridge" pattern — declaring a name's type here, then
+                # defining it via RA elsewhere — keeps that name off the
+                # taint list.
+                self._fuzz_declared_names |= self._collect_fuzz_declared_names(item)
                 # RA-tainted abbreviation: record its name so any later
-                # abbreviation referencing it is tainted by reference too.
-                if isinstance(item, Abbreviation) and self._is_ra_tainted(
-                    item.expression
+                # abbreviation referencing it is tainted by reference too,
+                # unless fuzz already knows the name from elsewhere (e.g.
+                # an axdef declaration) — that name stays fuzz-checkable.
+                if (
+                    isinstance(item, Abbreviation)
+                    and self._is_ra_tainted(item.expression)
+                    and item.name not in self._fuzz_declared_names
                 ):
                     self._ra_tainted_names.add(item.name)
                 # Not a zed item: generate normally

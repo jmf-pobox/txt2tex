@@ -74,6 +74,18 @@ end
 X == A union B
 """
 
+_BRIDGE_SRC = """given T
+axdef
+  S : T <-> T
+  U : T <-> T
+  RJoin : T <-> T
+end
+
+RJoin == S join U
+
+Combined == RJoin union S
+"""
+
 
 # ---------------------------------------------------------------------------
 # Direct reference: Combined references RJoin (RA-tainted), no RA operator

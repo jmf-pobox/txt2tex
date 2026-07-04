@@ -16,10 +16,16 @@ from __future__ import annotations
 from typing import ClassVar, cast
 
 from txt2tex.ast_nodes import (
+    AxDef,
     Binding,
+    Declaration,
     Divide,
+    DocumentItem,
     Expr,
     ExtendAggregate,
+    FreeType,
+    GenDef,
+    GivenType,
     Group,
     GroupAggregate,
     Identifier,
@@ -27,6 +33,7 @@ from txt2tex.ast_nodes import (
     Project,
     RelationRename,
     Restrict,
+    Schema,
     SetComprehension,
     Tuple,
     Ungroup,
@@ -100,19 +107,48 @@ class _FuzzRoutingCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
                 return True
         return False
 
+    def _collect_fuzz_declared_names(self, item: DocumentItem) -> frozenset[str]:
+        """Return names ``item`` declares directly to fuzz's type-checker.
+
+        A name is genuinely known to fuzz when it comes from a ``given``
+        type, an axdef/gendef/schema declaration signature, or a free-type
+        left-hand side — never from a display-math RA abbreviation, which
+        fuzz never parses.  ``_is_ra_tainted`` consults the running union of
+        these names (``self._fuzz_declared_names``) so a name declared here
+        can never be tainted by an RA reference alone.  This is the "axdef
+        bridge" pattern documented in ``FUZZ_VS_STD_LATEX.md``: declare the
+        name's type in an axdef, then reference it freely from RA notes.
+        """
+        if isinstance(item, GivenType):
+            return frozenset(item.names)
+        if isinstance(item, FreeType):
+            return frozenset({item.name})
+        if isinstance(item, (AxDef, GenDef, Schema)):
+            return frozenset(
+                decl.variable
+                for decl in item.declarations
+                if isinstance(decl, Declaration)
+            )
+        return frozenset()
+
     def _is_ra_tainted(self, expr: Expr) -> bool:
         """True if expr belongs outside the fuzz zed block.
 
         An expression is RA-tainted (display-math only) when it either
         contains a literal relational-algebra construct, or references a
-        name that an earlier RA abbreviation defined.  Fuzz requires
-        declare-before-use, so by the time an abbreviation is generated,
-        ``self._ra_tainted_names`` already holds every RA name defined
-        earlier in the document.
+        name that an earlier RA abbreviation defined and that fuzz has
+        not otherwise seen declared (via ``given``, axdef/gendef/schema
+        signature, or free-type).  Fuzz requires declare-before-use, so
+        by the time an abbreviation is generated, ``self._ra_tainted_names``
+        already holds every such RA name defined earlier in the document,
+        minus any name the "axdef bridge" pattern has separately declared.
         """
+        tainted_names = frozenset(self._ra_tainted_names) - frozenset(
+            self._fuzz_declared_names
+        )
         return self._expression_contains_dat_construct(
             expr
-        ) or self._expression_references_names(expr, frozenset(self._ra_tainted_names))
+        ) or self._expression_references_names(expr, tainted_names)
 
     def _binding_to_tuple_expr(self, binding: Binding) -> Expr:
         """Convert a binding to the equivalent tuple expression for fuzz.
