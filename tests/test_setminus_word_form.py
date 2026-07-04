@@ -8,8 +8,10 @@ parsed as function application (`A(setminus)(B)`) instead of set difference.
 
 from __future__ import annotations
 
+import pytest
+
 from txt2tex.latex_gen import LaTeXGenerator
-from txt2tex.lexer import Lexer
+from txt2tex.lexer import RESERVED_WORDS, Lexer, LexerError
 from txt2tex.parser import Parser
 from txt2tex.tokens import TokenType
 
@@ -55,3 +57,19 @@ def test_setminus_word_form_zed_paragraph() -> None:
     latex = _emit(src)
     assert "RelA \\setminus RelB" in latex
     assert "(setminus)" not in latex
+
+
+def test_setminus_in_reserved_words() -> None:
+    """`setminus` is in RESERVED_WORDS, like `union`/`intersect`."""
+    assert "setminus" in RESERVED_WORDS
+
+
+def test_setminus_decoration_is_rejected() -> None:
+    r"""`setminus?` must raise, not lex as a decorated identifier.
+
+    Reserved set operators cannot be decorated; `setminus` was missing from
+    RESERVED_WORDS, so `setminus?` silently lexed as a decorated identifier
+    instead of raising the reserved-keyword-decoration error.
+    """
+    with pytest.raises(LexerError, match=r"[Cc]annot decorate reserved keyword"):
+        Lexer("zed\n  x == A setminus? B\nend\n").tokenize()

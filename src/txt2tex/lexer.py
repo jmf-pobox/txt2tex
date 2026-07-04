@@ -114,6 +114,7 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "psubset",
         "union",
         "intersect",
+        "setminus",
         "cross",
         "bigcup",
         "bigcap",
