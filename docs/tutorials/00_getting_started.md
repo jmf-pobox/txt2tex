@@ -48,7 +48,7 @@ Create a new file called `my_first_spec.txt`:
 
 ** Example 1: Simple Implication **
 
-TEXT: If p land q are both true, then p is true.
+TEXT: If $p land q$ are both true, then $p$ is true.
 
 (p land q) => p
 ```
@@ -160,7 +160,7 @@ Edit your txt file and recompile until you're satisfied.
 ```text
 ** Problem 1 **
 
-TEXT: Prove that p land q implies p.
+TEXT: Prove that $p land q$ implies $p$.
 
 PROOF:
 p [land elim 1]
@@ -183,7 +183,7 @@ where
   forall n : N | square(n) = n * n
 end
 
-TEXT: For example, square(3) = 9 land square(5) = 25.
+TEXT: For example, $square(3) = 9 land square(5) = 25$.
 ```
 
 ### Pattern 3: Truth Table
@@ -225,7 +225,7 @@ F | F | F
 
 ** Example 2: Implication **
 
-TEXT: Implication p => q means "if p then q".
+TEXT: Implication $p => q$ means "if $p$ then $q$".
 
 PROOF:
 q [=> elim]
@@ -234,7 +234,7 @@ q [=> elim]
   :: p => q [land elim 2]
     p land (p => q) [premise]
 
-TEXT: This proof shows modus ponens: from p land (p => q), we conclude q.
+TEXT: This proof shows modus ponens: from $p land (p => q)$, we conclude $q$.
 The `=> elim` rule is binary, so its two premises each carry a `::`
 marker. Each premise is itself derived by `land elim` from the shared
 top assumption.

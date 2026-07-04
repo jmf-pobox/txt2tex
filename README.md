@@ -174,6 +174,20 @@ f(x) + g(y)
 
 txt2tex converts these to properly typeset LaTeX automatically.
 
+### Inline Math in Prose (`$...$`)
+
+`TEXT:` prose is literal — bare operator words like "exists" or "filter" render as English, not math. To drop math into a sentence, wrap it in `$...$`:
+
+```text
+TEXT: The map $p.a |-> p.b$ holds.
+TEXT: We require $forall x : N | x > 0$.
+TEXT: We know $x >= 0$.
+```
+
+Bare symbols work too — a `$...$` span with exactly one token emits that symbol: `$|->$` → ↦, `$forall$` → ∀.
+
+**Upgrading from 1.x?** Wrap inline math in `$...$` — bare math in `TEXT:` prose is no longer auto-converted.
+
 ### WYSIWYG Line Breaks
 
 **What You See Is What You Get** - Natural line breaks in your input control line breaks in PDF output:
@@ -265,7 +279,7 @@ PAGEBREAK:
 LINEBREAK:
 ```
 
-Supports `TEXT:` (prose with embedded formulas), `LATEX:` (raw LaTeX passthrough), title/author metadata, `\cite{key}` citations, and identifier decoration (`'`, `?`, `!`).
+Supports `TEXT:` (prose; inline math in `$...$`), `LATEX:` (raw LaTeX passthrough), title/author metadata, `\cite{key}` citations, and identifier decoration (`'`, `?`, `!`).
 
 ### 2. Propositional Logic
 
@@ -518,7 +532,7 @@ For detailed syntax documentation, see **[docs/guides/USER_GUIDE.md](https://git
 The guide covers:
 
 - Document structure (sections, solutions, parts)
-- Text blocks (with smart formula detection and citations)
+- Text blocks (inline math in `$...$`, and citations)
 - Propositional and predicate logic
 - Sets, relations, functions, sequences
 - Z notation (schemas, axiomatic definitions, free types)
