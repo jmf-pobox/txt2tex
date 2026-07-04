@@ -157,6 +157,10 @@ When delegating implementation work, the specialist's
 - ❌ No defensive coding or fallback logic unless explicitly requested
 - ❌ No `hasattr()` — use protocols instead
 - ❌ No duck typing — use explicit protocol inheritance
+- ❌ No batch/scripted edits to source files (`sed`/`awk`/`perl -i`/Python
+  one-liner substitutions), **even for a pure mechanical rename**. Edit each
+  file by hand with the Edit tool — batch edits have silently corrupted files
+  here. This binds delegated specialists too; state it in their mission.
 
 ## Workflow
 
@@ -302,9 +306,20 @@ Reported problems are almost always real bugs in the code.
 - Never say "intermittent" or "race condition" without proof.
 - When fixing a bug, grep for the same pattern across the entire
   codebase. Fix every instance, not just the reported one.
+- A bug *class* rarely lives in one place. Sweep every render path
+  (`codegen/` **and** `latex_gen.py`) and every entry point (the CLI
+  **and** the REPL) — not just the reported site. This session, one
+  "RA in a boxed Z environment" defect recurred across ~7 render sites
+  and both entry points, and an indentation fix initially missed a
+  second lambda code path. Treat each Cursor/Copilot finding of a
+  missed path as a real instance to fix, not a nit to wave off.
 - For output-facing changes (LaTeX/PDF), read the complete output as
   the consumer sees it and fix every defect in one pass. Do not ship
   symptom-by-symptom fixes.
+- Delegated documentation must **CLI-verify every rendered snippet**
+  (run the input through `txt2tex --tex-only` and paste the actual
+  output) — never hand-author or carry over an unverified LaTeX/output
+  example. A stale snippet slipped through review this session.
 - Match investigation depth to question complexity.
 
 ### Testing
@@ -629,3 +644,10 @@ When starting fresh:
   rationales or making product calls on his behalf.
 - `.tex` files are committed even though they are generated — they are
   first-class assets.
+- `make complexity-report` composes radon/lizard/pydeps into
+  `docs/complexity-report.{md,json}` (committed, so runs show deltas). Not a
+  per-commit gate — run it periodically and after large changes. Two files
+  carry known **pre-existing** high complexity: `lexer.py`
+  (`_scan_token`, `_scan_identifier`) and `parser_pkg/expressions.py`
+  (`_parse_postfix`). Adding to those two warrants extra care; prefer a
+  shared helper over concentrating new branches in them.

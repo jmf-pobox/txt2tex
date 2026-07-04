@@ -155,6 +155,36 @@ Input Text
 
 **Simplified Example**: For a minimal implementation of this pipeline, see [rpn2tex](https://github.com/jmf-pobox/rpn2tex) — a tutorial project that converts RPN expressions to LaTeX using the same architecture (lexer → parser → AST → generator) with only ~6 token types and 2 AST nodes instead of 100+.
 
+## Maintenance invariants
+
+Cross-cutting rules that new code must preserve. Each is detailed in an ADR
+below; violating one silently re-opens a whole bug class, so they are stated
+here for discoverability.
+
+1. **Relational algebra is never emitted into a fuzz-checked Z box.** RA
+   constructs render as engine-internal `\mathrm{...}` labels that fuzz cannot
+   parse. They route to unboxed inline/display math; a `zed`, `axdef`,
+   `gendef`, `schema`, or `syntax` box that contains one is a user error,
+   rejected via `_reject_ra_in_box` (raises `RaInZedError`; both the CLI and
+   REPL present it cleanly). A horizontal definition (`Name defs RHS`) is itself
+   emitted inside a `zed`, so it passes block kind `"zed"` — it is not a
+   distinct block kind. **Any new site that emits an `Expr` into a boxed Z
+   environment must call `_reject_ra_in_box(...)` with the real block kind** (one
+   of those five), or it re-opens
+   issue #83. See the two RA ADRs ("RA-taint routing", "RA construct inside an
+   explicit `zed` block — hard rejection"). Never fabricate a Z declaration for
+   an RA name to make fuzz "accept" it (jms).
+
+2. **Z-paragraph indentation tracks binding depth.** A continuation line inside
+   a Z paragraph is indented `\t{depth}` where `depth` = the number of binders
+   (`forall`/`exists`/`exists1`/`lambda`/`mu`/set comprehension) enclosing it,
+   via `_binding_depth` + `_get_indentation()`. **Any new binder must increment
+   `_binding_depth` around its scoped body** (predicate and term share one
+   level), or its wrapped body de-nests. See the ADR "Z-paragraph indentation
+   tracks binding depth". `\t{n}` is fuzz's tab macro (defined in fuzz.sty and
+   the zed packages), not `\quad`; `\quad` is only the depth-0 fallback. fuzz's
+   type checker ignores both as layout, so these are reader-facing only.
+
 ## Component Design
 
 ### 1. Lexer (Tokenizer)
