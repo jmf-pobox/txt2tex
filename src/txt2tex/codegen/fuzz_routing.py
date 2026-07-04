@@ -13,6 +13,7 @@ to their counterparts in the pre-refactor monolithic ``latex_gen.py``.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from typing import ClassVar, cast
 
 from txt2tex.ast_nodes import (
@@ -28,6 +29,7 @@ from txt2tex.ast_nodes import (
     GivenType,
     Group,
     GroupAggregate,
+    HorizDef,
     Identifier,
     NaturalJoin,
     Project,
@@ -57,6 +59,34 @@ class _FuzzRoutingCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         Ungroup,
     )
 
+    def _walk_nested_values(self, value: object) -> Iterator[object]:
+        """Yield ``value`` and every value nested beneath it, recursively.
+
+        Field-agnostic: descends into dataclass fields, list/tuple elements,
+        and dict values, regardless of which node type or container shape
+        holds them.  This is what lets ``_expression_contains_dat_construct``
+        and ``_expression_references_names`` see into every corner of the
+        tree — a ``Binding.pairs: list[tuple[str, Expr]]``, a
+        ``SetComprehension.extra_declarations: list[tuple[str, Expr]]``, or
+        any future field shape — without enumerating node types by hand.
+        """
+        yield value
+        if isinstance(value, (list, tuple)):
+            items = cast("tuple[object, ...] | list[object]", value)
+            for item in items:
+                yield from self._walk_nested_values(item)
+            return
+        if isinstance(value, dict):
+            mapping = cast("dict[object, object]", value)
+            for nested in mapping.values():
+                yield from self._walk_nested_values(nested)
+            return
+        fields = getattr(value, "__dataclass_fields__", None)
+        if fields is None:
+            return
+        for field_name in fields:
+            yield from self._walk_nested_values(getattr(value, field_name))
+
     def _expression_contains_dat_construct(self, expr: object) -> bool:
         """True if expr's AST tree contains any relational construct.
 
@@ -65,20 +95,10 @@ class _FuzzRoutingCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         This recursive walk lets abbreviation emission switch between an
         in-zed form (pure Z RHS) and a noindent-math form (relational RHS).
         """
-        if isinstance(expr, self._DAT_EXPRESSION_TYPES):
-            return True
-        fields = getattr(expr, "__dataclass_fields__", None)
-        if fields is None:
-            return False
-        for field_name in fields:
-            value: object = getattr(expr, field_name)
-            if isinstance(value, list):
-                items = cast("list[object]", value)
-                if any(self._expression_contains_dat_construct(v) for v in items):
-                    return True
-            elif self._expression_contains_dat_construct(value):
-                return True
-        return False
+        return any(
+            isinstance(node, self._DAT_EXPRESSION_TYPES)
+            for node in self._walk_nested_values(expr)
+        )
 
     def _expression_references_names(self, expr: object, names: frozenset[str]) -> bool:
         """True if expr's AST tree references any identifier in names.
@@ -92,36 +112,30 @@ class _FuzzRoutingCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         shadowed bound variable only pushes one extra line into display math;
         under-tainting would leave a real "not declared" fuzz error.
         """
-        if isinstance(expr, Identifier):
-            return expr.name in names
-        fields = getattr(expr, "__dataclass_fields__", None)
-        if fields is None:
-            return False
-        for field_name in fields:
-            value: object = getattr(expr, field_name)
-            if isinstance(value, list):
-                items = cast("list[object]", value)
-                if any(self._expression_references_names(v, names) for v in items):
-                    return True
-            elif self._expression_references_names(value, names):
-                return True
-        return False
+        return any(
+            isinstance(node, Identifier) and node.name in names
+            for node in self._walk_nested_values(expr)
+        )
 
     def _collect_fuzz_declared_names(self, item: DocumentItem) -> frozenset[str]:
         """Return names ``item`` declares directly to fuzz's type-checker.
 
         A name is genuinely known to fuzz when it comes from a ``given``
-        type, an axdef/gendef/schema declaration signature, or a free-type
+        type, an axdef/gendef/schema declaration signature, a free-type
+        left-hand side, or a horizontal definition's (``Name defs RHS``)
         left-hand side — never from a display-math RA abbreviation, which
         fuzz never parses.  ``_is_ra_tainted`` consults the running union of
         these names (``self._fuzz_declared_names``) so a name declared here
         can never be tainted by an RA reference alone.  This is the "axdef
         bridge" pattern documented in ``FUZZ_VS_STD_LATEX.md``: declare the
-        name's type in an axdef, then reference it freely from RA notes.
+        name's type in an axdef (or a horizontal definition), then
+        reference it freely from RA notes.
         """
         if isinstance(item, GivenType):
             return frozenset(item.names)
         if isinstance(item, FreeType):
+            return frozenset({item.name})
+        if isinstance(item, HorizDef):
             return frozenset({item.name})
         if isinstance(item, (AxDef, GenDef, Schema)):
             return frozenset(

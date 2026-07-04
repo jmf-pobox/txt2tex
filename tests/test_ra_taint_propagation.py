@@ -27,10 +27,13 @@ from typing import TYPE_CHECKING
 from txt2tex.ast_nodes import (
     Abbreviation,
     AxDef,
+    Binding,
     Document,
+    HorizDef,
     Identifier,
     Part,
     Section,
+    SetComprehension,
     Solution,
     Zed,
 )
@@ -97,6 +100,25 @@ end
 RJoin == S join U
 
 Combined == RJoin union S
+"""
+
+_HORIZ_DEF_BRIDGE_SRC = """given T
+axdef
+  S : T <-> T
+  U : T <-> T
+end
+
+schema Base
+  r : T <-> T
+end
+
+Combined defs Base
+
+RJoin == S join U
+
+Combined == RJoin union S
+
+UsesCombined == Combined union Combined
 """
 
 _FORWARD_REF_SRC = """given T
@@ -522,6 +544,131 @@ class TestIterItemsDescendsIntoZed:
 
         assert zed in seen
         assert nested_abbrev in seen
+
+
+# ---------------------------------------------------------------------------
+# HorizDef bridge: `Combined` is declared via a horizontal definition
+# (``Combined defs Base``), not an axdef/gendef/schema signature.  It ALSO
+# has its own (RA-tainted) `==` definition, and a downstream abbreviation
+# references it via a set-op.  ``_collect_fuzz_declared_names`` must credit
+# the HorizDef's LHS name the same way it credits an axdef declaration, so
+# the downstream reference is not falsely RA-tainted.
+# ---------------------------------------------------------------------------
+
+
+class TestHorizDefBridgeUntaints:
+    """A name declared by a HorizDef is never RA-tainted by reference."""
+
+    def test_uses_combined_stays_in_zed_block(self) -> None:
+        """`UsesCombined == Combined union Combined` renders INSIDE `\\begin{zed}`.
+
+        `Combined` also has an RA definition (`Combined == RJoin union S`)
+        that degrades to inline math on its own -- it references the
+        RA-tainted `RJoin` -- but that must not poison `UsesCombined`,
+        since `Combined` is independently declared via the HorizDef
+        `Combined defs Base` and so is a real, known-to-fuzz name.
+        """
+        latex = _fragment(_HORIZ_DEF_BRIDGE_SRC)
+        assert any(
+            "UsesCombined == Combined \\cup Combined" in block
+            for block in _zed_blocks(latex)
+        )
+
+    def test_uses_combined_not_display_math(self) -> None:
+        """`UsesCombined` must not be pushed out to inline math."""
+        latex = _fragment(_HORIZ_DEF_BRIDGE_SRC)
+        assert "$UsesCombined == Combined \\cup Combined$" not in latex
+
+    def test_combined_definition_still_display_math(self) -> None:
+        """`Combined == RJoin union S` still degrades -- `RJoin` is RA-tainted."""
+        latex = _fragment(_HORIZ_DEF_BRIDGE_SRC)
+        assert "\\noindent\n$Combined == RJoin \\cup S$" in latex
+
+    def test_horiz_def_bridge_document_fuzz_checks_clean(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """The HorizDef-declared name lets `UsesCombined` type-check with real fuzz."""
+        ast = Parser(Lexer(_HORIZ_DEF_BRIDGE_SRC).tokenize()).parse()
+        assert isinstance(ast, Document)
+        latex = LaTeXGenerator(use_fuzz=True).generate_document(ast)
+
+        tex_path = tmp_path / "ra_taint_horiz_def_bridge.tex"
+        tex_path.write_text(latex)
+
+        passed = typecheck_fuzz(tex_path)
+        captured = capsys.readouterr()
+
+        assert passed, captured.out + captured.err
+        assert "is not declared" not in captured.err
+
+
+class TestCollectFuzzDeclaredNamesHorizDef:
+    """Direct unit test: ``_collect_fuzz_declared_names`` credits HorizDef's LHS."""
+
+    def test_horiz_def_name_is_declared(self) -> None:
+        """A hand-built `HorizDef(name="Combined", ...)` yields `{"Combined"}`."""
+        horiz_def = HorizDef(
+            name="Combined",
+            generics=None,
+            body=Identifier(name="Base", line=1, column=1),
+            line=1,
+            column=1,
+        )
+        generator = LaTeXGenerator(use_fuzz=True)
+
+        declared = generator._collect_fuzz_declared_names(horiz_def)
+
+        assert declared == frozenset({"Combined"})
+
+
+# ---------------------------------------------------------------------------
+# Tuple-nested references: `_expression_references_names` must descend into
+# `Expr`s stored inside tuples, not just direct attributes or plain lists.
+# `Binding.pairs: list[tuple[str, Expr]]` and
+# `SetComprehension.extra_declarations: list[tuple[str, Expr]]` both hold
+# their `Expr` payload as the second element of a tuple -- a walk that only
+# recurses into lists and bare `Expr` attributes never reaches it.
+# ---------------------------------------------------------------------------
+
+
+class TestExpressionReferencesNamesTupleNesting:
+    """RA-tainted names nested inside binding/comprehension tuples are found."""
+
+    def test_binding_pairs_tuple_value_is_detected(self) -> None:
+        """A tainted name inside `Binding.pairs`' tuple value is detected."""
+        tainted_ref = Identifier(name="RJoin", line=2, column=3)
+        binding = Binding(pairs=[("field", tainted_ref)], line=2, column=3)
+        generator = LaTeXGenerator(use_fuzz=True)
+
+        assert generator._expression_references_names(binding, frozenset({"RJoin"}))
+
+    def test_binding_pairs_tuple_value_clean_case_not_detected(self) -> None:
+        """An untainted name inside the same tuple shape is NOT flagged."""
+        clean_ref = Identifier(name="Plain", line=2, column=3)
+        binding = Binding(pairs=[("field", clean_ref)], line=2, column=3)
+        generator = LaTeXGenerator(use_fuzz=True)
+
+        assert not generator._expression_references_names(binding, frozenset({"RJoin"}))
+
+    def test_set_comprehension_extra_declarations_tuple_value_is_detected(
+        self,
+    ) -> None:
+        """A tainted name inside `extra_declarations`' tuple value is detected."""
+        tainted_ref = Identifier(name="RJoin", line=2, column=3)
+        comprehension = SetComprehension(
+            variables=["x"],
+            domain=Identifier(name="X", line=1, column=1),
+            predicate=None,
+            expression=None,
+            extra_declarations=[("y", tainted_ref)],
+            line=1,
+            column=1,
+        )
+        generator = LaTeXGenerator(use_fuzz=True)
+
+        assert generator._expression_references_names(
+            comprehension, frozenset({"RJoin"})
+        )
 
 
 def _zed_blocks(latex: str) -> list[str]:
