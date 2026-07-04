@@ -2,7 +2,7 @@
 
 RA constructs (join, pi/project, sigma/restrict, div, group, ungroup, extend)
 are not fuzz-checkable, so an abbreviation whose RHS contains one is routed
-to display math (``\\noindent$...$``) instead of a fuzz ``\\begin{zed}``
+to inline math (``\\noindent$...$``) instead of a fuzz ``\\begin{zed}``
 paragraph.  That routing decision used to look only for a literal RA
 operator token.  An abbreviation that merely *references* an RA-defined
 name — with no RA operator of its own — was wrongly kept inside the zed
@@ -93,7 +93,7 @@ Combined == RJoin union S
 
 
 class TestDirectReferenceTaint:
-    """An abbreviation referencing an RA-tainted name is display math."""
+    """An abbreviation referencing an RA-tainted name is inline math."""
 
     def test_combined_is_display_math_not_zed(self) -> None:
         """`Combined == RJoin union S` emits as `$...$`, no RA operator present."""
@@ -107,7 +107,7 @@ class TestDirectReferenceTaint:
             assert "Combined" not in block
 
     def test_rjoin_itself_is_display_math(self) -> None:
-        """`RJoin == S join U` — direct RA operator — also routes to display math."""
+        """`RJoin == S join U` — direct RA operator — also routes to inline math."""
         latex = _fragment(_REPRO_SRC)
         assert "\\noindent\n$RJoin == \\mathrm{Join}(S, U)$" in latex
 
@@ -122,7 +122,7 @@ class TestTransitiveTaint:
     """RA taint propagates through a chain of references, not just one hop."""
 
     def test_extra_referencing_combined_is_display_math(self) -> None:
-        """`Extra == Combined setminus S` is display math via transitive taint."""
+        """`Extra == Combined setminus S` is inline math via transitive taint."""
         latex = _fragment(_TRANSITIVE_SRC)
         assert "\\noindent\n$Extra == Combined \\setminus S$" in latex
 
@@ -150,6 +150,87 @@ class TestPlainZUntouched:
         """The plain-Z abbreviation must not be pushed out to inline math."""
         latex = _fragment(_PLAIN_Z_SRC)
         assert "$X == A \\cup B$" not in latex
+
+
+# ---------------------------------------------------------------------------
+# Axdef bridge: RJoin is ALSO declared in an axdef, so fuzz genuinely knows
+# it. Referencing it must NOT taint the referencing abbreviation, even
+# though RJoin also has an (inline-math-only) RA definition.
+# ---------------------------------------------------------------------------
+
+
+class TestAxdefBridgeUntaints:
+    """A name declared in an axdef is never RA-tainted by reference."""
+
+    def test_combined_stays_in_zed_block(self) -> None:
+        """`Combined == RJoin union S` renders INSIDE `\\begin{zed}`.
+
+        RJoin's RA definition (`RJoin == S join U`) still degrades to
+        inline math on its own -- it contains a literal `join` -- but
+        that must not poison `Combined`, since RJoin is independently
+        declared in the axdef above and so is a real, known-to-fuzz name.
+        """
+        latex = _fragment(_BRIDGE_SRC)
+        assert any("Combined == RJoin \\cup S" in block for block in _zed_blocks(latex))
+
+    def test_combined_not_display_math(self) -> None:
+        """`Combined` must not be pushed out to inline math."""
+        latex = _fragment(_BRIDGE_SRC)
+        assert "$Combined == RJoin \\cup S$" not in latex
+
+    def test_rjoin_definition_still_display_math(self) -> None:
+        """`RJoin == S join U` still degrades -- it contains a literal `join`."""
+        latex = _fragment(_BRIDGE_SRC)
+        assert "\\noindent\n$RJoin == \\mathrm{Join}(S, U)$" in latex
+
+    def test_bridge_document_fuzz_checks_clean(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """The axdef-declared name lets `Combined` type-check with real fuzz."""
+        ast = Parser(Lexer(_BRIDGE_SRC).tokenize()).parse()
+        assert isinstance(ast, Document)
+        latex = LaTeXGenerator(use_fuzz=True).generate_document(ast)
+
+        tex_path = tmp_path / "ra_taint_bridge.tex"
+        tex_path.write_text(latex)
+
+        passed = typecheck_fuzz(tex_path)
+        captured = capsys.readouterr()
+
+        assert passed, captured.out + captured.err
+        assert "is not declared" not in captured.err
+
+
+# ---------------------------------------------------------------------------
+# Regression: without the axdef bridge, RJoin has no other declaration, so
+# Combined must still degrade to inline math (the original fix, unchanged).
+# ---------------------------------------------------------------------------
+
+
+class TestNoBridgeStillTaints:
+    """Without an independent declaration, RA-by-reference taint still applies."""
+
+    def test_combined_still_display_math_without_axdef_bridge(self) -> None:
+        """Same document, minus the `RJoin : T <-> T` axdef line, still degrades."""
+        latex = _fragment(_REPRO_SRC)
+        assert "\\noindent\n$Combined == RJoin \\cup S$" in latex
+
+    def test_no_bridge_document_fuzz_checks_clean(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Degrading to inline math still avoids fuzz's "not declared" error."""
+        ast = Parser(Lexer(_REPRO_SRC).tokenize()).parse()
+        assert isinstance(ast, Document)
+        latex = LaTeXGenerator(use_fuzz=True).generate_document(ast)
+
+        tex_path = tmp_path / "ra_taint_no_bridge.tex"
+        tex_path.write_text(latex)
+
+        passed = typecheck_fuzz(tex_path)
+        captured = capsys.readouterr()
+
+        assert passed, captured.out + captured.err
+        assert "is not declared" not in captured.err
 
 
 def _zed_blocks(latex: str) -> list[str]:

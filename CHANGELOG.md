@@ -102,7 +102,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   relational-algebra expression (`RJoin == S join U`), routed into a fuzz `zed`
   block and failed with `Identifier RJoin is not declared` (RA names are never
   declared to fuzz). RA "taint" now propagates by reference: a set-op line that
-  references an RA-defined name renders as inline display math — like the RA
+  references an RA-defined name renders as unboxed inline math — like the RA
   definition itself — instead of a broken checked block. Plain Z set operations
   over declared sets are unaffected (still fuzz-checked). See
   `docs/guides/FUZZ_VS_STD_LATEX.md`.

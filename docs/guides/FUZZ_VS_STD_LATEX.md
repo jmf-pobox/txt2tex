@@ -412,24 +412,25 @@ because schema rename doesn't carry a `/` token at this level.
 **Standard Z / Fuzz**: relational-algebra operators (`join`, `pi`/project,
 `sigma`/restrict, `div`, `group`, `ungroup`, `extend`) are DAT-course notation,
 not Z operators — they have no fuzz typing rule. An abbreviation built from them
-renders as **inline display math** and is deliberately *not* fuzz-checked:
+renders as **unboxed inline math** (`\noindent$...$`, not a LaTeX display
+environment) and is deliberately *not* fuzz-checked:
 
 ```text
-RJoin == S join U   →   $RJoin == \mathrm{Join}(S, U)$   (display math)
+RJoin == S join U   →   $RJoin == \mathrm{Join}(S, U)$   (inline math, unboxed)
 ```
 
 Because `RJoin` is not a Z declaration, fuzz never sees it. Z set operators
 (`union`, `intersect`, `setminus`) *are* Z; an abbreviation over declared Z sets
 renders inside a fuzz-checked `\begin{zed}` block. **The boundary is the box**: a
-`\begin{zed}` block is fuzz-checked; inline `$...$` display math is not.
+`\begin{zed}` block is fuzz-checked; unboxed inline `$...$` math is not.
 
 **RA taint propagates by reference.** If a set-op abbreviation references an
-RA-defined name, it too renders as display math — never a `zed` block — so the
-whole RA thread stays consistent:
+RA-defined name, it too renders as unboxed inline math — never a `zed` block —
+so the whole RA thread stays consistent:
 
 ```text
-RJoin == S join U            // RA -> display math
-Combined == RJoin union S    // references RJoin (RA) -> display math too
+RJoin == S join U            // RA -> inline math
+Combined == RJoin union S    // references RJoin (RA) -> inline math too
 ```
 
 Without this, `Combined` would route into a fuzz `zed` block referencing the
@@ -438,7 +439,7 @@ declared`). RA is outside fuzz's remit; the tool never fabricates a declaration
 for an RA name (that would make downstream Z type-check against a fiction). To
 get a set-op line genuinely fuzz-checked, declare the relation first in an
 `axdef` (`RJoin : X \rel Y` — you own the type claim), then give the RA
-definition as display math.
+definition as inline math.
 
 **Reference**: `codegen/fuzz_routing.py` — `_is_ra_tainted`,
 `_expression_references_names`; `latex_gen.py` — `_ra_tainted_names`.
