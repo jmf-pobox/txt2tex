@@ -78,11 +78,28 @@ CONTENTS:            & Table of contents \\
 PARTS: inline        & Parts formatting style \\
 PAGEBREAK:           & \verb|\newpage| \\
 LINEBREAK:           & \verb|\medskip| (gap, no new page) \\
-TEXT: prose here     & Smart prose (auto-detects formulas) \\
+TEXT: prose here     & Prose (escaped); inline math in \verb|$...$| \\
 PURETEXT: raw \&\ text & Verbatim prose; escapes \LaTeX\ specials \\
 LATEX: \textbackslash cmd & Raw \LaTeX\ passthrough (single-line) \\
 {[cite key]}         & \verb|\citep{key}| (in TEXT blocks) \\
 \end{tabularx}
+
+% ── INLINE MATH ──────────────────────────────────
+\needspace{16\baselineskip}
+\section{Inline Math}
+
+{\footnotesize Inside \kw{TEXT:} prose, wrap whiteboard math in \verb|$...$|. Bare prose is escaped, never converted to symbols.}
+
+\begin{tabularx}{\columnwidth}{LR}
+\$forall x : N | P\$ & $\forall x : \nat @ P$ \\
+\$A -> B\$           & $A \fun B$ \\
+\$x >= 0\$           & $x \geq 0$ \\
+\$p.a |-> p.b\$      & $p.a \mapsto p.b$ \\
+\$|->\$ / \$forall\$ & $\mapsto$ / $\forall$ (bare symbol) \\
+\$A \textbackslash{} B\$ & $A \setminus B$ (set difference; space required) \\
+\end{tabularx}
+
+{\footnotesize\textbf{Strict:} raw \LaTeX\ (e.g.\ \texttt{\textbackslash geq}) inside \texttt{\$...\$} is an error --- use a \kw{LATEX:} block instead.}
 
 % ── IDENTIFIERS ─────────────────────────────────
 \needspace{18\baselineskip}
@@ -109,7 +126,7 @@ x?'                  & $x?'$ (combinations allowed) \\
 land, lor, lnot                            & propositional \\
 forall, exists, exists1, mu, lambda        & quantifiers / binders \\
 elem, notin, subset, subseteq, psubset     & set membership / subset \\
-union, intersect, cross, bigcup, bigcap    & set operations \\
+union, intersect, setminus, cross, bigcup, bigcap & set operations \\
 dom, ran, inv, id, comp                    & relation operators \\
 P, P1, F, F1                               & power / finite set \\
 mod                                        & arithmetic \\

@@ -194,7 +194,7 @@ forall x : N | exists y : N | y > x
 
 ** Example 4: Mu Operator **
 
-TEXT: Find the unique natural number between 5 land 7.
+TEXT: Find the unique natural number between 5 and 7.
 
 mu x : N | x > 5 land x < 7
 

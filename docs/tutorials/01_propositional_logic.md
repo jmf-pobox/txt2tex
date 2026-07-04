@@ -390,7 +390,7 @@ TEXT: This document proves several logical equivalences.
 
 ** Example 1: Implication to Disjunction **
 
-TEXT: We prove that p => q is equivalent to lnot p lor q.
+TEXT: We prove that $p => q$ is equivalent to $lnot p lor q$.
 
 EQUIV:
 p => q
@@ -405,7 +405,7 @@ T | F | F | F | F
 F | T | T | T | T
 F | F | T | T | T
 
-TEXT: The columns for "p => q" land "lnot p lor q" are identical.
+TEXT: The columns for "$p => q$" and "$lnot p lor q$" are identical.
 
 ** Example 2: De Morgan's Law **
 
