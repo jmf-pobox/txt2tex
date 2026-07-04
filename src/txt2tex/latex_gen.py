@@ -4,6 +4,7 @@ from __future__ import annotations
 
 __all__ = ["LaTeXGenerator", "toc_depth_from_keyword"]
 
+from collections.abc import Iterator
 from typing import ClassVar
 
 from txt2tex.__version__ import __version__
@@ -271,6 +272,44 @@ class LaTeXGenerator(
         # tainted names from a previous, unrelated document.
         self._ra_tainted_names = set()
         self._fuzz_declared_names = set()
+        self._collect_declared_and_tainted_names(items)
+
+    def _iter_items_in_document_order(
+        self, items: list[DocumentItem]
+    ) -> Iterator[DocumentItem]:
+        """Yield every item in ``items``, recursing into nested containers.
+
+        Section, Solution, and Part all carry a ``.items`` list of their
+        own — a declaration or RA abbreviation can be nested arbitrarily
+        deep inside any of them (a Part inside a Solution inside a
+        Section, for instance).  Pre-order traversal preserves document
+        order, which is what fuzz's declare-before-use rule requires.
+        """
+        for item in items:
+            yield item
+            if isinstance(item, (Section, Solution, Part)):
+                yield from self._iter_items_in_document_order(item.items)
+
+    def _collect_declared_and_tainted_names(self, items: list[DocumentItem]) -> None:
+        """Populate ``_fuzz_declared_names`` and ``_ra_tainted_names`` up front.
+
+        A single forward pass over the *entire* item tree — including
+        items nested under Section/Solution/Part — computed once before
+        any rendering starts.  Rendering code (the consolidation loop,
+        ``generate_document_item``, ``_generate_part``, ...) only reads
+        these sets afterward; none of it mutates them.  That decouples
+        the taint/declaration bookkeeping from which render path happens
+        to visit a given item, so a declaration nested three parts deep
+        is seen exactly like a top-level sibling.
+        """
+        for item in self._iter_items_in_document_order(items):
+            if (
+                isinstance(item, Abbreviation)
+                and item.name not in self._fuzz_declared_names
+                and self._is_ra_tainted(item.expression)
+            ):
+                self._ra_tainted_names.add(item.name)
+            self._fuzz_declared_names |= self._collect_fuzz_declared_names(item)
 
     # -------------------------------------------------------------------------
     # Overflow warning helpers
@@ -361,14 +400,6 @@ class LaTeXGenerator(
                     zed_items.append(next_item)
                     j += 1
 
-                # Record names this group declares to fuzz (given types,
-                # free-type left-hand sides) before generating, so a later
-                # RA abbreviation referencing one of them is not tainted.
-                for zed_item in zed_items:
-                    self._fuzz_declared_names |= self._collect_fuzz_declared_names(
-                        zed_item
-                    )
-
                 # Generate consolidated zed environment
                 if len(zed_items) == 1:
                     # Single item: generate normally
@@ -394,22 +425,9 @@ class LaTeXGenerator(
                 # Skip processed items
                 i = j
             else:
-                # Record names this item declares to fuzz (axdef/gendef/
-                # schema signatures) before checking taint, so the "axdef
-                # bridge" pattern — declaring a name's type here, then
-                # defining it via RA elsewhere — keeps that name off the
-                # taint list.
-                self._fuzz_declared_names |= self._collect_fuzz_declared_names(item)
-                # RA-tainted abbreviation: record its name so any later
-                # abbreviation referencing it is tainted by reference too,
-                # unless fuzz already knows the name from elsewhere (e.g.
-                # an axdef declaration) — that name stays fuzz-checkable.
-                if (
-                    isinstance(item, Abbreviation)
-                    and self._is_ra_tainted(item.expression)
-                    and item.name not in self._fuzz_declared_names
-                ):
-                    self._ra_tainted_names.add(item.name)
+                # _fuzz_declared_names and _ra_tainted_names are precomputed
+                # by _collect_declared_and_tainted_names before rendering
+                # starts — this branch only reads them via _is_ra_tainted.
                 # Not a zed item: generate normally
                 item_lines = self.generate_document_item(item)
                 lines.extend(item_lines)

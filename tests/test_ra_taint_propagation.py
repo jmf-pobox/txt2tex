@@ -20,7 +20,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from txt2tex.ast_nodes import Document
+from txt2tex.ast_nodes import AxDef, Document, Part, Section, Solution
 from txt2tex.cli import typecheck_fuzz
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
@@ -224,6 +224,87 @@ class TestNoBridgeStillTaints:
         latex = LaTeXGenerator(use_fuzz=True).generate_document(ast)
 
         tex_path = tmp_path / "ra_taint_no_bridge.tex"
+        tex_path.write_text(latex)
+
+        passed = typecheck_fuzz(tex_path)
+        captured = capsys.readouterr()
+
+        assert passed, captured.out + captured.err
+        assert "is not declared" not in captured.err
+
+
+# ---------------------------------------------------------------------------
+# Nested-under-Part: the axdef/RA chain is not a Document-level sibling --
+# it is entirely inside a single Part's ``.items``.  ``_parse_part`` consumes
+# every item after ``(a) ...`` up to the next part/solution/section marker,
+# so any Z paragraph following a part label nests here rather than sitting
+# beside it.  Before the pre-pass refactor, ``_generate_part``'s default
+# (subsection) branch called ``generate_document_item`` per item directly,
+# never routing through ``_generate_document_items_with_consolidation`` --
+# the only place the old code updated ``_fuzz_declared_names`` and
+# ``_ra_tainted_names``.  RJoin's declaration and taint were silently
+# dropped, and ``Combined`` was left inside a fuzz zed block it does not
+# belong in, producing "Identifier RJoin is not declared".
+# ---------------------------------------------------------------------------
+
+_PART_NO_BRIDGE_SRC = """=== Q1 ===
+
+** Solution 1 **
+
+(a) Relational algebra
+
+given T
+
+axdef
+  S : T <-> T
+  U : T <-> T
+end
+
+RJoin == S join U
+
+Combined == RJoin union S
+"""
+
+
+class TestNestedUnderPartTaint:
+    """The declared/tainted-name pre-pass reaches items nested under a Part."""
+
+    def test_part_items_actually_nest_the_declaration(self) -> None:
+        """Sanity check: RJoin's axdef is a Part item, not a Document item.
+
+        Confirms this fixture exercises the exact layout Cursor flagged --
+        without this, the regression below would pass for the wrong reason.
+        """
+        ast = Parser(Lexer(_PART_NO_BRIDGE_SRC).tokenize()).parse()
+        assert isinstance(ast, Document)
+        section = ast.items[0]
+        assert isinstance(section, Section)
+        solution = section.items[0]
+        assert isinstance(solution, Solution)
+        part = solution.items[0]
+        assert isinstance(part, Part)
+        assert any(isinstance(item, AxDef) for item in part.items)
+
+    def test_combined_pushed_to_inline_math_without_bridge(self) -> None:
+        """Without an axdef bridge, `Combined` must degrade even nested in a Part."""
+        latex = _fragment(_PART_NO_BRIDGE_SRC)
+        assert "$Combined == RJoin \\cup S$" in latex
+
+    def test_combined_not_left_in_zed_block(self) -> None:
+        """Leaving `Combined` in a zed block here is the regression Cursor found."""
+        latex = _fragment(_PART_NO_BRIDGE_SRC)
+        for block in _zed_blocks(latex):
+            assert "Combined" not in block
+
+    def test_nested_part_document_fuzz_checks_clean(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """The regression manifests as fuzz's "not declared" error; must not recur."""
+        ast = Parser(Lexer(_PART_NO_BRIDGE_SRC).tokenize()).parse()
+        assert isinstance(ast, Document)
+        latex = LaTeXGenerator(use_fuzz=True).generate_document(ast)
+
+        tex_path = tmp_path / "ra_taint_part_no_bridge.tex"
         tex_path.write_text(latex)
 
         passed = typecheck_fuzz(tex_path)
