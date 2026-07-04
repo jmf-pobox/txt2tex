@@ -3184,7 +3184,7 @@ C == A setminus B         # setminus is a Z-native set op -> routed to zed
 `setminus` (and `union`, `intersect`, …) are ordinary Z operators, so
 `C == A setminus B` routed to `\begin{zed}`. But `A` and `B` were defined by RA
 abbreviations that render as `\mathrm{...}` inline math — invisible to fuzz's
-type environment. fuzz therefore rejected `A`/`B` as **"not declared"** on a
+type environment, so fuzz rejected `A`/`B` as **"not declared"** on a
 document that is otherwise correct. Relational algebra is not fuzz-checkable at
 all (the `\mathrm{Project}` etc. labels are not Z grammar), so a set operation
 built over RA names cannot live in a typechecked block.
