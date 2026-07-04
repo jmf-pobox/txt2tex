@@ -17,6 +17,7 @@ from txt2tex.ast_nodes import (
     Document,
     DocumentItem,
     Expr,
+    ExtendAggregate,
     FreeType,
     FunctionApp,
     GenericInstantiation,
@@ -675,16 +676,29 @@ class LaTeXGenerator(
         """
         # Nodes with line_break_after flag — check flag first, then children
         if isinstance(
-            expr, (BinaryOp, NaturalJoin, Divide, Group, Ungroup, GroupAggregate)
+            expr,
+            (
+                BinaryOp,
+                NaturalJoin,
+                Divide,
+                Group,
+                Ungroup,
+                GroupAggregate,
+                ExtendAggregate,
+            ),
         ):
             return self._has_line_breaks_flagged(expr)
-        # Quantifier has a different flag name
+        # Quantifier has different flag names (one per separator) and an
+        # optional post-bullet expression term — check both flags and every
+        # child, not just the body.
         if isinstance(expr, Quantifier):
-            if expr.line_break_after_pipe:
+            if expr.line_break_after_pipe or expr.line_break_after_bullet:
                 return True
             if expr.domain and self._has_line_breaks(expr.domain):
                 return True
-            return self._has_line_breaks(expr.body)
+            if self._has_line_breaks(expr.body):
+                return True
+            return bool(expr.expression and self._has_line_breaks(expr.expression))
         # Relational algebra wrappers: recurse into the inner relation
         if isinstance(expr, (Restrict, Project, RelationRename)):
             has_rel = self._has_line_breaks(expr.relation)
@@ -695,7 +709,13 @@ class LaTeXGenerator(
 
     def _has_line_breaks_flagged(
         self,
-        expr: BinaryOp | NaturalJoin | Divide | Group | Ungroup | GroupAggregate,
+        expr: BinaryOp
+        | NaturalJoin
+        | Divide
+        | Group
+        | Ungroup
+        | GroupAggregate
+        | ExtendAggregate,
     ) -> bool:
         """Check line breaks for nodes that carry a line_break_after flag."""
         if expr.line_break_after:
@@ -709,7 +729,8 @@ class LaTeXGenerator(
             return left_has or right_has or sub_has
         if isinstance(expr, Divide):
             return self._has_line_breaks(expr.left) or self._has_line_breaks(expr.right)
-        # Group, Ungroup, GroupAggregate: only the relation child matters
+        # Group, Ungroup, GroupAggregate, ExtendAggregate: only the relation
+        # child matters.
         return self._has_line_breaks(expr.relation)
 
     def _has_line_breaks_structural(self, expr: Expr) -> bool:
@@ -725,6 +746,13 @@ class LaTeXGenerator(
                 expr.exponent
             )
         if isinstance(expr, SetComprehension):
+            # A comprehension is a binder (Z RM §3.9): check its own pipe/
+            # bullet break flags, not just whether a child sub-expression
+            # happens to break — the comprehension's own separators can be
+            # the only break in the whole tree (jms ruling,
+            # fix/display-math-binding-indent).
+            if expr.line_break_after_pipe or expr.line_break_after_bullet:
+                return True
             if expr.domain and self._has_line_breaks(expr.domain):
                 return True
             if expr.predicate and self._has_line_breaks(expr.predicate):

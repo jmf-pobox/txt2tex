@@ -175,15 +175,22 @@ here for discoverability.
    explicit `zed` block — hard rejection"). Never fabricate a Z declaration for
    an RA name to make fuzz "accept" it (jms).
 
-2. **Z-paragraph indentation tracks binding depth.** A continuation line inside
-   a Z paragraph is indented `\t{depth}` where `depth` = the number of binders
-   (`forall`/`exists`/`exists1`/`lambda`/`mu`/set comprehension) enclosing it,
-   via `_binding_depth` + `_get_indentation()`. **Any new binder must increment
-   `_binding_depth` around its scoped body** (predicate and term share one
-   level), or its wrapped body de-nests. See the ADR "Z-paragraph indentation
-   tracks binding depth". `\t{n}` is fuzz's tab macro (defined in fuzz.sty and
-   the zed packages), not `\quad`; `\quad` is only the depth-0 fallback. fuzz's
-   type checker ignores both as layout, so these are reader-facing only.
+2. **Indentation tracks binding depth — in both the `zed` and display-math
+   paths.** A continuation line is indented `\t{depth}` where `depth` = the
+   number of binders (`forall`/`exists`/`exists1`/`lambda`/`mu`/set
+   comprehension) enclosing it, via `_binding_depth` + `_get_indentation()`.
+   **Any new binder must increment `_binding_depth` around its scoped body**
+   (predicate and term share one level), or its wrapped body de-nests. The same
+   depth traversal runs identically whether the construct is a fuzz-checkable
+   `zed` paragraph or unboxed display math (an expression that yields a binding
+   `\lblot … \rblot` or contains relational algebra): a construct reads the same
+   to a Z reader in both. Display math wraps the **whole** expression in one
+   `\begin{array}{l}` and emits `\t{depth}` at every break — never a
+   per-comprehension nested array or a bare `\\` (those produced ragged,
+   non-aligned output). See the ADR "Z-paragraph indentation tracks binding
+   depth". `\t{n}` is fuzz's tab macro (defined in fuzz.sty and the zed
+   packages), not `\quad`; `\quad` is only the depth-0 fallback. fuzz's type
+   checker ignores both as layout, so these are reader-facing only.
 
 ## Component Design
 
@@ -3456,3 +3463,31 @@ x mod 2 = 0 }`); this generalises it to arbitrary depth.
 - Fixture churn is indentation-only: top-level comprehension bodies move from the
   depth-0 `\quad` fallback to `\t1`; nested comprehension bodies move to their
   true `\t{depth}`. Two committed example `.tex` files regenerated.
+
+**Extended to the display-math path (jms, 2026-07-04).** The ruling applies to
+*both* rendering contexts: layout is not semantically significant in Z (Z RM §6),
+so one construct must read the same to a Z reader whether it renders as a
+fuzz-checkable `zed` paragraph or as unboxed display math (used when the
+expression yields a binding `\lblot … \rblot` or contains relational algebra).
+Previously the display path wrapped **each** comprehension in its own
+`\begin{array}{l}` and broke comprehensions with a bare `\\` (no `\t`), while the
+conjunction/quantifier breaks inside still used `\t{depth}` — the result was
+mixed indentation and nested arrays with different left edges (ragged). Fix:
+
+- `_generate_set_comprehension` never self-wraps in an array and always breaks
+  with `_get_indentation()` (the `if self._in_z_paragraph else r"\\"` branch is
+  gone).
+- The **whole** display expression is wrapped in exactly **one**
+  `\begin{array}{l}` (at the abbreviation / bare-expression entry point), so all
+  `\t{depth}` breaks share one left margin — reproducing the `zed` layout.
+- Removing the self-wrapping array exposed three `_has_line_breaks` gaps it had
+  masked (`Quantifier` bullet/`expression` child; `SetComprehension`'s own
+  pipe/bullet flags; `ExtendAggregate`); all fixed, or a wrapped comprehension
+  could emit bare `\\` directly inside `$…$` (invalid LaTeX).
+- The yielded term (a binding, a plain expression, or an RA label) sits at the
+  same `\t{depth}` as any sub-expression at that depth; only its *text* differs
+  between the two renderings. Overflow (long unbreakable lines) is a separate
+  axis — author break-points + `adjustbox` — untouched here.
+- Regression coverage: `tests/test_display_math_indent.py`. Fixture churn:
+  `bindings.tex`, `relational_calculus.tex`, `q2d_demo.tex` (indentation/array
+  structure only).

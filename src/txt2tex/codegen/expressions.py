@@ -924,14 +924,19 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         # bullet-term expression are both in the scope of the declared
         # variables, so both sit one binding level deeper than this
         # comprehension's own opening (jms ruling, fix/setcomp-wrap-indent).
-        # In Z-paragraph contexts (zed/axdef/gendef/schema/hidden-fuzz), emit
-        # a fuzz-safe line-break with \t{depth} indentation.  fuzz rejects
-        # \begin{array} inside a Z paragraph (fuzz manual §3, §3.2).  In
-        # the display (inline-math) context the outer \begin{array}{l}
-        # provides layout, so plain \\ suffices there.
+        # Layout is not semantically significant in Z (Z RM §6), so a
+        # comprehension breaks the same way whether it renders inside a Z
+        # paragraph or inside display math: \t{depth} indentation, always
+        # (jms ruling, fix/display-math-binding-indent).  The single
+        # enclosing \begin{array}{l} that gives every \t{depth} break a
+        # common left margin is the caller's job — the Z-paragraph box, or
+        # the one outer array the display-math emitter wraps around the
+        # whole expression — never this comprehension's own; nested arrays
+        # each establish their own left edge and make the \t{depth} values
+        # ragged instead of aligned.
         self._binding_depth += 1
         indent = self._get_indentation()
-        _break = f"\\\\\n{indent}" if self._in_z_paragraph else r"\\"
+        _break = f"\\\\\n{indent}"
 
         # Handle case with no predicate
         if node.predicate is None:
@@ -969,25 +974,12 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         # Add ~ spacing hint before closing brace
         parts.append(r"~\}")
 
-        result = " ".join(parts)
-
-        # When the comprehension has line breaks AND we are in a display
-        # (non-Z-paragraph) context, wrap in an array environment for proper
-        # multi-line rendering.  The opening brace sits on the first row and
-        # the closing brace on the last row (textbook convention).
-        # In Z-paragraph contexts the bare \\ + \t1 form is already embedded
-        # above; \begin{array} inside a Z paragraph is rejected by fuzz.
-        if (
-            node.line_break_after_pipe or node.line_break_after_bullet
-        ) and not self._in_z_paragraph:
-            inner = result[len(r"\{~ ") :].removesuffix(r"~\}")
-            return (
-                r"\begin{array}{l}"
-                r"\{~ " + inner + r" ~\}"
-                r"\end{array}"
-            )
-
-        return result
+        # No self-wrapping: a nested comprehension's \t{depth} breaks flow
+        # into whichever single array the enclosing context provides (the
+        # Z-paragraph box, or the one outer array a display-math caller
+        # wraps around the whole expression).  See the binding-depth comment
+        # above _break for the reasoning.
+        return " ".join(parts)
 
     @expr_register.register(FunctionApp)
     def _generate_function_app(

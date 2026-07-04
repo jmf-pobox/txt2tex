@@ -59,8 +59,13 @@ zS_1 == \{~ t : Track | t.genre = Jazz @ \\
 \end{zed}%
 }
 \noindent
-$\begin{array}{l}\{~ t : Track | t.genre = Jazz @ \\ \lblot~title == t.title, genre == t.genre~\rblot  ~\}\end{array}$
+$\displaystyle
+\begin{array}{l}
+\{~ t : Track | t.genre = Jazz @ \\
+\t1 \lblot~title == t.title, genre == t.genre~\rblot ~\}
+\end{array}$
 
+\bigskip
 
 \section*{Query 2: Two-relation join via comprehension}
 \addcontentsline{toc}{section}{Query 2: Two-relation join via comprehension}
@@ -79,8 +84,9 @@ zS_2 == \{~ t : Track ; al : Album ; ar : Artist | t.alid = al.alid \land \\
 \noindent
 $\displaystyle
 \begin{array}{l}
-\begin{array}{l}\{~ t : Track ; al : Album ; ar : Artist | t.alid = al.alid \land \\
-\t1 al.arid = ar.arid @ \\ \lblot~track == t.title, artist == ar.name~\rblot  ~\}\end{array}
+\{~ t : Track ; al : Album ; ar : Artist | t.alid = al.alid \land \\
+\t1 al.arid = ar.arid @ \\
+\t1 \lblot~track == t.title, artist == ar.name~\rblot ~\}
 \end{array}$
 
 \bigskip
@@ -102,8 +108,9 @@ zS_3 == \{~ p : PlaylistId ; t : Track ; al : Album | (p, t.tid) \in member \lan
 \noindent
 $\displaystyle
 \begin{array}{l}
-\begin{array}{l}\{~ p : PlaylistId ; t : Track ; al : Album | (p, t.tid) \in member \land \\
-\t1 t.alid = al.alid @ \\ \lblot~playlist == p, track == t.title, album == al.title~\rblot  ~\}\end{array}
+\{~ p : PlaylistId ; t : Track ; al : Album | (p, t.tid) \in member \land \\
+\t1 t.alid = al.alid @ \\
+\t1 \lblot~playlist == p, track == t.title, album == al.title~\rblot ~\}
 \end{array}$
 
 \bigskip
@@ -125,8 +132,9 @@ zS_4 == \{~ t : Track ; al : Album | t.alid = al.alid \land \\
 \noindent
 $\displaystyle
 \begin{array}{l}
-\begin{array}{l}\{~ t : Track ; al : Album | t.alid = al.alid \land \\
-\t1 t.duration > 300 @ \\ \lblot~track == t.title, album == al.title~\rblot  ~\}\end{array}
+\{~ t : Track ; al : Album | t.alid = al.alid \land \\
+\t1 t.duration > 300 @ \\
+\t1 \lblot~track == t.title, album == al.title~\rblot ~\}
 \end{array}$
 
 \bigskip

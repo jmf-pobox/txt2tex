@@ -109,9 +109,10 @@ zS_1 == \{~ m : Match ; t : Tournament ; p : Player | m.tournament = t.tournamen
 \noindent
 $\displaystyle
 \begin{array}{l}
-\begin{array}{l}\{~ m : Match ; t : Tournament ; p : Player | m.tournament = t.tournamentId \land \\
+\{~ m : Match ; t : Tournament ; p : Player | m.tournament = t.tournamentId \land \\
 \t1 m.winner = p.name \land \\
-\t1 t.venue = CentreCourt @ \\ \lblot~winner == m.winner, venue == t.venue, tier == t.tier~\rblot  ~\}\end{array}
+\t1 t.venue = CentreCourt @ \\
+\t1 \lblot~winner == m.winner, venue == t.venue, tier == t.tier~\rblot ~\}
 \end{array}$
 
 \bigskip
