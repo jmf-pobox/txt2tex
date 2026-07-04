@@ -3350,3 +3350,79 @@ them is **tool policy**, not Z semantics. We choose rejection because:
 - Closes issue #83. Regression tests assert the error (exception, message,
   offending line) and the clean CLI exit, not the old in-box `\mathrm{...}`
   rendering; two tests that had pinned the old behaviour were updated.
+
+## ADR: Z-paragraph indentation tracks binding depth
+
+**Status**: SETTLED by jms 2026-07-04. Implemented in `_generate_set_comprehension`
+and the `_binding_depth` counter.
+
+### Context
+
+Inside a Z paragraph (`zed`/`axdef`/`gendef`/`schema`) a continuation line is
+indented with fuzz's `\t{n}` tab macro (n tab stops; `\begin{array}` is rejected
+by fuzz inside a Z paragraph, so `\t{n}` is the only lever, and the fuzz *type
+checker* ignores it as layout). The indent level was computed from a
+`_quantifier_depth` counter that only `\forall`/`\exists`/`\exists_1`/`\mu`
+incremented. **Set comprehensions did not increment it, and their line-break was
+a hardcoded `\t1`** regardless of depth. Two defects:
+
+1. A wrapped comprehension body at depth 1 stayed at `\t1`, flush with the
+   surrounding predicate — the reader could not see which lines were *inside*
+   the `{…}` versus outside it (e.g. an implication consequent following the
+   comprehension).
+2. A comprehension nested deeper than depth 1 emitted its own `\t1` breaks while
+   the conjunction/quantifier breaks around it used `\t{depth}` — the
+   indentation was **non-monotonic within a single comprehension body**
+   (`\t1` then `\t2` on consecutive body lines).
+
+### Decision (jms ruling)
+
+**Indentation tracks binding depth.** A *binder* is `\forall`, `\exists`,
+`\exists_1`, `\lambda`, `\mu`, **and the set comprehension** `{ D | P • e }`
+(Z RM §3.9 — schema-text-plus-spot, the same construction as a quantifier §3.8;
+the declaration `D` scopes both `P` and `e`). For any continuation line,
+`depth = number of binders textually enclosing the start of that line`; a binder's
+*opening* line sits at its container's depth and increments depth for its
+*scoped body*. Every continuation line emits `\t{depth}`, from one AST traversal —
+**no branching on node kind for the indentation amount**.
+
+Consequences of the principle:
+
+- A comprehension body indents **one tab deeper** than the `{` that opens it, and
+  **every** wrapped line of that body sits at that one level (monotonic — a line
+  deeper in the scope tree is never shallower on the page).
+- The predicate `P` and the `•`-term `e` are **both** in the scope of `D`, so both
+  sit at the same level; `• e` is not set apart by indentation (an author may
+  *break* onto a fresh line for `• e`, but that line keeps the body's level).
+- The rule is **uniform** across comprehensions, schema `where` predicates, and
+  axdef/gendef predicates — a `{ … | … }` is one binder among the quantifiers,
+  not a special case.
+- **Break points are independent of the indent level** and unchanged: never break
+  after a closing delimiter (`}`, `)`, `]`) or across `\where`
+  (`FUZZ_VS_STD_LATEX.md`). This ADR changes only the `\t{n}` level.
+
+**Grounding**: the Z RM prescribes no line-wrapping *algorithm* for over-long
+predicates — it sets its examples by hand. What it and *Understanding Z* (Ch. 3–4)
+exhibit consistently is the *principle* that indentation reflects binding scope.
+This ADR mechanises that convention; it does not invent one. The repo already
+applied the single-level form (`FUZZ_VS_STD_LATEX.md`, `Evens == { x : N | \\ \t1
+x mod 2 = 0 }`); this generalises it to arbitrary depth.
+
+### Alternatives rejected
+
+- **Align the comprehension body at the same level as its container** (`\t{d}`).
+  Rejected: loses the scope boundary — defect 1. A binder must read as
+  containment.
+- **Keep the hardcoded `\t1`.** Rejected: it is the source of both defects; it is
+  depth-blind and produces non-monotonic output once nesting exceeds one level.
+
+### Consequences
+
+- `_quantifier_depth` renamed to `_binding_depth`; set comprehensions (and
+  `\lambda`) now increment it around predicate + expression generation, and the
+  comprehension line-break is computed from `_get_indentation()` at the
+  incremented depth (was a hardcoded `\t1`). `\mu` already incremented.
+- Regression coverage: `tests/test_setcomp_wrap_indent.py`.
+- Fixture churn is indentation-only: top-level comprehension bodies move from the
+  depth-0 `\quad` fallback to `\t1`; nested comprehension bodies move to their
+  true `\t{depth}`. Two committed example `.tex` files regenerated.

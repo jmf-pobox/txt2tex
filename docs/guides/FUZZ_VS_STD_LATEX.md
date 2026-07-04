@@ -720,12 +720,71 @@ Fuzz cannot parse `\begin{array}` inside a Z paragraph (`zed`, `axdef`, `schema`
 Identifier \begin is not declared
 ```
 
-Use bare `\\` line breaks with `\t1` indentation instead:
+Use bare `\\` line breaks with `\t{n}` indentation instead, where `n` tracks
+**binding depth**:
 
 ```latex
-Evens == \{ x : \nat | \\
-\t1  x \mod 2 = 0 \}
+Evens == \{~ x : \nat | \\
+\t1 x \mod 2 = 0 ~\}
 ```
+
+**Indentation tracks binding depth.** A *binder* is `\forall`, `\exists`,
+`\exists_1`, `\lambda`, `\mu`, and the **set comprehension** `{ D | P • e }` —
+a comprehension is schema-text-plus-spot, the same construction as a
+quantifier (Z RM §3.9). For any continuation line:
+
+```text
+depth = number of binders textually enclosing the start of that line
+```
+
+A binder's *opening* line sits at its container's depth; its *scoped body* —
+everything inside the binder — is one level deeper. In the `Evens` example
+above, the comprehension has no enclosing binder (depth 0), so it is itself
+the only binder in scope and its body sits at `\t1`.
+
+**Nesting climbs one level per enclosing binder.** A comprehension wrapped
+inside a `forall` indents one level deeper than the `forall`'s own body.
+Input:
+
+```text
+zed
+  forall s : P N |
+    #{ x : s |
+      x mod 2 = 0 } > 0
+end
+```
+
+Output:
+
+```latex
+\begin{zed}
+\forall s : \power \nat @ \\
+\t1 \# \{~ x : s | \\
+\t2 x \mod 2 = 0 ~\} > 0
+\end{zed}
+```
+
+The `\forall` is depth 1, so its body (`\#\{~ x : s | ...`) opens at `\t1`.
+The comprehension is itself a binder nested inside that body, so *its*
+predicate — `x \mod 2 = 0` — is depth 2 and sits at `\t2`. The trailing
+`> 0` is not a separate line: it closes the enclosing expression on the same
+line as `~\}`, not the comprehension's body.
+
+Two consequences follow from "depth = binder count", not from any special
+case for comprehensions:
+
+- **Every** wrapped line of a binder's body sits at that binder's depth —
+  monotonic. A line two binders deep is never rendered shallower than a
+  line one binder deep just because it comes later in the source.
+- The predicate `P` and the `•`-term `e` inside a comprehension `{ D | P • e }`
+  are both scoped by the same declaration `D`, so both sit at the **same**
+  level — don't indent `• e` more deeply than `P`.
+
+The rule is uniform: quantifier bodies, comprehension bodies, schema `where`
+predicates, and axdef/gendef predicates all indent by binder count. There is
+no special-casing by construct — see [DESIGN.md, "ADR: Z-paragraph
+indentation tracks binding depth"](../DESIGN.md) for the full ruling and
+rejected alternatives.
 
 **Safe break points** — `\\` is only valid at grammatically open positions:
 
@@ -736,9 +795,19 @@ Evens == \{ x : \nat | \\
 
 **Never** break after a closing delimiter (`}`, `)`, `]`) or across `\where`.
 
-**`\t1` / `\t2`** are fuzz typographic spacing commands (fuzz manual §3.2). The type checker ignores them; they affect PDF indentation only.
+Break *location* and indent *level* are independent decisions: the rules
+above say where a `\\` is allowed; binding depth says how far `\t{n}`
+indents once you've broken there. Changing nesting depth never changes
+which positions are safe to break at.
 
-txt2tex emits this form automatically for multi-line set comprehensions and comprehension abbreviations inside Z paragraphs. The `\begin{array}` wrapper is kept only for the non-fuzz inline-math display path.
+**`\t1` / `\t2` / `\t{n}`** are fuzz typographic spacing commands (fuzz
+manual §3.2). The type checker ignores them entirely — they only affect PDF
+indentation, never type-checking.
+
+txt2tex emits this form automatically for multi-line set comprehensions and
+comprehension abbreviations inside Z paragraphs, computing `n` from binder
+depth rather than hardcoding it. The `\begin{array}` wrapper is kept only
+for the non-fuzz inline-math display path.
 
 ### When to Use zed vs axdef
 

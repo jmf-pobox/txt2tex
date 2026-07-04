@@ -101,8 +101,8 @@ $\displaystyle
 \setbox0=\vbox{%
 \begin{zed}
 zS_1 == \{~ m : Match ; t : Tournament ; p : Player | m.tournament = t.tournamentId \land \\
-\quad m.winner = p.name \land \\
-\quad t.venue = CentreCourt @ \\
+\t1 m.winner = p.name \land \\
+\t1 t.venue = CentreCourt @ \\
 \t1 (m.winner, t.venue, t.tier) ~\}
 \end{zed}%
 }
@@ -110,8 +110,8 @@ zS_1 == \{~ m : Match ; t : Tournament ; p : Player | m.tournament = t.tournamen
 $\displaystyle
 \begin{array}{l}
 \begin{array}{l}\{~ m : Match ; t : Tournament ; p : Player | m.tournament = t.tournamentId \land \\
-\quad m.winner = p.name \land \\
-\quad t.venue = CentreCourt @ \\ \lblot~winner == m.winner, venue == t.venue, tier == t.tier~\rblot  ~\}\end{array}
+\t1 m.winner = p.name \land \\
+\t1 t.venue = CentreCourt @ \\ \lblot~winner == m.winner, venue == t.venue, tier == t.tier~\rblot  ~\}\end{array}
 \end{array}$
 
 \bigskip

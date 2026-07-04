@@ -63,7 +63,7 @@ class CodegenDispatch:
     if TYPE_CHECKING:
         _in_z_paragraph: bool
         _in_inline_part: bool
-        _quantifier_depth: int
+        _binding_depth: int
         _warn_overflow: bool
         _overflow_warnings: list[str]
         _overflow_threshold: int

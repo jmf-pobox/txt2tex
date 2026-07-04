@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-07-04
+
+### Fixed
+
+- **Z-paragraph indentation now tracks binding depth.** Inside a `zed`/`axdef`/
+  `gendef`/`schema` block, a wrapped set-comprehension body used to render at a
+  hardcoded one-tab indent (`\t1`), regardless of nesting. This made a
+  comprehension body sit flush with the surrounding predicate (you could not see
+  what was inside the `{…}`) and, when the comprehension was nested more than one
+  level deep, produced non-monotonic "zig-zag" indentation. A set comprehension
+  is now treated as a binder (like a quantifier, Z RM §3.9): its body indents one
+  tab deeper than the `{` that opens it, and every line of that body sits at that
+  one level. The rule applies uniformly to quantifiers, comprehensions, schema
+  `where` predicates, and axdef/gendef predicates. Break points are unchanged;
+  only the `\t{n}` level is now depth-aware. Layout only — fuzz's type checker
+  ignores `\t{n}`, so type-checking is unaffected. See the ADR in `docs/DESIGN.md`.
+
 ## [2.0.1] - 2026-07-04
 
 ### Fixed
