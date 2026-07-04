@@ -391,8 +391,14 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
             schema_text = "; ".join(decl_parts)
 
             pipe_sep = self._get_mid_separator()
-            # Recurse: the inner lambda will attempt its own collapse from scratch.
+            # Recurse: the inner lambda will attempt its own collapse from
+            # scratch.  This prefix's own scope covers that entire recursive
+            # result, so it is one binding level deeper — the recursive call
+            # adds its own increment for its own pred/expr, so a dependent
+            # chain of N lambdas accumulates N levels, one per lambda.
+            self._binding_depth += 1
             inner_latex = self._generate_lambda_quantifier(predicate, parent=node)
+            self._binding_depth -= 1
             result = rf"\lambda {schema_text} {pipe_sep} {inner_latex}"
             if self.use_fuzz:
                 result = f"({result})"
@@ -407,8 +413,11 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
 
         parts = [r"\lambda", schema_text]
 
-        # Predicate (before @) — always present in the multi-decl form
+        # Predicate (before @) and expression (after @) are both in scope of
+        # the declared variables, so both sit one binding level deeper
+        # (Z RM §3.8; mirrors _generate_lambda and the quantifier handlers).
         pipe_sep = self._get_mid_separator()
+        self._binding_depth += 1
         pred_latex = self.generate_expr(predicate, parent=node)
         parts.append(f"{pipe_sep} {pred_latex}")
 
@@ -417,6 +426,7 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
             bullet_sep = self._get_bullet_separator()
             expr_latex = self.generate_expr(expression, parent=node)
             parts.append(f"{bullet_sep} {expr_latex}")
+        self._binding_depth -= 1
 
         result = " ".join(parts)
 
@@ -531,10 +541,10 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
 
         parts = [quant_latex, schema_text]
 
-        self._quantifier_depth += 1
+        self._binding_depth += 1
         indent = self._get_indentation()
         pred_latex = self.generate_expr(predicate, parent=node)
-        self._quantifier_depth -= 1
+        self._binding_depth -= 1
 
         # Honour line_break_after_pipe / line_break_after_bullet from the
         # innermost Quantifier (where the parser scanned the actual `|` or
@@ -683,11 +693,11 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
             # Always use | for predicate separator in mu
 
             # Increment depth for nested quantifiers
-            self._quantifier_depth += 1
+            self._binding_depth += 1
             # Get indentation at this depth (for line breaks)
             indent = self._get_indentation()
             body_latex = self.generate_expr(node.body, parent=node)
-            self._quantifier_depth -= 1
+            self._binding_depth -= 1
 
             # Check for line break after pipe (|)
             if node.line_break_after_pipe:
@@ -713,11 +723,11 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
             pipe_sep = self._get_mid_separator()
 
             # Increment depth for nested quantifiers
-            self._quantifier_depth += 1
+            self._binding_depth += 1
             # Get indentation at this depth (for line breaks)
             indent = self._get_indentation()
             body_latex = self.generate_expr(node.body, parent=node)
-            self._quantifier_depth -= 1
+            self._binding_depth -= 1
 
             # Check for line break after pipe (|)
             if node.line_break_after_pipe:
@@ -744,11 +754,11 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
             separator = self._get_bullet_separator()
 
             # Increment depth for nested quantifiers
-            self._quantifier_depth += 1
+            self._binding_depth += 1
             # Get indentation at this depth (for line breaks)
             indent = self._get_indentation()
             body_latex = self.generate_expr(node.body, parent=node)
-            self._quantifier_depth -= 1
+            self._binding_depth -= 1
 
             # Check for line break after pipe (|)
             if node.line_break_after_pipe:
@@ -797,10 +807,10 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         binding_latex = self._generate_schema_binding_latex(node.schema_binding)
         bullet = self._get_bullet_separator()
 
-        self._quantifier_depth += 1
+        self._binding_depth += 1
         indent = self._get_indentation()
         body_latex = self.generate_expr(node.body, parent=node)
-        self._quantifier_depth -= 1
+        self._binding_depth -= 1
 
         if node.line_break_after_pipe:
             result = (
@@ -835,7 +845,10 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
 
         # Add bullet/@ separator
         parts.append(self._get_bullet_separator())
+        # Lambda is a binder (Z RM §3.8); its body is one binding level deeper.
+        self._binding_depth += 1
         body_latex = self.generate_expr(node.body)
+        self._binding_depth -= 1
         parts.append(body_latex)
 
         result = " ".join(parts)
@@ -906,12 +919,19 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
                 parts.append(self._get_colon_separator())
                 parts.append(extra_domain_latex)
 
+        # A comprehension is a binder (Z RM §3.9 — schema-text-plus-spot, the
+        # same construction as a quantifier, §3.8): the predicate and the
+        # bullet-term expression are both in the scope of the declared
+        # variables, so both sit one binding level deeper than this
+        # comprehension's own opening (jms ruling, fix/setcomp-wrap-indent).
         # In Z-paragraph contexts (zed/axdef/gendef/schema/hidden-fuzz), emit
-        # a fuzz-safe line-break with \t1 indentation.  fuzz rejects
+        # a fuzz-safe line-break with \t{depth} indentation.  fuzz rejects
         # \begin{array} inside a Z paragraph (fuzz manual §3, §3.2).  In
         # the display (inline-math) context the outer \begin{array}{l}
         # provides layout, so plain \\ suffices there.
-        _break = "\\\\\n\\t1" if self._in_z_paragraph else r"\\"
+        self._binding_depth += 1
+        indent = self._get_indentation()
+        _break = f"\\\\\n{indent}" if self._in_z_paragraph else r"\\"
 
         # Handle case with no predicate
         if node.predicate is None:
@@ -943,6 +963,7 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
                     parts.append(_break)
                 expression_latex = self.generate_expr(node.expression)
                 parts.append(expression_latex)
+        self._binding_depth -= 1
 
         # Close set
         # Add ~ spacing hint before closing brace

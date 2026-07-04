@@ -170,7 +170,7 @@ class LaTeXGenerator(
     _first_part_in_solution: bool
     _in_inline_part: bool
     _in_z_paragraph: bool
-    _quantifier_depth: int
+    _binding_depth: int
     _warn_overflow: bool
     _overflow_threshold: int
     _overflow_warnings: list[str]
@@ -206,7 +206,12 @@ class LaTeXGenerator(
         self._in_inline_part = False  # Track if we're inside an inline part
         # True when generating inside axdef/schema/gendef/zed
         self._in_z_paragraph = False
-        self._quantifier_depth = 0  # Track nesting for \t1, \t2 indentation
+        # Binder-nesting depth for \t1, \t2, ... indentation (Z RM §3.8/§3.9).
+        # Incremented around the *scoped body* of every binder: forall,
+        # exists, exists1, mu, lambda, and set comprehension.  A comprehension
+        # is schema-text-plus-spot, the same construction as a quantifier, so
+        # it counts as a binder too (jms ruling, fix/setcomp-wrap-indent).
+        self._binding_depth = 0
         self._warn_overflow = warn_overflow
         self._overflow_threshold = (
             overflow_threshold
@@ -753,13 +758,14 @@ class LaTeXGenerator(
     # generate_expr is inherited from _CodegenDispatch (dispatch stub).
 
     def _get_indentation(self) -> str:
-        """Get indentation command based on current quantifier depth.
+        """Get indentation command based on current binder-nesting depth.
 
         Returns:
             \\t1, \\t2, etc. for nested indentation, or \\quad for depth 0
         """
-        # Use depth-based \t commands for nested quantifiers
+        # Use depth-based \t commands for nested binders (quantifiers,
+        # lambda, mu, and set comprehensions).
         # \t1 = 1 * 2em, \t2 = 2 * 2em, etc.
-        if self._quantifier_depth == 0:
-            return r"\quad"  # Fallback for non-quantifier contexts
-        return f"\\t{self._quantifier_depth}"
+        if self._binding_depth == 0:
+            return r"\quad"  # Fallback for non-binder contexts
+        return f"\\t{self._binding_depth}"

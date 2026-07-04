@@ -72,7 +72,7 @@ $\begin{array}{l}\{~ t : Track | t.genre = Jazz @ \\ \lblot~title == t.title, ge
 \setbox0=\vbox{%
 \begin{zed}
 zS_2 == \{~ t : Track ; al : Album ; ar : Artist | t.alid = al.alid \land \\
-\quad al.arid = ar.arid @ \\
+\t1 al.arid = ar.arid @ \\
 \t1 (t.title, ar.name) ~\}
 \end{zed}%
 }
@@ -80,7 +80,7 @@ zS_2 == \{~ t : Track ; al : Album ; ar : Artist | t.alid = al.alid \land \\
 $\displaystyle
 \begin{array}{l}
 \begin{array}{l}\{~ t : Track ; al : Album ; ar : Artist | t.alid = al.alid \land \\
-\quad al.arid = ar.arid @ \\ \lblot~track == t.title, artist == ar.name~\rblot  ~\}\end{array}
+\t1 al.arid = ar.arid @ \\ \lblot~track == t.title, artist == ar.name~\rblot  ~\}\end{array}
 \end{array}$
 
 \bigskip
@@ -95,7 +95,7 @@ $\displaystyle
 \setbox0=\vbox{%
 \begin{zed}
 zS_3 == \{~ p : PlaylistId ; t : Track ; al : Album | (p, t.tid) \in member \land \\
-\quad t.alid = al.alid @ \\
+\t1 t.alid = al.alid @ \\
 \t1 (p, t.title, al.title) ~\}
 \end{zed}%
 }
@@ -103,7 +103,7 @@ zS_3 == \{~ p : PlaylistId ; t : Track ; al : Album | (p, t.tid) \in member \lan
 $\displaystyle
 \begin{array}{l}
 \begin{array}{l}\{~ p : PlaylistId ; t : Track ; al : Album | (p, t.tid) \in member \land \\
-\quad t.alid = al.alid @ \\ \lblot~playlist == p, track == t.title, album == al.title~\rblot  ~\}\end{array}
+\t1 t.alid = al.alid @ \\ \lblot~playlist == p, track == t.title, album == al.title~\rblot  ~\}\end{array}
 \end{array}$
 
 \bigskip
@@ -118,7 +118,7 @@ $\displaystyle
 \setbox0=\vbox{%
 \begin{zed}
 zS_4 == \{~ t : Track ; al : Album | t.alid = al.alid \land \\
-\quad t.duration > 300 @ \\
+\t1 t.duration > 300 @ \\
 \t1 (t.title, al.title) ~\}
 \end{zed}%
 }
@@ -126,7 +126,7 @@ zS_4 == \{~ t : Track ; al : Album | t.alid = al.alid \land \\
 $\displaystyle
 \begin{array}{l}
 \begin{array}{l}\{~ t : Track ; al : Album | t.alid = al.alid \land \\
-\quad t.duration > 300 @ \\ \lblot~track == t.title, album == al.title~\rblot  ~\}\end{array}
+\t1 t.duration > 300 @ \\ \lblot~track == t.title, album == al.title~\rblot  ~\}\end{array}
 \end{array}$
 
 \bigskip
@@ -153,14 +153,14 @@ $\displaystyle
 \setbox0=\vbox{%
 \begin{zed}
 zS_5 == \{~ t : Track ; al : Album | t.alid = al.alid \land \\
-\quad t.duration > 300 ~\}
+\t1 t.duration > 300 ~\}
 \end{zed}%
 }
 \noindent
 $\displaystyle
 \begin{array}{l}
 \{~ t : Track ; al : Album | t.alid = al.alid \land \\
-\quad t.duration > 300 ~\}
+\t1 t.duration > 300 ~\}
 \end{array}$
 
 \bigskip
