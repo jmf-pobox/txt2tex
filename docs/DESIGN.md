@@ -3161,3 +3161,81 @@ EXTEND — so EXTEND is the correct primitive to add.
   `cross` fuzz-routing fix).
 - The course did not teach `extend`, so its use is a per-document choice;
   single-argument `group` aggregation is unaffected.
+
+## ADR: RA-taint routing — a Z operator referencing an RA-defined name routes to inline math (PR #82)
+
+**Status**: SETTLED 2026-07-03 (merged in PR #82). Reviewed by jms.
+
+### Context
+
+The `GroupAggregate`/#142 ADR routes an abbreviation `Name == <expr>` to
+unboxed inline math when the RHS *is* a relational-algebra node (a member of
+`_DAT_EXPRESSION_TYPES`), and to a fuzz-checked `\begin{zed}` block otherwise.
+That test is on the *node type of the RHS itself*.
+
+It does not cover a **Z-native operator whose operand references an RA-defined
+name**. Consider:
+
+```text
+A == R project {x}        # RA node   -> inline math \mathrm{Project}(...)
+C == A setminus B         # setminus is a Z-native set op -> routed to zed
+```
+
+`setminus` (and `union`, `intersect`, …) are ordinary Z operators, so
+`C == A setminus B` routed to `\begin{zed}`. But `A` and `B` were defined by RA
+abbreviations that render as `\mathrm{...}` inline math — invisible to fuzz's
+type environment. fuzz therefore rejected `A`/`B` as **"not declared"** on a
+document that is otherwise correct. Relational algebra is not fuzz-checkable at
+all (the `\mathrm{Project}` etc. labels are not Z grammar), so a set operation
+built over RA names cannot live in a typechecked block.
+
+### Decision
+
+Extend routing from a node-type test to a **name-taint analysis**:
+
+1. A name is **RA-tainted** if it is defined (via `==` or a horizontal
+   definition) by an expression that itself routes to inline math.
+2. **Any expression that transitively references a tainted name** is routed to
+   unboxed inline math, not a `zed` block — even when the top operator is
+   Z-native (`setminus`, `union`, `\mapsto`, …).
+3. **Fuzz-declared exclusion (the axdef bridge)**: a name declared in an
+   `axdef`/`schema`/horizontal-definition is fuzz-visible and is **not** tainted
+   even if it also appears in RA context. Genuine Z declarations keep their
+   `zed` typechecking.
+4. **Fixpoint**: taint is computed to a fixpoint in a whole-document pre-pass
+   (recursing into `Section`/`Solution`/`Part`/`Zed`, via a field-agnostic
+   nested-value walk), so forward references (`C` used before `A` is defined)
+   and transitive chains (`A → B → C`) are all caught before generation.
+
+**jms ruling (in the loop for this decision): never fabricate a Z declaration
+for an RA name.** RA operators are not Z; inventing a given-set or `axdef` entry
+so fuzz "accepts" them yields a spec that typechecks but means nothing — a green
+check with no content. The honest rendering is unboxed inline math that fuzz
+does not touch.
+
+### Alternatives rejected
+
+1. **Fabricate a Z declaration (given set / `axdef`) for each RA name** so the
+   surrounding `zed` block typechecks. Rejected by jms: it makes fuzz pass a
+   non-Z construct, defeating the purpose of the type check.
+2. **Leave the Z operator in a `zed` block and accept the "not declared"
+   errors.** Rejected: spurious errors on correct documents; the student cannot
+   distinguish a real type error from an RA artifact.
+3. **Single-pass taint collection (no fixpoint).** Rejected during #82 review:
+   misses forward and transitive references.
+
+### Consequences
+
+- A Z set operation over RA-defined names (`C == A setminus B`) renders as
+  unboxed inline math and no longer triggers a fuzz "not declared" error;
+  axdef-bridged names still typecheck in `zed`.
+- Implemented in `codegen/fuzz_routing.py` + `latex_gen.py`:
+  `_collect_declared_and_tainted_names` (fixpoint pre-pass),
+  `_collect_fuzz_declared_names` (axdef/schema/HorizDef exclusion),
+  `_walk_nested_values` (field-agnostic nested-`Expr` traversal),
+  `_iter_items_in_document_order` (Section/Solution/Part/Zed recursion).
+  Commits `de91a42`, `4c19d9c`, `e9f0602`, `3388ab1`, `dea7fe9`, `6ee1698`.
+- Regression coverage: `tests/test_ra_taint_propagation.py` (37 tests).
+- **Known limitation (deferred, issue #83)**: an RA expression written *inside*
+  a hand-authored `zed` block is still emitted in that block and can trip fuzz.
+  The taint pre-pass routes *abbreviations*, not hand-written `zed` bodies.
