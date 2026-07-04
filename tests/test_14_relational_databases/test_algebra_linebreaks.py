@@ -9,6 +9,8 @@ detection → line_break_after=True on the AST node → \\\\ in LaTeX output.
 
 from __future__ import annotations
 
+import pytest
+
 from txt2tex.ast_nodes import (
     BinaryOp,
     Divide,
@@ -19,6 +21,7 @@ from txt2tex.ast_nodes import (
     NaturalJoin,
     Ungroup,
 )
+from txt2tex.codegen.paragraphs import RaInZedError
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
@@ -398,12 +401,24 @@ class TestDocumentItemArrayWrap:
 
 
 # ---------------------------------------------------------------------------
-# Generator: schema where-clause inline mode
+# Generator: RA in a schema where-clause is rejected (issue #83)
 # ---------------------------------------------------------------------------
+#
+# A `join` in a schema's where-clause used to render `\mathrm{Join}(...)`
+# (with `\\` line-break continuation) directly inside `\begin{schema}...
+# \end{schema}` -- invalid Z that fuzz would reject.  Per the ADR in
+# docs/DESIGN.md ("RA construct inside an explicit `zed` block -- hard
+# rejection"), no boxed Z environment (`zed`, `schema`, `axdef`, `gendef`)
+# accepts an RA construct; `_generate_schema` now raises `RaInZedError`
+# instead.  The underlying join line-break formatting logic (natural
+# newline, backslash continuation, array-wrap at document level) is
+# unaffected and is covered by `TestExprLineBreakRendering` and
+# `TestDocumentItemArrayWrap` above, neither of which puts the join inside
+# a schema box.
 
 
-class TestSchemaWhereInlineMode:
-    r"""In a schema where-clause, line-break emits \\\\ inline; no array wrap."""
+class TestSchemaWhereRaRejected:
+    r"""A `join` in a schema where-clause is a hard rejection, not a render."""
 
     def _gen_schema_latex(self, schema_src: str) -> str:
         """Parse and generate a schema block, returning the full LaTeX."""
@@ -412,24 +427,17 @@ class TestSchemaWhereInlineMode:
         lines = gen.generate_document_item(ast.items[0])
         return "\n".join(lines)
 
-    def test_join_break_in_schema_where(self) -> None:
-        r"""Schema predicate with join break emits \\\\ inline, not array wrap."""
+    def test_join_break_in_schema_where_raises(self) -> None:
+        r"""Schema predicate with a `join` raises, rather than rendering."""
         src = "schema TestPred\n  R : X\nwhere\n  result = A join\n    B\nend"
-        latex = self._gen_schema_latex(src)
-        # Must be inside schema environment, not wrapped in array{l}
-        assert r"\begin{schema}" in latex
-        assert r"\begin{array}{l}" not in latex
-        # The expression must contain \\
-        assert r"\\" in latex
+        with pytest.raises(RaInZedError, match="schema"):
+            self._gen_schema_latex(src)
 
-    def test_join_chain_in_schema_where(self) -> None:
-        r"""Three-way join in schema where-clause emits \\\\ without array."""
+    def test_join_chain_in_schema_where_raises(self) -> None:
+        r"""A three-way join in a schema where-clause also raises."""
         src = "schema JoinPred\n  x : X\nwhere\n  x = A join\n    B join\n    C\nend"
-        latex = self._gen_schema_latex(src)
-        assert r"\begin{schema}" in latex
-        assert r"\begin{array}{l}" not in latex
-        # Both breaks produce \\
-        assert latex.count(r"\\") >= 2
+        with pytest.raises(RaInZedError, match="schema"):
+            self._gen_schema_latex(src)
 
 
 # ---------------------------------------------------------------------------

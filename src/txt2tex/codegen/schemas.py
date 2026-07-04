@@ -38,9 +38,15 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
     ) -> str:
         """Generate LaTeX for an inline schema text used as an Expr.
 
-        Delegates to ``_generate_schema_text`` which returns the bracket form.
+        Delegates to ``_generate_schema_text`` which returns the bracket
+        form.  This handler is unreachable through the current grammar (see
+        ``TestSchemaTextAsInlineExprRoutesToDisplayMath`` in
+        ``tests/test_ra_in_zed_rejected.py``).  Passes ``block_kind=None``:
+        a ``SchemaText`` reached as an ``Expr`` operand is always inline /
+        display-math content, never a boxed Z paragraph, so RA taint here is
+        a routing decision the taint system already made, not a rejection.
         """
-        return self._generate_schema_text(node)
+        return self._generate_schema_text(node, None)
 
     @expr_register.register(SchemaRename)
     def _generate_schema_rename(
@@ -132,7 +138,9 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         right_latex = self.generate_expr(node.right)
         return f"{left_latex} \\project {right_latex}"
 
-    def _emit_schema_inclusion(self, incl: SchemaInclusion) -> str:
+    def _emit_schema_inclusion(
+        self, incl: SchemaInclusion, block_kind: str | None
+    ) -> str:
         """Return the LaTeX fragment for one schema-inclusion declaration line.
 
         Forms emitted:
@@ -144,18 +152,32 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         e.g. ``\\Delta Stack[\\nat]``.  The caller appends ``\\\\`` when the
         item is not the last in the declaration list; this method returns only
         the content fragment.
+
+        Every boxed caller renders this fragment straight into a boxed Z
+        environment (``axdef``, ``gendef``, ``schema``, or ``zed``), so a
+        relational-algebra generic argument -- e.g. ``Delta Stack[S join U]``
+        -- is rejected here via ``_reject_ra_in_box`` rather than left to
+        emit invalid ``\\mathrm{...}`` LaTeX inside the box.  ``block_kind``
+        names the caller's box for an accurate error message; ``None`` marks
+        an inline / display-math caller, where ``_reject_ra_in_box`` is a
+        no-op and RA taint is left for the taint system to route.
         """
         name_latex = self._generate_identifier(
             Identifier(line=incl.line, column=incl.column, name=incl.name)
         )
-        if incl.generics:
-            generic_str = ", ".join(self.generate_expr(g) for g in incl.generics)
-            name_latex = f"{name_latex}[{generic_str}]"
         if incl.decoration == "delta":
-            return rf"\Delta {name_latex}"
-        if incl.decoration == "xi":
-            return rf"\Xi {name_latex}"
-        return name_latex
+            name_latex = rf"\Delta {name_latex}"
+        elif incl.decoration == "xi":
+            name_latex = rf"\Xi {name_latex}"
+
+        if not incl.generics:
+            return name_latex
+
+        generic_latex_parts = [self.generate_expr(g) for g in incl.generics]
+        full_latex = f"{name_latex}[{', '.join(generic_latex_parts)}]"
+        for generic in incl.generics:
+            self._reject_ra_in_box(generic, generic.line, full_latex, block_kind)
+        return full_latex
 
     @item_register.register(Schema)
     def _generate_schema(self, node: Schema) -> list[str]:
@@ -216,7 +238,7 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             if node.declarations:
                 for i, decl in enumerate(node.declarations):
                     if isinstance(decl, SchemaInclusion):
-                        decl_line = self._emit_schema_inclusion(decl)
+                        decl_line = self._emit_schema_inclusion(decl, "schema")
                         plain_body.append(
                             f"{decl_line} \\\\"
                             if i < len(node.declarations) - 1
@@ -252,6 +274,12 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                                     break
 
                         plain_decl_line = f"{var_latex} : {type_latex}"
+                        self._reject_ra_in_box(
+                            decl.type_expr,
+                            decl.type_expr.line,
+                            plain_decl_line,
+                            "schema",
+                        )
                         self._check_overflow(
                             plain_decl_line,
                             decl.type_expr.line,
@@ -277,6 +305,7 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                 for group_idx, group in enumerate(node.predicates):
                     for pred_idx, pred in enumerate(group):
                         pred_latex = self.generate_expr(pred, parent=None)
+                        self._reject_ra_in_box(pred, pred.line, pred_latex, "schema")
                         self._check_overflow(
                             pred_latex,
                             pred.line,
@@ -316,20 +345,24 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
 
         return lines
 
-    def _generate_schema_text(self, node: SchemaText) -> str:
+    def _generate_schema_text(self, node: SchemaText, block_kind: str | None) -> str:
         r"""Return the LaTeX fragment for an inline schema text body.
 
         Emits: ``[ decl1; decl2 | pred1 \land pred2 ]``
 
         Declaration separator is ``;`` (Z RM §3.6).  Predicates are joined
         with ``\land``.  When there are no predicates the form is
-        ``[ decl1; decl2 ]``.
+        ``[ decl1; decl2 ]``.  ``block_kind`` is forwarded to
+        ``_emit_schema_inclusion`` so a nested schema-inclusion's generic
+        arguments are checked for RA taint against the correct enclosing box.
+        ``block_kind=None`` marks an inline / display-math caller, where no
+        rejection applies.
         """
         # Build declaration fragment
         decl_parts: list[str] = []
         for decl in node.declarations:
             if isinstance(decl, SchemaInclusion):
-                decl_parts.append(self._emit_schema_inclusion(decl))
+                decl_parts.append(self._emit_schema_inclusion(decl, block_kind))
             else:
                 var_latex = self._generate_identifier(
                     Identifier(line=0, column=0, name=decl.variable)
@@ -349,6 +382,48 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
 
         pred_str = r" \land ".join(all_preds)
         return f"[ {decl_str} | {pred_str} ]"
+
+    def _reject_ra_in_schema_text_box(
+        self, node: SchemaText, block_kind: str | None
+    ) -> None:
+        """Raise ``RaInZedError`` if any decl type or predicate is RA-tainted.
+
+        ``_generate_schema_text`` renders every plain declaration's type and
+        every predicate via ``generate_expr`` with no RA guard of its own --
+        it is also reached as a plain ``Expr`` operand
+        (``_generate_schema_text_expr``), where RA taint is a routing
+        decision, not a rejection.  Call this guard only at boxed call sites,
+        mirroring ``_generate_schema``'s own per-declaration and
+        per-predicate guards above; ``block_kind=None`` is an explicit no-op
+        -- the inline handler never calls this guard at all.  A nested
+        ``SchemaInclusion`` declaration is skipped here (``continue``)
+        because ``_generate_schema_text`` already forwards ``block_kind`` to
+        ``_emit_schema_inclusion``, which guards the inclusion's own generic
+        arguments.  Taint is checked before rendering so the common
+        (untainted) path never pays for a redundant ``generate_expr`` call --
+        ``_generate_schema_text`` renders every declaration and predicate
+        again regardless.
+        """
+        if block_kind is None:
+            return
+        for decl in node.declarations:
+            if isinstance(decl, SchemaInclusion):
+                continue
+            if self._is_ra_tainted(decl.type_expr):
+                var_latex = self._generate_identifier(
+                    Identifier(line=0, column=0, name=decl.variable)
+                )
+                type_latex = self.generate_expr(decl.type_expr)
+                self._reject_ra_in_box(
+                    decl.type_expr,
+                    decl.type_expr.line,
+                    f"{var_latex} : {type_latex}",
+                    block_kind,
+                )
+        for pred in node.predicates:
+            if self._is_ra_tainted(pred):
+                pred_latex = self.generate_expr(pred, parent=None)
+                self._reject_ra_in_box(pred, pred.line, pred_latex, block_kind)
 
     @item_register.register(HorizDef)
     def _generate_horiz_def(self, node: HorizDef) -> list[str]:
@@ -383,11 +458,15 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
 
         # Build RHS
         if isinstance(node.body, SchemaText):
-            rhs = self._generate_schema_text(node.body)
+            self._reject_ra_in_schema_text_box(node.body, "zed")
+            rhs = self._generate_schema_text(node.body, "zed")
         elif isinstance(node.body, SchemaInclusion):
-            rhs = self._emit_schema_inclusion(node.body)
+            rhs = self._emit_schema_inclusion(node.body, "zed")
         else:
             rhs = self.generate_expr(node.body)
+            self._reject_ra_in_box(
+                node.body, node.body.line, f"{lhs} \\defs {rhs}", "zed"
+            )
 
         lines.append("\\begin{zed}")
         lines.append(f"{lhs} \\defs {rhs}")

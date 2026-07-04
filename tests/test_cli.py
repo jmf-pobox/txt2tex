@@ -215,3 +215,23 @@ def test_cli_inline_math_paragraph_construct_error_is_clean(
     assert "Error:" in captured.err
     assert "block-level Z" in captured.err
     assert "Traceback" not in captured.err
+
+
+def test_cli_ra_in_zed_error_is_clean(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """RaInZedError from an RA construct inside a `zed` block surfaces cleanly.
+
+    Regression: RaInZedError was uncaught, producing a Python traceback.
+    The CLI must catch it, print one 'Error: ...' line to stderr, and
+    return 1 — no traceback.
+    """
+    input_file = tmp_path / "ra_in_zed.txt"
+    input_file.write_text("zed\n  RJoin == S join U\nend\n")
+    with patch.object(sys, "argv", ["txt2tex", str(input_file), "--tex-only"]):
+        result = main()
+    assert result == 1
+    captured = capsys.readouterr()
+    assert "Error:" in captured.err
+    assert "cannot appear inside a `zed` block" in captured.err
+    assert "Traceback" not in captured.err

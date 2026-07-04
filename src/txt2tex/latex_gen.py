@@ -481,18 +481,32 @@ class LaTeXGenerator(
                 else:
                     if isinstance(branch.parameters, SequenceLiteral):
                         if branch.parameters.elements:
-                            params_latex = self.generate_expr(
-                                branch.parameters.elements[0]
+                            param_expr = branch.parameters.elements[0]
+                            params_latex = self.generate_expr(param_expr)
+                            self._reject_ra_in_box(
+                                param_expr, param_expr.line, params_latex, "zed"
                             )
                         else:
                             params_latex = ""
                     else:
                         params_latex = self.generate_expr(branch.parameters)
+                        self._reject_ra_in_box(
+                            branch.parameters,
+                            branch.parameters.line,
+                            params_latex,
+                            "zed",
+                        )
                     branch_strs.append(f"{branch.name} \\ldata {params_latex} \\rdata")
             branches_str = " | ".join(branch_strs)
             return f"{item.name} ::= {branches_str}"
         # Abbreviation LHS: definition slot, not a math-mode reference.
+        # Unreachable with RA-tainted content today: the caller
+        # (_generate_document_items_with_consolidation) excludes an
+        # RA-tainted Abbreviation from the consolidated group before it
+        # ever reaches this method. Guarded anyway for uniformity with
+        # _generate_free_type -- harmless if it never fires.
         expr_latex = self.generate_expr(item.expression)
+        self._reject_ra_in_box(item.expression, item.line, expr_latex, "zed")
         name_latex = self._generate_identifier(
             Identifier(line=0, column=0, name=item.name),
         )
