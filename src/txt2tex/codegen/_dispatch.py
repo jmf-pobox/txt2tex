@@ -72,6 +72,7 @@ class CodegenDispatch:
         _dollar_sanitise_registry: dict[str, str]
         _synth_abbrev_counter: int
         _in_hidden_fuzz_block: bool
+        _ra_tainted_names: set[str]
         _toc_depth: int
         parts_format: str
         toc_parts: bool
@@ -93,6 +94,10 @@ class CodegenDispatch:
             content_preview: str | None = None,
         ) -> None: ...
         def _expression_contains_dat_construct(self, expr: object) -> bool: ...
+        def _expression_references_names(
+            self, expr: object, names: frozenset[str]
+        ) -> bool: ...
+        def _is_ra_tainted(self, expr: Expr) -> bool: ...
         def _emit_schema_inclusion(self, incl: SchemaInclusion) -> str: ...
         def _get_indentation(self) -> str: ...
         def _get_bullet_separator(self) -> str: ...
@@ -145,11 +150,12 @@ class CodegenDispatch:
 
         # Standalone set comprehension in fuzz mode: emit a hidden synthetic
         # abbreviation for fuzz validation before the visible inline-math copy.
-        # Only emit when the converted expression is fuzz-safe (no remaining
-        # DAT constructs like sigma, join, GROUP in predicates/domains).
+        # Only emit when the converted expression is fuzz-safe: no remaining
+        # RA construct (sigma, join, GROUP, ...) and no reference to a name
+        # an earlier RA abbreviation defined (fuzz never saw it declared).
         if self.use_fuzz and isinstance(expr, SetComprehension):
             hidden_expr = self._replace_binding_with_tuple(expr)
-            if not self._expression_contains_dat_construct(hidden_expr):
+            if not self._is_ra_tainted(hidden_expr):
                 synth_name = self._next_synth_name()
                 hidden_lines = self._emit_hidden_abbreviation(synth_name, hidden_expr)
                 return hidden_lines + self._generate_expr_document_item(expr)

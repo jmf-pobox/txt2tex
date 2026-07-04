@@ -175,6 +175,7 @@ class LaTeXGenerator(
     _dollar_sanitise_registry: dict[str, str]
     _synth_abbrev_counter: int
     _in_hidden_fuzz_block: bool
+    _ra_tainted_names: set[str]
 
     def __init__(
         self,
@@ -214,6 +215,11 @@ class LaTeXGenerator(
         self._dollar_sanitise_registry = {}
         self._synth_abbrev_counter = 0
         self._in_hidden_fuzz_block = False
+        # Names defined by an RA (relational-algebra) abbreviation, built as a
+        # forward pass over document items. Fuzz requires declare-before-use,
+        # so a name always lands here before anything downstream references
+        # it — see _is_ra_tainted.
+        self._ra_tainted_names = set()
 
     def _next_synth_name(self) -> str:
         """Generate the next synthetic abbreviation name for fuzz validation."""
@@ -253,6 +259,9 @@ class LaTeXGenerator(
             self._toc_depth = found_depth
         if self.toc_parts:
             self._toc_depth = 3
+        # Reset RA taint tracking so a reused generator (REPL) does not leak
+        # tainted names from a previous, unrelated document.
+        self._ra_tainted_names = set()
 
     # -------------------------------------------------------------------------
     # Overflow warning helpers
@@ -327,19 +336,18 @@ class LaTeXGenerator(
             item = items[i]
             # Check if this is a zed-generating item
             if isinstance(item, (GivenType, FreeType, Abbreviation)) and not (
-                isinstance(item, Abbreviation)
-                and self._expression_contains_dat_construct(item.expression)
+                isinstance(item, Abbreviation) and self._is_ra_tainted(item.expression)
             ):
-                # Collect consecutive zed items (exclude DAT abbreviations)
+                # Collect consecutive zed items (exclude RA-tainted abbreviations)
                 zed_items: list[GivenType | FreeType | Abbreviation] = [item]
                 j = i + 1
                 while j < len(items):
                     next_item = items[j]
                     if not isinstance(next_item, (GivenType, FreeType, Abbreviation)):
                         break
-                    if isinstance(
-                        next_item, Abbreviation
-                    ) and self._expression_contains_dat_construct(next_item.expression):
+                    if isinstance(next_item, Abbreviation) and self._is_ra_tainted(
+                        next_item.expression
+                    ):
                         break
                     zed_items.append(next_item)
                     j += 1
@@ -369,6 +377,12 @@ class LaTeXGenerator(
                 # Skip processed items
                 i = j
             else:
+                # RA-tainted abbreviation: record its name so any later
+                # abbreviation referencing it is tainted by reference too.
+                if isinstance(item, Abbreviation) and self._is_ra_tainted(
+                    item.expression
+                ):
+                    self._ra_tainted_names.add(item.name)
                 # Not a zed item: generate normally
                 item_lines = self.generate_document_item(item)
                 lines.extend(item_lines)

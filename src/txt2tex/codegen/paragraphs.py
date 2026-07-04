@@ -198,8 +198,10 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
 
         # Decide wrapping before generating the RHS so the math-context flag
         # is set correctly for context-sensitive operators like o9 (→ \comp
-        # inside zed, → \semi inside inline $...$ math).
-        is_relational_rhs = self._expression_contains_dat_construct(node.expression)
+        # inside zed, → \semi inside inline $...$ math). RA-tainted covers
+        # both a literal relational construct and a reference to a name an
+        # earlier RA abbreviation defined (fuzz never saw that name declared).
+        is_relational_rhs = self._is_ra_tainted(node.expression)
 
         prev_z = self._in_z_paragraph
         self._in_z_paragraph = not is_relational_rhs
@@ -225,7 +227,7 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                 and isinstance(node.expression.expression, Binding)
             ):
                 converted = self._replace_binding_with_tuple(node.expression)
-                if not self._expression_contains_dat_construct(converted):
+                if not self._is_ra_tainted(converted):
                     if node.generic_params:
                         params_str = ", ".join(node.generic_params)
                         hidden_name = f"{name_latex}[{params_str}]"

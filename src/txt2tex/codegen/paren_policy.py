@@ -61,6 +61,7 @@ class _ParenPolicyCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         "cross": r"\cross",  # Cartesian product
         "×": r"\cross",  # Cartesian product (Unicode)  # noqa: RUF001
         "\\": r"\setminus",  # Set difference
+        "setminus": r"\setminus",  # Set difference (word form)
         "++": r"\oplus",  # Override
         # Relation operators
         "<->": r"\rel",  # Relation type
@@ -153,6 +154,7 @@ class _ParenPolicyCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         "×": 9,  # Cartesian product (Unicode)  # noqa: RUF001
         "intersect": 10,
         "\\": 10,  # Set difference - same level as intersect (parser: _parse_intersect)
+        "setminus": 10,  # Set difference (word form) - same level as "\\"
         # Arithmetic operators (Gap #1 — Z RM §8.3 treats these as generic
         # infix; standard mathematical convention: * binds tighter than + and
         # -.  Levels 11 and 12 sit above all set operators (max 10) so that
