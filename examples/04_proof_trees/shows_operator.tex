@@ -28,7 +28,7 @@ $Gamma \shows Delta$
 \bigskip
 
 \noindent
-$(\power \land Q) \shows \power$
+$(p \land q) \shows p$
 
 
 \noindent Sequent with multiple context items (using sets):
@@ -36,7 +36,7 @@ $(\power \land Q) \shows \power$
 \bigskip
 
 \noindent
-$\{\power, \power \implies Q\} \shows Q$
+$\{p, p \implies q\} \shows q$
 
 
 \noindent We can use shows in inference rules to represent natural deduction:
@@ -44,10 +44,10 @@ $\{\power, \power \implies Q\} \shows Q$
 \bigskip
 
 \begin{infrule}
-  Gamma \shows \power & \\
-  Gamma \shows (\power \implies Q) & \\
+  Gamma \shows p & \\
+  Gamma \shows (p \implies q) & \\
   \derive \\
-  Gamma \shows Q & \mbox{modus ponens $\in$ sequent form}
+  Gamma \shows q & \mbox{modus ponens $\in$ sequent form}
 \end{infrule}
 
 \noindent Combining shows with inference rules for natural deduction style:

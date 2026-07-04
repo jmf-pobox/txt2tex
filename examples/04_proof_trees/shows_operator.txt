@@ -11,19 +11,19 @@ Gamma shows Delta
 
 TEXT: More concrete example with specific propositions:
 
-(P land Q) shows P
+(p land q) shows p
 
 TEXT: Sequent with multiple context items (using sets):
 
-{P, P => Q} shows Q
+{p, p => q} shows q
 
 TEXT: We can use shows in inference rules to represent natural deduction:
 
 INFRULE:
-Gamma shows P
-Gamma shows (P => Q)
+Gamma shows p
+Gamma shows (p => q)
 ---
-Gamma shows Q [modus ponens elem sequent form]
+Gamma shows q [modus ponens elem sequent form]
 
 TEXT: Combining shows with inference rules for natural deduction style:
 

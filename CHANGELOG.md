@@ -91,6 +91,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`setminus` word form** — `A setminus B` rendered as function application
+  `A(setminus)(B)` instead of `A \setminus B`, even though the reference card
+  documents the word form. The word is now registered as a keyword (alongside
+  `union`/`intersect`), with the operator's precedence and generator mapping
+  matching the `\` symbol form.
+
+- **Relational-algebra names referenced in Z set operators** — an abbreviation
+  such as `Combined == RJoin union S`, where `RJoin` is defined by a
+  relational-algebra expression (`RJoin == S join U`), routed into a fuzz `zed`
+  block and failed with `Identifier RJoin is not declared` (RA names are never
+  declared to fuzz). RA "taint" now propagates by reference: a set-op line that
+  references an RA-defined name renders as unboxed inline math — like the RA
+  definition itself — instead of a broken checked block. Plain Z set operations
+  over declared sets are unaffected (still fuzz-checked). See
+  `docs/guides/FUZZ_VS_STD_LATEX.md`.
+
+- **Predicate/proposition `P` rendered as powerset ℙ in proof examples** — the
+  lexer reserves single-letter `P` (and `P1`, `F`, `F1`) as the powerset/finset
+  shorthand, so `P`/`Q` used as proposition metavariables in the
+  `infrule_modus_ponens` and `shows_operator` examples typeset as ℙ. Those two
+  examples now use lowercase `p`/`q`/`r` propositions.
+
 - **Field selection rejected as an operand of set/relation operators** — a
   tight selection like `p.amount` parsed as an operand of `=` and `+` but not
   of `union`, `cross`, `intersect`, `setminus`, `*`, the maplet `|->`, `<->`,
