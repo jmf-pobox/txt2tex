@@ -22,7 +22,8 @@ collection loop repeats until a full scan adds nothing.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+
+import pytest
 
 from txt2tex.ast_nodes import (
     Abbreviation,
@@ -38,12 +39,10 @@ from txt2tex.ast_nodes import (
     Zed,
 )
 from txt2tex.cli import typecheck_fuzz
+from txt2tex.codegen.paragraphs import RaInZedError
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer
 from txt2tex.parser import Parser
-
-if TYPE_CHECKING:
-    import pytest
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -472,19 +471,25 @@ class TestNestedUnderPartTaint:
 # ---------------------------------------------------------------------------
 # Nested-inside-Zed: an explicit ``zed ... end`` block wraps its paragraphs
 # in a *nested* Document (``Zed.content``), not a flat ``.items`` list like
-# Section/Solution/Part.  Before the walker recursed into it, an RA
-# abbreviation defined inside a zed block was invisible to the
-# declared/tainted-name pre-pass -- ``Combined`` (a Document-level sibling
-# referencing ``RJoin``) was wrongly left inside its own top-level zed
-# block, referencing an identifier fuzz never saw declared.
+# Section/Solution/Part.  The declared/tainted-name pre-pass must still
+# descend into it -- before that fix, an RA abbreviation defined inside a
+# zed block was invisible to the pre-pass, so a Document-level sibling
+# referencing it (``Combined``) was wrongly left inside its own top-level
+# zed block, referencing an identifier fuzz never saw declared.
 #
-# Note: the zed block's OWN rendering of ``RJoin == S join U`` is a
-# separate, still-open defect -- ``_generate_zed`` renders every item
-# unconditionally, so the RA-tainted line still ends up inside
-# ``\begin{zed}...\end{zed}`` where fuzz will reject its ``\mathrm{Join}``.
-# That is a generator/rendering gap, not a traversal gap, and is out of
-# scope here (see PR #82 review discussion) -- these tests only pin the
-# traversal fix's effect on ``Combined``, not a full fuzz round-trip.
+# Separately, issue #83 closed the zed block's OWN rendering of
+# ``RJoin == S join U``: ``_generate_zed`` used to emit every item
+# unconditionally, so the RA-tainted line ended up inside
+# ``\begin{zed}...\end{zed}`` where fuzz rejected its ``\mathrm{Join}``.  Per
+# the ADR in docs/DESIGN.md ("RA construct inside an explicit `zed` block --
+# hard rejection"), that is now a hard rejection at generation time rather
+# than a relocation -- so this exact fixture, which nests the RA-tainting
+# definition inside `zed`, can no longer reach the point of testing
+# ``Combined``'s propagation through a full document generation; it now
+# raises before `Combined` is even generated.  The traversal fix itself is
+# separately pinned by ``TestIterItemsDescendsIntoZed`` below, which tests
+# the walker directly against a hand-built AST and does not exercise
+# ``_generate_zed``'s RA guard.
 # ---------------------------------------------------------------------------
 
 _RA_INSIDE_ZED_SRC = """zed
@@ -495,26 +500,21 @@ Combined == RJoin union S
 """
 
 
-class TestRAInsideZedBlockTaints:
-    """RA taint from an abbreviation nested inside a zed block still propagates."""
+class TestRAInsideZedBlockRejected:
+    """An RA-tainted definition nested inside `zed` is a hard rejection (#83)."""
 
-    def test_combined_is_display_math_not_zed(self) -> None:
-        """`Combined` degrades to inline math -- `RJoin` is defined inside `zed`."""
-        latex = _fragment(_RA_INSIDE_ZED_SRC)
-        assert "\\noindent\n$Combined == RJoin \\cup S$" in latex
+    def test_raises_ra_in_zed_error(self) -> None:
+        """Generation aborts instead of emitting invalid Z inside the box."""
+        with pytest.raises(RaInZedError):
+            _fragment(_RA_INSIDE_ZED_SRC)
 
-    def test_combined_not_left_in_a_zed_block(self) -> None:
-        """`Combined` must not sit in any `\\begin{zed}...\\end{zed}` block.
-
-        Before the fix, this was exactly the regression: the pre-pass
-        never descended into the zed block's nested Document, so
-        ``RJoin`` was never marked RA-tainted, and ``Combined`` was left
-        in its own zed block referencing an identifier fuzz never
-        declared -- a real "not declared" error.
-        """
-        latex = _fragment(_RA_INSIDE_ZED_SRC)
-        for block in _zed_blocks(latex):
-            assert "Combined" not in block
+    def test_error_names_offending_line_and_top_level(self) -> None:
+        """`RJoin == S join U` sits on source line 2 of the zed block."""
+        with pytest.raises(RaInZedError) as exc_info:
+            _fragment(_RA_INSIDE_ZED_SRC)
+        message = str(exc_info.value)
+        assert "line 2" in message
+        assert "top level" in message
 
 
 class TestIterItemsDescendsIntoZed:

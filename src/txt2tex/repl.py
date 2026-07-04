@@ -12,6 +12,7 @@ import tempfile
 from pathlib import Path
 
 from txt2tex.ast_nodes import Document
+from txt2tex.codegen.paragraphs import RaInZedError
 from txt2tex.codegen.text_pipeline import InlineMathError
 from txt2tex.compile import compile_pdf, copy_latex_files
 from txt2tex.errors import ErrorFormatter
@@ -180,6 +181,13 @@ def process_input(
         # This is the one error path raised *during* generation, so drop any
         # warnings accumulated before it — the success path clears them below,
         # and we must not leak them into the next REPL turn.
+        generator.clear_warnings()
+        print(f"Error: {e}", file=sys.stderr)
+        return False
+    except RaInZedError as e:
+        # Raised during generation, same as InlineMathError above — drop any
+        # warnings accumulated before it so they do not leak into the next
+        # REPL turn.
         generator.clear_warnings()
         print(f"Error: {e}", file=sys.stderr)
         return False

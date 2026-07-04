@@ -30,8 +30,46 @@ from txt2tex.ast_nodes import (
 from txt2tex.codegen._dispatch import CodegenDispatch, item_register
 
 
+class RaInZedError(Exception):
+    """Raised when a relational-algebra construct sits inside a boxed Z paragraph.
+
+    RA constructs (algebra, binding, GROUP/UNGROUP) are not Z; fuzz would
+    reject the ``\\mathrm{...}`` macros the generator would otherwise emit
+    inside a boxed Z environment (``zed``, ``schema``, ``axdef``, ``gendef``,
+    ``syntax``).
+    Unlike a top-level RA line -- which the consolidation pass silently
+    routes to display math -- a boxed environment is an explicit request for
+    a Z paragraph, so RA content there is a user error rather than something
+    to relocate.  See docs/DESIGN.md, ADR "RA construct inside an explicit
+    `zed` block -- hard rejection (issue #83)".
+    """
+
+
 class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
     """Mixin: handlers for Z paragraph constructs."""
+
+    def _reject_ra_in_box(
+        self, expr: Expr, line: int, rendered: str, block_kind: str | None
+    ) -> None:
+        """Raise ``RaInZedError`` if `expr` is RA-tainted inside a boxed paragraph.
+
+        Called before appending the rendered line to a boxed Z paragraph's
+        body (`block_kind` is ``"zed"``, ``"schema"``, ``"axdef"``,
+        ``"gendef"``, or ``"syntax"``), so the invalid ``\\mathrm{...}`` LaTeX
+        never reaches the box.  ``block_kind is None`` marks an inline /
+        display-math call site instead -- there the enclosing expression is
+        already routed to display math by the taint system, so
+        ``\\mathrm{...}`` is valid LaTeX and no rejection applies.
+        """
+        if block_kind is None or not self._is_ra_tainted(expr):
+            return
+        article = "an" if block_kind[:1] in "aeiou" else "a"
+        msg = (
+            f"line {line}: relational-algebra expression `{rendered}` "
+            f"cannot appear inside {article} `{block_kind}` block — write it "
+            "at top level, where it renders as display math."
+        )
+        raise RaInZedError(msg)
 
     @item_register.register(GivenType)
     def _generate_given_type(self, node: GivenType) -> list[str]:
@@ -68,11 +106,21 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                     # Generate contents without sequence delimiters
                     # \ldata ... \rdata already provide the delimiters
                     if branch.parameters.elements:
-                        params_latex = self.generate_expr(branch.parameters.elements[0])
+                        param_expr = branch.parameters.elements[0]
+                        params_latex = self.generate_expr(param_expr)
+                        self._reject_ra_in_box(
+                            param_expr, param_expr.line, params_latex, "zed"
+                        )
                     else:
                         params_latex = ""
                 else:
                     params_latex = self.generate_expr(branch.parameters)
+                    self._reject_ra_in_box(
+                        branch.parameters,
+                        branch.parameters.line,
+                        params_latex,
+                        "zed",
+                    )
                 branch_strs.append(f"{branch.name} \\ldata {params_latex} \\rdata")
 
         # Join branches with |
@@ -138,6 +186,10 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         Returns list of lines:
         - First line: "TypeName & ::= & branch1 | branch2 | ..."
         - Continuation lines (if any): "& | & branch3 | branch4 | ..."
+
+        ``\\syntax`` is defined in terms of fuzz's ``\\@zed`` (fuzz.sty line
+        232), so it is type-checked exactly like a ``zed`` block -- a
+        relational-algebra branch parameter is rejected the same way.
         """
         # Generate LaTeX for each branch
         branch_strs: list[str] = []
@@ -148,11 +200,21 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                 # Generate parameter expression
                 if isinstance(branch.parameters, SequenceLiteral):
                     if branch.parameters.elements:
-                        params_latex = self.generate_expr(branch.parameters.elements[0])
+                        param_expr = branch.parameters.elements[0]
+                        params_latex = self.generate_expr(param_expr)
+                        self._reject_ra_in_box(
+                            param_expr, param_expr.line, params_latex, "syntax"
+                        )
                     else:
                         params_latex = ""
                 else:
                     params_latex = self.generate_expr(branch.parameters)
+                    self._reject_ra_in_box(
+                        branch.parameters,
+                        branch.parameters.line,
+                        params_latex,
+                        "syntax",
+                    )
                 branch_strs.append(f"{branch.name} \\ldata {params_latex} \\rdata")
 
         # For now, put all branches on one line
@@ -277,7 +339,7 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             if node.declarations:
                 for i, decl in enumerate(node.declarations):
                     if isinstance(decl, SchemaInclusion):
-                        decl_line = self._emit_schema_inclusion(decl)
+                        decl_line = self._emit_schema_inclusion(decl, "axdef")
                     else:
                         # Process variable through identifier logic
                         var_latex = self._generate_identifier(
@@ -310,6 +372,9 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
 
                         # Build full declaration line for overflow check
                         decl_line = f"{var_latex} : {type_latex}"
+                        self._reject_ra_in_box(
+                            decl.type_expr, decl.type_expr.line, decl_line, "axdef"
+                        )
                         self._check_overflow(
                             decl_line,
                             decl.type_expr.line,
@@ -333,6 +398,8 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                     for pred_idx, pred in enumerate(group):
                         # Pass parent=None for smart parenthesization
                         pred_latex = self.generate_expr(pred, parent=None)
+
+                        self._reject_ra_in_box(pred, pred.line, pred_latex, "axdef")
 
                         # Auto-wrap long predicates; fall back to warning
                         self._check_overflow(
@@ -379,7 +446,7 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             if node.declarations:
                 for i, decl in enumerate(node.declarations):
                     if isinstance(decl, SchemaInclusion):
-                        decl_line = f"  {self._emit_schema_inclusion(decl)}"
+                        decl_line = f"  {self._emit_schema_inclusion(decl, 'gendef')}"
                     else:
                         # Process variable through identifier logic
                         var_latex = self._generate_identifier(
@@ -412,6 +479,9 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
 
                         # Build full declaration line for overflow check
                         decl_line = f"  {var_latex}: {type_latex}"
+                        self._reject_ra_in_box(
+                            decl.type_expr, decl.type_expr.line, decl_line, "gendef"
+                        )
                         self._check_overflow(
                             decl_line,
                             decl.type_expr.line,
@@ -435,6 +505,8 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                     for pred_idx, pred in enumerate(group):
                         # Pass parent=None for smart parenthesization
                         pred_latex = self.generate_expr(pred, parent=None)
+
+                        self._reject_ra_in_box(pred, pred.line, pred_latex, "gendef")
 
                         # Auto-wrap long predicates; fall back to warning
                         self._check_overflow(
@@ -507,6 +579,12 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                                 branch_strs.append(branch.name)
                             else:
                                 params_latex = self.generate_expr(branch.parameters)
+                                self._reject_ra_in_box(
+                                    branch.parameters,
+                                    branch.parameters.line,
+                                    params_latex,
+                                    "zed",
+                                )
                                 branch_str = (
                                     f"{branch.name} \\ldata {params_latex} \\rdata"
                                 )
@@ -532,6 +610,9 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                             abbrev_line = f"{name_latex}[{params_str}] == {expr_latex}"
                         else:
                             abbrev_line = f"{name_latex} == {expr_latex}"
+                        self._reject_ra_in_box(
+                            item.expression, item.line, abbrev_line, "zed"
+                        )
                         self._check_overflow(
                             abbrev_line,
                             item.line,
@@ -543,6 +624,7 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                     # Generate expressions/predicates
                     elif isinstance(item, Expr):
                         content_latex = self.generate_expr(item)
+                        self._reject_ra_in_box(item, item.line, content_latex, "zed")
                         self._check_overflow(
                             content_latex,
                             item.line,
@@ -552,6 +634,9 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             else:
                 # Single expression (backward compatible)
                 content_latex = self.generate_expr(node.content)
+                self._reject_ra_in_box(
+                    node.content, node.content.line, content_latex, "zed"
+                )
                 self._check_overflow(
                     content_latex,
                     node.content.line,

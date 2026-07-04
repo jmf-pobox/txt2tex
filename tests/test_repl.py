@@ -170,6 +170,28 @@ F | F | F"""
         result = process_input(text, generator, latex_only=True)
         assert result is True
 
+    def test_process_ra_in_zed_error_is_clean(
+        self, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """An RA construct inside a `zed` block is handled cleanly, no traceback."""
+        generator = LaTeXGenerator(use_fuzz=True)
+        text = """given T
+axdef
+  S : T <-> T
+  U : T <-> T
+end
+
+zed
+  RJoin == S join U
+end"""
+        result = process_input(text, generator, latex_only=True)
+        assert result is False
+        err = capsys.readouterr().err
+        assert "Error:" in err
+        assert "cannot appear inside" in err
+        assert "`zed`" in err
+        assert "Traceback" not in err
+
     def test_process_with_pdf_generation(self, tmp_path: Path) -> None:
         """Should attempt PDF generation when temp_dir provided."""
         generator = LaTeXGenerator(use_fuzz=True)

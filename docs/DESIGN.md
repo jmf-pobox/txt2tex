@@ -3236,6 +3236,117 @@ does not touch.
   `_iter_items_in_document_order` (Section/Solution/Part/Zed recursion).
   Commits `de91a42`, `4c19d9c`, `e9f0602`, `3388ab1`, `dea7fe9`, `6ee1698`.
 - Regression coverage: `tests/test_ra_taint_propagation.py` (37 tests).
-- **Known limitation (deferred, issue #83)**: an RA expression written *inside*
-  a hand-authored `zed` block is still emitted in that block and can trip fuzz.
-  The taint pre-pass routes *abbreviations*, not hand-written `zed` bodies.
+- **Resolved (issue #83)**: an RA expression written *inside* a hand-authored
+  `zed` block is now **rejected at generation** with an actionable error — see
+  the ADR below. The taint pre-pass routes *abbreviations*; a hand-written `zed`
+  body that puts RA in the box is a user error, not a rendering case to recover.
+
+## ADR: RA construct inside an explicit `zed` block — hard rejection (issue #83)
+
+**Status**: SETTLED 2026-07-04. Z-soundness confirmed by jms; policy chosen by
+jfreeman. Implemented as a shared `_reject_ra_in_box` guard across every boxed Z
+environment.
+
+### Context
+
+The RA-taint routing ADR (above) fixed *propagation* — a Z operator that
+*references* an RA-defined name degrades to inline math. It did not address an RA
+abbreviation written *inside an explicit* `zed … end` *block*:
+
+```text
+zed
+  RJoin == S join U
+end
+```
+
+`_generate_zed` (`codegen/paragraphs.py`) emitted every Zed-nested item
+unconditionally into the box, so this rendered `RJoin == \mathrm{Join}(S, U)`
+*inside* `\begin{zed}…\end{zed}`. `\mathrm{Join}` is not Z, so fuzz errored:
+`Syntax error at symbol "{"`. The **top-level** consolidation path
+(`_generate_document_items_with_consolidation`) pulls RA lines out into display
+math; the Zed-nested path did not, so identical RA content rendered at top level
+but produced invalid Z inside a `zed` block.
+
+### Decision
+
+**Reject** an RA-tainted item inside an explicit `zed … end` block at generation
+time, with an actionable error naming the offending line: *"relational-algebra
+expression `RJoin == S join U` cannot appear inside a `zed` block — write it at
+top level, where it renders as display math."* Do not relocate it, do not emit
+invalid Z.
+
+**Grounding — why this is a policy choice, not a Z requirement.** jms confirmed
+(2026-07-04) that the `zed` environment introduces **no scope**: a Z
+specification is a sequence of paragraphs sharing one flat global scope (Z RM 2nd
+ed. §3.1); only the *schema* scopes its own names (§3.5). So relocating a line
+out of a `zed` box would be Z-legal — the box boundary is typographic, not
+semantic. Both "relocate" and "reject" are therefore Z-sound; the choice between
+them is **tool policy**, not Z semantics. We choose rejection because:
+
+1. **Fail fast** — the project's stated principle is to raise on validation
+   failure, not to add defensive auto-recovery (see the code-standards section).
+   Silently relocating a line the user explicitly boxed is exactly the defensive
+   behaviour that principle rejects.
+2. **RA-in-`zed` is a user error** — RA belongs at top level. An actionable
+   error teaches that relational algebra is not Z; a silent relocation hides it.
+3. **Uniformity and simplicity** — a scoping environment (`schema`, `axdef`,
+   `gendef`) *must* reject RA anyway, because it binds names and relocation would
+   change meaning. Rejecting in `zed` too makes **every** boxed Z environment
+   behave identically (no RA in any box), and the fix is a guard, not the
+   split-and-interleave rendering rework relocation would require.
+
+### Alternatives rejected
+
+1. **Relocate-and-interleave with a non-fatal diagnostic** (jms's stated
+   preference). Split the `zed` into RA-tainted runs (→ display math) and plain-Z
+   runs (→ `zed` segments), warn on relocation, always emit fuzz-clean output.
+   Z-sound, but rejected in favour of fail-fast: it is defensive auto-recovery,
+   contradicts the project's raise-on-validation-failure standard, and is a
+   substantially larger change. The accepted cost is an **asymmetry** — RA at top
+   level relocates, RA in `zed` errors. This is coherent: at top level the user
+   requested no box, so the engine chooses the rendering; inside `zed` the user
+   explicitly requested a Z box, and RA cannot be a Z paragraph, so we surface it
+   rather than silently override the request.
+2. **Auto-unwrap the whole block to display math.** Rejected: a mixed block would
+   lose fuzz type-checking on its genuine Z lines.
+
+### Consequences
+
+- Implemented as a shared helper `_reject_ra_in_box(expr, line, rendered,
+  block_kind)` that raises `RaInZedError` (an actionable message naming the
+  offending line, the enclosing box kind, and directing the user to top level)
+  when `self._is_ra_tainted(expr)`, unless `block_kind is None` (an inline /
+  display-math call site, where the taint system has already routed the
+  enclosing expression out of any box). A **completeness sweep** of `codegen/`
+  *and* `latex_gen.py` applied it at **every** site where an `Expr` is emitted
+  into a fuzz-checked Z box:
+  - `zed` — abbreviation RHS, bare predicate, and free-type branch parameters
+    (a standalone `FreeType`, a `FreeType` nested in a multi-item `zed`, and the
+    consolidation renderer `_generate_zed_content` in `latex_gen.py` that packs
+    top-level `given`/free-type/abbreviation runs into one box);
+  - `axdef` / `gendef` — each declaration `type_expr` and where-clause predicate;
+  - `schema` — each declaration `type_expr` and where-clause predicate;
+  - horizontal definitions — the bare-`Expr` RHS, the schema-text RHS (its inner
+    decl types and predicates), and the schema-inclusion RHS;
+  - **schema-inclusion generic arguments** (`Delta Stack[…]`) at every boxed
+    call site — `block_kind` threaded explicitly so the message names the true
+    environment (`axdef`/`gendef`/`schema`/`zed`);
+  - `syntax` blocks — branch parameters (`fuzz.sty` defines `\syntax` in terms
+    of `\@zed`, so it is type-checked identically to a `zed` block).
+  Nested sub-expressions (a `BinaryOp`'s operands, a schema-calculus tree, a
+  `Quantifier` body, function arguments) need no separate guard: `_is_ra_tainted`
+  walks the whole tree, so the single box-boundary check covers them.
+- **The bug was systemic, not `zed`-only** — verified by reproduction at each
+  site, none was already safe: an RA construct in an `axdef`/`gendef`/`schema`/
+  horiz-def/free-type/syntax/schema-inclusion-generic position also rendered
+  `\mathrm{Join}(...)` inside the box and failed fuzz (`Syntax error at symbol
+  "{"`). The ADR's uniformity ("no boxed Z environment accepts RA") is now
+  enforced by the code, not merely asserted. `cli.py` catches `RaInZedError` and
+  prints a clean `Error:` line (exit 1, no traceback), consistent with
+  `InlineMathError`/`ParserError`.
+- Reachability is low: RA is normally written at top level, where it renders
+  correctly; wrapping it in a boxed environment is unusual. The change turns a
+  silent invalid-Z output into a clear, early error.
+- Closes issue #83. Regression tests assert the error (exception, message,
+  offending line) and the clean CLI exit, not the old in-box `\mathrm{...}`
+  rendering; two tests that had pinned the old behaviour were updated.
