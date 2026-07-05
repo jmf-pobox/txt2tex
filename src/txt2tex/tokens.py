@@ -144,7 +144,7 @@ class TokenType(Enum):
     LINEBREAK = auto()  # LINEBREAK: (insert \medskip vertical space)
     CONTENTS = auto()  # CONTENTS: (table of contents)
     PARTS = auto()  # PARTS: (parts formatting style)
-    B_BLOCK = auto()  # B: (B-machine verbatim block, terminated by column-0 END)
+    B_BLOCK = auto()  # B:/CODE: verbatim block, col-0 END terminator
     RAW_LATEX_BLOCK = auto()  # LATEX:\n...END (multi-line raw LaTeX, col-0 END)
     NOFUZZ = auto()  # NOFUZZ: reason (one-line modifier on next box paragraph)
     BIBLIOGRAPHY = auto()  # BIBLIOGRAPHY: (bibliography file)

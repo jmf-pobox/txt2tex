@@ -241,10 +241,12 @@ class _TextBlocksParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         )
 
     def _parse_b_block(self) -> BMachine:
-        """Parse B-machine verbatim block from B_BLOCK token.
+        """Parse a verbatim block (B: or CODE:) from a B_BLOCK token.
 
-        The token value is the raw multi-line body (including the final END
-        line) already captured by the lexer.  No Z-parser involvement.
+        The token value is the raw multi-line body already captured by the
+        lexer.  Whether the terminating END line is part of that body is
+        decided at lex time — B: keeps it, CODE: drops it — so the parser
+        just wraps whatever it received.  No Z-parser involvement.
         """
         b_token = self._advance()  # Consume B_BLOCK token
         if b_token.type != TokenType.B_BLOCK:

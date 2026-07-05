@@ -350,10 +350,12 @@ class _TextBlocksCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
 
     @item_register.register(BMachine)
     def _generate_b_machine(self, node: BMachine) -> list[str]:
-        r"""Generate LaTeX for B-machine verbatim block.
+        r"""Generate LaTeX for a verbatim block (backs both B: and CODE:).
 
         Wraps the body in \begin{verbatim}…\end{verbatim}.
-        Body indentation and blank lines are preserved exactly.
+        Body indentation and blank lines are preserved exactly. Whether the
+        body carries a trailing END line was decided at lex time (B: keeps
+        it, CODE: drops it); this renderer treats the body as opaque text.
         """
         lines: list[str] = []
         lines.append(r"\begin{verbatim}")
