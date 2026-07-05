@@ -380,6 +380,17 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             )
             raise NoFuzzUnsupportedError(msg)
 
+        # Generic abbreviations are rejected under NOFUZZ for the same reason
+        # as generic axdef/schema: the twin environments do not render generic
+        # parameters yet.  Keep the rule uniform across box kinds (and matching
+        # the user guide) rather than silently accept it here.
+        if node.generic_params and node.nofuzz_reason is not None:
+            msg = (
+                "NOFUZZ does not support generic parameters yet — remove the "
+                "generic parameters or the NOFUZZ modifier."
+            )
+            raise NoFuzzUnsupportedError(msg)
+
         # Pick the wrapping based on RHS content
         if is_relational_rhs:
             # Dual-emit for binding set comprehensions: hidden copy with

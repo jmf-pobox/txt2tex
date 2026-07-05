@@ -523,6 +523,16 @@ def test_nofuzz_axdef_with_generics_raises() -> None:
     assert "generic parameters" in str(exc_info.value)
 
 
+def test_nofuzz_abbreviation_with_generics_raises() -> None:
+    """A generic abbreviation ([X] foo == ...) is rejected under NOFUZZ too,
+    uniformly with axdef/schema and the user guide -- the abbreviation path
+    used to emit the zednofuzz wrapper regardless."""
+    doc = _parse("NOFUZZ: fuzz reads ^ as iteration\n[X] foo == { x : X | true }\n")
+    with pytest.raises(NoFuzzUnsupportedError) as exc_info:
+        LaTeXGenerator(use_fuzz=True).generate_document(doc)
+    assert "generic parameters" in str(exc_info.value)
+
+
 def test_nofuzz_in_zed_mode_raises() -> None:
     """NOFUZZ has no meaning and no defined env in zed-cm (--zed) mode."""
     doc = _parse("NOFUZZ: fuzz reads ^ as iteration\ngiven A\n")
