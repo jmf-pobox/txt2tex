@@ -146,6 +146,7 @@ class TokenType(Enum):
     PARTS = auto()  # PARTS: (parts formatting style)
     B_BLOCK = auto()  # B: (B-machine verbatim block, terminated by column-0 END)
     RAW_LATEX_BLOCK = auto()  # LATEX:\n...END (multi-line raw LaTeX, col-0 END)
+    NOFUZZ = auto()  # NOFUZZ: reason (one-line modifier on next box paragraph)
     BIBLIOGRAPHY = auto()  # BIBLIOGRAPHY: (bibliography file)
     BIBLIOGRAPHY_STYLE = auto()  # BIBLIOGRAPHY_STYLE: (bibliography style)
     # Title metadata

@@ -10,7 +10,11 @@ import tempfile
 from pathlib import Path
 
 from txt2tex.__version__ import __version__
-from txt2tex.codegen.paragraphs import RaInZedError
+from txt2tex.codegen.paragraphs import (
+    NoFuzzGenDefNotImplementedError,
+    NoFuzzLintItem,
+    RaInZedError,
+)
 from txt2tex.codegen.text_pipeline import InlineMathError
 from txt2tex.compile import compile_pdf, copy_latex_files, format_tex, get_latex_dir
 from txt2tex.errors import ErrorFormatter
@@ -66,6 +70,61 @@ def typecheck_fuzz(tex_path: Path) -> bool:
         # Clean up copied files
         for copied in copied_files:
             copied.unlink(missing_ok=True)
+
+
+def lint_nofuzz_block(item: NoFuzzLintItem) -> bool | None:
+    """Check whether a NOFUZZ box's body genuinely fails fuzz on its own.
+
+    NOFUZZ exists to waive genuine Z content fuzz cannot parse.  A box
+    whose body type-checks cleanly in isolation is a mislabeled waiver —
+    it should be a plain checked box instead.  This probes exactly that:
+    ``item.probe_snippet`` is already a complete, self-contained checked
+    fragment (``\\begin{axdef}...\\end{axdef}``, ``\\begin{zed}...\\end{zed}``,
+    or ``\\begin{schema}{name}...\\end{schema}``, matching the NOFUZZ box's
+    own kind) -- this drops it into a minimal fuzz document and runs the
+    ``fuzz`` binary.
+
+    Args:
+        item: The NOFUZZ box's checked-form probe, staged during codegen.
+
+    Returns:
+        True if fuzz rejected the body (the waiver is justified).
+        False if fuzz accepted the body cleanly (use a plain box instead).
+        None if the fuzz binary is not installed (lint skipped).
+    """
+    fuzz = shutil.which("fuzz")
+    if fuzz is None:
+        return None
+
+    probe = (
+        "\\documentclass[a4paper,10pt,fleqn]{article}\n"
+        "\\usepackage{fuzz}\n"
+        "\\usepackage{schemapk}\n"
+        "\\usepackage{zed-maths}\n"
+        "\\usepackage{zed-proof}\n"
+        "\\begin{document}\n"
+        f"{item.probe_snippet}\n"
+        "\\end{document}\n"
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        work_dir = Path(tmpdir)
+        tex_path = work_dir / "nofuzz_probe.tex"
+        tex_path.write_text(probe)
+        copied_files = copy_latex_files(work_dir)
+        try:
+            result = subprocess.run(  # noqa: S603
+                [fuzz, tex_path.name],
+                cwd=work_dir,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+        finally:
+            for copied in copied_files:
+                copied.unlink(missing_ok=True)
+
+    return result.returncode != 0
 
 
 def _check_latex_package(pdflatex: str, package: str) -> bool:
@@ -307,6 +366,9 @@ def main() -> int:
     except RaInZedError as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1
+    except NoFuzzGenDefNotImplementedError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
 
     # Emit any overflow warnings
     generator.emit_warnings()
@@ -329,6 +391,32 @@ def main() -> int:
     # Format with tex-fmt (if requested)
     if args.format:
         format_tex(output_path)
+
+    # Lint NOFUZZ blocks: each one must genuinely fail fuzz on its own — a
+    # block that type-checks cleanly in isolation is a mislabeled waiver.
+    # Skips gracefully (with a note) when fuzz is not installed, same
+    # degradation as the full-document typecheck below.
+    if not args.zed:
+        fuzz_missing_noted = False
+        for nofuzz_item in generator.nofuzz_lint_items:
+            outcome = lint_nofuzz_block(nofuzz_item)
+            if outcome is None:
+                if not fuzz_missing_noted:
+                    print(
+                        "Note: fuzz typechecker not found. Skipping NOFUZZ lint.",
+                        file=sys.stderr,
+                    )
+                    fuzz_missing_noted = True
+                continue
+            if outcome is False:
+                print(
+                    f"Error: NOFUZZ block at line {nofuzz_item.line} "
+                    "type-checks cleanly under fuzz — use a plain box "
+                    "instead; NOFUZZ is only for content fuzz genuinely "
+                    "cannot check.",
+                    file=sys.stderr,
+                )
+                return 1
 
     # Type check with fuzz (if available and using fuzz package)
     if not args.zed:

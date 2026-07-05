@@ -1,0 +1,156 @@
+%
+% zednofuzz.sty
+%
+% Companion package to fuzz.sty for txt2tex's NOFUZZ feature.
+%
+% PURPOSE
+%   Some genuine Z predicates cannot be parsed by the fuzz type-checker
+%   binary (e.g. `n = n^2`, which fuzz reads `^` as sequence iteration,
+%   not exponentiation). The *nofuzz twins defined here render such a
+%   paragraph -- using the same real box shapes fuzz.sty draws for the
+%   checked kind (rules, weight, indentation, skips are byte-identical)
+%   -- plus one mandatory note line below the box. There is no on-box
+%   mark and no separate "loud" frame: the checked and unchecked boxes
+%   of the same kind are visually identical, full stop -- only the
+%   note line distinguishes them. (An earlier revision offered a
+%   switchable on-box dagger in three placements; the student picked
+%   "note line only", so that machinery has been removed rather than
+%   left switched off.)
+%
+% WHY THE ENVIRONMENT NAMES MATTER
+%   `fuzz file.tex` is a static scanner over the .tex source text: it
+%   recognises the literal strings `\begin{zed}`, `\begin{axdef}`,
+%   `\begin{schema}`, `\begin{gendef}`, `\begin{syntax}` and type-checks
+%   what's inside. `zednofuzz`/`axdefnofuzz`/`schemanofuzz` are
+%   deliberately outside that set, so fuzz skips the blocks
+%   structurally -- it never sees the offending predicate and never has
+%   a chance to reject it. For that skip to hold, this file must NOT
+%   expand e.g. `\begin{axdefnofuzz}` into a real `\begin{axdef}`
+%   (fuzz's scanner would then find a nested `\begin{axdef}` and try to
+%   check it). Instead, each twin is built directly from the same
+%   low-level primitives its checked counterpart is built from --
+%   `\@zed`, `\@znoskip`, `\@zlign`, `\@jot`, `\@zskip`, `\@narrow`,
+%   `\@topline`-equivalent, `\@zedline` -- all defined in fuzz.sty and
+%   shared across zed/axdef/schema/argue/syntax/infrule. None of those
+%   primitives is environment-name specific, so reusing them carries no
+%   risk of fuzz seeing a checked delimiter.
+%
+% SHAPES (mirror the checked kind exactly; see fuzz.sty for the
+% originals -- \zed/\axdef/\schema)
+%   zednofuzz     -- bare: no frame at all (given sets, abbreviations,
+%                    free types render frameless, same as a real \zed).
+%   axdefnofuzz   -- continuous black left vertical rule (one per row,
+%                    via the row template, exactly like \axdef) plus
+%                    whatever `\where` separator bar the body invokes.
+%                    No top/bottom/right rule.
+%   schemanofuzz  -- axdef shape (left rule + \where bar) plus a top
+%                    rule carrying the schema NAME in a tab at the left
+%                    terminus (fuzz.sty's \@topline mechanism, reused
+%                    verbatim) and a full-width solid bottom rule
+%                    (fuzz.sty's \@zedline, reused verbatim). Right
+%                    side stays open, same as a real \schema.
+%   gendefnofuzz  -- NOT built yet (deferred). fuzz.sty's real \gendef
+%                    draws a bracketed generic-parameter tab at the top
+%                    (`\@gendef`/`\@ngendef`, using \doublerulesep for
+%                    the double top rule) instead of schema's name tab.
+%                    When this twin is needed: reuse `\@gendef`'s
+%                    `\@topline`-style bracket line the same way
+%                    `\@nftopline` below reuses schema's, keep the
+%                    axdef row template (left rule + \where bar), close
+%                    with `\@zedline` (as schemanofuzz does), and route
+%                    the reason through `\@nfreason` like the other
+%                    three. Two args: `{generic params}{reason}`,
+%                    mirroring schemanofuzz's `{name}{reason}`.
+%
+% NOTE LINE (the only mark -- mandatory, not suppressible)
+%   Every twin renders, immediately below the box (no paragraph break,
+%   indented to \zedindent so its left edge lines up with the box):
+%       † not type-checked --- <reason>
+%   in \footnotesize italics. "not type-checked" is a fixed constant;
+%   only the text after the em-dash comes from the environment's #1
+%   (or #2 for schemanofuzz, whose #1 is the schema name). There is no
+%   package option or flag that suppresses \@nfreason.
+%
+% REQUIRES
+%   fuzz.sty, loaded first, for \zedindent/\zedleftsep/\zedskip/\zedbar/
+%   \@jot/\preboxpenalty and the \@zed/\@znoskip/\@zlign/\@zskip/
+%   \@narrow/\@zedline/\t/\also machinery. \dagger is a base LaTeX math
+%   symbol (OMS/symbols font) -- no extra package needed for it.
+%
+
+\ProvidesPackage{zednofuzz}[2026/07/04]
+
+\RequirePackage{fuzz}
+
+% \@nftopline#1 -- schemanofuzz's top rule: byte-for-byte fuzz.sty's
+% \@topline (corner mark, zedleftsep gap, name, rule-fill to the right
+% edge). No on-box mark spliced in -- the note line below the box is
+% the only indicator that this twin isn't type-checked.
+\def\@nftopline#1{\hbox to\linewidth{%
+  \vrule height\arrayrulewidth width\arrayrulewidth
+  \vrule height0pt depth\@jot width0pt
+  \hbox to\zedleftsep{\@zrulefill\thinspace}%
+  #1\thinspace\@zrulefill}}
+
+% \@nfreason#1 -- the mandatory note line. Fixed phrase "not
+% type-checked" plus the reason argument; \footnotesize italic;
+% directly below the box (no \par before it, so no blank line is
+% inserted between the box and the note), indented to \zedindent so
+% its left edge lines up with the box above it. Not gated by any
+% option or flag -- always renders.
+\def\@nfreason#1{%
+  \par\noindent\hskip\zedindent
+  {\footnotesize\itshape$\dagger$\ not type-checked --- #1\par}}
+
+% axdefnofuzz{<reason>} -- axdef shape: continuous left rule (row
+% template, below) + whatever \where bar the body invokes. Body syntax
+% (identifiers, \t1/\t2, \also, \where, \\) is identical to \axdef's;
+% compare to fuzz.sty's \def\axdef{...}. Byte-identical to a checked
+% \axdef box -- the note line below is the only difference.
+\newenvironment{axdefnofuzz}[1]{%
+  \def\@currnfreason{#1}%
+  \def\also{\@zskip\zedskip}%
+  \predisplaypenalty=\preboxpenalty
+  \@zed\@znoskip \halign to\linewidth\bgroup
+    \strut \vrule width\arrayrulewidth \hskip\zedleftsep
+    $\@zlign##$\hfil \tabskip=0pt plus1fil\cr
+}{%
+  \crcr\egroup$$\global\@ignoretrue
+  \@nfreason{\@currnfreason}%
+}
+
+% zednofuzz{<reason>} -- bare shape: no left rule, no top/bottom rule.
+% Compare to fuzz.sty's \def\zed{...}. Byte-identical to a checked
+% \zed box -- the note line below is the only difference.
+\newenvironment{zednofuzz}[1]{%
+  \def\@currnfreason{#1}%
+  \@zed\@znoskip
+  \halign to\linewidth\bgroup
+    \strut$\@zlign##$\hfil \tabskip=0pt plus1fil\cr
+}{%
+  \crcr\egroup$$\global\@ignoretrue
+  \@nfreason{\@currnfreason}%
+}
+
+% schemanofuzz{<name>}{<reason>} -- schema shape: axdef's left rule +
+% \where bar, a top rule carrying the name (via \@nftopline above),
+% and a full-width solid bottom rule (fuzz.sty's own \@zedline, reused
+% verbatim -- it's already environment-name agnostic). Right side
+% stays open. Compare to fuzz.sty's \def\@nschema / \def\endschema.
+% Byte-identical to a checked \schema box -- the note line below is
+% the only difference.
+\newenvironment{schemanofuzz}[2]{%
+  \def\@currnfname{#1}%
+  \def\@currnfreason{#2}%
+  \@narrow
+  \def\also{\@zskip\zedskip}%
+  \predisplaypenalty=\preboxpenalty
+  \@zed\@znoskip \halign to\linewidth\bgroup
+    \strut \vrule width\arrayrulewidth \hskip\zedleftsep
+    $\@zlign##$\hfil \tabskip=0pt plus1fil\cr
+  \omit\@nftopline{$\strut\@currnfname$}\cr
+}{%
+  \@zskip\@jot \@zedline
+  \crcr\egroup$$\global\@ignoretrue
+  \@nfreason{\@currnfreason}%
+}

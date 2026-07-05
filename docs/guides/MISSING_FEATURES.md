@@ -91,7 +91,7 @@ The right workaround depends on what the exercise is asking for:
 
 ## Known Limitations
 
-1. **Superscript `^`**: Only for relation iteration (`R^n`), not arithmetic (`x^2`). Write `x * x` for squaring.
+1. **Superscript `^`**: Only for relation iteration (`R^n`), not arithmetic (`x^2`). Write `x * x` for squaring. If you need the literal `n^2` form to appear (e.g. teaching material), mark the containing `axdef`/`schema`/`zed`-paragraph box with `NOFUZZ:` — see [USER_GUIDE.md § NOFUZZ](USER_GUIDE.md#nofuzz--marking-content-fuzz-cant-check). `NOFUZZ:` renders the box normally (fuzz just skips checking it) and is enforced by a reject-if-clean lint, so it can't be used to hide an actual type error. `gendef` boxes are not yet supported by `NOFUZZ:` (`gendefnofuzz` is deferred — no LaTeX environment exists yet).
 2. **Tuple projection**: Only named fields (`x.field`), not positional (`.1`, `.2`).
 3. **fuzz parallel-binding in set comprehensions**: fuzz requires sequential binding of schema text (Z RM §3.5 allows parallel; fuzz tightens this). The generator automatically works around this for `forall`/`exists`/`exists1`/`mu`/`lambda` by reordering declarations. Set comprehensions using multiple schemas with cross-references raise a clear error directing you to rewrite as a single declaration sequence.
 4. **`id` is reserved**: maps to `\id` (the identity relation operator). It cannot be used as a schema-component name, variable, or relation name. Use `tid`, `rid`, `entityId`, etc. instead. (Other Z RM names that are similarly reserved: `dom`, `ran`, `inv`, `pre` — anything in the standard Z toolkit.)
@@ -163,6 +163,18 @@ These items were missing in earlier versions and are now shipped:
 - **Horizontal schema definitions `Name defs Schema-Exp`** — supports full schema calculus RHS expressions (Phase 1.3)
 - **Dependent-domain lambda/mu** — generator detects multi-decl expressions where later declarations depend on earlier ones and emits the correct Spivey collapsed form (fix `92823b7`)
 - **Schema calculus**: composition (`;`), piping (`>>`), hiding (`hide`), projection (`project`) — all shipped
+- **NOFUZZ: marking content fuzz can't check** (2026-07-05) — resolves the
+  "content fuzz genuinely can't check" gap (e.g. arithmetic `n^2`, listed
+  above under Known Limitations). A `NOFUZZ: <reason>` modifier line marks
+  an `axdef`, `schema`, or `zed`-producing paragraph (given set / free type
+  / abbreviation) as rendered but not type-checked; the box renders
+  identically to the checked kind plus one mandatory under-box note, and a
+  reject-if-clean lint fails the build if the wrapped content actually
+  type-checks cleanly on its own. `gendef` boxes remain unsupported
+  (`gendefnofuzz` is deferred — no LaTeX environment exists yet; marking
+  one errors with a clear message). See
+  [USER_GUIDE.md § NOFUZZ](USER_GUIDE.md#nofuzz--marking-content-fuzz-cant-check)
+  and `docs/DESIGN.md § ADR: NOFUZZ`.
 
 ---
 

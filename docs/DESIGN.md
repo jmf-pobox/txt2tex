@@ -3491,3 +3491,96 @@ mixed indentation and nested arrays with different left edges (ragged). Fix:
 - Regression coverage: `tests/test_display_math_indent.py`. Fixture churn:
   `bindings.tex`, `relational_calculus.tex`, `q2d_demo.tex` (indentation/array
   structure only).
+
+## ADR: NOFUZZ — Marking a Box Fuzz Genuinely Cannot Check
+
+**Problem.** fuzz rejects genuine Z that its grammar cannot express. The
+canonical case is numeric exponentiation: Z's toolkit has no arithmetic
+`^` operator. `\bsup...\esup` is defined for exactly one purpose —
+relation iteration (`R^n`, Z RM's `iter`) — so `n = n^2` with `n : N` is a
+fuzz type error even though it is exactly the mathematics the author
+intends. Before NOFUZZ, an author hitting this had no way to keep the box
+both boxed (so it reads as Z to a Z-trained reader) and present in a
+document that otherwise passes `fuzz`.
+
+**Alternatives rejected.**
+
+1. *A file-level exclusion list in CI* (skip fuzz on named files/lines).
+   Rejected: brittle (breaks silently when line numbers shift), and the
+   waiver is invisible in the document itself — a reader of the PDF has no
+   way to know a box wasn't checked. The waiver must live where the reader
+   can see it, not in a CI config the reader never opens.
+2. *A loud dashed-banner "unchecked" frame* around the box. Rejected: it
+   stops reading as Z. The box shape (rules, weight, indentation) is part
+   of what signals "this is a formal Z paragraph" to a Z-trained reader;
+   wrapping it in a warning frame undermines that signal for content that
+   is, in fact, genuine Z — just Z fuzz's grammar cannot parse.
+
+**Decision.** Per-box-kind fuzz-invisible twin environments —
+`axdefnofuzz`, `schemanofuzz`, `zednofuzz` — that render **byte-identical**
+to the checked box of the same kind (same rules, same shape, same
+indentation), plus one mandatory line directly beneath the box:
+
+```text
+† not type-checked — <reason>
+```
+
+"not type-checked" is fixed text; only the reason (mandatory, supplied by
+the author on the `NOFUZZ: <reason>` modifier line) varies, and there is
+no flag to suppress the note. fuzz's typechecker binary is a static
+scanner over the `.tex` source that recognizes the literal strings
+`\begin{zed}`, `\begin{axdef}`, `\begin{schema}` (etc.); the `*nofuzz`
+names are deliberately outside that vocabulary, so fuzz skips the box
+structurally — it never sees the offending predicate, and the rest of the
+document still type-checks normally. The twins are built from the same
+low-level fuzz.sty primitives (`\@zed`, `\@zlign`, `\@zedline`, ...) as
+their checked counterparts, not by wrapping a real `\begin{axdef}` —
+wrapping would put a checkable delimiter back in fuzz's path and defeat
+the skip.
+
+**Rationale.** The box is the formality signal in this document's
+vocabulary — that is precisely why NOFUZZ reuses the real box shape
+rather than inventing a new one. Reusing that signal for content fuzz
+cannot check would be dishonest without a compensating cost, so the
+mandatory "not type-checked — reason" line is the honesty tax: an author
+gets to keep the box, but never gets to keep the appearance of having
+been checked. The note is a fixed sentence rather than free-form
+commentary so a reader can grep a document for the constant phrase
+"not type-checked" and enumerate every waiver, regardless of author.
+
+**Enforced by a reject-if-clean lint.** NOFUZZ is a waiver for content
+fuzz genuinely cannot parse, not a way to silence a real type error. Each
+NOFUZZ box's body is independently probed by wrapping the same body lines
+in the corresponding *checked* environment and asking fuzz whether it
+type-checks on its own; if it does, the build fails —
+
+```text
+Error: NOFUZZ block at line N type-checks cleanly under fuzz — use a
+plain box instead; NOFUZZ is only for content fuzz genuinely cannot
+check.
+```
+
+— so a `NOFUZZ:` label cannot be used to paper over an author's actual
+mistake.
+
+**Scope.** `axdef`, `schema`, and `zed`-producing paragraphs (given
+types, free types, abbreviations — all three consolidate into one `zed`
+box) are supported. `gendef` is deferred: no `gendefnofuzz` environment
+exists yet (fuzz's real `\gendef` draws a bracketed generic-parameter tab
+via `\@gendef`/`\@ngendef` that the twin would need to reproduce), so
+marking a `gendef` with `NOFUZZ:` raises a clear "not yet implemented"
+error rather than emitting an undefined LaTeX environment that would
+break compilation.
+
+**Implementation.** `zednofuzz.sty` (new, requires `fuzz.sty`) defines the
+three twin environments plus `\@nfreason`/`\@nftopline`. Parser:
+`_parse_nofuzz_modifier` in `src/txt2tex/parser.py` re-stamps the
+immediately following `AxDef`/`Schema`/`GenDef`/`GivenType`/`FreeType`/
+`Abbreviation` node with a `nofuzz_reason` field via `dataclasses.replace`
+— so NOFUZZ content is parsed through the exact same grammar as the
+checked form, with rendering as the only divergence. Codegen
+(`codegen/paragraphs.py`, `codegen/schemas.py`) swaps the emitted
+environment name when `nofuzz_reason` is set and stages a
+`NoFuzzLintItem` (line, reason, checked-form probe snippet) per box; the
+CLI (`cli.py`) runs the reject-if-clean probe against each staged item
+after the full document has been generated.

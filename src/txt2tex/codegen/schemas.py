@@ -27,10 +27,15 @@ from txt2tex.ast_nodes import (
     SchemaText,
 )
 from txt2tex.codegen._dispatch import CodegenDispatch, expr_register, item_register
+from txt2tex.codegen.paragraphs import NoFuzzLintItem
 
 
 class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
     """Mixin: handlers for schema constructs."""
+
+    # Populated on LaTeXGenerator (see latex_gen.py __init__/_resolve_toc_depth);
+    # declared here so mypy/pyright resolve self.nofuzz_lint_items in this file.
+    nofuzz_lint_items: list[NoFuzzLintItem]
 
     @expr_register.register(SchemaText)
     def _generate_schema_text_expr(
@@ -189,12 +194,18 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         For schemas with pk-marked fields, uses dual-emit: a fuzz-checked copy
         inside ``\\setbox0=\\vbox{%…}`` (invisible to LaTeX output) and a
         rendered copy using the ``schemapk`` environment with
-        ``\\underline{field}`` for each primary-key attribute.
+        ``\\underline{field}`` for each primary-key attribute.  A
+        ``nofuzz_reason`` schema skips that dual-emit entirely -- fuzz never
+        sees a ``schemanofuzz`` box, so there is no reason to keep an
+        invisible checked copy around -- and renders once, with PK
+        underlining if marked, staging a throwaway plain-``schema`` probe
+        (see ``NoFuzzLintItem``) for the CLI's reject-if-clean lint.
 
         Processes schema names through _generate_identifier() for compound
         identifiers like S+, S*, S~ (partial support, GitHub #3 still open).
         """
         lines: list[str] = []
+        block_kind = "schemanofuzz" if node.nofuzz_reason is not None else "schema"
 
         # Determine schema name (empty string for anonymous)
         # Process name through _generate_identifier() for compound identifiers
@@ -207,7 +218,9 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             schema_name = ""
 
         # Context for overflow warnings
-        schema_context = f"schema {schema_name}" if schema_name else "anonymous schema"
+        schema_context = (
+            f"{block_kind} {schema_name}" if schema_name else f"anonymous {block_kind}"
+        )
 
         # Detect PK fields early so we know whether dual-emit is needed.
         pk_vars: set[str] = set()
@@ -238,7 +251,7 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             if node.declarations:
                 for i, decl in enumerate(node.declarations):
                     if isinstance(decl, SchemaInclusion):
-                        decl_line = self._emit_schema_inclusion(decl, "schema")
+                        decl_line = self._emit_schema_inclusion(decl, block_kind)
                         plain_body.append(
                             f"{decl_line} \\\\"
                             if i < len(node.declarations) - 1
@@ -278,7 +291,7 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                             decl.type_expr,
                             decl.type_expr.line,
                             plain_decl_line,
-                            "schema",
+                            block_kind,
                         )
                         self._check_overflow(
                             plain_decl_line,
@@ -305,7 +318,7 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                 for group_idx, group in enumerate(node.predicates):
                     for pred_idx, pred in enumerate(group):
                         pred_latex = self.generate_expr(pred, parent=None)
-                        self._reject_ra_in_box(pred, pred.line, pred_latex, "schema")
+                        self._reject_ra_in_box(pred, pred.line, pred_latex, block_kind)
                         self._check_overflow(
                             pred_latex,
                             pred.line,
@@ -320,7 +333,36 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         finally:
             self._in_z_paragraph = prev_z
 
-        if pk_vars:
+        if node.nofuzz_reason is not None:
+            # NOFUZZ: fuzz never sees this box, so render once -- with PK
+            # underlining if marked -- instead of the checked+rendered
+            # dual-emit a plain pk-marked schema needs.
+            probe_snippet = "\n".join(
+                [begin_schema, *plain_body, *where_lines, r"\end{schema}"]
+            )
+            self.nofuzz_lint_items.append(
+                NoFuzzLintItem(
+                    line=node.line,
+                    reason=node.nofuzz_reason,
+                    probe_snippet=probe_snippet,
+                )
+            )
+            escaped_reason = self._escape_latex_text(node.nofuzz_reason)
+            if node.generic_params:
+                params_str = ", ".join(node.generic_params)
+                begin_schemanofuzz = (
+                    f"\\begin{{schemanofuzz}}{{{schema_name}}}{{{escaped_reason}}}"
+                    f"[{params_str}]"
+                )
+            else:
+                begin_schemanofuzz = (
+                    f"\\begin{{schemanofuzz}}{{{schema_name}}}{{{escaped_reason}}}"
+                )
+            lines.append(begin_schemanofuzz)
+            lines.extend(pk_body if pk_vars else plain_body)
+            lines.extend(where_lines)
+            lines.append(r"\end{schemanofuzz}")
+        elif pk_vars:
             # Dual-emit: fuzz-checked copy inside \vbox (invisible), then
             # rendered schemapk copy with \underline on PK fields.
             # Must use \setbox0=\vbox, not \savebox — fuzz.sty's schema

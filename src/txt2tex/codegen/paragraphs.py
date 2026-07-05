@@ -10,6 +10,8 @@ changed.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from txt2tex.ast_nodes import (
     Abbreviation,
     AxDef,
@@ -30,6 +32,40 @@ from txt2tex.ast_nodes import (
 from txt2tex.codegen._dispatch import CodegenDispatch, item_register
 
 
+@dataclass(frozen=True)
+class NoFuzzLintItem:
+    """One NOFUZZ box's throwaway checked-form probe, staged for the lint.
+
+    Populated during code generation wherever ``node.nofuzz_reason`` is
+    set (``_generate_given_type``, ``_generate_free_type``,
+    ``_generate_abbreviation``, ``_generate_axdef``, and schema's
+    ``_generate_schema``); consumed by the CLI, once the full document has
+    been generated, via ``LaTeXGenerator.nofuzz_lint_items``.
+
+    ``probe_snippet`` is a complete, self-contained checked-box LaTeX
+    fragment -- e.g. ``\\begin{axdef}...\\end{axdef}`` or
+    ``\\begin{zed}...\\end{zed}`` -- built from the *same* body lines the
+    real NOFUZZ box renders, but wrapped in the plain (fuzz-checked)
+    environment instead of its ``*nofuzz`` twin.  The CLI drops this
+    verbatim into a minimal document and asks fuzz whether it type-checks
+    on its own.
+    """
+
+    line: int
+    reason: str
+    probe_snippet: str
+
+
+class NoFuzzGenDefNotImplementedError(Exception):
+    """Raised when a NOFUZZ modifier marks a ``gendef``.
+
+    No ``gendefnofuzz`` LaTeX environment exists yet (unlike
+    ``axdefnofuzz``/``zednofuzz``/``schemanofuzz``).  Rather than emit an
+    undefined environment that would break compilation, codegen rejects
+    the input with an actionable message pointing at the gap.
+    """
+
+
 class RaInZedError(Exception):
     """Raised when a relational-algebra construct sits inside a boxed Z paragraph.
 
@@ -47,6 +83,10 @@ class RaInZedError(Exception):
 
 class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
     """Mixin: handlers for Z paragraph constructs."""
+
+    # Populated on LaTeXGenerator (see latex_gen.py __init__/_resolve_toc_depth);
+    # declared here so mypy/pyright resolve self.nofuzz_lint_items in this file.
+    nofuzz_lint_items: list[NoFuzzLintItem]
 
     def _reject_ra_in_box(
         self, expr: Expr, line: int, rendered: str, block_kind: str | None
@@ -73,11 +113,30 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
 
     @item_register.register(GivenType)
     def _generate_given_type(self, node: GivenType) -> list[str]:
-        """Generate LaTeX for given type declaration."""
+        """Generate LaTeX for given type declaration.
+
+        ``nofuzz_reason`` (set by a preceding ``NOFUZZ:`` modifier) swaps
+        the wrapper to ``zednofuzz`` and stages the plain-``zed`` probe for
+        the CLI's reject-if-clean lint; the body -- ``[A, B, C]`` -- is
+        identical either way.
+        """
         lines: list[str] = []
-        # Generate as: [A, B, C] in zed environment
         names_str = ", ".join(node.names)
-        lines.append(f"\\begin{{zed}}[{names_str}]\\end{{zed}}")
+        body = f"[{names_str}]"
+        if node.nofuzz_reason is None:
+            lines.append(f"\\begin{{zed}}{body}\\end{{zed}}")
+        else:
+            self.nofuzz_lint_items.append(
+                NoFuzzLintItem(
+                    line=node.line,
+                    reason=node.nofuzz_reason,
+                    probe_snippet=f"\\begin{{zed}}{body}\\end{{zed}}",
+                )
+            )
+            escaped_reason = self._escape_latex_text(node.nofuzz_reason)
+            lines.append(
+                f"\\begin{{zednofuzz}}{{{escaped_reason}}}{body}\\end{{zednofuzz}}"
+            )
         lines.append("")
         return lines
 
@@ -89,8 +148,13 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         - Status ::= active | inactive (simple branches)
         - Tree ::= stalk | leaf \\ldata N \\rdata |
           branch \\ldata Tree \\cross Tree \\rdata
+
+        ``nofuzz_reason`` swaps the wrapper to ``zednofuzz`` and stages
+        the plain-``zed`` probe for the CLI's reject-if-clean lint; see
+        ``_generate_given_type`` for the identical pattern.
         """
         lines: list[str] = []
+        block_kind = "zednofuzz" if node.nofuzz_reason is not None else "zed"
 
         # Generate each branch with proper LaTeX formatting
         branch_strs: list[str] = []
@@ -109,7 +173,7 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                         param_expr = branch.parameters.elements[0]
                         params_latex = self.generate_expr(param_expr)
                         self._reject_ra_in_box(
-                            param_expr, param_expr.line, params_latex, "zed"
+                            param_expr, param_expr.line, params_latex, block_kind
                         )
                     else:
                         params_latex = ""
@@ -119,15 +183,28 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                         branch.parameters,
                         branch.parameters.line,
                         params_latex,
-                        "zed",
+                        block_kind,
                     )
                 branch_strs.append(f"{branch.name} \\ldata {params_latex} \\rdata")
 
         # Join branches with |
         branches_str = " | ".join(branch_strs)
+        body = f"{node.name} ::= {branches_str}"
 
-        # Wrap in zed environment for proper formatting
-        lines.append(f"\\begin{{zed}}{node.name} ::= {branches_str}\\end{{zed}}")
+        if node.nofuzz_reason is None:
+            lines.append(f"\\begin{{zed}}{body}\\end{{zed}}")
+        else:
+            self.nofuzz_lint_items.append(
+                NoFuzzLintItem(
+                    line=node.line,
+                    reason=node.nofuzz_reason,
+                    probe_snippet=f"\\begin{{zed}}{body}\\end{{zed}}",
+                )
+            )
+            escaped_reason = self._escape_latex_text(node.nofuzz_reason)
+            lines.append(
+                f"\\begin{{zednofuzz}}{{{escaped_reason}}}{body}\\end{{zednofuzz}}"
+            )
         lines.append("")
         return lines
 
@@ -311,16 +388,32 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             else:
                 lines.append(f"${abbrev}$")
         else:
-            # Pure Z RHS — emit inside a zed paragraph for fuzz type-checking
+            # Pure Z RHS — emit inside a zed paragraph for fuzz type-checking.
+            # nofuzz_reason swaps the wrapper to zednofuzz and stages the
+            # plain-zed probe for the CLI's reject-if-clean lint.
+            block_kind = "zednofuzz" if node.nofuzz_reason is not None else "zed"
             self._check_overflow(
                 abbrev,
                 node.line,
-                "zed abbreviation",
+                f"{block_kind} abbreviation",
                 f"{node.name} == ...",
             )
-            lines.append("\\begin{zed}")
-            lines.append(abbrev)
-            lines.append("\\end{zed}")
+            if node.nofuzz_reason is None:
+                lines.append("\\begin{zed}")
+                lines.append(abbrev)
+                lines.append("\\end{zed}")
+            else:
+                self.nofuzz_lint_items.append(
+                    NoFuzzLintItem(
+                        line=node.line,
+                        reason=node.nofuzz_reason,
+                        probe_snippet="\n".join([r"\begin{zed}", abbrev, r"\end{zed}"]),
+                    )
+                )
+                escaped_reason = self._escape_latex_text(node.nofuzz_reason)
+                lines.append(f"\\begin{{zednofuzz}}{{{escaped_reason}}}")
+                lines.append(abbrev)
+                lines.append("\\end{zednofuzz}")
 
         lines.append("")
         return lines
@@ -331,15 +424,14 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
 
         Supports optional generic parameters.
         Multiple declarations appear on separate lines with line breaks.
-        """
-        lines: list[str] = []
 
-        # Add generic parameters if present
-        if node.generic_params:
-            params_str = ", ".join(node.generic_params)
-            lines.append(f"\\begin{{axdef}}[{params_str}]")
-        else:
-            lines.append(r"\begin{axdef}")
+        ``nofuzz_reason`` swaps the wrapper to ``axdefnofuzz{<reason>}``
+        and stages a throwaway plain-``axdef`` probe (same body) for the
+        CLI's reject-if-clean lint -- the declaration/where-clause body
+        itself renders identically either way.
+        """
+        block_kind = "axdefnofuzz" if node.nofuzz_reason is not None else "axdef"
+        body_lines: list[str] = []
 
         # All expression generation inside this block uses Z-paragraph context so
         # that context-sensitive operators (e.g. o9 → \comp) emit correctly.
@@ -350,7 +442,7 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             if node.declarations:
                 for i, decl in enumerate(node.declarations):
                     if isinstance(decl, SchemaInclusion):
-                        decl_line = self._emit_schema_inclusion(decl, "axdef")
+                        decl_line = self._emit_schema_inclusion(decl, block_kind)
                     else:
                         # Process variable through identifier logic
                         var_latex = self._generate_identifier(
@@ -384,24 +476,24 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                         # Build full declaration line for overflow check
                         decl_line = f"{var_latex} : {type_latex}"
                         self._reject_ra_in_box(
-                            decl.type_expr, decl.type_expr.line, decl_line, "axdef"
+                            decl.type_expr, decl.type_expr.line, decl_line, block_kind
                         )
                         self._check_overflow(
                             decl_line,
                             decl.type_expr.line,
-                            "axdef declaration",
+                            f"{block_kind} declaration",
                             f"{decl.variable} : ...",
                         )
 
                     # Add line break after each declaration except the last
                     if i < len(node.declarations) - 1:
-                        lines.append(f"{decl_line} \\\\")
+                        body_lines.append(f"{decl_line} \\\\")
                     else:
-                        lines.append(decl_line)
+                        body_lines.append(decl_line)
 
             # Generate where clause if predicate groups exist
             if node.predicates and any(group for group in node.predicates):
-                lines.append(r"\where")
+                body_lines.append(r"\where")
 
                 # Iterate through predicate groups (separated by blank lines)
                 for group_idx, group in enumerate(node.predicates):
@@ -410,30 +502,51 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                         # Pass parent=None for smart parenthesization
                         pred_latex = self.generate_expr(pred, parent=None)
 
-                        self._reject_ra_in_box(pred, pred.line, pred_latex, "axdef")
+                        self._reject_ra_in_box(pred, pred.line, pred_latex, block_kind)
 
                         # Auto-wrap long predicates; fall back to warning
                         self._check_overflow(
                             pred_latex,
                             pred.line,
-                            "axdef where clause",
+                            f"{block_kind} where clause",
                         )
 
                         # Use \\ as separator within group
                         if pred_idx < len(group) - 1:
-                            lines.append(f"{pred_latex} \\\\")
+                            body_lines.append(f"{pred_latex} \\\\")
                         else:
-                            lines.append(pred_latex)
+                            body_lines.append(pred_latex)
 
                     # Add \also between groups (not after last group)
                     if group_idx < len(node.predicates) - 1:
-                        lines.append(r"\also")
+                        body_lines.append(r"\also")
         finally:
             self._in_z_paragraph = prev_z
 
-        lines.append(r"\end{axdef}")
-        lines.append("")
+        generics_suffix = (
+            f"[{', '.join(node.generic_params)}]" if node.generic_params else ""
+        )
 
+        if node.nofuzz_reason is None:
+            lines: list[str] = [f"\\begin{{axdef}}{generics_suffix}"]
+            lines.extend(body_lines)
+            lines.append(r"\end{axdef}")
+            lines.append("")
+            return lines
+
+        probe_snippet = "\n".join(
+            [f"\\begin{{axdef}}{generics_suffix}", *body_lines, r"\end{axdef}"]
+        )
+        self.nofuzz_lint_items.append(
+            NoFuzzLintItem(
+                line=node.line, reason=node.nofuzz_reason, probe_snippet=probe_snippet
+            )
+        )
+        escaped_reason = self._escape_latex_text(node.nofuzz_reason)
+        lines = [f"\\begin{{axdefnofuzz}}{{{escaped_reason}}}{generics_suffix}"]
+        lines.extend(body_lines)
+        lines.append(r"\end{axdefnofuzz}")
+        lines.append("")
         return lines
 
     @item_register.register(GenDef)
@@ -442,7 +555,19 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
 
         Generic definitions always have generic parameters (required).
         Multiple declarations appear on separate lines with line breaks.
+
+        Raises:
+            NoFuzzGenDefNotImplementedError: if ``node.nofuzz_reason`` is
+                set.  No ``gendefnofuzz`` environment exists yet -- see
+                the exception's docstring.
         """
+        if node.nofuzz_reason is not None:
+            msg = (
+                "gendefnofuzz not yet implemented — mark support pending "
+                "(NOFUZZ cannot be applied to a gendef block)"
+            )
+            raise NoFuzzGenDefNotImplementedError(msg)
+
         lines: list[str] = []
 
         # Generic parameters are always present for gendef
@@ -555,17 +680,31 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
 
         Supports mixed content (multiple construct types in one block).
         """
-        lines: list[str] = []
+        lines: list[str] = [r"\begin{zed}"]
+        lines.extend(self._generate_zed_body(node.content))
+        lines.append(r"\end{zed}")
+        lines.append("")
+        return lines
 
-        lines.append(r"\begin{zed}")
+    def _generate_zed_body(self, content: Expr | Document) -> list[str]:
+        """Generate the inner lines of a zed block's body (no env wrapper).
+
+        ``Zed`` does not carry a ``nofuzz_reason`` (NOFUZZ only marks the
+        top-level box-producing nodes -- axdef/schema/gendef/given
+        type/free type/abbreviation -- not an explicit ``zed ... end``
+        block's internal items), so this always renders for the plain
+        ``zed`` environment.
+        """
+        block_kind = "zed"
+        lines: list[str] = []
 
         # All expression generation inside this block uses Z-paragraph context.
         prev_z = self._in_z_paragraph
         self._in_z_paragraph = True
         try:
             # Handle Document content (multiple items in zed block)
-            if isinstance(node.content, Document):
-                for idx, item in enumerate(node.content.items):
+            if isinstance(content, Document):
+                for idx, item in enumerate(content.items):
                     # Add \also separator before all items except the first
                     # Note: fuzz requires \also between Z paragraphs, not \\
                     if idx > 0:
@@ -578,7 +717,7 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                         self._check_overflow(
                             given_line,
                             item.line,
-                            "zed given types",
+                            f"{block_kind} given types",
                         )
                         lines.append(given_line)
 
@@ -594,7 +733,7 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                                     branch.parameters,
                                     branch.parameters.line,
                                     params_latex,
-                                    "zed",
+                                    block_kind,
                                 )
                                 branch_str = (
                                     f"{branch.name} \\ldata {params_latex} \\rdata"
@@ -605,7 +744,7 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                         self._check_overflow(
                             free_type_line,
                             item.line,
-                            "zed free type",
+                            f"{block_kind} free type",
                             f"{item.name} ::= ...",
                         )
                         lines.append(free_type_line)
@@ -622,12 +761,12 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                         else:
                             abbrev_line = f"{name_latex} == {expr_latex}"
                         self._reject_ra_in_box(
-                            item.expression, item.line, abbrev_line, "zed"
+                            item.expression, item.line, abbrev_line, block_kind
                         )
                         self._check_overflow(
                             abbrev_line,
                             item.line,
-                            "zed abbreviation",
+                            f"{block_kind} abbreviation",
                             f"{item.name} == ...",
                         )
                         lines.append(abbrev_line)
@@ -635,29 +774,26 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                     # Generate expressions/predicates
                     elif isinstance(item, Expr):
                         content_latex = self.generate_expr(item)
-                        self._reject_ra_in_box(item, item.line, content_latex, "zed")
+                        self._reject_ra_in_box(
+                            item, item.line, content_latex, block_kind
+                        )
                         self._check_overflow(
                             content_latex,
                             item.line,
-                            "zed predicate",
+                            f"{block_kind} predicate",
                         )
                         lines.append(f"{content_latex}")
             else:
                 # Single expression (backward compatible)
-                content_latex = self.generate_expr(node.content)
-                self._reject_ra_in_box(
-                    node.content, node.content.line, content_latex, "zed"
-                )
+                content_latex = self.generate_expr(content)
+                self._reject_ra_in_box(content, content.line, content_latex, block_kind)
                 self._check_overflow(
                     content_latex,
-                    node.content.line,
-                    "zed predicate",
+                    content.line,
+                    f"{block_kind} predicate",
                 )
                 lines.append(f"{content_latex}")
         finally:
             self._in_z_paragraph = prev_z
-
-        lines.append(r"\end{zed}")
-        lines.append("")
 
         return lines

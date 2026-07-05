@@ -193,6 +193,7 @@ RESERVED_WORDS: frozenset[str] = frozenset(
         "BIBLIOGRAPHY_STYLE",
         "PAGEBREAK",
         "LINEBREAK",
+        "NOFUZZ",
     }
 )
 
@@ -1391,6 +1392,38 @@ class Lexer:
                     start_column,
                 )
             return Token(TokenType.B_BLOCK, body, start_line, start_column)
+
+        # Check for NOFUZZ: keyword — a one-line modifier marking the
+        # immediately-following box paragraph (axdef/schema/gendef/given
+        # type/free type/abbreviation) as genuine Z the fuzz type checker
+        # cannot parse (e.g. `n = n^2`, where fuzz reads `^` as relation
+        # iteration).  The reason (rest of the line) is *mandatory* — an
+        # undocumented waiver is a lex error, not a silent no-op.  Unlike
+        # B:/LATEX:, there is no slurped body: the parser parses the next
+        # box paragraph through its normal grammar (see
+        # _parse_nofuzz_modifier) and stamps the reason onto that node.
+        if value == "NOFUZZ" and self._current_char() == ":":
+            self._advance()  # Consume ':'
+
+            # Skip whitespace after the colon.
+            while not self._at_end() and self._current_char() in " \t":
+                self._advance()
+
+            # Capture the reason: the rest of the header line.
+            reason_start = self.pos
+            while not self._at_end() and self._current_char() != "\n":
+                self._advance()
+            reason = self.text[reason_start : self.pos].strip()
+            if not reason:
+                raise LexerError(
+                    f"NOFUZZ: at line {start_line} has no reason — state why "
+                    f"fuzz cannot check this content, e.g. "
+                    f"'NOFUZZ: fuzz reads ^ as relation iteration'",
+                    start_line,
+                    start_column,
+                )
+
+            return Token(TokenType.NOFUZZ, reason, start_line, start_column)
 
         # Auto-detect prose paragraphs BEFORE keyword checks
         # Also detect prose after part labels (any column)
