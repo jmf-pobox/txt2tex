@@ -397,6 +397,11 @@ END
 - A `B:` block opened without a matching `END` is a lexer error; the error
   message cites the source line of the `B:` opener.
 
+`B:` is for B-Method machines specifically, because it keeps the `END` that
+closes the machine. Writing SQL, Python, or any other code? Use
+[`CODE:`](#code---verbatim-code-block) instead — same verbatim rendering,
+but the fence's `END` is consumed rather than printed.
+
 **Why not use `LATEX:` for B machines?**
 
 `B:` wraps its body in `\begin{verbatim}…\end{verbatim}`, which gives you
@@ -425,6 +430,93 @@ END
 
 TEXT: The invariant ensures trains is a sequence of directed edges.
 ```
+
+### CODE: - Verbatim Code Block
+
+Use `CODE:` to embed a chunk of source code — SQL, Python, shell, whatever —
+verbatim, with fixed-width font and no escaping. It's the general-purpose
+sibling of `B:`: same rendering, but the fence itself doesn't leak into the
+output.
+
+**Syntax:**
+
+```text
+CODE:
+CREATE FUNCTION f() RETURNS trigger AS $$
+BEGIN
+    IF NEW.x IS NULL THEN
+        RAISE EXCEPTION 'no';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+END
+```
+
+renders as:
+
+```latex
+\begin{verbatim}
+CREATE FUNCTION f() RETURNS trigger AS $$
+BEGIN
+    IF NEW.x IS NULL THEN
+        RAISE EXCEPTION 'no';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+\end{verbatim}
+```
+
+Verified with `txt2tex --tex-only` on a file containing `TEXT:` before and
+after the block; the emitted LaTeX is pasted above unedited.
+
+**Rules:**
+
+- The `CODE:` line opens the block. Any text on the same line after `:` is
+  ignored.
+- Every line after `CODE:` is captured verbatim until a line that is
+  exactly `END` at column 0 (no leading whitespace, no trailing content
+  beyond a newline).
+- **The fence's `END` is consumed, not printed.** This is the one
+  difference from `B:`: `B:` keeps its terminating `END` because in
+  B-Method, `END` is the machine's own closing keyword. `CODE:` treats
+  `END` purely as a fence marker for the block — it isn't part of your
+  code, so it doesn't appear in the output.
+- Lines that merely *start with* `END` — `END;`, `END IF;`, `END LOOP;`,
+  and so on — are ordinary code, not the terminator. Only a line that is
+  exactly `END` and nothing else closes the block. That's why the
+  PL/pgSQL example above keeps its `END IF;` and `END;` lines but drops
+  the trailing bare `END` that closes the `CODE:` fence.
+- A `CODE:` block opened without a matching `END` is a lexer error citing
+  the source line of the `CODE:` opener:
+
+  ```text
+  Error: CODE: block opened at line 1 has no closing END
+  ```
+
+- A literal `\end{verbatim}` inside the body is rejected — it would close
+  the rendered `verbatim` environment early and let arbitrary LaTeX
+  through:
+
+  ```text
+  Error: CODE: block at line 1 contains a literal '\end{verbatim}' which
+  would prematurely terminate the rendered verbatim environment
+  ```
+
+  There's no in-band escape for this inside a LaTeX `verbatim`
+  environment, so rejection is the only safe option. If your code
+  genuinely needs that string, it can't go through `CODE:`.
+
+**`CODE:` vs. `B:`:**
+
+| | `B:` | `CODE:` |
+|---|---|---|
+| Use for | B-Method machines | General source code (SQL, Python, shell, …) |
+| Fence keyword | `END` | `END` |
+| Terminating `END` in output | Kept (it's the machine's own keyword) | Dropped (it's just a fence marker) |
+| `END;`, `END IF;`, etc. inside the body | Preserved as code | Preserved as code |
+| Rendering | `\begin{verbatim}...\end{verbatim}` | `\begin{verbatim}...\end{verbatim}` (identical) |
 
 ### LATEX: - Raw LaTeX Passthrough
 

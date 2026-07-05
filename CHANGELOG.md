@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-07-05
+
+### Added
+
+- **`CODE:` — general verbatim code block.** For embedding source code (SQL,
+  and the like) in a document. The body is captured verbatim until a line that
+  is exactly `END`, and — unlike `B:` — that terminating `END` is **consumed,
+  not rendered**:
+
+  ```text
+  CODE:
+  CREATE FUNCTION f() RETURNS trigger AS $$
+  BEGIN
+      IF NEW.x IS NULL THEN
+          RAISE EXCEPTION 'no';
+      END IF;
+      RETURN NEW;
+  END;
+  $$ LANGUAGE plpgsql;
+  END
+  ```
+
+  Lines that merely start with `END` — `END;`, `END IF;`, `END LOOP;` — are
+  code and are preserved; only a bare `END` line terminates the block. Renders
+  as `\begin{verbatim}…\end{verbatim}`, identical formatting to `B:`. A missing
+  terminator is a lexer error, and a literal `\end{verbatim}` in the body is
+  rejected (same safety posture as `B:`).
+
+  `B:` remains the B-Method machine block, which renders its terminating `END`
+  on purpose (it is B-Method's own keyword); `CODE:` is the right choice for
+  general code that should not show a trailing `END`.
+
 ## [2.1.0] - 2026-07-05
 
 ### Added
