@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-07-05
+
+### Added
+
+- **`NOFUZZ:` — mark a single Z box as rendered-but-not-type-checked.** For
+  genuine Z that fuzz's grammar cannot parse — the canonical case being numeric
+  exponentiation `n^2`, which the Z toolkit has no operator for (fuzz reads `^`
+  as *relational iteration*, so `n = n^2` with `n : N` is a type error even
+  though it is the intended mathematics). Syntax is a one-line modifier prefix
+  carrying a mandatory reason:
+
+  ```text
+  NOFUZZ: fuzz reads ^ as relational iteration, not exponentiation
+  axdef
+    square : N -> N
+  where
+    forall n : N | square(n) = n^2
+  end
+  ```
+
+  The box renders **visually identical to the checked box of the same kind** —
+  no banner, no special frame — with one mandatory, non-suppressible italic note
+  directly beneath it: `† not type-checked — <reason>`. fuzz skips the box
+  entirely (it is emitted in a fuzz-invisible twin environment —
+  `axdefnofuzz` / `zednofuzz` / `schemanofuzz`), so the rest of the document
+  still type-checks.
+- **Reject-if-clean lint.** `NOFUZZ:` is only for content fuzz genuinely cannot
+  check. If the wrapped content type-checks cleanly, the build fails
+  (`NOFUZZ block at line N type-checks cleanly under fuzz — use a plain box
+  instead`), so a `NOFUZZ:` waiver cannot paper over a real error.
+- Supported box kinds: `axdef`, `schema`, and `zed`-paragraphs (abbreviations,
+  given sets, free types). `gendef` is deferred — marking one raises a clear
+  "not yet implemented" error rather than emitting an undefined environment.
+
 ## [2.0.5] - 2026-07-05
 
 ### Fixed

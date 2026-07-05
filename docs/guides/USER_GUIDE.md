@@ -18,7 +18,8 @@ txt2tex emits standard LaTeX, so you can take any `.tex` file to Overleaf or you
 10. [Functions](#functions)
 11. [Sequences](#sequences)
 12. [Schema Notation](#schema-notation)
-13. [Proof Trees](#proof-trees)
+13. [NOFUZZ — Marking Content Fuzz Can't Check](#nofuzz--marking-content-fuzz-cant-check)
+14. [Proof Trees](#proof-trees)
 
 ---
 
@@ -1972,6 +1973,9 @@ R^n              →  Rⁿ          [n-fold relation composition]
 
 - Manual multiplication: `x * x` for x², `x * x * x` for x³
 - Define a pow function (see examples/06_definitions/pow_function.txt)
+- If you need `n^2` to appear literally (e.g. teaching material that must
+  show the exponent), mark the box with `NOFUZZ:` — see
+  [NOFUZZ — Marking Content Fuzz Can't Check](#nofuzz--marking-content-fuzz-cant-check)
 
 **Common mistake:**
 
@@ -2739,6 +2743,161 @@ remains a declaration separator — this is unchanged.
 
 ---
 
+## NOFUZZ — Marking Content Fuzz Can't Check
+
+Some genuine Z can't be parsed by the fuzz typechecker. The clearest
+example is numeric exponentiation: Z has no `^` operator for arithmetic.
+fuzz reads `^` as *relational iteration* (`R^n`, applying a relation to
+itself `n` times), so `n = n^2` with `n : N` fails as a type error even
+though it's exactly the arithmetic you meant.
+
+`NOFUZZ:` marks a single box — an `axdef`, `schema`, or a
+`zed`-producing paragraph (given set, free type, abbreviation) — as
+**rendered but deliberately not type-checked**. Use it only when the
+content is genuinely correct Z that fuzz's grammar can't express — not
+as a way to hide a real mistake (see [Reject-if-clean](#reject-if-clean),
+below).
+
+### Syntax
+
+`NOFUZZ:` is a one-line modifier immediately before the box it applies
+to. The reason is mandatory and runs to the end of the line:
+
+```text
+NOFUZZ: <reason>
+<axdef | schema | given set | free type | abbreviation>
+```
+
+### Example
+
+Input:
+
+```text
+NOFUZZ: fuzz reads ^ as relational iteration, not exponentiation
+axdef
+  square : N -> N
+where
+  forall n : N | square(n) = n^2
+end
+```
+
+Run `txt2tex file.txt --tex-only` and the box comes out as:
+
+```latex
+\begin{axdefnofuzz}{fuzz reads \textasciicircum{} as relational iteration, not exponentiation}
+square : \nat \fun \nat
+\where
+\forall n : \nat @ square(n) = n \bsup 2 \esup
+\end{axdefnofuzz}
+```
+
+A schema works the same way — `NOFUZZ:` immediately before `schema
+Squarer` produces `\begin{schemanofuzz}{Squarer}{<reason>}...
+\end{schemanofuzz}`:
+
+```text
+NOFUZZ: fuzz reads ^ as relational iteration, not exponentiation
+schema Squarer
+  n, result : N
+where
+  result = n^2
+end
+```
+
+```latex
+\begin{schemanofuzz}{Squarer}{fuzz reads \textasciicircum{} as relational iteration, not exponentiation}
+n : \nat \\
+result : \nat
+\where
+result = n \bsup 2 \esup
+\end{schemanofuzz}
+```
+
+An abbreviation, given set, or free type all render into `zednofuzz`
+instead of `zed`:
+
+```text
+NOFUZZ: same reason, abbreviation form
+squares == { n : N | n = n^2 }
+```
+
+```latex
+\begin{zednofuzz}{same reason, abbreviation form}
+squares == \{~ n : \nat | n = n \bsup 2 \esup ~\}
+\end{zednofuzz}
+```
+
+### How it renders
+
+The box is **visually identical to the checked box of the same kind** —
+same rules, same shape, same indentation. There is no banner and no
+special frame. The only mark is one line directly beneath the box:
+
+```text
+† not type-checked — fuzz reads ^ as relational iteration, not exponentiation
+```
+
+"not type-checked" is fixed text; only the reason after the dash comes
+from your `NOFUZZ:` line. This note is mandatory — there is no flag or
+option that suppresses it.
+
+fuzz never sees the box: `axdefnofuzz` / `schemanofuzz` / `zednofuzz`
+are environment names outside the literal set fuzz's typechecker scans
+for (`\begin{axdef}`, `\begin{schema}`, `\begin{zed}`, ...), so it skips
+the box entirely and the rest of the document still type-checks.
+
+### Reject-if-clean
+
+NOFUZZ exists for content fuzz genuinely cannot check — not as a
+shortcut past a real type error. If the box you wrap actually
+type-checks fine on its own, the build **fails**:
+
+```text
+Error: NOFUZZ block at line 4 type-checks cleanly under fuzz — use a plain box instead; NOFUZZ is only for content fuzz genuinely cannot check.
+```
+
+For example, wrapping a correct axdef that fuzz would happily accept
+unwrapped:
+
+```text
+NOFUZZ: this is actually fine, mislabeled on purpose
+axdef
+  double : N -> N
+where
+  forall n : N | double(n) = n + n
+end
+```
+
+produces exactly that error and exit code 1 — the build stops rather
+than shipping a mislabeled waiver.
+
+### Supported box kinds
+
+| Box kind | Supported | Rendered as |
+|---|---|---|
+| `axdef` | Yes | `axdefnofuzz` |
+| `schema` | Yes | `schemanofuzz` |
+| Given set / free type / abbreviation | Yes | `zednofuzz` |
+| `gendef` | Not yet | Errors: `gendefnofuzz not yet implemented — mark support pending (NOFUZZ cannot be applied to a gendef block)` |
+
+### Limitations
+
+- **A name declared inside a NOFUZZ box is invisible to fuzz.** The
+  `*nofuzz` environment is skipped by fuzz's scanner, so any name the box
+  declares (a function, a given set) is not known to the type-checker. If a
+  *checked* box then references that name, fuzz reports it as undeclared and
+  the build fails. Use the **axdef bridge**: declare the name's *type* in a
+  plain (checked) `axdef`, and put only the genuinely uncheckable predicate
+  under `NOFUZZ:`. That way the name is visible to fuzz and the offending
+  predicate is still waived.
+- These uses are rejected with a clear error, not silently mishandled:
+  generic parameters on the marked box; `NOFUZZ:` under `--zed` (zed-cm mode
+  does no type-checking); stacking `NOFUZZ:` twice; and `NOFUZZ:` on a
+  relational-algebra abbreviation (already display-math, so nothing to
+  waive).
+
+---
+
 ## Proof Trees
 
 Natural deduction proofs using indentation-based syntax. For a
@@ -3456,6 +3615,9 @@ R^{n+1}          →  Rⁿ⁺¹        [braces group multi-char superscripts]
 
 - Use manual multiplication: `x * x` for x², `x * x * x` for x³
 - Define a `pow` function (see examples/06_definitions/pow_function.txt)
+- If the literal `n^2` form is what you need on the page, mark the box
+  with `NOFUZZ:` — see
+  [NOFUZZ — Marking Content Fuzz Can't Check](#nofuzz--marking-content-fuzz-cant-check)
 
 **Why this limitation exists:** Fuzz's `\bsup...\esup` command is specifically for the `iter` operator, which applies a relation to itself n times. It expects a relation type, not a number type. See the Z Reference Manual section on `iter` for details.
 

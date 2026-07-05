@@ -2,13 +2,20 @@
 
 from __future__ import annotations
 
+import dataclasses
 from typing import ClassVar
 
 from txt2tex.ast_nodes import (
+    Abbreviation,
+    AxDef,
     Declaration,
     Document,
     DocumentItem,
     Expr,
+    FreeType,
+    GenDef,
+    GivenType,
+    Schema,
     SchemaInclusion,
     TitleMetadata,
 )
@@ -451,6 +458,7 @@ class Parser(
             TokenType.AXDEF,
             TokenType.GENDEF,
             TokenType.ZED,
+            TokenType.NOFUZZ,
             TokenType.SCHEMA,
             TokenType.SYNTAX,
             TokenType.PROOF,
@@ -480,6 +488,8 @@ class Parser(
             return self._parse_gendef()
         if self._match(TokenType.ZED):
             return self._parse_zed()
+        if self._match(TokenType.NOFUZZ):
+            return self._parse_nofuzz_modifier()
         if self._match(TokenType.SCHEMA):
             return self._parse_schema()
         if self._match(TokenType.SYNTAX):
@@ -861,3 +871,60 @@ class Parser(
                 depth -= 1
             offset += 1
         return self._peek_ahead(offset).type == TokenType.DEFS
+
+    def _parse_nofuzz_modifier(self) -> DocumentItem:
+        """Parse a NOFUZZ: <reason> modifier onto the next box paragraph.
+
+        ``NOFUZZ:`` is a one-line prefix (the lexer already validated the
+        reason is non-empty) -- not a block of its own.  The immediately
+        following construct is parsed through its ordinary grammar
+        (``_parse_axdef``, ``_parse_given_type``, ...) via the normal
+        ``_parse_document_item`` dispatch, then re-stamped with
+        ``nofuzz_reason`` via ``dataclasses.replace``.  This makes NOFUZZ
+        content accept exactly what the equivalent checked box accepts,
+        with identical downstream rendering except for the wrapper.
+
+        The per-type ``isinstance`` branches below are also the allow-list:
+        GivenType/FreeType/Abbreviation are the "zed-producing" items that
+        consolidate into a `zed` box; AxDef/Schema/GenDef are boxes in
+        their own right.  Anything else (prose, a bare predicate, a proof
+        tree, ...) is inline/non-boxed content NOFUZZ cannot waive, and
+        falls through to the error.  (Each branch calls ``dataclasses.replace``
+        on a concretely-typed local rather than the ``DocumentItem`` union
+        so mypy can validate the ``nofuzz_reason`` keyword.)
+        """
+        tok = self._advance()  # Consume NOFUZZ token
+        reason = tok.value  # already validated non-empty by the lexer
+        self._skip_newlines()  # NOFUZZ: <reason> is a header line of its own
+
+        if self._at_end():
+            msg = (
+                "NOFUZZ: must be immediately followed by an axdef, schema, "
+                "gendef, given type, free type, or abbreviation"
+            )
+            raise ParserError(msg, tok)
+
+        if self._current().type == TokenType.NOFUZZ:
+            msg = "NOFUZZ cannot be applied twice to the same box"
+            raise ParserError(msg, tok)
+
+        item = self._parse_document_item()
+        if isinstance(item, AxDef):
+            return dataclasses.replace(item, nofuzz_reason=reason)
+        if isinstance(item, Schema):
+            return dataclasses.replace(item, nofuzz_reason=reason)
+        if isinstance(item, GenDef):
+            return dataclasses.replace(item, nofuzz_reason=reason)
+        if isinstance(item, GivenType):
+            return dataclasses.replace(item, nofuzz_reason=reason)
+        if isinstance(item, FreeType):
+            return dataclasses.replace(item, nofuzz_reason=reason)
+        if isinstance(item, Abbreviation):
+            return dataclasses.replace(item, nofuzz_reason=reason)
+
+        msg = (
+            f"NOFUZZ: must be immediately followed by an axdef, schema, "
+            f"gendef, given type, free type, or abbreviation, not "
+            f"{type(item).__name__}"
+        )
+        raise ParserError(msg, tok)

@@ -10,6 +10,7 @@ from typing import ClassVar
 from txt2tex.__version__ import __version__
 from txt2tex.ast_nodes import (
     Abbreviation,
+    AxDef,
     BinaryOp,
     Conditional,
     Contents,
@@ -20,6 +21,7 @@ from txt2tex.ast_nodes import (
     ExtendAggregate,
     FreeType,
     FunctionApp,
+    GenDef,
     GenericInstantiation,
     GivenType,
     Group,
@@ -33,6 +35,7 @@ from txt2tex.ast_nodes import (
     RelationalImage,
     RelationRename,
     Restrict,
+    Schema,
     Section,
     SequenceLiteral,
     SetComprehension,
@@ -66,6 +69,8 @@ from txt2tex.codegen.overflow import (
     _OverflowCodegen,  # pyright: ignore[reportPrivateUsage]
 )
 from txt2tex.codegen.paragraphs import (
+    NoFuzzLintItem,
+    NoFuzzUnsupportedError,
     _ParagraphsCodegen,  # pyright: ignore[reportPrivateUsage]
 )
 from txt2tex.codegen.paren_policy import (
@@ -180,6 +185,7 @@ class LaTeXGenerator(
     _in_hidden_fuzz_block: bool
     _ra_tainted_names: set[str]
     _fuzz_declared_names: set[str]
+    nofuzz_lint_items: list[NoFuzzLintItem]
 
     def __init__(
         self,
@@ -238,6 +244,11 @@ class LaTeXGenerator(
         # to keep such names inside a fuzz-checked zed block. See
         # _is_ra_tainted.
         self._fuzz_declared_names = set()
+        # NOFUZZ-marked boxes encountered during generation, staged for the
+        # CLI's reject-if-clean lint (see NoFuzzLintItem and the
+        # nofuzz_reason handling in _generate_given_type/_generate_free_type/
+        # _generate_abbreviation/_generate_axdef/_generate_schema).
+        self.nofuzz_lint_items = []
 
     def _next_synth_name(self) -> str:
         """Generate the next synthetic abbreviation name for fuzz validation."""
@@ -282,6 +293,9 @@ class LaTeXGenerator(
         self._ra_tainted_names = set()
         self._fuzz_declared_names = set()
         self._collect_declared_and_tainted_names(items)
+        # Reset NOFUZZ lint staging so a reused generator (REPL) does not
+        # leak blocks from a previous, unrelated document.
+        self.nofuzz_lint_items = []
 
     def _iter_items_in_document_order(
         self, items: list[DocumentItem]
@@ -304,6 +318,27 @@ class LaTeXGenerator(
                 yield from self._iter_items_in_document_order(item.items)
             elif isinstance(item, Zed) and isinstance(item.content, Document):
                 yield from self._iter_items_in_document_order(item.content.items)
+
+    def _reject_nofuzz_in_zed_mode(self, items: list[DocumentItem]) -> None:
+        """Reject a NOFUZZ modifier when generating in zed-cm (``--zed``) mode.
+
+        The twin environments (``axdefnofuzz``/``zednofuzz``/``schemanofuzz``)
+        are only loaded in fuzz mode and are built on fuzz.sty primitives,
+        so emitting one under ``--zed`` yields an undefined environment.
+        zed-cm mode also runs no type-checker, so a waiver is meaningless.
+        Reject with an actionable message instead of shipping broken LaTeX.
+        """
+        if self.use_fuzz:
+            return
+        nofuzz_kinds = (AxDef, Schema, GenDef, GivenType, FreeType, Abbreviation)
+        for item in self._iter_items_in_document_order(items):
+            if isinstance(item, nofuzz_kinds) and item.nofuzz_reason is not None:
+                msg = (
+                    "NOFUZZ is a fuzz-mode feature and is not supported with "
+                    "--zed; zed-cm mode performs no type-checking, so there is "
+                    "nothing to waive."
+                )
+                raise NoFuzzUnsupportedError(msg)
 
     def _collect_declared_and_tainted_names(self, items: list[DocumentItem]) -> None:
         """Populate ``_fuzz_declared_names`` and ``_ra_tainted_names`` up front.
@@ -329,7 +364,19 @@ class LaTeXGenerator(
         ``len(abbreviations)`` — each pass either grows the (finite) tainted
         set or the loop stops.
         """
+        nofuzz_declaring_kinds = (GivenType, FreeType, AxDef, GenDef, Schema)
         for item in self._iter_items_in_document_order(items):
+            if (
+                isinstance(item, nofuzz_declaring_kinds)
+                and item.nofuzz_reason is not None
+            ):
+                # A NOFUZZ box is skipped by fuzz's scanner, so the names it
+                # introduces are invisible to the type-checker.  They must not
+                # count as fuzz-declared -- otherwise a later RA reference to
+                # one would be wrongly un-tainted (the "axdef bridge" only
+                # holds for names fuzz actually sees), or a checked box would
+                # appear to have a declaration fuzz never receives.
+                continue
             self._fuzz_declared_names |= self._collect_fuzz_declared_names(item)
 
         abbreviations = [
@@ -414,22 +461,36 @@ class LaTeXGenerator(
         """Generate document items with zed environment consolidation.
 
         Groups consecutive GivenType, FreeType, and Abbreviation items
-        into a single zed environment with \\also between them.
+        into a single zed environment with \\also between them.  A
+        NOFUZZ-marked item (``nofuzz_reason is not None``) never joins a
+        consolidated run -- it renders alone, in its own ``zednofuzz`` box
+        (see ``_generate_given_type``/``_generate_free_type``/
+        ``_generate_abbreviation``), so a checked run before or after it
+        still consolidates normally.
         """
         lines: list[str] = []
         i = 0
         while i < len(items):
             item = items[i]
             # Check if this is a zed-generating item
-            if isinstance(item, (GivenType, FreeType, Abbreviation)) and not (
-                isinstance(item, Abbreviation) and self._is_ra_tainted(item.expression)
+            if (
+                isinstance(item, (GivenType, FreeType, Abbreviation))
+                and item.nofuzz_reason is None
+                and not (
+                    isinstance(item, Abbreviation)
+                    and self._is_ra_tainted(item.expression)
+                )
             ):
-                # Collect consecutive zed items (exclude RA-tainted abbreviations)
+                # Collect consecutive zed items (exclude RA-tainted
+                # abbreviations and NOFUZZ-marked items -- either one
+                # breaks the run).
                 zed_items: list[GivenType | FreeType | Abbreviation] = [item]
                 j = i + 1
                 while j < len(items):
                     next_item = items[j]
                     if not isinstance(next_item, (GivenType, FreeType, Abbreviation)):
+                        break
+                    if next_item.nofuzz_reason is not None:
                         break
                     if isinstance(next_item, Abbreviation) and self._is_ra_tainted(
                         next_item.expression
@@ -547,6 +608,7 @@ class LaTeXGenerator(
         """
         # Store document-level parts format
         self.parts_format = ast.parts_format
+        self._reject_nofuzz_in_zed_mode(ast.items)
         self._resolve_toc_depth(ast.items)
 
         # Generate all document items
@@ -589,6 +651,16 @@ class LaTeXGenerator(
         )
         if self.use_fuzz:
             lines.append(r"\usepackage{fuzz}")  # Replaces zed-cm (fonts/styling)
+            # NOFUZZ: provides axdefnofuzz/zednofuzz/schemanofuzz, twins of
+            # axdef/zed/schema for Z the fuzz type-checker can't parse (e.g.
+            # n = n^2). Each twin is byte-identical in shape to its checked
+            # counterpart -- no on-box mark -- plus a mandatory
+            # "not type-checked" note line below the box; see zednofuzz.sty
+            # for why the env names (not "axdef"/"zed"/"schema") keep fuzz's
+            # structural scanner from descending into them. Fuzz-mode only:
+            # the fuzz binary is only invoked when not args.zed (see
+            # cli.py), so zed-cm mode has no need of it.
+            lines.append(r"\usepackage{zednofuzz}")
         else:
             lines.append(r"\usepackage{zed-cm}")  # Computer Modern fonts/styling
         lines.append(r"\usepackage{schemapk}")  # schemapk env for PK underlines
@@ -642,6 +714,7 @@ class LaTeXGenerator(
         if isinstance(ast, Document):
             # Store document-level parts format
             self.parts_format = ast.parts_format
+            self._reject_nofuzz_in_zed_mode(ast.items)
             self._resolve_toc_depth(ast.items)
             # Multi-line document: generate each item
             # Consolidate consecutive zed environments

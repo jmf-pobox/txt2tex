@@ -1076,9 +1076,16 @@ class InfruleBlock(ASTNode):
 
 @dataclass(frozen=True)
 class GivenType(ASTNode):
-    """Given type declaration (given A, B, C)."""
+    """Given type declaration (given A, B, C).
+
+    ``nofuzz_reason``, when set, marks this given type as preceded by a
+    ``NOFUZZ: <reason>`` modifier: it renders in a ``zednofuzz`` box
+    instead of ``zed`` and is exempt from fuzz type-checking (jms-settled
+    design; see the NOFUZZ feature).
+    """
 
     names: list[str]
+    nofuzz_reason: str | None = None
 
 
 @dataclass(frozen=True)
@@ -1115,6 +1122,7 @@ class FreeType(ASTNode):
 
     name: str
     branches: list[FreeBranch]  # List of constructor branches
+    nofuzz_reason: str | None = None  # See GivenType.nofuzz_reason
 
 
 @dataclass(frozen=True)
@@ -1171,6 +1179,7 @@ class Abbreviation(ASTNode):
     name: str
     expression: Expr
     generic_params: list[str] | None = None  # Optional generic parameters
+    nofuzz_reason: str | None = None  # See GivenType.nofuzz_reason
 
 
 @dataclass(frozen=True)
@@ -1225,6 +1234,7 @@ class AxDef(ASTNode):
     declarations: list[Declaration | SchemaInclusion]
     predicates: list[list[Expr]]  # Groups of predicates (separated by blank lines)
     generic_params: list[str] | None = None  # Optional generic parameters
+    nofuzz_reason: str | None = None  # See GivenType.nofuzz_reason
 
 
 @dataclass(frozen=True)
@@ -1241,11 +1251,16 @@ class GenDef(ASTNode):
     where
       forall x : X; y : Y @ fst(x, y) = x
     end
+
+    ``nofuzz_reason`` is accepted for grammar symmetry with AxDef/Schema,
+    but codegen rejects it: no ``gendefnofuzz`` environment exists yet
+    (see ``_generate_gendef``).
     """
 
     generic_params: list[str]  # Required generic parameters
     declarations: list[Declaration | SchemaInclusion]
     predicates: list[list[Expr]]  # Groups of predicates (separated by blank lines)
+    nofuzz_reason: str | None = None  # See GivenType.nofuzz_reason; not yet supported
 
 
 @dataclass(frozen=True)
@@ -1265,6 +1280,7 @@ class Schema(ASTNode):
     declarations: list[Declaration | SchemaInclusion]
     predicates: list[list[Expr]]  # Groups of predicates (separated by blank lines)
     generic_params: list[str] | None = None  # Optional generic parameters
+    nofuzz_reason: str | None = None  # See GivenType.nofuzz_reason
 
 
 @dataclass(frozen=True)
