@@ -88,8 +88,12 @@ def lint_nofuzz_block(item: NoFuzzLintItem) -> bool | None:
         item: The NOFUZZ box's checked-form probe, staged during codegen.
 
     Returns:
-        True if fuzz rejected the body (the waiver is justified).
-        False if fuzz accepted the body cleanly (use a plain box instead).
+        True if fuzz rejected the body with a genuine parse/type error
+            (the waiver is justified).
+        False if fuzz accepted the body cleanly, or rejected it *only* on
+            undeclared identifiers -- the probe is the box in isolation, so
+            an undeclared-name failure means the body may well be checkable
+            in context (a mislabeled waiver), not genuinely unparseable Z.
         None if the fuzz binary is not installed (lint skipped).
     """
     fuzz = shutil.which("fuzz")
@@ -124,7 +128,19 @@ def lint_nofuzz_block(item: NoFuzzLintItem) -> bool | None:
             for copied in copied_files:
                 copied.unlink(missing_ok=True)
 
-    return result.returncode != 0
+    output = f"{result.stdout}\n{result.stderr}"
+    if result.returncode == 0:
+        return False
+    # The probe is the box in isolation, so it can fail merely because it
+    # references names declared elsewhere in the document ("Identifier X is
+    # not declared") rather than because its own Z is unparseable. Only a
+    # genuine parse/type error justifies the waiver. fuzz reports every error
+    # (not just the first), so a failure whose error lines are *all*
+    # undeclared-name errors means the body is otherwise checkable in context.
+    error_lines = [ln for ln in output.splitlines() if ln.lstrip().startswith('"')]
+    if not error_lines:
+        return True
+    return any("is not declared" not in ln for ln in error_lines)
 
 
 def _check_latex_package(pdflatex: str, package: str) -> bool:
@@ -411,9 +427,9 @@ def main() -> int:
             if outcome is False:
                 print(
                     f"Error: NOFUZZ block at line {nofuzz_item.line} "
-                    "type-checks cleanly under fuzz — use a plain box "
-                    "instead; NOFUZZ is only for content fuzz genuinely "
-                    "cannot check.",
+                    "type-checks cleanly (or fails only on names declared "
+                    "elsewhere in the document) — use a plain box instead; "
+                    "NOFUZZ is only for content fuzz genuinely cannot parse.",
                     file=sys.stderr,
                 )
                 return 1

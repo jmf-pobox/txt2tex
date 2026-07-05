@@ -390,7 +390,30 @@ def test_cli_build_fails_when_nofuzz_content_is_clean(
         result = main()
     assert result == 1
     captured = capsys.readouterr()
-    assert "type-checks cleanly under fuzz" in captured.err
+    assert "type-checks cleanly" in captured.err
+    assert "use a plain box instead" in captured.err
+
+
+@pytest.mark.skipif(not _fuzz_available(), reason="fuzz binary not installed")
+def test_cli_build_fails_when_nofuzz_probe_fails_only_on_undeclared_names(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A mislabeled waiver whose isolated probe fails only on undeclared names
+    (checkable once the earlier given is in scope) must still be rejected —
+    an undeclared-name failure is not genuine unparseability."""
+    input_file = tmp_path / "context_nofuzz.txt"
+    # `foo` is fully checkable given `T`; the probe omits `given T`, so fuzz
+    # fails only with "Identifier T is not declared". This is a mislabel.
+    input_file.write_text(
+        "given T\n\n"
+        "NOFUZZ: mislabeled — this is checkable once T is in scope\n"
+        "axdef\n  foo : T -> T\nwhere\n  forall x : T | foo(x) = x\nend\n"
+    )
+    with patch.object(sys, "argv", ["txt2tex", str(input_file), "--tex-only"]):
+        result = main()
+    assert result == 1
+    captured = capsys.readouterr()
+    assert "declared elsewhere" in captured.err
     assert "use a plain box instead" in captured.err
 
 
