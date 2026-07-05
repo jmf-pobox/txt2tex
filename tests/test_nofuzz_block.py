@@ -529,3 +529,13 @@ def test_consecutive_nofuzz_raises_parser_error() -> None:
     with pytest.raises(ParserError) as exc_info:
         _lex_and_parse(source)
     assert "twice" in str(exc_info.value)
+
+
+def test_nofuzz_on_relational_algebra_abbreviation_raises() -> None:
+    """RA abbreviations render as display math outside any box; fuzz never
+    checks them, so a NOFUZZ waiver has nothing to waive -- reject rather
+    than silently drop the note (the RA branch used to ignore the modifier)."""
+    doc = _parse("NOFUZZ: fuzz reads ^ as iteration\nR == S join T\n")
+    with pytest.raises(NoFuzzUnsupportedError) as exc_info:
+        LaTeXGenerator(use_fuzz=True).generate_document(doc)
+    assert "relational-algebra" in str(exc_info.value)

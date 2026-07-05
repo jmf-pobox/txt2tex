@@ -368,6 +368,18 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         else:
             abbrev = f"{name_latex} == {expr_latex}"
 
+        # A relational-algebra RHS is already emitted as display math outside
+        # any Z environment (fuzz never checks it, and RA is barred from a
+        # box), so a NOFUZZ waiver has nothing to waive -- reject rather than
+        # silently drop the note and the reject-if-clean probe.
+        if is_relational_rhs and node.nofuzz_reason is not None:
+            msg = (
+                "NOFUZZ cannot be applied to a relational-algebra abbreviation "
+                "— RA is rendered as display math outside any fuzz-checked box, "
+                "so there is nothing to waive."
+            )
+            raise NoFuzzUnsupportedError(msg)
+
         # Pick the wrapping based on RHS content
         if is_relational_rhs:
             # Dual-emit for binding set comprehensions: hidden copy with
