@@ -1,9 +1,9 @@
 // ============================================================================
 // Example: Schema Renaming (Z RM §3.11)
 // ============================================================================
-// Demonstrates schema renaming: S[old/new, ...] renames components of schema S.
+// Demonstrates schema renaming: S[new/old, ...] renames components of schema S.
 //
-// Renders as S[old/new, ...] in math mode — brackets and slashes are literal.
+// Renders as S[new/old, ...] in math mode — brackets and slashes are literal.
 // Disambiguation from generic instantiation S[X] uses a depth-0 scan for /
 // inside the brackets before committing to either interpretation.
 // ============================================================================
@@ -11,7 +11,7 @@
 === Schema Renaming ===
 
 TEXT: Schema renaming lets you create a version of an existing schema
-TEXT: with some component names changed.  The notation S[old/new] is
+TEXT: with some component names changed.  The notation S[new/old] is
 TEXT: per Z RM §3.11.
 
 schema Counter
@@ -22,7 +22,7 @@ end
 
 TEXT: Single rename: produce a Counter with component ''count'' renamed to ''n''.
 
-CounterN defs Counter[count/n]
+CounterN defs Counter[n/count]
 
 TEXT: Multiple renames in one step:
 
@@ -43,10 +43,11 @@ TEXT: the primed schema S', not the result of renaming then priming.
 Op2 defs Counter[count'/count]
 
 TEXT: In an operation schema context, this captures the after-state renaming:
-TEXT: the primed component count' is renamed back to count in the view.
+TEXT: the existing component count is renamed to the primed component count'
+TEXT: in the view.
 
 === Decorated Component Names ===
 
 TEXT: The rename pairs themselves may carry decoration.
 
-CounterOp defs Counter[count'/n]
+CounterOp defs Counter[count'/count]

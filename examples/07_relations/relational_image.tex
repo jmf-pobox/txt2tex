@@ -56,6 +56,12 @@ $(R \inv \limg S \rimg)$
 \subsection*{Example 6 : Set comprehension with relational image ( Solution 35 pattern )}
 \addcontentsline{toc}{subsection}{Example 6 : Set comprehension with relational image ( Solution 35 pattern )}
 
+\begin{zed}[Person]\end{zed}
+
+\begin{axdef}
+parentOf : Person \rel Person
+\end{axdef}
+
 \setbox0=\vbox{%
 \begin{zed}
 zS_1 == \{~ p : Person | p \in \dom parentOf @ (p, (parentOf \limg \{p\} \rimg)) ~\}

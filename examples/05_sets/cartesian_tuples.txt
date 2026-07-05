@@ -9,7 +9,7 @@
 //
 // Features:
 //   - Basic form: { x : N | x > 0 }
-//   - Expression form: { x : N | x > 0 . x^2 }
+//   - Expression form: { x : N | x > 0 . x * x }
 //   - Multi-variable: { x, y : N | x = y }
 //   - No domain: { x | x elem A }
 //
@@ -33,7 +33,9 @@ TEXT: Multi variable set
 (c)
 TEXT: Set without domain
 
-{ x | x elem A }
+given A
+
+{ x : A | x elem A }
 
 
 ** Example 2: Set by Expression **
@@ -41,7 +43,7 @@ TEXT: Set without domain
 (a)
 TEXT: Set comprehension with expression part
 
-{ x : N | x > 0 . x^2 }
+{ x : N | x > 0 . x * x }
 
 (b)
 TEXT: Combining set comprehension with quantifier

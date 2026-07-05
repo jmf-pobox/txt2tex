@@ -60,13 +60,15 @@ $\{~ x, y : \nat | x = y ~\}$
 
 \bigskip
 
+\begin{zed}[A]\end{zed}
+
 \setbox0=\vbox{%
 \begin{zed}
-zS_3 == \{~ x | x \in A ~\}
+zS_3 == \{~ x : A | x \in A ~\}
 \end{zed}%
 }
 \noindent
-$\{~ x | x \in A ~\}$
+$\{~ x : A | x \in A ~\}$
 
 
 \subsection*{Example 2 : Set by Expression}
@@ -81,11 +83,11 @@ $\{~ x | x \in A ~\}$
 
 \setbox0=\vbox{%
 \begin{zed}
-zS_4 == \{~ x : \nat | x > 0 @ x \bsup 2 \esup ~\}
+zS_4 == \{~ x : \nat | x > 0 @ x * x ~\}
 \end{zed}%
 }
 \noindent
-$\{~ x : \nat | x > 0 @ x \bsup 2 \esup ~\}$
+$\{~ x : \nat | x > 0 @ x * x ~\}$
 
 
 \medskip

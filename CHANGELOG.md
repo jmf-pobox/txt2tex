@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.5] - 2026-07-05
+
+### Fixed
+
+- **`o9` (relational composition) rendered `\semi` instead of `\comp` inside a
+  consolidated `zed` box.** A top-level abbreviation such as `f == g o9 h` that
+  got consolidated into a shared `\begin{zed}` box generated its expression with
+  `_in_z_paragraph=False` — the consolidation renderer (`_generate_zed_content`)
+  never set the Z-paragraph flag, so `o9` fell through to the display-math form
+  `\semi`, which fuzz rejects for function/relation composition (`\semi` is
+  schema-only). `_generate_zed_content` now sets the context, so `o9` correctly
+  emits `\comp` and type-checks. Surfaced by a fuzz-check sweep of the examples.
+- **Three examples were not fuzz-checkable; now fixed:** `cartesian_tuples`
+  (bare set-comprehension binder `{ x | … }` → typed `{ x : T | … }`, and a
+  misused `x^2` → `x*x`), `relational_image` (undeclared `Person`/`parentOf` →
+  declared), and `schema_rename` (rename brackets were `[old/new]`; Z RM §3.11
+  and fuzz require `[new/old]` — inverted the pairs and the backwards
+  explanatory comments).
+
 ## [2.0.4] - 2026-07-04
 
 ### Fixed

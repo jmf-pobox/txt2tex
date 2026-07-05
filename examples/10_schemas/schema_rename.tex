@@ -14,7 +14,7 @@
 \section*{Schema Renaming}
 \addcontentsline{toc}{section}{Schema Renaming}
 
-\noindent Schema renaming lets you create a version of an existing schema with some component names changed.  The notation S[old/new] is per Z RM §3.11.
+\noindent Schema renaming lets you create a version of an existing schema with some component names changed.  The notation S[new/old] is per Z RM §3.11.
 
 \bigskip
 
@@ -29,7 +29,7 @@ count \geq 0
 \bigskip
 
 \begin{zed}
-CounterN \defs Counter[count/n]
+CounterN \defs Counter[n/count]
 \end{zed}
 
 \noindent Multiple renames in one step:
@@ -60,7 +60,7 @@ SwappedPoint \defs Point[x/y, y/x]
 Op2 \defs Counter[count'/count]
 \end{zed}
 
-\noindent In an operation schema context, this captures the after-state renaming: the primed component count' is renamed back to count in the view.
+\noindent In an operation schema context, this captures the after-state renaming: the existing component count is renamed to the primed component count' in the view.
 
 \bigskip
 
@@ -72,7 +72,7 @@ Op2 \defs Counter[count'/count]
 \bigskip
 
 \begin{zed}
-CounterOp \defs Counter[count'/n]
+CounterOp \defs Counter[count'/count]
 \end{zed}
 
 \end{document}
