@@ -2880,6 +2880,22 @@ than shipping a mislabeled waiver.
 | Given set / free type / abbreviation | Yes | `zednofuzz` |
 | `gendef` | Not yet | Errors: `gendefnofuzz not yet implemented — mark support pending (NOFUZZ cannot be applied to a gendef block)` |
 
+### Limitations
+
+- **A name declared inside a NOFUZZ box is invisible to fuzz.** The
+  `*nofuzz` environment is skipped by fuzz's scanner, so any name the box
+  declares (a function, a given set) is not known to the type-checker. If a
+  *checked* box then references that name, fuzz reports it as undeclared and
+  the build fails. Use the **axdef bridge**: declare the name's *type* in a
+  plain (checked) `axdef`, and put only the genuinely uncheckable predicate
+  under `NOFUZZ:`. That way the name is visible to fuzz and the offending
+  predicate is still waived.
+- These uses are rejected with a clear error, not silently mishandled:
+  generic parameters on the marked box; `NOFUZZ:` under `--zed` (zed-cm mode
+  does no type-checking); stacking `NOFUZZ:` twice; and `NOFUZZ:` on a
+  relational-algebra abbreviation (already display-math, so nothing to
+  waive).
+
 ---
 
 ## Proof Trees

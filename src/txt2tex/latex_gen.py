@@ -364,7 +364,19 @@ class LaTeXGenerator(
         ``len(abbreviations)`` — each pass either grows the (finite) tainted
         set or the loop stops.
         """
+        nofuzz_declaring_kinds = (GivenType, FreeType, AxDef, GenDef, Schema)
         for item in self._iter_items_in_document_order(items):
+            if (
+                isinstance(item, nofuzz_declaring_kinds)
+                and item.nofuzz_reason is not None
+            ):
+                # A NOFUZZ box is skipped by fuzz's scanner, so the names it
+                # introduces are invisible to the type-checker.  They must not
+                # count as fuzz-declared -- otherwise a later RA reference to
+                # one would be wrongly un-tainted (the "axdef bridge" only
+                # holds for names fuzz actually sees), or a checked box would
+                # appear to have a declaration fuzz never receives.
+                continue
             self._fuzz_declared_names |= self._collect_fuzz_declared_names(item)
 
         abbreviations = [

@@ -539,3 +539,26 @@ def test_nofuzz_on_relational_algebra_abbreviation_raises() -> None:
     with pytest.raises(NoFuzzUnsupportedError) as exc_info:
         LaTeXGenerator(use_fuzz=True).generate_document(doc)
     assert "relational-algebra" in str(exc_info.value)
+
+
+def test_nofuzz_declared_names_are_not_fuzz_visible() -> None:
+    """A name declared in a NOFUZZ box must not enter _fuzz_declared_names.
+
+    The *nofuzz environment is skipped by fuzz's scanner, so its declared
+    names are invisible to the type-checker; treating them as fuzz-declared
+    would wrongly un-taint later RA references or make a checked box look as
+    if fuzz had seen the declaration. The identical checked axdef DOES declare
+    the name -- the contrast is the whole point.
+    """
+    nofuzz_src = (
+        "NOFUZZ: fuzz reads ^ as iteration\n"
+        "axdef\n  square : N -> N\nwhere\n  forall n : N | square(n) = n^2\nend\n"
+    )
+    gen = LaTeXGenerator(use_fuzz=True)
+    gen.generate_document(_parse(nofuzz_src))
+    assert "square" not in gen._fuzz_declared_names
+
+    checked_src = "axdef\n  square : N -> N\nwhere\n  square(0) = 0\nend\n"
+    checked_gen = LaTeXGenerator(use_fuzz=True)
+    checked_gen.generate_document(_parse(checked_src))
+    assert "square" in checked_gen._fuzz_declared_names
