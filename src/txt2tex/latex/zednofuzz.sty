@@ -94,10 +94,11 @@
 
 % \@nfreason#1 -- the mandatory note line. Fixed phrase "not
 % type-checked" plus the reason argument; \footnotesize italic;
-% directly below the box (no \par before it, so no blank line is
-% inserted between the box and the note), indented to \zedindent so
-% its left edge lines up with the box above it. Not gated by any
-% option or flag -- always renders.
+% directly below the box. The leading \par ends the box's display and
+% starts the note on the next line without adding vertical space, so
+% no blank line appears between the box and the note. Indented to
+% \zedindent so its left edge lines up with the box above it. Not
+% gated by any option or flag -- always renders.
 \def\@nfreason#1{%
   \par\noindent\hskip\zedindent
   {\footnotesize\itshape$\dagger$\ not type-checked --- #1\par}}
