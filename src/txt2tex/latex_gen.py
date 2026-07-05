@@ -122,9 +122,9 @@ class LaTeXGenerator(
         "id": r"\id",  # Identity relation
         # Set functions
         "P": r"\power",  # Power set
-        "P1": r"\power_{1}",  # Non-empty power set (braced subscript)
+        "P1": r"\power_1",  # Non-empty power set (unbraced subscript)
         "F": r"\finset",  # Finite set
-        "F1": r"\finset_{1}",  # Non-empty finite set (braced subscript)
+        "F1": r"\finset_1",  # Non-empty finite set (unbraced subscript)
         "bigcup": r"\bigcup",  # Distributed union
         "bigcap": r"\bigcap",  # Distributed intersection
         # Postfix operators - special handling needed

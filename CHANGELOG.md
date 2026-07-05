@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.4] - 2026-07-04
+
+### Fixed
+
+- **`P1`/`F1` emitted a braced subscript that fuzz rejects.** The non-empty
+  power set `P1` (ℙ₁) and non-empty finite set `F1` (𝔽₁) rendered as
+  `\power_{1}` / `\finset_{1}`; fuzz rejects a braced subscript on these macros
+  (`Syntax error at symbol "_"`), so any spec using `P1`/`F1` failed
+  type-checking and PDF generation — including the shipped example
+  `examples/06_definitions/axdef_demo`. Now emits the unbraced `\power_1` /
+  `\finset_1`, which fuzz accepts. (#93)
+- **Docs:** `examples/05_sets/README.md` still documented the pre-migration `in`
+  membership keyword (`x in A`, "membership (`in`, `notin`)"); following it
+  produced parse errors. Updated to `elem` — the current lexer keyword — keeping
+  `notin` (which is unchanged). (#94)
+
 ## [2.0.3] - 2026-07-04
 
 ### Fixed

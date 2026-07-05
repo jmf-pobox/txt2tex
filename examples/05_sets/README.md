@@ -5,7 +5,7 @@ This directory contains examples for Lecture 5, covering sets, types, and set op
 ## Topics Covered
 
 - Set literals and notation
-- Set membership (`in`, `notin`)
+- Set membership (`elem`, `notin`)
 - Set relations (`subset`, `psubset`, `union`, `intersect`, set difference)
 - Power sets (`P`, `P1`, `F`)
 - Cardinality (`#`)
@@ -19,7 +19,7 @@ This directory contains examples for Lecture 5, covering sets, types, and set op
 
 ```text
 {1, 2, 3}            →  {1, 2, 3}       [set literal]
-x in A               →  x ∈ A           [membership]
+x elem A             →  x ∈ A           [membership]
 A subset B           →  A ⊆ B           [subset]
 A union B            →  A ∪ B           [union]
 A intersect C        →  A ∩ C           [intersection]
