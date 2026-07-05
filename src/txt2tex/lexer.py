@@ -1344,53 +1344,25 @@ class Lexer:
 
         # Check for B: keyword — B-machine verbatim block.
         # Consume body lines verbatim until a line that is exactly "END" at
-        # column 0 (no leading whitespace, optional trailing newline).
-        # The END line itself is included in the body.
+        # column 0 (no leading whitespace, optional trailing newline). The
+        # END line itself is included in the body: in B-Method, END is the
+        # machine's own keyword, not a delimiter txt2tex invented.
         if value == "B" and self._current_char() == ":":
             self._advance()  # consume ':'
-            # Skip optional trailing whitespace/rest of B: line up to newline
-            while not self._at_end() and self._current_char() != "\n":
-                self._advance()
-            # Consume the newline that ends the B: line, if present
-            if not self._at_end() and self._current_char() == "\n":
-                self._advance()
-            # Slurp body lines verbatim until column-0 END
-            body_lines: list[str] = []
-            found_end = False
-            while not self._at_end():
-                # Scan one line
-                line_start = self.pos
-                while not self._at_end() and self._current_char() != "\n":
-                    self._advance()
-                # Capture the line content (without its trailing newline)
-                raw_line = self.text[line_start : self.pos]
-                # Consume the newline, if present
-                if not self._at_end() and self._current_char() == "\n":
-                    self._advance()
-                body_lines.append(raw_line)
-                # Check if this line is the terminator: exactly "END"
-                if raw_line == "END":
-                    found_end = True
-                    break
-            if not found_end:
-                raise LexerError(
-                    f"B: block opened at line {start_line} has no closing END",
-                    start_line,
-                    start_column,
-                )
-            body = "\n".join(body_lines)
-            # Reject a literal \end{verbatim} in the body: it would close the
-            # generator's verbatim env early and let arbitrary LaTeX follow.
-            # No in-band escape exists inside LaTeX verbatim; rejection is the
-            # only safe posture (djb 2026-05-22 review).
-            if "\\end{verbatim}" in body:
-                raise LexerError(
-                    f"B: block at line {start_line} contains a literal "
-                    f"'\\end{{verbatim}}' which would prematurely terminate "
-                    f"the rendered verbatim environment",
-                    start_line,
-                    start_column,
-                )
+            body = self._scan_verbatim_block(
+                "B", start_line, start_column, keep_terminator=True
+            )
+            return Token(TokenType.B_BLOCK, body, start_line, start_column)
+
+        # Check for CODE: keyword — general verbatim code fence (SQL,
+        # PL/pgSQL, etc). Shares B:'s lexing, AST node (BMachine), and
+        # rendering; the terminating END is a pure delimiter here, so it is
+        # consumed rather than rendered (unlike B:'s own END keyword).
+        if value == "CODE" and self._current_char() == ":":
+            self._advance()  # consume ':'
+            body = self._scan_verbatim_block(
+                "CODE", start_line, start_column, keep_terminator=False
+            )
             return Token(TokenType.B_BLOCK, body, start_line, start_column)
 
         # Check for NOFUZZ: keyword — a one-line modifier marking the
@@ -1630,6 +1602,71 @@ class Lexer:
 
         # Regular identifier (includes seq, seq1)
         return Token(TokenType.IDENTIFIER, value, start_line, start_column)
+
+    def _scan_verbatim_block(
+        self,
+        keyword: str,
+        start_line: int,
+        start_column: int,
+        *,
+        keep_terminator: bool,
+    ) -> str:
+        """Slurp lines verbatim until a column-0 ``END`` line; return the body.
+
+        Shared by ``B:`` (B-machine) and ``CODE:`` (general code fence) —
+        the two differ only in whether the caller wants the literal
+        terminator line folded into the body. Assumes the opening
+        ``<keyword>:`` has already been consumed up to and including the
+        colon; this method consumes the rest of that line, then the body.
+
+        A line counts as the terminator only when it is exactly ``END``
+        (no leading/trailing text) — ``END;``, ``END IF;`` and similar are
+        ordinary body lines.
+        """
+        # Skip optional trailing whitespace/rest of the header line.
+        while not self._at_end() and self._current_char() != "\n":
+            self._advance()
+        # Consume the newline that ends the header line, if present.
+        if not self._at_end() and self._current_char() == "\n":
+            self._advance()
+
+        body_lines: list[str] = []
+        found_end = False
+        while not self._at_end():
+            line_start = self.pos
+            while not self._at_end() and self._current_char() != "\n":
+                self._advance()
+            raw_line = self.text[line_start : self.pos]
+            if not self._at_end() and self._current_char() == "\n":
+                self._advance()
+            if raw_line == "END":
+                found_end = True
+                if keep_terminator:
+                    body_lines.append(raw_line)
+                break
+            body_lines.append(raw_line)
+
+        if not found_end:
+            raise LexerError(
+                f"{keyword}: block opened at line {start_line} has no closing END",
+                start_line,
+                start_column,
+            )
+
+        body = "\n".join(body_lines)
+        # Reject a literal \end{verbatim} in the body: it would close the
+        # generator's verbatim env early and let arbitrary LaTeX follow.
+        # No in-band escape exists inside LaTeX verbatim; rejection is the
+        # only safe posture (djb 2026-05-22 review).
+        if "\\end{verbatim}" in body:
+            raise LexerError(
+                f"{keyword}: block at line {start_line} contains a literal "
+                f"'\\end{{verbatim}}' which would prematurely terminate "
+                f"the rendered verbatim environment",
+                start_line,
+                start_column,
+            )
+        return body
 
     def _scan_number(self, start_line: int, start_column: int) -> Token:
         """Scan number."""

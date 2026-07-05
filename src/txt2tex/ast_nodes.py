@@ -1380,13 +1380,17 @@ class LatexBlock(ASTNode):
 
 @dataclass(frozen=True)
 class BMachine(ASTNode):
-    """B-machine verbatim block (B: ... END).
+    """Verbatim block backing both ``B:`` and ``CODE:``.
 
-    Body text is passed verbatim inside a LaTeX verbatim environment.
-    The body includes the terminating END line; indentation is preserved.
+    Body text is passed verbatim inside a LaTeX verbatim environment;
+    indentation is preserved. The two directives differ only in the
+    terminating ``END`` line: ``B:`` (a B-Method machine listing) keeps it
+    in the body — ``END`` is B-Method's own keyword — while ``CODE:`` (a
+    general code fence) consumes it. The lexer applies that choice, so by
+    the time the body reaches this node it is just raw verbatim text.
     """
 
-    body: str  # Raw multi-line body including the final END line
+    body: str  # Raw verbatim body (B: keeps the final END line; CODE: drops it)
 
 
 @dataclass(frozen=True)
