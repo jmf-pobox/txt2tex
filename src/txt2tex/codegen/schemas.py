@@ -205,7 +205,9 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         identifiers like S+, S*, S~ (partial support, GitHub #3 still open).
         """
         lines: list[str] = []
-        block_kind = "schemanofuzz" if node.nofuzz_reason is not None else "schema"
+        # Source-level kind for user-facing diagnostics; the emitted LaTeX
+        # environment (schema vs schemanofuzz) is chosen separately below.
+        block_kind = "schema"
 
         # Determine schema name (empty string for anonymous)
         # Process name through _generate_identifier() for compound identifiers

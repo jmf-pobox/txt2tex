@@ -166,7 +166,9 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         ``_generate_given_type`` for the identical pattern.
         """
         lines: list[str] = []
-        block_kind = "zednofuzz" if node.nofuzz_reason is not None else "zed"
+        # Source-level kind for user-facing diagnostics; the emitted LaTeX
+        # environment (zed vs zednofuzz) is chosen separately below.
+        block_kind = "zed"
 
         # Generate each branch with proper LaTeX formatting
         branch_strs: list[str] = []
@@ -426,7 +428,9 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             # Pure Z RHS — emit inside a zed paragraph for fuzz type-checking.
             # nofuzz_reason swaps the wrapper to zednofuzz and stages the
             # plain-zed probe for the CLI's reject-if-clean lint.
-            block_kind = "zednofuzz" if node.nofuzz_reason is not None else "zed"
+            # Source-level kind for user-facing diagnostics; the emitted LaTeX
+            # environment (zed vs zednofuzz) is chosen separately below.
+            block_kind = "zed"
             self._check_overflow(
                 abbrev,
                 node.line,
@@ -465,7 +469,9 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         CLI's reject-if-clean lint -- the declaration/where-clause body
         itself renders identically either way.
         """
-        block_kind = "axdefnofuzz" if node.nofuzz_reason is not None else "axdef"
+        # Source-level kind for user-facing diagnostics; the emitted LaTeX
+        # environment (axdef vs axdefnofuzz) is chosen separately below.
+        block_kind = "axdef"
         body_lines: list[str] = []
 
         # All expression generation inside this block uses Z-paragraph context so

@@ -122,6 +122,7 @@ def lint_nofuzz_block(item: NoFuzzLintItem) -> bool | None:
                 cwd=work_dir,
                 capture_output=True,
                 text=True,
+                errors="replace",
                 check=False,
             )
         finally:
