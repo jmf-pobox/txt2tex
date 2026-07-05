@@ -199,3 +199,48 @@ TEXT: The operator $o9$ is relational composition.
 """
         latex = _gen(source)
         assert r"\semi" in latex
+
+
+# ---------------------------------------------------------------------------
+# o9 inside a consolidated zed box (multiple top-level Abbreviations)
+# ---------------------------------------------------------------------------
+
+
+class TestO9InConsolidatedZedBox:
+    """Two consecutive top-level abbreviations get consolidated into one
+    ``\\begin{zed}...\\end{zed}`` box by
+    ``_generate_document_items_with_consolidation`` /
+    ``_generate_zed_content``. That path must set ``_in_z_paragraph`` the
+    same way ``_generate_zed`` (the single-item path) already does, so o9
+    still emits \\comp inside the box.
+    """
+
+    def test_o9_in_consolidated_abbreviation_emits_comp(self) -> None:
+        """o9 in a consolidated-zed abbreviation RHS emits \\comp."""
+        source = """\
+given Q
+
+axdef
+  square : Q -> Q
+  successor : Q -> Q
+where
+  true
+end
+
+squareSuccessor == square o9 successor
+
+result == square(successor)
+"""
+        latex = _gen(source)
+        assert "squareSuccessor == square \\comp successor" in latex
+        assert r"\semi" not in latex
+        # The bug lived in the *consolidation* renderer (_generate_zed_content),
+        # not the single-item _generate_zed path. Assert the two consecutive
+        # abbreviations actually consolidated into ONE zed box (\also-separated,
+        # no intervening box boundary) — otherwise this test would pass even if
+        # the consolidated path were never exercised.
+        between = latex[latex.index("squareSuccessor ==") : latex.index("result ==")]
+        assert r"\also" in between, "abbreviations did not consolidate (\\also missing)"
+        assert r"\end{zed}" not in between, (
+            "abbreviations rendered in separate zed boxes, not consolidated"
+        )

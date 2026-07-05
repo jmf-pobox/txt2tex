@@ -478,48 +478,60 @@ class LaTeXGenerator(
         if isinstance(item, GivenType):
             names_str = ", ".join(item.names)
             return f"[{names_str}]"
-        if isinstance(item, FreeType):
-            # Generate branches
-            branch_strs: list[str] = []
-            for branch in item.branches:
-                if branch.parameters is None:
-                    branch_strs.append(branch.name)
-                else:
-                    if isinstance(branch.parameters, SequenceLiteral):
-                        if branch.parameters.elements:
-                            param_expr = branch.parameters.elements[0]
-                            params_latex = self.generate_expr(param_expr)
-                            self._reject_ra_in_box(
-                                param_expr, param_expr.line, params_latex, "zed"
-                            )
-                        else:
-                            params_latex = ""
+
+        # Everything below emits into a \begin{zed}...\end{zed} box (via the
+        # caller's consolidation loop), so context-sensitive operators (e.g.
+        # o9 → \comp) must see _in_z_paragraph=True here, exactly as
+        # _generate_zed does for the non-consolidated single-item path.
+        prev_z = self._in_z_paragraph
+        self._in_z_paragraph = True
+        try:
+            if isinstance(item, FreeType):
+                # Generate branches
+                branch_strs: list[str] = []
+                for branch in item.branches:
+                    if branch.parameters is None:
+                        branch_strs.append(branch.name)
                     else:
-                        params_latex = self.generate_expr(branch.parameters)
-                        self._reject_ra_in_box(
-                            branch.parameters,
-                            branch.parameters.line,
-                            params_latex,
-                            "zed",
+                        if isinstance(branch.parameters, SequenceLiteral):
+                            if branch.parameters.elements:
+                                param_expr = branch.parameters.elements[0]
+                                params_latex = self.generate_expr(param_expr)
+                                self._reject_ra_in_box(
+                                    param_expr, param_expr.line, params_latex, "zed"
+                                )
+                            else:
+                                params_latex = ""
+                        else:
+                            params_latex = self.generate_expr(branch.parameters)
+                            self._reject_ra_in_box(
+                                branch.parameters,
+                                branch.parameters.line,
+                                params_latex,
+                                "zed",
+                            )
+                        branch_strs.append(
+                            f"{branch.name} \\ldata {params_latex} \\rdata"
                         )
-                    branch_strs.append(f"{branch.name} \\ldata {params_latex} \\rdata")
-            branches_str = " | ".join(branch_strs)
-            return f"{item.name} ::= {branches_str}"
-        # Abbreviation LHS: definition slot, not a math-mode reference.
-        # Unreachable with RA-tainted content today: the caller
-        # (_generate_document_items_with_consolidation) excludes an
-        # RA-tainted Abbreviation from the consolidated group before it
-        # ever reaches this method. Guarded anyway for uniformity with
-        # _generate_free_type -- harmless if it never fires.
-        expr_latex = self.generate_expr(item.expression)
-        self._reject_ra_in_box(item.expression, item.line, expr_latex, "zed")
-        name_latex = self._generate_identifier(
-            Identifier(line=0, column=0, name=item.name),
-        )
-        if item.generic_params:
-            params_str = ", ".join(item.generic_params)
-            return f"{name_latex}[{params_str}] == {expr_latex}"
-        return f"{name_latex} == {expr_latex}"
+                branches_str = " | ".join(branch_strs)
+                return f"{item.name} ::= {branches_str}"
+            # Abbreviation LHS: definition slot, not a math-mode reference.
+            # Unreachable with RA-tainted content today: the caller
+            # (_generate_document_items_with_consolidation) excludes an
+            # RA-tainted Abbreviation from the consolidated group before it
+            # ever reaches this method. Guarded anyway for uniformity with
+            # _generate_free_type -- harmless if it never fires.
+            expr_latex = self.generate_expr(item.expression)
+            self._reject_ra_in_box(item.expression, item.line, expr_latex, "zed")
+            name_latex = self._generate_identifier(
+                Identifier(line=0, column=0, name=item.name),
+            )
+            if item.generic_params:
+                params_str = ", ".join(item.generic_params)
+                return f"{name_latex}[{params_str}] == {expr_latex}"
+            return f"{name_latex} == {expr_latex}"
+        finally:
+            self._in_z_paragraph = prev_z
 
     def generate_fragment(self, ast: Document) -> str:
         """Generate LaTeX content without document wrapper.
