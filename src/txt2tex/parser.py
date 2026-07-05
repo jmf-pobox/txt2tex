@@ -904,6 +904,10 @@ class Parser(
             )
             raise ParserError(msg, tok)
 
+        if self._current().type == TokenType.NOFUZZ:
+            msg = "NOFUZZ cannot be applied twice to the same box"
+            raise ParserError(msg, tok)
+
         item = self._parse_document_item()
         if isinstance(item, AxDef):
             return dataclasses.replace(item, nofuzz_reason=reason)

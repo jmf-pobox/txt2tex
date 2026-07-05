@@ -11,8 +11,8 @@ from pathlib import Path
 
 from txt2tex.__version__ import __version__
 from txt2tex.codegen.paragraphs import (
-    NoFuzzGenDefNotImplementedError,
     NoFuzzLintItem,
+    NoFuzzUnsupportedError,
     RaInZedError,
 )
 from txt2tex.codegen.text_pipeline import InlineMathError
@@ -366,7 +366,7 @@ def main() -> int:
     except RaInZedError as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1
-    except NoFuzzGenDefNotImplementedError as e:
+    except NoFuzzUnsupportedError as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1
 

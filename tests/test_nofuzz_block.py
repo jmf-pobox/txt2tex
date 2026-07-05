@@ -12,6 +12,7 @@ waiver).
 
 from __future__ import annotations
 
+import dataclasses
 import shutil
 import sys
 from pathlib import Path
@@ -29,7 +30,11 @@ from txt2tex.ast_nodes import (
     Schema,
 )
 from txt2tex.cli import lint_nofuzz_block, main
-from txt2tex.codegen.paragraphs import NoFuzzGenDefNotImplementedError, NoFuzzLintItem
+from txt2tex.codegen.paragraphs import (
+    NoFuzzGenDefNotImplementedError,
+    NoFuzzLintItem,
+    NoFuzzUnsupportedError,
+)
 from txt2tex.latex_gen import LaTeXGenerator
 from txt2tex.lexer import Lexer, LexerError
 from txt2tex.parser import Parser, ParserError
@@ -79,10 +84,10 @@ def test_whitespace_only_reason_raises_lexer_error():
 
 def test_reason_is_rest_of_header_line():
     """The reason is captured verbatim to end of line -- no END, no body slurp."""
-    tokens = Lexer("NOFUZZ: fuzz reads ^ as relation iteration\ngiven A\n").tokenize()
+    tokens = Lexer("NOFUZZ: fuzz reads ^ as relational iteration\ngiven A\n").tokenize()
     nofuzz_tokens = [t for t in tokens if t.type.name == "NOFUZZ"]
     assert len(nofuzz_tokens) == 1
-    assert nofuzz_tokens[0].value == "fuzz reads ^ as relation iteration"
+    assert nofuzz_tokens[0].value == "fuzz reads ^ as relational iteration"
 
 
 # ---------------------------------------------------------------------------
@@ -469,3 +474,58 @@ def test_cli_nofuzz_lint_skipped_when_fuzz_not_installed(
     assert result == 0
     captured = capsys.readouterr()
     assert "Skipping NOFUZZ lint" in captured.err
+
+
+# ---------------------------------------------------------------------------
+# Rejections: unsupported NOFUZZ targets (generics, --zed, stacked modifiers)
+# ---------------------------------------------------------------------------
+
+
+def test_nofuzz_schema_with_generics_raises() -> None:
+    """A generic schema cannot be a NOFUZZ twin -- the env takes no generics."""
+    doc = _parse("NOFUZZ: r\nschema S[X]\n  x : X\nwhere\n  x = x\nend\n")
+    with pytest.raises(NoFuzzUnsupportedError) as exc_info:
+        LaTeXGenerator(use_fuzz=True).generate_document(doc)
+    assert "generic parameters" in str(exc_info.value)
+
+
+def test_nofuzz_axdef_with_generics_raises() -> None:
+    """A generic axdef cannot be a NOFUZZ twin -- the env takes no generics."""
+    doc = _parse("NOFUZZ: r\naxdef\n  n : N\nwhere\n  n = n\nend\n")
+    axdef = doc.items[0]
+    assert isinstance(axdef, AxDef)
+    doc.items[0] = dataclasses.replace(axdef, generic_params=["X"])
+    with pytest.raises(NoFuzzUnsupportedError) as exc_info:
+        LaTeXGenerator(use_fuzz=True).generate_document(doc)
+    assert "generic parameters" in str(exc_info.value)
+
+
+def test_nofuzz_in_zed_mode_raises() -> None:
+    """NOFUZZ has no meaning and no defined env in zed-cm (--zed) mode."""
+    doc = _parse("NOFUZZ: fuzz reads ^ as iteration\ngiven A\n")
+    with pytest.raises(NoFuzzUnsupportedError) as exc_info:
+        LaTeXGenerator(use_fuzz=False).generate_document(doc)
+    assert "--zed" in str(exc_info.value)
+
+
+def test_cli_nofuzz_zed_mode_error_surfaces_cleanly(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """--zed + NOFUZZ is one clean error, not an undefined-env LaTeX crash."""
+    input_file = tmp_path / "zed_nofuzz.txt"
+    input_file.write_text("NOFUZZ: fuzz reads ^ as iteration\ngiven A\n")
+    with patch.object(sys, "argv", ["txt2tex", str(input_file), "--zed", "--tex-only"]):
+        result = main()
+    assert result == 1
+    captured = capsys.readouterr()
+    assert "Error:" in captured.err
+    assert "--zed" in captured.err
+    assert "Traceback" not in captured.err
+
+
+def test_consecutive_nofuzz_raises_parser_error() -> None:
+    """Stacking NOFUZZ: on NOFUZZ: is rejected, not silently collapsed."""
+    source = "NOFUZZ: a\nNOFUZZ: b\naxdef\n  n : N\nwhere\n  n = n\nend\n"
+    with pytest.raises(ParserError) as exc_info:
+        _lex_and_parse(source)
+    assert "twice" in str(exc_info.value)

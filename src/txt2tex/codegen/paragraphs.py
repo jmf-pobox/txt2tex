@@ -56,7 +56,19 @@ class NoFuzzLintItem:
     probe_snippet: str
 
 
-class NoFuzzGenDefNotImplementedError(Exception):
+class NoFuzzUnsupportedError(Exception):
+    """Raised when a NOFUZZ modifier cannot be honored with valid output.
+
+    Covers the cases that have no correct rendering: a box carrying generic
+    parameters (the twin environments take no generic argument yet) and
+    zed-cm (``--zed``) mode (the twin environments are undefined there, and
+    that mode performs no type-checking, so a waiver is meaningless).
+    Codegen rejects with an actionable message rather than emit broken
+    LaTeX.
+    """
+
+
+class NoFuzzGenDefNotImplementedError(NoFuzzUnsupportedError):
     """Raised when a NOFUZZ modifier marks a ``gendef``.
 
     No ``gendefnofuzz`` LaTeX environment exists yet (unlike
@@ -533,6 +545,13 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             lines.append(r"\end{axdef}")
             lines.append("")
             return lines
+
+        if node.generic_params:
+            msg = (
+                "NOFUZZ does not support generic parameters yet — remove the "
+                "generic parameters or the NOFUZZ modifier."
+            )
+            raise NoFuzzUnsupportedError(msg)
 
         probe_snippet = "\n".join(
             [f"\\begin{{axdef}}{generics_suffix}", *body_lines, r"\end{axdef}"]

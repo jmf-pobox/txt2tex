@@ -27,7 +27,7 @@ from txt2tex.ast_nodes import (
     SchemaText,
 )
 from txt2tex.codegen._dispatch import CodegenDispatch, expr_register, item_register
-from txt2tex.codegen.paragraphs import NoFuzzLintItem
+from txt2tex.codegen.paragraphs import NoFuzzLintItem, NoFuzzUnsupportedError
 
 
 class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
@@ -337,6 +337,12 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             # NOFUZZ: fuzz never sees this box, so render once -- with PK
             # underlining if marked -- instead of the checked+rendered
             # dual-emit a plain pk-marked schema needs.
+            if node.generic_params:
+                msg = (
+                    "NOFUZZ does not support generic parameters yet — remove "
+                    "the generic parameters or the NOFUZZ modifier."
+                )
+                raise NoFuzzUnsupportedError(msg)
             probe_snippet = "\n".join(
                 [begin_schema, *plain_body, *where_lines, r"\end{schema}"]
             )
@@ -348,16 +354,9 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                 )
             )
             escaped_reason = self._escape_latex_text(node.nofuzz_reason)
-            if node.generic_params:
-                params_str = ", ".join(node.generic_params)
-                begin_schemanofuzz = (
-                    f"\\begin{{schemanofuzz}}{{{schema_name}}}{{{escaped_reason}}}"
-                    f"[{params_str}]"
-                )
-            else:
-                begin_schemanofuzz = (
-                    f"\\begin{{schemanofuzz}}{{{schema_name}}}{{{escaped_reason}}}"
-                )
+            begin_schemanofuzz = (
+                f"\\begin{{schemanofuzz}}{{{schema_name}}}{{{escaped_reason}}}"
+            )
             lines.append(begin_schemanofuzz)
             lines.extend(pk_body if pk_vars else plain_body)
             lines.extend(where_lines)

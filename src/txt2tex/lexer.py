@@ -1418,7 +1418,7 @@ class Lexer:
                 raise LexerError(
                     f"NOFUZZ: at line {start_line} has no reason — state why "
                     f"fuzz cannot check this content, e.g. "
-                    f"'NOFUZZ: fuzz reads ^ as relation iteration'",
+                    f"'NOFUZZ: fuzz reads ^ as relational iteration'",
                     start_line,
                     start_column,
                 )

@@ -10,6 +10,7 @@ from typing import ClassVar
 from txt2tex.__version__ import __version__
 from txt2tex.ast_nodes import (
     Abbreviation,
+    AxDef,
     BinaryOp,
     Conditional,
     Contents,
@@ -20,6 +21,7 @@ from txt2tex.ast_nodes import (
     ExtendAggregate,
     FreeType,
     FunctionApp,
+    GenDef,
     GenericInstantiation,
     GivenType,
     Group,
@@ -33,6 +35,7 @@ from txt2tex.ast_nodes import (
     RelationalImage,
     RelationRename,
     Restrict,
+    Schema,
     Section,
     SequenceLiteral,
     SetComprehension,
@@ -67,6 +70,7 @@ from txt2tex.codegen.overflow import (
 )
 from txt2tex.codegen.paragraphs import (
     NoFuzzLintItem,
+    NoFuzzUnsupportedError,
     _ParagraphsCodegen,  # pyright: ignore[reportPrivateUsage]
 )
 from txt2tex.codegen.paren_policy import (
@@ -314,6 +318,27 @@ class LaTeXGenerator(
                 yield from self._iter_items_in_document_order(item.items)
             elif isinstance(item, Zed) and isinstance(item.content, Document):
                 yield from self._iter_items_in_document_order(item.content.items)
+
+    def _reject_nofuzz_in_zed_mode(self, items: list[DocumentItem]) -> None:
+        """Reject a NOFUZZ modifier when generating in zed-cm (``--zed``) mode.
+
+        The twin environments (``axdefnofuzz``/``zednofuzz``/``schemanofuzz``)
+        are only loaded in fuzz mode and are built on fuzz.sty primitives,
+        so emitting one under ``--zed`` yields an undefined environment.
+        zed-cm mode also runs no type-checker, so a waiver is meaningless.
+        Reject with an actionable message instead of shipping broken LaTeX.
+        """
+        if self.use_fuzz:
+            return
+        nofuzz_kinds = (AxDef, Schema, GenDef, GivenType, FreeType, Abbreviation)
+        for item in self._iter_items_in_document_order(items):
+            if isinstance(item, nofuzz_kinds) and item.nofuzz_reason is not None:
+                msg = (
+                    "NOFUZZ is a fuzz-mode feature and is not supported with "
+                    "--zed; zed-cm mode performs no type-checking, so there is "
+                    "nothing to waive."
+                )
+                raise NoFuzzUnsupportedError(msg)
 
     def _collect_declared_and_tainted_names(self, items: list[DocumentItem]) -> None:
         """Populate ``_fuzz_declared_names`` and ``_ra_tainted_names`` up front.
@@ -571,6 +596,7 @@ class LaTeXGenerator(
         """
         # Store document-level parts format
         self.parts_format = ast.parts_format
+        self._reject_nofuzz_in_zed_mode(ast.items)
         self._resolve_toc_depth(ast.items)
 
         # Generate all document items
@@ -676,6 +702,7 @@ class LaTeXGenerator(
         if isinstance(ast, Document):
             # Store document-level parts format
             self.parts_format = ast.parts_format
+            self._reject_nofuzz_in_zed_mode(ast.items)
             self._resolve_toc_depth(ast.items)
             # Multi-line document: generate each item
             # Consolidate consecutive zed environments
