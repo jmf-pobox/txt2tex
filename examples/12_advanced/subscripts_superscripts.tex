@@ -5,6 +5,7 @@
 \usepackage{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
+\usepackage{zednofuzz}
 \usepackage{schemapk}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
@@ -89,14 +90,14 @@ $\forall i : 1 \upto n @ s\_i \in \nat$
 
 \setbox0=\vbox{%
 \begin{zed}
-zS_1 == \{~ n : \nat | n < 10 @ n \bsup 2 \esup ~\}
+zS_1 == \{~ n : \nat | n < 10 @ n * n ~\}
 \end{zed}%
 }
 \noindent
-$\{~ n : \nat | n < 10 @ n \bsup 2 \esup ~\}$
+$\{~ n : \nat | n < 10 @ n * n ~\}$
 
 
-\noindent Set of squares.
+\noindent Set of squares. Z/fuzz has no numeric exponentiation operator, so a set comprehension body writes the square as n * n rather than n\textasciicircum{}2.
 
 \bigskip
 

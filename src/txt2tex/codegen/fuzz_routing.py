@@ -41,6 +41,7 @@ from txt2tex.ast_nodes import (
     Ungroup,
 )
 from txt2tex.codegen._dispatch import CodegenDispatch
+from txt2tex.codegen.numeric_superscript import check_no_numeric_superscript
 
 
 class _FuzzRoutingCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
@@ -209,6 +210,15 @@ class _FuzzRoutingCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         Sets ``_in_hidden_fuzz_block`` so nested generators suppress
         \begin{array} wrapping that fuzz would reject.
         """
+        # This is the shared fuzz-checked-box emission point for every
+        # SetComprehension (standalone top-level, and the binding-to-tuple
+        # dual-emit for an RA abbreviation): a numeric `^` base heading in
+        # here would fuzz-misparse as relational iteration (jms ruling,
+        # fix/tests-bugs-hygiene) -- reject with a source-line error before
+        # rendering rather than let fuzz's cryptic `iter k base` surface.
+        if isinstance(expr, SetComprehension):
+            check_no_numeric_superscript(expr, {})
+
         prev_z = self._in_z_paragraph
         prev_hidden = self._in_hidden_fuzz_block
         self._in_z_paragraph = True

@@ -2361,6 +2361,22 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                     ):
                         break
 
+                    # Z RM §3.16: field selection requires the base to have a
+                    # schema (binding) type.  A bare identifier has schema type
+                    # in a schema-text body only if it is a declared variable of
+                    # the current quantifier/comprehension.  A free identifier —
+                    # e.g. the set `S` in `forall x : N | x elem S . y elem T` —
+                    # has no fields, so a spaced dot after it is the bullet
+                    # separator, not projection.  Without this guard `S . y`
+                    # reads as `S.y` because `IN`/`NOTIN` are in safe_followers.
+                    if (
+                        self._in_comprehension_body
+                        and self._dot_is_spaced(next_token)
+                        and isinstance(base, Identifier)
+                        and base.name not in self._current_quantifier_vars
+                    ):
+                        break
+
                     # Z RM §3.16: field selection requires the LHS to have a
                     # schema (binding) type.  If the identifier after `.` is itself
                     # a declared variable in the current schema-text, the period

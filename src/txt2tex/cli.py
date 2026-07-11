@@ -10,6 +10,7 @@ import tempfile
 from pathlib import Path
 
 from txt2tex.__version__ import __version__
+from txt2tex.codegen.numeric_superscript import NumericSuperscriptError
 from txt2tex.codegen.paragraphs import (
     NoFuzzLintItem,
     NoFuzzUnsupportedError,
@@ -384,6 +385,9 @@ def main() -> int:
         print(f"Error: {e}", file=sys.stderr)
         return 1
     except NoFuzzUnsupportedError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
+    except NumericSuperscriptError as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1
 

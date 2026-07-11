@@ -326,6 +326,20 @@ Do NOT use reserved words as identifiers:
 ✅ GOOD: books : F BookId
 ```
 
+This applies to **free-type constructor names** too, not just variables. The
+relational-algebra family keywords are globally reserved and cannot name a
+constructor:
+
+```text
+❌ BAD:  TreeNode ::= nil | join <<...>>   (join is the RA Join keyword)
+✅ GOOD: TreeNode ::= nil | link <<...>>
+```
+
+Relational-algebra and nested-relation keywords reserved in `lexer.py`
+(`KEYWORDS`): `sigma`, `pi`, `join`, `group`, `ungroup`, `extend`, `hide`,
+`project`, and the aggregators `Count`, `Sum`, `Avg`, `Min`, `Max`, `Median`,
+plus `as`. None may be used as an identifier or constructor name.
+
 ### Case Sensitivity
 
 All reserved words are lowercase. Capitalized versions are valid identifiers:

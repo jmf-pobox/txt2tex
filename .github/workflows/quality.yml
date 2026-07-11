@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [main]
 
+# Least privilege: no job in this workflow pushes commits, creates
+# releases, or writes packages -- read-only access to repo contents
+# is sufficient. Individual jobs may narrow this further but never
+# need to widen it.
+permissions:
+  contents: read
+
 jobs:
   quality:
     runs-on: ubuntu-latest
@@ -47,3 +54,96 @@ jobs:
 
     - name: Run tests with coverage
       run: make test-cov
+
+  fuzz-check:
+    name: fuzz type-check gate (examples/)
+    runs-on: ubuntu-latest
+
+    # Pinned to a commit SHA, not the '2022-01-01' git tag (fuzz_version
+    # 1.2.1) -- git tags are mutable at the remote (upstream can force-move
+    # or delete/recreate one), so a tag alone is not a supply-chain-safe
+    # pin. FUZZ_REF is the exact 40-char commit that '2022-01-01' pointed
+    # to when resolved via `git ls-remote`; the build step below clones
+    # and then hard-checks-out this SHA and verifies it before building.
+    # Bump this deliberately, re-resolving the SHA for a real upstream
+    # release -- never track a moving branch or tag.
+    env:
+      FUZZ_REF: "6e76ce41990c9c72ae9ee4b68e1b603f501f50a5"  # tag: 2022-01-01
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        persist-credentials: false
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.12"
+
+    - name: Install uv
+      run: pip install uv
+
+    - name: Install dependencies
+      run: uv sync --frozen --group dev
+
+    # fuzz is a standalone C typechecker (bison/flex grammar, no TeX
+    # dependency at build or run time) -- installing TeX Live here
+    # would be wasted cost since `make fuzz-check` drives
+    # `txt2tex --tex-only`, which never invokes pdflatex.
+    - name: Cache fuzz build (pinned to FUZZ_REF)
+      id: fuzz-cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.local/fuzz
+        key: fuzz-typechecker-${{ runner.os }}-${{ env.FUZZ_REF }}
+
+    - name: Install fuzz build dependencies (bison, flex, gcc)
+      if: steps.fuzz-cache.outputs.cache-hit != 'true'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bison flex build-essential
+
+    - name: Build and install fuzz typechecker (pinned to FUZZ_REF)
+      if: steps.fuzz-cache.outputs.cache-hit != 'true'
+      run: |
+        git clone https://github.com/Spivoxity/fuzz.git /tmp/fuzz-src
+        cd /tmp/fuzz-src
+        git checkout "$FUZZ_REF"
+        actual_sha="$(git rev-parse HEAD)"
+        if [ "$actual_sha" != "$FUZZ_REF" ]; then
+          echo "fuzz checkout SHA mismatch: expected $FUZZ_REF, got $actual_sha" >&2
+          exit 1
+        fi
+        ./configure --prefix="$HOME/.local/fuzz"
+        make
+        # fuzz's own `make install` only `install -d`s TEXDIR/MFDIR
+        # (root/Makefile.in); it never creates bindir/libdir, so
+        # `install src/fuzz $(bindir)` fails with "No such file or
+        # directory" on a prefix that doesn't exist yet. Pre-create
+        # every directory `make install` writes into, matching the
+        # autoconf defaults for --prefix="$HOME/.local/fuzz"
+        # (bindir=$prefix/bin, libdir=$prefix/lib,
+        # datadir=$prefix/share -> TEXDIR/MFDIR below it).
+        mkdir -p \
+          "$HOME/.local/fuzz/bin" \
+          "$HOME/.local/fuzz/lib" \
+          "$HOME/.local/fuzz/share/texmf/tex/latex" \
+          "$HOME/.local/fuzz/share/texmf/fonts/source/public/oxsz"
+        make install
+
+    - name: Add fuzz to PATH
+      run: echo "$HOME/.local/fuzz/bin" >> "$GITHUB_PATH"
+
+    - name: Verify fuzz is installed and runnable
+      # Runs unconditionally (cache-hit or fresh build) so a corrupt
+      # cache entry or an install regression fails loudly right here,
+      # not 80 examples into `make fuzz-check`. `-Dv` (not `-v`, which
+      # sets an unrelated internal vflag) makes fuzz print its version
+      # banner; stdin is redirected from /dev/null because fuzz falls
+      # through to reading the prelude from stdin when given no input
+      # files, and would otherwise hang waiting for EOF.
+      run: fuzz -Dv < /dev/null
+
+    - name: Run fuzz type-check gate over examples/
+      run: make fuzz-check

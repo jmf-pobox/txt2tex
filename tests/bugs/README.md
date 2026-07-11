@@ -64,10 +64,16 @@ All seven sub-symptoms (7.A–7.F) are fixed.
   - 7.B: Colon in prose does not trigger math-mode wrap.
   - 7.C: Math-operator keywords in bare prose are not auto-mathed.
   - 7.D: Backtick/backslash adjacency in prose does not garble.
-- **bug7e_text_dollar_backslash.txt** ✓ (7.E fixed, m-2026-05-21-009)
-  - Backslash-prefixed LaTeX commands inside `$...$` (`\Leftrightarrow`,
-    `\forall`, `\Rightarrow`, etc.) pass through verbatim without
-    re-lexing as SETMINUS + identifier.
+- **bug7e_text_dollar_backslash.txt** ⚠ **error-expected** (superseded by the
+  2.0.0 strict-`$...$` policy)
+  - The original 7.E fix (m-2026-05-21-009) passed backslash-prefixed LaTeX
+    commands inside `$...$` through verbatim. The 2.0.0 strict-`$...$` policy
+    reversed that: `$...$` now takes whiteboard notation only, and raw LaTeX
+    (`\Leftrightarrow`, `\forall`, …) is **rejected** with a diagnostic
+    directing the author to a `LATEX:` block. This fixture therefore now
+    exits non-zero **by design** — it is an error-expected test, not a
+    passing one. Run it to confirm the strict rejection still fires:
+    `Error: line 6: … $...$ takes whiteboard notation only …`.
 - **bug7f_text_colon_auto_math.txt** ✓ (7.F fixed, m-2026-05-21-009)
   - Bare colons in TEXT prose are English punctuation; the
     colon-detection heuristic (`_process_type_declarations`) has been
@@ -141,9 +147,10 @@ All feature tests pass. They document working features.
 |----------|-------|--------|
 | Active Bugs | 0 | None open |
 | Limitation Tests | 3 | Expected behavior |
-| Regression Tests | 21 | All PASS |
+| Error-Expected Tests | 1 | `bug7e` — strict-`$...$` rejection fires by design |
+| Regression Tests | 20 | All PASS |
 | Feature Tests | 7 | All PASS |
-| **Total** | **31** | **28 PASS, 3 limitations, 0 open** |
+| **Total** | **31** | **27 PASS, 3 limitations, 1 error-expected, 0 open** |
 
 ---
 
@@ -166,8 +173,20 @@ done
 
 ---
 
-**Last Updated**: 2026-07-02
+**Last Updated**: 2026-07-11 (issue #96 reconciliation)
 **Active Bugs**: 0
+**Issue #96 reconciliation**:
+
+- `regression_in_operator_multiple_nested/patterns`,
+  `regression_in_notin_operators_combined` — the `∈`/`∉`-before-`.`-bullet parse
+  failure (`x elem S . y elem T` mis-reading `S . y` as a projection) is fixed
+  in `parser_pkg/expressions.py`; these three now generate. Regression test:
+  `tests/test_bullet_vs_projection.py`.
+- `feature_bag_syntax_in_free_types` — the free-type constructor `join` collided
+  with the reserved relational-algebra `join` keyword; renamed to `link`
+  (jms ruling: `join` stays globally reserved).
+- `bug7e_text_dollar_backslash` — reclassified error-expected (see above); the
+  README previously marked it a passing 7.E fix.
 **Retracted**: bug6 (`cat` keyword) — author error; canonical concat operator is `^`
 (with leading space → CAT, no leading space → CARET/exponent per `lexer.py:691-716`).
 `cat` is not in the txt2tex grammar.

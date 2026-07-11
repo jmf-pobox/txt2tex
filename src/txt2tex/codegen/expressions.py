@@ -1227,9 +1227,16 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         # Standard ^{n} doesn't work in fuzz mode
         # This syntax works in both fuzz and zed modes
 
-        # If base is itself a superscript, wrap in braces to avoid double superscript
+        # If base is itself a superscript, wrap in VISIBLE parens -- not
+        # braces.  fuzz's grammar requires an atomic Expression0 to the
+        # left of \bsup; `{...}` is bare TeX grouping (invisible at
+        # typeset time, and fuzz's own parser rejects the literal `{`
+        # symbol), while `(...)` is both a real Z-grammar atomic group
+        # fuzz accepts and the visible parenthesisation a reader needs to
+        # see the exponent-of-exponent grouping: `(z^2)^3` must render as
+        # `(z \bsup 2 \esup) \bsup 3 \esup`, in both fuzz and --zed mode.
         if isinstance(node.base, Superscript):
-            base = f"{{{base}}}"
+            base = f"({base})"
 
         return f"{base} \\bsup {exponent} \\esup"
 

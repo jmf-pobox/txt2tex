@@ -4,10 +4,10 @@
 
 { x : N | x > 0 }
 
-{ x : N | x > 0 . x^2 }
+{ x : N | x > 0 . x * x }
 
 { x, y : N | x = y }
 
-{ x | x elem A }
+{ x : N | x elem 1 .. 10 }
 
 {1 |-> a, 2 |-> b, 3 |-> c}

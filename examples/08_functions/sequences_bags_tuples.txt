@@ -148,7 +148,7 @@ exists s : seq[N] | head s = 1
 
 (c)
 
-{ x : N | x > 0 . ⟨x, x^2⟩ }
+{ x : N | x > 0 . ⟨x, x * x⟩ }
 
 ** Example 8: Real Examples **
 

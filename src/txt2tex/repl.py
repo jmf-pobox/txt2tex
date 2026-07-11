@@ -12,6 +12,7 @@ import tempfile
 from pathlib import Path
 
 from txt2tex.ast_nodes import Document
+from txt2tex.codegen.numeric_superscript import NumericSuperscriptError
 from txt2tex.codegen.paragraphs import RaInZedError
 from txt2tex.codegen.text_pipeline import InlineMathError
 from txt2tex.compile import compile_pdf, copy_latex_files
@@ -188,6 +189,16 @@ def process_input(
         # Raised during generation, same as InlineMathError above — drop any
         # warnings accumulated before it so they do not leak into the next
         # REPL turn.
+        generator.clear_warnings()
+        print(f"Error: {e}", file=sys.stderr)
+        return False
+    except NumericSuperscriptError as e:
+        # Raised during generation (axdef/schema/gendef/abbreviation blocks
+        # -- see process_input's isinstance(ast, Document) branch above --
+        # always reach here; a bare single-line expression at the REPL
+        # prompt parses to a non-Document Expr and never does, since that
+        # path calls generate_expr directly and never enters a fuzz-checked
+        # box).  Same warning-leak concern as InlineMathError/RaInZedError.
         generator.clear_warnings()
         print(f"Error: {e}", file=sys.stderr)
         return False

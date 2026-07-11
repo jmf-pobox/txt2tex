@@ -235,3 +235,28 @@ def test_cli_ra_in_zed_error_is_clean(
     assert "Error:" in captured.err
     assert "cannot appear inside a `zed` block" in captured.err
     assert "Traceback" not in captured.err
+
+
+def test_cli_numeric_superscript_error_is_clean(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """NumericSuperscriptError from a numeric `^` base surfaces cleanly.
+
+    Regression: NumericSuperscriptError was uncaught, so running any of the
+    numeric-`^` example files printed a raw Python traceback ending in
+    `txt2tex.codegen.numeric_superscript.NumericSuperscriptError: ...`
+    instead of a clean error.  The CLI must catch it, print one
+    'Error: line N: ...' line to stderr, and return 1 -- no traceback, and
+    no exception class name leaked to stdout/stderr.
+    """
+    input_file = tmp_path / "numeric_power.txt"
+    input_file.write_text("{ n : N | n <= 4 . (n, n^2) }\n")
+    with patch.object(sys, "argv", ["txt2tex", str(input_file), "--tex-only"]):
+        result = main()
+    assert result == 1
+    captured = capsys.readouterr()
+    assert "Error: line 1:" in captured.err
+    assert "iter 2 n" in captured.err
+    assert "Traceback" not in captured.err
+    assert "NumericSuperscriptError" not in captured.err
+    assert "NumericSuperscriptError" not in captured.out
