@@ -608,6 +608,58 @@ def test_three_variable_schema_text() -> None:
 # This pins the regression at the semantic level: if the bug reappears the
 # parser would emit `d.c` again, which fuzz rejects with "Argument of
 # selection must have schema type" (Z RM §3.16).
+# ---------------------------------------------------------------------------
+# Regression (issue #96): membership / negated-membership before the bullet
+# ---------------------------------------------------------------------------
+#
+# `forall x : N | x elem S . y elem T` failed with "Expected ')'".  The free
+# identifier `S` (the RHS of the membership) was treated as a schema base, and
+# `S . y` parsed as a named-field projection because `IN`/`NOTIN` are in
+# `safe_followers`.  Per Z RM §3.16 a field selection requires the base to have
+# schema type; a free identifier that is not a declared variable of the current
+# schema-text has no fields, so the spaced dot after it is the bullet separator,
+# exactly as it is after a comparison (`x > 0 . ...`).  (jms ruling, issue #96.)
+
+
+def test_forall_elem_before_bullet_elem_body() -> None:
+    """`forall x : N | x elem S . y elem T` — membership constraint, bullet body.
+
+    Input:  forall x : N | x elem S . y elem T
+    Target: \\forall x : \\nat | x \\in S @ y \\in T
+    Actual (bug): ParserError 'Expected )' — `S . y` swallowed as projection.
+    """
+    ast = _parse_quantifier("forall x : N | x elem S . y elem T")
+    assert ast.expression is not None, (
+        "expected body 'y elem T' after bullet, got None — "
+        "membership RHS 'S' mis-parsed as projection base 'S.y'"
+    )
+    latex = _gen_expr("forall x : N | x elem S . y elem T")
+    assert r"x \in S @ y \in T" in latex, f"unexpected: {latex!r}"
+    assert "S.y" not in latex, f"projection artefact in output: {latex!r}"
+
+
+def test_forall_notin_before_bullet_notin_body() -> None:
+    """`forall x : N | x notin S . y notin T` — negated membership both sides."""
+    ast = _parse_quantifier("forall x : N | x notin S . y notin T")
+    assert ast.expression is not None, (
+        "expected body 'y notin T' after bullet, got None"
+    )
+    latex = _gen_expr("forall x : N | x notin S . y notin T")
+    assert r"x \notin S @ y \notin T" in latex, f"unexpected: {latex!r}"
+    assert "S.y" not in latex, f"projection artefact in output: {latex!r}"
+
+
+def test_forall_elem_before_bullet_notin_body() -> None:
+    """`forall x : N | x elem S . y notin T` — mixed membership then negation."""
+    ast = _parse_quantifier("forall x : N | x elem S . y notin T")
+    assert ast.expression is not None, (
+        "expected body 'y notin T' after bullet, got None"
+    )
+    latex = _gen_expr("forall x : N | x elem S . y notin T")
+    assert r"x \in S @ y \notin T" in latex, f"unexpected: {latex!r}"
+    assert "S.y" not in latex, f"projection artefact in output: {latex!r}"
+
+
 @pytest.mark.skipif(not _fuzz_available(), reason="fuzz binary not on PATH")
 def test_fuzz_accepts_fixed_bullet_output(tmp_path: Path) -> None:
     """Fuzz accepts the fixed LaTeX for the canonical bullet disambiguation input.

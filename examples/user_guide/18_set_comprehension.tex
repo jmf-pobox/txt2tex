@@ -5,6 +5,7 @@
 \usepackage{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
+\usepackage{zednofuzz}
 \usepackage{schemapk}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
@@ -22,11 +23,11 @@ $\{~ x : \nat | x > 0 ~\}$
 
 \setbox0=\vbox{%
 \begin{zed}
-zS_2 == \{~ x : \nat | x > 0 @ x \bsup 2 \esup ~\}
+zS_2 == \{~ x : \nat | x > 0 @ x * x ~\}
 \end{zed}%
 }
 \noindent
-$\{~ x : \nat | x > 0 @ x \bsup 2 \esup ~\}$
+$\{~ x : \nat | x > 0 @ x * x ~\}$
 
 
 \setbox0=\vbox{%
@@ -40,11 +41,11 @@ $\{~ x, y : \nat | x = y ~\}$
 
 \setbox0=\vbox{%
 \begin{zed}
-zS_4 == \{~ x | x \in A ~\}
+zS_4 == \{~ x : \nat | x \in 1 \upto 10 ~\}
 \end{zed}%
 }
 \noindent
-$\{~ x | x \in A ~\}$
+$\{~ x : \nat | x \in 1 \upto 10 ~\}$
 
 
 \noindent

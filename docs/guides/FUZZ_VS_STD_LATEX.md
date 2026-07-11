@@ -2,7 +2,7 @@
 
 **Purpose**: This document captures important differences between fuzz (Mike Spivey's Z notation typesetter) and standard LaTeX that affect txt2tex code generation.
 
-**Last Updated**: 2026-05-22
+**Last Updated**: 2026-07-11
 
 ---
 
@@ -613,6 +613,60 @@ Generates:
 - Use `|` for predicate separator (not `@`)
 - Use `@` only when there's an expression part after the predicate
 - The error "Opening parenthesis expected at symbol `\mu`" means fuzz is expecting `(` before `\mu`
+
+---
+
+## Numeric Exponentiation Is Not a Z Operator
+
+### `^` Means Relational Iteration (Z RM §4.11), Not "To the Power Of"
+
+**Issue**: Whiteboard math writes `x^2` for "x squared." Z has no such
+operator. `_^_` is defined in the mathematical toolkit as relational
+iteration: `r^2` means `iter 2 r`, and it requires `r` to be a
+homogeneous relation (`r : S <-> S`). Feed it a number instead and fuzz
+reads `x^2` as "iterate `x` twice," which is nonsense for a `\num`-typed
+`x` — fuzz rejects it with a cryptic error rooted in `iter`, not a clear
+"exponentiation isn't supported" message.
+
+**jms ruling**: there is no numeric-exponentiation operator in the Z
+mathematical toolkit and none should be invented. The correct rewrite
+inside a fuzz-checked box is repeated multiplication: `x^2` becomes
+`x * x`, `x^3` becomes `x * x * x`.
+
+**txt2tex behavior**: the generator predicts this failure before fuzz
+ever sees it. It walks each fuzz-checked box (`axdef`, `gendef`,
+`schema`, and set comprehensions), classifies every `^` base against
+declarations visible in that box, and — only when the base is
+*provably* `\num`-typed (from `N`, `Z`, `N1`, a range domain, or an
+arithmetic expression) — raises a clear source-line error instead of
+letting fuzz produce a confusing one:
+
+```text
+Error: line 4: '^' denotes relational iteration in Z, not numeric power
+(there is no exponentiation operator in the toolkit). fuzz reads
+'x^2' as 'iter 2 x' and requires x to be a homogeneous relation, but x
+is a number here. Rewrite as 'x * x', or mark the box NOFUZZ, or use
+--zed.
+```
+
+A relation-typed base (`r^2` where `r : S <-> S`) is genuine iteration
+and is never flagged — the checker only fires when it can prove the
+base numeric; every other case (a relation, a given-set element, an
+unprovable free name) is left for fuzz to accept or reject on its own.
+
+**User workarounds**, in order of preference:
+
+1. **Rewrite as multiplication** (preferred inside a fuzz-checked box):
+   `x^2` → `x * x`. This is what the error message suggests, and for a
+   concrete integer exponent the tool computes the exact expansion for
+   you (`(x^2)^3` → `(x * x) * (x * x) * (x * x)`).
+2. **Mark the box `NOFUZZ`** if the numeric power is incidental to a
+   worked example you don't need type-checked.
+3. **Use `--zed`** to switch the whole document to the zed-\* packages,
+   which don't run fuzz's type checker.
+
+**Reference**: `src/txt2tex/codegen/numeric_superscript.py` —
+`check_no_numeric_superscript`, `NumericSuperscriptError`.
 
 ---
 

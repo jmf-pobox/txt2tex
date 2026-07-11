@@ -31,7 +31,7 @@ from txt2tex.parser import Parser, ParserError
 # as the corresponding LaTeX macro, bypassing the full expression parser.
 # Keys are the raw ASCII whiteboard tokens; values are ready-to-use LaTeX.
 # Ordered by descending key length to aid readability; lookup is by dict key.
-_BARE_SYMBOL: Final[dict[str, str]] = {
+_ASCII_BARE_SYMBOL: Final[dict[str, str]] = {
     # Arrow / relation / operator family
     "77->": r"\ffun",
     ">->>": r"\bij",
@@ -81,7 +81,20 @@ _BARE_SYMBOL: Final[dict[str, str]] = {
     "psubset": r"\subset",  # strict/proper subset
     "dom": r"\dom",
     "ran": r"\ran",
-    # Unicode math symbols (lone references in prose)
+}
+
+# Unicode math/Greek symbol -> LaTeX macro (jms-confirmed against bundled
+# fuzz.sty).  Single source of truth for two consumers:
+#
+# 1. ``_BARE_SYMBOL`` below (merged in) — a $...$ span whose stripped content
+#    is exactly one of these characters is emitted as the bare macro
+#    (already inside math mode, opened by the enclosing $...$).
+# 2. ``_convert_unicode_symbols`` — a bare occurrence of one of these
+#    characters *outside* any $...$ span (section titles, PURETEXT: prose)
+#    is rewritten to ``\ensuremath{<macro>}`` so pdflatex can compile it
+#    regardless of the surrounding mode (issue: bare Unicode in titles
+#    either hard-errors under pdflatex or silently vanishes from the PDF).
+_UNICODE_ALT: Final[dict[str, str]] = {
     "∈": r"\in",
     "∉": r"\notin",
     "⊆": r"\subseteq",
@@ -115,6 +128,8 @@ _BARE_SYMBOL: Final[dict[str, str]] = {
     "⊢": r"\vdash",
 }
 
+_BARE_SYMBOL: Final[dict[str, str]] = {**_ASCII_BARE_SYMBOL, **_UNICODE_ALT}
+
 
 def _sanitise_span_for_error(inner: str) -> str:
     """Return *inner* with non-printable characters removed.
@@ -125,6 +140,29 @@ def _sanitise_span_for_error(inner: str) -> str:
     unchanged; Python's ``str.isprintable()`` is the gate.
     """
     return "".join(ch for ch in inner if ch.isprintable())
+
+
+def _convert_unicode_symbols(text: str) -> str:
+    r"""Rewrite bare Unicode math/Greek symbols to a compilable LaTeX form.
+
+    A section title or ``PURETEXT:`` line never enters the ``$...$`` math
+    pipeline, so a whiteboard author's literal ``μ``, ``∈``, ``→``, … would
+    otherwise reach the ``.tex`` output untranslated.  pdflatex then either
+    hard-errors ("Unicode character μ (U+03BC) not set up for use with
+    LaTeX") or, depending on the active font encoding, silently drops the
+    glyph.  Every character present in :data:`_UNICODE_ALT` is rewritten to
+    ``\ensuremath{<macro>}``, which compiles under pdflatex whether or not
+    the surrounding text is already in math mode.
+
+    Text with no such characters is returned unchanged (the common case),
+    so this is a no-op for the vast majority of titles and prose.
+    """
+    if not any(ch in _UNICODE_ALT for ch in text):
+        return text
+    return "".join(
+        rf"\ensuremath{{{_UNICODE_ALT[ch]}}}" if ch in _UNICODE_ALT else ch
+        for ch in text
+    )
 
 
 class InlineMathError(Exception):
@@ -541,10 +579,14 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
         return re.sub(r"\belem\b", r"\\in", result)
 
     def _escape_latex(self, text: str) -> str:
-        """Escape LaTeX special characters.
+        r"""Escape LaTeX special characters.
 
         Escapes: & % $ # _ { } ~ ^ \
-        Does NOT convert operators or detect formulas.
+        Does NOT convert operators or detect formulas.  Bare Unicode
+        math/Greek symbols (μ, ∈, →, …) are rewritten to their compilable
+        ``\ensuremath{...}`` form via ``_convert_unicode_symbols`` — left
+        untranslated they either hard-error under pdflatex or silently
+        vanish from the compiled PDF, since this is a non-math context.
         """
         # Escape backslash first to avoid double-escaping
         result = text.replace("\\", r"\textbackslash{}")
@@ -557,10 +599,11 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
         result = result.replace("{", r"\{")
         result = result.replace("}", r"\}")
         result = result.replace("~", r"\textasciitilde{}")
-        return result.replace("^", r"\textasciicircum{}")
+        result = result.replace("^", r"\textasciicircum{}")
+        return _convert_unicode_symbols(result)
 
     def _escape_latex_text(self, text: str) -> str:
-        """Escape LaTeX-unsafe characters for verbatim heading text.
+        r"""Escape LaTeX-unsafe characters for verbatim heading text.
 
         Used for section and subsection headings where the text should pass
         through verbatim.  Only characters that are structurally significant
@@ -571,6 +614,11 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
                  $ → \\$, # → \\#, _ → \\_, { → \\{, } → \\},
                  ~ → \\textasciitilde{}, ^ → \\textasciicircum{}.
         NOT escaped: ( ) : . - (safe in LaTeX text mode).
+
+        Bare Unicode math/Greek symbols (μ, ∈, →, …) are rewritten to their
+        compilable ``\ensuremath{...}`` form via ``_convert_unicode_symbols``.
+        A heading is verbatim text, not math — left untranslated, pdflatex
+        either hard-errors on the glyph or silently drops it from the PDF.
         """
         # Escape backslash first to avoid double-escaping later replacements.
         result = text.replace("\\", r"\textbackslash{}")
@@ -582,4 +630,5 @@ class _TextPipelineCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClas
         result = result.replace("{", r"\{")
         result = result.replace("}", r"\}")
         result = result.replace("~", r"\textasciitilde{}")
-        return result.replace("^", r"\textasciicircum{}")
+        result = result.replace("^", r"\textasciicircum{}")
+        return _convert_unicode_symbols(result)

@@ -27,6 +27,10 @@ from txt2tex.ast_nodes import (
     SchemaText,
 )
 from txt2tex.codegen._dispatch import CodegenDispatch, expr_register, item_register
+from txt2tex.codegen.numeric_superscript import (
+    check_no_numeric_superscript,
+    declaration_scope,
+)
 from txt2tex.codegen.paragraphs import NoFuzzLintItem, NoFuzzUnsupportedError
 
 
@@ -233,6 +237,15 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                 if isinstance(decl, Declaration) and decl.is_primary_key
             }
 
+        # Local declaration scope for the numeric-`^` classifier (jms
+        # ruling, fix/tests-bugs-hygiene): skipped for a NOFUZZ box -- fuzz
+        # never sees it, and "mark the box NOFUZZ" is one of the checker's
+        # own suggested workarounds.
+        numeric_check_active = self.use_fuzz and node.nofuzz_reason is None
+        numeric_scope = (
+            declaration_scope(node.declarations) if numeric_check_active else {}
+        )
+
         # Build the begin line (reused for both copies when dual-emit).
         if node.generic_params:
             params_str = ", ".join(node.generic_params)
@@ -261,6 +274,8 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                         )
                         pk_body.append(plain_body[-1])
                     else:
+                        if numeric_check_active:
+                            check_no_numeric_superscript(decl.type_expr, numeric_scope)
                         var_latex = self._generate_identifier(
                             Identifier(line=0, column=0, name=decl.variable)
                         )
@@ -319,6 +334,8 @@ class _SchemasCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                 where_lines.append(r"\where")
                 for group_idx, group in enumerate(node.predicates):
                     for pred_idx, pred in enumerate(group):
+                        if numeric_check_active:
+                            check_no_numeric_superscript(pred, numeric_scope)
                         pred_latex = self.generate_expr(pred, parent=None)
                         self._reject_ra_in_box(pred, pred.line, pred_latex, block_kind)
                         self._check_overflow(

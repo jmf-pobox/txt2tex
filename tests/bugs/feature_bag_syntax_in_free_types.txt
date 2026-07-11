@@ -2,4 +2,4 @@
 
 given BookId, ChapterId, StatusA, StatusB
 
-TreeNode ::= nil | join <<(BookId cross ChapterId) cross (N cross StatusA cross StatusB) cross TreeNode>>
+TreeNode ::= nil | link <<(BookId cross ChapterId) cross (N cross StatusA cross StatusB) cross TreeNode>>

@@ -5,6 +5,7 @@
 \usepackage{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
+\usepackage{zednofuzz}
 \usepackage{schemapk}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
@@ -75,11 +76,11 @@ $p.1 \upto p.2$
 
 \setbox0=\vbox{%
 \begin{zed}
-zS_2 == \{~ x : 1 \upto 10 | x > 3 @ x \bsup 2 \esup ~\}
+zS_2 == \{~ x : 1 \upto 10 | x > 3 @ x * x ~\}
 \end{zed}%
 }
 \noindent
-$\{~ x : 1 \upto 10 | x > 3 @ x \bsup 2 \esup ~\}$
+$\{~ x : 1 \upto 10 | x > 3 @ x * x ~\}$
 
 
 \end{document}

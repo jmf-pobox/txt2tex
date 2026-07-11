@@ -58,9 +58,9 @@ TEXT: Here s_i represents the i-th element of a conceptual sequence.
 
 ** Example 5: Exponentiation in Expressions **
 
-{ n : N | n < 10 . n^2 }
+{ n : N | n < 10 . n * n }
 
-TEXT: Set of squares.
+TEXT: Set of squares. Z/fuzz has no numeric exponentiation operator, so a set comprehension body writes the square as n * n rather than n^2.
 
 ** Example 6: Power Function for Nested Exponents **
 

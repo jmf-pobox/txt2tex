@@ -192,6 +192,46 @@ end"""
         assert "`zed`" in err
         assert "Traceback" not in err
 
+    def test_process_numeric_superscript_error_is_clean(
+        self, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """A numeric `^` base inside an axdef block is handled cleanly, no traceback.
+
+        Regression: NumericSuperscriptError was uncaught in the REPL, so a
+        typed axdef/schema/gendef/abbreviation block reaching this error
+        printed a raw traceback instead of one clean 'Error: line N: ...'
+        line.  This block-input text goes through the same
+        `isinstance(ast, Document)` -> `generate_fragment` branch the CLI's
+        `generate_document` exercises (an axdef/schema/gendef keyword, or
+        `Name ==`, always parses to a `Document` -- see
+        `test_process_numeric_superscript_bare_expression_is_unaffected`
+        below for the REPL's other branch, which never reaches this check).
+        """
+        generator = LaTeXGenerator(use_fuzz=True)
+        text = "axdef\n  x : N\nwhere\n  x^2 > 0\nend"
+        result = process_input(text, generator, latex_only=True)
+        assert result is False
+        err = capsys.readouterr().err
+        assert "Error:" in err
+        assert "iter 2 x" in err
+        assert "Traceback" not in err
+        assert "NumericSuperscriptError" not in err
+
+    def test_process_numeric_superscript_bare_expression_is_unaffected(self) -> None:
+        """A bare single-line `^` expression never reaches the checker.
+
+        `process_input` routes a non-`Document` AST (a lone expression with
+        no trailing newline, e.g. typed alone at the `>>>` prompt) through
+        `generator.generate_expr` directly -- it never enters
+        `generate_document_item`, so it never reaches
+        `_emit_hidden_abbreviation` (the standalone-comprehension hook) or
+        any axdef/schema/gendef/abbreviation handler.  `x^2` alone at the
+        prompt must render, not raise.
+        """
+        generator = LaTeXGenerator(use_fuzz=True)
+        result = process_input("x^2", generator, latex_only=True)
+        assert result is True
+
     def test_process_with_pdf_generation(self, tmp_path: Path) -> None:
         """Should attempt PDF generation when temp_dir provided."""
         generator = LaTeXGenerator(use_fuzz=True)

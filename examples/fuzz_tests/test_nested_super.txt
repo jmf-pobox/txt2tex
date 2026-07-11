@@ -1,20 +1,25 @@
 // ============================================================================
-// Test: Nested Superscripts (Exponentiation)
+// Test: Nested Numeric Exponents (Expanded to Multiplication)
 // ============================================================================
 // Demonstrates:
-//   - Nested superscript notation
-//   - Exponentiation (^)
-//   - Parenthesization for nested powers
+//   - Numeric exponentiation expanded to repeated multiplication
+//   - Nested powers (square-then-cube) without the ^ operator
 //   - Set comprehension with complex expressions
 //
+// Why: Z/fuzz has no numeric exponentiation operator. ^ in Z is
+// relational iteration (Z RM Section 4.4), so a numeric x^2 fails
+// fuzz type checking. Inside a fuzz-checked box, write the square
+// and cube out as repeated multiplication instead.
+//
 // Features:
-//   - z^2 [basic exponentiation]
-//   - (z^2)^3 [nested exponents]
+//   - z * z [basic square, in place of z^2]
+//   - (z * z) * (z * z) * (z * z) [nested power: (z^2)^3 expanded]
 //   - Set comprehension with bullet separator
 //
 // See: docs/USER_GUIDE.md - Sections "Arithmetic Operators", "Set Comprehensions"
+// See: docs/guides/FUZZ_VS_STD_LATEX.md - "Numeric Exponentiation Is Not a Z Operator"
 // ============================================================================
 
-=== Test Nested Superscript ===
+=== Test Nested Exponent, Expanded to Multiplication ===
 
-{ z : Z | z mod 2 = 0 . (z^2)^3 }
+{ z : Z | z mod 2 = 0 . (z * z) * (z * z) * (z * z) }

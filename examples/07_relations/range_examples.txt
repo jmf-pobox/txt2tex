@@ -45,4 +45,4 @@ end
 p.1..p.2
 
 ** Test 8: Complex Set Comprehension **
-{ x : 1..10 | x > 3 . x^2 }
+{ x : 1..10 | x > 3 . x * x }

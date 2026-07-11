@@ -5,6 +5,7 @@
 \usepackage{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
+\usepackage{zednofuzz}
 \usepackage{schemapk}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
@@ -273,11 +274,11 @@ $\exists s : \seq \nat @ head(s) = 1$
 
 \setbox0=\vbox{%
 \begin{zed}
-zS_1 == \{~ x : \nat | x > 0 @ \langle x, x \bsup 2 \esup \rangle ~\}
+zS_1 == \{~ x : \nat | x > 0 @ \langle x, x * x \rangle ~\}
 \end{zed}%
 }
 \noindent
-$\{~ x : \nat | x > 0 @ \langle x, x \bsup 2 \esup \rangle ~\}$
+$\{~ x : \nat | x > 0 @ \langle x, x * x \rangle ~\}$
 
 
 \subsection*{Example 8 : Real Examples}

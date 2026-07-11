@@ -10,7 +10,7 @@
 // Features:
 //   - (a, b) [ordered pair]
 //   - (x, y, z) [triple]
-//   - { n : N | predicate . (n, n^2) } [tuple expression]
+//   - { n : N | predicate . (n, n * n) } [tuple expression]
 //   - (a, b) elem A cross B [membership]
 //
 // See: docs/USER_GUIDE.md - Section "Sets and Types" > "Cartesian Product"
@@ -27,7 +27,7 @@
 (x, y, z)
 
 (c) Set comprehension with tuple expression
-{ n : N | n <= 4 . (n, n^2) }
+{ n : N | n <= 4 . (n, n * n) }
 
 (d) Tuple elem set membership
 (a, b) elem A cross B

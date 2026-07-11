@@ -1,6 +1,6 @@
 .PHONY: help lint lint-md format format-check type type-pyright test test-cov check check-cov build clean \
 	ethos-doctor ethos-agents ethos-team dev-doctor dev-setup test-e2e regen-e2e \
-	complexity-report complexity-history qa qa-one reference
+	complexity-report complexity-history qa qa-one fuzz-check reference
 
 # `make` with no arguments prints the help.
 .DEFAULT_GOAL := help
@@ -83,6 +83,44 @@ qa-one:  ## Run scripts/qa_check.sh on a single PDF (PDF=path/to.pdf)
 		exit 1; \
 	fi
 	scripts/qa_check.sh "$(PDF)"
+
+# Recipe uses bash-only process substitution (<(...)) and `read -d ''`
+# for null-delimited iteration, so this target's shell is pinned to
+# bash rather than the Make-wide default (/bin/sh, which is dash on
+# Ubuntu CI runners and lacks both features). Scoped to this target
+# only -- no other recipe in this Makefile is affected.
+fuzz-check: SHELL := /bin/bash
+fuzz-check:  ## Type-check every examples/**/*.txt with fuzz (skips gracefully if fuzz is not installed)
+	@command -v fuzz >/dev/null 2>&1 || { \
+		echo "fuzz-check: fuzz not found on PATH — skipping (Z type checking disabled). Install: https://github.com/jmf-pobox/fuzz"; \
+		exit 0; \
+	}; \
+	rm -rf .tmp/fuzz-check; \
+	mkdir -p .tmp/fuzz-check; \
+	total=0; fail=0; failed_files=""; \
+	while IFS= read -r -d '' f; do \
+		total=$$((total + 1)); \
+		rel=$${f#examples/}; \
+		out=".tmp/fuzz-check/$${rel%.txt}.tex"; \
+		mkdir -p "$$(dirname "$$out")"; \
+		echo "Checking: $$f"; \
+		if uv run txt2tex "$$f" --tex-only -o "$$out" >.tmp/fuzz-check-out.log 2>&1; then \
+			echo "  PASS: $$f"; \
+		else \
+			echo "  FAIL: $$f"; \
+			sed 's/^/    /' .tmp/fuzz-check-out.log | tail -n 15; \
+			fail=$$((fail + 1)); \
+			failed_files="$$failed_files\n  - $$f"; \
+		fi; \
+	done < <(find examples -name "*.txt" -not -path "*/infrastructure/*" -print0 | sort -z); \
+	rm -f .tmp/fuzz-check-out.log; \
+	echo ""; \
+	echo "fuzz-check: $$total example(s) checked, $$((total - fail)) passed, $$fail failed"; \
+	if [ $$fail -gt 0 ]; then \
+		printf "Failed files:$$failed_files\n"; \
+		exit 1; \
+	fi; \
+	echo "All examples fuzz type-check cleanly."
 
 ##@ Complexity / code-quality assessment (local only; install with: uv sync --group complexity)
 

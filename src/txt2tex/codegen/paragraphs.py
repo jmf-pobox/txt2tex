@@ -30,6 +30,10 @@ from txt2tex.ast_nodes import (
     Zed,
 )
 from txt2tex.codegen._dispatch import CodegenDispatch, item_register
+from txt2tex.codegen.numeric_superscript import (
+    check_no_numeric_superscript,
+    declaration_scope,
+)
 
 
 @dataclass(frozen=True)
@@ -431,6 +435,12 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
             # Source-level kind for user-facing diagnostics; the emitted LaTeX
             # environment (zed vs zednofuzz) is chosen separately below.
             block_kind = "zed"
+            # An abbreviation has no local declaration scope of its own, so
+            # only a `Number` literal or a manifestly arithmetic expression
+            # (jms ruling, fix/tests-bugs-hygiene) can be provably numeric
+            # here; skipped under NOFUZZ, matching the axdef/schema rule.
+            if self.use_fuzz and node.nofuzz_reason is None:
+                check_no_numeric_superscript(node.expression, {})
             self._check_overflow(
                 abbrev,
                 node.line,
@@ -474,6 +484,14 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         block_kind = "axdef"
         body_lines: list[str] = []
 
+        # Local declaration scope for the numeric-`^` classifier (jms
+        # ruling, fix/tests-bugs-hygiene): skipped for a NOFUZZ box -- fuzz
+        # never sees it, so there is nothing to predict a rejection for,
+        # and "mark the box NOFUZZ" is one of the checker's own suggested
+        # workarounds.
+        numeric_check_active = self.use_fuzz and node.nofuzz_reason is None
+        scope = declaration_scope(node.declarations) if numeric_check_active else {}
+
         # All expression generation inside this block uses Z-paragraph context so
         # that context-sensitive operators (e.g. o9 → \comp) emit correctly.
         prev_z = self._in_z_paragraph
@@ -485,6 +503,8 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                     if isinstance(decl, SchemaInclusion):
                         decl_line = self._emit_schema_inclusion(decl, block_kind)
                     else:
+                        if numeric_check_active:
+                            check_no_numeric_superscript(decl.type_expr, scope)
                         # Process variable through identifier logic
                         var_latex = self._generate_identifier(
                             Identifier(line=0, column=0, name=decl.variable)
@@ -540,6 +560,8 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                 for group_idx, group in enumerate(node.predicates):
                     # Generate predicates in current group
                     for pred_idx, pred in enumerate(group):
+                        if numeric_check_active:
+                            check_no_numeric_superscript(pred, scope)
                         # Pass parent=None for smart parenthesization
                         pred_latex = self.generate_expr(pred, parent=None)
 
@@ -622,6 +644,12 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         params_str = ", ".join(node.generic_params)
         lines.append(f"\\begin{{gendef}}[{params_str}]")
 
+        # Local declaration scope for the numeric-`^` classifier (jms
+        # ruling, fix/tests-bugs-hygiene).  `node.nofuzz_reason` is always
+        # None here -- gendef rejects it above -- so gating on `use_fuzz`
+        # alone matches axdef/schema's "fuzz-checked box only" rule.
+        scope = declaration_scope(node.declarations) if self.use_fuzz else {}
+
         # All expression generation inside this block uses Z-paragraph context.
         prev_z = self._in_z_paragraph
         self._in_z_paragraph = True
@@ -632,6 +660,8 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                     if isinstance(decl, SchemaInclusion):
                         decl_line = f"  {self._emit_schema_inclusion(decl, 'gendef')}"
                     else:
+                        if self.use_fuzz:
+                            check_no_numeric_superscript(decl.type_expr, scope)
                         # Process variable through identifier logic
                         var_latex = self._generate_identifier(
                             Identifier(line=0, column=0, name=decl.variable)
@@ -687,6 +717,8 @@ class _ParagraphsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
                 for group_idx, group in enumerate(node.predicates):
                     # Generate predicates in current group
                     for pred_idx, pred in enumerate(group):
+                        if self.use_fuzz:
+                            check_no_numeric_superscript(pred, scope)
                         # Pass parent=None for smart parenthesization
                         pred_latex = self.generate_expr(pred, parent=None)
 

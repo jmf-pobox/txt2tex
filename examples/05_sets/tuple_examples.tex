@@ -5,6 +5,7 @@
 \usepackage{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
+\usepackage{zednofuzz}
 \usepackage{schemapk}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
@@ -60,11 +61,11 @@ $with(tuple)(expression)$
 
 \setbox0=\vbox{%
 \begin{zed}
-zS_1 == \{~ n : \nat | n \leq 4 @ (n, n \bsup 2 \esup) ~\}
+zS_1 == \{~ n : \nat | n \leq 4 @ (n, n * n) ~\}
 \end{zed}%
 }
 \noindent
-$\{~ n : \nat | n \leq 4 @ (n, n \bsup 2 \esup) ~\}$
+$\{~ n : \nat | n \leq 4 @ (n, n * n) ~\}$
 
 
 \medskip

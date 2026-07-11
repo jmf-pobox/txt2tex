@@ -5,22 +5,23 @@
 \usepackage{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{fuzz}
+\usepackage{zednofuzz}
 \usepackage{schemapk}
 \usepackage{zed-maths}
 \usepackage{zed-proof}
 \newdimen\savedleftskip
 \begin{document}
 
-\section*{Test Nested Superscript}
-\addcontentsline{toc}{section}{Test Nested Superscript}
+\section*{Test Nested Exponent, Expanded to Multiplication}
+\addcontentsline{toc}{section}{Test Nested Exponent, Expanded to Multiplication}
 
 \setbox0=\vbox{%
 \begin{zed}
-zS_1 == \{~ z : \num | z \mod 2 = 0 @ {z \bsup 2 \esup} \bsup 3 \esup ~\}
+zS_1 == \{~ z : \num | z \mod 2 = 0 @ (z * z) * (z * z) * (z * z) ~\}
 \end{zed}%
 }
 \noindent
-$\{~ z : \num | z \mod 2 = 0 @ {z \bsup 2 \esup} \bsup 3 \esup ~\}$
+$\{~ z : \num | z \mod 2 = 0 @ (z * z) * (z * z) * (z * z) ~\}$
 
 
 \end{document}
