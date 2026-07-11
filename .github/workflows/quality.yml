@@ -117,10 +117,33 @@ jobs:
         fi
         ./configure --prefix="$HOME/.local/fuzz"
         make
+        # fuzz's own `make install` only `install -d`s TEXDIR/MFDIR
+        # (root/Makefile.in); it never creates bindir/libdir, so
+        # `install src/fuzz $(bindir)` fails with "No such file or
+        # directory" on a prefix that doesn't exist yet. Pre-create
+        # every directory `make install` writes into, matching the
+        # autoconf defaults for --prefix="$HOME/.local/fuzz"
+        # (bindir=$prefix/bin, libdir=$prefix/lib,
+        # datadir=$prefix/share -> TEXDIR/MFDIR below it).
+        mkdir -p \
+          "$HOME/.local/fuzz/bin" \
+          "$HOME/.local/fuzz/lib" \
+          "$HOME/.local/fuzz/share/texmf/tex/latex" \
+          "$HOME/.local/fuzz/share/texmf/fonts/source/public/oxsz"
         make install
 
     - name: Add fuzz to PATH
       run: echo "$HOME/.local/fuzz/bin" >> "$GITHUB_PATH"
+
+    - name: Verify fuzz is installed and runnable
+      # Runs unconditionally (cache-hit or fresh build) so a corrupt
+      # cache entry or an install regression fails loudly right here,
+      # not 80 examples into `make fuzz-check`. `-Dv` (not `-v`, which
+      # sets an unrelated internal vflag) makes fuzz print its version
+      # banner; stdin is redirected from /dev/null because fuzz falls
+      # through to reading the prelude from stdin when given no input
+      # files, and would otherwise hang waiting for EOF.
+      run: fuzz -Dv < /dev/null
 
     - name: Run fuzz type-check gate over examples/
       run: make fuzz-check
