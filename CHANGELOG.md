@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.1] - 2026-07-11
+
+### Changed
+
+- **Numeric exponentiation heading into a fuzz-checked box now errors clearly.**
+  `x^2` with a numeric base compiles to fuzz's `\bsup … \esup`, which fuzz reads
+  as *relational iteration* (`iter 2 x`) and rejects — Z has no numeric
+  exponentiation operator. Instead of surfacing the raw fuzz diagnostic, txt2tex
+  now raises a source-line error naming the offending expression and suggesting
+  the `x * x` rewrite (or `NOFUZZ:` / `--zed`). The classifier flags **only
+  provably-numeric bases**, so genuine relational iteration `r^2` (with
+  `r : X ↔ X`) is unaffected and still type-checks.
+
+### Fixed
+
+- **Membership before a bullet now parses.** A quantifier/comprehension of the
+  form `forall x : N | x elem S . y elem T` failed with "Expected ')'": a spaced
+  dot after a *free identifier* was mis-read as a field projection (`S.y`)
+  because `elem`/`notin` sit in the projection-follower set. Field selection now
+  requires the base to be a declared variable (Z RM §3.16), so the `.` is
+  correctly recognised as the bullet. Restored three regression fixtures, and
+  corrected a live example (`11_mu_operator` was rendering `x ∈ S.f(x)` instead
+  of the bullet `x ∈ S • f(x)`).
+- **Nested superscripts render with visible parentheses.** `(x^2)^3` emitted
+  invisible LaTeX grouping (`{x^2}^3`), losing the parentheses a reader needs —
+  and fuzz rejected the brace form outright. It now emits `(x^2)^3`, which also
+  makes valid relational `(r^2)^3` iteration type-check.
+- **Unicode symbols in section titles and prose now render.** A literal `μ`
+  (or other Unicode math/Greek symbol) in a `=== … ===` title or `TEXT:`/
+  `PURETEXT:` prose passed through untranslated, breaking pdflatex and silently
+  dropping the glyph from the PDF. Such symbols are now emitted as
+  `\ensuremath{\mu}` etc. via the existing Unicode-alternatives table.
+- **`join` reserved as a free-type constructor name.** `join` became a reserved
+  relational-algebra keyword, so a free type using it as a branch name failed;
+  the reserved words are now documented and the affected fixture renamed.
+
+### Added
+
+- **`make fuzz-check` gate + fuzz in CI.** A non-destructive target that
+  generates every example into a scratch dir and type-checks it with fuzz,
+  failing on any unexpected error, wired into CI (fuzz built from a
+  commit-pinned Spivoxity/fuzz source, least-privilege token). Guards against
+  broken Z shipping in the examples.
+
 ## [2.2.0] - 2026-07-05
 
 ### Added
