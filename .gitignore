@@ -116,6 +116,8 @@ examples/*/phase12_*.pdf
 *.disabled
 
 /.punt-labs/quarry/captures/
+# Per-session vox config (machine-local; vox.md is the committed shared config)
+/.punt-labs/vox/vox.local.md
 
 # Stray root-level cheatsheet from prior workflow (now consolidated into docs/reference.pdf)
 /cheatsheet.pdf
