@@ -93,7 +93,7 @@ jobs:
     # `txt2tex --tex-only`, which never invokes pdflatex.
     - name: Cache fuzz build (pinned to FUZZ_REF)
       id: fuzz-cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: ~/.local/fuzz
         key: fuzz-typechecker-${{ runner.os }}-${{ env.FUZZ_REF }}
