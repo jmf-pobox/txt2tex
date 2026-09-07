@@ -65,6 +65,10 @@ complexity = [
     "lizard>=1.17.0",
     "wily>=2.0.0a1",
     "pydeps>=3.0.0",
+    # GitPython <=3.1.57 has multiple high-severity advisories (GHSA
+    # arbitrary command execution / file overwrite via unguarded git
+    # option forwarding). wily pulls it transitively with no floor.
+    "gitpython>=3.1.58",
 ]
 
 [tool.hatch.build.targets.wheel]
