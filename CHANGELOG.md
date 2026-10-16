@@ -12,8 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **REPL `.clear` no longer crashes when the clear command is missing.** The
   command now runs through `subprocess.run` with an argument list instead of the
   deprecated `os.system`. A missing or unexecutable `clear` is ignored rather
-  than ending the session. On Windows the shell is resolved from `%COMSPEC%`, so
-  a `cmd.exe` in the working directory is never run in its place.
+  than ending the session. On Windows the shell is resolved from `%COMSPEC%`,
+  falling back to `%SystemRoot%\System32\cmd.exe`, so a `cmd.exe` in the working
+  directory is never run in its place.
 
 ### Changed
 

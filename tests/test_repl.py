@@ -334,11 +334,22 @@ class TestClearCommand:
         monkeypatch.setenv("COMSPEC", sentinel)
         assert self._run_clear(monkeypatch, "Windows") == [[sentinel, "/c", "cls"]]
 
-    def test_clear_windows_without_comspec_uses_system32(
+    def test_clear_windows_without_comspec_uses_systemroot(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """With COMSPEC unset, .clear uses the absolute System32 cmd.exe."""
+        """With COMSPEC unset, .clear derives cmd.exe from %SystemRoot%."""
         monkeypatch.delenv("COMSPEC", raising=False)
+        monkeypatch.setenv("SYSTEMROOT", r"D:\Windows")
+        assert self._run_clear(monkeypatch, "Windows") == [
+            [r"D:\Windows\System32\cmd.exe", "/c", "cls"]
+        ]
+
+    def test_clear_windows_without_comspec_or_systemroot_uses_c_windows(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """With COMSPEC and SystemRoot unset, .clear falls back to C:\\Windows."""
+        monkeypatch.delenv("COMSPEC", raising=False)
+        monkeypatch.delenv("SYSTEMROOT", raising=False)
         assert self._run_clear(monkeypatch, "Windows") == [
             [r"C:\Windows\System32\cmd.exe", "/c", "cls"]
         ]
