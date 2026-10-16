@@ -276,8 +276,10 @@ class Lexer:
 
         # Build detailed error message with all diagnostic info
         details = [
-            f"Infinite loop detected in lexer at position {self.pos}, "
-            f"line {self.line}, column {self.column}: {context_msg}",
+            (
+                f"Infinite loop detected in lexer at position {self.pos}, "
+                f"line {self.line}, column {self.column}: {context_msg}"
+            ),
             f"Text length: {len(self.text)}",
             f"Context (-20/+20): {context}",
         ]

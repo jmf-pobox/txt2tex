@@ -17,6 +17,7 @@ from txt2tex.repl import (
     generate_preview_document,
     is_block_input,
     process_input,
+    repl_main,
 )
 
 
@@ -288,3 +289,74 @@ end"""
 
         assert r"\begin{schema}" in fragment
         assert r"\end{schema}" in fragment
+
+
+class TestClearCommand:
+    """Tests for the .clear REPL command."""
+
+    @staticmethod
+    def _run_clear(
+        monkeypatch: pytest.MonkeyPatch,
+        system: str,
+        error: OSError | None = None,
+    ) -> list[list[str]]:
+        """Drive repl_main with .clear then EOF; return recorded argvs."""
+        calls: list[list[str]] = []
+
+        def fake_run(cmd: list[str], **_kwargs: object) -> None:
+            calls.append(cmd)
+            if error is not None:
+                raise error
+
+        inputs = iter([".clear"])
+
+        def fake_input(_prompt: str) -> str:
+            try:
+                return next(inputs)
+            except StopIteration:
+                raise EOFError from None
+
+        monkeypatch.setattr("txt2tex.repl.subprocess.run", fake_run)
+        monkeypatch.setattr("txt2tex.repl.platform.system", lambda: system)
+        monkeypatch.setattr("builtins.input", fake_input)
+        assert repl_main() == 0
+        return calls
+
+    def test_clear_posix_runs_clear(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """On non-Windows, .clear runs ['clear'] without a shell."""
+        assert self._run_clear(monkeypatch, "Linux") == [["clear"]]
+
+    def test_clear_windows_runs_comspec_cls(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """On Windows, .clear runs %COMSPEC% /c cls (cls is a cmd builtin)."""
+        sentinel = r"C:\sentinel\cmd.exe"
+        monkeypatch.setenv("COMSPEC", sentinel)
+        assert self._run_clear(monkeypatch, "Windows") == [[sentinel, "/c", "cls"]]
+
+    def test_clear_windows_without_comspec_uses_systemroot(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """With COMSPEC unset, .clear derives cmd.exe from %SystemRoot%."""
+        monkeypatch.delenv("COMSPEC", raising=False)
+        monkeypatch.setenv("SYSTEMROOT", r"D:\Windows")
+        assert self._run_clear(monkeypatch, "Windows") == [
+            [r"D:\Windows\System32\cmd.exe", "/c", "cls"]
+        ]
+
+    def test_clear_windows_without_comspec_or_systemroot_uses_c_windows(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """With COMSPEC and SystemRoot unset, .clear falls back to C:\\Windows."""
+        monkeypatch.delenv("COMSPEC", raising=False)
+        monkeypatch.delenv("SYSTEMROOT", raising=False)
+        assert self._run_clear(monkeypatch, "Windows") == [
+            [r"C:\Windows\System32\cmd.exe", "/c", "cls"]
+        ]
+
+    @pytest.mark.parametrize("error", [FileNotFoundError(), PermissionError()])
+    def test_clear_survives_unexecutable_clear(
+        self, monkeypatch: pytest.MonkeyPatch, error: OSError
+    ) -> None:
+        """A missing or unexecutable clear must not crash the REPL."""
+        assert self._run_clear(monkeypatch, "Linux", error) == [["clear"]]

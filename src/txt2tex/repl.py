@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import contextlib
+import ntpath
 import os
 import platform
 import shutil
@@ -238,6 +239,16 @@ def process_input(
     return False
 
 
+def windows_cmd_exe() -> str:
+    """Return the absolute path of cmd.exe: COMSPEC, else under SystemRoot."""
+    if comspec := os.environ.get("COMSPEC"):
+        return comspec
+    # ntpath, not os.path/pathlib: the result must use backslashes on any host.
+    return ntpath.join(
+        os.environ.get("SYSTEMROOT", r"C:\Windows"), "System32", "cmd.exe"
+    )
+
+
 def print_help() -> None:
     """Print REPL help message."""
     print(
@@ -296,7 +307,16 @@ def repl_main(*, use_fuzz: bool = True) -> int:
                 if stripped == ".quit" or stripped == ".exit":
                     break
                 if stripped == ".clear":
-                    os.system("clear" if platform.system() != "Windows" else "cls")  # noqa: S605
+                    # cls is a cmd builtin, not an executable; resolve the shell
+                    # via COMSPEC so a cmd.exe in the cwd is never picked up.
+                    clear_cmd = (
+                        [windows_cmd_exe(), "/c", "cls"]
+                        if platform.system() == "Windows"
+                        else ["clear"]
+                    )
+                    # A missing or unexecutable clear must not crash the REPL.
+                    with contextlib.suppress(OSError):
+                        subprocess.run(clear_cmd, check=False)  # noqa: S603
                     continue
                 if stripped == ".latex":
                     latex_only = not latex_only

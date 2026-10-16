@@ -353,6 +353,7 @@ Every multi-premise rule has `::` on its premises.
 class ProofTree:
     conclusion: ProofStep
 
+
 @dataclass
 class ProofStep:
     expression: Expr
@@ -361,6 +362,7 @@ class ProofStep:
     is_assumption: bool
     is_sibling: bool  # Marked with ::
     children: list[ProofStep]
+
 
 @dataclass
 class CaseAnalysis:

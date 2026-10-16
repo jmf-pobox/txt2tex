@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **REPL `.clear` no longer crashes when the clear command is missing.** The
+  command now runs through `subprocess.run` with an argument list instead of the
+  deprecated `os.system`. A missing or unexecutable `clear` is ignored rather
+  than ending the session. On Windows the shell is resolved from `%COMSPEC%`,
+  falling back to `%SystemRoot%\System32\cmd.exe`, so a `cmd.exe` in the working
+  directory is never run in its place.
+
+### Changed
+
+- **Dev toolchain upgraded.** ruff 0.17.1, mypy 2.4.0, pyright 1.1.414 and
+  pytest 9.1.1 are the new floors in the `dev` group. ruff 0.17 formats Python
+  code blocks inside Markdown, so three docs were reformatted. Four paths are
+  excluded where the reformat made the docs harder to read: two docs with
+  compact keyword sets, one pseudo-code prompt, and ethos-managed content.
+- **Dependabot version updates now work.** The Python entry switched from the
+  `pip` ecosystem, which cannot read `uv.lock`, to `uv`. Tool bumps arrive as one
+  grouped PR.
+
 ## [2.2.1] - 2026-07-11
 
 ### Changed
