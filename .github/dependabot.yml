@@ -3,8 +3,10 @@
 
 version: 2
 updates:
-  # Python dependencies
-  - package-ecosystem: "pip"
+  # Python dependencies.  "uv" (not "pip"): the project has dependencies = []
+  # and keeps tools in PEP 735 [dependency-groups] locked in uv.lock, which
+  # the pip ecosystem does not read.
+  - package-ecosystem: "uv"
     directory: "/"
     schedule:
       interval: "weekly"
@@ -15,6 +17,11 @@ updates:
     labels:
       - "dependencies"
       - "python"
+    # One PR for all dev/complexity tool bumps instead of one per package.
+    groups:
+      python-tools:
+        patterns:
+          - "*"
 
   # GitHub Actions
   - package-ecosystem: "github-actions"

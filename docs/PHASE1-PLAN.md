@@ -160,6 +160,8 @@ Before any code moves:
    ```python
    # codegen/_dispatch.py
    from functools import singledispatchmethod
+
+
    class _Dispatcher:
        @singledispatchmethod
        def generate_expr(self, node, parent=None): ...
@@ -167,8 +169,7 @@ Before any code moves:
 
    ```python
    # codegen/__init__.py
-   class LaTeXGenerator(SchemaCodegen, AlgebraCodegen, ..., _Dispatcher):
-       ...
+   class LaTeXGenerator(SchemaCodegen, AlgebraCodegen, ..., _Dispatcher): ...
    ```
 
    Move ONE handler to a mixin file first, run `make check`, and

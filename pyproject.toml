@@ -46,10 +46,13 @@ prerelease = "allow"
 # arm64, and Windows x86_64 so CI on any of those reproduces the local
 # environment.
 dev = [
-    "ruff>=0.13.0",
-    "mypy>=1.18.1",
-    "pyright>=1.1.0",
-    "pytest>=8.4.2",
+    # Floors match the toolchain `make check` is verified against; they stop
+    # CI from resolving back to the pre-upgrade tools (ruff 0.17 formats
+    # Markdown python fences, mypy 2.x and pyright 1.1.414 add checks).
+    "ruff>=0.17.1",
+    "mypy>=2.4.0",
+    "pyright>=1.1.414",
+    "pytest>=9.1.1",
     "pytest-cov>=4.0.0",
     "pytest-xdist>=3.0.0",
 ]
@@ -161,6 +164,18 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+# ruff >=0.17 formats ```python fences inside Markdown; these files are excluded
+# because formatting degrades them.
+exclude = [
+    # compact keyword set explodes from 5 lines to 33
+    "docs/development/RESERVED_WORDS.md",
+    # function_like_ops set explodes from 3 lines to 15
+    "docs/guides/FUZZ_VS_STD_LATEX.md",
+    # pseudo-code with prose inside a string; reformat misaligns indentation
+    "docs/development/judge-prompt.md",
+    # ethos-managed content (talents), not ours to reformat
+    ".punt-labs/**",
+]
 
 [tool.mypy]
 python_version = "3.12"

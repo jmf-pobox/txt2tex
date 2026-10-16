@@ -205,7 +205,7 @@ class TokenType(Enum):
     # Structural
     SECTION_MARKER = "==="
     SOLUTION_MARKER = "**"
-    PART_LABEL = "(a)"          # (a), (b), (c), etc.
+    PART_LABEL = "(a)"  # (a), (b), (c), etc.
 
     # Environments
     TRUTH_TABLE = "TRUTH TABLE:"
@@ -246,10 +246,10 @@ class TokenType(Enum):
     RBRACE = "}"
 
     # Special
-    PIPE = "|"              # For table columns or quantifiers
+    PIPE = "|"  # For table columns or quantifiers
     NEWLINE = "\n"
-    INDENT = "  "           # Significant whitespace
-    TEXT = "..."            # Plain text/prose
+    INDENT = "  "  # Significant whitespace
+    TEXT = "..."  # Plain text/prose
     EOF = ""
 ```
 
@@ -358,24 +358,29 @@ class ASTNode:
     line: int
     column: int
 
+
 @dataclass
 class Document(ASTNode):
     sections: List[Section]
+
 
 @dataclass
 class Section(ASTNode):
     title: Optional[str]
     content: List[Block]
 
+
 @dataclass
 class Solution(ASTNode):
     number: int
     parts: List[Part]
 
+
 @dataclass
 class Part(ASTNode):
-    label: str          # "a", "b", "c"
+    label: str  # "a", "b", "c"
     content: List[Block]
+
 
 # Block types
 @dataclass
@@ -383,23 +388,28 @@ class Prose(ASTNode):
     text: str
     inline_math: List[MathExpr]  # Parsed math expressions
 
+
 @dataclass
 class TruthTable(ASTNode):
     headers: List[str]
     rows: List[List[str]]
 
+
 @dataclass
 class EquivChain(ASTNode):
     steps: List[EquivStep]
+
 
 @dataclass
 class EquivStep(ASTNode):
     expression: MathExpr
     justification: Optional[str]
 
+
 @dataclass
 class ProofTree(ASTNode):
     root: ProofNode
+
 
 @dataclass
 class ProofNode(ASTNode):
@@ -407,20 +417,24 @@ class ProofNode(ASTNode):
     children: List[ProofNode]
     indent_level: int
 
+
 # Z Notation
 @dataclass
 class GivenType(ASTNode):
     names: List[str]
+
 
 @dataclass
 class FreeType(ASTNode):
     name: str
     branches: List[str]
 
+
 @dataclass
 class AxDef(ASTNode):
     declarations: List[Declaration]
     predicates: List[MathExpr]
+
 
 @dataclass
 class Schema(ASTNode):
@@ -428,42 +442,50 @@ class Schema(ASTNode):
     declarations: List[Declaration]
     predicates: List[MathExpr]
 
+
 # Math expressions
 @dataclass
 class MathExpr(ASTNode):
     pass
 
+
 @dataclass
 class BinaryOp(MathExpr):
-    op: str              # "land", "lor", "=>", etc.
+    op: str  # "land", "lor", "=>", etc.
     left: MathExpr
     right: MathExpr
     explicit_parens: bool = False  # Preserves user-written parentheses
 
+
 @dataclass
 class UnaryOp(MathExpr):
-    op: str              # "lnot"
+    op: str  # "lnot"
     operand: MathExpr
+
 
 @dataclass
 class Quantifier(MathExpr):
-    quantifier: str      # "forall", "exists"
+    quantifier: str  # "forall", "exists"
     variable: str
     domain: Optional[MathExpr]
     body: MathExpr
+
 
 @dataclass
 class Identifier(MathExpr):
     name: str
 
+
 @dataclass
 class Number(MathExpr):
     value: str
+
 
 @dataclass
 class Superscript(MathExpr):
     base: MathExpr
     exponent: MathExpr
+
 
 @dataclass
 class Application(MathExpr):
@@ -615,30 +637,30 @@ class LaTeXGenerator:
         self.emit_preamble()
         self.visit(self.ast)
         self.emit_postamble()
-        return '\n'.join(self.output)
+        return "\n".join(self.output)
 
     def emit_preamble(self):
-        self.output.append(r'\documentclass{article}')
+        self.output.append(r"\documentclass{article}")
         if not self.options.use_zed:
-            self.output.append(r'\usepackage{fuzz}')  # Default
+            self.output.append(r"\usepackage{fuzz}")  # Default
         else:
             # Alternative: zed-* packages (via --zed flag)
-            self.output.append(r'\usepackage{zed-cm}')
-            self.output.append(r'\usepackage{zed-maths}')
+            self.output.append(r"\usepackage{zed-cm}")
+            self.output.append(r"\usepackage{zed-maths}")
             if self.has_proof_trees:  # Detected during parsing
-                self.output.append(r'\usepackage{zed-proof}')
+                self.output.append(r"\usepackage{zed-proof}")
             if self.has_floats:
-                self.output.append(r'\usepackage{zed-float}')
-        self.output.append(r'\usepackage{amsmath}')
+                self.output.append(r"\usepackage{zed-float}")
+        self.output.append(r"\usepackage{amsmath}")
         # Load natbib for author-year citations (Harvard style)
-        self.output.append(r'\usepackage{natbib}')
-        self.output.append(r'\begin{document}')
+        self.output.append(r"\usepackage{natbib}")
+        self.output.append(r"\begin{document}")
 
     def visit_solution(self, node: Solution):
-        self.output.append(r'\bigskip')
-        self.output.append(r'\noindent')
-        self.output.append(f'\\textbf{{Solution {node.number}}}')
-        self.output.append('')
+        self.output.append(r"\bigskip")
+        self.output.append(r"\noindent")
+        self.output.append(f"\\textbf{{Solution {node.number}}}")
+        self.output.append("")
         for part in node.parts:
             self.visit(part)
 
@@ -648,13 +670,13 @@ class LaTeXGenerator:
         right = self.visit(node.right)
 
         op_map = {
-            'and': r'\land',
-            'or': r'\lor',
-            '=>': r'\Rightarrow',
-            '<=>': r'\Leftrightarrow',
+            "and": r"\land",
+            "or": r"\lor",
+            "=>": r"\Rightarrow",
+            "<=>": r"\Leftrightarrow",
         }
 
-        return f'{left} {op_map[node.op]} {right}'
+        return f"{left} {op_map[node.op]} {right}"
 
     def visit_prose(self, node: Prose):
         # Handle inline math
@@ -663,28 +685,26 @@ class LaTeXGenerator:
             # Generate LaTeX for math expression
             math_latex = self.visit(math_expr)
             # Wrap in $ $ if not already
-            text = text.replace(
-                math_expr.original_text,
-                f'${math_latex}$'
-            )
-        
+            text = text.replace(math_expr.original_text, f"${math_latex}$")
+
         # Process citations: [cite key] → \citep{key}
         text = self._process_citations(text)
-        
+
         self.output.append(text)
 
     def _process_citations(self, text: str) -> str:
         """Process citation markup in text.
-        
+
         Converts [cite key] to \\citep{key} for Harvard-style parenthetical citations.
         Supports optional page/slide numbers.
-        
+
         Examples:
             "[cite spivey92]" → "\\citep{spivey92}"
             "[cite spivey92 p. 42]" → "\\citep[p. 42]{spivey92}"
             "[cite spivey92 p. 42]" → "\\citep[p. 42]{spivey92}"
         """
         pattern = r"\[cite\s+([a-zA-Z0-9_-]+)(?:\s+([^\]]+))?\]"
+
         def replace_citation(match: re.Match[str]) -> str:
             key = match.group(1)
             locator = match.group(2)
@@ -692,6 +712,7 @@ class LaTeXGenerator:
                 return f"\\citep[{locator.strip()}]{{{key}}}"
             else:
                 return f"\\citep{{{key}}}"
+
         return re.sub(pattern, replace_citation, text)
 ```
 
@@ -701,7 +722,7 @@ Store common patterns as templates:
 
 ```python
 TEMPLATES = {
-    'truth_table': r'''
+    "truth_table": r"""
 \begin{center}
 \begin{tabular}{|{columns}|}
 {header} \\
@@ -709,21 +730,19 @@ TEMPLATES = {
 {rows}
 \end{tabular}
 \end{center}
-''',
-
-    'equiv_chain': r'''
+""",
+    "equiv_chain": r"""
 \begin{align*}
 {steps}
 \end{align*}
-''',
-
-    'axdef': r'''
+""",
+    "axdef": r"""
 \begin{axdef}
 {declarations}
 \where
 {predicates}
 \end{axdef}
-''',
+""",
 }
 ```
 
@@ -883,16 +902,12 @@ class FuzzValidator:
 
     def validate(self) -> List[ValidationError]:
         # Write LaTeX to temp file
-        with tempfile.NamedTemporaryFile(suffix='.tex', mode='w') as f:
+        with tempfile.NamedTemporaryFile(suffix=".tex", mode="w") as f:
             f.write(self.latex)
             f.flush()
 
             # Run fuzz
-            result = subprocess.run(
-                ['fuzz', f.name],
-                capture_output=True,
-                text=True
-            )
+            result = subprocess.run(["fuzz", f.name], capture_output=True, text=True)
 
             if result.returncode != 0:
                 return self.parse_fuzz_errors(result.stderr)
@@ -903,8 +918,8 @@ class FuzzValidator:
         # Parse fuzz error format
         # Map LaTeX line numbers to original input line numbers
         errors = []
-        for line in stderr.split('\n'):
-            if 'error' in line.lower():
+        for line in stderr.split("\n"):
+            if "error" in line.lower():
                 # Extract line number, error message
                 # Map back to original input
                 errors.append(ValidationError(...))
@@ -937,23 +952,23 @@ class PDFGenerator:
 
     def generate(self) -> bool:
         with tempfile.TemporaryDirectory() as tmpdir:
-            tex_file = os.path.join(tmpdir, 'output.tex')
+            tex_file = os.path.join(tmpdir, "output.tex")
 
             # Write LaTeX
-            with open(tex_file, 'w') as f:
+            with open(tex_file, "w") as f:
                 f.write(self.latex)
 
             # Set environment for fuzz
             env = os.environ.copy()
-            env['TEXINPUTS'] = '../tex//:'
-            env['MFINPUTS'] = '../tex//:'
+            env["TEXINPUTS"] = "../tex//:"
+            env["MFINPUTS"] = "../tex//:"
 
             # Run pdflatex
             result = subprocess.run(
-                ['pdflatex', '-interaction=nonstopmode', tex_file],
+                ["pdflatex", "-interaction=nonstopmode", tex_file],
                 cwd=tmpdir,
                 env=env,
-                capture_output=True
+                capture_output=True,
             )
 
             if result.returncode != 0:
@@ -961,7 +976,7 @@ class PDFGenerator:
                 raise LaTeXError(self.parse_latex_log(result.stdout))
 
             # Copy PDF to output location
-            pdf_file = tex_file.replace('.tex', '.pdf')
+            pdf_file = tex_file.replace(".tex", ".pdf")
             shutil.copy(pdf_file, self.output_path)
 
             return True
@@ -974,31 +989,42 @@ class PDFGenerator:
 ```python
 class Txt2TeXError(Exception):
     """Base exception class."""
+
     pass
+
 
 class LexerError(Txt2TeXError):
     """Tokenization error."""
+
     line: int
     column: int
     message: str
 
+
 class ParserError(Txt2TeXError):
     """Parsing error."""
+
     line: int
     expected: str
     got: str
 
+
 class SemanticError(Txt2TeXError):
     """Semantic analysis error."""
+
     errors: List[str]
+
 
 class ValidationError(Txt2TeXError):
     """fuzz validation error."""
+
     line: int
     message: str
 
+
 class LaTeXError(Txt2TeXError):
     """LaTeX compilation error."""
+
     log: str
 ```
 
@@ -1098,9 +1124,9 @@ The `LaTeXGenerator` class accepts these configuration options:
 
 ```python
 generator = LaTeXGenerator(
-    use_fuzz=True,           # True=fuzz package (default), False=zed-* packages
-    toc_parts=False,         # Include parts in table of contents
-    warn_overflow=True,      # Emit warnings for potential overflow
+    use_fuzz=True,  # True=fuzz package (default), False=zed-* packages
+    toc_parts=False,  # Include parts in table of contents
+    warn_overflow=True,  # Emit warnings for potential overflow
     overflow_threshold=100,  # Character threshold for overflow detection
 )
 ```
@@ -2009,50 +2035,50 @@ F | F | T
 
 ```python
 Document(
-  sections=[
-    Section(
-      title=None,
-      content=[
-        Solution(
-          number=1,
-          parts=[
-            Part(
-              label="a",
-              content=[
-                Prose(
-                  text="",
-                  inline_math=[
-                    Quantifier(
-                      quantifier="forall",
-                      variable="x",
-                      domain=Identifier("N"),
-                      body=BinaryOp(
-                        op=">=",
-                        left=Superscript(
-                          base=Identifier("x"),
-                          exponent=Number("2")
-                        ),
-                        right=Number("0")
-                      )
-                    )
-                  ]
-                )
-              ]
-            )
-          ]
-        ),
-        TruthTable(
-          headers=["p", "q", "p => q"],
-          rows=[
-            ["T", "T", "T"],
-            ["T", "F", "F"],
-            ["F", "T", "T"],
-            ["F", "F", "T"]
-          ]
+    sections=[
+        Section(
+            title=None,
+            content=[
+                Solution(
+                    number=1,
+                    parts=[
+                        Part(
+                            label="a",
+                            content=[
+                                Prose(
+                                    text="",
+                                    inline_math=[
+                                        Quantifier(
+                                            quantifier="forall",
+                                            variable="x",
+                                            domain=Identifier("N"),
+                                            body=BinaryOp(
+                                                op=">=",
+                                                left=Superscript(
+                                                    base=Identifier("x"),
+                                                    exponent=Number("2"),
+                                                ),
+                                                right=Number("0"),
+                                            ),
+                                        )
+                                    ],
+                                )
+                            ],
+                        )
+                    ],
+                ),
+                TruthTable(
+                    headers=["p", "q", "p => q"],
+                    rows=[
+                        ["T", "T", "T"],
+                        ["T", "F", "F"],
+                        ["F", "T", "T"],
+                        ["F", "F", "T"],
+                    ],
+                ),
+            ],
         )
-      ]
-    )
-  ]
+    ]
 )
 ```
 

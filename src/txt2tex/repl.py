@@ -296,7 +296,20 @@ def repl_main(*, use_fuzz: bool = True) -> int:
                 if stripped == ".quit" or stripped == ".exit":
                     break
                 if stripped == ".clear":
-                    os.system("clear" if platform.system() != "Windows" else "cls")  # noqa: S605
+                    # cls is a cmd builtin, not an executable; resolve the shell
+                    # via COMSPEC so a cmd.exe in the cwd is never picked up.
+                    clear_cmd = (
+                        [
+                            os.environ.get("COMSPEC", r"C:\Windows\System32\cmd.exe"),
+                            "/c",
+                            "cls",
+                        ]
+                        if platform.system() == "Windows"
+                        else ["clear"]
+                    )
+                    # A missing or unexecutable clear must not crash the REPL.
+                    with contextlib.suppress(OSError):
+                        subprocess.run(clear_cmd, check=False)  # noqa: S603
                     continue
                 if stripped == ".latex":
                     latex_only = not latex_only
