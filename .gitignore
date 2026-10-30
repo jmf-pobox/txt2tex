@@ -108,8 +108,9 @@ htmlcov/
 .punt-labs/**/*.local
 .punt-labs/**/*.local.*
 
-# ethos runtime locks (never tracked; see ethos docs/audit-seal.md)
-.punt-labs/ethos/missions/**/*.lock
+# ethos runtime locks (never tracked; see ethos docs/audit-seal.md):
+# per-mission .lock, missions.jsonl.lock, identities/<handle>.yaml.lock
+.punt-labs/ethos/**/*.lock
 **/.create.lock
 
 # Homework - private (instructor-provided content, personal coursework)
