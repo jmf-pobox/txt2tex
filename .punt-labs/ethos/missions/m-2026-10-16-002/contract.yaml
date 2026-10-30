@@ -1,0 +1,74 @@
+mission_id: m-2026-10-16-002
+status: closed
+type: implement
+created_at: "2026-10-16T15:35:43Z"
+updated_at: "2026-10-16T15:54:19Z"
+closed_at: "2026-10-16T15:54:19Z"
+leader: jra
+worker: rmh
+evaluator:
+    handle: djb
+    pinned_at: "2026-10-16T15:35:43Z"
+    hash: 91c04f134ecc3e17ed1ec97be914d180a2b23466973c4866d3a7f5456041c6fd
+inputs:
+    files:
+        - src/txt2tex/lexer.py
+        - src/txt2tex/repl.py
+        - tests/test_repl.py
+write_set:
+    - src/txt2tex/lexer.py
+    - src/txt2tex/repl.py
+    - tests/test_repl.py
+    - .tmp/missions/deps-code-fixes-result.yaml
+success_criteria:
+    - uvx ruff@0.17.1 check . reports zero violations (ISC004 at lexer.py:279 fixed)
+    - uv run --with pyright==1.1.414 pyright reports zero errors (reportDeprecated os.system at repl.py:299 fixed)
+    - make check (current pinned toolchain) passes with zero violations
+    - 'TDD: a test in tests/test_repl.py for the .clear command is written first, shown failing, then passing'
+    - No change in lexer error-message text (the implicit concatenation is intended; only parenthesize it)
+budget:
+    rounds: 2
+    reflection_after_each: true
+current_round: 2
+context: |
+    Branch: chore/deps-upgrade (already checked out). Do not commit; jra commits.
+    Do not touch .claude/agents/*.md or .punt-labs/ — they carry unrelated
+    uncommitted changes.
+
+    We are upgrading dev tools: ruff 0.15.14 -> 0.17.1, pyright 1.1.409 -> 1.1.414.
+    A separate mission (adb) will bump the lockfile AFTER you finish. Your fixes
+    must pass under BOTH the current pinned tools (make check) and the new
+    versions (run via uvx / uv run --with as in the success criteria).
+
+    ## Fix 1 — ruff ISC004, src/txt2tex/lexer.py:279
+
+    In the `details = [...]` list, the first element is two implicitly
+    concatenated f-strings. That is intended (one message line). Wrap the two
+    f-strings in parentheses so ruff 0.17 ISC004 is satisfied. Same runtime
+    string. Grep the whole of src/ and tests/ for any other ISC004 instance
+    (ruff 0.17 reported only this one, but confirm).
+
+    ## Fix 2 — pyright reportDeprecated, src/txt2tex/repl.py:299
+
+    The `.clear` REPL command calls
+    `os.system("clear" if platform.system() != "Windows" else "cls")  # noqa: S605`.
+    pyright 1.1.414 flags os.system as deprecated. Replace with
+    subprocess.run using an argument list, no shell=True:
+      - non-Windows: ["clear"]
+      - Windows: ["cmd", "/c", "cls"]   (cls is a cmd builtin, not an executable;
+        ["cls"] alone would raise FileNotFoundError)
+    Use check=False (a failing clear must not crash the REPL). Keep any noqa
+    narrowly scoped to the specific ruff rules that fire (likely S603/S607) and
+    only if they fire. Remove the `os` / `platform` imports only if they become
+    unused. Imports at top of file, per project rules.
+
+    TDD: write a test in tests/test_repl.py that drives the REPL with `.clear`
+    input and monkeypatches subprocess.run, asserting the exact argv for the
+    current platform (and, via monkeypatching platform.system, for Windows).
+    Run it, show it fails against the current os.system code, then implement.
+
+    Rules: edit each file by hand with Edit — no sed/awk/perl -i/scripted
+    substitutions. Full type annotations; mypy and pyright strict.
+
+    Record your result in .tmp/missions/deps-code-fixes-result.yaml and via
+    `ethos mission result`.

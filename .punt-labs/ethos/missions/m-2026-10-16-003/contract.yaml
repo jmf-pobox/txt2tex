@@ -1,0 +1,99 @@
+mission_id: m-2026-10-16-003
+status: closed
+type: implement
+created_at: "2026-10-16T15:36:11Z"
+updated_at: "2026-10-16T16:02:34Z"
+closed_at: "2026-10-16T16:02:34Z"
+leader: jra
+worker: adb
+evaluator:
+    handle: rmh
+    pinned_at: "2026-10-16T15:36:11Z"
+    hash: eceecbd5388aa84868c0ff376e7de110fce2cc750f8461891f1085cdd796301b
+inputs:
+    files:
+        - pyproject.toml
+        - .github/dependabot.yml
+        - Makefile
+write_set:
+    - pyproject.toml
+    - uv.lock
+    - .github/dependabot.yml
+    - docs/DESIGN.md
+    - docs/PHASE1-PLAN.md
+    - docs/guides/PROOF_SYNTAX.md
+    - .tmp/missions/deps-upgrade-result.yaml
+success_criteria:
+    - .github/dependabot.yml uses package-ecosystem "uv" (not "pip") for the Python entry; all other settings preserved
+    - uv lock --upgrade applied; uv.lock resolves ruff 0.17.1, mypy 2.4.0, pyright 1.1.414, pytest 9.1.1 (or newer) for the dev group and current versions for the complexity group
+    - pyproject.toml dev-group floors raised to the new versions (ruff>=0.17.1, mypy>=2.4.0, pyright>=1.1.414, pytest>=9.1.1) so CI cannot resolve back to the old toolchain
+    - '[tool.ruff.format] exclude lists exactly: docs/development/RESERVED_WORDS.md, docs/guides/FUZZ_VS_STD_LATEX.md, docs/development/judge-prompt.md, .punt-labs/ — each with a one-line comment giving the reason'
+    - docs/DESIGN.md, docs/PHASE1-PLAN.md, docs/guides/PROOF_SYNTAX.md reformatted by `uv run ruff format` (the tool, not hand edits) and the result inspected
+    - make check passes with zero violations on the upgraded toolchain (lint, markdownlint, format-check, mypy, pyright, tests)
+    - uv sync --group complexity succeeds
+budget:
+    rounds: 2
+    reflection_after_each: true
+current_round: 1
+context: |
+    Branch: chore/deps-upgrade (already checked out) in /Users/jfreeman/Coding/txt2tex.
+    Do not commit; jra commits. Do not touch .claude/agents/*.md or the ethos
+    session audit.jsonl — unrelated uncommitted changes.
+
+    A prior mission (rmh, m-2026-10-16-002) already fixed the two code issues the
+    new tools raise (ruff ISC004 in lexer.py, pyright reportDeprecated os.system
+    in repl.py). If make check still fails on src/ or tests/ after the upgrade,
+    STOP and report — do not edit Python source; that is rmh's write-set.
+
+    ## 1. Dependabot
+
+    The weekly "pip" version-update jobs run green but never open PRs, because
+    the project has `dependencies = []` and keeps dev tools in PEP 735
+    [dependency-groups] locked in uv.lock — which the pip ecosystem does not read.
+    Only security updates (branch prefix dependabot/uv/) have arrived (PR #108).
+    Switch the Python entry to `package-ecosystem: "uv"`. Keep schedule, limits,
+    commit-message prefix, and labels. Consider adding a `groups:` block so dev
+    tools arrive as one PR rather than five — do it if simple, note it either way.
+
+    ## 2. Lockfile and floors
+
+    `uv lock --upgrade`, then `uv sync`. Raise dev-group floors as in the success
+    criteria. Leave the complexity group's existing comments intact (gitpython
+    floor stays >=3.1.58 or higher).
+
+    ## 3. ruff 0.17 formats Python code blocks inside Markdown
+
+    ruff 0.17 now formats ```python fences in .md files. Decision (from the
+    student, jfreeman): accept this in general, exclude specific files where
+    formatting degrades the doc. jra reviewed every diff:
+
+    - ACCEPT (reformat): docs/DESIGN.md, docs/PHASE1-PLAN.md,
+      docs/guides/PROOF_SYNTAX.md — PEP 8 blank lines, collapsed comment
+      alignment, quote normalization. Harmless.
+    - EXCLUDE:
+      - docs/development/RESERVED_WORDS.md — a compact keyword set explodes
+        from 5 lines to 33.
+      - docs/guides/FUZZ_VS_STD_LATEX.md — function_like_ops set explodes from
+        3 lines to 15.
+      - docs/development/judge-prompt.md — pseudo-code with prose inside a
+        string; reformat yields mismatched indentation.
+      - .punt-labs/ — ethos-managed content (talents), not ours to reformat.
+
+    Put the exclusions in `[tool.ruff.format] exclude = [...]` in pyproject.toml.
+    Verify with `uv run ruff format --check .` that exactly those four are
+    skipped and nothing else would change. After formatting the three accepted
+    docs, run markdownlint (part of make check) — the reformatted fences must
+    still pass. Read each reformatted block once to confirm it still reads
+    correctly as documentation.
+
+    ## 4. CI
+
+    Check .github/workflows/quality.yml: if it pins tool versions or calls ruff
+    with flags that would now behave differently, report it (do not edit — it is
+    not in the write-set; tell jra).
+
+    Rules: no sed/awk/perl -i/scripted edits to files; use Edit by hand. Running
+    `ruff format` and `uv lock` as tools is fine.
+
+    Record your result in .tmp/missions/deps-upgrade-result.yaml and via
+    `ethos mission result`.

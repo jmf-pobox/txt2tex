@@ -95,8 +95,22 @@ htmlcov/
 # ruff
 .ruff_cache/
 
-# Claude Code local settings (machine-specific, not team-wide)
-.claude/settings.local.json
+# Machine-local files (the `local` convention): never committed, at any depth.
+# Covers .envrc.local, .claude/settings.local.json, vox.local.md,
+# biff config.local.yaml, ethos <ns>.local.yaml extension secrets.
+*.local
+*.local.*
+
+# punt-labs canonical block (punt-kit standards/punt-labs-dir.md §6):
+# the .punt-labs/local/ zone holds ethos live audit/mission writes.
+.punt-labs/**/local
+.punt-labs/**/local/**
+.punt-labs/**/*.local
+.punt-labs/**/*.local.*
+
+# ethos runtime locks (never tracked; see ethos docs/audit-seal.md)
+.punt-labs/ethos/missions/**/*.lock
+**/.create.lock
 
 # Homework - private (instructor-provided content, personal coursework)
 hw/
@@ -116,8 +130,6 @@ examples/*/phase12_*.pdf
 *.disabled
 
 /.punt-labs/quarry/captures/
-# Per-session vox config (machine-local; vox.md is the committed shared config)
-/.punt-labs/vox/vox.local.md
 
 # Stray root-level cheatsheet from prior workflow (now consolidated into docs/reference.pdf)
 /cheatsheet.pdf

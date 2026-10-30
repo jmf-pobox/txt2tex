@@ -1,0 +1,1 @@
+Mission m-2026-10-16-004 is yours. Read it via `ethos mission show m-2026-10-16-004` and execute it exactly. Repo <repo>, branch chore/deps-upgrade. Follow TDD visibly (test, show failure, implement, show pass, make check). Do not commit. Report: the diff, failing-then-passing output, and make check summary.
