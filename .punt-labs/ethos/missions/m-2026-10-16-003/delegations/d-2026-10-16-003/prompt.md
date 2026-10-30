@@ -1,0 +1,5 @@
+You are the evaluator for mission m-2026-10-16-002 (`ethos mission show m-2026-10-16-002`). Repo: <repo>, branch chore/deps-upgrade, uncommitted. Review `git diff src/txt2tex/repl.py src/txt2tex/lexer.py tests/test_repl.py`.
+
+Focus: the REPL `.clear` command changed from `os.system("clear"/"cls")` to `subprocess.run(["clear"] | ["cmd", "/c", "cls"], check=False)  # noqa: S603`. Assess: PATH-lookup of a bare executable name (S607 did not fire — confirm why, and whether it matters for a local interactive REPL), argv construction, absence of shell=True, behaviour when `clear` is missing (FileNotFoundError would propagate and crash the REPL — check=False does not catch that; is that acceptable vs. the old os.system behaviour, which returned a nonzero status silently?), Windows correctness, and whether the noqa is narrowly scoped. Also confirm the lexer.py change is runtime-identical.
+
+Read-only: do not edit files. Report findings ranked by severity with file:line, and a verdict (pass / pass-with-findings / fail). Record your evaluation via `ethos mission` if the tool supports an evaluator verdict.

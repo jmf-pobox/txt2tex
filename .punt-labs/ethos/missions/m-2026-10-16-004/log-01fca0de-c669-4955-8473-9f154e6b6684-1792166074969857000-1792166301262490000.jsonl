@@ -1,0 +1,3 @@
+{"ts":"2026-10-16T15:54:34.969857Z","event":"create","actor":"jra","details":{"evaluator":"djb","ticket":"","worker":"rmh"}}
+{"ts":"2026-10-16T15:57:18.615373Z","event":"result","actor":"rmh","details":{"confidence":0.95,"evidence_entries":3,"files_changed":2,"round":1,"verdict":"pass"}}
+{"ts":"2026-10-16T15:58:21.26249Z","event":"close","actor":"jra","details":{"round":1,"status":"closed","verdict":"pass"}}

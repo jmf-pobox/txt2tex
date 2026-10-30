@@ -1,0 +1,47 @@
+mission_id: m-2026-10-16-004
+status: closed
+type: implement
+created_at: "2026-10-16T15:54:34Z"
+updated_at: "2026-10-16T15:58:21Z"
+closed_at: "2026-10-16T15:58:21Z"
+leader: jra
+worker: rmh
+evaluator:
+    handle: djb
+    pinned_at: "2026-10-16T15:54:34Z"
+    hash: 91c04f134ecc3e17ed1ec97be914d180a2b23466973c4866d3a7f5456041c6fd
+inputs:
+    files:
+        - src/txt2tex/repl.py
+        - tests/test_repl.py
+write_set:
+    - src/txt2tex/repl.py
+    - tests/test_repl.py
+    - .tmp/missions/repl-systemroot-result.yaml
+success_criteria:
+    - COMSPEC-unset fallback derives cmd.exe from %SystemRoot% (then a C:\Windows default only if SystemRoot is also unset)
+    - Fallback test sets SystemRoot to a non-default directory (e.g. D:\Windows) and asserts argv[0] == D:\Windows\System32\cmd.exe; a second case covers both unset
+    - Path built with Windows semantics regardless of host OS (tests run on macOS/Linux CI) — e.g. ntpath.join or PureWindowsPath — and ruff PTH rules satisfied
+    - 'TDD: tests written first, shown failing, then passing; make check green'
+budget:
+    rounds: 1
+    reflection_after_each: true
+current_round: 1
+context: |
+    Copilot review on PR #110 (thread PRRT_kwDOQDzczs6tRkC6, repl.py:303):
+    "When COMSPEC is unset and Windows is installed somewhere other than
+    C:\Windows (e.g. SystemRoot=D:\Windows), this fallback targets the wrong
+    executable. The suppressed FileNotFoundError then makes .clear silently do
+    nothing. Derive the fallback from SystemRoot, and update the fallback test to
+    set a non-default Windows directory explicitly."
+
+    Branch chore/deps-upgrade (checked out). Do not commit; jra commits.
+    Current code: os.environ.get("COMSPEC", r"C:\Windows\System32\cmd.exe").
+    Fix: COMSPEC, else <SystemRoot>\System32\cmd.exe, else C:\Windows\System32\cmd.exe.
+    Keep it compact; if the expression grows, a small module-level helper
+    (fully typed) is fine. The host running tests is POSIX, so do not use
+    pathlib.Path / os.path.join (they would emit '/'); use ntpath.join or
+    PureWindowsPath and str().
+
+    Edit by hand only — no sed/awk/scripted substitutions. Record the result via
+    `ethos mission result` and in .tmp/missions/repl-systemroot-result.yaml.

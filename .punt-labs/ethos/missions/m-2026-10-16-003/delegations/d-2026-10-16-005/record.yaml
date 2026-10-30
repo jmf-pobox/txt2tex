@@ -1,0 +1,8 @@
+id: d-2026-10-16-005
+tier: B
+mission: m-2026-10-16-003
+parent_session: 01fca0de-c669-4955-8473-9f154e6b6684
+agent_type: rmh
+created_at: "2026-10-16T15:45:19Z"
+closed_at: "2026-10-16T16:02:34Z"
+verdict: pass
