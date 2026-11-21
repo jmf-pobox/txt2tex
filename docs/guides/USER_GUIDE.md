@@ -1661,7 +1661,7 @@ R*               →  R*          [reflexive-transitive closure]
 - `+` (transitive): follow relation one or more times
 - `*` (reflexive-transitive): follow relation zero or more times
 
-Note: Reflexive closure (`rcl`) and symmetric closure (`s`) are not yet implemented.
+Note: Reflexive closure (`rcl`) and symmetric closure (`scl`) are not yet implemented ([#117](https://github.com/jmf-pobox/txt2tex/issues/117)).
 
 ### Compound Identifiers in Definitions
 
@@ -2968,7 +2968,7 @@ than shipping a mislabeled waiver.
 | `axdef` | Yes | `axdefnofuzz` |
 | `schema` | Yes | `schemanofuzz` |
 | Given set / free type / abbreviation | Yes | `zednofuzz` |
-| `gendef` | Not yet | Errors: `gendefnofuzz not yet implemented — mark support pending (NOFUZZ cannot be applied to a gendef block)` |
+| `gendef` | Not yet ([#100](https://github.com/jmf-pobox/txt2tex/issues/100)) | Errors: `gendefnofuzz not yet implemented — mark support pending (NOFUZZ cannot be applied to a gendef block)` |
 
 ### Limitations
 
@@ -3335,10 +3335,10 @@ The base may be any relation expression.  Compound bases are automatically
 parenthesised:
 
 ```text
-pi[tournament](sigma[venue = 'Wimbledon'](Match))[id/tournament]
+pi[artist](sigma[genre = 'Jazz'](Album))[id/artist]
 ```
 
-Renders: $(\mathrm{Project}_{tournament}(\mathrm{Restrict}_{venue = `Wimbledon'}(Match)))[id/tournament]$
+Renders: $(\mathrm{Project}_{artist}(\mathrm{Restrict}_{genre = `Jazz'}(Album)))[id/artist]$
 
 Multiple pairs are comma-separated; each pair writes NEW first then `/` then OLD:
 
@@ -3353,7 +3353,7 @@ wrap the rename inside a projection to force relational context:
 
 ```text
 // Force relational context with pi (project all attributes):
-B == pi[ship, class, launched](Ship[ship/name])
+B == pi[title, genre, year](Album[title/name])
 ```
 
 **Fuzz note.** `R[NEW/OLD]` on a relation is not valid inside Z paragraphs
@@ -3372,7 +3372,7 @@ Track join Album
 Renders: $\mathrm{Join}(Track, Album)$
 
 The source keyword is `join`; the LaTeX emission is `\mathrm{Join}(R, S)`,
-matching the instructor's canonical vocabulary (per slides/topic02.pdf §45).
+matching the conventional database-textbook (Date) vocabulary.
 
 **Theta-join** with explicit predicate:
 
@@ -3637,7 +3637,7 @@ Components are **comma-separated** (not semicolons).
 }
 ```
 
-The `;` in `s : Ship; c : Class` separates variable-type pairs with
+The `;` in `t : Track; a : Album` separates variable-type pairs with
 different domains (multi-typed comprehension).
 
 **LaTeX output:**
@@ -3870,16 +3870,17 @@ Semicolon-chained form — all four quantifier types (`forall`, `exists`,
 `exists1`, `mu`) honour the break equally:
 
 ```text
-forall s : Ship; o : Outcome; b : Battle |
-  (o.ship = s.name land o.battle = b.name) =>
-  (s.launched <= b.date)
+forall r : Artist; a : Album; t : Track |
+  (t.album = a.title land a.artist = r.name) =>
+  (r.founded <= a.year)
 ```
 
 Both forms emit `@ \\` followed by a newline and `\t1` indentation:
 
 ```latex
-\forall s : Ship; o : Outcome; b : Battle @ \\
-\t1 (o.ship = s.name \land o.battle = b.name) \implies ...
+\forall r : Artist; a : Album; t : Track @ \\
+\t1 (t.album = a.title \land a.artist = r.name) \implies \\
+\t1 (r.founded \leq a.year)
 ```
 
 The bullet (`.`) separator in constraint-plus-body quantifiers also supports
@@ -3918,9 +3919,17 @@ and `lor`.
 Example — long algebra expression broken at operator boundaries:
 
 ```text
-pi[winner, venue, tier](Tournament join
-  Match join
-  (pi[tournament](sigma[venue = 'Centre Court'](Match)))[id/tournament])
+pi[title, artist, year](Album join
+  Track join
+  (pi[artist](sigma[genre = 'Jazz'](Album)))[id/artist])
+```
+
+Renders:
+
+```latex
+\mathrm{Project}_{title, artist, year}(\mathrm{Join}(\mathrm{Join}(Album, \\
+\quad Track), \\
+\quad (\mathrm{Project}_{artist}(\mathrm{Restrict}_{genre = `Jazz'}(Album)))[id/artist]))
 ```
 
 Example — inside a schema `where` clause:
@@ -4017,7 +4026,7 @@ For more information:
 
 - See [../../README.md](../../README.md) for installation and setup
 - See [../DESIGN.md](../DESIGN.md) for architecture details
-- Check `examples/` directory for working examples (48 examples organized by topic)
+- Check `examples/` directory for working examples (160 `.txt` examples organized by topic, 61 of them in `examples/user_guide/`)
 - Review phase-specific test files in `tests/` for syntax examples
 
 ---

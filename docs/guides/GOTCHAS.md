@@ -115,15 +115,17 @@ for complex relation arguments.
 
 ## 7. Unspaced `>` or `<` inside `sigma[...]` lexes as angle bracket
 
-**Symptom.** A sigma predicate with an unspaced `>` or `<` fails
-to parse:
+Tracking: [#121](https://github.com/jmf-pobox/txt2tex/issues/121).
+
+**Symptom.** A sigma predicate with an unspaced `>` or `<` is
+rejected:
 
 ```text
 sigma[groupcount>1](R)
 ```
 
 ```text
-Error: Expected ']' after sigma predicate
+Error: Unspaced '>' inside sigma[...] is parsed as an angle bracket — add spaces around the operator (e.g. sigma[x > 1] not sigma[x>1])
 
 1 | sigma[groupcount>1](R)
   |      ^
@@ -132,8 +134,8 @@ Error: Expected ']' after sigma predicate
 The lexer disambiguates `>` and `<` based on spacing: without a
 leading space, `>` becomes RANGLE (closing angle bracket `⟩`) and
 `<` becomes LANGLE (opening angle bracket `⟨`).  The sigma
-predicate parser then sees a broken expression and reports a
-missing `]`.
+predicate parser then sees a broken expression and stops with the
+error above.
 
 The two-character operators `>=` and `<=` are not affected — they
 always lex correctly regardless of spacing.
@@ -154,5 +156,5 @@ sigma[x<=10](R)          -- OK: <= always lexes as LESS_EQUAL
 
 ```text
 sigma[groupcount > 1](R)
-sigma[x > 1 and y < 10](R)
+sigma[x > 1 land y < 10](R)
 ```

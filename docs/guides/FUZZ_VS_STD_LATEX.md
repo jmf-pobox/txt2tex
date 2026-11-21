@@ -973,15 +973,6 @@ pdftotext test.pdf -  # Check rendering
 
 ---
 
-## Future Considerations
+## Known Limitations
 
-### Potential Features
-
-1. **Fuzz-only mode**: Flag to reject all non-fuzz-compatible syntax at parse time
-2. **Compatibility warnings**: Warn users when they use features that won't work with fuzz
-3. **Automatic conversion**: Convert underscores to camelCase when fuzz mode is enabled
-4. **Precedence table**: Document all operator precedence differences between fuzz and standard Z
-
-### Known Limitations
-
-See [MISSING_FEATURES.md](MISSING_FEATURES.md) for complete list of fuzz features not yet supported by txt2tex.
+See [MISSING_FEATURES.md](MISSING_FEATURES.md) for the list of fuzz features not yet supported by txt2tex. Open work is tracked in [GitHub Issues](https://github.com/jmf-pobox/txt2tex/issues).

@@ -123,6 +123,6 @@ syntax cannot express that in txt2tex today.
     - Three-plus-char suffix (`cumulative_total`): goes to the multi-word identifier path; emits as `\mathit{cumulative\_total}`.
    Consequence: short letter suffixes that LOOK like subscripts (`FK_E`) are NOT subscripted; they render with a literal underscore. Use parenthesised parametrisation (`FK(E)`) or rename without an underscore if you want a clean visual.
 6. **Reflexive and symmetric closure**: `rcl` and `scl` are not supported. Tracking: [#117](https://github.com/jmf-pobox/txt2tex/issues/117). Write the union with the identity relation yourself (`R union id X`).
-7. **Unspaced `>` in `sigma[...]`**: `sigma[price>10](R)` stops with an error. Write `sigma[price > 10](R)` with spaces. Tracking: [#121](https://github.com/jmf-pobox/txt2tex/issues/121).
+7. **Unspaced `>` or `<` in `sigma[...]`**: `sigma[price>10](R)` stops with an error. Write `sigma[price > 10](R)` with spaces. Tracking: [#121](https://github.com/jmf-pobox/txt2tex/issues/121).
 8. **Line breaks after `;` in set comprehensions** are not preserved in the output. Tracking: [#122](https://github.com/jmf-pobox/txt2tex/issues/122).
 9. **Multi-declaration `lambda` without a `|` constraint** (`lambda x : N; y : N . x + y`) is rejected with `Expected '|' after quantifier binding`. Add a constraint: `lambda x : N; y : N | true . x + y`. Tracking: [#115](https://github.com/jmf-pobox/txt2tex/issues/115).
