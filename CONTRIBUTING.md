@@ -271,7 +271,8 @@ file.
 - Add a decision record to `docs/DESIGN.md` when a change involves a design
   choice with rejected alternatives.
 - Every command or LaTeX snippet in the docs must come from a real run. Run
-  `uv run txt2tex --tex-only file.txt` and paste what it prints.
+  `uv run txt2tex --tex-only file.txt`, then copy the relevant fragment from
+  the generated `.tex` file. The command itself prints only status lines.
 - Check Markdown with `make lint-md`.
 
 File names under `docs/`:
@@ -326,17 +327,19 @@ Where docs live:
    uvx twine upload dist/*
    ```
 
-9. Tag the release and create the GitHub release:
+9. Create `release-notes.md` in the repository root. Copy the section for this
+   version from `CHANGELOG.md` into it. Do not commit this file.
+10. Tag the release and create the GitHub release:
 
-   ```bash
-   git tag vX.Y.Z
-   git push origin vX.Y.Z
-   gh release create vX.Y.Z --title "vX.Y.Z" --notes-file release-notes.md
-   ```
+    ```bash
+    git tag vX.Y.Z
+    git push origin vX.Y.Z
+    gh release create vX.Y.Z --title "vX.Y.Z" --notes-file release-notes.md
+    ```
 
-   Copy the release notes from the matching `CHANGELOG.md` section.
+    Delete `release-notes.md` afterwards.
 
-10. Check the result at <https://pypi.org/project/txt2tex/>, then install it in
+11. Check the result at <https://pypi.org/project/txt2tex/>, then install it in
     a fresh environment:
 
     ```bash

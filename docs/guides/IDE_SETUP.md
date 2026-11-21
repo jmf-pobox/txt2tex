@@ -22,7 +22,7 @@ pdflatex until citations resolve):
         {
             "name": "fuzz",
             "command": "fuzz",
-            "args": ["-t", "%DOCFILE%"]
+            "args": ["-t", "%DOCFILE_EXT%"]
         },
         {
             "name": "latexmk",
@@ -36,8 +36,8 @@ pdflatex until citations resolve):
                 "%DOC%"
             ],
             "env": {
-                "TEXINPUTS": ".:%DIR%:%DIR%/latex//:",
-                "MFINPUTS": ".:%DIR%:%DIR%/latex//:"
+                "TEXINPUTS": ".:%DIR%:TXT2TEX_LATEX_DIR//:",
+                "MFINPUTS": ".:%DIR%:TXT2TEX_LATEX_DIR//:"
             }
         }
     ],
@@ -51,9 +51,19 @@ pdflatex until citations resolve):
 
 - `fuzz -> latexmk` (default) type-checks with fuzz, then builds the PDF.
 - `latexmk` builds the PDF without fuzz. Use it for quick iteration.
+- `%DOCFILE_EXT%` is the LaTeX Workshop placeholder for the file name with its
+  extension, so fuzz gets `myfile.tex`.
 - `TEXINPUTS` and `MFINPUTS` tell LaTeX where to find `fuzz.sty` and the
-  `oxsz*.mf` fonts. Run `txt2tex --tex-only myfile.txt` once so these files are
-  copied next to your `.tex` file.
+  `oxsz*.mf` fonts. They ship inside the installed package, in its `latex/`
+  folder. `txt2tex --tex-only` does not leave copies beside your `.tex` file.
+  Print the folder with:
+
+  ```bash
+  python -c "import txt2tex, pathlib; print(pathlib.Path(txt2tex.__file__).parent / 'latex')"
+  ```
+
+  Replace `TXT2TEX_LATEX_DIR` in the settings above with the path it prints.
+  Use the `python` that has txt2tex installed (in a clone, `uv run python`).
 
 #### .latexmkrc
 
