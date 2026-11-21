@@ -779,9 +779,9 @@ TEMPLATES = {
 
 **Current state of the policy** (all in `codegen/paren_policy.py` and the expression generators):
 
-1. **Arithmetic operators are in the `PRECEDENCE` table.** `+`, `-`, `*`, `/` have explicit entries, so `a + b * c` is parenthesised correctly under a lower-precedence parent.
+1. **Four arithmetic operators are in the `PRECEDENCE` table.** `+` and `-` are at level 11; `*` and `mod` are at level 12. All sit above the set operators (maximum 10), so `a + b * c` is parenthesised correctly under a lower-precedence parent. `/` and `div` have no entry. Bare `/` is the rename separator in relational algebra (`R[NEW/OLD]`), not division, so it is not an arithmetic operator here.
 
-2. **Unary operators have a table.** `UNARY_PRECEDENCE` holds the precedence of prefix and postfix operators, so `_needs_parens` is the single source of truth for unary operands.
+2. **Unary operators have a table, but `_needs_parens` does not read it.** `UNARY_PRECEDENCE` lists the prefix operators (`lnot`, unary `-`, `#`, `dom`, `ran`, `inv`, `id`, `P`, `P1`, `F`, `F1`, `bigcup`, `bigcap`) and the postfix operators (`~`, `+`, `*`), all at level 20, above every binary operator. `_needs_parens` handles binary children only. `_generate_unary_op` in `codegen/expressions.py` applies the rule the table states: it wraps a `BinaryOp` operand in parens unless the operand already carries its own source parens.
 
 3. **Set-comprehension predicates keep their parent context.** `_generate_set_comprehension` passes `parent=node` when it generates the constraint. A nested quantifier in a comprehension constraint therefore gets the always-paren treatment: the generator wraps it in parens even when the source has none.
 
