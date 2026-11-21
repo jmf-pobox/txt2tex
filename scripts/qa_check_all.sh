@@ -3,9 +3,8 @@
 # Usage: scripts/qa_check_all.sh  (run from the repository root)
 #
 # Runs scripts/qa_check.sh against every PDF in examples/, excluding the
-# reference/ and infrastructure/ subdirectories.  hw1/, hw2/, hw/, and
-# sem/ are out of scope — the gate covers only the published examples
-# corpus.
+# reference/ and infrastructure/ subdirectories.  The gate covers only the
+# published examples corpus.
 
 set -u
 
