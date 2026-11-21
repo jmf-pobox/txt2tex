@@ -98,15 +98,20 @@ htmlcov/
 # Claude Code local settings (machine-specific, not team-wide)
 .claude/settings.local.json
 
-# Homework - private (instructor-provided content, personal coursework)
-hw/
-hw[0-9]*/
-
 # Tutorial project
 rpn2tex/
 
-# user-specific assignments; not for upstream
-sem/
+# Environment files hold machine-local settings and secrets
+.env
+.env.*
+!.env.example
+
+# ethos: session logs, mission records and the machine-local zone hold
+# private transcripts and machine paths; agent definitions stay committed
+/.punt-labs/ethos/sessions/
+/.punt-labs/ethos/missions/
+/.punt-labs/ethos/missions.jsonl
+/.punt-labs/local/
 
 # Test-phase artefacts that must not re-enter the tree.
 # phase_a_* and phase12_* were transient PDFs from the Phase 1 test run;
@@ -122,5 +127,4 @@ examples/*/phase12_*.pdf
 # Stray root-level cheatsheet from prior workflow (now consolidated into docs/reference.pdf)
 /cheatsheet.pdf
 /B-summary.pdf
-/dat_requirements.md
 /docs/txt2tex-reference.pdf
