@@ -1,7 +1,7 @@
 # Tutorial 1: Propositional Logic
 
 <!-- markdownlint-disable-next-line MD036 -->
-**Lecture 1: Propositional Logic**
+**Tutorial 1: Propositional Logic**
 
 Learn the fundamentals of propositional logic: boolean operators, truth tables, logical equivalences, and tautologies.
 

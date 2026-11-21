@@ -1,14 +1,32 @@
 # Missing Features
 
-This document lists Z notation features not yet implemented in txt2tex.
-
-**Status**: Feature-complete for typical Z and relational-database specifications (4382+ tests, 100% pass rate). Comprehensive Z notation coverage including schema calculus. Some edge-case quirks documented below.
+This document lists Z notation features not yet implemented in txt2tex, and
+the limitations you may run into. Open work is tracked in
+[GitHub Issues](https://github.com/jmf-pobox/txt2tex/issues). Shipped
+features are recorded in [CHANGELOG.md](../../CHANGELOG.md).
 
 ---
 
-## LET Construct (Medium Priority)
+## Open Gaps
 
-Local definitions in expressions/predicates:
+| Gap | Issue |
+|-----|-------|
+| `LET` construct for local definitions | [#116](https://github.com/jmf-pobox/txt2tex/issues/116) |
+| User-defined operator templates (`_op_`, `op _`) | [#118](https://github.com/jmf-pobox/txt2tex/issues/118) |
+| `NOFUZZ:` on `gendef` boxes (`gendefnofuzz`) | [#100](https://github.com/jmf-pobox/txt2tex/issues/100) |
+| Positional tuple projection `p.1` inside a quantifier body renders as a bullet (bug) | [#114](https://github.com/jmf-pobox/txt2tex/issues/114) |
+| Multi-declaration `lambda` without a `\|` constraint is rejected | [#115](https://github.com/jmf-pobox/txt2tex/issues/115) |
+| Reflexive and symmetric closure (`rcl`, `scl`) | [#117](https://github.com/jmf-pobox/txt2tex/issues/117) |
+| Unspaced `>` inside `sigma[...]` is rejected | [#121](https://github.com/jmf-pobox/txt2tex/issues/121) |
+| Line breaks after `;` in set comprehensions are not preserved | [#122](https://github.com/jmf-pobox/txt2tex/issues/122) |
+
+---
+
+## LET Construct
+
+Tracking: [#116](https://github.com/jmf-pobox/txt2tex/issues/116).
+
+Local definitions in expressions and predicates:
 
 ```text
 LET double == lambda x : N . x * 2 @
@@ -21,55 +39,57 @@ quad(5)
 
 ## User-Defined Operator Names
 
+Tracking: [#118](https://github.com/jmf-pobox/txt2tex/issues/118). See
+[docs/deferred/user-defined-operators.md](../deferred/user-defined-operators.md)
+for the engine design needed to ship the feature.
+
 The engine does not yet accept underscored operator templates (`_⊕_`,
 `_R_`, `op _`, `_ †`) as the LHS of an abbreviation or declaration.
-Concretely, none of these compile today:
+None of these compile today:
 
 ```text
-_notin_ [X] == { x : X; s : P X | lnot (x elem s) . (x, s) }   # rejected
-_subrefn_ : (X cross X)                                         # rejected
-pre_ : Op -> Pred                                               # rejected
+_disjoint_ [X] == { s, t : P X | s intersect t = {} . (s, t) }   # rejected
+_subrefn_ : (Op cross Op)                                        # rejected
+pre_ : Op -> Pred                                                # rejected
 ```
 
 After such a definition (in real Z) the document could use the new
-operator natively (`x notin s`, `Op1 subrefn Op2`). That is what
-the surrounding declaration syntax cannot express in txt2tex right now.
-Tracking: engine bug #134. See
-[docs/deferred/user-defined-operators.md](../deferred/user-defined-operators.md)
-for the full engine design needed to ship the feature.
+operator natively (`s disjoint t`, `Op1 subrefn Op2`). The declaration
+syntax cannot express that in txt2tex today.
 
-**Workaround — what to do as an author:**
-
-The right workaround depends on what the exercise is asking for:
+**Workarounds:**
 
 1. **You want to *use* an operator that already exists in fuzz's
    toolkit** (`notin`, `subseteq`, `cat`, `oplus`, `dres`, `nrres`,
-   `mapsto`, …). Just write it. txt2tex already maps the keyword to
+   `mapsto`, ...). Just write it. txt2tex already maps the keyword to
    the right LaTeX command. No directive needed; fuzz already knows
    the symbol.
 
-2. **You want to *teach* how a stock operator is defined** (the SEM
-   ex26 case — "Define `∉` using generic abbreviation"). Use a regular
-   identifier as the LHS name and add a TEXT note explaining the
-   substitution:
+2. **You want to show how an operator is defined** by a generic
+   abbreviation. Use a regular identifier as the LHS name and add a
+   TEXT note explaining the substitution:
 
    ```text
-   TEXT: A generic abbreviation defines /elem (the not-in operator)
-   as the set of (x, s) pairs for which x is not a member of s.
+   TEXT: A generic abbreviation defines the relation Disjoint as the set of pairs (s, t) with no element in common.
 
-   [X] NotIn == { x : X; s : P X | lnot (x elem s) . (x, s) }
+   [X] Disjoint == { s, t : P X | s intersect t = {} . (s, t) }
    ```
 
-   The set on the RHS is the right mathematical object; the LHS uses
-   a parser-acceptable identifier (`NotIn`); the TEXT prose tells the
-   reader (and the grader) the intended operator name. The document
-   demonstrates the *technique* of generic abbreviation even though
-   the surface notation `x NotIn s` is not available.
+   `uv run txt2tex --tex-only` type-checks this and emits:
 
-3. **You want to introduce a genuinely new operator that subsequent
-   paragraphs use** (e.g. `_⊑_` for refinement, used throughout a
-   refinement chapter). The full surface form is not available; the
-   workarounds are:
+   ```latex
+   Disjoint[X] == \{~ s, t : \power X | s \cap t = \{\} @ (s, t) ~\}
+   ```
+
+   The set on the RHS is the right mathematical object. The LHS uses a
+   parser-acceptable identifier (`Disjoint`). The TEXT prose tells the
+   reader the intended operator name. The document shows the technique
+   of generic abbreviation even though the surface notation
+   `s Disjoint t` is not available.
+
+3. **You want to introduce a new operator that later paragraphs use**
+   (for example `_⊑_` for refinement). The full surface form is not
+   available. Two workarounds:
 
    - Define a named relation and use prefix notation everywhere:
      `refines : Op cross Op` and write `(Op1, Op2) elem refines`
@@ -77,22 +97,22 @@ The right workaround depends on what the exercise is asking for:
    - Define a named function and use application notation:
      `refines : Op cross Op -> Pred` and write `refines(Op1, Op2)`.
 
-   Neither matches Spivey's surface form, but both are
-   parser-acceptable and mathematically equivalent.
+   Neither matches Spivey's surface form. Both are parser-acceptable
+   and mathematically equivalent.
 
 4. **Last resort: drop into raw LaTeX with a `LATEX:` block.** The
-   engine passes the body verbatim to fuzz; you can write the literal
-   `\_ \notin \_ [X] == …` form including any `%%` directive
+   engine passes the body verbatim to fuzz. You can write the literal
+   `\_ \notin \_ [X] == ...` form including any `%%` directive
    announcement you need. This bypasses every txt2tex check; reserve
-   it for paragraphs that genuinely cannot be expressed in the
-   supported notation.
+   it for paragraphs that cannot be expressed in the supported
+   notation.
 
 ---
 
 ## Known Limitations
 
-1. **Superscript `^`**: Only for relation iteration (`R^n`), not arithmetic (`x^2`). Write `x * x` for squaring. If you need the literal `n^2` form to appear (e.g. teaching material), mark the containing `axdef`/`schema`/`zed`-paragraph box with `NOFUZZ:` — see [USER_GUIDE.md § NOFUZZ](USER_GUIDE.md#nofuzz--marking-content-fuzz-cant-check). `NOFUZZ:` renders the box normally (fuzz just skips checking it) and is enforced by a reject-if-clean lint, so it can't be used to hide an actual type error. `gendef` boxes are not yet supported by `NOFUZZ:` (`gendefnofuzz` is deferred — no LaTeX environment exists yet).
-2. **Tuple projection**: Only named fields (`x.field`), not positional (`.1`, `.2`).
+1. **Superscript `^`**: Only for relation iteration (`R^n`), not arithmetic (`x^2`). Write `x * x` for squaring. If you need the literal `n^2` form to appear (for example in teaching material), mark the containing `axdef`/`schema`/`zed`-paragraph box with `NOFUZZ:` — see [USER_GUIDE.md § NOFUZZ](USER_GUIDE.md#nofuzz--marking-content-fuzz-cant-check). `NOFUZZ:` renders the box normally (fuzz just skips checking it) and is enforced by a reject-if-clean lint, so it can't be used to hide an actual type error. `gendef` boxes are not yet supported by `NOFUZZ:` ([#100](https://github.com/jmf-pobox/txt2tex/issues/100)); no LaTeX environment exists for them yet.
+2. **Tuple projection**: Use named fields (`x.field`). Positional projection (`.1`, `.2`) is not supported. Inside a quantifier body the first `p.1` renders as a bullet (`p @ 1`), and fuzz rejects the output. Tracking: [#114](https://github.com/jmf-pobox/txt2tex/issues/114).
 3. **fuzz parallel-binding in set comprehensions**: fuzz requires sequential binding of schema text (Z RM §3.5 allows parallel; fuzz tightens this). The generator automatically works around this for `forall`/`exists`/`exists1`/`mu`/`lambda` by reordering declarations. Set comprehensions using multiple schemas with cross-references raise a clear error directing you to rewrite as a single declaration sequence.
 4. **`id` is reserved**: maps to `\id` (the identity relation operator). It cannot be used as a schema-component name, variable, or relation name. Use `tid`, `rid`, `entityId`, etc. instead. (Other Z RM names that are similarly reserved: `dom`, `ran`, `inv`, `pre` — anything in the standard Z toolkit.)
 5. **Underscore in identifiers**: txt2tex applies a heuristic when generating LaTeX (fuzz mode):
@@ -102,90 +122,7 @@ The right workaround depends on what the exercise is asking for:
     - Two-letter / mixed suffix (`FK_EE`, `state_AB`): emits `FK\_{EE}` — literal underscore plus braces.
     - Three-plus-char suffix (`cumulative_total`): goes to the multi-word identifier path; emits as `\mathit{cumulative\_total}`.
    Consequence: short letter suffixes that LOOK like subscripts (`FK_E`) are NOT subscripted; they render with a literal underscore. Use parenthesised parametrisation (`FK(E)`) or rename without an underscore if you want a clean visual.
-
----
-
-## Recently Resolved
-
-These items were missing in earlier versions and are now shipped:
-
-- **#131** — Quantifier `;`-prefix newline: parser now honours a natural
-  newline or `\` continuation after `;` in semicolon-chained quantifier
-  prefixes for all four quantifier types.
-- **#133** — Prefix-operator paren wrapping: generator wraps nested prefix
-  applications (`seq (P X)` → `\seq~(\power X)`) per Z RM §3.7.
-  See `tests/test_prefix_paren_wrap.py`.
-- **#137** — Multi-line `LATEX:` block: `LATEX:` alone on a line opens a
-  verbatim-pass block terminated by column-0 `END`, eliminating the
-  double-spacing and de-indentation of consecutive single-line directives.
-- **#138** — `B:` block for B-machine listings: verbatim passthrough to
-  `\begin{verbatim}…\end{verbatim}`, terminated by column-0 `END`.
-- **#140** — GROUP aggregate forms: `Count`, `Sum`, `Avg`, `Min`, `Max`,
-  and `Median` aggregator keywords inside `group` RHS.
-- **join rename** (2026-05-23) — Source keyword `bowtie` renamed to `join`;
-  natural-join emission changed from `R \otimes S` (wrong: denotes the
-  degenerate Cartesian-product case) to `\mathrm{Join}(R, S)` (instructor's
-  canonical vocabulary, slides/topic02.pdf §45).
-- **#141** — `free_vars` Binding: `expr_free_vars` now raises
-  `NotImplementedError` on `Binding` nodes instead of silently returning
-  an incomplete result.
-- **#142** — GroupAggregate abbreviation routing: `GroupAggregate` added to
-  the `_DAT_EXPRESSION_TYPES` detector so aggregate abbreviations route
-  to inline math rather than `\begin{zed}`.
-- **#144** — Set-comprehension newline after `|`/`;`: CONTINUATION/NEWLINE
-  skip inserted at both post-`|` and post-`;` sites in the set-comprehension
-  parser, completing line-break parity with quantifier prefixes.
-- **bare-B identifier restored** — lexer regression from #138 where `"B"` in
-  `RESERVED_WORDS` prevented decorating bare `B` identifiers; fix removes `"B"`
-  from the reserved-words set.
-- **#146 — Project subscript form** (2026-05-23) —
-  `pi[A, B](R)` keyword emission changed from the brace form
-  `\mathrm{Project}\{A, B\}(R)` to the subscript form
-  `\mathrm{Project}_{A, B}(R)`, matching the instructor's canonical
-  vocabulary (slides/topic02.pdf).  Source syntax unchanged.
-
-- **#147 — Relation rename: retire `rho`, adopt `R[NEW/OLD]`** (2026-05-23) —
-  `rho[A as B](R)` prefix syntax retired; replaced by Z RM §3.11 postfix form
-  `R[B/A]` (NEW first, OLD second).  `rho` now lexes as a plain identifier.
-  Engine routes `RelationRename` through `_DAT_EXPRESSION_TYPES` (inline math)
-  so fuzz never sees the `/` inside a Z paragraph.  Compound bases are
-  parenthesised automatically: `(pi[x](R))[b/a]`.  Top-level abbreviations
-  `B == R[a/b]` route to inline math via `_in_relational_context` in
-  `_parse_abbreviation`.
-
-- **Schema-text quantification** (`exists Delta S | P`, `exists Xi S | P`,
-  `exists S | P`, `exists S' | P`, and the same for `forall` and `exists1`) —
-  Z RM §3.10; implemented 2026-05-21.  The engine emits the binding literally
-  and lets fuzz expand the schema invariant (jms ruling).  See
-  `docs/DESIGN.md § ADR: Schema-text Quantification` for the design record.
-
-- **Schema renaming `S[a/b]`** — full component renaming syntax, including theta expressions (Phase 3.1, `feat/phase-3-1-schema-renaming`)
-- **Horizontal schema definitions `Name defs Schema-Exp`** — supports full schema calculus RHS expressions (Phase 1.3)
-- **Dependent-domain lambda/mu** — generator detects multi-decl expressions where later declarations depend on earlier ones and emits the correct Spivey collapsed form (fix `92823b7`)
-- **Schema calculus**: composition (`;`), piping (`>>`), hiding (`hide`), projection (`project`) — all shipped
-- **NOFUZZ: marking content fuzz can't check** (2026-07-05) — resolves the
-  "content fuzz genuinely can't check" gap (e.g. arithmetic `n^2`, listed
-  above under Known Limitations). A `NOFUZZ: <reason>` modifier line marks
-  an `axdef`, `schema`, or `zed`-producing paragraph (given set / free type
-  / abbreviation) as rendered but not type-checked; the box renders
-  identically to the checked kind plus one mandatory under-box note, and a
-  reject-if-clean lint fails the build if the wrapped content actually
-  type-checks cleanly on its own. `gendef` boxes remain unsupported
-  (`gendefnofuzz` is deferred — no LaTeX environment exists yet; marking
-  one errors with a clear message). See
-  [USER_GUIDE.md § NOFUZZ](USER_GUIDE.md#nofuzz--marking-content-fuzz-cant-check)
-  and `docs/DESIGN.md § ADR: NOFUZZ`.
-
----
-
-## Implemented Features
-
-All fundamental Z notation is complete:
-
-- **Paragraphs**: given, axdef, schema, gendef, zed, free types, abbreviations
-- **Expressions**: lambda, mu, if/then/else, set comprehension, sequences, bags, tuples
-- **Predicates**: forall, exists, exists1, schemas-as-predicates, pre, schema-text quantification (Z RM §3.10)
-- **Schema calculus**: composition (`;`), piping (`>>`), hiding (`hide`), projection (`project`), renaming (`S[a/b]`), horizontal definitions (`Name defs Schema-Exp`)
-- **Operators**: All logic, set, relation, function, and sequence operators
-- **Formatting**: `\also`, `\t` indentation, `~` spacing, line breaks
-- **Relational database extensions**: relational algebra (sigma, pi, R[NEW/OLD] rename, join, division), GROUP/UNGROUP, primary key annotation
+6. **Reflexive and symmetric closure**: `rcl` and `scl` are not supported. Tracking: [#117](https://github.com/jmf-pobox/txt2tex/issues/117). Write the union with the identity relation yourself (`R union id X`).
+7. **Unspaced `>` in `sigma[...]`**: `sigma[price>10](R)` stops with an error. Write `sigma[price > 10](R)` with spaces. Tracking: [#121](https://github.com/jmf-pobox/txt2tex/issues/121).
+8. **Line breaks after `;` in set comprehensions** are not preserved in the output. Tracking: [#122](https://github.com/jmf-pobox/txt2tex/issues/122).
+9. **Multi-declaration `lambda` without a `|` constraint** (`lambda x : N; y : N . x + y`) is rejected with `Expected '|' after quantifier binding`. Add a constraint: `lambda x : N; y : N | true . x + y`. Tracking: [#115](https://github.com/jmf-pobox/txt2tex/issues/115).

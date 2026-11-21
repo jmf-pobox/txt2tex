@@ -3,7 +3,7 @@
 // From USER_GUIDE.md - Sets and Types section
 
 zed
-  given Course
+  given Genre
 end
 
 
@@ -14,12 +14,12 @@ end
 
 schema Entry
   year: Year
-  course: Course
+  genre: Genre
   code: N
 end
 
 axdef
   e : Entry
 where
-  e.year = 2025 land e.code = 479
+  e.year = 2025 land e.code = 42
 end

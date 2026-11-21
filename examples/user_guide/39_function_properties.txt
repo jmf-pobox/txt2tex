@@ -3,15 +3,15 @@
 // From USER_GUIDE.md - Functions section
 
 zed
-  given StudentId, Student
+  given AccountId, Account
 end
 
 
 axdef
-  studentRecord : StudentId >-> Student
+  accountRecord : AccountId >-> Account
 where
-  forall id1, id2 : StudentId |
-    id1 != id2 => studentRecord(id1) != studentRecord(id2)
+  forall id1, id2 : AccountId |
+    id1 != id2 => accountRecord(id1) != accountRecord(id2)
 end
 
 axdef

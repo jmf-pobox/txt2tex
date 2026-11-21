@@ -196,8 +196,8 @@ LaTeX:  \ran \bigcup (\ran s)
 ```
 
 **Reference:** `latex_gen.py` — `_generate_unary_op`,
-`_generate_function_app`; `tests/test_prefix_paren_wrap.py` (engine
-bug #133, jms ruling 2026-05-22).
+`_generate_function_app`; `tests/test_prefix_paren_wrap.py` (jms ruling
+2026-05-22).
 
 ---
 
@@ -273,8 +273,6 @@ Input:  lnot p
 Fuzz:   \lnot p             ← no parens (atomic identifier)
 LaTeX:  \lnot p             ← same
 ```
-
-**Bug reference**: engine bug #132 (SEM Ex 51 part (b) repro).
 
 ---
 
@@ -370,7 +368,7 @@ those contexts, so fuzz rejects the expression.
 **txt2tex decision**:
 
 - `R[NEW/OLD]` relational rename is classified as a `RelationRename` AST node,
-  which is included in `_DAT_EXPRESSION_TYPES` alongside `Restrict`, `Project`,
+  which is included in `_RA_EXPRESSION_TYPES` alongside `Restrict`, `Project`,
   `Join`, etc.
 - When a `RelationRename` node appears anywhere in an expression (including as
   an abbreviation RHS), the engine routes the entire abbreviation through inline
@@ -381,7 +379,7 @@ those contexts, so fuzz rejects the expression.
 
 ```text
 ✅ CORRECT: pi[id, isbn](Book[id/bookId])      → inline math, fuzz skips it
-✅ CORRECT: B == pi[ship, class](Ship[ship/name])  → inline math, fuzz skips it
+✅ CORRECT: B == pi[title, genre](Album[title/name])  → inline math, fuzz skips it
 ❌ WRONG:   axdef ... Book[id/bookId] ... end  → fuzz rejects /
 ```
 
@@ -393,16 +391,16 @@ the RHS).  All three forms route through inline math:
 
 ```text
 // All three are equivalent in routing — RelationRename → inline math
-A == Ship[ship/name]                              // bare abbreviation
-B == pi[ship, class, launched](Ship[ship/name])   // wrapped in pi
-sigma[ship = 'Hood'](Ship[ship/name])             // wrapped in sigma
+A == Album[title/name]                              // bare abbreviation
+B == pi[title, genre, year](Album[title/name])      // wrapped in pi
+sigma[title = Blue](Album[title/name])              // wrapped in sigma
 ```
 
 Inside a Z paragraph (\texttt{zed}, \texttt{axdef}, \texttt{schema}), the same
 syntax \texttt{S[a/b]} is a \textit{schema} rename — that form is fuzz-clean
 because schema rename doesn't carry a `/` token at this level.
 
-**Reference**: `latex_gen.py` — `_DAT_EXPRESSION_TYPES`; `parser.py` —
+**Reference**: `latex_gen.py` — `_RA_EXPRESSION_TYPES`; `parser.py` —
 `_in_relational_context` flag set in `_parse_abbreviation`.
 
 ---
@@ -410,7 +408,7 @@ because schema rename doesn't carry a `/` token at this level.
 ## Relational Algebra Is Display-Only (Not Fuzz-Checked)
 
 **Standard Z / Fuzz**: relational-algebra operators (`join`, `pi`/project,
-`sigma`/restrict, `div`, `group`, `ungroup`, `extend`) are DAT-course notation,
+`sigma`/restrict, `div`, `group`, `ungroup`, `extend`) are relational-algebra notation,
 not Z operators — they have no fuzz typing rule. An abbreviation built from them
 renders as **unboxed inline math** (`\noindent$...$`, not a LaTeX display
 environment) and is deliberately *not* fuzz-checked:
@@ -496,12 +494,12 @@ person.name        ✅ Supported - Var-Name is an identifier
 **Example with schemas**:
 
 ```z
-Entry == [name: NAME, course: Course, grade: N]
+Entry == [name: NAME, genre: Genre, rating: N]
 
 % Access fields by name:
 e.name      ← Works in fuzz
-e.course    ← Works in fuzz
-e.grade     ← Works in fuzz
+e.genre     ← Works in fuzz
+e.rating    ← Works in fuzz
 ```
 
 ### Numeric Positional Projection: NOT Supported ❌

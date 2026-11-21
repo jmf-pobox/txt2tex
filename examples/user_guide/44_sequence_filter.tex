@@ -13,14 +13,14 @@
 \begin{document}
 
 \begin{schema}{Entry}
-viewed : \nat
+plays : \nat
 \end{schema}
 
 \begin{axdef}
 records : \seq~Entry \\
-yes : \nat
+target : \nat
 \where
-records \filter \{~ x : Entry | x.viewed = yes ~\} = \langle \rangle
+records \filter \{~ x : Entry | x.plays = target ~\} = \langle \rangle
 \end{axdef}
 
 \end{document}

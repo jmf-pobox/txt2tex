@@ -1,7 +1,7 @@
 # Tutorial 7: Functions
 
 <!-- markdownlint-disable-next-line MD036 -->
-**Lecture 7: Functions**
+**Tutorial 7: Functions**
 
 Learn function types, function application, lambda expressions, and function composition.
 

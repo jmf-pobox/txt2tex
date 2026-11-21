@@ -3,12 +3,12 @@
 // From USER_GUIDE.md - Sequences section
 
 schema Entry
-  viewed : N
+  plays : N
 end
 
 axdef
   records : seq Entry
-  yes : N
+  target : N
 where
-  records filter {x : Entry | x.viewed = yes} = <>
+  records filter {x : Entry | x.plays = target} = <>
 end

@@ -188,7 +188,7 @@ TEXT: Custom spacing inserted above.
 ### Organizing Large Specifications
 
 1. **Use sections:** `=== Section Title ===`
-2. **Use subsections:** `** Problem N **`
+2. **Use subsections:** `** Subsection Title **`
 3. **Add TEXT blocks:** Explain reasoning
 4. **Use PAGEBREAK:** Separate major sections
 5. **Group definitions:** Use zed blocks or schemas
@@ -256,7 +256,6 @@ You've learned:
 
 - Study examples in `examples/` directories for integration patterns
 - Consult [USER_GUIDE.md](../guides/USER_GUIDE.md) for comprehensive reference
-- Practice with course problems
 
 ---
 

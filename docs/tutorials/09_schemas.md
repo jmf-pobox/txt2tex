@@ -1,7 +1,7 @@
 # Tutorial 9: Schemas and Composition
 
 <!-- markdownlint-disable-next-line MD036 -->
-**Lecture 9: Advanced Z Notation**
+**Tutorial 9: Advanced Z Notation**
 
 Learn schema composition, state schemas, operations, and zed blocks.
 

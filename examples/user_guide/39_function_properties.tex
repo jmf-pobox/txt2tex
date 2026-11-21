@@ -13,14 +13,14 @@
 \begin{document}
 
 \begin{zed}
-[StudentId, Student]
+[AccountId, Account]
 \end{zed}
 
 \begin{axdef}
-studentRecord : StudentId \inj Student
+accountRecord : AccountId \inj Account
 \where
-\forall id1, id2 : StudentId @ \\
-\t1 id1 \neq id2 \implies studentRecord(id1) \neq studentRecord(id2)
+\forall id1, id2 : AccountId @ \\
+\t1 id1 \neq id2 \implies accountRecord(id1) \neq accountRecord(id2)
 \end{axdef}
 
 \begin{axdef}

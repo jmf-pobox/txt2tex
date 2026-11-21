@@ -1,7 +1,7 @@
 # Tutorial 5: Z Notation Definitions
 
 <!-- markdownlint-disable-next-line MD036 -->
-**Lecture 5: Z Notation Basics**
+**Tutorial 5: Z Notation Basics**
 
 Learn Z notation definition forms: given types, free types, abbreviations, axiomatic definitions, and schemas.
 

@@ -87,11 +87,11 @@ You'll see a nicely formatted PDF with:
 === Section Title ===
 ```
 
-**Subsections:** Use `**` for problem/solution numbers
+**Subsections:** Use `**` for subsection titles
 
 ```text
-** Solution 1 **
-** Problem 2 **
+** Setup **
+** Results **
 ```
 
 ### Text Blocks
@@ -158,7 +158,7 @@ Edit your txt file and recompile until you're satisfied.
 ### Pattern 1: Statement and Proof
 
 ```text
-** Problem 1 **
+** Conjunction elimination **
 
 TEXT: Prove that $p land q$ implies $p$.
 

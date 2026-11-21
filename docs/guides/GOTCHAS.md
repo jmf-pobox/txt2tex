@@ -21,7 +21,7 @@ C == A intersect B
 ```
 
 `A` and `B` route to inline math (`$A == ...$`) because their
-RHS contains DAT constructs.  `C` looks like ordinary Z —
+RHS contains relational-algebra constructs.  `C` looks like ordinary Z —
 two identifiers joined by `\cap` — so the engine puts it
 inside `\begin{zed}...\end{zed}`.  Fuzz then rejects `A` and
 `B` as undeclared because their definitions were never visible
@@ -75,7 +75,7 @@ These operators are txt2tex extensions that emit as
 Fuzz has no rules for them.
 
 **How the engine handles this.** Abbreviations whose RHS contains
-a DAT construct are automatically routed to `\noindent$...$`
+a relational-algebra construct are automatically routed to `\noindent$...$`
 (inline math) instead of `\begin{zed}...\end{zed}`.  Fuzz
 silently skips inline math.  Standalone expressions (not
 abbreviations) also route to inline math.  The `.tex` and PDF

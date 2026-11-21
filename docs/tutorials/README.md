@@ -16,11 +16,11 @@ This tutorial series teaches you how to write formal specifications using txt2te
 
 Start here if you're new to txt2tex. Learn how to install the tools, write your first document, and compile to PDF.
 
-## Core Tutorials (Lectures 1-9)
+## Core Tutorials (1-9)
 
-These tutorials follow a structured curriculum covering fundamental concepts progressively:
+These tutorials cover fundamental concepts progressively:
 
-### Lecture 1: Propositional Logic
+### Propositional Logic
 
 - **[Tutorial 1: Propositional Logic](01_propositional_logic.md)**
   - Boolean operators (land, lor, lnot, =>, <=>)
@@ -28,7 +28,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - Tautologies and logical laws
   - **Examples:** `01_propositional_logic/`
 
-### Lecture 2: Predicate Logic
+### Predicate Logic
 
 - **[Tutorial 2: Predicate Logic](02_predicate_logic.md)**
   - Predicates and declarations
@@ -37,7 +37,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - One-point rule and quantifier manipulation
   - **Examples:** `02_predicate_logic/`, `03_equality/`
 
-### Lecture 3: Set Theory
+### Set Theory
 
 - **[Tutorial 3: Sets and Types](03_sets_and_types.md)**
   - Set notation and literals
@@ -46,7 +46,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - Tuples and ordered pairs
   - **Examples:** `05_sets/`
 
-### Lecture 4: Deductive Proofs
+### Deductive Proofs
 
 - **[Tutorial 4: Proof Trees](04_proof_trees.md)**
   - Conclusion-first nesting in `PROOF:` blocks
@@ -57,7 +57,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - Common pitfalls
   - **Examples:** `04_proof_trees/`
 
-### Lecture 5: Z Notation Basics
+### Z Notation Basics
 
 - **[Tutorial 5: Z Notation Definitions](05_z_definitions.md)**
   - given types
@@ -67,7 +67,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - Schema definitions
   - **Examples:** `06_definitions/`
 
-### Lecture 6: Relations
+### Relations
 
 - **[Tutorial 6: Relations](06_relations.md)**
   - Binary relations (↔ or <->)
@@ -77,7 +77,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - Relational image
   - **Examples:** `07_relations/`
 
-### Lecture 7: Functions
+### Functions
 
 - **[Tutorial 7: Functions](07_functions.md)**
   - Function types (→, +→, ⇸, ⤖, ↣, ⤀, ↠, ⤖)
@@ -87,7 +87,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - Function composition
   - **Examples:** `08_functions/`
 
-### Lecture 8: Sequences and Bags
+### Sequences and Bags
 
 - **[Tutorial 8: Sequences](08_sequences.md)**
   - Sequence notation (⟨⟩, <> )
@@ -96,7 +96,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - Bags (multisets)
   - **Examples:** `09_sequences/`
 
-### Lecture 9: Advanced Z Notation
+### Advanced Z Notation
 
 - **[Tutorial 9: Schemas and Composition](09_schemas.md)**
   - Schema notation
@@ -106,7 +106,7 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
   - Zed blocks
   - **Examples:** `10_schemas/`
 
-## Course-Specific Topics
+## Specialised Topics
 
 - **[Tutorial 12: Schema Calculus](12_schema_calculus.md)** *(Level 3 — Advanced)*
   - Schema composition with `;` (`\semi`)
@@ -157,13 +157,6 @@ These tutorials follow a structured curriculum covering fundamental concepts pro
 2. Jump to relevant tutorials based on your needs
 3. Consult USER_GUIDE.md for quick syntax reference
 4. Explore advanced examples directly
-
-### For Course Students
-
-1. Follow tutorials aligned with lecture schedule (Tutorials 1-9)
-2. Complete exercises in each example directory
-3. Use `examples/` directories for assignment reference
-4. Refer to PROOF_SYNTAX.md for proof formatting
 
 ## Learning Tips
 

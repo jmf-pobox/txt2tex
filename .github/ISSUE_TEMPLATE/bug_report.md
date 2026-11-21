@@ -41,7 +41,7 @@ Is there a workaround? If so, describe it.
 ## Impact
 
 - **Severity**: HIGH / MEDIUM / LOW
-- **Blocks**: Which solutions/homework?
+- **Blocks**: Which documents?
 - **Component**: parser / lexer / latex-gen
 
 ## Environment
