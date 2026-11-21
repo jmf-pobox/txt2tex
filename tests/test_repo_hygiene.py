@@ -20,6 +20,17 @@ ETHOS_PRIVATE_DIRS = (
     ".punt-labs/ethos/missions/",
 )
 ETHOS_PRIVATE_FILES = frozenset({".punt-labs/ethos/missions.jsonl"})
+# Private working directories and hand-off notes that must stay local.
+PRIVATE_TOP_DIRS = frozenset({"hw", "sem"})
+PRIVATE_FILES = frozenset(
+    {
+        "resume.md",
+        "dat_requirements.md",
+        ".github/ISSUES_TO_CREATE.md",
+        "docs/development/judge-prompt.md",
+        "docs/development/verification-procedure.md",
+    }
+)
 
 
 @pytest.fixture(scope="module")
@@ -60,3 +71,23 @@ def test_no_ethos_session_or_mission_records_tracked(
         if path.startswith(ETHOS_PRIVATE_DIRS) or path in ETHOS_PRIVATE_FILES
     ]
     assert not offenders, f"tracked ethos session/mission records: {offenders}"
+
+
+def _is_private_top_dir(path: str) -> bool:
+    """Return True for paths under hw/, hwN/ or sem/ at the repo root."""
+    top, sep, _ = path.partition("/")
+    if not sep:
+        return False
+    return top in PRIVATE_TOP_DIRS or (
+        top.startswith("hw") and top.removeprefix("hw").isdigit()
+    )
+
+
+def test_no_private_working_files_tracked(tracked_files: tuple[str, ...]) -> None:
+    """Forbid private working directories and hand-off notes."""
+    offenders = [
+        path
+        for path in tracked_files
+        if path in PRIVATE_FILES or _is_private_top_dir(path)
+    ]
+    assert not offenders, f"tracked private working files: {offenders}"

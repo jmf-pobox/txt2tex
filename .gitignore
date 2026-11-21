@@ -101,6 +101,17 @@ htmlcov/
 # Tutorial project
 rpn2tex/
 
+# Private working directories and hand-off notes (never published;
+# tests/test_repo_hygiene.py enforces this)
+/hw/
+/hw[0-9]*/
+/sem/
+/dat_requirements.md
+/resume.md
+/.github/ISSUES_TO_CREATE.md
+/docs/development/judge-prompt.md
+/docs/development/verification-procedure.md
+
 # Environment files hold machine-local settings and secrets
 .env
 .env.*
