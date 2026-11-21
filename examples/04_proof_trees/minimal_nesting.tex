@@ -16,7 +16,7 @@
 \addcontentsline{toc}{subsection}{Test Real Nested Quantifier}
 
 \noindent
-$(\mu a : Artist | \forall b : Artist @ a \neq b \implies \# \{~ x : \dom plays | plays(x) @ 2 = a ~\} > \# \{~ x : \dom plays | plays(x) @ 2 = b ~\})$
+$(\mu a : Artist | \forall b : Artist @ a \neq b \implies \# \{~ x : \dom plays | second(plays(x)) = a ~\} > \# \{~ x : \dom plays | second(plays(x)) = b ~\})$
 
 
 \end{document}

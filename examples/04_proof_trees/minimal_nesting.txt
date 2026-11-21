@@ -4,18 +4,18 @@
 // Demonstrates:
 //   - Mu operator with nested forall quantifier
 //   - Complex predicates with set comprehension
-//   - Tuple component selection (.(2))
+//   - Tuple component selection (second)
 //   - Domain operations
 //   - Cardinality comparison
 //
 // Features:
 //   - Nested quantifier: mu a : T | forall b : T | predicate
 //   - Set comprehension within predicates
-//   - Function application and tuple projection
+//   - Function application and tuple projection with second
 //
 // See: docs/USER_GUIDE.md - Sections "Equality", "Predicate Logic"
 // ============================================================================
 
 ** Test Real Nested Quantifier **
 
-(mu a : Artist | forall b : Artist | a /= b | # {x : dom plays | (plays(x)).2 = a} > # {x : dom plays | (plays(x)).2 = b})
+(mu a : Artist | forall b : Artist | a /= b | # {x : dom plays | second(plays(x)) = a} > # {x : dom plays | second(plays(x)) = b})
