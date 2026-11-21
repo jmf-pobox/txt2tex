@@ -82,8 +82,7 @@ extension, not standard Z" — preferable to inventing a rule.
 
 - Z RM 2nd edition (Spivey, 1992) — the authoritative grammar and type
   system.
-- *Understanding Z* (Spivey, 1988) — the introduction Oxford SE
-  graduates start from.
+- *Understanding Z* (Spivey, 1988) — a standard introduction to Z.
 - fuzz source: github.com/Spivoxity/fuzz — the executable specification.
 - fuzz manual: `doc/fuzzman-pub.pdf` in the fuzz repo.
 - `docs/guides/FUZZ_VS_STD_LATEX.md` (this repo) — txt2tex's catalog of
