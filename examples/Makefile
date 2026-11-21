@@ -83,7 +83,7 @@ distclean: clean
 list:
 	@echo "Available targets:"
 	@echo "  all                    - Build all PDFs (default)"
-	@echo "  01-09                  - Build all examples in specific lecture directory"
+	@echo "  01-09                  - Build all examples in specific topic directory"
 	@echo "  01_propositional_logic - Build examples in 01_propositional_logic/"
 	@echo "  02_predicate_logic     - Build examples in 02_predicate_logic/"
 	@echo "  03_equality            - Build examples in 03_equality/"

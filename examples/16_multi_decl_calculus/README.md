@@ -13,7 +13,7 @@ Uses a tournament scheduling domain (Player, Tournament, Match).
 
 ## What's in here
 
-`q2d_demo.txt` --- one file, seven sections:
+`multi_decl_demo.txt` --- one file, seven sections:
 
 1. WYSIWYG line breaks for algebra operators (join, intersect, etc.).
 2. Multi-decl set comprehension with conjunction predicate over projections.
@@ -28,10 +28,10 @@ Uses a tournament scheduling domain (Player, Tournament, Match).
 ## Building
 
 ```bash
-txt2tex examples/16_multi_decl_calculus/q2d_demo.txt
+txt2tex examples/16_multi_decl_calculus/multi_decl_demo.txt
 ```
 
-Compiles to `q2d_demo.tex` + `q2d_demo.pdf`. Fuzz type-checks sections
+Compiles to `multi_decl_demo.tex` + `multi_decl_demo.pdf`. Fuzz type-checks sections
 1--5 cleanly. Sections 6 and 7 demonstrate the paren-wrap follow-up:
 the Spivey lambda form is correctly emitted but fuzz rejects it because
 top-level lambdas miss the parenthesisation that single-decl `Lambda`
@@ -39,5 +39,5 @@ nodes only apply when nested.
 
 ## Background
 
-Test pin file: `tests/test_q2d_calculus_predicate_chain.py` (13 tests).
+Regression tests for these constructs live under `tests/`.
 ADR: `docs/DESIGN.md` --- "multi-decl parser fix".

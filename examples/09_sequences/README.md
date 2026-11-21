@@ -1,6 +1,6 @@
-# Lecture 9: Sequences
+# Sequences
 
-This directory contains examples for Lecture 9, covering sequences and bags.
+This directory contains examples covering sequences and bags.
 
 ## Topics Covered
 
@@ -64,6 +64,6 @@ Browse the `.txt` files to see:
 ## See Also
 
 - **docs/guides/USER_GUIDE.md** - Section "Sequences"
-- **docs/tutorials/09_schemas.md** - Detailed tutorial for Lecture 9
+- **docs/tutorials/09_schemas.md** - Detailed tutorial
 - **Previous**: 08_functions/
 - **Next**: 10_schemas/
