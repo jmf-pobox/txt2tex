@@ -104,20 +104,18 @@ def test_newline_before_expr_sanity() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Test 6 — three-way prefix with mixed breaks (mirrors s1q2 (d) DAT pattern)
+# Test 6 — three-way prefix with mixed breaks
 # ---------------------------------------------------------------------------
 
 
 def test_three_way_prefix_mixed_breaks() -> None:
     """Three-binding prefix with newline after '|' and after ';' is accepted.
 
-    Mirrors the s1q2 (d) DAT pattern:
-        { o : Outcome; c : Class; s : Ship |
-              o.battle = Guadalcanal land o.ship = s.name .
-              {| name == s.name |} }
+    Shape under test:
+        { t : Track; r : Artist; a : Album |
+              t.title = Intro land t.album = a.name .
+              {| name == a.name |} }
     """
-    src = "{ o : Outcome; c : Class;\n  s : Ship |\n  o = c land c = s . o }"
+    src = "{ t : Track; r : Artist;\n  a : Album |\n  t = r land r = a . t }"
     result = _gen_expr(src)
-    assert "o" in result
-    assert "c" in result
-    assert "s" in result
+    assert "t : Track ; r : Artist ; a : Album" in result
