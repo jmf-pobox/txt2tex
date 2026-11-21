@@ -96,7 +96,7 @@ jobs:
       uses: actions/cache@v6
       with:
         path: ~/.local/fuzz
-        key: fuzz-typechecker-${{ runner.os }}-${{ env.FUZZ_REF }}
+        key: fuzz-typechecker-${{ runner.os }}-${{ env.FUZZ_REF }}-gnu17
 
     - name: Install fuzz build dependencies (bison, flex, gcc)
       if: steps.fuzz-cache.outputs.cache-hit != 'true'
@@ -116,7 +116,11 @@ jobs:
           exit 1
         fi
         ./configure --prefix="$HOME/.local/fuzz"
-        make
+        # -std=gnu17: GCC 15+ (ubuntu-26.04) defaults to C23, where `bool`
+        # is a keyword; fuzz.h typedefs its own bool and fails to compile.
+        # src/Makefile.in uses $(CFLAGS) with no default, so the command-line
+        # value is what the compiler sees.
+        make CFLAGS="-O2 -std=gnu17"
         # fuzz's own `make install` only `install -d`s TEXDIR/MFDIR
         # (root/Makefile.in); it never creates bindir/libdir, so
         # `install src/fuzz $(bindir)` fails with "No such file or
