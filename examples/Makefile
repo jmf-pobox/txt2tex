@@ -42,7 +42,7 @@ $(SUBDIRS):
 	@echo "Building examples in $@..."
 	@for f in $@/*.txt; do \
 		if [ -f "$$f" ]; then \
-			(cd .. && uv run txt2tex "examples/$$f") || (echo "Error building $$f"; exit 1); \
+			(cd .. && uv run txt2tex "examples/$$f") || { echo "failed: $$f" >&2; exit 1; }; \
 		fi; \
 	done
 
