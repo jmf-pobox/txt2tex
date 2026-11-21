@@ -69,6 +69,8 @@ jobs:
     # release -- never track a moving branch or tag.
     env:
       FUZZ_REF: "6e76ce41990c9c72ae9ee4b68e1b603f501f50a5"  # tag: 2022-01-01
+      # Compiler flags for the fuzz build; part of the cache key below.
+      FUZZ_CFLAGS: "-O2 -std=gnu17"
 
     steps:
     - name: Checkout code
@@ -96,7 +98,7 @@ jobs:
       uses: actions/cache@v6
       with:
         path: ~/.local/fuzz
-        key: fuzz-typechecker-${{ runner.os }}-${{ env.FUZZ_REF }}
+        key: fuzz-typechecker-${{ runner.os }}-${{ env.FUZZ_REF }}-${{ env.FUZZ_CFLAGS }}
 
     - name: Install fuzz build dependencies (bison, flex, gcc)
       if: steps.fuzz-cache.outputs.cache-hit != 'true'
@@ -116,7 +118,11 @@ jobs:
           exit 1
         fi
         ./configure --prefix="$HOME/.local/fuzz"
-        make
+        # -std=gnu17: GCC 15+ (ubuntu-26.04) defaults to C23, where `bool`
+        # is a keyword; fuzz.h typedefs its own bool and fails to compile.
+        # src/Makefile.in uses $(CFLAGS) with no default, so the command-line
+        # value is what the compiler sees.
+        make CFLAGS="$FUZZ_CFLAGS"
         # fuzz's own `make install` only `install -d`s TEXDIR/MFDIR
         # (root/Makefile.in); it never creates bindir/libdir, so
         # `install src/fuzz $(bindir)` fails with "No such file or

@@ -40,6 +40,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Dependabot version updates now work.** The Python entry switched from the
   `pip` ecosystem, which cannot read `uv.lock`, to `uv`. Tool bumps arrive as one
   grouped PR.
+- **fuzz CI gate builds on C23-default compilers.** The workflow compiles fuzz
+  with `-std=gnu17`, because GCC 15 on ubuntu-26.04 defaults to C23, where
+  fuzz's own `bool` typedef no longer compiles. The build cache key now includes
+  the compiler flags.
+
+### Removed
+
+- **Machine-local and private files are no longer tracked.** `.env`, ethos
+  agent session logs and mission records, and internal hand-off notes left the
+  repository and are now gitignored. `tests/test_repo_hygiene.py` fails if any
+  of them is committed again.
 
 ## [2.2.1] - 2026-07-11
 
