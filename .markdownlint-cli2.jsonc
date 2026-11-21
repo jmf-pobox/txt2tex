@@ -1,3 +1,5 @@
 {
+  // Skip files git ignores (private local notes must not fail the gate)
+  "gitignore": true,
   "ignores": [".beads/", ".claude/", ".venv/", "**/.venv/", ".tmp/", ".worktrees/", ".punt-labs/quarry/", "docs/.punt-labs/", ".punt-labs/ethos/agents/", ".punt-labs/ethos/missions/", ".punt-labs/local/", "research/", "rpn2tex/", "node_modules/", "htmlcov/"]
 }
