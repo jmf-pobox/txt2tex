@@ -920,8 +920,8 @@ class Binding(ASTNode):
     Examples:
     - {| name == s.name |}
       -> pairs=[("name", TupleProjection(s, "name"))]
-    - {| name == s.name, displacement == c.displacement |}
-      -> pairs=[("name", ...), ("displacement", ...)]
+    - {| name == s.name, year == c.year |}
+      -> pairs=[("name", ...), ("year", ...)]
     - {| |} (empty binding, Z RM permits it)
       -> pairs=[]
     """

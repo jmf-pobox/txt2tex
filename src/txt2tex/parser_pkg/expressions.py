@@ -186,7 +186,7 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         """Parse implies operation (=>).
 
         Right side can be a quantifier to support patterns like:
-        exists d : Dog | gentle(d) => forall t : Trainer | groomed(d, t)
+        exists x : X | p(x) => forall y : Y | r(x, y)
 
         Implies is right-associative: a => b => c parses as a => (b => c)
         Implies binds tighter than iff: a => b <=> c parses as (a => b) <=> c

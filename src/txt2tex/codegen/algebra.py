@@ -63,7 +63,7 @@ class _AlgebraCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
         pi[class, country](Class) → \mathrm{Project}_{class, country}(Class)
         Attribute names are emitted via _emit_attr_name (identity pass-through);
         keyword-to-LaTeX conversions do not apply inside the attribute list.
-        Subscript form matches the instructor's canonical notation (slides/topic02.pdf).
+        The attribute list is rendered as a subscript on ``Project``.
         """
         attrs_str = ", ".join(self._emit_attr_name(a) for a in node.attrs)
         rel_latex = self.generate_expr(node.relation, parent=node)
