@@ -9,7 +9,7 @@
 //   - Cardinality comparison
 //
 // Features:
-//   - Nested quantifier: mu p : T | forall q : T | predicate
+//   - Nested quantifier: mu a : T | forall b : T | predicate
 //   - Set comprehension within predicates
 //   - Function application and tuple projection
 //
@@ -18,4 +18,4 @@
 
 ** Test Real Nested Quantifier **
 
-(mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains(x)).2 = p} > # {x : dom trains | (trains(x)).2 = q})
+(mu a : Artist | forall b : Artist | a /= b | # {x : dom plays | (plays(x)).2 = a} > # {x : dom plays | (plays(x)).2 = b})

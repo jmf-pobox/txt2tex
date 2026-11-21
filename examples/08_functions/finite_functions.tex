@@ -27,16 +27,16 @@
 \bigskip
 
 \begin{zed}
-[Year, TableFF]
+[Year, Ledger]
 \end{zed}
 
 \begin{axdef}
-records : Year \ffun TableFF
+archive : Year \ffun Ledger
 \where
-\# (\dom records) \leq 1000
+\# (\dom archive) \leq 1000
 \end{axdef}
 
-\noindent The records relation is a finite partial function because: 1. It is partial: not all years need to have a table 2. Its domain is finite: at most 1000 years have records 3. It is functional: each year maps to at most one table
+\noindent The archive relation is a finite partial function because: 1. It is partial: not all years need to have a ledger 2. Its domain is finite: at most 1000 years have an archived ledger 3. It is functional: each year maps to at most one table
 
 \bigskip
 
