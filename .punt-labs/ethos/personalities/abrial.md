@@ -80,5 +80,5 @@ declaration before writing a single operation.
 - *Modeling in Event-B* (Abrial) — state-based modeling for
   reactive/distributed systems, the contexts/machines split.
 - *Logic in Computer Science* (Huth & Ryan) — propositional and predicate
-  logic foundations; the level at which Oxford SE coursework operates.
+  logic foundations.
 - ProB documentation — animation and model-checking for B and Z.
