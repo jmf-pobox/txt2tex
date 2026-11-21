@@ -129,7 +129,7 @@ select = [
     # Group 5: Testing & Advanced
     "PT",   # flake8-pytest-style
     "SLF",  # flake8-self
-    # TRY and PL deferred - see docs/development/CODE_REVIEW.md
+    # TRY and PL deferred - see CONTRIBUTING.md, "Deferred lint rules"
 ]
 extend-select = ["PLC0415"]
 
@@ -168,7 +168,7 @@ line-ending = "auto"
 # because formatting degrades them.
 exclude = [
     # compact keyword set explodes from 5 lines to 33
-    "docs/development/RESERVED_WORDS.md",
+    "docs/guides/RESERVED_WORDS.md",
     # function_like_ops set explodes from 3 lines to 15
     "docs/guides/FUZZ_VS_STD_LATEX.md",
     # pseudo-code with prose inside a string; reformat misaligns indentation
