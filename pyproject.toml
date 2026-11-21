@@ -171,8 +171,6 @@ exclude = [
     "docs/guides/RESERVED_WORDS.md",
     # function_like_ops set explodes from 3 lines to 15
     "docs/guides/FUZZ_VS_STD_LATEX.md",
-    # pseudo-code with prose inside a string; reformat misaligns indentation
-    "docs/development/judge-prompt.md",
     # ethos-managed content (talents), not ours to reformat
     ".punt-labs/**",
 ]
