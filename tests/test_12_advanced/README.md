@@ -1,6 +1,6 @@
 # Test 12: Advanced Features
 
-Tests for advanced Z notation features (Lecture 12).
+Tests for advanced Z notation features.
 
 ## Test Coverage
 

@@ -19,7 +19,8 @@ across workers correctly. A lazy generator inside the test function body
 would not parallelize under xdist.
 
 Scope: Phase 1 only (Stage A). Stage B (latexmk compilation) and Stage C
-(fuzz type-check) are NOT implemented here — see docs/development/TEST_PLAN.md.
+(fuzz type-check) are NOT implemented here — see CONTRIBUTING.md, section 3
+(Quality gates).
 
 To regenerate committed fixtures after a legitimate generator change::
 

@@ -1,6 +1,6 @@
 # Test 07: Relations
 
-Tests for binary relations and relational operators (Lecture 7).
+Tests for binary relations and relational operators.
 
 ## Test Coverage
 

@@ -1,6 +1,6 @@
 # Test 08: Functions
 
-Tests for function notation and operations (Lecture 8).
+Tests for function notation and operations.
 
 ## Test Coverage
 

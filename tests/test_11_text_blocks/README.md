@@ -1,6 +1,6 @@
 # Test 11: Text Blocks
 
-Tests for text formatting and document structure (Lecture 11).
+Tests for text formatting and document structure.
 
 ## Test Coverage
 

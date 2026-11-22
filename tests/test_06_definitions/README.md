@@ -1,6 +1,6 @@
 # Test 06: Definitions
 
-Tests for Z notation definition forms (Lecture 6).
+Tests for Z notation definition forms.
 
 ## Test Coverage
 

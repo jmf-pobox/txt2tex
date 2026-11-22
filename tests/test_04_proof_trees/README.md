@@ -1,6 +1,6 @@
 # Test 04: Proof Trees
 
-Tests for proof tree notation and natural deduction (Lecture 4).
+Tests for proof tree notation and natural deduction.
 
 ## Test Coverage
 
