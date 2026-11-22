@@ -38,7 +38,7 @@ end
 TEXT: The archive relation is a finite partial function because:
 TEXT: 1. It is partial: not all years need to have a ledger
 TEXT: 2. Its domain is finite: at most 1000 years have an archived ledger
-TEXT: 3. It is functional: each year maps to at most one table
+TEXT: 3. It is functional: each year maps to at most one ledger
 
 ** Example 2: Comparison with Other Function Types **
 

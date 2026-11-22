@@ -7,7 +7,8 @@ relational-calculus form.
 
 Until these features shipped, multi-typed queries required dropping into
 raw LaTeX for any expression crossing two or more relations. The demo
-also flags one known follow-up: the paren-wrap gap on top-level lambdas.
+also shows the fix for top-level lambdas, which now get the parentheses
+fuzz requires.
 
 Uses a tournament scheduling domain (Player, Tournament, Match).
 
@@ -23,7 +24,8 @@ Uses a tournament scheduling domain (Player, Tournament, Match).
 5. Multi-decl `mu` (definite description).
 6. Multi-decl `lambda` in Spivey-canonical form
    (`\lambda s : T; c : U | P @ E`).
-7. Paren-wrap follow-up --- the one known gap.
+7. Lambda parenthesisation --- every lambda is wrapped in parentheses,
+   at any position, as fuzz requires.
 
 ## Building
 
@@ -31,11 +33,9 @@ Uses a tournament scheduling domain (Player, Tournament, Match).
 txt2tex examples/16_multi_decl_calculus/multi_decl_demo.txt
 ```
 
-Compiles to `multi_decl_demo.tex` + `multi_decl_demo.pdf`. Fuzz type-checks sections
-1--5 cleanly. Sections 6 and 7 demonstrate the paren-wrap follow-up:
-the Spivey lambda form is correctly emitted but fuzz rejects it because
-top-level lambdas miss the parenthesisation that single-decl `Lambda`
-nodes only apply when nested.
+Compiles to `multi_decl_demo.tex` + `multi_decl_demo.pdf`. Fuzz type-checks
+every section. Sections 6 and 7 emit `(\lambda ... @ ...)` with the
+parentheses fuzz requires, including for top-level lambdas.
 
 ## Background
 
