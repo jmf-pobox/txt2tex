@@ -112,7 +112,9 @@ syntax cannot express that in txt2tex today.
 ## Known Limitations
 
 1. **Superscript `^`**: Only for relation iteration (`R^n`), not arithmetic (`x^2`). Write `x * x` for squaring. If you need the literal `n^2` form to appear (for example in teaching material), mark the containing `axdef`/`schema`/`zed`-paragraph box with `NOFUZZ:` — see [USER_GUIDE.md § NOFUZZ](USER_GUIDE.md#nofuzz--marking-content-fuzz-cant-check). `NOFUZZ:` renders the box normally (fuzz just skips checking it) and is enforced by a reject-if-clean lint, so it can't be used to hide an actual type error. `gendef` boxes are not yet supported by `NOFUZZ:` ([#100](https://github.com/jmf-pobox/txt2tex/issues/100)); no LaTeX environment exists for them yet.
-2. **Tuple projection**: Use named fields (`x.field`). Positional projection (`.1`, `.2`) is not supported. Inside a quantifier body the first `p.1` renders as a bullet (`p @ 1`), and fuzz rejects the output. Tracking: [#114](https://github.com/jmf-pobox/txt2tex/issues/114).
+2. **Tuple projection**: Use named fields (`x.field`). Two separate problems affect positional projection (`.1`, `.2`):
+    - **fuzz limitation.** txt2tex parses and emits `p.2`, but fuzz rejects numeric projection because its grammar requires a name after the dot. For `q = p.2` in an `axdef`, `uv run txt2tex --tex-only` reports `Syntax error at symbol "2"`. See [FUZZ_VS_STD_LATEX.md](FUZZ_VS_STD_LATEX.md). Use a schema with named fields, or mark the box `NOFUZZ:`.
+    - **parser bug.** Inside a quantifier body the first `p.1` is read as the bullet separator and renders as `p @ 1`. Tracking: [#114](https://github.com/jmf-pobox/txt2tex/issues/114).
 3. **fuzz parallel-binding in set comprehensions**: fuzz requires sequential binding of schema text (Z RM §3.5 allows parallel; fuzz tightens this). The generator automatically works around this for `forall`/`exists`/`exists1`/`mu`/`lambda` by reordering declarations. Set comprehensions using multiple schemas with cross-references raise a clear error directing you to rewrite as a single declaration sequence.
 4. **`id` is reserved**: maps to `\id` (the identity relation operator). It cannot be used as a schema-component name, variable, or relation name. Use `tid`, `rid`, `entityId`, etc. instead. (Other Z RM names that are similarly reserved: `dom`, `ran`, `inv`, `pre` — anything in the standard Z toolkit.)
 5. **Underscore in identifiers**: txt2tex applies a heuristic when generating LaTeX (fuzz mode):
@@ -122,7 +124,11 @@ syntax cannot express that in txt2tex today.
     - Two-letter / mixed suffix (`FK_EE`, `state_AB`): emits `FK\_{EE}` — literal underscore plus braces.
     - Three-plus-char suffix (`cumulative_total`): goes to the multi-word identifier path; emits as `\mathit{cumulative\_total}`.
    Consequence: short letter suffixes that LOOK like subscripts (`FK_E`) are NOT subscripted; they render with a literal underscore. Use parenthesised parametrisation (`FK(E)`) or rename without an underscore if you want a clean visual.
-6. **Reflexive and symmetric closure**: `rcl` and `scl` are not supported. Tracking: [#117](https://github.com/jmf-pobox/txt2tex/issues/117). Write the union with the identity relation yourself (`R union id X`).
+6. **Reflexive and symmetric closure**: `rcl` and `scl` are not supported. Tracking: [#117](https://github.com/jmf-pobox/txt2tex/issues/117). Write them out yourself. For a relation `R : X <-> X`:
+    - reflexive closure: `R union id X`, where `X` is the carrier set of `R`
+    - symmetric closure: `R union R~`
+
+    Both type-check under fuzz and emit `R \cup \id X` and `R \cup R \inv`.
 7. **Unspaced `>` or `<` in `sigma[...]`**: `sigma[price>10](R)` stops with an error. Write `sigma[price > 10](R)` with spaces. Tracking: [#121](https://github.com/jmf-pobox/txt2tex/issues/121).
 8. **Line breaks after `;` in set comprehensions** are not preserved in the output. Tracking: [#122](https://github.com/jmf-pobox/txt2tex/issues/122).
 9. **Multi-declaration `lambda` without a `|` constraint** (`lambda x : N; y : N . x + y`) is rejected with `Expected '|' after quantifier binding`. Add a constraint: `lambda x : N; y : N | true . x + y`. Tracking: [#115](https://github.com/jmf-pobox/txt2tex/issues/115).

@@ -1158,13 +1158,15 @@ Separately, `_parse_lambda` lacked SEMICOLON and PIPE branches, so multi-declara
 - *(a) Keep heuristic, add context flag*: adds parser state and couples `_parse_postfix` to comprehension/quantifier context — exactly the design error the heuristic introduced. Does not fix the root cause (bullet detection belongs at the outer parser).
 - *(b) Remove PERIOD/EOF from `safe_followers` globally*: would break chained projections outside comprehension bodies (e.g., `s.name.length` at the top level of a `zed` block). Too broad.
 
-**Decision — LaTeX form of multi-decl lambda**: the generator emits the Z RM canonical form (Spivey, §3.12), a single lambda with a semicolon-separated SchemaText:
+**Decision — LaTeX form of multi-decl lambda**: when no later domain refers to an earlier binding, the generator emits the Z RM canonical form (Spivey, §3.12), a single lambda with a semicolon-separated SchemaText:
 
 ```latex
 \lambda a : Album; t : Track | P @ E
 ```
 
 The alternative was nested lambdas (`\lambda a : Album @ \lambda t : Track | P @ E`). Both type-check in fuzz, but the Spivey form is what Z RM readers expect to see. The tests assert the Spivey form: `tests/test_08_functions/test_lambda_multidecl_fuzz.py`, `tests/test_lambda_paren_wrap.py`, and `tests/test_multi_decl_predicate_chain.py`.
+
+**Exception — dependent domains**: `_collect_lambda_chain` stops collecting when a later declaration's domain refers to an earlier binding (for example `lambda s : dom f | lambda e : f(s) | ...`). Fuzz binds co-declarations in parallel, so a flat form would be rejected. The generator then emits nested lambdas, `(\lambda s : \dom f | (\lambda e : f(s) | ... @ s))`. `test_lambda_dependent_domain` in `tests/test_spivey_dependent_domain.py` requires this.
 
 **Consequences**:
 
@@ -1972,8 +1974,16 @@ current and planned Z notation within Phase 3.x scope.
 ## Module Layout
 
 The pipeline is `source.txt → Lexer → tokens → Parser → AST → LaTeXGenerator → output.tex`.
-No stage reaches back into an earlier one: the generator never calls the lexer,
-and the parser knows nothing about LaTeX output.
+The parser knows nothing about LaTeX output, and the lexer and parser never
+call the generator.
+
+**One exception: TEXT inline math.** `codegen/text_pipeline.py` (the
+`$...$` handling in TEXT blocks) imports `Lexer` and `Parser`. For each `$...$`
+span it creates a fresh `Lexer` and `Parser`, parses the span as a whiteboard
+expression, then renders the resulting AST with `generate_expr`. A span that
+fails to lex or parse is left unchanged. A span that parses as a Z paragraph is
+an error. So the generator re-enters the front end while it generates TEXT. Any
+change to the lexer or parser API must keep that call site working.
 
 In 1.4.0 the two largest modules were split by construct family. Behaviour did
 not change: the `.tex` output of every input in `examples/` and `tests/bugs/`

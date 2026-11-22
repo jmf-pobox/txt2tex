@@ -7,12 +7,16 @@ and txt2tex's relational-algebra extensions creates a gap.
 
 ---
 
-## 1. Abbreviation chains that mix algebra and pure Z
+## 1. ~~Abbreviation chains that mix algebra and pure Z~~ (RESOLVED)
 
-**Symptom.** Fuzz rejects an abbreviation whose right-hand side is
-pure Z (`union`, `intersect`, `subset`, plain identifiers) but
-whose operands were defined in earlier abbreviations that used
-relational-algebra operators (`pi`, `sigma`, `join`, etc.).
+An abbreviation whose right-hand side is pure Z (`union`, `intersect`,
+plain identifiers) but whose operands were defined by earlier
+relational-algebra abbreviations used to fail fuzz, because the
+operands were never declared inside a Z environment.
+
+The engine now routes by reference.  A Z operator that mentions an
+algebra-defined name is rendered as inline math too, so no
+workaround is needed.  This input type-checks:
 
 ```text
 A == pi[x](sigma[p](R))
@@ -20,26 +24,19 @@ B == pi[x](sigma[q](R))
 C == A intersect B
 ```
 
-`A` and `B` route to inline math (`$A == ...$`) because their
-RHS contains relational-algebra constructs.  `C` looks like ordinary Z —
-two identifiers joined by `\cap` — so the engine puts it
-inside `\begin{zed}...\end{zed}`.  Fuzz then rejects `A` and
-`B` as undeclared because their definitions were never visible
-inside a Z environment.
+`txt2tex --tex-only` emits all three as inline math and fuzz reports no
+error:
 
-**Workaround.** Write the final step as a standalone expression
-(not an abbreviation):
+```latex
+\noindent
+$A == \mathrm{Project}_{x}(\mathrm{Restrict}_{p}(R))$
 
-```text
-A == pi[x](sigma[p](R))
-B == pi[x](sigma[q](R))
+\noindent
+$B == \mathrm{Project}_{x}(\mathrm{Restrict}_{q}(R))$
 
-pi[x](sigma[p](R)) intersect pi[x](sigma[q](R))
+\noindent
+$C == A \cap B$
 ```
-
-The standalone expression routes to inline math and fuzz skips
-it.  The `.tex` and PDF render correctly in both cases; the
-difference is only whether fuzz complains.
 
 ---
 
@@ -82,9 +79,8 @@ abbreviations) also route to inline math.  The `.tex` and PDF
 are always correct; the limitation is only on what fuzz can
 verify.
 
-**See also.** Gotcha #1 for the edge case where this routing
-logic is fooled by a pure-Z expression that references
-algebra-defined names.
+**See also.** Gotcha #1: a pure-Z abbreviation that references
+algebra-defined names is routed to inline math as well.
 
 ---
 
