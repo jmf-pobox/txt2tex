@@ -326,17 +326,17 @@ def test_forall_multi_conjunct_bullet() -> None:
 def test_mu_schema_typed_bullet_projection() -> None:
     """Schema-typed mu: predicate ends with named projection, bullet is unambiguous.
 
-    Input:  mu s : Ship; t : Ship | s.name = t.name . s.name
-    Target: (\\mu s : Ship; t : Ship | s.name = t.name @ s.name)
+    Input:  mu s : Item; t : Item | s.name = t.name . s.name
+    Target: (\\mu s : Item; t : Item | s.name = t.name @ s.name)
 
     After `s.name = t.name`, the next token is `.` then `s` (an identifier);
     `token_after_id` is `(` (from `s.name`) — this lands in the
     TupleProjection guard, stopping the greedy loop.  Already correct.
     """
-    ast = _parse_quantifier("mu s : Ship; t : Ship | s.name = t.name . s.name")
+    ast = _parse_quantifier("mu s : Item; t : Item | s.name = t.name . s.name")
     inner = _inner(ast)
     assert inner.expression is not None, "schema-typed mu should parse bullet correctly"
-    latex = _gen_expr("mu s : Ship; t : Ship | s.name = t.name . s.name")
+    latex = _gen_expr("mu s : Item; t : Item | s.name = t.name . s.name")
     assert "@ s.name" in latex or r"@ s\mathord{.}name" in latex or "s.name" in latex
     assert "t.name.s" not in latex, f"double-projection bug: {latex!r}"
 
@@ -414,20 +414,20 @@ end
 def test_mixed_basic_and_schema_decls() -> None:
     """Mixed schema+basic mu must recognise the final dot as the bullet.
 
-    Input:  mu s : Ship; d : N | s.name = d . d
-    Target: (\\mu s : Ship; d : \\nat | s.name = d @ d)
-    Actual: (\\mu s : Ship; d : \\nat | s.name = d.d)
+    Input:  mu s : Item; d : N | s.name = d . d
+    Target: (\\mu s : Item; d : \\nat | s.name = d @ d)
+    Actual: (\\mu s : Item; d : \\nat | s.name = d.d)
 
     The predicate ends at the first `d`; the body is just `d`.
     Because `d : N` is a basic type, `d.d` is ill-typed (Z RM §3.16)
     and the period must be the bullet.
     """
-    ast = _parse_quantifier("mu s : Ship; d : N | s.name = d . d")
+    ast = _parse_quantifier("mu s : Item; d : N | s.name = d . d")
     inner = _inner(ast)
     assert inner.expression is not None, (
         "expected body 'd' after bullet, got None — bullet consumed as projection d.d"
     )
-    latex = _gen_expr("mu s : Ship; d : N | s.name = d . d")
+    latex = _gen_expr("mu s : Item; d : N | s.name = d . d")
     assert "@ d" in latex, f"body 'd' not in output: {latex!r}"
     assert "d.d" not in latex, f"projection artefact in output: {latex!r}"
 
@@ -439,22 +439,22 @@ def test_mixed_basic_and_schema_decls() -> None:
 def test_schema_bullet_then_projection() -> None:
     """Schema-typed single-decl mu with bullet body that is itself a projection.
 
-    Input:  mu s : Ship | true . s.name
-    Target: (\\mu s : Ship | true @ s.name)
-    Actual: (\\mu s : Ship | true.s @ name)   ← projection spans the bullet
+    Input:  mu s : Item | true . s.name
+    Target: (\\mu s : Item | true @ s.name)
+    Actual: (\\mu s : Item | true.s @ name)   ← projection spans the bullet
 
     The predicate is `true`; the body is the projection `s.name`.
-    Projection in the body is Z-valid (s : Ship, a schema type).
+    Projection in the body is Z-valid (s : Item, a schema type).
     The `.` after `true` must be the bullet, not the start of `true.s`.
     """
-    tokens = Lexer("mu s : Ship | true . s.name").tokenize()
+    tokens = Lexer("mu s : Item | true . s.name").tokenize()
     ast = Parser(tokens).parse()
     assert isinstance(ast, Quantifier)
     # Single-decl: expression field is the bullet body.
     assert ast.expression is not None, (
         "expected body 's.name' in ast.expression, got None"
     )
-    latex = _gen_expr("mu s : Ship | true . s.name")
+    latex = _gen_expr("mu s : Item | true . s.name")
     assert "@ s" in latex or "@ s.name" in latex or r"@ s\mathord{.}name" in latex, (
         f"body 's.name' not in output: {latex!r}"
     )
