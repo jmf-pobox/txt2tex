@@ -95,8 +95,17 @@ htmlcov/
 # ruff
 .ruff_cache/
 
-# Claude Code local settings (machine-specific, not team-wide)
-.claude/settings.local.json
+# Machine-local files (the `local` convention): never committed, at any depth.
+# Covers .envrc.local, .claude/settings.local.json, .punt-labs/vox/vox.local.md,
+# biff config.local.yaml and ethos <ns>.local.yaml extension secrets.
+*.local
+*.local.*
+
+# punt-labs machine-local zone and ethos runtime locks
+.punt-labs/**/local
+.punt-labs/**/local/**
+.punt-labs/ethos/**/*.lock
+**/.create.lock
 
 # Tutorial project
 rpn2tex/
@@ -132,8 +141,6 @@ examples/*/phase12_*.pdf
 *.disabled
 
 /.punt-labs/quarry/captures/
-# Per-session vox config (machine-local; vox.md is the committed shared config)
-/.punt-labs/vox/vox.local.md
 
 # Stray root-level cheatsheet from prior workflow (now consolidated into docs/reference.pdf)
 /cheatsheet.pdf
