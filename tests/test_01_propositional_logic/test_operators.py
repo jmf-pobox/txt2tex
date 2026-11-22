@@ -398,7 +398,7 @@ class TestIntegration:
         assert latex == "p \\Rightarrow (q \\Rightarrow r)"
 
     def test_solution3_expression(self) -> None:
-        """Test expression from Solution 3 with parentheses."""
+        """Test a compound expression with explicit parentheses."""
         text = "lnot (p land q) lor r"
         lexer = Lexer(text)
         tokens = lexer.tokenize()

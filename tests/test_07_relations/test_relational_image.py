@@ -66,8 +66,8 @@ class TestRelationalImageParser:
         assert isinstance(ast.set, Identifier)
         assert ast.set.name == "S"
 
-    def test_solution_35_example(self) -> None:
-        """Test Solution 35 example pattern."""
+    def test_image_of_applied_relation_example(self) -> None:
+        """Test a realistic relational image pattern."""
         tokens = Lexer("parentOf(| {p} |)").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, RelationalImage)
@@ -134,8 +134,8 @@ class TestRelationalImageLatex:
         assert "S" in latex
         assert "A" in latex
 
-    def test_solution_35_latex(self) -> None:
-        """Test LaTeX generation for Solution 35 pattern."""
+    def test_image_of_applied_relation_latex(self) -> None:
+        """Test LaTeX generation for a realistic relational image pattern."""
         tokens = Lexer("parentOf(| {john} |)").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, RelationalImage)

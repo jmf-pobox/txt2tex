@@ -203,7 +203,7 @@ class TestSequenceFilterIntegration:
         assert "\\rres" not in latex_filter
 
     def test_filter_real_usage(self) -> None:
-        """Test realistic usage from Solutions 40, 41."""
+        """Test realistic usage of sequence filtering."""
         text = "s ↾ {t : Title | true}"
         lexer = Lexer(text)
         tokens = lexer.tokenize()

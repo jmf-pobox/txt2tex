@@ -168,7 +168,7 @@ class TestASCIISequenceIntegration:
     """Integration tests for ASCII sequences."""
 
     def test_solution40_style_pattern(self):
-        """Test pattern matching style from Solution 40."""
+        """Test pattern matching style for sequence definitions."""
         latex1 = generate_latex("total(<>) = 0")
         assert "total(\\langle \\rangle) = 0" in latex1
         latex2 = generate_latex("total(<x> ^ s) = x + total(s)")

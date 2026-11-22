@@ -27,7 +27,7 @@ from txt2tex.parser import Parser
 class TestTextBlockKeywordConversion:
     """Test that bare English keywords pass through as text in TEXT blocks.
 
-    Since DAT #11 / engine bug #136, math keywords like 'forall', 'exists',
+    Math keywords like 'forall', 'exists',
     'emptyset' in TEXT prose are NOT converted to math glyphs.  Math
     substitution is opt-in: use $...$ to get symbols, e.g. $\\forall$.
     """
@@ -248,7 +248,7 @@ class TestMixedTextAndPuretext:
     def test_both_preserve_keywords_as_text(self):
         """Test both TEXT and PURETEXT preserve keywords as literal text.
 
-        Since DAT #11, TEXT blocks no longer auto-convert keywords.
+        TEXT blocks do not auto-convert keywords.
         Both TEXT and PURETEXT now pass 'forall' through as English text.
         """
         text = (

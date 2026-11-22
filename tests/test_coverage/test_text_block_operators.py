@@ -263,7 +263,7 @@ class TestTextBlockOperatorOrdering:
         assert "+\\fun" not in latex
 
 
-class TestTextBlockHomeworkScenario:
+class TestTextBlockProseScenario:
     """Test realistic prose with operators in explicit $...$ spans."""
 
     def test_composition_in_prose(self) -> None:

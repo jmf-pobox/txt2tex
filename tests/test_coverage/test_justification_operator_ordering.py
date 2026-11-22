@@ -30,7 +30,7 @@ class TestOperatorReplacementOrdering:
         assert "|$\\fun$" not in latex
 
     def test_maplet_in_free_variable_justification(self) -> None:
-        """Test the actual homework bug: [x is not free elem y |-> z]."""
+        """Test a maplet inside a justification: [x is not free elem y |-> z]."""
         text = "EQUIV:\nx |-> y\ny |-> x [x is lnot free elem y |-> z]"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -90,8 +90,8 @@ class TestOperatorReplacementOrdering:
         assert "$\\pfun$" in latex
         assert "\\mbox{definition of $\\fun$ $\\land$ $\\pfun$}" in latex
 
-    def test_homework_question_5_line_220(self) -> None:
-        """Test the actual homework bug: [x is not free elem y |-> z]."""
+    def test_maplet_in_justification_after_equiv_steps(self) -> None:
+        """Test a maplet inside a justification: [x is not free elem y |-> z]."""
         text = "EQUIV:\nw |-> z elem R\nw |-> z elem S [x is not free elem y |-> z]"
         lexer = Lexer(text)
         tokens = lexer.tokenize()

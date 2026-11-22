@@ -47,15 +47,15 @@ class TestSetLiteralMapletParser:
         assert isinstance(first.left, BinaryOp)
         assert isinstance(first.right, BinaryOp)
 
-    def test_solution_29a_example(self) -> None:
-        """Test Solution 29(a) example."""
+    def test_numeric_maplets_example(self) -> None:
+        """Test a set literal of numeric maplets with repeated domain values."""
         tokens = Lexer("{2 |-> 4, 3 |-> 3, 3 |-> 4, 4 |-> 2}").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, SetLiteral)
         assert len(ast.elements) == 4
 
-    def test_solution_34a_example(self) -> None:
-        """Test Solution 34(a) example."""
+    def test_letter_maplets_example(self) -> None:
+        """Test a set literal of number-to-letter maplets with a repeated range."""
         tokens = Lexer("{1 |-> a, 2 |-> b, 3 |-> c, 4 |-> b}").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, SetLiteral)
@@ -99,8 +99,8 @@ class TestSetLiteralMapletLatex:
         assert latex.count(",") == 2
         assert latex.count("\\mapsto") == 3
 
-    def test_solution_29a_latex(self) -> None:
-        """Test LaTeX generation for Solution 29(a)."""
+    def test_numeric_maplets_latex(self) -> None:
+        """Test LaTeX generation for numeric maplets with repeated domain values."""
         tokens = Lexer("{2 |-> 4, 3 |-> 3, 3 |-> 4, 4 |-> 2}").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, SetLiteral)
@@ -110,8 +110,8 @@ class TestSetLiteralMapletLatex:
         assert "\\}" in latex
         assert latex.count("\\mapsto") == 4
 
-    def test_solution_34a_latex(self) -> None:
-        """Test LaTeX generation for Solution 34(a)."""
+    def test_letter_maplets_latex(self) -> None:
+        """Test LaTeX generation for number-to-letter maplets with a repeated range."""
         tokens = Lexer("{1 |-> a, 2 |-> b, 3 |-> c, 4 |-> b}").tokenize()
         ast = Parser(tokens).parse()
         assert isinstance(ast, SetLiteral)

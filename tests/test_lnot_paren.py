@@ -1,4 +1,4 @@
-"""Tests for lnot parenthesisation of non-atomic predicates (bug #132).
+"""Tests for lnot parenthesisation of non-atomic predicates.
 
 fuzz rejects ``\\lnot \\exists_1 s @ P`` with
 ``Opening parenthesis expected at symbol \\exists_1``.
@@ -106,8 +106,8 @@ def test_lnot_exists_wraps_quantifier() -> None:
 def test_lnot_exists1_wraps_quantifier() -> None:
     r"""lnot of an exists1 quantifier emits \lnot (\exists_1 ...).
 
-    This is the primary repro for bug #132: fuzz rejected
-    ``\lnot \exists_1 s @ P`` from SEM Ex 51 part (b).
+    This is the primary repro: fuzz rejected ``\lnot \exists_1 s @ P``
+    when the quantifier was not parenthesised.
     Expected: ``\lnot (\exists_1 s : \nat @ s > 0)``
     """
     src = "axdef\n  pp : N\nwhere\n  lnot (exists1 s : N | s > 0)\nend"
@@ -215,7 +215,7 @@ def test_lnot_relation_application() -> None:
 def test_fuzz_accepts_lnot_exists1(tmp_path: Path) -> None:
     r"""Fuzz accepts \lnot (\exists_1 s : \nat @ s > 0) in an axdef where clause.
 
-    This is the primary end-to-end regression test for bug #132.
+    This is the primary end-to-end regression test for lnot parenthesisation.
     The output must contain ``Type checking: passed``.
     """
     src = (
