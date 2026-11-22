@@ -1,6 +1,6 @@
 # Test 01: Propositional Logic
 
-Tests for propositional logic operators and truth tables (Lecture 1).
+Tests for propositional logic operators and truth tables.
 
 ## Test Coverage
 

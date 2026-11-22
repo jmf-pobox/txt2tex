@@ -15,6 +15,4 @@ TEXT: Repro line 4 - mixed math and prose: when a sentence has "x in N" or "x cr
 
 TEXT: Expected: TEXT prose should be plain text. Only content inside dollar math delimiters should be parsed as math. Special characters caret, underscore, ampersand, hash should be escaped as LaTeX punctuation (backslash-caret-bracebrace, backslash-underscore, backslash-ampersand, backslash-hash).
 
-TEXT: First observed: across SEM Solutions 6, 7, 23, 27, 33, 44, 45, 48 in this verification pass, 2026-05-21.
-
 TEXT: Workaround: avoid math operators, caret, and colons in TEXT prose entirely. Move math statements into zed, axdef, or EQUAL blocks. Use only pure English in TEXT.

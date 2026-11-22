@@ -265,7 +265,7 @@ def test_error_unknown_token_after_lparen() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Abbreviation routing: aggregate form must emit as inline math, not zed (#142)
+# Abbreviation routing: aggregate form must emit as inline math, not zed
 # ---------------------------------------------------------------------------
 
 

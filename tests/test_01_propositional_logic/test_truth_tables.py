@@ -173,7 +173,7 @@ class TestTruthTableIntegration:
         assert "\\lnot p" in latex
 
     def test_solutions_expressions(self) -> None:
-        """Test expressions from actual homework Solutions 1-3."""
+        """Test realistic truth-table expressions."""
         text = "p land q => p\np => (q => r)\nlnot (p land q)"
         lexer = Lexer(text)
         tokens = lexer.tokenize()

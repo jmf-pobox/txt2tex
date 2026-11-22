@@ -10,7 +10,6 @@ of the form ``<op>[\\s-]+(intro|elim)`` and emits the same tight
 ``{op_latex}\\textrm{-{rule_name}}`` form used by patterns 1 and 2.
 
 Reference: tests/bugs/bug4_proof_label_typography.txt
-Mission: m-2026-05-21-010
 """
 
 from __future__ import annotations

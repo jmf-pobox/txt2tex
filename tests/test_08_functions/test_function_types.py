@@ -344,7 +344,7 @@ class TestFunctionTypeIntegration:
         assert latex == "Domain \\bij Codomain"
 
     def test_complex_function_type(self) -> None:
-        """Test complex function type from homework."""
+        """Test a complex nested function type."""
         text = "X <-> Y"
         lexer = Lexer(text)
         tokens = lexer.tokenize()
@@ -357,7 +357,7 @@ class TestFunctionTypeIntegration:
         assert "\\rel" in latex
 
     def test_generic_function_declaration(self) -> None:
-        """Test function type elem generic context (for homework)."""
+        """Test function type elem generic context."""
         text = "(X -> Y) -> Z"
         lexer = Lexer(text)
         tokens = lexer.tokenize()

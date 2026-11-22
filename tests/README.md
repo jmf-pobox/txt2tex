@@ -1,14 +1,14 @@
 # txt2tex Test Suite
 
-This directory contains 845 tests organized by lecture topic and functionality. Tests are structured to match the course glossary organization, making it easy to find tests for specific features.
+This directory contains the tests, organized by notation topic and functionality, making it easy to find tests for specific features.
 
 ## Directory Structure
 
-### Lecture-Based Tests (01-09)
+### Notation-Topic Tests (01-09)
 
-Tests organized by glossary lectures, following the course progression:
+Tests organized by notation topic, progressing from propositional logic to sequences:
 
-#### test_01_propositional_logic/ (Lecture 1)
+#### test_01_propositional_logic/ (notation topic 1)
 
 Propositional logic operators and truth tables.
 
@@ -18,7 +18,7 @@ Propositional logic operators and truth tables.
 
 **Key features tested**: Boolean operators, truth table construction, document structure, paragraph handling
 
-#### test_02_predicate_logic/ (Lecture 2)
+#### test_02_predicate_logic/ (notation topic 2)
 
 Predicate logic with quantifiers.
 
@@ -27,7 +27,7 @@ Predicate logic with quantifiers.
 
 **Key features tested**: Quantifiers, type declarations, predicates with multiple bindings
 
-#### test_03_equality/ (Lecture 3)
+#### test_03_equality/ (notation topic 3)
 
 Equality operators and unique quantification.
 
@@ -35,7 +35,7 @@ Equality operators and unique quantification.
 
 **Key features tested**: Equality comparison, unique quantifier, definite description (mu), one-point rule
 
-#### test_04_proof_trees/ (Lecture 4)
+#### test_04_proof_trees/ (notation topic 4)
 
 Natural deduction proof trees.
 
@@ -44,7 +44,7 @@ Natural deduction proof trees.
 
 **Key features tested**: PROOF blocks, assumption management, rule citations, case analysis
 
-#### test_05_sets/ (Lecture 5)
+#### test_05_sets/ (notation topic 5)
 
 Set theory and operations.
 
@@ -55,7 +55,7 @@ Set theory and operations.
 
 **Key features tested**: Set notation, comprehension, tuples, maplets, cartesian products
 
-#### test_06_definitions/ (Lecture 6)
+#### test_06_definitions/ (notation topic 6)
 
 Z notation definitions and type systems.
 
@@ -67,7 +67,7 @@ Z notation definitions and type systems.
 
 **Key features tested**: Given types, free types, abbreviations, axiomatic definitions, schemas, generic parameters
 
-#### test_07_relations/ (Lecture 7)
+#### test_07_relations/ (notation topic 7)
 
 Relations and relational operators.
 
@@ -77,7 +77,7 @@ Relations and relational operators.
 
 **Key features tested**: Relation types, maplets, domain/range, restrictions, composition, inverse, identity
 
-#### test_08_functions/ (Lecture 8)
+#### test_08_functions/ (notation topic 8)
 
 Functions and function types.
 
@@ -89,7 +89,7 @@ Functions and function types.
 
 **Key features tested**: Total/partial functions, injections, surjections, bijections, lambda, application syntax
 
-#### test_09_sequences/ (Lecture 9)
+#### test_09_sequences/ (notation topic 9)
 
 Sequences and bags.
 
@@ -102,11 +102,11 @@ Sequences and bags.
 
 #### test_advanced_features/
 
-Cross-cutting features not tied to a single lecture.
+Cross-cutting features not tied to a single notation topic.
 
 - `test_range_override_indexing.py` - Range operator (..), override (++), indexing
 - `test_conditional_expressions.py` - Conditional expressions (if-then-else)
-- `test_digit_identifiers.py` - Identifiers starting with digits (479_courses)
+- `test_digit_identifiers.py` - Identifiers starting with digits (2_items)
 
 **Key features tested**: Advanced operators, conditional syntax, extended identifier rules
 
@@ -155,16 +155,16 @@ Error handling and boundary conditions.
 make test
 ```
 
-### Run Specific Lecture Tests
+### Run Specific Notation-Topic Tests
 
 ```bash
-# Lecture 1: Propositional logic
+# Propositional logic
 make test ARGS="tests/test_01_propositional_logic/"
 
-# Lecture 5: Sets
+# Sets
 make test ARGS="tests/test_05_sets/"
 
-# Lecture 8: Functions
+# Functions
 make test ARGS="tests/test_08_functions/"
 ```
 
@@ -193,17 +193,9 @@ make test ARGS="tests/test_04_proof_trees/ -v"
 make test-cov
 ```
 
-## Test Statistics
-
-- **Total Tests**: 845 (all passing)
-- **Coverage**: 88.49% overall
-  - parser.py: 88.91%
-  - latex_gen.py: 80.61%
-  - lexer.py: 94.56%
-
 ## Test Organization Principles
 
-1. **Lecture-based**: Tests follow glossary lecture order (01-09) for easy navigation
+1. **Topic-based**: Tests follow the notation-topic order (01-09) for easy navigation
 2. **Feature grouping**: Related features tested together in same file
 3. **Clear naming**: Descriptive test and file names (not "phase*")
 4. **Progressive complexity**: Simple tests before complex tests
@@ -213,7 +205,7 @@ make test-cov
 
 When adding new tests:
 
-1. **Choose the right directory**: Place in appropriate lecture or special directory
+1. **Choose the right directory**: Place in appropriate topic or special directory
 2. **Follow naming conventions**: Use descriptive names (test_feature_name.py)
 3. **Include docstrings**: Document what each test verifies
 4. **Test incrementally**: Add tests as you implement features
@@ -224,7 +216,7 @@ When adding new tests:
 Standard test file structure:
 
 ```python
-"""Tests for Feature X (Lecture N)."""
+"""Tests for Feature X."""
 
 from __future__ import annotations
 
@@ -268,12 +260,12 @@ class TestFeatureIntegration:
 
 ## Historical Note
 
-This test suite was reorganized in October 2025 from a phase-based system (test_phase0.py through test_phase19.py) to the current lecture-based organization. The reorganization:
+This test suite was reorganized in October 2025 from a phase-based system (test_phase0.py through test_phase19.py) to the current topic-based organization. The reorganization:
 
-- Mapped 19 phase files to 9 lecture directories
+- Mapped 19 phase files to 9 notation-topic directories
 - Merged 11 duplicate test files into 6 consolidated files
 - Created 4 special-purpose directories for cross-cutting concerns
-- Maintained 100% test compatibility (845 tests, all passing)
+- Maintained 100% test compatibility (all tests passing)
 - Improved discoverability and maintainability
 
 ## References
@@ -281,4 +273,3 @@ This test suite was reorganized in October 2025 from a phase-based system (test_
 - [docs/guides/USER_GUIDE.md](../docs/guides/USER_GUIDE.md) - Syntax guide for features tested here
 - [docs/DESIGN.md](../docs/DESIGN.md) - Architecture behind the tested code
 - [docs/guides/MISSING_FEATURES.md](../docs/guides/MISSING_FEATURES.md) - Features not yet implemented
-- [glossary.pdf](../examples/reference/glossary.pdf) - Course symbol reference

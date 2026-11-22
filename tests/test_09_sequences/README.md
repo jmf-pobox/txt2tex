@@ -1,6 +1,6 @@
 # Test 09: Sequences
 
-Tests for sequence notation and operations (Lecture 9).
+Tests for sequence notation and operations.
 
 ## Test Coverage
 

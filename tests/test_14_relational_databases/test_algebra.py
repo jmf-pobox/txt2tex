@@ -119,8 +119,8 @@ class TestRestrictParser:
         assert node.relation.name == "R"
 
     def test_restrict_comparison_predicate(self) -> None:
-        """sigma[bore >= 16](Class) — predicate is BinaryOp."""
-        node = _expr("sigma[bore >= 16](Class)")
+        """sigma[rating >= 4](Artist) — predicate is BinaryOp."""
+        node = _expr("sigma[rating >= 4](Artist)")
         assert isinstance(node, Restrict)
         assert isinstance(node.predicate, BinaryOp)
         assert node.predicate.operator == ">="
@@ -147,13 +147,13 @@ class TestRestrictParser:
         assert node.relation.name == "R"
 
     def test_restrict_without_parens_comparison(self) -> None:
-        """sigma[bore >= 16]Class — paren-free with comparison predicate."""
-        node = _expr("sigma[bore >= 16]Class")
+        """sigma[rating >= 4]Artist — paren-free with comparison predicate."""
+        node = _expr("sigma[rating >= 4]Artist")
         assert isinstance(node, Restrict)
         assert isinstance(node.predicate, BinaryOp)
         assert node.predicate.operator == ">="
         assert isinstance(node.relation, Identifier)
-        assert node.relation.name == "Class"
+        assert node.relation.name == "Artist"
 
     def test_restrict_without_parens_nested(self) -> None:
         """sigma[p]sigma[q](R) — paren-free sigma wrapping parenthesised sigma."""
@@ -177,10 +177,10 @@ class TestProjectParser:
         assert node.attrs == ["a"]
 
     def test_project_multiple_attrs(self) -> None:
-        """pi[class, country](Class) produces Project with two attributes."""
-        node = _expr("pi[class, country](Class)")
+        """pi[genre, label](Artist) produces Project with two attributes."""
+        node = _expr("pi[genre, label](Artist)")
         assert isinstance(node, Project)
-        assert node.attrs == ["class", "country"]
+        assert node.attrs == ["genre", "label"]
 
     def test_project_position(self) -> None:
         """Project node carries start position of pi keyword."""
@@ -294,11 +294,11 @@ class TestRelationRenameParser:
 
     def test_rename_pair_direction(self) -> None:
         """RelationRename pairs[0] is the new name, pairs[1] is the old name."""
-        node = _expr("pi[ship](Ship[ship/name])")
+        node = _expr("pi[album](Album[album/name])")
         assert isinstance(node, Project)
         inner = node.relation
         assert isinstance(inner, RelationRename)
-        assert inner.pairs[0] == ("ship", "name")  # new, old per Z RM §3.11
+        assert inner.pairs[0] == ("album", "name")  # new, old per Z RM §3.11
 
     def test_top_level_abbreviation_routes_to_relation_rename(self) -> None:
         """`B == R[a/b]` at top level — RHS routes via _in_relational_context."""
@@ -453,23 +453,23 @@ class TestRestrictGenerator:
         assert result == r"\mathrm{Restrict}_{p}(R)"
 
     def test_restrict_comparison(self) -> None:
-        r"""sigma[bore >= 16](R) → \mathrm{Restrict}_{bore \geq 16}(R)."""
-        result = _expr_latex("sigma[bore >= 16](R)")
+        r"""sigma[rating >= 4](R) → \mathrm{Restrict}_{rating \geq 4}(R)."""
+        result = _expr_latex("sigma[rating >= 4](R)")
         assert r"\mathrm{Restrict}_{" in result
         assert r"\geq" in result
-        assert r"16" in result
+        assert r"4" in result
 
     def test_restrict_with_named_relation(self) -> None:
-        r"""sigma[p](Class) → \mathrm{Restrict}_{p}(Class) (no relvar wrapping)."""
-        result = _expr_latex("sigma[p](Class)")
-        assert result == r"\mathrm{Restrict}_{p}(Class)"
+        r"""sigma[p](Artist) → \mathrm{Restrict}_{p}(Artist) (no relvar wrapping)."""
+        result = _expr_latex("sigma[p](Artist)")
+        assert result == r"\mathrm{Restrict}_{p}(Artist)"
 
-    def test_restrict_bore_attribute_italic(self) -> None:
-        r"""sigma[bore >= 16](Class) — bore and Class both render italic."""
-        result = _expr_latex("sigma[bore >= 16](Class)")
-        assert r"\mathrm{bore}" not in result
-        assert r"\mathrm{Class}" not in result
-        assert "Class" in result
+    def test_restrict_rating_attribute_italic(self) -> None:
+        r"""sigma[rating >= 4](Artist) — rating and Artist both render italic."""
+        result = _expr_latex("sigma[rating >= 4](Artist)")
+        assert r"\mathrm{rating}" not in result
+        assert r"\mathrm{Artist}" not in result
+        assert "Artist" in result
 
     def test_restrict_without_parens_same_output(self) -> None:
         r"""sigma[p]R renders identically to sigma[p](R)."""
@@ -485,7 +485,7 @@ class TestProjectGenerator:
     r"""LaTeX generator emits \mathrm{Project}_{attrs}(rel) for Project nodes."""
 
     def test_project_subscript_form(self) -> None:
-        r"""pi[a](R) emits subscript form, never the legacy brace form (#146)."""
+        r"""pi[a](R) emits subscript form, never the legacy brace form."""
         result = _expr_latex("pi[a](R)")
         assert r"\mathrm{Project}_{a}(R)" in result
         # Pin: the legacy brace form must never appear in current output.
@@ -497,19 +497,19 @@ class TestProjectGenerator:
         assert result == r"\mathrm{Project}_{a}(R)"
 
     def test_project_multiple_attrs(self) -> None:
-        r"""pi[class, country](R) → \mathrm{Project}_{class, country}(R)."""
-        result = _expr_latex("pi[class, country](R)")
-        assert result == r"\mathrm{Project}_{class, country}(R)"
+        r"""pi[genre, label](R) → \mathrm{Project}_{genre, label}(R)."""
+        result = _expr_latex("pi[genre, label](R)")
+        assert result == r"\mathrm{Project}_{genre, label}(R)"
 
     def test_project_named_relation(self) -> None:
-        r"""pi[class, country](Class) → \mathrm{Project}_{class, country}(Class)."""
-        result = _expr_latex("pi[class, country](Class)")
-        assert result == r"\mathrm{Project}_{class, country}(Class)"
+        r"""pi[genre, label](Artist) → \mathrm{Project}_{genre, label}(Artist)."""
+        result = _expr_latex("pi[genre, label](Artist)")
+        assert result == r"\mathrm{Project}_{genre, label}(Artist)"
 
     def test_project_attr_in_subscript(self) -> None:
-        r"""pi[Class](R) — Class in subscript."""
-        result = _expr_latex("pi[Class](R)")
-        assert result == r"\mathrm{Project}_{Class}(R)"
+        r"""pi[Artist](R) — Artist in subscript."""
+        result = _expr_latex("pi[Artist](R)")
+        assert result == r"\mathrm{Project}_{Artist}(R)"
 
     def test_project_without_parens_same_output(self) -> None:
         r"""pi[a,b]R renders identically to pi[a,b](R)."""
@@ -536,9 +536,9 @@ class TestRelationRenameGenerator:
         assert "R[b/a, d/c]" in result
 
     def test_rename_named_relation(self) -> None:
-        """pi[ship](Ship[ship/name]) → Ship[ship/name] literal emit."""
-        result = _expr_latex("pi[ship](Ship[ship/name])")
-        assert "Ship[ship/name]" in result
+        """pi[album](Album[album/name]) → Album[album/name] literal emit."""
+        result = _expr_latex("pi[album](Album[album/name])")
+        assert "Album[album/name]" in result
         assert r"\mathrm{Rename}" not in result
 
     def test_rename_no_mathrm(self) -> None:
@@ -578,9 +578,9 @@ class TestNaturalJoinGenerator:
         assert result == r"\mathrm{Join}_{p}(R, S)"
 
     def test_natural_join_named_relations(self) -> None:
-        r"""Ship join Outcome → \mathrm{Join}(Ship, Outcome) (no relvar wrapping)."""
-        result = _expr_latex("Ship join Outcome")
-        assert result == r"\mathrm{Join}(Ship, Outcome)"
+        r"""Album join Track → \mathrm{Join}(Album, Track) (no relvar wrapping)."""
+        result = _expr_latex("Album join Track")
+        assert result == r"\mathrm{Join}(Album, Track)"
 
 
 # ---------------------------------------------------------------------------
@@ -687,11 +687,11 @@ class TestAlgebraNegative:
 
 
 # ---------------------------------------------------------------------------
-# Acceptance probes -- Q1(a)-(d) from exercises1.tex
+# Acceptance probes -- project/restrict, natural join, rename-then-join
 # ---------------------------------------------------------------------------
 
 
-class TestQ1AcceptanceProbes:
+class TestAlgebraAcceptanceProbes:
     """Acceptance probes for relational algebra rendering.
 
     These probes verify the canonical keyword-algebra rendering.
@@ -706,32 +706,32 @@ class TestQ1AcceptanceProbes:
             return gen.generate_document(ast)
         return gen.generate_expr(ast)
 
-    def test_q1a_project_restrict(self) -> None:
-        r"""Q1(a): pi[class, country](sigma[bore >= 16](Class)).
+    def test_project_restrict(self) -> None:
+        r"""pi[genre, label](sigma[rating >= 4](Artist)).
 
         Expected:
-            \mathrm{Project}_{class, country}(\mathrm{Restrict}_{bore \geq 16}(Class))
+            \mathrm{Project}_{genre, label}(\mathrm{Restrict}_{rating \geq 4}(Artist))
         """
-        result = self._gen("pi[class, country](sigma[bore >= 16](Class))")
-        assert r"\mathrm{Project}_{class, country}" in result
-        assert r"\mathrm{Restrict}_{bore \geq 16}" in result
-        assert "Class" in result
+        result = self._gen("pi[genre, label](sigma[rating >= 4](Artist))")
+        assert r"\mathrm{Project}_{genre, label}" in result
+        assert r"\mathrm{Restrict}_{rating \geq 4}" in result
+        assert "Artist" in result
 
-    def test_q1b_natural_join(self) -> None:
-        r"""Q1(b): Ship join Class — natural join.
+    def test_natural_join(self) -> None:
+        r"""Album join Artist — natural join.
 
-        Expected: \mathrm{Join}(Ship, Class)
+        Expected: \mathrm{Join}(Album, Artist)
         """
-        result = self._gen("Ship join Class")
-        assert r"\mathrm{Join}(Ship, Class)" in result
+        result = self._gen("Album join Artist")
+        assert r"\mathrm{Join}(Album, Artist)" in result
 
-    def test_q1c_rename_then_join(self) -> None:
-        r"""Q1(c): pi[ship](Ship[ship/name]) join Class.
+    def test_rename_then_join(self) -> None:
+        r"""pi[album](Album[album/name]) join Artist.
 
-        Expected: Ship[ship/name] inside a \mathrm{Join}
+        Expected: Album[album/name] inside a \mathrm{Join}
         """
-        result = self._gen("pi[ship, class, launched](Ship[ship/name] join Class)")
-        assert "Ship[ship/name]" in result
+        result = self._gen("pi[album, genre, year](Album[album/name] join Artist)")
+        assert "Album[album/name]" in result
         assert r"\mathrm{Join}(" in result
 
 
@@ -808,8 +808,8 @@ class TestJoinRenameRegression:
 
     Added when the source keyword was renamed from ``bowtie`` to ``join``
     and the natural-join emission changed from ``R \otimes S`` to
-    ``\mathrm{Join}(R, S)`` per the instructor's canonical vocabulary
-    (slides/topic02.pdf page 45).
+    ``\mathrm{Join}(R, S)``, matching the Join/Restrict/Project vocabulary
+    used by the other relational-algebra operators.
     """
 
     def test_natural_join_emits_mathrm_join(self) -> None:

@@ -45,7 +45,7 @@ _NUMERIC_TYPE_NAMES = frozenset({"N", "Z", "N1"})
 # grammar's token space -- each always yields a \num result.  "div" is
 # deliberately excluded: this DSL's `div` keyword parses to the
 # relational (Codd) division node (see ast_nodes.Divide, listed in
-# fuzz_routing._DAT_EXPRESSION_TYPES as always RA-tainted), not Z RM's
+# fuzz_routing._RA_EXPRESSION_TYPES as always RA-tainted), not Z RM's
 # arithmetic div -- it never appears as a BinaryOp.operator value, so
 # including the string here would be dead code.
 _ARITHMETIC_BINARY_OPS = frozenset({"+", "-", "*", "mod"})

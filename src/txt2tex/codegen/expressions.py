@@ -182,7 +182,7 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         """Generate LaTeX for unary operation.
 
         Unary operators bind more tightly than all binary operators (see
-        UNARY_PRECEDENCE — level 20 exceeds the highest binary level of 11).
+        UNARY_PRECEDENCE — level 20 exceeds the highest binary level of 12).
         Parentheses are added around binary-operator operands using this
         table as the single source of truth (Gap #2).
 
@@ -893,7 +893,7 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
             parts.append(domain_latex)
 
         # Emit extra semicolon-separated declarations for multi-typed comprehensions.
-        # { s : Ship; c : Class | ... } → ...; c \colon \mathrm{Class} ...
+        # { a : Album; r : Artist | ... } → ...; r \colon \mathrm{Artist} ...
         if node.extra_declarations:
             # Primary variables are in scope for all extra_declaration domains.
             primary_bound = frozenset(node.variables)

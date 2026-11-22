@@ -204,7 +204,7 @@ class TestBindingParserPositive:
 
     def test_multiline_binding(self) -> None:
         """Binding spanning two lines parses correctly."""
-        src = "{| name == s.name,\n  displacement == c.displacement |}"
+        src = "{| name == a.name,\n  year == r.year |}"
         node = _parse_expr(src)
         assert isinstance(node, Binding)
         assert len(node.pairs) == 2
@@ -219,16 +219,16 @@ class TestBindingInContext:
     """Binding literals work correctly in set comprehensions and quantifiers."""
 
     def test_binding_in_set_comprehension(self) -> None:
-        """{ s : Ship | s.launched < 1921 . {| name == s.name |} } parses."""
-        src = "{ s : Ship | s.launched < 1921 . {| name == s.name |} }"
+        """{ a : Album | a.year < 1970 . {| name == a.name |} } parses."""
+        src = "{ a : Album | a.year < 1970 . {| name == a.name |} }"
         node = _parse_expr(src)
         assert isinstance(node, SetComprehension)
         assert isinstance(node.expression, Binding)
         assert node.expression.pairs[0][0] == "name"
 
     def test_binding_in_quantifier_body(self) -> None:
-        """forall s : Ship | {| name == s.name |} parses (binding as body)."""
-        src = "forall s : Ship | {| name == s.name |}"
+        """forall a : Album | {| name == a.name |} parses (binding as body)."""
+        src = "forall a : Album | {| name == a.name |}"
         result = Parser(_lex(src)).parse()
         # Parse succeeds without error
         assert result is not None
@@ -263,14 +263,14 @@ class TestBindingGenerator:
         assert out == r"\lblot~\rblot"
 
     def test_identifier_in_value(self) -> None:
-        r"""{| r == Ship |} → \lblot~r == Ship~\rblot (no wrapping)."""
-        out = _expr_latex("{| r == Ship |}")
-        assert out == r"\lblot~r == Ship~\rblot"
+        r"""{| r == Album |} → \lblot~r == Album~\rblot (no wrapping)."""
+        out = _expr_latex("{| r == Album |}")
+        assert out == r"\lblot~r == Album~\rblot"
 
     def test_identifier_label(self) -> None:
-        r"""{| Ship == x |} → \lblot~Ship == x~\rblot (label passes through)."""
-        out = _expr_latex("{| Ship == x |}")
-        assert out == r"\lblot~Ship == x~\rblot"
+        r"""{| Album == x |} → \lblot~Album == x~\rblot (label passes through)."""
+        out = _expr_latex("{| Album == x |}")
+        assert out == r"\lblot~Album == x~\rblot"
 
     def test_field_projection_value_latex(self) -> None:
         r"""{| name == s.name |} → \lblot~name == s.name~\rblot."""
@@ -289,43 +289,43 @@ class TestBindingGenerator:
 
 
 class TestBindingAcceptanceProbes:
-    """Full relational-calculus query round-trips per mission acceptance criteria."""
+    """Full relational-calculus query round-trips."""
 
-    def test_q2a_single_component(self) -> None:
-        r"""Q2(a): single-component binding in set comprehension.
+    def test_single_component_comprehension(self) -> None:
+        r"""Single-component binding in set comprehension.
 
-        { s : Ship | s.launched < 1921 . {| name == s.name |} }
-        must render the comprehension body as \lblot name == s.name \rblot.
+        { a : Album | a.year < 1970 . {| name == a.name |} }
+        must render the comprehension body as \lblot name == a.name \rblot.
         """
-        src = "{ s : Ship | s.launched < 1921 . {| name == s.name |} }"
+        src = "{ a : Album | a.year < 1970 . {| name == a.name |} }"
         out = _expr_latex(src)
         assert r"\lblot" in out
         assert r"\rblot" in out
         assert "name == " in out
-        assert "Ship" in out
+        assert "Album" in out
 
-    def test_q2d_multi_component(self) -> None:
-        r"""Q2(d): multi-component binding in multi-variable comprehension.
+    def test_multi_component_comprehension(self) -> None:
+        r"""Multi-component binding in multi-variable comprehension.
 
-        { s : Ship; c : Class | s.class = c.class .
-          {| name == s.name, displacement == c.displacement,
-             numGuns == c.numGuns |}
+        { a : Album; r : Artist | a.genre = r.genre .
+          {| name == a.name, year == r.year,
+             rating == r.rating |}
         }
         Must produce well-formed LaTeX with all three labels and comma
         separators.
         """
         src = (
-            "{ s : Ship; c : Class | s.class = c.class .\n"
-            "  {| name == s.name, displacement == c.displacement,"
-            " numGuns == c.numGuns |}\n"
+            "{ a : Album; r : Artist | a.genre = r.genre .\n"
+            "  {| name == a.name, year == r.year,"
+            " rating == r.rating |}\n"
             "}"
         )
         out = _expr_latex(src)
         assert r"\lblot" in out
         assert r"\rblot" in out
         assert "name ==" in out
-        assert "displacement ==" in out
-        assert "numGuns ==" in out
+        assert "year ==" in out
+        assert "rating ==" in out
         # Comma separators (not semicolons) between components
         assert ", " in out
         assert ";" not in out.split(r"\lblot")[1].split(r"\rblot")[0]

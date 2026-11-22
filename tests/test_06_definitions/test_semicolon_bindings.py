@@ -112,8 +112,8 @@ class TestSemicolonLaTeX:
         assert "\\seq" in latex
 
 
-class TestSolution40Examples:
-    """Test actual examples from Solution 40."""
+class TestProductTypeBindingExamples:
+    """Test realistic semicolon-separated product type bindings."""
 
     def test_cumulative_total_binding(self):
         """Test forall with semicolon-separated product type bindings."""

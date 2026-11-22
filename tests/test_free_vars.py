@@ -1,4 +1,4 @@
-"""Regression tests for free_vars.expr_free_vars (#141)."""
+"""Regression tests for free_vars.expr_free_vars."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from txt2tex.free_vars import expr_free_vars
 
 
 def test_binding_raises_not_implemented() -> None:
-    """expr_free_vars raises NotImplementedError for Binding nodes (#141).
+    """expr_free_vars raises NotImplementedError for Binding nodes.
 
     A Binding that silently fell through to the catch-all returned an
     incomplete free-variable set without any diagnostic.  The fix

@@ -1,6 +1,6 @@
 # Test 02: Predicate Logic
 
-Tests for quantifiers and predicate logic (Lecture 2).
+Tests for quantifiers and predicate logic.
 
 ## Test Coverage
 

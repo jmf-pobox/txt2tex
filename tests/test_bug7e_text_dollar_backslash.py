@@ -4,8 +4,9 @@ Bug 7.E (2026-05-21): backslash-prefixed LaTeX commands inside $...$ were
 re-lexed by the whiteboard engine, producing garbled output — a backslash parsed as
 SETMINUS, ``Leftrightarrow`` as an applied identifier.
 
-The original fix (allow-list pass-through) is superseded by the Phase 1 strict
-inline-math model (docs/development/PLAN_text_inline_math.md §Phase 1):
+The original fix (allow-list pass-through) is superseded by the strict
+inline-math model (docs/DESIGN.md, ADR on parser-backed inline math in TEXT
+blocks):
 
 - $...$ in TEXT: prose is whiteboard-only.  The content is routed through the
   real lexer → parser → generator (no backslash).

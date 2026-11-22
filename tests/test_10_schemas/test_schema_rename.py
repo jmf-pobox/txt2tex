@@ -184,7 +184,7 @@ class TestSchemaRenameDisambiguation:
 
 
 class TestSchemaRenameAcceptanceProbe:
-    """Acceptance probe from the mission spec."""
+    """End-to-end acceptance probe for schema renaming."""
 
     def test_acceptance_probe_ast(self) -> None:
         """``Op2 defs Counter[count'/count]`` produces correct AST."""

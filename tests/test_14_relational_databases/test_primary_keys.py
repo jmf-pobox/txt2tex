@@ -197,9 +197,11 @@ class TestPKGenerator:
         assert r"\mathrm{PK}" not in frag
 
     def test_schema_begin_has_plain_name(self) -> None:
-        r"""\begin{schemapk}{Class} — rendered copy uses schemapk."""
-        frag = _fragment("schema Class\n  pk class : ClassName\n  type : TypeName\nend")
-        assert r"\begin{schemapk}{Class}" in frag
+        r"""\begin{schemapk}{Artist} — rendered copy uses schemapk."""
+        frag = _fragment(
+            "schema Artist\n  pk artist : ArtistName\n  genre : GenreName\nend"
+        )
+        assert r"\begin{schemapk}{Artist}" in frag
 
     def test_fuzz_copy_no_underline(self) -> None:
         r"""The fuzz-checked copy inside \savebox must not contain \underline."""
@@ -245,38 +247,38 @@ class TestPKGenerator:
         assert r"\underline{x}" in frag
         assert r"\underline{y}" in frag
 
-    def test_probe_a_class_schema(self) -> None:
-        r"""Probe A: Class schema with pk class — underlined in schemapk."""
+    def test_probe_a_artist_schema(self) -> None:
+        r"""Probe A: Artist schema with pk artist — underlined in schemapk."""
         src = (
-            "given ClassName, TypeName, CountryName\n"
+            "given ArtistName, GenreName, CountryName\n"
             "\n"
-            "schema Class\n"
-            "  pk class : ClassName\n"
-            "  type : TypeName\n"
+            "schema Artist\n"
+            "  pk artist : ArtistName\n"
+            "  genre : GenreName\n"
             "  country : CountryName\n"
-            "  numGuns : N\n"
-            "  bore : N\n"
-            "  displacement : N\n"
+            "  albums : N\n"
+            "  tracks : N\n"
+            "  members : N\n"
             "end"
         )
         frag = _fragment(src)
-        assert r"\begin{schemapk}{Class}" in frag
-        assert r"\underline{class}" in frag
+        assert r"\begin{schemapk}{Artist}" in frag
+        assert r"\underline{artist}" in frag
         assert r"\mathrm{PK}" not in frag
 
-    def test_probe_a_ship_schema(self) -> None:
-        r"""Probe A: Ship schema with pk name — underlined in schemapk."""
+    def test_probe_a_album_schema(self) -> None:
+        r"""Probe A: Album schema with pk name — underlined in schemapk."""
         src = (
-            "given ShipName, ClassName\n"
+            "given AlbumName, ArtistName\n"
             "\n"
-            "schema Ship\n"
-            "  pk name : ShipName\n"
-            "  class : ClassName\n"
-            "  launched : N\n"
+            "schema Album\n"
+            "  pk name : AlbumName\n"
+            "  artist : ArtistName\n"
+            "  year : N\n"
             "end"
         )
         frag = _fragment(src)
-        assert r"\begin{schemapk}{Ship}" in frag
+        assert r"\begin{schemapk}{Album}" in frag
         assert r"\underline{name}" in frag
         assert r"\mathrm{PK}" not in frag
 

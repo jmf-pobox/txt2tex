@@ -47,7 +47,7 @@ from txt2tex.codegen.numeric_superscript import check_no_numeric_superscript
 class _FuzzRoutingCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
     """Mixin: helpers for routing emission between Z and inline math."""
 
-    _DAT_EXPRESSION_TYPES: ClassVar[tuple[type, ...]] = (
+    _RA_EXPRESSION_TYPES: ClassVar[tuple[type, ...]] = (
         Restrict,
         Project,
         RelationRename,
@@ -65,7 +65,7 @@ class _FuzzRoutingCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
 
         Field-agnostic: descends into dataclass fields, list/tuple elements,
         and dict values, regardless of which node type or container shape
-        holds them.  This is what lets ``_expression_contains_dat_construct``
+        holds them.  This is what lets ``_expression_contains_ra_construct``
         and ``_expression_references_names`` see into every corner of the
         tree — a ``Binding.pairs: list[tuple[str, Expr]]``, a
         ``SetComprehension.extra_declarations: list[tuple[str, Expr]]``, or
@@ -88,7 +88,7 @@ class _FuzzRoutingCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         for field_name in fields:
             yield from self._walk_nested_values(getattr(value, field_name))
 
-    def _expression_contains_dat_construct(self, expr: object) -> bool:
+    def _expression_contains_ra_construct(self, expr: object) -> bool:
         """True if expr's AST tree contains any relational construct.
 
         Relational constructs (algebra, bindings, GROUP/UNGROUP) cannot sit
@@ -97,7 +97,7 @@ class _FuzzRoutingCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         in-zed form (pure Z RHS) and a noindent-math form (relational RHS).
         """
         return any(
-            isinstance(node, self._DAT_EXPRESSION_TYPES)
+            isinstance(node, self._RA_EXPRESSION_TYPES)
             for node in self._walk_nested_values(expr)
         )
 
@@ -109,7 +109,7 @@ class _FuzzRoutingCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         abbreviation must also render as display math, since fuzz has never
         seen that name declared.  Walks the full field tree without
         quantifier-scope awareness — the same conservative over-approximation
-        ``_expression_contains_dat_construct`` already uses.  Over-tainting a
+        ``_expression_contains_ra_construct`` already uses.  Over-tainting a
         shadowed bound variable only pushes one extra line into display math;
         under-tainting would leave a real "not declared" fuzz error.
         """
@@ -161,7 +161,7 @@ class _FuzzRoutingCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
         tainted_names = frozenset(self._ra_tainted_names) - frozenset(
             self._fuzz_declared_names
         )
-        return self._expression_contains_dat_construct(
+        return self._expression_contains_ra_construct(
             expr
         ) or self._expression_references_names(expr, tainted_names)
 
