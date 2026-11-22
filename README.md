@@ -186,8 +186,6 @@ TEXT: We know $x >= 0$.
 
 Bare symbols work too — a `$...$` span with exactly one token emits that symbol: `$|->$` → ↦, `$forall$` → ∀.
 
-**Upgrading from 1.x?** Wrap inline math in `$...$` — bare math in `TEXT:` prose is no longer auto-converted.
-
 ### WYSIWYG Line Breaks
 
 **What You See Is What You Get** - Natural line breaks in your input control line breaks in PDF output:
@@ -542,7 +540,13 @@ The guide covers:
 
 ## Examples
 
-The `examples/` directory contains **159 working examples** organized by topic. **To access examples, you need to clone the repository** (see [For Developers](#for-developers-git-clone) below).
+The `examples/` directory contains **160 working examples** organized by topic. Each has its `.tex` and `.pdf` output next to it. The examples are not part of the `pip` package, so clone the repository to get them:
+
+```bash
+git clone https://github.com/jmf-pobox/txt2tex.git
+cd txt2tex
+txt2tex examples/01_propositional_logic/hello_world.txt
+```
 
 - **[00_getting_started](https://github.com/jmf-pobox/txt2tex/tree/main/examples/00_getting_started)** - Minimal first examples
 - **[01_propositional_logic](https://github.com/jmf-pobox/txt2tex/tree/main/examples/01_propositional_logic)** - Truth tables, logical operators, propositional formulas
@@ -564,22 +568,8 @@ The `examples/` directory contains **159 working examples** organized by topic. 
 - **[17_state_machines](https://github.com/jmf-pobox/txt2tex/tree/main/examples/17_state_machines)** - State-based modelling with schemas
 - **[user_guide](https://github.com/jmf-pobox/txt2tex/tree/main/examples/user_guide)** - Examples from the user guide documentation
 
-```bash
-# After cloning:
-cd txt2tex
-uv sync --group dev
-
-# Build all examples
-cd examples && make
-
-# Build examples in a specific directory
-cd examples && make 01_propositional_logic
-
-# Build a specific example
-txt2tex examples/01_propositional_logic/hello_world.txt
-```
-
-All 159 examples pass fuzz typechecking and compile to PDF
+All 160 examples pass fuzz typechecking. To build every example at once, see
+[CONTRIBUTING.md](https://github.com/jmf-pobox/txt2tex/blob/main/CONTRIBUTING.md#6-examples-and-committed-output).
 
 ---
 
@@ -616,12 +606,7 @@ Use `--zed` flag: `txt2tex input.txt --zed`
 3. Run `txt2tex myfile.txt` to generate PDF
 4. Or use `txt2tex myfile.txt --tex-only` for LaTeX Workshop live preview
 
-The project includes pre-configured settings:
-
-- `.vscode/settings.json` - LaTeX Workshop configuration
-- `.latexmkrc` - Build settings for natbib citations
-
-**See [docs/development/IDE_SETUP.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/development/IDE_SETUP.md) for complete setup instructions.**
+**See [docs/guides/IDE_SETUP.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/IDE_SETUP.md) for a LaTeX Workshop settings example and citation build notes.**
 
 ---
 
@@ -694,7 +679,6 @@ A few edge cases require workarounds:
 | Multiple pipes in TEXT blocks | Use `axdef`/`schema` for complex notation |
 
 **For workarounds, see [docs/guides/GOTCHAS.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/GOTCHAS.md).**
-**For details and test cases, see [tests/bugs/README.md](https://github.com/jmf-pobox/txt2tex/blob/main/tests/bugs/README.md).**
 
 ---
 
@@ -703,7 +687,6 @@ A few edge cases require workarounds:
 **Current Implementation:**
 
 - ✅ **Feature complete** for typical Z specifications
-- ✅ **4382 tests** - Comprehensive test suite
 - ✅ **Full Z notation** - Schemas, relations, functions, sequences
 - ✅ **Proof trees** - Natural deduction with justifications
 - ✅ **WYSIWYG line breaks** - Natural formatting controls PDF output
@@ -743,102 +726,20 @@ A few edge cases require workarounds:
 - **[docs/tutorials/11_relational_databases.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/11_relational_databases.md)** - Relational databases
 - **[docs/tutorials/12_schema_calculus.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/tutorials/12_schema_calculus.md)** - Schema calculus
 
-### Development Documentation
+### More References
 
-- **[docs/development/IDE_SETUP.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/development/IDE_SETUP.md)** - IDE configuration
+- **[docs/guides/IDE_SETUP.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/IDE_SETUP.md)** - VSCode/Cursor and LaTeX Workshop setup
+- **[docs/guides/RESERVED_WORDS.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/guides/RESERVED_WORDS.md)** - Words you cannot use as identifiers
 - **[docs/DESIGN.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/DESIGN.md)** - Architecture and design decisions
-
----
-
-## For Developers (git clone)
-
-To work with examples, run tests, or contribute:
-
-```bash
-# Clone the repository
-git clone https://github.com/jmf-pobox/txt2tex.git
-cd txt2tex
-
-# Install uv (Python package manager)
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Install dependencies
-uv sync --group dev
-
-# Now txt2tex works directly
-uv run txt2tex examples/01_propositional_logic/hello_world.txt
-```
-
-### Development Commands
-
-```bash
-# List all available Makefile targets by category
-make help
-
-# Run all quality checks (lint, type check, tests)
-make check
-
-# Lint markdown only
-make lint-md
-
-# Run tests only
-make test
-
-# Build all examples
-cd examples && make
-
-# Convert a file
-txt2tex myfile.txt
-
-# Code complexity snapshot (radon / lizard / pydeps / wily)
-make complexity-report
-```
-
-You'll also need LaTeX and optionally fuzz (see [Installation](#installation) above).
-
-### Quality Assurance
-
-`qa_check_all.sh` re-runs all 159 examples end-to-end, checking for bare math
-keywords in math environments and verifying PDF generation. Run it before
-releasing to confirm the full example suite is clean.
-
-### Agent Team (ethos)
-
-txt2tex uses [ethos](https://github.com/punt-labs/ethos) for its development
-agent team — identities, roles, and Claude Code agent definitions live in
-`.punt-labs/ethos/` and are loaded automatically when you start a Claude
-Code session in this repo.
-
-```bash
-# One-shot: install ethos and regenerate .claude/agents/
-make dev-setup
-
-# Verify ethos and the dev toolchain are healthy
-make dev-doctor
-
-# Inspect the team
-make ethos-team
-```
-
-The team is **`txt2tex`**: `jra` (principal — Jean-Raymond Abrial) leads,
-`jms` (Spivey) is the read-only Z/fuzz consultant, and specialists
-(`rmh` Python, `adb` infra, `ghr` docs, `mdm` CLI, `djb` security) report
-to the principal. See [docs/development/AGENTS.md](docs/development/AGENTS.md)
-for how to delegate work to them.
-
-If you do not install ethos, txt2tex still works as a CLI — ethos is only
-required for contributors using Claude Code to extend the tool.
+- **[CONTRIBUTING.md](https://github.com/jmf-pobox/txt2tex/blob/main/CONTRIBUTING.md)** - For people who change txt2tex
 
 ---
 
 ## Contributing
 
-Contributions welcome! See [For Developers](#for-developers-git-clone) for setup instructions.
-
-1. Read [docs/DESIGN.md](https://github.com/jmf-pobox/txt2tex/blob/main/docs/DESIGN.md) for architecture overview
-2. Follow quality gates: `make check` (lint, format, type, test)
-3. Add tests for new features
-4. Update documentation
+Found a bug or want to add a feature? See [CONTRIBUTING.md](https://github.com/jmf-pobox/txt2tex/blob/main/CONTRIBUTING.md)
+for setup, the quality checks, how to open a pull request, and how to release.
+Open work is tracked in [GitHub Issues](https://github.com/jmf-pobox/txt2tex/issues).
 
 ---
 

@@ -150,22 +150,22 @@ exists s : seq[N] | head s = 1
 
 { x : N | x > 0 . ⟨x, x * x⟩ }
 
-** Example 8: Real Examples **
+** Example 8: Further Examples **
 
 (a)
 
-TEXT: From Solution 37
+TEXT: A one-element sequence
 
 ⟨a⟩
 
 (b)
 
-TEXT: Tuple projection from Solution 38
+TEXT: Tuple projection on a function application
 
-(trains(x)).2
+(plays(x)).2
 
 (c)
 
-TEXT: Bags from Solution 39
+TEXT: A one-element bag
 
 [[d]]

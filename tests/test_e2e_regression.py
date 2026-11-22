@@ -18,9 +18,9 @@ Path collection is at module level so pytest-xdist can distribute tests
 across workers correctly. A lazy generator inside the test function body
 would not parallelize under xdist.
 
-Scope: Phase 1 only (Stage A). Stage B (latexmk compilation) and Stage C
-(fuzz type-check) are NOT implemented here — see CONTRIBUTING.md, section 3
-(Quality gates).
+Scope: the .txt -> .tex comparison only. PDF compilation is not checked here,
+and fuzz type-checking is covered by `make fuzz-check` — see CONTRIBUTING.md,
+section 3 (Quality gates).
 
 To regenerate committed fixtures after a legitimate generator change::
 

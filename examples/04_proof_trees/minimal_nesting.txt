@@ -4,18 +4,21 @@
 // Demonstrates:
 //   - Mu operator with nested forall quantifier
 //   - Complex predicates with set comprehension
-//   - Tuple component selection (.(2))
+//   - The toolkit function second applied to a pair
 //   - Domain operations
 //   - Cardinality comparison
 //
 // Features:
-//   - Nested quantifier: mu p : T | forall q : T | predicate
+//   - Nested quantifier: mu a : T | forall b : T | predicate
 //   - Set comprehension within predicates
-//   - Function application and tuple projection
+//   - Function application: second(plays(x))
+//
+// Positional projection (plays(x)).2 inside these predicates renders
+// incorrectly today (GitHub issue #114), so this example uses second.
 //
 // See: docs/USER_GUIDE.md - Sections "Equality", "Predicate Logic"
 // ============================================================================
 
 ** Test Real Nested Quantifier **
 
-(mu p : Place | forall q : Place | p /= q | # {x : dom trains | (trains(x)).2 = p} > # {x : dom trains | (trains(x)).2 = q})
+(mu a : Artist | forall b : Artist | a /= b | # {x : dom plays | second(plays(x)) = a} > # {x : dom plays | second(plays(x)) = b})

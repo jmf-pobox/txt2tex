@@ -31,7 +31,7 @@ TEXT: The formal methods community has produced many influential works on Z nota
 
 TEXT: This example uses a separate .bib file for bibliography management. The build process automatically runs BibTeX to process citations.
 
-** Solution 1 **
+** Example 1 **
 
 TEXT: When citing multiple sources, the bibliography is automatically generated from the .bib file. For example, [cite spivey92] and [cite woodcock96] are both included in the references.
 

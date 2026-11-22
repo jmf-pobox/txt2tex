@@ -1,6 +1,6 @@
-# Lecture 4: Deductive Proofs
+# Deductive Proofs
 
-This directory contains examples for Lecture 4, covering natural deduction and proof trees.
+This directory contains examples covering natural deduction and proof trees.
 
 ## Topics Covered
 
@@ -49,6 +49,6 @@ Browse the `.txt` files to see:
 
 - **docs/guides/PROOF_SYNTAX.md** - Complete proof tree syntax reference
 - **docs/guides/USER_GUIDE.md** - Section "Proof Trees"
-- **docs/tutorials/04_proof_trees.md** - Detailed tutorial for Lecture 4
+- **docs/tutorials/04_proof_trees.md** - Detailed tutorial
 - **Previous**: 03_equality/
 - **Next**: 05_sets/

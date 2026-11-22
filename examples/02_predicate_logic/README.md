@@ -1,6 +1,6 @@
-# Lecture 2: Predicate Logic
+# Predicate Logic
 
-This directory contains examples for Lecture 2, covering predicate logic and quantifiers.
+This directory contains examples covering predicate logic and quantifiers.
 
 ## Topics Covered
 
@@ -39,6 +39,6 @@ Browse the `.txt` files to see:
 ## See Also
 
 - **docs/guides/USER_GUIDE.md** - Section "Predicate Logic"
-- **docs/tutorials/02_predicate_logic.md** - Detailed tutorial for Lecture 2
+- **docs/tutorials/02_predicate_logic.md** - Detailed tutorial
 - **Previous**: 01_propositional_logic/
 - **Next**: 03_equality/

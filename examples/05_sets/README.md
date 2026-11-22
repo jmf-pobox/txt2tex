@@ -1,6 +1,6 @@
-# Lecture 5: Sets and Types
+# Sets and Types
 
-This directory contains examples for Lecture 5, covering sets, types, and set operations.
+This directory contains examples covering sets, types, and set operations.
 
 ## Topics Covered
 
@@ -42,6 +42,6 @@ Browse the `.txt` files to see:
 ## See Also
 
 - **docs/guides/USER_GUIDE.md** - Section "Sets and Types"
-- **docs/tutorials/03_sets_and_types.md** - Detailed tutorial for Lecture 5
+- **docs/tutorials/03_sets_and_types.md** - Detailed tutorial
 - **Previous**: 04_proof_trees/
 - **Next**: 06_definitions/

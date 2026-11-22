@@ -53,7 +53,7 @@ end
 
 ** Example 4: Cumulative Total **
 
-TEXT: A more descriptive example from the solutions:
+TEXT: A more descriptive name for the same recursion:
 
 axdef
   cumulative_total : seq N -> N

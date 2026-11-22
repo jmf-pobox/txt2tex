@@ -1,6 +1,6 @@
-# Lecture 1: Introduction and Propositions
+# Propositional Logic
 
-This directory contains examples for Lecture 1, covering propositional logic.
+This directory contains examples covering propositional logic.
 
 ## Topics Covered
 
@@ -32,5 +32,5 @@ Browse the `.txt` files in this directory to see:
 ## See Also
 
 - **docs/guides/USER_GUIDE.md** - Section "Propositional Logic"
-- **docs/tutorials/01_propositional_logic.md** - Detailed tutorial for Lecture 1
+- **docs/tutorials/01_propositional_logic.md** - Detailed tutorial
 - **Next**: 02_predicate_logic/
