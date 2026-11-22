@@ -893,7 +893,7 @@ class _ExpressionsCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
             parts.append(domain_latex)
 
         # Emit extra semicolon-separated declarations for multi-typed comprehensions.
-        # { s : Ship; c : Class | ... } → ...; c \colon \mathrm{Class} ...
+        # { a : Album; r : Artist | ... } → ...; r \colon \mathrm{Artist} ...
         if node.extra_declarations:
             # Primary variables are in scope for all extra_declaration domains.
             primary_bound = frozenset(node.variables)

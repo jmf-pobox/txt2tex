@@ -1,4 +1,4 @@
-"""Regression tests for bug #144: newline after '|' and ';' in set-comprehension.
+"""Regression tests for a newline after '|' and ';' in set-comprehension.
 
 The parser previously raised ``Expected identifier, number, '(', '{', '{|',
 '⟨', or lambda, got NEWLINE`` when a natural newline (or explicit ``\\``

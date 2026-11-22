@@ -50,7 +50,7 @@ class _AlgebraCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
     def _generate_restrict(self, node: Restrict, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for sigma[predicate](relation).
 
-        sigma[bore >= 16](Class) → \mathrm{Restrict}_{bore \geq 16}(Class)
+        sigma[rating >= 4](Artist) → \mathrm{Restrict}_{rating \geq 4}(Artist)
         """
         pred_latex = self.generate_expr(node.predicate, parent=node)
         rel_latex = self.generate_expr(node.relation, parent=node)
@@ -60,7 +60,7 @@ class _AlgebraCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass]
     def _generate_project(self, node: Project, parent: Expr | None = None) -> str:
         r"""Generate LaTeX for pi[A, B](relation).
 
-        pi[class, country](Class) → \mathrm{Project}_{class, country}(Class)
+        pi[genre, label](Artist) → \mathrm{Project}_{genre, label}(Artist)
         Attribute names are emitted via _emit_attr_name (identity pass-through);
         keyword-to-LaTeX conversions do not apply inside the attribute list.
         The attribute list is rendered as a subscript on ``Project``.

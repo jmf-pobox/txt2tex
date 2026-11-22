@@ -197,7 +197,7 @@ class SetComprehension(ASTNode):
     predicate: Expr | None  # The condition/predicate (can be None)
     expression: Expr | None  # Optional expression (if present, set by expression)
     # Additional semicolon-separated declaration groups for multi-typed bindings:
-    # { s : Ship; c : Class | ... } → extra_declarations=[("c", Class)]
+    # { a : Album; r : Artist | ... } → extra_declarations=[("r", Artist)]
     extra_declarations: list[tuple[str, Expr]] | None = None
     line_break_after_pipe: bool = False
     line_break_after_bullet: bool = False
@@ -716,7 +716,7 @@ class Restrict(ASTNode):
     Represents sigma[predicate](relation) — select tuples satisfying predicate.
 
     Example:
-    - sigma[bore >= 16](Class) -> predicate=(bore >= 16), relation=Class
+    - sigma[rating >= 4](Artist) -> predicate=(rating >= 4), relation=Artist
     """
 
     predicate: Expr
@@ -730,7 +730,7 @@ class Project(ASTNode):
     Represents pi[A, B](relation) — keep only named attributes.
 
     Example:
-    - pi[class, country](Class) -> attrs=["class", "country"], relation=Class
+    - pi[genre, label](Artist) -> attrs=["genre", "label"], relation=Artist
     """
 
     attrs: list[str]

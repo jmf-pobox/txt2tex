@@ -1135,7 +1135,7 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
         finally:
             self._parsing_schema_text = False
 
-        # Multi-decl form: lambda s : Ship; c : Class | P . E
+        # Multi-decl form: lambda a : Album; r : Artist | P . E
         # Delegate to _parse_quantifier_continuation (same path as forall/exists/mu),
         # which handles PIPE + optional bullet, producing nested Quantifier nodes.
         if self._match(TokenType.SEMICOLON):
@@ -1157,7 +1157,7 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                 column=lambda_token.column,
             )
 
-        # Single-decl form with predicate pipe: lambda s : Ship | P . E
+        # Single-decl form with predicate pipe: lambda a : Album | P . E
         # Produces Quantifier(quantifier="lambda") consistent with multi-decl path.
         if self._match(TokenType.PIPE):
             self._advance()  # Consume '|'
@@ -1449,7 +1449,7 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
                 self._parsing_schema_text = False
 
         # Parse optional extra declarations: ; var : Type ; var : Type ...
-        # Handles multi-typed set comprehensions like { s : Ship; c : Class | ... }
+        # Handles multi-typed set comprehensions like { a : Album; r : Artist | ... }
         extra_declarations: list[tuple[str, Expr]] | None = None
         while self._match(TokenType.SEMICOLON):
             self._advance()  # Consume ';'
@@ -1613,8 +1613,8 @@ class _ExpressionsParser(ParserBase):  # pyright: ignore[reportUnusedClass]
 
         Newlines between the bullet separator and the expression are skipped
         to support multi-line comprehensions like:
-            { s : Ship | pred .
-              {| name == s.name |}
+            { a : Album | pred .
+              {| name == a.name |}
             }
         """
         # Skip newlines before expression (multi-line comprehension support)
