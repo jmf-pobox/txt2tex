@@ -16,7 +16,7 @@ operands were never declared inside a Z environment.
 
 The engine now routes by reference.  A Z operator that mentions an
 algebra-defined name is rendered as inline math too, so no
-workaround is needed.  This input type-checks:
+workaround is needed.  This input now generates without a fuzz error:
 
 ```text
 A == pi[x](sigma[p](R))
@@ -24,8 +24,10 @@ B == pi[x](sigma[q](R))
 C == A intersect B
 ```
 
-`txt2tex --tex-only` emits all three as inline math and fuzz reports no
-error:
+`txt2tex --tex-only` emits all three as inline math.  Fuzz reports no
+error because it does not check inline math at all: these lines are
+display-only and are not type-checked (`R`, `p` and `q` are never
+declared).  Use them for presentation, not as checked Z:
 
 ```latex
 \noindent
