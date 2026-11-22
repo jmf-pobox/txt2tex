@@ -58,17 +58,17 @@ Year == \nat
 \end{zed}
 
 \begin{zed}
-[EntryAD]
+[Track]
 \end{zed}
 
 \begin{zed}
-TableAD == \seq~EntryAD
+Playlist == \seq~Track
 \end{zed}
 
 \begin{axdef}
-recordsAD : Year \pinj TableAD
+chart : Year \pinj Playlist
 \where
-\dom recordsAD = \{1993, 1994, 1995\}
+\dom chart = \{2001, 2002, 2003\}
 \end{axdef}
 
 \subsection*{Example 4 : Mixed function type operators}

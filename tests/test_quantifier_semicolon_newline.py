@@ -1,11 +1,11 @@
-"""Regression tests for bug #131: newline after ';' in quantifier prefix.
+"""Regression tests for a newline after ';' in a quantifier prefix.
 
 The parser previously raised ``Expected variable name after ';' in quantifier``
 when a natural newline (or explicit ``\\`` continuation) appeared immediately
 after ``;`` in a semicolon-chained quantifier prefix.
 
 Fix: ``_parse_quantifier_continuation`` now skips newlines at its top, mirroring
-the post-``|`` line-break handling that was added in m-2026-05-20-001.
+the existing post-``|`` line-break handling.
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ def _gen_expr(src: str, *, use_fuzz: bool = True) -> str:
 def test_newline_after_pipe_sanity() -> None:
     """Newline after '|' in a two-decl forall parses without error.
 
-    This is the existing behaviour (added by m-2026-05-20-001).
+    This is the existing behaviour.
     Included as a sanity regression to ensure the new fix does not
     disturb the post-'|' line-break path.
     """
@@ -46,7 +46,7 @@ def test_newline_after_pipe_sanity() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Test 2 — the bug: newline AFTER first ';' (bug #131)
+# Test 2 — the bug: newline AFTER first ';'
 # ---------------------------------------------------------------------------
 
 
@@ -91,18 +91,18 @@ def test_backslash_continuation_after_semicolon() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Test 5 — three-way chain mirroring SEM ex41 pattern (bug #131 repro shape)
+# Test 5 — three-way chain with a newline after the second ';'
 # ---------------------------------------------------------------------------
 
 
-def test_three_way_chain_sem_ex41_shape() -> None:
+def test_three_way_chain_newline_after_second_semicolon() -> None:
     """Three-decl exists with newline after the second ';' parses cleanly.
 
-    Mirrors the SEM ex41 attended-relation pattern that triggered the bug:
-        exists d : Date; c : Course;
+    Shape under test:
+        exists d : Date; c : Venue;
                att : N | body
     """
-    src = "exists d : Date; c : Course;\n  att : N | att > 0"
+    src = "exists d : Date; c : Venue;\n  att : N | att > 0"
     result = _gen_expr(src)
     assert r"\exists" in result
     assert "d" in result

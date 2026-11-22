@@ -161,7 +161,7 @@ class TestFiniteFunctionIntegration:
         assert ast.range.range.name == "Z"
 
     def test_finite_function_real_usage(self) -> None:
-        """Test realistic usage from Solutions 36, 40, 41."""
+        """Test realistic usage of finite functions."""
         text = "records : Year 77-> Table"
         lexer = Lexer(text)
         tokens = lexer.tokenize()

@@ -903,7 +903,7 @@ class Lexer:
             return self._scan_identifier(start_line, start_column)
 
         # Numbers and digit-starting identifiers
-        # Digit-starting identifiers: 479_courses (digit followed by underscore+letter)
+        # Digit-starting identifiers: 2_items (digit followed by underscore+letter)
         # Pure numbers: 479 (digits only)
         # Finite function operator: 77->
         if (
@@ -926,7 +926,7 @@ class Lexer:
                 temp_pos += 1
 
             # Check if followed by underscore and then letter/digit
-            # Pattern: 479_courses (digit+underscore+alphanumeric)
+            # Pattern: 2_items (digit+underscore+alphanumeric)
             if (
                 temp_pos < len(self.text)
                 and self.text[temp_pos] == "_"

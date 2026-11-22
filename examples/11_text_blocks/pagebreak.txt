@@ -10,7 +10,7 @@
 // Features:
 //   - PAGEBREAK [inserts page break]
 //   - Useful for submission formatting
-//   - Separate solutions or sections
+//   - Separate answers or sections
 //   - Control document flow
 //
 // See: docs/USER_GUIDE.md - Section "Text Blocks" > "PAGEBREAK Directive"
@@ -26,33 +26,33 @@ PAGEBREAK
 
 TEXT: This content appears on the next page. The PAGEBREAK directive forces a page break at that point in the document.
 
-** Example 2: Separating Solutions **
+** Example 2: Separating Answers **
 
-TEXT: When preparing solutions for submission, you may want each solution on a separate page.
+TEXT: When preparing a document for submission, you may want each answer on a separate page.
 
-** Solution 1 **
+** Answer 1 **
 
-TEXT: First solution content here.
+TEXT: First answer content here.
 
 forall x : N | x >= 0
 
-TEXT: Explanation of solution 1.
+TEXT: Explanation of answer 1.
 
 PAGEBREAK
 
-** Solution 2 **
+** Answer 2 **
 
-TEXT: Second solution content here.
+TEXT: Second answer content here.
 
 exists y : N | y > 10
 
-TEXT: Explanation of solution 2.
+TEXT: Explanation of answer 2.
 
 PAGEBREAK
 
-** Solution 3 **
+** Answer 3 **
 
-TEXT: Third solution content here.
+TEXT: Third answer content here.
 
 ** Example 3: Section Separation **
 
@@ -108,7 +108,7 @@ TEXT: Use PAGEBREAK strategically to improve document readability. Don't overuse
 
 TEXT: Good uses of PAGEBREAK include:
 TEXT: - Starting new major sections
-TEXT: - Separating independent solutions
+TEXT: - Separating independent answers
 TEXT: - Ensuring related content stays together
 
 ** Example 6: Avoiding Orphans **
@@ -129,22 +129,22 @@ TEXT: This ensures the definition stays with its title.
 
 ** Example 7: Submission Formatting **
 
-TEXT: For coursework submissions, instructors may require one solution per page:
+TEXT: When each answer must start on a new page:
 
 ** Problem 1 **
 
-TEXT: Solution to problem 1 goes here.
+TEXT: Answer to problem 1 goes here.
 
 PAGEBREAK
 
 ** Problem 2 **
 
-TEXT: Solution to problem 2 goes here.
+TEXT: Answer to problem 2 goes here.
 
 PAGEBREAK
 
 ** Problem 3 **
 
-TEXT: Solution to problem 3 goes here.
+TEXT: Answer to problem 3 goes here.
 
-TEXT: This format makes it easy for instructors to review and grade individual problems.
+TEXT: This format makes it easy to review individual problems.

@@ -14,9 +14,8 @@ Quantifier.variables is [] and Quantifier.domain is None.
 Regression contract: the existing value-binding quantifier path is
 unaffected.  Tests in this module include dedicated regression cases.
 
-Fuzz round-trip tests use a miniature promotion schema (BoxOffice +
-Promote) that mirrors SBM Ex 21 in structure.  They skip when the fuzz
-binary is absent from PATH.
+Fuzz round-trip tests use a miniature state schema (Counter +
+IncrCounter).  They skip when the fuzz binary is absent from PATH.
 """
 
 from __future__ import annotations
@@ -265,7 +264,7 @@ class TestRegressionValueBinding:
 
 
 # ---------------------------------------------------------------------------
-# Fuzz round-trip tests — miniature promotion schema (mirrors SBM Ex 21)
+# Fuzz round-trip tests — miniature state schema
 # ---------------------------------------------------------------------------
 
 _FUZZ_PREAMBLE = r"""\documentclass[a4paper]{article}
@@ -328,7 +327,7 @@ class TestSchemaQuantifierFuzz:
         _assert_fuzz_clean(body, tmp_path, "exists1 Delta Counter")
 
     def test_promote_promotion_predicate_fuzz_clean(self, tmp_path: Path) -> None:
-        r"""Miniature promotion predicate mirrors SBM Ex 21.
+        r"""Miniature promotion predicate over a state-change schema.
 
         Checks that ``exists Delta Counter | IncrCounter`` in a zed predicate
         position typechecks under fuzz.  This mirrors the promotion pattern:

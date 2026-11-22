@@ -25,6 +25,4 @@ TEXT: Root cause: src/txt2tex/latex_gen.py emits "\\semi" for the o9 token. fuzz
 
 TEXT: Workaround: use --zed mode (zed-cm.sty defines \semi as \mathrel{\comp}, so PDF renders correctly though fuzz still rejects under fuzz.sty mode). Or rewrite expressions to avoid o9 (e.g. via explicit set comprehension on maplets).
 
-TEXT: First observed: SEM Solution 30 verification (parentOf, siblingOf, cousinOf), 2026-05-21.
-
 TEXT: Filing: change the o9 generator to emit \\comp instead of \\semi when targeting fuzz.sty. Or document the divergence and require --zed for any source using composition.

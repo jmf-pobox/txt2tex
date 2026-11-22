@@ -1,1 +1,1 @@
-"""Tests for Z notation schemas (lecture 10)."""
+"""Tests for Z notation schemas."""

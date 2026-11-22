@@ -4,9 +4,8 @@ EQUAL: joins expression-chain steps with = (equality of expressions of the
 same Z type), as opposed to EQUIV: which joins predicate steps with
 \\Leftrightarrow (logical equivalence).
 
-Motivation: Oxford SE assessment feedback for Q11/Q12 chains was
-"you've used equivalence, rather than equality!" Natural-number valued
-expressions must render = not ⇔.
+Property under test: chains of natural-number valued expressions must
+render = not ⇔.
 """
 
 from __future__ import annotations

@@ -112,7 +112,7 @@ class TestJustificationOperatorFormatting:
         """Test: [land intro] formats correctly.
 
         Plain rule labels (no discharge, no subscript) emit ``\\textrm`` via
-        the Bug 4 fix (mission m-2026-05-21-010) — consistent with the
+        the rule-label typography fix — consistent with the
         discharge and subscript patterns. Multi-word justifications still
         emit ``\\mbox`` via ``_wrap_text_in_mathrm``.
         """

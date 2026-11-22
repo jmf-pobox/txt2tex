@@ -1,6 +1,6 @@
 """Regression tests: display-math indentation matches the Z-paragraph form.
 
-jms ruling (see mission for fix/display-math-binding-indent): layout is not
+jms ruling (branch fix/display-math-binding-indent): layout is not
 semantically significant in Z (Z RM §6), so a wrapped set comprehension must
 indent identically whether it renders inside a Z paragraph (``zed``/``schema``/
 ``axdef``, ``self._in_z_paragraph is True``) or inside display math (an

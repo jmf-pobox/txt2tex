@@ -1,12 +1,12 @@
 """Tests for text-and-label-cleanup fixes.
 
 Covers four bug clusters fixed together:
-  1. Sub-question label parser scope (DAT #1, #18): (word) only promotes to
+  1. Sub-question label parser scope: (word) only promotes to
      Part at paragraph start with a short structural label.
-  2. TEXT-block keyword rewrites dropped (engine #136, DAT #11): bare English
+  2. TEXT-block keyword rewrites dropped: bare English
      words like 'exists', 'forall', 'group', 'union' stay as text.
-  3. Consecutive TEXT: directives coalesce into one paragraph (DAT #16).
-  4. Heading text passes through verbatim via _escape_latex_text (DAT #15).
+  3. Consecutive TEXT: directives coalesce into one paragraph.
+  4. Heading text passes through verbatim via _escape_latex_text.
 """
 
 from __future__ import annotations

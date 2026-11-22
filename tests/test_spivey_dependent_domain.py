@@ -14,7 +14,7 @@ The planned fix is *partial collapse*: truncate the chain at the first
 dependency, emit the prefix as Spivey, and re-enter the generator for
 the remainder (which will try its own Spivey collapse recursively).
 
-Phase-3.2 bug — discovered via ``sem/solutions-corrected.txt`` regression.
+Regression: nested quantifier chains with dependent domains.
 """
 
 from __future__ import annotations

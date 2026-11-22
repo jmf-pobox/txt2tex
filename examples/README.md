@@ -130,7 +130,7 @@ Z paragraphs: given types, free types, abbreviations, axdef, schema.
 
 ---
 
-## 08_functions (8 examples)
+## 08_functions (7 examples)
 
 | File | Demonstrates |
 |------|-------------|
@@ -140,7 +140,6 @@ Z paragraphs: given types, free types, abbreviations, axdef, schema.
 | `composition_pipelines.txt` | Chained function composition |
 | `finite_functions.txt` | Finite function types and literals |
 | `higher_order_functions.txt` | Functions that take or return functions |
-| `sequence_tuple_tests.txt` | Sequence and tuple function examples |
 | `sequences_bags_tuples.txt` | Functions over sequences, bags, and tuples |
 
 ---
@@ -207,12 +206,13 @@ Schema calculus features beyond the basic vertical form.
 
 ---
 
-## 14_relational_databases (7 examples)
+## 14_relational_databases (8 examples)
 
 Relational-database modelling in Z, including the schema-based relational calculus.
 
 | File | Demonstrates |
 |------|-------------|
+| `aggregation.txt` | Aggregates (`Count`, `Sum`, `Avg`, `Min`, `Max`, `Median`), `EXTEND`, and two-argument aggregates |
 | `algebra_basics.txt` | Relational algebra operators: `sigma`, `pi`, `R[new/old]`, `join`, `div` |
 | `bindings.txt` | Z binding literals `{\| name == e \|}` for relational-calculus queries |
 | `foreign_keys.txt` | `pk` primary-key annotation; FK constraints as Z predicates (`forall`/`exists`, `pi`/`subset`) |
@@ -238,7 +238,7 @@ Schema-calculus operators in horizontal definitions.
 
 | File | Demonstrates |
 |------|-------------|
-| `q2d_demo.txt` | Multi-declaration Z constructs: `forall`, `exists`, `mu`, `lambda` with joint `decl; decl` form |
+| `multi_decl_demo.txt` | Multi-declaration Z constructs: `forall`, `exists`, `mu`, `lambda` with joint `decl; decl` form |
 
 ---
 

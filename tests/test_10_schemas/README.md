@@ -1,6 +1,6 @@
 # Test 10: Schemas
 
-Tests for Z notation schemas and schema calculus (Lecture 10).
+Tests for Z notation schemas and schema calculus.
 
 ## Test Coverage
 

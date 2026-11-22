@@ -1,6 +1,6 @@
-# Lecture 3: Equality
+# Equality
 
-This directory contains examples for Lecture 3, covering equality and unique values.
+This directory contains examples covering equality and unique values.
 
 ## Topics Covered
 
@@ -38,6 +38,6 @@ Browse the `.txt` files to see:
 ## See Also
 
 - **docs/guides/USER_GUIDE.md** - Section "Equality"
-- **docs/tutorials/03_sets_and_types.md** - Detailed tutorial for Lecture 3
+- **docs/tutorials/03_sets_and_types.md** - Detailed tutorial
 - **Previous**: 02_predicate_logic/
 - **Next**: 04_proof_trees/

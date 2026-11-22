@@ -1,4 +1,4 @@
-"""Tests for prefix-operator parenthesis wrapping (bug #133).
+"""Tests for prefix-operator parenthesis wrapping.
 
 Fuzz grammar rule (Z RM §3.7): prefix-generic operators require an atomic
 Expression0 as their immediate right operand.  A nested prefix application is

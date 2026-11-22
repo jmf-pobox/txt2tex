@@ -22,7 +22,7 @@
 
 === Equivalence Chains ===
 
-** Solution 1 **
+** Example 1 **
 
 (a) Commutative property
 
@@ -37,7 +37,7 @@ lnot (p land q)
 (lnot p) lor (lnot q) [De Morgan]
 lnot p lor lnot q [parentheses]
 
-** Solution 2 **
+** Example 2 **
 
 (a) Definition of implication
 
@@ -53,7 +53,7 @@ p land (q lor r) [distributive]
 (q lor r) land p [commutative]
 p land (r lor q) [commutative]
 
-** Solution 3 **
+** Example 3 **
 
 (a) Equivalence chain without justifications
 

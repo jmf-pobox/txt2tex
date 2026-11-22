@@ -13,4 +13,4 @@ Tests for unusual, boundary, and error conditions.
 
 ## Purpose
 
-This directory contains tests for unusual inputs, error conditions, and boundary cases that may not fit into lecture-based categories. These tests help ensure robust error handling and prevent regressions.
+This directory contains tests for unusual inputs, error conditions, and boundary cases that may not fit into topic-based categories. These tests help ensure robust error handling and prevent regressions.

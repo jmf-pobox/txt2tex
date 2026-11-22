@@ -36,9 +36,9 @@ TEXT: First quantifier has multiple variables with shared domain:
 
 TEXT: $forall x, y : N; z : N | x + y = z$
 
-** Example 4: Real-world example from Solution 41 **
+** Example 4: Bindings over a range and a domain **
 
-TEXT: $forall r : ran records; i1, i2 : dom r | i1 /= i2$
+TEXT: $forall r : ran catalogue; i1, i2 : dom r | i1 /= i2$
 
 ** Example 5: Conditional with semicolon bindings **
 
@@ -50,7 +50,7 @@ TEXT: $forall x : N; y : N | if x > y then x else y$
 
 TEXT: Definite description with multiple bindings:
 
-TEXT: $(mu p : ran hd; q : ran hd | p /= q . p.2 > q.2)$
+TEXT: $(mu p : ran items; q : ran items | p /= q . p.2 > q.2)$
 
 ** Example 7: With exists quantifier **
 

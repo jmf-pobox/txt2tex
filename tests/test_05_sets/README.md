@@ -1,6 +1,6 @@
 # Test 05: Sets and Relations
 
-Tests for set theory notation (Lecture 5).
+Tests for set theory notation.
 
 ## Test Coverage
 

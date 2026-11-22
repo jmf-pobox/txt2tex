@@ -29,5 +29,3 @@ TEXT: 5. [=> elim] renders LOOSE as \Rightarrow \mbox{elim} (no hyphen between o
 TEXT: Pattern: the "from N" form triggers a special tight emission. Labels without "from N" --- whether containing an internal hyphen (false-intro) or two words (=> elim) --- fall through a path that wraps each token in \mbox{} and inserts visible spacing.
 
 TEXT: Workaround: write all rule labels in the "from N" form even when N is irrelevant, or stick to one-word labels. A more durable fix is to normalise bracket-label tokenisation in the generator so any "<op> <word>" or "<word>-<word>" content produces the tight hyphenated form.
-
-TEXT: First observed: SEM Solution 15 verification, judge round 2 (2026-05-21).

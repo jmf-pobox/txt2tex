@@ -249,7 +249,7 @@ class TestThetaLatex:
 
 
 class TestAddBookingAcceptanceProbe:
-    """Full Phase 0 + 1.1 + 1.2 acceptance probe per mission spec."""
+    """Full end-to-end acceptance probe for theta expressions."""
 
     _source = (
         "schema AddBooking\n"

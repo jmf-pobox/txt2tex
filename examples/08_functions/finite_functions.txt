@@ -25,20 +25,20 @@ TEXT: Finite partial functions are partial functions with a finite domain. The o
 TEXT: A finite partial function from X to Y is a partial function whose domain is finite. This is useful when modeling resources with limited capacity or databases with a bounded number of entries.
 
 zed
-  given Year, TableFF
+  given Year, Ledger
 end
 
 
 axdef
-  records : Year 77-> TableFF
+  archive : Year 77-> Ledger
 where
-  # (dom records) <= 1000
+  # (dom archive) <= 1000
 end
 
-TEXT: The records relation is a finite partial function because:
-TEXT: 1. It is partial: not all years need to have a table
-TEXT: 2. Its domain is finite: at most 1000 years have records
-TEXT: 3. It is functional: each year maps to at most one table
+TEXT: The archive relation is a finite partial function because:
+TEXT: 1. It is partial: not all years need to have a ledger
+TEXT: 2. Its domain is finite: at most 1000 years have an archived ledger
+TEXT: 3. It is functional: each year maps to at most one ledger
 
 ** Example 2: Comparison with Other Function Types **
 

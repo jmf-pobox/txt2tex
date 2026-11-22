@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`examples/Makefile` builds every example directory and stops on the first
+  failure.** Directories 11, 12, 13, 16, 17 and user_guide were missing from the
+  per-directory targets, later files in a directory ran from the wrong working
+  directory, and a failed file did not fail the build.
 - **REPL `.clear` no longer crashes when the clear command is missing.** The
   command now runs through `subprocess.run` with an argument list instead of the
   deprecated `os.system`. A missing or unexecutable `clear` is ignored rather

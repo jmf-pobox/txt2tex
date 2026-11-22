@@ -715,7 +715,7 @@ class TestSetComprehensionLineBreaks:
         assert body.count("\\\\") >= 2
 
     def test_binding_output_after_break(self) -> None:
-        """The realistic DAT pattern: pred .\n {| ... |}."""
+        """The realistic relational pattern: pred .\n {| ... |}."""
         text = (
             "given X\n"
             "schema S\n  x : X\nend\n"

@@ -1,7 +1,7 @@
 """Regression tests for bare-`B` identifier decoration.
 
-The `B:` block keyword (#138) reserved the identifier `B` overzealously, which
-broke uses like `B! : P BookingId` (SBM ex14).  The lexer now only treats the
+The `B:` block keyword reserved the identifier `B` overzealously, which
+broke uses like `B! : P BookingId`.  The lexer now only treats the
 `B:` *sequence* as the block opener; bare `B` remains a usable identifier with
 the full `' ? !` decoration set.
 """

@@ -64,28 +64,28 @@ def test_multi_clause_machine_preserves_indentation():
     """A full multi-clause machine preserves leading whitespace on each line."""
     source = (
         "B:\n"
-        "MACHINE Trains\n"
+        "MACHINE Counter\n"
         "SETS\n"
-        "   PLACE\n"
+        "   ITEM\n"
         "VARIABLES\n"
-        "   trains\n"
+        "   items\n"
         "INVARIANT\n"
-        "   trains : iseq(PLACE * PLACE)\n"
+        "   items : iseq(ITEM * ITEM)\n"
         "INITIALISATION\n"
-        "   trains := []\n"
+        "   items := []\n"
         "END\n"
     )
     latex = _parse_and_generate(source)
     # Three-space indent must be preserved verbatim
-    assert "   PLACE" in latex
-    assert "   trains" in latex
-    assert "   trains : iseq(PLACE * PLACE)" in latex
-    assert "   trains := []" in latex
+    assert "   ITEM" in latex
+    assert "   items" in latex
+    assert "   items : iseq(ITEM * ITEM)" in latex
+    assert "   items := []" in latex
 
 
 def test_multi_clause_machine_no_double_spacing():
     """Body lines must not be separated by blank lines in the output."""
-    source = "B:\nMACHINE Trains\nSETS\n   PLACE\nEND\n"
+    source = "B:\nMACHINE Counter\nSETS\n   ITEM\nEND\n"
     latex = _parse_and_generate(source)
     # The body appears as a single contiguous string between the verbatim tags.
     begin_pos = latex.index(r"\begin{verbatim}")

@@ -104,7 +104,7 @@ class _ParenPolicyCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
     # Only LaTeX-style keywords supported: land, lor
     # Z RM §8.3 defines precedence for logical/set operators; arithmetic
     # operators are treated as generic infix in Z RM, so standard mathematical
-    # convention applies: multiply/divide bind tighter than add/subtract.
+    # convention applies: multiply/mod bind tighter than add/subtract.
     PRECEDENCE: ClassVar[dict[str, int]] = {
         "<=>": 1,  # Lowest precedence
         "=>": 2,
@@ -173,8 +173,8 @@ class _ParenPolicyCodegen(CodegenDispatch):  # pyright: ignore[reportUnusedClass
     # at runtime.
     RIGHT_ASSOCIATIVE: ClassVar[set[str]] = {"=>", "<=>"}
     # Unary operator precedence (Gap #2).  All unary operators bind more
-    # tightly than any binary operator (highest level in our table is 11 for
-    # * and /; unary level is 20 so any PRECEDENCE.get(op, 999) comparison
+    # tightly than any binary operator (highest level in our table is 12 for
+    # * and mod; unary level is 20 so any PRECEDENCE.get(op, 999) comparison
     # will correctly find unary > binary).  The dict makes the policy
     # machine-readable and queryable from tests.
     UNARY_PRECEDENCE: ClassVar[dict[str, int]] = {

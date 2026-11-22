@@ -121,7 +121,7 @@ def test_quantifier_at_sentence_end() -> None:
 def test_quantifier_without_pipe() -> None:
     """Test quantifier-like text without pipe renders as English prose.
 
-    Since DAT #11 / engine bug #136, bare English keywords like 'forall'
+    Bare English keywords like 'forall'
     in TEXT prose are NOT converted to math glyphs.  Math rewrite is
     opt-in via $...$ delimiters.
     """

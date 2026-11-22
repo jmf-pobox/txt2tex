@@ -326,7 +326,7 @@ class TestUngroupGenerator:
 
 
 # ---------------------------------------------------------------------------
-# Acceptance probe — from mission contract
+# Acceptance probe
 # ---------------------------------------------------------------------------
 
 
@@ -334,7 +334,7 @@ class TestGroupUngroupAcceptance:
     """Acceptance probe: GroupMembers group ({username} as members)."""
 
     def test_acceptance_probe(self) -> None:
-        r"""Full round-trip acceptance probe per mission contract.
+        r"""Full round-trip acceptance probe.
 
         GroupMembers group ({username} as members)
 

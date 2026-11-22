@@ -42,7 +42,7 @@ class TestNamedFieldProjection:
         test_cases = [
             ("record.status", "record", "status"),
             ("person.age", "person", "age"),
-            ("entry.course", "entry", "course"),
+            ("entry.title", "entry", "title"),
             ("x.field", "x", "field"),
         ]
         for input_text, expected_base, expected_field in test_cases:
@@ -54,12 +54,12 @@ class TestNamedFieldProjection:
 
     def test_field_projection_in_set_comprehension(self) -> None:
         """Test field projection inside set comprehension"""
-        result = parse_expr("{e : Entry | e.code = 479}")
+        result = parse_expr("{e : Entry | e.code = 42}")
         assert hasattr(result, "predicate")
 
     def test_field_projection_in_set_comprehension_latex(self) -> None:
         """Test LaTeX generation for field projection elem set comprehension"""
-        expr = parse_expr("{e : Entry | e.code = 479}")
+        expr = parse_expr("{e : Entry | e.code = 42}")
         assert not isinstance(expr, Document)
         gen = LaTeXGenerator(use_fuzz=True)
         latex = gen.generate_expr(expr)

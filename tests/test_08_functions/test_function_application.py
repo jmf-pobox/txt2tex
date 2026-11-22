@@ -276,24 +276,24 @@ class TestFunctionApplicationEdgeCases:
         assert isinstance(ast.args[0], FunctionApp)
 
 
-class TestSolution5Examples:
-    """Test examples from Solution 5."""
+class TestPredicateApplicationExamples:
+    """Test predicate application inside quantifiers and implications."""
 
-    def test_gentle_dog(self):
-        """Test gentle(d) from Solution 5(a)."""
-        ast = parse_expr("gentle(d)")
+    def test_unary_predicate_application(self):
+        """Test p(x) as a single-argument predicate application."""
+        ast = parse_expr("p(x)")
         assert isinstance(ast, FunctionApp)
         assert isinstance(ast.function, Identifier)
-        assert ast.function.name == "gentle"
+        assert ast.function.name == "p"
         assert len(ast.args) == 1
         assert isinstance(ast.args[0], Identifier)
-        assert ast.args[0].name == "d"
-        latex = generate_latex("gentle(d)")
-        assert latex == "gentle(d)"
+        assert ast.args[0].name == "x"
+        latex = generate_latex("p(x)")
+        assert latex == "p(x)"
 
-    def test_solution_5a(self):
-        """Test exists d : Dog | gentle(d) land well_trained(d)."""
-        text = "exists d : Dog | gentle(d) land neat(d)"
+    def test_exists_with_predicate_conjunction(self):
+        """Test exists x : X | p(x) land q(x)."""
+        text = "exists x : X | p(x) land q(x)"
         ast = parse_expr(text)
         assert isinstance(ast, Quantifier)
         assert ast.quantifier == "exists"
@@ -302,19 +302,19 @@ class TestSolution5Examples:
         assert isinstance(ast.body.left, FunctionApp)
         assert isinstance(ast.body.right, FunctionApp)
         latex = generate_latex(text)
-        assert "gentle(d)" in latex
-        assert "neat(d)" in latex
+        assert "p(x)" in latex
+        assert "q(x)" in latex
 
     def test_function_in_implication(self):
-        """Test neat(d) => attractive(d) from Solution 5(b)."""
-        text = "neat(d) => attractive(d)"
+        """Test q(x) => r(x) with predicate applications on both sides."""
+        text = "q(x) => r(x)"
         ast = parse_expr(text)
         assert isinstance(ast, BinaryOp)
         assert ast.operator == "=>"
         assert isinstance(ast.left, FunctionApp)
         assert isinstance(ast.right, FunctionApp)
         latex = generate_latex(text)
-        assert latex == "neat(d) \\Rightarrow attractive(d)"
+        assert latex == "q(x) \\Rightarrow r(x)"
 
 
 class TestFunctionApplicationIntegration:

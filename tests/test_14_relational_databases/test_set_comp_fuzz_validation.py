@@ -112,8 +112,8 @@ class TestStandaloneSetCompWithBinding:
     def test_multi_field_binding_becomes_tuple(self) -> None:
         """Multi-field binding converts to tuple in hidden copy."""
         src = (
-            "{ s : Ship; c : Class | s.class = c.class . "
-            "{| name == s.name, disp == c.displacement |} }"
+            "{ a : Album; r : Artist | a.genre = r.genre . "
+            "{| name == a.name, yr == r.year |} }"
         )
         latex = _generate(src)
         setbox_start = latex.find(r"\setbox0")
@@ -122,7 +122,7 @@ class TestStandaloneSetCompWithBinding:
         hidden_block = latex[setbox_start:vbox_close]
         assert r"\lblot" not in hidden_block
         # Hidden block should have the tuple components without binding syntax
-        assert "s.name" in hidden_block or "name" in hidden_block
+        assert "a.name" in hidden_block or "name" in hidden_block
 
 
 # ===================================================================

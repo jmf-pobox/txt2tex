@@ -1,6 +1,7 @@
-"""Phase 1 strict inline-math tests: $...$ takes whiteboard notation only.
+"""Strict inline-math tests: $...$ takes whiteboard notation only.
 
-Under the Phase 1 strict model (docs/development/PLAN_text_inline_math.md §Phase 1):
+Under the strict model (docs/DESIGN.md, ADR on parser-backed inline math in TEXT
+blocks):
 - $...$ in TEXT: prose routes content through the real lexer → parser → generator.
 - A backslash inside $...$ raises InlineMathError; use LATEX: for raw LaTeX.
 - A Z paragraph construct (schema, axdef, etc.) inside $...$ raises InlineMathError.

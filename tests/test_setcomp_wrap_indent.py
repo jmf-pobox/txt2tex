@@ -1,6 +1,6 @@
 """Regression tests: wrapped set-comprehension indentation tracks binder depth.
 
-jms ruling (see mission for fix/setcomp-wrap-indent): indentation inside a Z
+jms ruling (branch fix/setcomp-wrap-indent): indentation inside a Z
 paragraph tracks *binding depth*, where a binder is ``forall``, ``exists``,
 ``exists1``, ``lambda``, ``mu``, **and** set comprehension ``{ D | P . E }``
 (Z RM §3.9 — a comprehension is schema-text-plus-spot, the same construction

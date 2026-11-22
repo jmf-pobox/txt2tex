@@ -41,7 +41,7 @@ parentOf(| {john} |)
 
 R~(| S |)
 
-** Example 6: Set comprehension with relational image (Solution 35 pattern) **
+** Example 6: Set comprehension with relational image **
 
 given Person
 

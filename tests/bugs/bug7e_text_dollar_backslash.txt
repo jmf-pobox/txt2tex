@@ -9,4 +9,4 @@ TEXT: Affects any prose with explicit LaTeX commands inside `$...$`: `\Rightarro
 
 TEXT: Workaround: use the txt2tex ascii operators inside `$...$` (e.g. `$p <=> x > 1$`, `$forall x : N | p$`) instead of LaTeX backslash commands. Or rewrite the prose to avoid inline math.
 
-TEXT: First observed: SEM Solution 7 verification, round 3 (2026-05-21). Severity: medium (regression introduced by bug 7 fix — the original heuristic at least passed backslash sequences through).
+TEXT: Severity: medium (regression introduced by bug 7 fix — the original heuristic at least passed backslash sequences through).

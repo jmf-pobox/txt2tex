@@ -20,7 +20,9 @@ PDF_FILES := $(TXT_FILES:.txt=.pdf)
 # Subdirectory targets
 SUBDIRS := 00_getting_started 01_propositional_logic 02_predicate_logic 03_equality \
            04_proof_trees 05_sets 06_definitions 07_relations 08_functions \
-           09_sequences 10_schemas 14_relational_databases 15_schema_calculus fuzz_tests
+           09_sequences 10_schemas 11_text_blocks 12_advanced 13_equality_chains \
+           14_relational_databases 15_schema_calculus 16_multi_decl_calculus \
+           17_state_machines fuzz_tests user_guide
 
 # Set default goal to build all PDFs
 .DEFAULT_GOAL := all
@@ -40,12 +42,12 @@ $(SUBDIRS):
 	@echo "Building examples in $@..."
 	@for f in $@/*.txt; do \
 		if [ -f "$$f" ]; then \
-			cd .. && uv run txt2tex "examples/$$f" || (echo "Error building $$f"; exit 1); \
+			(cd .. && uv run txt2tex "examples/$$f") || { echo "failed: $$f" >&2; exit 1; }; \
 		fi; \
 	done
 
 # Convenient short aliases
-.PHONY: 00 01 02 03 04 05 06 07 08 09 10 14 15 fuzz
+.PHONY: 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 fuzz
 00: 00_getting_started
 01: 01_propositional_logic
 02: 02_predicate_logic
@@ -57,8 +59,13 @@ $(SUBDIRS):
 08: 08_functions
 09: 09_sequences
 10: 10_schemas
+11: 11_text_blocks
+12: 12_advanced
+13: 13_equality_chains
 14: 14_relational_databases
 15: 15_schema_calculus
+16: 16_multi_decl_calculus
+17: 17_state_machines
 fuzz: fuzz_tests
 
 # Clean auxiliary files in all subdirectories
@@ -83,7 +90,7 @@ distclean: clean
 list:
 	@echo "Available targets:"
 	@echo "  all                    - Build all PDFs (default)"
-	@echo "  01-09                  - Build all examples in specific lecture directory"
+	@echo "  00-17                  - Build all examples in specific topic directory"
 	@echo "  01_propositional_logic - Build examples in 01_propositional_logic/"
 	@echo "  02_predicate_logic     - Build examples in 02_predicate_logic/"
 	@echo "  03_equality            - Build examples in 03_equality/"
@@ -93,8 +100,15 @@ list:
 	@echo "  07_relations           - Build examples in 07_relations/"
 	@echo "  08_functions           - Build examples in 08_functions/"
 	@echo "  09_sequences           - Build examples in 09_sequences/"
+	@echo "  10_schemas             - Build examples in 10_schemas/"
+	@echo "  11_text_blocks         - Build examples in 11_text_blocks/"
+	@echo "  12_advanced            - Build examples in 12_advanced/"
+	@echo "  13_equality_chains     - Build examples in 13_equality_chains/"
 	@echo "  14_relational_databases - Build examples in 14_relational_databases/"
 	@echo "  15_schema_calculus     - Build examples in 15_schema_calculus/"
+	@echo "  16_multi_decl_calculus - Build examples in 16_multi_decl_calculus/"
+	@echo "  17_state_machines      - Build examples in 17_state_machines/"
+	@echo "  user_guide             - Build examples in user_guide/"
 	@echo "  fuzz_tests / fuzz      - Build examples in fuzz_tests/"
 	@echo "  clean                  - Remove auxiliary files"
 	@echo "  distclean              - Remove all generated files"
