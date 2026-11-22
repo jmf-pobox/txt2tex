@@ -91,3 +91,30 @@ def test_no_private_working_files_tracked(tracked_files: tuple[str, ...]) -> Non
         if path in PRIVATE_FILES or _is_private_top_dir(path)
     ]
     assert not offenders, f"tracked private working files: {offenders}"
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        ".envrc.local",
+        ".claude/settings.local.json",
+        ".punt-labs/vox/vox.local.md",
+        ".punt-labs/biff/config.local.yaml",
+        ".punt-labs/ethos/identities/someone.local.yaml",
+        ".punt-labs/ethos/missions.jsonl.lock",
+        ".punt-labs/ethos/local/audit.jsonl",
+    ],
+)
+def test_machine_local_files_are_gitignored(path: str) -> None:
+    """Machine-local files must be ignored so `git add .` cannot publish them."""
+    git = shutil.which("git")
+    if git is None:
+        pytest.skip("git not available")
+    if not (ROOT / ".git").exists():
+        pytest.skip("not a git checkout")
+    result = subprocess.run(  # noqa: S603
+        [git, "check-ignore", "--no-index", "-q", path],
+        cwd=ROOT,
+        check=False,
+    )
+    assert result.returncode == 0, f"{path} is not gitignored"
