@@ -367,4 +367,4 @@ Some operators use multiple characters:
 ## See Also
 
 - [USER_GUIDE.md](USER_GUIDE.md) - User-facing syntax guide
-- [DESIGN.md](DESIGN.md) - Operator precedence and parsing details
+- [DESIGN.md](../DESIGN.md) - Operator precedence and parsing details
