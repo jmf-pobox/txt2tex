@@ -7,12 +7,16 @@ and txt2tex's relational-algebra extensions creates a gap.
 
 ---
 
-## 1. Abbreviation chains that mix algebra and pure Z
+## 1. ~~Abbreviation chains that mix algebra and pure Z~~ (RESOLVED)
 
-**Symptom.** Fuzz rejects an abbreviation whose right-hand side is
-pure Z (`union`, `intersect`, `subset`, plain identifiers) but
-whose operands were defined in earlier abbreviations that used
-relational-algebra operators (`pi`, `sigma`, `join`, etc.).
+An abbreviation whose right-hand side is pure Z (`union`, `intersect`,
+plain identifiers) but whose operands were defined by earlier
+relational-algebra abbreviations used to fail fuzz, because the
+operands were never declared inside a Z environment.
+
+The engine now routes by reference.  A Z operator that mentions an
+algebra-defined name is rendered as inline math too, so no
+workaround is needed.  This input now generates without a fuzz error:
 
 ```text
 A == pi[x](sigma[p](R))
@@ -20,26 +24,21 @@ B == pi[x](sigma[q](R))
 C == A intersect B
 ```
 
-`A` and `B` route to inline math (`$A == ...$`) because their
-RHS contains DAT constructs.  `C` looks like ordinary Z —
-two identifiers joined by `\cap` — so the engine puts it
-inside `\begin{zed}...\end{zed}`.  Fuzz then rejects `A` and
-`B` as undeclared because their definitions were never visible
-inside a Z environment.
+`txt2tex --tex-only` emits all three as inline math.  Fuzz reports no
+error because it does not check inline math at all: these lines are
+display-only and are not type-checked (`R`, `p` and `q` are never
+declared).  Use them for presentation, not as checked Z:
 
-**Workaround.** Write the final step as a standalone expression
-(not an abbreviation):
+```latex
+\noindent
+$A == \mathrm{Project}_{x}(\mathrm{Restrict}_{p}(R))$
 
-```text
-A == pi[x](sigma[p](R))
-B == pi[x](sigma[q](R))
+\noindent
+$B == \mathrm{Project}_{x}(\mathrm{Restrict}_{q}(R))$
 
-pi[x](sigma[p](R)) intersect pi[x](sigma[q](R))
+\noindent
+$C == A \cap B$
 ```
-
-The standalone expression routes to inline math and fuzz skips
-it.  The `.tex` and PDF render correctly in both cases; the
-difference is only whether fuzz complains.
 
 ---
 
@@ -75,16 +74,15 @@ These operators are txt2tex extensions that emit as
 Fuzz has no rules for them.
 
 **How the engine handles this.** Abbreviations whose RHS contains
-a DAT construct are automatically routed to `\noindent$...$`
+a relational-algebra construct are automatically routed to `\noindent$...$`
 (inline math) instead of `\begin{zed}...\end{zed}`.  Fuzz
 silently skips inline math.  Standalone expressions (not
 abbreviations) also route to inline math.  The `.tex` and PDF
 are always correct; the limitation is only on what fuzz can
 verify.
 
-**See also.** Gotcha #1 for the edge case where this routing
-logic is fooled by a pure-Z expression that references
-algebra-defined names.
+**See also.** Gotcha #1: a pure-Z abbreviation that references
+algebra-defined names is routed to inline math as well.
 
 ---
 
@@ -115,15 +113,17 @@ for complex relation arguments.
 
 ## 7. Unspaced `>` or `<` inside `sigma[...]` lexes as angle bracket
 
-**Symptom.** A sigma predicate with an unspaced `>` or `<` fails
-to parse:
+Tracking: [#121](https://github.com/jmf-pobox/txt2tex/issues/121).
+
+**Symptom.** A sigma predicate with an unspaced `>` or `<` is
+rejected:
 
 ```text
 sigma[groupcount>1](R)
 ```
 
 ```text
-Error: Expected ']' after sigma predicate
+Error: Unspaced '>' inside sigma[...] is parsed as an angle bracket — add spaces around the operator (e.g. sigma[x > 1] not sigma[x>1])
 
 1 | sigma[groupcount>1](R)
   |      ^
@@ -132,8 +132,8 @@ Error: Expected ']' after sigma predicate
 The lexer disambiguates `>` and `<` based on spacing: without a
 leading space, `>` becomes RANGLE (closing angle bracket `⟩`) and
 `<` becomes LANGLE (opening angle bracket `⟨`).  The sigma
-predicate parser then sees a broken expression and reports a
-missing `]`.
+predicate parser then sees a broken expression and stops with the
+error above.
 
 The two-character operators `>=` and `<=` are not affected — they
 always lex correctly regardless of spacing.
@@ -154,5 +154,5 @@ sigma[x<=10](R)          -- OK: <= always lexes as LESS_EQUAL
 
 ```text
 sigma[groupcount > 1](R)
-sigma[x > 1 and y < 10](R)
+sigma[x > 1 land y < 10](R)
 ```

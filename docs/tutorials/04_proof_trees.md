@@ -1,7 +1,7 @@
 # Tutorial 4: Proof Trees
 
 <!-- markdownlint-disable-next-line MD036 -->
-**Lecture 4: Deductive Proofs**
+**Tutorial 4: Deductive Proofs**
 
 Learn natural deduction and write formal proofs that fuzz-typecheck and
 render as branching `\infer` trees in the PDF.
@@ -111,8 +111,8 @@ of the discharging rule.
 When the rule introducing the discharge is `=>-intro` or
 `false-elim`, the assumption marker and the body together act as the
 discharging step's "premises" in the rendered tree. This is the same
-pattern used throughout `txt2tex-hw/solutions.txt` and the example
-files.
+pattern used throughout the example files in
+`examples/04_proof_trees/`.
 
 **Note about the `::` on the body.** §2.2 says unary rules take a
 single indented child with no `::`. Discharging rules are unary in

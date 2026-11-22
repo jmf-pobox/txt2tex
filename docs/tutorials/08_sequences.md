@@ -1,7 +1,7 @@
 # Tutorial 8: Sequences
 
 <!-- markdownlint-disable-next-line MD036 -->
-**Lecture 8: Sequences and Bags**
+**Tutorial 8: Sequences and Bags**
 
 Learn sequence notation, sequence operations, pattern matching, and bags (multisets).
 

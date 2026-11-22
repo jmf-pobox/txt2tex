@@ -1,7 +1,7 @@
 # Tutorial 3: Sets and Types
 
 <!-- markdownlint-disable-next-line MD036 -->
-**Lecture 3: Set Theory**
+**Tutorial 3: Set Theory**
 
 Learn set notation, set operations, power sets, Cartesian products, and tuples.
 

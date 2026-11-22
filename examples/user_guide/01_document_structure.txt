@@ -1,15 +1,15 @@
 // Example: Document Structure
-// Demonstrates sections, solutions, and part labels
+// Demonstrates sections, subsections, and part labels
 // From USER_GUIDE.md - Document Structure section
 
 === Introduction land Propositions ===
 
-** Solution 1 **
+** Example 1 **
 
 (a) p land q
 (b) p lor q
 (c) lnot p
 
-** Solution 2 **
+** Example 2 **
 
 p => q

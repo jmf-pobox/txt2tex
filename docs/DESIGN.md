@@ -22,7 +22,7 @@ These principles guide all design decisions in txt2tex, balancing accessibility 
 <!-- markdownlint-disable-next-line MD036 -->
 *"Make the simple things invisible, the complex things explicit."*
 
-Users write natural whiteboard notation, but the generated LaTeX should be recognizable and teachable. A student who learns txt2tex should be 70%+ prepared to write LaTeX with fuzz directly.
+Users write natural whiteboard notation, but the generated LaTeX should be recognizable and teachable. A user who learns txt2tex should be 70%+ prepared to write LaTeX with fuzz directly.
 
 **Application**:
 
@@ -37,7 +37,7 @@ Users write natural whiteboard notation, but the generated LaTeX should be recog
 <!-- markdownlint-disable-next-line MD036 -->
 *"When whiteboard notation matches formal notation, prefer formal notation."*
 
-Where Z notation has established conventions (like `\land`, `\lor`, `\forall`), our ASCII input mirrors these closely. This reduces cognitive load when students transition to reading research papers or formal specifications.
+Where Z notation has established conventions (like `\land`, `\lor`, `\forall`), our ASCII input mirrors these closely. This reduces cognitive load when users transition to reading research papers or formal specifications.
 
 **Application**:
 
@@ -47,7 +47,7 @@ Where Z notation has established conventions (like `\land`, `\lor`, `\forall`), 
 - ✅ **Use Z terminology**: "maplet" not "pair", "dom" not "domain"
 - ⚠️ **ASCII approximations only where necessary**: `|->` for `\mapsto`, `<->` for `\rel`
 
-**Rationale**: Students learning `land` and `lor` are learning the actual Z notation names. Reading `\land` in LaTeX or papers becomes immediate recognition.
+**Rationale**: Users learning `land` and `lor` are learning the actual Z notation names. Reading `\land` in LaTeX or papers becomes immediate recognition.
 
 ### Principle 3: Progressive Disclosure of Complexity
 
@@ -69,7 +69,7 @@ Common patterns get smart defaults. Advanced users can override with explicit La
 
 ### Strategic Goals
 
-1. **Training Wheels for Z Notation**: A student proficient in txt2tex can read 80% of Z notation papers and write 60% of fuzz LaTeX without additional training.
+1. **Training Wheels for Z Notation**: A user proficient in txt2tex can read 80% of Z notation papers and write 60% of fuzz LaTeX without additional training.
 
 2. **Textbook-Quality LaTeX**: Generated LaTeX should be indistinguishable from examples in Spivey's "The Z Notation" or Woodcock & Davies' "Using Z".
 
@@ -132,11 +132,6 @@ Input Text
 ┌─────────────────┐
 │ Parser          │ → Abstract Syntax Tree (AST)
 │ (Structure)     │
-└─────────────────┘
-    ↓
-┌─────────────────┐
-│ Semantic        │ → Annotated AST
-│ Analyzer        │
 └─────────────────┘
     ↓
 ┌─────────────────┐
@@ -750,13 +745,13 @@ TEMPLATES = {
 
 **Status**: SETTLED 2026-04-13.
 
-**Context**: the parser builds an AST; the generator must decide which parentheses to emit. An early debate weighed *minimalist* (print only what is required for unambiguous parsing) against *instructive* (print what helps a human reader see precedence). The author started minimalist and conceded toward instructive in specific cases, but the end state was not clearly documented. Assessment feedback on Q8(b) surfaced the inconsistency — the grader expected parens around an existential predicate that the generator emitted bare.
+**Context**: the parser builds an AST; the generator must decide which parentheses to emit. An early debate weighed *minimalist* (print only what is required for unambiguous parsing) against *instructive* (print what helps a human reader see precedence). The author started minimalist and conceded toward instructive in specific cases, but the end state was not clearly documented. Review of rendered output surfaced the inconsistency — a reader expected parens around an existential predicate that the generator emitted bare.
 
 **Decision**: precedence-driven output with a small, enumerable set of *always-paren* contexts, plus honouring author-written parens.
 
-1. **Precedence-driven default.** The generator consults a PRECEDENCE table (`latex_gen.py:174`) and the `_needs_parens` helper (`latex_gen.py:939`) to decide whether a child expression needs parens against its parent. Standard compiler practice: emit parens iff the child's precedence is lower than the parent's (or equal with the wrong associativity).
+1. **Precedence-driven default.** The generator consults the `PRECEDENCE` table and the `_needs_parens` helper (both in `codegen/paren_policy.py`) to decide whether a child expression needs parens against its parent. Standard compiler practice: emit parens iff the child's precedence is lower than the parent's (or equal with the wrong associativity).
 
-2. **Author-written parens are preserved.** `BinaryOp.explicit_parens=True` (`ast_nodes.py:34`) is set by the parser when the source wrapped an expression in parens. The generator always emits parens for `explicit_parens=True`, irrespective of precedence. This is the mechanism documented at §2 *Explicit Parentheses Preservation*.
+2. **Author-written parens are preserved.** `BinaryOp.explicit_parens=True` (`ast_nodes.py`) is set by the parser when the source wrapped an expression in parens. The generator always emits parens for `explicit_parens=True`, irrespective of precedence. This is the mechanism documented at §2 *Explicit Parentheses Preservation*.
 
 3. **Always-paren contexts** (additions on top of precedence + explicit flag):
    - Quantifier body containing propositional connectives (`∧`, `∨`, `⇒`, `⇔`). Wrap the body for visual chunking.
@@ -767,13 +762,13 @@ TEMPLATES = {
 
 **Rationale**:
 
-- Pure minimalism produces output that type-checks but can confuse human readers in exactly the way the Q8(b) feedback describes. The generator's output is read by human reviewers, not only by `fuzz`.
+- Pure minimalism produces output that type-checks but can confuse human readers: an existential predicate with no parens reads as part of the surrounding connective. The generator's output is read by human reviewers, not only by `fuzz`.
 - Blanket instructive parenthesisation (parens around every non-atomic subexpression) produces cluttered output no Z reader writes by hand.
 - Precedence-driven plus a short always-paren list matches the Z RM grammar for correctness and the standard Z style for readability, with a rule set small enough to document in one paragraph.
 
 **Rejected alternatives**:
 
-- *Minimalist-only*: fails the legibility bar set by the graders.
+- *Minimalist-only*: fails the legibility bar for human readers.
 - *Instructive blanket*: fails the "textbook-quality output" requirement (Design Principle 1).
 - *Source-parens-only*: under-specifies because the AST discards paren nodes for unambiguous subexpressions; only `BinaryOp` currently carries `explicit_parens`.
 
@@ -782,17 +777,17 @@ TEMPLATES = {
 - Positive: a single policy statement. Tests can encode it with a parametrised matrix over operator pairs.
 - Negative: the always-paren list is a judgment call per construct. Future constructs (new quantifier-like forms) will need to be classified deliberately.
 
-**Known gaps requiring follow-up** (see task #15 and a forthcoming implementation mission):
+**Current state of the policy** (all in `codegen/paren_policy.py` and the expression generators):
 
-1. **Arithmetic operators missing from the PRECEDENCE table.** `+`, `-`, `*`, `/` fall to the default precedence of 999. Today this yields accidentally-correct output for logical/set expressions but would produce wrong parens on mixed arithmetic, e.g., `a + b * c` emitted without parens around `b * c` when printed under a lower-precedence parent. Add explicit entries.
+1. **Four arithmetic operators are in the `PRECEDENCE` table.** `+` and `-` are at level 11; `*` and `mod` are at level 12. All sit above the set operators (maximum 10), so `a + b * c` is parenthesised correctly under a lower-precedence parent. `/` and `div` have no entry. Bare `/` is the rename separator in relational algebra (`R[NEW/OLD]`), not division, so it is not an arithmetic operator here.
 
-2. **Unary special cases outside the table.** `_generate_unary_op` (`latex_gen.py:878–922`) has four conditional blocks driven by operator-string matching rather than the PRECEDENCE table. Lift these into a `UNARY_PRECEDENCE` structure so `_needs_parens` is the single source of truth.
+2. **Unary operators have a table, but `_needs_parens` does not read it.** `UNARY_PRECEDENCE` lists the prefix operators (`lnot`, unary `-`, `#`, `dom`, `ran`, `inv`, `id`, `P`, `P1`, `F`, `F1`, `bigcup`, `bigcap`) and the postfix operators (`~`, `+`, `*`), all at level 20, above every binary operator. `_needs_parens` handles binary children only. `_generate_unary_op` in `codegen/expressions.py` applies the rule the table states: it wraps a `BinaryOp` operand in parens unless the operand already carries its own source parens.
 
-3. **Set-comprehension predicate loses parent context.** `_generate_set_comprehension` at `latex_gen.py:1314` calls `generate_expr(node.predicate)` with no `parent=` argument. Quantifiers inside `{ x : T | ∃ … }` therefore appear top-level and receive no wrapping parens. This is the direct mechanism behind the Q8(b) feedback. Pass `parent=node`; the always-paren rule for nested quantifier in comprehension constraint then fires.
+3. **Set-comprehension predicates keep their parent context.** `_generate_set_comprehension` passes `parent=node` when it generates the constraint. A nested quantifier in a comprehension constraint therefore gets the always-paren treatment: the generator wraps it in parens even when the source has none.
 
-4. **Cross-product rationale.** Documented — see subsection below.
+4. **Cross-product rationale.** See the subsection below.
 
-5. **Test matrix is not exhaustive.** Per-feature tests exercise specific operator pairs; a `@pytest.mark.parametrize` matrix of `(child_op, parent_op, is_left_child, expected_parens)` across the PRECEDENCE table would make the policy machine-checkable and catch future table edits that break a pair.
+5. **Table-driven tests.** `TestPrecedenceMatrix` in `tests/test_coverage/test_paren_policy_gaps.py` derives parametrised cases from `PRECEDENCE` and `UNARY_PRECEDENCE`, so a table edit that breaks an operator pair fails a test. Moving every remaining paren decision into `paren_policy.py` is tracked in [#123](https://github.com/jmf-pobox/txt2tex/issues/123).
 
 #### Cross-product parenthesisation (settled, commit `6db389f`)
 
@@ -1131,18 +1126,18 @@ generator = LaTeXGenerator(
 )
 ```
 
-### ADR: Q2(d) parser-bug fix — multi-decl + conjunction-predicate Z comprehensions
+### ADR: multi-decl + conjunction-predicate parser fix — Z comprehensions
 
 **Status**: SETTLED 2026-05-19.
 
 **Context**: The parser's `_parse_postfix` method contained a 45-line heuristic (`is_bullet_indicator`) intended to stop field-projection consumption when a PERIOD token appeared to be a quantifier/comprehension bullet separator. In practice the heuristic conflated two distinct PERIOD roles:
 
 - `s.x` — field projection, should be consumed by `_parse_postfix`
-- `{ s : Ship | P . E }` — bullet separator, belongs to the outer comprehension/quantifier parser
+- `{ a : Album | P . E }` — bullet separator, belongs to the outer comprehension/quantifier parser
 
-The heuristic fired inside comprehension and quantifier bodies, blocking legitimate `s.field` projections in expression position. This caused 13 tests in `tests/test_q2d_calculus_predicate_chain.py` to fail. Two follow-on issues were also present: chained `TupleProjection` inside `mu` expressions greedily consumed the bullet PERIOD, and the RBRACE-separator heuristic in `_parse_postfix` swallowed RHS projections when parsing comparison expressions.
+The heuristic fired inside comprehension and quantifier bodies, blocking legitimate `a.field` projections in expression position. This caused 13 tests in `tests/test_multi_decl_predicate_chain.py` to fail. Two follow-on issues were also present: chained `TupleProjection` inside `mu` expressions greedily consumed the bullet PERIOD, and the RBRACE-separator heuristic in `_parse_postfix` swallowed RHS projections when parsing comparison expressions.
 
-Separately, `_parse_lambda` lacked SEMICOLON and PIPE branches, so multi-declaration lambda expressions (`lambda s : Ship; c : Class | P . E`) raised a parse error.
+Separately, `_parse_lambda` lacked SEMICOLON and PIPE branches, so multi-declaration lambda expressions (`lambda a : Album; t : Track | P . E`) raised a parse error.
 
 **Decision**:
 
@@ -1163,28 +1158,22 @@ Separately, `_parse_lambda` lacked SEMICOLON and PIPE branches, so multi-declara
 - *(a) Keep heuristic, add context flag*: adds parser state and couples `_parse_postfix` to comprehension/quantifier context — exactly the design error the heuristic introduced. Does not fix the root cause (bullet detection belongs at the outer parser).
 - *(b) Remove PERIOD/EOF from `safe_followers` globally*: would break chained projections outside comprehension bodies (e.g., `s.name.length` at the top level of a `zed` block). Too broad.
 
-**Open question for jfreeman — LaTeX form of multi-decl lambda**:
-
-The current generator emits nested lambdas:
+**Decision — LaTeX form of multi-decl lambda**: when no later domain refers to an earlier binding, the generator emits the Z RM canonical form (Spivey, §3.12), a single lambda with a semicolon-separated SchemaText:
 
 ```latex
-\lambda s : Ship @ \lambda c : Class | P @ E
+\lambda a : Album; t : Track | P @ E
 ```
 
-The Z RM canonical form (Spivey, §3.12) is a single lambda with a semicolon-separated SchemaText:
+The alternative was nested lambdas (`\lambda a : Album @ \lambda t : Track | P @ E`). Both type-check in fuzz, but the Spivey form is what Z RM readers expect to see. The tests assert the Spivey form: `tests/test_08_functions/test_lambda_multidecl_fuzz.py`, `tests/test_lambda_paren_wrap.py`, and `tests/test_multi_decl_predicate_chain.py`.
 
-```latex
-\lambda s : Ship; c : Class | P @ E
-```
-
-Both type-check in fuzz. The current code follows the same `_generate_quantifier` path used by multi-decl `forall`/`exists`, which is correct for those quantifiers. A specialisation of `_generate_quantifier` for `node.quantifier == "lambda"` could emit the Spivey form. This is not a blocker — fuzz accepts both — but the Spivey form is what Z RM readers expect to see. Decision deferred to jfreeman.
+**Exception — dependent domains**: `_collect_lambda_chain` stops collecting when a later declaration's domain refers to an earlier binding (for example `lambda s : dom f | lambda e : f(s) | ...`). Fuzz binds co-declarations in parallel, so a flat form would be rejected. The generator then emits nested lambdas, `(\lambda s : \dom f | (\lambda e : f(s) | ... @ s))`. `test_lambda_dependent_domain` in `tests/test_spivey_dependent_domain.py` requires this.
 
 **Consequences**:
 
-- All 13 tests in `tests/test_q2d_calculus_predicate_chain.py` pass.
+- All 13 tests in `tests/test_multi_decl_predicate_chain.py` pass.
 - Multi-typed relational-calculus expressions (Z comprehensions with conjunction predicates over tuple projections, multi-decl `forall`/`exists`/`mu`/`lambda`) can be written natively without dropping into raw LaTeX.
 - The `is_bullet_indicator` deletion removes 45 lines and one category of parser state. `_parse_postfix` is now simpler and more regular.
-- Known limitation: multi-decl lambda without a pipe-predicate (e.g., `lambda s : Ship; c : Class . (s, c)`) is not yet supported. See `MISSING_FEATURES.md`.
+- Known limitation: multi-decl lambda without a pipe-predicate (e.g., `lambda a : Album; t : Track . (a, t)`) is rejected. Tracked in [#115](https://github.com/jmf-pobox/txt2tex/issues/115).
 
 ### ADR: field selection as an operand of every infix operator
 
@@ -1207,7 +1196,7 @@ txt2tex is feature-complete for typical Z specifications. See [MISSING_FEATURES.
 ### Document Structure
 
 - Section headers (`=== Title ===`)
-- Solution markers (`** Solution N **`)
+- Subsection markers (`** Title **`)
 - Part labels (`(a)`, `(b)`, `(c)`)
 - Text paragraphs with `TEXT:` keyword
 - Proper spacing (`\bigskip`, `\medskip`)
@@ -1663,8 +1652,8 @@ R div S                -- division       → R \div S
 >
 > **Note (2026-05-23)**: Project keyword emission changed from the brace
 > form `\mathrm{Project}\{A, B\}(R)` to the subscript form
-> `\mathrm{Project}_{A, B}(R)` to match the instructor's canonical
-> vocabulary (#146).
+> `\mathrm{Project}_{A, B}(R)` to match conventional database-textbook
+> (Date) vocabulary.
 
 **Operator levels** (lowest binds least):
 
@@ -1691,7 +1680,7 @@ union / override (++)
 > 1. `setminus` is handled by `_parse_intersect` (parser.py:4081) alongside
 >    `intersect`, not by a separate `_parse_setminus`.  The two are at the
 >    same precedence level.
-> 2. `rho` was retired by #147; relation rename is now postfix `R[B/A]`
+> 2. `rho` was retired; relation rename is now postfix `R[B/A]`
 >    and is handled at the atom level by `_parse_postfix` rather than as
 >    a prefix.
 > 3. `group` and `ungroup` join `cross`/`join`/`div` in `_parse_cross`
@@ -1819,7 +1808,7 @@ the keyword-algebra rendering convention reviewed 2026-05-19.
   `docs/guides/USER_GUIDE.md`, and
   `examples/14_relational_databases/algebra_basics.{txt,tex}` updated.
 
-**Students who need the literal `:=` glyph** (e.g., for a SQL UPDATE
+**Authors who need the literal `:=` glyph** (e.g., for a SQL UPDATE
 trigger example) can use a `TEXT:` or `LATEX:` block.
 
 **Backward incompatibility**: Any existing `.txt` files that use `:=` will
@@ -1831,7 +1820,7 @@ fail to parse. Migrate to `==`.
    removal with no shims.
 
 2. Keep `\bowtie` as an option/flag — rejected; a single canonical symbol
-   per operator simplifies the output and matches the course materials.
+   per operator simplifies the output and matches textbook notation.
 
 ## ADR: Z Binding Brackets and Context-Sensitive == (Phase 2.3)
 
@@ -1841,8 +1830,8 @@ binding context.
 
 **Forces**:
 
-1. Relational-calculus exercises require binding-calculus expressions
-   of the form `{ s : Ship | pred . {| name == s.name |} }`.
+1. Relational-calculus expressions need binding-calculus forms
+   such as `{ a : Album | pred . {| title == a.title |} }`.
 2. Z RM §3.7 specifies `\lblot a == e_1, b == e_2 \rblot`; the macros
    `\lblot` and `\rblot` exist in both `fuzz.sty` and the `zed-*` family
    (confirmed by jms round-1 verification at `fuzz.sty:275-276` and
@@ -1982,20 +1971,43 @@ breaks on `S[a, b/c]` (multi-pair with a non-pair element first) or
 `S[some_longer_name/target]`.  The depth-tracking scan is correct for all
 current and planned Z notation within Phase 3.x scope.
 
-## Future Enhancements
+## Module Layout
 
-1. **Export formats**
-   - Plain text (pretty-printed)
+The pipeline is `source.txt → Lexer → tokens → Parser → AST → LaTeXGenerator → output.tex`.
+The parser knows nothing about LaTeX output, and the lexer and parser never
+call the generator.
 
-2. **LSP + IDE Integration**
-   - Language Server Protocol implementation
-   - VS Code extension (thin wrapper around LSP)
-   - Live validation, autocomplete, syntax highlighting
+**One exception: TEXT inline math.** `codegen/text_pipeline.py` (the
+`$...$` handling in TEXT blocks) imports `Lexer` and `Parser`. For each `$...$`
+span it creates a fresh `Lexer` and `Parser`, parses the span as a whiteboard
+expression, then renders the resulting AST with `generate_expr`. A span that
+fails to lex or parse is left unchanged. A span that parses as a Z paragraph is
+an error. So the generator re-enters the front end while it generates TEXT. Any
+change to the lexer or parser API must keep that call site working.
 
-3. **Handwritten image to LaTeX (OCR)**
-   - Convert whiteboard/paper photos to txt2tex input
-   - Recognize mathematical notation from handwriting
-   - Challenging but high-value for real whiteboard workflows
+In 1.4.0 the two largest modules were split by construct family. Behaviour did
+not change: the `.tex` output of every input in `examples/` and `tests/bugs/`
+(190 files) was byte-identical before and after. Today:
+
+| Path | Role |
+|------|------|
+| `src/txt2tex/latex_gen.py` | `LaTeXGenerator`, a thin shell that composes the mixins below |
+| `src/txt2tex/codegen/` | Generator handlers, one file per construct family (`paragraphs`, `schemas`, `proofs`, `algebra`, `expressions`, `types`, `bindings`, `text_blocks`), plus `paren_policy`, `overflow`, `fuzz_routing` and `text_pipeline` |
+| `src/txt2tex/parser.py` | `Parser`, a thin shell that composes the mixins below |
+| `src/txt2tex/parser_pkg/` | Grammar rules, one file per construct family, plus `errors` and `lexer_state` |
+| `src/txt2tex/ast_nodes.py` | Frozen dataclasses for every AST node |
+| `src/txt2tex/free_vars.py` | Free-variable analysis used by the Spivey-form quantifier collapse |
+
+To find where a construct is rendered, open the matching file in `codegen/`.
+`make refactor-diff` compares `.tex` output against a git ref over the same
+corpus; run it before and after any refactor.
+
+## Future Work
+
+Open work is tracked in [GitHub Issues](https://github.com/jmf-pobox/txt2tex/issues).
+Planned internal refactors (one tested paren-policy module, a rendered-node
+intermediate representation) and other ideas (plain-text export, a language
+server) are collected in [#123](https://github.com/jmf-pobox/txt2tex/issues/123).
 
 ## Deferred Designs
 
@@ -2004,7 +2016,7 @@ not implemented. Each entry has a standalone design document under
 `docs/deferred/`; see those files for the full engine surface and the
 references behind the decision.
 
-- **User-defined operator names** — full engine surface for
+- **User-defined operator names** ([#118](https://github.com/jmf-pobox/txt2tex/issues/118)) — full engine surface for
   underscored operator templates (`_⊕_`, `_R_`, `op _`, `_ †`) as
   the LHS of an abbreviation or declaration, including the fuzz
   announce-before-define directive machinery and the operator-table
@@ -2019,7 +2031,7 @@ references behind the decision.
 **Input (whiteboard.txt)**:
 
 ```text
-** Solution 1 **
+** Example 1 **
 
 (a) forall x : N | x * x >= 0
 
@@ -2040,7 +2052,7 @@ Document(
             title=None,
             content=[
                 Solution(
-                    number=1,
+                    number="Example 1",
                     parts=[
                         Part(
                             label="a",
@@ -2082,36 +2094,35 @@ Document(
 )
 ```
 
-**Output LaTeX** (with default fuzz package):
+**Output LaTeX** (document body only, from `txt2tex --tex-only` with the default fuzz package):
 
 ```latex
-\documentclass{article}
-\usepackage{fuzz}
-\usepackage{amsmath}
-\begin{document}
+\subsection*{Example 1}
+\addcontentsline{toc}{subsection}{Example 1}
 
-\bigskip
+\subsubsection*{(a)}
+\addcontentsline{toc}{subsubsection}{(a)}
+
 \noindent
-\textbf{Solution 1}
+$\forall x : \nat @ x * x \geq 0$
 
-(a) $\forall x : \nat \bullet x^{2} \geq 0$
-\medskip
 
 \begin{center}
-\begin{tabular}{|c|c|c|}
-$p$ & $q$ & $p \Rightarrow q$ \\
+\adjustbox{max width=\textwidth}{%
+\begin{tabular}{c|c|c}
+$p$ & $q$ & $\mathbf{p \Rightarrow q}$ \\
 \hline
-T & T & T \\
-T & F & F \\
-F & T & T \\
-F & F & T \\
-\end{tabular}
+\textit{t} & \textit{t} & \textbf{t} \\
+\textit{t} & \textit{f} & \textbf{f} \\
+\textit{f} & \textit{t} & \textbf{t} \\
+\textit{f} & \textit{f} & \textbf{t} \\
+\end{tabular}%
+}
 \end{center}
-
-\end{document}
+\bigskip
 ```
 
-**Note**: With `--zed` flag, `\usepackage{fuzz}` becomes `\usepackage{zed-cm}` and `\usepackage{zed-maths}`.
+**Note**: With the `--zed` flag the preamble loads `zed-cm` instead of `fuzz`.
 
 ## ADR: GROUP / UNGROUP `\mathop` Wrapping (Phase 4.1)
 
@@ -2239,14 +2250,14 @@ names are comma-separated inside the set literal.
 ## ADR: pk Primary-Key Underline via Dual-Emit (Phase 2.1 revised 2)
 
 **Decision**: Render `pk`-marked attributes with `\underline{field}` inside
-the schema box, matching the instructor's format.  Use dual-emit to keep
+the schema box, matching textbook convention.  Use dual-emit to keep
 fuzz happy.
 
 **Supersedes**: "ADR: Remove relvars, Add pk Primary-Key PK-Line Annotation
 (Phase 2.1 revised)" above.  The `\mathrm{PK}(Name) = \{...\}` line is
 removed.
 
-**Context**: The instructor's slides and worksheets underline primary-key
+**Context**: Database texts underline primary-key
 attributes inside schema boxes.  The previous ADR rejected `\underline{}`
 because fuzz's schema parser requires a plain identifier in the variable-name
 position — any macro with braces is a syntax error.
@@ -2300,15 +2311,16 @@ with `pk a : T` and `pk b : U` renders `\underline{a} : T` and
 A multi-join chain is representative:
 
 ```text
-pi[winner, venue, tier](Tournament bowtie Match bowtie
-  rho[tournament as id](pi[tournament](sigma[venue = 'Centre Court'](Match))))
+pi[title, artist, year](Album join
+  Track join
+  (pi[artist](sigma[genre = 'Jazz'](Album)))[id/artist])
 ```
 
-That expression is approximately 145 characters on one line. The existing
+That expression is approximately 100 characters on one line. The existing
 line-break mechanism (`\` continuation and natural newline after operator)
 already worked for logical operators (`land`, `lor`), comparisons, equality,
 and quantifier separators (`@`, `|`). The algebra and set operators
-(`bowtie`, `cross`, `div`, `intersect`, `union`, `setminus`, `++`,
+(`join`, `cross`, `div`, `intersect`, `union`, `setminus`, `++`,
 `group`, `ungroup`) were not included, so any attempt to break them across
 lines silently failed or produced malformed LaTeX.
 
@@ -2419,7 +2431,7 @@ Two shape changes merit attention:
 
 ### Rejected alternative: Tier 3 render-mode flag
 
-A `use_trigoni_style` CLI flag toggling between Greek and keyword emission was
+A style-toggle flag (a CLI option) toggling between Greek and keyword emission was
 considered. Rejected because:
 
 - Greek glyphs were never specified by Z or by any txt2tex consumer outside
@@ -2507,9 +2519,6 @@ a dependent extra declaration is detected, directing the user to rewrite.
   chains; nested form for dependent chains.
 - `expr_free_vars` is reusable for future generator work (capture analysis
   for substitution, occurrence checking, etc.).
-- `sem/solutions-corrected.txt` — the Phase 3 regression input — now
-  fuzz-typechecks without the v2 workaround conjunct that was required before
-  this fix.
 - 11 xfail tests in `tests/test_spivey_dependent_domain.py` flipped to PASS.
 
 ### Z RM citations
@@ -2533,7 +2542,7 @@ Z RM §3.10 permits schemas to appear directly as quantifier bindings:
 
 and the same for `∀` and `∃₁`.  Before this change, txt2tex rejected all
 four forms with "Expected variable name or tuple pattern after exists".
-The SBM coursework exercises (Ex 21, 24, 26) fell back to `LATEX:` blocks,
+Specifications that used these forms had to fall back to `LATEX:` blocks,
 defeating the engine's purpose.
 
 ### Decision
@@ -2620,7 +2629,7 @@ Prime handling: strip trailing `'` from the raw identifier, emit
 
 **Test count delta**: 4230 → 4257 (27 new schema-text quantifier tests).
 
-## ADR: Multi-line `LATEX:` block (issue #137, commit `3b80a19`)
+## ADR: Multi-line `LATEX:` block (commit `3b80a19`)
 
 ### Context
 
@@ -2659,7 +2668,7 @@ colon on the same line, the directive is single-line.
   documents them as one entry with two syntaxes.
 - 9 regression tests in `tests/test_multiline_latex.py`.
 
-## ADR: `B:` block for B-machine verbatim listings (issue #138)
+## ADR: `B:` block for B-machine verbatim listings
 
 ### Context
 
@@ -2690,8 +2699,7 @@ LaTeX to follow.
 
 ### Consequences
 
-- B-method coursework can embed machines without escaping; cf.
-  `examples/05_sets/bags.txt` and the SBM coursework.
+- B-method machine listings can be embedded without escaping.
 - The bare `B` identifier subsequently regressed (see the next ADR);
   the regression was fixed by lexing `B:` from the two-character
   sequence rather than reserved-word membership.
@@ -2700,10 +2708,10 @@ LaTeX to follow.
 
 ### Context
 
-The `B:` block (#138) added `"B"` to `RESERVED_WORDS` in the lexer, on
+The `B:` block added `"B"` to `RESERVED_WORDS` in the lexer, on
 the assumption that a one-letter reserved word would not collide with
-identifier use.  The all-courseware regression sweep surfaced SBM
-ex14, which declares `B! : P BookingId` — an output-state variable
+identifier use.  A regression sweep over the example corpus surfaced a
+declaration `B! : P BookingId` — an output-state variable
 literally named `B`.  The lexer raised
 `Cannot decorate reserved keyword 'B'`, breaking a valid Z
 declaration (commit `772861d` ships the fix).
@@ -2729,9 +2737,9 @@ a usable identifier with the full `' ? !` decoration set.
 - 4 regression tests in `tests/test_b_decoration.py` lock in both
   behaviours: `B!`/`B'`/`B?` lex as decorated identifiers; `B:` at
   line start still opens the block.
-- The all-courseware regression sweep moved from 95/96 to 96/96.
+- The regression sweep over the example corpus moved from 95/96 to 96/96.
 
-## ADR: GROUP aggregate form (issue #140)
+## ADR: GROUP aggregate form
 
 ### Context
 
@@ -2756,9 +2764,9 @@ Each aggregator emits
 rendering style of the other relational-algebra operators
 (`\mathrm{Project}`, `\mathrm{Restrict}`, `\mathrm{Rename}`, etc.).
 
-> **Note (2026-05-23)**: `\mathrm{Rename}` was retired by #147; relation
+> **Note (2026-05-23)**: `\mathrm{Rename}` was retired; relation
 > rename now emits as a literal pass-through `R[NEW/OLD]`.  The example
-> list above is from the pre-#147 era and is preserved as written.
+> list above uses the earlier syntax and is preserved as written.
 
 ### Alternatives rejected
 
@@ -2772,11 +2780,11 @@ rendering style of the other relational-algebra operators
 
 ### Consequences
 
-- DAT sheet 1 question 3 and sheet 2 question 5 use the aggregate form
-  natively; both were previously `LATEX:` passthrough.
+- Aggregate forms that were previously written as `LATEX:` passthrough now
+  parse natively.
 - 33 tests in `tests/test_group_aggregators.py`.
 
-## ADR: Prefix-operator atomic-argument paren wrap (issue #133, jms ruling 2026-05-22)
+## ADR: Prefix-operator atomic-argument paren wrap (jms ruling 2026-05-22)
 
 ### Context
 
@@ -2817,10 +2825,10 @@ whenever it is another prefix application."
 
 - 8 regression tests in `tests/test_prefix_paren_wrap.py` (`seq (P X)`,
   `ran (bigcup (ran s))`, `P (P X)`, etc.).
-- The all-courseware sweep emits these forms in the byte-identical
-  shape fuzz accepts.
+- A sweep over the example corpus emits these forms in the shape fuzz
+  accepts.
 
-## ADR: `GroupAggregate` abbreviation routes to inline math (issue #142)
+## ADR: `GroupAggregate` abbreviation routes to inline math
 
 ### Context
 
@@ -2835,15 +2843,14 @@ the RHS shape:
   `\mathrm{Group}(...)` labels are not Z paragraph syntax.
 
 The choice is made by checking the RHS AST against
-`_DAT_EXPRESSION_TYPES`, a tuple of node classes that route to inline
-math.  Before #142, `GroupAggregate` was missing from that tuple, so
+`_RA_EXPRESSION_TYPES`, a tuple of node classes that route to inline
+math.  Originally, `GroupAggregate` was missing from that tuple, so
 `B == R group (Count(x) as t)` routed to `\begin{zed}` and fuzz
 rejected the body.
 
 ### Decision
 
-Add `GroupAggregate` to `_DAT_EXPRESSION_TYPES` (single-line change at
-`latex_gen.py:5154`).  All six relational-algebra families are now
+Add `GroupAggregate` to `_RA_EXPRESSION_TYPES` (a single-line change).  All six relational-algebra families are now
 treated uniformly: `Restrict`, `Project`, `Rename`, `NaturalJoin`,
 `Divide`, `Binding`, `Group`, `GroupAggregate`, `Ungroup`.
 
@@ -2862,8 +2869,8 @@ treated uniformly: `Restrict`, `Project`, `Rename`, `NaturalJoin`,
 
 ### Consequences
 
-- DAT s2q5 (c) algebra chain — three abbreviation lines using
-  `Count(...)` and a `rho`/`join`/`pi` composition — fuzz-typechecks
+- An algebra chain of three abbreviation lines using
+  `Count(...)` and a `join`/`pi` composition fuzz-typechecks
   and renders cleanly without any `LATEX:` passthrough.
 - 1 regression test in `tests/test_group_aggregators.py`
   (`test_abbreviation_aggregator_routes_to_inline_math`).
@@ -2878,11 +2885,9 @@ The original engine used:
 - Natural-join emit: `R \otimes S`  (the ⊗ tensor-product symbol)
 - Theta-join emit: `\mathrm{Join}_{p}(R, S)` (already correct)
 
-The instructor's canonical vocabulary, confirmed in slides/topic02.pdf page 45, is:
-
-> "We write Join(r, s). This kind of join is commonly referred to as a
-> 'natural join'. Note that if r and s have nothing in common then
-> Join(r, s) degenerates to r ⊗ s."
+The conventional database-textbook (Date) vocabulary writes the natural
+join as `Join(r, s)`. When `r` and `s` have no attributes in common, the
+natural join degenerates to the Cartesian product `r ⊗ s`.
 
 Two problems followed:
 
@@ -2890,8 +2895,8 @@ Two problems followed:
    (no common attributes), not the natural join. Emitting `\otimes` for
    every natural join was semantically incorrect.
 2. **Wrong keyword.** `bowtie` names a LaTeX macro, not an English operator.
-   The course uses `Join` consistently. Students who read the slides then
-   write `R join S` in their `.txt` files got a parse error.
+   Textbooks use `Join` consistently. An author who followed that
+   vocabulary and wrote `R join S` in a `.txt` file got a parse error.
 
 jms confirmed (prior to this change) that `\mathrm{Join}(R, S)` (no
 subscript) is fuzz-compatible: fuzz parses `\mathrm{...}` as an identifier,
@@ -2904,8 +2909,7 @@ and a subscript-less form is a strict subset of the already-accepted
 2. Rename `TokenType.BOWTIE` → `TokenType.JOIN` in `tokens.py`.
 3. Change the natural-join emit: `R \otimes S` → `\mathrm{Join}(R, S)`.
 4. Preserve theta-join emit: `R join [p] S` → `\mathrm{Join}_{p}(R, S)`.
-5. Migrate all source `.txt` files in `examples/` and
-   `course-ox-dat/exercises-worked/` (sbm/sem had no join usage).
+5. Migrate all source `.txt` files in `examples/`.
 
 The AST class `NaturalJoin` retains its name for internal clarity; only
 the source-level keyword and token type rename.
@@ -2917,7 +2921,7 @@ the source-level keyword and token type rename.
    error messages.
 
 2. **Keep `\otimes` and just rename the keyword.** Rejected — `\otimes`
-   is semantically wrong per the slides. The symbol denotes the degenerate
+   is semantically wrong. The symbol denotes the degenerate
    case; using it for the general case is a lie to fuzz-trained readers.
 
 3. **Use the bowtie Unicode symbol ⋈ as an alternate emit.** Rejected —
@@ -2929,8 +2933,8 @@ the source-level keyword and token type rename.
 - Any `.txt` file using `bowtie` must be migrated to `join` — the old
   keyword lexes as an IDENTIFIER, so parsers won't silently misinterpret it;
   they produce a type error at the expression level.
-- Natural join now reads `\mathrm{Join}(R, S)`, matching the instructor's
-  slides and the theta-join form, giving a consistent vocabulary:
+- Natural join now reads `\mathrm{Join}(R, S)`, matching textbook
+  vocabulary and the theta-join form, giving a consistent vocabulary:
   `Join`, `Restrict`, `Project`, `Rename`.
 - `\otimes` is gone from all generated output; the symbol is now available
   for its correct Z-algebra meaning (degenerate cross-product), should a
@@ -2940,7 +2944,7 @@ the source-level keyword and token type rename.
 
 ---
 
-## ADR: Relation Rename — adopt `R[NEW/OLD]`, retire `rho` (issue #147)
+## ADR: Relation Rename — adopt `R[NEW/OLD]`, retire `rho`
 
 ### Context
 
@@ -2949,7 +2953,7 @@ renaming, emitting `\mathrm{Rename}_{A \to B}(R)`.  This has three problems:
 
 1. **Not Z RM.** Z RM §3.11 writes `R[b/a]` as postfix syntax on an expression,
    not a prefix function call.  The `rho` keyword was an invention with no
-   grounding in Spivey or the course slides.
+   grounding in Spivey or standard database texts.
 
 2. **Fuzz rejects it in Z paragraphs.** `\mathrm{Rename}_{...}(...)` is not
    part of fuzz's Z grammar.  Any attempt to use rename inside a Z block fails.
@@ -2990,7 +2994,7 @@ jms ruling (2026-05-23):
    emits `R[NEW/OLD]` with no `\mathrm` wrapper.  Compound bases are wrapped
    in parentheses: `(pi[x](R))[b/a]`.
 
-6. **`RelationRename` in `_DAT_EXPRESSION_TYPES`.** This routes every
+6. **`RelationRename` in `_RA_EXPRESSION_TYPES`.** This routes every
    abbreviation containing a relation rename through inline math
    (`\noindent$...$`), so fuzz never sees the `/`.
 
@@ -3076,7 +3080,7 @@ hidden-emit helpers), `codegen/paragraphs.py` (abbreviation dual-emit),
    external tool we do not maintain.
 
 2. *Only validate abbreviations, not standalone expressions.*
-   Standalone set comprehensions in exercise solutions are common;
+   Standalone set comprehensions in specifications are common;
    leaving them unvalidated defeats the purpose.
 
 **Consequences.**
@@ -3095,9 +3099,9 @@ hidden-emit helpers), `codegen/paragraphs.py` (abbreviation dual-emit),
 
 **Status**: SETTLED 2026-06-13.
 
-**Context.**  The original heading scheme mapped `** Solution N **` to
+**Context.**  The original heading scheme mapped `** Title **` to
 `\section*` and `(a)` part labels to `\subsection*`.  Section markers
-(`=== Title ===`) rendered `\section*` too, making sections and solutions
+(`=== Title ===`) rendered `\section*` too, making sections and subsections
 visually indistinguishable in the LaTeX output and colliding in any TOC.
 The starred headings carry manual `\addcontentsline` calls, so depth
 control has two levers that must agree: which entries the generator
@@ -3109,11 +3113,11 @@ the printed TOC actually shows (`\l@subsection` and friends test
 
 1. **Three distinct native heading levels.**  The generator now emits:
    - `=== Title ===` → `\section*{Title}` (section)
-   - `** Solution N **` → `\subsection*{Solution N}` (subsection)
+   - `** Title **` → `\subsection*{Title}` (subsection)
    - `(a)` part label → `\subsubsection*{(a)}` (subsubsection)
 
    This eliminates the `\section*` collision between sections and
-   solutions, and gives the PDF a visible visual hierarchy.
+   subsections, and gives the PDF a visible visual hierarchy.
 
 2. **Depth driven by a single effective depth.**  The generator computes
    one effective depth (from the `CONTENTS:` keyword, raised to 3 by
@@ -3125,15 +3129,15 @@ the printed TOC actually shows (`\l@subsection` and friends test
    hides them, or written without their parent level, is structurally
    impossible.
 
-3. **Default depth is 2 (sections + solutions).**  A bare `CONTENTS:`
-   directive produces a contents list with sections and solutions but no
-   individual part labels.  This is the sensible default for the common
-   question/solution document format.
+3. **Default depth is 2 (sections + subsections).**  A bare `CONTENTS:`
+   directive produces a contents list with sections and subsections but no
+   individual part labels.  This is the sensible default for a typical
+   document.
 
 4. **`CONTENTS:` depth keywords.**  The accepted forms and their depths:
    - bare `CONTENTS:` → depth 2
    - `CONTENTS: 1` → depth 1 (sections only)
-   - `CONTENTS: 2` → depth 2 (sections + solutions)
+   - `CONTENTS: 2` → depth 2 (sections + subsections)
    - `CONTENTS: 3` / `CONTENTS: full` / `CONTENTS: all` → depth 3 (all)
 
 5. **`--toc-parts` is a depth override.**  The flag forces parts into the
@@ -3142,15 +3146,15 @@ the printed TOC actually shows (`\l@subsection` and friends test
 
 **Rejected alternative.**  Keep `** **` at `\section*` and promote
 `=== ===` to `\part*`.  This would have preserved the rendering of
-existing solution documents, but the student chose three native levels so
+existing documents, but the project owner chose three native levels so
 that heading size encodes nesting depth consistently.  `\part*` is also a
 heavyweight, page-dominating heading in the article class — disproportionate
-for a homework section divider.
+for a section divider.
 
 **Rationale.**
 
-- The `\section*` collision between `===` sections and `** **` solutions
-  meant a section could not nest its solutions in any TOC — both appeared
+- The `\section*` collision between `===` sections and `** **` subsections
+  meant a section could not nest its subsections in any TOC — both appeared
   at the same level.  The demotion resolves this structurally.
 - `tocdepth` is *not* inert for manually-added entries.  Verified by
   compiling a document with `\setcounter{tocdepth}{1}` and `\addcontentsline`
@@ -3160,12 +3164,12 @@ for a homework section divider.
   write subsubsection entries that `tocdepth` then hides.  Driving both
   `tocdepth` and emission from one effective-depth value keeps them
   consistent.
-- Default depth 2 covers the most common use case (a solutions document
-  with a solution-level contents list) without requiring any extra syntax.
+- Default depth 2 covers the most common use case (a document with a
+  subsection-level contents list) without requiring any extra syntax.
 
 **Consequences.**
 
-- Positive: sections, solutions, and parts now occupy three visually
+- Positive: sections, subsections, and parts now occupy three visually
   distinct levels in the PDF.  TOC depth is predictable.
 - Negative: users who relied on `** **` rendering `\section*` (e.g., to
   achieve section-level bold headings without a `===` wrapper) now get
@@ -3202,8 +3206,7 @@ their key) and aggregating the RVA.
 only, with no `extend`.  Rejected because aggregating an RVA per tuple is
 EXTEND, not GROUP: GROUP *produces* an RVA and reduces cardinality; EXTEND
 *consumes* an RVA and preserves it.  Rendering the operation under `Group`
-mislabels it, and the course teaches Date's algebra where the distinction
-is real.  Reviewed by jms (2026-07-01).
+mislabels it, and Date's algebra keeps the distinction.  Reviewed by jms (2026-07-01).
 
 **Grounding.**  Confirmed against C. J. Date, *An Introduction to Database
 Systems*, 8e, Ch. 7 (Relational Algebra), pp. 225–229:
@@ -3219,10 +3222,10 @@ EXTEND — so EXTEND is the correct primitive to add.
 
 - `extend` is a new reserved keyword; relational-algebra documents can now
   express multiplicity-preserving aggregation correctly.
-- `ExtendAggregate` is in the DAT expression set, so `extend` renders as
+- `ExtendAggregate` is in the relational-algebra expression set, so `extend` renders as
   inline math and is never routed into a fuzz-checked `zed` block (per the
   `cross` fuzz-routing fix).
-- The course did not teach `extend`, so its use is a per-document choice;
+- `extend` is optional: its use is a per-document choice;
   single-argument `group` aggregation is unaffected.
 
 ## ADR: RA-taint routing — a Z operator referencing an RA-defined name routes to inline math (PR #82)
@@ -3231,9 +3234,9 @@ EXTEND — so EXTEND is the correct primitive to add.
 
 ### Context
 
-The `GroupAggregate`/#142 ADR routes an abbreviation `Name == <expr>` to
+The `GroupAggregate` ADR above routes an abbreviation `Name == <expr>` to
 unboxed inline math when the RHS *is* a relational-algebra node (a member of
-`_DAT_EXPRESSION_TYPES`), and to a fuzz-checked `\begin{zed}` block otherwise.
+`_RA_EXPRESSION_TYPES`), and to a fuzz-checked `\begin{zed}` block otherwise.
 That test is on the *node type of the RHS itself*.
 
 It does not cover a **Z-native operator whose operand references an RA-defined
@@ -3282,7 +3285,7 @@ does not touch.
    surrounding `zed` block typechecks. Rejected by jms: it makes fuzz pass a
    non-Z construct, defeating the purpose of the type check.
 2. **Leave the Z operator in a `zed` block and accept the "not declared"
-   errors.** Rejected: spurious errors on correct documents; the student cannot
+   errors.** Rejected: spurious errors on correct documents; the author cannot
    distinguish a real type error from an RA artifact.
 3. **Single-pass taint collection (no fixpoint).** Rejected during #82 review:
    misses forward and transitive references.
@@ -3515,7 +3518,7 @@ mixed indentation and nested arrays with different left edges (ragged). Fix:
   between the two renderings. Overflow (long unbreakable lines) is a separate
   axis — author break-points + `adjustbox` — untouched here.
 - Regression coverage: `tests/test_display_math_indent.py`. Fixture churn:
-  `bindings.tex`, `relational_calculus.tex`, `q2d_demo.tex` (indentation/array
+  `bindings.tex`, `relational_calculus.tex`, `multi_decl_demo.tex` (indentation/array
   structure only).
 
 ## ADR: NOFUZZ — Marking a Box Fuzz Genuinely Cannot Check

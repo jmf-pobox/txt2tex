@@ -1,7 +1,7 @@
 # Tutorial 6: Relations
 
 <!-- markdownlint-disable-next-line MD036 -->
-**Lecture 6: Relations**
+**Tutorial 6: Relations**
 
 Learn about binary relations, maplets, domain/range, and relational operators.
 

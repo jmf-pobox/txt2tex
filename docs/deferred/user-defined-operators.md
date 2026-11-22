@@ -4,9 +4,8 @@
 engine work needed to support Z user-defined operator names, so a
 future implementer has a complete starting point.
 
-**Tracking:** engine bug #134. Surfacing question: SEM Exercise 26
-("Define the symbol `∉` using generic abbreviation"). See
-[../guides/MISSING_FEATURES.md](../guides/MISSING_FEATURES.md) for
+**Tracking:** [#118](https://github.com/jmf-pobox/txt2tex/issues/118).
+See [../guides/MISSING_FEATURES.md](../guides/MISSING_FEATURES.md) for
 the author-side workaround.
 
 ## What Z permits
@@ -64,8 +63,8 @@ Stock fuzz operators (`\in`, `\notin`, `\subseteq`, `\cup`, `\cat`,
 `%%inop` / `%%inrel` is rejected as a duplicate-declaration error.
 The only legitimate use of the stock-symbol surface in user code is
 either (a) using it directly without redeclaration, or (b) showing
-its *definition* pedagogically inside a `%%unchecked` paragraph (this
-is precisely what SEM ex26 asks for).
+its *definition* pedagogically inside a `%%unchecked` paragraph (the
+usual way a textbook shows how a toolkit operator is defined).
 
 Associativity is not user-declarable. Infix-functions left-associate;
 infix-relations chain (`a R b R c` reads `a R b ∧ b R c`).
@@ -83,7 +82,7 @@ infix-relations chain (`a R b R c` reads `a R b ∧ b R c`).
    `_mapsto_`, … Each maps to the corresponding LaTeX command. The
    `op` slot is filled by an existing keyword from the engine's
    operator vocabulary.
-3. **Author-minted glyphs** (for course material that introduces
+3. **Author-minted glyphs** (for documents that introduce
    genuinely fresh symbols like `⊑` for refinement). One option is a
    binding directive in the .txt header that ties an ASCII handle to
    a LaTeX command: e.g. `OP: subrefn = \sqsubseteq inrel` declares
@@ -160,8 +159,7 @@ infix-relations chain (`a R b R c` reads `a R b ∧ b R c`).
 
 ## Common patterns in real Z corpora
 
-Ranked by jms by frequency of use in Oxford-style SE / SEM / SBM /
-DAT material:
+Ranked by frequency of use in published Z texts:
 
 1. **Custom binary relation between two sorts** — `_~_` (equivalence),
    `_<<_` (precedes), `_~>_` (reduces-to). Infix-relation, no
@@ -172,7 +170,7 @@ DAT material:
    laws.
 3. **Generic infix-function** — `_⊕_ [X]`. Toolkit extensions.
 4. **Custom prefix operator** — `pre _`, `wp _ _`. Weakest-precondition
-   courses.
+   texts.
 5. **Custom postfix operator** — `_ *` (Kleene), `_ !` (factorial).
    Occasional.
 
@@ -185,21 +183,6 @@ Safe to defer: `%%unchecked` author-side (already available via the
 `LATEX:` block escape; the engine should *emit* it but does not need
 to expose it for authors to write directly).
 
-## Why this is deferred
-
-One course exercise across SEM + SBM (SEM ex26) exercises the feature
-in its full form, and that exercise is a pedagogical demonstration —
-the author is teaching the *technique* of operator definition, not
-introducing an operator the rest of the document then relies on. The
-author-side workaround in MISSING_FEATURES.md is acceptable for that
-case.
-
-DAT (21 rows pending) and any later refinement-chapter coursework
-will exercise the feature in earnest. When that material lands and
-multiple rows depend on real user-defined operators, the priority
-shifts from low to load-bearing and this design becomes
-implementation-ready.
-
 ## References
 
 - Z RM §3.4 (operator templates), §3.9.2 (axdef / gendef), §3.9.3
@@ -208,4 +191,3 @@ implementation-ready.
   `doc/fuzzman.tex` at `github.com/Spivoxity/fuzz`. Grammar at
   `Def-Lhs ::= …`.
 - *Understanding Z* (Spivey 1988) Chapter 3 (mathematical toolkit).
-- jms consultation 2026-05-22 (logged in conversation transcript).

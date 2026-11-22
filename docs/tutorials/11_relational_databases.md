@@ -167,7 +167,7 @@ Track join Album
 Renders as: $\mathrm{Join}(Track, Album)$
 
 The source keyword is `join`; the LaTeX emission is `\mathrm{Join}(R, S)`,
-matching the instructor's canonical vocabulary (slides/topic02.pdf §45).
+matching the conventional database-textbook (Date) vocabulary.
 
 **Theta-join** — join with an explicit predicate:
 

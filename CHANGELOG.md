@@ -20,8 +20,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   falling back to `%SystemRoot%\System32\cmd.exe`, so a `cmd.exe` in the working
   directory is never run in its place.
 
+### Documentation
+
+- **README is for users; developer material moved to `CONTRIBUTING.md`.**
+  Setup, quality gates, tests, examples, release steps, deferred lint rules and
+  the agent team now live in `CONTRIBUTING.md`, which merges the former
+  `docs/development/{DEVELOPER,TOOL-PyPI,NAMING_STANDARDS,CODE_REVIEW,TEST_PLAN}.md`.
+  `IDE_SETUP.md` and `RESERVED_WORDS.md` moved to `docs/guides/`.
+- **Developer docs consolidated; open work tracked in GitHub Issues.**
+  `docs/guides/MISSING_FEATURES.md` now lists only open gaps and limitations,
+  each linked to its issue. The planning documents `docs/DESIGN-ROADMAP.md`,
+  `docs/PHASE1-PLAN.md` and `docs/development/PLAN_text_inline_math.md` are
+  removed; `docs/DESIGN.md` carries the module layout and links the roadmap
+  issue. The bug-fixture index in `tests/bugs/README.md` is trimmed to a
+  fixture list.
+
 ### Changed
 
+- **Removed references to third-party course material from docs, examples and
+  tests.** Exercise labels, lecture numbering, course names and slide citations
+  are gone; the affected examples now use neutral domains (albums, artists,
+  tracks).
 - **Dev toolchain upgraded.** ruff 0.17.1, mypy 2.4.0, pyright 1.1.414 and
   pytest 9.1.1 are the new floors in the `dev` group. ruff 0.17 formats Python
   code blocks inside Markdown, so three docs were reformatted. Four paths are
@@ -363,7 +382,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   pass `errors="replace"`, matching the log-file reads that already used it.
 
 - **Relational-calculus examples used non-Z string literals** —
-  `relational_calculus` and `q2d_demo` compared attributes to quoted
+  `relational_calculus` and `multi_decl_demo` compared attributes to quoted
   strings (`'Jazz'`, `'Ali'`, `'Centre Court'`), which fuzz rejected with a
   syntax error on the backtick (Z has no string literals). Each value is
   now declared as a constant of its given set via `axdef` (e.g.
@@ -430,7 +449,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **PK fields rendered with underline** — primary-key attributes
   in schemas now render as `\underline{field}` inside the schema
-  box, matching the instructor's format.  Uses a dual-emit
+  box, matching conventional textbook format.  Uses a dual-emit
   technique: fuzz type-checks a hidden plain copy; pdflatex renders
   a `schemapk` copy with underlines.  The old
   `\mathrm{PK}(Name) = \{...\}` line below the box is removed.
@@ -469,8 +488,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Family-line split of `latex_gen.py` and `parser.py`** (Phase 1
-  of [docs/DESIGN-ROADMAP.md](docs/DESIGN-ROADMAP.md)).  Behaviour
+- **Family-line split of `latex_gen.py` and `parser.py`.**  Behaviour
   is unchanged: every `.tex` output across the
   `examples/` + `tests/bugs/` corpus is byte-identical against the
   pre-refactor baseline (190 / 190).
@@ -501,16 +519,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Relation rename `R[NEW/OLD]`** (#147) — Z RM §3.11 postfix renaming syntax.
+- **Relation rename `R[NEW/OLD]`** — Z RM §3.11 postfix renaming syntax.
   `R[new/old]` is recognised inside relational contexts (sigma/pi args,
   join/div right operands). Compound bases parenthesised automatically:
   `(pi[x](R))[b/a]`. Emits as literal pass-through; engine routes through
   inline math so fuzz never sees `/`. Multiple pairs comma-separated.
   See `docs/DESIGN.md § ADR: Relation Rename`.
 
+- **Schema-text quantification** — `exists Delta S | P`, `exists Xi S | P`,
+  `exists S | P` and `exists S' | P`, and the same forms for `forall` and
+  `exists1` (Z RM §3.10).  The engine emits the binding literally and lets
+  fuzz expand the schema invariant.  See `docs/DESIGN.md § ADR:
+  Schema-text Quantification`.
+
 - New example: `examples/14_relational_databases/normalisation.txt`
   walks through functional dependencies and 1NF→3NF decomposition
-  on a generic employee/project/department relation (#84).
+  on a generic employee/project/department relation.
 - `make complexity-report` and `make complexity-history` — radon /
   lizard / pydeps / wily snapshot; outputs committed at
   `docs/complexity-report.{md,json}`.
@@ -564,13 +588,13 @@ version to pick up the new output.
 
 ### Removed
 
-- **`rho` keyword retired** (#147) — `rho[A as B](R)` prefix syntax removed.
+- **`rho` keyword retired** — `rho[A as B](R)` prefix syntax removed.
   `rho` now lexes as a plain identifier. Migrate to `R[B/A]` (postfix
   bracket form, Z RM §3.11, NEW first / OLD second).  A top-level
   abbreviation `B == R[a/b]` now routes through inline math automatically;
   no `pi`-wrapping needed.  `\mathrm{Rename}` never appears in output
   from this version onward.
-- **`bowtie` keyword renamed to `join`** (#148) — `R bowtie S` no longer
+- **`bowtie` keyword renamed to `join`** — `R bowtie S` no longer
   parses. Migrate to `R join S` (natural join) or `R join [p] S`
   (theta-join).  The `\bowtie` / `\otimes` emissions are gone; natural
   join now emits `\mathrm{Join}(R, S)`.
@@ -578,24 +602,24 @@ version to pick up the new output.
 ### Changed
 
 - Project operator renders as `\mathrm{Project}_{A,B}(R)` instead of
-  `\mathrm{Project}\{A,B\}(R)`, matching the instructor's canonical
-  subscript form (slides/topic02.pdf).  Source syntax `pi[A,B](R)` unchanged.
+  `\mathrm{Project}\{A,B\}(R)`, matching the conventional database-textbook
+  (Date) subscript form.  Source syntax `pi[A,B](R)` unchanged.
 - `qa_check.sh` / `qa_check_all.sh`: scope tightened to `examples/`
-  only (no longer touches `hw1/`, `hw2/`, `hw/`, or `sem/`). The
+  only. The
   bare-keyword check (`forall`, `emptyset`, etc.) now scopes to math
   environments only, eliminating false positives in section headers
   and prose. 150/150 example PDFs pass.
 - Refreshed `examples/README.md` index to catalogue every example
-  in the directory (#83).
+  in the directory.
 - `free_vars.expr_free_vars` now raises `NotImplementedError` on
   `Binding` nodes instead of silently returning an incomplete result
-  (#141, djb INFO finding).
+  (djb INFO finding).
 
 ### Fixed
 
-- **Regression from #138: bare `B` identifier could not be decorated.**
-  The `B:` block keyword (#138) added `"B"` to the lexer's RESERVED_WORDS,
-  which then caused declarations like `B! : P BookingId` (SBM ex14) to
+- **Regression from the `B:` block: bare `B` identifier could not be decorated.**
+  The `B:` block keyword added `"B"` to the lexer's RESERVED_WORDS,
+  which then caused declarations like `B! : P BookingId` to
   raise `Cannot decorate reserved keyword 'B'`.  The lexer's B-block
   trigger is the `B:` *sequence* (already a literal string comparison),
   not the reserved-words set, so removing `"B"` from RESERVED_WORDS is
@@ -603,33 +627,32 @@ version to pick up the new output.
   again a usable identifier with the full `' ? !` decoration set.
   Adds 4 regression tests covering both behaviours.
 
-- **Engine bug #137 — Multi-line LaTeX listings rendered double-spaced
+- **Multi-line LaTeX listings rendered double-spaced
   and de-indented when written with consecutive single-line `LATEX:`
   directives.**  Each `LATEX:` line became its own paragraph and leading
   whitespace was stripped, so multi-line listings came out wrong.  Fixed
   by the new `LATEX:` block form (`LATEX:\n...body...\nEND`): the body
   is slurped verbatim, emitted directly to `.tex` output with no
-  escaping, no environment wrapper, and no paragraph breaks between lines
-  (#137).
+  escaping, no environment wrapper, and no paragraph breaks between lines.
 
-- **Engine bug #144 — Set-comprehension parser rejects a natural newline or `\`
+- **Set-comprehension parser rejects a natural newline or `\`
   continuation after `|` and after `;` in the binding-prefix.**
-  `{ o : Outcome; c : Class; s : Ship |\n  o.battle = Guadalcanal ... }` raised
+  `{ a : Album; r : Artist; t : Track |\n  a.artist = r.name ... }` raised
   `Expected identifier, number, '(', '{', '{|', '⟨', or lambda, got NEWLINE`.
   Fix: inserted the same CONTINUATION/NEWLINE skip block at both post-`|` and
   post-`;` sites in `_parse_set_comprehension_from_brace`, completing the
-  line-break parity with quantifier prefixes (#131). Adds 6 regression tests
-  covering single, double, and triple-binding forms plus the `\` continuation (#144).
+  line-break parity with quantifier prefixes. Adds 6 regression tests
+  covering single, double, and triple-binding forms plus the `\` continuation.
 
-- **Engine bug #131 — Parser rejects a natural newline or `\` continuation
+- **Parser rejects a natural newline or `\` continuation
   immediately after `;` in a semicolon-chained quantifier prefix.**
-  `forall d : Date; c : Course;\n  s : Student | body` raised
+  `forall a : Album; r : Artist;\n  t : Track | body` raised
   `Expected variable name after ';' in quantifier`. Fix: inserted newline-skip
   logic at the top of `_parse_quantifier_continuation`, mirroring the post-`|`
-  handling shipped by m-2026-05-20-001. Both call-sites flow through the helper,
-  so all `;`-chained quantifiers now accept newlines at every `;` position (#131).
+  handling. Both call-sites flow through the helper,
+  so all `;`-chained quantifiers now accept newlines at every `;` position.
 
-- **Engine bug #133 — Generator strips grouping parentheses around nested
+- **Generator strips grouping parentheses around nested
   prefix-operator applications, causing fuzz syntax errors.**
   `seq (P X)` emitted `\seq~\power X` (fuzz: "Syntax error at \power");
   `ran (bigcup (ran s))` emitted `\ran \bigcup (\ran s)` (fuzz mis-parsed
@@ -642,13 +665,13 @@ version to pick up the new output.
   to all `_FUZZ_FUNCTION_LIKE_UNARY` operators as outer, covering `ran`, `dom`,
   `inv`, `id`, `P`, `P1`, `F`, `F1`, `bigcup`, `bigcap`.
 
-- **Engine bug #142 — Abbreviation `Name == <relational-algebra-expr>`
+- **Abbreviation `Name == <relational-algebra-expr>`
   routed through `\begin{zed}` instead of inline math.**  Surfaced
-  during DAT #9 GROUP-aggregator empirical verification.  The
+  while verifying the GROUP aggregate forms.  The
   abbreviation generator routes `Name == E` through `\begin{zed}` for
   pure-Z `E` and through `\noindent $Name == E$` for relational `E`.
-  The detector `_DAT_EXPRESSION_TYPES` was missing the new
-  `GroupAggregate` AST variant added by DAT #9, so the new aggregate
+  The detector `_RA_EXPRESSION_TYPES` was missing the new
+  `GroupAggregate` AST variant added with the GROUP aggregate form, so the new aggregate
   form fell through to the zed path and fuzz rejected the rendered
   `\mathrm{Group}(\mathrm{Count}(x)~\mathrm{as}~t)` body.  One-line
   fix: add `GroupAggregate` to the detector tuple.  Affected the
@@ -660,7 +683,7 @@ version to pick up the new output.
   `Identifier \mathrm is not declared`.
   After: `\noindent $A == R \mathrm{Group}(...)$` — fuzz accepts.
 
-- **DAT #15 — Section heading text padded with inter-character whitespace.**
+- **Section heading text padded with inter-character whitespace.**
   `=== Foreign-key constraints ===` previously emitted `Foreign - key constraints`
   because `-` was lexed as a MINUS token and re-joined with spaces. The lexer now
   captures the raw heading text verbatim between the two `===` markers; a new
@@ -676,7 +699,7 @@ version to pick up the new output.
   rendered as `Foreign - key constraints`. After: renders as
   `Foreign-key constraints`.
 
-- **DAT #16 — Consecutive `TEXT:` directives emit as separate paragraphs.**
+- **Consecutive `TEXT:` directives emit as separate paragraphs.**
   Two or more adjacent `TEXT:` lines (no blank line between them) now coalesce
   into a single `\noindent` paragraph. A blank line between `TEXT:` directives
   still starts a new paragraph.
@@ -692,21 +715,21 @@ version to pick up the new output.
   emitted three `\noindent ... \par \bigskip` paragraphs. After: emits one
   paragraph `First sentence. Second sentence. Third sentence.`
 
-- **DAT #18 / DAT #1 — Part-label parser too aggressive.**
+- **Part-label parser too aggressive.**
   The parser promoted any `(word)` at the start of a TEXT token to a `Part` AST
   node, including `(underlined)`, `(continued)`, and other parenthetical prose.
   The rule is now restricted to short structural labels only: single letter
   `(a)-(z)`, single digit `(1)-(9)`, or a short Roman numeral `(i)-(x)`.
   Arbitrary parenthesised words are treated as prose.
 
-- **Engine bug #136 / DAT #11 — Bare English keywords silently rewritten to math
+- **Bare English keywords silently rewritten to math
   glyphs in TEXT prose.**  Words like `exists`, `forall`, `exists1`, `emptyset`,
   `group`, `union` in TEXT blocks were automatically converted to `$\exists$`,
   `$\forall$`, etc., rewriting natural English sentences. Math substitution in
   TEXT prose is now opt-in: use `$\exists$`, `$\forall$`, etc. explicitly when
   you want the math glyph. Bare English words pass through unchanged.
 
-- **Bug #132 — `lnot` of non-atomic predicate rejected by fuzz** (jms ruling
+- **`lnot` of non-atomic predicate rejected by fuzz** (jms ruling
   2026-05-22). Previously, `lnot (exists1 s | P)` produced fuzz-rejected
   LaTeX (`\lnot \exists_1 s @ P` → fuzz error
   `Opening parenthesis expected at symbol \exists_1`). It now produces
@@ -774,33 +797,27 @@ version to pick up the new output.
   types (`forall`, `exists`, `exists1`, `mu`). The bullet (`.`) separator in
   constraint-plus-body form was already handled by the continuation path.
 
-  Before (chained form silently dropped the newline):
+  Before, the chained form silently dropped the newline and emitted the
+  whole quantifier on one line. Now:
 
   ```text
-  forall s : Ship; o : Outcome; b : Battle |
-    (o.ship = s.name land o.battle = b.name) => (s.launched <= b.date)
+  forall a : Album; r : Artist; t : Track |
+    (t.album = a.title land a.artist = r.name) => (r.founded <= a.year)
   ```
 
   ```latex
-  % old output — newline after | ignored, everything on one line:
-  \forall s : Ship; o : Outcome; b : Battle @ (o.ship = s.name ...
+  \forall a : Album; r : Artist; t : Track @ \\
+  \t1 (t.album = a.title \land a.artist = r.name) \implies (r.founded \leq a.year)
   ```
 
-  After (newline honoured):
-
-  ```latex
-  \forall s : Ship; o : Outcome; b : Battle @ \\
-  \t1 (o.ship = s.name \land o.battle = b.name) \implies ...
-  ```
-
-- **Q2(d) comprehension/quantifier parser bugs** (commits `20a6daa`, follow-on
+- **Multi-decl comprehension/quantifier parser bugs** (commits `20a6daa`, follow-on
   residual fix, and `fix(parser): add SEMICOLON/PIPE branches to _parse_lambda`).
   Three interrelated bugs prevented multi-typed relational-calculus expressions from being
   written natively without LaTeX escape:
 
   - The `is_bullet_indicator` heuristic (45 lines, `_parse_postfix` lines 3637–3681)
     conflated field-projection PERIOD (`s.x`) with the comprehension bullet separator
-    (`. E` in `{ s : Ship | P . E }`). Deletion lets `safe_followers` handle
+    (`. E` in `{ a : Album | P . E }`). Deletion lets `safe_followers` handle
     termination correctly; bullet detection remains the outer parser's responsibility.
   - Two residual disambiguation bugs: chained `TupleProjection` inside `mu` greedily
     consumed the bullet PERIOD; the RBRACE-separator heuristic swallowed RHS
@@ -809,16 +826,16 @@ version to pick up the new output.
     to `_parse_quantifier_continuation`, producing nested `Quantifier(quantifier="lambda")`
     nodes. `latex_gen.py` QUANTIFIERS dict gains `"lambda": r"\lambda"`.
 
-  All 13 tests in `tests/test_q2d_calculus_predicate_chain.py` pass. Before this fix:
+  All 13 tests in `tests/test_multi_decl_predicate_chain.py` pass. Before this fix:
 
   ```text
-  { s : Ship; c : Class | s.name = c.name land s.displacement > 500 . (s, c) }
+  { t : Track; a : Album | t.album = a.title land t.length > 500 . (t, a) }
   ```
 
   raised a parser error. After:
 
-  ```text
-  \{ s : Ship; c : Class | s.name = c.name \land s.displacement > 500 \bullet (s, c) \}
+  ```latex
+  \{~ t : Track ; a : Album | t.album = a.title \land t.length > 500 @ (t, a) ~\}
   ```
 
   Multi-typed comprehensions, multi-decl `forall`/`exists`/`mu`/`lambda`, and
@@ -895,7 +912,7 @@ parses the same. Only the rendered LaTeX differs. Regenerate any
 
 ### Added (engine + rendering)
 
-- **DAT #9 — GROUP aggregate form.** Six new aggregator keywords
+- **GROUP aggregate form.** Six new aggregator keywords
   (`Count`, `Sum`, `Avg`, `Min`, `Max`, `Median`) are now accepted
   inside the RHS of a `group` expression, replacing the raw `LATEX:`
   workaround. Syntax: `R group (Count(attr) as alias)`. Multiple
@@ -921,22 +938,22 @@ parses the same. Only the rendered LaTeX differs. Regenerate any
 - **Multi-line `LATEX:` block form** — `LATEX:` alone on a line opens a
   raw-LaTeX block whose body is slurped verbatim until a column-0 `END`.
   Preserves indentation and avoids the per-line paragraph breaks of the
-  single-line `LATEX:` directive (#137). Mirrors the `B:` block (#138)
+  single-line `LATEX:` directive. Mirrors the `B:` block
   precedent. Token: `RAW_LATEX_BLOCK`; AST node: `RawLatexBlock`. The body
   is emitted directly to `.tex` output with NO escaping and NO environment
   wrapper — the user owns the raw LaTeX.
 
 - WYSIWYG line-break support for algebra and set operators. Natural newline
-  or explicit `\` continuation is now recognised after `bowtie`, `cross`,
+  or explicit `\` continuation is now recognised after `join`, `cross`,
   `div`, `intersect`, `union`, `setminus`, `++`, `group`, and `ungroup`.
   In display position the broken chain wraps in `\begin{array}{l}...\end{array}`;
   inside a `where` predicate `\\` is emitted inline (same form as `land`/`lor`,
   fuzz type-checks cleanly). Example:
 
   ```text
-  pi[name, displacement, numGuns](Class bowtie
-    Ship bowtie
-    rho[ship as name](pi[ship](sigma[battle = 'Guadalcanal'](Outcome))))
+  pi[title, artist, year](Album join
+    Track join
+    (pi[artist](sigma[genre = 'Jazz'](Album)))[id/artist])
   ```
 
   Note: a `\` continuation cannot follow `setminus` directly because `\` is
@@ -1037,7 +1054,7 @@ parses the same. Only the rendered LaTeX differs. Regenerate any
   declared relvars receive `\mathrm{}` wrapping in both labels and values.
   `RBIND` added to `safe_followers` in `_parse_postfix` to allow field
   projections like `s.name` before `|}`.  Set comprehension extended to
-  support `;`-separated variable-type pairs (`s : Ship; c : Class`) for
+  support `;`-separated variable-type pairs (`t : Track; a : Album`) for
   multi-typed set comprehension queries; `_parse_set_expression` skips leading newlines
   for multi-line comprehensions; closing `}` also skips newlines.  38 new
   tests (lexer, parser, generator, acceptance probes, negative cases,
@@ -1060,11 +1077,11 @@ parses the same. Only the rendered LaTeX differs. Regenerate any
   with Relational Algebra section; `USER_GUIDE.md` Relational Algebra subsection
   added; `DESIGN.md` ADR added.
 
-- Relvar declaration paragraph (`relvars`) for relational database support (Phase 2.1).  `relvars Class, Ship, Battle, Outcome` declares relation
+- Relvar declaration paragraph (`relvars`) for relational database support (Phase 2.1).  `relvars Album, Artist, Track` declares relation
   variables; each declared name renders upright (`\mathrm{Name}`) wherever it
   appears as an identifier in a math context.  Attribute names (undeclared
   identifiers) stay italic (default math mode).  Decoration-outside rule:
-  `Class'` → `\mathrm{Class}'`; subscripts: `Class_1` → `\mathrm{Class}_1`.
+  `Album'` → `\mathrm{Album}'`; subscripts: `Album_1` → `\mathrm{Album}_1`.
   Generator pre-walks the AST in O(N) to collect all `Relvars` items into
   `relvar_set: frozenset[str]`; each identifier emission is then an O(1)
   membership test.  New `RELVARS` token type, `Relvars` AST node, parser
@@ -1156,7 +1173,7 @@ parses the same. Only the rendered LaTeX differs. Regenerate any
   - Arithmetic operators (`+`, `-`, `*`, `mod`) in PRECEDENCE table
   - `UNARY_PRECEDENCE` dict as machine-readable policy for unary binding
   - Set-comprehension predicate now receives parent context; always-paren
-    rules fire for nested quantifiers (fixes Q8(b) assessment feedback)
+    rules fire for nested quantifiers
   - Cross-product paren exemption documented with Z RM §2.5 citation
   - Parametrised precedence test matrix (2240 cases, self-maintaining)
 - Phase 1 end-to-end regression suite (`make test-e2e`) — 141 examples

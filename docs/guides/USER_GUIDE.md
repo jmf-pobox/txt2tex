@@ -45,7 +45,7 @@ Generates: `\section*{Introduction and Propositions}`
 
 Section titles may contain hyphens, colons, parentheses, and other
 punctuation — the title text is captured verbatim and LaTeX-escaped
-(DAT #15). Example:
+Example:
 
 ```text
 === Foreign-key constraints ===
@@ -54,17 +54,17 @@ punctuation — the title text is captured verbatim and LaTeX-escaped
 Generates: `\section*{Foreign-key constraints}` (the hyphen is preserved
 as a literal hyphen, not widened to math-mode spacing).
 
-### Solutions
+### Subsections
 
 ```text
-** Solution 1 **
+** Example 1 **
 
 Content here...
 ```
 
-Generates: `\subsection*{Solution 1}`
+Generates: `\subsection*{Example 1}`
 
-**Note:** In previous versions, `** **` rendered `\section*` (same level as `=== ===`). It now renders `\subsection*`, one level smaller, so solutions nest under sections in the table of contents.
+A `** Title **` heading renders as `\subsection*`, one level below `=== Title ===`, so subsections nest under sections in the table of contents.
 
 ### Part Labels
 
@@ -75,8 +75,6 @@ Generates: `\subsection*{Solution 1}`
 ```
 
 In the default `PARTS: subsection` mode each part renders as a `\subsubsection*{(a)}` heading; under `PARTS: inline` it renders inline as `(a) ...` with the part text following on the same line.
-
-**Note:** In previous versions, `(a)` rendered `\subsection*`. It now renders `\subsubsection*`, one level smaller.
 
 ### Table of Contents
 
@@ -89,7 +87,7 @@ The three structural markers map to three LaTeX heading levels:
 | Input marker | LaTeX heading | TOC level |
 |---|---|---|
 | `=== Title ===` | `\section*{Title}` | section |
-| `** Solution N **` | `\subsection*{Solution N}` | subsection |
+| `** Title **` | `\subsection*{Title}` | subsection |
 | `(a)` (part label) | `\subsubsection*{(a)}` | subsubsection |
 
 #### Depth control
@@ -98,14 +96,14 @@ The three structural markers map to three LaTeX heading levels:
 
 | Keyword | Depth | What appears |
 |---|---|---|
-| `CONTENTS:` (bare) | 2 | Sections and solutions |
+| `CONTENTS:` (bare) | 2 | Sections and subsections |
 | `CONTENTS: 1` | 1 | Sections only |
-| `CONTENTS: 2` | 2 | Sections and solutions |
-| `CONTENTS: 3` | 3 | Sections, solutions, and parts |
-| `CONTENTS: full` | 3 | Sections, solutions, and parts |
-| `CONTENTS: all` | 3 | Sections, solutions, and parts |
+| `CONTENTS: 2` | 2 | Sections and subsections |
+| `CONTENTS: 3` | 3 | Sections, subsections, and parts |
+| `CONTENTS: full` | 3 | Sections, subsections, and parts |
+| `CONTENTS: all` | 3 | Sections, subsections, and parts |
 
-Bare `CONTENTS:` defaults to depth 2 — the right default for a typical question/solution document where you want the solutions listed but not every sub-part.
+Bare `CONTENTS:` defaults to depth 2 — the right default for a typical document where you want the subsections listed but not every sub-part.
 
 #### --toc-parts flag
 
@@ -118,9 +116,9 @@ The `--toc-parts` CLI flag forces parts `(a)`, `(b)`, etc. into the TOC regardle
 ```text
 CONTENTS: full
 
-=== Question 1 ===
+=== Lemma One ===
 
-** Solution 1 **
+** Proof by induction **
 
 TEXT: The proof proceeds by induction.
 
@@ -132,26 +130,26 @@ TEXT: We show the base case holds.
 
 TEXT: Assume the hypothesis for n; prove it for n + 1.
 
-=== Question 2 ===
+=== Lemma Two ===
 
-** Solution 2 **
+** Direct proof **
 ```
 
 This produces a nested contents list:
 
 ```text
 Contents
-  Question 1
-    Solution 1
+  Lemma One
+    Proof by induction
       (a)
       (b)
-  Question 2
-    Solution 2
+  Lemma Two
+    Direct proof
 ```
 
-With bare `CONTENTS:` (depth 2), only "Question 1", "Solution 1", "Question 2", and "Solution 2" would appear — the `(a)` and `(b)` entries are suppressed.
+With bare `CONTENTS:` (depth 2), only "Lemma One", "Proof by induction", "Lemma Two", and "Direct proof" would appear — the `(a)` and `(b)` entries are suppressed.
 
-**Part-label scope rule (DAT #18 / DAT #1):** A `(label)` token is recognised
+**Part-label scope rule:** A `(label)` token is recognised
 as a structural part label only when it appears at the start of a paragraph
 AND uses a short, recognised form: a single letter `(a)-(z)`, a single digit
 `(1)-(9)`, or a short Roman numeral `(i)-(x)`.  Parenthesised words like
@@ -310,7 +308,7 @@ Block-level Z constructs (`schema`, `axdef`, `gendef`, `given`, `::=`, `==`)
 are not valid inside `$...$` — they are paragraph-level constructs, not
 inline expressions. Write them as standalone blocks.
 
-**Paragraph coalescing (DAT #16):** Consecutive `TEXT:` directives on
+**Paragraph coalescing:** Consecutive `TEXT:` directives on
 adjacent lines (with no blank line between them) are joined into a single
 paragraph. A blank line between two `TEXT:` directives produces two
 separate paragraphs.
@@ -414,21 +412,21 @@ as-written; use multi-line `LATEX:` for raw LaTeX you want interpreted.
 **Example — full machine with prose before and after:**
 
 ```text
-TEXT: Below is the B machine for the Trains case study.
+TEXT: Below is the B machine for a bounded counter.
 
 B:
-MACHINE Trains
-SETS
-   PLACE
+MACHINE Counter
 VARIABLES
-   trains
+   count
 INVARIANT
-   trains : iseq(PLACE * PLACE)
+   count : 0..10
 INITIALISATION
-   trains := []
+   count := 0
+OPERATIONS
+   increment = PRE count < 10 THEN count := count + 1 END
 END
 
-TEXT: The invariant ensures trains is a sequence of directed edges.
+TEXT: The invariant keeps the counter between 0 and 10.
 ```
 
 ### CODE: - Verbatim Code Block
@@ -652,7 +650,7 @@ Generates: `\newpage` to start a new page in the PDF.
 ## Propositional Logic
 
 <!-- markdownlint-disable-next-line MD036 -->
-*Lecture 1: Introduction and propositions*
+*Introduction and propositions*
 
 ### Basic Operators
 
@@ -813,7 +811,7 @@ Renders as: $\Leftrightarrow \exists y : Y \bullet w \mapsto y \in (R \semi S) \
 ## Predicate Logic
 
 <!-- markdownlint-disable-next-line MD036 -->
-*Lecture 2: Predicate logic*
+*Predicate logic*
 
 ### Quantifiers
 
@@ -947,7 +945,7 @@ Asserts there is some state change of schema `S` satisfying predicate `P`.
 fuzz expands `\Delta S` into the full before-and-after variable list; the
 engine emits the binding literally.
 
-Example — miniature promotion predicate (mirrors SBM Ex 21):
+Example — a promotion predicate over a box-office schema:
 
 ```text
 exists Delta BoxOffice | Promote
@@ -1030,7 +1028,7 @@ lambda x : N . expression      [lambda expression]
 ## Equality
 
 <!-- markdownlint-disable-next-line MD036 -->
-*Lecture 3: Equality*
+*Equality*
 
 ### Equality Operator
 
@@ -1066,7 +1064,7 @@ section)
 ## Sets and Types
 
 <!-- markdownlint-disable-next-line MD036 -->
-*Lecture 5: Sets and types*
+*Sets and types*
 
 ### Set Notation
 
@@ -1144,14 +1142,14 @@ Named field projections work with schema types:
 ```text
 schema Entry
   year: Year
-  course: Course
+  genre: Genre
   code: N
 end
 
 axdef
   e : Entry
 where
-  e.year = 2025 land e.code = 479
+  e.year = 2025 land e.code = 42
 end
 ```
 
@@ -1241,7 +1239,7 @@ Note: Use blackboard bold for standard number sets by capitalizing: `N`, `Z`.
 ## Definitions
 
 <!-- markdownlint-disable-next-line MD036 -->
-*Lecture 6: Definitions*
+*Definitions*
 
 ### Basic Type Definition (Given Types)
 
@@ -1567,7 +1565,7 @@ See `examples/06_definitions/gendef_advanced.txt` for complete working examples.
 ## Relations
 
 <!-- markdownlint-disable-next-line MD036 -->
-*Lecture 7: Relations*
+*Relations*
 
 ### Maplet (↦)
 
@@ -1663,7 +1661,7 @@ R*               →  R*          [reflexive-transitive closure]
 - `+` (transitive): follow relation one or more times
 - `*` (reflexive-transitive): follow relation zero or more times
 
-Note: Reflexive closure (`rcl`) and symmetric closure (`s`) are not yet implemented.
+Note: Reflexive closure (`rcl`) and symmetric closure (`scl`) are not yet implemented ([#117](https://github.com/jmf-pobox/txt2tex/issues/117)).
 
 ### Compound Identifiers in Definitions
 
@@ -1705,7 +1703,7 @@ rel_1+ == {x, y : N | x < y}     →  rel_1⁺
 ## Functions
 
 <!-- markdownlint-disable-next-line MD036 -->
-*Lecture 8: Functions*
+*Functions*
 
 ### Function Types
 
@@ -1933,13 +1931,13 @@ f(| A |)         →  f⟦A⟧        [image of set A under f]
 **Injective (one-to-one):**
 
 ```text
-given StudentId, Student
+given AccountId, Account
 
 axdef
-  studentRecord : StudentId >-> Student
+  accountRecord : AccountId >-> Account
 where
-  forall id1, id2 : StudentId |
-    id1 /= id2 => studentRecord(id1) /= studentRecord(id2)
+  forall id1, id2 : AccountId |
+    id1 /= id2 => accountRecord(id1) /= accountRecord(id2)
 end
 ```
 
@@ -1976,7 +1974,7 @@ where
 end
 ```
 
-**See [examples/08_functions/function_definitions_simple.txt](examples/08_functions/function_definitions_simple.txt) for working function examples that pass fuzz validation.**
+**See [examples/08_functions/function_definitions_simple.txt](../../examples/08_functions/function_definitions_simple.txt) for working function examples that pass fuzz validation.**
 
 **Note:** Additional advanced examples are available in function_definitions.txt and function_operators.txt, but may require further refinement for full fuzz compatibility.
 
@@ -1985,7 +1983,7 @@ end
 ## Sequences
 
 <!-- markdownlint-disable-next-line MD036 -->
-*Lecture 9: Sequences*
+*Sequences*
 
 ### Sequence Types
 
@@ -2093,7 +2091,7 @@ The filter operator restricts a sequence to only include elements from a given s
 **Example:**
 
 ```text
-records filter {x : Entry | x.viewed = yes}    [filter sequence to viewed entries]
+records filter {x : Entry | x.plays = target}    [filter sequence to entries with that play count]
 ```
 
 **Note:** The filter operator is distinct from `|>` (range restriction for relations).
@@ -2970,7 +2968,7 @@ than shipping a mislabeled waiver.
 | `axdef` | Yes | `axdefnofuzz` |
 | `schema` | Yes | `schemanofuzz` |
 | Given set / free type / abbreviation | Yes | `zednofuzz` |
-| `gendef` | Not yet | Errors: `gendefnofuzz not yet implemented — mark support pending (NOFUZZ cannot be applied to a gendef block)` |
+| `gendef` | Not yet ([#100](https://github.com/jmf-pobox/txt2tex/issues/100)) | Errors: `gendefnofuzz not yet implemented — mark support pending (NOFUZZ cannot be applied to a gendef block)` |
 
 ### Limitations
 
@@ -3337,10 +3335,10 @@ The base may be any relation expression.  Compound bases are automatically
 parenthesised:
 
 ```text
-pi[tournament](sigma[venue = 'Wimbledon'](Match))[id/tournament]
+pi[artist](sigma[genre = 'Jazz'](Album))[id/artist]
 ```
 
-Renders: $(\mathrm{Project}_{tournament}(\mathrm{Restrict}_{venue = `Wimbledon'}(Match)))[id/tournament]$
+Renders: $(\mathrm{Project}_{artist}(\mathrm{Restrict}_{genre = `Jazz'}(Album)))[id/artist]$
 
 Multiple pairs are comma-separated; each pair writes NEW first then `/` then OLD:
 
@@ -3355,7 +3353,7 @@ wrap the rename inside a projection to force relational context:
 
 ```text
 // Force relational context with pi (project all attributes):
-B == pi[ship, class, launched](Ship[ship/name])
+B == pi[title, genre, year](Album[title/name])
 ```
 
 **Fuzz note.** `R[NEW/OLD]` on a relation is not valid inside Z paragraphs
@@ -3374,7 +3372,7 @@ Track join Album
 Renders: $\mathrm{Join}(Track, Album)$
 
 The source keyword is `join`; the LaTeX emission is `\mathrm{Join}(R, S)`,
-matching the instructor's canonical vocabulary (per slides/topic02.pdf §45).
+matching the conventional database-textbook (Date) vocabulary.
 
 **Theta-join** with explicit predicate:
 
@@ -3639,7 +3637,7 @@ Components are **comma-separated** (not semicolons).
 }
 ```
 
-The `;` in `s : Ship; c : Class` separates variable-type pairs with
+The `;` in `t : Track; a : Album` separates variable-type pairs with
 different domains (multi-typed comprehension).
 
 **LaTeX output:**
@@ -3872,16 +3870,17 @@ Semicolon-chained form — all four quantifier types (`forall`, `exists`,
 `exists1`, `mu`) honour the break equally:
 
 ```text
-forall s : Ship; o : Outcome; b : Battle |
-  (o.ship = s.name land o.battle = b.name) =>
-  (s.launched <= b.date)
+forall r : Artist; a : Album; t : Track |
+  (t.album = a.title land a.artist = r.name) =>
+  (r.founded <= a.year)
 ```
 
 Both forms emit `@ \\` followed by a newline and `\t1` indentation:
 
 ```latex
-\forall s : Ship; o : Outcome; b : Battle @ \\
-\t1 (o.ship = s.name \land o.battle = b.name) \implies ...
+\forall r : Artist; a : Album; t : Track @ \\
+\t1 (t.album = a.title \land a.artist = r.name) \implies \\
+\t1 (r.founded \leq a.year)
 ```
 
 The bullet (`.`) separator in constraint-plus-body quantifiers also supports
@@ -3920,9 +3919,17 @@ and `lor`.
 Example — long algebra expression broken at operator boundaries:
 
 ```text
-pi[winner, venue, tier](Tournament join
-  Match join
-  (pi[tournament](sigma[venue = 'Centre Court'](Match)))[id/tournament])
+pi[title, artist, year](Album join
+  Track join
+  (pi[artist](sigma[genre = 'Jazz'](Album)))[id/artist])
+```
+
+Renders:
+
+```latex
+\mathrm{Project}_{title, artist, year}(\mathrm{Join}(\mathrm{Join}(Album, \\
+\quad Track), \\
+\quad (\mathrm{Project}_{artist}(\mathrm{Restrict}_{genre = `Jazz'}(Album)))[id/artist]))
 ```
 
 Example — inside a schema `where` clause:
@@ -4019,7 +4026,7 @@ For more information:
 
 - See [../../README.md](../../README.md) for installation and setup
 - See [../DESIGN.md](../DESIGN.md) for architecture details
-- Check `examples/` directory for working examples (48 examples organized by topic)
+- Check `examples/` directory for working examples (159 `.txt` examples organized by topic, 61 of them in `examples/user_guide/`)
 - Review phase-specific test files in `tests/` for syntax examples
 
 ---

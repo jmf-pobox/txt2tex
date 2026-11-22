@@ -1,7 +1,7 @@
 # Tutorial 2: Predicate Logic
 
 <!-- markdownlint-disable-next-line MD036 -->
-**Lecture 2: Predicate Logic**
+**Tutorial 2: Predicate Logic**
 
 Extend propositional logic with quantifiers and predicates to reason about collections of objects.
 
