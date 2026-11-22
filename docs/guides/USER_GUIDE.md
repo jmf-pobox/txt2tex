@@ -4026,7 +4026,7 @@ For more information:
 
 - See [../../README.md](../../README.md) for installation and setup
 - See [../DESIGN.md](../DESIGN.md) for architecture details
-- Check `examples/` directory for working examples (160 `.txt` examples organized by topic, 61 of them in `examples/user_guide/`)
+- Check `examples/` directory for working examples (159 `.txt` examples organized by topic, 61 of them in `examples/user_guide/`)
 - Review phase-specific test files in `tests/` for syntax examples
 
 ---

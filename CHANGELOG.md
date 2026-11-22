@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
+- **README is for users; developer material moved to `CONTRIBUTING.md`.**
+  Setup, quality gates, tests, examples, release steps, deferred lint rules and
+  the agent team now live in `CONTRIBUTING.md`, which merges the former
+  `docs/development/{DEVELOPER,TOOL-PyPI,NAMING_STANDARDS,CODE_REVIEW,TEST_PLAN}.md`.
+  `IDE_SETUP.md` and `RESERVED_WORDS.md` moved to `docs/guides/`.
 - **Developer docs consolidated; open work tracked in GitHub Issues.**
   `docs/guides/MISSING_FEATURES.md` now lists only open gaps and limitations,
   each linked to its issue. The planning documents `docs/DESIGN-ROADMAP.md`,
