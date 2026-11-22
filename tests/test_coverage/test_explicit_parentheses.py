@@ -156,27 +156,27 @@ class TestExplicitParenthesesLaTeXGeneration:
         assert "(((A \\land B) \\land C) \\land D)" in latex
 
 
-class TestQuestionTenScenario:
-    """Test the specific scenario from Question 10(b) land 10(c)."""
+class TestGroupedConjunctionScenario:
+    """Test explicit grouping of a conjunction nested in a left conjunct."""
 
-    def test_question_10b_grouping(self) -> None:
-        """Test the unplayed function grouping from Question 10(b)."""
-        txt = "forall pl | (fst(x) = Played land unplayed(y) = z) land unplayed(w) = v"
+    def test_grouping_with_first_function(self) -> None:
+        """Test the grouping when the inner conjunction uses function f."""
+        txt = "forall pl | (fst(x) = A land f(y) = z) land f(w) = v"
         lexer = Lexer(txt)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=True)
         latex = generator.generate_document(ast)
-        assert "(fst(x) = Played \\land unplayed(y) = z) \\land" in latex
+        assert "(fst(x) = A \\land f(y) = z) \\land" in latex
 
-    def test_question_10c_grouping(self) -> None:
-        """Test the played function grouping from Question 10(c)."""
-        txt = "forall pl | (fst(x) = NotP land played(y) = z) land played(w) = v"
+    def test_grouping_with_second_function(self) -> None:
+        """Test the grouping when the inner conjunction uses function g."""
+        txt = "forall pl | (fst(x) = B land g(y) = z) land g(w) = v"
         lexer = Lexer(txt)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         ast = parser.parse()
         generator = LaTeXGenerator(use_fuzz=True)
         latex = generator.generate_document(ast)
-        assert "(fst(x) = NotP \\land played(y) = z) \\land" in latex
+        assert "(fst(x) = B \\land g(y) = z) \\land" in latex
