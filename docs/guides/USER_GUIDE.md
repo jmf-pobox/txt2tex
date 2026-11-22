@@ -4050,4 +4050,4 @@ For more information:
 ### Development Resources
 
 - **[Missing Features](MISSING_FEATURES.md)** - Features not yet implemented
-- **[IDE Setup](../development/IDE_SETUP.md)** - VSCode/Cursor configuration
+- **[IDE Setup](IDE_SETUP.md)** - VSCode/Cursor configuration
