@@ -16,7 +16,7 @@
 
 === Propositional Logic ===
 
-** Solution 1 **
+** Example 1 **
 
 (a) p land q => p
 
@@ -29,7 +29,7 @@ F | F | T
 
 (c) lnot (p land q) <=> (lnot p) lor (lnot q)
 
-** Solution 2 **
+** Example 2 **
 
 (a) (p lor q) land r <=> (p land r) lor (q land r)
 

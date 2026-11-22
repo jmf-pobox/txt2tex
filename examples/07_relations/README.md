@@ -1,6 +1,6 @@
-# Lecture 7: Relations
+# Relations
 
-This directory contains examples for Lecture 7, covering binary relations and their operations.
+This directory contains examples covering binary relations and their operations.
 
 ## Topics Covered
 
@@ -51,6 +51,6 @@ Browse the `.txt` files to see:
 ## See Also
 
 - **docs/guides/USER_GUIDE.md** - Section "Relations"
-- **docs/tutorials/07_functions.md** - Detailed tutorial for Lecture 7
+- **docs/tutorials/07_functions.md** - Detailed tutorial
 - **Previous**: 06_definitions/
 - **Next**: 08_functions/

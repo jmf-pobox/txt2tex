@@ -1,6 +1,6 @@
-# Lecture 8: Functions
+# Functions
 
-This directory contains examples for Lecture 8, covering functions and their types.
+This directory contains examples covering functions and their types.
 
 ## Topics Covered
 
@@ -55,6 +55,6 @@ Browse the `.txt` files to see:
 ## See Also
 
 - **docs/guides/USER_GUIDE.md** - Section "Functions"
-- **docs/tutorials/08_sequences.md** - Detailed tutorial for Lecture 8
+- **docs/tutorials/08_sequences.md** - Detailed tutorial
 - **Previous**: 07_relations/
 - **Next**: 09_sequences/

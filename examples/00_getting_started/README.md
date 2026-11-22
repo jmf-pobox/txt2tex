@@ -33,4 +33,4 @@ txt2tex examples/00_getting_started/hello_world.txt --tex-only
 After completing these examples, proceed to:
 
 - **01_propositional_logic/** - Boolean operators and truth tables
-- **docs/tutorials/01_propositional_logic.md** - Lecture 1 tutorial
+- **docs/tutorials/01_propositional_logic.md** - Propositional logic tutorial
